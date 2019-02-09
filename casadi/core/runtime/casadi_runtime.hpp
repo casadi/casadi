@@ -77,6 +77,10 @@ namespace casadi {
   template<typename T1>
   casadi_int casadi_iamax(casadi_int n, const T1* x, casadi_int inc_x);
 
+  /// CLEAR: x <- 0
+  template<typename T1>
+  void casadi_clear(T1* x, casadi_int n);
+
   /// FILL: x <- alpha
   template<typename T1>
   void casadi_fill(T1* x, casadi_int n, T1 alpha);
@@ -195,6 +199,11 @@ namespace casadi {
     casadi_fill(x, n, alpha);
   }
 
+  // Alias names
+  inline void casadi_clear_casadi_int(casadi_int* x, casadi_int n) {
+    casadi_clear(x, n);
+  }
+
   template<typename T1>
   void casadi_bound_consistency(casadi_int n, T1* x, T1* lam,
                                  const T1* lbx, const T1* ubx);
@@ -224,6 +233,7 @@ namespace casadi {
   #include "casadi_axpy.hpp"
   #include "casadi_dot.hpp"
   #include "casadi_kron.hpp"
+  #include "casadi_clear.hpp"
   #include "casadi_fill.hpp"
   #include "casadi_max_viol.hpp"
   #include "casadi_minmax.hpp"

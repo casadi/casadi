@@ -741,9 +741,9 @@ namespace casadi {
     m->merit_mem = w; w += merit_memsize_;
 
     // Residual
-    for (auto&& v : m->lifted_mem) casadi_fill(v.res, v.n, 0.);
+    for (auto&& v : m->lifted_mem) casadi_clear(v.res, v.n);
     if (!gauss_newton_) {
-      for (auto&& v : m->lifted_mem) casadi_fill(v.resL, v.n, 0.);
+      for (auto&& v : m->lifted_mem) casadi_clear(v.resL, v.n);
     }
   }
 
@@ -767,11 +767,11 @@ namespace casadi {
     }
 
     // Reset dual guess
-    casadi_fill(m->dlam, nx_+ng_, 0.);
+    casadi_clear(m->dlam, nx_+ng_);
     if (!gauss_newton_) {
       for (auto&& v : m->lifted_mem) {
-        casadi_fill(v.lam, v.n, 0.);
-        casadi_fill(v.dlam, v.n, 0.);
+        casadi_clear(v.lam, v.n);
+        casadi_clear(v.dlam, v.n);
       }
     }
 
@@ -991,11 +991,11 @@ namespace casadi {
 
     if (gauss_newton_) {
       // Gauss-Newton Hessian
-      casadi_fill(m->qpH, spH_.nnz(), 0.);
+      casadi_clear(m->qpH, spH_.nnz());
       casadi_mtimes(m->qpL, spL_, m->qpL, spL_, m->qpH, spH_, m->w, true);
 
       // Gradient of the objective in Gauss-Newton
-      casadi_fill(m->gfk, nx_, 0.);
+      casadi_clear(m->gfk, nx_);
       casadi_mv(m->qpL, spL_, m->b_gn, m->gfk, true);
     }
 

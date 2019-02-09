@@ -403,7 +403,7 @@ namespace casadi {
 
       // Intitial guess
       casadi_copy(d_nlp->lam, nx_ + ng_, m->dlam);
-      casadi_fill(m->dz, nx_, 0.);
+      casadi_clear(m->dz, nx_);
 
       // Increase counter
       m->iter_count++;

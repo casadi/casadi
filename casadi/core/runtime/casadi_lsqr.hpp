@@ -66,9 +66,9 @@ int casadi_lsqr_single_solve(const T1* A, T1* x, casadi_int tr, const casadi_int
     sn2 = 0;
 
     u = w;  w+= m; casadi_copy(x, m, u);
-    v = w;  w+= n; casadi_fill(v, n, 0.0);
-    xx = w; w+= n; casadi_fill(xx, n, 0.0);
-    ww = w; w+= n; casadi_fill(v, n, 0.0);
+    v = w;  w+= n; casadi_clear(v, n);
+    xx = w; w+= n; casadi_clear(xx, n);
+    ww = w; w+= n; casadi_clear(v, n);
     dk = w; w+= n;
 
     alpha = 0;

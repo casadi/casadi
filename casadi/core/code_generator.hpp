@@ -292,6 +292,7 @@ namespace casadi {
       AUX_NORM_2,
       AUX_NORM_INF,
       AUX_IAMAX,
+      AUX_CLEAR,
       AUX_FILL,
       AUX_MV,
       AUX_MV_DENSE,
@@ -375,6 +376,9 @@ namespace casadi {
 
     /** \brief Create a fill operation */
     std::string fill(const std::string& res, std::size_t n, const std::string& v);
+
+    /** \brief Create a fill operation */
+    std::string clear(const std::string& res, std::size_t n);
 
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,

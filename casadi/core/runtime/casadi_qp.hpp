@@ -349,7 +349,7 @@ void casadi_qp_kkt(casadi_qp_data<T1>* d) {
   h_row = (h_colind = p->sp_h+2) + p->nx + 1;
   kkt_row = (kkt_colind = p->sp_kkt+2) + p->nz + 1;
   // Reset w to zero
-  casadi_fill(d->w, p->nz, 0.);
+  casadi_clear(d->w, p->nz);
   // Loop over rows of the (transposed) KKT
   for (i=0; i<p->nz; ++i) {
     // Copy row of KKT to w
@@ -389,7 +389,7 @@ void casadi_qp_kkt_vector(casadi_qp_data<T1>* d, T1* kkt_i, casadi_int i) {
   at_row = (at_colind = p->sp_at+2) + p->na + 1;
   h_row = (h_colind = p->sp_h+2) + p->nx + 1;
   // Reset kkt_i to zero
-  casadi_fill(kkt_i, p->nz, 0.);
+  casadi_clear(kkt_i, p->nz);
   // Copy sparse entries
   if (i<p->nx) {
     for (k=h_colind[i]; k<h_colind[i+1]; ++k) kkt_i[h_row[k]] = d->nz_h[k];
@@ -663,7 +663,7 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d) {
   // If dlam[index]!=1, new columns must be linearly independent
   if (fabs(d->dlam[d->index]-1.) >= 1e-12) return 0;
   // Next, find a linear combination of the new rows
-  casadi_fill(d->dz, p->nz, 0.);
+  casadi_clear(d->dz, p->nz);
   d->dz[d->index] = 1;
   casadi_qr_solve(d->dz, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
     p->prinv, p->pc, d->w);
@@ -699,7 +699,7 @@ void casadi_qp_expand_step(casadi_qp_data<T1>* d) {
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
   // Calculate change in Lagrangian gradient
-  casadi_fill(d->dlam, p->nx, 0.);
+  casadi_clear(d->dlam, p->nx);
   casadi_mv(d->nz_h, p->sp_h, d->dz, d->dlam, 0); // gradient of the objective
   casadi_mv(d->nz_a, p->sp_a, d->dz + p->nx, d->dlam, 1); // gradient of the Lagrangian
   // Step in lam[:nx]
@@ -709,12 +709,12 @@ void casadi_qp_expand_step(casadi_qp_data<T1>* d) {
   // Step in lam[nx:]
   casadi_copy(d->dz+p->nx, p->na, d->dlam + p->nx);
   // Step in z[nx:]
-  casadi_fill(d->dz + p->nx, p->na, 0.);
+  casadi_clear(d->dz + p->nx, p->na);
   casadi_mv(d->nz_a, p->sp_a, d->dz, d->dz + p->nx, 0);
   // Avoid steps that are nonzero due to numerics
   for (i = 0; i < p->nz; ++i) if (fabs(d->dz[i]) < 1e-14) d->dz[i] = 0.;
   // Tangent of the dual infeasibility at tau=0
-  casadi_fill(d->tinfeas, p->nx, 0.);
+  casadi_clear(d->tinfeas, p->nx);
   casadi_mv(d->nz_h, p->sp_h, d->dz, d->tinfeas, 0);
   casadi_mv(d->nz_a, p->sp_a, d->dlam + p->nx, d->tinfeas, 1);
   casadi_axpy(p->nx, 1., d->dlam, d->tinfeas);
@@ -928,7 +928,7 @@ void casadi_qp_calc_sens(casadi_qp_data<T1>* d, casadi_int i) {
   // Local variables
   const casadi_qp_prob<T1>* p = d->prob;
   // Calculate sensitivities in decreasing dual infeasibility index i
-  casadi_fill(d->sens, p->nz, 0.);
+  casadi_clear(d->sens, p->nz);
   if (i >= 0) {
     d->sens[i] = d->infeas[i] > 0 ? -1. : 1.;
     casadi_mv(d->nz_a, p->sp_a, d->sens, d->sens + p->nx, 0);
@@ -946,7 +946,7 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   d->f = casadi_bilin(d->nz_h, p->sp_h, d->z, d->z)/2.
        + casadi_dot(p->nx, d->z, d->g);
   // Calculate z[nx:]
-  casadi_fill(d->z+p->nx, p->na, 0.);
+  casadi_clear(d->z+p->nx, p->na);
   casadi_mv(d->nz_a, p->sp_a, d->z, d->z+p->nx, 0);
   // Calculate gradient of the Lagrangian
   casadi_copy(d->g, p->nx, d->infeas);

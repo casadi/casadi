@@ -39,7 +39,7 @@ void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const 
 
     starts[k] = start;
 
-    casadi_fill(boor, 2*degree+1, 0.0);
+    casadi_clear(boor, 2*degree+1);
     if (x>=knots[0] && x<=knots[n_knots-1]) {
       if (x==knots[1]) {
         casadi_fill(boor, degree+1, 1.0);
@@ -57,7 +57,7 @@ void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const 
     boor_offset[k+1] = boor_offset[k] + degree+1;
   }
 
-  casadi_fill_casadi_int(index, n_dims, 0);
+  casadi_clear_casadi_int(index, n_dims);
 
   // Prepare cumulative product
   for (pivot=n_dims-1;pivot>=0;--pivot) {

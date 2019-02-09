@@ -228,7 +228,7 @@ void casadi_qr_colcomb(T1* v, const T1* nz_r, const casadi_int* sp_r,
     }
   }
   // Reset w
-  casadi_fill(v, ncol, 0.);
+  casadi_clear(v, ncol);
   v[pc[ind]] = 1.;
   // Copy ind-th column to v
   for (k=r_colind[ind]; k<r_colind[ind+1]-1; ++k) {

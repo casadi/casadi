@@ -268,7 +268,7 @@ namespace casadi {
           casadi_scal(numqnz, 0.5, val);
           h += numqnz;
         } else {
-          casadi_fill(val, numqnz, 0.);
+          casadi_clear(val, numqnz);
         }
 
         // Pass to model

@@ -313,7 +313,7 @@ int Sqpmethod::solve(void* mem) const {
     // For seeds
     const double one = 1.;
 
-    casadi_fill(d->dx, nx_, 0.);
+    casadi_clear(d->dx, nx_);
 
     // MAIN OPTIMIZATION LOOP
     while (true) {
@@ -420,7 +420,7 @@ int Sqpmethod::solve(void* mem) const {
 
       // Initial guess
       casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
-      casadi_fill(d->dx, nx_, 0.);
+      casadi_clear(d->dx, nx_);
 
       // Increase counter
       m->iter_count++;

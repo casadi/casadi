@@ -731,8 +731,8 @@ namespace casadi {
       add_auxiliary(AUX_INTERPN_WEIGHTS);
       add_auxiliary(AUX_INTERPN_INTERPOLATE);
       add_auxiliary(AUX_FLIP, {});
-      add_auxiliary(AUX_FILL);
-      add_auxiliary(AUX_FILL, {"casadi_int"});
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_CLEAR, {"casadi_int"});
       this->auxiliaries << sanitize_source(casadi_interpn_str, inst);
       break;
     case AUX_INTERPN_GRAD:
@@ -746,6 +746,8 @@ namespace casadi {
       add_auxiliary(AUX_DE_BOOR);
       add_auxiliary(AUX_FILL);
       add_auxiliary(AUX_FILL, {"casadi_int"});
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_CLEAR, {"casadi_int"});
       add_auxiliary(AUX_LOW);
       this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str, inst);
       break;
@@ -773,6 +775,9 @@ namespace casadi {
       add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_norm_inf_str, inst);
       break;
+    case AUX_CLEAR:
+      this->auxiliaries << sanitize_source(casadi_clear_str, inst);
+      break;
     case AUX_FILL:
       this->auxiliaries << sanitize_source(casadi_fill_str, inst);
       break;
@@ -789,7 +794,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_project_str, inst);
       break;
     case AUX_DENSIFY:
-      add_auxiliary(AUX_FILL);
+      add_auxiliary(AUX_CLEAR);
       add_auxiliary(AUX_CAST);
       {
         vector<string> inst2 = inst;
@@ -828,12 +833,12 @@ namespace casadi {
       add_auxiliary(AUX_IF_ELSE);
       add_auxiliary(AUX_SCAL);
       add_auxiliary(AUX_DOT);
-      add_auxiliary(AUX_FILL);
+      add_auxiliary(AUX_CLEAR);
       this->auxiliaries << sanitize_source(casadi_qr_str, inst);
       break;
     case AUX_LSQR:
       add_auxiliary(AUX_COPY);
-      add_auxiliary(AUX_FILL);
+      add_auxiliary(AUX_CLEAR);
       add_auxiliary(AUX_NORM_2);
       add_auxiliary(AUX_MV);
       add_auxiliary(AUX_FABS);
@@ -852,6 +857,7 @@ namespace casadi {
       add_auxiliary(AUX_BILIN);
       add_auxiliary(AUX_INF);
       add_auxiliary(AUX_REAL_MIN);
+      add_auxiliary(AUX_CLEAR);
       add_include("stdarg.h");
       add_include("stdio.h");
       add_include("math.h");
@@ -1098,6 +1104,14 @@ namespace casadi {
     if (check_rhs) *this << "if (" << res << ") ";
     *this << fill(res, n, def) << "\n";
     *this << "}\n";
+  }
+
+  string CodeGenerator::clear(const string& res, std::size_t n) {
+    stringstream s;
+    // Perform operation
+    add_auxiliary(AUX_CLEAR);
+    s << "casadi_clear(" << res << ", " << n << ");";
+    return s.str();
   }
 
   string CodeGenerator::fill(const string& res,

@@ -2241,7 +2241,7 @@ namespace casadi {
       if (res[oind]==nullptr || nnz_out(oind)==0) continue;
 
       // Clear result
-      casadi_fill(res[oind], nnz_out(oind), bvec_t(0));
+      casadi_clear(res[oind], nnz_out(oind));
 
       // Loop over inputs
       for (casadi_int iind=0; iind<n_in_; ++iind) {
@@ -2292,7 +2292,7 @@ namespace casadi {
       }
 
       // Clear seeds
-      casadi_fill(res[oind], nnz_out(oind), bvec_t(0));
+      casadi_clear(res[oind], nnz_out(oind));
     }
     return 0;
   }

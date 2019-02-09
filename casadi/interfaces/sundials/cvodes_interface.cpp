@@ -535,7 +535,7 @@ namespace casadi {
         // Second order correction
         if (s.second_order_correction_) {
           // The outputs will double as seeds for jtimesF
-          casadi_fill(v + s.nx1_, s.nx_ - s.nx1_, 0.);
+          casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
           m->arg[0] = &t; // t
           m->arg[1] = NV_DATA_S(x); // x
           m->arg[2] = m->p; // p
@@ -586,7 +586,7 @@ namespace casadi {
         // Second order correction
         if (s.second_order_correction_) {
           // The outputs will double as seeds for jtimesF
-          casadi_fill(v + s.nrx1_, s.nrx_ - s.nrx1_, 0.);
+          casadi_clear(v + s.nrx1_, s.nrx_ - s.nrx1_);
           m->arg[0] = &t; // t
           m->arg[1] = NV_DATA_S(x); // x
           m->arg[2] = m->p; // p

@@ -350,9 +350,9 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bl[i])) m->bl[i] = -inf_;
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bu[i])) m->bu[i] = inf_;
     // Initialize states and slack
-    casadi_fill(get_ptr(m->hs), ng_ + nx_, 0);
+    casadi_clear(get_ptr(m->hs), ng_ + nx_);
     casadi_copy(d_nlp->z, nx_, get_ptr(m->xx));
-    casadi_fill(get_ptr(m->xx) + nx_, ng_, 0.);
+    casadi_clear(get_ptr(m->xx) + nx_, ng_);
 
     // Initialize multipliers
     casadi_copy(d_nlp->lam + nx_, ng_, get_ptr(m->pi));
@@ -444,7 +444,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
       casadi_assert(nnJac_ == nnJac, "Jac " + str(nnJac_) + " <-> " + str(nnJac));
 
       // Get reduced decision variables
-      casadi_fill(m->xk2, nx_, 0.);
+      casadi_clear(m->xk2, nx_);
       for (casadi_int k = 0; k < nnObj; ++k) m->xk2[k] = x[k];
 
       // Evaluate gradF with the linear variables put to zero
@@ -468,7 +468,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
 
       {
         // Get reduced decision variables
-        casadi_fill(m->xk2, nx_, 0.);
+        casadi_clear(m->xk2, nx_);
         for (casadi_int k = 0; k < nnJac; ++k) {
           m->xk2[k] = x[k];
         }

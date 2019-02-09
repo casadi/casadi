@@ -1279,7 +1279,7 @@ namespace casadi {
     casadi_copy(z, nz_, get_ptr(m->z));
 
     // Reset summation states
-    casadi_fill(get_ptr(m->q), nq_, 0.);
+    casadi_clear(get_ptr(m->q), nq_);
 
     // Bring discrete time to the beginning
     m->k = 0;
@@ -1308,7 +1308,7 @@ namespace casadi {
     casadi_copy(rz, nrz_, get_ptr(m->rz));
 
     // Reset summation states
-    casadi_fill(get_ptr(m->rq), nrq_, 0.);
+    casadi_clear(get_ptr(m->rq), nrq_);
 
     // Bring discrete time to the end
     m->k = nk_;

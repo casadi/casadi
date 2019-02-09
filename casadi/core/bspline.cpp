@@ -262,7 +262,7 @@ namespace casadi {
   int BSpline::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (!res[0]) return 0;
 
-    casadi_fill(res[0], m_, 0.0);
+    casadi_clear(res[0], m_);
     casadi_nd_boor_eval(res[0], degree_.size(), get_ptr(knots_), get_ptr(offset_),
       get_ptr(degree_), get_ptr(strides_), get_ptr(coeffs_), m_, arg[0], get_ptr(lookup_mode_),
       iw, w);
@@ -272,7 +272,7 @@ namespace casadi {
   int BSplineParametric::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (!res[0]) return 0;
 
-    casadi_fill(res[0], m_, 0.0);
+    casadi_clear(res[0], m_);
     casadi_nd_boor_eval(res[0], degree_.size(), get_ptr(knots_), get_ptr(offset_),
       get_ptr(degree_), get_ptr(strides_), arg[1], m_, arg[0], get_ptr(lookup_mode_),
       iw, w);

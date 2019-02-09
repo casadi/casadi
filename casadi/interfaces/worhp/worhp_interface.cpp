@@ -486,7 +486,7 @@ namespace casadi {
         calc_function(m, "nlp_hess_l");
         // Diagonal values
         double *dval = m->w;
-        casadi_fill(dval, nx_, 0.);
+        casadi_clear(dval, nx_);
 
         // Remove diagonal
         const casadi_int* colind = hesslag_sp_.colind();
