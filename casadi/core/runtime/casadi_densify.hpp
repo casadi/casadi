@@ -22,8 +22,9 @@ void casadi_densify(const T1* x, const casadi_int* sp_x, T2* y, casadi_int tr) {
   } else {
     for (i=0; i<ncol_x; ++i) {
       for (el=colind_x[i]; el!=colind_x[i+1]; ++el) {
-        y[row_x[el] + i*nrow_x] = CASADI_CAST(T2, *x++);
+        y[row_x[el]] = CASADI_CAST(T2, *x++);
       }
+      y += nrow_x;
     }
   }
 }

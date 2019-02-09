@@ -537,6 +537,10 @@ namespace casadi {
       return shared_from_this<MX>();
     } else if (sp.nnz()==0) {
       return MX::zeros(sp);
+    } else if (sp.is_dense()) {
+      return MX::create(new Densify(shared_from_this<MX>(), sp));
+    } else if (sparsity().is_dense()) {
+      return MX::create(new Sparsify(shared_from_this<MX>(), sp));
     } else {
       return MX::create(new Project(shared_from_this<MX>(), sp));
     }

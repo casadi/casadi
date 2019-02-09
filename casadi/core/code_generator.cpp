@@ -797,6 +797,14 @@ namespace casadi {
         this->auxiliaries << sanitize_source(casadi_densify_str, inst2);
       }
       break;
+    case AUX_SPARSIFY:
+      add_auxiliary(AUX_CAST);
+      {
+        vector<string> inst2 = inst;
+        if (inst.size()==1) inst2.push_back(inst[0]);
+        this->auxiliaries << sanitize_source(casadi_sparsify_str, inst2);
+      }
+      break;
     case AUX_TRANS:
       this->auxiliaries << sanitize_source(casadi_trans_str, inst);
       break;
@@ -1184,6 +1192,28 @@ namespace casadi {
     stringstream s;
     s << "casadi_project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
       << sparsity(sp_res) << ", " << w << ");";
+    return s.str();
+  }
+
+  string
+  CodeGenerator::densify(const std::string& arg, const Sparsity& sp_arg,
+                        const std::string& res, bool tr) {
+    // Create call
+    add_auxiliary(AUX_DENSIFY);
+    stringstream s;
+    s << "casadi_densify(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
+      << (tr ? 1 : 0) << ");";
+    return s.str();
+  }
+
+  string
+  CodeGenerator::sparsify(const std::string& arg, const std::string& res,
+                          const Sparsity& sp_res, bool tr) {
+    // Create call
+    add_auxiliary(AUX_SPARSIFY);
+    stringstream s;
+    s << "casadi_sparsify(" << arg << ", " << res << ", "
+      << sparsity(sp_res) << ", " << (tr ? 1 : 0) << ");";
     return s.str();
   }
 

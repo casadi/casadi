@@ -16,8 +16,9 @@ void casadi_sparsify(const T1* x, T2* y, const casadi_int* sp_y, casadi_int tr) 
   } else {
     for (i=0; i<ncol_y; ++i) {
       for (el=colind_y[i]; el!=colind_y[i+1]; ++el) {
-        *y++ = CASADI_CAST(T2, x[row_y[el] + i*nrow_y]);
+        *y++ = CASADI_CAST(T2, x[row_y[el]]);
       }
+      x += nrow_y;
     }
   }
 }
