@@ -92,7 +92,6 @@ class NLPtests(casadiTestCase):
         print(solver(**solver_in))
       except:
         pass
-      print solver.stats()
       if Solver not in ["ipopt","snopt","blocksqp","bonmin"]:      
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
