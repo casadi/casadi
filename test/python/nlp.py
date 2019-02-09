@@ -44,18 +44,18 @@ if has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":0}},set()))
 
 if has_nlpsol("snopt"):
-  solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}},set()))
+  solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12,"Minor_print_level":0,"Major_print_level":0}},set()))
 
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
-  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.tiny_step_tol": 1e-20, "ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":5,"print_time":False} }
-  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options},set()))
-  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10},set()))
+  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.tiny_step_tol": 1e-20, "ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":0,"print_time":False,"print_time":False} }
+  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},set()))
+  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10,"print_header":False,"print_iteration":False,"print_time":False},set()))
 
 if has_conic("qrqp") and has_nlpsol("sqpmethod"):
   qpsol_options = {"print_iter":False,"print_header":False,"error_on_fail" : False}
-  solvers.append(("sqpmethod",{"qpsol": "qrqp","qpsol_options": qpsol_options},{"codegen"}))
-  solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0,"qpsol_options": qpsol_options},{"codegen"}))
-  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True,"max_iter":500,"qpsol_options": qpsol_options},{"codegen"}))
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen"}))
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen"}))
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True,"max_iter":500,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen"}))
 
 if has_nlpsol("blocksqp"):
   try:

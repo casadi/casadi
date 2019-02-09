@@ -34,7 +34,8 @@ if has_nlpsol("ipopt"):
                    "jac_c_constant":"yes",
                    "jac_d_constant":"yes",
                    "hessian_constant":"yes",
-                   "tol":1e-12}
+                   "tol":1e-12,
+                   "print_level":0}
   conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False}))
 
 if has_nlpsol("worhp"):
@@ -47,7 +48,7 @@ if has_conic("ooqp"):
 
 
 if has_conic("qpoases"):
-  conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False, "codegen": False}))
+  conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False}))
 
 
 if has_conic("cplex"):
@@ -66,7 +67,7 @@ if has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False}))
 
 if has_conic("qrqp"):
-  conics.append(("qrqp",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False, "codegen": True}))
+  conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True}))
 
 
 print(conics)
