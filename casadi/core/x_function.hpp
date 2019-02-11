@@ -137,8 +137,11 @@ namespace casadi {
                           const Dict& opts) const override;
     ///@}
 
+    ///@{
     /** \brief Get Jacobian sparsity */
+    bool has_jacobian_sparsity() const override { return true;}
     Sparsity get_jacobian_sparsity() const override;
+    ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
     Function slice(const std::string& name, const std::vector<casadi_int>& order_in,

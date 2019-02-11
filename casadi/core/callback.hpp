@@ -152,6 +152,13 @@ namespace casadi {
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
     ///@}
+
+    ///@{
+    /** \brief Return sparsity of Jacobian of all input elements
+     * with respect to all output elements */
+    virtual bool has_jacobian_sparsity() const { return false; }
+    virtual Sparsity get_jacobian_sparsity() const { return Sparsity(); }
+    ///@}
   };
 
 } // namespace casadi
