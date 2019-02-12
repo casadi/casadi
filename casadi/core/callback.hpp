@@ -85,6 +85,10 @@ namespace casadi {
     /** \brief Evaluate numerically, temporary matrices and work vectors */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
+#ifndef SWIG
+    virtual int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+#endif
+
    /** \brief Get the number of inputs
      * This function is called during construction.
      */
