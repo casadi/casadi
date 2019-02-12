@@ -56,10 +56,6 @@ namespace casadi {
     return (*this)->FunctionInternal::eval_dm(arg);
   }
 
-  int Callback::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    return (*this)->FunctionInternal::eval(arg, res, iw, w, mem);
-  }
-
   casadi_int Callback::get_n_in() {
     return (*this)->FunctionInternal::get_n_in();
   }
