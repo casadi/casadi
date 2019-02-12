@@ -2277,6 +2277,15 @@ class Functiontests(casadiTestCase):
     with self.assertOutput("2 forward sweeps needed","1 reverse sweeps needed"):
       jacobian(f(sin(x)),x)
 
+  def test_map_exception(self):
+    x = MX.sym("x",4)
+    y = MX.sym("y",4)
+    f = Function("f",[x],[x+y]);
+
+    with self.assertInException("Evaluation failed"):
+      F = f.map(4,"thread",2)
+      F(3)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -315,7 +315,16 @@ namespace casadi {
       }
 
       // Evaluation
-      flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]) || flag;
+      try {
+        flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]) || flag;
+      } catch (std::exception& e) {
+        flag = 1;
+        casadi_warning("Exception raised: " + std::string(e.what()));
+      } catch (...) {
+        flag = 1;
+        casadi_warning("Uncaught exception.");
+      }
+
     }
 
     // Return error flag
@@ -395,7 +404,15 @@ namespace casadi {
       res1[j] = res[j] ? res[j] + i*f.nnz_out(j) : nullptr;
     }
 
-    ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);
+    try {
+      ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);
+    } catch (std::exception& e) {
+      ret = 1;
+      casadi_warning("Exception raised: " + std::string(e.what()));
+    } catch (...) {
+      ret = 1;
+      casadi_warning("Uncaught exception.");
+    }
   }
 
   int ThreadMap::eval(const double** arg, double** res, casadi_int* iw, double* w,
