@@ -266,7 +266,10 @@ namespace casadi {
   }
 
   Function Function::expand(const string& name, const Dict& opts) const {
-    casadi_assert(!has_free(), "Function with free symbols cannot be expanded.");
+    casadi_assert(!has_free(),
+      "Function with free symbols cannot be expanded. "
+      "List of free variables in your Function: " +
+        join(get_free(), ","));
     vector<SX> ex_in = sx_in();
     vector<SX> ex_out = Function(*this)(ex_in);
     return Function(name, ex_in, ex_out, name_in(), name_out(), opts);
