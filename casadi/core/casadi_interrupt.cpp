@@ -30,4 +30,7 @@ namespace casadi {
   bool (*InterruptHandler::checkInterrupted)() =
     InterruptHandler::checkInterruptedDefault;
 
+  void (*InterruptHandler::clearInterrupted)() =
+    InterruptHandler::clearInterruptedDefault;
+
 } // namespace casadi

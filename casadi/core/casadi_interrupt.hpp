@@ -54,13 +54,23 @@ namespace casadi {
       return false;
     }
 
+    /// By default, do nothing
+    static void clearInterruptedDefault() {
+    }
+
+
   public:
     /// The routine that is used for checking interrupts
     static bool (*checkInterrupted)();
+    /// The routine that is used for clearing interrupts
+    static void (*clearInterrupted)();
 
     /// Raises an error if an interrupt was captured.
     static void check() {
-      if (checkInterrupted()) throw KeyboardInterruptException();
+      if (checkInterrupted()) {
+        clearInterrupted();
+        throw KeyboardInterruptException();
+      }
     }
   };
 

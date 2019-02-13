@@ -131,6 +131,9 @@
     static bool mexcheckinterrupted() {
       return false;
     }
+    void mexclearinterrupted() {
+      
+    }
 #else
     // Undocumented matlab feature
     extern "C" bool utIsInterruptPending();
@@ -138,6 +141,11 @@
     static bool mexcheckinterrupted() {
       return utIsInterruptPending();
     }
+
+    void mexclearinterrupted() {
+      utSetInterruptPending(false);
+    }
+
 #endif
   }
 %}
@@ -184,6 +192,7 @@
 
   // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = casadi::mexcheckinterrupted;
+  casadi::InterruptHandler::clearInterrupted = casadi::mexclearinterrupted;
 %}
 #endif
 
