@@ -647,7 +647,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     }
     g.local("one", "const casadi_real");
     g.init_local("one", "1");
-    g << g.fill("d.dx", nx_, "0.0") << "\n";
+    g << g.clear("d.dx", nx_) << "\n";
     g.comment("MAIN OPTIMIZATION LOOP");
     g << "while (1) {\n";
     g.comment("Evaluate f, g and first order derivative information");
@@ -698,7 +698,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.ubdz") << "\n";
     g.comment("Initial guess");
     g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
-    g << g.fill("d.dx", nx_, "0.0") << "\n";
+    g << g.clear("d.dx", nx_) << "\n";
     g.comment("Increase counter");
     g << "iter_count++;\n";
     g.comment("Solve the QP");

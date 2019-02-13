@@ -572,7 +572,11 @@ namespace casadi {
     } else if (nnz()==1) {
       g << g.workel(res[0]) << " = " << g.constant(to_double()) << ";\n";
     } else {
-      g << g.fill(g.work(res[0], nnz()), nnz(), g.constant(to_double())) << '\n';
+      if (to_double()==0) {
+        g << g.clear(g.work(res[0], nnz()), nnz()) << '\n';
+      } else {
+        g << g.fill(g.work(res[0], nnz()), nnz(), g.constant(to_double())) << '\n';
+      }
     }
   }
 

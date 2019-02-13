@@ -178,10 +178,11 @@ namespace casadi {
   void HorzRepsum::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res) const {
+    g.add_auxiliary(CodeGenerator::AUX_CLEAR);
     casadi_int nnz = sparsity().nnz();
     g.local("i", "casadi_int");
     g.local("j", "casadi_int");
-    g << g.fill(g.work(res[0], nnz), nnz, "0") << "\n"
+    g << g.clear(g.work(res[0], nnz), nnz) << "\n"
       << "  for (i=0;i<" << n_ << ";++i) {\n"
       << "    for (j=0;j<" << nnz << ";++j) {\n"
       << "      " << g.work(res[0], nnz)<< "[j] += "

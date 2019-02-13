@@ -286,7 +286,7 @@ namespace casadi {
 
     g.add_auxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
     g.add_auxiliary(CodeGenerator::AUX_FILL);
-    g << g.fill(g.work(res[0], m_), m_, "0.0") << "\n";
+    g << g.clear(g.work(res[0], m_), m_) << "\n";
 
     // Input and output buffers
     g << "CASADI_PREFIX(nd_boor_eval)(" << g.work(res[0], m_) << "," << n_dims << ","
