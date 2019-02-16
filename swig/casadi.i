@@ -2908,6 +2908,9 @@ namespace casadi{
  DECL M casadi_reshape(const M& a, const Sparsity& sp) {
  return reshape(a, sp);
  }
+ DECL M casadi_sparsity_cast(const M& a, const Sparsity& sp) {
+ return sparsity_cast(a, sp);
+ }
  DECL casadi_int casadi_sprank(const M& A) {
  return sprank(A);
  }
