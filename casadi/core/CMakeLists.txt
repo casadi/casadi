@@ -130,6 +130,7 @@ set(CASADI_INTERNAL
   concat.hpp              concat.cpp              # Concatenation
   split.hpp               split.cpp               # Split (inverse of concatenation)
   reshape.hpp             reshape.cpp             # Reshape
+  sparsity_cast.hpp       sparsity_cast.cpp       # Sparsity cast
   subref.hpp              subref.cpp              # Submatrix reference
   subassign.hpp           subassign.cpp           # Submatrix assignment
   getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
