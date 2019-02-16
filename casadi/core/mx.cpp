@@ -1204,11 +1204,25 @@ namespace casadi {
   }
 
   MX MX::reshape(const MX& x, const Sparsity& sp) {
+    casadi_assert(sp.is_reshape(x.sparsity()), "Reshape mismatch");
+
     // Quick return if trivial
     if (sp==x.sparsity()) return x;
 
     // Call internal method
     return x->get_reshape(sp);
+  }
+
+  MX MX::sparsity_cast(const MX& x, const Sparsity& sp) {
+    casadi_assert(x.nnz()==sp.nnz(),
+      "Mismatching nonzero count: " + str(x.nnz()) + " versus " +
+      str(sp.nnz()) + ".");
+
+    // Quick return if trivial
+    if (sp==x.sparsity()) return x;
+
+    // Call internal method
+    return x->get_sparsity_cast(sp);
   }
 
   MX MX::if_else(const MX &cond, const MX &x_true, const MX &x_false, bool short_circuit) {

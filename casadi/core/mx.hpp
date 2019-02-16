@@ -547,6 +547,7 @@ namespace casadi {
     static MX mac(const MX& x, const MX& y, const MX& z);
     static MX reshape(const MX& x, casadi_int nrow, casadi_int ncol);
     static MX reshape(const MX& x, const Sparsity& sp);
+    static MX sparsity_cast(const MX& x, const Sparsity& sp);
     static MX kron(const MX& x, const MX& b);
     static MX repmat(const MX& x, casadi_int n, casadi_int m=1);
     ///@}
