@@ -77,6 +77,12 @@ private:
   CASADI_EXPORT std::vector<casadi_int> range(casadi_int start, casadi_int stop, casadi_int step=1,
                                             casadi_int len=std::numeric_limits<casadi_int>::max());
 
+  /** \brief Check if a vector matches a range
+   * 
+   */
+  CASADI_EXPORT bool is_range(const std::vector<casadi_int>& v,
+    casadi_int start, casadi_int stop, casadi_int step=1);
+
   CASADI_EXPORT std::string join(const std::vector<std::string>& l, const std::string& delim=",");
 
   /// Checsks if s starts with p

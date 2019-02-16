@@ -89,6 +89,19 @@ namespace casadi {
     return false;
   }
 
+  bool is_range(const std::vector<casadi_int>& v,
+    casadi_int start, casadi_int stop, casadi_int step) {
+    casadi_int nret = (stop-start)/step + ((stop-start)%step!=0);
+    if (v.size()!=nret) return false;
+    casadi_int ind = start;
+    for (casadi_int e : v) {
+      if (e!=ind) return false;
+      ind += step;
+    }
+    return true;
+  }
+
+
   std::vector<casadi_int> range(casadi_int start, casadi_int stop,
       casadi_int step, casadi_int len) {
     start = std::min(start, len);
