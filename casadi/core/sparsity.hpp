@@ -517,6 +517,9 @@ namespace casadi {
     Sparsity operator*(const Sparsity& b) const;
     /// @}
 
+    /// Is subset?
+    bool is_subset(const Sparsity& rhs) const;
+
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity pattern_inverse() const;
 

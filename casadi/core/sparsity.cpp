@@ -403,6 +403,10 @@ namespace casadi {
     return (*this)->combine(y, true, true);
   }
 
+  bool Sparsity::is_subset(const Sparsity& rhs) const {
+    return (*this)->is_subset(rhs);
+  }
+
   Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y) {
     // Check matching dimensions
     casadi_assert(x.size2()==y.size1(),

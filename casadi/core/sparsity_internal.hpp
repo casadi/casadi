@@ -493,6 +493,9 @@ namespace casadi {
     Sparsity combineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     ///@}
 
+    /// Is subset?
+    bool is_subset(const Sparsity& rhs) const;
+
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity pattern_inverse() const;
 
