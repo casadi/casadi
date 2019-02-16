@@ -412,6 +412,32 @@ class MXtests(casadiTestCase):
     for i in range(len(L)):
       self.assertAlmostEqual(L[i], zt[0,i],10)
 
+  def test_sparsity_cast(self):
+    sp_source = sparsify(IM([[1, 0, 1],[0, 0, 1],[1, 0,0]])).sparsity()
+    x   = MX.sym("x",sp_source)
+    xsx = SX.sym("x",sp_source)
+
+
+
+    sp = sparsify(IM([[1, 0, 1],[1, 0,1]])).sparsity()
+
+    with self.assertInException("mismatch"):
+      reshape(x,sp)
+
+    with self.assertInException("Mismatching"):
+      sparsity_cast(x,horzcat(sp,sp))
+
+    y = sparsity_cast(x,sp)
+    ysx = sparsity_cast(xsx,sp)
+
+    fsx = Function("fsx",[xsx],[ysx])
+    f = Function("f",[x],[y])
+
+    inp = DM([[1, 0, 2],[0, 0, 3],[4, 0, 0]])
+    self.checkfunction(f,fsx,inputs=[inp])
+    y = fsx(inp)
+    self.checkarray(y,DM([[1, 0, 2],[4, 0, 3]]))
+
   def test_MXcompose(self):
     self.message("compositions of vec, trans, reshape with vertcat")
     checkMXoperations(self,lambda x: x,lambda x: x,'vertcat')

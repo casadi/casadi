@@ -411,6 +411,7 @@ namespace casadi {
                 const std::vector<casadi_int>& offset2);
     static Matrix<Scalar> reshape(const Matrix<Scalar> &x, casadi_int nrow, casadi_int ncol);
     static Matrix<Scalar> reshape(const Matrix<Scalar> &x, const Sparsity& sp);
+    static Matrix<Scalar> sparsity_cast(const Matrix<Scalar> &x, const Sparsity& sp);
     static Matrix<Scalar> kron(const Matrix<Scalar> &x, const Matrix<Scalar>& y);
     static Matrix<Scalar> mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mac(const Matrix<Scalar> &x,

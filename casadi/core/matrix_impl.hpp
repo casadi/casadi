@@ -1807,6 +1807,16 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::sparsity_cast(const Matrix<Scalar>& x, const Sparsity& sp) {
+    // quick return if already the right shape
+    if (sp==x.sparsity()) return x;
+
+    casadi_assert_dev(sp.nnz()==x.nnz());
+
+    return Matrix<Scalar>(sp, x.nonzeros(), false);
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::trace(const Matrix<Scalar>& x) {
     casadi_assert(x.is_square(), "trace: must be square");
     Scalar res=0;

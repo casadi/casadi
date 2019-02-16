@@ -619,6 +619,20 @@ namespace casadi {
     /// Is subset?
     bool is_subset(const Sparsity& rhs) const;
 
+    /** \brief Propagates subset according to sparsity cast
+     * 
+     * Assumption: 'this' is a subset of X.
+     * 
+     * Example:
+     * 
+     * X = [ * . . .; . * . .; . . * .; . . . *]
+     * Y = [* *; . . ; * *]
+     * x = [ * . . .; . . . .; . . * .; . . . *]
+     * returns [* *; . . ; . *]
+     * 
+     */
+    Sparsity sparsity_cast_mod(const Sparsity& X, const Sparsity& Y) const;
+
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity pattern_inverse() const;
 
@@ -666,6 +680,7 @@ namespace casadi {
     static Sparsity mac(const Sparsity& x, const Sparsity& y, const Sparsity& z) { return z;}
     static Sparsity reshape(const Sparsity& x, casadi_int nrow, casadi_int ncol);
     static Sparsity reshape(const Sparsity& x, const Sparsity& sp);
+    static Sparsity sparsity_cast(const Sparsity& x, const Sparsity& sp);
     static casadi_int sprank(const Sparsity& x);
     static casadi_int norm_0_mul(const Sparsity& x, const Sparsity& A);
     static Sparsity kron(const Sparsity& a, const Sparsity& b);
