@@ -330,6 +330,12 @@ namespace casadi {
       return MatType::reshape(x, sp);
     }
 
+    /** \brief Cast matrix nonzeros to different Sparsity
+    */
+    inline friend MatType sparsity_cast(const MatType& x, const Sparsity& sp) {
+      return MatType::sparsity_cast(x, sp);
+    }
+
     /** \brief Obtain the structural rank of a sparsity-pattern
     */
     inline friend casadi_int sprank(const MatType& x) {

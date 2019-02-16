@@ -27,6 +27,7 @@
 #include "casadi_misc.hpp"
 #include "transpose.hpp"
 #include "reshape.hpp"
+#include "sparsity_cast.hpp"
 #include "multiplication.hpp"
 #include "bilin.hpp"
 #include "rank1.hpp"
@@ -409,6 +410,15 @@ namespace casadi {
       return shared_from_this<MX>();
     } else {
       return MX::create(new Reshape(shared_from_this<MX>(), sp));
+    }
+  }
+
+  MX MXNode::get_sparsity_cast(const Sparsity& sp) const {
+    casadi_assert_dev(sp.nnz()==nnz());
+    if (sp==sparsity()) {
+      return shared_from_this<MX>();
+    } else {
+      return MX::create(new SparsityCast(shared_from_this<MX>(), sp));
     }
   }
 
@@ -1157,6 +1167,7 @@ namespace casadi {
     {OP_VERTSPLIT, Vertsplit::deserialize},
     {OP_DIAGSPLIT, Diagsplit::deserialize},
     {OP_RESHAPE, Reshape::deserialize},
+    {OP_SPARSITY_CAST, SparsityCast::deserialize},
     // OP_SUBREF
     // OP_SUBASSIGN,
     {OP_GETNONZEROS, GetNonzeros::deserialize},

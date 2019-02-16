@@ -141,6 +141,9 @@ namespace casadi {
     // Reshape an expression
     OP_RESHAPE,
 
+    // Sparsity cast
+    OP_SPARSITY_CAST,
+
     // Submatrix reference
     OP_SUBREF,
 
@@ -1019,6 +1022,7 @@ namespace casadi {
     case OP_VERTSPLIT:     return F<OP_VERTSPLIT>::check;
     case OP_DIAGSPLIT:     return F<OP_DIAGSPLIT>::check;
     case OP_RESHAPE:       return F<OP_RESHAPE>::check;
+    case OP_SPARSITY_CAST: return F<OP_SPARSITY_CAST>::check;
     case OP_SUBREF:        return F<OP_SUBREF>::check;
     case OP_SUBASSIGN:     return F<OP_SUBASSIGN>::check;
     case OP_GETNONZEROS:   return F<OP_GETNONZEROS>::check;
@@ -1547,6 +1551,7 @@ namespace casadi {
     case OP_VERTSPLIT:      return "vertsplit";
     case OP_DIAGSPLIT:      return "diagsplit";
     case OP_RESHAPE:        return "reshape";
+    case OP_SPARSITY_CAST:  return "sparsity_cast";
     case OP_SUBREF:         return "subref";
     case OP_SUBASSIGN:      return "subassign";
     case OP_GETNONZEROS:    return "getnonzeros";

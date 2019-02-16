@@ -322,6 +322,9 @@ namespace casadi {
     /// Reshape
     virtual MX get_reshape(const Sparsity& sp) const;
 
+    /// Sparsity cast
+    virtual MX get_sparsity_cast(const Sparsity& sp) const;
+
     /** \brief Matrix multiplication and addition */
     virtual MX get_mac(const MX& y, const MX& z) const;
 
