@@ -256,7 +256,9 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, inames, onames, opts);
+    Dict custom_opts = opts;
+    custom_opts["always_inline"] = true;
+    return Function(name, arg, res, inames, onames, custom_opts);
   }
 
   Function Map
@@ -306,8 +308,34 @@ namespace casadi {
       *it = (*it)(Slice(), ind); // NOLINT
     }
 
+    Dict custom_opts = opts;
+    custom_opts["always_inline"] = true;
     // Construct return function
-    return Function(name, arg, res, inames, onames, opts);
+    return Function(name, arg, res, inames, onames, custom_opts);
+  }
+
+  Function Map::get_jacobian(const std::string& name,
+                                  const std::vector<std::string>& inames,
+                                  const std::vector<std::string>& onames,
+                                  const Dict& opts) const {
+    // Generate map of derivative
+    Function jf = f_.jacobian();
+    Function jm = jf.map(n_, parallelization());
+
+    // Input expressions
+    vector<MX> arg = jm.mx_in();
+
+    // Need to reorder sensitivity inputs
+    vector<MX> res = jm(arg);
+
+    casadi_assert_dev(res.size()==1);
+    MX y = sparsity_cast(res[0], Sparsity::kron(Sparsity::diag(n_), jf.sparsity_out(0)));
+
+    Dict custom_opts = opts;
+    custom_opts["always_inline"] = true;
+    Function f(name, arg, {y},  inames, onames, custom_opts);
+
+    return f;
   }
 
   int Map::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
