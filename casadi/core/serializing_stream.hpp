@@ -67,6 +67,7 @@ namespace casadi {
   public:
     /// Constructor
     DeserializingStream(std::istream &in_s);
+    DeserializingStream(const DeserializingStream&) = delete;
 
     //@{
     /** \brief Reconstruct an object from the input stream
