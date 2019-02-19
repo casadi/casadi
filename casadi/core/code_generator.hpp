@@ -359,7 +359,8 @@ namespace casadi {
       AUX_ISINF,
       AUX_BOUNDS_CONSISTENCY,
       AUX_LSQR,
-      AUX_FILE_SLURP
+      AUX_FILE_SLURP,
+      AUX_WEAVE
     };
 
     /** \brief Add a built-in auxiliary function */
