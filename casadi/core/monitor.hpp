@@ -82,6 +82,16 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new Monitor(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Monitor(DeserializingStream& s);
+
   private:
     std::string comment_;
   };

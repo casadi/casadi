@@ -1048,7 +1048,7 @@ namespace casadi {
     // OP_ADD_ELEMENTS
     {OP_PROJECT, Project::deserialize},
     {OP_ASSERTION, Assertion::deserialize},
-    // OP_MONITOR
+    {OP_MONITOR, Monitor::deserialize},
     {OP_NORM1, Norm1::deserialize},
     {OP_NORM2, Norm2::deserialize},
     {OP_NORMINF, NormInf::deserialize},
