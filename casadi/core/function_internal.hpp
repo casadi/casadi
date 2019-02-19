@@ -796,6 +796,8 @@ namespace casadi {
     void generate_in(const std::string& fname, const double** arg) const;
     void generate_out(const std::string& fname, double** res) const;
 
+    bool always_inline_, never_inline_;
+
     /// Number of inputs and outputs
     size_t n_in_, n_out_;
 

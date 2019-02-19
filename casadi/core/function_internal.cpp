@@ -71,6 +71,8 @@ namespace casadi {
     ad_weight_ = 0.33; // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na, forward when tie
     // Both modes equally expensive by default (no "taping" needed)
     ad_weight_sp_ = 0.49; // Forward when tie
+    always_inline_ = false;
+    never_inline_ = false;
     jac_penalty_ = 2;
     max_num_dir_ = GlobalOptions::getMaxNumDir();
     user_data_ = nullptr;
@@ -171,6 +173,12 @@ namespace casadi {
         "Weighting factor for sparsity pattern calculation calculation."
         "Overrides default behavior. Set to 0 and 1 to force forward and "
         "reverse mode respectively. Cf. option \"ad_weight\"."}},
+      {"always_inline",
+       {OT_BOOL,
+        "Force inlining."}},
+      {"never_inline",
+       {OT_BOOL,
+        "Forbid inlining."}},
       {"jac_penalty",
        {OT_DOUBLE,
         "When requested for a number of forward/reverse directions,   "
@@ -322,6 +330,8 @@ namespace casadi {
     opts["derivative_of"] = derivative_of_;
     opts["ad_weight"] = ad_weight_;
     opts["ad_weight_sp"] = ad_weight_sp_;
+    opts["always_inline"] = always_inline_;
+    opts["never_inline"] = never_inline_;
     opts["max_num_dir"] = max_num_dir_;
     opts["print_time"] = print_time_;
     opts["enable_forward"] = enable_forward_op_;
@@ -420,6 +430,10 @@ namespace casadi {
       } else if (op.first=="custom_jacobian") {
         custom_jacobian_ = op.second.to_function();
         jacobian_ = custom_jacobian_;
+      } else if (op.first=="always_inline") {
+        always_inline_ = op.second;
+      } else if (op.first=="never_inline") {
+        never_inline_ = op.second;
       }
     }
 
@@ -1827,9 +1841,13 @@ namespace casadi {
 
   void FunctionInternal::eval_mx(const MXVector& arg, MXVector& res,
                                  bool always_inline, bool never_inline) const {
+
+    always_inline = always_inline || always_inline_;
+    never_inline = never_inline || never_inline_;
+
     // The code below creates a call node, to inline, wrap in an MXFunction
     if (always_inline) {
-      casadi_assert(!never_inline, "Inconsistent options");
+      casadi_assert(!never_inline, "Inconsistent options for " + str(name_));
       return wrap().call(arg, res, true);
     }
 
@@ -2467,7 +2485,7 @@ namespace casadi {
 
         // Create the evaluation node
         Function dfcn = self().forward(nfwd_batch);
-        vector<MX> x = Call::create(dfcn, darg);
+        vector<MX> x = dfcn(darg);
 
         casadi_assert_dev(x.size()==n_out_);
 
@@ -2574,7 +2592,7 @@ namespace casadi {
 
         // Create the evaluation node
         Function dfcn = self().reverse(nadj_batch);
-        vector<MX> x = Call::create(dfcn, darg);
+        vector<MX> x = dfcn(darg);
         casadi_assert_dev(x.size()==n_in_);
 
         // Retrieve sensitivities
@@ -3239,6 +3257,8 @@ namespace casadi {
 
     s.pack("FunctionInternal::ad_weight", ad_weight_);
     s.pack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
+    s.pack("FunctionInternal::always_inline", always_inline_);
+    s.pack("FunctionInternal::never_inline", never_inline_);
 
     s.pack("FunctionInternal::max_num_dir", max_num_dir_);
 
@@ -3301,6 +3321,8 @@ namespace casadi {
 
     s.unpack("FunctionInternal::ad_weight", ad_weight_);
     s.unpack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
+    s.unpack("FunctionInternal::always_inline", always_inline_);
+    s.unpack("FunctionInternal::never_inline", never_inline_);
 
     s.unpack("FunctionInternal::max_num_dir", max_num_dir_);
 
