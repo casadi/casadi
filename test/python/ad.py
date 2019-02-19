@@ -504,6 +504,7 @@ class ADtests(casadiTestCase):
     # TODO: sparse seeding
 
     for inputs,values,out, jac in [
+          (in1,v1,repweave(horzcat(x[0]*y,x[1]*y,sin(x[0]*y),cos(x[1]*y)),2,2),blockcat([[casadi.vec(y),MX(4,1)],[casadi.vec(cos(x[0]*y)*y),MX(4,1)],[MX(4,1),casadi.vec(y)],[MX(4,1),-casadi.vec(sin(x[1]*y)*y)]])),
           (in1,v1,x,DM.eye(2)),
           (in1,v1,x.T,DM.eye(2)),
           (in1,v1,x**2,2*c.diag(x)),
