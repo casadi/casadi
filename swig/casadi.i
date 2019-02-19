@@ -3255,6 +3255,9 @@ DECL std::string casadi_print_operator(const M& xb,
 DECL M casadi_repsum(const M& A, casadi_int n, casadi_int m=1) {
   return repsum(A, n, m);
 }
+DECL M casadi_repweave(const M& x, casadi_int m, casadi_int n) {
+  return repweave(x, m, n);
+}
 DECL M casadi_diff(const M& A, casadi_int n=1, casadi_index axis=-1) {
   return diff(A, n, axis);
 }
@@ -3572,7 +3575,6 @@ DECL M casadi_graph_substitute(const M& ex, const std::vector< M >& v,
                          const std::vector< M > &vdef) {
   return graph_substitute(ex, v, vdef);
 }
-
 DECL std::vector< M >
 casadi_graph_substitute(const std::vector< M > &ex,
                  const std::vector< M > &v,

@@ -531,6 +531,7 @@ class ADtests(casadiTestCase):
           (in1,[v1[0],DM([[2,1.5],[1,0.9]])],y_nzs,blockcat([[0,0],[1,0],[0,1],[0,0]]),False,"c99"),
           (in1,[v1[0],DM([[0,1.5],[1,0.9]])],y_nzxs,blockcat([[cos(x[0]),0],[2*x[0],0]]),False,"c99"),
           (in1,[v1[0],DM([[1,1.5],[1,0.9]])],x.nz[y[:,0]],blockcat([[0,1],[0,1]]),False,"c99"),
+          (in1,v1,repweave(horzcat(x[0]*y,x[1]*y,sin(x[0]*y),cos(x[1]*y)),2,2),blockcat([[casadi.vec(y),MX(4,1)],[casadi.vec(cos(x[0]*y)*y),MX(4,1)],[MX(4,1),casadi.vec(y)],[MX(4,1),-casadi.vec(sin(x[1]*y)*y)]]),True,"c89"),
           (in1,v1,x,DM.eye(2),True,"c89"),
           (in1,v1,x.T,DM.eye(2),True,"c89"),
           (in1,v1,x**2,2*c.diag(x),True,"c89"),

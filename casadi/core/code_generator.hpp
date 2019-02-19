@@ -540,7 +540,8 @@ namespace casadi {
       AUX_HYPOT,
       AUX_MMIN,
       AUX_MMAX,
-      AUX_LOGSUMEXP
+      AUX_LOGSUMEXP,
+      AUX_WEAVE
     };
 
     /** \brief Add a built-in auxiliary function

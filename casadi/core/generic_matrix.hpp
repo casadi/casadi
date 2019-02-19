@@ -230,6 +230,7 @@ namespace casadi {
     static MatType tril2symm(const MatType &x);
     static MatType triu2symm(const MatType &x);
     static MatType repsum(const MatType &x, casadi_int n, casadi_int m=1);
+    static MatType repweave(const MatType &x, casadi_int m, casadi_int n);
     static MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1);
 
     static bool is_linear(const MatType &expr, const MatType &var);
@@ -973,6 +974,13 @@ namespace casadi {
         \identifier{1d7} */
     inline friend MatType repsum(const MatType &A, casadi_int n, casadi_int m=1) {
       return MatType::repsum(A, n, m);
+    }
+
+    /** \brief Reorder elements in a repeated matrix according to a weaving pattern
+     * 
+     */
+    inline friend MatType repweave(const MatType &A, casadi_int m, casadi_int n) {
+      return MatType::repweave(A, m, n);
     }
 
     ///@{

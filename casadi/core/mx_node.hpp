@@ -411,6 +411,9 @@ namespace casadi {
     /// Create a repeated sum node
     virtual MX get_repsum(casadi_int m, casadi_int n) const;
 
+    /// Create a repeated weave node
+    virtual MX get_repweave(casadi_int m, casadi_int n) const;
+
     /// Create a vertical concatenation node (vectors only)
     virtual MX get_vertcat(const std::vector<MX>& x) const;
 

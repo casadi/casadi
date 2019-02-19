@@ -1988,6 +1988,18 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::repweave(const Matrix<Scalar>& x, casadi_int m, casadi_int n) {
+    casadi_assert(x.size2() % m*n==0, "Dimension mismatch");
+    casadi_int ncol = x.size2()/(m*n);
+    Sparsity sp = x(Slice(), range(ncol)).sparsity();
+    casadi_assert(Sparsity::repmat(sp, 1, n*m)==x.sparsity(), "Dimension mismatch");
+
+    Matrix<Scalar> ret = x;
+    casadi_weave(x.ptr(), x.nnz()/(m*n), m, n, ret.ptr());
+    return ret;
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::
   qr_sparse(const Matrix<Scalar>& A,
     Matrix<Scalar>& V, Matrix<Scalar> &R, Matrix<Scalar>& beta,

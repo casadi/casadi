@@ -770,6 +770,36 @@ class Functiontests(casadiTestCase):
     self.check_codegen(F,inputs=[x0,x1])
     self.checkfunction(F,Fref,inputs=[x0,x1])
 
+  def test_repweave(self):
+
+    sp = Sparsity.lower(2)
+
+    m = 2
+    n = 3
+
+    data = [[DM.rand(sp) for i in range(m)] for j in range(n)]
+
+    flat = []
+    for d in data:
+      for e in d:
+        flat.append(e)
+
+    D = hcat(flat)
+
+
+    x = MX.sym("x",D.sparsity())
+
+    F = Function("f",[x],[repweave(sin(x),m,n)**2])
+
+    x = SX.sym("x",D.sparsity())
+
+    Fref = Function("f",[x],[repweave(sin(x),m,n)**2])
+
+
+    self.checkfunction(F,Fref,inputs=[D])
+    self.check_codegen(F,inputs=[D])
+    self.check_serialize(F,inputs=[D])
+
   def test_unknown_options(self):
     x = SX.sym("x")
 

@@ -209,4 +209,97 @@ namespace casadi {
     s.unpack("HorzRepsum::n", n_);
   }
 
+  HorzRepWeave::HorzRepWeave(const MX& x, casadi_int m, casadi_int n) : m_(m), n_(n) {
+    set_dep(x);
+    set_sparsity(x.sparsity());
+    nnz_ = x.nnz()/(m*n);
+
+
+    casadi_assert(x.size2() % m*n==0, "Dimension mismatch");
+    casadi_int ncol = x.size2()/(m*n);
+    Sparsity sp = x(Slice(), range(ncol)).sparsity();
+    casadi_assert(Sparsity::repmat(sp, 1, n*m)==x.sparsity(), "Dimension mismatch");
+  }
+
+  std::string HorzRepWeave::disp(const std::vector<std::string>& arg) const {
+    std::stringstream ss;
+    ss << "weave("  << arg.at(0) << ", " << m_ << ", " << n_ << ")";
+    return ss.str();
+  }
+
+  int HorzRepWeave::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    casadi_weave(arg[0], nnz_, m_, n_, res[0]);
+    return 0;
+  }
+
+  int HorzRepWeave::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    casadi_weave(arg[0], nnz_, m_, n_, res[0]);
+    return 0;
+  }
+
+  void HorzRepWeave::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    res[0] = arg[0]->get_repweave(m_, n_);
+  }
+
+  int HorzRepWeave::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    casadi_weave(arg[0], nnz_, m_, n_, res[0]);
+    return 0;
+  }
+
+  int HorzRepWeave::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    bvec_t* y = res[0];
+    bvec_t* x = arg[0];
+
+    bvec_t* src;
+    casadi_int stride = nnz_*m_;
+    for (casadi_int j=0;j<m_;++j) {
+      src = x;
+      for (casadi_int i=0;i<n_;++i) {
+        copy_rev(src, y, nnz_);
+        y += nnz_;
+        src += stride;
+      }
+      x += nnz_;
+    }
+
+    return 0;
+  }
+
+  void HorzRepWeave::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) const {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = project(fseed[d][0], sparsity())->get_repweave(m_, n_);
+    }
+  }
+
+  void HorzRepWeave::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                          std::vector<std::vector<MX> >& asens) const {
+    for (casadi_int d=0; d<asens.size(); ++d) {
+      asens[d][0] += project(aseed[d][0], sparsity())->get_repweave(n_, m_);
+    }
+  }
+
+  void HorzRepWeave::generate(CodeGenerator& g,
+                            const std::vector<casadi_int>& arg,
+                            const std::vector<casadi_int>& res) const {
+    casadi_int nnz = sparsity().nnz();
+    g.add_auxiliary(CodeGenerator::AUX_WEAVE);
+
+    g << "casadi_weave(" << g.work(arg[0], nnz) << ", "
+      << nnz_ << ", " << m_ << ", " << n_ << ", " << g.work(res[0], nnz) << ");\n";
+  }
+
+  void HorzRepWeave::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("HorzRepWeave::m", m_);
+    s.pack("HorzRepWeave::n", n_);
+    s.pack("HorzRepWeave::nnz", nnz_);
+  }
+
+  HorzRepWeave::HorzRepWeave(DeserializingStream& s) : MXNode(s) {
+    s.unpack("HorzRepWeave::m", m_);
+    s.unpack("HorzRepWeave::n", n_);
+    s.unpack("HorzRepWeave::nnz", nnz_);
+  }
+
 } // namespace casadi
