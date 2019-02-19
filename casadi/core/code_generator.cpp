@@ -1252,6 +1252,11 @@ namespace casadi {
                         << "  #define casadi_real_min " << this->real_min << "\n"
                         << "#endif\n\n";
       break;
+    case AUX_WEAVE:
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_CLEAR);
+      this->auxiliaries << sanitize_source(casadi_weave_str, inst);
+      break;
     }
   }
 

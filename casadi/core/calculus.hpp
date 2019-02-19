@@ -189,6 +189,9 @@ namespace casadi {
     // Horizontal repeat sum
     OP_HORZREPSUM,
 
+    // Horizontal repeat weave
+    OP_HORZREPWEAVE,
+
     OP_ERFINV,
     OP_PRINTME,
     OP_LIFT,
@@ -1042,6 +1045,7 @@ namespace casadi {
     case OP_MMAX:          return F<OP_MMAX>::check;
     case OP_HORZREPMAT:    return F<OP_HORZREPMAT>::check;
     case OP_HORZREPSUM:    return F<OP_HORZREPSUM>::check;
+    case OP_HORZREPWEAVE:  return F<OP_HORZREPWEAVE>::check;
     case OP_ERFINV:        return F<OP_ERFINV>::check;
     case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_LIFT:          return F<OP_LIFT>::check;

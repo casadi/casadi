@@ -391,7 +391,8 @@ namespace casadi {
       AUX_BOUNDS_CONSISTENCY,
       AUX_LSQR,
       AUX_FILE_SLURP,
-      AUX_CACHE
+      AUX_CACHE,
+      AUX_WEAVE
     };
 
     /** \brief Add a built-in auxiliary function */

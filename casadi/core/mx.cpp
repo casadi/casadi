@@ -1885,6 +1885,16 @@ namespace casadi {
     }
   }
 
+  MX MX::repweave(const MX& x, casadi_int m, casadi_int n) {
+    casadi_assert(n>=1, "Invalid arguments");
+    casadi_assert(m>=1, "Invalid arguments");
+    casadi_assert(x.size2() % m*n==0, "Dimension mismatch");
+    casadi_int ncol = x.size2()/(m*n);
+    Sparsity sp = x(Slice(), range(ncol)).sparsity();
+    casadi_assert(Sparsity::repmat(sp, 1, n*m)==x.sparsity(), "Dimension mismatch");
+    return x->get_repweave(m, n);
+  }
+
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
     Linsol mysolver("tmp", lsolver, a.sparsity(), dict);
     return mysolver.solve(a, b, false);

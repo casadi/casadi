@@ -193,6 +193,9 @@ namespace casadi {
                             const T1* x, const casadi_int* lookup_mode, casadi_int* iw, T1* w);
 
   template<typename T1>
+  void casadi_weave(const T1* x, casadi_int nnz, casadi_int m, casadi_int n, T1* y);
+
+  template<typename T1>
   T1 casadi_mmax(const T1* x, casadi_int n, T1 is_dense);
 
   template<typename T1>
@@ -290,6 +293,7 @@ namespace casadi {
   #include "casadi_lsqr.hpp"
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
+  #include "casadi_weave.hpp"
 
 } // namespace casadi
 

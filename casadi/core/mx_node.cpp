@@ -1060,11 +1060,19 @@ namespace casadi {
   }
 
   MX MXNode::get_repsum(casadi_int n, casadi_int m) const {
-    if (n==1) {
+    if (n==1 || m==1) {
       return MX::create(new HorzRepsum(shared_from_this<MX>(), m));
     } else {
       // Fallback to generic_matrix impl
       return GenericMatrix<MX>::repsum(shared_from_this<MX>(), n, m);
+    }
+  }
+
+  MX MXNode::get_repweave(casadi_int m, casadi_int n) const {
+    if (m==1) {
+      return shared_from_this<MX>();
+    } else {
+      return MX::create(new HorzRepWeave(shared_from_this<MX>(), m, n));
     }
   }
 
@@ -1187,6 +1195,7 @@ namespace casadi {
     {OP_MMAX, MMax::deserialize},
     {OP_HORZREPMAT, HorzRepmat::deserialize},
     {OP_HORZREPSUM, HorzRepsum::deserialize},
+    {OP_HORZREPWEAVE, HorzRepWeave::deserialize},
     //OP_ERFINV,
     //OP_PRINTME,
     //OP_LIFT,

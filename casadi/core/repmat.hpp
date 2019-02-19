@@ -162,6 +162,89 @@ namespace casadi {
     explicit HorzRepsum(DeserializingStream& s);
   };
 
+
+  /** \brief Horizontal repeated weave
+   * 
+   * Consider a matrix with sparsity repmat(S,1,m*n),
+   * and A and B have sparsity S.
+   * 
+   * Input: 
+   * [A0 B0 A1 B1 A2 B2], m=2, n=3
+   * 
+   * Output:
+   * [A0 A1 A2 B0 B1 B2]
+   * 
+   * 
+      \author Joris Gillis
+      \date 2019
+  */
+  class CASADI_EXPORT HorzRepWeave : public MXNode {
+  public:
+    /// Evaluate the function (template)
+    template<typename T>
+    int eval_gen(const T** arg, T** res) const;
+
+    /// Constructor
+    HorzRepWeave(const MX& x, casadi_int m, casadi_int n);
+
+    /// Evaluate the function (template)
+    template<typename T, typename R>
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w, R reduction) const;
+
+    /// Destructor
+    ~HorzRepWeave() override {}
+
+    /** \brief  Print expression */
+    std::string disp(const std::vector<std::string>& arg) const override;
+
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /// Evaluate the function symbolically (SX)
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
+    /** \brief  Propagate sparsity forward */
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
+    /** \brief  Propagate sparsity backwards */
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
+    /** \brief Calculate forward mode directional derivatives */
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) const override;
+
+    /** \brief Calculate reverse mode directional derivatives */
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                          std::vector<std::vector<MX> >& asens) const override;
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
+
+    /** \brief Get the operation */
+    casadi_int op() const override { return OP_HORZREPWEAVE;}
+
+    /// Weave structure
+    casadi_int m_, n_;
+    /// Number of nonzeros in one unit
+    casadi_int nnz_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new HorzRepWeave(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit HorzRepWeave(DeserializingStream& s);
+  };
+
+
 } // namespace casadi
 /// \endcond
 

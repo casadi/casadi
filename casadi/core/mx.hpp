@@ -530,6 +530,7 @@ namespace casadi {
     static std::vector<MX> symvar(const MX& x);
     static MX nullspace(const MX& A);
     static MX repsum(const MX& x, casadi_int n, casadi_int m=1);
+    static MX repweave(const MX& x, casadi_int m, casadi_int n);
     static MX densify(const MX& x, const MX& val=0);
     static MX _bilin(const MX& A, const MX& x, const MX& y);
     static MX _rank1(const MX& A, const MX& alpha, const MX& x, const MX& y);

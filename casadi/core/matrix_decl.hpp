@@ -340,6 +340,7 @@ namespace casadi {
     static Matrix<Scalar> norm_2(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_fro(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_inf(const Matrix<Scalar> &x);
+    static Matrix<Scalar> repweave(const Matrix<Scalar> &x, casadi_int m, casadi_int n);
     static Matrix<Scalar> sum2(const Matrix<Scalar> &x);
     static Matrix<Scalar> sum1(const Matrix<Scalar> &x);
     static Matrix<Scalar> dot(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
