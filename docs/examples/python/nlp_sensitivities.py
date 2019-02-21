@@ -172,7 +172,7 @@ prob = {'f': J, 'x': w, 'g': g, 'p': P}
 trajectories = ca.Function('trajectories', [w], [x_plot, u_plot], ['w'], ['x', 'u'])
 
 # Create an NLP solver, using SQP and active-set QP for accurate multipliers
-opts = dict(qpsol='qrqp', qpsol_options=dict(print_iter=False), print_time=False)
+opts = dict(qpsol='qrqp', qpsol_options=dict(print_iter=False,error_on_fail=False), print_time=False)
 solver = ca.nlpsol('solver', 'sqpmethod', prob, opts)
 
 # Solve the NLP
