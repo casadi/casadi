@@ -550,6 +550,53 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::CbcInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>cbc</td><td>OT_DICT</td><td>Options to be passed to CBC.Three sets of options are supported. The first can be found in OsiSolverParameters.hpp. The second can be found in CbcModel.hpp. The third are options that can be passed to CbcMain1.</td><td>casadi::CbcInterface</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
+<tr><td>hot_start</td><td>OT_BOOL</td><td>Hot start with x0 [Default false].</td><td>casadi::CbcInterface</td></tr>
+<tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CbcInterface</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::CbcInterface</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::CbcInterface</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Conic_cbc
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>cbc</td><td>OT_DICT</td><td>Options to be passed to CBC.Three sets of options are supported. The first can be found in OsiSolverParameters.hpp. The second can be found in CbcModel.hpp. The third are options that can be passed to CbcMain1.</td></tr>
+<tr><td>hot_start</td><td>OT_BOOL</td><td>Hot start with x0 [Default false].</td></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td></tr>
+</table>
+*/
+/** \addtogroup general_CbcInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>cbc</td><td>OT_DICT</td><td>Options to be passed to CBC.Three sets of options are supported. The first can be found in OsiSolverParameters.hpp. The second can be found in CbcModel.hpp. The third are options that can be passed to CbcMain1.</td><td>casadi::CbcInterface</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
+<tr><td>hot_start</td><td>OT_BOOL</td><td>Hot start with x0 [Default false].</td><td>casadi::CbcInterface</td></tr>
+<tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CbcInterface</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::CbcInterface</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::CbcInterface</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::CentralDiff
 \n
 \par
@@ -849,6 +896,9 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm start with simplex methods (affects only the simplex methods).</td><td>casadi::CplexInterface</td></tr>
 </table>
@@ -865,6 +915,9 @@
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm start with simplex methods (affects only the simplex methods).</td></tr>
 </table>
@@ -883,6 +936,9 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm start with simplex methods (affects only the simplex methods).</td><td>casadi::CplexInterface</td></tr>
 </table>

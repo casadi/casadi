@@ -64651,6 +64651,12 @@ Check if the vector is strictly increasing.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::check_sos "
+
+Check sos structure and generate defaults.
+
+";
+
 %feature("docstring") casadi::casadi_fill_casadi_int "
 
 [INTERNAL] ";
@@ -65011,6 +65017,14 @@ Explicitly load a plugin dynamically.
 %feature("docstring") casadi::casadi_newton "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::flatten_nested_vector "
+
+Flatten a nested std::vector tot a single flattened vector.
+
+Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+
+";
 
 %feature("docstring") casadi::integrator_n_in "
 
@@ -65469,6 +65483,8 @@ List of plugins
 
 
 
+- cbc
+
 - clp
 
 - cplex
@@ -65491,6 +65507,44 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Conic.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+cbc
+---
+
+
+
+Interface to Cbc solver for sparse Quadratic Programs
+
+>List of available options
+
++-------------+-----------------------+------------------------------------+
+|     Id      |         Type          |            Description             |
++=============+=======================+====================================+
+| cbc         | OT_DICT               | Options to be passed to CBC.Three  |
+|             |                       | sets of options are supported. The |
+|             |                       | first can be found in              |
+|             |                       | OsiSolverParameters.hpp. The       |
+|             |                       | second can be found in             |
+|             |                       | CbcModel.hpp. The third are        |
+|             |                       | options that can be passed to      |
+|             |                       | CbcMain1.                          |
++-------------+-----------------------+------------------------------------+
+| hot_start   | OT_BOOL               | Hot start with x0 [Default false]. |
++-------------+-----------------------+------------------------------------+
+| sos_groups  | OT_INTVECTORVECTOR    | Definition of SOS groups by        |
+|             |                       | indices.                           |
++-------------+-----------------------+------------------------------------+
+| sos_types   | OT_INTVECTOR          | Specify 1 or 2 for each SOS group. |
++-------------+-----------------------+------------------------------------+
+| sos_weights | OT_DOUBLEVECTORVECTOR | Weights corresponding to SOS       |
+|             |                       | entries.                           |
++-------------+-----------------------+------------------------------------+
+
+--------------------------------------------------------------------------------
 
 
 
@@ -65534,24 +65588,36 @@ Interface to Cplex solver for sparse Quadratic Programs
 
 >List of available options
 
-+---------------+-----------+----------------------------------------------+
-|      Id       |   Type    |                 Description                  |
-+===============+===========+==============================================+
-| cplex         | OT_DICT   | Options to be passed to CPLEX                |
-+---------------+-----------+----------------------------------------------+
-| dep_check     | OT_INT    | Detect redundant constraints.                |
-+---------------+-----------+----------------------------------------------+
-| dump_filename | OT_STRING | The filename to dump to.                     |
-+---------------+-----------+----------------------------------------------+
-| dump_to_file  | OT_BOOL   | Dumps QP to file in CPLEX format.            |
-+---------------+-----------+----------------------------------------------+
-| qp_method     | OT_INT    | Determines which CPLEX algorithm to use.     |
-+---------------+-----------+----------------------------------------------+
-| tol           | OT_DOUBLE | Tolerance of solver                          |
-+---------------+-----------+----------------------------------------------+
-| warm_start    | OT_BOOL   | Use warm start with simplex methods (affects |
-|               |           | only the simplex methods).                   |
-+---------------+-----------+----------------------------------------------+
++---------------+-----------------------+----------------------------------+
+|      Id       |         Type          |           Description            |
++===============+=======================+==================================+
+| cplex         | OT_DICT               | Options to be passed to CPLEX    |
++---------------+-----------------------+----------------------------------+
+| dep_check     | OT_INT                | Detect redundant constraints.    |
++---------------+-----------------------+----------------------------------+
+| dump_filename | OT_STRING             | The filename to dump to.         |
++---------------+-----------------------+----------------------------------+
+| dump_to_file  | OT_BOOL               | Dumps QP to file in CPLEX        |
+|               |                       | format.                          |
++---------------+-----------------------+----------------------------------+
+| qp_method     | OT_INT                | Determines which CPLEX algorithm |
+|               |                       | to use.                          |
++---------------+-----------------------+----------------------------------+
+| sos_groups    | OT_INTVECTORVECTOR    | Definition of SOS groups by      |
+|               |                       | indices.                         |
++---------------+-----------------------+----------------------------------+
+| sos_types     | OT_INTVECTOR          | Specify 1 or 2 for each SOS      |
+|               |                       | group.                           |
++---------------+-----------------------+----------------------------------+
+| sos_weights   | OT_DOUBLEVECTORVECTOR | Weights corresponding to SOS     |
+|               |                       | entries.                         |
++---------------+-----------------------+----------------------------------+
+| tol           | OT_DOUBLE             | Tolerance of solver              |
++---------------+-----------------------+----------------------------------+
+| warm_start    | OT_BOOL               | Use warm start with simplex      |
+|               |                       | methods (affects only the        |
+|               |                       | simplex methods).                |
++---------------+-----------------------+----------------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -65924,7 +65990,7 @@ Joel Andersson
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::doc_conic "
+%feature("docstring") casadi::doc_integrator "
 
 Get the documentation string for a plugin.
 
@@ -66320,7 +66386,7 @@ Check if the vector is strictly decreasing.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::doc_integrator "
+%feature("docstring") casadi::doc_conic "
 
 Get the documentation string for a plugin.
 
@@ -66329,6 +66395,12 @@ Get the documentation string for a plugin.
 %feature("docstring") casadi::casadi_dot "
 
 [INTERNAL]  Inner product.
+
+";
+
+%feature("docstring") casadi::nlpsol "
+
+";
 
 ";
 
@@ -66677,12 +66749,6 @@ Get DPLE input scheme name by index.
 %feature("docstring") casadi::matrixName< casadi_int > "
 
 Get typename.
-
-";
-
-%feature("docstring") casadi::nlpsol "
-
-";
 
 ";
 

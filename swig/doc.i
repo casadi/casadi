@@ -81571,6 +81571,14 @@ casadi_int nrhs, casadi_int tr, const casadi_int *sp, T1 *w) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::check_sos(casadi_int nx, const std::vector<
+std::vector< T > > &groups, std::vector< std::vector< double > > &weights,
+std::vector< casadi_int > &types) "
+
+Check sos structure and generate defaults.
+
+";
+
 %feature("docstring")  casadi::casadi_fill_casadi_int(casadi_int *x,
 casadi_int n, casadi_int alpha) "
 
@@ -82740,6 +82748,25 @@ Explicitly load a plugin dynamically.
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::flatten_nested_vector(const std::vector<
+std::vector< T > > &nested, std::vector< S > &flat) "
+
+Flatten a nested std::vector tot a single flattened vector.
+
+Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+
+";
+
+%feature("docstring")  casadi::flatten_nested_vector(const std::vector<
+std::vector< T > > &nested, std::vector< S > &flat, std::vector< I >
+&indices) "
+
+Flatten a nested std::vector tot a single flattened vector.
+
+Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+
+";
+
 %feature("docstring")  casadi::integrator_n_in() "
 
 Get the number of integrator inputs.
@@ -83199,6 +83226,8 @@ List of plugins
 
 
 
+- cbc
+
 - clp
 
 - cplex
@@ -83221,6 +83250,44 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Conic.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+cbc
+---
+
+
+
+Interface to Cbc solver for sparse Quadratic Programs
+
+>List of available options
+
++-------------+-----------------------+------------------------------------+
+|     Id      |         Type          |            Description             |
++=============+=======================+====================================+
+| cbc         | OT_DICT               | Options to be passed to CBC.Three  |
+|             |                       | sets of options are supported. The |
+|             |                       | first can be found in              |
+|             |                       | OsiSolverParameters.hpp. The       |
+|             |                       | second can be found in             |
+|             |                       | CbcModel.hpp. The third are        |
+|             |                       | options that can be passed to      |
+|             |                       | CbcMain1.                          |
++-------------+-----------------------+------------------------------------+
+| hot_start   | OT_BOOL               | Hot start with x0 [Default false]. |
++-------------+-----------------------+------------------------------------+
+| sos_groups  | OT_INTVECTORVECTOR    | Definition of SOS groups by        |
+|             |                       | indices.                           |
++-------------+-----------------------+------------------------------------+
+| sos_types   | OT_INTVECTOR          | Specify 1 or 2 for each SOS group. |
++-------------+-----------------------+------------------------------------+
+| sos_weights | OT_DOUBLEVECTORVECTOR | Weights corresponding to SOS       |
+|             |                       | entries.                           |
++-------------+-----------------------+------------------------------------+
+
+--------------------------------------------------------------------------------
 
 
 
@@ -83264,24 +83331,36 @@ Interface to Cplex solver for sparse Quadratic Programs
 
 >List of available options
 
-+---------------+-----------+----------------------------------------------+
-|      Id       |   Type    |                 Description                  |
-+===============+===========+==============================================+
-| cplex         | OT_DICT   | Options to be passed to CPLEX                |
-+---------------+-----------+----------------------------------------------+
-| dep_check     | OT_INT    | Detect redundant constraints.                |
-+---------------+-----------+----------------------------------------------+
-| dump_filename | OT_STRING | The filename to dump to.                     |
-+---------------+-----------+----------------------------------------------+
-| dump_to_file  | OT_BOOL   | Dumps QP to file in CPLEX format.            |
-+---------------+-----------+----------------------------------------------+
-| qp_method     | OT_INT    | Determines which CPLEX algorithm to use.     |
-+---------------+-----------+----------------------------------------------+
-| tol           | OT_DOUBLE | Tolerance of solver                          |
-+---------------+-----------+----------------------------------------------+
-| warm_start    | OT_BOOL   | Use warm start with simplex methods (affects |
-|               |           | only the simplex methods).                   |
-+---------------+-----------+----------------------------------------------+
++---------------+-----------------------+----------------------------------+
+|      Id       |         Type          |           Description            |
++===============+=======================+==================================+
+| cplex         | OT_DICT               | Options to be passed to CPLEX    |
++---------------+-----------------------+----------------------------------+
+| dep_check     | OT_INT                | Detect redundant constraints.    |
++---------------+-----------------------+----------------------------------+
+| dump_filename | OT_STRING             | The filename to dump to.         |
++---------------+-----------------------+----------------------------------+
+| dump_to_file  | OT_BOOL               | Dumps QP to file in CPLEX        |
+|               |                       | format.                          |
++---------------+-----------------------+----------------------------------+
+| qp_method     | OT_INT                | Determines which CPLEX algorithm |
+|               |                       | to use.                          |
++---------------+-----------------------+----------------------------------+
+| sos_groups    | OT_INTVECTORVECTOR    | Definition of SOS groups by      |
+|               |                       | indices.                         |
++---------------+-----------------------+----------------------------------+
+| sos_types     | OT_INTVECTOR          | Specify 1 or 2 for each SOS      |
+|               |                       | group.                           |
++---------------+-----------------------+----------------------------------+
+| sos_weights   | OT_DOUBLEVECTORVECTOR | Weights corresponding to SOS     |
+|               |                       | entries.                         |
++---------------+-----------------------+----------------------------------+
+| tol           | OT_DOUBLE             | Tolerance of solver              |
++---------------+-----------------------+----------------------------------+
+| warm_start    | OT_BOOL               | Use warm start with simplex      |
+|               |                       | methods (affects only the        |
+|               |                       | simplex methods).                |
++---------------+-----------------------+----------------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -83654,7 +83733,7 @@ Joel Andersson
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::doc_conic(const std::string &name) "
+%feature("docstring")  casadi::doc_integrator(const std::string &name) "
 
 Get the documentation string for a plugin.
 
@@ -85021,7 +85100,7 @@ Check if the vector is strictly decreasing.
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::doc_integrator(const std::string &name) "
+%feature("docstring")  casadi::doc_conic(const std::string &name) "
 
 Get the documentation string for a plugin.
 
@@ -85031,384 +85110,6 @@ Get the documentation string for a plugin.
 T1 *y) "
 
 [INTERNAL]  Inner product.
-
-";
-
-%feature("docstring")  casadi::casadi_qr_solve(T1 *x, casadi_int nrhs,
-casadi_int tr, const casadi_int *sp_v, const T1 *v, const casadi_int *sp_r,
-const T1 *r, const T1 *beta, const casadi_int *prinv, const casadi_int *pc,
-T1 *w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_de_boor(T1 x, const T1 *knots,
-casadi_int n_knots, casadi_int degree, T1 *boor) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::has_conic(const std::string &name) "
-
-Check if a particular plugin is available.
-
-";
-
-%feature("docstring")  casadi::casadi_clear_casadi_int(casadi_int *x,
-casadi_int n) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::load_conic(const std::string &name) "
-
-Explicitly load a plugin dynamically.
-
-";
-
-%feature("docstring")  casadi::casadi_qp_du_check(casadi_qp_data< T1 > *d,
-casadi_int i) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::rootfinder_option_type(const std::string
-&name, const std::string &op) "
-
-Get type info for a particular option.
-
-";
-
-%feature("docstring")  casadi::casadi_lb_eig(const casadi_int *sp_h, const
-T1 *h) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_smoothing_diff(T1 **yk, T1 *y0, T1 *J,
-T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::doc_interpolant(const std::string &name) "
-
-Get the documentation string for a plugin.
-
-";
-
-%feature("docstring")  casadi::dple_n_out() "
-
-Get the number of QP solver outputs.
-
-";
-
-%feature("docstring")  casadi::casadi_low(T1 x, const double *grid,
-casadi_int ng, casadi_int lookup_mode) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::load_rootfinder(const std::string &name) "
-
-Explicitly load a plugin dynamically.
-
-";
-
-%feature("docstring")  casadi::casadi_mv(const T1 *x, const casadi_int
-*sp_x, const T1 *y, T1 *z, casadi_int tr) "
-
-[INTERNAL]  Sparse matrix-vector multiplication: z <- z + x*y.
-
-";
-
-%feature("docstring")  casadi::casadi_lsqr_single_solve(const T1 *A, T1 *x,
-casadi_int tr, const casadi_int *sp, T1 *w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_norm_2(casadi_int n, const T1 *x) "
-
-[INTERNAL]  NORM_2: ||x||_2 -> return.
-
-";
-
-%feature("docstring")  casadi::dense_kron_stride(casadi_int n, casadi_int m,
-const double *A, const double *B, double *C, casadi_int strideA, casadi_int
-strideB, casadi_int strideC) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_pr_direction(casadi_qp_data< T1 >
-*d) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_forward_diff(T1 **yk, T1 *y0, T1 *J,
-T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_kkt(casadi_qp_data< T1 > *d) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_flip(casadi_qp_data< T1 > *d) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_clear(T1 *x, casadi_int n) "
-
-[INTERNAL]  CLEAR: x <- 0.
-
-";
-
-%feature("docstring")  casadi::casadi_qr_trs(const casadi_int *sp_r, const
-T1 *nz_r, T1 *x, casadi_int tr) "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::_which_depends "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_bilin(const T1 *A, const casadi_int
-*sp_A, const T1 *x, const T1 *y) "
-
-[INTERNAL]  Calculates dot(x, mul(A, y))
-
-";
-
-%feature("docstring")  casadi::casadi_trans(const T1 *x, const casadi_int
-*sp_x, T1 *y, const casadi_int *sp_y, casadi_int *tmp) "
-
-[INTERNAL]  TRANS: y <- trans(x) , w work vector (length >= rows x)
-
-";
-
-%feature("docstring")  casadi::casadi_nd_boor_eval(T1 *ret, casadi_int
-n_dims, const T1 *knots, const casadi_int *offset, const casadi_int *degree,
-const casadi_int *strides, const T1 *c, casadi_int m, const T1 *x, const
-casadi_int *lookup_mode, casadi_int *iw, T1 *w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::nlpsol_out() "
-
-Get NLP solver output scheme of NLP solvers.
-
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
-
-+--------------+-------+---------------------------------------------------+
-|  Full name   | Short |                    Description                    |
-+==============+=======+===================================================+
-| NLPSOL_X     | x     | Decision variables at the optimal solution (nx x  |
-|              |       | 1)                                                |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_F     | f     | Cost function value at the optimal solution (1 x  |
-|              |       | 1)                                                |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_G     | g     | Constraints function at the optimal solution (ng  |
-|              |       | x 1)                                              |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_LAM_X | lam_x | Lagrange multipliers for bounds on X at the       |
-|              |       | solution (nx x 1)                                 |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_LAM_G | lam_g | Lagrange multipliers for bounds on G at the       |
-|              |       | solution (ng x 1)                                 |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_LAM_P | lam_p | Lagrange multipliers for bounds on P at the       |
-|              |       | solution (np x 1)                                 |
-+--------------+-------+---------------------------------------------------+
-
-";
-
-%feature("docstring")  casadi::nlpsol_out(casadi_int ind) "
-
-Get output scheme name by index.
-
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
-
-+--------------+-------+---------------------------------------------------+
-|  Full name   | Short |                    Description                    |
-+==============+=======+===================================================+
-| NLPSOL_X     | x     | Decision variables at the optimal solution (nx x  |
-|              |       | 1)                                                |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_F     | f     | Cost function value at the optimal solution (1 x  |
-|              |       | 1)                                                |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_G     | g     | Constraints function at the optimal solution (ng  |
-|              |       | x 1)                                              |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_LAM_X | lam_x | Lagrange multipliers for bounds on X at the       |
-|              |       | solution (nx x 1)                                 |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_LAM_G | lam_g | Lagrange multipliers for bounds on G at the       |
-|              |       | solution (ng x 1)                                 |
-+--------------+-------+---------------------------------------------------+
-| NLPSOL_LAM_P | lam_p | Lagrange multipliers for bounds on P at the       |
-|              |       | solution (np x 1)                                 |
-+--------------+-------+---------------------------------------------------+
-
-";
-
-%feature("docstring")  casadi::casadi_qp_kkt_dot(casadi_qp_data< T1 > *d,
-const T1 *v, casadi_int i) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::is_strictly_monotone(const std::vector< T >
-&v) "
-
-Check if the vector is strictly monotone.
-
-";
-
-%feature("docstring")  casadi::has_linsol(const std::string &name) "
-
-Check if a particular plugin is available.
-
-";
-
-%feature("docstring")  casadi::casadi_qp_du_direction(casadi_qp_data< T1 >
-*d) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::simpleRK(Function f, casadi_int N=10,
-casadi_int order=4) "
-
-Construct an explicit Runge-Kutta integrator The constructed function has
-three inputs, corresponding to initial state (x0), parameter (p) and
-integration time (h) and one output, corresponding to final state (xf).
-
-Parameters:
------------
-
-f:  ODE function with two inputs (x and p) and one output (xdot)
-
-N:  Number of integrator steps
-
-order:  Order of interpolating polynomials
-
-";
-
-%feature("docstring")  casadi::casadi_qp_init(casadi_qp_data< T1 > *d,
-casadi_int **iw, T1 **w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::nlpsol_in() "
-
-Get input scheme of NLP solvers.
-
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
-
-+---------------+--------+-------------------------------------------------+
-|   Full name   | Short  |                   Description                   |
-+===============+========+=================================================+
-| NLPSOL_X0     | x0     | Decision variables, initial guess (nx x 1)      |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_P      | p      | Value of fixed parameters (np x 1)              |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_LBX    | lbx    | Decision variables lower bound (nx x 1),        |
-|               |        | default -inf.                                   |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_UBX    | ubx    | Decision variables upper bound (nx x 1),        |
-|               |        | default +inf.                                   |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_LBG    | lbg    | Constraints lower bound (ng x 1), default -inf. |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_UBG    | ubg    | Constraints upper bound (ng x 1), default +inf. |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_LAM_X0 | lam_x0 | Lagrange multipliers for bounds on X, initial   |
-|               |        | guess (nx x 1)                                  |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_LAM_G0 | lam_g0 | Lagrange multipliers for bounds on G, initial   |
-|               |        | guess (ng x 1)                                  |
-+---------------+--------+-------------------------------------------------+
-
-";
-
-%feature("docstring")  casadi::nlpsol_in(casadi_int ind) "
-
-Get NLP solver input scheme name by index.
-
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
-
-+---------------+--------+-------------------------------------------------+
-|   Full name   | Short  |                   Description                   |
-+===============+========+=================================================+
-| NLPSOL_X0     | x0     | Decision variables, initial guess (nx x 1)      |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_P      | p      | Value of fixed parameters (np x 1)              |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_LBX    | lbx    | Decision variables lower bound (nx x 1),        |
-|               |        | default -inf.                                   |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_UBX    | ubx    | Decision variables upper bound (nx x 1),        |
-|               |        | default +inf.                                   |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_LBG    | lbg    | Constraints lower bound (ng x 1), default -inf. |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_UBG    | ubg    | Constraints upper bound (ng x 1), default +inf. |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_LAM_X0 | lam_x0 | Lagrange multipliers for bounds on X, initial   |
-|               |        | guess (nx x 1)                                  |
-+---------------+--------+-------------------------------------------------+
-| NLPSOL_LAM_G0 | lam_g0 | Lagrange multipliers for bounds on G, initial   |
-|               |        | guess (ng x 1)                                  |
-+---------------+--------+-------------------------------------------------+
-
-";
-
-%feature("docstring")  casadi::casadi_qp_zero_blocking(casadi_qp_data< T1 >
-*d) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::conic_n_in() "
-
-Get the number of QP solver inputs.
-
-";
-
-%feature("docstring")  casadi::doc_rootfinder(const std::string &name) "
-
-Get the documentation string for a plugin.
-
-";
-
-%feature("docstring")  casadi::dense_mul_nt_stride(casadi_int n, casadi_int
-m, casadi_int l, const double *A, const double *B, double *C, casadi_int
-strideA, casadi_int strideB, casadi_int strideC) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
-const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::dple_in() "
-
-Get input scheme of DPLE solvers.
-
-";
-
-%feature("docstring")  casadi::dple_in(casadi_int ind) "
-
-Get DPLE input scheme name by index.
-
-";
-
-%feature("docstring")  casadi::dense_copy_t_stride(casadi_int n, casadi_int
-m, const double *A, double *B, casadi_int strideA, casadi_int strideB) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_print_iteration(casadi_qp_data< T1
-> *d, char *buf, int buf_sz) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::matrixName< casadi_int >() "
-
-Get typename.
 
 ";
 
@@ -86315,6 +86016,384 @@ A textbook SQPMethod
 
 
 Joel Andersson
+
+";
+
+%feature("docstring")  casadi::casadi_qr_solve(T1 *x, casadi_int nrhs,
+casadi_int tr, const casadi_int *sp_v, const T1 *v, const casadi_int *sp_r,
+const T1 *r, const T1 *beta, const casadi_int *prinv, const casadi_int *pc,
+T1 *w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_de_boor(T1 x, const T1 *knots,
+casadi_int n_knots, casadi_int degree, T1 *boor) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::has_conic(const std::string &name) "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::casadi_clear_casadi_int(casadi_int *x,
+casadi_int n) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::load_conic(const std::string &name) "
+
+Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring")  casadi::casadi_qp_du_check(casadi_qp_data< T1 > *d,
+casadi_int i) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::rootfinder_option_type(const std::string
+&name, const std::string &op) "
+
+Get type info for a particular option.
+
+";
+
+%feature("docstring")  casadi::casadi_lb_eig(const casadi_int *sp_h, const
+T1 *h) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_smoothing_diff(T1 **yk, T1 *y0, T1 *J,
+T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::doc_interpolant(const std::string &name) "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring")  casadi::dple_n_out() "
+
+Get the number of QP solver outputs.
+
+";
+
+%feature("docstring")  casadi::casadi_low(T1 x, const double *grid,
+casadi_int ng, casadi_int lookup_mode) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::load_rootfinder(const std::string &name) "
+
+Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring")  casadi::casadi_mv(const T1 *x, const casadi_int
+*sp_x, const T1 *y, T1 *z, casadi_int tr) "
+
+[INTERNAL]  Sparse matrix-vector multiplication: z <- z + x*y.
+
+";
+
+%feature("docstring")  casadi::casadi_lsqr_single_solve(const T1 *A, T1 *x,
+casadi_int tr, const casadi_int *sp, T1 *w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_norm_2(casadi_int n, const T1 *x) "
+
+[INTERNAL]  NORM_2: ||x||_2 -> return.
+
+";
+
+%feature("docstring")  casadi::dense_kron_stride(casadi_int n, casadi_int m,
+const double *A, const double *B, double *C, casadi_int strideA, casadi_int
+strideB, casadi_int strideC) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_pr_direction(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_forward_diff(T1 **yk, T1 *y0, T1 *J,
+T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_kkt(casadi_qp_data< T1 > *d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_flip(casadi_qp_data< T1 > *d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_clear(T1 *x, casadi_int n) "
+
+[INTERNAL]  CLEAR: x <- 0.
+
+";
+
+%feature("docstring")  casadi::casadi_qr_trs(const casadi_int *sp_r, const
+T1 *nz_r, T1 *x, casadi_int tr) "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::_which_depends "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_bilin(const T1 *A, const casadi_int
+*sp_A, const T1 *x, const T1 *y) "
+
+[INTERNAL]  Calculates dot(x, mul(A, y))
+
+";
+
+%feature("docstring")  casadi::casadi_trans(const T1 *x, const casadi_int
+*sp_x, T1 *y, const casadi_int *sp_y, casadi_int *tmp) "
+
+[INTERNAL]  TRANS: y <- trans(x) , w work vector (length >= rows x)
+
+";
+
+%feature("docstring")  casadi::casadi_nd_boor_eval(T1 *ret, casadi_int
+n_dims, const T1 *knots, const casadi_int *offset, const casadi_int *degree,
+const casadi_int *strides, const T1 *c, casadi_int m, const T1 *x, const
+casadi_int *lookup_mode, casadi_int *iw, T1 *w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::nlpsol_out() "
+
+Get NLP solver output scheme of NLP solvers.
+
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
+
++--------------+-------+---------------------------------------------------+
+|  Full name   | Short |                    Description                    |
++==============+=======+===================================================+
+| NLPSOL_X     | x     | Decision variables at the optimal solution (nx x  |
+|              |       | 1)                                                |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_F     | f     | Cost function value at the optimal solution (1 x  |
+|              |       | 1)                                                |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_G     | g     | Constraints function at the optimal solution (ng  |
+|              |       | x 1)                                              |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_LAM_X | lam_x | Lagrange multipliers for bounds on X at the       |
+|              |       | solution (nx x 1)                                 |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_LAM_G | lam_g | Lagrange multipliers for bounds on G at the       |
+|              |       | solution (ng x 1)                                 |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_LAM_P | lam_p | Lagrange multipliers for bounds on P at the       |
+|              |       | solution (np x 1)                                 |
++--------------+-------+---------------------------------------------------+
+
+";
+
+%feature("docstring")  casadi::nlpsol_out(casadi_int ind) "
+
+Get output scheme name by index.
+
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
+
++--------------+-------+---------------------------------------------------+
+|  Full name   | Short |                    Description                    |
++==============+=======+===================================================+
+| NLPSOL_X     | x     | Decision variables at the optimal solution (nx x  |
+|              |       | 1)                                                |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_F     | f     | Cost function value at the optimal solution (1 x  |
+|              |       | 1)                                                |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_G     | g     | Constraints function at the optimal solution (ng  |
+|              |       | x 1)                                              |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_LAM_X | lam_x | Lagrange multipliers for bounds on X at the       |
+|              |       | solution (nx x 1)                                 |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_LAM_G | lam_g | Lagrange multipliers for bounds on G at the       |
+|              |       | solution (ng x 1)                                 |
++--------------+-------+---------------------------------------------------+
+| NLPSOL_LAM_P | lam_p | Lagrange multipliers for bounds on P at the       |
+|              |       | solution (np x 1)                                 |
++--------------+-------+---------------------------------------------------+
+
+";
+
+%feature("docstring")  casadi::casadi_qp_kkt_dot(casadi_qp_data< T1 > *d,
+const T1 *v, casadi_int i) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::is_strictly_monotone(const std::vector< T >
+&v) "
+
+Check if the vector is strictly monotone.
+
+";
+
+%feature("docstring")  casadi::has_linsol(const std::string &name) "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::casadi_qp_du_direction(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::simpleRK(Function f, casadi_int N=10,
+casadi_int order=4) "
+
+Construct an explicit Runge-Kutta integrator The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
+
+Parameters:
+-----------
+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+N:  Number of integrator steps
+
+order:  Order of interpolating polynomials
+
+";
+
+%feature("docstring")  casadi::casadi_qp_init(casadi_qp_data< T1 > *d,
+casadi_int **iw, T1 **w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::nlpsol_in() "
+
+Get input scheme of NLP solvers.
+
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
+
++---------------+--------+-------------------------------------------------+
+|   Full name   | Short  |                   Description                   |
++===============+========+=================================================+
+| NLPSOL_X0     | x0     | Decision variables, initial guess (nx x 1)      |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_P      | p      | Value of fixed parameters (np x 1)              |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_LBX    | lbx    | Decision variables lower bound (nx x 1),        |
+|               |        | default -inf.                                   |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_UBX    | ubx    | Decision variables upper bound (nx x 1),        |
+|               |        | default +inf.                                   |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_LBG    | lbg    | Constraints lower bound (ng x 1), default -inf. |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_UBG    | ubg    | Constraints upper bound (ng x 1), default +inf. |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_LAM_X0 | lam_x0 | Lagrange multipliers for bounds on X, initial   |
+|               |        | guess (nx x 1)                                  |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_LAM_G0 | lam_g0 | Lagrange multipliers for bounds on G, initial   |
+|               |        | guess (ng x 1)                                  |
++---------------+--------+-------------------------------------------------+
+
+";
+
+%feature("docstring")  casadi::nlpsol_in(casadi_int ind) "
+
+Get NLP solver input scheme name by index.
+
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
+
++---------------+--------+-------------------------------------------------+
+|   Full name   | Short  |                   Description                   |
++===============+========+=================================================+
+| NLPSOL_X0     | x0     | Decision variables, initial guess (nx x 1)      |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_P      | p      | Value of fixed parameters (np x 1)              |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_LBX    | lbx    | Decision variables lower bound (nx x 1),        |
+|               |        | default -inf.                                   |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_UBX    | ubx    | Decision variables upper bound (nx x 1),        |
+|               |        | default +inf.                                   |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_LBG    | lbg    | Constraints lower bound (ng x 1), default -inf. |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_UBG    | ubg    | Constraints upper bound (ng x 1), default +inf. |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_LAM_X0 | lam_x0 | Lagrange multipliers for bounds on X, initial   |
+|               |        | guess (nx x 1)                                  |
++---------------+--------+-------------------------------------------------+
+| NLPSOL_LAM_G0 | lam_g0 | Lagrange multipliers for bounds on G, initial   |
+|               |        | guess (ng x 1)                                  |
++---------------+--------+-------------------------------------------------+
+
+";
+
+%feature("docstring")  casadi::casadi_qp_zero_blocking(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::conic_n_in() "
+
+Get the number of QP solver inputs.
+
+";
+
+%feature("docstring")  casadi::doc_rootfinder(const std::string &name) "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring")  casadi::dense_mul_nt_stride(casadi_int n, casadi_int
+m, casadi_int l, const double *A, const double *B, double *C, casadi_int
+strideA, casadi_int strideB, casadi_int strideC) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
+const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::dple_in() "
+
+Get input scheme of DPLE solvers.
+
+";
+
+%feature("docstring")  casadi::dple_in(casadi_int ind) "
+
+Get DPLE input scheme name by index.
+
+";
+
+%feature("docstring")  casadi::dense_copy_t_stride(casadi_int n, casadi_int
+m, const double *A, double *B, casadi_int strideA, casadi_int strideB) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_print_iteration(casadi_qp_data< T1
+> *d, char *buf, int buf_sz) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::matrixName< casadi_int >() "
+
+Get typename.
 
 ";
 
