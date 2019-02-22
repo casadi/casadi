@@ -84,7 +84,7 @@ namespace casadi {
 
   private:
     /// Number of references pointing to the object
-    casadi_int count;
+    std::atomic<casadi_int> count;
 
     /// Weak pointer (non-owning) object for the object
     WeakRef* weak_ref_;
