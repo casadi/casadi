@@ -666,6 +666,13 @@ if(WITH_CLP)
 endif()
 add_feature_info(clp-interface WITH_CLP "Interface to the LP solver CLP.")
 
+option(WITH_CBC "Compile the CBC interface" OFF)
+if(WITH_CBC)
+  find_package(CBC REQUIRED)
+endif()
+add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
+
+
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
 option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal SNOPT build)" OFF)

@@ -65,6 +65,9 @@ if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
 if has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
+if has_conic("cbc"):
+  conics.append(("cbc",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": True, "sos":True}))
+
 if has_conic("qrqp"):
   conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True, "discrete": False, "sos":False}))
 
