@@ -1445,6 +1445,57 @@ class Functiontests(casadiTestCase):
 
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,fwd=False,evals=1)
 
+  def test_callback_jacobian_sparsity(self):
+    
+    x = MX.sym("x",2)
+
+    h = 1e-7
+    for with_jacobian_sparsity in [True, False]:
+      
+      calls = []
+
+      class Fun(Callback):
+
+          def __init__(self):
+            Callback.__init__(self)
+            self.construct("Fun", {"enable_fd":True,"fd_method":"forward","fd_options":{"h": h,"h_iter":False}})
+          def get_n_in(self): return 1
+          def get_n_out(self): return 1
+          def get_sparsity_in(self,i): return Sparsity.dense(2,1)
+          def get_sparsity_out(self,i): return Sparsity.dense(2,1)
+
+          def eval(self,arg):
+            x = arg[0]
+            calls.append((x-DM([5,7]))/h)
+            return [x**2]
+
+          def has_forward(self,nfwd): return False
+          def has_reverse(self,nadj): return False
+
+          def has_jacobian_sparsity(self): return with_jacobian_sparsity
+
+          def get_jacobian_sparsity(self):
+            return Sparsity.diag(2)
+
+      f = Fun()
+      y = jacobian(f(x),x)
+
+      F = Function('F',[x],[y])
+
+      with capture_stdout() as out:
+       J = F([5,7])
+      calls = hcat(calls)
+      J_ref = DM([[5*2,0],[0,7*2]])
+      if with_jacobian_sparsity:
+        self.checkarray(calls,DM([[0,0],[1,1]]).T,digits=5)
+        J_ref = sparsify(J_ref)
+      else:
+        self.checkarray(calls,DM([[0,0],[1,0],[0,1]]).T,digits=5)
+      
+      self.checkarray(J,J_ref,digits=5)
+      self.assertTrue(J.sparsity()==J_ref.sparsity())
+
+
   @requires_nlpsol("ipopt")
   def test_common_specific_options(self):
 
