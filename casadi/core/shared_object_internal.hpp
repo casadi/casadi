@@ -28,6 +28,8 @@
 
 #include "shared_object.hpp"
 
+#include <atomic>
+
 namespace casadi {
 
   /// \cond INTERNAL
