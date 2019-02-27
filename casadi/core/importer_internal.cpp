@@ -218,7 +218,6 @@ namespace casadi {
   DllLibrary::DllLibrary(const std::string& bin_name)
     : ImporterInternal(bin_name), handle_(nullptr) {
 
-    init_handle();
   }
 
   void DllLibrary::init_handle() {
