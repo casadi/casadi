@@ -561,7 +561,7 @@ int Sqpmethod::solve(void* mem) const {
       t = 1.0;
       double fk_cand;
       // Merit function value in candidate
-      double L1merit_cand = 0;
+      double l1_cand = 0;
 
       // Reset line-search counter, success marker
       ls_iter = 0;
@@ -574,18 +574,17 @@ int Sqpmethod::solve(void* mem) const {
         // Calculate penalty parameter of merit function
         m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, d->dlam));
         // Calculate L1-merit function in the actual iterate
-        double l1_infeas = casadi_max_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
+        double l1_infeas = casadi_sum_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
         // Right-hand side of Armijo condition
-        double F_sens = casadi_dot(nx_, d->dx, d->gf);
-        double L1dir = F_sens - m->sigma * l1_infeas;
-        double L1merit = d_nlp->f + m->sigma * l1_infeas;
+        double tl1 = casadi_dot(nx_, d->dx, d->gf) - m->sigma*l1_infeas;
+        double l1 = d_nlp->f + m->sigma * l1_infeas;
         // Storing the actual merit function value in a list
-        d->merit_mem[m->merit_ind] = L1merit;
+        d->merit_mem[m->merit_ind] = l1;
         m->merit_ind++;
         m->merit_ind %= merit_memsize_;
         // Calculating maximal merit function value so far
-        double meritmax = casadi_vfmax(d->merit_mem+1,
-          std::min(merit_memsize_, static_cast<casadi_int>(m->iter_count))-1, d->merit_mem[0]);
+        //double meritmax = casadi_vfmax(d->merit_mem+1,
+        //  std::min(merit_memsize_, static_cast<casadi_int>(m->iter_count))-1, d->merit_mem[0]);
 
         // Line-search loop
         while (true) {
@@ -614,9 +613,8 @@ int Sqpmethod::solve(void* mem) const {
           }
 
           // Calculating merit-function in candidate
-          l1_infeas = casadi_max_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
-          L1merit_cand = fk_cand + m->sigma * l1_infeas;
-          if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
+          l1_cand = fk_cand + m->sigma*casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
+          if (l1_cand <= l1 + t * c1_ * tl1) {
             break;
           }
 
