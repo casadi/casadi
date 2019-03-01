@@ -11412,7 +11412,7 @@ C++ includes: serializer.hpp ";
 // File: classcasadi_1_1DeserializingStream.xml
 %feature("docstring") casadi::DeserializingStream::DeserializingStream "
 
-Constructor.
+";
 
 ";
 
@@ -48136,8 +48136,8 @@ Solve QPs using an active-set method
 +-----------------+-----------+--------------------------------------------+
 | print_lincomb   | OT_BOOL   | Print dependant linear combinations of     |
 |                 |           | constraints [false]. Printed numbers are   |
-|                 |           | 0-based incdices into the vector of        |
-|                 |           | [simple bounds;linear bounds]              |
+|                 |           | 0-based indices into the vector of [simple |
+|                 |           | bounds;linear bounds]                      |
 +-----------------+-----------+--------------------------------------------+
 
 Joel Andersson
@@ -48184,7 +48184,7 @@ Joel Andersson
 |                 |               | combinations of        |               |
 |                 |               | constraints [false].   |               |
 |                 |               | Printed numbers are    |               |
-|                 |               | 0-based incdices into  |               |
+|                 |               | 0-based indices into   |               |
 |                 |               | the vector of [simple  |               |
 |                 |               | bounds;linear bounds]  |               |
 +-----------------+---------------+------------------------+---------------+
@@ -65970,8 +65970,8 @@ Solve QPs using an active-set method
 +-----------------+-----------+--------------------------------------------+
 | print_lincomb   | OT_BOOL   | Print dependant linear combinations of     |
 |                 |           | constraints [false]. Printed numbers are   |
-|                 |           | 0-based incdices into the vector of        |
-|                 |           | [simple bounds;linear bounds]              |
+|                 |           | 0-based indices into the vector of [simple |
+|                 |           | bounds;linear bounds]                      |
 +-----------------+-----------+--------------------------------------------+
 
 --------------------------------------------------------------------------------

@@ -3074,7 +3074,7 @@
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::Qrqp</td></tr>
-<tr><td>print_lincomb</td><td>OT_BOOL</td><td>Print dependant linear combinations of constraints [false]. Printed numbers are 0-based incdices into the vector of [simple bounds;linear bounds]</td><td>casadi::Qrqp</td></tr>
+<tr><td>print_lincomb</td><td>OT_BOOL</td><td>Print dependant linear combinations of constraints [false]. Printed numbers are 0-based indices into the vector of [simple bounds;linear bounds]</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 </table>
 */
@@ -3092,7 +3092,7 @@
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td></tr>
-<tr><td>print_lincomb</td><td>OT_BOOL</td><td>Print dependant linear combinations of constraints [false]. Printed numbers are 0-based incdices into the vector of [simple bounds;linear bounds]</td></tr>
+<tr><td>print_lincomb</td><td>OT_BOOL</td><td>Print dependant linear combinations of constraints [false]. Printed numbers are 0-based indices into the vector of [simple bounds;linear bounds]</td></tr>
 </table>
 */
 /** \addtogroup general_Qrqp
@@ -3110,7 +3110,7 @@
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::Qrqp</td></tr>
-<tr><td>print_lincomb</td><td>OT_BOOL</td><td>Print dependant linear combinations of constraints [false]. Printed numbers are 0-based incdices into the vector of [simple bounds;linear bounds]</td><td>casadi::Qrqp</td></tr>
+<tr><td>print_lincomb</td><td>OT_BOOL</td><td>Print dependant linear combinations of constraints [false]. Printed numbers are 0-based indices into the vector of [simple bounds;linear bounds]</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 </table>
 */
