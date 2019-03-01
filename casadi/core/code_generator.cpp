@@ -1064,6 +1064,13 @@ namespace casadi {
     case AUX_FILE_SLURP:
       add_include("stdio.h");
       this->auxiliaries << sanitize_source(casadi_file_slurp_str, inst);
+    case AUX_CVX:
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_FABS);
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_DOT);
+      add_auxiliary(AUX_AXPY);
+      this->auxiliaries << sanitize_source(casadi_cvx_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
