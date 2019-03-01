@@ -224,6 +224,7 @@ namespace casadi {
 
  // Template function implementations
   #include "casadi_copy.hpp"
+  #include "casadi_cvx.hpp"
   #include "casadi_swap.hpp"
   #include "casadi_project.hpp"
   #include "casadi_densify.hpp"

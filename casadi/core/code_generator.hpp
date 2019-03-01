@@ -300,6 +300,7 @@ namespace casadi {
     /** \brief Auxiliary functions */
     enum Auxiliary {
       AUX_COPY,
+      AUX_CVX,
       AUX_SWAP,
       AUX_SCAL,
       AUX_AXPY,
