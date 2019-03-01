@@ -57,7 +57,7 @@ if 1 or has_conic("cplex"):
 # No solution for licensing on travis
 
 if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
-  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False}))
+  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False,"discrete":True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))

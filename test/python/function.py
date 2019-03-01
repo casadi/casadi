@@ -2025,11 +2025,11 @@ class Functiontests(casadiTestCase):
       F = Function.load("f.casadi")
 
       x_num = DM.from_file("f.000000.in.x." + fmt)
-      y_num = DM.from_file("f.000000.in.y." + fmt)
+      #y_num = DM.from_file("f.000000.in.y." + fmt)
       z_num = DM.from_file("f.000000.in.z." + fmt)
 
       self.checkarray(x_num,ins[0])
-      self.checkarray(y_num,ins[1])
+      #self.checkarray(y_num,ins[1])
       self.checkarray(z_num,ins[2])
 
       a_num = DM.from_file("f.000000.out.a." + fmt)
