@@ -7,9 +7,11 @@ template<typename T1>
 struct casadi_sqpmethod_prob {
   const casadi_nlpsol_prob<T1>* nlp;
   // Sparsity patterns
-  const casadi_int *sp_h, *sp_a;
+  const casadi_int *sp_h, *sp_a, *sp_hr;
   casadi_int merit_memsize;
   casadi_int max_iter_ls;
+  casadi_int sz_w_cvx;
+  casadi_int sz_iw_cvx;
 };
 // C-REPLACE "casadi_sqpmethod_prob<T1>" "struct casadi_sqpmethod_prob"
 
@@ -30,9 +32,17 @@ struct casadi_sqpmethod_data {
   // QP solution
   T1 *dx, *dlam;
   // Hessian approximation
-  T1* Bk;
+  T1 *Bk;
+  // Raw Hessian data (prior to convexification)
+  T1 *Brk;
+  // Projection work vectors
+  T1 *Bproj;
   // Jacobian
   T1* Jk;
+  // Work vector for convexification
+  T1* w_cvx;
+  // Work vector for convexification
+  casadi_int* iw_cvx;
   // merit_mem
   T1* merit_mem;
 };
@@ -44,8 +54,9 @@ template<typename T1>
 void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
     casadi_int* sz_iw, casadi_int* sz_w) {
   // Local variables
-  casadi_int nnz_h, nnz_a, nx, ng;
+  casadi_int nnz_h, nnz_hr, nnz_a, nx, ng;
   nnz_h = p->sp_h[2+p->sp_h[1]];
+  nnz_hr = p->sp_hr[2+p->sp_hr[1]];
   nnz_a = p->sp_a[2+p->sp_a[1]];
   nx = p->nlp->nx;
   ng = p->nlp->ng;
@@ -66,8 +77,14 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
   *sz_w += nx + ng; // dlam
   // Hessian approximation
   *sz_w += nnz_h; // Bk
+  *sz_w += nnz_hr; // Brk
+  *sz_w += nx; // Projection
   // Jacobian
   *sz_w += nnz_a; // Jk
+  // Convexification work vector
+  *sz_w += p->sz_w_cvx; // w_convex
+  // Convexification work vector
+  *sz_iw += p->sz_iw_cvx; // w_convex
   // merit_mem
   if (p->max_iter_ls>0) *sz_w += p->merit_memsize;
 }
@@ -76,10 +93,11 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
 template<typename T1>
 void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w) {
   // Local variables
-  casadi_int nnz_h, nnz_a, nx, ng;
+  casadi_int nnz_h, nnz_hr, nnz_a, nx, ng;
   const casadi_sqpmethod_prob<T1>* p = d->prob;
   // Get matrix number of nonzeros
   nnz_h = p->sp_h[2+p->sp_h[1]];
+  nnz_hr = p->sp_hr[2+p->sp_hr[1]];
   nnz_a = p->sp_a[2+p->sp_a[1]];
   nx = p->nlp->nx;
   ng = p->nlp->ng;
@@ -100,8 +118,14 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
   d->dlam = *w; *w += nx + ng;
   // Hessian approximation
   d->Bk = *w; *w += nnz_h;
+  d->Brk = *w; *w += nnz_hr;
+  d->Bproj = *w; *w += nx;
   // Jacobian
   d->Jk = *w; *w += nnz_a;
+  // Convexification work vector
+  d->w_cvx = *w; *w += p->sz_w_cvx;
+  // Convexification work vector
+  d->iw_cvx = *iw; *iw += p->sz_iw_cvx;
   // merit_mem
   if (p->max_iter_ls>0) {
     d->merit_mem = *w;

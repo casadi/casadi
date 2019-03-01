@@ -38,6 +38,7 @@
 using namespace std;
 namespace casadi {
 
+
   extern "C"
   int CASADI_NLPSOL_SQPMETHOD_EXPORT
       casadi_register_nlpsol_sqpmethod(Nlpsol::Plugin* plugin) {
@@ -101,13 +102,13 @@ namespace casadi {
       {"lbfgs_memory",
        {OT_INT,
         "Size of L-BFGS memory."}},
-      {"regularize",
-       {OT_BOOL,
-        "Automatic regularization of Lagrange Hessian."}},
-      {"regularize_margin",
+      {"convexify_strategy",
+       {OT_STRING,
+        "none|regularize|eigen-reflect|eigen-clip. Default: none."}},
+      {"convexify_margin",
        {OT_DOUBLE,
-        "When regularize is true, make sure that the smallest eigenvalue is at least this "
-        "(default: 1e-7)."}},
+        "When using a convexification strategy, make sure that "
+        "the smallest eigenvalue is at least this (default: 1e-7)."}},
       {"print_header",
        {OT_BOOL,
         "Print the header with problem statistics"}},
@@ -144,8 +145,8 @@ namespace casadi {
     lbfgs_memory_ = 10;
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
-    regularize_ = false;
-    regularize_margin_ = 1e-7;
+    convexify_margin_ = 1e-7;
+    max_iter_eig_ = 50;
     string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
     string qpsol_plugin = "qpoases";
@@ -154,6 +155,7 @@ namespace casadi {
     print_iteration_ = true;
     print_status_ = true;
 
+    std::string convexify_strategy = "none";
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
@@ -182,11 +184,11 @@ namespace casadi {
         qpsol_plugin = op.second.to_string();
       } else if (op.first=="qpsol_options") {
         qpsol_options = op.second;
-      } else if (op.first=="regularize") {
-        regularize_ = op.second;
-      } else if (op.first=="regularize_margin") {
-        regularize_margin_ = op.second;
-        casadi_assert(regularize_margin_>=0, "Margin must be >=0");
+      } else if (op.first=="convexify_margin") {
+        convexify_margin_ = op.second;
+        casadi_assert(convexify_margin_>=0, "Margin must be >=0");
+      } else if (op.first=="convexify_strategy") {
+        convexify_strategy = op.second.to_string();
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       } else if (op.first=="print_iteration") {
@@ -206,6 +208,19 @@ namespace casadi {
       }
     }
 
+    if (convexify_strategy=="none") {
+      convexify_strategy_ = CVX_NONE;
+    } else if (convexify_strategy=="regularize") {
+      convexify_strategy_ = CVX_REGULARIZE;
+    } else if (convexify_strategy=="eigen-reflect") {
+      convexify_strategy_ = CVX_EIGEN_REFLECT;
+    } else if (convexify_strategy=="eigen-clip") {
+      convexify_strategy_ = CVX_EIGEN_CLIP;
+    } else {
+      casadi_error("Invalid 'convexify_strategy'. "
+        "Choose from none|regularize|eigen-reflect|eigen-clip");
+    }
+
     // Use exact Hessian?
     exact_hessian_ = hessian_approximation =="exact";
 
@@ -219,17 +234,55 @@ namespace casadi {
     }
     Asp_ = get_function("nlp_jac_fg").sparsity_out(3);
 
+
+    scc_transform_ = false;
+    Hsp_project_ = false;
     if (exact_hessian_) {
       if (!has_function("nlp_hess_l")) {
         create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                       {"sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
-      Hsp_ = get_function("nlp_hess_l").sparsity_out(0);
-      casadi_assert(Hsp_.is_symmetric(), "Hessian must be symmetric");
+      Hrsp_ = get_function("nlp_hess_l").sparsity_out(0);
+      casadi_assert(Hrsp_.is_symmetric(), "Hessian must be symmetric");
+
+      if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
+        // Uncover strongly connected components
+        std::vector<casadi_int> scc_index;
+        casadi_int scc_nb = Hrsp_.scc(scc_index, scc_offset_);
+
+        // Represent Hessian as block-dense in permuted space
+        std::vector<Sparsity> sp;
+        for (casadi_int i=0;i<scc_nb;++i) {
+          casadi_int block = scc_offset_.at(i+1)-scc_offset_.at(i);
+          sp.push_back(Sparsity::dense(block, block));
+        }
+
+        std::vector<casadi_int> ssc_perm = lookupvector(scc_index);
+        std::vector<casadi_int> mapping_dummy;
+        Hsp_ = diagcat(sp).sub(ssc_perm, ssc_perm, mapping_dummy);
+        scc_sp_ = Hsp_.sub(scc_index, scc_index, scc_mapping_);
+
+        // Find out size of maximum block
+        block_size_ = 0;
+        for (casadi_int i=0;i<scc_nb;++i) {
+          casadi_int block = scc_offset_.at(i+1)-scc_offset_.at(i);
+          if (block>block_size_) block_size_ = block;
+        }
+
+        if (verbose_) casadi_message("Identified " + str(scc_nb) + " blocks "
+          "with maximum size " + str(block_size_) + ".");
+
+        scc_transform_ = scc_offset_!=range(nx_);
+      } else if (convexify_strategy_==CVX_REGULARIZE) {
+        Hsp_ = Hrsp_ + Sparsity::diag(nx_);
+      } else {
+        Hsp_ = Hrsp_;
+      }
+      Hsp_project_ = Hsp_!=Hrsp_;
     } else {
       Hsp_ = Sparsity::dense(nx_, nx_);
+      Hrsp_ = Hsp_;
     }
-
 
     // Allocate a QP solver
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
@@ -269,6 +322,15 @@ namespace casadi {
 
   void Sqpmethod::set_sqpmethod_prob() {
     p_.sp_h = Hsp_;
+    p_.sp_hr = Hrsp_;
+    if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
+      p_.sz_w_cvx = max(block_size_, 2*(block_size_-1)*max_iter_eig_);
+      if (scc_transform_) p_.sz_w_cvx += block_size_*block_size_;
+      p_.sz_iw_cvx = 1+3*max_iter_eig_;
+    } else {
+      p_.sz_w_cvx = 0;
+      p_.sz_iw_cvx = 0;
+    }
     p_.sp_a = Asp_;
     p_.merit_memsize = merit_memsize_;
     p_.max_iter_ls = max_iter_ls_;
@@ -393,13 +455,73 @@ int Sqpmethod::solve(void* mem) const {
         m->arg[1] = d_nlp->p;
         m->arg[2] = &one;
         m->arg[3] = d_nlp->lam + nx_;
-        m->res[0] = d->Bk;
+        m->res[0] = Hsp_project_ ? d->Brk : d->Bk;
         if (calc_function(m, "nlp_hess_l")) return 1;
 
-        // Determing regularization parameter with Gershgorin theorem
-        if (regularize_) {
-          m->reg = regularize_margin_-casadi_lb_eig(Hsp_, d->Bk);
+        if (Hsp_project_) {
+          casadi_project(d->Brk, Hrsp_, d->Bk, Hsp_, d->Bproj);
+        }
+
+        if (convexify_strategy_==CVX_REGULARIZE) {
+          // Determing regularization parameter with Gershgorin theorem
+          m->reg = convexify_margin_-casadi_lb_eig(Hsp_, d->Bk);
           if (m->reg > 0) casadi_regularize(Hsp_, d->Bk, m->reg);
+        } else if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
+          const casadi_int* row = scc_sp_.row();
+          const casadi_int* colind = scc_sp_.colind();
+          casadi_int offset = 0;
+
+          for (casadi_int k=0;k<scc_offset_.size()-1;++k) {
+            casadi_int block_start = scc_offset_.at(k);
+            casadi_int block_end = scc_offset_.at(k+1);
+            casadi_int block_size = block_end-block_start;
+
+            double *H_block;
+            double *w_cvx;
+
+            if (scc_transform_) {
+              // Loop over columns of block
+              for (casadi_int cc=block_start;cc<block_end;++cc) {
+                // Loop over elements in column
+                for (casadi_int el=colind[cc];el<colind[cc+1];++el) {
+                  casadi_int r = row[el];
+                  casadi_int j = (r-block_start)+block_size*(cc-block_start);
+                  d->w_cvx[j] = d->Bk[scc_mapping_[el]];
+                }
+              }
+              H_block = d->w_cvx;
+              w_cvx = d->w_cvx+block_size*block_size;
+            } else {
+              H_block = d->Bk+offset;
+              offset += block_size*block_size;
+              w_cvx = d->w_cvx;
+            }
+
+            int ret = casadi_cvx(block_size, H_block, convexify_margin_, 1e-10,
+              convexify_strategy_==CVX_EIGEN_REFLECT, max_iter_eig_, w_cvx, d->iw_cvx);
+            casadi_assert(!ret, "Failure in convexification.");
+
+            // Fill in upper-rectangular part
+            for (casadi_int i=0;i<block_size;++i) {
+              for (casadi_int j=0;j<block_size;++j) {
+                if (j<i) {
+                  H_block[block_size*i+j] = H_block[block_size*j+i];
+                }
+              }
+            }
+
+            if (scc_transform_) {
+              // Loop over columns of block
+              for (casadi_int cc=block_start;cc<block_end;++cc) {
+                // Loop over elements in column
+                for (casadi_int el=colind[cc];el<colind[cc+1];++el) {
+                  casadi_int r = row[el];
+                  casadi_int j = (r-block_start)+block_size*(cc-block_start);
+                  d->Bk[scc_mapping_[el]] = d->w_cvx[j];
+                }
+              }
+            }
+          }
         }
       } else if (m->iter_count==0) {
         // Initialize BFGS
@@ -629,7 +751,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.init_local("m_res", "res+" + str(NLPSOL_NUM_OUT));
     g.local("iter_count", "casadi_int");
     g.init_local("iter_count", "0");
-    if (regularize_) {
+    if (convexify_strategy_==CVX_REGULARIZE) {
       g.local("reg", "casadi_real");
       g.init_local("reg", "0");
     }
@@ -687,8 +809,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     std::string nlp_hess_l = g.add_dependency(get_function("nlp_hess_l"));
     g << nlp_hess_l + "(m_arg, m_res, m_iw, m_w, 0);\n";
     g.comment("Determing regularization parameter with Gershgorin theorem");
-    if (regularize_) {
-      g << "reg = " << regularize_margin_ << "-" + g.lb_eig(Hsp_, "d.Bk") << ";\n";
+    if (convexify_strategy_==CVX_REGULARIZE) {
+      g << "reg = " << convexify_margin_ << "-" + g.lb_eig(Hsp_, "d.Bk") << ";\n";
       g << "if (reg>0) " << g.regularize(Hsp_, "d.Bk", "reg") << "\n";
     }
     g.comment("Formulate the QP");
@@ -855,9 +977,19 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.unpack("Sqpmethod::print_iteration", print_iteration_);
     s.unpack("Sqpmethod::print_status", print_status_);
     s.unpack("Sqpmethod::Hsp", Hsp_);
+    s.unpack("Sqpmethod::Hrsp", Hrsp_);
     s.unpack("Sqpmethod::Asp", Asp_);
-    s.unpack("Sqpmethod::regularize", regularize_);
-    s.unpack("Sqpmethod::regularize_margin", regularize_margin_);
+    s.unpack("Sqpmethod::convexify_margin", convexify_margin_);
+    char convexify_strategy;
+    s.unpack("Sqpmethod::convexify_strategy", convexify_strategy);
+    convexify_strategy_ = static_cast<ConvexifyStrategy>(convexify_strategy);
+    s.unpack("Sqpmethod::Hsp_project", Hsp_project_);
+    s.unpack("Sqpmethod::scc_transform", scc_transform_);
+    s.unpack("Sqpmethod::scc_offset", scc_offset_);
+    s.unpack("Sqpmethod::scc_mapping", scc_mapping_);
+    s.unpack("Sqpmethod::max_iter_eig", max_iter_eig_);
+    s.unpack("Sqpmethod::block_size", block_size_);
+    s.unpack("Sqpmethod::scc_sp", scc_sp_);
     set_sqpmethod_prob();
   }
 
@@ -881,8 +1013,16 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.pack("Sqpmethod::print_iteration", print_iteration_);
     s.pack("Sqpmethod::print_status", print_status_);
     s.pack("Sqpmethod::Hsp", Hsp_);
+    s.pack("Sqpmethod::Hrsp", Hrsp_);
     s.pack("Sqpmethod::Asp", Asp_);
-    s.pack("Sqpmethod::regularize", regularize_);
-    s.pack("Sqpmethod::regularize_margin", regularize_margin_);
+    s.pack("Sqpmethod::convexify_margin", convexify_margin_);
+    s.pack("Sqpmethod::convexify_strategy", static_cast<char>(convexify_strategy_));
+    s.pack("Sqpmethod::Hsp_project", Hsp_project_);
+    s.pack("Sqpmethod::scc_transform", scc_transform_);
+    s.pack("Sqpmethod::scc_offset", scc_offset_);
+    s.pack("Sqpmethod::scc_mapping", scc_mapping_);
+    s.pack("Sqpmethod::max_iter_eig", max_iter_eig_);
+    s.pack("Sqpmethod::block_size", block_size_);
+    s.pack("Sqpmethod::scc_sp", scc_sp_);
   }
 } // namespace casadi

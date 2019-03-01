@@ -5,6 +5,7 @@ set(RUNTIME_SRC
   casadi_axpy.hpp
   casadi_bilin.hpp
   casadi_copy.hpp
+  casadi_cvx.hpp
   casadi_de_boor.hpp
   casadi_densify.hpp
   casadi_dot.hpp

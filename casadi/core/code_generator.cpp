@@ -902,6 +902,15 @@ namespace casadi {
       add_auxiliary(AUX_FMIN);
       this->auxiliaries << sanitize_source(casadi_bound_consistency_str, inst);
       break;
+    case AUX_CVX:
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_SIGN);
+      add_auxiliary(AUX_FABS);
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_DOT);
+      add_auxiliary(AUX_AXPY);
+      this->auxiliaries << sanitize_source(casadi_cvx_str, inst);
+      break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
                         << "(" << (this->cpp ? "static_cast<double>(x)" : "(double) x") << ")\n\n";
