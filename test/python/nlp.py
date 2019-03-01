@@ -48,8 +48,8 @@ if has_nlpsol("snopt"):
 
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.tiny_step_tol": 1e-20, "ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":0,"print_time":False,"print_time":False} }
-  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"print_header":False,"print_iteration":True,"print_time":False},set()))
-  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10,"min_step_size":1e-14,"print_header":False,"print_iteration":True,"print_time":False},set()))
+  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},set()))
+  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10,"min_step_size":1e-14,"print_header":False,"print_iteration":False,"print_time":False},set()))
 
 if has_conic("qrqp") and has_nlpsol("sqpmethod"):
   qpsol_options = {"print_iter":False,"print_header":False,"error_on_fail" : False}
@@ -1811,11 +1811,11 @@ class NLPtests(casadiTestCase):
 
       res = solver(x0=x0)
 
-
       self.checkarray(x0-np.linalg.solve(Hcvx,mtimes(H,x0)),res["x"])
-      #self.checkarray(x0-solve(Hcvx,mtimes(H,x0),"symbolicqr"),res["x"])
+
       self.check_serialize(solver,{"x0":x0})
 
+      self.check_codegen(solver,{"x0":x0},std="c99")
 
 
   def test_simple_bounds_detect(self):
