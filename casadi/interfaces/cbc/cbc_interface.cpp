@@ -292,7 +292,7 @@ namespace casadi {
     CbcModel model(osi_model);
 
     if (hot_start_)
-      model.setHotstartSolution(arg[CONIC_X0]);
+      model.setBestSolution(arg[CONIC_X0], nx_, COIN_DBL_MAX, true);
 
     // Construct SOS constraints
     std::vector<CbcSOS> sos_objects;
