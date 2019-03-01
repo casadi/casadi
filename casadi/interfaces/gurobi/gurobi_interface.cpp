@@ -186,8 +186,8 @@ namespace casadi {
       *lbx=arg[CONIC_LBX],
       *ubx=arg[CONIC_UBX],
       *p=arg[CONIC_P],
-      *q=arg[CONIC_Q];
-      //*x0=arg[CONIC_X0],
+      *q=arg[CONIC_Q],
+      *x0=arg[CONIC_X0];
       //*lam_x0=arg[CONIC_LAM_X0];
 
     // Outputs
@@ -231,6 +231,12 @@ namespace casadi {
         // Pass to model
         flag = GRBaddvar(model, 0, nullptr, nullptr, g ? g[i] : 0., lb, ub, vtype, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
+
+        // If it is a discrete variable, we can pass the start guess
+        if (vtype != GRB_CONTINUOUS) {
+          flag = GRBsetdblattrelement(model, "Start", i, x0[i]);
+          casadi_assert(!flag, GRBgeterrormsg(m->env));
+        }
       }
 
       /*  Treat SOCP constraints */
