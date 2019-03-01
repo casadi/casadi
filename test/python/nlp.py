@@ -1794,6 +1794,7 @@ class NLPtests(casadiTestCase):
       (diagcat(DM([[2, 0,0],[0, -1,0],[0,0,8]]),DM([[5, 8],[8, 6]])), diagcat(DM([[2, 0,0],[0, eps,0],[0,0,8]]),clip(DM([[5, 8],[8, 6]]),eps)), {"convexify_strategy": "eigen-clip","convexify_margin":eps},[],[]),
       (DM([[2, 0,0],[0, eps/2,0],[0,0,8]]), DM([[2, 0,0],[0, eps,0],[0,0,8]]), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},[],[]),
       (diagcat(sparsify(DM([[2, 0,0],[0, -1,0],[0,0,8]])),DM([[5, 3],[3, 6]])), diagcat(DM([[2, 0,0],[0, 1,0],[0,0,8]]),DM([[5, 3],[3, 6]])), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},["Identified 4 blocks with maximum size 2"],[]),
+      (diagcat(sparsify(DM([[2, 0,0],[0, -1,0],[0,0,8]])),DM([[5, 3],[3, 5]])), diagcat(DM([[2, 0,0],[0, 1,0],[0,0,8]]),DM([[5, 3],[3, 5]])), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},["Identified 4 blocks with maximum size 2"],[]),
       (Hp, reflect(Hp,eps), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},[],[]),
       (Hp, clip(Hp,eps), {"convexify_strategy": "eigen-clip","convexify_margin":eps},[],[]),
       ]:

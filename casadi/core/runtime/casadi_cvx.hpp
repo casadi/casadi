@@ -155,11 +155,13 @@ void casadi_cvx_givens(T1 a, T1 b, T1* c, T1* s) {
 // Golub & Van Loan Alg. 8.3.2
 template<typename T1>
 void casadi_cvx_implicit_qr(casadi_int n, T1* t_diag, T1* t_off, T1* cs) {
-  T1 d, mu, to2, x, z, c, s, t1, t2, d0, d1, o0, o1;
+  T1 d, mu, to2, x, z, c, s, t1, t2, d0, d1, o0, o1, sd;
   casadi_int i;
   d = 0.5*(t_diag[n-2]-t_diag[n-1]);
   to2 = t_off[n-2]*t_off[n-2];
-  mu = t_diag[n-1]-to2/(d+sign(d)*sqrt(d*d+to2));
+  sd = 1;
+  if (d<0) sd = -1;
+  mu = t_diag[n-1]-to2/(d+sd*sqrt(d*d+to2));
   x = t_diag[0]-mu;
   z = t_off[0];
   for (i=0;i<n-1;++i) {

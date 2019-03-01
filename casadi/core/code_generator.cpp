@@ -904,7 +904,6 @@ namespace casadi {
       break;
     case AUX_CVX:
       add_auxiliary(AUX_CLEAR);
-      add_auxiliary(AUX_SIGN);
       add_auxiliary(AUX_FABS);
       add_auxiliary(AUX_COPY);
       add_auxiliary(AUX_DOT);
