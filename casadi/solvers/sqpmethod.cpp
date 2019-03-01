@@ -482,7 +482,7 @@ int Sqpmethod::solve(void* mem) const {
               // Loop over columns of block
               for (casadi_int i=0;i<block_size;++i) {
                 // Loop over elements in column
-                for (casadi_int j=0;j<block_size;++j,++kk) {
+                for (casadi_int j=0;j<block_size;++j, ++kk) {
                   d->w_cvx[kk] = d->Bk[scc_mapping_[offset+kk]];
                 }
               }
@@ -513,7 +513,7 @@ int Sqpmethod::solve(void* mem) const {
               // Loop over columns of block
               for (casadi_int i=0;i<block_size;++i) {
                 // Loop over elements in column
-                for (casadi_int j=0;j<block_size;++j,++kk) {
+                for (casadi_int j=0;j<block_size;++j, ++kk) {
                   d->Bk[scc_mapping_[offset+kk]] = d->w_cvx[kk];
                 }
               }
@@ -839,7 +839,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g.comment("Set w_cvx to dense Hessian block from Bk");
       std::string H_block, w_cvx;
       if (scc_transform_) {
-        g.local("kk","casadi_int");
+        g.local("kk", "casadi_int");
         g.local("i", "casadi_int");
         g.local("j", "casadi_int");
         g << "for (i=0,kk=0;i<block_size;++i) {\n";
@@ -868,7 +868,6 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "}\n";
       g << "}\n";
 
-      
       if (scc_transform_) {
         g.comment("Put results back in Bk");
         g << "for (i=0,kk=0;i<block_size;++i) {\n";
