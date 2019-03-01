@@ -467,36 +467,33 @@ int Sqpmethod::solve(void* mem) const {
           m->reg = convexify_margin_-casadi_lb_eig(Hsp_, d->Bk);
           if (m->reg > 0) casadi_regularize(Hsp_, d->Bk, m->reg);
         } else if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
-          const casadi_int* row = scc_sp_.row();
-          const casadi_int* colind = scc_sp_.colind();
           casadi_int offset = 0;
 
+          // Loop over Hessian blocks
           for (casadi_int k=0;k<scc_offset_.size()-1;++k) {
-            casadi_int block_start = scc_offset_.at(k);
-            casadi_int block_end = scc_offset_.at(k+1);
-            casadi_int block_size = block_end-block_start;
+            casadi_int block_size = scc_offset_.at(k+1)-scc_offset_.at(k);
 
             double *H_block;
             double *w_cvx;
 
+            // Set w_cvx to dense Hessian block from Bk
             if (scc_transform_) {
+              casadi_int kk=0;
               // Loop over columns of block
-              for (casadi_int cc=block_start;cc<block_end;++cc) {
+              for (casadi_int i=0;i<block_size;++i) {
                 // Loop over elements in column
-                for (casadi_int el=colind[cc];el<colind[cc+1];++el) {
-                  casadi_int r = row[el];
-                  casadi_int j = (r-block_start)+block_size*(cc-block_start);
-                  d->w_cvx[j] = d->Bk[scc_mapping_[el]];
+                for (casadi_int j=0;j<block_size;++j,++kk) {
+                  d->w_cvx[kk] = d->Bk[scc_mapping_[offset+kk]];
                 }
               }
               H_block = d->w_cvx;
               w_cvx = d->w_cvx+block_size*block_size;
             } else {
               H_block = d->Bk+offset;
-              offset += block_size*block_size;
               w_cvx = d->w_cvx;
             }
 
+            // Perform convexification
             int ret = casadi_cvx(block_size, H_block, convexify_margin_, 1e-10,
               convexify_strategy_==CVX_EIGEN_REFLECT, max_iter_eig_, w_cvx, d->iw_cvx);
             casadi_assert(!ret, "Failure in convexification.");
@@ -510,17 +507,19 @@ int Sqpmethod::solve(void* mem) const {
               }
             }
 
+            // Put results back in Bk
             if (scc_transform_) {
+              casadi_int kk=0;
               // Loop over columns of block
-              for (casadi_int cc=block_start;cc<block_end;++cc) {
+              for (casadi_int i=0;i<block_size;++i) {
                 // Loop over elements in column
-                for (casadi_int el=colind[cc];el<colind[cc+1];++el) {
-                  casadi_int r = row[el];
-                  casadi_int j = (r-block_start)+block_size*(cc-block_start);
-                  d->Bk[scc_mapping_[el]] = d->w_cvx[j];
+                for (casadi_int j=0;j<block_size;++j,++kk) {
+                  d->Bk[scc_mapping_[offset+kk]] = d->w_cvx[kk];
                 }
               }
             }
+
+            offset += block_size*block_size;
           }
         }
       } else if (m->iter_count==0) {
@@ -732,7 +731,17 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
     g << "d.prob = &p;\n";
 
+    g << "p.sp_hr = " << g.sparsity(Hrsp_) << ";\n";
     g << "p.sp_h = " << g.sparsity(Hsp_) << ";\n";
+    casadi_int sz_w_cvx = 0;
+    casadi_int sz_iw_cvx = 0;
+    if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
+      sz_w_cvx = max(block_size_, 2*(block_size_-1)*max_iter_eig_);
+      if (scc_transform_) sz_w_cvx += block_size_*block_size_;
+      sz_iw_cvx = 1+3*max_iter_eig_;
+    }
+    g << "p.sz_w_cvx = " << sz_w_cvx << ";\n";
+    g << "p.sz_iw_cvx = " << sz_iw_cvx << ";\n";
     g << "p.sp_a = " << g.sparsity(Asp_) << ";\n";
     g << "p.merit_memsize = " << merit_memsize_ << ";\n";
     g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
@@ -754,8 +763,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g.init_local("reg", "0");
     }
     if (max_iter_ls_) {
-      g.local("merit_ind", "casadi_int");
-      g.init_local("merit_ind", "0");
+      //g.local("merit_ind", "casadi_int");
+      //g.init_local("merit_ind", "0");
       g.local("sigma", "casadi_real");
       g.init_local("sigma", "0.0");
       g.local("ls_iter", "casadi_int");
@@ -803,14 +812,76 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "m_arg[1] = m_p;\n";
     g << "m_arg[2] = &one;\n";
     g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
-    g << "m_res[0] = d.Bk;\n";
+    g << "m_res[0] = " << (Hsp_project_ ? "d.Brk" : "d.Bk") << ";\n";
     std::string nlp_hess_l = g.add_dependency(get_function("nlp_hess_l"));
     g << nlp_hess_l + "(m_arg, m_res, m_iw, m_w, 0);\n";
-    g.comment("Determing regularization parameter with Gershgorin theorem");
+
+    if (Hsp_project_) {
+      g << g.project("d.Brk", Hrsp_, "d.Bk", Hsp_, "d.Bproj") << "\n";
+    }
     if (convexify_strategy_==CVX_REGULARIZE) {
+      g.comment("Determing regularization parameter with Gershgorin theorem");
       g << "reg = " << convexify_margin_ << "-" + g.lb_eig(Hsp_, "d.Bk") << ";\n";
       g << "if (reg>0) " << g.regularize(Hsp_, "d.Bk", "reg") << "\n";
+    } else if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
+      g.add_auxiliary(CodeGenerator::AUX_CVX);
+      g.local("offset", "casadi_int");
+      g << "offset = 0;\n";
+
+      g.comment("Loop over Hessian blocks");
+      g.local("k", "casadi_int");
+      g << "for (k=0;k<" << scc_offset_.size()-1 << ";++k) {\n";
+      g.local("block_size", "casadi_int");
+      std::string scc_offset = g.constant(scc_offset_);
+      std::string scc_mapping = g.constant(scc_mapping_);
+      g << "block_size = " << scc_offset << "[k+1]-" << scc_offset << "[k];\n";
+
+      g.comment("Set w_cvx to dense Hessian block from Bk");
+      std::string H_block, w_cvx;
+      if (scc_transform_) {
+        g.local("kk","casadi_int");
+        g.local("i", "casadi_int");
+        g.local("j", "casadi_int");
+        g << "for (i=0,kk=0;i<block_size;++i) {\n";
+        g << "for (j=0;j<block_size;++j,++kk) {\n";
+        g << "d.w_cvx[kk] = d.Bk[" << scc_mapping << "[offset+kk]];\n";
+        g << "}\n";
+        g << "}\n";
+        H_block = "d.w_cvx";
+        w_cvx = "d.w_cvx+block_size*block_size";
+      } else {
+        H_block = "(d.Bk+offset)";
+        w_cvx = "d.w_cvx";
+      }
+
+      g.comment("Perform convexification");
+      g << "if (casadi_cvx(block_size, " + H_block + ", " + str(convexify_margin_) +
+        ", 1e-10, " + str(convexify_strategy_==CVX_EIGEN_REFLECT ? 1 : 0) + ", " +
+        str(max_iter_eig_) + ", " + w_cvx + ", d.iw_cvx)) return 1;\n";
+
+      g.comment("Fill in upper-rectangular part");
+      g << "for (i=0,kk=0;i<block_size;++i) {\n";
+      g << "for (j=0;j<block_size;++j,++kk) {\n";
+      g << "if (j<i) {\n";
+      g << H_block + "[kk] = " + H_block + "[block_size*j+i];\n";
+      g << "}\n";
+      g << "}\n";
+      g << "}\n";
+
+      
+      if (scc_transform_) {
+        g.comment("Put results back in Bk");
+        g << "for (i=0,kk=0;i<block_size;++i) {\n";
+        g << "for (j=0;j<block_size;++j,++kk) {\n";
+        g << "d.Bk[" << scc_mapping << "[offset+kk]] = d.w_cvx[kk];\n";
+        g << "}\n";
+        g << "}\n";
+      }
+
+      g << "offset += block_size*block_size;\n";
+      g << "}\n";
     }
+
     g.comment("Formulate the QP");
     g << g.copy("d_nlp.lbz", nx_+ng_, "d.lbdz") << "\n";
     g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.lbdz") << "\n";
@@ -829,28 +900,28 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d.dlam")+")") << "\n";
       g.comment("Calculate L1-merit function in the actual iterate");
       g.local("l1_infeas", "casadi_real");
-      g << "l1_infeas = " << g.max_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+      g << "l1_infeas = " << g.sum_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
       g.comment("Right-hand side of Armijo condition");
       g.local("F_sens", "casadi_real");
       g << "F_sens = " << g.dot(nx_, "d.dx", "d.gf") << ";\n";
-      g.local("L1dir", "casadi_real");
-      g << "L1dir = F_sens - sigma * l1_infeas;\n";
-      g.local("L1merit", "casadi_real");
-      g << "L1merit = m_f + sigma * l1_infeas;\n";
-      g.comment("Storing the actual merit function value in a list");
-      g << "d.merit_mem[merit_ind] = L1merit;\n";
+      g.local("tl1", "casadi_real");
+      g << "tl1 = F_sens - sigma * l1_infeas;\n";
+      g.local("l1", "casadi_real");
+      g << "l1 = m_f + sigma * l1_infeas;\n";
+      /*g.comment("Storing the actual merit function value in a list");
+      g << "d.merit_mem[merit_ind] = l1;\n";
       g << "merit_ind++;\n";
       g << "merit_ind %= " << merit_memsize_ << ";\n";
       g.comment("Calculating maximal merit function value so far");
       g.local("meritmax", "casadi_real");
       g << "meritmax = " << g.vfmax("d.merit_mem+1", g.min(str(merit_memsize_),
-           "iter_count")+"-1", "d.merit_mem[0]") << "\n";
+           "iter_count")+"-1", "d.merit_mem[0]") << "\n";*/
       g.comment("Stepsize");
       g << "t = 1.0;\n";
       g.local("fk_cand", "casadi_real");
       g.comment("Merit function value in candidate");
-      g.local("L1merit_cand", "casadi_real");
-      g << "L1merit_cand = 0.0;\n";
+      g.local("l1_cand", "casadi_real");
+      g << "l1_cand = 0.0;\n";
       g.comment("Reset line-search counter, success marker");
       g << "ls_iter = 0;\n";
       //g << "ls_success = 1;\n";
@@ -878,9 +949,9 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "continue;\n";
       g << "}\n";
       g.comment("Calculating merit-function in candidate");
-      g << "l1_infeas = " << g.max_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
-      g << "L1merit_cand = fk_cand + sigma * l1_infeas;\n";
-      g << "if (L1merit_cand <= meritmax + t * " << c1_ << "* L1dir) {\n";
+      g << "l1_cand = fk_cand + sigma * "
+        << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") + ";\n";
+      g << "if (l1_cand <= l1 + t * " << c1_ << "* tl1) {\n";
       g << "break;\n";
       g << "}\n";
       g.comment("Line-search not successful, but we accept it.");

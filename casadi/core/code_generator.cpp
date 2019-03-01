@@ -885,6 +885,9 @@ namespace casadi {
     case AUX_MAX_VIOL:
       this->auxiliaries << sanitize_source(casadi_max_viol_str, inst);
       break;
+    case AUX_SUM_VIOL:
+      this->auxiliaries << sanitize_source(casadi_sum_viol_str, inst);
+      break;
     case AUX_VFMIN:
       this->auxiliaries << sanitize_source(casadi_vfmin_str, inst);
       break;
@@ -1621,6 +1624,12 @@ namespace casadi {
   max_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {
     add_auxiliary(CodeGenerator::AUX_MAX_VIOL);
     return "casadi_max_viol(" + str(n) + ", " + x+ ", " + lb + ", " + ub + ")";
+  }
+
+  std::string CodeGenerator::
+  sum_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {
+    add_auxiliary(CodeGenerator::AUX_SUM_VIOL);
+    return "casadi_sum_viol(" + str(n) + ", " + x+ ", " + lb + ", " + ub + ")";
   }
 
   std::string CodeGenerator::

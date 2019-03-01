@@ -263,6 +263,10 @@ namespace casadi {
     std::string max_viol(casadi_int n, const std::string& x,
       const std::string& lb, const std::string& ub);
 
+    /** \brief sum_viol */
+    std::string sum_viol(casadi_int n, const std::string& x,
+      const std::string& lb, const std::string& ub);
+
     /** \brief bound_consistency */
     std::string bound_consistency(casadi_int n, const std::string& x,
       const std::string& lam, const std::string& lbx, const std::string& ubx);
@@ -334,6 +338,7 @@ namespace casadi {
       AUX_VFMIN,
       AUX_VFMAX,
       AUX_MAX_VIOL,
+      AUX_SUM_VIOL,
       AUX_REGULARIZE,
       AUX_INF,
       AUX_REAL_MIN,
