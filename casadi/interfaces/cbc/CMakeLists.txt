@@ -10,5 +10,5 @@ casadi_plugin(Conic cbc
 casadi_plugin_link_libraries(Conic cbc ${CBC_LIBRARIES})
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-set_target_properties(casadi_conic_cbc PROPERTIES COMPILE_FLAGS "-Wno-error=misleading-indentation")
+set_target_properties(casadi_conic_cbc PROPERTIES COMPILE_FLAGS "-Wno-misleading-indentation")
 endif()
