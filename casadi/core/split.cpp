@@ -347,20 +347,24 @@ namespace casadi {
   }
 
   MX Horzsplit::get_horzcat(const std::vector<MX>& x) const {
+    std::vector<MX> X;
+    for (auto&& e : x) {
+      if (e.nnz()!=0) X.push_back(e);
+    }
+ 
     // Check x length
-    if (x.size()!=nout()) {
+    if (X.size()!=nout()) {
       return MXNode::get_horzcat(x);
     }
 
     // Check x content
-    for (casadi_int i=0; i<x.size(); ++i) {
-      if (!(x[i]->is_output() && x[i]->which_output()==i && x[i]->dep().get()==this)) {
+    for (casadi_int i=0; i<X.size(); ++i) {
+      if (!(X[i]->is_output() && X[i]->which_output()==i && X[i]->dep().get()==this)) {
         return MXNode::get_horzcat(x);
       }
     }
 
-    // OK if reached this point
-    return dep();
+    return sparsity_cast(dep(), MXNode::get_horzcat(x).sparsity());
   }
 
   MX Vertsplit::get_vertcat(const std::vector<MX>& x) const {
