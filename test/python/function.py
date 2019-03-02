@@ -1054,7 +1054,7 @@ class Functiontests(casadiTestCase):
     data = np.random.random([len(e) for e in d_knots])
     r = np.meshgrid(*d_knots,indexing='ij')
 
-    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+    xyz = np.vstack(list(e.ravel(order='F') for e in r)).ravel(order='F')
 
     d_flat = data.ravel(order='F')
 
@@ -1099,7 +1099,7 @@ class Functiontests(casadiTestCase):
     data = np.random.random([len(e) for e in d_knots])
     r = np.array(d_knots)
 
-    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+    xyz = np.vstack(list(e.ravel(order='F') for e in r)).ravel(order='F')
 
     d_flat = data.ravel(order='F')
 
@@ -1640,7 +1640,7 @@ class Functiontests(casadiTestCase):
     data1 = np.random.random([len(e) for e in d_knots])
     r = np.meshgrid(*d_knots,indexing='ij')
 
-    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+    xyz = np.vstack(list(e.ravel(order='F') for e in r)).ravel(order='F')
 
     d_flat0 = data0.ravel(order='F')
 
@@ -1685,7 +1685,7 @@ class Functiontests(casadiTestCase):
     data1 = np.random.random([len(e) for e in d_knots])
     r = np.meshgrid(*d_knots,indexing='ij')
 
-    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+    xyz = np.vstack(list(e.ravel(order='F') for e in r)).ravel(order='F')
 
     d_flat0 = data0.ravel(order='F')
 
