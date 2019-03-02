@@ -898,6 +898,9 @@ const  "
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -1142,6 +1145,9 @@ const  "
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -9371,6 +9377,9 @@ const  "
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -9615,6 +9624,9 @@ const  "
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -13237,6 +13249,9 @@ Internal class.
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -13473,6 +13488,9 @@ Internal class.
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -14873,6 +14891,9 @@ Internal class.
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -15113,6 +15134,9 @@ Internal class.
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -17507,6 +17531,9 @@ Internal class.
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -17734,6 +17761,9 @@ Internal class.
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -21402,6 +21432,9 @@ std::string, M > &arg) const  "
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -21646,6 +21679,9 @@ std::string, M > &arg) const  "
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -25315,6 +25351,9 @@ std::string &parallelization) const  "
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -25559,6 +25598,9 @@ std::string &parallelization) const  "
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -28029,6 +28071,9 @@ member functions. Joel Andersson >List of available options
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -28252,6 +28297,9 @@ member functions. Joel Andersson >List of available options
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -38502,6 +38550,9 @@ Internal class
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -38745,6 +38796,9 @@ Internal class
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -39710,6 +39764,9 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | buffered         | OT_BOOL         | Buffer the       | casadi::JitFunct |
 |                  |                 | calls, user does | ion              |
 |                  |                 | not need to      |                  |
@@ -39943,6 +40000,9 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -41521,6 +41581,9 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | equilibration    |                  |
 |                  |                 | fails            |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -41747,6 +41810,9 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -42019,6 +42085,9 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -42249,6 +42318,9 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -58140,6 +58212,9 @@ Joel Andersson
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | common_options   | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | auto-generated   | nction           |
 |                  |                 | functions        |                  |
@@ -58378,6 +58453,9 @@ Joel Andersson
 |                  |                 | problem          | nction           |
 |                  |                 | functions to be  |                  |
 |                  |                 | monitored        |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -72427,6 +72505,9 @@ Andersson
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -72671,6 +72752,9 @@ Andersson
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -74954,9 +75038,10 @@ Is symmetric?
 
 ";
 
-%feature("docstring")  casadi::Sparsity::info() const  "
+%feature("docstring")  casadi::Sparsity::is_subset(const Sparsity &rhs)
+const  "
 
-Obtain information about sparsity
+Is subset?
 
 ";
 
@@ -75156,6 +75241,12 @@ the block boundaries to be found in r.
 
 The implementation is a modified version of cs_scc in CSparse Copyright(c)
 Timothy A. Davis, 2006-2009 Licensed as a derivative work under the GNU LGPL
+
+";
+
+%feature("docstring")  casadi::Sparsity::info() const  "
+
+Obtain information about sparsity
 
 ";
 
@@ -78787,6 +78878,9 @@ Joel Andersson
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -79015,6 +79109,9 @@ Joel Andersson
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -81026,6 +81123,9 @@ General information
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -81253,6 +81353,9 @@ General information
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -82893,6 +82996,9 @@ General information
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -83129,6 +83235,9 @@ General information
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -84243,6 +84352,9 @@ General information
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -84487,6 +84599,9 @@ General information
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
 +------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
@@ -84706,6 +84821,9 @@ General information
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
@@ -84947,6 +85065,9 @@ General information
 |                  |                 | Overrules the    |                  |
 |                  |                 | builtin optimize |                  |
 |                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
+|                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
