@@ -2018,18 +2018,18 @@ class Functiontests(casadiTestCase):
     z = MX.sym("z",2,2)
 
     for fmt in ["txt","mtx"]:
-      f = Function("f",[x,y,z],[2*x,2*z],["x","y","z"],["a","c"],{"dump":True,"dump_in":True,"dump_out":False,"dump_format":fmt})
+      f = Function("f",[x,y,z],[2*x,2*z],["x","y","z"],["a","c"],{"dump":True,"dump_in":True,"dump_out":True,"dump_format":fmt})
       ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([[1,3],[4,5]])]
       out = f(*ins)
 
       F = Function.load("f.casadi")
 
       x_num = DM.from_file("f.000000.in.x." + fmt)
-      #y_num = DM.from_file("f.000000.in.y." + fmt)
+      y_num = DM.from_file("f.000000.in.y." + fmt)
       z_num = DM.from_file("f.000000.in.z." + fmt)
 
       self.checkarray(x_num,ins[0])
-      #self.checkarray(y_num,ins[1])
+      self.checkarray(y_num,ins[1])
       self.checkarray(z_num,ins[2])
 
       a_num = DM.from_file("f.000000.out.a." + fmt)

@@ -190,7 +190,6 @@ namespace casadi {
   void CASADI_EXPORT DM::to_file(const std::string& filename,
       const Sparsity& sp, const double* nonzeros,
       const std::string& format_hint) {
-    casadi_assert_dev(nonzeros);
     std::string format = Sparsity::file_format(filename, format_hint, {"mtx", "txt"});
     std::ofstream out(filename);
     if (format=="mtx") {
@@ -202,7 +201,7 @@ namespace casadi {
 
       for (casadi_int k=0;k<row.size();++k) {
         out << row[k]+1 << " " << col[k]+1 << " ";
-        normalized_out(out, nonzeros[k]);
+        normalized_out(out, nonzeros ? nonzeros[k]: 0);
         out << std::endl;
       }
     } else if (format=="txt") {
@@ -228,7 +227,7 @@ namespace casadi {
           if (cc<size2-1) out << std::setw(w);
           // String representation of element
           if (ind[cc]<colind[cc+1] && row[ind[cc]]==rr) {
-            normalized_out(out, nonzeros[ind[cc]++]);
+            normalized_out(out, nonzeros ? nonzeros[ind[cc]++]: 0);
           } else {
             out << std::setw(w) << "00";
           }
