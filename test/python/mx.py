@@ -2963,6 +2963,27 @@ class MXtests(casadiTestCase):
 
         self.check_codegen(f,inputs=[A])
 
+  def test_horzcat_sparsity(self):
+    x = MX.sym("x",2,2)
+
+    for y in [MX.sym("y",Sparsity(2,2)), MX.sym("y",Sparsity.lower(2))]:
+
+      z = sin(horzcat(x,sin(y),x))
+      z_alt = sin(sparsity_cast(vertcat(vec(x),vec(sin(y)),vec(x)),z.sparsity()))
+      print z_alt
+
+      f = Function('f',[x,y],[z])
+      f_alt = Function('f_alt',[x,y],[z])
+
+      for F in [f,f_alt]:
+        self.assertEqual(F.call([x,y],True,False)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,y],False,True)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,x**2],True,False)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,x**2],False,True)[0].nnz(), z.nnz())
+
+    self.checkfunction(f,f.expand(),inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
+    self.checkfunction(f,f_alt,inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
+
 
 if __name__ == '__main__':
     unittest.main()
