@@ -516,6 +516,33 @@ namespace casadi {
     return dep()->get_nzref(sp, nz_new);
   }
 
+  MX GetNonzeros::get_project(const Sparsity& sp) const {
+    vector<unsigned char> mapping;
+    Sparsity res = sp.unite(sparsity(), mapping);
+
+    vector<casadi_int> nz;
+
+    // Get all the nonzeros
+    vector<casadi_int> nz_all = all();
+
+    // Index into nz_all
+    casadi_int i=0;
+    for (auto e : mapping) {
+      if (e==3) {
+        // Nonzero appears in both sp and sparsity()
+        nz.push_back(nz_all[i++]);
+      } else if (e==2) {
+        // Nonzero appears only in sparsity()
+        i++;
+      } else {
+        // Nonzero appears only in sp
+        nz.push_back(-1);
+      }
+    }
+
+    return dep()->get_nzref(sp, nz);
+  }
+
   void GetNonzerosSlice::generate(CodeGenerator& g,
                                   const std::vector<casadi_int>& arg,
                                   const std::vector<casadi_int>& res) const {

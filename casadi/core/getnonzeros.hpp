@@ -86,6 +86,9 @@ namespace casadi {
     /// Get the nonzeros of matrix
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
 
+    /// Create set sparse
+    MX get_project(const Sparsity& sp) const override;
+
     /** \brief Deserialize without type information
 
         \identifier{i8} */
