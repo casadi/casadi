@@ -113,7 +113,8 @@ namespace casadi {
     Dict get_stats(void* mem) const override;
 
     // Solve the QP
-    int solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res, casadi_int* iw,
+      double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
