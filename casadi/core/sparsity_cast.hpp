@@ -87,6 +87,9 @@ namespace casadi {
     /// SparsityCast
     MX get_reshape(const Sparsity& sp) const override;
 
+    /** \brief Get the nonzeros of matrix */
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+
     /// SparsityCast
     MX get_sparsity_cast(const Sparsity& sp) const override;
 
