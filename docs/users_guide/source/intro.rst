@@ -46,7 +46,7 @@ If you use |casadi| in published scientific work, please cite the following:
       Title = {{CasADi} -- {A} software framework for nonlinear optimization
                and optimal control},
       Journal = {Mathematical Programming Computation},
-      Year = {In Press, 2018},
+      Year = {2018},
     }
 
 Reading this document
@@ -54,5 +54,3 @@ Reading this document
 The goal of this document is to make the reader familiar with the syntax of |casadi| and provide easily available building blocks to build numerical optimization and dynamic optimization software. Our explanation is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of theory of optimization theory, solution of initial-value problems in differential equations and the programming language in question (C++, Python or MATLAB/Octave).
 
 We will use Python and MATLAB/Octave syntax side-by-side in this guide, noting that the Python interface is more stable and better documented. Unless otherwise noted, the MATLAB/Octave syntax also applies to Octave. We try to point out the instances where has a diverging syntax. To facilitate switching between the programming languages, we also list the major differences in :numref:`Chapter %s <sec-syntax_differences>`.
-
-
