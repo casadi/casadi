@@ -1855,7 +1855,7 @@ class Functiontests(casadiTestCase):
 
       q = solve(q,2*y,"lapackqr")
       q+= bilin(DM([[1,3],[7,8]]),q,2*q)
-      
+
       f = Function("f",[x,y],[q+1,jacobian(q, vertcat(x, y))])
 
       fs = Function.deserialize(f.serialize(opts))
@@ -1866,7 +1866,7 @@ class Functiontests(casadiTestCase):
       for X in [SX,MX]:
         x = X.sym("x")
 
-        y = x 
+        y = x
         for i in range(10000):
           y = sin(y)
 
@@ -1946,7 +1946,7 @@ class Functiontests(casadiTestCase):
 
   def test_factory_inherit_options(self):
       x = MX.sym("x",5)
-      
+
 
       for op in ["grad:f:x","jac:f:x","hess:f:x:x"]:
         f = Function("f",[x],[dot(x,x)],["x"],["f"],{"verbose": True})
@@ -2038,7 +2038,7 @@ class Functiontests(casadiTestCase):
       self.checkarray(a_num,out[0])
       self.checkarray(c_num,out[1])
 
-      
+
       F.generate_in("test_in.txt", [x_num,y_num,z_num])
       F.generate_out("test_out.txt", F.call([x_num,y_num,z_num]))
       X = DM.from_file("f.000000.in.txt")
@@ -2046,7 +2046,7 @@ class Functiontests(casadiTestCase):
 
       Xr = DM.from_file("test_in.txt")
       Ar = DM.from_file("test_out.txt")
-      
+
       self.checkarray(Xr,X)
       self.checkarray(Ar,A)
 
@@ -2057,7 +2057,7 @@ class Functiontests(casadiTestCase):
     f = Function("f",[x,y,z],[2*x,2*y,2*z],{"default_in":[1,2,3]})
 
     for ins, ref, ref_flat in [
-      #normal      
+      #normal
       ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])],
        [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])), 2*DM([9,8,7]), 2*DM([[1,3],[4,5]])],
        [1,2,7,4,8,9,9,8,7,1,4,3,5]),
@@ -2139,7 +2139,7 @@ class Functiontests(casadiTestCase):
       ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7,6]),DM([[1,3],[4,5]])],None,None),
 
       ]:
-      
+
       if ref is None:
         with self.assertInException("mismatching shape"):
           res = f.call(ins)
@@ -2157,7 +2157,7 @@ class Functiontests(casadiTestCase):
           res_flat = f.nz_from_out(res)
 
           self.checkarray(res_flat,[i*2 for i in ref_flat])
-          
+
           res_re = f.nz_to_out(res_flat)
 
           for i in range(f.n_out()):
@@ -2192,11 +2192,11 @@ class Functiontests(casadiTestCase):
         for i in range(f.n_in()):
           self.assertTrue(ins2[i].sparsity()==ref[i].sparsity())
           self.checkarray(ins2[i],ref[i]/2)
-  
+
 
     #Null dicts
     ins = {"i0": sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])), "i2": DM([1,3])}
-    res = f.call(ins)    
+    res = f.call(ins)
 
     self.checkarray(res["o0"],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
     self.checkarray(res["o1"],2*DM([2,2,2]))
@@ -2245,16 +2245,17 @@ class Functiontests(casadiTestCase):
     with self.assertInException("Incorrect"):
       f.convert_out([1,2,3])
 
+  @requires_nlpsol("ipopt")
   def test_ad_weight_sp(self):
     x = MX.sym("x",4)
 
     f = Function('f',[x],[x])
-    
+
     with self.assertOutput("1 forward sweeps needed","1 reverse sweeps needed"):
       jacobian(f(sin(x)),x,{"helper_options": {"verbose":True, "ad_weight_sp":0}})
     with self.assertOutput("1 reverse sweeps needed","1 forward sweeps needed"):
       jacobian(f(sin(x)),x,{"helper_options": {"verbose":True, "ad_weight_sp":1}})
-  
+
 
     x = MX.sym("x",4)
 

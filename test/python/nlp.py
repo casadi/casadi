@@ -92,7 +92,7 @@ class NLPtests(casadiTestCase):
         print(solver(**solver_in))
       except:
         pass
-      if Solver not in ["ipopt","snopt","blocksqp","bonmin"]:      
+      if Solver not in ["ipopt","snopt","blocksqp","bonmin"]:
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
 
@@ -110,14 +110,14 @@ class NLPtests(casadiTestCase):
         solver_out = solver(**solver_in)
       except:
         pass
-      if Solver not in ["ipopt","snopt","bonmin"]:      
+      if Solver not in ["ipopt","snopt","bonmin"]:
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
 
   def test_iteration_interrupt(self):
    for Solver, solver_options, features in solvers:
       if Solver not in ["ipopt","sqpmethod"]: continue
-      
+
       opti = Opti()
 
       x = opti.variable()
@@ -126,8 +126,8 @@ class NLPtests(casadiTestCase):
         raise KeyboardInterrupt()
 
       opti.minimize((x-1)**4)
-      
-      
+
+
       opts = dict(solver_options)
       if Solver=="bonmin":
         opts["discrete"] = [1]
@@ -1224,7 +1224,7 @@ class NLPtests(casadiTestCase):
       if "snopt"==Solver: continue
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
-      
+
   def test_missing_symbols(self):
     x = MX.sym("x")
     p = MX.sym("p")
@@ -1233,6 +1233,7 @@ class NLPtests(casadiTestCase):
       with self.assertInException("[p] are free"):
         solver = nlpsol("solver",Solver,{"x":x,"f":(x-p)**2}, solver_options)
 
+  @requires_nlpsol("ipopt")
   def test_no_success(self):
 
     x=SX.sym("x")
@@ -1247,7 +1248,7 @@ class NLPtests(casadiTestCase):
       solver = nlpsol("solver","ipopt",{'x':vertcat(x,y), 'f':f,'g':vertcat(x+1,x-2)},{"error_on_fail":True})
       with self.assertInException("process"):
         solver(x0=0,lbg=0,ubg=0)
-    
+
 
   @requires_nlpsol("ipopt")
   def test_iteration_Callback(self):
@@ -1603,7 +1604,7 @@ class NLPtests(casadiTestCase):
 
   @requires_conic("qrqp")
   def test_regularize_sqpmethod(self):
-    
+
     # Test problem that is indefinite in direction of the constraint Jacobian
     x = MX.sym("x",2)
     f = 0.5*bilin(DM([[1,0],[0,-2]]),x,x)
@@ -1657,7 +1658,7 @@ class NLPtests(casadiTestCase):
     self.assertTrue("H:\n[[1, 0], \n [0, 2]]" in result[0])
 
   def test_indefinite(self):
-    
+
     # Test problem that is indefinite in direction of the constraint Jacobian
     x = MX.sym("x",2)
     f = 0.5*bilin(DM([[1,0],[0,-2]]),x,x)
@@ -1702,7 +1703,7 @@ class NLPtests(casadiTestCase):
     H = H(0)
     # with an indefinite Hessian at x0
     self.assertTrue(np.any(np.linalg.eig(H)[0]<0))
-  
+
     # Solve with Gauss-Newton -> 6 iterations
     GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*mtimes(J.T,J)])
     options = {"regularize":True,"qpsol":"qrqp","hess_lag": GN}
@@ -1744,7 +1745,7 @@ class NLPtests(casadiTestCase):
     H = H(0)
     # with an indefinite Hessian at x0
     self.assertTrue(np.any(np.linalg.eig(H)[0]<0))
-  
+
     # Solve with Gauss-Newton -> 6 iterations
     GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*triu(mtimes(J.T,J))])
     options = {"hess_lag": GN}
