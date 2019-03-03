@@ -50,7 +50,7 @@ if has_conic("qpoases"):
   conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete": False, "sos":False}))
 
 
-if 1 or has_conic("cplex"):
+if has_conic("cplex"):
   conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
 
 
@@ -78,7 +78,7 @@ print(conics)
 class ConicTests(casadiTestCase):
 
   def test_sos(self):
-    
+
     H = DM(4,4)
     G = DM([-1,-2,-3,-1])
     A = DM([[-1,1,1,10],[1,-3,1,0],[0,1,0,-3.5]])
@@ -144,7 +144,7 @@ class ConicTests(casadiTestCase):
 
     for conic, qp_options, aux_options in conics:
       if not aux_options["discrete"]: continue
-      
+
       options = dict(qp_options)
       options["discrete"] = discrete
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},options)
@@ -177,7 +177,7 @@ class ConicTests(casadiTestCase):
 
     for conic, qp_options, aux_options in conics:
       if not aux_options["discrete"]: continue
-      
+
       options = dict(qp_options)
       options["discrete"] = discrete
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},options)
