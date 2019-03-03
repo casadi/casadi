@@ -88,6 +88,18 @@ namespace casadi {
     // Initialize the base classes
     Conic::init(opts);
 
+    // Transpose of the Jacobian
+    AT_ = A_.T();
+
+    // Assemble KKT system sparsity
+    kkt_ = Sparsity::kkt(H_, A_, true, true);
+
+    // Symbolic QR factorization
+    kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
+
+    // Setup memory structure
+    set_qp_prob();
+
     // Default options
     print_iter_ = true;
     print_header_ = true;
@@ -114,18 +126,6 @@ namespace casadi {
         print_lincomb_ = op.second;
       }
     }
-
-    // Transpose of the Jacobian
-    AT_ = A_.T();
-
-    // Assemble KKT system sparsity
-    kkt_ = Sparsity::kkt(H_, A_, true, true);
-
-    // Symbolic QR factorization
-    kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
-
-    // Setup memory structure
-    set_qp_prob();
 
     // Allocate memory
     casadi_int sz_w, sz_iw;
