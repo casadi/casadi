@@ -1853,7 +1853,7 @@ class Functiontests(casadiTestCase):
 
       q = gmap(horzcat(2*x,x-y[1]),horzcat(z+y,cos(z+y)))+1/gmapsx(horzcat(2*x,x-y[1]),repmat(z+y,1,2))
 
-      q = solve(q,2*y,"lapackqr")
+      q = solve(q,2*y, "qr")
       q+= bilin(DM([[1,3],[7,8]]),q,2*q)
 
       f = Function("f",[x,y],[q+1,jacobian(q, vertcat(x, y))])
