@@ -622,15 +622,21 @@ void OptiNode::bake() {
 
   // Collect bounds and canonical form of constraints
   std::vector<MX> g_all;
+  std::vector<MX> h_all;
   std::vector<MX> lbg_all;
   std::vector<MX> ubg_all;
   for (const auto& g : g_) {
-    g_all.push_back(meta_con(g).canon);
-    lbg_all.push_back(meta_con(g).lb);
-    ubg_all.push_back(meta_con(g).ub);
+    if (meta_con(g).type==OPTI_PSD) {
+      h_all.push_back(meta_con(g).canon);
+    } else {
+      g_all.push_back(meta_con(g).canon);
+      lbg_all.push_back(meta_con(g).lb);
+      ubg_all.push_back(meta_con(g).ub);
+    }
   }
 
   nlp_["g"] = veccat(g_all);
+  nlp_["h"] = diagcat(h_all);
 
   // Create bounds helper function
   MXDict bounds;
@@ -742,17 +748,24 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       if (e.is_vector()) {
         casadi_assert(!parametric[0] || !parametric[1],
           "Constraint must contain decision variables.");
-        con.type = OPTI_INEQUALITY;
-        if (parametric[0]) {
-          con.lb = args[0]*DM::ones(e.sparsity());
-          con.ub = inf*DM::ones(e.sparsity());
-          con.canon = args[1]*DM::ones(e.sparsity());
+        if (problem_type_=="conic") {
+          if (args[0].op()==OP_NORMF || args[0].op()==OP_NORM2) {
+            args[0] = -soc(args[0].dep(), args[1]);
+            args[1] = 0;
+          }
         } else {
-          con.lb = -inf*DM::ones(e.sparsity());
-          con.ub = args[1]*DM::ones(e.sparsity());
-          con.canon = args[0]*DM::ones(e.sparsity());
+          con.type = OPTI_INEQUALITY;
+          if (parametric[0]) {
+            con.lb = args[0]*DM::ones(e.sparsity());
+            con.ub = inf*DM::ones(e.sparsity());
+            con.canon = args[1]*DM::ones(e.sparsity());
+          } else {
+            con.lb = -inf*DM::ones(e.sparsity());
+            con.ub = args[1]*DM::ones(e.sparsity());
+            con.canon = args[0]*DM::ones(e.sparsity());
+          }
+          return con;
         }
-        return con;
       }
       // Fall through to generic inequalities
     } else if (args.size()==3 && parametric[0] && parametric[2]) {
@@ -778,9 +791,15 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
         con.flipped = flipped;
       } else {
         // A(x,p) >= b(p)
-        e = args[j+1]-args[j];
+        MX a = args[j+1];
+        MX b = args[j];
+        e = a-b;
+
         casadi_assert(e.size1()==e.size2(),
           "Matrix inequalities must be square. Did you mean element-wise inequality instead?");
+        if (a.is_scalar()) a*= MX::eye(e.size1());
+        if (b.is_scalar()) b*= MX::eye(e.size1());
+        e = a-b;
 
         ret.push_back(e);
         casadi_assert_dev(!type_known || con.type==OPTI_PSD);
@@ -897,7 +916,7 @@ void OptiNode::res(const DMDict& res) {
     std::vector<double> & data_v = store_latest_[OPTI_VAR][i].nonzeros();
     std::copy(x_v.begin()+meta(v).start, x_v.begin()+meta(v).stop, data_v.begin());
   }
-  if (res.find("lam_g")!=res.end()) {
+  if (res.find("lam_g")!=res.end() && problem_type_!="conic") {
     const std::vector<double> & lam_v = res.at("lam_g").nonzeros();
     for (const auto &v : active_symvar(OPTI_DUAL_G)) {
       casadi_int i = meta(v).i;
@@ -922,10 +941,12 @@ OptiSol OptiNode::solve(bool accept_limit) {
   }
   // Verify the constraint types
   for (const auto& g : g_) {
-    if (meta_con(g).type==OPTI_PSD)
-      casadi_error("Psd constraints not implemented yet. "
-      "Perhaps you intended an element-wise inequality? "
-      "In that case, make sure that the matrix is flattened (e.g. mat(:)).");
+    if (problem_type_!="conic") { 
+      if (meta_con(g).type==OPTI_PSD)
+        casadi_error("Psd constraints not implemented yet. "
+        "Perhaps you intended an element-wise inequality? "
+        "In that case, make sure that the matrix is flattened (e.g. mat(:)).");
+    }
   }
 
   bool solver_update =  solver_dirty() || old_callback() || (user_callback_ && callback_.is_null());
