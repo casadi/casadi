@@ -782,6 +782,13 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
     bool type_known = false;
     for (casadi_int j=0;j<args.size()-1;++j) {
       MX e = args[j]-args[j+1];
+      if (problem_type_=="conic") {
+        if (args[j].op()==OP_NORMF || args[j].op()==OP_NORM2) {
+          args[j] = -soc(args[j].dep(), args[j+1]);
+          args[j+1] = 0;
+          e = args[j]-args[j+1];
+        }
+      }
       if (e.is_vector()) {
         // g1(x,p) <= g2(x,p)
         ret.push_back(e);
