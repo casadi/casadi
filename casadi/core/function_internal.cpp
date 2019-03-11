@@ -1967,29 +1967,13 @@ namespace casadi {
 
     // Reset local variables, flush buffer
     g.flush(g.body);
-    g.local_variables_.clear();
-    g.local_default_.clear();
+
+    g.scope_enter();
 
     // Generate function body (to buffer)
     codegen_body(g);
 
-    // Order local variables
-    std::map<string, set<pair<string, string>>> local_variables_by_type;
-    for (auto&& e : g.local_variables_) {
-      local_variables_by_type[e.second.first].insert(make_pair(e.first, e.second.second));
-    }
-
-    // Codegen local variables
-    for (auto&& e : local_variables_by_type) {
-      g.body << "  " << e.first;
-      for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
-        g.body << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
-        // Insert definition, if any
-        auto k=g.local_default_.find(it->first);
-        if (k!=g.local_default_.end()) g.body << "=" << k->second;
-      }
-      g.body << ";\n";
-    }
+    g.scope_exit();
 
     // Finalize the function
     g << "return 0;\n";
@@ -2002,6 +1986,10 @@ namespace casadi {
   std::string FunctionInternal::signature(const std::string& fname) const {
     return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
                             "casadi_int* iw, casadi_real* w, void* mem)";
+  }
+
+  void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
+    g << "return 0;\n";
   }
 
   void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {

@@ -96,6 +96,9 @@ namespace casadi {
     std::string constant(const std::vector<casadi_int>& v);
 
     /** \brief Represent an array constant; adding it when new */
+    void constant_copy(const std::string& var_name, const std::vector<casadi_int>& v);
+
+    /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<double>& v);
 
     /** \brief Generate a call to a function (generic signature) */
@@ -122,6 +125,12 @@ namespace casadi {
 
     /** \brief Declare a local variable */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
+
+    /** \brief Enter a local scope */
+    void scope_enter();
+
+    /** \brief Exit a local scope */
+    void scope_exit();
 
     /** \brief Declare a work vector element */
     std::string sx_work(casadi_int i);
@@ -303,6 +312,7 @@ namespace casadi {
       AUX_MV_DENSE,
       AUX_MTIMES,
       AUX_PROJECT,
+      AUX_TRI_PROJECT,
       AUX_DENSIFY,
       AUX_SPARSIFY,
       AUX_TRANS,
@@ -386,10 +396,20 @@ namespace casadi {
     /** \brief Create a fill operation */
     std::string clear(const std::string& res, std::size_t n);
 
+    /** \brief Refer to argument */
+    std::string arg(casadi_int i);
+
+    /** \brief Refer to resuly */
+    std::string res(casadi_int i);
+
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, const Sparsity& sp_res,
                         const std::string& w);
+
+    /** \brief Project triangular part */
+    std::string tri_project(const std::string& arg, const Sparsity& sp_arg,
+                        const std::string& res);
 
     /** \brief Densify */
     std::string densify(const std::string& arg, const Sparsity& sp_arg,

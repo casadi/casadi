@@ -549,6 +549,15 @@ namespace casadi {
     /** \brief Codegen decref for dependencies */
     virtual void codegen_decref(CodeGenerator& g) const {}
 
+    /** \brief Codegen decref for alloc_mem */
+    virtual void codegen_alloc_mem(CodeGenerator& g) const {}
+
+    /** \brief Codegen decref for init_mem */
+    virtual void codegen_init_mem(CodeGenerator& g) const;
+
+    /** \brief Codegen for free_mem */
+    virtual void codegen_free_mem(CodeGenerator& g) const {}
+
     /** \brief Code generate the function  */
     std::string signature(const std::string& fname) const;
 

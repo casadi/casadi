@@ -161,6 +161,31 @@ namespace casadi {
 
   }
 
+  void CodeGenerator::scope_enter() {
+    local_variables_.clear();
+    local_default_.clear();
+  }
+
+  void CodeGenerator::scope_exit() {
+    // Order local variables
+    std::map<string, set<pair<string, string>>> local_variables_by_type;
+    for (auto&& e : local_variables_) {
+      local_variables_by_type[e.second.first].insert(make_pair(e.first, e.second.second));
+    }
+
+    // Codegen local variables
+    for (auto&& e : local_variables_by_type) {
+      body << "  " << e.first;
+      for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
+        body << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
+        // Insert definition, if any
+        auto k=local_default_.find(it->first);
+        if (k!=local_default_.end()) body << "=" << k->second;
+      }
+      body << ";\n";
+    }
+  }
+
   string CodeGenerator::add_dependency(const Function& f) {
     // Quick return if it already exists
     for (auto&& e : added_functions_) if (e.f==f) return e.codegen_name;
@@ -189,6 +214,30 @@ namespace casadi {
       f->codegen_decref(*this);
       *this << "}\n\n";
     }
+
+    // Alloc memory
+    *this << "void* " << fname << "_alloc_mem(void) {\n";
+    flush(this->body);
+    scope_enter();
+    f->codegen_alloc_mem(*this);
+    scope_exit();
+    *this << "}\n\n";
+
+    // Initialize memory
+    *this << "int " << fname << "_init_mem(void* mem) {\n";
+    flush(this->body);
+    scope_enter();
+    f->codegen_init_mem(*this);
+    scope_exit();
+    *this << "}\n\n";
+
+    // Clear memory
+    *this << "void " << fname << "_free_mem(void* mem) {\n";
+    flush(this->body);
+    scope_enter();
+    f->codegen_free_mem(*this);
+    scope_exit();
+    *this << "}\n\n";
 
     // Flush to body
     flush(this->body);
@@ -688,6 +737,13 @@ namespace casadi {
     return shorthand("s" + str(get_constant(v, true)));
   }
 
+  void CodeGenerator::constant_copy(const std::string& name, const vector<casadi_int>& v) {
+    std::string ref = constant(v);
+    local(name, "casadi_int", "*");
+    local("i", "casadi_int");
+    (*this) << "for (i=0;i<" << v.size() << ";++i) " + name + "[i] = " + ref + "[i];\n";
+  }
+
   string CodeGenerator::constant(const vector<double>& v) {
     return shorthand("c" + str(get_constant(v, true)));
   }
@@ -792,6 +848,9 @@ namespace casadi {
       break;
     case AUX_PROJECT:
       this->auxiliaries << sanitize_source(casadi_project_str, inst);
+      break;
+    case AUX_TRI_PROJECT:
+      this->auxiliaries << sanitize_source(casadi_tri_project_str, inst);
       break;
     case AUX_DENSIFY:
       add_auxiliary(AUX_CLEAR);
@@ -1125,6 +1184,14 @@ namespace casadi {
     return s.str();
   }
 
+  string CodeGenerator::arg(casadi_int i) {
+    return "arg[" + str(i) + "]";
+  }
+
+  string CodeGenerator::res(casadi_int i) {
+    return "res[" + str(i) + "]";
+  }
+
   string CodeGenerator::fill(const string& res,
                                   std::size_t n, const string& v) {
     stringstream s;
@@ -1217,6 +1284,16 @@ namespace casadi {
     stringstream s;
     s << "casadi_project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
       << sparsity(sp_res) << ", " << w << ");";
+    return s.str();
+  }
+
+  string
+  CodeGenerator::tri_project(const string& arg, const Sparsity& sp_arg,
+                         const string& res) {
+    // Create call
+    add_auxiliary(AUX_TRI_PROJECT);
+    stringstream s;
+    s << "casadi_tri_project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ");";
     return s.str();
   }
 
