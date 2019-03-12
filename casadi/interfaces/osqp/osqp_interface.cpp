@@ -252,7 +252,7 @@ namespace casadi {
     casadi_copy(m->work->solution->x, nx_, res[CONIC_X]);
     casadi_copy(m->work->solution->y, nx_, res[CONIC_LAM_X]);
     casadi_copy(m->work->solution->y+nx_, na_, res[CONIC_LAM_A]);
-    *res[CONIC_COST] = m->work->info->obj_val;
+    if (res[CONIC_COST]) *res[CONIC_COST] = m->work->info->obj_val;
 
     m->success = m->work->info->status_val == OSQP_SOLVED;
     m->unified_return_status = SOLVER_RET_SUCCESS;
