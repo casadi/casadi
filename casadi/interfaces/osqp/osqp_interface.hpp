@@ -124,7 +124,7 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
 
     /** \brief Codegen alloc_mem */
-    void codegen_alloc_mem(CodeGenerator& g) const override;
+    void codegen_init_mem(CodeGenerator& g) const override;
 
     /** \brief Codegen free_mem */
     void codegen_free_mem(CodeGenerator& g) const override;

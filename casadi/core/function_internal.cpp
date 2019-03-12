@@ -650,7 +650,7 @@ namespace casadi {
     }
     int ret;
     if (eval_) {
-      ret = eval_(arg, res, iw, w, mem);
+      ret = eval_(arg, res, iw, w, *static_cast<casadi_int*>(mem));
     } else {
       ret = eval(arg, res, iw, w, mem);
     }
@@ -1989,7 +1989,9 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
-    g << "return 0;\n";
+    std::string name = codegen_name(g, false);
+    std::string mem_counter = g.shorthand(name + "_mem_counter");
+    g << "return " + mem_counter + "++;\n";
   }
 
   void FunctionInternal::codegen_alloc_mem(CodeGenerator& g) const {
@@ -2005,15 +2007,15 @@ namespace casadi {
 
     if (needs_mem) {
       // Q: should alloc/init/mem really be in the code-exported API (and used external?)
-      g << g.declare("void* " + name_ + "_alloc_mem(void)") << " {\n";
+      g << g.declare("casadi_int " + name_ + "_alloc_mem(void)") << " {\n";
       g << "return " << codegen_name(g) << "_alloc_mem();\n";
       g << "}\n\n";
 
-      g << g.declare("int " + name_ + "_init_mem(void* mem)") << " {\n";
+      g << g.declare("int " + name_ + "_init_mem(casadi_int mem)") << " {\n";
       g << "return " << codegen_name(g) << "_init_mem(mem);\n";
       g << "}\n\n";
 
-      g << g.declare("void " + name_ + "_free_mem(void* mem)") << " {\n";
+      g << g.declare("void " + name_ + "_free_mem(casadi_int mem)") << " {\n";
       g << codegen_name(g) << "_free_mem(mem);\n";
       g << "}\n\n";
     }

@@ -264,7 +264,7 @@ namespace casadi {
     g << "osqp_cleanup((OSQPWorkspace*) mem);\n";
   }
 
-  void OsqpInterface::codegen_alloc_mem(CodeGenerator& g) const {
+  void OsqpInterface::codegen_init_mem(CodeGenerator& g) const {
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
     casadi_int dummy_size = max(nx_+na_, max(Asp.nnz(), H_.nnz()));
 
@@ -328,8 +328,11 @@ namespace casadi {
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
     //g << "settings.time_limit = " << settings_.time_limit << ";\n";
 
-    // Setup workspace
-    g << "return (void*) osqp_setup(&data, &settings);\n";
+    std::string name = codegen_name(g, false);
+    std::string mem_array = g.shorthand(name + "_mem");
+
+    g << mem_array + "[mem] = osqp_setup(&data, &settings);\n";
+    g << "return 0";
   }
 
   void OsqpInterface::codegen_body(CodeGenerator& g) const {

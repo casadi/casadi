@@ -203,7 +203,7 @@ namespace casadi {
 
   void* GenericExternal::alloc_mem() const {
     if (alloc_mem_) {
-      return alloc_mem_();
+      return new casadi_int(alloc_mem_());
     } else {
       return FunctionInternal::alloc_mem();
     }
@@ -211,7 +211,7 @@ namespace casadi {
 
   int GenericExternal::init_mem(void* mem) const {
     if (init_mem_) {
-      return init_mem_(mem);
+      return init_mem_(*static_cast<casadi_int*>(mem));
     } else {
       return FunctionInternal::init_mem(mem);
     }
@@ -219,7 +219,9 @@ namespace casadi {
 
   void GenericExternal::free_mem(void *mem) const {
     if (free_mem_) {
-      return free_mem_(mem);
+      free_mem_(*static_cast<casadi_int*>(mem));
+      delete static_cast<casadi_int*>(mem);
+      return;
     } else {
       return FunctionInternal::free_mem(mem);
     }

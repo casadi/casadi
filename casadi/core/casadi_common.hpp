@@ -138,13 +138,13 @@ namespace casadi {
   typedef double (*default_t)(casadi_int i);
   typedef const char* (*name_t)(casadi_int i);
   typedef const casadi_int* (*sparsity_t)(casadi_int i);
-  typedef void* (*alloc_mem_t)(void);
-  typedef int (*init_mem_t)(void* mem);
-  typedef void (*free_mem_t)(void* mem);
+  typedef casadi_int (*alloc_mem_t)(void);
+  typedef int (*init_mem_t)(casadi_int);
+  typedef void (*free_mem_t)(int);
   typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res,
     casadi_int* sz_iw, casadi_int* sz_w);
   typedef int (*eval_t)(const double** arg, double** res,
-                        casadi_int* iw, double* w, void* mem);
+                        casadi_int* iw, double* w, casadi_int);
   ///@}
 
   /// String representation, any type

@@ -48,12 +48,13 @@ extern "C" {
 /* Function types corresponding to entry points in CasADi's C API */
 typedef void (*casadi_signal_t)(void);
 typedef casadi_int (*casadi_getint_t)(void);
+typedef void (*casadi_release_t)(casadi_int);
 typedef const casadi_int* (*casadi_sparsity_t)(casadi_int i);
 typedef const char* (*casadi_name_t)(casadi_int i);
 typedef int (*casadi_work_t)(casadi_int* sz_arg, casadi_int* sz_res,
                              casadi_int* sz_iw, casadi_int* sz_w);
 typedef int (*casadi_eval_t)(const casadi_real** arg, casadi_real** res,
-                             casadi_int* iw, casadi_real* w, void* mem);
+                             casadi_int* iw, casadi_real* w, casadi_int mem);
 
 /* Structure to hold meta information about an input or output */
 typedef struct {
@@ -100,6 +101,8 @@ typedef struct {
   casadi_sparsity_t sparsity_out;
   casadi_work_t work;
   casadi_eval_t eval;
+  casadi_getint_t checkout;
+  casadi_release_t release;  
 } casadi_functions;
 
 /* Memory needed for evaluation */
@@ -113,7 +116,7 @@ typedef struct {
   casadi_real** res;
   casadi_int* iw;
   casadi_real* w;
-  void* mem;
+  casadi_int mem;
 
   /* Meta information */
   casadi_int n_in, n_out;
@@ -148,8 +151,8 @@ inline void casadi_init(casadi_mem* mem, casadi_functions* f) {
     assert(flag==0);
   }
 
-  /* TODO: Check out a memory object */
-  mem->mem = 0;
+  /* Check out a memory object */
+  mem->mem = f->checkout();
 
   /* No io structs allocated */
   mem->in = 0;
@@ -166,7 +169,8 @@ inline void casadi_init(casadi_mem* mem, casadi_functions* f) {
 inline void casadi_deinit(casadi_mem* mem) {
   assert(mem!=0);
 
-  /* TODO: Release a memory object */
+  /* Release a memory object */
+  mem->f->release(mem->mem);
 
   /* Decrease reference counter */
   if (mem->f->decref) mem->f->decref();

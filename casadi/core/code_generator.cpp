@@ -219,7 +219,7 @@ namespace casadi {
     }
 
     // Alloc memory
-    *this << "void* " << fname << "_alloc_mem(void) {\n";
+    *this << "casadi_int " << fname << "_alloc_mem(void) {\n";
     flush(this->body);
     scope_enter();
     f->codegen_alloc_mem(*this);
@@ -227,7 +227,7 @@ namespace casadi {
     *this << "}\n\n";
 
     // Initialize memory
-    *this << "int " << fname << "_init_mem(void* mem) {\n";
+    *this << "int " << fname << "_init_mem(casadi_int mem) {\n";
     flush(this->body);
     scope_enter();
     f->codegen_init_mem(*this);
@@ -235,7 +235,7 @@ namespace casadi {
     *this << "}\n\n";
 
     // Clear memory
-    *this << "void " << fname << "_free_mem(void* mem) {\n";
+    *this << "void " << fname << "_free_mem(casadi_int mem) {\n";
     flush(this->body);
     scope_enter();
     f->codegen_free_mem(*this);
@@ -264,13 +264,15 @@ namespace casadi {
                " *" << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
 
       *this << "casadi_int " << shorthand(name + "_checkout") << "(void) {\n";
+      *this << "casadi_int mid;\n";
       *this << "if (" << stack_counter << ">=0) {\n";
       *this << "return " << stack << "[" << stack_counter << "--];\n";
       *this << "} else {\n";
       *this << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) exit(1);\n";
-      *this << mem_array << "[" << mem_counter << "] = " << alloc_mem << "();\n";
-      *this << init_mem << "(" << mem_array << "[" << mem_counter << "]);\n";
-      *this << "return " << mem_counter << "++;\n";
+      *this << "mid = " << alloc_mem << "();\n";
+      *this << "if (mid<0) return -1;\n";
+      *this << "if(" << init_mem << "(mid)) return -1;\n";
+      *this << "return mid;\n";
       *this << "}\n";
 
       *this << "return " << stack << "[" << stack_counter << "--];\n";
@@ -687,6 +689,7 @@ namespace casadi {
       local("flag", "int");
       local(mem, "casadi_int");
       *this << mem << " = " << name << "_checkout();\n";
+      *this << "if (mem<0) return 1;\n"; 
       *this << "flag = " + name + "(" + arg + ", " + res + ", "
               + iw + ", " + w + ", " + name + "_mem[" + mem + "]);\n";
       *this << name << "_release(" << mem << ");\n";
