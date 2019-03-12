@@ -282,16 +282,16 @@ namespace casadi {
     g << "casadi_qp_init(&d, &iw, &w);\n";
 
     g.comment("Pass bounds on z");
-    g.copy_default("arg[" + str(CONIC_LBX)+ "]", nx_, "d.lbz", "-casadi_inf", false);
-    g.copy_default("arg[" + str(CONIC_LBA)+ "]", na_, "d.lbz+" + str(nx_), "-casadi_inf", false);
-    g.copy_default("arg[" + str(CONIC_UBX)+ "]", nx_, "d.ubz", "casadi_inf", false);
-    g.copy_default("arg[" + str(CONIC_UBA)+ "]", na_, "d.ubz+" + str(nx_), "casadi_inf", false);
+    g.copy_default(g.arg(CONIC_LBX), nx_, "d.lbz", "-casadi_inf", false);
+    g.copy_default(g.arg(CONIC_LBA), na_, "d.lbz+" + str(nx_), "-casadi_inf", false);
+    g.copy_default(g.arg(CONIC_UBX), nx_, "d.ubz", "casadi_inf", false);
+    g.copy_default(g.arg(CONIC_UBA), na_, "d.ubz+" + str(nx_), "casadi_inf", false);
 
     g.comment("Pass initial guess");
-    g.copy_default("arg[" + str(CONIC_X0)+ "]", nx_, "d.z", "0", false);
+    g.copy_default(g.arg(CONIC_X0), nx_, "d.z", "0", false);
     g << g.fill("d.z+"+str(nx_), na_, "NAN") << "\n";
-    g.copy_default("arg[" + str(CONIC_LAM_X0)+ "]", nx_, "d.lam", "0", false);
-    g.copy_default("arg[" + str(CONIC_LAM_A0)+ "]", na_, "d.lam+" + str(nx_), "0", false);
+    g.copy_default(g.arg(CONIC_LAM_X0), nx_, "d.lam", "0", false);
+    g.copy_default(g.arg(CONIC_LAM_A0), na_, "d.lam+" + str(nx_), "0", false);
 
     g.comment("Solve QP");
     g << "if (casadi_qp_reset(&d)) return 1;\n";
@@ -317,10 +317,10 @@ namespace casadi {
     g << "}\n";
 
     g.comment("Get solution");
-    g.copy_check("&d.f", 1, "res[" + str(CONIC_COST) + "]", false, true);
-    g.copy_check("d.z", nx_, "res[" + str(CONIC_X) + "]", false, true);
-    g.copy_check("d.lam", nx_, "res[" + str(CONIC_LAM_X) + "]", false, true);
-    g.copy_check("d.lam+"+str(nx_), na_, "res[" + str(CONIC_LAM_A) + "]", false, true);
+    g.copy_check("&d.f", 1, g.res(CONIC_COST), false, true);
+    g.copy_check("d.z", nx_, g.res(CONIC_X), false, true);
+    g.copy_check("d.lam", nx_, g.res(CONIC_LAM_X), false, true);
+    g.copy_check("d.lam+"+str(nx_), na_, g.res(CONIC_LAM_A), false, true);
 
     g << "return d.status != QP_SUCCESS;\n";
   }

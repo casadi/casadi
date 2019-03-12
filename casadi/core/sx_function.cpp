@@ -155,7 +155,7 @@ namespace casadi {
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
         g << "if (res[" << a.i0 << "]!=0) "
-          << "res["<< a.i0 << "][" << a.i2 << "]=" << g.sx_work(a.i1);
+          << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
       } else {
 
         // Where to store the result
@@ -165,7 +165,7 @@ namespace casadi {
         if (a.op==OP_CONST) {
           g << CodeGenerator::constant(a.d);
         } else if (a.op==OP_INPUT) {
-          g << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
+          g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);

@@ -2119,7 +2119,7 @@ namespace casadi {
           g << "if (--resc>=0) ";
         }
         // Create and get pointer
-        g << "res[" << i << "] = w+" << str(offset) << ";\n";
+        g << g.res(i) << " = w+" << str(offset) << ";\n";
         offset += nnz_out(i);
       }
 
@@ -2130,9 +2130,8 @@ namespace casadi {
 
       // Save results
       for (casadi_int i=0; i<n_out_; ++i) {
-        string res_i = "res[" + str(i) + "]";
-        g << "if (" << res_i << ") resv[" << i << "] = "
-          << g.to_mex(sparsity_out_[i], res_i) << "\n";
+        g << "if (" << g.res(i) << ") resv[" << i << "] = "
+          << g.to_mex(sparsity_out_[i], g.res(i)) << "\n";
       }
 
       // End conditional compilation and function

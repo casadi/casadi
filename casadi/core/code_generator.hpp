@@ -397,10 +397,10 @@ namespace casadi {
     std::string clear(const std::string& res, std::size_t n);
 
     /** \brief Refer to argument */
-    std::string arg(casadi_int i);
+    std::string arg(casadi_int i) const;
 
     /** \brief Refer to resuly */
-    std::string res(casadi_int i);
+    std::string res(casadi_int i) const;
 
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,
