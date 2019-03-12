@@ -118,6 +118,9 @@ namespace casadi {
     newline_ = true;
     current_indent_ = 0;
 
+    // Start off without the need for thread-local memory
+    needs_mem_ = false;
+
     // Divide name into base and suffix (if any)
     string::size_type dotpos = name.rfind('.');
     if (dotpos==string::npos) {
@@ -241,6 +244,42 @@ namespace casadi {
 
     // Flush to body
     flush(this->body);
+
+    bool fun_needs_mem = !f->codegen_mem().empty();
+    needs_mem_ |= fun_needs_mem;
+
+    if (fun_needs_mem) {
+      std::string name = f->codegen_name(*this, false);
+      std::string stack_counter = shorthand(name + "_unused_stack_counter");
+      std::string stack = shorthand(name + "_unused_stack");
+      std::string mem_counter = shorthand(name + "_mem_counter");
+      std::string mem_array = shorthand(name + "_mem");
+      std::string alloc_mem = shorthand(name + "_alloc_mem");
+      std::string init_mem = shorthand(name + "_init_mem");
+
+      *this << "static casadi_int " << mem_counter  << " = 0;\n";
+      *this << "static casadi_int " << stack_counter  << " = -1;\n";
+      *this << "static casadi_int " << stack << "[CASADI_MAX_NUM_THREADS];\n";
+      *this << "static " << f->codegen_mem() <<
+               " *" << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
+
+      *this << "casadi_int " << shorthand(name + "_checkout") << "(void) {\n";
+      *this << "if (" << stack_counter << ">=0) {\n";
+      *this << "return " << stack << "[" << stack_counter << "--];\n";
+      *this << "} else {\n";
+      *this << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) exit(1);\n";
+      *this << mem_array << "[" << mem_counter << "] = " << alloc_mem << "();\n";
+      *this << init_mem << "(" << mem_array << "[" << mem_counter << "]);\n";
+      *this << "return " << mem_counter << "++;\n";
+      *this << "}\n";
+
+      *this << "return " << stack << "[" << stack_counter << "--];\n";
+      *this << "}\n\n";
+
+      *this << "void " << shorthand(name + "_release") << "(casadi_int mem) {\n";
+      *this << stack << "[" << stack_counter << "++] = mem;\n";
+      *this << "}\n\n";
+    }
 
     return fname;
   }
@@ -490,6 +529,12 @@ namespace casadi {
     // Integer type (usually long long)
     generate_casadi_int(s);
 
+    if (needs_mem_) {
+      s << "#ifndef CASADI_MAX_NUM_THREADS\n";
+      s << "#define CASADI_MAX_NUM_THREADS 1\n";
+      s << "#endif\n\n";
+    }
+
     // casadi/mem after numeric types to define derived types
     // Memory struct entry point
     if (this->with_mem) {
@@ -634,9 +679,22 @@ namespace casadi {
   string CodeGenerator::
   operator()(const Function& f, const string& arg,
              const string& res, const string& iw,
-             const string& w, const string& mem) const {
-    return f->codegen_name(*this) + "(" + arg + ", " + res + ", "
-      + iw + ", " + w + ", " + mem + ")";
+             const string& w) {
+    std::string name = f->codegen_name(*this);
+    bool needs_mem = !f->codegen_mem().empty();
+    if (needs_mem) {
+      std::string mem = "mid";
+      local("flag", "int");
+      local(mem, "casadi_int");
+      *this << mem << " = " << name << "_checkout();\n";
+      *this << "flag = " + name + "(" + arg + ", " + res + ", "
+              + iw + ", " + w + ", " + name + "_mem[" + mem + "]);\n";
+      *this << name << "_release(" << mem << ");\n";
+      return "flag";
+    } else {
+      return name + "(" + arg + ", " + res + ", "
+              + iw + ", " + w + ", 0)";
+    }
   }
 
   void CodeGenerator::add_external(const string& new_external) {
@@ -739,9 +797,17 @@ namespace casadi {
 
   void CodeGenerator::constant_copy(const std::string& name, const vector<casadi_int>& v) {
     std::string ref = constant(v);
-    local(name, "casadi_int", "*");
-    local("i", "casadi_int");
-    (*this) << "for (i=0;i<" << v.size() << ";++i) " + name + "[i] = " + ref + "[i];\n";
+    if (v.size()) {
+      local(name+"[" + str(v.size()) + "]", "casadi_int");
+    } else {
+      local(name, "casadi_int", "*");
+    }
+    if (v.size()) {
+      local("i", "casadi_int");
+      (*this) << "for (i=0;i<" << v.size() << ";++i) " + name + "[i] = " + ref + "[i];\n";
+    } else {
+      init_local(name, "0");
+    }
   }
 
   string CodeGenerator::constant(const vector<double>& v) {
@@ -1184,16 +1250,17 @@ namespace casadi {
     return s.str();
   }
 
-  string CodeGenerator::arg(casadi_int i) {
+  string CodeGenerator::arg(casadi_int i) const {
     return "arg[" + str(i) + "]";
   }
 
-  string CodeGenerator::res(casadi_int i) {
+  string CodeGenerator::res(casadi_int i) const {
     return "res[" + str(i) + "]";
   }
 
   string CodeGenerator::fill(const string& res,
                                   std::size_t n, const string& v) {
+    if (v=="0") return clear(res, n);
     stringstream s;
     // Perform operation
     add_auxiliary(AUX_FILL);

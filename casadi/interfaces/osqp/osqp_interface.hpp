@@ -129,6 +129,9 @@ namespace casadi {
     /** \brief Codegen free_mem */
     void codegen_free_mem(CodeGenerator& g) const override;
 
+    /** \brief Thread-local memory object type */
+    std::string codegen_mem() const override { return "OSQPWorkspace"; }
+
     void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */

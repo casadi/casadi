@@ -9,7 +9,7 @@ void casadi_tri_project(const T1* x, const casadi_int* sp_x, T1* y) {
 
   for (j=0; j<ncol_x; ++j) {
     for (k=colind_x[j]; k<colind_x[j+1]; ++k) {
-      if (row_x[k]>=j) *y++ = x[k];
+      if (row_x[k]>=j) *y++ = x ? x[k] : 0;
     }
   }
 }

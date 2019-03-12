@@ -541,7 +541,7 @@ namespace casadi {
     void codegen_sparsities(CodeGenerator& g) const;
 
     /** \brief Get name in codegen */
-    virtual std::string codegen_name(const CodeGenerator& g) const;
+    virtual std::string codegen_name(const CodeGenerator& g, bool ns=true) const;
 
     /** \brief Codegen incref for dependencies */
     virtual void codegen_incref(CodeGenerator& g) const {}
@@ -550,7 +550,7 @@ namespace casadi {
     virtual void codegen_decref(CodeGenerator& g) const {}
 
     /** \brief Codegen decref for alloc_mem */
-    virtual void codegen_alloc_mem(CodeGenerator& g) const {}
+    virtual void codegen_alloc_mem(CodeGenerator& g) const;
 
     /** \brief Codegen decref for init_mem */
     virtual void codegen_init_mem(CodeGenerator& g) const;
@@ -566,6 +566,9 @@ namespace casadi {
 
     /** \brief Generate code for the function body */
     virtual void codegen_body(CodeGenerator& g) const;
+
+    /** \brief Thread-local memory object type */
+    virtual std::string codegen_mem() const { return ""; }
 
     /** \brief Export / Generate C code for the dependency function */
     virtual std::string generate_dependencies(const std::string& fname, const Dict& opts) const;

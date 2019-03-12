@@ -1992,11 +1992,49 @@ namespace casadi {
     g << "return 0;\n";
   }
 
+  void FunctionInternal::codegen_alloc_mem(CodeGenerator& g) const {
+    g << "return 0;\n";
+  }
+
   void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {
     g.add_io_sparsities(name_, sparsity_in_, sparsity_out_);
   }
 
   void FunctionInternal::codegen_meta(CodeGenerator& g) const {
+    bool needs_mem = !codegen_mem().empty();
+
+    if (needs_mem) {
+      // Q: should alloc/init/mem really be in the code-exported API (and used external?)
+      g << g.declare("void* " + name_ + "_alloc_mem(void)") << " {\n";
+      g << "return " << codegen_name(g) << "_alloc_mem();\n";
+      g << "}\n\n";
+
+      g << g.declare("int " + name_ + "_init_mem(void* mem)") << " {\n";
+      g << "return " << codegen_name(g) << "_init_mem(mem);\n";
+      g << "}\n\n";
+
+      g << g.declare("void " + name_ + "_free_mem(void* mem)") << " {\n";
+      g << codegen_name(g) << "_free_mem(mem);\n";
+      g << "}\n\n";
+    }
+
+    // Checkout/release routines
+    g << g.declare("casadi_int " + name_ + "_checkout(void)") << " {\n";
+    if (needs_mem) {
+      g << "return " << codegen_name(g) << "_checkout();\n";
+    } else {
+      g << "return 0;\n";
+    }
+    g << "}\n\n";
+
+    if (needs_mem) {
+      g << g.declare("void " + name_ + "_release(casadi_int mem)") << " {\n";
+      g << codegen_name(g) << "_release(mem);\n";
+    } else {
+      g << g.declare("void " + name_ + "_release(casadi_int mem)") << " {\n";
+    }
+    g << "}\n\n";
+
     // Reference counter routines
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
     codegen_incref(g);
@@ -2212,10 +2250,17 @@ namespace casadi {
     g.flush(g.body);
   }
 
-  std::string FunctionInternal::codegen_name(const CodeGenerator& g) const {
-    // Get the index of the function
-    for (auto&& e : g.added_functions_) {
-      if (e.f.get()==this) return e.codegen_name;
+  std::string FunctionInternal::codegen_name(const CodeGenerator& g, bool ns) const {
+    if (ns) {
+      // Get the index of the function
+      for (auto&& e : g.added_functions_) {
+        if (e.f.get()==this) return e.codegen_name;
+      }
+    } else {
+      for (casadi_int i=0;i<g.added_functions_.size();++i) {
+        const auto & e = g.added_functions_[i];
+        if (e.f.get()==this) return "f" + str(i);
+      }
     }
     casadi_error("Function '" + name_ + "' not found");
   }

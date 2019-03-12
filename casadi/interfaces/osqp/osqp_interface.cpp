@@ -49,6 +49,8 @@ namespace casadi {
   OsqpInterface::OsqpInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
+
+    has_refcount_ = true;
   }
 
   OsqpInterface::~OsqpInterface() {
@@ -86,8 +88,8 @@ namespace casadi {
             settings_.adaptive_rho_interval = op.second;
           } else if (op.first=="adaptive_rho_tolerance") {
             settings_.adaptive_rho_tolerance = op.second;
-          } else if (op.first=="adaptive_rho_fraction") {
-            settings_.adaptive_rho_fraction = op.second;
+          //} else if (op.first=="adaptive_rho_fraction") {
+          //  settings_.adaptive_rho_fraction = op.second;
           } else if (op.first=="max_iter") {
             settings_.max_iter = op.second;
           } else if (op.first=="eps_abs") {
@@ -114,8 +116,8 @@ namespace casadi {
             settings_.check_termination = op.second;
           } else if (op.first=="warm_start") {
             settings_.warm_start = op.second;
-          } else if (op.first=="time_limit") {
-            settings_.time_limit = op.second;
+          //} else if (op.first=="time_limit") {
+          //  settings_.time_limit = op.second;
           } else {
             casadi_error("Not recognised");
           }
@@ -127,6 +129,7 @@ namespace casadi {
     nnzA_ = A_.nnz()+nx_;
 
     alloc_w(nnzHupp_+nnzA_, false);
+    alloc_w(2*nx_+2*na_, false);
   }
 
   int OsqpInterface::init_mem(void* mem) const {
@@ -206,10 +209,10 @@ namespace casadi {
     // Set bounds
     casadi_copy(arg[CONIC_LBX], nx_, w);
     casadi_copy(arg[CONIC_LBA], na_, w+nx_);
-    ret = osqp_update_lower_bound(m->work, w);
-    casadi_copy(arg[CONIC_UBX], nx_, w);
-    casadi_copy(arg[CONIC_UBA], na_, w+nx_);
-    ret = osqp_update_upper_bound(m->work, w);
+    casadi_copy(arg[CONIC_UBX], nx_, w+nx_+na_);
+    casadi_copy(arg[CONIC_UBA], na_, w+2*nx_+na_);
+
+    ret = osqp_update_bounds(m->work, w, w+nx_+na_);
     casadi_assert(ret==0, "Problem in osqp_update_bounds");
 
     // Project Hessian
@@ -267,7 +270,7 @@ namespace casadi {
 
     g.local("A", "csc");
     g.local("dummy[" + str(dummy_size) + "]", "casadi_real");
-    g.clear("dummy", dummy_size);
+    g << g.clear("dummy", dummy_size) << "\n";
 
     g.constant_copy("A_row", Asp.get_row());
     g.constant_copy("A_colind", Asp.get_colind());
@@ -292,7 +295,6 @@ namespace casadi {
     g << "H.i = H_row;\n";
     g << "H.p = H_colind;\n";
 
-
     g.local("data", "OSQPData");
     g << "data.n = " << nx_ << ";\n";
     g << "data.m = " << nx_ + na_ << ";\n";
@@ -310,7 +312,7 @@ namespace casadi {
     g << "settings.adaptive_rho = " << settings_.adaptive_rho << ";\n";
     g << "settings.adaptive_rho_interval = " << settings_.adaptive_rho_interval << ";\n";
     g << "settings.adaptive_rho_tolerance = " << settings_.adaptive_rho_tolerance << ";\n";
-    g << "settings.adaptive_rho_fraction = " << settings_.adaptive_rho_fraction << ";\n";
+    //g << "settings.adaptive_rho_fraction = " << settings_.adaptive_rho_fraction << ";\n";
     g << "settings.max_iter = " << settings_.max_iter << ";\n";
     g << "settings.eps_abs = " << settings_.eps_abs << ";\n";
     g << "settings.eps_rel = " << settings_.eps_rel << ";\n";
@@ -324,7 +326,7 @@ namespace casadi {
     g << "settings.scaled_termination = " << settings_.scaled_termination << ";\n";
     g << "settings.check_termination = " << settings_.check_termination << ";\n";
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
-    g << "settings.time_limit = " << settings_.time_limit << ";\n";
+    //g << "settings.time_limit = " << settings_.time_limit << ";\n";
 
     // Setup workspace
     g << "return (void*) osqp_setup(&data, &settings);\n";
@@ -338,18 +340,18 @@ namespace casadi {
     g.init_local("work", "(OSQPWorkspace*) mem");
 
     g.comment("Set objective");
-    g << "if (osqp_update_lin_cost(work, arg[" << CONIC_G << "])) return 1;\n";
+    g.copy_default(g.arg(CONIC_G), nx_, "w", "0", false);
+    g << "if (osqp_update_lin_cost(work, w)) return 1;\n";
 
     g.comment("Set bounds");
-    g.copy_default("arg[" + str(CONIC_LBX) + "]", nx_, "w", "-casadi_inf", false);
-    g.copy_default("arg[" + str(CONIC_LBA) + "]", na_, "w+"+str(nx_), "-casadi_inf", false);
-    g << "if (osqp_update_lower_bound(work, w)) return 1;\n";
-    g.copy_default("arg[" + str(CONIC_UBX) + "]", nx_, "w", "casadi_inf", false);
-    g.copy_default("arg[" + str(CONIC_UBA) + "]", na_, "w+"+str(nx_), "casadi_inf", false);
-    g << "if (osqp_update_upper_bound(work, w)) return 1;\n";
+    g.copy_default(g.arg(CONIC_LBX), nx_, "w", "-casadi_inf", false);
+    g.copy_default(g.arg(CONIC_LBA), na_, "w+"+str(nx_), "-casadi_inf", false);
+    g.copy_default(g.arg(CONIC_UBX), nx_, "w+"+str(nx_+na_), "casadi_inf", false);
+    g.copy_default(g.arg(CONIC_UBA), na_, "w+"+str(2*nx_+na_), "casadi_inf", false);
+    g << "if (osqp_update_bounds(work, w, w+" + str(nx_+na_)+ ")) return 1;\n";
 
     g.comment("Project Hessian");
-    g << g.tri_project("arg[" + str(CONIC_H) + "]", H_, "w");
+    g << g.tri_project(g.arg(CONIC_H), H_, "w");
 
     g.comment("Get constraint matrix");
     std::string A_colind = g.constant(A_.get_colind());
@@ -376,11 +378,11 @@ namespace casadi {
 
     g << "if (osqp_solve(work)) return 1;\n";
 
-    g << g.copy("work->solution->x", nx_, g.res(CONIC_X)) << "\n";
-    g << g.copy("work->solution->y", nx_, g.res(CONIC_LAM_X)) << "\n";
-    g << g.copy("work->solution->y+" + str(nx_), nx_, g.res(CONIC_LAM_A)) << "\n";
+    g.copy_check("&work->info->obj_val", 1, g.res(CONIC_COST), false, true);
+    g.copy_check("work->solution->x", nx_, g.res(CONIC_X), false, true);
+    g.copy_check("work->solution->y", nx_, g.res(CONIC_LAM_X), false, true);
+    g.copy_check("work->solution->y+" + str(nx_), na_, g.res(CONIC_LAM_A), false, true);
 
-    g << "*" << g.res(CONIC_COST) << "= work->info->obj_val;\n";
     g << "if (work->info->status_val != OSQP_SOLVED) return 1;\n";
   }
 
@@ -409,7 +411,7 @@ namespace casadi {
     s.unpack("OsqpInterface::settings::adaptive_rho", settings_.adaptive_rho);
     s.unpack("OsqpInterface::settings::adaptive_rho_interval", settings_.adaptive_rho_interval);
     s.unpack("OsqpInterface::settings::adaptive_rho_tolerance", settings_.adaptive_rho_tolerance);
-    s.unpack("OsqpInterface::settings::adaptive_rho_fraction", settings_.adaptive_rho_fraction);
+    //s.unpack("OsqpInterface::settings::adaptive_rho_fraction", settings_.adaptive_rho_fraction);
     s.unpack("OsqpInterface::settings::max_iter", settings_.max_iter);
     s.unpack("OsqpInterface::settings::eps_abs", settings_.eps_abs);
     s.unpack("OsqpInterface::settings::eps_rel", settings_.eps_rel);
@@ -423,7 +425,7 @@ namespace casadi {
     s.unpack("OsqpInterface::settings::scaled_termination", settings_.scaled_termination);
     s.unpack("OsqpInterface::settings::check_termination", settings_.check_termination);
     s.unpack("OsqpInterface::settings::warm_start", settings_.warm_start);
-    s.unpack("OsqpInterface::settings::time_limit", settings_.time_limit);
+    //s.unpack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 
   void OsqpInterface::serialize_body(SerializingStream &s) const {
@@ -436,7 +438,7 @@ namespace casadi {
     s.pack("OsqpInterface::settings::adaptive_rho", settings_.adaptive_rho);
     s.pack("OsqpInterface::settings::adaptive_rho_interval", settings_.adaptive_rho_interval);
     s.pack("OsqpInterface::settings::adaptive_rho_tolerance", settings_.adaptive_rho_tolerance);
-    s.pack("OsqpInterface::settings::adaptive_rho_fraction", settings_.adaptive_rho_fraction);
+    //s.pack("OsqpInterface::settings::adaptive_rho_fraction", settings_.adaptive_rho_fraction);
     s.pack("OsqpInterface::settings::max_iter", settings_.max_iter);
     s.pack("OsqpInterface::settings::eps_abs", settings_.eps_abs);
     s.pack("OsqpInterface::settings::eps_rel", settings_.eps_rel);
@@ -450,7 +452,7 @@ namespace casadi {
     s.pack("OsqpInterface::settings::scaled_termination", settings_.scaled_termination);
     s.pack("OsqpInterface::settings::check_termination", settings_.check_termination);
     s.pack("OsqpInterface::settings::warm_start", settings_.warm_start);
-    s.pack("OsqpInterface::settings::time_limit", settings_.time_limit);
+    //s.pack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 
 } // namespace casadi
