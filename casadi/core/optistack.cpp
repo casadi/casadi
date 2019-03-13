@@ -322,6 +322,46 @@ MX Opti::lam_g() const {
   }
 }
 
+Function Opti::to_function(const std::string& name,
+    const std::vector<MX>& args, const std::vector<MX>& res,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) {
+  try {
+    return (*this)->to_function(name, args, res, name_in, name_out, opts);
+  } catch (exception& e) {
+    THROW_ERROR("to_function", e.what());
+  }
+}
+
+Function Opti::to_function(const std::string& name,
+    const std::vector<MX>& args, const std::vector<MX>& res,
+    const Dict& opts) {
+  return to_function(name, args, res, {}, {}, opts);
+}
+
+Function Opti::to_function(const std::string& name,
+    const std::map<std::string, MX>& dict,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) {
+  std::vector<MX> ex_in(name_in.size()), ex_out(name_out.size());
+  for (auto&& i : dict) {
+    vector<string>::const_iterator it;
+    if ((it=find(name_in.begin(), name_in.end(), i.first))!=name_in.end()) {
+      // Input expression
+      ex_in[it-name_in.begin()] = i.second;
+    } else if ((it=find(name_out.begin(), name_out.end(), i.first))!=name_out.end()) {
+      // Output expression
+      ex_out[it-name_out.begin()] = i.second;
+    } else {
+      // Neither
+      casadi_error("Unknown dictionary entry: '" + i.first + "'");
+    }
+  }
+  return to_function(name, ex_in, ex_out, name_in, name_out, opts);
+}
+
 void Opti::callback_class(OptiCallback* callback) {
   try {
     (*this)->callback_class(callback);

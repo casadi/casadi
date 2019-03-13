@@ -280,6 +280,24 @@ public:
   */
   MX lam_g() const;
 
+  /** \brief Create a CasADi Function from the Opti solver
+  */
+  Function to_function(const std::string& name,
+      const std::vector<MX>& args, const std::vector<MX>& res,
+      const Dict& opts = Dict());
+
+  Function to_function(const std::string& name,
+      const std::vector<MX>& args, const std::vector<MX>& res,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts = Dict());
+
+  Function to_function(const std::string& name,
+      const std::map<std::string, MX>& dict,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts = Dict());
+
   #ifndef SWIGMATLAB
   /** \brief Construct a double inequality
   *
@@ -404,6 +422,7 @@ public:
     VariableType type;
     casadi_int count;
     casadi_int i;
+    casadi_int active_i;
     Dict extra;
   };
 

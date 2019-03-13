@@ -587,6 +587,8 @@ void OptiNode::bake() {
     symbol_active_[meta(d).count] = true;
 
   std::vector<MX> x = active_symvar(OPTI_VAR);
+  for (casadi_int i=0;i<x.size();++i) meta(x[i]).active_i = i;
+
   casadi_int offset = 0;
   for (const auto& v : x) {
     meta(v).start = offset;
@@ -594,6 +596,7 @@ void OptiNode::bake() {
     meta(v).stop = offset;
   }
   std::vector<MX> p = active_symvar(OPTI_PAR);
+  for (casadi_int i=0;i<p.size();++i) meta(p[i]).active_i = i;
 
   // Fill the nlp definition
   nlp_["x"] = veccat(x);
@@ -618,7 +621,10 @@ void OptiNode::bake() {
 
   }
 
-  lam_ = veccat(active_symvar(OPTI_DUAL_G));
+  std::vector<MX> lam = active_symvar(OPTI_DUAL_G);
+  for (casadi_int i=0;i<lam.size();++i) meta(lam[i]).active_i = i;
+
+  lam_ = veccat(lam);
 
   // Collect bounds and canonical form of constraints
   std::vector<MX> g_all;
@@ -1226,6 +1232,63 @@ std::vector<DM> OptiNode::active_values(VariableType type) const {
     }
   }
   return ret;
+}
+
+Function OptiNode::to_function(const std::string& name,
+    const std::vector<MX>& args, const std::vector<MX>& res,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) {
+  if (problem_dirty()) return baked_copy().to_function(name, args, res, name_in, name_out, opts);
+
+  Function solver;
+  if (problem_type_=="conic") {
+    solver = qpsol("solver", solver_name_, nlp_, solver_options_);
+  } else {
+    solver = nlpsol("solver", solver_name_, nlp_, solver_options_);
+  }
+
+  // Get initial guess and parameter values
+  std::vector<MX> x0, p, lam_g;
+  assign_vector(active_values(OPTI_VAR), x0);
+  assign_vector(active_values(OPTI_PAR), p);
+  assign_vector(active_values(OPTI_DUAL_G), lam_g);
+
+  for (const auto& a : args) {
+    casadi_assert(symbol_active_[meta(a).count],
+      "Symbol not occuring in problem" + describe(a));
+    casadi_int i = meta(a).active_i;
+    if (meta(a).type==OPTI_VAR) {
+      x0.at(i) = a;
+    } else if (meta(a).type==OPTI_PAR) {
+      p.at(i) = a;
+    } else if (meta(a).type==OPTI_DUAL_G) {
+      lam_g.at(i) = a;
+    } else {
+      casadi_error("Unknown");
+    }
+  }
+  MXDict arg;
+  arg["p"] = veccat(p);
+
+  // Evaluate bounds for given parameter values
+  MXDict r = bounds_(arg);
+  arg["x0"] = veccat(x0);
+  arg["lam_g0"] = veccat(lam_g);
+  arg["lbg"] = r["lbg"];
+  arg["ubg"] = r["ubg"];
+
+  r = solver(arg);
+
+  std::vector<MX> helper_in = {veccat(active_symvar(OPTI_VAR)),
+                               veccat(active_symvar(OPTI_PAR)),
+                               veccat(active_symvar(OPTI_DUAL_G))};
+  Function helper("helper", helper_in, {res});
+
+  std::vector<MX> arg_in = helper(std::vector<MX>{r.at("x"), arg["p"], r.at("lam_g")});
+
+  return Function(name, args, arg_in, name_in, name_out, opts);
+
 }
 
 void OptiNode::disp(ostream &stream, bool more) const {
