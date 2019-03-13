@@ -412,7 +412,7 @@ namespace casadi {
 
     /** \brief Project triangular part */
     std::string tri_project(const std::string& arg, const Sparsity& sp_arg,
-                        const std::string& res);
+                        const std::string& res, bool lower);
 
     /** \brief Densify */
     std::string densify(const std::string& arg, const Sparsity& sp_arg,

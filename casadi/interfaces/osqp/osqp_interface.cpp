@@ -216,7 +216,7 @@ namespace casadi {
     casadi_assert(ret==0, "Problem in osqp_update_bounds");
 
     // Project Hessian
-    casadi_tri_project(arg[CONIC_H], H_, w);
+    casadi_tri_project(arg[CONIC_H], H_, w, false);
 
     // Get contraint matrix
     const casadi_int* colind = A_.colind();
@@ -351,7 +351,7 @@ namespace casadi {
     g << "if (osqp_update_bounds(work, w, w+" + str(nx_+na_)+ ")) return 1;\n";
 
     g.comment("Project Hessian");
-    g << g.tri_project(g.arg(CONIC_H), H_, "w");
+    g << g.tri_project(g.arg(CONIC_H), H_, "w", false);
 
     g.comment("Get constraint matrix");
     std::string A_colind = g.constant(A_.get_colind());

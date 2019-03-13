@@ -1368,11 +1368,12 @@ namespace casadi {
 
   string
   CodeGenerator::tri_project(const string& arg, const Sparsity& sp_arg,
-                         const string& res) {
+                         const string& res, bool lower) {
     // Create call
     add_auxiliary(AUX_TRI_PROJECT);
     stringstream s;
-    s << "casadi_tri_project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ");";
+    s << "casadi_tri_project(" << arg << ", " << sparsity(sp_arg) << ", ";
+    s << res  << ", " << (lower ? 1: 0) << ");";
     return s.str();
   }
 
