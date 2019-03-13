@@ -1228,6 +1228,61 @@ std::vector<DM> OptiNode::active_values(VariableType type) const {
   return ret;
 }
 
+Function OptiNode::to_function(const std::string& name,
+    const std::vector<MX>& args, const std::vector<MX>& res,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) {
+  if (problem_dirty()) return baked_copy().to_function(name, args, res, name_in, name_out, opts);
+
+  Function solver;
+  if (problem_type_=="conic") {
+    solver = qpsol("solver", solver_name_, nlp_, opts);
+  } else {
+    solver = nlpsol("solver", solver_name_, nlp_, opts);
+  }
+
+  // Get initial guess and parameter values
+  std::vector<MX> x0, p, lam_g;
+  assign_vector(active_values(OPTI_VAR), x0);
+  assign_vector(active_values(OPTI_PAR), p);
+  assign_vector(active_values(OPTI_DUAL_G), lam_g);
+
+  for (const auto& a : args) {
+    casadi_int i = meta(a).i;
+    if (meta(a).type==OPTI_VAR) {
+      x0[i] = a;
+    } else if (meta(a).type==OPTI_PAR) {
+      p[i] = a;
+    } else if (meta(a).type==OPTI_DUAL_G) {
+      lam_g[i] = a;
+    } else {
+      casadi_error("Unknown");
+    }
+  }
+  MXDict arg;
+  arg["p"] = veccat(p);
+
+  // Evaluate bounds for given parameter values
+  MXDict r = bounds_(arg);
+  arg["x0"] = veccat(x0);
+  arg["lam_g0"] = veccat(p);
+  arg["lbg"] = r["lbg"];
+  arg["ubg"] = r["ubg"];
+
+  r = solver(arg);
+
+  std::vector<MX> helper_in = {veccat(active_symvar(OPTI_VAR)),
+                               veccat(active_symvar(OPTI_PAR)),
+                               veccat(active_symvar(OPTI_DUAL_G))};
+  Function helper("helper", helper_in, {res});
+
+  std::vector<MX> arg_in = helper(std::vector<MX>{r.at("x"), arg["p"], r.at("lam_g")});
+
+  return Function(name, args, arg_in, name_in, name_out, opts);
+
+}
+
 void OptiNode::disp(ostream &stream, bool more) const {
 
 }

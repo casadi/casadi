@@ -253,6 +253,14 @@ public:
   }
   void assert_empty() const;
 
+
+  /** \brief Create a CasADi Function from the Opti solver */
+  Function to_function(const std::string& name,
+      const std::vector<MX>& args, const std::vector<MX>& res,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts);
+
   ///  Print representation
   void disp(std::ostream& stream, bool more=false) const override;
 
