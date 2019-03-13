@@ -325,6 +325,12 @@ private:
   template<typename T>
   std::vector<T> cumsum(const std::vector<T> &values);
 
+  /** \brief diff
+  *
+  */
+  template<typename T>
+  std::vector<T> diff(const std::vector<T> &values);
+
   /** \brief cumulative sum, starting with zero
   *
   */
@@ -800,6 +806,16 @@ namespace casadi {
     for (casadi_int i=0;i<values.size();++i) {
       acc+= values[i];
       ret[i+1] = acc;
+    }
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> diff(const std::vector<T> &values) {
+    casadi_assert(!values.empty(), "Array must be non-empty");
+    std::vector<T> ret(values.size()-1);
+    for (casadi_int i=0;i<values.size()-1;++i) {
+      ret[i] = values[i+1]-values[i];
     }
     return ret;
   }
