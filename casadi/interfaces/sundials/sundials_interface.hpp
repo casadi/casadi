@@ -77,7 +77,7 @@ namespace casadi {
     int ncheck;
 
     /// Linear solver memory objects
-    casadi_int mem_linsolF, mem_linsolB;
+    int mem_linsolF, mem_linsolB;
 
     /// Constructor
     SundialsMemory();

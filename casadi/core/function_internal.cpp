@@ -547,7 +547,7 @@ namespace casadi {
 
   void ProtoFunction::finalize() {
     // Create memory object
-    casadi_int mem = checkout();
+    int mem = checkout();
     casadi_assert_dev(mem==0);
   }
 
@@ -1985,17 +1985,20 @@ namespace casadi {
 
   std::string FunctionInternal::signature(const std::string& fname) const {
     return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
-                            "casadi_int* iw, casadi_real* w, void* mem)";
+                            "casadi_int* iw, casadi_real* w, int mem)";
   }
 
   void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
-    std::string name = codegen_name(g, false);
-    std::string mem_counter = g.shorthand(name + "_mem_counter");
-    g << "return " + mem_counter + "++;\n";
+    g << "return 0;\n";
   }
 
   void FunctionInternal::codegen_alloc_mem(CodeGenerator& g) const {
-    g << "return 0;\n";
+    bool needs_mem = !codegen_mem_type().empty();
+    if (needs_mem) {
+    std::string name = codegen_name(g, false);
+    std::string mem_counter = g.shorthand(name + "_mem_counter");
+    g << "return " + mem_counter + "++;\n";
+    }
   }
 
   void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {
@@ -2003,25 +2006,32 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_meta(CodeGenerator& g) const {
-    bool needs_mem = !codegen_mem().empty();
+    bool needs_mem = !codegen_mem_type().empty();
 
+    g << g.declare("int " + name_ + "_alloc_mem(void)") << " {\n";
     if (needs_mem) {
-      // Q: should alloc/init/mem really be in the code-exported API (and used external?)
-      g << g.declare("casadi_int " + name_ + "_alloc_mem(void)") << " {\n";
       g << "return " << codegen_name(g) << "_alloc_mem();\n";
-      g << "}\n\n";
-
-      g << g.declare("int " + name_ + "_init_mem(casadi_int mem)") << " {\n";
-      g << "return " << codegen_name(g) << "_init_mem(mem);\n";
-      g << "}\n\n";
-
-      g << g.declare("void " + name_ + "_free_mem(casadi_int mem)") << " {\n";
-      g << codegen_name(g) << "_free_mem(mem);\n";
-      g << "}\n\n";
+    } else {
+      g << "return 0;\n";
     }
+    g << "}\n\n";
+
+    g << g.declare("int " + name_ + "_init_mem(int mem)") << " {\n";
+    if (needs_mem) {
+      g << "return " << codegen_name(g) << "_init_mem(mem);\n";
+    } else {
+      g << "return 0;\n";
+    }
+    g << "}\n\n";
+
+    g << g.declare("void " + name_ + "_free_mem(int mem)") << " {\n";
+    if (needs_mem) {
+      g << codegen_name(g) << "_free_mem(mem);\n";
+    }
+    g << "}\n\n";
 
     // Checkout/release routines
-    g << g.declare("casadi_int " + name_ + "_checkout(void)") << " {\n";
+    g << g.declare("int " + name_ + "_checkout(void)") << " {\n";
     if (needs_mem) {
       g << "return " << codegen_name(g) << "_checkout();\n";
     } else {
@@ -2030,10 +2040,10 @@ namespace casadi {
     g << "}\n\n";
 
     if (needs_mem) {
-      g << g.declare("void " + name_ + "_release(casadi_int mem)") << " {\n";
+      g << g.declare("void " + name_ + "_release(int mem)") << " {\n";
       g << codegen_name(g) << "_release(mem);\n";
     } else {
-      g << g.declare("void " + name_ + "_release(casadi_int mem)") << " {\n";
+      g << g.declare("void " + name_ + "_release(int mem)") << " {\n";
     }
     g << "}\n\n";
 
@@ -2243,7 +2253,12 @@ namespace casadi {
         << name_ << "_sparsity_in,\n"
         << name_ << "_sparsity_out,\n"
         << name_ << "_work,\n"
-        << name_ << "\n"
+        << name_ << ",\n"
+        << name_ << "_checkout,\n"
+        << name_ << "_release,\n"
+        << name_ << "_alloc_mem,\n"
+        << name_ << "_init_mem,\n"
+        << name_ << "_free_mem\n"
         << "};\n"
         << "return &fun;\n"
         << "}\n";
@@ -2265,6 +2280,12 @@ namespace casadi {
       }
     }
     casadi_error("Function '" + name_ + "' not found");
+  }
+
+  std::string FunctionInternal::codegen_mem(CodeGenerator& g, const std::string& index) const {
+    std::string name = codegen_name(g, false);
+    std::string mem_array = g.shorthand(name + "_mem");
+    return mem_array+"[" + index + "]";
   }
 
   void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
@@ -3016,14 +3037,14 @@ namespace casadi {
     return Sparsity::scalar();
   }
 
-  void* ProtoFunction::memory(casadi_int ind) const {
+  void* ProtoFunction::memory(int ind) const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
     return mem_.at(ind);
   }
 
-  casadi_int ProtoFunction::checkout() const {
+  int ProtoFunction::checkout() const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
@@ -3043,7 +3064,7 @@ namespace casadi {
     }
   }
 
-  void ProtoFunction::release(casadi_int mem) const {
+  void ProtoFunction::release(int mem) const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD

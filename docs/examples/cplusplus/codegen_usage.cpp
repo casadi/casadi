@@ -65,7 +65,7 @@ int usage_c(){
   typedef casadi_int (*getint_t)(void);
   typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w);
   typedef const casadi_int* (*sparsity_t)(casadi_int ind);
-  typedef int (*eval_t)(const double** arg, double** res, casadi_int* iw, double* w, void* mem);
+  typedef int (*eval_t)(const double** arg, double** res, casadi_int* iw, double* w, int mem);
 
   /* Memory management -- increase reference counter */
   signal_t incref = (signal_t)dlsym(handle, "f_incref");

@@ -96,7 +96,7 @@ namespace casadi {
     if (sfact(A.ptr())) casadi_error("'sfact' failed");
   }
 
-  int Linsol::sfact(const double* A, casadi_int mem) const {
+  int Linsol::sfact(const double* A, int mem) const {
     if (A==nullptr) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
@@ -116,7 +116,7 @@ namespace casadi {
     if (nfact(A.ptr())) casadi_error("'nfact' failed");
   }
 
-  int Linsol::nfact(const double* A, casadi_int mem) const {
+  int Linsol::nfact(const double* A, int mem) const {
     if (A==nullptr) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
@@ -138,7 +138,7 @@ namespace casadi {
     return n;
   }
 
-  casadi_int Linsol::neig(const double* A, casadi_int mem) const {
+  casadi_int Linsol::neig(const double* A, int mem) const {
     return (*this)->neig((*this)->memory(mem), A);
   }
 
@@ -149,11 +149,11 @@ namespace casadi {
     return n;
   }
 
-  casadi_int Linsol::rank(const double* A, casadi_int mem) const {
+  casadi_int Linsol::rank(const double* A, int mem) const {
     return (*this)->rank((*this)->memory(mem), A);
   }
 
-  int Linsol::solve(const double* A, double* x, casadi_int nrhs, bool tr, casadi_int mem) const {
+  int Linsol::solve(const double* A, double* x, casadi_int nrhs, bool tr, int mem) const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
     casadi_assert(m->is_nfact, "Linear system has not been factorized");
     return (*this)->solve(m, A, x, nrhs, tr);
@@ -163,7 +163,7 @@ namespace casadi {
     return (*this)->checkout();
   }
 
-  void Linsol::release(casadi_int mem) const {
+  void Linsol::release(int mem) const {
     (*this)->release(mem);
   }
 
