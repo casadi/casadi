@@ -402,6 +402,9 @@ namespace casadi {
     /** \brief Refer to resuly */
     std::string res(casadi_int i) const;
 
+    /** \brief Access thread-local memory */
+    std::string mem(const Function& f);
+
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, const Sparsity& sp_res,

@@ -261,7 +261,7 @@ namespace casadi {
   }
 
   void OsqpInterface::codegen_free_mem(CodeGenerator& g) const {
-    g << "osqp_cleanup((OSQPWorkspace*) mem);\n";
+    g << "osqp_cleanup(" + codegen_mem(g) + ");\n";
   }
 
   void OsqpInterface::codegen_init_mem(CodeGenerator& g) const {
@@ -328,11 +328,8 @@ namespace casadi {
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
     //g << "settings.time_limit = " << settings_.time_limit << ";\n";
 
-    std::string name = codegen_name(g, false);
-    std::string mem_array = g.shorthand(name + "_mem");
-
-    g << mem_array + "[mem] = osqp_setup(&data, &settings);\n";
-    g << "return 0";
+    g << codegen_mem(g) + " = osqp_setup(&data, &settings);\n";
+    g << "return 0;\n";
   }
 
   void OsqpInterface::codegen_body(CodeGenerator& g) const {
@@ -340,7 +337,7 @@ namespace casadi {
     g.add_auxiliary(CodeGenerator::AUX_INF);
 
     g.local("work", "OSQPWorkspace", "*");
-    g.init_local("work", "(OSQPWorkspace*) mem");
+    g.init_local("work", codegen_mem(g));
 
     g.comment("Set objective");
     g.copy_default(g.arg(CONIC_G), nx_, "w", "0", false);

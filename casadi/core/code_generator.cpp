@@ -218,35 +218,38 @@ namespace casadi {
       *this << "}\n\n";
     }
 
-    // Alloc memory
-    *this << "casadi_int " << fname << "_alloc_mem(void) {\n";
-    flush(this->body);
-    scope_enter();
-    f->codegen_alloc_mem(*this);
-    scope_exit();
-    *this << "}\n\n";
+    bool fun_needs_mem = !f->codegen_mem_type().empty();
+    needs_mem_ |= fun_needs_mem;
 
-    // Initialize memory
-    *this << "int " << fname << "_init_mem(casadi_int mem) {\n";
-    flush(this->body);
-    scope_enter();
-    f->codegen_init_mem(*this);
-    scope_exit();
-    *this << "}\n\n";
+    if (fun_needs_mem) {
+      // Alloc memory
+      *this << "int " << fname << "_alloc_mem(void) {\n";
+      flush(this->body);
+      scope_enter();
+      f->codegen_alloc_mem(*this);
+      scope_exit();
+      *this << "}\n\n";
 
-    // Clear memory
-    *this << "void " << fname << "_free_mem(casadi_int mem) {\n";
-    flush(this->body);
-    scope_enter();
-    f->codegen_free_mem(*this);
-    scope_exit();
-    *this << "}\n\n";
+      // Initialize memory
+      *this << "int " << fname << "_init_mem(int mem) {\n";
+      flush(this->body);
+      scope_enter();
+      f->codegen_init_mem(*this);
+      scope_exit();
+      *this << "}\n\n";
+
+      // Clear memory
+      *this << "void " << fname << "_free_mem(int mem) {\n";
+      flush(this->body);
+      scope_enter();
+      f->codegen_free_mem(*this);
+      scope_exit();
+      *this << "}\n\n";
+    }
 
     // Flush to body
     flush(this->body);
 
-    bool fun_needs_mem = !f->codegen_mem().empty();
-    needs_mem_ |= fun_needs_mem;
 
     if (fun_needs_mem) {
       std::string name = f->codegen_name(*this, false);
@@ -257,18 +260,18 @@ namespace casadi {
       std::string alloc_mem = shorthand(name + "_alloc_mem");
       std::string init_mem = shorthand(name + "_init_mem");
 
-      *this << "static casadi_int " << mem_counter  << " = 0;\n";
-      *this << "static casadi_int " << stack_counter  << " = -1;\n";
-      *this << "static casadi_int " << stack << "[CASADI_MAX_NUM_THREADS];\n";
-      *this << "static " << f->codegen_mem() <<
+      auxiliaries << "static int " << mem_counter  << " = 0;\n";
+      auxiliaries << "static int " << stack_counter  << " = -1;\n";
+      auxiliaries << "static int " << stack << "[CASADI_MAX_NUM_THREADS];\n";
+      auxiliaries << "static " << f->codegen_mem_type() <<
                " *" << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
 
-      *this << "casadi_int " << shorthand(name + "_checkout") << "(void) {\n";
-      *this << "casadi_int mid;\n";
+      *this << "int " << shorthand(name + "_checkout") << "(void) {\n";
+      *this << "int mid;\n";
       *this << "if (" << stack_counter << ">=0) {\n";
       *this << "return " << stack << "[" << stack_counter << "--];\n";
       *this << "} else {\n";
-      *this << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) exit(1);\n";
+      *this << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) return -1;\n";
       *this << "mid = " << alloc_mem << "();\n";
       *this << "if (mid<0) return -1;\n";
       *this << "if(" << init_mem << "(mid)) return -1;\n";
@@ -278,7 +281,7 @@ namespace casadi {
       *this << "return " << stack << "[" << stack_counter << "--];\n";
       *this << "}\n\n";
 
-      *this << "void " << shorthand(name + "_release") << "(casadi_int mem) {\n";
+      *this << "void " << shorthand(name + "_release") << "(int mem) {\n";
       *this << stack << "[" << stack_counter << "++] = mem;\n";
       *this << "}\n\n";
     }
@@ -683,15 +686,15 @@ namespace casadi {
              const string& res, const string& iw,
              const string& w) {
     std::string name = f->codegen_name(*this);
-    bool needs_mem = !f->codegen_mem().empty();
+    bool needs_mem = !f->codegen_mem_type().empty();
     if (needs_mem) {
       std::string mem = "mid";
       local("flag", "int");
-      local(mem, "casadi_int");
+      local(mem, "int");
       *this << mem << " = " << name << "_checkout();\n";
-      *this << "if (mem<0) return 1;\n"; 
+      *this << "if (" << mem << "<0) return 1;\n";
       *this << "flag = " + name + "(" + arg + ", " + res + ", "
-              + iw + ", " + w + ", " + name + "_mem[" + mem + "]);\n";
+              + iw + ", " + w + ", " << mem << ");\n";
       *this << name << "_release(" << mem << ");\n";
       return "flag";
     } else {
@@ -1259,6 +1262,12 @@ namespace casadi {
 
   string CodeGenerator::res(casadi_int i) const {
     return "res[" + str(i) + "]";
+  }
+
+  std::string CodeGenerator::mem(const Function& f) {
+    std::string name = f->codegen_name(*this, false);
+    std::string mem_array = shorthand(name + "_mem");
+    return mem_array+"[mem]";
   }
 
   string CodeGenerator::fill(const string& res,
