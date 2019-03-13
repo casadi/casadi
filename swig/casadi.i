@@ -3935,6 +3935,9 @@ namespace casadi{
 namespace casadi{
 %extend GenericMatrixCommon {
   %matlabcode %{
+    function varargout = spy(self,varargin)
+      [varargout{1:nargout}] = spy(sparse(casadi.DM(self.sparsity(),1)),varargin{:});
+    end
     function varargout = subsref(self,s)
       if numel(s)==1 && strcmp(s.type,'()')
         [varargout{1}] = paren(self, s.subs{:});
