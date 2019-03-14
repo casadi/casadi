@@ -636,7 +636,9 @@ void OptiNode::bake() {
   }
 
   nlp_["g"] = veccat(g_all);
-  nlp_["h"] = diagcat(h_all);
+  if (problem_type_=="conic") {
+    nlp_["h"] = diagcat(h_all);
+  }
 
   // Create bounds helper function
   MXDict bounds;
