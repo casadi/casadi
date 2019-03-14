@@ -205,7 +205,7 @@ namespace casadi {
     if (alloc_mem_) {
       return new casadi_int(alloc_mem_());
     } else {
-      return FunctionInternal::alloc_mem();
+      return new casadi_int(0);
     }
   }
 
@@ -221,9 +221,8 @@ namespace casadi {
     if (free_mem_) {
       free_mem_(*static_cast<casadi_int*>(mem));
       delete static_cast<casadi_int*>(mem);
-      return;
     } else {
-      return FunctionInternal::free_mem(mem);
+      delete static_cast<casadi_int*>(mem);
     }
   }
 

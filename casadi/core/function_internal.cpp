@@ -650,7 +650,8 @@ namespace casadi {
     }
     int ret;
     if (eval_) {
-      ret = eval_(arg, res, iw, w, *static_cast<casadi_int*>(mem));
+      // TODO(jgillis): check why thsi check is needed (crashes function.py:inherit_jit_options)
+      ret = eval_(arg, res, iw, w, mem ? *static_cast<casadi_int*>(mem) : 0);
     } else {
       ret = eval(arg, res, iw, w, mem);
     }
