@@ -75,6 +75,8 @@ namespace casadi {
     dummy.stgs = &settings_;
     scs_set_default_settings(&dummy);
 
+    settings_.eps = 1e-6;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="superscs") {
