@@ -567,7 +567,7 @@ option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for Sup
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
 
 # OSQP: An operator-splitting QP solver
-option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" ON)
+option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
