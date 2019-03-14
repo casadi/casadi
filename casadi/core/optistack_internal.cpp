@@ -1294,7 +1294,7 @@ Function OptiNode::to_function(const std::string& name,
   // Evaluate bounds for given parameter values
   MXDict r = bounds_(arg);
   arg["x0"] = veccat(x0);
-  arg["lam_g0"] = veccat(p);
+  arg["lam_g0"] = veccat(lam_g);
   arg["lbg"] = r["lbg"];
   arg["ubg"] = r["ubg"];
 
