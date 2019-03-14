@@ -948,7 +948,7 @@ OptiSol OptiNode::solve(bool accept_limit) {
   }
   // Verify the constraint types
   for (const auto& g : g_) {
-    if (problem_type_!="conic") { 
+    if (problem_type_!="conic") {
       if (meta_con(g).type==OPTI_PSD)
         casadi_error("Psd constraints not implemented yet. "
         "Perhaps you intended an element-wise inequality? "
