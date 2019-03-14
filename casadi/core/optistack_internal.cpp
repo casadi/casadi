@@ -1267,9 +1267,9 @@ Function OptiNode::to_function(const std::string& name,
 
   Function solver;
   if (problem_type_=="conic") {
-    solver = qpsol("solver", solver_name_, nlp_, opts);
+    solver = qpsol("solver", solver_name_, nlp_, solver_options_);
   } else {
-    solver = nlpsol("solver", solver_name_, nlp_, opts);
+    solver = nlpsol("solver", solver_name_, nlp_, solver_options_);
   }
 
   // Get initial guess and parameter values
