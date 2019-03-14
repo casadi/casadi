@@ -1112,6 +1112,19 @@ class Matrixtests(casadiTestCase):
       self.checkarray(evalf(norm_2(M(a))),r)
       self.checkarray(evalf(norm_2(M(a).T)),r)
 
+  def test_ldl(self):
+    H = diagcat(DM.rand(5,5),DM.rand(5,5))
+    H = H+H.T+2*DM.eye(10)
+    
+    p = np.random.permutation(10)
+    H = H[p,p]
+
+    [D,Lt,p] = ldl(H)
+    P = DM.eye(10)[:,p]
+
+    F = mtimes(mtimes(sqrt(diag(D)),DM.eye(10)+Lt),P.T)
+    self.assertTrue(norm_fro(H-mtimes(F.T,F))<=1e-14)
+
 
 
 if __name__ == '__main__':

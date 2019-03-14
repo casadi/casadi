@@ -52,16 +52,20 @@ if has_conic("qpoases"):
 
 if has_conic("cplex"):
   conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
-conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": True,"soc":False,"discrete":False}))
 
+#conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": True,"soc":False,"discrete":False}))
+
+if has_conic("superscs"):
+  conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": True,"soc":True,"discrete":False}))
 
 # No solution for licensing on travis
-
 if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
   conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False,"discrete":True}))
 
+
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
+
 
 if has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
@@ -72,9 +76,7 @@ if has_conic("cbc"):
 if has_conic("qrqp"):
   conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True, "discrete": False, "sos":False}))
 
-
 print(conics)
-
 
 class ConicTests(casadiTestCase):
 
@@ -715,6 +717,8 @@ class ConicTests(casadiTestCase):
         continue
       if 'worhp' in str(conic): # works but occasionaly throws segfaults, ulimit on travis?
         continue
+      if 'superscs' in str(conic):
+        continue
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
@@ -758,7 +762,8 @@ class ConicTests(casadiTestCase):
       for conic, qp_options, aux_options in conics:
         if not aux_options["quadratic"]: continue
         if 'qcqp' in str(conic): continue
-        solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+        qp_options["dump_in"] = True
+        solver = casadi.conic("qpsol",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
           less_digits=aux_options["less_digits"]
@@ -774,6 +779,7 @@ class ConicTests(casadiTestCase):
         solver_in["lba"]=LBA
         solver_in["uba"]=UBA
         solver_out = solver(**solver_in)
+        self.check_codegen(solver,solver_in,std="c99")
 
         self.checkarray(solver_out["x"],DM([-0.19230768069,1.6846153915,0.692307690769276]),str(conic),digits=max(1,6-less_digits))
         self.assertAlmostEqual(solver_out["cost"][0],-5.850384678537,max(1,5-less_digits),str(conic))
@@ -1113,13 +1119,11 @@ class ConicTests(casadiTestCase):
 
   @requires_nlpsol("ipopt")
   def test_SOCP(self):
-    x = MX.sym("x")
-    y = MX.sym("y")
-    z = MX.sym("z")
-
-
 
     for conic, qp_options, aux_options in conics:
+      x = MX.sym("x")
+      y = MX.sym("y")
+      z = MX.sym("z")
       if not aux_options["soc"]: continue
 
 
@@ -1185,6 +1189,28 @@ class ConicTests(casadiTestCase):
       self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=4)
 
       self.assertTrue(solver.stats()["success"])
+
+      # mimic a QP
+      x = MX.sym("x",4)
+
+      H = DM([[  2.834044009405148 ,  0.867080384259271 ,  0.396881849048015 ,  0.506784822363357],
+         [0.867080384259271 ,  2.184677189537596 ,  0.725076945381028 ,  1.223678163433993],
+         [0.396881849048015 ,  0.725076945381028,   2.838389028806589,   0.712607093594686],
+         [0.506784822363357  , 1.223678163433993 ,  0.712607093594686 ,  3.340935020356804]])
+
+      x0 = DM([1,2,3,4])
+      f = -mtimes(x.T,mtimes(H,x0))
+
+      [D,Lt,p] = ldl(H)
+
+      F = mtimes(sqrt(diag(D)),DM.eye(4)+Lt)
+      
+      h = soc(vertcat(sqrt(2)*mtimes(F,x),1-y),1+y)
+
+      solver = casadi.qpsol("msyolver",conic,{'x': vertcat(x,y),"f": y+f,"h":h},qp_options)
+      res = solver(lbx=vertcat(-inf,-inf,-inf,-inf,1))
+
+      self.checkarray(res["x"][:-1],x0,conic,digits=4)
 
   def test_no_success(self):
 
