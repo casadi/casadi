@@ -303,8 +303,7 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -319,6 +318,13 @@ elements.
 %feature("docstring")  casadi::FiniteDiff::get_name_out(casadi_int i)  "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -1372,6 +1378,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FiniteDiff::get_n_in()  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -1438,6 +1451,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
 const  "
 
@@ -1458,6 +1478,13 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::reverse(casadi_int nadj)
 const  "
 
@@ -1474,8 +1501,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -1683,7 +1709,7 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -1712,6 +1738,12 @@ CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -1847,8 +1879,7 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -2074,8 +2105,15 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -3278,6 +3316,13 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::Nlpsol::serialize_base_function() const  "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
@@ -3347,6 +3392,12 @@ option) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::Blocksqp::set_work(void *mem, const double
 **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
@@ -3370,6 +3421,13 @@ option) const  "
 const  "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -3616,8 +3674,7 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -3751,6 +3808,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 iind, casadi_int oind, bool symmetric) const  "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -4527,6 +4591,13 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -4913,8 +4984,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -5107,6 +5177,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
@@ -5150,8 +5227,7 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -5592,7 +5668,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -5822,9 +5898,22 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::BSplineInterpolant::class_name() const  "
 
 [INTERNAL]  Get type name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -5872,6 +5961,13 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 %feature("docstring")  casadi::BSplineInterpolant::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -7011,7 +7107,7 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
-%feature("docstring")  casadi::Function::release(casadi_int mem) const  "
+%feature("docstring")  casadi::Function::release(int mem) const  "
 
 Release a memory object.
 
@@ -7879,7 +7975,7 @@ Get sparsity of a given output.
 
 ";
 
-%feature("docstring")  casadi::Function::stats(casadi_int mem=0) const  "
+%feature("docstring")  casadi::Function::stats(int mem=0) const  "
 
 Get all statistics obtained at the end of the last evaluate call.
 
@@ -8158,6 +8254,13 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
@@ -8282,6 +8385,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size2_in(casadi_int ind)
 const  "
 
@@ -8354,6 +8464,13 @@ std::string &name, std::ostream &stream) const  "
 %feature("docstring")  casadi::CentralDiff::has_err() const  "
 
 [INTERNAL] ";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::numel_out(casadi_int ind)
 const  "
@@ -8712,9 +8829,10 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -8877,15 +8995,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -9171,6 +9287,12 @@ casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
@@ -9219,7 +9341,7 @@ bool persistent=false) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -9778,6 +9900,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::serialize_base_function()
 const  "
 
@@ -10192,6 +10320,13 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nz_in(const std::vector< DM
 > &arg) const  "
 
@@ -10318,8 +10453,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -10337,7 +10471,7 @@ std::string &fname, double **res) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -10437,6 +10571,12 @@ iind, casadi_int oind, Sparsity &D1, Sparsity &D2, bool compact, bool
 symmetric, bool allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+
+[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -10549,6 +10689,13 @@ is_temp=false) const  "
 Dict &opts)  "
 
 [INTERNAL]  Helper for a more powerful 'integrator' factory
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -11334,9 +11481,10 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get required length of w field.
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -11416,6 +11564,12 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 const  "
 
 [INTERNAL]  Get explicit dynamics.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -11522,6 +11676,13 @@ double t, const double *rx, const double *rz, const double *rp) const  "
 %feature("docstring")  casadi::Integrator::get_n_out()  "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -11775,8 +11936,7 @@ double t, const double *x, const double *z, const double *p) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -12294,6 +12454,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::Conic::get_default_in(casadi_int ind) const
 "
 
@@ -12664,6 +12831,13 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_res(const
 std::vector< M > &res, casadi_int npar) const  "
 
@@ -12889,8 +13063,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -13011,7 +13184,7 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -13026,6 +13199,13 @@ CodeGenerator &g) const  "
 %feature("docstring")  casadi::ProtoFunction::free_mem(void *mem) const  "
 
 [INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -13149,10 +13329,23 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -13543,8 +13736,7 @@ Diagrams
 
 C++ includes: conic_impl.hpp ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -13620,6 +13812,9 @@ const  "
 
 
 // File: classcasadi_1_1ConstantDM.xml
+
+
+// File: classcasadi_1_1ConstantFile.xml
 
 
 // File: classcasadi_1_1ConstantMX.xml
@@ -15435,10 +15630,16 @@ casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
-size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get number of temporary variables needed.
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -15573,6 +15774,13 @@ std::vector< M > &arg, casadi_int npar) const  "
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -15775,6 +15983,20 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_out(casadi_int ind)
 const  "
 
@@ -15937,6 +16159,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
+size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
+
+[INTERNAL]  Get number of temporary variables needed.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
 [INTERNAL]  Get absolute tolerance.
@@ -16023,8 +16252,7 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -16064,8 +16292,7 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -16258,7 +16485,7 @@ std::vector< M > &arg, casadi_int npar) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -16789,6 +17016,13 @@ std::string &name) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
@@ -17260,6 +17494,13 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -17848,6 +18089,13 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
 std::string &fname, const Dict &opts) const  "
 
@@ -17892,7 +18140,7 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -17930,6 +18178,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
 nadj, const std::vector< MatType > &v) const  "
 
@@ -17937,8 +18191,7 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -18142,6 +18395,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nnz_out() const  "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -18198,8 +18458,7 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -18398,6 +18657,12 @@ classes.
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::checkout() const  "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
 %feature("docstring")  casadi::External::serialize_base_function() const  "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
@@ -18521,9 +18786,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::checkout() const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
 
-[INTERNAL]  Checkout a memory object.
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -18594,7 +18859,7 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -18712,6 +18977,13 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
@@ -18751,6 +19023,13 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -18931,8 +19210,7 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -18942,6 +19220,13 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -19092,8 +19377,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -19520,6 +19804,13 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
+std::string &fname, const Dict &opts) const  "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
 [INTERNAL]  Get absolute tolerance.
@@ -19607,10 +19898,10 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
-std::string &fname, const Dict &opts) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Export / Generate C code for the dependency function.
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -19801,8 +20092,7 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -19874,6 +20164,13 @@ bool persistent=false) "
 &stream) const  "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -20401,8 +20698,7 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -20456,7 +20752,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -20555,6 +20851,13 @@ const  "
 %feature("docstring")  casadi::FastNewton::plugin_name() const  "
 
 [INTERNAL] ";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
 
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
@@ -20974,6 +21277,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M >> &fseed, casadi_int npar) const  "
 
@@ -21262,12 +21571,26 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::create_function(const
 std::string &fname, const std::vector< std::string > &s_in, const
 std::vector< std::string > &s_out, const Function::AuxOut
 &aux=Function::AuxOut()) "
 
 [INTERNAL]  Create an oracle function
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -21306,6 +21629,13 @@ StringSerializer, FileDeserializer
 
 
 // File: classcasadi_1_1FiniteDiff.xml
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
 
@@ -22113,6 +22443,13 @@ ind) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
+&name) const  "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
 const  "
 
@@ -22140,8 +22477,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -22200,6 +22536,13 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
 propagation.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -22317,10 +22660,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
-&name) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -22344,7 +22687,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -22520,6 +22863,13 @@ MatrixCommon > &arg, std::vector< MatrixCommon > &res, casadi_int npar, bool
 always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -22925,8 +23275,7 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -22968,6 +23317,12 @@ k) const  "
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -23259,7 +23614,7 @@ ind) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -23300,6 +23655,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::expand() "
 
 [INTERNAL] ";
@@ -23314,6 +23675,13 @@ const  "
 std::vector< M > &arg, casadi_int npar) const  "
 
 [INTERNAL]   Project sparsities.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -23575,10 +23943,10 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
+ind) const  "
 
-[INTERNAL]  Ensure required length of w field.
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -23630,6 +23998,13 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_out(casadi_int ind)
 const  "
 
@@ -23647,6 +24022,13 @@ const  "
 const  "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -24076,6 +24458,13 @@ C++ includes: integrator_impl.hpp ";
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::instruction_id(casadi_int
 k) const  "
 
@@ -24262,10 +24651,10 @@ problem)
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
-ind) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -24471,8 +24860,7 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -24728,8 +25116,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -24867,8 +25254,14 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -25089,9 +25482,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
 
-[INTERNAL]  Get required length of res field.
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -25131,7 +25525,7 @@ std::vector< M > &arg, casadi_int npar) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -25271,6 +25665,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+
+[INTERNAL]  Get required length of res field.
 
 ";
 
@@ -25786,10 +26186,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
-const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
 
-[INTERNAL]  C-style formatted printing during evaluation.
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -26054,6 +26453,13 @@ elements.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nz_out(const std::vector<
 DM > &res) const  "
 
@@ -26111,6 +26517,13 @@ std::string &fname, const Dict &opts) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
+const  "
+
+[INTERNAL]  C-style formatted printing during evaluation.
 
 ";
 
@@ -26420,6 +26833,13 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -26507,8 +26927,7 @@ std::string, M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -26712,7 +27131,7 @@ the output elements).
 
 ";
 
-%feature("docstring")  casadi::Function::stats(casadi_int mem=0) const  "
+%feature("docstring")  casadi::Function::stats(int mem=0) const  "
 
 Get all statistics obtained at the end of the last evaluate call.
 
@@ -28383,7 +28802,7 @@ Number of nodes in the algorithm.
 
 ";
 
-%feature("docstring")  casadi::Function::release(casadi_int mem) const  "
+%feature("docstring")  casadi::Function::release(int mem) const  "
 
 Release a memory object.
 
@@ -29264,6 +29683,13 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_min_in(casadi_int ind)
 const  "
 
@@ -29315,8 +29741,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -29339,6 +29764,13 @@ always_inline, bool never_inline) const  "
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -29560,6 +29992,12 @@ casadi::GenericExternal::serialize_type(SerializingStream &s) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_in(const
 std::string &fname, const double **arg) const  "
 
@@ -29642,8 +30080,7 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -29779,6 +30216,13 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_partition(casadi_int
 iind, casadi_int oind, Sparsity &D1, Sparsity &D2, bool compact, bool
 symmetric, bool allow_forward, bool allow_reverse) const  "
@@ -29901,6 +30345,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::External::codegen_body(CodeGenerator &g)
 const  "
 
@@ -29973,7 +30424,7 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -32404,8 +32855,7 @@ C++ includes: global_options.hpp ";
 
 
 // File: classcasadi_1_1ImplicitFixedStepIntegrator.xml
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -32515,6 +32965,13 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 std::string &fname, double **res) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
 
 %feature("docstring")  casadi::Integrator::setStopTime(IntegratorMemory
 *mem, double tf) const  "
@@ -32674,6 +33131,13 @@ OracleMemory *m) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_sparsity_in(casadi_int i)  "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -32716,8 +33180,7 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -33401,6 +33864,12 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -33468,6 +33937,13 @@ structure recognition.
 casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 [INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -33592,6 +34068,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 const  "
 
 [INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -33968,7 +34451,7 @@ problem)
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -34231,8 +34714,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -34431,6 +34913,13 @@ const  "
 bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -34787,6 +35276,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::Rootfinder::get_n_out()  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -35029,7 +35525,7 @@ k) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -35306,6 +35802,13 @@ persistent=false) "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
 &fname, Function &f) const  "
 
@@ -35505,6 +36008,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -35554,6 +36064,12 @@ elements.
 %feature("docstring")  casadi::ImplicitToNlp::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -35611,8 +36127,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -36120,6 +36635,13 @@ std::string &fname)  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nz_out(const std::vector<
 DM > &res) const  "
 
@@ -36338,7 +36860,7 @@ k) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -36712,6 +37234,13 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
@@ -36933,10 +37462,16 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -37142,6 +37677,12 @@ const  "
 const  "
 
 [INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -37446,6 +37987,13 @@ double t, const double *x, const double *z, const double *p) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_reverse(casadi_int nadj,
 const std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -37571,8 +38119,7 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -37801,6 +38348,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
+ind) const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -37825,6 +38379,12 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -37937,8 +38497,7 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -38090,10 +38649,10 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
-ind) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -38173,6 +38732,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -38393,6 +38959,20 @@ elements.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
 &stream) const  "
 
@@ -38468,8 +39048,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -39298,7 +39877,7 @@ std::vector< MX > &arg, const std::string &parallelization) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -39668,6 +40247,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -39678,6 +40264,13 @@ const  "
 double **res, casadi_int *iw, double *w, void *mem) const  "
 
 [INTERNAL]  Evaluate numerically.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -40195,8 +40788,7 @@ const std::vector< std::string > &name_out, const std::vector< Sparsity >
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -40466,6 +41058,12 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::fwdViaJac(casadi_int nfwd)
 const  "
 
@@ -40541,7 +41139,7 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -40571,8 +41169,7 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -40863,6 +41460,13 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g) const  "
 
@@ -40970,6 +41574,13 @@ const  "
 const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -41372,8 +41983,7 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -41496,8 +42106,7 @@ casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -41911,8 +42520,7 @@ C++ includes: lapack_lu.hpp ";
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -42007,8 +42615,7 @@ casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -42651,6 +43258,13 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::LinearInterpolant::get_jacobian(const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -42778,6 +43392,13 @@ get_forward(casadi_int nfwd) if no cached version is available.
 &name) const  "
 
 [INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -43240,8 +43861,7 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -43283,8 +43903,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -43320,6 +43939,13 @@ ind) const  "
 std::string &lang, std::ostream &stream, const Dict &options) const  "
 
 [INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -43545,6 +44171,12 @@ Diagrams
 
 C++ includes: linear_interpolant.hpp ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
 bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
@@ -43674,7 +44306,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -43844,6 +44476,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
@@ -43883,10 +44522,10 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
-**arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Propagate sparsity forward.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -44157,6 +44796,12 @@ std::string &fname) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M >> &fseed, casadi_int npar) const  "
 
@@ -44296,6 +44941,13 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -44523,7 +45175,7 @@ tr:  Flip the relationship. Return which expressions contain the variables
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -44621,6 +45273,13 @@ std::vector< M > &res, casadi_int npar) const  "
 casadi::LinearInterpolantJac::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -44906,8 +45565,7 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -45035,10 +45693,16 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -45190,6 +45854,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::mx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -45827,8 +46498,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -45927,8 +46597,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -46062,8 +46731,7 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -46132,8 +46800,7 @@ casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -46294,8 +46961,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -46440,8 +47106,7 @@ Joel Andersson
 
 C++ includes: lsqr.hpp ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -46563,6 +47228,13 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -47083,6 +47755,13 @@ derivatives
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
 std::string &fname, const Dict &opts) const  "
 
@@ -47103,7 +47782,7 @@ std::string &fname, const Dict &opts) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -47142,6 +47821,13 @@ elements.
 %feature("docstring")  casadi::Map::init(const Dict &opts)  "
 
 [INTERNAL]  Initialize.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -47509,6 +48195,12 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
@@ -47552,8 +48244,7 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -47663,7 +48354,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 ";
 
 %feature("docstring")  casadi::Map::eval_gen(const T **arg, T **res,
-casadi_int *iw, T *w, casadi_int mem=0) const  "
+casadi_int *iw, T *w, int mem=0) const  "
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
@@ -47733,6 +48424,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 "
 
 [INTERNAL] ";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::project_arg(const
 std::vector< M > &arg, casadi_int npar) const  "
@@ -47864,8 +48562,7 @@ const std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -50878,6 +51575,13 @@ Construct matrix with a given sparsity and nonzeros.
 
 ";
 
+%feature("docstring") casadi::MX::MX(const Sparsity &sp, const std::string
+&fname) "
+
+Construct matrix with a given sparsity and a file with nonzeros.
+
+";
+
 %feature("docstring") casadi::MX::MX(double x) "
 
 Create scalar constant (also implicit type conversion)
@@ -51094,6 +51798,13 @@ const  "
 const  "
 
 [INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -51333,8 +52044,7 @@ original
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -51541,6 +52251,13 @@ std::string &name) const  "
 %feature("docstring")  casadi::FunctionInternal::sx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -51926,6 +52643,13 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::Newton::free_mem(void *mem) const  "
 
 [INTERNAL]  Free memory block.
@@ -52148,7 +52872,7 @@ elements.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -52166,6 +52890,12 @@ const std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -52294,6 +53024,13 @@ classes.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -52344,8 +53081,7 @@ std::string &parallelization) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -52761,8 +53497,7 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -53017,6 +53752,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
@@ -53061,6 +53802,13 @@ elements.
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -53236,8 +53984,7 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -53351,6 +54098,13 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 [INTERNAL] ";
 
 %feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen incref for dependencies.
@@ -53454,10 +54208,12 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::PluginInterface< Nlpsol  >::plugin_name()
-const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
 
-[INTERNAL] ";
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
 
 %feature("docstring")  casadi::Nlpsol::get_n_out()  "
 
@@ -53512,6 +54268,13 @@ multiplying.
 %feature("docstring")  casadi::Nlpsol::solve(void *mem) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
@@ -53982,6 +54745,11 @@ std::string &parallelization) const  "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Nlpsol  >::plugin_name()
+const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::index_in(const std::string
 &name) const  "
 
@@ -54198,7 +54966,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -54659,6 +55427,13 @@ std::string &name) const  "
 std::string &lang, std::ostream &stream, const Dict &options) const  "
 
 [INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
+double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+
+[INTERNAL]  Set the (persistent) work vectors.
 
 ";
 
@@ -55261,7 +56036,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::Map::eval_gen(const T **arg, T **res,
-casadi_int *iw, T *w, casadi_int mem=0) const  "
+casadi_int *iw, T *w, int mem=0) const  "
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
@@ -55319,8 +56094,7 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -55399,6 +56173,12 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_in(casadi_int ind)
 const  "
 
@@ -55413,8 +56193,21 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -55478,7 +56271,7 @@ elements.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -55491,10 +56284,10 @@ ind) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
-double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Set the (persistent) work vectors.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -55724,6 +56517,13 @@ const  "
 %feature("docstring")  casadi::Map::info() const  "
 
 [INTERNAL]  Obtain information about node
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -56301,6 +57101,14 @@ Get user data.
 
 ";
 
+%feature("docstring")  casadi::Opti::to_function(const std::string &name,
+const std::vector< MX > &args, const std::vector< MX > &res, const Dict
+&opts=Dict()) "
+
+Create a CasADi Function from the Opti solver.
+
+";
+
 %feature("docstring")  casadi::Opti::advanced() const  "
 
 Get a copy with advanced functionality.
@@ -56692,6 +57500,14 @@ Do not use directly.
 %feature("docstring")  casadi::Opti::get_str(bool more=false) const  "
 
 Get string representation.
+
+";
+
+%feature("docstring")  casadi::Opti::to_function(const std::string &name,
+const std::vector< MX > &args, const std::vector< MX > &res, const Dict
+&opts=Dict()) "
+
+Create a CasADi Function from the Opti solver.
 
 ";
 
@@ -57185,6 +58001,13 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_partition(casadi_int
 iind, casadi_int oind, Sparsity &D1, Sparsity &D2, bool compact, bool
 symmetric, bool allow_forward, bool allow_reverse) const  "
@@ -57280,7 +58103,7 @@ nadj, const std::vector< MatType > &v) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -57320,10 +58143,24 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -57475,8 +58312,7 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -57706,6 +58542,12 @@ const std::string &fname) const  "
 i) "
 
 [INTERNAL]  Get sparsity of a given input.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -58130,10 +58972,16 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -59189,6 +60037,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_res(const
 std::vector< M > &arg, casadi_int &npar) const  "
 
@@ -59255,6 +60110,12 @@ npar[out]:  required number of parallel calls (or -1)
 const  "
 
 [INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -59565,8 +60426,7 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -60103,6 +60963,13 @@ propagation.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::Conic::serialize_type(SerializingStream &s)
 const  "
 
@@ -60131,10 +60998,24 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -60145,8 +61026,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -60361,7 +61241,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -60613,7 +61493,7 @@ elements.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -60660,10 +61540,10 @@ std::string &parallelization) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
-const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  C-style formatted printing during evaluation.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -60909,8 +61789,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -60929,8 +61808,7 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -61016,6 +61894,20 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
+const  "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -61752,6 +62644,12 @@ Diagrams
 
 C++ includes: qrqp.hpp ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::Qrqp::init_mem(void *mem) const  "
 
 [INTERNAL]  Initalize memory block.
@@ -62131,6 +63029,20 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
@@ -62173,6 +63085,12 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
@@ -62187,8 +63105,7 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -62333,9 +63250,10 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -62953,6 +63871,12 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring")  casadi::Qrsqp::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
@@ -63033,8 +63957,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -63116,6 +64039,13 @@ const  "
 **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -63290,7 +64220,7 @@ Function &nlp) "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -63368,6 +64298,13 @@ std::vector< M > &arg, casadi_int npar) const  "
 %feature("docstring")  casadi::Qrsqp::init(const Dict &opts)  "
 
 [INTERNAL]  Initialize.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -63594,6 +64531,13 @@ npar[out]:  required number of parallel calls (or -1)
 const  "
 
 [INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -63894,10 +64838,10 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
-ind) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -64089,6 +65033,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::sx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
+ind) const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -64385,8 +65336,7 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -64439,6 +65389,12 @@ k) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens, bool
@@ -64478,10 +65434,12 @@ never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::PluginInterface< Rootfinder  >::plugin_name()
-const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
 
-[INTERNAL] ";
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
 
 %feature("docstring")  casadi::Rootfinder::has_sprev() const  "
 
@@ -64496,8 +65454,7 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -64513,6 +65470,13 @@ std::string &name, std::ostream &stream) const  "
 casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const  "
+
+[INTERNAL]  Display object.
 
 ";
 
@@ -64588,7 +65552,7 @@ bool persistent=false) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -64909,6 +65873,11 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Rootfinder  >::plugin_name()
+const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -65085,6 +66054,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
+&name) const  "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::has_function(const
 std::string &fname) const  "
 
@@ -65198,10 +66174,10 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
-&name) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -65283,10 +66259,10 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
-bool more) const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
 
-[INTERNAL]  Display object.
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -65546,8 +66522,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -65563,6 +66538,13 @@ Dict &opts)  "
 %feature("docstring")  casadi::OracleFunction::expand() "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
+&name) const  "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::map(casadi_int n, const
 std::string &parallelization) const  "
@@ -65679,10 +66661,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
-&name) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -65761,7 +66743,7 @@ problem)
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -65822,6 +66804,13 @@ npar[out]:  required number of parallel calls (or -1)
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -66029,6 +67018,12 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -66229,8 +67224,7 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -66720,6 +67714,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::Integrator::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -66745,6 +67746,13 @@ std::vector< M > &arg, casadi_int npar) const  "
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
+ind) const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -66780,10 +67788,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
-ind) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -67068,6 +68076,13 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
 [INTERNAL]  Get absolute tolerance.
@@ -67084,6 +68099,12 @@ const  "
 %feature("docstring")  casadi::Scpgen::eval_vec(ScpgenMemory *m) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::size1_out(casadi_int ind)
 const  "
@@ -67296,10 +68317,16 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -67391,7 +68418,7 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -67457,8 +68484,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -68282,6 +69308,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::dm_out(casadi_int ind)
 const  "
 
@@ -68809,6 +69842,13 @@ std::ostream &stream, casadi_int iter, double obj, double pr_inf, double
 du_inf, double rg, casadi_int ls_trials, bool ls_success) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
 
 
 // File: classcasadi_1_1SerializerBase.xml
@@ -69735,6 +70775,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
 const  "
 
@@ -69794,6 +70841,13 @@ const  "
 casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -69893,8 +70947,7 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -70075,6 +71128,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res, casadi_int &npar) const  "
 
@@ -70231,6 +71291,13 @@ const  "
 iind, casadi_int oind, bool symmetric) const  "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -70398,7 +71465,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -70487,6 +71554,12 @@ classes.
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -70606,8 +71679,7 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -71029,8 +72101,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -71042,6 +72113,12 @@ std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -71169,7 +72246,7 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 [INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -71394,6 +72471,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -71532,6 +72616,13 @@ casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -71778,8 +72869,7 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -71830,6 +72920,13 @@ elements.
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -72199,6 +73296,13 @@ bool more) const  "
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -72978,6 +74082,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
+
+[INTERNAL]  Memory objects.
+
+";
+
 %feature("docstring")  casadi::FiniteDiff::get_default_in(casadi_int ind)
 const  "
 
@@ -73111,8 +74221,7 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -73148,6 +74257,13 @@ bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -73306,6 +74422,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
 
 [INTERNAL]  Get relative tolerance.
@@ -73332,6 +74455,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -73661,6 +74791,13 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getJacSparsity(casadi_int
 iind, casadi_int oind, bool symmetric) const  "
 
@@ -73802,10 +74939,9 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
 
-[INTERNAL]  Memory objects.
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -74191,7 +75327,7 @@ persistent=false) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -75548,8 +76684,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -75616,6 +76751,13 @@ std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -75722,7 +76864,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -75875,6 +77017,14 @@ A textbook SQPMethod
 | c1                    | OT_DOUBLE   | Armijo condition, coefficient of   |
 |                       |             | decrease in merit                  |
 +-----------------------+-------------+------------------------------------+
+| convexify_margin      | OT_DOUBLE   | When using a convexification       |
+|                       |             | strategy, make sure that the       |
+|                       |             | smallest eigenvalue is at least    |
+|                       |             | this (default: 1e-7).              |
++-----------------------+-------------+------------------------------------+
+| convexify_strategy    | OT_STRING   | none|regularize|eigen-reflect      |
+|                       |             | |eigen-clip. Default: none.        |
++-----------------------+-------------+------------------------------------+
 | hess_lag              | OT_FUNCTION | Function for calculating the       |
 |                       |             | Hessian of the Lagrangian          |
 |                       |             | (autogenerated by default)         |
@@ -75915,13 +77065,6 @@ A textbook SQPMethod
 +-----------------------+-------------+------------------------------------+
 | qpsol_options         | OT_DICT     | Options to be passed to the QP     |
 |                       |             | solver                             |
-+-----------------------+-------------+------------------------------------+
-| regularize            | OT_BOOL     | Automatic regularization of        |
-|                       |             | Lagrange Hessian.                  |
-+-----------------------+-------------+------------------------------------+
-| regularize_margin     | OT_DOUBLE   | When regularize is true, make sure |
-|                       |             | that the smallest eigenvalue is at |
-|                       |             | least this (default: 1e-7).        |
 +-----------------------+-------------+------------------------------------+
 | tol_du                | OT_DOUBLE   | Stopping criterion for dual        |
 |                       |             | infeasability                      |
@@ -75972,6 +77115,20 @@ A textbook SQPMethod
 |                   |               | multipliers in    |                  |
 |                   |               | the Nlpsol base   |                  |
 |                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
+| convexify_margin  | OT_DOUBLE     | When using a      | casadi::Sqpmetho |
+|                   |               | convexification   | d                |
+|                   |               | strategy, make    |                  |
+|                   |               | sure that the     |                  |
+|                   |               | smallest          |                  |
+|                   |               | eigenvalue is at  |                  |
+|                   |               | least this        |                  |
+|                   |               | (default: 1e-7).  |                  |
++-------------------+---------------+-------------------+------------------+
+| convexify_strateg | OT_STRING     | none|regularize   | casadi::Sqpmetho |
+| y                 |               | |eigen-reflect    | d                |
+|                   |               | |eigen-clip.      |                  |
+|                   |               | Default: none.    |                  |
 +-------------------+---------------+-------------------+------------------+
 | discrete          | OT_BOOLVECTOR | Indicates which   | casadi::Nlpsol   |
 |                   |               | of the variables  |                  |
@@ -76089,18 +77246,6 @@ A textbook SQPMethod
 | qpsol_options     | OT_DICT       | Options to be     | casadi::Sqpmetho |
 |                   |               | passed to the QP  | d                |
 |                   |               | solver            |                  |
-+-------------------+---------------+-------------------+------------------+
-| regularize        | OT_BOOL       | Automatic         | casadi::Sqpmetho |
-|                   |               | regularization of | d                |
-|                   |               | Lagrange Hessian. |                  |
-+-------------------+---------------+-------------------+------------------+
-| regularize_margin | OT_DOUBLE     | When regularize   | casadi::Sqpmetho |
-|                   |               | is true, make     | d                |
-|                   |               | sure that the     |                  |
-|                   |               | smallest          |                  |
-|                   |               | eigenvalue is at  |                  |
-|                   |               | least this        |                  |
-|                   |               | (default: 1e-7).  |                  |
 +-------------------+---------------+-------------------+------------------+
 | tol_du            | OT_DOUBLE     | Stopping          | casadi::Sqpmetho |
 |                   |               | criterion for     | d                |
@@ -76396,6 +77541,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::Nlpsol::setOptionsFromFile(const std::string
 &file) "
 
@@ -76487,6 +77639,13 @@ Parameters:
 npar[in]:  normal usage: 1, disallow pararallel calls: -1
 
 npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -76950,6 +78109,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_min_in(casadi_int ind)
 const  "
 
@@ -76973,9 +78138,10 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -77059,6 +78225,12 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::Nlpsol::get_n_in()  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -77105,8 +78277,7 @@ const Function &nlp) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -77748,6 +78919,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring")  casadi::Switch::codegen_body(CodeGenerator &g) const
 "
 
@@ -77788,8 +78966,7 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -77848,6 +79025,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
 const std::string &fname) const  "
 
@@ -77872,6 +79056,13 @@ const  "
 "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -78130,6 +79321,13 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
@@ -78312,7 +79510,7 @@ k) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -78377,6 +79575,12 @@ buf_sz, const char *fmt,...) const  "
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -78535,8 +79739,7 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -78783,8 +79986,7 @@ casadi_int nrhs) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -79295,8 +80497,7 @@ casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -79425,6 +80626,13 @@ bool more) const  "
 const  "
 
 [INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -79587,7 +80795,7 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 ";
 
 %feature("docstring")  casadi::Map::eval_gen(const T **arg, T **res,
-casadi_int *iw, T *w, casadi_int mem=0) const  "
+casadi_int *iw, T *w, int mem=0) const  "
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
@@ -79608,8 +80816,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
-"
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
 
@@ -80084,10 +81291,10 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
-std::string &fname, const Dict &opts) const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
+&g, const std::string &index="mem") const  "
 
-[INTERNAL]  Export / Generate C code for the dependency function.
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -80263,6 +81470,12 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring")  casadi::Map::get_n_in()  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -80330,7 +81543,7 @@ iind, casadi_int oind, bool symmetric) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+CodeGenerator &g, bool ns=true) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -80548,6 +81761,13 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring")  casadi::Map::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
@@ -80605,8 +81825,7 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
 
@@ -80673,6 +81892,13 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_mat(const Sparsity
 &arg, const Sparsity &inp, casadi_int &npar) "
 
@@ -80698,6 +81924,13 @@ std::vector< MX > &arg) const  "
 double **arg, double **res, casadi_int *iw, double *w) const  "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
+std::string &fname, const Dict &opts) const  "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
 
 ";
 
@@ -80953,6 +82186,19 @@ T1 alpha, const T1 *x, const T1 *y) "
 T1 > *p, casadi_int *sz_iw, casadi_int *sz_w) "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_cvx_house_apply(casadi_int n,
+casadi_int m, casadi_int s, T1 *A, T1 *p, const T1 *v) "
+
+[INTERNAL]  Apply householder transform on dense A m-by-n matrix
+
+A is modified in-place
+
+s : stride normally equal to m when A is a submatrix of a bigger matrix, set
+equal to latter's number of rows v : compact housholder factorisation
+(length m) First element (always one) is used to store beta p : length n
+
+";
 
 %feature("docstring")  casadi::casadi_qp_kkt_residual(casadi_qp_data< T1 >
 *d, T1 *r) "
@@ -81478,8 +82724,8 @@ casadi_int K, const double *a, double *t, double *z, double *dwork, double
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_qp_print_header(casadi_qp_data< T1 >
-*d, char *buf, size_t buf_sz) "
+%feature("docstring")  casadi::casadi_cvx_scalar(T1 epsilon, casadi_int
+reflect, T1 eig) "
 
 [INTERNAL] ";
 
@@ -81532,6 +82778,11 @@ Number of NLP solver outputs.
 
 %feature("docstring")  casadi::casadi_bfgs_reset(const casadi_int *sp_h, T1
 *h) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_print_colcomb(casadi_qp_data< T1 >
+*d, char *buf, size_t buf_sz, casadi_int j) "
 
 [INTERNAL] ";
 
@@ -81617,8 +82868,7 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_factorize(casadi_qp_data< T1 > *d)
-"
+%feature("docstring")  casadi::casadi_qp_du_index(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
 
@@ -81684,6 +82934,11 @@ Check sos structure and generate defaults.
 
 %feature("docstring")  casadi::casadi_fill_casadi_int(casadi_int *x,
 casadi_int n, casadi_int alpha) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_cvx(casadi_int n, T1 *A, T1 epsilon,
+T1 tol, casadi_int reflect, casadi_int max_iter, T1 *w, casadi_int *iw) "
 
 [INTERNAL] ";
 
@@ -82241,6 +83496,11 @@ Joel Andersson
 
 ";
 
+%feature("docstring")  casadi::casadi_cvx_house_apply_symm(casadi_int n,
+casadi_int k, T1 *A, T1 *p, T1 *v) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_qp_take_step(casadi_qp_data< T1 > *d)
 "
 
@@ -82630,12 +83890,21 @@ Check if the vector has negative entries.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_du_index(casadi_qp_data< T1 > *d) "
+%feature("docstring")  casadi::casadi_tri_project(const T1 *x, const
+casadi_int *sp_x, T1 *y, casadi_int lower) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_qp_print_colcomb(casadi_qp_data< T1 >
-*d, char *buf, size_t buf_sz, casadi_int j) "
+%feature("docstring")  casadi::casadi_cvx_symm_schur(casadi_int n, T1
+*t_diag, T1 *t_off, T1 tol, casadi_int max_iter, casadi_int *trace_meta, T1
+*trace) "
+
+[INTERNAL]  Golub & Van Loan Alg. 8.3.3.
+
+";
+
+%feature("docstring")  casadi::casadi_qp_linesearch(casadi_qp_data< T1 > *d)
+"
 
 [INTERNAL] ";
 
@@ -82830,13 +84099,17 @@ Get documentation for a particular option.
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_cvx_implicit_qr(casadi_int n, T1
+*t_diag, T1 *t_off, T1 *cs) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_qp_primal_blocking(casadi_qp_data< T1
 > *d) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::dense_mul_nn(casadi_int n, casadi_int m,
-casadi_int l, const double *A, const double *B, double *C) "
+%feature("docstring")  casadi::casadi_cvx_givens(T1 a, T1 b, T1 *c, T1 *s) "
 
 [INTERNAL] ";
 
@@ -83347,9 +84620,13 @@ List of plugins
 
 - ooqp
 
+- osqp
+
 - qpoases
 
 - sqic
+
+- superscs
 
 - nlpsol
 
@@ -83600,6 +84877,27 @@ reInit();
 
 --------------------------------------------------------------------------------
 
+osqp
+----
+
+
+
+Interface to the OSQP Solver for quadratic programming
+
+>List of available options
+
++------+---------+-------------------------------------+
+|  Id  |  Type   |             Description             |
++======+=========+=====================================+
+| osqp | OT_DICT | const Options to be passed to osqp. |
++------+---------+-------------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 qpoases
 -------
 
@@ -83768,6 +85066,29 @@ Interface to the SQIC solver for quadratic programming
 
 --------------------------------------------------------------------------------
 
+superscs
+--------
+
+
+
+Interface to the SuperSCS solver for conic programming
+
+Joris Gillis, 2019
+
+>List of available options
+
++----------+---------+-----------------------------------+
+|    Id    |  Type   |            Description            |
++==========+=========+===================================+
+| superscs | OT_DICT | Options to be passed to superscs. |
++----------+---------+-----------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 nlpsol
 ------
 
@@ -83907,6 +85228,11 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring")  casadi::casadi_sqpmethod_work(const
+casadi_sqpmethod_prob< T1 > *p, casadi_int *sz_iw, casadi_int *sz_w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_densify(const T1 *x, const casadi_int
 *sp_x, T2 *y, casadi_int tr) "
 
@@ -83932,7 +85258,7 @@ const T1 *lb, const T1 *ub) "
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_linesearch(casadi_qp_data< T1 > *d)
+%feature("docstring")  casadi::casadi_qp_factorize(casadi_qp_data< T1 > *d)
 "
 
 [INTERNAL] ";
@@ -83982,6 +85308,10 @@ Pi @X_f = Sum_i D[i]*Z_i
 
 
 ";
+
+%feature("docstring")  casadi::casadi_cvx_tri(T1 *A, casadi_int n, T1 *p) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::is_nonincreasing(const std::vector< T > &v) "
 
@@ -84219,8 +85549,8 @@ const casadi_int *sp_r, const casadi_int *pc, T1 eps, casadi_int ind) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_sqpmethod_work(const
-casadi_sqpmethod_prob< T1 > *p, casadi_int *sz_iw, casadi_int *sz_w) "
+%feature("docstring")  casadi::casadi_qp_print_header(casadi_qp_data< T1 >
+*d, char *buf, size_t buf_sz) "
 
 [INTERNAL] ";
 
@@ -86077,6 +87407,14 @@ A textbook SQPMethod
 | c1                    | OT_DOUBLE   | Armijo condition, coefficient of   |
 |                       |             | decrease in merit                  |
 +-----------------------+-------------+------------------------------------+
+| convexify_margin      | OT_DOUBLE   | When using a convexification       |
+|                       |             | strategy, make sure that the       |
+|                       |             | smallest eigenvalue is at least    |
+|                       |             | this (default: 1e-7).              |
++-----------------------+-------------+------------------------------------+
+| convexify_strategy    | OT_STRING   | none|regularize|eigen-reflect      |
+|                       |             | |eigen-clip. Default: none.        |
++-----------------------+-------------+------------------------------------+
 | hess_lag              | OT_FUNCTION | Function for calculating the       |
 |                       |             | Hessian of the Lagrangian          |
 |                       |             | (autogenerated by default)         |
@@ -86117,13 +87455,6 @@ A textbook SQPMethod
 +-----------------------+-------------+------------------------------------+
 | qpsol_options         | OT_DICT     | Options to be passed to the QP     |
 |                       |             | solver                             |
-+-----------------------+-------------+------------------------------------+
-| regularize            | OT_BOOL     | Automatic regularization of        |
-|                       |             | Lagrange Hessian.                  |
-+-----------------------+-------------+------------------------------------+
-| regularize_margin     | OT_DOUBLE   | When regularize is true, make sure |
-|                       |             | that the smallest eigenvalue is at |
-|                       |             | least this (default: 1e-7).        |
 +-----------------------+-------------+------------------------------------+
 | tol_du                | OT_DOUBLE   | Stopping criterion for dual        |
 |                       |             | infeasability                      |
@@ -86248,11 +87579,21 @@ T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_cvx_givens_apply(casadi_int n, T1 *q,
+T1 c, T1 s, casadi_int p) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_qp_kkt(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_qp_flip(casadi_qp_data< T1 > *d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::dense_mul_nn(casadi_int n, casadi_int m,
+casadi_int l, const double *A, const double *B, double *C) "
 
 [INTERNAL] ";
 
@@ -86393,6 +87734,11 @@ order:  Order of interpolating polynomials
 
 ";
 
+%feature("docstring")  casadi::casadi_file_slurp(const char *fname,
+casadi_int n, T1 *x) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_qp_init(casadi_qp_data< T1 > *d,
 casadi_int **iw, T1 **w) "
 
@@ -86524,6 +87870,11 @@ Check if the vector is monotone.
 
 ";
 
+%feature("docstring")  casadi::casadi_mv_dense(const T1 *x, casadi_int
+nrow_x, casadi_int ncol_x, const T1 *y, T1 *z, casadi_int tr) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_norm_inf_mul(const T1 *x, const
 casadi_int *sp_x, const T1 *y, const casadi_int *sp_y, T1 *dwork, casadi_int
 *iwork) "
@@ -86551,10 +87902,15 @@ y.size1()+x.size2()+1
 
 ";
 
-%feature("docstring")  casadi::casadi_mv_dense(const T1 *x, casadi_int
-nrow_x, casadi_int ncol_x, const T1 *y, T1 *z, casadi_int tr) "
+%feature("docstring")  casadi::casadi_cvx_house(T1 *v, T1 *beta, casadi_int
+nv) "
 
-[INTERNAL] ";
+[INTERNAL]  Computes Householder vector beta: scalar v: vector of length nv
+Returns 2-norm of v
+
+Ref: Golub & Van Loan Alg 5.1.1
+
+";
 
 %feature("docstring")  casadi::conic_out() "
 

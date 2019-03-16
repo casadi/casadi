@@ -261,6 +261,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::nz_in "
 
 [INTERNAL]  Convert from/to flat vector of input/output nonzeros.
@@ -1186,6 +1192,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::get_n_in "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -1248,6 +1260,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::get_max_in "
 
 [INTERNAL]  Get largest input value.
@@ -1263,6 +1281,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::BackwardDiff::instructions_sx "
 
 [INTERNAL]  get SX expression associated with instructions
+
+";
+
+%feature("docstring") casadi::BackwardDiff::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -1457,6 +1481,12 @@ multiplying.
 %feature("docstring") casadi::BackwardDiff::ad_weight "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::BackwardDiff::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -1757,6 +1787,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Blocksqp::sprint "
 
 [INTERNAL]  C-style formatted printing to string.
+
+";
+
+%feature("docstring") casadi::Blocksqp::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -2822,6 +2858,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::Blocksqp::serialize_base_function "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
@@ -2866,6 +2908,12 @@ Evaluate a function, overloaded.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Blocksqp::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::Blocksqp::set_work "
 
 [INTERNAL]  Set the (persistent) work vectors.
@@ -2887,6 +2935,12 @@ Evaluate a function, overloaded.
 %feature("docstring") casadi::Blocksqp::get_jacobian_sparsity "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::Blocksqp::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -3211,6 +3265,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Blocksqp::getJacSparsity "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Blocksqp::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -3883,6 +3943,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::jacobian "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -4378,6 +4444,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::BSplineInterpolant::sp_forward "
 
 [INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -4940,9 +5012,21 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::class_name "
 
 [INTERNAL]  Get type name.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -4979,6 +5063,12 @@ multiplying.
 %feature("docstring") casadi::BSplineInterpolant::has_codegen "
 
 [INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -6217,6 +6307,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::CentralDiff::alloc_mem "
 
 [INTERNAL]  Create memory block.
@@ -6324,6 +6420,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::CentralDiff::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::CentralDiff::size2_in "
 
 [INTERNAL]  Input/output dimensions.
@@ -6379,6 +6481,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::CentralDiff::has_err "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::CentralDiff::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
 
 %feature("docstring") casadi::CentralDiff::numel_out "
 
@@ -6664,9 +6772,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::construct "
+%feature("docstring") casadi::CentralDiff::codegen_free_mem "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -7035,6 +7143,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::CentralDiff::serialize_type "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring") casadi::CentralDiff::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -7598,6 +7712,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::CentralDiff::serialize_base_function "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
@@ -7950,6 +8070,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Collocation::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::Collocation::nz_in "
 
 [INTERNAL]  Convert from/to flat vector of input/output nonzeros.
@@ -8158,6 +8284,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Collocation::sz_w "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
 %feature("docstring") casadi::Collocation::print_stats "
 
 [INTERNAL]  Print solver statistics.
@@ -8243,6 +8375,12 @@ classes.
 %feature("docstring") casadi::Collocation::create_advanced "
 
 [INTERNAL]  Helper for a more powerful 'integrator' factory
+
+";
+
+%feature("docstring") casadi::Collocation::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -8925,9 +9063,9 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::Collocation::sz_w "
+%feature("docstring") casadi::Collocation::codegen_alloc_mem "
 
-[INTERNAL]  Get required length of w field.
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -8988,6 +9126,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Collocation::getExplicit "
 
 [INTERNAL]  Get explicit dynamics.
+
+";
+
+%feature("docstring") casadi::Collocation::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -9074,6 +9218,12 @@ Evaluate a function, overloaded.
 %feature("docstring") casadi::Collocation::get_n_out "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Collocation::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -9681,6 +9831,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Conic::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Conic::get_default_in "
 
 [INTERNAL]  Get default input value.
@@ -9990,6 +10146,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Conic::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::Conic::replace_res "
 
 [INTERNAL]  Replace 0-by-0 outputs.
@@ -10278,6 +10440,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Conic::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::Conic::get_name_out "
 
 [INTERNAL]  Names of function input and outputs.
@@ -10387,9 +10555,21 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::Conic::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::Conic::print_options "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::Conic::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -10847,6 +11027,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 
 // File: classcasadi_1_1ConstantDM.xml
+
+
+// File: classcasadi_1_1ConstantFile.xml
 
 
 // File: classcasadi_1_1ConstantMX.xml
@@ -12292,9 +12475,15 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Dple::sz_work "
+%feature("docstring") casadi::Dple::codegen_init_mem "
 
-[INTERNAL]  Get number of temporary variables needed.
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring") casadi::Dple::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -12386,6 +12575,12 @@ elements.
 %feature("docstring") casadi::Dple::size_in "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Dple::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -12556,6 +12751,18 @@ a main.
 
 ";
 
+%feature("docstring") casadi::Dple::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring") casadi::Dple::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Dple::size_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -12687,6 +12894,12 @@ elements.
 %feature("docstring") casadi::Dple::numel_in "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::Dple::sz_work "
+
+[INTERNAL]  Get number of temporary variables needed.
 
 ";
 
@@ -13391,6 +13604,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Expm::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Expm::sp_weight "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
@@ -13773,6 +13992,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::Expm::codegen "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::Expm::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -14292,6 +14517,12 @@ C++ includes: expm_impl.hpp ";
 
 ";
 
+%feature("docstring") casadi::Expm::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::Expm::generate_dependencies "
 
 [INTERNAL]  Export / Generate C code for the dependency function.
@@ -14350,6 +14581,12 @@ elements.
 %feature("docstring") casadi::Expm::init_mem "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring") casadi::Expm::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -14538,6 +14775,12 @@ structure recognition.
 %feature("docstring") casadi::Expm::codegen_incref "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::Expm::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -14730,6 +14973,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::External::checkout "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
 %feature("docstring") casadi::External::serialize_base_function "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
@@ -14829,9 +15078,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::External::checkout "
+%feature("docstring") casadi::External::codegen_mem_type "
 
-[INTERNAL]  Checkout a memory object.
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -14992,6 +15241,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::External::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::External::self "
 
 [INTERNAL]  Get a public class instance.
@@ -15029,6 +15284,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::External::alloc_w "
 
 [INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::External::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -15184,6 +15445,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::External::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -15655,6 +15922,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::External::generate_dependencies "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
 %feature("docstring") casadi::External::get_abstol "
 
 [INTERNAL]  Get absolute tolerance.
@@ -15734,9 +16007,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::External::generate_dependencies "
+%feature("docstring") casadi::External::codegen_alloc_mem "
 
-[INTERNAL]  Export / Generate C code for the dependency function.
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -15943,6 +16216,12 @@ a main.
 %feature("docstring") casadi::FastNewton::print_options "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::FastNewton::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -16536,6 +16815,12 @@ propagation.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::FastNewton::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::FastNewton::weak "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -16852,6 +17137,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::FastNewton::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::FastNewton::replace_fseed "
 
 [INTERNAL]
@@ -17081,9 +17372,21 @@ elements.
 
 ";
 
+%feature("docstring") casadi::FastNewton::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::FastNewton::create_function "
 
 [INTERNAL]  Create an oracle function
+
+";
+
+%feature("docstring") casadi::FastNewton::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -17120,6 +17423,12 @@ StringSerializer, FileDeserializer
 
 
 // File: classcasadi_1_1FiniteDiff.xml
+%feature("docstring") casadi::FiniteDiff::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::print_options "
 
 [INTERNAL]  Print list of options.
@@ -17849,6 +18158,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::tocache "
 
 [INTERNAL]  Save function to cache.
@@ -17913,6 +18228,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
 propagation.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -17997,9 +18318,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::index_in "
+%feature("docstring") casadi::FiniteDiff::codegen_free_mem "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -18160,6 +18481,12 @@ multiplying.
 %feature("docstring") casadi::FiniteDiff::call_gen "
 
 [INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -18541,6 +18868,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::fwd_seed "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -18826,6 +19159,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::expand "
 
 [INTERNAL] ";
@@ -18839,6 +19178,12 @@ Evaluate a function, overloaded.
 %feature("docstring") casadi::FixedStepIntegrator::project_res "
 
 [INTERNAL]   Project sparsities.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -19055,9 +19400,9 @@ original
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::alloc_w "
+%feature("docstring") casadi::FixedStepIntegrator::get_default_in "
 
-[INTERNAL]  Ensure required length of w field.
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -19099,6 +19444,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::size_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -19114,6 +19465,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::FixedStepIntegrator::get_jacobian_sparsity "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::alloc_w "
+
+[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -19478,6 +19835,12 @@ C++ includes: integrator_impl.hpp ";
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::instruction_id "
 
 [INTERNAL]  Get an atomic operation operator index.
@@ -19621,9 +19984,9 @@ problem)
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::get_default_in "
+%feature("docstring") casadi::FixedStepIntegrator::codegen_alloc_mem "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -20114,6 +20477,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::memory "
 
 [INTERNAL]  Memory objects.
@@ -20286,9 +20655,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::sz_res "
+%feature("docstring") casadi::ForwardDiff::codegen_mem "
 
-[INTERNAL]  Get required length of res field.
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -20423,6 +20792,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::ForwardDiff::mx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sz_res "
+
+[INTERNAL]  Get required length of res field.
 
 ";
 
@@ -20923,9 +21298,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::print "
+%feature("docstring") casadi::ForwardDiff::codegen_mem_type "
 
-[INTERNAL]  C-style formatted printing during evaluation.
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -21146,6 +21521,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::nz_out "
 
 [INTERNAL]  Convert from/to flat vector of input/output nonzeros.
@@ -21180,6 +21561,12 @@ elements.
 %feature("docstring") casadi::ForwardDiff::alloc_iw "
 
 [INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
 
 ";
 
@@ -21429,6 +21816,12 @@ structure recognition.
 %feature("docstring") casadi::ForwardDiff::getJacSparsityGen "
 
 [INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -23125,6 +23518,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::GenericExternal::get_min_in "
 
 [INTERNAL]  Get smallest input value.
@@ -23174,6 +23573,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring") casadi::GenericExternal::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -23350,6 +23755,12 @@ generated function.
 %feature("docstring") casadi::GenericExternal::serialize_type "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring") casadi::GenericExternal::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -23535,6 +23946,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::GenericExternal::get_partition "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
@@ -23634,6 +24051,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::GenericExternal::get_forward "
 
 [INTERNAL]  Forward mode derivatives.
+
+";
+
+%feature("docstring") casadi::GenericExternal::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -24891,6 +25314,13 @@ multiplying.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen_init_mem
+"
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::setStopTime "
 
 [INTERNAL]  Set stop time for the integration.
@@ -25022,6 +25452,13 @@ casadi::ImplicitFixedStepIntegrator::get_jacobian_sparsity "
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::print_fstats "
 
 [INTERNAL]  Print statistics.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen_alloc_mem
+"
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -25659,6 +26096,13 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen_mem_type
+"
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::sz_arg "
 
 [INTERNAL]  Get required length of arg field.
@@ -25715,6 +26159,12 @@ structure recognition.
 casadi::ImplicitFixedStepIntegrator::codegen_declarations "
 
 [INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -25823,6 +26273,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::nnz_out "
 
 [INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen_free_mem
+"
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -26485,6 +26942,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
@@ -26782,6 +27245,12 @@ structure recognition.
 %feature("docstring") casadi::ImplicitToNlp::get_max_in "
 
 [INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -27223,6 +27692,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::incache "
 
 [INTERNAL]  Get function in cache.
@@ -27381,6 +27856,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::n_instructions "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -27425,6 +27906,12 @@ elements.
 %feature("docstring") casadi::ImplicitToNlp::get_stats "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -27921,6 +28408,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Integrator::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::Integrator::nz_out "
 
 [INTERNAL]  Convert from/to flat vector of input/output nonzeros.
@@ -28410,6 +28903,12 @@ C++ includes: integrator_impl.hpp ";
 
 ";
 
+%feature("docstring") casadi::Integrator::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Integrator::instruction_output "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
@@ -28591,6 +29090,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Integrator::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::Integrator::free_mx "
 
 [INTERNAL]  Get free variables ( MX)
@@ -28769,6 +29274,12 @@ elements.
 %feature("docstring") casadi::Integrator::has_forward "
 
 [INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::Integrator::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -29014,6 +29525,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::Integrator::expand "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Integrator::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
 
 %feature("docstring") casadi::Integrator::get_reverse "
 
@@ -29294,6 +29811,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Interpolant::get_default_in "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring") casadi::Interpolant::alloc "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
@@ -29315,6 +29838,12 @@ generated function.
 %feature("docstring") casadi::Interpolant::symbolic_output "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Interpolant::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -29545,9 +30074,9 @@ structure recognition for symmetric Jacobians
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Interpolant::get_default_in "
+%feature("docstring") casadi::Interpolant::codegen_init_mem "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -29614,6 +30143,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::Interpolant::has_free "
 
 [INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::Interpolant::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -29800,6 +30335,18 @@ elements.
 %feature("docstring") casadi::Interpolant::has_eval_dm "
 
 [INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::Interpolant::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring") casadi::Interpolant::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -30889,6 +31436,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::JitFunction::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::JitFunction::free_mx "
 
 [INTERNAL]  Get free variables ( MX)
@@ -30898,6 +31451,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::JitFunction::eval "
 
 [INTERNAL]  Evaluate numerically.
+
+";
+
+%feature("docstring") casadi::JitFunction::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -31601,6 +32160,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::JitFunction::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::JitFunction::fwdViaJac "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
@@ -31897,6 +32462,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::JitFunction::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::JitFunction::codegen_meta "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
@@ -31986,6 +32557,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::JitFunction::numel_in "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::JitFunction::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -33550,6 +34127,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::get_jacobian "
 
 [INTERNAL]  Full Jacobian.
@@ -33651,6 +34234,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::LinearInterpolant::index_out "
 
 [INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -34104,6 +34693,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::sp_forward "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::alloc_arg "
 
 [INTERNAL]  Ensure required length of arg field.
@@ -34277,6 +34872,12 @@ Diagrams
 
 
 C++ includes: linear_interpolant.hpp ";
+
+%feature("docstring") casadi::LinearInterpolant::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
 
 %feature("docstring") casadi::LinearInterpolant::sp_reverse "
 
@@ -34520,6 +35121,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::self "
 
 [INTERNAL]  Get a public class instance.
@@ -34556,9 +35163,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::sp_forward "
+%feature("docstring") casadi::LinearInterpolant::codegen_free_mem "
 
-[INTERNAL]  Propagate sparsity forward.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -34786,6 +35393,12 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::replace_fseed "
 
 [INTERNAL]
@@ -34891,6 +35504,12 @@ multiplying.
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -35156,6 +35775,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::LinearInterpolantJac::serialize_type "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -35497,6 +36122,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::sz_w "
 
 [INTERNAL]  Get required length of w field.
@@ -35618,6 +36249,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::LinearInterpolantJac::mx_out "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -36850,6 +37487,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Map::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Map::has_forward "
 
 [INTERNAL]  Generate a function that calculates nfwd forward derivatives.
@@ -37270,6 +37913,12 @@ derivatives
 
 ";
 
+%feature("docstring") casadi::Map::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::Map::generate_dependencies "
 
 [INTERNAL]  Export / Generate C code for the dependency function.
@@ -37322,6 +37971,12 @@ elements.
 %feature("docstring") casadi::Map::init "
 
 [INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::Map::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -37612,6 +38267,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Map::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::Map::finalize "
 
 [INTERNAL]  Finalize the object creation.
@@ -37730,7 +38391,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
->  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, int mem=0) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate or propagate sparsities.
@@ -37786,6 +38447,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::Map::factory "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Map::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
 
 %feature("docstring") casadi::Map::project_arg "
 
@@ -39734,6 +40401,12 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
+%feature("docstring") casadi::Newton::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::Newton::jit_dependencies "
 
 [INTERNAL]  JIT for dependencies.
@@ -40117,6 +40790,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Newton::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::Newton::serialize_type "
 
 [INTERNAL]  Serialize type information.
@@ -40444,6 +41123,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Newton::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::Newton::free_mem "
 
 [INTERNAL]  Free memory block.
@@ -40644,6 +41329,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Newton::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::Newton::uses_output "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
@@ -40729,6 +41420,12 @@ classes.
 %feature("docstring") casadi::Newton::get_stats "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::Newton::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -41312,6 +42009,12 @@ a main.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::Nlpsol::has_codegen "
 
 [INTERNAL]  Is codegen supported?
@@ -41352,6 +42055,12 @@ elements.
 %feature("docstring") casadi::Nlpsol::size1_in "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Nlpsol::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -41590,6 +42299,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Nlpsol::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::Nlpsol::codegen_incref "
 
 [INTERNAL]  Codegen incref for dependencies.
@@ -41677,9 +42392,11 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::plugin_name "
+%feature("docstring") casadi::Nlpsol::codegen_alloc_mem "
 
-[INTERNAL] ";
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
 
 %feature("docstring") casadi::Nlpsol::get_n_out "
 
@@ -41725,6 +42442,12 @@ multiplying.
 %feature("docstring") casadi::Nlpsol::solve "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Nlpsol::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
 
 %feature("docstring") casadi::Nlpsol::jacobian "
 
@@ -42127,6 +42850,10 @@ propagation.
 [INTERNAL]  Generate/retrieve cached serial map.
 
 ";
+
+%feature("docstring") casadi::Nlpsol::plugin_name "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Nlpsol::index_in "
 
@@ -42683,6 +43410,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::OmpMap::set_work "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
 %feature("docstring") casadi::OmpMap::is_a "
 
 [INTERNAL]  Check if the function is of a particular type.
@@ -43162,7 +43895,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
->  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, int mem=0) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate or propagate sparsities.
@@ -43283,6 +44016,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::OmpMap::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::OmpMap::sparsity_in "
 
 [INTERNAL]  Input/output sparsity.
@@ -43292,6 +44031,18 @@ multiplying.
 %feature("docstring") casadi::OmpMap::getAdaptorSolverName "
 
 [INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -43365,9 +44116,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OmpMap::set_work "
+%feature("docstring") casadi::OmpMap::codegen_free_mem "
 
-[INTERNAL]  Set the (persistent) work vectors.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -43536,6 +44287,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::OmpMap::info "
 
 [INTERNAL]  Obtain information about node
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -43942,6 +44699,12 @@ Get user data.
 
 ";
 
+%feature("docstring") casadi::Opti::to_function "
+
+";
+
+";
+
 %feature("docstring") casadi::Opti::advanced "
 
 Get a copy with advanced functionality.
@@ -44196,6 +44959,12 @@ Do not use directly.
 %feature("docstring") casadi::OptiAdvanced::get_str "
 
 Get string representation.
+
+";
+
+%feature("docstring") casadi::OptiAdvanced::to_function "
+
+";
 
 ";
 
@@ -44473,6 +45242,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::OracleFunction::get_partition "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
@@ -44588,9 +45363,21 @@ elements.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::OracleFunction::print_options "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::OracleFunction::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -44878,6 +45665,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::OracleFunction::get_sparsity_in "
 
 [INTERNAL]  Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::OracleFunction::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -45234,6 +46027,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::OracleFunction::memory "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::OracleFunction::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -46154,6 +46953,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::QpToNlp::matching_res "
 
 [INTERNAL]  Check if output arguments that needs to be replaced.
@@ -46209,6 +47014,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::QpToNlp::print "
 
 [INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::QpToNlp::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -46908,6 +47719,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::QpToNlp::serialize_type "
 
 [INTERNAL]  Serialize type information.
@@ -46934,9 +47751,21 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::QpToNlp::sz_work "
 
 [INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::QpToNlp::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -47360,9 +48189,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Qrqp::print "
+%feature("docstring") casadi::Qrqp::codegen_free_mem "
 
-[INTERNAL]  C-style formatted printing during evaluation.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -47665,6 +48494,18 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::Qrqp::codegen "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::Qrqp::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::Qrqp::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -48278,6 +49119,12 @@ Diagrams
 
 C++ includes: qrqp.hpp ";
 
+%feature("docstring") casadi::Qrqp::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::Qrqp::init_mem "
 
 [INTERNAL]  Initalize memory block.
@@ -48565,6 +49412,18 @@ classes.
 
 ";
 
+%feature("docstring") casadi::Qrqp::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring") casadi::Qrqp::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Qrqp::sp_weight "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
@@ -48595,6 +49454,12 @@ propagation.
 %feature("docstring") casadi::Qrsqp::alloc_arg "
 
 [INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring") casadi::Qrsqp::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -48739,9 +49604,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::Qrsqp::weak "
+%feature("docstring") casadi::Qrsqp::codegen_free_mem "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -49284,6 +50149,12 @@ multiplying.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Qrsqp::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring") casadi::Qrsqp::get_stats "
 
 [INTERNAL]  Get all statistics.
@@ -49409,6 +50280,12 @@ multiplying.
 %feature("docstring") casadi::Qrsqp::sp_forward "
 
 [INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::Qrsqp::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -49619,6 +50496,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Qrsqp::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::Qrsqp::nz_out "
 
 [INTERNAL]  Convert from/to flat vector of input/output nonzeros.
@@ -49803,6 +50686,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::Qrsqp::get_min_in "
 
 [INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring") casadi::Qrsqp::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -50046,9 +50935,9 @@ original
 
 ";
 
-%feature("docstring") casadi::Rootfinder::get_default_in "
+%feature("docstring") casadi::Rootfinder::codegen_init_mem "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -50204,6 +51093,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::Rootfinder::sx_out "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Rootfinder::get_default_in "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -50508,6 +51403,12 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
+%feature("docstring") casadi::Rootfinder::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::Rootfinder::call_reverse "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
@@ -50532,9 +51433,11 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
-%feature("docstring") casadi::Rootfinder::plugin_name "
+%feature("docstring") casadi::Rootfinder::codegen_alloc_mem "
 
-[INTERNAL] ";
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
 
 %feature("docstring") casadi::Rootfinder::has_sprev "
 
@@ -50563,6 +51466,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::Rootfinder::instruction_input "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Rootfinder::disp "
+
+[INTERNAL]  Display object.
 
 ";
 
@@ -50880,6 +51789,10 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::plugin_name "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Rootfinder::signature "
 
 [INTERNAL]  Code generate the function.
@@ -51017,6 +51930,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Rootfinder::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
 %feature("docstring") casadi::Rootfinder::has_function "
 
 [INTERNAL] ";
@@ -51113,9 +52032,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Rootfinder::index_in "
+%feature("docstring") casadi::Rootfinder::codegen_free_mem "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -51183,9 +52102,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::disp "
+%feature("docstring") casadi::Rootfinder::codegen_mem "
 
-[INTERNAL]  Display object.
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -51421,6 +52340,12 @@ elements.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::RungeKutta::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
 %feature("docstring") casadi::RungeKutta::map "
 
 [INTERNAL]  Generate/retrieve cached serial map.
@@ -51514,9 +52439,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::RungeKutta::index_in "
+%feature("docstring") casadi::RungeKutta::codegen_free_mem "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -51631,6 +52556,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::RungeKutta::size1_in "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::RungeKutta::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -51796,6 +52727,12 @@ multiplying.
 %feature("docstring") casadi::RungeKutta::sz_iw "
 
 [INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring") casadi::RungeKutta::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -52357,6 +53294,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::RungeKutta::has_sprev "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -52378,6 +53321,12 @@ multiplying.
 %feature("docstring") casadi::RungeKutta::eval_mx "
 
 [INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::RungeKutta::get_default_in "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -52410,9 +53359,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::get_default_in "
+%feature("docstring") casadi::RungeKutta::codegen_init_mem "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -52653,6 +53602,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::Scpgen::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::Scpgen::get_abstol "
 
 [INTERNAL]  Get absolute tolerance.
@@ -52668,6 +53623,12 @@ Evaluate a function, overloaded.
 %feature("docstring") casadi::Scpgen::eval_vec "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Scpgen::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
 
 %feature("docstring") casadi::Scpgen::size1_out "
 
@@ -52846,6 +53807,12 @@ multiplying.
 %feature("docstring") casadi::Scpgen::memory "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::Scpgen::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -53635,6 +54602,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Scpgen::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Scpgen::dm_out "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -54117,6 +55090,12 @@ C++ includes: scpgen.hpp ";
 %feature("docstring") casadi::Scpgen::printIteration "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Scpgen::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
 
 
 // File: classcasadi_1_1SerializerBase.xml
@@ -54816,6 +55795,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::SlicotDple::mx_out "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -54850,6 +55835,12 @@ elements.
 %feature("docstring") casadi::SlicotDple::serialize_body "
 
 [INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring") casadi::SlicotDple::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -55088,6 +56079,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::SlicotDple::check_res "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
@@ -55229,6 +56226,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::SlicotDple::getJacSparsity "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::SlicotDple::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -55425,6 +56428,12 @@ classes.
 %feature("docstring") casadi::SlicotDple::size_out "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::SlicotDple::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -55885,6 +56894,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::fwd_seed "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -56169,6 +57184,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::alloc_res "
 
 [INTERNAL]  Ensure required length of res field.
@@ -56278,6 +57299,12 @@ C++ includes: slicot_expm.hpp ";
 %feature("docstring") casadi::SlicotExpm::uses_output "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::SlicotExpm::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
 
 ";
 
@@ -56531,6 +57558,12 @@ elements.
 %feature("docstring") casadi::SlicotExpm::mx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::SlicotExpm::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -56824,6 +57857,12 @@ generated function.
 %feature("docstring") casadi::SlicotExpm::size2_in "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -57525,6 +58564,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Smoothing::memory "
+
+[INTERNAL]  Memory objects.
+
+";
+
 %feature("docstring") casadi::Smoothing::get_default_in "
 
 [INTERNAL]  Get default input value.
@@ -57667,6 +58712,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Smoothing::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::Smoothing::symbolic_output "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
@@ -57785,6 +58836,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::Smoothing::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Smoothing::get_reltol "
 
 [INTERNAL]  Get relative tolerance.
@@ -57809,6 +58866,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Smoothing::eval_mx "
 
 [INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::Smoothing::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -58087,6 +59150,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Smoothing::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::Smoothing::getJacSparsity "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
@@ -58197,9 +59266,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Smoothing::memory "
+%feature("docstring") casadi::Smoothing::codegen_mem_type "
 
-[INTERNAL]  Memory objects.
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -59611,6 +60680,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::size2_in "
 
 [INTERNAL]  Input/output dimensions.
@@ -59820,6 +60895,14 @@ A textbook SQPMethod
 | c1                    | OT_DOUBLE   | Armijo condition, coefficient of   |
 |                       |             | decrease in merit                  |
 +-----------------------+-------------+------------------------------------+
+| convexify_margin      | OT_DOUBLE   | When using a convexification       |
+|                       |             | strategy, make sure that the       |
+|                       |             | smallest eigenvalue is at least    |
+|                       |             | this (default: 1e-7).              |
++-----------------------+-------------+------------------------------------+
+| convexify_strategy    | OT_STRING   | none|regularize|eigen-reflect      |
+|                       |             | |eigen-clip. Default: none.        |
++-----------------------+-------------+------------------------------------+
 | hess_lag              | OT_FUNCTION | Function for calculating the       |
 |                       |             | Hessian of the Lagrangian          |
 |                       |             | (autogenerated by default)         |
@@ -59860,13 +60943,6 @@ A textbook SQPMethod
 +-----------------------+-------------+------------------------------------+
 | qpsol_options         | OT_DICT     | Options to be passed to the QP     |
 |                       |             | solver                             |
-+-----------------------+-------------+------------------------------------+
-| regularize            | OT_BOOL     | Automatic regularization of        |
-|                       |             | Lagrange Hessian.                  |
-+-----------------------+-------------+------------------------------------+
-| regularize_margin     | OT_DOUBLE   | When regularize is true, make sure |
-|                       |             | that the smallest eigenvalue is at |
-|                       |             | least this (default: 1e-7).        |
 +-----------------------+-------------+------------------------------------+
 | tol_du                | OT_DOUBLE   | Stopping criterion for dual        |
 |                       |             | infeasability                      |
@@ -59917,6 +60993,20 @@ A textbook SQPMethod
 |                   |               | multipliers in    |                  |
 |                   |               | the Nlpsol base   |                  |
 |                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
+| convexify_margin  | OT_DOUBLE     | When using a      | casadi::Sqpmetho |
+|                   |               | convexification   | d                |
+|                   |               | strategy, make    |                  |
+|                   |               | sure that the     |                  |
+|                   |               | smallest          |                  |
+|                   |               | eigenvalue is at  |                  |
+|                   |               | least this        |                  |
+|                   |               | (default: 1e-7).  |                  |
++-------------------+---------------+-------------------+------------------+
+| convexify_strateg | OT_STRING     | none|regularize   | casadi::Sqpmetho |
+| y                 |               | |eigen-reflect    | d                |
+|                   |               | |eigen-clip.      |                  |
+|                   |               | Default: none.    |                  |
 +-------------------+---------------+-------------------+------------------+
 | discrete          | OT_BOOLVECTOR | Indicates which   | casadi::Nlpsol   |
 |                   |               | of the variables  |                  |
@@ -60034,18 +61124,6 @@ A textbook SQPMethod
 | qpsol_options     | OT_DICT       | Options to be     | casadi::Sqpmetho |
 |                   |               | passed to the QP  | d                |
 |                   |               | solver            |                  |
-+-------------------+---------------+-------------------+------------------+
-| regularize        | OT_BOOL       | Automatic         | casadi::Sqpmetho |
-|                   |               | regularization of | d                |
-|                   |               | Lagrange Hessian. |                  |
-+-------------------+---------------+-------------------+------------------+
-| regularize_margin | OT_DOUBLE     | When regularize   | casadi::Sqpmetho |
-|                   |               | is true, make     | d                |
-|                   |               | sure that the     |                  |
-|                   |               | smallest          |                  |
-|                   |               | eigenvalue is at  |                  |
-|                   |               | least this        |                  |
-|                   |               | (default: 1e-7).  |                  |
 +-------------------+---------------+-------------------+------------------+
 | tol_du            | OT_DOUBLE     | Stopping          | casadi::Sqpmetho |
 |                   |               | criterion for     | d                |
@@ -60309,6 +61387,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::setOptionsFromFile "
 
 [INTERNAL]  Read options from parameter xml.
@@ -60384,6 +61468,12 @@ Parameters:
 npar[in]:  normal usage: 1, disallow pararallel calls: -1
 
 npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::Sqpmethod::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -60768,6 +61858,12 @@ Print iteration.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::get_min_in "
 
 [INTERNAL]  Get smallest input value.
@@ -60788,9 +61884,9 @@ Print iteration.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::construct "
+%feature("docstring") casadi::Sqpmethod::codegen_alloc_mem "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -60845,6 +61941,12 @@ Print iteration.
 %feature("docstring") casadi::Sqpmethod::project_res "
 
 [INTERNAL]   Project sparsities.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -61427,6 +62529,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Switch::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
 %feature("docstring") casadi::Switch::codegen_body "
 
 [INTERNAL]  Generate code for the body of the C function.
@@ -61518,6 +62626,12 @@ a main.
 
 ";
 
+%feature("docstring") casadi::Switch::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::Switch::codegen "
 
 [INTERNAL]  Generate code the function.
@@ -61533,6 +62647,12 @@ a main.
 %feature("docstring") casadi::Switch::get_stats "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::Switch::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
 
 ";
 
@@ -61743,6 +62863,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Switch::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::Switch::sp_weight "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
@@ -61937,6 +63063,12 @@ derivatives
 %feature("docstring") casadi::Switch::print_dimensions "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Switch::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -62881,6 +64013,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ThreadMap::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
 %feature("docstring") casadi::ThreadMap::mapsum_mx "
 
 [INTERNAL]  Parallel evaluation.
@@ -63000,7 +64138,7 @@ elements.
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
->  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, int mem=0) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate or propagate sparsities.
@@ -63411,9 +64549,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::ThreadMap::generate_dependencies "
+%feature("docstring") casadi::ThreadMap::codegen_mem "
 
-[INTERNAL]  Export / Generate C code for the dependency function.
+[INTERNAL]  Get thread-local memory object.
 
 ";
 
@@ -63534,6 +64672,12 @@ structure recognition.
 %feature("docstring") casadi::ThreadMap::ad_weight "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::ThreadMap::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -63772,6 +64916,12 @@ a main.
 
 ";
 
+%feature("docstring") casadi::ThreadMap::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
 %feature("docstring") casadi::ThreadMap::has_codegen "
 
 [INTERNAL]  Is codegen supported?
@@ -63877,6 +65027,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::ThreadMap::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::ThreadMap::check_mat "
 
 [INTERNAL]  Helper function
@@ -63899,6 +65055,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::ThreadMap::setup "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::ThreadMap::generate_dependencies "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
 
 ";
 
@@ -64130,6 +65292,18 @@ Explicitly load a plugin dynamically.
 %feature("docstring") casadi::casadi_nlpsol_work "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::casadi_cvx_house_apply "
+
+[INTERNAL]  Apply householder transform on dense A m-by-n matrix
+
+A is modified in-place
+
+s : stride normally equal to m when A is a submatrix of a bigger matrix, set
+equal to latter's number of rows v : compact housholder factorisation
+(length m) First element (always one) is used to store beta p : length n
+
+";
 
 %feature("docstring") casadi::casadi_qp_kkt_residual "
 
@@ -64595,7 +65769,7 @@ Get the number of integrator outputs.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::casadi_qp_print_header "
+%feature("docstring") casadi::casadi_cvx_scalar "
 
 [INTERNAL] ";
 
@@ -64619,6 +65793,10 @@ Number of NLP solver outputs.
 ";
 
 %feature("docstring") casadi::casadi_bfgs_reset "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_print_colcomb "
 
 [INTERNAL] ";
 
@@ -64701,7 +65879,7 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
-%feature("docstring") casadi::casadi_qp_factorize "
+%feature("docstring") casadi::casadi_qp_du_index "
 
 [INTERNAL] ";
 
@@ -64760,6 +65938,10 @@ Check sos structure and generate defaults.
 ";
 
 %feature("docstring") casadi::casadi_fill_casadi_int "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_cvx "
 
 [INTERNAL] ";
 
@@ -64822,6 +66004,10 @@ Generate native code in the interfaced language for debugging
 ";
 
 ";
+
+%feature("docstring") casadi::casadi_cvx_house_apply_symm "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qp_take_step "
 
@@ -64925,11 +66111,17 @@ Check if the vector has negative entries.
 
 ";
 
-%feature("docstring") casadi::casadi_qp_du_index "
+%feature("docstring") casadi::casadi_tri_project "
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::casadi_qp_print_colcomb "
+%feature("docstring") casadi::casadi_cvx_symm_schur "
+
+[INTERNAL]  Golub & Van Loan Alg. 8.3.3.
+
+";
+
+%feature("docstring") casadi::casadi_qp_linesearch "
 
 [INTERNAL] ";
 
@@ -65102,11 +66294,15 @@ Get documentation for a particular option.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_cvx_implicit_qr "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qp_primal_blocking "
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::dense_mul_nn "
+%feature("docstring") casadi::casadi_cvx_givens "
 
 [INTERNAL] ";
 
@@ -65603,9 +66799,13 @@ List of plugins
 
 - ooqp
 
+- osqp
+
 - qpoases
 
 - sqic
+
+- superscs
 
 - nlpsol
 
@@ -65856,6 +67056,27 @@ reInit();
 
 --------------------------------------------------------------------------------
 
+osqp
+----
+
+
+
+Interface to the OSQP Solver for quadratic programming
+
+>List of available options
+
++------+---------+-------------------------------------+
+|  Id  |  Type   |             Description             |
++======+=========+=====================================+
+| osqp | OT_DICT | const Options to be passed to osqp. |
++------+---------+-------------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 qpoases
 -------
 
@@ -66024,6 +67245,29 @@ Interface to the SQIC solver for quadratic programming
 
 --------------------------------------------------------------------------------
 
+superscs
+--------
+
+
+
+Interface to the SuperSCS solver for conic programming
+
+Joris Gillis, 2019
+
+>List of available options
+
++----------+---------+-----------------------------------+
+|    Id    |  Type   |            Description            |
++==========+=========+===================================+
+| superscs | OT_DICT | Options to be passed to superscs. |
++----------+---------+-----------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 nlpsol
 ------
 
@@ -66158,6 +67402,10 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_sqpmethod_work "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_densify "
 
 [INTERNAL]  Convert sparse to dense.
@@ -66180,7 +67428,7 @@ Get all options for a plugin.
 
 ";
 
-%feature("docstring") casadi::casadi_qp_linesearch "
+%feature("docstring") casadi::casadi_qp_factorize "
 
 [INTERNAL] ";
 
@@ -66227,6 +67475,10 @@ Pi @X_f = Sum_i D[i]*Z_i
 
 
 ";
+
+%feature("docstring") casadi::casadi_cvx_tri "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::is_nonincreasing "
 
@@ -66427,7 +67679,7 @@ Get the number of QP solver outputs.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::casadi_sqpmethod_work "
+%feature("docstring") casadi::casadi_qp_print_header "
 
 [INTERNAL] ";
 
@@ -66604,11 +67856,19 @@ Explicitly load a plugin dynamically.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_cvx_givens_apply "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qp_kkt "
 
 [INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qp_flip "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::dense_mul_nn "
 
 [INTERNAL] ";
 
@@ -66740,6 +68000,10 @@ order:  Order of interpolating polynomials
 
 ";
 
+%feature("docstring") casadi::casadi_file_slurp "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qp_init "
 
 [INTERNAL] ";
@@ -66866,6 +68130,10 @@ Check if the vector is monotone.
 
 ";
 
+%feature("docstring") casadi::casadi_mv_dense "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_norm_inf_mul "
 
 [INTERNAL]  Inf-norm of a Matrix-matrix product,*
@@ -66890,9 +68158,14 @@ y.size1()+x.size2()+1
 
 ";
 
-%feature("docstring") casadi::casadi_mv_dense "
+%feature("docstring") casadi::casadi_cvx_house "
 
-[INTERNAL] ";
+[INTERNAL]  Computes Householder vector beta: scalar v: vector of length nv
+Returns 2-norm of v
+
+Ref: Golub & Van Loan Alg 5.1.1
+
+";
 
 %feature("docstring") casadi::conic_out "
 

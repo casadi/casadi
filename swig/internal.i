@@ -544,6 +544,9 @@
 %exception  casadi::FunctionInternal::codegen(CodeGenerator &g, const std::string &fname) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::codegen_body(CodeGenerator &g) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -553,13 +556,25 @@
 %exception  casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::codegen_mem(CodeGenerator &g, const std::string &index="mem") const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::codegen_mem_type() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::codegen_meta(CodeGenerator &g) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::codegen_name(const CodeGenerator &g) const  {
+%exception  casadi::FunctionInternal::codegen_name(const CodeGenerator &g, bool ns=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  {
@@ -1930,10 +1945,10 @@
 %exception  casadi::ProtoFunction::get_options() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ProtoFunction::memory(casadi_int ind) const  {
+%exception  casadi::ProtoFunction::memory(int ind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ProtoFunction::release(casadi_int mem) const  {
+%exception  casadi::ProtoFunction::release(int mem) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProtoFunction::serialize(SerializingStream &s) const  {
@@ -2330,6 +2345,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ThreadMap::parallelization() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::casadi_cvx_scalar(T1 epsilon, casadi_int reflect, T1 eig) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::check_exposed(T t) {
