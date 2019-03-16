@@ -96,6 +96,9 @@ namespace casadi {
     std::string constant(const std::vector<casadi_int>& v);
 
     /** \brief Represent an array constant; adding it when new */
+    void constant_copy(const std::string& var_name, const std::vector<casadi_int>& v);
+
+    /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<double>& v);
 
     /** \brief Allocate file scope double read-only memory */
@@ -321,6 +324,7 @@ namespace casadi {
       AUX_MV_DENSE,
       AUX_MTIMES,
       AUX_PROJECT,
+      AUX_TRI_PROJECT,
       AUX_DENSIFY,
       AUX_SPARSIFY,
       AUX_TRANS,
@@ -418,6 +422,10 @@ namespace casadi {
     std::string project(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, const Sparsity& sp_res,
                         const std::string& w);
+
+    /** \brief Project triangular part */
+    std::string tri_project(const std::string& arg, const Sparsity& sp_arg,
+                        const std::string& res, bool lower);
 
     /** \brief Densify */
     std::string densify(const std::string& arg, const Sparsity& sp_arg,
