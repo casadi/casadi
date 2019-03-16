@@ -847,6 +847,21 @@ namespace casadi {
     return shorthand("s" + str(get_constant(v, true)));
   }
 
+  void CodeGenerator::constant_copy(const std::string& name, const vector<casadi_int>& v) {
+    std::string ref = constant(v);
+    if (v.size()) {
+      local(name+"[" + str(v.size()) + "]", "casadi_int");
+    } else {
+      local(name, "casadi_int", "*");
+    }
+    if (v.size()) {
+      local("i", "casadi_int");
+      (*this) << "for (i=0;i<" << v.size() << ";++i) " + name + "[i] = " + ref + "[i];\n";
+    } else {
+      init_local(name, "0");
+    }
+  }
+
   string CodeGenerator::constant(const vector<double>& v) {
     return shorthand("c" + str(get_constant(v, true)));
   }
@@ -951,6 +966,9 @@ namespace casadi {
       break;
     case AUX_PROJECT:
       this->auxiliaries << sanitize_source(casadi_project_str, inst);
+      break;
+    case AUX_TRI_PROJECT:
+      this->auxiliaries << sanitize_source(casadi_tri_project_str, inst);
       break;
     case AUX_DENSIFY:
       add_auxiliary(AUX_CLEAR);
@@ -1303,6 +1321,7 @@ namespace casadi {
 
   string CodeGenerator::fill(const string& res,
                                   std::size_t n, const string& v) {
+    if (v=="0") return clear(res, n);
     stringstream s;
     // Perform operation
     add_auxiliary(AUX_FILL);
@@ -1393,6 +1412,17 @@ namespace casadi {
     stringstream s;
     s << "casadi_project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
       << sparsity(sp_res) << ", " << w << ");";
+    return s.str();
+  }
+
+  string
+  CodeGenerator::tri_project(const string& arg, const Sparsity& sp_arg,
+                         const string& res, bool lower) {
+    // Create call
+    add_auxiliary(AUX_TRI_PROJECT);
+    stringstream s;
+    s << "casadi_tri_project(" << arg << ", " << sparsity(sp_arg) << ", ";
+    s << res  << ", " << (lower ? 1: 0) << ");";
     return s.str();
   }
 
