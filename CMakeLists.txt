@@ -560,6 +560,10 @@ if(WITH_HPMPC)
 endif()
 add_feature_info(hpmpc-interface WITH_HPMPC "Interface to hpmpc.")
 
+# OSQP: An operator-splitting QP solver
+option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" ON)
+add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
+
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
