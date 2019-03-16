@@ -173,6 +173,7 @@
 
   // Set library path
   casadi::GlobalOptions::setCasadiPath(path);
+  casadi::GlobalOptions::setCasadiIncludePath(path+sep+"include");
 
   // Matlab is index-one based
   casadi::GlobalOptions::start_index = 1;

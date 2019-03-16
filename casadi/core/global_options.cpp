@@ -32,6 +32,7 @@ namespace casadi {
   bool GlobalOptions::hierarchical_sparsity = true;
 
   std::string GlobalOptions::casadipath;
+  std::string GlobalOptions::casadi_include_path;
 
   casadi_int GlobalOptions::max_num_dir = 64;
 
