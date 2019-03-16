@@ -220,6 +220,7 @@ if(WITH_COMMON)
   # qpOASES and blockSQP built if LAPACK available
   set(WITH_QPOASES_DEF ${LAPACK_FOUND})
   set(WITH_BLOCKSQP_DEF ${LAPACK_FOUND})
+  set(WITH_SUPERSCS_DEF ${LAPACK_FOUND})
   # Look for IPOPT
   find_package(IPOPT QUIET)
   set(WITH_IPOPT_DEF ${IPOPT_FOUND})
@@ -229,6 +230,7 @@ else()
   set(WITH_QPOASES_DEF OFF)
   set(WITH_BLOCKSQP_DEF OFF)
   set(WITH_IPOPT_DEF OFF)
+  set(WITH_SUPERSCS_DEF OFF)
 endif()
 
 #####################################################
@@ -559,6 +561,10 @@ if(WITH_HPMPC)
   endif()
 endif()
 add_feature_info(hpmpc-interface WITH_HPMPC "Interface to hpmpc.")
+
+# SuperSCS: An conic solver
+option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
+add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
 
 # OSQP: An operator-splitting QP solver
 option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" OFF)
