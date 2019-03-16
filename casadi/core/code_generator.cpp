@@ -510,6 +510,34 @@ namespace casadi {
       << "}\n";
   }
 
+  void CodeGenerator::define_rom_double(const void* id, casadi_int size) {
+    auto it = file_scope_double_.find(id);
+    casadi_assert(it==file_scope_double_.end(), "Already defined.");
+    shorthand("rd" + str(file_scope_double_.size()));
+    file_scope_double_[id] = size;
+  }
+
+  std::string CodeGenerator::rom_double(const void* id) const {
+    auto it = file_scope_double_.find(id);
+    casadi_assert(it!=file_scope_double_.end(), "Not defined.");
+    casadi_int size = std::distance(file_scope_double_.begin(), it);
+    return "casadi_rd" + str(size);
+  }
+
+  void CodeGenerator::define_rom_integer(const void* id, casadi_int size) {
+    auto it = file_scope_double_.find(id);
+    casadi_assert(it==file_scope_double_.end(), "Already defined.");
+    shorthand("ri" + str(file_scope_double_.size()));
+    file_scope_double_[id] = size;
+  }
+
+  std::string CodeGenerator::rom_integer(const void* id) const {
+    auto it = file_scope_double_.find(id);
+    casadi_assert(it!=file_scope_double_.end(), "Not defined.");
+    casadi_int size = std::distance(file_scope_double_.begin(), it);
+    return "casadi_ri" + str(size);
+  }
+
   void CodeGenerator::dump(std::ostream& s) const {
     // Consistency check
     casadi_assert_dev(current_indent_ == 0);
@@ -569,6 +597,24 @@ namespace casadi {
     if (!double_constants_.empty()) {
       for (casadi_int i=0; i<double_constants_.size(); ++i) {
         print_vector(s, "casadi_c" + str(i), double_constants_[i]);
+      }
+      s << endl;
+    }
+
+    // Print file scope double work
+    if (!file_scope_double_.empty()) {
+      casadi_int i=0;
+      for (const auto& it : file_scope_double_) {
+        s << "static casadi_real casadi_rd" + str(i++) + "[" + str(it.second) + "];\n";
+      }
+      s << endl;
+    }
+
+    // Print file scope integer work
+    if (!file_scope_integer_.empty()) {
+      casadi_int i=0;
+      for (const auto& it : file_scope_integer_) {
+        s << "static casadi_real casadi_ri" + str(i++) + "[" + str(it.second) + "];\n";
       }
       s << endl;
     }
@@ -1014,6 +1060,10 @@ namespace casadi {
       add_auxiliary(AUX_FMAX);
       add_auxiliary(AUX_FMIN);
       this->auxiliaries << sanitize_source(casadi_bound_consistency_str, inst);
+      break;
+    case AUX_FILE_SLURP:
+      add_include("stdio.h");
+      this->auxiliaries << sanitize_source(casadi_file_slurp_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
@@ -1768,5 +1818,10 @@ namespace casadi {
              ", " + lbx + ", " + ubx + ")";
     }
 
+  std::string CodeGenerator::
+  file_slurp(const std::string& fname, casadi_int n, const std::string& a) {
+    add_auxiliary(CodeGenerator::AUX_FILE_SLURP);
+    return "casadi_file_slurp(\"" + fname + "\", " + str(n) + ", " + a + ")";
+  }
 
 } // namespace casadi

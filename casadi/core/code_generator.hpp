@@ -98,6 +98,18 @@ namespace casadi {
     /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<double>& v);
 
+    /** \brief Allocate file scope double read-only memory */
+    void define_rom_double(const void* id, casadi_int size);
+
+    /** \brief Access file scope double read-only memory */
+    std::string rom_double(const void* id) const;
+
+    /** \brief Allocate file scope integer read-only memory */
+    void define_rom_integer(const void* id, casadi_int size);
+
+    /** \brief Access file scope integer read-only memory */
+    std::string rom_integer(const void* id) const;
+
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
@@ -344,7 +356,8 @@ namespace casadi {
       AUX_REAL_MIN,
       AUX_ISINF,
       AUX_BOUNDS_CONSISTENCY,
-      AUX_LSQR
+      AUX_LSQR,
+      AUX_FILE_SLURP
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -427,6 +440,9 @@ namespace casadi {
     /** \brief Print an operation to a c file */
     std::string print_op(casadi_int op, const std::string& a0);
     std::string print_op(casadi_int op, const std::string& a0, const std::string& a1);
+
+    /** \brief Slurp a file */
+    std::string file_slurp(const std::string& fname, casadi_int n, const std::string& a);
   private:
 
     /// Print file header
@@ -539,6 +555,8 @@ namespace casadi {
     std::multimap<size_t, size_t> added_integer_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
     std::map<std::string, std::string> local_default_;
+    std::map<const void *, casadi_int> file_scope_double_;
+    std::map<const void *, casadi_int> file_scope_integer_;
 
     // Added functions
     struct FunctionMeta {

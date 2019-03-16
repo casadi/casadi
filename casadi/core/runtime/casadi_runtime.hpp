@@ -261,6 +261,7 @@ namespace casadi {
   #include "casadi_interpn_grad.hpp"
   #include "casadi_mv_dense.hpp"
   #include "casadi_finite_diff.hpp"
+  #include "casadi_file_slurp.hpp"
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
   #include "casadi_qp.hpp"

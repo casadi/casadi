@@ -11,6 +11,7 @@ set(RUNTIME_SRC
   casadi_clear.hpp
   casadi_fill.hpp
   casadi_flip.hpp
+  casadi_file_slurp.hpp
   casadi_getu.hpp
   casadi_iamax.hpp
   casadi_interpn.hpp

@@ -88,6 +88,9 @@ namespace casadi {
     /** \brief Construct matrix with a given sparsity and nonzeros */
     MX(const Sparsity& sp, const MX& val);
 
+    /** \brief Construct matrix with a given sparsity and a file with nonzeros */
+    MX(const Sparsity& sp, const std::string& fname);
+
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
 

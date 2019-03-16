@@ -2754,5 +2754,33 @@ class MXtests(casadiTestCase):
     self.check_codegen(f,inputs=[a])
     self.check_serialize(f,inputs=[a])
 
+  def test_constant_from_file(self):
+
+    open("test.txt", "w").write("5.6 1e-5")
+    with self.assertInException("Failed to read a double from 'test.txt'. Expected 3 doubles."):
+      x = MX(Sparsity.lower(2), "test.txt")
+
+    open("test.txt", "w").write("5.6 abc 1e-5")
+    with self.assertInException("Failed to read a double from 'test.txt'. Expected 3 doubles."):
+      x = MX(Sparsity.lower(2), "test.txt")
+
+    with self.assertInException("Cannot open file 'testQWHAL567p.txt'."):
+      x = MX(Sparsity.lower(2), "testQWHAL567p.txt")
+
+    open("test.txt", "w").write("5.6 1e-5 -12")
+    x = MX(Sparsity.lower(2), "test.txt")
+
+    a = MX.sym("a")
+
+    f = Function("f",[a],[a*x])
+    self.checkarray(f(2),DM(Sparsity.lower(2),[2*5.6,2*1e-5,-2*12]))
+
+    self.check_codegen(f,inputs=[2])
+
+    with self.assertInException("Not defined for ConstantFile"):
+      x.to_DM()
+    
+
+
 if __name__ == '__main__':
     unittest.main()
