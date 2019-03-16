@@ -196,7 +196,7 @@ namespace casadi {
     std::string jac_f_z = g.add_dependency(get_function("jac_f_z"));
 
     g.comment("Get the initial guess");
-    g << g.copy("arg[" + str(iin_)+ "]", n_, "m.x") << "\n";
+    g << g.copy(g.arg(iin_), n_, "m.x") << "\n";
 
     g.local("iter", "casadi_int");
     g << "for (iter=0; iter<" + str(max_iter_) + "; ++iter) {\n";
@@ -204,11 +204,11 @@ namespace casadi {
     g.comment("(re)calculate f and J");
     // Use x to evaluate J
     for (casadi_int i=0;i<n_in_;++i) {
-      g << "arg[" + str(i+n_in_) + "] = " << (i==iin_? "m.x" : "arg[" + str(i)+ "]") << ";\n";
+      g << g.arg(i+n_in_) << " = " << (i==iin_? "m.x" : g.arg(i)) << ";\n";
     }
-    g << "res[" + str(n_out_) + "] = m.jac_g_x;\n";
+    g << g.res(n_out_) + " = m.jac_g_x;\n";
     for (casadi_int i=0;i<n_out_;++i) {
-      g << "res[" + str(i+n_out_+1) + "] = " << (i==iout_? "m.g" : "res[" + str(i)+ "]") << ";\n";
+      g << g.res(i+n_out_+1) + " = " << (i==iout_? "m.g" : g.res(i)) << ";\n";
     }
     g << jac_f_z + "(arg+" + str(n_in_) + ", res+" + str(n_out_) + ", iw, w, 0);\n";
     g << "if (casadi_newton(&m)) break;\n";
@@ -216,7 +216,7 @@ namespace casadi {
 
     // Get the solution
     g.comment("Get the solution");
-    g << g.copy("m.x", n_, "res[" + str(iout_)+ "]") << "\n";
+    g << g.copy("m.x", n_, g.res(iout_)) << "\n";
   }
 
   void FastNewton::codegen_declarations(CodeGenerator& g) const {

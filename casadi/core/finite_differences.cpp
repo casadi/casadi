@@ -349,14 +349,14 @@ namespace casadi {
     g.local("z", "casadi_real", "*");
     g << "z = w;\n";
     for (casadi_int j=0; j<n_in; ++j) {
-      g << "arg[" << j << "] = w, w += " << derivative_of_.nnz_in(j) << ";\n";
+      g << g.arg(j) << " = w, w += " << derivative_of_.nnz_in(j) << ";\n";
     }
 
     g.comment("Setup res and y for evaluation");
     g.local("y", "casadi_real", "*");
     g << "y = w;\n";
     for (casadi_int j=0; j<n_out; ++j) {
-      g << "res[" << j << "] = w, w += " << derivative_of_.nnz_out(j) << ";\n";
+      g << g.res(j) << " = w, w += " << derivative_of_.nnz_out(j) << ";\n";
     }
 
     g.comment("For all sensitivity directions");

@@ -594,16 +594,16 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     Nlpsol::codegen_body(g);
     // From nlpsol
     g.local("m_p", "const casadi_real", "*");
-    g.init_local("m_p", "arg[" + str(NLPSOL_P) + "]");
+    g.init_local("m_p", g.arg(NLPSOL_P));
     g.local("m_f", "casadi_real");
-    g.copy_default("arg[" + str(NLPSOL_X0) + "]", nx_, "d_nlp.z", "0", false);
-    g.copy_default("arg[" + str(NLPSOL_LAM_X0) + "]", nx_, "d_nlp.lam", "0", false);
-    g.copy_default("arg[" + str(NLPSOL_LAM_G0) + "]", ng_, "d_nlp.lam+"+str(nx_), "0", false);
-    g.copy_default("arg[" + str(NLPSOL_LBX) + "]", nx_, "d_nlp.lbz", "-casadi_inf", false);
-    g.copy_default("arg[" + str(NLPSOL_UBX) + "]", nx_, "d_nlp.ubz", "casadi_inf", false);
-    g.copy_default("arg[" + str(NLPSOL_LBG) + "]", ng_, "d_nlp.lbz+"+str(nx_),
+    g.copy_default(g.arg(NLPSOL_X0), nx_, "d_nlp.z", "0", false);
+    g.copy_default(g.arg(NLPSOL_LAM_X0), nx_, "d_nlp.lam", "0", false);
+    g.copy_default(g.arg(NLPSOL_LAM_G0), ng_, "d_nlp.lam+"+str(nx_), "0", false);
+    g.copy_default(g.arg(NLPSOL_LBX), nx_, "d_nlp.lbz", "-casadi_inf", false);
+    g.copy_default(g.arg(NLPSOL_UBX), nx_, "d_nlp.ubz", "casadi_inf", false);
+    g.copy_default(g.arg(NLPSOL_LBG), ng_, "d_nlp.lbz+"+str(nx_),
       "-casadi_inf", false);
-    g.copy_default("arg[" + str(NLPSOL_UBG) + "]", ng_, "d_nlp.ubz+"+str(nx_),
+    g.copy_default(g.arg(NLPSOL_UBG), ng_, "d_nlp.ubz+"+str(nx_),
       "casadi_inf", false);
     casadi_assert(exact_hessian_, "Codegen implemented for exact Hessian only.", false);
 
@@ -799,12 +799,12 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     if (bound_consistency_) {
       g << g.bound_consistency(nx_+ng_, "d_nlp.z", "d_nlp.lam", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
     }
-    g.copy_check("d_nlp.z", nx_, "res[" + str(NLPSOL_X) + "]", false, true);
-    g.copy_check("d_nlp.z+" + str(nx_), ng_, "res[" + str(NLPSOL_G) + "]", false, true);
-    g.copy_check("d_nlp.lam", nx_, "res[" + str(NLPSOL_LAM_X) + "]", false, true);
-    g.copy_check("d_nlp.lam+"+str(nx_), ng_, "res[" + str(NLPSOL_LAM_G) + "]", false, true);
-    g.copy_check("d_nlp.lam_p", np_, "res[" + str(NLPSOL_LAM_P) + "]", false, true);
-    g.copy_check("&m_f", 1, "res[" + str(NLPSOL_F) + "]", false, true);
+    g.copy_check("d_nlp.z", nx_, g.res(NLPSOL_X), false, true);
+    g.copy_check("d_nlp.z+" + str(nx_), ng_, g.res(NLPSOL_G), false, true);
+    g.copy_check("d_nlp.lam", nx_, g.res(NLPSOL_LAM_X), false, true);
+    g.copy_check("d_nlp.lam+"+str(nx_), ng_, g.res(NLPSOL_LAM_G), false, true);
+    g.copy_check("d_nlp.lam_p", np_, g.res(NLPSOL_LAM_P), false, true);
+    g.copy_check("&m_f", 1, g.res(NLPSOL_F), false, true);
   }
   void Sqpmethod::codegen_qp_solve(CodeGenerator& cg, const std::string&  H, const std::string& g,
               const std::string&  lbdz, const std::string& ubdz,

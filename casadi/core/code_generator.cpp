@@ -1114,6 +1114,14 @@ namespace casadi {
     return s.str();
   }
 
+  string CodeGenerator::arg(casadi_int i) const {
+    return "arg[" + str(i) + "]";
+  }
+
+  string CodeGenerator::res(casadi_int i) const {
+    return "res[" + str(i) + "]";
+  }
+
   string CodeGenerator::fill(const string& res,
                                   std::size_t n, const string& v) {
     stringstream s;
