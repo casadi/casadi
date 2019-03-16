@@ -179,7 +179,8 @@ namespace casadi {
     }
 
     // Call function
-    g << "if (" << g(fcn_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    std::string flag = g(fcn_, "arg1", "res1", "iw", "w");
+    g << "if (" << flag << ") return 1;\n";
   }
 
   void Call::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {

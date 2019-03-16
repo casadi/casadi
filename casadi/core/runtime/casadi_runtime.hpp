@@ -227,6 +227,7 @@ namespace casadi {
   #include "casadi_cvx.hpp"
   #include "casadi_swap.hpp"
   #include "casadi_project.hpp"
+  #include "casadi_tri_project.hpp"
   #include "casadi_densify.hpp"
   #include "casadi_sparsify.hpp"
   #include "casadi_scal.hpp"
