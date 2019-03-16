@@ -126,4 +126,8 @@ namespace casadi {
 
 } // namespace casadi
 
+extern "C" {
+  CASADI_EXPORT int casadi_printf(const char  *fmt, ...);
+}
+
 #endif // CASADI_LOGGER_HPP

@@ -82,6 +82,10 @@ if(WITH_HPMPC)
   add_subdirectory(hpmpc)
 endif()
 
+if(WITH_SUPERSCS)
+  add_subdirectory(superscs)
+endif()
+
 if(WITH_SLICOT)
   add_subdirectory(slicot)
 endif()
