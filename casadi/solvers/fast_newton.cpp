@@ -193,8 +193,6 @@ namespace casadi {
     g << "m.lin_r = w+" + str(w_offset) + ";\n"; w_offset+=sp_r_.nnz();
     g << "m.lin_beta = w+" + str(w_offset) + ";\n"; w_offset+=sp_jac_.size2();
 
-    std::string jac_f_z = g.add_dependency(get_function("jac_f_z"));
-
     g.comment("Get the initial guess");
     g << g.copy(g.arg(iin_), n_, "m.x") << "\n";
 
@@ -210,7 +208,9 @@ namespace casadi {
     for (casadi_int i=0;i<n_out_;++i) {
       g << g.res(i+n_out_+1) + " = " << (i==iout_? "m.g" : g.res(i)) << ";\n";
     }
-    g << jac_f_z + "(arg+" + str(n_in_) + ", res+" + str(n_out_) + ", iw, w, 0);\n";
+    std::string flag = g(get_function("jac_f_z"),
+      "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w");
+    g << "if (" << flag << ") return 1;\n";
     g << "if (casadi_newton(&m)) break;\n";
     g << "}\n";
 

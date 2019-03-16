@@ -101,7 +101,7 @@ namespace casadi {
   }
 
   template<typename T>
-  int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, casadi_int mem) const {
+  int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;

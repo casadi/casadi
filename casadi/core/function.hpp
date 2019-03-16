@@ -472,7 +472,7 @@ namespace casadi {
 
     /** \brief Evaluate memory-less, numerically */
     int operator()(const double** arg, double** res,
-        casadi_int* iw, double* w, casadi_int mem) const;
+        casadi_int* iw, double* w, int mem) const;
 
     /** \brief Evaluate numerically with checkout/release */
     int operator()(const double** arg, double** res,
@@ -482,14 +482,14 @@ namespace casadi {
         Same syntax as the double version, allowing use in templated code
      */
     int operator()(const SXElem** arg, SXElem** res,
-        casadi_int* iw, SXElem* w, casadi_int mem=0) const;
+        casadi_int* iw, SXElem* w, int mem=0) const;
 
     /** \brief  Propagate sparsity forward */
     int operator()(const bvec_t** arg, bvec_t** res,
-        casadi_int* iw, bvec_t* w, casadi_int mem=0) const;
+        casadi_int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief  Propagate sparsity backward */
-    int rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, casadi_int mem=0) const;
+    int rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief Propagate sparsity backward with temporary memory allocation */
     int rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
@@ -752,7 +752,7 @@ namespace casadi {
 #endif // SWIG
 
     /// Get all statistics obtained at the end of the last evaluate call
-    Dict stats(casadi_int mem=0) const;
+    Dict stats(int mem=0) const;
 
     ///@{
     /** \brief Get symbolic primitives equivalent to the input expressions
@@ -884,14 +884,14 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(const double**& arg, double**& res,
-      casadi_int*& iw, double*& w, casadi_int mem=0) const;
+      casadi_int*& iw, double*& w, int mem=0) const;
 
     /** \brief Set the (temporary) work vectors */
     void set_temp(const double** arg, double** res,
-        casadi_int* iw, double* w, casadi_int mem=0) const;
+        casadi_int* iw, double* w, int mem=0) const;
 
     /** \brief Set the (persistent and temporary) work vectors */
-    void setup(const double** arg, double** res, casadi_int* iw, double* w, casadi_int mem=0) const;
+    void setup(const double** arg, double** res, casadi_int* iw, double* w, int mem=0) const;
 
     /** \brief Call using a map */
     template<typename M>
@@ -948,11 +948,11 @@ namespace casadi {
     casadi_int checkout() const;
 
     /// Release a memory object
-    void release(casadi_int mem) const;
+    void release(int mem) const;
 
 #ifndef SWIG
     /// Get memory object
-    void* memory(casadi_int ind) const;
+    void* memory(int ind) const;
 #endif // SWIG
 
     // Get a list of all functions
@@ -998,7 +998,7 @@ namespace casadi {
 #ifdef WITH_EXTRA_CHECKS
     public:
     // How many times have we passed through
-    // operator()(const double** arg, double** res, casadi_int* iw, double* w, casadi_int mem)?
+    // operator()(const double** arg, double** res, casadi_int* iw, double* w, int mem)?
     static thread_local casadi_int call_depth_;
 #endif
 

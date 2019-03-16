@@ -825,7 +825,7 @@ namespace casadi {
     return dynamic_cast<const FunctionInternal*>(ptr)!=nullptr;
   }
 
-  Dict Function::stats(casadi_int mem) const {
+  Dict Function::stats(int mem) const {
     return (*this)->get_stats(memory(mem));
   }
 
@@ -923,7 +923,7 @@ namespace casadi {
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
   int Function::operator()(const bvec_t** arg, bvec_t** res,
-                            casadi_int* iw, bvec_t* w, casadi_int mem) const {
+                            casadi_int* iw, bvec_t* w, int mem) const {
     try {
       return (*this)->sp_forward(arg, res, iw, w, memory(mem));
     } catch (exception& e) {
@@ -931,7 +931,7 @@ namespace casadi {
     }
   }
 
-  int Function::rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, casadi_int mem) const {
+  int Function::rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem) const {
     try {
       return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
     } catch (exception& e) {
@@ -940,7 +940,7 @@ namespace casadi {
   }
 
   void Function::set_work(const double**& arg, double**& res, casadi_int*& iw, double*& w,
-                          casadi_int mem) const {
+                          int mem) const {
     try {
       (*this)->set_work(memory(mem), arg, res, iw, w);
     } catch (exception& e) {
@@ -949,7 +949,7 @@ namespace casadi {
   }
 
   void Function::set_temp(const double** arg, double** res, casadi_int* iw, double* w,
-                          casadi_int mem) const {
+                          int mem) const {
     try {
       (*this)->set_temp(memory(mem), arg, res, iw, w);
     } catch (exception& e) {
@@ -958,7 +958,7 @@ namespace casadi {
   }
 
   void Function::setup(const double** arg, double** res, casadi_int* iw, double* w,
-                          casadi_int mem) const {
+                          int mem) const {
     try {
       (*this)->setup(memory(mem), arg, res, iw, w);
     } catch (exception& e) {
@@ -1294,7 +1294,7 @@ namespace casadi {
   }
 
   int Function::operator()(const double** arg, double** res,
-      casadi_int* iw, double* w, casadi_int mem) const {
+      casadi_int* iw, double* w, int mem) const {
     try {
 #ifdef WITH_EXTRA_CHECKS
       // Should never happen
@@ -1324,7 +1324,7 @@ namespace casadi {
   }
 
   int Function::operator()(const SXElem** arg, SXElem** res,
-      casadi_int* iw, SXElem* w, casadi_int mem) const {
+      casadi_int* iw, SXElem* w, int mem) const {
     try {
       return (*this)->eval_sx(arg, res, iw, w, memory(mem));
     } catch (exception& e) {
@@ -1552,11 +1552,11 @@ namespace casadi {
     return (*this)->checkout();
   }
 
-  void Function::release(casadi_int mem) const {
+  void Function::release(int mem) const {
     (*this)->release(mem);
   }
 
-  void* Function::memory(casadi_int ind) const {
+  void* Function::memory(int ind) const {
     return (*this)->memory(ind);
   }
 

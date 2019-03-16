@@ -65,7 +65,9 @@ int usage_c(){
   typedef casadi_int (*getint_t)(void);
   typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w);
   typedef const casadi_int* (*sparsity_t)(casadi_int ind);
-  typedef int (*eval_t)(const double** arg, double** res, casadi_int* iw, double* w, void* mem);
+  typedef int (*eval_t)(const double** arg, double** res, casadi_int* iw, double* w, int mem);
+  typedef int (*casadi_checkout_t)(void);
+  typedef void (*casadi_release_t)(int);
 
   /* Memory management -- increase reference counter */
   signal_t incref = (signal_t)dlsym(handle, "f_incref");
@@ -73,6 +75,14 @@ int usage_c(){
 
   /* Memory management -- decrease reference counter */
   signal_t decref = (signal_t)dlsym(handle, "f_decref");
+  if(dlerror()) dlerror(); // No such function, reset error flags
+
+  /* Thread-local memory management -- checkout memory */
+  casadi_checkout_t checkout = (casadi_checkout_t)dlsym(handle, "f_checkout");
+  if(dlerror()) dlerror(); // No such function, reset error flags
+
+  /* Thread-local memory management -- release memory */
+  casadi_release_t release = (casadi_release_t)dlsym(handle, "f_release");
   if(dlerror()) dlerror(); // No such function, reset error flags
 
   /* Number of inputs */
@@ -154,7 +164,7 @@ int usage_c(){
   double res0;
   double res1[4];
 
-  // Allocate memory
+  // Allocate memory (thread-safe)
   incref();
 
   /* Evaluate the function */
@@ -162,13 +172,22 @@ int usage_c(){
   arg[1] = &y_val;
   res[0] = &res0;
   res[1] = res1;
-  if (eval(arg, res, iw, w, 0)) return 1;
+
+  // Checkout thread-local memory (not thread-safe)
+  // Note MAX_NUM_THREADS
+  int mem = checkout();
+
+  // Evaluation is thread-safe
+  if (eval(arg, res, iw, w, mem)) return 1;
+
+  // Release thread-local (not thread-safe)
+  release(mem);
 
   /* Print result of evaluation */
   printf("result (0): %g\n",res0);
   printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
 
-  /* Free memory */
+  /* Free memory (thread-safe) */
   decref();
 
   /* Free the handle */
@@ -176,7 +195,6 @@ int usage_c(){
 
   return 0;
 }
-
 
 // C++ (and CasADi) from here on
 #include <casadi/casadi.hpp>
@@ -199,6 +217,60 @@ void usage_cplusplus(){
   cout << "result (0): " << res.at(0) << endl;
   cout << "result (1): " << res.at(1) << endl;
 }
+
+
+// Usage from C using mem.h
+#include <casadi/mem.h>
+int usage_c_with_mem(){
+  printf("---\n");
+  printf("Usage from C/C++ with casadi/mem.h:\n");
+  printf("\n");
+
+  /* Handle to the dll */
+  void* handle;
+
+  /* Load the dll */
+  handle = dlopen("./f_with_mem.so", RTLD_LAZY);
+  if(handle==0){
+    printf("Cannot open f_with_mem.so, error %s\n", dlerror());
+    return 1;
+  }
+
+  /* Reset error */
+  dlerror();
+
+  /* Typedefs */
+  typedef casadi_functions* (*functions_t)(void);
+
+  /* mem.h interface */
+  functions_t functions = (functions_t)dlsym(handle, "f_functions");
+  if(dlerror()) dlerror(); // No such function, reset error flags
+
+  casadi_functions* f = functions();
+
+  casadi_mem* mem = casadi_alloc(f);
+
+  /* Function input and output */
+  const double x_val[] = {1,2,3,4};
+  const double y_val = 5;
+  double res0;
+  double res1[4];
+
+  /* Evaluate the function */
+  mem->arg[0] = x_val;
+  mem->arg[1] = &y_val;
+  mem->res[0] = &res0;
+  mem->res[1] = res1;
+
+  casadi_eval(mem);
+
+  /* Print result of evaluation */
+  printf("result (0): %g\n",res0);
+  printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
+
+  casadi_free(mem);
+}
+
 
 int main(){
 
@@ -223,6 +295,17 @@ int main(){
 
   // Usage from C++
   usage_cplusplus();
+
+  // Generate C-code
+  f.generate("f_with_mem", {{"with_mem", true}});
+
+  // Compile the C-code to a shared library
+  compile_command = "gcc -fPIC -I"+ std::string(INCLUDE_DIR) + " -shared -g f_with_mem.c -o f_with_mem.so";
+  flag = system(compile_command.c_str());
+  casadi_assert(flag==0, "Compilation failed");
+
+  // Usage from c with mem.h
+  usage_c_with_mem();
 
   return 0;
 }

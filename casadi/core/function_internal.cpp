@@ -547,7 +547,7 @@ namespace casadi {
 
   void ProtoFunction::finalize() {
     // Create memory object
-    casadi_int mem = checkout();
+    int mem = checkout();
     casadi_assert_dev(mem==0);
   }
 
@@ -650,7 +650,8 @@ namespace casadi {
     }
     int ret;
     if (eval_) {
-      ret = eval_(arg, res, iw, w, mem);
+      // TODO(jgillis): check why thsi check is needed (crashes function.py:inherit_jit_options)
+      ret = eval_(arg, res, iw, w, mem ? *static_cast<casadi_int*>(mem) : 0);
     } else {
       ret = eval(arg, res, iw, w, mem);
     }
@@ -1967,29 +1968,13 @@ namespace casadi {
 
     // Reset local variables, flush buffer
     g.flush(g.body);
-    g.local_variables_.clear();
-    g.local_default_.clear();
+
+    g.scope_enter();
 
     // Generate function body (to buffer)
     codegen_body(g);
 
-    // Order local variables
-    std::map<string, set<pair<string, string>>> local_variables_by_type;
-    for (auto&& e : g.local_variables_) {
-      local_variables_by_type[e.second.first].insert(make_pair(e.first, e.second.second));
-    }
-
-    // Codegen local variables
-    for (auto&& e : local_variables_by_type) {
-      g.body << "  " << e.first;
-      for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
-        g.body << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
-        // Insert definition, if any
-        auto k=g.local_default_.find(it->first);
-        if (k!=g.local_default_.end()) g.body << "=" << k->second;
-      }
-      g.body << ";\n";
-    }
+    g.scope_exit();
 
     // Finalize the function
     g << "return 0;\n";
@@ -2001,7 +1986,20 @@ namespace casadi {
 
   std::string FunctionInternal::signature(const std::string& fname) const {
     return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
-                            "casadi_int* iw, casadi_real* w, void* mem)";
+                            "casadi_int* iw, casadi_real* w, int mem)";
+  }
+
+  void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
+    g << "return 0;\n";
+  }
+
+  void FunctionInternal::codegen_alloc_mem(CodeGenerator& g) const {
+    bool needs_mem = !codegen_mem_type().empty();
+    if (needs_mem) {
+    std::string name = codegen_name(g, false);
+    std::string mem_counter = g.shorthand(name + "_mem_counter");
+    g << "return " + mem_counter + "++;\n";
+    }
   }
 
   void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {
@@ -2009,6 +2007,47 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_meta(CodeGenerator& g) const {
+    bool needs_mem = !codegen_mem_type().empty();
+
+    g << g.declare("int " + name_ + "_alloc_mem(void)") << " {\n";
+    if (needs_mem) {
+      g << "return " << codegen_name(g) << "_alloc_mem();\n";
+    } else {
+      g << "return 0;\n";
+    }
+    g << "}\n\n";
+
+    g << g.declare("int " + name_ + "_init_mem(int mem)") << " {\n";
+    if (needs_mem) {
+      g << "return " << codegen_name(g) << "_init_mem(mem);\n";
+    } else {
+      g << "return 0;\n";
+    }
+    g << "}\n\n";
+
+    g << g.declare("void " + name_ + "_free_mem(int mem)") << " {\n";
+    if (needs_mem) {
+      g << codegen_name(g) << "_free_mem(mem);\n";
+    }
+    g << "}\n\n";
+
+    // Checkout/release routines
+    g << g.declare("int " + name_ + "_checkout(void)") << " {\n";
+    if (needs_mem) {
+      g << "return " << codegen_name(g) << "_checkout();\n";
+    } else {
+      g << "return 0;\n";
+    }
+    g << "}\n\n";
+
+    if (needs_mem) {
+      g << g.declare("void " + name_ + "_release(int mem)") << " {\n";
+      g << codegen_name(g) << "_release(mem);\n";
+    } else {
+      g << g.declare("void " + name_ + "_release(int mem)") << " {\n";
+    }
+    g << "}\n\n";
+
     // Reference counter routines
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
     codegen_incref(g);
@@ -2202,6 +2241,12 @@ namespace casadi {
         << "static casadi_functions fun = {\n"
         << name_ << "_incref,\n"
         << name_ << "_decref,\n"
+        << name_ << "_checkout,\n"
+        << name_ << "_release,\n"
+        << name_ << "_default_in,\n"
+        << name_ << "_alloc_mem,\n"
+        << name_ << "_init_mem,\n"
+        << name_ << "_free_mem,\n"
         << name_ << "_n_in,\n"
         << name_ << "_n_out,\n"
         << name_ << "_name_in,\n"
@@ -2218,12 +2263,25 @@ namespace casadi {
     g.flush(g.body);
   }
 
-  std::string FunctionInternal::codegen_name(const CodeGenerator& g) const {
-    // Get the index of the function
-    for (auto&& e : g.added_functions_) {
-      if (e.f.get()==this) return e.codegen_name;
+  std::string FunctionInternal::codegen_name(const CodeGenerator& g, bool ns) const {
+    if (ns) {
+      // Get the index of the function
+      for (auto&& e : g.added_functions_) {
+        if (e.f.get()==this) return e.codegen_name;
+      }
+    } else {
+      for (casadi_int i=0;i<g.added_functions_.size();++i) {
+        const auto & e = g.added_functions_[i];
+        if (e.f.get()==this) return "f" + str(i);
+      }
     }
     casadi_error("Function '" + name_ + "' not found");
+  }
+
+  std::string FunctionInternal::codegen_mem(CodeGenerator& g, const std::string& index) const {
+    std::string name = codegen_name(g, false);
+    std::string mem_array = g.shorthand(name + "_mem");
+    return mem_array+"[" + index + "]";
   }
 
   void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
@@ -2975,14 +3033,14 @@ namespace casadi {
     return Sparsity::scalar();
   }
 
-  void* ProtoFunction::memory(casadi_int ind) const {
+  void* ProtoFunction::memory(int ind) const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
     return mem_.at(ind);
   }
 
-  casadi_int ProtoFunction::checkout() const {
+  int ProtoFunction::checkout() const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
@@ -3002,7 +3060,7 @@ namespace casadi {
     }
   }
 
-  void ProtoFunction::release(casadi_int mem) const {
+  void ProtoFunction::release(int mem) const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD

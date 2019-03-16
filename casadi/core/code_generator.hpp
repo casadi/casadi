@@ -101,7 +101,7 @@ namespace casadi {
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const std::string& mem="0") const;
+                           const std::string& w);
 
     /** \brief Print a string to buffer  */
     CodeGenerator& operator<<(const std::string& s);
@@ -122,6 +122,12 @@ namespace casadi {
 
     /** \brief Declare a local variable */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
+
+    /** \brief Enter a local scope */
+    void scope_enter();
+
+    /** \brief Exit a local scope */
+    void scope_exit();
 
     /** \brief Declare a work vector element */
     std::string sx_work(casadi_int i);
@@ -386,6 +392,9 @@ namespace casadi {
     /** \brief Refer to resuly */
     std::string res(casadi_int i) const;
 
+    /** \brief Access thread-local memory */
+    std::string mem(const Function& f);
+
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, const Sparsity& sp_res,
@@ -543,6 +552,9 @@ namespace casadi {
     // Constants
     std::vector<std::vector<double> > double_constants_;
     std::vector<std::vector<casadi_int> > integer_constants_;
+
+    // Does any function need thread-local memory?
+    bool needs_mem_;
 
     // Hash a vector
     static size_t hash(const std::vector<double>& v);

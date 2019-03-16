@@ -60,7 +60,7 @@ public:
   }
 
 private:
-  casadi_int mem;
+  int mem;
   const T& proto_;
 };
 
