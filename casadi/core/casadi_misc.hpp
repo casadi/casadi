@@ -137,11 +137,18 @@ private:
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b);
 
+  /** \brief Join three lists
+  */
+  template<typename T>
+  std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c);
+
   /** \brief permute a list
   */
   template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order);
 
+  /** \brief find nonzeros */
+  template<typename T>
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
@@ -479,6 +486,14 @@ namespace casadi {
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b) {
     std::vector<T> ret = a;
     ret.insert(ret.end(), b.begin(), b.end());
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c) {
+    std::vector<T> ret = a;
+    ret.insert(ret.end(), b.begin(), b.end());
+    ret.insert(ret.end(), c.begin(), c.end());
     return ret;
   }
 
