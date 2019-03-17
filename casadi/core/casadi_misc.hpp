@@ -149,6 +149,8 @@ private:
 
   /** \brief find nonzeros */
   template<typename T>
+  std::vector<casadi_int> find(const std::vector<T> &v);
+
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
@@ -505,6 +507,15 @@ namespace casadi {
     casadi_assert_dev(*order_set.begin()==0);
     casadi_assert_dev(*order_set.rbegin()==a.size()-1);
     return vector_slice(a, order);
+  }
+
+  template<typename T>
+  std::vector<casadi_int> find(const std::vector<T> &v) {
+    std::vector<casadi_int> ret;
+    for (casadi_int i=0;i<v.size();++i) {
+      if (v[i]) ret.push_back(i);
+    }
+    return ret;
   }
 
 #ifndef SWIG
