@@ -481,7 +481,7 @@ namespace casadi {
     // Codegen the assignments
     g.local("cii", "const casadi_int", "*");
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
+    g.local("ss", "const casadi_real", "*");
     g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz())
       << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "; cii!=" << ind << "+" << nz_.size()
@@ -504,7 +504,8 @@ namespace casadi {
                                   const std::vector<casadi_int>& arg,
                                   const std::vector<casadi_int>& res) const {
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
+    g.local("ss", "const casadi_real", "*");
+    // Simplify for scalar case
     g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "+" << s_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
       << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
@@ -514,8 +515,8 @@ namespace casadi {
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res) const {
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
-    g.local("tt", "casadi_real", "*");
+    g.local("ss", "const casadi_real", "*");
+    g.local("tt", "const casadi_real", "*");
     g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "+" << outer_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+"
       << outer_.stop << "; ss+=" << outer_.step << ") "
