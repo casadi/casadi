@@ -38601,6 +38601,1177 @@ elements.
 ";
 
 
+// File: classcasadi_1_1MapSum.xml
+%feature("docstring") casadi::MapSum::has_derivative "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::MapSum::serialize_base_function "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
+%feature("docstring") casadi::MapSum::has_sprev "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::MapSum::set_work "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::MapSum::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring") casadi::MapSum::free_sx "
+
+[INTERNAL]  Get free variables (SX)
+
+";
+
+%feature("docstring") casadi::MapSum::get_reverse "
+
+[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::MapSum::sz_res "
+
+[INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring") casadi::MapSum::print_options "
+
+[INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::MapSum::checkout "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::MapSum::all_scalar "
+
+[INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::MapSum::has_free "
+
+[INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::MapSum::get_abstol "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring") casadi::MapSum::parallelization "
+
+[INTERNAL]  Type of parallellization.
+
+";
+
+%feature("docstring") casadi::MapSum::which_depends "
+
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::MapSum::get_name_out "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::eval_mx "
+
+[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::MapSum::matching_arg "
+
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::MapSum::replace_arg "
+
+[INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::MapSum::getJacSparsity "
+
+[INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::MapSum::call_reverse "
+
+[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::MapSum::getCount "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring") casadi::MapSum::size_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::MapSum::alloc_arg "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring") casadi::MapSum::get_max_in "
+
+[INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring") casadi::MapSum::convert_arg "
+
+[INTERNAL]  Convert from/to input/output lists/map.
+
+";
+
+%feature("docstring") casadi::MapSum::get_forward "
+
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_incref "
+
+[INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::MapSum::has_reverse "
+
+[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::MapSum::symbolic_output "
+
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_meta "
+
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
+
+";
+
+%feature("docstring") casadi::MapSum::class_name "
+
+[INTERNAL]  Get type name.
+
+";
+
+%feature("docstring") casadi::MapSum::disp_more "
+
+[INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::MapSum::eval_sx "
+
+[INTERNAL]  evaluate symbolically while also propagating directional
+derivatives
+
+";
+
+%feature("docstring") casadi::MapSum::matching_res "
+
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::MapSum::sparsity_out "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::MapSum::eval_gen "
+
+[INTERNAL]  Evaluate or propagate sparsities.
+
+>  int casadi::MapSum::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, int mem=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate or propagate sparsities.
+
+";
+
+";
+
+%feature("docstring") casadi::MapSum::check_mat "
+
+[INTERNAL]  Helper function
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar[out]:  required number of parallel calls (or -1)
+
+";
+
+%feature("docstring") casadi::MapSum::nz_out "
+
+[INTERNAL]  Convert from/to flat vector of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::MapSum::alloc_mem "
+
+[INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring") casadi::MapSum::signature "
+
+[INTERNAL]  Code generate the function.
+
+";
+
+%feature("docstring") casadi::MapSum::disp "
+
+[INTERNAL]  Display object.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring") casadi::MapSum::nnz_in "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::MapSum::reverse "
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::MapSum::mapsum_mx "
+
+[INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring") casadi::MapSum::mx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapSum::get_reltol "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
+%feature("docstring") casadi::MapSum::getAdaptorSolverName "
+
+[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::MapSum::has_forward "
+
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::MapSum::generate_dependencies "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::MapSum::call_gen "
+
+[INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring") casadi::MapSum::oracle "
+
+[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::MapSum::getJacSparsityGen "
+
+[INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::MapSum::get_min_in "
+
+[INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring") casadi::MapSum::memory "
+
+[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::MapSum::init_mem "
+
+[INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring") casadi::MapSum::check_res "
+
+[INTERNAL]  Check if output arguments have correct length and dimensions.
+
+Raises errors.
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::MapSum::get_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::MapSum::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
+%feature("docstring") casadi::MapSum::sx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapSum::get_default_in "
+
+[INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring") casadi::MapSum::sp_reverse "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_name "
+
+[INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring") casadi::MapSum::free_mem "
+
+[INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring") casadi::MapSum::eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::MapSum::get_options "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_declarations "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::MapSum::~MapSum "
+
+[INTERNAL]  Destructor.
+
+";
+
+%feature("docstring") casadi::MapSum::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::MapSum::index_out "
+
+[INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring") casadi::MapSum::generate_in "
+
+[INTERNAL]  Export an input file that can be passed to generate C code with
+a main.
+
+";
+
+%feature("docstring") casadi::MapSum::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
+%feature("docstring") casadi::MapSum::alloc_res "
+
+[INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring") casadi::MapSum::numel_in "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::MapSum "
+
+[INTERNAL]   Map with reduce_in/reduce_out Joris Gillis
+
+C++ includes: mapsum.hpp ";
+
+%feature("docstring") casadi::MapSum::generate_out "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::MapSum::get_free "
+
+[INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring") casadi::MapSum::fwdViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::MapSum::adjViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::MapSum::mx_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapSum::size2_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::MapSum::convert_res "
+
+[INTERNAL]  Convert from/to input/output lists/map.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen "
+
+[INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_decref "
+
+[INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::MapSum::get_stats "
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::MapSum::sz_arg "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring") casadi::MapSum::replace_fseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::MapSum::call_forward "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring") casadi::MapSum::slice "
+
+[INTERNAL]  returns a new function with a selection of inputs/outputs of the
+original
+
+";
+
+%feature("docstring") casadi::MapSum::has_spfwd "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::MapSum::getJacSparsityHierarchical "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring") casadi::MapSum::nz_in "
+
+[INTERNAL]  Convert from/to flat vector of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::MapSum::has_jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::MapSum::jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::MapSum::self "
+
+[INTERNAL]  Get a public class instance.
+
+";
+
+%feature("docstring") casadi::MapSum::get_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
+%feature("docstring") casadi::MapSum::serialize_type "
+
+[INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring") casadi::MapSum::sparsity_in "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::MapSum::get_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::MapSum::sp_forward "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::MapSum::instruction_output "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::MapSum::instruction_constant "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::MapSum::size_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::MapSum::uses_output "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::MapSum::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::MapSum::nnz_out "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::MapSum::set_temp "
+
+[INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::MapSum::sz_iw "
+
+[INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring") casadi::MapSum::project_arg "
+
+[INTERNAL]   Project sparsities.
+
+";
+
+%feature("docstring") casadi::MapSum::init "
+
+[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::MapSum::getJacSparsityHierarchicalSymm "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::MapSum::alloc_iw "
+
+[INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring") casadi::MapSum::numel_out "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::MapSum::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::MapSum::symbolicAdjSeed "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::MapSum::sprint "
+
+[INTERNAL]  C-style formatted printing to string.
+
+";
+
+%feature("docstring") casadi::MapSum::release "
+
+[INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring") casadi::MapSum::has_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::MapSum::sz_work "
+
+[INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::MapSum::get_n_in "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::sz_w "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring") casadi::MapSum::replace_aseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::MapSum::get_name_in "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::forward "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::MapSum::factory "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::MapSum::print_dimensions "
+
+[INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::fwd_seed "
+
+[INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::MapSum::generate_options "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
+%feature("docstring") casadi::MapSum::jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::MapSum::info "
+
+[INTERNAL]  Obtain information about function
+
+";
+
+%feature("docstring") casadi::MapSum::free_mx "
+
+[INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring") casadi::MapSum::dm_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapSum::instruction_MX "
+
+[INTERNAL]  get MX expression associated with instruction
+
+";
+
+%feature("docstring") casadi::MapSum::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
+%feature("docstring") casadi::MapSum::has_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::MapSum::get_sparsity_in "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::replace_res "
+
+[INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::sparsity_jac "
+
+[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::MapSum::has_codegen "
+
+[INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring") casadi::MapSum::instruction_input "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::MapSum::n_instructions "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::MapSum::definition "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::MapSum::get_sparsity_out "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::get_jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::MapSum::alloc_w "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::MapSum::print_option "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::MapSum::size1_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::MapSum::export_code "
+
+[INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::MapSum::get_partition "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::MapSum::sx_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapSum::generate_lifted "
+
+[INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_sparsities "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::MapSum::setup "
+
+[INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_body "
+
+[INTERNAL]  Generate code for the body of the C function.
+
+";
+
+%feature("docstring") casadi::MapSum::clear_mem "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::MapSum::call "
+
+[INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring") casadi::MapSum::dm_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapSum::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::MapSum::wrap "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::MapSum::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
+%feature("docstring") casadi::MapSum::get_n_out "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapSum::check_arg "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+Raises errors.
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::MapSum::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::MapSum::is_a "
+
+[INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring") casadi::MapSum::instruction_id "
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::MapSum::finalize "
+
+[INTERNAL]  Finalize the object creation.
+
+";
+
+%feature("docstring") casadi::MapSum::eval "
+
+[INTERNAL]  Evaluate the function numerically.
+
+";
+
+%feature("docstring") casadi::MapSum::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring") casadi::MapSum::serialize "
+
+[INTERNAL]  Serialize an object.
+
+";
+
+%feature("docstring") casadi::MapSum::alloc "
+
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::MapSum::n_nodes "
+
+[INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::MapSum::sp_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
+
+";
+
+%feature("docstring") casadi::MapSum::serialize_body "
+
+[INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring") casadi::MapSum::jit_dependencies "
+
+[INTERNAL]  Jit dependencies.
+
+";
+
+%feature("docstring") casadi::MapSum::project_res "
+
+[INTERNAL]   Project sparsities.
+
+";
+
+%feature("docstring") casadi::MapSum::size1_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::MapSum::ad_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::MapSum::size2_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+
 // File: classcasadi_1_1Matrix.xml
 
 
