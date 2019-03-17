@@ -627,11 +627,14 @@ class Functiontests(casadiTestCase):
 
     for Z_alt in [Z]:
 
-      for parallelization in ["serial","openmp","unroll","thread"]:
-
+      for parallelization in ["true_map_sum","serial","openmp","unroll","thread"]:
         for ad_weight_sp in [0,1]:
           for ad_weight in [0,1]:
-            F = fun.map("map",parallelization,n,[2,3],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+
+            if parallelization=="true_map_sum":
+              F = fun.map(n,[2,3],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+            else:
+              F = fun.map("map",parallelization,n,[2,3],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
 
             resref = [0 for i in range(fun.n_out())]
             acc = 0
@@ -658,6 +661,8 @@ class Functiontests(casadiTestCase):
 
             for f in [F,toSX_fun(F)]:
               self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
+
+            self.check_serialize(F,inputs=inputs)
 
   def test_repmatnode(self):
     x = MX.sym("x",2)

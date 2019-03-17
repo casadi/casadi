@@ -30,6 +30,7 @@
 #include "switch.hpp"
 #include "bspline.hpp"
 #include "nlpsol.hpp"
+#include "mapsum.hpp"
 #include "conic.hpp"
 #include "jit_function.hpp"
 #include "serializing_stream.hpp"
@@ -562,6 +563,13 @@ namespace casadi {
     for (const string& s : accum_in) accum_in_num.push_back(index_in(s));
     for (const string& s : accum_out) accum_out_num.push_back(index_out(s));
     return mapaccum(name, n, accum_in_num, accum_out_num, opts);
+  }
+
+  Function Function::map(casadi_int n,
+    const std::vector<casadi_int>& reduce_in,
+    const std::vector<casadi_int>& reduce_out,
+    const Dict& opts) const {
+    return MapSum::create("mapsum_" + name(), "serial", *this, n, reduce_in, reduce_out, opts);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, casadi_int n,

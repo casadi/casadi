@@ -170,6 +170,7 @@ set(CASADI_INTERNAL
   switch.hpp              switch.cpp
   bspline.hpp             bspline.cpp
   map.hpp                 map.cpp
+  mapsum.hpp              mapsum.cpp
   finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
 

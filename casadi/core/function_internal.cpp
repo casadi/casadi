@@ -34,6 +34,7 @@
 #include "sx_function.hpp"
 #include "rootfinder_impl.hpp"
 #include "map.hpp"
+#include "mapsum.hpp"
 #include "switch.hpp"
 #include "interpolant_impl.hpp"
 #include "nlpsol_impl.hpp"
@@ -3444,6 +3445,7 @@ namespace casadi {
     {"Interpolant", Interpolant::deserialize},
     {"Switch", Switch::deserialize},
     {"Map", Map::deserialize},
+    {"MapSum", MapSum::deserialize},
     {"Nlpsol", Nlpsol::deserialize},
     {"Rootfinder", Rootfinder::deserialize},
     {"Integrator", Integrator::deserialize},

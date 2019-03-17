@@ -149,9 +149,10 @@ namespace casadi {
   }
 
   void Map::codegen_body(CodeGenerator& g) const {
-    g << "casadi_int i;\n";
-    g << "const casadi_real** arg1;\n";
-    g << "casadi_real** res1;\n";
+    g.local("i", "casadi_int");
+    g.local("arg1", "const casadi_real*", "*");
+    g.local("res1", "casadi_real*", "*");
+
     // Input buffer
     g << "arg1 = arg+" << n_in_ << ";\n"
       << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";

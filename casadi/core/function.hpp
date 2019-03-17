@@ -599,6 +599,10 @@ namespace casadi {
       const std::vector<std::string>& reduce_in,
       const std::vector<std::string>& reduce_out,
       const Dict& opts=Dict()) const;
+    Function map(casadi_int n,
+      const std::vector<casadi_int>& reduce_in,
+      const std::vector<casadi_int>& reduce_out=std::vector<casadi_int>(),
+      const Dict& opts=Dict()) const;
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
