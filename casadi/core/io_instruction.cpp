@@ -46,7 +46,10 @@ namespace casadi {
     if (nnz==0) return; // quick return
     string a = g.arg(ind_);
     casadi_int i = res.front();
-    if (nnz==1) {
+    if (i<=-2) {
+      g << g.work(i, nnz) << " = " << a << " ? " << a << "+" << str(offset_) <<
+           " : casadi_zeros;\n";
+    } else if (nnz==1) {
       g << g.workel(i) << " = " << a << " ? " << a << "[" << offset_ << "] : 0;\n";
     } else if (offset_==0) {
       g << g.copy(a, nnz, g.work(i, nnz)) << "\n";
