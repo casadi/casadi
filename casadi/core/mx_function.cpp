@@ -46,6 +46,7 @@ namespace casadi {
                          const std::vector<std::string>& name_in,
                          const std::vector<std::string>& name_out) :
     XFunction<MXFunction, MX, MXNode>(name, inputv, outputv, name_in, name_out) {
+
   }
 
   MXFunction::~MXFunction() {
@@ -177,6 +178,36 @@ namespace casadi {
       nodes[i]->temp = i;
     }
 
+    n_ce_ = 0;
+    casadi_int nz_max = 0;
+    ce_off_.push_back(0);
+
+    // Construct input element data, loop over inputs
+    for (casadi_int ind=0; ind<in_.size(); ++ind) {
+      // Loop over symbolic primitives of each input
+      std::vector<MX> prim = in_[ind].primitives();
+      for (casadi_int p=0; p<prim.size(); ++p) {
+        casadi_int i = prim[p].get_temp();
+        if (i>=0) {
+          // Mark read
+          prim[p].set_temp(-(n_ce_++)-2);
+          nz_max = std::max(nz_max, prim[p]->nnz());
+          ce_off_.push_back(ce_off_.back()+prim[p]->nnz());
+        }
+      }
+    }
+    for (MXNode* n : nodes) {
+      if (n->elide_copy()) {
+        n->temp = -(n_ce_++)-2;
+        nz_max = std::max(nz_max, n->nnz());
+        ce_off_.push_back(ce_off_.back()+n->nnz());
+      }
+    }
+
+    zero_array_.resize(nz_max, 0);
+    alloc_arg(n_ce_, true);
+    zero_array_bvec_t_.resize(nz_max, bvec_t(0));
+
     // Place in the algorithm for each node
     std::vector<casadi_int> place_in_alg;
     place_in_alg.reserve(nodes.size());
@@ -201,7 +232,7 @@ namespace casadi {
       }
 
       // If a new element in the algorithm needs to be added
-      if (op>=0) {
+      if (op!=-1) {
         AlgEl ae;
         ae.op = op;
         ae.data.own(n);
@@ -264,6 +295,15 @@ namespace casadi {
       // memory off the arguments, order depends on whether inplace is possible
       casadi_int first_to_free = 0;
       casadi_int last_to_free = e.data->n_inplace();
+
+      // Don't do inplace operations in case of direct input dependence
+      for (casadi_int i=0; i<e.arg.size(); ++i) {
+        if (e.arg[i]<=-2) {
+          last_to_free = 0;
+          break;
+        }
+      }
+
       for (casadi_int task=0; task<2; ++task) {
 
         // Dereference or free the memory of the arguments
@@ -337,22 +377,27 @@ namespace casadi {
       }
     }
 
+    ce_active_ = false;
     // Allocate work vectors (numeric)
     workloc_.resize(worksize+1);
     std::fill(workloc_.begin(), workloc_.end(), -1);
     size_t wind=0, sz_w=0;
     for (auto&& e : algorithm_) {
+      alloc_iw(e.res.size());
       if (e.op!=OP_OUTPUT) {
         for (casadi_int c=0; c<e.res.size(); ++c) {
+          if (e.res[c]==-1) continue;
+          alloc_arg(e.data->sz_arg());
+          alloc_res(e.data->sz_res());
+          alloc_iw(e.data->sz_iw());
           if (e.res[c]>=0) {
-            alloc_arg(e.data->sz_arg());
-            alloc_res(e.data->sz_res());
-            alloc_iw(e.data->sz_iw());
             sz_w = std::max(sz_w, e.data->sz_w());
             if (workloc_[e.res[c]] < 0) {
               workloc_[e.res[c]] = wind;
               wind += e.data->sparsity(c).nnz();
             }
+          } else {
+            ce_active_ = true;
           }
         }
       }
@@ -391,6 +436,9 @@ namespace casadi {
           // Replace parameter with input instruction
           algorithm_[i].data.own(new Input(prim[p].sparsity(), ind, p, nz_offset));
           algorithm_[i].op = OP_INPUT;
+        } else if (i<=-2) {
+          // Mark read
+          prim[p].set_temp(0);
         }
         nz_offset += prim[p]->nnz();
       }
@@ -400,7 +448,7 @@ namespace casadi {
     free_vars_.clear();
     for (auto it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
       casadi_int i = it->second->temp-1;
-      if (i>=0) {
+      if (i!=-1) {
         // Save to list of free parameters
         free_vars_.push_back(MX::create(it->second));
 
@@ -429,7 +477,8 @@ namespace casadi {
       casadi_int* iw, double* w, void* mem) const {
     if (verbose_) casadi_message(name_ + "::eval");
     // Work vector and temporaries to hold pointers to operation input and outputs
-    const double** arg1 = arg+n_in_;
+    const double** r = arg+n_in_;
+    const double** arg1 = r+n_ce_;
     double** res1 = res+n_out_;
 
     // Make sure that there are no free variables
@@ -448,34 +497,54 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       // Perform the operation
       if (e.op==OP_INPUT) {
-        // Pass an input
-        double *w1 = w+workloc_[e.res.front()];
-        casadi_int nnz=e.data.nnz();
         casadi_int i=e.data->ind();
         casadi_int nz_offset=e.data->offset();
-        if (arg[i]==nullptr) {
-          std::fill(w1, w1+nnz, 0);
+        casadi_int j=e.res.front();
+        if (j>=0) {
+          double *w1 = w+workloc_[j];
+          casadi_int nnz=e.data.nnz();
+          if (arg[i]==nullptr) {
+            std::fill(w1, w1+nnz, 0);
+          } else {
+            std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
+          }
         } else {
-          std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
+          r[-j-2] = arg[i] ? arg[i]+nz_offset : get_ptr(zero_array_);
         }
       } else if (e.op==OP_OUTPUT) {
-        // Get an output
-        double *w1 = w+workloc_[e.arg.front()];
-        casadi_int nnz=e.data->dep().nnz();
         casadi_int i=e.data->ind();
-        casadi_int nz_offset=e.data->offset();
-        if (res[i]) std::copy(w1, w1+nnz, res[i]+nz_offset);
+        if (res[i]) {
+          casadi_int nnz=e.data->dep().nnz();
+          casadi_int nz_offset=e.data->offset();
+          if (e.arg.front()>=0) {
+            double *w1 = w+workloc_[e.arg.front()];
+            std::copy(w1, w1+nnz, res[i]+nz_offset);
+          } else {
+            const double *w1 = r[-e.arg.front()-2];
+            std::copy(w1, w1+nnz, res[i]+nz_offset);
+          }
+        }
       } else {
         // Point pointers to the data corresponding to the element
-        for (casadi_int i=0; i<e.arg.size(); ++i)
-          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : nullptr;
-        for (casadi_int i=0; i<e.res.size(); ++i)
-          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
-
+        for (casadi_int i=0; i<e.arg.size(); ++i) {
+          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : (e.arg[i]==-1 ? nullptr : r[-e.arg[i]-2]);
+        }
+        for (casadi_int i=0; i<e.res.size(); ++i) {
+          if (e.res[i]<=-2) {
+            iw[i] = 1;
+            res1[i] = const_cast<double *>(r[-e.res[i]-2]);
+          } else {
+            iw[i] = 0;
+            res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
+          }
+        }
         // Evaluate
         if (print_instructions_) print_arg(uout(), k, e, arg1);
         if (e.data->eval(arg1, res1, iw, w)) return 1;
         if (print_instructions_) print_res(uout(), k, e, res1);
+        for (casadi_int i=0; i<e.res.size(); ++i) {
+          if (e.res[i]<=-2) r[-e.res[i]-2] = res1[i];
+        }
       }
       // Increase counter
       k++;
@@ -483,31 +552,33 @@ namespace casadi {
     return 0;
   }
 
+  std::string print_repr(casadi_int i) {
+    if (i==-1) return "NULL";
+    if (i>=0) return "@" + str(i);
+    return "@r" + str(-i-2);
+  }
+
   std::string MXFunction::print(const AlgEl& el) const {
     std::stringstream s;
     if (el.op==OP_OUTPUT) {
       s << "output[" << el.data->ind() << "][" << el.data->segment() << "]"
-        << " = @" << el.arg.at(0);
+        << " = " << print_repr(el.arg.at(0));
     } else if (el.op==OP_SETNONZEROS || el.op==OP_ADDNONZEROS) {
       if (el.res.front()!=el.arg.at(0)) {
-        s << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
+        s << print_repr(el.res.front()) << " = " << print_repr(el.arg.at(0)) << "; ";
       }
       std::vector<std::string> arg(2);
-      arg[0] = "@" + str(el.res.front());
-      arg[1] = "@" + str(el.arg.at(1));
+      arg[0] = print_repr(el.res.front());
+      arg[1] = print_repr(el.arg.at(1));
       s << el.data->disp(arg);
     } else {
       if (el.res.size()==1) {
-        s << "@" << el.res.front() << " = ";
+        s << print_repr(el.res.front()) << " = ";
       } else {
         s << "{";
         for (casadi_int i=0; i<el.res.size(); ++i) {
           if (i!=0) s << ", ";
-          if (el.res[i]>=0) {
-            s << "@" << el.res[i];
-          } else {
-            s << "NULL";
-          }
+          s << print_repr(el.res[i]);
         }
         s << "} = ";
       }
@@ -515,11 +586,7 @@ namespace casadi {
       if (el.op!=OP_INPUT) {
         arg.resize(el.arg.size());
         for (casadi_int i=0; i<el.arg.size(); ++i) {
-          if (el.arg[i]>=0) {
-            arg[i] = "@" + str(el.arg[i]);
-          } else {
-            arg[i] = "NULL";
-          }
+          arg[i] = print_repr(el.arg[i]);
         }
       }
       s << el.data->disp(arg);
@@ -561,40 +628,65 @@ namespace casadi {
     if (sp_weight()==1 || sp_weight()==-1)
       return FunctionInternal::sp_forward(arg, res, iw, w, mem);
     // Temporaries to hold pointers to operation input and outputs
-    const bvec_t** arg1=arg+n_in_;
+    const bvec_t** r=arg+n_in_;
+    const bvec_t** arg1=r+n_ce_;
     bvec_t** res1=res+n_out_;
 
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       if (e.op==OP_INPUT) {
         // Pass input seeds
-        casadi_int nnz=e.data.nnz();
         casadi_int i=e.data->ind();
         casadi_int nz_offset=e.data->offset();
+        casadi_int j=e.res.front();
         const bvec_t* argi = arg[i];
-        bvec_t* w1 = w + workloc_[e.res.front()];
-        if (argi!=nullptr) {
-          std::copy(argi+nz_offset, argi+nz_offset+nnz, w1);
+        if (j>=0) {
+          casadi_int nnz=e.data.nnz();
+          bvec_t* w1 = w + workloc_[j];
+          if (argi!=nullptr) {
+            std::copy(argi+nz_offset, argi+nz_offset+nnz, w1);
+          } else {
+            std::fill_n(w1, nnz, 0);
+          }
         } else {
-          std::fill_n(w1, nnz, 0);
+          r[-j-2] = argi ? argi+nz_offset : get_ptr(zero_array_bvec_t_);
         }
+
       } else if (e.op==OP_OUTPUT) {
-        // Get the output sensitivities
-        casadi_int nnz=e.data.dep().nnz();
         casadi_int i=e.data->ind();
-        casadi_int nz_offset=e.data->offset();
-        bvec_t* resi = res[i];
-        bvec_t* w1 = w + workloc_[e.arg.front()];
-        if (resi!=nullptr) std::copy(w1, w1+nnz, resi+nz_offset);
+        if (res[i]) {
+          casadi_int nnz=e.data.dep().nnz();
+          casadi_int nz_offset=e.data->offset();
+          if (e.arg.front()>=0) {
+            bvec_t* w1 = w + workloc_[e.arg.front()];
+            std::copy(w1, w1+nnz, res[i]+nz_offset);
+          } else {
+            const bvec_t *w1 = r[-e.arg.front()-2];
+            std::copy(w1, w1+nnz, res[i]+nz_offset);
+          }
+        }
       } else {
         // Point pointers to the data corresponding to the element
-        for (casadi_int i=0; i<e.arg.size(); ++i)
-          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : nullptr;
-        for (casadi_int i=0; i<e.res.size(); ++i)
-          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
+        for (casadi_int i=0; i<e.arg.size(); ++i) {
+          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : (e.arg[i]==-1 ? nullptr : r[-e.arg[i]-2]);
+        }
+        for (casadi_int i=0; i<e.res.size(); ++i) {
+          if (e.res[i]<=-2) {
+            iw[i] = 1;
+            res1[i] = const_cast<bvec_t *>(r[-e.res[i]-2]);
+          } else {
+            iw[i] = 0;
+            res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
+          }
+        }
 
         // Propagate sparsity forwards
         if (e.data->sp_forward(arg1, res1, iw, w)) return 1;
+
+
+        for (casadi_int i=0; i<e.res.size(); ++i) {
+          if (e.res[i]<=-2) r[-e.res[i]-2] = res1[i];
+        }
       }
     }
     return 0;
@@ -611,6 +703,17 @@ namespace casadi {
 
     std::fill_n(w, sz_w(), 0);
 
+    // Prepare work vector for each operation
+    std::vector<bvec_t*> wloc(workloc_.size()+1+n_ce_, nullptr);
+    bvec_t** wloc_p = get_ptr(wloc)+n_ce_+1;
+
+    // Non-elided locations: found with workloc_
+    for (casadi_int i=0;i<workloc_.size();++i) wloc_p[i] = w+workloc_[i];
+
+    // Elided locations: use extra work-space
+    std::vector<bvec_t> wvec(ce_off_.back(), bvec_t(0));
+    for (casadi_int i=0;i<n_ce_;++i) wloc_p[-i-2] = get_ptr(wvec)+ce_off_[i];
+
     // Propagate sparsity backwards
     for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
       if (it->op==OP_INPUT) {
@@ -619,7 +722,7 @@ namespace casadi {
         casadi_int i=it->data->ind();
         casadi_int nz_offset=it->data->offset();
         bvec_t* argi = arg[i];
-        bvec_t* w1 = w + workloc_[it->res.front()];
+        bvec_t* w1 = wloc_p[it->res.front()];
         if (argi!=nullptr) for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
         std::fill_n(w1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
@@ -628,23 +731,25 @@ namespace casadi {
         casadi_int i=it->data->ind();
         casadi_int nz_offset=it->data->offset();
         bvec_t* resi = res[i] ? res[i] + nz_offset : nullptr;
-        bvec_t* w1 = w + workloc_[it->arg.front()];
+        bvec_t* w1 = wloc_p[it->arg.front()];
         if (resi!=nullptr) {
           for (casadi_int k=0; k<nnz; ++k) w1[k] |= resi[k];
           std::fill_n(resi, nnz, 0);
-
         }
       } else {
+
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<it->arg.size(); ++i)
-          arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : nullptr;
+          arg1[i] = it->arg[i]!=-1 ? wloc_p[it->arg[i]] : nullptr;
         for (casadi_int i=0; i<it->res.size(); ++i)
-          res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : nullptr;
+          res1[i] = it->res[i]!=-1 ? wloc_p[it->res[i]] : nullptr;
 
         // Propagate sparsity backwards
         if (it->data->sp_reverse(arg1, res1, iw, w)) return 1;
+
       }
     }
+
     return 0;
   }
 
@@ -688,7 +793,8 @@ namespace casadi {
       }
 
       // Symbolic work, non-differentiated
-      std::vector<MX> swork(workloc_.size()-1);
+      std::vector<MX> swork_vec(workloc_.size()+n_ce_+1);
+      MX* swork = get_ptr(swork_vec)+n_ce_+1;
       if (verbose_) casadi_message("Allocated work vector");
 
       // Split up inputs analogous to symbolic primitives
@@ -718,7 +824,7 @@ namespace casadi {
           arg1.resize(it->arg.size());
           for (casadi_int i=0; i<arg1.size(); ++i) {
             casadi_int el = it->arg[i]; // index of the argument
-            arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+            arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : swork[el];
           }
 
           // Perform the operation
@@ -728,7 +834,7 @@ namespace casadi {
           // Get the result
           for (casadi_int i=0; i<res1.size(); ++i) {
             casadi_int el = it->res[i]; // index of the output
-            if (el>=0) swork[el] = res1[i];
+            if (el!=-1) swork[el] = res1[i];
           }
         }
       }
@@ -800,8 +906,9 @@ namespace casadi {
       }
 
       // Work vector, forward derivatives
-      std::vector<std::vector<MX> > dwork(workloc_.size()-1);
-      fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
+      std::vector<std::vector<MX> > dwork_vec(workloc_.size()+n_ce_+1);
+      std::vector<MX> * dwork = get_ptr(dwork_vec) + n_ce_+1;
+      fill(dwork_vec.begin(), dwork_vec.end(), std::vector<MX>(nfwd));
       if (verbose_) casadi_message("Allocated derivative work vector (forward mode)");
 
       // Split up fseed analogous to symbolic primitives
@@ -856,7 +963,7 @@ namespace casadi {
             skip[d] = true; // All seeds are zero?
             for (casadi_int i=0; i<e.arg.size(); ++i) {
               casadi_int el = e.arg[i];
-              if (el<0 || dwork[el][d].is_empty(true)) {
+              if (el==-1 || dwork[el][d].is_empty(true)) {
                 seed[i] = MX(e.data->dep(i).size());
               } else {
                 seed[i] = dwork[el][d];
@@ -878,7 +985,7 @@ namespace casadi {
           for (casadi_int d=0; d<nfwd; ++d) {
             for (casadi_int i=0; i<e.res.size(); ++i) {
               casadi_int el = e.res[i];
-              if (el>=0) {
+              if (el!=-1) {
                 dwork[el][d] = skip[d] ? MX(e.data->sparsity(i).size()) : osens[d1][i];
               }
             }
@@ -996,8 +1103,9 @@ namespace casadi {
       std::vector<bool> skip(nadj, false);
 
       // Work vector, adjoint derivatives
-      std::vector<std::vector<MX> > dwork(workloc_.size()-1);
-      fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
+      std::vector<std::vector<MX> > dwork_vec(workloc_.size()+n_ce_+1);
+      fill(dwork_vec.begin(), dwork_vec.end(), std::vector<MX>(nadj));
+      std::vector<MX> * dwork = get_ptr(dwork_vec)+n_ce_+1;
 
       // Loop over computational nodes in reverse order
       for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
@@ -1035,11 +1143,11 @@ namespace casadi {
             for (casadi_int i=0; i<it->res.size(); ++i) {
               // Get and clear seed
               casadi_int el = it->res[i];
-              if (el>=0) {
+              if (el==-1) {
+                seed[i] = MX();
+              } else {
                 seed[i] = dwork[el][d];
                 dwork[el][d] = MX();
-              } else {
-                seed[i] = MX();
               }
 
               // If first time encountered, reset to zero of right dimension
@@ -1061,11 +1169,11 @@ namespace casadi {
             for (casadi_int i=0; i<it->arg.size(); ++i) {
               // Pass seed and reset to avoid counting twice
               casadi_int el = it->arg[i];
-              if (el>=0) {
+              if (el==-1) {
+                osens[d1][i] = MX();
+              } else {
                 osens[d1][i] = dwork[el][d];
                 dwork[el][d] = MX();
-              } else {
-                osens[d1][i] = MX();
               }
 
               // If first time encountered, reset to zero of right dimension
@@ -1085,7 +1193,7 @@ namespace casadi {
             if (skip[d]) continue;
             for (casadi_int i=0; i<it->arg.size(); ++i) {
               casadi_int el = it->arg[i];
-              if (el>=0) {
+              if (el!=-1) {
                 if (dwork[el][d].is_empty(true)) {
                   dwork[el][d] = osens[d1][i];
                 } else {
@@ -1114,39 +1222,69 @@ namespace casadi {
     // Work vector and temporaries to hold pointers to operation input and outputs
     std::vector<const SXElem*> argp(sz_arg());
     std::vector<SXElem*> resp(sz_res());
+    const SXElem** r = get_ptr(argp);
+    const SXElem** arg1 = r+n_ce_;
+    SXElem** res1 = get_ptr(resp);
+    std::vector<SXElem> zero_array(zero_array_.size());
+
+
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
     for (auto&& a : algorithm_) {
       if (a.op==OP_INPUT) {
         // Pass an input
-        SXElem *w1 = w+workloc_[a.res.front()];
-        casadi_int nnz=a.data.nnz();
         casadi_int i=a.data->ind();
         casadi_int nz_offset=a.data->offset();
-        if (arg[i]==nullptr) {
-          std::fill(w1, w1+nnz, 0);
+        casadi_int j=a.res.front();
+        if (j>=0) {
+          SXElem *w1 = w+workloc_[j];
+          casadi_int nnz=a.data.nnz();
+          if (arg[i]==nullptr) {
+            std::fill(w1, w1+nnz, 0);
+          } else {
+            std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
+          }
         } else {
-          std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
+          r[-j-2] = arg[i] ? arg[i]+nz_offset : get_ptr(zero_array);
         }
       } else if (a.op==OP_OUTPUT) {
-        // Get the outputs
-        SXElem *w1 = w+workloc_[a.arg.front()];
-        casadi_int nnz=a.data.dep().nnz();
         casadi_int i=a.data->ind();
-        casadi_int nz_offset=a.data->offset();
-        if (res[i]) std::copy(w1, w1+nnz, res[i]+nz_offset);
+        if (res[i]) {
+          // Get the outputs
+          casadi_int nnz=a.data.dep().nnz();
+          casadi_int nz_offset=a.data->offset();
+          if (a.arg.front()>=0) {
+            SXElem *w1 = w+workloc_[a.arg.front()];
+            std::copy(w1, w1+nnz, res[i]+nz_offset);
+          } else {
+            const SXElem *w1 = r[-a.arg.front()-2];
+            std::copy(w1, w1+nnz, res[i]+nz_offset);
+          }
+        }
       } else if (a.op==OP_PARAMETER) {
         continue; // FIXME
       } else {
         // Point pointers to the data corresponding to the element
-        for (casadi_int i=0; i<a.arg.size(); ++i)
-          argp[i] = a.arg[i]>=0 ? w+workloc_[a.arg[i]] : nullptr;
-        for (casadi_int i=0; i<a.res.size(); ++i)
-          resp[i] = a.res[i]>=0 ? w+workloc_[a.res[i]] : nullptr;
+        for (casadi_int i=0; i<a.arg.size(); ++i) {
+          arg1[i] = a.arg[i]>=0 ? w+workloc_[a.arg[i]] : (a.arg[i]==-1 ? nullptr : r[-a.arg[i]-2]);
+        }
+        for (casadi_int i=0; i<a.res.size(); ++i) {
+          if (a.res[i]<=-2) {
+            iw[i] = 1;
+            res1[i] = const_cast<SXElem *>(r[-a.res[i]-2]);
+          } else {
+            iw[i] = 0;
+            res1[i] = a.res[i]>=0 ? w+workloc_[a.res[i]] : nullptr;
+          }
+        }
 
         // Evaluate
-        if (a.data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w)) return 1;
+        if (a.data->eval_sx(arg1, res1, iw, w)) return 1;
+
+        for (casadi_int i=0; i<a.res.size(); ++i) {
+          if (a.res[i]<=-2) r[-a.res[i]-2] = res1[i];
+        }
       }
     }
     return 0;
@@ -1182,7 +1320,12 @@ namespace casadi {
 
   void MXFunction::codegen_body(CodeGenerator& g) const {
     // Temporary variables and vectors
-    g.init_local("arg1", "arg+" + str(n_in_));
+    if (ce_active_) {
+      g.local("r", "const casadi_real*", "*");
+      g.init_local("r", "arg+" + str(n_in_));
+      g.require_zeros(n_ce_);
+    }
+    g.init_local("arg1", "arg+" + str(n_ce_+n_in_));
     g.init_local("res1", "res+" + str(n_out_));
 
     // Declare scalar work vector elements as local variables
@@ -1230,6 +1373,8 @@ namespace casadi {
         casadi_int j=e.arg.at(i);
         if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
           arg.at(i) = j;
+        } else if (j<=-2) {
+          arg.at(i) = j;
         } else {
           arg.at(i) = -1;
         }
@@ -1240,6 +1385,8 @@ namespace casadi {
       for (casadi_int i=0; i<e.res.size(); ++i) {
         casadi_int j=e.res.at(i);
         if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+          res.at(i) = j;
+        } else if (j<=-2) {
           res.at(i) = j;
         } else {
           res.at(i) = -1;
@@ -1312,7 +1459,7 @@ namespace casadi {
             arg1.resize(e.arg.size());
             for (casadi_int i=0; i<arg1.size(); ++i) {
               casadi_int el = e.arg[i]; // index of the argument
-              arg1[i] = el<0 ? MX(e.data->dep(i).size()) : swork[el];
+              arg1[i] = el==-1 ? MX(e.data->dep(i).size()) : swork[el];
             }
 
             // Perform the operation
@@ -1322,7 +1469,7 @@ namespace casadi {
             // Get the result
             for (casadi_int i=0; i<res1.size(); ++i) {
               casadi_int el = e.res[i]; // index of the output
-              if (el>=0) swork[el] = res1[i];
+              if (el!=-1) swork[el] = res1[i];
             }
           }
         }
@@ -1358,7 +1505,9 @@ namespace casadi {
   }
 
   void MXFunction::substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const {
-    std::vector<MX> work(workloc_.size()-1);
+    std::vector<MX> work_vec(workloc_.size()+n_ce_);
+    MX* work = get_ptr(work_vec)+n_ce_+1;
+
     std::vector<MX> oarg, ores;
 
     // Output segments
@@ -1370,15 +1519,15 @@ namespace casadi {
       switch (it->op) {
       case OP_INPUT:
         casadi_assert(it->data->segment()==0, "Not implemented");
-        work.at(it->res.front())
+        work[it->res.front()]
           = out_.at(it->data->ind()).join_primitives(out_split.at(it->data->ind()));
         break;
       case OP_PARAMETER:
       case OP_CONST:
-        work.at(it->res.front()) = it->data;
+        work[it->res.front()] = it->data;
         break;
       case OP_OUTPUT:
-        out_split.at(it->data->ind()).at(it->data->segment()) = work.at(it->arg.front());
+        out_split.at(it->data->ind()).at(it->data->segment()) = work[it->arg.front()];
         break;
       default:
         {
@@ -1386,7 +1535,7 @@ namespace casadi {
           oarg.resize(it->arg.size());
           for (casadi_int i=0; i<oarg.size(); ++i) {
             casadi_int el = it->arg[i];
-            oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
+            oarg[i] = el==-1 ? MX(it->data->dep(i).size()) : work[el];
           }
 
           // Perform the operation
@@ -1396,7 +1545,7 @@ namespace casadi {
           // Get the result
           for (casadi_int i=0; i<ores.size(); ++i) {
             casadi_int el = it->res[i];
-            if (el>=0) work.at(el) = ores[i];
+            if (el!=-1) work[el] = ores[i];
           }
         }
       }
@@ -1424,6 +1573,10 @@ namespace casadi {
     if (has_free()) return true;
     // No inlining by default
     return false;
+  }
+
+  std::string xw(casadi_int i) {
+    return i>=0 ? "w"+str(i) : "wr"+str(-i-2);
   }
 
   void MXFunction::export_code_body(const std::string& lang,
@@ -1462,7 +1615,7 @@ namespace casadi {
 
       switch (op) {
         case OP_INPUT:
-          ss << indent << "w" << o[0] << " = varargin{" << i[0]+1 << "};" << std::endl;
+          ss << indent << xw(o[0]) << " = varargin{" << i[0]+1 << "};" << std::endl;
           break;
         case OP_OUTPUT:
           {
@@ -1471,7 +1624,7 @@ namespace casadi {
             x.dep(0).sparsity().export_code("matlab", ss,
               {{"name", "sp_in"}, {"indent_level", indent_level}, {"as_matrix", true}});
             ss << indent << "argout_" << o[0] << "{" << (1+segment) << "} = ";
-            ss << "w" << i[0] << "(sp_in==1);" << std::endl;
+            ss << "" << xw(i[0]) << "(sp_in==1);" << std::endl;
           }
           break;
         case OP_CONST:
@@ -1481,83 +1634,87 @@ namespace casadi {
             opts["name"] = "m";
             opts["indent_level"] = indent_level;
             v.export_code("matlab", ss, opts);
-            ss << indent << "w" << o[0] << " = m;" << std::endl;
+            ss << indent << xw(o[0]) << " = m;" << std::endl;
           }
           break;
         case OP_SQ:
-          ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".^2;" << std::endl;
+          ss << indent << xw(o[0]) << " = " << "" << xw(i[0]) << ".^2;" << std::endl;
           break;
         case OP_MTIMES:
-          ss << indent << "w" << o[0] << " = ";
-          ss << "w" << i[1] << "*w" << i[2] << "+w" << i[0] << ";" << std::endl;
+          ss << indent << xw(o[0]) << " = ";
+          ss << xw(i[1]) << "*" << xw(i[2]) << "+" << xw(i[0]) << ";" << std::endl;
           break;
         case OP_MUL:
           {
             std::string prefix = (x.dep(0).is_scalar() || x.dep(1).is_scalar()) ? "" : ".";
-            ss << indent << "w" << o[0] << " = " << "w" << i[0] << prefix << "*w" << i[1] << ";";
+            ss << indent << xw(o[0]) << " = " << "" << xw(i[0]) << prefix << "*" <<
+                  xw(i[1]) << ";";
             ss << std::endl;
           }
           break;
         case OP_TWICE:
-          ss << indent << "w" << o[0] << " = 2*w" << i[0] << ";" << std::endl;
+          ss << indent << xw(o[0]) << " = 2*" << xw(i[0]) << ";" << std::endl;
           break;
         case OP_INV:
-          ss << indent << "w" << o[0] << " = 1./w" << i[0] << ";" << std::endl;
+          ss << indent << xw(o[0]) << " = 1./" << xw(i[0]) << ";" << std::endl;
           break;
         case OP_DOT:
-          ss << indent << "w" << o[0] << " = dot(w" << i[0] << ",w" << i[1]<< ");" << std::endl;
+          ss << indent << xw(o[0]) << " = dot(" << xw(i[0]) << "," << xw(i[1]) << ");"
+             << std::endl;
           break;
         case OP_BILIN:
-          ss << indent << "w" << o[0] << " = w" << i[1] << ".'*w" << i[0]<< "*w" << i[2] << ";";
+          ss << indent << xw(o[0]) << " = " << xw(i[1]) << ".'*" << xw(i[0]) << "*" <<
+                xw(i[2]) << ";";
           ss << std::endl;
           break;
         case OP_RANK1:
-          ss << indent << "w" << o[0] << " = w" << i[0] << "+";
-          ss << "w" << i[1] << "*w" << i[2] << "*w" << i[3] << ".';";
+          ss << indent << xw(o[0]) << " = " << xw(i[0]) << "+";
+          ss << "" << xw(i[1]) << "*" << xw(i[2]) << "*" << xw(i[3]) << ".';";
           ss << std::endl;
           break;
         case OP_FABS:
-          ss << indent << "w" << o[0] << " = abs(w" << i[0] << ");" << std::endl;
+          ss << indent << xw(o[0]) << " = abs(" << xw(i[0]) << ");" << std::endl;
           break;
         case OP_DETERMINANT:
-          ss << indent << "w" << o[0] << " = det(w" << i[0] << ");" << std::endl;
+          ss << indent << xw(o[0]) << " = det(" << xw(i[0]) << ");" << std::endl;
           break;
         case OP_INVERSE:
-          ss << indent << "w" << o[0] << " = inv(w" << i[0] << ");";
-          ss << "w" << o[0] << "(w" << o[0] << "==0) = 1e-200;" << std::endl;
+          ss << indent << xw(o[0]) << " = inv(" << xw(i[0]) << ");";
+          ss << xw(o[0]) << "(" << xw(o[0]) << "==0) = 1e-200;" << std::endl;
           break;
         case OP_SOLVE:
           {
             bool tr = x.info()["tr"];
             if (tr) {
-              ss << indent << "w" << o[0] << " = ((w" << i[1] << ".')\\w" << i[0] << ").';";
+              ss << indent << xw(o[0]) << " = ((" << xw(i[1]) << ".')\\" << xw(i[0]) << ").';";
               ss << std::endl;
             } else {
-              ss << indent << "w" << o[0] << " = w" << i[1] << "\\w" << i[0] << ";" << std::endl;
+              ss << indent << xw(o[0]) << " = " << xw(i[1]) << "\\" << xw(i[0]) << ";" << std::endl;
             }
-            ss << "w" << o[0] << "(w" << o[0] << "==0) = 1e-200;" << std::endl;
+            ss << xw(o[0]) << "(" << xw(o[0]) << "==0) = 1e-200;" << std::endl;
           }
           break;
         case OP_DIV:
           {
             std::string prefix = (x.dep(0).is_scalar() || x.dep(1).is_scalar()) ? "" : ".";
-            ss << indent << "w" << o[0] << " = " << "w" << i[0] << prefix << "/w" << i[1] << ";";
+            ss << indent << xw(o[0]) << " = " << "" << xw(i[0]) << prefix << "/" << xw(i[1]) << ";";
             ss << std::endl;
           }
           break;
         case OP_POW:
         case OP_CONSTPOW:
-          ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".^w" << i[1] << ";" << std::endl;
+          ss << indent << xw(o[0]) << " = " << "" << xw(i[0]) << ".^" << xw(i[1]) << ";"
+             << std::endl;
           break;
         case OP_TRANSPOSE:
-          ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".';" << std::endl;
+          ss << indent << xw(o[0]) << " = " << "" << xw(i[0]) << ".';" << std::endl;
           break;
         case OP_HORZCAT:
         case OP_VERTCAT:
           {
-            ss << indent << "w" << o[0] << " = [";
+            ss << indent << xw(o[0]) << " = [";
             for (casadi_int e : i) {
-              ss << "w" << e << (op==OP_HORZCAT ? " " : ";");
+              ss << xw(e) << (op==OP_HORZCAT ? " " : ";");
             }
             ss << "];" << std::endl;
           }
@@ -1568,9 +1725,9 @@ namespace casadi {
               x.dep(k).sparsity().export_code("matlab", ss,
                 {{"name", "sp_in" + str(k)}, {"indent_level", indent_level}, {"as_matrix", true}});
             }
-            ss << indent << "w" << o[0] << " = [";
+            ss << indent << xw(o[0]) << " = [";
             for (casadi_int k=0;k<i.size();++k) {
-              ss << "w" << i[k] << "(sp_in" << k << "==1);";
+              ss << xw(i[k]) << "(sp_in" << k << "==1);";
             }
             ss << "];" << std::endl;
             Dict opts;
@@ -1578,8 +1735,8 @@ namespace casadi {
             opts["indent_level"] = indent_level;
             opts["as_matrix"] = false;
             x.sparsity().export_code("matlab", ss, opts);
-            ss << indent << "w" << o[0] << " = ";
-            ss << "sparse(sp_i, sp_j, w" << o[0] << ", sp_m, sp_n);" << std::endl;
+            ss << indent << xw(o[0]) << " = ";
+            ss << "sparse(sp_i, sp_j, " << xw(o[0]) << ", sp_m, sp_n);" << std::endl;
           }
           break;
         case OP_HORZSPLIT:
@@ -1595,13 +1752,13 @@ namespace casadi {
               if (o[k]==-1) continue;
               x.dep(0).sparsity().export_code("matlab", ss,
                 {{"name", "sp_in"}, {"indent_level", indent_level}, {"as_matrix", true}});
-              ss << indent << "tmp = w" << i[0]<< "(sp_in==1);" << std::endl;
+              ss << indent << "tmp = " << xw(i[0]) << "(sp_in==1);" << std::endl;
               Dict opts;
               opts["name"] = "sp";
               opts["indent_level"] = indent_level;
               opts["as_matrix"] = false;
               sp[k].export_code("matlab", ss, opts);
-              ss << indent << "w" << o[k] << " = sparse(sp_i, sp_j, ";
+              ss << indent << xw(o[k]) << " = sparse(sp_i, sp_j, ";
               ss << "tmp(" << offset[k]+1 << ":" << offset[k+1] << "), sp_m, sp_n);" << std::endl;
             }
           }
@@ -1650,25 +1807,25 @@ namespace casadi {
             if (op==OP_GETNONZEROS) {
               x.dep(0).sparsity().export_code("matlab", ss,
                 {{"name", "sp_in"}, {"indent_level", indent_level}, {"as_matrix", true}});
-              //ss << indent << "w" << i[0] << "" << std::endl;
-              //ss << indent << "size(w" << i[0] << ")" << std::endl;
-              ss << indent << "in_flat = w" << i[0] << "(sp_in==1);" << std::endl;
+              //ss << indent << "" << xw(i[0]) << "" << std::endl;
+              //ss << indent << "size(" << xw(i[0]) << ")" << std::endl;
+              ss << indent << "in_flat = " << xw(i[0]) << "(sp_in==1);" << std::endl;
               //ss << indent << "in_flat" << std::endl;
               //ss << indent << "size(in_flat)" << std::endl;
-              ss << indent << "w" << o[0] << " = in_flat(" << nonzeros << ");" << std::endl;
+              ss << indent << xw(o[0]) << " = in_flat(" << nonzeros << ");" << std::endl;
             } else {
               x.dep(0).sparsity().export_code("matlab", ss,
                 {{"name", "sp_in0"}, {"indent_level", indent_level}, {"as_matrix", true}});
               x.dep(1).sparsity().export_code("matlab", ss,
                 {{"name", "sp_in1"}, {"indent_level", indent_level}, {"as_matrix", true}});
-              ss << indent << "in_flat = w" << i[1] << "(sp_in1==1);" << std::endl;
-              ss << indent << "w" << o[0] << " = w" << i[0] << "(sp_in0==1);" << std::endl;
-              ss << indent << "w" << o[0] << "(" << nonzeros << ")  = ";
-              if (info["add"]) ss << "w" << o[0] << "(" << nonzeros << ") + ";
+              ss << indent << "in_flat = " << xw(i[1]) << "(sp_in1==1);" << std::endl;
+              ss << indent << xw(o[0]) << " = " << xw(i[0]) << "(sp_in0==1);" << std::endl;
+              ss << indent << xw(o[0]) << "(" << nonzeros << ")  = ";
+              if (info["add"]) ss << xw(o[0]) << "(" << nonzeros << ") + ";
               ss << "in_flat;";
             }
-            ss << indent << "w" << o[0] << " = ";
-            ss << "sparse(sp_i, sp_j, w" << o[0] << ", sp_m, sp_n);" << std::endl;
+            ss << indent << xw(o[0]) << " = ";
+            ss << "sparse(sp_i, sp_j, " << xw(o[0]) << ", sp_m, sp_n);" << std::endl;
           }
           break;
         case OP_PROJECT:
@@ -1677,43 +1834,43 @@ namespace casadi {
             opts["name"] = "sp";
             opts["indent_level"] = indent_level;
             x.sparsity().export_code("matlab", ss, opts);
-            ss << indent << "w" << o[0] << " = ";
-            ss << "sparse(sp_i, sp_j, w" << i[0] << "(sp==1), sp_m, sp_n);" << std::endl;
+            ss << indent << xw(o[0]) << " = ";
+            ss << "sparse(sp_i, sp_j, " << xw(i[0]) << "(sp==1), sp_m, sp_n);" << std::endl;
           }
           break;
         case OP_NORM1:
-          ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 1);" << std::endl;
+          ss << indent << xw(o[0]) << " = norm(" << xw(i[0]) << ", 1);" << std::endl;
           break;
         case OP_NORM2:
-          ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 2);" << std::endl;
+          ss << indent << xw(o[0]) << " = norm(" << xw(i[0]) << ", 2);" << std::endl;
           break;
         case OP_NORMF:
-          ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 'fro');" << std::endl;
+          ss << indent << xw(o[0]) << " = norm(" << xw(i[0]) << ", 'fro');" << std::endl;
           break;
         case OP_NORMINF:
-          ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", inf);" << std::endl;
+          ss << indent << xw(o[0]) << " = norm(" << xw(i[0]) << ", inf);" << std::endl;
           break;
         case OP_MMIN:
-          ss << indent << "w" << o[0] << " = min(w" << i[0] << ");" << std::endl;
+          ss << indent << xw(o[0]) << " = min(" << xw(i[0]) << ");" << std::endl;
           break;
         case OP_MMAX:
-          ss << indent << "w" << o[0] << " = max(w" << i[0] << ");" << std::endl;
+          ss << indent << xw(o[0]) << " = max(" << xw(i[0]) << ");" << std::endl;
           break;
         case OP_NOT:
-          ss << indent << "w" << o[0] << " = ~" << "w" << i[0] << ";" << std::endl;
+          ss << indent << xw(o[0]) << " = ~" << xw(i[0]) << ";" << std::endl;
           break;
         case OP_OR:
-          ss << indent << "w" << o[0] << " = w" << i[0] << " | w" << i[1] << ";" << std::endl;
+          ss << indent << xw(o[0]) << " = " << xw(i[0]) << " | " << xw(i[1]) << ";" << std::endl;
           break;
         case OP_AND:
-          ss << indent << "w" << o[0] << " = w" << i[0] << " & w" << i[1] << ";" << std::endl;
+          ss << indent << xw(o[0]) << " = " << xw(i[0]) << " & " << xw(i[1]) << ";" << std::endl;
           break;
         case OP_NE:
-          ss << indent << "w" << o[0] << " = w" << i[0] << " ~= w" << i[1] << ";" << std::endl;
+          ss << indent << xw(o[0]) << " = " << xw(i[0]) << " ~= " << xw(i[1]) << ";" << std::endl;
           break;
         case OP_IF_ELSE_ZERO:
-          ss << indent << "w" << o[0] << " = ";
-          ss << "if_else_zero_gen(w" << i[0] << ", w" << i[1] << ");" << std::endl;
+          ss << indent << xw(o[0]) << " = ";
+          ss << "if_else_zero_gen(" << xw(i[0]) << ", " << xw(i[1]) << ");" << std::endl;
           break;
         case OP_RESHAPE:
           {
@@ -1721,17 +1878,17 @@ namespace casadi {
               {{"name", "sp_in"}, {"indent_level", indent_level}, {"as_matrix", true}});
             x.sparsity().export_code("matlab", ss,
               {{"name", "sp_out"}, {"indent_level", indent_level}, {"as_matrix", false}});
-            ss << indent << "w" << o[0] << " = sparse(sp_out_i, sp_out_j, ";
-            ss << "w" << i[0] << "(sp_in==1), sp_out_m, sp_out_n);" << std::endl;
+            ss << indent << xw(o[0]) << " = sparse(sp_out_i, sp_out_j, ";
+            ss << "" << xw(i[0]) << "(sp_in==1), sp_out_m, sp_out_n);" << std::endl;
           }
           break;
         default:
           if (x.is_binary()) {
-            ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,
-              "w"+std::to_string(i[0]), "w"+std::to_string(i[1])) << ";" << std::endl;
+            ss << indent << xw(o[0]) << " = " << casadi::casadi_math<double>::print(op,
+              xw(i[0]), xw(i[1])) << ";" << std::endl;
           } else if (x.is_unary()) {
-            ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,
-              "w"+std::to_string(i[0])) << ";" << std::endl;
+            ss << indent << xw(o[0]) << " = " << casadi::casadi_math<double>::print(op,
+              xw(i[0])) << ";" << std::endl;
           } else {
             ss << "unknown" + x.class_name() << std::endl;
           }
@@ -1774,6 +1931,10 @@ namespace casadi {
     s.pack("MXFunction::default_in", default_in_);
     s.pack("MXFunction::live_variables", live_variables_);
     s.pack("MXFunction::print_instructions", print_instructions_);
+    s.pack("MXFunction::zero_array_size", static_cast<casadi_int>(zero_array_.size()));
+    s.pack("MXFunction::ce_off", ce_off_);
+    s.pack("MXFunction::n_ce", n_ce_);
+    s.pack("MXFunction::ce_active", ce_active_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_serialize_members(s);
   }
@@ -1798,6 +1959,13 @@ namespace casadi {
     s.unpack("MXFunction::live_variables", live_variables_);
     print_instructions_ = false;
     if (version >= 2) s.unpack("MXFunction::print_instructions", print_instructions_);
+    casadi_int zero_array_size;
+    s.unpack("MXFunction::zero_array_size", zero_array_size);
+    zero_array_.resize(zero_array_size, 0);
+    zero_array_bvec_t_.resize(zero_array_size, bvec_t(0));
+    s.unpack("MXFunction::ce_off", ce_off_);
+    s.unpack("MXFunction::n_ce", n_ce_);
+    s.unpack("MXFunction::ce_active", ce_active_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
   }

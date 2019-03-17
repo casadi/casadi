@@ -131,8 +131,8 @@ namespace casadi {
 
     casadi_int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
-    g.local("tt", "casadi_real", "*");
+    g.local("ss", "const casadi_real", "*");
+    g.local("tt", "const casadi_real", "*");
     g.local("i", "casadi_int");
     g.local("j", "casadi_int");
     g.local("k", "casadi_int");

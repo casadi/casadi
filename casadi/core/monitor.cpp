@@ -108,13 +108,13 @@ namespace casadi {
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const {
     // Print comment
-    g.local("rr", "casadi_real", "*");
+    g.local("ss", "const casadi_real", "*");
     g.local("i", "casadi_int");
     g << g.printf(comment_ + "\\n[") << "\n"
-      << "  for (i=0, rr=" << g.work(arg[0], dep(0).nnz())
+      << "  for (i=0, ss=" << g.work(arg[0], dep(0).nnz())
       << "; i!=" << nnz() << "; ++i) {\n"
       << "    if (i!=0) " << g.printf(", ") << "\n"
-      << "    " << g.printf("%g", "*rr++") << "\n"
+      << "    " << g.printf("%g", "*ss++") << "\n"
       << "  }\n"
       << "  " << g.printf("]\\n") << "\n";
 

@@ -121,6 +121,15 @@ namespace casadi {
     return 0;
   }
 
+  int ConstantDM::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    if (iw[0]) {
+      res[0] = const_cast<bvec_t*>(get_ptr(bvec_zeros_));
+    } else {
+      std::fill_n(res[0], nnz(), 0);
+    }
+    return 0;
+  }
+
   int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     std::fill_n(res[0], nnz(), 0);
     return 0;
@@ -132,8 +141,12 @@ namespace casadi {
     // Print the constant
     std::string ind = g.constant(x_.nonzeros());
 
-    // Copy the constant to the work vector
-    g << g.copy(ind, nnz(), g.work(res[0], nnz())) << '\n';
+    if (res[0]<=-2) {
+      g << g.work(res[0], nnz()) << " = " << ind << ";\n";
+    } else {
+      // Copy the constant to the work vector
+      g << g.copy(ind, nnz(), g.work(res[0], nnz())) << '\n';
+    }
   }
 
   bool ConstantMX::__nonzero__() const {
@@ -302,6 +315,8 @@ namespace casadi {
     std::vector<double> v;
     s.unpack("ConstantMX::nonzeros", v);
     x_ = DM(sparsity_, v);
+    sx_ = x_;
+    bvec_zeros_.resize(nnz(), bvec_t(0));
   }
 
   void ZeroByZero::serialize_type(SerializingStream& s) const {
@@ -385,7 +400,11 @@ namespace casadi {
   void ConstantFile::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res) const {
-    g << g.copy(g.rom_double(this), nnz(), g.work(res[0], nnz())) << '\n';
+    if (res[0]<=-2) {
+      g << g.work(res[0], nnz()) << " = " << g.rom_double(this) << ";\n";
+    } else {
+      g << g.copy(g.rom_double(this), nnz(), g.work(res[0], nnz())) << '\n';
+    }
   }
 
   ConstantPool::ConstantPool(const DM& x, const std::string& name) :

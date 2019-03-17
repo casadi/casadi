@@ -743,6 +743,8 @@ namespace casadi {
 
     static std::map<casadi_int, MXNode* (*)(DeserializingStream&)> deserialize_map;
 
+    virtual bool elide_copy() const { return false; }
+
   protected:
     /** \brief Deserializing constructor
 

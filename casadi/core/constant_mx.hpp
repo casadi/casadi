@@ -194,7 +194,9 @@ namespace casadi {
     /** \brief  Constructor
 
         \identifier{za} */
-    explicit ConstantDM(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x) {}
+    explicit ConstantDM(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x), sx_(x) {
+      bvec_zeros_.resize(nnz(), bvec_t(0));
+    }
 
     /// Destructor
     ~ConstantDM() override {}
@@ -210,7 +212,11 @@ namespace casadi {
 
         \identifier{zc} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
-      std::copy(x_->begin(), x_->end(), res[0]);
+      if (iw[0]) {
+        res[0] = const_cast<double*>(get_ptr(x_));
+      } else {
+        std::copy(x_->begin(), x_->end(), res[0]);
+      }
       return 0;
     }
 
@@ -219,9 +225,16 @@ namespace casadi {
         \identifier{zd} */
     int eval_sx(const SXElem** arg, SXElem** res,
                          casadi_int* iw, SXElem* w) const override {
-      std::copy(x_->begin(), x_->end(), res[0]);
+      if (iw[0]) {
+        res[0] = const_cast<SXElem*>(get_ptr(sx_));
+      } else {
+        std::copy(x_->begin(), x_->end(), res[0]);
+      }
       return 0;
     }
+
+    /** \brief  Propagate sparsity forward */
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation
 
@@ -253,6 +266,8 @@ namespace casadi {
 
         \identifier{zh} */
     Matrix<double> x_;
+    Matrix<SXElem> sx_;
+    std::vector<bvec_t> bvec_zeros_;
 
     /** \brief Serialize an object without type information
 
@@ -262,6 +277,11 @@ namespace casadi {
 
         \identifier{zj} */
     void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor
+
+        \identifier{zk} */
+    bool elide_copy() const override { return nnz()>=10; }
 
     /** \brief Deserializing constructor
 
@@ -335,6 +355,8 @@ namespace casadi {
 
         \identifier{zt} */
     std::vector<double> x_;
+
+    bool elide_copy() const override { return nnz()>=100; }
 
     /** \brief Serialize an object without type information
 
