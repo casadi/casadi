@@ -55,6 +55,7 @@ namespace casadi {
     this->prefix = "";
     avoid_stack_ = false;
     indent_ = 2;
+    sz_zeros_ = -1;
 
     // Read options
     for (auto&& e : opts) {
@@ -622,6 +623,11 @@ namespace casadi {
       s << endl;
     }
 
+    if (sz_zeros_>=0) {
+      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros_));
+      s << endl;
+    }
+
     // Print file scope double work
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
@@ -657,6 +663,9 @@ namespace casadi {
   }
 
   string CodeGenerator::work(casadi_int n, casadi_int sz) const {
+    if (n<=-2) {
+      return "r[" + str(-n-2) + "]";
+    }
     if (n<0 || sz==0) {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
@@ -667,11 +676,15 @@ namespace casadi {
   }
 
   string CodeGenerator::workel(casadi_int n) const {
-    if (n<0) return "0";
-    stringstream s;
-    if (this->codegen_scalars) s << "*";
-    s << "w" << n;
-    return s.str();
+    if (n==-1) return "0";
+    if (n<=-2) {
+      return "(*" + work(n, 1) + ")";
+    } else {
+      stringstream s;
+      if (this->codegen_scalars) s << "*";
+      s << "w" << n;
+      return s.str();
+    }
   }
 
   string CodeGenerator::array(const string& type, const string& name, casadi_int len,
@@ -1654,6 +1667,10 @@ namespace casadi {
   void CodeGenerator::init_local(const string& name, const string& def) {
     bool inserted = local_default_.insert(make_pair(name, def)).second;
     casadi_assert(inserted, name + " already defined");
+  }
+
+  void CodeGenerator::require_zeros(casadi_int size) {
+    if (size>sz_zeros_) sz_zeros_ = size;
   }
 
   string CodeGenerator::

@@ -198,7 +198,6 @@ namespace casadi {
     T* output0 = res[0];
     const T* input0 = arg[0];
     const T* input1 = arg[1];
-
     if (!ScX && !ScY) {
       casadi_math<T>::fun(op_, input0, input1, output0, nnz());
     } else if (ScX) {
