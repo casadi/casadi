@@ -210,6 +210,8 @@ namespace casadi {
         \identifier{si} */
     bool avoid_stack() { return avoid_stack_;}
 
+    void require_zeros(casadi_int size);
+
     /** \brief Print a constant in a lossless but compact manner
 
         \identifier{sj} */
@@ -805,6 +807,9 @@ namespace casadi {
 
     // Does any function need thread-local memory?
     bool needs_mem_;
+
+    // Amount of zeros needed
+    casadi_int sz_zeros_;
 
     // Hash a vector
     static size_t hash(const std::vector<double>& v);

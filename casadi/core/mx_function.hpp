@@ -87,6 +87,20 @@ namespace casadi {
     /// Default input values
     std::vector<double> default_in_;
 
+    /// Offset for copy elision
+    std::vector<casadi_int> ce_off_;
+
+    /// Number elided locations
+    casadi_int n_ce_;
+
+    /// Copy elision used?
+    bool ce_active_;
+
+    /// 0-buffer for copy elision
+    std::vector<double> zero_array_;
+    /// 0-buffer for copy elision
+    std::vector<bvec_t> zero_array_bvec_t_;
+
     /// Live variables?
     bool live_variables_;
 

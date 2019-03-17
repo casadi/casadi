@@ -269,7 +269,7 @@ namespace casadi {
     g << "rr = " << g.work(res[0], this->nnz()) << ";\n";
 
     // Array for A
-    g.local("ss", "casadi_real", "*");
+    g.local("ss", "const casadi_real", "*");
     g << "ss = " << g.work(arg[1], this->dep(1).nnz()) << ";\n";
 
     // Copy b to x if not inplace
