@@ -25,7 +25,7 @@
 
 #include "sparsity_cast.hpp"
 #include "casadi_misc.hpp"
-#include "getnonzeros.hpp"
+
 
 using namespace std;
 
@@ -99,7 +99,8 @@ namespace casadi {
   }
 
   MX SparsityCast::get_reshape(const Sparsity& sp) const {
-    return reshape(dep(0), sp);
+    return MXNode::get_reshape(sp);
+//    return reshape(dep(0), sp);
   }
 
   MX SparsityCast::get_sparsity_cast(const Sparsity& sp) const {
@@ -107,13 +108,13 @@ namespace casadi {
   }
 
   MX SparsityCast::get_nzref(const Sparsity& sp, const vector<casadi_int>& nz) const {
-    return GetNonzeros::create(sp, dep(), nz);
+    return dep()->get_nzref(sp, nz);
   }
 
   MX SparsityCast::get_transpose() const {
     // For vectors, reshape is also a transpose
     if (dep().is_vector() && sparsity().is_vector()) {
-      return dep();
+      return dep()->get_sparsity_cast(sparsity().T());
     } else {
       return MXNode::get_transpose();
     }

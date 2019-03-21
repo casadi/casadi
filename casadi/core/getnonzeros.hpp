@@ -138,6 +138,9 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
+    /// Create set sparse
+    MX get_project(const Sparsity& sp) const override;
+
     /** \brief  Print expression
 
         \identifier{id} */

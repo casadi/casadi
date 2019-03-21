@@ -57,6 +57,20 @@ namespace casadi {
     return arg.at(0) + "{" + str(oind_) + "}";
   }
 
+  MX OutputNode::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+    if (dep().op()==OP_HORZSPLIT) {
+      casadi_int nnz = 0;
+      for (casadi_int i=0;i<oind_;++i) {
+        nnz += dep()->sparsity(i).nnz();
+      }
+      std::vector<casadi_int> nz_mod = nz;
+      for (auto & e : nz_mod) e+= nnz;
+      return dep().dep()->get_nzref(sp, nz_mod);
+    } else {
+      return MXNode::get_nzref(sp, nz);
+    }
+  }
+
   void OutputNode::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("OutputNode::oind", oind_);
