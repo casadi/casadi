@@ -472,6 +472,15 @@ namespace casadi {
     return Matrix<casadi_int>(sparsity(), nz, false);
   }
 
+  MX GetNonzerosVector::get_project(const Sparsity& sp) const {
+    /*if (false && sp.is_dense()) {
+      return dep(0)->get_nzref(sp, nz_);
+    } else {
+      return MXNode::get_project(sp);
+    }*/
+    return MXNode::get_project(sp);
+  }
+
   void GetNonzerosVector::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res) const {
@@ -485,7 +494,16 @@ namespace casadi {
     g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz())
       << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "; cii!=" << ind << "+" << nz_.size()
-      << "; ++cii) *rr++ = *cii>=0 ? ss[*cii] : 0;\n";
+      << "; ++cii) *rr++ = ";
+    bool any_neg = false;
+    for (casadi_int e : nz_) {
+      if (e<0) any_neg = true;
+    }
+    if (any_neg) {
+      g << "*cii>=0 ? ss[*cii] : 0;\n";
+    } else {
+      g << "ss[*cii];\n";
+    }
   }
 
   MX GetNonzeros::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
@@ -501,6 +519,7 @@ namespace casadi {
   }
 
   MX GetNonzeros::get_project(const Sparsity& sp) const {
+    return MXNode::get_project(sp);
     vector<unsigned char> mapping;
     Sparsity res = sp.unite(sparsity(), mapping);
 
@@ -523,7 +542,12 @@ namespace casadi {
         nz.push_back(-1);
       }
     }
-
+    if (sp.is_dense()) {
+      uout() << "nz_all" << nz_all << std::endl;
+      if (nz_all.size()>=3 && nz_all[1]==31) {
+        casadi_error("foo here");
+      }
+    }
     return dep()->get_nzref(sp, nz);
   }
 
