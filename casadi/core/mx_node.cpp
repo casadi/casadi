@@ -556,7 +556,21 @@ namespace casadi {
   }
 
   MX MXNode::get_nzref(const Sparsity& sp, const vector<casadi_int>& nz) const {
-    return GetNonzeros::create(sp, shared_from_this<MX>(), nz);
+    if (is_range(nz, 0, nnz())) {
+      return get_sparsity_cast(sp);
+    } else {
+      return GetNonzeros::create(sp, shared_from_this<MX>(), nz);
+    }
+
+    //std::vector<casadi_int> nz_filtered;
+    //for (auto e : nz) {
+   //   if (e>=0) nz_filtered.push_back(e);
+    //}
+   // if (is_range(nz_filtered, 0, nnz())) {
+    //  return get_project(sp);
+    //} else {
+      return GetNonzeros::create(sp, shared_from_this<MX>(), nz);
+    //}
   }
 
   MX MXNode::get_nz_ref(const MX& nz) const {

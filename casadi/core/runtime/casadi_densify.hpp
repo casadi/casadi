@@ -20,11 +20,17 @@ void casadi_densify(const T1* x, const casadi_int* sp_x, T2* y, casadi_int tr) {
       }
     }
   } else {
-    for (i=0; i<ncol_x; ++i) {
-      for (el=colind_x[i]; el!=colind_x[i+1]; ++el) {
-        y[row_x[el]] = CASADI_CAST(T2, *x++);
+    if (nrow_x==1) {
+      for (i=0; i<ncol_x; ++i) {
+        if (colind_x[i]!=colind_x[i+1]) y[i] = CASADI_CAST(T2, *x++);
       }
-      y += nrow_x;
+    } else {
+      for (i=0; i<ncol_x; ++i) {
+        for (el=colind_x[i]; el!=colind_x[i+1]; ++el) {
+          y[row_x[el]] = CASADI_CAST(T2, *x++);
+        }
+        y += nrow_x;
+      }
     }
   }
 }

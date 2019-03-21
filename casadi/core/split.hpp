@@ -121,6 +121,9 @@ namespace casadi {
     /// Create a horizontal concatenation node
     MX get_horzcat(const std::vector<MX>& x) const override;
 
+    /** \brief Get the nonzeros of matrix */
+    //MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new Horzsplit(s); }
 
