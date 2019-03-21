@@ -351,7 +351,7 @@ namespace casadi {
     for (auto&& e : x) {
       if (e.nnz()!=0) X.push_back(e);
     }
- 
+
     // Check x length
     if (X.size()!=nout()) {
       return MXNode::get_horzcat(x);
@@ -366,6 +366,10 @@ namespace casadi {
 
     return sparsity_cast(dep(), MXNode::get_horzcat(x).sparsity());
   }
+
+  //MX Horzsplit::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+
+  //}
 
   MX Vertsplit::get_vertcat(const std::vector<MX>& x) const {
     // Check x length

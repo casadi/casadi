@@ -95,6 +95,9 @@ namespace casadi {
     /// Create a vertical concatenation node (vectors only)
     MX get_vertcat(const std::vector<MX>& x) const override { return dep()->get_vertcat(x);}
 
+    /// Create a vertical concatenation node (vectors only)
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+
     /** Obtain information about node */
     Dict info() const override { return {{"oind", oind_}}; }
 

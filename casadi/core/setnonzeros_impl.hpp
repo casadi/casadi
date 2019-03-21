@@ -849,8 +849,16 @@ namespace casadi {
     g.local("ss", "const casadi_real", "*");
     g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
       << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=" << ind
-      << "+" << this->nz_.size() << "; ++cii, ++ss)"
-      << " if (*cii>=0) rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
+      << "+" << this->nz_.size() << "; ++cii, ++ss)";
+    bool any_neg = false;
+    for (casadi_int e : this->nz_) {
+      if (e<0) any_neg = true;
+    }
+    if (any_neg) {
+      g << "if (*cii>=0) ";
+    }
+    g << "rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
+
   }
 
   template<bool Add>
