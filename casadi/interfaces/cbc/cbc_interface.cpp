@@ -315,6 +315,9 @@ namespace casadi {
     // Read Osi options
     for (auto&& op : opts_) {
       {
+        if (op.first=="hot_start") continue;
+      }
+      {
         // Check for double params
         auto it = param_map_double.find(op.first);
         if (it!=param_map_double.end()) {
