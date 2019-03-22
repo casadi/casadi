@@ -281,7 +281,7 @@ namespace casadi {
     }
 
     std::vector<bool> reduce_in = join(reduce_in_, reduce_out_, reduce_in_);
-    Function dm = MapSum::create("map_" + df.name(), parallelization(),
+    Function dm = MapSum::create("mapsum" + str(n_) + "_" + df.name(), parallelization(),
       df, n_, reduce_in, reduce_out_);
 
     // Input expressions
@@ -341,7 +341,7 @@ namespace casadi {
     }
 
     std::vector<bool> reduce_in = join(reduce_in_, reduce_out_, reduce_out_);
-    Function dm = MapSum::create("map_" + df.name(), parallelization(),
+    Function dm = MapSum::create("mapsum" + str(n_) + "_" + df.name(), parallelization(),
       df, n_, reduce_in, reduce_in_);
 
     // Input expressions
