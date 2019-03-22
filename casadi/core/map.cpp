@@ -164,11 +164,13 @@ namespace casadi {
     g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
-      g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+      if (f_.nnz_in(j))
+        g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
-      g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+      if (f_.nnz_out(j))
+        g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
     }
     g << "}\n";
   }
