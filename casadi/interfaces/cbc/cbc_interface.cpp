@@ -185,16 +185,6 @@ namespace casadi {
     }
   }
 
-  class CasadiHandler : public CoinMessageHandler {
-    public:
-      virtual int print() ;
-  };
-
-  int CasadiHandler::print() {
-    uout() << messageBuffer() << std::endl;
-    return 0;
-  }
-
   void CbcInterface::init(const Dict& opts) {
     // Call the init method of the base class
     Conic::init(opts);
@@ -364,9 +354,6 @@ namespace casadi {
 
     std::vector<const char*> main_options_char;
     for (const auto& s : main1_options) main_options_char.push_back(s.c_str());
-
-    CasadiHandler ch;
-    model.passInMessageHandler(&ch);
 
     m->fstats.at("preprocessing").toc();
     m->fstats.at("solver").tic();
