@@ -331,6 +331,9 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;
 
+    /** \brief Wrap in a Function with options */
+    Function wrap_as_needed(const Dict& opts) const;
+
     /** \brief Which variables enter with some order
     *
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed

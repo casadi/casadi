@@ -569,7 +569,8 @@ namespace casadi {
     const std::vector<casadi_int>& reduce_in,
     const std::vector<casadi_int>& reduce_out,
     const Dict& opts) const {
-    return MapSum::create("mapsum_" + name(), "serial", *this, n, reduce_in, reduce_out, opts);
+    return MapSum::create("mapsum_" + str(n) + "_" + name(), "serial",
+      *this, n, reduce_in, reduce_out, opts);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, casadi_int n,
@@ -1636,6 +1637,10 @@ namespace casadi {
 
   Function Function::wrap() const {
     return (*this)->wrap();
+  }
+
+  Function Function::wrap_as_needed(const Dict& opts) const {
+    return (*this)->wrap_as_needed(opts);
   }
 
   bool Function::operator==(const Function& f) const {

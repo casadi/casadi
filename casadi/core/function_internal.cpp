@@ -725,8 +725,9 @@ namespace casadi {
     }
   }
 
-  bool FunctionInternal::incache(const std::string& fname, Function& f) const {
-    auto it = cache_.find(fname);
+  bool FunctionInternal::incache(const std::string& fname, Function& f,
+      const std::string& suffix) const {
+    auto it = cache_.find(fname+":"+suffix);
     if (it!=cache_.end() && it->second.alive()) {
       f = shared_cast<Function>(it->second.shared());
       return true;
@@ -735,9 +736,9 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::tocache(const Function& f) const {
+  void FunctionInternal::tocache(const Function& f, const std::string& suffix) const {
     // Add to cache
-    cache_.insert(make_pair(f.name(), f));
+    cache_.insert(make_pair(f.name()+":"+suffix, f));
     // Remove a lost reference, if any, to prevent uncontrolled growth
     for (auto it = cache_.begin(); it!=cache_.end(); ++it) {
       if (!it->second.alive()) {
@@ -764,6 +765,21 @@ namespace casadi {
       f = Map::create(parallelization, self(), n);
     }
     return f;
+  }
+
+  Function FunctionInternal::wrap_as_needed(const Dict& opts) const {
+    if (opts.empty()) return shared_from_this<Function>();
+    string fname = "wrap_" + name_;
+    // Options
+    Dict my_opts = opts;
+    my_opts["derivative_of"] = derivative_of_;
+    my_opts["ad_weight"] = ad_weight();
+    my_opts["ad_weight_sp"] = sp_weight();
+    my_opts["max_num_dir"] = max_num_dir_;
+    // Wrap the function
+    vector<MX> arg = mx_in();
+    vector<MX> res = self()(arg);
+    return Function(fname, arg, res, name_in_, name_out_, my_opts);
   }
 
   Function FunctionInternal::wrap() const {

@@ -58,7 +58,16 @@ namespace casadi {
                           const std::vector<bool>& reduce_out,
                           const Dict& opts) {
     if (parallelization == "serial") {
-      return Function::create(new MapSum(name, f, n, reduce_in, reduce_out), opts);
+      string suffix = str(reduce_in)+str(reduce_out);
+      Function ret;
+      if (!f->incache(name, ret, suffix)) {
+        // Create new serial map
+        ret = Function::create(new MapSum(name, f, n, reduce_in, reduce_out), opts);
+        casadi_assert_dev(ret.name()==name);
+        // Save in cache
+        f->tocache(ret, suffix);
+      }
+      return ret.wrap_as_needed(opts);
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }

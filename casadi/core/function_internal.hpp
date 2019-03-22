@@ -525,11 +525,14 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;
 
+    /** \brief Wrap in an Function instance consisting of only one MX call */
+    Function wrap_as_needed(const Dict& opts) const;
+
     /** \brief Get function in cache */
-    bool incache(const std::string& fname, Function& f) const;
+    bool incache(const std::string& fname, Function& f, const std::string& suffix="") const;
 
     /** \brief Save function to cache */
-    void tocache(const Function& f) const;
+    void tocache(const Function& f, const std::string& suffix="") const;
 
     /** \brief Generate code the function */
     void codegen(CodeGenerator& g, const std::string& fname) const;
