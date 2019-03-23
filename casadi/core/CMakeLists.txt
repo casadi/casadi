@@ -89,6 +89,7 @@ set(CASADI_INTERNAL
   generic_type_internal.hpp
   options.cpp
   casadi_misc.cpp
+  casadi_common.cpp
   timing.cpp
   polynomial.cpp
 

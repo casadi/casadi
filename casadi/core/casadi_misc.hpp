@@ -120,6 +120,8 @@ private:
   CASADI_EXPORT std::vector< std::vector<int> > to_int(
     const std::vector< std::vector<casadi_int> >& rhs);
 
+  CASADI_EXPORT std::string str_bvec(bvec_t v);
+
   /**  \brief Slicing vector
   *  \param v Vector to slice
   *  \param i List of indices

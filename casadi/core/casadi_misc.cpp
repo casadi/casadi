@@ -385,4 +385,14 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
   }
 
 
+  std::string str_bvec(bvec_t v) {
+    std::stringstream ss;
+    for (casadi_int i=0;i<sizeof(bvec_t)*8;++i) {
+      bool bit = v & (bvec_t(1) << i);
+      ss << (bit ? "1" : "0");
+    }
+    return ss.str();
+  }
+
+
 } // namespace casadi
