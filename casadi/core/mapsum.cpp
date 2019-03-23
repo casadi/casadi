@@ -334,7 +334,9 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, inames, onames, opts);
+    Dict custom_opts = opts;
+    custom_opts["always_inline"] = true;
+    return Function(name, arg, res, inames, onames, custom_opts);
   }
 
   Function MapSum
@@ -394,7 +396,9 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, inames, onames, opts);
+    Dict custom_opts = opts;
+    custom_opts["always_inline"] = true;
+    return Function(name, arg, res, inames, onames, custom_opts);
   }
 
   int MapSum::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
