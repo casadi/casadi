@@ -100,9 +100,9 @@ namespace casadi {
     casadi_int nnz = dep(0).nnz();
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << n_ << ";++i) {\n"
-      << "    " << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
-                          g.work(res[0], sparsity().nnz()) + "+ i*" + str(nnz)) << "\n"
-      << "  }\n";
+      << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
+                g.work(res[0], sparsity().nnz()) + "+ i*" + str(nnz)) << "\n"
+      << "}\n";
   }
 
   HorzRepsum::HorzRepsum(const MX& x, casadi_int n) : n_(n) {
