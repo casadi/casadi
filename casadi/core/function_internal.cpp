@@ -298,7 +298,13 @@ namespace casadi {
       {"custom_jacobian",
        {OT_FUNCTION,
         "Override CasADi's AD. Use together with 'jac_penalty': 0. "
-        "Note: Highly experimental. Syntax may break often."}}
+        "Note: Highly experimental. Syntax may break often."}},
+      {"is_diff_in",
+       {OT_BOOLVECTOR,
+        "Indicate for each input if it should be differentiable."}},
+      {"is_diff_out",
+       {OT_BOOLVECTOR,
+        "Indicate for each output if it should be differentiable."}}
      }
   };
 
@@ -350,6 +356,8 @@ namespace casadi {
     opts["dump"] = dump_;
     opts["forward_options"] = forward_options_;
     opts["reverse_options"] = reverse_options_;
+    //opts["is_diff_in"] = is_diff_in_;
+    //opts["is_diff_out"] = is_diff_out_;
     return opts;
   }
 
@@ -435,8 +443,13 @@ namespace casadi {
         always_inline_ = op.second;
       } else if (op.first=="never_inline") {
         never_inline_ = op.second;
+      } else if (op.first=="is_diff_in") {
+        is_diff_in_ = op.second;
+      } else if (op.first=="is_diff_out") {
+        is_diff_out_ = op.second;
       }
     }
+
 
     // Verbose?
     if (verbose_) casadi_message(name_ + "::init");
@@ -454,6 +467,16 @@ namespace casadi {
       casadi_warning("Function " + name_ + " has many outputs (" + str(n_out_) + "). "
                      "Changing the problem formulation is strongly encouraged.");
     }
+
+    if (is_diff_in_.empty()) is_diff_in_.resize(n_in_, true);
+    if (is_diff_out_.empty()) is_diff_out_.resize(n_out_, true);
+
+    casadi_assert(n_in_==is_diff_in_.size(), "Dimension mismatch");
+    casadi_assert(n_out_==is_diff_out_.size(), "Dimension mismatch");
+
+
+    for (casadi_int i=0;i<n_in_;++i) is_diff_in_[i] = is_diff_in_[i] && is_diff_in(i);
+    for (casadi_int i=0;i<n_out_;++i) is_diff_out_[i] = is_diff_out_[i] && is_diff_out(i);
 
     // Query input sparsities if not already provided
     if (sparsity_in_.empty()) {
@@ -792,6 +815,8 @@ namespace casadi {
       opts["ad_weight"] = ad_weight();
       opts["ad_weight_sp"] = sp_weight();
       opts["max_num_dir"] = max_num_dir_;
+      opts["is_diff_in"] = is_diff_in_;
+      opts["is_diff_out"] = is_diff_out_;
       // Wrap the function
       vector<MX> arg = mx_in();
       vector<MX> res = self()(arg);
@@ -834,7 +859,22 @@ namespace casadi {
     static inline void sp(const FunctionInternal *f,
                           const bvec_t** arg, bvec_t** res,
                           casadi_int* iw, bvec_t* w, void* mem) {
-      f->sp_forward(arg, res, iw, w, mem);
+      std::vector<const bvec_t*> argm(f->sz_arg(), nullptr);
+      std::vector<bvec_t> wm(f->nnz_in(), bvec_t(0));
+      bvec_t* wp = get_ptr(wm);
+
+      for (casadi_int i=0;i<f->n_in_;++i) {
+        if (f->is_diff_in_[i]) {
+          argm[i] = arg[i];
+        } else  {
+          argm[i] = arg[i] ? wp : nullptr;
+          wp += f->nnz_in(i);
+        }
+      }
+      f->sp_forward(get_ptr(argm), res, iw, w, mem);
+      for (casadi_int i=0;i<f->n_out_;++i) {
+        if (!f->is_diff_out_[i] && res[i]) casadi_clear(res[i], f->nnz_out(i));
+      }
     }
   };
   template<> struct JacSparsityTraits<false> {
@@ -842,7 +882,13 @@ namespace casadi {
     static inline void sp(const FunctionInternal *f,
                           bvec_t** arg, bvec_t** res,
                           casadi_int* iw, bvec_t* w, void* mem) {
+      for (casadi_int i=0;i<f->n_out_;++i) {
+        if (!f->is_diff_out_[i] && res[i]) casadi_clear(res[i], f->nnz_out(i));
+      }
       f->sp_reverse(arg, res, iw, w, mem);
+      for (casadi_int i=0;i<f->n_in_;++i) {
+        if (!f->is_diff_in_[i] && arg[i]) casadi_clear(arg[i], f->nnz_in(i));
+      }
     }
   };
 
@@ -1117,7 +1163,8 @@ namespace casadi {
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies
-            sp_forward(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), nullptr);
+            JacSparsityTraits<true>::sp(this, get_ptr(arg), get_ptr(res),
+              get_ptr(iw), get_ptr(w), nullptr);
 
             // Temporary bit work vector
             bvec_t spsens;
@@ -1408,10 +1455,12 @@ namespace casadi {
 
             // Propagate the dependencies
             if (use_fwd) {
-              sp_forward(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), memory(0));
+              JacSparsityTraits<true>::sp(this, get_ptr(arg_fwd), get_ptr(res),
+                get_ptr(iw), get_ptr(w), memory(0));
             } else {
               fill(w.begin(), w.end(), 0);
-              sp_reverse(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), memory(0));
+              JacSparsityTraits<false>::sp(this, get_ptr(arg_adj), get_ptr(res),
+                get_ptr(iw), get_ptr(w), memory(0));
             }
 
             // Temporary bit work vector
@@ -3042,8 +3091,29 @@ namespace casadi {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == "jac_" + n) {
-        // Dense Jacobian by default
-        return Sparsity::dense(derivative_of_.nnz_out(), derivative_of_.nnz_in());
+        std::vector<casadi_int> row(derivative_of_.nnz_out());
+        casadi_int offset = 0;
+        for (casadi_int i=0;i<derivative_of_.n_out();++i) {
+          if (derivative_of_->is_diff_out_[i]) {
+            for (casadi_int k=0;k<derivative_of_.nnz_out(i);++k) {
+              row.push_back(offset++);
+            }
+          } else {
+            offset += derivative_of_.nnz_out(i);
+          }
+        }
+        std::vector<casadi_int> col(derivative_of_.nnz_in());
+        offset = 0;
+        for (casadi_int i=0;i<derivative_of_.n_in();++i) {
+          if (derivative_of_->is_diff_in_[i]) {
+            for (casadi_int k=0;k<derivative_of_.nnz_in(i);++k) {
+              col.push_back(offset++);
+            }
+          } else {
+            offset += derivative_of_.nnz_in(i);
+          }
+        }
+        return Sparsity::rowcol(row, col, derivative_of_.nnz_out(), derivative_of_.nnz_in());
       }
     }
     // Scalar by default
@@ -3297,6 +3367,8 @@ namespace casadi {
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
     s.version("FunctionInternal", 1);
+    s.pack("FunctionInternal::is_diff_in", is_diff_in_);
+    s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
     s.pack("FunctionInternal::sp_out", sparsity_out_);
     s.pack("FunctionInternal::name_in", name_in_);
@@ -3361,6 +3433,8 @@ namespace casadi {
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
     s.version("FunctionInternal", 1);
+    s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
+    s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
     s.unpack("FunctionInternal::sp_out", sparsity_out_);
     s.unpack("FunctionInternal::name_in", name_in_);

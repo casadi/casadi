@@ -315,6 +315,14 @@ namespace casadi {
     const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
+    /** \brief Get differentiability of inputs/output */
+    /// @{
+    bool is_diff_in(casadi_int ind) const;
+    bool is_diff_out(casadi_int ind) const;
+    std::vector<bool> is_diff_in() const;
+    std::vector<bool> is_diff_out() const;
+    /// @}
+
     // A linear combination of inputs
     typedef std::map<std::string, std::vector<std::string> > AuxOut;
 

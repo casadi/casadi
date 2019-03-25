@@ -745,12 +745,19 @@ namespace casadi {
       // All outputs of the return function
       std::vector<MatType> ret_out(onames.size());
       for (casadi_int i=0; i<n_out_; ++i) {
-        for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
-        ret_out.at(i) = horzcat(v);
+        if (is_diff_out_[i]) {
+          for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
+          ret_out.at(i) = horzcat(v);
+        } else {
+          ret_out.at(i) = MatType(size1_out(i), size2_out(i)*nfwd);
+        }
       }
 
+      Dict options = opts;
+      options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
+      options["is_diff_out"] = is_diff_out_;
       // Assemble function and return
-      return Function(name, ret_in, ret_out, inames, onames, opts);
+      return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("get_forward", e.what());
     }
@@ -784,12 +791,20 @@ namespace casadi {
       // All outputs of the return function
       std::vector<MatType> ret_out(onames.size());
       for (casadi_int i=0; i<n_in_; ++i) {
-        for (casadi_int d=0; d<nadj; ++d) v[d] = asens[d][i];
-        ret_out.at(i) = horzcat(v);
+        if (is_diff_in_[i]) {
+          for (casadi_int d=0; d<nadj; ++d) v[d] = asens[d][i];
+          ret_out.at(i) = horzcat(v);
+        } else {
+          ret_out.at(i) = MatType(size1_in(i), size2_in(i)*nadj);
+        }
       }
 
+      Dict options = opts;
+      options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_out_);
+      options["is_diff_out"] = is_diff_in_;
+
       // Assemble function and return
-      return Function(name, ret_in, ret_out, inames, onames, opts);
+      return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("get_reverse", e.what());
     }
@@ -1060,8 +1075,8 @@ namespace casadi {
 
     // Create an expression factory
     Factory<MatType> f(aux);
-    for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i]);
-    for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i]);
+    for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i], is_diff_in_[i]);
+    for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i], is_diff_out_[i]);
 
     // Specify input expressions to be calculated
     vector<string> ret_iname;

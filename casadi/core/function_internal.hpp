@@ -372,6 +372,9 @@ namespace casadi {
     std::vector<DM> nz_out(const std::vector<double>& res) const;
     ///@}
 
+    virtual bool is_diff_out(casadi_int i) { return true; }
+    virtual bool is_diff_in(casadi_int i) { return true; }
+
     ///@{
     /** \brief Forward mode AD, virtual functions overloaded in derived classes */
     virtual void call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
@@ -819,6 +822,9 @@ namespace casadi {
     /// Number of inputs and outputs
     size_t n_in_, n_out_;
 
+    /// Are inputs and outputs differentiable?
+    std::vector<bool> is_diff_in_, is_diff_out_;
+
     /// Input and output sparsity
     std::vector<Sparsity> sparsity_in_, sparsity_out_;
 
@@ -997,7 +1003,8 @@ namespace casadi {
       fseed[dir].resize(n_in_);
       for (casadi_int iind=0; iind<n_in_; ++iind) {
         std::string n = "f" + str(dir) + "_" +  name_in_[iind];
-        fseed[dir][iind] = MatType::sym(n, sparsity_in(iind));
+        Sparsity sp = is_diff_in_[iind] ? sparsity_in(iind) : Sparsity(size_in(iind));
+        fseed[dir][iind] = MatType::sym(n, sp);
       }
     }
     return fseed;
@@ -1021,7 +1028,7 @@ namespace casadi {
         ss << oind;
 
         // Save to matrix
-        *i = MatType::sym(ss.str(), i->sparsity());
+        *i = MatType::sym(ss.str(), is_diff_out_[oind] ? i->sparsity() : Sparsity(i->size()));
 
       }
     }

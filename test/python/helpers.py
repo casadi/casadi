@@ -130,7 +130,6 @@ def toMX_fun(fun):
   return Function("f",ins,fun(ins))
 
 
-
 class casadiTestCase(unittest.TestCase):
 
   @classmethod
@@ -470,10 +469,11 @@ class casadiTestCase(unittest.TestCase):
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
           res = f.call(inputss,True)
           #print res, "sp", [i.sparsity().dim(True) for i in fseeds]
-          [fwdsens] = forward(res, inputss, [fseeds])
-          [adjsens] = reverse(res, inputss, [aseeds])
+          opts = {"helper_options": {"is_diff_in": f.is_diff_in(), "is_diff_out": f.is_diff_out()}}
+          [fwdsens] = forward(res, inputss, [fseeds],opts)
+          [adjsens] = reverse(res, inputss, [aseeds],opts)
 
-          vf = Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]))
+          vf = Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]),{"is_diff_in": f.is_diff_in()+f.is_diff_in()+f.is_diff_out(), "is_diff_out": f.is_diff_out()+f.is_diff_out()+f.is_diff_in()})
 
           vf_in = list(inputs)
           # Complete random seeding
@@ -499,10 +499,11 @@ class casadiTestCase(unittest.TestCase):
               inputss2 = [sym("i",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
 
               res2 = vf.call(inputss2)
-              [fwdsens2] = forward(res2, inputss2, [fseeds2])
-              [adjsens2] = reverse(res2, inputss2, [aseeds2])
+              opts = {"helper_options": {"is_diff_in": vf.is_diff_in(), "is_diff_out": vf.is_diff_out()}}
+              [fwdsens2] = forward(res2, inputss2, [fseeds2],opts)
+              [adjsens2] = reverse(res2, inputss2, [aseeds2],opts)
 
-              vf2 = Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]))
+              vf2 = Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]),{"is_diff_in": vf.is_diff_in()+vf.is_diff_in()+vf.is_diff_out(), "is_diff_out": vf.is_diff_out()+vf.is_diff_out()+vf.is_diff_in()})
 
               vf2_in = list(inputs)
 

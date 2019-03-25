@@ -919,6 +919,38 @@ namespace casadi {
     }
   }
 
+  bool Function::is_diff_in(casadi_int ind) const {
+    try {
+      return (*this)->is_diff_in_.at(ind);
+    } catch (exception& e) {
+      THROW_ERROR("is_dif_in", e.what());
+    }
+  }
+
+  bool Function::is_diff_out(casadi_int ind) const {
+    try {
+      return (*this)->is_diff_out_.at(ind);
+    } catch (exception& e) {
+      THROW_ERROR("is_dif_in", e.what());
+    }
+  }
+
+  std::vector<bool> Function::is_diff_in() const {
+    try {
+      return (*this)->is_diff_in_;
+    } catch (exception& e) {
+      THROW_ERROR("is_dif_in", e.what());
+    }
+  }
+
+  std::vector<bool> Function::is_diff_out() const {
+    try {
+      return (*this)->is_diff_out_;
+    } catch (exception& e) {
+      THROW_ERROR("is_dif_in", e.what());
+    }
+  }
+
   void Function::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {
     (*this)->sz_work(sz_arg, sz_res, sz_iw, sz_w);
   }
