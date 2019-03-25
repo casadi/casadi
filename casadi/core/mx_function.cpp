@@ -174,7 +174,7 @@ namespace casadi {
       vector<MX> prim = in_[ind].primitives();
       for (casadi_int p=0; p<prim.size(); ++p) {
         casadi_int i = prim[p].get_temp();
-        if (i>=0) {
+        if (i>=0 && prim[p]->nnz()>=10) {
           // Mark read
           prim[p].set_temp(-(n_ce_++)-2);
           nz_max = max(nz_max, prim[p]->nnz());
