@@ -130,8 +130,21 @@ namespace casadi {
   void Densify::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const {
-    g << g.densify(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
-                           g.work(res.front(), nnz())) << "\n";
+     if (false && size1()==1 && dep().nnz()>1) {
+       // Codegen the indices
+       string col = g.constant(dep().sparsity().T().get_row());
+       g.local("cii", "const casadi_int", "*");
+       g.local("ss", "const casadi_real", "*");
+       std::string src = g.work(arg.front(), dep().nnz());
+       std::string dst = g.work(res.front(), nnz());
+
+       g << g.clear(dst, nnz()) << "\n";
+       g << "for (cii=" << col << ", ss=" << src << "; cii!=" << col << "+" <<
+         dep().nnz() << "; ++cii) " << dst << "[*cii] = *ss++;\n";
+     } else {
+       g << g.densify(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
+                             g.work(res.front(), nnz())) << "\n";
+     }
   }
 
   void Sparsify::generate(CodeGenerator& g,
