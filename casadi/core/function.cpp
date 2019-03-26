@@ -566,8 +566,8 @@ namespace casadi {
   }
 
   Function Function::map(casadi_int n,
-    const std::vector<casadi_int>& reduce_in,
-    const std::vector<casadi_int>& reduce_out,
+    const std::vector<bool>& reduce_in,
+    const std::vector<bool>& reduce_out,
     const Dict& opts) const {
     return MapSum::create("mapsum_" + str(n) + "_" + name(), "serial",
       *this, n, reduce_in, reduce_out, opts);

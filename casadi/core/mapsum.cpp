@@ -32,31 +32,12 @@ namespace casadi {
 
   Function MapSum::create(const std::string& name, const std::string& parallelization,
                           const Function& f, casadi_int n,
-                          const std::vector<casadi_int>& reduce_in,
-                          const std::vector<casadi_int>& reduce_out,
-                          const Dict& opts) {
-    std::vector<bool> r_in(f.n_in(), false);
-    std::vector<bool> r_out(f.n_out(), false);
-
-    for (casadi_int i=0;i<reduce_in.size();++i) {
-      casadi_assert(reduce_in[i]>=0 && reduce_in[i]<f.n_in(),
-        "reduce_in got invalid entry: " +  str(reduce_in[i]) + ".");
-      r_in[reduce_in[i]] = true;
-    }
-    for (casadi_int i=0;i<reduce_out.size();++i) {
-      casadi_assert(reduce_out[i]>=0 && reduce_out[i]<f.n_out(),
-        "reduce_out got invalid entry: " +  str(reduce_out[i]) + ".");
-      r_out[reduce_out[i]] = true;
-    }
-
-    return MapSum::create(name, parallelization, f, n, r_in, r_out, opts);
-  }
-
-  Function MapSum::create(const std::string& name, const std::string& parallelization,
-                          const Function& f, casadi_int n,
                           const std::vector<bool>& reduce_in,
                           const std::vector<bool>& reduce_out,
                           const Dict& opts) {
+    casadi_assert(reduce_in.size()==f.n_in(), "Dimension mismatch");
+    casadi_assert(reduce_out.size()==f.n_out(), "Dimension mismatch");
+
     if (parallelization == "serial") {
       string suffix = str(reduce_in)+str(reduce_out);
       Function ret;

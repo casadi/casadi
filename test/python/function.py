@@ -632,7 +632,7 @@ class Functiontests(casadiTestCase):
           for ad_weight in [0,1]:
 
             if parallelization=="true_map_sum":
-              F = fun.map(n,[2,3],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+              F = fun.map(n,[False,False,True,True],[True,False,False],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
             else:
               F = fun.map("map",parallelization,n,[2,3],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
 

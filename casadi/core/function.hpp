@@ -603,8 +603,8 @@ namespace casadi {
       const std::vector<std::string>& reduce_out,
       const Dict& opts=Dict()) const;
     Function map(casadi_int n,
-      const std::vector<casadi_int>& reduce_in,
-      const std::vector<casadi_int>& reduce_out=std::vector<casadi_int>(),
+      const std::vector<bool>& reduce_in,
+      const std::vector<bool>& reduce_out=std::vector<bool>(),
       const Dict& opts=Dict()) const;
     ///@}
 
