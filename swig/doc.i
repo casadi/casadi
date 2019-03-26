@@ -246,6 +246,10 @@ bool more) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::generate_options(bool
 is_temp=false) const  "
 
@@ -372,6 +376,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -395,6 +403,13 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -487,8 +502,8 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -1068,6 +1083,16 @@ const  "
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -1365,7 +1390,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -2112,10 +2137,10 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g, bool ns=true) const  "
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
 
-[INTERNAL]  Get name in codegen.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -2146,6 +2171,10 @@ double *gamma, const double *delta, casadi_int b) const  "
 [INTERNAL]  Number of nodes in the algorithm.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Blocksqp::pairInFilter(BlocksqpMemory *m,
 double cNorm, double obj) const  "
@@ -2428,6 +2457,10 @@ is_temp=false) const  "
 [INTERNAL]  Get required length of res field.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
@@ -2953,10 +2986,10 @@ Diagrams
 
 C++ includes: blocksqp.hpp ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_name(const
+CodeGenerator &g, bool ns=true) const  "
 
-[INTERNAL]  Generate code for the declarations of the C function.
+[INTERNAL]  Get name in codegen.
 
 ";
 
@@ -2999,7 +3032,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -3451,8 +3484,8 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -3706,6 +3739,13 @@ const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
+
+[INTERNAL]  Generate code for the declarations of the C function.
 
 ";
 
@@ -4655,6 +4695,13 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -5220,6 +5267,10 @@ double > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::instruction_MX(casadi_int
 k) const  "
 
@@ -5313,6 +5364,10 @@ always_inline, bool never_inline) const  "
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
 
 ";
+
+%feature("docstring")  casadi::Interpolant::is_diff_in(casadi_int i)  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
 nadj, const std::vector< MatType > &v) const  "
@@ -5548,7 +5603,7 @@ tr:  Flip the relationship. Return which expressions contain the variables
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -5891,8 +5946,8 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -6326,6 +6381,13 @@ Identifier index of the instruction (SXFunction/MXFunction)
 
 ";
 
+%feature("docstring")  casadi::Function::wrap_as_needed(const Dict &opts)
+const  "
+
+Wrap in a Function with options.
+
+";
+
 %feature("docstring")  casadi::Function::sz_arg() const  "
 
 Get required length of arg field.
@@ -6595,6 +6657,18 @@ Get required length of iw field.
 %feature("docstring")  casadi::SharedObject::is_null() const  "
 
 Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::Function::is_diff_in(casadi_int ind) const  "
+
+Get differentiability of inputs/output.
+
+";
+
+%feature("docstring")  casadi::Function::is_diff_in() const  "
+
+Get differentiability of inputs/output.
 
 ";
 
@@ -7121,6 +7195,19 @@ matches one of the base classes (default true)
 
 ";
 
+%feature("docstring")  casadi::Function::is_diff_out(casadi_int ind) const
+"
+
+Get differentiability of inputs/output.
+
+";
+
+%feature("docstring")  casadi::Function::is_diff_out() const  "
+
+Get differentiability of inputs/output.
+
+";
+
 %feature("docstring")  casadi::Function::wrap() const  "
 
 Wrap in an Function instance consisting of only one MX call.
@@ -7393,8 +7480,8 @@ the outputs summed up.
 ";
 
 %feature("docstring")  casadi::Function::map(casadi_int n, const
-std::vector< casadi_int > &reduce_in, const std::vector< casadi_int >
-&reduce_out=std::vector< casadi_int >(), const Dict &opts=Dict()) const  "
+std::vector< bool > &reduce_in, const std::vector< bool >
+&reduce_out=std::vector< bool >(), const Dict &opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -8373,7 +8460,7 @@ multiplying.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -8485,6 +8572,10 @@ std::string &name, std::ostream &stream) const  "
 ";
 
 %feature("docstring")  casadi::CentralDiff::has_err() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
 [INTERNAL] ";
 
@@ -9296,8 +9387,8 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -9686,6 +9777,16 @@ const  "
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -9882,6 +9983,13 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jac() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -9953,6 +10061,10 @@ std::string &fname) const  "
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
@@ -10459,6 +10571,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::Collocation::~Collocation "
 
 [INTERNAL]  Destructor.
@@ -10519,6 +10638,13 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 std::vector< MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -10715,12 +10841,9 @@ Dict &opts)  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
 
-[INTERNAL]  Codegen for free_mem.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")
 casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
@@ -10826,7 +10949,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -11067,6 +11190,10 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Integrator::serialize_base_function() const
 "
 
@@ -11182,8 +11309,8 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -12731,7 +12858,7 @@ std::map< std::string, Sparsity > &st) "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -13079,6 +13206,13 @@ std::string &parallelization) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::export_code(const
+std::string &lang, std::ostream &stream, const Dict &options) const  "
+
+[INTERNAL]  Export function in a specific language.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_in(casadi_int ind)
 const  "
 
@@ -13112,6 +13246,10 @@ bool persistent=false) "
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Conic::is_a(const std::string &type, bool
 recursive) const  "
@@ -13277,6 +13415,10 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 [INTERNAL]  Get the sparsity pattern, forward mode.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
@@ -13621,6 +13763,16 @@ Internal class.
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -13809,17 +13961,17 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::export_code(const
-std::string &lang, std::ostream &stream, const Dict &options) const  "
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
 
-[INTERNAL]  Export function in a specific language.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -15269,6 +15421,16 @@ Internal class.
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -16086,7 +16248,7 @@ ind) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -16110,6 +16272,10 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 [INTERNAL]  Codegen incref for dependencies.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
@@ -16473,6 +16639,13 @@ constructor), this class should invoke this function when initialized.
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
+
+[INTERNAL]  Serialize an object.
+
+";
+
 %feature("docstring")  casadi::Dple::get_n_out()  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -16514,8 +16687,8 @@ CodeGenerator &g, bool ns=true) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -16549,6 +16722,10 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -16561,10 +16738,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
-&s) const  "
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
 
-[INTERNAL]  Serialize an object.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -16732,7 +16909,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -17456,6 +17633,13 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname) const  "
+
+[INTERNAL]  Generate code the function.
+
+";
+
 %feature("docstring")  casadi::Expm::get_sparsity_out(casadi_int i)  "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -17506,6 +17690,17 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::map(casadi_int n, const
+std::string &parallelization) const  "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")
 casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
@@ -17513,12 +17708,9 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname) const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Generate code the function.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")
 casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
@@ -17527,10 +17719,10 @@ casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::map(casadi_int n, const
-std::string &parallelization) const  "
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
 
-[INTERNAL]  Generate/retrieve cached serial map.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -17942,6 +18134,16 @@ Internal class.
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -18330,8 +18532,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -18821,8 +19023,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -19094,6 +19296,10 @@ const Importer &li) "
 [INTERNAL]  Print list of options.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::get_function() const  "
 
@@ -19407,7 +19613,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -19479,6 +19685,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::External::has_reverse(casadi_int nadj) const
 "
 
@@ -19526,6 +19739,10 @@ const  "
 [INTERNAL]  Get the reference count.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::size1_out(casadi_int ind)
 const  "
@@ -19950,7 +20167,7 @@ double > &res) const  "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::Factory< MatType >::add_output(const
-std::string &s, const MatType &e) "
+std::string &s, const MatType &e, bool is_diff) "
 
 [INTERNAL] ";
 
@@ -19979,7 +20196,7 @@ std::string &s) "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::Factory< MatType >::add_input(const
-std::string &s, const MatType &e) "
+std::string &s, const MatType &e, bool is_diff) "
 
 [INTERNAL] ";
 
@@ -20128,6 +20345,13 @@ bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -20141,13 +20365,9 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::generate_in(const
-std::string &fname, const double **arg) const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
 
-[INTERNAL]  Export an input file that can be passed to generate C code with
-a main.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
@@ -20273,7 +20493,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -20935,8 +21155,16 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::generate_in(const
+std::string &fname, const double **arg) const  "
+
+[INTERNAL]  Export an input file that can be passed to generate C code with
+a main.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -21279,6 +21507,10 @@ structure recognition for symmetric Jacobians
 [INTERNAL]  Get free variables ( MX)
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")
 casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
@@ -21687,11 +21919,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::checkout() const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Checkout a memory object.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
 const  "
@@ -21949,6 +22179,16 @@ std::string, M > &arg) const  "
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -22167,7 +22407,7 @@ casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -22212,6 +22452,10 @@ const  "
 multiplying.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
@@ -22473,8 +22717,8 @@ ind) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -22531,6 +22775,13 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 %feature("docstring")  casadi::FiniteDiff::get_sparsity_in(casadi_int i)  "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -22980,6 +23231,12 @@ std::vector< std::vector< M >> &aseed, casadi_int npar) const  "
 std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::checkout() const  "
+
+[INTERNAL]  Checkout a memory object.
+
+";
 
 %feature("docstring")
 casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
@@ -23671,8 +23928,8 @@ is_temp=false) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -23778,9 +24035,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -24003,6 +24261,12 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 *mem, double t, double *x, double *z, double *q) const  "
 
 [INTERNAL]  Advance solution in time.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -24258,7 +24522,7 @@ std::string &fname, const Dict &opts) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -24808,6 +25072,13 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::sprint(char *buf, size_t
+buf_sz, const char *fmt,...) const  "
+
+[INTERNAL]  C-style formatted printing to string.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(casadi_int nadj)
 const  "
 
@@ -24876,12 +25147,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::sprint(char *buf, size_t
-buf_sz, const char *fmt,...) const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  C-style formatted printing to string.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
@@ -25202,6 +25470,10 @@ const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 
 // File: classcasadi_1_1ForwardDiff.xml
 %feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
@@ -25284,6 +25556,13 @@ casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
@@ -25291,7 +25570,7 @@ casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -25457,6 +25736,10 @@ double > &arg) const  "
 [INTERNAL]  Number of nodes in the algorithm.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::jac() const  "
 
@@ -25660,11 +25943,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
@@ -25937,6 +26218,16 @@ std::string &parallelization) const  "
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -26314,8 +26605,8 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -26882,6 +27173,12 @@ is_temp=false) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
 %feature("docstring")  casadi::FiniteDiff::codegen_body(CodeGenerator &g)
 const  "
 
@@ -27244,6 +27541,13 @@ Identifier index of the instruction (SXFunction/MXFunction)
 %feature("docstring")  casadi::Function::wrap() const  "
 
 Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring")  casadi::Function::wrap_as_needed(const Dict &opts)
+const  "
+
+Wrap in a Function with options.
 
 ";
 
@@ -27962,16 +28266,15 @@ Only allowed for (a subset of) SX/MX Functions
 
 ";
 
-%feature("docstring")  casadi::Function::size_out(casadi_int ind) const  "
+%feature("docstring")  casadi::Function::is_diff_in(casadi_int ind) const  "
 
-Get output dimension.
+Get differentiability of inputs/output.
 
 ";
 
-%feature("docstring")  casadi::Function::size_out(const std::string &oname)
-const  "
+%feature("docstring")  casadi::Function::is_diff_in() const  "
 
-Get output dimension.
+Get differentiability of inputs/output.
 
 ";
 
@@ -28092,6 +28395,19 @@ adheres to SCHEME_NLPINput
 
 ";
 
+%feature("docstring")  casadi::Function::size_out(casadi_int ind) const  "
+
+Get output dimension.
+
+";
+
+%feature("docstring")  casadi::Function::size_out(const std::string &oname)
+const  "
+
+Get output dimension.
+
+";
+
 %feature("docstring")  casadi::Function::checkout() const  "
 
 Checkout a memory object.
@@ -28170,8 +28486,8 @@ the outputs summed up.
 ";
 
 %feature("docstring")  casadi::Function::map(casadi_int n, const
-std::vector< casadi_int > &reduce_in, const std::vector< casadi_int >
-&reduce_out=std::vector< casadi_int >(), const Dict &opts=Dict()) const  "
+std::vector< bool > &reduce_in, const std::vector< bool >
+&reduce_out=std::vector< bool >(), const Dict &opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -28679,6 +28995,16 @@ member functions. Joel Andersson >List of available options
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -28815,6 +29141,12 @@ Get the MX node corresponding to an instruction ( MXFunction)
 
 ";
 
+%feature("docstring")  casadi::Function::release(int mem) const  "
+
+Release a memory object.
+
+";
+
 %feature("docstring")  casadi::Function::generate(const std::string &fname,
 const Dict &opts=Dict()) const  "
 
@@ -28848,9 +29180,16 @@ Number of nodes in the algorithm.
 
 ";
 
-%feature("docstring")  casadi::Function::release(int mem) const  "
+%feature("docstring")  casadi::Function::is_diff_out(casadi_int ind) const
+"
 
-Release a memory object.
+Get differentiability of inputs/output.
+
+";
+
+%feature("docstring")  casadi::Function::is_diff_out() const  "
+
+Get differentiability of inputs/output.
 
 ";
 
@@ -28867,93 +29206,63 @@ Get input dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::call(const std::vector< DM > &arg,
-std::vector< DM > &output_res, bool always_inline=false, bool
-never_inline=false) const  "
+%feature("docstring")  casadi::Function::jit(const std::string &name, const
+std::string &body, const std::vector< std::string > &name_in, const
+std::vector< std::string > &name_out, const Dict &opts=Dict()) "
 
-Evaluate the function symbolically or numerically.
+To resolve ambiguity on some compilers.
 
-";
+Create a just-in-time compiled function from a C language string The names
+and sparsity patterns of all the inputs and outputs must be provided. If
+sparsities are not provided, all inputs and outputs are assumed to be
+scalar. Only specify the function body, assuming that input and output
+nonzeros are stored in arrays with the specified naming convension. The data
+type used is 'casadi_real', which is typically equal to 'double` or another
+data type with the same API as 'double'.
 
-%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
-std::vector< SX > &output_res, bool always_inline=false, bool
-never_inline=false) const  "
+Inputs may be null pointers. This means that the all entries are zero.
+Outputs may be null points. This means that the corresponding result can be
+ignored.
 
-Generate a Jacobian function of output oind with respect to input iind.
+If an error occurs in the evaluation, issue \"return 1;\";
 
-Parameters:
------------
+The final generated function will have a structure similar to:
 
-iind:  The index of the input
-
-oind:  The index of the output Legacy function: To be deprecated in a future
-version of CasADi. Exists only for compatibility with Function::jacobian
-pre-CasADi 3.2
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
-std::vector< MX > &output_res, bool always_inline=false, bool
-never_inline=false) const  "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output Legacy function: To be deprecated in a future
-version of CasADi. Exists only for compatibility with Function::jacobian
-pre-CasADi 3.2
+casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
+casadi_real* w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1,
+*r2; x1 = *arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY>
+return 0; }
 
 ";
 
-%feature("docstring")  casadi::Function::call(const DMDict &arg, DMDict
-&output_res, bool always_inline=false, bool never_inline=false) const  "
+%feature("docstring")  casadi::Function::jit(const std::string &name, const
+std::string &body, const std::vector< std::string > &name_in, const
+std::vector< std::string > &name_out, const std::vector< Sparsity >
+&sparsity_in, const std::vector< Sparsity > &sparsity_out, const Dict
+&opts=Dict()) "
 
-Generate a Jacobian function of output oind with respect to input iind.
+To resolve ambiguity on some compilers.
 
-Parameters:
------------
+Create a just-in-time compiled function from a C language string The names
+and sparsity patterns of all the inputs and outputs must be provided. If
+sparsities are not provided, all inputs and outputs are assumed to be
+scalar. Only specify the function body, assuming that input and output
+nonzeros are stored in arrays with the specified naming convension. The data
+type used is 'casadi_real', which is typically equal to 'double` or another
+data type with the same API as 'double'.
 
-iind:  The index of the input
+Inputs may be null pointers. This means that the all entries are zero.
+Outputs may be null points. This means that the corresponding result can be
+ignored.
 
-oind:  The index of the output Legacy function: To be deprecated in a future
-version of CasADi. Exists only for compatibility with Function::jacobian
-pre-CasADi 3.2
+If an error occurs in the evaluation, issue \"return 1;\";
 
-";
+The final generated function will have a structure similar to:
 
-%feature("docstring")  casadi::Function::call(const SXDict &arg, SXDict
-&output_res, bool always_inline=false, bool never_inline=false) const  "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output Legacy function: To be deprecated in a future
-version of CasADi. Exists only for compatibility with Function::jacobian
-pre-CasADi 3.2
-
-";
-
-%feature("docstring")  casadi::Function::call(const MXDict &arg, MXDict
-&output_res, bool always_inline=false, bool never_inline=false) const  "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output Legacy function: To be deprecated in a future
-version of CasADi. Exists only for compatibility with Function::jacobian
-pre-CasADi 3.2
+casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
+casadi_real* w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1,
+*r2; x1 = *arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY>
+return 0; }
 
 ";
 
@@ -29137,63 +29446,93 @@ generate_in  convert_out to convert between dict/map and vector
 
 ";
 
-%feature("docstring")  casadi::Function::jit(const std::string &name, const
-std::string &body, const std::vector< std::string > &name_in, const
-std::vector< std::string > &name_out, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::call(const std::vector< DM > &arg,
+std::vector< DM > &output_res, bool always_inline=false, bool
+never_inline=false) const  "
 
-To resolve ambiguity on some compilers.
-
-Create a just-in-time compiled function from a C language string The names
-and sparsity patterns of all the inputs and outputs must be provided. If
-sparsities are not provided, all inputs and outputs are assumed to be
-scalar. Only specify the function body, assuming that input and output
-nonzeros are stored in arrays with the specified naming convension. The data
-type used is 'casadi_real', which is typically equal to 'double` or another
-data type with the same API as 'double'.
-
-Inputs may be null pointers. This means that the all entries are zero.
-Outputs may be null points. This means that the corresponding result can be
-ignored.
-
-If an error occurs in the evaluation, issue \"return 1;\";
-
-The final generated function will have a structure similar to:
-
-casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
-casadi_real* w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1,
-*r2; x1 = *arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY>
-return 0; }
+Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring")  casadi::Function::jit(const std::string &name, const
-std::string &body, const std::vector< std::string > &name_in, const
-std::vector< std::string > &name_out, const std::vector< Sparsity >
-&sparsity_in, const std::vector< Sparsity > &sparsity_out, const Dict
-&opts=Dict()) "
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+std::vector< SX > &output_res, bool always_inline=false, bool
+never_inline=false) const  "
 
-To resolve ambiguity on some compilers.
+Generate a Jacobian function of output oind with respect to input iind.
 
-Create a just-in-time compiled function from a C language string The names
-and sparsity patterns of all the inputs and outputs must be provided. If
-sparsities are not provided, all inputs and outputs are assumed to be
-scalar. Only specify the function body, assuming that input and output
-nonzeros are stored in arrays with the specified naming convension. The data
-type used is 'casadi_real', which is typically equal to 'double` or another
-data type with the same API as 'double'.
+Parameters:
+-----------
 
-Inputs may be null pointers. This means that the all entries are zero.
-Outputs may be null points. This means that the corresponding result can be
-ignored.
+iind:  The index of the input
 
-If an error occurs in the evaluation, issue \"return 1;\";
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
-The final generated function will have a structure similar to:
+";
 
-casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
-casadi_real* w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1,
-*r2; x1 = *arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY>
-return 0; }
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+std::vector< MX > &output_res, bool always_inline=false, bool
+never_inline=false) const  "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
+
+";
+
+%feature("docstring")  casadi::Function::call(const DMDict &arg, DMDict
+&output_res, bool always_inline=false, bool never_inline=false) const  "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
+
+";
+
+%feature("docstring")  casadi::Function::call(const SXDict &arg, SXDict
+&output_res, bool always_inline=false, bool never_inline=false) const  "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
+
+";
+
+%feature("docstring")  casadi::Function::call(const MXDict &arg, MXDict
+&output_res, bool always_inline=false, bool never_inline=false) const  "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -29348,8 +29687,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -29593,6 +29932,10 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::GenericExternal::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
@@ -29736,10 +30079,10 @@ casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_min_in(casadi_int ind)
-const  "
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
 
-[INTERNAL]  Get smallest input value.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -29847,6 +30190,10 @@ std::string &name) const  "
 [INTERNAL]  Get required length of res field.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::External::get_reverse(casadi_int nadj, const
 std::string &name, const std::vector< std::string > &inames, const
@@ -30355,7 +30702,7 @@ persistent=false) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -30380,6 +30727,13 @@ Parameters:
 npar[in]:  normal usage: 1, disallow pararallel calls: -1
 
 npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(casadi_int ind)
+const  "
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -33689,6 +34043,10 @@ problem)
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
 &vdef_fcn, Function &vinit_fcn) const  "
 
@@ -34213,8 +34571,8 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -34399,6 +34757,10 @@ k) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::convert_res(const
 std::vector< M > &res) const  "
 
@@ -34433,8 +34795,15 @@ classes.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -35225,6 +35594,10 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, casadi_int *iw, double *w) const  "
 
@@ -35856,14 +36229,14 @@ casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -35984,6 +36357,13 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 std::string &fname, double **res) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
 const std::string &fname) const  "
@@ -36218,6 +36598,10 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 [INTERNAL]  Check if the function is of a particular type.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
@@ -36613,8 +36997,8 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -36635,7 +37019,17 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::Integrator::t() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
 
 [INTERNAL] ";
 
@@ -36872,11 +37266,9 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  get SX expression associated with instructions
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Integrator::serialize_body(SerializingStream
 &s) const  "
@@ -37726,6 +38118,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_mem_type() const  "
 
 [INTERNAL]  Thread-local memory object type.
@@ -37756,7 +38155,7 @@ ind) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -38243,8 +38642,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -38375,6 +38774,10 @@ generated function.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::sx_out(casadi_int ind)
 const  "
 
@@ -38490,17 +38893,17 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::size1_in(casadi_int ind)
-const  "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::replace_arg(const
 std::vector< M > &arg, casadi_int npar) const  "
 
 [INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::size1_in(casadi_int ind)
+const  "
+
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -38946,6 +39349,13 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
@@ -39317,6 +39727,16 @@ Internal class
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -39737,6 +40157,10 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::Interpolant::is_diff_in(casadi_int i)  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M >> &fseed, casadi_int npar) const  "
 
@@ -39942,7 +40366,7 @@ const  "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -40553,6 +40977,16 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac              | OT_STRING       | Function body    | casadi::JitFunct |
 |                  |                 | for Jacobian     | ion              |
 +------------------+-----------------+------------------+------------------+
@@ -41016,10 +41450,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
-double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
-[INTERNAL]  Set the (persistent) work vectors.
+[INTERNAL]  Get required length of res field.
 
 ";
 
@@ -41118,6 +41551,13 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
+double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_in(casadi_int ind)
 const  "
 
@@ -41159,11 +41599,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Get required length of res field.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")
 casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
@@ -41393,16 +41831,27 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(casadi_int
 iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -41435,8 +41884,8 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -42382,6 +42831,16 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -42881,6 +43340,16 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -43155,7 +43624,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -43673,8 +44142,8 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -43697,6 +44166,10 @@ const  "
 [INTERNAL]  Get required length of arg field.
 
 ";
+
+%feature("docstring")  casadi::Interpolant::is_diff_in(casadi_int i)  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
@@ -43773,6 +44246,10 @@ std::string &parallelization) const  "
 [INTERNAL]  Generate/retrieve cached serial map.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
@@ -44384,6 +44861,13 @@ always_inline, bool never_inline) const  "
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -45542,8 +46026,8 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -45580,6 +46064,13 @@ DM > &arg) const  "
 std::vector< M > &arg, casadi_int npar) const  "
 
 [INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -45657,6 +46148,10 @@ reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::LinearInterpolantJac "
 
@@ -45772,7 +46267,7 @@ std::vector< MX > &arg, const std::string &parallelization) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -46017,6 +46512,10 @@ elements.
 [INTERNAL]  Number of function inputs and outputs.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
 std::string &fname, const Dict &opts) const  "
@@ -47215,6 +47714,10 @@ Sparsity &sp) "
 
 
 // File: classcasadi_1_1Map.xml
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ProtoFunction::sprint(char *buf, size_t
 buf_sz, const char *fmt,...) const  "
 
@@ -47328,6 +47831,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -47756,6 +48266,10 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ProtoFunction::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -47906,7 +48420,7 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -48492,8 +49006,8 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -48947,6 +49461,10 @@ ind) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::eval_gen(const double
 **arg, double **res, casadi_int *iw, double *w, void *mem) const  "
 
@@ -49169,6 +49687,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 %feature("docstring")  casadi::FunctionInternal::get_function(const
 std::string &name) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
 [INTERNAL] ";
 
@@ -49775,8 +50297,8 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -49786,6 +50308,13 @@ const  "
 std::string &fname) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
 
 %feature("docstring")  casadi::MapSum::get_sparsity_in(casadi_int i)  "
 
@@ -49991,7 +50520,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -53312,8 +53841,8 @@ std::string &fname)  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -53623,7 +54152,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -53704,6 +54233,12 @@ const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
+
+[INTERNAL]  Number of nodes in the algorithm.
 
 ";
 
@@ -54423,6 +54958,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(casadi_int iind,
 casadi_int oind) const  "
@@ -54727,11 +55266,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Number of nodes in the algorithm.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
@@ -54861,6 +55398,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -54959,6 +55503,10 @@ npar[in]:  normal usage: 1, disallow pararallel calls: -1
 npar[out]:  required number of parallel calls (or -1)
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
@@ -55354,8 +55902,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -55816,6 +56364,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 *m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
 
 %feature("docstring")  casadi::Nlpsol::has_reverse(casadi_int nadj) const  "
 
@@ -56292,6 +56847,10 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, casadi_int *iw, double *w) const  "
 
@@ -56591,7 +57150,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -56675,7 +57234,7 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -57342,8 +57901,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -57484,6 +58043,21 @@ const std::string &fname) const  "
 [INTERNAL]  Generate code the function.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
 const  "
@@ -59548,6 +60122,13 @@ std::vector< MX > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
+const  "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
 &g) const  "
 
@@ -59736,6 +60317,13 @@ double > &res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::factory(const std::string
 &name, const std::vector< std::string > &s_in, const std::vector<
 std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
@@ -59826,8 +60414,8 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -60099,7 +60687,7 @@ std::string &lang, std::ostream &stream, const Dict &options) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -60703,6 +61291,16 @@ Joel Andersson
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -61008,6 +61606,10 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg, casadi_int &npar) const  "
 
@@ -61126,10 +61728,9 @@ DM > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
-const  "
+%feature("docstring")  casadi::ProtoFunction::checkout() const  "
 
-[INTERNAL]  C-style formatted printing during evaluation.
+[INTERNAL]  Checkout a memory object.
 
 ";
 
@@ -61315,11 +61916,9 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::checkout() const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Checkout a memory object.
-
-";
+[INTERNAL] ";
 
 
 // File: classcasadi_1_1Output.xml
@@ -61609,8 +62208,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -62220,7 +62819,7 @@ get_forward(casadi_int nfwd) if no cached version is available.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -62749,6 +63348,13 @@ CodeGenerator &g, bool ns=true) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::map(casadi_int n, const
 std::string &parallelization) const  "
 
@@ -62771,6 +63377,10 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 [INTERNAL]  Codegen sparsities.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Conic::generateNativeCode(std::ostream &file)
 const  "
@@ -62824,6 +63434,10 @@ std::vector< M > &arg, casadi_int npar) const  "
 [INTERNAL]   Project sparsities.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::get_min_in(casadi_int ind)
 const  "
@@ -63380,12 +63994,9 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname) const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Generate code the function.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
 const  "
@@ -63531,8 +64142,8 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -63612,6 +64223,13 @@ std::string &fname, double **res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_function(const
 std::string &fname) const  "
 
@@ -63658,10 +64276,14 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_option(const
-std::string &name, std::ostream &stream) const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
 
-[INTERNAL]  Print all information there is to know about a certain option.
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname) const  "
+
+[INTERNAL]  Generate code the function.
 
 ";
 
@@ -64188,7 +64810,7 @@ is_temp=false) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -64289,6 +64911,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -64555,6 +65184,13 @@ const  "
 
 
 // File: classcasadi_1_1Qrsqp.xml
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::mx_in(casadi_int ind) const
 "
 
@@ -64600,6 +65236,10 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 [INTERNAL]  Memory objects.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
@@ -65361,11 +66001,9 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
 
-[INTERNAL]  Get a weak reference to the object.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Qrsqp::get_stats(void *mem) const  "
 
@@ -65698,6 +66336,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring") casadi::Qrsqp::Qrsqp(const std::string &name, const
 Function &nlp) "
 
@@ -65829,7 +66473,7 @@ double > &res) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -66150,8 +66794,8 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -66575,6 +67219,10 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::replace_arg(const
 std::vector< M > &arg, casadi_int npar) const  "
 
@@ -66773,14 +67421,14 @@ elements.
 [INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -67531,6 +68179,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ProtoFunction::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -67812,6 +68464,13 @@ ind) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::Rootfinder::eval(const double **arg, double
 **res, casadi_int *iw, double *w, void *mem) const  "
 
@@ -68025,6 +68684,13 @@ Dict &opts)  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::expand() "
 
 [INTERNAL] ";
@@ -68126,7 +68792,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -68332,11 +68998,9 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::wrap() const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::RungeKutta::serialize_body(SerializingStream
 &s) const  "
@@ -68366,8 +69030,8 @@ std::string, M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -68678,6 +69342,12 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap() const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -69348,6 +70018,10 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -69794,7 +70468,7 @@ std::string &fname, double **res) const  "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -69980,6 +70654,10 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::reverse(casadi_int nadj)
 const  "
 
@@ -69993,6 +70671,13 @@ get_reverse(casadi_int nadj) if no cached version is available.
 **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -70652,8 +71337,8 @@ std::string &name) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -70820,6 +71505,10 @@ const  "
 
 %feature("docstring")  casadi::Scpgen::line_search(ScpgenMemory *m,
 casadi_int &ls_iter, bool &ls_success) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
 
 [INTERNAL] ";
 
@@ -72051,6 +72740,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
+const  "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
 &vdef_fcn, Function &vinit_fcn) const  "
 
@@ -72431,7 +73127,7 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -73088,12 +73784,9 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::fwdViaJac(casadi_int nfwd)
 const  "
@@ -73139,6 +73832,10 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::instruction_id(casadi_int
 k) const  "
 
@@ -73166,6 +73863,13 @@ elements.
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -73384,8 +74088,8 @@ std::string &parallelization) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -73653,6 +74357,13 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
+const  "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(casadi_int ind)
 const  "
 
@@ -73749,10 +74460,17 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+[INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring")  casadi::PluginInterface< Expm
+>::serialize_type(SerializingStream &s) const "
+
+[INTERNAL]  Serialize type information.
 
 ";
 
@@ -74009,8 +74727,8 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -74089,19 +74807,9 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Expm
->::serialize_type(SerializingStream &s) const "
-
-[INTERNAL]  Serialize type information.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
@@ -74584,7 +75292,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -74914,6 +75622,10 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
 const std::string &fname) const  "
 
@@ -74925,6 +75637,13 @@ const std::string &fname) const  "
 std::string &fname, double **res) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
 
 %feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
 &s) const  "
@@ -75262,6 +75981,16 @@ Andersson
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -75604,6 +76333,10 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::numel_in() const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -75720,6 +76453,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FiniteDiff::get_sparsity_out(casadi_int i)  "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -75861,6 +76601,10 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 [INTERNAL]  Set the (persistent) work vectors.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::size_out(casadi_int ind)
 const  "
@@ -76644,7 +77388,7 @@ multiplying.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -76715,8 +77459,8 @@ std::string &lang, std::ostream &stream, const Dict &options) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -78447,7 +79191,7 @@ bool persistent=false) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -79012,6 +79756,13 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_arg(const
 std::vector< M > &arg, casadi_int &npar) const  "
 
@@ -79128,6 +79879,10 @@ npar[in]:  normal usage: 1, disallow pararallel calls: -1
 npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
 &g, const std::string &index="mem") const  "
@@ -79273,6 +80028,10 @@ k) const  "
 [INTERNAL]  Obtain information about function
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Nlpsol::get_default_in(casadi_int ind) const
 "
@@ -79650,8 +80409,8 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -80098,6 +80857,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::Switch::disp_more(std::ostream &stream) const
 "
 
@@ -80168,8 +80934,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -80842,6 +81608,10 @@ std::string &lang, std::ostream &stream, const Dict &options) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::has_eval_dm() const  "
 
 [INTERNAL]  Evaluate with DM matrices.
@@ -81276,7 +82046,7 @@ elements.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -81375,6 +82145,10 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 [INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::nnz_in() const  "
 
@@ -81714,6 +82488,16 @@ Joel Andersson
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -82089,8 +82873,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
-const  "
+%feature("docstring")  casadi::FunctionInternal::tocache(const Function &f,
+const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
 
@@ -82329,6 +83113,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::wrap_as_needed(const Dict
+&opts) const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::Map::info() const  "
 
 [INTERNAL]  Obtain information about node
@@ -82527,11 +83318,9 @@ derivatives
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::oracle() const  "
+%feature("docstring")  casadi::FunctionInternal::is_diff_out(casadi_int i) "
 
-[INTERNAL]  Get oracle.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::project_arg(const
 std::vector< M > &arg, casadi_int npar) const  "
@@ -82858,7 +83647,7 @@ structure recognition for symmetric Jacobians
 ";
 
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
+&fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
 
@@ -83312,6 +84101,10 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_diff_in(casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
@@ -83397,6 +84190,12 @@ Parameters:
 npar[in]:  normal usage: 1, disallow pararallel calls: -1
 
 npar[out]:  required number of parallel calls (or -1)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::oracle() const  "
+
+[INTERNAL]  Get oracle.
 
 ";
 
@@ -83989,6 +84788,16 @@ General information
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -85872,6 +86681,16 @@ General information
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -87215,6 +88034,16 @@ General information
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -87701,6 +88530,16 @@ General information
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |

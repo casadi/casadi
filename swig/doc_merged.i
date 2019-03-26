@@ -200,6 +200,10 @@ elements.
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::BackwardDiff::generate_options "
 
 [INTERNAL]  Reconstruct options dict.
@@ -301,6 +305,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::BackwardDiff::free_sx "
 
 [INTERNAL]  Get free variables (SX)
@@ -322,6 +330,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::BackwardDiff::size_out "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::BackwardDiff::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -916,6 +930,16 @@ elements.
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -1796,9 +1820,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::Blocksqp::codegen_name "
+%feature("docstring") casadi::Blocksqp::wrap_as_needed "
 
-[INTERNAL]  Get name in codegen.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -1827,6 +1851,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 [INTERNAL]  Number of nodes in the algorithm.
 
 ";
+
+%feature("docstring") casadi::Blocksqp::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::pairInFilter "
 
@@ -2041,6 +2069,10 @@ Evaluate exact hessian of Lagrangian.
 [INTERNAL]  Get required length of res field.
 
 ";
+
+%feature("docstring") casadi::Blocksqp::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::sp_forward "
 
@@ -2562,9 +2594,9 @@ Diagrams
 
 C++ includes: blocksqp.hpp ";
 
-%feature("docstring") casadi::Blocksqp::codegen_declarations "
+%feature("docstring") casadi::Blocksqp::codegen_name "
 
-[INTERNAL]  Generate code for the declarations of the C function.
+[INTERNAL]  Get name in codegen.
 
 ";
 
@@ -3182,6 +3214,12 @@ a main.
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring") casadi::Blocksqp::codegen_declarations "
+
+[INTERNAL]  Generate code for the declarations of the C function.
 
 ";
 
@@ -3990,6 +4028,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::clear_mem "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -4479,6 +4523,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::BSplineInterpolant::instruction_MX "
 
 [INTERNAL]  get MX expression associated with instruction
@@ -4548,6 +4596,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
 
 ";
+
+%feature("docstring") casadi::BSplineInterpolant::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::BSplineInterpolant::symbolicAdjSeed "
 
@@ -5263,6 +5315,12 @@ Identifier index of the instruction (SXFunction/MXFunction)
 
 ";
 
+%feature("docstring") casadi::Callback::wrap_as_needed "
+
+Wrap in a Function with options.
+
+";
+
 %feature("docstring") casadi::Callback::sz_arg "
 
 Get required length of arg field.
@@ -5412,6 +5470,12 @@ Get required length of iw field.
 %feature("docstring") casadi::Callback::is_null "
 
 Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Callback::is_diff_in "
+
+Get differentiability of inputs/output.
 
 ";
 
@@ -5723,6 +5787,12 @@ Release a memory object.
 
 Check if the function is of a particular type Optionally check if name
 matches one of the base classes (default true)
+
+";
+
+%feature("docstring") casadi::Callback::is_diff_out "
+
+Get differentiability of inputs/output.
 
 ";
 
@@ -6479,6 +6549,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 ";
 
 %feature("docstring") casadi::CentralDiff::has_err "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::CentralDiff::is_diff_out "
 
 [INTERNAL] ";
 
@@ -7498,6 +7572,16 @@ generated function.
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -7681,6 +7765,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::CentralDiff::jac "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -7739,6 +7829,10 @@ elements.
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
+
+%feature("docstring") casadi::CentralDiff::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::CentralDiff::alloc_res "
 
@@ -8161,6 +8255,12 @@ original
 
 ";
 
+%feature("docstring") casadi::Collocation::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
 %feature("docstring") casadi::Collocation::~Collocation "
 
 [INTERNAL]  Destructor.
@@ -8214,6 +8314,12 @@ original
 %feature("docstring") casadi::Collocation::mapsum_mx "
 
 [INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring") casadi::Collocation::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -8378,11 +8484,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::Collocation::codegen_free_mem "
+%feature("docstring") casadi::Collocation::is_diff_in "
 
-[INTERNAL]  Codegen for free_mem.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Collocation::codegen_sparsities "
 
@@ -8682,6 +8786,10 @@ problem)
 [INTERNAL]  Input/output sparsity.
 
 ";
+
+%feature("docstring") casadi::Collocation::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Collocation::serialize_base_function "
 
@@ -10324,6 +10432,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Conic::export_code "
+
+[INTERNAL]  Export function in a specific language.
+
+";
+
 %feature("docstring") casadi::Conic::sparsity_in "
 
 [INTERNAL]  Input/output sparsity.
@@ -10354,6 +10468,10 @@ elements.
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
+
+%feature("docstring") casadi::Conic::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Conic::is_a "
 
@@ -10487,6 +10605,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 [INTERNAL]  Get the sparsity pattern, forward mode.
 
 ";
+
+%feature("docstring") casadi::Conic::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Conic::uses_output "
 
@@ -10820,6 +10942,16 @@ Internal class.
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -11010,9 +11142,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Conic::export_code "
+%feature("docstring") casadi::Conic::wrap_as_needed "
 
-[INTERNAL]  Export function in a specific language.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -12129,6 +12261,16 @@ Internal class.
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -12844,6 +12986,10 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Dple::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Dple::has_derivative "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -13144,6 +13290,12 @@ constructor), this class should invoke this function when initialized.
 
 ";
 
+%feature("docstring") casadi::Dple::serialize "
+
+[INTERNAL]  Serialize an object.
+
+";
+
 %feature("docstring") casadi::Dple::get_n_out "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -13210,6 +13362,10 @@ constructor), this class should invoke this function when initialized.
 
 ";
 
+%feature("docstring") casadi::Dple::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Dple::has_spfwd "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -13222,9 +13378,9 @@ constructor), this class should invoke this function when initialized.
 
 ";
 
-%feature("docstring") casadi::Dple::serialize "
+%feature("docstring") casadi::Dple::wrap_as_needed "
 
-[INTERNAL]  Serialize an object.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -13936,6 +14092,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::Expm::codegen "
+
+[INTERNAL]  Generate code the function.
+
+";
+
 %feature("docstring") casadi::Expm::get_sparsity_out "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -13983,17 +14145,25 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::Expm::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring") casadi::Expm::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Expm::instruction_constant "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Expm::codegen "
+%feature("docstring") casadi::Expm::is_diff_out "
 
-[INTERNAL]  Generate code the function.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Expm::codegen_alloc_mem "
 
@@ -14001,9 +14171,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Expm::map "
+%feature("docstring") casadi::Expm::wrap_as_needed "
 
-[INTERNAL]  Generate/retrieve cached serial map.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -14358,6 +14528,16 @@ Internal class.
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -15323,6 +15503,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::External::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::External::get_function "
 
 [INTERNAL] ";
@@ -15641,6 +15825,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::External::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::External::has_reverse "
 
 [INTERNAL]  Reverse mode derivatives.
@@ -15677,6 +15867,10 @@ structure recognition.
 [INTERNAL]  Get the reference count.
 
 ";
+
+%feature("docstring") casadi::External::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::External::size1_out "
 
@@ -16170,6 +16364,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::FastNewton::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::FastNewton::print_option "
 
 [INTERNAL]  Print all information there is to know about a certain option.
@@ -16182,12 +16382,9 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::FastNewton::generate_in "
+%feature("docstring") casadi::FastNewton::is_diff_in "
 
-[INTERNAL]  Export an input file that can be passed to generate C code with
-a main.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::FastNewton::alloc "
 
@@ -16869,6 +17066,13 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::FastNewton::generate_in "
+
+[INTERNAL]  Export an input file that can be passed to generate C code with
+a main.
+
+";
+
 %feature("docstring") casadi::FastNewton::tocache "
 
 [INTERNAL]  Save function to cache.
@@ -17124,6 +17328,10 @@ structure recognition for symmetric Jacobians
 [INTERNAL]  Get free variables ( MX)
 
 ";
+
+%feature("docstring") casadi::FastNewton::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::FastNewton::codegen_sparsities "
 
@@ -17451,11 +17659,9 @@ StringSerializer, FileDeserializer
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::checkout "
+%feature("docstring") casadi::FiniteDiff::is_diff_out "
 
-[INTERNAL]  Checkout a memory object.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::FiniteDiff::get_max_in "
 
@@ -17702,6 +17908,16 @@ StringSerializer, FileDeserializer
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -17957,6 +18173,10 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::FiniteDiff::definition "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -18209,6 +18429,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::FiniteDiff::get_sparsity_in "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -18555,6 +18781,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
+
+";
+
+%feature("docstring") casadi::FiniteDiff::checkout "
+
+[INTERNAL]  Checkout a memory object.
 
 ";
 
@@ -19250,9 +19482,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::construct "
+%feature("docstring") casadi::FixedStepIntegrator::wrap_as_needed "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -19427,6 +19659,12 @@ original
 %feature("docstring") casadi::FixedStepIntegrator::advance "
 
 [INTERNAL]  Advance solution in time.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -20090,6 +20328,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::sprint "
+
+[INTERNAL]  C-style formatted printing to string.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::adjViaJac "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
@@ -20145,11 +20389,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::sprint "
+%feature("docstring") casadi::FixedStepIntegrator::is_diff_out "
 
-[INTERNAL]  C-style formatted printing to string.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::FixedStepIntegrator::memory "
 
@@ -20416,6 +20658,10 @@ elements.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::FixedStepIntegrator::is_diff_in "
+
+[INTERNAL] ";
+
 
 // File: classcasadi_1_1ForwardDiff.xml
 %feature("docstring") casadi::ForwardDiff::serialize "
@@ -20480,6 +20726,12 @@ multiplying.
 %feature("docstring") casadi::ForwardDiff::codegen_free_mem "
 
 [INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -20611,6 +20863,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 [INTERNAL]  Number of nodes in the algorithm.
 
 ";
+
+%feature("docstring") casadi::ForwardDiff::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::ForwardDiff::jac "
 
@@ -20771,11 +21027,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::construct "
+%feature("docstring") casadi::ForwardDiff::is_diff_in "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::ForwardDiff::weak "
 
@@ -21040,6 +21294,16 @@ structure recognition for symmetric Jacobians
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -21843,6 +22107,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::codegen_body "
 
 [INTERNAL]  Generate code for the body of the C function.
@@ -22140,6 +22410,12 @@ Wrap in an Function instance consisting of only one MX call.
 
 ";
 
+%feature("docstring") casadi::Function::wrap_as_needed "
+
+Wrap in a Function with options.
+
+";
+
 %feature("docstring") casadi::Function::nz_from_out "
 
 Convert from/to flat vector of input/output nonzeros.
@@ -22422,9 +22698,9 @@ Only allowed for (a subset of) SX/MX Functions
 
 ";
 
-%feature("docstring") casadi::Function::size_out "
+%feature("docstring") casadi::Function::is_diff_in "
 
-Get output dimension.
+Get differentiability of inputs/output.
 
 ";
 
@@ -22485,6 +22761,12 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLPSOL_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::Function::size_out "
+
+Get output dimension.
 
 ";
 
@@ -22813,6 +23095,16 @@ member functions. Joel Andersson >List of available options
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -22948,6 +23240,12 @@ Get the MX node corresponding to an instruction ( MXFunction)
 
 ";
 
+%feature("docstring") casadi::Function::release "
+
+Release a memory object.
+
+";
+
 %feature("docstring") casadi::Function::generate "
 
 Export / Generate C code for the function.
@@ -22972,9 +23270,9 @@ Number of nodes in the algorithm.
 
 ";
 
-%feature("docstring") casadi::Function::release "
+%feature("docstring") casadi::Function::is_diff_out "
 
-Release a memory object.
+Get differentiability of inputs/output.
 
 ";
 
@@ -22984,42 +23282,30 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Function::call "
+%feature("docstring") casadi::Function::jit "
 
-Generate a Jacobian function of output oind with respect to input iind.
+To resolve ambiguity on some compilers.
 
-Parameters:
------------
+Create a just-in-time compiled function from a C language string The names
+and sparsity patterns of all the inputs and outputs must be provided. If
+sparsities are not provided, all inputs and outputs are assumed to be
+scalar. Only specify the function body, assuming that input and output
+nonzeros are stored in arrays with the specified naming convension. The data
+type used is 'casadi_real', which is typically equal to 'double` or another
+data type with the same API as 'double'.
 
-iind:  The index of the input
+Inputs may be null pointers. This means that the all entries are zero.
+Outputs may be null points. This means that the corresponding result can be
+ignored.
 
-oind:  The index of the output Legacy function: To be deprecated in a future
-version of CasADi. Exists only for compatibility with Function::jacobian
-pre-CasADi 3.2
+If an error occurs in the evaluation, issue \"return 1;\";
 
->  void casadi::Function::call(const std::vector< SX > &arg, std::vector< SX > &output_res, bool always_inline=false, bool never_inline=false) const
+The final generated function will have a structure similar to:
 
->  void casadi::Function::call(const std::vector< MX > &arg, std::vector< MX > &output_res, bool always_inline=false, bool never_inline=false) const
-
->  void casadi::Function::call(const DMDict &arg, DMDict &output_res, bool always_inline=false, bool never_inline=false) const
-
->  void casadi::Function::call(const SXDict &arg, SXDict &output_res, bool always_inline=false, bool never_inline=false) const
-
->  void casadi::Function::call(const MXDict &arg, MXDict &output_res, bool always_inline=false, bool never_inline=false) const 
-------------------------------------------------------------------------
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output Legacy function: To be deprecated in a future
-version of CasADi. Exists only for compatibility with Function::jacobian
-pre-CasADi 3.2
-
-";
+casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
+casadi_real* w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1,
+*r2; x1 = *arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY>
+return 0; }
 
 ";
 
@@ -23091,30 +23377,42 @@ generate_in  convert_out to convert between dict/map and vector
 
 ";
 
-%feature("docstring") casadi::Function::jit "
+%feature("docstring") casadi::Function::call "
 
-To resolve ambiguity on some compilers.
+Generate a Jacobian function of output oind with respect to input iind.
 
-Create a just-in-time compiled function from a C language string The names
-and sparsity patterns of all the inputs and outputs must be provided. If
-sparsities are not provided, all inputs and outputs are assumed to be
-scalar. Only specify the function body, assuming that input and output
-nonzeros are stored in arrays with the specified naming convension. The data
-type used is 'casadi_real', which is typically equal to 'double` or another
-data type with the same API as 'double'.
+Parameters:
+-----------
 
-Inputs may be null pointers. This means that the all entries are zero.
-Outputs may be null points. This means that the corresponding result can be
-ignored.
+iind:  The index of the input
 
-If an error occurs in the evaluation, issue \"return 1;\";
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
-The final generated function will have a structure similar to:
+>  void casadi::Function::call(const std::vector< SX > &arg, std::vector< SX > &output_res, bool always_inline=false, bool never_inline=false) const
 
-casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
-casadi_real* w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1,
-*r2; x1 = *arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY>
-return 0; }
+>  void casadi::Function::call(const std::vector< MX > &arg, std::vector< MX > &output_res, bool always_inline=false, bool never_inline=false) const
+
+>  void casadi::Function::call(const DMDict &arg, DMDict &output_res, bool always_inline=false, bool never_inline=false) const
+
+>  void casadi::Function::call(const SXDict &arg, SXDict &output_res, bool always_inline=false, bool never_inline=false) const
+
+>  void casadi::Function::call(const MXDict &arg, MXDict &output_res, bool always_inline=false, bool never_inline=false) const 
+------------------------------------------------------------------------
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
+
+";
 
 ";
 
@@ -23411,6 +23709,10 @@ elements.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::GenericExternal::alloc_mem "
 
 [INTERNAL]  Create memory block.
@@ -23524,9 +23826,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::get_min_in "
+%feature("docstring") casadi::GenericExternal::wrap_as_needed "
 
-[INTERNAL]  Get smallest input value.
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -23597,6 +23899,10 @@ classes.
 [INTERNAL]  Get required length of res field.
 
 ";
+
+%feature("docstring") casadi::GenericExternal::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::GenericExternal::get_reverse "
 
@@ -24045,6 +24351,12 @@ Parameters:
 npar[in]:  normal usage: 1, disallow pararallel calls: -1
 
 npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::GenericExternal::get_min_in "
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -25903,6 +26215,10 @@ problem)
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::generate_lifted "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
@@ -26509,6 +26825,10 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::convert_res "
 
 [INTERNAL]  Convert from/to input/output lists/map.
@@ -26519,6 +26839,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -27166,6 +27492,10 @@ C++ includes: implicit_to_nlp.hpp ";
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::ImplicitToNlp::setup "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
@@ -27799,6 +28129,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::ImplicitToNlp::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::codegen "
 
 [INTERNAL]  Generate code the function.
@@ -27993,6 +28329,10 @@ multiplying.
 [INTERNAL]  Check if the function is of a particular type.
 
 ";
+
+%feature("docstring") casadi::ImplicitToNlp::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::ImplicitToNlp::call_reverse "
 
@@ -28368,7 +28708,17 @@ elements.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Integrator::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::Integrator::t "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Integrator::is_diff_in "
 
 [INTERNAL] ";
 
@@ -28555,11 +28905,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::Integrator::instructions_sx "
+%feature("docstring") casadi::Integrator::is_diff_out "
 
-[INTERNAL]  get SX expression associated with instructions
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Integrator::serialize_body "
 
@@ -29277,6 +29625,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Integrator::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Integrator::codegen_mem_type "
 
 [INTERNAL]  Thread-local memory object type.
@@ -29799,6 +30153,10 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Interpolant::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Interpolant::sx_out "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -29898,15 +30256,15 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Interpolant::size1_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
 %feature("docstring") casadi::Interpolant::replace_arg "
 
 [INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::Interpolant::size1_in "
+
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -30284,6 +30642,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Interpolant::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Interpolant::instruction_constant "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
@@ -30633,6 +30997,16 @@ Internal class
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -30988,6 +31362,10 @@ propagation.
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
 
 ";
+
+%feature("docstring") casadi::Interpolant::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Interpolant::replace_fseed "
 
@@ -31693,6 +32071,16 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac              | OT_STRING       | Function body    | casadi::JitFunct |
 |                  |                 | for Jacobian     | ion              |
 +------------------+-----------------+------------------+------------------+
@@ -32091,9 +32479,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::JitFunction::set_work "
+%feature("docstring") casadi::JitFunction::sz_res "
 
-[INTERNAL]  Set the (persistent) work vectors.
+[INTERNAL]  Get required length of res field.
 
 ";
 
@@ -32173,6 +32561,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::JitFunction::set_work "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
 %feature("docstring") casadi::JitFunction::size1_in "
 
 [INTERNAL]  Input/output dimensions.
@@ -32200,11 +32594,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::JitFunction::sz_res "
+%feature("docstring") casadi::JitFunction::is_diff_out "
 
-[INTERNAL]  Get required length of res field.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::JitFunction::codegen_decref "
 
@@ -32383,9 +32775,19 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::JitFunction::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::JitFunction::sparsity_jac "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::JitFunction::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -33260,6 +33662,16 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -33748,6 +34160,16 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -34443,6 +34865,10 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::LinearInterpolant::free_sx "
 
 [INTERNAL]  Get free variables (SX)
@@ -34512,6 +34938,10 @@ npar[out]:  required number of parallel calls (or -1)
 [INTERNAL]  Generate/retrieve cached serial map.
 
 ";
+
+%feature("docstring") casadi::LinearInterpolant::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::LinearInterpolant::codegen_incref "
 
@@ -35001,6 +35431,12 @@ structure recognition.
 %feature("docstring") casadi::LinearInterpolant::call "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -35974,6 +36410,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::index_in "
 
 [INTERNAL]  Get input scheme index by name.
@@ -36043,6 +36485,10 @@ reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
+
+%feature("docstring") casadi::LinearInterpolantJac::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::LinearInterpolantJac "
 
@@ -36343,6 +36789,10 @@ elements.
 [INTERNAL]  Number of function inputs and outputs.
 
 ";
+
+%feature("docstring") casadi::LinearInterpolantJac::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::LinearInterpolantJac::generate_dependencies "
 
@@ -37431,6 +37881,10 @@ C++ includes: lsqr.hpp ";
 
 
 // File: classcasadi_1_1Map.xml
+%feature("docstring") casadi::Map::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Map::sprint "
 
 [INTERNAL]  C-style formatted printing to string.
@@ -37535,6 +37989,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Map::sparsity_jac "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Map::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -37870,6 +38330,10 @@ propagation.
 [INTERNAL]  Get type name.
 
 ";
+
+%feature("docstring") casadi::Map::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Map::checkout "
 
@@ -38849,6 +39313,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::MapSum::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::MapSum::eval_gen "
 
 [INTERNAL]  Evaluate or propagate sparsities.
@@ -39007,6 +39475,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 ";
 
 %feature("docstring") casadi::MapSum::get_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::MapSum::is_diff_out "
 
 [INTERNAL] ";
 
@@ -39501,6 +39973,12 @@ elements.
 %feature("docstring") casadi::MapSum::has_function "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::MapSum::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
 
 %feature("docstring") casadi::MapSum::get_sparsity_in "
 
@@ -41938,6 +42416,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Newton::n_nodes "
+
+[INTERNAL]  Number of nodes in the algorithm.
+
+";
+
 %feature("docstring") casadi::Newton::numel_in "
 
 [INTERNAL]  Number of input/output elements.
@@ -42538,6 +43022,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Newton::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Newton::getJacSparsityHierarchical "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
@@ -42769,11 +43257,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::Newton::n_nodes "
+%feature("docstring") casadi::Newton::is_diff_out "
 
-[INTERNAL]  Number of nodes in the algorithm.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Newton::call_reverse "
 
@@ -42863,6 +43349,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Newton::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Newton::free_mx "
 
 [INTERNAL]  Get free variables ( MX)
@@ -42945,6 +43437,10 @@ npar[in]:  normal usage: 1, disallow pararallel calls: -1
 npar[out]:  required number of parallel calls (or -1)
 
 ";
+
+%feature("docstring") casadi::Nlpsol::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Nlpsol::alloc "
 
@@ -43668,6 +44164,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Nlpsol::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Nlpsol::has_reverse "
 
 [INTERNAL]  Generate a function that calculates reverse mode derivatives.
@@ -44061,6 +44563,10 @@ propagation.
 [INTERNAL]  Get type name.
 
 ";
+
+%feature("docstring") casadi::Nlpsol::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Nlpsol::setup "
 
@@ -45049,6 +45555,20 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 [INTERNAL]  Generate code the function.
 
 ";
+
+%feature("docstring") casadi::OmpMap::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::OmpMap::is_diff_out "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::OmpMap::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::OmpMap::mx_out "
 
@@ -46463,6 +46983,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
 %feature("docstring") casadi::OracleFunction::codegen_body "
 
 [INTERNAL]  Generate code for the function body.
@@ -46604,6 +47130,12 @@ a main.
 %feature("docstring") casadi::OracleFunction::nz_out "
 
 [INTERNAL]  Convert from/to flat vector of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::OracleFunction::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -47434,6 +47966,16 @@ Joel Andersson
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -47701,6 +48243,10 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::OracleFunction::matching_arg "
 
 [INTERNAL]  Check if input arguments that needs to be replaced.
@@ -47800,9 +48346,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::print "
+%feature("docstring") casadi::OracleFunction::checkout "
 
-[INTERNAL]  C-style formatted printing during evaluation.
+[INTERNAL]  Checkout a memory object.
 
 ";
 
@@ -47961,11 +48507,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::checkout "
+%feature("docstring") casadi::OracleFunction::is_diff_out "
 
-[INTERNAL]  Checkout a memory object.
-
-";
+[INTERNAL] ";
 
 
 // File: classcasadi_1_1Output.xml
@@ -49129,6 +49673,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::QpToNlp::map "
 
 [INTERNAL]  Generate/retrieve cached serial map.
@@ -49148,6 +49698,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 [INTERNAL]  Codegen sparsities.
 
 ";
+
+%feature("docstring") casadi::QpToNlp::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::QpToNlp::generateNativeCode "
 
@@ -49189,6 +49743,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 [INTERNAL]   Project sparsities.
 
 ";
+
+%feature("docstring") casadi::QpToNlp::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::QpToNlp::get_min_in "
 
@@ -49662,11 +50220,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Qrqp::codegen "
+%feature("docstring") casadi::Qrqp::is_diff_out "
 
-[INTERNAL]  Generate code the function.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Qrqp::print "
 
@@ -49849,6 +50405,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Qrqp::print_option "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
 %feature("docstring") casadi::Qrqp::has_function "
 
 [INTERNAL] ";
@@ -49883,9 +50445,13 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Qrqp::print_option "
+%feature("docstring") casadi::Qrqp::is_diff_in "
 
-[INTERNAL]  Print all information there is to know about a certain option.
+[INTERNAL] ";
+
+%feature("docstring") casadi::Qrqp::codegen "
+
+[INTERNAL]  Generate code the function.
 
 ";
 
@@ -50413,6 +50979,12 @@ original
 
 ";
 
+%feature("docstring") casadi::Qrqp::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Qrqp::has_sprev "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -50616,6 +51188,12 @@ propagation.
 
 
 // File: classcasadi_1_1Qrsqp.xml
+%feature("docstring") casadi::Qrsqp::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Qrsqp::mx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -50651,6 +51229,10 @@ propagation.
 [INTERNAL]  Memory objects.
 
 ";
+
+%feature("docstring") casadi::Qrsqp::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Qrsqp::is_a "
 
@@ -51320,11 +51902,9 @@ multiplying.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Qrsqp::weak "
+%feature("docstring") casadi::Qrsqp::is_diff_in "
 
-[INTERNAL]  Get a weak reference to the object.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Qrsqp::get_stats "
 
@@ -51594,6 +52174,12 @@ Print iteration.
 %feature("docstring") casadi::Qrsqp::definition "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::Qrsqp::weak "
+
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -52311,6 +52897,10 @@ get_reverse(casadi_int nadj) if no cached version is available.
 [INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
+
+%feature("docstring") casadi::Rootfinder::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Rootfinder::replace_arg "
 
@@ -53089,6 +53679,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Rootfinder::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Rootfinder::checkout "
 
 [INTERNAL]  Checkout a memory object.
@@ -53326,6 +53920,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Rootfinder::eval "
 
 [INTERNAL]  Evaluate numerically.
@@ -53504,6 +54104,12 @@ elements.
 %feature("docstring") casadi::RungeKutta::create_advanced "
 
 [INTERNAL]  Helper for a more powerful 'integrator' factory
+
+";
+
+%feature("docstring") casadi::RungeKutta::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -53758,11 +54364,9 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
-%feature("docstring") casadi::RungeKutta::wrap "
+%feature("docstring") casadi::RungeKutta::is_diff_out "
 
-[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::RungeKutta::serialize_body "
 
@@ -54038,6 +54642,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::RungeKutta::mx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::RungeKutta::wrap "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -54590,6 +55200,10 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::RungeKutta::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::RungeKutta::definition "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -55114,6 +55728,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Scpgen::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Scpgen::reverse "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -55125,6 +55743,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::Scpgen::set_work "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::Scpgen::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -55786,6 +56410,10 @@ elements.
 ";
 
 %feature("docstring") casadi::Scpgen::line_search "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Scpgen::is_diff_in "
 
 [INTERNAL] ";
 
@@ -56797,6 +57425,12 @@ Get string representation.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::serialize_base_function "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
 %feature("docstring") casadi::SlicotDple::generate_lifted "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
@@ -57630,11 +58264,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::serialize_base_function "
+%feature("docstring") casadi::SlicotDple::is_diff_in "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::SlicotDple::fwdViaJac "
 
@@ -57674,6 +58306,10 @@ original
 
 ";
 
+%feature("docstring") casadi::SlicotDple::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::SlicotDple::instruction_id "
 
 [INTERNAL]  Get an atomic operation operator index.
@@ -57697,6 +58333,12 @@ elements.
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
+
+";
+
+%feature("docstring") casadi::SlicotDple::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -58108,6 +58750,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::serialize_base_function "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::numel_out "
 
 [INTERNAL]  Number of input/output elements.
@@ -58181,9 +58829,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::serialize_base_function "
+%feature("docstring") casadi::SlicotExpm::serialize_type "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+[INTERNAL]  Serialize type information.
 
 ";
 
@@ -58461,11 +59109,9 @@ C++ includes: slicot_expm.hpp ";
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::serialize_type "
+%feature("docstring") casadi::SlicotExpm::is_diff_out "
 
-[INTERNAL]  Serialize type information.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::SlicotExpm::uses_output "
 
@@ -59130,6 +59776,10 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::SlicotExpm::codegen "
 
 [INTERNAL]  Generate code the function.
@@ -59139,6 +59789,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::SlicotExpm::generate_out "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::SlicotExpm::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
 
 %feature("docstring") casadi::SlicotExpm::serialize "
 
@@ -59460,6 +60116,16 @@ Andersson
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
 +------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
 |                  |                 | forward/reverse  |                  |
@@ -59764,6 +60430,10 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::Smoothing::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Smoothing::numel_in "
 
 [INTERNAL]  Number of input/output elements.
@@ -59856,6 +60526,12 @@ multiplying.
 %feature("docstring") casadi::Smoothing::get_sparsity_out "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -59974,6 +60650,10 @@ a main.
 [INTERNAL]  Set the (persistent) work vectors.
 
 ";
+
+%feature("docstring") casadi::Smoothing::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Smoothing::size_out "
 
@@ -62540,6 +63220,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::check_arg "
 
 [INTERNAL]  Check if input arguments have correct length and dimensions.
@@ -62638,6 +63324,10 @@ npar[in]:  normal usage: 1, disallow pararallel calls: -1
 npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
+
+%feature("docstring") casadi::Sqpmethod::is_diff_out "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::codegen_mem "
 
@@ -62758,6 +63448,10 @@ tr:  Flip the relationship. Return which expressions contain the variables
 [INTERNAL]  Obtain information about function
 
 ";
+
+%feature("docstring") casadi::Sqpmethod::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::get_default_in "
 
@@ -63440,6 +64134,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Switch::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::Switch::disp_more "
 
 [INTERNAL]  Print description.
@@ -64062,6 +64762,10 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Switch::is_diff_out "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Switch::has_eval_dm "
 
 [INTERNAL]  Evaluate with DM matrices.
@@ -64485,6 +65189,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Switch::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Switch::nnz_in "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -64807,6 +65515,16 @@ Joel Andersson
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -65351,6 +66069,12 @@ Evaluate or propagate sparsities.
 
 ";
 
+%feature("docstring") casadi::ThreadMap::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring") casadi::ThreadMap::info "
 
 [INTERNAL]  Obtain information about node
@@ -65521,11 +66245,9 @@ derivatives
 
 ";
 
-%feature("docstring") casadi::ThreadMap::oracle "
+%feature("docstring") casadi::ThreadMap::is_diff_out "
 
-[INTERNAL]  Get oracle.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::ThreadMap::project_arg "
 
@@ -66137,6 +66859,10 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::ThreadMap::is_diff_in "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::ThreadMap::release "
 
 [INTERNAL]  Release a memory object.
@@ -66211,6 +66937,12 @@ Parameters:
 npar[in]:  normal usage: 1, disallow pararallel calls: -1
 
 npar[out]:  required number of parallel calls (or -1)
+
+";
+
+%feature("docstring") casadi::ThreadMap::oracle "
+
+[INTERNAL]  Get oracle.
 
 ";
 
@@ -66734,6 +67466,16 @@ General information
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |
@@ -67737,6 +68479,16 @@ General information
 |                  |                 | numerical values |                  |
 |                  |                 | of the inputs    |                  |
 |                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each input if it | Internal         |
+|                  |                 | should be        |                  |
+|                  |                 | differentiable.  |                  |
++------------------+-----------------+------------------+------------------+
+| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
+|                  |                 | each output if   | Internal         |
+|                  |                 | it should be     |                  |
+|                  |                 | differentiable.  |                  |
 +------------------+-----------------+------------------+------------------+
 | jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
 |                  |                 | for a number of  | Internal         |

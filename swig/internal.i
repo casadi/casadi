@@ -337,10 +337,10 @@
 %exception  casadi::FStats::toc() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Factory< MatType >::add_input(const std::string &s, const MatType &e) {
+%exception  casadi::Factory< MatType >::add_input(const std::string &s, const MatType &e, bool is_diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Factory< MatType >::add_output(const std::string &s, const MatType &e) {
+%exception  casadi::Factory< MatType >::add_output(const std::string &s, const MatType &e, bool is_diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Factory< MatType >::calculate(const Dict &opts=Dict()) {
@@ -763,7 +763,7 @@
 %exception  casadi::FunctionInternal::has_sprev() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::incache(const std::string &fname, Function &f) const  {
+%exception  casadi::FunctionInternal::incache(const std::string &fname, Function &f, const std::string &suffix="") const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::index_in(const std::string &name) const  {
@@ -794,6 +794,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::is_a(const std::string &type, bool recursive) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::is_diff_in(casadi_int i) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::is_diff_out(casadi_int i) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jac() const  {
@@ -988,7 +994,7 @@
 %exception  casadi::FunctionInternal::sz_work(size_t &sz_arg, size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::tocache(const Function &f) const  {
+%exception  casadi::FunctionInternal::tocache(const Function &f, const std::string &suffix="") const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::uses_output() const  {
@@ -998,6 +1004,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::wrap() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::wrap_as_needed(const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExternal::alloc_mem() const override {
@@ -1388,6 +1397,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Interpolant::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Interpolant::is_diff_in(casadi_int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Interpolant::is_parametric() const  {
