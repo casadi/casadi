@@ -207,7 +207,7 @@ namespace casadi {
     /** \brief Serialize type information */
     void serialize_type(SerializingStream& s) const override;
 
-    bool elide_copy() const override { return nnz()>=1; }
+    bool elide_copy() const override { return nnz()>=10; }
 
     /** \brief Deserializing constructor */
     explicit ConstantDM(DeserializingStream& s);
