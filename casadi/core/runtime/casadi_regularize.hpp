@@ -5,7 +5,7 @@
 // SYMBOL "lb_eig"
 // Use Gershgorin to finds upper and lower bounds on the eigenvalues
 template<typename T1>
-double casadi_lb_eig(const casadi_int* sp_h, const T1* h) {
+T1 casadi_lb_eig(const casadi_int* sp_h, const T1* h) {
   // Local variables
   casadi_int ncol, c, k;
   T1 center, radius;
