@@ -263,6 +263,8 @@ namespace casadi {
     opts["ad_weight"] = (*this)->ad_weight();
     opts["ad_weight_sp"] = (*this)->sp_weight();
     opts["max_num_dir"] = (*this)->max_num_dir_;
+    opts["is_diff_in"] = (*this)->is_diff_in_;
+    opts["is_diff_out"] = (*this)->is_diff_out_;
     return expand(name(), opts);
   }
 

@@ -90,6 +90,8 @@ namespace casadi {
   }
 
   void Map::init(const Dict& opts) {
+    is_diff_in_ = f_.is_diff_in();
+    is_diff_out_ = f_.is_diff_out();
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
