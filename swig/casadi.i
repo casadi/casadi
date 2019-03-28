@@ -1157,14 +1157,43 @@ namespace std {
     }
 
     bool to_ptr(GUESTOBJECT *p, std::vector<bool>** m) {
-      if (m) {
-        std::vector<casadi_int> intvec;
-        if (!to_ptr(p, &&intvec)) return false;
-        std::copy(intvec.begin(), intvec.end(), (**m).begin());
-        return true;
-      } else {
-        return to_ptr(p,static_cast<std::vector<casadi_int>**>(0));
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2
+          && (mxGetM(p)<=1 || mxGetN(p)<=1)) {
+        double* data = static_cast<double*>(mxGetData(p));
+        casadi_int n = mxGetM(p)*mxGetN(p);
+
+        // Check if all integers
+        bool all_0_or_1 = true;
+        for (casadi_int i=0; all_0_or_1 && i<n; ++i) {
+          double d = data[i];
+          all_0_or_1 = all_0_or_1 && (d==1 || d==0);
+        }
+
+        // Successful conversion
+        if (all_0_or_1) {
+          if (m) {
+            (**m).resize(n);
+            std::copy(data, data+n, (**m).begin());
+          }
+          return true;
+        }
       }
+
+      if (mxIsLogical(p) && !mxIsLogicalScalar(p) &&mxGetNumberOfDimensions(p)==2
+          && (mxGetM(p)<=1 || mxGetN(p)<=1) ) {
+        casadi_int n = mxGetM(p)*mxGetN(p);
+        mxLogical* data = static_cast<mxLogical*>(mxGetData(p));
+        if (m) {
+          (**m).resize(n);
+          std::copy(data, data+n, (**m).begin());
+        }
+        return true;
+      }
+
+      // Cell array
+      if (to_ptr_cell(p, m)) return true;
+
+      return false;
     }
 
     // MATLAB n-by-m char array mapped to vector of length m

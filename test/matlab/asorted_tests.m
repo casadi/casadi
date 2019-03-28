@@ -535,3 +535,44 @@ assert(size(MX(ones(1,4)),1)==1)
 assert(size(MX(ones(1,4)),2)==4)
 
 
+
+x = MX.sym('x');
+y = MX.sym('y');
+
+f = Function('f',{x,y},{x+y},struct('is_diff_in',[1 0]))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',[true false]))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',{{true false}}))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',{{1 0}}))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',[1;0]))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',[true;false]))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',{{true;false}}))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',{{1;0}}))
+
+
+flag = false;
+try
+  f = Function('f',{x,y},{x+y},struct('is_diff_in',[1 3]))
+catch
+  flag = true;
+end
+assert(flag);
+
+f.map(3,[1 0],[0])
+f.map(3,[true false],[0])
+f.map(3,{true false},[0])
+%f.map(3,{1 0},[0])
+f.map(3,[1;0],[0])
+f.map(3,[true;false],[0])
+f.map(3,{true;false},[0])
+%f.map(3,{1;0},[0])
+
+flag = false;
+try
+  f.map(3,[1 3])
+catch
+  flag = true;
+end
+assert(flag);
+
+
+
