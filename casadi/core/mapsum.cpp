@@ -252,12 +252,14 @@ namespace casadi {
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
-      g << "if (res1[" << j << "]) ";
       if (reduce_out_[j]) {
+        g << "if (res1[" << j << "]) ";
         g << g.axpy(f_.nnz_out(j), "1.0", "res1[" + str(j) + "]", "res[" + str(j) + "]") << "\n";
       } else {
-        if (f_.nnz_out(j))
+        if (f_.nnz_out(j)) {
+          g << "if (res1[" << j << "]) ";
           g << "res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+        }
       }
     }
     g << "}\n";
