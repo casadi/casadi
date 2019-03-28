@@ -535,6 +535,7 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::vector<double> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<casadi_int>** m);
     GUESTOBJECT* from_ptr(const std::vector<casadi_int> *a);
+    bool to_ptr(GUESTOBJECT *p, const std::vector<bool> **m);
     GUESTOBJECT* from_ptr(const std::vector<bool> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
@@ -1155,6 +1156,16 @@ namespace std {
       return false;
     }
 
+    bool to_ptr(GUESTOBJECT *p, std::vector<bool>** m) {
+      if (m) {
+        std::vector<casadi_int> intvec;
+        if (!to_ptr(p, &&intvec)) return false;
+        std::copy(intvec.begin(), intvec.end(), (**m).begin());
+        return true;
+      } else {
+        return to_ptr(p,static_cast<std::vector<casadi_int>**>(0));
+      }
+    }
 
     // MATLAB n-by-m char array mapped to vector of length m
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
