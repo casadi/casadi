@@ -1,11 +1,11 @@
 // NOLINT(legal/copyright)
 // SYMBOL "low"
 template<typename T1>
-casadi_int casadi_low(T1 x, const double* grid, casadi_int ng, casadi_int lookup_mode) {
+casadi_int casadi_low(T1 x, const T1* grid, casadi_int ng, casadi_int lookup_mode) {
   switch (lookup_mode) {
     case 1: // exact
       {
-        double g0, dg;
+        T1 g0, dg;
         casadi_int ret;
         g0 = grid[0];
         dg = grid[ng-1]-g0;

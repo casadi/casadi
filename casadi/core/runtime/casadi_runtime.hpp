@@ -148,7 +148,7 @@ namespace casadi {
 
   // Find the interval to which a value belongs
   template<typename T1>
-  casadi_int casadi_low(T1 x, const double* grid, casadi_int ng, casadi_int lookup_mode);
+  casadi_int casadi_low(T1 x, const T1* grid, casadi_int ng, casadi_int lookup_mode);
 
   // Get weights for the multilinear interpolant
   template<typename T1>
