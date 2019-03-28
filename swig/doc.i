@@ -31158,7 +31158,27 @@ std::vector< M > &arg, casadi_int npar) const  "
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  casadi::GenericMatrixCommon::dot(const MatType &x,
+*/ %feature("docstring")  casadi::GenericMatrixCommon::repweave(const
+MatType &A, casadi_int m, casadi_int n) "
+
+[INTERNAL]  Reorder elements in a repeated matrix according to a weaving
+pattern.
+
+";
+
+%feature("docstring") casadi::casadi_repweave "
+
+Reorder elements in a repeated matrix according to a weaving pattern.
+
+";
+
+%feature("docstring")  casadi::GenericMatrixCommon::casadi_repweave "
+
+Reorder elements in a repeated matrix according to a weaving pattern.
+
+";
+
+%feature("docstring")  casadi::GenericMatrixCommon::dot(const MatType &x,
 const MatType &y) "
 
 [INTERNAL]  Inner product of two matrices with x and y matrices of the same
@@ -33249,6 +33269,9 @@ C++ includes: global_options.hpp ";
 
 
 // File: classcasadi_1_1HorzRepsum.xml
+
+
+// File: classcasadi_1_1HorzRepWeave.xml
 
 
 // File: classcasadi_1_1Horzsplit.xml
@@ -47752,10 +47775,28 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jacobian() const  "
+%feature("docstring")  casadi::Map::jacobian() const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Calculate derivatives by multiplying the full Jacobian and multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
+
+";
+
+%feature("docstring")  casadi::Map::casadi_jacobian "
+
+Calculate derivatives by multiplying the full Jacobian and multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -48369,12 +48410,14 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_jacobian(const
-std::string &name, const std::vector< std::string > &inames, const
-std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Map::get_jacobian(const std::string &name,
+const std::vector< std::string > &inames, const std::vector< std::string >
+&onames, const Dict &opts) const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -48735,10 +48778,12 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
+%feature("docstring")  casadi::Map::has_jacobian() const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -57716,12 +57761,14 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_jacobian(const
-std::string &name, const std::vector< std::string > &inames, const
-std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Map::get_jacobian(const std::string &name,
+const std::vector< std::string > &inames, const std::vector< std::string >
+&onames, const Dict &opts) const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -57975,10 +58022,28 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jacobian() const  "
+%feature("docstring")  casadi::Map::jacobian() const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Calculate derivatives by multiplying the full Jacobian and multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
+
+";
+
+%feature("docstring")  casadi::Map::casadi_jacobian "
+
+Calculate derivatives by multiplying the full Jacobian and multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -58320,10 +58385,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
+%feature("docstring")  casadi::Map::has_jacobian() const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -77874,35 +77941,10 @@ Is upper triangular?
 
 ";
 
-%feature("docstring")  casadi::Sparsity::qr_sparse(Sparsity &output_V,
-Sparsity &output_R, std::vector< casadi_int > &output_prinv, std::vector<
-casadi_int > &output_pc, bool amd=true) const  "
+%feature("docstring")  casadi::Sparsity::enlargeColumns(casadi_int ncol,
+const std::vector< casadi_int > &cc, bool ind1=false) "
 
-Symbolic QR factorization Returns the sparsity pattern of V (compact
-representation of Q) and R as well as vectors needed for the numerical
-factorization and solution. The implementation is a modified version of
-CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
-work under the GNU LGPL.
-
-";
-
-%feature("docstring") casadi::casadi_qr_sparse "
-
-Symbolic QR factorization Returns the sparsity pattern of V (compact
-representation of Q) and R as well as vectors needed for the numerical
-factorization and solution. The implementation is a modified version of
-CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
-work under the GNU LGPL.
-
-";
-
-%feature("docstring")  casadi::Sparsity::casadi_qr_sparse "
-
-Symbolic QR factorization Returns the sparsity pattern of V (compact
-representation of Q) and R as well as vectors needed for the numerical
-factorization and solution. The implementation is a modified version of
-CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
-work under the GNU LGPL.
+Enlarge the matrix along the second dimension (i.e. insert columns)
 
 ";
 
@@ -78459,14 +78501,15 @@ matrix
 
 ";
 
-%feature("docstring")  casadi::Sparsity::pmult(const std::vector< casadi_int
-> &p, bool permute_rows=true, bool permute_columns=true, bool
-invert_permutation=false) const  "
+%feature("docstring")  casadi::Sparsity::size() const  "
 
-Permute rows and/or columns Multiply the sparsity with a permutation matrix
-from the left and/or from the right P * A * trans(P), A * trans(P) or A *
-trans(P) with P defined by an index vector containing the row for each col.
-As an alternative, P can be transposed (inverted).
+Get the shape.
+
+";
+
+%feature("docstring")  casadi::Sparsity::size(casadi_int axis) const  "
+
+Get the size along a particular dimensions.
 
 ";
 
@@ -78491,6 +78534,20 @@ Timothy A. Davis, 2006-2009 Licensed as a derivative work under the GNU LGPL
 %feature("docstring")  casadi::SharedObject::class_name() const  "
 
 Get class name.
+
+";
+
+%feature("docstring")  casadi::Sparsity::sparsity_cast_mod(const Sparsity
+&X, const Sparsity &Y) const  "
+
+Propagates subset according to sparsity cast.
+
+Assumption: 'this' is a subset of X.
+
+Example:
+
+X = [ * . . .; . * . .; . . * .; . . . *] Y = [* *; . . ; * *] x = [ * . .
+.; . . . .; . . * .; . . . *] returns [* *; . . ; . *]
 
 ";
 
@@ -78697,10 +78754,35 @@ Otherwise: \"[5x10,3nz]\"
 
 ";
 
-%feature("docstring")  casadi::Sparsity::enlargeColumns(casadi_int ncol,
-const std::vector< casadi_int > &cc, bool ind1=false) "
+%feature("docstring")  casadi::Sparsity::qr_sparse(Sparsity &output_V,
+Sparsity &output_R, std::vector< casadi_int > &output_prinv, std::vector<
+casadi_int > &output_pc, bool amd=true) const  "
 
-Enlarge the matrix along the second dimension (i.e. insert columns)
+Symbolic QR factorization Returns the sparsity pattern of V (compact
+representation of Q) and R as well as vectors needed for the numerical
+factorization and solution. The implementation is a modified version of
+CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
+work under the GNU LGPL.
+
+";
+
+%feature("docstring") casadi::casadi_qr_sparse "
+
+Symbolic QR factorization Returns the sparsity pattern of V (compact
+representation of Q) and R as well as vectors needed for the numerical
+factorization and solution. The implementation is a modified version of
+CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
+work under the GNU LGPL.
+
+";
+
+%feature("docstring")  casadi::Sparsity::casadi_qr_sparse "
+
+Symbolic QR factorization Returns the sparsity pattern of V (compact
+representation of Q) and R as well as vectors needed for the numerical
+factorization and solution. The implementation is a modified version of
+CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
+work under the GNU LGPL.
 
 ";
 
@@ -78717,15 +78799,14 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::size() const  "
+%feature("docstring")  casadi::Sparsity::pmult(const std::vector< casadi_int
+> &p, bool permute_rows=true, bool permute_columns=true, bool
+invert_permutation=false) const  "
 
-Get the shape.
-
-";
-
-%feature("docstring")  casadi::Sparsity::size(casadi_int axis) const  "
-
-Get the size along a particular dimensions.
+Permute rows and/or columns Multiply the sparsity with a permutation matrix
+from the left and/or from the right P * A * trans(P), A * trans(P) or A *
+trans(P) with P defined by an index vector containing the row for each col.
+As an alternative, P can be transposed (inverted).
 
 ";
 
@@ -78798,6 +78879,9 @@ Number of non-zeros in the upper triangular half, i.e. the number of
 elements (i, j) with j>=i.
 
 ";
+
+
+// File: classcasadi_1_1SparsityCast.xml
 
 
 // File: classcasadi_1_1Split.xml
@@ -82980,10 +83064,12 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
+%feature("docstring")  casadi::Map::has_jacobian() const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -83021,12 +83107,14 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_jacobian(const
-std::string &name, const std::vector< std::string > &inames, const
-std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Map::get_jacobian(const std::string &name,
+const std::vector< std::string > &inames, const std::vector< std::string >
+&onames, const Dict &opts) const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -83126,10 +83214,28 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jacobian() const  "
+%feature("docstring")  casadi::Map::jacobian() const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Calculate derivatives by multiplying the full Jacobian and multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
+
+";
+
+%feature("docstring")  casadi::Map::casadi_jacobian "
+
+Calculate derivatives by multiplying the full Jacobian and multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -84957,7 +85063,8 @@ Joris Gillis
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_du(casadi_qp_data< T1 > *d) "
+%feature("docstring")  casadi::casadi_weave(const T1 *x, casadi_int nnz,
+casadi_int m, casadi_int n, T1 *y) "
 
 [INTERNAL] ";
 
@@ -89762,8 +89869,8 @@ Get the number of QP solver outputs.
 
 ";
 
-%feature("docstring")  casadi::casadi_low(T1 x, const double *grid,
-casadi_int ng, casadi_int lookup_mode) "
+%feature("docstring")  casadi::casadi_low(T1 x, const T1 *grid, casadi_int
+ng, casadi_int lookup_mode) "
 
 [INTERNAL] ";
 
@@ -89954,6 +90061,10 @@ order:  Order of interpolating polynomials
 
 %feature("docstring")  casadi::casadi_file_slurp(const char *fname,
 casadi_int n, T1 *x) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_du(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
 

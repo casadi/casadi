@@ -24712,7 +24712,14 @@ elements.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::GenericMatrixCommon::dot "
+*/ %feature("docstring") casadi::GenericMatrixCommon::repweave "
+
+[INTERNAL]  Reorder elements in a repeated matrix according to a weaving
+pattern.
+
+";
+
+%feature("docstring") casadi::GenericMatrixCommon::dot "
 
 [INTERNAL]  Inner product of two matrices with x and y matrices of the same
 dimension.
@@ -25535,6 +25542,9 @@ C++ includes: global_options.hpp ";
 
 
 // File: classcasadi_1_1HorzRepsum.xml
+
+
+// File: classcasadi_1_1HorzRepWeave.xml
 
 
 // File: classcasadi_1_1Horzsplit.xml
@@ -37918,8 +37928,10 @@ multiplying.
 
 %feature("docstring") casadi::Map::jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -38427,8 +38439,10 @@ derivatives
 
 %feature("docstring") casadi::Map::get_jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -38714,8 +38728,10 @@ elements.
 
 %feature("docstring") casadi::Map::has_jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -45284,8 +45300,10 @@ generated function.
 
 %feature("docstring") casadi::OmpMap::get_jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -45500,8 +45518,10 @@ a main.
 
 %feature("docstring") casadi::OmpMap::jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -45784,8 +45804,10 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 %feature("docstring") casadi::OmpMap::has_jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -61686,13 +61708,9 @@ Is upper triangular?
 
 ";
 
-%feature("docstring") casadi::Sparsity::qr_sparse "
+%feature("docstring") casadi::Sparsity::enlargeColumns "
 
-Symbolic QR factorization Returns the sparsity pattern of V (compact
-representation of Q) and R as well as vectors needed for the numerical
-factorization and solution. The implementation is a modified version of
-CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
-work under the GNU LGPL.
+Enlarge the matrix along the second dimension (i.e. insert columns)
 
 ";
 
@@ -62073,12 +62091,16 @@ matrix
 
 ";
 
-%feature("docstring") casadi::Sparsity::pmult "
+%feature("docstring") casadi::Sparsity::size "
 
-Permute rows and/or columns Multiply the sparsity with a permutation matrix
-from the left and/or from the right P * A * trans(P), A * trans(P) or A *
-trans(P) with P defined by an index vector containing the row for each col.
-As an alternative, P can be transposed (inverted).
+Get the size along a particular dimensions.
+
+>  casadi_int casadi::Sparsity::size(casadi_int axis) const 
+------------------------------------------------------------------------
+
+Get the size along a particular dimensions.
+
+";
 
 ";
 
@@ -62103,6 +62125,19 @@ Timothy A. Davis, 2006-2009 Licensed as a derivative work under the GNU LGPL
 %feature("docstring") casadi::Sparsity::class_name "
 
 Get class name.
+
+";
+
+%feature("docstring") casadi::Sparsity::sparsity_cast_mod "
+
+Propagates subset according to sparsity cast.
+
+Assumption: 'this' is a subset of X.
+
+Example:
+
+X = [ * . . .; . * . .; . . * .; . . . *] Y = [* *; . . ; * *] x = [ * . .
+.; . . . .; . . * .; . . . *] returns [* *; . . ; . *]
 
 ";
 
@@ -62294,9 +62329,13 @@ Otherwise: \"[5x10,3nz]\"
 
 ";
 
-%feature("docstring") casadi::Sparsity::enlargeColumns "
+%feature("docstring") casadi::Sparsity::qr_sparse "
 
-Enlarge the matrix along the second dimension (i.e. insert columns)
+Symbolic QR factorization Returns the sparsity pattern of V (compact
+representation of Q) and R as well as vectors needed for the numerical
+factorization and solution. The implementation is a modified version of
+CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
+work under the GNU LGPL.
 
 ";
 
@@ -62313,16 +62352,12 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring") casadi::Sparsity::size "
+%feature("docstring") casadi::Sparsity::pmult "
 
-Get the size along a particular dimensions.
-
->  casadi_int casadi::Sparsity::size(casadi_int axis) const 
-------------------------------------------------------------------------
-
-Get the size along a particular dimensions.
-
-";
+Permute rows and/or columns Multiply the sparsity with a permutation matrix
+from the left and/or from the right P * A * trans(P), A * trans(P) or A *
+trans(P) with P defined by an index vector containing the row for each col.
+As an alternative, P can be transposed (inverted).
 
 ";
 
@@ -62386,6 +62421,9 @@ Number of non-zeros in the upper triangular half, i.e. the number of
 elements (i, j) with j>=i.
 
 ";
+
+
+// File: classcasadi_1_1SparsityCast.xml
 
 
 // File: classcasadi_1_1Split.xml
@@ -65966,8 +66004,10 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 %feature("docstring") casadi::ThreadMap::has_jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -66003,8 +66043,10 @@ elements.
 
 %feature("docstring") casadi::ThreadMap::get_jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -66083,8 +66125,10 @@ Evaluate or propagate sparsities.
 
 %feature("docstring") casadi::ThreadMap::jacobian "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+Return Jacobian of all input elements with respect to all output elements
 
 ";
 
@@ -67635,7 +67679,7 @@ Joris Gillis
 
 ";
 
-%feature("docstring") casadi::casadi_qp_du "
+%feature("docstring") casadi::casadi_weave "
 
 [INTERNAL] ";
 
@@ -69823,6 +69867,10 @@ order:  Order of interpolating polynomials
 ";
 
 %feature("docstring") casadi::casadi_file_slurp "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_du "
 
 [INTERNAL] ";
 
