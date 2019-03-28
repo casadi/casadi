@@ -423,6 +423,31 @@ assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(~issparse(b));
 
+
+f.generate('fmex_rp',struct('mex',true,'casadi_int','int','casadi_real','float'));
+clear fmex_rp
+if is_octave
+mex -DMATLAB_MEX_FILE fmex_rp.c
+else
+mex -largeArrayDims fmex_rp.c
+end
+[a,b] = fmex_rp('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+clear fmex_rp
+if is_octave
+mex -DCASADI_MEX_NO_SPARSE -DMATLAB_MEX_FILE fmex_rp.c
+else
+mex -DCASADI_MEX_NO_SPARSE -largeArrayDims fmex_rp.c
+end
+[a,b] = fmex_rp('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(~issparse(b));
+
 Xs = {SX, MX};
 for j=1:2;
   X = Xs{j};
