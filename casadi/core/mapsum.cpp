@@ -35,6 +35,8 @@ namespace casadi {
                           const std::vector<bool>& reduce_in,
                           const std::vector<bool>& reduce_out,
                           const Dict& opts) {
+    if (reduce_out.empty()) return create(name, parallelization, f, n,
+                                     reduce_in, std::vector<bool>(f.n_out(), false));
     casadi_assert(reduce_in.size()==f.n_in(), "Dimension mismatch");
     casadi_assert(reduce_out.size()==f.n_out(), "Dimension mismatch");
 
