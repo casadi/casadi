@@ -259,7 +259,7 @@ namespace casadi {
         \identifier{zj} */
     void serialize_type(SerializingStream& s) const override;
 
-    bool elide_copy() const override { return nnz()>=1; }
+    bool elide_copy() const override { return nnz()>=10; }
 
     /** \brief Deserializing constructor
 
