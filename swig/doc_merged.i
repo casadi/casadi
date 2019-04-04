@@ -3969,12 +3969,6 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::is_parametric "
-
-[INTERNAL]  Is parametric?
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::instruction_input "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
@@ -4109,6 +4103,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::has_parametric_grid "
+
+[INTERNAL]  Is parametric?
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::call_gen "
 
 [INTERNAL]   Call a function, overloaded.
@@ -4144,6 +4144,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::BSplineInterpolant::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::has_parametric_values "
+
+[INTERNAL]  Is parametric?
 
 ";
 
@@ -4260,11 +4266,9 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::export_code "
+%feature("docstring") casadi::BSplineInterpolant::arg_values "
 
-[INTERNAL]  Export function in a specific language.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::BSplineInterpolant::codegen_declarations "
 
@@ -4301,7 +4305,7 @@ elements.
 
 %feature("docstring") casadi::BSplineInterpolant::coeff_size "
 
-[INTERNAL]  Size of the falttened coefficients vector.
+[INTERNAL]  Size of the flattened coefficients vector.
 
 ";
 
@@ -4804,6 +4808,10 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::arg_grid "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::BSplineInterpolant::generate_out "
 
 [INTERNAL] ";
@@ -5029,6 +5037,12 @@ generated function.
 %feature("docstring") casadi::BSplineInterpolant::get_jacobian "
 
 [INTERNAL]  Full Jacobian.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::export_code "
+
+[INTERNAL]  Export function in a specific language.
 
 ";
 
@@ -30141,9 +30155,9 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::Interpolant::is_parametric "
+%feature("docstring") casadi::Interpolant::disp_more "
 
-[INTERNAL]  Is parametric?
+[INTERNAL]  Print more.
 
 ";
 
@@ -30156,6 +30170,17 @@ generated function.
 %feature("docstring") casadi::Interpolant::is_diff_out "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Interpolant::replace_fseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Interpolant::sx_out "
 
@@ -30229,6 +30254,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Interpolant::set_temp "
+
+[INTERNAL]  Set the (temporary) work vectors.
+
+";
+
 %feature("docstring") casadi::Interpolant::has_jacobian "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -30276,7 +30307,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 %feature("docstring") casadi::Interpolant::coeff_size "
 
-[INTERNAL]  Size of the falttened coefficients vector.
+[INTERNAL]  Size of the flattened coefficients vector.
 
 ";
 
@@ -30406,6 +30437,12 @@ multiplying.
 %feature("docstring") casadi::Interpolant::get_n_in "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Interpolant::has_parametric_grid "
+
+[INTERNAL]  Is parametric?
 
 ";
 
@@ -30604,6 +30641,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Interpolant::generate_lifted "
+
+[INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
 %feature("docstring") casadi::Interpolant::get_n_out "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -30714,17 +30757,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Interpolant::disp_more "
+%feature("docstring") casadi::Interpolant::arg_values "
 
-[INTERNAL]  Print more.
-
-";
-
-%feature("docstring") casadi::Interpolant::generate_lifted "
-
-[INTERNAL]  Extract the functions needed for the Lifted Newton method.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Interpolant::mx_out "
 
@@ -31291,11 +31326,9 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::Interpolant::set_temp "
+%feature("docstring") casadi::Interpolant::arg_grid "
 
-[INTERNAL]  Set the (temporary) work vectors.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Interpolant::getCount "
 
@@ -31367,14 +31400,9 @@ propagation.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Interpolant::replace_fseed "
+%feature("docstring") casadi::Interpolant::has_parametric_values "
 
-[INTERNAL]
-
->  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-";
+[INTERNAL]  Is parametric?
 
 ";
 
@@ -34494,12 +34522,6 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::is_parametric "
-
-[INTERNAL]  Is parametric?
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::call_reverse "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
@@ -34687,6 +34709,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::arg_grid "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::LinearInterpolant::size_in "
 
 [INTERNAL]  Input/output dimensions.
@@ -34784,6 +34810,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::arg_values "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::LinearInterpolant::symbolicAdjSeed "
 
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
@@ -34810,7 +34840,7 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 %feature("docstring") casadi::LinearInterpolant::coeff_size "
 
-[INTERNAL]  Size of the falttened coefficients vector.
+[INTERNAL]  Size of the flattened coefficients vector.
 
 ";
 
@@ -34979,9 +35009,9 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::nz_in "
+%feature("docstring") casadi::LinearInterpolant::eval_sx "
 
-[INTERNAL]  Convert from/to flat vector of input/output nonzeros.
+[INTERNAL]  Evaluate with symbolic scalars.
 
 ";
 
@@ -35309,6 +35339,12 @@ C++ includes: linear_interpolant.hpp ";
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::has_parametric_values "
+
+[INTERNAL]  Is parametric?
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::sp_reverse "
 
 [INTERNAL]  Propagate sparsity backwards.
@@ -35374,9 +35410,9 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::eval_sx "
+%feature("docstring") casadi::LinearInterpolant::nz_in "
 
-[INTERNAL]  Evaluate with symbolic scalars.
+[INTERNAL]  Convert from/to flat vector of input/output nonzeros.
 
 ";
 
@@ -35431,6 +35467,12 @@ structure recognition.
 %feature("docstring") casadi::LinearInterpolant::call "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::has_parametric_grid "
+
+[INTERNAL]  Is parametric?
 
 ";
 
@@ -35923,11 +35965,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::get_reltol "
+%feature("docstring") casadi::LinearInterpolantJac::has_parametric_grid "
 
-[INTERNAL]  Get relative tolerance.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::LinearInterpolantJac::nz_in "
 
@@ -35964,6 +36004,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::LinearInterpolantJac::call_reverse "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::get_reltol "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -36061,6 +36107,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::codegen_name "
+
+[INTERNAL]  Get name in codegen.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::generate_in "
 
 [INTERNAL]  Export an input file that can be passed to generate C code with
@@ -36129,9 +36181,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::codegen_name "
+%feature("docstring") casadi::LinearInterpolantJac::has_parametric_values "
 
-[INTERNAL]  Get name in codegen.
+[INTERNAL]  Is parametric?
 
 ";
 
@@ -36547,12 +36599,6 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::LinearInterpolantJac::instruction_constant "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::is_parametric "
-
-[INTERNAL]  Is parametric?
 
 ";
 
@@ -69517,14 +69563,14 @@ Get the number of QP solver outputs.
 
 Parametric variant of interpolant.
 
-The resulting function will have an additional argument for the coefficients
+The resulting function will have an additional argument for the grid
 
->  Function casadi::interpolant(const std::string &name, const std::string &solver, const std::vector< std::vector< double > > &grid, casadi_int m=1, const Dict &opts=Dict())
+>  Function casadi::interpolant(const std::string &name, const std::string &solver, const std::vector< casadi_int > &grid_dims, const std::vector< double > &values, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Parametric variant of interpolant.
 
-The resulting function will have an additional argument for the coefficients
+The resulting function will have an additional argument for the grid
 
 ";
 
