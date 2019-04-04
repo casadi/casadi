@@ -89830,8 +89830,8 @@ Get the number of QP solver outputs.
 
 ";
 
-%feature("docstring")  casadi::casadi_low(T1 x, const double *grid,
-casadi_int ng, casadi_int lookup_mode) "
+%feature("docstring")  casadi::casadi_low(T1 x, const T1 *grid, casadi_int
+ng, casadi_int lookup_mode) "
 
 [INTERNAL] ";
 
