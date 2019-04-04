@@ -2970,7 +2970,6 @@ class MXtests(casadiTestCase):
 
       z = sin(horzcat(x,sin(y),x))
       z_alt = sin(sparsity_cast(vertcat(vec(x),vec(sin(y)),vec(x)),z.sparsity()))
-      print z_alt
 
       f = Function('f',[x,y],[z])
       f_alt = Function('f_alt',[x,y],[z])
