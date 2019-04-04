@@ -65,8 +65,18 @@ namespace casadi {
     // Grid must be strictly increasing
     for (auto&& g : grid) {
       casadi_assert(is_increasing(g), "Gridpoints must be strictly increasing");
-      casadi_assert(is_regular(g), "Gridpoints must beregular");
+      casadi_assert(is_regular(g), "Gridpoints must be regular");
       casadi_assert(g.size()>=2, "Need at least two grid points for every input");
+    }
+  }
+
+  void Interpolant::check_grid(const std::vector<casadi_int> & grid_dims) {
+    // Dimension at least 1
+    casadi_assert(!grid_dims.empty(), "At least one dimension required");
+
+    // Grid must be strictly increasing
+    for (casadi_int d : grid_dims) {
+      casadi_assert(d>=2, "Need at least two grid points for every input");
     }
   }
 
@@ -135,6 +145,24 @@ namespace casadi {
 
   Function interpolant(const std::string& name,
                        const std::string& solver,
+                       const std::vector<casadi_int>& grid_dims,
+                       const std::vector<double>& values,
+                       const Dict& opts) {
+      Interpolant::check_grid(grid_dims);
+
+       // Consistency check, number of elements
+      casadi_uint nel = product(grid_dims);
+       casadi_assert(values.size() % nel== 0,
+         "Inconsistent number of elements. Must be a multiple of " +
+         str(nel) + ", but got " + str(values.size()) + " instead.");
+
+      casadi_int m = values.size()/nel;
+      return Function::create(Interpolant::getPlugin(solver)
+              .creator(name, std::vector<double>{}, cumsum0(grid_dims), values, m), opts);
+  }
+
+  Function interpolant(const std::string& name,
+                       const std::string& solver,
                        const std::vector<std::vector<double> >& grid,
                        casadi_int m,
                        const Dict& opts) {
@@ -148,6 +176,16 @@ namespace casadi {
       Interpolant::stack_grid(grid, offset, stacked);
       return Function::create(Interpolant::getPlugin(solver)
                               .creator(name, stacked, offset, std::vector<double>{}, m), opts);
+  }
+
+  Function interpolant(const std::string& name,
+                       const std::string& solver,
+                       const std::vector<casadi_int>& grid_dims,
+                       casadi_int m,
+                       const Dict& opts) {
+      Interpolant::check_grid(grid_dims);
+      return Function::create(Interpolant::getPlugin(solver)
+        .creator(name, std::vector<double>{}, cumsum0(grid_dims), std::vector<double>{}, m), opts);
   }
 
   Interpolant::
@@ -165,13 +203,9 @@ namespace casadi {
   }
 
   Sparsity Interpolant::get_sparsity_in(casadi_int i) {
-    if (i==0) {
-      return Sparsity::dense(ndim_);
-    }
-    if (i==1) {
-      casadi_assert_dev(is_parametric());
-      return Sparsity::dense(coeff_size());
-    }
+    if (i==0) return Sparsity::dense(ndim_);
+    if (arg_values(i)) return Sparsity::dense(coeff_size());
+    if (arg_grid(i)) return Sparsity::dense(offset_.back());
     casadi_assert_dev(false);
   }
 
@@ -181,13 +215,9 @@ namespace casadi {
   }
 
   std::string Interpolant::get_name_in(casadi_int i) {
-    if (i==0) {
-      return "x";
-    }
-    if (i==1) {
-      casadi_assert_dev(is_parametric());
-      return "c";
-    }
+    if (i==0) return "x";
+    if (arg_values(i)) return "c";
+    if (arg_grid(i)) return "g";
     casadi_assert_dev(false);
   }
 
@@ -210,6 +240,25 @@ namespace casadi {
         "'binary' uses a binary search. (default when #knots>100)."}}
      }
   };
+
+
+  bool Interpolant::arg_values(casadi_int i) const {
+    if (!has_parametric_values()) return false;
+    return arg_values()==i;
+  }
+  bool Interpolant::arg_grid(casadi_int i) const {
+    if (!has_parametric_grid()) return false;
+    return arg_grid()==i;
+  }
+
+  casadi_int Interpolant::arg_values() const {
+    casadi_assert_dev(has_parametric_values());
+    return 1+has_parametric_grid();
+  }
+  casadi_int Interpolant::arg_grid() const {
+    casadi_assert_dev(has_parametric_grid());
+    return 1;
+  }
 
   void Interpolant::init(const Dict& opts) {
     // Call the base class initializer

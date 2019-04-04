@@ -128,9 +128,11 @@ namespace casadi {
     // Call the base class initializer
     Interpolant::init(opts);
 
+    casadi_assert(!has_parametric_grid(), "Parametric grid not supported");
+
     MX x = MX::sym("x", ndim_);
 
-    if (is_parametric()) {
+    if (has_parametric_values()) {
       MX coeff = MX::sym("coeff", coeff_size());
 
       MX e = construct_graph(x, coeff, opts);

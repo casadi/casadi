@@ -55,7 +55,7 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return is_parametric() ? 2 : 1;}
+    size_t get_n_in() override { return 1+has_parametric_values()+has_parametric_grid();}
     size_t get_n_out() override { return 1;}
     ///@}
 
@@ -94,6 +94,7 @@ namespace casadi {
       std::vector<casadi_int>& offset, std::vector<double>& stacked);
 
     static void check_grid(const std::vector< std::vector<double> >& grid);
+    static void check_grid(const std::vector<casadi_int>& grid);
 
     static std::vector<double> meshgrid(const std::vector< std::vector<double> >& grid);
 
@@ -142,12 +143,21 @@ namespace casadi {
     static ProtoFunction* deserialize(DeserializingStream& s);
 
     /** \brief Is parametric? */
-    bool is_parametric() const { return values_.empty(); }
+    bool has_parametric_values() const { return values_.empty(); }
 
-    /** \brief Size of the falttened coefficients vector */
+    /** \brief Is parametric? */
+    bool has_parametric_grid() const { return grid_.empty(); }
+
+    casadi_int arg_values() const;
+    casadi_int arg_grid() const;
+
+    /** \brief Size of the flattened coefficients vector */
     casadi_int coeff_size() const;
 
   protected:
+
+    bool arg_values(casadi_int i) const;
+    bool arg_grid(casadi_int i) const;
 
     /** \brief Deserializing constructor */
     explicit Interpolant(DeserializingStream& s);

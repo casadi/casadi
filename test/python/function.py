@@ -1680,6 +1680,19 @@ class Functiontests(casadiTestCase):
     self.check_codegen(f,inputs=[0.2,0.333])
     self.check_serialize(f,inputs=[0.2,0.333])
 
+    d_knots_cat = vcat(d_knots[0]+d_knots[1])
+
+    LUT_param = casadi.interpolant('name','linear',[5,6],2)
+    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y),d_knots_cat,d_flat)])
+    self.checkfunction(LUT,f, inputs=[0.2,0.333])
+    self.check_codegen(f,inputs=[0.2,0.333])
+    self.check_serialize(f,inputs=[0.2,0.333])
+
+    LUT_param = casadi.interpolant('name','linear',[5,6],d_flat)
+    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y),d_knots_cat)])
+    self.checkfunction(LUT,f, inputs=[0.2,0.333])
+    self.check_codegen(f,inputs=[0.2,0.333])
+    self.check_serialize(f,inputs=[0.2,0.333])
 
   def test_2d_bspline_multiout(self):
     np.random.seed(0)

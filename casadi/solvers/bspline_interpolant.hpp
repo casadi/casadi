@@ -167,7 +167,7 @@ namespace casadi {
           M V = M::reshape(values, m_, -1).T();
           M C_opt = solve(J, V, linear_solver_);
 
-          if (!is_parametric()) {
+          if (!has_parametric_values()) {
             double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - V));
             if (verbose_) casadi_message("Lookup table fitting error: " + str(fit));
           }
@@ -179,7 +179,7 @@ namespace casadi {
           casadi_int n_dim = degree_.size();
           // Linear fit
           Function linear;
-          if (is_parametric()) {
+          if (has_parametric_values()) {
             linear = interpolant("linear", "linear", grid, m_);
           } else {
             linear = interpolant("linear", "linear", grid, values_);
@@ -233,7 +233,7 @@ namespace casadi {
           // Evaluate linear interpolation on greville grid
           DM arg = DM::reshape(mg, n_dim, N);
           std::vector<M> res;
-          if (is_parametric()) {
+          if (has_parametric_values()) {
             res = linear(std::vector<M>{M(arg), values});
           } else {
             res = linear(std::vector<M>{M(arg)});
