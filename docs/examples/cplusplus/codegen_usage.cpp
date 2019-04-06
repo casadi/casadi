@@ -269,6 +269,9 @@ int usage_c_with_mem(){
   printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
 
   casadi_free(mem);
+
+  /* Success */
+  return 0;
 }
 
 
