@@ -339,11 +339,17 @@ public:
   \date 2010
 */
 class NanSX : public ConstantSX {
-public:
-
+private:
+  /* Private constructor (singleton class) */
   explicit NanSX() {this->count++;}
+public:
+  /* Get singleton instance */
+  static NanSX* singleton() {
+    static NanSX instance;
+    return &instance;
+  }
+  /* Destructor */
   ~NanSX() override {this->count--;}
-
   /** \brief  Get the value */
   double to_double() const override { return std::numeric_limits<double>::quiet_NaN();}
 

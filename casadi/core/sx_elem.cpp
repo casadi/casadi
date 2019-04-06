@@ -521,7 +521,7 @@ namespace casadi {
   const SXElem casadi_limits<SXElem>::two(IntegerSX::create(2), false);
   // node corresponding to a constant -1
   const SXElem casadi_limits<SXElem>::minus_one(new MinusOneSX(), false);
-  const SXElem casadi_limits<SXElem>::nan(new NanSX(), false);
+  const SXElem casadi_limits<SXElem>::nan(NanSX::singleton(), false);
   const SXElem casadi_limits<SXElem>::inf(new InfSX(), false);
   const SXElem casadi_limits<SXElem>::minus_inf(new MinusInfSX(), false);
 
