@@ -514,16 +514,16 @@ namespace casadi {
   }
 
   // node corresponding to a constant 0
-  const SXElem casadi_limits<SXElem>::zero(new ZeroSX(), false);
+  const SXElem casadi_limits<SXElem>::zero(ZeroSX::singleton(), false);
   // node corresponding to a constant 1
-  const SXElem casadi_limits<SXElem>::one(new OneSX(), false);
+  const SXElem casadi_limits<SXElem>::one(OneSX::singleton(), false);
   // node corresponding to a constant 2
   const SXElem casadi_limits<SXElem>::two(IntegerSX::create(2), false);
   // node corresponding to a constant -1
-  const SXElem casadi_limits<SXElem>::minus_one(new MinusOneSX(), false);
+  const SXElem casadi_limits<SXElem>::minus_one(MinusOneSX::singleton(), false);
   const SXElem casadi_limits<SXElem>::nan(NanSX::singleton(), false);
-  const SXElem casadi_limits<SXElem>::inf(new InfSX(), false);
-  const SXElem casadi_limits<SXElem>::minus_inf(new MinusInfSX(), false);
+  const SXElem casadi_limits<SXElem>::inf(InfSX::singleton(), false);
+  const SXElem casadi_limits<SXElem>::minus_inf(MinusInfSX::singleton(), false);
 
   bool casadi_limits<SXElem>::is_zero(const SXElem& val) {
     return val.is_zero();
