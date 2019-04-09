@@ -61,7 +61,13 @@ namespace casadi {
   = {{&Conic::options_},
      {{"osqp",
        {OT_DICT,
-        "const Options to be passed to osqp."}}
+        "const Options to be passed to osqp."}},
+      {"warm_start_primal",
+       {OT_BOOL,
+        "Use x0 input to warmstart [Default: true]."}},
+      {"warm_start_dual",
+       {OT_BOOL,
+        "Use lam_a0 and lam_x0 input to warmstart [Default: truw]."}}
      }
   };
 
@@ -70,10 +76,18 @@ namespace casadi {
     Conic::init(opts);
 
     osqp_set_default_settings(&settings_);
+    settings_.warm_start = false;
+
+    warm_start_primal_ = true;
+    warm_start_dual_ = true;
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="osqp") {
+      if (op.first=="warm_start_primal") {
+        warm_start_primal_ = op.second;
+      } else if (op.first=="warm_start_dual") {
+        warm_start_dual_ = op.second;
+      } else if (op.first=="osqp") {
         const Dict& opts = op.second;
         for (auto&& op : opts) {
           if (op.first=="rho") {
@@ -115,7 +129,8 @@ namespace casadi {
           } else if (op.first=="check_termination") {
             settings_.check_termination = op.second;
           } else if (op.first=="warm_start") {
-            settings_.warm_start = op.second;
+            casadi_error("OSQP's warm_start option is impure and therefore disabled. "
+                         "Use CasADi options 'warm_start_primal' and 'warm_start_dual' instead.");
           //} else if (op.first=="time_limit") {
           //  settings_.time_limit = op.second;
           } else {
@@ -236,14 +251,18 @@ namespace casadi {
     ret = osqp_update_P_A(m->work, w, nullptr, nnzHupp_, A, nullptr, nnzA_);
     casadi_assert(ret==0, "Problem in osqp_update_P_A");
 
-    ret = osqp_warm_start_x(m->work, arg[CONIC_X0]);
-    casadi_assert(ret==0, "Problem in osqp_warm_start_x");
 
-    // Load problem data
-    casadi_copy(arg[CONIC_LAM_X0], nx_, w);
-    casadi_copy(arg[CONIC_LAM_A0], na_, w+nx_);
-    ret = osqp_warm_start_y(m->work, w);
-    casadi_assert(ret==0, "Problem in osqp_warm_start_y");
+    if (warm_start_primal_) {
+      ret = osqp_warm_start_x(m->work, arg[CONIC_X0]);
+      casadi_assert(ret==0, "Problem in osqp_warm_start_x");
+    }
+
+    if (warm_start_dual_) {
+      casadi_copy(arg[CONIC_LAM_X0], nx_, w);
+      casadi_copy(arg[CONIC_LAM_A0], na_, w+nx_);
+      ret = osqp_warm_start_y(m->work, w);
+      casadi_assert(ret==0, "Problem in osqp_warm_start_y");
+    }
 
     // Solve Problem
     ret = osqp_solve(m->work);
@@ -403,6 +422,8 @@ namespace casadi {
   OsqpInterface::OsqpInterface(DeserializingStream& s) : Conic(s) {
     s.unpack("OsqpInterface::nnzHupp", nnzHupp_);
     s.unpack("OsqpInterface::nnzA", nnzA_);
+    s.unpack("OsqpInterface::warm_start_primal", warm_start_primal_);
+    s.unpack("OsqpInterface::warm_start_dual", warm_start_dual_);
 
     osqp_set_default_settings(&settings_);
     s.unpack("OsqpInterface::settings::rho", settings_.rho);
@@ -432,6 +453,8 @@ namespace casadi {
     Conic::serialize_body(s);
     s.pack("OsqpInterface::nnzHupp", nnzHupp_);
     s.pack("OsqpInterface::nnzA", nnzA_);
+    s.pack("OsqpInterface::warm_start_primal", warm_start_primal_);
+    s.pack("OsqpInterface::warm_start_dual", warm_start_dual_);
     s.pack("OsqpInterface::settings::rho", settings_.rho);
     s.pack("OsqpInterface::settings::sigma", settings_.sigma);
     s.pack("OsqpInterface::settings::scaling", settings_.scaling);
