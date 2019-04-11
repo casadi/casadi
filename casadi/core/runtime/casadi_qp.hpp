@@ -120,7 +120,7 @@ struct casadi_qp_data {
   // Pending active-set change
   casadi_int index, sign;
   // Feasibility restoration active-set change
-  casadi_int r_index, r_sign;
+  casadi_int r_index, r_sign, l_index;
   // Iteration
   casadi_int iter;
 };
@@ -198,6 +198,7 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   d->r_sign = 0;
   // Reset iteration counter
   d->iter = 0;
+  d->l_index = -1;
   return 0;
 }
 
@@ -274,6 +275,7 @@ void casadi_qp_du_index(casadi_qp_data<T1>* d) {
   d->index = -1;
   best_sens = -1;
   for (i = 0; i < p->nz; ++i) {
+    if (i==d->l_index) continue;
     // Skip if no dual infeasibility sensitivity
     if (d->sens[i] == 0.) continue;
     // Is the constraint enforced?
@@ -868,6 +870,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d) {
             }
           }
         } else if (!d->neverzero[i]) {
+          // Don't consider for dropping the constraint that was just enforced
+          if (d->has_search_dir && d->sign!=0 && i==d->index) continue;
           // Drop a constraint?
           if (d->lam[i] > 0 ? d->dlam[i] < -1e-12 : d->dlam[i] > 1e-12) {
             if ((tau_test = -d->lam[i] / d->dlam[i]) < tau) {
@@ -1064,6 +1068,7 @@ int casadi_qp_prepare(casadi_qp_data<T1>* d) {
   casadi_qp_flip(d);
   // Form and factorize the KKT system
   casadi_qp_factorize(d);
+  d->l_index = d->index;
   // Termination message
   if (!d->sing && d->index == -1) {
     d->status = QP_SUCCESS;
