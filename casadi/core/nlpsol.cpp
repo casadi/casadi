@@ -940,7 +940,7 @@ namespace casadi {
     // Callback outputs
     fill_n(m->res, fcallback_.n_out(), nullptr);
     double ret = 0;
-    m->arg[0] = &ret;
+    m->res[0] = &ret;
 
     // Start timer
     m->fstats.at("callback_fun").tic();
