@@ -1585,6 +1585,25 @@ namespace casadi {
     }
   }
 
+  Sparsity FunctionInternal::jacobian_sparsity_filter(const Sparsity& sp) const {
+    if (all(is_diff_in_) && all(is_diff_out_)) return sp;
+
+    // Split up Jacobian blocks
+    std::vector<casadi_int> r_offset = {0}, c_offset = {0};
+    for (casadi_int i=0;i<n_out_;++i) r_offset.push_back(r_offset.back() + numel_out(i));
+    for (casadi_int i=0;i<n_in_;++i) c_offset.push_back(c_offset.back() + numel_in(i));
+    auto spblocks = Sparsity::blocksplit(sp, r_offset, c_offset);
+
+    for (casadi_int i=0;i<n_in_;++i) {
+      for (casadi_int j=0;j<n_out_;++j) {
+        if (!is_diff_in_[i] || !is_diff_out_[j]) spblocks[j][i] = Sparsity(spblocks[j][i].size());
+      }
+    }
+
+    return blockcat(spblocks);
+  }
+
+
   Sparsity& FunctionInternal::
   sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
     // Get an owning reference to the block

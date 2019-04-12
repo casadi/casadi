@@ -683,6 +683,9 @@ namespace casadi {
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const;
 
+    /// Filter out nonzeros in the full sparsity jacobian according to is_diff_in/out
+    Sparsity jacobian_sparsity_filter(const Sparsity& sp) const;
+
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolic_output(const std::vector<MX>& arg) const;
 

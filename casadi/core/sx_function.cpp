@@ -836,6 +836,8 @@ namespace casadi {
     // Jacobian expression
     SX J = SX::jacobian(veccat(out_), veccat(in_));
 
+    J = project(J, jacobian_sparsity_filter(J.sparsity()));
+
     // All inputs of the return function
     std::vector<SX> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
