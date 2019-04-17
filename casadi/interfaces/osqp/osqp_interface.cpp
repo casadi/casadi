@@ -218,8 +218,10 @@ namespace casadi {
     int ret;
 
     // Set objective
-    if (arg[CONIC_G]) ret = osqp_update_lin_cost(m->work, arg[CONIC_G]);
-    casadi_assert(ret==0, "Problem in osqp_update_lin_cost");
+    if (arg[CONIC_G]) {
+      ret = osqp_update_lin_cost(m->work, arg[CONIC_G]);
+      casadi_assert(ret==0, "Problem in osqp_update_lin_cost");
+    }
 
     // Set bounds
     casadi_copy(arg[CONIC_LBX], nx_, w);
