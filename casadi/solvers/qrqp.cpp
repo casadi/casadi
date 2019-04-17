@@ -169,8 +169,6 @@ namespace casadi {
   int Qrqp::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<QrqpMemory*>(mem);
-    // Reset statistics
-    for (auto&& s : m->fstats) s.second.reset();
     // Message buffer
     char buf[121];
     // Setup data structure

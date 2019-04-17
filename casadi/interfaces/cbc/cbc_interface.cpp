@@ -253,8 +253,6 @@ namespace casadi {
     m->return_status = -1;
     m->secondary_return_status = -1;
 
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
     m->fstats.at("preprocessing").tic();
 
     // Get inputs
@@ -399,9 +397,6 @@ namespace casadi {
     if (res[CONIC_COST]) *res[CONIC_COST] = f;
 
     m->fstats.at("postprocessing").toc();
-
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
 
     m->return_status = model.status();
     m->success = m->return_status==0 && model.isProvenOptimal();

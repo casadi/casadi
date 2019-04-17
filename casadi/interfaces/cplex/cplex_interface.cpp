@@ -331,9 +331,6 @@ namespace casadi {
     auto m = static_cast<CplexMemory*>(mem);
     const SDPToSOCPMem& sm = sdp_to_socp_mem_;
 
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
-
     m->fstats.at("preprocessing").tic();
 
     // Problem has not been solved at this point
@@ -629,8 +626,6 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
     return 0;
   }
 
