@@ -60,7 +60,7 @@ public:
   }
 
 private:
-  casadi_int mem;
+  int mem;
   const T& proto_;
 };
 
@@ -77,6 +77,12 @@ private:
   CASADI_EXPORT std::vector<casadi_int> range(casadi_int start, casadi_int stop, casadi_int step=1,
                                             casadi_int len=std::numeric_limits<casadi_int>::max());
 
+  /** \brief Check if a vector matches a range
+   * 
+   */
+  CASADI_EXPORT bool is_range(const std::vector<casadi_int>& v,
+    casadi_int start, casadi_int stop, casadi_int step=1);
+
   CASADI_EXPORT std::string join(const std::vector<std::string>& l, const std::string& delim=",");
 
   /// Checsks if s starts with p
@@ -92,6 +98,16 @@ private:
   CASADI_EXPORT bool all(const std::vector<bool> &v);
   /// Check if any arguments are true
   CASADI_EXPORT bool any(const std::vector<bool> &v);
+  /// Invert all entries
+  CASADI_EXPORT std::vector<bool> boolvec_not(const std::vector<bool> &v);
+  /// And operation on boolean vector
+  CASADI_EXPORT std::vector<bool> boolvec_and(const std::vector<bool> &lhs,
+      const std::vector<bool> &rhs);
+  /// Or operation on boolean vector
+  CASADI_EXPORT std::vector<bool> boolvec_or(const std::vector<bool> &lhs,
+      const std::vector<bool> &rhs);
+
+  CASADI_EXPORT std::vector<casadi_int> boolvec_to_index(const std::vector<bool> &v);
 
   CASADI_EXPORT bool is_equally_spaced(const std::vector<double> &v);
 
@@ -103,6 +119,8 @@ private:
   CASADI_EXPORT std::vector<int> to_int(const std::vector<casadi_int>& rhs);
   CASADI_EXPORT std::vector< std::vector<int> > to_int(
     const std::vector< std::vector<casadi_int> >& rhs);
+
+  CASADI_EXPORT std::string str_bvec(bvec_t v);
 
   /**  \brief Slicing vector
   *  \param v Vector to slice
@@ -121,10 +139,19 @@ private:
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b);
 
+  /** \brief Join three lists
+  */
+  template<typename T>
+  std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c);
+
   /** \brief permute a list
   */
   template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order);
+
+  /** \brief find nonzeros */
+  template<typename T>
+  std::vector<casadi_int> find(const std::vector<T> &v);
 
   #endif // SWIG
 
@@ -171,6 +198,23 @@ private:
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v,
                                                      casadi_int size);
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v);
+
+  /** \brief Flatten a nested std::vector tot a single flattened vector
+   * 
+   * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+   */
+  template<class T, class S>
+  void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
+                            std::vector<S>& flat);
+
+  /** \brief Flatten a nested std::vector tot a single flattened vector
+   * 
+   * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+   */
+  template<class T, class S, class I>
+  void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
+                            std::vector<S>& flat,
+                            std::vector<I>& indices);
 
   /// \cond INTERNAL
 #ifndef SWIG
@@ -292,6 +336,12 @@ private:
   template<typename T>
   std::vector<T> cumsum(const std::vector<T> &values);
 
+  /** \brief diff
+  *
+  */
+  template<typename T>
+  std::vector<T> diff(const std::vector<T> &values);
+
   /** \brief cumulative sum, starting with zero
   *
   */
@@ -311,6 +361,57 @@ private:
 
   // Create a temporary file
   CASADI_EXPORT std::string temporary_file(const std::string& prefix, const std::string& suffix);
+
+  CASADI_EXPORT void normalized_setup(std::istream& stream);
+  CASADI_EXPORT void normalized_setup(std::ostream& stream);
+
+  inline void normalized_out(std::ostream& stream, double val) {
+    if (val==std::numeric_limits<double>::infinity()) {
+      stream << "inf";
+    } else if (val==-std::numeric_limits<double>::infinity()) {
+      stream << "-inf";
+    } else if (val!=val) {
+      stream << "nan";
+    } else {
+      stream << val;
+    }
+  }
+  inline int normalized_in(std::istream& stream, double& ret) {
+    std::streampos start = stream.tellg();
+    stream >> ret;
+    // Failed to interpret as double?
+    if (stream.fail()) {
+      // Clear error flag
+      stream.clear();
+      // Reset stream position
+      // Need to parse e.g "-inf"
+      stream.seekg(start);
+      // Might be a inf/nan
+      std::string non_reg;
+      stream >> non_reg;
+      // Break on trailing whitespace
+      if (stream.fail()) {
+        if (stream.eof()) {
+          ret = std::numeric_limits<double>::quiet_NaN();
+          return -1; // End of stream
+        } else {
+          ret = std::numeric_limits<double>::quiet_NaN();
+          return 1; // Failed to parse to string
+        }
+      }
+      if (non_reg=="inf") {
+        ret = std::numeric_limits<double>::infinity();
+      } else if (non_reg=="-inf") {
+        ret = -std::numeric_limits<double>::infinity();
+      } else if (non_reg=="nan") {
+        ret = std::numeric_limits<double>::quiet_NaN();
+      } else {
+        ret = std::numeric_limits<double>::quiet_NaN();
+        return 2; // Failed to interpretas number
+      }
+    }
+    return 0;
+  }
 
 } // namespace casadi
 
@@ -393,6 +494,14 @@ namespace casadi {
   }
 
   template<typename T>
+  std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c) {
+    std::vector<T> ret = a;
+    ret.insert(ret.end(), b.begin(), b.end());
+    ret.insert(ret.end(), c.begin(), c.end());
+    return ret;
+  }
+
+  template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order) {
     casadi_assert_dev(order.size()==a.size());
     std::set<casadi_int> order_set(order.begin(), order.end());
@@ -400,6 +509,15 @@ namespace casadi {
     casadi_assert_dev(*order_set.begin()==0);
     casadi_assert_dev(*order_set.rbegin()==a.size()-1);
     return vector_slice(a, order);
+  }
+
+  template<typename T>
+  std::vector<casadi_int> find(const std::vector<T> &v) {
+    std::vector<casadi_int> ret;
+    for (casadi_int i=0;i<v.size();++i) {
+      if (v[i]) ret.push_back(i);
+    }
+    return ret;
   }
 
 #ifndef SWIG
@@ -454,6 +572,41 @@ namespace casadi {
     if (max >= upper) return false;
     casadi_int min = *std::min_element(v.begin(), v.end());
     return (min >= lower);
+  }
+
+  template<class T, class S>
+  void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
+                             std::vector<S>& flat) {
+    // Count total elements in nested
+    casadi_int N = 0;
+    for (const auto& e : nested) {
+      N += e.size();
+    }
+
+    // Populate flat, one nested section at a time
+    flat.clear();
+    flat.reserve(N);
+    for (const auto& e : nested) {
+      flat.insert(flat.end(), e.begin(), e.end());
+    }
+  }
+
+  template<class T, class S, class I>
+  void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
+                             std::vector<S>& flat,
+                             std::vector<I>& indices) {
+    // Delegate
+    flatten_nested_vector(nested, flat);
+
+    // Build up indices
+    casadi_int N = nested.size();
+    indices.resize(1, 0);
+    indices.reserve(N+1);
+    casadi_int offset = 0;
+    for (const auto& e : nested) {
+      offset += e.size();
+      indices.push_back(offset);
+    }
   }
 
   template<typename T>
@@ -681,6 +834,16 @@ namespace casadi {
     for (casadi_int i=0;i<values.size();++i) {
       acc+= values[i];
       ret[i+1] = acc;
+    }
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> diff(const std::vector<T> &values) {
+    casadi_assert(!values.empty(), "Array must be non-empty");
+    std::vector<T> ret(values.size()-1);
+    for (casadi_int i=0;i<values.size()-1;++i) {
+      ret[i] = values[i+1]-values[i];
     }
     return ret;
   }

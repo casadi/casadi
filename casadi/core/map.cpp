@@ -90,6 +90,8 @@ namespace casadi {
   }
 
   void Map::init(const Dict& opts) {
+    is_diff_in_ = f_.is_diff_in();
+    is_diff_out_ = f_.is_diff_out();
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
@@ -101,7 +103,7 @@ namespace casadi {
   }
 
   template<typename T>
-  int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, casadi_int mem) const {
+  int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
@@ -149,9 +151,10 @@ namespace casadi {
   }
 
   void Map::codegen_body(CodeGenerator& g) const {
-    g << "casadi_int i;\n";
-    g << "const casadi_real** arg1;\n";
-    g << "casadi_real** res1;\n";
+    g.local("i", "casadi_int");
+    g.local("arg1", "const casadi_real*", "*");
+    g.local("res1", "casadi_real*", "*");
+
     // Input buffer
     g << "arg1 = arg+" << n_in_ << ";\n"
       << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
@@ -163,11 +166,13 @@ namespace casadi {
     g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
-      g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+      if (f_.nnz_in(j))
+        g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
-      g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+      if (f_.nnz_out(j))
+        g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
     }
     g << "}\n";
   }
@@ -315,7 +320,16 @@ namespace casadi {
       }
 
       // Evaluation
-      flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]) || flag;
+      try {
+        flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]) || flag;
+      } catch (std::exception& e) {
+        flag = 1;
+        casadi_warning("Exception raised: " + std::string(e.what()));
+      } catch (...) {
+        flag = 1;
+        casadi_warning("Uncaught exception.");
+      }
+
     }
 
     // Return error flag
@@ -335,12 +349,12 @@ namespace casadi {
       << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
     for (casadi_int j=0; j<n_in_; ++j) {
       g << "arg1[" << j << "] = arg[" << j << "] ? "
-        << "arg[" << j << "]+i*" << f_.nnz_in(j) << ": 0;\n";
+        << g.arg(j) << "+i*" << f_.nnz_in(j) << ": 0;\n";
     }
     g << "res1 = res + " <<  n_out_ << "+i*" <<  sz_res << ";\n";
     for (casadi_int j=0; j<n_out_; ++j) {
       g << "res1[" << j << "] = res[" << j << "] ?"
-        << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;\n";
+        << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
     }
     g << "flag = "
       << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << " || flag;\n"
@@ -395,7 +409,15 @@ namespace casadi {
       res1[j] = res[j] ? res[j] + i*f.nnz_out(j) : nullptr;
     }
 
-    ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);
+    try {
+      ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);
+    } catch (std::exception& e) {
+      ret = 1;
+      casadi_warning("Exception raised: " + std::string(e.what()));
+    } catch (...) {
+      ret = 1;
+      casadi_warning("Uncaught exception.");
+    }
   }
 
   int ThreadMap::eval(const double** arg, double** res, casadi_int* iw, double* w,

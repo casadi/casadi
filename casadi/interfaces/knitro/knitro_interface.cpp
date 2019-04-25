@@ -68,7 +68,11 @@ namespace casadi {
         "Detect type of constraints"}},
       {"contype",
        {OT_INTVECTOR,
-        "Type of constraint"}}
+        "Type of constraint"}},
+      {"complem_variables",
+       {OT_INTVECTORVECTOR,
+        "List of complementary constraints on simple bounds. "
+        "Pair (i, j) encodes complementarity between the bounds on variable i and variable j."}}
      }
   };
 
@@ -77,6 +81,7 @@ namespace casadi {
     Nlpsol::init(opts);
 
     bool detect_linear_constraints = true;
+    std::vector< std::vector<casadi_int> > complem_variables;
 
     // Read user options
     for (auto&& op : opts) {
@@ -86,6 +91,8 @@ namespace casadi {
         contype_ = op.second;
       } else if (op.first=="detect_linear_constraints") {
         detect_linear_constraints = op.second;
+      } else if (op.first=="complem_variables") {
+        complem_variables = op.second;
       }
     }
 
@@ -103,6 +110,19 @@ namespace casadi {
     }
 
     casadi_assert_dev(contype_.size()==ng_);
+
+    //comp_type_.resize(complem_variables.size(), KN_CCTYPE_VARVAR);
+    comp_i1_.reserve(complem_variables.size());
+    comp_i2_.reserve(complem_variables.size());
+    for (auto && e : complem_variables) {
+      casadi_assert(e.size()==2, "Complementary constraints must come in pairs.");
+      casadi_assert(e[0]>=0, "Invalid variable index.");
+      casadi_assert(e[1]>=0, "Invalid variable index.");
+      casadi_assert(e[0]<nx_, "Invalid variable index.");
+      casadi_assert(e[1]<nx_, "Invalid variable index.");
+      comp_i1_.push_back(e[0]);
+      comp_i2_.push_back(e[1]);
+    }
 
     // Setup NLP functions
     create_function("nlp_fg", {"x", "p"}, {"f", "g"});
@@ -250,6 +270,11 @@ namespace casadi {
                        nnzH, get_ptr(Hrow), get_ptr(Hcol), d_nlp->z, nullptr); // initial lambda
       casadi_assert(status==0, "KTR_init_problem failed");
     }
+
+    // Complementarity constraints
+    status = KTR_set_compcons(m->kc, comp_i1_.size(),
+      get_ptr(comp_i1_), get_ptr(comp_i2_));
+    casadi_assert(status==0, "KTR_set_compcons failed");
 
     // Register callback functions
     status = KTR_set_func_callback(m->kc, &callback);
@@ -434,6 +459,9 @@ namespace casadi {
   KnitroInterface::KnitroInterface(DeserializingStream& s) : Nlpsol(s) {
     s.version("KnitroInterface", 1);
     s.unpack("KnitroInterface::contype", contype_);
+    //s.unpack("KnitroInterface::comp_type", comp_type_);
+    s.unpack("KnitroInterface::comp_i1", comp_i1_);
+    s.unpack("KnitroInterface::comp_i2", comp_i2_);
     s.unpack("KnitroInterface::opts", opts_);
     s.unpack("KnitroInterface::jacg_sp", jacg_sp_);
     s.unpack("KnitroInterface::hesslag_sp", hesslag_sp_);
@@ -443,6 +471,9 @@ namespace casadi {
     Nlpsol::serialize_body(s);
     s.version("KnitroInterface", 1);
     s.pack("KnitroInterface::contype", contype_);
+    //s.pack("KnitroInterface::comp_type", comp_type_);
+    s.pack("KnitroInterface::comp_i1", comp_i1_);
+    s.pack("KnitroInterface::comp_i2", comp_i2_);
     s.pack("KnitroInterface::opts", opts_);
     s.pack("KnitroInterface::jacg_sp", jacg_sp_);
     s.pack("KnitroInterface::hesslag_sp", hesslag_sp_);

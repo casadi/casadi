@@ -115,7 +115,7 @@ deprecated = re.compile(r"\b[dD]epr[ei]c[ie]?at[ei]")
 warning = re.compile("warning")
 
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],check_depreciation=True,check_warning=False,custom_stdout=None,default_fail=False):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],stdout_must_have=[],check_depreciation=True,check_warning=False,custom_stdout=None,default_fail=False):
     """
 
     dirname: The directory that should be crawled for test problems.
@@ -138,6 +138,8 @@ class TestSuite:
     stderr_trigger: list of strings/regexes. If any string is found in std_err, it is considered an error, regardless of the return_code. A message may be attached to a trigger by packing the string/regex in a 2-tuple, with the second element the message.
 
     stdout_trigger: list of strings/regexes. If any string is found in std_out, it is considered an error, regardless of the return_code. A message may be attached to a trigger by packing the string/regex in a 2-tuple, with the second element the message.
+
+    stdout_must_have: list of strings/regexes. If any string is not found in std_out, it is considered an error, regardless of the return_code. A message may be attached to a trigger by packing the string/regex in a 2-tuple, with the second element the message.
 
     check_depreciation: raise an error if the output contains a depreciation warning
 
@@ -173,6 +175,7 @@ class TestSuite:
     self.passoptions = []
     self.stderr_trigger = stderr_trigger
     self.stdout_trigger = stdout_trigger
+    self.stdout_must_have = stdout_must_have
     self.custom_stdout = custom_stdout
     self.default_fail=default_fail
     if check_depreciation:
@@ -284,6 +287,19 @@ class TestSuite:
     else:
       passed = (not(stderr_trigger) and (p.returncode==0 or (p.returncode in self.allowable_returncodes)))
     
+    stdout_must_haves = True
+    for trigger in self.stdout_must_have:
+      trigger_message = str(trigger)
+      if isinstance(trigger,tuple):
+        trigger_message = trigger[1]
+        trigger = trigger[0]
+      trigger_raised = re.search(trigger, stdoutdata)
+      if not trigger_raised:
+        print("stdout_trigger '%s' was raised." % trigger_message)
+        stdout_must_haves = False
+
+    passed = passed and stdout_must_haves
+        
     if passed:
       pass
       #print "  > Succes: %0.2f [ms]" % (t*1000)

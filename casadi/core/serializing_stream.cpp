@@ -29,6 +29,11 @@
 #include "linsol.hpp"
 #include "importer.hpp"
 #include "generic_type.hpp"
+#include "shared_object_internal.hpp"
+#include "sx_node.hpp"
+#include "sparsity_internal.hpp"
+#include "mx_node.hpp"
+#include "function_internal.hpp"
 #include <iomanip>
 
 using namespace std;
@@ -224,12 +229,12 @@ namespace casadi {
     }
 
     void SerializingStream::pack(const Function& e) {
-      decorate('X');
+      decorate('F');
       shared_pack(e);
     }
 
     void DeserializingStream::unpack(Function& e) {
-      assert_decoration('X');
+      assert_decoration('F');
       shared_unpack<Function, FunctionInternal>(e);
     }
 
@@ -307,6 +312,40 @@ namespace casadi {
 
   void SerializingStream::version(const std::string& name, int v) {
     pack(name+"::serialization::version", v);
+  }
+
+  UniversalNodeOwner::UniversalNodeOwner(SharedObjectInternal* obj) :
+      node(obj), is_sx(false) {
+    if (node) obj->count++;
+  }
+
+  UniversalNodeOwner::UniversalNodeOwner(SXNode* obj) :
+      node(obj), is_sx(true) {
+    if (node) obj->count++;
+  }
+
+  UniversalNodeOwner::UniversalNodeOwner(UniversalNodeOwner&& rhs) noexcept :
+    node(std::move(rhs.node)), is_sx(std::move(rhs.is_sx)) {
+    rhs.node = nullptr;
+  }
+
+  UniversalNodeOwner& UniversalNodeOwner::operator=(UniversalNodeOwner&& other) noexcept {
+    std::swap(node, other.node);
+    std::swap(is_sx, other.is_sx);
+    return *this;
+  }
+
+  UniversalNodeOwner::~UniversalNodeOwner() {
+    if (!node) return;
+    if (is_sx) {
+      if (--static_cast<SXNode*>(node)->count == 0) {
+        delete static_cast<SXNode*>(node);
+      }
+    } else {
+      if (--static_cast<SharedObjectInternal*>(node)->count == 0) {
+        delete static_cast<SharedObjectInternal*>(node);
+      }
+    }
   }
 
 } // namespace casadi

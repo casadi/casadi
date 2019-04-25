@@ -60,6 +60,9 @@ namespace casadi {
     /** \brief Names of inputs and outputs */
     name_t get_name_in_, get_name_out_;
 
+    /** \brief Get default inputs */
+    default_t get_default_in_;
+
     /** \brief Work vector sizes */
     work_t work_;
 
@@ -76,6 +79,9 @@ namespace casadi {
 
     /** \brief Destructor */
     ~External() override = 0;
+
+    /** \brief Any symbol found? */
+    virtual bool any_symbol_found() const;
 
     // Factory
     Function factory(const std::string& name,
@@ -104,6 +110,9 @@ namespace casadi {
     size_t get_n_in() override;
     size_t get_n_out() override;
     ///@}
+
+    /** \brief Default inputs */
+    double get_default_in(casadi_int i) const override;
 
     ///@{
     /** \brief Names of function input and outputs */
@@ -167,6 +176,9 @@ namespace casadi {
 
     /** \brief  Destructor */
     ~GenericExternal() override { this->clear_mem();}
+
+    /** \brief Any symbol found? */
+    bool any_symbol_found() const override;
 
     /** \brief Initialize members that are unique */
     void init_external() override;

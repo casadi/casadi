@@ -89,6 +89,19 @@ namespace casadi {
     return false;
   }
 
+  bool is_range(const std::vector<casadi_int>& v,
+    casadi_int start, casadi_int stop, casadi_int step) {
+    casadi_int nret = (stop-start)/step + ((stop-start)%step!=0);
+    if (v.size()!=nret) return false;
+    casadi_int ind = start;
+    for (casadi_int e : v) {
+      if (e!=ind) return false;
+      ind += step;
+    }
+    return true;
+  }
+
+
   std::vector<casadi_int> range(casadi_int start, casadi_int stop,
       casadi_int step, casadi_int len) {
     start = std::min(start, len);
@@ -103,16 +116,18 @@ namespace casadi {
     return ret;
   }
 
-  bool is_equally_spaced(const std::vector<double> &v) {
-    if (v.size()<=1) return true;
-
-    double margin = (v[v.size()-1]-v[0])*1e-14;
-
-    for (casadi_int i=2;i<v.size();++i) {
-      double ref = v[0]+(static_cast<double>(i)*(v[v.size()-1]-v[0]))/
-        static_cast<double>(v.size()-1);
-      if (abs(ref-v[i])>margin) return false;
+  bool is_equally_spaced(const std::vector<double>& v) {
+    // Quick return if 2 or less entries
+    if (v.size()<=2) return true;
+    // Permitted error margin
+    // NOTE(@jaeandersson) 1e-14 good idea?
+    double margin = (v.back()-v.front())*1e-14;
+    // Make sure spacing is consistent throughout
+    double spacing = v[1]-v[0];
+    for (size_t i=2; i<v.size(); ++i) {
+      if (fabs(v[i]-v[i-1]-spacing)>margin) return false;
     }
+    // Equal if reached this point
     return true;
   }
 
@@ -324,6 +339,59 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     return prefix + string(tmpnam(nullptr)) + suffix;
     #endif // HAVE_SIMPLE_MKSTEMPS
     #endif // HAVE_MKSTEMPS
+  }
+
+
+  std::vector<bool> boolvec_not(const std::vector<bool> &v) {
+    std::vector<bool> ret(v.size());
+    std::transform(v.begin(), v.end(), ret.begin(),
+                   [](bool v) -> bool { return !v; });
+    return ret;
+  }
+
+  std::vector<bool> boolvec_and(const std::vector<bool> &lhs, const std::vector<bool> &rhs) {
+    casadi_assert(lhs.size()==rhs.size(), "Size mismatch.");
+    std::vector<bool> ret(lhs.size());
+    std::transform(lhs.begin(), lhs.end(), rhs.begin(), ret.begin(),
+                   [](bool a, bool b) -> bool { return a && b; });
+    return ret;
+  }
+
+  std::vector<bool> boolvec_or(const std::vector<bool> &lhs, const std::vector<bool> &rhs) {
+    casadi_assert(lhs.size()==rhs.size(), "Size mismatch.");
+    std::vector<bool> ret(lhs.size());
+    std::transform(lhs.begin(), lhs.end(), rhs.begin(), ret.begin(),
+                   [](bool a, bool b) -> bool { return a || b; });
+    return ret;
+  }
+
+
+  std::vector<casadi_int> boolvec_to_index(const std::vector<bool> &v) {
+    std::vector<casadi_int> ret;
+    for (casadi_int i=0;i<v.size();++i) {
+      if (v[i]) ret.push_back(i);
+    }
+    return ret;
+  }
+
+  void normalized_setup(std::istream& stream) {
+    stream.imbue(std::locale("C"));
+  }
+
+  void normalized_setup(std::ostream& stream) {
+    stream.imbue(std::locale("C"));
+    stream << std::scientific;
+    stream << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+  }
+
+
+  std::string str_bvec(bvec_t v) {
+    std::stringstream ss;
+    for (casadi_int i=0;i<sizeof(bvec_t)*8;++i) {
+      bool bit = v & (bvec_t(1) << i);
+      ss << (bit ? "1" : "0");
+    }
+    return ss.str();
   }
 
 

@@ -63,6 +63,7 @@ set(CASADI_PUBLIC
 
   # MISC useful stuff
   integration_tools.hpp
+  nlp_tools.hpp
   nlp_builder.hpp
   xml_node.hpp
   xml_file.hpp
@@ -88,6 +89,7 @@ set(CASADI_INTERNAL
   generic_type_internal.hpp
   options.cpp
   casadi_misc.cpp
+  casadi_common.cpp
   timing.cpp
   polynomial.cpp
 
@@ -169,11 +171,13 @@ set(CASADI_INTERNAL
   switch.hpp              switch.cpp
   bspline.hpp             bspline.cpp
   map.hpp                 map.cpp
+  mapsum.hpp              mapsum.cpp
   finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
 
   # MISC useful stuff
   integration_tools.cpp
+  nlp_tools.cpp
   nlp_builder.cpp
   xml_node.cpp
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
@@ -200,6 +204,9 @@ target_include_directories(casadi
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/runtime>
     $<INSTALL_INTERFACE:${TREL_INCLUDE_PREFIX}>
+  INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../> # <casadi.casadi.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../> # <casadi/core/casadi_export.h>
 )
 
 if(WITH_DL)

@@ -277,9 +277,10 @@ namespace casadi {
     static Matrix<Scalar> simplify(const Matrix<Scalar> &x);
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                    const Dict& opts = Dict());
-    static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
-                                    Matrix<Scalar>& g);
+      const Dict& opts = Dict());
+    static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
+                                    Matrix<Scalar>& g, const Dict& opts = Dict());
     static Matrix<Scalar>
       substitute(const Matrix<Scalar>& ex,
                  const Matrix<Scalar>& v,
@@ -1093,12 +1094,30 @@ namespace casadi {
 
     static Matrix<Scalar> deserialize(DeserializingStream& s);
 
+    // @{
     /** Export numerical matrix to file
     *
     * Supported formats:
-    *   - .mtx   Matrix Market
+    * 
+    * \verbatim
+    *   - .mtx   Matrix Market (sparse)
+    *   - .txt   Ascii full precision representation (sparse)
+    *            Whitespace separated, aligned.
+    *            Comments with # % or /
+    *            Uses C locale
+    *            Structural zeros represented by 00
+    *            Does not scale well for large sparse matrices
+    * \endverbatim
+    * 
     */
     void to_file(const std::string& filename, const std::string& format="") const;
+#ifndef SWIG
+    static void to_file(const std::string& filename, const Sparsity& sp,
+      const Scalar* nonzeros, const std::string& format="");
+#endif
+
+    static Matrix<double> from_file(const std::string& filename, const std::string& format_hint="");
+    //@}
 
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same

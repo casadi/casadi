@@ -16,7 +16,7 @@ void casadi_bfgs(const casadi_int* sp_h, T1* h, const T1* dx,
   casadi_copy(glag, nx, yk);
   casadi_axpy(nx, -1., glag_old, yk);
   // qk = H*dx
-  casadi_fill(qk, nx, 0.);
+  casadi_clear(qk, nx);
   casadi_mv(h, sp_h, dx, qk, 0);
   // Calculating theta
   dxBkdx = casadi_dot(nx, dx, qk);

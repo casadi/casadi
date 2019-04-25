@@ -26,6 +26,7 @@
 #include "integration_tools.hpp"
 #include "integrator.hpp"
 #include "rootfinder.hpp"
+#include "polynomial.hpp"
 
 #include <vector>
 
@@ -230,6 +231,62 @@ namespace casadi {
         C[j2][j] =  tfcn(vector<DM>{etau_root[j2]}).at(0)->front();
       }
     }
+  }
+
+  void collocation_coeff(const std::vector<double> & tau,
+                                DM &C, DM &D, DM &B) {
+    // Find the degree of the interpolation
+    casadi_int deg = tau.size();
+
+    // Include zero
+    std::vector<double> etau_root = tau;
+    etau_root.insert(etau_root.begin(), 0);
+
+    // Check if tau ends with '1' (cfr. radau scheme)
+    bool has_end = tau.back()==1;
+
+    // Coefficients of the collocation equation
+    vector<vector<double> > C_(deg+1, vector<double>(deg+1, 0));
+
+    // Coefficients of the continuity equation
+    vector<double> D_(deg+1, 0);
+
+    // Coefficients of the quadratures
+    vector<double> B_(deg+1, 0);
+
+    // For all collocation points
+    for (casadi_int j=0; j<deg+1; ++j) {
+
+      // Construct Lagrange polynomials to get the polynomial basis at the collocation point
+      Polynomial p = 1;
+      for (casadi_int r=0; r<deg+1; ++r) {
+        if (r!=j) {
+          p *= Polynomial(-etau_root[r], 1)/(etau_root[j]-etau_root[r]);
+        }
+      }
+
+      // Evaluate the polynomial at the final time to get the
+      // coefficients of the continuity equation
+      if (has_end) {
+        D_[j] = j==deg ? 1 : 0;
+      } else {
+        D_[j] = p(1.0);
+      }
+      // Evaluate the time derivative of the polynomial at all collocation points to
+      // get the coefficients of the continuity equation
+      Polynomial dp = p.derivative();
+      for (casadi_int r=0; r<deg+1; ++r) {
+        C_[j][r] = dp(etau_root[r]);
+      }
+
+      // Integrate polynomial to get the coefficients of the quadratures
+      Polynomial ip = p.anti_derivative();
+      B_[j] = ip(1.0);
+    }
+    C = DM(C_);
+    C = C(Slice(), Slice(1, deg+1)); // NOLINT(cppcoreguidelines-slicing)
+    D = DM(D_);
+    B = DM(std::vector<double>(B_.begin()+1, B_.end()));
   }
 
   Function simpleIRK(Function f, casadi_int N, casadi_int order, const std::string& scheme,

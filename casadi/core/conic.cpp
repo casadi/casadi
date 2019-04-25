@@ -392,7 +392,10 @@ namespace casadi {
         "Indicates which of the variables are discrete, i.e. integer-valued"}},
       {"print_problem",
        {OT_BOOL,
-        "Print a numeric description of the problem"}}
+        "Print a numeric description of the problem"}},
+      {"error_on_fail",
+       {OT_BOOL,
+        "When the numerical process returns unsuccessfully, raise an error (default false)."}}
      }
   };
 
@@ -401,6 +404,7 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     print_problem_ = false;
+    error_on_fail_ = true;
 
     // Read options
     for (auto&& op : opts) {
@@ -408,6 +412,8 @@ namespace casadi {
         discrete_ = op.second;
       } else if (op.first=="print_problem") {
         print_problem_ = op.second;
+      } else if (op.first=="error_on_fail") {
+        error_on_fail_ = op.second;
       }
     }
 
@@ -494,11 +500,11 @@ namespace casadi {
   int Conic::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (print_problem_) {
-      uout() << "H:" << std::endl;
+      uout() << "H:";
       DM::print_dense(uout(), H_, arg[CONIC_H], false);
       uout() << std::endl;
       uout() << "G:" << std::vector<double>(arg[CONIC_G], arg[CONIC_G]+nx_) << std::endl;
-      uout() << "A" << std::endl;
+      uout() << "A:";
       DM::print_dense(uout(), A_, arg[CONIC_A], false);
       uout() << std::endl;
       uout() << "lba:" << std::vector<double>(arg[CONIC_LBA], arg[CONIC_LBA]+na_) << std::endl;
@@ -509,7 +515,12 @@ namespace casadi {
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
-    return 0;
+    int ret = solve(arg, res, iw, w, mem);
+    auto m = static_cast<ConicMemory*>(mem);
+    if (error_on_fail_ && !m->success)
+      casadi_error("conic process failed. "
+                   "Set 'error_on_fail' option to false to ignore this error.");
+    return ret;
   }
 
   void Conic::print_fstats(const ConicMemory* m) const {
@@ -715,6 +726,7 @@ namespace casadi {
     s.version("Conic", 1);
     s.pack("Conic::discrete", discrete_);
     s.pack("Conic::print_problem", print_problem_);
+    s.pack("Conic::error_on_fail", error_on_fail_);
     s.pack("Conic::H", H_);
     s.pack("Conic::A", A_);
     s.pack("Conic::Q", Q_);
@@ -737,6 +749,7 @@ namespace casadi {
     s.version("Conic", 1);
     s.unpack("Conic::discrete", discrete_);
     s.unpack("Conic::print_problem", print_problem_);
+    s.unpack("Conic::error_on_fail", error_on_fail_);
     s.unpack("Conic::H", H_);
     s.unpack("Conic::A", A_);
     s.unpack("Conic::Q", Q_);

@@ -30,6 +30,10 @@ if(WITH_CLP)
   add_subdirectory(clp)
 endif()
 
+if(WITH_CBC)
+  add_subdirectory(cbc)
+endif()
+
 if(WITH_CSPARSE)
   add_subdirectory(csparse)
 endif()

@@ -88,14 +88,19 @@ namespace casadi {
     /** \brief Construct matrix with a given sparsity and nonzeros */
     MX(const Sparsity& sp, const MX& val);
 
+    /** \brief Construct matrix with a given sparsity and a file with nonzeros */
+    MX(const Sparsity& sp, const std::string& fname);
+
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
 
     /** \brief  Copy constructor */
     MX(const MX& x);
 
+#ifndef SWIG
     /** \brief  Create vector constant (also implicit type conversion) */
     MX(const std::vector<double> &x);
+#endif
 
     /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
@@ -424,8 +429,8 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     static MX jacobian(const MX& f, const MX& x, const Dict& opts = Dict());
-    static MX hessian(const MX& f, const MX& x);
-    static MX hessian(const MX& f, const MX& x, MX& g);
+    static MX hessian(const MX& f, const MX& x, const Dict& opts = Dict());
+    static MX hessian(const MX& f, const MX& x, MX& g, const Dict& opts = Dict());
     static std::vector<std::vector<MX> >
     forward(const std::vector<MX> &ex,
             const std::vector<MX> &arg,
@@ -504,6 +509,21 @@ namespace casadi {
                                          const Dict& options);
     static MX lift(const MX& x, const MX& x_guess);
     static DM evalf(const MX& m);
+    static MX bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict());
+    static DM bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts = Dict());
+    static MX bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict());
     ///@}
     /// \endcond
 
@@ -565,6 +585,31 @@ namespace casadi {
                     const std::vector<MX> &boundary = std::vector<MX>(),
                     const Dict& options = Dict()) {
       return MX::matrix_expand(e, boundary, options);
+    }
+
+
+    inline friend MX bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict()) {
+      return MX::bspline(x, coeffs, knots, degree, m, opts);
+    }
+
+    inline friend MX bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict()) {
+      return MX::bspline(x, coeffs, knots, degree, m, opts);
+    }
+
+    inline friend DM bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts = Dict()) {
+      return MX::bspline_dual(x, knots, degree, opts);
     }
 
     /** \brief Lift the expression

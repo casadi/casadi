@@ -43,47 +43,149 @@ namespace casadi {
     return Interpolant::getPlugin(name).doc;
   }
 
-  Function interpolant(const std::string& name,
-                       const std::string& solver,
-                       const std::vector<std::vector<double> >& grid,
-                       const std::vector<double>& values,
-                       const Dict& opts) {
-
-    // Dimension at least 1
-    casadi_assert(!grid.empty(), "At least one input required");
-
-    // Consistency check, number of elements
-    casadi_uint nel=1;
-    for (auto&& g : grid) {
-      casadi_assert(g.size()>=2, "Need at least two grid points for every input");
-      nel *= g.size();
-    }
-    casadi_assert(values.size() % nel== 0, "Inconsistent number of elements");
-    casadi_assert(!values.empty(), "Values cannot be empty");
-
-    // Grid must be strictly increasing
-    for (auto&& g : grid) {
-      double last = -inf;
-      for (auto&& e : g) {
-        casadi_assert(!isinf(e) && e>last,
-          "Gridpoints must be finite and strictly increasing");
-        last = e;
-      }
-    }
+  void Interpolant::stack_grid(const std::vector< std::vector<double> >& grid,
+    std::vector<casadi_int>& offset, std::vector<double>& stacked) {
 
     // Get offset for each input dimension
-    vector<casadi_int> offset;
+    offset.clear();
     offset.reserve(grid.size()+1);
     offset.push_back(0);
     for (auto&& g : grid) offset.push_back(offset.back()+g.size());
 
     // Stack input grids
-    vector<double> stacked;
+    stacked.clear();
     stacked.reserve(offset.back());
     for (auto&& g : grid) stacked.insert(stacked.end(), g.begin(), g.end());
-    casadi_int m = values.size()/nel;
-    return Function::create(Interpolant::getPlugin(solver)
-                            .creator(name, stacked, offset, values, m), opts);
+  }
+
+  void Interpolant::check_grid(const std::vector< std::vector<double> >& grid) {
+    // Dimension at least 1
+    casadi_assert(!grid.empty(), "At least one input required");
+
+    // Grid must be strictly increasing
+    for (auto&& g : grid) {
+      casadi_assert(is_increasing(g), "Gridpoints must be strictly increasing");
+      casadi_assert(is_regular(g), "Gridpoints must be regular");
+      casadi_assert(g.size()>=2, "Need at least two grid points for every input");
+    }
+  }
+
+  void Interpolant::check_grid(const std::vector<casadi_int> & grid_dims) {
+    // Dimension at least 1
+    casadi_assert(!grid_dims.empty(), "At least one dimension required");
+
+    // Grid must be strictly increasing
+    for (casadi_int d : grid_dims) {
+      casadi_assert(d>=2, "Need at least two grid points for every input");
+    }
+  }
+
+  std::vector<double> Interpolant::meshgrid(const std::vector< std::vector<double> >& grid) {
+    std::vector<casadi_int> cnts(grid.size()+1, 0);
+    std::vector<casadi_int> sizes(grid.size(), 0);
+    for (casadi_int k=0;k<grid.size();++k) sizes[k]= grid[k].size();
+
+    casadi_int total_iter = 1;
+    for (casadi_int k=0;k<grid.size();++k) total_iter*= sizes[k];
+
+    casadi_int n_dims = grid.size();
+
+    std::vector<double> ret(total_iter*n_dims);
+    for (casadi_int i=0;i<total_iter;++i) {
+
+      for (casadi_int j=0;j<grid.size();++j) {
+        ret[i*n_dims+j] = grid[j][cnts[j]];
+      }
+
+      cnts[0]++;
+      casadi_int j = 0;
+      while (j<n_dims && cnts[j]==sizes[j]) {
+        cnts[j] = 0;
+        j++;
+        cnts[j]++;
+      }
+
+    }
+
+    return ret;
+  }
+
+  casadi_int Interpolant::coeff_size() const  {
+    casadi_int ret = 1;
+    for (casadi_int k=0;k<offset_.size()-1;++k) {
+      ret *= offset_[k+1]-offset_[k];
+    }
+    return m_*ret;
+  }
+
+  Function interpolant(const std::string& name,
+                       const std::string& solver,
+                       const std::vector<std::vector<double> >& grid,
+                       const std::vector<double>& values,
+                       const Dict& opts) {
+      Interpolant::check_grid(grid);
+      // Get offset for each input dimension
+      vector<casadi_int> offset;
+      // Stack input grids
+      vector<double> stacked;
+
+       // Consistency check, number of elements
+      casadi_uint nel=1;
+       for (auto&& g : grid) nel *= g.size();
+       casadi_assert(values.size() % nel== 0,
+         "Inconsistent number of elements. Must be a multiple of " +
+         str(nel) + ", but got " + str(values.size()) + " instead.");
+
+      Interpolant::stack_grid(grid, offset, stacked);
+
+      casadi_int m = values.size()/nel;
+      return Function::create(Interpolant::getPlugin(solver)
+                              .creator(name, stacked, offset, values, m), opts);
+  }
+
+  Function interpolant(const std::string& name,
+                       const std::string& solver,
+                       const std::vector<casadi_int>& grid_dims,
+                       const std::vector<double>& values,
+                       const Dict& opts) {
+      Interpolant::check_grid(grid_dims);
+
+       // Consistency check, number of elements
+      casadi_uint nel = product(grid_dims);
+       casadi_assert(values.size() % nel== 0,
+         "Inconsistent number of elements. Must be a multiple of " +
+         str(nel) + ", but got " + str(values.size()) + " instead.");
+
+      casadi_int m = values.size()/nel;
+      return Function::create(Interpolant::getPlugin(solver)
+              .creator(name, std::vector<double>{}, cumsum0(grid_dims), values, m), opts);
+  }
+
+  Function interpolant(const std::string& name,
+                       const std::string& solver,
+                       const std::vector<std::vector<double> >& grid,
+                       casadi_int m,
+                       const Dict& opts) {
+      Interpolant::check_grid(grid);
+
+      // Get offset for each input dimension
+      vector<casadi_int> offset;
+      // Stack input grids
+      vector<double> stacked;
+
+      Interpolant::stack_grid(grid, offset, stacked);
+      return Function::create(Interpolant::getPlugin(solver)
+                              .creator(name, stacked, offset, std::vector<double>{}, m), opts);
+  }
+
+  Function interpolant(const std::string& name,
+                       const std::string& solver,
+                       const std::vector<casadi_int>& grid_dims,
+                       casadi_int m,
+                       const Dict& opts) {
+      Interpolant::check_grid(grid_dims);
+      return Function::create(Interpolant::getPlugin(solver)
+        .creator(name, std::vector<double>{}, cumsum0(grid_dims), std::vector<double>{}, m), opts);
   }
 
   Interpolant::
@@ -101,8 +203,10 @@ namespace casadi {
   }
 
   Sparsity Interpolant::get_sparsity_in(casadi_int i) {
-    casadi_assert_dev(i==0);
-    return Sparsity::dense(ndim_);
+    if (i==0) return Sparsity::dense(ndim_);
+    if (arg_values(i)) return Sparsity::dense(coeff_size());
+    if (arg_grid(i)) return Sparsity::dense(offset_.back());
+    casadi_assert_dev(false);
   }
 
   Sparsity Interpolant::get_sparsity_out(casadi_int i) {
@@ -111,8 +215,10 @@ namespace casadi {
   }
 
   std::string Interpolant::get_name_in(casadi_int i) {
-    casadi_assert_dev(i==0);
-    return "x";
+    if (i==0) return "x";
+    if (arg_values(i)) return "c";
+    if (arg_grid(i)) return "g";
+    casadi_assert_dev(false);
   }
 
   std::string Interpolant::get_name_out(casadi_int i) {
@@ -134,6 +240,25 @@ namespace casadi {
         "'binary' uses a binary search. (default when #knots>100)."}}
      }
   };
+
+
+  bool Interpolant::arg_values(casadi_int i) const {
+    if (!has_parametric_values()) return false;
+    return arg_values()==i;
+  }
+  bool Interpolant::arg_grid(casadi_int i) const {
+    if (!has_parametric_grid()) return false;
+    return arg_grid()==i;
+  }
+
+  casadi_int Interpolant::arg_values() const {
+    casadi_assert_dev(has_parametric_values());
+    return 1+has_parametric_grid();
+  }
+  casadi_int Interpolant::arg_grid() const {
+    casadi_assert_dev(has_parametric_grid());
+    return 1;
+  }
 
   void Interpolant::init(const Dict& opts) {
     // Call the base class initializer

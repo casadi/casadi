@@ -63,6 +63,9 @@ namespace casadi {
     // Creator (values may be different)
     static ConstantMX* create(const Matrix<double>& val);
 
+    // Creator (values may be different)
+    static ConstantMX* create(const Sparsity& sp, const std::string& fname);
+
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override = 0;
 
@@ -191,6 +194,64 @@ namespace casadi {
 
     /** \brief Deserializing constructor */
     explicit ConstantDM(DeserializingStream& s);
+  };
+
+  /// A constant to be read from a file
+  class CASADI_EXPORT ConstantFile : public ConstantMX {
+  public:
+
+    /** \brief  Constructor */
+    explicit ConstantFile(const Sparsity& x, const std::string& fname);
+
+    /// Destructor
+    ~ConstantFile() override {}
+
+    /** \brief Codegen incref */
+    void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
+
+    /** \brief  Print expression */
+    std::string disp(const std::vector<std::string>& arg) const override;
+
+    /// Get the value (only for scalar constant nodes)
+    double to_double() const override;
+
+    /// Get the value (only for constant nodes)
+    Matrix<double> get_DM() const override;
+
+    /** \brief  Evaluate the function numerically */
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+      std::copy(x_.begin(), x_.end(), res[0]);
+      return 0;
+    }
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    int eval_sx(const SXElem** arg, SXElem** res,
+                         casadi_int* iw, SXElem* w) const override {
+      std::copy(x_.begin(), x_.end(), res[0]);
+      return 0;
+    }
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
+
+    /** \brief Add a dependent function */
+    void add_dependency(CodeGenerator& g) const override;
+
+    /** \brief file to read from */
+    std::string fname_;
+
+    /** \brief nonzeros */
+    std::vector<double> x_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit ConstantFile(DeserializingStream& s);
   };
 
   /// A zero-by-zero matrix
@@ -572,7 +633,11 @@ namespace casadi {
     } else if (nnz()==1) {
       g << g.workel(res[0]) << " = " << g.constant(to_double()) << ";\n";
     } else {
-      g << g.fill(g.work(res[0], nnz()), nnz(), g.constant(to_double())) << '\n';
+      if (to_double()==0) {
+        g << g.clear(g.work(res[0], nnz()), nnz()) << '\n';
+      } else {
+        g << g.fill(g.work(res[0], nnz()), nnz(), g.constant(to_double())) << '\n';
+      }
     }
   }
 

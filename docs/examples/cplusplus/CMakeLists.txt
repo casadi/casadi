@@ -118,6 +118,7 @@ endif()
 if(WITH_DL AND NOT WIN32)
   add_executable(codegen_usage codegen_usage.cpp)
   target_link_libraries(codegen_usage casadi)
+  target_compile_definitions(codegen_usage PRIVATE "-DINCLUDE_DIR=\"${PROJECT_SOURCE_DIR}\"")
 endif()
 
 # Implicit Runge-Kutta integrator from scratch

@@ -482,7 +482,7 @@ if (WITH_DEPRECATED_FEATURES)
 endif()
 
 include_directories(.)
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(${PROJECT_BINARY_DIR})
 
 #######################################################################
 ################# 3rd party interface #################################
@@ -665,6 +665,13 @@ if(WITH_CLP)
   find_package(CLP REQUIRED)
 endif()
 add_feature_info(clp-interface WITH_CLP "Interface to the LP solver CLP.")
+
+option(WITH_CBC "Compile the CBC interface" OFF)
+if(WITH_CBC)
+  find_package(CBC REQUIRED)
+endif()
+add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
+
 
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)

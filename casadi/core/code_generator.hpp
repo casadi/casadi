@@ -98,10 +98,22 @@ namespace casadi {
     /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<double>& v);
 
+    /** \brief Allocate file scope double read-only memory */
+    void define_rom_double(const void* id, casadi_int size);
+
+    /** \brief Access file scope double read-only memory */
+    std::string rom_double(const void* id) const;
+
+    /** \brief Allocate file scope integer read-only memory */
+    void define_rom_integer(const void* id, casadi_int size);
+
+    /** \brief Access file scope integer read-only memory */
+    std::string rom_integer(const void* id) const;
+
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const std::string& mem="0") const;
+                           const std::string& w);
 
     /** \brief Print a string to buffer  */
     CodeGenerator& operator<<(const std::string& s);
@@ -122,6 +134,12 @@ namespace casadi {
 
     /** \brief Declare a local variable */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
+
+    /** \brief Enter a local scope */
+    void scope_enter();
+
+    /** \brief Exit a local scope */
+    void scope_exit();
 
     /** \brief Declare a work vector element */
     std::string sx_work(casadi_int i);
@@ -216,6 +234,10 @@ namespace casadi {
                          const std::string& beta, const std::string& prinv,
                          const std::string& pc, const std::string& w);
 
+    /** \\brief LSQR solve */
+    std::string lsqr_solve(const std::string& A, const std::string&x,
+                          casadi_int nrhs, bool tr, const std::string& sp, const std::string& w);
+
     /** \brief LDL factorization */
     std::string ldl(const std::string& sp_a, const std::string& a,
                    const std::string& sp_lt, const std::string& lt,
@@ -288,12 +310,14 @@ namespace casadi {
       AUX_NORM_2,
       AUX_NORM_INF,
       AUX_IAMAX,
+      AUX_CLEAR,
       AUX_FILL,
       AUX_MV,
       AUX_MV_DENSE,
       AUX_MTIMES,
       AUX_PROJECT,
       AUX_DENSIFY,
+      AUX_SPARSIFY,
       AUX_TRANS,
       AUX_TO_MEX,
       AUX_FROM_MEX,
@@ -331,7 +355,9 @@ namespace casadi {
       AUX_INF,
       AUX_REAL_MIN,
       AUX_ISINF,
-      AUX_BOUNDS_CONSISTENCY
+      AUX_BOUNDS_CONSISTENCY,
+      AUX_LSQR,
+      AUX_FILE_SLURP
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -362,14 +388,38 @@ namespace casadi {
 
     /** \brief Create a copy operation */
     std::string copy(const std::string& arg, std::size_t n, const std::string& res);
+    void copy_check(const std::string& arg, std::size_t n, const std::string& res,
+      bool check_lhs=true, bool check_rhs=true);
+    void copy_default(const std::string& arg, std::size_t n, const std::string& res,
+      const std::string& def,  bool check_rhs=true);
 
     /** \brief Create a fill operation */
     std::string fill(const std::string& res, std::size_t n, const std::string& v);
+
+    /** \brief Create a fill operation */
+    std::string clear(const std::string& res, std::size_t n);
+
+    /** \brief Refer to argument */
+    std::string arg(casadi_int i) const;
+
+    /** \brief Refer to resuly */
+    std::string res(casadi_int i) const;
+
+    /** \brief Access thread-local memory */
+    std::string mem(const Function& f);
 
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, const Sparsity& sp_res,
                         const std::string& w);
+
+    /** \brief Densify */
+    std::string densify(const std::string& arg, const Sparsity& sp_arg,
+                        const std::string& res, bool tr=false);
+
+    /** \brief Sparsify */
+    std::string sparsify(const std::string& arg, const std::string& res,
+                         const Sparsity& sp_res, bool tr=false);
 
     /** \brief Create matrix in MATLAB's MEX format */
     std::string to_mex(const Sparsity& sp, const std::string& arg);
@@ -390,6 +440,9 @@ namespace casadi {
     /** \brief Print an operation to a c file */
     std::string print_op(casadi_int op, const std::string& a0);
     std::string print_op(casadi_int op, const std::string& a0, const std::string& a1);
+
+    /** \brief Slurp a file */
+    std::string file_slurp(const std::string& fname, casadi_int n, const std::string& a);
   private:
 
     /// Print file header
@@ -470,6 +523,9 @@ namespace casadi {
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;
 
+    // Prefix
+    std::string prefix;
+
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
@@ -499,6 +555,8 @@ namespace casadi {
     std::multimap<size_t, size_t> added_integer_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
     std::map<std::string, std::string> local_default_;
+    std::map<const void *, casadi_int> file_scope_double_;
+    std::map<const void *, casadi_int> file_scope_integer_;
 
     // Added functions
     struct FunctionMeta {
@@ -512,6 +570,9 @@ namespace casadi {
     // Constants
     std::vector<std::vector<double> > double_constants_;
     std::vector<std::vector<casadi_int> > integer_constants_;
+
+    // Does any function need thread-local memory?
+    bool needs_mem_;
 
     // Hash a vector
     static size_t hash(const std::vector<double>& v);

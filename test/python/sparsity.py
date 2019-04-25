@@ -555,5 +555,19 @@ class Sparsitytests(casadiTestCase):
       else:
         self.checkarray(IM(a,1),IM(b,1))
 
+  def test_is_subset(self):
+
+      pairs = [ (Sparsity.lower(3), Sparsity.dense(3,3)),
+                (Sparsity.diag(3), Sparsity.dense(3,3)),
+                (Sparsity.diag(3), Sparsity.lower(3)),
+                (Sparsity(3,3), Sparsity.lower(3)),
+      ]
+
+      for L,R in pairs:
+        self.assertTrue(L.is_subset(R))
+        self.assertFalse(R.is_subset(L))
+
+
+
 if __name__ == '__main__':
     unittest.main()

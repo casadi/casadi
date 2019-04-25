@@ -130,8 +130,11 @@ def toMX_fun(fun):
   return Function("f",ins,fun(ins))
 
 
-
 class casadiTestCase(unittest.TestCase):
+
+  @classmethod
+  def tearDownClass(cls):
+    print("STATUS_RAN_ALL_TESTS")
 
   @contextmanager
   def assertInException(self,s):
@@ -143,6 +146,18 @@ class casadiTestCase(unittest.TestCase):
     self.assertFalse(e is None)
     self.assertTrue(s in e,msg=e + "<->" + s)
 
+  @contextmanager
+  def assertOutput(self,included,excluded):
+    with capture_stdout() as result:
+      yield
+    if not(isinstance(included,list)):
+      included = [included]
+    if not(isinstance(excluded,list)):
+      excluded = [excluded]
+    for e in included:
+      self.assertTrue(e in result[0],msg=result[0] + "<->" + e)
+    for e in excluded:
+      self.assertFalse(e in result[0],msg=result[0] + "<->" + e)
   def tearDown(self):
     t = time.time() - self.startTime
     print("deltaT %s: %.3f" % ( self.id(), t))
@@ -454,10 +469,11 @@ class casadiTestCase(unittest.TestCase):
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
           res = f.call(inputss,True)
           #print res, "sp", [i.sparsity().dim(True) for i in fseeds]
-          [fwdsens] = forward(res, inputss, [fseeds])
-          [adjsens] = reverse(res, inputss, [aseeds])
+          opts = {"helper_options": {"is_diff_in": f.is_diff_in(), "is_diff_out": f.is_diff_out()}}
+          [fwdsens] = forward(res, inputss, [fseeds],opts)
+          [adjsens] = reverse(res, inputss, [aseeds],opts)
 
-          vf = Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]))
+          vf = Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]),{"is_diff_in": f.is_diff_in()+f.is_diff_in()+f.is_diff_out(), "is_diff_out": f.is_diff_out()+f.is_diff_out()+f.is_diff_in()})
 
           vf_in = list(inputs)
           # Complete random seeding
@@ -483,10 +499,11 @@ class casadiTestCase(unittest.TestCase):
               inputss2 = [sym("i",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
 
               res2 = vf.call(inputss2)
-              [fwdsens2] = forward(res2, inputss2, [fseeds2])
-              [adjsens2] = reverse(res2, inputss2, [aseeds2])
+              opts = {"helper_options": {"is_diff_in": vf.is_diff_in(), "is_diff_out": vf.is_diff_out()}}
+              [fwdsens2] = forward(res2, inputss2, [fseeds2],opts)
+              [adjsens2] = reverse(res2, inputss2, [aseeds2],opts)
 
-              vf2 = Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]))
+              vf2 = Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]),{"is_diff_in": vf.is_diff_in()+vf.is_diff_in()+vf.is_diff_out(), "is_diff_out": vf.is_diff_out()+vf.is_diff_out()+vf.is_diff_in()})
 
               vf2_in = list(inputs)
 
@@ -515,14 +532,23 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",check_serialize=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False):
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       if opts is None: opts = {}
       F.generate(name, opts)
       import subprocess
-      p = subprocess.Popen("gcc -pedantic -std=%s -fPIC -shared -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 %s.c -o %s.so" % (std,name,name) ,shell=True).wait()
+
+      libdir = GlobalOptions.getCasadiPath()
+      includedir = GlobalOptions.getCasadiIncludePath()
+
+      if isinstance(extralibs,list):
+        extralibs = " " + " ".join(["-l"+lib for lib in extralibs])
+
+      commands = "gcc -pedantic -std={std} -fPIC -shared -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name}.so -L{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir) + extralibs
+      p = subprocess.Popen(commands,shell=True).wait()
+
       F2 = external(F.name(), './' + name + '.so')
 
       Fout = F.call(inputs)

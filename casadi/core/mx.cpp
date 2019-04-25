@@ -35,6 +35,7 @@
 #include "expm.hpp"
 #include "serializing_stream.hpp"
 #include "im.hpp"
+#include "bspline.hpp"
 
 // Throw informative error message
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -113,6 +114,10 @@ namespace casadi {
 
   MX::MX(const Sparsity& sp, double val, bool dummy) {
     own(ConstantMX::create(sp, val));
+  }
+
+  MX::MX(const Sparsity& sp, const std::string& fname) {
+    own(ConstantMX::create(sp, fname));
   }
 
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
@@ -1113,7 +1118,7 @@ namespace casadi {
   }
 
   MX MX::norm_2(const MX& x) {
-    if (x.is_column()) {
+    if (x.is_vector()) {
       return norm_fro(x);
     } else {
       return x->get_norm_2();
@@ -1605,25 +1610,26 @@ namespace casadi {
 
   MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {
     try {
-      // Propagate verbose option to helper function
       Dict h_opts;
-      if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+      Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
       Function h("helper_jacobian_MX", {x}, {f}, h_opts);
-      return h.get<MXFunction>()->jac(0, 0, opts);
+      return h.get<MXFunction>()->jac(0, 0, opts_remainder);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("jacobian", e.what());
     }
   }
 
-  MX MX::hessian(const MX& f, const MX& x) {
+  MX MX::hessian(const MX& f, const MX& x, const Dict& opts) {
     MX g;
-    return hessian(f, x, g);
+    return hessian(f, x, g, opts);
   }
 
-  MX MX::hessian(const MX& f, const MX& x, MX &g) {
+  MX MX::hessian(const MX& f, const MX& x, MX &g, const Dict& opts) {
     try {
-      g = gradient(f, x);
-      return jacobian(g, x, {{"symmetric", true}});
+      Dict all_opts = opts;
+      g = gradient(f, x, opts);
+      if (!opts.count("symmetric")) all_opts["symmetric"] = true;
+      return jacobian(g, x, all_opts);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("hessian", e.what());
     }
@@ -1637,19 +1643,20 @@ namespace casadi {
       // Read options
       bool always_inline = true;
       bool never_inline = false;
-      for (auto&& op : opts) {
+
+      Dict h_opts;
+      Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+      for (auto&& op : opts_remainder) {
         if (op.first=="always_inline") {
           always_inline = op.second;
         } else if (op.first=="never_inline") {
           never_inline = op.second;
-        } else if (op.first=="verbose") {
-          continue;
         } else {
           casadi_error("No such option: " + string(op.first));
         }
       }
       // Call internal function on a temporary object
-      Function temp("forward_temp", arg, ex);
+      Function temp("forward_temp", arg, ex, h_opts);
       std::vector<std::vector<MX> > ret;
       temp->call_forward(arg, ex, v, ret, always_inline, never_inline);
       return ret;
@@ -1666,19 +1673,22 @@ namespace casadi {
       // Read options
       bool always_inline = true;
       bool never_inline = false;
-      for (auto&& op : opts) {
+
+
+      Dict h_opts;
+      Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+
+      for (auto&& op : opts_remainder) {
         if (op.first=="always_inline") {
           always_inline = op.second;
         } else if (op.first=="never_inline") {
           never_inline = op.second;
-        } else if (op.first=="verbose") {
-          continue;
         } else {
           casadi_error("No such option: " + string(op.first));
         }
       }
       // Call internal function on a temporary object
-      Function temp("reverse_temp", arg, ex);
+      Function temp("reverse_temp", arg, ex, h_opts);
       std::vector<std::vector<MX> > ret;
       temp->call_reverse(arg, ex, v, ret, always_inline, never_inline);
       return ret;
@@ -1827,6 +1837,31 @@ namespace casadi {
 
   MX MX::find(const MX& x) {
     return x->get_find();
+  }
+
+
+  MX MX::bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts) {
+    return BSpline::create(x, knots, coeffs.nonzeros(), degree, m, opts);
+  }
+
+  MX MX::bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts) {
+    return BSplineParametric::create(x, coeffs, knots, degree, m, opts);
+  }
+
+  DM MX::bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts) {
+    return BSpline::dual(x, knots, degree, opts);
   }
 
   std::vector<MX> MX::get_input(const Function& f) {

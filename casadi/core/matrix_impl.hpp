@@ -854,6 +854,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::to_file(const std::string& filename, const std::string& format) const {
+    to_file(filename, sparsity(), ptr(), format);
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::disp(std::ostream& stream, bool more) const {
     if (is_empty()) {
       stream << "[]";
@@ -1444,6 +1449,12 @@ namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::reset_input() const {
     casadi_error("'reset_input' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  Matrix<double> Matrix<Scalar>::from_file(const std::string& filename,
+      const std::string& format_hint) {
+    casadi_error("'from_file' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2467,7 +2478,8 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
-                                             const Matrix<Scalar> &x) {
+                                             const Matrix<Scalar> &x,
+                                             const Dict& opts) {
     casadi_error("'hessian' not defined for " + type_name());
     return Matrix<Scalar>();
   }
@@ -2475,7 +2487,8 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
                                              const Matrix<Scalar> &x,
-                                             Matrix<Scalar> &g) {
+                                             Matrix<Scalar> &g,
+                                              const Dict& opts) {
     casadi_error("'hessian' not defined for " + type_name());
     return Matrix<Scalar>();
   }

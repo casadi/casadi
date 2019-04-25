@@ -210,11 +210,17 @@ class IntegerSX : public ConstantSX {
   \date 2010
 */
 class ZeroSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit ZeroSX() {this->count++;}
 public:
-
-  ~ZeroSX() override {}
-  explicit ZeroSX() {}
-
+  /* Get singleton instance */
+  static ZeroSX* singleton() {
+    static ZeroSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~ZeroSX() override {this->count--;}
   ///@{
   /** \brief  Get the value */
   double to_double() const override { return 0;}
@@ -239,11 +245,17 @@ public:
   \date 2010
 */
 class OneSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit OneSX() {this->count++;}
 public:
-
-  explicit OneSX() {}
-  ~OneSX() override {}
-
+  /* Get singleton instance */
+  static OneSX* singleton() {
+    static OneSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~OneSX() override {this->count--;}
   /** \brief  Get the value */
   double to_double() const override { return 1;}
   casadi_int to_int() const override { return 1;}
@@ -264,10 +276,17 @@ public:
   \date 2010
 */
 class MinusOneSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit MinusOneSX() {this->count++;}
 public:
-
-  explicit MinusOneSX() {}
-  ~MinusOneSX() override {}
+  /* Get singleton instance */
+  static MinusOneSX* singleton() {
+    static MinusOneSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~MinusOneSX() override {this->count--;}
 
   ///@{
   /** \brief  Get the value */
@@ -293,11 +312,17 @@ public:
   \date 2010
 */
 class InfSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit InfSX() {this->count++;}
 public:
-
-  explicit InfSX() {}
-  ~InfSX() override {}
-
+  /* Get singleton instance */
+  static InfSX* singleton() {
+    static InfSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~InfSX() override {this->count--;}
   /** \brief  Get the value */
   double to_double() const override { return std::numeric_limits<double>::infinity();}
 
@@ -316,10 +341,17 @@ public:
   \date 2010
 */
 class MinusInfSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit MinusInfSX() {this->count++;}
 public:
-
-  explicit MinusInfSX() {}
-  ~MinusInfSX() override {}
+  /* Get singleton instance */
+  static MinusInfSX* singleton() {
+    static MinusInfSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~MinusInfSX() override {this->count--;}
 
   /** \brief  Get the value */
   double to_double() const override { return -std::numeric_limits<double>::infinity();}
@@ -330,20 +362,24 @@ public:
   void serialize_node(SerializingStream& s) const override {
     s.pack("ConstantSX::type", 'f');
   }
-
 };
-
 
 /** \brief  Represents a not-a-number SX
   \author Joel Andersson
   \date 2010
 */
 class NanSX : public ConstantSX {
-public:
-
+private:
+  /* Private constructor (singleton class) */
   explicit NanSX() {this->count++;}
+public:
+  /* Get singleton instance */
+  static NanSX* singleton() {
+    static NanSX instance;
+    return &instance;
+  }
+  /* Destructor */
   ~NanSX() override {this->count--;}
-
   /** \brief  Get the value */
   double to_double() const override { return std::numeric_limits<double>::quiet_NaN();}
 

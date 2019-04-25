@@ -119,7 +119,18 @@ namespace casadi {
        "Linker flag to denote shared library output. Default: '-o '"}},
       {"extra_suffixes",
        {OT_STRINGVECTOR,
-       "List of suffixes for extra files that the compiler may generate. Default: None"}}
+       "List of suffixes for extra files that the compiler may generate. Default: None"}},
+      {"name",
+       {OT_STRING,
+        "The file name used to write out compiled objects/libraries. "
+        "The actual file names used depend on 'temp_suffix' and include extensions. "
+        "Default: 'tmp_casadi_compiler_shell'"}},
+      {"temp_suffix",
+       {OT_BOOL,
+        "Use a temporary (seemingly random) filename suffix for file names. "
+        "This is desired for thread-safety. "
+        "This behaviour may defeat caching compiler wrappers. "
+        "Default: true"}},
      }
   };
 
@@ -130,6 +141,8 @@ namespace casadi {
     // Default options
 
     cleanup_ = true;
+    bool temp_suffix = true;
+    std::string bare_name = "tmp_casadi_compiler_shell";
 
     vector<string> compiler_flags;
     vector<string> linker_flags;
@@ -174,14 +187,21 @@ namespace casadi {
         linker_output_flag = op.second.to_string();
       } else if (op.first=="extra_suffixes") {
         extra_suffixes_ = op.second.to_string_vector();
+      } else if (op.first=="name") {
+        bare_name = op.second.to_string();
+      } else if (op.first=="temp_suffix") {
+        temp_suffix = op.second;
       }
     }
 
     // Name of temporary file
-    obj_name_ = temporary_file("tmp_casadi_compiler_shell", suffix);
+    if (temp_suffix) {
+      obj_name_ = temporary_file(bare_name, suffix);
+    } else {
+      obj_name_ = bare_name + suffix;
+    }
     base_name_ = std::string(obj_name_.begin(), obj_name_.begin()+obj_name_.size()-suffix.size());
     bin_name_ = base_name_+SHARED_LIBRARY_SUFFIX;
-
 
 #ifndef _WIN32
     // Have relative paths start with ./
@@ -209,7 +229,7 @@ namespace casadi {
     cccmd << " " + compiler_output_flag << obj_name_;
 
     // Compile into an object
-    if (verbose_) uout() << "calling \"" << cccmd.str() + "\"" << std::endl;
+    if (verbose_) casadi_message("calling \"" + cccmd.str() + "\"");
     if (system(cccmd.str().c_str())) {
       casadi_error("Compilation failed. Tried \"" + cccmd.str() + "\"");
     }
@@ -226,7 +246,7 @@ namespace casadi {
     ldcmd << " " << obj_name_ << " " + linker_output_flag + bin_name_;
 
     // Compile into a shared library
-    if (verbose_) uout() << "calling \"" << ldcmd.str() << "\"" << std::endl;
+    if (verbose_) casadi_message("calling \"" + ldcmd.str() + "\"");
     if (system(ldcmd.str().c_str())) {
       casadi_error("Linking failed. Tried \"" + ldcmd.str() + "\"");
     }

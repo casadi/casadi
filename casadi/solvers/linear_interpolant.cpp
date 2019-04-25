@@ -81,16 +81,20 @@ namespace casadi {
   int LinearInterpolant::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (res[0]) {
-      casadi_interpn(res[0], ndim_, get_ptr(grid_), get_ptr(offset_),
-                     get_ptr(values_), arg[0], get_ptr(lookup_mode_), m_, iw, w);
+      const double* values = has_parametric_values() ? arg[arg_values()] : get_ptr(values_);
+      const double* grid = has_parametric_grid() ? arg[arg_grid()] : get_ptr(grid_);
+      casadi_interpn(res[0], ndim_, grid, get_ptr(offset_),
+                    values, arg[0], get_ptr(lookup_mode_), m_, iw, w);
     }
     return 0;
   }
 
   void LinearInterpolant::codegen_body(CodeGenerator& g) const {
+    std::string values = has_parametric_values() ? g.arg(arg_values()) : g.constant(values_);
+    std::string grid = has_parametric_grid() ? g.arg(arg_grid()) : g.constant(grid_);
     g << "  if (res[0]) {\n"
-      << "    " << g.interpn("res[0]", ndim_, g.constant(grid_), g.constant(offset_),
-      g.constant(values_), "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
+      << "    " << g.interpn("res[0]", ndim_, grid, g.constant(offset_),
+      values, "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
       << "  }\n";
   }
 
@@ -132,18 +136,33 @@ namespace casadi {
   int LinearInterpolantJac::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = derivative_of_.get<LinearInterpolant>();
-    casadi_interpn_grad(res[0], m->ndim_, get_ptr(m->grid_), get_ptr(m->offset_),
-                        get_ptr(m->values_), arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
+
+    const double* values = has_parametric_values() ? arg[m->arg_values()] : get_ptr(m->values_);
+    const double* grid = has_parametric_grid() ? arg[m->arg_grid()] : get_ptr(m->grid_);
+
+    casadi_interpn_grad(res[0], m->ndim_, grid, get_ptr(m->offset_),
+                      values, arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
     return 0;
   }
 
+  bool LinearInterpolantJac::has_parametric_values() const {
+    auto m = derivative_of_.get<LinearInterpolant>();
+    return m->has_parametric_values();
+  }
+
+  bool LinearInterpolantJac::has_parametric_grid() const {
+    auto m = derivative_of_.get<LinearInterpolant>();
+    return m->has_parametric_grid();
+  }
 
   void LinearInterpolantJac::codegen_body(CodeGenerator& g) const {
 
     auto m = derivative_of_.get<LinearInterpolant>();
+    std::string values = has_parametric_values() ? g.arg(m->arg_values()) : g.constant(m->values_);
+    std::string grid = has_parametric_grid() ? g.arg(m->arg_grid()) : g.constant(m->grid_);
 
     g << "  " << g.interpn_grad("res[0]", m->ndim_,
-      g.constant(m->grid_), g.constant(m->offset_), g.constant(m->values_),
+      grid, g.constant(m->offset_), values,
       "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";
   }
 

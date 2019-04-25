@@ -403,6 +403,10 @@ namespace casadi {
     return (*this)->combine(y, true, true);
   }
 
+  bool Sparsity::is_subset(const Sparsity& rhs) const {
+    return (*this)->is_subset(rhs);
+  }
+
   Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y) {
     // Check matching dimensions
     casadi_assert(x.size2()==y.size1(),
@@ -1775,7 +1779,8 @@ namespace casadi {
 
   std::set<std::string> Sparsity::file_formats = {"mtx"};
 
-  std::string Sparsity::file_format(const std::string& filename, const std::string& format_hint) {
+  std::string Sparsity::file_format(const std::string& filename,
+      const std::string& format_hint, const std::set<std::string>& file_formats) {
     if (format_hint.empty()) {
       std::string extension = filename.substr(filename.rfind(".")+1);
       auto it = file_formats.find(extension);
@@ -1793,7 +1798,7 @@ namespace casadi {
 
   }
   void Sparsity::to_file(const std::string& filename, const std::string& format_hint) const {
-    std::string format = file_format(filename, format_hint);
+    std::string format = file_format(filename, format_hint, file_formats);
     std::ofstream out(filename);
     if (format=="mtx") {
       out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
@@ -1811,8 +1816,9 @@ namespace casadi {
   }
 
   Sparsity Sparsity::from_file(const std::string& filename, const std::string& format_hint) {
-    std::string format = file_format(filename, format_hint);
+    std::string format = file_format(filename, format_hint, file_formats);
     std::ifstream in(filename);
+    casadi_assert(in.good(), "Could not open '" + filename + "'.");
     if (format=="mtx") {
       std::string line;
       std::vector<casadi_int> row, col;

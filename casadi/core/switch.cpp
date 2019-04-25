@@ -464,7 +464,7 @@ namespace casadi {
           const Sparsity& sp = sparsity_out_[i];
           if (f_sp!=sp) {
             g << g.project("res1[" + str(i) + "]", f_sp,
-                           "res[" + str(i) + "]", sp, "w") << "\n";
+                           g.res(i), sp, "w") << "\n";
           }
         }
 

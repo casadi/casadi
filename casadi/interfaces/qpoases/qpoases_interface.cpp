@@ -297,6 +297,12 @@ namespace casadi {
       }
     }
 
+    // Bug #2358
+    if (sparse_ && na_ == 0) {
+      casadi_error("With no linear constraints, qpOASES fails in sparse mode: "
+      "https://github.com/casadi/casadi/issues/2358");
+    }
+
     // Allocate work vectors
     if (sparse_) {
       alloc_w(nnz_in(CONIC_H), true); // h
@@ -347,8 +353,7 @@ namespace casadi {
   }
 
   int QpoasesInterface::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    Conic::eval(arg, res, iw, w, mem);
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
 
     // Statistics
@@ -454,10 +459,6 @@ namespace casadi {
     }
 
     if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
-
-    if (flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {
-      casadi_error("qpOASES failed: " + getErrorMessage(flag));
-    }
 
     // Get optimal cost
     if (res[CONIC_COST]) *res[CONIC_COST] = m->qp->getObjVal();

@@ -161,8 +161,7 @@ namespace casadi {
   }
 
   int GurobiInterface::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    Conic::eval(arg, res, iw, w, mem);
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<GurobiMemory*>(mem);
     const SDPToSOCPMem& sm = sdp_to_socp_mem_;
 
@@ -187,8 +186,8 @@ namespace casadi {
       *lbx=arg[CONIC_LBX],
       *ubx=arg[CONIC_UBX],
       *p=arg[CONIC_P],
-      *q=arg[CONIC_Q];
-      //*x0=arg[CONIC_X0],
+      *q=arg[CONIC_Q],
+      *x0=arg[CONIC_X0];
       //*lam_x0=arg[CONIC_LAM_X0];
 
     // Outputs
@@ -232,6 +231,12 @@ namespace casadi {
         // Pass to model
         flag = GRBaddvar(model, 0, nullptr, nullptr, g ? g[i] : 0., lb, ub, vtype, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
+
+        // If it is a discrete variable, we can pass the start guess
+        if (vtype != GRB_CONTINUOUS) {
+          flag = GRBsetdblattrelement(model, "Start", i, x0[i]);
+          casadi_assert(!flag, GRBgeterrormsg(m->env));
+        }
       }
 
       /*  Treat SOCP constraints */
@@ -269,7 +274,7 @@ namespace casadi {
           casadi_scal(numqnz, 0.5, val);
           h += numqnz;
         } else {
-          casadi_fill(val, numqnz, 0.);
+          casadi_clear(val, numqnz);
         }
 
         // Pass to model

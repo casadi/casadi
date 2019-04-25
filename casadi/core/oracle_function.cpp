@@ -290,7 +290,7 @@ namespace casadi {
       if (verbose_) casadi_message("compiling to "+ fname+"'.");
     // JIT dependent functions
     compiler_ = Importer(generate_dependencies(fname, Dict()),
-                         compilerplugin_, jit_options_);
+                         compiler_plugin_, jit_options_);
 
     // Replace the Oracle functions with generated functions
     for (auto&& e : all_functions_) {

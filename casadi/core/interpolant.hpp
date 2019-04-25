@@ -100,6 +100,36 @@ namespace casadi {
                                      const std::vector<std::vector<double> >& grid,
                                      const std::vector<double>& values,
                                      const Dict& opts=Dict());
+  /** \brief Parametric variant of interpolant
+   * 
+   * The resulting function will have an additional argument for the coefficients
+  */
+  CASADI_EXPORT Function interpolant(const std::string& name,
+                                     const std::string& solver,
+                                     const std::vector<std::vector<double> >& grid,
+                                     casadi_int m=1,
+                                     const Dict& opts=Dict());
+  ///@}
+
+  /** \brief Parametric variant of interpolant
+   * 
+   * The resulting function will have additional arguments for the grid and coefficients
+  */
+  CASADI_EXPORT Function interpolant(const std::string& name,
+                                     const std::string& solver,
+                                     const std::vector<casadi_int>& grid_dims,
+                                     casadi_int m=1,
+                                     const Dict& opts=Dict());
+
+  /** \brief Parametric variant of interpolant
+   * 
+   * The resulting function will have an additional argument for the grid
+  */
+  CASADI_EXPORT Function interpolant(const std::string& name,
+                                     const std::string& solver,
+                                     const std::vector<casadi_int>& grid_dims,
+                                     const std::vector<double>& values,
+                                     const Dict& opts=Dict());
   ///@}
 
   /// Check if a particular plugin is available

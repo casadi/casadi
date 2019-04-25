@@ -155,7 +155,7 @@ namespace casadi {
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
         g << "if (res[" << a.i0 << "]!=0) "
-          << "res["<< a.i0 << "][" << a.i2 << "]=" << g.sx_work(a.i1);
+          << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
       } else {
 
         // Where to store the result
@@ -165,7 +165,7 @@ namespace casadi {
         if (a.op==OP_CONST) {
           g << CodeGenerator::constant(a.d);
         } else if (a.op==OP_INPUT) {
-          g << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
+          g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);
@@ -195,20 +195,29 @@ namespace casadi {
      }
   };
 
+  Dict SXFunction::generate_options(bool is_temp) const {
+    Dict opts = FunctionInternal::generate_options(is_temp);
+    //opts["default_in"] = default_in_;
+    opts["live_variables"] = live_variables_;
+    opts["just_in_time_sparsity"] = just_in_time_sparsity_;
+    opts["just_in_time_opencl"] = just_in_time_opencl_;
+    return opts;
+  }
+
   void SXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<SXFunction, SX, SXNode>::init(opts);
     if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
-    bool live_variables = true;
+    live_variables_ = true;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
         default_in_ = op.second;
       } else if (op.first=="live_variables") {
-        live_variables = op.second;
+        live_variables_ = op.second;
       } else if (op.first=="just_in_time_opencl") {
         just_in_time_opencl_ = op.second;
       } else if (op.first=="just_in_time_sparsity") {
@@ -365,7 +374,7 @@ namespace casadi {
 
       // Find a place to store the variable
       if (a.op!=OP_OUTPUT) {
-        if (live_variables && !unused.empty()) {
+        if (live_variables_ && !unused.empty()) {
           // Try to reuse a variable from the stack if possible (last in, first out)
           a.i0 = place[a.i0] = unused.top();
           unused.pop();
@@ -394,7 +403,7 @@ namespace casadi {
     worksize_ = worksize;
 
     if (verbose_) {
-      if (live_variables) {
+      if (live_variables_) {
         casadi_message("Using live variables: work array is " + str(worksize_)
          + " instead of " + str(nodes.size()));
       } else {
@@ -462,6 +471,42 @@ namespace casadi {
 
     // Print
     if (verbose_) casadi_message(str(algorithm_.size()) + " elementary operations");
+  }
+
+  SX SXFunction::instructions_sx() const {
+    std::vector<SXElem> ret(algorithm_.size(), casadi_limits<SXElem>::nan);
+
+    vector<SXElem>::iterator it=ret.begin();
+
+    // Iterator to the binary operations
+    vector<SXElem>::const_iterator b_it = operations_.begin();
+
+    // Iterator to stack of constants
+    vector<SXElem>::const_iterator c_it = constants_.begin();
+
+    // Iterator to free variables
+    vector<SXElem>::const_iterator p_it = free_vars_.begin();
+
+    // Evaluate algorithm
+    if (verbose_) casadi_message("Evaluating algorithm forward");
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+      case OP_OUTPUT:
+        it++;
+        break;
+      case OP_CONST:
+        *it++ = *c_it++;
+        break;
+      case OP_PARAMETER:
+        *it++ = *p_it++;
+        break;
+      default:
+        *it++ = *b_it++;
+      }
+    }
+    casadi_assert(it==ret.end(), "Dimension mismacth");
+    return ret;
   }
 
   int SXFunction::
@@ -726,6 +771,8 @@ namespace casadi {
 
   int SXFunction::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    // Fall back when forward mode not allowed
+    if (sp_weight()==1) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -747,6 +794,8 @@ namespace casadi {
 
   int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
+    // Fall back when reverse mode not allowed
+    if (sp_weight()==0) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
@@ -936,6 +985,8 @@ namespace casadi {
     just_in_time_opencl_ = false;
     just_in_time_sparsity_ = false;
 
+    s.unpack("SXFunction::live_variables", live_variables_);
+
     XFunction<SXFunction, SX, SXNode>::delayed_deserialize_members(s);
   }
 
@@ -957,6 +1008,8 @@ namespace casadi {
       s.pack("SXFunction::ScalarAtomic::i1", e.i1);
       s.pack("SXFunction::ScalarAtomic::i2", e.i2);
     }
+
+    s.pack("SXFunction::live_variables", live_variables_);
 
     XFunction<SXFunction, SX, SXNode>::delayed_serialize_members(s);
   }

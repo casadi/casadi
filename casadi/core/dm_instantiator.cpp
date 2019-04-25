@@ -188,23 +188,186 @@ namespace casadi {
 
   template<>
   void CASADI_EXPORT DM::to_file(const std::string& filename,
-      const std::string& format_hint) const {
-    std::string format = Sparsity::file_format(filename, format_hint);
+      const Sparsity& sp, const double* nonzeros,
+      const std::string& format_hint) {
+    std::string format = Sparsity::file_format(filename, format_hint, {"mtx", "txt"});
     std::ofstream out(filename);
     if (format=="mtx") {
-      out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+      normalized_setup(out);
       out << "%%MatrixMarket matrix coordinate real general" << std::endl;
-      out << size1() << " " << size2() << " " << nnz() << std::endl;
-      std::vector<casadi_int> row = sparsity().get_row();
-      std::vector<casadi_int> col = sparsity().get_col();
+      out << sp.size1() << " " << sp.size2() << " " << sp.nnz() << std::endl;
+      std::vector<casadi_int> row = sp.get_row();
+      std::vector<casadi_int> col = sp.get_col();
 
       for (casadi_int k=0;k<row.size();++k) {
-        out << row[k]+1 << " " << col[k]+1 << " " << nonzeros_[k] << std::endl;
+        out << row[k]+1 << " " << col[k]+1 << " ";
+        normalized_out(out, nonzeros ? nonzeros[k]: 0);
+        out << std::endl;
+      }
+    } else if (format=="txt") {
+      normalized_setup(out);
+      out << std::left;
+      // Access data structures
+      casadi_int size1 = sp.size1();
+      casadi_int size2 = sp.size2();
+      const casadi_int* colind = sp.colind();
+      const casadi_int* row = sp.row();
+
+      // Index counter for each column
+      std::vector<casadi_int> ind(colind, colind+size2+1);
+
+      // Make enough room to put -3.3e-310
+      casadi_int w = std::numeric_limits<double>::digits10 + 9;
+
+      // Loop over rows
+      for (casadi_int rr=0; rr<size1; ++rr) {
+        // Loop over columns
+        for (casadi_int cc=0; cc<size2; ++cc) {
+          // Set filler execptfor last column
+          if (cc<size2-1) out << std::setw(w);
+          // String representation of element
+          if (ind[cc]<colind[cc+1] && row[ind[cc]]==rr) {
+            normalized_out(out, nonzeros ? nonzeros[ind[cc]++]: 0);
+          } else {
+            out << std::setw(w) << "00";
+          }
+          if (cc<size2-1) out << " ";
+        }
+        out << std::endl;
       }
     } else {
       casadi_error("Unknown format '" + format + "'");
     }
   }
+
+  template<>
+  DM CASADI_EXPORT DM::from_file(const std::string& filename, const std::string& format_hint) {
+    std::string format = Sparsity::file_format(filename, format_hint, {"mtx", "txt"});
+    std::ifstream in(filename);
+    casadi_assert(in.good(), "Could not open '" + filename + "'.");
+
+    if (format=="txt") {
+      std::string line;
+      std::vector<double> values;
+      casadi_int n_row = 0;
+      casadi_int n_col = 0;
+      bool first_line = true;
+      std::istringstream stream;
+
+      std::vector<casadi_int> row;
+      std::vector<casadi_int> col;
+
+      normalized_setup(stream);
+
+      // Read line-by-line
+      while (std::getline(in, line)) {
+        // Ignore empty lines
+        if (line.empty()) continue;
+
+        // Ignore lines with comments
+        if (line[0]=='%' || line[0]=='#' || line[0]=='/') continue;
+
+        // Populate a stream for pulling doubles
+        stream.clear();
+        stream.str(line);
+
+        // Keep pulling doubles from line
+        double val;
+        casadi_int i=0;
+        for (i=0; !stream.eof(); ++i) {
+          casadi_int start = stream.tellg();
+          int ret = normalized_in(stream, val);
+
+          if (ret==-1) break; // EOL reached
+          casadi_assert(ret==0, "Parsing error on line " + str(i+1) + ", column " + str(start+1));
+          casadi_int stop = line.size();
+          if (!stream.eof()) stop = stream.tellg();
+
+          // Check if structural zero
+          bool structural_zero = false;
+          if (val==0) {
+            // Check if stream contained '00'
+            casadi_int n_zeros = 0;
+            for (casadi_int k=start;k<stop;++k) {
+              char c = line.at(k);
+              if (c==' ' || c=='\t') continue;
+              if (c=='0') {
+                n_zeros++;
+              } else {
+                break;
+              }
+            }
+            if (n_zeros==2) structural_zero = true;
+          }
+
+          if (!structural_zero) {
+            row.push_back(n_row);
+            col.push_back(i);
+            values.push_back(val);
+          }
+          if (first_line) n_col++;
+        }
+
+        // Dimension check
+        casadi_assert(i==n_col, "Inconsistent dimensions. "
+        "File started with " + str(n_col) + ", while line " + str(n_row+1) +
+        " has " + str(i) + ".");
+
+        first_line = false;
+        n_row++;
+      }
+      return DM::triplet(row, col, values, n_row, n_col);
+    } else if (format=="mtx") {
+      std::string line;
+      bool first_line = true;
+      std::istringstream stream;
+
+      casadi_int n_row=0, n_col=0, nnz=0;
+      std::vector<double> values;
+      std::vector<casadi_int> row, col;
+      normalized_setup(stream);
+
+      casadi_int i=0;
+      // Read line-by-line
+      while (std::getline(in, line)) {
+        // Ignore empty lines
+        if (line.empty()) continue;
+
+        // Ignore lines with comments
+        if (line[0]=='%' || line[0]=='#' || line[0]=='/') continue;
+
+        // Populate a stream for pulling doubles
+        stream.clear();
+        stream.str(line);
+
+        if (first_line) {
+          stream >> n_row;
+          stream >> n_col;
+          stream >> nnz;
+          casadi_assert(!stream.fail(), "Could not parse first line");
+          values.reserve(nnz);
+          row.reserve(nnz);
+          col.reserve(nnz);
+          first_line = false;
+
+        } else {
+          casadi_int r, c;
+          double val;
+          stream >> r;
+          stream >> c;
+          casadi_assert(normalized_in(stream, val)==0, "Parse error");
+          row.push_back(r-1);
+          col.push_back(c-1);
+          values.push_back(val);
+          i++;
+        }
+      }
+      return DM::triplet(row, col, values, n_row, n_col);
+    } else {
+      casadi_error("Unknown format '" + format + "'");
+    }
+  }
+
 
   // Instantiate templates
   template class CASADI_EXPORT casadi_limits<double>;

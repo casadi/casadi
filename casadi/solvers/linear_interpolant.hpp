@@ -154,6 +154,10 @@ namespace casadi {
     /** \brief Serialize type information */
     void serialize_type(SerializingStream &s) const override;
 
+    /** \brief Is parametric? */
+    bool has_parametric_values() const;
+    bool has_parametric_grid() const;
+
     /** \brief String used to identify the immediate FunctionInternal subclass */
     std::string serialize_base_function() const override { return "Interpolant"; }
 

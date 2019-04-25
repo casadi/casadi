@@ -25,6 +25,7 @@
 
 #include "qp_to_nlp.hpp"
 #include "casadi/core/nlpsol.hpp"
+#include "casadi/core/nlpsol_impl.hpp"
 
 using namespace std;
 namespace casadi {
@@ -53,6 +54,20 @@ namespace casadi {
   QpToNlp::~QpToNlp() {
     clear_mem();
   }
+
+
+  void* QpToNlp::alloc_mem() const {
+    QpToNlpMemory *m = new QpToNlpMemory();
+    m->nlp_mem = solver_.checkout();
+    return m;
+  }
+
+  void QpToNlp::free_mem(void *mem) const {
+    auto m = static_cast<QpToNlpMemory*>(mem);
+    solver_.release(m->nlp_mem);
+    delete m;
+  }
+
 
   const Options QpToNlp::options_
   = {{&Conic::options_},
@@ -111,7 +126,7 @@ namespace casadi {
   }
 
   int QpToNlp::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     // Inputs
     const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_;
     // Outputs
@@ -183,15 +198,20 @@ namespace casadi {
     res1[NLPSOL_LAM_G] = lam_a_;
 
     // Solve the NLP
-    return solver_(arg1, res1, iw, w, 0);
+    auto m = static_cast<QpToNlpMemory*>(mem);
+    int ret = solver_(arg1, res1, iw, w, m->nlp_mem);
+    auto nlp_m = static_cast<NlpsolMemory*>(solver_.memory(m->nlp_mem));
+
+    m->success = nlp_m->success;
+    m->unified_return_status = nlp_m->unified_return_status;
+    return ret;
   }
 
   Dict QpToNlp::get_stats(void* mem) const {
-    Dict stats;
-    Dict solver_stats = solver_.stats();
-    stats["solver_stats"] = solver_stats;
-    stats["success"] = solver_stats["success"];
-
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<QpToNlpMemory*>(mem);
+    auto nlp_m = static_cast<NlpsolMemory*>(solver_.memory(m->nlp_mem));
+    stats["solver_stats"] = solver_->get_stats(nlp_m);
     return stats;
   }
 

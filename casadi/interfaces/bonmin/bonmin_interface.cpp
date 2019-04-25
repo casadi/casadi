@@ -355,6 +355,12 @@ namespace casadi {
     return ss.str();
   }
 
+  inline std::string to_str(TNLPSolver::UnsolvedError& e) {
+    std::stringstream ss;
+    e.printError(ss);
+    return ss.str();
+  }
+
 
   /** \brief Helper class to direct messages to uout()
   *
@@ -467,6 +473,10 @@ namespace casadi {
       bb(bonmin);
     } catch (CoinError& e) {
       casadi_error("CoinError occured: " + to_str(e));
+    } catch (TNLPSolver::UnsolvedError& e) {
+      casadi_error("TNLPSolver::UnsolvedError occured" + to_str(e));
+    } catch (...) {
+      casadi_error("Uncaught error in Bonmin");
     }
 
     // Save results to outputs

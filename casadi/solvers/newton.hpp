@@ -140,8 +140,6 @@ namespace casadi {
     /// If true, each iteration will be printed
     casadi_int print_iteration_interval_;
 
-    bool error_on_;
-
     bool line_search_;
 
     /// Print iteration header

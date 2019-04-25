@@ -40,7 +40,8 @@ namespace casadi {
   Dict CASADI_EXPORT IM::info() const;
   template<>
   void CASADI_EXPORT IM::to_file(const std::string& filename,
-    const std::string& format_hint) const;
+    const Sparsity& sp, const casadi_int* nonzeros,
+    const std::string& format_hint);
 
 #ifndef CASADI_IM_INSTANTIATOR_CPP
   extern template class Matrix<casadi_int>;

@@ -39,6 +39,24 @@ namespace casadi {
   class SXElem;
   class GenericType;
   class Importer;
+  class SharedObject;
+  class SharedObjectInternal;
+  class SXNode;
+  class UniversalNodeOwner {
+  public:
+    UniversalNodeOwner() = delete;
+    UniversalNodeOwner(const UniversalNodeOwner&) = delete;
+    UniversalNodeOwner(UniversalNodeOwner&& rhs) noexcept;
+    UniversalNodeOwner(SharedObjectInternal* obj);
+    UniversalNodeOwner(SXNode* obj);
+    UniversalNodeOwner& operator=(const UniversalNodeOwner& other) = delete;
+    UniversalNodeOwner& operator=(UniversalNodeOwner&& other) noexcept;
+    ~UniversalNodeOwner();
+    void* get() { return node; }
+  private:
+    void* node;
+    bool is_sx;
+  };
   typedef std::map<std::string, GenericType> Dict;
 
   /** \brief Helper class for Serialization
@@ -49,6 +67,7 @@ namespace casadi {
   public:
     /// Constructor
     DeserializingStream(std::istream &in_s);
+    DeserializingStream(const DeserializingStream&) = delete;
 
     //@{
     /** \brief Reconstruct an object from the input stream
@@ -132,13 +151,14 @@ namespace casadi {
       switch (i) {
         case 'd': // definition
           e = T::deserialize(*this);
-          nodes.push_back(e.get());
+          nodes.emplace_back(e.get());
           break;
         case 'r': // reference
           {
             casadi_int k;
             unpack("Shared::reference", k);
-            e = T::create(static_cast<M*>(nodes.at(k)));
+            UniversalNodeOwner& t = nodes.at(k);
+            e = T::create(static_cast<M*>(t.get()));
           }
           break;
         default:
@@ -153,7 +173,7 @@ namespace casadi {
     void assert_decoration(char e);
 
     /// Collection of all shared pointer deserialized so far
-    std::vector<void*> nodes;
+    std::vector<UniversalNodeOwner> nodes;
     /// Input stream
     std::istream& in;
     /// Debug mode?

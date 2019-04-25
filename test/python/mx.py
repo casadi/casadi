@@ -1817,6 +1817,9 @@ class MXtests(casadiTestCase):
     self.checkarray(f_out,DM([[1,0,0],[0,4,0],[0,0,6]]))
     self.checkarray(IM.ones(f.sparsity_out(0)),IM.ones(Sparsity.lower(3).T))
 
+    self.check_codegen(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
+    self.check_serialize(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
+
   def test_repmat(self):
     a = DM([[1,2],[3,4],[5,6]])
     self.checkarray(repmat(a,2,3),kron(DM.ones(2,3),a))
@@ -2719,6 +2722,65 @@ class MXtests(casadiTestCase):
 
   def test_doc_expression_tools(self):
     self.assertTrue("Given a repeated matrix, computes the sum of repeated parts." in repsum.__doc__)
+
+  def test_densify(self):
+    I = sparsify(IM([[0,1,0,1],[1,1,0,1],[0,1,1,0]])).sparsity()
+
+    x = MX.sym("x",I)
+
+    f = Function("f",[x],[densify(x)])
+
+    a = DM([[0,1,0,2],[3,4,0,5],[0,6,7,0]])
+
+    y = f(sparsify(a))
+    self.assertTrue(y.sparsity()==a.sparsity())
+    self.checkarray(y,a)
+
+    self.check_codegen(f,inputs=[a])
+
+
+    x = MX.sym("x",3,4)
+
+    f = Function("f",[x],[x[I]])
+
+    a = DM([[0,1,0,2],[3,4,0,5],[0,6,7,0]])
+    b = sparsify(a)
+    a = DM([[9,1,9,2],[3,4,9,5],[9,6,7,9]])
+
+    y = f(a)
+    self.assertTrue(y.sparsity()==b.sparsity())
+    self.checkarray(y,b)
+
+    self.check_codegen(f,inputs=[a])
+    self.check_serialize(f,inputs=[a])
+
+  def test_constant_from_file(self):
+
+    open("test.txt", "w").write("5.6 1e-5")
+    with self.assertInException("Failed to read a double from 'test.txt'. Expected 3 doubles."):
+      x = MX(Sparsity.lower(2), "test.txt")
+
+    open("test.txt", "w").write("5.6 abc 1e-5")
+    with self.assertInException("Failed to read a double from 'test.txt'. Expected 3 doubles."):
+      x = MX(Sparsity.lower(2), "test.txt")
+
+    with self.assertInException("Cannot open file 'testQWHAL567p.txt'."):
+      x = MX(Sparsity.lower(2), "testQWHAL567p.txt")
+
+    open("test.txt", "w").write("5.6 1e-5 -12")
+    x = MX(Sparsity.lower(2), "test.txt")
+
+    a = MX.sym("a")
+
+    f = Function("f",[a],[a*x])
+    self.checkarray(f(2),DM(Sparsity.lower(2),[2*5.6,2*1e-5,-2*12]))
+
+    self.check_codegen(f,inputs=[2])
+
+    with self.assertInException("Not defined for ConstantFile"):
+      x.to_DM()
+    
+
 
 if __name__ == '__main__':
     unittest.main()

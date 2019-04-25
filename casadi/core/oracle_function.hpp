@@ -121,7 +121,9 @@ namespace casadi {
     int calc_function(OracleMemory* m, const std::string& fcn,
                       const double* const* arg=nullptr) const;
 
-    // Get list of dependency functions
+    /** \brief Get list of dependency functions
+     * -1 Indicates irregularity
+    */
     std::vector<std::string> get_function() const override;
 
     // Get a dependency function

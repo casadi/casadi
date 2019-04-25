@@ -315,6 +315,14 @@ namespace casadi {
     const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
+    /** \brief Get differentiability of inputs/output */
+    /// @{
+    bool is_diff_in(casadi_int ind) const;
+    bool is_diff_out(casadi_int ind) const;
+    std::vector<bool> is_diff_in() const;
+    std::vector<bool> is_diff_out() const;
+    /// @}
+
     // A linear combination of inputs
     typedef std::map<std::string, std::vector<std::string> > AuxOut;
 
@@ -330,6 +338,9 @@ namespace casadi {
 
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;
+
+    /** \brief Wrap in a Function with options */
+    Function wrap_as_needed(const Dict& opts) const;
 
     /** \brief Which variables enter with some order
     *
@@ -472,7 +483,7 @@ namespace casadi {
 
     /** \brief Evaluate memory-less, numerically */
     int operator()(const double** arg, double** res,
-        casadi_int* iw, double* w, casadi_int mem) const;
+        casadi_int* iw, double* w, int mem) const;
 
     /** \brief Evaluate numerically with checkout/release */
     int operator()(const double** arg, double** res,
@@ -482,14 +493,14 @@ namespace casadi {
         Same syntax as the double version, allowing use in templated code
      */
     int operator()(const SXElem** arg, SXElem** res,
-        casadi_int* iw, SXElem* w, casadi_int mem=0) const;
+        casadi_int* iw, SXElem* w, int mem=0) const;
 
     /** \brief  Propagate sparsity forward */
     int operator()(const bvec_t** arg, bvec_t** res,
-        casadi_int* iw, bvec_t* w, casadi_int mem=0) const;
+        casadi_int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief  Propagate sparsity backward */
-    int rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, casadi_int mem=0) const;
+    int rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief Propagate sparsity backward with temporary memory allocation */
     int rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
@@ -599,6 +610,10 @@ namespace casadi {
       const std::vector<std::string>& reduce_in,
       const std::vector<std::string>& reduce_out,
       const Dict& opts=Dict()) const;
+    Function map(casadi_int n,
+      const std::vector<bool>& reduce_in,
+      const std::vector<bool>& reduce_out=std::vector<bool>(),
+      const Dict& opts=Dict()) const;
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
@@ -616,16 +631,6 @@ namespace casadi {
     static Function bspline(const std::string &name,
       const std::vector< std::vector<double> >& knots, const std::vector<double>& coeffs,
       const std::vector<casadi_int>& degree, casadi_int m=1, const Dict& opts=Dict());
-
-    /** \brief Dual BSpline evaluator function
-    *
-    *  Requires known evaluation positions
-    *  WARNING: This function may drastically change or be removed
-    */
-    static Function bspline_dual(const std::string &name,
-      const std::vector< std::vector<double> >& knots, const std::vector<double>& x,
-      const std::vector<casadi_int>& degree, casadi_int m=1,
-      bool reverse=false, const Dict& opts=Dict());
 
     /** \brief Constructor (if-else) */
     static Function if_else(const std::string& name, const Function& f_true,
@@ -694,10 +699,24 @@ namespace casadi {
     /** \brief Export / Generate C code for the dependency function */
     std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
-    /** \brief Export an input file that can be passed to generate C code with a main */
+    /** \brief Export an input file that can be passed to generate C code with a main
+     * 
+     * \seealso generate_out
+     * \seealso convert_in to convert between dict/map and vector
+     */
     /// @{
-    void generate_input(const std::string& fname, const DMDict& arg);
-    void generate_input(const std::string& fname, const std::vector<DM>& arg);
+    void generate_in(const std::string& fname, const std::vector<DM>& arg);
+    std::vector<DM> generate_in(const std::string& fname);
+    /// @}
+
+    /** \brief Export an output file that can be checked with generated C code output
+     * 
+     * \seealso generate_in
+     * \seealso convert_out to convert between dict/map and vector
+     */
+    /// @{
+    void generate_out(const std::string& fname, const std::vector<DM>& arg);
+    std::vector<DM> generate_out(const std::string& fname);
     /// @}
 
     /** \brief Export function in specific language
@@ -748,7 +767,7 @@ namespace casadi {
 #endif // SWIG
 
     /// Get all statistics obtained at the end of the last evaluate call
-    Dict stats(casadi_int mem=0) const;
+    Dict stats(int mem=0) const;
 
     ///@{
     /** \brief Get symbolic primitives equivalent to the input expressions
@@ -781,6 +800,34 @@ namespace casadi {
     }
     const std::vector<MX> mx_out() const;
     ///@}
+
+    /** \brief Convert from/to flat vector of input/output nonzeros */
+    /// @{
+    std::vector<double> nz_from_in(const std::vector<DM>& arg) const;
+    std::vector<double> nz_from_out(const std::vector<DM>& arg) const;
+    std::vector<DM> nz_to_in(const std::vector<double>& arg) const;
+    std::vector<DM> nz_to_out(const std::vector<double>& arg) const;
+    ///@}
+
+    /** \brief Convert from/to input/output lists/map 
+    *
+    * Will raise an error when an unknown key is used or a list has incorrect size.
+    * Does not perform sparsity checking. 
+    */
+    /// @{
+    DMDict convert_in(const std::vector<DM>& arg) const;
+    std::vector<DM> convert_in(const DMDict& arg) const;
+    DMDict convert_out(const std::vector<DM>& arg) const;
+    std::vector<DM> convert_out(const DMDict& arg) const;
+    SXDict convert_in(const std::vector<SX>& arg) const;
+    std::vector<SX> convert_in(const SXDict& arg) const;
+    SXDict convert_out(const std::vector<SX>& arg) const;
+    std::vector<SX> convert_out(const SXDict& arg) const;
+    MXDict convert_in(const std::vector<MX>& arg) const;
+    std::vector<MX> convert_in(const MXDict& arg) const;
+    MXDict convert_out(const std::vector<MX>& arg) const;
+    std::vector<MX> convert_out(const MXDict& arg) const;
+    /// @}
 
     /** \brief Does the function have free variables */
     bool has_free() const;
@@ -821,6 +868,13 @@ namespace casadi {
     /** \brief Get the MX node corresponding to an instruction (MXFunction) */
     MX instruction_MX(casadi_int k) const;
 
+    /** \brief Get the SX node corresponding to all instructions (SXFunction)
+     *
+     * Note: input and output instructions have no SX representation.
+     * This method returns nan for those instructions.
+    */
+    SX instructions_sx() const;
+
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     bool has_spfwd() const;
@@ -845,14 +899,14 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(const double**& arg, double**& res,
-      casadi_int*& iw, double*& w, casadi_int mem=0) const;
+      casadi_int*& iw, double*& w, int mem=0) const;
 
     /** \brief Set the (temporary) work vectors */
     void set_temp(const double** arg, double** res,
-        casadi_int* iw, double* w, casadi_int mem=0) const;
+        casadi_int* iw, double* w, int mem=0) const;
 
     /** \brief Set the (persistent and temporary) work vectors */
-    void setup(const double** arg, double** res, casadi_int* iw, double* w, casadi_int mem=0) const;
+    void setup(const double** arg, double** res, casadi_int* iw, double* w, int mem=0) const;
 
     /** \brief Call using a map */
     template<typename M>
@@ -909,11 +963,11 @@ namespace casadi {
     casadi_int checkout() const;
 
     /// Release a memory object
-    void release(casadi_int mem) const;
+    void release(int mem) const;
 
 #ifndef SWIG
     /// Get memory object
-    void* memory(casadi_int ind) const;
+    void* memory(int ind) const;
 #endif // SWIG
 
     // Get a list of all functions
@@ -959,7 +1013,7 @@ namespace casadi {
 #ifdef WITH_EXTRA_CHECKS
     public:
     // How many times have we passed through
-    // operator()(const double** arg, double** res, casadi_int* iw, double* w, casadi_int mem)?
+    // operator()(const double** arg, double** res, casadi_int* iw, double* w, int mem)?
     static thread_local casadi_int call_depth_;
 #endif
 

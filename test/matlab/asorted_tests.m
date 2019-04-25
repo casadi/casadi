@@ -423,6 +423,31 @@ assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(~issparse(b));
 
+
+f.generate('fmex_rp',struct('mex',true,'casadi_int','int','casadi_real','float'));
+clear fmex_rp
+if is_octave
+mex -DMATLAB_MEX_FILE fmex_rp.c
+else
+mex -largeArrayDims fmex_rp.c
+end
+[a,b] = fmex_rp('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+clear fmex_rp
+if is_octave
+mex -DCASADI_MEX_NO_SPARSE -DMATLAB_MEX_FILE fmex_rp.c
+else
+mex -DCASADI_MEX_NO_SPARSE -largeArrayDims fmex_rp.c
+end
+[a,b] = fmex_rp('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(~issparse(b));
+
 Xs = {SX, MX};
 for j=1:2;
   X = Xs{j};
@@ -499,4 +524,80 @@ data = s.encode();
 s = StringDeserializer(data);
 a = s.unpack();
 b = s.unpack();
+
+a = sparse([1 0 2; 3 0 4]);
+A = DM(a);
+assert(nnz(a(:))==nnz(A(:)));
+assert(full(norm(a(:)-A(:)))==0);
+
+a(:) = 3;
+A(:) = 3;
+assert(nnz(a(:))==nnz(A(:)));
+assert(full(norm(a(:)-A(:)))==0);
+
+a = sparse([1 0 2; 3 0 4]);
+A = DM(a);
+
+r = [1 2 6 7 8 9];
+a(:) = r;
+A(:) = r;
+
+assert(nnz(a(:))==nnz(A(:)));
+assert(full(norm(a(:)-A(:)))==0);
+
+a = sparse([1 0 2; 3 0 4]);
+A = DM(a);
+
+r = sparse([0 2 6 0 8 9]);
+a(:) = r;
+A(:) = r;
+
+assert(nnz(a(:))==nnz(A(:)));
+assert(full(norm(a(:)-A(:)))==0);
+
+
+assert(size(MX(ones(1,4)),1)==1)
+assert(size(MX(ones(1,4)),2)==4)
+
+
+
+x = MX.sym('x');
+y = MX.sym('y');
+
+f = Function('f',{x,y},{x+y},struct('is_diff_in',[1 0]))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',[true false]))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',{{true false}}))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',{{1 0}}))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',[1;0]))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',[true;false]))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',{{true;false}}))
+f = Function('f',{x,y},{x+y},struct('is_diff_in',{{1;0}}))
+
+
+flag = false;
+try
+  f = Function('f',{x,y},{x+y},struct('is_diff_in',[1 3]))
+catch
+  flag = true;
+end
+assert(flag);
+
+f.map(3,[1 0],[0])
+f.map(3,[true false],[0])
+f.map(3,{true false},[0])
+%f.map(3,{1 0},[0])
+f.map(3,[1;0],[0])
+f.map(3,[true;false],[0])
+f.map(3,{true;false},[0])
+%f.map(3,{1;0},[0])
+
+flag = false;
+try
+  f.map(3,[1 3])
+catch
+  flag = true;
+end
+assert(flag);
+
+
 

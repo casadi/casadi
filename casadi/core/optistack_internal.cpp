@@ -587,6 +587,8 @@ void OptiNode::bake() {
     symbol_active_[meta(d).count] = true;
 
   std::vector<MX> x = active_symvar(OPTI_VAR);
+  for (casadi_int i=0;i<x.size();++i) meta(x[i]).active_i = i;
+
   casadi_int offset = 0;
   for (const auto& v : x) {
     meta(v).start = offset;
@@ -594,6 +596,7 @@ void OptiNode::bake() {
     meta(v).stop = offset;
   }
   std::vector<MX> p = active_symvar(OPTI_PAR);
+  for (casadi_int i=0;i<p.size();++i) meta(p[i]).active_i = i;
 
   // Fill the nlp definition
   nlp_["x"] = veccat(x);
@@ -618,19 +621,30 @@ void OptiNode::bake() {
 
   }
 
-  lam_ = veccat(active_symvar(OPTI_DUAL_G));
+  std::vector<MX> lam = active_symvar(OPTI_DUAL_G);
+  for (casadi_int i=0;i<lam.size();++i) meta(lam[i]).active_i = i;
+
+  lam_ = veccat(lam);
 
   // Collect bounds and canonical form of constraints
   std::vector<MX> g_all;
+  std::vector<MX> h_all;
   std::vector<MX> lbg_all;
   std::vector<MX> ubg_all;
   for (const auto& g : g_) {
-    g_all.push_back(meta_con(g).canon);
-    lbg_all.push_back(meta_con(g).lb);
-    ubg_all.push_back(meta_con(g).ub);
+    if (meta_con(g).type==OPTI_PSD) {
+      h_all.push_back(meta_con(g).canon);
+    } else {
+      g_all.push_back(meta_con(g).canon);
+      lbg_all.push_back(meta_con(g).lb);
+      ubg_all.push_back(meta_con(g).ub);
+    }
   }
 
   nlp_["g"] = veccat(g_all);
+  if (problem_type_=="conic") {
+    nlp_["h"] = diagcat(h_all);
+  }
 
   // Create bounds helper function
   MXDict bounds;
@@ -742,17 +756,24 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       if (e.is_vector()) {
         casadi_assert(!parametric[0] || !parametric[1],
           "Constraint must contain decision variables.");
-        con.type = OPTI_INEQUALITY;
-        if (parametric[0]) {
-          con.lb = args[0]*DM::ones(e.sparsity());
-          con.ub = inf*DM::ones(e.sparsity());
-          con.canon = args[1]*DM::ones(e.sparsity());
+        if (problem_type_=="conic") {
+          if (args[0].op()==OP_NORMF || args[0].op()==OP_NORM2) {
+            args[0] = -soc(args[0].dep(), args[1]);
+            args[1] = 0;
+          }
         } else {
-          con.lb = -inf*DM::ones(e.sparsity());
-          con.ub = args[1]*DM::ones(e.sparsity());
-          con.canon = args[0]*DM::ones(e.sparsity());
+          con.type = OPTI_INEQUALITY;
+          if (parametric[0]) {
+            con.lb = args[0]*DM::ones(e.sparsity());
+            con.ub = inf*DM::ones(e.sparsity());
+            con.canon = args[1]*DM::ones(e.sparsity());
+          } else {
+            con.lb = -inf*DM::ones(e.sparsity());
+            con.ub = args[1]*DM::ones(e.sparsity());
+            con.canon = args[0]*DM::ones(e.sparsity());
+          }
+          return con;
         }
-        return con;
       }
       // Fall through to generic inequalities
     } else if (args.size()==3 && parametric[0] && parametric[2]) {
@@ -769,6 +790,13 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
     bool type_known = false;
     for (casadi_int j=0;j<args.size()-1;++j) {
       MX e = args[j]-args[j+1];
+      if (problem_type_=="conic") {
+        if (args[j].op()==OP_NORMF || args[j].op()==OP_NORM2) {
+          args[j] = -soc(args[j].dep(), args[j+1]);
+          args[j+1] = 0;
+          e = args[j]-args[j+1];
+        }
+      }
       if (e.is_vector()) {
         // g1(x,p) <= g2(x,p)
         ret.push_back(e);
@@ -778,9 +806,15 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
         con.flipped = flipped;
       } else {
         // A(x,p) >= b(p)
-        e = args[j+1]-args[j];
+        MX a = args[j+1];
+        MX b = args[j];
+        e = a-b;
+
         casadi_assert(e.size1()==e.size2(),
           "Matrix inequalities must be square. Did you mean element-wise inequality instead?");
+        if (a.is_scalar()) a*= MX::eye(e.size1());
+        if (b.is_scalar()) b*= MX::eye(e.size1());
+        e = a-b;
 
         ret.push_back(e);
         casadi_assert_dev(!type_known || con.type==OPTI_PSD);
@@ -897,7 +931,7 @@ void OptiNode::res(const DMDict& res) {
     std::vector<double> & data_v = store_latest_[OPTI_VAR][i].nonzeros();
     std::copy(x_v.begin()+meta(v).start, x_v.begin()+meta(v).stop, data_v.begin());
   }
-  if (res.find("lam_g")!=res.end()) {
+  if (res.find("lam_g")!=res.end() && problem_type_!="conic") {
     const std::vector<double> & lam_v = res.at("lam_g").nonzeros();
     for (const auto &v : active_symvar(OPTI_DUAL_G)) {
       casadi_int i = meta(v).i;
@@ -922,10 +956,12 @@ OptiSol OptiNode::solve(bool accept_limit) {
   }
   // Verify the constraint types
   for (const auto& g : g_) {
-    if (meta_con(g).type==OPTI_PSD)
-      casadi_error("Psd constraints not implemented yet. "
-      "Perhaps you intended an element-wise inequality? "
-      "In that case, make sure that the matrix is flattened (e.g. mat(:)).");
+    if (problem_type_!="conic") {
+      if (meta_con(g).type==OPTI_PSD)
+        casadi_error("Psd constraints not implemented yet. "
+        "Perhaps you intended an element-wise inequality? "
+        "In that case, make sure that the matrix is flattened (e.g. mat(:)).");
+    }
   }
 
   bool solver_update =  solver_dirty() || old_callback() || (user_callback_ && callback_.is_null());
@@ -1226,6 +1262,63 @@ std::vector<DM> OptiNode::active_values(VariableType type) const {
     }
   }
   return ret;
+}
+
+Function OptiNode::to_function(const std::string& name,
+    const std::vector<MX>& args, const std::vector<MX>& res,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) {
+  if (problem_dirty()) return baked_copy().to_function(name, args, res, name_in, name_out, opts);
+
+  Function solver;
+  if (problem_type_=="conic") {
+    solver = qpsol("solver", solver_name_, nlp_, solver_options_);
+  } else {
+    solver = nlpsol("solver", solver_name_, nlp_, solver_options_);
+  }
+
+  // Get initial guess and parameter values
+  std::vector<MX> x0, p, lam_g;
+  assign_vector(active_values(OPTI_VAR), x0);
+  assign_vector(active_values(OPTI_PAR), p);
+  assign_vector(active_values(OPTI_DUAL_G), lam_g);
+
+  for (const auto& a : args) {
+    casadi_assert(symbol_active_[meta(a).count],
+      "Symbol not occuring in problem" + describe(a));
+    casadi_int i = meta(a).active_i;
+    if (meta(a).type==OPTI_VAR) {
+      x0.at(i) = a;
+    } else if (meta(a).type==OPTI_PAR) {
+      p.at(i) = a;
+    } else if (meta(a).type==OPTI_DUAL_G) {
+      lam_g.at(i) = a;
+    } else {
+      casadi_error("Unknown");
+    }
+  }
+  MXDict arg;
+  arg["p"] = veccat(p);
+
+  // Evaluate bounds for given parameter values
+  MXDict r = bounds_(arg);
+  arg["x0"] = veccat(x0);
+  arg["lam_g0"] = veccat(lam_g);
+  arg["lbg"] = r["lbg"];
+  arg["ubg"] = r["ubg"];
+
+  r = solver(arg);
+
+  std::vector<MX> helper_in = {veccat(active_symvar(OPTI_VAR)),
+                               veccat(active_symvar(OPTI_PAR)),
+                               veccat(active_symvar(OPTI_DUAL_G))};
+  Function helper("helper", helper_in, {res});
+
+  std::vector<MX> arg_in = helper(std::vector<MX>{r.at("x"), arg["p"], r.at("lam_g")});
+
+  return Function(name, args, arg_in, name_in, name_out, opts);
+
 }
 
 void OptiNode::disp(ostream &stream, bool more) const {

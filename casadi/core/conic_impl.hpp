@@ -81,7 +81,11 @@ namespace casadi {
     ///@}
 
     /// Solve the QP
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const final;
+
+    /// Solve the QP
+    virtual int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const = 0;
 
     // Initialize
     void init(const Dict& opts) override;
@@ -168,6 +172,9 @@ namespace casadi {
       // Maximum size of ind/val vectors
       casadi_int indval_size;
     };
+
+    /// Throw an exception on failure?
+    bool error_on_fail_;
 
     /// SDP to SOCP conversion initialization
     void sdp_to_socp_init(SDPToSOCPMem& mem) const;

@@ -486,7 +486,7 @@ namespace casadi {
         calc_function(m, "nlp_hess_l");
         // Diagonal values
         double *dval = m->w;
-        casadi_fill(dval, nx_, 0.);
+        casadi_clear(dval, nx_);
 
         // Remove diagonal
         const casadi_int* colind = hesslag_sp_.colind();
@@ -525,6 +525,8 @@ namespace casadi {
     m->success = m->return_code > TerminateSuccess;
     if (m->return_code==MaxCalls || m->return_code==MaxCalls || m->return_code==Timeout)
       m->unified_return_status = SOLVER_RET_LIMITED;
+    if (m->return_code==evalsNaN)
+      m->unified_return_status = SOLVER_RET_NAN;
     return 0;
   }
 

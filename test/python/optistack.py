@@ -47,6 +47,8 @@ if has_nlpsol("ipopt"):
 
 class OptiStacktests(inherit_from):
 
+
+    @requires_conic("qrqp")
     def test_conic(self):
       opti = Opti('conic')
       x = opti.variable(2)
@@ -129,6 +131,27 @@ class OptiStacktests(inherit_from):
       
       sol.opti.nx
       
+    def test_to_function(self):
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      p = opti.parameter()
+      
+      opti.minimize(y**2+sin(x-y-p)**2)
+      opti.subject_to(x+y>=1)
+      
+      opti.solver(nlpsolver,nlpsolver_options)
+
+      
+
+      F = opti.to_function("F",[x,p,opti.lam_g],[x,y])
+      
+      r = F(0,0.1,0)
+      
+      print(F(0.1,0.1,0))
+      print(F(0,2,0))
+      print(F(100,1,0))
+
     def test_dual(self):
       opti = Opti()
       x = opti.variable()

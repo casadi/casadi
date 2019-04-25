@@ -64,6 +64,13 @@ namespace casadi {
      }
   };
 
+  Dict MXFunction::generate_options(bool is_temp) const {
+    Dict opts = FunctionInternal::generate_options(is_temp);
+    //opts["default_in"] = default_in_;
+    opts["live_variables"] = live_variables_;
+    return opts;
+  }
+
   MX MXFunction::instruction_MX(casadi_int k) const {
     return algorithm_.at(k).data;
   }
@@ -94,14 +101,14 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
-    bool live_variables = true;
+    live_variables_ = true;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
         default_in_ = op.second;
       } else if (op.first=="live_variables") {
-        live_variables = op.second;
+        live_variables_ = op.second;
       }
     }
 
@@ -243,7 +250,7 @@ namespace casadi {
             casadi_int remaining = --refcount[ch_ind];
 
             // Free variable for reuse
-            if (live_variables && remaining==0) {
+            if (live_variables_ && remaining==0) {
 
               // Get a pointer to the sparsity pattern of the argument that can be freed
               casadi_int nnz = nodes[ch_ind]->sparsity().nnz();
@@ -269,7 +276,7 @@ namespace casadi {
           if (e.res[c]>=0) {
 
             // Are reuse of variables (live variables) enabled?
-            if (live_variables) {
+            if (live_variables_) {
               // Get a pointer to the sparsity pattern node
               casadi_int nnz = e.data->sparsity(c).nnz();
 
@@ -292,7 +299,7 @@ namespace casadi {
     }
 
     if (verbose_) {
-      if (live_variables) {
+      if (live_variables_) {
         casadi_message("Using live variables: work array is " + str(worksize)
                        + " instead of " + str(nodes.size()));
       } else {
@@ -485,6 +492,8 @@ namespace casadi {
 
   int MXFunction::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    // Fall back when forward mode not allowed
+    if (sp_weight()==1) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in_;
     bvec_t** res1=res+n_out_;
@@ -527,6 +536,8 @@ namespace casadi {
 
   int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
+    // Fall back when reverse mode not allowed
+    if (sp_weight()==0) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in_;
     bvec_t** res1=res+n_out_;
@@ -590,6 +601,8 @@ namespace casadi {
 
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
                            bool always_inline, bool never_inline) const {
+    always_inline = always_inline || always_inline_;
+    never_inline = never_inline || never_inline_;
     if (verbose_) casadi_message(name_ + "::eval_mx");
     try {
       // Resize the number of outputs
@@ -710,6 +723,13 @@ namespace casadi {
           }
           return;
         }
+      }
+
+      if (!enable_forward_) {
+        // Do the non-inlining call from FunctionInternal
+        // NOLINTNEXTLINE(bugprone-parent-virtual-call)
+        FunctionInternal::call_forward(in_, out_, fseed, fsens, false, false);
+        return;
       }
 
       // Work vector, forward derivatives
@@ -863,6 +883,25 @@ namespace casadi {
           }
           return;
         }
+      }
+
+      if (!enable_reverse_) {
+        vector<vector<MX> > v;
+        // Do the non-inlining call from FunctionInternal
+        // NOLINTNEXTLINE(bugprone-parent-virtual-call)
+        FunctionInternal::call_reverse(in_, out_, aseed, v, false, false);
+        for (casadi_int i=0; i<v.size(); ++i) {
+          for (casadi_int j=0; j<v[i].size(); ++j) {
+            if (!v[i][j].is_empty()) { // TODO(@jaeandersson): Hack
+              if (asens[i][j].is_empty()) {
+                asens[i][j] = v[i][j];
+              } else {
+                asens[i][j] += v[i][j];
+              }
+            }
+          }
+        }
+        return;
       }
 
       // Split up aseed analogous to symbolic primitives
@@ -1050,7 +1089,7 @@ namespace casadi {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
-      casadi_error("Code generation is not possible since variables "
+      casadi_error("Code generation of '" + name_ + "' is not possible since variables "
                    + str(free_vars_) + " are free.");
     }
 
@@ -1656,7 +1695,7 @@ namespace casadi {
     s.pack("MXFunction::workloc", workloc_);
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
-
+    s.pack("MXFunction::live_variables", live_variables_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_serialize_members(s);
   }
@@ -1678,6 +1717,7 @@ namespace casadi {
     s.unpack("MXFunction::workloc", workloc_);
     s.unpack("MXFunction::free_vars", free_vars_);
     s.unpack("MXFunction::default_in", default_in_);
+    s.unpack("MXFunction::live_variables", live_variables_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
   }

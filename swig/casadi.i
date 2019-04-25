@@ -118,8 +118,10 @@
 
     // Flush the command window buffer (needed in gui mode)
     static void mexflush(bool error) {
-      if (mexEvalString("drawnow('update');pause(0.0001);")) {
-        utSetInterruptPending(true);
+      if (!utIsInterruptPending()) {
+        if (mexEvalString("drawnow('update');pause(0.0001);")) {
+          utSetInterruptPending(true);
+        }
       }
     }
 #endif
@@ -129,6 +131,9 @@
     static bool mexcheckinterrupted() {
       return false;
     }
+    void mexclearinterrupted() {
+
+    }
 #else
     // Undocumented matlab feature
     extern "C" bool utIsInterruptPending();
@@ -136,6 +141,11 @@
     static bool mexcheckinterrupted() {
       return utIsInterruptPending();
     }
+
+    void mexclearinterrupted() {
+      utSetInterruptPending(false);
+    }
+
 #endif
   }
 %}
@@ -163,6 +173,7 @@
 
   // Set library path
   casadi::GlobalOptions::setCasadiPath(path);
+  casadi::GlobalOptions::setCasadiIncludePath(path+sep+"include");
 
   // Matlab is index-one based
   casadi::GlobalOptions::start_index = 1;
@@ -182,6 +193,7 @@
 
   // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = casadi::mexcheckinterrupted;
+  casadi::InterruptHandler::clearInterrupted = casadi::mexclearinterrupted;
 %}
 #endif
 
@@ -523,6 +535,7 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::vector<double> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<casadi_int>** m);
     GUESTOBJECT* from_ptr(const std::vector<casadi_int> *a);
+    bool to_ptr(GUESTOBJECT *p, const std::vector<bool> **m);
     GUESTOBJECT* from_ptr(const std::vector<bool> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
@@ -697,7 +710,18 @@ namespace std {
 
 
     PyObject* get_Python_helper(const std::string& name) {
+%#if PY_VERSION_HEX < 0x03070000
       PyObject* module = PyImport_AddModule("casadi");
+%#else
+      PyObject* c_name = PyString_FromString("casadi");
+      PyObject* module = PyImport_GetModule(c_name);
+      Py_DECREF(c_name);
+%#endif
+      if (!module) {
+        if (PyErr_Occurred()) {
+          PyErr_Clear();
+        }
+      }
       PyObject* dict = PyModule_GetDict(module);
       return PyDict_GetItemString(dict, (char*) name.c_str());
     }
@@ -1132,6 +1156,45 @@ namespace std {
       return false;
     }
 
+    bool to_ptr(GUESTOBJECT *p, std::vector<bool>** m) {
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2
+          && (mxGetM(p)<=1 || mxGetN(p)<=1)) {
+        double* data = static_cast<double*>(mxGetData(p));
+        casadi_int n = mxGetM(p)*mxGetN(p);
+
+        // Check if all integers
+        bool all_0_or_1 = true;
+        for (casadi_int i=0; all_0_or_1 && i<n; ++i) {
+          double d = data[i];
+          all_0_or_1 = all_0_or_1 && (d==1 || d==0);
+        }
+
+        // Successful conversion
+        if (all_0_or_1) {
+          if (m) {
+            (**m).resize(n);
+            std::copy(data, data+n, (**m).begin());
+          }
+          return true;
+        }
+      }
+
+      if (mxIsLogical(p) && !mxIsLogicalScalar(p) &&mxGetNumberOfDimensions(p)==2
+          && (mxGetM(p)<=1 || mxGetN(p)<=1) ) {
+        casadi_int n = mxGetM(p)*mxGetN(p);
+        mxLogical* data = static_cast<mxLogical*>(mxGetData(p));
+        if (m) {
+          (**m).resize(n);
+          std::copy(data, data+n, (**m).begin());
+        }
+        return true;
+      }
+
+      // Cell array
+      if (to_ptr_cell(p, m)) return true;
+
+      return false;
+    }
 
     // MATLAB n-by-m char array mapped to vector of length m
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
@@ -1432,8 +1495,14 @@ namespace std {
       case OT_FUNCTION: return from_tmp(a->as_function());
       case OT_FUNCTIONVECTOR: return from_tmp(a->as_function_vector());
 #ifdef SWIGPYTHON
-      case OT_NULL: return Py_None;
+      case OT_NULL:
+      case OT_VOIDPTR:
+        return Py_None;
 #endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      case OT_VOIDPTR:
+        return mxCreateDoubleScalar(0);
+#endif
       default: return 0;
       }
     }
@@ -1462,14 +1531,15 @@ namespace std {
       }
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
-      if (mxIsChar(p) && mxGetM(p)==1) {
-	if (m) {
-	  size_t len=mxGetN(p);
-	  std::vector<char> s(len+1);
-	  if (mxGetString(p, &s[0], (len+1)*sizeof(char))) return false;
-	  **m = std::string(&s[0], len);
+      if (mxIsChar(p) && mxGetM(p)<=1) {
+        if (m) {
+          if (mxGetM(p)==0) return true;
+          size_t len=mxGetN(p);
+          std::vector<char> s(len+1);
+          if (mxGetString(p, &s[0], (len+1)*sizeof(char))) return false;
+          **m = std::string(&s[0], len);
         }
-	return true;
+        return true;
       }
 #endif // SWIGMATLAB
 
@@ -2629,7 +2699,10 @@ class NZproxy:
     }
 
     // Set a submatrix (index-1)
-    void paren_asgn(const Type& m, char rr) { $self->set(m, true, casadi::char2Slice(rr));}
+    void paren_asgn(const Type& m, char rr) {
+      casadi_assert_dev(rr==':');
+      $self->set(m, false, casadi::IM(casadi::range($self->numel())));
+    }
     void paren_asgn(const Type& m, const Matrix<casadi_int>& rr) { $self->set(m, true, rr);}
     void paren_asgn(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
     void paren_asgn(const Type& m, char rr, char cc) { $self->set(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));}
@@ -3229,6 +3302,7 @@ DECL M casadi_erfinv(const M& x) { using casadi::erfinv; return erfinv(x); }
 DECL M casadi_sign(const M& x) { using casadi::sign; return sign(x); }
 DECL M casadi_power(const M& x, const M& n) { return pow(x, n); }
 DECL M casadi_mod(const M& x, const M& y) { return fmod(x, y); }
+DECL M casadi_fmod(const M& x, const M& y) { return fmod(x, y); }
 DECL M casadi_atan2(const M& x, const M& y) { return atan2(x, y); }
 DECL M casadi_fmin(const M& x, const M& y) { return fmin(x, y); }
 DECL M casadi_fmax(const M& x, const M& y) { return fmax(x, y); }
@@ -3413,6 +3487,22 @@ casadi_graph_substitute(const std::vector< M > &ex,
                  const std::vector< M > &v,
                  const std::vector< M > &vdef) {
   return graph_substitute(ex, v, vdef);
+}
+DECL M casadi_bspline(const M& x,
+        const DM& coeffs,
+        const std::vector< std::vector<double> >& knots,
+        const std::vector<casadi_int>& degree,
+        casadi_int m,
+        const Dict& opts = Dict()) {
+  return bspline(x, coeffs, knots, degree, m, opts);
+}
+DECL M casadi_bspline(const M& x,
+        const M& coeffs,
+        const std::vector< std::vector<double> >& knots,
+        const std::vector<casadi_int>& degree,
+        casadi_int m,
+        const Dict& opts = Dict()) {
+  return bspline(x, coeffs, knots, degree, m, opts);
 }
 
 #endif
@@ -3886,6 +3976,9 @@ namespace casadi{
 namespace casadi{
 %extend GenericMatrixCommon {
   %matlabcode %{
+    function varargout = spy(self,varargin)
+      [varargout{1:nargout}] = spy(sparse(casadi.DM(self.sparsity(),1)),varargin{:});
+    end
     function varargout = subsref(self,s)
       if numel(s)==1 && strcmp(s.type,'()')
         [varargout{1}] = paren(self, s.subs{:});
@@ -4185,6 +4278,7 @@ namespace casadi {
 %include <casadi/core/global_options.hpp>
 %include <casadi/core/casadi_meta.hpp>
 %include <casadi/core/integration_tools.hpp>
+%include <casadi/core/nlp_tools.hpp>
 %include <casadi/core/nlp_builder.hpp>
 %include <casadi/core/variable.hpp>
 %include <casadi/core/dae_builder.hpp>

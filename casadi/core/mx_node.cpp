@@ -55,6 +55,7 @@
 #include "constant_mx.hpp"
 #include "get_elements.hpp"
 #include "map.hpp"
+#include "bspline.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -536,6 +537,10 @@ namespace casadi {
       return shared_from_this<MX>();
     } else if (sp.nnz()==0) {
       return MX::zeros(sp);
+    } else if (sp.is_dense()) {
+      return MX::create(new Densify(shared_from_this<MX>(), sp));
+    } else if (sparsity().is_dense()) {
+      return MX::create(new Sparsify(shared_from_this<MX>(), sp));
     } else {
       return MX::create(new Project(shared_from_this<MX>(), sp));
     }
@@ -759,6 +764,26 @@ namespace casadi {
     } else {
       return find(x.T());
     }
+  }
+
+  MX MXNode::get_bspline(const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<double>& coeffs,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const {
+    MX x = shared_from_this<MX>();
+    return MX::create(new BSpline(x, knots, offset, coeffs, degree, m, lookup_mode));
+  }
+
+  MX MXNode::get_bspline(const MX& coeffs,
+            const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const {
+    MX x = shared_from_this<MX>();
+    return MX::create(new BSplineParametric(x, coeffs, knots, offset, degree, m, lookup_mode));
   }
 
   MX MXNode::get_det() const {
@@ -1023,7 +1048,7 @@ namespace casadi {
     // OP_ADD_ELEMENTS
     {OP_PROJECT, Project::deserialize},
     {OP_ASSERTION, Assertion::deserialize},
-    // OP_MONITOR
+    {OP_MONITOR, Monitor::deserialize},
     {OP_NORM1, Norm1::deserialize},
     {OP_NORM2, Norm2::deserialize},
     {OP_NORMINF, NormInf::deserialize},
@@ -1036,6 +1061,7 @@ namespace casadi {
     //OP_PRINTME,
     //OP_LIFT,
     //OP_EINSTEIN
+    {OP_BSPLINE, BSplineCommon::deserialize},
     {-1, OutputNode::deserialize}
   };
 

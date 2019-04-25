@@ -130,4 +130,13 @@ namespace casadi {
     }
   }
 
+  void Monitor::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("Monitor::comment", comment_);
+  }
+
+  Monitor::Monitor(DeserializingStream& s) : MXNode(s) {
+    s.unpack("Monitor::comment", comment_);
+  }
+
 } // namespace casadi

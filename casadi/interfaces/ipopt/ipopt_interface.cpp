@@ -179,6 +179,7 @@ namespace casadi {
                         {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
+      casadi_assert(hesslag_sp_.is_triu(), "Hessian must be upper triangular");
     } else if (pass_nonlinear_variables_) {
       nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
     }

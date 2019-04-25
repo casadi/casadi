@@ -517,6 +517,9 @@ namespace casadi {
     Sparsity operator*(const Sparsity& b) const;
     /// @}
 
+    /// Is subset?
+    bool is_subset(const Sparsity& rhs) const;
+
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity pattern_inverse() const;
 
@@ -902,7 +905,8 @@ namespace casadi {
     template<typename T>
     void bor(T* data, const T* val_data, const Sparsity& val_sp) const;
 
-    static std::string file_format(const std::string& filename, const std::string& format_hint);
+    static std::string file_format(const std::string& filename,
+      const std::string& format_hint, const std::set<std::string>& file_formats);
     static std::set<std::string> file_formats;
   private:
 

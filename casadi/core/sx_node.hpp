@@ -45,7 +45,7 @@ namespace casadi {
   class SXNode {
     friend class SXElem;
     friend class Matrix<SXElem>;
-
+    friend class UniversalNodeOwner;
   public:
 
     /** \brief  constructor */

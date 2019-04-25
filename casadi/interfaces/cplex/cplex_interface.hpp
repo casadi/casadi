@@ -138,7 +138,8 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<CplexMemory*>(mem);}
 
     // Solve the QP
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
@@ -176,6 +177,12 @@ namespace casadi {
 
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new CplexInterface(s); }
+
+    // SOS structure
+    std::vector< double > sos_weights_;
+    std::vector<casadi_int> sos_beg_;
+    std::vector<int> sos_ind_;
+    std::vector<char> sos_types_;
 
   protected:
      /** \brief Deserializing constructor */

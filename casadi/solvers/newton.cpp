@@ -269,7 +269,7 @@ namespace casadi {
   int Newton::init_mem(void* mem) const {
     if (Rootfinder::init_mem(mem)) return 1;
     auto m = static_cast<NewtonMemory*>(mem);
-    m->return_status = nullptr;
+    m->return_status = "";
     m->iter = 0;
     return 0;
   }
@@ -289,7 +289,6 @@ namespace casadi {
     s.unpack("Newton::abstol", abstol_);
     s.unpack("Newton::abstolStep", abstolStep_);
     s.unpack("Newton::print_iteration", print_iteration_);
-    s.unpack("Newton::error_on", error_on_);
     s.unpack("Newton::line_search", line_search_);
   }
 
@@ -300,7 +299,6 @@ namespace casadi {
     s.pack("Newton::abstol", abstol_);
     s.pack("Newton::abstolStep", abstolStep_);
     s.pack("Newton::print_iteration", print_iteration_);
-    s.pack("Newton::error_on", error_on_);
     s.pack("Newton::line_search", line_search_);
   }
 

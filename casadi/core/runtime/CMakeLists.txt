@@ -8,8 +8,10 @@ set(RUNTIME_SRC
   casadi_de_boor.hpp
   casadi_densify.hpp
   casadi_dot.hpp
+  casadi_clear.hpp
   casadi_fill.hpp
   casadi_flip.hpp
+  casadi_file_slurp.hpp
   casadi_getu.hpp
   casadi_iamax.hpp
   casadi_interpn.hpp
@@ -26,6 +28,7 @@ set(RUNTIME_SRC
   casadi_mv.hpp
   casadi_mv_dense.hpp
   casadi_nd_boor_eval.hpp
+  casadi_nd_boor_dual_eval.hpp  
   casadi_norm_1.hpp
   casadi_norm_2.hpp
   casadi_norm_inf.hpp
@@ -47,7 +50,8 @@ set(RUNTIME_SRC
   casadi_bfgs.hpp
   casadi_regularize.hpp
   casadi_newton.hpp
-  casadi_bound_consistency.hpp  
+  casadi_bound_consistency.hpp 
+  casadi_lsqr.hpp 
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 
