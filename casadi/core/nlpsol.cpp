@@ -373,14 +373,14 @@ namespace casadi {
     // Dimension checks
     casadi_assert(sparsity_out_.at(NLPSOL_G).is_dense()
                           && sparsity_out_.at(NLPSOL_G).is_vector(),
-        "Expected a dense vector 'g', but got " + sparsity_out_.at(NLPSOL_G).dim() + ".");
+        "Expected a dense vector 'g', but got " + sparsity_out_.at(NLPSOL_G).dim(true) + ".");
 
     casadi_assert(sparsity_out_.at(NLPSOL_F).is_dense(),
-        "Expected a dense 'f', but got " + sparsity_out_.at(NLPSOL_F).dim() + ".");
+        "Expected a dense 'f', but got " + sparsity_out_.at(NLPSOL_F).dim(true) + ".");
 
     casadi_assert(sparsity_out_.at(NLPSOL_X).is_dense()
                           && sparsity_out_.at(NLPSOL_X).is_vector(),
-      "Expected a dense vector 'x', but got " + sparsity_out_.at(NLPSOL_X).dim() + ".");
+      "Expected a dense vector 'x', but got " + sparsity_out_.at(NLPSOL_X).dim(true) + ".");
 
     // Discrete marker
     mi_ = false;
