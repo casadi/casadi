@@ -562,6 +562,10 @@ if(WITH_HPMPC)
 endif()
 add_feature_info(hpmpc-interface WITH_HPMPC "Interface to hpmpc.")
 
+# QPALM
+option(WITH_QPALM "Compile the interface to QPALM" ON)
+add_feature_info(qpalm-interface WITH_QPALM "Interface to qpalm.")
+
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
