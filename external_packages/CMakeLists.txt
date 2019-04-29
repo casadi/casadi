@@ -37,3 +37,7 @@ endif()
 if(WITH_OSQP)
   add_subdirectory(osqp)
 endif()
+
+if(WITH_QPALM)
+  add_subdirectory(QPALM)
+endif()
