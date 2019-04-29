@@ -16,3 +16,6 @@
 [submodule "external_packages/hpipm"]
 	path = external_packages/hpipm
 	url = https://github.com/giaf/hpipm.git
+[submodule "external_packages/QPALM"]
+	path = external_packages/QPALM
+	url = https://github.com/Benny44/QPALM.git
