@@ -562,6 +562,10 @@ if(WITH_HPMPC)
 endif()
 add_feature_info(hpmpc-interface WITH_HPMPC "Interface to hpmpc.")
 
+# HPIPM
+option(WITH_HPIPM "Compile the interface to HPIPM" ON)
+add_feature_info(hpipm-interface WITH_HPIPM "Interface to hpipm.")
+
 # QPALM
 option(WITH_QPALM "Compile the interface to QPALM" ON)
 add_feature_info(qpalm-interface WITH_QPALM "Interface to qpalm.")

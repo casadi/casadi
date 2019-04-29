@@ -27,7 +27,13 @@ if(WITH_HPMPC AND WITH_BUILD_HPMPC)
 endif()
 
 if(WITH_BLASFEO AND WITH_BUILD_BLASFEO)
-  add_subdirectory(blasfeo)
+  # TODO: The following definition should go ASAP!
+  set(TARGET "GENERIC" CACHE STRING "Target architecture")
+  set(LA "HIGH_PERFORMANCE" CACHE STRING "Linear algebra optimization level")
+  set(BLASFEO_HEADERS_INSTALLATION_DIRECTORY "include/blasfeo/include" CACHE STRING "")
+  set(HPIPM_HEADERS_INSTALLATION_DIRECTORY "include/hpipm/include" CACHE STRING "")
+  set(HPMPC_HEADERS_INSTALLATION_DIRECTORY "include/hpmpc/include" CACHE STRING "")
+  add_subdirectory(blasfeo/src)
 endif()
 
 if(WITH_SUPERSCS)
@@ -37,6 +43,17 @@ endif()
 if(WITH_OSQP)
   add_subdirectory(osqp)
 endif()
+
+if(WITH_HPIPM)
+  # TODO: The following definition should go ASAP!
+  set(TARGET "GENERIC" CACHE STRING "Target architecture")
+  set(LA "HIGH_PERFORMANCE" CACHE STRING "Linear algebra optimization level")
+  set(BLASFEO_HEADERS_INSTALLATION_DIRECTORY "include/blasfeo/include" CACHE STRING "")
+  set(HPIPM_HEADERS_INSTALLATION_DIRECTORY "include/hpipm/include" CACHE STRING "")
+  set(HPMPC_HEADERS_INSTALLATION_DIRECTORY "include/hpmpc/include" CACHE STRING "")
+  add_subdirectory(hpipm)
+endif()
+
 
 if(WITH_QPALM)
   add_subdirectory(QPALM)
