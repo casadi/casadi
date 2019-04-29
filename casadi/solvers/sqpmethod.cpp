@@ -350,6 +350,16 @@ namespace casadi {
     m->iter_count = -1;
   }
 
+  int Sqpmethod::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
+    auto m = static_cast<SqpmethodMemory*>(mem);
+
+    m->fstats["regularize"]  = FStats();
+    m->fstats["QP"]  = FStats();
+    m->fstats["linesearch"]  = FStats();
+    return 0;
+  }
+
 int Sqpmethod::solve(void* mem) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
     auto d_nlp = &m->d_nlp;
@@ -463,10 +473,13 @@ int Sqpmethod::solve(void* mem) const {
         }
 
         if (convexify_strategy_==CVX_REGULARIZE) {
+          m->fstats.at("regularize").tic();
           // Determing regularization parameter with Gershgorin theorem
           m->reg = convexify_margin_-casadi_lb_eig(Hsp_, d->Bk);
           if (m->reg > 0) casadi_regularize(Hsp_, d->Bk, m->reg);
+          m->fstats.at("regularize").toc();
         } else if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
+          m->fstats.at("regularize").tic();
           casadi_int offset = 0;
 
           // Loop over Hessian blocks
@@ -522,6 +535,7 @@ int Sqpmethod::solve(void* mem) const {
             offset += block_size*block_size;
           }
         }
+        m->fstats.at("regularize").toc();
       } else if (m->iter_count==0) {
         // Initialize BFGS
         casadi_fill(d->Bk, Hsp_.nnz(), 1.);
@@ -546,9 +560,11 @@ int Sqpmethod::solve(void* mem) const {
       // Increase counter
       m->iter_count++;
 
+      m->fstats.at("QP").tic();
       // Solve the QP
       solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam);
+      m->fstats.at("QP").toc();
 
       // Detecting indefiniteness
       double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
@@ -569,6 +585,7 @@ int Sqpmethod::solve(void* mem) const {
       // Line-search
       if (verbose_) print("Starting line-search\n");
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
+        m->fstats.at("linesearch").tic();
 
         // Calculate penalty parameter of merit function
         m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, d->dlam));
@@ -633,6 +650,7 @@ int Sqpmethod::solve(void* mem) const {
 
         casadi_scal(nx_, t, d->dx);
 
+        m->fstats.at("linesearch").toc();
       } else {
         // Full step
         casadi_copy(d->dlam, nx_ + ng_, d_nlp->lam);
