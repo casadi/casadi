@@ -276,7 +276,7 @@ namespace casadi {
     if (res[CONIC_COST]) *res[CONIC_COST] = m->work->info->obj_val;
 
     m->success = m->work->info->status_val == OSQP_SOLVED;
-    m->unified_return_status = SOLVER_RET_SUCCESS;
+    if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
 
     return 0;
   }
@@ -422,6 +422,7 @@ namespace casadi {
   }
 
   OsqpInterface::OsqpInterface(DeserializingStream& s) : Conic(s) {
+    s.version("OsqpInterface", 1);
     s.unpack("OsqpInterface::nnzHupp", nnzHupp_);
     s.unpack("OsqpInterface::nnzA", nnzA_);
     s.unpack("OsqpInterface::warm_start_primal", warm_start_primal_);
@@ -453,6 +454,7 @@ namespace casadi {
 
   void OsqpInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
+    s.version("OsqpInterface", 1);
     s.pack("OsqpInterface::nnzHupp", nnzHupp_);
     s.pack("OsqpInterface::nnzA", nnzA_);
     s.pack("OsqpInterface::warm_start_primal", warm_start_primal_);
