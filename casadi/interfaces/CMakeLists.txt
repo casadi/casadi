@@ -78,6 +78,10 @@ if(WITH_HPMPC)
   add_subdirectory(hpmpc)
 endif()
 
+if(WITH_HPIPM)
+  add_subdirectory(hpipm)
+endif()
+
 if(WITH_SUPERSCS)
   add_subdirectory(superscs)
 endif()
