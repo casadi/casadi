@@ -808,6 +808,9 @@
 %exception  casadi::FunctionInternal::jacobian() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::jacobian_sparsity_filter(const Sparsity &sp) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::jit_dependencies(const std::string &fname) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2435,6 +2438,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ThreadMap::parallelization() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::casadi_cvx_scalar(T1 epsilon, casadi_int reflect, T1 eig) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::check_exposed(T t) {
