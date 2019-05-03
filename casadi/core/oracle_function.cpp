@@ -320,11 +320,12 @@ namespace casadi {
     print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
 
     // Print keys
-    for (auto &&s : m->fstats) {
-      const FStats& fs = m->fstats.at(s.first);
-      if (fs.n_call!=0) {
+    for (const auto &s : m->fstats) {
+      if (s.second.n_call!=0) {
         print(namefmt, s.first.c_str());
-        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
+        print("%12.3g\n", s.second.t_proc);
+        print("%12.3g\n", s.second.t_wall);
+        print("%9d\n", s.second.n_call);
       }
     }
   }
@@ -334,7 +335,7 @@ namespace casadi {
 
     // Add timing statistics
     Dict stats;
-    for (auto&& s : m->fstats) {
+    for (const auto& s : m->fstats) {
       stats["n_call_" +s.first] = s.second.n_call;
       stats["t_wall_" +s.first] = s.second.t_wall;
       stats["t_proc_" +s.first] = s.second.t_proc;
@@ -348,7 +349,7 @@ namespace casadi {
 
     // Create statistics
     for (auto&& e : all_functions_) {
-      m->fstats[e.first] = FStats();
+      m->add_stat(e.first);
     }
     return 0;
   }

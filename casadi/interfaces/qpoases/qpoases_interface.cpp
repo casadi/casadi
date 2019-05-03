@@ -341,9 +341,9 @@ namespace casadi {
     // Pass to qpOASES
     m->qp->setOptions(ops_);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
     m->h_row.resize(H_.nnz());
     m->h_colind.resize(H_.size2()+1);
     m->a_row.resize(A_.nnz());
@@ -355,9 +355,6 @@ namespace casadi {
   int QpoasesInterface::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
-
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
 
     m->fstats.at("preprocessing").tic();
 

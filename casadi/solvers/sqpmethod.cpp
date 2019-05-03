@@ -354,9 +354,10 @@ namespace casadi {
     if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<SqpmethodMemory*>(mem);
 
-    m->fstats["regularize"]  = FStats();
-    m->fstats["QP"]  = FStats();
-    m->fstats["linesearch"]  = FStats();
+    m->add_stat("convexify");
+    m->add_stat("BFGS");
+    m->add_stat("QP");
+    m->add_stat("linesearch");
     return 0;
   }
 
@@ -473,13 +474,13 @@ int Sqpmethod::solve(void* mem) const {
         }
 
         if (convexify_strategy_==CVX_REGULARIZE) {
-          m->fstats.at("regularize").tic();
+          m->fstats.at("convexify").tic();
           // Determing regularization parameter with Gershgorin theorem
           m->reg = convexify_margin_-casadi_lb_eig(Hsp_, d->Bk);
           if (m->reg > 0) casadi_regularize(Hsp_, d->Bk, m->reg);
-          m->fstats.at("regularize").toc();
+          m->fstats.at("convexify").toc();
         } else if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
-          m->fstats.at("regularize").tic();
+          m->fstats.at("convexify").tic();
           casadi_int offset = 0;
 
           // Loop over Hessian blocks
@@ -535,16 +536,20 @@ int Sqpmethod::solve(void* mem) const {
             offset += block_size*block_size;
           }
         }
-        m->fstats.at("regularize").toc();
+        m->fstats.at("convexify").toc();
       } else if (m->iter_count==0) {
+        m->fstats.at("BFGS").tic();
         // Initialize BFGS
         casadi_fill(d->Bk, Hsp_.nnz(), 1.);
         casadi_bfgs_reset(Hsp_, d->Bk);
+        m->fstats.at("BFGS").toc();
       } else {
+        m->fstats.at("BFGS").tic();
         // Update BFGS
         if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
         // Update the Hessian approximation
         casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
+        m->fstats.at("BFGS").toc();
       }
 
       // Formulate the QP

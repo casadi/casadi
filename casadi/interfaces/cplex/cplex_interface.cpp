@@ -319,9 +319,9 @@ namespace casadi {
     copy_vector(sm.map_Q.sparsity().colind(), m->socp_colind);
     copy_vector(sm.map_Q.sparsity().row(), m->socp_row);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
     return 0;
   }
 

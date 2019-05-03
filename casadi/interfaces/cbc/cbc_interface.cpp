@@ -235,9 +235,9 @@ namespace casadi {
     if (!mem) return 1;
     auto m = static_cast<CbcMemory*>(mem);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
 
     m->colind.resize(A_.size2()+1);
     m->row.resize(A_.nnz());
