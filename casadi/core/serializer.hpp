@@ -114,7 +114,32 @@ namespace casadi {
     DeserializerBase(std::unique_ptr<std::istream> stream);
 #endif // SWIG
     ~DeserializerBase();
+
     SerializerBase::SerializationType pop_type();
+
+    Sparsity blind_unpack_sparsity();
+    MX blind_unpack_mx();
+    Matrix<double> blind_unpack_dm();
+    Matrix<casadi_int> blind_unpack_im();
+    Matrix<SXElem> blind_unpack_sx();
+    Linsol blind_unpack_linsol();
+    Function blind_unpack_function();
+    GenericType blind_unpack_generictype();
+    casadi_int blind_unpack_int();
+    double blind_unpack_double();
+    std::string blind_unpack_string();
+    std::vector<Sparsity> blind_unpack_sparsity_vector();
+    std::vector<MX> blind_unpack_mx_vector();
+    std::vector< Matrix<casadi_int> > blind_unpack_im_vector();
+    std::vector< Matrix<double> > blind_unpack_dm_vector();
+    std::vector< Matrix<SXElem> > blind_unpack_sx_vector();
+    std::vector<Linsol> blind_unpack_linsol_vector();
+    std::vector<Function> blind_unpack_function_vector();
+    std::vector<GenericType> blind_unpack_generictype_vector();
+    std::vector<casadi_int> blind_unpack_int_vector();
+    std::vector<double> blind_unpack_double_vector();
+    std::vector<std::string> blind_unpack_string_vector();
+
     Sparsity unpack_sparsity();
     MX unpack_mx();
     Matrix<double> unpack_dm();
@@ -137,6 +162,7 @@ namespace casadi {
     std::vector<casadi_int> unpack_int_vector();
     std::vector<double> unpack_double_vector();
     std::vector<std::string> unpack_string_vector();
+
   protected:
     DeserializingStream& deserializer();
     std::unique_ptr<std::istream> stream_;

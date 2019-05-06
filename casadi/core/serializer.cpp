@@ -147,12 +147,20 @@ namespace casadi {
       serializer().pack(e); \
     } \
     \
-    Type DeserializerBase::unpack_ ## type() { \
+    Type DeserializerBase::blind_unpack_ ## type() { \
       Function f; \
       deserializer().unpack(f);\
       Type ret;\
       deserializer().unpack(ret);\
       return ret;\
+    } \
+    Type DeserializerBase::unpack_ ## type() { \
+      SerializerBase::SerializationType t = pop_type();\
+      casadi_assert(t==SerializerBase::SerializationType::SERIALIZED_ ## TYPE, \
+        "Expected to find a '" + SerializerBase::type_to_string(\
+          SerializerBase::SerializationType::SERIALIZED_ ## TYPE)+ \
+        "', but encountered a '" + SerializerBase::type_to_string(t) + "' instead.");\
+      return blind_unpack_ ## type();\
     }
 
 #define SERIALIZEX_ALL(TYPE, Type, type)\
@@ -168,10 +176,18 @@ SERIALIZEX_ALL(SX, SX, sx)
       serializer().pack(e); \
     } \
     \
-    Type DeserializerBase::unpack_ ## type() { \
+    Type DeserializerBase::blind_unpack_ ## type() { \
       Type ret;\
       deserializer().unpack(ret);\
       return ret;\
+    }\
+    Type DeserializerBase::unpack_ ## type() { \
+      SerializerBase::SerializationType t = pop_type();\
+      casadi_assert(t==SerializerBase::SerializationType::SERIALIZED_ ## TYPE, \
+        "Expected to find a '" + SerializerBase::type_to_string(\
+          SerializerBase::SerializationType::SERIALIZED_ ## TYPE) +\
+        "', but encountered a '" + SerializerBase::type_to_string(t) + "' instead.");\
+      return blind_unpack_ ## type();\
     }
 
 #define SERIALIZE_ALL(TYPE, Type, type)\

@@ -411,5 +411,28 @@ class Misctests(casadiTestCase):
     with self.assertInException("end of stream"):
       s.unpack()
 
+    si = FileSerializer("foo.dat")
+    f = Function("f",[x],[x**2])
+    g = Function("g",[x],[x**3])
+    si.pack([f,g])
+    si = None
+    with self.assertInException("File is not loadable with 'load'. Use 'FileDeserializer' instead."):
+      r = Function.load("foo.dat")
+
+    si = FileDeserializer("foo.dat")
+    print(si.unpack())
+
+    si = FileSerializer("foo.dat")
+    f = Function("f",[x],[x**2])
+    si.pack(f)
+    si = None
+    r = Function.load("foo.dat")
+    print(r)
+
+    f.save("foo.dat")
+    si = FileDeserializer("foo.dat")
+    print(si.unpack())
+
+
 if __name__ == '__main__':
     unittest.main()
