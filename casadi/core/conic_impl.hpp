@@ -41,7 +41,7 @@ namespace casadi {
 
     // Add a statistic
     void add_stat(const std::string& s) {
-      auto added = fstats.emplace(std::make_pair(s, FStats())).second;
+      auto added = fstats.insert(std::make_pair(s, FStats())).second;
       casadi_assert(added, "Duplicate stat: '" + s + "'");
     }
 

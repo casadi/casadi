@@ -45,7 +45,7 @@ namespace casadi {
 
     // Add a statistic
     void add_stat(const std::string& s) {
-      bool added = fstats.emplace(std::make_pair(s, FStats())).second;
+      bool added = fstats.insert(std::make_pair(s, FStats())).second;
       casadi_assert(added, "Duplicate stat: '" + s + "'");
     }
   };
