@@ -209,7 +209,7 @@ namespace casadi {
       g << g.res(i+n_out_+1) + " = " << (i==iout_? "m.g" : g.res(i)) << ";\n";
     }
     std::string flag = g(get_function("jac_f_z"),
-      g.arg(n_in_), g.res(n_out_), "iw", "w");
+      "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w");
     g << "if (" << flag << ") return 1;\n";
     g << "if (casadi_newton(&m)) break;\n";
     g << "}\n";
