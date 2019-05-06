@@ -55618,6 +55618,20 @@ Evaluate a function, overloaded.
 ";
 
 
+// File: classcasadi_1_1ScopedTiming.xml
+%feature("docstring") casadi::ScopedTiming::~ScopedTiming "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ScopedTiming "
+
+[INTERNAL] C++ includes: timing.hpp ";
+
+%feature("docstring") casadi::ScopedTiming::ScopedTiming "
+
+[INTERNAL] ";
+
+
 // File: classcasadi_1_1Scpgen.xml
 %feature("docstring") casadi::Scpgen::replace_aseed "
 

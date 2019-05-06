@@ -2578,6 +2578,9 @@
 %exception casadi::RungeKutta::RungeKutta(const std::string &name, const Function &dae) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::ScopedTiming::ScopedTiming(FStats &f) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::Scpgen::Scpgen(const std::string &name, const Function &nlp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
