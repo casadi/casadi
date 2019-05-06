@@ -2232,7 +2232,7 @@ namespace std {
 %enddef
 
 // Order in typemap matching: Lower value means will be checked first
-%define PREC_GENERICTYPE 22 %enddef
+
 %define PREC_DICT 21 %enddef
 %define PREC_SPARSITY 90 %enddef
 %define PREC_IVector 92 %enddef
@@ -2257,6 +2257,7 @@ namespace std {
 %define PREC_CREATOR 150 %enddef
 %define PREC_STRING 180 %enddef
 %define PREC_FUNCTION 200 %enddef
+%define PREC_GENERICTYPE 201 %enddef
 
 #ifndef SWIGXML
 
