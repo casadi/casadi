@@ -483,7 +483,7 @@ namespace casadi {
     std::string name, suffix;
 
     // Real-type used for the codegen
-    std::string casadi_real;
+    std::string casadi_real_type;
 
     // Int-type used for the codegen
     std::string casadi_int_type;

@@ -39,7 +39,7 @@ namespace casadi {
     this->mex = false;
     this->cpp = false;
     this->main = false;
-    this->casadi_real = "double";
+    this->casadi_real_type = "double";
     this->casadi_int_type = CASADI_INT_TYPE_STR;
     this->codegen_scalars = false;
     this->with_header = false;
@@ -67,7 +67,7 @@ namespace casadi {
       } else if (e.first=="main") {
         this->main = e.second;
       } else if (e.first=="casadi_real") {
-        this->casadi_real = e.second.to_string();
+        this->casadi_real_type = e.second.to_string();
       }  else if (e.first=="casadi_int") {
         this->casadi_int_type = e.second.to_string();
       } else if (e.first=="codegen_scalars") {
@@ -103,10 +103,10 @@ namespace casadi {
     if (this->real_min.empty()) {
       std::stringstream ss;
       ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
-      if (casadi_real=="float") {
+      if (casadi_real_type=="float") {
         ss << std::numeric_limits<float>::min();
         this->real_min = ss.str();
-      } else if (casadi_real=="double") {
+      } else if (casadi_real_type=="double") {
         ss << std::numeric_limits<double>::min();
         this->real_min = ss.str();
       } else {
@@ -352,7 +352,7 @@ namespace casadi {
 
   void CodeGenerator::generate_casadi_real(std::ostream &s) const {
     s << "#ifndef casadi_real\n"
-      << "#define casadi_real " << this->casadi_real << endl
+      << "#define casadi_real " << this->casadi_real_type << endl
       << "#endif\n\n";
   }
 

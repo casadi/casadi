@@ -216,13 +216,13 @@ namespace casadi {
     template <class T>
     void pack(const std::vector<T>& e) {
       decorate('V');
-      pack(casadi_int(e.size()));
+      pack(static_cast<casadi_int>(e.size()));
       for (const T & i : e) pack(i);
     }
     template <class K, class V>
     void pack(const std::map<K, V>& e) {
       decorate('D');
-      pack(casadi_int(e.size()));
+      pack(static_cast<casadi_int>(e.size()));
       for (const auto & i : e) {
         pack(i.first);
         pack(i.second);
