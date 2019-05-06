@@ -469,18 +469,17 @@ int Sqpmethod::solve(void* mem) const {
         m->res[0] = Hsp_project_ ? d->Brk : d->Bk;
         if (calc_function(m, "nlp_hess_l")) return 1;
 
+        ScopedTiming tic(m->fstats.at("convexify"));
+
         if (Hsp_project_) {
           casadi_project(d->Brk, Hrsp_, d->Bk, Hsp_, d->Bproj);
         }
 
         if (convexify_strategy_==CVX_REGULARIZE) {
-          m->fstats.at("convexify").tic();
           // Determing regularization parameter with Gershgorin theorem
           m->reg = convexify_margin_-casadi_lb_eig(Hsp_, d->Bk);
           if (m->reg > 0) casadi_regularize(Hsp_, d->Bk, m->reg);
-          m->fstats.at("convexify").toc();
         } else if (convexify_strategy_==CVX_EIGEN_REFLECT || convexify_strategy_==CVX_EIGEN_CLIP) {
-          m->fstats.at("convexify").tic();
           casadi_int offset = 0;
 
           // Loop over Hessian blocks
@@ -536,20 +535,17 @@ int Sqpmethod::solve(void* mem) const {
             offset += block_size*block_size;
           }
         }
-        m->fstats.at("convexify").toc();
       } else if (m->iter_count==0) {
-        m->fstats.at("BFGS").tic();
+        ScopedTiming tic(m->fstats.at("BFGS"));
         // Initialize BFGS
         casadi_fill(d->Bk, Hsp_.nnz(), 1.);
         casadi_bfgs_reset(Hsp_, d->Bk);
-        m->fstats.at("BFGS").toc();
       } else {
-        m->fstats.at("BFGS").tic();
+        ScopedTiming tic(m->fstats.at("BFGS"));
         // Update BFGS
         if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
         // Update the Hessian approximation
         casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
-        m->fstats.at("BFGS").toc();
       }
 
       // Formulate the QP
@@ -565,11 +561,9 @@ int Sqpmethod::solve(void* mem) const {
       // Increase counter
       m->iter_count++;
 
-      m->fstats.at("QP").tic();
       // Solve the QP
       solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam);
-      m->fstats.at("QP").toc();
 
       // Detecting indefiniteness
       double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
@@ -590,7 +584,7 @@ int Sqpmethod::solve(void* mem) const {
       // Line-search
       if (verbose_) print("Starting line-search\n");
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
-        m->fstats.at("linesearch").tic();
+        ScopedTiming tic(m->fstats.at("linesearch"));
 
         // Calculate penalty parameter of merit function
         m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, d->dlam));
@@ -654,8 +648,6 @@ int Sqpmethod::solve(void* mem) const {
         casadi_axpy(nx_ + ng_, t, d->dlam, d_nlp->lam);
 
         casadi_scal(nx_, t, d->dx);
-
-        m->fstats.at("linesearch").toc();
       } else {
         // Full step
         casadi_copy(d->dlam, nx_ + ng_, d_nlp->lam);
@@ -698,6 +690,7 @@ int Sqpmethod::solve(void* mem) const {
   void Sqpmethod::solve_QP(SqpmethodMemory* m, const double* H, const double* g,
                            const double* lbdz, const double* ubdz, const double* A,
                            double* x_opt, double* dlam) const {
+    ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;

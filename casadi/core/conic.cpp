@@ -437,7 +437,7 @@ namespace casadi {
 
     auto m = static_cast<ConicMemory*>(mem);
 
-    m->add_stat(name_);
+    m->add_stat("total");
     // Problem has not been solved at this point
     m->success = false;
     m->unified_return_status = SOLVER_RET_UNKNOWN;
@@ -516,12 +516,12 @@ namespace casadi {
     auto m = static_cast<ConicMemory*>(mem);
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
-    m->fstats.at(name_).tic();
+    m->fstats.at("total").tic();
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
     int ret = solve(arg, res, iw, w, mem);
-    m->fstats.at(name_).toc();
+    m->fstats.at("total").toc();
     // Show statistics
     if (print_time_)  print_fstats(m);
     if (error_on_fail_ && !m->success)

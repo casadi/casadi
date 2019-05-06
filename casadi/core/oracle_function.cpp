@@ -184,7 +184,7 @@ namespace casadi {
     casadi_int n_in = f.n_in(), n_out = f.n_out();
 
     // Prepare stats, start timer
-    fstats.tic();
+    ScopedTiming tic(fstats);
 
     // Input buffers
     if (arg) {
@@ -267,9 +267,6 @@ namespace casadi {
         return -1;
       }
     }
-
-    // Update stats
-    fstats.toc();
 
     // Success
     return 0;

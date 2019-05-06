@@ -60,4 +60,12 @@ namespace casadi {
 
   }
 
+  ScopedTiming::ScopedTiming(FStats& f) : f_(f) {
+    f_.tic();
+  }
+
+  ScopedTiming::~ScopedTiming() {
+    f_.toc();
+  }
+
 } // namespace casadi

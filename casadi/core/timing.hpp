@@ -83,6 +83,15 @@ namespace casadi {
       ///
       bool timing = false;
   };
+
+  class CASADI_EXPORT ScopedTiming {
+    public:
+      ScopedTiming(FStats& f);
+      ~ScopedTiming();
+    private:
+      FStats& f_;
+  };
+
 /// \endcond
 } // namespace casadi
 

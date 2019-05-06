@@ -158,7 +158,7 @@ namespace casadi {
 
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
-    m->fstats.at(name_).tic();
+    m->fstats.at("total").tic();
 
     // Read inputs
     const double* x0 = arg[INTEGRATOR_X0];
@@ -206,7 +206,7 @@ namespace casadi {
     }
 
     // Finalize/print statistics
-    m->fstats.at(name_).toc();
+    m->fstats.at("total").toc();
     if (print_stats_) print_stats(m);
     if (print_time_)  print_fstats(m);
     return 0;
@@ -339,7 +339,7 @@ namespace casadi {
     if (OracleFunction::init_mem(mem)) return 1;
 
     auto m = static_cast<IntegratorMemory*>(mem);
-    m->add_stat(name_);
+    m->add_stat("total");
     return 0;
   }
 
