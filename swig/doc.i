@@ -62229,28 +62229,27 @@ Create a new polynomial for the derivative.
 
 ";
 
-%feature("docstring") casadi::Polynomial::Polynomial(casadi_real scalar=1) "
+%feature("docstring") casadi::Polynomial::Polynomial(double scalar=1) "
 
 Construct a constant polynomial.
 
 ";
 
-%feature("docstring") casadi::Polynomial::Polynomial(casadi_real p0,
-casadi_real p1) "
+%feature("docstring") casadi::Polynomial::Polynomial(double p0, double p1) "
 
 Construct a linear polynomial.
 
 ";
 
-%feature("docstring") casadi::Polynomial::Polynomial(casadi_real p0,
-casadi_real p1, casadi_real p2) "
+%feature("docstring") casadi::Polynomial::Polynomial(double p0, double p1,
+double p2) "
 
 Construct a quadratic polynomial.
 
 ";
 
-%feature("docstring") casadi::Polynomial::Polynomial(casadi_real p0,
-casadi_real p1, casadi_real p2, casadi_real p3) "
+%feature("docstring") casadi::Polynomial::Polynomial(double p0, double p1,
+double p2, double p3) "
 
 Construct a cubic polynomial.
 
