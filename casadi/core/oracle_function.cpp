@@ -320,9 +320,7 @@ namespace casadi {
     for (const auto &s : m->fstats) {
       if (s.second.n_call!=0) {
         print(namefmt, s.first.c_str());
-        print("%12.3g\n", s.second.t_proc);
-        print("%12.3g\n", s.second.t_wall);
-        print("%9d\n", s.second.n_call);
+        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
       }
     }
   }
