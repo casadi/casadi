@@ -705,6 +705,12 @@ namespace casadi {
   Dict Conic::get_stats(void* mem) const {
     Dict stats = FunctionInternal::get_stats(mem);
     auto m = static_cast<ConicMemory*>(mem);
+    // Add timing statistics
+    for (const auto& s : m->fstats) {
+      stats["n_call_" +s.first] = s.second.n_call;
+      stats["t_wall_" +s.first] = s.second.t_wall;
+      stats["t_proc_" +s.first] = s.second.t_proc;
+    }
     stats["success"] = m->success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
     return stats;
