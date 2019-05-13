@@ -109,7 +109,10 @@ namespace casadi {
 
     int iter_count;
     int return_status;
-    std::vector<double> res;
+    double res_stat;
+	  double res_eq;
+	  double res_ineq;
+	  double res_comp;
 
     /// Constructor
     HpipmMemory();

@@ -549,8 +549,6 @@ namespace casadi {
 
     m->pv.resize(2*(nx_+na_));
 
-    m->res.resize(4);
-
     // We don't interface the slack-variable feature
     m->hZl.resize(N_+1, nullptr);
     m->hZu.resize(N_+1, nullptr);
@@ -774,6 +772,17 @@ namespace casadi {
     m->fstats.at("solver").toc();
     m->fstats.at("postprocessing").tic();
 
+    m->iter_count = d_get_ocp_qp_ipm_iter(&workspace);
+    m->res_stat = d_get_ocp_qp_ipm_res_stat(&workspace);
+	  m->res_eq = d_get_ocp_qp_ipm_res_eq(&workspace);
+	  m->res_ineq = d_get_ocp_qp_ipm_res_ineq(&workspace);
+	  m->res_comp = d_get_ocp_qp_ipm_res_comp(&workspace);
+
+
+	  double *stat = d_get_ocp_qp_ipm_stat(&workspace);
+printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
+    d_print_exp_tran_mat(5, m->iter_count, stat, 5);
+
     printf("\nHPIPM returned with flag %i.\n", m->return_status);
     if(m->return_status == 0)
 		{
@@ -831,11 +840,12 @@ namespace casadi {
     }
   }
 
-    if (print_level_>0) {
+
+
       uout() << "HPIPM finished after " << m->iter_count << " iterations." << std::endl;
       uout() << "return status: " << m->return_status << std::endl;
-      uout() << "residuals: " << m->res << std::endl;
-    }
+      uout() << "HPIPM residuals: " << m->res_stat << ", " << m->res_eq << ", " << m->res_ineq << ", " << m->res_comp << std::endl;
+
     m->success = m->return_status==0;
 
     dense_transfer(1.0, get_ptr(m->x), theirs_Xsp_, res[CONIC_X], xsp_, pv);
@@ -869,7 +879,6 @@ namespace casadi {
     auto m = static_cast<HpipmMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
-    stats["res"] = m->res;
     return stats;
   }
 
