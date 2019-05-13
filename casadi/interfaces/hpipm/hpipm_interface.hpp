@@ -62,7 +62,7 @@ In order to use this interface, you must:
 #include <hpipm_d_ocp_qp_dim.h>
 #include <hpipm_d_ocp_qp.h>
 #include <hpipm_d_ocp_qp_sol.h>
-
+#include <hpipm_d_ocp_qp_utils.h>
 
 /** \pluginsection{Conic,hpipm} */
 

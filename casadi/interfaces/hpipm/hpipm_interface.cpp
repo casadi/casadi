@@ -68,6 +68,9 @@ namespace casadi {
       {"ng",
        {OT_INTVECTOR,
         "Number of non-dynamic constraints, length N+1"}},
+      {"inf",
+       {OT_DOUBLE,
+        "Replace infinities by this amount [default: 1e8]"}},
       {"hpipm",
        {OT_DICT,
         "Options to be passed to hpipm"}}}
@@ -80,6 +83,8 @@ namespace casadi {
     casadi_int struct_cnt=0;
 
     d_set_default_ocp_qp_ipm_arg(mode, &hpipm_options_);
+
+    inf_ = 1e8;
 
     // Read options
     for (auto&& op : opts) {
@@ -95,6 +100,8 @@ namespace casadi {
       } else if (op.first=="ng") {
         ngs_ = op.second;
         struct_cnt++;
+      } else if (op.first=="inf") {
+        inf_ = op.second;
       } else if (op.first=="hpipm") {
         Dict hopts = op.second;
         auto it = hopts.find("mode");
@@ -478,13 +485,15 @@ namespace casadi {
     m->u.resize(usp_.nnz());m->r.resize(usp_.nnz());
     m->lg.resize(lugsp_.nnz());
     m->ug.resize(lugsp_.nnz());
-    m->lb.resize(nx_);m->ub.resize(nx_);
+
     m->pi.resize(pisp_.nnz());
 
     offset = 0;
-    for (casadi_int k=0;k<N_+1;++k) offset+=m->nx[k]+nu[k];
+    for (casadi_int k=0;k<N_+1;++k) offset+=nx[k]+nu[k];
     m->iidxb.resize(offset); // TODO; make range?
 
+    m->lb.resize(offset);
+    m->ub.resize(offset);
 
     offset = 0;
     for (casadi_int k=0;k<N_+1;++k) offset+=ng[k]+nx[k];
@@ -534,7 +543,7 @@ namespace casadi {
     offset = 0;
     for (casadi_int k=0;k<N_+1;++k) {
       m->hidxb[k] = get_ptr(m->iidxb)+offset;
-      for (casadi_int i=0;i<m->nbx[k]+m->nbu[k];++i) m->hidxb[k][i] = i;
+      for (casadi_int i=0;i<nbx[k]+nbu[k];++i) m->hidxb[k][i] = i;
       offset+=nbx[k]+nbu[k];
     }
 
