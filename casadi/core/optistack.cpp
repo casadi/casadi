@@ -109,6 +109,21 @@ void Opti::subject_to() {
   }
 }
 
+void Opti::bound_lower(const MX& var, const MX& value) {
+  try {
+    (*this)->bound_lower(var, value);
+  } catch (exception& e) {
+    THROW_ERROR("bound_lower", e.what());
+  }
+}
+
+void Opti::bound_upper(const MX& var, const MX& value) {
+  try {
+    (*this)->bound_upper(var, value);
+  } catch (exception& e) {
+    THROW_ERROR("bound_upper", e.what());
+  }
+}
 
 void Opti::solver(const std::string& solver,
                        const Dict& plugin_options,

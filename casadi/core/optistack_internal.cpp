@@ -269,6 +269,8 @@ MX OptiNode::variable(casadi_int n, casadi_int m, const std::string& attribute) 
   meta_data.type = OPTI_VAR;
   meta_data.count = count_++;
   meta_data.i = count_var_++;
+  meta_data.lbx = -DM::inf(n, m);
+  meta_data.ubx = DM::inf(n, m);
 
   MX symbol, ret;
 
@@ -584,6 +586,15 @@ void OptiNode::bake() {
   // Gather all expressions
   MX total_expr = vertcat(f_, veccat(g_));
 
+  std::vector<MX> temp;
+  for (auto e : symvar(total_expr)) {
+    temp.push_back(meta(e).lbx);
+    temp.push_back(meta(e).ubx);
+  }
+
+  // Gather all expressions
+  total_expr = vertcat(f_, veccat(g_), veccat(temp));
+
   // Categorize the symbols appearing in those expressions
   for (const auto& d : symvar(total_expr))
     symbol_active_[meta(d).count] = true;
@@ -605,6 +616,7 @@ void OptiNode::bake() {
   nlp_["p"] = veccat(p);
 
   nlp_["f"] = f_;
+
 
   offset = 0;
   for (casadi_int i=0;i<g_.size();++i) {
@@ -657,7 +669,17 @@ void OptiNode::bake() {
   bounds["lbg"] = bounds_lbg_;
   bounds["ubg"] = bounds_ubg_;
 
-  bounds_ = Function("bounds", bounds, {"p"}, {"lbg", "ubg"});
+  std::vector<MX> lbx_all;
+  std::vector<MX> ubx_all;
+  for (auto e : x) {
+    lbx_all.push_back(meta(e).lbx);
+    ubx_all.push_back(meta(e).ubx);
+  }
+
+  bounds["lbx"] = veccat(lbx_all);
+  bounds["ubx"] = veccat(ubx_all);
+
+  bounds_ = Function("bounds", bounds, {"p"}, {"lbx","ubx","lbg", "ubg"});
   mark_problem_dirty(false);
 }
 
@@ -890,6 +912,14 @@ void OptiNode::minimize(const MX& f) {
   f_ = f;
 }
 
+void OptiNode::bound_upper(const MX& var, const MX& value) {
+  meta(var).ubx = fmin(meta(var).ubx, value);
+}
+
+void OptiNode::bound_lower(const MX& var, const MX& value) {
+  meta(var).lbx = fmax(meta(var).lbx, value);
+}
+
 void OptiNode::subject_to(const MX& g) {
   assert_only_opti_nondual(g);
   mark_problem_dirty();
@@ -1036,7 +1066,8 @@ void OptiNode::solve_prepare() {
   DMDict res = bounds_(arg);
   arg_["lbg"] = res["lbg"];
   arg_["ubg"] = res["ubg"];
-
+  arg_["lbx"] = res["lbx"];
+  arg_["ubx"] = res["ubx"];
 }
 
 DMDict OptiNode::solve_actual(const DMDict& arg) {
