@@ -584,6 +584,15 @@ void OptiNode::bake() {
   // Gather all expressions
   MX total_expr = vertcat(f_, veccat(g_));
 
+  std::vector<MX> temp;
+  for (auto e : symvar(total_expr)) {
+    temp.push_back(meta(e).lbx);
+    temp.push_back(meta(e).ubx);
+  }
+
+  // Gather all expressions
+  total_expr = vertcat(f_, veccat(g_), veccat(temp));
+
   // Categorize the symbols appearing in those expressions
   for (const auto& d : symvar(total_expr))
     symbol_active_[meta(d).count] = true;
