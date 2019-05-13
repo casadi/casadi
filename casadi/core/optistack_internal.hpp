@@ -76,6 +76,11 @@ public:
   /// Clear constraints
   void subject_to();
 
+  /// brief Add constraints
+  void bound_lower(const MX& var, const MX& value);
+  /// Clear constraints
+  void bound_upper(const MX& var, const MX& value);
+
   /// Solver
   void solver(const std::string& solver,
               const Dict& plugin_options=Dict(),

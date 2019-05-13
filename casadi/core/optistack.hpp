@@ -160,6 +160,9 @@ public:
   /// Clear constraints
   void subject_to();
 
+  void bound_lower(const MX& var, const MX& value);
+  void bound_upper(const MX& var, const MX& value);
+
   /** \brief Set a solver
   *
   * \param[in] solver any of the nlpsol plugins can be used here
@@ -424,6 +427,8 @@ public:
     casadi_int i;
     casadi_int active_i;
     Dict extra;
+    MX lbx;
+    MX ubx;
   };
 
 
