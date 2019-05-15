@@ -27,7 +27,6 @@
 #define CASADI_ORACLE_FUNCTION_HPP
 
 #include "function_internal.hpp"
-#include "timing.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
@@ -153,9 +152,6 @@ namespace casadi {
     /** \brief Set the work vectors */
     void set_temp(void* mem, const double** arg, double** res,
                           casadi_int* iw, double* w) const override;
-
-    /// Print statistics
-    void print_fstats(const OracleMemory* m) const;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;

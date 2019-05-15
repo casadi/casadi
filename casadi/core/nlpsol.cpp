@@ -627,7 +627,7 @@ namespace casadi {
 
     // Finalize/print statistics
     m->fstats.at("total").toc();
-    if (print_time_)  print_fstats(m);
+    if (print_time_)  print_time(m->fstats);
 
     if (error_on_fail_ && !m->success)
       casadi_error("nlpsol process failed. "

@@ -29,7 +29,6 @@
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
-#include "timing.hpp"
 #include "im.hpp"
 
 /// \cond INTERNAL
@@ -137,9 +136,6 @@ namespace casadi {
 
     /// Can psd constraints be treated
     virtual bool psd_support() const { return false;}
-
-    /// Print statistics
-    void print_fstats(const ConicMemory* m) const;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;

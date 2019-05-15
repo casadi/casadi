@@ -301,30 +301,6 @@ namespace casadi {
     oracle_ = oracle_.expand();
   }
 
-  void OracleFunction::print_fstats(const OracleMemory* m) const {
-    // Length of the name being printed
-    size_t name_len=0;
-    for (auto &&s : m->fstats) {
-      name_len = max(s.first.size(), name_len);
-    }
-
-    // Print name with a given length. Format: "%NNs "
-    char namefmt[10];
-    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<casadi_int>(name_len));
-
-    // Print header
-    print(namefmt, "");
-    print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
-
-    // Print keys
-    for (const auto &s : m->fstats) {
-      if (s.second.n_call!=0) {
-        print(namefmt, s.first.c_str());
-        print("%12.3g %12.3g %9d\n", s.second.t_proc, s.second.t_wall, s.second.n_call);
-      }
-    }
-  }
-
   Dict OracleFunction::get_stats(void *mem) const {
     auto m = static_cast<OracleMemory*>(mem);
 

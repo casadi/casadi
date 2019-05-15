@@ -208,7 +208,7 @@ namespace casadi {
     // Finalize/print statistics
     m->fstats.at("total").toc();
     if (print_stats_) print_stats(m);
-    if (print_time_)  print_fstats(m);
+    if (print_time_)  print_time(m->fstats);
     return 0;
   }
 

@@ -523,36 +523,11 @@ namespace casadi {
     int ret = solve(arg, res, iw, w, mem);
     m->fstats.at("total").toc();
     // Show statistics
-    if (print_time_)  print_fstats(m);
+    if (print_time_)  print_time(m->fstats);
     if (error_on_fail_ && !m->success)
       casadi_error("conic process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");
     return ret;
-  }
-
-  void Conic::print_fstats(const ConicMemory* m) const {
-    // Length of the name being printed
-    size_t name_len=0;
-    for (auto &&s : m->fstats) {
-      name_len = max(s.first.size(), name_len);
-    }
-
-    // Print name with a given length. Format: "%NNs "
-    char namefmt[10];
-    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<casadi_int>(name_len));
-
-    // Print header
-    print(namefmt, "");
-    print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
-
-    // Print keys
-    for (auto &&s : m->fstats) {
-      const FStats& fs = m->fstats.at(s.first);
-      if (fs.n_call!=0) {
-        print(namefmt, s.first.c_str());
-        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
-      }
-    }
   }
 
   std::vector<std::string> conic_options(const std::string& name) {

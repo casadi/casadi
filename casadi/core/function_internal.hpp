@@ -34,6 +34,7 @@
 #include "sparse_storage.hpp"
 #include "options.hpp"
 #include "shared_object_internal.hpp"
+#include "timing.hpp"
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
 #include <mingw.mutex.h>
@@ -125,6 +126,12 @@ namespace casadi {
 
     /** \brief C-style formatted printing to string */
     void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
+
+    /** \brief Format time in a fixed width 8 format */
+    void format_time(char* buffer, double time) const;
+
+    /** \brief Print timing statistics */
+    void print_time(const std::map<std::string, FStats>& fstats) const;
 
     /** \brief Serialize an object */
     void serialize(SerializingStream &s) const;

@@ -3290,6 +3290,71 @@ namespace casadi {
     }
   }
 
+  void ProtoFunction::print_time(const std::map<std::string, FStats>& fstats) const {
+    // Length of the name being printed
+    size_t name_len=0;
+    for (auto &&s : fstats) {
+      name_len = max(s.first.size(), name_len);
+    }
+    name_len = max(name_.size(), name_len);
+
+    // Print name with a given length. Format: "%NNs "
+    char namefmt[10];
+    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<casadi_int>(name_len));
+
+    // Print header
+    print(namefmt, name_.c_str());
+    print("%12s %-14s %12s  %-14s %9s\n", "t_proc [s]", "(avg)", "t_wall [s]", "(avg)", "n_eval");
+
+    char buffer_proc[10];
+    char buffer_wall[10];
+    char buffer_proc_avg[10];
+    char buffer_wall_avg[10];
+
+    // Print keys
+    for (const auto &s : fstats) {
+      if (s.second.n_call!=0) {
+        print(namefmt, s.first.c_str());
+        format_time(buffer_proc, s.second.t_proc);
+        format_time(buffer_wall, s.second.t_wall);
+        format_time(buffer_proc_avg, s.second.t_proc/s.second.n_call);
+        format_time(buffer_wall_avg, s.second.t_wall/s.second.n_call);
+        print("%s (%s) %s (%s) %9d\n",
+          buffer_proc, buffer_proc_avg,
+          buffer_wall, buffer_wall_avg, s.second.n_call);
+      }
+    }
+  }
+
+  void ProtoFunction::format_time(char* buffer, double time) const {
+    // Always of width 8
+    casadi_assert_dev(time>=0);
+    double log_time = log10(time);
+    int magn = static_cast<int>(floor(log_time));
+    int iprefix = static_cast<int>(floor(log_time/3));
+    if (iprefix<-4) {
+      sprint(buffer, 10, "       0");f
+      return;
+    }
+    if (iprefix>=5) {
+      sprint(buffer, 10, "     inf");
+      return;
+    }
+    char prefixes[] = "TGMk munp";
+    char prefix = prefixes[4-iprefix];
+
+    int rem = magn-3*iprefix;
+    double time_normalized = time/pow(10, 3*iprefix);
+
+    if (rem==0) {
+      sprint(buffer, 10, "  %1.2f%cs", time_normalized, prefix);
+    } else if (rem==1) {
+      sprint(buffer, 10, " %2.2f%cs", time_normalized, prefix);
+    } else {
+      sprint(buffer, 10, "%3.2f%cs", time_normalized, prefix);
+    }
+  }
+
   void ProtoFunction::sprint(char* buf, size_t buf_sz, const char* fmt, ...) const {
     // Variable number of arguments
     va_list args;
