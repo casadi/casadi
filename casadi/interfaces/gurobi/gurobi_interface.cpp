@@ -25,6 +25,7 @@
 
 #include "gurobi_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
+#include "casadi/core/nlp_tools.hpp"
 
 using namespace std;
 namespace casadi {
@@ -62,7 +63,16 @@ namespace casadi {
         "Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]"}},
       {"gurobi",
        {OT_DICT,
-        "Options to be passed to gurobi."}}
+        "Options to be passed to gurobi."}},
+      {"sos_groups",
+       {OT_INTVECTORVECTOR,
+        "Definition of SOS groups by indices."}},
+      {"sos_weights",
+       {OT_DOUBLEVECTORVECTOR,
+        "Weights corresponding to SOS entries."}},
+      {"sos_types",
+       {OT_INTVECTOR,
+        "Specify 1 or 2 for each SOS group."}}
      }
   };
 
@@ -73,14 +83,34 @@ namespace casadi {
     // Default options
     std::vector<std::string> vtype;
 
+    std::vector< std::vector<casadi_int> > sos_groups;
+    std::vector< std::vector<double> > sos_weights;
+    std::vector<casadi_int> sos_types;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="vtype") {
         vtype = op.second;
       } else if (op.first=="gurobi") {
         opts_ = op.second;
+      } else if (op.first=="sos_groups") {
+        sos_groups = op.second.to_int_vector_vector();
+      } else if (op.first=="sos_weights") {
+        sos_weights = op.second.to_double_vector_vector();
+      } else if (op.first=="sos_types") {
+        sos_types = op.second.to_int_vector();
       }
     }
+
+    // Validaty SOS constraints
+    check_sos(nx_, sos_groups, sos_weights, sos_types);
+
+    // Populate SOS structures
+    flatten_nested_vector(sos_groups, sos_ind_, sos_beg_);
+    if (!sos_weights.empty())
+      flatten_nested_vector(sos_weights, sos_weights_);
+
+    sos_types_ = to_int(sos_types);
 
     // Variable types
     if (!vtype.empty()) {
@@ -110,6 +140,7 @@ namespace casadi {
     alloc_w(sdp_to_socp_mem_.indval_size, true); // val
     alloc_iw(sdp_to_socp_mem_.indval_size, true); // ind
     alloc_iw(nx_, true); // ind2
+    alloc_iw(nx_, true); // vtypes
   }
 
   int GurobiInterface::init_mem(void* mem) const {
@@ -119,6 +150,11 @@ namespace casadi {
     // Load environment
     casadi_int flag = GRBloadenv(&m->env, nullptr); // no log file
     casadi_assert(!flag && m->env, "Failed to create GUROBI environment. Flag: "+ str(flag));
+
+    m->sos_weights = sos_weights_;
+    m->sos_beg = sos_beg_;
+    m->sos_ind = sos_ind_;
+    m->sos_types = sos_types_;
 
     m->add_stat("preprocessing");
     m->add_stat("solver");
@@ -198,6 +234,7 @@ namespace casadi {
     double *val=w; w+=sm.indval_size;
     int *ind=reinterpret_cast<int*>(iw); iw+=sm.indval_size;
     int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;
+    char *vtypes=reinterpret_cast<char*>(iw); iw+=nx_;
 
     // Greate an empty model
     GRBmodel *model = nullptr;
@@ -225,17 +262,22 @@ namespace casadi {
           // Continious variable
           vtype = GRB_CONTINUOUS;
         }
+        vtypes[i] = vtype;
 
         // Pass to model
         flag = GRBaddvar(model, 0, nullptr, nullptr, g ? g[i] : 0., lb, ub, vtype, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
+      }
 
+      GRBupdatemodel(model);
+      for (casadi_int i=0; i<nx_; ++i) {
         // If it is a discrete variable, we can pass the start guess
-        if (vtype != GRB_CONTINUOUS) {
+        if (vtypes[i] != GRB_CONTINUOUS) {
           flag = GRBsetdblattrelement(model, "Start", i, x0[i]);
           casadi_assert(!flag, GRBgeterrormsg(m->env));
         }
       }
+
 
       /*  Treat SOCP constraints */
 
@@ -321,6 +363,14 @@ namespace casadi {
             casadi_assert(!flag, GRBgeterrormsg(m->env));
           }
         }
+      }
+
+      // Add SOS constraints when applicable
+      if (!m->sos_ind.empty()) {
+        flag = GRBaddsos(model, m->sos_beg.size()-1, m->sos_ind.size(),
+            get_ptr(m->sos_types), get_ptr(m->sos_beg), get_ptr(m->sos_ind),
+            get_ptr(m->sos_weights));
+        casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
       // SOCP helper constraints
@@ -462,6 +512,10 @@ namespace casadi {
     s.version("GurobiInterface", 1);
     s.unpack("GurobiInterface::vtype", vtype_);
     s.unpack("GurobiInterface::opts", opts_);
+    s.unpack("GurobiInterface::sos_weights", sos_weights_);
+    s.unpack("GurobiInterface::sos_beg", sos_beg_);
+    s.unpack("GurobiInterface::sos_ind", sos_ind_);
+    s.unpack("GurobiInterface::sos_types", sos_types_);
     Conic::deserialize(s, sdp_to_socp_mem_);
   }
 
@@ -470,6 +524,10 @@ namespace casadi {
     s.version("GurobiInterface", 1);
     s.pack("GurobiInterface::vtype", vtype_);
     s.pack("GurobiInterface::opts", opts_);
+    s.pack("GurobiInterface::sos_weights", sos_weights_);
+    s.pack("GurobiInterface::sos_beg", sos_beg_);
+    s.pack("GurobiInterface::sos_ind", sos_ind_);
+    s.pack("GurobiInterface::sos_types", sos_types_);
     Conic::serialize(s, sdp_to_socp_mem_);
   }
 
