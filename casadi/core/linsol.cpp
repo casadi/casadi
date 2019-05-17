@@ -75,15 +75,26 @@ namespace casadi {
       "Linsol::solve: Dimension mismatch. A and b must have matching row count. "
       "Got " + A.dim() + " and " + B.dim() + ".");
 
+    scoped_checkout<Linsol> mem(*this);
+    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+
+    // Reset statistics
+    for (auto&& s : m->fstats) s.second.reset();
+    if (m->t_total) m->t_total->tic();
     // Symbolic factorization
-    if (sfact(A.ptr())) casadi_error("Linsol::solve: 'sfact' failed");
+    if (sfact(A.ptr(), mem)) casadi_error("Linsol::solve: 'sfact' failed");
 
     // Numeric factorization
-    if (nfact(A.ptr())) casadi_error("Linsol::solve: 'nfact' failed");
+    if (nfact(A.ptr(), mem)) casadi_error("Linsol::solve: 'nfact' failed");
 
     // Solve
     DM x = densify(B);
-    if (solve(A.ptr(), x.ptr(), x.size2())) casadi_error("Linsol::solve: 'solve' failed");
+    if (solve(A.ptr(), x.ptr(), x.size2(), false, mem))
+      casadi_error("Linsol::solve: 'solve' failed");
+    // Show statistics
+    if (m->t_total) m->t_total->toc();
+
+    (*this)->print_time(m->fstats);
     return x;
   }
 
@@ -103,8 +114,10 @@ namespace casadi {
     // Factorization will be needed after this step
     m->is_sfact = m->is_nfact = false;
 
+    if (m->t_total) m->fstats.at("sfact").tic();
     // Perform pivoting
     if ((*this)->sfact(m, A)) return 1;
+    if (m->t_total) m->fstats.at("sfact").toc();
 
     // Mark as (successfully) pivoted
     m->is_sfact = true;
@@ -126,7 +139,9 @@ namespace casadi {
     }
 
     m->is_nfact = false;
+    if (m->t_total) m->fstats.at("nfact").tic();
     if ((*this)->nfact(m, A)) return 1;
+    if (m->t_total) m->fstats.at("nfact").toc();
     m->is_nfact = true;
     return 0;
   }
@@ -156,7 +171,10 @@ namespace casadi {
   int Linsol::solve(const double* A, double* x, casadi_int nrhs, bool tr, int mem) const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
     casadi_assert(m->is_nfact, "Linear system has not been factorized");
-    return (*this)->solve(m, A, x, nrhs, tr);
+    if (m->t_total) m->fstats.at("solve").tic();
+    int ret = (*this)->solve(m, A, x, nrhs, tr);
+    if (m->t_total) m->fstats.at("solve").toc();
+    return ret;
   }
 
   casadi_int Linsol::checkout() const {

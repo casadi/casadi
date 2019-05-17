@@ -442,7 +442,6 @@ namespace casadi {
   int Nlpsol::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
     auto m = static_cast<NlpsolMemory*>(mem);
-    m->add_stat("total");
     m->add_stat("callback_fun");
     m->success = false;
     m->unified_return_status = SOLVER_RET_UNKNOWN;
@@ -539,10 +538,6 @@ namespace casadi {
   int Nlpsol::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
-    // Reset statistics
-    for (auto&& s : m->fstats) s.second.reset();
-    m->fstats.at("total").tic();
-
     auto d_nlp = &m->d_nlp;
 
     // Bounds, given parameter values
@@ -624,10 +619,6 @@ namespace casadi {
     casadi_copy(d_nlp->lam + nx_, ng_, lam_g);
     casadi_copy(d_nlp->lam_p, np_, lam_p);
     casadi_copy(&d_nlp->f, 1, f);
-
-    // Finalize/print statistics
-    m->fstats.at("total").toc();
-    if (print_time_)  print_time(m->fstats);
 
     if (error_on_fail_ && !m->success)
       casadi_error("nlpsol process failed. "

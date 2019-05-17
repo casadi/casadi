@@ -63,6 +63,17 @@ namespace casadi {
 
   /** \brief Function memory with temporary work vectors */
   struct CASADI_EXPORT ProtoFunctionMemory {
+    // Function specific statistics
+    std::map<std::string, FStats> fstats;
+
+    // Short-hand for "total" fstats
+    FStats* t_total;
+
+    // Add a statistic
+    void add_stat(const std::string& s) {
+      bool added = fstats.insert(std::make_pair(s, FStats())).second;
+      casadi_assert(added, "Duplicate stat: '" + s + "'");
+    }
   };
 
   /** \brief Function memory with temporary work vectors */
@@ -126,6 +137,9 @@ namespace casadi {
     /** \brief Free memory block */
     virtual void free_mem(void *mem) const { delete static_cast<ProtoFunctionMemory*>(mem); }
 
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const;
+
     /** \brief Clear all memory (called from destructor) */
     void clear_mem();
 
@@ -163,6 +177,13 @@ namespace casadi {
 
     /// Verbose printout
     bool verbose_;
+
+    // Print timing statistics
+    bool print_time_;
+
+    // Print timing statistics
+    bool record_time_;
+
   private:
     /// Memory objects
     mutable std::vector<void*> mem_;
@@ -805,9 +826,6 @@ namespace casadi {
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f, bool persistent=false);
 
-    /// Get all statistics
-    virtual Dict get_stats(void* mem) const { return Dict();}
-
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
                           casadi_int*& iw, double*& w) const {}
@@ -910,9 +928,6 @@ namespace casadi {
 
     /// Errors are thrown if numerical values of inputs look bad
     bool inputs_check_;
-
-    // Print timing statistics
-    bool print_time_;
 
     // Finite difference step
     Dict fd_options_;

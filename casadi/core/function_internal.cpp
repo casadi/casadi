@@ -57,6 +57,8 @@ namespace casadi {
   ProtoFunction::ProtoFunction(const std::string& name) : name_(name) {
     // Default options (can be overridden in derived classes)
     verbose_ = false;
+    print_time_ = false;
+    record_time_ = false;
   }
 
   FunctionInternal::FunctionInternal(const std::string& name) : ProtoFunction(name) {
@@ -84,7 +86,7 @@ namespace casadi {
     jit_base_name_ = "jit_tmp";
     jit_temp_suffix_ = true;
     compiler_plugin_ = "clang";
-    print_time_ = true;
+
     eval_ = nullptr;
     has_refcount_ = false;
     enable_forward_op_ = true;
@@ -153,7 +155,13 @@ namespace casadi {
   = {{},
      {{"verbose",
        {OT_BOOL,
-        "Verbose evaluation -- for debugging"}}
+        "Verbose evaluation -- for debugging"}},
+      {"print_time",
+       {OT_BOOL,
+        "print information about execution time. Implies record_time."}},
+      {"record_time",
+       {OT_BOOL,
+        "record information about execution time, for retrieval with stats()."}}
       }
   };
 
@@ -241,9 +249,6 @@ namespace casadi {
        {OT_INT,
         "Specify the maximum number of directions for derivative functions."
         " Overrules the builtin optimized_num_dir."}},
-      {"print_time",
-       {OT_BOOL,
-        "print information about execution time"}},
       {"enable_forward",
        {OT_BOOL,
         "Enable derivative calculation using generated functions for"
@@ -313,6 +318,10 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="verbose") {
         verbose_ = op.second;
+      } else if (op.first=="print_time") {
+        print_time_ = op.second;
+      } else if (op.first=="record_time") {
+        record_time_ = op.second;
       }
     }
   }
@@ -320,6 +329,8 @@ namespace casadi {
   Dict ProtoFunction::generate_options(bool is_temp) const {
     Dict opts;
     opts["verbose"] = verbose_;
+    opts["print_time"] = print_time_;
+    opts["record_time"] = record_time_;
     return opts;
   }
 
@@ -340,7 +351,6 @@ namespace casadi {
     opts["always_inline"] = always_inline_;
     opts["never_inline"] = never_inline_;
     opts["max_num_dir"] = max_num_dir_;
-    opts["print_time"] = print_time_;
     opts["enable_forward"] = enable_forward_op_;
     opts["enable_reverse"] = enable_reverse_op_;
     opts["enable_jacobian"] = enable_jacobian_op_;
@@ -404,8 +414,6 @@ namespace casadi {
         ad_weight_sp_ = op.second;
       } else if (op.first=="max_num_dir") {
         max_num_dir_ = op.second;
-      } else if (op.first=="print_time") {
-        print_time_ = op.second;
       } else if (op.first=="enable_forward") {
         enable_forward_op_ = op.second;
       } else if (op.first=="enable_reverse") {
@@ -450,6 +458,8 @@ namespace casadi {
       }
     }
 
+    // print_time implies record_time
+    if (print_time_) record_time_ = true;
 
     // Verbose?
     if (verbose_) casadi_message(name_ + "::init");
@@ -656,6 +666,13 @@ namespace casadi {
   }
 
   int ProtoFunction::init_mem(void* mem) const {
+    auto m = static_cast<ProtoFunctionMemory*>(mem);
+    if (record_time_) {
+      m->add_stat("total");
+      m->t_total = &m->fstats.at("total");
+    } else {
+      m->t_total = nullptr;
+    }
     return 0;
   }
 
@@ -676,6 +693,12 @@ namespace casadi {
         }
       }
     }
+
+    auto m = static_cast<ProtoFunctionMemory*>(mem);
+
+    // Reset statistics
+    for (auto&& s : m->fstats) s.second.reset();
+    if (m->t_total) m->t_total->tic();
     int ret;
     if (eval_) {
       // TODO(jgillis): check why thsi check is needed (crashes function.py:inherit_jit_options)
@@ -683,6 +706,10 @@ namespace casadi {
     } else {
       ret = eval(arg, res, iw, w, mem);
     }
+    if (m->t_total) m->t_total->toc();
+    // Show statistics
+    print_time(m->fstats);
+
     if (dump_out_) dump_out(dump_id, res);
     if (print_out_) {
       uout() << "Function " << name_ << " (" << this << ")" << std::endl;
@@ -2503,6 +2530,18 @@ namespace casadi {
     alloc_w(sz_w, persistent);
   }
 
+  Dict ProtoFunction::get_stats(void* mem) const {
+    auto m = static_cast<ProtoFunctionMemory*>(mem);
+    // Add timing statistics
+    Dict stats;
+    for (const auto& s : m->fstats) {
+      stats["n_call_" +s.first] = s.second.n_call;
+      stats["t_wall_" +s.first] = s.second.t_wall;
+      stats["t_proc_" +s.first] = s.second.t_proc;
+    }
+    return stats;
+  }
+
   bool FunctionInternal::has_derivative() const {
     return enable_forward_ || enable_reverse_ || enable_jacobian_ || enable_fd_;
   }
@@ -3290,7 +3329,9 @@ namespace casadi {
     }
   }
 
+
   void ProtoFunction::print_time(const std::map<std::string, FStats>& fstats) const {
+    if (!print_time_) return;
     // Length of the name being printed
     size_t name_len=0;
     for (auto &&s : fstats) {
@@ -3304,7 +3345,9 @@ namespace casadi {
 
     // Print header
     print(namefmt, name_.c_str());
-    print("%12s %-14s %12s  %-14s %9s\n", "t_proc [s]", "(avg)", "t_wall [s]", "(avg)", "n_eval");
+
+    print(" : %8s %10s %8s %10s %9s\n", "t_proc", "(avg)", "t_wall", "(avg)", "n_eval");
+
 
     char buffer_proc[10];
     char buffer_wall[10];
@@ -3319,7 +3362,7 @@ namespace casadi {
         format_time(buffer_wall, s.second.t_wall);
         format_time(buffer_proc_avg, s.second.t_proc/s.second.n_call);
         format_time(buffer_wall_avg, s.second.t_wall/s.second.n_call);
-        print("%s (%s) %s (%s) %9d\n",
+        print(" | %s (%s) %s (%s) %9d\n",
           buffer_proc, buffer_proc_avg,
           buffer_wall, buffer_wall_avg, s.second.n_call);
       }
@@ -3333,7 +3376,7 @@ namespace casadi {
     int magn = static_cast<int>(floor(log_time));
     int iprefix = static_cast<int>(floor(log_time/3));
     if (iprefix<-4) {
-      sprint(buffer, 10, "       0");f
+      sprint(buffer, 10, "       0");
       return;
     }
     if (iprefix>=5) {
@@ -3436,12 +3479,17 @@ namespace casadi {
     s.version("ProtoFunction", 1);
     s.pack("ProtoFunction::name", name_);
     s.pack("ProtoFunction::verbose", verbose_);
+    s.pack("ProtoFunction::print_time", print_time_);
+    s.pack("ProtoFunction::record_time", record_time_);
   }
 
   ProtoFunction::ProtoFunction(DeserializingStream& s) {
     s.version("ProtoFunction", 1);
     s.unpack("ProtoFunction::name", name_);
     s.unpack("ProtoFunction::verbose", verbose_);
+
+    s.unpack("ProtoFunction::print_time", print_time_);
+    s.unpack("ProtoFunction::record_time", record_time_);
   }
 
   void FunctionInternal::serialize_type(SerializingStream &s) const {
@@ -3489,8 +3537,6 @@ namespace casadi {
     s.pack("FunctionInternal::regularity_check", regularity_check_);
 
     s.pack("FunctionInternal::inputs_check", inputs_check_);
-
-    s.pack("FunctionInternal::print_time", print_time_);
 
     s.pack("FunctionInternal::fd_step", fd_step_);
 
@@ -3555,8 +3601,6 @@ namespace casadi {
     s.unpack("FunctionInternal::regularity_check", regularity_check_);
 
     s.unpack("FunctionInternal::inputs_check", inputs_check_);
-
-    s.unpack("FunctionInternal::print_time", print_time_);
 
     s.unpack("FunctionInternal::fd_step", fd_step_);
 

@@ -721,8 +721,6 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
     return 0;
   }
 

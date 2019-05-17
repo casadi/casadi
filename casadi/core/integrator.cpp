@@ -116,7 +116,6 @@ namespace casadi {
     // Default options
     print_stats_ = false;
     output_t0_ = false;
-    print_time_ = false;
   }
 
   Integrator::~Integrator() {
@@ -155,10 +154,6 @@ namespace casadi {
   int Integrator::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<IntegratorMemory*>(mem);
-
-    // Reset statistics
-    for (auto&& s : m->fstats) s.second.reset();
-    m->fstats.at("total").tic();
 
     // Read inputs
     const double* x0 = arg[INTEGRATOR_X0];
@@ -205,10 +200,8 @@ namespace casadi {
       retreat(m, grid_.front(), rx, rz, rq);
     }
 
-    // Finalize/print statistics
-    m->fstats.at("total").toc();
     if (print_stats_) print_stats(m);
-    if (print_time_)  print_time(m->fstats);
+
     return 0;
   }
 
@@ -338,8 +331,7 @@ namespace casadi {
   int Integrator::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
 
-    auto m = static_cast<IntegratorMemory*>(mem);
-    m->add_stat("total");
+    //auto m = static_cast<IntegratorMemory*>(mem);
     return 0;
   }
 
@@ -1094,11 +1086,12 @@ namespace casadi {
       intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[DAE_ALG]);
 
       // Extract options for Function constructor
-      Dict opts;
+      Dict sopts;
+      sopts["print_time"] = print_time_;
       auto it = opts.find("simplify_options");
-      if (it!=opts.end()) opts = it->second;
+      if (it!=opts.end()) update_dict(sopts, it->second);
 
-      return Function(temp.name(), intg_in, intg_out, integrator_in(), integrator_out(), opts);
+      return Function(temp.name(), intg_in, intg_out, integrator_in(), integrator_out(), sopts);
     } else {
       return temp;
     }

@@ -302,15 +302,8 @@ namespace casadi {
   }
 
   Dict OracleFunction::get_stats(void *mem) const {
-    auto m = static_cast<OracleMemory*>(mem);
-
-    // Add timing statistics
-    Dict stats;
-    for (const auto& s : m->fstats) {
-      stats["n_call_" +s.first] = s.second.n_call;
-      stats["t_wall_" +s.first] = s.second.t_wall;
-      stats["t_proc_" +s.first] = s.second.t_proc;
-    }
+    Dict stats = FunctionInternal::get_stats(mem);
+    //auto m = static_cast<OracleMemory*>(mem);
     return stats;
   }
 

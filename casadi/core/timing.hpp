@@ -80,8 +80,6 @@ namespace casadi {
       /// Accumulated proc time [s] since last reset
       double t_proc = 0;
 
-      ///
-      bool timing = false;
   };
 
   class CASADI_EXPORT ScopedTiming {

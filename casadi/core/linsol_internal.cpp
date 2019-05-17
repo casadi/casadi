@@ -52,6 +52,12 @@ namespace casadi {
   int LinsolInternal::init_mem(void* mem) const {
     if (!mem) return 1;
     if (ProtoFunction::init_mem(mem)) return 1;
+    auto m = static_cast<LinsolMemory*>(mem);
+    if (record_time_) {
+      m->add_stat("nfact");
+      m->add_stat("sfact");
+      m->add_stat("solve");
+    }
     return 0;
   }
 

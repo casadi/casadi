@@ -30,7 +30,7 @@ from helpers import *
 import pickle
 from operator import itemgetter
 import sys
-
+from casadi.tools import capture_stdout
 
 scipy_available = True
 try:
@@ -432,6 +432,58 @@ class Misctests(casadiTestCase):
     f.save("foo.dat")
     si = FileDeserializer("foo.dat")
     print(si.unpack())
+  
+  def test_print_time(self):
+
+
+    x = MX.sym("x")
+    f = x**2
+
+
+    for print_time in [True,False]:
+      included = ["t_wall"] if print_time else []
+      excluded = [] if print_time else ["t_wall"]
+      opts = {"print_time":print_time}
+      ff = Function("f",[x],[f],opts)
+      with self.assertOutput(included, excluded):
+        ff(3)
+
+      solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
+      with self.assertOutput(included, excluded):
+        solver()
+
+
+      solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
+      with self.assertOutput(included, excluded):
+        solver()
+
+      solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
+      with self.assertOutput(included, excluded):
+        solver()
+
+      solver = integrator("integrator","rk",{"x":x,"ode":f},opts)
+      with self.assertOutput(included, excluded):
+        solver()
+
+
+      integr_options = dict(opts)
+      integr_options["simplify"] = True
+      solver = integrator("integrator","rk",{"x":x,"ode":f},integr_options)
+      with self.assertOutput(included, excluded):
+        solver()
+
+      A = DM.rand(3,3)
+      with self.assertOutput(included, excluded):
+        solve(A,vertcat(1,2,3),"lapacklu",opts)
+
+
+      Amx = MX(DM.rand(3,3))
+      with self.assertOutput(included, excluded):
+        evalf(solve(Amx,vertcat(1,2,3),"lapacklu",opts))
+
+      solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
+      with self.assertOutput(included, excluded):
+        solver.solve(A,vertcat(1,2,3))
 
 
 if __name__ == '__main__':
