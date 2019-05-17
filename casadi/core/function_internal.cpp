@@ -655,6 +655,10 @@ namespace casadi {
     return dump_count_++;
   }
 
+  int ProtoFunction::init_mem(void* mem) const {
+    return 0;
+  }
+
   int FunctionInternal::
   eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : 0;
@@ -675,7 +679,7 @@ namespace casadi {
     int ret;
     if (eval_) {
       // TODO(jgillis): check why thsi check is needed (crashes function.py:inherit_jit_options)
-      ret = eval_(arg, res, iw, w, mem ? *static_cast<casadi_int*>(mem) : 0);
+      ret = eval_(arg, res, iw, w, static_cast<ExternalMemory*>(mem)->mem);
     } else {
       ret = eval(arg, res, iw, w, mem);
     }
@@ -3054,10 +3058,6 @@ namespace casadi {
                                casadi_int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
     set_temp(mem, arg, res, iw, w);
-  }
-
-  void ProtoFunction::free_mem(void *mem) const {
-    casadi_warning("'free_mem' not defined for " + class_name());
   }
 
   void ProtoFunction::clear_mem() {

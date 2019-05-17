@@ -433,7 +433,7 @@ namespace casadi {
 
   /** \brief Initalize memory block */
   int Conic::init_mem(void* mem) const {
-    if (FunctionInternal::init_mem(mem)) return 1;
+    if (ProtoFunction::init_mem(mem)) return 1;
 
     auto m = static_cast<ConicMemory*>(mem);
 

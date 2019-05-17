@@ -34,7 +34,7 @@
 
 namespace casadi {
 
-  struct CASADI_EXPORT LinsolMemory {
+  struct CASADI_EXPORT LinsolMemory : public ProtoFunctionMemory {
     // Current state of factorization
     bool is_sfact, is_nfact;
 

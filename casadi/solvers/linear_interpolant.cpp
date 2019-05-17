@@ -65,6 +65,11 @@ namespace casadi {
   }
 
   LinearInterpolant::~LinearInterpolant() {
+    clear_mem();
+  }
+
+  LinearInterpolantJac::~LinearInterpolantJac() {
+    clear_mem();
   }
 
   void LinearInterpolant::init(const Dict& opts) {

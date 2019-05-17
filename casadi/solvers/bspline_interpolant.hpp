@@ -60,7 +60,7 @@ namespace casadi {
                       casadi_int m);
 
     // Destructor
-    ~BSplineInterpolant() override {}
+    ~BSplineInterpolant() override;
 
     // Get name of the plugin
     const char* plugin_name() const override { return "bspline";}

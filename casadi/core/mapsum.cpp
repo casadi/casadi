@@ -95,6 +95,7 @@ namespace casadi {
   }
 
   MapSum::~MapSum() {
+    clear_mem();
   }
 
   void MapSum::init(const Dict& opts) {

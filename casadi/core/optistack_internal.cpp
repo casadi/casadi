@@ -36,7 +36,9 @@ class InternalOptiCallback : public FunctionInternal {
 
   InternalOptiCallback(OptiNode& sol) : FunctionInternal(class_name()), sol_(sol) {}
 
-  ~InternalOptiCallback() override {}
+  ~InternalOptiCallback() override {
+    clear_mem();
+  }
 
   /** \brief Get type name */
   std::string class_name() const override {return "InternalOptiCallback";}

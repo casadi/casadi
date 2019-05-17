@@ -56,6 +56,7 @@ namespace casadi {
   }
 
   SXFunction::~SXFunction() {
+    clear_mem();
   }
 
   int SXFunction::eval(const double** arg, double** res,

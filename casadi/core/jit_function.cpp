@@ -87,6 +87,7 @@ namespace casadi {
   }
 
   JitFunction::~JitFunction() {
+    clear_mem();
   }
 
   void JitFunction::codegen_body(CodeGenerator& g) const {

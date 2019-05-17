@@ -51,6 +51,7 @@ namespace casadi {
   }
 
   MXFunction::~MXFunction() {
+    clear_mem();
   }
 
   const Options MXFunction::options_

@@ -45,7 +45,14 @@
 
 /// \cond INTERNAL
 
+
 namespace casadi {
+
+  /** \brief Function memory with temporary work vectors */
+  struct CASADI_EXPORT ExternalMemory : public FunctionMemory {
+    casadi_int mem;
+  };
+
   class CASADI_EXPORT External : public FunctionInternal {
   protected:
     /** \brief Information about the library */

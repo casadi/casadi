@@ -34,6 +34,7 @@ namespace casadi {
   }
 
   FiniteDiff::~FiniteDiff() {
+    clear_mem();
   }
 
   const Options FiniteDiff::options_

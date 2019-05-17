@@ -202,28 +202,30 @@ namespace casadi {
   }
 
   void* GenericExternal::alloc_mem() const {
+    ExternalMemory* m = new ExternalMemory();
     if (alloc_mem_) {
-      return new casadi_int(alloc_mem_());
-    } else {
-      return new casadi_int(0);
+      m->mem = alloc_mem_();
     }
+    return m;
   }
 
   int GenericExternal::init_mem(void* mem) const {
+    auto m = static_cast<ExternalMemory*>(mem);
+    if (FunctionInternal::init_mem(mem)) return 1;
     if (init_mem_) {
-      return init_mem_(*static_cast<casadi_int*>(mem));
+      return init_mem_(m->mem);
     } else {
-      return FunctionInternal::init_mem(mem);
+
     }
+    return 0;
   }
 
   void GenericExternal::free_mem(void *mem) const {
+    auto m = static_cast<ExternalMemory*>(mem);
     if (free_mem_) {
-      free_mem_(*static_cast<casadi_int*>(mem));
-      delete static_cast<casadi_int*>(mem);
-    } else {
-      delete static_cast<casadi_int*>(mem);
+      free_mem_(m->mem);
     }
+    delete static_cast<ExternalMemory*>(mem);
   }
 
   void External::init(const Dict& opts) {

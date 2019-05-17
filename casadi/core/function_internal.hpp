@@ -61,6 +61,14 @@ namespace casadi {
     return r;
   }
 
+  /** \brief Function memory with temporary work vectors */
+  struct CASADI_EXPORT ProtoFunctionMemory {
+  };
+
+  /** \brief Function memory with temporary work vectors */
+  struct CASADI_EXPORT FunctionMemory : public ProtoFunctionMemory {
+  };
+
   /** \brief Base class for FunctionInternal and LinsolInternal
     \author Joel Andersson
     \date 2017
@@ -110,13 +118,13 @@ namespace casadi {
     void* memory(int ind) const;
 
     /** \brief Create memory block */
-    virtual void* alloc_mem() const {return nullptr;}
+    virtual void* alloc_mem() const { return new ProtoFunctionMemory(); }
 
     /** \brief Initalize memory block */
-    virtual int init_mem(void* mem) const { return 0;}
+    virtual int init_mem(void* mem) const;
 
     /** \brief Free memory block */
-    virtual void free_mem(void *mem) const;
+    virtual void free_mem(void *mem) const { delete static_cast<ProtoFunctionMemory*>(mem); }
 
     /** \brief Clear all memory (called from destructor) */
     void clear_mem();

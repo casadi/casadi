@@ -87,6 +87,7 @@ namespace casadi {
   }
 
   Map::~Map() {
+    clear_mem();
   }
 
   void Map::init(const Dict& opts) {
@@ -288,6 +289,7 @@ namespace casadi {
   }
 
   OmpMap::~OmpMap() {
+    clear_mem();
   }
 
   int OmpMap::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
@@ -382,6 +384,7 @@ namespace casadi {
 
 
   ThreadMap::~ThreadMap() {
+    clear_mem();
   }
 
   void ThreadsWork(const Function& f, casadi_int i,

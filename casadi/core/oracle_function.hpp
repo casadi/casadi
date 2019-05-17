@@ -32,7 +32,7 @@
 namespace casadi {
 
   /** \brief Function memory with temporary work vectors */
-  struct CASADI_EXPORT OracleMemory {
+  struct CASADI_EXPORT OracleMemory : public FunctionMemory {
     // Work vectors
     const double** arg;
     double** res;

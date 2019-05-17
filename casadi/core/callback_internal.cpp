@@ -43,6 +43,7 @@ namespace casadi {
   }
 
   CallbackInternal::~CallbackInternal() {
+    clear_mem();
   }
 
   size_t CallbackInternal::get_n_in() {

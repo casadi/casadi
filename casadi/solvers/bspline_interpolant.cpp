@@ -66,6 +66,10 @@ namespace casadi {
      }
   };
 
+  BSplineInterpolant::~BSplineInterpolant() {
+    clear_mem();
+  }
+
   BSplineInterpolant::
   BSplineInterpolant(const string& name,
                     const std::vector<double>& grid,

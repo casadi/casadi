@@ -63,7 +63,8 @@ namespace casadi {
               const std::vector<std::string>& name_out);
 
     /** \brief  Destructor */
-    ~XFunction() override {}
+    ~XFunction() override {
+    }
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;

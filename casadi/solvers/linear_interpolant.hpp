@@ -125,7 +125,7 @@ namespace casadi {
     LinearInterpolantJac(const std::string& name) : FunctionInternal(name) {}
 
     /// Destructor
-    ~LinearInterpolantJac() override {}
+    ~LinearInterpolantJac() override;
 
     /** \brief Get type name */
     std::string class_name() const override { return "LinearInterpolantJac";}

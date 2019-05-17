@@ -56,6 +56,7 @@ namespace casadi {
   }
 
   Switch::~Switch() {
+    clear_mem();
   }
 
   size_t Switch::get_n_in() {

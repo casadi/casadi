@@ -43,7 +43,7 @@ namespace casadi {
   // Forward declaration
   class SlicotExpm;
 
-  struct CASADI_EXPM_SLICOT_EXPORT SlicotExpmMemory {
+  struct CASADI_EXPM_SLICOT_EXPORT SlicotExpmMemory : public FunctionMemory {
 
     double *A, *H;
     double *dwork;
