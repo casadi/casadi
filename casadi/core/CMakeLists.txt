@@ -185,6 +185,7 @@ set(CASADI_INTERNAL
   dae_builder.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
   serializer.cpp              serializing_stream.cpp
+  casadi_c.cpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp

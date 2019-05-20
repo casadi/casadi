@@ -348,7 +348,7 @@ namespace casadi {
       row.insert(row.end(), nnz, i);
     }
 
-    return DM(Sparsity::triplet(N, coeffs_size, col, row), data).T();
+    return DM(Sparsity::triplet(coeffs_size, N, col, row), data).T();
   }
 
 } // namespace casadi

@@ -49,13 +49,13 @@ if has_nlpsol("snopt"):
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.tiny_step_tol": 1e-20, "ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":0,"print_time":False,"print_time":False} }
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},set()))
-  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10,"print_header":False,"print_iteration":False,"print_time":False},set()))
+  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10,"min_step_size":1e-14,"print_header":False,"print_iteration":False,"print_time":False},set()))
 
 if has_conic("qrqp") and has_nlpsol("sqpmethod"):
   qpsol_options = {"print_iter":False,"print_header":False,"error_on_fail" : False}
   solvers.append(("sqpmethod",{"qpsol": "qrqp","qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen"}))
   solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen"}))
-  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True,"max_iter":500,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen"}))
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","convexify_strategy":"regularize","max_iter":500,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":True,"print_time":False,"tol_du":1e-8,"min_step_size":1e-12},{"codegen"}))
 
 if has_nlpsol("blocksqp"):
   try:
@@ -1619,7 +1619,7 @@ class NLPtests(casadiTestCase):
     self.assertTrue("H:\n[[1, 0], \n [0, -2]]" in result[0])
     self.checkarray(res["x"],DM([0,2]),digits=6)
 
-    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True,"regularize_margin":0})
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"convexify_strategy":"regularize","convexify_margin":0})
     with capture_stdout() as result:
       res = solver(lbg=2,ubg=2)
     stats_reg = solver.stats()
@@ -1627,7 +1627,7 @@ class NLPtests(casadiTestCase):
     self.assertTrue(stats_reg["iter_count"]==2)
     self.assertTrue("H:\n[[3, 0], \n [0, 0]]" in result[0])
 
-    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True,"regularize_margin":1e-4})
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"convexify_strategy":"regularize","convexify_margin":1e-4})
     with capture_stdout() as result:
       res = solver(lbg=2,ubg=2)
     stats_reg = solver.stats()
@@ -1649,7 +1649,7 @@ class NLPtests(casadiTestCase):
     self.assertTrue("H:\n[[1, 0], \n [0, 2]]" in result[0])
     self.checkarray(res["x"],DM([0,2]),digits=6)
 
-    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True})
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"convexify_strategy":"regularize"})
     with capture_stdout() as result:
       res = solver(lbg=2,ubg=2)
     stats_reg = solver.stats()
@@ -1706,7 +1706,7 @@ class NLPtests(casadiTestCase):
 
     # Solve with Gauss-Newton -> 6 iterations
     GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*mtimes(J.T,J)])
-    options = {"regularize":True,"qpsol":"qrqp","hess_lag": GN}
+    options = {"convexify_strategy":"regularize","qpsol":"qrqp","hess_lag": GN}
     nlp = {"x":x,"f":f}
     solver = nlpsol("solver","sqpmethod",nlp,options)
     res = solver()
@@ -1714,7 +1714,7 @@ class NLPtests(casadiTestCase):
     self.assertTrue(stats_reg["iter_count"]==6)
 
     # Solve with exact Hessian + regularization -> 9 iterations
-    options = {"regularize":True,"qpsol":"qrqp"}
+    options = {"convexify_strategy":"regularize","qpsol":"qrqp"}
     nlp = {"x":x,"f":f}
     solver = nlpsol("solver","sqpmethod",nlp,options)
     res = solver()
@@ -1761,6 +1761,62 @@ class NLPtests(casadiTestCase):
     res = solver()
     stats_reg = solver.stats()
     self.assertTrue(stats_reg["iter_count"]==9)
+
+  def test_cvx_sqpmethod(self):
+
+    eps = 1e-2
+
+    H = diagcat(DM([[2,3],[3,0]]),DM([[7,1,0],[1,0,6],[0,6,3]]))
+    p = [0,3,2,1,4]
+    Hp = H[p,p]
+
+    eig = np.linalg.eig
+
+    def reflect(A,eps):
+      [d,V] = np.linalg.eig(A)  
+      d = abs(d)
+      D = diag(d)
+      return np.dot(V,np.dot(D,V.T))
+
+    def clip(A,eps):
+      [d,V] = np.linalg.eig(A)  
+      d[d<eps] = eps
+      D = diag(d)
+      return np.dot(V,np.dot(D,V.T))
+
+
+    for H, Hcvx, opts, includes_init, excludes_init in [
+      (sparsify(DM([[0, 0],[0, 2]])), DM([[eps, 0],[0, 2+eps]]), {"convexify_strategy": "regularize","convexify_margin":eps},[],[]),
+      (diagcat(DM([[2, 0,0],[0, -1,0],[0,0,8]]),DM([[5, 3],[3, 6]])), diagcat(DM([[2, 0,0],[0, 1,0],[0,0,8]]),DM([[5, 3],[3, 6]])), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},["Identified 2 blocks with maximum size 3"],[]),
+      (diagcat(DM([[2, 0,0],[0, -1,0],[0,0,8]]),DM([[5, 3],[3, 6]])), diagcat(DM([[2, 0,0],[0, eps,0],[0,0,8]]),DM([[5, 3],[3, 6]])), {"convexify_strategy": "eigen-clip","convexify_margin":eps},[],[]),
+      (DM([[2, 0,0],[0, eps/2,0],[0,0,8]]), DM([[2, 0,0],[0, eps,0],[0,0,8]]), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},[],[]),
+      (diagcat(DM([[2, 0,0],[0, -1,0],[0,0,8]]),DM([[5, 8],[8, 6]])), diagcat(DM([[2, 0,0],[0, 1,0],[0,0,8]]),reflect(DM([[5, 8],[8, 6]]),eps)), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},[],[]),
+      (diagcat(DM([[2, 0,0],[0, -1,0],[0,0,8]]),DM([[5, 8],[8, 6]])), diagcat(DM([[2, 0,0],[0, eps,0],[0,0,8]]),clip(DM([[5, 8],[8, 6]]),eps)), {"convexify_strategy": "eigen-clip","convexify_margin":eps},[],[]),
+      (DM([[2, 0,0],[0, eps/2,0],[0,0,8]]), DM([[2, 0,0],[0, eps,0],[0,0,8]]), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},[],[]),
+      (diagcat(sparsify(DM([[2, 0,0],[0, -1,0],[0,0,8]])),DM([[5, 3],[3, 6]])), diagcat(DM([[2, 0,0],[0, 1,0],[0,0,8]]),DM([[5, 3],[3, 6]])), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},["Identified 4 blocks with maximum size 2"],[]),
+      (diagcat(sparsify(DM([[2, 0,0],[0, -1,0],[0,0,8]])),DM([[5, 3],[3, 5]])), diagcat(DM([[2, 0,0],[0, 1,0],[0,0,8]]),DM([[5, 3],[3, 5]])), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},["Identified 4 blocks with maximum size 2"],[]),
+      (Hp, reflect(Hp,eps), {"convexify_strategy": "eigen-reflect","convexify_margin":eps},[],[]),
+      (Hp, clip(Hp,eps), {"convexify_strategy": "eigen-clip","convexify_margin":eps},[],[]),
+      ]:
+
+      n = H.shape[0]
+      x = MX.sym("H",n)
+      nlp = {"x": x, "f": 0.5*bilin(H,x,x)}
+      options = {"max_iter":1,"qpsol":"qrqp","verbose":True}
+      options.update(opts)
+      with self.assertOutput(includes_init,excludes_init): 
+        solver = nlpsol("solver","sqpmethod",nlp,options)
+
+      x0 = DM.ones(n,1)
+
+      res = solver(x0=x0)
+
+      self.checkarray(x0-np.linalg.solve(Hcvx,mtimes(H,x0)),res["x"])
+
+      self.check_serialize(solver,{"x0":x0})
+
+      self.check_codegen(solver,{"x0":x0},std="c99")
+
 
   def test_simple_bounds_detect(self):
 

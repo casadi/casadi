@@ -34,6 +34,7 @@
 #include "conic.hpp"
 #include "jit_function.hpp"
 #include "serializing_stream.hpp"
+#include "serializer.hpp"
 
 #include <cctype>
 #include <fstream>
@@ -1118,8 +1119,8 @@ namespace casadi {
 
 
   void Function::save(const std::string &fname, const Dict& opts) const {
-    std::ofstream stream(fname, ios_base::binary | std::ios::out);
-    serialize(stream, opts);
+    FileSerializer fs(fname, opts);
+    fs.pack(*this);
   }
 
   std::string Function::serialize(const Dict& opts) const {
@@ -1197,11 +1198,13 @@ namespace casadi {
   }
 
   Function Function::load(const std::string& filename) {
-    std::ifstream stream(filename, ios_base::binary | std::ios::in);
-    if ((stream.rdstate() & std::ifstream::failbit) != 0) {
-      casadi_error("Could not open file '" + filename + "'.");
+    FileDeserializer fs(filename);
+    auto t = fs.pop_type();
+    if (t==SerializerBase::SerializationType::SERIALIZED_FUNCTION) {
+      return fs.blind_unpack_function();
+    } else {
+      casadi_error("File is not loadable with 'load'. Use 'FileDeserializer' instead.");
     }
-    return deserialize(stream);
   }
 
   Function Function::deserialize(const std::string& s) {

@@ -403,7 +403,7 @@ namespace casadi {
       m->ls_trials.push_back(ls_trials);
       m->obj.push_back(obj_value);
       if (!fcallback_.is_null()) {
-        m->fstats.at("callback_fun").tic();
+        ScopedTiming tic(m->fstats.at("callback_fun"));
         if (full_callback) {
           casadi_copy(x, nx_, d_nlp->z);
           for (casadi_int i=0; i<nx_; ++i) {
@@ -442,7 +442,6 @@ namespace casadi {
         fcallback_(m->arg, m->res, m->iw, m->w, 0);
         casadi_int ret = static_cast<casadi_int>(ret_double);
 
-        m->fstats.at("callback_fun").toc();
         return  !ret;
       } else {
         return 1;

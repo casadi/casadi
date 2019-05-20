@@ -58,7 +58,7 @@ if has_conic("cplex"):
 # No solution for licensing on travis
 
 if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
-  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False,"discrete":True}))
+  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False,"discrete":True,"sos":True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
@@ -129,6 +129,8 @@ class ConicTests(casadiTestCase):
       self.checkarray(solver_out["x"],DM([40, 7, 0, 2]))
       print(solver_out["cost"])
 
+      self.check_serialize(solver,solver_in)
+
   def test_milp(self):
     # From https://www.cs.upc.edu/~erodri/webpage/cps/theory/lp/milp/slides.pdf
     H = DM(2,2)
@@ -163,6 +165,8 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],DM([1,2]))
       self.checkarray(solver_out["cost"],DM([-3]))
+
+      self.check_serialize(solver,solver_in)
 
     H = DM(3,3)
     G = DM([-1,-1,-5])

@@ -39,7 +39,7 @@ namespace casadi {
     this->mex = false;
     this->cpp = false;
     this->main = false;
-    this->casadi_real = "double";
+    this->casadi_real_type = "double";
     this->casadi_int_type = CASADI_INT_TYPE_STR;
     this->codegen_scalars = false;
     this->with_header = false;
@@ -67,7 +67,7 @@ namespace casadi {
       } else if (e.first=="main") {
         this->main = e.second;
       } else if (e.first=="casadi_real") {
-        this->casadi_real = e.second.to_string();
+        this->casadi_real_type = e.second.to_string();
       }  else if (e.first=="casadi_int") {
         this->casadi_int_type = e.second.to_string();
       } else if (e.first=="codegen_scalars") {
@@ -103,10 +103,10 @@ namespace casadi {
     if (this->real_min.empty()) {
       std::stringstream ss;
       ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
-      if (casadi_real=="float") {
+      if (casadi_real_type=="float") {
         ss << std::numeric_limits<float>::min();
         this->real_min = ss.str();
-      } else if (casadi_real=="double") {
+      } else if (casadi_real_type=="double") {
         ss << std::numeric_limits<double>::min();
         this->real_min = ss.str();
       } else {
@@ -352,7 +352,7 @@ namespace casadi {
 
   void CodeGenerator::generate_casadi_real(std::ostream &s) const {
     s << "#ifndef casadi_real\n"
-      << "#define casadi_real " << this->casadi_real << endl
+      << "#define casadi_real " << this->casadi_real_type << endl
       << "#endif\n\n";
   }
 
@@ -1044,6 +1044,9 @@ namespace casadi {
     case AUX_MAX_VIOL:
       this->auxiliaries << sanitize_source(casadi_max_viol_str, inst);
       break;
+    case AUX_SUM_VIOL:
+      this->auxiliaries << sanitize_source(casadi_sum_viol_str, inst);
+      break;
     case AUX_VFMIN:
       this->auxiliaries << sanitize_source(casadi_vfmin_str, inst);
       break;
@@ -1064,6 +1067,14 @@ namespace casadi {
     case AUX_FILE_SLURP:
       add_include("stdio.h");
       this->auxiliaries << sanitize_source(casadi_file_slurp_str, inst);
+      break;
+    case AUX_CVX:
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_FABS);
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_DOT);
+      add_auxiliary(AUX_AXPY);
+      this->auxiliaries << sanitize_source(casadi_cvx_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
@@ -1790,6 +1801,12 @@ namespace casadi {
   max_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {
     add_auxiliary(CodeGenerator::AUX_MAX_VIOL);
     return "casadi_max_viol(" + str(n) + ", " + x+ ", " + lb + ", " + ub + ")";
+  }
+
+  std::string CodeGenerator::
+  sum_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {
+    add_auxiliary(CodeGenerator::AUX_SUM_VIOL);
+    return "casadi_sum_viol(" + str(n) + ", " + x+ ", " + lb + ", " + ub + ")";
   }
 
   std::string CodeGenerator::

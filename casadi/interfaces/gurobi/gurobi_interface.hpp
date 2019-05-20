@@ -49,6 +49,12 @@ namespace casadi {
 
     int return_status;
 
+    // SOS structure
+    std::vector<double> sos_weights;
+    std::vector<int> sos_beg;
+    std::vector<int> sos_ind;
+    std::vector<int> sos_types;
+
     /// Constructor
     GurobiMemory();
 
@@ -119,6 +125,12 @@ namespace casadi {
 
     // Variable types
     std::vector<char> vtype_;
+
+    // SOS structure
+    std::vector<double> sos_weights_;
+    std::vector<int> sos_beg_;
+    std::vector<int> sos_ind_;
+    std::vector<int> sos_types_;
 
     /// Gurobi options
     Dict opts_;

@@ -2232,7 +2232,7 @@ namespace std {
 %enddef
 
 // Order in typemap matching: Lower value means will be checked first
-%define PREC_GENERICTYPE 22 %enddef
+
 %define PREC_DICT 21 %enddef
 %define PREC_SPARSITY 90 %enddef
 %define PREC_IVector 92 %enddef
@@ -2257,6 +2257,7 @@ namespace std {
 %define PREC_CREATOR 150 %enddef
 %define PREC_STRING 180 %enddef
 %define PREC_FUNCTION 200 %enddef
+%define PREC_GENERICTYPE 201 %enddef
 
 #ifndef SWIGXML
 
@@ -4294,14 +4295,12 @@ namespace casadi {
 %nodefaultctor casadi::DeserializerBase;
 
 #ifdef SWIGPYTHON
-%rename("%(regex:/(unpack_\w+)/_\\1/)s", regextarget=1, fullname=1) "casadi::DeserializerBase::(unpack_\w+)";
 %rename("_pop_type") casadi::DeserializerBase::pop_type;
 %rename("%(regex:/(SERIALIZED_\w+)/_\\1/)s", regextarget=1, fullname=1) "casadi::SerializerBase::SERIALIZED_\w+";
 #endif // SWIG_PYTHON
 
 
 #ifdef SWIGMATLAB
-%rename("%(regex:/(unpack_\w+)/internal_\\1/)s", regextarget=1, fullname=1) "casadi::DeserializerBase::(unpack_\w+)";
 %rename("internal_pop_type") casadi::DeserializerBase::pop_type;
 %rename("%(regex:/(SERIALIZED_\w+)/internal_\\1/)s", regextarget=1, fullname=1) "casadi::SerializerBase::SERIALIZED_\w+";
 #endif // SWIG_PYTHON
@@ -4313,7 +4312,7 @@ namespace casadi {
   %pythoncode %{
     def unpack(self):
       type = SerializerBase.type_to_string(self._pop_type())
-      f = getattr(self, "_unpack_"+type)
+      f = getattr(self, "blind_unpack_"+type)
       return f()
   %}
 }
@@ -4323,7 +4322,7 @@ namespace casadi {
   %matlabcode %{
     function out = unpack(self)
       type = casadi.SerializerBase.type_to_string(self.internal_pop_type);
-      out = self.(['internal_unpack_' type]);
+      out = self.(['blind_unpack_' type]);
     end
   %}
 }

@@ -319,9 +319,9 @@ namespace casadi {
     copy_vector(sm.map_Q.sparsity().colind(), m->socp_colind);
     copy_vector(sm.map_Q.sparsity().row(), m->socp_row);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
     return 0;
   }
 
@@ -330,9 +330,6 @@ namespace casadi {
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<CplexMemory*>(mem);
     const SDPToSOCPMem& sm = sdp_to_socp_mem_;
-
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
 
     m->fstats.at("preprocessing").tic();
 
@@ -629,8 +626,6 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
     return 0;
   }
 

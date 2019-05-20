@@ -546,9 +546,9 @@ namespace casadi {
 
     m->res.resize(4);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
     return 0;
   }
 
@@ -577,8 +577,6 @@ namespace casadi {
   int HpmpcInterface::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<HpmpcMemory*>(mem);
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
     m->fstats.at("preprocessing").tic();
 
     double* pv =  get_ptr(m->pv);

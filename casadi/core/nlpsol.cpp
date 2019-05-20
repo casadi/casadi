@@ -373,14 +373,14 @@ namespace casadi {
     // Dimension checks
     casadi_assert(sparsity_out_.at(NLPSOL_G).is_dense()
                           && sparsity_out_.at(NLPSOL_G).is_vector(),
-        "Expected a dense vector 'g', but got " + sparsity_out_.at(NLPSOL_G).dim() + ".");
+        "Expected a dense vector 'g', but got " + sparsity_out_.at(NLPSOL_G).dim(true) + ".");
 
     casadi_assert(sparsity_out_.at(NLPSOL_F).is_dense(),
-        "Expected a dense 'f', but got " + sparsity_out_.at(NLPSOL_F).dim() + ".");
+        "Expected a dense 'f', but got " + sparsity_out_.at(NLPSOL_F).dim(true) + ".");
 
     casadi_assert(sparsity_out_.at(NLPSOL_X).is_dense()
                           && sparsity_out_.at(NLPSOL_X).is_vector(),
-      "Expected a dense vector 'x', but got " + sparsity_out_.at(NLPSOL_X).dim() + ".");
+      "Expected a dense vector 'x', but got " + sparsity_out_.at(NLPSOL_X).dim(true) + ".");
 
     // Discrete marker
     mi_ = false;
@@ -442,7 +442,7 @@ namespace casadi {
   int Nlpsol::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
     auto m = static_cast<NlpsolMemory*>(mem);
-    m->add_stat(name_);
+    m->add_stat("total");
     m->add_stat("callback_fun");
     m->success = false;
     m->unified_return_status = SOLVER_RET_UNKNOWN;
@@ -541,7 +541,7 @@ namespace casadi {
 
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
-    m->fstats.at(name_).tic();
+    m->fstats.at("total").tic();
 
     auto d_nlp = &m->d_nlp;
 
@@ -626,7 +626,7 @@ namespace casadi {
     casadi_copy(&d_nlp->f, 1, f);
 
     // Finalize/print statistics
-    m->fstats.at(name_).toc();
+    m->fstats.at("total").toc();
     if (print_time_)  print_fstats(m);
 
     if (error_on_fail_ && !m->success)

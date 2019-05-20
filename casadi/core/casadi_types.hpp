@@ -30,7 +30,15 @@
 #define CASADI_INT_TYPE long long int
 #endif // CASADI_INT_TYPE
 
+
+#ifndef CASADI_C_H
+// Avoid interaction problems with <casadi/casadi_c.h>
+#ifndef CASADI_MEM_H
+// Avoid interaction problems with <casadi/mem.h>
 typedef CASADI_INT_TYPE casadi_int;
+#endif
+#endif
+
 #ifndef SWIG  // Not in public API
 typedef unsigned CASADI_INT_TYPE casadi_uint;
 #endif // SWIG

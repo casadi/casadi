@@ -29,16 +29,18 @@ namespace casadi {
 
   using namespace std::chrono;
   FStats::FStats() {
-    reset();
   }
 
   void FStats::reset() {
     n_call = 0;
     t_wall = 0;
     t_proc = 0;
+    timing = false;
   }
 
   void FStats::tic() {
+    casadi_assert_dev(!timing);
+    timing = true;
     start_proc = std::clock();
     start_wall= high_resolution_clock::now();
   }
@@ -48,11 +50,22 @@ namespace casadi {
     stop_proc = std::clock();
     stop_wall = high_resolution_clock::now();
 
+    casadi_assert_dev(timing);
+    timing = false;
     // Process them
     t_proc += static_cast<double>(stop_proc - start_proc) / static_cast<double>(CLOCKS_PER_SEC);
     t_wall += duration<double>(stop_wall - start_wall).count();
 
     n_call +=1;
+
+  }
+
+  ScopedTiming::ScopedTiming(FStats& f) : f_(f) {
+    f_.tic();
+  }
+
+  ScopedTiming::~ScopedTiming() {
+    f_.toc();
   }
 
 } // namespace casadi

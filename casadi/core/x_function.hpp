@@ -833,7 +833,15 @@ namespace casadi {
       // Collect all outputs
       std::vector<MatType> ret_out;
       ret_out.reserve(onames.size());
-      for (auto& e1 : Jblocks) for (auto& e2 : e1) ret_out.push_back(e2);
+      for (casadi_int i=0;i<n_out_;++i) {
+        for (casadi_int j=0;j<n_in_;++j) {
+          MatType b = Jblocks[i][j];
+          if (!is_diff_in_[i] || !is_diff_out_[j]) {
+            b = MatType(b.size());
+          }
+          ret_out.push_back(b);
+        }
+      }
 
       // All inputs of the return function
       std::vector<MatType> ret_in(inames.size());
@@ -863,6 +871,9 @@ namespace casadi {
       // Jacobian expression
       MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
 
+      // Filter out parts that are non-differentiable
+      J = project(J, jacobian_sparsity_filter(J.sparsity()));
+
       // All inputs of the return function
       std::vector<MatType> ret_in(inames.size());
       copy(in_.begin(), in_.end(), ret_in.begin());
@@ -883,7 +894,7 @@ namespace casadi {
     // Temporary single-input, single-output function FIXME(@jaeandersson)
     Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
                  {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
-    return tmp.sparsity_jac(0, 0);
+    return jacobian_sparsity_filter(tmp.sparsity_jac(0, 0));
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

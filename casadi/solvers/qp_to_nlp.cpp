@@ -113,8 +113,8 @@ namespace casadi {
 
     // The nlp looks exactly like a mathematical description of the NLP
     SXDict nlp = {{"x", X}, {"p", vertcat(par)},
-                  {"f", mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X)},
-                  {"g", mtimes(A, X)}};
+                  {"f", densify(mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X))},
+                  {"g", densify(mtimes(A, X))}};
 
     // Create an Nlpsol instance
     casadi_assert(!nlpsol_plugin.empty(), "'nlpsol' option has not been set");

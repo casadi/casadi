@@ -265,9 +265,9 @@ namespace casadi {
     if (!mem) return 1;
     auto m = static_cast<ClpMemory*>(mem);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
 
     m->colind.resize(A_.size2()+1);
     m->row.resize(A_.nnz());
@@ -284,7 +284,6 @@ namespace casadi {
     m->secondary_return_status = -1;
 
     // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
     m->fstats.at("preprocessing").tic();
 
     // Get inputs
@@ -428,10 +427,6 @@ namespace casadi {
     if (res[CONIC_COST]) *res[CONIC_COST] = f;
 
     m->fstats.at("postprocessing").toc();
-
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
-
     m->return_status = model.status();
     m->success = m->return_status==0;
     m->secondary_return_status = model.secondaryStatus();

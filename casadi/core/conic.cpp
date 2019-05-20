@@ -437,6 +437,7 @@ namespace casadi {
 
     auto m = static_cast<ConicMemory*>(mem);
 
+    m->add_stat("total");
     // Problem has not been solved at this point
     m->success = false;
     m->unified_return_status = SOLVER_RET_UNKNOWN;
@@ -512,11 +513,17 @@ namespace casadi {
       uout() << "lbx:" << std::vector<double>(arg[CONIC_LBX], arg[CONIC_LBX]+nx_) << std::endl;
       uout() << "ubx:" << std::vector<double>(arg[CONIC_UBX], arg[CONIC_UBX]+nx_) << std::endl;
     }
+    auto m = static_cast<ConicMemory*>(mem);
+    // Reset statistics
+    for (auto&& s : m->fstats) s.second.reset();
+    m->fstats.at("total").tic();
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
     int ret = solve(arg, res, iw, w, mem);
-    auto m = static_cast<ConicMemory*>(mem);
+    m->fstats.at("total").toc();
+    // Show statistics
+    if (print_time_)  print_fstats(m);
     if (error_on_fail_ && !m->success)
       casadi_error("conic process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");
@@ -698,6 +705,12 @@ namespace casadi {
   Dict Conic::get_stats(void* mem) const {
     Dict stats = FunctionInternal::get_stats(mem);
     auto m = static_cast<ConicMemory*>(mem);
+    // Add timing statistics
+    for (const auto& s : m->fstats) {
+      stats["n_call_" +s.first] = s.second.n_call;
+      stats["t_wall_" +s.first] = s.second.t_wall;
+      stats["t_proc_" +s.first] = s.second.t_proc;
+    }
     stats["success"] = m->success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
     return stats;

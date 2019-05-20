@@ -2307,46 +2307,48 @@ class Functiontests(casadiTestCase):
 
   def test_nondiff(self):
 
-    X = SX
+    for X in [SX,MX]:
 
-    x = X.sym("x",2,2)
-    y = X.sym("y",2,2)
+      x = X.sym("x",2,2)
+      y = X.sym("y",2,2)
 
-    xn = DM([[1,3],[0.1,2]])
-    yn = DM([[4,5],[6,7]])
+      xn = DM([[1,3],[0.1,2]])
+      yn = DM([[4,5],[6,7]])
 
-    options = {"is_diff_in":[True,False],"is_diff_out":[True,False]}
-    f = Function("f",[x,y],[sin(x+y),x*y],options)
+      options = {"is_diff_in":[True,False],"is_diff_out":[True,False]}
+      f = Function("f",[x,y],[sin(x+y),x*y],options)
 
-    F = Function("F",[x,y],f(cos(x),(x*y)**2),["x","y"],["z","zz"],options)
+   
 
-
-    for ff in [F.forward(1).forward(1),F.forward(1).reverse(1),F.reverse(1).forward(1),F.reverse(1).reverse(1)]:
-      s = str(ff)
-      self.assertTrue("y" not in s.replace("_y[2x2,0nz]","foo")[len("fwd1_adj1_F:(x[2x2],y[2x2]"):])
+      F = Function("F",[x,y],f(cos(x),(x*y)**2),["x","y"],["z","zz"],options)
 
 
-    ye = X(2,2);
+      for ff in [F.forward(1).forward(1),F.forward(1).reverse(1),F.reverse(1).forward(1),F.reverse(1).reverse(1)]:
+        s = str(ff)
+        self.assertTrue("y" not in s.replace("_y[2x2,0nz]","foo")[len("fwd1_adj1_F:(x[2x2],y[2x2]"):])
 
-    G = Function("G",[x,ye],[f(cos(x),(x*yn)**2)[0], f(cos(xn),(xn*yn)**2)[1]],["x","y"],["z","zz"])
-    self.checkfunction(F,G,inputs=[xn,yn],evals=1)
 
-    for f1 in [lambda f: f.forward(1), lambda f: f.reverse(1)]:
-       Gf = f1(G)
-       Ff = f1(F)
-       
-       arg = [xn,yn]+[DM.rand(Gf.sparsity_in(i)) for i in range(Gf.n_in())][2:]
-       for a,b in zip(Gf.call(arg),Ff.call(arg)):
-          self.checkarray(a,b)
+      ye = X(2,2);
 
-    for f1 in [lambda f: f.forward(1), lambda f: f.reverse(1)]:
-      for f2 in [lambda f: f.forward(1), lambda f: f.reverse(1)]:
-         Gf = f1(f2(G))
-         Ff = f1(f2(F))
+      G = Function("G",[x,ye],[f(cos(x),(x*yn)**2)[0], f(cos(xn),(xn*yn)**2)[1]],["x","y"],["z","zz"])
+      self.checkfunction(F,G,inputs=[xn,yn],evals=1)
+
+      for f1 in [lambda f: f.forward(1), lambda f: f.reverse(1)]:
+         Gf = f1(G)
+         Ff = f1(F)
          
          arg = [xn,yn]+[DM.rand(Gf.sparsity_in(i)) for i in range(Gf.n_in())][2:]
          for a,b in zip(Gf.call(arg),Ff.call(arg)):
-           self.checkarray(a,b)
-        
+            self.checkarray(a,b)
+
+      for f1 in [lambda f: f.forward(1), lambda f: f.reverse(1)]:
+        for f2 in [lambda f: f.forward(1), lambda f: f.reverse(1)]:
+           Gf = f1(f2(G))
+           Ff = f1(f2(F))
+           
+           arg = [xn,yn]+[DM.rand(Gf.sparsity_in(i)) for i in range(Gf.n_in())][2:]
+           for a,b in zip(Gf.call(arg),Ff.call(arg)):
+             self.checkarray(a,b)
+          
 if __name__ == '__main__':
     unittest.main()
