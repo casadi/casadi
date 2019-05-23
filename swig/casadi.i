@@ -94,7 +94,8 @@
 %}
 %init %{
   // Set logger functions
-  casadi::Logger::writeFun = casadi::pythonlogger;
+  // Disabled as pythonlogger takes the GIL
+  // casadi::Logger::writeFun = casadi::pythonlogger;
 
   // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = casadi::pythoncheckinterrupted;
@@ -3951,6 +3952,34 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 #ifdef SWIGPYTHON
 namespace casadi{
 %extend Function {
+  void call_without_gil_if_dm(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),
+                        bool always_inline=false, bool never_inline=false) const {
+    Py_BEGIN_ALLOW_THREADS
+    self->call(arg, SWIG_OUTPUT(res), always_inline, never_inline);
+    Py_END_ALLOW_THREADS
+  };
+  void call_without_gil_if_dm(const std::vector<SX> &arg, std::vector<SX>& SWIG_OUTPUT(res),
+                        bool always_inline=false, bool never_inline=false) const {
+    self->call(arg, SWIG_OUTPUT(res), always_inline, never_inline);
+  };
+  void call_without_gil_if_dm(const std::vector<MX> &arg, std::vector<MX>& SWIG_OUTPUT(res),
+                        bool always_inline=false, bool never_inline=false) const {
+    self->call(arg, SWIG_OUTPUT(res), always_inline, never_inline);
+  };
+  void call_without_gil_if_dm(const DMDict& arg, DMDict& SWIG_OUTPUT(res),
+                        bool always_inline=false, bool never_inline=false) const {
+    Py_BEGIN_ALLOW_THREADS
+    self->call(arg, SWIG_OUTPUT(res), always_inline, never_inline);
+    Py_END_ALLOW_THREADS
+  };
+  void call_without_gil_if_dm(const SXDict& arg, SXDict& SWIG_OUTPUT(res),
+                        bool always_inline=false, bool never_inline=false) const {
+    self->call(arg, SWIG_OUTPUT(res), always_inline, never_inline);
+  };
+  void call_without_gil_if_dm(const MXDict& arg, MXDict& SWIG_OUTPUT(res),
+                        bool always_inline=false, bool never_inline=false) const {
+    self->call(arg, SWIG_OUTPUT(res), always_inline, never_inline);
+  };
   %pythoncode %{
     def __call__(self, *args, **kwargs):
       # Either named inputs or ordered inputs
@@ -3958,7 +3987,7 @@ namespace casadi{
         raise SyntaxError('Function evaluation requires all arguments to be named or none')
       if len(args)>0:
         # Ordered inputs -> return tuple
-        ret = self.call(args)
+        ret = self.call_without_gil_if_dm(args)
         if len(ret)==0:
           return None
         elif len(ret)==1:
@@ -3967,7 +3996,7 @@ namespace casadi{
           return tuple(ret)
       else:
         # Named inputs -> return dictionary
-        return self.call(kwargs)
+        return self.call_without_gil_if_dm(kwargs)
   %}
  }
 }
