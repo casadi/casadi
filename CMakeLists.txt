@@ -850,6 +850,15 @@ install(FILES
   "${PROJECT_BINARY_DIR}/casadi-config-version.cmake"
   DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
 
+# Generate the casadi.pc.in configuration file
+configure_file(casadi.pc.in
+  "${PROJECT_BINARY_DIR}/casadi.pc" @ONLY)
+
+# Install the casadi.pc 
+install(FILES
+  "${PROJECT_BINARY_DIR}/casadi.pc"
+  DESTINATION "${LIB_PREFIX}/pkgconfig" COMPONENT dev)
+
 # Install the export set for use with the install-tree
 install(EXPORT casadi-targets DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
 
