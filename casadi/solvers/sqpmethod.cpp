@@ -802,8 +802,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "m_res[1] = d.gf;\n";
     g << "m_res[2] = d_nlp.z+" + str(nx_) + ";\n";
     g << "m_res[3] = d.Jk;\n";
-    std::string nlp_jac_fg = g.add_dependency(get_function("nlp_jac_fg"));
-    g << "if (" + nlp_jac_fg + "(m_arg, m_res, m_iw, m_w, 0)) return 1;\n";
+    std::string nlp_jac_fg = g(get_function("nlp_jac_fg"), "m_arg", "m_res", "m_iw", "m_w");
+    g << "if (" + nlp_jac_fg + ") return 1;\n";
     g.comment("Evaluate the gradient of the Lagrangian");
     g << g.copy("d.gf", nx_, "d.gLag") << "\n";
     g << g.mv("d.Jk", Asp_, "d_nlp.lam+"+str(nx_), "d.gLag", true) << "\n";
@@ -829,8 +829,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "m_arg[2] = &one;\n";
     g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
     g << "m_res[0] = " << (Hsp_project_ ? "d.Brk" : "d.Bk") << ";\n";
-    std::string nlp_hess_l = g.add_dependency(get_function("nlp_hess_l"));
-    g << nlp_hess_l + "(m_arg, m_res, m_iw, m_w, 0);\n";
+    std::string nlp_hess_l = g(get_function("nlp_hess_l"), "m_arg", "m_res", "m_iw", "m_w");
+    g << "if (" + nlp_hess_l + ") return 1;\n";
 
     if (Hsp_project_) {
       g << g.project("d.Brk", Hrsp_, "d.Bk", Hsp_, "d.Bproj") << "\n";
@@ -952,8 +952,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "m_arg[1] = m_p;\n;";
       g << "m_res[0] = &fk_cand;\n;";
       g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n;";
-      std::string nlp_fg = g.add_dependency(get_function("nlp_fg"));
-      g << "if (" << nlp_fg << "(m_arg, m_res, m_iw, m_w, 0)) {\n";
+      std::string nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
+      g << "if (" << nlp_fg << ") {\n";
       g.comment("Avoid infinite recursion");
       g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
       //g << "ls_success = 0;\n";
@@ -997,8 +997,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "m_res[1] = " << (calc_g_ ? "d_nlp.z+" + str(nx_) : "0") << ";\n";
       g << "m_res[2] = " << (calc_lam_x_ ? "d_nlp.lam+" + str(nx_) : "0") << ";\n";
       g << "m_res[3] = " << (calc_lam_p_ ? "d_nlp.lam_p" : "0") << ";\n";
-      std::string nlp_grad = g.add_dependency(get_function("nlp_grad"));
-      g << nlp_grad << "(m_arg, m_res, m_iw, m_w, 0);\n";
+      std::string nlp_grad = g(get_function("nlp_grad"), "m_arg", "m_res", "m_iw", "m_w");
+      g << "if (" + nlp_grad + ") return 1;\n";
       if (calc_lam_x_) g << g.scal(nx_, "-1.0", "d_nlp.lam") << "\n";
       if (calc_lam_p_) g << g.scal(np_, "-1.0", "d_nlp.lam_p") << "\n";
     }
