@@ -314,6 +314,29 @@ class ImplicitFunctiontests(casadiTestCase):
       res = solver(x0=0)["x"]
       self.checkarray(res,-1.7692923542386)
 
+  def test_segfault_codegen(self):
+    # Symbols
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    # B-Spline interpolant
+    u = np.linspace(1, 5, 10)
+    v = u ** 2
+    f = interpolant("interp", "bspline", [u], v, {})
+
+    # Extrapolated interpolant, suitable for rootfinding later on
+    f = Function(
+        "f",
+        [x],
+        [if_else(x < u[0], x ** 2, if_else(x > u[-1], x ** 2, f(x), False), False)],
+    )
+
+    # Use rootfinder to find x such that x**2=y
+    res = Function("res", [x, y], [y - f(x)])
+    rf = rootfinder("rf", "fast_newton", res)
+
+    g = Function("g",[x],[x - rf(x, x)])
+    self.check_codegen(g,[1.01])
 
 if __name__ == '__main__':
     unittest.main()
