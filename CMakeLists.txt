@@ -870,7 +870,7 @@ install(FILES
   DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
 
 # Generate the casadi.pc.in configuration file
-configure_file(casadi.pc.in
+configure_file(${PROJECT_SOURCE_DIR}/misc/casadi.pc.in
   "${PROJECT_BINARY_DIR}/casadi.pc" @ONLY)
 
 # Install the casadi.pc 
