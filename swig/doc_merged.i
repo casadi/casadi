@@ -69193,14 +69193,22 @@ Interface to the GUROBI Solver for quadratic programming
 
 >List of available options
 
-+--------+-----------------+-----------------------------------------------+
-|   Id   |      Type       |                  Description                  |
-+========+=================+===============================================+
-| gurobi | OT_DICT         | Options to be passed to gurobi.               |
-+--------+-----------------+-----------------------------------------------+
-| vtype  | OT_STRINGVECTOR | Type of variables:                            |
-|        |                 | [CONTINUOUS|binary|integer|semicont|semiint]  |
-+--------+-----------------+-----------------------------------------------+
++-------------+-----------------------+------------------------------------+
+|     Id      |         Type          |            Description             |
++=============+=======================+====================================+
+| gurobi      | OT_DICT               | Options to be passed to gurobi.    |
++-------------+-----------------------+------------------------------------+
+| sos_groups  | OT_INTVECTORVECTOR    | Definition of SOS groups by        |
+|             |                       | indices.                           |
++-------------+-----------------------+------------------------------------+
+| sos_types   | OT_INTVECTOR          | Specify 1 or 2 for each SOS group. |
++-------------+-----------------------+------------------------------------+
+| sos_weights | OT_DOUBLEVECTORVECTOR | Weights corresponding to SOS       |
+|             |                       | entries.                           |
++-------------+-----------------------+------------------------------------+
+| vtype       | OT_STRINGVECTOR       | Type of variables: [CONTINUOUS|bin |
+|             |                       | ary|integer|semicont|semiint]      |
++-------------+-----------------------+------------------------------------+
 
 --------------------------------------------------------------------------------
 
