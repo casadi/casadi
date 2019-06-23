@@ -411,7 +411,7 @@ _ALT_TOKEN_REPLACEMENT = {
 # False positives include C-style multi-line comments and multi-line strings
 # but those have always been troublesome for cpplint.
 _ALT_TOKEN_REPLACEMENT_PATTERN = re.compile(
-    r'[ =()](' + ('|'.join(_ALT_TOKEN_REPLACEMENT.keys())) + r')(?=[ (]|$)')
+    r'[ =()](' + ('|'.join(list(_ALT_TOKEN_REPLACEMENT.keys()))) + r')(?=[ (]|$)')
 
 
 # These constants define types of headers for use with
@@ -748,7 +748,7 @@ class _CppLintState(object):
 
   def PrintErrorCounts(self):
     """Print a summary of errors by category, and the total."""
-    for category, count in self.errors_by_category.iteritems():
+    for category, count in self.errors_by_category.items():
       sys.stderr.write('Category \'%s\' errors found: %d\n' %
                        (category, count))
     if self.error_count > 0:
@@ -1234,7 +1234,7 @@ def FindEndOfExpressionInLine(line, startpos, depth, startchar, endchar):
     On finding matching endchar: (index just after matching endchar, 0)
     Otherwise: (-1, new depth at end of this line)
   """
-  for i in xrange(startpos, len(line)):
+  for i in range(startpos, len(line)):
     if line[i] == startchar:
       depth += 1
     elif line[i] == endchar:
@@ -1307,7 +1307,7 @@ def FindStartOfExpressionInLine(line, endpos, depth, startchar, endchar):
     On finding matching startchar: (index at matching startchar, 0)
     Otherwise: (-1, new depth at beginning of this line)
   """
-  for i in xrange(endpos, -1, -1):
+  for i in range(endpos, -1, -1):
     if line[i] == endchar:
       depth += 1
     elif line[i] == startchar:
@@ -1367,7 +1367,7 @@ def CheckForCopyright(filename, lines, error):
 
   # We'll say it should occur by line 10. Don't forget there's a
   # dummy line at the front.
-  for line in xrange(1, min(len(lines), 11)):
+  for line in range(1, min(len(lines), 11)):
     if re.search(r'Copyright', lines[line], re.I): break
   else:                       # means no copyright line was found
     error(filename, 0, 'legal/copyright', 5,
@@ -2316,7 +2316,7 @@ def CheckForFunctionLengths(filename, clean_lines, linenum,
 
   if starting_func:
     body_found = False
-    for start_linenum in xrange(linenum, clean_lines.NumLines()):
+    for start_linenum in range(linenum, clean_lines.NumLines()):
       start_line = lines[start_linenum]
       joined_line += ' ' + start_line.lstrip()
       if Search(r'(;|})', start_line):  # Declarations and trivial functions
@@ -2839,7 +2839,7 @@ def CheckSpacing(filename, clean_lines, linenum, nesting_state, error):
     trailing_text = ''
     if endpos > -1:
       trailing_text = endline[endpos:]
-    for offset in xrange(endlinenum + 1,
+    for offset in range(endlinenum + 1,
                          min(endlinenum + 3, clean_lines.NumLines() - 1)):
       trailing_text += clean_lines.elided[offset]
     if not Match(r'^[\s}]*[{.;,)<\]]', trailing_text):
@@ -3209,7 +3209,7 @@ def CheckCheck(filename, clean_lines, linenum, error):
     expression = lines[linenum][start_pos + 1:end_pos - 1]
   else:
     expression = lines[linenum][start_pos + 1:]
-    for i in xrange(linenum + 1, end_line):
+    for i in range(linenum + 1, end_line):
       expression += lines[i]
     expression += last_line[0:end_pos - 1]
 
@@ -3337,6 +3337,9 @@ def GetLineWidth(line):
     The width of the line in column positions, accounting for Unicode
     combining characters and wide characters.
   """
+  import sys
+  if sys.version_info >= (3, 0):
+    return len(line)
   if isinstance(line, unicode):
     width = 0
     for uc in unicodedata.normalize('NFC', line):
@@ -3667,7 +3670,7 @@ def _GetTextInside(text, start_pattern):
 
   # Give opening punctuations to get the matching close-punctuations.
   matching_punctuation = {'(': ')', '{': '}', '[': ']'}
-  closing_punctuation = set(matching_punctuation.itervalues())
+  closing_punctuation = set(matching_punctuation.values())
 
   # Find the position to start extracting text.
   match = re.search(start_pattern, text, re.M)
@@ -4082,7 +4085,7 @@ def CheckForNonConstReference(filename, clean_lines, linenum,
           # Found the matching < on an earlier line, collect all
           # pieces up to current line.
           line = ''
-          for i in xrange(startline, linenum + 1):
+          for i in range(startline, linenum + 1):
             line += clean_lines.elided[i].strip()
 
   # Check for non-const references in function parameters.  A single '&' may
@@ -4121,7 +4124,7 @@ def CheckForNonConstReference(filename, clean_lines, linenum,
     # Don't see a whitelisted function on this line.  Actually we
     # didn't see any function name on this line, so this is likely a
     # multi-line parameter list.  Try a bit harder to catch this case.
-    for i in xrange(2):
+    for i in range(2):
       if (linenum > i and
           Search(whitelisted_functions, clean_lines.elided[linenum - i - 1])):
         check_params = False
@@ -4394,7 +4397,7 @@ def CheckForIncludeWhatYouUse(filename, clean_lines, include_state, error,
   required = {}  # A map of header name to linenumber and the template entity.
                  # Example of required: { '<functional>': (1219, 'less<>') }
 
-  for linenum in xrange(clean_lines.NumLines()):
+  for linenum in range(clean_lines.NumLines()):
     line = clean_lines.elided[linenum]
     if not line or line[0] == '#':
       continue
@@ -4442,7 +4445,7 @@ def CheckForIncludeWhatYouUse(filename, clean_lines, include_state, error,
 
   # include_state is modified during iteration, so we iterate over a copy of
   # the keys.
-  header_keys = include_state.keys()
+  header_keys = list(include_state.keys())
   for header in header_keys:
     (same_module, common_path) = FilesBelongToSameModule(abs_filename, header)
     fullpath = common_path + header
@@ -4562,7 +4565,7 @@ def ProcessFileData(filename, file_extension, lines, error,
 
   RemoveMultiLineComments(filename, lines, error)
   clean_lines = CleansedLines(lines)
-  for line in xrange(clean_lines.NumLines()):
+  for line in range(clean_lines.NumLines()):
     ProcessLine(filename, file_extension, clean_lines, line,
                 include_state, function_state, nesting_state, error,
                 extra_check_functions)
@@ -4655,6 +4658,7 @@ def PrintUsage(message):
   if message:
     sys.exit('\nFATAL ERROR: ' + message)
   else:
+    print("as")
     sys.exit(1)
 
 
@@ -4743,20 +4747,20 @@ def main():
   # This should really be done in cmake.
   # -Greg
   nolint = ['snopt.h', 'snoptProblem.hpp']
-  filenames = filter(lambda x: x not in nolint, filenames)
+  filenames = [x for x in filenames if x not in nolint]
 
   # Change stderr to write with replacement characters so we don't die
   # if we try to print something containing non-ASCII characters.
-  sys.stderr = codecs.StreamReaderWriter(sys.stderr,
-                                         codecs.getreader('utf8'),
-                                         codecs.getwriter('utf8'),
-                                         'replace')
+  if sys.version_info < (3, 0):
+    sys.stderr = codecs.StreamReaderWriter(sys.stderr,
+                                           codecs.getreader('utf8'),
+                                           codecs.getwriter('utf8'),
+                                           'replace')
 
   _cpplint_state.ResetErrorCounts()
   for filename in filenames:
     ProcessFile(filename, _cpplint_state.verbose_level)
   _cpplint_state.PrintErrorCounts()
-
   sys.exit(_cpplint_state.error_count > 0)
 
 
