@@ -295,14 +295,16 @@ namespace casadi {
     // Construct SOS constraints
     std::vector<CbcSOS> sos_objects;
     for (casadi_int i=0;i<sos_groups_.size();++i) {
-
       const std::vector<int>& sos_group = sos_groups_[i];
       sos_objects.emplace_back(&model, sos_group.size(), get_ptr(sos_group),
                     sos_weights_.empty() ? nullptr : get_ptr(sos_weights_[i]), i, sos_types_[i]);
     }
+    std::vector<CbcObject*> sos_objects_ptr;
+    for (casadi_int i=0;i<sos_groups_.size();++i) {
+      sos_objects_ptr.push_back(&sos_objects[i]);
+    }
     if (!sos_objects.empty()) {
-      CbcObject* temp = get_ptr(sos_objects);
-      model.addObjects(sos_objects.size(), &temp);
+      model.addObjects(sos_objects.size(), get_ptr(sos_objects_ptr));
     }
 
     // Reset options
