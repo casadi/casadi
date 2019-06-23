@@ -141,6 +141,8 @@ namespace casadi {
     static std::map<std::string, OsiIntParam> osi_param_map_int;
     static std::map<std::string, OsiDblParam> osi_param_map_double;
 
+    void copy_cbc_results(const CbcModel& model, double** res) const;
+
     // SOS structure
     std::vector< std::vector<int> > sos_groups_;
     std::vector< std::vector<double> > sos_weights_;

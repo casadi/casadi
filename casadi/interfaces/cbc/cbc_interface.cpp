@@ -195,6 +195,30 @@ namespace casadi {
     return 0;
   }
 
+  void CbcInterface::copy_cbc_results(const CbcModel& model, double** res) const {
+    // Primal solution
+    const double* x = model.getColSolution();
+    casadi_copy(x, nx_, res[CONIC_X]);
+
+    // Dual solution (x)
+    const double* minus_lam_x = model.getReducedCost();
+    if (res[CONIC_LAM_X]) {
+      casadi_copy(minus_lam_x, nx_, res[CONIC_LAM_X]);
+      casadi_scal(nx_, -1., res[CONIC_LAM_X]);
+    }
+
+    // Dual solution (A)
+    const double* minus_lam_a = model.getRowPrice();
+    if (res[CONIC_LAM_A]) {
+      casadi_copy(minus_lam_a, na_, res[CONIC_LAM_A]);
+      casadi_scal(na_, -1., res[CONIC_LAM_A]);
+    }
+
+    // Optimal cost
+    double f = model.getObjValue();
+    if (res[CONIC_COST]) *res[CONIC_COST] = f;
+  }
+
   void CbcInterface::init(const Dict& opts) {
     // Call the init method of the base class
     Conic::init(opts);
@@ -289,8 +313,13 @@ namespace casadi {
 
     CbcModel model(osi_model);
 
-    if (hot_start_)
+    if (hot_start_) {
       model.setBestSolution(arg[CONIC_X0], nx_, COIN_DBL_MAX, true);
+
+      // We store the result here already, because when CbcMain1 cannot do
+      // better than setBestSolution() it will return a bogus result.
+      copy_cbc_results(model, res);
+    }
 
     // Construct SOS constraints
     std::vector<CbcSOS> sos_objects;
@@ -376,32 +405,16 @@ namespace casadi {
     m->fstats.at("solver").toc();
     m->fstats.at("postprocessing").tic();
 
-    // Primal solution
-    const double* x = model.getColSolution();
-    casadi_copy(x, nx_, res[CONIC_X]);
-
-    // Dual solution (x)
-    const double* minus_lam_x = model.getReducedCost();
-    if (res[CONIC_LAM_X]) {
-      casadi_copy(minus_lam_x, nx_, res[CONIC_LAM_X]);
-      casadi_scal(nx_, -1., res[CONIC_LAM_X]);
+    if (hot_start_ && model.status() == 0 && model.isProvenOptimal() && model.secondaryStatus() == 1) {
+      // Solution found by setBestSolution is best and only correct one.
+    } else {
+      copy_cbc_results(model, res);
     }
-
-    // Dual solution (A)
-    const double* minus_lam_a = model.getRowPrice();
-    if (res[CONIC_LAM_A]) {
-      casadi_copy(minus_lam_a, na_, res[CONIC_LAM_A]);
-      casadi_scal(na_, -1., res[CONIC_LAM_A]);
-    }
-
-    // Optimal cost
-    double f = model.getObjValue();
-    if (res[CONIC_COST]) *res[CONIC_COST] = f;
 
     m->fstats.at("postprocessing").toc();
 
     m->return_status = model.status();
-    m->success = m->return_status==0 && model.isProvenOptimal();
+    m->success = m->return_status==0 && model.isProvenOptimal() && model.secondaryStatus() <= 1;
     m->secondary_return_status = model.secondaryStatus();
     m->iter_count = model.getIterationCount();
     m->node_count = model.getNodeCount();
