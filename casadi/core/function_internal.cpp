@@ -75,6 +75,7 @@ namespace casadi {
     always_inline_ = false;
     never_inline_ = false;
     jac_penalty_ = 2;
+    Dict coloring_options_ = Dict();
     max_num_dir_ = GlobalOptions::getMaxNumDir();
     user_data_ = nullptr;
     regularity_check_ = false;
@@ -190,6 +191,9 @@ namespace casadi {
         "A high value of 'jac_penalty' makes it less likely for the heurstic "
         "to chose the full Jacobian strategy. "
         "The special value -1 indicates never to use the full Jacobian strategy"}},
+      {"coloring_options",
+       {OT_DICT,
+        "(Experimental) options for coloring"}},
       {"user_data",
        {OT_VOIDPTR,
         "A user-defined field that can be used to identify "
@@ -326,6 +330,7 @@ namespace casadi {
   Dict FunctionInternal::generate_options(bool is_temp) const {
     Dict opts = ProtoFunction::generate_options(is_temp);
     opts["jac_penalty"] = jac_penalty_;
+    opts["coloring_options"] = coloring_options_;
     opts["user_data"] = user_data_;
     opts["inputs_check"] = inputs_check_;
     if (!is_temp) opts["jit"] = jit_;
@@ -372,6 +377,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="jac_penalty") {
         jac_penalty_ = op.second;
+      } else if (op.first=="coloring_options") {
+        coloring_options_ = op.second;
       } else if (op.first=="user_data") {
         user_data_ = op.second.to_void_pointer();
       } else if (op.first=="regularity_check") {
@@ -1053,7 +1060,7 @@ namespace casadi {
       // Clear the fine block structure
       fine.clear();
 
-      Sparsity D = r.star_coloring();
+      Sparsity D = r.star_coloring(1, std::numeric_limits<casadi_int>::max(), coloring_options_);
 
       if (verbose_) {
         casadi_message("Star coloring on " + str(r.dim()) + ": "
@@ -1314,9 +1321,9 @@ namespace casadi {
       /**       Decide which ad_mode to take           */
 
       // Forward mode
-      Sparsity D1 = rT.uni_coloring(r);
+      Sparsity D1 = rT.uni_coloring(r, std::numeric_limits<casadi_int>::max(), coloring_options_);
       // Adjoint mode
-      Sparsity D2 = r.uni_coloring(rT);
+      Sparsity D2 = r.uni_coloring(rT, std::numeric_limits<casadi_int>::max(), coloring_options_);
       if (verbose_) {
         casadi_message("Coloring on " + str(r.dim()) + " (fwd seeps: " + str(D1.size2()) +
                  " , adj sweeps: " + str(D2.size1()) + ")");
@@ -1678,7 +1685,7 @@ namespace casadi {
 
       // Star coloring if symmetric
       if (verbose_) casadi_message("FunctionInternal::getPartition star_coloring");
-      D1 = A.star_coloring();
+      D1 = A.star_coloring(1, std::numeric_limits<casadi_int>::max(), coloring_options_);
       if (verbose_) {
         casadi_message("Star coloring completed: " + str(D1.size2())
           + " directional derivatives needed ("
@@ -1718,7 +1725,7 @@ namespace casadi {
           bool d = best_coloring>=w*static_cast<double>(A.size1());
           casadi_int max_colorings_to_test =
             d ? A.size1() : static_cast<casadi_int>(floor(best_coloring/w));
-          D1 = AT.uni_coloring(A, max_colorings_to_test);
+          D1 = AT.uni_coloring(A, max_colorings_to_test, coloring_options_);
           if (D1.is_null()) {
             if (verbose_) {
               casadi_message("Forward mode coloring interrupted (more than "
@@ -1739,7 +1746,7 @@ namespace casadi {
           casadi_int max_colorings_to_test =
             d ? A.size2() : static_cast<casadi_int>(floor(best_coloring/(1-w)));
 
-          D2 = A.uni_coloring(AT, max_colorings_to_test);
+          D2 = A.uni_coloring(AT, max_colorings_to_test, coloring_options_);
           if (D2.is_null()) {
             if (verbose_) {
               casadi_message("Adjoint mode coloring interrupted (more than "
@@ -3404,6 +3411,7 @@ namespace casadi {
     s.pack("FunctionInternal::derivative_of", derivative_of_);
 
     s.pack("FunctionInternal::jac_penalty", jac_penalty_);
+    s.pack("FunctionInternal::coloring_options", coloring_options_);
 
     s.pack("FunctionInternal::enable_forward", enable_forward_);
     s.pack("FunctionInternal::enable_reverse", enable_reverse_);
@@ -3470,6 +3478,7 @@ namespace casadi {
     s.unpack("FunctionInternal::derivative_of", derivative_of_);
 
     s.unpack("FunctionInternal::jac_penalty", jac_penalty_);
+    s.unpack("FunctionInternal::coloring_options", coloring_options_);
 
     s.unpack("FunctionInternal::enable_forward", enable_forward_);
     s.unpack("FunctionInternal::enable_reverse", enable_reverse_);

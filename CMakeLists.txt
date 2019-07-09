@@ -251,6 +251,9 @@ option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 option(SWIG_EXPORT "Export SWIG" OFF)
 option(SWIG_IMPORT "Export SWIG" OFF)
 
+# enabling ColPack support if requested
+option(WITH_COLPACK "Compile ColPack" OFF)
+
 # enabling OpenMP support if requested
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 if(WITH_OPENMP)

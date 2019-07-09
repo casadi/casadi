@@ -85,6 +85,12 @@ namespace casadi {
     /** \brief Obtain install prefix
     */
     static const char* install_prefix();
+    /** \brief Obtain bin prefix
+    */
+    static const char* bin_prefix();
+    /** \brief Is self contained?
+    */
+    static bool is_selfcontained();
   };
 
 }  // namespace casadi

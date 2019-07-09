@@ -25,6 +25,7 @@
 
 #include "global_options.hpp"
 #include "exception.hpp"
+#include "casadi_meta.hpp"
 
 namespace casadi {
 
@@ -33,6 +34,7 @@ namespace casadi {
 
   std::string GlobalOptions::casadipath;
   std::string GlobalOptions::casadi_include_path;
+  std::string GlobalOptions::casadi_executable_path = CasadiMeta::bin_prefix();
 
   casadi_int GlobalOptions::max_num_dir = 64;
 

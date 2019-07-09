@@ -7,3 +7,6 @@
 [submodule "external_packages/snopt-interface/snopt-interface"]
 	path = external_packages/snopt-interface/snopt-interface
 	url = https://github.com/snopt/snopt-interface.git
+[submodule "external_packages/ColPack"]
+	path = external_packages/ColPack
+	url = https://github.com/jgillis/ColPack.git

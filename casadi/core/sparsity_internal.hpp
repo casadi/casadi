@@ -587,12 +587,14 @@ namespace casadi {
      * A greedy distance-2 coloring algorithm
      * (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
      */
-    Sparsity uni_coloring(const Sparsity& AT, casadi_int cutoff) const;
+    Sparsity uni_coloring(const Sparsity& AT, casadi_int cutoff,
+      const Dict& coloring_options) const;
 
     /** \brief A greedy distance-2 coloring algorithm
      * See description in public class.
      */
-    Sparsity star_coloring(casadi_int ordering, casadi_int cutoff) const;
+    Sparsity star_coloring(casadi_int ordering, casadi_int cutoff,
+      const Dict& coloring_options) const;
 
     /** \brief An improved distance-2 coloring algorithm
      * See description in public class.

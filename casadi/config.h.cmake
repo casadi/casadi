@@ -39,5 +39,7 @@
 #define CASADI_MODULES "${CASADI_MODULES}"  // NOLINT(whitespace/line_length)
 #define CASADI_PLUGINS "${CASADI_PLUGINS}"  // NOLINT(whitespace/line_length)
 #define CASADI_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"  // NOLINT(whitespace/line_length)
+#define CASADI_BIN_PREFIX "${BIN_PREFIX}"  // NOLINT(whitespace/line_length)
+#define CASADI_IS_SELFCONTAINED "${WITH_SELFCONTAINED}"  // NOLINT(whitespace/line_length)
 
 #endif  // CASADI_CONFIG_H // NOLINT(build/header_guard)

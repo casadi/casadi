@@ -798,7 +798,8 @@ namespace casadi {
     /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
         (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
     Sparsity uni_coloring(const Sparsity& AT=Sparsity(),
-                          casadi_int cutoff = std::numeric_limits<casadi_int>::max()) const;
+                          casadi_int cutoff = std::numeric_limits<casadi_int>::max(),
+                          const Dict& coloring_options = Dict()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
         A greedy distance-2 coloring algorithm
@@ -810,7 +811,8 @@ namespace casadi {
         Ordering options: None (0), largest first (1)
     */
     Sparsity star_coloring(casadi_int ordering = 1,
-                            casadi_int cutoff = std::numeric_limits<casadi_int>::max()) const;
+                            casadi_int cutoff = std::numeric_limits<casadi_int>::max(),
+                            const Dict& coloring_options = Dict()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
         A new greedy distance-2 coloring algorithm
