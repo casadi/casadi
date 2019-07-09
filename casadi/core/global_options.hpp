@@ -64,6 +64,8 @@ namespace casadi {
 
       static std::string casadi_include_path;
 
+      static std::string casadi_executable_path;
+
       static bool hierarchical_sparsity;
 
       static casadi_int max_num_dir;
@@ -87,6 +89,11 @@ namespace casadi {
 
       static void setCasadiIncludePath(const std::string & path) { casadi_include_path = path; }
       static std::string getCasadiIncludePath() { return casadi_include_path; }
+
+      static void setCasadiExecutablePath(const std::string & path) {
+        casadi_executable_path = path;
+      }
+      static std::string getCasadiExecutablePath() { return casadi_executable_path; }
 
       static void setMaxNumDir(casadi_int ndir) { max_num_dir=ndir; }
       static casadi_int getMaxNumDir() { return max_num_dir; }

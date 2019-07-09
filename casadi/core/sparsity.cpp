@@ -747,16 +747,18 @@ namespace casadi {
     (*this)->get_nz(indices);
   }
 
-  Sparsity Sparsity::uni_coloring(const Sparsity& AT, casadi_int cutoff) const {
+  Sparsity Sparsity::uni_coloring(const Sparsity& AT, casadi_int cutoff,
+      const Dict& coloring_options) const {
     if (AT.is_null()) {
-      return (*this)->uni_coloring(T(), cutoff);
+      return (*this)->uni_coloring(T(), cutoff, coloring_options);
     } else {
-      return (*this)->uni_coloring(AT, cutoff);
+      return (*this)->uni_coloring(AT, cutoff, coloring_options);
     }
   }
 
-  Sparsity Sparsity::star_coloring(casadi_int ordering, casadi_int cutoff) const {
-    return (*this)->star_coloring(ordering, cutoff);
+  Sparsity Sparsity::star_coloring(casadi_int ordering, casadi_int cutoff,
+      const Dict& coloring_options) const {
+    return (*this)->star_coloring(ordering, cutoff, coloring_options);
   }
 
   Sparsity Sparsity::star_coloring2(casadi_int ordering, casadi_int cutoff) const {

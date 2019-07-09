@@ -13,3 +13,7 @@
 [submodule "external_packages/superscs"]
 	path = external_packages/superscs
 	url = https://github.com/jgillis/scs.git
+[submodule "external_packages/ColPack"]
+	path = external_packages/ColPack
+	url = https://github.com/jgillis/ColPack.git
+

@@ -2943,7 +2943,8 @@ namespace casadi {
     fill(it, indices.end(), -1);
   }
 
-  Sparsity SparsityInternal::uni_coloring(const Sparsity& AT, casadi_int cutoff) const {
+  Sparsity SparsityInternal::uni_coloring(const Sparsity& AT, casadi_int cutoff,
+      const Dict& coloring_options) const {
 
     // Allocate temporary vectors
     vector<casadi_int> forbiddenColors;
@@ -3285,11 +3286,57 @@ namespace casadi {
     return Sparsity(size2(), forbiddenColors.size(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::star_coloring(casadi_int ordering, casadi_int cutoff) const {
-    if (!is_square()) {
-      // NOTE(@jaeandersson) Why warning and not error?
-      casadi_message("StarColoring requires a square matrix, got " + dim() + ".");
+  Sparsity SparsityInternal::star_coloring(casadi_int ordering, casadi_int cutoff,
+      const Dict& coloring_options) const {
+    casadi_assert(is_square(), "StarColoring requires a square matrix, got " + dim() + ".");
+    if (is_empty()) return Sparsity(0, 0);
+
+    std::string driver = get_from_dict(coloring_options, "driver", std::string("custom"));
+    if (driver=="colpack") {
+      std::stringstream cmd;
+
+      #ifdef _WIN32
+      const std::string filesep("\\");
+      #else
+      const std::string filesep("/");
+      #endif
+      cmd << "\"" << GlobalOptions::casadi_executable_path << filesep;
+
+      #ifdef _WIN32
+      cmd << "ColPack.exe";
+      #else
+      cmd << "ColPack";
+      #endif
+      cmd << "\"";
+
+      std::string sp_in = temporary_file("sp", ".mtx");
+      shared_from_this<Sparsity>().to_file(sp_in);
+      cmd << " -f " << sp_in;
+      cmd << " -o LARGEST_FIRST -m STAR";
+      std::string sp_out = temporary_file("spc", ".mtx");
+      cmd << " -w " << sp_out << std::endl;
+
+      if (system(cmd.str().c_str())) {
+        casadi_error("Coloring with ColPack failed.");
+      }
+
+      Sparsity ret = Sparsity::from_file(sp_out);
+
+      if (remove(sp_out.c_str())) casadi_warning("Failed to remove " + sp_out);
+      if (remove(sp_in.c_str())) casadi_warning("Failed to remove " + sp_in);
+
+      // Purge empty columns
+      std::vector<casadi_int> colind_new(1, 0);
+      for (casadi_int i : ret.get_colind()) {
+        if (colind_new.back()!=i) colind_new.push_back(i);
+      }
+
+      return Sparsity(ret.size1(), colind_new.size()-1, colind_new, ret.get_row());
+    } else if (driver!="custom") {
+      casadi_error("Unknown driver '" + driver + "'");
     }
+
+
 
     // Reorder, if necessary
     if (ordering!=0) {

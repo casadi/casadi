@@ -49,4 +49,7 @@ namespace casadi {
 
   const char* CasadiMeta::install_prefix() { return CASADI_INSTALL_PREFIX;}
 
+  const char* CasadiMeta::bin_prefix() { return CASADI_BIN_PREFIX;}
+
+  bool CasadiMeta::is_selfcontained() { return std::string(CASADI_IS_SELFCONTAINED)=="ON";}
 }  // namespace casadi

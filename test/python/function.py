@@ -2843,6 +2843,21 @@ class Functiontests(casadiTestCase):
         f2 = Function('f',[x,y],[w],{"cse":True})
         self.assertTrue(f1.n_instructions()>3)
         self.assertTrue(f2.n_instructions()<=3)
+          
+  @requires_nlpsol("ipopt")
+  def test_colpack_driver(self):
+      N = 10
+      n = 1
+      A = DM(Sparsity.banded(N,n),1)
+      A[:,-n:] = 1
+      A[-n:,:] = 1
+
+      x = MX.sym("x",N)
+
+      nlp = {"x": x, "f": bilin(A,x,x)}
+
+      with self.assertOutput("Star coloring completed: 4 directional derivatives needed (10 without coloring)"):
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_hess_l" : {"helper_options" : {"coloring_options": {"driver": "colpack"} , "verbose":True}}}})
 
 if __name__ == '__main__':
     unittest.main()

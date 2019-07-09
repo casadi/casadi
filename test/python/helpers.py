@@ -231,7 +231,7 @@ class casadiTestCase(unittest.TestCase):
     self.assertTrue(s in e,msg=e + "<->" + s)
 
   @contextmanager
-  def assertOutput(self,included,excluded):
+  def assertOutput(self,included,excluded=[]):
     with capture_stdout() as result:
       yield
     if not(isinstance(included,list)):

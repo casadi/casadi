@@ -42,5 +42,7 @@
 #define CASADI_SHARED_LIBRARY_PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}"  // NOLINT(whitespace/line_length)
 #define CASADI_SHARED_LIBRARY_SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}"  // NOLINT(whitespace/line_length)
 #define CASADI_OBJECT_FILE_SUFFIX "${CMAKE_C_OUTPUT_EXTENSION}"  // NOLINT(whitespace/line_length)
+#define CASADI_BIN_PREFIX "${BIN_PREFIX}"  // NOLINT(whitespace/line_length)
+#define CASADI_IS_SELFCONTAINED "${WITH_SELFCONTAINED}"  // NOLINT(whitespace/line_length)
 
 #endif  // CASADI_CONFIG_H // NOLINT(build/header_guard)

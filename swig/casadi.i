@@ -187,6 +187,9 @@
   // Set library path
   casadi::GlobalOptions::setCasadiPath(path);
   casadi::GlobalOptions::setCasadiIncludePath(path+sep+"include");
+  if (casadi::CasadiMeta::is_selfcontained()) {
+    casadi::GlobalOptions::setCasadiExecutablePath(path);
+  }
 
   // Matlab is index-one based
   casadi::GlobalOptions::start_index = 1;

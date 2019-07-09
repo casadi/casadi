@@ -1282,6 +1282,9 @@ namespace casadi {
     /// Penalty factor for using a complete Jacobian to calculate directional derivatives
     double jac_penalty_;
 
+    // Options used in graph-coloring
+    Dict coloring_options_;
+
     // Types of derivative calculation permitted
     bool enable_forward_, enable_reverse_, enable_jacobian_, enable_fd_;
     bool enable_forward_op_, enable_reverse_op_, enable_jacobian_op_, enable_fd_op_;
