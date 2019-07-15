@@ -147,17 +147,20 @@ namespace casadi {
     // Nonzero reference
     OP_GETNONZEROS,
 
+    // Parameteric nonzero reference
+    OP_GETNONZEROS_PARAM,
+
     // Nonzero addition
     OP_ADDNONZEROS,
+
+    // parametric nonzero addition
+    OP_ADDNONZEROS_PARAM,
 
     // Nonzero assignment
     OP_SETNONZEROS,
 
-    // Symbolic reference
-    OP_GET_ELEMENTS,
-
-    // Symbolic addition
-    OP_ADD_ELEMENTS,
+    // Parametric nonzero assignment
+    OP_SETNONZEROS_PARAM,
 
     // Set sparse
     OP_PROJECT,
@@ -1013,10 +1016,11 @@ namespace casadi {
     case OP_SUBREF:        return F<OP_SUBREF>::check;
     case OP_SUBASSIGN:     return F<OP_SUBASSIGN>::check;
     case OP_GETNONZEROS:   return F<OP_GETNONZEROS>::check;
+    case OP_GETNONZEROS_PARAM:   return F<OP_GETNONZEROS_PARAM>::check;
     case OP_ADDNONZEROS:   return F<OP_ADDNONZEROS>::check;
+    case OP_ADDNONZEROS_PARAM:   return F<OP_ADDNONZEROS>::check;
     case OP_SETNONZEROS:   return F<OP_SETNONZEROS>::check;
-    case OP_GET_ELEMENTS:  return F<OP_GET_ELEMENTS>::check;
-    case OP_ADD_ELEMENTS:  return F<OP_ADD_ELEMENTS>::check;
+    case OP_SETNONZEROS_PARAM:   return F<OP_SETNONZEROS>::check;
     case OP_PROJECT:       return F<OP_PROJECT>::check;
     case OP_ASSERTION:     return F<OP_ASSERTION>::check;
     case OP_MONITOR:       return F<OP_MONITOR>::check;
@@ -1539,10 +1543,11 @@ namespace casadi {
     case OP_SUBREF:         return "subref";
     case OP_SUBASSIGN:      return "subassign";
     case OP_GETNONZEROS:    return "getnonzeros";
+    case OP_GETNONZEROS_PARAM:    return "getnonzeros_param";
     case OP_ADDNONZEROS:    return "addnonzeros";
+    case OP_ADDNONZEROS_PARAM:    return "addnonzeros_param";
     case OP_SETNONZEROS:    return "setnonzeros";
-    case OP_GET_ELEMENTS:   return "get_elements";
-    case OP_ADD_ELEMENTS:   return "add_elements";
+    case OP_SETNONZEROS_PARAM:    return "setnonzeros_param";
     case OP_PROJECT:        return "project";
     case OP_ASSERTION:      return "assertion";
     case OP_NORM2:          return "norm2";

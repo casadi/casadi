@@ -289,6 +289,9 @@ private:
   /// Get an pointer of sets of booleans from a double vector
   CASADI_EXPORT const bvec_t* get_bvec_t(const std::vector<double>& v);
 
+  /// Bit-wise or operation on bvec_t array
+  CASADI_EXPORT bvec_t bvec_or(const bvec_t* arg, casadi_int n);
+
   /// Get an pointer of sets of booleans from a double vector
   template<typename T>
   bvec_t* get_bvec_t(std::vector<T>& v);

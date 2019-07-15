@@ -133,8 +133,9 @@ set(CASADI_INTERNAL
   subref.hpp              subref.cpp              # Submatrix reference
   subassign.hpp           subassign.cpp           # Submatrix assignment
   getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
+  getnonzeros_param.hpp   getnonzeros_param.cpp   # Get the nonzeros of matrix, parametrically
   setnonzeros.hpp         setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
-  get_elements.hpp        get_elements.cpp        # Get elements of matrix by a symbolic slice
+  setnonzeros_param.hpp   setnonzeros_param_impl.hpp  # Assign the nonzeros of a matrix to another matrix
   project.hpp             project.cpp             # Sparse copy to another sparsity pattern
   determinant.hpp         determinant.cpp         # Determinant
   inverse.hpp             inverse.cpp             # Matrix inverse

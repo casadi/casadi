@@ -394,5 +394,17 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     return ss.str();
   }
 
+  bvec_t bvec_or(const bvec_t* arg, casadi_int n) {
+    bvec_t acc = 0;
+    // vacuous truth
+    if (n==0) {
+      return~acc;
+    }
+    for (casadi_int i=0;i<n;++i) {
+      acc |= arg[i];
+    }
+    return acc;
+  }
+
 
 } // namespace casadi

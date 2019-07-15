@@ -33,7 +33,9 @@
 #include "subref.hpp"
 #include "subassign.hpp"
 #include "getnonzeros.hpp"
+#include "getnonzeros_param.hpp"
 #include "setnonzeros.hpp"
+#include "setnonzeros_param.hpp"
 #include "project.hpp"
 #include "solve.hpp"
 #include "unary_mx.hpp"
@@ -53,12 +55,12 @@
 #include "io_instruction.hpp"
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
-#include "get_elements.hpp"
 #include "map.hpp"
 #include "bspline.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
+#include "setnonzeros_param_impl.hpp"
 #include "solve_impl.hpp"
 #include "binary_mx_impl.hpp"
 
@@ -512,6 +514,10 @@ namespace casadi {
     return GetNonzeros::create(sp, shared_from_this<MX>(), nz);
   }
 
+  MX MXNode::get_nz_ref(const MX& nz) const {
+    return GetNonzerosParam::create(shared_from_this<MX>(), nz);
+  }
+
   MX MXNode::get_nzassign(const MX& y, const vector<casadi_int>& nz) const {
     // Check if any element needs to be set at all
     bool set_any = false;
@@ -529,6 +535,19 @@ namespace casadi {
       return y;
     } else {
       return SetNonzeros<true>::create(y, shared_from_this<MX>(), nz);
+    }
+  }
+
+  MX MXNode::get_nzassign(const MX& y, const MX& nz) const {
+    return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), nz);
+  }
+
+
+  MX MXNode::get_nzadd(const MX& y, const MX& nz) const {
+    if (nz.is_empty() || is_zero()) {
+      return y;
+    } else {
+      return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), nz);
     }
   }
 
@@ -1042,10 +1061,11 @@ namespace casadi {
     // OP_SUBREF
     // OP_SUBASSIGN,
     {OP_GETNONZEROS, GetNonzeros::deserialize},
+    {OP_GETNONZEROS_PARAM, GetNonzerosParam::deserialize},
     {OP_ADDNONZEROS, SetNonzeros<true>::deserialize},
+    {OP_ADDNONZEROS_PARAM, SetNonzerosParam<true>::deserialize},
     {OP_SETNONZEROS, SetNonzeros<false>::deserialize},
-    {OP_GET_ELEMENTS, GetElements::deserialize},
-    // OP_ADD_ELEMENTS
+    {OP_SETNONZEROS_PARAM, SetNonzerosParam<false>::deserialize},
     {OP_PROJECT, Project::deserialize},
     {OP_ASSERTION, Assertion::deserialize},
     {OP_MONITOR, Monitor::deserialize},

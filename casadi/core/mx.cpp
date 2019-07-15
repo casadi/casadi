@@ -399,6 +399,11 @@ namespace casadi {
     m = (*this)->get_nzref(tr ? kk.sparsity().T() : kk.sparsity(), kk.nonzeros());
   }
 
+  void MX::get_nz(MX& m, bool ind1, const MX& kk) const {
+    // Create return MX
+    m = (*this)->get_nz_ref(ind1 ? kk-1.0 : kk);
+  }
+
   void MX::set_nz(const MX& m, bool ind1, const Slice& kk) {
     // Fallback on IM
     set_nz(m, ind1, kk.all(nnz(), ind1));
@@ -458,6 +463,10 @@ namespace casadi {
 
     // Create a nonzero assignment node
     *this = m->get_nzassign(*this, kk.nonzeros());
+  }
+
+  void MX::set_nz(const MX& m, bool ind1, const MX& kk) {
+    *this = m->get_nzassign(*this, kk);
   }
 
   MX MX::binary(casadi_int op, const MX &x, const MX &y) {

@@ -363,12 +363,16 @@ namespace casadi {
     /// Get a set of nonzeros
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Slice& kk) const;
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& kk) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const MX& kk) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, casadi_int kk) const { get_nz(m, ind1, Matrix<casadi_int>(kk)); }
     ///@}
 
     ///@{
     /// Set a set of nonzeros
     void set_nz(const MX& m, bool ind1, const Slice& kk);
     void set_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk);
+    void set_nz(const MX& m, bool ind1, const MX& kk);
+    void set_nz(const MX& m, bool ind1, casadi_int kk) { set_nz(m, ind1, Matrix<casadi_int>(kk)); }
     ///@}
 
     ///@{

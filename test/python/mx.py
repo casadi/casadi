@@ -2779,7 +2779,35 @@ class MXtests(casadiTestCase):
 
     with self.assertInException("Not defined for ConstantFile"):
       x.to_DM()
-    
+  
+  def test_nonzeros_param(self):
+    x = MX.sym("x",2)
+    y = MX.sym("y")
+  
+    for ad_weight_sp in [0,1]:
+      opts = {"helper_options":{"ad_weight_sp":ad_weight_sp}}
+      z = x.nz[y]
+      J = jacobian(z,x,opts)
+      self.assertTrue(J.size()==(1,2))
+      self.assertTrue(J.nnz()==2)
+      J = jacobian(z,y,opts)
+      self.assertTrue(J.size()==(1,1))
+      self.assertTrue(J.nnz()==0)
+
+      q = MX.sym("q")
+      z = MX(x)
+      z.nz[y] = q
+
+      J = jacobian(z,x,opts)
+      self.assertTrue(J.size()==(2,2))
+      self.assertTrue(J.nnz()==4)
+      J = jacobian(z,y,opts)
+      self.assertTrue(J.size()==(2,1))
+      self.assertTrue(J.nnz()==0)
+      J = jacobian(z,q,opts)
+      self.assertTrue(J.size()==(2,1))
+      self.assertTrue(J.nnz()==2)
+
 
 
 if __name__ == '__main__':

@@ -355,6 +355,11 @@ namespace casadi {
     */
     virtual MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const;
 
+    /** \brief Get the nonzeros of matrix, parametrically
+    *
+    */
+    virtual MX get_nz_ref(const MX& nz) const;
+
     /** \brief Assign the nonzeros of a matrix to another matrix
     *
     *   a->get_nzassign(b,nz)
@@ -368,6 +373,20 @@ namespace casadi {
     *   returns b with b[nz]+=a
     */
     virtual MX get_nzadd(const MX& y, const std::vector<casadi_int>& nz) const;
+
+    /** \brief Assign the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
+    virtual MX get_nzassign(const MX& y, const MX& nz) const;
+
+    /** \brief Add the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
+    virtual MX get_nzadd(const MX& y, const MX& nz) const;
 
     /// Get submatrix reference
     virtual MX get_subref(const Slice& i, const Slice& j) const;
