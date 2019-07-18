@@ -85,7 +85,7 @@ add_dependencies(install_python _casadi)
 
 # Install C++ wrapper library
 install(TARGETS _casadi
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${Python_SITELIB}/casadi"
   COMPONENT install_python
 )
 
