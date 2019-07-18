@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 # Find Python
-find_package(Python REQUIRED)
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${Python_INCLUDE_DIRS})
