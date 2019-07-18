@@ -1,49 +1,10 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.12)
 
-# Workaround for OS X
-if(APPLE)
-  if(WITH_PYTHON3)
-  set(PYTHON_CONFIG_NAME python3-config)
-  else()
-  set(PYTHON_CONFIG_NAME python-config)
-  endif()
-  find_program(PYTHON_CONFIG_EXECUTABLE
-               NAMES ${PYTHON_CONFIG_NAME} DOC "python-config executable")
-  if(PYTHON_CONFIG_EXECUTABLE)
-    execute_process(COMMAND ${PYTHON_CONFIG_EXECUTABLE} --prefix
-                    OUTPUT_VARIABLE PYTHON_PREFIX_STRING
-                    RESULT_VARIABLE PYTHON_PREFIX_FAILED
-                    ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(NOT PYTHON_PREFIX_FAILED)
-      file(GLOB LOCAL_PYTHON_NAME RELATIVE ${PYTHON_PREFIX_STRING}/lib "${PYTHON_PREFIX_STRING}/lib/python*.*")
-      find_library(PYTHON_LIBRARY NAMES ${LOCAL_PYTHON_NAME}
-        PATHS ${PYTHON_PREFIX_STRING}/lib NO_DEFAULT_PATH)
-      file(GLOB LOCAL_PYTHON_NAME "${PYTHON_PREFIX_STRING}/include/python*")
-      find_path(PYTHON_INCLUDE_DIR
-        NAMES Python.h
-        PATHS ${LOCAL_PYTHON_NAME} NO_DEFAULT_PATH)
-    endif()
-    message(STATUS ${PYTHON_INCLUDE_DIR})
-  endif()
-endif()
-
-# Find packages
-if(WITH_PYTHON3)
-set(MINPYVERSION "3")
-else()
-set(MINPYVERSION "")
-endif()
-find_package(PythonInterp ${MINPYVERSION} REQUIRED)
-
-# We don't really need the libs, but the headers.
-find_package(PythonLibs ${MINPYVERSION})
-
-if(NOT PYTHON_INCLUDE_PATH)
-  message(SEND_ERROR "Python include headers not found, but required." )
-endif()
+# Find Python
+find_package(Python REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${PYTHON_INCLUDE_PATH})
+include_directories(${Python_INCLUDE_DIRS})
 
 # a python library is built in the build directory inside swig/python
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
@@ -55,7 +16,7 @@ endif()
 set(PYTHONFLAG "")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPy_USING_UNICODE")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-noproxydel")
-if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
+if (${Python_VERSION_MAJOR} EQUAL 3)
 set(PYTHONFLAG "3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-py3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
@@ -106,10 +67,10 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 if(WIN32) # dlls don't allow missing symbols
-  if(NOT PYTHON_LIBRARIES)
+  if(NOT Python_LIBRARIES)
     message(SEND_ERROR "Python libraries not found, but required." )
   endif()
-  target_link_libraries(_casadi ${PYTHON_LIBRARIES})
+  target_link_libraries(_casadi ${Python_LIBRARIES})
 endif()
 target_link_libraries(_casadi casadi)
 
@@ -131,20 +92,20 @@ install(TARGETS _casadi
 if (SWIG_IMPORT)
 # Install Python proxy classes
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.py
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${Python_SITELIB}/casadi"
   COMPONENT install_python
 )
 else()
 # Install Python proxy classes
 install(FILES ${PROJECT_BINARY_DIR}/swig/python/casadi.py
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${Python_SITELIB}/casadi"
   COMPONENT install_python
 )
 endif()
 
 # Install Python tools
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${Python_SITELIB}/casadi"
   COMPONENT install_python
   USE_SOURCE_PERMISSIONS
   PATTERN .pyc EXCLUDE
@@ -153,7 +114,7 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
 
 # Install Python package initialization
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${Python_SITELIB}/casadi"
   COMPONENT install_python
 )
 
@@ -172,17 +133,17 @@ if (WITH_EXTENDING_CASADI)
   add_custom_target(extending_casadi_python DEPENDS _extending_casadi extending_casadi)
 
   install(TARGETS _extending_casadi
-    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    DESTINATION "${Python_SITELIB}/extending_casadi"
     COMPONENT install_python
   )
 
   install(FILES ${PROJECT_BINARY_DIR}/swig/python/extending_casadi.py
-    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    DESTINATION "${Python_SITELIB}/extending_casadi"
     COMPONENT install_python
   )
 
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../extending_casadi/__init__.py
-    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    DESTINATION "${Python_SITELIB}/extending_casadi"
     COMPONENT install_python
   )
 
