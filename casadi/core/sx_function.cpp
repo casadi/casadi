@@ -144,7 +144,7 @@ namespace casadi {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
-      casadi_error("Code generation is not possible since variables "
+      casadi_error("Code generation of '" + name_ + "' is not possible since variables "
                    + str(free_vars_) + " are free.");
     }
   }
