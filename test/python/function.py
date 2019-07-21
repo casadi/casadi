@@ -411,6 +411,70 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(out,25)
 
+  def test_callback_buffer(self):
+    class mycallback(Callback):
+      def __init__(self, name, opts={}):
+        Callback.__init__(self)
+        self.construct(name, opts)
+      def has_eval_buffer(self): return True
+      def eval_buffer(self, arg, res):
+        a = np.frombuffer(arg[0], dtype=np.float64)
+        r = np.frombuffer(res[0], dtype=np.float64)
+        r[:] = a**2
+        return 0
+
+    foo = mycallback("my_f")
+
+    x = MX.sym('x')
+    y = foo(x)
+
+    f = Function("f",[x],[y])
+
+    out = f(5)
+
+    self.checkarray(out,25)
+
+    class mycallback(Callback):
+      def __init__(self, name, opts={}):
+        Callback.__init__(self)
+        self.construct(name, opts)
+      def has_eval_buffer(self): return True
+      def get_n_in(self): return 3
+      def get_n_out(self): return 2
+      def get_sparsity_in(self, i):
+        if i==0:
+          return Sparsity.dense(1,1)
+        elif i==1:
+          return Sparsity.dense(3,1)
+        elif i==2:
+          return Sparsity.dense(3,3)
+      def get_sparsity_out(self, i):
+        if i==0:
+          return Sparsity.dense(3,1)
+        elif i==1:
+          return Sparsity.dense(3,3)
+      def eval_buffer(self, arg, res):
+        a = np.frombuffer(arg[0], dtype=np.float64)
+        b = np.frombuffer(arg[1], dtype=np.float64)
+        c = np.frombuffer(arg[2], dtype=np.float64).reshape((3,3), order='F')
+        print(c)
+        r0 = np.frombuffer(res[0], dtype=np.float64)
+        r1 = np.frombuffer(res[1], dtype=np.float64).reshape((3,3), order='F')
+        r0[:] = np.dot(a*c,b)
+        r1[:,:] = c**2
+        return 0
+
+    foo = mycallback("my_f")
+
+    a = 3
+    b = DM([1,2,3])
+    c = DM([[1,2,3],[4,5,6],[7,8,9]])
+
+    res = foo(a,b,c)
+
+    self.checkarray(res[0],mtimes(a*c,b))
+    self.checkarray(res[1],c**2)
+
   def test_callback_errors(self):
     class mycallback(Callback):
       def __init__(self, name, opts={}):
@@ -2415,6 +2479,24 @@ class Functiontests(casadiTestCase):
     self.checkfunction(J,J_ref,inputs=inputs,digits=8,digits_sens=1,evals=1)
 
 
-          
+  def test_functionbuffer(self):
+    A_ = np.random.random((4,4))
+    B_ = np.zeros((4,4))
+
+    A = MX.sym("A",4,4)
+
+    f = Function("f",[A],[A*10])
+
+
+    [buf,f_eval] = f.buffer()
+    buf.set_arg(0, memoryview(A_))
+    buf.set_res(0, memoryview(B_))
+
+    f_eval()
+
+    self.checkarray(B_, 10*A_)
+
+    self.assertEqual(buf.ret(), 0)
+
 if __name__ == '__main__':
     unittest.main()

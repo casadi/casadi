@@ -1694,5 +1694,67 @@ namespace casadi {
     return (*this)->info();
   }
 
+  FunctionBuffer::FunctionBuffer(const Function& f) : f_(f) {
+    w_.resize(f_.sz_w());
+    iw_.resize(f_.sz_iw());
+    arg_.resize(f_.sz_arg());
+    res_.resize(f_.sz_res());
+    mem_ = f_->checkout();
+    mem_internal_ = f.memory(mem_);
+    f_node_ = f.operator->();
+  }
+
+  FunctionBuffer::~FunctionBuffer() {
+    if (f_->release_) {
+      f_->release_(mem_);
+    } else {
+      f_.release(mem_);
+    }
+  }
+
+  FunctionBuffer::FunctionBuffer(const FunctionBuffer& f) : f_(f.f_) {
+    operator=(f);
+  }
+
+  FunctionBuffer& FunctionBuffer::operator=(const FunctionBuffer& f) {
+    f_ = f.f_;
+    w_ = f.w_; iw_ = f.iw_; arg_ = f.arg_; res_ = f.res_; f_node_ = f.f_node_;
+    // Checkout fresh memory
+    if (f_->checkout_) {
+      mem_ = f_->checkout_();
+    } else {
+      mem_ = f_.checkout();
+      mem_internal_ = f_.memory(mem_);
+    }
+
+    return *this;
+  }
+
+  void FunctionBuffer::set_arg(casadi_int i, const double* a, casadi_int size) {
+    casadi_assert(size>=f_.nnz_in(i)*sizeof(double),
+     "Buffer is not large enough. Needed " + str(f_.nnz_in(i)*sizeof(double)) +
+     " bytes, got " + str(size) + ".");
+    arg_.at(i) = a;
+  }
+  void FunctionBuffer::set_res(casadi_int i, double* a, casadi_int size) {
+    casadi_assert(size>=f_.nnz_out(i)*sizeof(double),
+     "Buffer is not large enough. Needed " + str(f_.nnz_out(i)*sizeof(double)) +
+     " bytes, got " + str(size) + ".");
+    res_.at(i) = a;
+  }
+  void FunctionBuffer::_eval() {
+    if (f_node_->eval_) {
+      ret_ = f_node_->eval_(get_ptr(arg_), get_ptr(res_), get_ptr(iw_), get_ptr(w_), mem_);
+    } else {
+      ret_ = f_node_->eval(get_ptr(arg_), get_ptr(res_), get_ptr(iw_), get_ptr(w_), mem_internal_);
+    }
+  }
+  int FunctionBuffer::ret() {
+    return ret_;
+  }
+
+  void CASADI_EXPORT _function_buffer_eval(void* raw) {
+    static_cast<FunctionBuffer*>(raw)->_eval();
+  }
 
 } // namespace casadi

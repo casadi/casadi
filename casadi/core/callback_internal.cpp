@@ -39,7 +39,7 @@ namespace casadi {
 
   CallbackInternal::
   CallbackInternal(const std::string& name, Callback *self)
-    : FunctionInternal(name), self_(self) {
+    : FunctionInternal(name), self_(self), has_eval_buffer_(false) {
   }
 
   CallbackInternal::~CallbackInternal() {
@@ -70,6 +70,10 @@ namespace casadi {
     TRY_CALL(get_name_out, self_, i);
   }
 
+  bool CallbackInternal::has_eval_buffer() const {
+    TRY_CALL(has_eval_buffer, self_);
+  }
+
   void CallbackInternal::init(const Dict& opts) {
     // Initialize the base classes
     FunctionInternal::init(opts);
@@ -86,10 +90,33 @@ namespace casadi {
 
     // Finalize the base classes
     FunctionInternal::finalize();
+
+    has_eval_buffer_ = has_eval_buffer();
+
+    if (has_eval_buffer_) {
+      sizes_arg_.resize(n_in_);
+      for (casadi_int i=0;i<n_in_;++i) {
+        sizes_arg_[i] = nnz_in(i);
+      }
+      sizes_res_.resize(n_out_);
+      for (casadi_int i=0;i<n_out_;++i) {
+        sizes_res_[i] = nnz_out(i);
+      }
+    }
   }
 
   std::vector<DM> CallbackInternal::eval_dm(const std::vector<DM>& arg) const {
     TRY_CALL(eval, self_, arg);
+  }
+
+  /** \brief  Evaluate numerically */
+  int CallbackInternal::eval(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const {
+    if (has_eval_dm()) {
+      return FunctionInternal::eval(arg, res, iw, w, mem);
+    } else {
+      TRY_CALL(eval_buffer, self_, arg, sizes_arg_, res, sizes_res_);
+    }
   }
 
   bool CallbackInternal::uses_output() const {

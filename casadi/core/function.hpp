@@ -29,6 +29,7 @@
 #include "mx.hpp"
 #include "printable.hpp"
 #include <exception>
+#include <stack>
 
 namespace casadi {
 
@@ -1023,6 +1024,52 @@ namespace casadi {
 
 
   };
+
+
+/** \brief Class to achieve minimal overhead function evaluations
+*/
+class CASADI_EXPORT FunctionBuffer {
+  Function f_;
+  std::vector<double> w_;
+  std::vector<casadi_int> iw_;
+  std::vector<const double*> arg_;
+  std::vector<double*> res_;
+  FunctionInternal* f_node_;
+  casadi_int mem_;
+  void *mem_internal_;
+  int ret_;
+public:
+  /** \brief Main constructor */
+  FunctionBuffer(const Function& f);
+#ifndef SWIG
+  ~FunctionBuffer();
+  FunctionBuffer(const FunctionBuffer& f);
+  FunctionBuffer& operator=(const FunctionBuffer& f);
+#endif // SWIG
+
+  /** \brief Set input buffer for input i
+
+      mem.set_arg(0, memoryview(a))
+
+      Note that CasADi uses 'fortran' order: column-by-column
+  */
+  void set_arg(casadi_int i, const double* a, casadi_int size);
+
+  /** \brief Set output buffer for ouput i
+
+      mem.set_res(0, memoryview(a))
+
+      Note that CasADi uses 'fortran' order: column-by-column
+  */
+  void set_res(casadi_int i, double* a, casadi_int size);
+  /// Get last return value
+  int ret();
+  void _eval();
+  void* _self() { return this; }
+};
+
+void CASADI_EXPORT _function_buffer_eval(void* raw);
+
 
 } // namespace casadi
 
