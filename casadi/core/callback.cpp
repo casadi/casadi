@@ -52,6 +52,13 @@ namespace casadi {
     }
   }
 
+  int Callback::eval_buffer(const double **arg, const std::vector<casadi_int>& sizes_arg,
+                              double **res, const std::vector<casadi_int>& sizes_res) const {
+    casadi_error("eval_buffer not overloaded.");
+  }
+  bool Callback::has_eval_buffer() const {
+    return false;
+  }
   std::vector<DM> Callback::eval(const std::vector<DM>& arg) const {
     return (*this)->FunctionInternal::eval_dm(arg);
   }

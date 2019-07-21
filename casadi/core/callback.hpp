@@ -85,7 +85,15 @@ namespace casadi {
     /** \brief Evaluate numerically, temporary matrices and work vectors */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
-   /** \brief Get the number of inputs
+    /** \brief A copy-free low level interface 
+     * 
+     * In Python, you will be passed two tuples of memoryview objects
+    */
+    virtual int eval_buffer(const double **arg, const std::vector<casadi_int>& sizes_arg,
+                              double **res, const std::vector<casadi_int>& sizes_res) const;
+    virtual bool has_eval_buffer() const;
+
+    /** \brief Get the number of inputs
      * This function is called during construction.
      */
     virtual casadi_int get_n_in();

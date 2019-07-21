@@ -29,8 +29,12 @@
 #include "mx.hpp"
 #include "printable.hpp"
 #include <exception>
+#include <stack>
 
 namespace casadi {
+
+
+
 
 #ifndef SWIG
   /** Forward declaration of internal class */
@@ -416,6 +420,13 @@ namespace casadi {
               bool always_inline=false, bool never_inline=false) const;
     ///@}
 
+    /** \brief Evaluate with temporary memory allocation */
+    void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
+
+    /** \brief Evaluate numerically with checkout/release */
+    int operator()(const double** arg, double** res,
+        casadi_int* iw, double* w) const;
+
 #ifndef SWIG
     /// Check if same as another function
     bool operator==(const Function& f) const;
@@ -432,7 +443,6 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate with temporary memory allocation */
-    void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
     void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const;
     void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const;
     template<typename D> void call_gen(std::vector<const D*> arg, std::vector<D*> res) const;
@@ -484,10 +494,6 @@ namespace casadi {
     /** \brief Evaluate memory-less, numerically */
     int operator()(const double** arg, double** res,
         casadi_int* iw, double* w, int mem) const;
-
-    /** \brief Evaluate numerically with checkout/release */
-    int operator()(const double** arg, double** res,
-        casadi_int* iw, double* w) const;
 
     /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
@@ -1021,8 +1027,53 @@ namespace casadi {
 #endif // SWIG
 
 
-
   };
+
+
+/** \brief Class to achieve minimal overhead function evaluations
+*/
+class CASADI_EXPORT FunctionBuffer {
+  Function f_;
+  std::vector<double> w_;
+  std::vector<casadi_int> iw_;
+  std::vector<const double*> arg_;
+  std::vector<double*> res_;
+  FunctionInternal* f_node_;
+  casadi_int mem_;
+  void *mem_internal_;
+  int ret_;
+public:
+  /** \brief Main constructor */
+  FunctionBuffer(const Function& f);
+#ifndef SWIG
+  ~FunctionBuffer();
+  FunctionBuffer(const FunctionBuffer& f);
+  FunctionBuffer& operator=(const FunctionBuffer& f);
+#endif // SWIG
+
+  /** \brief Set input buffer for input i
+
+      mem.set_arg(0, memoryview(a))
+
+      Note that CasADi uses 'fortran' order: column-by-column
+  */
+  void set_arg(casadi_int i, const double* a, casadi_int size);
+
+  /** \brief Set output buffer for ouput i
+
+      mem.set_res(0, memoryview(a))
+
+      Note that CasADi uses 'fortran' order: column-by-column
+  */
+  void set_res(casadi_int i, double* a, casadi_int size);
+  /// Get last return value
+  int ret();
+  void _eval();
+  void* _self() { return this; }
+};
+
+void CASADI_EXPORT _function_buffer_eval(void* raw);
+
 
 } // namespace casadi
 

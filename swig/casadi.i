@@ -23,6 +23,7 @@
  */
 
 
+
 %module(package="casadi",directors=1) casadi
 
 #ifdef CASADI_WITH_COPYSIGN_UNDEF
@@ -2294,6 +2295,58 @@ namespace std {
   #define L_STR "str"
 #endif
 
+%typemap(in, doc="memoryview(ro)", noblock=1, fragment="casadi_all") (const double * a, casadi_int size) (Py_buffer* buffer) {
+  if (!PyMemoryView_Check($input)) SWIG_exception_fail(SWIG_TypeError, "Must supply a MemoryView.");
+  buffer = PyMemoryView_GET_BUFFER($input);
+  $1 = static_cast<double*>(buffer->buf); // const double cast comes later
+  $2 = buffer->len;
+ }
+
+%typemap(in, doc="memoryview(rw)", noblock=1, fragment="casadi_all") (double * a, casadi_int size)  (Py_buffer* buffer) {
+  if (!PyMemoryView_Check($input)) SWIG_exception_fail(SWIG_TypeError, "Must supply a writable MemoryView.");
+  buffer = PyMemoryView_GET_BUFFER($input);
+  if (buffer->readonly) SWIG_exception_fail(SWIG_TypeError, "Must supply a writable MemoryView.");
+  $1 = static_cast<double*>(buffer->buf);
+  $2 = buffer->len;
+ }
+
+// Directorin typemap; as output
+%typemap(directorin, noblock=1, fragment="casadi_all") (const double** arg, const std::vector<casadi_int>& sizes_arg) (PyObject* my_tuple) {
+  PyObject * arg_tuple = PyTuple_New($2.size());
+  for (casadi_int i=0;i<$2.size();++i) {
+    
+#ifdef WITH_PYTHON3
+    PyObject* buf = $1[i] ? PyMemoryView_FromMemory(reinterpret_cast<char*>(const_cast<double*>($1[i])), $2[i]*sizeof(double), PyBUF_READ) : SWIG_Py_Void();
+#else
+    PyObject* buf = $1[i] ? PyBuffer_FromMemory(const_cast<double*>($1[i]), $2[i]*sizeof(double)) : SWIG_Py_Void();
+#endif
+    PyTuple_SET_ITEM(arg_tuple, i, buf);
+  }
+  $input = arg_tuple;
+}
+
+%typemap(directorin, noblock=1, fragment="casadi_all") (double** res, const std::vector<casadi_int>& sizes_res) {
+  PyObject* res_tuple = PyTuple_New($2.size());
+  for (casadi_int i=0;i<$2.size();++i) {
+#ifdef WITH_PYTHON3
+    PyObject* buf = $1[i] ? PyMemoryView_FromMemory(reinterpret_cast<char*>(const_cast<double*>($1[i])), $2[i]*sizeof(double), PyBUF_WRITE) : SWIG_Py_Void();
+#else
+    PyObject* buf = $1[i] ? PyBuffer_FromReadWriteMemory($1[i], $2[i]*sizeof(double)) : SWIG_Py_Void();
+#endif
+    PyTuple_SET_ITEM(res_tuple, i, buf);
+  }
+  $input = res_tuple;
+}
+
+
+%typemap(in, doc="void*", noblock=1, fragment="casadi_all") void* raw {
+  $1 = PyCapsule_GetPointer($input, NULL);
+}
+
+%typemap(out, doc="void*", noblock=1, fragment="casadi_all") void* {
+  $result = PyCapsule_New($1, NULL,NULL);
+}
+
 %casadi_typemaps(L_STR, PREC_STRING, std::string)
 %casadi_template(LL L_STR LR, PREC_VECTOR, std::vector<std::string>)
 %casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
@@ -3968,8 +4021,21 @@ namespace casadi{
       else:
         # Named inputs -> return dictionary
         return self.call(kwargs)
+
+    def buffer(self):
+      """
+      Create a FunctionBuffer object for evaluating with minimal overhead
+
+      """
+      import functools
+      fb = FunctionBuffer(self)
+      caller = functools.partial(_casadi._function_buffer_eval, fb._self())
+      return (fb, caller)
   %}
+
+
  }
+
 }
 #endif // SWIGPYTHON
 
