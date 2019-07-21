@@ -410,7 +410,6 @@ namespace casadi {
     (*this)(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-
   void Function::operator()(vector<const double*> arg, vector<double*> res) const {
     return call_gen(arg, res);
   }

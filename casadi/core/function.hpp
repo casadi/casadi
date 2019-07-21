@@ -33,6 +33,9 @@
 
 namespace casadi {
 
+
+
+
 #ifndef SWIG
   /** Forward declaration of internal class */
   class FunctionInternal;
@@ -417,6 +420,13 @@ namespace casadi {
               bool always_inline=false, bool never_inline=false) const;
     ///@}
 
+    /** \brief Evaluate with temporary memory allocation */
+    void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
+
+    /** \brief Evaluate numerically with checkout/release */
+    int operator()(const double** arg, double** res,
+        casadi_int* iw, double* w) const;
+
 #ifndef SWIG
     /// Check if same as another function
     bool operator==(const Function& f) const;
@@ -433,7 +443,6 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate with temporary memory allocation */
-    void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
     void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const;
     void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const;
     template<typename D> void call_gen(std::vector<const D*> arg, std::vector<D*> res) const;
@@ -485,10 +494,6 @@ namespace casadi {
     /** \brief Evaluate memory-less, numerically */
     int operator()(const double** arg, double** res,
         casadi_int* iw, double* w, int mem) const;
-
-    /** \brief Evaluate numerically with checkout/release */
-    int operator()(const double** arg, double** res,
-        casadi_int* iw, double* w) const;
 
     /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
@@ -1020,7 +1025,6 @@ namespace casadi {
 
 
 #endif // SWIG
-
 
 
   };
