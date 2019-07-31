@@ -30,10 +30,17 @@
 #include "casadi_misc.hpp"
 #include "function_internal.hpp"
 #include "runtime/shared.hpp"
+#include "importer_internal.hpp"
 
 using namespace std;
 
 namespace casadi {
+
+
+  typedef void (*einstein_external)(casadi_int, const casadi_int*, const casadi_int*,
+                                    casadi_int, const casadi_int*, const casadi_int*,
+                                    casadi_int, const casadi_int*, const casadi_int*,
+                                    const double*, const double*, double*);
 
   Einstein::Einstein(const MX& C, const MX& A, const MX& B,
     const std::vector<casadi_int>& dim_c, const std::vector<casadi_int>& dim_a,
@@ -45,6 +52,15 @@ namespace casadi {
     set_dep(C, A, B);
     set_sparsity(C.sparsity());
 
+    pure_ = true;
+    for (auto i : a) pure_ = pure_ && i<0;
+    for (auto i : b) pure_ = pure_ && i<0;
+    for (auto i : c) pure_ = pure_ && i<0;
+
+    pure_ = pure_ && !a.empty();
+    pure_ = pure_ && !b.empty();
+    pure_ = pure_ && !c.empty();
+
     n_iter_ = einstein_process(A, B, C, dim_a, dim_b, dim_c, a, b, c,
       iter_dims_, strides_a_, strides_b_, strides_c_);
 
@@ -55,7 +71,22 @@ namespace casadi {
   }
 
   int Einstein::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
-    return eval_gen<double>(arg, res, iw, w);
+    if (pure_) {
+      if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+
+      DllLoader wrapper("tcl_wrapper.dll");
+      wrapper.init_handle();
+      einstein_external cb = (einstein_external) wrapper.get_function("einstein_eval");
+      casadi_assert_dev(cb);
+      cb(dim_a_.size(), get_ptr(dim_a_), get_ptr(a_),
+        dim_b_.size(), get_ptr(dim_b_), get_ptr(b_),
+        dim_c_.size(), get_ptr(dim_c_), get_ptr(c_),
+        arg[1], arg[2], res[0]);
+    } else {
+      return eval_gen<double>(arg, res, iw, w);
+    }
+
+    return 0;
   }
 
   int Einstein::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
@@ -65,7 +96,7 @@ namespace casadi {
   template<typename T>
   int Einstein::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-
+  
     einstein_eval(n_iter_, iter_dims_, strides_a_, strides_b_, strides_c_, arg[1], arg[2], res[0]);
     return 0;
   }

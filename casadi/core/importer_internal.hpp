@@ -152,6 +152,36 @@ namespace casadi {
     explicit ImporterInternal(DeserializingStream& s);
   };
 
+
+ /** \brief Dynamically linked library
+      \author Joel Andersson
+      \date 2016
+  */
+  class CASADI_EXPORT
+  DllLoader {
+  private:
+#if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
+    typedef HINSTANCE handle_t;
+#else
+    typedef void* handle_t;
+#endif
+    handle_t handle_;
+    std::string name_;
+  public:
+
+    // Constructor
+    explicit DllLoader(const std::string& bin_name);
+
+    // Dummy type
+    void* get_function(const std::string& symname);
+
+    // Destructor
+    ~DllLoader();
+
+    void init_handle();
+
+  };
+
   /** \brief Dynamically linked library
       \author Joel Andersson
       \date 2016
