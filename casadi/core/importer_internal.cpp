@@ -309,7 +309,7 @@ namespace casadi {
   void* DllLoader::get_function(const std::string& sym) {
 #ifdef WITH_DL
 #ifdef _WIN32
-    return GetProcAddress(handle_, TEXT(sym.c_str()));
+    return (void*) GetProcAddress(handle_, TEXT(sym.c_str()));
 #else // _WIN32
     void* fcnPtr = dlsym(handle_, sym.c_str());
     if (dlerror()) {

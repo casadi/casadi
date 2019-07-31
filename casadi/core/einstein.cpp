@@ -60,6 +60,7 @@ namespace casadi {
     pure_ = pure_ && !a.empty();
     pure_ = pure_ && !b.empty();
     pure_ = pure_ && !c.empty();
+    pure_ = pure_ && GlobalOptions::experiment1;
 
     n_iter_ = einstein_process(A, B, C, dim_a, dim_b, dim_c, a, b, c,
       iter_dims_, strides_a_, strides_b_, strides_c_);
