@@ -237,13 +237,15 @@ namespace casadi {
     // Link step
     stringstream ldcmd;
     ldcmd << linker;
+
+    // Temporary file
+    ldcmd << " " << obj_name_ << " " + linker_output_flag + bin_name_;
+
+    // Add flags
     for (vector<string>::const_iterator i=linker_flags.begin(); i!=linker_flags.end(); ++i) {
       ldcmd << " " << *i;
     }
     ldcmd << " " << linker_setup;
-
-    // Temporary file
-    ldcmd << " " << obj_name_ << " " + linker_output_flag + bin_name_;
 
     // Compile into a shared library
     if (verbose_) casadi_message("calling \"" + ldcmd.str() + "\"");
