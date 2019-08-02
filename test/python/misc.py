@@ -485,6 +485,52 @@ class Misctests(casadiTestCase):
       with self.assertOutput(included, excluded):
         solver.solve(A,vertcat(1,2,3))
 
+  def test_record_time(self):
+
+
+    x = MX.sym("x")
+    f = x**2
+
+
+    opts = {"record_time":True}
+    ff = Function("f",[x],[f],opts)
+    ff(3)
+    self.assertTrue("t_proc_total" in ff.stats())
+    self.assertTrue(ff.stats()["t_proc_total"]>0)
+
+    solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    solver = integrator("integrator","rk",{"x":x,"ode":f},opts)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    integr_options = {}
+    integr_options["simplify"] = True
+    integr_options["simplify_options"] = opts
+    solver = integrator("integrator","rk",{"x":x,"ode":f},integr_options)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    A = DM.rand(3,3)
+    solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
+    solver.solve(A,vertcat(1,2,3))
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
 
 if __name__ == '__main__':
     unittest.main()

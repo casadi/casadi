@@ -115,6 +115,9 @@ namespace casadi {
       */
     casadi_int rank(const DM& A) const;
 
+   /// Get all statistics obtained at the end of the last evaluate call
+    Dict stats(int mem=1) const;
+
     #ifndef SWIG
     ///@{
     /// Low-level API

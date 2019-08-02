@@ -198,6 +198,10 @@ namespace casadi {
     return Linsol::doc(name);
   }
 
+  Dict Linsol::stats(int mem) const {
+    return (*this)->get_stats((*this)->memory(mem));
+  }
+
   void Linsol::serialize(SerializingStream &s) const {
     // TODO(jgillis): I don't get why LinsolInternal:: this is necessary
     return (*this)->LinsolInternal::serialize(s);

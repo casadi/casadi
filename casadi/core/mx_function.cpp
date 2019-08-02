@@ -1671,12 +1671,12 @@ namespace casadi {
       if (e.op==OP_CALL) {
         Function d = e.data.which_function();
         if (d.is_a("conic", true)) {
-          if (!dep.is_null()) return {};
+          if (!dep.is_null()) return stats;
           dep = d;
         }
       }
     }
-    if (dep.is_null()) return {};
+    if (dep.is_null()) return stats;
     return dep.stats(1);
   }
 
