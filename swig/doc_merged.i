@@ -76,6 +76,12 @@ original
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::size1_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -692,6 +698,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::get_reltol "
 
 [INTERNAL]  Get relative tolerance.
@@ -1050,7 +1062,15 @@ elements.
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -2607,6 +2627,12 @@ C++ includes: blocksqp.hpp ";
 
 ";
 
+%feature("docstring") casadi::Blocksqp::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Blocksqp::alloc_arg "
 
 [INTERNAL]  Ensure required length of arg field.
@@ -2900,6 +2926,12 @@ elements.
 %feature("docstring") casadi::Blocksqp::codegen_init_mem "
 
 [INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring") casadi::Blocksqp::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -3202,12 +3234,6 @@ a main.
 %feature("docstring") casadi::Blocksqp::jit_dependencies "
 
 [INTERNAL]  JIT for dependencies.
-
-";
-
-%feature("docstring") casadi::Blocksqp::print_fstats "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -4200,12 +4226,6 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::free_mem "
-
-[INTERNAL]  Free memory block.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::index_out "
 
 [INTERNAL]  Get output scheme index by name.
@@ -4603,9 +4623,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::get_stats "
+%feature("docstring") casadi::BSplineInterpolant::free_mem "
 
-[INTERNAL]  Get all statistics.
+[INTERNAL]  Free memory block.
 
 ";
 
@@ -4930,6 +4950,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::replace_arg "
 
 [INTERNAL]  Replace 0-by-0 inputs.
@@ -4985,6 +5011,12 @@ propagation.
 %feature("docstring") casadi::BSplineInterpolant::n_nodes "
 
 [INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::get_stats "
+
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -5216,6 +5248,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::BSplineInterpolant::get_partition "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -6597,6 +6635,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::CentralDiff::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::CentralDiff::numel_out "
 
 [INTERNAL]  Number of input/output elements.
@@ -6903,6 +6947,12 @@ elements.
 %feature("docstring") casadi::CentralDiff::getJacSparsity "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::CentralDiff::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -7726,7 +7776,15 @@ generated function.
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -8384,6 +8442,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Collocation::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Collocation::print_options "
 
 [INTERNAL]  Print list of options.
@@ -8713,12 +8777,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Collocation::print_fstats "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring") casadi::Collocation::sz_iw "
 
 [INTERNAL]  Get required length of iw field.
@@ -8735,6 +8793,12 @@ elements.
 %feature("docstring") casadi::Collocation::dm_in "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Collocation::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -10050,6 +10114,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Conic::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Conic::check_res "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
@@ -10482,6 +10552,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Conic::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Conic::map "
 
 [INTERNAL]  Generate/retrieve cached serial map.
@@ -10718,12 +10794,6 @@ structure recognition.
 %feature("docstring") casadi::Conic::size2_out "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::Conic::print_fstats "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -11114,7 +11184,15 @@ Internal class.
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -12433,7 +12511,15 @@ Internal class.
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -13031,6 +13117,12 @@ is_diff_in/out.
 
 ";
 
+%feature("docstring") casadi::Dple::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Dple::has_forward "
 
 [INTERNAL]  Generate a function that calculates nfwd forward derivatives.
@@ -13172,6 +13264,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Dple::init_mem "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring") casadi::Dple::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -14132,6 +14230,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::Expm::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Expm::alloc_arg "
 
 [INTERNAL]  Ensure required length of arg field.
@@ -14711,7 +14815,15 @@ Internal class.
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -15043,6 +15155,12 @@ structure recognition.
 %feature("docstring") casadi::Expm::get_max_in "
 
 [INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring") casadi::Expm::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -15550,6 +15668,12 @@ is_diff_in/out.
 
 ";
 
+%feature("docstring") casadi::External::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::External::weak "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -15839,6 +15963,12 @@ elements.
 %feature("docstring") casadi::External::release "
 
 [INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring") casadi::External::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -16923,9 +17053,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::FastNewton::print_fstats "
+%feature("docstring") casadi::FastNewton::codegen_name "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Get name in codegen.
 
 ";
 
@@ -17004,12 +17134,6 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::FastNewton::codegen_name "
-
-[INTERNAL]  Get name in codegen.
-
-";
-
 %feature("docstring") casadi::FastNewton::finalize "
 
 [INTERNAL]  Finalize initialization.
@@ -17066,6 +17190,12 @@ propagation.
 %feature("docstring") casadi::FastNewton::calc_function "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::FastNewton::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
 
 %feature("docstring") casadi::FastNewton::generate_options "
 
@@ -17159,6 +17289,12 @@ a main.
 %feature("docstring") casadi::FastNewton::get_default_in "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring") casadi::FastNewton::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -17731,6 +17867,12 @@ StringSerializer, FileDeserializer
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::FiniteDiff::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::alloc "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
@@ -18105,7 +18247,15 @@ StringSerializer, FileDeserializer
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -18938,6 +19088,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -19832,9 +19988,9 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::self "
+%feature("docstring") casadi::FixedStepIntegrator::eval_mx "
 
-[INTERNAL]  Get a public class instance.
+[INTERNAL]  Evaluate with symbolic matrices.
 
 ";
 
@@ -20026,6 +20182,12 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -20270,12 +20432,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::eval_mx "
-
-[INTERNAL]  Evaluate with symbolic matrices.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::index_out "
 
 [INTERNAL]  Get output scheme index by name.
@@ -20470,9 +20626,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::print_fstats "
+%feature("docstring") casadi::FixedStepIntegrator::self "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Get a public class instance.
 
 ";
 
@@ -20501,6 +20657,12 @@ multiplying.
 %feature("docstring") casadi::FixedStepIntegrator::instruction_output "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -21506,7 +21668,15 @@ structure recognition for symmetric Jacobians
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -21806,6 +21976,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::ForwardDiff::pert "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::ForwardDiff::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
 
 %feature("docstring") casadi::ForwardDiff::eval "
 
@@ -22321,6 +22497,12 @@ propagation.
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -23313,7 +23495,15 @@ member functions. Joel Andersson >List of available options
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats() .        |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -23997,6 +24187,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::GenericExternal::get_function "
 
 [INTERNAL] ";
@@ -24168,6 +24364,12 @@ generated function.
 %feature("docstring") casadi::GenericExternal::get_name_out "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::GenericExternal::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -24498,18 +24700,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::matching_arg "
+%feature("docstring") casadi::GenericExternal::free_mem "
 
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-Raises errors
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Free memory block.
 
 ";
 
@@ -24773,9 +24966,18 @@ elements.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::free_mem "
+%feature("docstring") casadi::GenericExternal::matching_arg "
 
-[INTERNAL]  Free memory block.
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -25874,9 +26076,9 @@ casadi::ImplicitFixedStepIntegrator::get_jacobian_sparsity "
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::print_fstats "
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen_decref "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Codegen decref for dependencies.
 
 ";
 
@@ -26464,12 +26666,6 @@ casadi::ImplicitFixedStepIntegrator::codegen_sparsities "
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen_decref "
-
-[INTERNAL]  Codegen decref for dependencies.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::getJacSparsity "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
@@ -26619,6 +26815,12 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -26873,6 +27075,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::numel_in "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -27149,12 +27357,6 @@ casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator "
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::print_fstats "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::ImplicitToNlp "
 
 [INTERNAL]  Constructor.
@@ -27288,6 +27490,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::ImplicitToNlp::dm_in "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -27751,6 +27959,12 @@ a main.
 %feature("docstring") casadi::ImplicitToNlp::alloc_w "
 
 [INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -28994,6 +29208,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Integrator::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Integrator::get_n_out "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -29211,6 +29431,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Integrator::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Integrator "
 
 Internal storage for integrator related data.
@@ -29355,9 +29581,10 @@ C++ includes: integrator_impl.hpp ";
 
 ";
 
-%feature("docstring") casadi::Integrator::print_fstats "
+%feature("docstring") casadi::Integrator::slice "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  returns a new function with a selection of inputs/outputs of the
+original
 
 ";
 
@@ -29807,13 +30034,6 @@ Parameters:
 npar[in]:  normal usage: 1, disallow pararallel calls: -1
 
 npar:  max number of horizontal repetitions across all arguments (or -1)
-
-";
-
-%feature("docstring") casadi::Integrator::slice "
-
-[INTERNAL]  returns a new function with a selection of inputs/outputs of the
-original
 
 ";
 
@@ -30285,6 +30505,12 @@ generated function.
 %feature("docstring") casadi::Interpolant::get_options "
 
 [INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::Interpolant::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -31293,7 +31519,15 @@ Internal class
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -31636,6 +31870,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Interpolant::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Interpolant::generate_dependencies "
 
 [INTERNAL]  Export / Generate C code for the dependency function.
@@ -31941,6 +32181,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::JitFunction::serialize_type "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring") casadi::JitFunction::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -32342,7 +32588,15 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -33154,6 +33408,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::JitFunction::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::JitFunction::jac "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -33937,7 +34197,15 @@ A: A = L.U, with L lower and U upper triangular
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -33985,6 +34253,12 @@ C++ includes: lapack_lu.hpp ";
 
 ";
 
+%feature("docstring") casadi::LapackLu::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::LapackLu::disp_more "
 
 [INTERNAL]  Print more.
@@ -33994,6 +34268,18 @@ C++ includes: lapack_lu.hpp ";
 %feature("docstring") casadi::LapackLu::neig "
 
 [INTERNAL]  Number of negative eigenvalues.
+
+";
+
+%feature("docstring") casadi::LapackLu::get_stats "
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::LapackLu::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -34036,6 +34322,12 @@ C++ includes: lapack_lu.hpp ";
 %feature("docstring") casadi::LapackQr::disp_more "
 
 [INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::LapackQr::get_stats "
+
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -34443,7 +34735,15 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -34563,9 +34863,21 @@ C++ includes: lapack_qr.hpp ";
 
 ";
 
+%feature("docstring") casadi::LapackQr::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::LapackQr::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::LapackQr::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -35221,6 +35533,12 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::has_codegen "
 
 [INTERNAL]  Is codegen supported?
@@ -35330,6 +35648,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::LinearInterpolant::dm_out "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -36189,6 +36513,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::codegen_body "
 
 [INTERNAL]  Generate code for the body of the C function.
@@ -36431,6 +36761,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -37351,6 +37687,12 @@ Get string representation.
 
 ";
 
+%feature("docstring") casadi::Linsol::stats "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
 %feature("docstring") casadi::Linsol::plugin_name "
 
 Query plugin name.
@@ -37413,6 +37755,12 @@ Get linear system sparsity.
 
 ";
 
+%feature("docstring") casadi::LinsolLdl::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::LinsolLdl::neig "
 
 [INTERNAL]  Number of negative eigenvalues.
@@ -37450,6 +37798,12 @@ Get linear system sparsity.
 %feature("docstring") casadi::LinsolLdl::alloc_mem "
 
 [INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring") casadi::LinsolLdl::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -37524,6 +37878,12 @@ C++ includes: linsol_ldl.hpp ";
 %feature("docstring") casadi::LinsolLdl::generate "
 
 [INTERNAL]  Generate C code.
+
+";
+
+%feature("docstring") casadi::LinsolLdl::get_stats "
+
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -37646,6 +38006,12 @@ C++ includes: linsol_qr.hpp ";
 
 ";
 
+%feature("docstring") casadi::LinsolQr::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::LinsolQr::clear_mem "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -37692,6 +38058,12 @@ class hierarchy in reverse order is run after init() has been completed.
 %feature("docstring") casadi::LinsolQr::weak "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::LinsolQr::get_stats "
+
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -37817,6 +38189,12 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring") casadi::LinsolQr::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::LinsolQr::getCount "
 
 [INTERNAL]  Get the reference count.
@@ -37882,6 +38260,12 @@ C++ includes: casadi_logger.hpp ";
 
 ";
 
+%feature("docstring") casadi::Lsqr::get_stats "
+
+[INTERNAL]  Get all statistics.
+
+";
+
 %feature("docstring") casadi::Lsqr::release "
 
 [INTERNAL]  Release a memory object.
@@ -37897,6 +38281,12 @@ C++ includes: casadi_logger.hpp ";
 %feature("docstring") casadi::Lsqr::neig "
 
 [INTERNAL]  Number of negative eigenvalues.
+
+";
+
+%feature("docstring") casadi::Lsqr::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -37931,6 +38321,12 @@ C++ includes: casadi_logger.hpp ";
 %feature("docstring") casadi::Lsqr::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::Lsqr::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -38349,6 +38745,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::Map::nz_in "
 
 [INTERNAL]  Convert from/to flat vector of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::Map::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -39127,6 +39529,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Map::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Map::is_a "
 
 [INTERNAL]  Check if the function is of a particular type.
@@ -39415,9 +39823,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::MapSum::getCount "
+%feature("docstring") casadi::MapSum::print_time "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -39573,6 +39981,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::MapSum::codegen_free_mem "
 
 [INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring") casadi::MapSum::getCount "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -40407,6 +40821,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::MapSum::alloc "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::MapSum::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -42402,6 +42822,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Newton::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Newton::export_code "
 
 [INTERNAL]  Export function in a specific language.
@@ -42917,12 +43343,6 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::Newton::print_fstats "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring") casadi::Newton::monitored "
 
 [INTERNAL] ";
@@ -43016,6 +43436,12 @@ elements.
 %feature("docstring") casadi::Newton::get_name_in "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::Newton::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -43683,6 +44109,12 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
+%feature("docstring") casadi::Nlpsol::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Nlpsol::memory "
 
 [INTERNAL]  Memory objects.
@@ -43857,9 +44289,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::print_fstats "
+%feature("docstring") casadi::Nlpsol::get_abstol "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -44267,6 +44699,12 @@ structure recognition for symmetric Jacobians
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::Nlpsol::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -44905,12 +45343,6 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::get_abstol "
-
-[INTERNAL]  Get absolute tolerance.
-
-";
-
 %feature("docstring") casadi::Nlpsol::numel_out "
 
 [INTERNAL]  Number of input/output elements.
@@ -45519,6 +45951,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::OmpMap::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::OmpMap::get_reverse "
 
 [INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
@@ -45677,6 +46115,12 @@ C++ includes: map.hpp ";
 
 [INTERNAL]  Export an input file that can be passed to generate C code with
 a main.
+
+";
+
+%feature("docstring") casadi::OmpMap::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -47220,6 +47664,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::OracleFunction::codegen_body "
 
 [INTERNAL]  Generate code for the function body.
@@ -47738,6 +48188,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
+
+";
+
+%feature("docstring") casadi::OracleFunction::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -48314,7 +48770,15 @@ Joel Andersson
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -48418,12 +48882,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::OracleFunction::generate_options "
 
 [INTERNAL]  Reconstruct options dict.
-
-";
-
-%feature("docstring") casadi::OracleFunction::print_fstats "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -49483,12 +49941,6 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::print_fstats "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring") casadi::QpToNlp::generate_options "
 
 [INTERNAL]  Reconstruct options dict.
@@ -49930,6 +50382,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::QpToNlp::has_forward "
 
 [INTERNAL]  Return function that calculates forward derivatives
@@ -50033,6 +50491,12 @@ elements.
 %feature("docstring") casadi::QpToNlp::index_out "
 
 [INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring") casadi::QpToNlp::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -50240,6 +50704,12 @@ multiplying.
 %feature("docstring") casadi::Qrqp::weak "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::Qrqp::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -50875,6 +51345,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Qrqp::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Qrqp::index_in "
 
 [INTERNAL]  Get input scheme index by name.
@@ -51160,12 +51636,6 @@ original
 %feature("docstring") casadi::Qrqp::incache "
 
 [INTERNAL]  Get function in cache.
-
-";
-
-%feature("docstring") casadi::Qrqp::print_fstats "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -51558,12 +52028,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Qrsqp::print_fstats "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring") casadi::Qrsqp::sparsity_jac "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
@@ -51681,6 +52145,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Qrsqp::codegen_sparsities "
 
 [INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::Qrsqp::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -52506,6 +52976,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Qrsqp::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Qrsqp::init "
 
 [INTERNAL]  Initialize.
@@ -52903,6 +53379,12 @@ classes.
 %feature("docstring") casadi::Rootfinder::definition "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::Rootfinder::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -53826,6 +54308,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Rootfinder::getJacSparsity "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
@@ -53860,12 +54348,6 @@ structure recognition.
 %feature("docstring") casadi::Rootfinder::n_instructions "
 
 [INTERNAL]  Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::Rootfinder::print_fstats "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -54624,6 +55106,12 @@ npar[out]:  required number of parallel calls (or -1)
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::RungeKutta::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::RungeKutta::alloc "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
@@ -54789,16 +55277,16 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::RungeKutta::sp_jac_dae "
 
 [INTERNAL]  Create sparsity pattern of the extended Jacobian (forward
 problem)
-
-";
-
-%feature("docstring") casadi::RungeKutta::print_fstats "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -55844,6 +56332,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Scpgen::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Scpgen::expand "
 
 [INTERNAL] ";
@@ -56421,6 +56915,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Scpgen::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Scpgen::which_depends "
 
 [INTERNAL]  Which variables enter with some order.
@@ -56575,12 +57075,6 @@ is_diff_in/out.
 %feature("docstring") casadi::Scpgen::tocache "
 
 [INTERNAL]  Save function to cache.
-
-";
-
-%feature("docstring") casadi::Scpgen::print_fstats "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -57937,6 +58431,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::SlicotDple::codegen_mem "
 
 [INTERNAL]  Get thread-local memory object.
@@ -58696,6 +59196,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::SlicotDple::codegen_declarations "
 
 [INTERNAL]  Generate code for the declarations of the C function.
@@ -59368,6 +59874,12 @@ C++ includes: slicot_expm.hpp ";
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::codegen_decref "
 
 [INTERNAL]  Codegen decref for dependencies.
@@ -59712,6 +60224,12 @@ elements.
 %feature("docstring") casadi::SlicotExpm::ad_weight "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -60536,7 +61054,15 @@ Andersson
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -61418,6 +61944,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Smoothing::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::Smoothing::get_reverse "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -61662,6 +62194,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Smoothing::tocache "
 
 [INTERNAL]  Save function to cache.
+
+";
+
+%feature("docstring") casadi::Smoothing::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -64024,12 +64562,6 @@ Print iteration.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::print_fstats "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::size_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -64098,6 +64630,12 @@ is_diff_in/out.
 %feature("docstring") casadi::Sqpmethod::generate_dependencies "
 
 [INTERNAL]  Export / Generate C code for the generated functions.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -64247,6 +64785,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -64861,6 +65405,12 @@ a main.
 
 ";
 
+%feature("docstring") casadi::Switch::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Switch::check_mat "
 
 [INTERNAL]  Helper function
@@ -64936,6 +65486,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::Switch::sz_res "
 
 [INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring") casadi::Switch::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -65613,6 +66169,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::SymbolicQr::get_stats "
+
+[INTERNAL]  Get all statistics.
+
+";
+
 %feature("docstring") casadi::SymbolicQr::disp_more "
 
 [INTERNAL]  Print more.
@@ -65960,7 +66522,15 @@ Joel Andersson
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -65995,6 +66565,12 @@ C++ includes: symbolic_qr.hpp ";
 %feature("docstring") casadi::SymbolicQr::nnz "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::SymbolicQr::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
 
 %feature("docstring") casadi::SymbolicQr::ncol "
 
@@ -66098,6 +66674,12 @@ class hierarchy in reverse order is run after init() has been completed.
 %feature("docstring") casadi::SymbolicQr::serialize_type "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -66665,6 +67247,12 @@ derivatives
 
 ";
 
+%feature("docstring") casadi::ThreadMap::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring") casadi::ThreadMap::codegen_meta "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
@@ -66712,6 +67300,12 @@ multiplying.
 %feature("docstring") casadi::ThreadMap::get_jacobian_sparsity "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::ThreadMap::print_time "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -67930,7 +68524,15 @@ General information
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -68965,7 +69567,15 @@ General information
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |

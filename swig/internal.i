@@ -1012,9 +1012,6 @@
 %exception  casadi::FunctionInternal::wrap_as_needed(const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericExternal::alloc_mem() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::GenericExternal::any_symbol_found() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2039,6 +2036,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProtoFunction::memory(int ind) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::print_time(const std::map< std::string, FStats > &fstats) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProtoFunction::release(int mem) const  {

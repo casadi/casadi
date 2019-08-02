@@ -104,6 +104,13 @@ original
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_out(casadi_int ind)
 const  "
 
@@ -838,6 +845,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
 
 [INTERNAL]  Get relative tolerance.
@@ -1204,7 +1218,15 @@ const  "
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -1700,8 +1722,7 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -3002,6 +3023,13 @@ CodeGenerator &g, bool ns=true) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -3362,6 +3390,13 @@ always_inline, bool never_inline) const  "
 casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -3726,13 +3761,6 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 std::string &fname)  "
 
 [INTERNAL]  JIT for dependencies.
-
-";
-
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -4903,12 +4931,6 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::free_mem(void *mem) const  "
-
-[INTERNAL]  Free memory block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::index_out(const std::string
 &name) const  "
 
@@ -5361,10 +5383,9 @@ std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::free_mem(void *mem) const  "
 
-[INTERNAL]  Get all statistics.
+[INTERNAL]  Free memory block.
 
 ";
 
@@ -5787,6 +5808,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_arg(const
 std::vector< M > &arg, casadi_int npar) const  "
 
@@ -5847,6 +5875,12 @@ casadi_int > &offset, const std::vector< double > &values, casadi_int m) "
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
+
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -6131,6 +6165,13 @@ iind, casadi_int oind, Sparsity &D1, Sparsity &D2, bool compact, bool
 symmetric, bool allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -8627,6 +8668,13 @@ casadi::FunctionInternal::codegen_alloc_mem(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(casadi_int ind)
 const  "
 
@@ -9021,6 +9069,13 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -9090,8 +9145,7 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -9939,7 +9993,15 @@ const  "
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -10718,6 +10780,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
 
@@ -11101,13 +11170,6 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
@@ -11131,6 +11193,13 @@ elements.
 %feature("docstring")  casadi::FunctionInternal::dm_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -12746,6 +12815,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res, casadi_int &npar) const  "
 
@@ -13267,6 +13343,13 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::map(casadi_int n, const
 std::string &parallelization) const  "
 
@@ -13546,13 +13629,6 @@ structure recognition.
 const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::Conic::print_fstats(const ConicMemory *m)
-const  "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -13947,7 +14023,15 @@ Internal class.
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -15605,7 +15689,15 @@ Internal class.
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -15655,8 +15747,7 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -16331,6 +16422,13 @@ ind) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::Dple::has_forward(casadi_int nfwd) const  "
 
 [INTERNAL]  Generate a function that calculates nfwd forward derivatives.
@@ -16503,6 +16601,13 @@ std::string &parallelization) const  "
 %feature("docstring")  casadi::ProtoFunction::init_mem(void *mem) const  "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -17619,8 +17724,7 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -17682,6 +17786,13 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -18332,7 +18443,15 @@ Internal class.
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -18730,6 +18849,13 @@ const  "
 const  "
 
 [INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -19353,6 +19479,13 @@ casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -19479,8 +19612,7 @@ std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -19704,6 +19836,13 @@ const  "
 %feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -20999,10 +21138,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_name(const
+CodeGenerator &g, bool ns=true) const  "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Get name in codegen.
 
 ";
 
@@ -21089,13 +21228,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g, bool ns=true) const  "
-
-[INTERNAL]  Get name in codegen.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
@@ -21158,6 +21290,13 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 *m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::generate_options(bool
 is_temp=false) const  "
@@ -21269,6 +21408,13 @@ const std::string &suffix="") const  "
 ind) const  "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -22009,6 +22155,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -22395,7 +22548,15 @@ std::string, M > &arg) const  "
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -23401,8 +23562,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -23425,6 +23585,13 @@ always_inline, bool never_inline) const  "
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -24472,9 +24639,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::self() const  "
+%feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
+&arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
-[INTERNAL]  Get a public class instance.
+[INTERNAL]  Evaluate with symbolic matrices.
 
 ";
 
@@ -24711,6 +24879,13 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -24993,13 +25168,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
-&arg, MXVector &res, bool always_inline, bool never_inline) const  "
-
-[INTERNAL]  Evaluate with symbolic matrices.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::index_out(const std::string
 &name) const  "
 
@@ -25242,10 +25410,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
+%feature("docstring")  casadi::FunctionInternal::self() const  "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Get a public class instance.
 
 ";
 
@@ -25283,6 +25450,13 @@ const  "
 casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -25917,8 +26091,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -26453,7 +26626,15 @@ std::string &parallelization) const  "
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -26800,6 +26981,13 @@ get_reverse(casadi_int nadj) if no cached version is available.
 const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
 
 %feature("docstring")  casadi::FiniteDiff::eval(const double **arg, double
 **res, casadi_int *iw, double *w, void *mem) const  "
@@ -27430,6 +27618,13 @@ const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -29238,7 +29433,15 @@ member functions. Joel Andersson >List of available options
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats() .        |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -30068,7 +30271,7 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::GenericExternal::alloc_mem() const  "
+%feature("docstring")  casadi::ProtoFunction::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
 
@@ -30308,6 +30511,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_function() const  "
 
 [INTERNAL] ";
@@ -30514,6 +30724,13 @@ k) const  "
 %feature("docstring")  casadi::External::get_name_out(casadi_int i)  "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -30908,19 +31125,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::matching_arg(const
-std::vector< M > &arg, casadi_int &npar) const  "
+%feature("docstring")  casadi::ProtoFunction::free_mem(void *mem) const  "
 
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-Raises errors
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Free memory block.
 
 ";
 
@@ -30944,8 +31151,7 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -30970,7 +31176,7 @@ CodeGenerator &g, bool ns=true) const  "
 
 ";
 
-%feature("docstring")  casadi::GenericExternal::init_mem(void *mem) const  "
+%feature("docstring")  casadi::ProtoFunction::init_mem(void *mem) const  "
 
 [INTERNAL]  Initalize memory block.
 
@@ -31243,9 +31449,19 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::GenericExternal::free_mem(void *mem) const  "
+%feature("docstring")  casadi::FunctionInternal::matching_arg(const
+std::vector< M > &arg, casadi_int &npar) const  "
 
-[INTERNAL]  Free memory block.
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -33664,10 +33880,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Codegen decref for dependencies.
 
 ";
 
@@ -34341,13 +34557,6 @@ const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
-
-[INTERNAL]  Codegen decref for dependencies.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getJacSparsity(casadi_int
 iind, casadi_int oind, bool symmetric) const  "
 
@@ -34516,6 +34725,13 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -34823,6 +35039,13 @@ std::vector< M > &arg, casadi_int npar) const  "
 const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -35167,13 +35390,6 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::ImplicitToNlp(const std::string
 &name, const Function &f) "
 
@@ -35333,6 +35549,13 @@ is_temp=false) const  "
 %feature("docstring")  casadi::FunctionInternal::dm_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -35911,6 +36134,13 @@ const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -37383,6 +37613,13 @@ double t, const double *rx, const double *rz, const double *rp) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_n_out()  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -37646,6 +37883,13 @@ ind) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring") casadi::Integrator "
 
 Internal storage for integrator related data.
@@ -37802,10 +38046,12 @@ double > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
+%feature("docstring")  casadi::FunctionInternal::slice(const std::string
+&name, const std::vector< casadi_int > &order_in, const std::vector<
+casadi_int > &order_out, const Dict &opts) const  "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  returns a new function with a selection of inputs/outputs of the
+original
 
 ";
 
@@ -38345,15 +38591,6 @@ Parameters:
 npar[in]:  normal usage: 1, disallow pararallel calls: -1
 
 npar:  max number of horizontal repetitions across all arguments (or -1)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::slice(const std::string
-&name, const std::vector< casadi_int > &order_in, const std::vector<
-casadi_int > &order_out, const Dict &opts) const  "
-
-[INTERNAL]  returns a new function with a selection of inputs/outputs of the
-original
 
 ";
 
@@ -38939,6 +39176,13 @@ generated function.
 %feature("docstring")  casadi::Interpolant::get_options() const  "
 
 [INTERNAL]  Options.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -40059,7 +40303,15 @@ Internal class
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -40416,8 +40668,7 @@ std::string &fname) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -40495,6 +40746,13 @@ std::string, M > &arg) const  "
 const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -40869,6 +41127,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -41282,7 +41547,15 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -41415,8 +41688,7 @@ is_diff_in/out.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -42303,6 +42575,13 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jac() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -43142,7 +43421,15 @@ A: A = L.U, with L lower and U upper triangular
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -43190,6 +43477,13 @@ C++ includes: lapack_lu.hpp ";
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::disp_more(std::ostream
 &stream) const  "
 
@@ -43201,6 +43495,19 @@ C++ includes: lapack_lu.hpp ";
 *A) const  "
 
 [INTERNAL]  Number of negative eigenvalues.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -43245,6 +43552,12 @@ C++ includes: lapack_lu.hpp ";
 &stream) const  "
 
 [INTERNAL]  Print more.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
+
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -43658,7 +43971,15 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -43789,9 +44110,23 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -44581,6 +44916,13 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::LinearInterpolant::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
@@ -44720,6 +45062,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::dm_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -45105,8 +45454,7 @@ std::string &fname, double **res) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -45520,8 +45868,7 @@ std::string, M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -45776,6 +46123,13 @@ const  "
 is_temp=false) const  "
 
 [INTERNAL]  Reconstruct options dict.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -46066,6 +46420,13 @@ const std::vector< std::string > &onames, const Dict &opts) const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -47157,6 +47518,12 @@ Get string representation.
 
 ";
 
+%feature("docstring")  casadi::Linsol::stats(int mem=1) const  "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
 %feature("docstring")  casadi::Linsol::plugin_name() const  "
 
 Query plugin name.
@@ -47236,6 +47603,13 @@ bool more) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::LinsolLdl::neig(void *mem, const double *A)
 const  "
 
@@ -47276,6 +47650,13 @@ const  "
 %feature("docstring")  casadi::LinsolLdl::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -47357,6 +47738,12 @@ casadi_int nrhs) const  "
 std::string &A, const std::string &x, casadi_int nrhs, bool tr) const  "
 
 [INTERNAL]  Generate C code.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
+
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -47487,6 +47874,13 @@ C++ includes: linsol_qr.hpp ";
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -47534,6 +47928,12 @@ class hierarchy in reverse order is run after init() has been completed.
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
+
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -47672,6 +48072,13 @@ const Sparsity &sp) "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
@@ -47742,6 +48149,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
+
+[INTERNAL]  Get all statistics.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
@@ -47758,6 +48171,13 @@ const  "
 *A) const  "
 
 [INTERNAL]  Number of negative eigenvalues.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -47794,6 +48214,13 @@ const  "
 %feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -48286,6 +48713,13 @@ double > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g) const  "
 
@@ -48521,8 +48955,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -49244,6 +49677,13 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -49585,9 +50025,10 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -49790,6 +50231,12 @@ bool more) const  "
 casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -50148,8 +50595,7 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -50825,6 +51271,13 @@ k) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -54232,6 +54685,13 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::export_code(const
 std::string &lang, std::ostream &stream, const Dict &options) const  "
 
@@ -54832,13 +55292,6 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::monitored(const std::string
 &name) const  "
 
@@ -54954,6 +55407,13 @@ const  "
 %feature("docstring")  casadi::Rootfinder::get_name_in(casadi_int i)  "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -55798,6 +56258,13 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
@@ -56014,10 +56481,9 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -56499,6 +56965,13 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -57243,12 +57716,6 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 k) const  "
 
 [INTERNAL]  Get an atomic operation operator index.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
-
-[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -58004,6 +58471,13 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::Map::get_reverse(casadi_int nadj, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -58191,6 +58665,13 @@ std::string &fname, const double **arg) const  "
 
 [INTERNAL]  Export an input file that can be passed to generate C code with
 a main.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -58407,8 +58888,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -60410,6 +60890,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
 &g) const  "
 
@@ -61061,6 +61548,13 @@ generated function.
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::reverse(casadi_int nadj)
 const  "
 
@@ -61689,7 +62183,15 @@ Joel Andersson
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -61820,13 +62322,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 is_temp=false) const  "
 
 [INTERNAL]  Reconstruct options dict.
-
-";
-
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -63114,13 +63609,6 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Conic::print_fstats(const ConicMemory *m)
-const  "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::generate_options(bool
 is_temp=false) const  "
 
@@ -63660,6 +64148,13 @@ std::string &parallelization) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_forward(casadi_int
 nfwd) const  "
 
@@ -63790,6 +64285,13 @@ const  "
 &name) const  "
 
 [INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -64041,6 +64543,13 @@ multiplying.
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -64799,6 +65308,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::index_in(const std::string
 &name) const  "
 
@@ -65120,13 +65636,6 @@ is_temp=false) const  "
 &fname, Function &f, const std::string &suffix="") const  "
 
 [INTERNAL]  Get function in cache.
-
-";
-
-%feature("docstring")  casadi::Conic::print_fstats(const ConicMemory *m)
-const  "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -65629,13 +66138,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(casadi_int
 iind, casadi_int oind, bool compact, bool symmetric) const  "
 
@@ -65776,6 +66278,13 @@ buf_sz, const char *fmt,...) const  "
 casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -66745,6 +67254,13 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::Qrsqp::init(const Dict &opts)  "
 
 [INTERNAL]  Initialize.
@@ -67234,6 +67750,13 @@ classes.
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -68348,6 +68871,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getJacSparsity(casadi_int
 iind, casadi_int oind, bool symmetric) const  "
 
@@ -68391,13 +68921,6 @@ never_inline) const  "
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
-
-";
-
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -69316,6 +69839,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -69516,17 +70046,17 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::Integrator::sp_jac_dae() "
 
 [INTERNAL]  Create sparsity pattern of the extended Jacobian (forward
 problem)
-
-";
-
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -70785,6 +71315,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::expand() "
 
 [INTERNAL] ";
@@ -71509,6 +72046,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
@@ -71698,13 +72242,6 @@ std::string &name) const  "
 const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
-
-";
-
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
 
 ";
 
@@ -73387,6 +73924,13 @@ casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_mem(CodeGenerator
 &g, const std::string &index="mem") const  "
 
@@ -73622,8 +74166,7 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -74305,6 +74848,13 @@ const  "
 std::string &fname, const Dict &opts) const  "
 
 [INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -75130,6 +75680,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
@@ -75335,8 +75892,7 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -75537,6 +76093,13 @@ bool persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -76469,7 +77032,15 @@ Andersson
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -77461,8 +78032,7 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -77526,6 +78096,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -77847,6 +78424,13 @@ std::string &lang, std::ostream &stream, const Dict &options) const  "
 const std::string &suffix="") const  "
 
 [INTERNAL]  Save function to cache.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -80725,13 +81309,6 @@ std::string, M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
-
-[INTERNAL]  Print statistics.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size_out(casadi_int ind)
 const  "
 
@@ -80823,6 +81400,13 @@ const std::string &suffix="") const  "
 std::string &fname, const Dict &opts) const  "
 
 [INTERNAL]  Export / Generate C code for the generated functions.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -81005,6 +81589,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -81701,8 +82292,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -81726,6 +82316,13 @@ const  "
 const  "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -81827,6 +82424,13 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -82658,6 +83262,12 @@ casadi_int nrhs) const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
+
+[INTERNAL]  Get all statistics.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::disp_more(std::ostream
 &stream) const  "
 
@@ -83006,7 +83616,15 @@ Joel Andersson
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -83041,6 +83659,13 @@ C++ includes: symbolic_qr.hpp ";
 %feature("docstring")  casadi::LinsolInternal::nnz() const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
 
 %feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
@@ -83154,6 +83779,13 @@ const  "
 casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
 
 ";
 
@@ -83827,6 +84459,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g) const  "
 
@@ -83887,6 +84526,13 @@ std::string, M > &arg) const  "
 const  "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
 
 ";
 
@@ -84064,8 +84710,7 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -85328,7 +85973,15 @@ General information
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -87246,7 +87899,15 @@ General information
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -88632,7 +89293,15 @@ General information
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
@@ -89134,7 +89803,15 @@ General information
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
+|                  |                 | time. Implies    |                  |
+|                  |                 | record_time.     |                  |
++------------------+-----------------+------------------+------------------+
+| record_time      | OT_BOOL         | record           | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time, for        |                  |
+|                  |                 | retrieval with   |                  |
+|                  |                 | stats().         |                  |
 +------------------+-----------------+------------------+------------------+
 | regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
 |                  |                 | when NaN or Inf  | Internal         |
