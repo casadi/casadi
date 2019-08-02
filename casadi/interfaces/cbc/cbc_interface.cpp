@@ -405,7 +405,8 @@ namespace casadi {
     m->fstats.at("solver").toc();
     m->fstats.at("postprocessing").tic();
 
-    if (hot_start_ && model.status() == 0 && model.isProvenOptimal() && model.secondaryStatus() == 1) {
+    if (hot_start_ && model.status() == 0 &&
+      model.isProvenOptimal() && model.secondaryStatus() == 1) {
       // Solution found by setBestSolution is best and only correct one.
     } else {
       copy_cbc_results(model, res);
