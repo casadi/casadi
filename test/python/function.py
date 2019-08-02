@@ -2434,6 +2434,41 @@ class Functiontests(casadiTestCase):
 
     self.assertEqual(buf.ret(), 0)
 
+  def test_jit_buffer_eval(self):
+    opti = Opti('conic')
+
+    x = opti.variable()
+
+    opti.minimize((x-3)**2)
+
+    opti.subject_to(x>=0)
+
+    opti.subject_to(x<=5)
+
+
+    opti.solver('osqp')
+
+
+    f = opti.to_function('f',[],[x])
+
+
+    f.generate('f.c')
+
+    libdir = GlobalOptions.getCasadiPath()
+    includedir = GlobalOptions.getCasadiIncludePath()
+
+    f = opti.to_function('f',[],[x],{"jit":True,"compiler":"shell","jit_options":{"compiler_flags":["-I"+includedir,"-L"+libdir,"-losqp"],"linker_flags":["-I"+includedir,"-L"+libdir,"-losqp"],"verbose":True}, "print_time": True})
+    [buf,trigger] = f.buffer()
+
+    a = np.array([1.0])
+    buf.set_res(0, memoryview(a))
+
+    trigger()
+
+    # buffer eval bypasses timings
+    self.assertTrue(f.stats()["n_call_total"]==0)
+    self.checkarray(a,3)
+
           
 if __name__ == '__main__':
     unittest.main()
