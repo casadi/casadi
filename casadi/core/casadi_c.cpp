@@ -182,21 +182,6 @@ double casadi_c_default_in_id(int id, casadi_int i) {
   }
 }
 
-int casadi_c_alloc_mem(void) {
-  return -1;
-}
-void casadi_c_free_mem(int mem) {}
-int casadi_c_init_mem(int mem) {
-  return -1;
-}
-int casadi_c_alloc_mem_id(int id) {
-  return -1;
-}
-void casadi_c_free_mem_id(int id, int mem) { }
-int casadi_c_init_mem_id(int id, int mem) {
-  return -1;
-}
-
 casadi_int casadi_c_n_in(void) {
   return casadi_c_n_in_id(casadi_c_active);
 }

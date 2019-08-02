@@ -88,6 +88,8 @@ namespace casadi {
     compiler_plugin_ = "clang";
 
     eval_ = nullptr;
+    checkout_ = nullptr;
+    release_ = nullptr;
     has_refcount_ = false;
     enable_forward_op_ = true;
     enable_reverse_op_ = true;
@@ -564,7 +566,9 @@ namespace casadi {
         compiler_ = Importer(gen.generate(), compiler_plugin_, jit_options_);
         if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         // Try to load
-        eval_ = (eval_t)compiler_.get_function(name_);
+        eval_ = (eval_t) compiler_.get_function(name_);
+        checkout_ = (casadi_checkout_t) compiler_.get_function(name_ + "checkout");
+        release_ = (casadi_release_t) compiler_.get_function(name_ + "release");
         casadi_assert(eval_!=nullptr, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
@@ -701,8 +705,20 @@ namespace casadi {
     if (m->t_total) m->t_total->tic();
     int ret;
     if (eval_) {
-      // TODO(jgillis): check why thsi check is needed (crashes function.py:inherit_jit_options)
-      ret = eval_(arg, res, iw, w, static_cast<ExternalMemory*>(mem)->mem);
+      int mem = 0;
+      if (checkout_) {
+#ifdef CASADI_WITH_THREAD
+    std::lock_guard<std::mutex> lock(mtx_);
+#endif //CASADI_WITH_THREAD
+        mem = checkout_();
+      }
+      ret = eval_(arg, res, iw, w, mem);
+      if (release_) {
+#ifdef CASADI_WITH_THREAD
+    std::lock_guard<std::mutex> lock(mtx_);
+#endif //CASADI_WITH_THREAD
+        release_(mem);
+      }
     } else {
       ret = eval(arg, res, iw, w, mem);
     }
@@ -3631,6 +3647,8 @@ namespace casadi {
     n_in_ = sparsity_in_.size();
     n_out_ = sparsity_out_.size();
     eval_ = nullptr;
+    checkout_ = nullptr;
+    release_ = nullptr;
     jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
 
   }

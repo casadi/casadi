@@ -92,7 +92,7 @@ namespace casadi {
   bool GenericExternal::any_symbol_found() const {
     return External::any_symbol_found() ||
       get_sparsity_in_ || get_sparsity_out_ ||
-      alloc_mem_ || init_mem_ || free_mem_ ||
+      checkout_ || release_ ||
       eval_;
   }
 
@@ -102,10 +102,9 @@ namespace casadi {
     get_sparsity_in_ = (sparsity_t)li_.get_function(name_ + "_sparsity_in");
     get_sparsity_out_ = (sparsity_t)li_.get_function(name_ + "_sparsity_out");
 
-    // Memory allocation functions
-    alloc_mem_ = (alloc_mem_t)li_.get_function(name_ + "_alloc_mem");
-    init_mem_ = (init_mem_t)li_.get_function(name_ + "_init_mem");
-    free_mem_ = (free_mem_t)li_.get_function(name_ + "_free_mem");
+    // Memory management functions
+    checkout_ = (casadi_checkout_t) li_.get_function(name_ + "_checkout");
+    release_ = (casadi_release_t) li_.get_function(name_ + "_release");
 
     // Function for numerical evaluation
     eval_ = (eval_t)li_.get_function(name_);
@@ -199,33 +198,6 @@ namespace casadi {
       // Fall back to base class
       return FunctionInternal::get_sparsity_out(i);
     }
-  }
-
-  void* GenericExternal::alloc_mem() const {
-    ExternalMemory* m = new ExternalMemory();
-    if (alloc_mem_) {
-      m->mem = alloc_mem_();
-    }
-    return m;
-  }
-
-  int GenericExternal::init_mem(void* mem) const {
-    auto m = static_cast<ExternalMemory*>(mem);
-    if (FunctionInternal::init_mem(mem)) return 1;
-    if (init_mem_) {
-      return init_mem_(m->mem);
-    } else {
-
-    }
-    return 0;
-  }
-
-  void GenericExternal::free_mem(void *mem) const {
-    auto m = static_cast<ExternalMemory*>(mem);
-    if (free_mem_) {
-      free_mem_(m->mem);
-    }
-    delete static_cast<ExternalMemory*>(mem);
   }
 
   void External::init(const Dict& opts) {

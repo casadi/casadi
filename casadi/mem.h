@@ -57,10 +57,6 @@ typedef int (*casadi_work_t)(casadi_int* sz_arg, casadi_int* sz_res,
 typedef int (*casadi_eval_t)(const casadi_real** arg, casadi_real** res,
                              casadi_int* iw, casadi_real* w, int mem);
 typedef casadi_real (*casadi_default_t)(casadi_int);
-typedef int (*casadi_alloc_t)(void);
-typedef int (*casadi_alloc_mem_t)(void);
-typedef int (*casadi_init_mem_t)(int);
-typedef void (*casadi_free_mem_t)(int);
 
 /* Structure to hold meta information about an input or output */
 typedef struct {
@@ -102,9 +98,6 @@ typedef struct {
   casadi_checkout_t checkout;
   casadi_release_t release;
   casadi_default_t default_in;
-  casadi_alloc_mem_t alloc_mem;
-  casadi_init_mem_t init_mem;
-  casadi_free_mem_t free_mem;
   casadi_getint_t n_in;
   casadi_getint_t n_out;
   casadi_name_t name_in;

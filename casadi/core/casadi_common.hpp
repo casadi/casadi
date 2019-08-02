@@ -138,9 +138,8 @@ namespace casadi {
   typedef double (*default_t)(casadi_int i);
   typedef const char* (*name_t)(casadi_int i);
   typedef const casadi_int* (*sparsity_t)(casadi_int i);
-  typedef int (*alloc_mem_t)(void);
-  typedef int (*init_mem_t)(int);
-  typedef void (*free_mem_t)(int);
+  typedef int (*casadi_checkout_t)(void);
+  typedef void (*casadi_release_t)(int);
   typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res,
     casadi_int* sz_iw, casadi_int* sz_w);
   typedef int (*eval_t)(const double** arg, double** res,

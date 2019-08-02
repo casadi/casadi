@@ -184,17 +184,17 @@ namespace casadi {
     // Print timing statistics
     bool record_time_;
 
+#ifdef CASADI_WITH_THREAD
+    /// Mutex for thread safety
+    mutable std::mutex mtx_;
+#endif // CASADI_WITH_THREAD
+
   private:
     /// Memory objects
     mutable std::vector<void*> mem_;
 
     /// Unused memory objects
     mutable std::stack<casadi_int> unused_;
-
-#ifdef CASADI_WITH_THREAD
-    /// Mutex for thread safety
-    mutable std::mutex mtx_;
-#endif // CASADI_WITH_THREAD
   };
 
   /** \brief Internal class for Function
@@ -883,6 +883,12 @@ namespace casadi {
 
     /** \brief Numerical evaluation redirected to a C function */
     eval_t eval_;
+
+    /** \brief Checkout redirected to a C function */
+    casadi_checkout_t checkout_;
+
+   /** \brief Release redirected to a C function */
+    casadi_release_t release_;
 
     /** \brief Dict of statistics (resulting from evaluate) */
     Dict stats_;

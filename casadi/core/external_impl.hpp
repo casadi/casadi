@@ -48,11 +48,6 @@
 
 namespace casadi {
 
-  /** \brief Function memory with temporary work vectors */
-  struct CASADI_EXPORT ExternalMemory : public FunctionMemory {
-    casadi_int mem;
-  };
-
   class CASADI_EXPORT External : public FunctionInternal {
   protected:
     /** \brief Information about the library */
@@ -172,11 +167,6 @@ namespace casadi {
     // Sparsities
     sparsity_t get_sparsity_in_, get_sparsity_out_;
 
-    // Memory allocation
-    alloc_mem_t alloc_mem_;
-    init_mem_t init_mem_;
-    free_mem_t free_mem_;
-
   public:
     /** \brief Constructor */
     GenericExternal(const std::string& name, const Importer& li);
@@ -198,15 +188,6 @@ namespace casadi {
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
-
-    /** \brief Create memory block */
-    void* alloc_mem() const override;
-
-    /** \brief Initalize memory block */
-    int init_mem(void* mem) const override;
-
-    /** \brief Free memory block */
-    void free_mem(void *mem) const override;
 
     /** \brief Serialize type information */
     void serialize_type(SerializingStream &s) const override;
