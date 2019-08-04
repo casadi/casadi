@@ -3459,6 +3459,9 @@ MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 DECL M casadi_find(const M& x) {
   return find(x);
 }
+DECL M casadi_low(const M& v, const M& p, const Dict& options = Dict()) {
+  return low(v, p, options);
+}
 DECL M casadi_inv_node(const M& x) {
   return inv_node(x);
 }

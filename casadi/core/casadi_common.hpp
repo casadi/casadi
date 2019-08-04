@@ -146,6 +146,11 @@ namespace casadi {
                         casadi_int* iw, double* w, int);
   ///@}
 
+  // Easier to maintain than an enum (serialization/codegen)
+  constexpr casadi_int LOOKUP_LINEAR = 0;
+  constexpr casadi_int LOOKUP_EXACT = 1;
+  constexpr casadi_int LOOKUP_BINARY = 2;
+
   /// String representation, any type
   template<typename T>
   std::string str(const T& v);

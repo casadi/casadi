@@ -442,6 +442,9 @@ namespace casadi {
     /// Find
     MX get_find() const;
 
+    /// Find
+    MX get_low(const MX& v, const Dict& options) const;
+
     /// BSpline
     MX get_bspline(const std::vector<double>& knots,
             const std::vector<casadi_int>& offset,

@@ -501,6 +501,7 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for this class
     static MX find(const MX& x);
+    static MX low(const MX& v, const MX& p, const Dict& options = Dict());
     static MX graph_substitute(const MX& x, const std::vector<MX> &v,
                                const std::vector<MX> &vdef);
     static std::vector<MX> graph_substitute(const std::vector<MX> &ex,
@@ -545,6 +546,13 @@ namespace casadi {
      */
     inline friend MX find(const MX& x) {
       return MX::find(x);
+    }
+
+    /** \brief Find first nonzero
+     * If failed, returns the number of rows
+     */
+    inline friend MX low(const MX& v, const MX& p, const Dict& options=Dict()) {
+      return MX::low(v, p, options);
     }
 
     /** \brief Substitute single expression in graph

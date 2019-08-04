@@ -124,6 +124,7 @@ set(CASADI_INTERNAL
   solve.hpp               solve_impl.hpp          # Solve linear system of equations
   casadi_call.hpp         casadi_call.cpp         # Function call
   casadi_find.hpp         casadi_find.cpp         # Find first nonzero
+  casadi_low.hpp          casadi_low.cpp          # Find first nonzero
   norm.hpp                norm.cpp                # 1-norm, 2-norm and infinity-norm
   mmin.hpp                mmin.cpp                # Matrix minimum
   transpose.hpp           transpose.cpp           # Transpose

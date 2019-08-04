@@ -88,8 +88,6 @@ namespace casadi {
         const std::vector<casadi_int>& margin_left=std::vector<casadi_int>(),
         const std::vector<casadi_int>& margin_right=std::vector<casadi_int>());
 
-    static std::vector<std::string> lookup_mode_from_enum(const std::vector<casadi_int>& modes);
-
     static void stack_grid(const std::vector< std::vector<double> >& grid,
       std::vector<casadi_int>& offset, std::vector<double>& stacked);
 

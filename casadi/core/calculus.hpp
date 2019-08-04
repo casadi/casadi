@@ -90,6 +90,9 @@ namespace casadi {
     // Find first nonzero in a vector
     OP_FIND,
 
+    // Find first nonzero in a vector
+    OP_LOW,
+
     // Embedded function call in parallel
     OP_MAP,
 
@@ -997,6 +1000,7 @@ namespace casadi {
     case OP_PARAMETER:     return F<OP_PARAMETER>::check;
     case OP_CALL:          return F<OP_CALL>::check;
     case OP_FIND:          return F<OP_FIND>::check;
+    case OP_LOW:           return F<OP_LOW>::check;
     case OP_MAP:           return F<OP_MAP>::check;
     case OP_MTIMES:        return F<OP_MTIMES>::check;
     case OP_SOLVE:         return F<OP_SOLVE>::check;

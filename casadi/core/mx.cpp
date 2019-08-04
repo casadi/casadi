@@ -1848,6 +1848,9 @@ namespace casadi {
     return x->get_find();
   }
 
+  MX MX::low(const MX& v, const MX& p, const Dict& options) {
+    return p->get_low(v, options);
+  }
 
   MX MX::bspline(const MX& x,
             const DM& coeffs,

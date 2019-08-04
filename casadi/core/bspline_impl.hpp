@@ -28,6 +28,7 @@
 
 #include "bspline.hpp"
 #include "interpolant_impl.hpp"
+#include "casadi_low.hpp"
 
 namespace casadi {
 
@@ -77,7 +78,9 @@ namespace casadi {
     std::vector<MX> parts;
 
     Dict opts;
-    opts["lookup_mode"] = Interpolant::lookup_mode_from_enum(lookup_mode_);
+    std::vector<std::string> lookup_mode;
+    for (auto e : lookup_mode_) lookup_mode.push_back(Low::lookup_mode_from_enum(e));
+    opts["lookup_mode"] = lookup_mode;
     
     // Loop over dimensions
     for (casadi_int k=0;k<n_dims;++k) {

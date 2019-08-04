@@ -51,6 +51,7 @@
 #include "monitor.hpp"
 #include "repmat.hpp"
 #include "casadi_find.hpp"
+#include "casadi_low.hpp"
 #include "einstein.hpp"
 #include "io_instruction.hpp"
 #include "symbolic_mx.hpp"
@@ -785,6 +786,10 @@ namespace casadi {
     }
   }
 
+  MX MXNode::get_low(const MX& v, const Dict& options) const {
+    return MX::create(new Low(v, shared_from_this<MX>(), options));
+  }
+
   MX MXNode::get_bspline(const std::vector<double>& knots,
             const std::vector<casadi_int>& offset,
             const std::vector<double>& coeffs,
@@ -1042,6 +1047,7 @@ namespace casadi {
     {OP_CONST, ConstantMX::deserialize},
     {OP_CALL, Call::deserialize},
     {OP_FIND, Find::deserialize},
+    {OP_LOW, Low::deserialize},
     //{OP_MAP, Map::deserialize}, Map is a function
     {OP_MTIMES, Multiplication::deserialize},
     {OP_SOLVE, Solve<false>::deserialize},

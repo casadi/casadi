@@ -1828,6 +1828,12 @@ namespace casadi {
   }
 
   std::string CodeGenerator::
+  low(const std::string& x, const std::string& grid, casadi_int ng, casadi_int lookup_mode) {
+    add_auxiliary(CodeGenerator::AUX_LOW);
+    return "casadi_low(" + x + ", " + grid + ", " + str(ng) + ", " + str(lookup_mode) + ");";
+  }
+
+  std::string CodeGenerator::
   bound_consistency(casadi_int n, const std::string& x,
     const std::string& lam, const std::string& lbx, const std::string& ubx) {
       add_auxiliary(CodeGenerator::AUX_BOUNDS_CONSISTENCY);

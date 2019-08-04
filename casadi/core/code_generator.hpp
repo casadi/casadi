@@ -295,6 +295,10 @@ namespace casadi {
     /** \brief regularize */
     std::string regularize(const Sparsity& sp_h, const std::string& h, const std::string& reg);
 
+    /** \brief low */
+    std::string low(const std::string& x, const std::string& grid,
+      casadi_int ng, casadi_int lookup_mode);
+
     /** \brief Declare a function */
     std::string declare(std::string s);
 

@@ -188,9 +188,9 @@ namespace casadi {
     std::vector<std::string> lookup_mode;
     auto it = opts.find("lookup_mode");
     if (it!=opts.end()) lookup_mode = it->second;
-    std::vector<casadi_int> lookup_mode_int =
+    std::vector<casadi_int> mode =
       Interpolant::interpret_lookup_mode(lookup_mode, stacked, offset, degree, degree);
-    return x->get_bspline(stacked, offset, coeffs, degree, m, lookup_mode_int);
+    return x->get_bspline(stacked, offset, coeffs, degree, m, mode);
   }
 
   MX BSplineParametric::create(const MX& x,
@@ -207,9 +207,9 @@ namespace casadi {
     std::vector<std::string> lookup_mode;
     auto it = opts.find("lookup_mode");
     if (it!=opts.end()) lookup_mode = it->second;
-    std::vector<casadi_int> lookup_mode_int =
+    std::vector<casadi_int> mode =
       Interpolant::interpret_lookup_mode(lookup_mode, stacked, offset, degree, degree);
-    return x->get_bspline(coeffs, stacked, offset, degree, m, lookup_mode_int);
+    return x->get_bspline(coeffs, stacked, offset, degree, m, mode);
   }
 
   std::string BSpline::disp(const std::vector<std::string>& arg) const {

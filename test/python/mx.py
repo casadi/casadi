@@ -2808,7 +2808,18 @@ class MXtests(casadiTestCase):
       self.assertTrue(J.size()==(2,1))
       self.assertTrue(J.nnz()==2)
 
+  def test_low(self):
+    v = MX.sym("v",5)
+    p0 = [-1,0,0.2,1,1.3,2,2.5,3,3.5,4,4.5]
+    p = MX.sym("p",len(p0))
 
 
+    f = Function("f",[v,p],[low(v, p)])
+
+    inputs = [list(range(5)),p0]
+    self.check_codegen(f,inputs=inputs)
+    self.check_serialize(f,inputs=inputs)
+
+    self.checkarray(f(*inputs),DM([0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3]))
 if __name__ == '__main__':
     unittest.main()
