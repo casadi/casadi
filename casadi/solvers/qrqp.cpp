@@ -287,7 +287,7 @@ namespace casadi {
 
     g.comment("Pass initial guess");
     g.copy_default(g.arg(CONIC_X0), nx_, "d.z", "0", false);
-    g << g.fill("d.z+"+str(nx_), na_, "NAN") << "\n";
+    g << g.fill("d.z+"+str(nx_), na_, g.constant(nan)) << "\n";
     g.copy_default(g.arg(CONIC_LAM_X0), nx_, "d.lam", "0", false);
     g.copy_default(g.arg(CONIC_LAM_A0), na_, "d.lam+" + str(nx_), "0", false);
 
