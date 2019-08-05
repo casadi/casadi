@@ -499,8 +499,9 @@ namespace casadi {
     // =================
 
     if (dump_to_file_) {
-      CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP");
-      casadi_error("CPXXwriteprob failed");
+      if (CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP")) {
+        casadi_error("CPXXwriteprob failed");
+      }
     }
 
     // Warm-starting if possible
