@@ -498,12 +498,6 @@ namespace casadi {
     // END SOCP BLOCK
     // =================
 
-    if (dump_to_file_) {
-      if (CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP")) {
-        casadi_error("CPXXwriteprob failed");
-      }
-    }
-
     // Warm-starting if possible
     if (qp_method_ != 0 && qp_method_ != 4 && m->is_warm) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
@@ -551,6 +545,12 @@ namespace casadi {
         }
       }
 
+      if (dump_to_file_) {
+        if (CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP")) {
+          casadi_error("CPXXwriteprob failed");
+        }
+      }
+
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
       // Optimize
@@ -582,6 +582,12 @@ namespace casadi {
       casadi_fill(lam_x, nx_, nan);
 
     } else {
+      if (dump_to_file_) {
+        if (CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP")) {
+          casadi_error("CPXXwriteprob failed");
+        }
+      }
+
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
       // Optimize
