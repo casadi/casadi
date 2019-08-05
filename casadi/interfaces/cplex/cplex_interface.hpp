@@ -161,6 +161,7 @@ namespace casadi {
     double tol_;
     casadi_int dep_check_;
     bool warm_start_;
+    bool mip_start_;
     ///@}
 
     // Are we solving a mixed-integer problem?
