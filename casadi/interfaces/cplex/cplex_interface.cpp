@@ -80,6 +80,9 @@ namespace casadi {
       {"warm_start",
        {OT_BOOL,
         "Use warm start with simplex methods (affects only the simplex methods)."}},
+      {"mip_start",
+       {OT_BOOL,
+        "Hot start integers with x0 [Default false]."}},
       {"sos_groups",
        {OT_INTVECTORVECTOR,
         "Definition of SOS groups by indices."}},
@@ -103,6 +106,7 @@ namespace casadi {
     tol_ = 1e-6;
     dep_check_ = 0;
     warm_start_ = false;
+    mip_start_ = false;
 
     std::vector< std::vector<casadi_int> > sos_groups;
     std::vector< std::vector<double> > sos_weights;
@@ -124,6 +128,8 @@ namespace casadi {
         dep_check_ = op.second;
       } else if (op.first=="warm_start") {
         warm_start_ = op.second;
+      } else if (op.first=="mip_start") {
+        mip_start_ = op.second;
       } else if (op.first=="sos_groups") {
         sos_groups = op.second.to_int_vector_vector();
       } else if (op.first=="sos_weights") {
@@ -522,6 +528,28 @@ namespace casadi {
         casadi_error("CPXXcopyctype failed");
       }
 
+      if (mip_start_) {
+        // Add a single MIP start based on x0
+        const CPXNNZ beg[] = {0};
+        std::vector<int> varindices;
+        std::vector<double> values;
+
+        for (casadi_int i=0; i<nx_; ++i) {
+          if (!discrete_.empty() && discrete_.at(i)) {
+            varindices.push_back(i);
+            values.push_back(x[i]);
+          }
+        }
+
+        casadi_assert_dev(varindices.size() > 0);
+
+        if (CPXXaddmipstarts(m->env, m->lp, 1, varindices.size(), &beg[0],
+                             get_ptr(varindices), get_ptr(values),
+                             nullptr, nullptr)) {
+          casadi_error("CPXXaddmipstarts failed");
+        }
+      }
+
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
       // Optimize
@@ -685,6 +713,7 @@ namespace casadi {
     s.unpack("CplexInterface::tol", tol_);
     s.unpack("CplexInterface::dep_check", dep_check_);
     s.unpack("CplexInterface::warm_start", warm_start_);
+    s.unpack("CplexInterface::mip_start", mip_start_);
     s.unpack("CplexInterface::mip", mip_);
     s.unpack("CplexInterface::ctype", ctype_);
     s.unpack("CplexInterface::sos_weights", sos_weights_);
@@ -704,6 +733,7 @@ namespace casadi {
     s.pack("CplexInterface::tol", tol_);
     s.pack("CplexInterface::dep_check", dep_check_);
     s.pack("CplexInterface::warm_start", warm_start_);
+    s.pack("CplexInterface::mip_start", mip_start_);
     s.pack("CplexInterface::mip", mip_);
     s.pack("CplexInterface::ctype", ctype_);
     s.pack("CplexInterface::sos_weights", sos_weights_);
