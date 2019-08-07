@@ -941,6 +941,12 @@ const  "
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -5130,6 +5136,20 @@ Joris Gillis
 |                  |                 | grid dimension,  | nterpolant       |
 |                  |                 | the degree of    |                  |
 |                  |                 | the spline.      |                  |
++------------------+-----------------+------------------+------------------+
+| inline           | OT_BOOL         | Implement the    | casadi::Interpol |
+|                  |                 | lookup table in  | ant              |
+|                  |                 | MX primitives.   |                  |
+|                  |                 | Useful when you  |                  |
+|                  |                 | need derivatives |                  |
+|                  |                 | with respect to  |                  |
+|                  |                 | grid and/or      |                  |
+|                  |                 | coefficients.    |                  |
+|                  |                 | Such derivatives |                  |
+|                  |                 | are              |                  |
+|                  |                 | fundamentally    |                  |
+|                  |                 | dense, so use    |                  |
+|                  |                 | with caution.    |                  |
 +------------------+-----------------+------------------+------------------+
 | linear_solver    | OT_STRING       | Solver used for  | casadi::BSplineI |
 |                  |                 | constructing the | nterpolant       |
@@ -9716,6 +9736,12 @@ const  "
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -13750,6 +13776,12 @@ Internal class.
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -15412,6 +15444,12 @@ Internal class.
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -18183,6 +18221,12 @@ Internal class.
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -22271,6 +22315,12 @@ std::string, M > &arg) const  "
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -26349,6 +26399,12 @@ std::string &parallelization) const  "
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -29177,6 +29233,12 @@ member functions. Joel Andersson >List of available options
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -33569,16 +33631,28 @@ C++ includes: generic_type.hpp ";
 [INTERNAL] C++ includes: generic_type_internal.hpp ";
 
 
-// File: classcasadi_1_1GetElements.xml
-
-
 // File: classcasadi_1_1GetNonzeros.xml
+
+
+// File: classcasadi_1_1GetNonzerosParam.xml
+
+
+// File: classcasadi_1_1GetNonzerosParamParam.xml
+
+
+// File: classcasadi_1_1GetNonzerosParamSlice.xml
+
+
+// File: classcasadi_1_1GetNonzerosParamVector.xml
 
 
 // File: classcasadi_1_1GetNonzerosSlice.xml
 
 
 // File: classcasadi_1_1GetNonzerosSlice2.xml
+
+
+// File: classcasadi_1_1GetNonzerosSliceParam.xml
 
 
 // File: classcasadi_1_1GetNonzerosVector.xml
@@ -40027,6 +40101,12 @@ Internal class
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -40161,6 +40241,20 @@ Internal class
 |                  |                 | Statistics are   |                  |
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| inline           | OT_BOOL         | Implement the    | casadi::Interpol |
+|                  |                 | lookup table in  | ant              |
+|                  |                 | MX primitives.   |                  |
+|                  |                 | Useful when you  |                  |
+|                  |                 | need derivatives |                  |
+|                  |                 | with respect to  |                  |
+|                  |                 | grid and/or      |                  |
+|                  |                 | coefficients.    |                  |
+|                  |                 | Such derivatives |                  |
+|                  |                 | are              |                  |
+|                  |                 | fundamentally    |                  |
+|                  |                 | dense, so use    |                  |
+|                  |                 | with caution.    |                  |
 +------------------+-----------------+------------------+------------------+
 | input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -41281,6 +41375,12 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -43157,6 +43257,12 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | allow_equilibrat | OT_BOOL         | Non-fatal error  | casadi::LapackLu |
 | ion_failure      |                 | when             |                  |
@@ -43708,6 +43814,12 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -44445,14 +44557,11 @@ casadi::FunctionInternal::codegen_init_mem(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_function() const  "
+%feature("docstring")  casadi::Interpolant::coeff_size() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Size of the flattened coefficients vector.
 
-%feature("docstring")  casadi::FunctionInternal::get_function(const
-std::string &name) const  "
-
-[INTERNAL] ";
+";
 
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
@@ -44646,11 +44755,14 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::Interpolant::coeff_size() const  "
+%feature("docstring")  casadi::FunctionInternal::get_function() const  "
 
-[INTERNAL]  Size of the flattened coefficients vector.
+[INTERNAL] ";
 
-";
+%feature("docstring")  casadi::FunctionInternal::get_function(const
+std::string &name) const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, casadi_int *iw, double *w) const  "
@@ -45226,6 +45338,19 @@ Joel Andersson
 +-------------+-----------------+---------------------+--------------------+
 |     Id      |      Type       |     Description     |      Used in       |
 +=============+=================+=====================+====================+
+| inline      | OT_BOOL         | Implement the       | casadi::Interpolan |
+|             |                 | lookup table in MX  | t                  |
+|             |                 | primitives. Useful  |                    |
+|             |                 | when you need       |                    |
+|             |                 | derivatives with    |                    |
+|             |                 | respect to grid     |                    |
+|             |                 | and/or              |                    |
+|             |                 | coefficients. Such  |                    |
+|             |                 | derivatives are     |                    |
+|             |                 | fundamentally       |                    |
+|             |                 | dense, so use with  |                    |
+|             |                 | caution.            |                    |
++-------------+-----------------+---------------------+--------------------+
 | lookup_mode | OT_STRINGVECTOR | Sets, for each grid | casadi::LinearInte |
 |             |                 | dimenion, the       | rpolant            |
 |             |                 | lookup algorithm    |                    |
@@ -46766,6 +46891,19 @@ get_reverse(casadi_int nadj) if no cached version is available.
 +-------------+-----------------+---------------------+--------------------+
 |     Id      |      Type       |     Description     |      Used in       |
 +=============+=================+=====================+====================+
+| inline      | OT_BOOL         | Implement the       | casadi::Interpolan |
+|             |                 | lookup table in MX  | t                  |
+|             |                 | primitives. Useful  |                    |
+|             |                 | when you need       |                    |
+|             |                 | derivatives with    |                    |
+|             |                 | respect to grid     |                    |
+|             |                 | and/or              |                    |
+|             |                 | coefficients. Such  |                    |
+|             |                 | derivatives are     |                    |
+|             |                 | fundamentally       |                    |
+|             |                 | dense, so use with  |                    |
+|             |                 | caution.            |                    |
++-------------+-----------------+---------------------+--------------------+
 | lookup_mode | OT_STRINGVECTOR | Sets, for each grid | casadi::LinearInte |
 |             |                 | dimenion, the       | rpolantJac         |
 |             |                 | lookup algorithm    |                    |
@@ -48101,6 +48239,9 @@ CasADi routines should go through this files.
 Joel Andersson
 
 C++ includes: casadi_logger.hpp ";
+
+
+// File: classcasadi_1_1Low.xml
 
 
 // File: classcasadi_1_1Lsqr.xml
@@ -53571,6 +53712,20 @@ Set a set of nonzeros
 
 ";
 
+%feature("docstring")  casadi::MX::set_nz(const MX &m, bool ind1, const MX
+&kk) "
+
+Set a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::set_nz(const MX &m, bool ind1, casadi_int
+kk) "
+
+Set a set of nonzeros
+
+";
+
 %feature("docstring")  casadi::GenericMatrixCommon::size2() const "
 
 Get the second dimension (i.e. number of columns)
@@ -53614,6 +53769,60 @@ Get a set of nonzeros
 MatrixCommon &kk) const  "
 
 Get a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::get_nz(MX &output_m, bool ind1, const MX
+&kk) const  "
+
+Get a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::get_nz(MX &output_m, bool ind1,
+casadi_int kk) const  "
+
+Get a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::get_nz(MX &output_m, bool ind1, const MX
+&inner, const Slice &outer) const  "
+
+Get a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::get_nz(MX &output_m, bool ind1, const
+Slice &inner, const MX &outer) const  "
+
+Get a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::get_nz(MX &output_m, bool ind1, const MX
+&inner, const MX &outer) const  "
+
+Get a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::low(const MX &v, const MX &p, const Dict
+&options=Dict()) "
+
+[INTERNAL]   Find first nonzero If failed, returns the number of rows.
+
+";
+
+%feature("docstring") casadi::casadi_low "
+
+Find first nonzero If failed, returns the number of rows.
+
+";
+
+%feature("docstring")  casadi::MX::casadi_low "
+
+Find first nonzero If failed, returns the number of rows.
 
 ";
 
@@ -54142,6 +54351,13 @@ Get a submatrix, two arguments
 
 ";
 
+%feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const Slice
+&rr, casadi_int cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
 %feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const
 MatrixCommon &rr, const Slice &cc) const  "
 
@@ -54149,8 +54365,43 @@ Get a submatrix, two arguments
 
 ";
 
+%feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, casadi_int
+rr, const Slice &cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
 %feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const
 MatrixCommon &rr, const MatrixCommon &cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, casadi_int
+rr, casadi_int cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const MX
+&rr, const Slice &cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const Slice
+&rr, const MX &cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const MX
+&rr, const MX &cc) const  "
 
 Get a submatrix, two arguments
 
@@ -61912,6 +62163,12 @@ Joel Andersson
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -73077,10 +73334,25 @@ Constructor.
 // File: classcasadi_1_1SetNonzeros.xml
 
 
+// File: classcasadi_1_1SetNonzerosParam.xml
+
+
+// File: classcasadi_1_1SetNonzerosParamParam.xml
+
+
+// File: classcasadi_1_1SetNonzerosParamSlice.xml
+
+
+// File: classcasadi_1_1SetNonzerosParamVector.xml
+
+
 // File: classcasadi_1_1SetNonzerosSlice.xml
 
 
 // File: classcasadi_1_1SetNonzerosSlice2.xml
+
+
+// File: classcasadi_1_1SetNonzerosSliceParam.xml
 
 
 // File: classcasadi_1_1SetNonzerosVector.xml
@@ -73516,9 +73788,9 @@ Get scalar (if is_scalar)
 
 ";
 
-%feature("docstring")  casadi::Slice::type_name() const  "
+%feature("docstring")  casadi::Slice::size() const  "
 
-Get name of the class.
+Get number of elements.
 
 ";
 
@@ -73534,6 +73806,24 @@ C++ includes: slice.hpp ";
 %feature("docstring")  casadi::Slice::info() const  "
 
 Obtain information
+
+";
+
+%feature("docstring")  casadi::Slice::all() const  "
+
+Get a vector of indices.
+
+";
+
+%feature("docstring") casadi::casadi_all "
+
+Get a vector of indices.
+
+";
+
+%feature("docstring")  casadi::Slice::casadi_all "
+
+Get a vector of indices.
 
 ";
 
@@ -73575,6 +73865,19 @@ Get a vector of indices (nested slice)
 
 ";
 
+%feature("docstring")  casadi::Slice::apply(casadi_int len, bool ind1=false)
+const  "
+
+Apply concrete length.
+
+";
+
+%feature("docstring")  casadi::Slice::is_empty() const  "
+
+Check if slice is empty.
+
+";
+
 %feature("docstring") casadi::Slice::Slice() "
 
 Default constructor - all elements.
@@ -73591,6 +73894,12 @@ A single element (explicit to avoid ambiguity with IM overload.
 stop, casadi_int step=1) "
 
 A slice.
+
+";
+
+%feature("docstring")  casadi::Slice::type_name() const  "
+
+Get name of the class.
 
 ";
 
@@ -76755,6 +77064,12 @@ Andersson
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -83355,6 +83670,12 @@ Joel Andersson
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -85713,6 +86034,12 @@ General information
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -87626,6 +87953,12 @@ General information
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -89017,6 +89350,12 @@ General information
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
@@ -89151,6 +89490,20 @@ General information
 |                  |                 | Statistics are   |                  |
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| inline           | OT_BOOL         | Implement the    | casadi::Interpol |
+|                  |                 | lookup table in  | ant              |
+|                  |                 | MX primitives.   |                  |
+|                  |                 | Useful when you  |                  |
+|                  |                 | need derivatives |                  |
+|                  |                 | with respect to  |                  |
+|                  |                 | grid and/or      |                  |
+|                  |                 | coefficients.    |                  |
+|                  |                 | Such derivatives |                  |
+|                  |                 | are              |                  |
+|                  |                 | fundamentally    |                  |
+|                  |                 | dense, so use    |                  |
+|                  |                 | with caution.    |                  |
 +------------------+-----------------+------------------+------------------+
 | input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -89526,6 +89879,12 @@ General information
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
+|                  |                 | When set to -1,  |                  |
+|                  |                 | sparsity is      |                  |
+|                  |                 | completely       |                  |
+|                  |                 | ignored and      |                  |
+|                  |                 | dense matrices   |                  |
+|                  |                 | are used.        |                  |
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |

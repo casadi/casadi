@@ -1669,6 +1669,9 @@
 %exception  casadi::MX::lift(const MX &x, const MX &x_guess) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::low(const MX &v, const MX &p, const Dict &options=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::matrix_expand(const MX &e, const std::vector< MX > &boundary=std::vector< MX >(), const Dict &options=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
