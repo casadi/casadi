@@ -360,6 +360,21 @@ namespace casadi {
     */
     virtual MX get_nz_ref(const MX& nz) const;
 
+    /** \brief Get the nonzeros of matrix, parametrically
+    *
+    */
+    virtual MX get_nz_ref(const MX& inner, const Slice& outer) const;
+
+    /** \brief Get the nonzeros of matrix, parametrically
+    *
+    */
+    virtual MX get_nz_ref(const Slice& inner, const MX& outer) const;
+
+    /** \brief Get the nonzeros of matrix, parametrically
+    *
+    */
+    virtual MX get_nz_ref(const MX& inner, const MX& outer) const;
+
     /** \brief Assign the nonzeros of a matrix to another matrix
     *
     *   a->get_nzassign(b,nz)
@@ -381,12 +396,54 @@ namespace casadi {
     */
     virtual MX get_nzassign(const MX& y, const MX& nz) const;
 
+    /** \brief Assign the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
+    virtual MX get_nzassign(const MX& y, const MX& inner, const Slice& outer) const;
+
+    /** \brief Assign the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
+    virtual MX get_nzassign(const MX& y, const Slice& inner, const MX& outer) const;
+
+    /** \brief Assign the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
+    virtual MX get_nzassign(const MX& y, const MX& inner, const MX& outer) const;
+
     /** \brief Add the nonzeros of a matrix to another matrix, parametrically
     *
     *   a->get_nzadd(b,nz)
     *   returns b with b[nz]+=a
     */
     virtual MX get_nzadd(const MX& y, const MX& nz) const;
+
+    /** \brief Add the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
+    virtual MX get_nzadd(const MX& y, const MX& inner, const Slice& outer) const;
+
+    /** \brief Add the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
+    virtual MX get_nzadd(const MX& y, const Slice& inner, const MX& outer) const;
+
+    /** \brief Add the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
+    virtual MX get_nzadd(const MX& y, const MX& inner, const MX& outer) const;
 
     /// Get submatrix reference
     virtual MX get_subref(const Slice& i, const Slice& j) const;

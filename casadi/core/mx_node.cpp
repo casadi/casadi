@@ -519,6 +519,26 @@ namespace casadi {
     return GetNonzerosParam::create(shared_from_this<MX>(), nz);
   }
 
+  MX MXNode::get_nz_ref(const MX& inner, const Slice& outer) const {
+    if (outer.all()==std::vector<casadi_int>{0}) {
+      return get_nz_ref(inner);
+    } else {
+      return GetNonzerosParam::create(shared_from_this<MX>(), inner, outer);
+    }
+  }
+
+  MX MXNode::get_nz_ref(const Slice& inner, const MX& outer) const {
+    if (inner.all()==std::vector<casadi_int>{0}) {
+      return get_nz_ref(outer);
+    } else {
+      return GetNonzerosParam::create(shared_from_this<MX>(), inner, outer);
+    }
+  }
+
+  MX MXNode::get_nz_ref(const MX& inner, const MX& outer) const {
+    return GetNonzerosParam::create(shared_from_this<MX>(), inner, outer);
+  }
+
   MX MXNode::get_nzassign(const MX& y, const vector<casadi_int>& nz) const {
     // Check if any element needs to be set at all
     bool set_any = false;
@@ -543,12 +563,47 @@ namespace casadi {
     return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), nz);
   }
 
+  MX MXNode::get_nzassign(const MX& y, const MX& inner, const Slice& outer) const {
+    return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), inner, outer);
+  }
+
+  MX MXNode::get_nzassign(const MX& y, const Slice& inner, const MX& outer) const {
+    return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), inner, outer);
+  }
+
+  MX MXNode::get_nzassign(const MX& y, const MX& inner, const MX& outer) const {
+    return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), inner, outer);
+  }
 
   MX MXNode::get_nzadd(const MX& y, const MX& nz) const {
     if (nz.is_empty() || is_zero()) {
       return y;
     } else {
       return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), nz);
+    }
+  }
+
+  MX MXNode::get_nzadd(const MX& y, const MX& inner, const Slice& outer) const {
+    if (inner.is_empty() || outer.is_empty() || is_zero()) {
+      return y;
+    } else {
+      return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), inner, outer);
+    }
+  }
+
+  MX MXNode::get_nzadd(const MX& y, const Slice& inner, const MX& outer) const {
+    if (outer.is_empty() || outer.is_empty() || is_zero()) {
+      return y;
+    } else {
+      return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), inner, outer);
+    }
+  }
+
+  MX MXNode::get_nzadd(const MX& y, const MX& inner, const MX& outer) const {
+    if (inner.is_empty() || outer.is_empty() || is_zero()) {
+      return y;
+    } else {
+      return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), inner, outer);
     }
   }
 

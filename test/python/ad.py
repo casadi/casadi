@@ -517,92 +517,96 @@ class ADtests(casadiTestCase):
 
     # nz[] double entry
     # add
-   
 
-    for inputs,values,out, jac, with_sx in [
-          (in1,v1,y_nz,blockcat([[MX(1,1),MX(1,1)],[1,MX(1,1)],[MX(1,1),1],[MX(1,1),MX(1,1)]]),True),
-          (in1,v1,y_nzx,blockcat([[cos(x[0]),MX(1,1)],[2*x[0],MX(1,1)]]),True),
-          (in1,[DM([2,1]),v1[1]],y.nz[x],DM(2,2),False),
-          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],x.nz[y[:,0]],blockcat([[0,1],[1,0]]),False),
-          (in1,[v1[0],DM([[2,1.5],[1,0.9]])],y_nzs,blockcat([[0,0],[1,0],[0,1],[0,0]]),False),
-          (in1,[v1[0],DM([[0,1.5],[1,0.9]])],y_nzxs,blockcat([[cos(x[0]),0],[2*x[0],0]]),False),
-          (in1,[v1[0],DM([[1,1.5],[1,0.9]])],x.nz[y[:,0]],blockcat([[0,1],[0,1]]),False),
-          (in1,v1,x,DM.eye(2),True),
-          (in1,v1,x.T,DM.eye(2),True),
-          (in1,v1,x**2,2*c.diag(x),True),
-          (in1,v1,(x**2).attachAssert(True),2*c.diag(x),True),
-          (in1,v1,(x**2).T,2*c.diag(x),True),
-          (in1,v1,c.reshape(x,(1,2)),DM.eye(2),True),
-          (in1,v1,c.reshape(x**2,(1,2)),2*c.diag(x),True),
-          (in1,v1,x+y.nz[0],DM.eye(2),True),
-          (in1,v1,x+y[0,0],DM.eye(2),True),
-          (in1,v1,x+x,2*DM.eye(2),True),
-          (in1,v1,x**2+x,2*c.diag(x)+DM.eye(2),True),
-          (in1,v1,x*x,2*c.diag(x),True),
-          (in1,v1,x*y.nz[0],DM.eye(2)*y.nz[0],True),
-          (in1,v1,x*y[0,0],DM.eye(2)*y[0,0],True),
-          (in1,v1,x[0],DM.eye(2)[0,:],True),
-          (in1,v1,(x**2)[0],horzcat(*[2*x[0],MX(1,1)]),True),
-          (in1,v1,x[0]+x[1],DM.ones(1,2),True),
-          (in1,v1,sin(repmat(x**2,1,3)),repmat(cos(c.diag(x**2))*2*c.diag(x),3,1),True),
-          (in1,v1,sin(repsum((x**2).T,1,2)),cos(x[0]**2+x[1]**2)*2*x.T,True),
-          (in1,v1,vertcat(*[x[1],x[0]]),sparsify(DM([[0,1],[1,0]])),True),
-          (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DM([[0,1]])),True),
-          (in1,v1,vertcat(*[x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True),
-          (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX(1,1),2*x[1]]]),True),
-          (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX(1,1),6*x[1]**5]]),True),
-          (in1,v1,horzcat(*[x[1],x[0]]).T,sparsify(DM([[0,1],[1,0]])),True),
-          (in1,v1,horzcat(*[x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True),
+    xx = horzcat(sin(x),cos(x))
+
+    for inputs,values,out, jac, with_sx, std in [
+          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[y[:,0],:],blockcat([[0,cos(x[1])],[cos(x[0]),0],[0,-sin(x[1])],[-sin(x[0]),0]]),False,"c99"),
+          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[:,y[:,0]],blockcat([[-sin(x[0]),0],[0,-sin(x[1])],[cos(x[0]),0],[0,cos(x[1])]]),False,"c99"),
+          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[y[:,0],y[:,0]],blockcat([[0,-sin(x[1])],[-sin(x[0]),0],[0,cos(x[1])],[cos(x[0]),0]]),False,"c99"),
+          (in1,v1,y_nz,blockcat([[MX(1,1),MX(1,1)],[1,MX(1,1)],[MX(1,1),1],[MX(1,1),MX(1,1)]]),True,"c89"),
+          (in1,v1,y_nzx,blockcat([[cos(x[0]),MX(1,1)],[2*x[0],MX(1,1)]]),True,"c89"),
+          (in1,[DM([2,1]),v1[1]],y.nz[x],DM(2,2),False,"c99"),
+          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],sin(x).nz[y[:,0]],blockcat([[0,cos(x[1])],[cos(x[0]),0]]),False,"c99"),
+          (in1,[v1[0],DM([[2,1.5],[1,0.9]])],y_nzs,blockcat([[0,0],[1,0],[0,1],[0,0]]),False,"c99"),
+          (in1,[v1[0],DM([[0,1.5],[1,0.9]])],y_nzxs,blockcat([[cos(x[0]),0],[2*x[0],0]]),False,"c99"),
+          (in1,[v1[0],DM([[1,1.5],[1,0.9]])],x.nz[y[:,0]],blockcat([[0,1],[0,1]]),False,"c99"),
+          (in1,v1,x,DM.eye(2),True,"c89"),
+          (in1,v1,x.T,DM.eye(2),True,"c89"),
+          (in1,v1,x**2,2*c.diag(x),True,"c89"),
+          (in1,v1,(x**2).attachAssert(True),2*c.diag(x),True,"c89"),
+          (in1,v1,(x**2).T,2*c.diag(x),True,"c89"),
+          (in1,v1,c.reshape(x,(1,2)),DM.eye(2),True,"c89"),
+          (in1,v1,c.reshape(x**2,(1,2)),2*c.diag(x),True,"c89"),
+          (in1,v1,x+y.nz[0],DM.eye(2),True,"c89"),
+          (in1,v1,x+y[0,0],DM.eye(2),True,"c89"),
+          (in1,v1,x+x,2*DM.eye(2),True,"c89"),
+          (in1,v1,x**2+x,2*c.diag(x)+DM.eye(2),True,"c89"),
+          (in1,v1,x*x,2*c.diag(x),True,"c89"),
+          (in1,v1,x*y.nz[0],DM.eye(2)*y.nz[0],True,"c89"),
+          (in1,v1,x*y[0,0],DM.eye(2)*y[0,0],True,"c89"),
+          (in1,v1,x[0],DM.eye(2)[0,:],True,"c89"),
+          (in1,v1,(x**2)[0],horzcat(*[2*x[0],MX(1,1)]),True,"c89"),
+          (in1,v1,x[0]+x[1],DM.ones(1,2),True,"c89"),
+          (in1,v1,sin(repmat(x**2,1,3)),repmat(cos(c.diag(x**2))*2*c.diag(x),3,1),True,"c89"),
+          (in1,v1,sin(repsum((x**2).T,1,2)),cos(x[0]**2+x[1]**2)*2*x.T,True,"c89"),
+          (in1,v1,vertcat(*[x[1],x[0]]),sparsify(DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DM([[0,1]])),True,"c89"),
+          (in1,v1,vertcat(*[x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True,"c89"),
+          (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX(1,1),2*x[1]]]),True,"c89"),
+          (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX(1,1),6*x[1]**5]]),True,"c89"),
+          (in1,v1,horzcat(*[x[1],x[0]]).T,sparsify(DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,horzcat(*[x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True,"c89"),
           (in1,v1,diagcat(*[x[1]**2,y,x[0]**2]),
             blockcat(  [[MX(1,1),2*x[1]]] + ([[MX(1,1),MX(1,1)]]*14)  + [[2*x[0],MX(1,1)]] )
-          ,True),
-          (in1,v1,horzcat(*[x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True),
-          (in1,v1,x[[0,1]],sparsify(DM([[1,0],[0,1]])),True),
-          (in1,v1,(x**2)[[0,1]],2*c.diag(x),True),
-          (in1,v1,x[[0,0,1,1]],sparsify(DM([[1,0],[1,0],[0,1],[0,1]])),True),
-          (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX(1,1)],[2*x[0],MX(1,1)],[MX(1,1),2*x[1]],[MX(1,1),2*x[1]]]),True),
-          (in1,v1,wwr,sparsify(DM([[2,0],[0,2]])),True),
-          (in1,v1,x[[1,0]],sparsify(DM([[0,1],[1,0]])),True),
-          (in1,v1,x[[1,0],0],sparsify(DM([[0,1],[1,0]])),True),
-          (in1,v1,w,sparsify(DM([[1,0],[0,2]])),True),
-          (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]]),True),
-          (in1,v1,ww,2*c.diag(x),True),
-          (in1,v1,wwf,vertcat(*[x[[1,0]].T,x[[1,0]].T]),True),
-          (in1,v1,yy[:,0],DM.eye(2),True),
-          (in1,v1,yy2[:,0],2*c.diag(x),True),
-          (in1,v1,yyy[:,0],sparsify(DM([[0,1],[1,0]])),True),
-          (in1,v1,mtimes(y,x),y,True),
-          (in1,v1,mtimes(x.T,y.T),y,True),
-          (in1,v1,mac(y,x,DM.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])],True),
-          (in1,v1,mac(x.T,y.T,DM.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])],True),
-          (in1,v1,mtimes(y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],x),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True),
-          (in1,v1,mtimes(x.T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True),
-          (in1,v1,mtimes(y,x**2),y*2*vertcat(*[x.T,x.T]),True),
-          (in1,v1,sin(x),c.diag(cos(x)),True),
-          (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x),True),
-          (in1,v1,x*y[:,0],c.diag(y[:,0]),True),
-          (in1,v1,x*y.nz[[0,1]],c.diag(y.nz[[0,1]]),True),
-          (in1,v1,x*y.nz[[1,0]],c.diag(y.nz[[1,0]]),True),
-          (in1,v1,x*y[[0,1],0],c.diag(y[[0,1],0]),True),
-          (in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0]),True),
-          (in1,v1,c.dot(x,x),(2*x).T,True),
-          (in1,v1,c.dot(x**2,x),(3*x**2).T,True),
+          ,True,"c89"),
+          (in1,v1,horzcat(*[x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True,"c89"),
+          (in1,v1,x[[0,1]],sparsify(DM([[1,0],[0,1]])),True,"c89"),
+          (in1,v1,(x**2)[[0,1]],2*c.diag(x),True,"c89"),
+          (in1,v1,x[[0,0,1,1]],sparsify(DM([[1,0],[1,0],[0,1],[0,1]])),True,"c89"),
+          (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX(1,1)],[2*x[0],MX(1,1)],[MX(1,1),2*x[1]],[MX(1,1),2*x[1]]]),True,"c89"),
+          (in1,v1,wwr,sparsify(DM([[2,0],[0,2]])),True,"c89"),
+          (in1,v1,x[[1,0]],sparsify(DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,x[[1,0],0],sparsify(DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,w,sparsify(DM([[1,0],[0,2]])),True,"c89"),
+          (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]]),True,"c89"),
+          (in1,v1,ww,2*c.diag(x),True,"c89"),
+          (in1,v1,wwf,vertcat(*[x[[1,0]].T,x[[1,0]].T]),True,"c89"),
+          (in1,v1,yy[:,0],DM.eye(2),True,"c89"),
+          (in1,v1,yy2[:,0],2*c.diag(x),True,"c89"),
+          (in1,v1,yyy[:,0],sparsify(DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,mtimes(y,x),y,True,"c89"),
+          (in1,v1,mtimes(x.T,y.T),y,True,"c89"),
+          (in1,v1,mac(y,x,DM.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])],True,"c89"),
+          (in1,v1,mac(x.T,y.T,DM.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])],True,"c89"),
+          (in1,v1,mtimes(y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],x),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
+          (in1,v1,mtimes(x.T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
+          (in1,v1,mtimes(y,x**2),y*2*vertcat(*[x.T,x.T]),True,"c89"),
+          (in1,v1,sin(x),c.diag(cos(x)),True,"c89"),
+          (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x),True,"c89"),
+          (in1,v1,x*y[:,0],c.diag(y[:,0]),True,"c89"),
+          (in1,v1,x*y.nz[[0,1]],c.diag(y.nz[[0,1]]),True,"c89"),
+          (in1,v1,x*y.nz[[1,0]],c.diag(y.nz[[1,0]]),True,"c89"),
+          (in1,v1,x*y[[0,1],0],c.diag(y[[0,1],0]),True,"c89"),
+          (in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0]),True,"c89"),
+          (in1,v1,c.dot(x,x),(2*x).T,True,"c89"),
+          (in1,v1,c.dot(x**2,x),(3*x**2).T,True,"c89"),
           #(in1,v1,c.det(horzcat(*[x,DM([1,2])])),DM([-1,2])), not implemented
-          (in1,v1,f1.call(in1)[1],y,True),
-          (in1,v1,f1.call([x**2,y])[1],y*2*vertcat(*[x.T,x.T]),True),
-          (in1,v1,f2.call(in1)[0],DM.zeros(0,2),True),
-          (in1,v1,f2(x**2,y),DM.zeros(0,2),True),
-          (in1,v1,f3.call(in1)[0],DM.zeros(0,2),True),
-          (in1,v1,f3.call([x**2,y])[0],DM.zeros(0,2),True),
-          (in1,v1,f4.call(in1)[0],DM.zeros(0,2),True),
-          (in1,v1,f4.call([x**2,y])[0],DM.zeros(0,2),True),
-          #(in1,v1,f1([x**2,[]])[1],DM.zeros(2,2),True),
-          #(in1,v1,f1([[],y])[1],DM.zeros(2,2),True),
-          (in1,v1,vertcat(*[x,DM(0,1)]),DM.eye(2),True),
-          (in1,v1,project(x**2, sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]]),True),
-          (in1,v1,c.dot(x,y[:,0]),y[:,0].T,True),
-          (in1,v1,x.nz[IM([[1,0]])].T*y.nz[IM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]]),True),
-          (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]]),True),
+          (in1,v1,f1.call(in1)[1],y,True,"c89"),
+          (in1,v1,f1.call([x**2,y])[1],y*2*vertcat(*[x.T,x.T]),True,"c89"),
+          (in1,v1,f2.call(in1)[0],DM.zeros(0,2),True,"c89"),
+          (in1,v1,f2(x**2,y),DM.zeros(0,2),True,"c89"),
+          (in1,v1,f3.call(in1)[0],DM.zeros(0,2),True,"c89"),
+          (in1,v1,f3.call([x**2,y])[0],DM.zeros(0,2),True,"c89"),
+          (in1,v1,f4.call(in1)[0],DM.zeros(0,2),True,"c89"),
+          (in1,v1,f4.call([x**2,y])[0],DM.zeros(0,2),True,"c89"),
+          #(in1,v1,f1([x**2,[]])[1],DM.zeros(2,2),True,"c89"),
+          #(in1,v1,f1([[],y])[1],DM.zeros(2,2),True,"c89"),
+          (in1,v1,vertcat(*[x,DM(0,1)]),DM.eye(2),True,"c89"),
+          (in1,v1,project(x**2, sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]]),True,"c89"),
+          (in1,v1,c.dot(x,y[:,0]),y[:,0].T,True,"c89"),
+          (in1,v1,x.nz[IM([[1,0]])].T*y.nz[IM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]]),True,"c89"),
+          (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]]),True,"c89"),
 
      ]:
       print(out)
@@ -620,9 +624,9 @@ class ADtests(casadiTestCase):
         funsx_out = funsx.call(values)
         self.checkarray(fun_out[0],funsx_out[0])
         self.checkarray(fun_out[1],funsx_out[1])
-
-      self.check_codegen(fun,inputs=values,std="c99")
-
+      else:
+        funsx_ad = None
+      self.check_codegen(fun,inputs=values,std=std)
       self.check_serialize(fun,inputs=values)
 
       J_ = fun_out[1]
@@ -638,7 +642,7 @@ class ADtests(casadiTestCase):
 
       vf_mx = None
 
-      for f in [fun] + [fun.expand('expand_'+fun.name())] if with_sx else []:
+      for f in [fun] + ([fun.expand('expand_'+fun.name())] if with_sx else []):
         d1 = f.forward(ndir)
         d2 = f.reverse(ndir)
 
@@ -676,7 +680,7 @@ class ADtests(casadiTestCase):
               vf_in.append(0)
 
             vf_out = vf.call(vf_in)
-            self.check_codegen(vf,inputs=vf_in)
+            self.check_codegen(vf,inputs=vf_in,std=std)
             self.check_serialize(vf,inputs=vf_in)
 
             offset = len(res)
@@ -702,7 +706,7 @@ class ADtests(casadiTestCase):
               vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
 
             vf_out = vf.call(vf_in)
-            self.check_codegen(vf,inputs=vf_in)
+            self.check_codegen(vf,inputs=vf_in,std=std)
             self.check_serialize(vf,inputs=vf_in)
             storagekey = (spmod,spmod2)
             if not(storagekey in storage):
@@ -736,7 +740,7 @@ class ADtests(casadiTestCase):
                 vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
 
               vf2_out = vf2.call(vf2_in)
-              self.check_codegen(vf2,inputs=vf2_in)
+              self.check_codegen(vf2,inputs=vf2_in,std=std)
               self.check_serialize(vf2,inputs=vf2_in)
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
@@ -752,16 +756,16 @@ class ADtests(casadiTestCase):
               if a.numel()==0 and sparsify(b).nnz()==0: continue
               self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k)))
 
-      for expand in [False] + [True] if with_sx else []:
+      for expand in [False] + ([True] if with_sx else []):
         #  jacobian()
         for mode in ["forward","reverse"]:
           ind = 0 if mode=='forward' else 1
-          f = fun_ad[ind] if expand  else funsx_ad[ind]
+          f = funsx_ad[ind] if expand else fun_ad[ind]
 
           Jf=f.jacobian_old(0,0)
           Jf_out = Jf.call(values)
 
-          self.check_codegen(Jf,inputs=values)
+          self.check_codegen(Jf,inputs=values,std=std)
           self.check_serialize(Jf,inputs=values)
           self.checkarray(Jf_out[0],J_)
           self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
@@ -774,7 +778,7 @@ class ADtests(casadiTestCase):
       s_k = s_i*out.size2()+s_j
       H_ = None
 
-      for expand in [False] + [True] if with_sx else []:
+      for expand in [False] + ([True] if with_sx else []):
         for mode in ["forward","reverse"]:
           w = 0 if mode=='forward' else 1
           f = Function("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
@@ -784,7 +788,7 @@ class ADtests(casadiTestCase):
 
           Hf=f.hessian_old(0, 0)
           Hf_out = Hf.call(values)
-          self.check_codegen(Hf,inputs=values)
+          self.check_codegen(Hf,inputs=values,std=std)
           self.check_serialize(Hf,inputs=values)
           if H_ is None:
             H_ = Hf_out[0]

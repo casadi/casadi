@@ -338,9 +338,22 @@ namespace casadi {
     ///@{
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Slice& cc) const;
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Matrix<casadi_int>& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, casadi_int cc) const {
+      get(m, ind1, rr, Matrix<casadi_int>(cc));
+    }
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& rr, const Slice& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, casadi_int rr, const Slice& cc) const {
+      get(m, ind1, Matrix<casadi_int>(rr), cc);
+    }
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& rr,
                                             const Matrix<casadi_int>& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, casadi_int rr,
+                                            casadi_int cc) const {
+      get(m, ind1, Matrix<casadi_int>(rr), Matrix<casadi_int>(cc));
+    }
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const MX& rr, const Slice& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const MX& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const MX& rr, const MX& cc) const;
     ///@}
 
     ///@{
@@ -364,7 +377,12 @@ namespace casadi {
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Slice& kk) const;
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& kk) const;
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const MX& kk) const;
-    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, casadi_int kk) const { get_nz(m, ind1, Matrix<casadi_int>(kk)); }
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, casadi_int kk) const {
+      get_nz(m, ind1, Matrix<casadi_int>(kk));
+    }
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const MX& inner, const Slice& outer) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Slice& inner, const MX& outer) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const MX& inner, const MX& outer) const;
     ///@}
 
     ///@{

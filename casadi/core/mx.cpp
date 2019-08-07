@@ -200,6 +200,21 @@ namespace casadi {
     m = project(*this, sp);
   }
 
+  void MX::get(MX& m, bool ind1, const Slice& rr, const MX& cc) const {
+    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
+    m = (*this)->get_nz_ref(rr.apply(size1(), ind1), (ind1 ? cc-1 : cc)*size1());
+  }
+
+  void MX::get(MX& m, bool ind1, const MX& rr, const Slice& cc) const {
+    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
+    m = (*this)->get_nz_ref(ind1 ? rr-1 : rr, cc.apply(size2(), ind1)*size1());
+  }
+
+  void MX::get(MX& m, bool ind1, const MX& rr, const MX& cc) const {
+    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
+    m = (*this)->get_nz_ref(ind1 ? rr-1 : rr, (ind1 ? cc-1 : cc)*size1());
+  }
+
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
     // Fall back on (IM, IM)
     set(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
@@ -404,6 +419,21 @@ namespace casadi {
     m = (*this)->get_nz_ref(ind1 ? kk-1.0 : kk);
   }
 
+  void MX::get_nz(MX& m, bool ind1, const MX& inner, const MX& outer) const {
+    // Create return MX
+    m = (*this)->get_nz_ref(ind1 ? inner-1.0: inner, ind1 ? outer-1.0: outer);
+  }
+
+  void MX::get_nz(MX& m, bool ind1, const Slice& inner, const MX& outer) const {
+    // Create return MX
+    m = (*this)->get_nz_ref(ind1 ? inner-1: inner, ind1 ? outer-1.0: outer);
+  }
+
+  void MX::get_nz(MX& m, bool ind1, const MX& inner, const Slice& outer) const {
+    // Create return MX
+    m = (*this)->get_nz_ref(ind1 ? inner-1.0: inner, ind1 ? outer-1: outer);
+  }
+
   void MX::set_nz(const MX& m, bool ind1, const Slice& kk) {
     // Fallback on IM
     set_nz(m, ind1, kk.all(nnz(), ind1));
@@ -466,7 +496,7 @@ namespace casadi {
   }
 
   void MX::set_nz(const MX& m, bool ind1, const MX& kk) {
-    *this = m->get_nzassign(*this, kk);
+    *this = m->get_nzassign(*this, ind1 ? kk-1 : kk);
   }
 
   MX MX::binary(casadi_int op, const MX &x, const MX &y) {
@@ -1881,12 +1911,12 @@ namespace casadi {
                 const std::vector<MX>& xis, // Normalised coordinates
                 const std::vector<MX>& L, const std::vector<MX>& Lp, // Lower indices
                 const std::vector<casadi_int>& strides,
-                const MX& I,
+                const Slice& I,
                 const MX& offset=0 // Offset into coefficients vector
                 ) {
     if (i==0) {
       MX ret;
-      v.get_nz(ret, false, offset+I);
+      v.get_nz(ret, false, offset, I);
       return ret;
     } else {
       casadi_int j = xis.size()-i;
@@ -1957,7 +1987,7 @@ namespace casadi {
       Lps.push_back(Lp);
     }
 
-    MX I = MX(DM::repmat(DM(range(n_out)).T(), nq, 1));
+    Slice I(0, n_out);
 
     return interpn_G(n_dim, v, xis, Ls, Lps, strides, I);
   }
