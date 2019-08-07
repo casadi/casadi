@@ -2852,7 +2852,7 @@ class MXtests(casadiTestCase):
     v = MX.sym("v",N**n_dim*n_out)
     xq = [MX.sym("xq%d" % i,nq) for i in range(n_dim)]
 
-    e = MX.interpn(x,v,xq)
+    e = MX.interpn_linear(x,v,xq)
 
     f = Function('f',[hcat(x),v,vcat(xq)],[e])
     inputs = [hcat([hcat(e) for e in grid]),d,vcat(x0)]

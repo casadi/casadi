@@ -558,7 +558,7 @@ namespace casadi {
      *
      * Accepts lookup_mode option.
      */
-    static MX interpn_linear(const std::vector<MX>& x, const MX& v, const std::vector<MX>& xq, const Dict& opts);
+    static MX interpn_linear(const std::vector<MX>& x, const MX& v, const std::vector<MX>& xq, const Dict& opts=Dict());
 
     MX printme(const MX& b) const;
 
