@@ -183,7 +183,8 @@ namespace casadi {
        {OT_DOUBLE,
         "Weighting factor for sparsity pattern calculation calculation."
         "Overrides default behavior. Set to 0 and 1 to force forward and "
-        "reverse mode respectively. Cf. option \"ad_weight\"."}},
+        "reverse mode respectively. Cf. option \"ad_weight\". "
+        "When set to -1, sparsity is completely ignored and dense matrices are used."}},
       {"always_inline",
        {OT_BOOL,
         "Force inlining."}},
@@ -1612,6 +1613,10 @@ namespace casadi {
 
         // Get weighting factor
         double w = sp_weight();
+
+        if (w==-1) {
+          return Sparsity::dense(nnz_out(oind), nnz_in(iind));
+        }
 
         // Use forward mode?
         if (w*static_cast<double>(nsweep_fwd) <= (1-w)*static_cast<double>(nsweep_adj)) {
