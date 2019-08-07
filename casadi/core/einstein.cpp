@@ -37,7 +37,7 @@ using namespace std;
 namespace casadi {
 
 
-  typedef void (*einstein_external)(casadi_int, const casadi_int*, const casadi_int*,
+  typedef int (*einstein_external)(casadi_int, const casadi_int*, const casadi_int*,
                                     casadi_int, const casadi_int*, const casadi_int*,
                                     casadi_int, const casadi_int*, const casadi_int*,
                                     const double*, const double*, double*);
@@ -68,7 +68,7 @@ namespace casadi {
   }
 
   std::string Einstein::disp(const std::vector<std::string>& arg) const {
-    return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ")";
+    return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ";" + str(dim_a_) + str(dim_b_) + str(dim_c_) + str(a_) + str(b_) + str(c_) + ")";
   }
 
   int Einstein::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
@@ -79,15 +79,14 @@ namespace casadi {
       wrapper.init_handle();
       einstein_external cb = (einstein_external) wrapper.get_function("einstein_eval");
       casadi_assert_dev(cb);
-      cb(dim_a_.size(), get_ptr(dim_a_), get_ptr(a_),
+      int ret = cb(dim_a_.size(), get_ptr(dim_a_), get_ptr(a_),
         dim_b_.size(), get_ptr(dim_b_), get_ptr(b_),
         dim_c_.size(), get_ptr(dim_c_), get_ptr(c_),
         arg[1], arg[2], res[0]);
-    } else {
-      return eval_gen<double>(arg, res, iw, w);
+      if (ret==0) return 0;
+      casadi_warning("Fallthrough");
     }
-
-    return 0;
+    return eval_gen<double>(arg, res, iw, w);
   }
 
   int Einstein::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
