@@ -2821,5 +2821,61 @@ class MXtests(casadiTestCase):
     self.check_serialize(f,inputs=inputs)
 
     self.checkarray(f(*inputs),DM([0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3]))
+
+  def test_linear_interpn(self):
+    N = 4
+    n_dim=1
+    nq = 3
+    n_out = 2
+    grid = []
+    x0 = []
+    for i in range(n_dim):
+      g = sorted(list(np.random.random(N)))
+      grid.append(g)
+      x0.append(np.linspace(g[0],g[-1],nq+2)[1:-1])
+
+    x0r = list(zip(*x0))
+
+    D = np.random.random([n_out]+[N]*n_dim)
+
+    d = D.ravel(order='F')
+
+    strides = [n_out]
+    for i in range(n_dim):
+      strides.append(strides[-1]*N)
+
+    F = interpolant('F', 'linear', grid, d)
+    
+    ref = vcat([F(x).T for x in x0r])
+
+    x = [MX.sym("x%d" % i,1,N) for i in range(n_dim)]
+    v = MX.sym("v",N**n_dim*n_out)
+    xq = [MX.sym("xq%d" % i,nq) for i in range(n_dim)]
+
+    e = MX.interpn(x,v,xq)
+
+    f = Function('f',[hcat(x),v,vcat(xq)],[e])
+    inputs = [hcat([hcat(e) for e in grid]),d,vcat(x0)]
+    r = f(*inputs)
+    self.checkarray(r, ref)
+    self.check_codegen(f,inputs=inputs,std="c99")
+    self.check_serialize(f,inputs=inputs)
+
+  def test_paramslice(self):
+    N = 4
+    M = 6
+    A = DM.rand(N,M)
+    As = MX.sym("A", A.shape)
+    vr=list(range(N))
+    vc=list(range(M))
+    for r in [1, slice(1,3), slice(0,N,2), slice(None)]:
+      rs = MX.sym("r",A[r,:].shape[0])
+      for c in [1, slice(1,3), slice(0,M,2), slice(None)]:
+        cs = MX.sym("c",A[:,c].shape[1])
+        for rr in [r, rs]:
+          for cc in [c, cs]:
+            f = Function('f',[As,rs,cs],[As[rr,cc]])
+            self.checkarray(f(A,vr[r],vc[c]),A[r,c])
+
 if __name__ == '__main__':
     unittest.main()

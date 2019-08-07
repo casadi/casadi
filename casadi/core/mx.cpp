@@ -1876,6 +1876,92 @@ namespace casadi {
     return BSpline::dual(x, knots, degree, opts);
   }
 
+  MX interpn_G(casadi_int i, // Dimension to interpolate along
+                const MX& v, // Coefficients
+                const std::vector<MX>& xis, // Normalised coordinates
+                const std::vector<MX>& L, const std::vector<MX>& Lp, // Lower indices
+                const std::vector<casadi_int>& strides,
+                const MX& I,
+                const MX& offset=0 // Offset into coefficients vector
+                ) {
+    if (i==0) {
+      MX ret;
+      v.get_nz(ret, false, offset+I);
+      return ret;
+    } else {
+      casadi_int j = xis.size()-i;
+      MX offsetL, offsetR;
+      if (strides[j]==1) {
+        offsetL = offset+L[j];
+        offsetR = offset+Lp[j];
+      } else {
+        offsetL = offset+L[j]*strides[j];
+        offsetR = offsetL+strides[j];
+      }
+      MX vl = interpn_G(i-1, v, xis, L, Lp, strides, I, offsetL);
+      MX vu = interpn_G(i-1, v, xis, L, Lp, strides, I, offsetR);
+
+      // Perform interpolation between vl and vu
+      return vl + xis[j]*(vu-vl);
+    }
+  }
+
+  MX MX::interpn_linear(const std::vector<MX>& x, const MX& v, const std::vector<MX>& xq,
+      const Dict& opts) {
+
+    casadi_int n_dim = x.size();
+    std::vector<std::string> lookup_mode(n_dim, "auto");
+    for (auto&& op : opts) {
+      if (op.first=="lookup_mode") {
+        lookup_mode = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
+    casadi_assert_dev(xq.size()==n_dim);
+    casadi_assert_dev(v.is_vector());
+
+    // Extract grid dimensions
+    std::vector<casadi_int> x_dims;
+    for (auto e : x) x_dims.push_back(e.numel());
+
+    // Determine multipicity of output
+    casadi_int n_out = v.numel()/product(x_dims);
+    casadi_assert(n_out*product(x_dims)==v.numel(),
+      "Dimension mismatch: coefficients (" + str(v.numel()) + ") should be "
+      "an integer multiple of product-of-dimensions (" + str(product(x_dims)) + ").");
+
+    // Dimension check xq
+    casadi_int nq = xq[0].numel();
+    for (auto e : xq) {
+      casadi_assert_dev(e.is_vector() && e.numel()==nq);
+    }
+
+    // Compute stride vector
+    std::vector<casadi_int> strides;
+    strides.push_back(n_out);
+    for (auto d : x_dims) strides.push_back(strides.back()*d);
+
+    // Pre-compute lower index and normalized coordinate
+    // (Allows for more sub-expression sharing)
+    std::vector<MX> xis, Ls, Lps;
+    for (casadi_int i=0;i<n_dim;++i) {
+      MX L = low(x[i], xq[i], {{"lookup_mode", lookup_mode[i]}});
+      MX Lp = L+1;
+      MX xl, xu;
+      x[i].get_nz(xl, false, L);
+      x[i].get_nz(xu, false, Lp);
+      xis.push_back((xq[i]-xl)/(xu-xl));
+      Ls.push_back(L);
+      Lps.push_back(Lp);
+    }
+
+    MX I = MX(DM::repmat(DM(range(n_out)).T(), nq, 1));
+
+    return interpn_G(n_dim, v, xis, Ls, Lps, strides, I);
+  }
+
   std::vector<MX> MX::get_input(const Function& f) {
     return f.mx_in();
   }

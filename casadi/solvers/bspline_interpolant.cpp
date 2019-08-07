@@ -38,6 +38,7 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &BSplineInterpolant::options_;
     plugin->deserialize = &BSplineInterpolant::deserialize;
+    plugin->exposed.do_inline = nullptr;
     return 0;
   }
 

@@ -534,6 +534,14 @@ namespace casadi {
 
 #endif // SWIG
 
+    /** \brief Low-level access to inlined linear interpolation
+     *
+     * Usually, you want to be using 'interpolant' instead.
+     *
+     * Accepts lookup_mode option.
+     */
+    static MX interpn_linear(const std::vector<MX>& x, const MX& v, const std::vector<MX>& xq, const Dict& opts);
+
     MX printme(const MX& b) const;
 
 #if !defined(SWIG) || defined(DOXYGEN)

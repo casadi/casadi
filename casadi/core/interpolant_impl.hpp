@@ -103,8 +103,23 @@ namespace casadi {
                                     const std::vector<double>& values,
                                     casadi_int m);
 
+    /** \brief  Comstruct a new Interpolant */
+    static Function construct(const std::string& solver, const std::string& name,
+                      const std::vector<double>& grid,
+                      const std::vector<casadi_int>& offset,
+                      const std::vector<double>& values,
+                      casadi_int m,
+                      const Dict& opts);
+
+    typedef Function (* DoInline)(const std::string& name,
+                    const std::vector<double>& grid,
+                    const std::vector<casadi_int>& offset,
+                    const std::vector<double>& values,
+                    casadi_int m,
+                    const Dict& opts);
+
     // No static functions exposed
-    struct Exposed{ };
+    struct Exposed{ DoInline do_inline; };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
@@ -151,6 +166,7 @@ namespace casadi {
 
     /** \brief Size of the flattened coefficients vector */
     casadi_int coeff_size() const;
+    static casadi_int coeff_size(const std::vector<casadi_int>& offset, casadi_int m);
 
   protected:
 

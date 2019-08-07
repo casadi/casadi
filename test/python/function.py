@@ -1050,6 +1050,29 @@ class Functiontests(casadiTestCase):
       self.assertTrue(same(F([-.6, 3.5]), 34.4))
 
   @skip(not scipy_interpolate)
+  def test_nd_linear(self):
+
+    N = 4
+    for n_dim in range(1,5):
+      grid = []
+      x0 = []
+      for i in range(n_dim):
+        g = sorted(list(np.random.random(N)))
+        grid.append(g)
+        x0.append(np.mean(g))
+
+      D = np.random.random([N]*n_dim)
+
+      xref = scipy.interpolate.interpn(grid, D, x0)
+
+      d = D.ravel(order='F')
+
+      F = interpolant('F', 'linear', grid, d)
+
+      self.checkarray(F(x0),xref)
+
+
+  @skip(not scipy_interpolate)
   def test_2d_bspline(self):
     import scipy.interpolate
     np.random.seed(0)
@@ -2349,6 +2372,49 @@ class Functiontests(casadiTestCase):
            arg = [xn,yn]+[DM.rand(Gf.sparsity_in(i)) for i in range(Gf.n_in())][2:]
            for a,b in zip(Gf.call(arg),Ff.call(arg)):
              self.checkarray(a,b)
+
+  @memory_heavy()
+  def test_inline_linear_interpolant(self):
+
+    do_inline = False
+
+    np.random.seed(0)
+
+    N = 3
+    M = 4
+
+    d_knots = [list(np.linspace(0,1,N)),list(np.linspace(0,1,M))]
+
+    data0 = np.random.random([len(e) for e in d_knots])
+    data1 = np.random.random([len(e) for e in d_knots])
+    r = np.meshgrid(*d_knots,indexing='ij')
+
+    xyz = np.vstack(list(e.ravel(order='F') for e in r)).ravel(order='F')
+
+    d_flat0 = data0.ravel(order='F')
+    d_flat1 = data1.ravel(order='F')
+
+    data = np.vstack((data0.ravel(order='F'),data1.ravel(order='F'))).ravel(order='F')
+    d_flat = data.ravel(order='F')
+
+
+    LUT_param = casadi.interpolant('name','linear',[N,M],2, {"lookup_mode": ["exact","linear"]})
+
+    LUT_param_ref = LUT_param.wrap_as_needed({"ad_weight_sp":-1,"enable_fd": True, "enable_forward": False, "enable_reverse": False})
+    J_ref = LUT_param_ref.jacobian()
+
+    d_knots_cat = vcat(d_knots[0]+d_knots[1])
+
+    inputs = [[0.2,0.333],d_knots_cat,d_flat]
+
+    LUT_param = casadi.interpolant('name','linear',[N,M],2,{"inline": True, "lookup_mode": ["exact","linear"]})
+    J = LUT_param.jacobian()
+
+    self.checkarray(LUT_param(*inputs),LUT_param_ref(*inputs))
+    inputs+= [0]
+    self.checkfunction(J,J_ref,inputs=inputs,digits=8,digits_sens=1,evals=1)
+
+
           
 if __name__ == '__main__':
     unittest.main()

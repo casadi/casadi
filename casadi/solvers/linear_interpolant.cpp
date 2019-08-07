@@ -37,6 +37,7 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &LinearInterpolant::options_;
     plugin->deserialize = &LinearInterpolant::deserialize;
+    plugin->exposed.do_inline = &LinearInterpolant::do_inline;
     return 0;
   }
 
@@ -205,6 +206,47 @@ namespace casadi {
     m->PluginInterface<Interpolant>::serialize_type(s);
     s.version("LinearInterpolant", 1);
     s.pack("LinearInterpolant::type", 'j');
+  }
+
+
+  Function LinearInterpolant::do_inline(const std::string& name,
+                    const std::vector<double>& grid,
+                    const std::vector<casadi_int>& offset,
+                    const std::vector<double>& values,
+                    casadi_int m,
+                    const Dict& opts) {
+
+    // Number of grid points
+    casadi_int ndim = offset.size()-1;
+
+    MX x = MX::sym("x", ndim);
+    MX g;
+    if (grid.empty()) {
+      g = MX::sym("g", offset.back());
+    } else {
+      g = MX(DM(grid));
+    }
+    MX c;
+    if (values.empty()) {
+      c = MX::sym("c", Interpolant::coeff_size(offset, m));
+    } else {
+      c = MX(DM(values));
+    }
+
+    MX f = MX::interpn_linear(vertsplit(g, offset), c, vertsplit(x), opts);
+
+    std::vector<MX> args = {x};
+    std::vector<std::string> arg_names = {"x"};
+    if (grid.empty()) {
+      args.push_back(g);
+      arg_names.push_back("g");
+    }
+    if (values.empty()) {
+      args.push_back(c);
+      arg_names.push_back("c");
+    }
+
+    return Function(name, args, {f.T()}, arg_names, {"f"});
   }
 
 } // namespace casadi

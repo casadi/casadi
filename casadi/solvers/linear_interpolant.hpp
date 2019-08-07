@@ -73,6 +73,13 @@ namespace casadi {
       return new LinearInterpolant(name, grid, offset, values, m);
     }
 
+    static Function do_inline(const std::string& name,
+                    const std::vector<double>& grid,
+                    const std::vector<casadi_int>& offset,
+                    const std::vector<double>& values,
+                    casadi_int m,
+                    const Dict& opts);
+
     // Initialize
     void init(const Dict& opts) override;
 

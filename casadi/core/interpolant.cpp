@@ -112,11 +112,15 @@ namespace casadi {
   }
 
   casadi_int Interpolant::coeff_size() const  {
+    return coeff_size(offset_, m_);
+  }
+
+  casadi_int Interpolant::coeff_size(const std::vector<casadi_int>& offset, casadi_int m) {
     casadi_int ret = 1;
-    for (casadi_int k=0;k<offset_.size()-1;++k) {
-      ret *= offset_[k+1]-offset_[k];
+    for (casadi_int k=0;k<offset.size()-1;++k) {
+      ret *= offset[k+1]-offset[k];
     }
-    return m_*ret;
+    return m*ret;
   }
 
   Function interpolant(const std::string& name,
@@ -140,8 +144,27 @@ namespace casadi {
       Interpolant::stack_grid(grid, offset, stacked);
 
       casadi_int m = values.size()/nel;
+      return Interpolant::construct(solver, name, stacked, offset, values, m, opts);
+  }
+
+  Function Interpolant::construct(const std::string& solver,
+                    const std::string& name,
+                    const std::vector<double>& grid,
+                    const std::vector<casadi_int>& offset,
+                    const std::vector<double>& values,
+                    casadi_int m,
+                    const Dict& opts) {
+    bool do_inline = false;
+    Dict options = extract_from_dict(opts, "inline", do_inline);
+    if (do_inline) {
+      casadi_assert(Interpolant::getPlugin(solver).exposed.do_inline,
+        "Inline option not supported for '" + solver + "'.");
+      return Interpolant::getPlugin(solver).exposed.
+        do_inline(name, grid, offset, values, m, options);
+    } else {
       return Function::create(Interpolant::getPlugin(solver)
-                              .creator(name, stacked, offset, values, m), opts);
+              .creator(name, grid, offset, values, m), options);
+    }
   }
 
   Function interpolant(const std::string& name,
@@ -158,8 +181,8 @@ namespace casadi {
          str(nel) + ", but got " + str(values.size()) + " instead.");
 
       casadi_int m = values.size()/nel;
-      return Function::create(Interpolant::getPlugin(solver)
-              .creator(name, std::vector<double>{}, cumsum0(grid_dims), values, m), opts);
+      return Interpolant::construct(solver, name, std::vector<double>{},
+        cumsum0(grid_dims), values, m, opts);
   }
 
   Function interpolant(const std::string& name,
@@ -175,8 +198,7 @@ namespace casadi {
       vector<double> stacked;
 
       Interpolant::stack_grid(grid, offset, stacked);
-      return Function::create(Interpolant::getPlugin(solver)
-                              .creator(name, stacked, offset, std::vector<double>{}, m), opts);
+      return Interpolant::construct(solver, name, stacked, offset, std::vector<double>{}, m, opts);
   }
 
   Function interpolant(const std::string& name,
@@ -185,8 +207,8 @@ namespace casadi {
                        casadi_int m,
                        const Dict& opts) {
       Interpolant::check_grid(grid_dims);
-      return Function::create(Interpolant::getPlugin(solver)
-        .creator(name, std::vector<double>{}, cumsum0(grid_dims), std::vector<double>{}, m), opts);
+      return Interpolant::construct(solver, name, std::vector<double>{},
+        cumsum0(grid_dims), std::vector<double>{}, m, opts);
   }
 
   Interpolant::
@@ -238,10 +260,14 @@ namespace casadi {
         "Specifies, for each grid dimenion, the lookup algorithm used to find the correct index. "
         "'linear' uses a for-loop + break; (default when #knots<=100), "
         "'exact' uses floored division (only for uniform grids), "
-        "'binary' uses a binary search. (default when #knots>100)."}}
+        "'binary' uses a binary search. (default when #knots>100)."}},
+      {"inline",
+       {OT_BOOL,
+        "Implement the lookup table in MX primitives. "
+        "Useful when you need derivatives with respect to grid and/or coefficients. "
+        "Such derivatives are fundamentally dense, so use with caution."}}
      }
   };
-
 
   bool Interpolant::arg_values(casadi_int i) const {
     if (!has_parametric_values()) return false;
