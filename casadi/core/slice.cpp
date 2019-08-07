@@ -52,7 +52,19 @@ namespace casadi {
   Slice::Slice(casadi_int start, int stop, int step) : start(start), stop(stop), step(step) {
   }
 
-  std::vector<casadi_int> Slice::all(casadi_int len, bool ind1) const {
+  Slice Slice::operator-(casadi_int i) const {
+    return Slice(start==std::numeric_limits<casadi_int>::min() ? start : start-i,
+                 stop==std::numeric_limits<casadi_int>::max() ? stop : stop-i,
+                 step);
+  }
+
+  Slice Slice::operator*(casadi_int i) const {
+    return Slice(start==std::numeric_limits<casadi_int>::min() ? start : start*i,
+                 stop==std::numeric_limits<casadi_int>::max() ? stop : stop*i,
+                 step*i);
+  }
+
+  Slice Slice::apply(casadi_int len, bool ind1) const {
     casadi_int start = this->start;
     if (start==std::numeric_limits<casadi_int>::min()) {
       start = (step < 0) ? len - 1 : 0;
@@ -72,9 +84,33 @@ namespace casadi {
     casadi_assert(start>=0,
       "Slice (start=" + str(start) + ", stop=" + str(stop) + ", step=" + str(step)
       + ") out of bounds with start<0.");
-    if ((stop>=start && step<0) || (stop<=start && step>0)) return std::vector<casadi_int>();
 
-    return range(start+ind1, stop+ind1, step, len+ind1);
+    return Slice(start+ind1, stop+ind1, step);
+  }
+
+  std::vector<casadi_int> Slice::all() const {
+    casadi_assert(start!=std::numeric_limits<casadi_int>::min(), "Need a length");
+    casadi_assert(stop!=std::numeric_limits<casadi_int>::max(), "Need a length");
+
+    if ((stop>=start && step<0) ||
+        (stop<=start && step>0)) return std::vector<casadi_int>();
+
+    return range(start, stop, step);
+  }
+
+  std::vector<casadi_int> Slice::all(casadi_int len, bool ind1) const {
+    return apply(len, ind1).all();
+  }
+
+  size_t Slice::size() const {
+    casadi_assert(start!=std::numeric_limits<casadi_int>::min() &&
+                  stop!=std::numeric_limits<casadi_int>::max(),
+                  "Cannot determine numel of slice.");
+    return all(std::numeric_limits<casadi_int>::max()).size();
+  }
+
+  bool Slice::is_empty() const {
+    return size()==0;
   }
 
   void Slice::disp(std::ostream& stream, bool more) const {
