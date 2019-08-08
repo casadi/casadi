@@ -916,6 +916,7 @@
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
+<tr><td>mip_start</td><td>OT_BOOL</td><td>Hot start integers with x0 [Default false].</td><td>casadi::CplexInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CplexInterface</td></tr>
@@ -936,6 +937,7 @@
 <tr><td>dep_check</td><td>OT_INT</td><td>Detect redundant constraints.</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td></tr>
+<tr><td>mip_start</td><td>OT_BOOL</td><td>Hot start integers with x0 [Default false].</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td></tr>
@@ -956,6 +958,7 @@
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
+<tr><td>mip_start</td><td>OT_BOOL</td><td>Hot start integers with x0 [Default false].</td><td>casadi::CplexInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CplexInterface</td></tr>

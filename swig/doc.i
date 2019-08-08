@@ -88434,6 +88434,9 @@ Interface to Cplex solver for sparse Quadratic Programs
 | dump_to_file  | OT_BOOL               | Dumps QP to file in CPLEX        |
 |               |                       | format.                          |
 +---------------+-----------------------+----------------------------------+
+| mip_start     | OT_BOOL               | Hot start integers with x0       |
+|               |                       | [Default false].                 |
++---------------+-----------------------+----------------------------------+
 | qp_method     | OT_INT                | Determines which CPLEX algorithm |
 |               |                       | to use.                          |
 +---------------+-----------------------+----------------------------------+
