@@ -71,20 +71,23 @@ namespace casadi {
     return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ";" + str(dim_a_) + str(dim_b_) + str(dim_c_) + str(a_) + str(b_) + str(c_) + ")";
   }
 
+  einstein_external get_einstein_external() {
+    static DllLoader wrapper("tcl_wrapper.dll");
+    wrapper.init_handle();
+    return (einstein_external) wrapper.get_function("einstein_eval");
+  }
+
   int Einstein::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (pure_) {
       if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
-      DllLoader wrapper("tcl_wrapper.dll");
-      wrapper.init_handle();
-      einstein_external cb = (einstein_external) wrapper.get_function("einstein_eval");
+      static einstein_external cb = get_einstein_external();
       casadi_assert_dev(cb);
       int ret = cb(dim_a_.size(), get_ptr(dim_a_), get_ptr(a_),
         dim_b_.size(), get_ptr(dim_b_), get_ptr(b_),
         dim_c_.size(), get_ptr(dim_c_), get_ptr(c_),
         arg[1], arg[2], res[0]);
       if (ret==0) return 0;
-      casadi_warning("Fallthrough");
     }
     return eval_gen<double>(arg, res, iw, w);
   }
