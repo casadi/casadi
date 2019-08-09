@@ -316,7 +316,7 @@ namespace casadi {
     this->exposed_fname.push_back(f.name());
   }
 
-  string CodeGenerator::dump() const {
+  string CodeGenerator::dump() {
     stringstream s;
     dump(s);
     return s.str();
@@ -396,7 +396,7 @@ namespace casadi {
       << "#endif\n\n";
   }
 
-  string CodeGenerator::generate(const string& prefix) const {
+  string CodeGenerator::generate(const string& prefix) {
     // Throw an error if the prefix contains the filename, since since syntax
     // has changed
     casadi_assert(prefix.find(this->name + this->suffix)==string::npos,
@@ -538,7 +538,7 @@ namespace casadi {
     return "casadi_ri" + str(size);
   }
 
-  void CodeGenerator::dump(std::ostream& s) const {
+  void CodeGenerator::dump(std::ostream& s) {
     // Consistency check
     casadi_assert_dev(current_indent_ == 0);
 
@@ -1230,8 +1230,9 @@ namespace casadi {
     if (isnan(v)) {
       s << "NAN";
     } else if (isinf(v)) {
+      add_auxiliary(AUX_INF);
       if (v<0) s << "-";
-      s << "INFINITY";
+      s << "casadi_inf";
     } else {
       casadi_int v_int = static_cast<casadi_int>(v);
       if (static_cast<double>(v_int)==v) {

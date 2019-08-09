@@ -164,7 +164,7 @@ namespace casadi {
 
         // What to store
         if (a.op==OP_CONST) {
-          g << CodeGenerator::constant(a.d);
+          g << g.constant(a.d);
         } else if (a.op==OP_INPUT) {
           g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
         } else {
