@@ -536,7 +536,7 @@ namespace casadi {
           }
         }
 
-        casadi_assert_dev(varindices.size() > 0);
+        casadi_assert_dev(!varindices.empty());
 
         if (CPXXaddmipstarts(m->env, m->lp, 1, varindices.size(), &beg[0],
                              get_ptr(varindices), get_ptr(values),
