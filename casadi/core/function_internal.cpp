@@ -2204,7 +2204,7 @@ namespace casadi {
       << "switch (i) {\n";
     for (casadi_int i=0; i<n_in_; ++i) {
       double def = get_default_in(i);
-      if (def!=0) g << "case " << i << ": return " << CodeGenerator::constant(def) << ";\n";
+      if (def!=0) g << "case " << i << ": return " << g.constant(def) << ";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";

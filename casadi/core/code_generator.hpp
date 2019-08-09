@@ -47,18 +47,18 @@ namespace casadi {
 
 #ifndef SWIG
     /// Generate the code to a stream
-    void dump(std::ostream& s) const;
+    void dump(std::ostream& s);
 #endif // SWIG
 
     /// Generate a file, return code as string
-    std::string dump() const;
+    std::string dump();
 
     /** \brief Generate file(s)
       The "prefix" argument will be prepended to the generated files and may
       be a directory or a file prefix.
       returns the filename
     */
-    std::string generate(const std::string& prefix="") const;
+    std::string generate(const std::string& prefix="");
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void add_include(const std::string& new_include, bool relative_path=false,
@@ -160,12 +160,12 @@ namespace casadi {
     bool avoid_stack() { return avoid_stack_;}
 
     /** \brief Print a constant in a lossless but compact manner */
-    static std::string constant(double v);
-    static std::string constant(casadi_int v);
+    std::string constant(double v);
+    std::string constant(casadi_int v);
 
     /** \brief Print an intializer */
-    static std::string initializer(const std::vector<double>& v);
-    static std::string initializer(const std::vector<casadi_int>& v);
+    std::string initializer(const std::vector<double>& v);
+    std::string initializer(const std::vector<casadi_int>& v);
 
     /** \brief Sanitize source files for codegen */
     std::string sanitize_source(const std::string& src,
@@ -393,11 +393,11 @@ namespace casadi {
                              const std::string& def=std::string());
 
     /** \brief  Print casadi_int vector to a c file */
-    static void print_vector(std::ostream &s, const std::string& name,
+    void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<casadi_int>& v);
 
     /** \brief  Print real vector to a c file */
-    static void print_vector(std::ostream &s, const std::string& name,
+    void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<double>& v);
 
     /** \brief Create a copy operation */
