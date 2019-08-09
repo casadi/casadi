@@ -114,8 +114,10 @@ classes0 = {}
 symnameToName = {}
 for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
-  symname = c.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
-
+  try:
+    symname = c.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
+  except:
+    continue
   if name == "casadi::"+symname:
     pass
   else:
