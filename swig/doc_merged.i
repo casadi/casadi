@@ -5377,22 +5377,16 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::reverse "
+%feature("docstring") casadi::Callback::Callback "
 
-Get a function that calculates nadj adjoint derivatives.
+Copy constructor (throws an error)
 
-Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_out inputs
-correspond to adjoint seeds, stacked horizontally The n_in outputs
-correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
+>  casadi::Callback::Callback(const Callback &obj)
+------------------------------------------------------------------------
 
-(n_in = n_in(), n_out = n_out())
+Copy constructor (throws an error)
 
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+";
 
 ";
 
@@ -5620,16 +5614,22 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
+%feature("docstring") casadi::Callback::reverse "
 
-Copy constructor (throws an error)
+Get a function that calculates nadj adjoint derivatives.
 
->  casadi::Callback::Callback(const Callback &obj)
-------------------------------------------------------------------------
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
 
-Copy constructor (throws an error)
+(n_in = n_in(), n_out = n_out())
 
-";
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -5810,6 +5810,14 @@ Convert from/to flat vector of input/output nonzeros.
 %feature("docstring") casadi::Callback::get_str "
 
 Get string representation.
+
+";
+
+%feature("docstring") casadi::Callback::eval_buffer "
+
+A copy-free low level interface.
+
+In Python, you will be passed two tuples of memoryview objects
 
 ";
 
@@ -23855,6 +23863,46 @@ Get default input value.
 %feature("docstring") casadi::Function::nz_from_in "
 
 Convert from/to flat vector of input/output nonzeros.
+
+";
+
+
+// File: classcasadi_1_1FunctionBuffer.xml
+%feature("docstring") casadi::FunctionBuffer "
+
+Class to achieve minimal overhead function evaluations.
+
+C++ includes: function.hpp ";
+
+%feature("docstring") casadi::FunctionBuffer::FunctionBuffer "
+
+Main constructor.
+
+";
+
+%feature("docstring") casadi::FunctionBuffer::set_arg "
+
+Set input buffer for input i.
+
+mem.set_arg(0, memoryview(a))
+
+Note that CasADi uses 'fortran' order: column-by-column
+
+";
+
+%feature("docstring") casadi::FunctionBuffer::set_res "
+
+Set output buffer for ouput i.
+
+mem.set_res(0, memoryview(a))
+
+Note that CasADi uses 'fortran' order: column-by-column
+
+";
+
+%feature("docstring") casadi::FunctionBuffer::ret "
+
+Get last return value.
 
 ";
 
