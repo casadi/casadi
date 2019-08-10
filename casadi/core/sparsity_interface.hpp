@@ -493,7 +493,11 @@ namespace casadi {
          it!=x_vec.end(); ++it) {
       *it = vec(*it);
     }
-    return vertcat(x_vec);
+    if (x_vec.empty()) {
+      return MatType(0, 1);
+    } else {
+      return vertcat(x_vec);
+    }
   }
 
   template<typename MatType>
