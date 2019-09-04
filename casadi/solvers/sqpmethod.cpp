@@ -109,6 +109,9 @@ namespace casadi {
        {OT_DOUBLE,
         "When using a convexification strategy, make sure that "
         "the smallest eigenvalue is at least this (default: 1e-7)."}},
+      {"max_iter_eig",
+       {OT_DOUBLE,
+        "Maximum number of iterations to compute an eigenvalue decomposition (default: 50)."}},
       {"print_header",
        {OT_BOOL,
         "Print the header with problem statistics"}},
@@ -189,6 +192,8 @@ namespace casadi {
         casadi_assert(convexify_margin_>=0, "Margin must be >=0");
       } else if (op.first=="convexify_strategy") {
         convexify_strategy = op.second.to_string();
+      } else if (op.first=="max_iter_eig") {
+        max_iter_eig_ = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       } else if (op.first=="print_iteration") {
