@@ -51,6 +51,11 @@ casadi_plugin(Linsol ldl
   linsol_ldl.hpp linsol_ldl.cpp linsol_ldl_meta.cpp
 )
 
+# Sparse tridiagonal - implemented in CasADi's C runtime
+casadi_plugin(Linsol tridiag
+  linsol_tridiag.hpp linsol_tridiag.cpp linsol_tridiag_meta.cpp
+)
+
 casadi_plugin(Linsol lsqr
   lsqr.hpp lsqr.cpp lsqr_meta.cpp
 )
