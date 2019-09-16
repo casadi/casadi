@@ -54,12 +54,50 @@ namespace casadi {
     clear_mem();
   }
 
+  const Options LinsolLdl::options_
+  = {{&ProtoFunction::options_},
+     {{"incomplete",
+      {OT_BOOL,
+       "Incomplete factorization, without any fill-in"}},
+      {"preordering",
+       {OT_BOOL,
+       "Approximate minimal degree (AMD) preordering"}}
+     }
+  };
+
   void LinsolLdl::init(const Dict& opts) {
     // Call the init method of the base class
     LinsolInternal::init(opts);
 
+    // Default options
+    incomplete_ = false;
+    amd_ = true;
+
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="incomplete") {
+        incomplete_ = op.second;
+      } else if (op.first=="amd") {
+        amd_ = op.second;
+      }
+    }
+
     // Symbolic factorization
-    sp_Lt_ = sp_.ldl(p_);
+    if (incomplete_) {
+      if (amd_) {
+        // Incomplete LDL^T, AMD permutation
+        p_ = sp_.amd();
+        std::vector<casadi_int> tmp;
+        Sparsity Aperm = sp_.sub(p_, p_, tmp);
+        sp_Lt_ = triu(Aperm, false);  // no fill-in
+      } else {
+        p_ = range(sp_.size1());  // no reordering
+        sp_Lt_ = triu(sp_, false);  // no fill-in
+      }
+    } else {
+      // Regular LDL^T
+      sp_Lt_ = sp_.ldl(p_, amd_);
+    }
   }
 
   int LinsolLdl::init_mem(void* mem) const {
