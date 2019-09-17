@@ -47524,6 +47524,8 @@ List of plugins
 
 - lapackqr
 
+- mumps
+
 - ldl
 
 - qr
@@ -47624,6 +47626,16 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 --------------------------------------------------------------------------------
 
 
+
+--------------------------------------------------------------------------------
+
+mumps
+-----
+
+
+
+Interface to the sparse direct linear solver MUMPS Works for symmetric
+indefinite systems Joel Andersson
 
 --------------------------------------------------------------------------------
 
