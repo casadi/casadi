@@ -697,6 +697,13 @@ if(WITH_HSL)
 endif()
 add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
 
+# MUMPS: Sparse direct linear solver
+option(WITH_MUMPS "Enable MUMPS interface" OFF)
+if(WITH_MUMPS)
+  find_package(MUMPS REQUIRED)
+endif()
+add_feature_info(mumps-interface WITH_MUMPS "Interface to MUMPS.")
+
 # OOQP: A sparse interior point QP solver
 option(WITH_OOQP "Enable OOQP interface" OFF)
 if(WITH_OOQP)
@@ -873,7 +880,7 @@ install(FILES
 configure_file(${PROJECT_SOURCE_DIR}/misc/casadi.pc.in
   "${PROJECT_BINARY_DIR}/casadi.pc" @ONLY)
 
-# Install the casadi.pc 
+# Install the casadi.pc
 install(FILES
   "${PROJECT_BINARY_DIR}/casadi.pc"
   DESTINATION "${LIB_PREFIX}/pkgconfig" COMPONENT dev)

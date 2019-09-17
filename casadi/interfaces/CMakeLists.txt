@@ -46,6 +46,10 @@ if(WITH_HSL)
   add_subdirectory(hsl)
 endif()
 
+if(WITH_MUMPS)
+  add_subdirectory(mumps)
+endif()
+
 if(WITH_OOQP)
   add_subdirectory(ooqp)
 endif()

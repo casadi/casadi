@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
   tests.push_back({"lapacklu", UNSYM});
   tests.push_back({"lapackqr", UNSYM});
   tests.push_back({"ma27", SYM});
+  tests.push_back({"mumps", SYM});
   tests.push_back({"symbolicqr", UNSYM});
   tests.push_back({"qr", UNSYM});
   tests.push_back({"ldl", SYM});
