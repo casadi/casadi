@@ -55,10 +55,36 @@ namespace casadi {
     clear_mem();
   }
 
+  const Options MumpsInterface::options_
+  = {{&ProtoFunction::options_},
+     {{"symmetric",
+      {OT_BOOL,
+       "Symmetric matrix"}},
+      {"posdef",
+       {OT_BOOL,
+       "Positive definite"}}
+     }
+  };
+
   void MumpsInterface::init(const Dict& opts) {
     // Call the init method of the base class
     LinsolInternal::init(opts);
 
+    // Default options
+    symmetric_ = false;
+    posdef_ = false;
+
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="symmetric") {
+        symmetric_ = op.second;
+      } else if (op.first=="posdef") {
+        posdef_ = op.second;
+      }
+    }
+
+    // Options consistency
+    if (posdef_ && !symmetric_) casadi_error("Inconsistent options");
   }
 
   int MumpsInterface::init_mem(void* mem) const {
@@ -77,13 +103,14 @@ namespace casadi {
     // Initialize MUMPS
     m->id->job = -1;  // initializes an instance of the package
     m->id->par = 1;
-    m->id->sym = 0;
+    m->id->sym = symmetric_ ? posdef_ ? 2 : 1 : 0;
     m->id->comm_fortran = -987654;
     dmumps_c(m->id);
 
     // Sparsity pattern in MUMPS format
     casadi_int n = this->nrow();
-    casadi_int nnz = this->nnz();
+    casadi_int nnz = symmetric_ ? sp_.nnz_upper() : this->nnz();
+    m->nz.resize(nnz);
     m->irn.clear();
     m->jcn.clear();
     m->irn.reserve(nnz);
@@ -92,8 +119,10 @@ namespace casadi {
     const casadi_int* row = this->row();
     for (casadi_int c = 0; c < n; ++c) {
       for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
-        m->irn.push_back(row[k] + 1);
-        m->jcn.push_back(c + 1);
+        if (!symmetric_ || row[k] <= c) {
+          m->irn.push_back(row[k] + 1);
+          m->jcn.push_back(c + 1);
+        }
       }
     }
 
@@ -103,6 +132,23 @@ namespace casadi {
   int MumpsInterface::nfact(void* mem, const double* A) const {
     auto m = static_cast<MumpsMemory*>(mem);
     casadi_assert_dev(A!=nullptr);
+
+    // Copy nonzero entries to m->nz
+    auto nz_it = m->nz.begin();
+    if (symmetric_) {
+      // Get upper triangular entries
+      casadi_int n = this->nrow();
+      const casadi_int* colind = this->colind();
+      const casadi_int* row = this->row();
+      for (casadi_int c = 0; c < n; ++c) {
+        for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+          if (row[k] <= c) *nz_it++ = A[k];
+        }
+      }
+    } else {
+      // Copy all entries
+      std::copy(A, A + this->nnz(), nz_it);
+    }
 
     return 0;
   }
@@ -115,20 +161,17 @@ namespace casadi {
 
     // Define problem
     m->id->n = this->nrow();
-    m->id->nnz = m->irn.size();
+    m->id->nnz = m->nz.size();
     m->id->irn = get_ptr(m->irn);
     m->id->jcn = get_ptr(m->jcn);
-    m->id->a = const_cast<double*>(A);
+    m->id->a = get_ptr(m->nz);
     m->id->rhs = x;
 
-    // Macro such that indices match documentation
-    #define ICNTL(I) icntl[(I) - 1]
-
     // No outputs
-    m->id->ICNTL(1) = -1;
-    m->id->ICNTL(2) = -1;
-    m->id->ICNTL(3) = -1;
-    m->id->ICNTL(4) = 0;
+    m->id->icntl[1 - 1] = -1;
+    m->id->icntl[2 - 1] = -1;
+    m->id->icntl[3 - 1] = -1;
+    m->id->icntl[4 - 1] = 0;
 
     // Call mumps
     m->id->job = 6;

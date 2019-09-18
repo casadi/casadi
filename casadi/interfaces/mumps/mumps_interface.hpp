@@ -54,6 +54,9 @@ namespace casadi {
 
     // Sparsity
     std::vector<int> irn, jcn;
+
+    // Nonzeros
+    std::vector<double> nz;
   };
 
   /** \brief \pluginbrief{Linsol,mumps}
@@ -73,6 +76,12 @@ namespace casadi {
 
     // Destructor
     ~MumpsInterface() override;
+
+    ///@{
+    /** \brief Options */
+    static const Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
 
     // Initialize the solver
     void init(const Dict& opts) override;
@@ -103,6 +112,11 @@ namespace casadi {
 
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new MumpsInterface(s); }
+
+    ///@{
+    // Options
+    bool symmetric_, posdef_;
+    ///@}
 
   protected:
     /** \brief Deserializing constructor */

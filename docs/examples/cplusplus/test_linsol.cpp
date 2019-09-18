@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
   tests.push_back({"lapacklu", UNSYM});
   tests.push_back({"lapackqr", UNSYM});
   tests.push_back({"ma27", SYM});
-  tests.push_back({"mumps", SYM});
+  tests.push_back({"mumps", UNSYM});
   tests.push_back({"symbolicqr", UNSYM});
   tests.push_back({"qr", UNSYM});
   tests.push_back({"ldl", SYM});
@@ -90,8 +90,15 @@ int main(int argc, char *argv[])
         continue;
       }
 
+      // Solver specific options
+      Dict opts;
+      if (t.solver == "mumps") {
+        opts["symmetric"] = s == SYM || s == PD;
+        opts["posdef"] = s == PD;
+      }
+
       // Create a solver instance
-      Linsol F("F", t.solver, A_test.sparsity());
+      Linsol F("F", t.solver, A_test.sparsity(), opts);
 
       // Solve
       if (F.sfact(A_test.ptr())) casadi_error("'sfact' failed");
