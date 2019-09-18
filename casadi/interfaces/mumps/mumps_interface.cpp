@@ -173,8 +173,10 @@ namespace casadi {
   int MumpsInterface::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<MumpsMemory*>(mem);
 
-    if (tr) casadi_error("not implemented");
     if (nrhs != 1) casadi_error("not implemented");
+
+    // Transpose or not?
+    m->id->icntl[9 - 1] = tr ? 0 : 1;
 
     // Solve factorized linear system
     m->id->rhs = x;
