@@ -27,9 +27,6 @@
 #include "mumps_interface.hpp"
 #include "casadi/core/global_options.hpp"
 
-#include <mumps_seq/mpi.h>
-#include <dmumps_c.h>
-
 using namespace std;
 namespace casadi {
 
@@ -67,6 +64,38 @@ namespace casadi {
   int MumpsInterface::init_mem(void* mem) const {
     if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<MumpsMemory*>(mem);
+    // Free existing MUMPS instance, if any
+    if (m->id) {
+      // Terminate the instance of the package
+      m->id->job = -2;
+      dmumps_c(m->id);
+      // Delete the memory structure
+      delete m->id;
+    }
+    m->id = new DMUMPS_STRUC_C();
+
+    // Initialize MUMPS
+    m->id->job = -1;  // initializes an instance of the package
+    m->id->par = 1;
+    m->id->sym = 0;
+    m->id->comm_fortran = -987654;
+    dmumps_c(m->id);
+
+    // Sparsity pattern in MUMPS format
+    casadi_int n = this->nrow();
+    casadi_int nnz = this->nnz();
+    m->irn.clear();
+    m->jcn.clear();
+    m->irn.reserve(nnz);
+    m->jcn.reserve(nnz);
+    const casadi_int* colind = this->colind();
+    const casadi_int* row = this->row();
+    for (casadi_int c = 0; c < n; ++c) {
+      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+        m->irn.push_back(row[k] + 1);
+        m->jcn.push_back(c + 1);
+      }
+    }
 
     return 0;
   }
@@ -84,61 +113,42 @@ namespace casadi {
     if (tr) casadi_error("not implemented");
     if (nrhs != 1) casadi_error("not implemented");
 
-    // Data structure
-    DMUMPS_STRUC_C id;
-
-    // Sparsity
-    casadi_int n = this->nrow();
-    int64_t nnz = this->nnz();
-    std::vector<int> irn, jcn;
-    const casadi_int* colind = this->colind();
-    const casadi_int* row = this->row();
-    for (casadi_int c = 0; c < n; ++c) {
-      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
-        irn.push_back(row[k] + 1);
-        jcn.push_back(c + 1);
-      }
-    }
-
-    // Initialize MUMPS
-    #define JOB_INIT -1
-    id.job = JOB_INIT;
-    id.par = 1;
-    id.sym = 0;
-    id.comm_fortran = -987654;
-    dmumps_c(&id);
-
     // Define problem
-    id.n = n;
-    id.nnz = nnz;
-    id.irn = get_ptr(irn);
-    id.jcn = get_ptr(jcn);
-    id.a = const_cast<double*>(A);
-    id.rhs = x;
+    m->id->n = this->nrow();
+    m->id->nnz = m->irn.size();
+    m->id->irn = get_ptr(m->irn);
+    m->id->jcn = get_ptr(m->jcn);
+    m->id->a = const_cast<double*>(A);
+    m->id->rhs = x;
 
     // Macro such that indices match documentation
     #define ICNTL(I) icntl[(I) - 1]
 
     // No outputs
-    id.ICNTL(1) = -1;
-    id.ICNTL(2) = -1;
-    id.ICNTL(3) = -1;
-    id.ICNTL(4) = 0;
+    m->id->ICNTL(1) = -1;
+    m->id->ICNTL(2) = -1;
+    m->id->ICNTL(3) = -1;
+    m->id->ICNTL(4) = 0;
 
     // Call mumps
-    id.job = 6;
-    dmumps_c(&id);
-    #define JOB_END -2
-    id.job = JOB_END;
-    dmumps_c(&id);
+    m->id->job = 6;
+    dmumps_c(m->id);
 
     return 0;
   }
 
   MumpsMemory::MumpsMemory() {
+    this->id = 0;
   }
 
   MumpsMemory::~MumpsMemory() {
+    if (this->id) {
+      // Terminate the instance of the package
+      this->id->job = -2;
+      dmumps_c(this->id);
+      // Delete the structure
+      delete this->id;
+    }
   }
 
 } // namespace casadi

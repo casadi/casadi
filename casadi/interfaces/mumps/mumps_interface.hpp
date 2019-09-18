@@ -29,6 +29,9 @@
 #include "casadi/core/linsol_internal.hpp"
 #include <casadi/interfaces/mumps/casadi_linsol_mumps_export.h>
 
+#include <mumps_seq/mpi.h>
+#include <dmumps_c.h>
+
 /** \defgroup plugin_Linsol_mumps
  * Interface to the sparse direct linear solver MUMPS
  * Works for symmetric indefinite systems
@@ -46,6 +49,11 @@ namespace casadi {
     // Destructor
     ~MumpsMemory();
 
+    // Memory block
+    DMUMPS_STRUC_C* id;
+
+    // Sparsity
+    std::vector<int> irn, jcn;
   };
 
   /** \brief \pluginbrief{Linsol,mumps}
