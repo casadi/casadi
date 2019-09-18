@@ -150,6 +150,23 @@ namespace casadi {
       std::copy(A, A + this->nnz(), nz_it);
     }
 
+    // Define problem
+    m->id->n = this->nrow();
+    m->id->nnz = m->nz.size();
+    m->id->irn = get_ptr(m->irn);
+    m->id->jcn = get_ptr(m->jcn);
+    m->id->a = get_ptr(m->nz);
+
+    // No outputs
+    m->id->icntl[1 - 1] = -1;
+    m->id->icntl[2 - 1] = -1;
+    m->id->icntl[3 - 1] = -1;
+    m->id->icntl[4 - 1] = 0;
+
+    // Symbolic and numeric factorization
+    m->id->job = 4;
+    dmumps_c(m->id);
+
     return 0;
   }
 
@@ -159,22 +176,9 @@ namespace casadi {
     if (tr) casadi_error("not implemented");
     if (nrhs != 1) casadi_error("not implemented");
 
-    // Define problem
-    m->id->n = this->nrow();
-    m->id->nnz = m->nz.size();
-    m->id->irn = get_ptr(m->irn);
-    m->id->jcn = get_ptr(m->jcn);
-    m->id->a = get_ptr(m->nz);
+    // Solve factorized linear system
     m->id->rhs = x;
-
-    // No outputs
-    m->id->icntl[1 - 1] = -1;
-    m->id->icntl[2 - 1] = -1;
-    m->id->icntl[3 - 1] = -1;
-    m->id->icntl[4 - 1] = 0;
-
-    // Call mumps
-    m->id->job = 6;
+    m->id->job = 3;
     dmumps_c(m->id);
 
     return 0;
