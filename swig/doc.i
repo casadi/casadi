@@ -47637,6 +47637,20 @@ mumps
 Interface to the sparse direct linear solver MUMPS Works for symmetric
 indefinite systems Joel Andersson
 
+>List of available options
+
++-----------+---------+-------------------+
+|    Id     |  Type   |    Description    |
++===========+=========+===================+
+| posdef    | OT_BOOL | Positive definite |
++-----------+---------+-------------------+
+| symmetric | OT_BOOL | Symmetric matrix  |
++-----------+---------+-------------------+
+
+--------------------------------------------------------------------------------
+
+
+
 --------------------------------------------------------------------------------
 
 ldl
