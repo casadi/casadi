@@ -451,9 +451,12 @@ namespace casadi {
 
     m->return_status = flag;
     m->success = flag==qpOASES::SUCCESSFUL_RETURN;
+    if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
     if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
       m->unified_return_status = SOLVER_RET_LIMITED;
     }
+
+    m->iter_count = nWSR;
 
     if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
 

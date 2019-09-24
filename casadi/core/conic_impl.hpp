@@ -40,6 +40,9 @@ namespace casadi {
 
     // Return status
     FunctionInternal::UnifiedReturnStatus unified_return_status;
+
+    // Number of iterations performed
+    casadi_int iter_count;
   };
 
   /// Internal class

@@ -439,6 +439,7 @@ namespace casadi {
     // Problem has not been solved at this point
     m->success = false;
     m->unified_return_status = SOLVER_RET_UNKNOWN;
+    m->iter_count = -1;
 
     return 0;
   }
@@ -452,6 +453,7 @@ namespace casadi {
     // Problem has not been solved at this point
     m->success = false;
     m->unified_return_status = SOLVER_RET_UNKNOWN;
+    m->iter_count = -1;
   }
 
   Conic::~Conic() {
@@ -677,6 +679,7 @@ namespace casadi {
 
     stats["success"] = m->success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
+    stats["iter_count"] = m->iter_count;
     return stats;
   }
 
