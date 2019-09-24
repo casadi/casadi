@@ -409,6 +409,8 @@ namespace casadi {
       casadi_assert(fcallback_.n_in()==n_out_,
         "Callback input signature must match the NLP solver output signature");
       for (casadi_int i=0; i<n_out_; ++i) {
+        // Ignore empty arguments
+        if (fcallback_.sparsity_in(i).is_empty()) continue;
         casadi_assert(fcallback_.size_in(i)==size_out(i),
           "Callback function input size mismatch. For argument '" + nlpsol_out(i) + "', "
           "callback has shape " + fcallback_.sparsity_in(i).dim() + " while NLP has " +
