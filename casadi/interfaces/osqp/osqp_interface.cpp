@@ -154,10 +154,10 @@ namespace casadi {
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
     std::vector<double> dummy(max(nx_+na_, max(Asp.nnz(), H_.nnz())));
 
-    std::vector<casadi_int> A_row = Asp.get_row();
-    std::vector<casadi_int> A_colind = Asp.get_colind();
-    std::vector<casadi_int> H_row = H_.get_row();
-    std::vector<casadi_int> H_colind = H_.get_colind();
+    std::vector<c_int> A_row = vector_static_cast<c_int>(Asp.get_row());
+    std::vector<c_int> A_colind = vector_static_cast<c_int>(Asp.get_colind());
+    std::vector<c_int> H_row = vector_static_cast<c_int>(H_.get_row());
+    std::vector<c_int> H_colind = vector_static_cast<c_int>(H_.get_colind());
 
     csc A;
     A.m = nx_ + na_;

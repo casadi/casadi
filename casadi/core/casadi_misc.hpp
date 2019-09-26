@@ -120,6 +120,9 @@ private:
   CASADI_EXPORT std::vector< std::vector<int> > to_int(
     const std::vector< std::vector<casadi_int> >& rhs);
 
+  template<typename T, typename S>
+  std::vector<T> vector_static_cast(const std::vector<S>& rhs);
+
   CASADI_EXPORT std::string str_bvec(bvec_t v);
 
   /**  \brief Slicing vector
@@ -464,6 +467,14 @@ namespace std {
 
 // Implementations
 namespace casadi {
+
+  template<typename T, typename S>
+  std::vector<T> vector_static_cast(const std::vector<S>& rhs) {
+    std::vector<T> ret;
+    ret.reserve(rhs.size());
+    for (auto e : rhs) ret.push_back(static_cast<T>(e));
+    return ret;
+  }
 
   template<typename T>
   std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i) {
