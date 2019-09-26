@@ -6023,7 +6023,10 @@ Get oracle.
 
 %feature("docstring") casadi::Callback::eval "
 
-Evaluate numerically, temporary matrices and work vectors.
+Evaluate numerically, using temporary matrices and work vectors.
+
+This signature is not thread-safe. For guaranteed thread-safety, use
+eval_buffer
 
 ";
 
@@ -37696,6 +37699,8 @@ List of plugins
 
 - qr
 
+- tridiag
+
 - symbolicqr
 
 Note: some of the plugins in this list might not be available on your
@@ -37839,6 +37844,21 @@ qr --
 
 
 Linear solver using sparse direct QR factorization
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+tridiag
+-------
+
+
+
+Linear solver for tridiagonal matrices
 
 --------------------------------------------------------------------------------
 
@@ -38790,6 +38810,243 @@ class hierarchy in reverse order is run after init() has been completed.
 %feature("docstring") casadi::LinsolQr::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+
+// File: classcasadi_1_1LinsolTridiag.xml
+%feature("docstring") casadi::LinsolTridiag::nnz "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag::clear_mem "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::serialize_type "
+
+[INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::init_mem "
+
+[INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::getCount "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::get_stats "
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::init "
+
+[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::disp "
+
+[INTERNAL]  Display object.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::disp_more "
+
+[INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::rank "
+
+[INTERNAL]   Matrix rank.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::serialize "
+
+[INTERNAL]  Serialize an object.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::checkout "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::serialize_base_function "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::generate_options "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::finalize "
+
+[INTERNAL]  Finalize the object creation This function, which visits the
+class hierarchy in reverse order is run after init() has been completed.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::get_options "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::alloc_mem "
+
+[INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::solve "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag::nfact "
+
+[INTERNAL]  Numeric factorization.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::sfact "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag::class_name "
+
+[INTERNAL]  Readable name of the internal class.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::LinsolTridiag "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag::free_mem "
+
+[INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::row "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::nrow "
+
+[INTERNAL]  Get sparsity pattern.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::colind "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag::memory "
+
+[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::neig "
+
+[INTERNAL]  Number of negative eigenvalues.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::linsol_eval_sx "
+
+[INTERNAL]  Evaluate SX, possibly transposed.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::generate "
+
+[INTERNAL]  Generate C code.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::ncol "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag "
+
+[INTERNAL]  'tridiag' plugin for LinsolInternal
+
+C++ includes: linsol_tridiag.hpp ";
+
+%feature("docstring") casadi::LinsolTridiag::serialize_body "
+
+[INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::plugin_name "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag::release "
+
+[INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::~LinsolTridiag "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag::sprint "
+
+[INTERNAL]  C-style formatted printing to string.
 
 ";
 
@@ -71255,12 +71512,20 @@ Parametric variant of interpolant.
 
 The resulting function will have an additional argument for the grid
 
+By default, derivatives wrt the coefficients are not supported (zero). Some
+interpolant plugins may support the inline=true which enables correct
+derivatives
+
 >  Function casadi::interpolant(const std::string &name, const std::string &solver, const std::vector< casadi_int > &grid_dims, const std::vector< double > &values, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Parametric variant of interpolant.
 
 The resulting function will have an additional argument for the grid
+
+By default, derivatives wrt the coefficients are not supported (zero). Some
+interpolant plugins may support the inline=true which enables correct
+derivatives
 
 ";
 

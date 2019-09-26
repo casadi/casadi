@@ -1627,6 +1627,21 @@
 %exception  casadi::LinsolQr::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::LinsolTridiag::alloc_mem() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolTridiag::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolTridiag::generate(CodeGenerator &g, const std::string &A, const std::string &x, casadi_int nrhs, bool tr) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolTridiag::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolTridiag::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Lsqr::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2552,6 +2567,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LinsolQr::LinsolQr(const std::string &name, const Sparsity &sp) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LinsolTridiag::LinsolTridiag(const std::string &name, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Lsqr::Lsqr(const std::string &name, const Sparsity &sp) {

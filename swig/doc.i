@@ -7454,7 +7454,10 @@ Get oracle.
 %feature("docstring")  casadi::Callback::eval(const std::vector< DM > &arg)
 const  "
 
-Evaluate numerically, temporary matrices and work vectors.
+Evaluate numerically, using temporary matrices and work vectors.
+
+This signature is not thread-safe. For guaranteed thread-safety, use
+eval_buffer
 
 ";
 
@@ -47530,6 +47533,8 @@ List of plugins
 
 - qr
 
+- tridiag
+
 - symbolicqr
 
 Note: some of the plugins in this list might not be available on your
@@ -47673,6 +47678,21 @@ qr --
 
 
 Linear solver using sparse direct QR factorization
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+tridiag
+-------
+
+
+
+Linear solver for tridiagonal matrices
 
 --------------------------------------------------------------------------------
 
@@ -48679,6 +48699,264 @@ double time) const  "
 %feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+
+// File: classcasadi_1_1LinsolTridiag.xml
+%feature("docstring")  casadi::LinsolInternal::nnz() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::clear_mem() "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
+%feature("docstring")
+casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
+
+[INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring")  casadi::LinsolTridiag::init_mem(void *mem) const  "
+
+[INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::get_stats(void *mem) const  "
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring")  casadi::LinsolTridiag::init(const Dict &opts)  "
+
+[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::disp(std::ostream &stream,
+bool more) const  "
+
+[INTERNAL]  Display object.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::rank(void *mem, const double
+*A) const  "
+
+[INTERNAL]   Matrix rank.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
+
+[INTERNAL]  Serialize an object.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::checkout() const  "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
+const  "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::finalize() "
+
+[INTERNAL]  Finalize the object creation This function, which visits the
+class hierarchy in reverse order is run after init() has been completed.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::get_options() const  "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring")  casadi::LinsolTridiag::alloc_mem() const  "
+
+[INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print_time(const std::map<
+std::string, FStats > &fstats) const  "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
+%feature("docstring")  casadi::LinsolTridiag::solve(void *mem, const double
+*A, double *x, casadi_int nrhs, bool tr) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolTridiag::nfact(void *mem, const double
+*A) const  "
+
+[INTERNAL]  Numeric factorization.
+
+";
+
+%feature("docstring")  casadi::LinsolTridiag::sfact(void *mem, const double
+*A) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolTridiag::class_name() const  "
+
+[INTERNAL]  Readable name of the internal class.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::LinsolTridiag(const std::string
+&name, const Sparsity &sp) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolTridiag::free_mem(void *mem) const  "
+
+[INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::row() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::format_time(char *buffer,
+double time) const  "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::nrow() const  "
+
+[INTERNAL]  Get sparsity pattern.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::colind() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
+
+[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::neig(void *mem, const double
+*A) const  "
+
+[INTERNAL]  Number of negative eigenvalues.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::linsol_eval_sx(const SXElem
+**arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem, bool tr,
+casadi_int nrhs) const  "
+
+[INTERNAL]  Evaluate SX, possibly transposed.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
+const  "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring")  casadi::LinsolTridiag::generate(CodeGenerator &g,
+const std::string &A, const std::string &x, casadi_int nrhs, bool tr) const
+"
+
+[INTERNAL]  Generate C code.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolTridiag "
+
+[INTERNAL]  'tridiag' plugin for LinsolInternal
+
+C++ includes: linsol_tridiag.hpp ";
+
+%feature("docstring")
+casadi::LinsolInternal::serialize_body(SerializingStream &s) const  "
+
+[INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring")  casadi::LinsolTridiag::plugin_name() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
+
+[INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring") casadi::LinsolTridiag::~LinsolTridiag "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::sprint(char *buf, size_t
+buf_sz, const char *fmt,...) const  "
+
+[INTERNAL]  C-style formatted printing to string.
 
 ";
 
@@ -90288,6 +90566,10 @@ Parametric variant of interpolant.
 
 The resulting function will have an additional argument for the coefficients
 
+By default, derivatives wrt the coefficients are not supported (zero). Some
+interpolant plugins may support the inline=true which enables correct
+derivatives
+
 ";
 
 %feature("docstring")  casadi::interpolant(const std::string &name, const
@@ -90299,6 +90581,10 @@ Parametric variant of interpolant.
 The resulting function will have additional arguments for the grid and
 coefficients
 
+By default, derivatives wrt the coefficients are not supported (zero). Some
+interpolant plugins may support the inline=true which enables correct
+derivatives
+
 ";
 
 %feature("docstring")  casadi::interpolant(const std::string &name, const
@@ -90308,6 +90594,10 @@ std::vector< double > &values, const Dict &opts=Dict()) "
 Parametric variant of interpolant.
 
 The resulting function will have an additional argument for the grid
+
+By default, derivatives wrt the coefficients are not supported (zero). Some
+interpolant plugins may support the inline=true which enables correct
+derivatives
 
 ";
 
