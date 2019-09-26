@@ -282,7 +282,7 @@ namespace casadi {
       *this << "}\n\n";
 
       *this << "void " << shorthand(name + "_release") << "(int mem) {\n";
-      *this << stack << "[" << stack_counter << "++] = mem;\n";
+      *this << stack << "[++" << stack_counter << "] = mem;\n";
       *this << "}\n\n";
     }
 
