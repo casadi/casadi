@@ -103,6 +103,11 @@ namespace casadi {
   /** \brief Parametric variant of interpolant
    * 
    * The resulting function will have an additional argument for the coefficients
+   * 
+   * By default, derivatives wrt the coefficients are not supported (zero).
+   * Some interpolant plugins may support the `inline=true` which enables correct derivatives
+   * 
+   * 
   */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
@@ -114,6 +119,10 @@ namespace casadi {
   /** \brief Parametric variant of interpolant
    * 
    * The resulting function will have additional arguments for the grid and coefficients
+   *
+   * By default, derivatives wrt the coefficients are not supported (zero).
+   * Some interpolant plugins may support the `inline=true` which enables correct derivatives
+   * 
   */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
@@ -124,6 +133,9 @@ namespace casadi {
   /** \brief Parametric variant of interpolant
    * 
    * The resulting function will have an additional argument for the grid
+   * 
+   * By default, derivatives wrt the coefficients are not supported (zero).
+   * Some interpolant plugins may support the `inline=true` which enables correct derivatives
   */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
