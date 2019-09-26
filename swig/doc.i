@@ -10438,7 +10438,7 @@ Joel Andersson
 
 C++ includes: code_generator.hpp ";
 
-%feature("docstring")  casadi::CodeGenerator::dump() const  "
+%feature("docstring")  casadi::CodeGenerator::dump() "
 
 Generate a file, return code as string.
 
@@ -10459,7 +10459,7 @@ Constructor.
 ";
 
 %feature("docstring")  casadi::CodeGenerator::generate(const std::string
-&prefix="") const  "
+&prefix="") "
 
 Generate file(s) The \"prefix\" argument will be prepended to the generated
 files and may be a directory or a file prefix. returns the filename.
@@ -81010,6 +81010,10 @@ A textbook SQPMethod
 +-----------------------+-------------+------------------------------------+
 | max_iter              | OT_INT      | Maximum number of SQP iterations   |
 +-----------------------+-------------+------------------------------------+
+| max_iter_eig          | OT_DOUBLE   | Maximum number of iterations to    |
+|                       |             | compute an eigenvalue              |
+|                       |             | decomposition (default: 50).       |
++-----------------------+-------------+------------------------------------+
 | max_iter_ls           | OT_INT      | Maximum number of linesearch       |
 |                       |             | iterations                         |
 +-----------------------+-------------+------------------------------------+
@@ -81166,6 +81170,13 @@ A textbook SQPMethod
 +-------------------+---------------+-------------------+------------------+
 | max_iter          | OT_INT        | Maximum number of | casadi::Sqpmetho |
 |                   |               | SQP iterations    | d                |
++-------------------+---------------+-------------------+------------------+
+| max_iter_eig      | OT_DOUBLE     | Maximum number of | casadi::Sqpmetho |
+|                   |               | iterations to     | d                |
+|                   |               | compute an        |                  |
+|                   |               | eigenvalue        |                  |
+|                   |               | decomposition     |                  |
+|                   |               | (default: 50).    |                  |
 +-------------------+---------------+-------------------+------------------+
 | max_iter_ls       | OT_INT        | Maximum number of | casadi::Sqpmetho |
 |                   |               | linesearch        | d                |
@@ -87011,8 +87022,7 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_factorize(casadi_qp_data< T1 > *d)
-"
+%feature("docstring")  casadi::casadi_qp_du_index(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
 
@@ -88034,7 +88044,8 @@ Check if the vector has negative entries.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_du_index(casadi_qp_data< T1 > *d) "
+%feature("docstring")  casadi::casadi_tri_project(const T1 *x, const
+casadi_int *sp_x, T1 *y, casadi_int lower) "
 
 [INTERNAL] ";
 
@@ -88045,6 +88056,11 @@ Check if the vector has negative entries.
 [INTERNAL]  Golub & Van Loan Alg. 8.3.3.
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_linesearch(casadi_qp_data< T1 > *d)
+"
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_vfmin(const T1 *x, casadi_int n, T1 r)
 "
@@ -88782,9 +88798,13 @@ List of plugins
 
 - ooqp
 
+- osqp
+
 - qpoases
 
 - sqic
+
+- superscs
 
 - nlpsol
 
@@ -89046,6 +89066,32 @@ reInit();
 
 --------------------------------------------------------------------------------
 
+osqp
+----
+
+
+
+Interface to the OSQP Solver for quadratic programming
+
+>List of available options
+
++-------------------+---------+--------------------------------------------+
+|        Id         |  Type   |                Description                 |
++===================+=========+============================================+
+| osqp              | OT_DICT | const Options to be passed to osqp.        |
++-------------------+---------+--------------------------------------------+
+| warm_start_dual   | OT_BOOL | Use lam_a0 and lam_x0 input to warmstart   |
+|                   |         | [Default: truw].                           |
++-------------------+---------+--------------------------------------------+
+| warm_start_primal | OT_BOOL | Use x0 input to warmstart [Default: true]. |
++-------------------+---------+--------------------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 qpoases
 -------
 
@@ -89209,6 +89255,29 @@ Interface to the SQIC solver for quadratic programming
 --------------------------------------------------------------------------------
 
 
+
+
+
+--------------------------------------------------------------------------------
+
+superscs
+--------
+
+
+
+Interface to the SuperSCS solver for conic programming
+
+Joris Gillis, 2019
+
+>List of available options
+
++----------+---------+-----------------------------------+
+|    Id    |  Type   |            Description            |
++==========+=========+===================================+
+| superscs | OT_DICT | Options to be passed to superscs. |
++----------+---------+-----------------------------------+
+
+--------------------------------------------------------------------------------
 
 
 
@@ -89383,7 +89452,7 @@ const T1 *lb, const T1 *ub) "
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_linesearch(casadi_qp_data< T1 > *d)
+%feature("docstring")  casadi::casadi_qp_factorize(casadi_qp_data< T1 > *d)
 "
 
 [INTERNAL] ";
@@ -91637,6 +91706,10 @@ A textbook SQPMethod
 | lbfgs_memory          | OT_INT      | Size of L-BFGS memory.             |
 +-----------------------+-------------+------------------------------------+
 | max_iter              | OT_INT      | Maximum number of SQP iterations   |
++-----------------------+-------------+------------------------------------+
+| max_iter_eig          | OT_DOUBLE   | Maximum number of iterations to    |
+|                       |             | compute an eigenvalue              |
+|                       |             | decomposition (default: 50).       |
 +-----------------------+-------------+------------------------------------+
 | max_iter_ls           | OT_INT      | Maximum number of linesearch       |
 |                       |             | iterations                         |
