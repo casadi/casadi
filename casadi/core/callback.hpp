@@ -82,7 +82,11 @@ namespace casadi {
     */
     virtual void finalize() {}
 
-    /** \brief Evaluate numerically, temporary matrices and work vectors */
+    /** \brief Evaluate numerically, using temporary matrices and work vectors
+     * 
+     * This signature is not thread-safe.
+     * For guaranteed thread-safety, use `eval_buffer`
+     */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
     /** \brief A copy-free low level interface 
