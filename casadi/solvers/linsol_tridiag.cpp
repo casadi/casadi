@@ -91,21 +91,24 @@ namespace casadi {
     if (tr) {
       if (!m->have_ctr) {
         // Precompute coefficients (transposed matrix)
-        m->ctr[0] = A[a_colind[0] + 1] / A[a_colind[0] + 0]; 
+        m->ctr[0] = A[a_colind[0] + 1] / A[a_colind[0] + 0];
         for (i = 1; i < nrow(); i++) {
-            // A[i + 1, i] / (A[i, i] - A[i - 1, i] * m->ctr[i - 1]);
-            m->ctr[i] = A[a_colind[i] + 2] / (A[a_colind[i] + 1] - A[a_colind[i] + 0] * m->ctr[i - 1]);
+          // A[i + 1, i] / (A[i, i] - A[i - 1, i] * m->ctr[i - 1]);
+          double denom = A[a_colind[i] + 1] - A[a_colind[i] + 0] * m->ctr[i - 1];
+          m->ctr[i] = A[a_colind[i] + 2] / denom;
         }
         m->have_ctr = true;
       }
     } else {
       if (!m->have_c) {
         // Precompute coefficients
-        m->c[0] = A[a_colind[1] + 0] / A[a_colind[0] + 0]; 
-        m->c[1] = A[a_colind[1 + 1] + 0] / (A[a_colind[1] + 1] - A[a_colind[1 - 1] + 1] * m->c[1 - 1]);
+        m->c[0] = A[a_colind[1] + 0] / A[a_colind[0] + 0];
+        double denom = A[a_colind[1] + 1] - A[a_colind[1 - 1] + 1] * m->c[1 - 1];
+        m->c[1] = A[a_colind[1 + 1] + 0] / denom;
         for (i = 2; i < nrow(); i++) {
-            // A[i, i + 1] / (A[i, i] - A[i, i - 1] * m->c[i - 1]);
-            m->c[i] = A[a_colind[i + 1] + 0] / (A[a_colind[i] + 1] - A[a_colind[i - 1] + 2] * m->c[i - 1]);
+          // A[i, i + 1] / (A[i, i] - A[i, i - 1] * m->c[i - 1]);
+          double denom = A[a_colind[i] + 1] - A[a_colind[i - 1] + 2] * m->c[i - 1];
+          m->c[i] = A[a_colind[i + 1] + 0] / denom;
         }
         m->have_c = true;
       }
@@ -116,26 +119,29 @@ namespace casadi {
         // Compute remaining coefficients (transposed matrix)
         m->d[0] = x[0] / A[a_colind[0] + 0];
         for (i = 1; i < nrow(); i++) {
-            //m->d[i] = (x[i] - A[i - 1, i] * m->d[i - 1]) / (A[i, i] - A[i - 1, i] * m->c[i - 1]);
-            m->d[i] = (x[i] - A[a_colind[i] + 0] * m->d[i - 1]) / (A[a_colind[i] + 1] - A[a_colind[i] + 0] * m->ctr[i - 1]);
+          //m->d[i] = (x[i] - A[i - 1, i] * m->d[i - 1]) / (A[i, i] - A[i - 1, i] * m->c[i - 1]);
+          double denom = A[a_colind[i] + 1] - A[a_colind[i] + 0] * m->ctr[i - 1];
+          m->d[i] = (x[i] - A[a_colind[i] + 0] * m->d[i - 1]) / denom;
         }
         // Solve
         x[nrow() - 1] = m->d[nrow() - 1];
         for (i = nrow() - 2; i >= 0; i--) {
-            x[i] = m->d[i] - m->ctr[i] * x[i + 1];
+          x[i] = m->d[i] - m->ctr[i] * x[i + 1];
         }
       } else {
         // Compute remaining coefficients
         m->d[0] = x[0] / A[a_colind[0] + 0];
-        m->d[1] = (x[1] - A[a_colind[1 - 1] + 1] * m->d[1 - 1]) / (A[a_colind[1] + 1] - A[a_colind[1 - 1] + 1] * m->c[1 - 1]);
+        double denom = A[a_colind[1] + 1] - A[a_colind[1 - 1] + 1] * m->c[1 - 1];
+        m->d[1] = (x[1] - A[a_colind[1 - 1] + 1] * m->d[1 - 1]) / denom;
         for (i = 2; i < nrow(); i++) {
-            //m->d[i] = (x[i] - A[i, i - 1] * m->d[i - 1]) / (A[i, i] - A[i, i - 1] * m->c[i - 1]);
-            m->d[i] = (x[i] - A[a_colind[i - 1] + 2] * m->d[i - 1]) / (A[a_colind[i] + 1] - A[a_colind[i - 1] + 2] * m->c[i - 1]);
+          //m->d[i] = (x[i] - A[i, i - 1] * m->d[i - 1]) / (A[i, i] - A[i, i - 1] * m->c[i - 1]);
+          double denom = A[a_colind[i] + 1] - A[a_colind[i - 1] + 2] * m->c[i - 1];
+          m->d[i] = (x[i] - A[a_colind[i - 1] + 2] * m->d[i - 1]) / denom;
         }
         // Solve
         x[nrow() - 1] = m->d[nrow() - 1];
         for (i = nrow() - 2; i >= 0; i--) {
-            x[i] = m->d[i] - m->c[i] * x[i + 1];
+          x[i] = m->d[i] - m->c[i] * x[i + 1];
         }
       }
       x += ncol();
