@@ -199,7 +199,7 @@ namespace casadi {
     iteration_callback_ignore_errors_ = false;
     print_time_ = true;
     calc_multipliers_ = false;
-    bound_consistency_ = true;
+    bound_consistency_ = false;
     min_lam_ = 0;
     calc_lam_x_ = calc_f_ = calc_g_ = false;
     calc_lam_p_ = true;
