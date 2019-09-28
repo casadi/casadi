@@ -965,6 +965,11 @@ namespace casadi {
   Matrix<Scalar>::Matrix(const Sparsity& sp, const Matrix<Scalar>& d) {
     if (d.is_scalar()) {
       *this = Matrix<Scalar>(sp, d.scalar(), false);
+    } else if (sp.nnz()==0) {
+      casadi_assert(d.nnz()==0,
+        "You passed nonzeros (" + d.dim(true) +
+        ") to the constructor of a fully sparse matrix (" + sp.dim(true) + ").");
+      *this = Matrix<Scalar>(sp);
     } else if (d.is_column() || d.size1()==1) {
       casadi_assert_dev(sp.nnz()==d.numel());
       if (d.is_dense()) {

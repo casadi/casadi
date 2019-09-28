@@ -178,12 +178,6 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.assertTrue(a.is_null())
 
-    a = IM(Sparsity.lower(4),list(range(10)))
-    s = pickle.dumps(a)
-    b = pickle.loads(s)
-    self.checkarray(a,b)
-
-
     a = DM(Sparsity.lower(4),list(range(10)))
     s = pickle.dumps(a)
     b = pickle.loads(s)

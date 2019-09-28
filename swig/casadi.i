@@ -384,6 +384,7 @@ namespace std {
 
 %include "doc.i"
 
+
 // Note: Only from 3.0.0 onwards,
 // DirectorException inherits from std::exception
 #if SWIG_VERSION >= 0x030000
@@ -613,50 +614,6 @@ namespace std {
     // Number of nonzeros
     size_t getNNZ(const mxArray* p);
 #endif // SWIGMATLAB
-
-
-    GUESTOBJECT* full(const IM& m) {
-#ifdef SWIGPYTHON
-      PyObject *p = from_ptr(&m);
-      PyObject *cr = PyObject_CallMethod(p, (char*) "toarray", 0);
-      Py_DECREF(p);
-      if (cr) return cr;
-      return Py_None;
-#elif defined(SWIGMATLAB)
-      mxArray *p  = mxCreateDoubleMatrix(m.size1(), m.size2(), mxREAL);
-      std::vector<double> nz = m.get_nonzeros<double>();
-      double* d = static_cast<double*>(mxGetData(p));
-      if (!nz.empty()) casadi_densify(&nz[0], m.sparsity(), d, false); // Column-major
-      return p;
-#else
-      return 0;
-#endif
-    }
-
-
-    // Convert to a sparse matrix
-    GUESTOBJECT* sparse(const IM& m) {
-#ifdef SWIGPYTHON
-      PyObject *p = from_ptr(&m);
-      PyObject *cr = PyObject_CallMethod(p, (char*) "tocsc", 0);
-      Py_DECREF(p);
-      if (cr) return cr;
-      return Py_None;
-#elif defined(SWIGMATLAB)
-      mxArray *p  = mxCreateSparse(m.size1(), m.size2(), m.nnz(), mxREAL);
-      std::vector<double> nz = m.get_nonzeros<double>();
-      if (!nz.empty()) casadi::casadi_copy(&nz[0], m.nnz(), static_cast<double*>(mxGetData(p)));
-      std::copy(m.colind(), m.colind()+m.size2()+1, mxGetJc(p));
-      std::copy(m.row(), m.row()+m.nnz(), mxGetIr(p));
-      return p;
-#else
-      return 0;
-#endif
-
-    }
-
-
-
 
     GUESTOBJECT* full(const DM& m, bool simplify=false) {
 #ifdef SWIGPYTHON
@@ -1900,17 +1857,6 @@ namespace std {
         return true;
       }
 
-      // Object is an IM
-      {
-        // Pointer to object
-        IM *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Matrix<casadi_int>*), 0))) {
-          if (m) **m=*m2;
-          return true;
-        }
-      }
-
       // Object is a sparsity pattern
       {
         Sparsity *m2;
@@ -1968,15 +1914,6 @@ namespace std {
       }
 #endif // SWIGMATLAB
 
-      // First convert to IM
-      if (can_convert<IM>(p)) {
-        IM tmp;
-        if (to_val(p, &tmp)) {
-          if (m) **m=tmp;
-          return true;
-        }
-      }
-
       // No match
       return false;
     }
@@ -2015,12 +1952,6 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
-      // IM already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::Matrix<casadi_int>*), 0))) {
-        return true;
-      }
-
       // Object is a sparsity pattern
       {
         Sparsity *m2;
@@ -2054,12 +1985,13 @@ namespace std {
 
       {
         std::vector <casadi_int> t;
-        casadi_int res = to_val(p, &t);
-        if (m) **m = casadi::Matrix<casadi_int>(t);
-        return res;
+        if (to_val(p, &t)) {
+          if (m) **m = casadi::Matrix<casadi_int>(t);
+          return true;
+        }
       }
-      return true;
 #endif // SWIGPYTHON
+
 #ifdef SWIGMATLAB
       // In MATLAB, it is common to use floating point values to represent integers
       if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
@@ -2088,13 +2020,30 @@ namespace std {
       }
 #endif // SWIGMATLAB
 
+      // Convert from DM
+      {
+        DM tmp;
+        if (to_val(p, m? &tmp: 0)) {
+          // Check integrality
+          for (double d : tmp.nonzeros()) {
+            if (d!=casadi_int(d)) return false;
+          }
+          // Convert
+          if (m) {
+            **m = casadi::Matrix<double>(tmp);
+          }
+          return true;
+        }
+      }
+
       // No match
       return false;
     }
-
     GUESTOBJECT* from_ptr(const IM *a) {
-      return SWIG_NewPointerObj(new IM(*a), $descriptor(casadi::Matrix<casadi_int>*), SWIG_POINTER_OWN);
+      DM tmp(*a);
+      return from_ref(tmp);
     }
+
   } // namespace casadi
  }
 
@@ -2243,8 +2192,6 @@ namespace std {
 %define PREC_SLICE 94 %enddef
 %define PREC_PAIR_IVector_IVector 96 %enddef
 %define PREC_IM 97 %enddef
-%define PREC_IMVector 98 %enddef
-%define PREC_IMVectorVector 98 %enddef
 %define PREC_DVector 99 %enddef
 %define PREC_DM 100 %enddef
 %define PREC_DMVector 101 %enddef
@@ -2391,8 +2338,6 @@ namespace std {
 %casadi_typemaps("IM", PREC_IM, casadi::Matrix<casadi_int>)
 // Without CASADI_INT_TYPE, you get SwigValueWrapper
 // With it, docstrings are screwed
-%casadi_template(LL "IM" LR, PREC_IMVector, std::vector< casadi::Matrix<CASADI_INT_TYPE> >)
-%casadi_template(LL LL "IM" LR LR, PREC_IMVectorVector, std::vector<std::vector< casadi::Matrix<CASADI_INT_TYPE> > >)
 %casadi_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
 %casadi_template(LL "GenericType" LR, PREC_GENERICTYPE, std::vector<casadi::GenericType>)
 %casadi_typemaps("Slice", PREC_SLICE, casadi::Slice)
@@ -2860,7 +2805,6 @@ namespace casadi{
 
 %include <casadi/core/generic_matrix.hpp>
 
-%template(GenIM)        casadi::GenericMatrix<casadi::Matrix<casadi_int> >;
 %template(GenDM)        casadi::GenericMatrix<casadi::Matrix<double> >;
 %template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElem> >;
 %template(GenMX)             casadi::GenericMatrix<casadi::MX>;
@@ -2996,7 +2940,6 @@ namespace casadi{
 %define SPARSITY_INTERFACE_ALL(DECL, FLAG)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SPARSITY), Sparsity)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_MX), MX)
-SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<casadi_int>)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 %enddef
@@ -3312,7 +3255,6 @@ DECL M casadi_blockcat(const std::vector< std::vector< M > > &v) {
 
 %define GENERIC_MATRIX_ALL(DECL, FLAG)
 GENERIC_MATRIX_FUN(DECL, (FLAG | IS_MX), MX)
-GENERIC_MATRIX_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<casadi_int>)
 GENERIC_MATRIX_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
 GENERIC_MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 %enddef
@@ -3370,7 +3312,6 @@ DECL M casadi_constpow(const M& x, const M& y) { using casadi::constpow; return 
 
 %define GENERIC_EXPRESSION_ALL(DECL, FLAG)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_MX), MX)
-GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<casadi_int>)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DOUBLE), double)
@@ -3503,7 +3444,6 @@ DECL M casadi_eig_symbolic(const M& m) {
 %enddef
 
 %define MATRIX_ALL(DECL, FLAG)
-MATRIX_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<casadi_int>)
 MATRIX_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
 MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 %enddef
@@ -3572,22 +3512,17 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 %include <casadi/core/matrix_fwd.hpp>
 %include <casadi/core/matrix_decl.hpp>
 %include <casadi/core/dm_fwd.hpp>
-%include <casadi/core/im_fwd.hpp>
 %include <casadi/core/sx_fwd.hpp>
 
+// Remove from API
+%warnfilter(401) casadi::Matrix<casadi_int>;
+%template() casadi::Matrix<casadi_int>;
 
 %template(DM) casadi::Matrix<double>;
 %extend casadi::Matrix<double> {
-   %template(DM) Matrix<casadi_int>;
    %template(DM) Matrix<SXElem>;
 };
 
-
-%template(IM) casadi::Matrix<casadi_int>;
-%extend casadi::Matrix<casadi_int> {
-   %template(IM) Matrix<double>;
-   %template(IM) Matrix<SXElem>;
-};
 
 namespace casadi{
   %extend Matrix<double> {
@@ -3595,11 +3530,7 @@ namespace casadi{
     %matrix_helpers(casadi::Matrix<double>)
 
   }
-  %extend Matrix<casadi_int> {
-    void assign(const casadi::Matrix<casadi_int>&rhs) { (*$self)=rhs; }
-    %matrix_helpers(casadi::Matrix<casadi_int>)
 
-  }
 }
 
 // Extend DM with SWIG unique features
@@ -3616,18 +3547,6 @@ namespace casadi{
     }
   }
 
-  %extend Matrix<casadi_int> {
-    // Convert to a dense matrix
-    GUESTOBJECT* full() const {
-      return full(*$self);
-    }
-
-    // Convert to a sparse matrix
-    GUESTOBJECT* sparse() const {
-      return sparse(*$self);
-    }
-
-  }
 } // namespace casadi
 
 
@@ -3697,43 +3616,8 @@ namespace casadi{
 
 }; // extend Matrix<double>
 
-%extend Matrix<casadi_int> {
-
-  %python_array_wrappers(998.0)
-
-  %pythoncode %{
-    def __abs__(self):
-      return abs(int(self))
-  %}
-
-  %pythoncode %{
-    def tocsc(self):
-      import numpy as np
-      import warnings
-      with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        from scipy.sparse import csc_matrix
-      return csc_matrix( (self.nonzeros(),self.row(),self.colind()), shape = self.shape, dtype=np.int )
-    def toarray(self):
-      import numpy as np
-      return np.array(self.T.elements()).reshape(self.shape)
-  %}
-
-} // extend Matrix<casadi_int>
-
 
 // Logic for pickling
-
-%extend Matrix<casadi_int> {
-
-  %pythoncode %{
-    def __setstate__(self, state):
-        self.__init__(IM.deserialize(state["serialization"]))
-
-    def __getstate__(self):
-        return {"serialization": self.serialize()}
-  %}
-}
 
 %extend Matrix<double> {
 
@@ -3767,34 +3651,7 @@ namespace casadi{
 
 #ifdef SWIGMATLAB
 namespace casadi{
-// Logic for pickling
-%extend Matrix<casadi_int> {
 
-  %matlabcode %{
-     function s = saveobj(obj)
-        try
-            s.serialization = obj.serialize();
-        catch exception
-            warning(['Serializing of CasADi IM failed:' getReport(exception) ]);
-            s = struct;
-        end
-     end
-  %}
-  %matlabcode_static %{
-     function obj = loadobj(s)
-        try
-          if isstruct(s)
-             obj = casadi.IM.deserialize(s.serialization);
-          else
-             obj = s;
-          end
-        catch exception
-            warning(['Serializing of CasADi IM failed:' getReport(exception) ]);
-            s = struct;
-        end
-     end
-  %}
-}
 
 %extend Matrix<double> {
 
@@ -3938,7 +3795,6 @@ namespace casadi {
 
 %template(SX) casadi::Matrix<casadi::SXElem>;
 %extend casadi::Matrix<casadi::SXElem> {
-   %template(SX) Matrix<casadi_int>;
    %template(SX) Matrix<double>;
 };
 

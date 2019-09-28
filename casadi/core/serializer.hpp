@@ -52,7 +52,6 @@ namespace casadi {
     ~SerializerBase();
     void pack(const Sparsity& e);
     void pack(const MX& e);
-    void pack(const Matrix<casadi_int>& e);
     void pack(const Matrix<double>& e);
     void pack(const Matrix<SXElem>& e);
     void pack(const Linsol& e);
@@ -63,7 +62,6 @@ namespace casadi {
     void pack(const std::string& e);
     void pack(const std::vector<Sparsity>& e);
     void pack(const std::vector<MX>& e);
-    void pack(const std::vector< Matrix<casadi_int> >& e);
     void pack(const std::vector< Matrix<double> >& e);
     void pack(const std::vector< Matrix<SXElem> >& e);
     void pack(const std::vector<Linsol>& e);
@@ -78,7 +76,6 @@ namespace casadi {
     enum SerializationType {
       SERIALIZED_SPARSITY,
       SERIALIZED_MX,
-      SERIALIZED_IM,
       SERIALIZED_DM,
       SERIALIZED_SX,
       SERIALIZED_LINSOL,
@@ -89,7 +86,6 @@ namespace casadi {
       SERIALIZED_STRING,
       SERIALIZED_SPARSITY_VECTOR,
       SERIALIZED_MX_VECTOR,
-      SERIALIZED_IM_VECTOR,
       SERIALIZED_DM_VECTOR,
       SERIALIZED_SX_VECTOR,
       SERIALIZED_LINSOL_VECTOR,
@@ -120,7 +116,6 @@ namespace casadi {
     Sparsity blind_unpack_sparsity();
     MX blind_unpack_mx();
     Matrix<double> blind_unpack_dm();
-    Matrix<casadi_int> blind_unpack_im();
     Matrix<SXElem> blind_unpack_sx();
     Linsol blind_unpack_linsol();
     Function blind_unpack_function();
@@ -130,7 +125,6 @@ namespace casadi {
     std::string blind_unpack_string();
     std::vector<Sparsity> blind_unpack_sparsity_vector();
     std::vector<MX> blind_unpack_mx_vector();
-    std::vector< Matrix<casadi_int> > blind_unpack_im_vector();
     std::vector< Matrix<double> > blind_unpack_dm_vector();
     std::vector< Matrix<SXElem> > blind_unpack_sx_vector();
     std::vector<Linsol> blind_unpack_linsol_vector();
@@ -143,7 +137,6 @@ namespace casadi {
     Sparsity unpack_sparsity();
     MX unpack_mx();
     Matrix<double> unpack_dm();
-    Matrix<casadi_int> unpack_im();
     Matrix<SXElem> unpack_sx();
     Linsol unpack_linsol();
     Function unpack_function();
@@ -153,7 +146,6 @@ namespace casadi {
     std::string unpack_string();
     std::vector<Sparsity> unpack_sparsity_vector();
     std::vector<MX> unpack_mx_vector();
-    std::vector< Matrix<casadi_int> > unpack_im_vector();
     std::vector< Matrix<double> > unpack_dm_vector();
     std::vector< Matrix<SXElem> > unpack_sx_vector();
     std::vector<Linsol> unpack_linsol_vector();

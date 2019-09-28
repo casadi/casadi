@@ -34,7 +34,7 @@ assert(is_zero(res))
 
 x = SX.sym('x',4);
 
-f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
+f = Function('f',{x},{x(2),x(DM(2)),x(2,1),x(DM(2),DM(1)),x(2:2),x(2:2,1)});
 r = f.call({[1,2,3,4]});
 
 for i=1:f.n_out()
@@ -65,7 +65,7 @@ assert(flag);
 
 x = MX.sym('x',4);
 
-f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
+f = Function('f',{x},{x(2),x(DM(2)),x(2,1),x(DM(2),DM(1)),x(2:2),x(2:2,1)});
 r = f.call({[1,2,3,4]});
 
 for i=1:f.n_out()

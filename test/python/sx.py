@@ -1007,6 +1007,12 @@ class SXtests(casadiTestCase):
     self.assertEqual(s[1],1)
     x = vertcat(*(SX.sym("x"),SX([])))
 
+    SX(Sparsity(3,3), [])
+
+    SX(Sparsity(3,3), [5])
+    with self.assertInException("fully sparse"):
+      SX(Sparsity(3,3), [5,4])
+
   def test_mul_sparsity(self):
 
     N = 10
@@ -1028,7 +1034,7 @@ class SXtests(casadiTestCase):
     f_out = f.call(f_in)
     g_out = g.call(g_in)
 
-    self.checkarray(IM.ones(filt),IM.ones(g.sparsity_out(0)))
+    self.checkarray(DM.ones(filt),DM.ones(g.sparsity_out(0)))
 
     self.checkarray(f_out[0][filt],g_out[0])
 
@@ -1419,6 +1425,8 @@ class SXtests(casadiTestCase):
     self.checkarray(evalf(y),5)
     with self.assertInException("since variables [x] are free"):
       evalf(x)
+
+
 
 
 if __name__ == '__main__':

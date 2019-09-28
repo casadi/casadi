@@ -27,9 +27,9 @@ from casadi import *
 def color(A):
   print("="*80)
   print("Original:")
-  print(repr(IM(A,1)))
+  print(repr(DM(A,1)))
   print("Colored: ")
-  print(repr(IM(A.uni_coloring(),1)))
+  print(repr(DM(A.uni_coloring(),1)))
 
 A = Sparsity.diag(5)
 color(A)
@@ -56,9 +56,9 @@ color(A+Sparsity.triplet(5,5,list(range(5)),[0]*5))
 def color(A):
   print("="*80)
   print("Original:")
-  print(repr(IM(A,1)))
+  print(repr(DM(A,1)))
   print("Star colored: ")
-  print(repr(IM(A.star_coloring(1),1)))
+  print(repr(DM(A.star_coloring(1),1)))
   
 color(A)
 #! One direction needed to capture all
@@ -72,6 +72,6 @@ color(A+Sparsity.triplet(5,5,[0]*5,list(range(5)))+Sparsity.triplet(5,5,list(ran
 
 #! Let's take an example from the paper
 
-A = IM([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+A = DM([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
 A = sparsify(A)
 color(A.sparsity())

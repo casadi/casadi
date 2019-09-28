@@ -635,7 +635,6 @@ class Toolstests(casadiTestCase):
     s = struct_symSX(list(map(entry, 'xyz'))) # IndexError: list index out of range
     print(s['x'])
 
-  @unittest.skipIf(sys.version_info >= (3, 0),"too lazy to fix now")
   def test_pickling_null(self):
     import pickle
     s = struct_symMX([

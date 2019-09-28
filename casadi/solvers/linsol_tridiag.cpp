@@ -151,7 +151,7 @@ namespace casadi {
 
   void LinsolTridiag::generate(CodeGenerator& g, const std::string& A, const std::string& x,
                           casadi_int nrhs, bool tr) const {
-    // TODO
+    casadi_error("Not implemented");
   }
 
 } // namespace casadi

@@ -29,7 +29,6 @@
 #include "slice.hpp"
 #include "linsol.hpp"
 #include "importer.hpp"
-#include "im.hpp"
 #include "generic_type.hpp"
 #include <iomanip>
 
@@ -59,7 +58,6 @@ namespace casadi {
       switch (type) {
         case SERIALIZED_SPARSITY: return "sparsity";
         case SERIALIZED_MX: return "mx";
-        case SERIALIZED_IM: return "im";
         case SERIALIZED_DM: return "dm";
         case SERIALIZED_SX: return "sx";
         case SERIALIZED_LINSOL: return "linsol";
@@ -70,7 +68,6 @@ namespace casadi {
         case SERIALIZED_STRING: return "string";
         case SERIALIZED_SPARSITY_VECTOR: return "sparsity_vector";
         case SERIALIZED_MX_VECTOR: return "mx_vector";
-        case SERIALIZED_IM_VECTOR: return "im_vector";
         case SERIALIZED_DM_VECTOR: return "dm_vector";
         case SERIALIZED_SX_VECTOR: return "sx_vector";
         case SERIALIZED_LINSOL_VECTOR: return "linsol_vector";
@@ -196,7 +193,6 @@ SERIALIZEX_ALL(SX, SX, sx)
 
 SERIALIZE_ALL(SPARSITY, Sparsity, sparsity)
 SERIALIZE_ALL(DM, DM, dm)
-SERIALIZE_ALL(IM, IM, im)
 SERIALIZE_ALL(LINSOL, Linsol, linsol)
 SERIALIZE_ALL(FUNCTION, Function, function)
 SERIALIZE_ALL(GENERICTYPE, GenericType, generictype)
