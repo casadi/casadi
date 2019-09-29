@@ -23,11 +23,12 @@
  */
 
 
-      #include "ipopt_interface.hpp"
-      #include <string>
+#include "ipopt_interface.hpp"
+#include <string>
 
-      const std::string casadi::IpoptInterface::meta_doc=
-      "\n"
+namespace {
+const std::string meta_doc_0 =
+"\n"
 "When in warmstart mode, output NLPSOL_LAM_X may be used as input\n"
 "\n"
 "NOTE: Even when max_iter == 0, it is not guaranteed that\n"
@@ -780,7 +781,8 @@
 "|                 |                 |                 | of the primal   |\n"
 "|                 |                 |                 | variables (see  |\n"
 "|                 |                 |                 | IPOPT           |\n"
-"|                 |                 |                 | documentation)  |\n"
+"|                 |                 |                 | documentation)  |\n";
+const std::string meta_doc_1 =
 "+-----------------+-----------------+-----------------+-----------------+\n"
 "| limited_memory_ | OT_STRING       | sherman-        | Strategy for    |\n"
 "| aug_solver      |                 | morrison        | solving the     |\n"
@@ -1511,6 +1513,8 @@
 "|                 |                 |                 | variables (see  |\n"
 "|                 |                 |                 | IPOPT           |\n"
 "|                 |                 |                 | documentation)  |\n"
+;
+const std::string meta_doc_2 =
 "+-----------------+-----------------+-----------------+-----------------+\n"
 "| obj_max_inc     | OT_DOUBLE         | 5               | Determines the  |\n"
 "|                 |                 |                 | upper bound on  |\n"
@@ -2354,3 +2358,6 @@
 "\n"
 "\n"
 ;
+}
+
+const std::string casadi::IpoptInterface::meta_doc = meta_doc_0 + meta_doc_1 + meta_doc_2;
