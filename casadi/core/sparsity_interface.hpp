@@ -493,7 +493,11 @@ namespace casadi {
          it!=x_vec.end(); ++it) {
       *it = vec(*it);
     }
-    return vertcat(x_vec);
+    if (x_vec.empty()) {
+      return MatType(0, 1);
+    } else {
+      return vertcat(x_vec);
+    }
   }
 
   template<typename MatType>
@@ -530,7 +534,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType SparsityInterface<MatType>::mtimes(const std::vector<MatType> &args) {
-    casadi_assert(args.size()>=1,
+    casadi_assert(!args.empty(),
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");
     MatType ret = args[0];

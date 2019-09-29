@@ -36,7 +36,7 @@ else:
 
 # For plugin loading
 GlobalOptions.setCasadiPath(os.path.dirname(__file__))
-
+GlobalOptions.setCasadiIncludePath(os.path.join(os.path.dirname(__file__),"include"))
 import types
 
 def wrapper(f, warning,error=False):

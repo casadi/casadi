@@ -27,27 +27,17 @@
 #define CASADI_ORACLE_FUNCTION_HPP
 
 #include "function_internal.hpp"
-#include "timing.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
 
   /** \brief Function memory with temporary work vectors */
-  struct CASADI_EXPORT OracleMemory {
+  struct CASADI_EXPORT OracleMemory : public FunctionMemory {
     // Work vectors
     const double** arg;
     double** res;
     casadi_int* iw;
     double* w;
-
-    // Function specific statistics
-    std::map<std::string, FStats> fstats;
-
-    // Add a statistic
-    void add_stat(const std::string& s) {
-      bool added = fstats.insert(std::make_pair(s, FStats())).second;
-      casadi_assert(added, "Duplicate stat: '" + s + "'");
-    }
   };
 
   /** \brief Base class for functions that perform calculation with an oracle
@@ -63,6 +53,9 @@ namespace casadi {
     Dict common_options_;
     Dict specific_options_;
 
+    /// Show evaluation warnings
+    bool show_eval_warnings_;
+
     // Information about one function
     struct RegFun {
       Function f;
@@ -72,6 +65,10 @@ namespace casadi {
 
     // All NLP functions
     std::map<std::string, RegFun> all_functions_;
+
+    // Active monitors
+    std::vector<std::string> monitor_;
+
   public:
     /** \brief  Constructor */
     OracleFunction(const std::string& name, const Function& oracle);
@@ -81,7 +78,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -89,7 +86,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Finalize initialization
-    void finalize(const Dict& opts) override;
+    void finalize() override;
 
     /** \brief Get oracle */
     const Function& oracle() const override { return oracle_;}
@@ -111,10 +108,12 @@ namespace casadi {
     void set_function(const Function& fcn) { set_function(fcn, fcn.name()); }
 
     // Calculate an oracle function
-    casadi_int calc_function(OracleMemory* m, const std::string& fcn,
+    int calc_function(OracleMemory* m, const std::string& fcn,
                       const double* const* arg=nullptr) const;
 
-    // Get list of dependency functions
+    /** \brief Get list of dependency functions
+     * -1 Indicates irregularity
+    */
     std::vector<std::string> get_function() const override;
 
     // Get a dependency function
@@ -145,11 +144,16 @@ namespace casadi {
     void set_temp(void* mem, const double** arg, double** res,
                           casadi_int* iw, double* w) const override;
 
-    /// Print statistics
-    void print_fstats(const OracleMemory* m) const;
-
     /// Get all statistics
     Dict get_stats(void* mem) const override;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit OracleFunction(DeserializingStream& s);
+
   };
 
 } // namespace casadi

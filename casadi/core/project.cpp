@@ -24,9 +24,9 @@
 
 
 #include "project.hpp"
-#include <vector>
-#include <sstream>
 #include "casadi_misc.hpp"
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -97,5 +97,76 @@ namespace casadi {
                            g.work(res.front(), nnz()), sparsity(), "w") << "\n";
   }
 
+  void Project::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("Project::type", 'n');
+  }
+
+  void Densify::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s); // NOLINT
+    s.pack("Project::type", 'd');
+  }
+
+  void Sparsify::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s); // NOLINT
+    s.pack("Project::type", 's');
+  }
+
+  MXNode* Project::deserialize(DeserializingStream& s) {
+    char t;
+    s.unpack("Project::type", t);
+    switch (t) {
+      case 'n':
+        return new Project(s);
+      case 'd':
+        return new Densify(s);
+      case 's':
+        return new Sparsify(s);
+      default:
+        casadi_assert_dev(false);
+    }
+  }
+
+  void Densify::generate(CodeGenerator& g,
+                          const std::vector<casadi_int>& arg,
+                          const std::vector<casadi_int>& res) const {
+    g << g.densify(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
+                           g.work(res.front(), nnz())) << "\n";
+  }
+
+  void Sparsify::generate(CodeGenerator& g,
+                          const std::vector<casadi_int>& arg,
+                          const std::vector<casadi_int>& res) const {
+    g << g.sparsify(g.work(arg.front(), dep().nnz()),
+                           g.work(res.front(), nnz()), sparsity()) << "\n";
+  }
+
+  template<typename T>
+  int Densify::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
+    casadi_densify(arg[0], dep().sparsity(), res[0], false);
+    return 0;
+  }
+
+  template<typename T>
+  int Sparsify::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
+    casadi_sparsify(arg[0], res[0], sparsity(), false);
+    return 0;
+  }
+
+  int Densify::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
+  }
+
+  int Densify::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
+  }
+
+  int Sparsify::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
+  }
+
+  int Sparsify::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
+  }
 
 } // namespace casadi

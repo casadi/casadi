@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = LapackQr::meta_doc.c_str();;
     plugin->version = CASADI_VERSION;
     plugin->options = &LapackQr::options_;
+    plugin->deserialize = &LapackQr::deserialize;
     return 0;
   }
 
@@ -53,7 +54,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options LapackQr::options_
+  const Options LapackQr::options_
   = {{&FunctionInternal::options_},
      {{"max_nrhs",
        {OT_INT,
@@ -167,6 +168,15 @@ namespace casadi {
              get_ptr(m->mat), &ncol, x, &ncol);
     }
     return 0;
+  }
+
+  LapackQr::LapackQr(DeserializingStream& s) : LinsolInternal(s) {
+    s.unpack("LapackQr::max_nrhs", max_nrhs_);
+  }
+
+  void LapackQr::serialize_body(SerializingStream &s) const {
+    LinsolInternal::serialize_body(s);
+    s.pack("LapackQr::max_nrhs", max_nrhs_);
   }
 
 } // namespace casadi

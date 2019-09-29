@@ -136,6 +136,9 @@ namespace casadi {
 
     // Temporary memory
     double* jac;
+    double* exact_hess_lag;
+
+    casadi_int ret_;  // return value (only needed for first iteration of restoration phase)
   };
 
   /** \brief \pluginbrief{Nlpsol,blocksqp}
@@ -160,7 +163,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -194,13 +197,14 @@ namespace casadi {
 
     // Jacobian/Hessian sparsity
     Sparsity Asp_, Hsp_;
+    Sparsity exact_hess_lag_sp_;
 
     /// Main Loop of SQP method
     casadi_int run(BlocksqpMemory* m, casadi_int maxIt, casadi_int warmStart = 0) const;
     /// Compute gradient of Lagrangian function (sparse version)
     void calcLagrangeGradient(BlocksqpMemory* m,
       const double* lam_x, const double* lam_g,
-      const double* grad_f, double *jacNz,
+      const double* grad_f, const double *jacNz,
       double *grad_lag, casadi_int flag) const;
 
     /// Overloaded function for convenience, uses current variables of SQPiterate vars
@@ -272,6 +276,8 @@ namespace casadi {
     // Compute limited memory Hessian approximations based on update formulas
     void calcHessianUpdateLimitedMemory(BlocksqpMemory* m,
         casadi_int updateType, casadi_int hessScaling) const;
+    // Compute exact Hessian update
+    void calcHessianUpdateExact(BlocksqpMemory* m) const;
     // [blockwise] Compute new approximation for Hessian by SR1 update
     void calcSR1(BlocksqpMemory* m, const double* gamma, const double* delta,
       casadi_int b) const;
@@ -313,6 +319,10 @@ namespace casadi {
     casadi_int evaluate(BlocksqpMemory* m, const double *xk,
                  double *f, double *g) const;
 
+    /// Evaluate exact hessian of Lagrangian
+    casadi_int evaluate(BlocksqpMemory* m,
+                 double *exact_hess_lag) const;
+
     //  Declaration of general purpose routines for matrix and vector computations
     double lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const;
 
@@ -339,6 +349,7 @@ namespace casadi {
     casadi_int max_it_qp_;  // Maximum number of QP iterations per SQP iteration
     casadi_int max_iter_; // Maximum number of SQP steps
     bool warmstart_; // Use warmstarting
+    bool qp_init_;
     bool block_hess_;  // Blockwise Hessian approximation?
     casadi_int hess_scaling_;// Scaling strategy for Hessian approximation
     casadi_int fallback_scaling_;  // If indefinite update is used, the type of fallback strategy
@@ -378,6 +389,22 @@ namespace casadi {
     double eta_;
     double obj_lo_;
     double obj_up_;
+
+    // feasibility restoration phase
+    double rho_;  // Regularization factor for first part of objective
+    double zeta_;  // Regularization factor for second part of objective
+    Function rp_solver_;  // restoration phase Solver
+    bool print_maxit_reached_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Blocksqp(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Blocksqp(DeserializingStream& s);
   };
 
 } // namespace casadi

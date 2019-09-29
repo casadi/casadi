@@ -26,11 +26,11 @@
 #ifndef CASADI_GLOBAL_OPTIONS_HPP
 #define CASADI_GLOBAL_OPTIONS_HPP
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include <casadi/core/casadi_export.h>
 #include "casadi/core/casadi_common.hpp"
+#include <casadi/core/casadi_export.h>
 
 namespace casadi {
 
@@ -60,6 +60,8 @@ namespace casadi {
 
       static std::string casadipath;
 
+      static std::string casadi_include_path;
+
       static bool hierarchical_sparsity;
 
       static casadi_int max_num_dir;
@@ -77,6 +79,9 @@ namespace casadi {
 
       static void setCasadiPath(const std::string & path) { casadipath = path; }
       static std::string getCasadiPath() { return casadipath; }
+
+      static void setCasadiIncludePath(const std::string & path) { casadi_include_path = path; }
+      static std::string getCasadiIncludePath() { return casadi_include_path; }
 
       static void setMaxNumDir(casadi_int ndir) { max_num_dir=ndir; }
       static casadi_int getMaxNumDir() { return max_num_dir; }

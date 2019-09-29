@@ -25,6 +25,7 @@
 
 #include "qp_to_nlp.hpp"
 #include "casadi/core/nlpsol.hpp"
+#include "casadi/core/nlpsol_impl.hpp"
 
 using namespace std;
 namespace casadi {
@@ -37,6 +38,7 @@ namespace casadi {
     plugin->doc = QpToNlp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &QpToNlp::options_;
+    plugin->deserialize = &QpToNlp::deserialize;
     return 0;
   }
 
@@ -50,9 +52,24 @@ namespace casadi {
   }
 
   QpToNlp::~QpToNlp() {
+    clear_mem();
   }
 
-  Options QpToNlp::options_
+
+  void* QpToNlp::alloc_mem() const {
+    QpToNlpMemory *m = new QpToNlpMemory();
+    m->nlp_mem = solver_.checkout();
+    return m;
+  }
+
+  void QpToNlp::free_mem(void *mem) const {
+    auto m = static_cast<QpToNlpMemory*>(mem);
+    solver_.release(m->nlp_mem);
+    delete m;
+  }
+
+
+  const Options QpToNlp::options_
   = {{&Conic::options_},
      {{"nlpsol",
        {OT_STRING,
@@ -96,8 +113,8 @@ namespace casadi {
 
     // The nlp looks exactly like a mathematical description of the NLP
     SXDict nlp = {{"x", X}, {"p", vertcat(par)},
-                  {"f", mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X)},
-                  {"g", mtimes(A, X)}};
+                  {"f", densify(mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X))},
+                  {"g", densify(mtimes(A, X))}};
 
     // Create an Nlpsol instance
     casadi_assert(!nlpsol_plugin.empty(), "'nlpsol' option has not been set");
@@ -109,7 +126,7 @@ namespace casadi {
   }
 
   int QpToNlp::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     // Inputs
     const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_;
     // Outputs
@@ -181,16 +198,33 @@ namespace casadi {
     res1[NLPSOL_LAM_G] = lam_a_;
 
     // Solve the NLP
-    return solver_(arg1, res1, iw, w, 0);
+    auto m = static_cast<QpToNlpMemory*>(mem);
+    int ret = solver_(arg1, res1, iw, w, m->nlp_mem);
+    auto nlp_m = static_cast<NlpsolMemory*>(solver_.memory(m->nlp_mem));
+
+    m->success = nlp_m->success;
+    m->unified_return_status = nlp_m->unified_return_status;
+    return ret;
   }
 
   Dict QpToNlp::get_stats(void* mem) const {
-    Dict stats;
-    Dict solver_stats = solver_.stats();
-    stats["solver_stats"] = solver_stats;
-    stats["success"] = solver_stats["success"];
-
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<QpToNlpMemory*>(mem);
+    auto nlp_m = static_cast<NlpsolMemory*>(solver_.memory(m->nlp_mem));
+    stats["solver_stats"] = solver_->get_stats(nlp_m);
     return stats;
+  }
+
+  QpToNlp::QpToNlp(DeserializingStream& s) : Conic(s) {
+    s.version("QpToNlp", 1);
+    s.unpack("QpToNlp::solver", solver_);
+  }
+
+  void QpToNlp::serialize_body(SerializingStream &s) const {
+    Conic::serialize_body(s);
+
+    s.version("QpToNlp", 1);
+    s.pack("QpToNlp::solver", solver_);
   }
 
 } // namespace casadi

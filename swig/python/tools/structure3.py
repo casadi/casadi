@@ -662,7 +662,6 @@ def performExtraIndex(i,extraIndex=None,entry=None,flip=False):
         a,b = extraIndex
         a = delegation(a,entry,0)
         b = delegation(b,entry,1)
-        print(a,b,i,type(a),type(b),type(i))
         return i.__getitem__((b,a) if flip else (a,b))
     except NotImplementedError:
        raise Exception("Powerindex exhausted. Passing on %s to %s, but it doesn't know what to do with it" % (str(extraIndex),str(type(i))))
@@ -751,7 +750,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
       if canonicalIndex in self.struct.map:
         res = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
-        if isinstance(res,IM):
+        if isinstance(res,DM):
           assert res.is_dense()
           return list(map(int,list(res.nonzeros())))
         return list(res)
@@ -783,7 +782,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     for i in self.traverseCanonicalIndex():
       e = self.getStructEntryByCanonicalIndex(i)
       sp = Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
-      m = IM(sp,list(range(k,k+sp.nnz())))
+      m = DM(sp,list(range(k,k+sp.nnz())))
       k += sp.nnz()
       it = tuple(i)
       self.map[it] = m
@@ -1008,7 +1007,6 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
     elif data is None:
       self.master = mtype.nan(self.size,1)
     else:
-      print(type(data), data.__class__)
       self.master = mtype(data)
 
     if self.master.shape[0]!=self.size:

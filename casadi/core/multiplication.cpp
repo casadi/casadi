@@ -29,6 +29,7 @@
 #include "multiplication.hpp"
 #include "casadi_misc.hpp"
 #include "function_internal.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -142,6 +143,27 @@ namespace casadi {
       << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="
       << g.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)"
       << " *rr += ss[k*" << nrow_x << "]**tt++;\n";
+  }
+
+  void Multiplication::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("Multiplication::dense", false);
+  }
+
+  void DenseMultiplication::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s); // NOLINT
+    s.pack("Multiplication::dense", true);
+  }
+
+  MXNode* Multiplication::deserialize(DeserializingStream& s) {
+    bool dense;
+    s.unpack("Multiplication::dense", dense);
+    if (dense) {
+      return new DenseMultiplication(s);
+    } else {
+      return new Multiplication(s);
+    }
+
   }
 
 } // namespace casadi

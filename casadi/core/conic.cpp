@@ -115,6 +115,25 @@ namespace casadi {
     //          subject to  lbx <= x <= ubx
     //                      lbg <= g(x) = A x + b <= ubg
     //                      h(x) >=0 (psd)
+
+    // Extract 'expand' option
+    Dict opt = opts;
+    auto it = opt.find("expand");
+    bool expand = false;
+    if (it!=opt.end()) {
+      expand = it->second;
+      opt.erase(it);
+    }
+    if (expand && M::type_name()=="MX") {
+      Function f = Function("f", qp, {"x", "p"}, {"f", "g", "h"});
+      std::vector<SX> arg = f.sx_in();
+      std::vector<SX> res = f(arg);
+      SXDict qp_mod;
+      for (casadi_int i=0;i<f.n_in();++i) qp_mod[f.name_in(i)] = arg[i];
+      for (casadi_int i=0;i<f.n_out();++i) qp_mod[f.name_out(i)] = res[i];
+      return qpsol_nlp(name, solver, qp_mod, opt);
+    }
+
     M x, p, f, g, h;
     for (auto&& i : qp) {
       if (i.first=="x") {
@@ -159,6 +178,9 @@ namespace casadi {
     // Identify the quadratic term in the objective
     M H = M::jacobian(gf, x, {{"symmetric", true}});
 
+    // Identify constant term in the objective
+    Function r("constant_qp", {x, p}, {substitute(f, x, M::zeros(x.sparsity()))});
+
     // Identify the constant term in the constraints
     M b = substitute(g, x, M::zeros(x.sparsity()));
 
@@ -181,7 +203,7 @@ namespace casadi {
     // Create the QP solver
     Function conic_f = conic(name + "_qpsol", solver,
                              {{"h", H.sparsity()}, {"a", A.sparsity()},
-                              {"p", P.sparsity()}, {"q", Q.sparsity()}}, opts);
+                              {"p", P.sparsity()}, {"q", Q.sparsity()}}, opt);
 
     // Create an MXFunction with the right signature
     vector<MX> ret_in(NLPSOL_NUM_IN);
@@ -195,10 +217,13 @@ namespace casadi {
     ret_in[NLPSOL_LAM_G0] = MX::sym("lam_g0", g.sparsity());
     vector<MX> ret_out(NLPSOL_NUM_OUT);
 
-    // Get expressions for the QP matrices and vectors
+
     vector<MX> v(NL_NUM_IN);
     v[NL_X] = ret_in[NLPSOL_X0];
     v[NL_P] = ret_in[NLPSOL_P];
+    // Evaluate constant part of objective
+    MX rv = r(v)[0];
+    // Get expressions for the QP matrices and vectors
     v = prob(v);
 
     // Call the QP solver
@@ -219,7 +244,7 @@ namespace casadi {
 
     // Get expressions for the solution
     ret_out[NLPSOL_X] = reshape(w[CONIC_X], x.size());
-    ret_out[NLPSOL_F] = w[CONIC_COST];
+    ret_out[NLPSOL_F] = rv + w[CONIC_COST];
     ret_out[NLPSOL_G] = reshape(mtimes(v.at(2), w[CONIC_X]), g.size()) + v.at(3);
     ret_out[NLPSOL_LAM_X] = reshape(w[CONIC_LAM_X], x.size());
     ret_out[NLPSOL_LAM_G] = reshape(w[CONIC_LAM_A], g.size());
@@ -293,7 +318,7 @@ namespace casadi {
         "Got incompatible dimensions.\n"
         "Q: " + Q_.dim() +
         "We need the product Qx to exist.");
-      np_ = sqrt(Q_.size1());
+      np_ = static_cast<casadi_int>(sqrt(static_cast<double>(Q_.size1())));
       casadi_assert(np_*np_==Q_.size1(),
         "Got incompatible dimensions.\n"
         "Q: " + Q_.dim() +
@@ -318,7 +343,6 @@ namespace casadi {
       "P: " + P_.dim() +
       "We need P " + str(np_) + "-by-" + str(np_) + ".");
 
-    print_time_ = false;
   }
 
   Sparsity Conic::get_sparsity_in(casadi_int i) {
@@ -360,11 +384,17 @@ namespace casadi {
     return Sparsity();
   }
 
-  Options Conic::options_
+  const Options Conic::options_
   = {{&FunctionInternal::options_},
      {{"discrete",
        {OT_BOOLVECTOR,
-        "Indicates which of the variables are discrete, i.e. integer-valued"}}
+        "Indicates which of the variables are discrete, i.e. integer-valued"}},
+      {"print_problem",
+       {OT_BOOL,
+        "Print a numeric description of the problem"}},
+      {"error_on_fail",
+       {OT_BOOL,
+        "When the numerical process returns unsuccessfully, raise an error (default false)."}}
      }
   };
 
@@ -372,10 +402,17 @@ namespace casadi {
     // Call the init method of the base class
     FunctionInternal::init(opts);
 
+    print_problem_ = false;
+    error_on_fail_ = true;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="discrete") {
         discrete_ = op.second;
+      } else if (op.first=="print_problem") {
+        print_problem_ = op.second;
+      } else if (op.first=="error_on_fail") {
+        error_on_fail_ = op.second;
       }
     }
 
@@ -391,6 +428,32 @@ namespace casadi {
     casadi_assert(np_==0 || psd_support(),
       "Selected solver does not support psd constraints.");
 
+  }
+
+  /** \brief Initalize memory block */
+  int Conic::init_mem(void* mem) const {
+    if (ProtoFunction::init_mem(mem)) return 1;
+
+    auto m = static_cast<ConicMemory*>(mem);
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
+    m->iter_count = -1;
+
+    return 0;
+  }
+
+  /** \brief Set the (persistent) work vectors */
+  void Conic::set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const {
+
+    auto m = static_cast<ConicMemory*>(mem);
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
+    m->iter_count = -1;
   }
 
   Conic::~Conic() {
@@ -435,29 +498,32 @@ namespace casadi {
     }
   }
 
-  void Conic::print_fstats(const ConicMemory* m) const {
-    // Length of the name being printed
-    size_t name_len=0;
-    for (auto &&s : m->fstats) {
-      name_len = max(s.first.size(), name_len);
+  int Conic::
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    if (print_problem_) {
+      uout() << "H:";
+      DM::print_dense(uout(), H_, arg[CONIC_H], false);
+      uout() << std::endl;
+      uout() << "G:" << std::vector<double>(arg[CONIC_G], arg[CONIC_G]+nx_) << std::endl;
+      uout() << "A:";
+      DM::print_dense(uout(), A_, arg[CONIC_A], false);
+      uout() << std::endl;
+      uout() << "lba:" << std::vector<double>(arg[CONIC_LBA], arg[CONIC_LBA]+na_) << std::endl;
+      uout() << "uba:" << std::vector<double>(arg[CONIC_UBA], arg[CONIC_UBA]+na_) << std::endl;
+      uout() << "lbx:" << std::vector<double>(arg[CONIC_LBX], arg[CONIC_LBX]+nx_) << std::endl;
+      uout() << "ubx:" << std::vector<double>(arg[CONIC_UBX], arg[CONIC_UBX]+nx_) << std::endl;
     }
+    auto m = static_cast<ConicMemory*>(mem);
 
-    // Print name with a given length. Format: "%NNs "
-    char namefmt[10];
-    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<casadi_int>(name_len));
-
-    // Print header
-    print(namefmt, "");
-    print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
-
-    // Print keys
-    for (auto &&s : m->fstats) {
-      const FStats& fs = m->fstats.at(s.first);
-      if (fs.n_call!=0) {
-        print(namefmt, s.first.c_str());
-        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
-      }
+    if (inputs_check_) {
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
+    int ret = solve(arg, res, iw, w, mem);
+
+    if (error_on_fail_ && !m->success)
+      casadi_error("conic process failed. "
+                   "Set 'error_on_fail' option to false to ignore this error.");
+    return ret;
   }
 
   std::vector<std::string> conic_options(const std::string& name) {
@@ -474,6 +540,203 @@ namespace casadi {
 
   bool Conic::is_a(const std::string& type, bool recursive) const {
     return type==shortname() || (recursive && FunctionInternal::is_a(type, recursive));
+  }
+
+  void Conic::sdp_to_socp_init(SDPToSOCPMem& mem) const {
+
+    Sparsity qsum = reshape(sum2(Q_), np_, np_);
+
+    // Block detection
+    Sparsity aggregate = qsum+P_;
+
+    std::vector<casadi_int> p;
+    casadi_int nb = aggregate.scc(p, mem.r);
+
+    std::string pattern_message = "Pattern not recognised";
+
+    casadi_assert(p==range(p.size()), pattern_message);
+
+    const casadi_int* row = aggregate.row();
+    const casadi_int* colind = aggregate.colind();
+
+    // Check fishbone-structure
+    for (casadi_int i=0;i<nb;++i) {
+      casadi_int block_size = mem.r[i+1]-mem.r[i];
+      // number of nonzeros in column mem.r[i+1]-1
+      casadi_int nz = colind[mem.r[i+1]]-colind[mem.r[i+1]-1];
+      // Last column of block should be dense
+      casadi_assert(nz==block_size, pattern_message);
+      for (casadi_int k=0;k<block_size-1;++k) {
+        casadi_assert(colind[mem.r[i]+k+1]-colind[mem.r[i]+k], pattern_message);
+        casadi_assert(*(row++)==k+mem.r[i], pattern_message);
+        casadi_assert(*(row++)==mem.r[i]+block_size-1, pattern_message);
+      }
+
+      for (casadi_int k=0;k<block_size;++k)
+        casadi_assert(*(row++)==k+mem.r[i], pattern_message);
+    }
+
+    /**
+      general soc constraints:
+      ||Ax + b ||_2 <= c'x + d
+
+      Need to represent as
+      X'X <= Z'Z
+
+      with X and Z helper variables and
+      Ax  + b = X
+      c'x + d = Z
+
+      [A;c'] x - [X;Z] = [b;d]
+
+      we look for the vertical concatenation of these constraints for all blocks:
+
+      Q(map_Q) [x;X1;Z1;X2;Z2;...] = P.nz(map_P)
+
+    */
+
+    /*
+
+    Aggregate pattern:
+
+    x (x)
+     x(x)
+    xx(x)
+       x (x)
+        x(x)
+       xx(x)
+
+    We are interested in the parts in parenthesis (target).
+
+    Find out which rows in Q correspond to those targets
+    */
+
+    // Lookup vector for target start and end
+    std::vector<casadi_int> target_start(nb), target_stop(nb);
+    for (casadi_int i=0;i<nb;++i) {
+      target_start[i] = (mem.r[i+1]-1)*aggregate.size1()+mem.r[i];
+      target_stop[i] = target_start[i]+mem.r[i+1]-mem.r[i];
+    }
+
+    // Collect the nonzero indices in Q that that correspond to the target area
+    std::vector<casadi_int> q_nz;
+    // Triplet form for map_Q sparsity
+    std::vector<casadi_int> q_row, q_col;
+
+    // Loop over Q's columns (decision variables)
+    for (casadi_int j=0; j<Q_.size2(); ++j) {
+      casadi_int block_index = 0;
+      // Loop over Q's rows
+      for (casadi_int k=Q_.colind(j); k<Q_.colind(j+1); ++k) {
+        casadi_int i = Q_.row(k);
+
+        // Increment block_index if i runs ahead
+        while (i>target_stop[block_index] && block_index<nb-1) block_index++;
+
+        if (i>=target_start[block_index] && i<target_stop[block_index]) {
+          // Got a nonzero in the target region
+          q_nz.push_back(k);
+          q_row.push_back(mem.r[block_index]+i-target_start[block_index]);
+          q_col.push_back(j);
+        }
+      }
+    }
+
+    mem.map_Q = IM::triplet(q_row, q_col, q_nz, mem.r[nb], nx_);
+
+    // Add the [X1;Z1;X2;Z2;...] part
+    mem.map_Q = horzcat(mem.map_Q, -IM::eye(mem.r[nb])).T();
+
+    // Get maximum nonzero count of any column
+    casadi_int max_nnz = 0;
+    for (casadi_int i=0;i<mem.map_Q.size2();++i) {
+      max_nnz = std::max(max_nnz, mem.map_Q.colind(i+1)-mem.map_Q.colind(i));
+    }
+
+    // ind/val size needs to cover max nonzero count
+    mem.indval_size = std::max(nx_, max_nnz);
+
+    // Collect the indices for the P target area
+    mem.map_P.resize(mem.r[nb], -1);
+    for (casadi_int i=0;i<nb;++i) {
+      for (casadi_int k=P_.colind(mem.r[i+1]-1); k<P_.colind(mem.r[i+1]); ++k) {
+        casadi_int r = P_.row(k);
+        mem.map_P[r] = k;
+      }
+    }
+
+    // ind/val size needs to cover blocksize
+    for (casadi_int i=0;i<nb;++i)
+      mem.indval_size = std::max(mem.indval_size, mem.r[i+1]-mem.r[i]);
+
+    // Get the transpose and mapping
+    mem.AT = A_.transpose(mem.A_mapping);
+  }
+
+  Dict Conic::get_stats(void* mem) const {
+    Dict stats = FunctionInternal::get_stats(mem);
+    auto m = static_cast<ConicMemory*>(mem);
+
+    stats["success"] = m->success;
+    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
+    stats["iter_count"] = m->iter_count;
+    return stats;
+  }
+
+  void Conic::serialize(SerializingStream &s, const SDPToSOCPMem& m) const {
+    s.pack("Conic::SDPToSOCPMem::r", m.r);
+    s.pack("Conic::SDPToSOCPMem::AT", m.AT);
+    s.pack("Conic::SDPToSOCPMem::A_mapping", m.A_mapping);
+    s.pack("Conic::SDPToSOCPMem::map_Q", m.map_Q);
+    s.pack("Conic::SDPToSOCPMem::map_P", m.map_P);
+    s.pack("Conic::SDPToSOCPMem::indval_size", m.indval_size);
+  }
+  void Conic::deserialize(DeserializingStream &s, SDPToSOCPMem& m) {
+    s.unpack("Conic::SDPToSOCPMem::r", m.r);
+    s.unpack("Conic::SDPToSOCPMem::AT", m.AT);
+    s.unpack("Conic::SDPToSOCPMem::A_mapping", m.A_mapping);
+    s.unpack("Conic::SDPToSOCPMem::map_Q", m.map_Q);
+    s.unpack("Conic::SDPToSOCPMem::map_P", m.map_P);
+    s.unpack("Conic::SDPToSOCPMem::indval_size", m.indval_size);
+  }
+
+  void Conic::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+
+    s.version("Conic", 1);
+    s.pack("Conic::discrete", discrete_);
+    s.pack("Conic::print_problem", print_problem_);
+    s.pack("Conic::error_on_fail", error_on_fail_);
+    s.pack("Conic::H", H_);
+    s.pack("Conic::A", A_);
+    s.pack("Conic::Q", Q_);
+    s.pack("Conic::P", P_);
+    s.pack("Conic::nx", nx_);
+    s.pack("Conic::na", na_);
+    s.pack("Conic::np", np_);
+  }
+
+  void Conic::serialize_type(SerializingStream &s) const {
+    FunctionInternal::serialize_type(s);
+    PluginInterface<Conic>::serialize_type(s);
+  }
+
+  ProtoFunction* Conic::deserialize(DeserializingStream& s) {
+    return PluginInterface<Conic>::deserialize(s);
+  }
+
+  Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
+    s.version("Conic", 1);
+    s.unpack("Conic::discrete", discrete_);
+    s.unpack("Conic::print_problem", print_problem_);
+    s.unpack("Conic::error_on_fail", error_on_fail_);
+    s.unpack("Conic::H", H_);
+    s.unpack("Conic::A", A_);
+    s.unpack("Conic::Q", Q_);
+    s.unpack("Conic::P", P_);
+    s.unpack("Conic::nx", nx_);
+    s.unpack("Conic::na", na_);
+    s.unpack("Conic::np", np_);
   }
 
 } // namespace casadi

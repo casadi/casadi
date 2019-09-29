@@ -26,11 +26,11 @@
 #ifndef CASADI_INTERRUPT_HPP
 #define CASADI_INTERRUPT_HPP
 
-#include <casadi/core/casadi_export.h>
 #include "exception.hpp"
+#include <casadi/core/casadi_export.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 namespace casadi {
 
@@ -54,13 +54,23 @@ namespace casadi {
       return false;
     }
 
+    /// By default, do nothing
+    static void clearInterruptedDefault() {
+    }
+
+
   public:
     /// The routine that is used for checking interrupts
     static bool (*checkInterrupted)();
+    /// The routine that is used for clearing interrupts
+    static void (*clearInterrupted)();
 
     /// Raises an error if an interrupt was captured.
     static void check() {
-      if (checkInterrupted()) throw KeyboardInterruptException();
+      if (checkInterrupted()) {
+        clearInterrupted();
+        throw KeyboardInterruptException();
+      }
     }
   };
 

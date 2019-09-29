@@ -27,6 +27,7 @@ macro(casadi_library name)
   endif()
   if(ENABLE_SHARED)
     add_library(${name} SHARED ${ARGN})
+    SET_TARGET_PROPERTIES(${name} PROPERTIES GNUtoMS 1)
   endif()
   generate_export_header(${name})
 
@@ -127,5 +128,5 @@ add_custom_target(libs ALL DEPENDS ${CASADI_MODULES})
 
 # Main header files
 configure_file(config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/config.h" ESCAPE_QUOTES)
-install(FILES casadi.hpp mem.h "${CMAKE_CURRENT_BINARY_DIR}/config.h"
+install(FILES casadi.hpp mem.h casadi_c.h "${CMAKE_CURRENT_BINARY_DIR}/config.h"
         DESTINATION ${INCLUDE_PREFIX}/casadi)

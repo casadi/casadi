@@ -28,9 +28,9 @@
 
 #include <casadi/core/casadi_export.h>
 
-#include <iostream>
-#include <fstream>
 #include <cstdarg>
+#include <fstream>
+#include <iostream>
 
 namespace casadi {
   /**
@@ -125,5 +125,9 @@ namespace casadi {
   CASADI_EXPORT std::ostream& uerr();
 
 } // namespace casadi
+
+extern "C" {
+  CASADI_EXPORT int casadi_printf(const char  *fmt, ...);
+}
 
 #endif // CASADI_LOGGER_HPP

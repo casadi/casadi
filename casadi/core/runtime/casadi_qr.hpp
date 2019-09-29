@@ -17,8 +17,8 @@ T1 casadi_house(T1* v, T1* beta, casadi_int nv) {
   v0_nonpos = v0<=0;
   // C-REPLACE "if_else" "casadi_if_else"
   v[0] = if_else(sigma_is_zero, 1,
-                 if_else(v0_nonpos, v0-s, -sigma/(v0+s)));
-  *beta = if_else(sigma_is_zero, 2*v0_nonpos, -1/(s*v[0]));
+                 if_else(v0_nonpos, v0-s, -sigma/(v0+s))); // NOLINT
+  *beta = if_else(sigma_is_zero, 2*v0_nonpos, -1/(s*v[0])); // NOLINT
   return s;
 }
 
@@ -228,7 +228,7 @@ void casadi_qr_colcomb(T1* v, const T1* nz_r, const casadi_int* sp_r,
     }
   }
   // Reset w
-  casadi_fill(v, ncol, 0.);
+  casadi_clear(v, ncol);
   v[pc[ind]] = 1.;
   // Copy ind-th column to v
   for (k=r_colind[ind]; k<r_colind[ind+1]-1; ++k) {

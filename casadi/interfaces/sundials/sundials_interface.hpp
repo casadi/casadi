@@ -77,7 +77,7 @@ namespace casadi {
     int ncheck;
 
     /// Linear solver memory objects
-    casadi_int mem_linsolF, mem_linsolB;
+    int mem_linsolF, mem_linsolB;
 
     /// Constructor
     SundialsMemory();
@@ -96,7 +96,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -155,7 +155,7 @@ namespace casadi {
     bool second_order_correction_;
     double step0_;
     double nonlin_conv_coeff_;
-    double max_order_;
+    casadi_int max_order_;
     ///@}
 
     /// Linear solver
@@ -167,7 +167,7 @@ namespace casadi {
     // Supported interpolations in Sundials
     enum InterpType {SD_POLYNOMIAL, SD_HERMITE} interp_;
 
-    /// Linear solver data (dense)
+    /// Linear solver data (dense) -- what is this?
     struct LinSolDataDense {};
 
     /** \brief Set the (persistent) work vectors */
@@ -183,6 +183,13 @@ namespace casadi {
       std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
       uout() << id << " = " << tmp << std::endl;
     }
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit SundialsInterface(DeserializingStream& s);
   };
 
   // Check if N_Vector is regular

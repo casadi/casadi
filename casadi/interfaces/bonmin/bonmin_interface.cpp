@@ -47,6 +47,7 @@ namespace casadi {
     plugin->doc = BonminInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &BonminInterface::options_;
+    plugin->deserialize = &BonminInterface::deserialize;
     return 0;
   }
 
@@ -63,7 +64,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options BonminInterface::options_
+  const Options BonminInterface::options_
   = {{&Nlpsol::options_},
      {{"pass_nonlinear_variables",
        {OT_BOOL,
@@ -348,9 +349,15 @@ namespace casadi {
     } else {
       ss << e.fileName() << ":" << e.lineNumber() << " method " << e.methodName()
          << " : assertion \'" << e.message() <<"\' failed.";
-      if (e.className()!="")
+      if (!e.className().empty())
         ss <<"Possible reason: "<< e.className();
     }
+    return ss.str();
+  }
+
+  inline std::string to_str(TNLPSolver::UnsolvedError& e) {
+    std::stringstream ss;
+    e.printError(ss);
     return ss.str();
   }
 
@@ -362,7 +369,7 @@ namespace casadi {
   */
   class BonMinMessageHandler : public CoinMessageHandler {
   public:
-    BonMinMessageHandler(): CoinMessageHandler() { }
+    BonMinMessageHandler() { }
     /// Core of the class: the method that directs the messages
     int print() override {
       uout() << messageBuffer_ << std::endl;
@@ -382,6 +389,7 @@ namespace casadi {
 
   int BonminInterface::solve(void* mem) const {
     auto m = static_cast<BonminMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     // Reset statistics
     m->inf_pr.clear();
@@ -459,18 +467,20 @@ namespace casadi {
     // Initialize
     bonmin.initialize(GetRawPtr(tminlp));
 
-    if (true) {
-      // Branch-and-bound
-      try {
-        Bab bb;
-        bb(bonmin);
-      } catch (CoinError& e) {
-        casadi_error("CoinError occured: " + to_str(e));
-      }
+    // Branch-and-bound
+    try {
+      Bab bb;
+      bb(bonmin);
+    } catch (CoinError& e) {
+      casadi_error("CoinError occured: " + to_str(e));
+    } catch (TNLPSolver::UnsolvedError& e) {
+      casadi_error("TNLPSolver::UnsolvedError occured" + to_str(e));
+    } catch (...) {
+      casadi_error("Uncaught error in Bonmin");
     }
 
     // Save results to outputs
-    casadi_copy(m->gk, ng_, m->g);
+    casadi_copy(m->gk, ng_, d_nlp->z + nx_);
     return 0;
   }
 
@@ -480,6 +490,7 @@ namespace casadi {
                         double inf_pr, double inf_du, double mu, double d_norm,
                         double regularization_size, double alpha_du, double alpha_pr,
                         int ls_trials, bool full_callback) const {
+    auto d_nlp = &m->d_nlp;
     m->n_iter += 1;
     try {
       if (verbose_) casadi_message("intermediate_callback started");
@@ -493,13 +504,13 @@ namespace casadi {
       m->ls_trials.push_back(ls_trials);
       m->obj.push_back(obj_value);
       if (!fcallback_.is_null()) {
-        m->fstats.at("callback_fun").tic();
+        ScopedTiming tic(m->fstats.at("callback_fun"));
         if (full_callback) {
-          casadi_copy(x, nx_, m->x);
+          casadi_copy(x, nx_, d_nlp->z);
           for (casadi_int i=0; i<nx_; ++i) {
-            m->lam_x[i] = z_U[i]-z_L[i];
+            d_nlp->lam[i] = z_U[i]-z_L[i];
           }
-          casadi_copy(lambda, ng_, m->lam_g);
+          casadi_copy(lambda, ng_, d_nlp->lam + nx_);
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
@@ -520,8 +531,8 @@ namespace casadi {
           m->arg[NLPSOL_F] = &obj_value;
           m->arg[NLPSOL_G] = g;
           m->arg[NLPSOL_LAM_P] = nullptr;
-          m->arg[NLPSOL_LAM_X] = m->lam_x;
-          m->arg[NLPSOL_LAM_G] = m->lam_g;
+          m->arg[NLPSOL_LAM_X] = d_nlp->lam;
+          m->arg[NLPSOL_LAM_G] = d_nlp->lam + nx_;
         }
 
         // Outputs
@@ -551,16 +562,16 @@ namespace casadi {
   void BonminInterface::
   finalize_solution(BonminMemory* m, TMINLP::SolverReturn status,
       const double* x, double obj_value) const {
+    auto d_nlp = &m->d_nlp;
     try {
       // Get primal solution
-      casadi_copy(x, nx_, m->x);
+      casadi_copy(x, nx_, d_nlp->z);
 
       // Get optimal cost
-      m->f = obj_value;
+      d_nlp->f = obj_value;
 
       // Dual solution not calculated
-      casadi_fill(m->lam_x, nx_, nan);
-      casadi_fill(m->lam_g, ng_, nan);
+      casadi_fill(d_nlp->lam, nx_ + ng_, nan);
 
       // Get the constraints
       casadi_fill(m->gk, ng_, nan);
@@ -571,7 +582,7 @@ namespace casadi {
       // Interpret return code
       m->return_status = return_status_string(status);
       m->success = status==Bonmin::TMINLP::SUCCESS;
-
+      if (status==Bonmin::TMINLP::LIMIT_EXCEEDED) m->unified_return_status = SOLVER_RET_LIMITED;
     } catch(exception& ex) {
       uerr() << "finalize_solution failed: " << ex.what() << endl;
     }
@@ -584,11 +595,12 @@ namespace casadi {
   bool BonminInterface::
   get_bounds_info(BonminMemory* m, double* x_l, double* x_u,
                   double* g_l, double* g_u) const {
+    auto d_nlp = &m->d_nlp;
     try {
-      casadi_copy(m->lbx, nx_, x_l);
-      casadi_copy(m->ubx, nx_, x_u);
-      casadi_copy(m->lbg, ng_, g_l);
-      casadi_copy(m->ubg, ng_, g_u);
+      casadi_copy(d_nlp->lbz, nx_, x_l);
+      casadi_copy(d_nlp->ubz, nx_, x_u);
+      casadi_copy(d_nlp->lbz+nx_, ng_, g_l);
+      casadi_copy(d_nlp->ubz+nx_, ng_, g_u);
       return true;
     } catch(exception& ex) {
       uerr() << "get_bounds_info failed: " << ex.what() << endl;
@@ -600,23 +612,24 @@ namespace casadi {
   get_starting_point(BonminMemory* m, bool init_x, double* x,
                      bool init_z, double* z_L, double* z_U,
                      bool init_lambda, double* lambda) const {
+    auto d_nlp = &m->d_nlp;
     try {
       // Initialize primal variables
       if (init_x) {
-        casadi_copy(m->x, nx_, x);
+        casadi_copy(d_nlp->z, nx_, x);
       }
 
       // Initialize dual variables (simple bounds)
       if (init_z) {
         for (casadi_int i=0; i<nx_; ++i) {
-          z_L[i] = max(0., -m->lam_x[i]);
-          z_U[i] = max(0., m->lam_x[i]);
+          z_L[i] = max(0., -d_nlp->lam[i]);
+          z_U[i] = max(0., d_nlp->lam[i]);
         }
       }
 
       // Initialize dual variables (nonlinear bounds)
       if (init_lambda) {
-        casadi_copy(m->lam_g, ng_, lambda);
+        casadi_copy(d_nlp->lam + nx_, ng_, lambda);
       }
 
       return true;
@@ -689,6 +702,63 @@ namespace casadi {
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
     return stats;
+  }
+
+  BonminInterface::BonminInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("BonminInterface", 1);
+    s.unpack("BonminInterface::jacg_sp", jacg_sp_);
+    s.unpack("BonminInterface::hesslag_sp", hesslag_sp_);
+    s.unpack("BonminInterface::exact_hessian", exact_hessian_);
+    s.unpack("BonminInterface::opts", opts_);
+
+    s.unpack("BonminInterface::sos1_weights", sos1_weights_);
+    s.unpack("BonminInterface::sos1_indices", sos1_indices_);
+    s.unpack("BonminInterface::sos1_priorities", sos1_priorities_);
+    s.unpack("BonminInterface::sos1_starts", sos1_starts_);
+    s.unpack("BonminInterface::sos1_types", sos1_types_);
+    s.unpack("BonminInterface::sos1_types", sos1_types_);
+    s.unpack("BonminInterface::sos_num", sos_num_);
+    s.unpack("BonminInterface::sos_num_nz", sos_num_nz_);
+
+    s.unpack("BonminInterface::pass_nonlinear_variables", pass_nonlinear_variables_);
+    s.unpack("BonminInterface::pass_nonlinear_constraints", pass_nonlinear_constraints_);
+    s.unpack("BonminInterface::nl_ex", nl_ex_);
+    s.unpack("BonminInterface::nl_g", nl_g_);
+    s.unpack("BonminInterface::var_string_md", var_string_md_);
+    s.unpack("BonminInterface::var_integer_md", var_integer_md_);
+    s.unpack("BonminInterface::var_numeric_md", var_numeric_md_);
+    s.unpack("BonminInterface::con_string_md", con_string_md_);
+    s.unpack("BonminInterface::con_integer_md", con_integer_md_);
+    s.unpack("BonminInterface::con_numeric_md", con_numeric_md_);
+  }
+
+  void BonminInterface::serialize_body(SerializingStream &s) const {
+    Nlpsol::serialize_body(s);
+    s.version("BonminInterface", 1);
+    s.pack("BonminInterface::jacg_sp", jacg_sp_);
+    s.pack("BonminInterface::hesslag_sp", hesslag_sp_);
+    s.pack("BonminInterface::exact_hessian", exact_hessian_);
+    s.pack("BonminInterface::opts", opts_);
+
+    s.pack("BonminInterface::sos1_weights", sos1_weights_);
+    s.pack("BonminInterface::sos1_indices", sos1_indices_);
+    s.pack("BonminInterface::sos1_priorities", sos1_priorities_);
+    s.pack("BonminInterface::sos1_starts", sos1_starts_);
+    s.pack("BonminInterface::sos1_types", sos1_types_);
+    s.pack("BonminInterface::sos1_types", sos1_types_);
+    s.pack("BonminInterface::sos_num", sos_num_);
+    s.pack("BonminInterface::sos_num_nz", sos_num_nz_);
+
+    s.pack("BonminInterface::pass_nonlinear_variables", pass_nonlinear_variables_);
+    s.pack("BonminInterface::pass_nonlinear_constraints", pass_nonlinear_constraints_);
+    s.pack("BonminInterface::nl_ex", nl_ex_);
+    s.pack("BonminInterface::nl_g", nl_g_);
+    s.pack("BonminInterface::var_string_md", var_string_md_);
+    s.pack("BonminInterface::var_integer_md", var_integer_md_);
+    s.pack("BonminInterface::var_numeric_md", var_numeric_md_);
+    s.pack("BonminInterface::con_string_md", con_string_md_);
+    s.pack("BonminInterface::con_integer_md", con_integer_md_);
+    s.pack("BonminInterface::con_numeric_md", con_numeric_md_);
   }
 
 } // namespace casadi

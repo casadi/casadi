@@ -64,6 +64,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x],[solve(A_,b_), mtimes(C_,solve(A_,b_))])
       self.checkfunction(solver,refsol,inputs=[0],digits=10)
+      if "newton" in Solver: self.check_serialize(solver,inputs=[0])
       if "codegen" in features: self.check_codegen(solver,inputs=[0])
 
       A = SX.sym("A",2,2)
@@ -76,6 +77,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x,A,b],[solve(A,b)])
       self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
+      if "newton" in Solver: self.check_serialize(solver,inputs=solver_in)
       if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
       A = SX.sym("A",2,2)
@@ -94,6 +96,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
           refsol = Function("refsol", [x,A,b],[solve(A,b),mtimes(C_,solve(A,b))])
           self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
+          if "newton" in Solver: self.check_serialize(solver,inputs=solver_in)
       if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
   def test_missing_symbols(self):
@@ -194,14 +197,11 @@ class ImplicitFunctiontests(casadiTestCase):
       y0 = DM([0.1,0.4])
       yy = y + y0
       n=0.2
-      f=Function("f", [y,x],[vertcat(*[x-arcsin(yy[0]),yy[1]**2-yy[0]])])
+      f=Function("f", [y,x],[vertcat(x-arcsin(yy[0]),yy[1]**2-yy[0])])
       solver=rootfinder("solver", Solver, f, options)
-      solver_in = [0]*solver.n_in();solver_in[0]=n
-      solver_out = solver(solver_in)
 
-      refsol = Function("refsol", [y,x],[vertcat(*[sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
-      refsol_in = [0]*refsol.n_in();refsol_in[0]=n
-      self.checkfunction(solver,refsol,digits=5,sens_der=False,failmessage=message)
+      refsol = Function("refsol", [y,x],[vertcat(sin(x),sqrt(sin(x)))-y0]) # ,sin(x)**2])
+      self.checkfunction(solver,refsol,inputs=[n,0],digits=4,sens_der=False,failmessage=message)
 
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
@@ -293,16 +293,50 @@ class ImplicitFunctiontests(casadiTestCase):
 
     for Solver, options, features in solvers:
       opts = dict(options)
-      if Solver=="kinsol": opts["error_on_fail"] = False # has different default
+      opts["error_on_fail"] = False
       solver = rootfinder("solver",Solver,{'x':vertcat(x,y), 'g':vertcat(sin(x)-2,sin(y)-2)},opts)
       solver(x0=0)
       self.assertFalse(solver.stats()["success"])
 
       opts = dict(options)
-      opts["error_on_fail"] = True
       solver = rootfinder("solver",Solver,{'x':vertcat(x,y), 'g':vertcat(sin(x)-2,sin(y)-2)},opts)
       with self.assertInException("process"):
         solver(x0=0)
+
+  def test_loop(self):
+    x=SX.sym("x")
+    for Solver, options, features in solvers:
+      solver = rootfinder("solver",Solver,{"x":x,"g":x**3-2*x+2},options)
+      if Solver=="kinsol": continue
+      if Solver=="nlpsol": continue
+      if Solver=="fast_newton": continue
+      print(Solver)
+      res = solver(x0=0)["x"]
+      self.checkarray(res,-1.7692923542386)
+
+  def test_segfault_codegen(self):
+    # Symbols
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    # B-Spline interpolant
+    u = np.linspace(1, 5, 10)
+    v = u ** 2
+    f = interpolant("interp", "bspline", [u], v, {})
+
+    # Extrapolated interpolant, suitable for rootfinding later on
+    f = Function(
+        "f",
+        [x],
+        [if_else(x < u[0], x ** 2, if_else(x > u[-1], x ** 2, f(x), False), False)],
+    )
+
+    # Use rootfinder to find x such that x**2=y
+    res = Function("res", [x, y], [y - f(x)])
+    rf = rootfinder("rf", "fast_newton", res)
+
+    g = Function("g",[x],[x - rf(x, x)])
+    self.check_codegen(g,[1.01])
 
 if __name__ == '__main__':
     unittest.main()

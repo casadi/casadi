@@ -59,7 +59,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Scpgen::options_
+  const Options Scpgen::options_
   = {{&Nlpsol::options_},
      {{"qpsol",
        {OT_STRING,
@@ -549,7 +549,7 @@ namespace casadi {
         uout() << "Starting compilation"  << endl;
       }
       time_t time1 = time(nullptr);
-      compiler_ = Importer(cname, compilerplugin_, jit_options_);
+      compiler_ = Importer(cname, compiler_plugin_, jit_options_);
       time_t time2 = time(nullptr);
       double comp_time = difftime(time2, time1);
       if (verbose_) {
@@ -627,11 +627,8 @@ namespace casadi {
     }
 
     // Allocate memory, nonlfted problem
-    alloc_w(ng_, true); // gk_
     alloc_w(nx_, true); // dxk_
-    alloc_w(nx_, true); // lam_xk_
-    alloc_w(nx_, true); // dlam_xk_
-    alloc_w(ng_, true); // dlam_gk_
+    alloc_w(nx_+ng_, true); // dlam
     alloc_w(nx_, true); // gfk_
     alloc_w(nx_, true); // gL_
     if (gauss_newton_) {
@@ -665,10 +662,8 @@ namespace casadi {
     }
 
     // QP solver
-    alloc_w(nx_, true); // qp_lbx_
-    alloc_w(nx_, true); // qp_ubx_
-    alloc_w(ng_, true); // qp_lba_
-    alloc_w(ng_, true); // qp_uba_
+    alloc_w(nx_+ng_, true); // lbdz
+    alloc_w(nx_+ng_, true); // ubdz
 
     // Line-search memory
     alloc_w(merit_memsize_, true);
@@ -705,11 +700,8 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Get work vectors, nonlifted problem
-    m->gk = w; w += ng_;
     m->dxk = w; w += nx_;
-    m->lam_xk = w; w += nx_;
-    m->dlam_xk = w; w += nx_;
-    m->dlam_gk = w; w += ng_;
+    m->dlam = w; w += nx_ + ng_;
     m->gfk = w; w += nx_;
     m->gL = w; w += nx_;
     if (gauss_newton_) {
@@ -742,29 +734,28 @@ namespace casadi {
     m->qpH_times_du = w; w += nx_;
 
     // QP solver
-    m->qp_lbx = w; w += nx_;
-    m->qp_ubx = w; w += nx_;
-    m->qp_lba = w; w += ng_;
-    m->qp_uba = w; w += ng_;
+    m->lbdz = w; w += nx_+ng_;
+    m->ubdz = w; w += nx_+ng_;
 
     // merit_mem
     m->merit_mem = w; w += merit_memsize_;
 
     // Residual
-    for (auto&& v : m->lifted_mem) casadi_fill(v.res, v.n, 0.);
+    for (auto&& v : m->lifted_mem) casadi_clear(v.res, v.n);
     if (!gauss_newton_) {
-      for (auto&& v : m->lifted_mem) casadi_fill(v.resL, v.n, 0.);
+      for (auto&& v : m->lifted_mem) casadi_clear(v.resL, v.n);
     }
   }
 
   int Scpgen::solve(void* mem) const {
     auto m = static_cast<ScpgenMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
-    if (v_.size()>0) {
+    if (!v_.empty()) {
       // Initialize lifted variables using the generated function
       fill_n(m->arg, vinit_fcn_.n_in(), nullptr);
-      m->arg[0] = m->x;
-      m->arg[1] = m->p;
+      m->arg[0] = d_nlp->z;
+      m->arg[1] = d_nlp->p;
       fill_n(m->res, vinit_fcn_.n_out(), nullptr);
       for (casadi_int i=0; i<v_.size(); ++i) {
         m->res[i] = m->lifted_mem[i].x0;
@@ -776,13 +767,11 @@ namespace casadi {
     }
 
     // Reset dual guess
-    casadi_fill(m->dlam_gk, ng_, 0.);
-    casadi_fill(m->lam_xk, nx_, 0.);
-    casadi_fill(m->dlam_xk, nx_, 0.);
+    casadi_clear(m->dlam, nx_+ng_);
     if (!gauss_newton_) {
       for (auto&& v : m->lifted_mem) {
-        casadi_fill(v.lam, v.n, 0.);
-        casadi_fill(v.dlam, v.n, 0.);
+        casadi_clear(v.lam, v.n);
+        casadi_clear(v.dlam, v.n);
       }
     }
 
@@ -837,7 +826,7 @@ namespace casadi {
       if (m->iter_count % 10 == 0) printIteration(m, uout());
 
       // Printing information about the actual iterate
-      printIteration(m, uout(), m->iter_count, m->f, pr_inf, du_inf, m->reg,
+      printIteration(m, uout(), m->iter_count, d_nlp->f, pr_inf, du_inf, m->reg,
                      ls_iter, ls_success);
 
       // Checking convergence criteria
@@ -856,7 +845,7 @@ namespace casadi {
       }
 
       // Check if not-a-number
-      if (m->f!=m->f || m->pr_step != m->pr_step || pr_inf != pr_inf) {
+      if (d_nlp->f!=d_nlp->f || m->pr_step != m->pr_step || pr_inf != pr_inf) {
         uout() << "casadi::SCPgen: Aborted, nan detected" << endl;
         break;
       }
@@ -883,11 +872,7 @@ namespace casadi {
     m->t_mainloop = (time2-time1)/CLOCKS_PER_SEC;
 
     // Store optimal value
-    uout() << "optimal cost = " << m->f << endl;
-
-    // Save results to outputs
-    casadi_copy(m->lam_xk, nx_, m->lam_x);
-    casadi_copy(m->gk, ng_, m->g);
+    uout() << "optimal cost = " << d_nlp->f << endl;
 
     // Write timers
     if (print_time_) {
@@ -905,18 +890,13 @@ namespace casadi {
   }
 
   double Scpgen::primalInfeasibility(ScpgenMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // L1-norm of the primal infeasibility
     double pr_inf = 0;
-
-    // Simple bounds
-    pr_inf += casadi_sum_viol(nx_, m->x, m->lbx, m->ubx);
-
+    // Inequality constraint violations
+    pr_inf += casadi_sum_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
     // Lifted variables
     for (auto&& v : m->lifted_mem) pr_inf += casadi_norm_1(v.n, v.res);
-
-    // Nonlinear bounds
-    pr_inf += casadi_sum_viol(ng_, m->gk, m->lbg, m->ubg);
-
     return pr_inf;
   }
 
@@ -948,6 +928,7 @@ namespace casadi {
   void Scpgen::printIteration(ScpgenMemory* m, std::ostream &stream, casadi_int iter, double obj,
                               double pr_inf, double du_inf, double rg, casadi_int ls_trials,
                               bool ls_success) const {
+    auto d_nlp = &m->d_nlp;
     stream << setw(4) << iter;
     stream << scientific;
     stream << setw(14) << setprecision(6) << obj;
@@ -968,7 +949,7 @@ namespace casadi {
 
     // Print variables
     for (vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
-      stream << setw(9) << setprecision(4) << m->x[*i];
+      stream << setw(9) << setprecision(4) << d_nlp->z[*i];
     }
 
     // Print note
@@ -982,18 +963,19 @@ namespace casadi {
   }
 
   void Scpgen::eval_mat(ScpgenMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // Get current time
     double time1 = clock();
 
     // Inputs
     fill_n(m->arg, mat_fcn_.n_in(), nullptr);
-    m->arg[mod_p_] = m->p; // Parameters
-    m->arg[mod_x_] = m->x; // Primal step/variables
+    m->arg[mod_p_] = d_nlp->p; // Parameters
+    m->arg[mod_x_] = d_nlp->z; // Primal step/variables
     for (size_t i=0; i<v_.size(); ++i) {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }
     if (!gauss_newton_) { // Dual steps/variables
-      m->arg[mod_g_lam_] = m->lam_g;
+      m->arg[mod_g_lam_] = d_nlp->lam + nx_;
       for (size_t i=0; i<v_.size(); ++i) {
         m->arg[v_[i].mod_lam] = m->lifted_mem[i].resL;
       }
@@ -1009,31 +991,32 @@ namespace casadi {
 
     if (gauss_newton_) {
       // Gauss-Newton Hessian
-      casadi_fill(m->qpH, spH_.nnz(), 0.);
+      casadi_clear(m->qpH, spH_.nnz());
       casadi_mtimes(m->qpL, spL_, m->qpL, spL_, m->qpH, spH_, m->w, true);
 
       // Gradient of the objective in Gauss-Newton
-      casadi_fill(m->gfk, nx_, 0.);
+      casadi_clear(m->gfk, nx_);
       casadi_mv(m->qpL, spL_, m->b_gn, m->gfk, true);
     }
 
     // Calculate the gradient of the lagrangian
     casadi_copy(m->gfk, nx_, m->gL);
-    casadi_axpy(nx_, 1., m->lam_xk, m->gL);
-    casadi_mv(m->qpA, spA_, m->lam_g, m->gL, true);
+    casadi_axpy(nx_, 1., d_nlp->lam, m->gL);
+    casadi_mv(m->qpA, spA_, d_nlp->lam + nx_, m->gL, true);
 
     double time2 = clock();
     m->t_eval_mat += (time2-time1)/CLOCKS_PER_SEC;
   }
 
   void Scpgen::eval_res(ScpgenMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // Get current time
     double time1 = clock();
 
     // Inputs
     fill_n(m->arg, res_fcn_.n_in(), nullptr);
-    m->arg[res_p_] = m->p; // Parameters
-    m->arg[res_x_] = m->x; // Non-lifted primal variables
+    m->arg[res_p_] = d_nlp->p; // Parameters
+    m->arg[res_x_] = d_nlp->z; // Non-lifted primal variables
     for (size_t i=0; i<v_.size(); ++i) { // Lifted primal variables
       m->arg[v_[i].res_var] = m->lifted_mem[i].x;
     }
@@ -1046,16 +1029,16 @@ namespace casadi {
 
     // Outputs
     fill_n(m->res, res_fcn_.n_out(), nullptr);
-    m->res[res_f_] = &m->f; // Objective
+    m->res[res_f_] = &d_nlp->f; // Objective
     m->res[res_gl_] = gauss_newton_ ? m->b_gn : m->gfk; // Objective gradient
-    m->res[res_g_] = m->gk; // Constraints
+    m->res[res_g_] = d_nlp->z + nx_; // Constraints
     for (size_t i=0; i<v_.size(); ++i) {
       m->res[v_[i].res_d] = m->lifted_mem[i].res;
       if (!gauss_newton_) {
         m->res[v_[i].res_lam_d] = m->lifted_mem[i].resL;
       }
     }
-    m->res[res_p_d_] = m->lam_p; // Parameter sensitivities
+    m->res[res_p_d_] = d_nlp->lam_p; // Parameter sensitivities
 
     // Evaluate residual function
     res_fcn_(m->arg, m->res, m->iw, m->w, 0);
@@ -1065,13 +1048,14 @@ namespace casadi {
   }
 
   void Scpgen::eval_vec(ScpgenMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // Get current time
     double time1 = clock();
 
     // Inputs
     fill_n(m->arg, vec_fcn_.n_in(), nullptr);
-    m->arg[mod_p_] = m->p; // Parameters
-    m->arg[mod_x_] = m->x; // Primal step/variables
+    m->arg[mod_p_] = d_nlp->p; // Parameters
+    m->arg[mod_x_] = d_nlp->z; // Primal step/variables
     for (size_t i=0; i<v_.size(); ++i) {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }
@@ -1092,7 +1076,7 @@ namespace casadi {
 
     // Linear offset in the reduced QP
     casadi_scal(ng_, -1., m->qpB);
-    casadi_axpy(ng_, 1., m->gk, m->qpB);
+    casadi_axpy(ng_, 1., d_nlp->z + nx_, m->qpB);
 
     // Gradient of the objective in the reduced QP
     if (gauss_newton_) {
@@ -1137,52 +1121,49 @@ namespace casadi {
   }
 
   void Scpgen::solve_qp(ScpgenMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // Get current time
     double time1 = clock();
 
     // Get bounds on step
-    casadi_copy(m->lbx, nx_, m->qp_lbx);
-    casadi_copy(m->ubx, nx_, m->qp_ubx);
-    casadi_copy(m->lbg, ng_, m->qp_lba);
-    casadi_copy(m->ubg, ng_, m->qp_uba);
-    casadi_axpy(nx_, -1., m->x, m->qp_lbx);
-    casadi_axpy(nx_, -1., m->x, m->qp_ubx);
-    casadi_axpy(ng_, -1., m->qpB, m->qp_lba);
-    casadi_axpy(ng_, -1., m->qpB, m->qp_uba);
+    casadi_copy(d_nlp->lbz, nx_+ng_, m->lbdz);
+    casadi_copy(d_nlp->ubz, nx_+ng_, m->ubdz);
+    casadi_axpy(nx_, -1., d_nlp->z, m->lbdz);
+    casadi_axpy(nx_, -1., d_nlp->z, m->ubdz);
+    casadi_axpy(ng_, -1., m->qpB, m->lbdz + nx_);
+    casadi_axpy(ng_, -1., m->qpB, m->ubdz + nx_);
 
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = m->qpH;
     m->arg[CONIC_G] = m->gfk;
     m->arg[CONIC_A] = m->qpA;
-    m->arg[CONIC_LBX] = m->qp_lbx;
-    m->arg[CONIC_UBX] = m->qp_ubx;
-    m->arg[CONIC_LBA] = m->qp_lba;
-    m->arg[CONIC_UBA] = m->qp_uba;
+    m->arg[CONIC_LBX] = m->lbdz;
+    m->arg[CONIC_UBX] = m->ubdz;
+    m->arg[CONIC_LBA] = m->lbdz + nx_;
+    m->arg[CONIC_UBA] = m->ubdz + nx_;
 
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = m->dxk; // Condensed primal step
-    m->res[CONIC_LAM_X] = m->dlam_xk; // Multipliers (simple bounds)
-    m->res[CONIC_LAM_A] = m->dlam_gk; // Multipliers (linear bounds)
+    m->res[CONIC_LAM_X] = m->dlam; // Multipliers (simple bounds)
+    m->res[CONIC_LAM_A] = m->dlam + nx_; // Multipliers (linear bounds)
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
 
     // Calculate penalty parameter of merit function
-    m->sigma = merit_start_;
-    m->sigma = std::max(m->sigma, 1.01*casadi_norm_inf(nx_, m->dlam_xk));
-    m->sigma = std::max(m->sigma, 1.01*casadi_norm_inf(ng_, m->dlam_gk));
+    m->sigma = std::max(merit_start_, 1.01*casadi_norm_inf(nx_+ng_, m->dlam));
 
     // Calculate step in multipliers
-    casadi_axpy(nx_, -1., m->lam_xk, m->dlam_xk);
-    casadi_axpy(ng_, -1., m->lam_g, m->dlam_gk);
+    casadi_axpy(nx_ + ng_, -1., d_nlp->lam, m->dlam);
 
     double time2 = clock();
     m->t_solve_qp += (time2-time1)/CLOCKS_PER_SEC;
   }
 
   void Scpgen::line_search(ScpgenMemory* m, casadi_int& ls_iter, bool& ls_success) const {
+    auto d_nlp = &m->d_nlp;
     // Make sure that we have a decent direction
     if (!gauss_newton_) {
       // Get the curvature in the step direction
@@ -1198,7 +1179,7 @@ namespace casadi {
     // Right-hand side of Armijo condition
     double F_sens = casadi_dot(nx_, m->dxk, m->gfk);
     double L1dir = F_sens - m->sigma * l1_infeas;
-    double L1merit = m->f + m->sigma * l1_infeas;
+    double L1merit = d_nlp->f + m->sigma * l1_infeas;
 
     // Storing the actual merit function value in a list
     m->merit_mem[m->merit_ind] = L1merit;
@@ -1227,12 +1208,11 @@ namespace casadi {
     while (true) {
       // Take the primal step
       double dt = t-t_prev;
-      casadi_axpy(nx_, dt, m->dxk, m->x);
+      casadi_axpy(nx_, dt, m->dxk, d_nlp->z);
       for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dx, v.x);
 
       // Take the dual step
-      casadi_axpy(ng_, dt, m->dlam_gk, m->lam_g);
-      casadi_axpy(nx_, dt, m->dlam_xk, m->lam_xk);
+      casadi_axpy(nx_+ng_, dt, m->dlam, d_nlp->lam);
       if (!gauss_newton_) {
         for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dlam, v.lam);
       }
@@ -1244,7 +1224,7 @@ namespace casadi {
 
       // Calculating merit-function in candidate
       l1_infeas = primalInfeasibility(m);
-      L1merit_cand = m->f + m->sigma * l1_infeas;
+      L1merit_cand = d_nlp->f + m->sigma * l1_infeas;
       if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
 
         // Accepting candidate
@@ -1270,26 +1250,27 @@ namespace casadi {
     m->pr_step *= t;
 
     // Calculate the dual step-size
-    m->du_step = casadi_norm_1(ng_, m->dlam_gk) + casadi_norm_1(nx_, m->dlam_xk);
+    m->du_step = casadi_norm_1(ng_, m->dlam +nx_) + casadi_norm_1(nx_, m->dlam);
     for (auto&& v : m->lifted_mem) m->du_step += casadi_norm_1(v.n, v.dlam);
     m->du_step *= t;
   }
 
   void Scpgen::eval_exp(ScpgenMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // Get current time
     double time1 = clock();
 
     // Inputs
     fill_n(m->arg, exp_fcn_.n_in(), nullptr);
-    m->arg[mod_p_] = m->p; // Parameter
+    m->arg[mod_p_] = d_nlp->p; // Parameter
     m->arg[mod_du_] = m->dxk; // Primal step
-    m->arg[mod_x_] = m->x; // Primal variables
+    m->arg[mod_x_] = d_nlp->z; // Primal variables
     for (size_t i=0; i<v_.size(); ++i) {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }
     if (!gauss_newton_) {
-      m->arg[mod_dlam_g_] = m->dlam_gk; // Dual variables
-      m->arg[mod_g_lam_] = m->lam_g; // Dual step
+      m->arg[mod_dlam_g_] = m->dlam + nx_; // Dual variables
+      m->arg[mod_g_lam_] = d_nlp->lam + nx_; // Dual step
       for (size_t i=0; i<v_.size(); ++i) {
         m->arg[v_[i].mod_lam] = m->lifted_mem[i].resL;
       }

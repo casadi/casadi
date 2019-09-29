@@ -24,6 +24,7 @@
 
 
 #include "bspline_interpolant.hpp"
+#include "casadi/core/bspline.hpp"
 
 using namespace std;
 namespace casadi {
@@ -36,6 +37,8 @@ namespace casadi {
     plugin->doc = BSplineInterpolant::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &BSplineInterpolant::options_;
+    plugin->deserialize = &BSplineInterpolant::deserialize;
+    plugin->exposed.do_inline = nullptr;
     return 0;
   }
 
@@ -44,7 +47,7 @@ namespace casadi {
     Interpolant::registerPlugin(casadi_register_interpolant_bspline);
   }
 
-  Options BSplineInterpolant::options_
+  const Options BSplineInterpolant::options_
   = {{&Interpolant::options_},
       {{"degree",
        {OT_INTVECTOR,
@@ -64,6 +67,10 @@ namespace casadi {
      }
   };
 
+  BSplineInterpolant::~BSplineInterpolant() {
+    clear_mem();
+  }
+
   BSplineInterpolant::
   BSplineInterpolant(const string& name,
                     const std::vector<double>& grid,
@@ -74,40 +81,7 @@ namespace casadi {
 
   }
 
-  BSplineInterpolant::~BSplineInterpolant() {
-  }
-
-  std::vector<double> meshgrid(const std::vector< std::vector<double> >& grid) {
-    std::vector<casadi_int> cnts(grid.size()+1, 0);
-    std::vector<casadi_int> sizes(grid.size(), 0);
-    for (casadi_int k=0;k<grid.size();++k) sizes[k]= grid[k].size();
-
-    casadi_int total_iter = 1;
-    for (casadi_int k=0;k<grid.size();++k) total_iter*= sizes[k];
-
-    casadi_int n_dims = grid.size();
-
-    std::vector<double> ret(total_iter*n_dims);
-    for (casadi_int i=0;i<total_iter;++i) {
-
-      for (casadi_int j=0;j<grid.size();++j) {
-        ret[i*n_dims+j] = grid[j][cnts[j]];
-      }
-
-      cnts[0]++;
-      casadi_int j = 0;
-      while (j<n_dims && cnts[j]==sizes[j]) {
-        cnts[j] = 0;
-        j++;
-        cnts[j]++;
-      }
-
-    }
-
-    return ret;
-  }
-
-  std::vector<double> not_a_knot(const std::vector<double>& x, casadi_int k) {
+  std::vector<double> BSplineInterpolant::not_a_knot(const std::vector<double>& x, casadi_int k) {
     std::vector<double> ret;
     if (k%2) {
       casadi_int m = (k-1)/2;
@@ -125,8 +99,6 @@ namespace casadi {
   }
 
   void BSplineInterpolant::init(const Dict& opts) {
-    // Call the base class initializer
-    Interpolant::init(opts);
 
     degree_  = std::vector<casadi_int>(offset_.size()-1, 3);
 
@@ -158,123 +130,29 @@ namespace casadi {
 
     casadi_assert_dev(degree_.size()==offset_.size()-1);
 
-    std::vector< std::vector<double> > grid;
-    for (casadi_int k=0;k<degree_.size();++k) {
-      std::vector<double> local_grid(grid_.begin()+offset_[k], grid_.begin()+offset_[k+1]);
-      grid.push_back(local_grid);
+    // Call the base class initializer
+    Interpolant::init(opts);
+
+    casadi_assert(!has_parametric_grid(), "Parametric grid not supported");
+
+    MX x = MX::sym("x", ndim_);
+
+    if (has_parametric_values()) {
+      MX coeff = MX::sym("coeff", coeff_size());
+
+      MX e = construct_graph(x, coeff, opts);
+
+      S_ = Function("wrapper", {x, coeff}, {e});
+    } else {
+      MX e = construct_graph(x, DM(values_), opts);
+      S_ = Function("wrapper", {x}, {e});
     }
 
-    Dict opts_bspline;
-    opts_bspline["lookup_mode"] = lookup_modes_;
-
-    switch (algorithm_) {
-      case ALG_NOT_A_KNOT:
-        {
-          std::vector< std::vector<double> > knots;
-          for (casadi_int k=0;k<degree_.size();++k)
-            knots.push_back(not_a_knot(grid[k], degree_[k]));
-          Dict opts_dual;
-          opts_dual["ad_weight_sp"] = 0;
-          opts_dual["lookup_mode"] = lookup_modes_;
-
-          Function B = Function::bspline_dual("spline", knots, meshgrid(grid), degree_, 1, false,
-            opts_dual);
-
-          Function Jf = B.jacobian_old(0, 0);
-
-          MX C = MX::sym("C", B.size_in(0));
-
-          MX Js = Jf(std::vector<MX>{C})[0];
-          Function temp = Function("J", {C}, {Js});
-          DM J = temp(std::vector<DM>{0})[0];
-
-          casadi_assert_dev(J.size1()==J.size2());
-
-          DM V = DM::reshape(DM(values_), m_, -1).T();
-          DM C_opt = solve(J, V, linear_solver_);
-
-          double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - V));
-
-          if (verbose_) casadi_message("Lookup table fitting error: " + str(fit));
-
-          S_ = Function::bspline("spline", knots, C_opt.T().nonzeros(), degree_, m_, opts_bspline);
-        }
-        break;
-      case ALG_SMOOTH_LINEAR:
-        {
-          casadi_int n_dim = degree_.size();
-          // Linear fit
-          Function linear = interpolant("linear", "linear", grid, values_);
-
-          std::vector< std::vector<double> > egrid;
-          std::vector< std::vector<double> > new_grid;
-
-          for (casadi_int k=0;k<n_dim;++k) {
-            casadi_assert(degree_[k]==3, "Only degree 3 supported for 'smooth_linear'.");
-
-            // Add extra knots
-            const std::vector<double>& g = grid[k];
-
-            // Determine smallest gap.
-            double m = inf;
-            for (casadi_int i=0;i<g.size()-1;++i) {
-              double delta = g[i+1]-g[i];
-              if (delta<m) m = delta;
-            }
-            double step = smooth_linear_frac_*m;
-
-            // Add extra knots
-            std::vector<double> new_g;
-            new_g.push_back(g.front());
-            new_g.push_back(g.front()+step);
-            for (casadi_int i=1;i<g.size()-1;++i) {
-              new_g.push_back(g[i]-step);
-              new_g.push_back(g[i]);
-              new_g.push_back(g[i]+step);
-            }
-            new_g.push_back(g.back()-step);
-            new_g.push_back(g.back());
-            new_grid.push_back(new_g);
-
-            // Correct multiplicity
-            double v1 = new_g.front();
-            double vend = new_g.back();
-            new_g.insert(new_g.begin(), degree_[k], v1);
-            new_g.insert(new_g.end(), degree_[k], vend);
-
-            grid[k] = new_g;
-
-            // Compute greville points
-            egrid.push_back(greville_points(new_g, degree_[k]));
-          }
-
-          // Evaluate linear interpolation on greville grid
-          std::vector<double> mg = meshgrid(egrid);
-          std::vector<double> Z(m_*mg.size()/n_dim);
-
-          // Work vectors
-          vector<casadi_int> iw(linear.sz_iw());
-          vector<double> w(linear.sz_w());
-
-          std::vector<const double*> arg(1);
-          std::vector<double*> res(1);
-
-          for (int i=0;i<Z.size();++i) {
-            arg[0] = get_ptr(mg)+n_dim*i;
-            res[0] = get_ptr(Z)+m_*i;
-            linear(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
-          }
-          S_ = Function::bspline("spline", grid, Z, degree_, m_, opts_bspline);
-        }
-        break;
-    }
-
-    alloc_w(S_->sz_w(), true);
-    alloc_iw(S_->sz_iw(), true);
-
+    alloc_w(S_.sz_w());
+    alloc_iw(S_.sz_iw());
+    alloc_arg(S_.sz_arg());
+    alloc_res(S_.sz_res());
   }
-
-
 
   std::vector<double> BSplineInterpolant::greville_points(const std::vector<double>& x,
                                                           casadi_int deg) {
@@ -292,11 +170,16 @@ namespace casadi {
 
   int BSplineInterpolant::eval(const double** arg, double** res,
                                 casadi_int* iw, double* w, void* mem) const {
-    return S_->eval(arg, res, iw, w, mem);
+    scoped_checkout<Function> m(S_);
+    return S_(arg, res, iw, w, m);
   }
 
   void BSplineInterpolant::codegen_body(CodeGenerator& g) const {
     S_->codegen_body(g);
+  }
+
+  void BSplineInterpolant::codegen_declarations(CodeGenerator& g) const {
+    S_->codegen_declarations(g);
   }
 
   Function BSplineInterpolant::
@@ -305,6 +188,18 @@ namespace casadi {
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
     return S_->get_jacobian(name, inames, onames, opts);
+  }
+
+  BSplineInterpolant::BSplineInterpolant(DeserializingStream& s) : Interpolant(s) {
+    s.version("BSplineInterpolant", 1);
+    s.unpack("BSplineInterpolant::s", S_);
+  }
+
+  void BSplineInterpolant::serialize_body(SerializingStream &s) const {
+    Interpolant::serialize_body(s);
+
+    s.version("BSplineInterpolant", 1);
+    s.pack("BSplineInterpolant::s", S_);
   }
 
 } // namespace casadi

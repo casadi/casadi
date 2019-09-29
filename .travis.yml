@@ -11,7 +11,7 @@ env:
     - PYTHONPATH=/usr/local/python
     - TRAVIS_PYTHON_VERSION=2.7
     - NUMPYVERSION=1.11
-    - casadi_build_flags="-DWITH_EXTRA_WARNINGS=ON -DWITH_EXTRA_CHECKS=ON"
+    - casadi_build_flags="-DWITH_EXTRA_WARNINGS=ON -DWITH_EXTRA_CHECKS=OFF"
    
 notifications:
   email: false
@@ -104,7 +104,7 @@ matrix:
       env:
         - TESTMODE=full-py3
         - WITH_PYTHON3=ON
-        - TRAVIS_PYTHON_VERSION=3.5
+        - TRAVIS_PYTHON_VERSION=3.7
       script:
         - sudo apt-get install cmake valgrind libgomp1 -y
         - mkdir build
@@ -127,6 +127,9 @@ matrix:
         - pip install pydot3 lxml
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
+
+        - pip install -r docs/users_guide/requirements.txt
+        - pushd docs/users_guide && make singlehtml && popd
 
         #- pushd test && make trunktesterbot_no_unittests_py && popd
         #- pushd test && make unittests_py_slow && popd
@@ -157,6 +160,7 @@ matrix:
         # Let's verify that we can still compile
         - pushd build && make && sudo make -j2 install && make json && popd
         - python -c "import doctest;import casadi;assert doctest.testmod(casadi.casadi,verbose=True).failed==0"
+
         - |
           if [[ $TRAVIS_BRANCH == *develop* || $TRAVIS_BRANCH == *release* ]]
           then
@@ -167,6 +171,29 @@ matrix:
       dist: trusty
       env: TESTMODE=minimal
       script:
+        - mkdir build
+        - pushd build
+        - bash -c "cmake $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - make
+        - sudo make install
+        - popd
+        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - pushd test
+        - make unittests_py examples_code_py || remote_access
+        - popd
+    - compiler: clang
+      os: linux
+      dist: trusty
+      env: TESTMODE=minimal
+      script:
+        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        - sudo apt-add-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-6.0 main"
+        - sudo apt-get update -qq
+        - sudo apt-get install clang-6.0
+        - export CC=clang-6.0
+        - export CXX=clang++-6.0
+        - export CXXFLAGS=-Wno-deprecated-register
         - mkdir build
         - pushd build
         - bash -c "cmake $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
@@ -218,6 +245,24 @@ matrix:
         - sudo apt-get install gcc-7 g++-7
         - export CC=gcc-7
         - export CXX=g++-7
+        - mkdir build
+        - pushd build
+        - bash -c "cmake  $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - make
+        - sudo make install
+        - popd
+        - #python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - #pushd test && make unittests_py examples_code_py && popd
+    - compiler: gcc
+      os: linux
+      dist: trusty
+      env: TESTMODE=minimal
+      script:
+        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        - sudo apt-get update -qq
+        - sudo apt-get install gcc-8 g++-8
+        - export CC=gcc-8
+        - export CXX=g++-8
         - mkdir build
         - pushd build
         - bash -c "cmake  $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
@@ -297,6 +342,9 @@ matrix:
       dist: trusty
       env: NEEDMATLAB=1
       script:
+        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        - sudo apt-get update -qq
+        - sudo apt-get install -y libgfortran4
         - sudo apt-get install -y gcc-4.7 g++-4.7 gfortran-4.7 locate
         - sudo updatedb
         - locate libstdc++.so
@@ -329,6 +377,9 @@ matrix:
       dist: trusty
       env: NEEDMATLAB=1
       script:
+        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        - sudo apt-get update -qq
+        - sudo apt-get install -y libgfortran4
         - sudo apt-add-repository ppa:octave/stable -y
         - sudo apt-get update -qq
         - sudo apt-get install octave liboctave-dev -y
@@ -337,6 +388,9 @@ matrix:
         
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
+
+        - pip install -r docs/users_guide/requirements.txt
+        - pushd docs/users_guide && make singlehtml && popd
 
         - mkdir build
         - pushd build
@@ -349,6 +403,8 @@ matrix:
         - octave --no-gui --no-window-system --eval "addpath('/home/travis/build/octave-install/matlab');savepath;"
         - matlabgcc
         - pushd test && make octave && popd
+        - pushd test && make user_guide_snippets_oct && popd
+
 branches:
   except:
     - /.*appveyor.*/

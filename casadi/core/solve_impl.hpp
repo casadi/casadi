@@ -55,9 +55,18 @@ namespace casadi {
   int Solve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     scoped_checkout<Linsol> mem(linsol_);
+
+    auto m = static_cast<LinsolMemory*>(linsol_->memory(mem));
+    // Reset statistics
+    for (auto&& s : m->fstats) s.second.reset();
+    if (m->t_total) m->t_total->tic();
+
     if (linsol_.sfact(arg[1], mem)) return 1;
     if (linsol_.nfact(arg[1], mem)) return 1;
     if (linsol_.solve(arg[1], res[0], dep(0).size2(), Tr, mem)) return 1;
+
+    linsol_->print_time(m->fstats);
+
     return 0;
   }
 
@@ -267,6 +276,35 @@ namespace casadi {
     }
     // Solver specific codegen
     linsol_->generate(g, "ss", "rr", nrhs, Tr);
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("Solve::Linsol", linsol_);
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("Solve::Tr", Tr);
+  }
+
+  template<bool Tr>
+  Solve<Tr>::Solve(DeserializingStream& s) : MXNode(s) {
+    s.unpack("Solve::Linsol", linsol_);
+  }
+
+  template<bool Tr>
+  MXNode* Solve<Tr>::deserialize(DeserializingStream& s) {
+    bool tr;
+    s.unpack("Solve::Tr", tr);
+
+    if (tr) {
+      return new Solve<true>(s);
+    } else {
+      return new Solve<false>(s);
+    }
   }
 
 } // namespace casadi

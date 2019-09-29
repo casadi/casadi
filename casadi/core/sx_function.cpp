@@ -36,6 +36,7 @@
 #include "sparsity_internal.hpp"
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
+#include "serializing_stream.hpp"
 
 namespace casadi {
 
@@ -55,6 +56,7 @@ namespace casadi {
   }
 
   SXFunction::~SXFunction() {
+    clear_mem();
   }
 
   int SXFunction::eval(const double** arg, double** res,
@@ -143,7 +145,7 @@ namespace casadi {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
-      casadi_error("Code generation is not possible since variables "
+      casadi_error("Code generation of '" + name_ + "' is not possible since variables "
                    + str(free_vars_) + " are free.");
     }
   }
@@ -154,7 +156,7 @@ namespace casadi {
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
         g << "if (res[" << a.i0 << "]!=0) "
-          << "res["<< a.i0 << "][" << a.i2 << "]=" << g.sx_work(a.i1);
+          << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
       } else {
 
         // Where to store the result
@@ -164,7 +166,7 @@ namespace casadi {
         if (a.op==OP_CONST) {
           g << g.constant(a.d);
         } else if (a.op==OP_INPUT) {
-          g << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
+          g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);
@@ -176,7 +178,7 @@ namespace casadi {
     }
   }
 
-  Options SXFunction::options_
+  const Options SXFunction::options_
   = {{&FunctionInternal::options_},
      {{"default_in",
        {OT_DOUBLEVECTOR,
@@ -194,20 +196,29 @@ namespace casadi {
      }
   };
 
+  Dict SXFunction::generate_options(bool is_temp) const {
+    Dict opts = FunctionInternal::generate_options(is_temp);
+    //opts["default_in"] = default_in_;
+    opts["live_variables"] = live_variables_;
+    opts["just_in_time_sparsity"] = just_in_time_sparsity_;
+    opts["just_in_time_opencl"] = just_in_time_opencl_;
+    return opts;
+  }
+
   void SXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<SXFunction, SX, SXNode>::init(opts);
     if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
-    bool live_variables = true;
+    live_variables_ = true;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
         default_in_ = op.second;
       } else if (op.first=="live_variables") {
-        live_variables = op.second;
+        live_variables_ = op.second;
       } else if (op.first=="just_in_time_opencl") {
         just_in_time_opencl_ = op.second;
       } else if (op.first=="just_in_time_sparsity") {
@@ -301,6 +312,7 @@ namespace casadi {
       case OP_PARAMETER: // a parameter or input
         symb_loc.push_back(make_pair(algorithm_.size(), n));
         ae.i0 = n->temp;
+        ae.d = 0; // value not used, but set here to avoid uninitialized data in serialization
         break;
       case OP_OUTPUT: // output instruction
         ae.i0 = curr_oind;
@@ -363,7 +375,7 @@ namespace casadi {
 
       // Find a place to store the variable
       if (a.op!=OP_OUTPUT) {
-        if (live_variables && !unused.empty()) {
+        if (live_variables_ && !unused.empty()) {
           // Try to reuse a variable from the stack if possible (last in, first out)
           a.i0 = place[a.i0] = unused.top();
           unused.pop();
@@ -392,7 +404,7 @@ namespace casadi {
     worksize_ = worksize;
 
     if (verbose_) {
-      if (live_variables) {
+      if (live_variables_) {
         casadi_message("Using live variables: work array is " + str(worksize_)
          + " instead of " + str(nodes.size()));
       } else {
@@ -460,6 +472,42 @@ namespace casadi {
 
     // Print
     if (verbose_) casadi_message(str(algorithm_.size()) + " elementary operations");
+  }
+
+  SX SXFunction::instructions_sx() const {
+    std::vector<SXElem> ret(algorithm_.size(), casadi_limits<SXElem>::nan);
+
+    vector<SXElem>::iterator it=ret.begin();
+
+    // Iterator to the binary operations
+    vector<SXElem>::const_iterator b_it = operations_.begin();
+
+    // Iterator to stack of constants
+    vector<SXElem>::const_iterator c_it = constants_.begin();
+
+    // Iterator to free variables
+    vector<SXElem>::const_iterator p_it = free_vars_.begin();
+
+    // Evaluate algorithm
+    if (verbose_) casadi_message("Evaluating algorithm forward");
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+      case OP_OUTPUT:
+        it++;
+        break;
+      case OP_CONST:
+        *it++ = *c_it++;
+        break;
+      case OP_PARAMETER:
+        *it++ = *p_it++;
+        break;
+      default:
+        *it++ = *b_it++;
+      }
+    }
+    casadi_assert(it==ret.end(), "Dimension mismacth");
+    return ret;
   }
 
   int SXFunction::
@@ -724,6 +772,8 @@ namespace casadi {
 
   int SXFunction::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    // Fall back when forward mode not allowed
+    if (sp_weight()==1) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -745,6 +795,8 @@ namespace casadi {
 
   int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
+    // Fall back when reverse mode not allowed
+    if (sp_weight()==0) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
@@ -785,6 +837,8 @@ namespace casadi {
     // Jacobian expression
     SX J = SX::jacobian(veccat(out_), veccat(in_));
 
+    J = project(J, jacobian_sparsity_filter(J.sparsity()));
+
     // All inputs of the return function
     std::vector<SX> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
@@ -809,142 +863,6 @@ namespace casadi {
                                   SX, SXNode>::is_a(type, recursive));
   }
 
-  Function SXFunction::deserialize(std::istream &stream) {
-
-    // Read in information from header
-    std::string name;
-    std::vector<Sparsity> sp_in, sp_out;
-    std::vector<std::string> names_in, names_out;
-    casadi_int sz_w, sz_iw;
-    deserialize_header(stream, name, sp_in, sp_out, names_in, names_out, sz_w, sz_iw);
-
-    // Create symbolic inputs
-    std::vector<SX> arg;
-    for (const Sparsity& e : sp_in) arg.push_back(SX::sym("x", e));
-
-    // Allocate space for outputs
-    std::vector<SX> res;
-    for (const Sparsity& e : sp_out) res.push_back(SX::zeros(e));
-
-    // Allocate work vector
-    std::vector<SXElem> w(sz_w);
-
-    char c;
-    // Start of algorithm
-    stream >> c; casadi_assert_dev(c=='a');
-    casadi_int n_instructions; stream >> n_instructions;
-    for (casadi_int k=0;k<n_instructions;++k) {
-      stream >> c;
-      switch (c) {
-        case 'i':
-          {
-            casadi_int o; stream >> o; stream >> c;
-            casadi_int i1; stream >> i1; stream >> c;
-            casadi_int i2; stream >> i2;
-            w.at(o) = arg[i1].nonzeros()[i2];
-          }
-          break;
-        case 'o':
-          {
-            casadi_int i; stream >> i; stream >> c;
-            casadi_int o1; stream >> o1; stream >> c;
-            casadi_int o2; stream >> o2;
-            res[o1].nonzeros()[o2] = w.at(i);
-          }
-          break;
-        case 'c':
-          {
-            casadi_int o; stream >> o; stream >> c;
-            int64_t b; stream >> b;
-            const double* d = reinterpret_cast<double*>(&b);
-            w.at(o) = *d;
-          }
-          break;
-        case 'u':
-          {
-            casadi_int op; stream >> op; stream >> c;
-            casadi_int o; stream >> o; stream >> c;
-            casadi_int i; stream >> i;
-            w.at(o) = SXElem::unary(op, w.at(i));
-          }
-          break;
-        case 'b':
-          {
-            casadi_int op; stream >> op; stream >> c;
-            casadi_int o; stream >> o; stream >> c;
-            casadi_int i1; stream >> i1; stream >> c;
-            casadi_int i2; stream >> i2;
-            w.at(o) = SXElem::binary(op, w.at(i1), w.at(i2));
-
-          }
-          break;
-        default:
-          casadi_error("Not implemented" + str(c));
-      }
-    }
-
-    return Function(name, arg, res, names_in, names_out);
-  }
-
-  void SXFunction::serialize(std::ostream &ss) const {
-    Function f = shared_from_this<Function>();
-
-    casadi_assert(!f.has_free(), "Cannot serialize SXFunction with free parameters.");
-
-    // SX Function identifier
-    ss << "S";
-
-    // Header information
-    serialize_header(ss);
-
-    // Make sure doubles are output exactly
-    std::ios_base::fmtflags fmtfl = ss.flags();
-    ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
-
-    // Start of algorithm
-    ss << "a" << f.n_instructions();
-
-    for (casadi_int k=0;k<f.n_instructions();++k) {
-      // Get operation
-      casadi_int op = static_cast<casadi_int>(f.instruction_id(k));
-      // Get input positions into workvector
-      std::vector<casadi_int> o = f.instruction_output(k);
-      // Get output positions into workvector
-      std::vector<casadi_int> i = f.instruction_input(k);
-      switch (op) {
-        case OP_INPUT:
-          ss << "i" << o[0] << ":" << i[0] << ":" << i[1];
-          break;
-        case OP_OUTPUT:
-          ss << "o"  << i[0] << ":" << o[0] << ":" << o[1];
-          break;
-        case OP_CONST:
-          {
-            double v = f.instruction_constant(k);
-            const int64_t* b = reinterpret_cast<int64_t*>(&v);
-            ss << "c" << o[0] << ":" << *b;
-          }
-          break;
-        default:
-          switch (casadi::casadi_math<double>::ndeps(op)) {
-            case 0:
-              casadi_error("Not implemented");
-              break;
-            case 1:
-              ss << "u" << op << ":" << o[0] << ":" << i[0];
-              break;
-            case 2:
-              ss << "b" << op << ":" << o[0] << ":" << i[0] << ":" <<  i[1];
-              break;
-            default:
-              casadi_error("Not implemented");
-          }
-
-      }
-    }
-    ss.flags(fmtfl);
-  }
-
   void SXFunction::export_code_body(const std::string& lang,
       std::ostream &ss, const Dict& options) const {
 
@@ -961,7 +879,7 @@ namespace casadi {
     }
 
     // Construct indent string
-    std::string indent = "";
+    std::string indent;
     for (casadi_int i=0;i<indent_level;++i) {
       indent += "  ";
     }
@@ -1043,6 +961,64 @@ namespace casadi {
       }
     }
 
+  }
+
+  SXFunction::SXFunction(DeserializingStream& s) :
+    XFunction<SXFunction, SX, SXNode>(s) {
+    s.version("SXFunction", 1);
+    size_t n_instructions;
+    s.unpack("SXFunction::n_instr", n_instructions);
+
+    s.unpack("SXFunction::worksize", worksize_);
+    s.unpack("SXFunction::free_vars", free_vars_);
+    s.unpack("SXFunction::operations", operations_);
+    s.unpack("SXFunction::constants", constants_);
+    s.unpack("SXFunction::default_in", default_in_);
+
+    algorithm_.resize(n_instructions);
+    for (casadi_int k=0;k<n_instructions;++k) {
+      AlgEl& e = algorithm_[k];
+      s.unpack("SXFunction::ScalarAtomic::op", e.op);
+      s.unpack("SXFunction::ScalarAtomic::i0", e.i0);
+      s.unpack("SXFunction::ScalarAtomic::i1", e.i1);
+      s.unpack("SXFunction::ScalarAtomic::i2", e.i2);
+    }
+
+    // Default (persistent) options
+    just_in_time_opencl_ = false;
+    just_in_time_sparsity_ = false;
+
+    s.unpack("SXFunction::live_variables", live_variables_);
+
+    XFunction<SXFunction, SX, SXNode>::delayed_deserialize_members(s);
+  }
+
+  void SXFunction::serialize_body(SerializingStream &s) const {
+    XFunction<SXFunction, SX, SXNode>::serialize_body(s);
+    s.version("SXFunction", 1);
+    s.pack("SXFunction::n_instr", algorithm_.size());
+
+    s.pack("SXFunction::worksize", worksize_);
+    s.pack("SXFunction::free_vars", free_vars_);
+    s.pack("SXFunction::operations", operations_);
+    s.pack("SXFunction::constants", constants_);
+    s.pack("SXFunction::default_in", default_in_);
+
+    // Loop over algorithm
+    for (const auto& e : algorithm_) {
+      s.pack("SXFunction::ScalarAtomic::op", e.op);
+      s.pack("SXFunction::ScalarAtomic::i0", e.i0);
+      s.pack("SXFunction::ScalarAtomic::i1", e.i1);
+      s.pack("SXFunction::ScalarAtomic::i2", e.i2);
+    }
+
+    s.pack("SXFunction::live_variables", live_variables_);
+
+    XFunction<SXFunction, SX, SXNode>::delayed_serialize_members(s);
+  }
+
+  ProtoFunction* SXFunction::deserialize(DeserializingStream& s) {
+    return new SXFunction(s);
   }
 
 } // namespace casadi

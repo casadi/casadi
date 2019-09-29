@@ -25,6 +25,7 @@
 
 #include "gurobi_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
+#include "casadi/core/nlp_tools.hpp"
 
 using namespace std;
 namespace casadi {
@@ -37,6 +38,7 @@ namespace casadi {
     plugin->doc = GurobiInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &GurobiInterface::options_;
+    plugin->deserialize = &GurobiInterface::deserialize;
     return 0;
   }
 
@@ -54,14 +56,23 @@ namespace casadi {
     clear_mem();
   }
 
-  Options GurobiInterface::options_
+  const Options GurobiInterface::options_
   = {{&Conic::options_},
      {{"vtype",
        {OT_STRINGVECTOR,
         "Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]"}},
       {"gurobi",
        {OT_DICT,
-        "Options to be passed to gurobi."}}
+        "Options to be passed to gurobi."}},
+      {"sos_groups",
+       {OT_INTVECTORVECTOR,
+        "Definition of SOS groups by indices."}},
+      {"sos_weights",
+       {OT_DOUBLEVECTORVECTOR,
+        "Weights corresponding to SOS entries."}},
+      {"sos_types",
+       {OT_INTVECTOR,
+        "Specify 1 or 2 for each SOS group."}}
      }
   };
 
@@ -72,14 +83,34 @@ namespace casadi {
     // Default options
     std::vector<std::string> vtype;
 
+    std::vector< std::vector<casadi_int> > sos_groups;
+    std::vector< std::vector<double> > sos_weights;
+    std::vector<casadi_int> sos_types;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="vtype") {
         vtype = op.second;
       } else if (op.first=="gurobi") {
         opts_ = op.second;
+      } else if (op.first=="sos_groups") {
+        sos_groups = op.second.to_int_vector_vector();
+      } else if (op.first=="sos_weights") {
+        sos_weights = op.second.to_double_vector_vector();
+      } else if (op.first=="sos_types") {
+        sos_types = op.second.to_int_vector();
       }
     }
+
+    // Validaty SOS constraints
+    check_sos(nx_, sos_groups, sos_weights, sos_types);
+
+    // Populate SOS structures
+    flatten_nested_vector(sos_groups, sos_ind_, sos_beg_);
+    if (!sos_weights.empty())
+      flatten_nested_vector(sos_weights, sos_weights_);
+
+    sos_types_ = to_int(sos_types);
 
     // Variable types
     if (!vtype.empty()) {
@@ -102,150 +133,33 @@ namespace casadi {
       }
     }
 
-    Sparsity qsum = reshape(sum2(Q_), np_, np_);
-
-    // Block detection
-    Sparsity aggregate = qsum+P_;
-
-    std::vector<casadi_int> p;
-    casadi_int nb = aggregate.scc(p, r_);
-
-    std::string pattern_message = "Pattern not recognised";
-
-    casadi_assert(p==range(p.size()), pattern_message);
-
-    const casadi_int* row = aggregate.row();
-    const casadi_int* colind = aggregate.colind();
-
-    // Check fishbone-structure
-    for (casadi_int i=0;i<nb;++i) {
-      casadi_int block_size = r_[i+1]-r_[i];
-      // number of nonzeros in column r_[i+1]-1
-      casadi_int nz = colind[r_[i+1]]-colind[r_[i+1]-1];
-      // Last column of block should be dense
-      casadi_assert(nz==block_size, pattern_message);
-      for (casadi_int k=0;k<block_size-1;++k) {
-        casadi_assert(colind[r_[i]+k+1]-colind[r_[i]+k], pattern_message);
-        casadi_assert(*(row++)==k+r_[i], pattern_message);
-        casadi_assert(*(row++)==r_[i]+block_size-1, pattern_message);
-      }
-
-      for (casadi_int k=0;k<block_size;++k)
-        casadi_assert(*(row++)==k+r_[i], pattern_message);
-    }
-
-    /**
-      general soc constraints:
-      ||Ax + b ||_2 <= c'x + d
-
-      Need to represent as
-      X'X <= Z'Z
-
-      with X and Z helper variables and
-      Ax  + b = X
-      c'x + d = Z
-
-      [A;c'] x - [X;Z] = [b;d]
-
-      we look for the vertical concatenation of these constraints for all blocks:
-
-      Q(map_Q) [x;X1;Z1;X2;Z2;...] = P.nz(map_P)
-
-    */
-
-    /*
-
-    Aggregate pattern:
-
-    x (x)
-     x(x)
-    xx(x)
-       x (x)
-        x(x)
-       xx(x)
-
-    We are interested in the parts in parenthesis (target).
-
-    Find out which rows in Q correspond to those targets
-    */
-
-    // Lookup vector for target start and end
-    std::vector<casadi_int> target_start(nb), target_stop(nb);
-    for (casadi_int i=0;i<nb;++i) {
-      target_start[i] = (r_[i+1]-1)*aggregate.size1()+r_[i];
-      target_stop[i] = target_start[i]+r_[i+1]-r_[i];
-    }
-
-    // Collect the nonzero indices in Q that that correspond to the target area
-    std::vector<casadi_int> q_nz;
-    // Triplet form for map_Q sparsity
-    std::vector<casadi_int> q_row, q_col;
-
-    // Loop over Q's columns (decision variables)
-    for (casadi_int j=0; j<Q_.size2(); ++j) {
-      casadi_int block_index = 0;
-      // Loop over Q's rows
-      for (casadi_int k=Q_.colind(j); k<Q_.colind(j+1); ++k) {
-        casadi_int i = Q_.row(k);
-
-        // Increment block_index if i runs ahead
-        while (i>target_stop[block_index] && block_index<nb-1) block_index++;
-
-        if (i>=target_start[block_index] && i<target_stop[block_index]) {
-          // Got a nonzero in the target region
-          q_nz.push_back(k);
-          q_row.push_back(r_[block_index]+i-target_start[block_index]);
-          q_col.push_back(j);
-        }
-      }
-    }
-
-    map_Q_ = IM::triplet(q_row, q_col, q_nz, r_[nb], nx_);
-
-    // Add the [X1;Z1;X2;Z2;...] part
-    map_Q_ = horzcat(map_Q_, -IM::eye(r_[nb])).T();
-
-    // Get maximum nonzero count of any column
-    casadi_int max_nnz = 0;
-    for (casadi_int i=0;i<map_Q_.size2();++i) {
-      max_nnz = std::max(max_nnz, map_Q_.colind(i+1)-map_Q_.colind(i));
-    }
-
-    // ind/val size needs to cover max nonzero count
-    indval_size_ = std::max(nx_, max_nnz);
-
-    // Collect the indices for the P target area
-    map_P_.resize(r_[nb], -1);
-    for (casadi_int i=0;i<nb;++i) {
-      for (casadi_int k=P_.colind(r_[i+1]-1); k<P_.colind(r_[i+1]); ++k) {
-        casadi_int r = P_.row(k);
-        map_P_[r] = k;
-      }
-    }
-
-    // ind/val size needs to cover blocksize
-    for (casadi_int i=0;i<nb;++i)
-      indval_size_ = std::max(indval_size_, r_[i+1]-r_[i]);
-
-    // Get the transpose and mapping
-    AT_ = A_.transpose(A_mapping_);
+    // Initialize SDP to SOCP memory
+    sdp_to_socp_init(sdp_to_socp_mem_);
 
     // Temporary memory
-    alloc_w(indval_size_, true); // val
-    alloc_iw(indval_size_, true); // ind
+    alloc_w(sdp_to_socp_mem_.indval_size, true); // val
+    alloc_iw(sdp_to_socp_mem_.indval_size, true); // ind
     alloc_iw(nx_, true); // ind2
+    alloc_iw(nx_, true); // vtypes
   }
 
   int GurobiInterface::init_mem(void* mem) const {
+    if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Load environment
     casadi_int flag = GRBloadenv(&m->env, nullptr); // no log file
-    casadi_assert(!flag && m->env, "Failed to create GUROBI environment. Flag: "+ str(flag));
+    casadi_assert(!flag && m->env, "Failed to create GUROBI environment. Flag: " + str(flag)
+      + ":" + GRBgeterrormsg(m->env));
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->sos_weights = sos_weights_;
+    m->sos_beg = sos_beg_;
+    m->sos_ind = sos_ind_;
+    m->sos_types = sos_types_;
+
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
     return 0;
   }
 
@@ -284,16 +198,14 @@ namespace casadi {
   }
 
   int GurobiInterface::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<GurobiMemory*>(mem);
+    const SDPToSOCPMem& sm = sdp_to_socp_mem_;
 
     // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
-
     m->fstats.at("preprocessing").tic();
 
     // Problem has not been solved at this point
-    m->success = false;
     m->return_status = -1;
 
     if (inputs_check_) {
@@ -309,8 +221,8 @@ namespace casadi {
       *lbx=arg[CONIC_LBX],
       *ubx=arg[CONIC_UBX],
       *p=arg[CONIC_P],
-      *q=arg[CONIC_Q];
-      //*x0=arg[CONIC_X0],
+      *q=arg[CONIC_Q],
+      *x0=arg[CONIC_X0];
       //*lam_x0=arg[CONIC_LAM_X0];
 
     // Outputs
@@ -320,9 +232,10 @@ namespace casadi {
       *lam_x=res[CONIC_LAM_X];
 
     // Temporary memory
-    double *val=w; w+=indval_size_;
-    int *ind=reinterpret_cast<int*>(iw); iw+=indval_size_;
+    double *val=w; w+=sm.indval_size;
+    int *ind=reinterpret_cast<int*>(iw); iw+=sm.indval_size;
     int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;
+    char *vtypes=reinterpret_cast<char*>(iw); iw+=nx_;
 
     // Greate an empty model
     GRBmodel *model = nullptr;
@@ -350,15 +263,28 @@ namespace casadi {
           // Continious variable
           vtype = GRB_CONTINUOUS;
         }
+        vtypes[i] = vtype;
 
         // Pass to model
         flag = GRBaddvar(model, 0, nullptr, nullptr, g ? g[i] : 0., lb, ub, vtype, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
+      GRBupdatemodel(model);
+      for (casadi_int i=0; i<nx_; ++i) {
+        // If it is a discrete variable, we can pass the start guess
+        if (vtypes[i] != GRB_CONTINUOUS) {
+          flag = GRBsetdblattrelement(model, "Start", i, x0[i]);
+          casadi_assert(!flag, GRBgeterrormsg(m->env));
+        }
+      }
+
+
+      /*  Treat SOCP constraints */
+
       // Add helper variables for SOCP
-      for (casadi_int i=0;i<r_.size()-1;++i) {
-        for (casadi_int k=0;k<r_[i+1]-r_[i]-1;++k) {
+      for (casadi_int i=0;i<sm.r.size()-1;++i) {
+        for (casadi_int k=0;k<sm.r[i+1]-sm.r[i]-1;++k) {
           flag = GRBaddvar(model, 0, nullptr, nullptr, 0, -GRB_INFINITY, GRB_INFINITY,
                            GRB_CONTINUOUS, nullptr);
           casadi_assert(!flag, GRBgeterrormsg(m->env));
@@ -389,7 +315,7 @@ namespace casadi {
           casadi_scal(numqnz, 0.5, val);
           h += numqnz;
         } else {
-          casadi_fill(val, numqnz, 0.);
+          casadi_clear(val, numqnz);
         }
 
         // Pass to model
@@ -398,7 +324,7 @@ namespace casadi {
       }
 
       // Add constraints
-      const casadi_int *AT_colind=AT_.colind(), *AT_row=AT_.row();
+      const casadi_int *AT_colind=sm.AT.colind(), *AT_row=sm.AT.row();
       for (casadi_int i=0; i<na_; ++i) {
         // Get bounds
         double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
@@ -409,7 +335,7 @@ namespace casadi {
           casadi_int j = AT_row[k];
 
           ind[numnz] = j;
-          val[numnz] = a ? a[A_mapping_[k]]  : 0;
+          val[numnz] = a ? a[sm.A_mapping[k]]  : 0;
 
           numnz++;
         }
@@ -440,11 +366,19 @@ namespace casadi {
         }
       }
 
+      // Add SOS constraints when applicable
+      if (!m->sos_ind.empty()) {
+        flag = GRBaddsos(model, m->sos_beg.size()-1, m->sos_ind.size(),
+            get_ptr(m->sos_types), get_ptr(m->sos_beg), get_ptr(m->sos_ind),
+            get_ptr(m->sos_weights));
+        casadi_assert(!flag, GRBgeterrormsg(m->env));
+      }
+
       // SOCP helper constraints
-      const Sparsity& sp = map_Q_.sparsity();
+      const Sparsity& sp = sm.map_Q.sparsity();
       const casadi_int* colind = sp.colind();
       const casadi_int* row = sp.row();
-      const casadi_int* data = map_Q_.ptr();
+      const casadi_int* data = sm.map_Q.ptr();
 
       // Loop over columns
       for (casadi_int i=0; i<sp.size2(); ++i) {
@@ -461,19 +395,19 @@ namespace casadi {
         }
 
         // Get bound
-        double bound = map_P_[i]==-1 ? 0 : -p[map_P_[i]];
+        double bound = sm.map_P[i]==-1 ? 0 : -p[sm.map_P[i]];
 
         flag = GRBaddconstr(model, numnz, ind, val, GRB_EQUAL, bound, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
       // Loop over blocks
-      for (casadi_int i=0; i<r_.size()-1; ++i) {
-        casadi_int block_size = r_[i+1]-r_[i];
+      for (casadi_int i=0; i<sm.r.size()-1; ++i) {
+        casadi_int block_size = sm.r[i+1]-sm.r[i];
 
         // Indicate x'x - y^2 <= 0
         for (casadi_int j=0;j<block_size;++j) {
-          ind[j] = nx_ + r_[i] + j;
+          ind[j] = nx_ + sm.r[i] + j;
           val[j] = j<block_size-1 ? 1 : -1;
         }
 
@@ -528,6 +462,9 @@ namespace casadi {
 
       m->return_status = optimstatus;
       m->success = optimstatus==GRB_OPTIMAL;
+      if (optimstatus==GRB_ITERATION_LIMIT || optimstatus==GRB_TIME_LIMIT
+          || optimstatus==GRB_NODE_LIMIT || optimstatus==GRB_SOLUTION_LIMIT)
+        m->unified_return_status = SOLVER_RET_LIMITED;
 
       // Get the objective value, if requested
       if (cost) {
@@ -554,8 +491,6 @@ namespace casadi {
       throw;
     }
 
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
     return 0;
   }
 
@@ -563,7 +498,6 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<GurobiMemory*>(mem);
     stats["return_status"] = return_status_string(m->return_status);
-    stats["success"] = m->success;
     return stats;
   }
 
@@ -573,6 +507,29 @@ namespace casadi {
 
   GurobiMemory::~GurobiMemory() {
     if (this->env) GRBfreeenv(this->env);
+  }
+
+  GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
+    s.version("GurobiInterface", 1);
+    s.unpack("GurobiInterface::vtype", vtype_);
+    s.unpack("GurobiInterface::opts", opts_);
+    s.unpack("GurobiInterface::sos_weights", sos_weights_);
+    s.unpack("GurobiInterface::sos_beg", sos_beg_);
+    s.unpack("GurobiInterface::sos_ind", sos_ind_);
+    s.unpack("GurobiInterface::sos_types", sos_types_);
+    Conic::deserialize(s, sdp_to_socp_mem_);
+  }
+
+  void GurobiInterface::serialize_body(SerializingStream &s) const {
+    Conic::serialize_body(s);
+    s.version("GurobiInterface", 1);
+    s.pack("GurobiInterface::vtype", vtype_);
+    s.pack("GurobiInterface::opts", opts_);
+    s.pack("GurobiInterface::sos_weights", sos_weights_);
+    s.pack("GurobiInterface::sos_beg", sos_beg_);
+    s.pack("GurobiInterface::sos_ind", sos_ind_);
+    s.pack("GurobiInterface::sos_types", sos_types_);
+    Conic::serialize(s, sdp_to_socp_mem_);
   }
 
 } // namespace casadi

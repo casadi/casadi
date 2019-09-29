@@ -34,13 +34,17 @@ namespace casadi {
   }
 
   FiniteDiff::~FiniteDiff() {
+    clear_mem();
   }
 
-  Options FiniteDiff::options_
+  const Options FiniteDiff::options_
   = {{&FunctionInternal::options_},
      {{"second_order_stepsize",
        {OT_DOUBLE,
         "Second order perturbation size [default: 1e-3]"}},
+      {"h",
+       {OT_DOUBLE,
+        "Step size [default: computed from abstol]"}},
       {"h_max",
        {OT_DOUBLE,
         "Maximum step size [default 0]"}},
@@ -346,14 +350,14 @@ namespace casadi {
     g.local("z", "casadi_real", "*");
     g << "z = w;\n";
     for (casadi_int j=0; j<n_in; ++j) {
-      g << "arg[" << j << "] = w, w += " << derivative_of_.nnz_in(j) << ";\n";
+      g << g.arg(j) << " = w, w += " << derivative_of_.nnz_in(j) << ";\n";
     }
 
     g.comment("Setup res and y for evaluation");
     g.local("y", "casadi_real", "*");
     g << "y = w;\n";
     for (casadi_int j=0; j<n_out; ++j) {
-      g << "res[" << j << "] = w, w += " << derivative_of_.nnz_out(j) << ";\n";
+      g << g.res(j) << " = w, w += " << derivative_of_.nnz_out(j) << ";\n";
     }
 
     g.comment("For all sensitivity directions");

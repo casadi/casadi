@@ -38,6 +38,7 @@ namespace casadi {
     plugin->doc = Blocksqp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Blocksqp::options_;
+    plugin->deserialize = &Blocksqp::deserialize;
     return 0;
   }
 
@@ -55,7 +56,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Blocksqp::options_
+  const Options Blocksqp::options_
   = {{&Nlpsol::options_},
      {{"qpsol",
        {OT_STRING,
@@ -103,6 +104,9 @@ namespace casadi {
        {OT_INT,
         "Maximum number of SQP iterations"}},
       {"warmstart",
+       {OT_BOOL,
+        "Use warmstarting"}},
+      {"qp_init",
        {OT_BOOL,
         "Use warmstarting"}},
       {"max_it_qp",
@@ -212,7 +216,16 @@ namespace casadi {
         "Lower bound on objective function [-inf]"}},
       {"obj_up",
        {OT_DOUBLE,
-        "Upper bound on objective function [inf]"}}
+        "Upper bound on objective function [inf]"}},
+      {"rho",
+       {OT_DOUBLE,
+        "Feasibility restoration phase parameter"}},
+      {"zeta",
+       {OT_DOUBLE,
+        "Feasibility restoration phase parameter"}},
+      {"print_maxit_reached",
+       {OT_BOOL,
+        "Print error when maximum number of SQP iterations reached"}}
      }
   };
 
@@ -273,6 +286,10 @@ namespace casadi {
     eta_ = 1.0e-4;
     obj_lo_ = -inf;
     obj_up_ = inf;
+    rho_ = 1.0e3;
+    zeta_ = 1.0e-3;
+    print_maxit_reached_ = true;
+    qp_init_ = true;
 
     // Read user options
     for (auto&& op : opts) {
@@ -310,6 +327,8 @@ namespace casadi {
         max_iter_ = op.second;
       } else if (op.first=="warmstart") {
         warmstart_ = op.second;
+      } else if (op.first=="qp_init") {
+        qp_init_ = op.second;
       } else if (op.first=="max_it_qp") {
         max_it_qp_ = op.second;
       } else if (op.first=="block_hess") {
@@ -382,6 +401,12 @@ namespace casadi {
         obj_lo_ = op.second;
       } else if (op.first=="obj_up") {
         obj_up_ = op.second;
+      } else if (op.first=="rho") {
+        rho_ = op.second;
+      } else if (op.first=="zeta") {
+        zeta_ = op.second;
+      } else if (op.first=="print_maxit_reached") {
+        print_maxit_reached_ = op.second;
       }
     }
 
@@ -399,6 +424,46 @@ namespace casadi {
              "Using BFGS updates instead.\n");
       hess_update_ = 2;
       hess_scaling_ = fallback_scaling_;
+    }
+
+    // Setup feasibility restoration phase
+    if (restore_feas_) {
+      // get orignal nlp
+      Function nlp = oracle_;
+      vector<MX> resv;
+      vector<MX> argv = nlp.mx_in();
+
+      // build fesibility restoration phase nlp
+      MX p = MX::sym("p", nlp.size1_in("x"));
+      MX s = MX::sym("s", nlp.size1_out("g"));
+
+      MX d = fmin(1.0, 1.0/abs(p)) * (argv.at(0) - p);
+      MX f_rp = 0.5 * rho_ * dot(s, s) + zeta_/2.0 * dot(d, d);
+      MX g_rp = nlp(argv).at(1) - s;
+
+      MXDict nlp_rp = {{"x", MX::vertcat({argv.at(0), s})},
+                       {"p", MX::vertcat({argv.at(1), p})},
+                       {"f", f_rp},
+                       {"g", g_rp}};
+
+      // Set options for the SQP method for the restoration problem
+      Dict solver_options;
+      solver_options["globalization"] = true;
+      solver_options["which_second_derv"] = 0;
+      solver_options["restore_feas"] = false;
+      solver_options["hess_update"] = 2;
+      solver_options["hess_lim_mem"] = 1;
+      solver_options["hess_scaling"] = 2;
+      solver_options["opttol"] = opttol_;
+      solver_options["nlinfeastol"] = nlinfeastol_;
+      solver_options["max_iter"] = 1;
+      solver_options["print_time"] = false;
+      solver_options["print_header"] = false;
+      solver_options["print_iteration"] = false;
+      solver_options["print_maxit_reached"] = false;
+
+      // Create and initialize solver for the restoration problem
+      rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
     }
 
     // Setup NLP functions
@@ -454,6 +519,10 @@ namespace casadi {
       nnz_H_ += dim_[i]*dim_[i];
     }
 
+    create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                    {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+    exact_hess_lag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
+
     if (verbose_) casadi_message(str(nblocks_) + " blocks of max size " + str(max_size) + ".");
 
     // Allocate a QP solver
@@ -492,6 +561,7 @@ namespace casadi {
     alloc_res(nblocks_*n_hess, true);
     alloc_w(n_hess*nnz_H_, true);
     alloc_iw(nnz_H_ + (nx_+1) + nx_, true); // hessIndRow
+    alloc_w(exact_hess_lag_sp_.nnz(), true); // exact_hess_lag
   }
 
   int Blocksqp::init_mem(void* mem) const {
@@ -504,6 +574,7 @@ namespace casadi {
       m->qpoases_mem->linsol_plugin = linsol_plugin_;
     }
 
+    m->qp = nullptr;
     m->colind.resize(Asp_.size2()+1);
     m->row.resize(Asp_.nnz());
     return 0;
@@ -557,10 +628,13 @@ namespace casadi {
     } else {
       m->hess2 = nullptr;
     }
+
+    m->exact_hess_lag = w; w += exact_hess_lag_sp_.nnz();
   }
 
   int Blocksqp::solve(void* mem) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     casadi_int ret = 0;
 
@@ -602,17 +676,21 @@ namespace casadi {
     reset_sqp(m);
 
     // Free existing memory, if any
-    if (m->qp) delete m->qp;
-    m->qp = nullptr;
-    if (schur_) {
-      m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
-                                          m->qpoases_mem,
-                                          QpoasesInterface::qpoases_init,
-                                          QpoasesInterface::qpoases_sfact,
-                                          QpoasesInterface::qpoases_nfact,
-                                          QpoasesInterface::qpoases_solve);
-    } else {
-      m->qp = new qpOASES::SQProblem(nx_, ng_);
+    if (qp_init_) {
+      delete m->qp;
+      m->qp = nullptr;
+    }
+    if (!m->qp) {
+      if (schur_) {
+        m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
+                                            m->qpoases_mem,
+                                            QpoasesInterface::qpoases_init,
+                                            QpoasesInterface::qpoases_sfact,
+                                            QpoasesInterface::qpoases_nfact,
+                                            QpoasesInterface::qpoases_solve);
+      } else {
+        m->qp = new qpOASES::SQProblem(nx_, ng_);
+      }
     }
 
     // Print header and information about the algorithmic parameters
@@ -626,9 +704,9 @@ namespace casadi {
     initializeFilter(m);
 
     // Primal-dual initial guess
-    casadi_copy(m->lam_x, nx_, m->lam_xk);
+    casadi_copy(d_nlp->lam, nx_, m->lam_xk);
     casadi_scal(nx_, -1., m->lam_xk);
-    casadi_copy(m->lam_g, ng_, m->lam_gk);
+    casadi_copy(d_nlp->lam + nx_, ng_, m->lam_gk);
     casadi_scal(ng_, -1., m->lam_gk);
 
     casadi_copy(m->lam_xk, nx_, m->lam_qp);
@@ -637,21 +715,26 @@ namespace casadi {
     ret = run(m, max_iter_, warmstart_);
 
     m->success = ret==0;
+    m->ret_ = ret;
 
-    if (ret==1) print("***WARNING: Maximum number of iterations reached\n");
+    if (ret==1) {
+      if (print_maxit_reached_) print("***WARNING: Maximum number of iterations reached\n");
+      m->unified_return_status = SOLVER_RET_LIMITED;
+    }
+
 
     // Get optimal cost
-    m->f = m->obj;
+    d_nlp->f = m->obj;
     // Get constraints at solution
-    casadi_copy(m->gk, ng_, m->g);
+    casadi_copy(m->gk, ng_, d_nlp->z + nx_);
     // Get dual solution (simple bounds)
-    if (m->lam_x) {
-      casadi_copy(m->lam_xk, nx_, m->lam_x);
-      casadi_scal(nx_, -1., m->lam_x);
+    if (d_nlp->lam) {
+      casadi_copy(m->lam_xk, nx_, d_nlp->lam);
+      casadi_scal(nx_, -1., d_nlp->lam);
     }
     // Get dual solution (nonlinear bounds)
-    casadi_copy(m->lam_gk, ng_, m->lam_g);
-    casadi_scal(ng_, -1., m->lam_g);
+    casadi_copy(m->lam_gk, ng_, d_nlp->lam + nx_);
+    casadi_scal(ng_, -1., d_nlp->lam + nx_);
     return 0;
   }
 
@@ -667,7 +750,15 @@ namespace casadi {
       calcInitialHessian(m);
 
       /// Evaluate all functions and gradients for xk_0
-      (void)evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
+      switch (evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g)) {
+        case -1:
+          m->unified_return_status = SOLVER_RET_NAN;
+          return -1;
+        case 0:
+          break;
+        default:
+          return 1;
+      }
       m->nDerCalls++;
 
       /// Check if converged
@@ -838,7 +929,7 @@ namespace casadi {
       } else if (hess_update_ < 4 && hess_lim_mem_) {
         calcHessianUpdateLimitedMemory(m, hess_update_, hess_scaling_);
       } else if (hess_update_ == 4) {
-        casadi_error("Not implemented");
+        calcHessianUpdateExact(m);
       }
 
       // If limited memory updates  are used, set pointers deltaXi and
@@ -862,7 +953,7 @@ namespace casadi {
   void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m,
     const double* lam_x, const double* lam_g,
-    const double* grad_f, double *jacNz,
+    const double* grad_f, const double *jacNz,
     double* grad_lag, casadi_int flag) const {
 
     // Objective gradient
@@ -905,6 +996,7 @@ namespace casadi {
    * ||constrViolation||_infty / (1 + ||xi||_infty) <= TOL
    */
   bool Blocksqp::calcOptTol(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // scaled norm of Lagrangian gradient
     calcLagrangeGradient(m, m->grad_lagk, 0);
     m->gradNorm = casadi_norm_inf(nx_, m->grad_lagk);
@@ -912,13 +1004,10 @@ namespace casadi {
                                    casadi_norm_inf(ng_, m->lam_gk)));
 
     // norm of constraint violation
-    m->cNorm  = lInfConstraintNorm(m, m->x, m->gk);
-    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(nx_, m->x));
+    m->cNorm  = lInfConstraintNorm(m, d_nlp->z, m->gk);
+    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(nx_, d_nlp->z));
 
-    if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
-      return true;
-    else
-      return false;
+    return m->tol <= opttol_ && m->cNormS <= nlinfeastol_;
   }
 
   void Blocksqp::printInfo(BlocksqpMemory* m) const {
@@ -1019,6 +1108,7 @@ namespace casadi {
   void Blocksqp::
   acceptStep(BlocksqpMemory* m, const double* deltaXi,
     const double* lambdaQP, double alpha, casadi_int nSOCS) const {
+    auto d_nlp = &m->d_nlp;
     double lStpNorm;
 
     // Current alpha
@@ -1027,7 +1117,7 @@ namespace casadi {
 
     // Set new x by accepting the current trial step
     for (casadi_int k=0; k<nx_; k++) {
-      m->x[k] = m->trial_xk[k];
+      d_nlp->z[k] = m->trial_xk[k];
       m->dxk[k] = alpha * deltaXi[k];
     }
 
@@ -1060,11 +1150,12 @@ namespace casadi {
 
   void Blocksqp::
   reduceSOCStepsize(BlocksqpMemory* m, double *alphaSOC) const {
+    auto d_nlp = &m->d_nlp;
     // Update bounds on linearized constraints for the next SOC QP:
     // That is different from the update for the first SOC QP!
     for (casadi_int i=0; i<ng_; i++) {
-      double lbg = m->lbg ? m->lbg[i] : 0;
-      double ubg = m->ubg ? m->ubg[i] : 0;
+      double lbg = d_nlp->lbz[i + nx_];
+      double ubg = d_nlp->ubz[i + nx_];
       if (lbg != inf) {
         m->lba_qp[i] = *alphaSOC * m->lba_qp[i] - m->gk[i];
       } else {
@@ -1087,6 +1178,7 @@ namespace casadi {
    * lambda = lambdaQP
    */
   casadi_int Blocksqp::fullstep(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     double alpha;
     double objTrial, cNormTrial;
 
@@ -1095,7 +1187,7 @@ namespace casadi {
     for (casadi_int k=0; k<10; k++) {
       // Compute new trial point
       for (casadi_int i=0; i<nx_; i++)
-        m->trial_xk[i] = m->x[i] + alpha * m->dxk[i];
+        m->trial_xk[i] = d_nlp->z[i] + alpha * m->dxk[i];
 
       // Compute problem functions at trial point
       casadi_int info = evaluate(m, m->trial_xk, &objTrial, m->gk);
@@ -1124,18 +1216,19 @@ namespace casadi {
    *
    */
   casadi_int Blocksqp::filterLineSearch(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     double alpha = 1.0;
     double cNormTrial=0, objTrial, dfTdeltaXi=0;
 
     // Compute ||constr(xi)|| at old point
-    double cNorm = lInfConstraintNorm(m, m->x, m->gk);
+    double cNorm = lInfConstraintNorm(m, d_nlp->z, m->gk);
 
     // Backtracking line search
     casadi_int k;
     for (k=0; k<max_line_search_; k++) {
       // Compute new trial point
       for (casadi_int i=0; i<nx_; i++)
-        m->trial_xk[i] = m->x[i] + alpha * m->dxk[i];
+        m->trial_xk[i] = d_nlp->z[i] + alpha * m->dxk[i];
 
       // Compute grad(f)^T * deltaXi
       dfTdeltaXi = 0.0;
@@ -1239,6 +1332,7 @@ namespace casadi {
   bool Blocksqp::
   secondOrderCorrection(BlocksqpMemory* m, double cNorm, double cNormTrial,
     double dfTdeltaXi, bool swCond, casadi_int it) const {
+    auto d_nlp = &m->d_nlp;
 
     // Perform SOC only on the first iteration of backtracking line search
     if (it > 0) return false;
@@ -1271,7 +1365,7 @@ namespace casadi {
 
       // Set new SOC trial point
       for (casadi_int i=0; i<nx_; i++) {
-        m->trial_xk[i] = m->x[i] + deltaXiSOC[i];
+        m->trial_xk[i] = d_nlp->z[i] + deltaXiSOC[i];
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
@@ -1339,11 +1433,199 @@ namespace casadi {
    * "The dreaded restoration phase" -- Nick Gould
    */
   casadi_int Blocksqp::feasibilityRestorationPhase(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // No Feasibility restoration phase
     if (!restore_feas_) return -1;
 
-    casadi_error("not implemented");
-    return 0;
+    m->nRestPhaseCalls++;
+
+    casadi_int ret, info;
+    casadi_int maxRestIt = 100;
+    casadi_int warmStart;
+    double cNormTrial, objTrial, lStpNorm;
+
+
+    // Create Input for the minimum norm NLP
+    DMDict solver_in;
+
+    // The reference point is the starting value for the restoration phase
+    vector<double> in_x0(d_nlp->z, d_nlp->z+nx_);
+
+    // Initialize slack variables such that the constraints are feasible
+    for (casadi_int i=0; i<ng_; i++) {
+      if (m->gk[i] <= d_nlp->lbz[i+nx_])
+        in_x0.push_back(m->gk[i] - d_nlp->lbz[i+nx_]);
+      else if (m->gk[i] > d_nlp->ubz[i+nx_])
+        in_x0.push_back(m->gk[i] - d_nlp->ubz[i+nx_]);
+      else
+        in_x0.push_back(0.0);
+    }
+
+    // Add current iterate xk to parameter p
+    vector<double> in_p(d_nlp->p, d_nlp->p+np_);
+    vector<double> in_p2(d_nlp->z, d_nlp->z+nx_);
+    in_p.insert(in_p.end(), in_p2.begin(), in_p2.end());
+
+    // Set bounds for variables
+    vector<double> in_lbx(d_nlp->lbz, d_nlp->lbz+nx_);
+    vector<double> in_ubx(d_nlp->ubz, d_nlp->ubz+nx_);
+    for (casadi_int i=0; i<ng_; i++) {
+      in_lbx.push_back(-inf);
+      in_ubx.push_back(inf);
+    }
+
+    // Set bounds for constraints
+    vector<double> in_lbg(d_nlp->lbz+nx_, d_nlp->lbz+nx_+ng_);
+    vector<double> in_ubg(d_nlp->ubz+nx_, d_nlp->ubz+nx_+ng_);
+
+    solver_in["x0"] = in_x0;
+    solver_in["p"] = in_p;
+    solver_in["lbx"] = in_lbx;
+    solver_in["ubx"] = in_ubx;
+    solver_in["lbg"] = in_lbg;
+    solver_in["ubg"] = in_ubg;
+
+      /*
+
+        Consider the following simple call:
+        auto solver_out = rp_solver_(solver_in);
+
+        This call in fact allocates memory,
+        calls a memory-less eval(),
+        and clears up the memory again.
+
+        Since we want to access the memory later on,
+        we need to unravel the simple call into its parts,
+        and avoid the memory cleanup
+
+      */
+
+    // perform first iteration for the minimum norm NLP
+
+    // Get the number of inputs and outputs
+    int n_in = rp_solver_.n_in();
+    int n_out = rp_solver_.n_out();
+
+    // Get default inputs
+    vector<DM> arg_v(n_in);
+    for (casadi_int i=0; i<arg_v.size(); i++)
+      arg_v[i] = DM::repmat(rp_solver_.default_in(i), rp_solver_.size1_in(i), 1);
+
+    // Assign provided inputs
+    for (auto&& e : solver_in) arg_v.at(rp_solver_.index_in(e.first)) = e.second;
+
+    // Check sparsities
+    for (casadi_int i=0; i<arg_v.size(); i++)
+      casadi_assert_dev(arg_v[i].sparsity()==rp_solver_.sparsity_in(i));
+
+    // Allocate results
+    std::vector<DM> res(n_out);
+    for (casadi_int i=0; i<n_out; i++) {
+      if (res[i].sparsity()!=rp_solver_.sparsity_out(i))
+        res[i] = DM::zeros(rp_solver_.sparsity_out(i));
+    }
+
+    // Allocate temporary memory if needed
+    std::vector<casadi_int> iw_tmp(rp_solver_.sz_iw());
+    std::vector<double> w_tmp(rp_solver_.sz_w());
+
+    // Get pointers to input arguments
+    std::vector<const double*> argp(rp_solver_.sz_arg());
+    for (casadi_int i=0; i<n_in; ++i) argp[i] = get_ptr(arg_v[i]);
+
+    // Get pointers to output arguments
+    std::vector<double*> resp(rp_solver_.sz_res());
+    for (casadi_int i=0; i<n_out; i++) resp[i] = get_ptr(res[i]);
+
+    void* mem2 = rp_solver_.memory(0);
+
+    // perform The m
+    rp_solver_->eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), mem2);
+
+    // Get BlocksqpMemory and Blocksqp from restoration phase
+    auto m2 = static_cast<BlocksqpMemory*>(mem2);
+    const Blocksqp* bp = static_cast<const Blocksqp*>(rp_solver_.get());
+    ret = m2->ret_;
+
+    warmStart = 1;
+    for (casadi_int it=0; it<maxRestIt; it++) {
+      // One iteration for minimum norm NLP
+      if (it > 0)
+        ret = bp->run(m2, 1, warmStart);
+
+      // If restMethod yields error, stop restoration phase
+      if (ret == -1)
+        break;
+
+      // Get new xi from the restoration phase
+      for (casadi_int i=0; i<nx_; i++)
+        m->trial_xk[i] = m2->d_nlp.z[i];
+
+      // Compute objective at trial point
+      info = evaluate(m, m->trial_xk, &objTrial, m->gk);
+      m->nFunCalls++;
+      cNormTrial = lInfConstraintNorm(m, m->trial_xk, m->gk);
+      if ( info != 0 || objTrial < obj_lo_ || objTrial > obj_up_ ||
+          !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
+        continue;
+
+      // Is this iterate acceptable for the filter?
+      if (!pairInFilter(m, cNormTrial, objTrial)) {
+        // success
+        print("Found a point acceptable for the filter.\n");
+        ret = 0;
+        break;
+      }
+
+      // If minimum norm NLP has converged, declare local infeasibility
+        if (m2->tol < opttol_ && m2->cNormS < nlinfeastol_) {
+          ret = 1;
+          break;
+        }
+    }
+
+    // Success or locally infeasible
+    if (ret == 0 || ret == 1) {
+        // Store the infinity norm of the multiplier step
+        m->lambdaStepNorm = 0.0;
+        // Compute restoration step
+        for (casadi_int k=0; k<nx_; k++) {
+            m->dxk[k] = d_nlp->z[k];
+
+            d_nlp->z[k] = m->trial_xk[k];
+
+            // Store lInf norm of dual step
+            if ((lStpNorm = fabs(m2->lam_xk[k] - m->lam_xk[k])) > m->lambdaStepNorm)
+                m->lambdaStepNorm = lStpNorm;
+            m->lam_xk[k] = m2->lam_xk[k];
+            m->lam_qp[k] = m2->lam_qp[k];
+
+            m->dxk[k] -= d_nlp->z[k];
+        }
+        for (casadi_int k=0; k<ng_; k++) {
+            // skip the dual variables for the slack variables in the restoration problem
+            if ((lStpNorm = fabs(m2->lam_gk[k] - m->lam_gk[k])) > m->lambdaStepNorm)
+                m->lambdaStepNorm = lStpNorm;
+            m->lam_gk[k] = m2->lam_gk[k];
+            m->lam_qp[k] = m2->lam_qp[nx_+ng_+k];
+        }
+        m->alpha = 1.0;
+        m->nSOCS = 0;
+
+        // reset reduced step counter
+        m->reducedStepCount = 0;
+
+        // reset Hessian and limited memory information
+        resetHessian(m);
+    }
+
+    if (ret == 1) {
+        if (print_iteration_) printProgress(m);
+        updateStats(m);
+        print("The problem seems to be locally infeasible. Infeasibilities minimized.\n");
+    }
+
+    return ret;
   }
 
 
@@ -1353,13 +1635,14 @@ namespace casadi {
    * iteration with the current controls and measurement weights q and w
    */
   casadi_int Blocksqp::feasibilityRestorationHeuristic(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     m->nRestHeurCalls++;
 
     // Call problem specific heuristic to reduce constraint violation.
     // For shooting methods that means setting consistent values for
     // shooting nodes by one forward integration.
     for (casadi_int k=0; k<nx_; k++) // input: last successful step
-      m->trial_xk[k] = m->x[k];
+      m->trial_xk[k] = d_nlp->z[k];
 
     // FIXME(@jaeandersson) Not implemented
     return -1;
@@ -1370,12 +1653,13 @@ namespace casadi {
    * If the line search fails, check if the full step reduces the KKT error by a factor kappaF.
    */
   casadi_int Blocksqp::kktErrorReduction(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     casadi_int info = 0;
     double objTrial, cNormTrial, trialGradNorm, trialTol;
 
     // Compute new trial point
     for (casadi_int i=0; i<nx_; i++)
-      m->trial_xk[i] = m->x[i] + m->dxk[i];
+      m->trial_xk[i] = d_nlp->z[i] + m->dxk[i];
 
     // Compute objective and ||constr(trial_xk)|| at trial point
     std::vector<double> trialConstr(ng_, 0.);
@@ -1811,6 +2095,43 @@ namespace casadi {
 
 
   void Blocksqp::
+  calcHessianUpdateExact(BlocksqpMemory* m) const {
+    // compute exact hessian
+    (void)evaluate(m, m->exact_hess_lag);
+
+    // assign exact hessian to blocks
+    const casadi_int* col = exact_hess_lag_sp_.colind();
+    const casadi_int* row = exact_hess_lag_sp_.row();
+    casadi_int s, dim;
+
+    for (casadi_int k=0; k<nblocks_; k++) {
+      s = blocks_[k];
+      dim = dim_[k];
+      for (casadi_int i=0; i<dim; i++)
+        // Set diagonal to 0 (may have been 1 because of CalcInitialHessian)
+        m->hess[k][i + i*dim] = 0.0;
+      for (casadi_int j=0; j<dim; j++) {
+        for (casadi_int i=col[j+s]; i<col[j+1+s]; i++) {
+          m->hess[k][row[i]-row[col[s]] + j*dim] = m->exact_hess_lag[i];
+          if (row[i]-row[col[s]] < j)
+            m->hess[k][j + (row[i]-row[col[s]])*dim] = m->exact_hess_lag[i];
+        }
+      }
+    }
+
+    // Prepare to compute fallback update as well
+    m->hess = m->hess2;
+    if (fallback_update_ == 2 && !hess_lim_mem_)
+        calcHessianUpdate(m, fallback_update_, fallback_scaling_);
+    else if (fallback_update_ == 0)
+        calcInitialHessian(m);  // Set fallback as Identity
+
+    // Reset pointer
+    m->hess = m->hess1;
+  }
+
+
+  void Blocksqp::
   calcBFGS(BlocksqpMemory* m, const double* gamma,
     const double* delta, casadi_int b) const {
     casadi_int dim = dim_[b];
@@ -1987,7 +2308,7 @@ namespace casadi {
     bool matricesChanged) const {
     casadi_int maxQP, l;
     if (globalization_ &&
-        hess_update_ == 1 &&
+        (hess_update_ == 1 || hess_update_ == 4) &&
         matricesChanged &&
         m->itCount > 1) {
         maxQP = max_conv_qp_ + 1;
@@ -2001,7 +2322,7 @@ namespace casadi {
 
     // Setup QProblem data
     if (matricesChanged) {
-      if (m->A) delete m->A;
+      delete m->A;
       m->A = nullptr;
       copy_vector(Asp_.colind(), m->colind);
       copy_vector(Asp_.row(), m->row);
@@ -2031,7 +2352,7 @@ namespace casadi {
 
     // Other variables for qpOASES
     double cpuTime = matricesChanged ? max_time_qp_ : 0.1*max_time_qp_;
-    int maxIt = matricesChanged ? max_it_qp_ : 0.1*max_it_qp_;
+    int maxIt = matricesChanged ? max_it_qp_ : static_cast<int>(0.1*max_it_qp_);
     qpOASES::SolutionAnalysis solAna;
     qpOASES::returnValue ret = qpOASES::RET_INFO_UNDEFINED;
 
@@ -2060,7 +2381,7 @@ namespace casadi {
         if (matricesChanged) {
           // Convert block-Hessian to sparse format
           convertHessian(m);
-          if (m->H) delete m->H;
+          delete m->H;
           m->H = nullptr;
           m->H = new qpOASES::SymSparseMat(nx_, nx_,
                                            m->hessIndRow, m->hessIndCol,
@@ -2087,7 +2408,7 @@ namespace casadi {
               }
           } else {
             // Second order correction: H and A do not change
-            maxIt = 0.1*max_it_qp_;
+            maxIt = static_cast<int>(0.1*max_it_qp_);
             cpuTime = 0.1*max_time_qp_;
             ret = m->qp->hotstart(g, lb, lu, lbA, luA, maxIt, &cpuTime);
           }
@@ -2140,7 +2461,7 @@ namespace casadi {
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
       print("***WARNING: qpOASES error message: \"%s\"\n",
-              qpOASES::getGlobalMessageHandler()->getErrorCodeMessage(ret));
+              qpOASES::MessageHandling::getErrorCodeMessage(ret));
 
     // Point Hessian again to the first Hessian
     m->hess = m->hess1;
@@ -2194,18 +2515,19 @@ namespace casadi {
    * trust region box radius
    */
   void Blocksqp::updateStepBounds(BlocksqpMemory* m, bool soc) const {
+    auto d_nlp = &m->d_nlp;
     // Bounds on step
     for (casadi_int i=0; i<nx_; i++) {
-      double lbx = m->lbx ? m->lbx[i] : 0;
+      double lbx = d_nlp->lbz[i];
       if (lbx != inf) {
-        m->lbx_qp[i] = lbx - m->x[i];
+        m->lbx_qp[i] = lbx - d_nlp->z[i];
       } else {
         m->lbx_qp[i] = inf;
       }
 
-      double ubx = m->ubx ? m->ubx[i] : 0;
+      double ubx = d_nlp->ubz[i];
       if (ubx != inf) {
-        m->ubx_qp[i] = ubx - m->x[i];
+        m->ubx_qp[i] = ubx - d_nlp->z[i];
       } else {
         m->ubx_qp[i] = inf;
       }
@@ -2213,7 +2535,7 @@ namespace casadi {
 
     // Bounds on linearized constraints
     for (casadi_int i=0; i<ng_; i++) {
-      double lbg = m->lbg ? m->lbg[i] : 0;
+      double lbg = d_nlp->lbz[i+nx_];
       if (lbg != inf) {
         m->lba_qp[i] = lbg - m->gk[i];
         if (soc) m->lba_qp[i] += m->jac_times_dxk[i];
@@ -2221,7 +2543,7 @@ namespace casadi {
         m->lba_qp[i] = inf;
       }
 
-      double ubg = m->ubg ? m->ubg[i] : 0;
+      double ubg = d_nlp->ubz[i+nx_];
       if (ubg != inf) {
         m->uba_qp[i] = ubg - m->gk[i];
         if (soc) m->uba_qp[i] += m->jac_times_dxk[i];
@@ -2462,25 +2784,44 @@ namespace casadi {
   evaluate(BlocksqpMemory* m,
            double *f, double *g,
            double *grad_f, double *jac_g) const {
-    m->arg[0] = m->x; // x
-    m->arg[1] = m->p; // p
+    auto d_nlp = &m->d_nlp;
+    m->arg[0] = d_nlp->z; // x
+    m->arg[1] = d_nlp->p; // p
     m->res[0] = f; // f
     m->res[1] = g; // g
     m->res[2] = grad_f; // grad:f:x
     m->res[3] = jac_g; // jac:g:x
-    calc_function(m, "nlp_gf_jg");
-    return 0;
+    return calc_function(m, "nlp_gf_jg");
   }
 
   casadi_int Blocksqp::
   evaluate(BlocksqpMemory* m, const double *xk, double *f,
            double *g) const {
+    auto d_nlp = &m->d_nlp;
     m->arg[0] = xk; // x
-    m->arg[1] = m->p; // p
+    m->arg[1] = d_nlp->p; // p
     m->res[0] = f; // f
     m->res[1] = g; // g
-    calc_function(m, "nlp_fg");
-    return 0;
+    return calc_function(m, "nlp_fg");
+  }
+
+  casadi_int Blocksqp::
+  evaluate(BlocksqpMemory* m,
+           double *exact_hess_lag) const {
+    auto d_nlp = &m->d_nlp;
+    static std::vector<double> ones;
+    ones.resize(nx_);
+    for (casadi_int i=0; i<nx_; ++i) ones[i] = 1.0;
+    static std::vector<double> minus_lam_gk;
+    minus_lam_gk.resize(ng_);
+    // Langrange function in blocksqp is L = f - lambdaT * g, whereas + in casadi
+    for (casadi_int i=0; i<ng_; ++i) minus_lam_gk[i] = -m->lam_gk[i];
+    m->arg[0] = d_nlp->z; // x
+    m->arg[1] = d_nlp->p; // p
+    m->arg[2] = get_ptr(ones); // lam:f
+    m->arg[3] = get_ptr(minus_lam_gk); // lam:g
+    m->res[0] = exact_hess_lag; // hess:gamma:x:x
+    return calc_function(m, "nlp_hess_l");;
   }
 
   BlocksqpMemory::BlocksqpMemory() {
@@ -2491,16 +2832,152 @@ namespace casadi {
   }
 
   BlocksqpMemory::~BlocksqpMemory() {
-    if (qpoases_mem) delete qpoases_mem;
-    if (H) delete H;
-    if (A) delete A;
-    if (qp) delete qp;
+    delete qpoases_mem;
+    delete H;
+    delete A;
+    delete qp;
   }
 
   double Blocksqp::
   lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const {
-    return fmax(casadi_max_viol(nx_, xk, m->lbx, m->ubx),
-                casadi_max_viol(ng_, g, m->lbg, m->ubg));
+    auto d_nlp = &m->d_nlp;
+    return fmax(casadi_max_viol(nx_, xk, d_nlp->lbz, d_nlp->ubz),
+                casadi_max_viol(ng_, g, d_nlp->lbz+nx_, d_nlp->ubz+nx_));
+  }
+
+
+  Blocksqp::Blocksqp(DeserializingStream& s) : Nlpsol(s) {
+    s.version("Blocksqp", 1);
+    s.unpack("Blocksqp::nblocks", nblocks_);
+    s.unpack("Blocksqp::blocks", blocks_);
+    s.unpack("Blocksqp::dim", dim_);
+    s.unpack("Blocksqp::nnz_H", nnz_H_);
+    s.unpack("Blocksqp::Asp", Asp_);
+    s.unpack("Blocksqp::Hsp", Hsp_);
+    s.unpack("Blocksqp::exact_hess_lag_sp_", exact_hess_lag_sp_);
+    s.unpack("Blocksqp::linsol_plugin", linsol_plugin_);
+    s.unpack("Blocksqp::print_header", print_header_);
+    s.unpack("Blocksqp::print_iteration", print_iteration_);
+    s.unpack("Blocksqp::eps", eps_);
+    s.unpack("Blocksqp::opttol", opttol_);
+    s.unpack("Blocksqp::nlinfeastol", nlinfeastol_);
+    s.unpack("Blocksqp::schur", schur_);
+    s.unpack("Blocksqp::globalization", globalization_);
+    s.unpack("Blocksqp::restore_feas", restore_feas_);
+    s.unpack("Blocksqp::max_line_search", max_line_search_);
+    s.unpack("Blocksqp::max_consec_reduced_steps", max_consec_reduced_steps_);
+    s.unpack("Blocksqp::max_consec_skipped_updates", max_consec_skipped_updates_);
+    s.unpack("Blocksqp::max_it_qp", max_it_qp_);
+    s.unpack("Blocksqp::max_iter", max_iter_);
+    s.unpack("Blocksqp::warmstart", warmstart_);
+    s.unpack("Blocksqp::qp_init", qp_init_);
+    s.unpack("Blocksqp::block_hess", block_hess_);
+    s.unpack("Blocksqp::hess_scaling", hess_scaling_);
+    s.unpack("Blocksqp::fallback_scaling", fallback_scaling_);
+    s.unpack("Blocksqp::max_time_qp", max_time_qp_);
+    s.unpack("Blocksqp::ini_hess_diag", ini_hess_diag_);
+    s.unpack("Blocksqp::col_eps", col_eps_);
+    s.unpack("Blocksqp::col_tau1", col_tau1_);
+    s.unpack("Blocksqp::col_tau2", col_tau2_);
+    s.unpack("Blocksqp::hess_damp", hess_damp_);
+    s.unpack("Blocksqp::hess_damp_fac", hess_damp_fac_);
+    s.unpack("Blocksqp::hess_update", hess_update_);
+    s.unpack("Blocksqp::fallback_update", fallback_update_);
+    s.unpack("Blocksqp::hess_lim_mem", hess_lim_mem_);
+    s.unpack("Blocksqp::hess_memsize", hess_memsize_);
+    s.unpack("Blocksqp::which_second_derv", which_second_derv_);
+    s.unpack("Blocksqp::skip_first_globalization", skip_first_globalization_);
+    s.unpack("Blocksqp::conv_strategy", conv_strategy_);
+    s.unpack("Blocksqp::max_conv_qp", max_conv_qp_);
+    s.unpack("Blocksqp::max_soc_iter", max_soc_iter_);
+    s.unpack("Blocksqp::gamma_theta", gamma_theta_);
+    s.unpack("Blocksqp::gamma_f", gamma_f_);
+    s.unpack("Blocksqp::kappa_soc", kappa_soc_);
+    s.unpack("Blocksqp::kappa_f", kappa_f_);
+    s.unpack("Blocksqp::theta_max", theta_max_);
+    s.unpack("Blocksqp::theta_min", theta_min_);
+    s.unpack("Blocksqp::delta", delta_);
+    s.unpack("Blocksqp::s_theta", s_theta_);
+    s.unpack("Blocksqp::s_f", s_f_);
+    s.unpack("Blocksqp::kappa_minus", kappa_minus_);
+    s.unpack("Blocksqp::kappa_plus", kappa_plus_);
+    s.unpack("Blocksqp::kappa_plus_max", kappa_plus_max_);
+    s.unpack("Blocksqp::delta_h0", delta_h0_);
+    s.unpack("Blocksqp::eta", eta_);
+    s.unpack("Blocksqp::obj_lo", obj_lo_);
+    s.unpack("Blocksqp::obj_up", obj_up_);
+    s.unpack("Blocksqp::rho", rho_);
+    s.unpack("Blocksqp::zeta", zeta_);
+    s.unpack("Blocksqp::rp_solver", rp_solver_);
+    s.unpack("Blocksqp::print_maxit_reached", print_maxit_reached_);
+
+  }
+
+  void Blocksqp::serialize_body(SerializingStream &s) const {
+    Nlpsol::serialize_body(s);
+    s.version("Blocksqp", 1);
+    s.pack("Blocksqp::nblocks", nblocks_);
+    s.pack("Blocksqp::blocks", blocks_);
+    s.pack("Blocksqp::dim", dim_);
+    s.pack("Blocksqp::nnz_H", nnz_H_);
+    s.pack("Blocksqp::Asp", Asp_);
+    s.pack("Blocksqp::Hsp", Hsp_);
+    s.pack("Blocksqp::exact_hess_lag_sp_", exact_hess_lag_sp_);
+    s.pack("Blocksqp::linsol_plugin", linsol_plugin_);
+    s.pack("Blocksqp::print_header", print_header_);
+    s.pack("Blocksqp::print_iteration", print_iteration_);
+    s.pack("Blocksqp::eps", eps_);
+    s.pack("Blocksqp::opttol", opttol_);
+    s.pack("Blocksqp::nlinfeastol", nlinfeastol_);
+    s.pack("Blocksqp::schur", schur_);
+    s.pack("Blocksqp::globalization", globalization_);
+    s.pack("Blocksqp::restore_feas", restore_feas_);
+    s.pack("Blocksqp::max_line_search", max_line_search_);
+    s.pack("Blocksqp::max_consec_reduced_steps", max_consec_reduced_steps_);
+    s.pack("Blocksqp::max_consec_skipped_updates", max_consec_skipped_updates_);
+    s.pack("Blocksqp::max_it_qp", max_it_qp_);
+    s.pack("Blocksqp::max_iter", max_iter_);
+    s.pack("Blocksqp::warmstart", warmstart_);
+    s.pack("Blocksqp::qp_init", qp_init_);
+    s.pack("Blocksqp::block_hess", block_hess_);
+    s.pack("Blocksqp::hess_scaling", hess_scaling_);
+    s.pack("Blocksqp::fallback_scaling", fallback_scaling_);
+    s.pack("Blocksqp::max_time_qp", max_time_qp_);
+    s.pack("Blocksqp::ini_hess_diag", ini_hess_diag_);
+    s.pack("Blocksqp::col_eps", col_eps_);
+    s.pack("Blocksqp::col_tau1", col_tau1_);
+    s.pack("Blocksqp::col_tau2", col_tau2_);
+    s.pack("Blocksqp::hess_damp", hess_damp_);
+    s.pack("Blocksqp::hess_damp_fac", hess_damp_fac_);
+    s.pack("Blocksqp::hess_update", hess_update_);
+    s.pack("Blocksqp::fallback_update", fallback_update_);
+    s.pack("Blocksqp::hess_lim_mem", hess_lim_mem_);
+    s.pack("Blocksqp::hess_memsize", hess_memsize_);
+    s.pack("Blocksqp::which_second_derv", which_second_derv_);
+    s.pack("Blocksqp::skip_first_globalization", skip_first_globalization_);
+    s.pack("Blocksqp::conv_strategy", conv_strategy_);
+    s.pack("Blocksqp::max_conv_qp", max_conv_qp_);
+    s.pack("Blocksqp::max_soc_iter", max_soc_iter_);
+    s.pack("Blocksqp::gamma_theta", gamma_theta_);
+    s.pack("Blocksqp::gamma_f", gamma_f_);
+    s.pack("Blocksqp::kappa_soc", kappa_soc_);
+    s.pack("Blocksqp::kappa_f", kappa_f_);
+    s.pack("Blocksqp::theta_max", theta_max_);
+    s.pack("Blocksqp::theta_min", theta_min_);
+    s.pack("Blocksqp::delta", delta_);
+    s.pack("Blocksqp::s_theta", s_theta_);
+    s.pack("Blocksqp::s_f", s_f_);
+    s.pack("Blocksqp::kappa_minus", kappa_minus_);
+    s.pack("Blocksqp::kappa_plus", kappa_plus_);
+    s.pack("Blocksqp::kappa_plus_max", kappa_plus_max_);
+    s.pack("Blocksqp::delta_h0", delta_h0_);
+    s.pack("Blocksqp::eta", eta_);
+    s.pack("Blocksqp::obj_lo", obj_lo_);
+    s.pack("Blocksqp::obj_up", obj_up_);
+    s.pack("Blocksqp::rho", rho_);
+    s.pack("Blocksqp::zeta", zeta_);
+    s.pack("Blocksqp::rp_solver", rp_solver_);
+    s.pack("Blocksqp::print_maxit_reached", print_maxit_reached_);
   }
 
 } // namespace casadi

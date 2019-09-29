@@ -59,6 +59,12 @@ namespace casadi {
     // Destructor
     ~LinsolLdl() override;
 
+    ///@{
+    /** \brief Options */
+    static const Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
     // Initialize the solver
     void init(const Dict& opts) override;
 
@@ -102,6 +108,21 @@ namespace casadi {
     // Symbolic factorization
     std::vector<casadi_int> p_;
     Sparsity sp_Lt_;
+
+    ///@{
+    // Options
+    bool incomplete_, amd_;
+    ///@}
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new LinsolLdl(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit LinsolLdl(DeserializingStream& s);
   };
 
 } // namespace casadi

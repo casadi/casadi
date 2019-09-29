@@ -28,6 +28,10 @@
 
 #include "shared_object.hpp"
 
+#ifdef CASADI_WITH_THREAD
+#include <atomic>
+#endif // CASADI_WITH_THREAD
+
 namespace casadi {
 
   /// \cond INTERNAL
@@ -35,6 +39,7 @@ namespace casadi {
   class CASADI_EXPORT SharedObjectInternal {
     friend class SharedObject;
     friend class Memory;
+    friend class UniversalNodeOwner;
   public:
 
     /// Default constructor
@@ -83,8 +88,11 @@ namespace casadi {
 
   private:
     /// Number of references pointing to the object
+#ifdef CASADI_WITH_THREAD
+    std::atomic<casadi_int> count;
+#else // CASADI_WITH_THREAD
     casadi_int count;
-
+#endif
     /// Weak pointer (non-owning) object for the object
     WeakRef* weak_ref_;
   };

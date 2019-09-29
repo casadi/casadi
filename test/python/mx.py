@@ -641,7 +641,7 @@ class MXtests(casadiTestCase):
   def test_imatrix_index(self):
     self.message("IM indexing")
     X = MX.sym("x",2,2)
-    Y = X.nz[IM([[0,2],[1,1],[3,3]])]
+    Y = X.nz[np.array([[0,2],[1,1],[3,3]])]
 
     f = Function("f", [X],[Y])
     f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),[1,2,3,4])
@@ -650,7 +650,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f_out,array([[1,3],[2,2],[4,4]]),"IM indexing")
 
     Y = X[:,:]
-    Y.nz[IM([[0,2]])] = DM([[9,8]])
+    Y.nz[np.array([[0,2]])] = DM([[9,8]])
 
     f = Function("f", [X],[Y])
     f_in = DM(f.sparsity_in(0),[1,2,3,4])
@@ -1220,7 +1220,7 @@ class MXtests(casadiTestCase):
     self.message("reshape")
     X = MX.sym("X",10)
 
-    i = IM(Sparsity.lower(3),list(range(6)))
+    i = DM(Sparsity.lower(3),list(range(6)))
 
     i.print_dense()
     print(i.T.nz[:])
@@ -1231,19 +1231,19 @@ class MXtests(casadiTestCase):
     f = Function("f", [X], [q])
     f_out = f(list(range(10)))
 
-    self.checkarray(IM([0,1,9,4,16,25]),f_out)
+    self.checkarray(DM([0,1,9,4,16,25]),f_out)
 
     Y = MX.sym("Y",10)
 
     ff = Function("ff", [Y],f.call([Y],True))
     ff_out = ff(list(range(10)))
 
-    self.checkarray(IM([0,1,9,4,16,25]),ff_out)
+    self.checkarray(DM([0,1,9,4,16,25]),ff_out)
 
     J = Function("J", [X],[jacobian(q, X)])
     J_out = J(list(range(10)))
 
-    i = horzcat(*[diag([0,2,4,6,8,10]),IM.zeros(6,4)])
+    i = horzcat(*[diag([0,2,4,6,8,10]),DM.zeros(6,4)])
     i[[2,3],:] = i[[3,2],:]
 
     self.checkarray(i,J_out)
@@ -1253,7 +1253,7 @@ class MXtests(casadiTestCase):
     J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 
-    i = horzcat(*[diag([0,2,4,6,8,10]),IM.zeros(6,4)])
+    i = horzcat(*[diag([0,2,4,6,8,10]),DM.zeros(6,4)])
     i[[2,3],:] = i[[3,2],:]
 
     self.checkarray(i,J_out)
@@ -1268,7 +1268,7 @@ class MXtests(casadiTestCase):
     f_in = [0]*f.n_in();f_in[0]=list(range(10))
     f_out = f.call(f_in)
 
-    self.checkarray(IM([16,4]),f_out[0])
+    self.checkarray(DM([16,4]),f_out[0])
 
     Y = MX.sym("Y",10)
 
@@ -1276,12 +1276,12 @@ class MXtests(casadiTestCase):
     ff_in = [0]*ff.n_in();ff_in[0]=list(range(10))
     ff_out = ff(*ff_in)
 
-    self.checkarray(IM([16,4]),ff_out)
+    self.checkarray(DM([16,4]),ff_out)
     J = Function("J", [X],[jacobian(q,X)])
     J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 
-    i = IM.zeros(2,10)
+    i = DM.zeros(2,10)
     i[0,4] = 8
     i[1,2] = 4
 
@@ -1338,7 +1338,7 @@ class MXtests(casadiTestCase):
     B_ = DM([[1,2,3,4,5],[6,7,8,9,10]])
     B = MX.sym("B",2,5)
 
-    A = IM([[1,1,0,0,0],[0,0,1,0,0]])
+    A = DM([[1,1,0,0,0],[0,0,1,0,0]])
     A = sparsify(A)
     sp = A.sparsity()
     import copy
@@ -1419,7 +1419,7 @@ class MXtests(casadiTestCase):
     f_out = f(*f_in)
     g_out = g(*g_in)
 
-    self.checkarray(IM.ones(filt),IM.ones(g.sparsity_out(0)))
+    self.checkarray(DM.ones(filt),DM.ones(g.sparsity_out(0)))
 
     self.checkarray(f_out[filt],g_out)
 
@@ -1626,8 +1626,8 @@ class MXtests(casadiTestCase):
             rr = f(v)
             self.checkarray(rr,numpyop(x_))
 
-            a = IM(f.sparsity_out(0),1)
-            b = IM.ones(DM(numpyop(x_)).sparsity())
+            a = DM(f.sparsity_out(0),1)
+            b = DM.ones(DM(numpyop(x_)).sparsity())
 
             c = b-a
             if c.nnz()>0:
@@ -1661,8 +1661,8 @@ class MXtests(casadiTestCase):
 
 
                 if "mul" not in name:
-                  a = IM.ones(f.sparsity_out(0))
-                  b = IM.ones(g.sparsity_out(0))
+                  a = DM.ones(f.sparsity_out(0))
+                  b = DM.ones(g.sparsity_out(0))
 
                   c = b-a
                   if c.nnz()>0:
@@ -1692,8 +1692,8 @@ class MXtests(casadiTestCase):
 
             self.checkarray(r.to_DM(),numpyop(x_),str([x_,name]))
 
-            a = IM.ones(r.to_DM().sparsity())
-            b = IM.ones(DM(numpyop(x_)).sparsity())
+            a = DM.ones(r.to_DM().sparsity())
+            b = DM.ones(DM(numpyop(x_)).sparsity())
 
             c = b-a
             if c.nnz()>0:
@@ -1717,8 +1717,8 @@ class MXtests(casadiTestCase):
 
                 self.checkarray(f_out[0],numpyop([x1_,x2_]),str([sp,sp2,v1,v2,name]))
                 if "mul" not in name and "mtimes" not in name:
-                  a = IM.ones(f.sparsity_out(0))
-                  b = IM.ones(DM(numpyop([x1_,x2_])).sparsity())
+                  a = DM.ones(f.sparsity_out(0))
+                  b = DM.ones(DM(numpyop([x1_,x2_])).sparsity())
 
                   c = b-a
                   if c.nnz()>0:
@@ -1815,7 +1815,10 @@ class MXtests(casadiTestCase):
     f_out = f(f_in)
 
     self.checkarray(f_out,DM([[1,0,0],[0,4,0],[0,0,6]]))
-    self.checkarray(IM.ones(f.sparsity_out(0)),IM.ones(Sparsity.lower(3).T))
+    self.checkarray(DM.ones(f.sparsity_out(0)),DM.ones(Sparsity.lower(3).T))
+
+    self.check_codegen(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
+    self.check_serialize(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
 
   def test_repmat(self):
     a = DM([[1,2],[3,4],[5,6]])
@@ -2187,7 +2190,7 @@ class MXtests(casadiTestCase):
 
     sp = Sparsity.triplet(3,3,[0,1,2,2],[0,0,1,2])
 
-    f = Function("f", [x],[x.nz[IM(sp,list(range(sp.nnz())))]])
+    f = Function("f", [x],[x.nz[DM(sp,list(range(sp.nnz())))]])
 
     g = Function("g", [x],[MX(sp,x)])
 
@@ -2265,6 +2268,17 @@ class MXtests(casadiTestCase):
     z = jacobian(x,y)
 
     self.assertTrue(z.nnz()==0)
+
+  def test_expand_free(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+    f = Function('f',[x],[x+y])
+    with self.assertInException("free"):
+      f.expand()
+
+    g = Function('g',[x,y],[f(x)])
+    ge = g.expand()
+    self.checkfunction(g,g,inputs=[1,2])
 
   def test_singularcat(self):
 
@@ -2709,5 +2723,165 @@ class MXtests(casadiTestCase):
   def test_doc_expression_tools(self):
     self.assertTrue("Given a repeated matrix, computes the sum of repeated parts." in repsum.__doc__)
 
+  def test_densify(self):
+    I = sparsify(DM([[0,1,0,1],[1,1,0,1],[0,1,1,0]])).sparsity()
+
+    x = MX.sym("x",I)
+
+    f = Function("f",[x],[densify(x)])
+
+    a = DM([[0,1,0,2],[3,4,0,5],[0,6,7,0]])
+
+    y = f(sparsify(a))
+    self.assertTrue(y.sparsity()==a.sparsity())
+    self.checkarray(y,a)
+
+    self.check_codegen(f,inputs=[a])
+
+
+    x = MX.sym("x",3,4)
+
+    f = Function("f",[x],[x[I]])
+
+    a = DM([[0,1,0,2],[3,4,0,5],[0,6,7,0]])
+    b = sparsify(a)
+    a = DM([[9,1,9,2],[3,4,9,5],[9,6,7,9]])
+
+    y = f(a)
+    self.assertTrue(y.sparsity()==b.sparsity())
+    self.checkarray(y,b)
+
+    self.check_codegen(f,inputs=[a])
+    self.check_serialize(f,inputs=[a])
+
+  def test_constant_from_file(self):
+
+    open("test.txt", "w").write("5.6 1e-5")
+    with self.assertInException("Failed to read a double from 'test.txt'. Expected 3 doubles."):
+      x = MX(Sparsity.lower(2), "test.txt")
+
+    open("test.txt", "w").write("5.6 abc 1e-5")
+    with self.assertInException("Failed to read a double from 'test.txt'. Expected 3 doubles."):
+      x = MX(Sparsity.lower(2), "test.txt")
+
+    with self.assertInException("Cannot open file 'testQWHAL567p.txt'."):
+      x = MX(Sparsity.lower(2), "testQWHAL567p.txt")
+
+    open("test.txt", "w").write("5.6 1e-5 -12")
+    x = MX(Sparsity.lower(2), "test.txt")
+
+    a = MX.sym("a")
+
+    f = Function("f",[a],[a*x])
+    self.checkarray(f(2),DM(Sparsity.lower(2),[2*5.6,2*1e-5,-2*12]))
+
+    self.check_codegen(f,inputs=[2])
+
+    with self.assertInException("Not defined for ConstantFile"):
+      x.to_DM()
+  
+  def test_nonzeros_param(self):
+    x = MX.sym("x",2)
+    y = MX.sym("y")
+  
+    for ad_weight_sp in [0,1]:
+      opts = {"helper_options":{"ad_weight_sp":ad_weight_sp}}
+      z = x.nz[y]
+      J = jacobian(z,x,opts)
+      self.assertTrue(J.size()==(1,2))
+      self.assertTrue(J.nnz()==2)
+      J = jacobian(z,y,opts)
+      self.assertTrue(J.size()==(1,1))
+      self.assertTrue(J.nnz()==0)
+
+      q = MX.sym("q")
+      z = MX(x)
+      z.nz[y] = q
+
+      J = jacobian(z,x,opts)
+      self.assertTrue(J.size()==(2,2))
+      self.assertTrue(J.nnz()==4)
+      J = jacobian(z,y,opts)
+      self.assertTrue(J.size()==(2,1))
+      self.assertTrue(J.nnz()==0)
+      J = jacobian(z,q,opts)
+      self.assertTrue(J.size()==(2,1))
+      self.assertTrue(J.nnz()==2)
+
+  def test_low(self):
+    v = MX.sym("v",5)
+    p0 = [-1,0,0.2,1,1.3,2,2.5,3,3.5,4,4.5]
+    p = MX.sym("p",len(p0))
+
+
+    f = Function("f",[v,p],[low(v, p)])
+
+    inputs = [list(range(5)),p0]
+    self.check_codegen(f,inputs=inputs)
+    self.check_serialize(f,inputs=inputs)
+
+    self.checkarray(f(*inputs),DM([0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3]))
+
+  def test_linear_interpn(self):
+    N = 4
+    n_dim=1
+    nq = 3
+    n_out = 2
+    grid = []
+    x0 = []
+    for i in range(n_dim):
+      g = sorted(list(np.random.random(N)))
+      grid.append(g)
+      x0.append(np.linspace(g[0],g[-1],nq+2)[1:-1])
+
+    x0r = list(zip(*x0))
+
+    D = np.random.random([n_out]+[N]*n_dim)
+
+    d = D.ravel(order='F')
+
+    strides = [n_out]
+    for i in range(n_dim):
+      strides.append(strides[-1]*N)
+
+    F = interpolant('F', 'linear', grid, d)
+    
+    ref = vcat([F(x).T for x in x0r])
+
+    x = [MX.sym("x%d" % i,1,N) for i in range(n_dim)]
+    v = MX.sym("v",N**n_dim*n_out)
+    xq = [MX.sym("xq%d" % i,nq) for i in range(n_dim)]
+
+    e = MX.interpn_linear(x,v,xq)
+
+    f = Function('f',[hcat(x),v,vcat(xq)],[e])
+    inputs = [hcat([hcat(e) for e in grid]),d,vcat(x0)]
+    r = f(*inputs)
+    self.checkarray(r, ref)
+    self.check_codegen(f,inputs=inputs,std="c99")
+    self.check_serialize(f,inputs=inputs)
+
+  def test_paramslice(self):
+    N = 4
+    M = 6
+    A = DM.rand(N,M)
+    As = MX.sym("A", A.shape)
+    vr=list(range(N))
+    vc=list(range(M))
+    for r in [1, slice(1,3), slice(0,N,2), slice(None)]:
+      rs = MX.sym("r",A[r,:].shape[0])
+      for c in [1, slice(1,3), slice(0,M,2), slice(None)]:
+        cs = MX.sym("c",A[:,c].shape[1])
+        for rr in [r, rs]:
+          for cc in [c, cs]:
+            f = Function('f',[As,rs,cs],[As[rr,cc]])
+            self.checkarray(f(A,vr[r],vc[c]),A[r,c])
+
+  def test_mapping(self):
+    A = MX.sym("A",4,4)
+    i = DM([[0,3],[1,2]])
+    self.checkarray(i,A[i].mapping())
+
+    
 if __name__ == '__main__':
     unittest.main()

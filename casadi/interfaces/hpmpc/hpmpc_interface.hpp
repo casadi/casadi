@@ -143,7 +143,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -160,7 +160,8 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<HpmpcMemory*>(mem);}
 
     /** \brief  Evaluate numerically */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief Helper function */
     static void mproject(double factor, const double* x, const casadi_int* sp_x,
@@ -196,7 +197,7 @@ namespace casadi {
     };
 
     static Sparsity blocksparsity(casadi_int rows, casadi_int cols,
-                                   const std::vector<Block>& b, bool eye=false);
+                                   const std::vector<Block>& blocks, bool eye=false);
     static void blockptr(std::vector<double *>& vs, std::vector<double>& v,
       const std::vector<Block>& blocks, bool eye=false);
     Sparsity Asp_, Bsp_, Csp_, Dsp_, Isp_, Rsp_, Ssp_, Qsp_, bsp_, lugsp_, usp_, xsp_;

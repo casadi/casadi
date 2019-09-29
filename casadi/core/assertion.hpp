@@ -40,7 +40,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    Assertion(const MX& x, const MX& y, const std::string & s);
+    Assertion(const MX& x, const MX& y, const std::string & fail_message);
 
     /// Destructor
     ~Assertion() override {}
@@ -81,6 +81,16 @@ namespace casadi {
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new Assertion(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Assertion(DeserializingStream& s);
 
   private:
     std::string fail_message_;

@@ -24,6 +24,7 @@
 
 
 #include "switch.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -37,7 +38,25 @@ namespace casadi {
     casadi_assert_dev(!f_.empty());
   }
 
+  void Switch::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+    s.version("Switch", 1);
+    s.pack("Switch::f", f_);
+    s.pack("Switch::f_def", f_def_);
+    s.pack("Switch::project_in", project_in_);
+    s.pack("Switch::project_out", project_out_);
+  }
+
+  Switch::Switch(DeserializingStream& s) : FunctionInternal(s) {
+    s.version("Switch", 1);
+    s.unpack("Switch::f", f_);
+    s.unpack("Switch::f_def", f_def_);
+    s.unpack("Switch::project_in", project_in_);
+    s.unpack("Switch::project_out", project_out_);
+  }
+
   Switch::~Switch() {
+    clear_mem();
   }
 
   size_t Switch::get_n_in() {
@@ -446,7 +465,7 @@ namespace casadi {
           const Sparsity& sp = sparsity_out_[i];
           if (f_sp!=sp) {
             g << g.project("res1[" + str(i) + "]", f_sp,
-                           "res[" + str(i) + "]", sp, "w") << "\n";
+                           g.res(i), sp, "w") << "\n";
           }
         }
 

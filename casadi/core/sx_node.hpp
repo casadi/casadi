@@ -27,9 +27,9 @@
 #define CASADI_SX_NODE_HPP
 
 #include <iostream>
-#include <string>
-#include <sstream>
 #include <math.h>
+#include <sstream>
+#include <string>
 
 /** \brief  Scalar expression (which also works as a smart pointer class to this class) */
 #include "sx_elem.hpp"
@@ -45,7 +45,7 @@ namespace casadi {
   class SXNode {
     friend class SXElem;
     friend class Matrix<SXElem>;
-
+    friend class UniversalNodeOwner;
   public:
 
     /** \brief  constructor */
@@ -119,7 +119,7 @@ namespace casadi {
     void mark() const;
 
     /** \brief Non-recursive delete */
-    static void safe_delete(SXNode* node);
+    static void safe_delete(SXNode* n);
 
     // Depth when checking equalities
     static casadi_int eq_depth_;
@@ -132,6 +132,16 @@ namespace casadi {
 
     // Reference counter -- counts the number of parents of the node
     unsigned int count;
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    virtual void serialize_node(SerializingStream& s) const;
+
+    static SXNode* deserialize(DeserializingStream& s);
+
+    static std::map<casadi_int, SXNode* (*)(DeserializingStream&)> deserialize_map;
+
 
   };
 

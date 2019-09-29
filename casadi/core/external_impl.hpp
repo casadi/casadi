@@ -45,7 +45,9 @@
 
 /// \cond INTERNAL
 
+
 namespace casadi {
+
   class CASADI_EXPORT External : public FunctionInternal {
   protected:
     /** \brief Information about the library */
@@ -59,6 +61,9 @@ namespace casadi {
 
     /** \brief Names of inputs and outputs */
     name_t get_name_in_, get_name_out_;
+
+    /** \brief Get default inputs */
+    default_t get_default_in_;
 
     /** \brief Work vector sizes */
     work_t work_;
@@ -77,6 +82,9 @@ namespace casadi {
     /** \brief Destructor */
     ~External() override = 0;
 
+    /** \brief Any symbol found? */
+    virtual bool any_symbol_found() const;
+
     // Factory
     Function factory(const std::string& name,
                              const std::vector<std::string>& s_in,
@@ -86,6 +94,9 @@ namespace casadi {
 
     /** \brief Get type name */
     std::string class_name() const override { return "External";}
+
+    /** \brief Initialize members that are unique */
+    virtual void init_external();
 
     /// Initialize
     void init(const Dict& opts) override;
@@ -101,6 +112,9 @@ namespace casadi {
     size_t get_n_in() override;
     size_t get_n_out() override;
     ///@}
+
+    /** \brief Default inputs */
+    double get_default_in(casadi_int i) const override;
 
     ///@{
     /** \brief Names of function input and outputs */
@@ -134,16 +148,24 @@ namespace casadi {
                                      const std::vector<std::string>& onames,
                                      const Dict& opts) const override;
     ///@}
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "External"; }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit External(DeserializingStream& s);
   };
 
   class CASADI_EXPORT GenericExternal : public External {
     // Sparsities
     sparsity_t get_sparsity_in_, get_sparsity_out_;
-
-    // Memory allocation
-    alloc_mem_t alloc_mem_;
-    init_mem_t init_mem_;
-    free_mem_t free_mem_;
 
   public:
     /** \brief Constructor */
@@ -151,6 +173,12 @@ namespace casadi {
 
     /** \brief  Destructor */
     ~GenericExternal() override { this->clear_mem();}
+
+    /** \brief Any symbol found? */
+    bool any_symbol_found() const override;
+
+    /** \brief Initialize members that are unique */
+    void init_external() override;
 
     /// Initialize
     void init(const Dict& opts) override;
@@ -161,14 +189,12 @@ namespace casadi {
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
-    /** \brief Create memory block */
-    void* alloc_mem() const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
 
-    /** \brief Initalize memory block */
-    int init_mem(void* mem) const override;
+    /** \brief Deserializing constructor */
+    explicit GenericExternal(DeserializingStream& s);
 
-    /** \brief Free memory block */
-    void free_mem(void *mem) const override;
   };
 
 

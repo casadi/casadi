@@ -114,8 +114,10 @@ classes0 = {}
 symnameToName = {}
 for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
-  symname = c.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
-
+  try:
+    symname = c.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
+  except:
+    continue
   if name == "casadi::"+symname:
     pass
   else:
@@ -172,8 +174,8 @@ def getCanonicalParams(d,debug=""):
   params = []
   if d.find('attributelist/parmlist') is not None:
     for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]'):
-       name = x.findall('../attribute[@name="name"]')[0].attrib['value']
-    params.append( (getCanonicalType(x.attrib['value']),"Output" if name=="OUTPUT" else "Normal") )
+      name = x.findall('../attribute[@name="name"]')[0].attrib['value']
+      params.append( (getCanonicalType(x.attrib['value']),"Output" if name=="OUTPUT" else "Normal") )
 
   return params
 print("elpased", time.time()-t0)
@@ -213,7 +215,7 @@ for name,c in classes0.items():
     storage = getAttribute(d,"storage")
 
     access = getAttribute(d,"access")
-    if access=="private": continue
+    if access in ["private", "protected"]: continue
 
     if dname == "ptr": continue # WORKAROUND FOR POTENTIAL SWIG BUG
 
@@ -235,7 +237,7 @@ for name,c in classes0.items():
 
     rettype = name
     access = getAttribute(d,"access")
-    if access=="private": continue
+    if access in ["private", "protected"]: continue
 
     if is_internal(d,msg="constructors"):
       numInternalConstructors += 1
@@ -304,7 +306,6 @@ for d in r.findall('*//namespace/cdecl'):
                     'funParams':params,
                     'funReturn':rettype,
                     'funDocs':"",#docs,
-                    'funDocslink':"",
                     'funFriendwrap':friendwrap})
 
 
@@ -339,9 +340,9 @@ for k,v in classes.items():
   methods = []
   if "methods" in v:
     for (name,pars,rettype,mkind,docs) in getAllMethods(k): # v["methods"]:
-      methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":"","methodDocslink":""})
+      methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":""})
 
-  treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": v['docs'],"classDocslink":""})
+  treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": v['docs']})
 print("elpased", time.time()-t0)
 t0 = time.time()
 print("functions")
@@ -352,9 +353,8 @@ print("enums")
 for k,v in enums.items():
   treedata["treeEnums"][k] = {
     "enumDocs": v['docs'],
-    "enumDocslink": "",
     "enumEntries": dict(
-       (kk , {"enumEntryDocs": vv["docs"],"enumEntryDocslink":"","enumEntryVal": vv["ev"]})
+       (kk , {"enumEntryDocs": vv["docs"],"enumEntryVal": vv["ev"]})
           for kk,vv in v["entries"].items())
   }
 print("%5d classes %5d functions %5d enums" % (len(treedata['treeClasses']),

@@ -50,11 +50,16 @@ namespace casadi {
     /// Destructor
     ~Interpolant() override;
 
+    /** \brief Get type name */
+    std::string class_name() const override {return "Interpolant";}
+
     ///@{
     /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return 1;}
+    size_t get_n_in() override { return 1+has_parametric_values()+has_parametric_grid();}
     size_t get_n_out() override { return 1;}
     ///@}
+
+    bool is_diff_in(casadi_int i) override { return i==0; }
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
@@ -70,7 +75,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -83,7 +88,13 @@ namespace casadi {
         const std::vector<casadi_int>& margin_left=std::vector<casadi_int>(),
         const std::vector<casadi_int>& margin_right=std::vector<casadi_int>());
 
-    static std::vector<std::string> lookup_mode_from_enum(const std::vector<casadi_int>& modes);
+    static void stack_grid(const std::vector< std::vector<double> >& grid,
+      std::vector<casadi_int>& offset, std::vector<double>& stacked);
+
+    static void check_grid(const std::vector< std::vector<double> >& grid);
+    static void check_grid(const std::vector<casadi_int>& grid);
+
+    static std::vector<double> meshgrid(const std::vector< std::vector<double> >& grid);
 
     // Creator function for internal class
     typedef Interpolant* (*Creator)(const std::string& name,
@@ -92,8 +103,23 @@ namespace casadi {
                                     const std::vector<double>& values,
                                     casadi_int m);
 
+    /** \brief  Comstruct a new Interpolant */
+    static Function construct(const std::string& solver, const std::string& name,
+                      const std::vector<double>& grid,
+                      const std::vector<casadi_int>& offset,
+                      const std::vector<double>& values,
+                      casadi_int m,
+                      const Dict& opts);
+
+    typedef Function (* DoInline)(const std::string& name,
+                    const std::vector<double>& grid,
+                    const std::vector<casadi_int>& offset,
+                    const std::vector<double>& values,
+                    casadi_int m,
+                    const Dict& opts);
+
     // No static functions exposed
-    struct Exposed{ };
+    struct Exposed{ DoInline do_inline; };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
@@ -118,6 +144,39 @@ namespace casadi {
 
     // Lookup modes
     std::vector<std::string> lookup_modes_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Interpolant"; }
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
+    /** \brief Is parametric? */
+    bool has_parametric_values() const { return values_.empty(); }
+
+    /** \brief Is parametric? */
+    bool has_parametric_grid() const { return grid_.empty(); }
+
+    casadi_int arg_values() const;
+    casadi_int arg_grid() const;
+
+    /** \brief Size of the flattened coefficients vector */
+    casadi_int coeff_size() const;
+    static casadi_int coeff_size(const std::vector<casadi_int>& offset, casadi_int m);
+
+  protected:
+
+    bool arg_values(casadi_int i) const;
+    bool arg_grid(casadi_int i) const;
+
+    /** \brief Deserializing constructor */
+    explicit Interpolant(DeserializingStream& s);
+
+
   };
 
 } // namespace casadi

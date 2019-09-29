@@ -26,10 +26,22 @@
 #include "split.hpp"
 #include "casadi_misc.hpp"
 #include "global_options.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
 namespace casadi {
+
+  Split::Split(DeserializingStream& s) : MultipleOutput(s) {
+    s.unpack("Split::offset", offset_);
+    s.unpack("Split::output_sparsity", output_sparsity_);
+  }
+
+  void Split::serialize_body(SerializingStream& s) const {
+    MultipleOutput::serialize_body(s);
+    s.pack("Split::offset", offset_);
+    s.pack("Split::output_sparsity", output_sparsity_);
+  }
 
   Split::Split(const MX& x, const std::vector<casadi_int>& offset) : offset_(offset) {
     set_dep(x);

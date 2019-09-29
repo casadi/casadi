@@ -99,6 +99,7 @@ class MyCallback(Callback):
     if hasattr(self,'lines'):
       if "template" not in matplotlib.get_backend(): # Broken for template: https://github.com/matplotlib/matplotlib/issues/8516/
         self.lines[0].set_data(self.x_sols,self.y_sols)
+
     else:
       self.lines = plot(self.x_sols,self.y_sols,'or-')
 

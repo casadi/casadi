@@ -38,6 +38,7 @@ namespace casadi {
     plugin->doc = Ma27Interface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Ma27Interface::options_;
+    plugin->deserialize = &Ma27Interface::deserialize;
     return 0;
   }
 

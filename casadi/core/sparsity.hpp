@@ -40,6 +40,8 @@
 namespace casadi {
   // Forward declaration
   class SparsityInternal;
+  class SerializingStream;
+  class DeserializingStream;
 
   #ifndef SWIG
     /** \brief Compact representation of a sparsity pattern */
@@ -124,6 +126,8 @@ namespace casadi {
     using B::diagsplit;
     using B::vertsplit;
     using B::mtimes;
+
+    SparsityInternal* get() const;
 #endif
 
     /** \brief Create a scalar sparsity pattern **/
@@ -337,9 +341,6 @@ namespace casadi {
     /** Obtain information about sparsity */
     Dict info() const;
 
-    /** Construct instance from info */
-    static Sparsity from_info(const Dict& info);
-
     /** Export sparsity pattern to file
     *
     * Supported formats:
@@ -358,10 +359,16 @@ namespace casadi {
     std::string serialize() const;
 
     /** \brief Build Sparsity from serialization */
-    static Sparsity deserialize(std::istream& istream);
+    static Sparsity deserialize(std::istream& stream);
 
     /** \brief Build Sparsity from serialization */
     static Sparsity deserialize(const std::string& s);
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    /** \brief Deserialize */
+    static Sparsity deserialize(DeserializingStream& s);
 
 #ifndef SWIG
     /** \brief Get a reference to row-vector,
@@ -481,10 +488,10 @@ namespace casadi {
         the second bit indicates if the second argument is nonzero (note that none of,
         one of or both of the arguments can be nonzero) */
 #ifndef SWIG
-    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero,
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
                             std::vector<unsigned char>& mapping) const;
 #endif // SWIG
-    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
     /// @}
 
     /// @{
@@ -509,6 +516,9 @@ namespace casadi {
     Sparsity intersect(const Sparsity& y) const;
     Sparsity operator*(const Sparsity& b) const;
     /// @}
+
+    /// Is subset?
+    bool is_subset(const Sparsity& rhs) const;
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity pattern_inverse() const;
@@ -540,9 +550,9 @@ namespace casadi {
     static Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
     static Sparsity diagcat(const std::vector< Sparsity > &v);
     static std::vector<Sparsity>
-      horzsplit(const Sparsity& x, const std::vector<casadi_int>& output_offset);
+      horzsplit(const Sparsity& x, const std::vector<casadi_int>& offset);
     static std::vector<Sparsity>
-      vertsplit(const Sparsity& x, const std::vector<casadi_int>& output_offset);
+      vertsplit(const Sparsity& x, const std::vector<casadi_int>& offset);
     static std::vector<Sparsity>
       diagsplit(const Sparsity& x,
                 const std::vector<casadi_int>& offset1,
@@ -552,8 +562,8 @@ namespace casadi {
     static Sparsity reshape(const Sparsity& x, casadi_int nrow, casadi_int ncol);
     static Sparsity reshape(const Sparsity& x, const Sparsity& sp);
     static casadi_int sprank(const Sparsity& x);
-    static casadi_int norm_0_mul(const Sparsity& x, const Sparsity& B);
-    static Sparsity kron(const Sparsity& x, const Sparsity& b);
+    static casadi_int norm_0_mul(const Sparsity& x, const Sparsity& A);
+    static Sparsity kron(const Sparsity& a, const Sparsity& b);
     static Sparsity triu(const Sparsity& x, bool includeDiagonal=true);
     static Sparsity tril(const Sparsity& x, bool includeDiagonal=true);
 
@@ -895,7 +905,8 @@ namespace casadi {
     template<typename T>
     void bor(T* data, const T* val_data, const Sparsity& val_sp) const;
 
-    static std::string file_format(const std::string& filename, const std::string& format_hint);
+    static std::string file_format(const std::string& filename,
+      const std::string& format_hint, const std::set<std::string>& file_formats);
     static std::set<std::string> file_formats;
   private:
 

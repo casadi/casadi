@@ -24,6 +24,7 @@
 
 
 #include "io_instruction.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -43,7 +44,7 @@ namespace casadi {
                        const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
     casadi_int nnz = this->nnz();
     if (nnz==0) return; // quick return
-    string a = "arg[" + str(ind_) + "]";
+    string a = g.arg(ind_);
     casadi_int i = res.front();
     if (nnz==1) {
       g << g.workel(i) << " = " << a << " ? " << a << "[" << offset_ << "] : 0;\n";
@@ -71,7 +72,7 @@ namespace casadi {
     casadi_int nnz = dep().nnz();
     if (nnz==0) return; // quick return
     casadi_int i = arg.front();
-    string r = "res[" + str(ind_) + "]";
+    string r = g.res(ind_);
     if (nnz==1) {
       g << "if (" << r << ") " << r << "[" << offset_ << "] = " << g.workel(i) << ";\n";
     } else if (offset_==0) {
@@ -91,5 +92,17 @@ namespace casadi {
     return ret;
   }
 
+  void IOInstruction::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("IOInstruction::ind", ind_);
+    s.pack("IOInstruction::segment", segment_);
+    s.pack("IOInstruction::offset", offset_);
+  }
+
+  IOInstruction::IOInstruction(DeserializingStream& s) : MXNode(s) {
+    s.unpack("IOInstruction::ind", ind_);
+    s.unpack("IOInstruction::segment", segment_);
+    s.unpack("IOInstruction::offset", offset_);
+  }
 
 } // namespace casadi

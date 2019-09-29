@@ -25,9 +25,10 @@
 
 #include "external_impl.hpp"
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 namespace casadi {
@@ -50,17 +51,30 @@ namespace casadi {
   External::External(const std::string& name, const Importer& li)
     : FunctionInternal(name), li_(li) {
 
+    External::init_external();
+  }
+
+  bool External::any_symbol_found() const {
+    return incref_ || decref_ || get_default_in_ ||
+      get_n_in_ || get_n_out_ || get_name_in_ ||
+      get_name_out_ || work_;
+  }
+
+  void External::init_external() {
     // Increasing/decreasing reference counter
     incref_ = (signal_t)li_.get_function(name_ + "_incref");
     decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
+    // Getting default arguments
+    get_default_in_ = (default_t)li_.get_function(name_ + "_default_in");
+
     // Getting number of inputs and outputs
-    get_n_in_ = (getint_t)li_.get_function(name + "_n_in");
-    get_n_out_ = (getint_t)li_.get_function(name + "_n_out");
+    get_n_in_ = (getint_t)li_.get_function(name_ + "_n_in");
+    get_n_out_ = (getint_t)li_.get_function(name_ + "_n_out");
 
     // Getting names of inputs and outputs
-    get_name_in_ = (name_t)li_.get_function(name + "_name_in");
-    get_name_out_ = (name_t)li_.get_function(name + "_name_out");
+    get_name_in_ = (name_t)li_.get_function(name_ + "_name_in");
+    get_name_out_ = (name_t)li_.get_function(name_ + "_name_out");
 
     // Work vector sizes
     work_ = (work_t)li_.get_function(name_ + "_work");
@@ -72,14 +86,25 @@ namespace casadi {
   GenericExternal::GenericExternal(const std::string& name, const Importer& li)
     : External(name, li) {
 
-    // Functions for retrieving sparsities of inputs and outputs
-    get_sparsity_in_ = (sparsity_t)li_.get_function(name + "_sparsity_in");
-    get_sparsity_out_ = (sparsity_t)li_.get_function(name + "_sparsity_out");
+    GenericExternal::init_external();
+  }
 
-    // Memory allocation functions
-    alloc_mem_ = (alloc_mem_t)li_.get_function(name_ + "_alloc_mem");
-    init_mem_ = (init_mem_t)li_.get_function(name_ + "_init_mem");
-    free_mem_ = (free_mem_t)li_.get_function(name_ + "_free_mem");
+  bool GenericExternal::any_symbol_found() const {
+    return External::any_symbol_found() ||
+      get_sparsity_in_ || get_sparsity_out_ ||
+      checkout_ || release_ ||
+      eval_;
+  }
+
+  void GenericExternal::init_external() {
+
+    // Functions for retrieving sparsities of inputs and outputs
+    get_sparsity_in_ = (sparsity_t)li_.get_function(name_ + "_sparsity_in");
+    get_sparsity_out_ = (sparsity_t)li_.get_function(name_ + "_sparsity_out");
+
+    // Memory management functions
+    checkout_ = (casadi_checkout_t) li_.get_function(name_ + "_checkout");
+    release_ = (casadi_release_t) li_.get_function(name_ + "_release");
 
     // Function for numerical evaluation
     eval_ = (eval_t)li_.get_function(name_);
@@ -109,6 +134,15 @@ namespace casadi {
     } else {
       // Fall back to base class
       return FunctionInternal::get_n_out();
+    }
+  }
+
+  double External::get_default_in(casadi_int i) const {
+    if (get_default_in_) {
+      return get_default_in_(i);
+    } else {
+      // Fall back to base class
+      return FunctionInternal::get_default_in(i);
     }
   }
 
@@ -166,33 +200,13 @@ namespace casadi {
     }
   }
 
-  void* GenericExternal::alloc_mem() const {
-    if (alloc_mem_) {
-      return alloc_mem_();
-    } else {
-      return FunctionInternal::alloc_mem();
-    }
-  }
-
-  int GenericExternal::init_mem(void* mem) const {
-    if (init_mem_) {
-      return init_mem_(mem);
-    } else {
-      return FunctionInternal::init_mem(mem);
-    }
-  }
-
-  void GenericExternal::free_mem(void *mem) const {
-    if (free_mem_) {
-      return free_mem_(mem);
-    } else {
-      return FunctionInternal::free_mem(mem);
-    }
-  }
-
   void External::init(const Dict& opts) {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
+
+    casadi_assert(any_symbol_found(),
+      "Could not find any function/symbol starting with '" + name_ + "_'. "
+      "Make sure to read documentation of `external()` for proper usage.");
 
     // Reference counting?
     has_refcount_ = li_.has_function(name_ + "_incref");
@@ -348,4 +362,44 @@ namespace casadi {
     return ret;
   }
 
+  void External::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+
+    s.version("External", 1);
+    s.pack("External::int_data", int_data_);
+    s.pack("External::real_data", real_data_);
+    s.pack("External::string_data", string_data_);
+    s.pack("External::li", li_);
+  }
+
+  ProtoFunction* External::deserialize(DeserializingStream& s) {
+    s.version("GenericExternal", 1);
+    char type;
+    s.unpack("GenericExternal::type", type);
+    switch (type) {
+      case 'g': return new GenericExternal(s);
+      default:
+        casadi_error("External::deserialize error");
+    }
+  }
+
+  void GenericExternal::serialize_type(SerializingStream &s) const {
+    FunctionInternal::serialize_type(s);
+    s.version("GenericExternal", 1);
+    s.pack("GenericExternal::type", 'g');
+  }
+
+  External::External(DeserializingStream & s) : FunctionInternal(s) {
+    s.version("External", 1);
+    s.unpack("External::int_data", int_data_);
+    s.unpack("External::real_data", real_data_);
+    s.unpack("External::string_data", string_data_);
+    s.unpack("External::li", li_);
+
+    External::init_external();
+  }
+
+  GenericExternal::GenericExternal(DeserializingStream& s) : External(s) {
+    GenericExternal::init_external();
+  }
 } // namespace casadi

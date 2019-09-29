@@ -27,6 +27,7 @@
 #define CASADI_CONSTANT_SX_HPP
 
 #include "sx_node.hpp"
+#include "serializing_stream.hpp"
 #include <cassert>
 
 /// \cond INTERNAL
@@ -124,6 +125,11 @@ class RealtypeSX : public ConstantSX {
 
     bool is_almost_zero(double tol) const override { return fabs(value)<=tol; }
 
+    void serialize_node(SerializingStream& s) const override {
+      s.pack("ConstantSX::type", 'r');
+      s.pack("ConstantSX::value", value);
+    }
+
   protected:
     /** \brief Hash map of all constants currently allocated
      * (storage is allocated for it in sx_element.cpp) */
@@ -184,6 +190,11 @@ class IntegerSX : public ConstantSX {
     /** \brief  Properties */
     bool is_integer() const override { return true; }
 
+    void serialize_node(SerializingStream& s) const override {
+      s.pack("ConstantSX::type", 'i');
+      s.pack("ConstantSX::value", value);
+    }
+
   protected:
 
     /** \brief Hash map of all constants currently allocated
@@ -199,11 +210,17 @@ class IntegerSX : public ConstantSX {
   \date 2010
 */
 class ZeroSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit ZeroSX() {this->count++;}
 public:
-
-  ~ZeroSX() override {}
-  explicit ZeroSX() {}
-
+  /* Get singleton instance */
+  static ZeroSX* singleton() {
+    static ZeroSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~ZeroSX() override {this->count--;}
   ///@{
   /** \brief  Get the value */
   double to_double() const override { return 0;}
@@ -216,6 +233,10 @@ public:
   bool is_zero() const override { return true; }
   bool is_almost_zero(double tol) const override { return true; }
   ///@}
+
+  void serialize_node(SerializingStream& s) const override {
+    s.pack("ConstantSX::type", '0');
+  }
 };
 
 
@@ -224,11 +245,17 @@ public:
   \date 2010
 */
 class OneSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit OneSX() {this->count++;}
 public:
-
-  explicit OneSX() {}
-  ~OneSX() override {}
-
+  /* Get singleton instance */
+  static OneSX* singleton() {
+    static OneSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~OneSX() override {this->count--;}
   /** \brief  Get the value */
   double to_double() const override { return 1;}
   casadi_int to_int() const override { return 1;}
@@ -236,6 +263,10 @@ public:
   /** \brief  Properties */
   bool is_integer() const override { return true; }
   bool is_one() const override { return true; }
+
+  void serialize_node(SerializingStream& s) const override {
+    s.pack("ConstantSX::type", '1');
+  }
 
 };
 
@@ -245,10 +276,17 @@ public:
   \date 2010
 */
 class MinusOneSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit MinusOneSX() {this->count++;}
 public:
-
-  explicit MinusOneSX() {}
-  ~MinusOneSX() override {}
+  /* Get singleton instance */
+  static MinusOneSX* singleton() {
+    static MinusOneSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~MinusOneSX() override {this->count--;}
 
   ///@{
   /** \brief  Get the value */
@@ -262,6 +300,10 @@ public:
   bool is_minus_one() const override { return true; }
   ///@}
 
+  void serialize_node(SerializingStream& s) const override {
+    s.pack("ConstantSX::type", 'm');
+  }
+
 };
 
 
@@ -270,16 +312,26 @@ public:
   \date 2010
 */
 class InfSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit InfSX() {this->count++;}
 public:
-
-  explicit InfSX() {}
-  ~InfSX() override {}
-
+  /* Get singleton instance */
+  static InfSX* singleton() {
+    static InfSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~InfSX() override {this->count--;}
   /** \brief  Get the value */
   double to_double() const override { return std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
   bool is_inf() const override { return true; }
+
+  void serialize_node(SerializingStream& s) const override {
+    s.pack("ConstantSX::type", 'F');
+  }
 
 };
 
@@ -289,10 +341,17 @@ public:
   \date 2010
 */
 class MinusInfSX : public ConstantSX {
+private:
+  /* Private constructor (singleton class) */
+  explicit MinusInfSX() {this->count++;}
 public:
-
-  explicit MinusInfSX() {}
-  ~MinusInfSX() override {}
+  /* Get singleton instance */
+  static MinusInfSX* singleton() {
+    static MinusInfSX instance;
+    return &instance;
+  }
+  /* Destructor */
+  ~MinusInfSX() override {this->count--;}
 
   /** \brief  Get the value */
   double to_double() const override { return -std::numeric_limits<double>::infinity();}
@@ -300,26 +359,63 @@ public:
   /** \brief  Properties */
   bool is_minus_inf() const override { return true; }
 
+  void serialize_node(SerializingStream& s) const override {
+    s.pack("ConstantSX::type", 'f');
+  }
 };
-
 
 /** \brief  Represents a not-a-number SX
   \author Joel Andersson
   \date 2010
 */
 class NanSX : public ConstantSX {
-public:
-
+private:
+  /* Private constructor (singleton class) */
   explicit NanSX() {this->count++;}
+public:
+  /* Get singleton instance */
+  static NanSX* singleton() {
+    static NanSX instance;
+    return &instance;
+  }
+  /* Destructor */
   ~NanSX() override {this->count--;}
-
   /** \brief  Get the value */
   double to_double() const override { return std::numeric_limits<double>::quiet_NaN();}
 
   /** \brief  Properties */
   bool is_nan() const override { return true; }
 
+  void serialize_node(SerializingStream& s) const override {
+    s.pack("ConstantSX::type", 'n');
+  }
+
 };
+
+inline SXNode* ConstantSX_deserialize(DeserializingStream& s) {
+  char type;
+  s.unpack("ConstantSX::type", type);
+  switch (type) {
+    case '1': return casadi_limits<SXElem>::one.get();
+    case '0': return casadi_limits<SXElem>::zero.get();
+    case 'r': {
+      double value;
+      s.unpack("ConstantSX::value", value);
+      return RealtypeSX::create(value);
+    }
+    case 'i': {
+      int value;
+      s.unpack("ConstantSX::value", value);
+      if (value==2) return casadi_limits<SXElem>::two.get();
+      return IntegerSX::create(value);
+    }
+    case 'n': return casadi_limits<SXElem>::nan.get();
+    case 'f': return casadi_limits<SXElem>::minus_inf.get();
+    case 'F': return casadi_limits<SXElem>::inf.get();
+    case 'm': return casadi_limits<SXElem>::minus_one.get();
+    default: casadi_error("ConstantSX::deserialize error");
+  }
+}
 
 } // namespace casadi
 /// \endcond

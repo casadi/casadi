@@ -172,7 +172,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Options Dple::options_
+  const Options Dple::options_
   = {{&FunctionInternal::options_},
      {{"const_dim",
        {OT_BOOL,

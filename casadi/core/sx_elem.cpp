@@ -24,7 +24,7 @@
 
 
 #include "sx_elem.hpp"
-#include "matrix.hpp"
+#include "sx.hpp"
 #include <stack>
 #include <cassert>
 #include "calculus.hpp"
@@ -329,7 +329,7 @@ namespace casadi {
             } else if (nn%2 == 1) { // odd power
               return x*pow(x, nn-1);
             } else { // even power
-              SXElem rt = pow(x, nn/2);
+              SXElem rt = pow(x, static_cast<casadi_int>(nn/2));
               return rt*rt;
             }
           } else if (y->to_double()==0.5) {
@@ -514,16 +514,16 @@ namespace casadi {
   }
 
   // node corresponding to a constant 0
-  const SXElem casadi_limits<SXElem>::zero(new ZeroSX(), false);
+  const SXElem casadi_limits<SXElem>::zero(ZeroSX::singleton(), false);
   // node corresponding to a constant 1
-  const SXElem casadi_limits<SXElem>::one(new OneSX(), false);
+  const SXElem casadi_limits<SXElem>::one(OneSX::singleton(), false);
   // node corresponding to a constant 2
   const SXElem casadi_limits<SXElem>::two(IntegerSX::create(2), false);
   // node corresponding to a constant -1
-  const SXElem casadi_limits<SXElem>::minus_one(new MinusOneSX(), false);
-  const SXElem casadi_limits<SXElem>::nan(new NanSX(), false);
-  const SXElem casadi_limits<SXElem>::inf(new InfSX(), false);
-  const SXElem casadi_limits<SXElem>::minus_inf(new MinusInfSX(), false);
+  const SXElem casadi_limits<SXElem>::minus_one(MinusOneSX::singleton(), false);
+  const SXElem casadi_limits<SXElem>::nan(NanSX::singleton(), false);
+  const SXElem casadi_limits<SXElem>::inf(InfSX::singleton(), false);
+  const SXElem casadi_limits<SXElem>::minus_inf(MinusInfSX::singleton(), false);
 
   bool casadi_limits<SXElem>::is_zero(const SXElem& val) {
     return val.is_zero();
@@ -591,6 +591,14 @@ namespace casadi {
     } else {
       casadi_error("Cannot check regularity for symbolic SXElem");
     }
+  }
+
+  void SXElem::serialize(SerializingStream& s) const {
+    return (*this)->serialize(s);
+  }
+
+  SXElem SXElem::deserialize(DeserializingStream& s) {
+    return SXElem::create(SXNode::deserialize(s));
   }
 
 } // namespace casadi

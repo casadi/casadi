@@ -24,7 +24,6 @@
 
 
 #include "expm_impl.hpp"
-#include "matrix.hpp"
 #include "sparsity_interface.hpp"
 #include <typeinfo>
 
@@ -84,7 +83,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Options Expm::options_
+  const Options Expm::options_
   = {{&FunctionInternal::options_},
      {{"const_A",
        {OT_BOOL,
@@ -155,7 +154,8 @@ namespace casadi {
       MX extended = MX::blockcat({{At, Ybar}, {N, At}});
       MX R = expm(extended*t);
 
-      Abar = R(Slice(0, A_.size1()), Slice(A_.size1(), 2*A_.size1()));
+      Abar = R(Slice(0, A_.size1()), // NOLINT(cppcoreguidelines-slicing)
+               Slice(A_.size1(), 2*A_.size1()));
     }
     Function ret = Function(name, {A, t, Y, Ybar}, {Abar, tbar});
 

@@ -53,30 +53,14 @@ class typemaptests(casadiTestCase):
    self.assertEqual(sys.getrefcount(a), 2)
    casadi.DM(a)
    self.assertEqual(sys.getrefcount(a), 2)
-   casadi.IM(a)
-   self.assertEqual(sys.getrefcount(a), 2)   
-   casadi.IM(a)
-   self.assertEqual(sys.getrefcount(a), 2)
    casadi.SX(a)
    self.assertEqual(sys.getrefcount(a), 2)   
    casadi.SX(a)
    self.assertEqual(sys.getrefcount(a), 2)
    
-  def test_0a(self):
-    self.message("Typemap array -> IM")
-    arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]]),array([[1,2,3],[4,5,6]],dtype=int)]
-    for i in range(len(arrays)):
-      m = arrays[i]
-      zt=c.transpose(c.transpose(m))
-      self.assertTrue(isinstance(zt,IM),"IM expected")
-      self.checkarray(m,zt,"IM(numpy.ndarray)")
-      self.checkarray(m,zt.full(),"IM(numpy.ndarray).full()")
-      #if scipy_available:
-      #  self.checkarray(m,zt.sparse(),"IM(numpy.ndarray).sparse()")
-
   def test_0(self):
     self.message("Typemap array -> DM")
-    arrays = [array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
+    arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]]),array([[1,2,3],[4,5,6]],dtype=int), array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
@@ -585,22 +569,14 @@ class typemaptests(casadiTestCase):
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),list(b))
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),b)
 
-  def test_imatrix(self):
-    self.message("IM")
-
-    A = IM.ones(2,2)
-    B = A + 1
-    self.assertEqual(type(B),type(A))
-    self.checkarray(array(B),repmat(DM(2),2,2),"Imatrix")
-
   def test_issue314(self):
     self.message("regression test for #314: SX sparsity constructor")
     SX(Sparsity.diag(3),[1,2,3])
   def test_setAll_365(self):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
-    for i in [DM(4),IM(4),4,4.0]:
+    for i in [DM(4),np.array([4]),np.array(4),np.array([[4]]),4,4.0]:
       m = DM.ones(5,5)
-      m[:,:] = DM(4)
+      m[:,:] = i
       self.checkarray(m,DM.ones(5,5)*4)
 
   @unittest.skipIf(sys.version_info>=(3,0), "To lazy to fix")
@@ -616,6 +592,7 @@ class typemaptests(casadiTestCase):
   def test_casting_DM(self):
     self.message("casting DM")
 
+    print("cast A")
     x = SX.sym("x")
     f = Function("f", [x],[x])
     class Foo:
@@ -623,49 +600,28 @@ class typemaptests(casadiTestCase):
         return DM([4])
 
     self.assertEqual(f(Foo()),4)
+    print("cast B")
 
     class Foo:
       def __DM__(self):
         return SX([4])
 
+
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
+    print("cast C")
 
     class Foo:
       def __DM__(self):
         raise Exception("15")
 
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
+    print("cast D")
 
     class Foo:
       pass
 
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
-
-  def test_casting_IM(self):
-    self.message("casting IM")
-
-    class Foo:
-      def __IM__(self):
-        return IM([[4,6],[2,4]])
-
-    self.assertEqual(det(Foo()),4)
-
-    class Foo:
-      def __IM__(self):
-        return SX([[4,6],[2,4]])
-
-    self.assertRaises(NotImplementedError,lambda :det(Foo()))
-
-    class Foo:
-      def __IM__(self):
-        raise Exception("15")
-
-    self.assertRaises(NotImplementedError,lambda :det(Foo()))
-
-    class Foo:
-      pass
-
-    self.assertRaises(NotImplementedError,lambda : det(Foo()))
+    print("cast E")
 
   def test_casting_SX(self):
     self.message("casting SX")
@@ -820,16 +776,6 @@ class typemaptests(casadiTestCase):
     with self.assertRaises(NotImplementedError):
       c = repmat(b, 1, 1)
 
-  @known_bug()
-  def test_IMDMarray(self):
-    num = [2,2.0,IM(2),DM(2)]
-    for i in num:
-      for j in num:
-        a = np.array([[i,j]])
-        self.checkarray(a,np.array([[2,2]]))
-        a = np.array([i,j])
-        self.checkarray(a,np.array([2,2]))
-
   @requires_nlpsol("ipopt")
   def testGenericTypeBoolean(self):
     x=SX.sym("x")
@@ -838,6 +784,7 @@ class typemaptests(casadiTestCase):
 
     nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": 1}})
   
+  """
   def test_to_longlong(self):
     a = IM(10)
 
@@ -845,6 +792,7 @@ class typemaptests(casadiTestCase):
     b = a**15
 
     self.assertEqual(int(b),10**15)
+  """
 
   def test_buglonglong(self):
     x = SX.sym("x")

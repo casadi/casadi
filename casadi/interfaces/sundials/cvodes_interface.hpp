@@ -102,7 +102,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -193,6 +193,19 @@ namespace casadi {
 
     casadi_int lmm_; // linear multistep method
     casadi_int iter_; // nonlinear solver iteration
+
+
+  public:
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new CvodesInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit CvodesInterface(DeserializingStream& s);
   };
 
 } // namespace casadi

@@ -48,7 +48,7 @@ namespace casadi {
     ///@}
 
     /// Constructor
-    GetNonzeros(const Sparsity& sp, const MX& x);
+    GetNonzeros(const Sparsity& sp, const MX& y);
 
     /// Destructor
     ~GetNonzeros() override {}
@@ -75,6 +75,13 @@ namespace casadi {
 
     /// Get the nonzeros of matrix
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s);
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit GetNonzeros(DeserializingStream& s) : MXNode(s) {}
   };
 
   class CASADI_EXPORT GetNonzerosVector : public GetNonzeros {
@@ -121,6 +128,14 @@ namespace casadi {
 
     /// Operation sequence
     std::vector<casadi_int> nz_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit GetNonzerosVector(DeserializingStream& s);
   };
 
   // Specialization of the above when nz_ is a Slice
@@ -168,6 +183,14 @@ namespace casadi {
 
     // Data member
     Slice s_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit GetNonzerosSlice(DeserializingStream& s);
   };
 
   // Specialization of the above when nz_ is a nested Slice
@@ -216,6 +239,14 @@ namespace casadi {
 
     // Data members
     Slice inner_, outer_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit GetNonzerosSlice2(DeserializingStream& s);
   };
 
 

@@ -25,6 +25,7 @@
 
 #include "function_internal.hpp"
 #include "global_options.hpp"
+#include "serializing_stream.hpp"
 
 #include <stdlib.h>
 
@@ -75,6 +76,8 @@ namespace casadi {
     return t;
   }
 
+  typedef ProtoFunction* (*Deserialize)(DeserializingStream&);
+
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
       \date 2013
@@ -82,6 +85,7 @@ namespace casadi {
   template<class Derived>
   class PluginInterface {
     public:
+
 
     /// Fields
     struct Plugin{
@@ -91,8 +95,10 @@ namespace casadi {
       int version;
       typename Derived::Exposed exposed;
       const Options* options;
+      Deserialize deserialize;
       // Constructor
-      Plugin() : creator(nullptr), name(nullptr), doc(nullptr), version(0), options(nullptr) {}
+      Plugin() : creator(nullptr), name(nullptr), doc(nullptr), version(0),
+                  options(nullptr), deserialize(nullptr) {}
     };
 
     // Plugin registration function
@@ -103,6 +109,9 @@ namespace casadi {
 
     /// Get the plugin options
     static const Options& plugin_options(const std::string& pname);
+
+    /// Get the plugin deserialize_map
+    static Deserialize plugin_deserialize(const std::string& pname);
 
     /// Instantiate a Plugin struct from a factory function
     static Plugin pluginFromRegFcn(RegFcn regfcn);
@@ -129,6 +138,20 @@ namespace casadi {
                                         const std::string& pname, Problem problem);
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const {
+      s.pack("PluginInterface::plugin_name", std::string(plugin_name()));
+    }
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) {
+      std::string class_name, plugin_name;
+      s.unpack("PluginInterface::plugin_name", plugin_name);
+      Deserialize deserialize = plugin_deserialize(plugin_name);
+      return deserialize(s);
+    }
+
   };
 
   template<class Derived>
@@ -156,6 +179,13 @@ namespace casadi {
     const Options *op = getPlugin(pname).options;
     casadi_assert(op!=nullptr, "Plugin \"" + pname + "\" does not support options");
     return *op;
+  }
+
+  template<class Derived>
+  Deserialize PluginInterface<Derived>::plugin_deserialize(const std::string& pname) {
+    Deserialize m = getPlugin(pname).deserialize;
+    casadi_assert(m, "Plugin \"" + pname + "\" does not support deserialize");
+    return m;
   }
 
   template<class Derived>
@@ -272,7 +302,7 @@ namespace casadi {
       handle = LoadLibrary(TEXT(lib.c_str()));
       SetDllDirectory(NULL);
 #else // _WIN32
-      std::string libname = searchpath.size()==0 ? lib : searchpath + filesep + lib;
+      std::string libname = searchpath.empty() ? lib : searchpath + filesep + lib;
       handle = dlopen(libname.c_str(), flag);
 #endif // _WIN32
       if (handle) {

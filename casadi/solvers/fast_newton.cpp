@@ -38,6 +38,7 @@ namespace casadi {
     plugin->doc = FastNewton::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &FastNewton::options_;
+    plugin->deserialize = &FastNewton::deserialize;
     return 0;
   }
 
@@ -54,7 +55,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options FastNewton::options_
+  const Options FastNewton::options_
   = {{&Rootfinder::options_},
      {{"abstol",
        {OT_DOUBLE,
@@ -162,6 +163,7 @@ namespace casadi {
     casadi_copy(M->x, n_, m->ires[iout_]);
 
     m->success = m->return_status>0;
+    if (m->return_status==0) m->unified_return_status = SOLVER_RET_LIMITED;
 
     return 0;
   }
@@ -191,10 +193,8 @@ namespace casadi {
     g << "m.lin_r = w+" + str(w_offset) + ";\n"; w_offset+=sp_r_.nnz();
     g << "m.lin_beta = w+" + str(w_offset) + ";\n"; w_offset+=sp_jac_.size2();
 
-    std::string jac_f_z = g.add_dependency(get_function("jac_f_z"));
-
     g.comment("Get the initial guess");
-    g << g.copy("arg[" + str(iin_)+ "]", n_, "m.x") << "\n";
+    g << g.copy(g.arg(iin_), n_, "m.x") << "\n";
 
     g.local("iter", "casadi_int");
     g << "for (iter=0; iter<" + str(max_iter_) + "; ++iter) {\n";
@@ -202,19 +202,21 @@ namespace casadi {
     g.comment("(re)calculate f and J");
     // Use x to evaluate J
     for (casadi_int i=0;i<n_in_;++i) {
-      g << "arg[" + str(i+n_in_) + "] = " << (i==iin_? "m.x" : "arg[" + str(i)+ "]") << ";\n";
+      g << g.arg(i+n_in_) << " = " << (i==iin_? "m.x" : g.arg(i)) << ";\n";
     }
-    g << "res[" + str(n_out_) + "] = m.jac_g_x;\n";
+    g << g.res(n_out_) + " = m.jac_g_x;\n";
     for (casadi_int i=0;i<n_out_;++i) {
-      g << "res[" + str(i+n_out_+1) + "] = " << (i==iout_? "m.g" : "res[" + str(i)+ "]") << ";\n";
+      g << g.res(i+n_out_+1) + " = " << (i==iout_? "m.g" : g.res(i)) << ";\n";
     }
-    g << jac_f_z + "(arg+" + str(n_in_) + ", res+" + str(n_out_) + ", iw, w, 0);\n";
+    std::string flag = g(get_function("jac_f_z"),
+      "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w+" + str(w_offset));
+    g << "if (" << flag << ") return 1;\n";
     g << "if (casadi_newton(&m)) break;\n";
     g << "}\n";
 
     // Get the solution
     g.comment("Get the solution");
-    g << g.copy("m.x", n_, "res[" + str(iout_)+ "]") << "\n";
+    g << g.copy("m.x", n_, g.res(iout_)) << "\n";
   }
 
   void FastNewton::codegen_declarations(CodeGenerator& g) const {
@@ -248,6 +250,32 @@ namespace casadi {
     stats["return_status"] = return_code(m->return_status);
     stats["iter_count"] = m->iter;
     return stats;
+  }
+
+
+  FastNewton::FastNewton(DeserializingStream& s) : Rootfinder(s) {
+    s.version("Newton", 1);
+    s.unpack("Newton::max_iter", max_iter_);
+    s.unpack("Newton::abstol", abstol_);
+    s.unpack("Newton::abstolStep", abstolStep_);
+    s.unpack("Newton::jac_f_z", jac_f_z_);
+    s.unpack("Newton::sp_v", sp_v_);
+    s.unpack("Newton::sp_r", sp_r_);
+    s.unpack("Newton::prinv", prinv_);
+    s.unpack("Newton::pc", pc_);
+  }
+
+  void FastNewton::serialize_body(SerializingStream &s) const {
+    Rootfinder::serialize_body(s);
+    s.version("Newton", 1);
+    s.pack("Newton::max_iter", max_iter_);
+    s.pack("Newton::abstol", abstol_);
+    s.pack("Newton::abstolStep", abstolStep_);
+    s.pack("Newton::jac_f_z", jac_f_z_);
+    s.pack("Newton::sp_v", sp_v_);
+    s.pack("Newton::sp_r", sp_r_);
+    s.pack("Newton::prinv", prinv_);
+    s.pack("Newton::pc", pc_);
   }
 
 } // namespace casadi

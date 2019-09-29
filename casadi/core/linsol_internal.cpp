@@ -51,7 +51,13 @@ namespace casadi {
 
   int LinsolInternal::init_mem(void* mem) const {
     if (!mem) return 1;
-    //auto m = static_cast<LinsolMemory*>(mem);
+    if (ProtoFunction::init_mem(mem)) return 1;
+    auto m = static_cast<LinsolMemory*>(mem);
+    if (record_time_) {
+      m->add_stat("nfact");
+      m->add_stat("sfact");
+      m->add_stat("solve");
+    }
     return 0;
   }
 
@@ -110,5 +116,24 @@ namespace casadi {
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;
 
   const std::string LinsolInternal::infix_ = "linsol";
+
+
+  void LinsolInternal::serialize_type(SerializingStream &s) const {
+    ProtoFunction::serialize_type(s);
+    PluginInterface<LinsolInternal>::serialize_type(s);
+  }
+
+  void LinsolInternal::serialize_body(SerializingStream &s) const {
+    ProtoFunction::serialize_body(s);
+    s.pack("LinsolInternal::sp", sp_);
+  }
+
+  LinsolInternal::LinsolInternal(DeserializingStream& s) : ProtoFunction(s) {
+    s.unpack("LinsolInternal::sp", sp_);
+  }
+
+  ProtoFunction* LinsolInternal::deserialize(DeserializingStream& s) {
+    return PluginInterface<LinsolInternal>::deserialize(s);
+  }
 
 } // namespace casadi

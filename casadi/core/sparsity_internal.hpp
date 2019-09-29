@@ -133,8 +133,8 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static casadi_int postorder_dfs(casadi_int j, casadi_int k, casadi_int* head, casadi_int* next,
-                             casadi_int* post, casadi_int* stack);
+    static casadi_int postorder_dfs(casadi_int j, casadi_int k, casadi_int* head,
+        const casadi_int* next, casadi_int* post, casadi_int* stack);
 
     /** \brief Calculate the postorder permuation
       * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -492,6 +492,9 @@ namespace casadi {
     template<bool with_mapping, bool f0x_is_zero, bool function0_is_zero>
     Sparsity combineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     ///@}
+
+    /// Is subset?
+    bool is_subset(const Sparsity& rhs) const;
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity pattern_inverse() const;

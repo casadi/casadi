@@ -29,6 +29,7 @@
 #include "mx_node.hpp"
 #include <iomanip>
 #include <iostream>
+#include "serializing_stream.hpp"
 
 /// \cond INTERNAL
 
@@ -61,6 +62,9 @@ namespace casadi {
 
     // Creator (values may be different)
     static ConstantMX* create(const Matrix<double>& val);
+
+    // Creator (values may be different)
+    static ConstantMX* create(const Sparsity& sp, const std::string& fname);
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override = 0;
@@ -124,6 +128,12 @@ namespace casadi {
 
     /** \brief Reset the marker for an input expression */
     void reset_input() const override {}
+
+    /** \brief Deserialize with type disambiguation */
+    static MXNode* deserialize(DeserializingStream& s);
+
+    /** \brief Deserializing constructor */
+    explicit ConstantMX(DeserializingStream& s) : MXNode(s) {}
   };
 
   /// A constant given as a DM
@@ -176,6 +186,72 @@ namespace casadi {
 
     /** \brief  data member */
     Matrix<double> x_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit ConstantDM(DeserializingStream& s);
+  };
+
+  /// A constant to be read from a file
+  class CASADI_EXPORT ConstantFile : public ConstantMX {
+  public:
+
+    /** \brief  Constructor */
+    explicit ConstantFile(const Sparsity& x, const std::string& fname);
+
+    /// Destructor
+    ~ConstantFile() override {}
+
+    /** \brief Codegen incref */
+    void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
+
+    /** \brief  Print expression */
+    std::string disp(const std::vector<std::string>& arg) const override;
+
+    /// Get the value (only for scalar constant nodes)
+    double to_double() const override;
+
+    /// Get the value (only for constant nodes)
+    Matrix<double> get_DM() const override;
+
+    /** \brief  Evaluate the function numerically */
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+      std::copy(x_.begin(), x_.end(), res[0]);
+      return 0;
+    }
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    int eval_sx(const SXElem** arg, SXElem** res,
+                         casadi_int* iw, SXElem* w) const override {
+      std::copy(x_.begin(), x_.end(), res[0]);
+      return 0;
+    }
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
+
+    /** \brief Add a dependent function */
+    void add_dependency(CodeGenerator& g) const override;
+
+    /** \brief file to read from */
+    std::string fname_;
+
+    /** \brief nonzeros */
+    std::vector<double> x_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit ConstantFile(DeserializingStream& s);
   };
 
   /// A zero-by-zero matrix
@@ -253,6 +329,12 @@ namespace casadi {
       static std::string dummyname;
       return dummyname;
     }
+
+    /** \brief Serialize specific part of node  */
+    void serialize_type(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_body(SerializingStream& s) const override;
+
   };
 
   /** \brief Constant known at runtime */
@@ -261,13 +343,45 @@ namespace casadi {
     const T value;
     RuntimeConst() {}
     RuntimeConst(T v) : value(v) {}
+    static char type_char();
+    void serialize_type(SerializingStream& s) const {
+      s.pack("Constant::value", value);
+    }
+    static RuntimeConst deserialize(DeserializingStream& s) {
+      T v;
+      s.unpack("Constant::value", v);
+      return RuntimeConst(v);
+    }
   };
 
-  /** \brief  Constant known at compiletime */
+  template<typename T>
+  inline char RuntimeConst<T>::type_char() { return 'u'; }
+
+  template<>
+  inline char RuntimeConst<casadi_int>::type_char() { return 'I'; }
+
+  template<>
+  inline char RuntimeConst<double>::type_char() { return 'D'; }
+
   template<int v>
   struct CompiletimeConst {
     static const int value = v;
+    static char type_char();
+    void serialize_type(SerializingStream& s) const {}
+    static CompiletimeConst deserialize(DeserializingStream& s) {
+      return CompiletimeConst();
+    }
   };
+
+  template<int v>
+  inline char CompiletimeConst<v>::type_char() { return 'u'; }
+
+  template<>
+  inline char CompiletimeConst<0>::type_char() { return '0'; }
+  template<>
+  inline char CompiletimeConst<(-1)>::type_char() { return 'm'; }
+  template<>
+  inline char CompiletimeConst<1>::type_char() { return '1'; }
 
   /// A constant with all entries identical
   template<typename Value>
@@ -276,6 +390,9 @@ namespace casadi {
 
     /** \brief  Constructor */
     explicit Constant(const Sparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v) {}
+
+    /** \brief Deserializing constructor */
+    explicit Constant(DeserializingStream& s, const Value& v);
 
     /// Destructor
     ~Constant() override {}
@@ -341,9 +458,29 @@ namespace casadi {
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, casadi_int depth) const override;
 
-    /** \brief The actual numerical value */
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
     Value v_;
   };
+
+  template<typename Value>
+  void Constant<Value>::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("ConstantMX::type", Value::type_char());
+    v_.serialize_type(s);
+  }
+
+  template<typename Value>
+  void Constant<Value>::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+  }
+
+  template<typename Value>
+  Constant<Value>::Constant(DeserializingStream& s, const Value& v) : ConstantMX(s), v_(v) {
+  }
 
   template<typename Value>
   MX Constant<Value>::get_horzcat(const std::vector<MX>& x) const {
@@ -496,7 +633,11 @@ namespace casadi {
     } else if (nnz()==1) {
       g << g.workel(res[0]) << " = " << g.constant(to_double()) << ";\n";
     } else {
-      g << g.fill(g.work(res[0], nnz()), nnz(), g.constant(to_double())) << '\n';
+      if (to_double()==0) {
+        g << g.clear(g.work(res[0], nnz()), nnz()) << '\n';
+      } else {
+        g << g.fill(g.work(res[0], nnz()), nnz(), g.constant(to_double())) << '\n';
+      }
     }
   }
 
@@ -576,6 +717,7 @@ namespace casadi {
   bool Constant<Value>::is_equal(const MXNode* node, casadi_int depth) const {
     return node->is_value(to_double()) && sparsity()==node->sparsity();
   }
+
 
 } // namespace casadi
 /// \endcond

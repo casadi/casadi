@@ -46,6 +46,7 @@ namespace casadi {
     plugin->doc = OoqpInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &OoqpInterface::options_;
+    plugin->deserialize = &OoqpInterface::deserialize;
     return 0;
   }
 
@@ -60,9 +61,10 @@ namespace casadi {
   }
 
   OoqpInterface::~OoqpInterface() {
+    clear_mem();
   }
 
-  Options OoqpInterface::options_
+  const Options OoqpInterface::options_
   = {{&Conic::options_},
      {{"print_level",
        {OT_INT,
@@ -144,13 +146,9 @@ namespace casadi {
   }
 
   int OoqpInterface::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-
-    return_status_ = -1;
-    success_ = false;
-    if (inputs_check_) {
-      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
-    }
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    auto m = static_cast<OoqpMemory*>(mem);
+    m->return_status = -1;
 
     // Get problem data
     double* g=w; w += nx_;
@@ -345,19 +343,19 @@ namespace casadi {
     }
 
     // Reset the solution
-    casadi_fill(x_, nx_, 0.);
-    casadi_fill(gamma_, nx_, 0.);
-    casadi_fill(phi_, nx_, 0.);
-    casadi_fill(y_, na_, 0.);
-    casadi_fill(z_, na_, 0.);
-    casadi_fill(lambda_, na_, 0.);
-    casadi_fill(pi_, na_, 0.);
+    casadi_clear(x_, nx_);
+    casadi_clear(gamma_, nx_);
+    casadi_clear(phi_, nx_);
+    casadi_clear(y_, na_);
+    casadi_clear(z_, na_);
+    casadi_clear(lambda_, na_);
+    casadi_clear(pi_, na_);
 
     // Solve the QP
     double objectiveValue;
 
     int ierr;
-    if (false) { // Use C interface
+    if (false) { // Use C interface NOLINT
       // TODO(jgillis): Change to conicvehb, see OOQP users guide
       qpsolvesp(c_, nx,
                 irowQ_,  nnzQ, jcolQ_, dQ_,
@@ -411,8 +409,9 @@ namespace casadi {
       }
     }
 
-    return_status_ = ierr;
-    success_ = ierr==SUCCESSFUL_TERMINATION;
+    m->return_status = ierr;
+    m->success = ierr==SUCCESSFUL_TERMINATION;
+    if (ierr==MAX_ITS_EXCEEDED) m->unified_return_status = SOLVER_RET_LIMITED;
     if (ierr>0) {
       casadi_warning("Unable to solve problem: " + str(errFlag(ierr)));
     } else if (ierr<0) {
@@ -489,8 +488,9 @@ namespace casadi {
 
   Dict OoqpInterface::get_stats(void* mem) const {
     Dict stats = Conic::get_stats(mem);
-    stats["return_status"] = return_status_;
-    stats["success"] = success_;
+
+    auto m = static_cast<OoqpMemory*>(mem);
+    stats["return_status"] = m->return_status;
     return stats;
   }
 
@@ -510,5 +510,27 @@ namespace casadi {
     return ss.str();
   }
 
+  OoqpInterface::OoqpInterface(DeserializingStream& s) : Conic(s) {
+    s.version("OoqpInterface", 1);
+    s.unpack("OoqpInterface::spAT", spAT_);
+    s.unpack("OoqpInterface::nQ", nQ_);
+    s.unpack("OoqpInterface::nH", nH_);
+    s.unpack("OoqpInterface::nA", nA_);
+    s.unpack("OoqpInterface::print_level", print_level_);
+    s.unpack("OoqpInterface::mutol", mutol_);
+    s.unpack("OoqpInterface::artol", artol_);
+  }
+
+  void OoqpInterface::serialize_body(SerializingStream &s) const {
+    Conic::serialize_body(s);
+    s.version("OoqpInterface", 1);
+    s.pack("OoqpInterface::spAT", spAT_);
+    s.pack("OoqpInterface::nQ", nQ_);
+    s.pack("OoqpInterface::nH", nH_);
+    s.pack("OoqpInterface::nA", nA_);
+    s.pack("OoqpInterface::print_level", print_level_);
+    s.pack("OoqpInterface::mutol", mutol_);
+    s.pack("OoqpInterface::artol", artol_);
+  }
 
 } // namespace casadi

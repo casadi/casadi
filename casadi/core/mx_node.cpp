@@ -33,7 +33,9 @@
 #include "subref.hpp"
 #include "subassign.hpp"
 #include "getnonzeros.hpp"
+#include "getnonzeros_param.hpp"
 #include "setnonzeros.hpp"
+#include "setnonzeros_param.hpp"
 #include "project.hpp"
 #include "solve.hpp"
 #include "unary_mx.hpp"
@@ -49,12 +51,21 @@
 #include "monitor.hpp"
 #include "repmat.hpp"
 #include "casadi_find.hpp"
+#include "casadi_low.hpp"
 #include "einstein.hpp"
+#include "io_instruction.hpp"
+#include "symbolic_mx.hpp"
+#include "constant_mx.hpp"
+#include "map.hpp"
+#include "bspline.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
+#include "setnonzeros_param_impl.hpp"
 #include "solve_impl.hpp"
 #include "binary_mx_impl.hpp"
+
+#include "serializing_stream.hpp"
 
 #include <typeinfo>
 
@@ -65,6 +76,7 @@ namespace casadi {
   MXNode::MXNode() {
     temp = 0;
   }
+
 
   MXNode::~MXNode() {
 
@@ -402,6 +414,47 @@ namespace casadi {
     return Dict();
   }
 
+  void MXNode::serialize(SerializingStream& s) const {
+    serialize_type(s);
+    serialize_body(s);
+  }
+
+  void MXNode::serialize_body(SerializingStream& s) const {
+    s.pack("MXNode::deps", dep_);
+    s.pack("MXNode::sp", sparsity_);
+  }
+
+  void MXNode::serialize_type(SerializingStream& s) const {
+    s.pack("MXNode::op", static_cast<int>(op()));
+  }
+
+  MXNode::MXNode(DeserializingStream& s) {
+    temp = 0;
+
+    s.unpack("MXNode::deps", dep_);
+    s.unpack("MXNode::sp", sparsity_);
+  }
+
+
+  MXNode* MXNode::deserialize(DeserializingStream& s) {
+    int op;
+    s.unpack("MXNode::op", op);
+
+    if (casadi_math<MX>::is_binary(op)) {
+      return BinaryMX<false, false>::deserialize(s);
+    } else if (casadi_math<MX>::is_unary(op)) {
+      return UnaryMX::deserialize(s);
+    }
+
+    auto it = MXNode::deserialize_map.find(op);
+    if (it==MXNode::deserialize_map.end()) {
+      casadi_error("Not implemented op " + str(casadi_int(op)) + ":" + str(OP_GETNONZEROS));
+    } else {
+      return it->second(s);
+    }
+  }
+
+
   MX MXNode::get_mac(const MX& y, const MX& z) const {
     // Get reference to transposed first argument
     MX x = shared_from_this<MX>();
@@ -462,6 +515,30 @@ namespace casadi {
     return GetNonzeros::create(sp, shared_from_this<MX>(), nz);
   }
 
+  MX MXNode::get_nz_ref(const MX& nz) const {
+    return GetNonzerosParam::create(shared_from_this<MX>(), nz);
+  }
+
+  MX MXNode::get_nz_ref(const MX& inner, const Slice& outer) const {
+    if (outer.all()==std::vector<casadi_int>{0}) {
+      return get_nz_ref(inner);
+    } else {
+      return GetNonzerosParam::create(shared_from_this<MX>(), inner, outer);
+    }
+  }
+
+  MX MXNode::get_nz_ref(const Slice& inner, const MX& outer) const {
+    if (inner.all()==std::vector<casadi_int>{0}) {
+      return get_nz_ref(outer);
+    } else {
+      return GetNonzerosParam::create(shared_from_this<MX>(), inner, outer);
+    }
+  }
+
+  MX MXNode::get_nz_ref(const MX& inner, const MX& outer) const {
+    return GetNonzerosParam::create(shared_from_this<MX>(), inner, outer);
+  }
+
   MX MXNode::get_nzassign(const MX& y, const vector<casadi_int>& nz) const {
     // Check if any element needs to be set at all
     bool set_any = false;
@@ -475,10 +552,58 @@ namespace casadi {
 
 
   MX MXNode::get_nzadd(const MX& y, const vector<casadi_int>& nz) const {
-    if (nz.size()==0 || is_zero()) {
+    if (nz.empty() || is_zero()) {
       return y;
     } else {
       return SetNonzeros<true>::create(y, shared_from_this<MX>(), nz);
+    }
+  }
+
+  MX MXNode::get_nzassign(const MX& y, const MX& nz) const {
+    return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), nz);
+  }
+
+  MX MXNode::get_nzassign(const MX& y, const MX& inner, const Slice& outer) const {
+    return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), inner, outer);
+  }
+
+  MX MXNode::get_nzassign(const MX& y, const Slice& inner, const MX& outer) const {
+    return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), inner, outer);
+  }
+
+  MX MXNode::get_nzassign(const MX& y, const MX& inner, const MX& outer) const {
+    return SetNonzerosParam<false>::create(y, shared_from_this<MX>(), inner, outer);
+  }
+
+  MX MXNode::get_nzadd(const MX& y, const MX& nz) const {
+    if (nz.is_empty() || is_zero()) {
+      return y;
+    } else {
+      return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), nz);
+    }
+  }
+
+  MX MXNode::get_nzadd(const MX& y, const MX& inner, const Slice& outer) const {
+    if (inner.is_empty() || outer.is_empty() || is_zero()) {
+      return y;
+    } else {
+      return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), inner, outer);
+    }
+  }
+
+  MX MXNode::get_nzadd(const MX& y, const Slice& inner, const MX& outer) const {
+    if (outer.is_empty() || outer.is_empty() || is_zero()) {
+      return y;
+    } else {
+      return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), inner, outer);
+    }
+  }
+
+  MX MXNode::get_nzadd(const MX& y, const MX& inner, const MX& outer) const {
+    if (inner.is_empty() || outer.is_empty() || is_zero()) {
+      return y;
+    } else {
+      return SetNonzerosParam<true>::create(y, shared_from_this<MX>(), inner, outer);
     }
   }
 
@@ -487,6 +612,10 @@ namespace casadi {
       return shared_from_this<MX>();
     } else if (sp.nnz()==0) {
       return MX::zeros(sp);
+    } else if (sp.is_dense()) {
+      return MX::create(new Densify(shared_from_this<MX>(), sp));
+    } else if (sparsity().is_dense()) {
+      return MX::create(new Sparsify(shared_from_this<MX>(), sp));
     } else {
       return MX::create(new Project(shared_from_this<MX>(), sp));
     }
@@ -710,6 +839,30 @@ namespace casadi {
     } else {
       return find(x.T());
     }
+  }
+
+  MX MXNode::get_low(const MX& v, const Dict& options) const {
+    return MX::create(new Low(v, shared_from_this<MX>(), options));
+  }
+
+  MX MXNode::get_bspline(const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<double>& coeffs,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const {
+    MX x = shared_from_this<MX>();
+    return MX::create(new BSpline(x, knots, offset, coeffs, degree, m, lookup_mode));
+  }
+
+  MX MXNode::get_bspline(const MX& coeffs,
+            const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const {
+    MX x = shared_from_this<MX>();
+    return MX::create(new BSplineParametric(x, coeffs, knots, offset, degree, m, lookup_mode));
   }
 
   MX MXNode::get_det() const {
@@ -939,5 +1092,59 @@ namespace casadi {
       return false;
     }
   }
+
+
+  // Note: binary/unary operations are omitted here
+  std::map<casadi_int, MXNode* (*)(DeserializingStream&)> MXNode::deserialize_map = {
+    {OP_INPUT, Input::deserialize},
+    {OP_OUTPUT, Output::deserialize},
+    {OP_PARAMETER, SymbolicMX::deserialize},
+    {OP_CONST, ConstantMX::deserialize},
+    {OP_CALL, Call::deserialize},
+    {OP_FIND, Find::deserialize},
+    {OP_LOW, Low::deserialize},
+    //{OP_MAP, Map::deserialize}, Map is a function
+    {OP_MTIMES, Multiplication::deserialize},
+    {OP_SOLVE, Solve<false>::deserialize},
+    {OP_TRANSPOSE, Transpose::deserialize},
+    {OP_DETERMINANT, Determinant::deserialize},
+    {OP_INVERSE, Inverse::deserialize},
+    {OP_DOT, Dot::deserialize},
+    {OP_BILIN, Bilin::deserialize},
+    {OP_RANK1, Rank1::deserialize},
+    {OP_HORZCAT, Horzcat::deserialize},
+    {OP_VERTCAT, Vertcat::deserialize},
+    {OP_DIAGCAT, Diagcat::deserialize},
+    {OP_HORZSPLIT, Horzsplit::deserialize},
+    {OP_VERTSPLIT, Vertsplit::deserialize},
+    {OP_DIAGSPLIT, Diagsplit::deserialize},
+    {OP_RESHAPE, Reshape::deserialize},
+    // OP_SUBREF
+    // OP_SUBASSIGN,
+    {OP_GETNONZEROS, GetNonzeros::deserialize},
+    {OP_GETNONZEROS_PARAM, GetNonzerosParam::deserialize},
+    {OP_ADDNONZEROS, SetNonzeros<true>::deserialize},
+    {OP_ADDNONZEROS_PARAM, SetNonzerosParam<true>::deserialize},
+    {OP_SETNONZEROS, SetNonzeros<false>::deserialize},
+    {OP_SETNONZEROS_PARAM, SetNonzerosParam<false>::deserialize},
+    {OP_PROJECT, Project::deserialize},
+    {OP_ASSERTION, Assertion::deserialize},
+    {OP_MONITOR, Monitor::deserialize},
+    {OP_NORM1, Norm1::deserialize},
+    {OP_NORM2, Norm2::deserialize},
+    {OP_NORMINF, NormInf::deserialize},
+    {OP_NORMF, NormF::deserialize},
+    {OP_MMIN, MMin::deserialize},
+    {OP_MMAX, MMax::deserialize},
+    {OP_HORZREPMAT, HorzRepmat::deserialize},
+    {OP_HORZREPSUM, HorzRepsum::deserialize},
+    //OP_ERFINV,
+    //OP_PRINTME,
+    //OP_LIFT,
+    //OP_EINSTEIN
+    {OP_BSPLINE, BSplineCommon::deserialize},
+    {-1, OutputNode::deserialize}
+  };
+
 
 } // namespace casadi

@@ -66,8 +66,17 @@ namespace casadi {
     LinsolInternal* operator->();
     const LinsolInternal* operator->() const;
 
+#ifndef SWIG
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectInternal* ptr);
+#endif //SWIG
+
+    /// \cond INTERNAL
+#ifndef SWIG
+    /** \brief  Create from node */
+    static Linsol create(LinsolInternal* node);
+#endif // SWIG
+    /// \endcond
 
     /// Check if a plugin is available
     static bool has_plugin(const std::string& name);
@@ -106,21 +115,30 @@ namespace casadi {
       */
     casadi_int rank(const DM& A) const;
 
+   /// Get all statistics obtained at the end of the last evaluate call
+    Dict stats(int mem=1) const;
+
     #ifndef SWIG
     ///@{
     /// Low-level API
-    int sfact(const double* A, casadi_int mem=0) const;
-    int nfact(const double* A, casadi_int mem=0) const;
-    int solve(const double* A, double* x, casadi_int nrhs=1, bool tr=false, casadi_int mem=0) const;
-    casadi_int neig(const double* A, casadi_int mem=0) const;
-    casadi_int rank(const double* A, casadi_int mem=0) const;
+    int sfact(const double* A, int mem=0) const;
+    int nfact(const double* A, int mem=0) const;
+    int solve(const double* A, double* x, casadi_int nrhs=1, bool tr=false, int mem=0) const;
+    casadi_int neig(const double* A, int mem=0) const;
+    casadi_int rank(const double* A, int mem=0) const;
     ///@}
 
     /// Checkout a memory object
     casadi_int checkout() const;
 
     /// Release a memory object
-    void release(casadi_int mem) const;
+    void release(int mem) const;
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream &s) const;
+
+    /** \brief Deserialize with type disambiguation */
+    static Linsol deserialize(DeserializingStream& s);
 
     #endif // SWIG
   };

@@ -39,40 +39,15 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_SQPMETHOD_EXPORT SqpmethodMemory : public NlpsolMemory {
-    /// Current and previous linearization point and candidate
-    double *x_cand;
-
-    /// Lagrange gradient in the next iterate
-    double *gLag, *gLag_old;
-
-    /// Constraint function value
-    double *g_cand;
-
-    /// Gradient of the objective function
-    double *gf;
-
-    // Bounds of the QP
-    double *qp_LBA, *qp_UBA, *qp_LBX, *qp_UBX;
-
-    // QP solution
-    double *dx, *qp_DUAL_X, *qp_DUAL_A;
-
-    // Current Jacobian
-    double *Jk;
-
-    /// Current Hessian approximation
-    double *Bk;
-
+    // Problem data structure
+    casadi_sqpmethod_data<double> d;
     /// Hessian regularization
     double reg;
 
     /// Linesearch parameters
     double sigma;
 
-    // Storage for merit function
-    double* merit_mem;
-    size_t merit_ind;
-
+    casadi_int merit_ind;
     /// Last return status
     const char* return_status;
 
@@ -102,7 +77,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -115,6 +90,9 @@ namespace casadi {
     /** \brief Create memory block */
     void* alloc_mem() const override { return new SqpmethodMemory();}
 
+    /** \brief Initalize memory block */
+    int init_mem(void* mem) const override;
+
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<SqpmethodMemory*>(mem);}
 
@@ -125,11 +103,24 @@ namespace casadi {
     // Solve the NLP
     int solve(void* mem) const override;
 
+    // Memory structure
+    casadi_sqpmethod_prob<double> p_;
+
     /// QP solver for the subproblems
     Function qpsol_;
 
     /// Exact Hessian?
     bool exact_hessian_;
+
+    /// Block structure of Hessian for certain convexification methods
+    std::vector<casadi_int> scc_offset_, scc_mapping_;
+
+    /// For eigen-* convexification strategies: maximum iterations for symmetric Schur decomposition
+    // Needs to be "big enough"
+    casadi_int max_iter_eig_;
+
+    /// Maximum block size of Hessian
+    casadi_int block_size_ = 0;
 
     /// Maximum, minimum number of SQP iterations
     casadi_int max_iter_, min_iter_;
@@ -154,14 +145,36 @@ namespace casadi {
     // Print options
     bool print_header_, print_iteration_, print_status_;
 
-    // Hessian sparsity
+    // Raw Hessian sparsity
+    Sparsity Hrsp_;
+
+    // Actual Hessian Sparsity used for QP
     Sparsity Hsp_;
+
+    // scc transformed Hessian sparsity
+    Sparsity scc_sp_;
+
+    // Projection of Hessian sparsity needed? (cache)
+    bool Hsp_project_;
+    // Reordering of Hessian needed for scc? (cache)
+    bool scc_transform_;
 
     // Jacobian sparsity
     Sparsity Asp_;
 
     /// Regularization
-    bool regularize_;
+    enum ConvexifyStrategy {
+      CVX_NONE,
+      CVX_REGULARIZE,
+      CVX_EIGEN_REFLECT,
+      CVX_EIGEN_CLIP} convexify_strategy_;
+    double convexify_margin_;
+
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
+
+    /** \brief Generate code for the declarations of the C function */
+    void codegen_declarations(CodeGenerator& g) const override;
 
     /// Access Conic
     const Function getConic() const { return qpsol_;}
@@ -171,17 +184,36 @@ namespace casadi {
 
     /// Print iteration
     void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
-                         double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const;
+                         double dx_norm, double rg, casadi_int ls_trials, bool ls_success) const;
 
     // Solve the QP subproblem
     virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
-                          const double* lbx, const double* ubx,
-                          const double* A, const double* lbA, const double* ubA,
-                          double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const;
+                          const double* lbdz, const double* ubdz,
+                          const double* A,
+                          double* x_opt, double* dlam) const;
+
+
+    // Solve the QP subproblem
+    void codegen_qp_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
+              const std::string& lbdz, const std::string& ubdz,
+              const std::string& A, const std::string& x_opt, const std::string& dlam) const;
 
     /// A documentation string
     static const std::string meta_doc;
 
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Sqpmethod(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Sqpmethod(DeserializingStream& s);
+
+  private:
+    void set_sqpmethod_prob();
   };
 
 } // namespace casadi

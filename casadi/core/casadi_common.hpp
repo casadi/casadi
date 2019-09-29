@@ -26,19 +26,19 @@
 #ifndef CASADI_COMMON_HPP
 #define CASADI_COMMON_HPP
 
-#include <cmath>
-#include <climits>
-#include <limits>
-#include <vector>
-#include <set>
-#include <map>
-#include <utility>
-#include <sstream>
-#include <iostream>
-#include <string>
-#include <fstream>
 #include <algorithm>
+#include <climits>
+#include <cmath>
+#include <fstream>
+#include <iostream>
 #include <iterator>
+#include <limits>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #ifdef SWIG
 #define SWIG_IF_ELSE(is_swig, not_swig) is_swig
@@ -135,16 +135,21 @@ namespace casadi {
   /** \brief  Function pointer types for the C API */
   typedef void (*signal_t)(void);
   typedef casadi_int (*getint_t)(void);
+  typedef double (*default_t)(casadi_int i);
   typedef const char* (*name_t)(casadi_int i);
   typedef const casadi_int* (*sparsity_t)(casadi_int i);
-  typedef void* (*alloc_mem_t)(void);
-  typedef int (*init_mem_t)(void* mem);
-  typedef void (*free_mem_t)(void* mem);
+  typedef int (*casadi_checkout_t)(void);
+  typedef void (*casadi_release_t)(int);
   typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res,
     casadi_int* sz_iw, casadi_int* sz_w);
   typedef int (*eval_t)(const double** arg, double** res,
-                        casadi_int* iw, double* w, void* mem);
+                        casadi_int* iw, double* w, int);
   ///@}
+
+  // Easier to maintain than an enum (serialization/codegen)
+  constexpr casadi_int LOOKUP_LINEAR = 0;
+  constexpr casadi_int LOOKUP_EXACT = 1;
+  constexpr casadi_int LOOKUP_BINARY = 2;
 
   /// String representation, any type
   template<typename T>

@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 
 set(CASADI_MAJOR_VERSION 3)
-set(CASADI_MINOR_VERSION 4)
-set(CASADI_PATCH_VERSION 5)
+set(CASADI_MINOR_VERSION 5)
+set(CASADI_PATCH_VERSION 0)
 set(CASADI_IS_RELEASE 1)
 
 set(CASADI_VERSION ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
@@ -18,6 +18,31 @@ set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differenta
 set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
 set(PACKAGE_URL "http://casadi.org")
+
+############################################################
+####################### Policies ###########################
+############################################################
+# Enforce cmake2.4+ style behaviour for
+# mixed filename/full path linker directives
+cmake_policy(SET CMP0003 NEW)
+
+# cmake_policy propagation rules
+if(POLICY CMP0011)
+cmake_policy(SET CMP0011 OLD)
+endif()
+
+# cmake_policy avoid escaping in add_definitions
+cmake_policy(SET CMP0005 OLD)
+
+# cmake_policy use MACOSX_RPATH=ON by default
+if(POLICY CMP0042)
+  cmake_policy(SET CMP0042 NEW)
+endif()
+
+# cmake_policy how to interpret string arguments
+if(POLICY CMP0054)
+  cmake_policy(SET CMP0054 NEW)
+endif()
 
 #############################################################
 ########################## Version ##########################
@@ -118,6 +143,7 @@ if(CXX11FLAG)
     add_definitions(-DHAS_COPYSIGN)
   endif()
 
+
   try_compile(HAS_ERF
     ${CMAKE_BINARY_DIR}
     ${CMAKE_MODULE_PATH}/check_erf.cpp
@@ -176,31 +202,6 @@ else()
 endif()
 
 ############################################################
-####################### Policies ###########################
-############################################################
-# Enforce cmake2.4+ style behaviour for
-# mixed filename/full path linker directives
-cmake_policy(SET CMP0003 NEW)
-
-# cmake_policy propagation rules
-if(POLICY CMP0011)
-cmake_policy(SET CMP0011 OLD)
-endif()
-
-# cmake_policy avoid escaping in add_definitions
-cmake_policy(SET CMP0005 OLD)
-
-# cmake_policy use MACOSX_RPATH=ON by default
-if(POLICY CMP0042)
-  cmake_policy(SET CMP0042 NEW)
-endif()
-
-# cmake_policy how to interpret string arguments
-if(POLICY CMP0054)
-  cmake_policy(SET CMP0054 NEW)
-endif()
-
-############################################################
 ####################### macports python ####################
 ############################################################
 # find the macports python libs if they exist
@@ -219,6 +220,7 @@ if(WITH_COMMON)
   # qpOASES and blockSQP built if LAPACK available
   set(WITH_QPOASES_DEF ${LAPACK_FOUND})
   set(WITH_BLOCKSQP_DEF ${LAPACK_FOUND})
+  set(WITH_SUPERSCS_DEF ${LAPACK_FOUND})
   # Look for IPOPT
   find_package(IPOPT QUIET)
   set(WITH_IPOPT_DEF ${IPOPT_FOUND})
@@ -228,11 +230,23 @@ else()
   set(WITH_QPOASES_DEF OFF)
   set(WITH_BLOCKSQP_DEF OFF)
   set(WITH_IPOPT_DEF OFF)
+  set(WITH_SUPERSCS_DEF OFF)
 endif()
+
+#####################################################
+######################### swig ######################
+#####################################################
+option(WITH_PYTHON "Compile the Python front-end" OFF)
+option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
+option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
+option(WITH_JSON "Compile the JSON front-end" OFF)
+option(WITH_OCTAVE_IMPORT "[DEPRECATED] Copy import.m file to install directory" OFF)
+option(WITH_PYTHON3 "Use Python 3.*" OFF)
 
 ############################################################
 ################# Misc options #############################
 ############################################################
+option(INSTALL_INTERNAL_HEADERS "Install all headers" OFF)
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
@@ -288,6 +302,12 @@ endif()
 
 # Have an so version?
 option(WITH_SO_VERSION "Use an so version for the library (version suffix) when applicable" ON)
+
+set(WITH_COPYSIGN_UNDEF_DEFAULT OFF)
+if(WITH_PYTHON AND MSVC)
+  set(WITH_COPYSIGN_UNDEF_DEFAULT OFF)
+endif()
+option(WITH_COPYSIGN_UNDEF "On Windows, in Python.h #defines copysign to be _copysign. This option inserts an #undef" WITH_COPYSIGN_UNDEF_DEFAULT)
 
 ############################################################
 ################# Installation location ####################
@@ -370,7 +390,7 @@ option(WITH_EXTRA_WARNINGS "Add extra warnings (like -Wall -Wextra)" OFF)
 option(WITH_WERROR "Add -Werror" OFF)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   if(WITH_EXTRA_WARNINGS)
-    set(EXTRA_CASADI_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare")
+    set(EXTRA_CASADI_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-attributes")
     set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value")
   endif()
   if(WITH_WERROR)
@@ -464,7 +484,7 @@ if (WITH_DEPRECATED_FEATURES)
 endif()
 
 include_directories(.)
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(${PROJECT_BINARY_DIR})
 
 #######################################################################
 ################# 3rd party interface #################################
@@ -541,6 +561,14 @@ if(WITH_HPMPC)
   endif()
 endif()
 add_feature_info(hpmpc-interface WITH_HPMPC "Interface to hpmpc.")
+
+# SuperSCS: An conic solver
+option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
+add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
+
+# OSQP: An operator-splitting QP solver
+option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" OFF)
+add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
@@ -648,6 +676,13 @@ if(WITH_CLP)
 endif()
 add_feature_info(clp-interface WITH_CLP "Interface to the LP solver CLP.")
 
+option(WITH_CBC "Compile the CBC interface" OFF)
+if(WITH_CBC)
+  find_package(CBC REQUIRED)
+endif()
+add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
+
+
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
 option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal SNOPT build)" OFF)
@@ -671,6 +706,13 @@ if(WITH_HSL)
   find_package(HSL REQUIRED)
 endif()
 add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
+
+# MUMPS: Sparse direct linear solver
+option(WITH_MUMPS "Enable MUMPS interface" OFF)
+if(WITH_MUMPS)
+  find_package(MUMPS REQUIRED)
+endif()
+add_feature_info(mumps-interface WITH_MUMPS "Interface to MUMPS.")
 
 # OOQP: A sparse interior point QP solver
 option(WITH_OOQP "Enable OOQP interface" OFF)
@@ -734,14 +776,8 @@ else()
 endif()
 
 #####################################################
-######################### swig ######################
+###################### swig #########################
 #####################################################
-option(WITH_PYTHON "Compile the Python front-end" OFF)
-option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
-option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
-option(WITH_JSON "Compile the JSON front-end" OFF)
-option(WITH_OCTAVE_IMPORT "[DEPRECATED] Copy import.m file to install directory" OFF)
-option(WITH_PYTHON3 "Use Python 3.*" OFF)
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
 if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON)
   add_subdirectory(swig)
@@ -849,6 +885,15 @@ install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/casadi-config.cmake"
   "${PROJECT_BINARY_DIR}/casadi-config-version.cmake"
   DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
+
+# Generate the casadi.pc.in configuration file
+configure_file(${PROJECT_SOURCE_DIR}/misc/casadi.pc.in
+  "${PROJECT_BINARY_DIR}/casadi.pc" @ONLY)
+
+# Install the casadi.pc
+install(FILES
+  "${PROJECT_BINARY_DIR}/casadi.pc"
+  DESTINATION "${LIB_PREFIX}/pkgconfig" COMPONENT dev)
 
 # Install the export set for use with the install-tree
 install(EXPORT casadi-targets DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)

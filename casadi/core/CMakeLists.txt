@@ -25,7 +25,14 @@ set(CASADI_PUBLIC
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
   generic_expression.hpp      # Base class for SXElem MX and Matrix<>
   generic_matrix.hpp          # Base class for Matrix<> and MX
-  matrix.hpp                  # The Matrix template class
+  matrix_fwd.hpp
+  matrix_decl.hpp
+  sx_fwd.hpp
+  sx.hpp
+  dm_fwd.hpp
+  dm.hpp
+  im_fwd.hpp
+  im.hpp
   sparsity_interface.hpp
   sparsity.hpp                # reference counted sparsity pattern
   slice.hpp                   # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
@@ -56,12 +63,15 @@ set(CASADI_PUBLIC
 
   # MISC useful stuff
   integration_tools.hpp
+  nlp_tools.hpp
   nlp_builder.hpp
   xml_node.hpp
   xml_file.hpp
   variable.hpp
   dae_builder.hpp
   optistack.hpp
+  serializer.hpp
+  serializing_stream.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -79,11 +89,15 @@ set(CASADI_INTERNAL
   generic_type_internal.hpp
   options.cpp
   casadi_misc.cpp
+  casadi_common.cpp
   timing.cpp
   polynomial.cpp
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
-  matrix.cpp
+  matrix_impl.hpp
+  sx_instantiator.cpp
+  dm_instantiator.cpp
+  im_instantiator.cpp
 
   sparse_storage.hpp   sparse_storage_impl.hpp
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
@@ -110,6 +124,7 @@ set(CASADI_INTERNAL
   solve.hpp               solve_impl.hpp          # Solve linear system of equations
   casadi_call.hpp         casadi_call.cpp         # Function call
   casadi_find.hpp         casadi_find.cpp         # Find first nonzero
+  casadi_low.hpp          casadi_low.cpp          # Find first nonzero
   norm.hpp                norm.cpp                # 1-norm, 2-norm and infinity-norm
   mmin.hpp                mmin.cpp                # Matrix minimum
   transpose.hpp           transpose.cpp           # Transpose
@@ -119,8 +134,9 @@ set(CASADI_INTERNAL
   subref.hpp              subref.cpp              # Submatrix reference
   subassign.hpp           subassign.cpp           # Submatrix assignment
   getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
+  getnonzeros_param.hpp   getnonzeros_param.cpp   # Get the nonzeros of matrix, parametrically
   setnonzeros.hpp         setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
-  get_elements.hpp        get_elements.cpp        # Get elements of matrix by a symbolic slice
+  setnonzeros_param.hpp   setnonzeros_param_impl.hpp  # Assign the nonzeros of a matrix to another matrix
   project.hpp             project.cpp             # Sparse copy to another sparsity pattern
   determinant.hpp         determinant.cpp         # Determinant
   inverse.hpp             inverse.cpp             # Matrix inverse
@@ -157,17 +173,21 @@ set(CASADI_INTERNAL
   switch.hpp              switch.cpp
   bspline.hpp             bspline.cpp
   map.hpp                 map.cpp
+  mapsum.hpp              mapsum.cpp
   finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
 
   # MISC useful stuff
   integration_tools.cpp
+  nlp_tools.cpp
   nlp_builder.cpp
   xml_node.cpp
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
   variable.cpp
   dae_builder.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
+  serializer.cpp              serializing_stream.cpp
+  casadi_c.cpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp
@@ -187,6 +207,9 @@ target_include_directories(casadi
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/runtime>
     $<INSTALL_INTERFACE:${TREL_INCLUDE_PREFIX}>
+  INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../> # <casadi.casadi.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../> # <casadi/core/casadi_export.h>
 )
 
 if(WITH_DL)
@@ -207,3 +230,8 @@ endif()
 install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h
   DESTINATION ${INCLUDE_PREFIX}/casadi/core
 )
+if(INSTALL_INTERNAL_HEADERS)
+  install(FILES ${CASADI_INTERNAL}
+    DESTINATION ${INCLUDE_PREFIX}/casadi/core
+  )
+endif()

@@ -26,198 +26,220 @@
 #ifndef CASADI_BSPLINE_HPP
 #define CASADI_BSPLINE_HPP
 
-#include "function_internal.hpp"
+#include "mx_node.hpp"
+#include <map>
+#include <stack>
+
+/// \cond INTERNAL
 
 namespace casadi {
-
-  /** Base class for BSpline evaluators
-  *
-  *
-  *
+  /** \brief BSpline Node
+      \author Joris Gillis
+      \date 2017-2019
   */
-  class BSplineCommon : public FunctionInternal {
+  class CASADI_EXPORT BSplineCommon : public MXNode {
   public:
-    BSplineCommon(const std::string &name, const std::vector<double>& knots,
-      const std::vector<casadi_int>& offset, const std::vector<casadi_int>& degree, casadi_int m);
 
-    /** \brief  Initialize */
-    void init(const Dict& opts) override;
+    /// Constructor
+    BSplineCommon(const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode);
 
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return 1; }
-    size_t get_n_out() override { return 1; }
-    ///@}
+    /// Destructor
+    ~BSplineCommon() override {}
 
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    const Options& get_options() const override { return options_;}
-    ///@}
+    static void prepare(casadi_int m, const std::vector<casadi_int>& offset,
+      const std::vector<casadi_int>& degree, casadi_int &coeffs_size,
+      std::vector<casadi_int>& coeffs_dims, std::vector<casadi_int>& strides);
 
-    static void from_knots(const std::vector< std::vector<double> >& knots,
-      std::vector<casadi_int>& offset, std::vector<double>& stacked);
+    static casadi_int get_coeff_size(casadi_int m, const std::vector<casadi_int>& offset,
+      const std::vector<casadi_int>& degree);
 
-    std::vector<casadi_int> lookup_mode_;
     std::vector<double> knots_;
     std::vector<casadi_int> offset_;
     std::vector<casadi_int> degree_;
-    std::vector<casadi_int> strides_;
+    casadi_int m_;
+    std::vector<casadi_int> lookup_mode_;
 
+    // Derived fiels
+    std::vector<casadi_int> strides_;
     std::vector<casadi_int> coeffs_dims_;
     casadi_int coeffs_size_;
-    casadi_int m_;
+
+    /** \brief Jacobian
+     * 
+     * Derivatives are computed by transforming the coefficient matrix
+     * This is efficient
+     */
+    mutable MX jac_cache_;
+
+    virtual MX jac_cached() const = 0;
+
+    /** \brief Get required length of iw field */
+    static size_t n_iw(const std::vector<casadi_int> &degree);
+
+    /** \brief Get required length of w field */
+    static size_t n_w(const std::vector<casadi_int> &degree);
+
+    /** \brief Get required length of iw field */
+    size_t sz_iw() const override;
+
+    /** \brief Get required length of w field */
+    size_t sz_w() const override;
+
+    /** \brief Get the operation */
+    casadi_int op() const override { return OP_BSPLINE;}
+
+    /** \brief Calculate forward mode directional derivatives */
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
+
+    /** \brief Calculate reverse mode directional derivatives */
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
+
+    /** \brief Generate code for the operation */
+    virtual std::string generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg) const = 0;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s);
+
+    template<class M>
+    M derivative_coeff(casadi_int i, const M& coeffs) const;
+
+    template<class T>
+    MX jac(const MX& x, const T& coeffs) const;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
+  protected:
+
+    /** \brief Deserializing constructor */
+    explicit BSplineCommon(DeserializingStream& s);
+
   };
 
-  class BSpline : public BSplineCommon {
+  /** 
+   * 
+   * y = bspline(position=symbolic(x),coeffs=numeric);
+   * 
+   * y in R^m
+   * x in R^n
+   * 
+   */
+  class CASADI_EXPORT BSpline : public BSplineCommon {
   public:
-    static Function create(const std::string &name,
-      const std::vector< std::vector<double> >& knots,
-      const std::vector<double>& coeffs, const std::vector<casadi_int>& degree, casadi_int m=1,
-      const Dict& opts=Dict());
 
-    BSpline(const std::string &name, const std::vector<double>& knots,
-      const std::vector<casadi_int>& offset, const std::vector<double>& coeffs,
-      const std::vector<casadi_int>& degree, casadi_int m);
+    static MX create(const MX& x, const std::vector< std::vector<double> >& knots,
+          const std::vector<double>& coeffs,
+          const std::vector<casadi_int>& degree,
+          casadi_int m,
+          const Dict& opts);
 
-    /** \brief  Destructor */
+    /// Constructor
+    BSpline(const MX& x, const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<double>& coeffs,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode);
+
+    /// Destructor
     ~BSpline() override {}
 
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(casadi_int i) override { return Sparsity::dense(offset_.size()-1); }
-    Sparsity get_sparsity_out(casadi_int i) override { return Sparsity::dense(m_, 1); }
-    /// @}
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Initialize */
-    void init(const Dict& opts) override;
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief  Evaluate numerically, work vectors given */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    /** \brief Generate code for the operation */
+    std::string generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg) const override;
 
-    ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    bool has_forward(casadi_int nfwd) const override { return true;}
-    Function get_forward(casadi_int nfwd, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    ///@}
+    /** \brief  Print expression */
+    std::string disp(const std::vector<std::string>& arg) const override;
 
-    ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    bool has_reverse(casadi_int nadj) const override { return true;}
-    Function get_reverse(casadi_int nadj, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    ///@}
-
-    ///@{
-    /** \brief Return Jacobian of all input elements with respect to all output elements */
-    bool has_jacobian() const override { return true;}
-    Function get_jacobian(const std::string& name,
-                          const std::vector<std::string>& inames,
-                          const std::vector<std::string>& onames,
-                          const Dict& opts) const override;
-    ///@}
-
-    /** \brief Is codegen supported? */
-    bool has_codegen() const override { return true;}
-
-    /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
-    void codegen_declarations(CodeGenerator& g) const override {};
-
-    std::string class_name() const override { return "BSpline"; }
-
+    // Numeric coefficients
     std::vector<double> coeffs_;
 
-  private:
-    std::vector<double> derivative_coeff(casadi_int i) const;
-    MX jac(const MX& x) const;
+    MX jac_cached() const override;
+
+    /**
+     * 
+     * y = bspline(position=numeric(x),coeffs);
+     * 
+     * x in R^(n x N)
+     * y in R^(1 x N)
+     * 
+     * vec(y) = A coeffs
+     * 
+     */
+    static DM dual(const std::vector<double>& x,
+          const std::vector< std::vector<double> >& knots,
+          const std::vector<casadi_int>& degree,
+          const Dict& opts);
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit BSpline(DeserializingStream& s);
   };
 
-
-  class BSplineDual : public BSplineCommon {
+  // Symbolic coefficients
+  class CASADI_EXPORT BSplineParametric : public BSplineCommon {
   public:
-    static Function create(const std::string &name,
-      const std::vector< std::vector<double> >& knots,
-      const std::vector<double>& x, const std::vector<casadi_int>& degree,
-      casadi_int m=1, bool reverse=false,
-      const Dict& opts=Dict());
+    static MX create(const MX& x, const MX& coeffs,
+          const std::vector< std::vector<double> >& knots,
+          const std::vector<casadi_int>& degree,
+          casadi_int m,
+          const Dict& opts);
 
-    BSplineDual(const std::string &name, const std::vector<double>& knots,
-      const std::vector<casadi_int>& offset, const std::vector<double>& x,
-      const std::vector<casadi_int>& degree, casadi_int m, bool reverse);
+    /// Constructor
+    BSplineParametric(const MX& x, const MX& coeffs,
+            const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode);
 
-    /** \brief  Destructor */
-    ~BSplineDual() override {}
+    /// Destructor
+    ~BSplineParametric() override {}
 
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return 1; }
-    size_t get_n_out() override { return 1; }
-    ///@}
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(casadi_int i) override;
-    Sparsity get_sparsity_out(casadi_int i) override;
-    /// @}
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief  Initialize */
-    void init(const Dict& opts) override;
+    MX jac_cached() const override;
 
-    /** \brief  Evaluate numerically, work vectors given */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    /** \brief Generate code for the operation */
+    std::string generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg) const override;
 
-    ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    bool has_forward(casadi_int nfwd) const override { return true;}
-    Function get_forward(casadi_int nfwd, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    ///@}
+    /** \brief  Print expression */
+    std::string disp(const std::vector<std::string>& arg) const override;
 
-    ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    bool has_reverse(casadi_int nadj) const override { return true;}
-    Function get_reverse(casadi_int nadj, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    ///@}
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
 
-
-    /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res,
-      casadi_int* iw, bvec_t* w, void* mem) const override;
-
-    /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
-
-    ///@{
-    /// Is the class able to propagate seeds through the algorithm?
-    bool has_spfwd() const override { return true;}
-    bool has_sprev() const override { return true;}
-    ///@}
-
-    /** \brief Is codegen supported? */
-    bool has_codegen() const override { return true;}
-
-    /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
-    void codegen_declarations(CodeGenerator& g) const override {};
-
-    std::string class_name() const override { return "BSplineDual"; }
-
-    std::vector<double> x_;
-    bool reverse_;
-    casadi_int N_;
+    /** \brief Deserializing constructor */
+    explicit BSplineParametric(DeserializingStream& s) : BSplineCommon(s) {}
   };
 
 } // namespace casadi
+/// \endcond
 
 #endif // CASADI_BSPLINE_HPP

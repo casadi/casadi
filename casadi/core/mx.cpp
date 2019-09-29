@@ -33,6 +33,9 @@
 #include "mx_function.hpp"
 #include "linsol.hpp"
 #include "expm.hpp"
+#include "serializing_stream.hpp"
+#include "im.hpp"
+#include "bspline.hpp"
 
 // Throw informative error message
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -113,6 +116,10 @@ namespace casadi {
     own(ConstantMX::create(sp, val));
   }
 
+  MX::MX(const Sparsity& sp, const std::string& fname) {
+    own(ConstantMX::create(sp, fname));
+  }
+
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
     casadi_assert_dev(dynamic_cast<MultipleOutput*>(node)!=nullptr);
     MX x =  MX::create(node);
@@ -191,6 +198,21 @@ namespace casadi {
       + str(size()) + ", but supplied sparsity index has shape "
       + str(sp.size()) + ".");
     m = project(*this, sp);
+  }
+
+  void MX::get(MX& m, bool ind1, const Slice& rr, const MX& cc) const {
+    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
+    m = (*this)->get_nz_ref(rr.apply(size1(), ind1), (ind1 ? cc-1 : cc)*size1());
+  }
+
+  void MX::get(MX& m, bool ind1, const MX& rr, const Slice& cc) const {
+    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
+    m = (*this)->get_nz_ref(ind1 ? rr-1 : rr, cc.apply(size2(), ind1)*size1());
+  }
+
+  void MX::get(MX& m, bool ind1, const MX& rr, const MX& cc) const {
+    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
+    m = (*this)->get_nz_ref(ind1 ? rr-1 : rr, (ind1 ? cc-1 : cc)*size1());
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
@@ -392,6 +414,26 @@ namespace casadi {
     m = (*this)->get_nzref(tr ? kk.sparsity().T() : kk.sparsity(), kk.nonzeros());
   }
 
+  void MX::get_nz(MX& m, bool ind1, const MX& kk) const {
+    // Create return MX
+    m = (*this)->get_nz_ref(ind1 ? kk-1.0 : kk);
+  }
+
+  void MX::get_nz(MX& m, bool ind1, const MX& inner, const MX& outer) const {
+    // Create return MX
+    m = (*this)->get_nz_ref(ind1 ? inner-1.0: inner, ind1 ? outer-1.0: outer);
+  }
+
+  void MX::get_nz(MX& m, bool ind1, const Slice& inner, const MX& outer) const {
+    // Create return MX
+    m = (*this)->get_nz_ref(ind1 ? inner-1: inner, ind1 ? outer-1.0: outer);
+  }
+
+  void MX::get_nz(MX& m, bool ind1, const MX& inner, const Slice& outer) const {
+    // Create return MX
+    m = (*this)->get_nz_ref(ind1 ? inner-1.0: inner, ind1 ? outer-1: outer);
+  }
+
   void MX::set_nz(const MX& m, bool ind1, const Slice& kk) {
     // Fallback on IM
     set_nz(m, ind1, kk.all(nnz(), ind1));
@@ -451,6 +493,10 @@ namespace casadi {
 
     // Create a nonzero assignment node
     *this = m->get_nzassign(*this, kk.nonzeros());
+  }
+
+  void MX::set_nz(const MX& m, bool ind1, const MX& kk) {
+    *this = m->get_nzassign(*this, ind1 ? kk-1 : kk);
   }
 
   MX MX::binary(casadi_int op, const MX &x, const MX &y) {
@@ -743,6 +789,14 @@ namespace casadi {
     return (*this)->info();
   }
 
+  void MX::serialize(SerializingStream& s) const {
+    return (*this)->serialize(s);
+  }
+
+  MX MX::deserialize(DeserializingStream& s) {
+    return MX::create(MXNode::deserialize(s));
+  }
+
   bool MX::is_equal(const MX& x, const MX& y, casadi_int depth) {
     return MXNode::is_equal(x.get(), y.get(), depth);
   }
@@ -1026,7 +1080,7 @@ namespace casadi {
 
   std::vector<MX> MX::horzsplit(const MX& x, const std::vector<casadi_int>& offset) {
     // Consistency check
-    casadi_assert_dev(offset.size()>=1);
+    casadi_assert_dev(!offset.empty());
     casadi_assert_dev(offset.front()==0);
     casadi_assert_dev(offset.back()==x.size2());
     casadi_assert_dev(is_monotone(offset));
@@ -1044,13 +1098,13 @@ namespace casadi {
   std::vector<MX> MX::diagsplit(const MX& x, const std::vector<casadi_int>& offset1,
                                 const std::vector<casadi_int>& offset2) {
     // Consistency check
-    casadi_assert_dev(offset1.size()>=1);
+    casadi_assert_dev(!offset1.empty());
     casadi_assert_dev(offset1.front()==0);
     casadi_assert_dev(offset1.back()==x.size1());
     casadi_assert_dev(is_monotone(offset1));
 
     // Consistency check
-    casadi_assert_dev(offset2.size()>=1);
+    casadi_assert_dev(!offset2.empty());
     casadi_assert_dev(offset2.front()==0);
     casadi_assert_dev(offset2.back()==x.size2());
     casadi_assert_dev(is_monotone(offset2));
@@ -1061,7 +1115,7 @@ namespace casadi {
   std::vector<MX> MX::vertsplit(const MX& x, const std::vector<casadi_int>& offset) {
     if (x.is_column()) {
       // Consistency check
-      casadi_assert_dev(offset.size()>=1);
+      casadi_assert_dev(!offset.empty());
       casadi_assert_dev(offset.front()==0);
       casadi_assert_dev(offset.back()==x.size1());
       casadi_assert_dev(is_monotone(offset));
@@ -1103,7 +1157,7 @@ namespace casadi {
   }
 
   MX MX::norm_2(const MX& x) {
-    if (x.is_column()) {
+    if (x.is_vector()) {
       return norm_fro(x);
     } else {
       return x->get_norm_2();
@@ -1595,25 +1649,26 @@ namespace casadi {
 
   MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {
     try {
-      // Propagate verbose option to helper function
       Dict h_opts;
-      if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+      Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
       Function h("helper_jacobian_MX", {x}, {f}, h_opts);
-      return h.get<MXFunction>()->jac(0, 0, opts);
+      return h.get<MXFunction>()->jac(0, 0, opts_remainder);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("jacobian", e.what());
     }
   }
 
-  MX MX::hessian(const MX& f, const MX& x) {
+  MX MX::hessian(const MX& f, const MX& x, const Dict& opts) {
     MX g;
-    return hessian(f, x, g);
+    return hessian(f, x, g, opts);
   }
 
-  MX MX::hessian(const MX& f, const MX& x, MX &g) {
+  MX MX::hessian(const MX& f, const MX& x, MX &g, const Dict& opts) {
     try {
-      g = gradient(f, x);
-      return jacobian(g, x, {{"symmetric", true}});
+      Dict all_opts = opts;
+      g = gradient(f, x, opts);
+      if (!opts.count("symmetric")) all_opts["symmetric"] = true;
+      return jacobian(g, x, all_opts);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("hessian", e.what());
     }
@@ -1627,19 +1682,20 @@ namespace casadi {
       // Read options
       bool always_inline = true;
       bool never_inline = false;
-      for (auto&& op : opts) {
+
+      Dict h_opts;
+      Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+      for (auto&& op : opts_remainder) {
         if (op.first=="always_inline") {
           always_inline = op.second;
         } else if (op.first=="never_inline") {
           never_inline = op.second;
-        } else if (op.first=="verbose") {
-          continue;
         } else {
           casadi_error("No such option: " + string(op.first));
         }
       }
       // Call internal function on a temporary object
-      Function temp("forward_temp", arg, ex);
+      Function temp("forward_temp", arg, ex, h_opts);
       std::vector<std::vector<MX> > ret;
       temp->call_forward(arg, ex, v, ret, always_inline, never_inline);
       return ret;
@@ -1656,19 +1712,22 @@ namespace casadi {
       // Read options
       bool always_inline = true;
       bool never_inline = false;
-      for (auto&& op : opts) {
+
+
+      Dict h_opts;
+      Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+
+      for (auto&& op : opts_remainder) {
         if (op.first=="always_inline") {
           always_inline = op.second;
         } else if (op.first=="never_inline") {
           never_inline = op.second;
-        } else if (op.first=="verbose") {
-          continue;
         } else {
           casadi_error("No such option: " + string(op.first));
         }
       }
       // Call internal function on a temporary object
-      Function temp("reverse_temp", arg, ex);
+      Function temp("reverse_temp", arg, ex, h_opts);
       std::vector<std::vector<MX> > ret;
       temp->call_reverse(arg, ex, v, ret, always_inline, never_inline);
       return ret;
@@ -1817,6 +1876,120 @@ namespace casadi {
 
   MX MX::find(const MX& x) {
     return x->get_find();
+  }
+
+  MX MX::low(const MX& v, const MX& p, const Dict& options) {
+    return p->get_low(v, options);
+  }
+
+  MX MX::bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts) {
+    return BSpline::create(x, knots, coeffs.nonzeros(), degree, m, opts);
+  }
+
+  MX MX::bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts) {
+    return BSplineParametric::create(x, coeffs, knots, degree, m, opts);
+  }
+
+  DM MX::bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts) {
+    return BSpline::dual(x, knots, degree, opts);
+  }
+
+  MX interpn_G(casadi_int i, // Dimension to interpolate along
+                const MX& v, // Coefficients
+                const std::vector<MX>& xis, // Normalised coordinates
+                const std::vector<MX>& L, const std::vector<MX>& Lp, // Lower indices
+                const std::vector<casadi_int>& strides,
+                const Slice& I,
+                const MX& offset=0 // Offset into coefficients vector
+                ) {
+    if (i==0) {
+      MX ret;
+      v.get_nz(ret, false, offset, I);
+      return ret;
+    } else {
+      casadi_int j = xis.size()-i;
+      MX offsetL, offsetR;
+      if (strides[j]==1) {
+        offsetL = offset+L[j];
+        offsetR = offset+Lp[j];
+      } else {
+        offsetL = offset+L[j]*strides[j];
+        offsetR = offsetL+strides[j];
+      }
+      MX vl = interpn_G(i-1, v, xis, L, Lp, strides, I, offsetL);
+      MX vu = interpn_G(i-1, v, xis, L, Lp, strides, I, offsetR);
+
+      // Perform interpolation between vl and vu
+      return vl + xis[j]*(vu-vl);
+    }
+  }
+
+  MX MX::interpn_linear(const std::vector<MX>& x, const MX& v, const std::vector<MX>& xq,
+      const Dict& opts) {
+
+    casadi_int n_dim = x.size();
+    std::vector<std::string> lookup_mode(n_dim, "auto");
+    for (auto&& op : opts) {
+      if (op.first=="lookup_mode") {
+        lookup_mode = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
+    casadi_assert_dev(xq.size()==n_dim);
+    casadi_assert_dev(v.is_vector());
+
+    // Extract grid dimensions
+    std::vector<casadi_int> x_dims;
+    for (auto e : x) x_dims.push_back(e.numel());
+
+    // Determine multipicity of output
+    casadi_int n_out = v.numel()/product(x_dims);
+    casadi_assert(n_out*product(x_dims)==v.numel(),
+      "Dimension mismatch: coefficients (" + str(v.numel()) + ") should be "
+      "an integer multiple of product-of-dimensions (" + str(product(x_dims)) + ").");
+
+    // Dimension check xq
+    casadi_int nq = xq[0].numel();
+    for (auto e : xq) {
+      casadi_assert_dev(e.is_vector() && e.numel()==nq);
+    }
+
+    // Compute stride vector
+    std::vector<casadi_int> strides;
+    strides.push_back(n_out);
+    for (auto d : x_dims) strides.push_back(strides.back()*d);
+
+    // Pre-compute lower index and normalized coordinate
+    // (Allows for more sub-expression sharing)
+    std::vector<MX> xis, Ls, Lps;
+    for (casadi_int i=0;i<n_dim;++i) {
+      MX L = low(x[i], xq[i], {{"lookup_mode", lookup_mode[i]}});
+      MX Lp = L+1;
+      MX xl, xu;
+      x[i].get_nz(xl, false, L);
+      x[i].get_nz(xu, false, Lp);
+      xis.push_back((xq[i]-xl)/(xu-xl));
+      Ls.push_back(L);
+      Lps.push_back(Lp);
+    }
+
+    Slice I(0, n_out);
+
+    return interpn_G(n_dim, v, xis, Ls, Lps, strides, I);
   }
 
   std::vector<MX> MX::get_input(const Function& f) {

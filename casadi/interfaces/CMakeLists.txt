@@ -30,6 +30,10 @@ if(WITH_CLP)
   add_subdirectory(clp)
 endif()
 
+if(WITH_CBC)
+  add_subdirectory(cbc)
+endif()
+
 if(WITH_CSPARSE)
   add_subdirectory(csparse)
 endif()
@@ -40,6 +44,10 @@ endif()
 
 if(WITH_HSL)
   add_subdirectory(hsl)
+endif()
+
+if(WITH_MUMPS)
+  add_subdirectory(mumps)
 endif()
 
 if(WITH_OOQP)
@@ -74,12 +82,20 @@ if(WITH_HPMPC)
   add_subdirectory(hpmpc)
 endif()
 
+if(WITH_SUPERSCS)
+  add_subdirectory(superscs)
+endif()
+
 if(WITH_SLICOT)
   add_subdirectory(slicot)
 endif()
 
 if(WITH_AMPL)
   add_subdirectory(ampl)
+endif()
+
+if(WITH_OSQP)
+  add_subdirectory(osqp)
 endif()
 
 if(WITH_LINT)

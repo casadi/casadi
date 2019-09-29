@@ -30,7 +30,7 @@ import sys
 
 compileme = True  # Flag wether compiling should take place or not
 
-if len(sys.argv)>1 and sys.arg[0]=='nc':
+if len(sys.argv)>1 and sys.argv[1]=='nc':
   compileme = False
 else:
   print("Info: Use 'python c_code_generation.py nc' to omit compiling")

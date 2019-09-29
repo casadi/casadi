@@ -65,17 +65,18 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Finalize the object creation */
-    void finalize(const Dict& opts) override;
+    void finalize() override;
 
-    /** \brief  Evaluate numerically, work vectors given */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
-
-    /** \brief  Evaluate symbolically, work vectors given */
-    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw,
-                SXElem* w, void* mem) const override;
-
+    ///@{
     /** \brief Evaluate with DM matrices */
     std::vector<DM> eval_dm(const std::vector<DM>& arg) const override;
+    bool has_eval_dm() const override { return !has_eval_buffer_;}
+    ///@}
+
+    /** \brief  Evaluate numerically */
+    virtual int eval(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
+    bool has_eval_buffer() const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override;
@@ -109,6 +110,10 @@ namespace casadi {
 
     /** \brief Pointer to the public class */
     Callback* self_;
+
+    // For buffered evaluation
+    std::vector<casadi_int> sizes_arg_, sizes_res_;
+    bool has_eval_buffer_;
   };
 
 } // namespace casadi

@@ -53,7 +53,7 @@ namespace casadi {
   // Forward declaration
   class SlicotDple;
 
-  struct CASADI_DPLE_SLICOT_EXPORT SlicotDpleMemory {
+  struct CASADI_DPLE_SLICOT_EXPORT SlicotDpleMemory : public ProtoFunctionMemory {
 
     /// T Hessenberg-triangular data
     /// Z Schur form multiplier data
@@ -121,7 +121,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 

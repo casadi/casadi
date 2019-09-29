@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = QpoasesInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &QpoasesInterface::options_;
+    plugin->deserialize = &QpoasesInterface::deserialize;
     return 0;
   }
 
@@ -67,7 +68,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options QpoasesInterface::options_
+  const Options QpoasesInterface::options_
   = {{&Conic::options_},
      {{"sparse",
        {OT_BOOL,
@@ -296,6 +297,12 @@ namespace casadi {
       }
     }
 
+    // Bug #2358
+    if (sparse_ && na_ == 0) {
+      casadi_error("With no linear constraints, qpOASES fails in sparse mode: "
+      "https://github.com/casadi/casadi/issues/2358");
+    }
+
     // Allocate work vectors
     if (sparse_) {
       alloc_w(nnz_in(CONIC_H), true); // h
@@ -313,6 +320,7 @@ namespace casadi {
   }
 
   int QpoasesInterface::init_mem(void* mem) const {
+    if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<QpoasesMemory*>(mem);
     m->called_once = false;
 
@@ -320,7 +328,7 @@ namespace casadi {
     m->linsol_plugin = linsol_plugin_;
 
     // Create qpOASES instance
-    if (m->qp) delete m->qp;
+    delete m->qp;
     if (schur_) {
       m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_schur_,
         mem, qpoases_init, qpoases_sfact, qpoases_nfact, qpoases_solve);
@@ -333,9 +341,9 @@ namespace casadi {
     // Pass to qpOASES
     m->qp->setOptions(ops_);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
     m->h_row.resize(H_.nnz());
     m->h_colind.resize(H_.size2()+1);
     m->a_row.resize(A_.nnz());
@@ -345,21 +353,13 @@ namespace casadi {
   }
 
   int QpoasesInterface::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
-
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
 
     m->fstats.at("preprocessing").tic();
 
     // Problem has not been solved at this point
-    m->success = false;
     m->return_status = -1;
-
-    if (inputs_check_) {
-      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
-    }
 
     // Maxiumum number of working set changes
     int nWSR = max_nWSR_;
@@ -388,7 +388,7 @@ namespace casadi {
       copy_vector(H_.row(), m->h_row);
       double* h=w; w += H_.nnz();
       casadi_copy(arg[CONIC_H], H_.nnz(), h);
-      if (m->h) delete m->h;
+      delete m->h;
       m->h = new qpOASES::SymSparseMat(H_.size1(), H_.size2(),
         get_ptr(m->h_row), get_ptr(m->h_colind), h);
       m->h->createDiagInfo();
@@ -398,7 +398,7 @@ namespace casadi {
       copy_vector(A_.row(), m->a_row);
       double* a=w; w += A_.nnz();
       casadi_copy(arg[CONIC_A], A_.nnz(), a);
-      if (m->a) delete m->a;
+      delete m->a;
       m->a = new qpOASES::SparseMatrix(A_.size1(), A_.size2(),
         get_ptr(m->a_row), get_ptr(m->a_colind), a);
 
@@ -451,12 +451,14 @@ namespace casadi {
 
     m->return_status = flag;
     m->success = flag==qpOASES::SUCCESSFUL_RETURN;
+    if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
+    if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
+      m->unified_return_status = SOLVER_RET_LIMITED;
+    }
+
+    m->iter_count = nWSR;
 
     if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
-
-    if (flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {
-      casadi_error("qpOASES failed: " + getErrorMessage(flag));
-    }
 
     // Get optimal cost
     if (res[CONIC_COST]) *res[CONIC_COST] = m->qp->getObjVal();
@@ -475,8 +477,6 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
     return 0;
   }
 
@@ -838,9 +838,9 @@ namespace casadi {
   }
 
   QpoasesMemory::~QpoasesMemory() {
-    if (this->qp) delete this->qp;
-    if (this->h) delete this->h;
-    if (this->a) delete this->a;
+    delete this->qp;
+    delete this->h;
+    delete this->a;
   }
 
   int QpoasesInterface::
@@ -925,8 +925,137 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<QpoasesMemory*>(mem);
     stats["return_status"] = getErrorMessage(m->return_status);
-    stats["success"] = m->success;
     return stats;
+  }
+
+  QpoasesInterface::QpoasesInterface(DeserializingStream& s) : Conic(s) {
+    s.version("QpoasesInterface", 1);
+    s.unpack("QpoasesInterface::max_nWSR", max_nWSR_);
+    s.unpack("QpoasesInterface::max_cputime", max_cputime_);
+    casadi_int hess;
+    s.unpack("QpoasesInterface::hess", hess);
+    hess_ = static_cast<qpOASES::HessianType>(hess);
+    s.unpack("QpoasesInterface::sparse", sparse_);
+    s.unpack("QpoasesInterface::schur", schur_);
+    s.unpack("QpoasesInterface::max_schur", max_schur_);
+    s.unpack("QpoasesInterface::linsol_plugin", linsol_plugin_);
+    ops_.setToDefault();
+    casadi_int print_level;
+    s.unpack("QpoasesInterface::ops::printLevel", print_level);
+
+    bool enableRamping;
+    s.unpack("QpoasesInterface::ops::enableRamping", enableRamping);
+    ops_.enableRamping = to_BooleanType(enableRamping);
+
+
+    bool enableFarBounds;
+    s.unpack("QpoasesInterface::ops::enableFarBounds", enableFarBounds);
+    ops_.enableFarBounds = to_BooleanType(enableFarBounds);
+
+
+    bool enableFlippingBounds;
+    s.unpack("QpoasesInterface::ops::enableFlippingBounds", enableFlippingBounds);
+    ops_.enableFlippingBounds = to_BooleanType(enableFlippingBounds);
+
+
+    bool enableRegularisation;
+    s.unpack("QpoasesInterface::ops::enableRegularisation", enableRegularisation);
+    ops_.enableRegularisation = to_BooleanType(enableRegularisation);
+
+
+    bool enableFullLITests;
+    s.unpack("QpoasesInterface::ops::enableFullLITests", enableFullLITests);
+    ops_.enableFullLITests = to_BooleanType(enableFullLITests);
+
+
+    bool enableNZCTests;
+    s.unpack("QpoasesInterface::ops::enableNZCTests", enableNZCTests);
+    ops_.enableNZCTests = to_BooleanType(enableNZCTests);
+
+
+    s.unpack("QpoasesInterface::ops::enableDriftCorrection", ops_.enableDriftCorrection);
+    s.unpack("QpoasesInterface::ops::enableCholeskyRefactorisation",
+      ops_.enableCholeskyRefactorisation);
+
+
+    bool enableEqualities;
+    s.unpack("QpoasesInterface::ops::enableEqualities", enableEqualities);
+    ops_.enableEqualities = to_BooleanType(enableEqualities);
+
+    s.unpack("QpoasesInterface::ops::terminationTolerance", ops_.terminationTolerance);
+    s.unpack("QpoasesInterface::ops::boundTolerance", ops_.boundTolerance);
+    s.unpack("QpoasesInterface::ops::boundRelaxation", ops_.boundRelaxation);
+    s.unpack("QpoasesInterface::ops::epsNum", ops_.epsNum);
+    s.unpack("QpoasesInterface::ops::epsDen", ops_.epsDen);
+    s.unpack("QpoasesInterface::ops::maxPrimalJump", ops_.maxPrimalJump);
+    s.unpack("QpoasesInterface::ops::maxDualJump", ops_.maxDualJump);
+    s.unpack("QpoasesInterface::ops::initialRamping", ops_.initialRamping);
+    s.unpack("QpoasesInterface::ops::finalRamping", ops_.finalRamping);
+    s.unpack("QpoasesInterface::ops::initialFarBounds", ops_.initialFarBounds);
+    s.unpack("QpoasesInterface::ops::growFarBounds", ops_.growFarBounds);
+    std::string initialStatusBounds;
+    s.unpack("QpoasesInterface::ops::initialStatusBounds", initialStatusBounds);
+    ops_.initialStatusBounds = to_SubjectToStatus(initialStatusBounds);
+    s.unpack("QpoasesInterface::ops::epsFlipping", ops_.epsFlipping);
+    s.unpack("QpoasesInterface::ops::numRegularisationSteps", ops_.numRegularisationSteps);
+    s.unpack("QpoasesInterface::ops::epsRegularisation", ops_.epsRegularisation);
+    s.unpack("QpoasesInterface::ops::numRefinementSteps", ops_.numRefinementSteps);
+    s.unpack("QpoasesInterface::ops::epsIterRef", ops_.epsIterRef);
+    s.unpack("QpoasesInterface::ops::epsLITests", ops_.epsLITests);
+    s.unpack("QpoasesInterface::ops::epsNZCTests", ops_.epsNZCTests);
+    bool enableInertiaCorrection;
+    s.unpack("QpoasesInterface::ops::enableInertiaCorrection", enableInertiaCorrection);
+    ops_.enableInertiaCorrection = to_BooleanType(enableInertiaCorrection);
+  }
+
+  void QpoasesInterface::serialize_body(SerializingStream &s) const {
+    Conic::serialize_body(s);
+    s.version("QpoasesInterface", 1);
+    s.pack("QpoasesInterface::max_nWSR", max_nWSR_);
+    s.pack("QpoasesInterface::max_cputime", max_cputime_);
+    s.pack("QpoasesInterface::hess", static_cast<casadi_int>(hess_));
+    s.pack("QpoasesInterface::sparse", sparse_);
+    s.pack("QpoasesInterface::schur", schur_);
+    s.pack("QpoasesInterface::max_schur", max_schur_);
+    s.pack("QpoasesInterface::linsol_plugin", linsol_plugin_);
+    s.pack("QpoasesInterface::ops::printLevel", static_cast<casadi_int>(ops_.printLevel));
+    s.pack("QpoasesInterface::ops::enableRamping", from_BooleanType(ops_.enableRamping));
+    s.pack("QpoasesInterface::ops::enableFarBounds",
+      from_BooleanType(ops_.enableFarBounds));
+    s.pack("QpoasesInterface::ops::enableFlippingBounds",
+      from_BooleanType(ops_.enableFlippingBounds));
+    s.pack("QpoasesInterface::ops::enableRegularisation",
+      from_BooleanType(ops_.enableRegularisation));
+    s.pack("QpoasesInterface::ops::enableFullLITests",
+      from_BooleanType(ops_.enableFullLITests));
+    s.pack("QpoasesInterface::ops::enableNZCTests", from_BooleanType(ops_.enableNZCTests));
+    s.pack("QpoasesInterface::ops::enableDriftCorrection", ops_.enableDriftCorrection);
+    s.pack("QpoasesInterface::ops::enableCholeskyRefactorisation",
+      ops_.enableCholeskyRefactorisation);
+    s.pack("QpoasesInterface::ops::enableEqualities", from_BooleanType(ops_.enableEqualities));
+    s.pack("QpoasesInterface::ops::terminationTolerance", ops_.terminationTolerance);
+    s.pack("QpoasesInterface::ops::boundTolerance", ops_.boundTolerance);
+    s.pack("QpoasesInterface::ops::boundRelaxation", ops_.boundRelaxation);
+    s.pack("QpoasesInterface::ops::epsNum", ops_.epsNum);
+    s.pack("QpoasesInterface::ops::epsDen", ops_.epsDen);
+    s.pack("QpoasesInterface::ops::maxPrimalJump", ops_.maxPrimalJump);
+    s.pack("QpoasesInterface::ops::maxDualJump", ops_.maxDualJump);
+    s.pack("QpoasesInterface::ops::initialRamping", ops_.initialRamping);
+    s.pack("QpoasesInterface::ops::finalRamping", ops_.finalRamping);
+    s.pack("QpoasesInterface::ops::initialFarBounds", ops_.initialFarBounds);
+    s.pack("QpoasesInterface::ops::growFarBounds", ops_.growFarBounds);
+    s.pack("QpoasesInterface::ops::initialStatusBounds",
+      from_SubjectToStatus(ops_.initialStatusBounds));
+    s.pack("QpoasesInterface::ops::epsFlipping", ops_.epsFlipping);
+    s.pack("QpoasesInterface::ops::numRegularisationSteps", ops_.numRegularisationSteps);
+    s.pack("QpoasesInterface::ops::epsRegularisation", ops_.epsRegularisation);
+    s.pack("QpoasesInterface::ops::numRefinementSteps", ops_.numRefinementSteps);
+    s.pack("QpoasesInterface::ops::epsIterRef", ops_.epsIterRef);
+    s.pack("QpoasesInterface::ops::epsLITests", ops_.epsLITests);
+    s.pack("QpoasesInterface::ops::epsNZCTests", ops_.epsNZCTests);
+    s.pack("QpoasesInterface::ops::enableInertiaCorrection",
+      from_BooleanType(ops_.enableInertiaCorrection));
+
   }
 
 } // namespace casadi

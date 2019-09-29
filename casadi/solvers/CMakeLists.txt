@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-casadi_plugin(Conic nlpsol
-  qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
+casadi_plugin(Conic nlpsol qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 
 # Active-set QP solver
 casadi_plugin(Conic qrqp qrqp.hpp qrqp.cpp qrqp_meta.cpp)
+
+# Active-set SQP method
+casadi_plugin(Nlpsol qrsqp qrsqp.hpp qrsqp.cpp qrsqp_meta.cpp)
 
 # Simple just-in-time compiler, using shell commands
 if(WITH_DL)
@@ -47,6 +49,11 @@ casadi_plugin(Linsol qr
 # Sparse direct LDL' - implemented in CasADi's C runtime
 casadi_plugin(Linsol ldl
   linsol_ldl.hpp linsol_ldl.cpp linsol_ldl_meta.cpp
+)
+
+# Sparse tridiagonal - implemented in CasADi's C runtime
+casadi_plugin(Linsol tridiag
+  linsol_tridiag.hpp linsol_tridiag.cpp linsol_tridiag_meta.cpp
 )
 
 casadi_plugin(Linsol lsqr

@@ -48,7 +48,12 @@ namespace casadi {
     GRBenv *env;
 
     int return_status;
-    bool success;
+
+    // SOS structure
+    std::vector<double> sos_weights;
+    std::vector<int> sos_beg;
+    std::vector<int> sos_ind;
+    std::vector<int> sos_types;
 
     /// Constructor
     GurobiMemory();
@@ -86,7 +91,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -103,7 +108,8 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<GurobiMemory*>(mem);}
 
     /// Solve the QP
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
@@ -120,24 +126,26 @@ namespace casadi {
     // Variable types
     std::vector<char> vtype_;
 
+    // SOS structure
+    std::vector<double> sos_weights_;
+    std::vector<int> sos_beg_;
+    std::vector<int> sos_ind_;
+    std::vector<int> sos_types_;
+
     /// Gurobi options
     Dict opts_;
 
-    // Block partition vector for SOCP (block i runs from r_[i] to r_[i+1])
-    std::vector<casadi_int> r_;
+    /// SDP to SOCP conversion memory
+    SDPToSOCPMem sdp_to_socp_mem_;
 
-    // Tranpose of A, and corresponding mapping
-    Sparsity AT_;
-    std::vector<casadi_int> A_mapping_;
+    void serialize_body(SerializingStream &s) const override;
 
-    // Aggregate SOCP helper constraints (lhs)
-    IM map_Q_;
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new GurobiInterface(s); }
 
-    // Aggregate SOCP helper constraints (rhs)
-    std::vector<casadi_int> map_P_;
-
-    // Maximum size of ind/val vectors
-    casadi_int indval_size_;
+  protected:
+     /** \brief Deserializing constructor */
+    explicit GurobiInterface(DeserializingStream& s);
   };
 
 } // namespace casadi

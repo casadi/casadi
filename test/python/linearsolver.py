@@ -330,6 +330,7 @@ class LinearSolverTests(casadiTestCase):
 
 
       self.checkfunction(relay,solution,inputs=solver_in)
+      self.check_serialize(relay,inputs=solver_in)
 
       if Solver in ["qr","ldl"]:
         self.check_codegen(relay,inputs=solver_in)

@@ -77,6 +77,10 @@ namespace casadi {
   template<typename T1>
   casadi_int casadi_iamax(casadi_int n, const T1* x, casadi_int inc_x);
 
+  /// CLEAR: x <- 0
+  template<typename T1>
+  void casadi_clear(T1* x, casadi_int n);
+
   /// FILL: x <- alpha
   template<typename T1>
   void casadi_fill(T1* x, casadi_int n, T1 alpha);
@@ -123,6 +127,10 @@ namespace casadi {
   template<typename T1>
   T1 casadi_bilin(const T1* A, const casadi_int* sp_A, const T1* x, const T1* y);
 
+  /** Calculates Calculates nonzeros of kronecker product */
+  template<typename T1>
+  void casadi_kron(const T1* a, const casadi_int* sp_a, const T1* b, const casadi_int* sp_b, T1* r);
+
   /// Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A
   template<typename T1>
   void casadi_rank1(T1* A, const casadi_int* sp_A, T1 alpha, const T1* x);
@@ -140,7 +148,7 @@ namespace casadi {
 
   // Find the interval to which a value belongs
   template<typename T1>
-  casadi_int casadi_low(T1 x, const double* grid, casadi_int ng, casadi_int lookup_mode);
+  casadi_int casadi_low(T1 x, const T1* grid, casadi_int ng, casadi_int lookup_mode);
 
   // Get weights for the multilinear interpolant
   template<typename T1>
@@ -172,20 +180,33 @@ namespace casadi {
   void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* knots, const casadi_int* offset,
                             const casadi_int* degree, const casadi_int* strides, const T1* c,
                             casadi_int m,
-                            const T1* x, const casadi_int* lookup_mode, casadi_int reverse,
-                            casadi_int* iw, T1* w);
-
+                            const T1* x, const casadi_int* lookup_mode, casadi_int* iw, T1* w);
 
   template<typename T1>
-  T1 casadi_mmax(const T1* x, casadi_int n, casadi_int is_dense);
+  T1 casadi_mmax(const T1* x, casadi_int n, T1 is_dense);
 
   template<typename T1>
   T1 casadi_mmin(const T1* x, casadi_int n, casadi_int is_dense);
+
+  template<typename T1>
+  T1 casadi_vfmax(const T1* x, casadi_int n, T1 r);
+
+  template<typename T1>
+  T1 casadi_vfmin(const T1* x, casadi_int n, T1 r);
 
   // Alias names
   inline void casadi_fill_casadi_int(casadi_int* x, casadi_int n, casadi_int alpha) {
     casadi_fill(x, n, alpha);
   }
+
+  // Alias names
+  inline void casadi_clear_casadi_int(casadi_int* x, casadi_int n) {
+    casadi_clear(x, n);
+  }
+
+  template<typename T1>
+  void casadi_bound_consistency(casadi_int n, T1* x, T1* lam,
+                                 const T1* lbx, const T1* ubx);
 
   template <class T1>
   struct casadi_newton_mem;
@@ -201,19 +222,25 @@ namespace casadi {
         for (k=0, ss=A+i*LDA, tt=B+j*LDB; k<K; ++k) \
           *rr += *ss++**tt++;
 
-  // Template function implementations
+ // Template function implementations
   #include "casadi_copy.hpp"
+  #include "casadi_cvx.hpp"
   #include "casadi_swap.hpp"
   #include "casadi_project.hpp"
+  #include "casadi_tri_project.hpp"
   #include "casadi_densify.hpp"
   #include "casadi_sparsify.hpp"
   #include "casadi_scal.hpp"
   #include "casadi_iamax.hpp"
   #include "casadi_axpy.hpp"
   #include "casadi_dot.hpp"
+  #include "casadi_kron.hpp"
+  #include "casadi_clear.hpp"
   #include "casadi_fill.hpp"
   #include "casadi_max_viol.hpp"
   #include "casadi_minmax.hpp"
+  #include "casadi_vfmin.hpp"
+  #include "casadi_vfmax.hpp"
   #include "casadi_sum_viol.hpp"
   #include "casadi_mtimes.hpp"
   #include "casadi_mv.hpp"
@@ -229,17 +256,25 @@ namespace casadi {
   #include "casadi_polyval.hpp"
   #include "casadi_de_boor.hpp"
   #include "casadi_nd_boor_eval.hpp"
+  #include "casadi_nd_boor_dual_eval.hpp"
   #include "casadi_interpn_weights.hpp"
   #include "casadi_interpn_interpolate.hpp"
   #include "casadi_interpn.hpp"
   #include "casadi_interpn_grad.hpp"
   #include "casadi_mv_dense.hpp"
   #include "casadi_finite_diff.hpp"
+  #include "casadi_file_slurp.hpp"
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
+  #include "casadi_qp.hpp"
+  #include "casadi_nlp.hpp"
+  #include "casadi_sqpmethod.hpp"
   #include "casadi_bfgs.hpp"
   #include "casadi_regularize.hpp"
   #include "casadi_newton.hpp"
+  #include "casadi_bound_consistency.hpp"
+  #include "casadi_lsqr.hpp"
+
 } // namespace casadi
 
 /// \endcond

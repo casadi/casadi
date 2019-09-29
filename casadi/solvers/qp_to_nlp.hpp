@@ -41,6 +41,16 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  struct CASADI_CONIC_NLPSOL_EXPORT QpToNlpMemory : public ConicMemory {
+    casadi_int nlp_mem;
+
+    /// Constructor
+    QpToNlpMemory() {}
+
+    /// Destructor
+    ~QpToNlpMemory() {}
+  };
+
   /** \brief \pluginbrief{Conic,nlpsol}
 
       @copydoc Conic_doc
@@ -70,9 +80,15 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "QpToNlp";}
 
+    /** \brief Create memory block */
+    void* alloc_mem() const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override;
+
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -82,13 +98,23 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
 
     /// Solve with
     Function solver_;
+
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new QpToNlp(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit QpToNlp(DeserializingStream& s);
   };
 
 } // namespace casadi

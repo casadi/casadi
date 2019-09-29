@@ -83,6 +83,13 @@ namespace casadi {
 
     /** \brief Get the operation */
     casadi_int op() const override { return OP_BILIN;}
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new Bilin(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Bilin(DeserializingStream& s) : MXNode(s) {}
   };
 
 

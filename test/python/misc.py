@@ -30,7 +30,7 @@ from helpers import *
 import pickle
 from operator import itemgetter
 import sys
-
+from casadi.tools import capture_stdout
 
 scipy_available = True
 try:
@@ -166,7 +166,6 @@ class Misctests(casadiTestCase):
 
     #d = i.optionAllowed(n)
 
-  @unittest.skipIf(sys.version_info>=(3,0),"too lazy to fix now")
   def test_pickling(self):
 
     a = Sparsity.lower(4)
@@ -179,59 +178,52 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.assertTrue(a.is_null())
 
-    a = IM(Sparsity.lower(4),list(range(10)))
-    s = pickle.dumps(a)
-    b = pickle.loads(s)
-    self.checkarray(a,b)
-
-
     a = DM(Sparsity.lower(4),list(range(10)))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
 
-  @known_bug()
   def test_exceptions(self):
     try:
       nlpsol(123)
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "nlpsol(str,str,Function,Dict)" in e.message
-      assert "You have: nlpsol(int)" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
+      e_message = str(e)
+      assert "nlpsol(str,str,dict:MX,dict)" in e_message
+      assert "You have: '(int)'" in e_message
+      assert "::" not in e_message
+      assert "std" not in e_message
 
     try:
-      vertcat(*123)
+      vcat(123)
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "vertcat(*[SX]" in e.message
-      assert "vertcat(*[DM" in e.message
-      assert "You have: vertcat(*int)" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
+      e_message = str(e)
+      assert "vertcat([SX]" in e_message
+      assert "vertcat([DM]" in e_message
+      assert "You have: '(int)'" in e_message
+      assert "::" not in e_message
+      assert "std" not in e_message
 
     try:
       substitute(123)
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "substitute(SX,SX,SX)" in e.message
-      assert "substitute([SX] ,[SX] ,[SX] )" in e.message
-      assert "You have: substitute(int)" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
+      e_message = str(e)
+      assert "substitute(SX,SX,SX)" in e_message
+      assert "substitute([SX],[SX],[SX])" in e_message
+      assert "You have: '(int)'" in e_message
+      assert "::" not in e_message
+      assert "std" not in e_message
 
     try:
       load_nlpsol(132)
       self.assertTrue(False)
-    except TypeError as e:
-      print(e.message)
-      assert "Failed to convert input to str" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
+    except NotImplementedError as e:
+      e_message = str(e)
+      assert "load_nlpsol(str)" in e_message
+      assert "::" not in e_message
+      assert "std" not in e_message
 
     x=SX.sym("x")
 
@@ -239,49 +231,49 @@ class Misctests(casadiTestCase):
       [x]+ x
       self.assertTrue(False)
     except TypeError as e:
-      print(e.message)
+      e_message = str(e)
 
     try:
       x + [x]
       self.assertTrue(False)
     except TypeError as e:
-      print(e.message)
+      e_message = str(e)
 
     try:
       x.reshape(2)
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "reshape(SX,(int,int) )" in e.message
+      e_message = str(e)
+      assert "reshape(SX,(int,int))" in e_message
 
     try:
       x.reshape(("a",2))
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "You have: reshape((str,int))" in e.message
+      e_message = str(e)
+      assert "You have: '(SX,(str,int))'" in e_message
 
     try:
       diagsplit("s")
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "diagsplit(SX,int)" in e.message
-      assert "diagsplit(DM ,int)" in e.message
+      e_message = str(e)
+      assert "diagsplit(SX,int)" in e_message
+      assert "diagsplit(DM,int)" in e_message
 
     try:
       DM("df")
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "  DM (" in e.message
+      e_message = str(e)
+      assert "  DM(" in e_message
 
     try:
-      vertcat(*[1,SX.sym('x'),MX.sym('x')])
+      vertcat(1,SX.sym('x'),MX.sym('x'))
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "  vertcat(*" in e.message
+      e_message = str(e)
+      assert "vertcat(" in e_message
 
   def test_getscheme(self):
     x = SX.sym("x")
@@ -347,6 +339,192 @@ class Misctests(casadiTestCase):
 
     assert "casadi_nlpsol_foo" in result[1]
 
+  def test_serialize(self):
+
+    x = Sparsity.upper(3)
+
+    y = SX.sym("y") # nested
+
+    si = StringSerializer()
+    si.pack([x])
+
+    z = y
+    for i in range(10000):
+      z = sin(z)
+    e = vertcat(y,z,2*z)
+    fref = Function('f',[y],[e])
+    si.pack(e)
+    data = si.encode()
+    si.pack([x])
+
+    si = StringDeserializer(data)
+
+    spx = si.unpack()
+    self.assertTrue(spx[0]==x)
+    A = si.unpack()
+    f = Function('f',[A[0]],[A])
+    self.checkfunction_light(f,fref,[7])
+    with self.assertInException("end of stream"):
+      si.unpack()
+    with self.assertInException("end of stream"):
+      si.unpack()
+
+    si = FileSerializer("foo.dat")
+    si.pack([x])
+    z = sin(y)
+    e = vertcat(y,z,2*z)
+    fref = Function('f',[y],[e])
+    si.pack(e)
+    si = None
+    si = FileDeserializer("foo.dat")
+
+    spx = si.unpack()
+    self.assertTrue(spx[0]==x)
+    A = si.unpack()
+    f = Function('f',[A[0]],[A])
+    self.checkfunction_light(f,fref,[7])
+    with self.assertInException("end of stream"):
+      si.unpack()
+    with self.assertInException("end of stream"):
+      si.unpack()
+
+
+    x = SX.sym('x')
+    s = StringSerializer()
+    s.pack(x)
+    data1 = s.encode()
+    s.pack(sin(x))
+    data2 = s.encode()
+
+    s = StringDeserializer(data1)
+    a = s.unpack()
+    with self.assertInException("end of stream"):
+      s.unpack()
+    s.decode(data2)
+    b = s.unpack()
+    with self.assertInException("end of stream"):
+      s.unpack()
+
+    si = FileSerializer("foo.dat")
+    f = Function("f",[x],[x**2])
+    g = Function("g",[x],[x**3])
+    si.pack([f,g])
+    si = None
+    with self.assertInException("File is not loadable with 'load'. Use 'FileDeserializer' instead."):
+      r = Function.load("foo.dat")
+
+    si = FileDeserializer("foo.dat")
+    print(si.unpack())
+
+    si = FileSerializer("foo.dat")
+    f = Function("f",[x],[x**2])
+    si.pack(f)
+    si = None
+    r = Function.load("foo.dat")
+    print(r)
+
+    f.save("foo.dat")
+    si = FileDeserializer("foo.dat")
+    print(si.unpack())
+  
+  def test_print_time(self):
+
+
+    x = MX.sym("x")
+    f = x**2
+
+
+    for print_time in [True,False]:
+      included = ["t_wall"] if print_time else []
+      excluded = [] if print_time else ["t_wall"]
+      opts = {"print_time":print_time}
+      ff = Function("f",[x],[f],opts)
+      with self.assertOutput(included, excluded):
+        ff(3)
+
+      solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
+      with self.assertOutput(included, excluded):
+        solver()
+
+
+      solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
+      with self.assertOutput(included, excluded):
+        solver()
+
+      solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
+      with self.assertOutput(included, excluded):
+        solver()
+
+      solver = integrator("integrator","rk",{"x":x,"ode":f},opts)
+      with self.assertOutput(included, excluded):
+        solver()
+
+
+      integr_options = dict(opts)
+      integr_options["simplify"] = True
+      solver = integrator("integrator","rk",{"x":x,"ode":f},integr_options)
+      with self.assertOutput(included, excluded):
+        solver()
+
+      A = DM.rand(3,3)
+      with self.assertOutput(included, excluded):
+        solve(A,vertcat(1,2,3),"lapacklu",opts)
+
+
+      Amx = MX(DM.rand(3,3))
+      with self.assertOutput(included, excluded):
+        evalf(solve(Amx,vertcat(1,2,3),"lapacklu",opts))
+
+      solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
+      with self.assertOutput(included, excluded):
+        solver.solve(A,vertcat(1,2,3))
+
+  def test_record_time(self):
+
+
+    x = MX.sym("x")
+    f = x**2
+
+
+    opts = {"record_time":True}
+    ff = Function("f",[x],[f],opts)
+    ff(3)
+    self.assertTrue("t_proc_total" in ff.stats())
+    self.assertTrue(ff.stats()["t_proc_total"]>0)
+
+    solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    solver = integrator("integrator","rk",{"x":x,"ode":f},opts)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    integr_options = {}
+    integr_options["simplify"] = True
+    integr_options["simplify_options"] = opts
+    solver = integrator("integrator","rk",{"x":x,"ode":f},integr_options)
+    solver()
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
+
+    A = DM.rand(3,3)
+    solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
+    solver.solve(A,vertcat(1,2,3))
+    self.assertTrue("t_proc_total" in solver.stats())
+    self.assertTrue(solver.stats()["t_proc_total"]>0)
 
 if __name__ == '__main__':
     unittest.main()

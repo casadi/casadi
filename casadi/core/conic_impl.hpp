@@ -29,14 +29,20 @@
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
-#include "timing.hpp"
+#include "im.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
 
-  struct CASADI_EXPORT ConicMemory {
-    // Function specific statistics
-    std::map<std::string, FStats> fstats;
+  struct CASADI_EXPORT ConicMemory : public FunctionMemory {
+    // Success?
+    bool success;
+
+    // Return status
+    FunctionInternal::UnifiedReturnStatus unified_return_status;
+
+    // Number of iterations performed
+    casadi_int iter_count;
   };
 
   /// Internal class
@@ -69,12 +75,26 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
+    /// Solve the QP
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const final;
+
+    /// Solve the QP
+    virtual int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const = 0;
+
     // Initialize
     void init(const Dict& opts) override;
+
+    /** \brief Initalize memory block */
+    int init_mem(void* mem) const override;
+
+    /** \brief Set the (persistent) work vectors */
+    void set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const override;
 
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void check_inputs(const double* lbx, const double* ubx,
@@ -111,12 +131,12 @@ namespace casadi {
     /// Can psd constraints be treated
     virtual bool psd_support() const { return false;}
 
-    /// Print statistics
-    void print_fstats(const ConicMemory* m) const;
-
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
   protected:
     /// Options
     std::vector<bool> discrete_;
+    bool print_problem_;
 
     /// Problem structure
     Sparsity H_, A_, Q_, P_;
@@ -129,6 +149,50 @@ namespace casadi {
 
     /// The shape of psd constraint matrix
     casadi_int np_;
+
+    /// SDP to SOCP conversion memory
+    struct SDPToSOCPMem {
+      // Block partition vector for SOCP (block i runs from r[i] to r[i+1])
+      std::vector<casadi_int> r;
+
+      // Tranpose of A, and corresponding mapping
+      Sparsity AT;
+      std::vector<casadi_int> A_mapping;
+
+      // Aggregate SOCP helper constraints (lhs)
+      IM map_Q;
+
+      // Aggregate SOCP helper constraints (rhs)
+      std::vector<casadi_int> map_P;
+
+      // Maximum size of ind/val vectors
+      casadi_int indval_size;
+    };
+
+    /// Throw an exception on failure?
+    bool error_on_fail_;
+
+    /// SDP to SOCP conversion initialization
+    void sdp_to_socp_init(SDPToSOCPMem& mem) const;
+
+    void serialize(SerializingStream &s, const SDPToSOCPMem& m) const;
+    void deserialize(DeserializingStream &s, SDPToSOCPMem& m);
+
+  public:
+      /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Conic"; }
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
+  protected:
+
+    /** \brief Deserializing constructor */
+    explicit Conic(DeserializingStream& s);
   };
 
 

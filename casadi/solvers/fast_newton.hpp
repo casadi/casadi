@@ -78,7 +78,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -113,7 +113,16 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function */
     void codegen_declarations(CodeGenerator& g) const override;
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new FastNewton(s); }
+
   protected:
+    /** \brief Deserializing constructor */
+    explicit FastNewton(DeserializingStream& s);
+
     /// Maximum number of Newton iterations
     casadi_int max_iter_;
 

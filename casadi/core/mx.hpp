@@ -26,7 +26,10 @@
 #ifndef CASADI_MX_HPP
 #define CASADI_MX_HPP
 #include "shared_object.hpp"
-#include "matrix.hpp"
+#include "matrix_fwd.hpp"
+#include "sx_fwd.hpp"
+#include "dm.hpp"
+#include "generic_matrix.hpp"
 #include "generic_expression.hpp"
 #include "generic_type.hpp"
 #include "printable.hpp"
@@ -36,6 +39,8 @@ namespace casadi {
   /** \brief  Forward declaration */
   class MXNode;
   class Function;
+  class SerializingStream;
+  class DeserializingStream;
 
   /** \brief MX - Matrix expression
 
@@ -83,14 +88,19 @@ namespace casadi {
     /** \brief Construct matrix with a given sparsity and nonzeros */
     MX(const Sparsity& sp, const MX& val);
 
+    /** \brief Construct matrix with a given sparsity and a file with nonzeros */
+    MX(const Sparsity& sp, const std::string& fname);
+
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
 
     /** \brief  Copy constructor */
     MX(const MX& x);
 
+#ifndef SWIG
     /** \brief  Create vector constant (also implicit type conversion) */
     MX(const std::vector<double> &x);
+#endif
 
     /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
@@ -275,6 +285,12 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const;
 
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    /** \brief Deserialize with type disambiguation */
+    static MX deserialize(DeserializingStream& s);
+
     /// \cond INTERNAL
     /// Get the temporary variable
     casadi_int get_temp() const;
@@ -304,7 +320,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Identity matrix */
-    static MX eye(casadi_int ncol);
+    static MX eye(casadi_int n);
 
 #ifndef SWIG
     /// Get a const pointer to the node
@@ -322,9 +338,22 @@ namespace casadi {
     ///@{
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Slice& cc) const;
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Matrix<casadi_int>& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, casadi_int cc) const {
+      get(m, ind1, rr, Matrix<casadi_int>(cc));
+    }
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& rr, const Slice& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, casadi_int rr, const Slice& cc) const {
+      get(m, ind1, Matrix<casadi_int>(rr), cc);
+    }
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& rr,
                                             const Matrix<casadi_int>& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, casadi_int rr,
+                                            casadi_int cc) const {
+      get(m, ind1, Matrix<casadi_int>(rr), Matrix<casadi_int>(cc));
+    }
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const MX& rr, const Slice& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const MX& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const MX& rr, const MX& cc) const;
     ///@}
 
     ///@{
@@ -347,12 +376,21 @@ namespace casadi {
     /// Get a set of nonzeros
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Slice& kk) const;
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& kk) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const MX& kk) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, casadi_int kk) const {
+      get_nz(m, ind1, Matrix<casadi_int>(kk));
+    }
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const MX& inner, const Slice& outer) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Slice& inner, const MX& outer) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const MX& inner, const MX& outer) const;
     ///@}
 
     ///@{
     /// Set a set of nonzeros
     void set_nz(const MX& m, bool ind1, const Slice& kk);
     void set_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk);
+    void set_nz(const MX& m, bool ind1, const MX& kk);
+    void set_nz(const MX& m, bool ind1, casadi_int kk) { set_nz(m, ind1, Matrix<casadi_int>(kk)); }
     ///@}
 
     ///@{
@@ -413,8 +451,8 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     static MX jacobian(const MX& f, const MX& x, const Dict& opts = Dict());
-    static MX hessian(const MX& f, const MX& x);
-    static MX hessian(const MX& f, const MX& x, MX& g);
+    static MX hessian(const MX& f, const MX& x, const Dict& opts = Dict());
+    static MX hessian(const MX& f, const MX& x, MX& g, const Dict& opts = Dict());
     static std::vector<std::vector<MX> >
     forward(const std::vector<MX> &ex,
             const std::vector<MX> &arg,
@@ -434,7 +472,7 @@ namespace casadi {
     static void substitute_inplace(const std::vector<MX>& v,
                                   std::vector<MX>& vdef,
                                   std::vector<MX>& ex, bool reverse);
-    static MX solve(const MX& A, const MX& b, const std::string& lsolver="qr",
+    static MX solve(const MX& a, const MX& b, const std::string& lsolver="qr",
                     const Dict& dict = Dict());
     static MX inv_minor(const MX& A);
     static MX inv_node(const MX& A);
@@ -481,6 +519,7 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for this class
     static MX find(const MX& x);
+    static MX low(const MX& v, const MX& p, const Dict& options = Dict());
     static MX graph_substitute(const MX& x, const std::vector<MX> &v,
                                const std::vector<MX> &vdef);
     static std::vector<MX> graph_substitute(const std::vector<MX> &ex,
@@ -492,13 +531,37 @@ namespace casadi {
                                          const std::vector<MX>& boundary,
                                          const Dict& options);
     static MX lift(const MX& x, const MX& x_guess);
-    static DM evalf(const MX& x);
+    static DM evalf(const MX& m);
+    static MX bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict());
+    static DM bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts = Dict());
+    static MX bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict());
     ///@}
     /// \endcond
 
 #endif // SWIG
 
-    MX printme(const MX& y) const;
+    /** \brief Low-level access to inlined linear interpolation
+     *
+     * Usually, you want to be using 'interpolant' instead.
+     *
+     * Accepts lookup_mode option.
+     */
+    static MX interpn_linear(const std::vector<MX>& x, const MX& v, const std::vector<MX>& xq,
+      const Dict& opts=Dict());
+
+    MX printme(const MX& b) const;
 
 #if !defined(SWIG) || defined(DOXYGEN)
 /**
@@ -510,6 +573,13 @@ namespace casadi {
      */
     inline friend MX find(const MX& x) {
       return MX::find(x);
+    }
+
+    /** \brief Find first nonzero
+     * If failed, returns the number of rows
+     */
+    inline friend MX low(const MX& v, const MX& p, const Dict& options=Dict()) {
+      return MX::low(v, p, options);
     }
 
     /** \brief Substitute single expression in graph
@@ -554,6 +624,31 @@ namespace casadi {
                     const std::vector<MX> &boundary = std::vector<MX>(),
                     const Dict& options = Dict()) {
       return MX::matrix_expand(e, boundary, options);
+    }
+
+
+    inline friend MX bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict()) {
+      return MX::bspline(x, coeffs, knots, degree, m, opts);
+    }
+
+    inline friend MX bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict()) {
+      return MX::bspline(x, coeffs, knots, degree, m, opts);
+    }
+
+    inline friend DM bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts = Dict()) {
+      return MX::bspline_dual(x, knots, degree, opts);
     }
 
     /** \brief Lift the expression

@@ -29,6 +29,7 @@
 #include <stack>
 #include "function_internal.hpp"
 #include "factory.hpp"
+#include "serializing_stream.hpp"
 
 // To reuse variables we need to be able to sort by sparsity pattern
 #include <unordered_map>
@@ -62,7 +63,8 @@ namespace casadi {
               const std::vector<std::string>& name_out);
 
     /** \brief  Destructor */
-    ~XFunction() override {}
+    ~XFunction() override {
+    }
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
@@ -192,6 +194,21 @@ namespace casadi {
     Sparsity get_sparsity_out(casadi_int i) override { return out_.at(i).sparsity();}
     /// @}
 
+    /** \brief Deserializing constructor */
+    explicit XFunction(DeserializingStream& s);
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief  Helper functions to avoid recursion limit
+     *
+     * The out member is problematic to de/serialize before the sorted algorithm
+     * has a chance of laying out the expression graph efficiently
+    */
+    //@{
+    void delayed_serialize_members(SerializingStream &s) const;
+    void delayed_deserialize_members(DeserializingStream &s);
+    //@}
+
     // Data members (all public)
 
     /** \brief  Inputs of the function (needed for symbolic calculations) */
@@ -223,6 +240,35 @@ namespace casadi {
       "Mismatching number of output names");
       name_out_ = name_out;
     }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  XFunction<DerivedType, MatType, NodeType>::
+  XFunction(DeserializingStream& s) : FunctionInternal(s) {
+    s.version("XFunction", 1);
+    s.unpack("XFunction::in", in_);
+    // 'out' member needs to be delayed
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  delayed_deserialize_members(DeserializingStream& s) {
+    s.unpack("XFunction::out", out_);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  delayed_serialize_members(SerializingStream& s) const {
+    s.pack("XFunction::out", out_);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  serialize_body(SerializingStream& s) const {
+    FunctionInternal::serialize_body(s);
+    s.version("XFunction", 1);
+    s.pack("XFunction::in", in_);
+    // 'out' member needs to be delayed
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -503,13 +549,13 @@ namespace casadi {
         }
 
         // Evaluate symbolically
-        if (fseed.size()>0) {
-          casadi_assert_dev(aseed.size()==0);
+        if (!fseed.empty()) {
+          casadi_assert_dev(aseed.empty());
           if (verbose_) casadi_message("Calling 'ad_forward'");
           static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
           if (verbose_) casadi_message("Back from 'ad_forward'");
-        } else if (aseed.size()>0) {
-          casadi_assert_dev(fseed.size()==0);
+        } else if (!aseed.empty()) {
+          casadi_assert_dev(fseed.empty());
           if (verbose_) casadi_message("Calling 'ad_reverse'");
           static_cast<const DerivedType*>(this)->ad_reverse(aseed, asens);
           if (verbose_) casadi_message("Back from 'ad_reverse'");
@@ -700,12 +746,19 @@ namespace casadi {
       // All outputs of the return function
       std::vector<MatType> ret_out(onames.size());
       for (casadi_int i=0; i<n_out_; ++i) {
-        for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
-        ret_out.at(i) = horzcat(v);
+        if (is_diff_out_[i]) {
+          for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
+          ret_out.at(i) = horzcat(v);
+        } else {
+          ret_out.at(i) = MatType(size1_out(i), size2_out(i)*nfwd);
+        }
       }
 
+      Dict options = opts;
+      options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
+      options["is_diff_out"] = is_diff_out_;
       // Assemble function and return
-      return Function(name, ret_in, ret_out, inames, onames, opts);
+      return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("get_forward", e.what());
     }
@@ -739,12 +792,20 @@ namespace casadi {
       // All outputs of the return function
       std::vector<MatType> ret_out(onames.size());
       for (casadi_int i=0; i<n_in_; ++i) {
-        for (casadi_int d=0; d<nadj; ++d) v[d] = asens[d][i];
-        ret_out.at(i) = horzcat(v);
+        if (is_diff_in_[i]) {
+          for (casadi_int d=0; d<nadj; ++d) v[d] = asens[d][i];
+          ret_out.at(i) = horzcat(v);
+        } else {
+          ret_out.at(i) = MatType(size1_in(i), size2_in(i)*nadj);
+        }
       }
 
+      Dict options = opts;
+      options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_out_);
+      options["is_diff_out"] = is_diff_in_;
+
       // Assemble function and return
-      return Function(name, ret_in, ret_out, inames, onames, opts);
+      return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("get_reverse", e.what());
     }
@@ -757,9 +818,9 @@ namespace casadi {
             const std::vector<std::string>& onames,
             const Dict& opts) const {
     try {
+      Dict tmp_options = generate_options(true);
       // Temporary single-input, single-output function FIXME(@jaeandersson)
-      Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
-                   {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
+      Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
 
       // Jacobian expression
       MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
@@ -773,7 +834,15 @@ namespace casadi {
       // Collect all outputs
       std::vector<MatType> ret_out;
       ret_out.reserve(onames.size());
-      for (auto& e1 : Jblocks) for (auto& e2 : e1) ret_out.push_back(e2);
+      for (casadi_int i=0;i<n_out_;++i) {
+        for (casadi_int j=0;j<n_in_;++j) {
+          MatType b = Jblocks[i][j];
+          if (!is_diff_in_[i] || !is_diff_out_[j]) {
+            b = MatType(b.size());
+          }
+          ret_out.push_back(b);
+        }
+      }
 
       // All inputs of the return function
       std::vector<MatType> ret_in(inames.size());
@@ -796,12 +865,15 @@ namespace casadi {
                  const std::vector<std::string>& onames,
                  const Dict& opts) const {
     try {
+      Dict tmp_options = generate_options(true);
       // Temporary single-input, single-output function FIXME(@jaeandersson)
-      Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
-                   {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
+      Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
 
       // Jacobian expression
       MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
+
+      // Filter out parts that are non-differentiable
+      J = project(J, jacobian_sparsity_filter(J.sparsity()));
 
       // All inputs of the return function
       std::vector<MatType> ret_in(inames.size());
@@ -823,7 +895,7 @@ namespace casadi {
     // Temporary single-input, single-output function FIXME(@jaeandersson)
     Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
                  {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
-    return tmp.sparsity_jac(0, 0);
+    return jacobian_sparsity_filter(tmp.sparsity_jac(0, 0));
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -853,67 +925,68 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>
-  ::export_code(const std::string& lang, std::ostream &ss, const Dict& options) const {
+  ::export_code(const std::string& lang, std::ostream &stream, const Dict& options) const {
 
     casadi_assert(!has_free(), "export_code needs a Function without free variables");
 
     casadi_assert(lang=="matlab", "Only matlab language supported for now.");
 
     // start function
-    ss << "function [varargout] = " << name_ << "(varargin)" << std::endl;
+    stream << "function [varargout] = " << name_ << "(varargin)" << std::endl;
 
     // Allocate space for output argument (segments)
     for (casadi_int i=0;i<n_out_;++i) {
-      ss << "  argout_" << i <<  " = cell(" << nnz_out(i) << ",1);" << std::endl;
+      stream << "  argout_" << i <<  " = cell(" << nnz_out(i) << ",1);" << std::endl;
     }
 
     Dict opts;
     opts["indent_level"] = 1;
-    export_code_body(lang, ss, opts);
+    export_code_body(lang, stream, opts);
 
     // Process the outputs
     for (casadi_int i=0;i<n_out_;++i) {
       const Sparsity& out = sparsity_out_.at(i);
       if (out.is_dense()) {
         // Special case if dense
-        ss << "  varargout{" << i+1 <<  "} = reshape(vertcat(argout_" << i << "{:}), ";
-        ss << out.size1() << ", " << out.size2() << ");" << std::endl;
+        stream << "  varargout{" << i+1 <<  "} = reshape(vertcat(argout_" << i << "{:}), ";
+        stream << out.size1() << ", " << out.size2() << ");" << std::endl;
       } else {
         // For sparse outputs, export sparsity and call 'sparse'
         Dict opts;
         opts["name"] = "sp";
         opts["indent_level"] = 1;
         opts["as_matrix"] = false;
-        out.export_code("matlab", ss, opts);
-        ss << "  varargout{" << i+1 <<  "} = ";
-        ss << "sparse(sp_i, sp_j, vertcat(argout_" << i << "{:}), sp_m, sp_n);" << std::endl;
+        out.export_code("matlab", stream, opts);
+        stream << "  varargout{" << i+1 <<  "} = ";
+        stream << "sparse(sp_i, sp_j, vertcat(argout_" << i << "{:}), sp_m, sp_n);" << std::endl;
       }
     }
 
     // end function
-    ss << "end" << std::endl;
-    ss << "function y=nonzeros_gen(x)" << std::endl;
-    ss << "  if isa(x,'casadi.SX') || isa(x,'casadi.MX') || isa(x,'casadi.DM')" << std::endl;
-    ss << "    y = x{:};" << std::endl;
-    ss << "  elseif isa(x,'sdpvar')" << std::endl;
-    ss << "    b = getbase(x);" << std::endl;
-    ss << "    f = find(sum(b~=0,2));" << std::endl;
-    ss << "    y = sdpvar(length(f),1,[],getvariables(x),b(f,:));" << std::endl;
-    ss << "  else" << std::endl;
-    ss << "    y = nonzeros(x);" << std::endl;
-    ss << "  end" << std::endl;
-    ss << "end" << std::endl;
-    ss << "function y=if_else_zero_gen(c,e)" << std::endl;
-    ss << "  if isa(c+e,'casadi.SX') || isa(c+e,'casadi.MX') || isa(c+e,'casadi.DM')" << std::endl;
-    ss << "    y = if_else(c, e, 0);" << std::endl;
-    ss << "  else" << std::endl;
-    ss << "    if c" << std::endl;
-    ss << "        y = x;" << std::endl;
-    ss << "    else" << std::endl;
-    ss << "        y = 0;" << std::endl;
-    ss << "    end" << std::endl;
-    ss << "  end" << std::endl;
-    ss << "end" << std::endl;
+    stream << "end" << std::endl;
+    stream << "function y=nonzeros_gen(x)" << std::endl;
+    stream << "  if isa(x,'casadi.SX') || isa(x,'casadi.MX') || isa(x,'casadi.DM')" << std::endl;
+    stream << "    y = x{:};" << std::endl;
+    stream << "  elseif isa(x,'sdpvar')" << std::endl;
+    stream << "    b = getbase(x);" << std::endl;
+    stream << "    f = find(sum(b~=0,2));" << std::endl;
+    stream << "    y = sdpvar(length(f),1,[],getvariables(x),b(f,:));" << std::endl;
+    stream << "  else" << std::endl;
+    stream << "    y = nonzeros(x);" << std::endl;
+    stream << "  end" << std::endl;
+    stream << "end" << std::endl;
+    stream << "function y=if_else_zero_gen(c,e)" << std::endl;
+    stream << "  if isa(c+e,'casadi.SX') || isa(c+e,'casadi.MX') "
+              "|| isa(c+e,'casadi.DM')" << std::endl;
+    stream << "    y = if_else(c, e, 0);" << std::endl;
+    stream << "  else" << std::endl;
+    stream << "    if c" << std::endl;
+    stream << "        y = x;" << std::endl;
+    stream << "    else" << std::endl;
+    stream << "        y = 0;" << std::endl;
+    stream << "    end" << std::endl;
+    stream << "  end" << std::endl;
+    stream << "end" << std::endl;
 
 
   }
@@ -1003,14 +1076,19 @@ namespace casadi {
           const Dict& opts) const {
     using namespace std;
 
-    auto it = opts.find("verbose");
-    bool verbose = false;
-    if (it!=opts.end()) verbose = it->second;
+    Dict g_ops = generate_options();
+    Dict f_options;
+    f_options["helper_options"] = g_ops;
+    f_options["final_options"] = g_ops;
+    update_dict(f_options, opts, true);
+
+    Dict final_options;
+    extract_from_dict_inplace(f_options, "final_options", final_options);
 
     // Create an expression factory
-    Factory<MatType> f(aux, verbose);
-    for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i]);
-    for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i]);
+    Factory<MatType> f(aux);
+    for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i], is_diff_in_[i]);
+    for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i], is_diff_out_[i]);
 
     // Specify input expressions to be calculated
     vector<string> ret_iname;
@@ -1033,7 +1111,7 @@ namespace casadi {
     }
 
     // Calculate expressions
-    f.calculate();
+    f.calculate(f_options);
 
     // Get input expressions
     vector<MatType> ret_in;
@@ -1046,7 +1124,7 @@ namespace casadi {
     for (const string& s : s_out) ret_out.push_back(f.get_output(s));
 
     // Create function and return
-    Function ret(name, ret_in, ret_out, ret_iname, ret_oname, opts);
+    Function ret(name, ret_in, ret_out, ret_iname, ret_oname, final_options);
     if (ret.has_free()) {
       // Substitute free variables with zeros
       // We assume that the free variables are caused by false positive dependencies
@@ -1054,7 +1132,7 @@ namespace casadi {
       vector<MatType> free_sub = free_in;
       for (auto&& e : free_sub) e = MatType::zeros(e.sparsity());
       ret_out = substitute(ret_out, free_in, free_sub);
-      ret = Function(name, ret_in, ret_out, ret_iname, ret_oname, opts);
+      ret = Function(name, ret_in, ret_out, ret_iname, ret_oname, final_options);
     }
     return ret;
   }

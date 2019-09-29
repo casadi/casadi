@@ -36,7 +36,9 @@
 #include "casadi_meta.hpp"
 
 // Matrices
-#include "matrix.hpp"
+#include "sx.hpp"
+#include "dm.hpp"
+#include "im.hpp"
 
 // Matrix expressions
 #include "mx.hpp"
@@ -57,10 +59,12 @@
 
 // Misc
 #include "integration_tools.hpp"
+#include "nlp_tools.hpp"
 #include "nlp_builder.hpp"
 #include "variable.hpp"
 #include "dae_builder.hpp"
 #include "xml_file.hpp"
 #include "optistack.hpp"
+#include "serializer.hpp"
 
 #endif // CASADI_CORE_HPP

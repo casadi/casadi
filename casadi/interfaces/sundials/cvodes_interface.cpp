@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = CvodesInterface::meta_doc.c_str();;
     plugin->version = CASADI_VERSION;
     plugin->options = &CvodesInterface::options_;
+    plugin->deserialize = &CvodesInterface::deserialize;
     return 0;
   }
 
@@ -56,7 +57,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options CvodesInterface::options_
+  const Options CvodesInterface::options_
   = {{&SundialsInterface::options_},
      {{"linear_multistep_method",
        {OT_STRING,
@@ -150,13 +151,13 @@ namespace casadi {
     THROWING(CVodeSetMaxNumSteps, m->mem, max_num_steps_);
 
     // Initial step size
-    if (step0_) THROWING(CVodeSetInitStep, m->mem, step0_);
+    if (step0_!=0) THROWING(CVodeSetInitStep, m->mem, step0_);
 
     // Maximum order of method
     if (max_order_) THROWING(CVodeSetMaxOrd, m->mem, max_order_);
 
     // Coeff. in the nonlinear convergence test
-    if (nonlin_conv_coeff_) THROWING(CVodeSetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
+    if (nonlin_conv_coeff_!=0) THROWING(CVodeSetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
 
     // attach a linear solver
     if (newton_scheme_==SD_DIRECT) {
@@ -375,7 +376,7 @@ namespace casadi {
     char* flagname = CVodeGetReturnFlagName(flag);
     stringstream ss;
     ss << module << " returned \"" << flagname << "\". Consult CVODES documentation.";
-    free(flagname);
+    free(flagname); // NOLINT
     casadi_error(ss.str());
   }
 
@@ -534,7 +535,7 @@ namespace casadi {
         // Second order correction
         if (s.second_order_correction_) {
           // The outputs will double as seeds for jtimesF
-          casadi_fill(v + s.nx1_, s.nx_ - s.nx1_, 0.);
+          casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
           m->arg[0] = &t; // t
           m->arg[1] = NV_DATA_S(x); // x
           m->arg[2] = m->p; // p
@@ -585,7 +586,7 @@ namespace casadi {
         // Second order correction
         if (s.second_order_correction_) {
           // The outputs will double as seeds for jtimesF
-          casadi_fill(v + s.nrx1_, s.nrx_ - s.nrx1_, 0.);
+          casadi_clear(v + s.nrx1_, s.nrx_ - s.nrx1_);
           m->arg[0] = &t; // t
           m->arg[1] = NV_DATA_S(x); // x
           m->arg[2] = m->p; // p
@@ -824,7 +825,7 @@ namespace casadi {
   template<typename MatType>
   Function CvodesInterface::getJ(bool backward) const {
     vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = const_cast<Function&>(oracle_)(a);
+    vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
 
@@ -851,6 +852,19 @@ namespace casadi {
 
   CvodesMemory::~CvodesMemory() {
     if (this->mem) CVodeFree(&this->mem);
+  }
+
+  CvodesInterface::CvodesInterface(DeserializingStream& s) : SundialsInterface(s) {
+    s.version("CvodesInterface", 1);
+    s.unpack("CvodesInterface::lmm", lmm_);
+    s.unpack("CvodesInterface::iter", iter_);
+  }
+
+  void CvodesInterface::serialize_body(SerializingStream &s) const {
+    SundialsInterface::serialize_body(s);
+    s.version("CvodesInterface", 1);
+    s.pack("CvodesInterface::lmm", lmm_);
+    s.pack("CvodesInterface::iter", iter_);
   }
 
 } // namespace casadi

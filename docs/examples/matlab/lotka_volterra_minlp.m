@@ -89,7 +89,8 @@ xk = x0;
 x_start = [xk];
 for k=1:N
     ret = F('x0',xk, 'p',u_start(k));
-    x_start = [x_start ret.xf];
+    xk = ret.xf;
+    x_start = [x_start xk];
 end
 
 % Start with an empty NLP

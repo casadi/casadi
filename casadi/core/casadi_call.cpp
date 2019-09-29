@@ -26,6 +26,7 @@
 #include "casadi_call.hpp"
 #include "function_internal.hpp"
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
 throw CasadiException("Error in Call::" FNAME " for '" + fcn_.name() + "' "\
@@ -178,7 +179,8 @@ namespace casadi {
     }
 
     // Call function
-    g << "if (" << g(fcn_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    std::string flag = g(fcn_, "arg1", "res1", "iw", "w");
+    g << "if (" << flag << ") return 1;\n";
   }
 
   void Call::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
@@ -217,6 +219,15 @@ namespace casadi {
 
   std::vector<MX> Call::create(const Function& fcn, const std::vector<MX>& arg) {
     return MX::createMultipleOutput(new Call(fcn, arg));
+  }
+
+  void Call::serialize_body(SerializingStream& s) const {
+    MultipleOutput::serialize_body(s);
+    s.pack("Call::fcn", fcn_);
+  }
+
+  Call::Call(DeserializingStream& s) : MultipleOutput(s) {
+    s.unpack("Call::fcn", fcn_);
   }
 
 } // namespace casadi

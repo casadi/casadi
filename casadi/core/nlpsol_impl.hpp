@@ -36,23 +36,14 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT NlpsolMemory : public OracleMemory {
-    // Bounds, given parameter values
-    const double *lbx, *ubx, *lbg, *ubg, *p;
-
-    // Current primal solution
-    double *x;
-
-    // Current dual solution
-    double *lam_g, *lam_x, *lam_p;
-
-    // Outputs
-    double f, *g;
-
+    // Problem data structure
+    casadi_nlpsol_data<double> d_nlp;
     // number of iterations
     casadi_int n_iter;
-
     // Success?
     bool success;
+    // Return status
+    FunctionInternal::UnifiedReturnStatus unified_return_status;
   };
 
   /** \brief NLP solver storage class
@@ -64,6 +55,10 @@ namespace casadi {
   class CASADI_EXPORT
   Nlpsol : public OracleFunction, public PluginInterface<Nlpsol> {
   public:
+
+    // Memory structure
+    casadi_nlpsol_prob<double> p_nlp_;
+
     /// Number of variables
     casadi_int nx_;
 
@@ -90,6 +85,7 @@ namespace casadi {
     bool calc_multipliers_;
     bool calc_lam_x_, calc_lam_p_, calc_f_, calc_g_;
     bool bound_consistency_;
+    double min_lam_;
     bool no_nlp_grad_;
     std::vector<bool> discrete_;
     ///@}
@@ -99,6 +95,17 @@ namespace casadi {
 
     /// Cache for KKT function
     mutable WeakRef kkt_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Nlpsol"; }
 
     /// Constructor
     Nlpsol(const std::string& name, const Function& oracle);
@@ -126,7 +133,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -159,10 +166,13 @@ namespace casadi {
                           casadi_int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const final;
 
     // Solve the NLP
     virtual int solve(void* mem) const = 0;
+
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override {return true;}
@@ -189,15 +199,14 @@ namespace casadi {
     ///@}
 
     // Call the callback function
-    int callback(void* mem, const double* x, const double* f, const double* g,
-                 const double* lam_x, const double* lam_g, const double* lam_p) const;
+    int callback(NlpsolMemory* m) const;
 
     // Get KKT function
     Function kkt() const;
 
     // Make sure primal-dual solution is consistent with bounds
-    static void bound_consistency(casadi_int n, double* x, double* lam,
-                                  const double* lbx, const double* ubx);
+    static void bound_consistency(casadi_int n, double* z, double* lam,
+                                  const double* lbz, const double* ubz);
 
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const Function& oracle);
@@ -213,6 +222,9 @@ namespace casadi {
 
     /// Short name
     static std::string shortname() { return "nlpsol";}
+
+    /** \brief Get type name */
+    std::string class_name() const override {return "Nlpsol";}
 
     // Get reduced Hessian
     virtual DM getReducedHessian();
@@ -231,6 +243,12 @@ namespace casadi {
     template<typename XType>
       static Function create_oracle(const std::map<std::string, XType>& d,
                                     const Dict& opts);
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Nlpsol(DeserializingStream& s);
+  private:
+    void set_nlpsol_prob();
   };
 
 } // namespace casadi

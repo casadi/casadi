@@ -185,9 +185,9 @@ namespace casadi {
     static bool is_linear(const MatType &expr, const MatType &var);
     static bool is_quadratic(const MatType &expr, const MatType &var);
     static void quadratic_coeff(const MatType &expr, const MatType &var,
-        MatType& A, MatType& b, MatType& c);
+        MatType& A, MatType& b, MatType& c, bool check);
     static void linear_coeff(const MatType &expr, const MatType &var,
-        MatType& A, MatType& b);
+        MatType& A, MatType& b, bool check);
     /** @}  */
     /// \endcond
 
@@ -562,8 +562,9 @@ namespace casadi {
     }
 
     /** \brief Linearize an expression */
-    friend inline MatType linearize(const MatType& f, const MatType& x, const MatType& x0) {
-      return MatType::linearize(f, x, x0);
+    friend inline MatType linearize(const MatType& f, const MatType& x, const MatType& x0,
+        const Dict& opts=Dict()) {
+      return MatType::linearize(f, x, x0, opts);
     }
 
     /** \brief Computes the Moore-Penrose pseudo-inverse
@@ -608,11 +609,11 @@ namespace casadi {
                                    const Dict& opts = Dict()) {
       return MatType::jacobian(ex, arg, opts);
     }
-    inline friend MatType gradient(const MatType &ex, const MatType &arg) {
-      return MatType::gradient(ex, arg);
+    inline friend MatType gradient(const MatType &ex, const MatType &arg, const Dict& opts=Dict()) {
+      return MatType::gradient(ex, arg, opts);
     }
-    inline friend MatType tangent(const MatType &ex, const MatType &arg) {
-      return MatType::tangent(ex, arg);
+    inline friend MatType tangent(const MatType &ex, const MatType &arg, const Dict& opts=Dict()) {
+      return MatType::tangent(ex, arg, opts);
     }
     ///@}
 
@@ -624,8 +625,8 @@ namespace casadi {
         not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
     */
     friend inline MatType jtimes(const MatType &ex, const MatType &arg,
-                                 const MatType &v, bool tr=false) {
-      return MatType::jtimes(ex, arg, v, tr);
+                                 const MatType &v, bool tr=false, const Dict& opts=Dict()) {
+      return MatType::jtimes(ex, arg, v, tr, opts);
     }
 
     /** \brief Forward directional derivative */
@@ -646,11 +647,13 @@ namespace casadi {
 
     ///@{
     // Hessian and (optionally) gradient
-    inline friend MatType hessian(const MatType &ex, const MatType &arg) {
-      return MatType::hessian(ex, arg);
+    inline friend MatType hessian(const MatType &ex, const MatType &arg,
+        const Dict& opts = Dict()) {
+      return MatType::hessian(ex, arg, opts);
     }
-    inline friend MatType hessian(const MatType &ex, const MatType &arg, MatType& output_g) {
-      return MatType::hessian(ex, arg, output_g);
+    inline friend MatType hessian(const MatType &ex, const MatType &arg, MatType& output_g,
+        const Dict& opts = Dict()) {
+      return MatType::hessian(ex, arg, output_g, opts);
     }
     ///@}
 
@@ -685,19 +688,25 @@ namespace casadi {
     * 1/2*x' A x + b' x + c
     *
     * e = 0.5*bilin(A,x,x)+dot(b,x)+c
+    *
+    * \param check[in] When true (default), A is checked to be independent of x.
+    *                  Provided to deal with false positive dependency checks.
     */
     inline friend void quadratic_coeff(const MatType &expr, const MatType &var,
-        MatType& A, MatType& b, MatType& c) {
-      MatType::quadratic_coeff(expr, var, A, b, c);
+        MatType& A, MatType& b, MatType& c, bool check=true) {
+      MatType::quadratic_coeff(expr, var, A, b, c, check);
     }
 
     /** \brief Recognizes linear form in vector expression
     *
     * A x + b
+    *
+    * \param check[in] When true (default)m, A is checked to be independent of x.
+    *                  Provided to deal with false positive dependency checks.
     */
     inline friend void linear_coeff(const MatType &expr, const MatType &var,
-        MatType& A, MatType& b) {
-      MatType::linear_coeff(expr, var, A, b);
+        MatType& A, MatType& b, bool check=true) {
+      MatType::linear_coeff(expr, var, A, b, check);
     }
 
     /** Count number of nodes */
@@ -759,10 +768,11 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined here
     static MatType jtimes(const MatType &ex, const MatType &arg,
-                          const MatType &v, bool tr=false);
-    static MatType gradient(const MatType &ex, const MatType &arg);
-    static MatType tangent(const MatType &ex, const MatType &arg);
-    static MatType linearize(const MatType& f, const MatType& x, const MatType& x0);
+                          const MatType &v, bool tr=false, const Dict& opts=Dict());
+    static MatType gradient(const MatType &ex, const MatType &arg, const Dict& opts=Dict());
+    static MatType tangent(const MatType &ex, const MatType &arg, const Dict& opts=Dict());
+    static MatType linearize(const MatType& f, const MatType& x, const MatType& x0,
+      const Dict& opts=Dict());
     static MatType mpower(const MatType &x, const MatType &y);
     static MatType soc(const MatType &x, const MatType &y);
     ///@}
@@ -940,7 +950,7 @@ namespace casadi {
     MatType step = (b-a)/static_cast<MatType>(nsteps-1);
 
     for (casadi_int i=1; i<nsteps-1; ++i)
-      ret[i] = ret[i-1] + step;
+      ret[i] = a + i * step;
 
     ret[nsteps-1] = b;
     return vertcat(ret);
@@ -1146,7 +1156,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::jtimes(const MatType &ex, const MatType &arg,
-                                         const MatType &v, bool tr) {
+                                         const MatType &v, bool tr, const Dict& opts) {
     try {
       // Assert consistent input dimensions
       if (tr) {
@@ -1169,9 +1179,9 @@ namespace casadi {
 
       // Calculate directional derivatives
       if (tr) {
-        ww = reverse({ex}, {arg}, ww);
+        ww = reverse({ex}, {arg}, ww, opts);
       } else {
-        ww = forward({ex}, {arg}, ww);
+        ww = forward({ex}, {arg}, ww, opts);
       }
 
       // Get results
@@ -1183,22 +1193,24 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::gradient(const MatType &ex, const MatType &arg) {
+  MatType GenericMatrix<MatType>::gradient(const MatType &ex, const MatType &arg,
+      const Dict& opts) {
     try {
       casadi_assert(ex.is_scalar(),
                     "'gradient' only defined for scalar outputs: Use 'jacobian' instead.");
-      return project(jtimes(ex, arg, MatType::ones(ex.sparsity()), true), arg.sparsity());
+      return project(jtimes(ex, arg, MatType::ones(ex.sparsity()), true, opts), arg.sparsity());
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("gradient", e.what());
     }
   }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::tangent(const MatType &ex, const MatType &arg) {
+  MatType GenericMatrix<MatType>::tangent(const MatType &ex, const MatType &arg,
+      const Dict& opts) {
     try {
       casadi_assert(arg.is_scalar(),
                     "'tangent' only defined for scalar inputs: Use 'jacobian' instead.");
-      return project(jtimes(ex, arg, MatType::ones(arg.sparsity()), false), ex.sparsity());
+      return project(jtimes(ex, arg, MatType::ones(arg.sparsity()), false, opts), ex.sparsity());
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("tangent", e.what());
     }
@@ -1206,7 +1218,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::
-  linearize(const MatType& f, const MatType& x, const MatType& x0) {
+  linearize(const MatType& f, const MatType& x, const MatType& x0, const Dict& opts) {
     MatType x_lin = MatType::sym("x_lin", x.sparsity());
     // mismatching dimensions
     if (x0.size() != x.size()) {
@@ -1216,7 +1228,7 @@ namespace casadi {
       }
       casadi_error("Dimension mismatch in 'linearize'");
     }
-    return substitute(f + jtimes(f, x, x_lin),
+    return substitute(f + jtimes(f, x, x_lin, false, opts),
       MatType::vertcat({x_lin, x}), MatType::vertcat({x, x0}));
   }
 
@@ -1234,7 +1246,7 @@ namespace casadi {
     if (N==0) return MatType::eye(a.size1());
     if (N==1) return a;
     if (N % 2 == 0) {
-      MatType h = mpower(a, N/2);
+      MatType h = mpower(a, N/2); // NOLINT
       return MatType::mtimes(h, h);
     } else {
       return MatType::mtimes(mpower(a, N-1), a);
@@ -1249,7 +1261,7 @@ namespace casadi {
 
     MatType x_col = x.is_column() ? x : x.T();
 
-    x_col = x_col.nz(Slice());
+    x_col = x_col.nz(Slice()); // NOLINT
 
     casadi_int n = x_col.numel();
     return blockcat(y*MatType::eye(n), x_col, x_col.T(), y);
@@ -1262,25 +1274,26 @@ namespace casadi {
 
   template<typename MatType>
   bool GenericMatrix<MatType>::is_quadratic(const MatType &expr, const MatType &var) {
-    return is_linear(jacobian(expr, var), var);
+    return is_linear(gradient(expr, var), var);
   }
 
   template<typename MatType>
   void GenericMatrix<MatType>::quadratic_coeff(const MatType &expr, const MatType &var,
-          MatType& A, MatType& b, MatType& c) {
+          MatType& A, MatType& b, MatType& c, bool check) {
     casadi_assert(expr.is_scalar(), "'quadratic_coeff' only defined for scalar expressions.");
     A = hessian(expr, var);
-    casadi_assert(!depends_on(A, var), "'quadratic_coeff' called on non-quadratic expression.");
-    //auto res = substitute(std::vector<MatType>{jacobian(expr, var).T(), expr}, {var}, {0});
     b = substitute(jacobian(expr, var), var, 0).T();
+    if (check)
+      casadi_assert(!depends_on(A, var), "'quadratic_coeff' called on non-quadratic expression.");
     c = substitute(expr, var, 0);
   }
 
   template<typename MatType>
   void GenericMatrix<MatType>::linear_coeff(const MatType &expr, const MatType &var,
-          MatType& A, MatType& b) {
+          MatType& A, MatType& b, bool check) {
     casadi_assert(expr.is_vector(), "'linear_coeff' only defined for vector expressions.");
-    casadi_assert(is_linear(expr, var), "'linear_coeff' called on non-linear expression.");
+    if (check)
+      casadi_assert(is_linear(expr, var), "'linear_coeff' called on non-linear expression.");
     A = substitute(jacobian(expr, var), var, 0);
     b = vec(substitute(expr, var, 0));
   }

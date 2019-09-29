@@ -30,15 +30,16 @@
 #include "printable.hpp"
 #include "exception.hpp"
 #include "casadi_limits.hpp"
-#include "matrix.hpp"
+#include "matrix_fwd.hpp"
 #include "generic_expression.hpp"
+#include "serializing_stream.hpp"
 
 /** \brief  C/C++ */
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <limits>
 #include <cmath>
+#include <iostream>
+#include <limits>
+#include <sstream>
+#include <string>
 #include <vector>
 
 namespace casadi {
@@ -215,6 +216,11 @@ namespace casadi {
     friend inline SXElem if_else(const SXElem& x, const SXElem& y, const SXElem& z) {
       return if_else_zero(x, y) + if_else_zero(!x, z);
     }
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    static SXElem deserialize(DeserializingStream& s);
   private:
     /// Pointer to node (SXElem is only a reference class)
     SXNode* node;
@@ -245,16 +251,6 @@ namespace casadi {
 
 #endif // SWIG
 /// \endcond
-
-  ///@{
-  /// Readability typedefs
-  typedef Matrix<SXElem> SX;
-  typedef std::vector<SX> SXVector;
-  typedef std::initializer_list<SX> SXIList;
-  typedef std::vector<SXVector> SXVectorVector;
-  typedef std::map<std::string, SX> SXDict;
-  ///@}
-
 
 } // namespace casadi
 

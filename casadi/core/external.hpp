@@ -31,13 +31,25 @@
 
 namespace casadi {
 
-  /** \brief  Load an external function
-   * File name is assumed to be ./<f_name>.so
+  /** \brief  Load an external function from a shared library
+   * \param name Name as in the label assigned to a CasADi Function object:
+   *             Function(name,...,...)
+   *             Will be used to look up symbols/functions named eg. <name>_eval
+   *             Use `nm` (linux/osx) or `depends.exe` (win) to check which symbols are present
+   *             in your shared library
+   * 
+   * File name is assumed to be ./<name>.so
    */
   CASADI_EXPORT Function external(const std::string& name, const Dict& opts=Dict());
 
-  /** \brief  Load an external function
-   * File name given
+  /** \brief  Load an external function from a shared library
+   *
+   * \param name Name as in the label assigned to a CasADi Function object:
+   *             Function(name,...,...)
+   *             Will be used to look up symbols/functions named eg. <name>_eval
+   *             Use `nm` (linux/osx) or `depends.exe` (win) to check which symbols are present
+   *             in your shared library
+   * \param bin_name File name of the shared library
    */
   CASADI_EXPORT Function external(const std::string& name, const std::string& bin_name,
                                   const Dict& opts=Dict());
@@ -45,7 +57,7 @@ namespace casadi {
   /** \brief  Load a just-in-time compiled external function
    * File name given
    */
-  CASADI_EXPORT Function external(const std::string& name, const Importer& compiler,
+  CASADI_EXPORT Function external(const std::string& name, const Importer& li,
                                   const Dict& opts=Dict());
 
 } // namespace casadi

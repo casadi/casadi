@@ -30,7 +30,6 @@
 #include <climits>
 #include <cstdlib>
 #include <cmath>
-#include "matrix.hpp"
 
 using namespace std;
 
@@ -75,7 +74,7 @@ namespace casadi {
   }
 
   casadi_int SparsityInternal::postorder_dfs(casadi_int j, casadi_int k,
-                                      casadi_int* head, casadi_int* next,
+                                      casadi_int* head, const casadi_int* next,
                                       casadi_int* post, casadi_int* stack) {
     /* Modified version of cs_tdfs in CSparse
       Copyright(c) Timothy A. Davis, 2006-2009
@@ -460,7 +459,7 @@ namespace casadi {
   }
 
   SparsityInternal::~SparsityInternal() {
-    if (btf_) delete btf_;
+    delete btf_;
   }
 
   const SparsityInternal::Btf& SparsityInternal::btf() const {
@@ -2281,6 +2280,16 @@ namespace casadi {
     return combineGen1<true>(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
+  bool SparsityInternal::is_subset(const Sparsity& rhs) const {
+    if (is_equal(rhs)) return true;
+    std::vector<unsigned char> mapping;
+    shared_from_this<Sparsity>().unite(rhs, mapping);
+    for (auto e : mapping) {
+      if (e==1) return false;
+    }
+    return true;
+  }
+
   template<bool with_mapping>
   Sparsity SparsityInternal::combineGen1(const Sparsity& y, bool f0x_is_zero,
                                                 bool function0_is_zero,
@@ -2313,7 +2322,8 @@ namespace casadi {
                                                vector<unsigned char>& mapping) const {
 
     // Assert dimensions
-    casadi_assert(size2()==y.size2() && size1()==y.size1(), "Dimension mismatch");
+    casadi_assert(size2()==y.size2() && size1()==y.size1(),
+      "Dimension mismatch : " + str(size()) + " versus " + str(y.size()) + ".");
 
     // Sparsity pattern of the argument
     const casadi_int* y_colind = y.colind();
@@ -3571,7 +3581,7 @@ namespace casadi {
     }
 
     // Construct indent string
-    std::string indent = "";
+    std::string indent;
     for (casadi_int i=0;i<indent_level;++i) {
       indent += "  ";
     }

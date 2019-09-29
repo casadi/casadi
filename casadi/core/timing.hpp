@@ -28,8 +28,8 @@
 
 #include "generic_type.hpp"
 
-#include <ctime>
 #include <chrono>
+#include <ctime>
 
 namespace casadi {
   /// \cond INTERNAL
@@ -72,14 +72,24 @@ namespace casadi {
       void toc();
 
       /// Accumulated number of calls since last reset
-      casadi_int n_call;
+      casadi_int n_call = 0;
 
       /// Accumulated wall time [s] since last reset
-      double t_wall;
+      double t_wall = 0;
 
       /// Accumulated proc time [s] since last reset
-      double t_proc;
+      double t_proc = 0;
+
   };
+
+  class CASADI_EXPORT ScopedTiming {
+    public:
+      ScopedTiming(FStats& f);
+      ~ScopedTiming();
+    private:
+      FStats& f_;
+  };
+
 /// \endcond
 } // namespace casadi
 

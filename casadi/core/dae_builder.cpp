@@ -25,12 +25,12 @@
 
 #include "dae_builder.hpp"
 
+#include <cctype>
+#include <ctime>
 #include <map>
 #include <set>
-#include <string>
 #include <sstream>
-#include <ctime>
-#include <cctype>
+#include <string>
 
 #include "casadi_misc.hpp"
 #include "exception.hpp"
@@ -72,7 +72,7 @@ namespace casadi {
         string alias       = vnode.getAttribute("alias");
 
         // Skip to the next variable if its an alias
-        if (alias.compare("alias") == 0 || alias.compare("negatedAlias") == 0)
+        if (alias == "alias" || alias == "negatedAlias")
           continue;
 
         // Get the name
@@ -89,33 +89,33 @@ namespace casadi {
           var.valueReference = valueReference;
 
           // Variability
-          if (variability.compare("constant")==0)
+          if (variability=="constant")
             var.variability = CONSTANT;
-          else if (variability.compare("parameter")==0)
+          else if (variability=="parameter")
             var.variability = PARAMETER;
-          else if (variability.compare("discrete")==0)
+          else if (variability=="discrete")
             var.variability = DISCRETE;
-          else if (variability.compare("continuous")==0)
+          else if (variability=="continuous")
             var.variability = CONTINUOUS;
           else
             throw CasadiException("Unknown variability");
 
           // Causality
-          if (causality.compare("input")==0)
+          if (causality=="input")
             var.causality = INPUT;
-          else if (causality.compare("output")==0)
+          else if (causality=="output")
             var.causality = OUTPUT;
-          else if (causality.compare("internal")==0)
+          else if (causality=="internal")
             var.causality = INTERNAL;
           else
             throw CasadiException("Unknown causality");
 
           // Alias
-          if (alias.compare("noAlias")==0)
+          if (alias=="noAlias")
             var.alias = NO_ALIAS;
-          else if (alias.compare("alias")==0)
+          else if (alias=="alias")
             var.alias = ALIAS;
-          else if (alias.compare("negatedAlias")==0)
+          else if (alias=="negatedAlias")
             var.alias = NEGATED_ALIAS;
           else
             throw CasadiException("Unknown alias");
@@ -136,19 +136,19 @@ namespace casadi {
           // Variable category
           if (vnode.hasChild("VariableCategory")) {
             string cat = vnode["VariableCategory"].getText();
-            if (cat.compare("derivative")==0)
+            if (cat=="derivative")
               var.category = CAT_DERIVATIVE;
-            else if (cat.compare("state")==0)
+            else if (cat=="state")
               var.category = CAT_STATE;
-            else if (cat.compare("dependentConstant")==0)
+            else if (cat=="dependentConstant")
               var.category = CAT_DEPENDENT_CONSTANT;
-            else if (cat.compare("independentConstant")==0)
+            else if (cat=="independentConstant")
               var.category = CAT_INDEPENDENT_CONSTANT;
-            else if (cat.compare("dependentParameter")==0)
+            else if (cat=="dependentParameter")
               var.category = CAT_DEPENDENT_PARAMETER;
-            else if (cat.compare("independentParameter")==0)
+            else if (cat=="independentParameter")
               var.category = CAT_INDEPENDENT_PARAMETER;
-            else if (cat.compare("algebraic")==0)
+            else if (cat=="algebraic")
               var.category = CAT_ALGEBRAIC;
             else
               throw CasadiException("Unknown variable category: " + cat);
@@ -349,52 +349,52 @@ namespace casadi {
     // The switch below is alphabetical, and can be thus made more efficient,
     // for example by using a switch statement of the first three letters,
     // if it would ever become a bottleneck
-    if (name.compare("Add")==0) {
+    if (name=="Add") {
       return read_expr(node[0]) + read_expr(node[1]);
-    } else if (name.compare("Acos")==0) {
+    } else if (name=="Acos") {
       return acos(read_expr(node[0]));
-    } else if (name.compare("Asin")==0) {
+    } else if (name=="Asin") {
       return asin(read_expr(node[0]));
-    } else if (name.compare("Atan")==0) {
+    } else if (name=="Atan") {
       return atan(read_expr(node[0]));
-    } else if (name.compare("Cos")==0) {
+    } else if (name=="Cos") {
       return cos(read_expr(node[0]));
-    } else if (name.compare("Der")==0) {
+    } else if (name=="Der") {
       const Variable& v = read_variable(node[0]);
       return v.d;
-    } else if (name.compare("Div")==0) {
+    } else if (name=="Div") {
       return read_expr(node[0]) / read_expr(node[1]);
-    } else if (name.compare("Exp")==0) {
+    } else if (name=="Exp") {
       return exp(read_expr(node[0]));
-    } else if (name.compare("Identifier")==0) {
+    } else if (name=="Identifier") {
       return read_variable(node).v;
-    } else if (name.compare("IntegerLiteral")==0) {
+    } else if (name=="IntegerLiteral") {
       casadi_int val;
       node.getText(val);
       return val;
-    } else if (name.compare("Instant")==0) {
+    } else if (name=="Instant") {
       double val;
       node.getText(val);
       return val;
-    } else if (name.compare("Log")==0) {
+    } else if (name=="Log") {
       return log(read_expr(node[0]));
-    } else if (name.compare("LogLeq")==0) { // Logical less than equal
+    } else if (name=="LogLeq") { // Logical less than equal
       return read_expr(node[0]) <= read_expr(node[1]);
-    } else if (name.compare("LogGeq")==0) { // Logical greater than equal
+    } else if (name=="LogGeq") { // Logical greater than equal
       return read_expr(node[0]) >= read_expr(node[1]);
-    } else if (name.compare("LogLt")==0) { // Logical less than
+    } else if (name=="LogLt") { // Logical less than
       return read_expr(node[0]) < read_expr(node[1]);
-    } else if (name.compare("LogGt")==0) { // Logical greater than
+    } else if (name=="LogGt") { // Logical greater than
       return read_expr(node[0]) > read_expr(node[1]);
-    } else if (name.compare("Max")==0) {
+    } else if (name=="Max") {
       return fmax(read_expr(node[0]), read_expr(node[1]));
-    } else if (name.compare("Min")==0) {
+    } else if (name=="Min") {
       return fmin(read_expr(node[0]), read_expr(node[1]));
-    } else if (name.compare("Mul")==0) { // Multiplication
+    } else if (name=="Mul") { // Multiplication
       return read_expr(node[0]) * read_expr(node[1]);
-    } else if (name.compare("Neg")==0) {
+    } else if (name=="Neg") {
       return -read_expr(node[0]);
-    } else if (name.compare("NoEvent")==0) {
+    } else if (name=="NoEvent") {
       // NOTE: This is a workaround, we assume that whenever NoEvent occurs,
       // what is meant is a switch
       casadi_int n = node.size();
@@ -408,25 +408,25 @@ namespace casadi {
       }
 
       return ex;
-    } else if (name.compare("Pow")==0) {
+    } else if (name=="Pow") {
       return pow(read_expr(node[0]), read_expr(node[1]));
-    } else if (name.compare("RealLiteral")==0) {
+    } else if (name=="RealLiteral") {
       double val;
       node.getText(val);
       return val;
-    } else if (name.compare("Sin")==0) {
+    } else if (name=="Sin") {
       return sin(read_expr(node[0]));
-    } else if (name.compare("Sqrt")==0) {
+    } else if (name=="Sqrt") {
       return sqrt(read_expr(node[0]));
-    } else if (name.compare("StringLiteral")==0) {
+    } else if (name=="StringLiteral") {
       throw CasadiException(node.getText());
-    } else if (name.compare("Sub")==0) {
+    } else if (name=="Sub") {
       return read_expr(node[0]) - read_expr(node[1]);
-    } else if (name.compare("Tan")==0) {
+    } else if (name=="Tan") {
       return tan(read_expr(node[0]));
-    } else if (name.compare("Time")==0) {
+    } else if (name=="Time") {
       return t;
-    } else if (name.compare("TimedVariable")==0) {
+    } else if (name=="TimedVariable") {
       return read_variable(node[0]).v;
     }
 
@@ -766,7 +766,7 @@ namespace casadi {
       vector<MX> fb(this->dae.begin()+rowblock[b], this->dae.begin()+rowblock[b+1]);
 
       // Get local Jacobian
-      MX Jb = J(Slice(rowblock[b], rowblock[b+1]), Slice(colblock[b], colblock[b+1]));
+      MX Jb = J(Slice(rowblock[b], rowblock[b+1]), Slice(colblock[b], colblock[b+1])); // NOLINT
 
       // If Jb depends on xb, then the state derivative does not enter linearly
       // in the ODE and we cannot solve for the state derivative

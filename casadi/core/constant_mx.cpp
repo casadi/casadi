@@ -27,6 +27,7 @@
 #include <vector>
 #include <algorithm>
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -160,6 +161,14 @@ namespace casadi {
     }
   }
 
+  ConstantMX* ConstantMX::create(const Sparsity& sp, const std::string& fname) {
+    if (sp.nnz()==0) {
+      return create(sp, 0);
+    } else {
+      return new ConstantFile(sp, fname);
+    }
+  }
+
   bool ConstantDM::is_zero() const {
     return x_.is_zero();
   }
@@ -244,6 +253,106 @@ namespace casadi {
   MX ZeroByZero::get_reshape(const Sparsity& sp) const {
     casadi_assert_dev(sp.is_empty());
     return MX::zeros(sp);
+  }
+
+  void ConstantDM::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("ConstantMX::type", 'a');
+  }
+
+  void ConstantDM::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    DM v = get_DM();
+    s.pack("ConstantMX::nonzeros", v.nonzeros());
+  }
+
+  ConstantDM::ConstantDM(DeserializingStream& s) : ConstantMX(s) {
+    std::vector<double> v;
+    s.unpack("ConstantMX::nonzeros", v);
+    x_ = DM(sparsity_, v);
+  }
+
+  void ZeroByZero::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("ConstantMX::type", 'z');
+  }
+
+  void ZeroByZero::serialize_body(SerializingStream& s) const {
+   // No need to serialize body at all. All info is in header.
+  }
+
+  MXNode* ConstantMX::deserialize(DeserializingStream& s) {
+    char t;
+    s.unpack("ConstantMX::type", t);
+    switch (t) {
+      case 'a':    return new ConstantDM(s);
+      case 'f':    return new ConstantFile(s);
+      case 'z':    return ZeroByZero::getInstance();
+      case 'D':
+        return new Constant<RuntimeConst<double> >(s, RuntimeConst<double>::deserialize(s));
+      case 'I':
+        return new Constant<RuntimeConst<casadi_int> >(s,
+                      RuntimeConst<casadi_int>::deserialize(s));
+      case '0':
+        return new Constant<CompiletimeConst<0> >(s, CompiletimeConst<0>::deserialize(s));
+      case '1':
+        return new Constant<CompiletimeConst<1> >(s, CompiletimeConst<1>::deserialize(s));
+      case 'm':
+        return new Constant<CompiletimeConst<(-1)> >(s, CompiletimeConst<(-1)>::deserialize(s));
+      default:
+        casadi_error("Error deserializing");
+    }
+  }
+
+  void ConstantFile::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("ConstantFile::type", 'f');
+  }
+
+  void ConstantFile::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("ConstantFile::fname", fname_);
+    s.pack("ConstantFile::x", x_);
+  }
+
+  ConstantFile::ConstantFile(DeserializingStream& s) : ConstantMX(s) {
+    s.unpack("ConstantFile::fname", fname_);
+    s.unpack("ConstantFile::x", x_);
+  }
+
+  ConstantFile::ConstantFile(const Sparsity& sp, const std::string& fname) :
+      ConstantMX(sp), fname_(fname) {
+    x_.resize(sp.nnz());
+    int ret = casadi_file_slurp(fname_.c_str(), nnz(), get_ptr(x_));
+    if (ret==1) casadi_error("Cannot open file '" + str(fname) + "'.");
+    if (ret==2) casadi_error("Failed to read a double from '" + str(fname) + "'. "
+                             "Expected " + str(sp.nnz()) + " doubles.");
+  }
+
+  std::string ConstantFile::disp(const std::vector<std::string>& arg) const {
+    return "from_file('"  + fname_ + "'): " + DM(sparsity(), x_, false).get_str();
+  }
+
+  double ConstantFile::to_double() const {
+    casadi_error("Not defined for ConstantFile");
+  }
+
+  Matrix<double> ConstantFile::get_DM() const {
+    casadi_error("Not defined for ConstantFile");
+  }
+
+  void ConstantFile::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
+    g << g.file_slurp(fname_, nnz(), g.rom_double(this)) << ";\n";
+  }
+
+  void ConstantFile::add_dependency(CodeGenerator& g) const {
+    g.define_rom_double(this, nnz());
+  }
+
+  void ConstantFile::generate(CodeGenerator& g,
+                            const std::vector<casadi_int>& arg,
+                            const std::vector<casadi_int>& res) const {
+    g << g.copy(g.rom_double(this), nnz(), g.work(res[0], nnz())) << '\n';
   }
 
 } // namespace casadi

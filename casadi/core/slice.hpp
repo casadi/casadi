@@ -34,6 +34,9 @@
 #include "generic_type.hpp"
 
 namespace casadi {
+  class SerializingStream;
+  class DeserializingStream;
+
 
   /** \brief Class representing a Slice
    *
@@ -62,10 +65,19 @@ namespace casadi {
     Slice(casadi_int start, int stop, int step=1);
 
     /// Get a vector of indices
+    std::vector<casadi_int> all() const;
+
+    /// Get a vector of indices
     std::vector<casadi_int> all(casadi_int len, bool ind1=false) const;
 
     /// Get a vector of indices (nested slice)
     std::vector<casadi_int> all(const Slice& outer, casadi_int len) const;
+
+    /// Get number of elements
+    size_t size() const;
+
+    /// Check if slice is empty
+    bool is_empty() const;
 
     /// Is the slice a scalar
     bool is_scalar(casadi_int len) const;
@@ -80,6 +92,15 @@ namespace casadi {
 
     /// Check inequality
     bool operator!=(const Slice& other) const { return !(*this == other);}
+
+    /// Apply concrete length
+    Slice apply(casadi_int len, bool ind1=false) const;
+
+    /// Substract
+    Slice operator-(casadi_int i) const;
+
+    // Multiply
+    Slice operator*(casadi_int i) const;
 
     /// Get name of the class
     std::string type_name() const {return "Slice";}
@@ -98,6 +119,12 @@ namespace casadi {
     Dict info() const {
       return {{"start", start}, {"stop", stop}, {"step", step}};
     }
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    /** \brief Deserialize without type information */
+    static Slice deserialize(DeserializingStream& s);
   };
 
   /// Construct from an index vector (requires is_slice(v) to be true)

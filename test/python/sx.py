@@ -329,9 +329,9 @@ class SXtests(casadiTestCase):
     # Create function
     f = fun(x,y)
     if GlobalOptions.getSimplificationOnTheFly():
-      self.assertEqual(str(f),'[SX(((3-sin(sq(x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong')
+      self.assertEqual(str(f),'[SX(((3-sin(sq(x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong '+str(f))
     else:
-      self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong'+str(f))
+      self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong '+str(f))
     fcn = Function("fcn", [vertcat(*[x,y])],[vertcat(*f)])
 
     self.assertEqual(repr(fcn),'Function(fcn:(i0[2])->(o0[2]) SXFunction)','SX representation is wrong')
@@ -1007,6 +1007,12 @@ class SXtests(casadiTestCase):
     self.assertEqual(s[1],1)
     x = vertcat(*(SX.sym("x"),SX([])))
 
+    SX(Sparsity(3,3), [])
+
+    SX(Sparsity(3,3), [5])
+    with self.assertInException("fully sparse"):
+      SX(Sparsity(3,3), [5,4])
+
   def test_mul_sparsity(self):
 
     N = 10
@@ -1028,7 +1034,7 @@ class SXtests(casadiTestCase):
     f_out = f.call(f_in)
     g_out = g.call(g_in)
 
-    self.checkarray(IM.ones(filt),IM.ones(g.sparsity_out(0)))
+    self.checkarray(DM.ones(filt),DM.ones(g.sparsity_out(0)))
 
     self.checkarray(f_out[0][filt],g_out[0])
 
@@ -1038,7 +1044,8 @@ class SXtests(casadiTestCase):
   def test_large_hessian(self):
     import pickle
 
-    A = pickle.load(open("../data/apoa1-2.pkl","r"))
+    A = Sparsity.from_file("../data/apoa1-2.mtx")
+
 
     H = DM(A,list(range(A.nnz())))
     H = H + H.T
@@ -1418,6 +1425,8 @@ class SXtests(casadiTestCase):
     self.checkarray(evalf(y),5)
     with self.assertInException("since variables [x] are free"):
       evalf(x)
+
+
 
 
 if __name__ == '__main__':

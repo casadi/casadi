@@ -74,6 +74,49 @@ namespace casadi {
                             std::vector< std::vector<double> > &SWIG_OUTPUT(C),
                             std::vector< double > &SWIG_OUTPUT(D));
 
+  /** \brief Obtain collocation interpolating matrices
+  
+  A collocation method poses a polynomial Pi that interpolates exactly through
+  an initial state (0,X_0) and helper states at collocation points (tau_j,Xc_j)
+  with j=1..degree.
+
+  This function computes the linear mapping between dPi/dt and coefficients Z=[X_0 Xc].
+
+  \param tau  location of collocation points (length: degree), as obtained from collocation_points
+  \param[out] C interpolating coefficients to obtain derivatives.
+      Size: (degree+1)-by-degree
+
+    You may find the slopes of Pi at the collocation points as
+    \verbatim
+      dPi/dt @ Xc = (1/h) Z*C,
+    \endverbatim
+
+    with h the length of the integration interval.
+
+  \param[out] D interpolating coefficients to obtain end state.
+      Size: (degree+1)-by-1
+
+    You may find the end point of Pi as
+    \verbatim
+      Pi @X_f = Z*D
+    \endverbatim
+
+  \param[out] B quadrature coefficients
+      Size: degree-by-1
+
+    Given quadrature righ-hand-sides 'quad' evaluated at the collocation points,
+    you may find the integrated quadratures as
+    \verbatim
+      q = quad*B*h
+    \endverbatim
+
+  */
+  CASADI_EXPORT void
+  collocation_coeff(const std::vector<double> & tau,
+                            DM &SWIG_OUTPUT(C),
+                            DM &SWIG_OUTPUT(D),
+                            DM &SWIG_OUTPUT(B));
+
   // Type of collocation points
   enum CollocationPoints {LEGENDRE, RADAU};
 

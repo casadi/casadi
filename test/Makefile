@@ -6,11 +6,11 @@ all: unittests
 
 # Each of these targets will be tested by CasADi's trunktesterbot as individual tests.
 # These targets must all go on one line
-trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp user_guide_snippets_py
 
-trunktesterbot_no_unittests_py: examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot_no_unittests_py: examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp user_guide_snippets_py
 
-trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp user_guide_snippets_py
 
 # Set to -memcheck if you want to include a check for memory leaks
 MEMCHECK =
@@ -39,21 +39,21 @@ unittests: unittests_py
 unittests_knownbugs: unittests_py_knownbugs
 
 unittests_py_slow:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--run_slow"
+	python internal/test_pytest.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--run_slow"
 
 unittests_py_valgrind:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -memcheck -passoptions="--ignore_memory_heavy"
+	python internal/test_pytest.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -memcheck -passoptions="--ignore_memory_heavy"
 
 unittests_py:
 ifdef MEMCHECK
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="--ignore_memory_heavy  --run_slow"
+	python internal/test_pytest.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
+	python internal/test_pytest.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="--ignore_memory_heavy  --run_slow"
 else
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
+	python internal/test_pytest.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
 endif
 
 unittests_py_knownbugs:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--known_bugs"
+	python internal/test_pytest.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--known_bugs"
 
 examples: examples_indoc examples_code
 
@@ -90,11 +90,13 @@ doxygen:
 
 # No memchecks because it's slow
 examples_code_cpp:
-	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp snopt_nl.cpp rocket_snopt.cpp test_blocksqp.cpp" -skipdirs="cmake_find_package"
+	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp snopt_nl.cpp rocket_snopt.cpp test_blocksqp.cpp" -skipdirs="cmake_find_package cmake_pkgconfig"
 	cd "../docs/examples/cplusplus/cmake_find_package" && ./run.sh && cd ../../../../test
+	cd "../docs/examples/cplusplus/cmake_pkgconfig" && ./run.sh && cd ../../../../test
 
-users_guide:
-	cd '../docs/users_guide/' && make snippets && cd ..
+user_guide_snippets_py:
+	cd '../docs/users_guide/' && python run_snippets.py python && cd ../..
 
-user_guide_snippets_py: users_guide
-	python internal/test_py.py '../docs/users_guide' -skipfiles="pytex.py temp_pytex.py"
+user_guide_snippets_oct:
+	cd '../docs/users_guide/' && python run_snippets.py octave && cd ../..
+

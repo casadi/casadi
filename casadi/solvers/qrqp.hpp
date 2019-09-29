@@ -28,9 +28,6 @@
 
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/solvers/casadi_conic_qrqp_export.h>
-namespace casadi {
-#include "casadi/core/runtime/casadi_qp.hpp"
-} // namespace casadi
 
 /** \defgroup plugin_Conic_qrqp
  Solve QPs using an active-set method
@@ -42,7 +39,6 @@ namespace casadi {
 namespace casadi {
   struct CASADI_CONIC_QRQP_EXPORT QrqpMemory : public ConicMemory {
     const char* return_status;
-    bool success;
   };
 
   /** \brief \pluginbrief{Conic,qrqp}
@@ -69,7 +65,7 @@ namespace casadi {
     ~Qrqp() override;
 
     // Get name of the plugin
-    const char* plugin_name() const override { return "as";}
+    const char* plugin_name() const override { return "qrqp";}
 
     // Get name of the class
     std::string class_name() const override { return "Qrqp";}
@@ -85,7 +81,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -93,11 +89,14 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Solve the QP */
-    int eval(const double** arg, double** res,
+    int solve(const double** arg, double** res,
              casadi_int* iw, double* w, void* mem) const override;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
+
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -109,10 +108,20 @@ namespace casadi {
     std::vector<casadi_int> prinv_, pc_;
     ///@{
     // Options
-    casadi_int max_iter_;
-    bool print_iter_, print_header_;
-    double du_to_pr_;
+    bool print_iter_, print_header_, print_info_, print_lincomb_;
     ///@}
+
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Qrqp(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit Qrqp(DeserializingStream& s);
+
+  private:
+    void set_qp_prob();
   };
 
 } // namespace casadi

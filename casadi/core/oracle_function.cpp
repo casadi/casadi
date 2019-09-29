@@ -25,9 +25,10 @@
 
 #include "oracle_function.hpp"
 #include "external.hpp"
+#include "serializing_stream.hpp"
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 using namespace std;
 
@@ -40,11 +41,17 @@ namespace casadi {
   OracleFunction::~OracleFunction() {
   }
 
-  Options OracleFunction::options_
+  const Options OracleFunction::options_
   = {{&FunctionInternal::options_},
-     {{"monitor",
+     {{"expand",
+       {OT_BOOL,
+        "Replace MX with SX expressions in problem formulation [false]"}},
+      {"monitor",
        {OT_STRINGVECTOR,
         "Set of user problem functions to be monitored"}},
+      {"show_eval_warnings",
+       {OT_BOOL,
+        "Show warnings generated from function evaluations [true]"}},
       {"common_options",
        {OT_DICT,
         "Options for auto-generated functions"}},
@@ -59,9 +66,16 @@ namespace casadi {
 
     FunctionInternal::init(opts);
 
+    // Default options
+    bool expand = false;
+
+    show_eval_warnings_ = true;
+
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="common_options") {
+      if (op.first=="expand") {
+        expand = op.second;
+      } else if (op.first=="common_options") {
         common_options_ = op.second;
       } else if (op.first=="specific_options") {
         specific_options_ = op.second;
@@ -71,23 +85,23 @@ namespace casadi {
             " Type mismatch for entry '" + i.first+ "': "
             " got type " + i.second.get_description() + ".");
         }
+      } else if (op.first=="monitor") {
+        monitor_ = op.second;
+      } else if (op.first=="show_eval_warnings") {
+        show_eval_warnings_ = op.second;
       }
     }
+
+    // Replace MX oracle with SX oracle?
+    if (expand) oracle_ = oracle_.expand();
+
   }
 
-  void OracleFunction::finalize(const Dict& opts) {
-    // Default options
-    vector<string> monitor;
+  void OracleFunction::finalize() {
 
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="monitor") {
-        monitor = op.second;
-      }
-    }
 
     // Set corresponding monitors
-    for (const string& fname : monitor) {
+    for (const string& fname : monitor_) {
       auto it = all_functions_.find(fname);
       if (it==all_functions_.end()) {
         casadi_warning("Ignoring monitor '" + fname + "'."
@@ -106,7 +120,7 @@ namespace casadi {
     }
 
     // Recursive call
-    FunctionInternal::finalize(opts);
+    FunctionInternal::finalize();
   }
 
   Function OracleFunction::create_function(const std::string& fname,
@@ -148,7 +162,7 @@ namespace casadi {
     alloc(fcn);
   }
 
-  casadi_int OracleFunction::
+  int OracleFunction::
   calc_function(OracleMemory* m, const std::string& fcn,
                 const double* const* arg) const {
     // Is the function monitored?
@@ -170,7 +184,7 @@ namespace casadi {
     casadi_int n_in = f.n_in(), n_out = f.n_out();
 
     // Prepare stats, start timer
-    fstats.tic();
+    ScopedTiming tic(fstats);
 
     // Input buffers
     if (arg) {
@@ -205,7 +219,9 @@ namespace casadi {
       f(m->arg, m->res, m->iw, m->w);
     } catch(exception& ex) {
       // Fatal error
-      casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));
+      if (show_eval_warnings_) {
+        casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));
+      }
       return 1;
     }
 
@@ -246,14 +262,11 @@ namespace casadi {
         if (regularity_check_) {
           casadi_error(ss.str());
         } else {
-          casadi_warning(ss.str());
+          if (show_eval_warnings_) casadi_warning(ss.str());
         }
         return -1;
       }
     }
-
-    // Update stats
-    fstats.toc();
 
     // Success
     return 0;
@@ -274,7 +287,7 @@ namespace casadi {
       if (verbose_) casadi_message("compiling to "+ fname+"'.");
     // JIT dependent functions
     compiler_ = Importer(generate_dependencies(fname, Dict()),
-                         compilerplugin_, jit_options_);
+                         compiler_plugin_, jit_options_);
 
     // Replace the Oracle functions with generated functions
     for (auto&& e : all_functions_) {
@@ -288,51 +301,20 @@ namespace casadi {
     oracle_ = oracle_.expand();
   }
 
-  void OracleFunction::print_fstats(const OracleMemory* m) const {
-    // Length of the name being printed
-    size_t name_len=0;
-    for (auto &&s : m->fstats) {
-      name_len = max(s.first.size(), name_len);
-    }
-
-    // Print name with a given length. Format: "%NNs "
-    char namefmt[10];
-    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<casadi_int>(name_len));
-
-    // Print header
-    print(namefmt, "");
-    print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
-
-    // Print keys
-    for (auto &&s : m->fstats) {
-      const FStats& fs = m->fstats.at(s.first);
-      if (fs.n_call!=0) {
-        print(namefmt, s.first.c_str());
-        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
-      }
-    }
-  }
-
   Dict OracleFunction::get_stats(void *mem) const {
-    auto m = static_cast<OracleMemory*>(mem);
-
-    // Add timing statistics
-    Dict stats;
-    for (auto&& s : m->fstats) {
-      stats["n_call_" +s.first] = s.second.n_call;
-      stats["t_wall_" +s.first] = s.second.t_wall;
-      stats["t_proc_" +s.first] = s.second.t_proc;
-    }
+    Dict stats = FunctionInternal::get_stats(mem);
+    //auto m = static_cast<OracleMemory*>(mem);
     return stats;
   }
 
   int OracleFunction::init_mem(void* mem) const {
+    if (ProtoFunction::init_mem(mem)) return 1;
     if (!mem) return 1;
     auto m = static_cast<OracleMemory*>(mem);
 
     // Create statistics
     for (auto&& e : all_functions_) {
-      m->fstats[e.first] = FStats();
+      m->add_stat(e.first);
     }
     return 0;
   }
@@ -375,5 +357,45 @@ namespace casadi {
     return all_functions_.find(fname) != all_functions_.end();
   }
 
+
+  void OracleFunction::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+
+    s.version("OracleFunction", 1);
+    s.pack("OracleFunction::oracle", oracle_);
+    s.pack("OracleFunction::common_options", common_options_);
+    s.pack("OracleFunction::specific_options", specific_options_);
+    s.pack("OracleFunction::show_eval_warnings", show_eval_warnings_);
+    s.pack("OracleFunction::all_functions::size", all_functions_.size());
+    for (auto &e : all_functions_) {
+      s.pack("OracleFunction::all_functions::key", e.first);
+      s.pack("OracleFunction::all_functions::value::f", e.second.f);
+      s.pack("OracleFunction::all_functions::value::jit", e.second.jit);
+      s.pack("OracleFunction::all_functions::value::monitored", e.second.monitored);
+    }
+    s.pack("OracleFunction::monitor", monitor_);
+  }
+
+  OracleFunction::OracleFunction(DeserializingStream& s) : FunctionInternal(s) {
+
+    s.version("OracleFunction", 1);
+    s.unpack("OracleFunction::oracle", oracle_);
+    s.unpack("OracleFunction::common_options", common_options_);
+    s.unpack("OracleFunction::specific_options", specific_options_);
+    s.unpack("OracleFunction::show_eval_warnings", show_eval_warnings_);
+    size_t size;
+
+    s.unpack("OracleFunction::all_functions::size", size);
+    for (casadi_int i=0;i<size;++i) {
+      std::string key;
+      s.unpack("OracleFunction::all_functions::key", key);
+      RegFun r;
+      s.unpack("OracleFunction::all_functions::value::f", r.f);
+      s.unpack("OracleFunction::all_functions::value::jit", r.jit);
+      s.unpack("OracleFunction::all_functions::value::monitored", r.monitored);
+      all_functions_[key] = r;
+    }
+    s.unpack("OracleFunction::monitor", monitor_);
+  }
 
 } // namespace casadi

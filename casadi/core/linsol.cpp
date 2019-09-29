@@ -75,15 +75,26 @@ namespace casadi {
       "Linsol::solve: Dimension mismatch. A and b must have matching row count. "
       "Got " + A.dim() + " and " + B.dim() + ".");
 
+    scoped_checkout<Linsol> mem(*this);
+    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+
+    // Reset statistics
+    for (auto&& s : m->fstats) s.second.reset();
+    if (m->t_total) m->t_total->tic();
     // Symbolic factorization
-    if (sfact(A.ptr())) casadi_error("Linsol::solve: 'sfact' failed");
+    if (sfact(A.ptr(), mem)) casadi_error("Linsol::solve: 'sfact' failed");
 
     // Numeric factorization
-    if (nfact(A.ptr())) casadi_error("Linsol::solve: 'nfact' failed");
+    if (nfact(A.ptr(), mem)) casadi_error("Linsol::solve: 'nfact' failed");
 
     // Solve
     DM x = densify(B);
-    if (solve(A.ptr(), x.ptr(), x.size2())) casadi_error("Linsol::solve: 'solve' failed");
+    if (solve(A.ptr(), x.ptr(), x.size2(), false, mem))
+      casadi_error("Linsol::solve: 'solve' failed");
+    // Show statistics
+    if (m->t_total) m->t_total->toc();
+
+    (*this)->print_time(m->fstats);
     return x;
   }
 
@@ -96,15 +107,17 @@ namespace casadi {
     if (sfact(A.ptr())) casadi_error("'sfact' failed");
   }
 
-  int Linsol::sfact(const double* A, casadi_int mem) const {
+  int Linsol::sfact(const double* A, int mem) const {
     if (A==nullptr) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
     // Factorization will be needed after this step
     m->is_sfact = m->is_nfact = false;
 
+    if (m->t_total) m->fstats.at("sfact").tic();
     // Perform pivoting
     if ((*this)->sfact(m, A)) return 1;
+    if (m->t_total) m->fstats.at("sfact").toc();
 
     // Mark as (successfully) pivoted
     m->is_sfact = true;
@@ -116,7 +129,7 @@ namespace casadi {
     if (nfact(A.ptr())) casadi_error("'nfact' failed");
   }
 
-  int Linsol::nfact(const double* A, casadi_int mem) const {
+  int Linsol::nfact(const double* A, int mem) const {
     if (A==nullptr) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
@@ -126,7 +139,9 @@ namespace casadi {
     }
 
     m->is_nfact = false;
+    if (m->t_total) m->fstats.at("nfact").tic();
     if ((*this)->nfact(m, A)) return 1;
+    if (m->t_total) m->fstats.at("nfact").toc();
     m->is_nfact = true;
     return 0;
   }
@@ -138,7 +153,7 @@ namespace casadi {
     return n;
   }
 
-  casadi_int Linsol::neig(const double* A, casadi_int mem) const {
+  casadi_int Linsol::neig(const double* A, int mem) const {
     return (*this)->neig((*this)->memory(mem), A);
   }
 
@@ -149,21 +164,24 @@ namespace casadi {
     return n;
   }
 
-  casadi_int Linsol::rank(const double* A, casadi_int mem) const {
+  casadi_int Linsol::rank(const double* A, int mem) const {
     return (*this)->rank((*this)->memory(mem), A);
   }
 
-  int Linsol::solve(const double* A, double* x, casadi_int nrhs, bool tr, casadi_int mem) const {
+  int Linsol::solve(const double* A, double* x, casadi_int nrhs, bool tr, int mem) const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
     casadi_assert(m->is_nfact, "Linear system has not been factorized");
-    return (*this)->solve(m, A, x, nrhs, tr);
+    if (m->t_total) m->fstats.at("solve").tic();
+    int ret = (*this)->solve(m, A, x, nrhs, tr);
+    if (m->t_total) m->fstats.at("solve").toc();
+    return ret;
   }
 
   casadi_int Linsol::checkout() const {
     return (*this)->checkout();
   }
 
-  void Linsol::release(casadi_int mem) const {
+  void Linsol::release(int mem) const {
     (*this)->release(mem);
   }
 
@@ -178,6 +196,28 @@ namespace casadi {
 
   string doc_linsol(const string& name) {
     return Linsol::doc(name);
+  }
+
+  Dict Linsol::stats(int mem) const {
+    return (*this)->get_stats((*this)->memory(mem));
+  }
+
+  void Linsol::serialize(SerializingStream &s) const {
+    // TODO(jgillis): I don't get why LinsolInternal:: this is necessary
+    return (*this)->LinsolInternal::serialize(s);
+  }
+
+  Linsol Linsol::deserialize(DeserializingStream& s) {
+    Linsol linsol;
+    linsol.own(LinsolInternal::deserialize(s));
+    linsol->finalize();
+    return linsol;
+  }
+
+  Linsol Linsol::create(LinsolInternal* node) {
+    Linsol ret;
+    ret.own(node);
+    return ret;
   }
 
 } // namespace casadi

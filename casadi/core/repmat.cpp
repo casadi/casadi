@@ -25,6 +25,7 @@
 
 #include "repmat.hpp"
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -99,9 +100,9 @@ namespace casadi {
     casadi_int nnz = dep(0).nnz();
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << n_ << ";++i) {\n"
-      << "    " << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
-                          g.work(res[0], sparsity().nnz()) + "+ i*" + str(nnz)) << "\n"
-      << "  }\n";
+      << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
+                g.work(res[0], sparsity().nnz()) + "+ i*" + str(nnz)) << "\n"
+      << "}\n";
   }
 
   HorzRepsum::HorzRepsum(const MX& x, casadi_int n) : n_(n) {
@@ -177,16 +178,35 @@ namespace casadi {
   void HorzRepsum::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res) const {
+    g.add_auxiliary(CodeGenerator::AUX_CLEAR);
     casadi_int nnz = sparsity().nnz();
     g.local("i", "casadi_int");
     g.local("j", "casadi_int");
-    g << g.fill(g.work(res[0], nnz), nnz, "0") << "\n"
+    g << g.clear(g.work(res[0], nnz), nnz) << "\n"
       << "  for (i=0;i<" << n_ << ";++i) {\n"
       << "    for (j=0;j<" << nnz << ";++j) {\n"
       << "      " << g.work(res[0], nnz)<< "[j] += "
       << g.work(arg[0], dep(0).nnz()) << "[j+i*" << nnz << "];\n"
       << "    }\n"
       << "  }\n";
+  }
+
+  void HorzRepmat::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("HorzRepmat::n", n_);
+  }
+
+  void HorzRepsum::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("HorzRepsum::n", n_);
+  }
+
+  HorzRepmat::HorzRepmat(DeserializingStream& s) : MXNode(s) {
+    s.unpack("HorzRepmat::n", n_);
+  }
+
+  HorzRepsum::HorzRepsum(DeserializingStream& s) : MXNode(s) {
+    s.unpack("HorzRepsum::n", n_);
   }
 
 } // namespace casadi

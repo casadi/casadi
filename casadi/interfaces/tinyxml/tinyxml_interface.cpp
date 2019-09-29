@@ -43,7 +43,7 @@ namespace casadi {
     XmlFileInternal::registerPlugin(casadi_register_xmlfile_tinyxml);
   }
 
-  TinyXmlInterface::TinyXmlInterface() : XmlFileInternal() {
+  TinyXmlInterface::TinyXmlInterface()  {
   }
 
   TinyXmlInterface::~TinyXmlInterface() {

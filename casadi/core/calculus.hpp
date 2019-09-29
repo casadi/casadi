@@ -90,6 +90,9 @@ namespace casadi {
     // Find first nonzero in a vector
     OP_FIND,
 
+    // Find first nonzero in a vector
+    OP_LOW,
+
     // Embedded function call in parallel
     OP_MAP,
 
@@ -147,17 +150,20 @@ namespace casadi {
     // Nonzero reference
     OP_GETNONZEROS,
 
+    // Parameteric nonzero reference
+    OP_GETNONZEROS_PARAM,
+
     // Nonzero addition
     OP_ADDNONZEROS,
+
+    // parametric nonzero addition
+    OP_ADDNONZEROS_PARAM,
 
     // Nonzero assignment
     OP_SETNONZEROS,
 
-    // Symbolic reference
-    OP_GET_ELEMENTS,
-
-    // Symbolic addition
-    OP_ADD_ELEMENTS,
+    // Parametric nonzero assignment
+    OP_SETNONZEROS_PARAM,
 
     // Set sparse
     OP_PROJECT,
@@ -184,9 +190,11 @@ namespace casadi {
     OP_PRINTME,
     OP_LIFT,
 
-    OP_EINSTEIN
+    OP_EINSTEIN,
+
+    OP_BSPLINE
   };
-  #define NUM_BUILT_IN_OPS (OP_EINSTEIN+1)
+  #define NUM_BUILT_IN_OPS (OP_BSPLINE+1)
 
   #define OP_
 
@@ -215,54 +223,24 @@ namespace casadi {
   using std::pow;
   using std::fmod;
   using std::atan2;
+  using std::erf;
+  using std::fmin;
+  using std::fmax;
+  using std::fabs;
+  using std::atanh;
+  using std::asinh;
+  using std::acosh;
+  using std::isnan;
+  using std::isinf;
   ///@}
 
   ///@{
   // Implement "missing" operations
-  inline double atanh(double x) throw() {
-    if (x==-1) return -inf;
-    if (x==1) return inf;
-    return 0.5*log((1+x)/(1-x));
-  }
-
-  inline double asinh(double x) throw() {
-    return log(x + sqrt(1+x*x));
-  }
-
-  inline double acosh(double x) throw() {
-    return log(x + sqrt(1+x)*sqrt(x-1));
-  }
-
-  inline casadi_int isnan(double x) throw() { return x!=x;}
-  inline casadi_int isinf(double x) throw() { return isnan(x-x);}
 
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
-
-  /// fmin, fmax and erf should be available if C99 and/or C++11 required
-  inline double fmin(double x, double y) throw() { return std::min(x, y);}
-  inline casadi_int fmin(casadi_int x, casadi_int y) throw() { return std::min(x, y);}
-  inline double fmax(double x, double y) throw() { return std::max(x, y);}
-  inline casadi_int fmax(casadi_int x, casadi_int y) throw() { return std::max(x, y);}
-
-  /// fabs(casadi_int) was added in C++11
-  inline casadi_int fabs(casadi_int x) throw() { return std::abs(x);}
   ///@}
 
-#ifdef HAS_ERF
-  using ::erf;
-#else // HAS ERF
-  inline double erf(double x) throw() {
-    // Approximation found in Sourceforge and modified,
-    // originally from numerical recipes in Fortran
-    double sx = x<0 ? -1 : x>0 ? 1 : x;
-    double z = sx*x;
-    double t = 1.0/(1.0+0.5*z);
-    return 1.-sx*(t*exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+
-                                       t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+
-                                                           t*(-0.82215223+t*0.17087277))))))))));
-  }
-#endif // HAS ERF
   ///@}
 
   ///@{
@@ -272,7 +250,7 @@ namespace casadi {
   inline double printme(double x, double y) {
     std::ios::fmtflags f(uout().flags());
     uout() << "|> " << y << " : ";
-    uout() << std::setprecision(16) << std::scientific;
+    uout() << std::setprecision(std::numeric_limits<double>::digits10 + 1) << std::scientific;
     uout() << x << std::endl;
     uout().flags(f);
     return x;
@@ -286,9 +264,13 @@ namespace casadi {
   inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
   #endif //HAS_COPYSIGN
 
+  // Integer maximum and minimum
+  inline casadi_int casadi_max(casadi_int x, casadi_int y) { return std::max(x, y);}
+  inline casadi_int casadi_min(casadi_int x, casadi_int y) { return std::min(x, y);}
+
   /// Conditional assignment
-  inline double if_else_zero(double x, double y) { return x ? y : 0;}
-  inline double if_else(double x, double y, double z) { return x ? y : z;}
+  inline double if_else_zero(double x, double y) { return x==0 ? 0 : y;}
+  inline double if_else(double x, double y, double z) { return x==0 ? z : y;}
 #ifdef HAS_ERFINV
   using ::erfinv;
 #else // HAS ERFINV
@@ -1018,6 +1000,7 @@ namespace casadi {
     case OP_PARAMETER:     return F<OP_PARAMETER>::check;
     case OP_CALL:          return F<OP_CALL>::check;
     case OP_FIND:          return F<OP_FIND>::check;
+    case OP_LOW:           return F<OP_LOW>::check;
     case OP_MAP:           return F<OP_MAP>::check;
     case OP_MTIMES:        return F<OP_MTIMES>::check;
     case OP_SOLVE:         return F<OP_SOLVE>::check;
@@ -1037,10 +1020,11 @@ namespace casadi {
     case OP_SUBREF:        return F<OP_SUBREF>::check;
     case OP_SUBASSIGN:     return F<OP_SUBASSIGN>::check;
     case OP_GETNONZEROS:   return F<OP_GETNONZEROS>::check;
+    case OP_GETNONZEROS_PARAM:   return F<OP_GETNONZEROS_PARAM>::check;
     case OP_ADDNONZEROS:   return F<OP_ADDNONZEROS>::check;
+    case OP_ADDNONZEROS_PARAM:   return F<OP_ADDNONZEROS>::check;
     case OP_SETNONZEROS:   return F<OP_SETNONZEROS>::check;
-    case OP_GET_ELEMENTS:  return F<OP_GET_ELEMENTS>::check;
-    case OP_ADD_ELEMENTS:  return F<OP_ADD_ELEMENTS>::check;
+    case OP_SETNONZEROS_PARAM:   return F<OP_SETNONZEROS>::check;
     case OP_PROJECT:       return F<OP_PROJECT>::check;
     case OP_ASSERTION:     return F<OP_ASSERTION>::check;
     case OP_MONITOR:       return F<OP_MONITOR>::check;
@@ -1056,6 +1040,7 @@ namespace casadi {
     case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_LIFT:          return F<OP_LIFT>::check;
     case OP_EINSTEIN:      return F<OP_EINSTEIN>::check;
+    case OP_BSPLINE:       return F<OP_BSPLINE>::check;
     }
     return T();
   }
@@ -1562,10 +1547,11 @@ namespace casadi {
     case OP_SUBREF:         return "subref";
     case OP_SUBASSIGN:      return "subassign";
     case OP_GETNONZEROS:    return "getnonzeros";
+    case OP_GETNONZEROS_PARAM:    return "getnonzeros_param";
     case OP_ADDNONZEROS:    return "addnonzeros";
+    case OP_ADDNONZEROS_PARAM:    return "addnonzeros_param";
     case OP_SETNONZEROS:    return "setnonzeros";
-    case OP_GET_ELEMENTS:   return "get_elements";
-    case OP_ADD_ELEMENTS:   return "add_elements";
+    case OP_SETNONZEROS_PARAM:    return "setnonzeros_param";
     case OP_PROJECT:        return "project";
     case OP_ASSERTION:      return "assertion";
     case OP_NORM2:          return "norm2";
@@ -1576,6 +1562,7 @@ namespace casadi {
     case OP_PRINTME:        return "printme";
     case OP_LIFT:           return "lift";
     case OP_EINSTEIN:       return "einstein";
+    case OP_BSPLINE:       return "bspline";
     }
     return nullptr;
   }

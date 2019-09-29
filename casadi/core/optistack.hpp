@@ -91,8 +91,10 @@ class CASADI_EXPORT Opti
 public:
 
   /** \brief Create Opti Context
+   * 
+   * \param[in] problem_type of optimization 'nlp' or 'conic' (default nlp)
   */
-  Opti();
+  Opti(const std::string& problem_type="nlp");
 
   /** \brief Create a decision variable (symbol)
   *
@@ -194,6 +196,13 @@ public:
   /// Crunch the numbers; solve the problem
   OptiSol solve();
 
+  /** \brief Crunch the numbers; solve the problem
+   * 
+   * Allows the solver to return without error when
+   * an iteration or time limit is reached
+   */
+  OptiSol solve_limited();
+
   /// @{
   /** Obtain value of expression at the current value
   *
@@ -270,6 +279,24 @@ public:
   * \endverbatim
   */
   MX lam_g() const;
+
+  /** \brief Create a CasADi Function from the Opti solver
+  */
+  Function to_function(const std::string& name,
+      const std::vector<MX>& args, const std::vector<MX>& res,
+      const Dict& opts = Dict());
+
+  Function to_function(const std::string& name,
+      const std::vector<MX>& args, const std::vector<MX>& res,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts = Dict());
+
+  Function to_function(const std::string& name,
+      const std::map<std::string, MX>& dict,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts = Dict());
 
   #ifndef SWIGMATLAB
   /** \brief Construct a double inequality
@@ -395,6 +422,7 @@ public:
     VariableType type;
     casadi_int count;
     casadi_int i;
+    casadi_int active_i;
     Dict extra;
   };
 
@@ -546,7 +574,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
     */
     Dict stats() const;
 
-    Opti opti() const { return optistack_; }
+    Opti opti() const { return optistack_; } // NOLINT(cppcoreguidelines-slicing)
 
   protected:
     OptiSol(const Opti& opti);

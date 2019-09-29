@@ -77,9 +77,11 @@ namespace casadi {
     std::vector<CPXDIM> a_row, h_row;
     std::vector<CPXNNZ> a_colind, h_colind;
 
+    std::vector<CPXNNZ> socp_colind;
+    std::vector<CPXDIM> socp_qind, socp_lind, socp_row;
+    std::vector<double> socp_qval, socp_lbound, socp_lval, socp_lbx;
 
     int return_status;
-    bool success;
 
     /// Constructor
     CplexMemory();
@@ -119,7 +121,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -136,10 +138,14 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<CplexMemory*>(mem);}
 
     // Solve the QP
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
+
+    /// Can psd constraints be treated
+    bool psd_support() const override { return true;}
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
@@ -155,6 +161,7 @@ namespace casadi {
     double tol_;
     casadi_int dep_check_;
     bool warm_start_;
+    bool mip_start_;
     ///@}
 
     // Are we solving a mixed-integer problem?
@@ -164,6 +171,23 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// SDP to SOCP conversion memory
+    SDPToSOCPMem sdp_to_socp_mem_;
+
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new CplexInterface(s); }
+
+    // SOS structure
+    std::vector< double > sos_weights_;
+    std::vector<casadi_int> sos_beg_;
+    std::vector<int> sos_ind_;
+    std::vector<char> sos_types_;
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit CplexInterface(DeserializingStream& s);
   };
 } // end namespace casadi
 /// \endcond

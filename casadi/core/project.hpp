@@ -83,6 +83,94 @@ namespace casadi {
 
     /** \brief Get required length of w field */
     size_t sz_w() const override { return size1();}
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s);
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Project(DeserializingStream& s) : MXNode(s) {}
+
+  };
+
+
+  /** \brief Densify
+      \author Joris Gillis
+      \date 2019
+  */
+  class CASADI_EXPORT Densify : public Project {
+  public:
+
+    /// Constructor
+    Densify(const MX& x, const Sparsity& sp) : Project(x, sp) {}
+
+    /// Destructor
+    ~Densify() override {}
+
+    /// Evaluate the function (template)
+    template<typename T>
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
+
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /// Evaluate the function symbolically (SX)
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
+
+    /** \brief Get required length of iw field */
+    size_t sz_w() const override { return 0;}
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit Densify(DeserializingStream& s) : Project(s) {}
+  };
+
+  /** \brief Densify
+      \author Joris Gillis
+      \date 2019
+  */
+  class CASADI_EXPORT Sparsify : public Project {
+  public:
+
+    /// Constructor
+    Sparsify(const MX& x, const Sparsity& sp) : Project(x, sp) {}
+
+    /// Destructor
+    ~Sparsify() override {}
+
+    /// Evaluate the function (template)
+    template<typename T>
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
+
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /// Evaluate the function symbolically (SX)
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
+
+    /** \brief Get required length of iw field */
+    size_t sz_w() const override { return 0;}
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit Sparsify(DeserializingStream& s) : Project(s) {}
   };
 
 } // namespace casadi

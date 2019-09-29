@@ -57,7 +57,8 @@ namespace casadi {
     if (dae.has_free()) {
       casadi_error("Cannot create '" + name + "' since " + str(dae.get_free()) + " are free.");
     }
-    return Function::create(Integrator::getPlugin(solver).creator(name, dae), opts);
+    Integrator* intg = Integrator::getPlugin(solver).creator(name, dae);
+    return intg->create_advanced(opts);
   }
 
   vector<string> integrator_in() {
@@ -115,7 +116,6 @@ namespace casadi {
     // Default options
     print_stats_ = false;
     output_t0_ = false;
-    print_time_ = false;
   }
 
   Integrator::~Integrator() {
@@ -147,13 +147,13 @@ namespace casadi {
     return Sparsity();
   }
 
+  Function Integrator::create_advanced(const Dict& opts) {
+    return Function::create(this, opts);
+  }
+
   int Integrator::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<IntegratorMemory*>(mem);
-
-    // Reset statistics
-    for (auto&& s : m->fstats) s.second.reset();
-    m->fstats.at(name_).tic();
 
     // Read inputs
     const double* x0 = arg[INTEGRATOR_X0];
@@ -200,14 +200,12 @@ namespace casadi {
       retreat(m, grid_.front(), rx, rz, rq);
     }
 
-    // Finalize/print statistics
-    m->fstats.at(name_).toc();
     if (print_stats_) print_stats(m);
-    if (print_time_)  print_fstats(m);
+
     return 0;
   }
 
-  Options Integrator::options_
+  const Options Integrator::options_
   = {{&OracleFunction::options_},
      {{"expand",
        {OT_BOOL,
@@ -333,8 +331,7 @@ namespace casadi {
   int Integrator::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
 
-    auto m = static_cast<IntegratorMemory*>(mem);
-    m->add_stat(name_);
+    //auto m = static_cast<IntegratorMemory*>(mem);
     return 0;
   }
 
@@ -1031,13 +1028,74 @@ namespace casadi {
     clear_mem();
   }
 
-  Options FixedStepIntegrator::options_
+  const Options FixedStepIntegrator::options_
   = {{&Integrator::options_},
      {{"number_of_finite_elements",
        {OT_INT,
-        "Number of finite elements"}}
-     }
+        "Number of finite elements"}},
+      {"simplify",
+        {OT_BOOL,
+        "Implement as MX Function (codegeneratable/serializable) default: false"}},
+      {"simplify_options",
+        {OT_DICT,
+        "Any options to pass to simplified form Function constructor"}}
+      }
   };
+
+
+  Function FixedStepIntegrator::create_advanced(const Dict& opts) {
+    Function temp = Function::create(this, opts);
+
+    // Check if we need to simplify
+    bool simplify = false;
+    auto it = opts.find("simplify");
+    if (it!=opts.end()) simplify = it->second;
+
+    if (simplify && nrx_==0 && grid_.size()==2) {
+      // Retrieve explicit simulation step (one finite element)
+      Function F = getExplicit();
+
+      MX z0 = MX::sym("z0", sparsity_in(INTEGRATOR_Z0));
+
+      // Create symbols
+      std::vector<MX> F_in = F.mx_in();
+
+      // Prepare return Function inputs
+      std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
+      intg_in[INTEGRATOR_X0] = F_in[DAE_X];
+      intg_in[INTEGRATOR_P] = F_in[DAE_P];
+      intg_in[INTEGRATOR_Z0] = z0;
+      F_in[DAE_Z] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
+
+      // Prepare return Function outputs
+      std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
+      F_in[DAE_T] = grid_[0];
+
+      std::vector<MX> F_out;
+      // Loop over finite elements
+      for (casadi_int k=0;k<nk_;++k) {
+        F_out = F(F_in);
+
+        F_in[DAE_X] = F_out[DAE_ODE];
+        F_in[DAE_Z] = F_out[DAE_ALG];
+        intg_out[INTEGRATOR_QF] = k==0? F_out[DAE_QUAD] : intg_out[INTEGRATOR_QF]+F_out[DAE_QUAD];
+        F_in[DAE_T] += h_;
+      }
+
+      intg_out[INTEGRATOR_XF] = F_out[DAE_ODE];
+      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[DAE_ALG]);
+
+      // Extract options for Function constructor
+      Dict sopts;
+      sopts["print_time"] = print_time_;
+      auto it = opts.find("simplify_options");
+      if (it!=opts.end()) update_dict(sopts, it->second);
+
+      return Function(temp.name(), intg_in, intg_out, integrator_in(), integrator_out(), sopts);
+    } else {
+      return temp;
+    }
+  }
 
   void FixedStepIntegrator::init(const Dict& opts) {
     // Call the base class init
@@ -1214,7 +1272,7 @@ namespace casadi {
     casadi_copy(z, nz_, get_ptr(m->z));
 
     // Reset summation states
-    casadi_fill(get_ptr(m->q), nq_, 0.);
+    casadi_clear(get_ptr(m->q), nq_);
 
     // Bring discrete time to the beginning
     m->k = 0;
@@ -1243,7 +1301,7 @@ namespace casadi {
     casadi_copy(rz, nrz_, get_ptr(m->rz));
 
     // Reset summation states
-    casadi_fill(get_ptr(m->rq), nrq_, 0.);
+    casadi_clear(get_ptr(m->rq), nrq_);
 
     // Bring discrete time to the end
     m->k = nk_;
@@ -1260,7 +1318,7 @@ namespace casadi {
   ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {
   }
 
-  Options ImplicitFixedStepIntegrator::options_
+  const Options ImplicitFixedStepIntegrator::options_
   = {{&FixedStepIntegrator::options_},
      {{"rootfinder",
        {OT_STRING,
@@ -1392,6 +1450,117 @@ namespace casadi {
 
     // Construct
     return Function(name, de_in, de_out, DE_INPUTS, DE_OUTPUTS, opts);
+  }
+
+  void Integrator::serialize_body(SerializingStream &s) const {
+    OracleFunction::serialize_body(s);
+
+    s.version("Integrator", 1);
+    s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
+    s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+    s.pack("Integrator::nx", nx_);
+    s.pack("Integrator::nz", nz_);
+    s.pack("Integrator::nq", nq_);
+    s.pack("Integrator::nx1", nx1_);
+    s.pack("Integrator::nz1", nz1_);
+    s.pack("Integrator::nq1", nq1_);
+    s.pack("Integrator::nrx", nrx_);
+    s.pack("Integrator::nrz", nrz_);
+    s.pack("Integrator::nrq", nrq_);
+    s.pack("Integrator::nrx1", nrx1_);
+    s.pack("Integrator::nrz1", nrz1_);
+    s.pack("Integrator::nrq1", nrq1_);
+    s.pack("Integrator::np", np_);
+    s.pack("Integrator::nrp", nrp_);
+    s.pack("Integrator::np1", np1_);
+    s.pack("Integrator::nrp1", nrp1_);
+    s.pack("Integrator::ns", ns_);
+    s.pack("Integrator::grid", grid_);
+    s.pack("Integrator::ngrid", ngrid_);
+    s.pack("Integrator::augmented_options", augmented_options_);
+    s.pack("Integrator::opts", opts_);
+    s.pack("Integrator::onestep", onestep_);
+    s.pack("Integrator::print_stats", print_stats_);
+    s.pack("Integrator::output_t0", output_t0_);
+    s.pack("Integrator::ntout", ntout_);
+  }
+
+  void Integrator::serialize_type(SerializingStream &s) const {
+    OracleFunction::serialize_type(s);
+    PluginInterface<Integrator>::serialize_type(s);
+  }
+
+  ProtoFunction* Integrator::deserialize(DeserializingStream& s) {
+    return PluginInterface<Integrator>::deserialize(s);
+  }
+
+  Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
+    s.version("Integrator", 1);
+    s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
+    s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+    s.unpack("Integrator::nx", nx_);
+    s.unpack("Integrator::nz", nz_);
+    s.unpack("Integrator::nq", nq_);
+    s.unpack("Integrator::nx1", nx1_);
+    s.unpack("Integrator::nz1", nz1_);
+    s.unpack("Integrator::nq1", nq1_);
+    s.unpack("Integrator::nrx", nrx_);
+    s.unpack("Integrator::nrz", nrz_);
+    s.unpack("Integrator::nrq", nrq_);
+    s.unpack("Integrator::nrx1", nrx1_);
+    s.unpack("Integrator::nrz1", nrz1_);
+    s.unpack("Integrator::nrq1", nrq1_);
+    s.unpack("Integrator::np", np_);
+    s.unpack("Integrator::nrp", nrp_);
+    s.unpack("Integrator::np1", np1_);
+    s.unpack("Integrator::nrp1", nrp1_);
+    s.unpack("Integrator::ns", ns_);
+    s.unpack("Integrator::grid", grid_);
+    s.unpack("Integrator::ngrid", ngrid_);
+    s.unpack("Integrator::augmented_options", augmented_options_);
+    s.unpack("Integrator::opts", opts_);
+    s.unpack("Integrator::onestep", onestep_);
+    s.unpack("Integrator::print_stats", print_stats_);
+    s.unpack("Integrator::output_t0", output_t0_);
+    s.unpack("Integrator::ntout", ntout_);
+  }
+
+
+  void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
+    Integrator::serialize_body(s);
+
+    s.version("FixedStepIntegrator", 1);
+    s.pack("FixedStepIntegrator::F", F_);
+    s.pack("FixedStepIntegrator::G", G_);
+    s.pack("FixedStepIntegrator::nk", nk_);
+    s.pack("FixedStepIntegrator::h", h_);
+    s.pack("FixedStepIntegrator::nZ", nZ_);
+    s.pack("FixedStepIntegrator::nRZ", nRZ_);
+  }
+
+  FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
+    s.version("FixedStepIntegrator", 1);
+    s.unpack("FixedStepIntegrator::F", F_);
+    s.unpack("FixedStepIntegrator::G", G_);
+    s.unpack("FixedStepIntegrator::nk", nk_);
+    s.unpack("FixedStepIntegrator::h", h_);
+    s.unpack("FixedStepIntegrator::nZ", nZ_);
+    s.unpack("FixedStepIntegrator::nRZ", nRZ_);
+  }
+
+  void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {
+    FixedStepIntegrator::serialize_body(s);
+
+    s.version("ImplicitFixedStepIntegrator", 1);
+    s.pack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
+    s.pack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
+  }
+
+  ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s) :
+      FixedStepIntegrator(s) {
+    s.version("ImplicitFixedStepIntegrator", 1);
+    s.unpack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
+    s.unpack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
   }
 
 } // namespace casadi

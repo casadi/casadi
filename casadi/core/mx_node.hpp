@@ -36,6 +36,10 @@
 #include <stack>
 
 namespace casadi {
+
+  class SerializingStream;
+  class DeserializingStream;
+
   /** \brief Node class for MX objects
       \author Joel Andersson
       \date 2010
@@ -173,6 +177,26 @@ namespace casadi {
 
     /** Obtain information about node */
     virtual Dict info() const;
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    /** \brief Serialize an object without type information */
+    virtual void serialize_body(SerializingStream& s) const;
+
+    /** \brief Serialize type information
+     * 
+     * Information needed to unambiguously find the (lowest level sub)class,
+     * such that its deserializing constructor can be called.
+     */
+    virtual void serialize_type(SerializingStream& s) const;
+
+    /** \brief Deserialize with type disambiguation
+     * 
+     * Uses the information encoded with serialize_type to unambiguously find the (lowest level sub)class,
+     * and calls its deserializing constructor.
+     */
+    static MXNode* deserialize(DeserializingStream& s);
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     static bool is_equal(const MXNode* x, const MXNode* y, casadi_int depth);
@@ -331,6 +355,26 @@ namespace casadi {
     */
     virtual MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const;
 
+    /** \brief Get the nonzeros of matrix, parametrically
+    *
+    */
+    virtual MX get_nz_ref(const MX& nz) const;
+
+    /** \brief Get the nonzeros of matrix, parametrically
+    *
+    */
+    virtual MX get_nz_ref(const MX& inner, const Slice& outer) const;
+
+    /** \brief Get the nonzeros of matrix, parametrically
+    *
+    */
+    virtual MX get_nz_ref(const Slice& inner, const MX& outer) const;
+
+    /** \brief Get the nonzeros of matrix, parametrically
+    *
+    */
+    virtual MX get_nz_ref(const MX& inner, const MX& outer) const;
+
     /** \brief Assign the nonzeros of a matrix to another matrix
     *
     *   a->get_nzassign(b,nz)
@@ -344,6 +388,62 @@ namespace casadi {
     *   returns b with b[nz]+=a
     */
     virtual MX get_nzadd(const MX& y, const std::vector<casadi_int>& nz) const;
+
+    /** \brief Assign the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
+    virtual MX get_nzassign(const MX& y, const MX& nz) const;
+
+    /** \brief Assign the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
+    virtual MX get_nzassign(const MX& y, const MX& inner, const Slice& outer) const;
+
+    /** \brief Assign the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
+    virtual MX get_nzassign(const MX& y, const Slice& inner, const MX& outer) const;
+
+    /** \brief Assign the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
+    virtual MX get_nzassign(const MX& y, const MX& inner, const MX& outer) const;
+
+    /** \brief Add the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
+    virtual MX get_nzadd(const MX& y, const MX& nz) const;
+
+    /** \brief Add the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
+    virtual MX get_nzadd(const MX& y, const MX& inner, const Slice& outer) const;
+
+    /** \brief Add the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
+    virtual MX get_nzadd(const MX& y, const Slice& inner, const MX& outer) const;
+
+    /** \brief Add the nonzeros of a matrix to another matrix, parametrically
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
+    virtual MX get_nzadd(const MX& y, const MX& inner, const MX& outer) const;
 
     /// Get submatrix reference
     virtual MX get_subref(const Slice& i, const Slice& j) const;
@@ -399,6 +499,23 @@ namespace casadi {
     /// Find
     MX get_find() const;
 
+    /// Find
+    MX get_low(const MX& v, const Dict& options) const;
+
+    /// BSpline
+    MX get_bspline(const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<double>& coeffs,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const;
+    /// BSpline
+    MX get_bspline(const MX& coeffs, const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const;
+
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero
@@ -416,6 +533,12 @@ namespace casadi {
 
     /** \brief Propagate sparsities backwards through a copy operation */
     static void copy_rev(bvec_t* arg, bvec_t* res, casadi_int len);
+
+    static std::map<casadi_int, MXNode* (*)(DeserializingStream&)> deserialize_map;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit MXNode(DeserializingStream& s);
   };
 
   /// \endcond

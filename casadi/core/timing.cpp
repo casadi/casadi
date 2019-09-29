@@ -29,7 +29,6 @@ namespace casadi {
 
   using namespace std::chrono;
   FStats::FStats() {
-    reset();
   }
 
   void FStats::reset() {
@@ -49,10 +48,20 @@ namespace casadi {
     stop_wall = high_resolution_clock::now();
 
     // Process them
-    t_proc += static_cast<double>(stop_proc - start_proc) / static_cast<double>(CLOCKS_PER_SEC);
-    t_wall += duration<double>(stop_wall - start_wall).count();
-
+    double proc = static_cast<double>(stop_proc - start_proc) / static_cast<double>(CLOCKS_PER_SEC);
+    t_proc += proc;
+    double wall = duration<double>(stop_wall - start_wall).count();
+    t_wall += wall;
     n_call +=1;
+
+  }
+
+  ScopedTiming::ScopedTiming(FStats& f) : f_(f) {
+    f_.tic();
+  }
+
+  ScopedTiming::~ScopedTiming() {
+    f_.toc();
   }
 
 } // namespace casadi

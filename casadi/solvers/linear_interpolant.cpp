@@ -36,6 +36,8 @@ namespace casadi {
     plugin->doc = LinearInterpolant::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &LinearInterpolant::options_;
+    plugin->deserialize = &LinearInterpolant::deserialize;
+    plugin->exposed.do_inline = &LinearInterpolant::do_inline;
     return 0;
   }
 
@@ -44,7 +46,7 @@ namespace casadi {
     Interpolant::registerPlugin(casadi_register_interpolant_linear);
   }
 
-  Options LinearInterpolant::options_
+  const Options LinearInterpolant::options_
   = {{&Interpolant::options_},
      {{"lookup_mode",
        {OT_STRINGVECTOR,
@@ -64,6 +66,11 @@ namespace casadi {
   }
 
   LinearInterpolant::~LinearInterpolant() {
+    clear_mem();
+  }
+
+  LinearInterpolantJac::~LinearInterpolantJac() {
+    clear_mem();
   }
 
   void LinearInterpolant::init(const Dict& opts) {
@@ -80,16 +87,20 @@ namespace casadi {
   int LinearInterpolant::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (res[0]) {
-      casadi_interpn(res[0], ndim_, get_ptr(grid_), get_ptr(offset_),
-                     get_ptr(values_), arg[0], get_ptr(lookup_mode_), m_, iw, w);
+      const double* values = has_parametric_values() ? arg[arg_values()] : get_ptr(values_);
+      const double* grid = has_parametric_grid() ? arg[arg_grid()] : get_ptr(grid_);
+      casadi_interpn(res[0], ndim_, grid, get_ptr(offset_),
+                    values, arg[0], get_ptr(lookup_mode_), m_, iw, w);
     }
     return 0;
   }
 
   void LinearInterpolant::codegen_body(CodeGenerator& g) const {
+    std::string values = has_parametric_values() ? g.arg(arg_values()) : g.constant(values_);
+    std::string grid = has_parametric_grid() ? g.arg(arg_grid()) : g.constant(grid_);
     g << "  if (res[0]) {\n"
-      << "    " << g.interpn("res[0]", ndim_, g.constant(grid_), g.constant(offset_),
-      g.constant(values_), "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
+      << "    " << g.interpn("res[0]", ndim_, grid, g.constant(offset_),
+      values, "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
       << "  }\n";
   }
 
@@ -131,19 +142,111 @@ namespace casadi {
   int LinearInterpolantJac::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = derivative_of_.get<LinearInterpolant>();
-    casadi_interpn_grad(res[0], m->ndim_, get_ptr(m->grid_), get_ptr(m->offset_),
-                        get_ptr(m->values_), arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
+
+    const double* values = has_parametric_values() ? arg[m->arg_values()] : get_ptr(m->values_);
+    const double* grid = has_parametric_grid() ? arg[m->arg_grid()] : get_ptr(m->grid_);
+
+    casadi_interpn_grad(res[0], m->ndim_, grid, get_ptr(m->offset_),
+                      values, arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
     return 0;
   }
 
+  bool LinearInterpolantJac::has_parametric_values() const {
+    auto m = derivative_of_.get<LinearInterpolant>();
+    return m->has_parametric_values();
+  }
+
+  bool LinearInterpolantJac::has_parametric_grid() const {
+    auto m = derivative_of_.get<LinearInterpolant>();
+    return m->has_parametric_grid();
+  }
 
   void LinearInterpolantJac::codegen_body(CodeGenerator& g) const {
 
     auto m = derivative_of_.get<LinearInterpolant>();
+    std::string values = has_parametric_values() ? g.arg(m->arg_values()) : g.constant(m->values_);
+    std::string grid = has_parametric_grid() ? g.arg(m->arg_grid()) : g.constant(m->grid_);
 
     g << "  " << g.interpn_grad("res[0]", m->ndim_,
-      g.constant(m->grid_), g.constant(m->offset_), g.constant(m->values_),
+      grid, g.constant(m->offset_), values,
       "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";
+  }
+
+
+  LinearInterpolant::LinearInterpolant(DeserializingStream& s) : Interpolant(s) {
+    s.unpack("LinearInterpolant::lookup_mode", lookup_mode_);
+  }
+
+  ProtoFunction* LinearInterpolant::deserialize(DeserializingStream& s) {
+    s.version("LinearInterpolant", 1);
+    char type;
+    s.unpack("LinearInterpolant::type", type);
+    switch (type) {
+      case 'f': return new LinearInterpolant(s);
+      case 'j': return new LinearInterpolantJac(s);
+      default:
+        casadi_error("LinearInterpolant::deserialize error");
+    }
+  }
+
+  void LinearInterpolant::serialize_body(SerializingStream &s) const {
+    Interpolant::serialize_body(s);
+    s.pack("LinearInterpolant::lookup_mode", lookup_mode_);
+  }
+
+  void LinearInterpolant::serialize_type(SerializingStream &s) const {
+    Interpolant::serialize_type(s);
+    s.version("LinearInterpolant", 1);
+    s.pack("LinearInterpolant::type", 'f');
+  }
+
+  void LinearInterpolantJac::serialize_type(SerializingStream &s) const {
+    FunctionInternal::serialize_type(s);
+    auto m = derivative_of_.get<LinearInterpolant>();
+    m->PluginInterface<Interpolant>::serialize_type(s);
+    s.version("LinearInterpolant", 1);
+    s.pack("LinearInterpolant::type", 'j');
+  }
+
+
+  Function LinearInterpolant::do_inline(const std::string& name,
+                    const std::vector<double>& grid,
+                    const std::vector<casadi_int>& offset,
+                    const std::vector<double>& values,
+                    casadi_int m,
+                    const Dict& opts) {
+
+    // Number of grid points
+    casadi_int ndim = offset.size()-1;
+
+    MX x = MX::sym("x", ndim);
+    MX g;
+    if (grid.empty()) {
+      g = MX::sym("g", offset.back());
+    } else {
+      g = MX(DM(grid));
+    }
+    MX c;
+    if (values.empty()) {
+      c = MX::sym("c", Interpolant::coeff_size(offset, m));
+    } else {
+      c = MX(DM(values));
+    }
+
+    MX f = MX::interpn_linear(vertsplit(g, offset), c, vertsplit(x), opts);
+
+    std::vector<MX> args = {x};
+    std::vector<std::string> arg_names = {"x"};
+    if (grid.empty()) {
+      args.push_back(g);
+      arg_names.push_back("g");
+    }
+    if (values.empty()) {
+      args.push_back(c);
+      arg_names.push_back("c");
+    }
+
+    return Function(name, args, {f.T()}, arg_names, {"f"});
   }
 
 } // namespace casadi

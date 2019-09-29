@@ -41,6 +41,7 @@ namespace casadi {
     plugin->doc = IdasInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &IdasInterface::options_;
+    plugin->deserialize = &IdasInterface::deserialize;
     return 0;
   }
 
@@ -57,7 +58,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options IdasInterface::options_
+  const Options IdasInterface::options_
   = {{&SundialsInterface::options_},
      {{"suppress_algebraic",
        {OT_BOOL,
@@ -289,13 +290,13 @@ namespace casadi {
     THROWING(IDASetMaxStep, m->mem, max_step_size_);
 
     // Initial step size
-    if (step0_) THROWING(IDASetInitStep, m->mem, step0_);
+    if (step0_!=0) THROWING(IDASetInitStep, m->mem, step0_);
 
     // Maximum order of method
     if (max_order_) THROWING(IDASetMaxOrd, m->mem, max_order_);
 
     // Coeff. in the nonlinear convergence test
-    if (nonlin_conv_coeff_) THROWING(IDASetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
+    if (nonlin_conv_coeff_!=0) THROWING(IDASetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
 
     if (!abstolv_.empty()) {
       // Vector absolute tolerances
@@ -387,7 +388,9 @@ namespace casadi {
     SundialsInterface::reset(mem, t, _x, _z, _p);
 
     // Re-initialize
+    N_VConst(0.0, m->xzdot);
     copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
+
     THROWING(IDAReInit, m->mem, grid_.front(), m->xz, m->xzdot);
 
     // Re-initialize quadratures
@@ -453,8 +456,14 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::resetB");
     auto m = to_mem(mem);
 
+    // Reset initial guess
+    N_VConst(0.0, m->rxz);
+
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
+
+    // Reset initial guess
+    N_VConst(0.0, m->rxzdot);
 
     if (m->first_callB) {
       // Create backward problem
@@ -556,7 +565,7 @@ namespace casadi {
     char* flagname = IDAGetReturnFlagName(flag);
     stringstream ss;
     ss << module << " returned \"" << flagname << "\". Consult IDAS documentation.";
-    free(flagname);
+    free(flagname); // NOLINT
     casadi_error(ss.str());
   }
 
@@ -674,8 +683,8 @@ namespace casadi {
         // Second order correction
         if (s.second_order_correction_) {
           // The outputs will double as seeds for jtimesF
-          casadi_fill(vx + s.nx1_, s.nx_ - s.nx1_, 0.);
-          casadi_fill(vz + s.nz1_, s.nz_ - s.nz1_, 0.);
+          casadi_clear(vx + s.nx1_, s.nx_ - s.nx1_);
+          casadi_clear(vz + s.nz1_, s.nz_ - s.nz1_);
           m->arg[0] = &t; // t
           m->arg[1] = NV_DATA_S(xz); // x
           m->arg[2] = NV_DATA_S(xz)+s.nx_; // z
@@ -752,8 +761,8 @@ namespace casadi {
         // Second order correction
         if (s.second_order_correction_) {
           // The outputs will double as seeds for jtimesB
-          casadi_fill(vx + s.nrx1_, s.nrx_ - s.nrx1_, 0.);
-          casadi_fill(vz + s.nrz1_, s.nrz_ - s.nrz1_, 0.);
+          casadi_clear(vx + s.nrx1_, s.nrx_ - s.nrx1_);
+          casadi_clear(vz + s.nrz1_, s.nrz_ - s.nrz1_);
 
           // Get second-order-correction, save to m->v2
           m->arg[0] = &t; // t
@@ -999,7 +1008,7 @@ namespace casadi {
   template<typename MatType>
   Function IdasInterface::getJ(bool backward) const {
     vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = const_cast<Function&>(oracle_)(a);
+    vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
     MatType cj = MatType::sym("cj");
 
     // Get the Jacobian in the Newton iteration
@@ -1038,6 +1047,31 @@ namespace casadi {
     if (this->mem) IDAFree(&this->mem);
     if (this->xzdot) N_VDestroy_Serial(this->xzdot);
     if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
+  }
+
+  IdasInterface::IdasInterface(DeserializingStream& s) : SundialsInterface(s) {
+    s.version("IdasInterface", 1);
+    s.unpack("IdasInterface::cj_scaling", cj_scaling_);
+    s.unpack("IdasInterface::calc_ic", calc_ic_);
+    s.unpack("IdasInterface::calc_icB", calc_icB_);
+    s.unpack("IdasInterface::suppress_algebraic", suppress_algebraic_);
+    s.unpack("IdasInterface::max_step_size", max_step_size_);
+    s.unpack("IdasInterface::abstolv", abstolv_);
+    s.unpack("IdasInterface::first_time", first_time_);
+    s.unpack("IdasInterface::init_xdot", init_xdot_);
+  }
+
+  void IdasInterface::serialize_body(SerializingStream &s) const {
+    SundialsInterface::serialize_body(s);
+    s.version("IdasInterface", 1);
+    s.pack("IdasInterface::cj_scaling", cj_scaling_);
+    s.pack("IdasInterface::calc_ic", calc_ic_);
+    s.pack("IdasInterface::calc_icB", calc_icB_);
+    s.pack("IdasInterface::suppress_algebraic", suppress_algebraic_);
+    s.pack("IdasInterface::max_step_size", max_step_size_);
+    s.pack("IdasInterface::abstolv", abstolv_);
+    s.pack("IdasInterface::first_time", first_time_);
+    s.pack("IdasInterface::init_xdot", init_xdot_);
   }
 
 } // namespace casadi

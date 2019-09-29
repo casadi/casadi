@@ -150,14 +150,13 @@ namespace casadi {
     // Default options
     iin_ = 0;
     iout_ = 0;
-    // TODO(jgillis): remove hack in new release -- need uniform default.
-    error_on_fail_ = name=="kinsol" ? true : false;
+    error_on_fail_ = true;
   }
 
   Rootfinder::~Rootfinder() {
   }
 
-  Options Rootfinder::options_
+  const Options Rootfinder::options_
   = {{&OracleFunction::options_},
      {{"linear_solver",
        {OT_STRING,
@@ -258,7 +257,13 @@ namespace casadi {
 
   int Rootfinder::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
-    //auto m = static_cast<RootfinderMemory*>(mem);
+
+    auto m = static_cast<RootfinderMemory*>(mem);
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
+
     return 0;
   }
 
@@ -283,6 +288,7 @@ namespace casadi {
 
     // Problem has not been solved at this point
     m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
 
     // Get input pointers
     m->iarg = arg;
@@ -538,7 +544,41 @@ namespace casadi {
     Dict stats = OracleFunction::get_stats(mem);
     auto m = static_cast<RootfinderMemory*>(mem);
     stats["success"] = m->success;
+    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
     return stats;
+  }
+
+  void Rootfinder::serialize_body(SerializingStream &s) const {
+    OracleFunction::serialize_body(s);
+
+    s.version("Rootfinder", 1);
+    s.pack("Rootfinder::n", n_);
+    s.pack("Rootfinder::linsol", linsol_);
+    s.pack("Rootfinder::sp_jac", sp_jac_);
+    s.pack("Rootfinder::u_c", u_c_);
+    s.pack("Rootfinder::iin", iin_);
+    s.pack("Rootfinder::iout", iout_);
+    s.pack("Rootfinder::error_on_fail", error_on_fail_);
+  }
+
+  void Rootfinder::serialize_type(SerializingStream &s) const {
+    OracleFunction::serialize_type(s);
+    PluginInterface<Rootfinder>::serialize_type(s);
+  }
+
+  ProtoFunction* Rootfinder::deserialize(DeserializingStream& s) {
+    return PluginInterface<Rootfinder>::deserialize(s);
+  }
+
+  Rootfinder::Rootfinder(DeserializingStream & s) : OracleFunction(s) {
+    s.version("Rootfinder", 1);
+    s.unpack("Rootfinder::n", n_);
+    s.unpack("Rootfinder::linsol", linsol_);
+    s.unpack("Rootfinder::sp_jac", sp_jac_);
+    s.unpack("Rootfinder::u_c", u_c_);
+    s.unpack("Rootfinder::iin", iin_);
+    s.unpack("Rootfinder::iout", iout_);
+    s.unpack("Rootfinder::error_on_fail", error_on_fail_);
   }
 
 } // namespace casadi

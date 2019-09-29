@@ -2188,7 +2188,7 @@ static int CVAfindIndex(CVodeMem cv_mem, realtype t,
                         long int *indx, booleantype *newpoint)
 {
   CVadjMem ca_mem;
-  static long int ilast;
+  long int ilast;
   DtpntMem *dt_mem;
   int sign;
   booleantype to_left, to_right;
@@ -2206,6 +2206,8 @@ static int CVAfindIndex(CVodeMem cv_mem, realtype t,
     ilast     = np-1;
     *newpoint = TRUE;
     IMnewData   = FALSE;
+  } else {
+    ilast     = ca_mem->ilast;
   }
 
   /* Search for indx starting from ilast */
@@ -2232,6 +2234,7 @@ static int CVAfindIndex(CVodeMem cv_mem, realtype t,
     if ( *indx == 0 ) {
       /* t is beyond leftmost limit. Is it too far? */  
       if ( SUNRabs(t - dt_mem[0]->t) > FUZZ_FACTOR * uround ) {
+        ca_mem->ilast = ilast;
         return(CV_GETY_BADT);
       }
     }
@@ -2256,6 +2259,8 @@ static int CVAfindIndex(CVodeMem cv_mem, realtype t,
     *indx = ilast;
 
   }
+
+  ca_mem->ilast = ilast;
 
   return(CV_SUCCESS);
 

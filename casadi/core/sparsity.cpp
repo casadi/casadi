@@ -25,9 +25,10 @@
 
 
 #include "sparsity_internal.hpp"
-#include "matrix.hpp"
+#include "im.hpp"
 #include "casadi_misc.hpp"
 #include "sparse_storage_impl.hpp"
+#include "serializing_stream.hpp"
 #include <climits>
 
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -375,14 +376,14 @@ namespace casadi {
   }
 
   Sparsity Sparsity::combine(const Sparsity& y, bool f0x_is_zero,
-                                    bool function0_is_zero,
+                                    bool fx0_is_zero,
                                     std::vector<unsigned char>& mapping) const {
-    return (*this)->combine(y, f0x_is_zero, function0_is_zero, mapping);
+    return (*this)->combine(y, f0x_is_zero, fx0_is_zero, mapping);
   }
 
   Sparsity Sparsity::combine(const Sparsity& y, bool f0x_is_zero,
-                                    bool function0_is_zero) const {
-    return (*this)->combine(y, f0x_is_zero, function0_is_zero);
+                                    bool fx0_is_zero) const {
+    return (*this)->combine(y, f0x_is_zero, fx0_is_zero);
   }
 
   Sparsity Sparsity::unite(const Sparsity& y, std::vector<unsigned char>& mapping) const {
@@ -400,6 +401,10 @@ namespace casadi {
 
   Sparsity Sparsity::intersect(const Sparsity& y) const {
     return (*this)->combine(y, true, true);
+  }
+
+  bool Sparsity::is_subset(const Sparsity& rhs) const {
+    return (*this)->is_subset(rhs);
   }
 
   Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y) {
@@ -675,8 +680,8 @@ namespace casadi {
     return (*this)->dfs(j, top, xi, pstack, pinv, marked);
   }
 
-  casadi_int Sparsity::scc(std::vector<casadi_int>& p, std::vector<casadi_int>& r) const {
-    return (*this)->scc(p, r);
+  casadi_int Sparsity::scc(std::vector<casadi_int>& index, std::vector<casadi_int>& offset) const {
+    return (*this)->scc(index, offset);
   }
 
   std::vector<casadi_int> Sparsity::amd() const {
@@ -1102,8 +1107,10 @@ namespace casadi {
     bool perfectly_ordered=true;
     for (casadi_int k=0; k<col.size(); ++k) {
       // Consistency check
-      casadi_assert(col[k]>=0 && col[k]<ncol, "Column index out of bounds");
-      casadi_assert(row[k]>=0 && row[k]<nrow, "Row index out of bounds");
+      casadi_assert(col[k]>=0 && col[k]<ncol,
+        "Column index (" + str(col[k]) + ") out of bounds [0," + str(ncol) + "[");
+      casadi_assert(row[k]>=0 && row[k]<nrow,
+        "Row index out of bounds (" + str(row[k]) + ") out of bounds [0," + str(nrow) + "[");
 
       // Check if ordering is already perfect
       perfectly_ordered = perfectly_ordered && (col[k]<last_col ||
@@ -1480,7 +1487,7 @@ namespace casadi {
   std::vector<Sparsity> Sparsity::horzsplit(const Sparsity& x,
       const std::vector<casadi_int>& offset) {
     // Consistency check
-    casadi_assert_dev(offset.size()>=1);
+    casadi_assert_dev(!offset.empty());
     casadi_assert_dev(offset.front()==0);
     casadi_assert(offset.back()==x.size2(),
                           "horzsplit(Sparsity, std::vector<casadi_int>): Last elements of offset "
@@ -1546,7 +1553,7 @@ namespace casadi {
                                             const std::vector<casadi_int>& offset1,
                                             const std::vector<casadi_int>& offset2) {
     // Consistency check
-    casadi_assert_dev(offset1.size()>=1);
+    casadi_assert_dev(!offset1.empty());
     casadi_assert_dev(offset1.front()==0);
     casadi_assert(offset1.back()==x.size1(),
                           "diagsplit(Sparsity, offset1, offset2): Last elements of offset1 "
@@ -1772,29 +1779,11 @@ namespace casadi {
     return {{"nrow", size1()}, {"ncol", size2()}, {"colind", get_colind()}, {"row", get_row()}};
   }
 
-  Sparsity Sparsity::from_info(const Dict& info) {
-    auto it = info.find("nrow");
-    if (it==info.end()) return Sparsity();
-    casadi_int nrow = info.at("nrow");
-    casadi_int ncol = info.at("ncol");
-    std::vector<casadi_int> row, colind;
-    if (info.at("row").is_int_vector()) {
-      row = info.at("row");
-    } else {
-      row.push_back(info.at("row"));
-    }
-    if (info.at("colind").is_int_vector()) {
-      colind = info.at("colind");
-    } else {
-      colind.push_back(info.at("colind"));
-    }
-    return Sparsity(nrow, ncol, colind, row);
-  }
-
   std::set<std::string> Sparsity::file_formats = {"mtx"};
 
-  std::string Sparsity::file_format(const std::string& filename, const std::string& format_hint) {
-    if (format_hint=="") {
+  std::string Sparsity::file_format(const std::string& filename,
+      const std::string& format_hint, const std::set<std::string>& file_formats) {
+    if (format_hint.empty()) {
       std::string extension = filename.substr(filename.rfind(".")+1);
       auto it = file_formats.find(extension);
       casadi_assert(it!=file_formats.end(),
@@ -1811,10 +1800,10 @@ namespace casadi {
 
   }
   void Sparsity::to_file(const std::string& filename, const std::string& format_hint) const {
-    std::string format = file_format(filename, format_hint);
+    std::string format = file_format(filename, format_hint, file_formats);
     std::ofstream out(filename);
     if (format=="mtx") {
-      out << std::scientific << std::setprecision(15);
+      out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
       out << "%%MatrixMarket matrix coordinate pattern general" << std::endl;
       out << size1() << " " << size2() << " " << nnz() << std::endl;
       std::vector<casadi_int> row = get_row();
@@ -1829,8 +1818,9 @@ namespace casadi {
   }
 
   Sparsity Sparsity::from_file(const std::string& filename, const std::string& format_hint) {
-    std::string format = file_format(filename, format_hint);
+    std::string format = file_format(filename, format_hint, file_formats);
     std::ifstream in(filename);
+    casadi_assert(in.good(), "Could not open '" + filename + "'.");
     if (format=="mtx") {
       std::string line;
       std::vector<casadi_int> row, col;
@@ -1881,37 +1871,31 @@ namespace casadi {
   }
 
   void Sparsity::serialize(std::ostream &stream) const {
-    casadi_int size1=this->size1(), size2=this->size2(), nnz=this->nnz();
-    const casadi_int *colind = this->colind(), *row = this->row();
-    stream << "sp";
-    stream << size1 << "x" << size2;
-    stream << "n" << nnz;
-    for (int i=0; i<nnz; ++i)
-      stream << ":" << row[i];
-    for (int i=0; i<size2+1; ++i)
-      stream << ":" << colind[i];
-    stream << "s";
+    SerializingStream s(stream);
+    serialize(s);
   }
 
   Sparsity Sparsity::deserialize(std::istream &stream) {
-    char ch;
-    stream >> ch;
-    stream >> ch;
-    casadi_int nrow, ncol, nnz;
-    stream >> nrow; stream >> ch;
-    stream >> ncol; stream >> ch;
-    stream >> nnz;
-    std::vector<casadi_int> row(nnz), colind(ncol+1);
-    for (int i=0; i<nnz; ++i) {
-      stream >> ch;
-      stream >> row[i];
+    DeserializingStream s(stream);
+    return Sparsity::deserialize(s);
+  }
+
+  void Sparsity::serialize(SerializingStream& s) const {
+    if (is_null()) {
+      s.pack("SparsityInternal::compressed", std::vector<casadi_int>{});
+    } else {
+      s.pack("SparsityInternal::compressed", compress());
     }
-    for (int i=0; i<ncol+1; ++i) {
-      stream >> ch;
-      stream >> colind[i];
+  }
+
+  Sparsity Sparsity::deserialize(DeserializingStream& s) {
+    std::vector<casadi_int> i;
+    s.unpack("SparsityInternal::compressed", i);
+    if (i.empty()) {
+      return Sparsity();
+    } else {
+      return Sparsity::compressed(i);
     }
-    stream >> ch;
-    return Sparsity(nrow, ncol, colind, row);
   }
 
   std::string Sparsity::serialize() const {
@@ -1924,5 +1908,9 @@ namespace casadi {
     std::stringstream ss;
     ss << s;
     return deserialize(ss);
+  }
+
+  SparsityInternal* Sparsity::get() const {
+    return static_cast<SparsityInternal*>(SharedObject::get());
   }
 } // namespace casadi
