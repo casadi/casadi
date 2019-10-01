@@ -490,7 +490,7 @@ class Misctests(casadiTestCase):
     ff = Function("f",[x],[f],opts)
     ff(3)
     self.assertTrue("t_proc_total" in ff.stats())
-    self.assertTrue(ff.stats()["t_proc_total"]>0)
+    self.assertTrue(ff.stats()["t_proc_total"]>=0)
 
     solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
     solver()
@@ -505,12 +505,12 @@ class Misctests(casadiTestCase):
     solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>0)
+    self.assertTrue(solver.stats()["t_proc_total"]>=0)
 
     solver = integrator("integrator","rk",{"x":x,"ode":f},opts)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>0)
+    self.assertTrue(solver.stats()["t_proc_total"]>=0)
 
     integr_options = {}
     integr_options["simplify"] = True
@@ -518,13 +518,13 @@ class Misctests(casadiTestCase):
     solver = integrator("integrator","rk",{"x":x,"ode":f},integr_options)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>0)
+    self.assertTrue(solver.stats()["t_proc_total"]>=0)
 
     A = DM.rand(3,3)
     solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
     solver.solve(A,vertcat(1,2,3))
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>0)
+    self.assertTrue(solver.stats()["t_proc_total"]>=0)
 
 if __name__ == '__main__':
     unittest.main()
