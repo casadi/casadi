@@ -600,4 +600,15 @@ end
 assert(flag);
 
 
+A0 = DM([1 2; 3 4; 5 6])
+A = MX.sym('A',2,3);
+x = MX.sym('x');
+xi = 1;
+
+f = Function('f',{A,x},{A{x}});assert(f(A0,xi)==A0{xi})
+f = Function('f',{A,x},{A(x)});assert(f(A0,xi)==A0(xi))
+f = Function('f',{A,x},{A(x,:)});assert(f(A0,xi)==A0(xi,:))
+f = Function('f',{A,x},{A(:,x)});assert(f(A0,xi)==A0(:,xi))
+f = Function('f',{A,x},{A(1:2,x)});assert(f(A0,xi)==A0(1:2,xi))
+f = Function('f',{A,x},{A(x,1:2)});assert(f(A0,xi)==A0(xi,1:2))
 
