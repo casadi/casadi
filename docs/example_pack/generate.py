@@ -68,6 +68,6 @@ for root, dirs, files in os.walk(base): # Walk directory tree
        zf.write(os.path.join(root,f),f,compress_type=compression)
 
 #zf.write("../cheatsheet/python.pdf","cheatsheet.pdf",compress_type=compression)
-zf.write("../users_guide/casadi-users_guide.pdf","user_guide.pdf",compress_type=compression)
+zf.write("../users_guide/users_guide.pdf","user_guide.pdf",compress_type=compression)
 
 zf.close()
