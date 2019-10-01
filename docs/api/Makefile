@@ -108,7 +108,7 @@ export:
 	cp -r html/ export/api/
 	cp -r internal/ export/api/
 	cp  ../users_guide/*.pdf export/users_guide/
-	cp -r ../users_guide/casadi-users_guide export/users_guide/html/
+	#cp -r ../users_guide/build/ export/users_guide/html/
 	cp  ../cheatsheet/*.pdf export/cheatsheets/
 	cp  ../documents/*.pdf export/documents/
 
