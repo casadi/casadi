@@ -544,17 +544,22 @@ class casadiTestCase(unittest.TestCase):
       includedir = GlobalOptions.getCasadiIncludePath()
 
       if isinstance(extralibs,list):
-        extralibs = " " + " ".join(["-l"+lib for lib in extralibs])
+        extralibs = " " + " ".join([lib + ".lib" if os.name=='nt' else "-l"+lib for lib in extralibs])
 
       if isinstance(extra_options,bool) or extra_options is None:
         extra_options = ""
       if isinstance(extra_options,list):
         extra_options = " " + " ".join(extra_options)
 
-      commands = "gcc -pedantic -std={std} -fPIC -shared -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name}.so -L{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir) + extralibs + extra_options
-      p = subprocess.Popen(commands,shell=True).wait()
+      if os.name=='nt':
+        commands = "cl.exe /LD {name}.c {extra} /link  /libpath:{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options) 
+        p = subprocess.Popen(commands,shell=True).wait()
+      else:
+        commands = "gcc -pedantic -std={std} -fPIC -shared -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name}.so -L{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir) + extralibs + extra_options
 
-      F2 = external(F.name(), './' + name + '.so')
+        p = subprocess.Popen(commands,shell=True).wait()
+
+      F2 = external(F.name(), name)
 
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)

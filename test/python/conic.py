@@ -56,7 +56,10 @@ if has_conic("cplex"):
 
 if has_conic("osqp"):
   extralibs.append("osqp")
-  conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": ["-Wno-unused-variable"],"soc":False,"discrete":False}))
+  options = ["-Wno-unused-variable"]
+  if os.name=='nt':
+    options = []
+  conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": options,"soc":False,"discrete":False}))
 
 if has_conic("superscs"):
   conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"discrete":False}))

@@ -28,7 +28,7 @@ import unittest
 from types import *
 from helpers import *
 import pickle
-
+import os
 scipy_interpolate = False
 try:
   import scipy.interpolate
@@ -2523,7 +2523,10 @@ class Functiontests(casadiTestCase):
     libdir = GlobalOptions.getCasadiPath()
     includedir = GlobalOptions.getCasadiIncludePath()
 
-    f = opti.to_function('f',[],[x],{"jit":True,"compiler":"shell","jit_options":{"compiler_flags":["-I"+includedir,"-L"+libdir,"-losqp"],"linker_flags":["-I"+includedir,"-L"+libdir,"-losqp"],"verbose":True}, "print_time": True})
+    if os.name=='nt':
+      f = opti.to_function('f',[],[x],{"jit":True,"compiler":"shell","jit_options":{"compiler_flags":["/I"+includedir],"linker_flags":["/LIBPATH:"+libdir,"osqp.lib"],"verbose":True}, "print_time": True})
+    else:
+      f = opti.to_function('f',[],[x],{"jit":True,"compiler":"shell","jit_options":{"compiler_flags":["-I"+includedir,"-L"+libdir,"-losqp"],"linker_flags":["-I"+includedir,"-L"+libdir,"-losqp"],"verbose":True}, "print_time": True})
     [buf,trigger] = f.buffer()
 
     a = np.array([1.0])
