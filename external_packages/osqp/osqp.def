@@ -1,0 +1,11 @@
+LIBRARY libosqp.dll
+EXPORTS
+    osqp_set_default_settings
+    osqp_setup
+    osqp_solve
+    osqp_cleanup
+    osqp_update_lin_cost
+    osqp_update_bounds
+    osqp_warm_start_x
+    osqp_warm_start_y
+    osqp_update_P_A
