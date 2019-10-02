@@ -55068,6 +55068,20 @@ Get a submatrix, single argument
 
 ";
 
+%feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const MX
+&rr) const  "
+
+Get a submatrix, single argument
+
+";
+
+%feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const
+casadi_int rr) const  "
+
+Get a submatrix, single argument
+
+";
+
 %feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const Slice
 &rr, const Slice &cc) const  "
 
