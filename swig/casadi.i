@@ -2677,11 +2677,6 @@ class NZproxy:
       $self->get(m, true, sp);
       return m;
     }
-    const Type paren(const MX& sp) const {
-      Type m;
-      $self->get(m, true, sp);
-      return m;
-    }
     const Type paren(char rr, char cc) const {
       Type m;
       $self->get(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));
@@ -4085,34 +4080,24 @@ namespace casadi {
   }
   %extend MX {
     MX_ALL(static inline, IS_MEMBER)
-    const Type brace(const MX& rr) const { Type m; $self->get_nz(m, true, rr); return m;}
-    const Type paren(const MX& rr) const {
-      Type m;
+    const MX brace(const casadi::MX& rr) const { casadi::MX m; $self->get_nz(m, true, rr); return m;}
+    const MX paren(const casadi::MX& rr) const {
+      casadi::MX m;
       $self->get(m, true, rr);
       return m;
     }
-    const Type paren(char rr, const MX& cc) const {
-      Type m;
+    const MX paren(char rr, const casadi::MX& cc) const {
+      casadi::MX m;
       $self->get(m, true, casadi::char2Slice(rr), cc);
       return m;
     }
-    const Type paren(const MX& rr, char cc) const {
-      Type m;
+    const MX paren(const casadi::MX& rr, char cc) const {
+      casadi::MX m;
       $self->get(m, true, rr, casadi::char2Slice(cc));
       return m;
     }
-    const Type paren(const Matrix<casadi_int>& rr, const MX& cc) const {
-      Type m;
-      $self->get(m, true, rr, cc);
-      return m;
-    }
-    const Type paren(const MX& rr, const Matrix<casadi_int>& cc) const {
-      Type m;
-      $self->get(m, true, rr, cc);
-      return m;
-    }
-    const Type paren(const MX& rr, const MX& cc) const {
-      Type m;
+    const MX paren(const casadi::MX& rr, const casadi::MX& cc) const {
+      casadi::MX m;
       $self->get(m, true, rr, cc);
       return m;
     }

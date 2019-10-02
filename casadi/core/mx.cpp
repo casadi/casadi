@@ -200,14 +200,20 @@ namespace casadi {
     m = project(*this, sp);
   }
 
+  void MX::get(MX& m, bool ind1, const MX& rr) const {
+    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices."
+                              "Got " + dim(true) + " instead.");
+    get_nz(m, ind1, rr);
+  }
+
   void MX::get(MX& m, bool ind1, const Slice& rr, const MX& cc) const {
-    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
-    m = (*this)->get_nz_ref(rr.apply(size1(), ind1), (ind1 ? cc-1 : cc)*size1());
+    casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices. ");
+    m = (*this)->get_nz_ref(rr.apply(size1()), (ind1 ? cc-1 : cc)*size1());
   }
 
   void MX::get(MX& m, bool ind1, const MX& rr, const Slice& cc) const {
     casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
-    m = (*this)->get_nz_ref(ind1 ? rr-1 : rr, cc.apply(size2(), ind1)*size1());
+    m = (*this)->get_nz_ref(ind1 ? rr-1 : rr, cc.apply(size2())*size1());
   }
 
   void MX::get(MX& m, bool ind1, const MX& rr, const MX& cc) const {

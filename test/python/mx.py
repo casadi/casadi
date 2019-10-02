@@ -2866,8 +2866,11 @@ class MXtests(casadiTestCase):
     M = 6
     A = DM.rand(N,M)
     As = MX.sym("A", A.shape)
+    ASs = MX.sym("AS",tril(As.sparsity()))
+    print(ASs.sparsity().spy())
     vr=list(range(N))
     vc=list(range(M))
+    vk=list(range(M*N))
     for r in [1, slice(1,3), slice(0,N,2), slice(None)]:
       rs = MX.sym("r",A[r,:].shape[0])
       for c in [1, slice(1,3), slice(0,M,2), slice(None)]:
@@ -2876,6 +2879,16 @@ class MXtests(casadiTestCase):
           for cc in [c, cs]:
             f = Function('f',[As,rs,cs],[As[rr,cc]])
             self.checkarray(f(A,vr[r],vc[c]),A[r,c])
+            if isinstance(rr,MX) or isinstance(cc,MX):
+              with self.assertInException("Parametric slicing only supported for dense matrices"):
+                ASs[rr,cc]
+    for k in [1, slice(1,3), slice(0,N,2), slice(0,2*N,2), slice(None)]:
+      ks = MX.sym("r",A[k].shape[0])
+      for kk in [k, ks]:
+        f = Function('f',[As,ks],[As[kk]])
+        self.checkarray(f(A,vk[k]),A[k])
+        with self.assertInException("Parametric slicing only supported for dense matrices"):
+          ASs[ks]
 
   def test_mapping(self):
     A = MX.sym("A",4,4)

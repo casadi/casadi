@@ -600,15 +600,25 @@ end
 assert(flag);
 
 
-A0 = DM([1 2; 3 4; 5 6])
-A = MX.sym('A',2,3);
+A0 = DM([1 2; 3 4; 5 6]);
+A = MX.sym('A',3,2);
 x = MX.sym('x');
 xi = 1;
 
-f = Function('f',{A,x},{A{x}});assert(f(A0,xi)==A0{xi})
-f = Function('f',{A,x},{A(x)});assert(f(A0,xi)==A0(xi))
-f = Function('f',{A,x},{A(x,:)});assert(f(A0,xi)==A0(xi,:))
-f = Function('f',{A,x},{A(:,x)});assert(f(A0,xi)==A0(:,xi))
-f = Function('f',{A,x},{A(1:2,x)});assert(f(A0,xi)==A0(1:2,xi))
-f = Function('f',{A,x},{A(x,1:2)});assert(f(A0,xi)==A0(xi,1:2))
+%f = Function('f',{A,x},{A{x}});assert(f(A0,xi)==A0{xi})
+f = Function('f',{A,x},{A(x,:)});assert(full(norm(f(A0,xi)-A0(xi,:)))==0)
+f = Function('f',{A,x},{A(:,x)});assert(full(norm(f(A0,xi)-A0(:,xi)))==0)
+f = Function('f',{A,x},{A(1:2,x)});assert(full(norm(f(A0,xi)-A0(1:2,xi)))==0)
+f = Function('f',{A,x},{A(x,1:2)});assert(full(norm(f(A0,xi)-A0(xi,1:2)))==0)
+f = Function('f',{A,x},{A(x,x)});assert(full(norm(f(A0,xi)-A0(xi,xi)))==0)
+f = Function('f',{A,x},{A(x)});assert(full(norm(f(A0,xi)-A0(xi)))==0)
+
+A0 = DM([1 2 3]);
+A = MX.sym('A',3);
+f = Function('f',{A,x},{A(x)});assert(full(norm(f(A0,xi)-A0(xi)))==0)
+
+A0 = DM([1 2 3])';
+A = MX.sym('A',1,3);
+f = Function('f',{A,x},{A(x)});assert(full(norm(f(A0,xi)-A0(xi)))==0)
+
 

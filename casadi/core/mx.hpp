@@ -332,6 +332,10 @@ namespace casadi {
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& rr) const;
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const MX& rr) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const casadi_int rr) const {
+      get(m, ind1, Matrix<casadi_int>(rr));
+    }
     ///@}
 
     /// Get a submatrix, two arguments
