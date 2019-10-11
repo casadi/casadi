@@ -193,7 +193,8 @@ class OptiStacktests(inherit_from):
       with self.assertInException("Argument 1"):
         opti.to_function("F",[y,vertcat(x,2)],[vertcat(x,y,z)])
 
-      opti.to_function("F",[x,x],[vertcat(x,y,z)])
+      with self.assertInException("not independent"):
+        opti.to_function("F",[x,x],[vertcat(x,y,z)])
       opti.to_function("F",[a],[vertcat(x,y,z)])
       with self.assertInException("belonging to a different instance"):
         opti.to_function("F",[b],[vertcat(x,y,z)])
