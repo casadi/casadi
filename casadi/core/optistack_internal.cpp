@@ -1286,18 +1286,22 @@ Function OptiNode::to_function(const std::string& name,
   assign_vector(active_values(OPTI_PAR), p);
   assign_vector(active_values(OPTI_DUAL_G), lam_g);
 
+  casadi_int k = 0;
   for (const auto& a : args) {
-    casadi_assert(symbol_active_[meta(a).count],
-      "Symbol not occuring in problem" + describe(a));
-    casadi_int i = meta(a).active_i;
-    if (meta(a).type==OPTI_VAR) {
-      x0.at(i) = a;
-    } else if (meta(a).type==OPTI_PAR) {
-      p.at(i) = a;
-    } else if (meta(a).type==OPTI_DUAL_G) {
-      lam_g.at(i) = a;
-    } else {
-      casadi_error("Unknown");
+    casadi_assert(a.is_valid_input(), "Argument " + str(k) + " is not purely symbolic.");
+    k++;
+    for (const auto& prim : a.primitives()) {
+      if (!symbol_active_[meta(prim).count]) continue;
+      casadi_int i = meta(prim).active_i;
+      if (meta(prim).type==OPTI_VAR) {
+        x0.at(i) = prim;
+      } else if (meta(prim).type==OPTI_PAR) {
+        p.at(i) = prim;
+      } else if (meta(prim).type==OPTI_DUAL_G) {
+        lam_g.at(i) = prim;
+      } else {
+        casadi_error("Unknown");
+      }
     }
   }
   MXDict arg;

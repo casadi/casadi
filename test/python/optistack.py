@@ -139,7 +139,7 @@ class OptiStacktests(inherit_from):
       
       opti.minimize(y**2+sin(x-y-p)**2)
       opti.subject_to(x+y>=1)
-      
+
       opti.solver(nlpsolver,nlpsolver_options)
 
       
@@ -151,6 +151,52 @@ class OptiStacktests(inherit_from):
       print(F(0.1,0.1,0))
       print(F(0,2,0))
       print(F(100,1,0))
+
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      p = opti.parameter()
+
+      opti.minimize(sin(2*pi*(x+y-p))**2+sin(pi*z)**2)
+      opti.subject_to(x==2*y)
+
+      opti.solver("ipopt")
+
+      F = opti.to_function("F",[vertcat(x,y,z),p],[vertcat(x,y,z)])
+
+      self.checkarray(F([3.9,1.8,0],6),vertcat(4,2,0))
+      self.checkarray(F([0,1,0],6),vertcat(2.0/3,1.0/3,0))
+      self.checkarray(F([3.9,1.8,7.8],6),vertcat(4,2,8))
+      self.checkarray(F([0,1,7.8],6),vertcat(2.0/3,1.0/3,8))
+
+      F = opti.to_function("F",[vertcat(z,x,y),p],[vertcat(x,y,z)])
+      self.checkarray(F([7.8,3.9,1.8],6),vertcat(4,2,8))
+      self.checkarray(F([7.8,0,1],6),vertcat(2.0/3,1.0/3,8))
+
+
+      b = opti.variable()
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      a = opti.variable()
+      p = opti.parameter()
+
+      opti.minimize(sin(2*pi*(x+y-p))**2+sin(pi*z)**2)
+      opti.subject_to(x==2*y)
+
+      opti.solver("ipopt")
+
+      with self.assertInException("Argument 0"):
+        opti.to_function("F",[vertcat(x,2)],[vertcat(x,y,z)])
+      with self.assertInException("Argument 1"):
+        opti.to_function("F",[y,vertcat(x,2)],[vertcat(x,y,z)])
+
+      opti.to_function("F",[x,x],[vertcat(x,y,z)])
+      opti.to_function("F",[a],[vertcat(x,y,z)])
+      with self.assertInException("belonging to a different instance"):
+        opti.to_function("F",[b],[vertcat(x,y,z)])
 
     def test_dual(self):
       opti = Opti()
