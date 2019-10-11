@@ -48,6 +48,7 @@ namespace casadi {
     this->with_import = false;
     this->include_math = true;
     this->infinity = "INFINITY";
+    this->nan = "NAN";
     this->real_min = "";
     bool prefix_set = false;
     this->prefix = "";
@@ -84,6 +85,8 @@ namespace casadi {
         this->include_math = e.second;
       } else if (e.first=="infinity") {
         this->infinity = e.second.to_string();
+      } else if (e.first=="nan") {
+        this->nan = e.second.to_string();
       } else if (e.first=="real_min") {
         this->real_min = e.second.to_string();
       } else if (e.first=="indent") {
@@ -585,6 +588,17 @@ namespace casadi {
 
     if (this->with_export) generate_export_symbol(s);
 
+    // Check if inf/nan is needed
+    for (const auto& d : double_constants_) {
+      for (double e : d) {
+        if (isinf(e)) add_auxiliary(AUX_INF);
+        if (isnan(e)) add_auxiliary(AUX_NAN);
+      }
+    }
+
+    // Codegen auxiliary functions
+    s << this->auxiliaries.str();
+
     // Print integer constants
     if (!integer_constants_.empty()) {
       for (casadi_int i=0; i<integer_constants_.size(); ++i) {
@@ -627,9 +641,6 @@ namespace casadi {
       }
       s << endl << endl;
     }
-
-    // Codegen auxiliary functions
-    s << this->auxiliaries.str();
 
     // Codegen body
     s << this->body.str();
@@ -1194,6 +1205,11 @@ namespace casadi {
                         << "  #define casadi_inf " << this->infinity << "\n"
                         << "#endif\n\n";
       break;
+    case AUX_NAN:
+      this->auxiliaries << "#ifndef casadi_nan\n"
+                        << "  #define casadi_nan " << this->nan << "\n"
+                        << "#endif\n\n";
+      break;
     case AUX_REAL_MIN:
       this->auxiliaries << "#ifndef casadi_real_min\n"
                         << "  #define casadi_real_min " << this->real_min << "\n"
@@ -1228,7 +1244,8 @@ namespace casadi {
   string CodeGenerator::constant(double v) {
     stringstream s;
     if (isnan(v)) {
-      s << "NAN";
+      add_auxiliary(AUX_NAN);
+      s << "casadi_nan";
     } else if (isinf(v)) {
       add_auxiliary(AUX_INF);
       if (v<0) s << "-";

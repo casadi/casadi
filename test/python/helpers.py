@@ -554,12 +554,15 @@ class casadiTestCase(unittest.TestCase):
       if os.name=='nt':
         commands = "cl.exe /LD {name}.c {extra} /link  /libpath:{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options) 
         p = subprocess.Popen(commands,shell=True).wait()
+
+        F2 = external(F.name(), "./" + name+ ".dll")
       else:
         commands = "gcc -pedantic -std={std} -fPIC -shared -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name}.so -L{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir) + extralibs + extra_options
 
         p = subprocess.Popen(commands,shell=True).wait()
 
-      F2 = external(F.name(), name)
+
+        F2 = external(F.name(), "./" + name + ".so")
 
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)

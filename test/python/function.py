@@ -2538,6 +2538,19 @@ class Functiontests(casadiTestCase):
     self.assertTrue(f.stats()["n_call_total"]==0)
     self.checkarray(a,3)
 
+  def test_codegen_inf_nan(self):
+    x = MX.sym("x")
+    f = Function("F",[x],[x+inf])
+    self.check_codegen(f,inputs=[1],std="c99")
+
+    x = MX.sym("x")
+    f = Function("F",[x],[x+np.nan])
+    self.check_codegen(f,inputs=[1],std="c99")
+
+    x = MX.sym("x")
+    f = Function("F",[x],[x+vertcat(inf,np.nan,-inf)])
+    self.check_codegen(f,inputs=[1],std="c99")
+
           
 if __name__ == '__main__':
     unittest.main()
