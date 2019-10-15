@@ -2551,6 +2551,12 @@ class Functiontests(casadiTestCase):
     f = Function("F",[x],[x+vertcat(inf,np.nan,-inf)])
     self.check_codegen(f,inputs=[1],std="c99")
 
+  def test_bug_codegen_logical(self):
+    a = MX([1,0,0])
+    b = MX([1,1,0])
+    c = logic_or(a,b)
+    f = Function("f",[],[c])
+    self.check_codegen(f,inputs=[])
           
 if __name__ == '__main__':
     unittest.main()

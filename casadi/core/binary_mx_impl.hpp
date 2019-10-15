@@ -138,7 +138,13 @@ namespace casadi {
       if (!ScX && !inplace) {
         g.local("cr", "const casadi_real", "*");
         g << ", cr=" << g.work(arg[0], dep(0).nnz());
-        x = "(*cr++)";
+        if (op_==OP_OR || op_==OP_AND) {
+          // Avoid short-circuiting with side effects
+          x = "cr[i]";
+        } else {
+          x = "(*cr++)";
+        }
+
       }
 
       // Iterate over second argument?
