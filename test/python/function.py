@@ -561,6 +561,9 @@ class Functiontests(casadiTestCase):
         Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ]
         V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ]
 
+        if parallelization!="thread":
+          self.check_codegen(F,inputs=X_+Y_+Z_+V_)
+
         for f in [F, F.expand('expand_'+F.name())]:
 
           self.checkfunction(f,Fref,inputs=X_+Y_+Z_+V_,sparsity_mod=args.run_slow)

@@ -339,30 +339,142 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void OmpMap::codegen_body(CodeGenerator& g) const {
+  size_t round_to_cache_line(size_t s, size_t sz) {
+    size_t cache_size = 64;
+    s *= sz;
+
+    if (s==0) return 0;
+    size_t rem = s % cache_size;
+    if (rem == 0) return s/sz;
+
+    return (s - rem + cache_size)/sz;
+  }
+
+ void OmpMap::codegen_body(CodeGenerator& g) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+    size_t sz_wout = round_to_cache_line(f_.nnz_out(), sizeof(double));
     g << "casadi_int i;\n"
-      << "const double** arg1;\n"
-      << "double** res1;\n"
-      << "casadi_int flag = 0;\n"
-      << "#pragma omp parallel for private(i,arg1,res1) reduction(||:flag)\n"
-      << "for (i=0; i<" << n_ << "; ++i) {\n"
-      << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
+      << "const double* arg1[" << n_in_ << "];\n"
+      << "double* res1[" << n_out_ << "];\n"
+      << "double w_out[" << sz_wout*n_ << "];\n"
+      << "#pragma omp parallel for private(i,arg1,res1)\n"
+      << "for (i=0; i<" << n_ << "; ++i) {\n";
     for (casadi_int j=0; j<n_in_; ++j) {
       g << "arg1[" << j << "] = arg[" << j << "] ? "
         << g.arg(j) << "+i*" << f_.nnz_in(j) << ": 0;\n";
     }
-    g << "res1 = res + " <<  n_out_ << "+i*" <<  sz_res << ";\n";
+    casadi_int w_out_offset = 0;
     for (casadi_int j=0; j<n_out_; ++j) {
-      g << "res1[" << j << "] = res[" << j << "] ?"
-        << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
+      g << "res1[" << j << "] = res[" << j << "] ? "
+        << "w_out+i*" << sz_wout << "+" << w_out_offset << ": 0;\n";
+        w_out_offset+= f_.nnz_out(j);
     }
-    g << "flag = "
-      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << " || flag;\n"
-      << "}\n"
-      << "if (flag) return 1;\n";
+    g << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << ";\n";
+    g << "}\n";
+
+    w_out_offset = 0;
+    g << "for (i=0; i<" << n_ << "; ++i) {\n";
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "if (res[" << j << "]) " << g.copy("w_out+i*" + str(sz_wout)+ "+" + str(w_out_offset), f_.nnz_out(j), g.res(j) + "+i*" + str(f_.nnz_out(j))) << "\n";
+      w_out_offset+= f_.nnz_out(j);
+    }
+    g << "}\n";
   }
+
+
+/*
+ void OmpMap::codegen_body(CodeGenerator& g) const {
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+    g << "casadi_int i;\n"
+      << "const double* arg1[" << n_in_ << "];\n"
+      << "double* res1[" << n_out_ << "];\n";
+
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "double w_out" << j << "[" << round_to_cache_line(f_.nnz_out(j), sizeof(double))*n_ << "];\n";
+    }
+
+    g << "#pragma omp parallel for private(i,arg1,res1)\n"
+      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    for (casadi_int j=0; j<n_in_; ++j) {
+      g << "arg1[" << j << "] = arg[" << j << "] ? "
+        << g.arg(j) << "+i*" << f_.nnz_in(j) << ": 0;\n";
+    }
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "res1[" << j << "] = res[" << j << "] ? "
+        << "w_out" << j << "+i*" << round_to_cache_line(f_.nnz_out(j), sizeof(double)) << ": 0;\n";
+    }
+    g << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << ";\n";
+    g << "}\n";
+
+    g << "for (i=0; i<" << n_ << "; ++i) {\n";
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "if (res[" << j << "]) " << g.copy("w_out" + str(j) + "+i*" + str(round_to_cache_line(f_.nnz_out(j), sizeof(double))), f_.nnz_out(j), g.res(j) + "+i*" + str(f_.nnz_out(j))) << "\n";
+    }
+    g << "}\n";
+  }*/
+  
+/*
+void OmpMap::codegen_body(CodeGenerator& g) const {
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+    g << "casadi_int i;\n"
+      << "const double* arg1[" << n_in_ << "];\n"
+      << "double* res1[" << n_out_ << "];\n";
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "double w_out" << j << "[" << round_to_cache_line(f_.nnz_out(j), sizeof(double))*n_ << "];\n";
+    }
+    g << "#pragma omp parallel for private(i,arg1,res1";
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << ",w_out" << j;
+    }
+    g << ")\n"
+      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    for (casadi_int j=0; j<n_in_; ++j) {
+      g << "arg1[" << j << "] = arg[" << j << "] ? "
+        << g.arg(j) << "+i*" << f_.nnz_in(j) << ": 0;\n";
+    }
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "res1[" << j << "] = res[" << j << "] ? "
+        << "w_out" << j << "+i*" << round_to_cache_line(f_.nnz_out(j), sizeof(double)) << ": 0;\n";
+    }
+    g << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << ";\n";
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "if (res[" << j << "]) " << g.copy("w_out" + str(j) + "+i*" + str(round_to_cache_line(f_.nnz_out(j), sizeof(double))), f_.nnz_out(j), g.res(j) + "+i*" + str(f_.nnz_out(j))) << "\n";
+    }
+    g << "}\n";
+  }*/
+/*
+  void OmpMap::codegen_body(CodeGenerator& g) const {
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+    size_t sz_wout = round_to_cache_line(f_.nnz_out(), sizeof(double));
+    g << "casadi_int i;\n"
+      << "const double* arg1[" << n_in_ << "];\n"
+      << "double* res1[" << n_out_ << "];\n"
+      << "double w_out[" << sz_wout << "];\n"
+      << "#pragma omp parallel for private(i,arg1,res1,w_out)\n"
+      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    for (casadi_int j=0; j<n_in_; ++j) {
+      g << "arg1[" << j << "] = arg[" << j << "] ? "
+        << g.arg(j) << "+i*" << f_.nnz_in(j) << ": 0;\n";
+    }
+    casadi_int w_out_offset = 0;
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "res1[" << j << "] = res[" << j << "] ? "
+        << "w_out+" << w_out_offset << ": 0;\n";
+        w_out_offset+= f_.nnz_out(j);
+    }
+    g << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << ";\n";
+    w_out_offset = 0;;
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "if (res[" << j << "]) " << g.copy("w_out+" + str(w_out_offset), f_.nnz_out(j), g.res(j) + "+i*" + str(f_.nnz_out(j))) << "\n";
+      w_out_offset+= f_.nnz_out(j);
+    }
+    g << "}\n";
+  }
+*/
 
   void OmpMap::init(const Dict& opts) {
 #ifndef CASADI_WITH_THREAD
