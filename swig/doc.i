@@ -54219,7 +54219,7 @@ C++ includes: mx.hpp ";
 &x, const std::vector< std::vector< double > > &knots, const std::vector<
 casadi_int > &degree, const Dict &opts=Dict()) "
 
-[INTERNAL]   Find first nonzero If failed, returns the number of rows.
+Find first nonzero If failed, returns the number of rows.
 
 ";
 
