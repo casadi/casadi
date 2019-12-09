@@ -175,22 +175,112 @@ namespace casadi {
     set_sparsity(Sparsity::dense(m, 1));
   }
 
+  void get_boor(const MX& x, const MX& knots, casadi_int degree, casadi_int lookup_mode,
+      MX& start, MX& boor) {
+    MX knots_clipped = knots(range(degree, knots.size1()-degree));
+
+    Dict low_opts;
+    low_opts["lookup_mode"] = Low::lookup_mode_from_enum(lookup_mode);
+    MX L = low(knots_clipped, x, low_opts);
+    start = fmin(L, knots.size1()-2*degree-2);
+
+    DM boor_init = DM::zeros(2*degree+1, 1);
+    boor_init(degree) = 1;
+    MX boor_full = boor_init;
+    casadi_int n_knots = 2*degree+2;
+
+    MX kn = MX(knots)(start+MX(range(n_knots)));
+
+    std::vector<MX> knv = vertsplit(kn);
+
+    for (casadi_int d=1;d<degree+1;++d) {
+      for (casadi_int i=0;i<n_knots-d-1;++i) {
+        MX bottom = knv[i+d]-knv[i];
+        MX b = if_else_zero(bottom, (x-knv[i])*boor_full(i)/bottom);
+        bottom = knv[i+d+1]-knv[i + 1];
+        b += if_else_zero(bottom, (knv[i+d+1]-x)*boor_full(i+1)/bottom);
+        boor_full(i) = b;
+      }
+    }
+
+    boor = boor_full(range(degree+1));
+  }
+
+  MX do_inline(const MX& x,
+                const std::vector< std::vector<double> >& knots,
+                const MX& coeffs,
+                casadi_int m,
+                const std::vector<casadi_int>& degree,
+                const std::vector<casadi_int>& lookup_mode) {
+
+    // Number of grid points
+    casadi_int N = knots.size();
+    std::vector<MX> xs = vertsplit(x);
+
+    // Compute De Boor vector in each direction
+    std::vector<MX> boors(N), starts(N);
+    for (casadi_int i=0;i<N;++i) {
+      get_boor(xs[i], knots[i], degree[i], lookup_mode[i], starts[i], boors[i]);
+    }
+
+    // Compute strides
+    std::vector<casadi_int> strides = {m};
+    for (casadi_int i=0;i<N-1;++i) {
+      strides.push_back(strides.back()*(knots[i].size()-degree[i]-1));
+    }
+
+    // Start index of subtensor
+    MX start = dot(DM(strides), vertcat(starts));
+
+    // Elements of subtensor
+    DM core = DM(range(m));
+    for (casadi_int i=0;i<N;++i) {
+      casadi_int n = degree[i]+1;
+      core = vec(repmat(core, 1, n)+repmat(strides[i]*DM(range(n)).T(), core.size1(), 1));
+    }
+
+    // Flattened subtensor of coefficients
+    MX c = reshape(coeffs(start+core), m, -1);
+
+    // Compute outer product of De Boor vectors
+    MX boor = 1;
+    for (casadi_int i=0;i<N;++i) {
+      boor = vec(mtimes(boor, boors[i].T()));
+    }
+
+    return mtimes(c, boor);
+  }
+
   MX BSpline::create(const MX& x, const std::vector< std::vector<double> >& knots,
           const std::vector<double>& coeffs,
           const std::vector<casadi_int>& degree,
           casadi_int m,
           const Dict& opts) {
 
+
+    bool do_inline_flag = false;
+    std::vector<std::string> lookup_mode;
+
+    for (auto&& op : opts) {
+      if (op.first=="inline") {
+        do_inline_flag = op.second;
+      } else if (op.first=="lookup_mode") {
+        lookup_mode = op.second;
+      }
+    }
+
     std::vector<casadi_int> offset;
     std::vector<double> stacked;
     Interpolant::stack_grid(knots, offset, stacked);
 
-    std::vector<std::string> lookup_mode;
-    auto it = opts.find("lookup_mode");
-    if (it!=opts.end()) lookup_mode = it->second;
     std::vector<casadi_int> mode =
       Interpolant::interpret_lookup_mode(lookup_mode, stacked, offset, degree, degree);
-    return x->get_bspline(stacked, offset, coeffs, degree, m, mode);
+
+    if (do_inline_flag) {
+      return do_inline(x, knots, coeffs, m, degree, mode);
+    } else {
+      return x->get_bspline(stacked, offset, coeffs, degree, m, mode);
+    }
   }
 
   MX BSplineParametric::create(const MX& x,
@@ -200,16 +290,28 @@ namespace casadi {
           casadi_int m,
           const Dict& opts) {
 
+    bool do_inline_flag = false;
+    std::vector<std::string> lookup_mode;
+
+    for (auto&& op : opts) {
+      if (op.first=="inline") {
+        do_inline_flag = op.second;
+      } else if (op.first=="lookup_mode") {
+        lookup_mode = op.second;
+      }
+    }
+
     std::vector<casadi_int> offset;
     std::vector<double> stacked;
     Interpolant::stack_grid(knots, offset, stacked);
-
-    std::vector<std::string> lookup_mode;
-    auto it = opts.find("lookup_mode");
-    if (it!=opts.end()) lookup_mode = it->second;
     std::vector<casadi_int> mode =
       Interpolant::interpret_lookup_mode(lookup_mode, stacked, offset, degree, degree);
-    return x->get_bspline(coeffs, stacked, offset, degree, m, mode);
+
+    if (do_inline_flag) {
+      return do_inline(x, knots, coeffs, m, degree, mode);
+    } else {
+      return x->get_bspline(coeffs, stacked, offset, degree, m, mode);
+    }
   }
 
   std::string BSpline::disp(const std::vector<std::string>& arg) const {

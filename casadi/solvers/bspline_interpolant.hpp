@@ -148,8 +148,16 @@ namespace casadi {
       grid.push_back(local_grid);
     }
 
+    bool do_inline = false;
+    for (auto&& op : opts) {
+      if (op.first=="inline") {
+        do_inline = op.second;
+      }
+    }
+
     Dict opts_bspline;
     opts_bspline["lookup_mode"] = lookup_modes_;
+    opts_bspline["inline"] = do_inline;
 
     switch (algorithm_) {
       case ALG_NOT_A_KNOT:

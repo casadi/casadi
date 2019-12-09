@@ -156,9 +156,11 @@ namespace casadi {
                     const Dict& opts) {
     bool do_inline = false;
     Dict options = extract_from_dict(opts, "inline", do_inline);
-    if (do_inline) {
-      casadi_assert(Interpolant::getPlugin(solver).exposed.do_inline,
-        "Inline option not supported for '" + solver + "'.");
+    if (do_inline && !Interpolant::getPlugin(solver).exposed.do_inline) {
+      options["inline"] = true;
+      do_inline = false;
+    }
+    if (do_inline && Interpolant::getPlugin(solver).exposed.do_inline) {
       return Interpolant::getPlugin(solver).exposed.
         do_inline(name, grid, offset, values, m, options);
     } else {
