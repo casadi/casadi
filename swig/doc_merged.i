@@ -42829,7 +42829,7 @@ C++ includes: mx.hpp ";
 
 %feature("docstring") casadi::MX::bspline_dual "
 
-[INTERNAL]   Find first nonzero If failed, returns the number of rows.
+Find first nonzero If failed, returns the number of rows.
 
 ";
 
