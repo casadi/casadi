@@ -196,9 +196,9 @@ namespace casadi {
     for (casadi_int d=1;d<degree+1;++d) {
       for (casadi_int i=0;i<n_knots-d-1;++i) {
         MX bottom = knv[i+d]-knv[i];
-        MX b = if_else_zero(bottom, (x-knv[i])*boor_full(i)/bottom);
+        MX b = if_else_zero(bottom, (x-knv[i])*boor_full(i)/(bottom+1e-100));
         bottom = knv[i+d+1]-knv[i + 1];
-        b += if_else_zero(bottom, (knv[i+d+1]-x)*boor_full(i+1)/bottom);
+        b += if_else_zero(bottom, (knv[i+d+1]-x)*boor_full(i+1)/(bottom+1e-100));
         boor_full(i) = b;
       }
     }
