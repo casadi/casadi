@@ -301,9 +301,23 @@ namespace casadi {
     }
   }
 
-  void DeserializingStream::version(const std::string& name, int v) {
+  int DeserializingStream::version(const std::string& name) {
     int load_version;
     unpack(name+"::serialization::version", load_version);
+    return load_version;
+  }
+
+  int DeserializingStream::version(const std::string& name, int min, int max) {
+    int load_version = version(name);
+    casadi_assert(load_version>=min && load_version<=max,
+      "DeSerialization of " + name + " failed. "
+      "Object written in version " + str(load_version) +
+      " but can only read version " + str(min) + "..." + str(max) + ".");
+    return load_version;
+  }
+
+  void DeserializingStream::version(const std::string& name, int v) {
+    int load_version = version(name);
     casadi_assert(load_version==v,
       "DeSerialization of " + name + " failed. "
       "Object written in version " + str(load_version) +

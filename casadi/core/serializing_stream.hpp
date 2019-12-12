@@ -137,6 +137,8 @@ namespace casadi {
     //@}
 
     void version(const std::string& name, int v);
+    int version(const std::string& name);
+    int version(const std::string& name, int min, int max);
 
   private:
 
