@@ -137,12 +137,12 @@ namespace casadi {
     get_options().check(opts);
 
     // Initialize the class hierarchy
-    try {
+    //try {
       init(opts);
-    } catch (exception& e) {
-      casadi_error("Error calling " + class_name() + "::init for '" + name_ + "':\n"
-        + string(e.what()));
-    }
+    //} catch (exception& e) {
+    //  casadi_error("Error calling " + class_name() + "::init for '" + name_ + "':\n"
+    //    + string(e.what()));
+    //}
 
     // Revisit class hierarchy in reverse order
     try {

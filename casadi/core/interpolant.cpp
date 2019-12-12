@@ -228,7 +228,7 @@ namespace casadi {
   }
 
   Sparsity Interpolant::get_sparsity_in(casadi_int i) {
-    if (i==0) return Sparsity::dense(ndim_);
+    if (i==0) return Sparsity::dense(ndim_, batch_x_);
     if (arg_values(i)) return Sparsity::dense(coeff_size());
     if (arg_grid(i)) return Sparsity::dense(offset_.back());
     casadi_assert_dev(false);
@@ -236,7 +236,7 @@ namespace casadi {
 
   Sparsity Interpolant::get_sparsity_out(casadi_int i) {
     casadi_assert_dev(i==0);
-    return Sparsity::dense(m_);
+    return Sparsity::dense(m_, batch_x_);
   }
 
   std::string Interpolant::get_name_in(casadi_int i) {
@@ -267,7 +267,10 @@ namespace casadi {
        {OT_BOOL,
         "Implement the lookup table in MX primitives. "
         "Useful when you need derivatives with respect to grid and/or coefficients. "
-        "Such derivatives are fundamentally dense, so use with caution."}}
+        "Such derivatives are fundamentally dense, so use with caution."}},
+      {"batch_x",
+       {OT_INT,
+        "Evaluate a batch of different inputs at once (default 1)."}}
      }
   };
 
@@ -290,15 +293,20 @@ namespace casadi {
   }
 
   void Interpolant::init(const Dict& opts) {
-    // Call the base class initializer
-    FunctionInternal::init(opts);
+
+    batch_x_ = 1;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="lookup_mode") {
         lookup_modes_ = op.second;
+      } else if (op.first=="batch_x") {
+        batch_x_ = op.second;
       }
     }
+
+    // Call the base class initializer
+    FunctionInternal::init(opts);
 
     // Needed by casadi_interpn
     alloc_w(ndim_, true);
@@ -335,13 +343,14 @@ namespace casadi {
 
   void Interpolant::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
-    s.version("Interpolant", 1);
+    s.version("Interpolant", 2);
     s.pack("Interpolant::ndim", ndim_);
     s.pack("Interpolant::m", m_);
     s.pack("Interpolant::grid", grid_);
     s.pack("Interpolant::offset", offset_);
     s.pack("Interpolant::values", values_);
     s.pack("Interpolant::lookup_modes", lookup_modes_);
+    s.pack("Interpolant::batch_x", batch_x_);
   }
 
   void Interpolant::serialize_type(SerializingStream &s) const {
@@ -354,13 +363,18 @@ namespace casadi {
   }
 
   Interpolant::Interpolant(DeserializingStream & s) : FunctionInternal(s) {
-    s.version("Interpolant", 1);
+    int version = s.version("Interpolant", 1, 2);
     s.unpack("Interpolant::ndim", ndim_);
     s.unpack("Interpolant::m", m_);
     s.unpack("Interpolant::grid", grid_);
     s.unpack("Interpolant::offset", offset_);
     s.unpack("Interpolant::values", values_);
     s.unpack("Interpolant::lookup_modes", lookup_modes_);
+    if (version==1) {
+      batch_x_ = 1;
+    } else {
+      s.unpack("Interpolant::batch_x", batch_x_);
+    }
   }
 
 } // namespace casadi

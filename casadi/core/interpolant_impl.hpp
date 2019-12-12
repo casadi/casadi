@@ -133,6 +133,9 @@ namespace casadi {
     // Number of outputs
     casadi_int m_;
 
+    // Number of inputs
+    casadi_int batch_x_;
+
     // Input grid
     std::vector<double> grid_;
 

@@ -170,7 +170,7 @@ namespace casadi {
           casadi_int m,
           const std::vector<casadi_int>& lookup_mode) :
           BSplineCommon(knots, offset, degree, m, lookup_mode) {
-    casadi_assert_dev(x.numel()==degree.size());
+    casadi_assert_dev(x.size1()==degree.size());
     set_dep(x, coeffs);
     set_sparsity(Sparsity::dense(m, 1));
   }
@@ -184,26 +184,29 @@ namespace casadi {
     MX L = low(knots_clipped, x, low_opts);
     start = fmin(L, knots.size1()-2*degree-2);
 
-    DM boor_init = DM::zeros(2*degree+1, 1);
-    boor_init(degree) = 1;
-    MX boor_full = boor_init;
+    DM boor_init = DM::zeros(x.size2(), 2*degree+1);
+    boor_init(Slice(), degree) = 1;
+    std::vector<MX> boor_full = horzsplit(MX(boor_init));
     casadi_int n_knots = 2*degree+2;
 
-    MX kn = MX(knots)(start+MX(range(n_knots)));
+    MX kn;
+    MX(knots).get_nz(kn, false, start, MX(range(n_knots)));
 
-    std::vector<MX> knv = vertsplit(kn);
+    std::vector<MX> knv = horzsplit(kn);
+
+    MX xt = x.T();
 
     for (casadi_int d=1;d<degree+1;++d) {
       for (casadi_int i=0;i<n_knots-d-1;++i) {
         MX bottom = knv[i+d]-knv[i];
-        MX b = if_else_zero(bottom, (x-knv[i])*boor_full(i)/(bottom+1e-100));
+        MX b = if_else_zero(bottom, (xt-knv[i])*boor_full[i]/(bottom+1e-100));
         bottom = knv[i+d+1]-knv[i + 1];
-        b += if_else_zero(bottom, (knv[i+d+1]-x)*boor_full(i+1)/(bottom+1e-100));
-        boor_full(i) = b;
+        b += if_else_zero(bottom, (knv[i+d+1]-xt)*boor_full[i+1]/(bottom+1e-100));
+        boor_full[i] = b;
       }
     }
 
-    boor = boor_full(range(degree+1));
+    boor = horzcat(std::vector<MX>(boor_full.begin(), boor_full.begin()+degree+1));
   }
 
   MX do_inline(const MX& x,
@@ -213,14 +216,19 @@ namespace casadi {
                 const std::vector<casadi_int>& degree,
                 const std::vector<casadi_int>& lookup_mode) {
 
+    casadi_int batch_x = x.size2();
+
     // Number of grid points
     casadi_int N = knots.size();
     std::vector<MX> xs = vertsplit(x);
 
     // Compute De Boor vector in each direction
-    std::vector<MX> boors(N), starts(N);
+    std::vector<MX> starts(N);
+    std::vector< std::vector<MX> > boors(N);
     for (casadi_int i=0;i<N;++i) {
-      get_boor(xs[i], knots[i], degree[i], lookup_mode[i], starts[i], boors[i]);
+      MX boor;
+      get_boor(xs[i], knots[i], degree[i], lookup_mode[i], starts[i], boor);
+      boors[i] = horzsplit(boor.T());
     }
 
     // Compute strides
@@ -229,8 +237,8 @@ namespace casadi {
       strides.push_back(strides.back()*(knots[i].size()-degree[i]-1));
     }
 
-    // Start index of subtensor
-    MX start = dot(DM(strides), vertcat(starts));
+    // Start index of subtensor: row vector
+    MX start = mtimes(DM(strides).T(), vertcat(starts));
 
     // Elements of subtensor
     DM core = DM(range(m));
@@ -239,16 +247,23 @@ namespace casadi {
       core = vec(repmat(core, 1, n)+repmat(strides[i]*DM(range(n)).T(), core.size1(), 1));
     }
 
-    // Flattened subtensor of coefficients
-    MX c = reshape(coeffs(start+core), m, -1);
+    std::vector<MX> res;
 
-    // Compute outer product of De Boor vectors
-    MX boor = 1;
-    for (casadi_int i=0;i<N;++i) {
-      boor = vec(mtimes(boor, boors[i].T()));
+    for (casadi_int k=0;k<batch_x;++k) {
+
+      // Flattened subtensor of coefficients
+      MX c = reshape(coeffs(start(k)+core), m, -1);
+
+      // Compute outer product of De Boor vectors
+      MX boor = 1;
+      for (casadi_int i=0;i<N;++i) {
+        boor = vec(mtimes(boor, boors[i][k].T()));
+      }
+
+      res.push_back(mtimes(c, boor));
     }
 
-    return mtimes(c, boor);
+    return horzcat(res);
   }
 
   MX BSpline::create(const MX& x, const std::vector< std::vector<double> >& knots,

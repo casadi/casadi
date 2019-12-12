@@ -135,7 +135,7 @@ namespace casadi {
 
     casadi_assert(!has_parametric_grid(), "Parametric grid not supported");
 
-    MX x = MX::sym("x", ndim_);
+    MX x = MX::sym("x", ndim_, batch_x_);
 
     if (has_parametric_values()) {
       MX coeff = MX::sym("coeff", coeff_size());
