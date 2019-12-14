@@ -55,6 +55,9 @@ namespace casadi {
        {"linear_solver",
         {OT_STRING,
          "Solver used for constructing the coefficient tensor."}},
+       {"linear_solver_options",
+        {OT_DICT,
+         "Options to be passed to the linear solver."}},
        {"algorithm",
         {OT_STRING,
          "Algorithm used for fitting the data: 'not_a_knot' (default, same as Matlab),"
@@ -106,12 +109,16 @@ namespace casadi {
     algorithm_ = ALG_NOT_A_KNOT;
     smooth_linear_frac_ = 0.1;
 
+    Dict linear_solver_options;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="degree") {
         degree_ = op.second;
       } else if (op.first=="linear_solver") {
         linear_solver_ = op.second.to_string();
+      } else if (op.first=="linear_solver_options") {
+        linear_solver_options = op.second.to_dict();
       } else if (op.first=="algorithm") {
         std::string alg = op.second.to_string();
         if (alg=="not_a_knot") {
@@ -140,11 +147,11 @@ namespace casadi {
     if (has_parametric_values()) {
       MX coeff = MX::sym("coeff", coeff_size());
 
-      MX e = construct_graph(x, coeff, opts);
+      MX e = construct_graph(x, coeff, linear_solver_options, opts);
 
       S_ = Function("wrapper", {x, coeff}, {e});
     } else {
-      MX e = construct_graph(x, DM(values_), opts);
+      MX e = construct_graph(x, DM(values_), linear_solver_options, opts);
       S_ = Function("wrapper", {x}, {e});
     }
 

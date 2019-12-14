@@ -103,12 +103,12 @@ namespace casadi {
   }
 
   int Low::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    res[0][0] = 0;
+    fill_n(res[0], nnz(), 0);
     return 0;
   }
 
   int Low::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    res[0][0] = 0;
+    fill_n(res[0], nnz(), 0);
     return 0;
   }
 
