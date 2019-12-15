@@ -39,6 +39,10 @@
 namespace casadi {
   struct CASADI_LINSOL_QR_EXPORT LinsolQrMemory : public LinsolMemory {
     std::vector<double> v, r, beta, w;
+    std::vector<double> cache;
+
+    // Cache locations sorted by access time
+    std::vector<int> cache_loc;
   };
 
   /** \brief \pluginbrief{LinsolInternal,qr}
@@ -61,6 +65,9 @@ namespace casadi {
 
     // Initialize the solver
     void init(const Dict& opts) override;
+
+    /// Finalize the object creation
+    void finalize() override;
 
     ///@{
     /** \brief Options */
@@ -103,6 +110,10 @@ namespace casadi {
     std::vector<casadi_int> prinv_, pc_;
     Sparsity sp_v_, sp_r_;
     double eps_;
+
+    /// Cache size
+    casadi_int n_cache_;
+    casadi_int cache_stride_;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;

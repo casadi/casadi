@@ -274,6 +274,7 @@ namespace casadi {
   #include "casadi_newton.hpp"
   #include "casadi_bound_consistency.hpp"
   #include "casadi_lsqr.hpp"
+  #include "casadi_cache.hpp"
 
 } // namespace casadi
 

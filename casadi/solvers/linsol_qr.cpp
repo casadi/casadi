@@ -58,7 +58,10 @@ namespace casadi {
   = {{&LinsolInternal::options_},
      {{"eps",
        {OT_DOUBLE,
-        "Minimum R entry before singularity is declared [1e-12]"}}
+        "Minimum R entry before singularity is declared [1e-12]"}},
+      {"cache",
+       {OT_DOUBLE,
+        "Amount of factorisations to remember (thread-local) [0]"}}
      }
   };
 
@@ -68,14 +71,22 @@ namespace casadi {
 
     // Read options
     eps_ = 1e-12;
+    n_cache_ = 0;
     for (auto&& op : opts) {
       if (op.first=="eps") {
         eps_ = op.second;
+      } else if (op.first=="cache") {
+        n_cache_ = op.second;
       }
     }
 
     // Symbolic factorization
     sp_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
+  }
+
+  void LinsolQr::finalize() {
+    cache_stride_ = sp_.nnz()+sp_v_.nnz()+sp_r_.nnz()+ncol();
+    LinsolInternal::finalize();
   }
 
   int LinsolQr::init_mem(void* mem) const {
@@ -87,6 +98,10 @@ namespace casadi {
     m->r.resize(sp_r_.nnz());
     m->beta.resize(ncol());
     m->w.resize(nrow() + ncol());
+
+    m->cache.resize(cache_stride_*n_cache_);
+    m->cache_loc.resize(n_cache_, -1);
+
     return 0;
   }
 
@@ -96,6 +111,18 @@ namespace casadi {
 
   int LinsolQr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
+
+    double* c;
+    bool check = cache_check(A, get_ptr(m->cache), get_ptr(m->cache_loc),
+      cache_stride_, n_cache_, sp_.nnz(), &c);
+    if (n_cache_ && check) {
+      c += sp_.nnz();
+      // Retrieve from cache
+      casadi_copy(c, sp_v_.nnz(), get_ptr(m->v)); c+=sp_v_.nnz();
+      casadi_copy(c, sp_r_.nnz(), get_ptr(m->r)); c+=sp_r_.nnz();
+      casadi_copy(c, ncol(), get_ptr(m->beta)); c+=ncol();
+      return 0;
+    }
     casadi_qr(sp_, A, get_ptr(m->w),
               sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
               get_ptr(m->beta), get_ptr(prinv_), get_ptr(pc_));
@@ -114,6 +141,13 @@ namespace casadi {
       }
       return 1;
     } else {
+      if (n_cache_) {
+        // Store in cache
+        casadi_copy(A, sp_.nnz(), c); c+=sp_.nnz();
+        casadi_copy(get_ptr(m->v), sp_v_.nnz(), c); c+=sp_v_.nnz();
+        casadi_copy(get_ptr(m->r), sp_r_.nnz(), c); c+=sp_r_.nnz();
+        casadi_copy(get_ptr(m->beta), ncol(), c); c+=ncol();
+      }
       return 0;
     }
   }
@@ -143,8 +177,36 @@ namespace casadi {
          "beta[" << ncol() << "], "
          "w[" << nrow() + ncol() << "];\n";
 
+    if (n_cache_) {
+      g << "casadi_real *c;\n";
+      g << "casadi_real cache[" << cache_stride_*n_cache_ << "];\n";
+      g << "int cache_loc[" << n_cache_ << "] = {";
+      for (casadi_int i=0;i<n_cache_;++i) {
+        g << "-1,";
+      }
+      g << "};\n";
+      g << "if (" << g.cache_check(A, "cache", "cache_loc",
+        cache_stride_, n_cache_, sp_.nnz(), "&c") << ") {\n";
+      casadi_int offset = sp_.nnz();
+      g.comment("Retrieve from cache");
+      g << g.copy("c+" + str(offset), sp_v_.nnz(), "v") << "\n"; offset+=sp_v_.nnz();
+      g << g.copy("c+" + str(offset), sp_r_.nnz(), "r") << "\n"; offset+=sp_r_.nnz();
+      g << g.copy("c+" + str(offset), ncol(), "beta") << "\n"; offset+=ncol();
+      g << "} else {\n";
+    }
+
     // Factorize
     g << g.qr(sp, A, "w", sp_v, "v", sp_r, "r", "beta", prinv, pc) << "\n";
+
+    if (n_cache_) {
+      casadi_int offset = 0;
+      g.comment("Store in cache");
+      g << g.copy(A, sp_.nnz(), "c") << "\n";; offset+=sp_.nnz();
+      g << g.copy("v", sp_v_.nnz(), "c+"+str(offset)) << "\n"; offset+=sp_v_.nnz();
+      g << g.copy("r", sp_r_.nnz(), "c+"+str(offset)) << "\n"; offset+=sp_r_.nnz();
+      g << g.copy("beta", ncol(), "c+"+str(offset)) << "\n"; offset+=ncol();
+      g << "}\n";
+    }
 
     // Solve
     g << g.qr_solve(x, nrhs, tr, sp_v, "v", sp_r, "r", "beta", prinv, pc, "w") << "\n";
@@ -154,22 +216,28 @@ namespace casadi {
   }
 
   LinsolQr::LinsolQr(DeserializingStream& s) : LinsolInternal(s) {
-    s.version("LinsolQr", 1);
+    int version = s.version("LinsolQr", 1, 2);
     s.unpack("LinsolQr::prinv", prinv_);
     s.unpack("LinsolQr::pc", pc_);
     s.unpack("LinsolQr::sp_v", sp_v_);
     s.unpack("LinsolQr::sp_r", sp_r_);
     s.unpack("LinsolQr::eps", eps_);
+    if (version>1) {
+      s.unpack("LinsolQr::n_cache", n_cache_);
+    } else {
+      n_cache_ = 1;
+    }
   }
 
   void LinsolQr::serialize_body(SerializingStream &s) const {
     LinsolInternal::serialize_body(s);
-    s.version("LinsolQr", 1);
+    s.version("LinsolQr", 2);
     s.pack("LinsolQr::prinv", prinv_);
     s.pack("LinsolQr::pc", pc_);
     s.pack("LinsolQr::sp_v", sp_v_);
     s.pack("LinsolQr::sp_r", sp_r_);
     s.pack("LinsolQr::eps", eps_);
+    s.pack("LinsolQr::n_cache", n_cache_);
   }
 
 } // namespace casadi

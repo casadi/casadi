@@ -372,7 +372,8 @@ namespace casadi {
       AUX_ISINF,
       AUX_BOUNDS_CONSISTENCY,
       AUX_LSQR,
-      AUX_FILE_SLURP
+      AUX_FILE_SLURP,
+      AUX_CACHE
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -462,6 +463,11 @@ namespace casadi {
 
     /** \brief Slurp a file */
     std::string file_slurp(const std::string& fname, casadi_int n, const std::string& a);
+
+    /** \brief cache check */
+    std::string cache_check(const std::string& key, const std::string& cache,
+        const std::string& loc, casadi_int stride, casadi_int sz, casadi_int key_sz,
+        const std::string& val);
   private:
 
     /// Print file header

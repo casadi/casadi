@@ -473,6 +473,35 @@ class LinearSolverTests(casadiTestCase):
       with self.assertRaises(Exception):
         solve(As,bs,Solver,options)
 
+  def test_cache(self):
+    n = 5
+
+    As = [np.random.random((n,n)) for i in range(10)]
+
+    A = MX.sym("A",n,n)
+    f = Function('f',[A],[solve(A, DM.ones(n), "qr", {"cache": 2})])
+
+    S1 = f(As[0])
+    r = f(As[0])
+    self.checkarray(S1, r)
+
+    S2 = f(As[1])
+    r = f(As[1])
+    self.checkarray(S2, r)
+    r = f(As[0])
+    self.checkarray(S1, r)
+
+    S3 = f(As[2])
+    r = f(As[2])
+    self.checkarray(S3, r)
+    r = f(As[0])
+    self.checkarray(S1, r)
+    r = f(As[1])
+    self.checkarray(S2, r)
+
+    self.check_codegen(f, inputs=[As[0]])
+    self.check_serialize(f, inputs=[As[0]])
+
   @memory_heavy()
   def test_thread_safety(self):
     x = MX.sym('x')

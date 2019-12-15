@@ -1097,6 +1097,9 @@ namespace casadi {
       add_include("stdio.h");
       this->auxiliaries << sanitize_source(casadi_file_slurp_str, inst);
       break;
+    case AUX_CACHE:
+      this->auxiliaries << sanitize_source(casadi_cache_str, inst);
+      break;
     case AUX_CVX:
       add_auxiliary(AUX_CLEAR);
       add_auxiliary(AUX_FABS);
@@ -1893,6 +1896,14 @@ namespace casadi {
   file_slurp(const std::string& fname, casadi_int n, const std::string& a) {
     add_auxiliary(CodeGenerator::AUX_FILE_SLURP);
     return "casadi_file_slurp(\"" + fname + "\", " + str(n) + ", " + a + ")";
+  }
+
+  std::string CodeGenerator::
+  cache_check(const std::string& key, const std::string& cache, const std::string& loc,
+        casadi_int stride, casadi_int sz, casadi_int key_sz, const std::string& val) {
+    add_auxiliary(CodeGenerator::AUX_CACHE);
+    return "cache_check(" + key + ", " + cache + ", " + loc + ", " +
+    str(stride) + ", " + str(sz) + ", " + str(key_sz) + ", " + val + ")";
   }
 
 } // namespace casadi
