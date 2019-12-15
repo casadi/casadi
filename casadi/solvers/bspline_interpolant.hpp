@@ -123,7 +123,8 @@ namespace casadi {
     }
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override {
+    int sp_reverse(bvec_t** arg, bvec_t** res,
+        casadi_int* iw, bvec_t* w, void* mem) const override {
       return S_->sp_reverse(arg, res, iw, w, mem);
     }
 
@@ -154,7 +155,8 @@ namespace casadi {
 
 
   template <typename M>
-  MX BSplineInterpolant::construct_graph(const MX& x, const M& values, const Dict& linsol_options, const Dict& opts) {
+  MX BSplineInterpolant::construct_graph(const MX& x, const M& values,
+      const Dict& linsol_options, const Dict& opts) {
 
     std::vector< std::vector<double> > grid;
     for (casadi_int k=0;k<degree_.size();++k) {
