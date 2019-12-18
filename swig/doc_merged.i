@@ -1026,6 +1026,13 @@ elements.
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -4372,25 +4379,28 @@ fitpack
 
 >List of available options
 
-+--------------------+--------------+--------------------------------------+
-|         Id         |     Type     |             Description              |
-+====================+==============+======================================+
-| algorithm          | OT_STRING    | Algorithm used for fitting the data: |
-|                    |              | 'not_a_knot' (default, same as       |
-|                    |              | Matlab), 'smooth_linear'.            |
-+--------------------+--------------+--------------------------------------+
-| degree             | OT_INTVECTOR | Sets, for each grid dimension, the   |
-|                    |              | degree of the spline.                |
-+--------------------+--------------+--------------------------------------+
-| linear_solver      | OT_STRING    | Solver used for constructing the     |
-|                    |              | coefficient tensor.                  |
-+--------------------+--------------+--------------------------------------+
-| smooth_linear_frac | OT_DOUBLE    | When 'smooth_linear' algorithm is    |
-|                    |              | active, determines sharpness between |
-|                    |              | 0 (sharp, as linear interpolation)   |
-|                    |              | and 0.5 (smooth).Default value is    |
-|                    |              | 0.1.                                 |
-+--------------------+--------------+--------------------------------------+
++-----------------------+--------------+-----------------------------------+
+|          Id           |     Type     |            Description            |
++=======================+==============+===================================+
+| algorithm             | OT_STRING    | Algorithm used for fitting the    |
+|                       |              | data: 'not_a_knot' (default, same |
+|                       |              | as Matlab), 'smooth_linear'.      |
++-----------------------+--------------+-----------------------------------+
+| degree                | OT_INTVECTOR | Sets, for each grid dimension,    |
+|                       |              | the degree of the spline.         |
++-----------------------+--------------+-----------------------------------+
+| linear_solver         | OT_STRING    | Solver used for constructing the  |
+|                       |              | coefficient tensor.               |
++-----------------------+--------------+-----------------------------------+
+| linear_solver_options | OT_DICT      | Options to be passed to the       |
+|                       |              | linear solver.                    |
++-----------------------+--------------+-----------------------------------+
+| smooth_linear_frac    | OT_DOUBLE    | When 'smooth_linear' algorithm is |
+|                       |              | active, determines sharpness      |
+|                       |              | between 0 (sharp, as linear       |
+|                       |              | interpolation) and 0.5            |
+|                       |              | (smooth).Default value is 0.1.    |
++-----------------------+--------------+-----------------------------------+
 
 Joris Gillis
 
@@ -4406,6 +4416,11 @@ Joris Gillis
 |                  |                 | (default, same   |                  |
 |                  |                 | as Matlab),      |                  |
 |                  |                 | 'smooth_linear'. |                  |
++------------------+-----------------+------------------+------------------+
+| batch_x          | OT_INT          | Evaluate a batch | casadi::Interpol |
+|                  |                 | of different     | ant              |
+|                  |                 | inputs at once   |                  |
+|                  |                 | (default 1).     |                  |
 +------------------+-----------------+------------------+------------------+
 | degree           | OT_INTVECTOR    | Sets, for each   | casadi::BSplineI |
 |                  |                 | grid dimension,  | nterpolant       |
@@ -4430,6 +4445,10 @@ Joris Gillis
 |                  |                 | constructing the | nterpolant       |
 |                  |                 | coefficient      |                  |
 |                  |                 | tensor.          |                  |
++------------------+-----------------+------------------+------------------+
+| linear_solver_op | OT_DICT         | Options to be    | casadi::BSplineI |
+| tions            |                 | passed to the    | nterpolant       |
+|                  |                 | linear solver.   |                  |
 +------------------+-----------------+------------------+------------------+
 | lookup_mode      | OT_STRINGVECTOR | Specifies, for   | casadi::Interpol |
 |                  |                 | each grid        | ant              |
@@ -7771,6 +7790,13 @@ generated function.
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -8020,6 +8046,12 @@ elements.
 %feature("docstring") casadi::ClangCompiler::disp "
 
 [INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::library "
+
+[INTERNAL]  Get library name.
 
 ";
 
@@ -11181,6 +11213,13 @@ Internal class.
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -12081,6 +12120,12 @@ C++ includes: importer_internal.hpp ";
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::DllLibrary::library "
+
+[INTERNAL]  Get library name.
+
+";
+
 %feature("docstring") casadi::DllLibrary::can_have_meta "
 
 [INTERNAL]  Can meta information be read?
@@ -12513,6 +12558,13 @@ Internal class.
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
@@ -14827,6 +14879,13 @@ Internal class.
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
@@ -18266,6 +18325,13 @@ StringSerializer, FileDeserializer
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -21693,6 +21759,13 @@ structure recognition for symmetric Jacobians
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -23525,6 +23598,13 @@ member functions. Joel Andersson >List of available options
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
@@ -28821,9 +28901,9 @@ Get the function body, if inlined.
 
 ";
 
-%feature("docstring") casadi::Importer::class_name "
+%feature("docstring") casadi::Importer::library "
 
-Get class name.
+Get library name.
 
 ";
 
@@ -28842,6 +28922,12 @@ Does a meta entry exist?
 %feature("docstring") casadi::Importer::disp "
 
 Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Importer::is_null "
+
+Is a null pointer?
 
 ";
 
@@ -28992,9 +29078,9 @@ Importer factory.
 
 ";
 
-%feature("docstring") casadi::Importer::is_null "
+%feature("docstring") casadi::Importer::class_name "
 
-Is a null pointer?
+Get class name.
 
 ";
 
@@ -31378,6 +31464,11 @@ Internal class
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
+| batch_x          | OT_INT          | Evaluate a batch | casadi::Interpol |
+|                  |                 | of different     | ant              |
+|                  |                 | inputs at once   |                  |
+|                  |                 | (default 1).     |                  |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -31601,6 +31692,13 @@ Internal class
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
@@ -32696,6 +32794,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
@@ -34312,6 +34417,13 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -34848,6 +34960,13 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
@@ -35942,6 +36061,10 @@ Joel Andersson
 +-------------+-----------------+---------------------+--------------------+
 |     Id      |      Type       |     Description     |      Used in       |
 +=============+=================+=====================+====================+
+| batch_x     | OT_INT          | Evaluate a batch of | casadi::Interpolan |
+|             |                 | different inputs at | t                  |
+|             |                 | once (default 1).   |                    |
++-------------+-----------------+---------------------+--------------------+
 | inline      | OT_BOOL         | Implement the       | casadi::Interpolan |
 |             |                 | lookup table in MX  | t                  |
 |             |                 | primitives. Useful  |                    |
@@ -37213,6 +37336,10 @@ get_reverse(casadi_int nadj) if no cached version is available.
 +-------------+-----------------+---------------------+--------------------+
 |     Id      |      Type       |     Description     |      Used in       |
 +=============+=================+=====================+====================+
+| batch_x     | OT_INT          | Evaluate a batch of | casadi::Interpolan |
+|             |                 | different inputs at | t                  |
+|             |                 | once (default 1).   |                    |
++-------------+-----------------+---------------------+--------------------+
 | inline      | OT_BOOL         | Implement the       | casadi::Interpolan |
 |             |                 | lookup table in MX  | t                  |
 |             |                 | primitives. Useful  |                    |
@@ -38372,6 +38499,13 @@ Get linear system sparsity.
 |                  |                 | passed to the    | ction            |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::ProtoFun |
+|                  |                 | behaviour when   | ction            |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::ProtoFun |
 |                  |                 | (seemingly       | ction            |
 |                  |                 | random) filename |                  |
@@ -38578,20 +38712,27 @@ class hierarchy in reverse order is run after init() has been completed.
 
 >List of available options
 
-+-----+-----------+--------------------------------------------------------+
-| Id  |   Type    |                      Description                       |
-+=====+===========+========================================================+
-| eps | OT_DOUBLE | Minimum R entry before singularity is declared [1e-12] |
-+-----+-----------+--------------------------------------------------------+
++-------+-----------+------------------------------------------------------+
+|  Id   |   Type    |                     Description                      |
++=======+===========+======================================================+
+| cache | OT_DOUBLE | Amount of factorisations to remember (thread-local)  |
+|       |           | [0]                                                  |
++-------+-----------+------------------------------------------------------+
+| eps   | OT_DOUBLE | Minimum R entry before singularity is declared       |
+|       |           | [1e-12]                                              |
++-------+-----------+------------------------------------------------------+
 
 >List of available options
 
-+-----+-----------+-------------------------------------+------------------+
-| Id  |   Type    |             Description             |     Used in      |
-+=====+===========+=====================================+==================+
-| eps | OT_DOUBLE | Minimum R entry before singularity  | casadi::LinsolQr |
-|     |           | is declared [1e-12]                 |                  |
-+-----+-----------+-------------------------------------+------------------+
++-------+-----------+-----------------------------------+------------------+
+|  Id   |   Type    |            Description            |     Used in      |
++=======+===========+===================================+==================+
+| cache | OT_DOUBLE | Amount of factorisations to       | casadi::LinsolQr |
+|       |           | remember (thread-local) [0]       |                  |
++-------+-----------+-----------------------------------+------------------+
+| eps   | OT_DOUBLE | Minimum R entry before            | casadi::LinsolQr |
+|       |           | singularity is declared [1e-12]   |                  |
++-------+-----------+-----------------------------------+------------------+
 
 Diagrams
 --------
@@ -38656,8 +38797,7 @@ C++ includes: linsol_qr.hpp ";
 
 %feature("docstring") casadi::LinsolQr::finalize "
 
-[INTERNAL]  Finalize the object creation This function, which visits the
-class hierarchy in reverse order is run after init() has been completed.
+[INTERNAL]  Finalize the object creation.
 
 ";
 
@@ -49593,6 +49733,13 @@ Joel Andersson
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -58771,6 +58918,12 @@ point to any node, \"0\" is returned.
 
 ";
 
+%feature("docstring") casadi::ShellCompiler::library "
+
+[INTERNAL]  Get library name.
+
+";
+
 %feature("docstring") casadi::ShellCompiler::class_name "
 
 [INTERNAL]  Get type name.
@@ -61920,6 +62073,13 @@ Andersson
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
@@ -67406,6 +67566,13 @@ Joel Andersson
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -69414,6 +69581,13 @@ General information
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -70463,6 +70637,13 @@ General information
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
+|                  |                 | behaviour when   | Internal         |
+|                  |                 | serializing a    |                  |
+|                  |                 | jitted function: |                  |
+|                  |                 | SOURCE|link|embe |                  |
+|                  |                 | d.               |                  |
++------------------+-----------------+------------------+------------------+
 | jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
 |                  |                 | (seemingly       | Internal         |
 |                  |                 | random) filename |                  |
@@ -71194,6 +71375,10 @@ solver:  Solver plugin
 solver_options:  Options to be passed to the solver plugin
 
 ";
+
+%feature("docstring") casadi::cache_check "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::nlpsol_option_type "
 
