@@ -44,6 +44,9 @@ namespace casadi {
 
     DeserializingStream::DeserializingStream(std::istream& in_s) : in(in_s), debug_(false) {
 
+      casadi_assert(in_s.good(), "Invalid input stream. If you specified an input file, "
+        "make sure it exists relative to the current directory.");
+
       // Sanity check
       casadi_int check;
       unpack(check);
