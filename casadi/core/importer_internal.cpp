@@ -292,6 +292,10 @@ namespace casadi {
     return it->second.second;
   }
 
+  std::string ImporterInternal::library() const {
+    casadi_error("library not implemented.");
+  }
+
   void ImporterInternal::serialize(SerializingStream& s) const {
     serialize_type(s);
     serialize_body(s);
@@ -329,6 +333,10 @@ namespace casadi {
     DllLibrary* ret = new DllLibrary(s);
     ret->finalize();
     return ret;
+  }
+
+  std::string DllLibrary::library() const {
+    return name_;
   }
 
 } // namespace casadi

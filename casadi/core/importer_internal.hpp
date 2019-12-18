@@ -116,6 +116,9 @@ namespace casadi {
     /// Get the function body, if inlined
     std::string body(const std::string& symname) const;
 
+    /// Get library name
+    virtual std::string library() const;
+
     /// Can meta information be read?
     virtual bool can_have_meta() const { return true;}
 
@@ -182,6 +185,9 @@ namespace casadi {
 
     // Dummy type
     signal_t get_function(const std::string& symname) override;
+
+    /// Get library name
+    std::string library() const override;
 
     /// Can meta information be read?
     bool can_have_meta() const override { return false;}

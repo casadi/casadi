@@ -86,6 +86,7 @@ namespace casadi {
     void unpack(Function& e);
     void unpack(Importer& e);
     void unpack(GenericType& e);
+    void unpack(std::ostream& s);
     void unpack(Slice& e);
     void unpack(int& e);
     void unpack(bool& e);
@@ -208,6 +209,7 @@ namespace casadi {
     void pack(const Importer& e);
     void pack(const Slice& e);
     void pack(const GenericType& e);
+    void pack(std::istream& s);
     void pack(int e);
     void pack(bool e);
     void pack(casadi_int e);
@@ -238,6 +240,11 @@ namespace casadi {
     }
     template <class T>
     void pack(const std::string& descr, const T& e) {
+      if (debug_) pack(descr);
+      pack(e);
+    }
+    template <class T>
+    void pack(const std::string& descr, T& e) {
       if (debug_) pack(descr);
       pack(e);
     }

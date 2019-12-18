@@ -873,6 +873,9 @@ namespace casadi {
     /** \brief  Cleanup jit source file */
     bool jit_cleanup_;
 
+    /** \brief  Serialize behaviour */
+    std::string jit_serialize_;
+
     /** \brief  Name if jit source file */
     std::string jit_name_;
 

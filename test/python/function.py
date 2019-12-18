@@ -2557,6 +2557,94 @@ class Functiontests(casadiTestCase):
     c = logic_or(a,b)
     f = Function("f",[],[c])
     self.check_codegen(f,inputs=[])
+
+  def test_jit_serialize(self):
+    if not args.run_slow: return
+
+    def test_cases(jit_serialize):
+      opts = {"jit":True, "compiler": "shell", "jit_options": {"verbose":True}, "verbose":False, "jit_serialize": jit_serialize}
+      x = MX.sym("x")
+      yield lambda : Function('f',[x],[(x-3)**2],opts)
+
+      
+      x = MX.sym("x", 2)
+      f = x[0]*x[0] + x[1]*x[1]
+
+ 
+      yield lambda : nlpsol("solver", "ipopt", {"x": x, "f": f},opts)
+
+
+
+    for case in test_cases("source"):
+
+      with self.assertOutput(["jit_tmp"],[]):
+        f = case()
+
+      f.save('f.casadi')
+
+      with self.assertOutput(["jit_tmp"],[]):
+        g = Function.load('f.casadi')
+
+      self.checkfunction_light(f, g, inputs={})
+
+      g.save('f.casadi')
+      with self.assertOutput(["jit_tmp"],[]):
+        g = Function.load('f.casadi')
+
+      self.checkfunction_light(f, g, inputs={})
+
+
+
+    for case in test_cases("link"):
+
+      with self.assertOutput(["jit_tmp"],[]):
+        f = case()
+
+
+      f.save('f.casadi')
+
+      with self.assertOutput([],["jit_tmp"]):
+        g = Function.load('f.casadi')
+
+      self.checkfunction_light(f, g, inputs={})
+
+      g.save('f.casadi')
+      with self.assertOutput([],["jit_tmp"]):
+        g = Function.load('f.casadi')
+
+      self.checkfunction_light(f, g, inputs={})
+
+      f = None
+      g = None
+      with self.assertInException("No such file"):
+        g = Function.load('f.casadi')
+
+
+    for case in test_cases("embed"):
+
+      with self.assertOutput(["jit_tmp"],[]):
+        f = case()
+
+      f.save('f.casadi')
+      with self.assertOutput([],["jit_tmp"]):
+        g = Function.load('f.casadi')
+      g()
+      f = None
+      with self.assertOutput([],["jit_tmp"]):
+        g = Function.load('f.casadi')
+
+      g()
+      g.save('f.casadi')
+      with self.assertOutput([],["jit_tmp"]):
+        g = Function.load('f.casadi')
+      g()
+      g = None
+      with self.assertOutput([],["jit_tmp"]):
+        g = Function.load('f.casadi')
+
+
+
+
           
 if __name__ == '__main__':
     unittest.main()

@@ -138,6 +138,9 @@ namespace casadi {
     /// Get the function body, if inlined
     std::string body(const std::string& symname) const;
 
+    /// Get library name
+    std::string library() const;
+
 #ifndef SWIG
     /** Convert indexed command */
     static inline std::string indexed(const std::string& cmd, casadi_int ind) {

@@ -83,6 +83,7 @@ namespace casadi {
     inputs_check_ = true;
     jit_ = false;
     jit_cleanup_ = true;
+    jit_serialize_ = "source";
     jit_base_name_ = "jit_tmp";
     jit_temp_suffix_ = true;
     compiler_plugin_ = "clang";
@@ -226,6 +227,9 @@ namespace casadi {
       {"jit_cleanup",
        {OT_BOOL,
         "Cleanup up the temporary source file that jit creates. Default: true"}},
+      {"jit_serialize",
+       {OT_STRING,
+        "Specify behaviour when serializing a jitted function: SOURCE|link|embed."}},
       {"jit_name",
        {OT_STRING,
         "The file name used to write out code. "
@@ -344,6 +348,7 @@ namespace casadi {
     opts["inputs_check"] = inputs_check_;
     if (!is_temp) opts["jit"] = jit_;
     opts["jit_cleanup"] = jit_cleanup_;
+    opts["jit_serialize"] = jit_serialize_;
     opts["compiler"] = compiler_plugin_;
     opts["jit_options"] = jit_options_;
     opts["jit_name"] = jit_base_name_;
@@ -401,6 +406,10 @@ namespace casadi {
         jit_ = op.second;
       } else if (op.first=="jit_cleanup") {
         jit_cleanup_ = op.second;
+      } else if (op.first=="jit_serialize") {
+        jit_serialize_ = op.second.to_string();
+        casadi_assert(jit_serialize_=="source" || jit_serialize_=="link" || jit_serialize_=="embed",
+          "jit_serialize option not understood. Pick one of source, link, embed.");
       } else if (op.first=="compiler") {
         compiler_plugin_ = op.second.to_string();
       } else if (op.first=="jit_options") {
@@ -556,16 +565,18 @@ namespace casadi {
         jit_name_ = std::string(jit_name_.begin(), jit_name_.begin()+jit_name_.size()-2);
       }
       if (has_codegen()) {
-        if (verbose_) casadi_message("Codegenerating function '" + name_ + "'.");
-        // JIT everything
-        Dict opts;
-        // Override the default to avoid random strings in the generated code
-        opts["prefix"] = "jit";
-        CodeGenerator gen(jit_name_, opts);
-        gen.add(self());
-        if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
-        compiler_ = Importer(gen.generate(), compiler_plugin_, jit_options_);
-        if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
+        if (compiler_.is_null()) {
+          if (verbose_) casadi_message("Codegenerating function '" + name_ + "'.");
+          // JIT everything
+          Dict opts;
+          // Override the default to avoid random strings in the generated code
+          opts["prefix"] = "jit";
+          CodeGenerator gen(jit_name_, opts);
+          gen.add(self());
+          if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
+          compiler_ = Importer(gen.generate(), compiler_plugin_, jit_options_);
+          if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
+        }
         // Try to load
         eval_ = (eval_t) compiler_.get_function(name_);
         checkout_ = (casadi_checkout_t) compiler_.get_function(name_ + "checkout");
@@ -3519,7 +3530,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 1);
+    s.version("FunctionInternal", 2);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -3529,6 +3540,15 @@ namespace casadi {
 
     s.pack("FunctionInternal::jit", jit_);
     s.pack("FunctionInternal::jit_cleanup", jit_cleanup_);
+    s.pack("FunctionInternal::jit_serialize", jit_serialize_);
+    if (jit_serialize_=="link" || jit_serialize_=="embed") {
+      s.pack("FunctionInternal::jit_library", compiler_.library());
+      if (jit_serialize_=="embed") {
+        std::ifstream binary(compiler_.library(), ios_base::binary);
+        casadi_assert(binary.good(), "Could not open library '" + compiler_.library() + "'.");
+        s.pack("FunctionInternal::jit_binary", binary);
+      }
+    }
     s.pack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
     s.pack("FunctionInternal::jit_base_name", jit_base_name_);
     s.pack("FunctionInternal::jit_options", jit_options_);
@@ -3583,7 +3603,7 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
-    s.version("FunctionInternal", 1);
+    int version = s.version("FunctionInternal", 1, 2);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -3593,6 +3613,28 @@ namespace casadi {
 
     s.unpack("FunctionInternal::jit", jit_);
     s.unpack("FunctionInternal::jit_cleanup", jit_cleanup_);
+    if (version==1) {
+      jit_serialize_ = "source";
+    } else {
+      s.unpack("FunctionInternal::jit_serialize", jit_serialize_);
+    }
+    if (jit_serialize_=="link" || jit_serialize_=="embed") {
+      std::string library;
+      s.unpack("FunctionInternal::jit_library", library);
+      if (jit_serialize_=="embed") {
+        // If file already exist
+        std::ifstream binary(library, ios_base::binary);
+        if (binary.good()) { // library exists
+          // Ignore packed contents
+          std::stringstream ss;
+          s.unpack("FunctionInternal::jit_binary", ss);
+        } else { // library does not exist
+          std::ofstream binary(library, ios_base::binary | std::ios_base::out);
+          s.unpack("FunctionInternal::jit_binary", binary);
+        }
+      }
+      compiler_ = Importer(library, "dll");
+    }
     s.unpack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
     s.unpack("FunctionInternal::jit_base_name", jit_base_name_);
     s.unpack("FunctionInternal::jit_options", jit_options_);

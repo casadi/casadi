@@ -283,17 +283,19 @@ namespace casadi {
   }
 
   void OracleFunction::jit_dependencies(const std::string& fname) {
-    if (verbose_)
+    if (compiler_.is_null()) {
       if (verbose_) casadi_message("compiling to "+ fname+"'.");
-    // JIT dependent functions
-    compiler_ = Importer(generate_dependencies(fname, Dict()),
-                         compiler_plugin_, jit_options_);
-
+      // JIT dependent functions
+      compiler_ = Importer(generate_dependencies(fname, Dict()),
+                          compiler_plugin_, jit_options_);
+    }
     // Replace the Oracle functions with generated functions
     for (auto&& e : all_functions_) {
-      if (verbose_)
-        if (verbose_) casadi_message("loading '" + e.second.f.name() + "' from '" + fname + "'.");
-      if (e.second.jit) e.second.f = external(e.second.f.name(), compiler_);
+      if (verbose_) casadi_message("loading '" + e.second.f.name() + "' from '" + fname + "'.");
+      if (e.second.jit) {
+        e.second.f_original = e.second.f;
+        e.second.f = external(e.second.f.name(), compiler_);
+      }
     }
   }
 
@@ -361,7 +363,7 @@ namespace casadi {
   void OracleFunction::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
-    s.version("OracleFunction", 1);
+    s.version("OracleFunction", 2);
     s.pack("OracleFunction::oracle", oracle_);
     s.pack("OracleFunction::common_options", common_options_);
     s.pack("OracleFunction::specific_options", specific_options_);
@@ -369,8 +371,20 @@ namespace casadi {
     s.pack("OracleFunction::all_functions::size", all_functions_.size());
     for (auto &e : all_functions_) {
       s.pack("OracleFunction::all_functions::key", e.first);
-      s.pack("OracleFunction::all_functions::value::f", e.second.f);
       s.pack("OracleFunction::all_functions::value::jit", e.second.jit);
+      if (jit_ && e.second.jit) {
+        if (jit_serialize_=="source") {
+          // Save original f, such that it can be built
+          s.pack("OracleFunction::all_functions::value::f", e.second.f_original);
+        } else {
+          std::string f_name = e.second.f.name();
+          s.pack("OracleFunction::all_functions::value::f_name", f_name);
+          // FunctionInternal will set compiler_
+        }
+      } else {
+        // Save f
+        s.pack("OracleFunction::all_functions::value::f", e.second.f);
+      }
       s.pack("OracleFunction::all_functions::value::monitored", e.second.monitored);
     }
     s.pack("OracleFunction::monitor", monitor_);
@@ -378,7 +392,7 @@ namespace casadi {
 
   OracleFunction::OracleFunction(DeserializingStream& s) : FunctionInternal(s) {
 
-    s.version("OracleFunction", 1);
+    int version = s.version("OracleFunction", 1, 2);
     s.unpack("OracleFunction::oracle", oracle_);
     s.unpack("OracleFunction::common_options", common_options_);
     s.unpack("OracleFunction::specific_options", specific_options_);
@@ -390,8 +404,24 @@ namespace casadi {
       std::string key;
       s.unpack("OracleFunction::all_functions::key", key);
       RegFun r;
-      s.unpack("OracleFunction::all_functions::value::f", r.f);
-      s.unpack("OracleFunction::all_functions::value::jit", r.jit);
+      if (version==1) {
+        s.unpack("OracleFunction::all_functions::value::f", r.f);
+        s.unpack("OracleFunction::all_functions::value::jit", r.jit);
+      } else {
+        s.unpack("OracleFunction::all_functions::value::jit", r.jit);
+        if (jit_ && r.jit) {
+          if (jit_serialize_=="source") {
+            s.unpack("OracleFunction::all_functions::value::f", r.f);
+          } else {
+            std::string f_name;
+            s.unpack("OracleFunction::all_functions::value::f_name", f_name);
+            r.f = Function(f_name, std::vector<MX>{}, std::vector<MX>{});
+            // FunctionInternal will set compiler_
+          }
+        } else {
+          s.unpack("OracleFunction::all_functions::value::f", r.f);
+        }
+      }
       s.unpack("OracleFunction::all_functions::value::monitored", r.monitored);
       all_functions_[key] = r;
     }

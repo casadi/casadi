@@ -268,6 +268,34 @@ namespace casadi {
       shared_unpack<GenericType, SharedObjectInternal>(e);
     }
 
+    void SerializingStream::pack(std::istream& s) {
+      decorate('B');
+      s.seekg(0, std::ios::end);
+      size_t len = s.tellg();
+      s.seekg(0, std::ios::beg);
+      pack(len);
+      char buffer[1024];
+      for (size_t i=0;i<len;++i) {
+        s.read(buffer, 1024);
+        size_t c = s.gcount();
+        for (size_t j=0;j<c;++j) {
+          pack(buffer[j]);
+        }
+        if (s.rdstate() & std::ifstream::eofbit) break;
+      }
+    }
+
+    void DeserializingStream::unpack(std::ostream& s) {
+      assert_decoration('B');
+      size_t len;
+      unpack(len);
+      for (size_t i=0;i<len;++i) {
+        char c;
+        unpack(c);
+        s.put(c);
+      }
+    }
+
     void SerializingStream::pack(const Slice& e) {
       decorate('S');
       e.serialize(*this);

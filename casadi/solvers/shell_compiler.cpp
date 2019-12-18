@@ -271,6 +271,10 @@ namespace casadi {
 #endif // _WIN32
   }
 
+  std::string ShellCompiler::library() const {
+    return bin_name_;
+  }
+
   signal_t ShellCompiler::get_function(const std::string& symname) {
 #ifdef _WIN32
     return (signal_t)GetProcAddress(handle_, TEXT(symname.c_str()));

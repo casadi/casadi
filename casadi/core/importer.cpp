@@ -97,6 +97,10 @@ namespace casadi {
     return (*this)->body(symname);
   }
 
+  std::string Importer::library() const {
+    return (*this)->library();
+  }
+
   void Importer::serialize(SerializingStream &s) const {
     return (*this)->serialize(s);
   }

@@ -81,6 +81,10 @@ namespace casadi {
 
     /// Get a function pointer for numerical evaluation
     signal_t get_function(const std::string& symname) override;
+
+    /// Get library name
+    std::string library() const override;
+
   protected:
     std::string base_name_;
 

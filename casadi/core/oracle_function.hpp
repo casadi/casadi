@@ -60,6 +60,7 @@ namespace casadi {
     struct RegFun {
       Function f;
       bool jit;
+      Function f_original; // Relevant for jit
       bool monitored = false;
     };
 
