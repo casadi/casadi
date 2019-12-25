@@ -1748,8 +1748,10 @@ namespace casadi {
 
     // Loop over the columns of y and z
     casadi_int ncol = z_sp.size2();
+    casadi_int nrow = z_sp.size1();
     for (casadi_int cc=0; cc<ncol; ++cc) {
       // Get the dense column of z
+      casadi_fill(w, nrow, static_cast<bvec_t>(0));
       for (casadi_int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
         w[z_row[kk]] = z[kk];
       }
