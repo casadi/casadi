@@ -102,7 +102,7 @@ int casadi_c_push_file(const char *filename) {
   return ret;
 }
 
-void casadi_c_clear(const char *fun) {
+void casadi_c_clear(void) {
   casadi_c_load_stack.clear();
   casadi_c_loaded_functions.clear();
   casadi_c_active = -1;
