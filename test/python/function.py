@@ -2479,6 +2479,7 @@ class Functiontests(casadiTestCase):
     self.checkfunction(J,J_ref,inputs=inputs,digits=8,digits_sens=1,evals=1)
 
 
+
   def test_functionbuffer(self):
     A_ = np.random.random((4,4))
     B_ = np.zeros((4,4))
@@ -2497,6 +2498,7 @@ class Functiontests(casadiTestCase):
     self.checkarray(B_, 10*A_)
 
     self.assertEqual(buf.ret(), 0)
+
 
   @requires_conic("osqp")
   @requiresPlugin(Importer,"shell")

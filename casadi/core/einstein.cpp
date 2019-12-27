@@ -30,10 +30,17 @@
 #include "casadi_misc.hpp"
 #include "function_internal.hpp"
 #include "runtime/shared.hpp"
+#include "importer_internal.hpp"
 
 using namespace std;
 
 namespace casadi {
+
+
+  typedef int (*einstein_external)(casadi_int, const casadi_int*, const casadi_int*,
+                                    casadi_int, const casadi_int*, const casadi_int*,
+                                    casadi_int, const casadi_int*, const casadi_int*,
+                                    const double*, const double*, double*);
 
   Einstein::Einstein(const MX& C, const MX& A, const MX& B,
     const std::vector<casadi_int>& dim_c, const std::vector<casadi_int>& dim_a,
@@ -45,16 +52,43 @@ namespace casadi {
     set_dep(C, A, B);
     set_sparsity(C.sparsity());
 
+    pure_ = true;
+    for (auto i : a) pure_ = pure_ && i<0;
+    for (auto i : b) pure_ = pure_ && i<0;
+    for (auto i : c) pure_ = pure_ && i<0;
+
+    pure_ = pure_ && !a.empty();
+    pure_ = pure_ && !b.empty();
+    pure_ = pure_ && !c.empty();
+    pure_ = pure_ && GlobalOptions::experiment1;
+
     n_iter_ = einstein_process(A, B, C, dim_a, dim_b, dim_c, a, b, c,
       iter_dims_, strides_a_, strides_b_, strides_c_);
 
   }
 
   std::string Einstein::disp(const std::vector<std::string>& arg) const {
-    return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ")";
+    return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ";" + str(dim_a_) + str(dim_b_) + str(dim_c_) + str(a_) + str(b_) + str(c_) + ")";
+  }
+
+  einstein_external get_einstein_external() {
+    static DllLoader wrapper("tcl_wrapper.dll");
+    wrapper.init_handle();
+    return (einstein_external) wrapper.get_function("einstein_eval");
   }
 
   int Einstein::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (pure_) {
+      if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+
+      static einstein_external cb = get_einstein_external();
+      casadi_assert_dev(cb);
+      int ret = cb(dim_a_.size(), get_ptr(dim_a_), get_ptr(a_),
+        dim_b_.size(), get_ptr(dim_b_), get_ptr(b_),
+        dim_c_.size(), get_ptr(dim_c_), get_ptr(c_),
+        arg[1], arg[2], res[0]);
+      if (ret==0) return 0;
+    }
     return eval_gen<double>(arg, res, iw, w);
   }
 
@@ -65,7 +99,7 @@ namespace casadi {
   template<typename T>
   int Einstein::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-
+  
     einstein_eval(n_iter_, iter_dims_, strides_a_, strides_b_, strides_c_, arg[1], arg[2], res[0]);
     return 0;
   }

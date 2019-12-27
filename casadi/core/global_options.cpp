@@ -30,6 +30,7 @@ namespace casadi {
 
   bool GlobalOptions::simplification_on_the_fly = true;
   bool GlobalOptions::hierarchical_sparsity = true;
+  bool GlobalOptions::experiment1 = false;
 
   std::string GlobalOptions::casadipath;
   std::string GlobalOptions::casadi_include_path;

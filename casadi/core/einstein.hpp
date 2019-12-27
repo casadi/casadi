@@ -117,6 +117,8 @@ namespace casadi {
     std::vector<casadi_int> strides_b_;
     std::vector<casadi_int> strides_c_;
 
+    bool pure_;
+
     casadi_int n_iter_;
 
   };

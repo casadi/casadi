@@ -215,6 +215,11 @@ namespace casadi {
     return const_cast<ImporterInternal*>(this)->get_function(symname)!=nullptr;
   }
 
+  DllLoader::DllLoader(const std::string& bin_name)
+    : handle_(nullptr), name_(bin_name) {
+
+  }
+
   DllLibrary::DllLibrary(const std::string& bin_name)
     : ImporterInternal(bin_name), handle_(nullptr) {
 
@@ -229,6 +234,54 @@ namespace casadi {
       "Error code (WIN32): " + str(GetLastError()));
 #else // _WIN32
     handle_ = dlopen(name_.c_str(), RTLD_LAZY);
+    casadi_assert(handle_!=nullptr,
+      "CommonExternal: Cannot open \"" + name_ + "\". "
+      "Error code: " + str(dlerror()));
+    // reset error
+    dlerror();
+#endif // _WIN32
+#else // WITH_DL
+    casadi_error("CommonExternal: WITH_DL  not activated");
+#endif // WITH_DL
+  }
+
+  void DllLoader::init_handle() {
+#ifdef WITH_DL
+#ifdef _WIN32
+    // Build up search paths;
+    std::vector<std::string> search_paths;
+
+    #ifdef _WIN32
+    char pathsep = ';';
+    const std::string filesep("\\");
+    #else
+    char pathsep = ':';
+    const std::string filesep("/");
+    #endif
+
+    // Search path: global casadipath option
+    std::stringstream casadipaths(GlobalOptions::getCasadiPath());
+    std::string casadipath;
+    while (std::getline(casadipaths, casadipath, pathsep)) {
+      search_paths.push_back(casadipath);
+    }
+
+    // Try getting a handle
+    for (casadi_int i=0;i<search_paths.size();++i) {
+      searchpath = search_paths[i];
+      SetDllDirectory(TEXT(searchpath.c_str()));
+      handle_ = LoadLibrary(TEXT(name_.c_str()));
+      if (handle_) {
+        break;
+      }
+      SetDllDirectory(NULL);
+    }
+    casadi_assert(handle_!=0,
+      "CommonExternal: Cannot open \"" + name_ + "\". "
+      "Error code (WIN32): " + str(GetLastError()));
+
+#else // _WIN32
+    handle_ = dlopen(name_.c_str(), RTLD_LAZY | RTLD_LOCAL | RTLD_DEEPBIND);
     casadi_assert(handle_!=nullptr,
       "CommonExternal: Cannot open \"" + name_ + "\". "
       "Error code: " + str(dlerror()));
@@ -255,12 +308,38 @@ namespace casadi {
 #endif // WITH_DL
   }
 
+  DllLoader::~DllLoader() {
+#ifdef WITH_DL
+    // close the dll
+#ifdef _WIN32
+    if (handle_) FreeLibrary(handle_);
+#else // _WIN32
+    if (handle_) dlclose(handle_);
+#endif // _WIN32
+#endif // WITH_DL
+  }
+
   signal_t DllLibrary::get_function(const std::string& sym) {
 #ifdef WITH_DL
 #ifdef _WIN32
     return (signal_t)GetProcAddress(handle_, TEXT(sym.c_str()));
 #else // _WIN32
     signal_t fcnPtr = (signal_t)dlsym(handle_, sym.c_str());
+    if (dlerror()) {
+      fcnPtr=nullptr;
+      dlerror(); // Reset error flags
+    }
+    return fcnPtr;
+#endif // _WIN32
+#endif // WITH_DL
+  }
+
+  void* DllLoader::get_function(const std::string& sym) {
+#ifdef WITH_DL
+#ifdef _WIN32
+    return (void*) GetProcAddress(handle_, TEXT(sym.c_str()));
+#else // _WIN32
+    void* fcnPtr = dlsym(handle_, sym.c_str());
     if (dlerror()) {
       fcnPtr=nullptr;
       dlerror(); // Reset error flags
