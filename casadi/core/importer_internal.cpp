@@ -268,7 +268,7 @@ namespace casadi {
 
     // Try getting a handle
     for (casadi_int i=0;i<search_paths.size();++i) {
-      searchpath = search_paths[i];
+      std::string searchpath = search_paths[i];
       SetDllDirectory(TEXT(searchpath.c_str()));
       handle_ = LoadLibrary(TEXT(name_.c_str()));
       if (handle_) {
