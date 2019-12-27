@@ -35,7 +35,7 @@ else:
   import casadi
 
 # For plugin loading
-GlobalOptions.setCasadiPath(os.path.dirname(__file__))
+GlobalOptions.setCasadiPath(os.path.dirname(__file__)+';'+os.path.normpath(os.path.join(os.path.dirname(__file__),'..','tcl_wrapper')))
 GlobalOptions.setCasadiIncludePath(os.path.join(os.path.dirname(__file__),"include"))
 import types
 
