@@ -1780,9 +1780,9 @@ namespace casadi {
 
       // Clear the work vector for the next column (except last iteration)
       if(cc < ncol - 1) {
-          for(casadi_int kk = z_colind[cc]; kk < z_colind[cc + 1]; ++kk) {
-              w[z_row[kk]] = static_cast<bvec_t>(0);
-          }
+        for(casadi_int kk = z_colind[cc]; kk < z_colind[cc + 1]; ++kk) {
+          w[z_row[kk]] = static_cast<bvec_t>(0);
+        }
       }
     }
   }
