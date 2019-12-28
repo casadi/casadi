@@ -1773,16 +1773,10 @@ namespace casadi {
         y[kk] |= yy;
       }
 
-      // Get the sparse column of z
+      // Get the sparse column of z, clear work vector for next column
       for (casadi_int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
         z[kk] = w[z_row[kk]];
-      }
-
-      // Clear the work vector for the next column (except last iteration)
-      if(cc < ncol - 1) {
-        for(casadi_int kk = z_colind[cc]; kk < z_colind[cc + 1]; ++kk) {
-          w[z_row[kk]] = static_cast<bvec_t>(0);
-        }
+        w[z_row[kk]] = 0;
       }
     }
   }
