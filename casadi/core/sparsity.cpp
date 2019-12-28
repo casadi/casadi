@@ -1746,12 +1746,16 @@ namespace casadi {
     const casadi_int* z_colind = z_sp.colind();
     const casadi_int* z_row = z_sp.row();
 
+    // Clear residual work vector data from preceding operations (not necessary
+    // for data from this method if conditional clear code is made unconditional
+    // in loop)
+    casadi_int nrow = z_sp.size1();
+    casadi_fill(w, nrow, static_cast<bvec_t>(0));
+
     // Loop over the columns of y and z
     casadi_int ncol = z_sp.size2();
-    casadi_int nrow = z_sp.size1();
     for (casadi_int cc=0; cc<ncol; ++cc) {
       // Get the dense column of z
-      casadi_fill(w, nrow, static_cast<bvec_t>(0));
       for (casadi_int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
         w[z_row[kk]] = z[kk];
       }
@@ -1772,6 +1776,13 @@ namespace casadi {
       // Get the sparse column of z
       for (casadi_int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
         z[kk] = w[z_row[kk]];
+      }
+
+      // Clear the work vector for the next column (except last iteration)
+      if(cc < ncol - 1) {
+          for(casadi_int kk = z_colind[cc]; kk < z_colind[cc + 1]; ++kk) {
+              w[z_row[kk]] = static_cast<bvec_t>(0);
+          }
       }
     }
   }
