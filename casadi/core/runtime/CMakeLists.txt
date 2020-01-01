@@ -63,6 +63,7 @@ set(RUNTIME_SRC
   casadi_convexify.hpp
   casadi_logsumexp.hpp
   casadi_weave.hpp
+  casadi_align.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 

@@ -300,6 +300,7 @@ namespace casadi {
   #include "casadi_convexify.hpp"
   #include "casadi_logsumexp.hpp"
   #include "casadi_weave.hpp"
+  #include "casadi_align.hpp"
 
 } // namespace casadi
 

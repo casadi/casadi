@@ -287,9 +287,16 @@ namespace casadi {
     // Add if not already added
     string codegen_name = add_dependency(f);
 
+    if (f.align_w()>1) {
+      add_auxiliary(AUX_ALIGN);
+    }
+
     // Define function
-    *this << declare(f->signature(f.name())) << "{\n"
-          << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
+    *this << declare(f->signature(f.name())) << "{\n";
+    if (f.align_w()>1) {
+      *this << "w = " << align("w", f.align_w()) << "\n";
+    }
+    *this << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
           << "}\n\n";
 
     // Generate meta information
@@ -676,11 +683,11 @@ namespace casadi {
     }
   }
 
-  string CodeGenerator::array(const string& type, const string& name, casadi_int len,
+  string CodeGenerator::array(const string& type, const string& name, const std::string& len,
                                    const string& def) {
     stringstream s;
     s << type << " ";
-    if (len==0) {
+    if (len=="0") {
       s << "*" << name << " = 0";
     } else {
       s << name << "[" << len << "]";
@@ -688,6 +695,12 @@ namespace casadi {
     }
     s << ";\n";
     return s.str();
+  }
+
+
+  string CodeGenerator::array(const string& type, const string& name, casadi_int len,
+                                   const string& def) {
+    return array(type, name, str(len), def);
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const string& name,
@@ -1127,6 +1140,13 @@ namespace casadi {
       break;
     case AUX_CACHE:
       this->auxiliaries << sanitize_source(casadi_cache_str, inst);
+      break;
+    case AUX_ASSERT:
+      add_include("assert.h");
+      break;
+    case AUX_ALIGN:
+      add_include("stdint.h");
+      this->auxiliaries << sanitize_source(casadi_align_str, inst);
       break;
     case AUX_CVX:
       add_auxiliary(AUX_CLEAR);
@@ -2036,6 +2056,18 @@ namespace casadi {
     add_auxiliary(CodeGenerator::AUX_CACHE);
     return "cache_check(" + key + ", " + cache + ", " + loc + ", " +
     str(stride) + ", " + str(sz) + ", " + str(key_sz) + ", " + val + ")";
+  }
+
+  std::string CodeGenerator::
+  align(const std::string& a, size_t p) {
+    add_auxiliary(CodeGenerator::AUX_ALIGN);
+    return "casadi_align(" + a + ", " + str(p) + ");";
+  }
+
+  std::string CodeGenerator::
+  debug_assert(const std::string& test) {
+    add_auxiliary(CodeGenerator::AUX_ASSERT);
+    return "assert(" + test + ");";
   }
 
 } // namespace casadi

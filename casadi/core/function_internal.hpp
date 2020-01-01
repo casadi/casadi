@@ -1315,6 +1315,9 @@ namespace casadi {
     mutable std::mutex dump_count_mtx_;
 #endif // CASADI_WITH_THREAD
 
+    // Alignment of work-vector
+    size_t align_w_;
+
     /** \brief Check if the function is of a particular type
 
         \identifier{np} */
@@ -1575,7 +1578,7 @@ namespace casadi {
 
     // Allocate temporary memory if needed
     std::vector<casadi_int> iw_tmp(sz_iw());
-    std::vector<D> w_tmp(sz_w());
+    std::vector<D> w_tmp(sz_w()+align_w_/sizeof(D));
 
     // Get pointers to input arguments
     std::vector<const D*> argp(sz_arg());
@@ -1589,7 +1592,7 @@ namespace casadi {
     for (casadi_int p=0; p<npar; ++p) {
       // Call memory-less
       if (eval_gen(get_ptr(argp), get_ptr(resp),
-                   get_ptr(iw_tmp), get_ptr(w_tmp), memory(0))) {
+                   get_ptr(iw_tmp), casadi_align(get_ptr(w_tmp), align_w_), memory(0))) {
         casadi_error("Evaluation failed");
       }
       // Update offsets

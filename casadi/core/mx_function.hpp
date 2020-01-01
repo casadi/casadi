@@ -81,6 +81,9 @@ namespace casadi {
         \identifier{21} */
     std::vector<casadi_int> workloc_;
 
+    /** \brief Offset for the 'extra' working memory (non-io) */
+    size_t w_extra_offset_;
+
     /// Free variables
     std::vector<MX> free_vars_;
 

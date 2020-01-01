@@ -1105,6 +1105,9 @@ namespace casadi {
         \identifier{1xp} */
     size_t sz_w() const;
 
+    /** \brief Alignment (bytes) of work of w field */
+    size_t align_w() const;
+
 #ifndef SWIG
     /** \brief Get number of temporary variables needed
 

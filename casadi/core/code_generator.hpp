@@ -541,7 +541,9 @@ namespace casadi {
       AUX_MMIN,
       AUX_MMAX,
       AUX_LOGSUMEXP,
-      AUX_WEAVE
+      AUX_WEAVE,
+      AUX_ALIGN,
+      AUX_ASSERT
     };
 
     /** \brief Add a built-in auxiliary function
@@ -564,6 +566,10 @@ namespace casadi {
 
     /** Declare an array */
     static std::string array(const std::string& type, const std::string& name, casadi_int len,
+                             const std::string& def=std::string());
+
+    /** Declare an array */
+    static std::string array(const std::string& type, const std::string& name, const std::string& len,
                              const std::string& def=std::string());
 
     /** \brief  Print casadi_int vector to a c file
@@ -676,6 +682,13 @@ namespace casadi {
     std::string cache_check(const std::string& key, const std::string& cache,
         const std::string& loc, casadi_int stride, casadi_int sz, casadi_int key_sz,
         const std::string& val);
+
+    /** \brief Align operation */
+    std::string align(const std::string& a, size_t p);
+
+    /** \brief Add an assertion */
+    std::string debug_assert(const std::string& test);
+
   private:
 
     /// Print file header
