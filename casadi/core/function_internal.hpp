@@ -52,6 +52,19 @@
 /// \cond INTERNAL
 
 namespace casadi {
+
+  template<class T>
+  T* round_pow2(T* arg, size_t cache_size) {
+    // e.g cache_size = 64= 1000000
+    size_t m = cache_size-1; // 0111111
+    uintptr_t a = reinterpret_cast<uintptr_t>(arg);
+    if (a & m) { // any trailing 6 bits set
+      return reinterpret_cast<T*>((a | m) + 1);
+    } else {     // none set
+      return arg;
+    }
+  }
+
   template<typename T>
   std::vector<std::pair<std::string, T>> zip(const std::vector<std::string>& id,
                                              const std::vector<T>& mat) {
@@ -969,6 +982,9 @@ namespace casadi {
     mutable std::mutex dump_count_mtx_;
 #endif // CASADI_WITH_THREAD
 
+    // Alignment of work-vector
+    size_t align_w_;
+
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
@@ -1201,7 +1217,7 @@ namespace casadi {
 
     // Allocate temporary memory if needed
     std::vector<casadi_int> iw_tmp(sz_iw());
-    std::vector<D> w_tmp(sz_w());
+    std::vector<D> w_tmp(sz_w()+align_w_-1);
 
     // Get pointers to input arguments
     std::vector<const D*> argp(sz_arg());
@@ -1215,7 +1231,7 @@ namespace casadi {
     for (casadi_int p=0; p<npar; ++p) {
       // Call memory-less
       if (eval_gen(get_ptr(argp), get_ptr(resp),
-                   get_ptr(iw_tmp), get_ptr(w_tmp), memory(0))) {
+                   get_ptr(iw_tmp), round_pow2(get_ptr(w_tmp), align_w_), memory(0))) {
         casadi_error("Evaluation failed");
       }
       // Update offsets

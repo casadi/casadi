@@ -96,6 +96,16 @@ namespace casadi {
     }
   }
 
+  size_t round_pow2(size_t s, size_t sz, size_t cache_size) {
+    s *= sz;
+
+    if (s==0) return 0;
+    size_t rem = s % cache_size;
+    if (rem == 0) return s/sz;
+
+    return (s - rem + cache_size)/sz;
+  }
+
   void MXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
@@ -308,6 +318,25 @@ namespace casadi {
       }
     }
 
+    // Determine alignment
+    std::vector<size_t> align(worksize);
+    for (auto&& e : algorithm_) {
+      for (casadi_int c=0; c<e.res.size(); ++c) {
+        if (e.res[c]>=0) {
+          size_t & a = align[e.res[c]];
+          a = max(a, e.data->align_out(c));
+          align_w_ = max(align_w_, a);
+        }
+      }
+      for (casadi_int c=0; c<e.arg.size(); ++c) {
+        if (e.arg[c]>=0) {
+          size_t & a = align[e.arg[c]];
+          a = max(a, e.data->align_in(c));
+          align_w_ = max(align_w_, a);
+        }
+      }
+    }
+
     // Allocate work vectors (numeric)
     workloc_.resize(worksize+1);
     fill(workloc_.begin(), workloc_.end(), -1);
@@ -320,7 +349,11 @@ namespace casadi {
             alloc_res(e.data->sz_res());
             alloc_iw(e.data->sz_iw());
             sz_w = max(sz_w, e.data->sz_w());
+
+            // First encounter?
             if (workloc_[e.res[c]] < 0) {
+              wind = round_pow2(wind, sizeof(double), align[e.res[c]]);
+              // Determine index
               workloc_[e.res[c]] = wind;
               wind += e.data->sparsity(c).nnz();
             }
@@ -329,6 +362,7 @@ namespace casadi {
       }
     }
     workloc_.back()=wind;
+    sz_w = round_pow2(sz_w, sizeof(double), align_w_);
     for (casadi_int i=0; i<workloc_.size(); ++i) {
       if (workloc_[i]<0) workloc_[i] = i==0 ? 0 : workloc_[i-1];
       workloc_[i] += sz_w;

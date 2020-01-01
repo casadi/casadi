@@ -89,6 +89,12 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
+    /// Alignment (bytes) for specific input argument
+    size_t align_in(casadi_int iind) const override { return 64; }
+
+    /// Alignment (bytes) for specific output argument
+    size_t align_out(casadi_int oind) const override { return 64; }
+
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, casadi_int depth) const override {
       return sameOpAndDeps(node, depth) && dynamic_cast<const Einstein*>(node)!=nullptr;

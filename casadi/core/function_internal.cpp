@@ -110,6 +110,7 @@ namespace casadi {
     sz_res_per_ = 0;
     sz_iw_per_ = 0;
     sz_w_per_ = 0;
+    align_w_ = 1;
   }
 
   ProtoFunction::~ProtoFunction() {
@@ -3519,7 +3520,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 1);
+    s.version("FunctionInternal", 2);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -3580,10 +3581,13 @@ namespace casadi {
     s.pack("FunctionInternal::sz_res_tmp", sz_res_tmp_);
     s.pack("FunctionInternal::sz_iw_tmp", sz_iw_tmp_);
     s.pack("FunctionInternal::sz_w_tmp", sz_w_tmp_);
+    s.pack("FunctionInternal::align_w", align_w_);
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
-    s.version("FunctionInternal", 1);
+    s.version("FunctionInternal", 2);
+    //int version = s.version("FunctionInternal", 1, 2);
+
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -3656,6 +3660,11 @@ namespace casadi {
     release_ = nullptr;
     jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
 
+    //if (version>=2) { 
+    s.unpack("FunctionInternal::align_w", align_w_);
+    //} else {
+    //  align_w_ = 1;
+    //}
   }
 
   void ProtoFunction::serialize(SerializingStream& s) const {
