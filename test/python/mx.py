@@ -2419,12 +2419,12 @@ class MXtests(casadiTestCase):
         def einstein_tests(dim_a, dim_b, dim_c, ind_a, ind_b, ind_c):
 
 
-          A = MX.sym("A", np.product(dim_a))
-          B = MX.sym("B", np.product(dim_b))
+          A = MX.sym("A", int(np.product(dim_a)))
+          B = MX.sym("B", int(np.product(dim_b)))
           C = MX.sym("C", int(np.product(dim_c)),1)
 
-          A_sx = SX.sym("A", np.product(dim_a))
-          B_sx = SX.sym("B", np.product(dim_b))
+          A_sx = SX.sym("A", int(np.product(dim_a)))
+          B_sx = SX.sym("B", int(np.product(dim_b)))
           C_sx = SX.sym("C", int(np.product(dim_c)),1)
 
           np.random.seed(0)
@@ -2432,6 +2432,7 @@ class MXtests(casadiTestCase):
           A_ = np.random.random(A.shape)
           B_ = np.random.random(B.shape)
           C_ = np.random.random(C.shape)
+
 
 
 
@@ -2452,6 +2453,14 @@ class MXtests(casadiTestCase):
             self.check_sparsity(f.sparsity_jac(i, 0), fsx.sparsity_jac(i, 0))
             self.check_sparsity(frev.sparsity_jac(i, 0), fsx.sparsity_jac(i, 0))
 
+
+          if np.all(np.array(ind_a)<0) and np.all(np.array(ind_b)<0) and np.all(np.array(ind_c)<0):
+            s = "ijklmn"
+            a = "".join([s[-i+1] for i in ind_a])
+            b = "".join([s[-i+1] for i in ind_b])
+            c = "".join([s[-i+1] for i in ind_c])
+            Cref = np.einsum(a+","+b+"->"+c, A_.reshape(dim_a, order='F'), B_.reshape(dim_b, order='F'))
+            self.checkarray(Cref, np.array(f(A_, B_, C_*0)).reshape(dim_c, order='F'))
 
         def my_einstein(A, B, C, dim_a, dim_b, dim_c, ind_a, ind_b, ind_c):
           try:
@@ -2486,6 +2495,15 @@ class MXtests(casadiTestCase):
                   einstein_tests(dim_a, dim_b, dim_c, ind_a, ind_b, ind_c)
 
         einstein_tests([2,4,3], [2,5,3], [5, 4], [-1, -2, -3], [-1, -4, -3], [-4, -2])
+
+
+        einstein_tests([2,1,3], [2,1,3], [1, 1], [-1, -2, -3], [-1, -4, -3], [-4, -2])
+
+        einstein_tests([2,3], [2,3], [], [-1, -3], [-1, -3], [])
+
+        einstein_tests([2,3], [], [2,3], [-1, -2], [], [-1, -2])
+        einstein_tests([2,3], [], [3,2], [-1, -2], [], [-2, -1])
+
 
   def test_sparsity_operation(self):
     L = [MX(Sparsity(1,1)),MX(Sparsity(2,1)), MX.sym("x",1,1), MX.sym("x", Sparsity(1,1)), DM(1), DM(Sparsity(1,1),1), DM(Sparsity(2,1),1), DM(Sparsity.dense(2,1),1)]

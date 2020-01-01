@@ -492,7 +492,31 @@ namespace casadi {
         dim_a, dim_b, dim_c, a, b, c);
     }
 
-    return MX::create(new Einstein(C, densify(A), densify(B), dim_c, dim_a, dim_b, c, a, b));
+    casadi_assert(dim_a.size()==a.size(), "Dimension mismatch");
+    casadi_assert(dim_b.size()==b.size(), "Dimension mismatch");
+    casadi_assert(dim_c.size()==c.size(), "Dimension mismatch");
+
+    std::vector<casadi_int> dim_a_sq, dim_b_sq, dim_c_sq, a_sq, b_sq, c_sq;
+    // Squeeze out singleton dimensions
+    for (casadi_int i=0;i<dim_a.size();++i) {
+      if (dim_a[i]!=1 || a[i]>=0) {
+        dim_a_sq.push_back(dim_a[i]);
+        a_sq.push_back(a[i]);
+      }
+    }
+    for (casadi_int i=0;i<dim_b.size();++i) {
+      if (dim_b[i]!=1 || b[i]>=0) {
+        dim_b_sq.push_back(dim_b[i]);
+        b_sq.push_back(b[i]);
+      }
+    }
+    for (casadi_int i=0;i<dim_c.size();++i) {
+      if (dim_c[i]!=1 || c[i]>=0) {
+        dim_c_sq.push_back(dim_c[i]);
+        c_sq.push_back(c[i]);
+      }
+    }
+    return MX::create(new Einstein(C, densify(A), densify(B), dim_c_sq, dim_a_sq, dim_b_sq, c_sq, a_sq, b_sq));
   }
 
   MX MXNode::get_bilin(const MX& x, const MX& y) const {
