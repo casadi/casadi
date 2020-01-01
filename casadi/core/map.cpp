@@ -126,6 +126,8 @@ namespace casadi {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
+    align_w_ = f_.align_w();
+
     // Allocate sufficient memory for serial evaluation
     alloc_arg(f_.sz_arg());
     alloc_res(f_.sz_res());

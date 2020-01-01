@@ -97,6 +97,101 @@ namespace casadi {
     }
   }
 
+  size_t round_pow2(size_t s, size_t sz, size_t cache_size) {
+    s *= sz;
+
+    if (s==0) return 0;
+    size_t rem = s % cache_size;
+    if (rem == 0) return s/sz;
+
+    return (s - rem + cache_size)/sz;
+  }
+
+
+  /* Re-order work vector from large to small alignment, to avoid excessive padding
+   *  
+   * Algorithm elements arg and res will be updated
+   * align vector will be updated
+  */
+  void reorder_align(std::vector<MXFunction::AlgEl>& algorithm, std::vector<size_t>& align) {
+    size_t worksize = align.size();
+
+    // Prepair a structure for sorting while retaining the needed relocation
+    struct SortPair {
+      size_t index;
+      size_t align;
+    };
+    std::vector< SortPair > temp_sort(worksize);
+    for (size_t i=0;i<worksize;++i) {
+      temp_sort[i].index = i;
+      temp_sort[i].align = align[i];
+    }
+
+    // Sort from high to low, retaining order when equal
+    std::stable_sort(temp_sort.begin(), temp_sort.end(), [](auto a, auto b) {
+        return a.align > b.align;
+    });
+
+    // Prepare a lookup structure k -> lookup[k]
+    std::vector<size_t> lookup(worksize);
+    for (size_t i=0;i<worksize;++i) {
+      lookup[temp_sort[i].index] = i;
+    }
+
+    // Update algorithm
+    for (auto&& e : algorithm) {
+      // Loop over arguments
+      for (casadi_int c=0; c<e.arg.size(); ++c) {
+        // Get argument index in work vector
+        casadi_int& k = e.arg[c];
+        // If argument is actually used
+        if (k>=0) {
+          k = lookup[k];
+        }
+      }
+      // Loop over result locations of node
+      for (casadi_int c=0; c<e.res.size(); ++c) {
+        // Get result index in work vector
+        casadi_int k = e.res[c];
+        // If result is actually used
+        if (k>=0) {
+          k = lookup[k];
+        }
+      }
+    }
+
+    // Update alignment vector
+    for (size_t i=0;i<worksize;++i) {
+      align[i] = temp_sort[i].align;
+    }
+  }
+
+  void get_align(const std::vector<MXFunction::AlgEl>& algorithm, std::vector<size_t>& align) {
+    // Loop over all nodes in algorithm
+    for (auto&& e : algorithm) {
+      // Loop over arguments
+      for (casadi_int c=0; c<e.arg.size(); ++c) {
+        // Get argument index in work vector
+        casadi_int k = e.arg[c];
+        // If argument is actually used
+        if (k>=0) {
+          // Make work vector element big enough
+          align[k] = max(align[k], e.data->align_in(c));
+        }
+      }
+      // Loop over result locations of node
+      for (casadi_int c=0; c<e.res.size(); ++c) {
+        // Get result index in work vector
+        casadi_int k = e.res[c];
+        // If result is actually used
+        if (k>=0) {
+          // Make work vector element big enough
+          align[k] = max(align[k], e.data->align_out(c));
+        }
+      }
+    }
+  }
+
   void MXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
@@ -349,10 +444,28 @@ namespace casadi {
     }
 
     ce_active_ = false;
+    // Determine alignment of work vector elements, in bytes
+    std::vector<size_t> align(worksize);
+    get_align(algorithm_, align);
+    // Re-order work vector with large alignments upfront
+    reorder_align(algorithm_, align);
+
+    // Max alignment for io related work vector elements
+    size_t align_w_io = align.empty() ? 1 : *std::max_element(align.begin(), align.end());
+    // Max alignment extra working memory (e.g. Function calls)
+    size_t align_w_extra = 1;
+    for (auto&& e : algorithm_) align_w_extra = max(align_w_extra, e.data->align_w());
+
+    // Exported alignment requirement is the composition of both
+    align_w_ = max(align_w_io, align_w_extra);
+
     // Allocate work vectors (numeric)
     workloc_.resize(worksize+1);
     fill(workloc_.begin(), workloc_.end(), -1);
-    size_t wind=0, sz_w=0;
+    // (double/8 byte) offset into fully aligned work-vector
+    size_t wind=0;
+    // non-io memory requirement
+    size_t sz_w_extra=0;
     for (auto&& e : algorithm_) {
       alloc_iw(e.res.size());
       if (e.op!=OP_OUTPUT) {
@@ -362,8 +475,12 @@ namespace casadi {
           alloc_res(e.data->sz_res());
           alloc_iw(e.data->sz_iw());
           if (e.res[c]>=0) {
-            sz_w = max(sz_w, e.data->sz_w());
+            sz_w_extra = max(sz_w_extra, e.data->sz_w());
             if (workloc_[e.res[c]] < 0) {
+              // Assuming work vector starts fully aligned,
+              // add padding to reach alignment requirement for work-vector element
+              wind = round_pow2(wind, sizeof(double), align[e.res[c]]);
+              // Determine index
               workloc_[e.res[c]] = wind;
               wind += e.data->sparsity(c).nnz();
             }
@@ -373,13 +490,35 @@ namespace casadi {
         }
       }
     }
-    workloc_.back()=wind;
-    for (casadi_int i=0; i<workloc_.size(); ++i) {
-      if (workloc_[i]<0) workloc_[i] = i==0 ? 0 : workloc_[i-1];
-      workloc_[i] += sz_w;
+    size_t sz_w_io = wind;
+    workloc_.back()=sz_w_io;
+
+    // Exported memory requirement has both io part and extra part
+    // Let's pick the order that requires least padding
+    if (align_w_extra>=align_w_io) {
+      //  Order [extra;io]
+      sz_w_extra = round_pow2(sz_w_extra, sizeof(double), align_w_io);
+      for (casadi_int i=0; i<workloc_.size(); ++i) {
+        if (workloc_[i]<0) workloc_[i] = i==0 ? 0 : workloc_[i-1];
+        workloc_[i] += sz_w_extra;
+      }
+      w_extra_offset_ = 0;
+    } else {
+      // Order [io;extra]
+      sz_w_io = round_pow2(sz_w_io, sizeof(double), align_w_extra);
+      for (casadi_int i=0; i<workloc_.size(); ++i) {
+        if (workloc_[i]<0) workloc_[i] = i==0 ? 0 : workloc_[i-1];
+      }
+      w_extra_offset_ = sz_w_io;
     }
-    sz_w += wind;
-    alloc_w(sz_w);
+
+    // Total working memory requirement
+    alloc_w(sz_w_io+sz_w_extra);
+
+    // Assertion checks on alignment
+    for (casadi_int i=0;i<align.size();++i) {
+      casadi_assert_dev(workloc_.at(i)*sizeof(double) % align.at(i)==0);
+    }
 
     // Reset the temporary variables
     for (casadi_int i=0; i<nodes.size(); ++i) {
@@ -453,6 +592,8 @@ namespace casadi {
                    + str(free_vars_) + " are free.");
     }
 
+    double* w_eval = w+w_extra_offset_;
+
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
     for (auto&& e : algorithm_) {
@@ -499,7 +640,7 @@ namespace casadi {
           }
         }
         // Evaluate
-        if (e.data->eval(arg1, res1, iw, w)) return 1;
+        if (e.data->eval(arg1, res1, iw, w_eval)) return 1;
         for (casadi_int i=0; i<e.res.size(); ++i) {
           if (e.res[i]<=-2) r[-e.res[i]-2] = res1[i];
         }
@@ -567,6 +708,8 @@ namespace casadi {
     const bvec_t** arg1=r+n_ce_;
     bvec_t** res1=res+n_out_;
 
+    bvec_t *w_eval = w+w_extra_offset_;
+
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       if (e.op==OP_INPUT) {
@@ -616,7 +759,7 @@ namespace casadi {
         }
 
         // Propagate sparsity forwards
-        if (e.data->sp_forward(arg1, res1, iw, w)) return 1;
+        if (e.data->sp_forward(arg1, res1, iw, w_eval)) return 1;
 
 
         for (casadi_int i=0; i<e.res.size(); ++i) {
@@ -634,6 +777,8 @@ namespace casadi {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in_;
     bvec_t** res1=res+n_out_;
+
+    bvec_t *w_eval = w+w_extra_offset_;
 
     fill_n(w, sz_w(), 0);
 
@@ -679,7 +824,7 @@ namespace casadi {
           res1[i] = it->res[i]!=-1 ? wloc_p[it->res[i]] : nullptr;
 
         // Propagate sparsity backwards
-        if (it->data->sp_reverse(arg1, res1, iw, w)) return 1;
+        if (it->data->sp_reverse(arg1, res1, iw, w_eval)) return 1;
 
       }
     }
@@ -1163,6 +1308,8 @@ namespace casadi {
 
 
 
+    SXElem* w_eval = w+w_extra_offset_;
+
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
     for (auto&& a : algorithm_) {
@@ -1214,7 +1361,7 @@ namespace casadi {
         }
 
         // Evaluate
-        if (a.data->eval_sx(arg1, res1, iw, w)) return 1;
+        if (a.data->eval_sx(arg1, res1, iw, w_eval)) return 1;
 
         for (casadi_int i=0; i<a.res.size(); ++i) {
           if (a.res[i]<=-2) r[-a.res[i]-2] = res1[i];
@@ -1308,6 +1455,7 @@ namespace casadi {
       }
     }
     if (!first) g << ";\n";
+    if (w_extra_offset_) g << "w+= " << w_extra_offset_ << ";\n";
 
     // Operation number (for printing)
     casadi_int k=0;
@@ -1320,6 +1468,28 @@ namespace casadi {
       // Generate comment
       if (g.verbose) {
         g << "/* #" << k++ << ": " << print(e) << " */\n";
+      }
+
+      for (casadi_int i=0; i<e.arg.size(); ++i) {
+        casadi_int j=e.arg.at(i);
+        if (j>=0) {
+          size_t a = e.data->align_in(i);
+          if (a>1) {
+            std::string rem = "(uintptr_t) " + g.work(j, e.data.dep(i).nnz())+"%"+str(a);
+            g << g.debug_assert(rem + "==0") + "\n";
+          }
+        }
+      }
+
+      for (casadi_int i=0; i<e.res.size(); ++i) {
+        casadi_int j=e.res.at(i);
+        if (j>=0) {
+          size_t a = e.data->align_out(i);
+          if (a>1) {
+            std::string rem = "(uintptr_t) " + g.work(j, e.data->sparsity(i).nnz())+"%"+str(a);
+            g << g.debug_assert(rem +"==0") + "\n";
+          }
+        }
       }
 
       // Get the names of the operation arguments
@@ -1872,6 +2042,7 @@ namespace casadi {
     }
 
     s.pack("MXFunction::workloc", workloc_);
+    s.pack("MXFunction::w_offset", w_extra_offset_);
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
     s.pack("MXFunction::live_variables", live_variables_);
@@ -1898,6 +2069,7 @@ namespace casadi {
     }
 
     s.unpack("MXFunction::workloc", workloc_);
+    s.unpack("MXFunction::w_offset", w_extra_offset_);
     s.unpack("MXFunction::free_vars", free_vars_);
     s.unpack("MXFunction::default_in", default_in_);
     s.unpack("MXFunction::live_variables", live_variables_);

@@ -893,6 +893,9 @@ namespace casadi {
     /** \brief Get required length of w field */
     size_t sz_w() const;
 
+    /** \brief Alignment (bytes) of work of w field */
+    size_t align_w() const;
+
 #ifndef SWIG
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;

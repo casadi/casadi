@@ -294,6 +294,7 @@ namespace casadi {
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
   #include "casadi_weave.hpp"
+  #include "casadi_align.hpp"
 
 } // namespace casadi
 

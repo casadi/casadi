@@ -404,10 +404,10 @@ namespace casadi {
 
     // Work vectors
     vector<casadi_int> iw(sz_iw());
-    vector<D> w(sz_w());
+    vector<D> w(sz_w()+align_w()/sizeof(D));
 
     // Evaluate memoryless
-    (*this)(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+    (*this)(get_ptr(arg), get_ptr(res), get_ptr(iw), casadi_align(get_ptr(w), align_w()), 0);
   }
 
 
@@ -980,6 +980,8 @@ namespace casadi {
   size_t Function::sz_iw() const { return (*this)->sz_iw();}
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
+
+  size_t Function::align_w() const { return (*this)->align_w_;}
 
   int Function::operator()(const bvec_t** arg, bvec_t** res,
                             casadi_int* iw, bvec_t* w, int mem) const {

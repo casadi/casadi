@@ -222,6 +222,10 @@ namespace casadi {
     return fcn_.sz_w();
   }
 
+  size_t Call::align_w() const {
+    return fcn_.align_w();
+  }
+
   std::vector<MX> Call::create(const Function& fcn, const std::vector<MX>& arg) {
     return MX::createMultipleOutput(new Call(fcn, arg));
   }
