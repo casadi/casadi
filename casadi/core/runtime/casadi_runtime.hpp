@@ -276,6 +276,7 @@ namespace casadi {
   #include "casadi_lsqr.hpp"
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
+  #include "casadi_align.hpp"
 
 } // namespace casadi
 

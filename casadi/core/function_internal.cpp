@@ -111,6 +111,7 @@ namespace casadi {
     sz_res_per_ = 0;
     sz_iw_per_ = 0;
     sz_w_per_ = 0;
+    align_w_ = 1;
   }
 
   ProtoFunction::~ProtoFunction() {
@@ -2253,7 +2254,7 @@ namespace casadi {
       << "if (sz_arg) *sz_arg = " << sz_arg() << ";\n"
       << "if (sz_res) *sz_res = " << sz_res() << ";\n"
       << "if (sz_iw) *sz_iw = " << sz_iw() << ";\n"
-      << "if (sz_w) *sz_w = " << sz_w_codegen << ";\n"
+      << "if (sz_w) *sz_w = " << sz_w_codegen << "+" << align_w_ << "/sizeof(casadi_real);\n"
       << "return 0;\n"
       << "}\n\n";
 
@@ -2337,7 +2338,7 @@ namespace casadi {
       g << "casadi_int main_" << name_ << "(casadi_int argc, char* argv[]) {\n";
 
       // Work vectors and input and output buffers
-      size_t nr = sz_w() + nnz_in() + nnz_out();
+      std::string nr = str(sz_w()) + "+" +  str(align_w_) + "/sizeof(casadi_real) + " + str(nnz_in()+nnz_out());
       g << CodeGenerator::array("casadi_int", "iw", sz_iw())
         << CodeGenerator::array("casadi_real", "w", nr);
 
@@ -2561,6 +2562,7 @@ namespace casadi {
     alloc_res(sz_res, persistent);
     alloc_iw(sz_iw, persistent);
     alloc_w(sz_w, persistent);
+    align_w_ = max(f.align_w(), align_w_);
   }
 
   Dict ProtoFunction::get_stats(void* mem) const {
@@ -3129,6 +3131,7 @@ namespace casadi {
   void FunctionInternal::setup(void* mem, const double** arg, double** res,
                                casadi_int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
+    w = casadi_align(w, align_w_);
     set_temp(mem, arg, res, iw, w);
   }
 
@@ -3601,6 +3604,7 @@ namespace casadi {
     s.pack("FunctionInternal::sz_res_tmp", sz_res_tmp_);
     s.pack("FunctionInternal::sz_iw_tmp", sz_iw_tmp_);
     s.pack("FunctionInternal::sz_w_tmp", sz_w_tmp_);
+    s.pack("FunctionInternal::align_w", align_w_);
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
@@ -3699,6 +3703,11 @@ namespace casadi {
     release_ = nullptr;
     jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
 
+    if (version>=2) {
+      s.unpack("FunctionInternal::align_w", align_w_);
+    } else {
+      align_w_ = 1;
+    }
   }
 
   void ProtoFunction::serialize(SerializingStream& s) const {
