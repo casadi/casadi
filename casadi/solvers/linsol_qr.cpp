@@ -112,17 +112,21 @@ namespace casadi {
   int LinsolQr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
 
-    double* c;
-    bool check = cache_check(A, get_ptr(m->cache), get_ptr(m->cache_loc),
-      cache_stride_, n_cache_, sp_.nnz(), &c);
-    if (n_cache_ && check) {
-      c += sp_.nnz();
-      // Retrieve from cache
-      casadi_copy(c, sp_v_.nnz(), get_ptr(m->v)); c+=sp_v_.nnz();
-      casadi_copy(c, sp_r_.nnz(), get_ptr(m->r)); c+=sp_r_.nnz();
-      casadi_copy(c, ncol(), get_ptr(m->beta)); c+=ncol();
+    // Check for a cache hit
+    double* cache = nullptr;
+    bool cache_hit = cache_check(A, get_ptr(m->cache), get_ptr(m->cache_loc),
+      cache_stride_, n_cache_, sp_.nnz(), &cache);
+
+    if (cache && cache_hit) {
+      cache += sp_.nnz();
+      // Retrieve from cache and return early
+      casadi_copy(cache, sp_v_.nnz(), get_ptr(m->v)); cache+=sp_v_.nnz();
+      casadi_copy(cache, sp_r_.nnz(), get_ptr(m->r)); cache+=sp_r_.nnz();
+      casadi_copy(cache, ncol(), get_ptr(m->beta)); cache+=ncol();
       return 0;
     }
+
+    // Cache miss -> compute result
     casadi_qr(sp_, A, get_ptr(m->w),
               sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
               get_ptr(m->beta), get_ptr(prinv_), get_ptr(pc_));
@@ -140,16 +144,15 @@ namespace casadi {
         print("]\n");
       }
       return 1;
-    } else {
-      if (n_cache_) {
-        // Store in cache
-        casadi_copy(A, sp_.nnz(), c); c+=sp_.nnz();
-        casadi_copy(get_ptr(m->v), sp_v_.nnz(), c); c+=sp_v_.nnz();
-        casadi_copy(get_ptr(m->r), sp_r_.nnz(), c); c+=sp_r_.nnz();
-        casadi_copy(get_ptr(m->beta), ncol(), c); c+=ncol();
-      }
-      return 0;
     }
+
+    if (cache) { // Store result in cache
+      casadi_copy(A, sp_.nnz(), cache); cache+=sp_.nnz();
+      casadi_copy(get_ptr(m->v), sp_v_.nnz(), cache); cache+=sp_v_.nnz();
+      casadi_copy(get_ptr(m->r), sp_r_.nnz(), cache); cache+=sp_r_.nnz();
+      casadi_copy(get_ptr(m->beta), ncol(), cache); cache+=ncol();
+    }
+    return 0;
   }
 
   int LinsolQr::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
