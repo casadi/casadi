@@ -2112,7 +2112,8 @@ namespace casadi {
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
     // Define function
     g << "/* " << definition() << " */\n";
-    g << "static " << signature(fname) << " {\n";
+    bool compact = codegen_compact(g);
+    g << "static " << signature(fname, compact) << " {\n";
 
     // Reset local variables, flush buffer
     g.flush(g.body);
@@ -2132,9 +2133,23 @@ namespace casadi {
     g.flush(g.body);
   }
 
-  std::string FunctionInternal::signature(const std::string& fname) const {
-    return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
-                            "casadi_int* iw, casadi_real* w, int mem)";
+  std::string FunctionInternal::signature(const std::string& fname, bool compact) const {
+    if (compact) {
+      std::stringstream ss;
+      ss << "int " << fname << "(";
+      for (casadi_int i=0;i<n_in_;++i) {
+        ss << "const casadi_real* arg" << i;
+        ss << ", ";
+      }
+      for (casadi_int i=0;i<n_out_;++i) {
+        ss << "casadi_real* res" << i;
+        ss << ", ";
+      }
+      return ss.str()+"casadi_int* iw, casadi_real* w, int mem)";
+    } else {
+      return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
+                              "casadi_int* iw, casadi_real* w, int mem)";
+    }
   }
 
   void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {

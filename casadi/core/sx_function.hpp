@@ -206,6 +206,9 @@ class CASADI_EXPORT SXFunction :
   /** \brief Generate code for the body of the C function */
   void codegen_body(CodeGenerator& g) const override;
 
+  /** \brief Use compact codegen signature? */
+  bool codegen_compact(const CodeGenerator& g) const override;
+
   /** \brief  Propagate sparsity forward */
   int sp_forward(const bvec_t** arg, bvec_t** res,
                   casadi_int* iw, bvec_t* w, void* mem) const override;

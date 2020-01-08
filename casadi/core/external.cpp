@@ -250,7 +250,7 @@ namespace casadi {
 
   void External::codegen_declarations(CodeGenerator& g) const {
     if (!li_.inlined(name_)) {
-      g.add_external(signature(name_) + ";");
+      g.add_external(signature(name_, false) + ";");
     }
   }
 

@@ -150,13 +150,22 @@ namespace casadi {
     }
   }
 
+  bool SXFunction::codegen_compact(const CodeGenerator& g) const {
+    return g.vectorize;
+  }
+
   void SXFunction::codegen_body(CodeGenerator& g) const {
+    bool compact = codegen_compact(g);
 
     // Run the algorithm
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
-        g << "if (res[" << a.i0 << "]!=0) "
-          << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
+        if (compact) {
+          g << "res" << a.i0 << "[" << a.i2 << "]=" << g.sx_work(a.i1);
+        } else {
+          g << "if (res[" << a.i0 << "]!=0) "
+            << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
+        }
       } else {
 
         // Where to store the result
@@ -166,7 +175,11 @@ namespace casadi {
         if (a.op==OP_CONST) {
           g << g.constant(a.d);
         } else if (a.op==OP_INPUT) {
-          g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
+          if (compact) {
+            g << "arg" << a.i1 << "[" << a.i2 << "]";
+          } else {
+            g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
+          }
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);

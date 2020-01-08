@@ -118,6 +118,11 @@ namespace casadi {
                            const std::string& res, const std::string& iw,
                            const std::string& w);
 
+    /** \brief Generate a call to a function (generic signature) */
+    std::string operator()(const Function& f, const std::vector<std::string>& arg,
+                           const std::vector<std::string>& res, const std::string& iw,
+                           const std::string& w);          
+
     /** \brief Print a string to buffer  */
     CodeGenerator& operator<<(const std::string& s);
 
@@ -550,6 +555,9 @@ namespace casadi {
 
     // Prefix
     std::string prefix;
+
+    // Vectorize
+    bool vectorize;
 
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;

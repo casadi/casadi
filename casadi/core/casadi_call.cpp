@@ -166,20 +166,39 @@ namespace casadi {
 
   void Call::generate(CodeGenerator& g,
                       const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
-    // Collect input arguments
-    g.local("arg1", "const casadi_real", "**");
-    for (casadi_int i=0; i<arg.size(); ++i) {
-      g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
+    bool compact = fcn_->codegen_compact(g);
+    std::vector<std::string> argv, resv;
+
+    std::string flag;
+
+    if (compact) {
+      // Collect input arguments
+      for (casadi_int i=0; i<arg.size(); ++i) {
+        argv.push_back(g.work(arg[i], fcn_.nnz_in(i)));
+      }
+
+      // Collect output arguments
+      for (casadi_int i=0; i<res.size(); ++i) {
+        resv.push_back(g.work(res[i], fcn_.nnz_out(i)));
+      }
+      // Call function
+      flag = g(fcn_, argv, resv, "iw", "w");
+    } else {
+      // Collect input arguments
+      g.local("arg1", "const casadi_real", "**");
+      for (casadi_int i=0; i<arg.size(); ++i) {
+        g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
+      }
+
+      // Collect output arguments
+      g.local("res1", "casadi_real", "**");
+      for (casadi_int i=0; i<res.size(); ++i) {
+        g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
+      }
+      // Call function
+      flag = g(fcn_, "arg1", "res1", "iw", "w");
     }
 
-    // Collect output arguments
-    g.local("res1", "casadi_real", "**");
-    for (casadi_int i=0; i<res.size(); ++i) {
-      g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
-    }
-
-    // Call function
-    std::string flag = g(fcn_, "arg1", "res1", "iw", "w");
     g << "if (" << flag << ") return 1;\n";
   }
 

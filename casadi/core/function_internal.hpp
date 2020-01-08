@@ -585,6 +585,9 @@ namespace casadi {
     /** \brief Get name in codegen */
     virtual std::string codegen_name(const CodeGenerator& g, bool ns=true) const;
 
+    /** \brief Use compact codegen signature? */
+    virtual bool codegen_compact(const CodeGenerator& g) const { return false; }
+
     /** \brief Get thread-local memory object */
     std::string codegen_mem(CodeGenerator& g, const std::string& index="mem") const;
 
@@ -604,7 +607,7 @@ namespace casadi {
     virtual void codegen_free_mem(CodeGenerator& g) const {}
 
     /** \brief Code generate the function  */
-    std::string signature(const std::string& fname) const;
+    std::string signature(const std::string& fname, bool compact) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void codegen_declarations(CodeGenerator& g) const;

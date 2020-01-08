@@ -153,27 +153,59 @@ namespace casadi {
 
   void Map::codegen_body(CodeGenerator& g) const {
     g.local("i", "casadi_int");
-    g.local("arg1", "const casadi_real*", "*");
-    g.local("res1", "casadi_real*", "*");
 
-    // Input buffer
-    g << "arg1 = arg+" << n_in_ << ";\n"
-      << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
-    // Output buffer
-    g << "res1 = res+" << n_out_ << ";\n"
-      << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
-      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    bool compact = f_->codegen_compact(g);
+
+    std::vector<std::string> args, res;
+    if (compact) {
+      for (casadi_int i=0;i<n_in_;++i) {
+        args.push_back("arg"+str(i));
+        g.local("arg"+str(i), "const casadi_real", "*");
+        g.init_local("arg"+str(i), "arg[" + str(i)+"]");
+      }
+      for (casadi_int i=0;i<n_out_;++i) {
+        res.push_back("res"+str(i));
+        g.local("res"+str(i), "casadi_real", "*");
+        g.init_local("res"+str(i), "res[" + str(i)+"]");
+      }
+    } else {
+     g.local("arg1", "const casadi_real*", "*");
+     g.local("res1", "casadi_real*", "*");
+ 
+     // Input buffer
+     g << "arg1 = arg+" << n_in_ << ";\n"
+       << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
+     // Output buffer
+     g << "res1 = res+" << n_out_ << ";\n"
+       << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n";
+    }
+    g << "for (i=0; i<" << n_ << "; ++i) {\n";
+
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    if (compact) {
+      g << g(f_, args, res, "iw", "w") << ";\n";
+    } else {
+      g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    }
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
-      if (f_.nnz_in(j))
-        g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+      if (f_.nnz_in(j)) {
+        if (compact) {
+          g << "arg" << j << "+=" << f_.nnz_in(j) << ";\n"; // null check mising
+        } else {
+          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+        }
+      }
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
-      if (f_.nnz_out(j))
-        g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+      if (f_.nnz_out(j)) {
+        if (compact) {
+          g << "res" << j << "+=" << f_.nnz_out(j) << ";\n"; // null check missing
+        } else {
+          g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+        }
+      }
     }
     g << "}\n";
   }

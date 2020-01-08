@@ -52,6 +52,7 @@ namespace casadi {
     this->real_min = "";
     bool prefix_set = false;
     this->prefix = "";
+    this->vectorize = false;
     avoid_stack_ = false;
     indent_ = 2;
 
@@ -97,6 +98,8 @@ namespace casadi {
       } else if (e.first=="prefix") {
         this->prefix = e.second.to_string();
         prefix_set = true;
+      } else if (e.first=="vectorize") {
+        this->vectorize = e.second;
       } else {
         casadi_error("Unrecongnized option: " + str(e.first));
       }
@@ -297,7 +300,7 @@ namespace casadi {
     string codegen_name = add_dependency(f);
 
     // Define function
-    *this << declare(f->signature(f.name())) << "{\n"
+    *this << declare(f->signature(f.name(), false)) << "{\n"
           << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
           << "}\n\n";
 
@@ -742,6 +745,22 @@ namespace casadi {
   operator()(const Function& f, const string& arg,
              const string& res, const string& iw,
              const string& w) {
+    std::stringstream arg_s;
+    std::stringstream res_s;
+    bool compact = f->codegen_compact(*this);
+    if (compact) {
+      for (casadi_int i=0;i<f.n_in();++i) {
+        arg_s << arg << "[" << i << "]" << ", ";
+      }
+      for (casadi_int i=0;i<f.n_out();++i) {
+        res_s << res << "[" << i << "]" << ", ";
+      }
+    } else {
+      arg_s << arg << ", ";
+      res_s << res << ", ";
+    }
+    
+
     std::string name = add_dependency(f);
     bool needs_mem = !f->codegen_mem_type().empty();
     if (needs_mem) {
@@ -750,14 +769,32 @@ namespace casadi {
       local(mem, "int");
       *this << mem << " = " << name << "_checkout();\n";
       *this << "if (" << mem << "<0) return 1;\n";
-      *this << "flag = " + name + "(" + arg + ", " + res + ", "
+      *this << "flag = " + name + "(" + arg_s.str() + res_s.str()
               + iw + ", " + w + ", " << mem << ");\n";
       *this << name << "_release(" << mem << ");\n";
       return "flag";
     } else {
-      return name + "(" + arg + ", " + res + ", "
+      return name + "(" + arg_s.str() + res_s.str()
               + iw + ", " + w + ", 0)";
     }
+  }
+
+  string CodeGenerator::
+  operator()(const Function& f, const std::vector<string>& arg,
+             const std::vector<string>& res, const string& iw,
+             const string& w) {
+    std::string name = add_dependency(f);
+    std::stringstream ss;
+    ss << name << "(";
+    for (size_t i=0;i<arg.size();++i) {
+      ss << arg[i];
+      ss << ",";
+    }
+    for (size_t i=0;i<res.size();++i) {
+      ss << res[i];
+      ss << ",";
+    }
+    return ss.str() + iw + ", " + w + ", 0)";
   }
 
   void CodeGenerator::add_external(const string& new_external) {
