@@ -168,7 +168,7 @@ namespace casadi {
     return 0;
   }
 
-  void FastNewton::codegen_body(CodeGenerator& g) const {
+  void FastNewton::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.add_auxiliary(CodeGenerator::AUX_NEWTON);
 
     g.local("m", "struct casadi_newton_mem");

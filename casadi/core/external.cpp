@@ -254,7 +254,8 @@ namespace casadi {
     }
   }
 
-  void External::codegen_body(CodeGenerator& g) const {
+  void External::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     if (li_.inlined(name_)) {
       // Function body is inlined
       g << li_.body(name_) << "\n";

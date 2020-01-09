@@ -151,17 +151,16 @@ namespace casadi {
     g.add_dependency(f_);
   }
 
-  void Map::codegen_body(CodeGenerator& g) const {
+  void Map::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     g.local("i", "casadi_int");
-    g.local("arg1", "const casadi_real*", "*");
-    g.local("res1", "casadi_real*", "*");
+    g.local("arg1[" + str(n_in_) + "]", "const casadi_real*");
+    g.local("res1[" + str(n_out_) + "]", "casadi_real*");
 
     // Input buffer
-    g << "arg1 = arg+" << n_in_ << ";\n"
-      << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
+    g << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "res1 = res+" << n_out_ << ";\n"
-      << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
+    g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate
     g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
@@ -339,7 +338,8 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void OmpMap::codegen_body(CodeGenerator& g) const {
+  void OmpMap::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     g << "casadi_int i;\n"
@@ -463,8 +463,9 @@ namespace casadi {
 #endif // CASADI_WITH_THREAD
   }
 
-  void ThreadMap::codegen_body(CodeGenerator& g) const {
-    Map::codegen_body(g);
+  void ThreadMap::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
+    Map::codegen_body(g, inst);
   }
 
   void ThreadMap::init(const Dict& opts) {

@@ -99,7 +99,7 @@ namespace casadi {
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     // Function to be evaluated for each case
     std::vector<Function> f_;

@@ -126,7 +126,7 @@ namespace casadi {
     void codegen_decref(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;

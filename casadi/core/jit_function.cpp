@@ -90,7 +90,8 @@ namespace casadi {
     clear_mem();
   }
 
-  void JitFunction::codegen_body(CodeGenerator& g) const {
+  void JitFunction::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     // Add all input arguments as local variables
     for (casadi_int i=0; i<n_in_; ++i) {
       g.local(name_in_[i], "const casadi_real", "*");

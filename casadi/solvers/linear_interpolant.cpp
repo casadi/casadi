@@ -95,7 +95,7 @@ namespace casadi {
     return 0;
   }
 
-  void LinearInterpolant::codegen_body(CodeGenerator& g) const {
+  void LinearInterpolant::codegen_body(CodeGenerator& g, const Instance& inst) const {
     std::string values = has_parametric_values() ? g.arg(arg_values()) : g.constant(values_);
     std::string grid = has_parametric_grid() ? g.arg(arg_grid()) : g.constant(grid_);
     g << "  if (res[0]) {\n"
@@ -161,7 +161,7 @@ namespace casadi {
     return m->has_parametric_grid();
   }
 
-  void LinearInterpolantJac::codegen_body(CodeGenerator& g) const {
+  void LinearInterpolantJac::codegen_body(CodeGenerator& g, const Instance& inst) const {
 
     auto m = derivative_of_.get<LinearInterpolant>();
     std::string values = has_parametric_values() ? g.arg(m->arg_values()) : g.constant(m->values_);

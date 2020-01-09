@@ -120,7 +120,7 @@ namespace casadi {
     void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;

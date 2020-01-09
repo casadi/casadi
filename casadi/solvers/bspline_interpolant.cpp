@@ -181,8 +181,8 @@ namespace casadi {
     return S_(arg, res, iw, w, m);
   }
 
-  void BSplineInterpolant::codegen_body(CodeGenerator& g) const {
-    S_->codegen_body(g);
+  void BSplineInterpolant::codegen_body(CodeGenerator& g, const Instance& inst) const {
+    S_->codegen_body(g, inst);
   }
 
   void BSplineInterpolant::codegen_declarations(CodeGenerator& g) const {

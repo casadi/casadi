@@ -376,7 +376,7 @@ namespace casadi {
     return 0;
   }
 
-  void Switch::codegen_body(CodeGenerator& g) const {
+  void Switch::codegen_body(CodeGenerator& g, const Instance& inst) const {
     // Project arguments with different sparsity
     if (project_in_) {
       // Project one or more argument

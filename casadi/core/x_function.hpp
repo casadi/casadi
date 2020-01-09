@@ -149,7 +149,7 @@ namespace casadi {
     void codegen_declarations(CodeGenerator& g) const override = 0;
 
     /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override = 0;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override = 0;
 
     /** \brief Export function in a specific language */
     void export_code(const std::string& lang,

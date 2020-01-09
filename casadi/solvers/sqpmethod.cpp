@@ -729,9 +729,9 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.add_dependency(qpsol_);
   }
 
-  void Sqpmethod::codegen_body(CodeGenerator& g) const {
+  void Sqpmethod::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.add_auxiliary(CodeGenerator::AUX_SQPMETHOD);
-    Nlpsol::codegen_body(g);
+    Nlpsol::codegen_body(g, inst);
     // From nlpsol
     g.local("m_p", "const casadi_real", "*");
     g.init_local("m_p", g.arg(NLPSOL_P));
