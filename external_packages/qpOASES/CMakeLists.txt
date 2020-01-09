@@ -6,6 +6,14 @@ cmake_minimum_required(VERSION 2.8.6)
 
 project(qpOASES CXX)
 
+# ifort on Windows
+if ("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Intel" AND CMAKE_HOST_WIN32)
+	add_definitions(-Ddgemm_=DGEMM)
+	add_definitions(-Ddpotrf_=DPOTRF)
+	add_definitions(-Ddtrtrs_=DTRTRS)
+	add_definitions(-Ddtrcon_=DTRCON)
+endif()
+
 if(WITH_NO_QPOASES_BANNER)
   add_definitions(-D__NO_COPYRIGHT__)
 endif()
