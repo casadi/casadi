@@ -117,7 +117,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Codegen incref for dependencies */
     void codegen_incref(CodeGenerator& g) const override;

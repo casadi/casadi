@@ -1086,7 +1086,7 @@ namespace casadi {
     return 0;
   }
 
-  void MXFunction::codegen_declarations(CodeGenerator& g) const {
+  void MXFunction::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {

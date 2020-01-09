@@ -147,8 +147,9 @@ namespace casadi {
     return 0;
   }
 
-  void Map::codegen_declarations(CodeGenerator& g) const {
-    g.add_dependency(f_);
+  void Map::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
+    uout() << "inst" << inst.arg_null << std::endl;
+    g.add_dependency(f_, inst);
   }
 
   void Map::codegen_body(CodeGenerator& g,
@@ -163,16 +164,31 @@ namespace casadi {
     g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    if (str(f_).find("SXFunction")!= std::string::npos) {
+      g << g(f_, "arg1", "res1", "iw", "w", inst) << ";\n";
+    } else {
+      g << "if (" << g(f_, "arg1", "res1", "iw", "w", inst) << ") return 1;\n";
+    }
+
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
-      if (f_.nnz_in(j))
-        g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+      if (f_.nnz_in(j)) {
+        if (inst.arg_null.empty()) {
+          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+        } else {
+          if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+        }
+      }
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
-      if (f_.nnz_out(j))
-        g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+      if (f_.nnz_out(j)) {
+        if (inst.res_null.empty()) {
+          g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+        } else {
+          if (!inst.res_null[j]) g << "res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+        }
+      }
     }
     g << "}\n";
   }
@@ -359,7 +375,7 @@ namespace casadi {
         << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
     }
     g << "flag = "
-      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << " || flag;\n"
+      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w), inst) << " || flag;\n"
       << "}\n"
       << "if (flag) return 1;\n";
   }

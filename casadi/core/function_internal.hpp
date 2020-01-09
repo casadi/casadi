@@ -607,7 +607,7 @@ namespace casadi {
     std::string signature(const std::string& fname) const;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void codegen_declarations(CodeGenerator& g) const;
+    virtual void codegen_declarations(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Generate code for the function body */
     virtual void codegen_body(CodeGenerator& g,

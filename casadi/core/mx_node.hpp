@@ -91,7 +91,7 @@ namespace casadi {
     virtual std::string disp(const std::vector<std::string>& arg) const = 0;
 
     /** \brief Add a dependent function */
-    virtual void add_dependency(CodeGenerator& g) const {}
+    virtual void add_dependency(CodeGenerator& g, const Instance& inst) const {}
 
     /** \brief Is reference counting needed in codegen? */
     virtual bool has_refcount() const { return false;}

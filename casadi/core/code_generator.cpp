@@ -208,7 +208,10 @@ namespace casadi {
     added_functions_.push_back({f, fname, inst});
 
     // Generate declarations
-    f->codegen_declarations(*this);
+    f->codegen_declarations(*this, inst);
+
+
+    comment("inst: " + str(inst.arg_null) + ":" + str(inst.res_null));
 
     // Print to file
     f->codegen(*this, fname, inst);

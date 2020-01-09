@@ -219,7 +219,7 @@ namespace casadi {
     g << g.copy("m.x", n_, g.res(iout_)) << "\n";
   }
 
-  void FastNewton::codegen_declarations(CodeGenerator& g) const {
+  void FastNewton::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     g.add_dependency(get_function("jac_f_z"));
   }
 

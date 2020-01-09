@@ -213,7 +213,7 @@ namespace casadi {
     return 0;
   }
 
-  void MapSum::codegen_declarations(CodeGenerator& g) const {
+  void MapSum::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     g.add_dependency(f_);
   }
 

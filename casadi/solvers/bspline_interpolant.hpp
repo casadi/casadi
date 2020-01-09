@@ -102,7 +102,7 @@ namespace casadi {
     void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /// A documentation string
     static const std::string meta_doc;

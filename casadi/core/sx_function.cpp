@@ -82,12 +82,10 @@ namespace casadi {
 
       case OP_CONST: w[e.i0] = e.d; break;
       case OP_INPUT: {
-        casadi_assert_dev(arg[e.i1]);
         w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2];
         break;
       }
       case OP_OUTPUT: {
-        casadi_assert_dev(res[e.i0]);
         if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1];
         break;
       }
@@ -149,7 +147,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::codegen_declarations(CodeGenerator& g) const {
+  void SXFunction::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {

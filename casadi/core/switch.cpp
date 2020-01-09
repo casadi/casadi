@@ -285,7 +285,7 @@ namespace casadi {
     }
   }
 
-  void Switch::codegen_declarations(CodeGenerator& g) const {
+  void Switch::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     for (casadi_int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
       g.add_dependency(fk);

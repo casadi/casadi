@@ -2432,7 +2432,7 @@ namespace casadi {
     return mem_array+"[" + index + "]";
   }
 
-  void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
+  void FunctionInternal::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     // Nothing to declare
   }
 

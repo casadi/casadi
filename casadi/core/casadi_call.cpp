@@ -177,7 +177,6 @@ namespace casadi {
     // Collect output arguments
     g.local("res1", "casadi_real", "**");
     for (casadi_int i=0; i<res.size(); ++i) {
-      g.comment(str(res[i])+":"+str(fcn_.nnz_out(i)));
       g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
       res_null.push_back(res[i]<0);
     }

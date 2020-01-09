@@ -720,7 +720,7 @@ int Sqpmethod::solve(void* mem) const {
     if (verbose_) print("QP solved\n");
   }
 
-void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
+void Sqpmethod::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     if (max_iter_ls_) g.add_dependency(get_function("nlp_fg"));
     g.add_dependency(get_function("nlp_jac_fg"));
     if (exact_hessian_) g.add_dependency(get_function("nlp_hess_l"));
