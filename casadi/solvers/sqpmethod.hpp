@@ -151,10 +151,10 @@ namespace casadi {
     bool convexify_;
 
     /** \brief Generate code for the function body */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /// Access Conic
     const Function getConic() const { return qpsol_;}

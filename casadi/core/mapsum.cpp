@@ -213,11 +213,11 @@ namespace casadi {
     return 0;
   }
 
-  void MapSum::codegen_declarations(CodeGenerator& g) const {
+  void MapSum::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     g.add_dependency(f_);
   }
 
-  void MapSum::codegen_body(CodeGenerator& g) const {
+  void MapSum::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.add_auxiliary(CodeGenerator::AUX_CLEAR);
     g.local("i", "casadi_int");
     g.local("arg1", "const casadi_real*", "*");

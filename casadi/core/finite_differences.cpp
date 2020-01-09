@@ -306,12 +306,13 @@ namespace casadi {
     return casadi_central_diff(yk, y0, J, h, n_y_, &m_);
   }
 
-  void FiniteDiff::codegen_declarations(CodeGenerator& g) const {
+  void FiniteDiff::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     g.add_dependency(derivative_of_);
     g.add_auxiliary(CodeGenerator::AUX_FINITE_DIFF);
   }
 
-  void FiniteDiff::codegen_body(CodeGenerator& g) const {
+  void FiniteDiff::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     // Shorthands
     casadi_int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
     casadi_int n_pert = this->n_pert();
