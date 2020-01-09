@@ -755,7 +755,7 @@ namespace casadi {
     /** \brief Generate code the function
 
         \identifier{lm} */
-    void codegen(CodeGenerator& g, const std::string& fname) const;
+    void codegen(CodeGenerator& g, const std::string& fname, const Instance& inst) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function
 
@@ -820,12 +820,12 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function
 
         \identifier{lz} */
-    virtual void codegen_declarations(CodeGenerator& g) const;
+    virtual void codegen_declarations(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Generate code for the function body
 
         \identifier{m0} */
-    virtual void codegen_body(CodeGenerator& g) const;
+    virtual void codegen_body(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Thread-local memory object type
 

@@ -194,21 +194,29 @@ namespace casadi {
     }
   }
 
-  string CodeGenerator::add_dependency(const Function& f) {
+  string CodeGenerator::add_dependency(const Function& f, const Instance& inst) {
+
+    /*std::string prefix = "_";
+    for (bool b : arg_null) prefix+= b ? 'n' : 'r';
+    prefix += "_";
+    for (bool b : res_null) prefix+= b ? 'n' : 'r';*/
     // Quick return if it already exists
-    for (auto&& e : added_functions_) if (e.f==f) return e.codegen_name;
+    for (auto&& e : added_functions_) if (e.f==f && e.inst==inst) return e.codegen_name;
 
     // Give it a name
     string fname = shorthand("f" + str(added_functions_.size()));
 
     // Add to list of functions
-    added_functions_.push_back({f, fname});
+    added_functions_.push_back({f, fname, inst});
 
     // Generate declarations
-    f->codegen_declarations(*this);
+    f->codegen_declarations(*this, inst);
+
+
+    comment("inst: " + str(inst.arg_null) + ":" + str(inst.res_null));
 
     // Print to file
-    f->codegen(*this, fname);
+    f->codegen(*this, fname, inst);
 
     // Codegen reference count functions, if needed
     if (f->has_refcount_) {
@@ -754,8 +762,9 @@ namespace casadi {
   string CodeGenerator::
   operator()(const Function& f, const string& arg,
              const string& res, const string& iw,
-             const string& w) {
-    std::string name = add_dependency(f);
+             const string& w,
+             const Instance& inst) {
+    std::string name = add_dependency(f, inst);
     bool needs_mem = !f->codegen_mem_type().empty();
     if (needs_mem) {
       std::string mem = "mid";

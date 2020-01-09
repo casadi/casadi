@@ -153,8 +153,8 @@ namespace casadi {
     return fcn_.rev(arg, res, iw, w);
   }
 
-  void Call::add_dependency(CodeGenerator& g) const {
-    g.add_dependency(fcn_);
+  void Call::add_dependency(CodeGenerator& g, const Instance& inst) const {
+    g.add_dependency(fcn_, inst);
   }
 
   bool Call::has_refcount() const {
@@ -163,20 +163,25 @@ namespace casadi {
 
   void Call::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res) const {
+    std::vector<bool> arg_null, res_null;
     // Collect input arguments
     g.local("arg1", "const casadi_real", "**");
     for (casadi_int i=0; i<arg.size(); ++i) {
       g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
+      arg_null.push_back(arg[i]<0);
     }
 
     // Collect output arguments
     g.local("res1", "casadi_real", "**");
     for (casadi_int i=0; i<res.size(); ++i) {
       g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
+      res_null.push_back(res[i]<0);
     }
 
+    Instance inst = {arg_null, res_null};
+
     // Call function
-    std::string flag = g(fcn_, "arg1", "res1", "iw", "w");
+    std::string flag = g(fcn_, "arg1", "res1", "iw", "w", inst);
     g << "if (" << flag << ") return 1;\n";
   }
 

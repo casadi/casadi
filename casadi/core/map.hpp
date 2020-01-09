@@ -142,12 +142,12 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function
 
         \identifier{he} */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the body of the C function
 
         \identifier{hf} */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief  Initialize
 
@@ -272,7 +272,7 @@ namespace casadi {
     /** \brief Generate code for the body of the C function
 
         \identifier{hs} */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
   protected:
     /** \brief Deserializing constructor
@@ -323,7 +323,7 @@ namespace casadi {
     /** \brief Generate code for the body of the C function
 
         \identifier{hy} */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
   protected:
     /** \brief Deserializing constructor

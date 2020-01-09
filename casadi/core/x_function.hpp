@@ -159,12 +159,12 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function
 
         \identifier{xz} */
-    void codegen_declarations(CodeGenerator& g) const override = 0;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override = 0;
 
     /** \brief Generate code for the body of the C function
 
         \identifier{y0} */
-    void codegen_body(CodeGenerator& g) const override = 0;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override = 0;
 
     /** \brief Export function in a specific language
 

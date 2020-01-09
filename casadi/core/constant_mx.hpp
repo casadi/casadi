@@ -322,7 +322,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{zr} */
-    void add_dependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief file to read from
 

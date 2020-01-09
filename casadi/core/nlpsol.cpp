@@ -983,7 +983,7 @@ namespace casadi {
     return stats;
   }
 
-  void Nlpsol::nlpsol_codegen_body(CodeGenerator& g) const {
+  void Nlpsol::nlpsol_codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.local("d_nlp", "struct casadi_nlpsol_data");
     g.local("p_nlp", "struct casadi_nlpsol_prob");
 

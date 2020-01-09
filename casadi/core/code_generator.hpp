@@ -71,7 +71,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Add a function dependency
-    std::string add_dependency(const Function& f);
+    std::string add_dependency(const Function& f, const Instance& inst=Instance());
 
     /// Add an external function declaration
     void add_external(const std::string& new_external);
@@ -143,7 +143,7 @@ namespace casadi {
         \identifier{s6} */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w);
+                           const std::string& w, const Instance& inst=Instance());
 
     /** \brief Print a string to buffer
 
@@ -799,6 +799,7 @@ namespace casadi {
       Function f;
       // Name in codegen
       std::string codegen_name;
+      Instance inst;
     };
     std::vector<FunctionMeta> added_functions_;
 

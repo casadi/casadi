@@ -213,7 +213,7 @@ namespace casadi {
     /** \brief Generate code for the function body
 
         \identifier{1o0} */
-    void nlpsol_codegen_body(CodeGenerator& g) const;
+    void nlpsol_codegen_body(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
 

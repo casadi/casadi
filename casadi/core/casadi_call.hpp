@@ -62,7 +62,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{6n} */
-    void add_dependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Is reference counting needed in codegen?
 

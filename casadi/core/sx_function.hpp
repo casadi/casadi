@@ -263,12 +263,12 @@ class CASADI_EXPORT SXFunction :
   /** \brief Generate code for the declarations of the C function
 
       \identifier{v4} */
-  void codegen_declarations(CodeGenerator& g) const override;
+  void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Generate code for the body of the C function
 
       \identifier{v5} */
-  void codegen_body(CodeGenerator& g) const override;
+  void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief  Propagate sparsity forward
 

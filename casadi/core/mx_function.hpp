@@ -162,7 +162,7 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function
 
         \identifier{2a} */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Codegen incref for dependencies
 
@@ -177,7 +177,7 @@ namespace casadi {
     /** \brief Generate code for the body of the C function
 
         \identifier{2d} */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Serialize an object without type information
 

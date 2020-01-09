@@ -247,7 +247,7 @@ namespace casadi {
     return 0;
   }
 
-  void Qrqp::codegen_body(CodeGenerator& g) const {
+  void Qrqp::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.add_auxiliary(CodeGenerator::AUX_QP);
     if (print_iter_) g.add_auxiliary(CodeGenerator::AUX_PRINTF);
     g.local("d", "struct casadi_qp_data");

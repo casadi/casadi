@@ -78,8 +78,14 @@ namespace casadi {
         CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
 
       case OP_CONST: w[e.i0] = e.d; break;
-      case OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
-      case OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
+      case OP_INPUT: {
+        w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2];
+        break;
+      }
+      case OP_OUTPUT: {
+        if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1];
+        break;
+      }
       default:
         casadi_error("Unknown operation" + str(e.op));
       }
@@ -138,7 +144,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::codegen_declarations(CodeGenerator& g) const {
+  void SXFunction::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -147,13 +153,18 @@ namespace casadi {
     }
   }
 
-  void SXFunction::codegen_body(CodeGenerator& g) const {
+  void SXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
 
     // Run the algorithm
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
-        g << "if (res[" << a.i0 << "]!=0) "
-          << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
+        if (inst.res_null.empty()) {
+          g << "if (res[" << a.i0 << "]!=0) ";
+          g << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
+        } else {
+          if (!inst.res_null[a.i0])
+            g << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
+        }
       } else {
 
         // Where to store the result
@@ -163,7 +174,15 @@ namespace casadi {
         if (a.op==OP_CONST) {
           g << g.constant(a.d);
         } else if (a.op==OP_INPUT) {
-          g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
+          if (inst.arg_null.empty()) {
+            g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
+          } else {
+            if (inst.arg_null[a.i1]) {
+              g << "0";
+            } else {
+              g << g.arg(a.i1) << "[" << a.i2 << "]";
+            }
+          }
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);

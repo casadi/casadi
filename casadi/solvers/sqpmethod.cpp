@@ -1006,7 +1006,7 @@ int Sqpmethod::solve(void* mem) const {
     return max(gamma_0_*casadi_norm_inf(nx_, d->gf), gamma_1_min_);
   }
 
-void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
+void Sqpmethod::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     if (max_iter_ls_ || so_corr_) g.add_dependency(get_function("nlp_fg"));
     g.add_dependency(get_function("nlp_jac_fg"));
     if (exact_hessian_) g.add_dependency(get_function("nlp_hess_l"));
@@ -1016,9 +1016,9 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     if (elastic_mode_) g.add_dependency(qpsol_ela_);
   }
 
-  void Sqpmethod::codegen_body(CodeGenerator& g) const {
+  void Sqpmethod::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.add_auxiliary(CodeGenerator::AUX_SQPMETHOD);
-    nlpsol_codegen_body(g);
+    nlpsol_codegen_body(g, inst);
     // From nlpsol
     g.local("m_p", "const casadi_real", "*");
     g.init_local("m_p", g.arg(NLPSOL_P));

@@ -127,12 +127,12 @@ class CASADI_EXPORT External : public FunctionInternal {
   /** \brief Generate code for the declarations of the C function
 
       \identifier{1ze} */
-  void codegen_declarations(CodeGenerator& g) const override;
+  void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Generate code for the body of the C function
 
       \identifier{1zf} */
-  void codegen_body(CodeGenerator& g) const override;
+  void codegen_body(CodeGenerator& g, const Instance& inst) const;
 
   /** \brief Thread-local memory object type
 

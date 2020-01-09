@@ -103,12 +103,12 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function
 
         \identifier{1ug} */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the body of the C function
 
         \identifier{1uh} */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
   protected:
     // Number of function evaluations needed

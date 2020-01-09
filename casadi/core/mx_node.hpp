@@ -118,7 +118,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{1qo} */
-    virtual void add_dependency(CodeGenerator& g) const {}
+    virtual void add_dependency(CodeGenerator& g, const Instance& inst) const {}
 
     /** \brief Is reference counting needed in codegen?
 
