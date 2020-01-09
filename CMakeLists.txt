@@ -212,7 +212,7 @@ endif()
 ############################################################
 ################# WITH_COMMON option #######################
 ############################################################
-option(WITH_COMMON "Build common, stable interfaces, if found" OFF)
+option(WITH_COMMON "Build common, stable interfaces, if found" ON)
 if(WITH_COMMON)
   # Look for LAPACK
   find_package(LAPACK QUIET)
