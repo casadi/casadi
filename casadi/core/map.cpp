@@ -177,33 +177,48 @@ namespace casadi {
     return 0;
   }
 
-  void Map::codegen_declarations(CodeGenerator& g) const {
-    g.add_dependency(f_);
+  void Map::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
+    uout() << "inst" << inst.arg_null << std::endl;
+    g.add_dependency(f_, inst);
   }
 
-  void Map::codegen_body(CodeGenerator& g) const {
+  void Map::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     g.local("i", "casadi_int");
-    g.local("arg1", "const casadi_real*", "*");
-    g.local("res1", "casadi_real*", "*");
+    g.local("arg1[" + str(f_.sz_arg()) + "]", "const casadi_real*");
+    g.local("res1[" + str(f_.sz_res()) + "]", "casadi_real*");
 
     // Input buffer
-    g << "arg1 = arg+" << n_in_ << ";\n"
-      << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
+    g << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "res1 = res+" << n_out_ << ";\n"
-      << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
+    g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    if (str(f_).find("SXFunction")!= std::string::npos) {
+      g << g(f_, "arg1", "res1", "iw", "w", inst) << ";\n";
+    } else {
+      g << "if (" << g(f_, "arg1", "res1", "iw", "w", inst) << ") return 1;\n";
+    }
+
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
-      if (f_.nnz_in(j))
-        g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+      if (f_.nnz_in(j)) {
+        if (inst.arg_null.empty()) {
+          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+        } else {
+          if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+        }
+      }
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
-      if (f_.nnz_out(j))
-        g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+      if (f_.nnz_out(j)) {
+        if (inst.res_null.empty()) {
+          g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+        } else {
+          if (!inst.res_null[j]) g << "res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+        }
+      }
     }
     g << "}\n";
   }
@@ -397,7 +412,8 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void OmpMap::codegen_body(CodeGenerator& g) const {
+  void OmpMap::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     g << "casadi_int i;\n"
@@ -417,7 +433,7 @@ namespace casadi {
         << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
     }
     g << "flag = "
-      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << " || flag;\n"
+      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w), inst) << " || flag;\n"
       << "}\n"
       << "if (flag) return 1;\n";
   }
@@ -521,8 +537,9 @@ namespace casadi {
 #endif // CASADI_WITH_THREAD
   }
 
-  void ThreadMap::codegen_body(CodeGenerator& g) const {
-    Map::codegen_body(g);
+  void ThreadMap::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
+    Map::codegen_body(g, inst);
   }
 
   void ThreadMap::init(const Dict& opts) {

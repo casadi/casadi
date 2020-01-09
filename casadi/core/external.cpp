@@ -296,13 +296,14 @@ namespace casadi {
     External::init(opts);
   }
 
-  void External::codegen_declarations(CodeGenerator& g) const {
+  void External::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     if (!li_.inlined(name_)) {
       g.add_external(signature(name_) + ";");
     }
   }
 
-  void External::codegen_body(CodeGenerator& g) const {
+  void External::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     if (li_.inlined(name_)) {
       // Function body is inlined
       g << li_.body(name_) << "\n";

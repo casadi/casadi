@@ -254,7 +254,7 @@ namespace casadi {
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Add a dependent function */
-    void add_dependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief file to read from */
     std::string fname_;

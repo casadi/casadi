@@ -65,7 +65,8 @@ namespace casadi {
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the function body */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g,
+      const Instance& inst) const override;
 
     ///@{
     /** \brief Jacobian of all outputs with respect to all inputs */

@@ -2085,7 +2085,7 @@ namespace casadi {
     casadi_error("'get_jacobian' not defined for " + class_name());
   }
 
-  void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
+  void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname, const Instance& inst) const {
     // Define function
     g << "/* " << definition() << " */\n";
     g << "static " << signature(fname) << " {\n";
@@ -2096,7 +2096,7 @@ namespace casadi {
     g.scope_enter();
 
     // Generate function body (to buffer)
-    codegen_body(g);
+    codegen_body(g, inst);
 
     g.scope_exit();
 
@@ -2433,11 +2433,12 @@ namespace casadi {
     return mem_array+"[" + index + "]";
   }
 
-  void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
+  void FunctionInternal::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     // Nothing to declare
   }
 
-  void FunctionInternal::codegen_body(CodeGenerator& g) const {
+  void FunctionInternal::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     casadi_warning("The function \"" + name_ + "\", which is of type \""
                    + class_name() + "\" cannot be code generated. The generation "
                    "will proceed, but compilation of the code will not be possible.");

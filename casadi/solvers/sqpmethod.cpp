@@ -613,7 +613,7 @@ int Sqpmethod::solve(void* mem) const {
     if (verbose_) print("QP solved\n");
   }
 
-void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
+void Sqpmethod::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     if (max_iter_ls_) g.add_dependency(get_function("nlp_fg"));
     g.add_dependency(get_function("nlp_jac_fg"));
     if (exact_hessian_) g.add_dependency(get_function("nlp_hess_l"));
@@ -622,9 +622,9 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.add_dependency(qpsol_);
   }
 
-  void Sqpmethod::codegen_body(CodeGenerator& g) const {
+  void Sqpmethod::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.add_auxiliary(CodeGenerator::AUX_SQPMETHOD);
-    nlpsol_codegen_body(g);
+    nlpsol_codegen_body(g, inst);
     // From nlpsol
     g.local("m_p", "const casadi_real", "*");
     g.init_local("m_p", g.arg(NLPSOL_P));

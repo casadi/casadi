@@ -102,10 +102,11 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g,
+      const Instance& inst) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs */

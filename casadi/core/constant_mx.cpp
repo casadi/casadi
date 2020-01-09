@@ -360,7 +360,7 @@ namespace casadi {
     g << g.file_slurp(fname_, nnz(), g.rom_double(this)) << ";\n";
   }
 
-  void ConstantFile::add_dependency(CodeGenerator& g) const {
+  void ConstantFile::add_dependency(CodeGenerator& g, const Instance& inst) const {
     g.define_rom_double(this, nnz());
   }
 

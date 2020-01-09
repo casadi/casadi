@@ -52,7 +52,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Add a dependent function */
-    void add_dependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Is reference counting needed in codegen? */
     bool has_refcount() const override;

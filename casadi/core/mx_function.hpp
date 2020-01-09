@@ -131,7 +131,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Codegen incref for dependencies */
     void codegen_incref(CodeGenerator& g) const override;
@@ -140,7 +140,7 @@ namespace casadi {
     void codegen_decref(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;

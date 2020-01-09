@@ -176,7 +176,7 @@ namespace casadi {
     virtual int solve(void* mem) const = 0;
 
     /** \brief Generate code for the function body */
-    void nlpsol_codegen_body(CodeGenerator& g) const;
+    void nlpsol_codegen_body(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override {return true;}

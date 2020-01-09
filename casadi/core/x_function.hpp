@@ -134,10 +134,10 @@ namespace casadi {
                    const std::vector<casadi_int>& order_out, const Dict& opts) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override = 0;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override = 0;
 
     /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override = 0;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override = 0;
 
     /** \brief Export function in a specific language */
     void export_code(const std::string& lang,

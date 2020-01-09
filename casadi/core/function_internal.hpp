@@ -565,7 +565,7 @@ namespace casadi {
     void tocache(const Function& f, const std::string& suffix="") const;
 
     /** \brief Generate code the function */
-    void codegen(CodeGenerator& g, const std::string& fname) const;
+    void codegen(CodeGenerator& g, const std::string& fname, const Instance& inst) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
     void codegen_meta(CodeGenerator& g) const;
@@ -598,10 +598,11 @@ namespace casadi {
     std::string signature(const std::string& fname) const;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void codegen_declarations(CodeGenerator& g) const;
+    virtual void codegen_declarations(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Generate code for the function body */
-    virtual void codegen_body(CodeGenerator& g) const;
+    virtual void codegen_body(CodeGenerator& g,
+      const Instance& inst) const;
 
     /** \brief Thread-local memory object type */
     virtual std::string codegen_mem_type() const { return ""; }

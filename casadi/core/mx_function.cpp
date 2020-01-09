@@ -1224,7 +1224,7 @@ namespace casadi {
     return 0;
   }
 
-  void MXFunction::codegen_declarations(CodeGenerator& g) const {
+  void MXFunction::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -1233,8 +1233,29 @@ namespace casadi {
     }
 
     // Generate code for the embedded functions
-    for (auto&& a : algorithm_) {
-      a.data->add_dependency(g);
+    for (auto&& e : algorithm_) {
+      // Get the names of the operation arguments
+      std::vector<bool> arg_null(e.arg.size());
+      for (casadi_int i=0; i<e.arg.size(); ++i) {
+        casadi_int j=e.arg.at(i);
+        if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+          arg_null.at(i) = false;
+        } else {
+          arg_null.at(i) = true;
+        }
+      }
+
+      // Get the names of the operation results
+      std::vector<bool> res_null(e.res.size());
+      for (casadi_int i=0; i<e.res.size(); ++i) {
+        casadi_int j=e.res.at(i);
+        if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+          res_null.at(i) = false;
+        } else {
+          res_null.at(i) = true;
+        }
+      }
+      e.data->add_dependency(g, Instance{arg_null, res_null});
     }
   }
 
@@ -1252,7 +1273,7 @@ namespace casadi {
     }
   }
 
-  void MXFunction::codegen_body(CodeGenerator& g) const {
+  void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
     // Temporary variables and vectors
     if (ce_active_) {
       g.local("r", "const casadi_real*", "*");
