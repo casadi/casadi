@@ -118,6 +118,9 @@ namespace casadi {
     /** \brief Get required length of w field */
     size_t sz_w() const override;
 
+    /// Alignment (bytes) for specific input argument
+    size_t align_w() const override;
+
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
 

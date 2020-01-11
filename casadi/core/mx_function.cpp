@@ -335,6 +335,7 @@ namespace casadi {
           align_w_ = max(align_w_, a);
         }
       }
+      align_w_ = max(align_w_, e.data->align_w());
     }
 
     // Allocate work vectors (numeric)
@@ -369,6 +370,11 @@ namespace casadi {
     }
     sz_w += wind;
     alloc_w(sz_w);
+
+    for (casadi_int i=0;i<align.size();++i) {
+      casadi_assert(workloc_.at(i)*sizeof(double) % align.at(i)==0, str(workloc_.at(i)) + "%" + str(align.at(i)) + "=" + str(workloc_.at(i) % align.at(i)));
+    }
+
 
     // Reset the temporary variables
     for (casadi_int i=0; i<nodes.size(); ++i) {

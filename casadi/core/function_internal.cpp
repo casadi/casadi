@@ -2550,6 +2550,7 @@ namespace casadi {
     alloc_res(sz_res, persistent);
     alloc_iw(sz_iw, persistent);
     alloc_w(sz_w, persistent);
+    align_w_ = max(f.align_w(), align_w_);
   }
 
   Dict ProtoFunction::get_stats(void* mem) const {
@@ -3118,6 +3119,7 @@ namespace casadi {
   void FunctionInternal::setup(void* mem, const double** arg, double** res,
                                casadi_int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
+    w = round_pow2(w, align_w_);
     set_temp(mem, arg, res, iw, w);
   }
 

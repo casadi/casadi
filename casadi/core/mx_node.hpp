@@ -233,6 +233,9 @@ namespace casadi {
     /// Alignment (bytes) for specific output argument
     virtual size_t align_out(casadi_int oind) const { return 1; }
 
+    /// Alignment (bytes) for work vector
+    virtual size_t align_w() const { return 1; }
+
     /// Get shape
     casadi_int numel() const { return sparsity().numel(); }
     casadi_int nnz(casadi_int i=0) const { return sparsity(i).nnz(); }

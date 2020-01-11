@@ -78,7 +78,16 @@ namespace casadi {
   }
 
   int Einstein::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+
+      // Alignment check
+      casadi_assert(casadi_int(arg[1]) % 64==0, "Mem alignment error arg[1] " + str(casadi_int(arg[1]) % 64));
+      casadi_assert(casadi_int(arg[2]) % 64==0, "Mem alignment error arg[2] " + str(casadi_int(arg[2]) % 64));
+      casadi_assert(casadi_int(res[0]) % 64==0, "Mem alignment error res[0] " + str(casadi_int(res[0]) % 64));
+
+
     if (pure_) {
+
+
       if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
       static einstein_external cb = get_einstein_external();

@@ -822,7 +822,7 @@ namespace casadi {
     size_t sz_iw() const { return sz_iw_per_ + sz_iw_tmp_;}
 
     /** \brief Get required length of w field */
-    size_t sz_w() const { return sz_w_per_ + sz_w_tmp_;}
+    size_t sz_w() const { return sz_w_per_ + sz_w_tmp_ + align_w_-1;}
 
     /** \brief Ensure required length of arg field */
     void alloc_arg(size_t sz_arg, bool persistent=false);
