@@ -19,6 +19,21 @@ set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
 set(PACKAGE_URL "http://casadi.org")
 
+if(MSVC)
+    # Force linking with static run-time library
+	set(replace_from "/MD")
+	set(replace_to "/MT")
+	foreach(flag_var
+		CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+		CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+		CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+		CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO)
+		if(${${flag_var}} MATCHES "${replace_from}")
+			string(REPLACE "${replace_from}" "${replace_to}" tmp "${${flag_var}}")
+			set(${flag_var} ${tmp} CACHE STRING "compiler flags" FORCE)
+		endif()
+	endforeach(flag_var)
+endif()
 ############################################################
 ####################### Policies ###########################
 ############################################################

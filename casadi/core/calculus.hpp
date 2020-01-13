@@ -241,6 +241,7 @@ namespace casadi {
 
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
+
   ///@}
 
   ///@}
