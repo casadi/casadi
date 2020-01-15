@@ -19,6 +19,11 @@ set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
 set(PACKAGE_URL "http://casadi.org")
 
+if(" ${CMAKE_C_FLAGS} " MATCHES " -m64 " AND CMAKE_HOST_WIN32)
+    add_definitions(-DMS_WIN64)
+    message(STATUS "Adding MS_WIN64 definition")
+endif()
+
 if(MSVC)
     # Force linking with static run-time library
 	set(replace_from "/MD")
