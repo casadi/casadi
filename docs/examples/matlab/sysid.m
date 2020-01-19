@@ -78,19 +78,53 @@ X_measured = all_samples(x0, u_data, repmat(param_truth,1,N));
 
 y_data = X_measured(1,:)';
 
+% You may add some noise here
+%y_data= ydata + 0.001*rand(N)
+% When noise is absent, the fit will be perfect.
+
 %%%%%%%%%%%% Identifying the simulated system: single shooting strategy %%%%%%%%%%
 
 % Note, it is in general a good idea to scale your decision variables such
 % that they are in the order of ~0.1..100
 X_symbolic = all_samples(x0, u_data, repmat(params.*scale,1,N));
 
-e = y_data-X_symbolic(01,:)';
+e = y_data-X_symbolic(1,:)';
 
 nlp = struct('x', params, 'f', 0.5*dot(e,e));
-solver = nlpsol('solver','ipopt', nlp);
+solver = sysid_gauss_newton(e,nlp,params);
 
 sol = solver('x0',param_guess);
 
 sol.x.*scale
 
-assert(max(full(abs(sol.x.*scale-param_truth)))<1e-8)
+assert(norm(full(sol.x).*scale-param_truth,'inf')<1e-8)
+
+%%%%%%%%%%%% Identifying the simulated system: multiple shooting strategy %%%%%%%%%%
+
+% All states become decision variables
+X = MX.sym('X', 2, N);
+
+res = one_sample.map(N, 'thread', 4);
+Xn = res(X, u_data', repmat(params.*scale,1,N));
+
+gaps = Xn(:,1:end-1)-X(:,2:end);
+
+e = y_data-Xn(1,:)';
+
+V = veccat(params, X);
+
+nlp = struct('x',V, 'f',0.5*dot(e,e),'g',vec(gaps));
+
+% Multipleshooting allows for careful initialization
+yd = diff(y_data)*fs;
+X_guess = [ y_data  [yd;yd(end)]]';
+
+x0 = veccat(param_guess,X_guess);
+
+solver = sysid_gauss_newton(e,nlp, V);
+
+sol = solver('x0',x0,'lbg',0,'ubg',0);
+
+sol.x(1:4).*scale
+
+assert(norm(full(sol.x(1:4)).*scale-param_truth,'inf')<1e-8);
