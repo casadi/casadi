@@ -89,27 +89,19 @@ iopts["t0"] = 0.0
 iopts["tf"] = tf/num_nodes
 I = integrator("I", "cvodes", dae, iopts)
 
-# Variables in the root finding problem
-NV = nX*(num_nodes+1)
-V = MX.sym("V",NV)
-
-# Get the state at each shooting node
-X = []
-v_offset = 0
-for k in range(num_nodes+1):
-  X.append(V[v_offset:v_offset+nX])
-  v_offset = v_offset+nX
+# Variables for the states at each shooting node
+X = MX.sym('X',nX,num_nodes+1)
 
 # Formulate the root finding problem
 G = []
-G.append(X[0][:2] - NP.array([0,1])) # states fixed, costates free at initial time
+G.append(X[:2,0] - vertcat(0,1)) # states fixed, costates free at initial time
 for k in range(num_nodes):
-  XF = I(x0=X[k])["xf"]
-  G.append(XF-X[k+1])
-G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
+  XF = I(x0=X[:,k])["xf"]
+  G.append(XF-X[:,k+1])
+G.append(X[2:,num_nodes] - vertcat(0,0)) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-rfp = Function('rfp', [V], [vertcat(*G)])
+rfp = {"x": vec(X), "g": vertcat(*G)}
 
 # Select a solver for the root-finding problem
 Solver = "nlpsol"
@@ -122,17 +114,18 @@ if Solver=="nlpsol":
     opts["nlpsol"] = "ipopt"
     opts["nlpsol_options"] = {"ipopt.hessian_approximation":"limited-memory"}
 elif Solver=="newton":
-    opts["linear_solver"] = CSparse
+    opts["linear_solver"] = "csparse"
 elif Solver=="kinsol":
     opts["linear_solver_type"] = "user_defined"
-    opts["linear_solver"] = CSparse
+    opts["linear_solver"] = "csparse"
     opts["max_iter"] = 1000
 
 # Allocate a solver
 solver = rootfinder('solver', Solver, rfp, opts)
 
 # Solve the problem
-V_sol = solver(0)
+X_sol = solver(x0=0)['x']
+print(X_sol)
 
 # Time grid for visualization
 tgrid = NP.linspace(0,tf,100)
@@ -141,11 +134,10 @@ tgrid = NP.linspace(0,tf,100)
 simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid,'output_t0':True})
 
 # Simulate to get the trajectories
-sol = simulator(x0 = V_sol[0:4])["xf"]
+sol = simulator(x0 = X_sol[0:4])["xf"]
 
 # Calculate the optimal control
-ufcn_all = u_fcn.map(len(tgrid))
-u_opt = ufcn_all(sol)
+u_opt = u_fcn(sol)
 
 # Plot the results
 plt.figure(1)
@@ -158,3 +150,5 @@ plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])
 plt.grid()
 plt.show()
+
+print(sol[0,:])
