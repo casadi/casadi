@@ -3292,6 +3292,7 @@ namespace casadi {
     if (is_empty()) return Sparsity(0, 0);
 
     std::string driver = get_from_dict(coloring_options, "driver", std::string("custom"));
+    std::string order = get_from_dict(coloring_options, "order", std::string("LARGEST_FIRST"));
     if (driver=="colpack") {
       std::stringstream cmd;
 
@@ -3312,9 +3313,10 @@ namespace casadi {
       std::string sp_in = temporary_file("sp", ".mtx");
       shared_from_this<Sparsity>().to_file(sp_in);
       cmd << " -f " << sp_in;
-      cmd << " -o LARGEST_FIRST -m STAR";
+      cmd << " -o " << order << " -m STAR";
       std::string sp_out = temporary_file("spc", ".mtx");
       cmd << " -w " << sp_out << std::endl;
+      uout() << cmd.str() << std::endl;
 
       if (system(cmd.str().c_str())) {
         casadi_error("Coloring with ColPack failed.");
