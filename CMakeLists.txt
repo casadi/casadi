@@ -25,9 +25,9 @@ if(" ${CMAKE_C_FLAGS} " MATCHES " -m64 " AND CMAKE_HOST_WIN32)
 endif()
 
 if(MSVC)
-    # Force linking with static run-time library
-	set(replace_from "/MD")
-	set(replace_to "/MT")
+    # Force linking with MD run-time library
+	set(replace_from "/MT")
+	set(replace_to "/MD")
 	foreach(flag_var
 		CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
 		CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO

@@ -1,3 +1,4 @@
+%include "windows.i"
 
 // File: index.xml
 

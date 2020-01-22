@@ -1,4 +1,6 @@
+%include "windows.i"
 %exception  casadi::BSplineInterpolant::class_name() const override {
+
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::BSplineInterpolant::codegen_body(CodeGenerator &g) const override {
