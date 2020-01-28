@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.6)
 include_directories(${IPOPT_INCLUDE_DIRS})
 link_directories(${IPOPT_LIBRARY_DIRS})
 
+message(STATUS IPOPT_INCLUDE_DIRS=${IPOPT_INCLUDE_DIRS}  IPOPT_LIBRARY_DIRS=${IPOPT_LIBRARY_DIRS})
+
 set(NLPSOL_IPOPT_SRCS
   ipopt_interface.hpp
   ipopt_interface.cpp
