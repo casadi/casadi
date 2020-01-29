@@ -1106,6 +1106,7 @@ namespace casadi {
       add_auxiliary(AUX_COPY);
       add_auxiliary(AUX_DOT);
       add_auxiliary(AUX_AXPY);
+      add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_cvx_str, inst);
       break;
     case AUX_TO_DOUBLE:

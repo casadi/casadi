@@ -58,6 +58,8 @@
 #include "constant_mx.hpp"
 #include "map.hpp"
 #include "bspline.hpp"
+#include "convexify.hpp"
+
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -865,6 +867,10 @@ namespace casadi {
     return MX::create(new BSplineParametric(x, coeffs, knots, offset, degree, m, lookup_mode));
   }
 
+  MX MXNode::get_convexify(const Dict& opts) const {
+    return MX::create(new Convexify(shared_from_this<MX>(), opts));
+  }
+
   MX MXNode::get_det() const {
     return MX::create(new Determinant(shared_from_this<MX>()));
   }
@@ -1143,6 +1149,7 @@ namespace casadi {
     //OP_LIFT,
     //OP_EINSTEIN
     {OP_BSPLINE, BSplineCommon::deserialize},
+    {OP_CONVEXIFY, Convexify::deserialize},
     {-1, OutputNode::deserialize}
   };
 

@@ -547,6 +547,7 @@ namespace casadi {
             const std::vector<casadi_int>& degree,
             casadi_int m,
             const Dict& opts = Dict());
+    static MX convexify(const MX& H, const Dict& opts = Dict());
     ///@}
     /// \endcond
 
@@ -654,6 +655,11 @@ namespace casadi {
             const std::vector<casadi_int>& degree,
             const Dict& opts = Dict()) {
       return MX::bspline_dual(x, knots, degree, opts);
+    }
+
+    inline friend MX convexify(const MX& H,
+            const Dict& opts = Dict()) {
+      return MX::convexify(H, opts);
     }
 
     /** \brief Lift the expression

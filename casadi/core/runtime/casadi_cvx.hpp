@@ -1,4 +1,6 @@
 // NOLINT(legal/copyright)
+// C-REPLACE "fmax" "casadi_fmax"
+
 // SYMBOL "cvx_house"
 /// Computes Householder vector
 /// beta: scalar
@@ -290,7 +292,7 @@ void casadi_cvx_givens_apply(casadi_int n, T1* q, T1 c, T1 s, casadi_int p) {
   m[n+1] = c*t4-s*t3;
   // Update columns
   m = q+n*p+p+2;
-  for (casadi_int i=0;i<n-p-2;++i) {
+  for (i=0;i<n-p-2;++i) {
     a = m[0];
     b = m[n];
     m[0] = c*a+s*b;
@@ -365,7 +367,12 @@ T1 casadi_cvx_scalar(T1 epsilon, casadi_int reflect, T1 eig) {
 template<typename T1>
 int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casadi_int max_iter,
     T1* w, casadi_int* iw) {
-  // Short-circuit for emptu matrices
+  casadi_int i, j, k, n_iter, nn, p, trace_offset;
+  casadi_int *t_meta;
+  T1 c, s, t_off0;
+  T1 *cs, *t_diag, *t_off;
+
+  // Short-circuit for empty matrices
   if (n==0) return 0;
 
   // Short-circuit for scalar matrices
@@ -375,10 +382,6 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   }
 
   casadi_cvx_tri(A, n, w);
-  casadi_int i, j, n_iter, nn, p, trace_offset;
-  casadi_int *t_meta;
-  T1 c, s;
-  T1 *cs;
 
   for (i=0;i<n;++i) {
     for (j=0;j<n;++j) {
@@ -389,9 +392,9 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   }
 
   // Represent tri-diagonal as vector pair (t_diag, t_off)
-  T1 t_off0 = A[1];
-  T1* t_diag = A;
-  T1* t_off = A+n;
+  t_off0 = A[1];
+  t_diag = A;
+  t_off = A+n;
   for (i=1;i<n;++i) {
     t_diag[i] = A[i+n*i];
   }
@@ -431,7 +434,7 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   }
 
   // Undo triangularization
-  for (casadi_int k = n-3; k>=0; --k) {
+  for (k = n-3; k>=0; --k) {
     casadi_int N = n-k-1;
     T1 *v = A+N*n;
     casadi_cvx_house_apply_symm(n, k, A, w, v);

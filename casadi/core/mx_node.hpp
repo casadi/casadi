@@ -516,6 +516,9 @@ namespace casadi {
             casadi_int m,
             const std::vector<casadi_int>& lookup_mode) const;
 
+    /// Convexify
+    MX get_convexify(const Dict& opts) const;
+
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero

@@ -147,6 +147,7 @@ set(CASADI_INTERNAL
   assertion.hpp           assertion.cpp           # Assertion
   monitor.hpp             monitor.cpp             # Monitor
   repmat.hpp              repmat.cpp              # RepMat
+  convexify.hpp           convexify.cpp           # Convexify
 
   # A dynamically created function with AD capabilities
   function.cpp

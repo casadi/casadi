@@ -1912,6 +1912,11 @@ namespace casadi {
     return BSpline::dual(x, knots, degree, opts);
   }
 
+  MX MX::convexify(const MX& H,
+            const Dict& opts) {
+    return H->get_convexify(opts);
+  }
+
   MX interpn_G(casadi_int i, // Dimension to interpolate along
                 const MX& v, // Coefficients
                 const std::vector<MX>& xis, // Normalised coordinates
