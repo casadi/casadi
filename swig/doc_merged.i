@@ -11386,6 +11386,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 // File: classcasadi_1_1ConstantSX.xml
 
 
+// File: classcasadi_1_1Convexify.xml
+
+
 // File: classcasadi_1_1DaeBuilder.xml
 
 
@@ -43189,6 +43192,12 @@ Check if the matrix expression is scalar.
 %feature("docstring") casadi::MX::is_binary "
 
 Is binary operation.
+
+";
+
+%feature("docstring") casadi::MX::convexify "
+
+[INTERNAL]   Find first nonzero If failed, returns the number of rows.
 
 ";
 

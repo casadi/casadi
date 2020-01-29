@@ -14235,6 +14235,9 @@ const  "
 // File: classcasadi_1_1ConstantSX.xml
 
 
+// File: classcasadi_1_1Convexify.xml
+
+
 // File: classcasadi_1_1DaeBuilder.xml
 
 
@@ -54748,6 +54751,25 @@ Check if the matrix expression is scalar.
 %feature("docstring")  casadi::MX::is_binary() const  "
 
 Is binary operation.
+
+";
+
+%feature("docstring")  casadi::MX::convexify(const MX &H, const Dict
+&opts=Dict()) "
+
+[INTERNAL]   Find first nonzero If failed, returns the number of rows.
+
+";
+
+%feature("docstring") casadi::casadi_convexify "
+
+Find first nonzero If failed, returns the number of rows.
+
+";
+
+%feature("docstring")  casadi::MX::casadi_convexify "
+
+Find first nonzero If failed, returns the number of rows.
 
 ";
 
