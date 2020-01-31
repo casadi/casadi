@@ -64682,8 +64682,10 @@ A textbook SQPMethod
 |                       |             | smallest eigenvalue is at least    |
 |                       |             | this (default: 1e-7).              |
 +-----------------------+-------------+------------------------------------+
-| convexify_strategy    | OT_STRING   | none|regularize|eigen-reflect      |
-|                       |             | |eigen-clip. Default: none.        |
+| convexify_strategy    | OT_STRING   | NONE|regularize|eigen-reflect      |
+|                       |             | |eigen-clip. Strategy to convexify |
+|                       |             | the Lagrange Hessian before        |
+|                       |             | passing it to the solver.          |
 +-----------------------+-------------+------------------------------------+
 | hess_lag              | OT_FUNCTION | Function for calculating the       |
 |                       |             | Hessian of the Lagrangian          |
@@ -64789,10 +64791,14 @@ A textbook SQPMethod
 |                   |               | least this        |                  |
 |                   |               | (default: 1e-7).  |                  |
 +-------------------+---------------+-------------------+------------------+
-| convexify_strateg | OT_STRING     | none|regularize   | casadi::Sqpmetho |
+| convexify_strateg | OT_STRING     | NONE|regularize   | casadi::Sqpmetho |
 | y                 |               | |eigen-reflect    | d                |
 |                   |               | |eigen-clip.      |                  |
-|                   |               | Default: none.    |                  |
+|                   |               | Strategy to       |                  |
+|                   |               | convexify the     |                  |
+|                   |               | Lagrange Hessian  |                  |
+|                   |               | before passing it |                  |
+|                   |               | to the solver.    |                  |
 +-------------------+---------------+-------------------+------------------+
 | discrete          | OT_BOOLVECTOR | Indicates which   | casadi::Nlpsol   |
 |                   |               | of the variables  |                  |
@@ -71868,6 +71874,10 @@ Explicitly load a plugin dynamically.
 [INTERNAL]  NORM_2: ||x||_2 -> return.
 
 ";
+
+%feature("docstring") casadi::convexify_eval "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::dense_kron_stride "
 
