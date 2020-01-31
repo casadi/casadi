@@ -315,7 +315,7 @@ namespace casadi {
     if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<SqpmethodMemory*>(mem);
 
-    m->add_stat("convexify");
+    if (convexify_) m->add_stat("convexify");
     m->add_stat("BFGS");
     m->add_stat("QP");
     m->add_stat("linesearch");
@@ -430,6 +430,7 @@ int Sqpmethod::solve(void* mem) const {
         m->res[0] = d->Bk;
         if (calc_function(m, "nlp_hess_l")) return 1;
         if (convexify_) {
+          ScopedTiming tic(m->fstats.at("convexify"));
           if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
         }
       } else if (m->iter_count==0) {

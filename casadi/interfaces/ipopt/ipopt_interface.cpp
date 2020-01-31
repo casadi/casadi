@@ -322,6 +322,8 @@ namespace casadi {
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
     casadi_assert(status == Solve_Succeeded, "Error during IPOPT initialization");
+
+    if (convexify_) m->add_stat("convexify");
     return 0;
   }
 
