@@ -112,13 +112,6 @@ namespace casadi {
     /// Exact Hessian?
     bool exact_hessian_;
 
-    /// Block structure of Hessian for certain convexification methods
-    std::vector<casadi_int> scc_offset_, scc_mapping_;
-
-    /// For eigen-* convexification strategies: maximum iterations for symmetric Schur decomposition
-    // Needs to be "big enough"
-    casadi_int max_iter_eig_;
-
     /// Maximum block size of Hessian
     casadi_int block_size_ = 0;
 
@@ -145,30 +138,17 @@ namespace casadi {
     // Print options
     bool print_header_, print_iteration_, print_status_;
 
-    // Raw Hessian sparsity
-    Sparsity Hrsp_;
-
-    // Actual Hessian Sparsity used for QP
+    // Hessian Sparsity
     Sparsity Hsp_;
-
-    // scc transformed Hessian sparsity
-    Sparsity scc_sp_;
-
-    // Projection of Hessian sparsity needed? (cache)
-    bool Hsp_project_;
-    // Reordering of Hessian needed for scc? (cache)
-    bool scc_transform_;
 
     // Jacobian sparsity
     Sparsity Asp_;
 
-    /// Regularization
-    enum ConvexifyStrategy {
-      CVX_NONE,
-      CVX_REGULARIZE,
-      CVX_EIGEN_REFLECT,
-      CVX_EIGEN_CLIP} convexify_strategy_;
-    double convexify_margin_;
+    /// Data for convexification
+    ConvexifyData convexify_data_;
+
+    /// convexify?
+    bool convexify_;
 
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;

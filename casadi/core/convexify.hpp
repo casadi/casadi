@@ -33,6 +33,10 @@
 /// \cond INTERNAL
 
 namespace casadi {
+
+
+
+
   /** \brief Convexify a symmetric matrix
       \author Joris Gillis
       \date 2020
@@ -79,36 +83,19 @@ namespace casadi {
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new Convexify(s); }
 
-    enum Strategy {
-      CVX_REGULARIZE,
-      CVX_EIGEN_REFLECT,
-      CVX_EIGEN_CLIP};
+    struct ConvexifyData convexify_data_;
 
+    static Sparsity setup(ConvexifyData& d, const Sparsity& H,
+                      const Dict& opts=Dict(), bool inplace=true);
+
+    static std::string generate(CodeGenerator& g,
+      const ConvexifyData &d,
+      const std::string& Hin, const std::string& Hout,
+      const std::string& iw, const std::string& w);
+
+    static void deserialize(DeserializingStream& s, const std::string& prefix, ConvexifyData& d);
+    static void serialize(SerializingStream& s, const std::string& prefix, const ConvexifyData& d);
   protected:
-    enum TypeIn {SYMM, TRIL, TRIU} type_in_;
-
-    /// Regularization
-    Strategy strategy_;
-    double margin_;
-
-    /// For eigen-* convexification strategies: maximum iterations for symmetric Schur decomposition
-    // Needs to be "big enough"
-    casadi_int max_iter_eig_;
-
-    /// Block structure of Hessian for certain convexification methods
-    std::vector<casadi_int> scc_offset_, scc_mapping_;
-
-    /// Maximum block size of Hessian
-    casadi_int block_size_ = 0;
-
-    // scc transformed Hessian sparsity
-    Sparsity scc_sp_;
-
-    // Projection of Hessian sparsity needed? (cache)
-    bool Hsp_project_;
-
-    // Reordering of Hessian needed for scc? (cache)
-    bool scc_transform_;
 
     /** \brief Deserializing constructor */
     explicit Convexify(DeserializingStream& s);

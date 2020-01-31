@@ -26,6 +26,7 @@
 #include "ipopt_nlp.hpp"
 #include "ipopt_interface.hpp"
 #include "casadi/core/timing.hpp"
+#include "casadi/core/convexify.hpp"
 
 namespace casadi {
 
@@ -149,7 +150,11 @@ namespace casadi {
       mem_->arg[2] = &obj_factor;
       mem_->arg[3] = lambda;
       mem_->res[0] = values;
-      return !solver_.calc_function(mem_, "nlp_hess_l");
+      if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
+      if (solver_.convexify_) {
+          if (convexify_eval(&solver_.convexify_data_.config, values, values, mem_->iw, mem_->w)) return false;
+      }
+      return true;
     } else {
       // Get the sparsity pattern
       casadi_int ncol = solver_.hesslag_sp_.size2();

@@ -191,6 +191,12 @@ namespace casadi {
     Dict var_string_md_, var_integer_md_, var_numeric_md_,
       con_string_md_, con_integer_md_, con_numeric_md_;
 
+    /// Data for convexification
+    ConvexifyData convexify_data_;
+
+    /// convexify?
+    bool convexify_;
+
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
 

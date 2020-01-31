@@ -27,6 +27,7 @@
 #define CASADI_CODE_GENERATOR_HPP
 
 #include "function.hpp"
+
 #include <map>
 #include <set>
 #include <sstream>
@@ -298,6 +299,10 @@ namespace casadi {
     /** \brief regularize */
     std::string regularize(const Sparsity& sp_h, const std::string& h, const std::string& reg);
 
+    /** \brief convexify */
+    std::string convexify_eval(const ConvexifyData& d,
+      const std::string& Hin, const std::string& Hout, const std::string& iw, const std::string& w);
+
     /** \brief low */
     std::string low(const std::string& x, const std::string& grid,
       casadi_int ng, casadi_int lookup_mode);
@@ -312,6 +317,7 @@ namespace casadi {
     enum Auxiliary {
       AUX_COPY,
       AUX_CVX,
+      AUX_CONVEXIFY,
       AUX_SWAP,
       AUX_SCAL,
       AUX_AXPY,

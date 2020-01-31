@@ -26,6 +26,7 @@
 
 #include "code_generator.hpp"
 #include "function_internal.hpp"
+#include "convexify.hpp"
 #include <casadi_runtime_str.h>
 #include <iomanip>
 
@@ -1109,6 +1110,13 @@ namespace casadi {
       add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_cvx_str, inst);
       break;
+    case AUX_CONVEXIFY:
+      add_auxiliary(AUX_CVX);
+      add_auxiliary(AUX_PROJECT);
+      add_auxiliary(AUX_REGULARIZE);
+      add_auxiliary(AUX_COPY);
+      this->auxiliaries << sanitize_source(casadi_convexify_str, inst);
+      break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
                         << "(" << (this->cpp ? "static_cast<double>(x)" : "(double) x") << ")\n\n";
@@ -1877,6 +1885,13 @@ namespace casadi {
   regularize(const Sparsity& sp_h, const std::string& h, const std::string& reg) {
     add_auxiliary(CodeGenerator::AUX_REGULARIZE);
     return "casadi_regularize(" + sparsity(sp_h) + ", " + h + ", " + reg + ");";
+  }
+
+  std::string CodeGenerator::
+  convexify_eval(const ConvexifyData &d,
+    const std::string& Hin, const std::string& Hout, const std::string& iw, const std::string& w) {
+      add_auxiliary(CodeGenerator::AUX_CONVEXIFY);
+      return Convexify::generate(*this, d, Hin, Hout, iw, w);
   }
 
   std::string CodeGenerator::

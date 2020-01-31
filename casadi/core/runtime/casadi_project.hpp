@@ -2,6 +2,7 @@
 // SYMBOL "project"
 template<typename T1>
 void casadi_project(const T1* x, const casadi_int* sp_x, T1* y, const casadi_int* sp_y, T1* w) {
+  // x and y should be distinct
   casadi_int ncol_x, ncol_y, i, el;
   const casadi_int *colind_x, *row_x, *colind_y, *row_y;
   ncol_x = sp_x[1];
