@@ -49,7 +49,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Generate the code to a stream
-    void dump(std::ostream& s);
+    void dump(std::ostream& s, const std::string& body);
 #endif // SWIG
 
     /// Generate a file, return code as string
@@ -150,7 +150,7 @@ namespace casadi {
     void scope_enter();
 
     /** \brief Exit a local scope */
-    void scope_exit();
+    void scope_exit(std::ostream& s);
 
     /** \brief Declare a work vector element */
     std::string sx_work(casadi_int i);
@@ -443,11 +443,11 @@ namespace casadi {
 
     /** \brief  Print casadi_int vector to a c file */
     void print_vector(std::ostream &s, const std::string& name,
-                             const std::vector<casadi_int>& v, casadi_int align=1);
+                             const std::vector<casadi_int>& v, casadi_int align=1, bool external=false);
 
     /** \brief  Print real vector to a c file */
     void print_vector(std::ostream &s, const std::string& name,
-                             const std::vector<double>& v, casadi_int align=1);
+                             const std::vector<double>& v, casadi_int align=1, bool external=false);
 
     /** \brief Create a copy operation */
     std::string copy(const std::string& arg, std::size_t n, const std::string& res);
@@ -612,6 +612,9 @@ namespace casadi {
     std::stringstream body;
     std::stringstream header;
     std::stringstream buffer;
+
+    std::map<std::string, std::string> body_parts;
+    std::stringstream casadi_headers;
 
     // Are we at a new line?
     bool newline_;

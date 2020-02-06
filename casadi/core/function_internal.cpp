@@ -2150,23 +2150,28 @@ namespace casadi {
       }
     }
 
+    std::stringstream s;
+
     // Reset local variables, flush buffer
-    g.flush(g.body);
+    g.flush(s);
 
     g.scope_enter();
-
 
     // Generate function body (to buffer)
     codegen_body(g, inst);
 
-    g.scope_exit();
+    g.scope_exit(s);
 
     // Finalize the function
     if (!vectorize || !is_a("SXFunction", false)) g << "return 0;\n";
     g << "}\n\n";
 
     // Flush to function body
-    g.flush(g.body);
+    g.flush(s);
+    g.body_parts[fname] = s.str();
+
+    g.casadi_headers << signature(fname) << ";\n";
+
   }
 
   std::string FunctionInternal::signature(const std::string& fname, bool vectorize) const {
