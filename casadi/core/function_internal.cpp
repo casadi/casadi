@@ -1762,10 +1762,12 @@ namespace casadi {
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
     // Define function
     g << "/* " << definition() << " */\n";
-    g << "static " << signature(fname) << " {\n";
 
+
+    g.body_parts[fname] = std::stringstream();
+    g << signature(fname) << " {\n";
     // Reset local variables, flush buffer
-    g.flush(g.body);
+    g.flush(g.body_parts[fname]);
     g.local_variables_.clear();
     g.local_default_.clear();
 
@@ -1780,14 +1782,14 @@ namespace casadi {
 
     // Codegen local variables
     for (auto&& e : local_variables_by_type) {
-      g.body << "  " << e.first;
+      g.body_parts[fname] << "  " << e.first;
       for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
-        g.body << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
+        g.body_parts[fname] << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
         // Insert definition, if any
         auto k=g.local_default_.find(it->first);
-        if (k!=g.local_default_.end()) g.body << "=" << k->second;
+        if (k!=g.local_default_.end()) g.body_parts[fname] << "=" << k->second;
       }
-      g.body << ";\n";
+      g.body_parts[fname] << ";\n";
     }
 
     // Finalize the function
@@ -1795,7 +1797,10 @@ namespace casadi {
     g << "}\n\n";
 
     // Flush to function body
-    g.flush(g.body);
+    g.flush(g.body_parts[fname]);
+
+    g.casadi_headers << signature(fname) << ";\n";
+
   }
 
   std::string FunctionInternal::signature(const std::string& fname) const {
