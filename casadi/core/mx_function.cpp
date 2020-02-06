@@ -128,7 +128,7 @@ namespace casadi {
     }
 
     // Sort from high to low, retaining order when equal
-    std::stable_sort(temp_sort.begin(), temp_sort.end(), [](auto a, auto b) {
+    std::stable_sort(temp_sort.begin(), temp_sort.end(), [](const SortPair& a, const SortPair& b) {
         return a.align > b.align;
     });
 
