@@ -47,7 +47,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Generate the code to a stream
-    void dump(std::ostream& s, const std::stringstream& body) const;
+    void dump(std::ostream& s, const std::string& body) const;
 #endif // SWIG
 
     /// Generate a file, return code as string
@@ -417,7 +417,7 @@ namespace casadi {
     std::stringstream header;
     std::stringstream buffer;
 
-    std::map<std::string, std::stringstream> body_parts;
+    std::map<std::string, std::string> body_parts;
     std::stringstream casadi_headers;
 
     // Are we at a new line?

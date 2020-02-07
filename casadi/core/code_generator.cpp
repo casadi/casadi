@@ -191,7 +191,7 @@ namespace casadi {
 
   string CodeGenerator::dump() const {
     stringstream s;
-    dump(s, body);
+    dump(s, body.str());
     return s.str();
   }
 
@@ -336,7 +336,7 @@ namespace casadi {
     file_open(s, fullname);
 
     // Dump code to file
-    dump(s, body);
+    dump(s, body.str());
 
     // Mex entry point
     if (this->mex) generate_mex(s);
@@ -449,7 +449,7 @@ namespace casadi {
       << "}\n";
   }
 
-  void CodeGenerator::dump(std::ostream& s, const std::stringstream& body) const {
+  void CodeGenerator::dump(std::ostream& s, const std::string& body) const {
     // Consistency check
     casadi_assert_dev(current_indent_ == 0);
 
@@ -514,7 +514,7 @@ namespace casadi {
     s << casadi_headers.str();
 
     // Codegen body
-    s << body.str();
+    s << body;
 
     // End with new line
     s << endl;
