@@ -108,7 +108,7 @@ namespace casadi {
 
 
   /* Re-order work vector from large to small alignment, to avoid excessive padding
-   *  
+   *
    * Algorithm elements arg and res will be updated
    * align vector will be updated
   */
@@ -407,7 +407,7 @@ namespace casadi {
     std::vector<size_t> align(worksize);
     get_align(algorithm_, align);
     // Re-order work vector with large alignments upfront
-    reorder_align(algorithm_, align);
+    //reorder_align(algorithm_, align);
 
     // Max alignment for io related work vector elements
     size_t align_w_io = align.empty() ? 1 : *std::max_element(align.begin(), align.end());
@@ -450,6 +450,7 @@ namespace casadi {
     size_t sz_w_io = wind;
     workloc_.back()=sz_w_io;
 
+    //uout() << "workloc(before)" << workloc_ << std::endl;
     // Exported memory requirement has both io part and extra part
     // Let's pick the order that requires least padding
     if (align_w_extra>=align_w_io) {
@@ -468,6 +469,8 @@ namespace casadi {
       }
       w_extra_offset_ = sz_w_io;
     }
+
+    //uout() << "workloc(after)" << workloc_ << std::endl;
 
     // Total working memory requirement
     alloc_w(sz_w_io+sz_w_extra);
