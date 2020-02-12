@@ -119,6 +119,12 @@ namespace casadi {
     size_t sz_w() const override;
 
     /// Alignment (bytes) for specific input argument
+    virtual size_t align_in(casadi_int iind) const { return 64; }
+
+    /// Alignment (bytes) for specific output argument
+    virtual size_t align_out(casadi_int oind) const { return 64; }
+
+    /// Alignment (bytes) for specific input argument
     size_t align_w() const override;
 
     /** \brief Serialize an object without type information */

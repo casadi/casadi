@@ -163,8 +163,14 @@ namespace casadi {
     // Input buffer
     g << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
-      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    if (str(f_).find("SXFunction")!= std::string::npos) {
+      g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
+        << "#pragma omp simd\n"
+        << "for (i=0; i<" << n_ << "; ++i) {\n";
+    } else {
+      g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
+        << "for (i=0; i<" << n_ << "; ++i) {\n";
+    }
     // Evaluate
     if (str(f_).find("SXFunction")!= std::string::npos) {
       g << g(f_, "arg1", "res1", "iw", "w", inst) << ";\n";

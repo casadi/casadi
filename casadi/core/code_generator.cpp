@@ -42,7 +42,7 @@ namespace casadi {
     this->main = false;
     this->casadi_real_type = "double";
     this->casadi_int_type = CASADI_INT_TYPE_STR;
-    this->codegen_scalars = false;
+    this->codegen_scalars = true;
     this->with_header = false;
     this->with_mem = false;
     this->with_export = true;
