@@ -58,9 +58,9 @@ namespace casadi {
 
   LinearInterpolant::
   LinearInterpolant(const string& name,
-                    const std::vector<double>& grid,
+                    const MX& grid,
                     const std::vector<casadi_int>& offset,
-                    const vector<double>& values,
+                    const MX& values,
                     casadi_int m)
                     : Interpolant(name, grid, offset, values, m) {
   }
@@ -87,20 +87,16 @@ namespace casadi {
   int LinearInterpolant::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (res[0]) {
-      const double* values = has_parametric_values() ? arg[arg_values()] : get_ptr(values_);
-      const double* grid = has_parametric_grid() ? arg[arg_grid()] : get_ptr(grid_);
-      casadi_interpn(res[0], ndim_, grid, get_ptr(offset_),
-                    values, arg[0], get_ptr(lookup_mode_), m_, iw, w);
+      casadi_interpn(res[0], ndim_, get_ptr(*grid_ptr_), get_ptr(offset_),
+                    get_ptr(*values_ptr_), arg[0], get_ptr(lookup_mode_), m_, iw, w);
     }
     return 0;
   }
 
   void LinearInterpolant::codegen_body(CodeGenerator& g) const {
-    std::string values = has_parametric_values() ? g.arg(arg_values()) : g.constant(values_);
-    std::string grid = has_parametric_grid() ? g.arg(arg_grid()) : g.constant(grid_);
     g << "  if (res[0]) {\n"
-      << "    " << g.interpn("res[0]", ndim_, grid, g.constant(offset_),
-      values, "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
+      << "    " << g.interpn("res[0]", ndim_, codegen_grid(g), g.constant(offset_),
+      codegen_values(g), "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
       << "  }\n";
   }
 
@@ -143,32 +139,16 @@ namespace casadi {
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = derivative_of_.get<LinearInterpolant>();
 
-    const double* values = has_parametric_values() ? arg[m->arg_values()] : get_ptr(m->values_);
-    const double* grid = has_parametric_grid() ? arg[m->arg_grid()] : get_ptr(m->grid_);
-
-    casadi_interpn_grad(res[0], m->ndim_, grid, get_ptr(m->offset_),
-                      values, arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
+    casadi_interpn_grad(res[0], m->ndim_, get_ptr(*m->grid_ptr_), get_ptr(m->offset_),
+                      get_ptr(*m->values_ptr_), arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
     return 0;
   }
 
-  bool LinearInterpolantJac::has_parametric_values() const {
-    auto m = derivative_of_.get<LinearInterpolant>();
-    return m->has_parametric_values();
-  }
-
-  bool LinearInterpolantJac::has_parametric_grid() const {
-    auto m = derivative_of_.get<LinearInterpolant>();
-    return m->has_parametric_grid();
-  }
-
   void LinearInterpolantJac::codegen_body(CodeGenerator& g) const {
-
     auto m = derivative_of_.get<LinearInterpolant>();
-    std::string values = has_parametric_values() ? g.arg(m->arg_values()) : g.constant(m->values_);
-    std::string grid = has_parametric_grid() ? g.arg(m->arg_grid()) : g.constant(m->grid_);
 
     g << "  " << g.interpn_grad("res[0]", m->ndim_,
-      grid, g.constant(m->offset_), values,
+      m->codegen_grid(g), g.constant(m->offset_), m->codegen_values(g),
       "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";
   }
 
@@ -210,9 +190,9 @@ namespace casadi {
 
 
   Function LinearInterpolant::do_inline(const std::string& name,
-                    const std::vector<double>& grid,
+                    const MX& grid,
                     const std::vector<casadi_int>& offset,
-                    const std::vector<double>& values,
+                    const MX& values,
                     casadi_int m,
                     const Dict& opts) {
 
@@ -220,31 +200,18 @@ namespace casadi {
     casadi_int ndim = offset.size()-1;
 
     MX x = MX::sym("x", ndim);
-    MX g;
-    if (grid.empty()) {
-      g = MX::sym("g", offset.back());
-    } else {
-      g = MX(DM(grid));
-    }
-    MX c;
-    if (values.empty()) {
-      c = MX::sym("c", Interpolant::coeff_size(offset, m));
-    } else {
-      c = MX(DM(values));
-    }
-
-    MX f = MX::interpn_linear(vertsplit(g, offset), c, vertsplit(x), opts);
+    MX f = MX::interpn_linear(vertsplit(grid, offset), values, vertsplit(x), opts);
 
     std::vector<MX> args = {x};
     std::vector<std::string> arg_names = {"x"};
-    if (grid.empty()) {
-      args.push_back(g);
+    //if (grid.empty()) {
+      args.push_back(grid);
       arg_names.push_back("g");
-    }
-    if (values.empty()) {
-      args.push_back(c);
+    //}
+    //if (values.empty()) {
+      args.push_back(values);
       arg_names.push_back("c");
-    }
+    //}
 
     return Function(name, args, {f.T()}, arg_names, {"f"});
   }

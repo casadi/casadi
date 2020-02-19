@@ -707,8 +707,8 @@ namespace casadi {
   }
 
   Function Function::bspline(const std::string &name,
-      const std::vector< std::vector<double> >& knots,
-      const vector<double>& coeffs, const vector<casadi_int>& degree,
+      const std::vector< MX >& knots,
+      const MX& coeffs, const vector<casadi_int>& degree,
         casadi_int m, const Dict& opts) {
     try {
       MX x = MX::sym("x", degree.size());
@@ -716,7 +716,7 @@ namespace casadi {
       Dict opts_remainder = extract_from_dict(opts, "lookup_mode", lookup_mode);
       Dict opts_bspline;
       opts_bspline["lookup_mode"] = lookup_mode;
-      MX y = MX::bspline(x, DM(coeffs), knots, degree, m, opts_bspline);
+      MX y = MX::bspline(x, coeffs, knots, degree, m, opts_bspline);
       return Function(name, {x}, {y}, opts_remainder);
     } catch (exception& e) {
       THROW_ERROR_NOOBJ("bspline", e.what(), "BSpline");
@@ -730,6 +730,11 @@ namespace casadi {
     } catch (exception& e) {
       THROW_ERROR_NOOBJ("if_else", e.what(), "Switch");
     }
+  }
+
+
+  char Function::type() const {
+    return (*this)->type();
   }
 
   casadi_int Function::n_in() const {
@@ -1760,6 +1765,10 @@ namespace casadi {
 
   Function Function::conf(const std::string& name, const std::vector<MX>& args) {
     return Function(name, args, Gate::gates());
+  }
+
+  void Function::conf_clean() {
+    return Gate::gates_clean();
   }
 
 } // namespace casadi

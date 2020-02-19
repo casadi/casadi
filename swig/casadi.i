@@ -3531,22 +3531,6 @@ casadi_graph_substitute(const std::vector< M > &ex,
   return graph_substitute(ex, v, vdef);
 }
 DECL M casadi_bspline(const M& x,
-        const DM& coeffs,
-        const std::vector< std::vector<double> >& knots,
-        const std::vector<casadi_int>& degree,
-        casadi_int m,
-        const Dict& opts = Dict()) {
-  return bspline(x, coeffs, knots, degree, m, opts);
-}
-DECL M casadi_bspline(const M& x,
-        const M& coeffs,
-        const std::vector< std::vector<double> >& knots,
-        const std::vector<casadi_int>& degree,
-        casadi_int m,
-        const Dict& opts = Dict()) {
-  return bspline(x, coeffs, knots, degree, m, opts);
-}
-DECL M casadi_bspline(const M& x,
         const M& coeffs,
         const std::vector< MX >& knots,
         const std::vector<casadi_int>& degree,

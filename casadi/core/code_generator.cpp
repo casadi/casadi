@@ -1107,9 +1107,11 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_sum_viol_str, inst);
       break;
     case AUX_VFMIN:
+      add_auxiliary(AUX_FMIN);
       this->auxiliaries << sanitize_source(casadi_vfmin_str, inst);
       break;
     case AUX_VFMAX:
+      add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_vfmax_str, inst);
       break;
     case AUX_REGULARIZE:
@@ -1145,6 +1147,16 @@ namespace casadi {
       add_auxiliary(AUX_REGULARIZE);
       add_auxiliary(AUX_COPY);
       this->auxiliaries << sanitize_source(casadi_convexify_str, inst);
+      break;
+    case AUX_MMIN:
+      add_auxiliary(AUX_VFMIN);
+      add_auxiliary(AUX_INF);
+      this->auxiliaries << sanitize_source(casadi_mmin_str, inst);
+      break;
+    case AUX_MMAX:
+      add_auxiliary(AUX_VFMAX);
+      add_auxiliary(AUX_INF);
+      this->auxiliaries << sanitize_source(casadi_mmax_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
@@ -1885,6 +1897,17 @@ namespace casadi {
     return "casadi_min(" + x + ", " + y + ")";
   }
 
+  std::string CodeGenerator::
+  mmax(const std::string& x, std::size_t n, bool dense) {
+    add_auxiliary(CodeGenerator::AUX_MMAX);
+    return "casadi_mmax(" + x + ", " + str(n) + ", " + str(int(dense)) + ")";
+  }
+
+  std::string CodeGenerator::
+  mmin(const std::string& x, std::size_t n, bool dense) {
+    add_auxiliary(CodeGenerator::AUX_MMIN);
+    return "casadi_mmin(" + x + ", " + str(n) + ", " + str(int(dense)) + ")";
+  }
 
   std::string CodeGenerator::
   max_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {

@@ -628,6 +628,8 @@ namespace casadi {
     /** \brief Jit dependencies */
     virtual void jit_dependencies(const std::string& fname) {}
 
+    virtual char type() const { return 0; }
+    
     /** \brief Export function in a specific language */
     virtual void export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const;

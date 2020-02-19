@@ -42,9 +42,9 @@ namespace casadi {
   public:
     /// Constructor
     Interpolant(const std::string& name,
-                const std::vector<double>& grid,
+                const MX& grid,
                 const std::vector<casadi_int>& offset,
-                const std::vector<double>& values,
+                const MX& values,
                 casadi_int m);
 
     /// Destructor
@@ -52,14 +52,6 @@ namespace casadi {
 
     /** \brief Get type name */
     std::string class_name() const override {return "Interpolant";}
-
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return 1+has_parametric_values()+has_parametric_grid();}
-    size_t get_n_out() override { return 1;}
-    ///@}
-
-    bool is_diff_in(casadi_int i) override { return i==0; }
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
@@ -82,12 +74,10 @@ namespace casadi {
     /// Initialize
     void init(const Dict& opts) override;
 
-    /// Convert from (optional) lookup modes labels to enum
-    static std::vector<casadi_int> interpret_lookup_mode(const std::vector<std::string>& modes,
-        const std::vector<double>& grid, const std::vector<casadi_int>& offset,
-        const std::vector<casadi_int>& margin_left=std::vector<casadi_int>(),
-        const std::vector<casadi_int>& margin_right=std::vector<casadi_int>());
+    /// Finalize initialization
+    void finalize() override;
 
+    /// Convert from (optional) lookup modes labels to enum
     static std::vector<casadi_int> interpret_lookup_mode(const std::vector<std::string>& modes,
         const MX& grid, const std::vector<casadi_int>& offset,
         const std::vector<casadi_int>& margin_left=std::vector<casadi_int>(),
@@ -99,8 +89,7 @@ namespace casadi {
     static void stack_grid(const std::vector< MX >& grid,
       std::vector<casadi_int>& offset, MX& stacked);
 
-    static void check_grid(const std::vector< std::vector<double> >& grid);
-    static void check_grid(const std::vector<casadi_int>& grid);
+    static void check_grid(const std::vector<MX>& grid);
 
     static std::vector< std::vector<double> > parse_grid(const std::vector< DM >& grid);
     static std::vector<MX> parse_grid(const std::vector< MX >& grid) { return grid; }
@@ -108,27 +97,28 @@ namespace casadi {
     static MX parse_grid(const MX & grid) { return grid; }
 
     static std::vector<double> meshgrid(const std::vector< std::vector<double> >& grid);
-    static DM meshgrid(const std::vector< DM >& grid);
+    template<typename T>
+    static T meshgrid(const std::vector< T >& grid);
 
     // Creator function for internal class
     typedef Interpolant* (*Creator)(const std::string& name,
-                                    const std::vector<double>& grid,
+                                    const MX& grid,
                                     const std::vector<casadi_int>& offset,
-                                    const std::vector<double>& values,
+                                    const MX& values,
                                     casadi_int m);
 
     /** \brief  Comstruct a new Interpolant */
     static Function construct(const std::string& solver, const std::string& name,
-                      const std::vector<double>& grid,
+                      const MX& grid,
                       const std::vector<casadi_int>& offset,
-                      const std::vector<double>& values,
+                      const MX& values,
                       casadi_int m,
                       const Dict& opts);
 
     typedef Function (* DoInline)(const std::string& name,
-                    const std::vector<double>& grid,
+                    const MX& grid,
                     const std::vector<casadi_int>& offset,
-                    const std::vector<double>& values,
+                    const MX& values,
                     casadi_int m,
                     const Dict& opts);
 
@@ -151,16 +141,27 @@ namespace casadi {
     casadi_int batch_x_;
 
     // Input grid
-    std::vector<double> grid_;
+    const std::vector<double>* grid_ptr_;
 
     // Offset for each dimension
     std::vector<casadi_int> offset_;
 
     // Values at gridpoints
-    std::vector<double> values_;
+    const std::vector<double>* values_ptr_;
 
     // Lookup modes
     std::vector<std::string> lookup_modes_;
+
+    MX grid_;
+    std::vector<double> grid_vec_;
+    MX values_;
+    std::vector<double> values_vec_;
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void codegen_declarations(CodeGenerator& g) const;
+
+    std::string codegen_values(CodeGenerator& g) const;
+    std::string codegen_grid(CodeGenerator& g) const;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
@@ -172,29 +173,33 @@ namespace casadi {
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
-    /** \brief Is parametric? */
-    bool has_parametric_values() const { return values_.empty(); }
-
-    /** \brief Is parametric? */
-    bool has_parametric_grid() const { return grid_.empty(); }
-
-    casadi_int arg_values() const;
-    casadi_int arg_grid() const;
-
     /** \brief Size of the flattened coefficients vector */
     casadi_int coeff_size() const;
     static casadi_int coeff_size(const std::vector<casadi_int>& offset, casadi_int m);
 
+    char type() const override;
+    
   protected:
-
-    bool arg_values(casadi_int i) const;
-    bool arg_grid(casadi_int i) const;
 
     /** \brief Deserializing constructor */
     explicit Interpolant(DeserializingStream& s);
 
 
   };
+
+
+  template<typename M>
+  M meshgrid_fund(const M& next, const std::vector<M>& grid) {
+    if (grid.empty()) return next;
+    M n = horzcat(repmat(next, grid.front().size1()), vec(repmat(grid.front().T(), next.size1(), 1)));
+    return meshgrid_fund(n, std::vector<M>(grid.begin()+1, grid.end()));
+  }
+
+  template<typename M>
+  M Interpolant::meshgrid(const std::vector< M >& grid) {
+    M ret = meshgrid_fund(grid.front(), std::vector<M>(grid.begin()+1, grid.end()));
+    return vec(ret.T());
+  }
 
 } // namespace casadi
 /// \endcond

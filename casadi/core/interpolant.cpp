@@ -72,25 +72,17 @@ namespace casadi {
     stacked = vertcat(grid);
   }
 
-  void Interpolant::check_grid(const std::vector< std::vector<double> >& grid) {
+  void Interpolant::check_grid(const std::vector<MX> & grid) {
     // Dimension at least 1
-    casadi_assert(!grid.empty(), "At least one input required");
+    casadi_assert(!grid.empty(), "At least one dimension required");
 
     // Grid must be strictly increasing
-    for (auto&& g : grid) {
-      casadi_assert(is_increasing(g), "Gridpoints must be strictly increasing");
-      casadi_assert(is_regular(g), "Gridpoints must be regular");
-      casadi_assert(g.size()>=2, "Need at least two grid points for every input");
-    }
-  }
-
-  void Interpolant::check_grid(const std::vector<casadi_int> & grid_dims) {
-    // Dimension at least 1
-    casadi_assert(!grid_dims.empty(), "At least one dimension required");
-
-    // Grid must be strictly increasing
-    for (casadi_int d : grid_dims) {
-      casadi_assert(d>=2, "Need at least two grid points for every input");
+    for (const auto& e : grid) {
+      casadi_assert(e.is_dense() && e.is_vector(), "Grid component must be dense vector.");
+      casadi_assert(e.numel()>=2, "Need at least two grid points for every input");
+      //casadi_assert(is_increasing(g), "Gridpoints must be strictly increasing");
+      //casadi_assert(is_regular(g), "Gridpoints must be regular");
+      //casadi_assert(g.size()>=2, "Need at least two grid points for every input");
     }
   }
 
@@ -106,17 +98,6 @@ namespace casadi {
     casadi_assert_dev(grid.is_vector());
     casadi_assert_dev(grid.is_dense());
     return grid.nonzeros();
-  }
-
-  DM meshgrid_fund(const DM& next, const std::vector<DM>& grid) {
-    if (grid.empty()) return next;
-    DM n = horzcat(repmat(next, grid.front().size1()), vec(repmat(grid.front().T(), next.size1(), 1)));
-    return meshgrid_fund(n, std::vector<DM>(grid.begin()+1, grid.end()));
-  }
-
-  DM Interpolant::meshgrid(const std::vector< DM >& grid) {
-    DM ret = meshgrid_fund(grid.front(), std::vector<DM>(grid.begin()+1, grid.end()));
-    return vec(ret.T());
   }
 
   std::vector<double> Interpolant::meshgrid(const std::vector< std::vector<double> >& grid) {
@@ -163,33 +144,45 @@ namespace casadi {
 
   Function interpolant(const std::string& name,
                        const std::string& solver,
-                       const std::vector<std::vector<double> >& grid,
-                       const std::vector<double>& values,
+                       const std::vector<MX>& grid,
+                       const MX& values,
                        const Dict& opts) {
-      Interpolant::check_grid(grid);
-      // Get offset for each input dimension
-      vector<casadi_int> offset;
-      // Stack input grids
-      vector<double> stacked;
+    casadi_assert(values.is_dense() && values.is_vector(), "Values must be a dense vector.");
 
-       // Consistency check, number of elements
-      casadi_uint nel=1;
-       for (auto&& g : grid) nel *= g.size();
-       casadi_assert(values.size() % nel== 0,
-         "Inconsistent number of elements. Must be a multiple of " +
-         str(nel) + ", but got " + str(values.size()) + " instead.");
+    MX values_p = values;
+    if (values_p->type_==MXNode::MX_NONE) values_p = evalf(values_p);
 
-      Interpolant::stack_grid(grid, offset, stacked);
+    std::vector<MX> grid_p = grid;
+    for (auto& e : grid_p) {
+      if (e->type_==MXNode::MX_NONE) e = evalf(e);
+    }
 
-      casadi_int m = values.size()/nel;
-      return Interpolant::construct(solver, name, stacked, offset, values, m, opts);
+    Interpolant::check_grid(grid);
+    // Get offset for each input dimension
+    vector<casadi_int> offset;
+    // Stack input grids
+    MX stacked;
+
+      // Consistency check, number of elements
+    casadi_uint nel=1;
+      for (auto&& g : grid) nel *= g.numel();
+      casadi_assert(values.numel() % nel== 0,
+        "Inconsistent number of elements. Must be a multiple of " +
+        str(nel) + ", but got " + str(values.numel()) + " instead.");
+
+    Interpolant::stack_grid(grid, offset, stacked);
+
+    if (stacked->type_==MXNode::MX_NONE) stacked = evalf(stacked);
+
+    casadi_int m = values.numel()/nel;
+    return Interpolant::construct(solver, name, stacked, offset, values, m, opts);
   }
 
   Function Interpolant::construct(const std::string& solver,
                     const std::string& name,
-                    const std::vector<double>& grid,
+                    const MX& grid,
                     const std::vector<casadi_int>& offset,
-                    const std::vector<double>& values,
+                    const MX& values,
                     casadi_int m,
                     const Dict& opts) {
     bool do_inline = false;
@@ -207,57 +200,18 @@ namespace casadi {
     }
   }
 
-  Function interpolant(const std::string& name,
-                       const std::string& solver,
-                       const std::vector<casadi_int>& grid_dims,
-                       const std::vector<double>& values,
-                       const Dict& opts) {
-      Interpolant::check_grid(grid_dims);
-
-       // Consistency check, number of elements
-      casadi_uint nel = product(grid_dims);
-       casadi_assert(values.size() % nel== 0,
-         "Inconsistent number of elements. Must be a multiple of " +
-         str(nel) + ", but got " + str(values.size()) + " instead.");
-
-      casadi_int m = values.size()/nel;
-      return Interpolant::construct(solver, name, std::vector<double>{},
-        cumsum0(grid_dims), values, m, opts);
-  }
-
-  Function interpolant(const std::string& name,
-                       const std::string& solver,
-                       const std::vector<std::vector<double> >& grid,
-                       casadi_int m,
-                       const Dict& opts) {
-      Interpolant::check_grid(grid);
-
-      // Get offset for each input dimension
-      vector<casadi_int> offset;
-      // Stack input grids
-      vector<double> stacked;
-
-      Interpolant::stack_grid(grid, offset, stacked);
-      return Interpolant::construct(solver, name, stacked, offset, std::vector<double>{}, m, opts);
-  }
-
-  Function interpolant(const std::string& name,
-                       const std::string& solver,
-                       const std::vector<casadi_int>& grid_dims,
-                       casadi_int m,
-                       const Dict& opts) {
-      Interpolant::check_grid(grid_dims);
-      return Interpolant::construct(solver, name, std::vector<double>{},
-        cumsum0(grid_dims), std::vector<double>{}, m, opts);
-  }
-
   Interpolant::
   Interpolant(const std::string& name,
-              const std::vector<double>& grid,
+              const MX& grid,
               const std::vector<casadi_int>& offset,
-              const std::vector<double>& values,
+              const MX& values,
               casadi_int m)
-              : FunctionInternal(name), m_(m), grid_(grid), offset_(offset),  values_(values) {
+              : FunctionInternal(name), m_(m), offset_(offset), grid_(grid), values_(values) {
+
+
+    if (values_->type_ & MXNode::MX_PAR) values_ = values_->get_gate();
+    if (grid_->type_ & MXNode::MX_PAR) grid_ = grid_->get_gate();
+
     // Number of grid points
     ndim_ = offset_.size()-1;
   }
@@ -265,11 +219,13 @@ namespace casadi {
   Interpolant::~Interpolant() {
   }
 
+  char Interpolant::type() const {
+    return values_->type_ | grid_->type_;
+  }
+
   Sparsity Interpolant::get_sparsity_in(casadi_int i) {
-    if (i==0) return Sparsity::dense(ndim_, batch_x_);
-    if (arg_values(i)) return Sparsity::dense(coeff_size());
-    if (arg_grid(i)) return Sparsity::dense(offset_.back());
-    casadi_assert_dev(false);
+    casadi_assert_dev(i==0);
+    return Sparsity::dense(ndim_, batch_x_);
   }
 
   Sparsity Interpolant::get_sparsity_out(casadi_int i) {
@@ -279,8 +235,6 @@ namespace casadi {
 
   std::string Interpolant::get_name_in(casadi_int i) {
     if (i==0) return "x";
-    if (arg_values(i)) return "c";
-    if (arg_grid(i)) return "g";
     casadi_assert_dev(false);
   }
 
@@ -312,24 +266,6 @@ namespace casadi {
      }
   };
 
-  bool Interpolant::arg_values(casadi_int i) const {
-    if (!has_parametric_values()) return false;
-    return arg_values()==i;
-  }
-  bool Interpolant::arg_grid(casadi_int i) const {
-    if (!has_parametric_grid()) return false;
-    return arg_grid()==i;
-  }
-
-  casadi_int Interpolant::arg_values() const {
-    casadi_assert_dev(has_parametric_values());
-    return 1+has_parametric_grid();
-  }
-  casadi_int Interpolant::arg_grid() const {
-    casadi_assert_dev(has_parametric_grid());
-    return 1;
-  }
-
   void Interpolant::init(const Dict& opts) {
 
     batch_x_ = 1;
@@ -351,6 +287,27 @@ namespace casadi {
     alloc_iw(2*ndim_, true);
   }
 
+
+  void Interpolant::finalize() {
+
+    try {
+      grid_ptr_ = &static_cast<const std::vector<double> &>(grid_);
+    } catch (...) {
+      grid_vec_ = static_cast<DM>(grid_).nonzeros();
+      grid_ptr_ = &grid_vec_;
+    }
+    try {
+      values_ptr_ = &static_cast<const std::vector<double> &>(values_);
+    } catch (...) {
+      values_vec_ = static_cast<DM>(values_vec_).nonzeros();
+      values_ptr_ = &values_vec_;
+    }
+
+    // Recursive call
+    FunctionInternal::finalize();
+  }
+
+/**
   std::vector<casadi_int> Interpolant::interpret_lookup_mode(
       const std::vector<std::string>& modes, const std::vector<double>& knots,
       const std::vector<casadi_int>& offset,
@@ -378,7 +335,7 @@ namespace casadi {
     }
     return ret;
   }
-
+*/
   std::vector<casadi_int> Interpolant::interpret_lookup_mode(
       const std::vector<std::string>& modes, const MX& knots,
       const std::vector<casadi_int>& offset,
@@ -428,6 +385,23 @@ namespace casadi {
     } else {
       s.unpack("Interpolant::batch_x", batch_x_);
     }
+  }
+
+  void Interpolant::codegen_declarations(CodeGenerator& g) const {
+    if (values_->type_ & MXNode::MX_PAR) {
+      g.define_rw_double(values_.get(), values_.nnz());
+    }
+    if (grid_->type_ & MXNode::MX_PAR) {
+      g.define_rw_double(grid_.get(), grid_.nnz());
+    }
+  }
+
+  std::string Interpolant::codegen_values(CodeGenerator& g) const {
+    return (values_->type_ & MXNode::MX_PAR) ? g.rw_double(values_.get()) : g.constant(*values_ptr_);
+  }
+
+  std::string Interpolant::codegen_grid(CodeGenerator& g) const {
+    return (grid_->type_ & MXNode::MX_PAR) ? g.rw_double(grid_.get()) : g.constant(*grid_ptr_);
   }
 
 } // namespace casadi

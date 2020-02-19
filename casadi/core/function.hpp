@@ -630,7 +630,7 @@ namespace casadi {
      *  Requires a known coefficient tensor
      */
     static Function bspline(const std::string &name,
-      const std::vector< std::vector<double> >& knots, const std::vector<double>& coeffs,
+      const std::vector< MX >& knots, const MX& coeffs,
       const std::vector<casadi_int>& degree, casadi_int m=1, const Dict& opts=Dict());
 
     /** \brief Constructor (if-else) */
@@ -672,6 +672,8 @@ namespace casadi {
      *        with the same value, then multiple references to the same function will be returned.
      */
     Function reverse(casadi_int nadj) const;
+
+    char type() const;
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
@@ -985,6 +987,8 @@ namespace casadi {
 
 
     static Function conf(const std::string& name, const std::vector<MX>& args);
+    static void conf_clean();
+    
 #ifndef SWIG
     protected:
     ///@{

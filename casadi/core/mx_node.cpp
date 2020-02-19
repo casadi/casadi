@@ -396,6 +396,10 @@ namespace casadi {
     casadi_error("'get_DM' not defined for class " + class_name());
   }
 
+  const std::vector<double>& MXNode::get_double_vec() const {
+    casadi_error("'get_double_vec' not defined for class " + class_name());
+  }
+
   MX MXNode::get_transpose() const {
     if (sparsity().is_scalar()) {
       return shared_from_this<MX>();
@@ -856,26 +860,6 @@ namespace casadi {
     return MX::create(new Low(v, shared_from_this<MX>(), options));
   }
 
-  MX MXNode::get_bspline(const std::vector<double>& knots,
-            const std::vector<casadi_int>& offset,
-            const std::vector<double>& coeffs,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const std::vector<casadi_int>& lookup_mode) const {
-    MX x = shared_from_this<MX>();
-    return MX::create(new BSpline(x, knots, offset, coeffs, degree, m, lookup_mode));
-  }
-
-  MX MXNode::get_bspline(const MX& coeffs,
-            const std::vector<double>& knots,
-            const std::vector<casadi_int>& offset,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const std::vector<casadi_int>& lookup_mode) const {
-    MX x = shared_from_this<MX>();
-    return MX::create(new BSplineParametric(x, coeffs, knots, offset, degree, m, lookup_mode));
-  }
-
   MX MXNode::get_bspline(const MX& coeffs,
             const MX& knots,
             const std::vector<casadi_int>& offset,
@@ -883,7 +867,7 @@ namespace casadi {
             casadi_int m,
             const std::vector<casadi_int>& lookup_mode) const {
     MX x = shared_from_this<MX>();
-    return MX::create(new BSplineFullyParametric(x, coeffs, knots, offset, degree, m, lookup_mode));
+    return MX::create(new BSpline(x, knots, offset, coeffs, degree, m, lookup_mode));
   }
 
   MX MXNode::get_convexify(const Dict& opts) const {
@@ -1171,7 +1155,7 @@ namespace casadi {
     //OP_PRINTME,
     //OP_LIFT,
     //OP_EINSTEIN
-    {OP_BSPLINE, BSplineCommon::deserialize},
+    {OP_BSPLINE, BSpline::deserialize},
     {OP_CONVEXIFY, Convexify::deserialize},
     {OP_GATE, Gate::deserialize},
     {-1, OutputNode::deserialize}

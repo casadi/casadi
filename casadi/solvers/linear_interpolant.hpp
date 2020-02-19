@@ -50,9 +50,9 @@ namespace casadi {
   public:
     // Constructor
     LinearInterpolant(const std::string& name,
-                      const std::vector<double>& grid,
+                      const MX& grid,
                       const std::vector<casadi_int>& offset,
-                      const std::vector<double>& values,
+                      const MX& values,
                       casadi_int m);
 
     // Destructor
@@ -66,17 +66,17 @@ namespace casadi {
 
     /** \brief  Create a new Interpolant */
     static Interpolant* creator(const std::string& name,
-                                const std::vector<double>& grid,
+                                const MX& grid,
                                 const std::vector<casadi_int>& offset,
-                                const std::vector<double>& values,
+                                const MX& values,
                                 casadi_int m) {
       return new LinearInterpolant(name, grid, offset, values, m);
     }
 
     static Function do_inline(const std::string& name,
-                    const std::vector<double>& grid,
+                    const MX& grid,
                     const std::vector<casadi_int>& offset,
-                    const std::vector<double>& values,
+                    const MX& values,
                     casadi_int m,
                     const Dict& opts);
 
@@ -160,10 +160,6 @@ namespace casadi {
 
     /** \brief Serialize type information */
     void serialize_type(SerializingStream &s) const override;
-
-    /** \brief Is parametric? */
-    bool has_parametric_values() const;
-    bool has_parametric_grid() const;
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
     std::string serialize_base_function() const override { return "Interpolant"; }

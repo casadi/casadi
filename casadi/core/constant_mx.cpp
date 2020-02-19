@@ -272,6 +272,10 @@ namespace casadi {
     x_ = DM(sparsity_, v);
   }
 
+  const std::vector<double>& ConstantDM::get_double_vec() const {
+    return x_.nonzeros();
+  }
+
   void ZeroByZero::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
     s.pack("ConstantMX::type", 'z');
