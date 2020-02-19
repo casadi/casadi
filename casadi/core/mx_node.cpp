@@ -59,7 +59,7 @@
 #include "map.hpp"
 #include "bspline.hpp"
 #include "convexify.hpp"
-
+#include "gate.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -77,6 +77,7 @@ namespace casadi {
 
   MXNode::MXNode() {
     temp = 0;
+    type_ = MX_NONE;
   }
 
 
@@ -204,25 +205,29 @@ namespace casadi {
   }
 
   void MXNode::set_dep(const MX& dep) {
-    dep_.resize(1);
-    dep_[0] = dep;
+    set_dep(vector<MX>{dep});
   }
 
   void MXNode::set_dep(const MX& dep1, const MX& dep2) {
-    dep_.resize(2);
-    dep_[0] = dep1;
-    dep_[1] = dep2;
+    set_dep(vector<MX>{dep1, dep2});
   }
 
   void MXNode::set_dep(const MX& dep1, const MX& dep2, const MX& dep3) {
-    dep_.resize(3);
-    dep_[0] = dep1;
-    dep_[1] = dep2;
-    dep_[2] = dep3;
+    set_dep(vector<MX>{dep1, dep2, dep3});
   }
 
   void MXNode::set_dep(const vector<MX>& dep) {
     dep_ = dep;
+    for (const auto& e : dep) {
+      type_ |= e->type_;
+    }
+    if (type_ == MX_MIXED) {
+      for (auto& e : dep_) {
+        if (!(e->type_ & MX_SYM)) {
+          e = e->get_gate();
+        }
+      }
+    }
   }
 
   const Sparsity& MXNode::sparsity(casadi_int oind) const {
@@ -424,6 +429,7 @@ namespace casadi {
   void MXNode::serialize_body(SerializingStream& s) const {
     s.pack("MXNode::deps", dep_);
     s.pack("MXNode::sp", sparsity_);
+    s.pack("MXNode::symbolic", static_cast<char>(type_));
   }
 
   void MXNode::serialize_type(SerializingStream& s) const {
@@ -435,6 +441,9 @@ namespace casadi {
 
     s.unpack("MXNode::deps", dep_);
     s.unpack("MXNode::sp", sparsity_);
+    char type;
+    s.unpack("MXNode::symbolic", type);
+    type_ = static_cast<MXType>(type);
   }
 
 
@@ -871,6 +880,10 @@ namespace casadi {
     return MX::create(new Convexify(shared_from_this<MX>(), opts));
   }
 
+  MX MXNode::get_gate() const {
+    return Gate::create(shared_from_this<MX>());
+  }
+
   MX MXNode::get_det() const {
     return MX::create(new Determinant(shared_from_this<MX>()));
   }
@@ -1150,6 +1163,7 @@ namespace casadi {
     //OP_EINSTEIN
     {OP_BSPLINE, BSplineCommon::deserialize},
     {OP_CONVEXIFY, Convexify::deserialize},
+    {OP_GATE, Gate::deserialize},
     {-1, OutputNode::deserialize}
   };
 

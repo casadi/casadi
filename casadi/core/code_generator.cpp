@@ -527,11 +527,25 @@ namespace casadi {
     file_scope_double_[id] = size;
   }
 
+  void CodeGenerator::define_rw_double(const void* id, casadi_int size) {
+    //auto it = file_scope_double_rw_.find(id);
+    //casadi_assert(it==file_scope_double_rw_.end(), "Already defined.");
+    shorthand("rwd" + str(file_scope_double_rw_.size()));
+    file_scope_double_rw_[id] = size;
+  }
+
   std::string CodeGenerator::rom_double(const void* id) const {
     auto it = file_scope_double_.find(id);
     casadi_assert(it!=file_scope_double_.end(), "Not defined.");
     casadi_int size = std::distance(file_scope_double_.begin(), it);
     return "casadi_rd" + str(size);
+  }
+
+  std::string CodeGenerator::rw_double(const void* id) const {
+    auto it = file_scope_double_rw_.find(id);
+    casadi_assert(it!=file_scope_double_rw_.end(), "Not defined.");
+    casadi_int size = std::distance(file_scope_double_rw_.begin(), it);
+    return "casadi_rwd" + str(size);
   }
 
   void CodeGenerator::define_rom_integer(const void* id, casadi_int size) {
@@ -627,6 +641,15 @@ namespace casadi {
       casadi_int i=0;
       for (const auto& it : file_scope_double_) {
         s << "static casadi_real casadi_rd" + str(i++) + "[" + str(it.second) + "];\n";
+      }
+      s << endl;
+    }
+
+    // Print file scope double work
+    if (!file_scope_double_rw_.empty()) {
+      casadi_int i=0;
+      for (const auto& it : file_scope_double_rw_) {
+        s << "static casadi_real casadi_rwd" + str(i++) + "[" + str(it.second) + "];\n";
       }
       s << endl;
     }

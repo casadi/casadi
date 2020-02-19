@@ -739,6 +739,10 @@ namespace casadi {
     return (*this)->op()==OP_PARAMETER;
   }
 
+  bool MX::is_gate() const {
+    return (*this)->op()==OP_GATE;
+  }
+
   bool MX::is_constant() const {
     return (*this)->op()==OP_CONST;
   }
@@ -876,6 +880,14 @@ namespace casadi {
 
   casadi_int MX::get_max_depth() {
     return eq_depth_;
+  }
+
+  MX MX::par(const std::string& name, const Sparsity& sp) {
+    return MX::create(new Parameter(name, sp));
+  }
+
+  MX MX::par(const std::string& name, casadi_int nrow, casadi_int ncol) {
+    return MX::create(new Parameter(name, nrow, ncol));
   }
 
   MX MX::_sym(const std::string& name, const Sparsity& sp) {

@@ -211,6 +211,9 @@ namespace casadi {
     /// Check if symbolic
     bool is_symbolic() const;
 
+    /// Check if symbolic
+    bool is_gate() const;
+
     /// Check if constant
     bool is_constant() const;
 
@@ -751,6 +754,12 @@ namespace casadi {
 
     /// Readability typedef
     typedef std::map<std::string, MX> MXDict;
+
+    // Create parameter
+    static MX par(const std::string& name, const Sparsity& sp);
+
+    // Create parameter
+    static MX par(const std::string& name, casadi_int nrow=1, casadi_int ncol=1);
 
 #ifndef SWIG
     ///@{

@@ -108,6 +108,12 @@ namespace casadi {
     /** \brief Access file scope double read-only memory */
     std::string rom_double(const void* id) const;
 
+    /** \brief Allocate file scope double read-write memory */
+    void define_rw_double(const void* id, casadi_int size);
+
+    /** \brief Access file scope double read-write memory */
+    std::string rw_double(const void* id) const;
+
     /** \brief Allocate file scope integer read-only memory */
     void define_rom_integer(const void* id, casadi_int size);
 
@@ -587,6 +593,7 @@ namespace casadi {
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
     std::map<std::string, std::string> local_default_;
     std::map<const void *, casadi_int> file_scope_double_;
+    std::map<const void *, casadi_int> file_scope_double_rw_;
     std::map<const void *, casadi_int> file_scope_integer_;
 
     // Added functions

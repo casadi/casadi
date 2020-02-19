@@ -80,6 +80,8 @@ namespace casadi {
     /// Live variables?
     bool live_variables_;
 
+    bool context_;
+
     /** \brief Constructor */
     MXFunction(const std::string& name,
       const std::vector<MX>& input, const std::vector<MX>& output,

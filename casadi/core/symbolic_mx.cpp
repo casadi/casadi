@@ -33,14 +33,29 @@ namespace casadi {
 
   SymbolicMX::SymbolicMX(const std::string& name, casadi_int nrow, casadi_int ncol) : name_(name) {
     set_sparsity(Sparsity::dense(nrow, ncol));
+    type_ = MX_SYM;
   }
 
   SymbolicMX::SymbolicMX(const std::string& name, const Sparsity & sp) : name_(name) {
     set_sparsity(sp);
+    type_ = MX_SYM;
+  }
+
+
+  Parameter::Parameter(const std::string& name, const Sparsity & sp) : SymbolicMX(name, sp) {
+    type_ = MX_PAR;
+  }
+
+  Parameter::Parameter(const std::string& name, casadi_int nrow, casadi_int ncol) : SymbolicMX(name, nrow, ncol) {
+    type_ = MX_PAR;
   }
 
   std::string SymbolicMX::disp(const std::vector<std::string>& arg) const {
     return name_;
+  }
+
+  std::string Parameter::disp(const std::vector<std::string>& arg) const {
+    return "param(" + name_ + ")";
   }
 
   int SymbolicMX::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
@@ -88,6 +103,29 @@ namespace casadi {
 
   void SymbolicMX::reset_input() const {
     this->temp = 0;
+  }
+
+  MXNode* SymbolicMX::deserialize(DeserializingStream& s) {
+    char t;
+    s.unpack("SymbolicMX::type", t);
+    switch (t) {
+      case 'r':
+        return new SymbolicMX(s);
+      case 'p':
+        return new Parameter(s);
+      default:
+        casadi_error("Unknown SymbolicMX type");
+    }
+  }
+
+  void SymbolicMX::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("SymbolicMX::type", 'r');
+  }
+
+  void Parameter::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("SymbolicMX::type", 'p');
   }
 
   void SymbolicMX::serialize_body(SerializingStream& s) const {

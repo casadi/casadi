@@ -522,6 +522,9 @@ namespace casadi {
     /// Convexify
     MX get_convexify(const Dict& opts) const;
 
+    /// Gate
+    MX get_gate() const;
+
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero
@@ -533,6 +536,10 @@ namespace casadi {
 
     /** \brief  The sparsity pattern */
     Sparsity sparsity_;
+
+    ///
+    char type_;
+    enum MXType {MX_NONE, MX_PAR, MX_SYM, MX_MIXED};
 
     /** \brief Propagate sparsities forward through a copy operation */
     static void copy_fwd(const bvec_t* arg, bvec_t* res, casadi_int len);
