@@ -88,13 +88,27 @@ namespace casadi {
         const std::vector<casadi_int>& margin_left=std::vector<casadi_int>(),
         const std::vector<casadi_int>& margin_right=std::vector<casadi_int>());
 
+    static std::vector<casadi_int> interpret_lookup_mode(const std::vector<std::string>& modes,
+        const MX& grid, const std::vector<casadi_int>& offset,
+        const std::vector<casadi_int>& margin_left=std::vector<casadi_int>(),
+        const std::vector<casadi_int>& margin_right=std::vector<casadi_int>());
+
     static void stack_grid(const std::vector< std::vector<double> >& grid,
       std::vector<casadi_int>& offset, std::vector<double>& stacked);
+
+    static void stack_grid(const std::vector< MX >& grid,
+      std::vector<casadi_int>& offset, MX& stacked);
 
     static void check_grid(const std::vector< std::vector<double> >& grid);
     static void check_grid(const std::vector<casadi_int>& grid);
 
+    static std::vector< std::vector<double> > parse_grid(const std::vector< DM >& grid);
+    static std::vector<MX> parse_grid(const std::vector< MX >& grid) { return grid; }
+    static std::vector<double> parse_grid(const DM & grid);
+    static MX parse_grid(const MX & grid) { return grid; }
+
     static std::vector<double> meshgrid(const std::vector< std::vector<double> >& grid);
+    static DM meshgrid(const std::vector< DM >& grid);
 
     // Creator function for internal class
     typedef Interpolant* (*Creator)(const std::string& name,

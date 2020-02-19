@@ -59,6 +59,19 @@ namespace casadi {
     for (auto&& g : grid) stacked.insert(stacked.end(), g.begin(), g.end());
   }
 
+  void Interpolant::stack_grid(const std::vector< MX> & grid,
+    std::vector<casadi_int>& offset, MX& stacked) {
+
+    // Get offset for each input dimension
+    offset.clear();
+    offset.reserve(grid.size()+1);
+    offset.push_back(0);
+    for (auto&& g : grid) offset.push_back(offset.back()+g.numel());
+
+    // Stack input grids
+    stacked = vertcat(grid);
+  }
+
   void Interpolant::check_grid(const std::vector< std::vector<double> >& grid) {
     // Dimension at least 1
     casadi_assert(!grid.empty(), "At least one input required");
@@ -79,6 +92,31 @@ namespace casadi {
     for (casadi_int d : grid_dims) {
       casadi_assert(d>=2, "Need at least two grid points for every input");
     }
+  }
+
+  std::vector< std::vector<double> > Interpolant::parse_grid(const std::vector< DM >& grid) {
+    std::vector< std::vector<double> > ret;
+    for (const auto& e : grid) {
+      ret.push_back(parse_grid(e));
+    }
+    return ret;
+  }
+
+  std::vector<double> Interpolant::parse_grid(const DM& grid) {
+    casadi_assert_dev(grid.is_vector());
+    casadi_assert_dev(grid.is_dense());
+    return grid.nonzeros();
+  }
+
+  DM meshgrid_fund(const DM& next, const std::vector<DM>& grid) {
+    if (grid.empty()) return next;
+    DM n = horzcat(repmat(next, grid.front().size1()), vec(repmat(grid.front().T(), next.size1(), 1)));
+    return meshgrid_fund(n, std::vector<DM>(grid.begin()+1, grid.end()));
+  }
+
+  DM Interpolant::meshgrid(const std::vector< DM >& grid) {
+    DM ret = meshgrid_fund(grid.front(), std::vector<DM>(grid.begin()+1, grid.end()));
+    return vec(ret.T());
   }
 
   std::vector<double> Interpolant::meshgrid(const std::vector< std::vector<double> >& grid) {
@@ -338,6 +376,21 @@ namespace casadi {
         }
       }
     }
+    return ret;
+  }
+
+  std::vector<casadi_int> Interpolant::interpret_lookup_mode(
+      const std::vector<std::string>& modes, const MX& knots,
+      const std::vector<casadi_int>& offset,
+      const std::vector<casadi_int>& margin_left, const std::vector<casadi_int>& margin_right) {
+    casadi_assert_dev(modes.empty() || modes.size()==offset.size()-1);
+
+    std::vector<casadi_int> ret;
+    for (casadi_int i=0;i<offset.size()-1;++i) {
+      casadi_int n = offset[i+1]-offset[i];
+      ret.push_back(Low::interpret_lookup_mode(modes.empty() ? "auto": modes[i], n));
+    }
+
     return ret;
   }
 

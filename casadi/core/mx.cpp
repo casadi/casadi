@@ -1917,6 +1917,14 @@ namespace casadi {
     return BSplineParametric::create(x, coeffs, knots, degree, m, opts);
   }
 
+  MX MX::bspline(const MX& x, const MX& coeffs,
+            const std::vector< MX >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts) {
+    return BSplineFullyParametric::create(x, coeffs, knots, degree, m, opts);
+  }
+
   DM MX::bspline_dual(const std::vector<double>& x,
             const std::vector< std::vector<double> >& knots,
             const std::vector<casadi_int>& degree,

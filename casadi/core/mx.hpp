@@ -564,6 +564,11 @@ namespace casadi {
             const std::vector<casadi_int>& degree,
             casadi_int m,
             const Dict& opts = Dict());
+    static MX bspline(const MX& x, const MX& coeffs,
+            const std::vector< MX >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict());
     static MX convexify(const MX& H, const Dict& opts = Dict());
     ///@}
     /// \endcond
@@ -661,6 +666,14 @@ namespace casadi {
 
     inline friend MX bspline(const MX& x, const MX& coeffs,
             const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict()) {
+      return MX::bspline(x, coeffs, knots, degree, m, opts);
+    }
+
+    inline friend MX bspline(const MX& x, const MX& coeffs,
+            const std::vector< MX >& knots,
             const std::vector<casadi_int>& degree,
             casadi_int m,
             const Dict& opts = Dict()) {
