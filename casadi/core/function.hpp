@@ -983,6 +983,8 @@ namespace casadi {
     /** Obtain information about function */
     Dict info() const;
 
+
+    static Function conf(const std::string& name, const std::vector<MX>& args);
 #ifndef SWIG
     protected:
     ///@{

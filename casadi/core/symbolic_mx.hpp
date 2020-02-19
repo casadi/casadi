@@ -90,11 +90,14 @@ namespace casadi {
     /** \brief Reset the marker for an input expression */
     void reset_input() const override;
 
+    /** \brief Serialize specific part of node  */
+    void serialize_type(SerializingStream& s) const override;
+
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeserializingStream& s) { return new SymbolicMX(s); }
+    static MXNode* deserialize(DeserializingStream& s);
 
   protected:
     /** \brief Deserializing constructor */
@@ -103,6 +106,29 @@ namespace casadi {
     // Name of the variable
     std::string name_;
   };
+
+  class CASADI_EXPORT Parameter : public SymbolicMX {
+  public:
+    /** \brief  Constructors */
+    explicit Parameter(const std::string& name, const Sparsity & sp);
+
+    /** \brief  Constructors */
+    explicit Parameter(const std::string& name, casadi_int nrow=1, casadi_int ncol=1);
+
+    /** \brief Deserializing constructor */
+    explicit Parameter(DeserializingStream& s) : SymbolicMX(s) {}
+
+    /** \brief Serialize specific part of node  */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief  Print expression */
+    std::string disp(const std::vector<std::string>& arg) const override;
+
+    /// Destructor
+    ~Parameter() override {}
+
+  };
+
 
 } // namespace casadi
 

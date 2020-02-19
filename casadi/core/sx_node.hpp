@@ -67,6 +67,7 @@ namespace casadi {
     virtual bool is_nan() const { return false; }
     virtual bool is_inf() const { return false; }
     virtual bool is_minus_inf() const { return false; }
+    bool is_gate() const { return false; }
     ///@}
 
     ///@{

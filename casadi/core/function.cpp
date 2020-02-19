@@ -35,6 +35,7 @@
 #include "jit_function.hpp"
 #include "serializing_stream.hpp"
 #include "serializer.hpp"
+#include "gate.hpp"
 
 #include <cctype>
 #include <fstream>
@@ -1755,6 +1756,10 @@ namespace casadi {
 
   void CASADI_EXPORT _function_buffer_eval(void* raw) {
     static_cast<FunctionBuffer*>(raw)->_eval();
+  }
+
+  Function Function::conf(const std::string& name, const std::vector<MX>& args) {
+    return Function(name, args, Gate::gates());
   }
 
 } // namespace casadi

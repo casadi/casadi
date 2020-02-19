@@ -113,6 +113,11 @@ namespace casadi {
       }
     }
 
+    context_ = false;
+    for (const auto &e : in_) {
+      context_ = context_ || (e->type_ & MXNode::MX_PAR);
+    }
+
     // Check/set default inputs
     if (default_in_.empty()) {
       default_in_.resize(n_in_, 0);
@@ -135,7 +140,7 @@ namespace casadi {
       for (casadi_int p=0; p<prim.size(); ++p) {
         // Get the nodes using a depth first search
         s.push(prim[p].get());
-        sort_depth_first(s, nodes);
+        sort_depth_first(s, nodes, !context_);
         // Add an output instruction ("data" below will take ownership)
         nodes.push_back(new Output(prim[p], ind, p, nz_offset));
         // Update offset
@@ -176,9 +181,11 @@ namespace casadi {
         AlgEl ae;
         ae.op = op;
         ae.data.own(n);
-        ae.arg.resize(n->n_dep());
-        for (casadi_int i=0; i<n->n_dep(); ++i) {
-          ae.arg[i] = n->dep(i)->temp;
+        if (context_ || op!=OP_GATE) {
+          ae.arg.resize(n->n_dep());
+          for (casadi_int i=0; i<n->n_dep(); ++i) {
+            ae.arg[i] = n->dep(i)->temp;
+          }
         }
         ae.res.resize(n->nout());
         if (n->has_output()) {
@@ -425,6 +432,12 @@ namespace casadi {
         casadi_int i=e.data->ind();
         casadi_int nz_offset=e.data->offset();
         if (res[i]) copy(w1, w1+nnz, res[i]+nz_offset);
+      } else if (e.op==OP_GATE && !context_) {
+        for (casadi_int i=0; i<e.res.size(); ++i)
+          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
+
+        // Evaluate
+        if (e.data->eval(nullptr, res1, iw, w)) return 1;
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<e.arg.size(); ++i)
@@ -1697,7 +1710,6 @@ namespace casadi {
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
     s.pack("MXFunction::live_variables", live_variables_);
-
     XFunction<MXFunction, MX, MXNode>::delayed_serialize_members(s);
   }
 
@@ -1721,6 +1733,12 @@ namespace casadi {
     s.unpack("MXFunction::live_variables", live_variables_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
+
+    context_ = false;
+    for (const auto &e : in_) {
+      context_ = context_ || (e->type_ & MXNode::MX_PAR);
+    }
+
   }
 
   ProtoFunction* MXFunction::deserialize(DeserializingStream& s) {

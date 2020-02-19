@@ -195,8 +195,10 @@ namespace casadi {
     OP_BSPLINE,
 
     OP_CONVEXIFY,
+
+    OP_GATE
   };
-  #define NUM_BUILT_IN_OPS (OP_CONVEXIFY+1)
+  #define NUM_BUILT_IN_OPS (OP_GATE+1)
 
   #define OP_
 
@@ -1044,6 +1046,7 @@ namespace casadi {
     case OP_EINSTEIN:      return F<OP_EINSTEIN>::check;
     case OP_BSPLINE:       return F<OP_BSPLINE>::check;
     case OP_CONVEXIFY:     return F<OP_CONVEXIFY>::check;
+    case OP_GATE:          return F<OP_GATE>::check;
     }
     return T();
   }

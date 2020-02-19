@@ -76,7 +76,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
-    static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
+    static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes, bool stop_at_gate=true);
 
     /** \brief  Construct a complete Jacobian by compression */
     MatType jac(casadi_int iind, casadi_int oind, const Dict& opts) const;
@@ -309,7 +309,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::sort_depth_first(
-      std::stack<NodeType*>& s, std::vector<NodeType*>& nodes) {
+      std::stack<NodeType*>& s, std::vector<NodeType*>& nodes, bool stop_at_gate) {
     while (!s.empty()) {
       // Get the topmost element
       NodeType* t = s.top();
@@ -320,7 +320,9 @@ namespace casadi {
         // If there is any dependency which has not yet been added
         if (next_dep < t->n_dep()) {
           // Add dependency to stack
-          s.push(static_cast<NodeType*>(t->dep(next_dep).get()));
+          if (!stop_at_gate || t->op()!=OP_GATE) {
+            s.push(static_cast<NodeType*>(t->dep(next_dep).get()));
+          }
         } else {
           // if no dependencies need to be added, we can add the node to the algorithm
           nodes.push_back(t);
