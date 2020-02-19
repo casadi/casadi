@@ -140,19 +140,23 @@ namespace casadi {
     // Call the base class initializer
     Interpolant::init(opts);
 
-    casadi_assert(!has_parametric_grid(), "Parametric grid not supported");
+    //casadi_assert(!has_parametric_grid(), "Parametric grid not supported");
 
     MX x = MX::sym("x", ndim_, batch_x_);
 
     if (has_parametric_values()) {
       MX coeff = MX::sym("coeff", coeff_size());
 
-      MX e = construct_graph(x, coeff, linear_solver_options, opts);
+      MX e = construct_graph(x, coeff, DM(grid_), linear_solver_options, opts);
 
       S_ = Function("wrapper", {x, coeff}, {e});
     } else {
-      MX e = construct_graph(x, DM(values_), linear_solver_options, opts);
+      MX e = construct_graph(x, DM(values_), DM(grid_), linear_solver_options, opts);
       S_ = Function("wrapper", {x}, {e});
+    }
+
+    if (has_parametric_grid()) {
+      
     }
 
     alloc_w(S_.sz_w());
@@ -161,18 +165,14 @@ namespace casadi {
     alloc_res(S_.sz_res());
   }
 
-  std::vector<double> BSplineInterpolant::greville_points(const std::vector<double>& x,
-                                                          casadi_int deg) {
-    casadi_int dim = x.size()-deg-1;
-    std::vector<double> ret(dim);
-    for (casadi_int i = 0; i < dim; ++i) {
-      ret[i] = 0;
-      for (casadi_int j = 0; j < deg; j++) {
-        ret[i] += x[i+1+j];
-      }
-      ret[i] = ret[i] / deg;
-    }
-    return ret;
+  DM BSplineInterpolant::greville_points(const DM& x, casadi_int deg) {
+    casadi_int dim = x.numel()-deg-1;
+    Sparsity sp = Sparsity::triu(Sparsity::banded(x.numel(), deg), false);
+    std::vector<casadi_int> dummy;
+    sp = sp.sub(range(dim), range(x.numel()), dummy);
+    DM moving_average_op = DM::ones(sp);
+
+    return mtimes(moving_average_op, x)/deg;
   }
 
   int BSplineInterpolant::eval(const double** arg, double** res,

@@ -36,6 +36,8 @@ namespace casadi {
         return new BSpline(s);
       case 'p':
         return new BSplineParametric(s);
+      case 'f':
+        return new BSplineFullyParametric(s);
       default:
         casadi_error("Unknown BSpline type");
     }
@@ -116,6 +118,11 @@ namespace casadi {
     s.pack("BSpline::type", 'p');
   }
 
+  void BSplineFullyParametric::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("BSpline::type", 'f');
+  }
+
   void BSplineCommon::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("BSplineCommon::knots", knots_);
@@ -172,6 +179,19 @@ namespace casadi {
           BSplineCommon(knots, offset, degree, m, lookup_mode) {
     casadi_assert_dev(x.size1()==degree.size());
     set_dep(x, coeffs);
+    set_sparsity(Sparsity::dense(m, 1));
+  }
+
+  BSplineFullyParametric::BSplineFullyParametric(const MX& x,
+          const MX& coeffs,
+          const MX& knots,
+          const std::vector<casadi_int>& offset,
+          const std::vector<casadi_int>& degree,
+          casadi_int m,
+          const std::vector<casadi_int>& lookup_mode) :
+          BSplineCommon(std::vector<double>(), offset, degree, m, lookup_mode) {
+    casadi_assert_dev(x.size1()==degree.size());
+    set_dep(x, coeffs, knots);
     set_sparsity(Sparsity::dense(m, 1));
   }
 
@@ -329,12 +349,45 @@ namespace casadi {
     }
   }
 
+  MX BSplineFullyParametric::create(const MX& x,
+          const MX& coeffs,
+          const std::vector< MX >& knots,
+          const std::vector<casadi_int>& degree,
+          casadi_int m,
+          const Dict& opts) {
+
+    bool do_inline_flag = false;
+    std::vector<std::string> lookup_mode;
+
+    for (auto&& op : opts) {
+      if (op.first=="inline") {
+        do_inline_flag = op.second;
+      } else if (op.first=="lookup_mode") {
+        lookup_mode = op.second;
+      }
+    }
+
+    casadi_assert(!do_inline_flag, "Inlining not supported.");
+
+    std::vector<casadi_int> offset;
+    MX stacked;
+    Interpolant::stack_grid(knots, offset, stacked);
+    std::vector<casadi_int> mode =
+      Interpolant::interpret_lookup_mode(lookup_mode, stacked, offset, degree, degree);
+
+    return x->get_bspline(coeffs, stacked, offset, degree, m, mode);
+  }
+
   std::string BSpline::disp(const std::vector<std::string>& arg) const {
     return "BSpline(" + arg.at(0) + ")";
   }
 
   std::string BSplineParametric::disp(const std::vector<std::string>& arg) const {
     return "BSplineParametric(" + arg.at(0) + ")";
+  }
+
+  std::string BSplineFullyParametric::disp(const std::vector<std::string>& arg) const {
+    return "BSplineFullyParametric(" + arg.at(0) + ")";
   }
 
   void BSpline::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
@@ -345,16 +398,27 @@ namespace casadi {
     res[0] = arg[0]->get_bspline(arg[0], knots_, offset_, degree_, m_, lookup_mode_);
   }
 
+  void BSplineFullyParametric::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    res[0] = arg[0]->get_bspline(arg[0], arg[1], offset_, degree_, m_, lookup_mode_);
+  }
+
   MX BSpline::jac_cached() const {
     if (jac_cache_.is_empty()) {
-      jac_cache_ = jac(dep(0), DM(coeffs_));
+      jac_cache_ = jac(dep(0), DM(coeffs_), DM(knots_));
     }
     return jac_cache_;
   }
 
   MX BSplineParametric::jac_cached() const {
     if (jac_cache_.is_empty()) {
-      jac_cache_ = jac(dep(0), dep(1));
+      jac_cache_ = jac(dep(0), dep(1), DM(knots_));
+    }
+    return jac_cache_;
+  }
+
+  MX BSplineFullyParametric::jac_cached() const {
+    if (jac_cache_.is_empty()) {
+      jac_cache_ = jac(dep(0), dep(1), dep(2));
     }
     return jac_cache_;
   }
@@ -396,6 +460,16 @@ namespace casadi {
     return 0;
   }
 
+  int BSplineFullyParametric::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (!res[0]) return 0;
+
+    casadi_clear(res[0], m_);
+    casadi_nd_boor_eval(res[0], degree_.size(), arg[2], get_ptr(offset_),
+      get_ptr(degree_), get_ptr(strides_), arg[1], m_, arg[0], get_ptr(lookup_mode_),
+      iw, w);
+    return 0;
+  }
+
   void BSplineCommon::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
                       const std::vector<casadi_int>& res) const {
@@ -407,18 +481,32 @@ namespace casadi {
 
     // Input and output buffers
     g << "CASADI_PREFIX(nd_boor_eval)(" << g.work(res[0], m_) << "," << n_dims << ","
-      << g.constant(knots_) << "," << g.constant(offset_) << "," <<  g.constant(degree_)
-      << "," << g.constant(strides_) << "," << generate(g, arg) << "," << m_  << ","
+      << generate_grid(g, arg) << "," << g.constant(offset_) << "," <<  g.constant(degree_)
+      << "," << g.constant(strides_) << "," << generate_coeff(g, arg) << "," << m_  << ","
       << g.work(arg[0], n_dims) << "," <<  g.constant(lookup_mode_) << ", iw, w);\n";
   }
 
-  std::string BSpline::generate(CodeGenerator& g, const std::vector<casadi_int>& arg) const {
+  std::string BSpline::generate_coeff(CodeGenerator& g, const std::vector<casadi_int>& arg) const {
     return g.constant(coeffs_);
   }
 
-  std::string BSplineParametric::generate(CodeGenerator& g,
+  std::string BSplineCommon::generate_grid(CodeGenerator& g, const std::vector<casadi_int>& arg) const {
+    return g.constant(knots_);
+  }
+
+  std::string BSplineParametric::generate_coeff(CodeGenerator& g,
                       const std::vector<casadi_int>& arg) const {
     return g.work(arg[1], dep(1).nnz());
+  }
+
+  std::string BSplineFullyParametric::generate_coeff(CodeGenerator& g,
+                      const std::vector<casadi_int>& arg) const {
+    return g.work(arg[1], dep(1).nnz());
+  }
+
+  std::string BSplineFullyParametric::generate_grid(CodeGenerator& g,
+                      const std::vector<casadi_int>& arg) const {
+    return g.work(arg[2], dep(2).nnz());
   }
 
   DM BSpline::dual(const std::vector<double>& x,

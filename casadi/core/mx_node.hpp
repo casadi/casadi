@@ -518,6 +518,12 @@ namespace casadi {
             const std::vector<casadi_int>& degree,
             casadi_int m,
             const std::vector<casadi_int>& lookup_mode) const;
+    /// BSpline
+    MX get_bspline(const MX& coeffs, const MX& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const;
 
     /// Convexify
     MX get_convexify(const Dict& opts) const;

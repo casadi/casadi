@@ -1934,6 +1934,25 @@ class Functiontests(casadiTestCase):
     self.check_serialize(F,inputs=[vertcat(0.3,0.4)])
 
 
+  def test_fullyparametric_bspline(self):
+    knots = [[0,0,0,0,0.2,0.5,0.8,1,1,1,1],[0,0,0,0.1,0.5,0.9,1,1,1]]
+    x=MX.sym("x",2)
+    data = np.random.random((7,6,2)).ravel(order='F')
+    y = bspline(x,data,knots,[3,2],2)
+
+    C = MX.sym("C",data.shape[0],1)
+    K0 = MX.sym("K1",len(knots[0]))
+    K1 = MX.sym("K2",len(knots[1]))
+    
+    Y = bspline(x,C,[K0, K1],[3,2],2)
+    f = Function('f',[x],[y])
+    F = Function('f',[x,C,K0,K1],[Y])
+    F = Function('f',[x],[F(x,data,knots[0],knots[1])])
+    self.checkfunction(f,F,inputs=[vertcat(0.3,0.4)])
+    self.check_codegen(F,inputs=[vertcat(0.3,0.4)])
+    self.check_serialize(F,inputs=[vertcat(0.3,0.4)])
+
+
   def test_smooth_linear(self):
     np.random.seed(0)
 

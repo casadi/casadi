@@ -876,6 +876,16 @@ namespace casadi {
     return MX::create(new BSplineParametric(x, coeffs, knots, offset, degree, m, lookup_mode));
   }
 
+  MX MXNode::get_bspline(const MX& coeffs,
+            const MX& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const {
+    MX x = shared_from_this<MX>();
+    return MX::create(new BSplineFullyParametric(x, coeffs, knots, offset, degree, m, lookup_mode));
+  }
+
   MX MXNode::get_convexify(const Dict& opts) const {
     return MX::create(new Convexify(shared_from_this<MX>(), opts));
   }
