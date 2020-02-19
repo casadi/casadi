@@ -97,6 +97,11 @@ namespace casadi {
 
     static std::vector<MX>& gates();
 
+    static void gates_clean();
+
+    /// Get the value (only for constant nodes)
+    virtual const std::vector<double>& get_double_vec() const;
+
   protected:
     /** \brief Deserializing constructor */
     explicit Gate(DeserializingStream& s);

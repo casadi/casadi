@@ -285,6 +285,9 @@ namespace casadi {
     /// Get the value (only for constant nodes)
     virtual DM get_DM() const;
 
+    /// Get the value (only for constant nodes)
+    virtual const std::vector<double>& get_double_vec() const;
+
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual casadi_int n_inplace() const { return 0;}
 
@@ -502,19 +505,6 @@ namespace casadi {
     /// Find
     MX get_low(const MX& v, const Dict& options) const;
 
-    /// BSpline
-    MX get_bspline(const std::vector<double>& knots,
-            const std::vector<casadi_int>& offset,
-            const std::vector<double>& coeffs,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const std::vector<casadi_int>& lookup_mode) const;
-    /// BSpline
-    MX get_bspline(const MX& coeffs, const std::vector<double>& knots,
-            const std::vector<casadi_int>& offset,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const std::vector<casadi_int>& lookup_mode) const;
     /// BSpline
     MX get_bspline(const MX& coeffs, const MX& knots,
             const std::vector<casadi_int>& offset,

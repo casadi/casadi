@@ -779,8 +779,22 @@ namespace casadi {
     return (*this)->to_double();
   }
 
+  MX MX::eval() const {
+    if (!is_constant() && (*this)->type_ == MXNode::MX_NONE) {
+      return evalf(*this);
+    }
+    return *this;
+  }
+
   MX::operator DM() const {
+    if (!is_constant() && (*this)->type_ == MXNode::MX_NONE) {
+      return static_cast<DM>(evalf(*this));
+    }
     return (*this)->get_DM();
+  }
+
+  MX::operator const std::vector<double>&() const {
+    return (*this)->get_double_vec();
   }
 
   bool MX::is_binary() const {
@@ -1901,32 +1915,16 @@ namespace casadi {
   }
 
   MX MX::bspline(const MX& x,
-            const DM& coeffs,
-            const std::vector< std::vector<double> >& knots,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const Dict& opts) {
-    return BSpline::create(x, knots, coeffs.nonzeros(), degree, m, opts);
-  }
-
-  MX MX::bspline(const MX& x, const MX& coeffs,
-            const std::vector< std::vector<double> >& knots,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const Dict& opts) {
-    return BSplineParametric::create(x, coeffs, knots, degree, m, opts);
-  }
-
-  MX MX::bspline(const MX& x, const MX& coeffs,
+            const MX& coeffs,
             const std::vector< MX >& knots,
             const std::vector<casadi_int>& degree,
             casadi_int m,
             const Dict& opts) {
-    return BSplineFullyParametric::create(x, coeffs, knots, degree, m, opts);
+    return BSpline::create(x, knots, coeffs, degree, m, opts);
   }
 
-  DM MX::bspline_dual(const std::vector<double>& x,
-            const std::vector< std::vector<double> >& knots,
+  MX MX::bspline_dual(const MX& x,
+            const std::vector< MX >& knots,
             const std::vector<casadi_int>& degree,
             const Dict& opts) {
     return BSpline::dual(x, knots, degree, opts);

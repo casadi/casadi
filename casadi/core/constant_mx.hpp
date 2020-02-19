@@ -187,6 +187,9 @@ namespace casadi {
     /** \brief  data member */
     Matrix<double> x_;
 
+    /// Get the value (only for constant nodes)
+    virtual const std::vector<double>& get_double_vec() const;
+
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
     /** \brief Serialize type information */

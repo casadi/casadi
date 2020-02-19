@@ -75,6 +75,7 @@ namespace casadi {
     }
     set_dep(arg1);
     set_sparsity(Sparsity::scalar());
+    type_ |= fcn_.type();
   }
 
   std::string Call::disp(const std::vector<std::string>& arg) const {

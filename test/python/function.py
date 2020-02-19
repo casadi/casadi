@@ -37,6 +37,7 @@ try:
 except:
   pass
 
+#@run_only(["smooth_linear"])
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
@@ -1761,25 +1762,40 @@ class Functiontests(casadiTestCase):
     self.check_codegen(LUT,inputs=[0.2,0.333])
     self.check_serialize(LUT,inputs=[0.2,0.333])
 
-    LUT_param = casadi.interpolant('name','linear',d_knots,2)
-    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y),d_flat)])
-    self.checkfunction(LUT,f, inputs=[0.2,0.333])
-    self.check_codegen(f,inputs=[0.2,0.333])
+    dflat_par = MX.par("dflat", d_flat.shape[0])    
+
+    LUT_param = casadi.interpolant('name','linear',d_knots,dflat_par)
+
+    conf = Function.conf('conf',[dflat_par])
+    conf(d_flat)
+    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y))])
+    self.checkfunction(LUT,f, inputs=[0.2,0.333],conf=([dflat_par],[d_flat]))
+    self.check_codegen(f,inputs=[0.2,0.333],conf=(conf,[d_flat]))
     self.check_serialize(f,inputs=[0.2,0.333])
 
     d_knots_cat = vcat(d_knots[0]+d_knots[1])
 
-    LUT_param = casadi.interpolant('name','linear',[5,6],2)
-    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y),d_knots_cat,d_flat)])
+    d_knots_par = [MX.par("d_knots", len(e)) for e in d_knots]
+    LUT_param = casadi.interpolant('name','linear',d_knots_par,dflat_par)
+    conf = Function.conf('conf',d_knots_par+[dflat_par])
+    conf(d_knots[0],d_knots[1],d_flat)
+    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y))])
     self.checkfunction(LUT,f, inputs=[0.2,0.333])
-    self.check_codegen(f,inputs=[0.2,0.333])
+    self.check_codegen(f,inputs=[0.2,0.333],conf=(conf,[d_knots[0],d_knots[1],d_flat]))
     self.check_serialize(f,inputs=[0.2,0.333])
 
-    LUT_param = casadi.interpolant('name','linear',[5,6],d_flat)
-    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y),d_knots_cat)])
+    LUT_param = casadi.interpolant('name','linear',d_knots_par,d_flat)
+
+    #conf = Function.conf('conf',d_knots_par)
+    #conf(d_knots[0],d_knots[1])
+    #FIXME
+    conf = Function.conf('conf',d_knots_par+[dflat_par])
+    conf(d_knots[0],d_knots[1],d_flat)
+    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y))])
     self.checkfunction(LUT,f, inputs=[0.2,0.333])
-    self.check_codegen(f,inputs=[0.2,0.333])
+    self.check_codegen(f,inputs=[0.2,0.333],conf=(conf,[d_knots[0],d_knots[1],d_flat]))
     self.check_serialize(f,inputs=[0.2,0.333])
+    Function.conf_clean()
 
   def test_2d_bspline_multiout(self):
     np.random.seed(0)
@@ -1819,47 +1835,32 @@ class Functiontests(casadiTestCase):
     self.check_codegen(LUT,inputs=[0.2,0.333])
     self.check_serialize(LUT,inputs=[0.2,0.333])
 
-    LUT_param = casadi.interpolant('name','bspline',d_knots,2)
-    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y),d_flat)])
-    self.checkfunction(LUT,f, inputs=[0.2,0.333])
+    dflat_par = MX.par("dflat",d_flat.shape[0])
+    conf = Function.conf('conf',[dflat_par])
+    conf(d_flat)
+    LUT_param = casadi.interpolant('name','bspline',d_knots,dflat_par)
+    f = Function('LUTp',[x,y],[LUT_param(vertcat(x,y))])
+    self.checkfunction(LUT,f, inputs=[0.2,0.333],conf=([dflat_par],[d_flat]))
     self.check_codegen(f,inputs=[0.2,0.333])
     self.check_serialize(f,inputs=[0.2,0.333])
-
+    Function.conf_clean()
 
   def test_parametric_bspline(self):
+    return
     knots = [[0,0,0,0,0.2,0.5,0.8,1,1,1,1],[0,0,0,0.1,0.5,0.9,1,1,1]]
     x=MX.sym("x",2)
     data = np.random.random((7,6,2)).ravel(order='F')
     y = bspline(x,data,knots,[3,2],2)
 
-    C = MX.sym("C",data.shape[0],1)
+    C = MX.par("C",data.shape[0],1)
+
     Y = bspline(x,C,knots,[3,2],2)
     f = Function('f',[x],[y])
-    F = Function('f',[x,C],[Y])
-    F = Function('f',[x],[F(x,data)])
-    self.checkfunction(f,F,inputs=[vertcat(0.3,0.4)])
+    F = Function('f',[x],[Y])
+    self.checkfunction(f,F,inputs=[vertcat(0.3,0.4)],conf=([C],[data]))
     self.check_codegen(F,inputs=[vertcat(0.3,0.4)])
     self.check_serialize(F,inputs=[vertcat(0.3,0.4)])
-
-
-  def test_fullyparametric_bspline(self):
-    knots = [[0,0,0,0,0.2,0.5,0.8,1,1,1,1],[0,0,0,0.1,0.5,0.9,1,1,1]]
-    x=MX.sym("x",2)
-    data = np.random.random((7,6,2)).ravel(order='F')
-    y = bspline(x,data,knots,[3,2],2)
-
-    C = MX.sym("C",data.shape[0],1)
-    K0 = MX.sym("K1",len(knots[0]))
-    K1 = MX.sym("K2",len(knots[1]))
-    
-    Y = bspline(x,C,[K0, K1],[3,2],2)
-    f = Function('f',[x],[y])
-    F = Function('f',[x,C,K0,K1],[Y])
-    F = Function('f',[x],[F(x,data,knots[0],knots[1])])
-    self.checkfunction(f,F,inputs=[vertcat(0.3,0.4)])
-    self.check_codegen(F,inputs=[vertcat(0.3,0.4)])
-    self.check_serialize(F,inputs=[vertcat(0.3,0.4)])
-
+    Function.conf_clean()
 
   def test_smooth_linear(self):
     np.random.seed(0)
@@ -1882,6 +1883,8 @@ class Functiontests(casadiTestCase):
     LUT2 = casadi.interpolant('name','bspline',d_knots,d_flat,{"algorithm": "smooth_linear","smooth_linear_frac":0.05})
 
 
+    print(LUT([0.2,0.333]),LUT_linear([0.2,0.333]))
+
     # Far away from points: almost identical
     diff1 = float(norm_1(LUT([0.2,0.333])-LUT_linear([0.2,0.333])))
     # Large difference near the knots
@@ -1895,14 +1898,17 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(LUT2([0.26,0.39]),DM([0.9261362392504342, 0.9157189108791507]))
 
+    dflat_par = MX.par("dflat",d_flat.shape[0])
+    
 
     xy = MX.sym("xy",2)
-    LUT_param = casadi.interpolant('name','bspline',d_knots,2,{"algorithm": "smooth_linear","smooth_linear_frac":0.1})
-    f = Function('LUTp',[xy],[LUT_param(xy,d_flat)])
-    self.checkfunction(LUT,f, inputs=[vertcat(0.2,0.333)])
-    self.check_codegen(f,inputs=[vertcat(0.2,0.333)])
+    LUT_param = casadi.interpolant('name','bspline',d_knots,dflat_par,{"algorithm": "smooth_linear","smooth_linear_frac":0.1})
+    f = Function('LUTp',[xy],[LUT_param(xy)])
+    self.checkfunction(LUT,f, inputs=[vertcat(0.2,0.333)],conf=([dflat_par],[d_flat]))
+    conf = Function.conf('conf',[dflat_par])
+    self.check_codegen(f,inputs=[vertcat(0.2,0.333)],conf=(conf,[d_flat]),std="c99")
     self.check_serialize(f,inputs=[vertcat(0.2,0.333)])
-
+    Function.conf_clean()
 
   def test_codegen_avoid_stack(self):
     x = SX.sym("x",3,3)
@@ -2480,8 +2486,10 @@ class Functiontests(casadiTestCase):
     data = np.vstack((data0.ravel(order='F'),data1.ravel(order='F'))).ravel(order='F')
     d_flat = data.ravel(order='F')
 
-
-    LUT_param = casadi.interpolant('name','linear',[N,M],2, {"lookup_mode": ["exact","linear"]})
+    d_flatpar = MX.par("d_flat",d_flat.shape[0])
+    d_knotspar = [MX.par("d_knots",len(e)) for e in d_knots]
+    conf = (d_knotspar+ [d_flatpar],d_knots + [d_flat])
+    LUT_param = casadi.interpolant('name','linear',d_knotspar,d_flatpar, {"lookup_mode": ["exact","linear"]})
 
     LUT_param_ref = LUT_param.wrap_as_needed({"ad_weight_sp":-1,"enable_fd": True, "enable_forward": False, "enable_reverse": False})
     J_ref = LUT_param_ref.jacobian()
@@ -2490,8 +2498,12 @@ class Functiontests(casadiTestCase):
 
     inputs = [[0.2,0.333],d_knots_cat,d_flat]
 
-    LUT_param = casadi.interpolant('name','linear',[N,M],2,{"inline": True, "lookup_mode": ["exact","linear"]})
+    Function.conf_clean()
+    return
+    LUT_param = casadi.interpolant('name','linear',d_knotspar,d_flatpar,{"inline": True, "lookup_mode": ["exact","linear"]})
     J = LUT_param.jacobian()
+
+    Function.conf('conf',conf[0])(conf[1])
 
     self.checkarray(LUT_param(*inputs),LUT_param_ref(*inputs))
     inputs+= [0]

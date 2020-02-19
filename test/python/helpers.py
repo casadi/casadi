@@ -359,8 +359,8 @@ class casadiTestCase(unittest.TestCase):
 
   def checkfunction_light(self,trial,solution,inputs=None,**kwargs):
     self.checkfunction(trial,solution,inputs,fwd=False,adj=False,jacobian=False,gradient=False,hessian=False,sens_der=False,evals=False,**kwargs)
-  def checkfunction(self,trial,solution,inputs=None,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):
-
+  def checkfunction(self,trial,solution,inputs=None,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False,conf=None):
+    if conf is not None: Function.conf('conf',conf[0]).call(conf[1])
     if isinstance(inputs,dict):
       d = inputs
       inputs = [0]*trial.n_in()
@@ -371,6 +371,7 @@ class casadiTestCase(unittest.TestCase):
     if indirect:
       ins = trial.mx_in()
       extra_trial = Function("extra_trial", ins,trial(ins))
+      if conf is not None: Function.conf('conf',conf[0]).call(conf[1])
       self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,inputs=inputs,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
 
     if digits_sens is None:
@@ -384,6 +385,7 @@ class casadiTestCase(unittest.TestCase):
       try:
         trial_outputs = trial.call(inputs)
         solution_outputs = solution.call(inputs)
+        print(solution_outputs)
       except Exception as e:
         raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (0,0,failmessage) )
 
@@ -401,9 +403,11 @@ class casadiTestCase(unittest.TestCase):
         if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
         for j in range(trial.n_out()):
           trialjac = trial.jacobian_old(i,j)
+          if conf is not None: Function.conf('conf',conf[0]).call(conf[1])
           self.assertEqual(trialjac.n_in(),trial.n_in())
           self.assertEqual(trialjac.n_out(),trial.n_out()+1)
           solutionjac = solution.jacobian_old(i,j)
+          if conf is not None: Function.conf('conf',conf[0]).call(conf[1])
           self.assertEqual(solutionjac.n_in(),solution.n_in())
           self.assertEqual(solutionjac.n_out(),solution.n_out()+1)
 
@@ -415,6 +419,7 @@ class casadiTestCase(unittest.TestCase):
         for j in range(trial.n_out()):
           if trial.sparsity_out(j).is_scalar() and solution.sparsity_out(j).is_scalar():
             trialhess = trial.hessian_old(i,j)
+            if conf is not None: Function.conf('conf',conf[0]).call(conf[1])
             self.assertEqual(trialhess.n_in(),trial.n_in())
             self.assertEqual(trialhess.n_out(),trial.n_out()+2)
             solutionhess = solution.hessian_old(i,j)
@@ -474,6 +479,7 @@ class casadiTestCase(unittest.TestCase):
           [adjsens] = reverse(res, inputss, [aseeds],opts)
 
           vf = Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]),{"is_diff_in": f.is_diff_in()+f.is_diff_in()+f.is_diff_out(), "is_diff_out": f.is_diff_out()+f.is_diff_out()+f.is_diff_in()})
+          if conf is not None: Function.conf('conf',conf[0]).call(conf[1])
 
           vf_in = list(inputs)
           # Complete random seeding
@@ -504,6 +510,7 @@ class casadiTestCase(unittest.TestCase):
               [adjsens2] = reverse(res2, inputss2, [aseeds2],opts)
 
               vf2 = Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]),{"is_diff_in": vf.is_diff_in()+vf.is_diff_in()+vf.is_diff_out(), "is_diff_out": vf.is_diff_out()+vf.is_diff_out()+vf.is_diff_in()})
+              if conf is not None: Function.conf('conf',conf[0]).call(conf[1])
 
               vf2_in = list(inputs)
 
@@ -532,12 +539,16 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,conf=None):
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       if opts is None: opts = {}
-      F.generate(name, opts)
+      cg = CodeGenerator(name, opts)
+      if conf is not None:
+        cg.add(conf[0])
+      cg.add(F)
+      cg.generate()
       import subprocess
 
       libdir = GlobalOptions.getCasadiPath()
@@ -555,14 +566,18 @@ class casadiTestCase(unittest.TestCase):
         commands = "cl.exe /LD {name}.c {extra} /link  /libpath:{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options) 
         p = subprocess.Popen(commands,shell=True).wait()
 
-        F2 = external(F.name(), "./" + name+ ".dll")
+        libname = "./" + name+ ".dll"
       else:
         commands = "gcc -pedantic -std={std} -fPIC -shared -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name}.so -L{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir) + extralibs + extra_options
 
         p = subprocess.Popen(commands,shell=True).wait()
 
+        libname = "./" + name+ ".so"
 
-        F2 = external(F.name(), "./" + name + ".so")
+      F2 = external(F.name(), libname)
+      if conf is not None:
+        FCONF = external(conf[0].name(), libname)
+        FCONF.call(conf[1])
 
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)

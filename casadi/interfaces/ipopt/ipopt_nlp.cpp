@@ -150,11 +150,15 @@ namespace casadi {
       mem_->arg[2] = &obj_factor;
       mem_->arg[3] = lambda;
       mem_->res[0] = values;
+      //static int count = 0;
       if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
+      //DM::to_file("pre" + str(count) + ".mtx", solver_.convexify_data_.Hrsp, values);
       if (solver_.convexify_) {
         ScopedTiming tic(mem_->fstats.at("convexify"));
         if (convexify_eval(&solver_.convexify_data_.config, values, values, mem_->iw, mem_->w)) return false;
+        //DM::to_file("post" + str(count) + ".mtx", solver_.hesslag_sp_, values);
       }
+      //count++;
       return true;
     } else {
       // Get the sparsity pattern

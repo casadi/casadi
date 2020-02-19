@@ -37,18 +37,28 @@ namespace casadi {
       \author Joris Gillis
       \date 2017-2019
   */
-  class CASADI_EXPORT BSplineCommon : public MXNode {
+  class CASADI_EXPORT BSpline : public MXNode {
   public:
 
+    static MX create(const MX& x, const std::vector< MX >& knots,
+          const MX& coeffs,
+          const std::vector<casadi_int>& degree,
+          casadi_int m,
+          const Dict& opts);
+
     /// Constructor
-    BSplineCommon(const std::vector<double>& knots,
+    BSpline(const MX& x, const MX& knots,
             const std::vector<casadi_int>& offset,
+            const MX& coeffs,
             const std::vector<casadi_int>& degree,
             casadi_int m,
             const std::vector<casadi_int>& lookup_mode);
 
     /// Destructor
-    ~BSplineCommon() override {}
+    ~BSpline() override {}
+
+    /** \brief  Print expression */
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     static void prepare(casadi_int m, const std::vector<casadi_int>& offset,
       const std::vector<casadi_int>& degree, casadi_int &coeffs_size,
@@ -57,7 +67,14 @@ namespace casadi {
     static casadi_int get_coeff_size(casadi_int m, const std::vector<casadi_int>& offset,
       const std::vector<casadi_int>& degree);
 
-    std::vector<double> knots_;
+    MX knots_;
+    // Numeric coefficients
+    MX coeffs_;
+    std::vector<double> knots_vec_;
+    std::vector<double> coeffs_vec_;
+    const std::vector<double>* knots_ptr_;
+    const std::vector<double>* coeffs_ptr_;
+
     std::vector<casadi_int> offset_;
     std::vector<casadi_int> degree_;
     casadi_int m_;
@@ -68,6 +85,8 @@ namespace casadi {
     std::vector<casadi_int> coeffs_dims_;
     casadi_int coeffs_size_;
 
+ 
+
     /** \brief Jacobian
      * 
      * Derivatives are computed by transforming the coefficient matrix
@@ -75,7 +94,7 @@ namespace casadi {
      */
     mutable MX jac_cache_;
 
-    virtual MX jac_cached() const = 0;
+    MX jac_cached() const;
 
     /** \brief Get required length of iw field */
     static size_t n_iw(const std::vector<casadi_int> &degree);
@@ -92,6 +111,12 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_BSPLINE;}
 
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
     /** \brief Calculate forward mode directional derivatives */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
@@ -106,188 +131,34 @@ namespace casadi {
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Generate code for the operation */
-    virtual std::string generate_coeff(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const = 0;
+    std::string generate_coeff(CodeGenerator& g) const;
 
     /** \brief Generate code for the operation */
-    virtual std::string generate_grid(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const;
+    std::string generate_grid(CodeGenerator& g) const;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeserializingStream& s);
+    static MXNode* deserialize(DeserializingStream& s) { return new BSpline(s); }
 
-    template<class M, class Mk>
-    M derivative_coeff(casadi_int i, const M& coeffs, const Mk& knots) const;
+    MX derivative_coeff(casadi_int i, const MX& coeffs, const MX& knots) const;
 
-    template<class T, class Mk>
-    MX jac(const MX& x, const T& coeffs, const Mk& kn) const;
+    MX jac(const MX& x, const MX& coeffs, const MX& kn) const;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
+
+    static MX dual(const MX& x,
+          const std::vector< MX >& knots,
+          const std::vector<casadi_int>& degree,
+          const Dict& opts);
+
 
   protected:
 
     /** \brief Deserializing constructor */
-    explicit BSplineCommon(DeserializingStream& s);
-
-  };
-
-  /** 
-   * 
-   * y = bspline(position=symbolic(x),coeffs=numeric);
-   * 
-   * y in R^m
-   * x in R^n
-   * 
-   */
-  class CASADI_EXPORT BSpline : public BSplineCommon {
-  public:
-
-    static MX create(const MX& x, const std::vector< std::vector<double> >& knots,
-          const std::vector<double>& coeffs,
-          const std::vector<casadi_int>& degree,
-          casadi_int m,
-          const Dict& opts);
-
-    /// Constructor
-    BSpline(const MX& x, const std::vector<double>& knots,
-            const std::vector<casadi_int>& offset,
-            const std::vector<double>& coeffs,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const std::vector<casadi_int>& lookup_mode);
-
-    /// Destructor
-    ~BSpline() override {}
-
-    /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
-
-    /** \brief  Evaluate symbolically (MX) */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
-
-    /** \brief Generate code for the operation */
-    std::string generate_coeff(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const override;
-
-    /** \brief  Print expression */
-    std::string disp(const std::vector<std::string>& arg) const override;
-
-    // Numeric coefficients
-    std::vector<double> coeffs_;
-
-    MX jac_cached() const override;
-
-    /**
-     * 
-     * y = bspline(position=numeric(x),coeffs);
-     * 
-     * x in R^(n x N)
-     * y in R^(1 x N)
-     * 
-     * vec(y) = A coeffs
-     * 
-     */
-    static DM dual(const std::vector<double>& x,
-          const std::vector< std::vector<double> >& knots,
-          const std::vector<casadi_int>& degree,
-          const Dict& opts);
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream& s) const override;
-    /** \brief Serialize type information */
-    void serialize_type(SerializingStream& s) const override;
-
-    /** \brief Deserializing constructor */
     explicit BSpline(DeserializingStream& s);
+
   };
 
-  // Symbolic coefficients
-  class CASADI_EXPORT BSplineParametric : public BSplineCommon {
-  public:
-    static MX create(const MX& x, const MX& coeffs,
-          const std::vector< std::vector<double> >& knots,
-          const std::vector<casadi_int>& degree,
-          casadi_int m,
-          const Dict& opts);
-
-    /// Constructor
-    BSplineParametric(const MX& x, const MX& coeffs,
-            const std::vector<double>& knots,
-            const std::vector<casadi_int>& offset,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const std::vector<casadi_int>& lookup_mode);
-
-    /// Destructor
-    ~BSplineParametric() override {}
-
-    /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
-
-    /** \brief  Evaluate symbolically (MX) */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
-
-    MX jac_cached() const override;
-
-    /** \brief Generate code for the operation */
-    std::string generate_coeff(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const override;
-
-    /** \brief  Print expression */
-    std::string disp(const std::vector<std::string>& arg) const override;
-
-    /** \brief Serialize type information */
-    void serialize_type(SerializingStream& s) const override;
-
-    /** \brief Deserializing constructor */
-    explicit BSplineParametric(DeserializingStream& s) : BSplineCommon(s) {}
-  };
-
-// Symbolic coefficients
-  class CASADI_EXPORT BSplineFullyParametric : public BSplineCommon {
-  public:
-    static MX create(const MX& x, const MX& coeffs,
-          const std::vector< MX >& knots,
-          const std::vector<casadi_int>& degree,
-          casadi_int m,
-          const Dict& opts);
-
-    /// Constructor
-    BSplineFullyParametric(const MX& x, const MX& coeffs,
-            const MX& knots,
-            const std::vector<casadi_int>& offset,
-            const std::vector<casadi_int>& degree,
-            casadi_int m,
-            const std::vector<casadi_int>& lookup_mode);
-
-    /// Destructor
-    ~BSplineFullyParametric() override {}
-
-    /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
-
-    /** \brief  Evaluate symbolically (MX) */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
-
-    MX jac_cached() const override;
-
-    /** \brief Generate code for the operation */
-    std::string generate_coeff(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const override;
-
-    /** \brief Generate code for the operation */
-    std::string generate_grid(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const override;
-
-    /** \brief  Print expression */
-    std::string disp(const std::vector<std::string>& arg) const override;
-
-    /** \brief Serialize type information */
-    void serialize_type(SerializingStream& s) const override;
-
-    /** \brief Deserializing constructor */
-    explicit BSplineFullyParametric(DeserializingStream& s) : BSplineCommon(s) {}
-  };
 
 } // namespace casadi
 /// \endcond

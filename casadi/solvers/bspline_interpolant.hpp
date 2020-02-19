@@ -54,9 +54,9 @@ namespace casadi {
   public:
     // Constructor
     BSplineInterpolant(const std::string& name,
-                      const std::vector<double>& grid,
+                      const MX& grid,
                       const std::vector<casadi_int>& offset,
-                      const std::vector<double>& values,
+                      const MX& values,
                       casadi_int m);
 
     // Destructor
@@ -70,15 +70,12 @@ namespace casadi {
 
     /** \brief  Create a new Interpolant */
     static Interpolant* creator(const std::string& name,
-                                const std::vector<double>& grid,
+                                const MX& grid,
                                 const std::vector<casadi_int>& offset,
-                                const std::vector<double>& values,
+                                const MX& values,
                                 casadi_int m) {
       return new BSplineInterpolant(name, grid, offset, values, m);
     }
-
-    // Is differentiable? Deferred to bspline
-    bool is_diff_in(casadi_int i) override { return true; }
 
     // Initialize
     void init(const Dict& opts) override;
@@ -128,7 +125,7 @@ namespace casadi {
       return S_->sp_reverse(arg, res, iw, w, mem);
     }
 
-    static DM greville_points(const DM& x, casadi_int deg);
+    static MX greville_points(const MX& x, casadi_int deg);
 
     void serialize_body(SerializingStream &s) const override;
 
@@ -139,10 +136,9 @@ namespace casadi {
      /** \brief Deserializing constructor */
     explicit BSplineInterpolant(DeserializingStream& s);
 
-    static std::vector<double> not_a_knot(const std::vector<double>& x, casadi_int k);
+    static MX not_a_knot(const MX& x, casadi_int k);
 
-    template <typename M, typename Mk>
-    MX construct_graph(const MX& x, const M& values, const Mk& g, const Dict& linsol_options, const Dict& opts);
+    MX construct_graph(const MX& x, const MX& values, const MX& g, const Dict& linsol_options, const Dict& opts);
 
     enum FittingAlgorithm {ALG_NOT_A_KNOT, ALG_SMOOTH_LINEAR};
 
@@ -153,110 +149,6 @@ namespace casadi {
     std::vector<casadi_int> degree_;
   };
 
-
-  template <typename M, typename Mk>
-  MX BSplineInterpolant::construct_graph(const MX& x, const M& values, const Mk& g,
-      const Dict& linsol_options, const Dict& opts) {
-
-    std::vector< Mk > grid;
-    for (casadi_int k=0;k<degree_.size();++k) {
-      grid.push_back(g(range(offset_[k], offset_[k+1])));
-    }
-
-    bool do_inline = false;
-    for (auto&& op : opts) {
-      if (op.first=="inline") {
-        do_inline = op.second;
-      }
-    }
-
-    Dict opts_bspline;
-    opts_bspline["lookup_mode"] = lookup_modes_;
-    opts_bspline["inline"] = do_inline;
-
-    switch (algorithm_) {
-      case ALG_NOT_A_KNOT:
-        {
-          std::vector< std::vector<double> > knots;
-          for (casadi_int k=0;k<degree_.size();++k)
-            knots.push_back(not_a_knot(Interpolant::parse_grid(grid[k]), degree_[k]));
-          Dict opts_dual;
-          opts_dual["lookup_mode"] = lookup_modes_;
-
-          DM J = MX::bspline_dual(meshgrid(Interpolant::parse_grid(grid)), knots, degree_, opts_dual);
-
-          casadi_assert_dev(J.size1()==J.size2());
-
-          M V = M::reshape(values, m_, -1).T();
-          M C_opt = solve(J, V, linear_solver_, linsol_options);
-
-          if (!has_parametric_values()) {
-            double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - V));
-            if (verbose_) casadi_message("Lookup table fitting error: " + str(fit));
-          }
-
-          return MX::bspline(x, C_opt.T(), knots, degree_, m_, opts_bspline);
-        }
-      case ALG_SMOOTH_LINEAR:
-        {
-          casadi_int n_dim = degree_.size();
-          // Linear fit
-          Function linear;
-          if (has_parametric_values()) {
-            linear = interpolant("linear", "linear", Interpolant::parse_grid(grid), m_);
-          } else {
-            linear = interpolant("linear", "linear", Interpolant::parse_grid(grid), values_);
-          }
-
-          std::vector< Mk > egrid;
-          std::vector< Mk > new_grid;
-
-          for (casadi_int k=0;k<n_dim;++k) {
-            casadi_assert(degree_[k]==3, "Only degree 3 supported for 'smooth_linear'.");
-
-            // Add extra knots
-            Mk& g = grid[k];
-
-            // Determine smallest gap.
-            Mk m = mmin(g(range(1, g.numel()))-g(range(g.numel()-1)));
-            Mk step = smooth_linear_frac_*m;
-
-            // Add extra knots
-            std::vector<Mk> new_g;
-
-            std::vector<Mk> g_parts = vertsplit(g,{0, 1, g.numel()-1, g.numel()});
-            Mk g0 = g_parts[0];
-            Mk gm = g_parts[1];
-            Mk gN = g_parts[2];
-            g0 = vertcat(repmat(g0, degree_[k]+1, 1), g0+step);
-            gm = vec(horzcat(gm-step, gm, gm+step).T());
-            gN = vertcat(gN-step, repmat(gN, degree_[k]+1, 1));
-
-            g = vertcat(g0, gm, gN);
-
-            // Compute greville points
-            egrid.push_back(greville_points(g, degree_[k]));
-          }
-
-          Mk mg = meshgrid(egrid);
-          uout() << mg << std::endl;
-          casadi_int N = mg.numel()/n_dim;
-
-          // Evaluate linear interpolation on greville grid
-          Mk arg = Mk::reshape(mg, n_dim, N);
-          std::vector<M> res;
-          if (has_parametric_values()) {
-            res = linear(std::vector<M>{M(arg), values});
-          } else {
-            res = linear(std::vector<M>{M(arg)});
-          }
-
-          return MX::bspline(x, res[0], Interpolant::parse_grid(grid), degree_, m_, opts_bspline);
-        }
-      default:
-        casadi_assert_dev(false);
-      }
-    }
 
 } // namespace casadi
 

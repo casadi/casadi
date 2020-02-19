@@ -284,6 +284,12 @@ namespace casadi {
     /** \brief min */
     std::string min(const std::string& x, const std::string& y);
 
+    /** \brief max */
+    std::string mmax(const std::string& x, std::size_t n, bool dense);
+
+    /** \brief min */
+    std::string mmin(const std::string& x, std::size_t n, bool dense);
+
     /** \brief norm_inf */
     std::string norm_inf(casadi_int n, const std::string& x);
 
@@ -385,7 +391,9 @@ namespace casadi {
       AUX_BOUNDS_CONSISTENCY,
       AUX_LSQR,
       AUX_FILE_SLURP,
-      AUX_CACHE
+      AUX_CACHE,
+      AUX_MMIN,
+      AUX_MMAX
     };
 
     /** \brief Add a built-in auxiliary function */

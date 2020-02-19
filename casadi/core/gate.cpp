@@ -28,9 +28,14 @@ using namespace std;
 namespace casadi {
 
 
+  static std::vector<MX> casadi_gates;
+
   std::vector<MX>& Gate::gates() {
-    static std::vector<MX> gates;
-    return gates;
+    return casadi_gates;
+  }
+
+  void Gate::gates_clean() {
+    casadi_gates.clear();
   }
 
   
@@ -109,7 +114,6 @@ namespace casadi {
   void Gate::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
                       const std::vector<casadi_int>& res) const {
-    uout() << "arg:" << arg << std::endl;
     if (arg.empty()) {
       g << g.copy(g.rw_double(this), nnz(), g.work(res[0], nnz())) << '\n';
     } else {
@@ -120,6 +124,10 @@ namespace casadi {
 
   void Gate::add_dependency(CodeGenerator& g) const {
     g.define_rw_double(this, nnz());
+  }
+
+  const std::vector<double>& Gate::get_double_vec() const {
+    return value_;
   }
 
 } // namespace casadi
