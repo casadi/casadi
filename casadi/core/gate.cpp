@@ -62,7 +62,11 @@ namespace casadi {
   }
 
   void Gate::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = arg[0]->get_gate();
+    if (arg.empty()) {
+      res[0] = shared_from_this<MX>();
+    } else {
+      res[0] = arg[0]->get_gate();
+    }
   }
 
   void Gate::ad_forward(const std::vector<std::vector<MX> >& fseed,
