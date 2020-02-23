@@ -95,6 +95,7 @@ namespace casadi {
 
         \identifier{10l} */
     static SXElem sym(const std::string& name);
+    static SXElem apply(const Function &f, const SXElem& arg);
 
     /// \cond INTERNAL
     /// Create an expression from a node: extra dummy argument to avoid ambiguity for 0/NULL

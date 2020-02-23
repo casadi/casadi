@@ -2748,6 +2748,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::apply(const Function& f) {
+    casadi_error("'apply' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::rand(const Sparsity& sp) { // NOLINT(runtime/threadsafe_fn)
 
     casadi_error("'rand' not defined for " + type_name());
