@@ -41,6 +41,8 @@ namespace casadi {
     };
   };
 
+  class CallSX;
+
 /** \brief  Internal node class for SXFunction
     Do not use any internal class directly - always use the public Function
     \author Joel Andersson
@@ -231,6 +233,9 @@ class CASADI_EXPORT SXFunction :
 
   /// Live variables?
   bool live_variables_;
+
+  /// Lookup table for call nodes
+  std::vector<const CallSX*> call_nodes_;
 
 protected:
   /** \brief Deserializing constructor */

@@ -2764,5 +2764,25 @@ class Functiontests(casadiTestCase):
 
     self.checkfunction_light(g, f2, inputs=[3])
 
+  def test_mxfun_in_sx(self):
+    x = MX.sym("x")
+    f = Function("f",[x],[sin(x)])
+    g = Function("g",[x],[x**2])
+
+    y = SX.sym("y")
+
+    y2 = y.apply(f).apply(g)
+    y_ref = g(f(y))
+
+    ff = Function('ff',[y],[y2,jacobian(y2,y)])
+
+    ff_ref = Function('ff',[y],[y_ref,jacobian(y_ref,y)])
+
+    self.checkfunction(ff,ff_ref, inputs=[0.2])
+    self.check_codegen(ff,inputs=[0.2])
+    self.check_serialize(ff,inputs=[0.2])
+
+    self.checkfunction_light(g, f2, inputs=[3])
+          
 if __name__ == '__main__':
     unittest.main()

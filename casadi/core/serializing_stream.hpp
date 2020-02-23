@@ -148,6 +148,18 @@ namespace casadi {
     void connect(SerializingStream & s);
     void reset();
 
+    /* \brief Packs a shared object
+    * 
+    * Also treats SXNode, which is not actually a SharedObjectInternal
+    */
+    template <class T>
+    void unpack(const T*& e) {
+      casadi_int k;
+      unpack("Shared::reference", k);
+      UniversalNodeOwner& t = nodes_.at(k);
+      e = static_cast<const T*>(t.get());
+    }
+  
   private:
 
     /* \brief Unpacks a shared object
@@ -266,6 +278,17 @@ namespace casadi {
     void connect(DeserializingStream & s);
     void reset();
 
+    /* \brief Packs a shared object
+    * 
+    * Also treats SXNode, which is not actually a SharedObjectInternal
+    */
+    template <class T>
+    void pack(const T* e) {
+      auto it = shared_map_.find(const_cast<T*>(e));
+      casadi_assert_dev(it!=shared_map_.end());
+      pack("Shared::reference", it->second);
+    }
+
   private:
     /** \brief Insert information for a primitive typecheck during deserialization
      *
@@ -292,6 +315,8 @@ namespace casadi {
         pack("Shared::reference", it->second);
       }
     }
+
+
 
     /// Mapping from shared pointers to running counter
     std::unordered_map<void*, casadi_int> shared_map_;

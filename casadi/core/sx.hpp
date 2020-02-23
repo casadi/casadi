@@ -44,6 +44,9 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   SX SX::_sym(const std::string& name, const Sparsity& sp);
 
   template<>
+  SX SX::apply(const Function& f);
+
+  template<>
   bool SX::is_regular() const;
 
   template<>

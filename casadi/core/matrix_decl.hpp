@@ -1122,6 +1122,8 @@ namespace casadi {
     static Matrix<double> from_file(const std::string& filename, const std::string& format_hint="");
     //@}
 
+    Matrix<Scalar> apply(const Function& f);
+
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same
     Matrix(const Sparsity& sp, const Scalar& val, bool dummy);
