@@ -34,6 +34,7 @@
 #include "binary_sx.hpp"
 #include "global_options.hpp"
 #include "sx_function.hpp"
+#include "call_sx.hpp"
 
 using namespace std;
 namespace casadi {
@@ -83,6 +84,10 @@ namespace casadi {
 
   SXElem SXElem::sym(const std::string& name) {
     return create(new SymbolicSX(name));
+  }
+
+  SXElem SXElem::apply(const Function &f, const SXElem& arg) {
+    return create(new CallSX(f, arg));
   }
 
   SXElem::~SXElem() {

@@ -149,6 +149,7 @@ set(CASADI_INTERNAL
   repmat.hpp              repmat.cpp              # RepMat
   convexify.hpp           convexify.cpp           # Convexify
   gate.hpp                gate.cpp
+  call_sx.hpp             call_sx.cpp
 
   # A dynamically created function with AD capabilities
   function.cpp
