@@ -103,7 +103,16 @@ namespace casadi {
   }
 
   int Call::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
-    return fcn_(arg, res, iw, w);
+    try {
+      return fcn_(arg, res, iw, w);
+    } catch (const CasadiException& e) {
+      if (fcn_.n_in()==1 && fcn_.nnz_in()==1 && fcn_.n_out() && fcn_.nnz_out()==1) {
+        res[0][0] = SXElem::apply(fcn_, arg[0][0]);
+        return 0;
+      } else {
+        throw e;
+      }
+    }
   }
 
   void Call::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
