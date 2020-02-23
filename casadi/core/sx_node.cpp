@@ -29,6 +29,7 @@
 #include "binary_sx.hpp"
 #include "constant_sx.hpp"
 #include "symbolic_sx.hpp"
+#include "call_sx.hpp"
 
 #include <limits>
 #include <stack>
@@ -229,6 +230,7 @@ namespace casadi {
   // Note: binary/unary operations are ommitted here
   std::map<casadi_int, SXNode* (*)(DeserializingStream&)> SXNode::deserialize_map = {
     {OP_PARAMETER, SymbolicSX::deserialize},
+    {OP_CALL, CallSX::deserialize},
     {OP_CONST, ConstantSX_deserialize}};
 
 

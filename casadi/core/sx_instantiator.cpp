@@ -98,6 +98,19 @@ namespace casadi {
   }
 
   template<>
+  SX CASADI_EXPORT SX::apply(const Function& name) {
+    // Create a dense n-by-m matrix
+    vector<SXElem> retv;
+    const vector<SXElem>& argv = nonzeros();
+
+    for (const auto & e : argv) {
+      retv.push_back(SXElem::apply(name, e));
+    }
+
+    return SX(sparsity(), retv, false);
+  }
+
+  template<>
   bool CASADI_EXPORT SX::is_regular() const {
     // First pass: ignore symbolics
     for (casadi_int i=0; i<nnz(); ++i) {
