@@ -90,7 +90,7 @@ namespace casadi {
         if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1];
         break;
       }
-      case OP_CALL: w[e.i0] = call_nodes_[e.i2]->fcn(w[e.i1], arg+n_in_, res+n_out_, iw, w+worksize_); break;
+      case OP_CALL: if (call_nodes_[e.i2]->fcn(w[e.i0], w[e.i1], arg+n_in_, res+n_out_, iw, w+worksize_)) return 1; break;
       default:
         casadi_error("Unknown operation" + str(e.op));
       }
