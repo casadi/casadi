@@ -87,6 +87,11 @@ namespace casadi {
   }
 
   SXElem SXElem::apply(const Function &f, const SXElem& arg) {
+    casadi_assert_dev(f.n_in()==1);
+    casadi_assert_dev(f.n_out()==1);
+    casadi_assert_dev(f.nnz_in()==1);
+    if (f.nnz_out()==0) return SXElem(0);
+    casadi_assert_dev(f.nnz_out()==1);
     return create(new CallSX(f, arg));
   }
 
