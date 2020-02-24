@@ -31,16 +31,19 @@ namespace casadi {
 
   CallSX::CallSX(const Function &f, const SXElem& dep) :
     dep_(dep),
-    f_(f) { }
+    f_(f) {
+      casadi_assert_dev(f.n_in()==1);
+      casadi_assert_dev(f.n_out()==1);
+      casadi_assert_dev(f.nnz_in()==1);
+      casadi_assert_dev(f.nnz_out()==1);
+    }
 
 
-  double CallSX::fcn(double x, const double** arg, double** res, casadi_int* iw, double* w) const {
-    // Note: not thread-safe
+  int CallSX::fcn(double& result, double x, const double** arg, double** res, casadi_int* iw, double* w) const {
     arg[0] = &x;
-    double ret;
-    res[0] = &ret;
+    res[0] = &result;
     int mem = f_.checkout();
-    f_(arg, res, iw, w, mem);
+    int ret = f_(arg, res, iw, w, mem);
     f_.release(mem);
     return ret;
   }

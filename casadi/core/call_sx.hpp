@@ -58,7 +58,7 @@ public:
   const SXElem& dep(casadi_int i) const override { return dep_; }
   SXElem& dep(casadi_int i) override { return dep_; }
 
-  double fcn(double x, const double** arg, double** res, casadi_int* iw, double* w) const;
+  int fcn(double& result, double x, const double** arg, double** res, casadi_int* iw, double* w) const;
   SXElem fcn(const SXElem& arg) const;
 
   static void der(const SXElem& x, const SXElem& y, const SXElem& f, SXElem* d);

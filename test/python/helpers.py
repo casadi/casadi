@@ -385,7 +385,7 @@ class casadiTestCase(unittest.TestCase):
       try:
         trial_outputs = trial.call(inputs)
         solution_outputs = solution.call(inputs)
-        print(solution_outputs)
+        #print(solution_outputs)
       except Exception as e:
         raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (0,0,failmessage) )
 
