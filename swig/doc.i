@@ -89547,6 +89547,9 @@ options or rely on automatic detection
 +----------------+--------------+------------------------------------------+
 | nx             | OT_INTVECTOR | Number of states, length N+1             |
 +----------------+--------------+------------------------------------------+
+| print_level    | OT_INTEGER   | Amount of diagnostic printing [Default:  |
+|                |              | 1].                                      |
++----------------+--------------+------------------------------------------+
 | target         | OT_STRING    | hpmpc target                             |
 +----------------+--------------+------------------------------------------+
 | tol            | OT_DOUBLE    | Tolerance in the duality measure         |
