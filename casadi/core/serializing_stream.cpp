@@ -393,4 +393,20 @@ namespace casadi {
     }
   }
 
+  void SerializingStream::connect(DeserializingStream & s) {
+    nodes_ = &s.nodes_;
+  }
+
+  void DeserializingStream::connect(SerializingStream & s) {
+    shared_map_ = &s.shared_map_;
+  }
+
+  void SerializingStream::reset() {
+    shared_map_.clear();
+  }
+
+  void DeserializingStream::reset() {
+    nodes_.clear();
+  }
+
 } // namespace casadi

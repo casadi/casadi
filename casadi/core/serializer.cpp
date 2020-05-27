@@ -44,14 +44,14 @@ namespace casadi {
           std::unique_ptr<std::ostream>(
             new std::ofstream(fname, ios_base::binary | std::ios::out)),
           opts) {
-      if ((stream_->rdstate() & std::ifstream::failbit) != 0) {
+      if ((sstream_->rdstate() & std::ifstream::failbit) != 0) {
         casadi_error("Could not open file '" + fname + "' for writing.");
       }
     }
 
     SerializerBase::SerializerBase(std::unique_ptr<std::ostream> stream, const Dict& opts) :
-        stream_(std::move(stream)),
-        serializer_(new SerializingStream(*stream_, opts)) {
+        sstream_(std::move(stream)),
+        serializer_(new SerializingStream(*sstream_, opts)) {
     }
 
     std::string SerializerBase::type_to_string(SerializationType type) {
@@ -84,30 +84,30 @@ namespace casadi {
     }
 
     std::string StringSerializer::encode() {
-      std::string ret = static_cast<std::stringstream*>(stream_.get())->str();
-      static_cast<std::stringstream*>(stream_.get())->str("");
-      stream_->clear();
+      std::string ret = static_cast<std::stringstream*>(sstream_.get())->str();
+      static_cast<std::stringstream*>(sstream_.get())->str("");
+      sstream_->clear();
       return ret;
     }
     void StringDeserializer::decode(const std::string& string) {
-      casadi_assert(stream_->peek()==char_traits<char>::eof(),
+      casadi_assert(dstream_->peek()==char_traits<char>::eof(),
         "StringDeserializer::decode does not apply: current string not fully consumed yet.");
-      static_cast<std::stringstream*>(stream_.get())->str(string);
-      stream_->clear(); // reset error flags
+      static_cast<std::stringstream*>(dstream_.get())->str(string);
+      dstream_->clear(); // reset error flags
     }
 
     SerializerBase::~SerializerBase() { }
     StringSerializer::~StringSerializer() { }
 
     DeserializerBase::DeserializerBase(std::unique_ptr<std::istream> stream) :
-      stream_(std::move(stream)),
-      deserializer_(new DeserializingStream(*stream_)) {
+      dstream_(std::move(stream)),
+      deserializer_(new DeserializingStream(*dstream_)) {
     }
 
     FileDeserializer::FileDeserializer(const std::string& fname) :
         DeserializerBase(std::unique_ptr<std::istream>(
           new std::ifstream(fname, ios_base::binary | std::ios::in))) {
-      if ((stream_->rdstate() & std::ifstream::failbit) != 0) {
+      if ((dstream_->rdstate() & std::ifstream::failbit) != 0) {
         casadi_error("Could not open file '" + fname + "' for reading.");
       }
     }
@@ -126,7 +126,7 @@ namespace casadi {
     }
 
     DeserializingStream& DeserializerBase::deserializer() {
-      casadi_assert(stream_->peek()!=char_traits<char>::eof(),
+      casadi_assert(dstream_->peek()!=char_traits<char>::eof(),
         "Deserializer reached end of stream. Nothing left to unpack.");
       return *deserializer_;
     }
@@ -199,5 +199,18 @@ SERIALIZE_ALL(GENERICTYPE, GenericType, generictype)
 SERIALIZE_ALL(INT, casadi_int, int)
 SERIALIZE_ALL(DOUBLE, double, double)
 SERIALIZE_ALL(STRING, std::string , string)
+
+  void SerializerBase::connect(DeserializerBase & s) {
+    serializer_->connect(*s.deserializer_);
+  }
+  void SerializerBase::reset() {
+    serializer_->reset();
+  }
+  void DeserializerBase::connect(SerializerBase & s) {
+    deserializer_->connect(*s.serializer_);
+  }
+  void DeserializerBase::reset() {
+    deserializer_->reset();
+  }
 
 } // namespace casadi

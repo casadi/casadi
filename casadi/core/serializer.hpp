@@ -41,10 +41,12 @@ namespace casadi {
   class SXElem;
   class GenericType;
   class Importer;
+  class DeserializerBase;
 
 
 
   class CASADI_EXPORT SerializerBase {
+    friend class DeserializerBase;
   public:
 #ifndef SWIG
     SerializerBase(std::unique_ptr<std::ostream> stream, const Dict& opts = Dict());
@@ -98,13 +100,17 @@ namespace casadi {
 
     static std::string type_to_string(SerializationType type);
 
+    void connect(DeserializerBase & s);
+    void reset();
+
   protected:
     SerializingStream& serializer();
-    std::unique_ptr<std::ostream> stream_;
+    std::unique_ptr<std::ostream> sstream_;
     std::unique_ptr<SerializingStream> serializer_;
   };
 
   class CASADI_EXPORT DeserializerBase {
+    friend class SerializerBase;
   public:
 #ifndef SWIG
     DeserializerBase(std::unique_ptr<std::istream> stream);
@@ -155,9 +161,12 @@ namespace casadi {
     std::vector<double> unpack_double_vector();
     std::vector<std::string> unpack_string_vector();
 
+    void connect(SerializerBase & s);
+    void reset();
+
   protected:
     DeserializingStream& deserializer();
-    std::unique_ptr<std::istream> stream_;
+    std::unique_ptr<std::istream> dstream_;
     std::unique_ptr<DeserializingStream> deserializer_;
   };
 
