@@ -100,6 +100,10 @@ namespace casadi {
     casadi_error("'nfact' not defined for " + class_name());
   }
 
+  double LinsolInternal::det(void* mem, const double* A) const {
+    casadi_error("'det' not defined for " + class_name());
+  }
+
   casadi_int LinsolInternal::neig(void* mem, const double* A) const {
     casadi_error("'neig' not defined for " + class_name());
   }

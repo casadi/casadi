@@ -97,6 +97,9 @@ namespace casadi {
     // Solve numerically
     virtual int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const;
 
+    /// Determinant
+    virtual double det(void* mem, const double* A) const;
+
     /// Number of negative eigenvalues
     virtual casadi_int neig(void* mem, const double* A) const;
 
