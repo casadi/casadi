@@ -91,6 +91,13 @@ namespace casadi {
     ///@}
 
     ///@{
+    /** \brief Return sparsity of Jacobian of all input elements
+     * with respect to all output elements */
+    bool has_jacobian_sparsity() const override;
+    Sparsity get_jacobian_sparsity() const override;
+    ///@}
+
+    ///@{
     /** \brief Return function that calculates forward derivatives */
     bool has_forward(casadi_int nfwd) const override;
     Function get_forward(casadi_int nfwd, const std::string& name,

@@ -1932,6 +1932,18 @@ namespace casadi {
     return f;
   }
 
+  Sparsity FunctionInternal::jacobian_sparsity() const {
+    if (!jacobian_sparsity_.is_null()) {
+      return jacobian_sparsity_;
+    }
+    if (has_jacobian_sparsity()) {
+      jacobian_sparsity_ = get_jacobian_sparsity();
+      return jacobian_sparsity_;
+    } else {
+      return wrap()->jacobian_sparsity();
+    }
+  }
+
   Function FunctionInternal::
   get_forward(casadi_int nfwd, const std::string& name,
               const std::vector<std::string>& inames,
@@ -2103,10 +2115,6 @@ namespace casadi {
                const std::vector<std::string>& onames,
                const Dict& opts) const {
     casadi_error("'get_jac' not defined for " + class_name());
-  }
-
-  Sparsity FunctionInternal::get_jacobian_sparsity() const {
-    return wrap()->get_jacobian_sparsity();
   }
 
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
