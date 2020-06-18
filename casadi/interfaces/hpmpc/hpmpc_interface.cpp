@@ -83,7 +83,7 @@ namespace casadi {
        {OT_DOUBLE,
         "HPMPC cannot handle infinities. Infinities will be replaced by this option's value."}},
       {"print_level",
-       {OT_INTEGER,
+       {OT_INT,
         "Amount of diagnostic printing [Default: 1]."}},
       {"target",
        {OT_STRING,
