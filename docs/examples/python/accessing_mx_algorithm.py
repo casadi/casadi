@@ -57,7 +57,8 @@ for k in range(f.n_instructions()):
 
   if(op==OP_CONST):
     v = f.instruction_MX(k).to_DM()
-    work[o[0]] = v
+    assert v.is_dense()
+    work[o[0]] = np.array(v)
     print('work[{o[0]}] = {v}'.format(o=o,v=v))
   else:
     if op==OP_INPUT:
@@ -76,7 +77,9 @@ for k in range(f.n_instructions()):
       work[o[0]] = np.dot(work[i[1]], work[i[2]])+work[i[0]]
       print('work[{o[0]}] = work[{i[1]}] @ work[{i[2]}] + work[{i[0]}]        ---> {v}'.format(o=o,i=i,v=work[o[0]]))
     else:
-      print('Unknown operation: ', op)
+      disp_in = ["work[" + str(a) + "]" for a in i]
+      debug_str = print_operator(f.instruction_MX(k),disp_in)
+      raise Exception('Unknown operation: ' + str(op) + ' -- ' + debug_str)
 
 print('------')
 print('Evaluated ' + str(f))

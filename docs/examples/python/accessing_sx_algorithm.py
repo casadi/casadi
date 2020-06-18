@@ -44,6 +44,9 @@ output_val = [numpy.zeros(2)]
 # Work vector
 work = numpy.zeros(f.sz_w())
 
+# For debugging
+instr = f.instructions_sx()
+
 # Loop over the algorithm
 for k in range(f.n_instructions()):
 
@@ -69,12 +72,11 @@ for k in range(f.n_instructions()):
       work[o[0]] = work[i[0]] * work[i[1]]
       print('work[', o[0], '] = work[', i[0], '] * work[', i[1], ']','        ---> ', work[o[0]])
     else:
-      print('Unknown operation: ', op)
+      disp_in = ["work[" + str(a) + "]" for a in i]
+      debug_str = print_operator(instr[k],disp_in)
+      raise Exception('Unknown operation: ' + str(op) + ' -- ' + debug_str)
 
 print('------')
 print('Evaluated ' + str(f))
 print('Expected: ', f.call(input_val))
 print('Got:      ', output_val)
-
-
-print(f.instructions_sx())

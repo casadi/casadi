@@ -77,8 +77,8 @@ int main(){
   opti.subject_to(0<=U<=1);           // control is limited
 
   // ---- boundary conditions --------
-  opti.subject_to(pos(1)==0);   // start at position 0 ...
-  opti.subject_to(speed(1)==0); // ... from stand-still 
+  opti.subject_to(pos(0)==0);   // start at position 0 ...
+  opti.subject_to(speed(0)==0); // ... from stand-still 
   opti.subject_to(pos(N)==1); // finish line at position 1
 
   // ---- misc. constraints  ----------
