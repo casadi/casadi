@@ -760,6 +760,9 @@
 %exception  casadi::FunctionInternal::has_jacobian() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::has_jacobian_sparsity() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::has_reverse(casadi_int nadj) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -812,6 +815,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jacobian() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::jacobian_sparsity() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jacobian_sparsity_filter(const Sparsity &sp) const  {

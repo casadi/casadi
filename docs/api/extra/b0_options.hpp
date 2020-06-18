@@ -1683,7 +1683,7 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::HpmpcInterface</td></tr>
-<tr><td>print_level</td><td>OT_INTEGER</td><td>Amount of diagnostic printing [Default: 1].</td><td>casadi::HpmpcInterface</td></tr>
+<tr><td>print_level</td><td>OT_INT</td><td>Amount of diagnostic printing [Default: 1].</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>target</td><td>OT_STRING</td><td>hpmpc target</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance in the duality measure</td><td>casadi::HpmpcInterface</td></tr>
@@ -1705,7 +1705,7 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td></tr>
-<tr><td>print_level</td><td>OT_INTEGER</td><td>Amount of diagnostic printing [Default: 1].</td></tr>
+<tr><td>print_level</td><td>OT_INT</td><td>Amount of diagnostic printing [Default: 1].</td></tr>
 <tr><td>target</td><td>OT_STRING</td><td>hpmpc target</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance in the duality measure</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm-starting</td></tr>
@@ -1727,7 +1727,7 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::HpmpcInterface</td></tr>
-<tr><td>print_level</td><td>OT_INTEGER</td><td>Amount of diagnostic printing [Default: 1].</td><td>casadi::HpmpcInterface</td></tr>
+<tr><td>print_level</td><td>OT_INT</td><td>Amount of diagnostic printing [Default: 1].</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>target</td><td>OT_STRING</td><td>hpmpc target</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance in the duality measure</td><td>casadi::HpmpcInterface</td></tr>

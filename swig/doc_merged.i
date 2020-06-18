@@ -30,9 +30,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::BackwardDiff::disp_more "
+%feature("docstring") casadi::BackwardDiff::replace_res "
 
-[INTERNAL]  Print more.
+[INTERNAL]  Replace 0-by-0 outputs.
 
 ";
 
@@ -79,6 +79,12 @@ original
 %feature("docstring") casadi::BackwardDiff::format_time "
 
 [INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
+%feature("docstring") casadi::BackwardDiff::alloc_res "
+
+[INTERNAL]  Ensure required length of res field.
 
 ";
 
@@ -138,9 +144,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::BackwardDiff::get_jacobian_sparsity "
+%feature("docstring") casadi::BackwardDiff::info "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]  Obtain information about function
 
 ";
 
@@ -209,6 +215,12 @@ elements.
 %feature("docstring") casadi::BackwardDiff::is_diff_in "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::BackwardDiff::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
 
 %feature("docstring") casadi::BackwardDiff::generate_options "
 
@@ -343,6 +355,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::BackwardDiff::size_out "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::BackwardDiff::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -667,9 +685,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::BackwardDiff::replace_res "
+%feature("docstring") casadi::BackwardDiff::get_jacobian_sparsity "
 
-[INTERNAL]  Replace 0-by-0 outputs.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -1161,12 +1179,6 @@ C++ includes: finite_differences.hpp ";
 
 ";
 
-%feature("docstring") casadi::BackwardDiff::info "
-
-[INTERNAL]  Obtain information about function
-
-";
-
 %feature("docstring") casadi::BackwardDiff::init "
 
 [INTERNAL]  Initialize.
@@ -1300,9 +1312,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::BackwardDiff::alloc_res "
+%feature("docstring") casadi::BackwardDiff::disp_more "
 
-[INTERNAL]  Ensure required length of res field.
+[INTERNAL]  Print more.
 
 ";
 
@@ -2723,6 +2735,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Blocksqp::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
 %feature("docstring") casadi::Blocksqp::filterLineSearch "
 
 [INTERNAL] ";
@@ -2927,6 +2945,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::Blocksqp::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -3220,9 +3244,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::index_in "
+%feature("docstring") casadi::Blocksqp::jacobian_sparsity "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -4600,6 +4624,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::is_diff_out "
 
 [INTERNAL] ";
@@ -4954,6 +4984,12 @@ Evaluate a function, overloaded.
 
 [INTERNAL]  Export an input file that can be passed to generate C code with
 a main.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -5396,22 +5432,29 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
+%feature("docstring") casadi::Callback::reverse "
 
-Copy constructor (throws an error)
+Get a function that calculates nadj adjoint derivatives.
 
->  casadi::Callback::Callback(const Callback &obj)
-------------------------------------------------------------------------
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
 
-Copy constructor (throws an error)
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
-";
+%feature("docstring") casadi::Callback::get_jacobian_sparsity "
 
-%feature("docstring") casadi::Callback::get_name_in "
-
-Get the sparsity of an input This function is called during construction.
+Return sparsity of Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
@@ -5633,22 +5676,16 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::Callback::reverse "
+%feature("docstring") casadi::Callback::Callback "
 
-Get a function that calculates nadj adjoint derivatives.
+Copy constructor (throws an error)
 
-Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_out inputs
-correspond to adjoint seeds, stacked horizontally The n_in outputs
-correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
+>  casadi::Callback::Callback(const Callback &obj)
+------------------------------------------------------------------------
 
-(n_in = n_in(), n_out = n_out())
+Copy constructor (throws an error)
 
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+";
 
 ";
 
@@ -6004,6 +6041,13 @@ Get the MX node corresponding to an instruction ( MXFunction)
 
 ";
 
+%feature("docstring") casadi::Callback::has_jacobian_sparsity "
+
+Return sparsity of Jacobian of all input elements with respect to all output
+elements.
+
+";
+
 %feature("docstring") casadi::Callback::sz_res "
 
 Get required length of res field.
@@ -6296,6 +6340,12 @@ Get output dimension.
 
 ";
 
+%feature("docstring") casadi::Callback::get_name_in "
+
+Get the sparsity of an input This function is called during construction.
+
+";
+
 %feature("docstring") casadi::Callback::get_name_out "
 
 Get the sparsity of an output This function is called during construction.
@@ -6384,9 +6434,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::CentralDiff::convert_arg "
+%feature("docstring") casadi::CentralDiff::get_jacobian_sparsity "
 
-[INTERNAL]  Convert from/to input/output lists/map.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -6709,6 +6759,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::CentralDiff::convert_arg "
+
+[INTERNAL]  Convert from/to input/output lists/map.
+
+";
+
 %feature("docstring") casadi::CentralDiff::generate_in "
 
 [INTERNAL]  Export an input file that can be passed to generate C code with
@@ -6729,12 +6785,6 @@ a main.
 %feature("docstring") casadi::CentralDiff::get_abstol "
 
 [INTERNAL]  Get absolute tolerance.
-
-";
-
-%feature("docstring") casadi::CentralDiff::get_jacobian_sparsity "
-
-[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -7189,6 +7239,12 @@ original
 
 ";
 
+%feature("docstring") casadi::CentralDiff::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::CentralDiff::check_res "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
@@ -7413,6 +7469,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::CentralDiff::codegen_name "
 
 [INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring") casadi::CentralDiff::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -8452,6 +8514,12 @@ original
 
 ";
 
+%feature("docstring") casadi::Collocation::signature "
+
+[INTERNAL]  Code generate the function.
+
+";
+
 %feature("docstring") casadi::Collocation::generate_out "
 
 [INTERNAL] ";
@@ -8632,6 +8700,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring") casadi::Collocation::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -8893,9 +8967,9 @@ elements.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Collocation::signature "
+%feature("docstring") casadi::Collocation::has_jacobian_sparsity "
 
-[INTERNAL]  Code generate the function.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -10171,6 +10245,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Conic::set_temp "
+
+[INTERNAL]  Set the (temporary) work vectors.
+
+";
+
 %feature("docstring") casadi::Conic::mapsum_mx "
 
 [INTERNAL]  Parallel evaluation.
@@ -10520,9 +10600,9 @@ a main.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Conic::set_temp "
+%feature("docstring") casadi::Conic::has_jacobian_sparsity "
 
-[INTERNAL]  Set the (temporary) work vectors.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -10707,6 +10787,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Conic::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Conic::solve "
 
 [INTERNAL]   Solve the QP.
@@ -10823,9 +10909,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::Conic::get_jacobian_sparsity "
+%feature("docstring") casadi::Conic::project_res "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]   Project sparsities.
 
 ";
 
@@ -11346,9 +11432,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Conic::project_res "
+%feature("docstring") casadi::Conic::get_jacobian_sparsity "
 
-[INTERNAL]   Project sparsities.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -12743,16 +12829,14 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Dple::check_mat "
+%feature("docstring") casadi::Dple::replace_aseed "
 
-[INTERNAL]  Helper function
+[INTERNAL]
 
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar[out]:  required number of parallel calls (or -1)
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -13377,14 +13461,16 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::Dple::replace_aseed "
+%feature("docstring") casadi::Dple::check_mat "
 
-[INTERNAL]
+[INTERNAL]  Helper function
 
->  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-";
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar[out]:  required number of parallel calls (or -1)
 
 ";
 
@@ -13515,6 +13601,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Dple::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Dple::get_partition "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
@@ -13594,6 +13686,12 @@ constructor), this class should invoke this function when initialized.
 %feature("docstring") casadi::Dple::codegen_name "
 
 [INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring") casadi::Dple::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -14042,6 +14140,12 @@ propagation.
 %feature("docstring") casadi::Expm::get_options "
 
 [INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::Expm::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -15179,6 +15283,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Expm::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Expm::tocache "
 
 [INTERNAL]  Save function to cache.
@@ -15339,9 +15449,18 @@ elements.
 
 ";
 
-%feature("docstring") casadi::External::call "
+%feature("docstring") casadi::External::check_arg "
 
-[INTERNAL]   Call a function, templated.
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+Raises errors.
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -15430,18 +15549,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::External::check_arg "
+%feature("docstring") casadi::External::call "
 
-[INTERNAL]  Check if input arguments have correct length and dimensions.
-
-Raises errors.
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]   Call a function, templated.
 
 ";
 
@@ -15647,18 +15757,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::External::matching_res "
+%feature("docstring") casadi::External::jacobian_sparsity "
 
-[INTERNAL]  Check if output arguments that needs to be replaced.
-
-Raises errors
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -15779,9 +15880,18 @@ is_diff_in/out.
 
 ";
 
-%feature("docstring") casadi::External::codegen_free_mem "
+%feature("docstring") casadi::External::matching_res "
 
-[INTERNAL]  Codegen for free_mem.
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -15800,6 +15910,12 @@ is_diff_in/out.
 %feature("docstring") casadi::External::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::External::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -16062,6 +16178,12 @@ original
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::External::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -17030,14 +17152,9 @@ C++ includes: fast_newton.hpp ";
 
 ";
 
-%feature("docstring") casadi::FastNewton::get_function "
+%feature("docstring") casadi::FastNewton::nz_out "
 
-[INTERNAL]
-
->  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
-------------------------------------------------------------------------
-[INTERNAL] 
-";
+[INTERNAL]  Convert from/to flat vector of input/output nonzeros.
 
 ";
 
@@ -17145,6 +17262,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::FastNewton::set_temp "
+
+[INTERNAL]  Set the work vectors.
+
+";
+
 %feature("docstring") casadi::FastNewton::print "
 
 [INTERNAL]  C-style formatted printing during evaluation.
@@ -17248,6 +17371,12 @@ propagation.
 %feature("docstring") casadi::FastNewton::get_min_in "
 
 [INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring") casadi::FastNewton::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -17560,9 +17689,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::FastNewton::nz_out "
+%feature("docstring") casadi::FastNewton::has_jacobian_sparsity "
 
-[INTERNAL]  Convert from/to flat vector of input/output nonzeros.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -17578,9 +17707,14 @@ elements.
 
 ";
 
-%feature("docstring") casadi::FastNewton::set_temp "
+%feature("docstring") casadi::FastNewton::get_function "
 
-[INTERNAL]  Set the work vectors.
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -18457,6 +18591,12 @@ C++ includes: finite_differences.hpp ";
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::instruction_input "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
@@ -19264,13 +19404,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::reverse "
+%feature("docstring") casadi::FiniteDiff::get_function "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::FiniteDiff::set_work "
 
@@ -19299,6 +19435,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -19536,9 +19678,13 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::get_function "
+%feature("docstring") casadi::FiniteDiff::reverse "
 
-[INTERNAL] ";
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(casadi_int nadj) if no cached version is available.
+
+";
 
 %feature("docstring") casadi::FiniteDiff::size_out "
 
@@ -19668,6 +19814,12 @@ npar[out]:  required number of parallel calls (or -1)
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::FixedStepIntegrator::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::init_mem "
 
 [INTERNAL]  Initalize memory block.
@@ -19678,9 +19830,9 @@ npar[out]:  required number of parallel calls (or -1)
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::FixedStepIntegrator::serialize_body "
+%feature("docstring") casadi::FixedStepIntegrator::jacobian_sparsity "
 
-[INTERNAL]  Serialize an object without type information.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -20077,9 +20229,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::get_jacobian_sparsity "
+%feature("docstring") casadi::FixedStepIntegrator::convert_arg "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]  Convert from/to input/output lists/map.
 
 ";
 
@@ -20619,9 +20771,9 @@ problem)
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::convert_arg "
+%feature("docstring") casadi::FixedStepIntegrator::get_jacobian_sparsity "
 
-[INTERNAL]  Convert from/to input/output lists/map.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -20856,6 +21008,12 @@ a main.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::serialize_body "
+
+[INTERNAL]  Serialize an object without type information.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::size2_in "
 
 [INTERNAL]  Input/output dimensions.
@@ -21080,6 +21238,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::oracle "
 
 [INTERNAL]  Get oracle.
@@ -21193,9 +21357,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::get_n_out "
+%feature("docstring") casadi::ForwardDiff::get_jacobian_sparsity "
 
-[INTERNAL]  Number of function inputs and outputs.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -22004,6 +22168,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::get_name_in "
 
 [INTERNAL]  Names of function input and outputs.
@@ -22420,9 +22590,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::get_jacobian_sparsity "
+%feature("docstring") casadi::ForwardDiff::get_n_out "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]  Number of function inputs and outputs.
 
 ";
 
@@ -24112,9 +24282,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::checkout "
+%feature("docstring") casadi::GenericExternal::jacobian_sparsity "
 
-[INTERNAL]  Checkout a memory object.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -24224,9 +24394,18 @@ elements.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::disp "
+%feature("docstring") casadi::GenericExternal::check_arg "
 
-[INTERNAL]  Display object.
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+Raises errors.
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -24272,6 +24451,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::GenericExternal::index_out "
 
 [INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring") casadi::GenericExternal::sz_arg "
+
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -24403,9 +24588,9 @@ classes.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::GenericExternal::codegen_declarations "
+%feature("docstring") casadi::GenericExternal::has_jacobian_sparsity "
 
-[INTERNAL]  Generate code for the declarations of the C function.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -24850,18 +25035,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::check_arg "
+%feature("docstring") casadi::GenericExternal::codegen_declarations "
 
-[INTERNAL]  Check if input arguments have correct length and dimensions.
-
-Raises errors.
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Generate code for the declarations of the C function.
 
 ";
 
@@ -24947,6 +25123,12 @@ elements.
 %feature("docstring") casadi::GenericExternal::init_mem "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring") casadi::GenericExternal::checkout "
+
+[INTERNAL]  Checkout a memory object.
 
 ";
 
@@ -25201,9 +25383,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::GenericExternal::sz_arg "
+%feature("docstring") casadi::GenericExternal::disp "
 
-[INTERNAL]  Get required length of arg field.
+[INTERNAL]  Display object.
 
 ";
 
@@ -26107,9 +26289,10 @@ C++ includes: global_options.hpp ";
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::sparsity_in "
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::jacobian_sparsity
+"
 
-[INTERNAL]  Input/output sparsity.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -26431,6 +26614,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::sparsity_in "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::get_free "
 
 [INTERNAL]  Print free variables.
@@ -26719,6 +26908,13 @@ casadi::ImplicitFixedStepIntegrator::algebraic_state_init "
 
 [INTERNAL]  Create sparsity pattern of the extended Jacobian (forward
 problem)
+
+";
+
+%feature("docstring")
+casadi::ImplicitFixedStepIntegrator::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -28097,9 +28293,9 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::get_jacobian_sparsity "
+%feature("docstring") casadi::ImplicitToNlp::get_name_out "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -28511,6 +28707,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::codegen_meta "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
@@ -28766,9 +28968,9 @@ is_diff_in/out.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::get_name_out "
+%feature("docstring") casadi::ImplicitToNlp::get_jacobian_sparsity "
 
-[INTERNAL]  Names of function input and outputs.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -28792,6 +28994,12 @@ elements.
 %feature("docstring") casadi::ImplicitToNlp::get_stats "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -29320,6 +29528,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Integrator::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Integrator::nz_out "
 
 [INTERNAL]  Convert from/to flat vector of input/output nonzeros.
@@ -29376,9 +29590,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Integrator::nnz_in "
+%feature("docstring") casadi::Integrator::eval "
 
-[INTERNAL]  Number of input/output nonzeros.
+[INTERNAL]  evaluate
 
 ";
 
@@ -29428,9 +29642,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Integrator::get_n_out "
+%feature("docstring") casadi::Integrator::has_jacobian_sparsity "
 
-[INTERNAL]  Number of function inputs and outputs.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -29925,6 +30139,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Integrator::get_n_out "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
 %feature("docstring") casadi::Integrator::get_name_in "
 
 [INTERNAL]  Names of function input and outputs.
@@ -30160,9 +30380,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Integrator::eval "
+%feature("docstring") casadi::Integrator::nnz_in "
 
-[INTERNAL]  evaluate
+[INTERNAL]  Number of input/output nonzeros.
 
 ";
 
@@ -30605,6 +30825,12 @@ npar[out]:  required number of parallel calls (or -1)
 %feature("docstring") casadi::Interpolant::get_reltol "
 
 [INTERNAL]  Get relative tolerance.
+
+";
+
+%feature("docstring") casadi::Interpolant::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -32098,6 +32324,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Interpolant::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Interpolant::convert_arg "
 
 [INTERNAL]  Convert from/to input/output lists/map.
@@ -32959,6 +33191,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::JitFunction::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::JitFunction::has_derivative "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -33063,6 +33301,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::JitFunction::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::JitFunction::sparsity_out "
 
 [INTERNAL]  Input/output sparsity.
@@ -33072,6 +33316,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::JitFunction::get_default_in "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring") casadi::JitFunction::project_res "
+
+[INTERNAL]   Project sparsities.
 
 ";
 
@@ -33376,12 +33626,6 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::JitFunction::disp_more "
 
 [INTERNAL]  Print more.
-
-";
-
-%feature("docstring") casadi::JitFunction::print_option "
-
-[INTERNAL]  Print all information there is to know about a certain option.
 
 ";
 
@@ -33790,9 +34034,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::JitFunction::get_jacobian_sparsity "
+%feature("docstring") casadi::JitFunction::print_option "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]  Print all information there is to know about a certain option.
 
 ";
 
@@ -33814,9 +34058,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::JitFunction::project_res "
+%feature("docstring") casadi::JitFunction::get_jacobian_sparsity "
 
-[INTERNAL]   Project sparsities.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -35460,9 +35704,9 @@ is_diff_in/out.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::ad_weight "
+%feature("docstring") casadi::LinearInterpolant::get_jacobian_sparsity "
 
-[INTERNAL]  Weighting factor for chosing forward/reverse mode.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -35534,6 +35778,19 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::LinearInterpolant::size_out "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::check_mat "
+
+[INTERNAL]  Helper function
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar[out]:  required number of parallel calls (or -1)
 
 ";
 
@@ -35689,16 +35946,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::check_mat "
+%feature("docstring") casadi::LinearInterpolant::jacobian_sparsity "
 
-[INTERNAL]  Helper function
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar[out]:  required number of parallel calls (or -1)
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -35806,9 +36056,9 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::get_jacobian_sparsity "
+%feature("docstring") casadi::LinearInterpolant::ad_weight "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]  Weighting factor for chosing forward/reverse mode.
 
 ";
 
@@ -35995,6 +36245,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::LinearInterpolant::get_n_out "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -36767,6 +37023,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::info "
 
 [INTERNAL]  Obtain information about function
@@ -36848,6 +37110,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::LinearInterpolantJac::has_derivative "
 
 [INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -37242,9 +37510,11 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::replace_arg "
+%feature("docstring")
+casadi::LinearInterpolantJac::getJacSparsityHierarchical "
 
-[INTERNAL]  Replace 0-by-0 inputs.
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
 
 ";
 
@@ -37491,11 +37761,9 @@ original
 
 ";
 
-%feature("docstring")
-casadi::LinearInterpolantJac::getJacSparsityHierarchical "
+%feature("docstring") casadi::LinearInterpolantJac::replace_arg "
 
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition.
+[INTERNAL]  Replace 0-by-0 inputs.
 
 ";
 
@@ -39574,9 +39842,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::Map::sparsity_jac "
+%feature("docstring") casadi::Map::eval "
 
-[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+[INTERNAL]  Evaluate the function numerically.
 
 ";
 
@@ -39762,11 +40030,9 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::Map::get_forward "
+%feature("docstring") casadi::Map::factory "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Map::get_n_in "
 
@@ -39802,12 +40068,6 @@ propagation.
 %feature("docstring") casadi::Map::sz_work "
 
 [INTERNAL]  Get number of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::Map::size2_out "
-
-[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -39952,6 +40212,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Map::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Map::get_default_in "
 
 [INTERNAL]  Get default input value.
@@ -40038,9 +40304,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Map::numel_out "
+%feature("docstring") casadi::Map::size2_out "
 
-[INTERNAL]  Number of input/output elements.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -40059,6 +40325,12 @@ elements.
 %feature("docstring") casadi::Map::incache "
 
 [INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::Map::convert_arg "
+
+[INTERNAL]  Convert from/to input/output lists/map.
 
 ";
 
@@ -40192,6 +40464,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Map::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Map::project_res "
 
 [INTERNAL]   Project sparsities.
@@ -40228,9 +40506,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Map::eval "
+%feature("docstring") casadi::Map::sparsity_jac "
 
-[INTERNAL]  Evaluate the function numerically.
+[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
@@ -40502,9 +40780,11 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Map::factory "
+%feature("docstring") casadi::Map::get_forward "
 
-[INTERNAL] ";
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
 
 %feature("docstring") casadi::Map::codegen_free_mem "
 
@@ -40559,9 +40839,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Map::convert_arg "
+%feature("docstring") casadi::Map::numel_out "
 
-[INTERNAL]  Convert from/to input/output lists/map.
+[INTERNAL]  Number of input/output elements.
 
 ";
 
@@ -40732,9 +41012,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::MapSum::has_free "
+%feature("docstring") casadi::MapSum::sz_w "
 
-[INTERNAL]  Does the function have free variables.
+[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -40767,9 +41047,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::MapSum::get_name_out "
+%feature("docstring") casadi::MapSum::size2_out "
 
-[INTERNAL]  Names of function input and outputs.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -40842,9 +41122,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::MapSum::get_forward "
+%feature("docstring") casadi::MapSum::has_free "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Does the function have free variables.
 
 ";
 
@@ -41023,6 +41303,10 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::MapSum::get_function "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::MapSum::generate_dependencies "
 
 [INTERNAL]  Export / Generate C code for the dependency function.
@@ -41080,9 +41364,11 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::MapSum::get_function "
+%feature("docstring") casadi::MapSum::has_jacobian_sparsity "
 
-[INTERNAL] ";
+[INTERNAL]  Get Jacobian sparsity.
+
+";
 
 %feature("docstring") casadi::MapSum::is_diff_out "
 
@@ -41227,9 +41513,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::MapSum::size2_out "
+%feature("docstring") casadi::MapSum::get_forward "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -41493,12 +41779,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::MapSum::sz_w "
-
-[INTERNAL]  Get required length of w field.
-
-";
-
 %feature("docstring") casadi::MapSum::replace_aseed "
 
 [INTERNAL]
@@ -41587,6 +41867,13 @@ elements.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::MapSum::sp_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
+
+";
+
 %feature("docstring") casadi::MapSum::wrap_as_needed "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
@@ -41620,6 +41907,12 @@ elements.
 %feature("docstring") casadi::MapSum::instruction_input "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::MapSum::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -41825,10 +42118,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring") casadi::MapSum::sp_weight "
+%feature("docstring") casadi::MapSum::get_name_out "
 
-[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
-propagation.
+[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -43871,18 +44163,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Newton::matching_res "
+%feature("docstring") casadi::Newton::jacobian_sparsity "
 
-[INTERNAL]  Check if output arguments that needs to be replaced.
-
-Raises errors
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -44217,6 +44500,10 @@ is_diff_in/out.
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
 
 ";
+
+%feature("docstring") casadi::Newton::is_diff_in "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Newton::nnz_out "
 
@@ -44678,9 +44965,20 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Newton::is_diff_in "
+%feature("docstring") casadi::Newton::matching_res "
 
-[INTERNAL] ";
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
 
 %feature("docstring") casadi::Newton::getJacSparsityHierarchical "
 
@@ -45017,6 +45315,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Newton::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Newton::solve "
 
 [INTERNAL]   Solve the system of equations and calculate derivatives.
@@ -45110,9 +45414,9 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
-%feature("docstring") casadi::Nlpsol::oracle "
+%feature("docstring") casadi::Nlpsol::jacobian_sparsity "
 
-[INTERNAL]  Get oracle.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -45271,15 +45575,13 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::getReducedHessian "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Nlpsol::sparsity_out "
 
 [INTERNAL]  Input/output sparsity.
-
-";
-
-%feature("docstring") casadi::Nlpsol::get_n_in "
-
-[INTERNAL]  Number of function inputs and outputs.
 
 ";
 
@@ -45553,9 +45855,11 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Nlpsol::getReducedHessian "
+%feature("docstring") casadi::Nlpsol::get_n_in "
 
-[INTERNAL] ";
+[INTERNAL]  Number of function inputs and outputs.
+
+";
 
 %feature("docstring") casadi::Nlpsol::serialize_body "
 
@@ -45885,6 +46189,12 @@ elements.
 %feature("docstring") casadi::Nlpsol::get_default_in "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring") casadi::Nlpsol::oracle "
+
+[INTERNAL]  Get oracle.
 
 ";
 
@@ -46327,6 +46637,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Nlpsol::replace_aseed "
 
 [INTERNAL]
@@ -46562,6 +46878,12 @@ C++ includes: nonzeros.hpp ";
 
 ";
 
+%feature("docstring") casadi::OmpMap::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::OmpMap::index_in "
 
 [INTERNAL]  Get input scheme index by name.
@@ -46583,12 +46905,6 @@ structure recognition for symmetric Jacobians
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
-
-";
-
-%feature("docstring") casadi::OmpMap::has_free "
-
-[INTERNAL]  Does the function have free variables.
 
 ";
 
@@ -46631,9 +46947,10 @@ derivatives
 
 ";
 
-%feature("docstring") casadi::OmpMap::parallelization "
+%feature("docstring") casadi::OmpMap::fwdViaJac "
 
-[INTERNAL]  Type of parallellization.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
 
 ";
 
@@ -46988,6 +47305,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::OmpMap::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::OmpMap::factory "
 
 [INTERNAL] ";
@@ -46995,6 +47318,12 @@ elements.
 %feature("docstring") casadi::OmpMap::alloc_iw "
 
 [INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring") casadi::OmpMap::self "
+
+[INTERNAL]  Get a public class instance.
 
 ";
 
@@ -47376,10 +47705,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OmpMap::fwdViaJac "
+%feature("docstring") casadi::OmpMap::has_free "
 
-[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
-multiplying.
+[INTERNAL]  Does the function have free variables.
 
 ";
 
@@ -47389,9 +47717,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::OmpMap::self "
+%feature("docstring") casadi::OmpMap::parallelization "
 
-[INTERNAL]  Get a public class instance.
+[INTERNAL]  Type of parallellization.
 
 ";
 
@@ -48772,6 +49100,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::OracleFunction::generate_in "
 
 [INTERNAL]  Export an input file that can be passed to generate C code with
@@ -49911,6 +50245,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::OracleFunction::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::OracleFunction::size1_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -50554,6 +50894,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::QpToNlp::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::QpToNlp::set_temp "
 
 [INTERNAL]  Set the (temporary) work vectors.
@@ -50914,9 +51260,10 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::instruction_input "
+%feature("docstring") casadi::QpToNlp::get_jacobian "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
@@ -51113,6 +51460,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::QpToNlp::instruction_input "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::QpToNlp::jacobian_sparsity_filter "
 
 [INTERNAL]  Filter out nonzeros in the full sparsity jacobian according to
@@ -51207,9 +51560,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::get_jacobian_sparsity "
+%feature("docstring") casadi::QpToNlp::sz_w "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -51259,6 +51612,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::QpToNlp::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -51381,12 +51740,6 @@ elements.
 %feature("docstring") casadi::QpToNlp::codegen_name "
 
 [INTERNAL]  Get name in codegen.
-
-";
-
-%feature("docstring") casadi::QpToNlp::sz_w "
-
-[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -51574,10 +51927,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::get_jacobian "
+%feature("docstring") casadi::QpToNlp::get_jacobian_sparsity "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -52436,6 +52788,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Qrqp::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Qrqp::self "
 
 [INTERNAL]  Get a public class instance.
@@ -52497,10 +52855,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::Qrqp::getJacSparsityHierarchicalSymm "
+%feature("docstring") casadi::Qrqp::class_name "
 
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition for symmetric Jacobians
+[INTERNAL]  Readable name of the internal class.
 
 ";
 
@@ -52861,9 +53218,10 @@ classes.
 
 ";
 
-%feature("docstring") casadi::Qrqp::class_name "
+%feature("docstring") casadi::Qrqp::getJacSparsityHierarchicalSymm "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
 
 ";
 
@@ -52925,6 +53283,12 @@ propagation.
 %feature("docstring") casadi::Qrqp::get_options "
 
 [INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::Qrqp::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -53236,9 +53600,18 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Qrsqp::get_reverse "
+%feature("docstring") casadi::Qrsqp::check_res "
 
-[INTERNAL]  Generate a function that calculates reverse mode derivatives.
+[INTERNAL]  Check if output arguments have correct length and dimensions.
+
+Raises errors.
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -53505,21 +53878,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Qrsqp::check_res "
-
-[INTERNAL]  Check if output arguments have correct length and dimensions.
-
-Raises errors.
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
-
-";
-
 %feature("docstring") casadi::Qrsqp::alloc_res "
 
 [INTERNAL]  Ensure required length of res field.
@@ -53637,6 +53995,12 @@ multiplying.
 %feature("docstring") casadi::Qrsqp::symbolicAdjSeed "
 
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::Qrsqp::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -53952,6 +54316,12 @@ Print iteration.
 
 ";
 
+%feature("docstring") casadi::Qrsqp::eval "
+
+[INTERNAL]  Evaluate numerically.
+
+";
+
 %feature("docstring") casadi::Qrsqp::generate_in "
 
 [INTERNAL]  Export an input file that can be passed to generate C code with
@@ -53993,6 +54363,12 @@ generated function.
 %feature("docstring") casadi::Qrsqp::sx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Qrsqp::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -54223,9 +54599,9 @@ npar[out]:  required number of parallel calls (or -1)
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Qrsqp::eval "
+%feature("docstring") casadi::Qrsqp::get_reverse "
 
-[INTERNAL]  Evaluate numerically.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
@@ -55402,6 +55778,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Rootfinder::get_sparsity_in "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -55438,6 +55820,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 %feature("docstring") casadi::Rootfinder::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::Rootfinder::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -55758,6 +56146,12 @@ elements.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::RungeKutta::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::RungeKutta::~RungeKutta "
 
 [INTERNAL]  Destructor.
@@ -56063,11 +56457,9 @@ problem)
 
 ";
 
-%feature("docstring") casadi::RungeKutta::get_forward "
+%feature("docstring") casadi::RungeKutta::p "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::RungeKutta::q "
 
@@ -56194,9 +56586,17 @@ npar[out]:  required number of parallel calls (or -1)
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::RungeKutta::p "
+%feature("docstring") casadi::RungeKutta::get_forward "
 
-[INTERNAL] ";
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::RungeKutta::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
 
 %feature("docstring") casadi::RungeKutta::instruction_input "
 
@@ -57251,10 +57651,9 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::Scpgen::getJacSparsityHierarchicalSymm "
+%feature("docstring") casadi::Scpgen::print "
 
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition for symmetric Jacobians
+[INTERNAL]  C-style formatted printing during evaluation.
 
 ";
 
@@ -57312,6 +57711,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::Scpgen::is_a "
 
 [INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring") casadi::Scpgen::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -57608,6 +58013,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::Scpgen::get_forward "
 
 [INTERNAL]  Generate a function that calculates forward mode derivatives.
+
+";
+
+%feature("docstring") casadi::Scpgen::getConic "
+
+[INTERNAL]  Access qpsol.
 
 ";
 
@@ -57978,6 +58389,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Scpgen::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Scpgen::definition "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -58068,12 +58485,6 @@ is_diff_in/out.
 %feature("docstring") casadi::Scpgen::generate_dependencies "
 
 [INTERNAL]  Export / Generate C code for the generated functions.
-
-";
-
-%feature("docstring") casadi::Scpgen::print "
-
-[INTERNAL]  C-style formatted printing during evaluation.
 
 ";
 
@@ -58678,9 +59089,10 @@ C++ includes: scpgen.hpp ";
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Scpgen::getConic "
+%feature("docstring") casadi::Scpgen::getJacSparsityHierarchicalSymm "
 
-[INTERNAL]  Access qpsol.
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
 
 ";
 
@@ -59260,6 +59672,12 @@ Get string representation.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::serialize_base_function "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
 %feature("docstring") casadi::SlicotDple::export_code "
 
 [INTERNAL]  Export function in a specific language.
@@ -59278,9 +59696,9 @@ Get string representation.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::serialize_base_function "
+%feature("docstring") casadi::SlicotDple::codegen_free_mem "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+[INTERNAL]  Codegen for free_mem.
 
 ";
 
@@ -59453,9 +59871,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::codegen_free_mem "
+%feature("docstring") casadi::SlicotDple::jacobian_sparsity "
 
-[INTERNAL]  Codegen for free_mem.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -60101,6 +60519,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::SlicotDple::get_function "
 
 [INTERNAL] ";
@@ -60585,6 +61009,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::fwd_seed "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -60846,6 +61276,12 @@ elements.
 %feature("docstring") casadi::SlicotExpm::export_code "
 
 [INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -61304,18 +61740,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::matching_res "
+%feature("docstring") casadi::SlicotExpm::dm_in "
 
-[INTERNAL]  Check if output arguments that needs to be replaced.
-
-Raises errors
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -61648,9 +62075,18 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::dm_in "
+%feature("docstring") casadi::SlicotExpm::matching_res "
 
-[INTERNAL]  Get function input(s) and output(s)
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -62313,12 +62749,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Smoothing::memory "
-
-[INTERNAL]  Memory objects.
-
-";
-
 %feature("docstring") casadi::Smoothing::get_default_in "
 
 [INTERNAL]  Get default input value.
@@ -62352,9 +62782,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Smoothing::get_name_in "
+%feature("docstring") casadi::Smoothing::codegen_mem_type "
 
-[INTERNAL]  Names of function input and outputs.
+[INTERNAL]  Thread-local memory object type.
 
 ";
 
@@ -62480,6 +62910,12 @@ multiplying.
 %feature("docstring") casadi::Smoothing::symbolic_output "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -62754,6 +63190,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Smoothing::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Smoothing::instruction_input "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
@@ -62825,9 +63267,11 @@ is_diff_in/out.
 
 ";
 
-%feature("docstring") casadi::Smoothing::factory "
+%feature("docstring") casadi::Smoothing::get_name_in "
 
-[INTERNAL] ";
+[INTERNAL]  Names of function input and outputs.
+
+";
 
 %feature("docstring") casadi::Smoothing::finalize "
 
@@ -63042,9 +63486,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Smoothing::codegen_mem_type "
+%feature("docstring") casadi::Smoothing::memory "
 
-[INTERNAL]  Thread-local memory object type.
+[INTERNAL]  Memory objects.
 
 ";
 
@@ -63406,6 +63850,10 @@ propagation.
 [INTERNAL]  Get smallest input value.
 
 ";
+
+%feature("docstring") casadi::Smoothing::factory "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Smoothing::codegen_decref "
 
@@ -64508,9 +64956,18 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::check_inputs "
+%feature("docstring") casadi::Sqpmethod::check_res "
 
-[INTERNAL]  Check if the inputs correspond to a well-posed problem.
+[INTERNAL]  Check if output arguments have correct length and dimensions.
+
+Raises errors.
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -64529,6 +64986,12 @@ elements.
 %feature("docstring") casadi::Sqpmethod::print_options "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -64977,9 +65440,9 @@ C++ includes: sqpmethod.hpp ";
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::weak "
+%feature("docstring") casadi::Sqpmethod::generate_dependencies "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Export / Generate C code for the generated functions.
 
 ";
 
@@ -65408,6 +65871,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Sqpmethod::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::get_default_in "
 
 [INTERNAL]  Get default input value.
@@ -65447,6 +65916,12 @@ elements.
 %feature("docstring") casadi::Sqpmethod::sz_res "
 
 [INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::weak "
+
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -65722,9 +66197,9 @@ is_diff_in/out.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::generate_dependencies "
+%feature("docstring") casadi::Sqpmethod::check_inputs "
 
-[INTERNAL]  Export / Generate C code for the generated functions.
+[INTERNAL]  Check if the inputs correspond to a well-posed problem.
 
 ";
 
@@ -65833,21 +66308,6 @@ original
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::check_res "
-
-[INTERNAL]  Check if output arguments have correct length and dimensions.
-
-Raises errors.
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -66010,15 +66470,21 @@ classes.
 
 ";
 
-%feature("docstring") casadi::Switch::eval_mx "
+%feature("docstring") casadi::Switch::disp_more "
 
-[INTERNAL]  Evaluate with symbolic matrices.
+[INTERNAL]  Print description.
 
 ";
 
 %feature("docstring") casadi::Switch::size2_out "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Switch::n_nodes "
+
+[INTERNAL]  Number of nodes in the algorithm.
 
 ";
 
@@ -66104,9 +66570,20 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::Switch::disp_more "
+%feature("docstring") casadi::Switch::which_depends "
 
-[INTERNAL]  Print description.
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
@@ -66247,9 +66724,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::Switch::n_nodes "
+%feature("docstring") casadi::Switch::jacobian_sparsity "
 
-[INTERNAL]  Number of nodes in the algorithm.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -66537,20 +67014,9 @@ npar[out]:  required number of parallel calls (or -1)
 
 ";
 
-%feature("docstring") casadi::Switch::which_depends "
+%feature("docstring") casadi::Switch::sx_out "
 
-[INTERNAL]  Which variables enter with some order.
-
-Parameters:
------------
-
-s_in:   Input name
-
-s_out:   Output name(s)
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -66694,6 +67160,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Switch::eval_mx "
+
+[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
 %feature("docstring") casadi::Switch::self "
 
 [INTERNAL]  Get a public class instance.
@@ -66767,12 +67239,6 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::Switch::sx_out "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
 %feature("docstring") casadi::Switch::get_options "
 
 [INTERNAL]  Options.
@@ -66824,6 +67290,12 @@ propagation.
 %feature("docstring") casadi::Switch::get_sparsity_out "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Switch::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -67848,6 +68320,12 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring") casadi::ThreadMap::self "
+
+[INTERNAL]  Get a public class instance.
+
+";
+
 %feature("docstring") casadi::ThreadMap::sparsity_in "
 
 [INTERNAL]  Input/output sparsity.
@@ -68569,6 +69047,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::ThreadMap::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
 %feature("docstring") casadi::ThreadMap::get_abstol "
 
 [INTERNAL]  Get absolute tolerance.
@@ -68834,9 +69318,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::ThreadMap::self "
+%feature("docstring") casadi::ThreadMap::jacobian_sparsity "
 
-[INTERNAL]  Get a public class instance.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -71026,7 +71510,7 @@ options or rely on automatic detection
 +----------------+--------------+------------------------------------------+
 | nx             | OT_INTVECTOR | Number of states, length N+1             |
 +----------------+--------------+------------------------------------------+
-| print_level    | OT_INTEGER   | Amount of diagnostic printing [Default:  |
+| print_level    | OT_INT       | Amount of diagnostic printing [Default:  |
 |                |              | 1].                                      |
 +----------------+--------------+------------------------------------------+
 | target         | OT_STRING    | hpmpc target                             |
