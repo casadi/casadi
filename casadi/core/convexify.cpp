@@ -109,7 +109,8 @@ namespace casadi {
     deserialize(s, "", convexify_data_);
   }
 
-  void Convexify::serialize(SerializingStream& s, const std::string& prefix, const ConvexifyData& d) {
+  void Convexify::serialize(SerializingStream& s, const std::string& prefix,
+      const ConvexifyData& d) {
     s.version(prefix + "Convexify", 1);
     s.pack(prefix + "Convexify::type_in", static_cast<int>(d.config.type_in));
     s.pack(prefix + "Convexify::strategy", static_cast<int>(d.config.strategy));
@@ -124,7 +125,8 @@ namespace casadi {
     s.pack(prefix + "Convexify::Hrsp", d.Hrsp);
   }
 
-  void Convexify::deserialize(DeserializingStream& s, const std::string& prefix, ConvexifyData& d) {
+  void Convexify::deserialize(DeserializingStream& s, const std::string& prefix,
+      ConvexifyData& d) {
     s.version(prefix + "Convexify", 1);
     int type_in;
     s.unpack(prefix + "Convexify::type_in", type_in);

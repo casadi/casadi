@@ -153,7 +153,9 @@ namespace casadi {
       if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
       if (solver_.convexify_) {
         ScopedTiming tic(mem_->fstats.at("convexify"));
-        if (convexify_eval(&solver_.convexify_data_.config, values, values, mem_->iw, mem_->w)) return false;
+        if (convexify_eval(&solver_.convexify_data_.config, values, values, mem_->iw, mem_->w)) {
+          return false;
+        }
       }
       return true;
     } else {
