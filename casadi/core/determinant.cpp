@@ -30,7 +30,7 @@ using namespace std;
 
 namespace casadi {
 
-  Determinant::Determinant(const MX& x) : linsol_("lu","csparse",x.sparsity()) {
+  Determinant::Determinant(const MX& x) : linsol_("lu", "csparse", x.sparsity()) {
     casadi_assert(x.is_square(), "Dimension mismatch. Matrix must be square, "
       "but got " + x.dim() + " instead.");
     set_dep(x);
