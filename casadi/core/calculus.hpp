@@ -873,7 +873,7 @@ namespace casadi {
   template<>
   struct UnaryOperation<OP_COSH>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = cosh(x);}
-    template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = -sinh(x); }
+    template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = sinh(x); }
   };
 
   /// Hyperbolic tangent
