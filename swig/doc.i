@@ -2037,11 +2037,6 @@ multiplying.
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::OracleFunction::has_function(const
-std::string &fname) const  "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
 const  "
 
@@ -2173,6 +2168,13 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::nlpsol_codegen_body(CodeGenerator &g)
+const  "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
 bool more) const  "
 
@@ -2255,12 +2257,10 @@ casadi_int b) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Nlpsol::codegen_body(CodeGenerator &g) const
-"
+%feature("docstring")  casadi::OracleFunction::has_function(const
+std::string &fname) const  "
 
-[INTERNAL]  Generate code for the function body.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::dm_in(casadi_int ind) const
 "
@@ -3078,6 +3078,13 @@ double cNormTrial, double dfTdeltaXi, bool swCond, casadi_int it) const  "
 *m) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
+&g) const  "
+
+[INTERNAL]  Generate code for the function body.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::check_arg(const
 std::vector< M > &arg, casadi_int &npar) const  "
@@ -58097,6 +58104,13 @@ casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::nlpsol_codegen_body(CodeGenerator &g)
+const  "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
@@ -59105,8 +59119,8 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::codegen_body(CodeGenerator &g) const
-"
+%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
+&g) const  "
 
 [INTERNAL]  Generate code for the function body.
 
@@ -67978,8 +67992,15 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::codegen_body(CodeGenerator &g) const
-"
+%feature("docstring")  casadi::Nlpsol::nlpsol_codegen_body(CodeGenerator &g)
+const  "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
+&g) const  "
 
 [INTERNAL]  Generate code for the function body.
 
@@ -72862,6 +72883,13 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::nlpsol_codegen_body(CodeGenerator &g)
+const  "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -72869,8 +72897,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::codegen_body(CodeGenerator &g) const
-"
+%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
+&g) const  "
 
 [INTERNAL]  Generate code for the function body.
 
@@ -82851,6 +82879,13 @@ const  "
 iind, casadi_int oind, bool symmetric) const  "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::Nlpsol::nlpsol_codegen_body(CodeGenerator &g)
+const  "
+
+[INTERNAL]  Generate code for the function body.
 
 ";
 

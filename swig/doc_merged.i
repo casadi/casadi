@@ -1743,10 +1743,6 @@ multiplying.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::has_function "
-
-[INTERNAL] ";
-
 %feature("docstring") casadi::Blocksqp::mx_out "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -1854,6 +1850,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Blocksqp::nlpsol_codegen_body "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
 %feature("docstring") casadi::Blocksqp::disp "
 
 [INTERNAL]  Display object.
@@ -1922,11 +1924,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::codegen_body "
+%feature("docstring") casadi::Blocksqp::has_function "
 
-[INTERNAL]  Generate code for the function body.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::dm_in "
 
@@ -2675,6 +2675,12 @@ C++ includes: blocksqp.hpp ";
 %feature("docstring") casadi::Blocksqp::kktErrorReduction "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Blocksqp::codegen_body "
+
+[INTERNAL]  Generate code for the function body.
+
+";
 
 %feature("docstring") casadi::Blocksqp::check_arg "
 
@@ -45695,6 +45701,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::nlpsol_codegen_body "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
 %feature("docstring") casadi::Nlpsol::finalize "
 
 [INTERNAL]  Finalize initialization.
@@ -53615,6 +53627,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Qrsqp::nlpsol_codegen_body "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
 %feature("docstring") casadi::Qrsqp::codegen_body "
 
 [INTERNAL]  Generate code for the function body.
@@ -57677,6 +57695,12 @@ propagation.
 %feature("docstring") casadi::Scpgen::alloc_w "
 
 [INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::Scpgen::nlpsol_codegen_body "
+
+[INTERNAL]  Generate code for the function body.
 
 ";
 
@@ -65892,6 +65916,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::Sqpmethod::getJacSparsity "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::nlpsol_codegen_body "
+
+[INTERNAL]  Generate code for the function body.
 
 ";
 

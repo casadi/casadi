@@ -1897,9 +1897,6 @@
 %exception  casadi::Nlpsol::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Nlpsol::codegen_body(CodeGenerator &g) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Nlpsol::disp_more(std::ostream &stream) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1949,6 +1946,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::kkt() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Nlpsol::nlpsol_codegen_body(CodeGenerator &g) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::serialize_base_function() const override {
