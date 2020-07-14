@@ -2628,8 +2628,8 @@ class Functiontests(casadiTestCase):
       x = MX.sym("x", 2)
       f = x[0]*x[0] + x[1]*x[1]
 
- 
-      yield lambda : nlpsol("solver", "ipopt", {"x": x, "f": f},opts)
+      if has_nlpsol("ipopt"):
+        yield lambda : nlpsol("solver", "ipopt", {"x": x, "f": f},opts)
 
 
 
