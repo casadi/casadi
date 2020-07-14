@@ -363,14 +363,14 @@ class SXtests(casadiTestCase):
     self.checkarray(f.size_in(0),(2,3),"Function constructors")
     self.checkarray(f.size_out(0),(2,3),"Function constructors")
 
-    self.assertRaises(NotImplementedError,lambda: Function("f", y,[y,y]))
-    self.assertRaises(NotImplementedError,lambda: Function("f", x0,[x0,x1]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", y,[y,y]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", x0,[x0,x1]))
 
   def test_evalfail(self):
     self.message("eval fail test")
     x = SX.sym("x",2,2)
     f = Function("f", [x], [x])
-    self.assertRaises(NotImplementedError,lambda: f.call(x))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: f.call(x))
 
   def test_SXconversion(self):
     self.message("Conversions from and to SX")
@@ -678,7 +678,7 @@ class SXtests(casadiTestCase):
     self.message("Regression test #181")
     x = SX.sym("x")
     #self.assertRaises(TypeError,lambda : SX([x,None]))  # FIXME: this is leaking memory
-    self.assertRaises(NotImplementedError,lambda: Function("f", [[x], [None]], [[2 * x]]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", [[x], [None]], [[2 * x]]))
 
   @known_bug()  # Not implemented
   def test_is_equal(self):
@@ -1113,11 +1113,20 @@ class SXtests(casadiTestCase):
     c = SX(0,0)
     x = SX.sym("x",2,3)
 
-    with self.assertRaises(RuntimeError):
-      d = x + c
+    # https://github.com/casadi/casadi/issues/2628
+    if swig4:
+      with self.assertRaises(TypeError):
+        d = x + c
+    else:
+      with self.assertRaises(RuntimeError):
+        d = x + c
 
-    with self.assertRaises(RuntimeError):
-      d = x / c
+    if swig4:
+      with self.assertRaises(TypeError):
+        d = x / c
+    else:
+      with self.assertRaises(RuntimeError):
+        d = x / c
 
   def test_copysign(self):
     x = SX.sym("x")

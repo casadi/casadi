@@ -42,7 +42,26 @@ else:
   import __builtin__
   builtins = __builtin__
 
+x = MX.sym("x",2,3)
+y = MX.sym("x",3,4)
 
+try:
+  x+y
+except TypeError:
+  swig4 = True
+except RuntimeError:
+  swig4 = False
+
+try:
+  nlpsol(123)
+except Exception as e:
+  if "SXDict" in str(e):
+    systemswig = True
+  elif "dict:SX" in str(e):
+    systemswig = False
+  else:
+    systemswig = True
+    
 platform_arch = 8 * struct.calcsize("P")
 
 parser = argparse.ArgumentParser()
@@ -648,6 +667,18 @@ class requires_conic(object):
       return c
     except:
       print("Not available QP plugin %s, skipping unittests" % self.n)
+      return None
+
+class requires_linsol(object):
+  def __init__(self,n):
+    self.n = n
+
+  def __call__(self,c):
+    try:
+      load_linsol(self.n)
+      return c
+    except:
+      print("Not available linsol plugin %s, skipping unittests" % self.n)
       return None
 
 class requires_nlpsol(object):

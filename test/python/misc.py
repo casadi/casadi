@@ -184,6 +184,8 @@ class Misctests(casadiTestCase):
     self.checkarray(a,b)
 
   def test_exceptions(self):
+    if systemswig: return
+
     try:
       nlpsol(123)
       self.assertTrue(False)
@@ -442,14 +444,16 @@ class Misctests(casadiTestCase):
       with self.assertOutput(included, excluded):
         ff(3)
 
-      solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
-      with self.assertOutput(included, excluded):
-        solver()
+      if has_nlpsol("ipopt"):
+        solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
+        with self.assertOutput(included, excluded):
+          solver()
 
 
-      solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
-      with self.assertOutput(included, excluded):
-        solver()
+      if has_conic("ipopt"):
+        solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
+        with self.assertOutput(included, excluded):
+          solver()
 
       solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
       with self.assertOutput(included, excluded):
@@ -467,17 +471,20 @@ class Misctests(casadiTestCase):
         solver()
 
       A = DM.rand(3,3)
-      with self.assertOutput(included, excluded):
-        solve(A,vertcat(1,2,3),"lapacklu",opts)
+      if has_linsol("lapacklu"):
+        with self.assertOutput(included, excluded):
+          solve(A,vertcat(1,2,3),"lapacklu",opts)
 
 
       Amx = MX(DM.rand(3,3))
-      with self.assertOutput(included, excluded):
-        evalf(solve(Amx,vertcat(1,2,3),"lapacklu",opts))
+      if has_linsol("lapacklu"):
+        with self.assertOutput(included, excluded):
+          evalf(solve(Amx,vertcat(1,2,3),"lapacklu",opts))
 
-      solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
-      with self.assertOutput(included, excluded):
-        solver.solve(A,vertcat(1,2,3))
+      if has_linsol("lapacklu"):
+        solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
+        with self.assertOutput(included, excluded):
+          solver.solve(A,vertcat(1,2,3))
 
   def test_record_time(self):
 
@@ -492,15 +499,17 @@ class Misctests(casadiTestCase):
     self.assertTrue("t_proc_total" in ff.stats())
     self.assertTrue(ff.stats()["t_proc_total"]>=0)
 
-    solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
-    solver()
-    self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>0)
+    if has_nlpsol("ipopt"):
+      solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
+      solver()
+      self.assertTrue("t_proc_total" in solver.stats())
+      self.assertTrue(solver.stats()["t_proc_total"]>0)
 
-    solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
-    solver()
-    self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>0)
+    if has_conic("qpoases"):
+      solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
+      solver()
+      self.assertTrue("t_proc_total" in solver.stats())
+      self.assertTrue(solver.stats()["t_proc_total"]>0)
 
     solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
     solver()
@@ -521,10 +530,11 @@ class Misctests(casadiTestCase):
     self.assertTrue(solver.stats()["t_proc_total"]>=0)
 
     A = DM.rand(3,3)
-    solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
-    solver.solve(A,vertcat(1,2,3))
-    self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>=0)
+    if has_linsol("lapacklu"):
+      solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
+      solver.solve(A,vertcat(1,2,3))
+      self.assertTrue("t_proc_total" in solver.stats())
+      self.assertTrue(solver.stats()["t_proc_total"]>=0)
 
 if __name__ == '__main__':
     unittest.main()

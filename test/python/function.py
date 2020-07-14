@@ -2439,9 +2439,14 @@ class Functiontests(casadiTestCase):
   def test_map_exception(self):
     x = MX.sym("x",4)
     y = MX.sym("y",4)
-    f = Function("f",[x],[x+y]);
+    f = Function("f",[x],[x+y])
 
-    with self.assertInException("Evaluation failed"):
+    if "CASADI_WITH_THREAD" in CasadiMeta.feature_list():
+      message = "Evaluation failed"
+    else:
+      message = "since variables [y] are free"
+
+    with self.assertInException(message):
       F = f.map(4,"thread",2)
       F(3)
 

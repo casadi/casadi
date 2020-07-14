@@ -40,6 +40,8 @@ except:
 	scipy_available = False
 import warnings
 
+print(swig4, systemswig)
+
 class typemaptests(casadiTestCase):
 
   def setUp(self):
@@ -607,20 +609,20 @@ class typemaptests(casadiTestCase):
         return SX([4])
 
 
-    self.assertRaises(NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
     print("cast C")
 
     class Foo:
       def __DM__(self):
         raise Exception("15")
 
-    self.assertRaises(NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
     print("cast D")
 
     class Foo:
       pass
 
-    self.assertRaises(NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
     print("cast E")
 
   def test_casting_SX(self):
@@ -639,18 +641,18 @@ class typemaptests(casadiTestCase):
       def __SX__(self):
         return MX.sym("x")
 
-    self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
 
     class Foo:
       def __SX__(self):
         raise Exception("15")
 
-    self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
 
     class Foo:
       pass
 
-    self.assertRaises(NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
 
 
   def test_casting_MX(self):
@@ -669,7 +671,7 @@ class typemaptests(casadiTestCase):
       def __MX__(self):
         return SX.sym("x")
 
-    with self.assertRaises(NotImplementedError):
+    with self.assertRaises(TypeError if systemswig else NotImplementedError):
       Function("tmp", [x],[Foo()])
 
     class Foo:
@@ -682,13 +684,14 @@ class typemaptests(casadiTestCase):
     class Foo:
       pass
 
-    with self.assertRaises(NotImplementedError):
+    with self.assertRaises(TypeError if systemswig else NotImplementedError):
       Function("tmp", [x],[Foo()])
 
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
     a = SX.sym("A",3,3)
-    self.assertTrue(isinstance(qr(a),tuple))
+    
+    self.assertTrue(isinstance(qr(a),tuple([tuple]+([list] if swig4 else []))))
 
   def test_cvar(self):
     self.message("We must not have cvar, to avoid bug #652")
@@ -773,7 +776,7 @@ class typemaptests(casadiTestCase):
   def test_None(self):
     #self.assertFalse(None==DM(3))
     b = atleast_2d(None)
-    with self.assertRaises(NotImplementedError):
+    with self.assertRaises(TypeError if systemswig else NotImplementedError):
       c = repmat(b, 1, 1)
 
   @requires_nlpsol("ipopt")

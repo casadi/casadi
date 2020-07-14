@@ -1599,11 +1599,20 @@ class MXtests(casadiTestCase):
     c = MX(0,0)
     x = MX.sym("x",2,3)
 
-    with self.assertRaises(RuntimeError):
-      d = x + c
+    # https://github.com/casadi/casadi/issues/2628
+    if swig4:
+      with self.assertRaises(TypeError):
+        d = x + c
+    else:
+      with self.assertRaises(RuntimeError):
+        d = x + c
 
-    with self.assertRaises(RuntimeError):
-      d = x / c
+    if swig4:
+      with self.assertRaises(TypeError):
+        d = x / c
+    else:
+      with self.assertRaises(RuntimeError):
+        d = x / c
 
   @slow()
   @memory_heavy()
@@ -2499,8 +2508,9 @@ class MXtests(casadiTestCase):
         else:
           self.assertTrue(c.nnz()>0)
 
-  @requiresPlugin(Linsol,"lapackqr")
+  @requires_linsol("lapackqr")
   def test_solve(self):
+    print(123)
     N = 3
     nrhs = 50
     np.random.seed(0)
