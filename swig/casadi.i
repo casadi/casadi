@@ -2623,23 +2623,40 @@ class NZproxy:
     fun=getattr(self, name)
     return fun(*args[1:])
 
-  def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
-    conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt"}
-    name = ufunc.__name__
-    inputs = list(inputs)
-    if len(inputs)==3:
-      raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name)
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-    if name in conversion:
-      name = conversion[name]
-    if len(inputs)==2 and inputs[1] is self and not(inputs[0] is self):
-      name = 'r' + name
-      inputs.reverse()
-    if not(hasattr(self,name)) or ('mul' in name):
-      name = '__' + name + '__'
-    fun=getattr(self, name)
-    return fun(*inputs[1:])
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+      conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt"}
+      name = ufunc.__name__
+      inputs = list(inputs)
+      if len(inputs)==3:
+        import warnings
+        warnings.warn("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name, RuntimeWarning)
+        return NotImplemented
+      if "vectorized" in name:
+          name = name[:-len(" (vectorized)")]
+      if name in conversion:
+        name = conversion[name]
+      if len(inputs)==2 and inputs[1] is self and not(inputs[0] is self):
+        name = 'r' + name
+        inputs.reverse()
+      if not(hasattr(self,name)) or ('mul' in name):
+        name = '__' + name + '__'
+      try:
+        assert method=="__call__"
+        fun=getattr(self, name)
+        return fun(*inputs[1:])
+      except:
+        # Fall back to numpy conversion
+        new_inputs = list(inputs)
+        try:
+          new_inputs[0] = new_inputs[0].full()
+        except:
+          import warnings
+          warnings.warn("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
+                                 + "This may occur when you pass a CasADi object to a numpy function.\n"
+                                 + "Use an equivalent CasADi function instead of that numpy function.", RuntimeWarning)
+          return NotImplemented
+        return new_inputs[0].__array_ufunc__(ufunc, method, *new_inputs, **kwargs)
+
 
   def __array__(self,*args,**kwargs):
     import numpy as n

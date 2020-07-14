@@ -800,6 +800,44 @@ class typemaptests(casadiTestCase):
     jacobian(x/1.458151064450277e-12,x)
 
 
+  def test_issue_2625(self):
+    # This is obviously a bug
+    self.checkarray(np.inner(DM([1,0,1]),DM([1,0,1])), np.array([[1,0,1],[0,0,0],[1,0,1]]))
+    self.checkarray(np.outer(DM([1,0,1]),DM([1,0,1])), np.array([[1,0,1],[0,0,0],[1,0,1]]))
+    #print(np.logical_or(DM([1,0,1]),DM([1,0,12])))
+    self.checkarray(np.add.accumulate(DM([1,0,1])),np.array([[1],[1],[2]]))
+    self.checkarray(np.cumsum(DM([1,0,1])), np.array([1,1,2]))
+    self.checkarray(np.sum(DM([1,0,1])),np.array(2))
+    self.assertFalse(np.all(DM([1,0,1])))
+    self.assertTrue(np.any(DM([1,0,1])))
+    self.checkarray(np.sum(DM([[1,0,1],[0,1,0]])),np.array(3))
+    self.assertFalse(np.all(DM([[1,0,1],[0,1,0]])))
+    self.assertTrue(np.any(DM([[1,0,1],[0,1,0]])))
+
+    for M in [SX,MX]:
+      with self.assertRaises(Exception):
+        np.inner(M([1,0,1]),M([1,0,1]))
+      with self.assertRaises(Exception):
+        np.outer(M([1,0,1]),M([1,0,1]))
+
+      with self.assertRaises(Exception):
+        np.add.accumulate(M([1,0,1]))
+
+      with self.assertRaises(Exception):
+        np.cumsum(M([1,0,1]))
+
+      with self.assertRaises(Exception):
+        np.sum(M([1,0,1]))
+      with self.assertRaises(Exception):
+        np.all(M([1,0,1]))
+      with self.assertRaises(Exception):
+        np.any(M([1,0,1]))
+      with self.assertRaises(Exception):
+        np.sum(M([[1,0,1],[0,1,0]]))
+      with self.assertRaises(Exception):
+        np.all(M([[1,0,1],[0,1,0]]))
+      with self.assertRaises(Exception):
+        np.any(M([[1,0,1],[0,1,0]]))
 
 if __name__ == '__main__':
     unittest.main()
