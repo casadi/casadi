@@ -2441,7 +2441,7 @@ class Functiontests(casadiTestCase):
     y = MX.sym("y",4)
     f = Function("f",[x],[x+y])
 
-    if "CASADI_WITH_THREAD" in CasadiMeta.feature_list():
+    if "CASADI_WITH_THREAD" in CasadiMeta.compiler_flags():
       message = "Evaluation failed"
     else:
       message = "since variables [y] are free"
