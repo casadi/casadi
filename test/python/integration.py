@@ -253,6 +253,8 @@ class Integrationtests(casadiTestCase):
                 self.assertTrue(stats["nlinsetups"]<100)
                 self.assertTrue(stats["nlinsetupsB"]<250)
 
+    DM.set_precision(6)
+
   @memory_heavy()
   def test_lsolvers(self):
     self.message("Test different linear solvers")

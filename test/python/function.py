@@ -1648,6 +1648,8 @@ class Functiontests(casadiTestCase):
       solver(x0=1)
 
 
+    DM.set_precision(6)
+
     self.assertTrue("[[1]," in out[0])
 
 
