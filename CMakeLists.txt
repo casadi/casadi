@@ -809,6 +809,19 @@ include(embed_resources)
 include(GenerateExportHeader)
 
 #####################################################
+################# gathering info for config.h #######
+#####################################################
+
+feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
+string(REPLACE "\n" "\\n" feature_list "${feature_list}")
+
+get_directory_property( compiler_definitions COMPILE_DEFINITIONS )
+set(EXTRA_CXX_FLAGS_FROM_DEFS "")
+foreach(DEF ${compiler_definitions})
+  set(EXTRA_CXX_FLAGS_FROM_DEFS "${EXTRA_CXX_FLAGS_FROM_DEFS} -D${DEF}")
+endforeach()
+
+#####################################################
 ################# include the rest ##################
 #####################################################
 add_subdirectory(external_packages)
@@ -835,18 +848,8 @@ if(WITH_DOC)
   add_custom_target(tutor)
 endif()
 
-
-
 # Print a summary
 feature_summary(WHAT ALL)
-feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
-
-string(REPLACE "\n" "\\n" feature_list "${feature_list}")
-get_directory_property( compiler_definitions COMPILE_DEFINITIONS )
-set(EXTRA_CXX_FLAGS_FROM_DEFS "")
-foreach(DEF ${compiler_definitions})
-  set(EXTRA_CXX_FLAGS_FROM_DEFS "${EXTRA_CXX_FLAGS_FROM_DEFS} -D${DEF}")
-endforeach()
 
 # what is this?
 if(EXTRA_CMAKE)
