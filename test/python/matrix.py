@@ -1109,6 +1109,7 @@ class Matrixtests(casadiTestCase):
     P = DM.eye(10)[:,p]
 
     F = mtimes(mtimes(sqrt(diag(D)),DM.eye(10)+Lt),P.T)
+    print(H-mtimes(F.T,F))
     self.assertTrue(norm_fro(H-mtimes(F.T,F))<=1e-14)
 
 
