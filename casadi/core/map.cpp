@@ -56,6 +56,21 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_(n) {
   }
 
+  bool Map::is_a(const std::string& type, bool recursive) const {
+    return type=="Map"
+      || (recursive && FunctionInternal::is_a(type, recursive));
+  }
+
+  bool OmpMap::is_a(const std::string& type, bool recursive) const {
+    return type=="OmpMap"
+      || (recursive && Map::is_a(type, recursive));
+  }
+
+  bool ThreadMap::is_a(const std::string& type, bool recursive) const {
+    return type=="ThreadMap"
+      || (recursive && Map::is_a(type, recursive));
+  }
+
   void Map::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
     s.pack("Map::f", f_);

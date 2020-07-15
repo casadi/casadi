@@ -48,6 +48,9 @@ namespace casadi {
     /** \brief Get type name */
     std::string class_name() const override {return "Map";}
 
+    /** \brief Check if the function is of a particular type */
+    bool is_a(const std::string& type, bool recursive) const override;
+
     /// @{
     /** \brief Sparsities of function inputs and outputs */
     Sparsity get_sparsity_in(casadi_int i) override {
@@ -177,6 +180,9 @@ namespace casadi {
     /** \brief Get type name */
     std::string class_name() const override {return "OmpMap";}
 
+    /** \brief Check if the function is of a particular type */
+    bool is_a(const std::string& type, bool recursive) const override;
+
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
@@ -212,6 +218,9 @@ namespace casadi {
 
     /** \brief Get type name */
     std::string class_name() const override {return "ThreadMap";}
+
+    /** \brief Check if the function is of a particular type */
+    bool is_a(const std::string& type, bool recursive) const override;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
