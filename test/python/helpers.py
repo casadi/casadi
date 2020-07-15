@@ -554,7 +554,7 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None):
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
@@ -573,18 +573,23 @@ class casadiTestCase(unittest.TestCase):
         extra_options = ""
       if isinstance(extra_options,list):
         extra_options = " " + " ".join(extra_options)
+      if definitions is None:
+        definitions = []
 
       def get_commands(shared=True):
         if os.name=='nt':
-          commands = "cl.exe {shared} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options)
+          defs = " ".join(["/D"+d for d in definitions])
+          commands = "cl.exe {shared} {definitions} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs)
           output = "./" + name + (".dll" if shared else ".exe")
           return [commands, output]
         else:
+          defs = " ".join(["-D"+d for d in definitions])
           output = "./" + name + (".so" if shared else "")
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name_out} -L{libdir}".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir) + (" -lm" if not shared else "") + extralibs + extra_options 
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir}".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir,definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options 
           return [commands, output]
 
       [commands, libname] = get_commands(shared=True)
+      print(commands)
       p = subprocess.Popen(commands,shell=True).wait()
       F2 = external(F.name(), libname)
 

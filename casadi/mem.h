@@ -183,8 +183,9 @@ inline void casadi_deinit(casadi_mem* mem) {
 /* Initialize */
 inline void casadi_init_arrays(casadi_mem* mem) {
   casadi_int i;
+  casadi_functions* f;
   assert(mem!=0);
-  casadi_functions* f = mem->f;
+  f = mem->f;
 
   /* Input meta data */
   for (i=0; i<mem->n_in; ++i) {
@@ -294,4 +295,4 @@ inline void casadi_free(casadi_mem* mem) {
 }
 #endif
 
-#endif // CASADI_MEM_H
+#endif /* CASADI_MEM_H */
