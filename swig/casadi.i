@@ -102,7 +102,20 @@
 %}
 #elif defined(SWIGMATLAB)
 %{
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
   namespace casadi {
+
+#ifdef CASADI_WITH_THREAD
+    std::mutex mutex_interrupt;
+#endif //CASADI_WITH_THREAD
+
     // Redirect printout to mexPrintf
     static void mexlogger(const char* s, std::streamsize num, bool error) {
       mexPrintf("%.*s", static_cast<int>(num), s);
@@ -112,22 +125,6 @@
     // Flush the command window buffer (needed in gui mode)
     static void mexflush(bool error) {
     }
-#else
-    // Undocumented matlab feature
-    extern "C" bool utIsInterruptPending(void);
-    extern "C" void utSetInterruptPending(bool);
-
-    // Flush the command window buffer (needed in gui mode)
-    static void mexflush(bool error) {
-      if (!utIsInterruptPending()) {
-        if (mexEvalString("drawnow('update');pause(0.0001);")) {
-          utSetInterruptPending(true);
-        }
-      }
-    }
-#endif
-
-#ifdef HAVE_OCTAVE
     // Never for Octave
     static bool mexcheckinterrupted() {
       return false;
@@ -137,17 +134,30 @@
     }
 #else
     // Undocumented matlab feature
-    extern "C" bool utIsInterruptPending();
+    extern "C" bool utIsInterruptPending(void);
+    extern "C" void utSetInterruptPending(bool);
 
     static bool mexcheckinterrupted() {
+      std::lock_guard<std::mutex> lock(mutex_interrupt);
       return utIsInterruptPending();
     }
 
     void mexclearinterrupted() {
+      std::lock_guard<std::mutex> lock(mutex_interrupt);
       utSetInterruptPending(false);
     }
 
+    // Flush the command window buffer (needed in gui mode)
+    static void mexflush(bool error) {
+      if (!mexcheckinterrupted()) {
+        if (mexEvalString("drawnow('update');pause(0.0001);")) {
+          std::lock_guard<std::mutex> lock(mutex_interrupt);
+          utSetInterruptPending(true);
+        }
+      }
+    }
 #endif
+
   }
 %}
 %init %{
