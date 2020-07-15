@@ -1083,7 +1083,11 @@ namespace casadi {
       }
 
       intg_out[INTEGRATOR_XF] = F_out[DAE_ODE];
-      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[DAE_ALG]);
+
+      // If-clause needed because rk abuses DAE_ALG output for intermediate state output
+      if (nz_) {
+        intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[DAE_ALG]);
+      }
 
       // Extract options for Function constructor
       Dict sopts;

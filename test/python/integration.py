@@ -1046,5 +1046,11 @@ class Integrationtests(casadiTestCase):
       self.checkarray(norm_inf(res["xf"].T-exp(-1)*numpy.linspace(0, 10, 40)),0, digits=5)
       self.checkarray(norm_inf(res["rxf"].T-exp(1)*numpy.linspace(0, 10, 40)),0, digits=5)
 
+  def test_simplify_zdim(self):
+    x = MX.sym("x")
+    intg = integrator("intg","rk",{"x":x,"ode":x**2},{"simplify":True})
+
+    self.assertTrue(intg.nnz_out("zf")==0)
+
 if __name__ == '__main__':
     unittest.main()
