@@ -2616,6 +2616,12 @@ class Functiontests(casadiTestCase):
     self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True},definitions=["inline=''"])
     self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True,"with_header":True},definitions=["inline=''"])
 
+  def test_codegen_scalars_bug(self):
+    x = MX.sym("x")
+    z = 3*x/sin(x)
+    f = Function("F",[x],[z,z/x],{"live_variables":False})
+    self.check_codegen(f,inputs=[1],opts={"codegen_scalars":True})
+
   def test_bug_codegen_logical(self):
     a = MX([1,0,0])
     b = MX([1,1,0])

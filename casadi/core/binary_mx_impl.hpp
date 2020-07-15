@@ -126,6 +126,11 @@ namespace casadi {
     string x = g.workel(arg[0]);
     string y = g.workel(arg[1]);
 
+    // Avoid emitting '/*' which will be mistaken for a comment
+    if (op_==OP_DIV && g.codegen_scalars && dep(1).nnz()==1) {
+      y = "(" + y + ")";
+    }
+
     // Codegen loop, if needed
     if (nnz()>1) {
       // Iterate over result
