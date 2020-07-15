@@ -58,12 +58,14 @@ namespace casadi {
     static void clearInterruptedDefault() {
     }
 
-
   public:
     /// The routine that is used for checking interrupts
     static bool (*checkInterrupted)();
     /// The routine that is used for clearing interrupts
     static void (*clearInterrupted)();
+
+    /// Are we in the main thread?
+    static bool is_main_thread();
 
     /// Raises an error if an interrupt was captured.
     static void check() {

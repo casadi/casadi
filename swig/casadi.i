@@ -67,6 +67,7 @@
     }
 
     static bool pythoncheckinterrupted() {
+      if (!casadi::InterruptHandler::is_main_thread()) return false;
       return PyErr_CheckSignals();
     }
 
@@ -99,12 +100,19 @@
 
   // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = casadi::pythoncheckinterrupted;
+
+  casadi::InterruptHandler::is_main_thread();
+
 %}
 #elif defined(SWIGMATLAB)
 %{
   namespace casadi {
     // Redirect printout to mexPrintf
     static void mexlogger(const char* s, std::streamsize num, bool error) {
+      if (!casadi::InterruptHandler::is_main_thread()) {
+        casadi::Logger::writeDefault(s, num, error);
+        return;
+      }
       mexPrintf("%.*s", static_cast<int>(num), s);
     }
 
@@ -112,22 +120,6 @@
     // Flush the command window buffer (needed in gui mode)
     static void mexflush(bool error) {
     }
-#else
-    // Undocumented matlab feature
-    extern "C" bool utIsInterruptPending(void);
-    extern "C" void utSetInterruptPending(bool);
-
-    // Flush the command window buffer (needed in gui mode)
-    static void mexflush(bool error) {
-      if (!utIsInterruptPending()) {
-        if (mexEvalString("drawnow('update');pause(0.0001);")) {
-          utSetInterruptPending(true);
-        }
-      }
-    }
-#endif
-
-#ifdef HAVE_OCTAVE
     // Never for Octave
     static bool mexcheckinterrupted() {
       return false;
@@ -137,9 +129,11 @@
     }
 #else
     // Undocumented matlab feature
-    extern "C" bool utIsInterruptPending();
+    extern "C" bool utIsInterruptPending(void);
+    extern "C" void utSetInterruptPending(bool);
 
     static bool mexcheckinterrupted() {
+      if (casadi::InterruptHandler::main_thread_only && !casadi::InterruptHandler::is_main_thread()) return false;
       return utIsInterruptPending();
     }
 
@@ -147,7 +141,20 @@
       utSetInterruptPending(false);
     }
 
+    // Flush the command window buffer (needed in gui mode)
+    static void mexflush(bool error) {
+      if (!casadi::InterruptHandler::is_main_thread()) {
+        casadi::Logger::flushDefault(error);
+        return;
+      }
+      if (!mexcheckinterrupted()) {
+        if (mexEvalString("drawnow('update');pause(0.0001);")) {
+          utSetInterruptPending(true);
+        }
+      }
+    }
 #endif
+
   }
 %}
 %init %{
@@ -195,6 +202,9 @@
   // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = casadi::mexcheckinterrupted;
   casadi::InterruptHandler::clearInterrupted = casadi::mexclearinterrupted;
+
+  casadi::InterruptHandler::is_main_thread();
+
 %}
 #endif
 

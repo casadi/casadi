@@ -25,6 +25,14 @@
 
 #include "casadi_interrupt.hpp"
 
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.thread.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <thread>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
 namespace casadi {
 
   bool (*InterruptHandler::checkInterrupted)() =
@@ -32,5 +40,14 @@ namespace casadi {
 
   void (*InterruptHandler::clearInterrupted)() =
     InterruptHandler::clearInterruptedDefault;
+
+  bool InterruptHandler::is_main_thread() {
+#ifdef CASADI_WITH_THREAD
+    static std::thread::id main = std::this_thread::get_id();
+    return std::this_thread::get_id()==main;
+#else //CASADI_WITH_THREAD
+    return true;
+#endif //CASADI_WITH_THREAD
+  }
 
 } // namespace casadi
