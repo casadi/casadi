@@ -1,5 +1,6 @@
 // NOLINT(legal/copyright)
 // C-REPLACE "fmax" "casadi_fmax"
+// C-REPLACE "nullptr" "0"
 
 // SYMBOL "cvx_house"
 /// Computes Householder vector
@@ -251,7 +252,7 @@ int casadi_cvx_symm_schur(casadi_int n, T1* t_diag, T1* t_off, T1 tol, casadi_in
 
     nn = n-q-p;
     if (q<n) {
-      casadi_cvx_implicit_qr(nn, t_diag+p, t_off+p, trace ? trace+trace_offset : 0);
+      casadi_cvx_implicit_qr(nn, t_diag+p, t_off+p, trace ? trace+trace_offset : nullptr);
       trace_offset += 2*(nn-1);
 
       if (trace_meta) {
