@@ -133,7 +133,7 @@
     extern "C" void utSetInterruptPending(bool);
 
     static bool mexcheckinterrupted() {
-      if (casadi::InterruptHandler::main_thread_only && !casadi::InterruptHandler::is_main_thread()) return false;
+      if (!casadi::InterruptHandler::is_main_thread()) return false;
       return utIsInterruptPending();
     }
 
