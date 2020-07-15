@@ -48,16 +48,16 @@ class typemaptests(casadiTestCase):
   def test_floordiv(self):
     self.message("make sure that floor_div raises errors")
     for x in [SX.sym("x"),MX.sym("x"),DM([3]),SX.sym("x")]:
-      for y in [2,2.0,DM(3),numpy.matrix([2.0])]:
+      for y in [2,2.0,DM(3),numpy.array([2.0])]:
         print((x,y))
         self.assertRaises(Exception,lambda : x//y)
         self.assertRaises(Exception,lambda : y//x)
 
   def test_autoconversion(self):
     self.message("Auto conversion DM")
-    x=array([2.3])
+    x=np.array([2.3])
     s = DM([[1,2],[3,4]])
-    n = array(s)
+    n = np.array(s)
 
     self.checkarray(x[0]*s,s*x[0],"")
     self.checkarray(x[0]*s,n*x[0],"")
@@ -71,19 +71,19 @@ class typemaptests(casadiTestCase):
     self.checkarray(x[0]+s,s+x[0],"")
     self.checkarray(x[0]+s,x[0]+n,"")
 
-    w=array([2.3])[0]
+    w=np.array([2.3])[0]
     w+=s
     self.checkarray(w,2.3+n,"")
 
-    w=array([2.3])[0]
+    w=np.array([2.3])[0]
     w-=s
     self.checkarray(w,2.3-n,"")
 
-    w=array([2.3])[0]
+    w=np.array([2.3])[0]
     w*=s
     self.checkarray(w,2.3*n,"")
 
-    w=array([2.3])[0]
+    w=np.array([2.3])[0]
     w/=s
     self.checkarray(w,2.3/n,"")
 
@@ -183,12 +183,12 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s/z)
       doit(z,s,lambda z,s: z**s)
       doit(z,s,lambda z,s: s**z)
-      doit(z,s,lambda z,s: fmin(s,z))
-      doit(z,s,lambda z,s: fmax(s,z))
+      doit(z,s,lambda z,s: np.fmin(s,z))
+      doit(z,s,lambda z,s: np.fmax(s,z))
       doit(z,s,lambda z,s: constpow(s,z))
       doit(z,s,lambda z,s: constpow(z,s))
 
-    nums = [array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), array(4),4.0,4]
+    nums = [np.array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), np.array(4),4.0,4]
 
     ## numeric & SX
     for s in nums:
@@ -219,7 +219,7 @@ class typemaptests(casadiTestCase):
         tests(z,s)
 
     for (s,x,y) in [
-                  (matrix([[1,2],[3,4]]),SX.sym("x",2,2),MX.sym("x",2,2))
+                  (np.array([[1,2],[3,4]]),SX.sym("x",2,2),MX.sym("x",2,2))
                   ]:
       for z,ztype in zip([x,y],[[type(SX()),type(SX())],[type(MX())]]):
         print("z = %s, s = %s" % (str(z),str(s)))

@@ -37,6 +37,7 @@ try:
 except:
   pass
 
+
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):

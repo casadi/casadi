@@ -316,7 +316,7 @@ class SXtests(casadiTestCase):
     J=f.jacobian_old(0, 0)
     J_in = [0]*J.n_in();J_in[0]=L
     J_out = J.call(J_in)
-    Jr=matrix([[1,1],[3,2],[4,27]])
+    Jr=np.array([[1,1],[3,2],[4,27]])
     self.checkarray(J_out[0],Jr,"SXfunction jacobian evaluates incorrectly")
 
   def test_SX2(self):
@@ -452,8 +452,8 @@ class SXtests(casadiTestCase):
 
   def test_sparseconstr(self):
     self.message("Check sparsity constructors")
-    self.checkarray(DM.ones(Sparsity.lower(3)).full(),matrix([[1,0,0],[1,1,0],[1,1,1]]),"tril")
-    self.checkarray(DM.ones(Sparsity.diag(3)).full(),matrix([[1,0,0],[0,1,0],[0,0,1]]),"diag")
+    self.checkarray(DM.ones(Sparsity.lower(3)).full(),np.array([[1,0,0],[1,1,0],[1,1,1]]),"tril")
+    self.checkarray(DM.ones(Sparsity.diag(3)).full(),np.array([[1,0,0],[0,1,0],[0,0,1]]),"diag")
 
   def test_subsassignment(self):
     self.message("Check subscripted assignment")
@@ -559,7 +559,7 @@ class SXtests(casadiTestCase):
     f_in = [0]*f.n_in();f_in[0]=x_
     f_in[1]=a_
     f_out = f.call(f_in)
-    self.checkarray(f_out[0],matrix([[x_*a_,a_],[1+a_*x_,0],[1,0]]),"taylor on dense matrices")
+    self.checkarray(f_out[0],np.array([[x_*a_,a_],[1+a_*x_,0],[1,0]]),"taylor on dense matrices")
 
   def test_null(self):
     self.message("Function null")

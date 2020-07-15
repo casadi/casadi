@@ -26,7 +26,7 @@ import casadi as c
 import numpy
 import numpy as n
 import sys
-from numpy import array, double, int32, atleast_2d, ones, matrix, zeros
+from numpy import double, int32, ones, matrix, zeros
 import unittest
 from types import *
 from helpers import *
@@ -49,7 +49,7 @@ class typemaptests(casadiTestCase):
 
   def test_memleak(self):
   
-   a = numpy.array([[0, 0]])
+   a = np.array([[0, 0]])
    self.assertEqual(sys.getrefcount(a), 2)
    casadi.DM(a)
    self.assertEqual(sys.getrefcount(a), 2)
@@ -61,8 +61,8 @@ class typemaptests(casadiTestCase):
    self.assertEqual(sys.getrefcount(a), 2)
    
   def test_0(self):
-    self.message("Typemap array -> DM")
-    arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]]),array([[1,2,3],[4,5,6]],dtype=int), array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
+    self.message("Typemap np.array -> DM")
+    arrays = [np.array([[1,2,3],[4,5,6]],dtype=int32),np.array([[1,2,3],[4,5,6]]),np.array([[1,2,3],[4,5,6]],dtype=int), np.array([[1,2],[3,4],[5,6]],dtype=double),np.array([[3.2,4.6,9.9]])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
@@ -104,7 +104,7 @@ class typemaptests(casadiTestCase):
   def test_setget(self):
     return # get/set with return-by-reference has been dropped
     self.message("DM set/get")
-    data = n.array([3,2.3,8])
+    data = n.np.array([3,2.3,8])
     dm=DM(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
 
     if scipy_available:
@@ -149,28 +149,29 @@ class typemaptests(casadiTestCase):
   def test_conversion(self):
     self.message("DM conversions")
     w = DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
-    d = array([[1,2,3],[4,5,6]])
+    d = np.array([[1,2,3],[4,5,6]])
 
     list(w.nonzeros())
     tuple(w.nonzeros())
     w.full()
-    array(w)
-    matrix(w)
+    np.array(w)
+    if check_matrix:
+      matrix(w)
     if scipy_available:
       w.sparse()
 
     self.checkarray(DM(d),d,"DM(numpy.ndarray)")
-    #self.checkarray(DM(array([1,2,3,4,5,6])),d.ravel(),"DM(numpy.ndarray)")
-    #print DM(array([1,2,3,4,5,6]))
-    #print DM(array([1,2,3,6]),2,2).full()
+    #self.checkarray(DM(np.array([1,2,3,4,5,6])),d.ravel(),"DM(numpy.ndarray)")
+    #print DM(np.array([1,2,3,4,5,6]))
+    #print DM(np.array([1,2,3,6]),2,2).full()
 
-    #print DM(array([1,2,3,6]),2,2).full()
+    #print DM(np.array([1,2,3,6]),2,2).full()
 
   def test_autoconversion(self):
     self.message("Auto conversion DM")
-    x=array([2.3])
+    x=np.array([2.3])
     s = DM([[1,2],[3,4]])
-    n = array(s)
+    n = np.array(s)
 
     self.checkarray(x[0]*s,s*x[0],"")
     self.checkarray(x[0]*s,n*x[0],"")
@@ -184,19 +185,19 @@ class typemaptests(casadiTestCase):
     self.checkarray(x[0]+s,s+x[0],"")
     self.checkarray(x[0]+s,x[0]+n,"")
 
-    w=array([2.3])[0]
+    w=np.array([2.3])[0]
     w+=s
     self.checkarray(w,2.3+n,"")
 
-    w=array([2.3])[0]
+    w=np.array([2.3])[0]
     w-=s
     self.checkarray(w,2.3-n,"")
 
-    w=array([2.3])[0]
+    w=np.array([2.3])[0]
     w*=s
     self.checkarray(w,2.3*n,"")
 
-    w=array([2.3])[0]
+    w=np.array([2.3])[0]
     w/=s
     self.checkarray(w,2.3/n,"")
 
@@ -327,18 +328,18 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s/z)
       doit(z,s,lambda z,s: z**s)
       doit(z,s,lambda z,s: s**z)
-      doit(z,s,lambda z,s: fmin(s,z))
-      doit(z,s,lambda z,s: fmax(s,z))
-      doit(z,s,lambda z,s: fmin(s,z))
-      doit(z,s,lambda z,s: fmax(s,z))
+      doit(z,s,lambda z,s: np.fmin(s,z))
+      doit(z,s,lambda z,s: np.fmax(s,z))
+      doit(z,s,lambda z,s: np.fmin(s,z))
+      doit(z,s,lambda z,s: np.fmax(s,z))
       doit(z,s,lambda z,s: constpow(s,z))
       doit(z,s,lambda z,s: constpow(z,s))
-      doit(z,s,lambda z,s: arctan2(s,z))
-      doit(z,s,lambda z,s: arctan2(z,s))
-      doit(z,s,lambda z,s: copysign(z,s))
-      doit(z,s,lambda z,s: copysign(s,z))
+      doit(z,s,lambda z,s: np.arctan2(s,z))
+      doit(z,s,lambda z,s: np.arctan2(z,s))
+      doit(z,s,lambda z,s: np.copysign(z,s))
+      doit(z,s,lambda z,s: np.copysign(s,z))
 
-    nums = [array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), array(4),4.0,4]
+    nums = [np.array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), np.array(4),4.0,4]
 
     ## numeric & SX
     for s in nums:
@@ -362,7 +363,7 @@ class typemaptests(casadiTestCase):
         tests(z,s)
 
     for (s,x,y) in [
-                  (matrix([[1,2],[3,4]]),SX.sym("x",2,2),MX.sym("x",2,2))
+                  (np.array([[1,2],[3,4]]),SX.sym("x",2,2),MX.sym("x",2,2))
                   ]:
       for z,ztype in zip([x,y],[[type(SX()),type(SX())],[type(MX())]]):
         print("z = %s, s = %s" % (str(z),str(s)))
@@ -405,7 +406,7 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s==z)
       doit(z,s,lambda z,s: s!=z)
 
-    nums = [array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), array(4),4.0,4]
+    nums = [np.array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), np.array(4),4.0,4]
 
     ## numeric & SX
     for s in nums:
@@ -440,13 +441,13 @@ class typemaptests(casadiTestCase):
 
     # should be integers
     goallist = [1,2,3]
-    goal = array([goallist]).T
+    goal = np.array([goallist]).T
 
     test={
       "list" : goallist,
       "tuple" : tuple(goallist),
-      "array1ddouble" : array(goallist,dtype=double),
-      "array1dint" : array(goallist)
+      "array1ddouble" : np.array(goallist,dtype=double),
+      "array1dint" : np.array(goallist)
     }
     w=DM(goal)
     self.checkarray(w,goal,"Constructor")
@@ -456,8 +457,8 @@ class typemaptests(casadiTestCase):
       self.checkarray(w,goal,"name")
 
     test={
-      "array2ddouble" : array([goallist],dtype=double).T,
-      "array2dint" : array([goallist]).T,
+      "array2ddouble" : np.array([goallist],dtype=double).T,
+      "array2dint" : np.array([goallist]).T,
     }
     w=DM(goal)
     self.checkarray(w,goal,"Constructor")
@@ -510,12 +511,12 @@ class typemaptests(casadiTestCase):
 
     w = DM([[0,0]])
 
-    A = matrix([[1.0,2],[3,4]])
-    B = matrix([[4.0,5],[6,7]])
+    A = np.array([[1.0,2],[3,4]])
+    B = np.array([[4.0,5],[6,7]])
 
     w[:,:] = A[0,:]
-    self.checkarray(w,A[0,:],"set")
-    B[0,:] = w
+    self.checkarray(w,A[0,:].reshape((1,-1)),"set")
+    B[:1,:] = w
     self.checkarray(B[0,:],A[0,:],"get")
 
     w = DM([[0],[0]])
@@ -523,12 +524,12 @@ class typemaptests(casadiTestCase):
 
     w[:,:] = A[:,0]
     self.checkarray(w,A[:,0],"set")
-    B[:,0] = w
+    B[:,:1] = w
     self.checkarray(B[:,0],A[:,0],"get")
 
     w = DM([[1,2],[3,4]])
-    A = zeros((8,7))
-    B = zeros((8,7))
+    A = np.zeros((8,7))
+    B = np.zeros((8,7))
     A[2:7:3,:7:4] = w
     B[2:7:3,:7:4] = w
     self.checkarray(A,B,"get")
@@ -549,20 +550,20 @@ class typemaptests(casadiTestCase):
   def test_issue190(self):
     self.message("regression test issue #190")
     x=SX.sym("x")
-    x * array(1)
-    x * array(1.2)
+    x * np.array(1)
+    x * np.array(1.2)
 
-    SX.sym("x") * array(1.0)
-    MX.sym("x") * array(1.0)
+    SX.sym("x") * np.array(1.0)
+    MX.sym("x") * np.array(1.0)
 
   def test_array_cat(self):
-    horzcat(*(SX.sym("x",4,3),ones((4,3))))
+    horzcat(*(SX.sym("x",4,3),np.ones((4,3))))
 
 
   def test_issue(self):
     self.message("std::vector<double> typemap.")
-    a = array([0,2,2,3])
-    b = array([0.738,0.39,0.99])
+    a = np.array([0,2,2,3])
+    b = np.array([0.738,0.39,0.99])
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
     DM(Sparsity(4,3,(0,2,2,3),[1,2,1]),[0.738,0.39,0.99])
     DM(Sparsity(4,3,list(a),[1,2,1]),[0.738,0.39,0.99])
@@ -702,7 +703,7 @@ class typemaptests(casadiTestCase):
   def test_ufuncsum(self):
     self.message("ufunc.add")
 
-    self.checkarray(DM(sum(DM([1,2,3]).nonzeros())),DM(6))
+    self.checkarray(DM(np.sum(DM([1,2,3]).nonzeros())),DM(6))
 
   def test_sxmatrix(self):
 
@@ -712,21 +713,21 @@ class typemaptests(casadiTestCase):
       return f_out[0]
 
     for i in [SX(1),1,1.0]:
-      a = array([[1,2],[3,4]])
+      a = np.array([[1,2],[3,4]])
       print(val(SX(a)))
       print(val(SX(a.T)))
 
       self.checkarray(val(SX(a)),DM([[1,2],[3,4]]))
       self.checkarray(val(SX(a.T).T),DM([[1,2],[3,4]]))
 
+      if check_matrix:
+        a = numpy.matrix([[1,2],[3,4]])
 
-      a = numpy.matrix([[1,2],[3,4]])
+        print(val(SX(a)))
+        print(DM([[1,2],[3,4]]))
 
-      print(val(SX(a)))
-      print(DM([[1,2],[3,4]]))
-
-      self.checkarray(val(SX(a)),DM([[1,2],[3,4]]))
-      self.checkarray(val(SX(a.T).T),DM([[1,2],[3,4]]))
+        self.checkarray(val(SX(a)),DM([[1,2],[3,4]]))
+        self.checkarray(val(SX(a.T).T),DM([[1,2],[3,4]]))
 
   def test_issue1158(self):
     A = numpy.zeros((0,2))
@@ -736,11 +737,11 @@ class typemaptests(casadiTestCase):
 
   def test_matrices(self):
 
-    Ds = [
+    Ds = ([
           numpy.matrix([[1,2],[3,4]]),
-          numpy.matrix([[1,2],[3,4.0]]),
-          array([[1,2],[3,4]]),
-          array([[1,2],[3,4.0]]),
+          numpy.matrix([[1,2],[3,4.0]])] if check_matrix else [])+[
+          np.array([[1,2],[3,4]]),
+          np.array([[1,2],[3,4.0]]),
         ]
 
     if scipy_available:
@@ -765,7 +766,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(d,DM([[1,2],[3,4]]))
 
   def test_issue1217(self):
-    a = numpy.matrix([0,SX.sym("x")])
+    a = np.array([0,SX.sym("x")])
 
     print(if_else(0,a,a))
 
@@ -775,7 +776,7 @@ class typemaptests(casadiTestCase):
 
   def test_None(self):
     #self.assertFalse(None==DM(3))
-    b = atleast_2d(None)
+    b = np.atleast_2d(None)
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
       c = repmat(b, 1, 1)
 

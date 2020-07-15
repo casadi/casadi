@@ -62,6 +62,9 @@ except Exception as e:
   else:
     systemswig = True
     
+# Pending deprecation in numpy
+check_matrix = False
+
 platform_arch = 8 * struct.calcsize("P")
 
 parser = argparse.ArgumentParser()
