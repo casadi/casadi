@@ -71,6 +71,21 @@ namespace casadi {
       || (recursive && Map::is_a(type, recursive));
   }
 
+ std::vector<std::string> Map::get_function() const {
+    return {"f"};
+  }
+
+  const Function& Map::get_function(const std::string &name) const {
+    casadi_assert(has_function(name),
+      "No function \"" + name + "\" in " + name_ + ". " +
+      "Available functions: " + join(get_function()) + ".");
+    return f_;
+  }
+
+  bool Map::has_function(const std::string& fname) const {
+    return fname=="f";
+  }
+
   void Map::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
     s.pack("Map::f", f_);

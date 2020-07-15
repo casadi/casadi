@@ -2714,8 +2714,16 @@ class Functiontests(casadiTestCase):
         g = Function.load('f.casadi')
 
 
+  def test_map_get_function(self):
+    x = MX.sym("x")
 
+    g = Function("g",[x],[x**2])
+    ff = g.map(5)
 
+    self.assertTrue(len(ff.get_function())==1)
+    f2 = ff.get_function("f")
+
+    self.checkfunction_light(g, f2, inputs=[3])
           
 if __name__ == '__main__':
     unittest.main()
