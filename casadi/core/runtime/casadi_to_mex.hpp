@@ -2,7 +2,10 @@
 // SYMBOL "to_mex"
 template<typename T1>
 mxArray* casadi_to_mex(const casadi_int* sp, const T1* x) {
-  casadi_int nrow, ncol, nnz, c, k;
+  casadi_int nrow, ncol, c, k;
+#ifndef CASADI_MEX_NO_SPARSE
+  casadi_int nnz;
+#endif
   const casadi_int *colind, *row;
   mxArray *p;
   double *d;
@@ -12,10 +15,10 @@ mxArray* casadi_to_mex(const casadi_int* sp, const T1* x) {
 #endif /* CASADI_MEX_NO_SPARSE */
   nrow = *sp++;
   ncol = *sp++;
-  nnz = sp[ncol];
   colind = sp;
   row = sp+ncol+1;
 #ifndef CASADI_MEX_NO_SPARSE
+  nnz = sp[ncol];
   if (nnz!=nrow*ncol) {
     p = mxCreateSparse(nrow, ncol, nnz, mxREAL);
     for (i=0, j=mxGetJc(p); i<=ncol; ++i) *j++ = *colind++;

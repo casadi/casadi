@@ -464,14 +464,20 @@ namespace casadi {
     s << "  char buf[" << (buf_len+1) << "];\n";
 
     // Read string argument
-    s << "  int buf_ok = --argc >= 0 && !mxGetString(*argv++, buf, sizeof(buf));\n";
+    s << "  int buf_ok = argc > 0 && !mxGetString(*argv, buf, sizeof(buf));\n";
 
     // Create switch
-    s << "  if (!buf_ok) {\n"
-      << "    /* name error */\n";
+    s << "  if (!buf_ok) {\n";
+    // Allow stringless call when unambiguous
+    if (exposed_fname.size()==1) {
+      s << "    mex_" << exposed_fname[0] << "(resc, resv, argc, argv);\n"
+        << "    return;\n";
+    } else {
+      s << "    /* name error */\n";
+    }
     for (casadi_int i=0; i<exposed_fname.size(); ++i) {
       s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {\n"
-        << "    mex_" << exposed_fname[i] << "(resc, resv, argc, argv);\n"
+        << "    mex_" << exposed_fname[i] << "(resc, resv, argc-1, argv+1);\n"
         << "    return;\n";
     }
     s << "  }\n";

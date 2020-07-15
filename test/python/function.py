@@ -1934,7 +1934,7 @@ class Functiontests(casadiTestCase):
     LUT_param = casadi.interpolant('name','bspline',d_knots,2,{"algorithm": "smooth_linear","smooth_linear_frac":0.1})
     f = Function('LUTp',[xy],[LUT_param(xy,d_flat)])
     self.checkfunction(LUT,f, inputs=[vertcat(0.2,0.333)])
-    self.check_codegen(f,inputs=[vertcat(0.2,0.333)])
+    self.check_codegen(f,inputs=[vertcat(0.2,0.333)],main=True)
     self.check_serialize(f,inputs=[vertcat(0.2,0.333)])
 
 
@@ -2100,7 +2100,7 @@ class Functiontests(casadiTestCase):
       z = MX.sym("z")
 
       f = Function('f',[x,y,z],[x,y,z],["x","y","z"],["a","b","c"],{"default_in": [1,2,3]})
-      self.check_codegen(f,{"x":5,"z":3})
+      self.check_codegen(f,{"x":5,"z":3},main=True)
 
   def test_factory_inherit_options(self):
       x = MX.sym("x",5)
@@ -2599,15 +2599,15 @@ class Functiontests(casadiTestCase):
   def test_codegen_inf_nan(self):
     x = MX.sym("x")
     f = Function("F",[x],[x+inf])
-    self.check_codegen(f,inputs=[1],std="c99")
+    self.check_codegen(f,inputs=[1],std="c99",main=True)
 
     x = MX.sym("x")
     f = Function("F",[x],[x+np.nan])
-    self.check_codegen(f,inputs=[1],std="c99")
+    self.check_codegen(f,inputs=[1],std="c99",main=True)
 
     x = MX.sym("x")
     f = Function("F",[x],[x+vertcat(inf,np.nan,-inf)])
-    self.check_codegen(f,inputs=[1],std="c99")
+    self.check_codegen(f,inputs=[1],std="c99",main=True)
 
   def test_bug_codegen_logical(self):
     a = MX([1,0,0])

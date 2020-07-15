@@ -551,11 +551,12 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False):
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       if opts is None: opts = {}
+      if main: opts["main"] = True
       F.generate(name, opts)
       import subprocess
 
@@ -570,21 +571,43 @@ class casadiTestCase(unittest.TestCase):
       if isinstance(extra_options,list):
         extra_options = " " + " ".join(extra_options)
 
-      if os.name=='nt':
-        commands = "cl.exe /LD {name}.c {extra} /link  /libpath:{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options) 
+      def get_commands(shared=True):
+        if os.name=='nt':
+          commands = "cl.exe {shared} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options)
+          output = "./" + name + (".dll" if shared else ".exe")
+          return [commands, output]
+        else:
+          output = "./" + name + (".so" if shared else "")
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name_out} -L{libdir}".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir) + (" -lm" if not shared else "") + extralibs + extra_options 
+          return [commands, output]
+
+      [commands, libname] = get_commands(shared=True)
+      p = subprocess.Popen(commands,shell=True).wait()
+      F2 = external(F.name(), libname)
+
+      if main:
+        [commands, exename] = get_commands(shared=False)
         p = subprocess.Popen(commands,shell=True).wait()
-
-        F2 = external(F.name(), "./" + name+ ".dll")
-      else:
-        commands = "gcc -pedantic -std={std} -fPIC -shared -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name}.so -L{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir) + extralibs + extra_options
-
-        p = subprocess.Popen(commands,shell=True).wait()
-
-
-        F2 = external(F.name(), "./" + name + ".so")
+        inputs_main = inputs
+        if isinstance(inputs,dict):
+          inputs_main = F.convert_in(inputs)
+        F.generate_in(F.name()+"_in.txt", inputs_main)
 
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)
+
+      if main:
+        with open(F.name()+"_out.txt","w") as stdout:
+          with open(F.name()+"_in.txt","r") as stdin:
+            p = subprocess.Popen(exename+" "+F.name(),shell=True,stdin=stdin,stdout=stdout).communicate()
+        outputs = F.generate_out(F.name()+"_out.txt")
+        if isinstance(inputs,dict):
+          outputs = F.convert_out(outputs)
+          for k in F.name_out():
+            self.checkarray(Fout[k],outputs[k],digits=15)
+        else:
+          for i in range(F.n_out()):
+            self.checkarray(Fout[i],Fout2[i],digits=15)
 
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())

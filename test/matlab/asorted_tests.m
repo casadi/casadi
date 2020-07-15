@@ -397,6 +397,12 @@ if ~is_octave
   assert(data.x.isnull)
 end
 
+if isunix
+  compile_flags = 'CFLAGS=$CFLAGS -pedantic -std=c89 -fPIC -shared -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter'
+else
+  compile_flags = '';
+end
+
 x=SX.sym('x');
 f=Function('f',{x},{2*x,DM.eye(2)*x});
 f.generate('fmex',struct('mex',true));
@@ -404,7 +410,7 @@ clear fmex
 if is_octave
 mex -DMATLAB_MEX_FILE fmex.c
 else
-mex -largeArrayDims fmex.c
+mex('-largeArrayDims',compile_flags,'fmex.c')
 end
 [a,b] = fmex('f',3);
 assert(norm(a-6,1)==0);
@@ -415,7 +421,7 @@ clear fmex
 if is_octave
 mex -DCASADI_MEX_NO_SPARSE -DMATLAB_MEX_FILE fmex.c
 else
-mex -DCASADI_MEX_NO_SPARSE -largeArrayDims fmex.c
+mex('-DCASADI_MEX_NO_SPARSE',compile_flags,'-largeArrayDims','fmex.c')
 end
 [a,b] = fmex('f',3);
 assert(norm(a-6,1)==0);
@@ -440,13 +446,158 @@ clear fmex_rp
 if is_octave
 mex -DCASADI_MEX_NO_SPARSE -DMATLAB_MEX_FILE fmex_rp.c
 else
-mex -DCASADI_MEX_NO_SPARSE -largeArrayDims fmex_rp.c
+mex('-DCASADI_MEX_NO_SPARSE',compile_flags,'-largeArrayDims','fmex_rp.c')
 end
 [a,b] = fmex_rp('f',3);
 assert(norm(a-6,1)==0);
 assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(~issparse(b));
+
+
+x=SX.sym('x');
+f=Function('f',{x},{2*x,DM.eye(2)*x});
+f.generate('fmex',struct('mex',true));
+clear fmex
+if is_octave
+mex -DMATLAB_MEX_FILE fmex.c
+else
+mex('-largeArrayDims',compile_flags,'fmex.c')
+end
+[a,b] = fmex(3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+
+x=SX.sym('x');
+f=Function('f',{x},{2*x,DM.eye(2)*x});
+g=Function('g',{x},{3*x,DM.eye(2)*x});
+cg = CodeGenerator('fmex', struct('mex',true))
+cg.add(f)
+cg.add(g)
+cg.generate()
+
+clear fmex
+if is_octave
+mex -DMATLAB_MEX_FILE fmex.c
+else
+mex('-largeArrayDims',compile_flags,'fmex.c')
+end
+
+flag = false;
+try
+  [a,b] = fmex(3);
+catch
+  flag = true;
+end
+assert(flag);
+
+[a,b] = fmex('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+
+
+flag = false;
+try
+  [a,b] = fmex('h',3);
+catch
+  flag = true;
+end
+assert(flag);
+
+flag = false;
+try
+  [a,b] = fmex('hhhhhh',3);
+catch
+  flag = true;
+end
+assert(flag);
+
+x = SX.sym('x',2,2);
+y = SX.sym('y',Sparsity.lower(2))
+f=Function('f',{x,y},{x+y,3*y});
+f.generate('fmex',struct('mex',true));
+clear fmex
+if is_octave
+mex -DMATLAB_MEX_FILE fmex.c
+else
+mex('-largeArrayDims',compile_flags,'fmex.c')
+end
+xnom = [1 2;3 5]
+ynom = sparse([7 0;6 9])
+[a,b] = fmex('f',xnom,ynom);
+assert(norm(a-(xnom+ynom),1)==0);
+assert(norm(b-3*ynom,1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+xnom = [4 4;4 4]
+ynom = sparse([5 0;5 5])
+[a,b] = fmex('f',4,5);
+assert(norm(a-(xnom+ynom),1)==0);
+assert(norm(b-3*ynom,1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+
+ynom = sparse([5 0;0 6])
+[a,b] = fmex('f',4,ynom);
+assert(norm(a-(xnom+ynom),1)==0);
+assert(norm(b-3*ynom,1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+
+ynom = sparse([5 0;6 7])
+[a,b] = fmex('f',4,sparse([5 12;6 7]));
+assert(norm(a-(xnom+ynom),1)==0);
+assert(norm(b-3*ynom,1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+
+ynom = sparse([5 0;6 7])
+[a,b] = fmex('f',4,[5 12;6 7]);
+assert(norm(a-(xnom+ynom),1)==0);
+assert(norm(b-3*ynom,1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+
+xnom = [4 4;4 4]
+ynom = sparse([5 0;5 5])
+
+flag = false;
+try
+  [a,b] = fmex('f',[2 3],ynom);
+catch
+  flag = true;
+end
+assert(flag);
+
+flag = false;
+try
+  [a,b] = fmex('f',xnom,sparse(ones(3,2)));
+catch
+  flag = true;
+end
+assert(flag);
+
+clear fmex
+if is_octave
+mex -DCASADI_MEX_NO_SPARSE -DMATLAB_MEX_FILE fmex.c
+else
+mex('-DCASADI_MEX_NO_SPARSE',compile_flags,'-largeArrayDims','fmex.c')
+end
+xnom = [1 2;3 5]
+ynom = sparse([7 0;6 9])
+[a,b] = fmex('f',xnom,ynom);
+assert(norm(a-(xnom+ynom),1)==0);
+assert(norm(b-3*ynom,1)==0);
+assert(~issparse(a));
+assert(~issparse(b));
+xnom = [4 4;4 4]
+ynom = sparse([5 0;5 5])
+[a,b] = fmex('f',4,5);
+assert(norm(a-(xnom+ynom),1)==0);
+assert(norm(b-3*ynom,1)==0);
+assert(~issparse(a));
+assert(~issparse(b));
+
 
 Xs = {SX, MX};
 for j=1:2;

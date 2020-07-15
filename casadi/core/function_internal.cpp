@@ -2273,7 +2273,7 @@ namespace casadi {
       // Declare wrapper
       g << "void mex_" << name_
         << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
-        << "casadi_int i, j;\n";
+        << "casadi_int i;\n";
 
       // Work vectors, including input and output buffers
       casadi_int i_nnz = nnz_in(), o_nnz = nnz_out();
@@ -2344,42 +2344,45 @@ namespace casadi {
       // Declare wrapper
       g << "casadi_int main_" << name_ << "(casadi_int argc, char* argv[]) {\n";
 
+      g << "casadi_int j;\n";
+      g << "casadi_real* a;\n";
+      g << "const casadi_real* r;\n";
+      g << "casadi_int flag;\n";
+
+
+
       // Work vectors and input and output buffers
       size_t nr = sz_w() + nnz_in() + nnz_out();
       g << CodeGenerator::array("casadi_int", "iw", sz_iw())
         << CodeGenerator::array("casadi_real", "w", nr);
 
       // Input buffers
-      g << "const casadi_real* arg[" << sz_arg() << "] = {";
-      casadi_int off=0;
-      for (casadi_int i=0; i<n_in_; ++i) {
-        if (i!=0) g << ", ";
-        g << "w+" << off;
-        off += nnz_in(i);
-      }
-      g << "};\n";
+      g << "const casadi_real* arg[" << sz_arg() << "];\n";
 
       // Output buffers
-      g << "casadi_real* res[" << sz_res() << "] = {";
+      g << "casadi_real* res[" << sz_res() << "];\n";
+
+      casadi_int off=0;
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << "arg[" << i << "] = w+" << off << ";\n";
+        off += nnz_in(i);
+      }
       for (casadi_int i=0; i<n_out_; ++i) {
-        if (i!=0) g << ", ";
-        g << "w+" << off;
+        g << "res[" << i << "] = w+" << off << ";\n";
         off += nnz_out(i);
       }
-      g << "};\n";
 
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
-      g << "casadi_int j;\n"
-        << "casadi_real* a = w;\n"
+      g << "a = w;\n"
         << "for (j=0; j<" << nnz_in() << "; ++j) "
-        << "scanf(\"%lg\", a++);\n";
+        << "if (scanf(\"%lg\", a++)<=0) return 2;\n";
 
       // Call the function
-      g << "casadi_int flag = " << name_ << "(arg, res, iw, w+" << off << ", 0);\n"
+      g << "flag = " << name_ << "(arg, res, iw, w+" << off << ", 0);\n"
         << "if (flag) return flag;\n";
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-      g << "const casadi_real* r = w+" << nnz_in() << ";\n"
+      g << "r = w+" << nnz_in() << ";\n"
         << "for (j=0; j<" << nnz_out() << "; ++j) "
         << g.printf("%g ", "*r++") << "\n";
 
