@@ -50531,12 +50531,12 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_function() const  "
+%feature("docstring")  casadi::Map::get_function() const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::get_function(const
-std::string &name) const  "
+%feature("docstring")  casadi::Map::get_function(const std::string &name)
+const  "
 
 [INTERNAL] ";
 
@@ -51040,8 +51040,8 @@ std::string, FStats > &fstats) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Map::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -51130,8 +51130,8 @@ std::string &fname, double **res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_function(const
-std::string &fname) const  "
+%feature("docstring")  casadi::Map::has_function(const std::string &fname)
+const  "
 
 [INTERNAL] ";
 
@@ -59574,10 +59574,10 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::size_out(casadi_int ind)
-const  "
+%feature("docstring")  casadi::OmpMap::eval(const double **arg, double
+**res, casadi_int *iw, double *w, void *mem) const  "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Evaluate the function numerically.
 
 ";
 
@@ -59752,12 +59752,12 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_function() const  "
+%feature("docstring")  casadi::Map::get_function() const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::get_function(const
-std::string &name) const  "
+%feature("docstring")  casadi::Map::get_function(const std::string &name)
+const  "
 
 [INTERNAL] ";
 
@@ -59775,8 +59775,8 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::OmpMap::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -59827,12 +59827,6 @@ casadi_int *iw, bvec_t *w, void *mem) const  "
 std::vector< M > &arg, casadi_int npar) const  "
 
 [INTERNAL]  Replace 0-by-0 inputs.
-
-";
-
-%feature("docstring")  casadi::Map::get_name_out(casadi_int i)  "
-
-[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -60091,16 +60085,16 @@ double > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::OmpMap::eval(const double **arg, double
-**res, casadi_int *iw, double *w, void *mem) const  "
+%feature("docstring")  casadi::FunctionInternal::size_out(casadi_int ind)
+const  "
 
-[INTERNAL]  Evaluate the function numerically.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize()  "
+%feature("docstring")  casadi::Map::get_name_out(casadi_int i)  "
 
-[INTERNAL]  Finalize the object creation.
+[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -60438,6 +60432,12 @@ std::string &fname) "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
+
+[INTERNAL]  Release a memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nnz_in() const  "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -60482,9 +60482,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
-[INTERNAL]  Release a memory object.
+[INTERNAL]  Finalize the object creation.
 
 ";
 
@@ -60677,8 +60677,8 @@ casadi::FunctionInternal::codegen_free_mem(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_function(const
-std::string &fname) const  "
+%feature("docstring")  casadi::Map::has_function(const std::string &fname)
+const  "
 
 [INTERNAL] ";
 
@@ -86515,8 +86515,8 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::ThreadMap::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -86529,12 +86529,12 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_function() const  "
+%feature("docstring")  casadi::Map::get_function() const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::get_function(const
-std::string &name) const  "
+%feature("docstring")  casadi::Map::get_function(const std::string &name)
+const  "
 
 [INTERNAL] ";
 
@@ -87029,8 +87029,8 @@ std::vector< M > &res, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_function(const
-std::string &fname) const  "
+%feature("docstring")  casadi::Map::has_function(const std::string &fname)
+const  "
 
 [INTERNAL] ";
 

@@ -46926,9 +46926,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::OmpMap::size_out "
+%feature("docstring") casadi::OmpMap::eval "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Evaluate the function numerically.
 
 ";
 
@@ -47140,12 +47140,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OmpMap::get_name_out "
-
-[INTERNAL]  Names of function input and outputs.
-
-";
-
 %feature("docstring") casadi::OmpMap::get_name_in "
 
 [INTERNAL]  Names of function input and outputs.
@@ -47345,15 +47339,15 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OmpMap::eval "
+%feature("docstring") casadi::OmpMap::size_out "
 
-[INTERNAL]  Evaluate the function numerically.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::OmpMap::finalize "
+%feature("docstring") casadi::OmpMap::get_name_out "
 
-[INTERNAL]  Finalize the object creation.
+[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -47630,6 +47624,12 @@ Evaluate or propagate sparsities.
 
 ";
 
+%feature("docstring") casadi::OmpMap::release "
+
+[INTERNAL]  Release a memory object.
+
+";
+
 %feature("docstring") casadi::OmpMap::nnz_in "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -47664,9 +47664,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OmpMap::release "
+%feature("docstring") casadi::OmpMap::finalize "
 
-[INTERNAL]  Release a memory object.
+[INTERNAL]  Finalize the object creation.
 
 ";
 
