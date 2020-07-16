@@ -22407,10 +22407,6 @@ C++ includes: serializer.hpp ";
 
 
 // File: classcasadi_1_1FileSerializer.xml
-%feature("docstring") casadi::FileSerializer "
-
-C++ includes: serializer.hpp ";
-
 %feature("docstring") casadi::FileSerializer::FileSerializer(const
 std::string &fname, const Dict &opts=Dict()) "
 
@@ -22419,6 +22415,10 @@ Advanced serialization of CasADi objects.
 StringSerializer, FileDeserializer
 
 ";
+
+%feature("docstring") casadi::FileSerializer "
+
+C++ includes: serializer.hpp ";
 
 
 // File: classcasadi_1_1Find.xml
