@@ -74,15 +74,12 @@ for k=0:f.n_instructions()-1
     elseif op==OP_MUL
       work{o(1)} = work{i(1)} * work{i(2)};
      disp(['work{' num2str(o(1)) '} = work{' num2str(i(1)) '} * work{'  num2str(i(2)) '};     ---> ' num2str(work{o(1)})]);
-    elseif op==OP_MTIMES
-      work{o(1)} = work{i(2)}*work{i(3)}+work{i(1)};
-      disp(['work{' num2str(o(1)) '} = work{' num2str(i(2)) '} * work{' num2str(i(3)) '} + work{' num2str(i(1)) '};     ---> ' num2str(work{o(1)})])
     else
       disp_in = {};
       for a=i
          disp_in{end+1} = ['work{' num2str(a) '}'];
       end
-      debug_str = print_operator(instr{k},disp_in);
+      debug_str = print_operator(instr{k+1},disp_in);
       error(['Unknown operation: '  num2str(op) ' -- ' debug_str]);
     end
   end
