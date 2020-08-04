@@ -1435,6 +1435,8 @@ class SXtests(casadiTestCase):
     with self.assertInException("since variables [x] are free"):
       evalf(x)
 
+  def test_ufunc(self):
+    y = np.sin(casadi.SX.sym('x'))
 
 
 
