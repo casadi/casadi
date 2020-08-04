@@ -47,7 +47,7 @@ class typemaptests(casadiTestCase):
 
   def test_floordiv(self):
     self.message("make sure that floor_div raises errors")
-    for x in [SX.sym("x"),MX.sym("x"),DM([3]),SX.sym("x")]:
+    for x in [SX.sym("x"),MX.sym("x"),SX.sym("x")]:
       for y in [2,2.0,DM(3),numpy.array([2.0])]:
         print((x,y))
         self.assertRaises(Exception,lambda : x//y)
