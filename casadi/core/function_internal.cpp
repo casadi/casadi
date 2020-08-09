@@ -74,6 +74,7 @@ namespace casadi {
     ad_weight_ = 0.33; // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na, forward when tie
     // Both modes equally expensive by default (no "taping" needed)
     ad_weight_sp_ = 0.49; // Forward when tie
+    ad_batching_max_num_threads_ = 1;
     always_inline_ = false;
     never_inline_ = false;
     jac_penalty_ = 2;
@@ -186,6 +187,10 @@ namespace casadi {
         "Overrides default behavior. Set to 0 and 1 to force forward and "
         "reverse mode respectively. Cf. option \"ad_weight\". "
         "When set to -1, sparsity is completely ignored and dense matrices are used."}},
+      {"ad_batching_max_num_threads",
+       {OT_INT,
+        "When a batch of forward/reverse sweeps is requested, allow at most this amount "
+        " of threads to be spawned. Default: 1."}},
       {"always_inline",
        {OT_BOOL,
         "Force inlining."}},
@@ -424,6 +429,8 @@ namespace casadi {
         ad_weight_ = op.second;
       } else if (op.first=="ad_weight_sp") {
         ad_weight_sp_ = op.second;
+      } else if (op.first=="ad_batching_max_num_threads") {
+        ad_batching_max_num_threads_ = op.second;
       } else if (op.first=="max_num_dir") {
         max_num_dir_ = op.second;
       } else if (op.first=="enable_forward") {
@@ -2685,10 +2692,54 @@ namespace casadi {
     } else {
       // Evaluate in batches
       casadi_assert_dev(enable_forward_ || enable_fd_);
-      casadi_int max_nfwd = max_num_dir_;
+      casadi_int max_nfwd = min(max_num_dir_, nfwd/ad_batching_max_num_threads_);
+      max_nfwd = max(max_nfwd, casadi_int(1));
       if (!enable_fd_) {
         while (!has_forward(max_nfwd)) max_nfwd/=2;
       }
+
+      // Parallel seeding
+      if (ad_batching_max_num_threads_>1) {
+        casadi_int n = ceil(static_cast<double>(nfwd)/max_nfwd);
+        casadi_int dummy_n = n*max_nfwd-nfwd;
+
+        if (verbose_) {
+          casadi_message("Computing " + str(nfwd) + " forward sweeps using " + str(n) +
+            " calls to forward(" + str(max_nfwd) + ") with " + str(ad_batching_max_num_threads_) +
+            " threads.");
+        }
+        Function dfcn = self().forward(max_nfwd).map(n, "thread", ad_batching_max_num_threads_);
+
+        // All inputs and seeds
+        vector<MX> darg;
+        darg.reserve(n_in_ + n_out_ + n_in_);
+        darg.insert(darg.end(), arg.begin(), arg.end());
+        darg.insert(darg.end(), res.begin(), res.end());
+        vector<MX> v(nfwd);
+        for (casadi_int i=0; i<n_in_; ++i) {
+          for (casadi_int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
+          // Pad with zeros
+          MX padding = MX::zeros(repmat(sparsity_in_[i], 1, dummy_n));
+          darg.push_back(horzcat(horzcat(v), padding));
+        }
+
+        vector<MX> x = dfcn(darg);
+        casadi_assert_dev(x.size()==n_out_);
+
+        // Retrieve sensitivities
+        for (casadi_int d=0; d<nfwd; ++d) fsens[d].resize(n_out_);
+        for (casadi_int i=0; i<n_out_; ++i) {
+          if (size2_out(i)>0) {
+            v = horzsplit(x[i], size2_out(i));
+            casadi_assert_dev(v.size()==nfwd+dummy_n);
+          } else {
+            v = vector<MX>(nfwd+dummy_n, MX(size_out(i)));
+          }
+          for (casadi_int d=0; d<nfwd; ++d) fsens[d][i] = v[d];
+        }
+        return;
+      }
+
       casadi_int offset = 0;
       while (offset<nfwd) {
         // Number of derivatives, in this batch
@@ -2793,9 +2844,60 @@ namespace casadi {
     } else {
       // Evaluate in batches
       casadi_assert_dev(enable_reverse_);
-      casadi_int max_nadj = max_num_dir_;
+      casadi_int max_nadj = min(max_num_dir_, nadj/ad_batching_max_num_threads_);
+      max_nadj = max(max_nadj, casadi_int(1));
 
       while (!has_reverse(max_nadj)) max_nadj/=2;
+
+      // Parallel seeding
+      if (ad_batching_max_num_threads_>1) {
+        casadi_int n = ceil(static_cast<double>(nadj)/max_nadj);
+        casadi_int dummy_n = n*max_nadj-nadj;
+
+        if (verbose_) {
+          casadi_message("Computing " + str(nadj) + " reverse sweeps using " + str(n) +
+            " calls to reverse(" + str(max_nadj) + ") with " + str(ad_batching_max_num_threads_) +
+            " threads.");
+        }
+        Function dfcn = self().reverse(max_nadj).map(n, "thread", ad_batching_max_num_threads_);
+
+        // All inputs and seeds
+        vector<MX> darg;
+        darg.reserve(n_in_ + n_out_ + n_out_);
+        darg.insert(darg.end(), arg.begin(), arg.end());
+        darg.insert(darg.end(), res.begin(), res.end());
+        vector<MX> v(nadj);
+        for (casadi_int i=0; i<n_out_; ++i) {
+          for (casadi_int d=0; d<nadj; ++d) v[d] = aseed[d][i];
+          // Pad with zeros
+          MX padding = MX::zeros(repmat(sparsity_out_[i], 1, dummy_n));
+          darg.push_back(horzcat(horzcat(v), padding));
+        }
+
+        vector<MX> x = dfcn(darg);
+        casadi_assert_dev(x.size()==n_in_);
+
+        // Retrieve sensitivities
+        for (casadi_int d=0; d<nadj; ++d) asens[d].resize(n_in_);
+        for (casadi_int i=0; i<n_in_; ++i) {
+          if (size2_in(i)>0) {
+            v = horzsplit(x[i], size2_in(i));
+            casadi_assert_dev(v.size()==nadj+dummy_n);
+          } else {
+            v = vector<MX>(nadj+dummy_n, MX(size_in(i)));
+          }
+          for (casadi_int d=0; d<nadj; ++d) {
+            if (asens[d][i].is_empty(true)) {
+              asens[d][i] = v[d];
+            } else {
+              asens[d][i] += v[d];
+            }
+          }
+        }
+
+        return;
+      }
+
       casadi_int offset = 0;
       while (offset<nadj) {
         // Number of derivatives, in this batch
@@ -3541,7 +3643,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 2);
+    s.version("FunctionInternal", 3);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -3581,6 +3683,7 @@ namespace casadi {
 
     s.pack("FunctionInternal::ad_weight", ad_weight_);
     s.pack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
+    s.pack("FunctionInternal::ad_batching_max_num_threads", ad_batching_max_num_threads_);
     s.pack("FunctionInternal::always_inline", always_inline_);
     s.pack("FunctionInternal::never_inline", never_inline_);
 
@@ -3614,7 +3717,7 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
-    int version = s.version("FunctionInternal", 1, 2);
+    int version = s.version("FunctionInternal", 1, 3);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -3667,6 +3770,11 @@ namespace casadi {
 
     s.unpack("FunctionInternal::ad_weight", ad_weight_);
     s.unpack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
+    if (version>=3) {
+      s.unpack("FunctionInternal::ad_batching_max_num_threads", ad_batching_max_num_threads_);
+    } else {
+      ad_batching_max_num_threads_ = 1;
+    }
     s.unpack("FunctionInternal::always_inline", always_inline_);
     s.unpack("FunctionInternal::never_inline", never_inline_);
 
