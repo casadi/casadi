@@ -24,7 +24,7 @@ add_definitions(${IPOPT_CFLAGS_OTHER})
 
 casadi_plugin(Nlpsol ipopt ${NLPSOL_IPOPT_SRCS})
 if(MSVC)
-set(IPOPT_LIBRARIES ${IPOPT_LIBRARIES} mkl_intel_lp64 mkl_sequential mkl_core)
+set(IPOPT_LIBRARIES ${IPOPT_LIBRARIES} mkl_intel_lp64 mkl_sequential mkl_core netapi32 comctl32 Ws2_32 Dhcpcsvc Userenv Shlwapi Comdlg32 OleAut32 Ole32 Wbemuuid)
 endif()
 casadi_plugin_link_libraries(Nlpsol ipopt ${IPOPT_LIBRARIES})
 
