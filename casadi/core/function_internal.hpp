@@ -939,6 +939,9 @@ namespace casadi {
     /// Maximum number of threads for AD batching
     casadi_int ad_batching_max_num_threads_;
 
+    /// Map used for AD batching
+    std::string ad_batching_map_;
+
     /// Maximum number of sensitivity directions
     casadi_int max_num_dir_;
 

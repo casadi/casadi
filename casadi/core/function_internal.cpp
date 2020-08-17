@@ -75,6 +75,7 @@ namespace casadi {
     // Both modes equally expensive by default (no "taping" needed)
     ad_weight_sp_ = 0.49; // Forward when tie
     ad_batching_max_num_threads_ = 1;
+    ad_batching_map_ = "thread";
     always_inline_ = false;
     never_inline_ = false;
     jac_penalty_ = 2;
@@ -191,6 +192,9 @@ namespace casadi {
        {OT_INT,
         "When a batch of forward/reverse sweeps is requested, allow at most this amount "
         " of threads to be spawned. Default: 1."}},
+      {"ad_batching_map",
+       {OT_STRING,
+        "Map parallelization type to use when ad_batching_max_num_threads>1. Default: thread."}},
       {"always_inline",
        {OT_BOOL,
         "Force inlining."}},
@@ -431,6 +435,8 @@ namespace casadi {
         ad_weight_sp_ = op.second;
       } else if (op.first=="ad_batching_max_num_threads") {
         ad_batching_max_num_threads_ = op.second;
+      } else if (op.first=="ad_batching_map") {
+        ad_batching_map_ = op.second.to_string();
       } else if (op.first=="max_num_dir") {
         max_num_dir_ = op.second;
       } else if (op.first=="enable_forward") {
@@ -2708,7 +2714,8 @@ namespace casadi {
             " calls to forward(" + str(max_nfwd) + ") with " + str(ad_batching_max_num_threads_) +
             " threads.");
         }
-        Function dfcn = self().forward(max_nfwd).map(n, "thread", ad_batching_max_num_threads_);
+        Function dfcn = self().forward(max_nfwd);
+        dfcn = dfcn.map(n, ad_batching_map_, ad_batching_max_num_threads_);
 
         // All inputs and seeds
         vector<MX> darg;
@@ -2859,7 +2866,8 @@ namespace casadi {
             " calls to reverse(" + str(max_nadj) + ") with " + str(ad_batching_max_num_threads_) +
             " threads.");
         }
-        Function dfcn = self().reverse(max_nadj).map(n, "thread", ad_batching_max_num_threads_);
+        Function dfcn = self().reverse(max_nadj);
+        dfcn = dfcn.map(n, ad_batching_map_, ad_batching_max_num_threads_);
 
         // All inputs and seeds
         vector<MX> darg;
@@ -3684,6 +3692,7 @@ namespace casadi {
     s.pack("FunctionInternal::ad_weight", ad_weight_);
     s.pack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
     s.pack("FunctionInternal::ad_batching_max_num_threads", ad_batching_max_num_threads_);
+    s.pack("FunctionInternal::ad_batching_map", ad_batching_map_);
     s.pack("FunctionInternal::always_inline", always_inline_);
     s.pack("FunctionInternal::never_inline", never_inline_);
 
@@ -3772,8 +3781,10 @@ namespace casadi {
     s.unpack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
     if (version>=3) {
       s.unpack("FunctionInternal::ad_batching_max_num_threads", ad_batching_max_num_threads_);
+      s.unpack("FunctionInternal::ad_batching_map", ad_batching_map_);
     } else {
       ad_batching_max_num_threads_ = 1;
+      ad_batching_map_ = "thread";
     }
     s.unpack("FunctionInternal::always_inline", always_inline_);
     s.unpack("FunctionInternal::never_inline", never_inline_);
