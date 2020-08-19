@@ -292,6 +292,9 @@ namespace casadi {
     // Initial step size
     if (step0_!=0) THROWING(IDASetInitStep, m->mem, step0_);
 
+    // Max step size
+    if (step_max_!=0) THROWING(IDASetMaxStep, m->mem, step_max_);
+
     // Maximum order of method
     if (max_order_) THROWING(IDASetMaxOrd, m->mem, max_order_);
 

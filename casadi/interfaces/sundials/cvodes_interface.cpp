@@ -153,6 +153,12 @@ namespace casadi {
     // Initial step size
     if (step0_!=0) THROWING(CVodeSetInitStep, m->mem, step0_);
 
+    // Min step size
+    if (step_min_!=0) THROWING(CVodeSetMinStep, m->mem, step_min_);
+
+    // Max step size
+    if (step_max_!=0) THROWING(CVodeSetMaxStep, m->mem, step_max_);
+
     // Maximum order of method
     if (max_order_) THROWING(CVodeSetMaxOrd, m->mem, max_order_);
 
