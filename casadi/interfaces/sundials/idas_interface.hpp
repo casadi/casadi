@@ -200,7 +200,6 @@ namespace casadi {
     bool calc_ic_;
     bool calc_icB_;
     bool suppress_algebraic_;
-    double max_step_size_;
     std::vector<double> abstolv_;
     double first_time_;
 

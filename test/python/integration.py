@@ -1053,8 +1053,8 @@ class Integrationtests(casadiTestCase):
     x = SX.sym("x")
     opts = {
         "step0":    1e-4,
-        "step_min": 1e-4,
-        "step_max": 1.1e-4,
+        "min_step_size": 1e-4,
+        "max_step_size": 1.1e-4,
         "t0"      : 0.0,
         "tf"      : 0.5
     }
@@ -1070,7 +1070,7 @@ class Integrationtests(casadiTestCase):
     x = SX.sym("x")
     opts = {
         "step0":    1e-4,
-        "step_max": 1.1e-4,
+        "max_step_size": 1.1e-4,
         "t0"      : 0.0,
         "tf"      : 0.5
     }
