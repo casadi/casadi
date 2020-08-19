@@ -98,7 +98,6 @@ namespace casadi {
     cj_scaling_ = true;
     calc_ic_ = true;
     suppress_algebraic_ = false;
-    max_step_size_ = 0;
 
     // Read options
     for (auto&& op : opts) {
@@ -110,8 +109,6 @@ namespace casadi {
         calc_ic_ = op.second;
       } else if (op.first=="suppress_algebraic") {
         suppress_algebraic_ = op.second;
-      } else if (op.first=="max_step_size") {
-        max_step_size_ = op.second;
       } else if (op.first=="abstolv") {
         abstolv_ = op.second;
       }
@@ -286,14 +283,11 @@ namespace casadi {
     // Maxinum order for the multistep method
     THROWING(IDASetMaxOrd, m->mem, max_multistep_order_);
 
-    // Set maximum step size
-    THROWING(IDASetMaxStep, m->mem, max_step_size_);
-
     // Initial step size
     if (step0_!=0) THROWING(IDASetInitStep, m->mem, step0_);
 
-    // Max step size
-    if (step_max_!=0) THROWING(IDASetMaxStep, m->mem, step_max_);
+    // Set maximum step size
+    if (max_step_size_!=0) THROWING(IDASetMaxStep, m->mem, max_step_size_);
 
     // Maximum order of method
     if (max_order_) THROWING(IDASetMaxOrd, m->mem, max_order_);
@@ -1058,7 +1052,6 @@ namespace casadi {
     s.unpack("IdasInterface::calc_ic", calc_ic_);
     s.unpack("IdasInterface::calc_icB", calc_icB_);
     s.unpack("IdasInterface::suppress_algebraic", suppress_algebraic_);
-    s.unpack("IdasInterface::max_step_size", max_step_size_);
     s.unpack("IdasInterface::abstolv", abstolv_);
     s.unpack("IdasInterface::first_time", first_time_);
     s.unpack("IdasInterface::init_xdot", init_xdot_);
@@ -1071,7 +1064,6 @@ namespace casadi {
     s.pack("IdasInterface::calc_ic", calc_ic_);
     s.pack("IdasInterface::calc_icB", calc_icB_);
     s.pack("IdasInterface::suppress_algebraic", suppress_algebraic_);
-    s.pack("IdasInterface::max_step_size", max_step_size_);
     s.pack("IdasInterface::abstolv", abstolv_);
     s.pack("IdasInterface::first_time", first_time_);
     s.pack("IdasInterface::init_xdot", init_xdot_);
