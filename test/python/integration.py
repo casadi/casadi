@@ -345,9 +345,6 @@ class Integrationtests(casadiTestCase):
               self.check_pure(integrator,inputs=integrator_in)
               self.check_serialize(integrator,inputs=integrator_in)
 
-
-
-
   @memory_heavy()
   def test_X(self):
     self.message("Extensive integrator tests")
@@ -594,7 +591,6 @@ class Integrationtests(casadiTestCase):
     p=num['p']
     self.assertAlmostEqual(qe_out[0][0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
 
-
   def test_jac1(self):
     self.message('CVodes integration: jacobian to q0')
     num=self.num
@@ -818,7 +814,6 @@ class Integrationtests(casadiTestCase):
     H_out = H(A, vec(B))
     print(array(H_out[0]))
 
-
   def test_mathieu_system(self):
     self.message("Mathieu ODE")
     A=array([0.3,1.2])
@@ -945,6 +940,7 @@ class Integrationtests(casadiTestCase):
     dae = {'x':x, 'z':z, 'ode':z+p, 'alg':z*cos(z)-x} # p forgotten here
     with self.assertInException("[p] are free"):
       integrator('F', 'idas', dae)
+
   def test_hessian2D(self):
     self.message("hessian")
     N=2
@@ -974,6 +970,7 @@ class Integrationtests(casadiTestCase):
 
     H  = JT.jacobian_old(1, 0)
     H_out = H(x0_, vec(A_))
+
 
     H1 = H_out[0]
 
@@ -1024,7 +1021,6 @@ class Integrationtests(casadiTestCase):
       r = [0] + collocation_points(k,"legendre")
       self.assertEqual(len(r),k+1)
 
-
   @memory_heavy()
   def test_thread_safety(self):
     x = MX.sym('x')
@@ -1051,6 +1047,41 @@ class Integrationtests(casadiTestCase):
     intg = integrator("intg","rk",{"x":x,"ode":x**2},{"simplify":True})
 
     self.assertTrue(intg.nnz_out("zf")==0)
+
+  @requires_integrator('cvodes')
+  def test_step_options_cvodes(self):
+    x = SX.sym("x")
+    opts = {
+        "step0":    1e-4,
+        "step_min": 1e-4,
+        "step_max": 1.1e-4,
+        "t0"      : 0.0,
+        "tf"      : 0.5
+    }
+
+    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, opts)
+    I(x0=0)
+    stats = I.stats()
+
+    self.assertTrue(int(0.5/1e-4)>=stats["nsteps"]>=int(0.5/1.1e-4))
+
+  @requires_integrator('idas')
+  def test_step_options_idas(self):
+    x = SX.sym("x")
+    opts = {
+        "step0":    1e-4,
+        "step_max": 1.1e-4,
+        "t0"      : 0.0,
+        "tf"      : 0.5
+    }
+
+    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, opts)
+    I(x0=0)
+    stats = I.stats()
+
+    print(stats["nsteps"])
+    self.assertTrue(stats["nsteps"]>=int(0.5/1.1e-4))
+
 
 if __name__ == '__main__':
     unittest.main()
