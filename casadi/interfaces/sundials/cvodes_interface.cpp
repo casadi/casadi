@@ -872,9 +872,9 @@ namespace casadi {
     s.unpack("CvodesInterface::iter", iter_);
 
     if (version>=2) {
-        s.unpack("CvodesInterface::min_step_size", min_step_size_);
+      s.unpack("CvodesInterface::min_step_size", min_step_size_);
     } else {
-        min_step_size_ = 0;
+      min_step_size_ = 0;
     }
   }
 

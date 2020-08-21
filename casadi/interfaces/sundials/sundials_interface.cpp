@@ -415,9 +415,9 @@ namespace casadi {
 
     s.unpack("SundialsInterface::step0", step0_);
     if (version>=2) {
-        s.unpack("SundialsInterface::max_step_size", max_step_size_);
+      s.unpack("SundialsInterface::max_step_size", max_step_size_);
     } else {
-        max_step_size_ = 0;
+      max_step_size_ = 0;
     }
 
     s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
