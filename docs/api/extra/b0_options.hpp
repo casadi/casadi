@@ -996,6 +996,8 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Max step size [default: 0/inf]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>min_step_size</td><td>OT_DOUBLE</td><td>Min step size [default: 0/0.0]</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td><td>casadi::CvodesInterface</td></tr>
@@ -1028,6 +1030,8 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td></tr>
 <tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td></tr>
+<tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Max step size [default: 0/inf]</td></tr>
+<tr><td>min_step_size</td><td>OT_DOUBLE</td><td>Min step size [default: 0/0.0]</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td></tr>
@@ -1059,6 +1063,8 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Max step size [default: 0/inf]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>min_step_size</td><td>OT_DOUBLE</td><td>Min step size [default: 0/0.0]</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td><td>casadi::CvodesInterface</td></tr>
@@ -4274,6 +4280,7 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Max step size [default: 0/inf]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
@@ -4315,6 +4322,7 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Max step size [default: 0/inf]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>

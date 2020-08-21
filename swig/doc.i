@@ -88523,6 +88523,10 @@ times t_i.
 +----------------------------+-----------+---------------------------------+
 | max_order                  | OT_DOUBLE | Maximum order                   |
 +----------------------------+-----------+---------------------------------+
+| max_step_size              | OT_DOUBLE | Max step size [default: 0/inf]  |
++----------------------------+-----------+---------------------------------+
+| min_step_size              | OT_DOUBLE | Min step size [default: 0/0.0]  |
++----------------------------+-----------+---------------------------------+
 | newton_scheme              | OT_STRING | Linear solver scheme in the     |
 |                            |           | Newton method:                  |
 |                            |           | DIRECT|gmres|bcgstab|tfqmr      |
