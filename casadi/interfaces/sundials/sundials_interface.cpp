@@ -407,8 +407,8 @@ namespace casadi {
     s.unpack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
     s.unpack("SundialsInterface::max_multistep_order", max_multistep_order_);
     s.unpack("SundialsInterface::linear_solver", linear_solver_);
-
     s.unpack("SundialsInterface::linear_solver_options", linear_solver_options_);
+
     s.unpack("SundialsInterface::max_krylov", max_krylov_);
     s.unpack("SundialsInterface::use_precon", use_precon_);
     s.unpack("SundialsInterface::second_order_correction", second_order_correction_);
@@ -447,8 +447,8 @@ namespace casadi {
     s.pack("SundialsInterface::steps_per_checkpoint", steps_per_checkpoint_);
     s.pack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
     s.pack("SundialsInterface::max_multistep_order", max_multistep_order_);
-    s.pack("SundialsInterface::linear_solver", linear_solver_);
 
+    s.pack("SundialsInterface::linear_solver", linear_solver_);
     s.pack("SundialsInterface::linear_solver_options", linear_solver_options_);
     s.pack("SundialsInterface::max_krylov", max_krylov_);
     s.pack("SundialsInterface::use_precon", use_precon_);
