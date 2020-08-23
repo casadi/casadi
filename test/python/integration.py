@@ -33,10 +33,10 @@ import copy
 
 scipy_available = True
 try:
-	import scipy.special
-	from scipy.linalg import expm
+  import scipy.special
+  from scipy.linalg import expm
 except:
-	scipy_available = False
+  scipy_available = False
 
 integrators = []
 
@@ -1052,11 +1052,11 @@ class Integrationtests(casadiTestCase):
   def test_step_options_cvodes(self):
     x = SX.sym("x")
     opts = {
-        "step0":    1e-4,
-        "min_step_size": 1e-4,
-        "max_step_size": 1.1e-4,
-        "t0"      : 0.0,
-        "tf"      : 0.5
+      "step0":    1e-4,
+      "min_step_size": 1e-4,
+      "max_step_size": 1.1e-4,
+      "t0"      : 0.0,
+      "tf"      : 0.5
     }
 
     I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, opts)
@@ -1069,10 +1069,10 @@ class Integrationtests(casadiTestCase):
   def test_step_options_idas(self):
     x = SX.sym("x")
     opts = {
-        "step0":    1e-4,
-        "max_step_size": 1.1e-4,
-        "t0"      : 0.0,
-        "tf"      : 0.5
+      "step0":    1e-4,
+      "max_step_size": 1.1e-4,
+      "t0"      : 0.0,
+      "tf"      : 0.5
     }
 
     I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, opts)
