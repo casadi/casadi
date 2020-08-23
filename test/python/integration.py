@@ -1082,6 +1082,35 @@ class Integrationtests(casadiTestCase):
     print(stats["nsteps"])
     self.assertTrue(stats["nsteps"]>=int(0.5/1.1e-4))
 
+  @requires_integrator('idas')
+  def test_constraints_idas(self):
+    x = SX.sym("x")
+    z = SX.sym("z")
+    p = SX.sym("p")
+
+    dae = { 'x':x, 'z':z, 'p':p, 'ode':z+p, 'alg':z*cos(z)-x }
+
+    opts = {"constraints": [1, 1]}
+    I = integrator("I","idas", dae, opts)
+    sol = I(x0=0, p=0.15)
+    # xf:0.259754>=0, zf:0.26948>=0
+
+    opts = {"constraints": [-1, -1]}
+    I = integrator("I","idas", dae, opts)
+
+    try:
+      sol = I(x0=0, p=0.15)
+      # xf:0.259754<=0, zf:0.26948<=0
+    except RuntimeError as e:
+      if re.search("IDA_CONSTR_FAIL", str(e)):
+        constr_applied = True
+      else:
+        raise RuntimeError(e)
+
+    self.assertTrue(constr_applied)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
