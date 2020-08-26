@@ -224,11 +224,10 @@ namespace casadi {
 
     // Compute De Boor vector in each direction
     std::vector<MX> starts(N);
-    std::vector< std::vector<MX> > boors(N);
+    std::vector< MX> boors(N);
     for (casadi_int i=0;i<N;++i) {
-      MX boor;
-      get_boor(xs[i], knots[i], degree[i], lookup_mode[i], starts[i], boor);
-      boors[i] = horzsplit(boor.T());
+      get_boor(xs[i], knots[i], degree[i], lookup_mode[i], starts[i], boors[i]);
+      boors[i] = boors[i].T();
     }
 
     // Compute strides
@@ -247,23 +246,45 @@ namespace casadi {
       core = vec(repmat(core, 1, n)+repmat(strides[i]*DM(range(n)).T(), core.size1(), 1));
     }
 
-    std::vector<MX> res;
-
-    for (casadi_int k=0;k<batch_x;++k) {
-
-      // Flattened subtensor of coefficients
-      MX c = reshape(coeffs(start(k)+core), m, -1);
-
-      // Compute outer product of De Boor vectors
-      MX boor = 1;
-      for (casadi_int i=0;i<N;++i) {
-        boor = vec(mtimes(boor, boors[i][k].T()));
-      }
-
-      res.push_back(mtimes(c, boor));
+    // Elementary Function
+    std::vector< MX> boor_slices(N);
+    for (casadi_int i=0;i<N;++i) {
+      boor_slices[i] = MX::sym("boor_slice", boors[i].size1());
     }
 
-    return horzcat(res);
+    MX s = MX::sym("s");
+
+    MX coeffs_work = coeffs.is_constant() ? coeffs : MX::sym("coeffs_here", coeffs.sparsity());
+
+    // Flattened subtensor of coefficients
+    MX c = reshape(coeffs_work(s+core), m, -1);
+
+    // Compute outer product of De Boor vectors
+    MX boor = 1;
+    for (casadi_int i=0;i<N;++i) {
+      boor = vec(mtimes(boor, boor_slices[i].T()));
+    }
+
+    MX res = mtimes(c, boor);
+
+    std::vector<MX> args_elem = boor_slices;
+    std::vector<bool> reduce_in(boor_slices.size(), false);
+    std::vector<MX> args = boors;
+
+    args_elem.push_back(s);
+    reduce_in.push_back(false);
+    args.push_back(start);
+
+    if (!coeffs.is_constant()) {
+      args_elem.push_back(coeffs_work);
+      reduce_in.push_back(true);
+      args.push_back(coeffs);
+    }
+
+    Function elem = Function("elem", args_elem, {res});
+    Function elems = elem.map(batch_x, reduce_in, {false});
+
+    return elems(args)[0];
   }
 
   MX BSpline::create(const MX& x, const std::vector< std::vector<double> >& knots,
