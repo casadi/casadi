@@ -88601,6 +88601,12 @@ Interface to IDAS from the Sundials suite.
 |                           |                 | user-defined linear solver |
 |                           |                 | module                     |
 +---------------------------+-----------------+----------------------------+
+| constraints               | OT_INTVECTOR    | Constrain the solution     |
+|                           |                 | y=[x,z]. 0 (default): no   |
+|                           |                 | constraint on yi, 1: yi >= |
+|                           |                 | 0.0, -1: yi <= 0.0, 2: yi  |
+|                           |                 | > 0.0, -2: yi < 0.0.       |
++---------------------------+-----------------+----------------------------+
 | disable_internal_warnings | OT_BOOL         | Disable SUNDIALS internal  |
 |                           |                 | warning messages           |
 +---------------------------+-----------------+----------------------------+
