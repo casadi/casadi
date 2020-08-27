@@ -1957,6 +1957,9 @@
 %exception  casadi::Nlpsol::integer_support() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Nlpsol::is_a(const std::string &type, bool recursive) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Nlpsol::kkt() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

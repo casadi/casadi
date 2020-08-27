@@ -3980,8 +3980,8 @@ std::string, M > &res) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -58352,8 +58352,8 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -67673,8 +67673,8 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -72922,10 +72922,19 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::FunctionInternal::matching_arg(const
+std::vector< M > &arg, casadi_int &npar) const  "
 
-[INTERNAL]  Check if the function is of a particular type.
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -74170,19 +74179,10 @@ a main.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::matching_arg(const
-std::vector< M > &arg, casadi_int &npar) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-Raises errors
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -83464,8 +83464,8 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
