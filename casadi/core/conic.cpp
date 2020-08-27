@@ -539,7 +539,7 @@ namespace casadi {
   }
 
   bool Conic::is_a(const std::string& type, bool recursive) const {
-    return type==shortname() || (recursive && FunctionInternal::is_a(type, recursive));
+    return type=="Conic" || (recursive && FunctionInternal::is_a(type, recursive));
   }
 
   void Conic::sdp_to_socp_init(SDPToSOCPMem& mem) const {
