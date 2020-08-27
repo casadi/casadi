@@ -68,7 +68,7 @@ namespace casadi {
         "Use IDACalcIC to get consistent initial conditions."}},
       {"constraints",
        {OT_INTVECTOR,
-        "Constrain the sulution y=[x,z]. 0 (default): no constraint on yi, "
+        "Constrain the solution y=[x,z]. 0 (default): no constraint on yi, "
         "1: yi >= 0.0, -1: yi <= 0.0, 2: yi > 0.0, -2: yi < 0.0."}},
       {"calc_icB",
        {OT_BOOL,
@@ -154,7 +154,7 @@ namespace casadi {
     // Constraints
     casadi_assert(y_c_.size()==nx_+nz_ || y_c_.empty(),
       "Constraint vector if supplied, must be of length nx+nz, but got "
-      + str(y_c_.size()) + " and nx+nz = " + str(nx_+nz_));
+      + str(y_c_.size()) + " and nx+nz = " + str(nx_+nz_) + ".");
 
 
     // Attach functions for jacobian information
