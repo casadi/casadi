@@ -1098,17 +1098,9 @@ class Integrationtests(casadiTestCase):
     opts = {"constraints": [-1, -1]}
     I = integrator("I","idas", dae, opts)
 
-    try:
+    with self.assertInException("IDA_CONSTR_FAIL"):
       sol = I(x0=0, p=0.15)
       # xf:0.259754<=0, zf:0.26948<=0
-    except RuntimeError as e:
-      if re.search("IDA_CONSTR_FAIL", str(e)):
-        constr_applied = True
-      else:
-        raise RuntimeError(e)
-
-    self.assertTrue(constr_applied)
-
 
 
 
