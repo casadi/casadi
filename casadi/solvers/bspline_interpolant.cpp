@@ -197,6 +197,22 @@ namespace casadi {
     return S_->get_jacobian(name, inames, onames, opts);
   }
 
+  Function BSplineInterpolant::
+  get_forward(casadi_int nfwd, const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
+    return S_->get_forward(nfwd, name, inames, onames, opts);
+  }
+
+  Function BSplineInterpolant::
+  get_reverse(casadi_int nadj, const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
+    return S_->get_reverse(nadj, name, inames, onames, opts);
+  }
+
   BSplineInterpolant::BSplineInterpolant(DeserializingStream& s) : Interpolant(s) {
     s.version("BSplineInterpolant", 1);
     s.unpack("BSplineInterpolant::s", S_);
