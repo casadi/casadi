@@ -226,6 +226,9 @@ namespace casadi {
     /** \brief Get type name */
     std::string class_name() const override {return "Nlpsol";}
 
+    /** \brief Check if the function is of a particular type */
+    bool is_a(const std::string& type, bool recursive) const override;
+
     // Get reduced Hessian
     virtual DM getReducedHessian();
 
