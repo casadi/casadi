@@ -5355,7 +5355,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_forward(casadi_int
+%feature("docstring")  casadi::BSplineInterpolant::has_forward(casadi_int
 nfwd) const  "
 
 [INTERNAL]  Return function that calculates forward derivatives
@@ -5608,7 +5608,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_forward(casadi_int
+%feature("docstring")  casadi::BSplineInterpolant::get_forward(casadi_int
 nfwd, const std::string &name, const std::vector< std::string > &inames,
 const std::vector< std::string > &onames, const Dict &opts) const  "
 
@@ -5880,7 +5880,7 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_reverse(casadi_int
+%feature("docstring")  casadi::BSplineInterpolant::get_reverse(casadi_int
 nadj, const std::string &name, const std::vector< std::string > &inames,
 const std::vector< std::string > &onames, const Dict &opts) const  "
 
@@ -6240,7 +6240,7 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_reverse(casadi_int
+%feature("docstring")  casadi::BSplineInterpolant::has_reverse(casadi_int
 nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
