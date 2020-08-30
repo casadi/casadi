@@ -426,9 +426,27 @@ namespace casadi {
     std::vector<DM> operator()(const std::vector<DM>& arg) const;
     std::vector<SX> operator()(const std::vector<SX>& arg) const;
     std::vector<MX> operator()(const std::vector<MX>& arg) const;
+    std::vector<DM> operator()(std::initializer_list<DM> arg) const {
+      return this->operator()(std::vector<DM>(arg));
+    }
+    std::vector<SX> operator()(SXIList arg) const {
+      return this->operator()(std::vector<SX>(arg));
+    }
+    std::vector<MX> operator()(MXIList arg) const {
+      return this->operator()(std::vector<MX>(arg));
+    }
     const DMDict operator()(const DMDict& arg) const;
     const SXDict operator()(const SXDict& arg) const;
     const MXDict operator()(const MXDict& arg) const;
+    const DMDict operator()(std::initializer_list<std::pair<const std::string, DM> > arg) const {
+      return this->operator()(DMDict(arg));
+    }
+    const SXDict operator()(std::initializer_list<std::pair<const std::string, SX> > arg) const {
+      return this->operator()(SXDict(arg));
+    }
+    const MXDict operator()(std::initializer_list<std::pair<const std::string, MX> > arg) const {
+      return this->operator()(MXDict(arg));
+    }
     ///@}
 
     ///@{
