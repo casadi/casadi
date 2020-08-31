@@ -1,11 +1,27 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-# Generate SWIG wrapper (for both MATLAB and Octave)
-set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
-swig_module_initialize(casadiMEX matlab)
-swig_add_source_to_module(casadiMEX FALSE MEX_FILE ../casadi.i)
-get_directory_property(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${MEX_FILE}")
+
+
+if(SWIG_EXPORT)
+  set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target/extra)
+  set(CMAKE_SWIG_WRAP_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target/source/dummy)
+endif()
+
+if(SWIG_IMPORT)
+  set(PYTHON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/source/casadiPYTHON_wrap.cxx)
+  set_source_files_properties(${PYTHON_FILE}  PROPERTIES  CPLUSPLUS ON)
+else()
+  # Generate SWIG wrapper (for both MATLAB and Octave)
+  set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
+  swig_module_initialize(casadiMEX matlab)
+  swig_add_source_to_module(casadiMEX FALSE MEX_FILE ../casadi.i)
+  get_directory_property(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${MEX_FILE}")
+endif()
+
+if(SWIG_EXPORT)
+  add_custom_target(matlab_source DEPENDS ${MEX_FILE})
+endif()
 
 # Install the generated front-end to ${MATLAB_PREFIX}
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/+casadi DESTINATION ${MATLAB_PREFIX})
