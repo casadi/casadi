@@ -119,7 +119,19 @@ namespace casadi {
         "the smallest eigenvalue is at least this (default: 1e-7)."}},
       {"max_iter_eig",
        {OT_DOUBLE,
-        "Maximum number of iterations to compute an eigenvalue decomposition (default: 50)."}}
+        "Maximum number of iterations to compute an eigenvalue decomposition (default: 50)."}},
+      {"clip_inactive_lam",
+       {OT_BOOL,
+        "Explicitly set Lagrange multipliers to 0 when bound is deemed inactive "
+        "(default: false)."}},
+      {"inactive_lam_strategy",
+       {OT_STRING,
+        "Strategy to detect if a bound is inactive. "
+        "RELTOL: use solver-defined constraint tolerance * inactive_lam_value|"
+        "abstol: use inactive_lam_value"}},
+      {"inactive_lam_value",
+       {OT_DOUBLE,
+        "Value used in inactive_lam_strategy (default: 10)."}}
      }
   };
 
@@ -133,6 +145,10 @@ namespace casadi {
     std::string convexify_strategy = "none";
     double convexify_margin = 1e-7;
     casadi_int max_iter_eig = 200;
+
+    clip_inactive_lam_ = false;
+    inactive_lam_strategy_ = "reltol";
+    inactive_lam_value_ = 10;
 
     // Read user options
     for (auto&& op : opts) {
@@ -173,6 +189,12 @@ namespace casadi {
         convexify_margin = op.second;
       } else if (op.first=="max_iter_eig") {
         max_iter_eig = op.second;
+      } else if (op.first=="clip_inactive_lam") {
+        clip_inactive_lam_ = op.second;
+      } else if (op.first=="inactive_lam_strategy") {
+        inactive_lam_strategy_ = op.second.to_string();
+      } else if (op.first=="inactive_lam_value") {
+        inactive_lam_value_ = op.second;
       }
     }
 
@@ -420,6 +442,31 @@ namespace casadi {
 
     // Save results to outputs
     casadi_copy(m->gk, ng_, d_nlp->z + nx_);
+
+    if (clip_inactive_lam_) {
+      // Compute a margin
+      double margin;
+      if (inactive_lam_strategy_=="abstol") {
+        margin = inactive_lam_value_;
+      } else if (inactive_lam_strategy_=="reltol") {
+        double constr_viol_tol;
+        (*app)->Options()->GetNumericValue("constr_viol_tol", constr_viol_tol, "");
+        if (status==Solved_To_Acceptable_Level) {
+          (*app)->Options()->GetNumericValue("acceptable_constr_viol_tol", constr_viol_tol, "");
+        }
+        margin = inactive_lam_value_*constr_viol_tol;
+      } else {
+        casadi_error("inactive_lam_strategy '" + inactive_lam_strategy_ +
+                      "' unknown. Use 'abstol' or reltol'.");
+      }
+      
+
+      for (casadi_int i=0; i<nx_ + ng_; ++i) {
+        // Sufficiently inactive -> make multiplier exactly zero
+        if (d_nlp->lam[i]>0 && d_nlp->ubz[i] - d_nlp->z[i] > margin) d_nlp->lam[i]=0;
+        if (d_nlp->lam[i]<0 && d_nlp->z[i] - d_nlp->lbz[i] > margin) d_nlp->lam[i]=0;
+      }
+    }
 
     return 0;
   }
@@ -679,7 +726,7 @@ namespace casadi {
   }
 
   IpoptInterface::IpoptInterface(DeserializingStream& s) : Nlpsol(s) {
-    int version = s.version("IpoptInterface", 1, 2);
+    int version = s.version("IpoptInterface", 1, 3);
     s.unpack("IpoptInterface::jacg_sp", jacg_sp_);
     s.unpack("IpoptInterface::hesslag_sp", hesslag_sp_);
     s.unpack("IpoptInterface::exact_hessian", exact_hessian_);
@@ -696,11 +743,21 @@ namespace casadi {
       s.unpack("IpoptInterface::convexify", convexify_);
       if (convexify_) Convexify::deserialize(s, "IpoptInterface::", convexify_data_);
     }
+
+    if (version>=3) {
+      s.unpack("IpoptInterface::clip_inactive_lam", clip_inactive_lam_);
+      s.unpack("IpoptInterface::inactive_lam_strategy", inactive_lam_strategy_);
+      s.unpack("IpoptInterface::inactive_lam_value", inactive_lam_value_);
+    } else {
+      clip_inactive_lam_ = false;
+      inactive_lam_strategy_ = "reltol";
+      inactive_lam_value_ = 10;
+    }
   }
 
   void IpoptInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
-    s.version("IpoptInterface", 2);
+    s.version("IpoptInterface", 3);
     s.pack("IpoptInterface::jacg_sp", jacg_sp_);
     s.pack("IpoptInterface::hesslag_sp", hesslag_sp_);
     s.pack("IpoptInterface::exact_hessian", exact_hessian_);
@@ -715,6 +772,11 @@ namespace casadi {
     s.pack("IpoptInterface::con_numeric_md", con_numeric_md_);
     s.pack("IpoptInterface::convexify", convexify_);
     if (convexify_) Convexify::serialize(s, "IpoptInterface::", convexify_data_);
+
+    s.pack("IpoptInterface::clip_inactive_lam", clip_inactive_lam_);
+    s.pack("IpoptInterface::inactive_lam_strategy", inactive_lam_strategy_);
+    s.pack("IpoptInterface::inactive_lam_value", inactive_lam_value_);
+
   }
 
 } // namespace casadi

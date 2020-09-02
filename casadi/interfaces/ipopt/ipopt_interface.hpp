@@ -191,6 +191,10 @@ namespace casadi {
     Dict var_string_md_, var_integer_md_, var_numeric_md_,
       con_string_md_, con_integer_md_, con_numeric_md_;
 
+    bool clip_inactive_lam_;
+    std::string inactive_lam_strategy_;
+    double inactive_lam_value_;
+
     /// Data for convexification
     ConvexifyData convexify_data_;
 
