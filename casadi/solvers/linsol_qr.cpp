@@ -70,8 +70,8 @@ namespace casadi {
     LinsolInternal::init(opts);
 
     // Read options
-    eps_ = 1e-12;
     n_cache_ = 0;
+    eps_ = 0;//1e-12;
     for (auto&& op : opts) {
       if (op.first=="eps") {
         eps_ = op.second;
