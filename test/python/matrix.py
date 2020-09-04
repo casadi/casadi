@@ -1110,7 +1110,7 @@ class Matrixtests(casadiTestCase):
 
     F = mtimes(mtimes(sqrt(diag(D)),DM.eye(10)+Lt),P.T)
     print(H-mtimes(F.T,F))
-    self.assertTrue(norm_fro(H-mtimes(F.T,F))<=1e-14)
+    self.assertTrue(norm_fro(H-mtimes(F.T,F))<=1e-14,msg=str(H-mtimes(F.T,F))+":"+str(norm_fro(H-mtimes(F.T,F))))
 
 
   def test_im_bugs(self):
