@@ -21,6 +21,8 @@
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>solver</td><td>OT_STRING</td><td>AMPL solver binary</td><td>casadi::AmplInterface</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
@@ -58,6 +60,8 @@
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>solver</td><td>OT_STRING</td><td>AMPL solver binary</td><td>casadi::AmplInterface</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
@@ -243,6 +247,8 @@
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
@@ -390,6 +396,8 @@
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
@@ -435,6 +443,8 @@
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_constraints</td><td>OT_BOOL</td><td>Pass list of constraints entering nonlinearly to BONMIN</td><td>casadi::BonMinMessageHandler</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to BONMIN</td><td>casadi::BonMinMessageHandler</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sos1_groups</td><td>OT_INTVECTORVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonMinMessageHandler</td></tr>
 <tr><td>sos1_priorities</td><td>OT_INTVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonMinMessageHandler</td></tr>
 <tr><td>sos1_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonMinMessageHandler</td></tr>
@@ -481,6 +491,8 @@
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_constraints</td><td>OT_BOOL</td><td>Pass list of constraints entering nonlinearly to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to BONMIN</td><td>casadi::BonminInterface</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sos1_groups</td><td>OT_INTVECTORVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonminInterface</td></tr>
 <tr><td>sos1_priorities</td><td>OT_INTVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonminInterface</td></tr>
 <tr><td>sos1_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonminInterface</td></tr>
@@ -552,6 +564,8 @@
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_constraints</td><td>OT_BOOL</td><td>Pass list of constraints entering nonlinearly to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to BONMIN</td><td>casadi::BonminInterface</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sos1_groups</td><td>OT_INTVECTORVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonminInterface</td></tr>
 <tr><td>sos1_priorities</td><td>OT_INTVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonminInterface</td></tr>
 <tr><td>sos1_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::BonminInterface</td></tr>
@@ -2162,6 +2176,8 @@
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
@@ -2231,6 +2247,8 @@
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
@@ -2460,6 +2478,8 @@
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
@@ -2503,6 +2523,8 @@
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
@@ -3172,6 +3194,8 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -3204,6 +3228,8 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -3673,6 +3699,8 @@
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method [qrqp]</td><td>casadi::Qrsqp</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Qrsqp</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Qrsqp</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Qrsqp</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Qrsqp</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -3740,6 +3768,8 @@
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method [qrqp]</td><td>casadi::Qrsqp</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Qrsqp</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Qrsqp</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Qrsqp</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Qrsqp</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -3882,6 +3912,8 @@
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Scpgen</td></tr>
 <tr><td>reg_threshold</td><td>OT_DOUBLE</td><td>Threshold for the regularization.</td><td>casadi::Scpgen</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Scpgen</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_pr_step</td><td>OT_DOUBLE</td><td>Stopping criterion for the step size</td><td>casadi::Scpgen</td></tr>
@@ -3957,6 +3989,8 @@
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Scpgen</td></tr>
 <tr><td>reg_threshold</td><td>OT_DOUBLE</td><td>Threshold for the regularization.</td><td>casadi::Scpgen</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Scpgen</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_pr_step</td><td>OT_DOUBLE</td><td>Stopping criterion for the step size</td><td>casadi::Scpgen</td></tr>
@@ -4161,6 +4195,8 @@
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>snopt</td><td>OT_DICT</td><td>Options to be passed to SNOPT</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>start</td><td>OT_STRING</td><td>Warm-start options for Worhp: cold|warm|hot</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -4200,6 +4236,8 @@
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>snopt</td><td>OT_DICT</td><td>Options to be passed to SNOPT</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>start</td><td>OT_STRING</td><td>Warm-start options for Worhp: cold|warm|hot</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -4248,6 +4286,8 @@
 <tr><td>print_status</td><td>OT_BOOL</td><td>Print a status message after solving</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method [qpoases]</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -4325,6 +4365,8 @@
 <tr><td>print_status</td><td>OT_BOOL</td><td>Print a status message after solving</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method [qpoases]</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -4584,6 +4626,8 @@
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>worhp</td><td>OT_DICT</td><td>Options to be passed to WORHP</td><td>casadi::WorhpInterface</td></tr>
@@ -4621,6 +4665,8 @@
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
+<tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>worhp</td><td>OT_DICT</td><td>Options to be passed to WORHP</td><td>casadi::WorhpInterface</td></tr>
