@@ -205,6 +205,7 @@ namespace casadi {
     calc_lam_p_ = true;
     no_nlp_grad_ = false;
     error_on_fail_ = false;
+    sens_linsol_ = "qr";
   }
 
   Nlpsol::~Nlpsol() {
@@ -308,7 +309,13 @@ namespace casadi {
         "Options to be passed to the oracle function"}},
       {"error_on_fail",
        {OT_BOOL,
-        "When the numerical process returns unsuccessfully, raise an error (default false)."}}
+        "When the numerical process returns unsuccessfully, raise an error (default false)."}},
+      {"sens_linsol",
+       {OT_STRING,
+        "Linear solver used for parametric sensitivities (default 'qr')."}},
+      {"sens_linsol_options",
+       {OT_DICT,
+        "Linear solver options used for parametric sensitivities."}}
      }
   };
 
@@ -348,6 +355,10 @@ namespace casadi {
         min_lam_ = op.second;
       } else if (op.first=="error_on_fail") {
         error_on_fail_ = op.second;
+      } else if (op.first=="sens_linsol") {
+        sens_linsol_ = op.second.to_string();
+      } else if (op.first=="sens_linsol_options") {
+        sens_linsol_options_ = op.second;
       }
     }
 
@@ -771,7 +782,7 @@ namespace casadi {
     MX v = MX::vertcat({fwd_alpha_x, fwd_alpha_g});
 
     // Solve
-    v = MX::solve(H, v, "qr");
+    v = MX::solve(H, v, sens_linsol_, sens_linsol_options_);
 
     // Extract sensitivities in x, lam_x and lam_g
     vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
@@ -888,7 +899,7 @@ namespace casadi {
 
     // Solve to get beta_x_bar, beta_g_bar
     MX v = MX::vertcat({adj_x + adj_x0, adj_lam_g + adj_lam_g0});
-    v = MX::solve(H.T(), v, "qr");
+    v = MX::solve(H.T(), v, sens_linsol_, sens_linsol_options_);
     vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
     MX beta_x_bar = v_split.at(0);
     MX beta_g_bar = v_split.at(1);
@@ -983,7 +994,7 @@ namespace casadi {
   void Nlpsol::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
-    s.version("Nlpsol", 1);
+    s.version("Nlpsol", 2);
     s.pack("Nlpsol::nx", nx_);
     s.pack("Nlpsol::ng", ng_);
     s.pack("Nlpsol::np", np_);
@@ -1003,6 +1014,8 @@ namespace casadi {
     s.pack("Nlpsol::no_nlp_grad", no_nlp_grad_);
     s.pack("Nlpsol::discrete", discrete_);
     s.pack("Nlpsol::mi", mi_);
+    s.pack("Nlpsol::sens_linsol", sens_linsol_);
+    s.pack("Nlpsol::sens_linsol_options", sens_linsol_options_);
   }
 
   void Nlpsol::serialize_type(SerializingStream &s) const {
@@ -1015,7 +1028,7 @@ namespace casadi {
   }
 
   Nlpsol::Nlpsol(DeserializingStream & s) : OracleFunction(s) {
-    s.version("Nlpsol", 1);
+    int version = s.version("Nlpsol", 1, 2);
     s.unpack("Nlpsol::nx", nx_);
     s.unpack("Nlpsol::ng", ng_);
     s.unpack("Nlpsol::np", np_);
@@ -1035,6 +1048,12 @@ namespace casadi {
     s.unpack("Nlpsol::no_nlp_grad", no_nlp_grad_);
     s.unpack("Nlpsol::discrete", discrete_);
     s.unpack("Nlpsol::mi", mi_);
+    if (version>=2) {
+      s.unpack("Nlpsol::sens_linsol", sens_linsol_);
+      s.unpack("Nlpsol::sens_linsol_options", sens_linsol_options_);
+    } else {
+      sens_linsol_ = "qr";
+    }
     set_nlpsol_prob();
   }
 

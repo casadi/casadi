@@ -77,6 +77,10 @@ namespace casadi {
     /// Throw an exception on failure?
     bool error_on_fail_;
 
+    /// Linear solver and options
+    std::string sens_linsol_;
+    Dict sens_linsol_options_;
+
     ///@{
     /** \brief Options */
     bool eval_errors_fatal_;
