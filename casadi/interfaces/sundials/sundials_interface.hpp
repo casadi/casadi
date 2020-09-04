@@ -154,6 +154,7 @@ namespace casadi {
     bool use_precon_;
     bool second_order_correction_;
     double step0_;
+    double max_step_size_;
     double nonlin_conv_coeff_;
     casadi_int max_order_;
     ///@}

@@ -95,6 +95,33 @@ namespace casadi {
                                       const Dict& opts) const override;
     ///@}
 
+
+    ///@{
+    /** \brief Return function that calculates forward derivatives
+     *    forward(nfwd) returns a cached instance if available,
+     *    and calls <tt>Function get_forward(casadi_int nfwd)</tt>
+     *    if no cached version is available.
+     */
+    bool has_forward(casadi_int nfwd) const override { return true; }
+    Function get_forward(casadi_int nfwd, const std::string& name,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
+                                 const Dict& opts) const override;
+    ///@}
+
+    ///@{
+    /** \brief Return function that calculates adjoint derivatives
+     *    reverse(nadj) returns a cached instance if available,
+     *    and calls <tt>Function get_reverse(casadi_int nadj)</tt>
+     *    if no cached version is available.
+     */
+    bool has_reverse(casadi_int nadj) const override { return true; }
+    Function get_reverse(casadi_int nadj, const std::string& name,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
+                                 const Dict& opts) const override;
+    ///@}
+
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 

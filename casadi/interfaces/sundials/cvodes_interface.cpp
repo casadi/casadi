@@ -65,6 +65,9 @@ namespace casadi {
       {"nonlinear_solver_iteration",
        {OT_STRING,
         "Nonlinear solver type: NEWTON|functional"}},
+      {"min_step_size",
+       {OT_DOUBLE,
+        "Min step size [default: 0/0.0]"}},
       {"fsens_all_at_once",
        {OT_BOOL,
         "Calculate all right hand sides of the sensitivity equations at once"}}
@@ -80,11 +83,14 @@ namespace casadi {
     // Default options
     string linear_multistep_method = "bdf";
     string nonlinear_solver_iteration = "newton";
+    min_step_size_ = 0;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="linear_multistep_method") {
         linear_multistep_method = op.second.to_string();
+      } else if (op.first=="min_step_size") {
+        min_step_size_ = op.second;
       } else if (op.first=="nonlinear_solver_iteration") {
         nonlinear_solver_iteration = op.second.to_string();
       }
@@ -152,6 +158,12 @@ namespace casadi {
 
     // Initial step size
     if (step0_!=0) THROWING(CVodeSetInitStep, m->mem, step0_);
+
+    // Min step size
+    if (min_step_size_!=0) THROWING(CVodeSetMinStep, m->mem, min_step_size_);
+
+    // Max step size
+    if (max_step_size_!=0) THROWING(CVodeSetMaxStep, m->mem, max_step_size_);
 
     // Maximum order of method
     if (max_order_) THROWING(CVodeSetMaxOrd, m->mem, max_order_);
@@ -855,16 +867,25 @@ namespace casadi {
   }
 
   CvodesInterface::CvodesInterface(DeserializingStream& s) : SundialsInterface(s) {
-    s.version("CvodesInterface", 1);
+    int version = s.version("CvodesInterface", 1, 2);
     s.unpack("CvodesInterface::lmm", lmm_);
     s.unpack("CvodesInterface::iter", iter_);
+
+    if (version>=2) {
+      s.unpack("CvodesInterface::min_step_size", min_step_size_);
+    } else {
+      min_step_size_ = 0;
+    }
   }
 
   void CvodesInterface::serialize_body(SerializingStream &s) const {
     SundialsInterface::serialize_body(s);
-    s.version("CvodesInterface", 1);
+    s.version("CvodesInterface", 2);
+
     s.pack("CvodesInterface::lmm", lmm_);
     s.pack("CvodesInterface::iter", iter_);
+    s.pack("CvodesInterface::min_step_size", min_step_size_);
+
   }
 
 } // namespace casadi

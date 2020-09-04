@@ -958,5 +958,34 @@ class OptiStacktests(inherit_from):
       with self.assertInException("Infeasible"):
         sol = opti.solve_limited()
 
+    @requires_conic("superscs")
+    def test_conic(self):
+      options = {"eps":1e-9,"do_super_scs":1, "verbose":0}
+
+      opti = Opti('conic')
+      x = opti.variable()
+      y = opti.variable()
+
+      #  min  2 x + y
+      #
+      #    ||  x-5 , y-7 ||_2 <= 4
+      #
+      #
+
+      h = soc(vertcat(x-5,y-7),4)
+
+      # Note: >= destroys sparsity
+      opti.subject_to(h>0)
+  
+      opti.minimize(2*x+y)
+
+      opti.solver("superscs",{},options)
+      sol = opti.solve()
+
+      res = sol.value(vertcat(x,y))
+
+      self.checkarray(res,DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
+      self.checkarray(sol.value(opti.f),10-16/sqrt(5)+7-4/sqrt(5),conic,digits=7)
+
 if __name__ == '__main__':
     unittest.main()

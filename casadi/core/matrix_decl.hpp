@@ -37,6 +37,7 @@
 #include <random>
 #include <typeinfo>
 #include <vector>
+#include <initializer_list>
 
 namespace casadi {
 
@@ -153,6 +154,9 @@ namespace casadi {
 #ifndef SWIG
     /// Construct from a vector
     Matrix(const std::vector<Scalar>& x);
+
+    /// Construct from initializer list
+    Matrix(std::initializer_list<Scalar> x) : Matrix<Scalar>(std::vector<Scalar>(x)) {}
 
     /// Convert to scalar type
     const Scalar scalar() const;

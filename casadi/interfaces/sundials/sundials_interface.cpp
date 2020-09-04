@@ -96,6 +96,9 @@ namespace casadi {
       {"step0",
        {OT_DOUBLE,
         "initial step size [default: 0/estimated]"}},
+      {"max_step_size",
+       {OT_DOUBLE,
+        "Max step size [default: 0/inf]"}},
       {"max_order",
        {OT_DOUBLE,
         "Maximum order"}},
@@ -129,6 +132,7 @@ namespace casadi {
     max_multistep_order_ = 5;
     second_order_correction_ = true;
     step0_ = 0;
+    max_step_size_ = 0;
     max_order_ = 0;
     nonlin_conv_coeff_ = 0;
 
@@ -166,6 +170,8 @@ namespace casadi {
         second_order_correction_ = op.second;
       } else if (op.first=="step0") {
         step0_ = op.second;
+      } else if (op.first=="max_step_size") {
+        max_step_size_ = op.second;
       } else if (op.first=="max_order") {
         max_order_ = op.second;
       } else if (op.first=="nonlin_conv_coeff") {
@@ -391,7 +397,7 @@ namespace casadi {
   }
 
   SundialsInterface::SundialsInterface(DeserializingStream& s) : Integrator(s) {
-    s.version("SundialsInterface", 1);
+    int version = s.version("SundialsInterface", 1, 2);
     s.unpack("SundialsInterface::abstol", abstol_);
     s.unpack("SundialsInterface::reltol", reltol_);
     s.unpack("SundialsInterface::max_num_steps", max_num_steps_);
@@ -401,12 +407,19 @@ namespace casadi {
     s.unpack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
     s.unpack("SundialsInterface::max_multistep_order", max_multistep_order_);
     s.unpack("SundialsInterface::linear_solver", linear_solver_);
-
     s.unpack("SundialsInterface::linear_solver_options", linear_solver_options_);
+
     s.unpack("SundialsInterface::max_krylov", max_krylov_);
     s.unpack("SundialsInterface::use_precon", use_precon_);
     s.unpack("SundialsInterface::second_order_correction", second_order_correction_);
+
     s.unpack("SundialsInterface::step0", step0_);
+    if (version>=2) {
+      s.unpack("SundialsInterface::max_step_size", max_step_size_);
+    } else {
+      max_step_size_ = 0;
+    }
+
     s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
     s.unpack("SundialsInterface::max_order", max_order_);
 
@@ -420,11 +433,12 @@ namespace casadi {
     int interp;
     s.unpack("SundialsInterface::interp", interp);
     interp_ = static_cast<InterpType>(interp);
+
   }
 
   void SundialsInterface::serialize_body(SerializingStream &s) const {
     Integrator::serialize_body(s);
-    s.version("SundialsInterface", 1);
+    s.version("SundialsInterface", 2);
     s.pack("SundialsInterface::abstol", abstol_);
     s.pack("SundialsInterface::reltol", reltol_);
     s.pack("SundialsInterface::max_num_steps", max_num_steps_);
@@ -433,13 +447,16 @@ namespace casadi {
     s.pack("SundialsInterface::steps_per_checkpoint", steps_per_checkpoint_);
     s.pack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
     s.pack("SundialsInterface::max_multistep_order", max_multistep_order_);
-    s.pack("SundialsInterface::linear_solver", linear_solver_);
 
+    s.pack("SundialsInterface::linear_solver", linear_solver_);
     s.pack("SundialsInterface::linear_solver_options", linear_solver_options_);
     s.pack("SundialsInterface::max_krylov", max_krylov_);
     s.pack("SundialsInterface::use_precon", use_precon_);
     s.pack("SundialsInterface::second_order_correction", second_order_correction_);
+
     s.pack("SundialsInterface::step0", step0_);
+    s.pack("SundialsInterface::max_step_size", max_step_size_);
+
     s.pack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
     s.pack("SundialsInterface::max_order", max_order_);
 

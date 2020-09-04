@@ -66,6 +66,10 @@ namespace casadi {
       {"calc_ic",
        {OT_BOOL,
         "Use IDACalcIC to get consistent initial conditions."}},
+      {"constraints",
+       {OT_INTVECTOR,
+        "Constrain the solution y=[x,z]. 0 (default): no constraint on yi, "
+        "1: yi >= 0.0, -1: yi <= 0.0, 2: yi > 0.0, -2: yi < 0.0."}},
       {"calc_icB",
        {OT_BOOL,
         "Use IDACalcIC to get consistent initial conditions for "
@@ -98,7 +102,6 @@ namespace casadi {
     cj_scaling_ = true;
     calc_ic_ = true;
     suppress_algebraic_ = false;
-    max_step_size_ = 0;
 
     // Read options
     for (auto&& op : opts) {
@@ -110,8 +113,8 @@ namespace casadi {
         calc_ic_ = op.second;
       } else if (op.first=="suppress_algebraic") {
         suppress_algebraic_ = op.second;
-      } else if (op.first=="max_step_size") {
-        max_step_size_ = op.second;
+      } else if (op.first=="constraints") {
+        y_c_ = op.second;
       } else if (op.first=="abstolv") {
         abstolv_ = op.second;
       }
@@ -147,6 +150,12 @@ namespace casadi {
         "In that case, make use of the 'augmented_options' options "
         "to correct 'init_xdot' for the augmented integrator.");
     }
+
+    // Constraints
+    casadi_assert(y_c_.size()==nx_+nz_ || y_c_.empty(),
+      "Constraint vector if supplied, must be of length nx+nz, but got "
+      + str(y_c_.size()) + " and nx+nz = " + str(nx_+nz_) + ".");
+
 
     // Attach functions for jacobian information
     if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
@@ -286,11 +295,24 @@ namespace casadi {
     // Maxinum order for the multistep method
     THROWING(IDASetMaxOrd, m->mem, max_multistep_order_);
 
-    // Set maximum step size
-    THROWING(IDASetMaxStep, m->mem, max_step_size_);
-
     // Initial step size
     if (step0_!=0) THROWING(IDASetInitStep, m->mem, step0_);
+
+    // Set maximum step size
+    if (max_step_size_!=0) THROWING(IDASetMaxStep, m->mem, max_step_size_);
+
+    // Set constraints
+    if (!y_c_.empty()) {
+      N_Vector domain  = N_VNew_Serial(nx_+nz_);
+      copy(y_c_.begin(), y_c_.end(), NV_DATA_S(domain));
+
+      // Pass to IDA
+      int flag = IDASetConstraints(m->mem, domain);
+      casadi_assert_dev(flag==IDA_SUCCESS);
+
+      // Free the temporary vector
+      N_VDestroy_Serial(domain);
+    }
 
     // Maximum order of method
     if (max_order_) THROWING(IDASetMaxOrd, m->mem, max_order_);
@@ -1050,28 +1072,33 @@ namespace casadi {
   }
 
   IdasInterface::IdasInterface(DeserializingStream& s) : SundialsInterface(s) {
-    s.version("IdasInterface", 1);
+    int version = s.version("IdasInterface", 1, 2);
     s.unpack("IdasInterface::cj_scaling", cj_scaling_);
     s.unpack("IdasInterface::calc_ic", calc_ic_);
     s.unpack("IdasInterface::calc_icB", calc_icB_);
     s.unpack("IdasInterface::suppress_algebraic", suppress_algebraic_);
-    s.unpack("IdasInterface::max_step_size", max_step_size_);
     s.unpack("IdasInterface::abstolv", abstolv_);
     s.unpack("IdasInterface::first_time", first_time_);
     s.unpack("IdasInterface::init_xdot", init_xdot_);
+
+    if (version<2) {
+      s.unpack("IdasInterface::max_step_size", max_step_size_);
+      s.unpack("IdasInterface::y_c", y_c_);
+    }
   }
 
   void IdasInterface::serialize_body(SerializingStream &s) const {
     SundialsInterface::serialize_body(s);
-    s.version("IdasInterface", 1);
+    s.version("IdasInterface", 2);
     s.pack("IdasInterface::cj_scaling", cj_scaling_);
     s.pack("IdasInterface::calc_ic", calc_ic_);
     s.pack("IdasInterface::calc_icB", calc_icB_);
     s.pack("IdasInterface::suppress_algebraic", suppress_algebraic_);
-    s.pack("IdasInterface::max_step_size", max_step_size_);
     s.pack("IdasInterface::abstolv", abstolv_);
     s.pack("IdasInterface::first_time", first_time_);
     s.pack("IdasInterface::init_xdot", init_xdot_);
+    s.pack("IdasInterface::max_step_size", max_step_size_);
+    s.pack("IdasInterface::y_c", y_c_);
   }
 
 } // namespace casadi

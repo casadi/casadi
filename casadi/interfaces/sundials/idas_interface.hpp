@@ -200,9 +200,11 @@ namespace casadi {
     bool calc_ic_;
     bool calc_icB_;
     bool suppress_algebraic_;
-    double max_step_size_;
     std::vector<double> abstolv_;
     double first_time_;
+
+    // Constraints on decision variables
+    std::vector<casadi_int> y_c_;
 
     //  Initial values for \p xdot
     std::vector<double> init_xdot_;

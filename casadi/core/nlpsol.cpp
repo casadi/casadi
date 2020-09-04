@@ -212,6 +212,10 @@ namespace casadi {
     clear_mem();
   }
 
+  bool Nlpsol::is_a(const std::string& type, bool recursive) const {
+    return type=="Nlpsol" || (recursive && OracleFunction::is_a(type, recursive));
+  }
+
   Sparsity Nlpsol::get_sparsity_in(casadi_int i) {
     switch (static_cast<NlpsolInput>(i)) {
     case NLPSOL_X0:

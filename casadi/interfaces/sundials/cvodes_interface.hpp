@@ -104,7 +104,9 @@ namespace casadi {
     /** \brief Options */
     static const Options options_;
     const Options& get_options() const override { return options_;}
+    double min_step_size_;
     ///@}
+
 
     /** \brief  Initialize stage */
     void init(const Dict& opts) override;

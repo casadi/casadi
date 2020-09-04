@@ -57732,9 +57732,18 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::Scpgen::is_a "
+%feature("docstring") casadi::Scpgen::matching_arg "
 
-[INTERNAL]  Check if the function is of a particular type.
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -58740,18 +58749,9 @@ a main.
 
 ";
 
-%feature("docstring") casadi::Scpgen::matching_arg "
+%feature("docstring") casadi::Scpgen::is_a "
 
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-Raises errors
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 

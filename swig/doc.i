@@ -3980,8 +3980,8 @@ std::string, M > &res) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -5355,7 +5355,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_forward(casadi_int
+%feature("docstring")  casadi::BSplineInterpolant::has_forward(casadi_int
 nfwd) const  "
 
 [INTERNAL]  Return function that calculates forward derivatives
@@ -5608,7 +5608,7 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_forward(casadi_int
+%feature("docstring")  casadi::BSplineInterpolant::get_forward(casadi_int
 nfwd, const std::string &name, const std::vector< std::string > &inames,
 const std::vector< std::string > &onames, const Dict &opts) const  "
 
@@ -5880,7 +5880,7 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_reverse(casadi_int
+%feature("docstring")  casadi::BSplineInterpolant::get_reverse(casadi_int
 nadj, const std::string &name, const std::vector< std::string > &inames,
 const std::vector< std::string > &onames, const Dict &opts) const  "
 
@@ -6240,7 +6240,7 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_reverse(casadi_int
+%feature("docstring")  casadi::BSplineInterpolant::has_reverse(casadi_int
 nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -58352,8 +58352,8 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -67673,8 +67673,8 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -72922,10 +72922,19 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::FunctionInternal::matching_arg(const
+std::vector< M > &arg, casadi_int &npar) const  "
 
-[INTERNAL]  Check if the function is of a particular type.
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
@@ -74170,19 +74179,10 @@ a main.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::matching_arg(const
-std::vector< M > &arg, casadi_int &npar) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-Raises errors
-
-Parameters:
------------
-
-npar[in]:  normal usage: 1, disallow pararallel calls: -1
-
-npar:  max number of horizontal repetitions across all arguments (or -1)
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -83464,8 +83464,8 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Nlpsol::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -88523,6 +88523,10 @@ times t_i.
 +----------------------------+-----------+---------------------------------+
 | max_order                  | OT_DOUBLE | Maximum order                   |
 +----------------------------+-----------+---------------------------------+
+| max_step_size              | OT_DOUBLE | Max step size [default: 0/inf]  |
++----------------------------+-----------+---------------------------------+
+| min_step_size              | OT_DOUBLE | Min step size [default: 0/0.0]  |
++----------------------------+-----------+---------------------------------+
 | newton_scheme              | OT_STRING | Linear solver scheme in the     |
 |                            |           | Newton method:                  |
 |                            |           | DIRECT|gmres|bcgstab|tfqmr      |
@@ -88596,6 +88600,12 @@ Interface to IDAS from the Sundials suite.
 | cj_scaling                | OT_BOOL         | IDAS scaling on cj for the |
 |                           |                 | user-defined linear solver |
 |                           |                 | module                     |
++---------------------------+-----------------+----------------------------+
+| constraints               | OT_INTVECTOR    | Constrain the solution     |
+|                           |                 | y=[x,z]. 0 (default): no   |
+|                           |                 | constraint on yi, 1: yi >= |
+|                           |                 | 0.0, -1: yi <= 0.0, 2: yi  |
+|                           |                 | > 0.0, -2: yi < 0.0.       |
 +---------------------------+-----------------+----------------------------+
 | disable_internal_warnings | OT_BOOL         | Disable SUNDIALS internal  |
 |                           |                 | warning messages           |
