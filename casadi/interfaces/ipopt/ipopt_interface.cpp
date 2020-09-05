@@ -459,7 +459,6 @@ namespace casadi {
         casadi_error("inactive_lam_strategy '" + inactive_lam_strategy_ +
                       "' unknown. Use 'abstol' or reltol'.");
       }
-      
 
       for (casadi_int i=0; i<nx_ + ng_; ++i) {
         // Sufficiently inactive -> make multiplier exactly zero
