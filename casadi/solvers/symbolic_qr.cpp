@@ -217,6 +217,7 @@ namespace casadi {
       SX rr = solv(v).at(0);
       copy(rr->begin(), rr->end(), r);
       r += rr.nnz();
+      a += v[2].nnz();
     }
   }
 

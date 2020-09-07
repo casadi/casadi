@@ -523,6 +523,20 @@ class LinearSolverTests(casadiTestCase):
       res = f_par(numpy.linspace(10, 0, 200), numpy.linspace(0, 10, 200))
 
 
+  def test_issue2664(self):
+
+    bnum = DM.rand(3,3)
+
+    x = MX.sym('x',3,3)
+    for b in [MX.sym('b',3,3),MX.sym('b',Sparsity.lower(3)),MX.sym('b',Sparsity.upper(3))]:
+      f = Function('f',[x,b],[solve(x,b,'symbolicqr')])
+
+      for bn in [bnum,bnum[Sparsity.lower(3)],bnum[Sparsity.upper(3)]]:
+
+        A = evalf(f(diagcat(1,2,3),SX(bn)))
+        B = f(diagcat(1,2,3),bn)
+        self.checkarray(A,B)
+
 
 
 if __name__ == '__main__':
