@@ -710,6 +710,8 @@ namespace casadi {
       const vector<double>& coeffs, const vector<casadi_int>& degree,
         casadi_int m, const Dict& opts) {
     try {
+      casadi_assert(degree.size()==knots.size(), "Degree list length (" + str(degree.size()) + ") "
+                  "must match knot list length (" + str(knots.size()) + ").");
       MX x = MX::sym("x", degree.size());
       std::vector<std::string> lookup_mode;
       Dict opts_remainder = extract_from_dict(opts, "lookup_mode", lookup_mode);

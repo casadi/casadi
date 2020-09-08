@@ -272,6 +272,11 @@ namespace casadi {
           casadi_int m,
           const Dict& opts) {
 
+    casadi_assert(x.is_vector(), "x argument must be a vector, got " + x.dim() + " instead.");
+    casadi_assert(x.numel()==knots.size(), "x argument length (" + str(x.numel()) + ") must match "
+                                           "number knot list length (" + str(knots.size()) + ").");
+    casadi_assert(degree.size()==knots.size(), "Degree list length (" + str(degree.size()) + ") "
+                  "must match knot list length (" + str(knots.size()) + ").");
 
     bool do_inline_flag = false;
     std::vector<std::string> lookup_mode;
@@ -305,6 +310,11 @@ namespace casadi {
           casadi_int m,
           const Dict& opts) {
 
+    casadi_assert(x.is_vector(), "x argument must be a vector, got " + x.dim() + " instead.");
+    casadi_assert(x.numel()==knots.size(), "x argument length (" + str(x.numel()) + ") must match "
+                                           "knot list length (" + str(knots.size()) + ").");
+    casadi_assert(degree.size()==knots.size(), "Degree list length (" + str(degree.size()) + ") "
+                  "must match knot list length (" + str(knots.size()) + ").");
     bool do_inline_flag = false;
     std::vector<std::string> lookup_mode;
 
