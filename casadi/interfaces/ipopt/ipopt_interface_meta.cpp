@@ -57,10 +57,8 @@ const std::string meta_doc_0 =
 const std::string meta_doc_1 =
 "Too long list to be displayed."
 ;
-;
 const std::string meta_doc_2 =
 "Too long list to be displayed."
-;
 "\n"
 ">List of available monitors\n"
 "\n"
