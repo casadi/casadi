@@ -917,6 +917,14 @@ void OptiNode::subject_to() {
   count_dual_ = 0;
 }
 
+void OptiNode::set_lb(const DM& value) {
+  lbx_ = value;
+}
+
+void OptiNode::set_ub(const DM& value) {
+  ubx_ = value;
+}
+
 std::vector<MX> OptiNode::symvar(const MX& expr, VariableType type) const {
   std::vector<MX> ret;
   for (const auto& d : symvar(expr)) {
@@ -1036,6 +1044,8 @@ void OptiNode::solve_prepare() {
   DMDict res = bounds_(arg);
   arg_["lbg"] = res["lbg"];
   arg_["ubg"] = res["ubg"];
+  arg_["lbx"] = lbx_;
+  arg_["ubx"] = ubx_;
 
 }
 

@@ -109,6 +109,22 @@ void Opti::subject_to() {
   }
 }
 
+void Opti::set_lb(const DM& value) {
+  try {
+    (*this)->set_lb(value);
+  } catch (exception& e) {
+    THROW_ERROR("set_lb", e.what());
+  }
+}
+
+void Opti::set_ub(const DM& value) {
+  try {
+    (*this)->set_ub(value);
+  } catch (exception& e) {
+    THROW_ERROR("set_ub", e.what());
+  }
+}
+
 
 void Opti::solver(const std::string& solver,
                        const Dict& plugin_options,

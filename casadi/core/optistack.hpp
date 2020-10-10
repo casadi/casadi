@@ -160,6 +160,9 @@ public:
   /// Clear constraints
   void subject_to();
 
+  void set_lb(const DM& value);
+  void set_ub(const DM& value);
+
   /** \brief Set a solver
   *
   * \param[in] solver any of the nlpsol plugins can be used here

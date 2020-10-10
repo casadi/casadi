@@ -76,6 +76,9 @@ public:
   /// Clear constraints
   void subject_to();
 
+  void set_lb(const DM& value);
+  void set_ub(const DM& value);
+
   /// Solver
   void solver(const std::string& solver,
               const Dict& plugin_options=Dict(),
@@ -394,6 +397,10 @@ private:
   std::string name_prefix() const;
 
   static std::string format_stacktrace(const Dict& stacktrace, casadi_int indent);
+
+
+  DM lbx_;
+  DM ubx_;
 
 };
 
