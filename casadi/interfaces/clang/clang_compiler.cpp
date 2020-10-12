@@ -153,13 +153,17 @@ namespace casadi {
     clang::DiagnosticsEngine diags(diagID, diagOpts, diagClient);
 
     // Create the compiler invocation
-    #if LLVM_VERSION_MAJOR>=4
+    #if LLVM_VERSION_MAJOR >= 4
     std::shared_ptr<clang::CompilerInvocation> compInv(new clang::CompilerInvocation());
     #else
     clang::CompilerInvocation* compInv = new clang::CompilerInvocation();
     #endif
+    #if LLVM_VERSION_MAJOR >= 5
+    clang::CompilerInvocation::CreateFromArgs(*compInv, args, diags);
+    #else
     clang::CompilerInvocation::CreateFromArgs(*compInv, &args[0],
                                               &args[0] + args.size(), diags);
+    #endif
     compInst.setInvocation(compInv);
 
     // Get ready to report problems
