@@ -5,6 +5,9 @@ casadi_plugin(Conic nlpsol qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 # Active-set QP solver
 casadi_plugin(Conic qrqp qrqp.hpp qrqp.cpp qrqp_meta.cpp)
 
+# Code-generating Hybrid Active-Set Method
+casadi_plugin(Conic qpchasm qpchasm.hpp qpchasm.cpp qpchasm_meta.cpp)
+
 # Active-set SQP method
 casadi_plugin(Nlpsol qrsqp qrsqp.hpp qrsqp.cpp qrsqp_meta.cpp)
 
