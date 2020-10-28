@@ -37,6 +37,21 @@
 
 /// \cond INTERNAL
 namespace casadi {
+  template<typename T1>
+  struct casadi_qpip_prob : public casadi_qp_prob<T1> {
+  };
+
+  template<typename T1>
+  struct casadi_qpip_data : public casadi_qp_data<T1> {
+    // Diagonal entries
+    T1* D;
+    // Scaling factor
+    T1* S;
+    // lam_lbx, lam_ubz
+    T1* lam_lbz;
+    T1* lam_ubz;
+  };
+
   struct CASADI_CONIC_QPCHASM_EXPORT QpchasmMemory : public ConicMemory {
     const char* return_status;
   };
@@ -101,7 +116,7 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
     // Memory structure
-    casadi_qp_prob<double> p_;
+    casadi_qpip_prob<double> p_;
     // KKT system and its QR factorization
     Sparsity AT_, kkt_, sp_v_, sp_r_;
     // KKT system permutation
