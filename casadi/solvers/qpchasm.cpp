@@ -130,6 +130,15 @@ namespace casadi {
     // Allocate memory
     casadi_int sz_w, sz_iw;
     casadi_qp_work(&p_, &sz_iw, &sz_w);
+
+    // Constraint ID
+    sz_iw += p_.nz;
+    // D_x, D_g
+    sz_w += p_.nz;
+    // lam_lbz, lam_ubz
+    sz_w += p_.nz;
+    sz_w += p_.nz;
+
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
 
@@ -177,6 +186,16 @@ namespace casadi {
     d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
     d.nz_a = arg[CONIC_A];
+
+    // Constraint ID
+    casadi_int* cstr_id = iw; iw += p_.nz;
+
+    // D_x, D_a
+    double* D_z = w; w += p_.nz;
+    // lam_lbx, lam_ubz
+    double* lam_lbz = w; w += p_.nz;
+    double* lam_ubz = w; w += p_.nz;
+
     casadi_qp_init(&d, &iw, &w);
     // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
@@ -188,6 +207,106 @@ namespace casadi {
     casadi_fill(d.z+nx_, na_, nan);
     casadi_copy(arg[CONIC_LAM_X0], nx_, d.lam);
     casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
+    casadi_fill(lam_lbz, p_.nz, 0.);
+    casadi_fill(lam_ubz, p_.nz, 0.);
+
+    enum CSTR_ID {FIXED, BOXED, LOWER, UPPER, UNBOUNDED};
+    // Total number of finite constraints
+    casadi_int n_con = 0;
+
+    // Find interior point
+    for (casadi_int k = 0; k < p_.nz; ++k) {
+      if (d.lbz[k] > -p_.inf) {
+        if (d.ubz[k] < p_.inf) {
+          // Both upper and lower bounds
+          d.z[k] = .5 * (d.lbz[k] + d.ubz[k]);
+          if (d.ubz[k] - d.lbz[k] < p_.dmin) {
+            cstr_id[k] = FIXED;
+          } else {
+            cstr_id[k] = BOXED;
+            lam_lbz[k] = 1;
+            lam_ubz[k] = 1;
+            n_con += 2;
+          }
+        } else {
+          // Only lower bound
+          cstr_id[k] = LOWER;
+          d.z[k] = d.lbz[k] + 1.;
+          lam_lbz[k] = 1;
+          n_con++;
+        }
+      } else {
+        if (d.ubz[k] < p_.inf) {
+          // Only upper bound
+          cstr_id[k] = UPPER;
+          d.z[k] = d.ubz[k] - 1.;
+          lam_ubz[k] = 1;
+          n_con++;
+        } else {
+          // Unbounded
+          cstr_id[k] = UNBOUNDED;
+          d.z[k] = 0;
+        }
+      }
+    }
+    uout() << n_con << " finite constraints\n";
+
+    // Calculate complimentarity measure
+    double mu = 0;
+    for (casadi_int k = 0; k < p_.nz; ++k) {
+      if (d.lbz[k] > -p_.inf) {
+        mu += lam_lbz[k] * (d.z[k] - d.lbz[k]);
+      }
+      if (d.ubz[k] < p_.inf) {
+        mu += lam_ubz[k] * (d.ubz[k] - d.z[k]);
+      }
+    }
+    uout() << "mu = " << mu << "\n";
+
+    // Calculate diagonal entries
+    for (casadi_int k = 0; k < p_.nx; ++k) {
+      if (cstr_id[k] == FIXED) {
+        D_z[k] = nan;
+        continue;
+      }
+      D_z[k] = 0;
+      if (d.lbz[k] > -p_.inf) {
+        D_z[k] += lam_lbz[k] / (d.z[k] - d.lbz[k]);
+      }
+      if (d.ubz[k] < p_.inf) {
+        D_z[k] += lam_ubz[k] / (d.ubz[k] - d.z[k]);
+      }
+    }
+    for (casadi_int k = p_.nx; k < p_.nz; ++k) {
+      if (d.lbz[k] > -p_.inf) {
+        if (d.ubz[k] < p_.inf) {
+          if (d.ubz[k] - d.lbz[k] < p_.dmin) {
+            // Fixed
+            D_z[k] = 0;
+          } else {
+            // Upper and lower
+            D_z[k] = 1. / (lam_lbz[k] / (d.z[k] - d.lbz[k])
+              + lam_ubz[k] / (d.ubz[k] - d.z[k]));
+          }
+        } else {
+          // Only lower
+          D_z[k] = (d.z[k] - d.lbz[k]) / lam_lbz[k];
+        }
+      } else {
+        if (d.ubz[k] < p_.inf) {
+          // Only upper
+          D_z[k] = (d.ubz[k] - d.z[k]) / lam_ubz[k];
+        } else {
+          // Neither upper or lower
+          D_z[k] = nan;
+          casadi_assert(0, "not eliminated");
+        }
+      }
+    }
+    uout() << "D_z =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << D_z[k];
+    uout() << "\n";
+
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
     while (true) {
