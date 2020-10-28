@@ -135,6 +135,8 @@ namespace casadi {
     sz_iw += p_.nz;
     // D_x, D_g
     sz_w += p_.nz;
+    // S_z
+    sz_w += p_.nz;
     // lam_lbz, lam_ubz
     sz_w += p_.nz;
     sz_w += p_.nz;
@@ -192,6 +194,9 @@ namespace casadi {
 
     // D_x, D_a
     double* D_z = w; w += p_.nz;
+    // S_z
+    double* S_z = w; w += p_.nz;
+
     // lam_lbx, lam_ubz
     double* lam_lbz = w; w += p_.nz;
     double* lam_ubz = w; w += p_.nz;
@@ -266,7 +271,7 @@ namespace casadi {
     // Calculate diagonal entries
     for (casadi_int k = 0; k < p_.nx; ++k) {
       if (cstr_id[k] == FIXED) {
-        D_z[k] = nan;
+        D_z[k] = -1;
         continue;
       }
       D_z[k] = 0;
@@ -298,14 +303,35 @@ namespace casadi {
           D_z[k] = (d.ubz[k] - d.z[k]) / lam_ubz[k];
         } else {
           // Neither upper or lower
-          D_z[k] = nan;
-          casadi_assert(0, "not eliminated");
+          D_z[k] = -1;
         }
       }
     }
+    // Calculate scaling factors
+    for (casadi_int k = 0; k < p_.nz; ++k) {
+      if (D_z[k] < 0) {
+        // Eliminate
+        S_z[k] = 0;
+        D_z[k] = 1;
+      } else {
+        // Scale
+        S_z[k] = fmin(1., std::sqrt(1. / D_z[k]));
+        D_z[k] = fmax(1., D_z[k]);
+      }
+    }
+
+
+
     uout() << "D_z =";
     for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << D_z[k];
     uout() << "\n";
+    uout() << "S_z =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << S_z[k];
+    uout() << "\n";
+
+
+
+
 
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
