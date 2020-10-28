@@ -50,6 +50,8 @@ namespace casadi {
     // lam_lbx, lam_ubz
     T1* lam_lbz;
     T1* lam_ubz;
+    // Number of finite constraints
+    casadi_int n_con;
   };
 
   struct CASADI_CONIC_QPCHASM_EXPORT QpchasmMemory : public ConicMemory {

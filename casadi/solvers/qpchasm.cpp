@@ -46,6 +46,124 @@ namespace casadi {
     Conic::registerPlugin(casadi_register_conic_qpchasm);
   }
 
+  template<typename T1>
+  void init_ip(casadi_qpip_data<T1>* d) {
+    // Local variables
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Reset constraint count
+    d->n_con = 0;
+    // Find interior point
+    for (k = 0; k < p->nz; ++k) {
+      if (d->lbz[k] > -p->inf) {
+        if (d->ubz[k] < p->inf) {
+          // Both upper and lower bounds
+          d->z[k] = .5 * (d->lbz[k] + d->ubz[k]);
+          if (d->ubz[k] > d->lbz[k] + p->dmin) {
+            d->lam_lbz[k] = 1;
+            d->lam_ubz[k] = 1;
+            d->n_con += 2;
+          }
+        } else {
+          // Only lower bound
+          d->z[k] = d->lbz[k] + 1.;
+          d->lam_lbz[k] = 1;
+          d->n_con++;
+        }
+      } else {
+        if (d->ubz[k] < p->inf) {
+          // Only upper bound
+          d->z[k] = d->ubz[k] - 1.;
+          d->lam_ubz[k] = 1;
+          d->n_con++;
+        } else {
+          // Unbounded
+          d->z[k] = 0;
+        }
+      }
+    }
+  }
+
+  template<typename T1>
+  T1 calc_mu(const casadi_qpip_data<T1>* d) {
+    // Local variables
+    casadi_int k;
+    T1 mu;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Calculate complimentarity measure
+    mu = 0;
+    for (k = 0; k < p->nz; ++k) {
+      if (d->lbz[k] > -p->inf) {
+        mu += d->lam_lbz[k] * (d->z[k] - d->lbz[k]);
+      }
+      if (d->ubz[k] < p->inf) {
+        mu += d->lam_ubz[k] * (d->ubz[k] - d->z[k]);
+      }
+    }
+    // Divide by total number of constraints
+    mu /= d->n_con;
+    return mu;
+  }
+
+  template<typename T1>
+  void calc_diag(casadi_qpip_data<T1>* d) {
+    // Local variables
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Diagonal entries corresponding to variables
+    for (k = 0; k < p->nx; ++k) {
+      if (d->ubz[k] <= d->lbz[k] + p->dmin) {
+        d->D[k] = -1;
+        continue;
+      }
+      d->D[k] = 0;
+      if (d->lbz[k] > -p->inf) {
+        d->D[k] += d->lam_lbz[k] / (d->z[k] - d->lbz[k]);
+      }
+      if (d->ubz[k] < p->inf) {
+        d->D[k] += d->lam_ubz[k] / (d->ubz[k] - d->z[k]);
+      }
+    }
+    // Diagonal entries corresponding to constraints
+    for (; k < p->nz; ++k) {
+      if (d->lbz[k] > -p->inf) {
+        if (d->ubz[k] < p->inf) {
+          if (d->ubz[k] - d->lbz[k] < p->dmin) {
+            // Fixed
+            d->D[k] = 0;
+          } else {
+            // Upper and lower
+            d->D[k] = 1. / (d->lam_lbz[k] / (d->z[k] - d->lbz[k])
+              + d->lam_ubz[k] / (d->ubz[k] - d->z[k]));
+          }
+        } else {
+          // Only lower
+          d->D[k] = (d->z[k] - d->lbz[k]) / d->lam_lbz[k];
+        }
+      } else {
+        if (d->ubz[k] < p->inf) {
+          // Only upper
+          d->D[k] = (d->ubz[k] - d->z[k]) / d->lam_ubz[k];
+        } else {
+          // Neither upper or lower
+          d->D[k] = -1;
+        }
+      }
+    }
+    // Scale diagonal entries
+    for (k = 0; k < p->nz; ++k) {
+      if (d->D[k] < 0) {
+        // Eliminate
+        d->S[k] = 0;
+        d->D[k] = 1;
+      } else {
+        // Scale
+        d->S[k] = fmin(1., std::sqrt(1. / d->D[k]));
+        d->D[k] = fmax(1., d->D[k]);
+      }
+    }
+  }
+
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
@@ -210,115 +328,16 @@ namespace casadi {
     casadi_fill(d.lam_lbz, p_.nz, 0.);
     casadi_fill(d.lam_ubz, p_.nz, 0.);
 
-    // Total number of finite constraints
-    casadi_int n_con = 0;
-
     // Find interior point
-    for (casadi_int k = 0; k < p_.nz; ++k) {
-      if (d.lbz[k] > -p_.inf) {
-        if (d.ubz[k] < p_.inf) {
-          // Both upper and lower bounds
-          d.z[k] = .5 * (d.lbz[k] + d.ubz[k]);
-          if (d.ubz[k] > d.lbz[k] + p_.dmin) {
-            d.lam_lbz[k] = 1;
-            d.lam_ubz[k] = 1;
-            n_con += 2;
-          }
-        } else {
-          // Only lower bound
-          d.z[k] = d.lbz[k] + 1.;
-          d.lam_lbz[k] = 1;
-          n_con++;
-        }
-      } else {
-        if (d.ubz[k] < p_.inf) {
-          // Only upper bound
-          d.z[k] = d.ubz[k] - 1.;
-          d.lam_ubz[k] = 1;
-          n_con++;
-        } else {
-          // Unbounded
-          d.z[k] = 0;
-        }
-      }
-    }
-    uout() << n_con << " finite constraints\n";
+    init_ip(&d);
+    uout() << d.n_con << " finite constraints\n";
 
     // Calculate complimentarity measure
-    double mu = 0;
-    for (casadi_int k = 0; k < p_.nz; ++k) {
-      if (d.lbz[k] > -p_.inf) {
-        mu += d.lam_lbz[k] * (d.z[k] - d.lbz[k]);
-      }
-      if (d.ubz[k] < p_.inf) {
-        mu += d.lam_ubz[k] * (d.ubz[k] - d.z[k]);
-      }
-    }
+    double mu = calc_mu(&d);
     uout() << "mu = " << mu << "\n";
 
-    // Calculate diagonal entries
-    for (casadi_int k = 0; k < p_.nx; ++k) {
-      if (d.ubz[k] <= d.lbz[k] + p_.dmin) {
-        d.D[k] = -1;
-        continue;
-      }
-      d.D[k] = 0;
-      if (d.lbz[k] > -p_.inf) {
-        d.D[k] += d.lam_lbz[k] / (d.z[k] - d.lbz[k]);
-      }
-      if (d.ubz[k] < p_.inf) {
-        d.D[k] += d.lam_ubz[k] / (d.ubz[k] - d.z[k]);
-      }
-    }
-    for (casadi_int k = p_.nx; k < p_.nz; ++k) {
-      if (d.lbz[k] > -p_.inf) {
-        if (d.ubz[k] < p_.inf) {
-          if (d.ubz[k] - d.lbz[k] < p_.dmin) {
-            // Fixed
-            d.D[k] = 0;
-          } else {
-            // Upper and lower
-            d.D[k] = 1. / (d.lam_lbz[k] / (d.z[k] - d.lbz[k])
-              + d.lam_ubz[k] / (d.ubz[k] - d.z[k]));
-          }
-        } else {
-          // Only lower
-          d.D[k] = (d.z[k] - d.lbz[k]) / d.lam_lbz[k];
-        }
-      } else {
-        if (d.ubz[k] < p_.inf) {
-          // Only upper
-          d.D[k] = (d.ubz[k] - d.z[k]) / d.lam_ubz[k];
-        } else {
-          // Neither upper or lower
-          d.D[k] = -1;
-        }
-      }
-    }
-
-    uout() << "d.D =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.D[k];
-    uout() << "\n";
-
-
-
-    // Calculate scaling factors
-    for (casadi_int k = 0; k < p_.nz; ++k) {
-      if (d.D[k] < 0) {
-        // Eliminate
-        d.S[k] = 0;
-        d.D[k] = 1;
-      } else {
-        // Scale
-        d.S[k] = fmin(1., std::sqrt(1. / d.D[k]));
-        d.D[k] = fmax(1., d.D[k]);
-      }
-    }
-
-    // Calculate residual equations
-
-
-
+    // Calculate diagonal entries and scaling factors
+    calc_diag(&d);
 
     uout() << "d.D =";
     for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.D[k];
