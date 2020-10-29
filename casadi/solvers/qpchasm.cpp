@@ -92,41 +92,24 @@ namespace casadi {
     // Diagonal entries corresponding to variables
     for (k = 0; k < p->nx; ++k) {
       if (d->ubz[k] <= d->lbz[k] + p->dmin) {
+        // Fixed variable (eliminate)
         d->D[k] = -1;
-        continue;
-      }
-      d->D[k] = 0;
-      if (d->lbz[k] > -p->inf) {
-        d->D[k] += d->lam_lbz[k] / (d->z[k] - d->lbz[k]);
-      }
-      if (d->ubz[k] < p->inf) {
-        d->D[k] += d->lam_ubz[k] / (d->ubz[k] - d->z[k]);
+      } else {
+        d->D[k] = d->lam_lbz[k] * d->dinv_lbz[k]
+          + d->lam_ubz[k] * d->dinv_ubz[k];
       }
     }
     // Diagonal entries corresponding to constraints
     for (; k < p->nz; ++k) {
-      if (d->lbz[k] > -p->inf) {
-        if (d->ubz[k] < p->inf) {
-          if (d->ubz[k] - d->lbz[k] < p->dmin) {
-            // Fixed
-            d->D[k] = 0;
-          } else {
-            // Upper and lower
-            d->D[k] = 1. / (d->lam_lbz[k] / (d->z[k] - d->lbz[k])
-              + d->lam_ubz[k] / (d->ubz[k] - d->z[k]));
-          }
-        } else {
-          // Only lower
-          d->D[k] = (d->z[k] - d->lbz[k]) / d->lam_lbz[k];
-        }
+      if (d->lbz[k] <= -p->inf && d->ubz[k] >= p->inf) {
+        // Unconstrained (eliminate)
+        d->D[k] = -1;
+      } else if (d->ubz[k] <= d->lbz[k] + p->dmin) {
+        // Equality constrained
+        d->D[k] = 0;
       } else {
-        if (d->ubz[k] < p->inf) {
-          // Only upper
-          d->D[k] = (d->ubz[k] - d->z[k]) / d->lam_ubz[k];
-        } else {
-          // Neither upper or lower
-          d->D[k] = -1;
-        }
+        d->D[k] = 1. / (d->lam_lbz[k] * d->dinv_lbz[k]
+          + d->lam_ubz[k] * d->dinv_ubz[k]);
       }
     }
     // Scale diagonal entries
@@ -147,6 +130,7 @@ namespace casadi {
   void calc_res(casadi_qpip_data<T1>* d) {
     // Local variables
     casadi_int k;
+    T1 bdiff;
     const casadi_qp_prob<T1>* p = d->prob;
     // Gradient of the Lagrangian
     casadi_axpy(p->nx, 1., d->lam, d->rz);
@@ -162,19 +146,67 @@ namespace casadi {
     for (k = 0; k < p->nz; ++k) {
       // Lower bound
       if (d->lbz[k] > -p->inf) {
-        d->mu += d->rlam_lbz[k] = d->lam_lbz[k] * (d->z[k] - d->lbz[k]);
+        bdiff = d->z[k] - d->lbz[k];
+        d->mu += d->rlam_lbz[k] = d->lam_lbz[k] * bdiff;
+        d->dinv_lbz[k] = 1. / bdiff;
       } else {
         d->rlam_lbz[k] = 0;
+        d->dinv_lbz[k] = 0;
       }
       // Upper bound
       if (d->ubz[k] < p->inf) {
-        d->mu += d->rlam_ubz[k] = d->lam_ubz[k] * (d->ubz[k] - d->z[k]);
+        bdiff = d->ubz[k] - d->z[k];
+        d->mu += d->rlam_ubz[k] = d->lam_ubz[k] * bdiff;
+        d->dinv_ubz[k] = 1. / bdiff;
       } else {
         d->rlam_ubz[k] = 0;
+        d->dinv_ubz[k] = 0;
       }
     }
     // Divide mu by total number of finite constraints
     d->mu /= d->n_con;
+  }
+
+  template<typename T1>
+  void qp_factorize(casadi_qpip_data<T1>* d) {
+    // Local variables
+    casadi_int i, k, j;
+    const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row,
+                     *kkt_colind, *kkt_row;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Extract sparsities
+    a_row = (a_colind = p->sp_a+2) + p->nx + 1;
+    at_row = (at_colind = p->sp_at+2) + p->na + 1;
+    h_row = (h_colind = p->sp_h+2) + p->nx + 1;
+    kkt_row = (kkt_colind = p->sp_kkt+2) + p->nz + 1;
+    // Reset w to zero
+    casadi_clear(d->w, p->nz);
+    // Loop over rows of the (transposed) KKT
+    for (i=0; i<p->nz; ++i) {
+      // Copy row of KKT to w
+      if (i<p->nx) {
+        for (k=h_colind[i]; k<h_colind[i+1]; ++k) d->w[h_row[k]] = d->nz_h[k];
+        for (k=a_colind[i]; k<a_colind[i+1]; ++k) d->w[p->nx+a_row[k]] = d->nz_a[k];
+      } else {
+        for (k=at_colind[i-p->nx]; k<at_colind[i-p->nx+1]; ++k) {
+          d->w[at_row[k]] = d->nz_at[k];
+        }
+      }
+      // Copy row to KKT, scale, zero out w
+      for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
+        j = kkt_row[k];
+        d->nz_kkt[k] = d->S[j] * d->w[j] * d->S[i];
+        d->w[j] = 0;
+        if (i == j) {
+          d->nz_kkt[k] += i<p->nx ? d->D[i] : -d->D[i];
+        }
+      }
+    }
+    // QR factorization
+    casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r,
+              d->nz_r, d->beta, p->prinv, p->pc);
+    // Check singularity
+    d->sing = casadi_qr_singular(&d->mina, &d->imina, d->nz_r, p->sp_r, p->pc, 1e-12);
   }
 
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
@@ -274,6 +306,9 @@ namespace casadi {
     sz_w += p_.nz;
     sz_w += p_.nz;
     sz_w += p_.nz;
+    // Inverse of distance to bounds
+    sz_w += p_.nz;
+    sz_w += p_.nz;
 
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
@@ -338,6 +373,10 @@ namespace casadi {
     d.rlam_lbz = w; w += p_.nz;
     d.rlam_ubz = w; w += p_.nz;
 
+    // Inverse of distance to bounds
+    d.dinv_lbz = w; w += p_.nz;
+    d.dinv_ubz = w; w += p_.nz;
+
     casadi_qp_init(&d, &iw, &w);
     // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
@@ -362,16 +401,6 @@ namespace casadi {
 
     uout() << "lam_ubz =";
     for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.lam_ubz[k];
-    uout() << "\n";
-
-    // Calculate diagonal entries and scaling factors
-    calc_diag(&d);
-
-    uout() << "d.D =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.D[k];
-    uout() << "\n";
-    uout() << "d.S =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.S[k];
     uout() << "\n";
 
     // Matrix-vector multiplication
@@ -399,6 +428,30 @@ namespace casadi {
     uout() << "res_lam_ubz =";
     for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_ubz[k];
     uout() << "\n";
+
+    // Calculate diagonal entries and scaling factors
+    calc_diag(&d);
+
+    uout() << "d.D =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.D[k];
+    uout() << "\n";
+    uout() << "d.S =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.S[k];
+    uout() << "\n";
+
+    // Factorize KKT
+    qp_factorize(&d);
+    uout() << "sing = " << d.sing << "\n";
+
+    // Predictor step
+    double sigma = .5;
+
+
+    // Calculate step
+
+
+
+
 
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;

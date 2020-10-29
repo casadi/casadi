@@ -55,6 +55,9 @@ namespace casadi {
     T1* rlam;
     T1* rlam_lbz;
     T1* rlam_ubz;
+    // Inverse of margin to bounds (0 if no bound)
+    T1* dinv_lbz;
+    T1* dinv_ubz;
     // Complimentarity measure
     T1 mu;
     // Number of finite constraints
