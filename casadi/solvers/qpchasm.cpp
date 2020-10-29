@@ -263,6 +263,19 @@ namespace casadi {
     for (k=0; k<p->nz; ++k) d->rlam[k] += d->dlam_ubz[k] - d->dlam_lbz[k];
   }
 
+  template<typename T1>
+  void qp_ipstep(casadi_qpip_data<T1>* d, T1 alpha_pr, T1 alpha_du) {
+    // Local variables
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Primal step
+    for (k=0; k<p->nz; ++k) d->z[k] += alpha_pr * d->dz[k];
+    // Dual step
+    for (k=0; k<p->nz; ++k) d->lam[k] += alpha_du * d->dlam[k];
+    for (k=0; k<p->nz; ++k) d->lam_lbz[k] += alpha_du * d->dlam_lbz[k];
+    for (k=0; k<p->nz; ++k) d->lam_ubz[k] += alpha_du * d->dlam_ubz[k];
+  }
+
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
@@ -514,6 +527,9 @@ namespace casadi {
     // Complete predictor step
     qp_predictor(&d);
 
+    // Take step
+    qp_ipstep(&d, 1., 1.);
+
     uout() << "dz =";
     for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.dz[k];
     uout() << "\n";
@@ -521,6 +537,27 @@ namespace casadi {
     uout() << "dlam =";
     for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.dlam[k];
     uout() << "\n";
+
+    // Recalculate residual
+    calc_res(&d);
+    uout() << "new mu = " << d.mu << "\n";
+
+    uout() << "res_z =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rz[k];
+    uout() << "\n";
+
+    uout() << "res_lam =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam[k];
+    uout() << "\n";
+
+    uout() << "res_lam_lbz =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_lbz[k];
+    uout() << "\n";
+
+    uout() << "res_lam_ubz =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_ubz[k];
+    uout() << "\n";
+
 
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
