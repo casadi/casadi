@@ -85,27 +85,6 @@ namespace casadi {
   }
 
   template<typename T1>
-  T1 calc_mu(const casadi_qpip_data<T1>* d) {
-    // Local variables
-    casadi_int k;
-    T1 mu;
-    const casadi_qp_prob<T1>* p = d->prob;
-    // Calculate complimentarity measure
-    mu = 0;
-    for (k = 0; k < p->nz; ++k) {
-      if (d->lbz[k] > -p->inf) {
-        mu += d->lam_lbz[k] * (d->z[k] - d->lbz[k]);
-      }
-      if (d->ubz[k] < p->inf) {
-        mu += d->lam_ubz[k] * (d->ubz[k] - d->z[k]);
-      }
-    }
-    // Divide by total number of constraints
-    mu /= d->n_con;
-    return mu;
-  }
-
-  template<typename T1>
   void calc_diag(casadi_qpip_data<T1>* d) {
     // Local variables
     casadi_int k;
@@ -162,6 +141,40 @@ namespace casadi {
         d->D[k] = fmax(1., d->D[k]);
       }
     }
+  }
+
+  template<typename T1>
+  void calc_res(casadi_qpip_data<T1>* d) {
+    // Local variables
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Gradient of the Lagrangian
+    casadi_axpy(p->nx, 1., d->lam, d->rz);
+    casadi_axpy(p->nx, 1., d->g, d->rz);
+    // Linear constraint
+    casadi_axpy(p->na, -1., d->z + p->nx, d->rz + p->nx);
+    // Multiplier consistency
+    casadi_copy(d->lam_ubz, p->nz, d->rlam);
+    casadi_axpy(p->nz, -1., d->lam_lbz, d->rlam);
+    casadi_axpy(p->nz, -1., d->lam, d->rlam);
+    // Complementarity conditions, mu
+    d->mu = 0;
+    for (k = 0; k < p->nz; ++k) {
+      // Lower bound
+      if (d->lbz[k] > -p->inf) {
+        d->mu += d->rlam_lbz[k] = d->lam_lbz[k] * (d->z[k] - d->lbz[k]);
+      } else {
+        d->rlam_lbz[k] = 0;
+      }
+      // Upper bound
+      if (d->ubz[k] < p->inf) {
+        d->mu += d->rlam_ubz[k] = d->lam_ubz[k] * (d->ubz[k] - d->z[k]);
+      } else {
+        d->rlam_ubz[k] = 0;
+      }
+    }
+    // Divide mu by total number of finite constraints
+    d->mu /= d->n_con;
   }
 
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
@@ -256,6 +269,11 @@ namespace casadi {
     // lam_lbz, lam_ubz
     sz_w += p_.nz;
     sz_w += p_.nz;
+    // Residual
+    sz_w += p_.nz;
+    sz_w += p_.nz;
+    sz_w += p_.nz;
+    sz_w += p_.nz;
 
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
@@ -314,6 +332,12 @@ namespace casadi {
     d.lam_lbz = w; w += p_.nz;
     d.lam_ubz = w; w += p_.nz;
 
+    // Residual
+    d.rz = w; w += p_.nz;
+    d.rlam = w; w += p_.nz;
+    d.rlam_lbz = w; w += p_.nz;
+    d.rlam_ubz = w; w += p_.nz;
+
     casadi_qp_init(&d, &iw, &w);
     // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
@@ -332,9 +356,13 @@ namespace casadi {
     init_ip(&d);
     uout() << d.n_con << " finite constraints\n";
 
-    // Calculate complimentarity measure
-    double mu = calc_mu(&d);
-    uout() << "mu = " << mu << "\n";
+    uout() << "lam_lbz =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.lam_lbz[k];
+    uout() << "\n";
+
+    uout() << "lam_ubz =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.lam_ubz[k];
+    uout() << "\n";
 
     // Calculate diagonal entries and scaling factors
     calc_diag(&d);
@@ -346,9 +374,31 @@ namespace casadi {
     for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.S[k];
     uout() << "\n";
 
+    // Matrix-vector multiplication
+    casadi_clear(d.rz, p_.nz);
+    casadi_mv(d.nz_h, p_.sp_h, d.z, d.rz, 0);
+    casadi_mv(d.nz_a, p_.sp_a, d.lam + p_.nx, d.rz, 1);
+    casadi_mv(d.nz_a, p_.sp_a, d.z, d.rz + p_.nx, 0);
 
+    // Calculate residual
+    calc_res(&d);
+    uout() << "mu = " << d.mu << "\n";
 
+    uout() << "res_z =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rz[k];
+    uout() << "\n";
 
+    uout() << "res_lam =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam[k];
+    uout() << "\n";
+
+    uout() << "res_lam_lbz =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_lbz[k];
+    uout() << "\n";
+
+    uout() << "res_lam_ubz =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_ubz[k];
+    uout() << "\n";
 
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;

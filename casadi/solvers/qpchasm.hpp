@@ -50,6 +50,13 @@ namespace casadi {
     // lam_lbx, lam_ubz
     T1* lam_lbz;
     T1* lam_ubz;
+    // Residual
+    T1* rz;
+    T1* rlam;
+    T1* rlam_lbz;
+    T1* rlam_ubz;
+    // Complimentarity measure
+    T1 mu;
     // Number of finite constraints
     casadi_int n_con;
   };
