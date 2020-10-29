@@ -121,7 +121,7 @@ namespace casadi {
       } else {
         // Scale
         d->S[k] = fmin(1., std::sqrt(1. / d->D[k]));
-        d->D[k] = fmax(1., d->D[k]);
+        d->D[k] = fmin(1., d->D[k]);
       }
     }
   }
@@ -145,7 +145,7 @@ namespace casadi {
     d->mu = 0;
     for (k = 0; k < p->nz; ++k) {
       // Lower bound
-      if (d->lbz[k] > -p->inf) {
+      if (d->lbz[k] > -p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
         bdiff = d->z[k] - d->lbz[k];
         d->mu += d->rlam_lbz[k] = d->lam_lbz[k] * bdiff;
         d->dinv_lbz[k] = 1. / bdiff;
@@ -154,7 +154,7 @@ namespace casadi {
         d->dinv_lbz[k] = 0;
       }
       // Upper bound
-      if (d->ubz[k] < p->inf) {
+      if (d->ubz[k] < p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
         bdiff = d->ubz[k] - d->z[k];
         d->mu += d->rlam_ubz[k] = d->lam_ubz[k] * bdiff;
         d->dinv_ubz[k] = 1. / bdiff;
@@ -207,6 +207,60 @@ namespace casadi {
               d->nz_r, d->beta, p->prinv, p->pc);
     // Check singularity
     d->sing = casadi_qr_singular(&d->mina, &d->imina, d->nz_r, p->sp_r, p->pc, 1e-12);
+  }
+
+  template<typename T1>
+  void qp_predictor_prepare(casadi_qpip_data<T1>* d, T1 shift) {
+    // Local variables
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Store r_lam - dinv_lbz * rlam_lbz + dinv_ubz * rlam_ubz in dz
+    casadi_copy(d->rlam, p->nz, d->dz);
+    for (k=0; k<p->nz; ++k) d->dz[k] -= d->dinv_lbz[k] * (d->rlam_lbz[k] - shift);
+    for (k=0; k<p->nz; ++k) d->dz[k] += d->dinv_ubz[k] * (d->rlam_ubz[k] - shift);
+    // Finish calculating x-component of right-hand-side and store in dz[:nx]
+    for (k=0; k<p->nx; ++k) d->dz[k] += d->rz[k];
+    // Copy tilde{r}_lam to dlam[nx:] (needed to calculate step in g later)
+    for (k=p->nx; k<p->nz; ++k) d->dlam[k] = d->dz[k];
+    // Finish calculating g-component of right-hand-side and store in dz[nx:]
+    for (k=p->nx; k<p->nz; ++k) {
+      d->dz[k] *= d->D[k] / (d->S[k] * d->S[k]);
+      d->dz[k] += d->rz[k];
+    }
+    // Scale and negate right-hand-side
+    for (k=0; k<p->nz; ++k) d->dz[k] *= -d->S[k];
+    // dlam_lbz := -rlam_lbz, dlam_ubz := -rlam_ubz
+    for (k=0; k<p->nz; ++k) d->dlam_lbz[k] = shift - d->rlam_lbz[k];
+    for (k=0; k<p->nz; ++k) d->dlam_ubz[k] = shift - d->rlam_ubz[k];
+    // dlam := rlam
+    for (k=0; k<p->nz; ++k) d->dlam[k] = d->rlam[k];
+  }
+
+  template<typename T1>
+  void qp_predictor(casadi_qpip_data<T1>* d) {
+    // Local variables
+    casadi_int k;
+    T1 t;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Scale results
+    for (k=0; k<p->nz; ++k) d->dz[k] *= d->S[k];
+    // Calculate step in g, lam_g
+    for (k=p->nx; k<p->nz; ++k) {
+      t = d->dlam[k];
+      d->dlam[k] = d->dz[k];
+      d->dz[k] = d->D[k] / (d->S[k] * d->S[k]) * (d->dlam[k] - t);
+    }
+    // Finish calculation in dlam_lbz, dlam_ubz
+    for (k=0; k<p->nz; ++k) {
+      d->dlam_lbz[k] -= d->lam_lbz[k] * d->dz[k];
+      d->dlam_lbz[k] *= d->dinv_lbz[k];
+    }
+    for (k=0; k<p->nz; ++k) {
+      d->dlam_ubz[k] += d->lam_ubz[k] * d->dz[k];
+      d->dlam_ubz[k] *= d->dinv_ubz[k];
+    }
+    // Finish calculation of dlam
+    for (k=0; k<p->nz; ++k) d->rlam[k] += d->dlam_ubz[k] - d->dlam_lbz[k];
   }
 
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
@@ -301,6 +355,9 @@ namespace casadi {
     // lam_lbz, lam_ubz
     sz_w += p_.nz;
     sz_w += p_.nz;
+    // dlam_lbz, dlam_ubz
+    sz_w += p_.nz;
+    sz_w += p_.nz;
     // Residual
     sz_w += p_.nz;
     sz_w += p_.nz;
@@ -357,22 +414,21 @@ namespace casadi {
     d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
     d.nz_a = arg[CONIC_A];
-
     // D_x, D_a
     d.D = w; w += p_.nz;
     // d.S
     d.S = w; w += p_.nz;
-
     // lam_lbx, lam_ubz
     d.lam_lbz = w; w += p_.nz;
     d.lam_ubz = w; w += p_.nz;
-
+    // dlam_lbx, dlam_ubz
+    d.dlam_lbz = w; w += p_.nz;
+    d.dlam_ubz = w; w += p_.nz;
     // Residual
     d.rz = w; w += p_.nz;
     d.rlam = w; w += p_.nz;
     d.rlam_lbz = w; w += p_.nz;
     d.rlam_ubz = w; w += p_.nz;
-
     // Inverse of distance to bounds
     d.dinv_lbz = w; w += p_.nz;
     d.dinv_ubz = w; w += p_.nz;
@@ -443,15 +499,28 @@ namespace casadi {
     qp_factorize(&d);
     uout() << "sing = " << d.sing << "\n";
 
-    // Predictor step
+    // Prepare predictor step
     double sigma = .5;
+    qp_predictor_prepare(&d, sigma * d.mu);
 
+    uout() << "dz (rhs) =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.dz[k];
+    uout() << "\n";
 
     // Calculate step
+    casadi_qr_solve(d.dz, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r, d.beta,
+      p_.prinv, p_.pc, d.w);
 
+    // Complete predictor step
+    qp_predictor(&d);
 
+    uout() << "dz =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.dz[k];
+    uout() << "\n";
 
-
+    uout() << "dlam =";
+    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.dlam[k];
+    uout() << "\n";
 
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;

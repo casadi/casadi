@@ -50,6 +50,9 @@ namespace casadi {
     // lam_lbx, lam_ubz
     T1* lam_lbz;
     T1* lam_ubz;
+    // dlam_lbx, dlam_ubz
+    T1* dlam_lbz;
+    T1* dlam_ubz;
     // Residual
     T1* rz;
     T1* rlam;
