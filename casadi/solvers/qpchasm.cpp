@@ -46,19 +46,36 @@ namespace casadi {
     Conic::registerPlugin(casadi_register_conic_qpchasm);
   }
 
+  void print_vec(const std::string& str, const double* v, casadi_int n) {
+    uout() << str << " =";
+    for (casadi_int k = 0; k < n; ++k) uout() << " " << v[k];
+    uout() << "\n";
+  }
+
   template<typename T1>
   void init_ip(casadi_qpip_data<T1>* d) {
     // Local variables
     casadi_int k;
+    T1 margin, mid;
     const casadi_qp_prob<T1>* p = d->prob;
+    // Required margin to constraints
+    margin = .1;
     // Reset constraint count
     d->n_con = 0;
+    // Initialize constraints to zero
+    for (k = p->nx; k < p->nz; ++k) d->z[k] = 0;
     // Find interior point
     for (k = 0; k < p->nz; ++k) {
       if (d->lbz[k] > -p->inf) {
         if (d->ubz[k] < p->inf) {
           // Both upper and lower bounds
-          d->z[k] = .5 * (d->lbz[k] + d->ubz[k]);
+          mid = .5 * (d->lbz[k] + d->ubz[k]);
+          // Ensure margin to boundary, without crossing midpoint
+          if (d->z[k] < mid) {
+            d->z[k] = fmin(fmax(d->z[k], d->lbz[k] + margin), mid);
+          } else if (d->z[k] > mid) {
+            d->z[k] = fmax(fmin(d->z[k], d->ubz[k] - margin), mid);
+          }
           if (d->ubz[k] > d->lbz[k] + p->dmin) {
             d->lam_lbz[k] = 1;
             d->lam_ubz[k] = 1;
@@ -66,19 +83,16 @@ namespace casadi {
           }
         } else {
           // Only lower bound
-          d->z[k] = d->lbz[k] + 1.;
+          d->z[k] = fmax(d->z[k], d->lbz[k] + margin);
           d->lam_lbz[k] = 1;
           d->n_con++;
         }
       } else {
         if (d->ubz[k] < p->inf) {
           // Only upper bound
-          d->z[k] = d->ubz[k] - 1.;
+          d->z[k] = fmin(d->z[k], d->ubz[k] - margin);
           d->lam_ubz[k] = 1;
           d->n_con++;
-        } else {
-          // Unbounded
-          d->z[k] = 0;
         }
       }
     }
@@ -164,7 +178,7 @@ namespace casadi {
       }
     }
     // Divide mu by total number of finite constraints
-    d->mu /= d->n_con;
+    if (d->n_con > 0) d->mu /= d->n_con;
   }
 
   template<typename T1>
@@ -216,8 +230,8 @@ namespace casadi {
     const casadi_qp_prob<T1>* p = d->prob;
     // Store r_lam - dinv_lbz * rlam_lbz + dinv_ubz * rlam_ubz in dz
     casadi_copy(d->rlam, p->nz, d->dz);
-    for (k=0; k<p->nz; ++k) d->dz[k] -= d->dinv_lbz[k] * (d->rlam_lbz[k] - shift);
-    for (k=0; k<p->nz; ++k) d->dz[k] += d->dinv_ubz[k] * (d->rlam_ubz[k] - shift);
+    for (k=0; k<p->nz; ++k) d->dz[k] += d->dinv_lbz[k] * (d->rlam_lbz[k] - shift);
+    for (k=0; k<p->nz; ++k) d->dz[k] -= d->dinv_ubz[k] * (d->rlam_ubz[k] - shift);
     // Finish calculating x-component of right-hand-side and store in dz[:nx]
     for (k=0; k<p->nx; ++k) d->dz[k] += d->rz[k];
     // Copy tilde{r}_lam to dlam[nx:] (needed to calculate step in g later)
@@ -232,8 +246,8 @@ namespace casadi {
     // dlam_lbz := -rlam_lbz, dlam_ubz := -rlam_ubz
     for (k=0; k<p->nz; ++k) d->dlam_lbz[k] = shift - d->rlam_lbz[k];
     for (k=0; k<p->nz; ++k) d->dlam_ubz[k] = shift - d->rlam_ubz[k];
-    // dlam := rlam
-    for (k=0; k<p->nz; ++k) d->dlam[k] = d->rlam[k];
+    // dlam_x := rlam_x
+    for (k=0; k<p->nx; ++k) d->dlam[k] = d->rlam[k];
   }
 
   template<typename T1>
@@ -244,11 +258,11 @@ namespace casadi {
     const casadi_qp_prob<T1>* p = d->prob;
     // Scale results
     for (k=0; k<p->nz; ++k) d->dz[k] *= d->S[k];
-    // Calculate step in g, lam_g
+    // Calculate step in z(g), lam(g)
     for (k=p->nx; k<p->nz; ++k) {
-      t = d->dlam[k];
+      t = d->D[k] / (d->S[k] * d->S[k]) * (d->dz[k] - d->dlam[k]);
       d->dlam[k] = d->dz[k];
-      d->dz[k] = d->D[k] / (d->S[k] * d->S[k]) * (d->dlam[k] - t);
+      d->dz[k] = t;
     }
     // Finish calculation in dlam_lbz, dlam_ubz
     for (k=0; k<p->nz; ++k) {
@@ -259,8 +273,8 @@ namespace casadi {
       d->dlam_ubz[k] += d->lam_ubz[k] * d->dz[k];
       d->dlam_ubz[k] *= d->dinv_ubz[k];
     }
-    // Finish calculation of dlam
-    for (k=0; k<p->nz; ++k) d->rlam[k] += d->dlam_ubz[k] - d->dlam_lbz[k];
+    // Finish calculation of dlam(x)
+    for (k=0; k<p->nx; ++k) d->dlam[k] += d->dlam_ubz[k] - d->dlam_lbz[k];
   }
 
   template<typename T1>
@@ -464,13 +478,14 @@ namespace casadi {
     init_ip(&d);
     uout() << d.n_con << " finite constraints\n";
 
-    uout() << "lam_lbz =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.lam_lbz[k];
-    uout() << "\n";
+    // Transpose A
+    casadi_trans(d.nz_a, p_.sp_a, d.nz_at, p_.sp_at, d.iw);
 
-    uout() << "lam_ubz =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.lam_ubz[k];
-    uout() << "\n";
+
+    print_vec("init z", d.z, p_.nz);
+    print_vec("init lam", d.lam, p_.nz);
+    print_vec("init lam_lbz", d.lam_lbz, p_.nz);
+    print_vec("init lam_ubz", d.lam_ubz, p_.nz);
 
     // Matrix-vector multiplication
     casadi_clear(d.rz, p_.nz);
@@ -482,31 +497,16 @@ namespace casadi {
     calc_res(&d);
     uout() << "mu = " << d.mu << "\n";
 
-    uout() << "res_z =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rz[k];
-    uout() << "\n";
-
-    uout() << "res_lam =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam[k];
-    uout() << "\n";
-
-    uout() << "res_lam_lbz =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_lbz[k];
-    uout() << "\n";
-
-    uout() << "res_lam_ubz =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_ubz[k];
-    uout() << "\n";
+    print_vec("res_z", d.rz, p_.nz);
+    print_vec("res_lam", d.rlam, p_.nz);
+    print_vec("res_lam_lbz", d.rlam_lbz, p_.nz);
+    print_vec("res_lam_ubz", d.rlam_ubz, p_.nz);
 
     // Calculate diagonal entries and scaling factors
     calc_diag(&d);
 
-    uout() << "d.D =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.D[k];
-    uout() << "\n";
-    uout() << "d.S =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.S[k];
-    uout() << "\n";
+    print_vec("d.D", d.D, p_.nz);
+    print_vec("d.S", d.S, p_.nz);
 
     // Factorize KKT
     qp_factorize(&d);
@@ -516,48 +516,42 @@ namespace casadi {
     double sigma = .5;
     qp_predictor_prepare(&d, sigma * d.mu);
 
-    uout() << "dz (rhs) =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.dz[k];
-    uout() << "\n";
+    print_vec("dz (rhs)", d.dz, p_.nz);
 
     // Calculate step
     casadi_qr_solve(d.dz, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r, d.beta,
       p_.prinv, p_.pc, d.w);
 
+    print_vec("dz (sol)", d.dz, p_.nz);
+
     // Complete predictor step
     qp_predictor(&d);
+
+    print_vec("dz", d.dz, p_.nz);
+    print_vec("dlam", d.dlam, p_.nz);
+    print_vec("dlam_lbz", d.dlam_lbz, p_.nz);
+    print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
 
     // Take step
     qp_ipstep(&d, 1., 1.);
 
-    uout() << "dz =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.dz[k];
-    uout() << "\n";
+    print_vec("new z", d.z, p_.nz);
+    print_vec("new lam", d.lam, p_.nz);
 
-    uout() << "dlam =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.dlam[k];
-    uout() << "\n";
+    // Matrix-vector multiplication
+    casadi_clear(d.rz, p_.nz);
+    casadi_mv(d.nz_h, p_.sp_h, d.z, d.rz, 0);
+    casadi_mv(d.nz_a, p_.sp_a, d.lam + p_.nx, d.rz, 1);
+    casadi_mv(d.nz_a, p_.sp_a, d.z, d.rz + p_.nx, 0);
 
     // Recalculate residual
     calc_res(&d);
     uout() << "new mu = " << d.mu << "\n";
 
-    uout() << "res_z =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rz[k];
-    uout() << "\n";
-
-    uout() << "res_lam =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam[k];
-    uout() << "\n";
-
-    uout() << "res_lam_lbz =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_lbz[k];
-    uout() << "\n";
-
-    uout() << "res_lam_ubz =";
-    for (casadi_int k = 0; k < p_.nz; ++k) uout() << " " << d.rlam_ubz[k];
-    uout() << "\n";
-
+    print_vec("new rz", d.rz, p_.nz);
+    print_vec("new rlam", d.rlam, p_.nz);
+    print_vec("new rlam_lbz", d.rlam_lbz, p_.nz);
+    print_vec("new rlam_ubz", d.rlam_ubz, p_.nz);
 
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
