@@ -611,111 +611,123 @@ namespace casadi {
     print_vec("init lam_lbz", d.lam_lbz, p_.nz);
     print_vec("init lam_ubz", d.lam_ubz, p_.nz);
 
-    // Matrix-vector multiplication
-    casadi_clear(d.rz, p_.nz);
-    casadi_mv(d.nz_h, p_.sp_h, d.z, d.rz, 0);
-    casadi_mv(d.nz_a, p_.sp_a, d.lam + p_.nx, d.rz, 1);
-    casadi_mv(d.nz_a, p_.sp_a, d.z, d.rz + p_.nx, 0);
+    size_t iter = 0;
+    while (true) {
 
-    // Calculate residual
-    calc_res(&d);
-    uout() << "mu = " << d.mu << "\n";
+      // Matrix-vector multiplication
+      casadi_clear(d.rz, p_.nz);
+      casadi_mv(d.nz_h, p_.sp_h, d.z, d.rz, 0);
+      casadi_mv(d.nz_a, p_.sp_a, d.lam + p_.nx, d.rz, 1);
+      casadi_mv(d.nz_a, p_.sp_a, d.z, d.rz + p_.nx, 0);
 
-    print_vec("res_z", d.rz, p_.nz);
-    print_vec("res_lam", d.rlam, p_.nz);
-    print_vec("res_lam_lbz", d.rlam_lbz, p_.nz);
-    print_vec("res_lam_ubz", d.rlam_ubz, p_.nz);
+      // Calculate residual
+      calc_res(&d);
+      uout() << "mu = " << d.mu << "\n";
 
-    // Calculate diagonal entries and scaling factors
-    calc_diag(&d);
+      print_vec("res_z", d.rz, p_.nz);
+      print_vec("res_lam", d.rlam, p_.nz);
+      print_vec("res_lam_lbz", d.rlam_lbz, p_.nz);
+      print_vec("res_lam_ubz", d.rlam_ubz, p_.nz);
 
-    print_vec("d.D", d.D, p_.nz);
-    print_vec("d.S", d.S, p_.nz);
+      uout() << "iteration " << iter << "\n";
 
-    // Factorize KKT
-    qp_factorize(&d);
-    uout() << "sing = " << d.sing << "\n";
+      // Stop, if converged or max iter
+      if (iter >= p_.max_iter) break;
 
-    // Prepare predictor step
-    qp_predictor_prepare(&d);
+      // Start new iteration
+      iter++;
 
-    print_vec("dz (rhs)", d.dz, p_.nz);
+      // Calculate diagonal entries and scaling factors
+      calc_diag(&d);
 
-    // Calculate step
-    casadi_qr_solve(d.dz, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r, d.beta,
-      p_.prinv, p_.pc, d.w);
+      print_vec("d.D", d.D, p_.nz);
+      print_vec("d.S", d.S, p_.nz);
 
-    print_vec("dz (sol)", d.dz, p_.nz);
+      // Factorize KKT
+      qp_factorize(&d);
+      uout() << "sing = " << d.sing << "\n";
 
-    // Complete predictor step
-    qp_predictor(&d);
+      // Prepare predictor step
+      qp_predictor_prepare(&d);
 
-    uout() << "predictor step:\n";
-    print_vec("dz", d.dz, p_.nz);
-    print_vec("dlam", d.dlam, p_.nz);
-    print_vec("dlam_lbz", d.dlam_lbz, p_.nz);
-    print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
+      print_vec("dz (rhs)", d.dz, p_.nz);
 
-    // Maximum primal and dual step
-    double alpha_pr, alpha_du;
-    qp_stepsize(&d, &alpha_pr, &alpha_du, 1.);
-    double alpha = fmin(alpha_pr, alpha_du);
-    uout() << "alpha_pr (aff) = " << alpha_pr << "\n";
-    uout() << "alpha_du (aff) = " << alpha_du << "\n";
-    uout() << "alpha = (aff) " << alpha << "\n";
+      // Calculate step
+      casadi_qr_solve(d.dz, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r, d.beta,
+        p_.prinv, p_.pc, d.w);
 
-    // Calculate sigma
-    double sigma = qp_calc_sigma(&d, alpha);
-    uout() << "sigma = " << sigma << "\n";
+      print_vec("dz (sol)", d.dz, p_.nz);
 
-    // Prepare corrector step
-    qp_corrector_prepare(&d, sigma * d.mu);
+      // Complete predictor step
+      qp_predictor(&d);
 
-    // Solve KKT system
-    print_vec("rz (rhs)", d.rz, p_.nz);
-    casadi_qr_solve(d.rz, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r, d.beta,
-      p_.prinv, p_.pc, d.w);
-    print_vec("rz (sol)", d.rz, p_.nz);
+      uout() << "predictor step:\n";
+      print_vec("dz", d.dz, p_.nz);
+      print_vec("dlam", d.dlam, p_.nz);
+      print_vec("dlam_lbz", d.dlam_lbz, p_.nz);
+      print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
 
-    // Complete predictor step
-    qp_corrector(&d);
+      // Maximum primal and dual step
+      double alpha_pr, alpha_du;
+      qp_stepsize(&d, &alpha_pr, &alpha_du, 1.);
+      double alpha = fmin(alpha_pr, alpha_du);
+      uout() << "alpha_pr (aff) = " << alpha_pr << "\n";
+      uout() << "alpha_du (aff) = " << alpha_du << "\n";
+      uout() << "alpha = (aff) " << alpha << "\n";
 
-    uout() << "predictor + corrector step:\n";
-    print_vec("dz", d.dz, p_.nz);
-    print_vec("dlam", d.dlam, p_.nz);
-    print_vec("dlam_lbz", d.dlam_lbz, p_.nz);
-    print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
+      // Calculate sigma
+      double sigma = qp_calc_sigma(&d, alpha);
+      uout() << "sigma = " << sigma << "\n";
 
-    // Damping paramter
-    double tau = .9;
+      // Prepare corrector step
+      qp_corrector_prepare(&d, sigma * d.mu);
 
-    // Maximum primal and dual step
-    qp_stepsize(&d, &alpha_pr, &alpha_du, tau);
-    alpha = fmin(alpha_pr, alpha_du);
-    uout() << "alpha_pr = " << alpha_pr << "\n";
-    uout() << "alpha_du = " << alpha_du << "\n";
-    uout() << "alpha = " << alpha << "\n";
+      // Solve KKT system
+      print_vec("rz (rhs)", d.rz, p_.nz);
+      casadi_qr_solve(d.rz, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r, d.beta,
+        p_.prinv, p_.pc, d.w);
+      print_vec("rz (sol)", d.rz, p_.nz);
 
-    // Take step
-    qp_ipstep(&d, alpha, alpha);
+      // Complete predictor step
+      qp_corrector(&d);
 
-    print_vec("new z", d.z, p_.nz);
-    print_vec("new lam", d.lam, p_.nz);
+      uout() << "predictor + corrector step:\n";
+      print_vec("dz", d.dz, p_.nz);
+      print_vec("dlam", d.dlam, p_.nz);
+      print_vec("dlam_lbz", d.dlam_lbz, p_.nz);
+      print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
 
-    // Matrix-vector multiplication
-    casadi_clear(d.rz, p_.nz);
-    casadi_mv(d.nz_h, p_.sp_h, d.z, d.rz, 0);
-    casadi_mv(d.nz_a, p_.sp_a, d.lam + p_.nx, d.rz, 1);
-    casadi_mv(d.nz_a, p_.sp_a, d.z, d.rz + p_.nx, 0);
+      // Damping paramter
+      double tau = .9;
 
-    // Recalculate residual
-    calc_res(&d);
-    uout() << "new mu = " << d.mu << "\n";
+      // Maximum primal and dual step
+      qp_stepsize(&d, &alpha_pr, &alpha_du, tau);
+      alpha = fmin(alpha_pr, alpha_du);
+      uout() << "alpha_pr = " << alpha_pr << "\n";
+      uout() << "alpha_du = " << alpha_du << "\n";
+      uout() << "alpha = " << alpha << "\n";
 
-    print_vec("new rz", d.rz, p_.nz);
-    print_vec("new rlam", d.rlam, p_.nz);
-    print_vec("new rlam_lbz", d.rlam_lbz, p_.nz);
-    print_vec("new rlam_ubz", d.rlam_ubz, p_.nz);
+      // Take step
+      qp_ipstep(&d, alpha, alpha);
+
+      print_vec("new z", d.z, p_.nz);
+      print_vec("new lam", d.lam, p_.nz);
+
+      // Matrix-vector multiplication
+      casadi_clear(d.rz, p_.nz);
+      casadi_mv(d.nz_h, p_.sp_h, d.z, d.rz, 0);
+      casadi_mv(d.nz_a, p_.sp_a, d.lam + p_.nx, d.rz, 1);
+      casadi_mv(d.nz_a, p_.sp_a, d.z, d.rz + p_.nx, 0);
+
+      // Recalculate residual
+      calc_res(&d);
+      uout() << "new mu = " << d.mu << "\n";
+
+      print_vec("new rz", d.rz, p_.nz);
+      print_vec("new rlam", d.rlam, p_.nz);
+      print_vec("new rlam_lbz", d.rlam_lbz, p_.nz);
+      print_vec("new rlam_ubz", d.rlam_ubz, p_.nz);
+    }
 
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
