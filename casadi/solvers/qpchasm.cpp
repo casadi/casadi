@@ -332,6 +332,34 @@ namespace casadi {
     }
   }
 
+  template<typename T1>
+  T1 qp_calc_sigma(casadi_qpip_data<T1>* d, T1 alpha) {
+    // Local variables
+    T1 sigma;
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Calculate projected mu (and save to sigma variable)
+    sigma = 0;
+    for (k = 0; k < p->nz; ++k) {
+      // Lower bound
+      if (d->lbz[k] > -p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
+        sigma += (d->lam_lbz[k] + alpha * d->dlam_lbz[k])
+          * (d->z[k] + alpha * d->dz[k] - d->lbz[k]);
+      }
+      // Upper bound
+      if (d->ubz[k] < p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
+        sigma += (d->lam_ubz[k] + alpha * d->dlam_ubz[k])
+          * (d->ubz[k] + alpha * d->dz[k] - d->z[k]);
+      }
+    }
+    // Divide mu by total number of finite constraints
+    if (d->n_con > 0) sigma /= d->n_con;
+    // Finish calculation of sigma := (mu_aff / mu)^3
+    sigma /= d->mu;
+    sigma *= sigma * sigma;
+    return sigma;
+  }
+
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
@@ -555,7 +583,7 @@ namespace casadi {
     uout() << "sing = " << d.sing << "\n";
 
     // Prepare predictor step
-    double sigma = .5;
+    double sigma = 0.;
     qp_predictor_prepare(&d, sigma * d.mu);
 
     print_vec("dz (rhs)", d.dz, p_.nz);
@@ -575,10 +603,13 @@ namespace casadi {
     print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
 
     // Maximum primal and dual step
-    double alpha_pr, alpha_du;
-    qp_stepsize(&d, &alpha_pr, &alpha_du);
-    uout() << "alpha_pr = " << alpha_pr << "\n";
-    uout() << "alpha_du = " << alpha_du << "\n";
+    double alpha_aff;
+    qp_stepsize(&d, &alpha_aff, &alpha_aff);
+    uout() << "alpha_aff = " << alpha_aff << "\n";
+
+    // Calculate sigma
+    sigma = qp_calc_sigma(&d, alpha_aff);
+    uout() << "sigma = " << sigma << "\n";
 
     // Take step
     qp_ipstep(&d, 1., 1.);
