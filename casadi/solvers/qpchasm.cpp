@@ -307,6 +307,31 @@ namespace casadi {
     for (k=0; k<p->nz; ++k) d->lam_ubz[k] += alpha_du * d->dlam_ubz[k];
   }
 
+  template<typename T1>
+  void qp_stepsize(casadi_qpip_data<T1>* d, T1* alpha_pr, T1* alpha_du) {
+    // Local variables
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Reset both primal and dual step (note: may be the same variable)
+    *alpha_pr = *alpha_du = 1;
+    // Primal step
+    for (k=0; k<p->nz; ++k) {
+      if (d->dz[k] > 0 && d->ubz[k] < p->inf) {
+        *alpha_pr = fmin(*alpha_pr, (d->ubz[k] - d->z[k]) / d->dz[k]);
+      } else if (d->dz[k] < 0 && d->lbz[k] > -p->inf) {
+        *alpha_pr = fmin(*alpha_pr, (d->lbz[k] - d->z[k]) / d->dz[k]);
+      }
+    }
+    // Dual step
+    for (k=0; k<p->nz; ++k) {
+      if (d->dlam_lbz[k] < 0. && d->lam_lbz[k] > 0.) {
+        *alpha_du = fmin(*alpha_du, -d->lam_lbz[k] / d->dlam_lbz[k]);
+      } else if (d->dlam_ubz[k] < 0. && d->lam_ubz[k] > 0.) {
+        *alpha_du = fmin(*alpha_du, -d->lam_ubz[k] / d->dlam_ubz[k]);
+      }
+    }
+  }
+
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
@@ -548,6 +573,12 @@ namespace casadi {
     print_vec("dlam", d.dlam, p_.nz);
     print_vec("dlam_lbz", d.dlam_lbz, p_.nz);
     print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
+
+    // Maximum primal and dual step
+    double alpha_pr, alpha_du;
+    qp_stepsize(&d, &alpha_pr, &alpha_du);
+    uout() << "alpha_pr = " << alpha_pr << "\n";
+    uout() << "alpha_du = " << alpha_du << "\n";
 
     // Take step
     qp_ipstep(&d, 1., 1.);
