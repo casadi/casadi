@@ -308,13 +308,13 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_stepsize(casadi_qpip_data<T1>* d, T1* alpha_pr, T1* alpha_du) {
+  void qp_stepsize(casadi_qpip_data<T1>* d, T1* alpha_pr, T1* alpha_du,
+      T1 tau) {
     // Local variables
     casadi_int k;
     const casadi_qp_prob<T1>* p = d->prob;
-    // Reset both primal and dual step (note: may be the same variable)
-    *alpha_pr = *alpha_du = 1;
     // Primal step
+    *alpha_pr = 1. / tau;
     for (k=0; k<p->nz; ++k) {
       if (d->dz[k] > 0 && d->ubz[k] < p->inf) {
         *alpha_pr = fmin(*alpha_pr, (d->ubz[k] - d->z[k]) / d->dz[k]);
@@ -322,7 +322,9 @@ namespace casadi {
         *alpha_pr = fmin(*alpha_pr, (d->lbz[k] - d->z[k]) / d->dz[k]);
       }
     }
+    *alpha_pr *= tau;
     // Dual step
+    *alpha_du = 1. / tau;
     for (k=0; k<p->nz; ++k) {
       if (d->dlam_lbz[k] < 0. && d->lam_lbz[k] > 0.) {
         *alpha_du = fmin(*alpha_du, -d->lam_lbz[k] / d->dlam_lbz[k]);
@@ -330,6 +332,7 @@ namespace casadi {
         *alpha_du = fmin(*alpha_du, -d->lam_ubz[k] / d->dlam_ubz[k]);
       }
     }
+    *alpha_du *= tau;
   }
 
   template<typename T1>
@@ -603,8 +606,11 @@ namespace casadi {
     print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
 
     // Maximum primal and dual step
-    double alpha_aff;
-    qp_stepsize(&d, &alpha_aff, &alpha_aff);
+    double alpha_aff_pr, alpha_aff_du;
+    qp_stepsize(&d, &alpha_aff_pr, &alpha_aff_du, 1.);
+    double alpha_aff = fmin(alpha_aff_pr, alpha_aff_du);
+    uout() << "alpha_aff_pr = " << alpha_aff_pr << "\n";
+    uout() << "alpha_aff_du = " << alpha_aff_du << "\n";
     uout() << "alpha_aff = " << alpha_aff << "\n";
 
     // Calculate sigma
