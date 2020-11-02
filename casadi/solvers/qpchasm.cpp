@@ -241,14 +241,14 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_predictor_prepare(casadi_qpip_data<T1>* d, T1 shift) {
+  void qp_predictor_prepare(casadi_qpip_data<T1>* d) {
     // Local variables
     casadi_int k;
     const casadi_qp_prob<T1>* p = d->prob;
     // Store r_lam - dinv_lbz * rlam_lbz + dinv_ubz * rlam_ubz in dz
     casadi_copy(d->rlam, p->nz, d->dz);
-    for (k=0; k<p->nz; ++k) d->dz[k] += d->dinv_lbz[k] * (d->rlam_lbz[k] - shift);
-    for (k=0; k<p->nz; ++k) d->dz[k] -= d->dinv_ubz[k] * (d->rlam_ubz[k] - shift);
+    for (k=0; k<p->nz; ++k) d->dz[k] += d->dinv_lbz[k] * d->rlam_lbz[k];
+    for (k=0; k<p->nz; ++k) d->dz[k] -= d->dinv_ubz[k] * d->rlam_ubz[k];
     // Finish calculating x-component of right-hand-side and store in dz[:nx]
     for (k=0; k<p->nx; ++k) d->dz[k] += d->rz[k];
     // Copy tilde{r}_lam to dlam[nx:] (needed to calculate step in g later)
@@ -261,8 +261,8 @@ namespace casadi {
     // Scale and negate right-hand-side
     for (k=0; k<p->nz; ++k) d->dz[k] *= -d->S[k];
     // dlam_lbz := -rlam_lbz, dlam_ubz := -rlam_ubz
-    for (k=0; k<p->nz; ++k) d->dlam_lbz[k] = shift - d->rlam_lbz[k];
-    for (k=0; k<p->nz; ++k) d->dlam_ubz[k] = shift - d->rlam_ubz[k];
+    for (k=0; k<p->nz; ++k) d->dlam_lbz[k] = -d->rlam_lbz[k];
+    for (k=0; k<p->nz; ++k) d->dlam_ubz[k] = -d->rlam_ubz[k];
     // dlam_x := rlam_x
     for (k=0; k<p->nx; ++k) d->dlam[k] = d->rlam[k];
   }
@@ -361,6 +361,57 @@ namespace casadi {
     sigma /= d->mu;
     sigma *= sigma * sigma;
     return sigma;
+  }
+
+  template<typename T1>
+  void qp_corrector_prepare(casadi_qpip_data<T1>* d, T1 shift) {
+    // Local variables
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Modified residual in lam_lbz, lam_ubz
+    for (k=0; k<p->nz; ++k) d->rlam_lbz[k] = d->dlam_lbz[k] * d->dz[k] - shift;
+    for (k=0; k<p->nz; ++k) d->rlam_ubz[k] = d->dlam_ubz[k] * d->dz[k] - shift;
+    // Difference in tilde(r)_x, tilde(r)_lamg
+    for (k=0; k<p->nz; ++k)
+      d->rz[k] = d->dinv_lbz[k] * d->rlam_lbz[k]
+        - d->dinv_ubz[k] * d->rlam_ubz[k];
+    // Difference in tilde(r)_g
+    for (k=p->nx; k<p->nz; ++k) {
+      d->rlam[k] = d->rz[k];
+      d->rz[k] *= d->D[k] / (d->S[k] * d->S[k]);
+    }
+    // Scale and negate right-hand-side
+    for (k=0; k<p->nz; ++k) d->rz[k] *= -d->S[k];
+  }
+
+  template<typename T1>
+  void qp_corrector(casadi_qpip_data<T1>* d) {
+    // Local variables
+    T1 t;
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Scale results
+    for (k=0; k<p->nz; ++k) d->rz[k] *= d->S[k];
+    // Calculate step in z(g), lam(g)
+    for (k=p->nx; k<p->nz; ++k) {
+      t = d->D[k] / (d->S[k] * d->S[k]) * (d->rz[k] - d->rlam[k]);
+      d->rlam[k] = d->rz[k];
+      d->rz[k] = t;
+    }
+    // Update step in dz
+    for (k=0; k<p->nz; ++k) d->dz[k] += d->rz[k];
+    // Update step in lam_lbz
+    for (k=0; k<p->nz; ++k) {
+      t = d->dinv_lbz[k] * (d->rlam_lbz[k] + d->lam_lbz[k] * d->rz[k]);
+      d->dlam_lbz[k] -= t;
+      if (k<p->nx) d->dlam[k] -= t;
+    }
+    // Update step in lam_ubz
+    for (k=0; k<p->nz; ++k) {
+      t = d->dinv_ubz[k] * (d->rlam_ubz[k] - d->lam_ubz[k] * d->rz[k]);
+      d->dlam_ubz[k] -= t;
+      if (k<p->nx) d->dlam[k] += t;
+    }
   }
 
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
@@ -586,8 +637,7 @@ namespace casadi {
     uout() << "sing = " << d.sing << "\n";
 
     // Prepare predictor step
-    double sigma = 0.;
-    qp_predictor_prepare(&d, sigma * d.mu);
+    qp_predictor_prepare(&d);
 
     print_vec("dz (rhs)", d.dz, p_.nz);
 
@@ -600,25 +650,54 @@ namespace casadi {
     // Complete predictor step
     qp_predictor(&d);
 
+    uout() << "predictor step:\n";
     print_vec("dz", d.dz, p_.nz);
     print_vec("dlam", d.dlam, p_.nz);
     print_vec("dlam_lbz", d.dlam_lbz, p_.nz);
     print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
 
     // Maximum primal and dual step
-    double alpha_aff_pr, alpha_aff_du;
-    qp_stepsize(&d, &alpha_aff_pr, &alpha_aff_du, 1.);
-    double alpha_aff = fmin(alpha_aff_pr, alpha_aff_du);
-    uout() << "alpha_aff_pr = " << alpha_aff_pr << "\n";
-    uout() << "alpha_aff_du = " << alpha_aff_du << "\n";
-    uout() << "alpha_aff = " << alpha_aff << "\n";
+    double alpha_pr, alpha_du;
+    qp_stepsize(&d, &alpha_pr, &alpha_du, 1.);
+    double alpha = fmin(alpha_pr, alpha_du);
+    uout() << "alpha_pr (aff) = " << alpha_pr << "\n";
+    uout() << "alpha_du (aff) = " << alpha_du << "\n";
+    uout() << "alpha = (aff) " << alpha << "\n";
 
     // Calculate sigma
-    sigma = qp_calc_sigma(&d, alpha_aff);
+    double sigma = qp_calc_sigma(&d, alpha);
     uout() << "sigma = " << sigma << "\n";
 
+    // Prepare corrector step
+    qp_corrector_prepare(&d, sigma * d.mu);
+
+    // Solve KKT system
+    print_vec("rz (rhs)", d.rz, p_.nz);
+    casadi_qr_solve(d.rz, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r, d.beta,
+      p_.prinv, p_.pc, d.w);
+    print_vec("rz (sol)", d.rz, p_.nz);
+
+    // Complete predictor step
+    qp_corrector(&d);
+
+    uout() << "predictor + corrector step:\n";
+    print_vec("dz", d.dz, p_.nz);
+    print_vec("dlam", d.dlam, p_.nz);
+    print_vec("dlam_lbz", d.dlam_lbz, p_.nz);
+    print_vec("dlam_ubz", d.dlam_ubz, p_.nz);
+
+    // Damping paramter
+    double tau = .9;
+
+    // Maximum primal and dual step
+    qp_stepsize(&d, &alpha_pr, &alpha_du, tau);
+    alpha = fmin(alpha_pr, alpha_du);
+    uout() << "alpha_pr = " << alpha_pr << "\n";
+    uout() << "alpha_du = " << alpha_du << "\n";
+    uout() << "alpha = " << alpha << "\n";
+
     // Take step
-    qp_ipstep(&d, 1., 1.);
+    qp_ipstep(&d, alpha, alpha);
 
     print_vec("new z", d.z, p_.nz);
     print_vec("new lam", d.lam, p_.nz);
