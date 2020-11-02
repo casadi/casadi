@@ -147,14 +147,31 @@ namespace casadi {
     T1 bdiff;
     const casadi_qp_prob<T1>* p = d->prob;
     // Gradient of the Lagrangian
-    casadi_axpy(p->nx, 1., d->lam, d->rz);
     casadi_axpy(p->nx, 1., d->g, d->rz);
+    for (k = 0; k < p->nx; ++k) {
+      if (d->ubz[k] <= d->lbz[k] + p->dmin) {
+        // Fixed variable: Solve to get multiplier explicitly
+        d->lam[k] = -d->rz[k];
+        d->rz[k] = 0;
+      } else {
+        // Residual
+        d->rz[k] += d->lam[k];
+      }
+    }
     // Linear constraint
     casadi_axpy(p->na, -1., d->z + p->nx, d->rz + p->nx);
     // Multiplier consistency
-    casadi_copy(d->lam_ubz, p->nz, d->rlam);
-    casadi_axpy(p->nz, -1., d->lam_lbz, d->rlam);
-    casadi_axpy(p->nz, -1., d->lam, d->rlam);
+    for (k = 0; k < p->nz; ++k) {
+      if (d->ubz[k] <= d->lbz[k] + p->dmin) {
+        // Fixed variable: Solve to get lam_lbz, lam_ubz
+        d->lam_ubz[k] = fmax(d->lam[k], 0.);
+        d->lam_lbz[k] = fmax(-d->lam[k], 0.);
+        d->rlam[k] = 0;
+      } else {
+        // Residual
+        d->rlam[k] = d->lam_ubz[k] - d->lam_lbz[k] - d->lam[k];
+      }
+    }
     // Complementarity conditions, mu
     d->mu = 0;
     for (k = 0; k < p->nz; ++k) {
