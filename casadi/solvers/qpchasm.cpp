@@ -177,6 +177,21 @@ namespace casadi {
         d->rz[k] += d->lam[k];
       }
     }
+    // Constraint violation (only possible for linear constraints)
+    d->ipr = -1;
+    d->pr = 0;
+    for (k = p->na; k < p->nz; ++k) {
+      if (d->rz[k] + d->pr < d->lbz[k]) {
+        d->pr = d->lbz[k] - d->rz[k];
+        d->ipr = k;
+      } else if (d->rz[k] - d->pr > d->ubz[k]) {
+        d->pr = d->rz[k] - d->ubz[k];
+        d->ipr = k;
+      }
+    }
+    // Dual infeasibility
+    d->idu = -1;
+    d->du = 0;
     // Linear constraint
     casadi_axpy(p->na, -1., d->z + p->nx, d->rz + p->nx);
     // Multiplier consistency
@@ -189,6 +204,11 @@ namespace casadi {
       } else {
         // Residual
         d->rlam[k] = d->lam_ubz[k] - d->lam_lbz[k] - d->lam[k];
+        // Largest dual infeasibility
+        if (fabs(d->rlam[k]) > d->du) {
+          d->du = fabs(d->rlam[k]);
+          d->idu = k;
+        }
       }
     }
     // Complementarity conditions, mu
@@ -482,6 +502,8 @@ namespace casadi {
         d->task = QP_MV;
         d->next = QP_RESIDUAL;
         return 1;
+      default:
+        return 0;
     }
     // Error
     return 0;
@@ -695,7 +717,22 @@ namespace casadi {
         break;
       case QP_PROGRESS:
         // Print progress
-        uout() << d.iter << " " << d.mu << "\n";
+        if (print_iter_) {
+          if (d.iter % 10 == 0) {
+            // Print header
+            if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;
+            uout() << buf << "\n";
+          }
+          // Print iteration
+          d.sing = 0;
+          d.f = nan;
+          d.mina = nan;
+          d.imina = 0;
+          d.tau = nan;
+          d.msg = 0;
+          if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;
+          uout() << buf << "\n";
+        }
         break;
       case QP_FACTOR:
         // Factorize KKT
