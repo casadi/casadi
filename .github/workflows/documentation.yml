@@ -1,0 +1,77 @@
+# This action generates the documentation and then deploys it to the `gh-pages` branch.
+
+name: Documentation & Coverage
+
+on:
+  push:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out the repository under $GITHUB_WORKSPACE
+    - uses: actions/checkout@v2
+
+    # Cache the doxygen executable
+    - uses: actions/cache@v2
+      with:
+        path: |
+          /tmp/doxygen
+          /tmp/gtest
+          /tmp/lcov
+        key: ${{ runner.os }}-doc-${{ hashFiles('scripts/ci/**') }}
+    
+    - name: Install Graphviz/Dot and LCOV Perl dependencies
+      run: sudo apt-get install graphviz libjson-perl libperlio-gzip-perl perl
+
+    - name: Install LCOV
+      run: |
+        ./scripts/ci/install-lcov.sh /tmp/lcov
+        echo "::add-path::/tmp/lcov/bin"
+
+    # Download and build doxygen (if not cached already)
+    - name: Install Doxygen
+      run: |
+        ./scripts/ci/install-doxygen.sh /tmp/doxygen
+        echo "::add-path::/tmp/doxygen/bin"
+
+    - name: Show Doxygen version
+      run: |
+        which doxygen
+        doxygen --version
+
+    - name: Install Google Test
+      run: ./ci/install-gtest.sh /tmp/gtest
+      working-directory: scripts
+
+    # Create the `gh-pages` branch if it doesn't exist already, check it out, 
+    # and copy it to /tmp/staging.
+    - name: Create staging area
+      run: |
+        rm -rf /tmp/staging
+        git fetch origin gh-pages:gh-pages ||:
+        git checkout gh-pages || \
+        { git checkout --orphan gh-pages && git rm -rf . && git clean -fxd ; }
+        cp -ar $GITHUB_WORKSPACE/ /tmp/staging
+        git checkout ${GITHUB_REF##*/}
+
+    # Generate the documentation and save it in /tmp/staging
+    - name: Generate documentation
+      run: ./scripts/ci/gen-docs.sh /tmp/staging
+      env:
+        CC: gcc-9
+        CXX: g++-9
+        CMAKE_PREFIX_PATH: "/tmp/gtest"
+
+    # Commit the new documentation, squash the commits, and push it to GitHub
+    - name: Commit and push documention
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
+        commithash=$(git rev-parse HEAD)
+        cd /tmp/staging
+        git add .
+        git commit -m "Documentation for ${commithash}" && \
+        git reset $(git commit-tree HEAD^{tree} -m "Documentation for ${commithash}") && \
+        git push -f origin gh-pages ||:

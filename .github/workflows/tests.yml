@@ -1,0 +1,33 @@
+name: CI Tests
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/cache@v2
+      with:
+        path: "/tmp/gtest"
+        key: ${{ runner.os }}-${{ hashFiles('scripts/ci/install-gtest.sh') }}
+    - name: Install Google Test
+      run: ./ci/install-gtest.sh /tmp/gtest
+      working-directory: scripts
+    - name: Create build directory
+      run: mkdir -p build
+    - name: CMake
+      run: cmake .. -DCMAKE_BUILD_TYPE=Asan
+      working-directory: build
+      env:
+        CC: gcc-9
+        CXX: g++-9
+        CMAKE_PREFIX_PATH: "/tmp/gtest"
+    - name: Build
+      run: make -j4
+      working-directory: build
+    - name: Run tests
+      run: ./test/tests
+      working-directory: build
