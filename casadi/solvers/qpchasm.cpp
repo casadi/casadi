@@ -243,6 +243,12 @@ namespace casadi {
     }
     // Divide mu by total number of finite constraints
     if (d->n_con > 0) d->mu /= d->n_con;
+    // uout() << "residual\n";
+    // print_vec("rz: ", d->rz, p->nz);
+    // print_vec("rlam: ", d->rlam, p->nz);
+    // print_vec("rlam_ubz: ", d->rlam_ubz, p->nz);
+    // print_vec("rlam_lbz: ", d->rlam_lbz, p->nz);
+    // uout() << "mu = " << d->mu << "\n";
   }
 
   template<typename T1>
@@ -363,20 +369,9 @@ namespace casadi {
     // Maximum primal and dual step
     qp_stepsize(d, &alpha, &alpha, 1.);
     // Calculate sigma
-    // uout() << "predictor step\n";
-    // uout() << "alpha = " << alpha << "\n";
-    // print_vec("dz: ", d->dz, p->nz);
-    // print_vec("dlam: ", d->dlam, p->nz);
-    // print_vec("dlam_ubz: ", d->dlam_ubz, p->nz);
-    // print_vec("dlam_lbz: ", d->dlam_lbz, p->nz);
-
-
     sigma = qp_calc_sigma(d, alpha);
-
     // uout() << "sigma = " << sigma << "\n";
     // uout() << "mu = " << d->mu << "\n";
-
-
     // Prepare corrector step
     qp_corrector_prepare(d, sigma * d->mu);
     // Solve to get step
@@ -484,7 +479,6 @@ namespace casadi {
     }
     // Scale and negate right-hand-side
     for (k=0; k<p->nz; ++k) d->rz[k] *= -d->S[k];
-    // print_vec("qp_corrector_prepare: ", d->rz, p->nz);
   }
 
   template<typename T1>
@@ -501,20 +495,22 @@ namespace casadi {
       d->rlam[k] = d->rz[k];
       d->rz[k] = t;
     }
-    // Update step in dz
+    // Update step in dz, dlam
     for (k=0; k<p->nz; ++k) d->dz[k] += d->rz[k];
+    for (k=p->nx; k<p->nz; ++k) d->dlam[k] += d->rlam[k];
     // Update step in lam_lbz
     for (k=0; k<p->nz; ++k) {
-      t = d->dinv_lbz[k] * (d->rlam_lbz[k] + d->lam_lbz[k] * d->rz[k]);
-      d->dlam_lbz[k] -= t;
+      t = d->dinv_lbz[k] * (-d->rlam_lbz[k] - d->lam_lbz[k] * d->rz[k]);
+      d->dlam_lbz[k] += t;
       if (k<p->nx) d->dlam[k] -= t;
     }
     // Update step in lam_ubz
     for (k=0; k<p->nz; ++k) {
-      t = d->dinv_ubz[k] * (d->rlam_ubz[k] - d->lam_ubz[k] * d->rz[k]);
-      d->dlam_ubz[k] -= t;
+      t = d->dinv_ubz[k] * (-d->rlam_ubz[k] + d->lam_ubz[k] * d->rz[k]);
+      d->dlam_ubz[k] += t;
       if (k<p->nx) d->dlam[k] += t;
     }
+
     // Maximum primal and dual step
     qp_stepsize(d, &alpha, &alpha, .9);
 
@@ -815,6 +811,9 @@ namespace casadi {
         break;
       }
     } while (qp_ip(&d));
+
+    print_vec("primal solution: ", d.z, p_.nz);
+    print_vec("dual solution: ", d.lam, p_.nz);
 
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
