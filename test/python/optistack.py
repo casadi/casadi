@@ -975,5 +975,21 @@ class OptiStacktests(inherit_from):
       self.checkarray(res,DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
       self.checkarray(sol.value(opti.f),10-16/sqrt(5)+7-4/sqrt(5),conic,digits=7)
 
+    def test_subject_to_symbols_clear(self):
+
+      opti = Opti()
+      x = opti.variable()
+      opti.subject_to(x>=1)
+      opti.minimize(x**2)
+
+      opti.subject_to()
+      opti.subject_to(x<=5)
+
+      opti.solver(nlpsolver,nlpsolver_options)
+      sol = opti.solve()
+
+      self.assertEqual(len(opti.debug.symvar()),2)
+      self.assertEqual(len(opti.initial()),2)
+
 if __name__ == '__main__':
     unittest.main()
