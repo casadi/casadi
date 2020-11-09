@@ -197,6 +197,13 @@ namespace casadi {
 
     // print_vec("A * x: ", d->rz + p->nx, p->na);
     // print_vec("g: ", d->z + p->nx, p->na);
+    // print_vec("lbg: ", d->lbz + p->nx, p->na);
+    // print_vec("ubg: ", d->ubz + p->nx, p->na);
+    //
+    // print_vec("g: ", d->g, p->nx);
+    //
+    // print_vec("lbx: ", d->lbz, p->nx);
+    // print_vec("ubx: ", d->ubz, p->nx);
 
     casadi_axpy(p->na, -1., d->z + p->nx, d->rz + p->nx);
 
@@ -368,6 +375,7 @@ namespace casadi {
 
     // Maximum primal and dual step
     qp_stepsize(d, &alpha, &alpha, 1.);
+
     // Calculate sigma
     sigma = qp_calc_sigma(d, alpha);
     // uout() << "sigma = " << sigma << "\n";
@@ -475,7 +483,7 @@ namespace casadi {
     // print_vec("rz: ", d->rz, p->nz);
     for (k=p->nx; k<p->nz; ++k) {
       d->rlam[k] = d->rz[k];
-      d->rz[k] *= -d->D[k] / (d->S[k] * d->S[k]);
+      d->rz[k] *= d->D[k] / (d->S[k] * d->S[k]);
     }
     // Scale and negate right-hand-side
     for (k=0; k<p->nz; ++k) d->rz[k] *= -d->S[k];
@@ -513,7 +521,6 @@ namespace casadi {
 
     // Maximum primal and dual step
     qp_stepsize(d, &alpha, &alpha, .9);
-
     // uout() << "corrector step\n";
     // uout() << "alpha = " << alpha << "\n";
     // print_vec("dz: ", d->dz, p->nz);
@@ -755,13 +762,19 @@ namespace casadi {
     init_ip(&d);
     uout() << d.n_con << " finite constraints\n";
 
+    // casadi::DM H(H_, std::vector<double>(d.nz_h, d.nz_h + H_.nnz()));
+    // uout() << "H = " << H << "\n";
+    //
+    // casadi::DM A(A_, std::vector<double>(d.nz_a, d.nz_a + A_.nnz()));
+    // uout() << "A = " << A << "\n";
+
     // Transpose A
     casadi_trans(d.nz_a, p_.sp_a, d.nz_at, p_.sp_at, d.iw);
 
-    print_vec("init z", d.z, p_.nz);
-    print_vec("init lam", d.lam, p_.nz);
-    print_vec("init lam_lbz", d.lam_lbz, p_.nz);
-    print_vec("init lam_ubz", d.lam_ubz, p_.nz);
+    // print_vec("init z", d.z, p_.nz);
+    // print_vec("init lam", d.lam, p_.nz);
+    // print_vec("init lam_lbz", d.lam_lbz, p_.nz);
+    // print_vec("init lam_ubz", d.lam_ubz, p_.nz);
 
     // Reverse communication loop
     do {

@@ -41,6 +41,11 @@ namespace casadi {
   struct casadi_qpip_prob : public casadi_qp_prob<T1> {
   };
 
+  enum Task {QP_MV, QP_PROGRESS, QP_FACTOR, QP_SOLVE};
+
+  enum Next {QP_RESIDUAL, QP_NEWITER, QP_PREPARE, QP_PREDICTOR,
+    QP_CORRECTOR};
+
   template<typename T1>
   struct casadi_qpip_data : public casadi_qp_data<T1> {
     // Diagonal entries
@@ -65,6 +70,12 @@ namespace casadi {
     T1 mu;
     // Number of finite constraints
     casadi_int n_con;
+    // User task
+    enum Task task;
+    // Next step
+    enum Next next;
+    // Linear system
+    T1* linsys;
   };
 
   struct CASADI_CONIC_QPCHASM_EXPORT QpchasmMemory : public ConicMemory {
