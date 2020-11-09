@@ -101,6 +101,7 @@ public:
 
   /// @{
   /// Obtain value of expression at the current value
+  /// Optionally set different values for some symbol in expression
   DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
   DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const { return x; }
   DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>()) const {

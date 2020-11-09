@@ -1080,13 +1080,15 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   }
 
   bool undecided_vars = false;
+
   std::vector<DM> x_num;
   for (const auto& e : x) {
     casadi_int i = meta(e).i;
     x_num.push_back(store_latest_.at(OPTI_VAR).at(i));
     undecided_vars |= override_num(temp[OPTI_VAR], x_num, i);
+    // if numeric value x_var is overridden set undecided_vars true
   }
-
+  // lam
   std::vector<DM> lam_num;
   for (const auto& e : lam) {
     casadi_int i = meta(e).i;
