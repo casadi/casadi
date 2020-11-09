@@ -167,6 +167,7 @@ public:
   MX dual(const MX& m) const;
 
   void assert_active_symbol(const MX& m) const;
+  void assert_active_symbol_(const MX& m, const std::string& error_msg) const;
 
   std::vector<MX> active_symvar(VariableType type) const;
   std::vector<DM> active_values(VariableType type) const;
@@ -351,7 +352,7 @@ private:
   std::map< VariableType, std::vector<DM> > store_initial_, store_latest_;
 
   /// Is symbol present in problem?
-  std::vector<bool> symbol_active_;
+  std::map<casadi_int, bool> symbol_active_;
 
   /// Solver
   Function solver_;
