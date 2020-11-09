@@ -31,6 +31,13 @@
 using namespace std;
 namespace casadi {
 
+casadi_int OptiNode::instance_count_ = 0;
+
+std::map<VariableType, std::string> OptiNode::VariableType2String_ =
+  {{OPTI_VAR, "decision variable"},
+   {OPTI_PAR, "parameter"},
+   {OPTI_DUAL_G, "dual variable"}};
+
 class InternalOptiCallback : public FunctionInternal {
   public:
 
@@ -93,9 +100,8 @@ class InternalOptiCallback : public FunctionInternal {
 };
 
 OptiNode* OptiNode::create(const std::string& problem_type) {
-return new OptiNode(problem_type);
+  return new OptiNode(problem_type);
 }
-
 
 void OptiNode::callback_class(OptiCallback* callback) {
   user_callback_ = callback;
@@ -512,8 +518,6 @@ void OptiNode::assert_has_con(const MX& m) const {
   casadi_assert(has_con(m), "Constraint not present in Opti stack.");
 }
 
-casadi_int OptiNode::instance_count_ = 0;
-
 bool OptiNode::parse_opti_name(const std::string& name, VariableType& vt) const {
   casadi_int i = name.find("opti");
   if (i!=0) return false;
@@ -541,10 +545,6 @@ std::string OptiNode::variable_type_to_string(VariableType vt) const {
   return it->second;
 
 }
-std::map<VariableType, std::string> OptiNode::VariableType2String_ =
-  {{OPTI_VAR, "decision variable"},
-   {OPTI_PAR, "parameter"},
-   {OPTI_DUAL_G, "dual variable"}};
 
 std::vector<MX> OptiNode::initial() const {
   std::vector<MX> ret;
@@ -691,6 +691,15 @@ std::vector<MX> OptiNode::symvar() const {
 
 std::vector<MX> OptiNode::symvar(const MX& expr) const {
   return sort(MX::symvar(expr));
+}
+
+std::vector<MX> OptiNode::symvar(const MX& expr, VariableType type) const {
+  std::vector<MX> ret;
+  for (const auto& d : symvar(expr)) {
+    if (meta(d).type==type) ret.push_back(d);
+  }
+
+  return ret;
 }
 
 std::vector<MX> OptiNode::ineq_unchain(const MX& a, bool& flipped) {
@@ -917,15 +926,6 @@ void OptiNode::subject_to() {
   count_dual_ = 0;
 }
 
-std::vector<MX> OptiNode::symvar(const MX& expr, VariableType type) const {
-  std::vector<MX> ret;
-  for (const auto& d : symvar(expr)) {
-    if (meta(d).type==type) ret.push_back(d);
-  }
-
-  return ret;
-}
-
 void OptiNode::res(const DMDict& res) {
   const std::vector<double> & x_v = res.at("x").nonzeros();
   for (const auto &v : active_symvar(OPTI_VAR)) {
@@ -1000,10 +1000,8 @@ OptiSol OptiNode::solve(bool accept_limit) {
 
   return Opti(this);
 }
-
 // Solve the problem
 void OptiNode::solve_prepare() {
-
 
   // Verify the constraint types
   for (const auto& g : g_) {
