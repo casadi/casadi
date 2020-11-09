@@ -921,6 +921,12 @@ void OptiNode::subject_to(const MX& g) {
 void OptiNode::subject_to() {
   mark_problem_dirty();
   g_.clear();
+
+  // Remove symbols associated_with existing constraints
+  for (casadi_int i=0; i<symbols_.size(); i++) {
+    if (get_meta(symbols_[i]).type == OPTI_DUAL_G) symbols_.erase(symbols_.begin()+i);
+  }
+
   store_initial_[OPTI_DUAL_G].clear();
   store_latest_[OPTI_DUAL_G].clear();
   count_dual_ = 0;
