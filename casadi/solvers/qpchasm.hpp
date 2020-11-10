@@ -136,9 +136,6 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
-    /** \brief Generate code for the function body */
-    void codegen_body(CodeGenerator& g) const override;
-
     /// A documentation string
     static const std::string meta_doc;
     // Memory structure

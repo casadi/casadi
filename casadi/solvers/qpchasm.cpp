@@ -567,6 +567,59 @@ namespace casadi {
     return 0;
   }
 
+  template<typename T1>
+  int ip_qp_print_header(casadi_qpip_data<T1>* d, char* buf, size_t buf_sz) {
+    int flag;
+    // Print to string
+    flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s  %4s",
+            "Iter", "Sing", "mu", "|pr|", "con", "|du|", "var",
+            "min_R", "con", "last_tau", "Note");
+    // Check if error
+    if (flag < 0) {
+      d->status = QP_PRINTING_ERROR;
+      return 1;
+    }
+    // Successful return
+    return 0;
+  }
+
+  // SYMBOL "qp_print_iteration"
+  template<typename T1>
+  int ip_qp_print_iteration(casadi_qpip_data<T1>* d, char* buf, int buf_sz) {
+    int flag;
+    // Print iteration data without note to string
+    flag = snprintf(buf, buf_sz,
+      "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
+      static_cast<int>(d->iter), static_cast<int>(d->sing), d->mu, d->pr,
+      static_cast<int>(d->ipr), d->du, static_cast<int>(d->idu),
+      d->mina, static_cast<int>(d->imina), d->tau);
+    // Check if error
+    if (flag < 0) {
+      d->status = QP_PRINTING_ERROR;
+      return 1;
+    }
+    // Rest of buffer reserved for iteration note
+    buf += flag;
+    buf_sz -= flag;
+    // Print iteration note, if any
+    if (d->msg) {
+      if (d->msg_ind > -2) {
+        flag = snprintf(buf, buf_sz, "%s, i=%d", d->msg, static_cast<int>(d->msg_ind));
+      } else {
+        flag = snprintf(buf, buf_sz, "%s", d->msg);
+      }
+      // Check if error
+      if (flag < 0) {
+        d->status = QP_PRINTING_ERROR;
+        return 1;
+      }
+    }
+    // Successful return
+    return 0;
+  }
+
+
+
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
@@ -756,7 +809,10 @@ namespace casadi {
     d.sing = -1;
     d.mina = nan;
     d.imina = -1;
-
+    d.f = nan;
+    d.msg = 0;
+    d.msg_ind = -2;
+    d.tau = -1;
     uout() << d.n_con << " finite constraints\n";
 
     // casadi::DM H(H_, std::vector<double>(d.nz_h, d.nz_h + H_.nnz()));
@@ -794,17 +850,11 @@ namespace casadi {
         if (print_iter_) {
           if (d.iter % 10 == 0) {
             // Print header
-            if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;
+            if (ip_qp_print_header(&d, buf, sizeof(buf))) break;
             uout() << buf << "\n";
           }
           // Print iteration
-          d.f = nan;
-          // Additional outputs
-          std::stringstream ss;
-          ss << "mu = " << d.mu;
-          d.msg = ss.str().c_str();
-          d.msg_ind = -2;
-          if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;
+          if (ip_qp_print_iteration(&d, buf, sizeof(buf))) break;
           uout() << buf << "\n";
         }
         break;
@@ -881,83 +931,6 @@ namespace casadi {
     if (verbose_) casadi_warning(m->return_status);
     m->success = d.status == QP_SUCCESS;
     return 0;
-  }
-
-  void Qpchasm::codegen_body(CodeGenerator& g) const {
-    g.add_auxiliary(CodeGenerator::AUX_QP);
-    if (print_iter_) g.add_auxiliary(CodeGenerator::AUX_PRINTF);
-    g.local("d", "struct casadi_qp_data");
-    g.local("p", "struct casadi_qp_prob");
-    g.local("flag", "int");
-    if (print_iter_ || print_lincomb_) g.local("buf[121]", "char");
-    if (print_lincomb_) g.local("k", "casadi_int");
-
-    // Setup memory structure
-    g << "p.sp_a = " << g.sparsity(A_) << ";\n";
-    g << "p.sp_h = " << g.sparsity(H_) << ";\n";
-    g << "p.sp_at = " << g.sparsity(AT_) << ";\n";
-    g << "p.sp_kkt = " << g.sparsity(kkt_) << ";\n";
-    g << "p.sp_v = " << g.sparsity(sp_v_) << ";\n";
-    g << "p.sp_r = " << g.sparsity(sp_r_) << ";\n";
-    g << "p.prinv = " << g.constant(prinv_) << ";\n";
-    g << "p.pc =  " << g.constant(pc_) << ";\n";
-    g << "casadi_qp_setup(&p);\n";
-
-    // Copy options
-    g << "p.max_iter = " << p_.max_iter << ";\n";
-    g << "p.min_lam = " << p_.min_lam << ";\n";
-    g << "p.constr_viol_tol = " << p_.constr_viol_tol << ";\n";
-    g << "p.dual_inf_tol = " << p_.dual_inf_tol << ";\n";
-
-    // Setup data structure
-    g << "d.prob = &p;\n";
-    g << "d.nz_h = arg[" << CONIC_H << "];\n";
-    g << "d.g = arg[" << CONIC_G << "];\n";
-    g << "d.nz_a = arg[" << CONIC_A << "];\n";
-    g << "casadi_qp_init(&d, &iw, &w);\n";
-
-    g.comment("Pass bounds on z");
-    g.copy_default(g.arg(CONIC_LBX), nx_, "d.lbz", "-casadi_inf", false);
-    g.copy_default(g.arg(CONIC_LBA), na_, "d.lbz+" + str(nx_), "-casadi_inf", false);
-    g.copy_default(g.arg(CONIC_UBX), nx_, "d.ubz", "casadi_inf", false);
-    g.copy_default(g.arg(CONIC_UBA), na_, "d.ubz+" + str(nx_), "casadi_inf", false);
-
-    g.comment("Pass initial guess");
-    g.copy_default(g.arg(CONIC_X0), nx_, "d.z", "0", false);
-    g << g.fill("d.z+"+str(nx_), na_, g.constant(nan)) << "\n";
-    g.copy_default(g.arg(CONIC_LAM_X0), nx_, "d.lam", "0", false);
-    g.copy_default(g.arg(CONIC_LAM_A0), na_, "d.lam+" + str(nx_), "0", false);
-
-    g.comment("Solve QP");
-    g << "if (casadi_qp_reset(&d)) return 1;\n";
-    g << "while (1) {\n";
-    g << "flag = casadi_qp_prepare(&d);\n";
-    if (print_iter_) {
-      // Print header
-      g << "if (d.iter % 10 == 0) {\n";
-      g << "if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;\n";
-      g << g.printf("%s\\n", "buf") << "\n";
-      g << "}\n";
-      // Print iteration
-      g << "if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;\n";
-      g << g.printf("%s\\n", "buf") << "\n";
-    }
-    g << "if (flag || casadi_qp_iterate(&d)) break;\n";
-    if (print_lincomb_) {
-      g << "for (k=0;k<d.sing;++k) {\n";
-      g << "casadi_qp_print_colcomb(&d, buf, sizeof(buf), k);\n";
-      g << g.printf("lincomb: %s\\n", "buf") << "\n";
-      g << "}\n";
-    }
-    g << "}\n";
-
-    g.comment("Get solution");
-    g.copy_check("&d.f", 1, g.res(CONIC_COST), false, true);
-    g.copy_check("d.z", nx_, g.res(CONIC_X), false, true);
-    g.copy_check("d.lam", nx_, g.res(CONIC_LAM_X), false, true);
-    g.copy_check("d.lam+"+str(nx_), na_, g.res(CONIC_LAM_A), false, true);
-
-    g << "return d.status != QP_SUCCESS;\n";
   }
 
   Dict Qpchasm::get_stats(void* mem) const {
