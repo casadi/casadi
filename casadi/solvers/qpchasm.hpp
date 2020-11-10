@@ -43,7 +43,7 @@ namespace casadi {
 
   enum Task {QP_MV, QP_PROGRESS, QP_FACTOR, QP_SOLVE};
 
-  enum Next {QP_RESIDUAL, QP_NEWITER, QP_PREPARE, QP_PREDICTOR,
+  enum Next {QP_INIT, QP_RESIDUAL, QP_NEWITER, QP_PREPARE, QP_PREDICTOR,
     QP_CORRECTOR};
 
   template<typename T1>

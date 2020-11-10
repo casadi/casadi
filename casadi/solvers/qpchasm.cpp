@@ -98,9 +98,14 @@ namespace casadi {
     }
     // Reset iteration counter
     d->iter = 0;
-    // Next task
-    d->task = QP_MV;
-    d->next = QP_RESIDUAL;
+    // Reset iteration variables
+    d->sing = -1;
+    d->mina = nan;
+    d->imina = -1;
+    d->f = nan;
+    d->msg = 0;
+    d->msg_ind = -2;
+    d->tau = -1;
   }
 
   template<typename T1>
@@ -548,6 +553,11 @@ namespace casadi {
     // Local variables
     const casadi_qp_prob<T1>* p = d->prob;
     switch (d->next) {
+      case QP_INIT:
+        init_ip(d);
+        d->task = QP_MV;
+        d->next = QP_RESIDUAL;
+        return 1;
       case QP_RESIDUAL:
         // Calculate residual
         calc_res(d);
@@ -556,7 +566,7 @@ namespace casadi {
         return 1;
       case QP_NEWITER:
         // New iteration
-        if (qp_ip_iter(d)) return 0;
+        if (qp_ip_iter(d)) break;
         d->task = QP_FACTOR;
         d->next = QP_PREPARE;
         return 1;
@@ -579,9 +589,10 @@ namespace casadi {
         d->next = QP_RESIDUAL;
         return 1;
       default:
-        return 0;
+        break;
     }
-    // Error
+    // Done iterating
+    d->next = QP_INIT;
     return 0;
   }
 
@@ -826,46 +837,20 @@ namespace casadi {
     casadi_fill(d.lam_lbz, p_.nz, 0.);
     casadi_fill(d.lam_ubz, p_.nz, 0.);
 
-    // Find interior point
-    init_ip(&d);
-    d.sing = -1;
-    d.mina = nan;
-    d.imina = -1;
-    d.f = nan;
-    d.msg = 0;
-    d.msg_ind = -2;
-    d.tau = -1;
-    uout() << d.n_con << " finite constraints\n";
-
-    // casadi::DM H(H_, std::vector<double>(d.nz_h, d.nz_h + H_.nnz()));
-    // uout() << "H = " << H << "\n";
-    //
-    // casadi::DM A(A_, std::vector<double>(d.nz_a, d.nz_a + A_.nnz()));
-    // uout() << "A = " << A << "\n";
-
     // Transpose A
     casadi_trans(d.nz_a, p_.sp_a, d.nz_at, p_.sp_at, d.iw);
-
-    // print_vec("init z", d.z, p_.nz);
-    // print_vec("init lam", d.lam, p_.nz);
-    // print_vec("init lam_lbz", d.lam_lbz, p_.nz);
-    // print_vec("init lam_ubz", d.lam_ubz, p_.nz);
+    // New QP
+    d.next = QP_INIT;
 
     // Reverse communication loop
-    do {
+    while (qp_ip(&d)) {
       switch (d.task) {
       case QP_MV:
-        // uout() << "MV: \n";
         // Matrix-vector multiplication
         casadi_clear(d.rz, p_.nz);
         casadi_mv(d.nz_h, p_.sp_h, d.z, d.rz, 0);
         casadi_mv(d.nz_a, p_.sp_a, d.lam + p_.nx, d.rz, 1);
         casadi_mv(d.nz_a, p_.sp_a, d.z, d.rz + p_.nx, 0);
-        // print_vec("nz_a", d.nz_a, p_.sp_a[2 + p_.sp_a[1]]);
-        //
-        // print_vec("z", d.z, p_.nz);
-        // print_vec("rz", d.rz, p_.nz);
-
         break;
       case QP_PROGRESS:
         // Print progress
@@ -892,7 +877,7 @@ namespace casadi {
         // print_vec("x: ", d.linsys, p_.nz);
         break;
       }
-    } while (qp_ip(&d));
+    }
 
     print_vec("primal solution: ", d.z, p_.nz);
     print_vec("dual solution: ", d.lam, p_.nz);
