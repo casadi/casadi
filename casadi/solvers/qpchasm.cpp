@@ -163,7 +163,7 @@ namespace casadi {
   void calc_res(casadi_qpip_data<T1>* d) {
     // Local variables
     casadi_int k;
-    T1 bdiff;
+    T1 bdiff, viol;
     const casadi_qp_prob<T1>* p = d->prob;
     // Gradient of the Lagrangian
     casadi_axpy(p->nx, 1., d->g, d->rz);
@@ -213,22 +213,40 @@ namespace casadi {
     }
     // Complementarity conditions, mu
     d->mu = 0;
+    d->ico = -1;
+    d->co = 0;
     for (k = 0; k < p->nz; ++k) {
       // Lower bound
       if (d->lbz[k] > -p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
+        // Inequality constraint
         bdiff = d->z[k] - d->lbz[k];
         d->mu += d->rlam_lbz[k] = d->lam_lbz[k] * bdiff;
         d->dinv_lbz[k] = 1. / bdiff;
+        // Constraint violation
+        viol = bdiff * fmax(d->lam_lbz[k], -d->lam[k]);
+        if (viol > d->co) {
+          d->co = viol;
+          d->ico = k;
+        }
       } else {
+        // No bound or equality constraint
         d->rlam_lbz[k] = 0;
         d->dinv_lbz[k] = 0;
       }
       // Upper bound
       if (d->ubz[k] < p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
+        // Inequality constraint
         bdiff = d->ubz[k] - d->z[k];
         d->mu += d->rlam_ubz[k] = d->lam_ubz[k] * bdiff;
         d->dinv_ubz[k] = 1. / bdiff;
+        // Constraint violation
+        viol = bdiff * fmax(d->lam_ubz[k], d->lam[k]);
+        if (viol > d->co) {
+          d->co = viol;
+          d->ico = k;
+        }
       } else {
+        // No bound or equality constraint
         d->rlam_ubz[k] = 0;
         d->dinv_ubz[k] = 0;
       }
@@ -571,8 +589,9 @@ namespace casadi {
   int ip_qp_print_header(casadi_qpip_data<T1>* d, char* buf, size_t buf_sz) {
     int flag;
     // Print to string
-    flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s  %4s",
-            "Iter", "Sing", "mu", "|pr|", "con", "|du|", "var",
+    flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s "
+            "%9s %5s %9s %4s",
+            "Iter", "Sing", "mu", "|pr|", "con", "|du|", "var", "|co|", "con",
             "min_R", "con", "last_tau", "Note");
     // Check if error
     if (flag < 0) {
@@ -589,9 +608,12 @@ namespace casadi {
     int flag;
     // Print iteration data without note to string
     flag = snprintf(buf, buf_sz,
-      "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
-      static_cast<int>(d->iter), static_cast<int>(d->sing), d->mu, d->pr,
-      static_cast<int>(d->ipr), d->du, static_cast<int>(d->idu),
+      "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d "
+      "%9.2g %5d %9.2g  ",
+      static_cast<int>(d->iter), static_cast<int>(d->sing), d->mu,
+      d->pr, static_cast<int>(d->ipr),
+      d->du, static_cast<int>(d->idu),
+      d->co, static_cast<int>(d->ico),
       d->mina, static_cast<int>(d->imina), d->tau);
     // Check if error
     if (flag < 0) {

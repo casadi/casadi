@@ -66,8 +66,11 @@ namespace casadi {
     // Inverse of margin to bounds (0 if no bound)
     T1* dinv_lbz;
     T1* dinv_ubz;
-    // Complimentarity measure
+    // Complementarity measure
     T1 mu;
+    // Complementarity constraint error and corresponding index
+    T1 co;
+    casadi_int ico;
     // Number of finite constraints
     casadi_int n_con;
     // User task
