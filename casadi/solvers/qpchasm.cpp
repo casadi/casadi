@@ -180,8 +180,7 @@ namespace casadi {
     // Constraint violation (only possible for linear constraints)
     d->ipr = -1;
     d->pr = 0;
-    for (k = p->na; k < p->nz; ++k) {
-      // uout() << k << ":" << d->rz[k] << "\n";
+    for (k = p->nx; k < p->nz; ++k) {
       if (d->rz[k] + d->pr < d->lbz[k]) {
         d->pr = d->lbz[k] - d->rz[k];
         d->ipr = k;
@@ -194,21 +193,7 @@ namespace casadi {
     d->idu = -1;
     d->du = 0;
     // Linear constraint
-
-    // print_vec("A * x: ", d->rz + p->nx, p->na);
-    // print_vec("g: ", d->z + p->nx, p->na);
-    // print_vec("lbg: ", d->lbz + p->nx, p->na);
-    // print_vec("ubg: ", d->ubz + p->nx, p->na);
-    //
-    // print_vec("g: ", d->g, p->nx);
-    //
-    // print_vec("lbx: ", d->lbz, p->nx);
-    // print_vec("ubx: ", d->ubz, p->nx);
-
     casadi_axpy(p->na, -1., d->z + p->nx, d->rz + p->nx);
-
-    // print_vec("A*x - g: ", d->rz + p->nx, p->na);
-
     // Multiplier consistency
     for (k = 0; k < p->nz; ++k) {
       if (d->ubz[k] <= d->lbz[k] + p->dmin) {
@@ -250,12 +235,16 @@ namespace casadi {
     }
     // Divide mu by total number of finite constraints
     if (d->n_con > 0) d->mu /= d->n_con;
-    // uout() << "residual\n";
-    // print_vec("rz: ", d->rz, p->nz);
-    // print_vec("rlam: ", d->rlam, p->nz);
-    // print_vec("rlam_ubz: ", d->rlam_ubz, p->nz);
-    // print_vec("rlam_lbz: ", d->rlam_lbz, p->nz);
-    // uout() << "mu = " << d->mu << "\n";
+
+    // if (d->iter == p->max_iter - 1) {
+    //   uout() << "residual\n";
+    //   print_vec("rz: ", d->rz, p->nz);
+    //   print_vec("rlam: ", d->rlam, p->nz);
+    //   print_vec("rlam_ubz: ", d->rlam_ubz, p->nz);
+    //   print_vec("rlam_lbz: ", d->rlam_lbz, p->nz);
+    //   uout() << "mu = " << d->mu << "\n";
+    // }
+
   }
 
   template<typename T1>
@@ -492,7 +481,7 @@ namespace casadi {
   template<typename T1>
   void qp_corrector(casadi_qpip_data<T1>* d) {
     // Local variables
-    T1 t, alpha;
+    T1 t;
     casadi_int k;
     const casadi_qp_prob<T1>* p = d->prob;
     // Scale results
@@ -520,16 +509,20 @@ namespace casadi {
     }
 
     // Maximum primal and dual step
-    qp_stepsize(d, &alpha, &alpha, .9);
-    // uout() << "corrector step\n";
-    // uout() << "alpha = " << alpha << "\n";
-    // print_vec("dz: ", d->dz, p->nz);
-    // print_vec("dlam: ", d->dlam, p->nz);
-    // print_vec("dlam_ubz: ", d->dlam_ubz, p->nz);
-    // print_vec("dlam_lbz: ", d->dlam_lbz, p->nz);
+    qp_stepsize(d, &d->tau, &d->tau, .9);
+
+    // if (d->iter == p->max_iter - 1) {
+    //   d->tau = 1;
+    //   uout() << "corrector step\n";
+    //   print_vec("dz: ", d->dz, p->nz);
+    //   print_vec("dlam: ", d->dlam, p->nz);
+    //   print_vec("dlam_ubz: ", d->dlam_ubz, p->nz);
+    //   print_vec("dlam_lbz: ", d->dlam_lbz, p->nz);
+    // }
+
 
     // Take step
-    qp_ipstep(d, alpha, alpha);
+    qp_ipstep(d, d->tau, d->tau);
   }
 
   template<typename T1>
@@ -760,6 +753,10 @@ namespace casadi {
 
     // Find interior point
     init_ip(&d);
+    d.sing = -1;
+    d.mina = nan;
+    d.imina = -1;
+
     uout() << d.n_con << " finite constraints\n";
 
     // casadi::DM H(H_, std::vector<double>(d.nz_h, d.nz_h + H_.nnz()));
@@ -801,12 +798,12 @@ namespace casadi {
             uout() << buf << "\n";
           }
           // Print iteration
-          d.sing = 0;
           d.f = nan;
-          d.mina = nan;
-          d.imina = 0;
-          d.tau = nan;
-          d.msg = 0;
+          // Additional outputs
+          std::stringstream ss;
+          ss << "mu = " << d.mu;
+          d.msg = ss.str().c_str();
+          d.msg_ind = -2;
           if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;
           uout() << buf << "\n";
         }
