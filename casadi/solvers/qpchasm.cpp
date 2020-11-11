@@ -206,6 +206,12 @@ namespace casadi {
     // Dual infeasibility
     d->idu = -1;
     d->du = 0;
+    for (k = 0; k < p->nx; ++k) {
+      if (fabs(d->rz[k]) > d->du) {
+        d->du = fabs(d->rz[k]);
+        d->idu = k;
+      }
+    }
     // Linear constraint
     casadi_axpy(p->na, -1., d->z + p->nx, d->rz + p->nx);
     // Multiplier consistency
@@ -218,11 +224,6 @@ namespace casadi {
       } else {
         // Residual
         d->rlam[k] = d->lam_ubz[k] - d->lam_lbz[k] - d->lam[k];
-        // Largest dual infeasibility
-        if (fabs(d->rlam[k]) > d->du) {
-          d->du = fabs(d->rlam[k]);
-          d->idu = k;
-        }
       }
     }
     // Complementarity conditions, mu
@@ -237,7 +238,7 @@ namespace casadi {
         d->mu += d->rlam_lbz[k] = d->lam_lbz[k] * bdiff;
         d->dinv_lbz[k] = 1. / bdiff;
         // Constraint violation
-        viol = bdiff * fmax(d->lam_lbz[k], -d->lam[k]);
+        viol = bdiff * fmax(-d->lam[k], 0.);
         if (viol > d->co) {
           d->co = viol;
           d->ico = k;
@@ -254,7 +255,7 @@ namespace casadi {
         d->mu += d->rlam_ubz[k] = d->lam_ubz[k] * bdiff;
         d->dinv_ubz[k] = 1. / bdiff;
         // Constraint violation
-        viol = bdiff * fmax(d->lam_ubz[k], d->lam[k]);
+        viol = bdiff * fmax(d->lam[k], 0.);
         if (viol > d->co) {
           d->co = viol;
           d->ico = k;
@@ -423,6 +424,8 @@ namespace casadi {
     T1 sigma;
     casadi_int k;
     const casadi_qp_prob<T1>* p = d->prob;
+    // Quick return if no inequalities
+    if (d->n_con == 0) return 0;
     // Calculate projected mu (and save to sigma variable)
     sigma = 0;
     for (k = 0; k < p->nz; ++k) {
@@ -440,7 +443,7 @@ namespace casadi {
       }
     }
     // Divide mu by total number of finite constraints
-    if (d->n_con > 0) sigma /= d->n_con;
+    sigma /= d->n_con;
     // Finish calculation of sigma := (mu_aff / mu)^3
     sigma /= d->mu;
     sigma *= sigma * sigma;
@@ -499,6 +502,7 @@ namespace casadi {
     }
     // Maximum primal and dual step
     qp_stepsize(d, &d->tau, &d->tau, .9);
+
     // Take step
     qp_ipstep(d, d->tau, d->tau);
   }
