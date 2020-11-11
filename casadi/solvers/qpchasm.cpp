@@ -154,7 +154,10 @@ namespace casadi {
   int qp_ip_iter(casadi_qpip_data<T1>* d) {
     // Local variables
     const casadi_qp_prob<T1>* p = d->prob;
-    // Stop, if converged or max iter
+    // Converged?
+    if (d->pr < p->constr_viol_tol && d->du < p->dual_inf_tol
+      && d->mu < 1e-6) return 1;
+    // Max number of iterations reached
     if (d->iter >= p->max_iter) return 1;
     // Start new iteration
     d->iter++;
