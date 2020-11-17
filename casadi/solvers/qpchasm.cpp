@@ -431,15 +431,13 @@ namespace casadi {
     for (k = 0; k < p->nz; ++k) {
       // Lower bound
       if (d->lbz[k] > -p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
-        // uout() << "Lower: k = " << k << "\n";
         sigma += (d->lam_lbz[k] + alpha * d->dlam_lbz[k])
-          * (d->z[k] + alpha * d->dz[k] - d->lbz[k]);
+          * (d->z[k] - d->lbz[k] + alpha * d->dz[k]);
       }
       // Upper bound
       if (d->ubz[k] < p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
-        // uout() << "Upper: k = " << k << "\n";
         sigma += (d->lam_ubz[k] + alpha * d->dlam_ubz[k])
-          * (d->ubz[k] + alpha * d->dz[k] - d->z[k]);
+          * (d->ubz[k] - d->z[k] - alpha * d->dz[k]);
       }
     }
     // Divide mu by total number of finite constraints
