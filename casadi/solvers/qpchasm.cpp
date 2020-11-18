@@ -156,7 +156,7 @@ namespace casadi {
     const casadi_qp_prob<T1>* p = d->prob;
     // Converged?
     if (d->pr < p->constr_viol_tol && d->du < p->dual_inf_tol
-        && d->mu < 1e-6) {
+        && d->co < 1e-9 && d->mu < 1e-6) {
       d->status = QP_SUCCESS;
       return 1;
     }
