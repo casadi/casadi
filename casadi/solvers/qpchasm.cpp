@@ -195,12 +195,19 @@ namespace casadi {
     d->ipr = -1;
     d->pr = 0;
     for (k = p->nx; k < p->nz; ++k) {
-      if (d->rz[k] + d->pr < d->lbz[k]) {
-        d->pr = d->lbz[k] - d->rz[k];
-        d->ipr = k;
-      } else if (d->rz[k] - d->pr > d->ubz[k]) {
-        d->pr = d->rz[k] - d->ubz[k];
-        d->ipr = k;
+      if (d->lbz[k] <= -p->inf && d->ubz[k] >= p->inf) {
+        // Unconstrained: Solve to get g explicitly
+        d->z[k] = d->rz[k];
+        d->lam[k] = 0;
+      } else {
+        // Check constraint violation
+        if (d->rz[k] + d->pr < d->lbz[k]) {
+          d->pr = d->lbz[k] - d->rz[k];
+          d->ipr = k;
+        } else if (d->rz[k] - d->pr > d->ubz[k]) {
+          d->pr = d->rz[k] - d->ubz[k];
+          d->ipr = k;
+        }
       }
     }
     // Dual infeasibility
@@ -327,8 +334,13 @@ namespace casadi {
     for (k=p->nx; k<p->nz; ++k) d->dlam[k] = d->dz[k];
     // Finish calculating g-component of right-hand-side and store in dz[nx:]
     for (k=p->nx; k<p->nz; ++k) {
-      d->dz[k] *= d->D[k] / (d->S[k] * d->S[k]);
-      d->dz[k] += d->rz[k];
+      if (d->S[k] == 0.) {
+        // Eliminate
+        d->dz[k] = 0;
+      } else {
+        d->dz[k] *= d->D[k] / (d->S[k] * d->S[k]);
+        d->dz[k] += d->rz[k];
+      }
     }
     // Scale and negate right-hand-side
     for (k=0; k<p->nz; ++k) d->dz[k] *= -d->S[k];
@@ -351,9 +363,14 @@ namespace casadi {
     for (k=0; k<p->nz; ++k) d->dz[k] *= d->S[k];
     // Calculate step in z(g), lam(g)
     for (k=p->nx; k<p->nz; ++k) {
-      t = d->D[k] / (d->S[k] * d->S[k]) * (d->dz[k] - d->dlam[k]);
-      d->dlam[k] = d->dz[k];
-      d->dz[k] = t;
+      if (d->S[k] == 0.) {
+        // Eliminate
+        d->dlam[k] = d->dz[k] = 0;
+      } else {
+        t = d->D[k] / (d->S[k] * d->S[k]) * (d->dz[k] - d->dlam[k]);
+        d->dlam[k] = d->dz[k];
+        d->dz[k] = t;
+      }
     }
     // Finish calculation in dlam_lbz, dlam_ubz
     for (k=0; k<p->nz; ++k) {
@@ -366,7 +383,6 @@ namespace casadi {
     }
     // Finish calculation of dlam(x)
     for (k=0; k<p->nx; ++k) d->dlam[k] += d->dlam_ubz[k] - d->dlam_lbz[k];
-
     // Maximum primal and dual step
     (void)qp_maxstep(d, &alpha, 0);
     // Calculate sigma
@@ -498,8 +514,13 @@ namespace casadi {
         - d->dinv_ubz[k] * d->rlam_ubz[k];
     // Difference in tilde(r)_g
     for (k=p->nx; k<p->nz; ++k) {
-      d->rlam[k] = d->rz[k];
-      d->rz[k] *= d->D[k] / (d->S[k] * d->S[k]);
+      if (d->S[k] == 0.) {
+        // Eliminate
+        d->rlam[k] = d->rz[k] = 0;
+      } else {
+        d->rlam[k] = d->rz[k];
+        d->rz[k] *= d->D[k] / (d->S[k] * d->S[k]);
+      }
     }
     // Scale and negate right-hand-side
     for (k=0; k<p->nz; ++k) d->rz[k] *= -d->S[k];
@@ -516,9 +537,14 @@ namespace casadi {
     for (k=0; k<p->nz; ++k) d->rz[k] *= d->S[k];
     // Calculate step in z(g), lam(g)
     for (k=p->nx; k<p->nz; ++k) {
-      t = d->D[k] / (d->S[k] * d->S[k]) * (d->rz[k] - d->rlam[k]);
-      d->rlam[k] = d->rz[k];
-      d->rz[k] = t;
+      if (d->S[k] == 0.) {
+        // Eliminate
+        d->rlam[k] = d->rz[k] = 0;
+      } else {
+        t = d->D[k] / (d->S[k] * d->S[k]) * (d->rz[k] - d->rlam[k]);
+        d->rlam[k] = d->rz[k];
+        d->rz[k] = t;
+      }
     }
     // Update step in dz, dlam
     for (k=0; k<p->nz; ++k) d->dz[k] += d->rz[k];
