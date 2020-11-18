@@ -538,7 +538,10 @@ namespace casadi {
     // Find the largest step size, keeping track of blocking constraints
     flag = qp_maxstep(d, &max_tau, &k);
     // Handle blocking constraints using Mehrotra's heuristic
-    if (flag != QP_NONE) {
+    if (flag == QP_NONE) {
+      // No blocking constraints
+      d->tau = 1;
+    } else {
       // Calculate mu for maximum step
       mu_test = qp_mu_test(d, max_tau);
       // Get distance to constraints for blocking variable
