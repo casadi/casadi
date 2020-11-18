@@ -372,7 +372,7 @@ namespace casadi {
     // Calculate sigma
     sigma = qp_calc_sigma(d, alpha);
     // Prepare corrector step
-    qp_corrector_prepare(d, sigma * d->mu);
+    qp_corrector_prepare(d, -sigma * d->mu);
     // Solve to get step
     d->linsys = d->rz;
   }
@@ -454,8 +454,8 @@ namespace casadi {
     casadi_int k;
     const casadi_qp_prob<T1>* p = d->prob;
     // Modified residual in lam_lbz, lam_ubz
-    for (k=0; k<p->nz; ++k) d->rlam_lbz[k] = -d->dlam_lbz[k] * d->dz[k] - shift;
-    for (k=0; k<p->nz; ++k) d->rlam_ubz[k] = d->dlam_ubz[k] * d->dz[k] - shift;
+    for (k=0; k<p->nz; ++k) d->rlam_lbz[k] = d->dlam_lbz[k] * d->dz[k] + shift;
+    for (k=0; k<p->nz; ++k) d->rlam_ubz[k] = -d->dlam_ubz[k] * d->dz[k] + shift;
     // Difference in tilde(r)_x, tilde(r)_lamg
     for (k=0; k<p->nz; ++k)
       d->rz[k] = d->dinv_lbz[k] * d->rlam_lbz[k]
