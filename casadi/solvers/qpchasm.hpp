@@ -46,6 +46,14 @@ namespace casadi {
   enum Next {QP_INIT, QP_RESIDUAL, QP_NEWITER, QP_PREPARE, QP_PREDICTOR,
     QP_CORRECTOR};
 
+  enum Blocker {
+    QP_NONE = 0x0,
+    QP_UPPER = 0x1,
+    QP_LOWER = 0x2,
+    QP_PRIMAL = 0x4,
+    QP_DUAL = 0x8
+  };
+
   template<typename T1>
   struct casadi_qpip_data : public casadi_qp_data<T1> {
     // Diagonal entries

@@ -366,9 +366,9 @@ namespace casadi {
     }
     // Finish calculation of dlam(x)
     for (k=0; k<p->nx; ++k) d->dlam[k] += d->dlam_ubz[k] - d->dlam_lbz[k];
-    // Maximum primal and dual step
-    qp_stepsize(d, &alpha, &alpha, 1.);
 
+    // Maximum primal and dual step
+    (void)qp_maxstep(d, &alpha, 0);
     // Calculate sigma
     sigma = qp_calc_sigma(d, alpha);
     // Prepare corrector step
@@ -391,31 +391,81 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_stepsize(casadi_qpip_data<T1>* d, T1* alpha_pr, T1* alpha_du,
-      T1 tau) {
+  int qp_maxstep(casadi_qpip_data<T1>* d, T1* alpha, casadi_int* ind) {
     // Local variables
-    casadi_int k;
+    T1 test;
+    casadi_int k, blocking_k;
+    int flag;
     const casadi_qp_prob<T1>* p = d->prob;
-    // Reset both primal and dual step (may be the same variable)
-    *alpha_pr = *alpha_du = 1.;
+    // Reset variables
+    blocking_k = -1;
+    flag = QP_NONE;
+    // Maximum step size is 1
+    *alpha = 1.;
     // Primal step
     for (k=0; k<p->nz; ++k) {
+      if (d->dz[k] < 0 && d->lbz[k] > -p->inf) {
+        if ((test = (d->lbz[k] - d->z[k]) / d->dz[k]) < *alpha) {
+          *alpha = test;
+          blocking_k = k;
+          flag = QP_PRIMAL | QP_LOWER;
+        }
+      }
       if (d->dz[k] > 0 && d->ubz[k] < p->inf) {
-        *alpha_pr = fmin(*alpha_pr, tau * (d->ubz[k] - d->z[k]) / d->dz[k]);
-      } else if (d->dz[k] < 0 && d->lbz[k] > -p->inf) {
-        *alpha_pr = fmin(*alpha_pr, tau * (d->lbz[k] - d->z[k]) / d->dz[k]);
+        if ((test = (d->ubz[k] - d->z[k]) / d->dz[k]) < *alpha) {
+          *alpha = test;
+          blocking_k = k;
+          flag = QP_PRIMAL | QP_UPPER;
+        }
       }
     }
-    // uout() << "primal alpha = " << (*alpha_pr) << "\n";
     // Dual step
     for (k=0; k<p->nz; ++k) {
-      if (d->dlam_lbz[k] < 0. && d->lam_lbz[k] > 0.) {
-        *alpha_du = fmin(*alpha_du, -tau * d->lam_lbz[k] / d->dlam_lbz[k]);
-      } else if (d->dlam_ubz[k] < 0. && d->lam_ubz[k] > 0.) {
-        *alpha_du = fmin(*alpha_du, -tau * d->lam_ubz[k] / d->dlam_ubz[k]);
+      if (d->dlam_lbz[k] < 0.) {
+        if ((test = -d->lam_lbz[k] / d->dlam_lbz[k]) < *alpha) {
+          *alpha = test;
+          blocking_k = k;
+          flag = QP_DUAL | QP_LOWER;
+        }
+      }
+      if (d->dlam_ubz[k] < 0.) {
+        if ((test = -d->lam_ubz[k] / d->dlam_ubz[k]) < *alpha) {
+          *alpha = test;
+          blocking_k = k;
+          flag = QP_DUAL | QP_UPPER;
+        }
       }
     }
-    // uout() << "dual alpha = " << (*alpha_du) << "\n";
+    // Return information about blocking constraints
+    if (ind) *ind = blocking_k;
+    return flag;
+  }
+
+  template<typename T1>
+  T1 qp_mu_test(casadi_qpip_data<T1>* d, T1 alpha) {
+    // Local variables
+    T1 mu;
+    casadi_int k;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Quick return if no inequalities
+    if (d->n_con == 0) return 0;
+    // Calculate projected mu (and save to sigma variable)
+    mu = 0;
+    for (k = 0; k < p->nz; ++k) {
+      // Lower bound
+      if (d->lbz[k] > -p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
+        mu += (d->lam_lbz[k] + alpha * d->dlam_lbz[k])
+          * (d->z[k] - d->lbz[k] + alpha * d->dz[k]);
+      }
+      // Upper bound
+      if (d->ubz[k] < p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
+        mu += (d->lam_ubz[k] + alpha * d->dlam_ubz[k])
+          * (d->ubz[k] - d->z[k] - alpha * d->dz[k]);
+      }
+    }
+    // Divide mu by total number of finite constraints
+    mu /= d->n_con;
+    return mu;
   }
 
   template<typename T1>
@@ -427,21 +477,7 @@ namespace casadi {
     // Quick return if no inequalities
     if (d->n_con == 0) return 0;
     // Calculate projected mu (and save to sigma variable)
-    sigma = 0;
-    for (k = 0; k < p->nz; ++k) {
-      // Lower bound
-      if (d->lbz[k] > -p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
-        sigma += (d->lam_lbz[k] + alpha * d->dlam_lbz[k])
-          * (d->z[k] - d->lbz[k] + alpha * d->dz[k]);
-      }
-      // Upper bound
-      if (d->ubz[k] < p->inf && d->ubz[k] > d->lbz[k] + p->dmin) {
-        sigma += (d->lam_ubz[k] + alpha * d->dlam_ubz[k])
-          * (d->ubz[k] - d->z[k] - alpha * d->dz[k]);
-      }
-    }
-    // Divide mu by total number of finite constraints
-    sigma /= d->n_con;
+    sigma = qp_mu_test(d, alpha);
     // Finish calculation of sigma := (mu_aff / mu)^3
     sigma /= d->mu;
     sigma *= sigma * sigma;
@@ -472,8 +508,9 @@ namespace casadi {
   template<typename T1>
   void qp_corrector(casadi_qpip_data<T1>* d) {
     // Local variables
-    T1 t;
+    T1 t, mu_test, primal_slack, primal_step, dual_slack, dual_step, max_tau;
     casadi_int k;
+    int flag;
     const casadi_qp_prob<T1>* p = d->prob;
     // Scale results
     for (k=0; k<p->nz; ++k) d->rz[k] *= d->S[k];
@@ -498,9 +535,34 @@ namespace casadi {
       d->dlam_ubz[k] += t;
       if (k<p->nx) d->dlam[k] += t;
     }
-    // Maximum primal and dual step
-    qp_stepsize(d, &d->tau, &d->tau, .9);
-
+    // Find the largest step size, keeping track of blocking constraints
+    flag = qp_maxstep(d, &max_tau, &k);
+    // Handle blocking constraints using Mehrotra's heuristic
+    if (flag != QP_NONE) {
+      // Calculate mu for maximum step
+      mu_test = qp_mu_test(d, max_tau);
+      // Get distance to constraints for blocking variable
+      if (flag & QP_UPPER) {
+        primal_slack = d->ubz[k] - d->z[k];
+        primal_step = -d->dz[k];
+        dual_slack = d->lam_ubz[k];
+        dual_step = d->dlam_ubz[k];
+      } else {
+        primal_slack = d->z[k] - d->lbz[k];
+        primal_step = d->dz[k];
+        dual_slack = d->lam_lbz[k];
+        dual_step = d->dlam_lbz[k];
+      }
+      // Mehrotra's heuristic as in in OOQP per communication with S. Wright
+      if (flag & QP_PRIMAL) {
+        d->tau = (0.01 * mu_test / (dual_slack + max_tau * dual_slack)
+          - primal_slack) / primal_step;
+      } else {
+        d->tau = (0.01 * mu_test / ( primal_slack + max_tau * primal_step)
+          - dual_slack) / dual_slack;
+      }
+      d->tau = fmax(d->tau, 0.99 * max_tau);
+    }
     // Take step
     qp_ipstep(d, d->tau, d->tau);
   }
