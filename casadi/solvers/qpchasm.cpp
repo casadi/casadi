@@ -52,8 +52,9 @@ namespace casadi {
     uout() << "\n";
   }
 
+  // SYMBOL "ipqp_reset"
   template<typename T1>
-  void init_ip(casadi_ipqp_data<T1>* d) {
+  void casadi_ipqp_reset(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     T1 margin, mid;
@@ -108,8 +109,9 @@ namespace casadi {
     d->tau = -1;
   }
 
+  // SYMBOL "ipqp_diag"
   template<typename T1>
-  void calc_diag(casadi_ipqp_data<T1>* d) {
+  void casadi_ipqp_diag(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     const casadi_ipqp_prob<T1>* p = d->prob;
@@ -150,8 +152,9 @@ namespace casadi {
     }
   }
 
+  // SYMBOL "ipqp_newiter"
   template<typename T1>
-  int qp_ip_iter(casadi_ipqp_data<T1>* d) {
+  int casadi_ipqp_newiter(casadi_ipqp_data<T1>* d) {
     // Local variables
     const casadi_ipqp_prob<T1>* p = d->prob;
     // Converged?
@@ -168,13 +171,14 @@ namespace casadi {
     // Start new iteration
     d->iter++;
     // Calculate diagonal entries and scaling factors
-    calc_diag(d);
+    casadi_ipqp_diag(d);
     // Success
     return 0;
   }
 
+  // SYMBOL "ipqp_residual"
   template<typename T1>
-  void calc_res(casadi_ipqp_data<T1>* d) {
+  void casadi_ipqp_residual(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     T1 bdiff, viol;
@@ -319,8 +323,9 @@ namespace casadi {
     d->sing = casadi_qr_singular(&d->mina, &d->imina, d->nz_r, p->sp_r, p->pc, 1e-12);
   }
 
+  // SYMBOL "ipqp_predictor_prepare"
   template<typename T1>
-  void qp_predictor_prepare(casadi_ipqp_data<T1>* d) {
+  void casadi_ipqp_predictor_prepare(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     const casadi_ipqp_prob<T1>* p = d->prob;
@@ -353,61 +358,9 @@ namespace casadi {
     d->linsys = d->dz;
   }
 
+  // SYMBOL "ipqp_maxstep"
   template<typename T1>
-  void qp_predictor(casadi_ipqp_data<T1>* d) {
-    // Local variables
-    casadi_int k;
-    T1 t, alpha, sigma;
-    const casadi_ipqp_prob<T1>* p = d->prob;
-    // Scale results
-    for (k=0; k<p->nz; ++k) d->dz[k] *= d->S[k];
-    // Calculate step in z(g), lam(g)
-    for (k=p->nx; k<p->nz; ++k) {
-      if (d->S[k] == 0.) {
-        // Eliminate
-        d->dlam[k] = d->dz[k] = 0;
-      } else {
-        t = d->D[k] / (d->S[k] * d->S[k]) * (d->dz[k] - d->dlam[k]);
-        d->dlam[k] = d->dz[k];
-        d->dz[k] = t;
-      }
-    }
-    // Finish calculation in dlam_lbz, dlam_ubz
-    for (k=0; k<p->nz; ++k) {
-      d->dlam_lbz[k] -= d->lam_lbz[k] * d->dz[k];
-      d->dlam_lbz[k] *= d->dinv_lbz[k];
-    }
-    for (k=0; k<p->nz; ++k) {
-      d->dlam_ubz[k] += d->lam_ubz[k] * d->dz[k];
-      d->dlam_ubz[k] *= d->dinv_ubz[k];
-    }
-    // Finish calculation of dlam(x)
-    for (k=0; k<p->nx; ++k) d->dlam[k] += d->dlam_ubz[k] - d->dlam_lbz[k];
-    // Maximum primal and dual step
-    (void)qp_maxstep(d, &alpha, 0);
-    // Calculate sigma
-    sigma = qp_calc_sigma(d, alpha);
-    // Prepare corrector step
-    qp_corrector_prepare(d, -sigma * d->mu);
-    // Solve to get step
-    d->linsys = d->rz;
-  }
-
-  template<typename T1>
-  void qp_ipstep(casadi_ipqp_data<T1>* d, T1 alpha_pr, T1 alpha_du) {
-    // Local variables
-    casadi_int k;
-    const casadi_ipqp_prob<T1>* p = d->prob;
-    // Primal step
-    for (k=0; k<p->nz; ++k) d->z[k] += alpha_pr * d->dz[k];
-    // Dual step
-    for (k=0; k<p->nz; ++k) d->lam[k] += alpha_du * d->dlam[k];
-    for (k=0; k<p->nz; ++k) d->lam_lbz[k] += alpha_du * d->dlam_lbz[k];
-    for (k=0; k<p->nz; ++k) d->lam_ubz[k] += alpha_du * d->dlam_ubz[k];
-  }
-
-  template<typename T1>
-  int qp_maxstep(casadi_ipqp_data<T1>* d, T1* alpha, casadi_int* ind) {
+  int casadi_ipqp_maxstep(casadi_ipqp_data<T1>* d, T1* alpha, casadi_int* ind) {
     // Local variables
     T1 test;
     casadi_int k, blocking_k;
@@ -457,8 +410,64 @@ namespace casadi {
     return flag;
   }
 
+  // SYMBOL "ipqp_predictor"
   template<typename T1>
-  T1 qp_mu_test(casadi_ipqp_data<T1>* d, T1 alpha) {
+  void casadi_ipqp_predictor(casadi_ipqp_data<T1>* d) {
+    // Local variables
+    casadi_int k;
+    T1 t, alpha, sigma;
+    const casadi_ipqp_prob<T1>* p = d->prob;
+    // Scale results
+    for (k=0; k<p->nz; ++k) d->dz[k] *= d->S[k];
+    // Calculate step in z(g), lam(g)
+    for (k=p->nx; k<p->nz; ++k) {
+      if (d->S[k] == 0.) {
+        // Eliminate
+        d->dlam[k] = d->dz[k] = 0;
+      } else {
+        t = d->D[k] / (d->S[k] * d->S[k]) * (d->dz[k] - d->dlam[k]);
+        d->dlam[k] = d->dz[k];
+        d->dz[k] = t;
+      }
+    }
+    // Finish calculation in dlam_lbz, dlam_ubz
+    for (k=0; k<p->nz; ++k) {
+      d->dlam_lbz[k] -= d->lam_lbz[k] * d->dz[k];
+      d->dlam_lbz[k] *= d->dinv_lbz[k];
+    }
+    for (k=0; k<p->nz; ++k) {
+      d->dlam_ubz[k] += d->lam_ubz[k] * d->dz[k];
+      d->dlam_ubz[k] *= d->dinv_ubz[k];
+    }
+    // Finish calculation of dlam(x)
+    for (k=0; k<p->nx; ++k) d->dlam[k] += d->dlam_ubz[k] - d->dlam_lbz[k];
+    // Maximum primal and dual step
+    (void)casadi_ipqp_maxstep(d, &alpha, 0);
+    // Calculate sigma
+    sigma = casadi_ipqp_sigma(d, alpha);
+    // Prepare corrector step
+    casadi_ipqp_corrector_prepare(d, -sigma * d->mu);
+    // Solve to get step
+    d->linsys = d->rz;
+  }
+
+  // SYMBOL "ipqp_step"
+  template<typename T1>
+  void casadi_ipqp_step(casadi_ipqp_data<T1>* d, T1 alpha_pr, T1 alpha_du) {
+    // Local variables
+    casadi_int k;
+    const casadi_ipqp_prob<T1>* p = d->prob;
+    // Primal step
+    for (k=0; k<p->nz; ++k) d->z[k] += alpha_pr * d->dz[k];
+    // Dual step
+    for (k=0; k<p->nz; ++k) d->lam[k] += alpha_du * d->dlam[k];
+    for (k=0; k<p->nz; ++k) d->lam_lbz[k] += alpha_du * d->dlam_lbz[k];
+    for (k=0; k<p->nz; ++k) d->lam_ubz[k] += alpha_du * d->dlam_ubz[k];
+  }
+
+  // SYMBOL "ipqp_mu"
+  template<typename T1>
+  T1 casadi_ipqp_mu(casadi_ipqp_data<T1>* d, T1 alpha) {
     // Local variables
     T1 mu;
     casadi_int k;
@@ -484,8 +493,9 @@ namespace casadi {
     return mu;
   }
 
+  // SYMBOL "ipqp_sigma"
   template<typename T1>
-  T1 qp_calc_sigma(casadi_ipqp_data<T1>* d, T1 alpha) {
+  T1 casadi_ipqp_sigma(casadi_ipqp_data<T1>* d, T1 alpha) {
     // Local variables
     T1 sigma;
     casadi_int k;
@@ -493,15 +503,16 @@ namespace casadi {
     // Quick return if no inequalities
     if (d->n_con == 0) return 0;
     // Calculate projected mu (and save to sigma variable)
-    sigma = qp_mu_test(d, alpha);
+    sigma = casadi_ipqp_mu(d, alpha);
     // Finish calculation of sigma := (mu_aff / mu)^3
     sigma /= d->mu;
     sigma *= sigma * sigma;
     return sigma;
   }
 
+  // SYMBOL "ipqp_corrector_prepare"
   template<typename T1>
-  void qp_corrector_prepare(casadi_ipqp_data<T1>* d, T1 shift) {
+  void casadi_ipqp_corrector_prepare(casadi_ipqp_data<T1>* d, T1 shift) {
     // Local variables
     casadi_int k;
     const casadi_ipqp_prob<T1>* p = d->prob;
@@ -526,8 +537,9 @@ namespace casadi {
     for (k=0; k<p->nz; ++k) d->rz[k] *= -d->S[k];
   }
 
+  // SYMBOL "ipqp_corrector"
   template<typename T1>
-  void qp_corrector(casadi_ipqp_data<T1>* d) {
+  void casadi_ipqp_corrector(casadi_ipqp_data<T1>* d) {
     // Local variables
     T1 t, mu_test, primal_slack, primal_step, dual_slack, dual_step, max_tau;
     casadi_int k;
@@ -562,14 +574,14 @@ namespace casadi {
       if (k<p->nx) d->dlam[k] += t;
     }
     // Find the largest step size, keeping track of blocking constraints
-    flag = qp_maxstep(d, &max_tau, &k);
+    flag = casadi_ipqp_maxstep(d, &max_tau, &k);
     // Handle blocking constraints using Mehrotra's heuristic
     if (flag == IPQP_NONE) {
       // No blocking constraints
       d->tau = 1;
     } else {
       // Calculate mu for maximum step
-      mu_test = qp_mu_test(d, max_tau);
+      mu_test = casadi_ipqp_mu(d, max_tau);
       // Get distance to constraints for blocking variable
       if (flag & IPQP_UPPER) {
         primal_slack = d->ubz[k] - d->z[k];
@@ -593,46 +605,47 @@ namespace casadi {
       d->tau = fmax(d->tau, 0.99 * max_tau);
     }
     // Take step
-    qp_ipstep(d, d->tau, d->tau);
+    casadi_ipqp_step(d, d->tau, d->tau);
   }
 
+  // SYMBOL "ipqp"
   template<typename T1>
-  int qp_ip(casadi_ipqp_data<T1>* d) {
+  int casadi_ipqp(casadi_ipqp_data<T1>* d) {
     // Local variables
     const casadi_ipqp_prob<T1>* p = d->prob;
     switch (d->next) {
-      case IPQP_INIT:
-        init_ip(d);
+      case IPQP_RESET:
+        casadi_ipqp_reset(d);
         d->task = IPQP_MV;
         d->next = IPQP_RESIDUAL;
         return 1;
       case IPQP_RESIDUAL:
         // Calculate residual
-        calc_res(d);
+        casadi_ipqp_residual(d);
         d->task = IPQP_PROGRESS;
         d->next = IPQP_NEWITER;
         return 1;
       case IPQP_NEWITER:
         // New iteration
-        if (qp_ip_iter(d)) break;
+        if (casadi_ipqp_newiter(d)) break;
         d->task = IPQP_FACTOR;
         d->next = IPQP_PREPARE;
         return 1;
       case IPQP_PREPARE:
         // Prepare predictor step
-        qp_predictor_prepare(d);
+        casadi_ipqp_predictor_prepare(d);
         d->task = IPQP_SOLVE;
         d->next = IPQP_PREDICTOR;
         return 1;
       case IPQP_PREDICTOR:
         // Complete predictor step
-        qp_predictor(d);
+        casadi_ipqp_predictor(d);
         d->task = IPQP_SOLVE;
         d->next = IPQP_CORRECTOR;
         return 1;
       case IPQP_CORRECTOR:
         // Complete predictor step
-        qp_corrector(d);
+        casadi_ipqp_corrector(d);
         d->task = IPQP_MV;
         d->next = IPQP_RESIDUAL;
         return 1;
@@ -640,12 +653,13 @@ namespace casadi {
         break;
     }
     // Done iterating
-    d->next = IPQP_INIT;
+    d->next = IPQP_RESET;
     return 0;
   }
 
+  // SYMBOL "ipqp_print_header"
   template<typename T1>
-  int ip_ipqp_print_header(casadi_ipqp_data<T1>* d, char* buf, size_t buf_sz) {
+  int casadi_ipqp_print_header(casadi_ipqp_data<T1>* d, char* buf, size_t buf_sz) {
     int flag;
     // Print to string
     flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s "
@@ -661,9 +675,9 @@ namespace casadi {
     return 0;
   }
 
-  // SYMBOL "qp_print_iteration"
+  // SYMBOL "ipqp_print_iteration"
   template<typename T1>
-  int ip_ipqp_print_iteration(casadi_ipqp_data<T1>* d, char* buf, int buf_sz) {
+  int casadi_ipqp_print_iteration(casadi_ipqp_data<T1>* d, char* buf, int buf_sz) {
     int flag;
     // Print iteration data without note to string
     flag = snprintf(buf, buf_sz,
@@ -698,8 +712,6 @@ namespace casadi {
     // Successful return
     return 0;
   }
-
-
 
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
@@ -848,9 +860,9 @@ namespace casadi {
     // Transpose A
     casadi_trans(d.nz_a, p_.sp_a, d.nz_at, p_.sp_at, d.iw);
     // New QP
-    d.next = IPQP_INIT;
+    d.next = IPQP_RESET;
     // Reverse communication loop
-    while (qp_ip(&d)) {
+    while (casadi_ipqp(&d)) {
       switch (d.task) {
       case IPQP_MV:
         // Matrix-vector multiplication
@@ -864,11 +876,11 @@ namespace casadi {
         if (print_iter_) {
           if (d.iter % 10 == 0) {
             // Print header
-            if (ip_ipqp_print_header(&d, buf, sizeof(buf))) break;
+            if (casadi_ipqp_print_header(&d, buf, sizeof(buf))) break;
             uout() << buf << "\n";
           }
           // Print iteration
-          if (ip_ipqp_print_iteration(&d, buf, sizeof(buf))) break;
+          if (casadi_ipqp_print_iteration(&d, buf, sizeof(buf))) break;
           uout() << buf << "\n";
           // User interrupt?
           InterruptHandler::check();
