@@ -38,24 +38,24 @@
 /// \cond INTERNAL
 namespace casadi {
   template<typename T1>
-  struct casadi_qpip_prob : public casadi_qp_prob<T1> {
+  struct casadi_qpip_prob : public casadi_ipqp_prob<T1> {
   };
 
-  enum Task {QP_MV, QP_PROGRESS, QP_FACTOR, QP_SOLVE};
+  enum Task {IPQP_MV, IPQP_PROGRESS, IPQP_FACTOR, IPQP_SOLVE};
 
-  enum Next {QP_INIT, QP_RESIDUAL, QP_NEWITER, QP_PREPARE, QP_PREDICTOR,
-    QP_CORRECTOR};
+  enum Next {IPQP_INIT, IPQP_RESIDUAL, IPQP_NEWITER, IPQP_PREPARE, IPQP_PREDICTOR,
+    IPQP_CORRECTOR};
 
   enum Blocker {
-    QP_NONE = 0x0,
-    QP_UPPER = 0x1,
-    QP_LOWER = 0x2,
-    QP_PRIMAL = 0x4,
-    QP_DUAL = 0x8
+    IPQP_NONE = 0x0,
+    IPQP_UPPER = 0x1,
+    IPQP_LOWER = 0x2,
+    IPQP_PRIMAL = 0x4,
+    IPQP_DUAL = 0x8
   };
 
   template<typename T1>
-  struct casadi_qpip_data : public casadi_qp_data<T1> {
+  struct casadi_qpip_data : public casadi_ipqp_data<T1> {
     // Diagonal entries
     T1* D;
     // Scaling factor
