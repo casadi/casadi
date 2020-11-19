@@ -85,6 +85,31 @@ typedef enum {
   IPQP_PRINTING_ERROR
 } casadi_ipqp_flag_t;
 
+// SYMBOL "ipqp_task_t"
+typedef enum {
+  IPQP_MV,
+  IPQP_PROGRESS,
+  IPQP_FACTOR,
+  IPQP_SOLVE} casadi_ipqp_task_t;
+
+// SYMBOL "ipqp_task_t"
+typedef enum {
+  IPQP_INIT,
+  IPQP_RESIDUAL,
+  IPQP_NEWITER,
+  IPQP_PREPARE,
+  IPQP_PREDICTOR,
+  IPQP_CORRECTOR} casadi_ipqp_next_t;
+
+// SYMBOL "ipqp_blocker_t"
+typedef enum {
+  IPQP_NONE = 0x0,
+  IPQP_UPPER = 0x1,
+  IPQP_LOWER = 0x2,
+  IPQP_PRIMAL = 0x4,
+  IPQP_DUAL = 0x8
+} casadi_blocker_t;
+
 // SYMBOL "ipqp_data"
 template<typename T1>
 struct casadi_ipqp_data {
@@ -123,6 +148,37 @@ struct casadi_ipqp_data {
   casadi_int r_index, r_sign;
   // Iteration
   casadi_int iter;
+  // Diagonal entries
+  T1* D;
+  // Scaling factor
+  T1* S;
+  // lam_lbx, lam_ubz
+  T1* lam_lbz;
+  T1* lam_ubz;
+  // dlam_lbx, dlam_ubz
+  T1* dlam_lbz;
+  T1* dlam_ubz;
+  // Residual
+  T1* rz;
+  T1* rlam;
+  T1* rlam_lbz;
+  T1* rlam_ubz;
+  // Inverse of margin to bounds (0 if no bound)
+  T1* dinv_lbz;
+  T1* dinv_ubz;
+  // Complementarity measure
+  T1 mu;
+  // Complementarity constraint error and corresponding index
+  T1 co;
+  casadi_int ico;
+  // Number of finite constraints
+  casadi_int n_con;
+  // User task
+  casadi_ipqp_task_t task;
+  // Next step
+  casadi_ipqp_next_t next;
+  // Linear system
+  T1* linsys;
 };
 // C-REPLACE "casadi_ipqp_data<T1>" "struct casadi_ipqp_data"
 
@@ -1120,57 +1176,6 @@ int casadi_ipqp_print_header(casadi_ipqp_data<T1>* d, char* buf, size_t buf_sz) 
     d->status = IPQP_PRINTING_ERROR;
     return 1;
   }
-  // Successful return
-  return 0;
-}
-
-// SYMBOL "ipqp_print_colcomb"
-template<typename T1>
-int casadi_ipqp_print_colcomb(casadi_ipqp_data<T1>* d, char* buf, size_t buf_sz, casadi_int j) {
-  casadi_int num_size, n_print, i, k, buf_offset, val;
-  size_t b;
-  const casadi_ipqp_prob<T1>* p = d->prob;
-  casadi_qr_colcomb(d->dlam, d->nz_r, p->sp_r, p->pc, 1e-12, j);
-
-  // Determine max printing size
-  num_size = 1;
-  val = p->nz-1;
-  while (val) {
-    val/=10;
-    num_size++;
-  }
-
-  if (buf_sz<=4) return 1;
-
-  // How many numbers can be printed?
-  // Need some extra space for '...'
-  // and null
-  n_print = (buf_sz-4)/num_size;
-
-  // Clear buffer
-  for (b=0;b<buf_sz;++b) buf[b]=' ';
-
-  buf_offset = 0;
-  for (i=0;i<p->nz;++i) {
-    if (fabs(d->dlam[i]) >= 1e-12) {
-      if (n_print==0) {
-        buf[buf_sz-4] = '.';
-        buf[buf_sz-3] = '.';
-        buf[buf_sz-2] = '.';
-        buf[buf_sz-1] = '\0';
-        return 1;
-      }
-      n_print--;
-      snprintf(buf+buf_offset, num_size, "%d", static_cast<int>(i));
-      // Clear null chars
-      for (k=0;k<num_size;++k) {
-        if (buf[buf_offset+k]=='\0') buf[buf_offset+k] = ' ';
-      }
-      buf_offset += num_size;
-    }
-  }
-  buf[buf_sz-1] = '\0';
-
   // Successful return
   return 0;
 }

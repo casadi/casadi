@@ -37,58 +37,6 @@
 
 /// \cond INTERNAL
 namespace casadi {
-  template<typename T1>
-  struct casadi_qpip_prob : public casadi_ipqp_prob<T1> {
-  };
-
-  enum Task {IPQP_MV, IPQP_PROGRESS, IPQP_FACTOR, IPQP_SOLVE};
-
-  enum Next {IPQP_INIT, IPQP_RESIDUAL, IPQP_NEWITER, IPQP_PREPARE, IPQP_PREDICTOR,
-    IPQP_CORRECTOR};
-
-  enum Blocker {
-    IPQP_NONE = 0x0,
-    IPQP_UPPER = 0x1,
-    IPQP_LOWER = 0x2,
-    IPQP_PRIMAL = 0x4,
-    IPQP_DUAL = 0x8
-  };
-
-  template<typename T1>
-  struct casadi_qpip_data : public casadi_ipqp_data<T1> {
-    // Diagonal entries
-    T1* D;
-    // Scaling factor
-    T1* S;
-    // lam_lbx, lam_ubz
-    T1* lam_lbz;
-    T1* lam_ubz;
-    // dlam_lbx, dlam_ubz
-    T1* dlam_lbz;
-    T1* dlam_ubz;
-    // Residual
-    T1* rz;
-    T1* rlam;
-    T1* rlam_lbz;
-    T1* rlam_ubz;
-    // Inverse of margin to bounds (0 if no bound)
-    T1* dinv_lbz;
-    T1* dinv_ubz;
-    // Complementarity measure
-    T1 mu;
-    // Complementarity constraint error and corresponding index
-    T1 co;
-    casadi_int ico;
-    // Number of finite constraints
-    casadi_int n_con;
-    // User task
-    enum Task task;
-    // Next step
-    enum Next next;
-    // Linear system
-    T1* linsys;
-  };
-
   struct CASADI_CONIC_QPCHASM_EXPORT QpchasmMemory : public ConicMemory {
     const char* return_status;
   };
@@ -150,7 +98,7 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
     // Memory structure
-    casadi_qpip_prob<double> p_;
+    casadi_ipqp_prob<double> p_;
     // KKT system and its QR factorization
     Sparsity AT_, kkt_, sp_v_, sp_r_;
     // KKT system permutation

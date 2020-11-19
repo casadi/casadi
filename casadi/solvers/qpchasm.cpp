@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void init_ip(casadi_qpip_data<T1>* d) {
+  void init_ip(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     T1 margin, mid;
@@ -109,7 +109,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void calc_diag(casadi_qpip_data<T1>* d) {
+  void calc_diag(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     const casadi_ipqp_prob<T1>* p = d->prob;
@@ -151,7 +151,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  int qp_ip_iter(casadi_qpip_data<T1>* d) {
+  int qp_ip_iter(casadi_ipqp_data<T1>* d) {
     // Local variables
     const casadi_ipqp_prob<T1>* p = d->prob;
     // Converged?
@@ -174,7 +174,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void calc_res(casadi_qpip_data<T1>* d) {
+  void calc_res(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     T1 bdiff, viol;
@@ -278,7 +278,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_factorize(casadi_qpip_data<T1>* d) {
+  void qp_factorize(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int i, k, j;
     const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row,
@@ -320,7 +320,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_predictor_prepare(casadi_qpip_data<T1>* d) {
+  void qp_predictor_prepare(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     const casadi_ipqp_prob<T1>* p = d->prob;
@@ -354,7 +354,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_predictor(casadi_qpip_data<T1>* d) {
+  void qp_predictor(casadi_ipqp_data<T1>* d) {
     // Local variables
     casadi_int k;
     T1 t, alpha, sigma;
@@ -394,7 +394,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_ipstep(casadi_qpip_data<T1>* d, T1 alpha_pr, T1 alpha_du) {
+  void qp_ipstep(casadi_ipqp_data<T1>* d, T1 alpha_pr, T1 alpha_du) {
     // Local variables
     casadi_int k;
     const casadi_ipqp_prob<T1>* p = d->prob;
@@ -407,7 +407,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  int qp_maxstep(casadi_qpip_data<T1>* d, T1* alpha, casadi_int* ind) {
+  int qp_maxstep(casadi_ipqp_data<T1>* d, T1* alpha, casadi_int* ind) {
     // Local variables
     T1 test;
     casadi_int k, blocking_k;
@@ -458,7 +458,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  T1 qp_mu_test(casadi_qpip_data<T1>* d, T1 alpha) {
+  T1 qp_mu_test(casadi_ipqp_data<T1>* d, T1 alpha) {
     // Local variables
     T1 mu;
     casadi_int k;
@@ -485,7 +485,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  T1 qp_calc_sigma(casadi_qpip_data<T1>* d, T1 alpha) {
+  T1 qp_calc_sigma(casadi_ipqp_data<T1>* d, T1 alpha) {
     // Local variables
     T1 sigma;
     casadi_int k;
@@ -501,7 +501,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_corrector_prepare(casadi_qpip_data<T1>* d, T1 shift) {
+  void qp_corrector_prepare(casadi_ipqp_data<T1>* d, T1 shift) {
     // Local variables
     casadi_int k;
     const casadi_ipqp_prob<T1>* p = d->prob;
@@ -527,7 +527,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void qp_corrector(casadi_qpip_data<T1>* d) {
+  void qp_corrector(casadi_ipqp_data<T1>* d) {
     // Local variables
     T1 t, mu_test, primal_slack, primal_step, dual_slack, dual_step, max_tau;
     casadi_int k;
@@ -597,7 +597,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  int qp_ip(casadi_qpip_data<T1>* d) {
+  int qp_ip(casadi_ipqp_data<T1>* d) {
     // Local variables
     const casadi_ipqp_prob<T1>* p = d->prob;
     switch (d->next) {
@@ -645,7 +645,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  int ip_ipqp_print_header(casadi_qpip_data<T1>* d, char* buf, size_t buf_sz) {
+  int ip_ipqp_print_header(casadi_ipqp_data<T1>* d, char* buf, size_t buf_sz) {
     int flag;
     // Print to string
     flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s "
@@ -663,7 +663,7 @@ namespace casadi {
 
   // SYMBOL "qp_print_iteration"
   template<typename T1>
-  int ip_ipqp_print_iteration(casadi_qpip_data<T1>* d, char* buf, int buf_sz) {
+  int ip_ipqp_print_iteration(casadi_ipqp_data<T1>* d, char* buf, int buf_sz) {
     int flag;
     // Print iteration data without note to string
     flag = snprintf(buf, buf_sz,
@@ -847,7 +847,7 @@ namespace casadi {
     // Message buffer
     char buf[121];
     // Setup data structure
-    casadi_qpip_data<double> d;
+    casadi_ipqp_data<double> d;
     d.prob = &p_;
     d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
