@@ -785,26 +785,6 @@ namespace casadi {
     // Allocate memory
     casadi_int sz_w, sz_iw;
     casadi_ipqp_work(&p_, &sz_iw, &sz_w);
-
-    // D_x, D_g
-    sz_w += p_.nz;
-    // d.S
-    sz_w += p_.nz;
-    // lam_lbz, lam_ubz
-    sz_w += p_.nz;
-    sz_w += p_.nz;
-    // dlam_lbz, dlam_ubz
-    sz_w += p_.nz;
-    sz_w += p_.nz;
-    // Residual
-    sz_w += p_.nz;
-    sz_w += p_.nz;
-    sz_w += p_.nz;
-    sz_w += p_.nz;
-    // Inverse of distance to bounds
-    sz_w += p_.nz;
-    sz_w += p_.nz;
-
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
 
@@ -852,24 +832,6 @@ namespace casadi {
     d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
     d.nz_a = arg[CONIC_A];
-    // D_x, D_a
-    d.D = w; w += p_.nz;
-    // d.S
-    d.S = w; w += p_.nz;
-    // lam_lbx, lam_ubz
-    d.lam_lbz = w; w += p_.nz;
-    d.lam_ubz = w; w += p_.nz;
-    // dlam_lbx, dlam_ubz
-    d.dlam_lbz = w; w += p_.nz;
-    d.dlam_ubz = w; w += p_.nz;
-    // Residual
-    d.rz = w; w += p_.nz;
-    d.rlam = w; w += p_.nz;
-    d.rlam_lbz = w; w += p_.nz;
-    d.rlam_ubz = w; w += p_.nz;
-    // Inverse of distance to bounds
-    d.dinv_lbz = w; w += p_.nz;
-    d.dinv_ubz = w; w += p_.nz;
     casadi_ipqp_init(&d, &iw, &w);
     // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
