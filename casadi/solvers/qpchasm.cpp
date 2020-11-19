@@ -52,48 +52,6 @@ namespace casadi {
     uout() << "\n";
   }
 
-  template<typename T1>
-  void qp_factorize(casadi_ipqp_data<T1>* d) {
-    // Local variables
-    casadi_int i, k, j;
-    const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row,
-                     *kkt_colind, *kkt_row;
-    const casadi_ipqp_prob<T1>* p = d->prob;
-    // Extract sparsities
-    a_row = (a_colind = p->sp_a+2) + p->nx + 1;
-    at_row = (at_colind = p->sp_at+2) + p->na + 1;
-    h_row = (h_colind = p->sp_h+2) + p->nx + 1;
-    kkt_row = (kkt_colind = p->sp_kkt+2) + p->nz + 1;
-    // Reset w to zero
-    casadi_clear(d->w, p->nz);
-    // Loop over rows of the (transposed) KKT
-    for (i=0; i<p->nz; ++i) {
-      // Copy row of KKT to w
-      if (i<p->nx) {
-        for (k=h_colind[i]; k<h_colind[i+1]; ++k) d->w[h_row[k]] = d->nz_h[k];
-        for (k=a_colind[i]; k<a_colind[i+1]; ++k) d->w[p->nx+a_row[k]] = d->nz_a[k];
-      } else {
-        for (k=at_colind[i-p->nx]; k<at_colind[i-p->nx+1]; ++k) {
-          d->w[at_row[k]] = d->nz_at[k];
-        }
-      }
-      // Copy row to KKT, scale, zero out w
-      for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
-        j = kkt_row[k];
-        d->nz_kkt[k] = d->S[j] * d->w[j] * d->S[i];
-        d->w[j] = 0;
-        if (i == j) {
-          d->nz_kkt[k] += i<p->nx ? d->D[i] : -d->D[i];
-        }
-      }
-    }
-    // QR factorization
-    casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r,
-              d->nz_r, d->beta, p->prinv, p->pc);
-    // Check singularity
-    d->sing = casadi_qr_singular(&d->mina, &d->imina, d->nz_r, p->sp_r, p->pc, 1e-12);
-  }
-
   Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
@@ -269,7 +227,45 @@ namespace casadi {
         break;
       case IPQP_FACTOR:
         // Factorize KKT
-        qp_factorize(&d);
+        {
+          // Local variables
+          casadi_int i, k, j;
+          const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row,
+                           *kkt_colind, *kkt_row;
+          // Extract sparsities
+          a_row = (a_colind = p_.sp_a+2) + p_.nx + 1;
+          at_row = (at_colind = p_.sp_at+2) + p_.na + 1;
+          h_row = (h_colind = p_.sp_h+2) + p_.nx + 1;
+          kkt_row = (kkt_colind = p_.sp_kkt+2) + p_.nz + 1;
+          // Reset w to zero
+          casadi_clear(d.w, p_.nz);
+          // Loop over rows of the (transposed) KKT
+          for (i=0; i<p_.nz; ++i) {
+            // Copy row of KKT to w
+            if (i<p_.nx) {
+              for (k=h_colind[i]; k<h_colind[i+1]; ++k) d.w[h_row[k]] = d.nz_h[k];
+              for (k=a_colind[i]; k<a_colind[i+1]; ++k) d.w[p_.nx+a_row[k]] = d.nz_a[k];
+            } else {
+              for (k=at_colind[i-p_.nx]; k<at_colind[i-p_.nx+1]; ++k) {
+                d.w[at_row[k]] = d.nz_at[k];
+              }
+            }
+            // Copy row to KKT, scale, zero out w
+            for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
+              j = kkt_row[k];
+              d.nz_kkt[k] = d.S[j] * d.w[j] * d.S[i];
+              d.w[j] = 0;
+              if (i == j) {
+                d.nz_kkt[k] += i<p_.nx ? d.D[i] : -d.D[i];
+              }
+            }
+          }
+          // QR factorization
+          casadi_qr(p_.sp_kkt, d.nz_kkt, d.w, p_.sp_v, d.nz_v, p_.sp_r,
+                    d.nz_r, d.beta, p_.prinv, p_.pc);
+          // Check singularity
+          d.sing = casadi_qr_singular(&d.mina, &d.imina, d.nz_r, p_.sp_r, p_.pc, 1e-12);
+        }
         break;
       case IPQP_SOLVE:
         // Calculate step
