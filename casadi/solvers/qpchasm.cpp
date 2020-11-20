@@ -154,9 +154,6 @@ namespace casadi {
   }
 
   void Qpchasm::set_qp_prob() {
-    p_.sp_a = A_;
-    p_.sp_h = H_;
-    p_.sp_kkt = kkt_;
     casadi_ipqp_setup(&p_, nx_, na_);
   }
 
@@ -175,9 +172,7 @@ namespace casadi {
     // Setup data structure
     casadi_ipqp_data<double> d;
     d.prob = &p_;
-    d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
-    d.nz_a = arg[CONIC_A];
     double* nz_kkt = w; w += kkt_.nnz();
     casadi_ipqp_init(&d, &iw, &w);
     // Pass bounds on z

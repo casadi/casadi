@@ -8,8 +8,6 @@
 // SYMBOL "ipqp_prob"
 template<typename T1>
 struct casadi_ipqp_prob {
-  // Sparsity patterns
-  const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
   // Dimensions
   casadi_int nx, na, nz;
   // Smallest nonzero number
@@ -107,54 +105,43 @@ template<typename T1>
 struct casadi_ipqp_data {
   // Problem structure
   const casadi_ipqp_prob<T1>* prob;
-  // Solver status
-  casadi_ipqp_flag_t status;
   // QP data
-  const T1 *nz_a, *nz_h, *g;
-  // Vectors
-  T1 *z, *lbz, *ubz, *lam, *dz, *dlam;
-  // Message buffer
-  const char *msg;
-  // Message index
-  casadi_int msg_ind;
-  // Stepsize
-  T1 tau;
-  // Primal and dual error, corresponding index
-  T1 pr, du, epr, edu;
-  casadi_int ipr, idu;
-  // Iteration
-  casadi_int iter;
-  // Diagonal entries
-  T1* D;
-  // Scaling factor
-  T1* S;
-  // lam_lbx, lam_ubz
-  T1* lam_lbz;
-  T1* lam_ubz;
-  // dlam_lbx, dlam_ubz
-  T1* dlam_lbz;
-  T1* dlam_ubz;
-  // Residual
-  T1* rz;
-  T1* rlam;
-  T1* rlam_lbz;
-  T1* rlam_ubz;
-  // Inverse of margin to bounds (0 if no bound)
-  T1* dinv_lbz;
-  T1* dinv_ubz;
+  const T1 *g;
   // Complementarity measure
   T1 mu;
-  // Complementarity constraint error and corresponding index
-  T1 co;
-  casadi_int ico;
   // Number of finite constraints
   casadi_int n_con;
+  // Solver status
+  casadi_ipqp_flag_t status;
   // User task
   casadi_ipqp_task_t task;
   // Next step
   casadi_ipqp_next_t next;
   // Linear system
   T1* linsys;
+  // Message buffer
+  const char *msg;
+  // Stepsize
+  T1 tau;
+  // Primal and dual error, complementarity error, corresponding index
+  T1 pr, du, co;
+  casadi_int ipr, idu, ico;
+  // Iteration
+  casadi_int iter;
+  // Bounds
+  T1 *lbz, *ubz;
+  // Current solution
+  T1 *z, *lam, *lam_lbz, *lam_ubz;
+  // Step
+  T1 *dz, *dlam, *dlam_lbz, *dlam_ubz;
+  // Residual
+  T1 *rz, *rlam, *rlam_lbz, *rlam_ubz;
+  // Diagonal entries
+  T1* D;
+  // Scaling factor
+  T1* S;
+  // Inverse of margin to bounds (0 if no bound)
+  T1 *dinv_lbz, *dinv_ubz;
 };
 // C-REPLACE "casadi_ipqp_data<T1>" "struct casadi_ipqp_data"
 
@@ -162,23 +149,23 @@ struct casadi_ipqp_data {
 template<typename T1>
 void casadi_ipqp_init(casadi_ipqp_data<T1>* d, casadi_int** iw, T1** w) {
   const casadi_ipqp_prob<T1>* p = d->prob;
-  // Get matrix number of nonzeros
-  d->z = *w; *w += p->nz;
+  // Assign memory
   d->lbz = *w; *w += p->nz;
   d->ubz = *w; *w += p->nz;
+  d->z = *w; *w += p->nz;
   d->lam = *w; *w += p->nz;
-  d->dz = *w; *w += p->nz;
-  d->dlam = *w; *w += p->nz;
-  d->D = *w; *w += p->nz;
-  d->S = *w; *w += p->nz;
   d->lam_lbz = *w; *w += p->nz;
   d->lam_ubz = *w; *w += p->nz;
+  d->dz = *w; *w += p->nz;
+  d->dlam = *w; *w += p->nz;
   d->dlam_lbz = *w; *w += p->nz;
   d->dlam_ubz = *w; *w += p->nz;
   d->rz = *w; *w += p->nz;
   d->rlam = *w; *w += p->nz;
   d->rlam_lbz = *w; *w += p->nz;
   d->rlam_ubz = *w; *w += p->nz;
+  d->D = *w; *w += p->nz;
+  d->S = *w; *w += p->nz;
   d->dinv_lbz = *w; *w += p->nz;
   d->dinv_ubz = *w; *w += p->nz;
 }
@@ -232,7 +219,6 @@ void casadi_ipqp_reset(casadi_ipqp_data<T1>* d) {
   d->iter = 0;
   // Reset iteration variables
   d->msg = 0;
-  d->msg_ind = -2;
   d->tau = -1;
 }
 
@@ -833,11 +819,7 @@ int casadi_ipqp_print_iteration(casadi_ipqp_data<T1>* d, char* buf, int buf_sz) 
   buf_sz -= flag;
   // Print iteration note, if any
   if (d->msg) {
-    if (d->msg_ind > -2) {
-      flag = snprintf(buf, buf_sz, "%s, i=%d", d->msg, static_cast<int>(d->msg_ind));
-    } else {
-      flag = snprintf(buf, buf_sz, "%s", d->msg);
-    }
+    flag = snprintf(buf, buf_sz, "%s", d->msg);
     // Check if error
     if (flag < 0) {
       d->status = IPQP_PRINTING_ERROR;
