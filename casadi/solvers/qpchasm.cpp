@@ -225,17 +225,15 @@ namespace casadi {
       case IPQP_FACTOR:
         // Form KKT
         casadi_ipqp_kkt(p_.sp_kkt, d.nz_kkt, p_.sp_h, d.nz_h, p_.sp_a, d.nz_a,
-          d.S, d.D, d.w, d.iw);
+          d.S, d.D, w, iw);
           // Factorize KKT
-        casadi_qr(p_.sp_kkt, d.nz_kkt, d.w, p_.sp_v, d.nz_v, p_.sp_r,
+        casadi_qr(p_.sp_kkt, d.nz_kkt, w, p_.sp_v, d.nz_v, p_.sp_r,
                   d.nz_r, d.beta, p_.prinv, p_.pc);
-        // Check singularity
-        d.sing = casadi_qr_singular(&d.mina, &d.imina, d.nz_r, p_.sp_r, p_.pc, 1e-12);
         break;
       case IPQP_SOLVE:
         // Calculate step
         casadi_qr_solve(d.linsys, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r,
-          d.beta, p_.prinv, p_.pc, d.w);
+          d.beta, p_.prinv, p_.pc, w);
         break;
       }
     }

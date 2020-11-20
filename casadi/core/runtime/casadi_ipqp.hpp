@@ -64,13 +64,7 @@ void casadi_ipqp_work(const casadi_ipqp_prob<T1>* p, casadi_int* sz_iw, casadi_i
   *sz_w += p->nz; // lam
   *sz_w += p->nz; // dz
   *sz_w += p->nz; // dlam
-  *sz_w += p->nx; // infeas
-  *sz_w += p->nx; // tinfeas
   *sz_w += p->nz; // sens
-  *sz_iw += p->nz; // neverzero
-  *sz_iw += p->nz; // neverupper
-  *sz_iw += p->nz; // neverlower
-  *sz_iw += p->nz; // lincomb
   *sz_w += casadi_max(nnz_v+nnz_r, nnz_kkt); // [v,r] or trans(kkt)
   *sz_w += p->nz; // beta
   *sz_w += p->nz; // D
@@ -127,13 +121,10 @@ struct casadi_ipqp_data {
   const casadi_ipqp_prob<T1>* prob;
   // Solver status
   casadi_ipqp_flag_t status;
-  // Cost
-  T1 f;
   // QP data
   const T1 *nz_a, *nz_h, *g;
   // Vectors
-  T1 *z, *lbz, *ubz, *infeas, *tinfeas, *sens, *lam, *w, *dz, *dlam;
-  casadi_int *iw, *neverzero, *neverlower, *neverupper, *lincomb;
+  T1 *z, *lbz, *ubz, *sens, *lam, *dz, *dlam;
   // Numeric QR factorization
   T1 *nz_kkt, *beta, *nz_v, *nz_r;
   // Message buffer
@@ -142,20 +133,9 @@ struct casadi_ipqp_data {
   casadi_int msg_ind;
   // Stepsize
   T1 tau;
-  // Singularity
-  casadi_int sing;
-  // Do we already have a search direction?
-  int has_search_dir;
-  // Smallest diagonal value for the QR factorization
-  T1 mina;
-  casadi_int imina;
   // Primal and dual error, corresponding index
   T1 pr, du, epr, edu;
   casadi_int ipr, idu;
-  // Pending active-set change
-  casadi_int index, sign;
-  // Feasibility restoration active-set change
-  casadi_int r_index, r_sign;
   // Iteration
   casadi_int iter;
   // Diagonal entries
@@ -212,13 +192,7 @@ void casadi_ipqp_init(casadi_ipqp_data<T1>* d, casadi_int** iw, T1** w) {
   d->nz_v = *w; *w += casadi_max(nnz_v+nnz_r, nnz_kkt);
   d->nz_r = d->nz_v + nnz_v;
   d->beta = *w; *w += p->nz;
-  d->infeas = *w; *w += p->nx;
-  d->tinfeas = *w; *w += p->nx;
   d->sens = *w; *w += p->nz;
-  d->neverzero = *iw; *iw += p->nz;
-  d->neverupper = *iw; *iw += p->nz;
-  d->neverlower = *iw; *iw += p->nz;
-  d->lincomb = *iw; *iw += p->nz;
   d->D = *w; *w += p->nz;
   d->S = *w; *w += p->nz;
   d->lam_lbz = *w; *w += p->nz;
@@ -231,8 +205,6 @@ void casadi_ipqp_init(casadi_ipqp_data<T1>* d, casadi_int** iw, T1** w) {
   d->rlam_ubz = *w; *w += p->nz;
   d->dinv_lbz = *w; *w += p->nz;
   d->dinv_ubz = *w; *w += p->nz;
-  d->w = *w;
-  d->iw = *iw;
 }
 
 // SYMBOL "ipqp_reset"
@@ -283,10 +255,6 @@ void casadi_ipqp_reset(casadi_ipqp_data<T1>* d) {
   // Reset iteration counter
   d->iter = 0;
   // Reset iteration variables
-  d->sing = -1;
-  d->mina = nan;
-  d->imina = -1;
-  d->f = nan;
   d->msg = 0;
   d->msg_ind = -2;
   d->tau = -1;
@@ -854,10 +822,10 @@ template<typename T1>
 int casadi_ipqp_print_header(casadi_ipqp_data<T1>* d, char* buf, size_t buf_sz) {
   int flag;
   // Print to string
-  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s "
+  flag = snprintf(buf, buf_sz, "%5s %9s %9s %5s %9s %5s "
           "%9s %5s %9s %4s",
-          "Iter", "Sing", "mu", "|pr|", "con", "|du|", "var", "|co|", "con",
-          "min_R", "con", "last_tau", "Note");
+          "Iter", "mu", "|pr|", "con", "|du|", "var", "|co|", "con",
+          "last_tau", "Note");
   // Check if error
   if (flag < 0) {
     d->status = IPQP_PRINTING_ERROR;
@@ -873,13 +841,12 @@ int casadi_ipqp_print_iteration(casadi_ipqp_data<T1>* d, char* buf, int buf_sz) 
   int flag;
   // Print iteration data without note to string
   flag = snprintf(buf, buf_sz,
-    "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d "
-    "%9.2g %5d %9.2g  ",
-    static_cast<int>(d->iter), static_cast<int>(d->sing), d->mu,
+    "%5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
+    static_cast<int>(d->iter), d->mu,
     d->pr, static_cast<int>(d->ipr),
     d->du, static_cast<int>(d->idu),
     d->co, static_cast<int>(d->ico),
-    d->mina, static_cast<int>(d->imina), d->tau);
+    d->tau);
   // Check if error
   if (flag < 0) {
     d->status = IPQP_PRINTING_ERROR;
