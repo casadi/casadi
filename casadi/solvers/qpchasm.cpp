@@ -95,29 +95,27 @@ namespace casadi {
   void Qpchasm::init(const Dict& opts) {
     // Initialize the base classes
     Conic::init(opts);
-
     // Assemble KKT system sparsity
     kkt_ = Sparsity::kkt(H_, A_, true, true);
-
     // Setup memory structure
     set_qp_prob();
-
     // Default options
     print_iter_ = true;
     print_header_ = true;
     print_info_ = true;
     linear_solver_ = "qr";
-
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
         p_.max_iter = op.second;
-      } else if (op.first=="constr_viol_tol") {
-        p_.constr_viol_tol = op.second;
-      } else if (op.first=="dual_inf_tol") {
-        p_.dual_inf_tol = op.second;
-      } else if (op.first=="min_lam") {
-        p_.min_lam = op.second;
+      } else if (op.first=="pr_tol") {
+        p_.pr_tol = op.second;
+      } else if (op.first=="du_tol") {
+        p_.du_tol = op.second;
+      } else if (op.first=="co_tol") {
+        p_.co_tol = op.second;
+      } else if (op.first=="mu_tol") {
+        p_.mu_tol = op.second;
       } else if (op.first=="print_iter") {
         print_iter_ = op.second;
       } else if (op.first=="print_header") {
@@ -130,20 +128,16 @@ namespace casadi {
         linear_solver_options_ = op.second;
       }
     }
-
-    // Allocate memory for IP solver
+    // Memory for IP solver
     alloc_w(casadi_ipqp_sz_w(&p_), true);
-
-    // For KKT formation
+    // Memory for KKT formation
     alloc_w(kkt_.nnz(), true);
     alloc_iw(A_.size2());
     alloc_w(nx_ + na_);
-
     // KKT solver
     linsol_ = Linsol("linsol", linear_solver_, kkt_, linear_solver_options_);
-
+    // Print summary
     if (print_header_) {
-      // Print summary
       print("-------------------------------------------\n");
       print("This is casadi::QPCHASM\n");
       print("Number of variables:                       %9d\n", nx_);
@@ -287,11 +281,14 @@ namespace casadi {
     s.unpack("Qpchasm::print_iter", print_iter_);
     s.unpack("Qpchasm::print_header", print_header_);
     s.unpack("Qpchasm::print_info", print_info_);
+    s.unpack("Qpchasm::linear_solver", linear_solver_);
+    s.unpack("Qpchasm::linear_solver_options", linear_solver_options_);
     set_qp_prob();
     s.unpack("Qpchasm::max_iter", p_.max_iter);
-    s.unpack("Qpchasm::min_lam", p_.min_lam);
-    s.unpack("Qpchasm::constr_viol_tol", p_.constr_viol_tol);
-    s.unpack("Qpchasm::dual_inf_tol", p_.dual_inf_tol);
+    s.unpack("Qpchasm::pr_tol", p_.pr_tol);
+    s.unpack("Qpchasm::du_tol", p_.du_tol);
+    s.unpack("Qpchasm::co_tol", p_.co_tol);
+    s.unpack("Qpchasm::mu_tol", p_.mu_tol);
   }
 
   void Qpchasm::serialize_body(SerializingStream &s) const {
@@ -302,10 +299,13 @@ namespace casadi {
     s.pack("Qpchasm::print_iter", print_iter_);
     s.pack("Qpchasm::print_header", print_header_);
     s.pack("Qpchasm::print_info", print_info_);
+    s.pack("Qpchasm::linear_solver", linear_solver_);
+    s.pack("Qpchasm::linear_solver_options", linear_solver_options_);
     s.pack("Qpchasm::max_iter", p_.max_iter);
-    s.pack("Qpchasm::min_lam", p_.min_lam);
-    s.pack("Qpchasm::constr_viol_tol", p_.constr_viol_tol);
-    s.pack("Qpchasm::dual_inf_tol", p_.dual_inf_tol);
+    s.pack("Qpchasm::pr_tol", p_.pr_tol);
+    s.pack("Qpchasm::du_tol", p_.du_tol);
+    s.pack("Qpchasm::co_tol", p_.co_tol);
+    s.pack("Qpchasm::mu_tol", p_.mu_tol);
   }
 
 } // namespace casadi

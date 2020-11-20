@@ -14,12 +14,10 @@ struct casadi_ipqp_prob {
   T1 dmin;
   // Infinity
   T1 inf;
-  // Smallest multiplier treated as inactive for the initial active set
-  T1 min_lam;
   // Maximum number of iterations
   casadi_int max_iter;
-  // Primal and dual error tolerance
-  T1 constr_viol_tol, dual_inf_tol;
+  // Error tolerance
+  T1 pr_tol, du_tol, co_tol, mu_tol;
 };
 // C-REPLACE "casadi_ipqp_prob<T1>" "struct casadi_ipqp_prob"
 
@@ -31,10 +29,11 @@ void casadi_ipqp_setup(casadi_ipqp_prob<T1>* p, casadi_int nx, casadi_int na) {
   p->nz = nx + na;
   p->dmin = std::numeric_limits<T1>::min();
   p->inf = std::numeric_limits<T1>::infinity();
-  p->min_lam = 0;
-  p->max_iter = 1000;
-  p->constr_viol_tol = 1e-8;
-  p->dual_inf_tol = 1e-8;
+  p->max_iter = 100;
+  p->pr_tol = 1e-8;
+  p->du_tol = 1e-8;
+  p->co_tol = 1e-8;
+  p->mu_tol = 1e-8;
 }
 
 // SYMBOL "ipqp_flag_t"
@@ -271,8 +270,8 @@ int casadi_ipqp_newiter(casadi_ipqp_data<T1>* d) {
   // Local variables
   const casadi_ipqp_prob<T1>* p = d->prob;
   // Converged?
-  if (d->pr < p->constr_viol_tol && d->du < p->dual_inf_tol
-      && d->co < 1e-9 && d->mu < 1e-6) {
+  if (d->pr < p->pr_tol && d->du < p->du_tol && d->co < p->co_tol
+      && d->mu < p->mu_tol) {
     d->status = IPQP_SUCCESS;
     return 1;
   }
