@@ -134,11 +134,8 @@ namespace casadi {
       }
     }
 
-    // Allocate memory
-    casadi_int sz_w, sz_iw;
-    casadi_ipqp_work(&p_, &sz_iw, &sz_w);
-    alloc_iw(sz_iw, true);
-    alloc_w(sz_w, true);
+    // Allocate memory for IP solver
+    alloc_w(casadi_ipqp_sz_w(&p_), true);
 
     // For KKT formation
     alloc_w(kkt_.nnz(), true);

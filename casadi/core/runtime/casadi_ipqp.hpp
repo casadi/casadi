@@ -41,43 +41,43 @@ void casadi_ipqp_setup(casadi_ipqp_prob<T1>* p, casadi_int nx, casadi_int na) {
   p->dual_inf_tol = 1e-8;
 }
 
-// SYMBOL "ipqp_work"
+// SYMBOL "ipqp_sz_w"
 template<typename T1>
-void casadi_ipqp_work(const casadi_ipqp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) {
+casadi_int casadi_ipqp_sz_w(const casadi_ipqp_prob<T1>* p) {
   // Local variables
   casadi_int nnz_kkt, nnz_v, nnz_r;
+  // Return value
+  casadi_int sz_w = 0;
   // Get matrix number of nonzeros
   nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
   nnz_v = p->sp_v[2+p->sp_v[1]];
   nnz_r = p->sp_r[2+p->sp_r[1]];
-  // Reset sz_w, sz_iw
-  *sz_w = *sz_iw = 0;
   // Temporary work vectors
-  *sz_w = casadi_max(*sz_w, p->nz); // casadi_project, tau memory
-  *sz_iw = casadi_max(*sz_iw, p->nz); // casadi_trans, tau type, allzero
-  *sz_w = casadi_max(*sz_w, 2*p->nz); // casadi_qr
+  sz_w = casadi_max(sz_w, p->nz); // casadi_project, tau memory
+  sz_w = casadi_max(sz_w, 2*p->nz); // casadi_qr
   // Persistent work vectors
-  *sz_w += nnz_kkt; // kkt
-  *sz_w += p->nz; // z=[xk,gk]
-  *sz_w += p->nz; // lbz
-  *sz_w += p->nz; // ubz
-  *sz_w += p->nz; // lam
-  *sz_w += p->nz; // dz
-  *sz_w += p->nz; // dlam
-  *sz_w += casadi_max(nnz_v+nnz_r, nnz_kkt); // [v,r] or trans(kkt)
-  *sz_w += p->nz; // beta
-  *sz_w += p->nz; // D
-  *sz_w += p->nz; // S
-  *sz_w += p->nz; // lam_lbz
-  *sz_w += p->nz; // lam_ubz
-  *sz_w += p->nz; // dlam_lbz
-  *sz_w += p->nz; // dlam_ubz
-  *sz_w += p->nz; // rz
-  *sz_w += p->nz; // rlam
-  *sz_w += p->nz; // rlam_lbz
-  *sz_w += p->nz; // rlam_ubz
-  *sz_w += p->nz; // dinv_lbz
-  *sz_w += p->nz; // dinv_ubz
+  sz_w += nnz_kkt; // kkt
+  sz_w += p->nz; // z
+  sz_w += p->nz; // lbz
+  sz_w += p->nz; // ubz
+  sz_w += p->nz; // lam
+  sz_w += p->nz; // dz
+  sz_w += p->nz; // dlam
+  sz_w += casadi_max(nnz_v+nnz_r, nnz_kkt); // [v,r] or trans(kkt)
+  sz_w += p->nz; // beta
+  sz_w += p->nz; // D
+  sz_w += p->nz; // S
+  sz_w += p->nz; // lam_lbz
+  sz_w += p->nz; // lam_ubz
+  sz_w += p->nz; // dlam_lbz
+  sz_w += p->nz; // dlam_ubz
+  sz_w += p->nz; // rz
+  sz_w += p->nz; // rlam
+  sz_w += p->nz; // rlam_lbz
+  sz_w += p->nz; // rlam_ubz
+  sz_w += p->nz; // dinv_lbz
+  sz_w += p->nz; // dinv_ubz
+  return sz_w;
 }
 
 // SYMBOL "ipqp_flag_t"
