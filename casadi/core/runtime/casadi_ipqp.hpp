@@ -45,9 +45,8 @@ void casadi_ipqp_setup(casadi_ipqp_prob<T1>* p) {
 template<typename T1>
 void casadi_ipqp_work(const casadi_ipqp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) {
   // Local variables
-  casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
+  casadi_int nnz_kkt, nnz_v, nnz_r;
   // Get matrix number of nonzeros
-  nnz_a = p->sp_a[2+p->sp_a[1]];
   nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
   nnz_v = p->sp_v[2+p->sp_v[1]];
   nnz_r = p->sp_r[2+p->sp_r[1]];
@@ -63,7 +62,6 @@ void casadi_ipqp_work(const casadi_ipqp_prob<T1>* p, casadi_int* sz_iw, casadi_i
   *sz_w += p->nz; // lbz
   *sz_w += p->nz; // ubz
   *sz_w += p->nz; // lam
-  *sz_w += nnz_a; // trans(a)
   *sz_w += p->nz; // dz
   *sz_w += p->nz; // dlam
   *sz_w += p->nx; // infeas
@@ -137,7 +135,7 @@ struct casadi_ipqp_data {
   T1 *z, *lbz, *ubz, *infeas, *tinfeas, *sens, *lam, *w, *dz, *dlam;
   casadi_int *iw, *neverzero, *neverlower, *neverupper, *lincomb;
   // Numeric QR factorization
-  T1 *nz_at, *nz_kkt, *beta, *nz_v, *nz_r;
+  T1 *nz_kkt, *beta, *nz_v, *nz_r;
   // Message buffer
   const char *msg;
   // Message index
@@ -198,10 +196,9 @@ struct casadi_ipqp_data {
 template<typename T1>
 void casadi_ipqp_init(casadi_ipqp_data<T1>* d, casadi_int** iw, T1** w) {
   // Local variables
-  casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
+  casadi_int nnz_kkt, nnz_v, nnz_r;
   const casadi_ipqp_prob<T1>* p = d->prob;
   // Get matrix number of nonzeros
-  nnz_a = p->sp_a[2+p->sp_a[1]];
   nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
   nnz_v = p->sp_v[2+p->sp_v[1]];
   nnz_r = p->sp_r[2+p->sp_r[1]];
@@ -215,7 +212,6 @@ void casadi_ipqp_init(casadi_ipqp_data<T1>* d, casadi_int** iw, T1** w) {
   d->nz_v = *w; *w += casadi_max(nnz_v+nnz_r, nnz_kkt);
   d->nz_r = d->nz_v + nnz_v;
   d->beta = *w; *w += p->nz;
-  d->nz_at = *w; *w += nnz_a;
   d->infeas = *w; *w += p->nx;
   d->tinfeas = *w; *w += p->nx;
   d->sens = *w; *w += p->nz;

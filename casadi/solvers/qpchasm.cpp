@@ -94,9 +94,6 @@ namespace casadi {
     // Initialize the base classes
     Conic::init(opts);
 
-    // Transpose of the Jacobian
-    AT_ = A_.T();
-
     // Assemble KKT system sparsity
     kkt_ = Sparsity::kkt(H_, A_, true, true);
 
@@ -159,7 +156,6 @@ namespace casadi {
   void Qpchasm::set_qp_prob() {
     p_.sp_a = A_;
     p_.sp_h = H_;
-    p_.sp_at = AT_;
     p_.sp_kkt = kkt_;
     p_.sp_v = sp_v_;
     p_.sp_r = sp_r_;
@@ -199,8 +195,6 @@ namespace casadi {
     casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
     casadi_fill(d.lam_lbz, p_.nz, 0.);
     casadi_fill(d.lam_ubz, p_.nz, 0.);
-    // Transpose A
-    casadi_trans(d.nz_a, p_.sp_a, d.nz_at, p_.sp_at, d.iw);
     // New QP
     d.next = IPQP_RESET;
     // Reverse communication loop
@@ -233,41 +227,43 @@ namespace casadi {
         {
           // Local variables
           casadi_int i, k, j;
-          const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row,
+          const casadi_int *h_colind, *h_row, *a_colind, *a_row,
                            *kkt_colind, *kkt_row;
           // Extract sparsities
           a_row = (a_colind = p_.sp_a+2) + p_.nx + 1;
-          at_row = (at_colind = p_.sp_at+2) + p_.na + 1;
           h_row = (h_colind = p_.sp_h+2) + p_.nx + 1;
           kkt_row = (kkt_colind = p_.sp_kkt+2) + p_.nz + 1;
+          // Running indices for each row of A
+          for (i = 0; i < p_.na; ++i) d.iw[i] = kkt_colind[i + p_.nx];
           // Reset w to zero
           casadi_clear(d.w, p_.nz);
           // Loop over columns of [H + D_x; A]
           for (i=0; i<p_.nx; ++i) {
-            // Copy row of KKT to w
-            for (k=h_colind[i]; k<h_colind[i+1]; ++k) d.w[h_row[k]] = d.nz_h[k];
-            for (k=a_colind[i]; k<a_colind[i+1]; ++k) d.w[p_.nx+a_row[k]] = d.nz_a[k];
-            // Copy row to KKT, scale, zero out w
+            // Copy scaled column of H to w
+            for (k=h_colind[i]; k<h_colind[i+1]; ++k) {
+              j = h_row[k];
+              d.w[j] = d.nz_h[k] * d.S[i] * d.S[j];
+            }
+            // Copy scaled column of A to w
+            for (k=a_colind[i]; k<a_colind[i+1]; ++k) {
+              j = a_row[k] + p_.nx;
+              d.w[j] = d.nz_a[k] * d.S[i] * d.S[j];
+            }
+            // Add D_x to diagonal
+            d.w[i] += d.D[i];
+            // Copy column to KKT
             for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
               j = kkt_row[k];
-              d.nz_kkt[k] = d.S[j] * d.w[j] * d.S[i];
-              d.w[j] = 0;
-              if (i == j) d.nz_kkt[k] += d.D[i];
+              d.nz_kkt[k] = d.w[j];
+              if (j >= p_.nx) d.nz_kkt[d.iw[j - p_.nx]++] = d.w[j];
             }
+            // Zero out w
+            for (k=h_colind[i]; k<h_colind[i+1]; ++k) d.w[h_row[k]] = 0;
+            for (k=a_colind[i]; k<a_colind[i+1]; ++k) d.w[a_row[k] + p_.nx] = 0;
           }
-          // Loop over columns of [A', -D_g]
+          // Copy -D_g to diagonal
           for (i=p_.nx; i<p_.nz; ++i) {
-            // Copy row of KKT to w
-            for (k=at_colind[i-p_.nx]; k<at_colind[i-p_.nx+1]; ++k) {
-              d.w[at_row[k]] = d.nz_at[k];
-            }
-            // Copy row to KKT, scale, zero out w
-            for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
-              j = kkt_row[k];
-              d.nz_kkt[k] = d.S[j] * d.w[j] * d.S[i];
-              d.w[j] = 0;
-              if (i == j) d.nz_kkt[k] -= d.D[i];
-            }
+            d.nz_kkt[d.iw[i - p_.nx]++] = -d.D[i];
           }
           // QR factorization
           casadi_qr(p_.sp_kkt, d.nz_kkt, d.w, p_.sp_v, d.nz_v, p_.sp_r,
@@ -323,7 +319,6 @@ namespace casadi {
 
   Qpchasm::Qpchasm(DeserializingStream& s) : Conic(s) {
     s.version("Qpchasm", 1);
-    s.unpack("Qpchasm::AT", AT_);
     s.unpack("Qpchasm::kkt", kkt_);
     s.unpack("Qpchasm::sp_v", sp_v_);
     s.unpack("Qpchasm::sp_r", sp_r_);
@@ -344,7 +339,6 @@ namespace casadi {
     Conic::serialize_body(s);
 
     s.version("Qpchasm", 1);
-    s.pack("Qpchasm::AT", AT_);
     s.pack("Qpchasm::kkt", kkt_);
     s.pack("Qpchasm::sp_v", sp_v_);
     s.pack("Qpchasm::sp_r", sp_r_);
