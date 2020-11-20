@@ -732,6 +732,21 @@ int casadi_ipqp(casadi_ipqp_data<T1>* d) {
   return 0;
 }
 
+// SYMBOL "ipqp_return_status"
+inline
+const char* casadi_ipqp_return_status(casadi_ipqp_flag_t status) {
+  switch (status) {
+    case IPQP_SUCCESS: return "success";
+    case IPQP_MAX_ITER: return "Maximum number of iterations reached";
+    case IPQP_NO_SEARCH_DIR: return "Failed to calculate search direction";
+    case IPQP_MV_ERROR: return "Matrix-vector evaluation error";
+    case IPQP_FACTOR_ERROR: return "Linear solver factorization error";
+    case IPQP_SOLVE_ERROR: return "Linear solver solution error";
+    case IPQP_PROGRESS_ERROR: return "Printing error";
+  }
+  return 0;
+}
+
 // The following routines require stdio
 #ifndef CASADI_PRINTF
 

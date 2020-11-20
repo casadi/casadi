@@ -226,33 +226,12 @@ namespace casadi {
         break;
       }
     }
-    // Check return flag
-    switch (d.status) {
-      case IPQP_SUCCESS:
-        m->return_status = "success";
-        break;
-      case IPQP_MAX_ITER:
-        m->return_status = "Maximum number of iterations reached";
-        m->unified_return_status = SOLVER_RET_LIMITED;
-        break;
-      case IPQP_NO_SEARCH_DIR:
-        m->return_status = "Failed to calculate search direction";
-        break;
-      case IPQP_MV_ERROR:
-        m->return_status = "Matrix-vector evaluation error";
-        break;
-      case IPQP_FACTOR_ERROR:
-        m->return_status = "Linear solver factorization error";
-        break;
-      case IPQP_SOLVE_ERROR:
-        m->return_status = "Linear solver solution error";
-        break;
-      case IPQP_PROGRESS_ERROR:
-        m->return_status = "Printing error";
-        break;
-    }
     // Release linear solver instance
     linsol_.release(linsol_mem);
+    // Read return status
+    m->return_status = casadi_ipqp_return_status(d.status);
+    if (d.status == IPQP_MAX_ITER)
+      m->unified_return_status = SOLVER_RET_LIMITED;
     // Get solution
     casadi_copy(d.z, nx_, res[CONIC_X]);
     casadi_copy(d.lam, nx_, res[CONIC_LAM_X]);
