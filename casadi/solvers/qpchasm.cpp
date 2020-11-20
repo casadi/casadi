@@ -141,6 +141,7 @@ namespace casadi {
     alloc_w(sz_w, true);
 
     // For KKT formation
+    alloc_w(kkt_.nnz(), true);
     alloc_iw(A_.size2());
 
     // KKT solver
@@ -189,6 +190,7 @@ namespace casadi {
     d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
     d.nz_a = arg[CONIC_A];
+    double* nz_kkt = w; w += kkt_.nnz();
     casadi_ipqp_init(&d, &iw, &w);
     // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
@@ -212,9 +214,9 @@ namespace casadi {
       case IPQP_MV:
         // Matrix-vector multiplication
         casadi_clear(d.rz, p_.nz);
-        casadi_mv(d.nz_h, p_.sp_h, d.z, d.rz, 0);
-        casadi_mv(d.nz_a, p_.sp_a, d.lam + p_.nx, d.rz, 1);
-        casadi_mv(d.nz_a, p_.sp_a, d.z, d.rz + p_.nx, 0);
+        casadi_mv(arg[CONIC_H], H_, d.z, d.rz, 0);
+        casadi_mv(arg[CONIC_A], A_, d.lam + p_.nx, d.rz, 1);
+        casadi_mv(arg[CONIC_A], A_, d.z, d.rz + p_.nx, 0);
         break;
       case IPQP_PROGRESS:
         // Print progress
@@ -233,14 +235,14 @@ namespace casadi {
         break;
       case IPQP_FACTOR:
         // Form KKT
-        casadi_ipqp_kkt(p_.sp_kkt, d.nz_kkt, p_.sp_h, d.nz_h, p_.sp_a, d.nz_a,
+        casadi_ipqp_kkt(kkt_, nz_kkt, H_, arg[CONIC_H], A_, arg[CONIC_A],
           d.S, d.D, w, iw);
         // Factorize KKT
-        (void)linsol_.nfact(d.nz_kkt, linsol_mem);
+        (void)linsol_.nfact(nz_kkt, linsol_mem);
         break;
       case IPQP_SOLVE:
         // Solve KKT
-        (void)linsol_.solve(d.nz_kkt, d.linsys, 1, false, linsol_mem);
+        (void)linsol_.solve(nz_kkt, d.linsys, 1, false, linsol_mem);
         break;
       }
     }
@@ -268,7 +270,7 @@ namespace casadi {
     casadi_copy(d.lam+nx_, na_, res[CONIC_LAM_A]);
     // Calculate optimal cost
     if (res[CONIC_COST]) {
-      *res[CONIC_COST] = .5 * casadi_bilin(d.nz_h, p_.sp_h, d.z, d.z)
+      *res[CONIC_COST] = .5 * casadi_bilin(arg[CONIC_H], H_, d.z, d.z)
         + casadi_dot(p_.nx, d.z, d.g);
     }
     // Return
