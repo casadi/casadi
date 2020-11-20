@@ -23,27 +23,27 @@
  */
 
 
-#include "qpchasm.hpp"
+#include "ipqp.hpp"
 #include "casadi/core/nlpsol.hpp"
 
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_CONIC_QPCHASM_EXPORT
-  casadi_register_conic_qpchasm(Conic::Plugin* plugin) {
-    plugin->creator = Qpchasm::creator;
-    plugin->name = "qpchasm";
-    plugin->doc = Qpchasm::meta_doc.c_str();
+  int CASADI_CONIC_IPQP_EXPORT
+  casadi_register_conic_ipqp(Conic::Plugin* plugin) {
+    plugin->creator = Ipqp::creator;
+    plugin->name = "ipqp";
+    plugin->doc = Ipqp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
-    plugin->options = &Qpchasm::options_;
-    plugin->deserialize = &Qpchasm::deserialize;
+    plugin->options = &Ipqp::options_;
+    plugin->deserialize = &Ipqp::deserialize;
     return 0;
   }
 
   extern "C"
-  void CASADI_CONIC_QPCHASM_EXPORT casadi_load_conic_qpchasm() {
-    Conic::registerPlugin(casadi_register_conic_qpchasm);
+  void CASADI_CONIC_IPQP_EXPORT casadi_load_conic_ipqp() {
+    Conic::registerPlugin(casadi_register_conic_ipqp);
   }
 
   void print_vec(const std::string& str, const double* v, casadi_int n) {
@@ -52,15 +52,15 @@ namespace casadi {
     uout() << "\n";
   }
 
-  Qpchasm::Qpchasm(const std::string& name, const std::map<std::string, Sparsity> &st)
+  Ipqp::Ipqp(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
 
-  Qpchasm::~Qpchasm() {
+  Ipqp::~Ipqp() {
     clear_mem();
   }
 
-  const Options Qpchasm::options_
+  const Options Ipqp::options_
   = {{&Conic::options_},
      {{"max_iter",
        {OT_INT,
@@ -92,7 +92,7 @@ namespace casadi {
      }
   };
 
-  void Qpchasm::init(const Dict& opts) {
+  void Ipqp::init(const Dict& opts) {
     // Initialize the base classes
     Conic::init(opts);
     // Assemble KKT system sparsity
@@ -139,7 +139,7 @@ namespace casadi {
     // Print summary
     if (print_header_) {
       print("-------------------------------------------\n");
-      print("This is casadi::QPCHASM\n");
+      print("This is casadi::IPQP\n");
       print("Number of variables:                       %9d\n", nx_);
       print("Number of constraints:                     %9d\n", na_);
       print("Number of nonzeros in H:                   %9d\n", H_.nnz());
@@ -148,20 +148,20 @@ namespace casadi {
     }
   }
 
-  void Qpchasm::set_qp_prob() {
+  void Ipqp::set_qp_prob() {
     casadi_ipqp_setup(&p_, nx_, na_);
   }
 
-  int Qpchasm::init_mem(void* mem) const {
+  int Ipqp::init_mem(void* mem) const {
     if (Conic::init_mem(mem)) return 1;
-    auto m = static_cast<QpchasmMemory*>(mem);
+    auto m = static_cast<IpqpMemory*>(mem);
     m->return_status = "";
     return 0;
   }
 
-  int Qpchasm::
+  int Ipqp::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    auto m = static_cast<QpchasmMemory*>(mem);
+    auto m = static_cast<IpqpMemory*>(mem);
     // Message buffer
     char buf[121];
     // Setup data structure
@@ -268,44 +268,44 @@ namespace casadi {
     return 0;
   }
 
-  Dict Qpchasm::get_stats(void* mem) const {
+  Dict Ipqp::get_stats(void* mem) const {
     Dict stats = Conic::get_stats(mem);
-    auto m = static_cast<QpchasmMemory*>(mem);
+    auto m = static_cast<IpqpMemory*>(mem);
     stats["return_status"] = m->return_status;
     return stats;
   }
 
-  Qpchasm::Qpchasm(DeserializingStream& s) : Conic(s) {
-    s.version("Qpchasm", 1);
-    s.unpack("Qpchasm::kkt", kkt_);
-    s.unpack("Qpchasm::print_iter", print_iter_);
-    s.unpack("Qpchasm::print_header", print_header_);
-    s.unpack("Qpchasm::print_info", print_info_);
-    s.unpack("Qpchasm::linear_solver", linear_solver_);
-    s.unpack("Qpchasm::linear_solver_options", linear_solver_options_);
+  Ipqp::Ipqp(DeserializingStream& s) : Conic(s) {
+    s.version("Ipqp", 1);
+    s.unpack("Ipqp::kkt", kkt_);
+    s.unpack("Ipqp::print_iter", print_iter_);
+    s.unpack("Ipqp::print_header", print_header_);
+    s.unpack("Ipqp::print_info", print_info_);
+    s.unpack("Ipqp::linear_solver", linear_solver_);
+    s.unpack("Ipqp::linear_solver_options", linear_solver_options_);
     set_qp_prob();
-    s.unpack("Qpchasm::max_iter", p_.max_iter);
-    s.unpack("Qpchasm::pr_tol", p_.pr_tol);
-    s.unpack("Qpchasm::du_tol", p_.du_tol);
-    s.unpack("Qpchasm::co_tol", p_.co_tol);
-    s.unpack("Qpchasm::mu_tol", p_.mu_tol);
+    s.unpack("Ipqp::max_iter", p_.max_iter);
+    s.unpack("Ipqp::pr_tol", p_.pr_tol);
+    s.unpack("Ipqp::du_tol", p_.du_tol);
+    s.unpack("Ipqp::co_tol", p_.co_tol);
+    s.unpack("Ipqp::mu_tol", p_.mu_tol);
   }
 
-  void Qpchasm::serialize_body(SerializingStream &s) const {
+  void Ipqp::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
-    s.version("Qpchasm", 1);
-    s.pack("Qpchasm::kkt", kkt_);
-    s.pack("Qpchasm::print_iter", print_iter_);
-    s.pack("Qpchasm::print_header", print_header_);
-    s.pack("Qpchasm::print_info", print_info_);
-    s.pack("Qpchasm::linear_solver", linear_solver_);
-    s.pack("Qpchasm::linear_solver_options", linear_solver_options_);
-    s.pack("Qpchasm::max_iter", p_.max_iter);
-    s.pack("Qpchasm::pr_tol", p_.pr_tol);
-    s.pack("Qpchasm::du_tol", p_.du_tol);
-    s.pack("Qpchasm::co_tol", p_.co_tol);
-    s.pack("Qpchasm::mu_tol", p_.mu_tol);
+    s.version("Ipqp", 1);
+    s.pack("Ipqp::kkt", kkt_);
+    s.pack("Ipqp::print_iter", print_iter_);
+    s.pack("Ipqp::print_header", print_header_);
+    s.pack("Ipqp::print_info", print_info_);
+    s.pack("Ipqp::linear_solver", linear_solver_);
+    s.pack("Ipqp::linear_solver_options", linear_solver_options_);
+    s.pack("Ipqp::max_iter", p_.max_iter);
+    s.pack("Ipqp::pr_tol", p_.pr_tol);
+    s.pack("Ipqp::du_tol", p_.du_tol);
+    s.pack("Ipqp::co_tol", p_.co_tol);
+    s.pack("Ipqp::mu_tol", p_.mu_tol);
   }
 
 } // namespace casadi

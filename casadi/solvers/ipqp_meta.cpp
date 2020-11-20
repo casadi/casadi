@@ -23,9 +23,9 @@
  */
 
 
-      #include "qpchasm.hpp"
+      #include "ipqp.hpp"
       #include <string>
 
-      const std::string casadi::Qpchasm::meta_doc=
+      const std::string casadi::Ipqp::meta_doc=
       "\n"
 ;

@@ -23,62 +23,62 @@
  */
 
 
-#ifndef CASADI_QPCHASM_HPP
-#define CASADI_QPCHASM_HPP
+#ifndef CASADI_IPQP_HPP
+#define CASADI_IPQP_HPP
 
 #include "casadi/core/conic_impl.hpp"
-#include <casadi/solvers/casadi_conic_qpchasm_export.h>
+#include <casadi/solvers/casadi_conic_ipqp_export.h>
 #include "casadi/core/linsol.hpp"
 
-/** \defgroup plugin_Conic_qpchasm
- Solve QPs using an hybrid active-set, interior point method
+/** \defgroup plugin_Conic_ipqp
+ Solves QPs using a Mehrotra predictor-corrector interior point method
 */
 
-/** \pluginsection{Conic,qpchasm} */
+/** \pluginsection{Conic,ipqp} */
 
 /// \cond INTERNAL
 namespace casadi {
-  struct CASADI_CONIC_QPCHASM_EXPORT QpchasmMemory : public ConicMemory {
+  struct CASADI_CONIC_IPQP_EXPORT IpqpMemory : public ConicMemory {
     const char* return_status;
   };
 
-  /** \brief \pluginbrief{Conic,qpchasm}
+  /** \brief \pluginbrief{Conic,ipqp}
 
       @copydoc Conic_doc
-      @copydoc plugin_Conic_qpchasm
+      @copydoc plugin_Conic_ipqp
 
       \author Joel Andersson
       \date 2020
   */
-  class CASADI_CONIC_QPCHASM_EXPORT Qpchasm : public Conic {
+  class CASADI_CONIC_IPQP_EXPORT Ipqp : public Conic {
   public:
     /** \brief  Create a new Solver */
-    explicit Qpchasm(const std::string& name,
+    explicit Ipqp(const std::string& name,
                   const std::map<std::string, Sparsity> &st);
 
     /** \brief  Create a new QP Solver */
     static Conic* creator(const std::string& name,
                           const std::map<std::string, Sparsity>& st) {
-      return new Qpchasm(name, st);
+      return new Ipqp(name, st);
     }
 
     /** \brief  Destructor */
-    ~Qpchasm() override;
+    ~Ipqp() override;
 
     // Get name of the plugin
-    const char* plugin_name() const override { return "qpchasm";}
+    const char* plugin_name() const override { return "ipqp";}
 
     // Get name of the class
-    std::string class_name() const override { return "Qpchasm";}
+    std::string class_name() const override { return "Ipqp";}
 
     /** \brief Create memory block */
-    void* alloc_mem() const override { return new QpchasmMemory();}
+    void* alloc_mem() const override { return new IpqpMemory();}
 
     /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<QpchasmMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<IpqpMemory*>(mem);}
 
     ///@{
     /** \brief Options */
@@ -114,11 +114,11 @@ namespace casadi {
     void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeserializingStream& s) { return new Qpchasm(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Ipqp(s); }
 
   protected:
      /** \brief Deserializing constructor */
-    explicit Qpchasm(DeserializingStream& s);
+    explicit Ipqp(DeserializingStream& s);
 
   private:
     void set_qp_prob();
@@ -126,4 +126,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_QPCHASM_HPP
+#endif // CASADI_IPQP_HPP
