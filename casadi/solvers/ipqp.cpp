@@ -82,7 +82,7 @@ namespace casadi {
         "Print info [true]."}},
       {"linear_solver",
        {OT_STRING,
-        "A custom linear solver creator function [default: qr]"}},
+        "A custom linear solver creator function [default: ldl]"}},
       {"linear_solver_options",
        {OT_DICT,
         "Options to be passed to the linear solver"}},
@@ -103,7 +103,7 @@ namespace casadi {
     print_iter_ = true;
     print_header_ = true;
     print_info_ = true;
-    linear_solver_ = "qr";
+    linear_solver_ = "ldl";
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
