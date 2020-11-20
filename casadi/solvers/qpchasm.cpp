@@ -219,7 +219,7 @@ namespace casadi {
         break;
       case IPQP_FACTOR:
         // Form KKT
-        casadi_ipqp_kkt(kkt_, nz_kkt, H_, arg[CONIC_H], A_, arg[CONIC_A],
+        casadi_kkt(kkt_, nz_kkt, H_, arg[CONIC_H], A_, arg[CONIC_A],
           d.S, d.D, w, iw);
         // Factorize KKT
         if (linsol_.nfact(nz_kkt, linsol_mem))
