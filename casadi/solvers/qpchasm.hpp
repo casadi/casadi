@@ -100,10 +100,8 @@ namespace casadi {
     static const std::string meta_doc;
     // Memory structure
     casadi_ipqp_prob<double> p_;
-    // KKT system and its QR factorization
-    Sparsity kkt_, sp_v_, sp_r_;
-    // KKT system permutation
-    std::vector<casadi_int> prinv_, pc_;
+    // KKT system
+    Sparsity kkt_;
     // KKT linear solver
     Linsol linsol_;
     ///@{

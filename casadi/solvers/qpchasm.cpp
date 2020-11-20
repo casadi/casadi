@@ -99,9 +99,6 @@ namespace casadi {
     // Assemble KKT system sparsity
     kkt_ = Sparsity::kkt(H_, A_, true, true);
 
-    // Symbolic QR factorization
-    kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
-
     // Setup memory structure
     set_qp_prob();
 
@@ -153,8 +150,6 @@ namespace casadi {
       print("Number of nonzeros in H:                   %9d\n", H_.nnz());
       print("Number of nonzeros in A:                   %9d\n", A_.nnz());
       print("Number of nonzeros in KKT:                 %9d\n", kkt_.nnz());
-      print("Number of nonzeros in QR(V):               %9d\n", sp_v_.nnz());
-      print("Number of nonzeros in QR(R):               %9d\n", sp_r_.nnz());
     }
   }
 
@@ -162,10 +157,6 @@ namespace casadi {
     p_.sp_a = A_;
     p_.sp_h = H_;
     p_.sp_kkt = kkt_;
-    p_.sp_v = sp_v_;
-    p_.sp_r = sp_r_;
-    p_.prinv = get_ptr(prinv_);
-    p_.pc = get_ptr(pc_);
     casadi_ipqp_setup(&p_, nx_, na_);
   }
 
@@ -286,10 +277,6 @@ namespace casadi {
   Qpchasm::Qpchasm(DeserializingStream& s) : Conic(s) {
     s.version("Qpchasm", 1);
     s.unpack("Qpchasm::kkt", kkt_);
-    s.unpack("Qpchasm::sp_v", sp_v_);
-    s.unpack("Qpchasm::sp_r", sp_r_);
-    s.unpack("Qpchasm::prinv", prinv_);
-    s.unpack("Qpchasm::pc", pc_);
     s.unpack("Qpchasm::print_iter", print_iter_);
     s.unpack("Qpchasm::print_header", print_header_);
     s.unpack("Qpchasm::print_info", print_info_);
@@ -305,10 +292,6 @@ namespace casadi {
 
     s.version("Qpchasm", 1);
     s.pack("Qpchasm::kkt", kkt_);
-    s.pack("Qpchasm::sp_v", sp_v_);
-    s.pack("Qpchasm::sp_r", sp_r_);
-    s.pack("Qpchasm::prinv", prinv_);
-    s.pack("Qpchasm::pc", pc_);
     s.pack("Qpchasm::print_iter", print_iter_);
     s.pack("Qpchasm::print_header", print_header_);
     s.pack("Qpchasm::print_info", print_info_);

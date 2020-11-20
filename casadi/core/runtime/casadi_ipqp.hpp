@@ -10,8 +10,6 @@ template<typename T1>
 struct casadi_ipqp_prob {
   // Sparsity patterns
   const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
-  // Symbolic QR factorization
-  const casadi_int *prinv, *pc, *sp_v, *sp_r;
   // Dimensions
   casadi_int nx, na, nz;
   // Smallest nonzero number
@@ -44,27 +42,18 @@ void casadi_ipqp_setup(casadi_ipqp_prob<T1>* p, casadi_int nx, casadi_int na) {
 // SYMBOL "ipqp_sz_w"
 template<typename T1>
 casadi_int casadi_ipqp_sz_w(const casadi_ipqp_prob<T1>* p) {
-  // Local variables
-  casadi_int nnz_kkt, nnz_v, nnz_r;
   // Return value
   casadi_int sz_w = 0;
-  // Get matrix number of nonzeros
-  nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
-  nnz_v = p->sp_v[2+p->sp_v[1]];
-  nnz_r = p->sp_r[2+p->sp_r[1]];
   // Temporary work vectors
   sz_w = casadi_max(sz_w, p->nz); // casadi_project, tau memory
   sz_w = casadi_max(sz_w, 2*p->nz); // casadi_qr
   // Persistent work vectors
-  sz_w += nnz_kkt; // kkt
   sz_w += p->nz; // z
   sz_w += p->nz; // lbz
   sz_w += p->nz; // ubz
   sz_w += p->nz; // lam
   sz_w += p->nz; // dz
   sz_w += p->nz; // dlam
-  sz_w += casadi_max(nnz_v+nnz_r, nnz_kkt); // [v,r] or trans(kkt)
-  sz_w += p->nz; // beta
   sz_w += p->nz; // D
   sz_w += p->nz; // S
   sz_w += p->nz; // lam_lbz
@@ -124,8 +113,6 @@ struct casadi_ipqp_data {
   const T1 *nz_a, *nz_h, *g;
   // Vectors
   T1 *z, *lbz, *ubz, *lam, *dz, *dlam;
-  // Numeric QR factorization
-  T1 *nz_kkt, *beta, *nz_v, *nz_r;
   // Message buffer
   const char *msg;
   // Message index
@@ -174,23 +161,14 @@ struct casadi_ipqp_data {
 // SYMBOL "ipqp_init"
 template<typename T1>
 void casadi_ipqp_init(casadi_ipqp_data<T1>* d, casadi_int** iw, T1** w) {
-  // Local variables
-  casadi_int nnz_kkt, nnz_v, nnz_r;
   const casadi_ipqp_prob<T1>* p = d->prob;
   // Get matrix number of nonzeros
-  nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
-  nnz_v = p->sp_v[2+p->sp_v[1]];
-  nnz_r = p->sp_r[2+p->sp_r[1]];
-  d->nz_kkt = *w; *w += nnz_kkt;
   d->z = *w; *w += p->nz;
   d->lbz = *w; *w += p->nz;
   d->ubz = *w; *w += p->nz;
   d->lam = *w; *w += p->nz;
   d->dz = *w; *w += p->nz;
   d->dlam = *w; *w += p->nz;
-  d->nz_v = *w; *w += casadi_max(nnz_v+nnz_r, nnz_kkt);
-  d->nz_r = d->nz_v + nnz_v;
-  d->beta = *w; *w += p->nz;
   d->D = *w; *w += p->nz;
   d->S = *w; *w += p->nz;
   d->lam_lbz = *w; *w += p->nz;
