@@ -80,10 +80,12 @@ namespace casadi {
       {"print_info",
        {OT_BOOL,
         "Print info [true]."}},
-      {"print_lincomb",
-       {OT_BOOL,
-        "Print dependant linear combinations of constraints [false]. "
-        "Printed numbers are 0-based indices into the vector of [simple bounds;linear bounds]"}},
+      {"linear_solver",
+       {OT_STRING,
+        "A custom linear solver creator function [default: qr]"}},
+      {"linear_solver_options",
+       {OT_DICT,
+        "Options to be passed to the linear solver"}},
       {"min_lam",
        {OT_DOUBLE,
         "Smallest multiplier treated as inactive for the initial active set [0]."}}
@@ -107,7 +109,7 @@ namespace casadi {
     print_iter_ = true;
     print_header_ = true;
     print_info_ = true;
-    print_lincomb_ = false;
+    linear_solver_ = "qr";
 
     // Read user options
     for (auto&& op : opts) {
@@ -125,8 +127,10 @@ namespace casadi {
         print_header_ = op.second;
       } else if (op.first=="print_info") {
         print_info_ = op.second;
-      } else if (op.first=="print_lincomb") {
-        print_lincomb_ = op.second;
+      } else if (op.first=="linear_solver") {
+        linear_solver_ = op.second.to_string();
+      } else if (op.first=="linear_solver_options") {
+        linear_solver_options_ = op.second;
       }
     }
 
@@ -138,6 +142,9 @@ namespace casadi {
 
     // For KKT formation
     alloc_iw(A_.size2());
+
+    // KKT solver
+    linsol_ = Linsol("linsol", linear_solver_, kkt_, linear_solver_options_);
 
     if (print_header_) {
       // Print summary
@@ -195,6 +202,8 @@ namespace casadi {
     casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
     casadi_fill(d.lam_lbz, p_.nz, 0.);
     casadi_fill(d.lam_ubz, p_.nz, 0.);
+    // Checkout a linear solver instance
+    int linsol_mem = linsol_.checkout();
     // New QP
     d.next = IPQP_RESET;
     // Reverse communication loop
@@ -226,14 +235,12 @@ namespace casadi {
         // Form KKT
         casadi_ipqp_kkt(p_.sp_kkt, d.nz_kkt, p_.sp_h, d.nz_h, p_.sp_a, d.nz_a,
           d.S, d.D, w, iw);
-          // Factorize KKT
-        casadi_qr(p_.sp_kkt, d.nz_kkt, w, p_.sp_v, d.nz_v, p_.sp_r,
-                  d.nz_r, d.beta, p_.prinv, p_.pc);
+        // Factorize KKT
+        (void)linsol_.nfact(d.nz_kkt, linsol_mem);
         break;
       case IPQP_SOLVE:
-        // Calculate step
-        casadi_qr_solve(d.linsys, 1, 1, p_.sp_v, d.nz_v, p_.sp_r, d.nz_r,
-          d.beta, p_.prinv, p_.pc, w);
+        // Solve KKT
+        (void)linsol_.solve(d.nz_kkt, d.linsys, 1, false, linsol_mem);
         break;
       }
     }
@@ -253,6 +260,8 @@ namespace casadi {
         m->return_status = "Printing error";
         break;
     }
+    // Release linear solver instance
+    linsol_.release(linsol_mem);
     // Get solution
     casadi_copy(d.z, nx_, res[CONIC_X]);
     casadi_copy(d.lam, nx_, res[CONIC_LAM_X]);
@@ -285,7 +294,6 @@ namespace casadi {
     s.unpack("Qpchasm::print_iter", print_iter_);
     s.unpack("Qpchasm::print_header", print_header_);
     s.unpack("Qpchasm::print_info", print_info_);
-    s.unpack("Qpchasm::print_lincomb_", print_lincomb_);
     set_qp_prob();
     s.unpack("Qpchasm::max_iter", p_.max_iter);
     s.unpack("Qpchasm::min_lam", p_.min_lam);
@@ -305,7 +313,6 @@ namespace casadi {
     s.pack("Qpchasm::print_iter", print_iter_);
     s.pack("Qpchasm::print_header", print_header_);
     s.pack("Qpchasm::print_info", print_info_);
-    s.pack("Qpchasm::print_lincomb_", print_lincomb_);
     s.pack("Qpchasm::max_iter", p_.max_iter);
     s.pack("Qpchasm::min_lam", p_.min_lam);
     s.pack("Qpchasm::constr_viol_tol", p_.constr_viol_tol);

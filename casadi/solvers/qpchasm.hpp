@@ -28,6 +28,7 @@
 
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/solvers/casadi_conic_qpchasm_export.h>
+#include "casadi/core/linsol.hpp"
 
 /** \defgroup plugin_Conic_qpchasm
  Solve QPs using an hybrid active-set, interior point method
@@ -100,12 +101,16 @@ namespace casadi {
     // Memory structure
     casadi_ipqp_prob<double> p_;
     // KKT system and its QR factorization
-    Sparsity AT_, kkt_, sp_v_, sp_r_;
+    Sparsity kkt_, sp_v_, sp_r_;
     // KKT system permutation
     std::vector<casadi_int> prinv_, pc_;
+    // KKT linear solver
+    Linsol linsol_;
     ///@{
     // Options
-    bool print_iter_, print_header_, print_info_, print_lincomb_;
+    bool print_iter_, print_header_, print_info_;
+    std::string linear_solver_;
+    Dict linear_solver_options_;
     ///@}
 
     void serialize_body(SerializingStream &s) const override;
