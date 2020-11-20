@@ -139,6 +139,9 @@ namespace casadi {
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
 
+    // For KKT formation
+    alloc_iw(A_.size2());
+
     if (print_header_) {
       // Print summary
       print("-------------------------------------------\n");
@@ -239,25 +242,31 @@ namespace casadi {
           kkt_row = (kkt_colind = p_.sp_kkt+2) + p_.nz + 1;
           // Reset w to zero
           casadi_clear(d.w, p_.nz);
-          // Loop over rows of the (transposed) KKT
-          for (i=0; i<p_.nz; ++i) {
+          // Loop over columns of [H + D_x; A]
+          for (i=0; i<p_.nx; ++i) {
             // Copy row of KKT to w
-            if (i<p_.nx) {
-              for (k=h_colind[i]; k<h_colind[i+1]; ++k) d.w[h_row[k]] = d.nz_h[k];
-              for (k=a_colind[i]; k<a_colind[i+1]; ++k) d.w[p_.nx+a_row[k]] = d.nz_a[k];
-            } else {
-              for (k=at_colind[i-p_.nx]; k<at_colind[i-p_.nx+1]; ++k) {
-                d.w[at_row[k]] = d.nz_at[k];
-              }
+            for (k=h_colind[i]; k<h_colind[i+1]; ++k) d.w[h_row[k]] = d.nz_h[k];
+            for (k=a_colind[i]; k<a_colind[i+1]; ++k) d.w[p_.nx+a_row[k]] = d.nz_a[k];
+            // Copy row to KKT, scale, zero out w
+            for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
+              j = kkt_row[k];
+              d.nz_kkt[k] = d.S[j] * d.w[j] * d.S[i];
+              d.w[j] = 0;
+              if (i == j) d.nz_kkt[k] += d.D[i];
+            }
+          }
+          // Loop over columns of [A', -D_g]
+          for (i=p_.nx; i<p_.nz; ++i) {
+            // Copy row of KKT to w
+            for (k=at_colind[i-p_.nx]; k<at_colind[i-p_.nx+1]; ++k) {
+              d.w[at_row[k]] = d.nz_at[k];
             }
             // Copy row to KKT, scale, zero out w
             for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
               j = kkt_row[k];
               d.nz_kkt[k] = d.S[j] * d.w[j] * d.S[i];
               d.w[j] = 0;
-              if (i == j) {
-                d.nz_kkt[k] += i<p_.nx ? d.D[i] : -d.D[i];
-              }
+              if (i == j) d.nz_kkt[k] -= d.D[i];
             }
           }
           // QR factorization
