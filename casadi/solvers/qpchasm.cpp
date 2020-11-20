@@ -137,6 +137,7 @@ namespace casadi {
     // For KKT formation
     alloc_w(kkt_.nnz(), true);
     alloc_iw(A_.size2());
+    alloc_w(nx_ + na_);
 
     // KKT solver
     linsol_ = Linsol("linsol", linear_solver_, kkt_, linear_solver_options_);
@@ -221,11 +222,13 @@ namespace casadi {
         casadi_ipqp_kkt(kkt_, nz_kkt, H_, arg[CONIC_H], A_, arg[CONIC_A],
           d.S, d.D, w, iw);
         // Factorize KKT
-        (void)linsol_.nfact(nz_kkt, linsol_mem);
+        if (linsol_.nfact(nz_kkt, linsol_mem))
+          d.status = IPQP_FACTOR_ERROR;
         break;
       case IPQP_SOLVE:
         // Solve KKT
-        (void)linsol_.solve(nz_kkt, d.linsys, 1, false, linsol_mem);
+        if (linsol_.solve(nz_kkt, d.linsys, 1, false, linsol_mem))
+          d.status = IPQP_SOLVE_ERROR;
         break;
       }
     }
@@ -241,7 +244,16 @@ namespace casadi {
       case IPQP_NO_SEARCH_DIR:
         m->return_status = "Failed to calculate search direction";
         break;
-      case IPQP_PRINTING_ERROR:
+      case IPQP_MV_ERROR:
+        m->return_status = "Matrix-vector evaluation error";
+        break;
+      case IPQP_FACTOR_ERROR:
+        m->return_status = "Linear solver factorization error";
+        break;
+      case IPQP_SOLVE_ERROR:
+        m->return_status = "Linear solver solution error";
+        break;
+      case IPQP_PROGRESS_ERROR:
         m->return_status = "Printing error";
         break;
     }

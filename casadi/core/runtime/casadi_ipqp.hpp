@@ -37,42 +37,15 @@ void casadi_ipqp_setup(casadi_ipqp_prob<T1>* p, casadi_int nx, casadi_int na) {
   p->dual_inf_tol = 1e-8;
 }
 
-// SYMBOL "ipqp_sz_w"
-template<typename T1>
-casadi_int casadi_ipqp_sz_w(const casadi_ipqp_prob<T1>* p) {
-  // Return value
-  casadi_int sz_w = 0;
-  // Temporary work vectors
-  sz_w = casadi_max(sz_w, p->nz); // casadi_project, tau memory
-  sz_w = casadi_max(sz_w, 2*p->nz); // casadi_qr
-  // Persistent work vectors
-  sz_w += p->nz; // z
-  sz_w += p->nz; // lbz
-  sz_w += p->nz; // ubz
-  sz_w += p->nz; // lam
-  sz_w += p->nz; // dz
-  sz_w += p->nz; // dlam
-  sz_w += p->nz; // D
-  sz_w += p->nz; // S
-  sz_w += p->nz; // lam_lbz
-  sz_w += p->nz; // lam_ubz
-  sz_w += p->nz; // dlam_lbz
-  sz_w += p->nz; // dlam_ubz
-  sz_w += p->nz; // rz
-  sz_w += p->nz; // rlam
-  sz_w += p->nz; // rlam_lbz
-  sz_w += p->nz; // rlam_ubz
-  sz_w += p->nz; // dinv_lbz
-  sz_w += p->nz; // dinv_ubz
-  return sz_w;
-}
-
 // SYMBOL "ipqp_flag_t"
 typedef enum {
   IPQP_SUCCESS,
   IPQP_MAX_ITER,
   IPQP_NO_SEARCH_DIR,
-  IPQP_PRINTING_ERROR
+  IPQP_MV_ERROR,
+  IPQP_FACTOR_ERROR,
+  IPQP_SOLVE_ERROR,
+  IPQP_PROGRESS_ERROR
 } casadi_ipqp_flag_t;
 
 // SYMBOL "ipqp_task_t"
@@ -107,8 +80,6 @@ struct casadi_ipqp_data {
   const casadi_ipqp_prob<T1>* prob;
   // QP data
   const T1 *g;
-  // Complementarity measure
-  T1 mu;
   // Number of finite constraints
   casadi_int n_con;
   // Solver status
@@ -121,6 +92,8 @@ struct casadi_ipqp_data {
   T1* linsys;
   // Message buffer
   const char *msg;
+  // Complementarity measure
+  T1 mu;
   // Stepsize
   T1 tau;
   // Primal and dual error, complementarity error, corresponding index
@@ -144,6 +117,33 @@ struct casadi_ipqp_data {
   T1 *dinv_lbz, *dinv_ubz;
 };
 // C-REPLACE "casadi_ipqp_data<T1>" "struct casadi_ipqp_data"
+
+// SYMBOL "ipqp_sz_w"
+template<typename T1>
+casadi_int casadi_ipqp_sz_w(const casadi_ipqp_prob<T1>* p) {
+  // Return value
+  casadi_int sz_w = 0;
+  // Persistent work vectors
+  sz_w += p->nz; // lbz
+  sz_w += p->nz; // ubz
+  sz_w += p->nz; // z
+  sz_w += p->nz; // lam
+  sz_w += p->nz; // lam_lbz
+  sz_w += p->nz; // lam_ubz
+  sz_w += p->nz; // dz
+  sz_w += p->nz; // dlam
+  sz_w += p->nz; // dlam_lbz
+  sz_w += p->nz; // dlam_ubz
+  sz_w += p->nz; // rz
+  sz_w += p->nz; // rlam
+  sz_w += p->nz; // rlam_lbz
+  sz_w += p->nz; // rlam_ubz
+  sz_w += p->nz; // D
+  sz_w += p->nz; // S
+  sz_w += p->nz; // dinv_lbz
+  sz_w += p->nz; // dinv_ubz
+  return sz_w;
+}
 
 // SYMBOL "ipqp_init"
 template<typename T1>
@@ -692,30 +692,35 @@ int casadi_ipqp(casadi_ipqp_data<T1>* d) {
       return 1;
     case IPQP_RESIDUAL:
       // Calculate residual
+      if (d->status == IPQP_MV_ERROR) break;
       casadi_ipqp_residual(d);
       d->task = IPQP_PROGRESS;
       d->next = IPQP_NEWITER;
       return 1;
     case IPQP_NEWITER:
       // New iteration
+      if (d->status == IPQP_PROGRESS_ERROR) break;
       if (casadi_ipqp_newiter(d)) break;
       d->task = IPQP_FACTOR;
       d->next = IPQP_PREPARE;
       return 1;
     case IPQP_PREPARE:
       // Prepare predictor step
+      if (d->status == IPQP_FACTOR_ERROR) break;
       casadi_ipqp_predictor_prepare(d);
       d->task = IPQP_SOLVE;
       d->next = IPQP_PREDICTOR;
       return 1;
     case IPQP_PREDICTOR:
       // Complete predictor step
+      if (d->status == IPQP_SOLVE_ERROR) break;
       casadi_ipqp_predictor(d);
       d->task = IPQP_SOLVE;
       d->next = IPQP_CORRECTOR;
       return 1;
     case IPQP_CORRECTOR:
       // Complete predictor step
+      if (d->status == IPQP_SOLVE_ERROR) break;
       casadi_ipqp_corrector(d);
       d->task = IPQP_MV;
       d->next = IPQP_RESIDUAL;
@@ -790,7 +795,7 @@ int casadi_ipqp_print_header(casadi_ipqp_data<T1>* d, char* buf, size_t buf_sz) 
           "last_tau", "Note");
   // Check if error
   if (flag < 0) {
-    d->status = IPQP_PRINTING_ERROR;
+    d->status = IPQP_PROGRESS_ERROR;
     return 1;
   }
   // Successful return
@@ -811,7 +816,7 @@ int casadi_ipqp_print_iteration(casadi_ipqp_data<T1>* d, char* buf, int buf_sz) 
     d->tau);
   // Check if error
   if (flag < 0) {
-    d->status = IPQP_PRINTING_ERROR;
+    d->status = IPQP_PROGRESS_ERROR;
     return 1;
   }
   // Rest of buffer reserved for iteration note
@@ -822,7 +827,7 @@ int casadi_ipqp_print_iteration(casadi_ipqp_data<T1>* d, char* buf, int buf_sz) 
     flag = snprintf(buf, buf_sz, "%s", d->msg);
     // Check if error
     if (flag < 0) {
-      d->status = IPQP_PRINTING_ERROR;
+      d->status = IPQP_PROGRESS_ERROR;
       return 1;
     }
   }
