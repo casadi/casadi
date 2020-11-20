@@ -223,54 +223,14 @@ namespace casadi {
         }
         break;
       case IPQP_FACTOR:
-        // Factorize KKT
-        {
-          // Local variables
-          casadi_int i, k, j;
-          const casadi_int *h_colind, *h_row, *a_colind, *a_row,
-                           *kkt_colind, *kkt_row;
-          // Extract sparsities
-          a_row = (a_colind = p_.sp_a+2) + p_.nx + 1;
-          h_row = (h_colind = p_.sp_h+2) + p_.nx + 1;
-          kkt_row = (kkt_colind = p_.sp_kkt+2) + p_.nz + 1;
-          // Running indices for each row of A
-          for (i = 0; i < p_.na; ++i) d.iw[i] = kkt_colind[i + p_.nx];
-          // Reset w to zero
-          casadi_clear(d.w, p_.nz);
-          // Loop over columns of [H + D_x; A]
-          for (i=0; i<p_.nx; ++i) {
-            // Copy scaled column of H to w
-            for (k=h_colind[i]; k<h_colind[i+1]; ++k) {
-              j = h_row[k];
-              d.w[j] = d.nz_h[k] * d.S[i] * d.S[j];
-            }
-            // Copy scaled column of A to w
-            for (k=a_colind[i]; k<a_colind[i+1]; ++k) {
-              j = a_row[k] + p_.nx;
-              d.w[j] = d.nz_a[k] * d.S[i] * d.S[j];
-            }
-            // Add D_x to diagonal
-            d.w[i] += d.D[i];
-            // Copy column to KKT
-            for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
-              j = kkt_row[k];
-              d.nz_kkt[k] = d.w[j];
-              if (j >= p_.nx) d.nz_kkt[d.iw[j - p_.nx]++] = d.w[j];
-            }
-            // Zero out w
-            for (k=h_colind[i]; k<h_colind[i+1]; ++k) d.w[h_row[k]] = 0;
-            for (k=a_colind[i]; k<a_colind[i+1]; ++k) d.w[a_row[k] + p_.nx] = 0;
-          }
-          // Copy -D_g to diagonal
-          for (i=p_.nx; i<p_.nz; ++i) {
-            d.nz_kkt[d.iw[i - p_.nx]++] = -d.D[i];
-          }
-          // QR factorization
-          casadi_qr(p_.sp_kkt, d.nz_kkt, d.w, p_.sp_v, d.nz_v, p_.sp_r,
-                    d.nz_r, d.beta, p_.prinv, p_.pc);
-          // Check singularity
-          d.sing = casadi_qr_singular(&d.mina, &d.imina, d.nz_r, p_.sp_r, p_.pc, 1e-12);
-        }
+        // Form KKT
+        casadi_ipqp_kkt(p_.sp_kkt, d.nz_kkt, p_.sp_h, d.nz_h, p_.sp_a, d.nz_a,
+          d.S, d.D, d.w, d.iw);
+          // Factorize KKT
+        casadi_qr(p_.sp_kkt, d.nz_kkt, d.w, p_.sp_v, d.nz_v, p_.sp_r,
+                  d.nz_r, d.beta, p_.prinv, p_.pc);
+        // Check singularity
+        d.sing = casadi_qr_singular(&d.mina, &d.imina, d.nz_r, p_.sp_r, p_.pc, 1e-12);
         break;
       case IPQP_SOLVE:
         // Calculate step
