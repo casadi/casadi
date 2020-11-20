@@ -29,10 +29,10 @@ struct casadi_ipqp_prob {
 
 // SYMBOL "ipqp_setup"
 template<typename T1>
-void casadi_ipqp_setup(casadi_ipqp_prob<T1>* p) {
-  p->na = p->sp_a[0];
-  p->nx = p->sp_a[1];
-  p->nz = p->nx + p->na;
+void casadi_ipqp_setup(casadi_ipqp_prob<T1>* p, casadi_int nx, casadi_int na) {
+  p->nx = nx;
+  p->na = na;
+  p->nz = nx + na;
   p->dmin = std::numeric_limits<T1>::min();
   p->inf = std::numeric_limits<T1>::infinity();
   p->min_lam = 0;

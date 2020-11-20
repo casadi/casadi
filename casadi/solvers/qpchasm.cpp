@@ -169,7 +169,7 @@ namespace casadi {
     p_.sp_r = sp_r_;
     p_.prinv = get_ptr(prinv_);
     p_.pc = get_ptr(pc_);
-    casadi_ipqp_setup(&p_);
+    casadi_ipqp_setup(&p_, nx_, na_);
   }
 
   int Qpchasm::init_mem(void* mem) const {
