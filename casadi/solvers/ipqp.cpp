@@ -139,12 +139,13 @@ namespace casadi {
     // Print summary
     if (print_header_) {
       print("-------------------------------------------\n");
-      print("This is casadi::IPQP\n");
-      print("Number of variables:                       %9d\n", nx_);
-      print("Number of constraints:                     %9d\n", na_);
-      print("Number of nonzeros in H:                   %9d\n", H_.nnz());
-      print("Number of nonzeros in A:                   %9d\n", A_.nnz());
-      print("Number of nonzeros in KKT:                 %9d\n", kkt_.nnz());
+      print("This is casadi::Ipqp\n");
+      print("Linear solver:                   %12s\n", linear_solver_.c_str());
+      print("Number of variables:             %12d\n", nx_);
+      print("Number of constraints:           %12d\n", na_);
+      print("Number of nonzeros in H:         %12d\n", H_.nnz());
+      print("Number of nonzeros in A:         %12d\n", A_.nnz());
+      print("Number of nonzeros in KKT:       %12d\n", kkt_.nnz());
     }
   }
 
