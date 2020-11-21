@@ -167,6 +167,38 @@ void casadi_ipqp_init(casadi_ipqp_data<T1>* d, casadi_int** iw, T1** w) {
   d->S = *w; *w += p->nz;
   d->dinv_lbz = *w; *w += p->nz;
   d->dinv_ubz = *w; *w += p->nz;
+  // New QP
+  d->next = IPQP_RESET;
+}
+
+// SYMBOL "ipqp_bounds"
+template<typename T1>
+void casadi_ipqp_bounds(casadi_ipqp_data<T1>* d, const T1* g,
+    const T1* lbx, const T1* ubx, const T1* lba, const T1* uba) {
+  // Local variables
+  const casadi_ipqp_prob<T1>* p = d->prob;
+  // Pass pointer to linear term in objective
+  d->g = g;
+  // Pass bounds on z
+  casadi_copy(lbx, p->nx, d->lbz);
+  casadi_copy(lba, p->na, d->lbz + p->nx);
+  casadi_copy(ubx, p->nx, d->ubz);
+  casadi_copy(uba, p->na, d->ubz + p->nx);
+}
+
+// SYMBOL "ipqp_guess"
+template<typename T1>
+void casadi_ipqp_guess(casadi_ipqp_data<T1>* d,
+    const T1* x0, const T1* lam_x0, const T1* lam_a0) {
+  // Local variables
+  const casadi_ipqp_prob<T1>* p = d->prob;
+  // Pass initial guess
+  casadi_copy(x0, p->nx, d->z);
+  casadi_fill(d->z + p->nx, p->na, 0.);
+  casadi_copy(lam_x0, p->nx, d->lam);
+  casadi_copy(lam_a0, p->na, d->lam + p->nx);
+  casadi_fill(d->lam_lbz, p->nz, 0.);
+  casadi_fill(d->lam_ubz, p->nz, 0.);
 }
 
 // SYMBOL "ipqp_reset"

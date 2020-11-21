@@ -165,28 +165,17 @@ namespace casadi {
     auto m = static_cast<IpqpMemory*>(mem);
     // Message buffer
     char buf[121];
-    // Setup data structure
-    casadi_ipqp_data<double> d;
-    d.prob = &p_;
-    d.g = arg[CONIC_G];
+    // Setup KKT system
     double* nz_kkt = w; w += kkt_.nnz();
-    casadi_ipqp_init(&d, &iw, &w);
-    // Pass bounds on z
-    casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
-    casadi_copy(arg[CONIC_LBA], na_, d.lbz+nx_);
-    casadi_copy(arg[CONIC_UBX], nx_, d.ubz);
-    casadi_copy(arg[CONIC_UBA], na_, d.ubz+nx_);
-    // Pass initial guess
-    casadi_copy(arg[CONIC_X0], nx_, d.z);
-    casadi_fill(d.z+nx_, na_, nan);
-    casadi_copy(arg[CONIC_LAM_X0], nx_, d.lam);
-    casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
-    casadi_fill(d.lam_lbz, p_.nz, 0.);
-    casadi_fill(d.lam_ubz, p_.nz, 0.);
     // Checkout a linear solver instance
     int linsol_mem = linsol_.checkout();
-    // New QP
-    d.next = IPQP_RESET;
+    // Setup IP solver
+    casadi_ipqp_data<double> d;
+    d.prob = &p_;
+    casadi_ipqp_init(&d, &iw, &w);
+    casadi_ipqp_bounds(&d, arg[CONIC_G],
+      arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+    casadi_ipqp_guess(&d, arg[CONIC_X0], arg[CONIC_LAM_X0], arg[CONIC_LAM_A0]);
     // Reverse communication loop
     while (casadi_ipqp(&d)) {
       switch (d.task) {
