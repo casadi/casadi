@@ -783,6 +783,17 @@ const char* casadi_ipqp_return_status(casadi_ipqp_flag_t status) {
   return 0;
 }
 
+// SYMBOL "ipqp_solution"
+template<typename T1>
+void casadi_ipqp_solution(casadi_ipqp_data<T1>* d, T1* x, T1* lam_x, T1* lam_a) {
+  // Local variables
+  const casadi_ipqp_prob<T1>* p = d->prob;
+  // Copy solution
+  casadi_copy(d->z, p->nx, x);
+  casadi_copy(d->lam, p->nx, lam_x);
+  casadi_copy(d->lam + p->nx, p->na, lam_a);
+}
+
 // The following routines require stdio
 #ifndef CASADI_PRINTF
 

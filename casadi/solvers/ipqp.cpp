@@ -222,10 +222,7 @@ namespace casadi {
     if (d.status == IPQP_MAX_ITER)
       m->unified_return_status = SOLVER_RET_LIMITED;
     // Get solution
-    casadi_copy(d.z, nx_, res[CONIC_X]);
-    casadi_copy(d.lam, nx_, res[CONIC_LAM_X]);
-    casadi_copy(d.lam+nx_, na_, res[CONIC_LAM_A]);
-    // Calculate optimal cost
+    casadi_ipqp_solution(&d, res[CONIC_X], res[CONIC_LAM_X], res[CONIC_LAM_A]);
     if (res[CONIC_COST]) {
       *res[CONIC_COST] = .5 * casadi_bilin(arg[CONIC_H], H_, d.z, d.z)
         + casadi_dot(p_.nx, d.z, d.g);
