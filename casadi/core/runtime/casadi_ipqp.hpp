@@ -214,6 +214,8 @@ void casadi_ipqp_reset(casadi_ipqp_data<T1>* d) {
       }
     }
   }
+  // Clear residual
+  casadi_clear(d->rz, p->nz);
   // Reset iteration counter
   d->iter = 0;
   // Reset iteration variables
@@ -676,6 +678,8 @@ void casadi_ipqp_corrector(casadi_ipqp_data<T1>* d) {
   }
   // Take step
   casadi_ipqp_step(d, d->tau, d->tau);
+  // Clear residual
+  casadi_clear(d->rz, p->nz);
 }
 
 // SYMBOL "ipqp"

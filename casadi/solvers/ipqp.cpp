@@ -192,7 +192,6 @@ namespace casadi {
       switch (d.task) {
       case IPQP_MV:
         // Matrix-vector multiplication
-        casadi_clear(d.rz, p_.nz);
         casadi_mv(arg[CONIC_H], H_, d.z, d.rz, 0);
         casadi_mv(arg[CONIC_A], A_, d.lam + p_.nx, d.rz, 1);
         casadi_mv(arg[CONIC_A], A_, d.z, d.rz + p_.nx, 0);
