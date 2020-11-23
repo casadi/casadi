@@ -1369,8 +1369,11 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
     ret_out.push_back(horzcat(ret_out_split));
   }
 
+  Dict options = opts;
+  options["allow_duplicate_io_names"] = true;
+
   // Create derivative function and return
-  return Function(name, ret_in, ret_out, inames, onames, opts);
+  return Function(name, ret_in, ret_out, inames, onames, options);
 }
 
 Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
@@ -1495,8 +1498,11 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     ret_out.push_back(horzcat(ret_out_split));
   }
 
+  Dict options = opts;
+  options["allow_duplicate_io_names"] = true;
+
   // Create derivative function and return
-  return Function(name, ret_in, ret_out, inames, onames, opts);
+  return Function(name, ret_in, ret_out, inames, onames, options);
 }
 
 Dict Integrator::getDerivativeOptions(bool fwd) const {

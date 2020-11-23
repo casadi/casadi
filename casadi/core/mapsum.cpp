@@ -339,6 +339,7 @@ namespace casadi {
     // Construct return function
     Dict custom_opts = opts;
     custom_opts["always_inline"] = true;
+    custom_opts["allow_duplicate_io_names"] = true;
     return Function(name, arg, res, inames, onames, custom_opts);
   }
 
@@ -401,6 +402,7 @@ namespace casadi {
     // Construct return function
     Dict custom_opts = opts;
     custom_opts["always_inline"] = true;
+    custom_opts["allow_duplicate_io_names"] = true;
     return Function(name, arg, res, inames, onames, custom_opts);
   }
 

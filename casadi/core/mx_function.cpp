@@ -68,7 +68,10 @@ namespace casadi {
         "Perform common subexpression elimination (complexity is N*log(N) in graph size)"}},
       {"allow_free",
        {OT_BOOL,
-        "Allow construction with free variables (Default: false)"}}
+        "Allow construction with free variables (Default: false)"}},
+      {"allow_duplicate_io_names",
+       {OT_BOOL,
+        "Allow construction with duplicate io names (Default: false)"}}
      }
   };
 

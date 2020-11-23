@@ -2183,7 +2183,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x")
     p = MX.sym("p")
     J = Function("jac_Q", [x, p, MX(1,1), MX(1,1)], [x*pi, 1, 1, 1],
-        ['x', 'p', 'out_r', 'out_s'], ['jac_r_x', 'jac_r_p', 'jac_r_s', 'jac_r_s'])
+        ['x', 'p', 'out_r', 'out_s'], ['jac_r_x', 'jac_r_p', 'jac_s_x', 'jac_s_p'])
 
     f = Function('Q', [x, p], [x**2, 2*x*p], ['x', 'p'], ['r', 's'],
             dict(custom_jacobian = J, jac_penalty = 0))
