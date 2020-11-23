@@ -279,7 +279,6 @@ namespace casadi {
     // Call the init function of the base class
     FunctionInternal::init(opts);
     if (verbose_) casadi_message(name_ + "::init");
-
     // Make sure that inputs are symbolic
     for (casadi_int i=0; i<n_in_; ++i) {
       if (in_.at(i).nnz()>0 && !in_.at(i).is_valid_input()) {
@@ -287,7 +286,6 @@ namespace casadi {
                      "\nArgument " + str(i) + "(" + name_in_[i] + ") is not symbolic.");
       }
     }
-
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;
     for (auto&& i : in_) {
@@ -296,10 +294,9 @@ namespace casadi {
         break;
       }
     }
-
     // Reset temporaries
     for (auto&& i : in_) i.reset_input();
-
+    // Generate error
     if (has_duplicates) {
       std::stringstream s;
       s << "The input expressions are not independent:\n";
@@ -307,6 +304,32 @@ namespace casadi {
         s << iind << ": " << in_[iind] << "\n";
       }
       casadi_error(s.str());
+    }
+    // Collect hashes for all inputs and outputs
+    std::hash<std::string> hasher;
+    std::vector<size_t> iohash;
+    iohash.reserve(name_in_.size() + name_out_.size());
+    for (const std::string& s : name_in_) iohash.push_back(hasher(s));
+    for (const std::string& s : name_out_) iohash.push_back(hasher(s));
+    std::sort(iohash.begin(), iohash.end());
+    // Look for duplicates
+    size_t prev = -1;
+    for (size_t h : iohash) {
+      if (h == prev) {
+        // Hash duplicate found, collect strings
+        std::vector<std::string> io_names;
+        io_names.reserve(iohash.size());
+        for (const std::string& s : name_in_) io_names.push_back(s);
+        for (const std::string& s : name_out_) io_names.push_back(s);
+        std::sort(io_names.begin(), io_names.end());
+        // Look for duplicates
+        std::string prev;
+        for (std::string h : io_names) {
+          if (h == prev) casadi_error("Duplicate IO name: " + h);
+          prev = h;
+        }
+      }
+      prev = h;
     }
   }
 
