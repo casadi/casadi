@@ -1,5 +1,8 @@
 add_library(panoc-alm SHARED
     "src/panoc.cpp"
+    "src/box.cpp"
+    "src/lbfgs.cpp"
+    "src/alm.cpp"
 )
 add_library(panoc-alm::panoc-alm ALIAS panoc-alm)
 set_target_properties(panoc-alm PROPERTIES EXPORT_NAME panoc-alm::panoc-alm)
@@ -10,6 +13,7 @@ target_include_directories(panoc-alm
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
+target_link_libraries(panoc-alm PUBLIC Eigen3::Eigen)
 
 include(GNUInstallDirs)
 

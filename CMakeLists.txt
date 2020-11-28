@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(PANOC-ALM VERSION 0.0.1)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 # find_package(GTest REQUIRED PATHS "$ENV{HOME}/.local/lib/cmake" NO_DEFAULT_PATH)
@@ -10,29 +10,33 @@ find_package(GTest REQUIRED NO_CMAKE_SYSTEM_PATH)
 include(GoogleTest)
 enable_testing()
 
+# Eigen
+find_package(Eigen3 REQUIRED)
+
 # Set the compiler warnings
 set(CMAKE_CPP_FLAGS "${CMAKE_CPP_FLAGS} \
     -Wmissing-include-dirs")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -Wall -Wextra -Werror -pedantic -pedantic-errors -fdiagnostics-show-option \
-    -Wno-unknown-pragmas")
+    -Wno-unknown-pragmas \
+    -Wno-error=unused-parameter -Wno-error=unused-variable")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Wall -Wextra -Werror -pedantic -pedantic-errors -fdiagnostics-show-option")
     
 # Build-type specific flags
-set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O0 -D_GLIBCXX_DEBUG")
-set(CMAKE_C_FLAGS_DEBUG   "-ggdb3 -O0 -D_GLIBCXX_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O0")
+set(CMAKE_C_FLAGS_DEBUG   "-ggdb3 -O0")
 set(CMAKE_DEBUG_POSTFIX "-debug")
 
-set(CMAKE_CXX_FLAGS_ASAN "-g3 -O0 -D_GLIBCXX_DEBUG \
+set(CMAKE_CXX_FLAGS_ASAN "-g3 -O0 \
     -fsanitize=address,leak,undefined,pointer-compare,pointer-subtract")
-set(CMAKE_C_FLAGS_ASAN   "-g3 -O0 -D_GLIBCXX_DEBUG \
+set(CMAKE_C_FLAGS_ASAN   "-g3 -O0 \
     -fsanitize=address,leak,undefined,pointer-compare,pointer-subtract")
 set(CMAKE_ASAN_POSTFIX "-asan")
 
-set(CMAKE_CXX_FLAGS_TSAN "-g3 -O0 -D_GLIBCXX_DEBUG \
+set(CMAKE_CXX_FLAGS_TSAN "-g3 -O0 \
     -fsanitize=thread,undefined")
-set(CMAKE_C_FLAGS_TSAN   "-g3 -O0 -D_GLIBCXX_DEBUG \
+set(CMAKE_C_FLAGS_TSAN   "-g3 -O0 \
     -fsanitize=thread,undefined")
 set(CMAKE_TSAN_POSTFIX "-tsan")
 

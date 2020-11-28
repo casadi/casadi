@@ -1,0 +1,72 @@
+PANOC
+-----
+
+calc: Σ⁻¹y
+
+calc: g(x₀)
+calc: ẑ(x₀)  = Π(g(x₀) + Σ⁻¹y, D)
+calc: ỹ(x₀)  = Σ(g(x₀) - ẑ(x₀)) + y
+calc: ∇ψ(x₀) = ∇f(x₀) + ∇g(x₀) ỹ(x₀)
+
+calc: x̂₀ = Π(x₀ - γ∇ψ(x₀), C)
+calc: r₀ = x₀ - x̂₀
+
+calc: ψ(x₀) = f(x₀) + ½ distΣ²(g(x₀) + Σ⁻¹y, D)
+calc: ‖∇ψ(x₀)‖²
+calc: ‖r₀‖²
+
+loop:
+    calc: g(x̂ₖ)
+    calc: ŷ(x̂ₖ)  = Σ(g(x̂ₖ) - Π(g(x̂ₖ) + Σ⁻¹y, D)) + y
+    calc: ∇ψ(x̂ₖ) = ∇f(x̂ₖ) + ∇g(x̂ₖ) ŷ(x̂ₖ)
+
+    calc: εₖ = ‖γ⁻¹rₖ + ∇ψ(x̂ₖ) - ∇ψ(xₖ)‖ₘₐₓ
+    if εₖ < ε:
+        return x̂ₖ, ẑ(xₖ), ŷ(x̂ₖ)
+
+    calc: ψ(x̂ₖ)
+    calc: ∇ψ(xₖ)ᵀrₖ
+
+    while ψ(x̂ₖ) > ψ(xₖ) - ∇ψ(xₖ)ᵀrₖ:
+        empty L-BFGS buffers
+
+        L *= 2, σ /= 2, γ /= 2
+
+        calc: x̂ₖ
+        calc: ψ(x̂ₖ)
+
+    calc: dₖ = Hₖ rₖ
+
+    calc: φ(xₖ) = ψ(xₖ) - ½γ ‖∇ψ(xₖ)‖² + ½/γ ‖rₖ‖²
+
+    τ = 1
+    repeat:
+        calc: xₖ₊₁ = xₖ - (1-τ)rₖ + τdₖ
+
+        calc: g(xₖ₊₁)
+        calc: ẑ(xₖ₊₁)  = Π(g(xₖ₊₁) + Σ⁻¹y, D)
+        calc: ỹ(xₖ₊₁)  = Σ(g(xₖ₊₁) - ẑ(xₖ₊₁)) + y
+        calc: ∇ψ(xₖ₊₁) = ∇f(xₖ₊₁) + ∇g(xₖ₊₁)ỹ(xₖ₊₁)
+
+        calc: x̂ₖ₊₁ = Π(xₖ₊₁ - γ∇ψ(xₖ₊₁), C)
+        calc: rₖ₊₁ = xₖ₊₁ - x̂ₖ₊₁
+
+        calc: ψ(xₖ₊₁)
+        calc: ‖∇ψ(xₖ₊₁)‖²
+        calc: ‖rₖ₊₁‖²
+
+        calc: φ(xₖ₊₁) = ψ(xₖ₊₁) - ½γ ‖∇ψ(xₖ₊₁)‖² + ½/γ ‖rₖ₊₁‖²
+
+        τ /= 2
+    until φ(xₖ₊₁) < φ(xₖ) - σ ‖γ⁻¹rₖ‖²
+
+    update L-BFGS
+
+    carry over to next iteration:
+        ψ(xₖ)      ←  ψ(xₖ₊₁)
+        x̂ₖ         ←  x̂ₖ₊₁
+        ẑₖ         ←  ẑₖ₊₁
+        rₖ         ←  rₖ₊₁
+        ∇ψ(xₖ)     ←  ∇ψ(xₖ₊₁)
+        ‖∇ψ(xₖ)‖²  ←  ‖∇ψ(xₖ₊₁)‖²
+        ‖rₖ‖²      ←  ‖rₖ₊₁‖²

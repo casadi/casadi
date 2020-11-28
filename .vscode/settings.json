@@ -66,6 +66,16 @@
         "stop_token": "cpp",
         "thread": "cpp",
         "typeindex": "cpp",
-        "complex": "cpp"
-    }
+        "complex": "cpp",
+        "list": "cpp",
+        "valarray": "cpp",
+        "core": "cpp",
+        "bitset": "cpp",
+        "eigen": "cpp"
+    },
+    "cSpell.words": [
+        "Lipschitz",
+        "lbfgs",
+        "panoc"
+    ]
 }
