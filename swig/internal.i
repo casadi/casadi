@@ -1462,6 +1462,24 @@
 %exception  casadi::IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType &var_string_md, IntegerMetaDataMapType &var_integer_md, NumericMetaDataMapType &var_numeric_md, Index m, StringMetaDataMapType &con_string_md, IntegerMetaDataMapType &con_integer_md, NumericMetaDataMapType &con_numeric_md) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Ipqp::alloc_mem() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Ipqp::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Ipqp::get_options() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Ipqp::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Ipqp::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Ipqp::serialize_body(SerializingStream &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::JitFunction::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2518,6 +2536,9 @@
 %exception  casadi::casadi_cvx_scalar(T1 epsilon, casadi_int reflect, T1 eig) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::casadi_ipqp_return_status(casadi_ipqp_flag_t status) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2597,6 +2618,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Interpolant::Interpolant(const std::string &name, const std::vector< double > &grid, const std::vector< casadi_int > &offset, const std::vector< double > &values, casadi_int m) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Ipqp::Ipqp(const std::string &name, const std::map< std::string, Sparsity > &st) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::JitFunction::JitFunction(const std::string &name, const std::string &body, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, const std::vector< Sparsity > &sparsity_in, const std::vector< Sparsity > &sparsity_out) {

@@ -32574,6 +32574,1359 @@ Lagrangian (if \"values\" is not NULL)
 [INTERNAL] ";
 
 
+// File: classcasadi_1_1Ipqp.xml
+%feature("docstring") casadi::Ipqp::generate_lifted "
+
+[INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::Ipqp::format_time "
+
+[INTERNAL]  Format time in a fixed width 8 format.
+
+";
+
+%feature("docstring") casadi::Ipqp::n_nodes "
+
+[INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::Ipqp::getJacSparsityHierarchical "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring") casadi::Ipqp::sp_forward "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_reverse "
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Ipqp::mx_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Ipqp::is_diff_out "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Ipqp::all_scalar "
+
+[INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_sparsities "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::Ipqp::check_res "
+
+[INTERNAL]  Check if output arguments have correct length and dimensions.
+
+Raises errors.
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::Ipqp::size2_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Ipqp::jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::Ipqp::mapsum_mx "
+
+[INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_partition "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::Ipqp::size_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Ipqp::getAdaptorSolverName "
+
+[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::Ipqp::size1_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Ipqp::n_instructions "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_min_in "
+
+[INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring") casadi::Ipqp::eval_gen "
+
+[INTERNAL]  Evaluate a function, overloaded.
+
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
+
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate a function, overloaded.
+
+";
+
+";
+
+%feature("docstring") casadi::Ipqp::which_depends "
+
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::Ipqp::instruction_output "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Ipqp::nnz_out "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::Ipqp::memory "
+
+[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_forward "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Ipqp::symbolicAdjSeed "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::Ipqp::serialize_type "
+
+[INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring") casadi::Ipqp::is_diff_in "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Ipqp::class_name "
+
+[INTERNAL]  Readable name of the internal class.
+
+";
+
+%feature("docstring") casadi::Ipqp::alloc_arg "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring") casadi::Ipqp::size_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Ipqp::info "
+
+[INTERNAL]  Obtain information about function
+
+";
+
+%feature("docstring") casadi::Ipqp::get_options "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::Ipqp::print_options "
+
+[INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_abstol "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen "
+
+[INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_sparsity_in "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::getJacSparsityGen "
+
+[INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_sprev "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Ipqp::convert_res "
+
+[INTERNAL]  Convert from/to input/output lists/map.
+
+";
+
+%feature("docstring") casadi::Ipqp::sp_reverse "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_forward "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Ipqp::instruction_constant "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Ipqp::fwdViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::Ipqp::sz_w "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring") casadi::Ipqp::getJacSparsity "
+
+[INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_codegen "
+
+[INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring") casadi::Ipqp::free_mem "
+
+[INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring") casadi::Ipqp::print_option "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::Ipqp::check_arg "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+Raises errors.
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::Ipqp::instruction_input "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Ipqp::project_arg "
+
+[INTERNAL]   Project sparsities.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_spfwd "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Ipqp::nz_in "
+
+[INTERNAL]  Convert from/to flat vector of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::Ipqp::ad_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::Ipqp::signature "
+
+[INTERNAL]  Code generate the function.
+
+";
+
+%feature("docstring") casadi::Ipqp::release "
+
+[INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_reltol "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
+%feature("docstring") casadi::Ipqp::definition "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_incref "
+
+[INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::Ipqp::eval_mx "
+
+[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_name_in "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_mem "
+
+[INTERNAL]  Get thread-local memory object.
+
+";
+
+%feature("docstring") casadi::Ipqp::sp_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::Ipqp::adjViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::Ipqp::getJacSparsityHierarchicalSymm "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::Ipqp::get_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Ipqp::alloc_mem "
+
+[INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_alloc_mem "
+
+[INTERNAL]  Codegen decref for alloc_mem.
+
+";
+
+%feature("docstring") casadi::Ipqp::jacobian_sparsity_filter "
+
+[INTERNAL]  Filter out nonzeros in the full sparsity jacobian according to
+is_diff_in/out.
+
+";
+
+%feature("docstring") casadi::Ipqp::generateNativeCode "
+
+[INTERNAL]  Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring") casadi::Ipqp::has_reverse "
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Ipqp::instruction_MX "
+
+[INTERNAL]  get MX expression associated with instruction
+
+";
+
+%feature("docstring") casadi::Ipqp::is_a "
+
+[INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring") casadi::Ipqp::generate_options "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
+%feature("docstring") casadi::Ipqp::sz_arg "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring") casadi::Ipqp::checkout "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::Ipqp::symbolic_output "
+
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::numel_out "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::Ipqp::psd_support "
+
+[INTERNAL]  Can psd constraints be treated.
+
+";
+
+%feature("docstring") casadi::Ipqp::plugin_name "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Ipqp::numel_in "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::Ipqp::alloc_res "
+
+[INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring") casadi::Ipqp::sz_work "
+
+[INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_body "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
+%feature("docstring") casadi::Ipqp::replace_fseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::Ipqp "
+
+'ipqp' plugin for Conic
+
+Solves QPs using a Mehrotra predictor-corrector interior point method
+
+>List of available options
+
++-----------------------+-----------+--------------------------------------+
+|          Id           |   Type    |             Description              |
++=======================+===========+======================================+
+| constr_viol_tol       | OT_DOUBLE | Constraint violation tolerance       |
+|                       |           | [1e-8].                              |
++-----------------------+-----------+--------------------------------------+
+| dual_inf_tol          | OT_DOUBLE | Dual feasibility violation tolerance |
+|                       |           | [1e-8]                               |
++-----------------------+-----------+--------------------------------------+
+| linear_solver         | OT_STRING | A custom linear solver creator       |
+|                       |           | function [default: ldl]              |
++-----------------------+-----------+--------------------------------------+
+| linear_solver_options | OT_DICT   | Options to be passed to the linear   |
+|                       |           | solver                               |
++-----------------------+-----------+--------------------------------------+
+| max_iter              | OT_INT    | Maximum number of iterations [1000]. |
++-----------------------+-----------+--------------------------------------+
+| min_lam               | OT_DOUBLE | Smallest multiplier treated as       |
+|                       |           | inactive for the initial active set  |
+|                       |           | [0].                                 |
++-----------------------+-----------+--------------------------------------+
+| print_header          | OT_BOOL   | Print header [true].                 |
++-----------------------+-----------+--------------------------------------+
+| print_info            | OT_BOOL   | Print info [true].                   |
++-----------------------+-----------+--------------------------------------+
+| print_iter            | OT_BOOL   | Print iterations [true].             |
++-----------------------+-----------+--------------------------------------+
+
+Joel Andersson
+
+>List of available options
+
++---------------------+---------------+--------------------+---------------+
+|         Id          |     Type      |    Description     |    Used in    |
++=====================+===============+====================+===============+
+| constr_viol_tol     | OT_DOUBLE     | Constraint         | casadi::Ipqp  |
+|                     |               | violation          |               |
+|                     |               | tolerance [1e-8].  |               |
++---------------------+---------------+--------------------+---------------+
+| discrete            | OT_BOOLVECTOR | Indicates which of | casadi::Conic |
+|                     |               | the variables are  |               |
+|                     |               | discrete, i.e.     |               |
+|                     |               | integer-valued     |               |
++---------------------+---------------+--------------------+---------------+
+| dual_inf_tol        | OT_DOUBLE     | Dual feasibility   | casadi::Ipqp  |
+|                     |               | violation          |               |
+|                     |               | tolerance [1e-8]   |               |
++---------------------+---------------+--------------------+---------------+
+| error_on_fail       | OT_BOOL       | When the numerical | casadi::Conic |
+|                     |               | process returns    |               |
+|                     |               | unsuccessfully,    |               |
+|                     |               | raise an error     |               |
+|                     |               | (default false).   |               |
++---------------------+---------------+--------------------+---------------+
+| linear_solver       | OT_STRING     | A custom linear    | casadi::Ipqp  |
+|                     |               | solver creator     |               |
+|                     |               | function [default: |               |
+|                     |               | ldl]               |               |
++---------------------+---------------+--------------------+---------------+
+| linear_solver_optio | OT_DICT       | Options to be      | casadi::Ipqp  |
+| ns                  |               | passed to the      |               |
+|                     |               | linear solver      |               |
++---------------------+---------------+--------------------+---------------+
+| max_iter            | OT_INT        | Maximum number of  | casadi::Ipqp  |
+|                     |               | iterations [1000]. |               |
++---------------------+---------------+--------------------+---------------+
+| min_lam             | OT_DOUBLE     | Smallest           | casadi::Ipqp  |
+|                     |               | multiplier treated |               |
+|                     |               | as inactive for    |               |
+|                     |               | the initial active |               |
+|                     |               | set [0].           |               |
++---------------------+---------------+--------------------+---------------+
+| print_header        | OT_BOOL       | Print header       | casadi::Ipqp  |
+|                     |               | [true].            |               |
++---------------------+---------------+--------------------+---------------+
+| print_info          | OT_BOOL       | Print info [true]. | casadi::Ipqp  |
++---------------------+---------------+--------------------+---------------+
+| print_iter          | OT_BOOL       | Print iterations   | casadi::Ipqp  |
+|                     |               | [true].            |               |
++---------------------+---------------+--------------------+---------------+
+| print_problem       | OT_BOOL       | Print a numeric    | casadi::Conic |
+|                     |               | description of the |               |
+|                     |               | problem            |               |
++---------------------+---------------+--------------------+---------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: ipqp.hpp ";
+
+%feature("docstring") casadi::Ipqp::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_init_mem "
+
+[INTERNAL]  Codegen decref for init_mem.
+
+";
+
+%feature("docstring") casadi::Ipqp::serialize "
+
+[INTERNAL]  Serialize an object.
+
+";
+
+%feature("docstring") casadi::Ipqp::check_mat "
+
+[INTERNAL]  Helper function
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar[out]:  required number of parallel calls (or -1)
+
+";
+
+%feature("docstring") casadi::Ipqp::wrap_as_needed "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::Ipqp::free_sx "
+
+[INTERNAL]  Get free variables (SX)
+
+";
+
+%feature("docstring") casadi::Ipqp::generate_dependencies "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::Ipqp::convert_arg "
+
+[INTERNAL]  Convert from/to input/output lists/map.
+
+";
+
+%feature("docstring") casadi::Ipqp::jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_free "
+
+[INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_name "
+
+[INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring") casadi::Ipqp::integer_support "
+
+[INTERNAL]  Can discrete variables be treated.
+
+";
+
+%feature("docstring") casadi::Ipqp::setup "
+
+[INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::Ipqp::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring") casadi::Ipqp::instruction_id "
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::Ipqp::sparsity_jac "
+
+[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Ipqp::check_inputs "
+
+[INTERNAL]  Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::Ipqp::project_res "
+
+[INTERNAL]   Project sparsities.
+
+";
+
+%feature("docstring") casadi::Ipqp::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::Ipqp::forward "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Ipqp::init_mem "
+
+[INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring") casadi::Ipqp::nz_out "
+
+[INTERNAL]  Convert from/to flat vector of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::Ipqp::Ipqp "
+
+[INTERNAL]  Create a new Solver.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_default_in "
+
+[INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring") casadi::Ipqp::call "
+
+[INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring") casadi::Ipqp::alloc "
+
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::Ipqp::index_out "
+
+[INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring") casadi::Ipqp::solve "
+
+[INTERNAL]   Solve the QP.
+
+";
+
+%feature("docstring") casadi::Ipqp::uses_output "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::Ipqp::call_gen "
+
+[INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring") casadi::Ipqp::generate_in "
+
+[INTERNAL]  Export an input file that can be passed to generate C code with
+a main.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_sparsity_out "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::generate_out "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Ipqp::export_code "
+
+[INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::Ipqp::replace_res "
+
+[INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::Ipqp::replace_arg "
+
+[INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::free_mx "
+
+[INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring") casadi::Ipqp::init "
+
+[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::Ipqp::set_temp "
+
+[INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Ipqp::sparsity_in "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::Ipqp::serialize_body "
+
+[INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring") casadi::Ipqp::eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::Ipqp::slice "
+
+[INTERNAL]  returns a new function with a selection of inputs/outputs of the
+original
+
+";
+
+%feature("docstring") casadi::Ipqp::set_work "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::Ipqp::size2_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Ipqp::sx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Ipqp::sz_res "
+
+[INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring") casadi::Ipqp::~Ipqp "
+
+[INTERNAL]  Destructor.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::Ipqp::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Ipqp::serialize_base_function "
+
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
+%feature("docstring") casadi::Ipqp::call_reverse "
+
+[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::Ipqp::sx_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Ipqp::sprint "
+
+[INTERNAL]  C-style formatted printing to string.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_n_in "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::dm_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Ipqp::get_name_out "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_stats "
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::Ipqp::factory "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Ipqp::matching_arg "
+
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::Ipqp::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
+%feature("docstring") casadi::Ipqp::finalize "
+
+[INTERNAL]  Finalize the object creation.
+
+";
+
+%feature("docstring") casadi::Ipqp::jit_dependencies "
+
+[INTERNAL]  Jit dependencies.
+
+";
+
+%feature("docstring") casadi::Ipqp::nnz_in "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::Ipqp::fwd_seed "
+
+[INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_mem_type "
+
+[INTERNAL]  Thread-local memory object type.
+
+";
+
+%feature("docstring") casadi::Ipqp::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_max_in "
+
+[INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring") casadi::Ipqp::clear_mem "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::Ipqp::jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::Ipqp::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring") casadi::Ipqp::call_forward "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring") casadi::Ipqp::getCount "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring") casadi::Ipqp::disp_more "
+
+[INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::Ipqp::replace_aseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_meta "
+
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
+
+";
+
+%feature("docstring") casadi::Ipqp::sparsity_out "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::Ipqp::oracle "
+
+[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::Ipqp::size1_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Ipqp::wrap "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::Ipqp::alloc_iw "
+
+[INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_decref "
+
+[INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::Ipqp::print_dimensions "
+
+[INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::has_derivative "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::Ipqp::sz_iw "
+
+[INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring") casadi::Ipqp::dm_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Ipqp::get_n_out "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Ipqp::mx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_free_mem "
+
+[INTERNAL]  Codegen for free_mem.
+
+";
+
+%feature("docstring") casadi::Ipqp::eval "
+
+[INTERNAL]   Solve the QP.
+
+";
+
+%feature("docstring") casadi::Ipqp::alloc_w "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::Ipqp::reverse "
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Ipqp::print_time "
+
+[INTERNAL]  Print timing statistics.
+
+";
+
+%feature("docstring") casadi::Ipqp::matching_res "
+
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+Raises errors
+
+Parameters:
+-----------
+
+npar[in]:  normal usage: 1, disallow pararallel calls: -1
+
+npar:  max number of horizontal repetitions across all arguments (or -1)
+
+";
+
+%feature("docstring") casadi::Ipqp::disp "
+
+[INTERNAL]  Display object.
+
+";
+
+%feature("docstring") casadi::Ipqp::get_free "
+
+[INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring") casadi::Ipqp::self "
+
+[INTERNAL]  Get a public class instance.
+
+";
+
+%feature("docstring") casadi::Ipqp::eval_sx "
+
+[INTERNAL]  Evaluate with symbolic scalars.
+
+";
+
+%feature("docstring") casadi::Ipqp::codegen_declarations "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+
 // File: classcasadi_1_1JitFunction.xml
 %feature("docstring") casadi::JitFunction::convert_arg "
 
@@ -69723,6 +71076,10 @@ Get type info for a particular option.
 
 ";
 
+%feature("docstring") casadi::casadi_ipqp_predictor_prepare "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qp_pr_index "
 
 [INTERNAL] ";
@@ -69797,6 +71154,10 @@ lam_backward:  (lam_sg,lam_x,p)->(lam_g)
 ";
 
 %feature("docstring") casadi::dense_mul_tn "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ipqp_residual "
 
 [INTERNAL] ";
 
@@ -70345,12 +71706,9 @@ q = quad*B*h
 
 ";
 
-%feature("docstring") casadi::to_slice2 "
+%feature("docstring") casadi::casadi_ipqp_step "
 
-Construct nested slices from an index vector (requires is_slice2(v) to be
-true)
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::in_range "
 
@@ -70375,6 +71733,10 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring") casadi::casadi_ipqp_reset "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qp_dual_blocking "
 
 [INTERNAL] ";
@@ -70388,6 +71750,10 @@ Explicitly load a plugin dynamically.
 Get the number of expm solver outputs.
 
 ";
+
+%feature("docstring") casadi::casadi_ipqp_return_status "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_sum_viol "
 
@@ -70423,7 +71789,15 @@ Check sos structure and generate defaults.
 
 ";
 
+%feature("docstring") casadi::casadi_ipqp_bounds "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_fill_casadi_int "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ipqp_init "
 
 [INTERNAL] ";
 
@@ -70448,6 +71822,10 @@ Check sos structure and generate defaults.
 Get all options for a plugin.
 
 ";
+
+%feature("docstring") casadi::casadi_ipqp_corrector_prepare "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::load_linsol "
 
@@ -70491,7 +71869,15 @@ Generate native code in the interfaced language for debugging
 
 ";
 
+%feature("docstring") casadi::casadi_ipqp_mu "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_cvx_house_apply_symm "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ipqp_print_iteration "
 
 [INTERNAL] ";
 
@@ -70505,7 +71891,15 @@ Get documentation for a particular option.
 
 ";
 
+%feature("docstring") casadi::casadi_ipqp_maxstep "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::check_exposed "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ipqp_predictor "
 
 [INTERNAL] ";
 
@@ -70585,6 +71979,10 @@ slices.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_ipqp "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::dple_n_in "
 
 Get the number of QP solver inputs.
@@ -70604,6 +72002,13 @@ Check if the vector has negative entries.
 %feature("docstring") casadi::casadi_cvx_symm_schur "
 
 [INTERNAL]  Golub & Van Loan Alg. 8.3.3.
+
+";
+
+%feature("docstring") casadi::to_slice2 "
+
+Construct nested slices from an index vector (requires is_slice2(v) to be
+true)
 
 ";
 
@@ -70709,6 +72114,14 @@ Generate a hash value incrementally, array.
 
 ";
 
+%feature("docstring") casadi::casadi_ipqp_setup "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ipqp_solution "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::rootfinder_n_in "
 
 Number of rootfinder inputs.
@@ -70716,6 +72129,10 @@ Number of rootfinder inputs.
 ";
 
 %feature("docstring") casadi::casadi_sqpmethod_init "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ipqp_sigma "
 
 [INTERNAL] ";
 
@@ -70738,6 +72155,10 @@ Check if a particular plugin is available.
 [INTERNAL] ";
 
 %feature("docstring") casadi::casadi_central_diff "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ipqp_print_header "
 
 [INTERNAL] ";
 
@@ -71324,6 +72745,8 @@ List of plugins
 
 - superscs
 
+- ipqp
+
 - nlpsol
 
 - qrqp
@@ -71804,6 +73227,49 @@ Joris Gillis, 2019
 
 --------------------------------------------------------------------------------
 
+ipqp
+----
+
+
+
+Solves QPs using a Mehrotra predictor-corrector interior point method
+
+>List of available options
+
++-----------------------+-----------+--------------------------------------+
+|          Id           |   Type    |             Description              |
++=======================+===========+======================================+
+| constr_viol_tol       | OT_DOUBLE | Constraint violation tolerance       |
+|                       |           | [1e-8].                              |
++-----------------------+-----------+--------------------------------------+
+| dual_inf_tol          | OT_DOUBLE | Dual feasibility violation tolerance |
+|                       |           | [1e-8]                               |
++-----------------------+-----------+--------------------------------------+
+| linear_solver         | OT_STRING | A custom linear solver creator       |
+|                       |           | function [default: ldl]              |
++-----------------------+-----------+--------------------------------------+
+| linear_solver_options | OT_DICT   | Options to be passed to the linear   |
+|                       |           | solver                               |
++-----------------------+-----------+--------------------------------------+
+| max_iter              | OT_INT    | Maximum number of iterations [1000]. |
++-----------------------+-----------+--------------------------------------+
+| min_lam               | OT_DOUBLE | Smallest multiplier treated as       |
+|                       |           | inactive for the initial active set  |
+|                       |           | [0].                                 |
++-----------------------+-----------+--------------------------------------+
+| print_header          | OT_BOOL   | Print header [true].                 |
++-----------------------+-----------+--------------------------------------+
+| print_info            | OT_BOOL   | Print info [true].                   |
++-----------------------+-----------+--------------------------------------+
+| print_iter            | OT_BOOL   | Print iterations [true].             |
++-----------------------+-----------+--------------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 nlpsol
 ------
 
@@ -72020,6 +73486,10 @@ Pi @X_f = Sum_i D[i]*Z_i
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_ipqp_sz_w "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::is_nonincreasing "
 
 Check if the vector is non-increasing.
@@ -72133,6 +73603,10 @@ Hash value of an integer.
 Number of rootfinder outputs.
 
 ";
+
+%feature("docstring") casadi::casadi_ipqp_guess "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_flip "
 
@@ -72312,6 +73786,10 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_kkt "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qr_solve "
 
 [INTERNAL] ";
@@ -72351,6 +73829,10 @@ Get type info for a particular option.
 [INTERNAL] ";
 
 %feature("docstring") casadi::casadi_smoothing_diff "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ipqp_corrector "
 
 [INTERNAL] ";
 
@@ -72429,6 +73911,10 @@ Explicitly load a plugin dynamically.
 [INTERNAL]  CLEAR: x <- 0.
 
 ";
+
+%feature("docstring") casadi::casadi_ipqp_diag "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qr_trs "
 
@@ -72530,6 +74016,10 @@ Check if the vector is strictly monotone.
 Check if a particular plugin is available.
 
 ";
+
+%feature("docstring") casadi::casadi_ipqp_newiter "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qp_du_direction "
 
