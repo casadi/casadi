@@ -78,6 +78,7 @@ lcov \
     --remove "$dest"/coverage_total.info \
     '/usr/*' "$HOME/.local/*" \
     '*/gtest/*' '*/gmock/*' '*/googletest/*' \
+    '*/eigen/*' '*/eigen3/*' \
     '*/test/*' \
     --output-file "$dest"/coverage_filtered.info \
     --gcov-tool "$gcov_bin" \
