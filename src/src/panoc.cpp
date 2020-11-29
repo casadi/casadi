@@ -55,22 +55,26 @@ void calc_ẑ(const Problem &p, ///< [in]  Problem description
  */
 void calc_ŷ(const vec &ẑₖ, ///< [in]  Slack variable @f$ \hat{z}^k @f$
             const vec &gₖ, ///< [in]  Constraint @f$ g(\hat{x}^{k+1}) @f$
+            const vec &y,  ///< [in]  Lagrange multipliers
             const vec &Σ,  ///< [in]  Constraint weights @f$ \Sigma @f$
             vec &ŷₖ        ///< [out] @f$ \hat{y}^k @f$
 ) {
-    ŷₖ = Σ.array() * (gₖ - ẑₖ).array();
+    auto Σgz = Σ.array() * (gₖ - ẑₖ).array();
+    ŷₖ       = Σgz.matrix() + y;
     // conversion to Eigen array ensures element-wise multiplication
 }
 
 void calc_ẑŷ(const Problem &p, ///< [in]  Problem description
              const vec &gₖ,    ///< [in]  Constraint @f$ g(\hat{x}^k) @f$
              const vec &Σ⁻¹y,  ///< [in]  @f$ \Sigma^{-1} y @f$
+             const vec &y,     ///< [in]  Lagrange multipliers
              const vec &Σ,     ///< [in]  Constraint weights @f$ \Sigma @f$
              vec &ŷₖ           ///< [out] @f$ \hat{y}^k @f$
 ) {
     // TODO: does this allocate?
-    auto ẑₖ = project(gₖ + Σ⁻¹y, p.D);
-    ŷₖ      = Σ.array() * (gₖ - ẑₖ).array();
+    auto ẑₖ  = project(gₖ + Σ⁻¹y, p.D);
+    auto Σgz = Σ.array() * (gₖ - ẑₖ).array();
+    ŷₖ       = Σgz.matrix() + y;
 }
 
 real_t calc_ψ(const Problem &p, const vec &x, const vec &ẑₖ, const vec &Σ) {
@@ -96,14 +100,6 @@ real_t calc_error_stop_crit(real_t γ, const vec &rₖ, const vec &grad_̂ψₖ,
     // TODO: does this allocate?
     auto err = (1 / γ) * rₖ + grad_̂ψₖ - grad_ψₖ;
     return detail::norm_inf(err);
-}
-
-void PANOCParams::verify() {
-    assert(L > 0); // TODO: better error handling
-    assert(γ > 0);
-    assert(γ < 1 / L);
-    assert(σ > 0);
-    assert(σ < γ * (1 - γ * L) / 2);
 }
 
 void PANOCSolver::operator()(const Problem &problem, // in
@@ -137,13 +133,8 @@ void PANOCSolver::operator()(const Problem &problem, // in
     vec grad_g(n);    // ∇g(x)
 
     real_t ψₖ;
-    real_t norm_sq_grad_ψₖ;
+    real_t grad_ψₖᵀrₖ;
     real_t norm_sq_rₖ;
-
-    // params.verify();
-    real_t L = params.L;
-    real_t σ = params.σ;
-    real_t γ = params.γ;
 
     // Σ and y are constant in PANOC, so calculate Σ⁻¹y once in advance
     vec Σ⁻¹y = y.array() / Σ.array();
@@ -155,34 +146,48 @@ void PANOCSolver::operator()(const Problem &problem, // in
 
     // Calculate ∇ψ(x₀ + h)
     problem.g(x, g);
-    calc_ẑŷ(problem, g, Σ⁻¹y, Σ, ŷₖ);
+    calc_ẑŷ(problem, g, Σ⁻¹y, y, Σ, ŷₖ);
     calc_grad_ψ(problem, x, ŷₖ, grad_g, grad_ψₖ₊₁);
 
     // Calculate ẑ(x₀), ∇ψ(x₀)
     problem.g(xₖ, g);
     calc_ẑ(problem, g, Σ⁻¹y, ẑₖ);
-    calc_ŷ(ẑₖ, g, Σ, ŷₖ);
+    calc_ŷ(ẑₖ, g, y, Σ, ŷₖ);
     calc_grad_ψ(problem, xₖ, ŷₖ, grad_g, grad_ψₖ);
 
     // Estimate Lipschitz constant
-    L = (grad_ψₖ₊₁ - grad_ψₖ).norm() / h.norm();
-    γ = 0.95 / L;
-    σ = γ * (1 - γ * L) / 2;
+    real_t L = (grad_ψₖ₊₁ - grad_ψₖ).norm() / h.norm();
+    real_t γ = 0.95 / L;
+    real_t σ = γ * (1 - γ * L) / 2;
 
     // Calculate x̂₀, r₀ (gradient step)
     x̂ₖ = project(xₖ - γ * grad_ψₖ, problem.C);
     rₖ = xₖ - x̂ₖ;
 
-    // Calculate ψ(x₀), ‖∇ψ(x₀)‖², ‖r₀‖²
-    ψₖ              = calc_ψ(problem, x, ẑₖ, Σ);
-    norm_sq_grad_ψₖ = grad_ψₖ.squaredNorm();
-    norm_sq_rₖ      = rₖ.squaredNorm();
+    // Calculate ψ(x₀), ∇ψ(x₀)ᵀr₀, ‖r₀‖²
+    ψₖ         = calc_ψ(problem, x, ẑₖ, Σ);
+    grad_ψₖᵀrₖ = grad_ψₖ.dot(rₖ);
+    norm_sq_rₖ = rₖ.squaredNorm();
 
     for (unsigned k = 0; k < params.max_iter; ++k) {
-        std::cout << "[" << __PRETTY_FUNCTION__ << "] " << k << std::endl;
-        // Calculate g(x̂ₖ), ∇ψ(x̂ₖ)
+        std::cout << std::endl;
+        std::cout << "[PANOC] "
+                  << "Iteration #" << k << std::endl;
+        std::cout << "[PANOC] "
+                  << "xₖ = " << xₖ.transpose() << std::endl;
+        std::cout << "[PANOC] "
+                  << "γ = " << γ << std::endl;
+        std::cout << "[PANOC] "
+                  << "ψ(xₖ) = " << ψₖ << std::endl;
+        std::cout << "[PANOC] "
+                  << "∇ψ(xₖ) = " << grad_ψₖ.transpose() << std::endl;
+        problem.g(xₖ, g);
+        std::cout << "[PANOC] "
+                  << "g(xₖ) = " << g.transpose() << std::endl;
+
+        // Calculate g(x̂ₖ), ŷ, ∇ψ(x̂ₖ)
         problem.g(x̂ₖ, g);
-        calc_ẑŷ(problem, g, Σ⁻¹y, Σ, ŷₖ);
+        calc_ẑŷ(problem, g, Σ⁻¹y, y, Σ, ŷₖ);
         calc_grad_ψ(problem, x̂ₖ, ŷₖ, grad_g, grad_̂ψₖ);
 
         // Check stop condition
@@ -195,11 +200,12 @@ void PANOCSolver::operator()(const Problem &problem, // in
             return;
         }
 
-        // Calculate ψ(x̂ₖ), ∇ψ(xₖ)ᵀrₖ
+        // Calculate ψ(x̂ₖ)
         calc_ẑ(problem, g, Σ⁻¹y, ẑₖ);
-        real_t ψ̂xₖ        = calc_ψ(problem, x̂ₖ, ẑₖ, Σ);
-        real_t grad_ψₖᵀrₖ = grad_ψₖ.dot(rₖ);
-        while (ψ̂xₖ > ψₖ - grad_ψₖᵀrₖ + 0.5 * L * rₖ.squaredNorm()) {
+        real_t ψ̂xₖ    = calc_ψ(problem, x̂ₖ, ẑₖ, Σ);
+        real_t margin = 1e-6 * std::abs(ψₖ); // TODO
+        // TODO: check formula ↓
+        while (ψ̂xₖ > ψₖ + margin - grad_ψₖᵀrₖ + 0.5 * L / γ * norm_sq_rₖ) {
             lbfgs.reset();
             L *= 2;
             σ /= 2;
@@ -209,13 +215,16 @@ void PANOCSolver::operator()(const Problem &problem, // in
             x̂ₖ = project(xₖ - γ * grad_ψₖ, problem.C);
             rₖ = xₖ - x̂ₖ;
 
-            // Calculate ∇ψ(xₖ)ᵀrₖ
+            // Calculate ∇ψ(xₖ)ᵀrₖ, ‖rₖ‖²
             grad_ψₖᵀrₖ = grad_ψₖ.dot(rₖ);
+            norm_sq_rₖ = rₖ.squaredNorm();
 
             // Calculate ψ(x̂ₖ)
             problem.g(x̂ₖ, g);
             calc_ẑ(problem, g, Σ⁻¹y, ẑₖ);
             ψ̂xₖ = calc_ψ(problem, x̂ₖ, ẑₖ, Σ);
+
+            std::cout << "[PANOC] " << "Update L: γ = " << γ << std::endl;
         }
 
         // Calculate Newton step
@@ -223,44 +232,55 @@ void PANOCSolver::operator()(const Problem &problem, // in
         lbfgs.apply(1, rₖ_tmp, dₖ);
 
         // Line search
-        real_t φₖ = ψₖ - 0.5 * γ * norm_sq_grad_ψₖ + 0.5 / γ * norm_sq_rₖ;
+        real_t φₖ = ψₖ - grad_ψₖᵀrₖ + 0.5 / γ * norm_sq_rₖ;
         real_t σ_norm_γ⁻¹rₖ = σ * norm_sq_rₖ / (γ * γ);
-        real_t φₖ₊₁, ψₖ₊₁, norm_sq_grad_ψₖ₊₁, norm_sq_rₖ₊₁;
-        real_t τ = 1;
+        real_t φₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁ᵀrₖ₊₁, norm_sq_rₖ₊₁;
+        real_t τ     = 1;
+        real_t τ_min = 1e-12; // TODO: make parameter?
         do {
             // Calculate xₖ₊₁
             xₖ₊₁ = xₖ - (1 - τ) * rₖ - τ * dₖ; // TODO: check sign
             // Calculate ẑ(xₖ₊₁), ∇ψ(xₖ₊₁)
             problem.g(xₖ₊₁, g);
             calc_ẑ(problem, g, Σ⁻¹y, ẑₖ₊₁);
-            calc_ŷ(ẑₖ₊₁, g, Σ, ŷₖ);
+            calc_ŷ(ẑₖ₊₁, g, y, Σ, ŷₖ);
             calc_grad_ψ(problem, xₖ₊₁, ŷₖ, grad_g, grad_ψₖ₊₁);
             // Calculate x̂ₖ₊₁, rₖ₊₁ (next gradient step)
             x̂ₖ₊₁ = project(xₖ₊₁ - γ * grad_ψₖ₊₁, problem.C);
             rₖ₊₁ = xₖ₊₁ - x̂ₖ₊₁;
 
             // Calculate ψ(xₖ₊₁), ‖∇ψ(xₖ₊₁)‖², ‖rₖ₊₁‖²
-            ψₖ₊₁              = calc_ψ(problem, xₖ₊₁, ẑₖ₊₁, Σ);
-            norm_sq_grad_ψₖ₊₁ = grad_ψₖ₊₁.squaredNorm();
-            norm_sq_rₖ₊₁      = rₖ₊₁.squaredNorm();
+            ψₖ₊₁           = calc_ψ(problem, xₖ₊₁, ẑₖ₊₁, Σ);
+            grad_ψₖ₊₁ᵀrₖ₊₁ = grad_ψₖ₊₁.dot(rₖ₊₁);
+            norm_sq_rₖ₊₁   = rₖ₊₁.squaredNorm();
             // Calculate φ(xₖ₊₁)
-            φₖ₊₁ = ψₖ₊₁ - 0.5 * γ * norm_sq_grad_ψₖ₊₁ + 0.5 / γ * norm_sq_rₖ₊₁;
+            φₖ₊₁ = ψₖ₊₁ - grad_ψₖ₊₁ᵀrₖ₊₁ + 0.5 / γ * norm_sq_rₖ₊₁;
 
             τ /= 2;
-        } while (φₖ₊₁ > φₖ - σ_norm_γ⁻¹rₖ);
+        } while (φₖ₊₁ > φₖ - σ_norm_γ⁻¹rₖ && τ >= τ_min);
+
+        if (τ < τ_min) {
+            std::cerr << "[PANOC] "
+                         "\x1b[0;31m"
+                         "Line search failed"
+                         "\x1b[0m"
+                      << std::endl;
+        }
 
         // Update LBFGS
         lbfgs.update(xₖ₊₁ - xₖ, rₖ₊₁ - rₖ);
 
         // Advance step
-        ψₖ              = ψₖ₊₁;
-        x̂ₖ              = std::move(x̂ₖ₊₁);
-        ẑₖ              = std::move(ẑₖ₊₁);
-        rₖ              = std::move(rₖ₊₁);
-        grad_ψₖ         = std::move(grad_ψₖ₊₁);
-        norm_sq_grad_ψₖ = norm_sq_grad_ψₖ₊₁;
-        norm_sq_rₖ      = norm_sq_rₖ₊₁;
+        ψₖ         = ψₖ₊₁;
+        xₖ         = std::move(xₖ₊₁);
+        x̂ₖ         = std::move(x̂ₖ₊₁);
+        ẑₖ         = std::move(ẑₖ₊₁);
+        rₖ         = std::move(rₖ₊₁);
+        grad_ψₖ    = std::move(grad_ψₖ₊₁);
+        grad_ψₖᵀrₖ = grad_ψₖ₊₁ᵀrₖ₊₁;
+        norm_sq_rₖ = norm_sq_rₖ₊₁;
     }
+    throw std::runtime_error("[PANOC] max iterations exceeded");
 }
 
 } // namespace pa

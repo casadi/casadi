@@ -1,6 +1,7 @@
 #pragma once
 
 #include "panoc.hpp"
+#include <iostream>
 
 namespace pa {
 
@@ -37,6 +38,9 @@ class ALMSolver {
         real_t ε = params.ε₀;
 
         for (unsigned int i = 0; i < params.max_iter; ++i) {
+            std::cout << std::endl;
+            std::cout << "[ALM]   "
+                      << "Iteration #" << i << std::endl;
             detail::project_y(y, problem.D.lowerbound, problem.D.upperbound,
                               params.M);
             panoc(problem, x, z, y, error, Σ, ε);

@@ -9,9 +9,6 @@
 namespace pa {
 
 struct PANOCParams {
-    real_t L;
-    real_t γ;
-    real_t σ;
     struct {
         /// Relative step size for finite difference Lipschitz estimate
         real_t ε;

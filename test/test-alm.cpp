@@ -49,16 +49,13 @@ TEST(ALM, singleshooting1D) {
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
     almparam.σₘₐₓ     = 1e9;
-    almparam.max_iter = 100;
+    almparam.max_iter = 10;
 
     PANOCParams panocparam;
-    panocparam.L           = 0;
-    panocparam.γ           = 0;
-    panocparam.σ           = 0;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
     panocparam.lbfgs_mem   = 10;
-    panocparam.max_iter    = 10000;
+    panocparam.max_iter    = 100;
 
     ALMSolver solver{almparam, panocparam};
 
@@ -68,6 +65,8 @@ TEST(ALM, singleshooting1D) {
     solver(p, y, x);
 
     EXPECT_NEAR(x(0), -0.454545, 1e-4);
+    std::cout << "u = " << x.transpose() << std::endl;
+    std::cout << "x = " << (A * x0 + B * x).transpose() << std::endl;
 }
 
 TEST(ALM, multipleshooting1D) {
@@ -119,23 +118,20 @@ TEST(ALM, multipleshooting1D) {
     ALMParams almparam;
     almparam.ε        = 1e-4;
     almparam.δ        = 1e-4;
-    almparam.Δ        = 100; ///< Factor used in updating the penalty parameters
-    almparam.Σ₀       = 20;  ///< Initial penalty parameter
-    almparam.ε₀       = 1;   ///< Initial tolerance on x
+    almparam.Δ        = 5;  ///< Factor used in updating the penalty parameters
+    almparam.Σ₀       = 20; ///< Initial penalty parameter
+    almparam.ε₀       = 1;  ///< Initial tolerance on x
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
     almparam.σₘₐₓ     = 1e9;
-    almparam.max_iter = 100;
+    almparam.max_iter = 10;
 
     PANOCParams panocparam;
-    panocparam.L           = 0;
-    panocparam.γ           = 0;
-    panocparam.σ           = 0;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
     panocparam.lbfgs_mem   = 10;
-    panocparam.max_iter    = 10000;
+    panocparam.max_iter    = 100;
 
     ALMSolver solver{almparam, panocparam};
 
