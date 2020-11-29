@@ -11,10 +11,17 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/cache@v2
       with:
-        path: "/tmp/gtest"
+        path: "/tmp/lib-install/gtest"
         key: ${{ runner.os }}-${{ hashFiles('scripts/ci/install-gtest.sh') }}
     - name: Install Google Test
-      run: ./ci/install-gtest.sh /tmp/gtest
+      run: ./ci/install-gtest.sh /tmp/lib-install/gtest
+      working-directory: scripts
+    - uses: actions/cache@v2
+      with:
+        path: "/tmp/lib-install/eigen"
+        key: ${{ runner.os }}-${{ hashFiles('scripts/ci/install-eigen.sh') }}
+    - name: Install Eigen
+      run: ./ci/install-eigen.sh /tmp/lib-install/eigen
       working-directory: scripts
     - name: Create build directory
       run: mkdir -p build
@@ -24,7 +31,7 @@ jobs:
       env:
         CC: gcc-9
         CXX: g++-9
-        CMAKE_PREFIX_PATH: "/tmp/gtest"
+        CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen"
     - name: Build
       run: make -j4
       working-directory: build
