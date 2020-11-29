@@ -35,7 +35,7 @@ function run_doxygen_coverage {
     mkdir -p build 
     pushd build
     cmake .. -DCMAKE_BUILD_TYPE=Coverage
-    make coverage
+    make coverage ||:
     mkdir -p "$2/$dir"
     popd
     rm -rf "$2/$dir"
