@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     # Checks-out the repository under $GITHUB_WORKSPACE
@@ -27,13 +27,13 @@ jobs:
     - name: Install LCOV
       run: |
         ./scripts/ci/install-lcov.sh /tmp/lcov
-        echo "::add-path::/tmp/lcov/bin"
+        echo "/tmp/lcov/bin" >> $GITHUB_PATH
 
     # Download and build doxygen (if not cached already)
     - name: Install Doxygen
       run: |
         ./scripts/ci/install-doxygen.sh /tmp/doxygen
-        echo "::add-path::/tmp/doxygen/bin"
+        echo "/tmp/doxygen/bin" >> $GITHUB_PATH
 
     - name: Show Doxygen version
       run: |
@@ -71,8 +71,8 @@ jobs:
     - name: Generate documentation
       run: ./scripts/ci/gen-docs.sh /tmp/staging
       env:
-        CC: gcc-9
-        CXX: g++-9
+        CC: clang-10
+        CXX: clang++-10
         CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen"
 
     # Commit the new documentation, squash the commits, and push it to GitHub
