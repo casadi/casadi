@@ -77,8 +77,13 @@ void calc_ẑŷ(const Problem &p, ///< [in]  Problem description
     ŷₖ       = Σgz.matrix() + y;
 }
 
-real_t calc_ψ(const Problem &p, const vec &x, const vec &ẑₖ, const vec &Σ) {
-    return p.f(x) + 0.5 * dist_squared(ẑₖ, p.D, Σ);
+real_t calc_ψ(const Problem &p, const vec &x, ///< [in]  x
+              const vec &gₖ,   ///< [in]  Constraint @f$ g(\hat{x}^k) @f$
+              const vec &Σ⁻¹y, ///< [in]  @f$ \Sigma^{-1} y @f$
+              const vec &ẑₖ, const vec &Σ) {
+    auto diff  = gₖ + Σ⁻¹y - ẑₖ;
+    auto Σdiff = Σ.array() * diff.array();
+    return p.f(x) + 0.5 * (diff.dot(Σdiff.matrix()));
 }
 
 void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
@@ -141,7 +146,8 @@ void PANOCSolver::operator()(const Problem &problem, // in
 
     // Estimate Lipschitz constant using finite difference
     vec h(n);
-    h = (x * params.Lipschitz.ε).cwiseMax(params.Lipschitz.δ);
+    // TODO: what about negative x?
+    h = (x * params.Lipschitz.ε).cwiseMax(params.Lipschitz.δ); 
     x += h;
 
     // Calculate ∇ψ(x₀ + h)
@@ -165,7 +171,7 @@ void PANOCSolver::operator()(const Problem &problem, // in
     rₖ = xₖ - x̂ₖ;
 
     // Calculate ψ(x₀), ∇ψ(x₀)ᵀr₀, ‖r₀‖²
-    ψₖ         = calc_ψ(problem, x, ẑₖ, Σ);
+    ψₖ         = calc_ψ(problem, x, g, Σ⁻¹y, ẑₖ, Σ);
     grad_ψₖᵀrₖ = grad_ψₖ.dot(rₖ);
     norm_sq_rₖ = rₖ.squaredNorm();
 
@@ -174,16 +180,16 @@ void PANOCSolver::operator()(const Problem &problem, // in
         std::cout << "[PANOC] "
                   << "Iteration #" << k << std::endl;
         std::cout << "[PANOC] "
-                  << "xₖ = " << xₖ.transpose() << std::endl;
+                  << "xₖ     = " << xₖ.transpose() << std::endl;
         std::cout << "[PANOC] "
-                  << "γ = " << γ << std::endl;
+                  << "γ      = " << γ << std::endl;
         std::cout << "[PANOC] "
-                  << "ψ(xₖ) = " << ψₖ << std::endl;
+                  << "ψ(xₖ)  = " << ψₖ << std::endl;
         std::cout << "[PANOC] "
                   << "∇ψ(xₖ) = " << grad_ψₖ.transpose() << std::endl;
         problem.g(xₖ, g);
         std::cout << "[PANOC] "
-                  << "g(xₖ) = " << g.transpose() << std::endl;
+                  << "g(xₖ)  = " << g.transpose() << std::endl;
 
         // Calculate g(x̂ₖ), ŷ, ∇ψ(x̂ₖ)
         problem.g(x̂ₖ, g);
@@ -202,10 +208,10 @@ void PANOCSolver::operator()(const Problem &problem, // in
 
         // Calculate ψ(x̂ₖ)
         calc_ẑ(problem, g, Σ⁻¹y, ẑₖ);
-        real_t ψ̂xₖ    = calc_ψ(problem, x̂ₖ, ẑₖ, Σ);
-        real_t margin = 1e-6 * std::abs(ψₖ); // TODO
+        real_t ψ̂xₖ    = calc_ψ(problem, x̂ₖ, g, Σ⁻¹y, ẑₖ, Σ);
+        real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO
         // TODO: check formula ↓
-        while (ψ̂xₖ > ψₖ + margin - grad_ψₖᵀrₖ + 0.5 * L / γ * norm_sq_rₖ) {
+        while (ψ̂xₖ > ψₖ + margin - grad_ψₖᵀrₖ + 0.5 * L * norm_sq_rₖ) {
             lbfgs.reset();
             L *= 2;
             σ /= 2;
@@ -222,9 +228,33 @@ void PANOCSolver::operator()(const Problem &problem, // in
             // Calculate ψ(x̂ₖ)
             problem.g(x̂ₖ, g);
             calc_ẑ(problem, g, Σ⁻¹y, ẑₖ);
-            ψ̂xₖ = calc_ψ(problem, x̂ₖ, ẑₖ, Σ);
+            ψ̂xₖ = calc_ψ(problem, x̂ₖ, g, Σ⁻¹y, ẑₖ, Σ);
 
-            std::cout << "[PANOC] " << "Update L: γ = " << γ << std::endl;
+            std::cout << "[PANOC] "
+                      << "\x1b[0;34m"
+                         "Update L <<<<<<<<"
+                         "\x1b[0m"
+                      << std::endl;
+            std::cout << "[PANOC] "
+                      << "L = " << L << std::endl;
+            std::cout << "[PANOC] "
+                      << "γ = " << γ << std::endl;
+            std::cout << "[PANOC] "
+                      << "∇ψ(xₖ) = " << grad_ψₖ.transpose() << std::endl;
+            std::cout << "[PANOC] "
+                      << "x̂ₖ     = " << x̂ₖ.transpose() << std::endl;
+            std::cout << "[PANOC] "
+                      << "rₖ     = " << rₖ.transpose() << std::endl;
+            std::cout << "[PANOC] "
+                      << "∇ψₖᵀrₖ = " << grad_ψₖᵀrₖ << std::endl;
+            std::cout << "[PANOC] "
+                      << "‖rₖ‖²  = " << norm_sq_rₖ << std::endl;
+            std::cout << "[PANOC] "
+                      << "ψ(x̂ₖ)  = " << ψ̂xₖ << std::endl;
+            std::cout << "[PANOC] "
+                      << "g(x̂ₖ)  = " << g.transpose() << std::endl;
+            std::cout << "[PANOC] "
+                      << "-----------" << std::endl;
         }
 
         // Calculate Newton step
@@ -250,7 +280,7 @@ void PANOCSolver::operator()(const Problem &problem, // in
             rₖ₊₁ = xₖ₊₁ - x̂ₖ₊₁;
 
             // Calculate ψ(xₖ₊₁), ‖∇ψ(xₖ₊₁)‖², ‖rₖ₊₁‖²
-            ψₖ₊₁           = calc_ψ(problem, xₖ₊₁, ẑₖ₊₁, Σ);
+            ψₖ₊₁           = calc_ψ(problem, xₖ₊₁, g, Σ⁻¹y, ẑₖ₊₁, Σ);
             grad_ψₖ₊₁ᵀrₖ₊₁ = grad_ψₖ₊₁.dot(rₖ₊₁);
             norm_sq_rₖ₊₁   = rₖ₊₁.squaredNorm();
             // Calculate φ(xₖ₊₁)
