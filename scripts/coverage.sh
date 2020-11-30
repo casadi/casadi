@@ -58,7 +58,7 @@ lcov \
     --gcov-tool "$gcov_bin" \
     --rc lcov_branch_coverage=$branches
 
-"$build_dir"/test/tests
+"$build_dir"/test/tests --gtest_color=yes
 
 lcov \
     --capture \

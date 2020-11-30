@@ -36,5 +36,5 @@ jobs:
       run: make -j4
       working-directory: build
     - name: Run tests
-      run: ./test/tests
+      run: ./test/tests --gtest_color=yes
       working-directory: build
