@@ -74,8 +74,11 @@
         "eigen": "cpp"
     },
     "cSpell.words": [
+        "Eigen",
         "Lipschitz",
         "lbfgs",
-        "panoc"
+        "panoc",
+        "r",
+        "ψₖᵀrₖ"
     ]
 }

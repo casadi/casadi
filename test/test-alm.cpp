@@ -108,7 +108,8 @@ TEST(ALM, multipleshooting1D) {
         auto x         = ux.bottomRows(1);
         g_u.topRows(1) = A * x0 + B * u - x;
     };
-    auto grad_g = [&](const vec &u, const vec &v, vec &grad_u_v) {
+    auto grad_g = [&](const vec &ux, const vec &v, vec &grad_u_v) {
+        (void)ux;
         grad_u_v.topRows(1)    = B * v;
         grad_u_v.bottomRows(1) = -Eigen::MatrixXd::Identity(1, 1) * v;
     };

@@ -20,6 +20,7 @@ struct ALMParams {
     void verify();
 };
 
+/// Augmented Lagrangian Method solver
 class ALMSolver {
   public:
     using Params = ALMParams;
@@ -27,43 +28,7 @@ class ALMSolver {
     ALMSolver(Params params, PANOCSolver::Params panoc_params)
         : params(params), panoc(panoc_params) {}
 
-    void operator()(const Problem &problem, vec &y, vec &x) & {
-        vec Σ(problem.m);
-        vec z(problem.m);
-        vec error(problem.m);
-        vec error_old(problem.m);
-
-        // Initialize the penalty weights
-        Σ.fill(params.Σ₀);
-        real_t ε = params.ε₀;
-
-        for (unsigned int i = 0; i < params.max_iter; ++i) {
-            std::cout << std::endl;
-            std::cout << "[ALM]   "
-                      << "Iteration #" << i << std::endl;
-            detail::project_y(y, problem.D.lowerbound, problem.D.upperbound,
-                              params.M);
-            panoc(problem, x, z, y, error, Σ, ε);
-            real_t norm_e = detail::norm_inf(error);
-
-            if (ε <= params.ε && norm_e <= params.δ) {
-                return;
-            }
-            update_penalty_weights(i == 0, error, error_old, norm_e, Σ);
-            ε = params.ρ * ε;
-        }
-    }
-
-    void update_penalty_weights(bool first_it, vec &e, vec &old_e,
-                                real_t norm_e, vec &Σ) {
-        for (Eigen::Index i = 0; i < e.rows(); ++i) {
-            if (first_it || std::abs(e(i)) > params.θ * std::abs(old_e(i))) {
-                Σ(i) = std::fmin(
-                    params.σₘₐₓ,
-                    std::fmax(params.Δ * std::abs(e(i)) / norm_e, 1) * Σ(i));
-            }
-        }
-    }
+    void operator()(const Problem &problem, vec &y, vec &x);
 
   private:
     Params params;
