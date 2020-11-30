@@ -1,3 +1,6 @@
+# Target options
+# --------------
+
 add_library(panoc-alm SHARED
     "src/panoc.cpp"
     "src/box.cpp"
@@ -14,6 +17,9 @@ target_include_directories(panoc-alm
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 target_link_libraries(panoc-alm PUBLIC Eigen3::Eigen)
+
+# Target installation
+# -------------------
 
 include(GNUInstallDirs)
 
@@ -68,7 +74,7 @@ install(FILES
 export(EXPORT PANOC-ALMTargets
     FILE "${PROJECT_BINARY_DIR}/PANOC-ALMTargets.cmake")
 
-# Export the package for use from the build tree
-# (this registers the build tree with a global CMake-registry, so you can use
+# Export the package for use from the build tree:
+# This registers the build tree with a global CMake-registry, so you can use
 # find_package(PANOC-ALM) to find the package in the build tree
 export(PACKAGE PANOC-ALM)
