@@ -39,11 +39,22 @@
 #include <stdio.h>
 #include <dlfcn.h>
 
+#include <IpTNLP.hpp>
+
+using namespace Ipopt;
+
+class IpoptUserClass : public TNLP {
+};
+
 // Usage from C
 int usage_c(){
   printf("---\n");
   printf("Standalone usage from C/C++:\n");
   printf("\n");
+ 
+
+  IpoptUserClass a();
+
 
   /* Handle to the dll */
   void* handle;
