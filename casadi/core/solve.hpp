@@ -54,6 +54,20 @@ namespace casadi {
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
 
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
+    /** \brief Calculate forward mode directional derivatives */
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
+
+    /** \brief Calculate reverse mode directional derivatives */
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
+
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    casadi_int n_inplace() const override { return 1;}
+
     /** \brief  Propagate sparsity forward */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
@@ -69,6 +83,15 @@ namespace casadi {
     /** Obtain information about function */
     Dict info() const override {
       return {{"tr", Tr}};
+    }
+
+    /** Create a call node with the same linear solve object, if any */
+    virtual MX solve(const MX& A, const MX& B, bool tr) const {
+      if (tr) {
+        return MX::solve(A.T(), B);
+      } else {
+        return MX::solve(A, B);
+      }
     }
 
     /** \brief Serialize an object without type information */
@@ -105,20 +128,6 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
-
-    /** \brief Calculate forward mode directional derivatives */
-    void ad_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const override;
-
-    /** \brief Calculate reverse mode directional derivatives */
-    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const override;
-
-    /// Can the operation be performed inplace (i.e. overwrite the result)
-    casadi_int n_inplace() const override { return 1;}
-
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
@@ -126,6 +135,11 @@ namespace casadi {
 
     /// Linear solver (may be shared between multiple nodes)
     Linsol linsol_;
+
+    /** Create a call node with the same linear solve object, if any */
+    MX solve(const MX& A, const MX& B, bool tr) const override {
+      return linsol_.solve(A, B, tr);
+    }
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;

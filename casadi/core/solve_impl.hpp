@@ -81,16 +81,16 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void LinsolCall<Tr>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Solve<Tr>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     if (arg[0].is_zero()) {
       res[0] = MX(arg[0].size());
     } else {
-      res[0] = linsol_.solve(arg[1], arg[0], Tr);
+      res[0] = solve(arg[1], arg[0], Tr);
     }
   }
 
   template<bool Tr>
-  void LinsolCall<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
+  void Solve<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(this->n_dep());
@@ -112,7 +112,7 @@ namespace casadi {
       rhs[d] = Tr ? B_hat - mtimes(A_hat.T(), X) : B_hat - mtimes(A_hat, X);
       col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
-    rhs = horzsplit(linsol_.solve(A, horzcat(rhs), Tr), col_offset);
+    rhs = horzsplit(solve(A, horzcat(rhs), Tr), col_offset);
 
     // Fetch result
     fsens.resize(nfwd);
@@ -123,7 +123,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void LinsolCall<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Solve<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(this->n_dep());
@@ -143,7 +143,7 @@ namespace casadi {
       rhs[d] = aseed[d][0];
       col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
-    rhs = horzsplit(linsol_.solve(A, horzcat(rhs), !Tr), col_offset);
+    rhs = horzsplit(solve(A, horzcat(rhs), !Tr), col_offset);
 
     // Collect sensitivities
     asens.resize(nadj);
