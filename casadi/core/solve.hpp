@@ -45,15 +45,59 @@ namespace casadi {
   template<bool Tr>
   class CASADI_EXPORT Solve : public MXNode {
   public:
-
     /** \brief  Constructor */
-    Solve(const MX& r, const MX& A, const Linsol& linear_solver);
+    Solve(const MX& r, const MX& A);
 
     /** \brief  Destructor */
     ~Solve() override {}
 
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
+
+    /** \brief  Propagate sparsity forward */
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
+    /** \brief  Propagate sparsity backwards */
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
+    /** \brief Get the operation */
+    casadi_int op() const override { return OP_SOLVE;}
+
+    /** \brief Get required length of w field */
+    size_t sz_w() const override;
+
+    /** Obtain information about function */
+    Dict info() const override {
+      return {{"tr", Tr}};
+    }
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static MXNode* deserialize(DeserializingStream& s);
+
+    /** \brief Deserializing constructor */
+    explicit Solve(DeserializingStream& s);
+  };
+
+  /** \brief Linear solve operation with a linear solver instance
+
+      \author Joel Andersson
+      \date 2013
+  */
+  template<bool Tr>
+  class CASADI_EXPORT LinsolCall : public Solve<Tr> {
+  public:
+
+    /** \brief  Constructor */
+    LinsolCall(const MX& r, const MX& A, const Linsol& linear_solver);
+
+    /** \brief  Destructor */
+    ~LinsolCall() override {}
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
@@ -72,15 +116,6 @@ namespace casadi {
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
-
-    /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
-
-    /** \brief Get the operation */
-    casadi_int op() const override { return OP_SOLVE;}
-
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
@@ -89,19 +124,12 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Get required length of w field */
-    size_t sz_w() const override;
-
-    /** Obtain information about function */
-    Dict info() const override {
-      return {{"tr", Tr}};
-    }
-
-    /// Linear Solver (may be shared between multiple nodes)
+    /// Linear solver (may be shared between multiple nodes)
     Linsol linsol_;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
+
     /** \brief Serialize type information */
     void serialize_type(SerializingStream& s) const override;
 
@@ -109,7 +137,7 @@ namespace casadi {
     static MXNode* deserialize(DeserializingStream& s);
 
     /** \brief Deserializing constructor */
-    explicit Solve(DeserializingStream& s);
+    explicit LinsolCall(DeserializingStream& s);
   };
 
 

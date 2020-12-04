@@ -34,8 +34,7 @@ using namespace std;
 namespace casadi {
 
   template<bool Tr>
-  Solve<Tr>::Solve(const MX& r, const MX& A, const Linsol& linear_solver) :
-      linsol_(linear_solver) {
+  Solve<Tr>::Solve(const MX& r, const MX& A) {
     casadi_assert(r.size1() == A.size2(),
       "Solve::Solve: dimension mismatch. Got r " + r.dim() + " and A " + A.dim());
     set_dep(r, A);
@@ -52,8 +51,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int Solve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+  LinsolCall<Tr>::LinsolCall(const MX& r, const MX& A, const Linsol& linear_solver) :
+      Solve<Tr>(r, A), linsol_(linear_solver) {
+  }
+
+  template<bool Tr>
+  int LinsolCall<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     scoped_checkout<Linsol> mem(linsol_);
 
     auto m = static_cast<LinsolMemory*>(linsol_->memory(mem));
@@ -63,7 +67,7 @@ namespace casadi {
 
     if (linsol_.sfact(arg[1], mem)) return 1;
     if (linsol_.nfact(arg[1], mem)) return 1;
-    if (linsol_.solve(arg[1], res[0], dep(0).size2(), Tr, mem)) return 1;
+    if (linsol_.solve(arg[1], res[0], this->dep(0).size2(), Tr, mem)) return 1;
 
     linsol_->print_time(m->fstats);
 
@@ -71,13 +75,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int Solve<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
-    linsol_->linsol_eval_sx(arg, res, iw, w, linsol_->memory(0), Tr, dep(0).size2());
+  int LinsolCall<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    linsol_->linsol_eval_sx(arg, res, iw, w, linsol_->memory(0), Tr, this->dep(0).size2());
     return 0;
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void LinsolCall<Tr>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     if (arg[0].is_zero()) {
       res[0] = MX(arg[0].size());
     } else {
@@ -86,13 +90,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
+  void LinsolCall<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(n_dep());
-    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
-    for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
+    vector<MX> arg(this->n_dep());
+    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = this->dep(i);
+    vector<MX> res(this->nout());
+    for (casadi_int i=0; i<res.size(); ++i) res[i] = this->get_output(i);
 
     // Number of derivatives
     casadi_int nfwd = fseed.size();
@@ -119,13 +123,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+  void LinsolCall<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(n_dep());
-    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
-    for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
+    vector<MX> arg(this->n_dep());
+    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = this->dep(i);
+    vector<MX> res(this->nout());
+    for (casadi_int i=0; i<res.size(); ++i) res[i] = this->get_output(i);
 
     // Number of derivatives
     casadi_int nadj = aseed.size();
@@ -256,23 +260,23 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::generate(CodeGenerator& g,
+  void LinsolCall<Tr>::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res) const {
     // Number of right-hand-sides
-    casadi_int nrhs = dep(0).size2();
+    casadi_int nrhs = this->dep(0).size2();
 
     // Array for x
     g.local("rr", "casadi_real", "*");
-    g << "rr = " << g.work(res[0], nnz()) << ";\n";
+    g << "rr = " << g.work(res[0], this->nnz()) << ";\n";
 
     // Array for A
     g.local("ss", "casadi_real", "*");
-    g << "ss = " << g.work(arg[1], dep(1).nnz()) << ";\n";
+    g << "ss = " << g.work(arg[1], this->dep(1).nnz()) << ";\n";
 
     // Copy b to x if not inplace
     if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], nnz()), nnz(), "rr") << '\n';
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), "rr") << '\n';
     }
     // Solver specific codegen
     linsol_->generate(g, "ss", "rr", nrhs, Tr);
@@ -281,29 +285,55 @@ namespace casadi {
   template<bool Tr>
   void Solve<Tr>::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
-    s.pack("Solve::Linsol", linsol_);
   }
 
   template<bool Tr>
   void Solve<Tr>::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
-    s.pack("Solve::Tr", Tr);
+    s.pack("LinsolCall::Tr", Tr);
   }
 
   template<bool Tr>
   Solve<Tr>::Solve(DeserializingStream& s) : MXNode(s) {
-    s.unpack("Solve::Linsol", linsol_);
   }
 
   template<bool Tr>
   MXNode* Solve<Tr>::deserialize(DeserializingStream& s) {
     bool tr;
-    s.unpack("Solve::Tr", tr);
+    s.unpack("LinsolCall::Tr", tr);
 
     if (tr) {
       return new Solve<true>(s);
     } else {
       return new Solve<false>(s);
+    }
+  }
+
+  template<bool Tr>
+  void LinsolCall<Tr>::serialize_body(SerializingStream& s) const {
+    Solve<Tr>::serialize_body(s);
+    s.pack("LinsolCall::Linsol", linsol_);
+  }
+
+  template<bool Tr>
+  void LinsolCall<Tr>::serialize_type(SerializingStream& s) const {
+    Solve<Tr>::serialize_type(s);
+  }
+
+  template<bool Tr>
+  LinsolCall<Tr>::LinsolCall(DeserializingStream& s) : Solve<Tr>(s) {
+    s.unpack("LinsolCall::Linsol", linsol_);
+  }
+
+  template<bool Tr>
+  MXNode* LinsolCall<Tr>::deserialize(DeserializingStream& s) {
+    bool tr;
+    s.unpack("LinsolCall::Tr", tr);
+
+    if (tr) {
+      return new LinsolCall<true>(s);
+    } else {
+      return new LinsolCall<false>(s);
     }
   }
 
