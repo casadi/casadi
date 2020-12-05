@@ -44,7 +44,7 @@ namespace casadi {
   template<bool Tr>
   std::string Solve<Tr>::disp(const std::vector<std::string>& arg) const {
     std::stringstream ss;
-    ss << "(" << arg.at(1);
+    ss << "(" << mod_prefix() << arg.at(1) << mod_suffix();
     if (Tr) ss << "'";
     ss << "\\" << arg.at(0) << ")";
     return ss.str();
@@ -178,7 +178,7 @@ namespace casadi {
     casadi_int nrhs = dep(0).size2();
 
     // Sparsities
-    const Sparsity& A_sp = dep(1).sparsity();
+    const Sparsity& A_sp = this->A_sp();
     const casadi_int* A_colind = A_sp.colind();
     const casadi_int* A_row = A_sp.row();
     casadi_int n = A_sp.size1();
@@ -218,7 +218,7 @@ namespace casadi {
     casadi_int nrhs = dep(0).size2();
 
     // Sparsities
-    const Sparsity& A_sp = dep(1).sparsity();
+    const Sparsity& A_sp = this->A_sp();
     const casadi_int* A_colind = A_sp.colind();
     const casadi_int* A_row = A_sp.row();
     casadi_int n = A_sp.size1();
@@ -416,6 +416,72 @@ namespace casadi {
     }
   }
 
+  template<typename T1>
+  void casadi_triu_solve_unity(const casadi_int* sp_a, const T1* nz_a, T1* x, int tr,
+      casadi_int nrhs) {
+    // Local variables
+    casadi_int nrow, ncol, c, k, rhs;
+    const casadi_int *colind, *row;
+    // Extract sparsity
+    nrow = sp_a[0];
+    ncol = sp_a[1];
+    colind = sp_a + 2;
+    row = colind + ncol + 1;
+    // For all right hand sides
+    for (rhs = 0; rhs < nrhs; ++rhs) {
+      if (tr) {
+        // Forward substitution
+        for (c = 0; c < ncol; ++c) {
+          for (k = colind[c]; k < colind[c+1]; ++k) {
+            x[c] += nz_a[k] * x[row[k]];
+          }
+        }
+      } else {
+        // Backward substitution
+        for (c = ncol; c-- > 0; ) {
+          for (k = colind[c + 1]; k-- > colind[c]; ) {
+            x[row[k]] += nz_a[k] * x[c];
+          }
+        }
+      }
+      // Next right-hand-side
+      x += nrow;
+    }
+  }
+
+  template<typename T1>
+  void casadi_tril_solve_unity(const casadi_int* sp_a, const T1* nz_a, T1* x, int tr,
+      casadi_int nrhs) {
+    // Local variables
+    casadi_int nrow, ncol, c, k, rhs;
+    const casadi_int *colind, *row;
+    // Extract sparsity
+    nrow = sp_a[0];
+    ncol = sp_a[1];
+    colind = sp_a + 2;
+    row = colind + ncol + 1;
+    // For all right hand sides
+    for (rhs = 0; rhs < nrhs; ++rhs) {
+      if (tr) {
+        // Backward substitution
+        for (c = ncol; c-- > 0; ) {
+          for (k = colind[c + 1]; k-- > colind[c]; ) {
+            x[c] += nz_a[k] * x[row[k]];
+          }
+        }
+      } else {
+        // Forward substitution
+        for (c = 0; c < ncol; ++c) {
+          for (k = colind[c]; k < colind[c+1]; ++k) {
+            x[row[k]] += nz_a[k] * x[c];
+          }
+        }
+      }
+      // Next right-hand-side
+      x += nrow;
+    }
+  }
+
   template<bool Tr>
   TriuSolve<Tr>::TriuSolve(const MX& r, const MX& A) : Solve<Tr>(r, A) {
   }
@@ -435,6 +501,35 @@ namespace casadi {
   int TrilSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_tril_solve(this->dep(1).sparsity(), arg[1], res[0], Tr, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  SolveUnity<Tr>::SolveUnity(const MX& r, const MX& A, const Sparsity& A_sp)
+    : Solve<Tr>(r, A), A_sp_(A_sp) {
+  }
+
+  template<bool Tr>
+  TriuSolveUnity<Tr>::TriuSolveUnity(const MX& r, const MX& A, const Sparsity& A_sp)
+    : SolveUnity<Tr>(r, A, A_sp) {
+  }
+
+  template<bool Tr>
+  int TriuSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_triu_solve_unity(this->dep(1).sparsity(), arg[1], res[0], Tr, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  TrilSolveUnity<Tr>::TrilSolveUnity(const MX& r, const MX& A, const Sparsity& A_sp)
+    : SolveUnity<Tr>(r, A, A_sp) {
+  }
+
+  template<bool Tr>
+  int TrilSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_tril_solve_unity(this->dep(1).sparsity(), arg[1], res[0], Tr, this->dep(0).size2());
     return 0;
   }
 

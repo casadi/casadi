@@ -365,6 +365,24 @@ namespace casadi {
     */
     virtual MX get_solve_tril(const MX& r, bool tr) const;
 
+    /** \brief Solve a system of linear equations, upper triangular A, unity diagonal
+    *
+    *      For system Ax = b:
+    *
+    *      A->get_solve_triu(b)
+    *
+    */
+    virtual MX get_solve_triu_unity(const MX& r, bool tr, const Sparsity& A_sp) const;
+
+    /** \brief Solve a system of linear equations, lower triangular A, unity diagnal
+    *
+    *      For system Ax = b:
+    *
+    *      A->get_solve_tril(b)
+    *
+    */
+    virtual MX get_solve_tril_unity(const MX& r, bool tr, const Sparsity& A_sp) const;
+
     /** \brief Get the nonzeros of matrix
     *
     *   a->get_nzref(sp,nz)

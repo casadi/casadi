@@ -54,6 +54,12 @@ namespace casadi {
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
 
+    /** \brief  Modifier for linear system, before argument */
+    virtual std::string mod_prefix() const {return "";}
+
+    /** \brief  Modifier for linear system, after argument */
+    virtual std::string mod_suffix() const {return "";}
+
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
@@ -87,6 +93,9 @@ namespace casadi {
 
     /// Solve another system with the same factorization
     virtual MX solve(const MX& A, const MX& B, bool tr) const = 0;
+
+    /// Sparsity pattern for the linear system
+    virtual const Sparsity& A_sp() const { return dep(1).sparsity();}
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
@@ -168,7 +177,7 @@ namespace casadi {
 
     /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
-      A->get_solve_triu(B, tr);
+      return A->get_solve_triu(B, tr);
     }
   };
 
@@ -192,7 +201,83 @@ namespace casadi {
 
     /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
-      A->get_solve_tril(B, tr);
+      return A->get_solve_tril(B, tr);
+    }
+  };
+
+  /** \brief Linear solve with unity diagonal added
+
+      \author Joel Andersson
+      \date 2020
+  */
+  template<bool Tr>
+  class CASADI_EXPORT SolveUnity : public Solve<Tr> {
+  public:
+
+    /** \brief  Constructor */
+    SolveUnity(const MX& r, const MX& A, const Sparsity& A_sp);
+
+    /** \brief  Destructor */
+    ~SolveUnity() override {}
+
+    /** \brief  Modifier for linear system, before argument */
+    std::string mod_prefix() const override {return "(I - ";}
+
+    /** \brief  Modifier for linear system, after argument */
+    std::string mod_suffix() const override {return ")";}
+
+    /// Sparsity pattern for the linear system
+    const Sparsity& A_sp() const override { return A_sp_;}
+
+    // Sparsity pattern, I added
+    Sparsity A_sp_;
+  };
+
+  /** \brief Linear solve with an upper triangular matrix, unity diagonal
+
+      \author Joel Andersson
+      \date 2020
+  */
+  template<bool Tr>
+  class CASADI_EXPORT TriuSolveUnity : public SolveUnity<Tr> {
+  public:
+
+    /** \brief  Constructor */
+    TriuSolveUnity(const MX& r, const MX& A, const Sparsity& A_sp);
+
+    /** \brief  Destructor */
+    ~TriuSolveUnity() override {}
+
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /// Solve another system with the same factorization
+    MX solve(const MX& A, const MX& B, bool tr) const override {
+      return A->get_solve_triu_unity(B, tr, this->A_sp_);
+    }
+  };
+
+  /** \brief Linear solve with an upper triangular matrix
+
+      \author Joel Andersson
+      \date 2020
+  */
+  template<bool Tr>
+  class CASADI_EXPORT TrilSolveUnity : public SolveUnity<Tr> {
+  public:
+
+    /** \brief  Constructor */
+    TrilSolveUnity(const MX& r, const MX& A, const Sparsity& A_sp);
+
+    /** \brief  Destructor */
+    ~TrilSolveUnity() override {}
+
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /// Solve another system with the same factorization
+    MX solve(const MX& A, const MX& B, bool tr) const override {
+      return A->get_solve_tril_unity(B, tr, this->A_sp_);
     }
   };
 
