@@ -94,6 +94,16 @@ namespace casadi {
   template<typename T1>
   void casadi_mv(const T1* x, const casadi_int* sp_x, const T1* y, T1* z, casadi_int tr);
 
+  /// Linear solve, upper triangular matrix, optionally transposed or unity diagonal (1 - R)
+  template<typename T1>
+  void casadi_triusolve(const casadi_int* sp_a, const T1* nz_a, T1* x, int tr, int unity,
+      casadi_int nrhs);
+
+  /// Linear solve, lower triangular matrix, optionally transposed or unity diagonal (1 - L)
+  template<typename T1>
+  void casadi_trilsolve(const casadi_int* sp_a, const T1* nz_a, T1* x, int tr, int unity,
+      casadi_int nrhs);
+
   /// TRANS: y <- trans(x) , w work vector (length >= rows x)
   template<typename T1>
   void casadi_trans(const T1* x, const casadi_int* sp_x, T1* y, const casadi_int* sp_y,
@@ -244,6 +254,8 @@ namespace casadi {
   #include "casadi_sum_viol.hpp"
   #include "casadi_mtimes.hpp"
   #include "casadi_mv.hpp"
+  #include "casadi_trilsolve.hpp"
+  #include "casadi_triusolve.hpp"
   #include "casadi_trans.hpp"
   #include "casadi_norm_1.hpp"
   #include "casadi_norm_2.hpp"

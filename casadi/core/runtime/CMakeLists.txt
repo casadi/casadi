@@ -27,6 +27,8 @@ set(RUNTIME_SRC
   casadi_vfmin.hpp
   casadi_vfmax.hpp
   casadi_mv.hpp
+  casadi_trilsolve.hpp
+  casadi_triusolve.hpp
   casadi_mv_dense.hpp
   casadi_nd_boor_eval.hpp
   casadi_nd_boor_dual_eval.hpp
