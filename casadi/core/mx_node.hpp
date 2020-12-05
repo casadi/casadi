@@ -185,14 +185,14 @@ namespace casadi {
     virtual void serialize_body(SerializingStream& s) const;
 
     /** \brief Serialize type information
-     * 
+     *
      * Information needed to unambiguously find the (lowest level sub)class,
      * such that its deserializing constructor can be called.
      */
     virtual void serialize_type(SerializingStream& s) const;
 
     /** \brief Deserialize with type disambiguation
-     * 
+     *
      * Uses the information encoded with serialize_type to unambiguously find the (lowest level sub)class,
      * and calls its deserializing constructor.
      */
@@ -346,6 +346,24 @@ namespace casadi {
     *
     */
     virtual MX get_solve(const MX& r, bool tr, const Linsol& linear_solver) const;
+
+    /** \brief Solve a system of linear equations, upper triangular A
+    *
+    *      For system Ax = b:
+    *
+    *      A->get_solve_triu(b)
+    *
+    */
+    virtual MX get_solve_triu(const MX& r, bool tr) const;
+
+    /** \brief Solve a system of linear equations, lower triangular A
+    *
+    *      For system Ax = b:
+    *
+    *      A->get_solve_tril(b)
+    *
+    */
+    virtual MX get_solve_tril(const MX& r, bool tr) const;
 
     /** \brief Get the nonzeros of matrix
     *

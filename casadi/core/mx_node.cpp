@@ -505,6 +505,22 @@ namespace casadi {
     return MX::create(new Rank1(shared_from_this<MX>(), alpha, x, y));
   }
 
+  MX MXNode::get_solve_triu(const MX& r, bool tr) const {
+    if (tr) {
+      return MX::create(new TriuSolve<true>(densify(r), shared_from_this<MX>()));
+    } else {
+      return MX::create(new TriuSolve<false>(densify(r), shared_from_this<MX>()));
+    }
+  }
+
+  MX MXNode::get_solve_tril(const MX& r, bool tr) const {
+    if (tr) {
+      return MX::create(new TrilSolve<true>(densify(r), shared_from_this<MX>()));
+    } else {
+      return MX::create(new TrilSolve<false>(densify(r), shared_from_this<MX>()));
+    }
+  }
+
   MX MXNode::get_solve(const MX& r, bool tr, const Linsol& linear_solver) const {
     if (tr) {
       return MX::create(new LinsolCall<true>(densify(r), shared_from_this<MX>(), linear_solver));

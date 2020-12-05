@@ -1831,6 +1831,19 @@ namespace casadi {
     return x->get_repsum(n, m);
   }
 
+  MX MX::solve(const MX& a, const MX& b) {
+    if (a.is_triu()) {
+      // A is upper triangular
+      return a->get_solve_triu(b, false);
+    } else if (a.is_tril()) {
+      // A is lower triangular
+      return a->get_solve_tril(b, false);
+    } else {
+      // Fall-back to QR factorization
+      return solve(a, b, "qr");
+    }
+  }
+
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
     Linsol mysolver("tmp", lsolver, a.sparsity(), dict);
     return mysolver.solve(a, b, false);

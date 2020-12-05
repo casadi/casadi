@@ -85,14 +85,8 @@ namespace casadi {
       return {{"tr", Tr}};
     }
 
-    /** Create a call node with the same linear solve object, if any */
-    virtual MX solve(const MX& A, const MX& B, bool tr) const {
-      if (tr) {
-        return MX::solve(A.T(), B);
-      } else {
-        return MX::solve(A, B);
-      }
-    }
+    /// Solve another system with the same factorization
+    virtual MX solve(const MX& A, const MX& B, bool tr) const = 0;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
@@ -136,7 +130,7 @@ namespace casadi {
     /// Linear solver (may be shared between multiple nodes)
     Linsol linsol_;
 
-    /** Create a call node with the same linear solve object, if any */
+    /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
       return linsol_.solve(A, B, tr);
     }
@@ -154,6 +148,53 @@ namespace casadi {
     explicit LinsolCall(DeserializingStream& s);
   };
 
+  /** \brief Linear solve with an upper triangular matrix
+
+      \author Joel Andersson
+      \date 2020
+  */
+  template<bool Tr>
+  class CASADI_EXPORT TriuSolve : public Solve<Tr> {
+  public:
+
+    /** \brief  Constructor */
+    TriuSolve(const MX& r, const MX& A);
+
+    /** \brief  Destructor */
+    ~TriuSolve() override {}
+
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /// Solve another system with the same factorization
+    MX solve(const MX& A, const MX& B, bool tr) const override {
+      A->get_solve_triu(B, tr);
+    }
+  };
+
+  /** \brief Linear solve with an upper triangular matrix
+
+      \author Joel Andersson
+      \date 2020
+  */
+  template<bool Tr>
+  class CASADI_EXPORT TrilSolve : public Solve<Tr> {
+  public:
+
+    /** \brief  Constructor */
+    TrilSolve(const MX& r, const MX& A);
+
+    /** \brief  Destructor */
+    ~TrilSolve() override {}
+
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /// Solve another system with the same factorization
+    MX solve(const MX& A, const MX& B, bool tr) const override {
+      A->get_solve_tril(B, tr);
+    }
+  };
 
 } // namespace casadi
 
