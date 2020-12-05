@@ -255,8 +255,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  size_t Solve<Tr>::sz_w() const {
-    return sparsity().size1();
+  size_t LinsolCall<Tr>::sz_w() const {
+    return this->sparsity().size1();
   }
 
   template<bool Tr>
@@ -344,11 +344,25 @@ namespace casadi {
   }
 
   template<bool Tr>
+  int TriuSolve<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
   TrilSolve<Tr>::TrilSolve(const MX& r, const MX& A) : Solve<Tr>(r, A) {
   }
 
   template<bool Tr>
   int TrilSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  int TrilSolve<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
     return 0;
@@ -382,6 +396,13 @@ namespace casadi {
   }
 
   template<bool Tr>
+  int TriuSolveUnity<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
   TrilSolveUnity<Tr>::TrilSolveUnity(const MX& r, const MX& A)
     : SolveUnity<Tr>(r, A) {
   }
@@ -391,6 +412,69 @@ namespace casadi {
     if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
     return 0;
+  }
+
+  template<bool Tr>
+  int TrilSolveUnity<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  void TriuSolve<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
+    // Number of right-hand-sides
+    casadi_int nrhs = this->dep(0).size2();
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), g.work(res[0], this->nnz())) << '\n';
+    }
+    // Perform sparse matrix multiplication
+    g << g.triusolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
+      g.work(arg[1], this->dep(1).nnz()), Tr, false, nrhs) << '\n';
+  }
+
+  template<bool Tr>
+  void TrilSolve<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
+    // Number of right-hand-sides
+    casadi_int nrhs = this->dep(0).size2();
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), g.work(res[0], this->nnz())) << '\n';
+    }
+    // Perform sparse matrix multiplication
+    g << g.trilsolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
+      g.work(arg[1], this->dep(1).nnz()), Tr, false, nrhs) << '\n';
+  }
+
+  template<bool Tr>
+  void TriuSolveUnity<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
+    // Number of right-hand-sides
+    casadi_int nrhs = this->dep(0).size2();
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), g.work(res[0], this->nnz())) << '\n';
+    }
+    // Perform sparse matrix multiplication
+    g << g.triusolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
+      g.work(arg[1], this->dep(1).nnz()), Tr, true, nrhs) << '\n';
+  }
+
+  template<bool Tr>
+  void TrilSolveUnity<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
+    // Number of right-hand-sides
+    casadi_int nrhs = this->dep(0).size2();
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), g.work(res[0], this->nnz())) << '\n';
+    }
+    // Perform sparse matrix multiplication
+    g << g.trilsolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
+      g.work(arg[1], this->dep(1).nnz()), Tr, true, nrhs) << '\n';
   }
 
 } // namespace casadi

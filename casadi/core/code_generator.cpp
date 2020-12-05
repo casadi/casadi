@@ -982,6 +982,12 @@ namespace casadi {
     case AUX_MTIMES:
       this->auxiliaries << sanitize_source(casadi_mtimes_str, inst);
       break;
+    case AUX_TRILSOLVE:
+      this->auxiliaries << sanitize_source(casadi_trilsolve_str, inst);
+      break;
+    case AUX_TRIUSOLVE:
+      this->auxiliaries << sanitize_source(casadi_triusolve_str, inst);
+      break;
     case AUX_PROJECT:
       this->auxiliaries << sanitize_source(casadi_project_str, inst);
       break;
@@ -1550,6 +1556,20 @@ namespace casadi {
     add_auxiliary(AUX_MTIMES);
     return "casadi_mtimes(" + x + ", " + sparsity(sp_x) + ", " + y + ", " + sparsity(sp_y) + ", "
       + z + ", " + sparsity(sp_z) + ", " + w + ", " +  (tr ? "1" : "0") + ");";
+  }
+
+  std::string CodeGenerator::trilsolve(const Sparsity& sp_x, const std::string& x,
+      const std::string& y, bool tr, bool unity, casadi_int nrhs) {
+    add_auxiliary(AUX_TRILSOLVE);
+    return "casadi_trilsolve(" + sparsity(sp_x) + ", " + x + ", " + y + ", " + str(tr) + ", "
+        + str(unity) + ", " + str(nrhs) + ");";
+  }
+
+  std::string CodeGenerator::triusolve(const Sparsity& sp_x, const std::string& x,
+      const std::string& y, bool tr, bool unity, casadi_int nrhs) {
+    add_auxiliary(AUX_TRIUSOLVE);
+    return "casadi_triusolve(" + sparsity(sp_x) + ", " + x + ", " + y + ", " + str(tr) + ", "
+        + str(unity) + ", " + str(nrhs) + ");";
   }
 
   void CodeGenerator::print_formatted(const string& s) {

@@ -197,6 +197,14 @@ namespace casadi {
                        const std::string& z, const Sparsity& sp_z,
                        const std::string& w, bool tr);
 
+    /** \brief Codegen lower triangular solve */
+    std::string trilsolve(const Sparsity& sp_x, const std::string& x, const std::string& y,
+                          bool tr, bool unity, casadi_int nrhs);
+
+    /** \brief Codegen upper triangular solve */
+    std::string triusolve(const Sparsity& sp_x, const std::string& x, const std::string& y,
+                          bool tr, bool unity, casadi_int nrhs);
+
     /** \brief Codegen bilinear form */
     std::string bilin(const std::string& A, const Sparsity& sp_A,
                       const std::string& x, const std::string& y);
@@ -333,6 +341,8 @@ namespace casadi {
       AUX_MV,
       AUX_MV_DENSE,
       AUX_MTIMES,
+      AUX_TRILSOLVE,
+      AUX_TRIUSOLVE,
       AUX_PROJECT,
       AUX_TRI_PROJECT,
       AUX_DENSIFY,

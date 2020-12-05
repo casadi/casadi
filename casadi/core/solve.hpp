@@ -83,9 +83,6 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_SOLVE;}
 
-    /** \brief Get required length of w field */
-    size_t sz_w() const override;
-
     /** Obtain information about function */
     Dict info() const override {
       return {{"tr", Tr}};
@@ -131,6 +128,9 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
+    /** \brief Get required length of w field */
+    size_t sz_w() const override;
+
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
@@ -175,10 +175,17 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
+    /// Evaluate the function symbolically (SX)
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
     /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
       return A->get_solve_triu(B, tr);
     }
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const override;
   };
 
   /** \brief Linear solve with an upper triangular matrix
@@ -199,10 +206,17 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
+    /// Evaluate the function symbolically (SX)
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
     /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
       return A->get_solve_tril(B, tr);
     }
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const override;
   };
 
   /** \brief Linear solve with unity diagonal added
@@ -251,10 +265,17 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
+    /// Evaluate the function symbolically (SX)
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
     /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
       return A->get_solve_triu_unity(B, tr);
     }
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const override;
   };
 
   /** \brief Linear solve with an upper triangular matrix
@@ -275,10 +296,17 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
+    /// Evaluate the function symbolically (SX)
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
     /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
       return A->get_solve_tril_unity(B, tr);
     }
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const override;
   };
 
 } // namespace casadi
