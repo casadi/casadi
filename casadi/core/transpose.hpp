@@ -94,6 +94,16 @@ namespace casadi {
     //virtual MX get_solve(const MX& r, bool tr, const Linsol& linear_solver) const {
     // return dep()->get_solve(r, !tr, linear_solver);} // FIXME #1001
 
+    /// Solve a system of linear equations, upper triangular A
+    MX get_solve_triu(const MX& r, bool tr) const override {
+      return dep()->get_solve_tril(r, !tr);
+    }
+
+    /// Solve a system of linear equations, lower triangular A
+    MX get_solve_tril(const MX& r, bool tr) const override {
+      return dep()->get_solve_triu(r, !tr);
+    }
+
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, casadi_int depth) const override {
       return sameOpAndDeps(node, depth);
