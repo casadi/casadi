@@ -634,10 +634,10 @@ namespace casadi {
     bool is_symmetric() const;
 
     /// Is upper triangular?
-    bool is_triu() const;
+    bool is_triu(bool strictly = false) const;
 
     /// Is lower triangular?
-    bool is_tril() const;
+    bool is_tril(bool strictly = false) const;
 
     /// Check whether the sparsity-pattern indicates structural singularity
     bool is_singular() const;

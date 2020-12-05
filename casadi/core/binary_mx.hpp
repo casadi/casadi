@@ -90,6 +90,7 @@ namespace casadi {
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
+
     /** \brief Serialize type information */
     void serialize_type(SerializingStream& s) const override;
 
@@ -119,6 +120,12 @@ namespace casadi {
         return false;
       }
     }
+
+    /// Solve a system of linear equations, upper triangular A
+    MX get_solve_triu(const MX& r, bool tr) const override;
+
+    /// Solve a system of linear equations, lower triangular A
+    MX get_solve_tril(const MX& r, bool tr) const override;
 
     //! \brief Operation
     Operation op_;

@@ -316,6 +316,38 @@ namespace casadi {
     op_ = Operation(op);
   }
 
+  template<bool ScX, bool ScY>
+  MX BinaryMX<ScX, ScY>::get_solve_triu(const MX& r, bool tr) const {
+    // Identify systems with the structure (I - R)
+    if (!ScX && !ScY && op_ == OP_SUB) {
+      // Is the first term a projected unity matrix?
+      if (dep(0).is_op(OP_PROJECT) && dep(0).dep(0).is_eye()) {
+        // Is the second term strictly lower triangular?
+        if (dep(1).is_op(OP_PROJECT) && dep(1).dep(0).sparsity().is_triu(true)) {
+          return dep(1).dep(0)->get_solve_triu_unity(r, tr);
+        }
+      }
+    }
+    // Fall back to default routine
+    return MXNode::get_solve_triu(r, tr);
+  }
+
+  template<bool ScX, bool ScY>
+  MX BinaryMX<ScX, ScY>::get_solve_tril(const MX& r, bool tr) const {
+    // Identify systems with the structure (I - L)
+    if (!ScX && !ScY && op_ == OP_SUB) {
+      // Is the first term a projected unity matrix?
+      if (dep(0).is_op(OP_PROJECT) && dep(0).dep(0).is_eye()) {
+        // Is the second term strictly lower triangular?
+        if (dep(1).is_op(OP_PROJECT) && dep(1).dep(0).sparsity().is_tril(true)) {
+          return dep(1).dep(0)->get_solve_tril_unity(r, tr);
+        }
+      }
+    }
+    // Fall back to default routine
+    return MXNode::get_solve_tril(r, tr);
+  }
+
 } // namespace casadi
 
 #endif // CASADI_BINARY_MX_IMPL_HPP

@@ -298,12 +298,12 @@ namespace casadi {
     return (*this)->is_symmetric();
   }
 
-  bool Sparsity::is_tril() const {
-    return (*this)->is_tril();
+  bool Sparsity::is_tril(bool strictly) const {
+    return (*this)->is_tril(strictly);
   }
 
-  bool Sparsity::is_triu() const {
-    return (*this)->is_triu();
+  bool Sparsity::is_triu(bool strictly) const {
+    return (*this)->is_triu(strictly);
   }
 
   Sparsity Sparsity::sub(const std::vector<casadi_int>& rr, const Sparsity& sp,

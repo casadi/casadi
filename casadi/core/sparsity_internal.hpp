@@ -453,10 +453,10 @@ namespace casadi {
     bool is_symmetric() const;
 
     /// Is lower triangular?
-    bool is_tril() const;
+    bool is_tril(bool strictly) const;
 
     /// is upper triangular?
-    bool is_triu() const;
+    bool is_triu(bool strictly) const;
 
     /// Get upper triangular part
     Sparsity _triu(bool includeDiagonal) const;
