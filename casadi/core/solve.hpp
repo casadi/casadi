@@ -215,7 +215,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    SolveUnity(const MX& r, const MX& A, const Sparsity& A_sp);
+    SolveUnity(const MX& r, const MX& A);
 
     /** \brief  Destructor */
     ~SolveUnity() override {}
@@ -227,10 +227,10 @@ namespace casadi {
     std::string mod_suffix() const override {return ")";}
 
     /// Sparsity pattern for the linear system
-    const Sparsity& A_sp() const override { return A_sp_;}
+    const Sparsity& A_sp() const override;
 
-    // Sparsity pattern, I added
-    Sparsity A_sp_;
+    // Sparsity pattern of linear system, cached
+    mutable Sparsity A_sp_;
   };
 
   /** \brief Linear solve with an upper triangular matrix, unity diagonal
@@ -243,7 +243,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    TriuSolveUnity(const MX& r, const MX& A, const Sparsity& A_sp);
+    TriuSolveUnity(const MX& r, const MX& A);
 
     /** \brief  Destructor */
     ~TriuSolveUnity() override {}
@@ -253,7 +253,7 @@ namespace casadi {
 
     /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
-      return A->get_solve_triu_unity(B, tr, this->A_sp_);
+      return A->get_solve_triu_unity(B, tr);
     }
   };
 
@@ -267,7 +267,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    TrilSolveUnity(const MX& r, const MX& A, const Sparsity& A_sp);
+    TrilSolveUnity(const MX& r, const MX& A);
 
     /** \brief  Destructor */
     ~TrilSolveUnity() override {}
@@ -277,7 +277,7 @@ namespace casadi {
 
     /// Solve another system with the same factorization
     MX solve(const MX& A, const MX& B, bool tr) const override {
-      return A->get_solve_tril_unity(B, tr, this->A_sp_);
+      return A->get_solve_tril_unity(B, tr);
     }
   };
 

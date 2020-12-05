@@ -521,19 +521,19 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_solve_triu_unity(const MX& r, bool tr, const Sparsity& A_sp) const {
+  MX MXNode::get_solve_triu_unity(const MX& r, bool tr) const {
     if (tr) {
-      return MX::create(new TriuSolveUnity<true>(densify(r), shared_from_this<MX>(), A_sp));
+      return MX::create(new TriuSolveUnity<true>(densify(r), shared_from_this<MX>()));
     } else {
-      return MX::create(new TriuSolveUnity<false>(densify(r), shared_from_this<MX>(), A_sp));
+      return MX::create(new TriuSolveUnity<false>(densify(r), shared_from_this<MX>()));
     }
   }
 
-  MX MXNode::get_solve_tril_unity(const MX& r, bool tr, const Sparsity& A_sp) const {
+  MX MXNode::get_solve_tril_unity(const MX& r, bool tr) const {
     if (tr) {
-      return MX::create(new TrilSolveUnity<true>(densify(r), shared_from_this<MX>(), A_sp));
+      return MX::create(new TrilSolveUnity<true>(densify(r), shared_from_this<MX>()));
     } else {
-      return MX::create(new TrilSolveUnity<false>(densify(r), shared_from_this<MX>(), A_sp));
+      return MX::create(new TrilSolveUnity<false>(densify(r), shared_from_this<MX>()));
     }
   }
 

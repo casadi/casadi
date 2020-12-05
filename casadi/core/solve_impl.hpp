@@ -505,13 +505,23 @@ namespace casadi {
   }
 
   template<bool Tr>
-  SolveUnity<Tr>::SolveUnity(const MX& r, const MX& A, const Sparsity& A_sp)
-    : Solve<Tr>(r, A), A_sp_(A_sp) {
+  SolveUnity<Tr>::SolveUnity(const MX& r, const MX& A) : Solve<Tr>(r, A) {
   }
 
   template<bool Tr>
-  TriuSolveUnity<Tr>::TriuSolveUnity(const MX& r, const MX& A, const Sparsity& A_sp)
-    : SolveUnity<Tr>(r, A, A_sp) {
+  const Sparsity& SolveUnity<Tr>::A_sp() const {
+    // Create on first call
+    if (A_sp_.is_null()) {
+      const Sparsity& no_diag = this->dep(1).sparsity();
+      A_sp_ = no_diag + Sparsity::diag(no_diag.size1());
+    }
+    // Return reference
+    return A_sp_;
+  }
+
+  template<bool Tr>
+  TriuSolveUnity<Tr>::TriuSolveUnity(const MX& r, const MX& A)
+    : SolveUnity<Tr>(r, A) {
   }
 
   template<bool Tr>
@@ -522,8 +532,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  TrilSolveUnity<Tr>::TrilSolveUnity(const MX& r, const MX& A, const Sparsity& A_sp)
-    : SolveUnity<Tr>(r, A, A_sp) {
+  TrilSolveUnity<Tr>::TrilSolveUnity(const MX& r, const MX& A)
+    : SolveUnity<Tr>(r, A) {
   }
 
   template<bool Tr>

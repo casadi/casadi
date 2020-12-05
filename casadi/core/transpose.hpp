@@ -105,13 +105,13 @@ namespace casadi {
     }
 
     /// Solve a system of linear equations, upper triangular A, unity diagonal
-    MX get_solve_triu_unity(const MX& r, bool tr, const Sparsity& A_sp) const override {
-      return dep()->get_solve_tril_unity(r, !tr, A_sp.T());
+    MX get_solve_triu_unity(const MX& r, bool tr) const override {
+      return dep()->get_solve_tril_unity(r, !tr);
     }
 
     /// Solve a system of linear equations, lower triangular A, unity diagonal
-    MX get_solve_tril_unity(const MX& r, bool tr, const Sparsity& A_sp) const override {
-      return dep()->get_solve_triu_unity(r, !tr, A_sp.T());
+    MX get_solve_tril_unity(const MX& r, bool tr) const override {
+      return dep()->get_solve_triu_unity(r, !tr);
     }
 
     /** \brief Check if two nodes are equivalent up to a given depth */

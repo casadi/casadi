@@ -372,7 +372,7 @@ namespace casadi {
     *      A->get_solve_triu(b)
     *
     */
-    virtual MX get_solve_triu_unity(const MX& r, bool tr, const Sparsity& A_sp) const;
+    virtual MX get_solve_triu_unity(const MX& r, bool tr) const;
 
     /** \brief Solve a system of linear equations, lower triangular A, unity diagnal
     *
@@ -381,7 +381,7 @@ namespace casadi {
     *      A->get_solve_tril(b)
     *
     */
-    virtual MX get_solve_tril_unity(const MX& r, bool tr, const Sparsity& A_sp) const;
+    virtual MX get_solve_tril_unity(const MX& r, bool tr) const;
 
     /** \brief Get the nonzeros of matrix
     *
