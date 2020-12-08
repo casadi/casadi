@@ -46,13 +46,17 @@ namespace casadi {
       z:      algebraic variables
       u:      control signals
       q:      quadrature states
-      y:      outputs
       \endverbatim
 
       <H3>Time-constant variables:  </H3>
       \verbatim
       p:      free parameters
+      \endverbatim
+
+      <H3>Dependent variables:  </H3>
+      \verbatim
       d:      dependent parameters
+      y:      dependent variables or outputs
       \endverbatim
 
       <H3>Dynamic constraints (imposed everywhere):  </H3>
@@ -201,6 +205,9 @@ namespace casadi {
 
     /// Register algebraic variable
     void register_z(const MX& new_z, const MX& new_der_z = MX());
+
+    /// Register dependent variable
+    void register_y(const MX& new_y, const MX& new_ydef, const MX& new_der_y = MX());
     ///@}
 
     /** @name Manipulation

@@ -962,6 +962,15 @@ namespace casadi {
     this->z.push_back(new_z);
   }
 
+  void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef, const MX& new_der_y) {
+    if (new_y.sparsity() != new_ydef.sparsity())
+      casadi_error("Mismatching sparsity in DaeBuilder::register_y");
+    add_variable(new_y, new_der_y);
+    this->y.push_back(new_y);
+    this->ydef.push_back(new_ydef);
+    this->lam_ydef.push_back(MX::sym("lam_" + new_y.name(), new_y.sparsity()));
+  }
+
   MX DaeBuilder::add_q(const std::string& name, casadi_int n) {
     if (name.empty()) return add_q("q" + str(this->q.size()), n);
     MX new_q = add_variable(name, n);
