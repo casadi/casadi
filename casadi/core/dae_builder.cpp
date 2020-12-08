@@ -940,11 +940,26 @@ namespace casadi {
     return v.v;
   }
 
+  void DaeBuilder::add_variable(const MX& new_v, const MX& new_der_v) {
+    Variable v(new_v.name(), new_v.sparsity(), new_v, new_der_v);
+    add_variable(new_v.name(), v);
+  }
+
   MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
     if (name.empty()) return add_x("x" + str(this->x.size()), n);
     MX new_x = add_variable(name, n);
     this->x.push_back(new_x);
     return new_x;
+  }
+
+  void DaeBuilder::register_x(const MX& new_x, const MX& new_der_x) {
+    add_variable(new_x, new_der_x);
+    this->x.push_back(new_x);
+  }
+
+  void DaeBuilder::register_z(const MX& new_z, const MX& new_der_z) {
+    add_variable(new_z, new_der_z);
+    this->z.push_back(new_z);
   }
 
   MX DaeBuilder::add_q(const std::string& name, casadi_int n) {

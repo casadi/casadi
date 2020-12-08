@@ -73,7 +73,10 @@ namespace casadi {
     Variable() {}
 
     /// Constructor
-    explicit Variable(const std::string& name, const Sparsity& sp = Sparsity::scalar());
+    explicit Variable(const std::string& name,
+      const Sparsity& sp = Sparsity::scalar(),
+      const MX& v = MX(),
+      const MX& d = MX());
 
     /// Variable name
     std::string name() const;

@@ -194,6 +194,15 @@ namespace casadi {
     void sanity_check() const;
     ///@}
 
+    /** @name Register an existing variable */
+    ///@{
+    /// Register differential state
+    void register_x(const MX& new_x, const MX& new_der_x = MX());
+
+    /// Register algebraic variable
+    void register_z(const MX& new_z, const MX& new_der_z = MX());
+    ///@}
+
     /** @name Manipulation
      *  Reformulate the dynamic optimization problem.
      */
@@ -460,6 +469,9 @@ namespace casadi {
 
     /// Add a new variable: returns corresponding symbolic expression
     MX add_variable(const std::string& name, const Sparsity& sp);
+
+    /// Add a new variable from symbolic expressions
+    void add_variable(const MX& new_v, const MX& new_der_v);
 
     ///@{
     /// Access a variable by name
