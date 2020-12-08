@@ -1644,8 +1644,8 @@ namespace casadi {
   }
 
   Function DaeBuilder::create(const std::string& fname,
-                                const std::vector<std::string>& s_in,
-                                const std::vector<std::string>& s_out) const {
+                              const std::vector<std::string>& s_in,
+                              const std::vector<std::string>& s_out) const {
     // Collect function inputs
     vector<MX> ret_in(s_in.size());
     std::vector<bool> input_used(DAE_BUILDER_NUM_IN, false);
@@ -1964,8 +1964,25 @@ namespace casadi {
       }
     }
 
-    // Generate the constructed function
-    return Function(fname, ret_in, ret_out, s_in, s_out);
+    // Construct function
+    Function ret(fname, ret_in, ret_out, s_in, s_out);
+
+    // Eliminate free variables?
+    if (ret.has_free()) {
+      // All dependent variables, defining expressions
+      std::vector<MX> dep(this->d), dep_def(this->ddef);
+      dep.insert(dep.end(), this->y.begin(), this->y.end());
+      dep_def.insert(dep_def.end(), this->ydef.begin(), this->ydef.end());
+      // Perform in-place substitution
+      substitute_inplace(dep, dep_def, ret_out, false);
+      // Recreate function
+      ret = Function(fname, ret_in, ret_out, s_in, s_out);
+      // Ensure that there are no longer any free variables
+      casadi_assert(!ret.has_free(), "Failed to eliminate " + str(ret.get_free()));
+    }
+
+    // Return constructed function
+    return ret;
   }
 
   Function DaeBuilder::add_fun(const Function& f) {

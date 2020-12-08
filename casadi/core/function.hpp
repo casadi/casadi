@@ -701,7 +701,7 @@ namespace casadi {
     std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
     /** \brief Export an input file that can be passed to generate C code with a main
-     * 
+     *
      * \seealso generate_out
      * \seealso convert_in to convert between dict/map and vector
      */
@@ -711,7 +711,7 @@ namespace casadi {
     /// @}
 
     /** \brief Export an output file that can be checked with generated C code output
-     * 
+     *
      * \seealso generate_in
      * \seealso convert_out to convert between dict/map and vector
      */
@@ -810,10 +810,10 @@ namespace casadi {
     std::vector<DM> nz_to_out(const std::vector<double>& arg) const;
     ///@}
 
-    /** \brief Convert from/to input/output lists/map 
+    /** \brief Convert from/to input/output lists/map
     *
     * Will raise an error when an unknown key is used or a list has incorrect size.
-    * Does not perform sparsity checking. 
+    * Does not perform sparsity checking.
     */
     /// @{
     DMDict convert_in(const std::vector<DM>& arg) const;
