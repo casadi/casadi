@@ -338,10 +338,10 @@ namespace casadi {
     std::vector<MX> output(DaeBuilderOut ind) const;
 
     // Get input expression, given enum
-    std::vector<MX> input(std::vector<DaeBuilderIn>& ind) const;
+    std::vector<MX> input(const std::vector<DaeBuilderIn>& ind) const;
 
     // Get output expression, given enum
-    std::vector<MX> output(std::vector<DaeBuilderOut>& ind) const;
+    std::vector<MX> output(const std::vector<DaeBuilderOut>& ind) const;
 
     // Get multiplier corresponding to an output expression, given enum
     std::vector<MX> multiplier(DaeBuilderOut ind) const;

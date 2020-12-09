@@ -1569,7 +1569,7 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> DaeBuilder::input(std::vector<DaeBuilderIn>& ind) const {
+  std::vector<MX> DaeBuilder::input(const std::vector<DaeBuilderIn>& ind) const {
     std::vector<MX> ret(ind.size());
     for (casadi_int i=0; i<ind.size(); ++i) {
       ret[i] = vertcat(input(ind[i]));
@@ -1590,7 +1590,7 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> DaeBuilder::output(std::vector<DaeBuilderOut>& ind) const {
+  std::vector<MX> DaeBuilder::output(const std::vector<DaeBuilderOut>& ind) const {
     std::vector<MX> ret(ind.size());
     for (casadi_int i=0; i<ind.size(); ++i) {
       ret[i] = vertcat(output(ind[i]));
