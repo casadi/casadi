@@ -520,6 +520,14 @@ namespace casadi {
     typedef void (DaeBuilder::*setAttS)(const std::string& name, const MX& val);
     void set_attribute(setAttS f, const MX& var, const MX& val);
 
+    /// Construct a function object, SX or MX
+    template<typename SType, typename ExType>
+    Function createGen(
+      const SType& st,
+      const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out) const;
+
 #endif // SWIG
 
   };
