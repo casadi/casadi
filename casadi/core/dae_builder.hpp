@@ -39,24 +39,16 @@ namespace casadi {
       t:      time
       \endverbatim
 
-      <H3>Time-continuous variables:  </H3>
+      <H3>Variables:  </H3>
       \verbatim
       x:      states defined by ODE
       s:      implicitly defined states
       z:      algebraic variables
       u:      control signals
       q:      quadrature states
-      \endverbatim
-
-      <H3>Time-constant variables:  </H3>
-      \verbatim
       p:      free parameters
-      \endverbatim
-
-      <H3>Dependent variables:  </H3>
-      \verbatim
-      d:      dependent parameters
-      y:      dependent variables or outputs
+      d:      dependent variables
+      y:      outputs
       \endverbatim
 
       <H3>Dynamic constraints (imposed everywhere):  </H3>
@@ -207,6 +199,9 @@ namespace casadi {
     void register_z(const MX& new_z, const MX& new_der_z = MX());
 
     /// Register dependent variable
+    void register_d(const MX& new_d, const MX& new_ddef, const MX& new_der_d = MX());
+
+    /// Register output variable
     void register_y(const MX& new_y, const MX& new_ydef, const MX& new_der_y = MX());
     ///@}
 

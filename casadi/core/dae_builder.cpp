@@ -961,6 +961,15 @@ namespace casadi {
     this->z.push_back(new_z);
   }
 
+  void DaeBuilder::register_d(const MX& new_d, const MX& new_ddef, const MX& new_der_d) {
+    if (new_d.sparsity() != new_ddef.sparsity())
+      casadi_error("Mismatching sparsity in DaeBuilder::register_d");
+    add_variable(new_d, new_der_d);
+    this->d.push_back(new_d);
+    this->ddef.push_back(new_ddef);
+    this->lam_ddef.push_back(MX::sym("lam_" + new_d.name(), new_d.sparsity()));
+  }
+
   void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef, const MX& new_der_y) {
     if (new_y.sparsity() != new_ydef.sparsity())
       casadi_error("Mismatching sparsity in DaeBuilder::register_y");
@@ -1968,12 +1977,10 @@ namespace casadi {
 
     // Eliminate free variables?
     if (ret.has_free()) {
-      // All dependent variables, defining expressions
-      std::vector<MX> dep(this->d), dep_def(this->ddef);
-      dep.insert(dep.end(), this->y.begin(), this->y.end());
-      dep_def.insert(dep_def.end(), this->ydef.begin(), this->ydef.end());
+      // Make a copy of dependent variable definitions to avoid modifying member variable
+      std::vector<MX> ddef(this->ddef);
       // Perform in-place substitution
-      substitute_inplace(dep, dep_def, ret_out, false);
+      substitute_inplace(this->d, ddef, ret_out, false);
       // Recreate function
       ret = Function(fname, ret_in, ret_out, s_in, s_out);
       // Ensure that there are no longer any free variables
