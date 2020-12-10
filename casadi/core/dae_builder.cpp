@@ -473,7 +473,7 @@ namespace casadi {
     if (!this->u.empty()) stream << "  u =  " << str(this->u) << std::endl;
 
     if (!this->d.empty()) {
-      stream << "Dependent variables" << std::endl;
+      stream << "Dependent parameters" << std::endl;
       for (casadi_int i=0; i<this->d.size(); ++i)
         stream << "  " << str(this->d[i]) << " == " << str(this->ddef[i]) << std::endl;
     }
@@ -1654,17 +1654,8 @@ namespace casadi {
   Function DaeBuilder::create(const std::string& fname,
                               const std::vector<std::string>& s_in,
                               const std::vector<std::string>& s_out) const {
-    return createGen<DaeBuilder, MX>(*this, fname, s_in, s_out);
-  }
-
-  template<typename SType, typename ExType>
-  Function DaeBuilder::createGen(
-      const SType& st,
-      const std::string& fname,
-      const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out) const {
     // Collect function inputs
-    std::vector<ExType> ret_in(s_in.size());
+    std::vector<MX> ret_in(s_in.size());
     std::vector<bool> input_used(DAE_BUILDER_NUM_IN, false);
     std::vector<bool> output_used(DAE_BUILDER_NUM_IN, false);
     for (auto s_in_it=s_in.begin(); s_in_it!=s_in.end(); ++s_in_it) {
@@ -1706,7 +1697,7 @@ namespace casadi {
     }
 
     // Function outputs
-    std::vector<ExType> ret_out(s_out.size());
+    std::vector<MX> ret_out(s_out.size());
     std::vector<bool> assigned(s_out.size(), false);
 
     // List of valid attributes
@@ -1765,7 +1756,7 @@ namespace casadi {
     // Linear combination of outputs
     for (casadi_int i=0; i<s_out_noatt.size(); ++i) {
       if (assigned[i]) continue;
-      auto j=lin_comb_.find(s_out_noatt[i]);
+      std::map<std::string, MX>::const_iterator j=lin_comb_.find(s_out_noatt[i]);
       if (j!=lin_comb_.end()) {
         ret_out[i] = j->second;
         assigned[i] = true;
@@ -1841,11 +1832,11 @@ namespace casadi {
         }
 
         // When we know which blocks we are interested in, we form the Jacobian
-        std::vector<ExType> arg=input(ib), res=output(ob);
-        ExType J = jacobian(vertcat(res), vertcat(arg));
+        std::vector<MX> arg=input(ib), res=output(ob);
+        MX J = jacobian(vertcat(res), vertcat(arg));
 
         // Divide into blocks and copy to output
-        std::vector<std::vector<ExType> > J_all = blocksplit(J, offset(res), offset(arg));
+        std::vector<std::vector<MX> > J_all = blocksplit(J, offset(res), offset(arg));
         for (casadi_int ki=0; ki<ib.size(); ++ki) {
           for (casadi_int ko=0; ko<ob.size(); ++ko) {
             casadi_int& ind=wanted[ob[ko]][ib[ki]];
@@ -1858,7 +1849,8 @@ namespace casadi {
     }
 
     // For all linear combinations
-    for (auto lin_comb_it=lin_comb_.begin(); lin_comb_it!=lin_comb_.end(); ++lin_comb_it) {
+    for (std::map<std::string, MX>::const_iterator lin_comb_it=lin_comb_.begin();
+         lin_comb_it!=lin_comb_.end(); ++lin_comb_it) {
       // Determine which Hessian blocks to generate
       wanted.resize(DAE_BUILDER_NUM_IN);
       fill(wanted.begin(), wanted.end(), std::vector<casadi_int>(DAE_BUILDER_NUM_IN, -1));
@@ -1935,15 +1927,15 @@ namespace casadi {
           for (casadi_int i=0; symmetric && i<ib1.size(); ++i) symmetric=ib1[i]==ib2[i];
 
           // Calculate blocks
-          std::vector<std::vector<ExType> > H_all;
+          std::vector<std::vector<MX> > H_all;
           if (symmetric) {
-            std::vector<ExType> arg=input(ib1);
-            ExType H = hessian(lin_comb_it->second, vertcat(arg));
+            std::vector<MX> arg=input(ib1);
+            MX H = hessian(lin_comb_it->second, vertcat(arg));
             H_all = blocksplit(H, offset(arg), offset(arg));
           } else {
-            std::vector<ExType> arg1=input(ib1), arg2=input(ib2);
-            ExType g = gradient(lin_comb_it->second, vertcat(arg1));
-            ExType J = jacobian(g, vertcat(arg2));
+            std::vector<MX> arg1=input(ib1), arg2=input(ib2);
+            MX g = gradient(lin_comb_it->second, vertcat(arg1));
+            MX J = jacobian(g, vertcat(arg2));
             H_all = blocksplit(J, offset(arg1), offset(arg2));
           }
           // Fetch the requested blocks
@@ -1969,7 +1961,7 @@ namespace casadi {
       }
 
       // Apply attributes starting from the right-most one
-      ExType& r = ret_out[i];
+      MX& r = ret_out[i];
       for (auto a=attr[i].rbegin(); a!=attr[i].rend(); ++a) {
         switch (*a) {
         case ATTR_TRANSPOSE: r = r.T(); break;
@@ -1986,9 +1978,9 @@ namespace casadi {
     // Eliminate free variables?
     if (ret.has_free()) {
       // Make a copy of dependent variable definitions to avoid modifying member variable
-      std::vector<ExType> ddef(st.ddef);
+      std::vector<MX> ddef(this->ddef);
       // Perform in-place substitution
-      substitute_inplace(st.d, ddef, ret_out, false);
+      substitute_inplace(this->d, ddef, ret_out, false);
       // Recreate function
       ret = Function(fname, ret_in, ret_out, s_in, s_out);
       // Ensure that there are no longer any free variables
