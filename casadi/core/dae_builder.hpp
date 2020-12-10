@@ -104,11 +104,6 @@ namespace casadi {
      */
     std::vector<MX> q, quad, lam_quad;
 
-
-    /** \brief Local variables and corresponding definitions
-     */
-    std::vector<MX> w, wdef, lam_wdef;
-
     /** \brief Output variables and corresponding definitions
      */
     std::vector<MX> y, ydef, lam_ydef;
@@ -291,7 +286,6 @@ namespace casadi {
       DAE_BUILDER_SDOT,
       DAE_BUILDER_Z,
       DAE_BUILDER_Q,
-      DAE_BUILDER_W,
       DAE_BUILDER_Y,
       DAE_BUILDER_NUM_IN
     };
@@ -299,7 +293,6 @@ namespace casadi {
     // Output convension in codegen
     enum DaeBuilderOut {
       DAE_BUILDER_DDEF,
-      DAE_BUILDER_WDEF,
       DAE_BUILDER_ODE,
       DAE_BUILDER_DAE,
       DAE_BUILDER_ALG,

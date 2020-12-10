@@ -1447,7 +1447,6 @@ namespace casadi {
     case DAE_BUILDER_SDOT: return "sdot";
     case DAE_BUILDER_Z: return "z";
     case DAE_BUILDER_Q: return "q";
-    case DAE_BUILDER_W: return "w";
     case DAE_BUILDER_Y: return "y";
     default: return "";
     }
@@ -1474,8 +1473,6 @@ namespace casadi {
       return DAE_BUILDER_Z;
     } else if (id=="q") {
       return DAE_BUILDER_Q;
-    } else if (id=="w") {
-      return DAE_BUILDER_W;
     } else if (id=="y") {
       return DAE_BUILDER_Y;
     } else {
@@ -1495,7 +1492,6 @@ namespace casadi {
   std::string DaeBuilder::name_out(DaeBuilderOut ind) {
     switch (ind) {
     case DAE_BUILDER_DDEF: return "ddef";
-    case DAE_BUILDER_WDEF: return "wdef";
     case DAE_BUILDER_ODE: return "ode";
     case DAE_BUILDER_DAE: return "dae";
     case DAE_BUILDER_ALG: return "alg";
@@ -1508,8 +1504,6 @@ namespace casadi {
   DaeBuilder::DaeBuilderOut DaeBuilder::enum_out(const std::string& id) {
     if (id=="ddef") {
       return DAE_BUILDER_DDEF;
-    } else if (id=="wdef") {
-      return DAE_BUILDER_WDEF;
     } else if (id=="ode") {
       return DAE_BUILDER_ODE;
     } else if (id=="dae") {
@@ -1568,7 +1562,6 @@ namespace casadi {
     case DAE_BUILDER_SDOT: return this->sdot;
     case DAE_BUILDER_Z: return this->z;
     case DAE_BUILDER_Q: return this->q;
-    case DAE_BUILDER_W: return this->w;
     case DAE_BUILDER_Y: return this->y;
     default: return std::vector<MX>();
     }
@@ -1585,7 +1578,6 @@ namespace casadi {
   std::vector<MX> DaeBuilder::output(DaeBuilderOut ind) const {
     switch (ind) {
     case DAE_BUILDER_DDEF: return this->ddef;
-    case DAE_BUILDER_WDEF: return this->wdef;
     case DAE_BUILDER_ODE: return this->ode;
     case DAE_BUILDER_DAE: return this->dae;
     case DAE_BUILDER_ALG: return this->alg;
@@ -1606,7 +1598,6 @@ namespace casadi {
   std::vector<MX> DaeBuilder::multiplier(DaeBuilderOut ind) const {
     switch (ind) {
     case DAE_BUILDER_DDEF: return this->lam_ddef;
-    case DAE_BUILDER_WDEF: return this->lam_wdef;
     case DAE_BUILDER_ODE: return this->lam_ode;
     case DAE_BUILDER_DAE: return this->lam_dae;
     case DAE_BUILDER_ALG: return this->lam_alg;
