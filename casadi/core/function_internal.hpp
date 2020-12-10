@@ -1405,6 +1405,50 @@ namespace casadi {
     return res_v;
   }
 
+
+  // Traits
+  template<bool fwd> struct JacSparsityTraits {};
+  template<> struct JacSparsityTraits<true> {
+    typedef const bvec_t* arg_t;
+    static inline int sp(const FunctionInternal *f,
+                          const bvec_t** arg, bvec_t** res,
+                          casadi_int* iw, bvec_t* w, void* mem) {
+      std::vector<const bvec_t*> argm(f->sz_arg(), nullptr);
+      std::vector<bvec_t> wm(f->nnz_in(), bvec_t(0));
+      bvec_t* wp = get_ptr(wm);
+
+      for (casadi_int i=0;i<f->n_in_;++i) {
+        if (f->is_diff_in_[i]) {
+          argm[i] = arg[i];
+        } else  {
+          argm[i] = arg[i] ? wp : nullptr;
+          wp += f->nnz_in(i);
+        }
+      }
+      int ret = f->sp_forward(get_ptr(argm), res, iw, w, mem);
+      for (casadi_int i=0;i<f->n_out_;++i) {
+        if (!f->is_diff_out_[i] && res[i]) casadi_clear(res[i], f->nnz_out(i));
+      }
+      return ret;
+    }
+  };
+  template<> struct JacSparsityTraits<false> {
+    typedef bvec_t* arg_t;
+    static inline int sp(const FunctionInternal *f,
+                          bvec_t** arg, bvec_t** res,
+                          casadi_int* iw, bvec_t* w, void* mem) {
+      for (casadi_int i=0;i<f->n_out_;++i) {
+        if (!f->is_diff_out_[i] && res[i]) casadi_clear(res[i], f->nnz_out(i));
+      }
+      int ret = f->sp_reverse(arg, res, iw, w, mem);
+      for (casadi_int i=0;i<f->n_in_;++i) {
+        if (!f->is_diff_in_[i] && arg[i]) casadi_clear(arg[i], f->nnz_in(i));
+      }
+      return ret;
+    }
+  };
+
+
 } // namespace casadi
 
 /// \endcond

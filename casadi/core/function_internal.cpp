@@ -490,15 +490,22 @@ namespace casadi {
                      "Changing the problem formulation is strongly encouraged.");
     }
 
-    if (is_diff_in_.empty()) is_diff_in_.resize(n_in_, true);
-    if (is_diff_out_.empty()) is_diff_out_.resize(n_out_, true);
+    // Read in is_diff_in/out from virtual functions,
+    // allowing manual override by options
+    bool diff_in_given = !is_diff_in_.empty();
+    bool diff_out_given = !is_diff_out_.empty();
 
-    casadi_assert(n_in_==is_diff_in_.size(), "Dimension mismatch");
-    casadi_assert(n_out_==is_diff_out_.size(), "Dimension mismatch");
+    if (diff_in_given) casadi_assert(n_in_==is_diff_in_.size(), "Dimension mismatch");
+    if (diff_out_given) casadi_assert(n_out_==is_diff_out_.size(), "Dimension mismatch");
+    is_diff_in_.resize(n_in_);
+    is_diff_out_.resize(n_out_);
 
-
-    for (casadi_int i=0;i<n_in_;++i) is_diff_in_[i] = is_diff_in_[i] && is_diff_in(i);
-    for (casadi_int i=0;i<n_out_;++i) is_diff_out_[i] = is_diff_out_[i] && is_diff_out(i);
+    if (!diff_in_given) {
+      for (casadi_int i=0;i<n_in_;++i) is_diff_in_[i] = is_diff_in(i);
+    }
+    if (!diff_out_given) {
+      for (casadi_int i=0;i<n_out_;++i) is_diff_out_[i] = is_diff_out(i);
+    }
 
     // Query input sparsities if not already provided
     if (sparsity_in_.empty()) {
@@ -913,45 +920,7 @@ namespace casadi {
   }
   /// \endcond
 
-  // Traits
-  template<bool fwd> struct JacSparsityTraits {};
-  template<> struct JacSparsityTraits<true> {
-    typedef const bvec_t* arg_t;
-    static inline void sp(const FunctionInternal *f,
-                          const bvec_t** arg, bvec_t** res,
-                          casadi_int* iw, bvec_t* w, void* mem) {
-      std::vector<const bvec_t*> argm(f->sz_arg(), nullptr);
-      std::vector<bvec_t> wm(f->nnz_in(), bvec_t(0));
-      bvec_t* wp = get_ptr(wm);
 
-      for (casadi_int i=0;i<f->n_in_;++i) {
-        if (f->is_diff_in_[i]) {
-          argm[i] = arg[i];
-        } else  {
-          argm[i] = arg[i] ? wp : nullptr;
-          wp += f->nnz_in(i);
-        }
-      }
-      f->sp_forward(get_ptr(argm), res, iw, w, mem);
-      for (casadi_int i=0;i<f->n_out_;++i) {
-        if (!f->is_diff_out_[i] && res[i]) casadi_clear(res[i], f->nnz_out(i));
-      }
-    }
-  };
-  template<> struct JacSparsityTraits<false> {
-    typedef bvec_t* arg_t;
-    static inline void sp(const FunctionInternal *f,
-                          bvec_t** arg, bvec_t** res,
-                          casadi_int* iw, bvec_t* w, void* mem) {
-      for (casadi_int i=0;i<f->n_out_;++i) {
-        if (!f->is_diff_out_[i] && res[i]) casadi_clear(res[i], f->nnz_out(i));
-      }
-      f->sp_reverse(arg, res, iw, w, mem);
-      for (casadi_int i=0;i<f->n_in_;++i) {
-        if (!f->is_diff_in_[i] && arg[i]) casadi_clear(arg[i], f->nnz_in(i));
-      }
-    }
-  };
 
   template<bool fwd>
   Sparsity FunctionInternal::
@@ -1823,6 +1792,17 @@ namespace casadi {
       }
 
     }
+
+    // No use having forward seeds for Jacobian columns without entries
+    if (!D1.is_null()) {
+      D1.erase(complement(sum2(A).get_row(), A.size1()));
+    }
+
+    // No use having reverse seeds for Jacobian rows without entries
+    if (!D2.is_null()) {
+      D2.erase(complement(sum2(AT).get_row(), AT.size1()));
+    }
+
   }
 
   std::vector<DM> FunctionInternal::eval_dm(const std::vector<DM>& arg) const {
@@ -2090,6 +2070,65 @@ namespace casadi {
     Dict opts;
     opts["derivative_of"] = self();
 
+    // Construct is_diff_in
+    {
+      GenericType empty(std::vector<bool>{});
+
+      auto diff_in_fwd  = get_from_dict(forward_options_, "is_diff_in", empty).to_bool_vector();
+      if (diff_in_fwd.empty()) diff_in_fwd = join(is_diff_in_, is_diff_out_, is_diff_in_);
+      casadi_assert(diff_in_fwd.size()==2*n_in_+n_out_,
+        "forward_options.is_diff_in shape mismatch");
+
+      auto diff_out_fwd = get_from_dict(forward_options_, "is_diff_out", empty).to_bool_vector();
+      if (diff_out_fwd.empty()) diff_out_fwd = is_diff_out_;
+      casadi_assert(diff_out_fwd.size()==n_out_,
+        "forward_options.is_diff_out shape mismatch");
+
+      auto diff_in_rev  = get_from_dict(reverse_options_, "is_diff_in", empty).to_bool_vector();
+      if (diff_in_rev.empty()) diff_in_rev = join(is_diff_in_, is_diff_out_, is_diff_out_);
+      casadi_assert(diff_in_rev.size()==n_in_+2*n_out_,
+        "reverse_options.is_diff_in shape mismatch");
+
+      auto diff_out_rev = get_from_dict(reverse_options_, "is_diff_out", empty).to_bool_vector();
+      if (diff_out_rev.empty()) diff_out_rev = is_diff_in_;
+      casadi_assert(diff_out_rev.size()==n_in_,
+        "reverse_options.is_diff_out shape mismatch");
+
+      std::string err = "is_diff_in/out mismatch in jacobian. Set jac_penalty -1?";
+
+      std::vector<bool> is_diff_in(diff_in_fwd.begin(), diff_in_fwd.begin()+n_in_+n_out_);
+      for (casadi_int i=0;i<n_in_+n_out_;++i) {
+        casadi_assert(is_diff_in[i]==diff_in_rev[i], err);
+      }
+
+      // Check consensus
+      std::vector<bool> votes;
+      for (casadi_int i=0;i<n_in_;++i) {
+        // false is_diff_in entry leads to an empty jacobian block
+        if (is_diff_in_[i]) votes.push_back(diff_out_rev[i]);
+      }
+      for (casadi_int i=0;i<n_out_;++i) {
+        // false is_diff_out entry leads to an empty jacobian block
+        if (is_diff_out_[i]) votes.push_back(diff_out_fwd[i]);
+      }
+
+      // Vote outcome
+      bool diff_out;
+
+      if (all(votes)) {
+        // Unanimous vote for true
+        diff_out = true;
+      } else if (!any(votes)) {
+        // Unanimous vote for false
+        diff_out = false;
+      } else {
+        // Mixed vote -> raise problem
+        casadi_error(err);
+      }
+
+      if (!all(is_diff_in)) opts["is_diff_in"] = is_diff_in;
+      if (!diff_out) opts["is_diff_out"] = std::vector<bool>{diff_out};
+    }
     // Generate derivative function
     casadi_assert_dev(enable_jacobian_);
     Function ret = get_jacobian(name, inames, onames, opts);

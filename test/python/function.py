@@ -1631,6 +1631,54 @@ class Functiontests(casadiTestCase):
       with self.assertRaises(Exception):
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
 
+  def test_lin(self):
+
+    for ab in AutoBrancher():
+      
+      def lin(expr):
+        x = vcat(symvar(expr))
+        inline = ab.branch([{},{"always_inline":True, "never_inline":False}])
+        FS = Function('FS',[x],[expr],{
+        "never_inline":True,"jac_penalty": ab.branch([0,-1]),
+        "forward_options": {"is_diff_in": [False,False,True], "is_diff_out": [True], "forward_options": inline, "reverse_options": inline},
+        "reverse_options": {"is_diff_in": [False,False,True], "is_diff_out": [True], "forward_options": inline, "reverse_options": inline}})
+
+        return FS(x)
+
+      N = ab.branch([1,5])
+      DM.rng(0)
+
+      A = DM.rand(Sparsity.banded(N,min(2,N-1)))
+      x = MX.sym("x",N)
+
+
+
+      c = lambda x: sin(A @ x)
+      phi = lambda x: sumsqr(x)
+      if N==1:
+        phi = ab.branch([(lambda x: x), phi])
+
+      Hphi = Function("phi",[x],[hessian(phi(x),x)[0]])
+      Jc = Function("Jc",[x],[jacobian(c(x),x)])
+
+      x0 = DM.rand(N,1)
+
+      h = Jc(x).T @ Hphi(c(x)) @ Jc(x)
+
+      e = phi(c(x))
+      ref = Function('ref',[x],[e,jacobian(e,x),gradient(e,x),h])
+
+      E = phi(lin(c(x)))
+      c_nl = Function('ref',[x],[E,jacobian(E,x),gradient(E,x),hessian(E,x)[0]])
+
+      refs = ref(x0)
+      c_nls_s = c_nl(x0)
+
+      for i in range(4):
+        self.checkarray(refs[i],c_nls_s[i])
+        self.assertTrue(refs[i].sparsity()==c_nls_s[i].sparsity())
+
+    
 
   @requires_nlpsol("ipopt")
   def test_oracle_options(self):
@@ -2521,22 +2569,70 @@ class Functiontests(casadiTestCase):
     d_flat = data.ravel(order='F')
 
 
-    LUT_param = casadi.interpolant('name','linear',[N,M],2, {"lookup_mode": ["exact","linear"]})
+    LUT_param = casadi.interpolant('name','linear',[N,M],2, {"lookup_mode": ["exact","linear"], "is_diff_in": [True,True,True]})
+
+    print(LUT_param)
 
     LUT_param_ref = LUT_param.wrap_as_needed({"ad_weight_sp":-1,"enable_fd": True, "enable_forward": False, "enable_reverse": False})
     J_ref = LUT_param_ref.jacobian()
+
+    print(J_ref)
 
     d_knots_cat = vcat(d_knots[0]+d_knots[1])
 
     inputs = [[0.2,0.333],d_knots_cat,d_flat]
 
     LUT_param = casadi.interpolant('name','linear',[N,M],2,{"inline": True, "lookup_mode": ["exact","linear"]})
+    print(LUT_param)
     J = LUT_param.jacobian()
 
     self.checkarray(LUT_param(*inputs),LUT_param_ref(*inputs))
     inputs+= [0]
     self.checkfunction(J,J_ref,inputs=inputs,digits=8,digits_sens=1,evals=1)
 
+    print(J(*inputs))
+    print("sss")
+
+    DM.set_precision(15)
+    inputs = [[0.2,0.333],d_knots_cat,d_flat]
+    LUT_param = casadi.interpolant('name','linear',[N,M],2, {"lookup_mode": ["exact","linear"],"print_in":True, "print_out": True})
+    print(LUT_param)
+    LUT_param_ref = LUT_param.wrap_as_needed({"ad_weight_sp":-1,"enable_fd": True, "enable_forward": False, "enable_reverse": False, "fd_method": "forward", "fd_options": {"h": 1e-5}})
+
+    print(LUT_param_ref)
+    J_ref = LUT_param_ref.jacobian()
+
+    J_ref.generate("J_ref.c")
+
+    eps = 1e-5
+    print((0.687286882169867-0.687282543807156)/eps)
+
+    LUT_param = casadi.interpolant('name','linear',[N,M],2,{"inline": True, "lookup_mode": ["exact","linear"]})
+    LUT_param = LUT_param.wrap_as_needed({"is_diff_in": [True,False,False]})
+
+    J = LUT_param.jacobian()
+    inputs+= [0]
+    print(J(*inputs))
+    self.checkfunction_light(J,J_ref,inputs=inputs,digits=8)#,digits_sens=1,evals=1)
+
+  def test_is_diff_in_fd(self):
+    for ab in AutoBrancher():
+      x = MX.sym("x")
+      y = MX.sym("y")
+      F = Function("F",[x,y],[vertcat(x*y,x+y)],{"is_diff_in": [True,False],"never_inline":True})
+      if ab.branch(): F = Function("F",[x,y],[F(x,y)])
+
+      J = F.jacobian()
+
+      J1 = J(2,3,0)
+
+      F = Function("F",[x,y],[vertcat(x*y,x+y)],{"is_diff_in": [True,False],"never_inline":True,"enable_fd": True, "enable_forward": False, "enable_reverse": False})
+      if ab.branch(): F = Function("F",[x,y],[F(x,y)])
+      J = F.jacobian()
+
+      J2 = J(2,3,0)
+
+      self.checkarray(J1,J2)
 
   def test_functionbuffer(self):
     A_ = np.random.random((4,4))

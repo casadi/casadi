@@ -758,8 +758,10 @@ namespace casadi {
       }
 
       Dict options = opts;
-      options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
-      options["is_diff_out"] = is_diff_out_;
+      if (opts.find("is_diff_in")==opts.end() || options["is_diff_in"].to_bool_vector().empty())
+        options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
+      if (opts.find("is_diff_out")==opts.end() || options["is_diff_out"].to_bool_vector().empty())
+        options["is_diff_out"] = is_diff_out_;
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {
@@ -804,8 +806,10 @@ namespace casadi {
       }
 
       Dict options = opts;
-      options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_out_);
-      options["is_diff_out"] = is_diff_in_;
+      if (opts.find("is_diff_in")==opts.end() || options["is_diff_in"].to_bool_vector().empty())
+        options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_out_);
+      if (opts.find("is_diff_out")==opts.end() || options["is_diff_out"].to_bool_vector().empty())
+        options["is_diff_out"] = is_diff_in_;
 
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);

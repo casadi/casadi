@@ -969,7 +969,7 @@ namespace casadi {
   int Function::operator()(const bvec_t** arg, bvec_t** res,
                             casadi_int* iw, bvec_t* w, int mem) const {
     try {
-      return (*this)->sp_forward(arg, res, iw, w, memory(mem));
+      return JacSparsityTraits<true>::sp((*this).get(), arg, res, iw, w, memory(mem));
     } catch (exception& e) {
       THROW_ERROR("operator()", e.what());
     }
@@ -977,7 +977,7 @@ namespace casadi {
 
   int Function::rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem) const {
     try {
-      return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
+      return JacSparsityTraits<false>::sp((*this).get(), arg, res, iw, w, memory(mem));
     } catch (exception& e) {
       THROW_ERROR("rev", e.what());
     }
