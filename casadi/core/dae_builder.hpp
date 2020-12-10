@@ -48,23 +48,23 @@ namespace casadi {
       u:      control signals
       q:      quadrature states
       p:      free parameters
-      d:      dependent variables
+      v:      dependent variables
       y:      outputs
       \endverbatim
 
       <H3>Dynamic constraints (imposed everywhere):  </H3>
       \verbatim
-      ODE                    \dot{x} ==  ode(t, x, s, z, u, p, d)
-      DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, d, sdot)
-      algebraic equations:         0 ==  alg(t, x, s, z, u, p, d)
-      quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, d)
-      dependent parameters:        d == ddef(t, x, s, z, u, p, d)
-      output equations:            y == ydef(t, x, s, z, u, p, d)
+      ODE                    \dot{x} ==  ode(t, x, s, z, u, p, v)
+      DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, v, sdot)
+      algebraic equations:         0 ==  alg(t, x, s, z, u, p, v)
+      quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, v)
+      dependent parameters:        d == ddef(t, x, s, z, u, p, v)
+      output equations:            y == ydef(t, x, s, z, u, p, v)
       \endverbatim
 
       <H3>Point constraints (imposed pointwise):  </H3>
       \verbatim
-      Initial equations:           0 == init(t, x, s, z, u, p, d, sdot)
+      Initial equations:           0 == init(t, x, s, z, u, p, v, sdot)
       \endverbatim
 
       \date 2012-2015
@@ -126,7 +126,7 @@ namespace casadi {
     /** \brief Dependent parameters and corresponding definitions
      * Interdependencies are allowed but must be non-cyclic.
      */
-    std::vector<MX> d, ddef, lam_ddef;
+    std::vector<MX> v, vdef, lam_vdef;
     ///@}
 
     /** \brief Auxiliary variables: Used e.g. to define functions */
@@ -162,7 +162,7 @@ namespace casadi {
     MX add_q(const std::string& name=std::string(), casadi_int n=1);
 
     /// Add a new dependent parameter
-    MX add_d(const std::string& name, const MX& new_ddef);
+    MX add_v(const std::string& name, const MX& new_vdef);
 
     /// Add a new output
     MX add_y(const std::string& name, const MX& new_ydef);
@@ -195,7 +195,7 @@ namespace casadi {
     void register_z(const MX& new_z, const MX& new_der_z = MX());
 
     /// Register dependent variable
-    void register_d(const MX& new_d, const MX& new_ddef, const MX& new_der_d = MX());
+    void register_v(const MX& new_v, const MX& new_vdef, const MX& new_der_v = MX());
 
     /// Register output variable
     void register_y(const MX& new_y, const MX& new_ydef, const MX& new_der_y = MX());
@@ -218,14 +218,14 @@ namespace casadi {
     /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
     void make_explicit();
 
-    /// Sort dependent parameters
-    void sort_d();
+    /// Sort dependent variables
+    void sort_v();
 
     /// Eliminate interdependencies amongst dependent parameters
-    void split_d();
+    void split_v();
 
     /// Eliminate dependent parameters
-    void eliminate_d();
+    void eliminate_v();
 
     /// Eliminate quadrature states and turn them into ODE states
     void eliminate_quad();
@@ -279,7 +279,7 @@ namespace casadi {
       DAE_BUILDER_T,
       DAE_BUILDER_C,
       DAE_BUILDER_P,
-      DAE_BUILDER_D,
+      DAE_BUILDER_V,
       DAE_BUILDER_U,
       DAE_BUILDER_X,
       DAE_BUILDER_S,
@@ -292,7 +292,7 @@ namespace casadi {
 
     // Output convension in codegen
     enum DaeBuilderOut {
-      DAE_BUILDER_DDEF,
+      DAE_BUILDER_VDEF,
       DAE_BUILDER_ODE,
       DAE_BUILDER_DAE,
       DAE_BUILDER_ALG,

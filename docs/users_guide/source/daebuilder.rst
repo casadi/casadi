@@ -47,9 +47,8 @@ Input expressions
 'p'
   Independent parameters :math:`p`
 
-'d'
-  Dependent parameters :math:`d`, depends only on :math:`p` and :math:`c` and,
-  acyclically, on other :math:`d`
+'v'
+  Dependent variables :math:`v`, depends on other variables and, acyclically, on other :math:`v`
 
 'x'
   Differential state :math:`x`, defined by an explicit ODE
@@ -67,10 +66,6 @@ Input expressions
   Quadrature state :math:`q`. A differential state that may not appear in
   the right-hand-side and hence can be calculated by quadrature formulas.
 
-'w'
-  Local variables :math:`w`. Calculated from time and time dependent
-  variables. They may also depend, acyclically, on other :math:`w`.
-
 'y'
   Output variables :math:`y`
 
@@ -81,27 +76,24 @@ Output expressions
 
 The above input expressions are used to define the following output expressions:
 
-'ddef'
-  Explicit expression for calculating :math:`d`
-
-'wdef'
-  Explicit expression for calculating :math:`w`
+'vdef'
+  Explicit expression for calculating :math:`v`
 
 'ode'
   The explicit ODE right-hand-side:
-    :math:`\dot{x} = \text{ode}(t,w,x,s,z,u,p,d)`
+    :math:`\dot{x} = \text{ode}(t,v,x,s,z,u,p)`
 
 'dae'
   The implicit ODE right-hand-side:
-  :math:`\text{dae}(t,w,x,s,z,u,p,d,\dot{s}) =0`
+  :math:`\text{dae}(t,v,x,s,z,u,p,\dot{s}) =0`
 
 'alg'
    The algebraic equations:
-    :math:`\text{alg}(t,w,x,s,z,u,p,d) = 0`
+    :math:`\text{alg}(t,v,x,s,z,u,p) = 0`
 
 'quad'
   The quadrature equations:
-  :math:`\dot{q} = \text{quad}(t,w,x,s,z,u,p,d)`
+  :math:`\dot{q} = \text{quad}(t,v,x,s,z,u,p)`
 
 'ydef'
   Explicit expressions for calculating :math:`y`
@@ -131,7 +123,7 @@ as follows.
 
 .. side-by-side::
     .. exec-block:: python
-        
+
         g = 9.81 [hidden]
 
         dae = DaeBuilder()
