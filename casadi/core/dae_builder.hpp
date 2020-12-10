@@ -27,6 +27,7 @@
 #define CASADI_DAE_BUILDER_HPP
 
 #include "variable.hpp"
+#include "function.hpp"
 
 namespace casadi {
 
@@ -481,6 +482,9 @@ namespace casadi {
     const Variable& variable(const std::string& name) const;
     ///@}
 
+    /// Get the (cached) oracle, SX or MX
+    const Function& oracle(bool sx = false);
+
 #ifndef SWIG
     // Internal methods
   protected:
@@ -497,6 +501,9 @@ namespace casadi {
 
     /** \brief Functions */
     std::vector<Function> fun_;
+
+    /** \brief Function oracles */
+    Function sx_oracle_, mx_oracle_;
 
     /// Read an equation
     MX read_expr(const XmlNode& node);
@@ -519,6 +526,9 @@ namespace casadi {
     /// Set a symbolic attribute by expression
     typedef void (DaeBuilder::*setAttS)(const std::string& name, const MX& val);
     void set_attribute(setAttS f, const MX& var, const MX& val);
+
+    /// Problem structure has changed: Clear cache
+    void clear_cache();
 
 #endif // SWIG
 

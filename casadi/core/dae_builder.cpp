@@ -924,9 +924,10 @@ namespace casadi {
       std::stringstream ss;
       casadi_error("Variable \"" + name + "\" has already been added.");
     }
-
     // Add to the map of all variables
     varmap_[name] = var;
+    // Clear cache
+    clear_cache();
   }
 
   MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
@@ -1042,21 +1043,25 @@ namespace casadi {
   void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
     this->ode.push_back(new_ode);
     this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
+    clear_cache();
   }
 
   void DaeBuilder::add_dae(const std::string& name, const MX& new_dae) {
     this->dae.push_back(new_dae);
     this->lam_dae.push_back(MX::sym("lam_" + name, new_dae.sparsity()));
+    clear_cache();
   }
 
   void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
     this->alg.push_back(new_alg);
     this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
+    clear_cache();
   }
 
   void DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
     this->quad.push_back(new_quad);
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
+    clear_cache();
   }
 
   void DaeBuilder::sanity_check() const {
@@ -2040,6 +2045,46 @@ namespace casadi {
       if (f.name()==name) return f;
     }
     return Function();
+  }
+
+  void DaeBuilder::clear_cache() {
+    if (!mx_oracle_.is_null()) mx_oracle_ = Function();
+    if (!sx_oracle_.is_null()) sx_oracle_ = Function();
+  }
+
+  const Function& DaeBuilder::oracle(bool sx) {
+    // Create an MX oracle, if needed
+    if (mx_oracle_.is_null()) {
+      // Oracle function inputs and outputs
+      std::vector<MX> f_in, f_out, v;
+      std::vector<std::string> f_in_name, f_out_name;
+      // Collect all DAE input variables with at least one entry
+      for (casadi_int i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
+        v = input(static_cast<DaeBuilderIn>(i));
+        if (!v.empty()) {
+          f_in.push_back(vertcat(v));
+          f_in_name.push_back(name_in(static_cast<DaeBuilderIn>(i)));
+        }
+      }
+      // Collect all DAE output variables with at least one entry
+      for (casadi_int i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
+        v = output(static_cast<DaeBuilderOut>(i));
+        if (!v.empty()) {
+          f_out.push_back(vertcat(v));
+          f_out_name.push_back(name_out(static_cast<DaeBuilderOut>(i)));
+        }
+      }
+      // Create oracle
+      mx_oracle_ = Function("mx_oracle", f_in, f_out, f_in_name, f_out_name);
+    }
+    // Return MX oracle, if requested
+    if (!sx) return mx_oracle_;
+    // Create SX oracle, if needed
+    if (sx_oracle_.is_null()) {
+      sx_oracle_ = mx_oracle_.expand("sx_oracle");
+    }
+    // Return SX oracle
+    return sx_oracle_;
   }
 
 } // namespace casadi
