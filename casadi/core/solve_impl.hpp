@@ -396,7 +396,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int TriuSolveUnity<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+  int TriuSolveUnity<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw,
+      SXElem* w) const {
     if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
     return 0;
@@ -415,7 +416,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int TrilSolveUnity<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+  int TrilSolveUnity<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw,
+      SXElem* w) const {
     if (arg[0] != res[0]) copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
     return 0;

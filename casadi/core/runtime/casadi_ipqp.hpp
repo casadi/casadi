@@ -703,7 +703,7 @@ void casadi_ipqp_corrector(casadi_ipqp_data<T1>* d) {
       d->tau = (0.01 * mu_test / (dual_slack + max_tau * dual_slack)
         - primal_slack) / primal_step;
     } else {
-      d->tau = (0.01 * mu_test / ( primal_slack + max_tau * primal_step)
+      d->tau = (0.01 * mu_test / (primal_slack + max_tau * primal_step)
         - dual_slack) / dual_slack;
     }
     d->tau = fmax(d->tau, 0.99 * max_tau);
