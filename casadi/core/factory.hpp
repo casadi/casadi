@@ -324,15 +324,25 @@ namespace casadi {
 
   template<typename MatType>
   void Factory<MatType>::calculate_jac(const Dict& opts) {
+    // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : jac_) {
-      const MatType& ex = out_.at(b.ex);
-      const MatType& arg = in_.at(b.arg);
-      if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg)) {
-        out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg, opts);
-        is_diff_out_["jac:" + b.ex + ":" + b.arg] = true;
-      } else {
-        out_["jac:" + b.ex + ":" + b.arg] = MatType(ex.numel(), arg.numel());
-        is_diff_out_["jac:" + b.ex + ":" + b.arg] = false;
+      if (!is_diff_out_.at(b.ex) || !is_diff_in_.at(b.arg)) {
+        std::string s = "jac:" + b.ex + ":" + b.arg;
+        out_[s] = MatType(out_.at(b.ex).numel(), in_.at(b.arg).numel());
+        is_diff_out_[s] = false;
+      }
+    }
+    // Calculate regular blocks
+    for (auto &&b : jac_) {
+      // Get block name, skip if already calculated
+      std::vector<std::string> s{"jac:" + b.ex + ":" + b.arg};
+      if (out_.find(s[0]) != out_.end()) continue;
+      // Create a list of blocks to be calculated at the same time
+      std::vector<MatType> ex{out_.at(b.ex)}, arg{in_.at(b.arg)};
+      // Calculate blocks
+      for (size_t i = 0; i < s.size(); ++i) {
+        out_[s[i]] = MatType::jacobian(ex[i], arg[i], opts);
+        is_diff_out_[s[i]] = true;
       }
     }
   }
