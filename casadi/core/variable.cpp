@@ -31,8 +31,8 @@ namespace casadi {
 
   Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, const MX& d)
       : v(v), d(d) {
-    if (this->v.is_null()) this->v = MX::sym(name, sp);
-    if (this->d.is_null()) this->d = MX::sym("der_" + name, sp);
+    if (this->v.is_empty()) this->v = MX::sym(name, sp);
+    if (this->d.is_empty()) this->d = MX::sym("der_" + name, sp);
     this->variability = CONTINUOUS;
     this->causality = INTERNAL;
     this->category = CAT_UNKNOWN;
