@@ -280,11 +280,7 @@ namespace casadi {
     // Calculate directional derivatives
     Dict local_opts = opts;
     local_opts["always_inline"] = true;
-    try {
-      sens = forward(res, arg, seed, local_opts);
-    } catch (std::exception& e) {
-      casadi_error("Forward mode AD failed:\n" + str(e.what()));
-    }
+    sens = forward(res, arg, seed, local_opts);
 
     // Get directional derivatives
     for (casadi_int i=0; i<fwd_out_.size(); ++i) {
@@ -315,11 +311,7 @@ namespace casadi {
     // Calculate directional derivatives
     Dict local_opts;
     local_opts["always_inline"] = true;
-    try {
-      sens = reverse(res, arg, seed, local_opts);
-    } catch (std::exception& e) {
-      casadi_error("Reverse mode AD failed:\n" + str(e.what()));
-    }
+    sens = reverse(res, arg, seed, local_opts);
 
     // Get directional derivatives
     for (casadi_int i=0; i<adj_out_.size(); ++i) {
@@ -335,16 +327,12 @@ namespace casadi {
     for (auto &&b : jac_) {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
-      try {
-        if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg)) {
-          out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg, opts);
-          is_diff_out_["jac:" + b.ex + ":" + b.arg] = true;
-        } else {
-          out_["jac:" + b.ex + ":" + b.arg] = MatType(ex.numel(), arg.numel());
-          is_diff_out_["jac:" + b.ex + ":" + b.arg] = false;
-        }
-      } catch (std::exception& e) {
-        casadi_error("Jacobian generation failed:\n" + str(e.what()));
+      if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg)) {
+        out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg, opts);
+        is_diff_out_["jac:" + b.ex + ":" + b.arg] = true;
+      } else {
+        out_["jac:" + b.ex + ":" + b.arg] = MatType(ex.numel(), arg.numel());
+        is_diff_out_["jac:" + b.ex + ":" + b.arg] = false;
       }
     }
   }
@@ -354,17 +342,13 @@ namespace casadi {
     for (auto &&b : grad_) {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
-      try {
-        if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg)) {
-          out_["grad:" + b.ex + ":" + b.arg] = project(gradient(ex, arg, opts), arg.sparsity());
-          is_diff_out_["grad:" + b.ex + ":" + b.arg] = true;
-        } else {
-          casadi_assert(ex.is_scalar(), "Can only take gradient of scalar expression.");
-          out_["grad:" + b.ex + ":" + b.arg] = MatType(1, arg.numel());
-          is_diff_out_["grad:" + b.ex + ":" + b.arg] = false;
-        }
-      } catch (std::exception& e) {
-        casadi_error("Gradient generation failed:\n" + str(e.what()));
+      if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg)) {
+        out_["grad:" + b.ex + ":" + b.arg] = project(gradient(ex, arg, opts), arg.sparsity());
+        is_diff_out_["grad:" + b.ex + ":" + b.arg] = true;
+      } else {
+        casadi_assert(ex.is_scalar(), "Can only take gradient of scalar expression.");
+        out_["grad:" + b.ex + ":" + b.arg] = MatType(1, arg.numel());
+        is_diff_out_["grad:" + b.ex + ":" + b.arg] = false;
       }
     }
   }
@@ -376,17 +360,13 @@ namespace casadi {
       casadi_assert(b.arg1==b.arg2, "Mixed Hessian terms not supported");
       const MatType& arg1 = in_.at(b.arg1);
       //const MatType& arg2 = in_.at(b.arg2);
-      try {
-        if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg1)) {
-          out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1, opts));
-          is_diff_out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = true;
-        } else {
-          casadi_assert(ex.is_scalar(), "Can only take Hessian of scalar expression.");
-          out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = MatType(arg1.numel(), arg1.numel());
-          is_diff_out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = false;
-        }
-      } catch (std::exception& e) {
-        casadi_error("Hessian generation failed:\n" + str(e.what()));
+      if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg1)) {
+        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1, opts));
+        is_diff_out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = true;
+      } else {
+        casadi_assert(ex.is_scalar(), "Can only take Hessian of scalar expression.");
+        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = MatType(arg1.numel(), arg1.numel());
+        is_diff_out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = false;
       }
     }
   }
@@ -400,10 +380,18 @@ namespace casadi {
     }
 
     // Forward mode directional derivatives
-    calculate_fwd(opts);
+    try {
+      calculate_fwd(opts);
+    } catch (std::exception& e) {
+      casadi_error("Forward mode AD failed:\n" + str(e.what()));
+    }
 
     // Reverse mode directional derivatives
-    calculate_adj(opts);
+    try {
+      calculate_adj(opts);
+    } catch (std::exception& e) {
+      casadi_error("Reverse mode AD failed:\n" + str(e.what()));
+    }
 
     // Add linear combinations
     for (auto i : aux_) {
@@ -416,13 +404,25 @@ namespace casadi {
     }
 
     // Jacobian blocks
-    calculate_jac(opts);
+    try {
+      calculate_jac(opts);
+    } catch (std::exception& e) {
+      casadi_error("Jacobian generation failed:\n" + str(e.what()));
+    }
 
     // Gradient blocks
-    calculate_grad(opts);
+    try {
+      calculate_grad(opts);
+    } catch (std::exception& e) {
+      casadi_error("Gradient generation failed:\n" + str(e.what()));
+    }
 
     // Hessian blocks
-    calculate_hess(opts);
+    try {
+      calculate_hess(opts);
+    } catch (std::exception& e) {
+      casadi_error("Hessian generation failed:\n" + str(e.what()));
+    }
   }
 
   template<typename MatType>
