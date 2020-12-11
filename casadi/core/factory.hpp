@@ -99,6 +99,21 @@ namespace casadi {
     // Request a factory output
     std::string request_output(const std::string& s);
 
+    // Calculate forward mode directional derivatives
+    void calculate_fwd(const Dict& opts);
+
+    // Calculate reverse mode directional derivatives
+    void calculate_adj(const Dict& opts);
+
+    // Calculate Jacobian blocks
+    void calculate_jac(const Dict& opts);
+
+    // Calculate gradient blocks
+    void calculate_grad(const Dict& opts);
+
+    // Calculate Hessian blocks
+    void calculate_hess(const Dict& opts);
+
     // Calculate requested outputs
     void calculate(const Dict& opts = Dict());
 
@@ -245,95 +260,78 @@ namespace casadi {
   }
 
   template<typename MatType>
-  void Factory<MatType>::calculate(const Dict& opts) {
-    using namespace std;
+  void Factory<MatType>::calculate_fwd(const Dict& opts) {
+    if (fwd_out_.empty()) return;
+    casadi_assert_dev(!fwd_in_.empty());
 
-    // Dual variables
-    for (auto&& e : out_) {
-      Sparsity sp = is_diff_out_[e.first] ? e.second.sparsity() : Sparsity(e.second.size());
-      in_["lam:" + e.first] = MatType::sym("lam_" + e.first, sp);
+    std::vector<MatType> arg, res;
+    std::vector<std::vector<MatType>> seed(1), sens(1);
+    // Inputs and forward mode seeds
+    for (const std::string& s : fwd_in_) {
+      arg.push_back(in_[s]);
+      Sparsity sp = is_diff_in_[s] ? arg.back().sparsity() : Sparsity(arg.back().size());
+      seed[0].push_back(MatType::sym("fwd_" + s, sp));
+      in_["fwd:" + s] = seed[0].back();
+    }
+    // Outputs
+    for (const std::string& s : fwd_out_) {
+      res.push_back(out_[s]);
+    }
+    // Calculate directional derivatives
+    Dict local_opts = opts;
+    local_opts["always_inline"] = true;
+    try {
+      sens = forward(res, arg, seed, local_opts);
+    } catch (std::exception& e) {
+      casadi_error("Forward mode AD failed:\n" + str(e.what()));
     }
 
-    // Forward mode directional derivatives
-    if (!fwd_out_.empty()) {
-      casadi_assert_dev(!fwd_in_.empty());
+    // Get directional derivatives
+    for (casadi_int i=0; i<fwd_out_.size(); ++i) {
+      std::string s = fwd_out_[i];
+      Sparsity sp = is_diff_out_[s] ? res.at(i).sparsity() : Sparsity(res.at(i).size());
+      out_["fwd:" + s] = project(sens[0].at(i), sp);
+      is_diff_out_["fwd:" + s] = is_diff_out_[s];
+    }
+  }
 
-      vector<MatType> arg, res;
-      vector<vector<MatType>> seed(1), sens(1);
-      // Inputs and forward mode seeds
-      for (const string& s : fwd_in_) {
-        arg.push_back(in_[s]);
-        Sparsity sp = is_diff_in_[s] ? arg.back().sparsity() : Sparsity(arg.back().size());
-        seed[0].push_back(MatType::sym("fwd_" + s, sp));
-        in_["fwd:" + s] = seed[0].back();
-      }
-      // Outputs
-      for (const string& s : fwd_out_) {
-        res.push_back(out_[s]);
-      }
-      // Calculate directional derivatives
-      Dict local_opts = opts;
-      local_opts["always_inline"] = true;
-      try {
-        sens = forward(res, arg, seed, local_opts);
-      } catch (exception& e) {
-        casadi_error("Forward mode AD failed:\n" + str(e.what()));
-      }
-
-      // Get directional derivatives
-      for (casadi_int i=0; i<fwd_out_.size(); ++i) {
-        std::string s = fwd_out_[i];
-        Sparsity sp = is_diff_out_[s] ? res.at(i).sparsity() : Sparsity(res.at(i).size());
-        out_["fwd:" + s] = project(sens[0].at(i), sp);
-        is_diff_out_["fwd:" + s] = is_diff_out_[s];
-      }
+  template<typename MatType>
+  void Factory<MatType>::calculate_adj(const Dict& opts) {
+    if (adj_out_.empty()) return;
+    casadi_assert_dev(!adj_in_.empty());
+    std::vector<MatType> arg, res;
+    std::vector<std::vector<MatType>> seed(1), sens(1);
+    // Inputs
+    for (const std::string& s : adj_out_) {
+      arg.push_back(in_[s]);
+    }
+    // Outputs and reverse mode seeds
+    for (const std::string& s : adj_in_) {
+      res.push_back(out_[s]);
+      Sparsity sp = is_diff_out_[s] ? res.back().sparsity() : Sparsity(res.back().size());
+      seed[0].push_back(MatType::sym("adj_" + s, sp));
+      in_["adj:" + s] = seed[0].back();
+    }
+    // Calculate directional derivatives
+    Dict local_opts;
+    local_opts["always_inline"] = true;
+    try {
+      sens = reverse(res, arg, seed, local_opts);
+    } catch (std::exception& e) {
+      casadi_error("Reverse mode AD failed:\n" + str(e.what()));
     }
 
-    // Reverse mode directional derivatives
-    if (!adj_out_.empty()) {
-      casadi_assert_dev(!adj_in_.empty());
-      vector<MatType> arg, res;
-      vector<vector<MatType>> seed(1), sens(1);
-      // Inputs
-      for (const string& s : adj_out_) {
-        arg.push_back(in_[s]);
-      }
-      // Outputs and reverse mode seeds
-      for (const string& s : adj_in_) {
-        res.push_back(out_[s]);
-        Sparsity sp = is_diff_out_[s] ? res.back().sparsity() : Sparsity(res.back().size());
-        seed[0].push_back(MatType::sym("adj_" + s, sp));
-        in_["adj:" + s] = seed[0].back();
-      }
-      // Calculate directional derivatives
-      Dict local_opts;
-      local_opts["always_inline"] = true;
-      try {
-        sens = reverse(res, arg, seed, local_opts);
-      } catch (exception& e) {
-        casadi_error("Reverse mode AD failed:\n" + str(e.what()));
-      }
-
-      // Get directional derivatives
-      for (casadi_int i=0; i<adj_out_.size(); ++i) {
-        std::string s = adj_out_[i];
-        Sparsity sp = is_diff_in_[s] ? arg.at(i).sparsity() : Sparsity(arg.at(i).size());
-        out_["adj:" + s] = project(sens[0].at(i), sp);
-        is_diff_in_["adj:" + s] = is_diff_in_[s];
-      }
+    // Get directional derivatives
+    for (casadi_int i=0; i<adj_out_.size(); ++i) {
+      std::string s = adj_out_[i];
+      Sparsity sp = is_diff_in_[s] ? arg.at(i).sparsity() : Sparsity(arg.at(i).size());
+      out_["adj:" + s] = project(sens[0].at(i), sp);
+      is_diff_in_["adj:" + s] = is_diff_in_[s];
     }
+  }
 
-    // Add linear combinations
-    for (auto i : aux_) {
-      MatType lc = 0;
-      for (auto j : i.second) {
-        lc += dot(in_.at("lam:" + j), out_.at(j));
-      }
-      out_[i.first] = lc;
-      is_diff_out_[i.first] = true;
-    }
-
-    // Jacobian blocks
+  template<typename MatType>
+  void Factory<MatType>::calculate_jac(const Dict& opts) {
     for (auto &&b : jac_) {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
@@ -345,12 +343,14 @@ namespace casadi {
           out_["jac:" + b.ex + ":" + b.arg] = MatType(ex.numel(), arg.numel());
           is_diff_out_["jac:" + b.ex + ":" + b.arg] = false;
         }
-      } catch (exception& e) {
+      } catch (std::exception& e) {
         casadi_error("Jacobian generation failed:\n" + str(e.what()));
       }
     }
+  }
 
-    // Gradient blocks
+  template<typename MatType>
+  void Factory<MatType>::calculate_grad(const Dict& opts) {
     for (auto &&b : grad_) {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
@@ -363,12 +363,14 @@ namespace casadi {
           out_["grad:" + b.ex + ":" + b.arg] = MatType(1, arg.numel());
           is_diff_out_["grad:" + b.ex + ":" + b.arg] = false;
         }
-      } catch (exception& e) {
+      } catch (std::exception& e) {
         casadi_error("Gradient generation failed:\n" + str(e.what()));
       }
     }
+  }
 
-    // Hessian blocks
+  template<typename MatType>
+  void Factory<MatType>::calculate_hess(const Dict& opts) {
     for (auto &&b : hess_) {
       const MatType& ex = out_.at(b.ex);
       casadi_assert(b.arg1==b.arg2, "Mixed Hessian terms not supported");
@@ -383,10 +385,44 @@ namespace casadi {
           out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = MatType(arg1.numel(), arg1.numel());
           is_diff_out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = false;
         }
-      } catch (exception& e) {
+      } catch (std::exception& e) {
         casadi_error("Hessian generation failed:\n" + str(e.what()));
       }
     }
+  }
+
+  template<typename MatType>
+  void Factory<MatType>::calculate(const Dict& opts) {
+    // Dual variables
+    for (auto&& e : out_) {
+      Sparsity sp = is_diff_out_[e.first] ? e.second.sparsity() : Sparsity(e.second.size());
+      in_["lam:" + e.first] = MatType::sym("lam_" + e.first, sp);
+    }
+
+    // Forward mode directional derivatives
+    calculate_fwd(opts);
+
+    // Reverse mode directional derivatives
+    calculate_adj(opts);
+
+    // Add linear combinations
+    for (auto i : aux_) {
+      MatType lc = 0;
+      for (auto j : i.second) {
+        lc += dot(in_.at("lam:" + j), out_.at(j));
+      }
+      out_[i.first] = lc;
+      is_diff_out_[i.first] = true;
+    }
+
+    // Jacobian blocks
+    calculate_jac(opts);
+
+    // Gradient blocks
+    calculate_grad(opts);
+
+    // Hessian blocks
+    calculate_hess(opts);
   }
 
   template<typename MatType>
