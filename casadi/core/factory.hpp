@@ -326,23 +326,79 @@ namespace casadi {
   void Factory<MatType>::calculate_jac(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : jac_) {
+      std::string s = "jac:" + b.ex + ":" + b.arg;
       if (!is_diff_out_.at(b.ex) || !is_diff_in_.at(b.arg)) {
-        std::string s = "jac:" + b.ex + ":" + b.arg;
         out_[s] = MatType(out_.at(b.ex).numel(), in_.at(b.arg).numel());
         is_diff_out_[s] = false;
+      } else {
+        is_diff_out_[s] = true;
       }
     }
     // Calculate regular blocks
     for (auto &&b : jac_) {
       // Get block name, skip if already calculated
-      std::vector<std::string> s{"jac:" + b.ex + ":" + b.arg};
-      if (out_.find(s[0]) != out_.end()) continue;
-      // Create a list of blocks to be calculated at the same time
-      std::vector<MatType> ex{out_.at(b.ex)}, arg{in_.at(b.arg)};
-      // Calculate blocks
-      for (size_t i = 0; i < s.size(); ++i) {
-        out_[s[i]] = MatType::jacobian(ex[i], arg[i], opts);
-        is_diff_out_[s[i]] = true;
+      std::string s = "jac:" + b.ex + ":" + b.arg;
+      if (out_.find(s) != out_.end()) continue;
+      // Find other blocks with the same input, but different (not yet calculated) outputs
+      std::vector<MatType> ex;
+      std::vector<std::string> all_ex;
+      for (auto &&b1 : jac_) {
+        // Check if same input
+        if (b1.arg != b.arg) continue;
+        // Check if already calculated
+        std::string s1 = "jac:" + b1.ex + ":" + b1.arg;
+        if (out_.find(s1) != out_.end()) continue;
+        // Collect expressions
+        all_ex.push_back(b1.ex);
+        ex.push_back(out_.at(b1.ex));
+      }
+      // Now find other blocks with *all* the same outputs, but different inputs
+      std::vector<MatType> arg{in_.at(b.arg)};
+      std::vector<std::string> all_arg{b.arg};
+      for (auto &&b1 : jac_) {
+        // Candidate b1.arg: Check if already added
+        bool skip = false;
+        for (const std::string& a : all_arg) {
+          if (a == b1.arg) {
+            skip = true;
+            break;
+          }
+        }
+        if (skip) continue;
+        // Check if all blocks corresponding to the same input are needed
+        for (const std::string& e : all_ex) {
+          std::string s1 = "jac:" + e + ":" + b1.arg;
+          if (is_diff_out_.find(s1) == is_diff_out_.end() || out_.find(s1) != out_.end()) {
+            // Block is not requested or has already been calculated
+            skip = true;
+            break;
+          }
+        }
+        if (skip) continue;
+        // Keep candidate
+        arg.push_back(in_.at(b1.arg));
+        all_arg.push_back(b1.arg);
+      }
+      try {
+        // Calculate Jacobian block(s)
+        if (ex.size() == 1 && arg.size() == 1) {
+          out_[s] = MatType::jacobian(ex[0], arg[0], opts);
+        } else {
+          // Calculate Jacobian of all outputs with respect to all inputs
+          MatType J = MatType::jacobian(vertcat(ex), vertcat(arg), opts);
+          // Split Jacobian into blocks
+          std::vector<std::vector<MatType>> J_all = blocksplit(J, offset(ex), offset(arg));
+          // Save blocks
+          for (size_t i = 0; i < all_ex.size(); ++i) {
+            for (size_t j = 0; j < all_arg.size(); ++j) {
+              out_["jac:" + all_ex[i] + ":" + all_arg[j]] = J_all.at(i).at(j);
+            }
+          }
+        }
+      } catch (std::exception& e) {
+        std::stringstream ss;
+        ss << "Calculating Jacobian of " << all_ex << " w.r.t. " << all_arg << ": " << e.what();
+        casadi_error(ss.str());
       }
     }
   }
