@@ -346,9 +346,15 @@ namespace casadi {
               const std::vector<std::string>& f_out);
 
     /// Construct a function object
+    Function create_new(const std::string& fname,
+        std::vector<std::string> s_in,
+        std::vector<std::string> s_out, bool sx = false) const;
+
+    /// Construct a function object, legacy implementation
     Function create(const std::string& fname,
-                    const std::vector<std::string>& s_in,
-                    const std::vector<std::string>& s_out) const;
+        const std::vector<std::string>& s_in,
+        const std::vector<std::string>& s_out) const;
+
     ///@}
 
     /// Get variable expression by name
@@ -475,8 +481,8 @@ namespace casadi {
     const Variable& variable(const std::string& name) const;
     ///@}
 
-    /// Get the (cached) oracle, SX or MX
-    const Function& oracle(bool sx = false);
+      /// Get the (cached) oracle, SX or MX
+    const Function& oracle(bool sx = false, bool elim_v = false) const;
 
 #ifndef SWIG
     // Internal methods
@@ -491,12 +497,13 @@ namespace casadi {
 
     /// Linear combinations of output expressions
     std::map<std::string, MX> lin_comb_;
+    Function::AuxOut lc_;
 
     /** \brief Functions */
     std::vector<Function> fun_;
 
-    /** \brief Function oracles */
-    Function sx_oracle_, mx_oracle_;
+    /** \brief Function oracles (cached) */
+    mutable Function sx_oracle_[2], mx_oracle_[2];
 
     /// Read an equation
     MX read_expr(const XmlNode& node);

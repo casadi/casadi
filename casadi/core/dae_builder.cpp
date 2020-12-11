@@ -1619,13 +1619,8 @@ namespace casadi {
                             "DaeBuilder::add_lc: \"name\" must be alphanumeric");
     }
 
-    // Get a reference to the expression
-    MX& ret = lin_comb_[name];
-    if (!ret.is_empty()) casadi_warning("DaeBuilder::add_lc: Overwriting " << name);
-    ret = 0;
-
-    // Get indices of outputs
-    std::vector<DaeBuilderOut> f_out_enum(f_out.size());
+    // Consistency checks
+    casadi_assert(!f_out.empty(), "DaeBuilder::add_lc: Linear combination is empty");
     std::vector<bool> in_use(DAE_BUILDER_NUM_OUT, false);
     for (casadi_int i=0; i<f_out.size(); ++i) {
       DaeBuilderOut oind = enum_out(f_out[i]);
@@ -1635,8 +1630,19 @@ namespace casadi {
       casadi_assert(!in_use[oind],
         "DaeBuilder::add_lc: Duplicate expression " + f_out[i]);
       in_use[oind] = true;
+    }
 
-      // Add linear combination of expressions
+    std::vector<std::string>& ret1 = lc_[name];
+    if (!ret1.empty()) casadi_warning("DaeBuilder::add_lc: Overwriting " << name);
+    ret1 = f_out;
+
+    // Get a reference to the expression
+    MX& ret = lin_comb_[name];
+    ret = 0;
+
+    // Add linear combination of expressions
+    for (casadi_int i=0; i<f_out.size(); ++i) {
+      DaeBuilderOut oind = enum_out(f_out[i]);
       std::vector<MX> res=output(oind), lam_res=multiplier(oind);
       for (casadi_int i=0; i<res.size(); ++i) {
         ret += dot(lam_res[i], res[i]);
@@ -1647,9 +1653,37 @@ namespace casadi {
     return ret;
   }
 
+  Function DaeBuilder::create_new(const std::string& fname,
+      std::vector<std::string> s_in,
+      std::vector<std::string> s_out, bool sx) const {
+    // Replace '_' with ':', if needed
+    for (auto s_io : {&s_in, &s_out}) {
+      for (std::string& s : *s_io) replace(s.begin(), s.end(), '_', ':');
+    }
+    // Check if dependent variables are given and needed
+    bool elim_v;
+    if (this->v.empty()) {
+      // No dependent variables, no substitution needed
+      elim_v = false;
+    } else {
+      // Dependent variables exists, eliminate unless v is given
+      elim_v = true;
+      for (const std::string& s : s_in) {
+        if (s == "v") {
+          // Dependent variables are given
+          elim_v = false;
+          break;
+        }
+      }
+    }
+    // Call factory
+    return oracle(sx, elim_v).factory(fname, s_in, s_out, lc_);
+  }
+
   Function DaeBuilder::create(const std::string& fname,
-                              const std::vector<std::string>& s_in,
-                              const std::vector<std::string>& s_out) const {
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out) const {
+
     // Collect function inputs
     std::vector<MX> ret_in(s_in.size());
     std::vector<bool> input_used(DAE_BUILDER_NUM_IN, false);
@@ -2039,22 +2073,30 @@ namespace casadi {
   }
 
   void DaeBuilder::clear_cache() {
-    if (!mx_oracle_.is_null()) mx_oracle_ = Function();
-    if (!sx_oracle_.is_null()) sx_oracle_ = Function();
+    for (bool elim_v : {false, true}) {
+      if (!mx_oracle_[elim_v].is_null()) mx_oracle_[elim_v] = Function();
+      if (!sx_oracle_[elim_v].is_null()) sx_oracle_[elim_v] = Function();
+    }
   }
 
-  const Function& DaeBuilder::oracle(bool sx) {
+  const Function& DaeBuilder::oracle(bool sx, bool elim_v) const {
     // Create an MX oracle, if needed
-    if (mx_oracle_.is_null()) {
+    if (mx_oracle_[elim_v].is_null()) {
       // Oracle function inputs and outputs
       std::vector<MX> f_in, f_out, v;
       std::vector<std::string> f_in_name, f_out_name;
+      // Do we need to substitute out v
+      bool subst_v = false;
       // Collect all DAE input variables with at least one entry
       for (casadi_int i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
         v = input(static_cast<DaeBuilderIn>(i));
         if (!v.empty()) {
-          f_in.push_back(vertcat(v));
-          f_in_name.push_back(name_in(static_cast<DaeBuilderIn>(i)));
+          if (elim_v && i == DAE_BUILDER_V) {
+            subst_v = true;
+          } else {
+            f_in.push_back(vertcat(v));
+            f_in_name.push_back(name_in(static_cast<DaeBuilderIn>(i)));
+          }
         }
       }
       // Collect all DAE output variables with at least one entry
@@ -2065,17 +2107,24 @@ namespace casadi {
           f_out_name.push_back(name_out(static_cast<DaeBuilderOut>(i)));
         }
       }
+      // Eliminate v from inputs
+      if (subst_v) {
+        // Make a copy of dependent variable definitions to avoid modifying member variable
+        std::vector<MX> vdef(this->vdef);
+        // Perform in-place substitution
+        substitute_inplace(this->v, vdef, f_out, false);
+      }
       // Create oracle
-      mx_oracle_ = Function("mx_oracle", f_in, f_out, f_in_name, f_out_name);
+      mx_oracle_[elim_v] = Function("mx_oracle", f_in, f_out, f_in_name, f_out_name);
     }
     // Return MX oracle, if requested
-    if (!sx) return mx_oracle_;
+    if (!sx) return mx_oracle_[elim_v];
     // Create SX oracle, if needed
-    if (sx_oracle_.is_null()) {
-      sx_oracle_ = mx_oracle_.expand("sx_oracle");
+    if (sx_oracle_[elim_v].is_null()) {
+      sx_oracle_[elim_v] = mx_oracle_[elim_v].expand("sx_oracle");
     }
     // Return SX oracle
-    return sx_oracle_;
+    return sx_oracle_[elim_v];
   }
 
 } // namespace casadi
