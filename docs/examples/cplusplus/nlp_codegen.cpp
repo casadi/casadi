@@ -77,7 +77,7 @@ int main(){
   arg["lbx"] = -DM::inf();
   arg["ubx"] =  DM::inf();
   arg["lbg"] =  0;
-  arg["ubg"] =  DM::inf();
+  arg["ubg"] =  0;
   arg["x0"] = 0;
 
   // Solve the NLP
