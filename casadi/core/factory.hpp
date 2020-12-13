@@ -327,11 +327,11 @@ namespace casadi {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : jac_) {
       std::string s = "jac:" + b.ex + ":" + b.arg;
-      if (!is_diff_out_.at(b.ex) || !is_diff_in_.at(b.arg)) {
+      if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg)) {
+        is_diff_out_[s] = true;
+      } else {
         out_[s] = MatType(out_.at(b.ex).numel(), in_.at(b.arg).numel());
         is_diff_out_[s] = false;
-      } else {
-        is_diff_out_[s] = true;
       }
     }
     // Calculate regular blocks
@@ -421,19 +421,29 @@ namespace casadi {
 
   template<typename MatType>
   void Factory<MatType>::calculate_hess(const Dict& opts) {
+    // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : hess_) {
+      std::string s = "hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2;
+      if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg1) && is_diff_in_.at(b.arg2)) {
+        is_diff_out_[s] = true;
+      } else {
+        out_[s] = MatType(in_.at(b.arg1).numel(), in_.at(b.arg2).numel());
+        is_diff_out_[s] = false;
+      }
+      // Consistency check
+      casadi_assert(out_.at(b.ex).is_scalar(), "Can only take Hessian of scalar expression.");
+    }
+    // Calculate regular blocks
+    for (auto &&b : hess_) {
+      // Get block name, skip if already calculated
+      std::string s = "hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2;
+      if (out_.find(s) != out_.end()) continue;
+      // Find other blocks with the same input, but different (not yet calculated) outputs
       const MatType& ex = out_.at(b.ex);
       casadi_assert(b.arg1==b.arg2, "Mixed Hessian terms not supported");
       const MatType& arg1 = in_.at(b.arg1);
       //const MatType& arg2 = in_.at(b.arg2);
-      if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg1)) {
-        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = hessian(ex, arg1, opts);
-        is_diff_out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = true;
-      } else {
-        casadi_assert(ex.is_scalar(), "Can only take Hessian of scalar expression.");
-        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = MatType(arg1.numel(), arg1.numel());
-        is_diff_out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = false;
-      }
+      out_[s] = hessian(ex, arg1, opts);
     }
   }
 
