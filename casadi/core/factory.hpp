@@ -432,11 +432,15 @@ namespace casadi {
       // Get block name, skip if already calculated
       std::string s = "hess:" + ex + ":" + b.arg1 + ":" + b.arg2;
       if (out_.find(s) != out_.end()) continue;
-      // Find other blocks with the same input, but different (not yet calculated) outputs
-      casadi_assert(b.arg1 == b.arg2, "Mixed Hessian terms not supported");
+      // Calculate Hessian blocks
       const MatType& x1 = in_.at(b.arg1);
-      //const MatType& x2 = in_.at(b.arg2);
-      out_[s] = hessian(f, x1, opts);
+      const MatType& x2 = in_.at(b.arg2);
+      if (b.arg1 == b.arg2) {
+        out_[s] = hessian(f, x1, opts);
+      } else {
+        MatType g = gradient(f, x1);
+        out_[s] = jacobian(g, x2);
+      }
     }
   }
 
