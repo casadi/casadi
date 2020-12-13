@@ -111,6 +111,9 @@ namespace casadi {
     // Calculate gradient blocks
     void calculate_grad(const Dict& opts);
 
+    // Calculate Hessian blocks, one expression
+    void calculate_hess(const Dict& opts, const std::string& ex);
+
     // Calculate Hessian blocks
     void calculate_hess(const Dict& opts);
 
@@ -420,6 +423,24 @@ namespace casadi {
   }
 
   template<typename MatType>
+  void Factory<MatType>::calculate_hess(const Dict& opts, const std::string& ex) {
+    // Get expression to be differentiated
+    const MatType& f = out_.at(ex);
+    // Handle all blocks for this expression
+    for (auto &&b : hess_) {
+      if (b.ex != ex) continue;
+      // Get block name, skip if already calculated
+      std::string s = "hess:" + ex + ":" + b.arg1 + ":" + b.arg2;
+      if (out_.find(s) != out_.end()) continue;
+      // Find other blocks with the same input, but different (not yet calculated) outputs
+      casadi_assert(b.arg1 == b.arg2, "Mixed Hessian terms not supported");
+      const MatType& x1 = in_.at(b.arg1);
+      //const MatType& x2 = in_.at(b.arg2);
+      out_[s] = hessian(f, x1, opts);
+    }
+  }
+
+  template<typename MatType>
   void Factory<MatType>::calculate_hess(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : hess_) {
@@ -438,12 +459,8 @@ namespace casadi {
       // Get block name, skip if already calculated
       std::string s = "hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2;
       if (out_.find(s) != out_.end()) continue;
-      // Find other blocks with the same input, but different (not yet calculated) outputs
-      const MatType& ex = out_.at(b.ex);
-      casadi_assert(b.arg1==b.arg2, "Mixed Hessian terms not supported");
-      const MatType& arg1 = in_.at(b.arg1);
-      //const MatType& arg2 = in_.at(b.arg2);
-      out_[s] = hessian(ex, arg1, opts);
+      // Calculate all Hessian blocks for b.ex
+      calculate_hess(opts, b.ex);
     }
   }
 
