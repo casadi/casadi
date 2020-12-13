@@ -222,7 +222,7 @@ namespace casadi {
     if (exact_hessian_) {
       if (!has_function("nlp_hess_l")) {
         create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                        {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                        {"triu:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
 

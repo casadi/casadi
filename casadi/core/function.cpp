@@ -815,7 +815,7 @@ namespace casadi {
     vector<string> s_out = name_out();
     s_out.insert(s_out.begin(), "grad:" + name_out(oind) + ":" + name_in(iind));
     s_out.insert(s_out.begin(),
-                 "sym:hess:" + name_out(oind) + ":" + name_in(iind) + ":" + name_in(iind));
+                 "hess:" + name_out(oind) + ":" + name_in(iind) + ":" + name_in(iind));
     return factory(name() + "_hess", s_in, s_out);
   }
 

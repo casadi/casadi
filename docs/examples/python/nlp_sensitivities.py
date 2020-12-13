@@ -197,12 +197,12 @@ plt.show()
 
 # High-level approach:
 # Use factory to e.g. to calculate Hessian of optimal f w.r.t. p
-hsolver = solver.factory('h', solver.name_in(), ['sym:hess:f:p:p'])
+hsolver = solver.factory('h', solver.name_in(), ['hess:f:p:p'])
 print('hsolver generated')
 hsol = hsolver(x0=sol['x'], lam_x0=sol['lam_x'], lam_g0=sol['lam_g'],
                lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0)
 print('Hessian of f w.r.t. p:')
-print(hsol['sym_hess_f_p_p'])
+print(hsol['hess_f_p_p'])
 
 # Low-level approach: Calculate directional derivatives.
 # We will calculate two directions simultaneously

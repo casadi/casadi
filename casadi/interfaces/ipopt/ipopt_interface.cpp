@@ -221,9 +221,8 @@ namespace casadi {
     // Allocate temporary work vectors
     if (exact_hessian_) {
       if (!has_function("nlp_hess_l")) {
-        std::string hess = "hess:gamma:x:x";
         create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                        {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                        {"triu:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
       casadi_assert(hesslag_sp_.is_triu(), "Hessian must be upper triangular");

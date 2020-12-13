@@ -427,7 +427,7 @@ namespace casadi {
       const MatType& arg1 = in_.at(b.arg1);
       //const MatType& arg2 = in_.at(b.arg2);
       if (is_diff_out_.at(b.ex) && is_diff_in_.at(b.arg1)) {
-        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1, opts));
+        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = hessian(ex, arg1, opts);
         is_diff_out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = true;
       } else {
         casadi_assert(ex.is_scalar(), "Can only take Hessian of scalar expression.");
@@ -522,7 +522,8 @@ namespace casadi {
     } else if (a=="densify") {
       return densify(r);
     } else if (a=="sym") {
-      return triu2symm(r);
+      casadi_warning("Attribute 'sym' has been deprecated. Hessians are symmetric by default.");
+      return r;
     } else if (a=="withdiag") {
       return project(r, r.sparsity() + Sparsity::diag(r.size1()));
     } else {

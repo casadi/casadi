@@ -520,7 +520,7 @@ namespace casadi {
     }
 
     create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                    {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                    {"triu:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
     exact_hess_lag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
 
     if (verbose_) casadi_message(str(nblocks_) + " blocks of max size " + str(max_size) + ".");

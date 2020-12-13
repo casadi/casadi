@@ -670,7 +670,7 @@ namespace casadi {
 
     // Generate KKT function
     Function ret = oracle_.factory("kkt", {"x", "p", "lam:f", "lam:g"},
-      {"jac:g:x", "sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+      {"jac:g:x", "hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
 
     // Cache and return
     kkt_ = ret;

@@ -186,7 +186,7 @@ namespace casadi {
 
     if (exact_hessian_) {
       Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                                           {"sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                                           {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       Hsp_ = hess_l_fcn.sparsity_out(0);
     } else {
       Hsp_ = Sparsity::dense(nx_, nx_);

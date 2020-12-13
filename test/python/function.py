@@ -1539,12 +1539,12 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,fwd=False,evals=1)
 
   def test_callback_jacobian_sparsity(self):
-    
+
     x = MX.sym("x",2)
 
     h = 1e-7
     for with_jacobian_sparsity in [True, False]:
-      
+
       calls = []
 
       class Fun(Callback):
@@ -1584,7 +1584,7 @@ class Functiontests(casadiTestCase):
         J_ref = sparsify(J_ref)
       else:
         self.checkarray(calls,DM([[0,0],[1,0],[0,1]]).T,digits=5)
-      
+
       self.checkarray(J,J_ref,digits=5)
       self.assertTrue(J.sparsity()==J_ref.sparsity())
 
@@ -2107,7 +2107,7 @@ class Functiontests(casadiTestCase):
       x = MX.sym("x",5)
 
 
-      for op in ["grad:f:x","jac:f:x","hess:f:x:x"]:
+      for op in ["grad:f:x","jac:f:x","triu:hess:f:x:x"]:
         f = Function("f",[x],[dot(x,x)],["x"],["f"],{"verbose": True})
 
         with capture_stdout() as out:
@@ -2464,7 +2464,7 @@ class Functiontests(casadiTestCase):
       options = {"is_diff_in":[True,False],"is_diff_out":[True,False]}
       f = Function("f",[x,y],[sin(x+y),x*y],options)
 
-   
+
 
       F = Function("F",[x,y],f(cos(x),(x*y)**2),["x","y"],["z","zz"],options)
 
@@ -2482,7 +2482,7 @@ class Functiontests(casadiTestCase):
       for f1 in [lambda f: f.forward(1), lambda f: f.reverse(1)]:
          Gf = f1(G)
          Ff = f1(F)
-         
+
          arg = [xn,yn]+[DM.rand(Gf.sparsity_in(i)) for i in range(Gf.n_in())][2:]
          for a,b in zip(Gf.call(arg),Ff.call(arg)):
             self.checkarray(a,b)
@@ -2491,7 +2491,7 @@ class Functiontests(casadiTestCase):
         for f2 in [lambda f: f.forward(1), lambda f: f.reverse(1)]:
            Gf = f1(f2(G))
            Ff = f1(f2(F))
-           
+
            arg = [xn,yn]+[DM.rand(Gf.sparsity_in(i)) for i in range(Gf.n_in())][2:]
            for a,b in zip(Gf.call(arg),Ff.call(arg)):
              self.checkarray(a,b)
@@ -2637,7 +2637,7 @@ class Functiontests(casadiTestCase):
       x = MX.sym("x")
       yield lambda : Function('f',[x],[(x-3)**2],opts)
 
-      
+
       x = MX.sym("x", 2)
       f = x[0]*x[0] + x[1]*x[1]
 
@@ -2724,6 +2724,6 @@ class Functiontests(casadiTestCase):
     f2 = ff.get_function("f")
 
     self.checkfunction_light(g, f2, inputs=[3])
-          
+
 if __name__ == '__main__':
     unittest.main()
