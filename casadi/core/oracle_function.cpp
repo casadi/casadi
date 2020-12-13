@@ -46,6 +46,9 @@ namespace casadi {
      {{"expand",
        {OT_BOOL,
         "Replace MX with SX expressions in problem formulation [false]"}},
+      {"delay_expand",
+       {OT_BOOL,
+        "Expand as a last step [false]"}},
       {"monitor",
        {OT_STRINGVECTOR,
         "Set of user problem functions to be monitored"}},
@@ -75,6 +78,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="expand") {
         expand = op.second;
+      } else if (op.first=="delay_expand") {
+        delay_expand_ = op.second;
       } else if (op.first=="common_options") {
         common_options_ = op.second;
       } else if (op.first=="specific_options") {
@@ -147,6 +152,8 @@ namespace casadi {
     if (ret.has_free()) {
       casadi_error("Cannot create '" + fname + "' since " + str(ret.get_free()) + " are free.");
     }
+
+    if (delay_expand_) ret = ret.expand();
 
     // Save and return
     set_function(ret, fname, true);

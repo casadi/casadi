@@ -1634,16 +1634,6 @@ class Functiontests(casadiTestCase):
   def test_lin(self):
 
     for ab in AutoBrancher():
-      
-      def lin(expr):
-        x = vcat(symvar(expr))
-        inline = ab.branch([{},{"always_inline":True, "never_inline":False}])
-        FS = Function('FS',[x],[expr],{
-        "never_inline":True,"jac_penalty": ab.branch([0,-1]),
-        "forward_options": {"is_diff_in": [False,False,True], "is_diff_out": [True], "forward_options": inline, "reverse_options": inline},
-        "reverse_options": {"is_diff_in": [False,False,True], "is_diff_out": [True], "forward_options": inline, "reverse_options": inline}})
-
-        return FS(x)
 
       N = ab.branch([1,5])
       DM.rng(0)

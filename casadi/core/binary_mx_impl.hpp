@@ -101,6 +101,11 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
+  char BinaryMX<ScX, ScY>::prop_curv(const std::vector<char>& args) const {
+    return casadi_math<MX>::prop_curv(op_, args[0], args[1]);
+  }
+
+  template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
   generate(CodeGenerator& g,
            const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {

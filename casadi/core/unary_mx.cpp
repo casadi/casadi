@@ -91,6 +91,10 @@ namespace casadi {
     }
   }
 
+  char UnaryMX::prop_curv(const std::vector<char>& args) const {
+    return casadi_math<MX>::prop_curv(op_, args[0], '?');
+  }
+
   int UnaryMX::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     copy_fwd(arg[0], res[0], nnz());
     return 0;

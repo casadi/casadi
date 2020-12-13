@@ -562,6 +562,9 @@ namespace casadi {
             casadi_int m,
             const Dict& opts = Dict());
     static MX convexify(const MX& H, const Dict& opts = Dict());
+    static MX auto_lin(const MX& expr, const MX& var, const MX& par);
+    static MX lin(const MX& expr);
+    static MX lin(const MX& expr, const MX& var_lin, const MX& var_nonlin, const MX& par);
     ///@}
     /// \endcond
 
@@ -674,6 +677,18 @@ namespace casadi {
     inline friend MX convexify(const MX& H,
             const Dict& opts = Dict()) {
       return MX::convexify(H, opts);
+    }
+
+    inline friend MX lin(const MX& expr, const MX& var_lin, const MX& var_nonlin, const MX& par) {
+      return MX::lin(expr, var_lin, var_nonlin, par);
+    }
+
+    inline friend MX lin(const MX& expr) {
+      return MX::lin(expr);
+    }
+
+    inline friend MX auto_lin(const MX& expr, const MX& var, const MX& par) {
+      return MX::auto_lin(expr, var, par);
     }
 
     /** \brief Lift the expression

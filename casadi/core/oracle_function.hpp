@@ -53,6 +53,9 @@ namespace casadi {
     Dict common_options_;
     Dict specific_options_;
 
+    /// Delay expand
+    bool delay_expand_;
+
     /// Show evaluation warnings
     bool show_eval_warnings_;
 

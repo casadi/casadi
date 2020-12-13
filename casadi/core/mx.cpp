@@ -1917,6 +1917,128 @@ namespace casadi {
     return H->get_convexify(opts);
   }
 
+  MX MX::lin(const MX& expr) {
+    MX var = veccat(symvar(expr));
+    return lin(expr, var, MX(), MX());
+  }
+
+  MX MX::lin(const MX& expr, const MX& var_lin, const MX& var_nonlin, const MX& par) {
+    Dict options;
+    options["never_inline"] = true;
+    options["is_diff_in"] = std::vector<bool>{true, true, false};
+    options["is_diff_out"] = std::vector<bool>{true};
+    Dict forward_options, reverse_options, inline_options;
+    inline_options["never_inline"] = false;
+    inline_options["always_inline"] = true;
+    forward_options["is_diff_in"] = std::vector<bool>{false, true, false,  true,  true, true, true};
+    forward_options["is_diff_out"] = std::vector<bool>{true};
+    forward_options["forward_options"] = inline_options;
+    forward_options["reverse_options"] = inline_options;
+    options["forward_options"] = forward_options;
+    reverse_options["is_diff_in"] = std::vector<bool>{false, true, false,  true,  true};
+    reverse_options["is_diff_out"] = std::vector<bool>{true, true, true};
+    reverse_options["forward_options"] = inline_options;
+    reverse_options["reverse_options"] = inline_options;
+    options["reverse_options"] = reverse_options;
+    Function f("lin", {var_lin, var_nonlin, par}, {expr}, options);
+    casadi_assert(!f.has_free(), "You must list all dependencies");
+    return f(std::vector<MX>{var_lin, var_nonlin, par})[0];
+  }
+
+  MX MX::auto_lin(const MX& expr, const MX& var, const MX& par) {
+
+    Function f("f", {var, par}, {expr}, {{"live_variables", false}});
+    casadi_assert(!f.has_free(), "You must list all dependencies as either var or par.");
+    auto *ff = f.get<MXFunction>();
+
+    // Get references to the internal data structures
+    const vector<MXAlgEl>& algorithm = ff->algorithm_;
+
+    // Forward pass: which expressions depend on a variable?
+    std::vector<bool> dep_var(f.sz_w(), false);
+
+    casadi_int k = 0;
+    for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
+      // TODO: switch to bvec_t seeding; matrix-wise
+      switch (it->op) {
+      case OP_CONST:
+        dep_var[k] = false;
+        break;
+      case OP_INPUT:
+        dep_var[k] = it->data->ind()==0;
+        break;
+      case OP_PARAMETER:
+      case OP_OUTPUT:
+        break;
+      default: // Unary operation, binary operation
+        bool is_dep = false;
+        for (casadi_int c=0; c<it->arg.size(); ++c) {
+          is_dep |= dep_var[it->arg[c]];
+        }
+        for (casadi_int c=0; c<it->res.size(); ++c) {
+          dep_var[it->res[c]] = is_dep;
+        }
+      }
+    }
+
+    // Reverse pass: which operations break convexity?
+    std::vector<char> convex(f.sz_w(), '+');
+    std::vector<bool> dirty(f.sz_w(), false);
+
+    std::vector<MX> nonlinear;
+    std::vector<casadi_int> nonlinear_index;
+
+    std::vector<char> args;
+    k = algorithm.size()-1;
+    for (auto it=algorithm.rbegin(); it<algorithm.rend(); ++it, --k) {
+      // TODO: switch to bvec_t seeding; matrix-wise
+      switch (it->op) {
+        case OP_CONST:
+        case OP_INPUT:
+        case OP_PARAMETER:
+          break;
+        case OP_OUTPUT:
+          convex[it->data->ind()] = '+';
+          break;
+        default: // Unary operation, binary operation
+          casadi_assert_dev(it->res.size()==1);
+          args.resize(it->arg.size());
+          for (casadi_int c=0; c<it->arg.size(); ++c) {
+            args[c] = dep_var[it->arg[c]] ? '+' : '0';
+          }
+          char cvx = it->data->prop_curv(args);
+          for (casadi_int c=0; c<it->res.size(); ++c) {
+            if (!dirty[it->res[c]] && convex[it->res[c]] != cvx) {
+              nonlinear.push_back(it->data);
+              nonlinear_index.push_back(it->res[c]);
+              dirty[it->res[c]] = true;
+            }
+          }
+
+          for (casadi_int c=0; c<it->res.size(); ++c) {
+            convex[it->res[c]] = cvx;
+          }
+          for (casadi_int c=0; c<it->arg.size(); ++c) {
+            convex[it->arg[c]] = cvx;
+            dirty[it->arg[c]] = dirty[it->res[0]]; 
+          }
+      }
+    }
+
+    uout() << "nonlinear parts: " << nonlinear << std::endl;
+
+    std::vector<MX> nonlinear_vec;
+    std::vector<casadi_int> offsets = {0};
+    for (auto e : nonlinear) {
+      nonlinear_vec.push_back(vec(e));
+      offsets.push_back(offsets.back()+e.nnz());
+    }
+
+    std::vector<MX> linearized = vertsplit(lin(vertcat(nonlinear_vec), var, MX(), par), offsets);
+
+    return graph_substitute(expr, nonlinear_vec, linearized);
+  }
+
   MX interpn_G(casadi_int i, // Dimension to interpolate along
                 const MX& v, // Coefficients
                 const std::vector<MX>& xis, // Normalised coordinates

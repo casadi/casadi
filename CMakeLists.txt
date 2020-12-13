@@ -391,7 +391,7 @@ option(WITH_WERROR "Add -Werror" OFF)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   if(WITH_EXTRA_WARNINGS)
     set(EXTRA_CASADI_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-attributes")
-    set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value")
+    set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value -Wno-trigraphs")
   endif()
   if(WITH_WERROR)
     set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Werror")
@@ -801,7 +801,7 @@ if(WITH_CLANG_TIDY)
     # -Wall leaks into clang-tidy (through compile_commands.json)
     # silently overruling the 'Checks' field.
     # These warnings come from external_packages
-    set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-overloaded-virtual -Wno-deprecated-register")
+    set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-overloaded-virtual -Wno-trigraphs")
   endif()
 endif()
 

@@ -130,6 +130,9 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const;
 
+    /** \brief  Propagate curvature */
+    virtual char prop_curv(const std::vector<char>& args) const { return '?'; }
+
     /** \brief  Get the name */
     virtual const std::string& name() const;
 

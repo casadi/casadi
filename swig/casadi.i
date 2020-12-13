@@ -3551,6 +3551,17 @@ DECL M casadi_convexify(const M& H,
   return convexify(H, opts);
 }
 
+DECL M casadi_lin(const M& expr, const M& var_lin, const M& var_nonlin, const M& par) {
+  return lin(expr, var_lin, var_nonlin, par);
+}
+DECL M casadi_lin(const M& expr) {
+  return lin(expr);
+}
+
+DECL M casadi_auto_lin(const M& expr, const M& var, const M& par) {
+  return auto_lin(expr, var, par);
+}
+
 #endif
 %enddef
 

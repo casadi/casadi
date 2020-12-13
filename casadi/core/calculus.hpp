@@ -201,6 +201,29 @@ namespace casadi {
   #define OP_
 
 #ifndef SWIG
+  inline char table_lookup(const char* header,
+                          const char* r,
+                          char x) {
+    if (x==header[0]) return r[0];
+    if (x==header[1]) return r[1];
+    if (x==header[2]) return r[2];
+    if (x==header[3]) return r[3];
+    return '?';
+  }
+
+  inline char table_lookup(const char* header,
+                          char hr1, const char* r1,
+                          char hr2, const char* r2,   
+                          char hr3, const char* r3,   
+                          char hr4, const char* r4,
+                          char x, char y) {
+    if (x==hr1) return table_lookup(header, r1, y);
+    if (x==hr2) return table_lookup(header, r2, y);
+    if (x==hr3) return table_lookup(header, r3, y);
+    if (x==hr4) return table_lookup(header, r4, y);
+    return '?';
+  }
+
 
   ///@{
   /** \brief Enable using elementary numerical operations without std:: prefix */
@@ -324,6 +347,9 @@ namespace casadi {
 
     /// Partial derivatives
     template<typename T> static inline void der(const T& x, const T& f, T* d);
+
+    static inline char prop_curv(char x);
+    static inline char prop_sign(char x);
   };
 
   template<casadi_int I>
@@ -335,6 +361,11 @@ namespace casadi {
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         UnaryOperation<I>::der(x, f, d); d[1]=0; }
+
+    static inline char prop_curv(char x, char y) {
+      return UnaryOperation<I>::prop_curv(x);
+    }
+    static inline char prop_sign(char x, char y);
   };
 
   template<casadi_int I>
@@ -581,6 +612,16 @@ namespace casadi {
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x+y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=d[1]=1;}
+
+    static inline char prop_curv(char x, char y) {
+      return table_lookup(
+          "+-0?",
+      '+',"+?+?",
+      '-',"?--?",
+      '0',"+-0?",
+      '?',"????",
+      x, y);
+    }
   };
 
   /// Subtraction
@@ -599,6 +640,15 @@ namespace casadi {
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x*y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=y; d[1]=x;}
+    static inline char prop_curv(char x, char y) {
+      return table_lookup(
+            "+-0?",
+        '+',"??+?",
+        '-',"??-?",
+        '0',"+-0?",
+        '?',"????",
+        x, y);
+    }
   };
 
   /// Division
@@ -624,6 +674,12 @@ namespace casadi {
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = exp(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=f;}
+
+    static inline char prop_curv(char x) {
+      return table_lookup(
+          "+-0?",
+          "+?0?", x);
+    }
   };
 
   /// Natural logarithm
@@ -667,6 +723,16 @@ namespace casadi {
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = sq(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=twice(x);}
+    static inline char prop_sign(char x) {
+      return table_lookup(
+          "+-0?",
+          "++0+", x);
+    }
+    static inline char prop_curv(char x) {
+      return table_lookup(
+          "+-0?",
+          "++0+", x);
+    }
   };
 
   /// Times two
@@ -682,6 +748,16 @@ namespace casadi {
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = sin(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=cos(x);}
+    static inline char prop_curv(char x) {
+      return table_lookup(
+          "+-0?",
+          "??0?",x);
+    }
+    static inline char prop_sign(char x) {
+      return table_lookup(
+          "+-0?",
+          "??0?", x);
+    }
   };
 
   /// Cosine
@@ -690,6 +766,17 @@ namespace casadi {
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = cos(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=-sin(x);}
+
+    static inline char prop_curv(char x) {
+      return table_lookup(
+          "+-0?",
+          "??0?",x);
+    }
+    static inline char prop_sign(char x) {
+      return table_lookup(
+          "+-0?",
+          "??+?", x);
+    }
   };
 
   /// Tangent
@@ -822,6 +909,11 @@ namespace casadi {
     template<typename T> static inline void fcn(const T& x, T& f) { f = fabs(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) {
         d[0]=sign(x);}
+    static inline char prop_sign(char x) {
+      return table_lookup(
+          "+-0?",
+          "++0+", x);
+    }
   };
 
   /// Sign
@@ -1092,6 +1184,8 @@ namespace casadi {
     static inline std::string pre(unsigned char op);
     static inline std::string sep(unsigned char op);
     static inline std::string post(unsigned char op);
+
+    static inline char prop_curv(unsigned char op, char x, char y);
   };
 
   /// Specialize the class so that it can be used with integer type
@@ -1323,6 +1417,19 @@ namespace casadi {
       }
   }
 
+  template<typename T>
+  inline char casadi_math<T>::prop_curv(unsigned char op, char x, char y) {
+    switch (op) {
+      case OP_ADD: return BinaryOperation<OP_ADD>::prop_curv(x, y);
+      case OP_EXP: return BinaryOperation<OP_EXP>::prop_curv(x, y);
+      case OP_SIN: return BinaryOperation<OP_SIN>::prop_curv(x, y);
+      case OP_COS: return BinaryOperation<OP_COS>::prop_curv(x, y);
+      case OP_SQ:  return BinaryOperation<OP_SQ>::prop_curv(x, y);
+      case OP_MUL: return BinaryOperation<OP_MUL>::prop_curv(x, y);
+      default:
+        return '?';
+    }
+  }
 
     template<typename T>
       inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f, T* d) {

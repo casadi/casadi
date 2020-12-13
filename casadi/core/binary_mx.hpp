@@ -64,6 +64,9 @@ namespace casadi {
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
+    /** \brief  Propagate curvature */
+    char prop_curv(const std::vector<char>& args) const override;
+
     /** \brief  Propagate sparsity forward */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
