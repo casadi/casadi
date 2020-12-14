@@ -47,9 +47,6 @@ namespace casadi {
   class Factory {
   public:
 
-    // All auxiliary outputs
-    const Function::AuxOut& aux_;
-
     // All input and output expressions
     std::vector<MatType> in_, out_;
 
@@ -78,14 +75,14 @@ namespace casadi {
     // Read a Hessian block
     HBlock hblock(const std::string& s) const;
 
-    // Constructor
-    Factory(const Function::AuxOut& aux) : aux_(aux) {}
-
     // Add an input expression
     void add_input(const std::string& s, const MatType& e, bool is_diff);
 
     // Add an output expression
     void add_output(const std::string& s, const MatType& e, bool is_diff);
+
+    // Add the dual variables
+    void add_dual(const Function::AuxOut& aux);
 
     // Request a factory input
     std::string request_input(const std::string& s);
@@ -130,12 +127,7 @@ namespace casadi {
     bool has_in(const std::string& s) const { return imap2_.find(s)!=imap2_.end();}
 
     // Check if out exists
-    bool has_out(const std::string& s) const {
-      // Standard output
-      if (omap2_.find(s)!=omap2_.end()) return true;
-      // Auxiliary output?
-      return aux_.find(s)!=aux_.end();
-    }
+    bool has_out(const std::string& s) const { return omap2_.find(s) != omap2_.end();}
 
     // Get input scheme
     std::vector<std::string> name_in() const;
@@ -475,14 +467,25 @@ namespace casadi {
   }
 
   template<typename MatType>
-  void Factory<MatType>::calculate(const Dict& opts) {
+  void Factory<MatType>::add_dual(const Function::AuxOut& aux) {
     // Dual variables
     for (auto&& e : omap2_) {
       Sparsity sp = is_diff_omap_[e.first] ? out_.at(e.second).sparsity()
         : Sparsity(out_.at(e.second).size());
       add_input("lam:" + e.first, MatType::sym("lam_" + e.first, sp), true);
     }
+    // Add linear combinations
+    for (auto i : aux) {
+      MatType lc = 0;
+      for (auto j : i.second) {
+        lc += dot(in_.at(imap2_.at("lam:" + j)), out_.at(omap2_.at(j)));
+      }
+      add_output(i.first, lc, true);
+    }
+  }
 
+  template<typename MatType>
+  void Factory<MatType>::calculate(const Dict& opts) {
     // Forward mode directional derivatives
     try {
       calculate_fwd(opts);
@@ -495,19 +498,6 @@ namespace casadi {
       calculate_adj(opts);
     } catch (std::exception& e) {
       casadi_error("Reverse mode AD failed:\n" + str(e.what()));
-    }
-
-    // Add linear combinations
-    for (auto i : aux_) {
-      MatType lc = 0;
-      for (auto j : i.second) {
-        lc += dot(in_.at(imap2_.at("lam:" + j)), out_.at(omap2_.at(j)));
-      }
-      casadi_assert(omap2_.find(i.first) == omap2_.end(), "here");
-      omap2_[i.first] = out_.size();
-      out_.push_back(lc);
-      oname_.push_back(i.first);
-      is_diff_omap_[i.first] = true;
     }
 
     // Jacobian blocks

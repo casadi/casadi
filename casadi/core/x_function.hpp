@@ -1089,9 +1089,10 @@ namespace casadi {
     extract_from_dict_inplace(f_options, "final_options", final_options);
 
     // Create an expression factory
-    Factory<MatType> f(aux);
+    Factory<MatType> f;
     for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i], is_diff_in_[i]);
     for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i], is_diff_out_[i]);
+    f.add_dual(aux);
 
     // Specify input expressions to be calculated
     vector<string> ret_iname;
