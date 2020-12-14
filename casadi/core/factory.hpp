@@ -39,7 +39,7 @@ namespace casadi {
 
   // A Hessian block
   struct HBlock {
-    std::string ex, arg1, arg2;
+    std::string s, ex, arg1, arg2;
   };
 
   // Helper class for generating new functions
@@ -418,16 +418,15 @@ namespace casadi {
     for (auto &&b : hess_) {
       if (b.ex != ex) continue;
       // Get block name, skip if already calculated
-      std::string s = "hess:" + ex + ":" + b.arg1 + ":" + b.arg2;
-      if (omap_.find(s) != omap_.end()) continue;
+      if (omap_.find(b.s) != omap_.end()) continue;
       // Calculate Hessian blocks
       const MatType& x1 = imap_.at(b.arg1);
       const MatType& x2 = imap_.at(b.arg2);
       if (b.arg1 == b.arg2) {
-        omap_[s] = hessian(f, x1, opts);
+        omap_[b.s] = hessian(f, x1, opts);
       } else {
         MatType g = gradient(f, x1);
-        omap_[s] = jacobian(g, x2);
+        omap_[b.s] = jacobian(g, x2);
       }
     }
   }
@@ -436,12 +435,11 @@ namespace casadi {
   void Factory<MatType>::calculate_hess(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : hess_) {
-      std::string s = "hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2;
       if (is_diff_omap_.at(b.ex) && is_diff_imap_.at(b.arg1) && is_diff_imap_.at(b.arg2)) {
-        is_diff_omap_[s] = true;
+        is_diff_omap_[b.s] = true;
       } else {
-        omap_[s] = MatType(imap_.at(b.arg1).numel(), imap_.at(b.arg2).numel());
-        is_diff_omap_[s] = false;
+        omap_[b.s] = MatType(imap_.at(b.arg1).numel(), imap_.at(b.arg2).numel());
+        is_diff_omap_[b.s] = false;
       }
       // Consistency check
       casadi_assert(omap_.at(b.ex).is_scalar(), "Can only take Hessian of scalar expression.");
@@ -449,8 +447,7 @@ namespace casadi {
     // Calculate regular blocks
     for (auto &&b : hess_) {
       // Get block name, skip if already calculated
-      std::string s = "hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2;
-      if (omap_.find(s) != omap_.end()) continue;
+      if (omap_.find(b.s) != omap_.end()) continue;
       // Calculate all Hessian blocks for b.ex
       calculate_hess(opts, b.ex);
     }
@@ -599,6 +596,7 @@ namespace casadi {
   template<typename MatType>
   HBlock Factory<MatType>::hblock(const std::string& s) const {
     HBlock b;
+    b.s = "hess:" + s;
     size_t pos1 = s.find(':');
     if (pos1 < s.size()) {
       size_t pos2 = s.find(':', pos1 + 1);
