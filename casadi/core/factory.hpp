@@ -35,29 +35,11 @@ namespace casadi {
   // A Jacobian or gradient block
   struct Block {
     std::string ex, arg;
-    Block(const std::string& s) {
-      size_t pos = s.find(':');
-      if (pos<s.size()) {
-        this->ex = s.substr(0, pos);
-        this->arg = s.substr(pos+1, std::string::npos);
-      }
-    }
   };
 
   // A Hessian block
   struct HBlock {
     std::string ex, arg1, arg2;
-    HBlock(const std::string& s) {
-      size_t pos1 = s.find(':');
-      if (pos1<s.size()) {
-        size_t pos2 = s.find(':', pos1+1);
-        if (pos2<s.size()) {
-          this->ex = s.substr(0, pos1);
-          this->arg1 = s.substr(pos1+1, pos2-pos1-1);
-          this->arg2 = s.substr(pos2+1, std::string::npos);
-        }
-      }
-    }
   };
 
   // Helper class for generating new functions
@@ -83,6 +65,12 @@ namespace casadi {
 
     // Hessian blocks
     std::vector<HBlock> hess_;
+
+    // Read a Jacobian or gradient block
+    Block block(const std::string& s) const;
+
+    // Read a Hessian block
+    HBlock hblock(const std::string& s) const;
 
     // Constructor
     Factory(const Function::AuxOut& aux) : aux_(aux) {}
@@ -225,7 +213,7 @@ namespace casadi {
         "Available: " + join(name_in()) + ".");
       adj_out_.push_back(ss.second);
     } else if (ss.first=="jac") {
-      jac_.push_back(ss.second);
+      jac_.push_back(block(ss.second));
       casadi_assert(has_out(jac_.back().ex),
         "Cannot process \"" + jac_.back().ex + "\" (from \"" + s + "\") as output. "
         "Available: " + join(name_out()) + ".");
@@ -233,7 +221,7 @@ namespace casadi {
         "Cannot process \"" + jac_.back().arg + "\" (from \"" + s + "\") as input. "
         "Available: " + join(name_in()) + ".");
     } else if (ss.first=="grad") {
-      grad_.push_back(ss.second);
+      grad_.push_back(block(ss.second));
       casadi_assert(has_out(grad_.back().ex),
         "Cannot process \"" + grad_.back().ex + "\" (from \"" + s + "\") as output. "
         "Available: " + join(name_out()) + ".");
@@ -241,7 +229,7 @@ namespace casadi {
         "Cannot process \"" + grad_.back().arg + "\" (from \"" + s + "\") as input. "
         "Available: " + join(name_in()) + ".");
     } else if (ss.first=="hess") {
-      hess_.push_back(ss.second);
+      hess_.push_back(hblock(ss.second));
       casadi_assert(has_out(hess_.back().ex),
         "Cannot process \"" + hess_.back().ex + "\" (from \"" + s + "\") as output. "
         "Available: " + join(name_out()) + ".");
@@ -595,6 +583,32 @@ namespace casadi {
       ret.push_back(i.first);
     }
     return ret;
+  }
+
+  template<typename MatType>
+  Block Factory<MatType>::block(const std::string& s) const {
+    Block b;
+    size_t pos = s.find(':');
+    if (pos<s.size()) {
+      b.ex = s.substr(0, pos);
+      b.arg = s.substr(pos+1, std::string::npos);
+    }
+    return b;
+  }
+
+  template<typename MatType>
+  HBlock Factory<MatType>::hblock(const std::string& s) const {
+    HBlock b;
+    size_t pos1 = s.find(':');
+    if (pos1 < s.size()) {
+      size_t pos2 = s.find(':', pos1 + 1);
+      if (pos2 < s.size()) {
+        b.ex = s.substr(0, pos1);
+        b.arg1 = s.substr(pos1 + 1, pos2 - pos1 - 1);
+        b.arg2 = s.substr(pos2 + 1, std::string::npos);
+      }
+    }
+    return b;
   }
 
 } // namespace casadi
