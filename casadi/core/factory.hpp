@@ -262,7 +262,7 @@ namespace casadi {
       arg.push_back(imap_[s]);
       Sparsity sp = is_diff_imap_[s] ? arg.back().sparsity() : Sparsity(arg.back().size());
       seed[0].push_back(MatType::sym("fwd_" + s, sp));
-      imap_["fwd:" + s] = seed[0].back();
+      add_input("fwd:" + s, seed[0].back(), true);
     }
     // Outputs
     for (const std::string& s : fwd_omap_) {
@@ -277,8 +277,7 @@ namespace casadi {
     for (casadi_int i=0; i<fwd_omap_.size(); ++i) {
       std::string s = fwd_omap_[i];
       Sparsity sp = is_diff_omap_[s] ? res.at(i).sparsity() : Sparsity(res.at(i).size());
-      omap_["fwd:" + s] = project(sens[0].at(i), sp);
-      is_diff_omap_["fwd:" + s] = is_diff_omap_[s];
+      add_output("fwd:" + s, project(sens[0].at(i), sp), is_diff_omap_[s]);
     }
   }
 
@@ -297,7 +296,7 @@ namespace casadi {
       res.push_back(omap_[s]);
       Sparsity sp = is_diff_omap_[s] ? res.back().sparsity() : Sparsity(res.back().size());
       seed[0].push_back(MatType::sym("adj_" + s, sp));
-      imap_["adj:" + s] = seed[0].back();
+      add_input("adj:" + s, seed[0].back(), true);
     }
     // Calculate directional derivatives
     Dict local_opts;
@@ -308,8 +307,7 @@ namespace casadi {
     for (casadi_int i=0; i<adj_omap_.size(); ++i) {
       std::string s = adj_omap_[i];
       Sparsity sp = is_diff_imap_[s] ? arg.at(i).sparsity() : Sparsity(arg.at(i).size());
-      omap_["adj:" + s] = project(sens[0].at(i), sp);
-      is_diff_imap_["adj:" + s] = is_diff_imap_[s];
+      add_output("adj:" + s, project(sens[0].at(i), sp), is_diff_imap_[s]);
     }
   }
 
@@ -321,8 +319,7 @@ namespace casadi {
       if (is_diff_omap_.at(b.ex) && is_diff_imap_.at(b.arg)) {
         is_diff_omap_[s] = true;
       } else {
-        omap_[s] = MatType(omap_.at(b.ex).numel(), imap_.at(b.arg).numel());
-        is_diff_omap_[s] = false;
+        add_output(s, MatType(omap_.at(b.ex).numel(), imap_.at(b.arg).numel()), false);
       }
     }
     // Calculate regular blocks
@@ -400,12 +397,11 @@ namespace casadi {
       const MatType& ex = omap_.at(b.ex);
       const MatType& arg = imap_.at(b.arg);
       if (is_diff_omap_.at(b.ex) && is_diff_imap_.at(b.arg)) {
-        omap_["grad:" + b.ex + ":" + b.arg] = project(gradient(ex, arg, opts), arg.sparsity());
-        is_diff_omap_["grad:" + b.ex + ":" + b.arg] = true;
+        add_output("grad:" + b.ex + ":" + b.arg,
+          project(gradient(ex, arg, opts), arg.sparsity()), true);
       } else {
         casadi_assert(ex.is_scalar(), "Can only take gradient of scalar expression.");
-        omap_["grad:" + b.ex + ":" + b.arg] = MatType(1, arg.numel());
-        is_diff_omap_["grad:" + b.ex + ":" + b.arg] = false;
+        add_output("grad:" + b.ex + ":" + b.arg, MatType(1, arg.numel()), false);
       }
     }
   }
@@ -438,8 +434,7 @@ namespace casadi {
       if (is_diff_omap_.at(b.ex) && is_diff_imap_.at(b.arg1) && is_diff_imap_.at(b.arg2)) {
         is_diff_omap_[b.s] = true;
       } else {
-        omap_[b.s] = MatType(imap_.at(b.arg1).numel(), imap_.at(b.arg2).numel());
-        is_diff_omap_[b.s] = false;
+        add_output(b.s, MatType(imap_.at(b.arg1).numel(), imap_.at(b.arg2).numel()), false);
       }
       // Consistency check
       casadi_assert(omap_.at(b.ex).is_scalar(), "Can only take Hessian of scalar expression.");
