@@ -104,6 +104,9 @@ namespace casadi {
     // Find a Jacobian block
     size_t find_jac(size_t f, size_t x) const;
 
+    // Find a Hessian block
+    size_t find_hess(size_t f, size_t x1, size_t x2) const;
+
     // Calculate Jacobian blocks
     void calculate_jac(const Dict& opts);
 
@@ -303,6 +306,15 @@ namespace casadi {
   }
 
   template<typename MatType>
+  size_t Factory<MatType>::find_hess(size_t f, size_t x1, size_t x2) const {
+    for (size_t k = 0; k < hess_.size(); ++k) {
+      if (hess_[k].f == f && hess_[k].x1 == x1 && hess_[k].x2 == x2) return k;
+    }
+    // Not in list
+    return -1;
+  }
+
+  template<typename MatType>
   void Factory<MatType>::calculate_jac(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : jac_) {
@@ -400,13 +412,110 @@ namespace casadi {
       if (b.f != f) continue;
       // Skip if already calculated
       if (b.calculated) continue;
+      // Find other blocks with one of the arguments matching
+      std::vector<size_t> all_x1;
+      for (auto &&b1 : hess_) {
+        if (b1.f == b.f && !b1.calculated) {
+          if (b1.x1 == b.x1) {
+            // Block found
+            all_x1.push_back(b1.x2);
+          } else if (b1.x2 == b.x1) {
+            // Opposite block found
+            all_x1.push_back(b1.x1);
+          }
+        }
+      }
+      // Find other blocks with both of the arguments matching
+      std::vector<size_t> all_x2;
+      for (auto &&b1 : hess_) {
+        if (b1.f != f || b1.calculated) continue;
+        // Can either b1.x1 or b1.x2 be added to all_x2?
+        for (bool test_x1 : {false, true}) {
+          size_t cand = test_x1 ? b1.x1 : b1.x2;
+          size_t other = test_x1 ? b1.x2 : b1.x1;
+          bool cand_ok = true;
+          bool other_ok = false;
+          // Skip if already in all_x2
+          if (std::count(all_x2.begin(), all_x2.end(), cand)) continue;
+          // Loop over existing entries in x1
+          for (size_t a : all_x1) {
+            // The other argument must already be in all_x1
+            if (other == a) other_ok = true;
+            // Is block not requested?
+            size_t ind = find_hess(f, a, cand);
+            if (ind == size_t(-1) || hess_[ind].calculated) {
+              // Also check mirror block, if there is one
+              if (a != cand) {
+                ind = find_hess(f, cand, a);
+                if (ind != size_t(-1) && !hess_[ind].calculated) continue;
+              }
+              // Not a candidate
+              cand_ok = false;
+              break;
+            }
+          }
+          // Keep candidate
+          if (cand_ok && other_ok) all_x2.push_back(cand);
+        }
+      }
       // Calculate Hessian blocks
-      const MatType& x1 = in_[b.x1];
-      const MatType& x2 = in_[b.x2];
-      MatType H = b.x1 == b.x2 ? hessian(out_.at(f), x1, opts)
-        : jacobian(gradient(out_.at(f), x1), x2);
-      add_output(b.s, H, true);
-      b.calculated = true;
+      try {
+        if (all_x1.size() == 1 && all_x2.size() == 1) {
+          // Single block
+          MatType H = b.x1 == b.x2 ? hessian(out_.at(f), in_[b.x1], opts)
+            : jacobian(gradient(out_.at(f), in_[b.x1]), in_[b.x2]);
+          add_output(b.s, H, true);
+          b.calculated = true;
+        } else {
+          // Sort blocks
+          std::sort(all_x1.begin(), all_x1.end());
+          std::sort(all_x2.begin(), all_x2.end());
+          // Symmetric extended Hessian?
+          bool symmetric = all_x1 == all_x2;
+          // Collect components
+          std::vector<MatType> x1(all_x1.size()), x2(all_x2.size());
+          for (size_t i = 0; i < x1.size(); ++i) x1[i] = in_.at(all_x1[i]);
+          for (size_t i = 0; i < x2.size(); ++i) x2[i] = in_.at(all_x2[i]);
+          // Calculate extended Hessian
+          MatType H;
+          if (symmetric) {
+            H = hessian(out_.at(f), vertcat(x1));
+          } else {
+            H = jacobian(gradient(out_.at(f), vertcat(x1)), vertcat(x2));
+          }
+          // Split into blocks
+          std::vector<std::vector<MatType>> H_all = blocksplit(H, offset(x1), offset(x2));
+          // Collect Hessian blocks
+          for (auto &&b1 : hess_) {
+            if (b1.f == f && !b1.calculated) {
+              // Find arguments in all_x1 and all_x2
+              auto it_x1 = std::find(all_x1.begin(), all_x1.end(), b1.x1);
+              auto it_x2 = std::find(all_x2.begin(), all_x2.end(), b1.x2);
+              if (it_x1 != all_x1.end() && it_x2 != all_x2.end()) {
+                // Block located
+                const MatType& Hb = H_all.at(it_x1 - all_x1.begin()).at(it_x2 - all_x2.begin());
+                add_output(b1.s, Hb, true);
+                b1.calculated = true;
+              } else if (!symmetric) {
+                // Check mirror block
+                it_x1 = std::find(all_x1.begin(), all_x1.end(), b1.x2);
+                it_x2 = std::find(all_x2.begin(), all_x2.end(), b1.x1);
+                if (it_x1 != all_x1.end() && it_x2 != all_x2.end()) {
+                  // Transpose of block located
+                  const MatType& Hb = H_all.at(it_x1 - all_x1.begin()).at(it_x2 - all_x2.begin());
+                  add_output(b1.s, Hb.T(), true);
+                  b1.calculated = true;
+                }
+              }
+            }
+          }
+        }
+      } catch (std::exception& e) {
+        std::stringstream ss;
+        ss << "Calculating Hessian of " << oname_.at(f) << " w.r.t. " << iname(all_x1) << " and "
+          << iname(all_x2) << ": " << e.what();
+        casadi_error(ss.str());
+      }
     }
   }
 
