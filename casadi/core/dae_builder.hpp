@@ -336,25 +336,15 @@ namespace casadi {
 
     // Get output expression, given enum
     std::vector<MX> output(const std::vector<DaeBuilderOut>& ind) const;
-
-    // Get multiplier corresponding to an output expression, given enum
-    std::vector<MX> multiplier(DaeBuilderOut ind) const;
 #endif // SWIG
 
     /// Add a named linear combination of output expressions
-    MX add_lc(const std::string& name,
-              const std::vector<std::string>& f_out);
+    void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 
     /// Construct a function object
     Function create(const std::string& fname,
         const std::vector<std::string>& s_in,
         const std::vector<std::string>& s_out, bool sx = false) const;
-
-    /// Construct a function object, legacy implementation
-    Function create_old(const std::string& fname,
-        const std::vector<std::string>& s_in,
-        const std::vector<std::string>& s_out) const;
-
     ///@}
 
     /// Get variable expression by name
@@ -496,7 +486,6 @@ namespace casadi {
     VarMap varmap_;
 
     /// Linear combinations of output expressions
-    std::map<std::string, MX> lin_comb_;
     Function::AuxOut lc_;
 
     /** \brief Functions */
