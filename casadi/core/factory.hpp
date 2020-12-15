@@ -26,6 +26,7 @@
 #ifndef CASADI_FACTORY_HPP
 #define CASADI_FACTORY_HPP
 
+#include <algorithm>
 #include "function.hpp"
 
 /// \cond INTERNAL
@@ -317,51 +318,42 @@ namespace casadi {
       // Skip if already calculated
       if (b.calculated) continue;
       // Find other blocks with the same input, but different (not yet calculated) outputs
-      std::vector<MatType> f;
       std::vector<size_t> all_f;
       for (auto &&b1 : jac_) {
-        // Check if same input
-        if (b1.x != b.x) continue;
-        // Check if already calculated
-        if (b1.calculated) continue;
-        // Collect expressions
-        all_f.push_back(b1.f);
-        f.push_back(out_.at(b1.f));
+        if (b1.x == b.x && !b1.calculated) all_f.push_back(b1.f);
       }
       // Now find other blocks with *all* the same outputs, but different inputs
-      std::vector<MatType> x{in_[b.x]};
       std::vector<size_t> all_x{b.x};
       for (auto &&b1 : jac_) {
         // Candidate b1.arg: Check if already added
+        if (std::count(all_x.begin(), all_x.end(), b1.x)) continue;
+        // Skip if all block are not requested or any block has already been calculated
         bool skip = false;
-        for (size_t a : all_x) {
-          if (a == b1.x) {
-            skip = true;
-            break;
-          }
-        }
-        if (skip) continue;
-        // Check if all blocks corresponding to the same input are needed
         for (size_t f1 : all_f) {
-          // Search for block
           size_t ind = find_jac(f1, b1.x);
           if (ind == size_t(-1) || jac_[ind].calculated) {
-            // Block is not requested or has already been calculated
             skip = true;
             break;
           }
         }
         if (skip) continue;
         // Keep candidate
-        x.push_back(in_[b1.x]);
         all_x.push_back(b1.x);
       }
       try {
         // Calculate Jacobian block(s)
-        if (f.size() == 1 && x.size() == 1) {
-          add_output(b.s, MatType::jacobian(f[0], x[0], opts), true);
+        if (all_f.size() == 1 && all_x.size() == 1) {
+          // Single block
+          add_output(b.s, MatType::jacobian(out_[b.f], in_[b.x], opts), true);
           b.calculated = true;
         } else {
+          // Sort blocks
+          std::sort(all_x.begin(), all_x.end());
+          std::sort(all_f.begin(), all_f.end());
+          // Collect components
+          std::vector<MatType> x(all_x.size()), f(all_f.size());
+          for (size_t i = 0; i < x.size(); ++i) x[i] = in_.at(all_x[i]);
+          for (size_t i = 0; i < f.size(); ++i) f[i] = out_.at(all_f[i]);
           // Calculate Jacobian of all outputs with respect to all inputs
           MatType J = MatType::jacobian(vertcat(f), vertcat(x), opts);
           // Split Jacobian into blocks
