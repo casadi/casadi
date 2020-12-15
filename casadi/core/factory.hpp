@@ -62,10 +62,10 @@ namespace casadi {
     std::vector<bool> is_diff_in_, is_diff_out_;
 
     // Forward mode directional derivatives
-    std::vector<std::string> fwd_imap_, fwd_omap_;
+    std::vector<size_t> fwd_in_, fwd_out_;
 
     // Reverse mode directional derivatives
-    std::vector<std::string> adj_imap_, adj_omap_;
+    std::vector<size_t> adj_in_, adj_out_;
 
     // Jacobian/gradient blocks
     std::vector<Block> jac_, grad_;
@@ -188,14 +188,10 @@ namespace casadi {
 
     if (ss.first=="fwd") {
       // Forward mode directional derivative
-      casadi_assert(has_in(ss.second), "Cannot process \"" + ss.second + "\""
-        " (from \"" + s + "\") as input. Available: " + join(iname()) + ".");
-      fwd_imap_.push_back(ss.second);
+      fwd_in_.push_back(imap(ss.second));
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
-      casadi_assert(has_out(ss.second), "Cannot process \"" + ss.second + "\""
-        " (from \"" + s + "\") as output. Available: " + join(oname()) + ".");
-      adj_imap_.push_back(ss.second);
+      adj_in_.push_back(omap(ss.second));
     }
 
     // Replace colons with underscore
@@ -218,16 +214,9 @@ namespace casadi {
     pair<string, string> ss = split_prefix(s);
 
     if (ss.first=="fwd") {
-      // Forward mode directional derivative
-      casadi_assert(has_out(ss.second), "Cannot process \"" + ss.second + "\""
-        " (from \"" + s + "\") as output. Available: " + join(oname()) + ".");
-      fwd_omap_.push_back(ss.second);
+      fwd_out_.push_back(omap(ss.second));
     } else if (ss.first=="adj") {
-      // Reverse mode directional derivative
-      casadi_assert(has_in(ss.second),
-        "Cannot process \"" + ss.second + "\" (from \"" + s + "\") as input. "
-        "Available: " + join(iname()) + ".");
-      adj_omap_.push_back(ss.second);
+      adj_out_.push_back(imap(ss.second));
     } else if (ss.first=="jac") {
       jac_.push_back(block(ss.second, s));
     } else if (ss.first=="grad") {
@@ -247,51 +236,48 @@ namespace casadi {
 
   template<typename MatType>
   void Factory<MatType>::calculate_fwd(const Dict& opts) {
-    if (fwd_omap_.empty()) return;
-    casadi_assert_dev(!fwd_imap_.empty());
+    if (fwd_out_.empty()) return;
+    casadi_assert_dev(!fwd_in_.empty());
 
     std::vector<MatType> arg, res;
     std::vector<std::vector<MatType>> seed(1), sens(1);
     // Inputs and forward mode seeds
-    for (const std::string& s : fwd_imap_) {
-      arg.push_back(in_[imap_[s]]);
-      Sparsity sp = is_diff_in_.at(imap(s)) ? arg.back().sparsity() : Sparsity(arg.back().size());
-      seed[0].push_back(MatType::sym("fwd_" + s, sp));
-      add_input("fwd:" + s, seed[0].back(), true);
+    for (size_t iind : fwd_in_) {
+      arg.push_back(in_[iind]);
+      Sparsity sp = is_diff_in_.at(iind) ? arg.back().sparsity() : Sparsity(arg.back().size());
+      seed[0].push_back(MatType::sym("fwd_" + iname_[iind], sp));
+      add_input("fwd:" + iname_[iind], seed[0].back(), true);
     }
     // Outputs
-    for (const std::string& s : fwd_omap_) {
-      res.push_back(out_.at(omap_[s]));
-    }
+    for (size_t oind : fwd_out_) res.push_back(out_.at(oind));
     // Calculate directional derivatives
     Dict local_opts = opts;
     local_opts["always_inline"] = true;
     sens = forward(res, arg, seed, local_opts);
 
     // Get directional derivatives
-    for (casadi_int i=0; i<fwd_omap_.size(); ++i) {
-      std::string s = fwd_omap_[i];
-      Sparsity sp = is_diff_out_.at(omap(s)) ? res.at(i).sparsity() : Sparsity(res.at(i).size());
-      add_output("fwd:" + s, project(sens[0].at(i), sp), is_diff_out_.at(omap(s)));
+    for (size_t i = 0; i < fwd_out_.size(); ++i) {
+      std::string s = oname_.at(fwd_out_[i]);
+      Sparsity sp = is_diff_out_.at(fwd_out_[i]) ? res.at(i).sparsity()
+        : Sparsity(res.at(i).size());
+      add_output("fwd:" + s, project(sens[0].at(i), sp), is_diff_out_.at(fwd_out_[i]));
     }
   }
 
   template<typename MatType>
   void Factory<MatType>::calculate_adj(const Dict& opts) {
-    if (adj_omap_.empty()) return;
-    casadi_assert_dev(!adj_imap_.empty());
+    if (adj_out_.empty()) return;
+    casadi_assert_dev(!adj_in_.empty());
     std::vector<MatType> arg, res;
     std::vector<std::vector<MatType>> seed(1), sens(1);
     // Inputs
-    for (const std::string& s : adj_omap_) {
-      arg.push_back(in_[imap_[s]]);
-    }
+    for (size_t ind : adj_out_) arg.push_back(in_[ind]);
     // Outputs and reverse mode seeds
-    for (const std::string& s : adj_imap_) {
-      res.push_back(out_.at(omap_[s]));
-      Sparsity sp = is_diff_out_.at(omap(s)) ? res.back().sparsity() : Sparsity(res.back().size());
-      seed[0].push_back(MatType::sym("adj_" + s, sp));
-      add_input("adj:" + s, seed[0].back(), true);
+    for (size_t ind : adj_in_) {
+      res.push_back(out_.at(ind));
+      Sparsity sp = is_diff_out_.at(ind) ? res.back().sparsity() : Sparsity(res.back().size());
+      seed[0].push_back(MatType::sym("adj_" + oname_[ind], sp));
+      add_input("adj:" + oname_[ind], seed[0].back(), true);
     }
     // Calculate directional derivatives
     Dict local_opts;
@@ -299,10 +285,10 @@ namespace casadi {
     sens = reverse(res, arg, seed, local_opts);
 
     // Get directional derivatives
-    for (size_t i=0; i < adj_omap_.size(); ++i) {
-      std::string s = adj_omap_[i];
-      Sparsity sp = is_diff_in_.at(imap(s)) ? arg.at(i).sparsity() : Sparsity(arg.at(i).size());
-      add_output("adj:" + s, project(sens[0].at(i), sp), is_diff_in_.at(imap(s)));
+    for (size_t i=0; i < adj_out_.size(); ++i) {
+      std::string s = iname_[adj_out_[i]];
+      Sparsity sp = is_diff_in_.at(adj_out_[i]) ? arg.at(i).sparsity() : Sparsity(arg.at(i).size());
+      add_output("adj:" + s, project(sens[0].at(i), sp), is_diff_in_.at(adj_out_[i]));
     }
   }
 
