@@ -35,6 +35,7 @@ namespace casadi {
   // A Jacobian or gradient block
   struct Block {
     size_t f, x;
+    std::string s;
     bool calculated;
   };
 
@@ -73,10 +74,10 @@ namespace casadi {
     std::vector<HBlock> hess_;
 
     // Read a Jacobian or gradient block
-    Block block(const std::string& s) const;
+    Block block(const std::string& s1, const std::string& s) const;
 
     // Read a Hessian block
-    HBlock hblock(const std::string& s) const;
+    HBlock hblock(const std::string& s1, const std::string& s) const;
 
     // Add an input expression
     void add_input(const std::string& s, const MatType& e, bool is_diff);
@@ -229,11 +230,11 @@ namespace casadi {
         "Available: " + join(name_in()) + ".");
       adj_omap_.push_back(ss.second);
     } else if (ss.first=="jac") {
-      jac_.push_back(block(ss.second));
+      jac_.push_back(block(ss.second, s));
     } else if (ss.first=="grad") {
-      grad_.push_back(block(ss.second));
+      grad_.push_back(block(ss.second, s));
     } else if (ss.first=="hess") {
-      hess_.push_back(hblock(ss.second));
+      hess_.push_back(hblock(ss.second, s));
     } else {
       // Assume attribute
       request_output(ss.second);
@@ -319,19 +320,17 @@ namespace casadi {
   void Factory<MatType>::calculate_jac(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : jac_) {
-      std::string s = "jac:" + oname_.at(b.f) + ":" + iname_.at(b.x);
       if (is_diff_omap_.at(oname_.at(b.f)) && is_diff_imap_.at(iname_.at(b.x))) {
         b.calculated = false;
       } else {
-        add_output(s, MatType(out_[b.f].numel(), in_[b.x].numel()), false);
+        add_output(b.s, MatType(out_[b.f].numel(), in_[b.x].numel()), false);
         b.calculated = true;
       }
     }
     // Calculate regular blocks
     for (auto &&b : jac_) {
-      // Get block name, skip if already calculated
-      std::string s = "jac:" + oname_[b.f] + ":" + iname_[b.x];
-      if (omap_.find(s) != omap_.end()) continue;
+      // Skip if already calculated
+      if (b.calculated) continue;
       // Find other blocks with the same input, but different (not yet calculated) outputs
       std::vector<MatType> ex;
       std::vector<std::string> all_ex;
@@ -359,7 +358,6 @@ namespace casadi {
         if (skip) continue;
         // Check if all blocks corresponding to the same input are needed
         for (const std::string& e : all_ex) {
-          std::string s1 = "jac:" + e + ":" + iname_[b1.x];
           // Search for block
           size_t ind = find_jac(omap(e), b1.x);
           if (ind == size_t(-1) || jac_[ind].calculated) {
@@ -376,7 +374,7 @@ namespace casadi {
       try {
         // Calculate Jacobian block(s)
         if (ex.size() == 1 && arg.size() == 1) {
-          add_output(s, MatType::jacobian(ex[0], arg[0], opts), true);
+          add_output(b.s, MatType::jacobian(ex[0], arg[0], opts), true);
           b.calculated = true;
         } else {
           // Calculate Jacobian of all outputs with respect to all inputs
@@ -387,10 +385,10 @@ namespace casadi {
           for (size_t i = 0; i < all_ex.size(); ++i) {
             for (size_t j = 0; j < all_arg.size(); ++j) {
               size_t J_ind = find_jac(omap(all_ex[i]), imap(all_arg[j]));
-              casadi_assert(J_ind != size_t(-1), "here");
-              std::string sJ = "jac:" + all_ex[i] + ":" + all_arg[j];
-              add_output(sJ, J_all.at(i).at(j), true);
-              jac_[J_ind].calculated = true;
+              if (J_ind != size_t(-1)) {
+                add_output(jac_[J_ind].s, J_all.at(i).at(j), true);
+                jac_[J_ind].calculated = true;
+              }
             }
           }
         }
@@ -606,27 +604,28 @@ namespace casadi {
   }
 
   template<typename MatType>
-  Block Factory<MatType>::block(const std::string& s) const {
+  Block Factory<MatType>::block(const std::string& s2, const std::string& s) const {
     Block b;
-    size_t pos = s.find(':');
-    if (pos<s.size()) {
-      b.f = omap(s.substr(0, pos));
-      b.x = imap(s.substr(pos+1, std::string::npos));
+    b.s = s;
+    size_t pos = s2.find(':');
+    if (pos < s2.size()) {
+      b.f = omap(s2.substr(0, pos));
+      b.x = imap(s2.substr(pos+1, std::string::npos));
     }
     return b;
   }
 
   template<typename MatType>
-  HBlock Factory<MatType>::hblock(const std::string& s) const {
+  HBlock Factory<MatType>::hblock(const std::string& s2, const std::string& s) const {
     HBlock b;
-    b.s = "hess:" + s;
-    size_t pos1 = s.find(':');
-    if (pos1 < s.size()) {
-      size_t pos2 = s.find(':', pos1 + 1);
-      if (pos2 < s.size()) {
-        b.f = omap(s.substr(0, pos1));
-        b.x1 = imap(s.substr(pos1 + 1, pos2 - pos1 - 1));
-        b.x2 = imap(s.substr(pos2 + 1, std::string::npos));
+    b.s = s;
+    size_t pos1 = s2.find(':');
+    if (pos1 < s2.size()) {
+      size_t pos2 = s2.find(':', pos1 + 1);
+      if (pos2 < s2.size()) {
+        b.f = omap(s2.substr(0, pos1));
+        b.x1 = imap(s2.substr(pos1 + 1, pos2 - pos1 - 1));
+        b.x2 = imap(s2.substr(pos2 + 1, std::string::npos));
       }
     }
     return b;
