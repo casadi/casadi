@@ -331,34 +331,34 @@ namespace casadi {
       // Skip if already calculated
       if (b.calculated) continue;
       // Find other blocks with the same input, but different (not yet calculated) outputs
-      std::vector<MatType> ex;
-      std::vector<std::string> all_ex;
+      std::vector<MatType> f;
+      std::vector<size_t> all_f;
       for (auto &&b1 : jac_) {
         // Check if same input
         if (b1.x != b.x) continue;
         // Check if already calculated
         if (b1.calculated) continue;
         // Collect expressions
-        all_ex.push_back(oname_.at(b1.f));
-        ex.push_back(out_.at(b1.f));
+        all_f.push_back(b1.f);
+        f.push_back(out_.at(b1.f));
       }
       // Now find other blocks with *all* the same outputs, but different inputs
-      std::vector<MatType> arg{in_[b.x]};
-      std::vector<std::string> all_arg{iname_[b.x]};
+      std::vector<MatType> x{in_[b.x]};
+      std::vector<size_t> all_x{b.x};
       for (auto &&b1 : jac_) {
         // Candidate b1.arg: Check if already added
         bool skip = false;
-        for (const std::string& a : all_arg) {
-          if (a == iname_[b1.x]) {
+        for (size_t a : all_x) {
+          if (a == b1.x) {
             skip = true;
             break;
           }
         }
         if (skip) continue;
         // Check if all blocks corresponding to the same input are needed
-        for (const std::string& e : all_ex) {
+        for (size_t f1 : all_f) {
           // Search for block
-          size_t ind = find_jac(omap(e), b1.x);
+          size_t ind = find_jac(f1, b1.x);
           if (ind == size_t(-1) || jac_[ind].calculated) {
             // Block is not requested or has already been calculated
             skip = true;
@@ -367,23 +367,23 @@ namespace casadi {
         }
         if (skip) continue;
         // Keep candidate
-        arg.push_back(in_[b1.x]);
-        all_arg.push_back(iname_[b1.x]);
+        x.push_back(in_[b1.x]);
+        all_x.push_back(b1.x);
       }
       try {
         // Calculate Jacobian block(s)
-        if (ex.size() == 1 && arg.size() == 1) {
-          add_output(b.s, MatType::jacobian(ex[0], arg[0], opts), true);
+        if (f.size() == 1 && x.size() == 1) {
+          add_output(b.s, MatType::jacobian(f[0], x[0], opts), true);
           b.calculated = true;
         } else {
           // Calculate Jacobian of all outputs with respect to all inputs
-          MatType J = MatType::jacobian(vertcat(ex), vertcat(arg), opts);
+          MatType J = MatType::jacobian(vertcat(f), vertcat(x), opts);
           // Split Jacobian into blocks
-          std::vector<std::vector<MatType>> J_all = blocksplit(J, offset(ex), offset(arg));
+          std::vector<std::vector<MatType>> J_all = blocksplit(J, offset(f), offset(x));
           // Save blocks
-          for (size_t i = 0; i < all_ex.size(); ++i) {
-            for (size_t j = 0; j < all_arg.size(); ++j) {
-              size_t J_ind = find_jac(omap(all_ex[i]), imap(all_arg[j]));
+          for (size_t i = 0; i < all_f.size(); ++i) {
+            for (size_t j = 0; j < all_x.size(); ++j) {
+              size_t J_ind = find_jac(all_f[i], all_x[j]);
               if (J_ind != size_t(-1)) {
                 add_output(jac_[J_ind].s, J_all.at(i).at(j), true);
                 jac_[J_ind].calculated = true;
@@ -393,7 +393,8 @@ namespace casadi {
         }
       } catch (std::exception& e) {
         std::stringstream ss;
-        ss << "Calculating Jacobian of " << all_ex << " w.r.t. " << all_arg << ": " << e.what();
+        ss << "Calculating Jacobian of " << oname(all_f) << " w.r.t. " << iname(all_x)
+          << ": " << e.what();
         casadi_error(ss.str());
       }
     }
