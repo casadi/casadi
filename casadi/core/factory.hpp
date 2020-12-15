@@ -59,7 +59,7 @@ namespace casadi {
 
     // All input and output expressions created so far
     std::map<std::string, size_t> imap_, omap_;
-    std::map<std::string, bool> is_diff_imap_, is_diff_omap_;
+    std::vector<bool> is_diff_in_, is_diff_out_;
 
     // Forward mode directional derivatives
     std::vector<std::string> fwd_imap_, fwd_omap_;
@@ -157,7 +157,7 @@ namespace casadi {
     size_t ind = in_.size();
     auto it = imap_.insert(make_pair(s, ind));
     casadi_assert(it.second, "Duplicate input expression \"" + s + "\"");
-    is_diff_imap_.insert(make_pair(s, is_diff));
+    is_diff_in_.push_back(is_diff);
     in_.push_back(e);
     iname_.push_back(s);
   }
@@ -168,7 +168,7 @@ namespace casadi {
     size_t ind = out_.size();
     auto it = omap_.insert(make_pair(s, ind));
     casadi_assert(it.second, "Duplicate output expression \"" + s + "\"");
-    is_diff_omap_.insert(make_pair(s, is_diff));
+    is_diff_out_.push_back(is_diff);
     out_.push_back(e);
     oname_.push_back(s);
   }
@@ -255,7 +255,7 @@ namespace casadi {
     // Inputs and forward mode seeds
     for (const std::string& s : fwd_imap_) {
       arg.push_back(in_[imap_[s]]);
-      Sparsity sp = is_diff_imap_[s] ? arg.back().sparsity() : Sparsity(arg.back().size());
+      Sparsity sp = is_diff_in_.at(imap(s)) ? arg.back().sparsity() : Sparsity(arg.back().size());
       seed[0].push_back(MatType::sym("fwd_" + s, sp));
       add_input("fwd:" + s, seed[0].back(), true);
     }
@@ -271,8 +271,8 @@ namespace casadi {
     // Get directional derivatives
     for (casadi_int i=0; i<fwd_omap_.size(); ++i) {
       std::string s = fwd_omap_[i];
-      Sparsity sp = is_diff_omap_[s] ? res.at(i).sparsity() : Sparsity(res.at(i).size());
-      add_output("fwd:" + s, project(sens[0].at(i), sp), is_diff_omap_[s]);
+      Sparsity sp = is_diff_out_.at(omap(s)) ? res.at(i).sparsity() : Sparsity(res.at(i).size());
+      add_output("fwd:" + s, project(sens[0].at(i), sp), is_diff_out_.at(omap(s)));
     }
   }
 
@@ -289,7 +289,7 @@ namespace casadi {
     // Outputs and reverse mode seeds
     for (const std::string& s : adj_imap_) {
       res.push_back(out_.at(omap_[s]));
-      Sparsity sp = is_diff_omap_[s] ? res.back().sparsity() : Sparsity(res.back().size());
+      Sparsity sp = is_diff_out_.at(omap(s)) ? res.back().sparsity() : Sparsity(res.back().size());
       seed[0].push_back(MatType::sym("adj_" + s, sp));
       add_input("adj:" + s, seed[0].back(), true);
     }
@@ -299,10 +299,10 @@ namespace casadi {
     sens = reverse(res, arg, seed, local_opts);
 
     // Get directional derivatives
-    for (casadi_int i=0; i<adj_omap_.size(); ++i) {
+    for (size_t i=0; i < adj_omap_.size(); ++i) {
       std::string s = adj_omap_[i];
-      Sparsity sp = is_diff_imap_[s] ? arg.at(i).sparsity() : Sparsity(arg.at(i).size());
-      add_output("adj:" + s, project(sens[0].at(i), sp), is_diff_imap_[s]);
+      Sparsity sp = is_diff_in_.at(imap(s)) ? arg.at(i).sparsity() : Sparsity(arg.at(i).size());
+      add_output("adj:" + s, project(sens[0].at(i), sp), is_diff_in_.at(imap(s)));
     }
   }
 
@@ -319,7 +319,7 @@ namespace casadi {
   void Factory<MatType>::calculate_jac(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : jac_) {
-      if (is_diff_omap_.at(oname_.at(b.f)) && is_diff_imap_.at(iname_.at(b.x))) {
+      if (is_diff_out_.at(b.f) && is_diff_in_.at(b.x)) {
         b.calculated = false;
       } else {
         add_output(b.s, MatType(out_[b.f].numel(), in_[b.x].numel()), false);
@@ -405,7 +405,7 @@ namespace casadi {
     for (auto &&b : grad_) {
       const MatType& ex = out_.at(b.f);
       const MatType& arg = in_[b.x];
-      if (is_diff_omap_.at(oname_[b.f]) && is_diff_imap_.at(iname_[b.x])) {
+      if (is_diff_out_.at(b.f) && is_diff_in_.at(b.x)) {
         add_output("grad:" + oname_[b.f] + ":" + iname_[b.x],
           project(gradient(ex, arg, opts), arg.sparsity()), true);
       } else {
@@ -436,8 +436,7 @@ namespace casadi {
   void Factory<MatType>::calculate_hess(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : hess_) {
-      if (is_diff_omap_.at(oname_[b.f]) && is_diff_imap_.at(iname_[b.x1])
-          && is_diff_imap_.at(iname_[b.x2])) {
+      if (is_diff_out_.at(b.f) && is_diff_in_.at(b.x1) && is_diff_in_.at(b.x2)) {
         b.calculated = false;
       } else {
         add_output(b.s, MatType(in_[b.x1].numel(), in_[b.x2].numel()), false);
@@ -459,10 +458,9 @@ namespace casadi {
   template<typename MatType>
   void Factory<MatType>::add_dual(const Function::AuxOut& aux) {
     // Dual variables
-    for (auto&& e : omap_) {
-      Sparsity sp = is_diff_omap_[e.first] ? out_.at(e.second).sparsity()
-        : Sparsity(out_.at(e.second).size());
-      add_input("lam:" + e.first, MatType::sym("lam_" + e.first, sp), true);
+    for (size_t k = 0; k < out_.size(); ++k) {
+      Sparsity sp = is_diff_out_[k] ? out_.at(k).sparsity() : Sparsity(out_.at(k).size());
+      add_input("lam:" + oname_[k], MatType::sym("lam_" + oname_[k], sp), true);
     }
     // Add linear combinations
     for (auto i : aux) {
