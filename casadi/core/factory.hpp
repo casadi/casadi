@@ -39,7 +39,8 @@ namespace casadi {
 
   // A Hessian block
   struct HBlock {
-    std::string s, ex, arg1, arg2;
+    size_t f, x1, x2;
+    std::string s;
   };
 
   // Helper class for generating new functions
@@ -228,15 +229,6 @@ namespace casadi {
       grad_.push_back(block(ss.second));
     } else if (ss.first=="hess") {
       hess_.push_back(hblock(ss.second));
-      casadi_assert(has_out(hess_.back().ex),
-        "Cannot process \"" + hess_.back().ex + "\" (from \"" + s + "\") as output. "
-        "Available: " + join(name_out()) + ".");
-      casadi_assert(has_in(hess_.back().arg1),
-        "Cannot process \"" + hess_.back().arg1 + "\" (from \"" + s + "\") as input. "
-        "Available: " + join(name_in()) + ".");
-      casadi_assert(has_in(hess_.back().arg2),
-        "Cannot process \"" + hess_.back().arg2 + "\" (from \"" + s + "\") as input. "
-        "Available: " + join(name_in()) + ".");
     } else {
       // Assume attribute
       request_output(ss.second);
@@ -417,14 +409,14 @@ namespace casadi {
     MatType f = out_.at(omap_.at(ex));
     // Handle all blocks for this expression
     for (auto &&b : hess_) {
-      if (b.ex != ex) continue;
+      if (oname_[b.f] != ex) continue;
       // Get block name, skip if already calculated
       if (omap_.find(b.s) != omap_.end()) continue;
       // Calculate Hessian blocks
-      const MatType& x1 = in_[imap_.at(b.arg1)];
-      const MatType& x2 = in_[imap_.at(b.arg2)];
+      const MatType& x1 = in_[b.x1];
+      const MatType& x2 = in_[b.x2];
       casadi_assert(omap_.find(b.s) == omap_.end(), "here");
-      if (b.arg1 == b.arg2) {
+      if (b.x1 == b.x2) {
         omap_[b.s] = out_.size();
         out_.push_back(hessian(f, x1, opts));
         oname_.push_back(b.s);
@@ -441,22 +433,22 @@ namespace casadi {
   void Factory<MatType>::calculate_hess(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : hess_) {
-      if (is_diff_omap_.at(b.ex) && is_diff_imap_.at(b.arg1) && is_diff_imap_.at(b.arg2)) {
+      if (is_diff_omap_.at(oname_[b.f]) && is_diff_imap_.at(iname_[b.x1])
+          && is_diff_imap_.at(iname_[b.x2])) {
         is_diff_omap_[b.s] = true;
       } else {
-        add_output(b.s, MatType(in_[imap_.at(b.arg1)].numel(),
-          in_[imap_.at(b.arg2)].numel()), false);
+        add_output(b.s, MatType(in_[b.x1].numel(), in_[b.x2].numel()), false);
       }
       // Consistency check
-      casadi_assert(out_.at(omap_.at(b.ex)).is_scalar(),
+      casadi_assert(out_.at(b.f).is_scalar(),
         "Can only take Hessian of scalar expression.");
     }
     // Calculate regular blocks
     for (auto &&b : hess_) {
       // Get block name, skip if already calculated
       if (omap_.find(b.s) != omap_.end()) continue;
-      // Calculate all Hessian blocks for b.ex
-      calculate_hess(opts, b.ex);
+      // Calculate all Hessian blocks for b.f
+      calculate_hess(opts, oname_[b.f]);
     }
   }
 
@@ -626,9 +618,9 @@ namespace casadi {
     if (pos1 < s.size()) {
       size_t pos2 = s.find(':', pos1 + 1);
       if (pos2 < s.size()) {
-        b.ex = s.substr(0, pos1);
-        b.arg1 = s.substr(pos1 + 1, pos2 - pos1 - 1);
-        b.arg2 = s.substr(pos2 + 1, std::string::npos);
+        b.f = omap(s.substr(0, pos1));
+        b.x1 = imap(s.substr(pos1 + 1, pos2 - pos1 - 1));
+        b.x2 = imap(s.substr(pos2 + 1, std::string::npos));
       }
     }
     return b;
