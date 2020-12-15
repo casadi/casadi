@@ -143,10 +143,12 @@ namespace casadi {
     bool has_out(const std::string& s) const { return omap_.find(s) != omap_.end();}
 
     // Get input scheme
-    std::vector<std::string> name_in() const;
+    const std::vector<std::string>& iname() const {return iname_;}
+    std::vector<std::string> iname(const std::vector<size_t>& ind) const;
 
     // Get output scheme
-    std::vector<std::string> name_out() const;
+    const std::vector<std::string>& oname() const {return oname_;}
+    std::vector<std::string> oname(const std::vector<size_t>& ind) const;
   };
 
   template<typename MatType>
@@ -181,20 +183,18 @@ namespace casadi {
 
     // Get prefix
     casadi_assert(has_prefix(s), "Cannot process \"" + s + "\" as input."
-                                         " Available: " + join(name_in()) + ".");
+      " Available: " + join(iname()) + ".");
     pair<string, string> ss = split_prefix(s);
 
     if (ss.first=="fwd") {
       // Forward mode directional derivative
       casadi_assert(has_in(ss.second), "Cannot process \"" + ss.second + "\""
-                                               " (from \"" + s + "\") as input."
-                                               " Available: " + join(name_in()) + ".");
+        " (from \"" + s + "\") as input. Available: " + join(iname()) + ".");
       fwd_imap_.push_back(ss.second);
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
       casadi_assert(has_out(ss.second), "Cannot process \"" + ss.second + "\""
-                                                " (from \"" + s + "\") as output."
-                                                " Available: " + join(name_out()) + ".");
+        " (from \"" + s + "\") as output. Available: " + join(oname()) + ".");
       adj_imap_.push_back(ss.second);
     }
 
@@ -214,20 +214,19 @@ namespace casadi {
 
     // Get prefix
     casadi_assert(has_prefix(s), "Cannot process \"" + s + "\" as output."
-                                         " Available: " + join(name_out()) + ".");
+      " Available: " + join(oname()) + ".");
     pair<string, string> ss = split_prefix(s);
 
     if (ss.first=="fwd") {
       // Forward mode directional derivative
       casadi_assert(has_out(ss.second), "Cannot process \"" + ss.second + "\""
-                                                " (from \"" + s + "\") as output."
-                                                " Available: " + join(name_out()) + ".");
+        " (from \"" + s + "\") as output. Available: " + join(oname()) + ".");
       fwd_omap_.push_back(ss.second);
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
       casadi_assert(has_in(ss.second),
         "Cannot process \"" + ss.second + "\" (from \"" + s + "\") as input. "
-        "Available: " + join(name_in()) + ".");
+        "Available: " + join(iname()) + ".");
       adj_omap_.push_back(ss.second);
     } else if (ss.first=="jac") {
       jac_.push_back(block(ss.second, s));
@@ -570,20 +569,16 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::vector<std::string> Factory<MatType>::name_in() const {
+  std::vector<std::string> Factory<MatType>::iname(const std::vector<size_t>& ind) const {
     std::vector<std::string> ret;
-    for (auto i : imap_) {
-      ret.push_back(i.first);
-    }
+    for (size_t i : ind) ret.push_back(iname_.at(i));
     return ret;
   }
 
   template<typename MatType>
-  std::vector<std::string> Factory<MatType>::name_out() const {
+  std::vector<std::string> Factory<MatType>::oname(const std::vector<size_t>& ind) const {
     std::vector<std::string> ret;
-    for (auto i : omap_) {
-      ret.push_back(i.first);
-    }
+    for (size_t i : ind) ret.push_back(oname_.at(i));
     return ret;
   }
 
@@ -591,7 +586,7 @@ namespace casadi {
   size_t Factory<MatType>::imap(const std::string& s) const {
     auto iind = imap_.find(s);
     casadi_assert(iind != imap_.end(),
-      "Cannot process \"" + s + "\" as input. Available: " + join(name_out()) + ".");
+      "Cannot process \"" + s + "\" as input. Available: " + join(oname()) + ".");
     return iind->second;
   }
 
@@ -599,7 +594,7 @@ namespace casadi {
   size_t Factory<MatType>::omap(const std::string& s) const {
     auto oind = omap_.find(s);
     casadi_assert(oind != omap_.end(),
-      "Cannot process \"" + s + "\" as output. Available: " + join(name_out()) + ".");
+      "Cannot process \"" + s + "\" as output. Available: " + join(oname()) + ".");
     return oind->second;
   }
 
