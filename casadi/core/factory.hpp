@@ -41,6 +41,7 @@ namespace casadi {
   struct HBlock {
     size_t f, x1, x2;
     std::string s;
+    bool calculated;
   };
 
   // Helper class for generating new functions
@@ -104,7 +105,7 @@ namespace casadi {
     void calculate_grad(const Dict& opts);
 
     // Calculate Hessian blocks, one expression
-    void calculate_hess(const Dict& opts, const std::string& ex);
+    void calculate_hess(const Dict& opts, size_t f);
 
     // Calculate Hessian blocks
     void calculate_hess(const Dict& opts);
@@ -404,28 +405,19 @@ namespace casadi {
   }
 
   template<typename MatType>
-  void Factory<MatType>::calculate_hess(const Dict& opts, const std::string& ex) {
-    // Get expression to be differentiated
-    MatType f = out_.at(omap_.at(ex));
+  void Factory<MatType>::calculate_hess(const Dict& opts, size_t f) {
     // Handle all blocks for this expression
     for (auto &&b : hess_) {
-      if (oname_[b.f] != ex) continue;
-      // Get block name, skip if already calculated
-      if (omap_.find(b.s) != omap_.end()) continue;
+      if (b.f != f) continue;
+      // Skip if already calculated
+      if (b.calculated) continue;
       // Calculate Hessian blocks
       const MatType& x1 = in_[b.x1];
       const MatType& x2 = in_[b.x2];
-      casadi_assert(omap_.find(b.s) == omap_.end(), "here");
-      if (b.x1 == b.x2) {
-        omap_[b.s] = out_.size();
-        out_.push_back(hessian(f, x1, opts));
-        oname_.push_back(b.s);
-      } else {
-        MatType g = gradient(f, x1);
-        omap_[b.s] = out_.size();
-        out_.push_back(jacobian(g, x2));
-        oname_.push_back(b.s);
-      }
+      MatType H = b.x1 == b.x2 ? hessian(out_.at(f), x1, opts)
+        : jacobian(gradient(out_.at(f), x1), x2);
+      add_output(b.s, H, true);
+      b.calculated = true;
     }
   }
 
@@ -435,9 +427,10 @@ namespace casadi {
     for (auto &&b : hess_) {
       if (is_diff_omap_.at(oname_[b.f]) && is_diff_imap_.at(iname_[b.x1])
           && is_diff_imap_.at(iname_[b.x2])) {
-        is_diff_omap_[b.s] = true;
+        b.calculated = false;
       } else {
         add_output(b.s, MatType(in_[b.x1].numel(), in_[b.x2].numel()), false);
+        b.calculated = true;
       }
       // Consistency check
       casadi_assert(out_.at(b.f).is_scalar(),
@@ -445,10 +438,10 @@ namespace casadi {
     }
     // Calculate regular blocks
     for (auto &&b : hess_) {
-      // Get block name, skip if already calculated
-      if (omap_.find(b.s) != omap_.end()) continue;
+      // Skip if already calculated
+      if (b.calculated) continue;
       // Calculate all Hessian blocks for b.f
-      calculate_hess(opts, oname_[b.f]);
+      calculate_hess(opts, b.f);
     }
   }
 
