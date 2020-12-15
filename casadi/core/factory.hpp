@@ -35,6 +35,7 @@ namespace casadi {
   // A Jacobian or gradient block
   struct Block {
     size_t f, x;
+    bool calculated;
   };
 
   // A Hessian block
@@ -97,6 +98,9 @@ namespace casadi {
 
     // Calculate reverse mode directional derivatives
     void calculate_adj(const Dict& opts);
+
+    // Find a Jacobian block
+    size_t find_jac(size_t f, size_t x) const;
 
     // Calculate Jacobian blocks
     void calculate_jac(const Dict& opts);
@@ -303,14 +307,24 @@ namespace casadi {
   }
 
   template<typename MatType>
+  size_t Factory<MatType>::find_jac(size_t f, size_t x) const {
+    for (size_t k = 0; k < jac_.size(); ++k) {
+      if (jac_[k].f == f && jac_[k].x == x) return k;
+    }
+    // Not in list
+    return -1;
+  }
+
+  template<typename MatType>
   void Factory<MatType>::calculate_jac(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : jac_) {
       std::string s = "jac:" + oname_.at(b.f) + ":" + iname_.at(b.x);
       if (is_diff_omap_.at(oname_.at(b.f)) && is_diff_imap_.at(iname_.at(b.x))) {
-        is_diff_omap_[s] = true;
+        b.calculated = false;
       } else {
         add_output(s, MatType(out_[b.f].numel(), in_[b.x].numel()), false);
+        b.calculated = true;
       }
     }
     // Calculate regular blocks
@@ -325,8 +339,7 @@ namespace casadi {
         // Check if same input
         if (b1.x != b.x) continue;
         // Check if already calculated
-        std::string s1 = "jac:" + oname_.at(b1.f) + ":" + iname_[b1.x];
-        if (omap_.find(s1) != omap_.end()) continue;
+        if (b1.calculated) continue;
         // Collect expressions
         all_ex.push_back(oname_.at(b1.f));
         ex.push_back(out_.at(b1.f));
@@ -347,7 +360,9 @@ namespace casadi {
         // Check if all blocks corresponding to the same input are needed
         for (const std::string& e : all_ex) {
           std::string s1 = "jac:" + e + ":" + iname_[b1.x];
-          if (is_diff_omap_.find(s1) == is_diff_omap_.end() || omap_.find(s1) != omap_.end()) {
+          // Search for block
+          size_t ind = find_jac(omap(e), b1.x);
+          if (ind == size_t(-1) || jac_[ind].calculated) {
             // Block is not requested or has already been calculated
             skip = true;
             break;
@@ -361,10 +376,8 @@ namespace casadi {
       try {
         // Calculate Jacobian block(s)
         if (ex.size() == 1 && arg.size() == 1) {
-          casadi_assert(omap_.find(s) == omap_.end(), "here");
-          omap_[s] = out_.size();
-          out_.push_back(MatType::jacobian(ex[0], arg[0], opts));
-          oname_.push_back(s);
+          add_output(s, MatType::jacobian(ex[0], arg[0], opts), true);
+          b.calculated = true;
         } else {
           // Calculate Jacobian of all outputs with respect to all inputs
           MatType J = MatType::jacobian(vertcat(ex), vertcat(arg), opts);
@@ -373,11 +386,11 @@ namespace casadi {
           // Save blocks
           for (size_t i = 0; i < all_ex.size(); ++i) {
             for (size_t j = 0; j < all_arg.size(); ++j) {
+              size_t J_ind = find_jac(omap(all_ex[i]), imap(all_arg[j]));
+              casadi_assert(J_ind != size_t(-1), "here");
               std::string sJ = "jac:" + all_ex[i] + ":" + all_arg[j];
-              casadi_assert(omap_.find(sJ) == omap_.end(), "here");
-              omap_[sJ] = out_.size();
-              out_.push_back(J_all.at(i).at(j));
-              oname_.push_back(sJ);
+              add_output(sJ, J_all.at(i).at(j), true);
+              jac_[J_ind].calculated = true;
             }
           }
         }
