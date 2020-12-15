@@ -102,10 +102,10 @@ namespace casadi {
     void calculate_adj(const Dict& opts);
 
     // Find a Jacobian block
-    size_t find_jac(size_t f, size_t x) const;
+    std::vector<Block>::iterator find_jac(size_t f, size_t x);
 
     // Find a Hessian block
-    size_t find_hess(size_t f, size_t x1, size_t x2) const;
+    std::vector<HBlock>::iterator find_hess(size_t f, size_t x1, size_t x2);
 
     // Calculate Jacobian blocks
     void calculate_jac(const Dict& opts);
@@ -297,21 +297,21 @@ namespace casadi {
   }
 
   template<typename MatType>
-  size_t Factory<MatType>::find_jac(size_t f, size_t x) const {
-    for (size_t k = 0; k < jac_.size(); ++k) {
-      if (jac_[k].f == f && jac_[k].x == x) return k;
+  std::vector<Block>::iterator Factory<MatType>::find_jac(size_t f, size_t x) {
+    for (std::vector<Block>::iterator it = jac_.begin(); it != jac_.end(); ++it) {
+      if (it->f == f && it->x == x) return it;
     }
     // Not in list
-    return -1;
+    return jac_.end();
   }
 
   template<typename MatType>
-  size_t Factory<MatType>::find_hess(size_t f, size_t x1, size_t x2) const {
-    for (size_t k = 0; k < hess_.size(); ++k) {
-      if (hess_[k].f == f && hess_[k].x1 == x1 && hess_[k].x2 == x2) return k;
+  std::vector<HBlock>::iterator Factory<MatType>::find_hess(size_t f, size_t x1, size_t x2) {
+    for (std::vector<HBlock>::iterator it = hess_.begin(); it != hess_.end(); ++it) {
+      if (it->f == f && it->x1 == x1 && it->x2 == x2) return it;
     }
     // Not in list
-    return -1;
+    return hess_.end();
   }
 
   template<typename MatType>
@@ -342,8 +342,8 @@ namespace casadi {
         // Skip if all block are not requested or any block has already been calculated
         bool skip = false;
         for (size_t f1 : all_f) {
-          size_t ind = find_jac(f1, b1.x);
-          if (ind == size_t(-1) || jac_[ind].calculated) {
+          auto it = find_jac(f1, b1.x);
+          if (it == jac_.end() || it->calculated) {
             skip = true;
             break;
           }
@@ -373,10 +373,10 @@ namespace casadi {
           // Save blocks
           for (size_t i = 0; i < all_f.size(); ++i) {
             for (size_t j = 0; j < all_x.size(); ++j) {
-              size_t J_ind = find_jac(all_f[i], all_x[j]);
-              if (J_ind != size_t(-1)) {
-                add_output(jac_[J_ind].s, J_all.at(i).at(j), true);
-                jac_[J_ind].calculated = true;
+              auto J_it = find_jac(all_f[i], all_x[j]);
+              if (J_it != jac_.end()) {
+                add_output(J_it->s, J_all.at(i).at(j), true);
+                J_it->calculated = true;
               }
             }
           }
@@ -442,12 +442,12 @@ namespace casadi {
             // The other argument must already be in all_x1
             if (other == a) other_ok = true;
             // Is block not requested?
-            size_t ind = find_hess(f, a, cand);
-            if (ind == size_t(-1) || hess_[ind].calculated) {
+            auto it = find_hess(f, a, cand);
+            if (it == hess_.end() || it->calculated) {
               // Also check mirror block, if there is one
               if (a != cand) {
-                ind = find_hess(f, cand, a);
-                if (ind != size_t(-1) && !hess_[ind].calculated) continue;
+                it = find_hess(f, cand, a);
+                if (it != hess_.end() && !it->calculated) continue;
               }
               // Not a candidate
               cand_ok = false;
