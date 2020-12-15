@@ -346,12 +346,12 @@ namespace casadi {
               const std::vector<std::string>& f_out);
 
     /// Construct a function object
-    Function create_new(const std::string& fname,
-        std::vector<std::string> s_in,
-        std::vector<std::string> s_out, bool sx = false) const;
+    Function create(const std::string& fname,
+        const std::vector<std::string>& s_in,
+        const std::vector<std::string>& s_out, bool sx = false) const;
 
     /// Construct a function object, legacy implementation
-    Function create(const std::string& fname,
+    Function create_old(const std::string& fname,
         const std::vector<std::string>& s_in,
         const std::vector<std::string>& s_out) const;
 

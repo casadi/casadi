@@ -31,6 +31,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 #include "casadi_misc.hpp"
 #include "exception.hpp"
@@ -1653,12 +1654,24 @@ namespace casadi {
     return ret;
   }
 
-  Function DaeBuilder::create_new(const std::string& fname,
-      std::vector<std::string> s_in,
-      std::vector<std::string> s_out, bool sx) const {
-    // Replace '_' with ':', if needed
+  Function DaeBuilder::create(const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out, bool sx) const {
+    // Are there any '_' in the names?
+    bool with_underscore = false;
     for (auto s_io : {&s_in, &s_out}) {
-      for (std::string& s : *s_io) replace(s.begin(), s.end(), '_', ':');
+      for (const std::string& s : *s_io) {
+        with_underscore = with_underscore || std::count(s.begin(), s.end(), '_');
+      }
+    }
+    // Replace '_' with ':', if needed
+    if (with_underscore) {
+      std::vector<std::string> s_in_mod(s_in), s_out_mod(s_out);
+      for (auto s_io : {&s_in_mod, &s_out_mod}) {
+        for (std::string& s : *s_io) replace(s.begin(), s.end(), '_', ':');
+      }
+      // Recursive call
+      return create(fname, s_in_mod, s_out_mod, sx);
     }
     // Check if dependent variables are given and needed
     bool elim_v;
@@ -1680,7 +1693,7 @@ namespace casadi {
     return oracle(sx, elim_v).factory(fname, s_in, s_out, lc_);
   }
 
-  Function DaeBuilder::create(const std::string& fname,
+  Function DaeBuilder::create_old(const std::string& fname,
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const {
 
