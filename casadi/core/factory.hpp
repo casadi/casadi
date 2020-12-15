@@ -34,7 +34,7 @@ namespace casadi {
 
   // A Jacobian or gradient block
   struct Block {
-    std::string ex, arg;
+    size_t f, x;
   };
 
   // A Hessian block
@@ -54,7 +54,7 @@ namespace casadi {
     std::vector<std::string> iname_, oname_;
 
     // All input and output expressions created so far
-    std::map<std::string, size_t> imap2_, omap2_;
+    std::map<std::string, size_t> imap_, omap_;
     std::map<std::string, bool> is_diff_imap_, is_diff_omap_;
 
     // Forward mode directional derivatives
@@ -111,6 +111,12 @@ namespace casadi {
     // Calculate requested outputs
     void calculate(const Dict& opts = Dict());
 
+    // Get input index from string
+    size_t imap(const std::string& s) const;
+
+    // Get output index from string
+    size_t omap(const std::string& s) const;
+
     // Retrieve an input
     MatType get_input(const std::string& s);
 
@@ -124,10 +130,10 @@ namespace casadi {
     static std::pair<std::string, std::string> split_prefix(const std::string& s);
 
     // Check if input exists
-    bool has_in(const std::string& s) const { return imap2_.find(s)!=imap2_.end();}
+    bool has_in(const std::string& s) const { return imap_.find(s)!=imap_.end();}
 
     // Check if out exists
-    bool has_out(const std::string& s) const { return omap2_.find(s) != omap2_.end();}
+    bool has_out(const std::string& s) const { return omap_.find(s) != omap_.end();}
 
     // Get input scheme
     std::vector<std::string> name_in() const;
@@ -140,7 +146,7 @@ namespace casadi {
   void Factory<MatType>::
   add_input(const std::string& s, const MatType& e, bool is_diff) {
     size_t ind = in_.size();
-    auto it = imap2_.insert(make_pair(s, ind));
+    auto it = imap_.insert(make_pair(s, ind));
     casadi_assert(it.second, "Duplicate input expression \"" + s + "\"");
     is_diff_imap_.insert(make_pair(s, is_diff));
     in_.push_back(e);
@@ -151,7 +157,7 @@ namespace casadi {
   void Factory<MatType>::
   add_output(const std::string& s, const MatType& e, bool is_diff) {
     size_t ind = out_.size();
-    auto it = omap2_.insert(make_pair(s, ind));
+    auto it = omap_.insert(make_pair(s, ind));
     casadi_assert(it.second, "Duplicate output expression \"" + s + "\"");
     is_diff_omap_.insert(make_pair(s, is_diff));
     out_.push_back(e);
@@ -218,20 +224,8 @@ namespace casadi {
       adj_omap_.push_back(ss.second);
     } else if (ss.first=="jac") {
       jac_.push_back(block(ss.second));
-      casadi_assert(has_out(jac_.back().ex),
-        "Cannot process \"" + jac_.back().ex + "\" (from \"" + s + "\") as output. "
-        "Available: " + join(name_out()) + ".");
-      casadi_assert(has_in(jac_.back().arg),
-        "Cannot process \"" + jac_.back().arg + "\" (from \"" + s + "\") as input. "
-        "Available: " + join(name_in()) + ".");
     } else if (ss.first=="grad") {
       grad_.push_back(block(ss.second));
-      casadi_assert(has_out(grad_.back().ex),
-        "Cannot process \"" + grad_.back().ex + "\" (from \"" + s + "\") as output. "
-        "Available: " + join(name_out()) + ".");
-      casadi_assert(has_in(grad_.back().arg),
-        "Cannot process \"" + grad_.back().arg + "\" (from \"" + s + "\") as input. "
-        "Available: " + join(name_in()) + ".");
     } else if (ss.first=="hess") {
       hess_.push_back(hblock(ss.second));
       casadi_assert(has_out(hess_.back().ex),
@@ -263,14 +257,14 @@ namespace casadi {
     std::vector<std::vector<MatType>> seed(1), sens(1);
     // Inputs and forward mode seeds
     for (const std::string& s : fwd_imap_) {
-      arg.push_back(in_[imap2_[s]]);
+      arg.push_back(in_[imap_[s]]);
       Sparsity sp = is_diff_imap_[s] ? arg.back().sparsity() : Sparsity(arg.back().size());
       seed[0].push_back(MatType::sym("fwd_" + s, sp));
       add_input("fwd:" + s, seed[0].back(), true);
     }
     // Outputs
     for (const std::string& s : fwd_omap_) {
-      res.push_back(out_.at(omap2_[s]));
+      res.push_back(out_.at(omap_[s]));
     }
     // Calculate directional derivatives
     Dict local_opts = opts;
@@ -293,11 +287,11 @@ namespace casadi {
     std::vector<std::vector<MatType>> seed(1), sens(1);
     // Inputs
     for (const std::string& s : adj_omap_) {
-      arg.push_back(in_[imap2_[s]]);
+      arg.push_back(in_[imap_[s]]);
     }
     // Outputs and reverse mode seeds
     for (const std::string& s : adj_imap_) {
-      res.push_back(out_.at(omap2_[s]));
+      res.push_back(out_.at(omap_[s]));
       Sparsity sp = is_diff_omap_[s] ? res.back().sparsity() : Sparsity(res.back().size());
       seed[0].push_back(MatType::sym("adj_" + s, sp));
       add_input("adj:" + s, seed[0].back(), true);
@@ -319,39 +313,39 @@ namespace casadi {
   void Factory<MatType>::calculate_jac(const Dict& opts) {
     // Calculate blocks for all non-differentiable inputs and outputs
     for (auto &&b : jac_) {
-      std::string s = "jac:" + b.ex + ":" + b.arg;
-      if (is_diff_omap_.at(b.ex) && is_diff_imap_.at(b.arg)) {
+      std::string s = "jac:" + oname_.at(b.f) + ":" + iname_.at(b.x);
+      if (is_diff_omap_.at(oname_.at(b.f)) && is_diff_imap_.at(iname_.at(b.x))) {
         is_diff_omap_[s] = true;
       } else {
-        add_output(s, MatType(out_[omap2_.at(b.ex)].numel(), in_[imap2_.at(b.arg)].numel()), false);
+        add_output(s, MatType(out_[b.f].numel(), in_[b.x].numel()), false);
       }
     }
     // Calculate regular blocks
     for (auto &&b : jac_) {
       // Get block name, skip if already calculated
-      std::string s = "jac:" + b.ex + ":" + b.arg;
-      if (omap2_.find(s) != omap2_.end()) continue;
+      std::string s = "jac:" + oname_[b.f] + ":" + iname_[b.x];
+      if (omap_.find(s) != omap_.end()) continue;
       // Find other blocks with the same input, but different (not yet calculated) outputs
       std::vector<MatType> ex;
       std::vector<std::string> all_ex;
       for (auto &&b1 : jac_) {
         // Check if same input
-        if (b1.arg != b.arg) continue;
+        if (b1.x != b.x) continue;
         // Check if already calculated
-        std::string s1 = "jac:" + b1.ex + ":" + b1.arg;
-        if (omap2_.find(s1) != omap2_.end()) continue;
+        std::string s1 = "jac:" + oname_.at(b1.f) + ":" + iname_[b1.x];
+        if (omap_.find(s1) != omap_.end()) continue;
         // Collect expressions
-        all_ex.push_back(b1.ex);
-        ex.push_back(out_.at(omap2_.at(b1.ex)));
+        all_ex.push_back(oname_.at(b1.f));
+        ex.push_back(out_.at(b1.f));
       }
       // Now find other blocks with *all* the same outputs, but different inputs
-      std::vector<MatType> arg{in_[imap2_.at(b.arg)]};
-      std::vector<std::string> all_arg{b.arg};
+      std::vector<MatType> arg{in_[b.x]};
+      std::vector<std::string> all_arg{iname_[b.x]};
       for (auto &&b1 : jac_) {
         // Candidate b1.arg: Check if already added
         bool skip = false;
         for (const std::string& a : all_arg) {
-          if (a == b1.arg) {
+          if (a == iname_[b1.x]) {
             skip = true;
             break;
           }
@@ -359,8 +353,8 @@ namespace casadi {
         if (skip) continue;
         // Check if all blocks corresponding to the same input are needed
         for (const std::string& e : all_ex) {
-          std::string s1 = "jac:" + e + ":" + b1.arg;
-          if (is_diff_omap_.find(s1) == is_diff_omap_.end() || omap2_.find(s1) != omap2_.end()) {
+          std::string s1 = "jac:" + e + ":" + iname_[b1.x];
+          if (is_diff_omap_.find(s1) == is_diff_omap_.end() || omap_.find(s1) != omap_.end()) {
             // Block is not requested or has already been calculated
             skip = true;
             break;
@@ -368,14 +362,14 @@ namespace casadi {
         }
         if (skip) continue;
         // Keep candidate
-        arg.push_back(in_[imap2_.at(b1.arg)]);
-        all_arg.push_back(b1.arg);
+        arg.push_back(in_[b1.x]);
+        all_arg.push_back(iname_[b1.x]);
       }
       try {
         // Calculate Jacobian block(s)
         if (ex.size() == 1 && arg.size() == 1) {
-          casadi_assert(omap2_.find(s) == omap2_.end(), "here");
-          omap2_[s] = out_.size();
+          casadi_assert(omap_.find(s) == omap_.end(), "here");
+          omap_[s] = out_.size();
           out_.push_back(MatType::jacobian(ex[0], arg[0], opts));
           oname_.push_back(s);
         } else {
@@ -387,8 +381,8 @@ namespace casadi {
           for (size_t i = 0; i < all_ex.size(); ++i) {
             for (size_t j = 0; j < all_arg.size(); ++j) {
               std::string sJ = "jac:" + all_ex[i] + ":" + all_arg[j];
-              casadi_assert(omap2_.find(sJ) == omap2_.end(), "here");
-              omap2_[sJ] = out_.size();
+              casadi_assert(omap_.find(sJ) == omap_.end(), "here");
+              omap_[sJ] = out_.size();
               out_.push_back(J_all.at(i).at(j));
               oname_.push_back(sJ);
             }
@@ -405,14 +399,14 @@ namespace casadi {
   template<typename MatType>
   void Factory<MatType>::calculate_grad(const Dict& opts) {
     for (auto &&b : grad_) {
-      const MatType& ex = out_.at(omap2_.at(b.ex));
-      const MatType& arg = in_[imap2_.at(b.arg)];
-      if (is_diff_omap_.at(b.ex) && is_diff_imap_.at(b.arg)) {
-        add_output("grad:" + b.ex + ":" + b.arg,
+      const MatType& ex = out_.at(b.f);
+      const MatType& arg = in_[b.x];
+      if (is_diff_omap_.at(oname_[b.f]) && is_diff_imap_.at(iname_[b.x])) {
+        add_output("grad:" + oname_[b.f] + ":" + iname_[b.x],
           project(gradient(ex, arg, opts), arg.sparsity()), true);
       } else {
         casadi_assert(ex.is_scalar(), "Can only take gradient of scalar expression.");
-        add_output("grad:" + b.ex + ":" + b.arg, MatType(1, arg.numel()), false);
+        add_output("grad:" + oname_[b.f] + ":" + iname_[b.x], MatType(1, arg.numel()), false);
       }
     }
   }
@@ -420,23 +414,23 @@ namespace casadi {
   template<typename MatType>
   void Factory<MatType>::calculate_hess(const Dict& opts, const std::string& ex) {
     // Get expression to be differentiated
-    MatType f = out_.at(omap2_.at(ex));
+    MatType f = out_.at(omap_.at(ex));
     // Handle all blocks for this expression
     for (auto &&b : hess_) {
       if (b.ex != ex) continue;
       // Get block name, skip if already calculated
-      if (omap2_.find(b.s) != omap2_.end()) continue;
+      if (omap_.find(b.s) != omap_.end()) continue;
       // Calculate Hessian blocks
-      const MatType& x1 = in_[imap2_.at(b.arg1)];
-      const MatType& x2 = in_[imap2_.at(b.arg2)];
-      casadi_assert(omap2_.find(b.s) == omap2_.end(), "here");
+      const MatType& x1 = in_[imap_.at(b.arg1)];
+      const MatType& x2 = in_[imap_.at(b.arg2)];
+      casadi_assert(omap_.find(b.s) == omap_.end(), "here");
       if (b.arg1 == b.arg2) {
-        omap2_[b.s] = out_.size();
+        omap_[b.s] = out_.size();
         out_.push_back(hessian(f, x1, opts));
         oname_.push_back(b.s);
       } else {
         MatType g = gradient(f, x1);
-        omap2_[b.s] = out_.size();
+        omap_[b.s] = out_.size();
         out_.push_back(jacobian(g, x2));
         oname_.push_back(b.s);
       }
@@ -450,17 +444,17 @@ namespace casadi {
       if (is_diff_omap_.at(b.ex) && is_diff_imap_.at(b.arg1) && is_diff_imap_.at(b.arg2)) {
         is_diff_omap_[b.s] = true;
       } else {
-        add_output(b.s, MatType(in_[imap2_.at(b.arg1)].numel(),
-          in_[imap2_.at(b.arg2)].numel()), false);
+        add_output(b.s, MatType(in_[imap_.at(b.arg1)].numel(),
+          in_[imap_.at(b.arg2)].numel()), false);
       }
       // Consistency check
-      casadi_assert(out_.at(omap2_.at(b.ex)).is_scalar(),
+      casadi_assert(out_.at(omap_.at(b.ex)).is_scalar(),
         "Can only take Hessian of scalar expression.");
     }
     // Calculate regular blocks
     for (auto &&b : hess_) {
       // Get block name, skip if already calculated
-      if (omap2_.find(b.s) != omap2_.end()) continue;
+      if (omap_.find(b.s) != omap_.end()) continue;
       // Calculate all Hessian blocks for b.ex
       calculate_hess(opts, b.ex);
     }
@@ -469,7 +463,7 @@ namespace casadi {
   template<typename MatType>
   void Factory<MatType>::add_dual(const Function::AuxOut& aux) {
     // Dual variables
-    for (auto&& e : omap2_) {
+    for (auto&& e : omap_) {
       Sparsity sp = is_diff_omap_[e.first] ? out_.at(e.second).sparsity()
         : Sparsity(out_.at(e.second).size());
       add_input("lam:" + e.first, MatType::sym("lam_" + e.first, sp), true);
@@ -478,7 +472,7 @@ namespace casadi {
     for (auto i : aux) {
       MatType lc = 0;
       for (auto j : i.second) {
-        lc += dot(in_.at(imap2_.at("lam:" + j)), out_.at(omap2_.at(j)));
+        lc += dot(in_.at(imap_.at("lam:" + j)), out_.at(omap_.at(j)));
       }
       add_output(i.first, lc, true);
     }
@@ -524,8 +518,8 @@ namespace casadi {
 
   template<typename MatType>
   MatType Factory<MatType>::get_input(const std::string& s) {
-    auto it = imap2_.find(s);
-    casadi_assert(it!=imap2_.end(), "Cannot retrieve \"" + s + "\"");
+    auto it = imap_.find(s);
+    casadi_assert(it!=imap_.end(), "Cannot retrieve \"" + s + "\"");
     return in_.at(it->second);
   }
 
@@ -534,8 +528,8 @@ namespace casadi {
     using namespace std;
 
     // Quick return if output
-    auto it = omap2_.find(s);
-    if (it!=omap2_.end()) return out_.at(it->second);
+    auto it = omap_.find(s);
+    if (it!=omap_.end()) return out_.at(it->second);
 
     // Assume attribute
     casadi_assert(has_prefix(s), "Cannot process \"" + s + "\"");
@@ -582,7 +576,7 @@ namespace casadi {
   template<typename MatType>
   std::vector<std::string> Factory<MatType>::name_in() const {
     std::vector<std::string> ret;
-    for (auto i : imap2_) {
+    for (auto i : imap_) {
       ret.push_back(i.first);
     }
     return ret;
@@ -591,10 +585,26 @@ namespace casadi {
   template<typename MatType>
   std::vector<std::string> Factory<MatType>::name_out() const {
     std::vector<std::string> ret;
-    for (auto i : omap2_) {
+    for (auto i : omap_) {
       ret.push_back(i.first);
     }
     return ret;
+  }
+
+  template<typename MatType>
+  size_t Factory<MatType>::imap(const std::string& s) const {
+    auto iind = imap_.find(s);
+    casadi_assert(iind != imap_.end(),
+      "Cannot process \"" + s + "\" as input. Available: " + join(name_out()) + ".");
+    return iind->second;
+  }
+
+  template<typename MatType>
+  size_t Factory<MatType>::omap(const std::string& s) const {
+    auto oind = omap_.find(s);
+    casadi_assert(oind != omap_.end(),
+      "Cannot process \"" + s + "\" as output. Available: " + join(name_out()) + ".");
+    return oind->second;
   }
 
   template<typename MatType>
@@ -602,8 +612,8 @@ namespace casadi {
     Block b;
     size_t pos = s.find(':');
     if (pos<s.size()) {
-      b.ex = s.substr(0, pos);
-      b.arg = s.substr(pos+1, std::string::npos);
+      b.f = omap(s.substr(0, pos));
+      b.x = imap(s.substr(pos+1, std::string::npos));
     }
     return b;
   }
