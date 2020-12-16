@@ -2219,7 +2219,7 @@ namespace casadi {
       << " { return " << n_out_ << ";}\n\n";
 
     // Default inputs
-    g << g.declare("casadi_real " + name_ + "_default_in(casadi_int i)") << "{\n"
+    g << g.declare("casadi_real " + name_ + "_default_in(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<n_in_; ++i) {
       double def = get_default_in(i);
@@ -2229,7 +2229,7 @@ namespace casadi {
       << "}\n\n";
 
     // Input names
-    g << g.declare("const char* " + name_ + "_name_in(casadi_int i)") << "{\n"
+    g << g.declare("const char* " + name_ + "_name_in(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<n_in_; ++i) {
       g << "case " << i << ": return \"" << name_in_[i] << "\";\n";
@@ -2238,7 +2238,7 @@ namespace casadi {
       << "}\n\n";
 
     // Output names
-    g << g.declare("const char* " + name_ + "_name_out(casadi_int i)") << "{\n"
+    g << g.declare("const char* " + name_ + "_name_out(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<n_out_; ++i) {
       g << "case " << i << ": return \"" << name_out_[i] << "\";\n";
@@ -2264,6 +2264,28 @@ namespace casadi {
       << "if (sz_w) *sz_w = " << sz_w_codegen << ";\n"
       << "return 0;\n"
       << "}\n\n";
+
+    // Which inputs are differentiable
+    if (!all(is_diff_in_)) {
+      g << g.declare("int " + name_ + "_diff_in(casadi_int i)") << " {\n"
+        << "switch (i) {\n";
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << "case " << i << ": return " << is_diff_in_[i] << ";\n";
+      }
+      g << "default: return -1;\n}\n"
+        << "}\n\n";
+    }
+
+    // Which outputs are differentiable
+    if (!all(is_diff_out_)) {
+      g << g.declare("int " + name_ + "_diff_out(casadi_int i)") << " {\n"
+        << "switch (i) {\n";
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << "case " << i << ": return " << is_diff_out_[i] << ";\n";
+      }
+      g << "default: return -1;\n}\n"
+        << "}\n\n";
+    }
 
     // Generate mex gateway for the function
     if (g.mex) {
