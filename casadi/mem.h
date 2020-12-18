@@ -51,6 +51,7 @@ typedef casadi_int (*casadi_getint_t)(void);
 typedef int (*casadi_checkout_t)(void);
 typedef void (*casadi_release_t)(int);
 typedef const casadi_int* (*casadi_sparsity_t)(casadi_int i);
+typedef int (*casadi_diff_t)(casadi_int i);
 typedef const char* (*casadi_name_t)(casadi_int i);
 typedef int (*casadi_work_t)(casadi_int* sz_arg, casadi_int* sz_res,
                              casadi_int* sz_iw, casadi_int* sz_w);

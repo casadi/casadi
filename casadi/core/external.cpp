@@ -92,6 +92,7 @@ namespace casadi {
   bool GenericExternal::any_symbol_found() const {
     return External::any_symbol_found() ||
       get_sparsity_in_ || get_sparsity_out_ ||
+      get_diff_in_ || get_diff_out_ ||
       checkout_ || release_ ||
       eval_;
   }
@@ -101,6 +102,10 @@ namespace casadi {
     // Functions for retrieving sparsities of inputs and outputs
     get_sparsity_in_ = (sparsity_t)li_.get_function(name_ + "_sparsity_in");
     get_sparsity_out_ = (sparsity_t)li_.get_function(name_ + "_sparsity_out");
+
+    // Differentiability of inputs and outputs
+    get_diff_in_ = (diff_t)li_.get_function(name_ + "_diff_in");
+    get_diff_out_ = (diff_t)li_.get_function(name_ + "_diff_out");
 
     // Memory management functions
     checkout_ = (casadi_checkout_t) li_.get_function(name_ + "_checkout");
@@ -197,6 +202,26 @@ namespace casadi {
     } else {
       // Fall back to base class
       return FunctionInternal::get_sparsity_out(i);
+    }
+  }
+
+  bool GenericExternal::is_diff_in(casadi_int i) {
+    if (get_diff_in_) {
+      // Query function exists
+      return get_diff_in_(i);
+    } else {
+      // Fall back to base class
+      return FunctionInternal::is_diff_in(i);
+    }
+  }
+
+  bool GenericExternal::is_diff_out(casadi_int i) {
+    if (get_diff_out_) {
+      // Query function exists
+      return get_diff_out_(i);
+    } else {
+      // Fall back to base class
+      return FunctionInternal::is_diff_out(i);
     }
   }
 

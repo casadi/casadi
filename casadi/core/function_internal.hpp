@@ -310,7 +310,7 @@ namespace casadi {
 
     ///@{
     /** Helper function
-     * 
+     *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
      * \param npar[out] required number of parallel calls (or -1)
      */
@@ -319,7 +319,7 @@ namespace casadi {
 
     ///@{
     /** \brief Check if input arguments have correct length and dimensions
-     * 
+     *
      * Raises errors.
      *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
@@ -331,9 +331,9 @@ namespace casadi {
 
     ///@{
     /** \brief Check if output arguments have correct length and dimensions
-     * 
+     *
      * Raises errors.
-     * 
+     *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
      * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
      */
@@ -342,9 +342,9 @@ namespace casadi {
     ///@}
 
     /** \brief Check if input arguments that needs to be replaced
-     * 
+     *
      * Raises errors
-     * 
+     *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
      * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
      */
@@ -352,9 +352,9 @@ namespace casadi {
     matching_arg(const std::vector<M>& arg, casadi_int& npar) const;
 
     /** \brief Check if output arguments that needs to be replaced
-     * 
+     *
      * Raises errors
-     * 
+     *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
      * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
      */
@@ -366,12 +366,12 @@ namespace casadi {
     template<typename M> std::vector<M>
     replace_arg(const std::vector<M>& arg, casadi_int npar) const;
 
-    /** \brief Project sparsities 
+    /** \brief Project sparsities
      * */
     template<typename M> std::vector<M>
     project_arg(const std::vector<M>& arg, casadi_int npar) const;
 
-    /** \brief Project sparsities 
+    /** \brief Project sparsities
      * */
     template<typename M> std::vector<M>
     project_res(const std::vector<M>& arg, casadi_int npar) const;
@@ -407,9 +407,6 @@ namespace casadi {
     std::vector<DM> nz_in(const std::vector<double>& arg) const;
     std::vector<DM> nz_out(const std::vector<double>& res) const;
     ///@}
-
-    virtual bool is_diff_out(casadi_int i) { return true; }
-    virtual bool is_diff_in(casadi_int i) { return true; }
 
     ///@{
     /** \brief Forward mode AD, virtual functions overloaded in derived classes */
@@ -772,6 +769,12 @@ namespace casadi {
 
     /** \brief Get sparsity of a given output */
     virtual Sparsity get_sparsity_out(casadi_int i);
+
+    /** \brief Which inputs are differentiable */
+    virtual bool is_diff_in(casadi_int i) { return true; }
+
+    /** \brief Which outputs are differentiable */
+    virtual bool is_diff_out(casadi_int i) { return true; }
 
     /** \brief Get input scheme index by name */
     casadi_int index_in(const std::string &name) const {

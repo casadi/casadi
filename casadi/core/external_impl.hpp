@@ -166,6 +166,8 @@ namespace casadi {
   class CASADI_EXPORT GenericExternal : public External {
     // Sparsities
     sparsity_t get_sparsity_in_, get_sparsity_out_;
+    // Differentiability
+    diff_t get_diff_in_, get_diff_out_;
 
   public:
     /** \brief Constructor */
@@ -187,6 +189,12 @@ namespace casadi {
     /** \brief Retreive sparsities */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
+    /// @}
+
+    /// @{
+    /** \brief Retreive differentiability */
+    bool is_diff_in(casadi_int i) override;
+    bool is_diff_out(casadi_int i) override;
     /// @}
 
     /** \brief Serialize type information */
