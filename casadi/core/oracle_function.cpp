@@ -73,6 +73,7 @@ namespace casadi {
     bool expand = false;
 
     show_eval_warnings_ = true;
+    delay_expand_ = false;
 
     // Read options
     for (auto&& op : opts) {
