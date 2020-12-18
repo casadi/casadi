@@ -61,6 +61,13 @@ if has_conic("osqp"):
     options = []
   conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": options,"soc":False,"discrete":False}))
 
+if has_conic("qpalm"):
+  extralibs.append("qpalm")
+  options = ["-Wno-unused-variable"]
+  if os.name=='nt':
+    options = []
+  conics.append(("qpalm",{"qpalm":{"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": options,"soc":False,"discrete":False}))
+
 if has_conic("superscs"):
   conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"discrete":False}))
 

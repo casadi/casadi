@@ -570,6 +570,10 @@ add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver Sup
 option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
+# QPALM: An proximal augmented Lagrangian QP solver
+option(WITH_QPALM "Compile the interface to QPALM (the source code for QPALM is included)" OFF)
+add_feature_info(qpalm-interface WITH_QPALM "Interface to QP solver QPALM.")
+
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)

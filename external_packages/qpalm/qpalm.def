@@ -1,0 +1,10 @@
+LIBRARY libqpalm.dll
+EXPORTS
+    qpalm_set_default_settings
+    qpalm_setup
+    qpalm_solve
+    qpalm_cleanup
+    qpalm_update_q
+    qpalm_update_bounds
+    qpalm_warm_start
+    qpalm_update_Q_A

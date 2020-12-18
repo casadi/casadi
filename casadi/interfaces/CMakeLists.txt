@@ -98,6 +98,10 @@ if(WITH_OSQP)
   add_subdirectory(osqp)
 endif()
 
+if(WITH_QPALM)
+  add_subdirectory(qpalm)
+endif()
+
 if(WITH_LINT)
   set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)
 endif()
