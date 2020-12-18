@@ -771,10 +771,10 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(casadi_int i);
 
     /** \brief Which inputs are differentiable */
-    virtual bool is_diff_in(casadi_int i) { return true; }
+    virtual bool get_diff_in(casadi_int i) { return true; }
 
     /** \brief Which outputs are differentiable */
-    virtual bool is_diff_out(casadi_int i) { return true; }
+    virtual bool get_diff_out(casadi_int i) { return true; }
 
     /** \brief Get input scheme index by name */
     casadi_int index_in(const std::string &name) const {

@@ -59,7 +59,8 @@ namespace casadi {
     size_t get_n_out() override { return 1;}
     ///@}
 
-    bool is_diff_in(casadi_int i) override { return i==0; }
+    /** \brief Which inputs are differentiable? */
+    bool get_diff_in(casadi_int i) override { return i==0; }
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */

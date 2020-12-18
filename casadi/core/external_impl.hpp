@@ -193,8 +193,8 @@ namespace casadi {
 
     /// @{
     /** \brief Retreive differentiability */
-    bool is_diff_in(casadi_int i) override;
-    bool is_diff_out(casadi_int i) override;
+    bool get_diff_in(casadi_int i) override;
+    bool get_diff_out(casadi_int i) override;
     /// @}
 
     /** \brief Serialize type information */

@@ -78,7 +78,7 @@ namespace casadi {
     }
 
     // Is differentiable? Deferred to bspline
-    bool is_diff_in(casadi_int i) override { return true; }
+    bool get_diff_in(casadi_int i) override { return true; }
 
     // Initialize
     void init(const Dict& opts) override;

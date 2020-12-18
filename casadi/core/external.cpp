@@ -205,23 +205,23 @@ namespace casadi {
     }
   }
 
-  bool GenericExternal::is_diff_in(casadi_int i) {
+  bool GenericExternal::get_diff_in(casadi_int i) {
     if (get_diff_in_) {
       // Query function exists
       return get_diff_in_(i);
     } else {
       // Fall back to base class
-      return FunctionInternal::is_diff_in(i);
+      return FunctionInternal::get_diff_in(i);
     }
   }
 
-  bool GenericExternal::is_diff_out(casadi_int i) {
+  bool GenericExternal::get_diff_out(casadi_int i) {
     if (get_diff_out_) {
       // Query function exists
       return get_diff_out_(i);
     } else {
       // Fall back to base class
-      return FunctionInternal::is_diff_out(i);
+      return FunctionInternal::get_diff_out(i);
     }
   }
 

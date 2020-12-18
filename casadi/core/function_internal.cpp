@@ -490,22 +490,28 @@ namespace casadi {
                      "Changing the problem formulation is strongly encouraged.");
     }
 
-    if (is_diff_in_.empty()) is_diff_in_.resize(n_in_, true);
-    if (is_diff_out_.empty()) is_diff_out_.resize(n_out_, true);
+    // Query which inputs are differentiable if not already provided
+    if (is_diff_in_.empty()) {
+      is_diff_in_.resize(n_in_);
+      for (casadi_int i = 0; i < n_in_; ++i) is_diff_in_[i] = get_diff_in(i);
+    } else {
+      casadi_assert_dev(n_in_ == is_diff_in_.size());
+    }
 
-    casadi_assert(n_in_==is_diff_in_.size(), "Dimension mismatch");
-    casadi_assert(n_out_==is_diff_out_.size(), "Dimension mismatch");
-
-
-    for (casadi_int i=0;i<n_in_;++i) is_diff_in_[i] = is_diff_in_[i] && is_diff_in(i);
-    for (casadi_int i=0;i<n_out_;++i) is_diff_out_[i] = is_diff_out_[i] && is_diff_out(i);
+    // Query which outputs are differentiable if not already provided
+    if (is_diff_out_.empty()) {
+      is_diff_out_.resize(n_out_);
+      for (casadi_int i = 0; i < n_out_; ++i) is_diff_out_[i] = get_diff_out(i);
+    } else {
+      casadi_assert_dev(n_out_ == is_diff_out_.size());
+    }
 
     // Query input sparsities if not already provided
     if (sparsity_in_.empty()) {
       sparsity_in_.resize(n_in_);
       for (casadi_int i=0; i<n_in_; ++i) sparsity_in_[i] = get_sparsity_in(i);
     } else {
-      casadi_assert_dev(sparsity_in_.size()==n_in_);
+      casadi_assert_dev(sparsity_in_.size() == n_in_);
     }
 
     // Query output sparsities if not already provided
@@ -513,7 +519,7 @@ namespace casadi {
       sparsity_out_.resize(n_out_);
       for (casadi_int i=0; i<n_out_; ++i) sparsity_out_[i] = get_sparsity_out(i);
     } else {
-      casadi_assert_dev(sparsity_out_.size()==n_out_);
+      casadi_assert_dev(sparsity_out_.size() == n_out_);
     }
 
     // Query input names if not already provided
