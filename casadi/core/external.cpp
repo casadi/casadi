@@ -335,27 +335,31 @@ namespace casadi {
     // Retrieve function
     Function ret = external(name, li_, opts);
 
+    // Replace colons in input names
+    std::vector<std::string> s_io(s_in);
+    for (std::string& s : s_io) replace(s.begin(), s.end(), ':', '_');
+
     // Inputs consistency checks
     casadi_assert(s_in.size() == ret.n_in(),
       "Inconsistent number of inputs. Expected " + str(s_in.size())+ "  "
-      "(" + str(s_in) + "), got " + str(ret.n_in()) + ".");
-    for (casadi_int i=0; i<s_in.size(); ++i) {
-      string s = s_in[i];
-      replace(s.begin(), s.end(), ':', '_');
-      casadi_assert(s == ret.name_in(i),
-        "Inconsistent input name. Expected: " + str(s_in) + ", "
+      "(" + str(s_io) + "), got " + str(ret.n_in()) + ".");
+    for (size_t i = 0; i < s_in.size(); ++i) {
+      casadi_assert(s_io[i] == ret.name_in(i),
+        "Inconsistent input name. Expected: " + str(s_io) + ", "
         "got " + ret.name_in(i) + " for input " + str(i));
     }
+
+    // Replace colons in output names
+    s_io = s_out;
+    for (std::string& s : s_io) replace(s.begin(), s.end(), ':', '_');
 
     // Outputs consistency checks
     casadi_assert(s_out.size() == ret.n_out(),
       "Inconsistent number of outputs. Expected " + str(s_out.size()) + " "
-      "(" + str(s_out) + "), got " + str(ret.n_out()) + ".");
-    for (casadi_int i=0; i<s_out.size(); ++i) {
-      string s = s_out[i];
-      replace(s.begin(), s.end(), ':', '_');
-      casadi_assert(s == ret.name_out(i),
-        "Inconsistent output name. Expected: " + str(s_out) + ", "
+      "(" + str(s_io) + "), got " + str(ret.n_out()) + ".");
+    for (size_t i = 0; i < s_out.size(); ++i) {
+      casadi_assert(s_io[i] == ret.name_out(i),
+        "Inconsistent output name. Expected: " + str(s_io) + ", "
         "got " + ret.name_out(i) + " for output " + str(i));
     }
 
