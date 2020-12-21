@@ -67,7 +67,7 @@ namespace casadi {
         "Use x0 input to warmstart [Default: true]."}},
       {"warm_start_dual",
        {OT_BOOL,
-        "Use lam_a0 and lam_x0 input to warmstart [Default: truw]."}}
+        "Use lam_a0 and lam_x0 input to warmstart [Default: true]."}}
      }
   };
 
@@ -91,9 +91,9 @@ namespace casadi {
         const Dict& opts = op.second;
         for (auto&& op : opts) {
           if (op.first=="max_iter") {
-            settings_.max_iter = op.second;
+            settings_.max_iter = op.second.as_int();
           } else if (op.first=="inner_max_iter") {
-            settings_.inner_max_iter = op.second;
+            settings_.inner_max_iter = op.second.as_int();
           } else if (op.first=="eps_abs") {
             settings_.eps_abs = op.second;
           } else if (op.first=="eps_rel") {
@@ -117,7 +117,7 @@ namespace casadi {
           } else if (op.first=="sigma_init") {
             settings_.sigma_init = op.second;
           } else if (op.first=="proximal") {
-            settings_.proximal = op.second;
+            settings_.proximal = op.second.as_int();
           } else if (op.first=="gamma_init") {
             settings_.gamma_init = op.second;
           } else if (op.first=="gamma_upd") {
@@ -125,30 +125,30 @@ namespace casadi {
           } else if (op.first=="gamma_max") {
             settings_.gamma_max = op.second;
           } else if (op.first=="scaling") {
-            settings_.scaling = op.second;
+            settings_.scaling = op.second.as_int();
           } else if (op.first=="nonconvex") {
-            settings_.nonconvex = op.second;
+            settings_.nonconvex = op.second.as_int();
           } else if (op.first=="warm_start") {
             casadi_error("OSQP's warm_start option is impure and therefore disabled. "
                          "Use CasADi options 'warm_start_primal' and 'warm_start_dual' instead.");
           } else if (op.first=="verbose") {
-            settings_.verbose = op.second;
+            settings_.verbose = op.second.as_int();
           } else if (op.first=="print_iter") {
-            settings_.print_iter = op.second;
+            settings_.print_iter = op.second.as_int();
           } else if (op.first=="reset_newton_iter") {
-            settings_.reset_newton_iter = op.second;
+            settings_.reset_newton_iter = op.second.as_int();
           } else if (op.first=="enable_dual_termination") {
-            settings_.enable_dual_termination = op.second;
+            settings_.enable_dual_termination = op.second.as_int();
           } else if (op.first=="dual_objective_limit") {
             settings_.dual_objective_limit = op.second;
           } else if (op.first=="time_limit") {
            settings_.time_limit = op.second;
           } else if (op.first=="ordering") {
-            settings_.ordering = op.second;
+            settings_.ordering = op.second.as_int();
           } else if (op.first=="factorization_method") {
-            settings_.factorization_method = op.second;
+            settings_.factorization_method = op.second.as_int();
           } else if (op.first=="max_rank_update") {
-            settings_.max_rank_update = op.second;
+            settings_.max_rank_update = op.second.as_int();
           } else if (op.first=="max_rank_update_fraction") {
             settings_.max_rank_update_fraction = op.second;
           } else {
@@ -266,7 +266,7 @@ namespace casadi {
     casadi_copy(arg[CONIC_LBA], na_, w+nx_);
     casadi_copy(arg[CONIC_UBX], nx_, w+nx_+na_);
     casadi_copy(arg[CONIC_UBA], na_, w+2*nx_+na_);
-    
+
     // Set objective
     if (arg[CONIC_G]) {
       qpalm_update_q(m->work, arg[CONIC_G]);
@@ -278,9 +278,7 @@ namespace casadi {
 
     if (warm_start_primal_) {
       x_warm=arg[CONIC_X0];
-    } 
-    else
-    {
+    } else {
       x_warm=NULL;
     }
 
@@ -288,12 +286,10 @@ namespace casadi {
       casadi_copy(arg[CONIC_LAM_X0], nx_, w);
       casadi_copy(arg[CONIC_LAM_A0], na_, w+nx_);
       y_warm = w;
-    } 
-    else
-    {
+    } else {
       y_warm = NULL;
     }
-    
+
     qpalm_warm_start(m->work, x_warm, y_warm);
 
     // Solve Problem
@@ -433,11 +429,10 @@ namespace casadi {
     g.copy_default(g.arg(CONIC_UBX), nx_, "w+"+str(nx_+na_), "casadi_inf", false);
     g.copy_default(g.arg(CONIC_UBA), na_, "w+"+str(2*nx_+na_), "casadi_inf", false);
     g << "qpalm_update_bounds(work, w, w+" + str(nx_+na_)+ ");\n";
-  
+
     g.copy_default(g.arg(CONIC_LAM_X0), nx_, "w", "0", false);
     g.copy_default(g.arg(CONIC_LAM_A0), na_, "w+"+str(nx_), "0", false);
     g << "qpalm_warm_start(work," + g.arg(CONIC_X0) + ", w);\n";
-
     g << "qpalm_solve(work);\n";
 
     g.copy_check("&work->info->objective", 1, g.res(CONIC_COST), false, true);
@@ -470,8 +465,11 @@ namespace casadi {
     s.unpack("QpalmInterface::warm_start_dual", warm_start_dual_);
 
     qpalm_set_default_settings(&settings_);
-    s.unpack("QpalmInterface::settings::max_iter", settings_.max_iter);
-    s.unpack("QpalmInterface::settings::inner_max_iter", settings_.inner_max_iter);
+    casadi_int max_iter;
+    s.unpack("QpalmInterface::settings::max_iter", max_iter); settings_.max_iter = max_iter;
+    casadi_int inner_max_iter;
+    s.unpack("QpalmInterface::settings::inner_max_iter", inner_max_iter);
+    settings_.inner_max_iter = inner_max_iter;
     s.unpack("QpalmInterface::settings::eps_abs", settings_.eps_abs);
     s.unpack("QpalmInterface::settings::eps_rel", settings_.eps_rel);
     s.unpack("QpalmInterface::settings::eps_abs_in", settings_.eps_abs_in);
@@ -483,23 +481,40 @@ namespace casadi {
     s.unpack("QpalmInterface::settings::delta", settings_.delta);
     s.unpack("QpalmInterface::settings::sigma_max", settings_.sigma_max);
     s.unpack("QpalmInterface::settings::sigma_init", settings_.sigma_init);
-    s.unpack("QpalmInterface::settings::proximal", settings_.proximal);
+    casadi_int proximal;
+    s.unpack("QpalmInterface::settings::proximal", proximal); settings_.proximal = proximal;
     s.unpack("QpalmInterface::settings::gamma_init", settings_.gamma_init);
     s.unpack("QpalmInterface::settings::gamma_upd", settings_.gamma_upd);
     s.unpack("QpalmInterface::settings::gamma_max", settings_.gamma_max);
-    s.unpack("QpalmInterface::settings::scaling", settings_.scaling);
-    s.unpack("QpalmInterface::settings::nonconvex", settings_.nonconvex);
-    s.unpack("QpalmInterface::settings::warm_start", settings_.warm_start);
-    s.unpack("QpalmInterface::settings::verbose", settings_.verbose);
-    s.unpack("QpalmInterface::settings::print_iter", settings_.print_iter);
-    s.unpack("QpalmInterface::settings::reset_newton_iter", settings_.reset_newton_iter);
-    s.unpack("QpalmInterface::settings::enable_dual_termination", settings_.enable_dual_termination);
+    casadi_int scaling;
+    s.unpack("QpalmInterface::settings::scaling", scaling); settings_.scaling = scaling;
+    casadi_int nonconvex;
+    s.unpack("QpalmInterface::settings::nonconvex", nonconvex); settings_.nonconvex = nonconvex;
+    casadi_int warm_start;
+    s.unpack("QpalmInterface::settings::warm_start", warm_start);
+    settings_.warm_start = warm_start;
+    casadi_int verbose;
+    s.unpack("QpalmInterface::settings::verbose", verbose); settings_.verbose = verbose;
+    casadi_int print_iter;
+    s.unpack("QpalmInterface::settings::print_iter", print_iter); settings_.print_iter = print_iter;
+    casadi_int reset_newton_iter;
+    s.unpack("QpalmInterface::settings::reset_newton_iter", reset_newton_iter);
+    settings_.reset_newton_iter = reset_newton_iter;
+    casadi_int enable_dual_termination;
+    s.unpack("QpalmInterface::settings::enable_dual_termination", enable_dual_termination);
+    settings_.enable_dual_termination = enable_dual_termination;
     s.unpack("QpalmInterface::settings::dual_objective_limit", settings_.dual_objective_limit);
     s.unpack("QpalmInterface::settings::time_limit", settings_.time_limit);
-    s.unpack("QpalmInterface::settings::ordering", settings_.ordering);
-    s.unpack("QpalmInterface::settings::factorization_method", settings_.factorization_method);
-    s.unpack("QpalmInterface::settings::max_rank_update", settings_.max_rank_update);
-    s.unpack("QpalmInterface::settings::max_rank_update_fraction", settings_.max_rank_update_fraction);
+    casadi_int ordering;
+    s.unpack("QpalmInterface::settings::ordering", ordering); settings_.ordering = ordering;
+    casadi_int factorization_method;
+    s.unpack("QpalmInterface::settings::factorization_method", factorization_method);
+    settings_.factorization_method = factorization_method;
+    casadi_int max_rank_update;
+    s.unpack("QpalmInterface::settings::max_rank_update", max_rank_update);
+    settings_.max_rank_update = max_rank_update;
+    s.unpack("QpalmInterface::settings::max_rank_update_fraction",
+      settings_.max_rank_update_fraction);
   }
 
   void QpalmInterface::serialize_body(SerializingStream &s) const {
@@ -509,8 +524,9 @@ namespace casadi {
     s.pack("QpalmInterface::nnzA", nnzA_);
     s.pack("QpalmInterface::warm_start_primal", warm_start_primal_);
     s.pack("QpalmInterface::warm_start_dual", warm_start_dual_);
-    s.pack("QpalmInterface::settings::max_iter", settings_.max_iter);
-    s.pack("QpalmInterface::settings::inner_max_iter", settings_.inner_max_iter);
+    s.pack("QpalmInterface::settings::max_iter", static_cast<casadi_int>(settings_.max_iter));
+    s.pack("QpalmInterface::settings::inner_max_iter",
+      static_cast<casadi_int>(settings_.inner_max_iter));
     s.pack("QpalmInterface::settings::eps_abs", settings_.eps_abs);
     s.pack("QpalmInterface::settings::eps_rel", settings_.eps_rel);
     s.pack("QpalmInterface::settings::eps_abs_in", settings_.eps_abs_in);
@@ -522,23 +538,28 @@ namespace casadi {
     s.pack("QpalmInterface::settings::delta", settings_.delta);
     s.pack("QpalmInterface::settings::sigma_max", settings_.sigma_max);
     s.pack("QpalmInterface::settings::sigma_init", settings_.sigma_init);
-    s.pack("QpalmInterface::settings::proximal", settings_.proximal);
+    s.pack("QpalmInterface::settings::proximal", static_cast<casadi_int>(settings_.proximal));
     s.pack("QpalmInterface::settings::gamma_init", settings_.gamma_init);
     s.pack("QpalmInterface::settings::gamma_upd", settings_.gamma_upd);
     s.pack("QpalmInterface::settings::gamma_max", settings_.gamma_max);
-    s.pack("QpalmInterface::settings::scaling", settings_.scaling);
-    s.pack("QpalmInterface::settings::nonconvex", settings_.nonconvex);
-    s.pack("QpalmInterface::settings::warm_start", settings_.warm_start);
-    s.pack("QpalmInterface::settings::verbose", settings_.verbose);
-    s.pack("QpalmInterface::settings::print_iter", settings_.print_iter);
-    s.pack("QpalmInterface::settings::reset_newton_iter", settings_.reset_newton_iter);
-    s.pack("QpalmInterface::settings::enable_dual_termination", settings_.enable_dual_termination);
+    s.pack("QpalmInterface::settings::scaling", static_cast<casadi_int>(settings_.scaling));
+    s.pack("QpalmInterface::settings::nonconvex", static_cast<casadi_int>(settings_.nonconvex));
+    s.pack("QpalmInterface::settings::warm_start", static_cast<casadi_int>(settings_.warm_start));
+    s.pack("QpalmInterface::settings::verbose", static_cast<casadi_int>(settings_.verbose));
+    s.pack("QpalmInterface::settings::print_iter", static_cast<casadi_int>(settings_.print_iter));
+    s.pack("QpalmInterface::settings::reset_newton_iter",
+      static_cast<casadi_int>(settings_.reset_newton_iter));
+    s.pack("QpalmInterface::settings::enable_dual_termination",
+      static_cast<casadi_int>(settings_.enable_dual_termination));
     s.pack("QpalmInterface::settings::dual_objective_limit", settings_.dual_objective_limit);
     s.pack("QpalmInterface::settings::time_limit", settings_.time_limit);
-    s.pack("QpalmInterface::settings::ordering", settings_.ordering);
-    s.pack("QpalmInterface::settings::factorization_method", settings_.factorization_method);
-    s.pack("QpalmInterface::settings::max_rank_update", settings_.max_rank_update);
-    s.pack("QpalmInterface::settings::max_rank_update_fraction", settings_.max_rank_update_fraction);
+    s.pack("QpalmInterface::settings::ordering", static_cast<casadi_int>(settings_.ordering));
+    s.pack("QpalmInterface::settings::factorization_method",
+      static_cast<casadi_int>(settings_.factorization_method));
+    s.pack("QpalmInterface::settings::max_rank_update",
+      static_cast<casadi_int>(settings_.max_rank_update));
+    s.pack("QpalmInterface::settings::max_rank_update_fraction",
+      settings_.max_rank_update_fraction);
   }
 
 } // namespace casadi
