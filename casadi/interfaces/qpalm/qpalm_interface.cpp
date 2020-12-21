@@ -186,6 +186,7 @@ namespace casadi {
     A.i = get_ptr(A_row);
     A.p = get_ptr(A_colind);
     A.symmetry = UNSYMMETRIC;
+    A.values = TRUE;
 
     ladel_sparse_matrix H;
     H.nrow = nx_;
@@ -196,6 +197,7 @@ namespace casadi {
     H.i = get_ptr(H_row);
     H.p = get_ptr(H_colind);
     H.symmetry = UPPER;
+    H.values = TRUE;
 
     QPALMData data;
     // Populate data
@@ -531,6 +533,7 @@ namespace casadi {
     s.pack("QpalmInterface::settings::print_iter", settings_.print_iter);
     s.pack("QpalmInterface::settings::reset_newton_iter", settings_.reset_newton_iter);
     s.pack("QpalmInterface::settings::enable_dual_termination", settings_.enable_dual_termination);
+    s.pack("QpalmInterface::settings::dual_objective_limit", settings_.dual_objective_limit);
     s.pack("QpalmInterface::settings::time_limit", settings_.time_limit);
     s.pack("QpalmInterface::settings::ordering", settings_.ordering);
     s.pack("QpalmInterface::settings::factorization_method", settings_.factorization_method);
