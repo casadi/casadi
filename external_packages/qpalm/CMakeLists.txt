@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.6)
 
 set(PROFILING OFF CACHE BOOL "Enable solver profiling (timing)")
 set(USE_LADEL ON)
+set(INTERFACES OFF)
 
 set(CMAKE_INSTALL_INCLUDEDIR ${INCLUDE_PREFIX})
 set(CMAKE_INSTALL_LIBDIR ${LIB_PREFIX})

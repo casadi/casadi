@@ -178,8 +178,8 @@ namespace casadi {
     std::vector<c_int> H_colind = vector_static_cast<c_int>(H_.get_colind());
 
     ladel_sparse_matrix A;
-    A.m = nx_ + na_;
-    A.n = nx_;
+    A.nrow = nx_ + na_;
+    A.ncol = nx_;
     A.nz = NULL;
     A.nzmax = nnzA_;
     A.x = get_ptr(dummy);
@@ -188,8 +188,8 @@ namespace casadi {
     A.symmetry = UNSYMMETRIC;
 
     ladel_sparse_matrix H;
-    H.m = nx_;
-    H.n = nx_;
+    H.nrow = nx_;
+    H.ncol = nx_;
     H.nz = NULL;
     H.nzmax = H_.nnz();
     H.x = get_ptr(dummy);
@@ -327,8 +327,8 @@ namespace casadi {
     g.constant_copy("H_colind", H_.get_colind());
 
     g.local("A", "ladel_sparse_matrix");
-    g << "A.m = " << nx_ + na_ << ";\n";
-    g << "A.n = " << nx_ << ";\n";
+    g << "A.nrow = " << nx_ + na_ << ";\n";
+    g << "A.ncol = " << nx_ << ";\n";
     g << "A.nz = " << "NULL" << ";\n";
     g << "A.nzmax = " << nnzA_ << ";\n";
     g << "A.x = dummy;\n";
@@ -337,8 +337,8 @@ namespace casadi {
     g << "A.symmetry = UNSYMMETRIC;\n";
 
     g.local("H", "ladel_sparse_matrix");
-    g << "H.m = " << nx_ << ";\n";
-    g << "H.n = " << nx_ << ";\n";
+    g << "H.nrow = " << nx_ << ";\n";
+    g << "H.ncol = " << nx_ << ";\n";
     g << "H.nz = " << "NULL" << ";\n";
     g << "H.nzmax = " << H_.nnz() << ";\n";
     g << "H.x = dummy;\n";
@@ -393,7 +393,7 @@ namespace casadi {
     g << "return 0;\n";
   }
 
-  void OsqpInterface::codegen_body(CodeGenerator& g) const {
+  void QpalmInterface::codegen_body(CodeGenerator& g) const {
     g.add_include("qpalm/qpalm.h");
     g.add_auxiliary(CodeGenerator::AUX_INF);
 
@@ -431,26 +431,7 @@ namespace casadi {
     g.copy_default(g.arg(CONIC_UBX), nx_, "w+"+str(nx_+na_), "casadi_inf", false);
     g.copy_default(g.arg(CONIC_UBA), na_, "w+"+str(2*nx_+na_), "casadi_inf", false);
     g << "qpalm_update_bounds(work, w, w+" + str(nx_+na_)+ ");\n";
-
-
-    if (warm_start_primal_) {
-      x_warm=arg[CONIC_X0];
-    } 
-    else
-    {
-      x_warm=NULL;
-    }
-
-    if (warm_start_dual_) {
-      casadi_copy(arg[CONIC_LAM_X0], nx_, w);
-      casadi_copy(arg[CONIC_LAM_A0], na_, w+nx_);
-      y_warm = w;
-    } 
-    else
-    {
-      y_warm = NULL;
-    }
-    
+  
     g.copy_default(g.arg(CONIC_LAM_X0), nx_, "w", "0", false);
     g.copy_default(g.arg(CONIC_LAM_A0), na_, "w+"+str(nx_), "0", false);
     g << "qpalm_warm_start(work," + g.arg(CONIC_X0) + ", w);\n";
@@ -486,7 +467,7 @@ namespace casadi {
     s.unpack("QpalmInterface::warm_start_primal", warm_start_primal_);
     s.unpack("QpalmInterface::warm_start_dual", warm_start_dual_);
 
-    Qpalm_set_default_settings(&settings_);
+    qpalm_set_default_settings(&settings_);
     s.unpack("QpalmInterface::settings::max_iter", settings_.max_iter);
     s.unpack("QpalmInterface::settings::inner_max_iter", settings_.inner_max_iter);
     s.unpack("QpalmInterface::settings::eps_abs", settings_.eps_abs);
