@@ -602,7 +602,6 @@ template<typename T1>
 T1 casadi_ipqp_sigma(casadi_ipqp_data<T1>* d, T1 alpha) {
   // Local variables
   T1 sigma;
-  casadi_int k;
   const casadi_ipqp_prob<T1>* p = d->prob;
   // Quick return if no inequalities
   if (d->n_con == 0) return 0;
