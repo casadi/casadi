@@ -458,7 +458,9 @@ namespace casadi {
         reverse_options_ = op.second;
       } else if (op.first=="custom_jacobian") {
         custom_jacobian_ = op.second.to_function();
-        jacobian_ = custom_jacobian_;
+        casadi_assert(custom_jacobian_.name() == "jac_" + name_,
+          "Inconsistent naming of custom Jacobian, expected: jac_" + name_);
+        tocache(custom_jacobian_);
       } else if (op.first=="always_inline") {
         always_inline_ = op.second;
       } else if (op.first=="never_inline") {
@@ -2073,38 +2075,29 @@ namespace casadi {
                             "Derivatives cannot be calculated for " + name_);
       return wrap().jacobian(true);
     }
-
-    // Quick return if cached
-    if (jacobian_.alive()) {
-      return shared_cast<Function>(jacobian_.shared());
+    // Retrieve/generate cached
+    Function f;
+    string fname = "jac_" + name_;
+    if (!incache(fname, f)) {
+      // Names of inputs
+      std::vector<std::string> inames;
+      for (casadi_int i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
+      for (casadi_int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
+      // Names of outputs
+      std::vector<std::string> onames = {"jac"};
+      // Options
+      Dict opts;
+      opts["derivative_of"] = self();
+      // Generate derivative function
+      casadi_assert_dev(enable_jacobian_);
+      f = get_jacobian(fname, inames, onames, opts);
+      // Consistency checks
+      casadi_assert_dev(f.n_in() == n_in_ + n_out_);
+      casadi_assert_dev(f.n_out() == 1);
+      // Save to cache
+      tocache(f);
     }
-
-    // Give it a suitable name
-    string name = "jac_" + name_;
-
-    // Names of inputs
-    std::vector<std::string> inames;
-    for (casadi_int i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
-    for (casadi_int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
-
-    // Names of outputs
-    std::vector<std::string> onames = {"jac"};
-
-    // Options
-    Dict opts;
-    opts["derivative_of"] = self();
-
-    // Generate derivative function
-    casadi_assert_dev(enable_jacobian_);
-    Function ret = get_jacobian(name, inames, onames, opts);
-
-    // Consistency check
-    casadi_assert_dev(ret.n_in()==n_in_ + n_out_);
-    casadi_assert_dev(ret.n_out()==1);
-
-    // Cache it for reuse and return
-    jacobian_ = ret;
-    return ret;
+    return f;
   }
 
   Function FunctionInternal::
@@ -3717,10 +3710,11 @@ namespace casadi {
     dump_ = false;
     s.unpack("FunctionInternal::forward_options", forward_options_);
     s.unpack("FunctionInternal::reverse_options", reverse_options_);
-
     s.unpack("FunctionInternal::custom_jacobian", custom_jacobian_);
-    if (!custom_jacobian_.is_null()) jacobian_ = custom_jacobian_;
-
+    if (!custom_jacobian_.is_null()) {
+      casadi_assert_dev(custom_jacobian_.name() == "jac_" + name_);
+      tocache(custom_jacobian_);
+    }
     s.unpack("FunctionInternal::sz_arg_per", sz_arg_per_);
     s.unpack("FunctionInternal::sz_res_per", sz_res_per_);
     s.unpack("FunctionInternal::sz_iw_per", sz_iw_per_);

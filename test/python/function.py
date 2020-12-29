@@ -2160,7 +2160,7 @@ class Functiontests(casadiTestCase):
     n1 = MX.sym("n1")
     n2 = MX.sym("n2")
 
-    J = Function("J",[x,p,n1,n2],[blockcat([[x*pi,1],[1,1]])])
+    J = Function("jac_Q",[x,p,n1,n2],[blockcat([[x*pi,1],[1,1]])])
 
     f = Function('Q',[x,p],[x**2,2*x*p],{"custom_jacobian": J,"jac_penalty":0})
 

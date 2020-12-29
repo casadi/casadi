@@ -909,9 +909,6 @@ namespace casadi {
     /// Function cache
     mutable std::map<std::string, WeakRef> cache_;
 
-    /// Cache for full Jacobian
-    mutable WeakRef jacobian_;
-
     /// Cache for sparsities of the Jacobian blocks
     mutable SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;
 
