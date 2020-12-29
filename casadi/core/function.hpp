@@ -367,15 +367,10 @@ namespace casadi {
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Replaced by Function::factory. */
     Function jacobian_old(casadi_int iind, casadi_int oind) const;
-#endif // WITH_DEPRECATED_FEATURES
 
-    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     * Legacy function: To be deprecated in a future version of CasADi.
-     * Exists only for compatibility with Function::hessian pre-CasADi 3.2
-     */
+    /** \brief [DEPRECATED] Replaced by Function::factory. */
     Function hessian_old(casadi_int iind, casadi_int oind) const;
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
      * the output elements).

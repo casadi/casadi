@@ -786,7 +786,7 @@ class ADtests(casadiTestCase):
           f_out = f.call(values)
           J_ = f_out[1]
 
-          Hf=f.hessian_old(0, 0)
+          Hf = hessian_old(f, 0, 0)
           Hf_out = Hf.call(values)
           self.check_codegen(Hf,inputs=values,std=std)
           self.check_serialize(Hf,inputs=values)

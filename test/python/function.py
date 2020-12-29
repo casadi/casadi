@@ -231,7 +231,7 @@ class Functiontests(casadiTestCase):
       x = SX.sym("x",sp.size2())
       self.assertTrue(sp==sp.T)
       f = Function("f", [x],[mtimes([x.T,DM.ones(sp),x])])
-      J = f.hessian_old(0, 0)
+      J = hessian_old(f, 0, 0)
       sp2 = J.sparsity_out(0)
       self.checkarray(sp.row(),sp2.row())
       self.checkarray(sp.colind(),sp2.colind())
@@ -1153,7 +1153,7 @@ class Functiontests(casadiTestCase):
 
     LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
     LUTJ = jacobian_old(LUT, 0, 0)
-    LUTH = LUT.hessian_old(0, 0)
+    LUTH = hessian_old(LUT, 0, 0)
 
     self.check_codegen(LUT, [vertcat(0.2,0.3)])
     self.check_serialize(LUT, [vertcat(0.2,0.3)])
@@ -1199,7 +1199,7 @@ class Functiontests(casadiTestCase):
     LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
     self.check_codegen(LUT, [0.2])
     LUTJ = jacobian_old(LUT, 0, 0)
-    LUTH = LUT.hessian_old(0, 0)
+    LUTH = hessian_old(LUT, 0, 0)
 
     interp = scipy.interpolate.InterpolatedUnivariateSpline(d_knots[0], data)
     for x in [0,0.01,0.1,0.2,0.9,0.99,1]:

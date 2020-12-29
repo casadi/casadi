@@ -155,6 +155,11 @@ def jacobian_old(f, i, j):
     return f.factory(f.name() + '_jac', f.name_in(),
         ['jac:' + f.name_out(j) + ':' + f.name_in(i)] + f.name_out())
 
+def hessian_old(f, i, j):
+    return f.factory(f.name() + '_hess', f.name_in(),
+        ['hess:' + f.name_out(j) + ':' + f.name_in(i) + ":" + f.name_in(i),
+        'grad:' + f.name_out(j) + ':' + f.name_in(i)] + f.name_out())
+
 class casadiTestCase(unittest.TestCase):
 
   @classmethod
@@ -439,10 +444,10 @@ class casadiTestCase(unittest.TestCase):
         if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
         for j in range(trial.n_out()):
           if trial.sparsity_out(j).is_scalar() and solution.sparsity_out(j).is_scalar():
-            trialhess = trial.hessian_old(i,j)
+            trialhess = hessian_old(trial, i, j)
             self.assertEqual(trialhess.n_in(),trial.n_in())
             self.assertEqual(trialhess.n_out(),trial.n_out()+2)
-            solutionhess = solution.hessian_old(i,j)
+            solutionhess = hessian_old(solution, i, j)
             self.assertEqual(solutionhess.n_in(),solution.n_in())
             self.assertEqual(solutionhess.n_out(),solution.n_out()+2)
             self.checkfunction(trialhess,solutionhess,inputs=inputs,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian_old(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
