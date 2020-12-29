@@ -602,7 +602,6 @@ template<typename T1>
 T1 casadi_ipqp_sigma(casadi_ipqp_data<T1>* d, T1 alpha) {
   // Local variables
   T1 sigma;
-  const casadi_ipqp_prob<T1>* p = d->prob;
   // Quick return if no inequalities
   if (d->n_con == 0) return 0;
   // Calculate projected mu (and save to sigma variable)
@@ -716,8 +715,6 @@ void casadi_ipqp_corrector(casadi_ipqp_data<T1>* d) {
 // SYMBOL "ipqp"
 template<typename T1>
 int casadi_ipqp(casadi_ipqp_data<T1>* d) {
-  // Local variables
-  const casadi_ipqp_prob<T1>* p = d->prob;
   switch (d->next) {
     case IPQP_RESET:
       casadi_ipqp_reset(d);
