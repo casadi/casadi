@@ -381,14 +381,12 @@ namespace casadi {
     * are also all-zero sparse.
     * The Jacobian blocks are sorted starting by all the blocks for the first
     * output, then all the blocks for the second output and so on.
-    * E.g. f:(x,y)->(r,s) results in the function
-    * jac_f:(x,y,r,s)->(dr_dx, dr_dy, ds_dx, ds_dy)
-    *
-    * Optionally generates a function with legacy signature (blocks combined).
+    * E.g. f : (x,y) -> (r,s) results in the function
+    * jac_f : (x,y,r,s) -> (DrDx, DrDy, DsDx, DsDy)
     *
     * This function is cached.
     */
-    Function jacobian(bool old_syntax = true) const;
+    Function jacobian() const;
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */

@@ -2024,56 +2024,13 @@ namespace casadi {
     res = Call::create(self(), arg);
   }
 
-  Function FunctionInternal::jac() const {
-    // Used wrapped function if jacobian not available
-    if (!has_jac()) {
-      // Derivative information must be available
-      casadi_assert(has_derivative(),
-                    "Derivatives cannot be calculated for " + name_);
-      return wrap().jacobian(false);
-    }
-    // Retrieve/generate cached
-    Function f;
-    string fname = "JAC_" + name_;
-    if (!incache(fname, f)) {
-      // Names of inputs
-      std::vector<std::string> inames = name_in_;
-      inames.insert(inames.end(), name_out_.begin(), name_out_.end());
-
-      // Names of outputs
-      std::vector<std::string> onames;
-      onames.reserve(n_in_*n_out_);
-      for (size_t oind=0; oind<n_out_; ++oind) {
-        for (size_t iind=0; iind<n_in_; ++iind) {
-          onames.push_back("D" + name_out_[oind] + "D" + name_in_[iind]);
-        }
-      }
-
-      // Options
-      Dict opts;
-      opts["derivative_of"] = self();
-
-      // Generate derivative function
-      casadi_assert_dev(enable_jacobian_);
-      f = get_jac(fname, inames, onames, opts);
-
-      // Consistency check
-      casadi_assert(f.n_in()==inames.size(),
-                    "Return function has wrong number of inputs");
-      casadi_assert(f.n_out()==onames.size(),
-                    "Return function has wrong number of outputs");
-      tocache(f);
-    }
-    return f;
-  }
-
   Function FunctionInternal::jacobian() const {
     // Used wrapped function if jacobian not available
     if (!has_jacobian()) {
       // Derivative information must be available
       casadi_assert(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
-      return wrap().jacobian(true);
+      return wrap().jacobian();
     }
     // Retrieve/generate cached
     Function f;
@@ -2084,7 +2041,19 @@ namespace casadi {
       for (casadi_int i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
       for (casadi_int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
       // Names of outputs
-      std::vector<std::string> onames = {"jac"};
+      std::vector<std::string> onames;
+#if 1
+      // Single extended Jacobian matrix
+      onames = {"jac"};
+#else
+      // Different Jacobian blocks handled separately
+      onames.reserve(n_in_ * n_out_);
+      for (size_t oind = 0; oind < n_out_; ++oind) {
+        for (size_t iind = 0; iind < n_in_; ++iind) {
+          onames.push_back("D" + name_out_[oind] + "D" + name_in_[iind]);
+        }
+      }
+#endif
       // Options
       Dict opts;
       opts["derivative_of"] = self();
@@ -2092,8 +2061,8 @@ namespace casadi {
       casadi_assert_dev(enable_jacobian_);
       f = get_jacobian(fname, inames, onames, opts);
       // Consistency checks
-      casadi_assert_dev(f.n_in() == n_in_ + n_out_);
-      casadi_assert_dev(f.n_out() == 1);
+      casadi_assert_dev(f.n_in() == inames.size());
+      casadi_assert_dev(f.n_out() == onames.size());
       // Save to cache
       tocache(f);
     }
@@ -2106,14 +2075,6 @@ namespace casadi {
                const std::vector<std::string>& onames,
                const Dict& opts) const {
     casadi_error("'get_jacobian' not defined for " + class_name());
-  }
-
-  Function FunctionInternal::
-  get_jac(const std::string& name,
-               const std::vector<std::string>& inames,
-               const std::vector<std::string>& onames,
-               const Dict& opts) const {
-    casadi_error("'get_jac' not defined for " + class_name());
   }
 
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
@@ -2686,8 +2647,9 @@ namespace casadi {
       // Multiply the Jacobian from the right
       vector<MX> darg = arg;
       darg.insert(darg.end(), res.begin(), res.end());
-      MX J = jacobian()(darg).at(0);
-      v = horzsplit(mtimes(J, horzcat(v)));
+      std::vector<MX> J = jacobian()(darg);
+      if (J.size() > 1) casadi_error("Not implemented");
+      v = horzsplit(mtimes(J.at(0), horzcat(v)));
 
       // Vertical offsets
       vector<casadi_int> offset(n_out_+1, 0);
@@ -2790,8 +2752,9 @@ namespace casadi {
       // Multiply the transposed Jacobian from the right
       vector<MX> darg = arg;
       darg.insert(darg.end(), res.begin(), res.end());
-      MX J = jacobian()(darg).at(0);
-      v = horzsplit(mtimes(J.T(), horzcat(v)));
+      std::vector<MX> J = jacobian()(darg);
+      if (J.size() > 1) casadi_error("Not implemented");
+      v = horzsplit(mtimes(J.at(0).T(), horzcat(v)));
 
       // Vertical offsets
       vector<casadi_int> offset(n_in_+1, 0);
