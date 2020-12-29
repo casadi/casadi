@@ -95,11 +95,11 @@ k3 = f(states+dt/2.0*k2,controls,disturbances)
 k4 = f(states+dt*k3,controls,disturbances)
 
 states_1 = states+dt/6.0*(k1+2*k2+2*k3+k4)
-phi = Function('phi', [states,controls,disturbances],[states_1])
-PHI = phi.jacobian_old(0, 0)
+phi = Function('phi', [states, controls, disturbances], [states_1], ['x', 'u', 'd'], ['x1'])
+PHI = phi.factory('PHI', ['x', 'u', 'd'], ['jac:x1:x'])
 # Define the measurement system
-h = Function('h', [states],[x]) # We have measurements of the position
-H = h.jacobian_old(0, 0)
+h = Function('h', [states], [x], ['x'], ['y']) # We have measurements of the position
+H = h.factory('H', ['x'], ['jac:y:x'])
 # Build the objective
 obj = 0
 # First the arrival cost
@@ -167,13 +167,13 @@ for i in range(1,Nsimulation-N+1):
 
   # Update the arrival cost, using linearisations around the estimate of MHE at the beginning of the horizon (according to the 'Smoothed EKF Update'): first update the state and covariance with the measurement that will be deleted, and next propagate the state and covariance because of the shifting of the horizon
   print("step %d/%d (%s)" % (i, Nsimulation-N , nlpsol.stats()["return_status"]))
-  H0 = H(solution["X",0])[0]
+  H0 = H(solution["X",0])
   K = mtimes([P,H0.T,linalg.inv(mtimes([H0,P,H0.T])+R)])
   P = mtimes((DM.eye(Nstates)-mtimes(K,H0)),P)
   h0 = h(solution["X",0])
   x0 = x0 + mtimes(K, current_parameters["Y",0]-h0-mtimes(H0,x0-solution["X",0]))
   x0 = phi(x0, current_parameters["U",0], solution["W",0])
-  F = PHI(solution["X",0], current_parameters["U",0], solution["W",0])[0]
+  F = PHI(solution["X",0], current_parameters["U",0], solution["W",0])
   P = mtimes([F,P,F.T]) + linalg.inv(Q)
   # Get the measurements and control inputs
   current_parameters["U",lambda x: horzcat(*x)] = simulated_U[:,i:i+N-1]

@@ -61,7 +61,7 @@ except Exception as e:
     systemswig = False
   else:
     systemswig = True
-    
+
 # Pending deprecation in numpy
 check_matrix = False
 
@@ -151,6 +151,9 @@ def toMX_fun(fun):
   ins = fun.mx_in()
   return Function("f",ins,fun(ins))
 
+def jacobian_old(f, i, j):
+    return f.factory(f.name() + '_jac', f.name_in(),
+        ['jac:' + f.name_out(j) + ':' + f.name_in(i)] + f.name_out())
 
 class casadiTestCase(unittest.TestCase):
 
@@ -422,10 +425,10 @@ class casadiTestCase(unittest.TestCase):
       for i in range(trial.n_in()):
         if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
         for j in range(trial.n_out()):
-          trialjac = trial.jacobian_old(i,j)
+          trialjac = jacobian_old(trial, i, j)
           self.assertEqual(trialjac.n_in(),trial.n_in())
           self.assertEqual(trialjac.n_out(),trial.n_out()+1)
-          solutionjac = solution.jacobian_old(i,j)
+          solutionjac = jacobian_old(solution, i, j)
           self.assertEqual(solutionjac.n_in(),solution.n_in())
           self.assertEqual(solutionjac.n_out(),solution.n_out()+1)
 
@@ -585,7 +588,7 @@ class casadiTestCase(unittest.TestCase):
         else:
           defs = " ".join(["-D"+d for d in definitions])
           output = "./" + name + (".so" if shared else "")
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir}".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir,definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options 
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir}".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir,definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
           return [commands, output]
 
       [commands, libname] = get_commands(shared=True)
@@ -629,7 +632,7 @@ class casadiTestCase(unittest.TestCase):
         self.check_serialize(F2,inputs=inputs)
 
   def check_thread_safety(self,F,inputs=None,N=20):
-    
+
     FP = F.map(N, 'thread',2)
     FS = F.map(N, 'thread')
     self.checkfunction_light(FP, FS, inputs)

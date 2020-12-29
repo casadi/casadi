@@ -110,7 +110,7 @@ class Functiontests(casadiTestCase):
 
     f = Function("f", [x,y],[x**2,y,x*y[0]])
 
-    g = f.jacobian_old(0, 0)
+    g = jacobian_old(f, 0, 0)
 
     self.assertEqual(g.n_in(),f.n_in())
     self.assertEqual(g.n_out(),f.n_out()+1)
@@ -345,7 +345,7 @@ class Functiontests(casadiTestCase):
 
     Pf = Function("P", [X, P], [mtimes(M_X,P)])
 
-    P_P = Pf.jacobian_old(1, 0)
+    P_P = jacobian_old(Pf, 1, 0)
 
     self.assertFalse("derivative" in str(P_P))
 
@@ -1152,7 +1152,7 @@ class Functiontests(casadiTestCase):
     d_flat = data.ravel(order='F')
 
     LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
-    LUTJ = LUT.jacobian_old(0, 0)
+    LUTJ = jacobian_old(LUT, 0, 0)
     LUTH = LUT.hessian_old(0, 0)
 
     self.check_codegen(LUT, [vertcat(0.2,0.3)])
@@ -1198,7 +1198,7 @@ class Functiontests(casadiTestCase):
 
     LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
     self.check_codegen(LUT, [0.2])
-    LUTJ = LUT.jacobian_old(0, 0)
+    LUTJ = jacobian_old(LUT, 0, 0)
     LUTH = LUT.hessian_old(0, 0)
 
     interp = scipy.interpolate.InterpolatedUnivariateSpline(d_knots[0], data)
@@ -1341,7 +1341,7 @@ class Functiontests(casadiTestCase):
         f.gradient()
 
       with self.assertRaises(Exception):
-        f.jacobian_old(0, 0)
+        jacobian_old(f, 0, 0)
 
       with self.assertRaises(Exception):
         f.forward(1)

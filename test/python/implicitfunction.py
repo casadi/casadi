@@ -260,7 +260,7 @@ class ImplicitFunctiontests(casadiTestCase):
     # Test values
     x0_val  = 1
 
-    J = F.jacobian_old(0, 0)
+    J = jacobian_old(F, 0, 0)
     J_out = J(x0_val)
     print(J_out[0])
     print(J)

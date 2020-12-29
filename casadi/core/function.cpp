@@ -801,6 +801,7 @@ namespace casadi {
     return (*this)->uses_output();
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   Function Function::jacobian_old(casadi_int iind, casadi_int oind) const {
     // Redirect to factory class
     vector<string> s_in = name_in();
@@ -808,6 +809,7 @@ namespace casadi {
     s_out.insert(s_out.begin(), "jac:" + name_out(oind) + ":" + name_in(iind));
     return factory(name() + "_jac", s_in, s_out);
   }
+#endif  // WITH_DEPRECATED_FEATURES
 
   Function Function::hessian_old(casadi_int iind, casadi_int oind) const {
     // Redirect to factory class

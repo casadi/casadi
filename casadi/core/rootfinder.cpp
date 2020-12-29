@@ -229,10 +229,14 @@ namespace casadi {
     OracleFunction::init(opts);
 
     // Generate Jacobian if not provided
-    if (jac.is_null()) jac = oracle_.jacobian_old(iin_, iout_);
+    if (jac.is_null()) {
+      std::vector<std::string> s_in = oracle_.name_in();
+      std::vector<std::string> s_out = oracle_.name_out();
+      s_out.insert(s_out.begin(), "jac:" + oracle_.name_out(iout_) + ":" + oracle_.name_in(iin_));
+      jac = oracle_.factory(oracle_.name() + "_jac", s_in, s_out);
+    }
     set_function(jac, "jac_f_z");
     sp_jac_ = jac.sparsity_out(0);
-
     // Check for structural singularity in the Jacobian
     casadi_assert(!sp_jac_.is_singular(),
       "Rootfinder::init: singularity - the jacobian is structurally rank-deficient. "

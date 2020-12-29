@@ -364,14 +364,10 @@ namespace casadi {
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const;
 
-    ///@{
-    /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     * Legacy function: To be deprecated in a future version of CasADi.
-     * Exists only for compatibility with Function::jacobian pre-CasADi 3.2
-     */
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Replaced by Function::factory. */
     Function jacobian_old(casadi_int iind, casadi_int oind) const;
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
      * \param iind The index of the input

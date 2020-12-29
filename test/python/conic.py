@@ -920,7 +920,7 @@ class ConicTests(casadiTestCase):
     # Fixed step Runge-Kutta 4 integrator
     F = Function('F', [x, u], [x+xdot, L])
 
-    J = F.jacobian_old(0, 0)
+    J = jacobian_old(F, 0, 0)
     # Start with an empty NLP
     w=[]
     w0 = []
@@ -1213,7 +1213,7 @@ class ConicTests(casadiTestCase):
       [D,Lt,p] = ldl(H)
 
       F = mtimes(sqrt(diag(D)),DM.eye(4)+Lt)
-      
+
       h = soc(vertcat(sqrt(2)*mtimes(F,x),1-y),1+y)
 
       solver = casadi.qpsol("msyolver",conic,{'x': vertcat(x,y),"f": y+f,"h":h},qp_options)

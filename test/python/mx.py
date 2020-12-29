@@ -541,8 +541,7 @@ class MXtests(casadiTestCase):
     x0=array([[0.738]])
 
     def fmod(f,x):
-      J=f.jacobian_old(0, 0)
-      return J
+      return jacobian_old(f, 0, 0)
 
     self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
 
@@ -553,8 +552,7 @@ class MXtests(casadiTestCase):
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
-        J=f.jacobian_old(0, 0)
-        return J
+        return jacobian_old(f, 0, 0)
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
 
@@ -761,7 +759,7 @@ class MXtests(casadiTestCase):
 
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
-      J = f.jacobian_old(0, 0)
+      J = jacobian_old(f, 0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -831,7 +829,7 @@ class MXtests(casadiTestCase):
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
 
-      J = f.jacobian_old(0, 0)
+      J = jacobian_old(f, 0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -904,7 +902,7 @@ class MXtests(casadiTestCase):
 
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
-      J = f.jacobian_old(0, 0)
+      J = jacobian_old(f, 0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -921,7 +919,7 @@ class MXtests(casadiTestCase):
     x=SX.sym("x")
     y=x**3
     f=Function("f", [x],[y])
-    J=f.jacobian_old(0, 0)
+    J = jacobian_old(f, 0, 0)
 
     X=MX.sym("X")
     F=Function("F", [X], J(X))
@@ -1193,7 +1191,7 @@ class MXtests(casadiTestCase):
         gfcn = Function("gfcn", [U], [G]).expand("e_gfcn", {"ad_weight":1})
       else:
         gfcn = Function("gfcn", [U],[G], {"ad_weight":1})
-      J = gfcn.jacobian_old(0, 0)
+      J = jacobian_old(gfcn, 0, 0)
       J_in = [0]*J.n_in();J_in[0]=1
       J_out = J.call(J_in)
       self.assertAlmostEqual(J_out[0],1,9)
@@ -2305,7 +2303,7 @@ class MXtests(casadiTestCase):
 
       x2 = vertcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,0))
-      
+
       x0 = c.zeros(0,1)
       x2 = vertcat(x0,c.zeros(0,0),x0)
       self.checkarray(x2.shape,(0,1))
@@ -2538,7 +2536,7 @@ class MXtests(casadiTestCase):
      out = f(Av)
      for o in out:
        self.checkarray(o, np.linalg.inv(np.array(Av)))
-    
+
 
   def test_interp1d(self):
     v = [7,3,4,-3]
@@ -2566,22 +2564,22 @@ class MXtests(casadiTestCase):
     F = Function("f",[vs],[interp1d(x,vs,xq,"linear",True)])
 
     self.checkarray(F(v),np.interp(xq,x,v))
-    
+
   def test_bilin_etc(self):
     x = MX.sym("x",3,3)
     y = MX.sym("y",3,1)
     z = MX.sym("z",3,1)
-    
+
     import numpy
     numpy.random.seed(42)
     x0 = numpy.random.random((3,3))
     y0 = numpy.random.random((3,1))
     z0 = numpy.random.random((3,1))
-    
+
     for e in [(bilin(x,y,z),mtimes(mtimes(y.T,x),z)),(rank1(x,0.3,y,z),x+0.3*mtimes(y,z.T))]:
       f = Function('f',[x,y,z],[e[0]])
       fref = Function('fref',[x,y,z],[e[1]])
-      f_sx = f.expand()    
+      f_sx = f.expand()
       self.checkfunction(f,fref,inputs=[x0,y0,z0])
       self.checkfunction(f_sx,fref,inputs=[x0,y0,z0])
       self.check_codegen(f,inputs=[x0,y0,z0])
@@ -2592,8 +2590,8 @@ class MXtests(casadiTestCase):
       det(X)
     X = MX.sym("x",3,3)
     det(X)
-    
-    
+
+
   @known_bug()
   def test_det(self):
     X = MX.sym("x",3,3)
@@ -2602,7 +2600,7 @@ class MXtests(casadiTestCase):
     import numpy
     numpy.random.seed(42)
     x0 = numpy.random.random((3,3))
-    
+
     f = Function('f',[x],[det(x)])
     F = Function('F',[X],[det(X)])
     self.checkfunction(f,F,inputs=[x0])
@@ -2610,7 +2608,7 @@ class MXtests(casadiTestCase):
   def test_mtimes_mismatch_segfault(self):
     with self.assertInException("incompatible dimensions"):
       mtimes(DM(Sparsity.lower(5)),MX.sym('x',100))
-    
+
   def test_monitor(self):
     x = MX.sym("x")
     y = sqrt(x.monitor("hey"))
@@ -2635,13 +2633,13 @@ class MXtests(casadiTestCase):
       self.check_codegen(f,inputs=[1,-2])
 
 
-  @memory_heavy()    
+  @memory_heavy()
   def test_getsetnonzeros(self):
     import numpy
     numpy.random.seed(42)
     for S in [Sparsity.lower(5),Sparsity.dense(5,5)]:
       M = MX.sym("X",S.nnz())
-      
+
       m = sin(MX(S,M))
       for i in [0,2]:
         for ind in [(i,i),(1,i),(i,1),(slice(None),i),(i,slice(None)),(slice(i,i+2),slice(i,i+2)),(slice(i,i+2),slice(None)),([i,i],[0,0]),([],[])]:
@@ -2650,15 +2648,15 @@ class MXtests(casadiTestCase):
           e = dot(e,e)
           f = Function('f',[M],[e])
           self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1))])
-        
+
           mc = m+0
-          
+
           Y = MX.sym("y",E.nnz())
           y = MX(E.sparsity(),Y)
           mc.__setitem__(ind,y)
           e = cos(mc)
           e = dot(e,e)
-          
+
           f = Function('f',[M,Y],[e])
           self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))])
 
@@ -2789,11 +2787,11 @@ class MXtests(casadiTestCase):
 
     with self.assertInException("Not defined for ConstantFile"):
       x.to_DM()
-  
+
   def test_nonzeros_param(self):
     x = MX.sym("x",2)
     y = MX.sym("y")
-  
+
     for ad_weight_sp in [0,1]:
       opts = {"helper_options":{"ad_weight_sp":ad_weight_sp}}
       z = x.nz[y]
@@ -2855,7 +2853,7 @@ class MXtests(casadiTestCase):
       strides.append(strides[-1]*N)
 
     F = interpolant('F', 'linear', grid, d)
-    
+
     ref = vcat([F(x).T for x in x0r])
 
     x = [MX.sym("x%d" % i,1,N) for i in range(n_dim)]
@@ -2939,6 +2937,6 @@ class MXtests(casadiTestCase):
 
         self.check_codegen(f,inputs=[A])
 
-    
+
 if __name__ == '__main__':
     unittest.main()

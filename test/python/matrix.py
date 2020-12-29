@@ -873,7 +873,7 @@ class Matrixtests(casadiTestCase):
 
     f = Function("f", [vec(P.T),A,B],[vec(mtimes([A,P,B]).T)])
 
-    J = f.jacobian_old(0, 0)
+    J = jacobian_old(f, 0, 0)
     J_in = []
     J_in.append(numpy.random.rand(*vec(P.T).shape))
     J_in.append(numpy.random.rand(*A.shape))
@@ -1100,7 +1100,7 @@ class Matrixtests(casadiTestCase):
   def test_ldl(self):
     H = diagcat(DM.rand(5,5),DM.rand(5,5))
     H = H+H.T+2*DM.eye(10)
-    
+
     p = np.random.permutation(10)
     H = H[p,p]
 

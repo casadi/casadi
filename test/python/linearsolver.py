@@ -124,13 +124,13 @@ class LinearSolverTests(casadiTestCase):
         options["ad_weight_sp"] = 0
         solver = Solver("solver", A.T.sparsity(), options)
 
-        Jf = solver.jacobian_old(0, 0)
+        Jf = jacobian_old(solver, 0, 0)
 
         options["ad_weight"] = 1
         options["ad_weight_sp"] = 1
         solver = Solver("solver", A.T.sparsity(), options)
 
-        Jb = solver.jacobian_old(0, 0)
+        Jb = jacobian_old(solver, 0, 0)
 
         Jf_in = [0]*Jf.n_in();Jf_in[0]=A.T
         Jb_in = [0]*Jb.n_in();Jb_in[0]=A.T
