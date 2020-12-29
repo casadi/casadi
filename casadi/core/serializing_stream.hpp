@@ -149,7 +149,7 @@ namespace casadi {
   private:
 
     /* \brief Unpacks a shared object
-    * 
+    *
     * Also treats SXNode, which is not actually a SharedObjectInternal
     */
     template <class T, class M>
@@ -229,7 +229,7 @@ namespace casadi {
     void pack(const std::vector<T>& e) {
       decorate('V');
       pack(static_cast<casadi_int>(e.size()));
-      for (const T & i : e) pack(i);
+      for (auto&& i : e) pack(i);
     }
     template <class K, class V>
     void pack(const std::map<K, V>& e) {
@@ -271,7 +271,7 @@ namespace casadi {
     void decorate(char e);
 
     /* \brief Packs a shared object
-    * 
+    *
     * Also treats SXNode, which is not actually a SharedObjectInternal
     */
     template <class T>
