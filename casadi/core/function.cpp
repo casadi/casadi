@@ -821,19 +821,15 @@ namespace casadi {
   }
 #endif  // WITH_DEPRECATED_FEATURES
 
-  Function Function::jacobian() const {
+  Function Function::jacobian(bool old_syntax) const {
     try {
-      return (*this)->jacobian();
+      if (old_syntax) {
+        return (*this)->jacobian();
+      } else {
+        return (*this)->jac();
+      }
     } catch (exception& e) {
       THROW_ERROR("jacobian", e.what());
-    }
-  }
-
-  Function Function::jac() const {
-    try {
-      return (*this)->jac();
-    } catch (exception& e) {
-      THROW_ERROR("jac", e.what());
     }
   }
 

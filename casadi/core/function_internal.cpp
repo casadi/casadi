@@ -2028,7 +2028,7 @@ namespace casadi {
       // Derivative information must be available
       casadi_assert(has_derivative(),
                     "Derivatives cannot be calculated for " + name_);
-      return wrap().jac();
+      return wrap().jacobian(false);
     }
     // Retrieve/generate cached
     Function f;
@@ -2071,7 +2071,7 @@ namespace casadi {
       // Derivative information must be available
       casadi_assert(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
-      return wrap().jacobian();
+      return wrap().jacobian(true);
     }
 
     // Quick return if cached
