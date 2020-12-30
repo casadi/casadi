@@ -2638,33 +2638,53 @@ namespace casadi {
 
     // Calculating full Jacobian and then multiplying
     if (fwdViaJac(nfwd)) {
-      // Join forward seeds
-      vector<MX> v(nfwd);
-      for (casadi_int d=0; d<nfwd; ++d) {
-        v[d] = veccat(fseed[d]);
-      }
-
       // Multiply the Jacobian from the right
       vector<MX> darg = arg;
       darg.insert(darg.end(), res.begin(), res.end());
       std::vector<MX> J = jacobian()(darg);
-      if (J.size() > 1) casadi_error("Not implemented");
-      v = horzsplit(mtimes(J.at(0), horzcat(v)));
-
-      // Vertical offsets
-      vector<casadi_int> offset(n_out_+1, 0);
-      for (casadi_int i=0; i<n_out_; ++i) {
-        offset[i+1] = offset[i]+numel_out(i);
-      }
-
-      // Collect forward sensitivities
-      for (casadi_int d=0; d<nfwd; ++d) {
-        fsens[d] = vertsplit(v[d], offset);
+      if (J.size() == n_in_ * n_out_) {
+        // Join forward seeds
+        std::vector<MX> v(nfwd), all_fseed(n_in_);
+        for (size_t i = 0; i < n_in_; ++i) {
+          for (size_t d = 0; d < nfwd; ++d) v[d] = vec(fseed.at(d).at(i));
+          all_fseed[i] = horzcat(v);
+        }
+        // Calculate forward sensitivities
+        std::vector<MX> all_fsens(n_out_);
+        std::vector<MX>::const_iterator J_it = J.begin();
+        for (size_t oind = 0; oind < n_out_; ++oind) {
+          for (size_t iind = 0; iind < n_in_; ++iind) {
+            // Add contribution
+            MX a = mtimes(*J_it++, all_fseed[iind]);
+            all_fsens[oind] = all_fsens[oind].is_empty(true) ? a : all_fsens[oind] + a;
+          }
+        }
+        // Split forward sensitivities
+        for (size_t i = 0; i < n_out_; ++i) {
+          v = horzsplit(all_fsens[i]);
+          casadi_assert_dev(v.size() == nfwd);
+          for (size_t d = 0; d < nfwd; ++d) fsens[d][i] = reshape(v[d], size_out(i));
+        }
+      } else {
+        // Join forward seeds
+        std::vector<MX> v(nfwd);
+        for (size_t d=0; d<nfwd; ++d) v[d] = veccat(fseed[d]);
+        // Legacy function signature
+        casadi_assert(J.size() == 1, "Inconsistent number of outputs");
+        v = horzsplit(mtimes(J.at(0), horzcat(v)));
+        // Vertical offsets
+        vector<casadi_int> offset(n_out_+1, 0);
         for (casadi_int i=0; i<n_out_; ++i) {
-          fsens[d][i] = reshape(fsens[d][i], size_out(i));
+          offset[i+1] = offset[i]+numel_out(i);
+        }
+        // Collect forward sensitivities
+        for (casadi_int d=0; d<nfwd; ++d) {
+          fsens[d] = vertsplit(v[d], offset);
+          for (casadi_int i=0; i<n_out_; ++i) {
+            fsens[d][i] = reshape(fsens[d][i], size_out(i));
+          }
         }
       }
-
     } else {
       // Evaluate in batches
       casadi_assert_dev(enable_forward_ || enable_fd_);
