@@ -2660,49 +2660,28 @@ namespace casadi {
       vector<MX> darg = arg;
       darg.insert(darg.end(), res.begin(), res.end());
       std::vector<MX> J = jacobian()(darg);
-      if (J.size() == n_in_ * n_out_) {
-        // Join forward seeds
-        std::vector<MX> v(nfwd), all_fseed(n_in_);
-        for (size_t i = 0; i < n_in_; ++i) {
-          for (size_t d = 0; d < nfwd; ++d) v[d] = vec(fseed.at(d).at(i));
-          all_fseed[i] = horzcat(v);
+      // Join forward seeds
+      std::vector<MX> v(nfwd), all_fseed(n_in_);
+      for (size_t i = 0; i < n_in_; ++i) {
+        for (size_t d = 0; d < nfwd; ++d) v[d] = vec(fseed.at(d).at(i));
+        all_fseed[i] = horzcat(v);
+      }
+      // Calculate forward sensitivities
+      std::vector<MX> all_fsens(n_out_);
+      std::vector<MX>::const_iterator J_it = J.begin();
+      for (size_t oind = 0; oind < n_out_; ++oind) {
+        for (size_t iind = 0; iind < n_in_; ++iind) {
+          // Add contribution
+          MX a = mtimes(*J_it++, all_fseed[iind]);
+          all_fsens[oind] = all_fsens[oind].is_empty(true) ? a : all_fsens[oind] + a;
         }
-        // Calculate forward sensitivities
-        std::vector<MX> all_fsens(n_out_);
-        std::vector<MX>::const_iterator J_it = J.begin();
-        for (size_t oind = 0; oind < n_out_; ++oind) {
-          for (size_t iind = 0; iind < n_in_; ++iind) {
-            // Add contribution
-            MX a = mtimes(*J_it++, all_fseed[iind]);
-            all_fsens[oind] = all_fsens[oind].is_empty(true) ? a : all_fsens[oind] + a;
-          }
-        }
-        // Split forward sensitivities
-        for (size_t d = 0; d < nfwd; ++d) fsens[d].resize(n_out_);
-        for (size_t i = 0; i < n_out_; ++i) {
-          v = horzsplit(all_fsens[i]);
-          casadi_assert_dev(v.size() == nfwd);
-          for (size_t d = 0; d < nfwd; ++d) fsens[d][i] = reshape(v[d], size_out(i));
-        }
-      } else {
-        // Join forward seeds
-        std::vector<MX> v(nfwd);
-        for (size_t d=0; d<nfwd; ++d) v[d] = veccat(fseed[d]);
-        // Legacy function signature
-        casadi_assert(J.size() == 1, "Inconsistent number of outputs");
-        v = horzsplit(mtimes(J.at(0), horzcat(v)));
-        // Vertical offsets
-        vector<casadi_int> offset(n_out_+1, 0);
-        for (casadi_int i=0; i<n_out_; ++i) {
-          offset[i+1] = offset[i]+numel_out(i);
-        }
-        // Collect forward sensitivities
-        for (casadi_int d=0; d<nfwd; ++d) {
-          fsens[d] = vertsplit(v[d], offset);
-          for (casadi_int i=0; i<n_out_; ++i) {
-            fsens[d][i] = reshape(fsens[d][i], size_out(i));
-          }
-        }
+      }
+      // Split forward sensitivities
+      for (size_t d = 0; d < nfwd; ++d) fsens[d].resize(n_out_);
+      for (size_t i = 0; i < n_out_; ++i) {
+        v = horzsplit(all_fsens[i]);
+        casadi_assert_dev(v.size() == nfwd);
+        for (size_t d = 0; d < nfwd; ++d) fsens[d][i] = reshape(v[d], size_out(i));
       }
     } else {
       // Evaluate in batches
@@ -2786,58 +2765,32 @@ namespace casadi {
       vector<MX> darg = arg;
       darg.insert(darg.end(), res.begin(), res.end());
       std::vector<MX> J = jacobian()(darg);
-      if (J.size() == n_in_ * n_out_) {
-        // Join adjoint seeds
-        std::vector<MX> v(nadj), all_aseed(n_out_);
-        for (size_t i = 0; i < n_out_; ++i) {
-          for (size_t d = 0; d < nadj; ++d) v[d] = vec(aseed.at(d).at(i));
-          all_aseed[i] = horzcat(v);
+      // Join adjoint seeds
+      std::vector<MX> v(nadj), all_aseed(n_out_);
+      for (size_t i = 0; i < n_out_; ++i) {
+        for (size_t d = 0; d < nadj; ++d) v[d] = vec(aseed.at(d).at(i));
+        all_aseed[i] = horzcat(v);
+      }
+      // Calculate adjoint sensitivities
+      std::vector<MX> all_asens(n_in_);
+      std::vector<MX>::const_iterator J_it = J.begin();
+      for (size_t oind = 0; oind < n_out_; ++oind) {
+        for (size_t iind = 0; iind < n_in_; ++iind) {
+          // Add contribution
+          MX a = mtimes((*J_it++).T(), all_aseed[oind]);
+          all_asens[iind] = all_asens[iind].is_empty(true) ? a : all_asens[iind] + a;
         }
-        // Calculate adjoint sensitivities
-        std::vector<MX> all_asens(n_in_);
-        std::vector<MX>::const_iterator J_it = J.begin();
-        for (size_t oind = 0; oind < n_out_; ++oind) {
-          for (size_t iind = 0; iind < n_in_; ++iind) {
-            // Add contribution
-            MX a = mtimes((*J_it++).T(), all_aseed[oind]);
-            all_asens[iind] = all_asens[iind].is_empty(true) ? a : all_asens[iind] + a;
-          }
-        }
-        // Split adjoint sensitivities
-        for (size_t d = 0; d < nadj; ++d) asens[d].resize(n_in_);
-        for (size_t i = 0; i < n_in_; ++i) {
-          v = horzsplit(all_asens[i]);
-          casadi_assert_dev(v.size() == nadj);
-          for (size_t d = 0; d < nadj; ++d) {
-            if (asens[d][i].is_empty(true)) {
-              asens[d][i] = reshape(v[d], size_in(i));
-            } else {
-              asens[d][i] += reshape(v[d], size_in(i));
-            }
-          }
-        }
-      } else {
-        // Legacy function signature
-        casadi_assert(J.size() == 1, "Inconsistent number of outputs");
-        // Join adjoint seeds
-        vector<MX> v(nadj);
-        for (casadi_int d=0; d<nadj; ++d) v[d] = veccat(aseed[d]);
-        v = horzsplit(mtimes(J.at(0).T(), horzcat(v)));
-        // Vertical offsets
-        vector<casadi_int> offset(n_in_+1, 0);
-        for (casadi_int i=0; i<n_in_; ++i) {
-          offset[i+1] = offset[i]+numel_in(i);
-        }
-        // Collect adjoint sensitivities
-        for (casadi_int d=0; d<nadj; ++d) {
-          asens[d].resize(n_in_);
-          vector<MX> a = vertsplit(v[d], offset);
-          for (casadi_int i=0; i<n_in_; ++i) {
-            if (asens[d][i].is_empty(true)) {
-              asens[d][i] = reshape(a[i], size_in(i));
-            } else {
-              asens[d][i] += reshape(a[i], size_in(i));
-            }
+      }
+      // Split adjoint sensitivities
+      for (size_t d = 0; d < nadj; ++d) asens[d].resize(n_in_);
+      for (size_t i = 0; i < n_in_; ++i) {
+        v = horzsplit(all_asens[i]);
+        casadi_assert_dev(v.size() == nadj);
+        for (size_t d = 0; d < nadj; ++d) {
+          if (asens[d][i].is_empty(true)) {
+            asens[d][i] = reshape(v[d], size_in(i));
+          } else {
+            asens[d][i] += reshape(v[d], size_in(i));
           }
         }
       }
