@@ -572,7 +572,7 @@ namespace casadi {
     Dict h_opts;
     Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
     Function h("jac_helper", {x}, {f}, h_opts);
-    return h.get<SXFunction>()->jac(0, 0, opts_remainder);
+    return h.get<SXFunction>()->jac(opts_remainder);
   }
 
   template<>

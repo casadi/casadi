@@ -79,7 +79,7 @@ namespace casadi {
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
 
     /** \brief  Construct a complete Jacobian by compression */
-    MatType jac(casadi_int iind, casadi_int oind, const Dict& opts) const;
+    MatType jac(const Dict& opts) const;
 
     /** \brief Check if the function is of a particular type */
     bool is_a(const std::string& type, bool recursive) const override {
@@ -332,7 +332,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   MatType XFunction<DerivedType, MatType, NodeType>
-  ::jac(casadi_int iind, casadi_int oind, const Dict& opts) const {
+  ::jac(const Dict& opts) const {
     using namespace std;
     try {
       // Read options
@@ -355,6 +355,11 @@ namespace casadi {
           casadi_error("No such Jacobian option: " + string(op.first));
         }
       }
+
+      // FIXME(@jaeandersson)
+      casadi_int iind = 0, oind = 0;
+      casadi_assert(n_in_ == 1, "Not implemented");
+      casadi_assert(n_out_ == 1, "Not implemented");
 
       // Quick return if trivially empty
       if (nnz_in(iind)==0 || nnz_out(oind)==0) {
@@ -817,7 +822,7 @@ namespace casadi {
       Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
 
       // Expression for the extended Jacobian
-      MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
+      MatType J = tmp.get<DerivedType>()->jac(Dict());
 
       // Split up extended Jacobian
       std::vector<casadi_int> r_offset = {0}, c_offset = {0};

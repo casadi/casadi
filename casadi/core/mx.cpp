@@ -1658,7 +1658,7 @@ namespace casadi {
       Dict h_opts;
       Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
       Function h("helper_jacobian_MX", {x}, {f}, h_opts);
-      return h.get<MXFunction>()->jac(0, 0, opts_remainder);
+      return h.get<MXFunction>()->jac(opts_remainder);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("jacobian", e.what());
     }
