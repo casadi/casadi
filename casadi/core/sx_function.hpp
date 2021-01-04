@@ -213,12 +213,6 @@ class CASADI_EXPORT SXFunction :
   /** \brief  Propagate sparsity backwards */
   int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
-  /** \brief Return Jacobian of all input elements with respect to all output elements */
-  Function get_jacobian(const std::string& name,
-                                   const std::vector<std::string>& inames,
-                                   const std::vector<std::string>& onames,
-                                   const Dict& opts) const override;
-
   /** *\brief get SX expression associated with instructions */
   SX instructions_sx() const override;
 
