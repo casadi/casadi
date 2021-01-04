@@ -816,13 +816,9 @@ namespace casadi {
       // Temporary single-input, single-output function FIXME(@jaeandersson)
       Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
 
-      // Jacobian expression
+      // Expression for the extended Jacobian
       MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
 
-      // Filter out parts that are non-differentiable
-      J = project(J, jacobian_sparsity_filter(J.sparsity()));
-
-#if 0
       // Split up extended Jacobian
       std::vector<casadi_int> r_offset = {0}, c_offset = {0};
       for (auto& e : out_) r_offset.push_back(r_offset.back() + e.numel());
@@ -832,19 +828,15 @@ namespace casadi {
       // Collect all outputs
       std::vector<MatType> ret_out;
       ret_out.reserve(onames.size());
-      for (casadi_int i=0; i<n_out_; ++i) {
-        for (casadi_int j=0; j<n_in_; ++j) {
-          MatType b = Jblocks[i][j];
-          if (!is_diff_in_[i] || !is_diff_out_[j]) {
+      for (casadi_int i = 0; i < n_out_; ++i) {
+        for (casadi_int j = 0; j < n_in_; ++j) {
+          MatType b = Jblocks.at(i).at(j);
+          if (!is_diff_out_.at(i) || !is_diff_in_.at(j)) {
             b = MatType(b.size());
           }
           ret_out.push_back(b);
         }
       }
-#else
-      // Return extended Jacobian
-      std::vector<MatType> ret_out = {J};
-#endif
 
       // All inputs of the return function
       std::vector<MatType> ret_in(inames.size());

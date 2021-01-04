@@ -381,8 +381,8 @@ namespace casadi {
     * are also all-zero sparse.
     * The Jacobian blocks are sorted starting by all the blocks for the first
     * output, then all the blocks for the second output and so on.
-    * E.g. f : (x,y) -> (r,s) results in the function
-    * jac_f : (x,y,r,s) -> (DrDx, DrDy, DsDx, DsDy)
+    * E.g. f : (x, y) -> (r, s) results in the function
+    * jac_f : (x, y, out_r, out_s) -> (jac_r_x, jac_r_y, jac_s_x, jac_s_y)
     *
     * This function is cached.
     */

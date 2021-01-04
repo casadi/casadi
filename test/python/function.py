@@ -1257,7 +1257,7 @@ class Functiontests(casadiTestCase):
           x = SX.sym("x")
           y = SX.sym("y")
           out_g = SX.sym('out_g', Sparsity(1,1))
-          J = Function(name, [x,y,out_g],[horzcat(cos(x+3*y),3*cos(x+3*y))], inames, onames, opts)
+          J = Function(name, [x,y, out_g], [cos(x+3*y), 3*cos(x+3*y)], inames, onames, opts)
           return J
 
     f = Fun()
@@ -2156,13 +2156,11 @@ class Functiontests(casadiTestCase):
   def test_custom_jacobian(self):
     x = MX.sym("x")
     p = MX.sym("p")
+    J = Function("jac_Q", [x, p, MX(1,1), MX(1,1)], [x*pi, 1, 1, 1],
+        ['x', 'p', 'out_r', 'out_s'], ['jac_r_x', 'jac_r_p', 'jac_r_s', 'jac_r_s'])
 
-    n1 = MX.sym("n1")
-    n2 = MX.sym("n2")
-
-    J = Function("jac_Q",[x,p,n1,n2],[blockcat([[x*pi,1],[1,1]])])
-
-    f = Function('Q',[x,p],[x**2,2*x*p],{"custom_jacobian": J,"jac_penalty":0})
+    f = Function('Q', [x, p], [x**2, 2*x*p], ['x', 'p'], ['r', 's'],
+            dict(custom_jacobian = J, jac_penalty = 0))
 
     J = None
 

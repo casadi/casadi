@@ -837,7 +837,24 @@ namespace casadi {
     // Jacobian expression
     SX J = SX::jacobian(veccat(out_), veccat(in_));
 
-    J = project(J, jacobian_sparsity_filter(J.sparsity()));
+    // Split up extended Jacobian
+    std::vector<casadi_int> r_offset = {0}, c_offset = {0};
+    for (auto& e : out_) r_offset.push_back(r_offset.back() + e.numel());
+    for (auto& e : in_) c_offset.push_back(c_offset.back() + e.numel());
+    auto Jblocks = SX::blocksplit(J, r_offset, c_offset);
+
+    // Collect all outputs
+    std::vector<SX> ret_out;
+    ret_out.reserve(onames.size());
+    for (casadi_int i = 0; i < n_out_; ++i) {
+      for (casadi_int j = 0; j < n_in_; ++j) {
+        SX b = Jblocks[i][j];
+        if (!is_diff_out_.at(i) || !is_diff_in_.at(j)) {
+          b = SX(b.size());
+        }
+        ret_out.push_back(b);
+      }
+    }
 
     // All inputs of the return function
     std::vector<SX> ret_in(inames.size());
@@ -847,7 +864,7 @@ namespace casadi {
     }
 
     // Assemble function and return
-    return Function(name, ret_in, {J}, inames, onames, opts);
+    return Function(name, ret_in, ret_out, inames, onames, opts);
   }
 
   const SX SXFunction::sx_in(casadi_int ind) const {

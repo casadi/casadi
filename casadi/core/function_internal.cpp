@@ -558,10 +558,32 @@ namespace casadi {
   }
 
   std::string FunctionInternal::get_name_in(casadi_int i) {
+    if (!derivative_of_.is_null()) {
+      string n = derivative_of_.name();
+      if (name_ == "jac_" + n) {
+        if (i < derivative_of_.n_in()) {
+          // Same as nondifferentiated function
+          return derivative_of_.name_in(i);
+        } else {
+          // Nondifferentiated output
+          return "out_" + derivative_of_.name_out(i - derivative_of_.n_in());
+        }
+      }
+    }
+    // Default name
     return "i" + str(i);
   }
 
   std::string FunctionInternal::get_name_out(casadi_int i) {
+    if (!derivative_of_.is_null()) {
+      string n = derivative_of_.name();
+      if (name_ == "jac_" + n) {
+        // Jacobian block
+        casadi_int oind = i / derivative_of_.n_in(), iind = i % derivative_of_.n_in();
+        return "jac_" + derivative_of_.name_out(oind) + "_" + derivative_of_.name_in(iind);
+      }
+    }
+    // Default name
     return "o" + str(i);
   }
 
@@ -2042,18 +2064,12 @@ namespace casadi {
       for (casadi_int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
       // Names of outputs
       std::vector<std::string> onames;
-#if 1
-      // Single extended Jacobian matrix
-      onames = {"jac"};
-#else
-      // Different Jacobian blocks handled separately
       onames.reserve(n_in_ * n_out_);
       for (size_t oind = 0; oind < n_out_; ++oind) {
         for (size_t iind = 0; iind < n_in_; ++iind) {
-          onames.push_back("D" + name_out_[oind] + "D" + name_in_[iind]);
+          onames.push_back("jac_" + name_out_[oind] + "_" + name_in_[iind]);
         }
       }
-#endif
       // Options
       Dict opts;
       opts["derivative_of"] = self();
@@ -2061,8 +2077,10 @@ namespace casadi {
       casadi_assert_dev(enable_jacobian_);
       f = get_jacobian(fname, inames, onames, opts);
       // Consistency checks
-      casadi_assert_dev(f.n_in() == inames.size());
-      casadi_assert_dev(f.n_out() == onames.size());
+      casadi_assert(f.n_in() == inames.size(),
+        "Mismatching input signature, expected " + str(inames));
+      casadi_assert(f.n_out() == onames.size(),
+        "Mismatching output signature, expected " + str(onames));
       // Save to cache
       tocache(f);
     }
@@ -2764,12 +2782,10 @@ namespace casadi {
 
     // Calculating full Jacobian and then multiplying likely cheaper
     if (adjViaJac(nadj)) {
-
       // Multiply the transposed Jacobian from the right
       vector<MX> darg = arg;
       darg.insert(darg.end(), res.begin(), res.end());
       std::vector<MX> J = jacobian()(darg);
-
       if (J.size() == n_in_ * n_out_) {
         // Join adjoint seeds
         std::vector<MX> v(nadj), all_aseed(n_out_);
@@ -2792,7 +2808,13 @@ namespace casadi {
         for (size_t i = 0; i < n_in_; ++i) {
           v = horzsplit(all_asens[i]);
           casadi_assert_dev(v.size() == nadj);
-          for (size_t d = 0; d < nadj; ++d) asens[d][i] = reshape(v[d], size_in(i));
+          for (size_t d = 0; d < nadj; ++d) {
+            if (asens[d][i].is_empty(true)) {
+              asens[d][i] = reshape(v[d], size_in(i));
+            } else {
+              asens[d][i] += reshape(v[d], size_in(i));
+            }
+          }
         }
       } else {
         // Legacy function signature
@@ -3193,7 +3215,7 @@ namespace casadi {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == "jac_" + n) {
-        return 1;
+        return derivative_of_.n_in() * derivative_of_.n_out();
       }
     }
     // One by default
@@ -3221,29 +3243,36 @@ namespace casadi {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == "jac_" + n) {
-        std::vector<casadi_int> row(derivative_of_.nnz_out());
-        casadi_int offset = 0;
-        for (casadi_int i=0;i<derivative_of_.n_out();++i) {
-          if (derivative_of_->is_diff_out_[i]) {
-            for (casadi_int k=0;k<derivative_of_.nnz_out(i);++k) {
-              row.push_back(offset++);
+        // Get Jacobian block
+        casadi_int oind = i / derivative_of_.n_in(), iind = i % derivative_of_.n_in();
+        const Sparsity& sp_in = derivative_of_.sparsity_in(iind);
+        const Sparsity& sp_out = derivative_of_.sparsity_out(oind);
+        // Handle Jacobian blocks corresponding to non-differentiable inputs or outputs
+        if (!derivative_of_->is_diff_out_[oind] || !derivative_of_->is_diff_in_[iind]) {
+          return Sparsity(sp_out.numel(), sp_in.numel());
+        }
+        // Construct sparsity pattern
+        std::vector<casadi_int> row, colind;
+        row.reserve(sp_out.nnz() * sp_in.nnz());
+        colind.reserve(sp_in.numel() + 1);
+        // Loop over input nonzeros
+        for (casadi_int c1 = 0; c1 < sp_in.size2(); ++c1) {
+          for (casadi_int k1 = sp_in.colind(c1); k1 < sp_in.colind(c1 + 1); ++k1) {
+            casadi_int e1 = sp_in.row(k1) + sp_in.size1() * c1;
+            // Update column offsets
+            colind.resize(e1 + 1, row.size());
+            // Add nonzeros corresponding to all nonzero outputs
+            for (casadi_int c2 = 0; c2 < sp_out.size2(); ++c2) {
+              for (casadi_int k2 = sp_out.colind(c2); k2 < sp_out.colind(c2 + 1); ++k2) {
+                row.push_back(sp_out.row(k2) + sp_out.size1() * c2);
+              }
             }
-          } else {
-            offset += derivative_of_.nnz_out(i);
           }
         }
-        std::vector<casadi_int> col(derivative_of_.nnz_in());
-        offset = 0;
-        for (casadi_int i=0;i<derivative_of_.n_in();++i) {
-          if (derivative_of_->is_diff_in_[i]) {
-            for (casadi_int k=0;k<derivative_of_.nnz_in(i);++k) {
-              col.push_back(offset++);
-            }
-          } else {
-            offset += derivative_of_.nnz_in(i);
-          }
-        }
-        return Sparsity::rowcol(row, col, derivative_of_.nnz_out(), derivative_of_.nnz_in());
+        // Finish column offsets
+        colind.resize(sp_in.numel() + 1, row.size());
+        // Assemble and return sparsity pattern
+        return Sparsity(sp_out.numel(), sp_in.numel(), colind, row);
       }
     }
     // Scalar by default
