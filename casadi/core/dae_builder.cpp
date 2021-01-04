@@ -589,7 +589,7 @@ namespace casadi {
 
     // Find out which intermediates depends on which other
     Function f("tmp", {vertcat(this->v)}, {vertcat(this->v) - vertcat(this->vdef)});
-    Sparsity sp = f.sparsity_jac(0, 0);
+    Sparsity sp = f.jac_sparsity().at(0);
     casadi_assert_dev(sp.is_square());
 
     // BLT transformation
@@ -664,7 +664,7 @@ namespace casadi {
 
     // Find out which differential equation depends on which differential state
     Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
-    Sparsity sp = f.sparsity_jac(0, 0);
+    Sparsity sp = f.jac_sparsity().at(0);
     casadi_assert_dev(sp.is_square());
 
     // BLT transformation
@@ -692,7 +692,7 @@ namespace casadi {
 
     // Find out which algebraic equation depends on which algebraic state
     Function f("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
-    Sparsity sp = f.sparsity_jac(0, 0);
+    Sparsity sp = f.jac_sparsity().at(0);
     casadi_assert_dev(sp.is_square());
 
     // BLT transformation
@@ -727,7 +727,7 @@ namespace casadi {
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
-    Sparsity sp = f.sparsity_jac(0, 0);
+    Sparsity sp = f.jac_sparsity().at(0);
     casadi_assert_dev(sp.is_square());
 
     // BLT transformation
@@ -808,7 +808,7 @@ namespace casadi {
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
-    Sparsity sp = f.sparsity_jac(0, 0);
+    Sparsity sp = f.jac_sparsity().at(0);
     casadi_assert_dev(sp.is_square());
 
     // BLT transformation

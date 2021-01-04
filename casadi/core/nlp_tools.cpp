@@ -50,7 +50,7 @@ void detect_simple_bounds_gen(const T& x, const T& p,
 
     // Get constraint Jacobian sparsity
     Function temp("temp", {x, p}, {g});
-    Sparsity sp = temp.sparsity_jac(0, 0);
+    Sparsity sp = temp.jac_sparsity().at(0);
     Sparsity spT = sp.T();
 
     // Reset result vector

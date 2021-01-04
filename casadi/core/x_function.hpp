@@ -355,7 +355,7 @@ namespace casadi {
         }
       }
 
-      // Return value
+      // Return object
       std::vector<MatType> ret(n_in_ * n_out_);
 
       // Quick return if trivially empty
@@ -377,12 +377,8 @@ namespace casadi {
       casadi_assert(n_in_ == 1, "Not implemented");
       casadi_assert(n_out_ == 1, "Not implemented");
 
-      if (symmetric) {
-        casadi_assert_dev(sparsity_out_.at(oind).is_dense());
-      }
-
       // Create return object
-      ret.at(0) = MatType::zeros(sparsity_jac(iind, oind, compact, symmetric).T());
+      ret.at(0) = MatType::zeros(sparsity_jac(0, 0, compact, symmetric).T());
       if (verbose_) casadi_message("Allocated return value");
 
       // Quick return if empty
@@ -414,7 +410,7 @@ namespace casadi {
       std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
 
       // Get the sparsity of the Jacobian block
-      Sparsity jsp = sparsity_jac(iind, oind, true, symmetric).T();
+      Sparsity jsp = sparsity_jac(0, 0, true, symmetric).T();
       const casadi_int* jsp_colind = jsp.colind();
       const casadi_int* jsp_row = jsp.row();
 
@@ -874,7 +870,7 @@ namespace casadi {
     // Temporary single-input, single-output function FIXME(@jaeandersson)
     Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
                  {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
-    return jacobian_sparsity_filter(tmp.sparsity_jac(0, 0));
+    return jacobian_sparsity_filter(tmp.jac_sparsity().at(0));
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

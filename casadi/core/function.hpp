@@ -372,6 +372,24 @@ namespace casadi {
     Function hessian_old(casadi_int iind, casadi_int oind) const;
 #endif // WITH_DEPRECATED_FEATURES
 
+    ///@{
+    /// Get, if necessary generate, the sparsity of a Jacobian block
+    const Sparsity sparsity_jac(casadi_int iind, casadi_int oind,
+                                bool compact=false, bool symmetric=false) const;
+    const Sparsity sparsity_jac(const std::string &iind, casadi_int oind=0,
+                                bool compact=false, bool symmetric=false) const {
+      return sparsity_jac(index_in(iind), oind, compact, symmetric);
+    }
+    const Sparsity sparsity_jac(casadi_int iind, const std::string &oind,
+                                bool compact=false, bool symmetric=false) const {
+      return sparsity_jac(iind, index_out(oind), compact, symmetric);
+    }
+    const Sparsity sparsity_jac(const std::string &iind, const std::string &oind,
+                                bool compact=false, bool symmetric=false) const {
+      return sparsity_jac(index_in(iind), index_out(oind), compact, symmetric);
+    }
+    ///@}
+
   /** \brief Calculate all Jacobian blocks
     * Generates a function that takes all non-differentiated inputs and outputs
     * and calculates all Jacobian blocks.
@@ -660,23 +678,8 @@ namespace casadi {
      */
     Function reverse(casadi_int nadj) const;
 
-    ///@{
-    /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity sparsity_jac(casadi_int iind, casadi_int oind,
-                                bool compact=false, bool symmetric=false) const;
-    const Sparsity sparsity_jac(const std::string &iind, casadi_int oind=0,
-                                bool compact=false, bool symmetric=false) const {
-      return sparsity_jac(index_in(iind), oind, compact, symmetric);
-    }
-    const Sparsity sparsity_jac(casadi_int iind, const std::string &oind,
-                                bool compact=false, bool symmetric=false) const {
-      return sparsity_jac(iind, index_out(oind), compact, symmetric);
-    }
-    const Sparsity sparsity_jac(const std::string &iind, const std::string &oind,
-                                bool compact=false, bool symmetric=false) const {
-      return sparsity_jac(index_in(iind), index_out(oind), compact, symmetric);
-    }
-    ///@}
+    /// Get, if necessary generate, the sparsity of all Jacobian blocks
+    std::vector<Sparsity> jac_sparsity(bool compact=false, bool symmetric=false) const;
 
     /** \brief Export / Generate C code for the function */
     std::string generate(const std::string& fname, const Dict& opts=Dict()) const;
