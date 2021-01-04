@@ -165,7 +165,7 @@ namespace casadi {
 
   class CASADI_EXPORT GenericExternal : public External {
     // Sparsities
-    sparsity_t get_sparsity_in_, get_sparsity_out_;
+    sparsity_t get_sparsity_in_, get_sparsity_out_, get_jac_sparsity_;
     // Differentiability
     diff_t get_diff_in_, get_diff_out_;
 
@@ -190,6 +190,12 @@ namespace casadi {
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
+
+    ///@{
+    /** \brief Return sparsity of Jacobian of an output respect to an input */
+    bool has_jac_sparsity(casadi_int ind) const override;
+    Sparsity get_jac_sparsity(casadi_int ind) const override;
+    ///@}
 
     /// @{
     /** \brief Retreive differentiability */

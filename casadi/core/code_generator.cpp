@@ -308,9 +308,9 @@ namespace casadi {
     // Generate Jacobian sparsity information
     if (with_jac_sparsity) {
       // Generate/get Jacobian sparsity
-      Sparsity jac = f->jacobian_sparsity();
+      std::vector<Sparsity> jac = f.jac_sparsity();
       // Code generate the sparsity pattern
-      add_io_sparsities("jac_" + f.name(), f->sparsity_in_, {jac});
+      add_io_sparsities("jac_" + f.name(), f->sparsity_in_, jac);
 
       // Flush buffers
       flush(this->body);

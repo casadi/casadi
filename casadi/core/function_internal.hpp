@@ -449,6 +449,13 @@ namespace casadi {
     ///@}
 
     ///@{
+    /** \brief Get Jacobian sparsity */
+    //const Sparsity& jac_sparsity(casadi_int ind) const;
+    virtual bool has_jac_sparsity(casadi_int ind) const { return false;}
+    virtual Sparsity get_jac_sparsity(casadi_int ind) const { return Sparsity(); }
+    ///@}
+
+    ///@{
     /** \brief Return function that calculates forward derivatives
      *    forward(nfwd) returns a cached instance if available,
      *    and calls <tt>Function get_forward(casadi_int nfwd)</tt>
@@ -492,13 +499,6 @@ namespace casadi {
     /** \brief  Weighting factor for chosing forward/reverse mode,
         sparsity propagation */
     virtual double sp_weight() const;
-
-    ///@{
-    /** \brief Get Jacobian sparsity */
-    Sparsity jacobian_sparsity() const;
-    virtual bool has_jacobian_sparsity() const { return false;}
-    virtual Sparsity get_jacobian_sparsity() const { return Sparsity(); }
-    ///@}
 
     ///@{
     /** \brief Get function input(s) and output(s)  */
@@ -710,9 +710,6 @@ namespace casadi {
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const;
 
-    /// Filter out nonzeros in the full sparsity jacobian according to is_diff_in/out
-    Sparsity jacobian_sparsity_filter(const Sparsity& sp) const;
-
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolic_output(const std::vector<MX>& arg) const;
 
@@ -902,9 +899,6 @@ namespace casadi {
     /// Cache for sparsities of the Jacobian blocks
     mutable SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;
 
-    /// Cache for full Jacobian sparsity
-    mutable Sparsity jacobian_sparsity_;
-
     /// If the function is the derivative of another function
     Function derivative_of_;
 
@@ -1006,7 +1000,7 @@ namespace casadi {
 
   protected:
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
-    void set_jac_sparsity(const Sparsity& sp);
+    void set_jac_sparsity(casadi_int ind, const Sparsity& sp);
 
   private:
     // @{

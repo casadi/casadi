@@ -91,10 +91,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Return sparsity of Jacobian of all input elements
-     * with respect to all output elements */
-    bool has_jacobian_sparsity() const override;
-    Sparsity get_jacobian_sparsity() const override;
+    /** \brief Return sparsity of Jacobian of an output respect to an input */
+    bool has_jac_sparsity(casadi_int ind) const override;
+    Sparsity get_jac_sparsity(casadi_int ind) const override;
     ///@}
 
     ///@{

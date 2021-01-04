@@ -129,12 +129,6 @@ namespace casadi {
                           const Dict& opts) const override;
     ///@}
 
-    ///@{
-    /** \brief Get Jacobian sparsity */
-    bool has_jacobian_sparsity() const override { return true;}
-    Sparsity get_jacobian_sparsity() const override;
-    ///@}
-
     /** \brief returns a new function with a selection of inputs/outputs of the original */
     Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
                    const std::vector<casadi_int>& order_out, const Dict& opts) const override;
@@ -862,15 +856,6 @@ namespace casadi {
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("get_jacobian", e.what());
     }
-  }
-
-  template<typename DerivedType, typename MatType, typename NodeType>
-  Sparsity XFunction<DerivedType, MatType, NodeType>
-  ::get_jacobian_sparsity() const {
-    // Temporary single-input, single-output function FIXME(@jaeandersson)
-    Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
-                 {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
-    return jacobian_sparsity_filter(tmp.jac_sparsity().at(0));
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

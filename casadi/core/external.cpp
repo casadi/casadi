@@ -113,6 +113,9 @@ namespace casadi {
 
     // Function for numerical evaluation
     eval_ = (eval_t)li_.get_function(name_);
+
+    // Sparsity patterns of Jacobians
+    get_jac_sparsity_ = (sparsity_t)li_.get_function("jac_" + name_ + "_sparsity_out");
   }
 
   External::~External() {
@@ -205,6 +208,29 @@ namespace casadi {
     }
   }
 
+  bool GenericExternal::has_jac_sparsity(casadi_int ind) const {
+    if (get_jac_sparsity_ || li_.has_meta("JAC_" + name_ + "_SPARSITY_OUT", ind)) {
+      // Jacobian sparsity pattern known
+      return true;
+    } else {
+      // Fall back to base class
+      return FunctionInternal::has_jac_sparsity(ind);
+    }
+  }
+
+  Sparsity GenericExternal::get_jac_sparsity(casadi_int ind) const {
+    // Use sparsity retrieval function, if present
+    if (get_jac_sparsity_) {
+      return Sparsity::compressed(get_jac_sparsity_(ind));
+    } else if (li_.has_meta("JAC_" + name_ + "_SPARSITY_OUT", ind)) {
+      return Sparsity::compressed(
+        li_.meta_vector<casadi_int>("jac_" + name_ + "_SPARSITY_OUT", ind));
+    } else {
+      // Fall back to base class
+      return FunctionInternal::get_jac_sparsity(ind);
+    }
+  }
+
   bool GenericExternal::get_diff_in(casadi_int i) {
     if (get_diff_in_) {
       // Query function exists
@@ -253,15 +279,12 @@ namespace casadi {
       sz_w = v[3];
     }
 
-    // Get information about Jacobian sparsity, if any
-    sparsity_t jac_sparsity_fcn = (sparsity_t)li_.get_function("jac_" + name_ + "_sparsity_out");
-    if (jac_sparsity_fcn) {
-      set_jac_sparsity(Sparsity::compressed(jac_sparsity_fcn(0)));
-    } else if (li_.has_meta("JAC_" + name_ + "_SPARSITY_OUT", 0)) {
-      vector<casadi_int> sp = li_.meta_vector<casadi_int>("jac_" + name_ + "_SPARSITY_OUT", 0);
-      set_jac_sparsity(Sparsity::compressed(sp));
+    // Set Jacobian blocks
+    for (casadi_int ind = 0; ind < n_out_ * n_in_; ++ind) {
+      if (has_jac_sparsity(ind)) set_jac_sparsity(ind, get_jac_sparsity(ind));
     }
 
+    // Work vectors
     alloc_arg(sz_arg);
     alloc_res(sz_res);
     alloc_iw(sz_iw);

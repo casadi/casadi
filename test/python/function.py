@@ -1543,7 +1543,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x",2)
 
     h = 1e-7
-    for with_jacobian_sparsity in [True, False]:
+    for with_jac_sparsity in [True, False]:
 
       calls = []
 
@@ -1565,9 +1565,10 @@ class Functiontests(casadiTestCase):
           def has_forward(self,nfwd): return False
           def has_reverse(self,nadj): return False
 
-          def has_jacobian_sparsity(self): return with_jacobian_sparsity
+          def has_jac_sparsity(self,ind): return with_jac_sparsity
 
-          def get_jacobian_sparsity(self):
+          def get_jac_sparsity(self,ind):
+            assert(ind == 0)
             return Sparsity.diag(2)
 
       f = Fun()
@@ -1579,7 +1580,7 @@ class Functiontests(casadiTestCase):
        J = F([5,7])
       calls = hcat(calls)
       J_ref = DM([[5*2,0],[0,7*2]])
-      if with_jacobian_sparsity:
+      if with_jac_sparsity:
         self.checkarray(calls,DM([[0,0],[1,1]]).T,digits=5)
         J_ref = sparsify(J_ref)
       else:

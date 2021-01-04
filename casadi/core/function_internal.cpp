@@ -1678,25 +1678,6 @@ namespace casadi {
     }
   }
 
-  Sparsity FunctionInternal::jacobian_sparsity_filter(const Sparsity& sp) const {
-    if (all(is_diff_in_) && all(is_diff_out_)) return sp;
-
-    // Split up Jacobian blocks
-    std::vector<casadi_int> r_offset = {0}, c_offset = {0};
-    for (casadi_int i=0;i<n_out_;++i) r_offset.push_back(r_offset.back() + numel_out(i));
-    for (casadi_int i=0;i<n_in_;++i) c_offset.push_back(c_offset.back() + numel_in(i));
-    auto spblocks = Sparsity::blocksplit(sp, r_offset, c_offset);
-
-    for (casadi_int i=0;i<n_in_;++i) {
-      for (casadi_int j=0;j<n_out_;++j) {
-        if (!is_diff_in_[i] || !is_diff_out_[j]) spblocks[j][i] = Sparsity(spblocks[j][i].size());
-      }
-    }
-
-    return blockcat(spblocks);
-  }
-
-
   Sparsity& FunctionInternal::
   sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
     // Get an owning reference to the block
@@ -1960,18 +1941,6 @@ namespace casadi {
       tocache(f);
     }
     return f;
-  }
-
-  Sparsity FunctionInternal::jacobian_sparsity() const {
-    if (!jacobian_sparsity_.is_null()) {
-      return jacobian_sparsity_;
-    }
-    if (has_jacobian_sparsity()) {
-      jacobian_sparsity_ = get_jacobian_sparsity();
-      return jacobian_sparsity_;
-    } else {
-      return wrap()->jacobian_sparsity();
-    }
   }
 
   Function FunctionInternal::
@@ -3317,27 +3286,14 @@ namespace casadi {
     return true;
   }
 
-  void FunctionInternal::set_jac_sparsity(const Sparsity& sp) {
-    // Make sure that it's of the right size
-    casadi_assert_dev(sp.size1()==numel_out());
-    casadi_assert_dev(sp.size2()==numel_in());
-    // Split up into the individual patterns
-    std::vector<casadi_int> v_offset(n_out_+1, 0);
-    for (casadi_int i=0; i<n_out_; ++i) v_offset[i+1] = v_offset[i] + numel_out(i);
-    std::vector<casadi_int> h_offset(n_in_+1, 0);
-    for (casadi_int i=0; i<n_in_; ++i) h_offset[i+1] = h_offset[i] + numel_in(i);
-    vector<vector<Sparsity>> blocks = blocksplit(sp, v_offset, h_offset);
-    // Save to jac_sparsity_ and jac_sparsity_compact_
-    for (casadi_int oind=0; oind<n_out_; ++oind) {
-      vector<casadi_int> row_nz = sparsity_out(oind).find();
-      for (casadi_int iind=0; iind<n_in_; ++iind) {
-        vector<casadi_int> col_nz = sparsity_in(iind).find();
-        const Sparsity& sp = blocks.at(oind).at(iind);
-        jac_sparsity_.elem(oind, iind) = sp;
-        vector<casadi_int> mapping;
-        jac_sparsity_compact_.elem(oind, iind) = sp.sub(row_nz, col_nz, mapping);
-      }
-    }
+  void FunctionInternal::set_jac_sparsity(casadi_int ind, const Sparsity& sp) {
+    casadi_int oind = ind / n_in_;
+    casadi_int iind = ind % n_in_;
+    std::vector<casadi_int> row_nz = sparsity_out(oind).find();
+    std::vector<casadi_int> col_nz = sparsity_in(iind).find();
+    jac_sparsity_.elem(oind, iind) = sp;
+    vector<casadi_int> mapping;
+    jac_sparsity_compact_.elem(oind, iind) = sp.sub(row_nz, col_nz, mapping);
   }
 
   int FunctionInternal::
