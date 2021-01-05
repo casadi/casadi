@@ -691,6 +691,9 @@ namespace casadi {
     /** \brief Are all inputs and outputs scalar */
     bool all_scalar() const;
 
+    /// Is a Jacobian block known to be symmetric a priori?
+    virtual bool jac_is_symm(casadi_int iind, casadi_int oind) const;
+
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(casadi_int iind, casadi_int oind, bool symmetric) const;
 

@@ -1627,6 +1627,19 @@ namespace casadi {
     return r.T();
   }
 
+  bool FunctionInternal::jac_is_symm(casadi_int iind, casadi_int oind) const {
+    // If derivative expression
+    if (!derivative_of_.is_null()) {
+      string n = derivative_of_.name();
+      // Reverse move
+      if (name_ == "adj1_" + n) {
+        if (iind == oind) return true;
+      }
+    }
+    // Not symmetric by default
+    return false;
+  }
+
   Sparsity FunctionInternal::getJacSparsity(casadi_int iind, casadi_int oind,
       bool symmetric) const {
     // Check if we are able to propagate dependencies through the function
