@@ -99,7 +99,6 @@ set(CASADI_INTERNAL
   dm_instantiator.cpp
   im_instantiator.cpp
 
-  sparse_storage.hpp   sparse_storage_impl.hpp
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
   slice.cpp generic_matrix.cpp
 

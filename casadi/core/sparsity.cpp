@@ -27,7 +27,6 @@
 #include "sparsity_internal.hpp"
 #include "im.hpp"
 #include "casadi_misc.hpp"
-#include "sparse_storage_impl.hpp"
 #include "serializing_stream.hpp"
 #include <climits>
 
@@ -38,9 +37,6 @@ throw CasadiException("Error in Sparsity::" FNAME " at " + CASADI_WHERE + ":\n"\
 using namespace std;
 
 namespace casadi {
-  // Instantiate templates
-  template class SparseStorage<Sparsity>;
-
   /// \cond INTERNAL
   // Singletons
   class EmptySparsity : public Sparsity {

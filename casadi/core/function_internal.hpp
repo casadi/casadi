@@ -31,7 +31,6 @@
 #include <stack>
 #include "code_generator.hpp"
 #include "importer.hpp"
-#include "sparse_storage.hpp"
 #include "options.hpp"
 #include "shared_object_internal.hpp"
 #include "timing.hpp"

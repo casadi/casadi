@@ -23,7 +23,6 @@
  */
 
 #include "shared_object_internal.hpp"
-#include "sparse_storage_impl.hpp"
 #ifdef WITH_EXTRA_CHECKS
 #include "function.hpp"
 #endif // WITH_EXTRA_CHECKS
@@ -31,9 +30,6 @@
 
 using namespace std;
 namespace casadi {
-
-  // Instantiate templates
-  template class SparseStorage<WeakRef>;
 
   SharedObject::SharedObject() {
     node = nullptr;
