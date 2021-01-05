@@ -338,7 +338,7 @@ class ADtests(casadiTestCase):
             self.message("jacsparsity on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             J = self.jacobians[inputtype][outputtype](*n)
-            self.checkarray(DM.ones(f.sparsity_jac(0, 0)),array(J!=0,int),"jacsparsity")
+            self.checkarray(DM.ones(f.jac_sparsity(0, 0)),array(J!=0,int),"jacsparsity")
 
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
@@ -375,7 +375,7 @@ class ADtests(casadiTestCase):
               J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(J_out),J,"jacobian")
-              self.checkarray(array(DM.ones(f.sparsity_jac(0, 0))),array(J!=0,int),"jacsparsity")
+              self.checkarray(array(DM.ones(f.jac_sparsity(0, 0))),array(J!=0,int),"jacsparsity")
 
 
 
@@ -769,7 +769,7 @@ class ADtests(casadiTestCase):
           self.check_serialize(Jf,inputs=values)
           self.checkarray(Jf_out[0],J_)
           self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
-          self.checkarray(DM.ones(f.sparsity_jac(0, 0)),DM.ones(J_.sparsity()))
+          self.checkarray(DM.ones(f.jac_sparsity(0, 0)),DM.ones(J_.sparsity()))
 
       # Scalarized
       if out.is_empty(): continue

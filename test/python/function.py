@@ -386,11 +386,11 @@ class Functiontests(casadiTestCase):
       for i in range(2):
         f = XFunction("nlp",[V],[vertcat(*g)],{"ad_weight_sp":i})
 
-        assert f.sparsity_jac(0, 0).nnz()==162
+        assert f.jac_sparsity(0, 0).nnz()==162
 
         f2 = XFunction("nlp",[V],[vertcat(*g2)],{"ad_weight_sp":i})
 
-        assert f2.sparsity_jac(0, 0).nnz()==162
+        assert f2.jac_sparsity(0, 0).nnz()==162
 
   def test_callback(self):
     class mycallback(Callback):

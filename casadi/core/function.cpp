@@ -820,7 +820,6 @@ namespace casadi {
     return factory(name() + "_hess", s_in, s_out);
   }
 
-#endif  // WITH_DEPRECATED_FEATURES
   const Sparsity Function::
   sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
     try {
@@ -829,6 +828,7 @@ namespace casadi {
       THROW_ERROR("sparsity_jac", e.what());
     }
   }
+#endif  // WITH_DEPRECATED_FEATURES
 
   Function Function::jacobian() const {
     try {
@@ -847,19 +847,30 @@ namespace casadi {
   }
 
   std::vector<Sparsity> Function::jac_sparsity() const {
-    try {
-      // Collect all sparsity patterns
-      std::vector<Sparsity> ret;
-      ret.reserve(n_in() * n_out());
-      for (casadi_int oind = 0; oind < n_out(); ++oind) {
-        for (casadi_int iind = 0; iind < n_in(); ++iind) {
-          ret.push_back((*this)->sparsity_jac(iind, oind, false, false));
-        }
+    // Collect all sparsity patterns
+    std::vector<Sparsity> ret;
+    ret.reserve(n_in() * n_out());
+    casadi_int ind = 0;
+    for (casadi_int oind = 0; oind < n_out(); ++oind) {
+      for (casadi_int iind = 0; iind < n_in(); ++iind) {
+        ret.push_back(jac_sparsity(ind++));
       }
-      return ret;
+    }
+    return ret;
+  }
+
+  Sparsity Function::jac_sparsity(casadi_int oind, casadi_int iind) const {
+    try {
+      return (*this)->sparsity_jac(iind, oind, false, false);
     } catch (exception& e) {
       THROW_ERROR("jac_sparsity", e.what());
     }
+  }
+
+  Sparsity Function::jac_sparsity(casadi_int ind) const {
+    casadi_int oind = ind / n_in();
+    casadi_int iind = ind % n_in();
+    return jac_sparsity(oind, iind);
   }
 
   const vector<string>& Function::name_in() const {

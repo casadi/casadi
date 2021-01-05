@@ -2456,8 +2456,8 @@ class MXtests(casadiTestCase):
           self.checkfunction(fsx, f_sx, inputs=[A_,B_,C_])
 
           for i in range(3):
-            self.check_sparsity(f.sparsity_jac(i, 0), fsx.sparsity_jac(i, 0))
-            self.check_sparsity(frev.sparsity_jac(i, 0), fsx.sparsity_jac(i, 0))
+            self.check_sparsity(f.jac_sparsity(0, i), fsx.jac_sparsity(0, i))
+            self.check_sparsity(frev.jac_sparsity(0, i), fsx.jac_sparsity(0, i))
 
 
         def my_einstein(A, B, C, dim_a, dim_b, dim_c, ind_a, ind_b, ind_c):

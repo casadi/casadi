@@ -975,7 +975,7 @@ namespace casadi {
 
   Sparsity Integrator::sp_jac_dae() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity jac_ode_x = oracle_.sparsity_jac(DE_X, DE_ODE);
+    Sparsity jac_ode_x = oracle_.jac_sparsity(DE_ODE, DE_X);
 
     // Add diagonal to get interdependencies
     jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
@@ -984,16 +984,16 @@ namespace casadi {
     if (nz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = oracle_.sparsity_jac(DE_Z, DE_ODE);
-    Sparsity jac_alg_x = oracle_.sparsity_jac(DE_X, DE_ALG);
-    Sparsity jac_alg_z = oracle_.sparsity_jac(DE_Z, DE_ALG);
+    Sparsity jac_ode_z = oracle_.jac_sparsity(DE_ODE, DE_Z);
+    Sparsity jac_alg_x = oracle_.jac_sparsity(DE_ALG, DE_X);
+    Sparsity jac_alg_z = oracle_.jac_sparsity(DE_ALG, DE_Z);
     return blockcat(jac_ode_x, jac_ode_z,
                     jac_alg_x, jac_alg_z);
   }
 
   Sparsity Integrator::sp_jac_rdae() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity jac_ode_x = oracle_.sparsity_jac(DE_RX, DE_RODE);
+    Sparsity jac_ode_x = oracle_.jac_sparsity(DE_RODE, DE_RX);
 
     // Add diagonal to get interdependencies
     jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
@@ -1002,9 +1002,9 @@ namespace casadi {
     if (nrz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = oracle_.sparsity_jac(DE_RZ, DE_RODE);
-    Sparsity jac_alg_x = oracle_.sparsity_jac(DE_RX, DE_RALG);
-    Sparsity jac_alg_z = oracle_.sparsity_jac(DE_RZ, DE_RALG);
+    Sparsity jac_ode_z = oracle_.jac_sparsity(DE_RODE, DE_RZ);
+    Sparsity jac_alg_x = oracle_.jac_sparsity(DE_RALG, DE_RX);
+    Sparsity jac_alg_z = oracle_.jac_sparsity(DE_RALG, DE_RZ);
     return blockcat(jac_ode_x, jac_ode_z,
                     jac_alg_x, jac_alg_z);
   }

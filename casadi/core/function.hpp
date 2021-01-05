@@ -370,10 +370,9 @@ namespace casadi {
 
     /** \brief [DEPRECATED] Replaced by Function::factory. */
     Function hessian_old(casadi_int iind, casadi_int oind) const;
-#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
-    /// Get, if necessary generate, the sparsity of a Jacobian block
+    /// [DEPRECATED] Get, if necessary generate, the sparsity of a Jacobian block
     const Sparsity sparsity_jac(casadi_int iind, casadi_int oind,
                                 bool compact=false, bool symmetric=false) const;
     const Sparsity sparsity_jac(const std::string &iind, casadi_int oind=0,
@@ -389,6 +388,7 @@ namespace casadi {
       return sparsity_jac(index_in(iind), index_out(oind), compact, symmetric);
     }
     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
   /** \brief Calculate all Jacobian blocks
     * Generates a function that takes all non-differentiated inputs and outputs
@@ -678,8 +678,16 @@ namespace casadi {
      */
     Function reverse(casadi_int nadj) const;
 
-    /** \brief Export Get, if necessary generate, the sparsity of all Jacobian blocks */
+    /** \brief Get, if necessary generate, the sparsity of all Jacobian blocks */
     std::vector<Sparsity> jac_sparsity() const;
+
+    /** \brief Get, if necessary generate, the sparsity of a single Jacobian block */
+    Sparsity jac_sparsity(casadi_int oind, casadi_int iind) const;
+
+    /** \brief Get, if necessary generate, the sparsity of a single Jacobian block
+     *  Numbered the same way as the outputs of a Jacobian
+     */
+    Sparsity jac_sparsity(casadi_int ind) const;
 
     /** \brief Export / Generate C code for the function */
     std::string generate(const std::string& fname, const Dict& opts=Dict()) const;
