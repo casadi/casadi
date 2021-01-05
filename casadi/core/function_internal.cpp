@@ -545,7 +545,8 @@ namespace casadi {
     sz_res_per_ += n_out_;
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
-    jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
+    jac_sparsity_old_ = jac_sparsity_compact_old_
+      = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
 
     // Type of derivative calculations enabled
     enable_forward_ = enable_forward_op_ && has_forward(1);
@@ -1694,8 +1695,8 @@ namespace casadi {
   Sparsity& FunctionInternal::
   sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
     // Get an owning reference to the block
-    Sparsity jsp = compact ? jac_sparsity_compact_.elem(oind, iind)
-        : jac_sparsity_.elem(oind, iind);
+    Sparsity jsp = compact ? jac_sparsity_compact_old_.elem(oind, iind)
+        : jac_sparsity_old_.elem(oind, iind);
 
     // Generate, if null
     if (jsp.is_null()) {
@@ -1742,8 +1743,8 @@ namespace casadi {
     }
 
     // Return a reference to the block
-    Sparsity& jsp_ref = compact ? jac_sparsity_compact_.elem(oind, iind) :
-        jac_sparsity_.elem(oind, iind);
+    Sparsity& jsp_ref = compact ? jac_sparsity_compact_old_.elem(oind, iind) :
+        jac_sparsity_old_.elem(oind, iind);
     jsp_ref = jsp;
     return jsp_ref;
   }
@@ -3304,9 +3305,9 @@ namespace casadi {
     casadi_int iind = ind % n_in_;
     std::vector<casadi_int> row_nz = sparsity_out(oind).find();
     std::vector<casadi_int> col_nz = sparsity_in(iind).find();
-    jac_sparsity_.elem(oind, iind) = sp;
+    jac_sparsity_old_.elem(oind, iind) = sp;
     vector<casadi_int> mapping;
-    jac_sparsity_compact_.elem(oind, iind) = sp.sub(row_nz, col_nz, mapping);
+    jac_sparsity_compact_old_.elem(oind, iind) = sp.sub(row_nz, col_nz, mapping);
   }
 
   int FunctionInternal::
@@ -3688,8 +3689,8 @@ namespace casadi {
     eval_ = nullptr;
     checkout_ = nullptr;
     release_ = nullptr;
-    jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
-
+    jac_sparsity_old_ = jac_sparsity_compact_old_
+      = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
   }
 
   void ProtoFunction::serialize(SerializingStream& s) const {

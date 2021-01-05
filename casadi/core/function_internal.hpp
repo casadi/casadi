@@ -900,7 +900,7 @@ namespace casadi {
     mutable std::map<std::string, WeakRef> cache_;
 
     /// Cache for sparsities of the Jacobian blocks
-    mutable SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;
+    mutable SparseStorage<Sparsity> jac_sparsity_old_, jac_sparsity_compact_old_;
 
     /// If the function is the derivative of another function
     Function derivative_of_;
