@@ -450,7 +450,8 @@ namespace casadi {
 
     ///@{
     /** \brief Get Jacobian sparsity */
-    //const Sparsity& jac_sparsity(casadi_int ind) const;
+    /// Get, if necessary generate, the sparsity of a Jacobian block
+    Sparsity& jac_sparsity(casadi_int ind, bool compact, bool symmetric) const;
     virtual bool has_jac_sparsity(casadi_int ind) const { return false;}
     virtual Sparsity get_jac_sparsity(casadi_int ind) const { return Sparsity(); }
     ///@}
@@ -709,9 +710,6 @@ namespace casadi {
     * structure recognition for symmetric Jacobians
     */
     Sparsity getJacSparsityHierarchicalSymm(casadi_int iind, casadi_int oind) const;
-
-    /// Get, if necessary generate, the sparsity of a Jacobian block
-    Sparsity& sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const;
 
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolic_output(const std::vector<MX>& arg) const;

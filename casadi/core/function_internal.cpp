@@ -1692,8 +1692,9 @@ namespace casadi {
     }
   }
 
-  Sparsity& FunctionInternal::
-  sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
+  Sparsity& FunctionInternal::jac_sparsity(casadi_int ind, bool compact, bool symmetric) const {
+    // Index to the block
+    casadi_int iind = ind % n_in_, oind = ind / n_in_;
     // Get an owning reference to the block
     Sparsity jsp = compact ? jac_sparsity_compact_old_.elem(oind, iind)
         : jac_sparsity_old_.elem(oind, iind);
@@ -1708,7 +1709,7 @@ namespace casadi {
       } else {
 
         // Get the compact sparsity pattern
-        Sparsity sp = sparsity_jac(iind, oind, true, symmetric);
+        Sparsity sp = jac_sparsity(ind, true, symmetric);
 
         // Enlarge if sparse output
         if (numel_out(oind)!=sp.size1()) {
@@ -1756,7 +1757,7 @@ namespace casadi {
     casadi_assert(allow_forward || allow_reverse, "Inconsistent options");
 
     // Sparsity pattern with transpose
-    Sparsity &AT = sparsity_jac(iind, oind, compact, symmetric);
+    Sparsity &AT = jac_sparsity(iind + oind * n_in_, compact, symmetric);
     Sparsity A = symmetric ? AT : AT.T();
 
     // Get seed matrices by graph coloring
@@ -2458,7 +2459,7 @@ namespace casadi {
         if (arg[iind]==nullptr || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = sparsity_jac(iind, oind, true, false);
+        Sparsity sp = jac_sparsity(iind + n_in_ * oind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
@@ -2487,7 +2488,7 @@ namespace casadi {
         if (arg[iind]==nullptr || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = sparsity_jac(iind, oind, true, false);
+        Sparsity sp = jac_sparsity(iind + n_in_ * oind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication

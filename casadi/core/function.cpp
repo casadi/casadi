@@ -823,7 +823,7 @@ namespace casadi {
   const Sparsity Function::
   sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
     try {
-      return (*this)->sparsity_jac(iind, oind, compact, symmetric);
+      return (*this)->jac_sparsity(iind + oind * n_in(), compact, symmetric);
     } catch (exception& e) {
       THROW_ERROR("sparsity_jac", e.what());
     }
@@ -861,16 +861,14 @@ namespace casadi {
 
   Sparsity Function::jac_sparsity(casadi_int oind, casadi_int iind) const {
     try {
-      return (*this)->sparsity_jac(iind, oind, false, false);
+      return jac_sparsity(iind + oind * n_in());
     } catch (exception& e) {
       THROW_ERROR("jac_sparsity", e.what());
     }
   }
 
   Sparsity Function::jac_sparsity(casadi_int ind) const {
-    casadi_int oind = ind / n_in();
-    casadi_int iind = ind % n_in();
-    return jac_sparsity(oind, iind);
+    return (*this)->jac_sparsity(ind, false, false);
   }
 
   const vector<string>& Function::name_in() const {

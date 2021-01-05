@@ -372,7 +372,7 @@ namespace casadi {
       casadi_assert(n_out_ == 1, "Not implemented");
 
       // Create return object
-      ret.at(0) = MatType::zeros(sparsity_jac(0, 0, compact, symmetric).T());
+      ret.at(0) = MatType::zeros(jac_sparsity(0, false, symmetric).T());
       if (verbose_) casadi_message("Allocated return value");
 
       // Quick return if empty
@@ -404,7 +404,7 @@ namespace casadi {
       std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
 
       // Get the sparsity of the Jacobian block
-      Sparsity jsp = sparsity_jac(0, 0, true, symmetric).T();
+      Sparsity jsp = jac_sparsity(0, true, symmetric).T();
       const casadi_int* jsp_colind = jsp.colind();
       const casadi_int* jsp_row = jsp.row();
 
