@@ -544,10 +544,6 @@ namespace casadi {
     sz_arg_per_ += n_in_;
     sz_res_per_ += n_out_;
 
-    // Resize the matrix that holds the sparsity of the Jacobian blocks
-    jac_sparsity_old_ = jac_sparsity_compact_old_
-      = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
-
     // Type of derivative calculations enabled
     enable_forward_ = enable_forward_op_ && has_forward(1);
     enable_reverse_ = enable_reverse_op_ && has_reverse(1);
@@ -1693,59 +1689,44 @@ namespace casadi {
   }
 
   Sparsity& FunctionInternal::jac_sparsity(casadi_int ind, bool compact, bool symmetric) const {
+    // If first call, allocate
+    if (jac_sparsity_[compact].empty()) jac_sparsity_[compact].resize(n_in_ * n_out_);
+    // Get an owning reference to the block
+    Sparsity jsp = jac_sparsity_[compact].at(ind);
     // Index to the block
     casadi_int iind = ind % n_in_, oind = ind / n_in_;
-    // Get an owning reference to the block
-    Sparsity jsp = compact ? jac_sparsity_compact_old_.elem(oind, iind)
-        : jac_sparsity_old_.elem(oind, iind);
-
     // Generate, if null
     if (jsp.is_null()) {
       if (compact) {
-
         // Use internal routine to determine sparsity
         jsp = getJacSparsity(iind, oind, symmetric);
-
+        // If still null, not dependent
+        if (jsp.is_null()) jsp = Sparsity(nnz_out(oind), nnz_in(iind));
       } else {
-
         // Get the compact sparsity pattern
         Sparsity sp = jac_sparsity(ind, true, symmetric);
-
         // Enlarge if sparse output
         if (numel_out(oind)!=sp.size1()) {
           casadi_assert_dev(sp.size1()==nnz_out(oind));
-
           // New row for each old row
           vector<casadi_int> row_map = sparsity_out(oind).find();
-
           // Insert rows
           sp.enlargeRows(numel_out(oind), row_map);
         }
-
         // Enlarge if sparse input
         if (numel_in(iind)!=sp.size2()) {
           casadi_assert_dev(sp.size2()==nnz_in(iind));
-
           // New column for each old column
           vector<casadi_int> col_map = sparsity_in(iind).find();
-
           // Insert columns
           sp.enlargeColumns(numel_in(iind), col_map);
         }
-
         // Save
         jsp = sp;
       }
     }
-
-    // If still null, not dependent
-    if (jsp.is_null()) {
-      jsp = Sparsity(nnz_out(oind), nnz_in(iind));
-    }
-
     // Return a reference to the block
-    Sparsity& jsp_ref = compact ? jac_sparsity_compact_old_.elem(oind, iind) :
-        jac_sparsity_old_.elem(oind, iind);
+    Sparsity& jsp_ref = jac_sparsity_[compact].at(ind);
     jsp_ref = jsp;
     return jsp_ref;
   }
@@ -3302,13 +3283,15 @@ namespace casadi {
   }
 
   void FunctionInternal::set_jac_sparsity(casadi_int ind, const Sparsity& sp) {
+    jac_sparsity_[false].resize(n_in_ * n_out_);
     casadi_int oind = ind / n_in_;
     casadi_int iind = ind % n_in_;
     std::vector<casadi_int> row_nz = sparsity_out(oind).find();
     std::vector<casadi_int> col_nz = sparsity_in(iind).find();
-    jac_sparsity_old_.elem(oind, iind) = sp;
+    jac_sparsity_[false].at(ind) = sp;
     vector<casadi_int> mapping;
-    jac_sparsity_compact_old_.elem(oind, iind) = sp.sub(row_nz, col_nz, mapping);
+    jac_sparsity_[true].resize(n_in_ * n_out_);
+    jac_sparsity_[true].at(ind) = sp.sub(row_nz, col_nz, mapping);
   }
 
   int FunctionInternal::
@@ -3690,8 +3673,6 @@ namespace casadi {
     eval_ = nullptr;
     checkout_ = nullptr;
     release_ = nullptr;
-    jac_sparsity_old_ = jac_sparsity_compact_old_
-      = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
   }
 
   void ProtoFunction::serialize(SerializingStream& s) const {
