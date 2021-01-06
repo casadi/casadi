@@ -457,6 +457,7 @@ namespace casadi {
     }
 
     // Initialize
+    bonmin.readOptionsFile();
     bonmin.initialize(GetRawPtr(tminlp));
 
     if (true) {

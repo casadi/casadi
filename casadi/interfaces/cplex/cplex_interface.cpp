@@ -428,19 +428,26 @@ namespace casadi {
 
       // Get objective value
       if (CPXXgetobjval(m->env, m->lp, &f)) {
-        casadi_error("CPXXgetobjval failed");
+	f = nan;
+        //casadi_error("CPXXgetobjval failed");
       }
 
       // Get primal solution
       casadi_int cur_numcols = CPXXgetnumcols(m->env, m->lp);
       if (CPXXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
-        casadi_error("CPXXgetx failed");
+	for(int i=0;i<cur_numcols;i++){
+	  x[i] = nan;
+	}
+        //casadi_error("CPXXgetx failed");
       }
 
       // Get slacks
       casadi_int cur_numrows = CPXXgetnumrows(m->env, m->lp);
       if (CPXXgetslack(m->env, m->lp, get_ptr(slack), 0, cur_numrows-1)) {
-        casadi_error("CPXXgetslack failed");
+	for(int i=0;i<cur_numrows;i++){
+	  slack[i] = nan;
+	}
+        // casadi_error("CPXXgetslack failed");
       }
 
       // Not a number as dual variables (not calculated with MIQP algorithm)

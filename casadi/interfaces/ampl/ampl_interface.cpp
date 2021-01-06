@@ -74,7 +74,7 @@ namespace casadi {
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="solver") {
-        solver_ = op.first;
+        solver_ = op.second.to_string();
       }
     }
 
