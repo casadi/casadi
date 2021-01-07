@@ -1565,10 +1565,11 @@ class Functiontests(casadiTestCase):
           def has_forward(self,nfwd): return False
           def has_reverse(self,nadj): return False
 
-          def has_jac_sparsity(self,ind): return with_jac_sparsity
+          def has_jac_sparsity(self,oind,iind): return with_jac_sparsity
 
-          def get_jac_sparsity(self,ind):
-            assert(ind == 0)
+          def get_jac_sparsity(self,oind,iind):
+            assert(oind == 0)
+            assert(iind == 0)
             return Sparsity.diag(2)
 
       f = Fun()

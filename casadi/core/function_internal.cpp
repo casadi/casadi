@@ -1712,13 +1712,15 @@ namespace casadi {
     // Return non-compact pattern
     return r;
   }
-  Sparsity& FunctionInternal::jac_sparsity(casadi_int ind, bool compact, bool symmetric) const {
+
+  Sparsity& FunctionInternal::jac_sparsity(casadi_int oind, casadi_int iind, bool compact,
+      bool symmetric) const {
     // If first call, allocate cache
     for (bool c : {false, true}) {
       if (jac_sparsity_[c].empty()) jac_sparsity_[c].resize(n_in_ * n_out_);
     }
-    // Input/output indices to the block
-    casadi_int iind = ind % n_in_, oind = ind / n_in_;
+    // Flat index
+    casadi_int ind = iind + oind * n_in_;
     // Reference to the block
     Sparsity& jsp = jac_sparsity_[compact].at(ind);
     // If null, generate
@@ -1752,7 +1754,7 @@ namespace casadi {
     casadi_assert(allow_forward || allow_reverse, "Inconsistent options");
 
     // Sparsity pattern with transpose
-    Sparsity &AT = jac_sparsity(iind + oind * n_in_, compact, symmetric);
+    Sparsity &AT = jac_sparsity(oind, iind, compact, symmetric);
     Sparsity A = symmetric ? AT : AT.T();
 
     // Get seed matrices by graph coloring
@@ -2454,7 +2456,7 @@ namespace casadi {
         if (arg[iind]==nullptr || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = jac_sparsity(iind + n_in_ * oind, true, false);
+        Sparsity sp = jac_sparsity(oind, iind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
@@ -2483,7 +2485,7 @@ namespace casadi {
         if (arg[iind]==nullptr || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = jac_sparsity(iind + n_in_ * oind, true, false);
+        Sparsity sp = jac_sparsity(oind, iind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
@@ -3296,8 +3298,8 @@ namespace casadi {
     return true;
   }
 
-  void FunctionInternal::set_jac_sparsity(casadi_int ind, const Sparsity& sp) {
-    casadi_int iind = ind % n_in_, oind = ind / n_in_;
+  void FunctionInternal::set_jac_sparsity(casadi_int oind, casadi_int iind, const Sparsity& sp) {
+    casadi_int ind = iind + oind * n_in_;
     jac_sparsity_[false].resize(n_in_ * n_out_);
     jac_sparsity_[false].at(ind) = sp;
     jac_sparsity_[true].resize(n_in_ * n_out_);

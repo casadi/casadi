@@ -74,12 +74,12 @@ namespace casadi {
     TRY_CALL(has_eval_buffer, self_);
   }
 
-  bool CallbackInternal::has_jac_sparsity(casadi_int ind) const {
-    TRY_CALL(has_jac_sparsity, self_, ind);
+  bool CallbackInternal::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
+    TRY_CALL(has_jac_sparsity, self_, oind, iind);
   }
 
-  Sparsity CallbackInternal::get_jac_sparsity(casadi_int ind) const {
-    TRY_CALL(get_jac_sparsity, self_, ind);
+  Sparsity CallbackInternal::get_jac_sparsity(casadi_int oind, casadi_int iind) const {
+    TRY_CALL(get_jac_sparsity, self_, oind, iind);
   }
 
   void CallbackInternal::init(const Dict& opts) {
@@ -91,8 +91,11 @@ namespace casadi {
     self_->init();
 
     // Set Jacobian blocks
-    for (casadi_int ind = 0; ind < n_out_ * n_in_; ++ind) {
-      if (has_jac_sparsity(ind)) set_jac_sparsity(ind, get_jac_sparsity(ind));
+    for (casadi_int oind = 0; oind < n_out_; ++oind) {
+      for (casadi_int iind = 0; iind < n_in_; ++iind) {
+        if (has_jac_sparsity(oind, iind))
+          set_jac_sparsity(oind, iind, get_jac_sparsity(oind, iind));
+      }
     }
   }
 
