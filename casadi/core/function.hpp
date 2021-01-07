@@ -682,12 +682,7 @@ namespace casadi {
     const std::vector<Sparsity>& jac_sparsity(bool compact = false) const;
 
     /** \brief Get, if necessary generate, the sparsity of a single Jacobian block */
-    Sparsity jac_sparsity(casadi_int oind, casadi_int iind) const;
-
-    /** \brief Get, if necessary generate, the sparsity of a single Jacobian block
-     *  Numbered the same way as the outputs of a Jacobian
-     */
-    Sparsity jac_sparsity(casadi_int ind) const;
+    Sparsity jac_sparsity(casadi_int oind, casadi_int iind, bool compact = false) const;
 
     /** \brief Export / Generate C code for the function */
     std::string generate(const std::string& fname, const Dict& opts=Dict()) const;

@@ -850,23 +850,19 @@ namespace casadi {
     // Make sure all are calculated
     for (casadi_int oind = 0; oind < n_out(); ++oind) {
       for (casadi_int iind = 0; iind < n_in(); ++iind) {
-        (void)(*this)->jac_sparsity(iind + oind * n_in(), compact,
-          (*this)->jac_is_symm(iind, oind));
+        (void)jac_sparsity(oind, iind, compact);
       }
     }
+    // Return reference to internal cache
     return (*this)->jac_sparsity_[compact];
   }
 
-  Sparsity Function::jac_sparsity(casadi_int oind, casadi_int iind) const {
+  Sparsity Function::jac_sparsity(casadi_int oind, casadi_int iind, bool compact) const {
     try {
-      return jac_sparsity(iind + oind * n_in());
+      return (*this)->jac_sparsity(iind + oind * n_in(), compact, (*this)->jac_is_symm(iind, oind));
     } catch (exception& e) {
       THROW_ERROR("jac_sparsity", e.what());
     }
-  }
-
-  Sparsity Function::jac_sparsity(casadi_int ind) const {
-    return (*this)->jac_sparsity(ind, false, false);
   }
 
   const vector<string>& Function::name_in() const {
