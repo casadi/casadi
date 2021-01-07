@@ -846,17 +846,15 @@ namespace casadi {
     return (*this)->get_stats(memory(mem));
   }
 
-  std::vector<Sparsity> Function::jac_sparsity() const {
-    // Collect all sparsity patterns
-    std::vector<Sparsity> ret;
-    ret.reserve(n_in() * n_out());
-    casadi_int ind = 0;
+  const std::vector<Sparsity>& Function::jac_sparsity(bool compact) const {
+    // Make sure all are calculated
     for (casadi_int oind = 0; oind < n_out(); ++oind) {
       for (casadi_int iind = 0; iind < n_in(); ++iind) {
-        ret.push_back(jac_sparsity(ind++));
+        (void)(*this)->jac_sparsity(iind + oind * n_in(), compact,
+          (*this)->jac_is_symm(iind, oind));
       }
     }
-    return ret;
+    return (*this)->jac_sparsity_[compact];
   }
 
   Sparsity Function::jac_sparsity(casadi_int oind, casadi_int iind) const {

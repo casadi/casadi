@@ -679,7 +679,7 @@ namespace casadi {
     Function reverse(casadi_int nadj) const;
 
     /** \brief Get, if necessary generate, the sparsity of all Jacobian blocks */
-    std::vector<Sparsity> jac_sparsity() const;
+    const std::vector<Sparsity>& jac_sparsity(bool compact = false) const;
 
     /** \brief Get, if necessary generate, the sparsity of a single Jacobian block */
     Sparsity jac_sparsity(casadi_int oind, casadi_int iind) const;
