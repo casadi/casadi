@@ -692,13 +692,13 @@ namespace casadi {
     bool all_scalar() const;
 
     /// Is a Jacobian block known to be symmetric a priori?
-    virtual bool jac_is_symm(casadi_int iind, casadi_int oind) const;
+    virtual bool jac_is_symm(casadi_int oind, casadi_int iind) const;
 
     /// Convert to compact Jacobian sparsity pattern
-    Sparsity to_compact(casadi_int ind, const Sparsity& sp) const;
+    Sparsity to_compact(casadi_int oind, casadi_int iind, const Sparsity& sp) const;
 
     /// Convert from compact Jacobian sparsity pattern
-    Sparsity from_compact(casadi_int ind, const Sparsity& sp) const;
+    Sparsity from_compact(casadi_int oind, casadi_int iind, const Sparsity& sp) const;
 
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(casadi_int iind, casadi_int oind, bool symmetric) const;

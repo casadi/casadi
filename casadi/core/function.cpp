@@ -859,7 +859,7 @@ namespace casadi {
 
   Sparsity Function::jac_sparsity(casadi_int oind, casadi_int iind, bool compact) const {
     try {
-      return (*this)->jac_sparsity(iind + oind * n_in(), compact, (*this)->jac_is_symm(iind, oind));
+      return (*this)->jac_sparsity(iind + oind * n_in(), compact, (*this)->jac_is_symm(oind, iind));
     } catch (exception& e) {
       THROW_ERROR("jac_sparsity", e.what());
     }

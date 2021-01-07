@@ -1624,7 +1624,7 @@ namespace casadi {
     return r.T();
   }
 
-  bool FunctionInternal::jac_is_symm(casadi_int iind, casadi_int oind) const {
+  bool FunctionInternal::jac_is_symm(casadi_int oind, casadi_int iind) const {
     // If derivative expression
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
@@ -1688,17 +1688,15 @@ namespace casadi {
     }
   }
 
-  Sparsity FunctionInternal::to_compact(casadi_int ind, const Sparsity& sp) const {
-    // Get input/output indices
-    casadi_int oind = ind / n_in_, iind = ind % n_in_;
+  Sparsity FunctionInternal::to_compact(casadi_int oind, casadi_int iind,
+      const Sparsity& sp) const {
     // Strip rows and columns
     vector<casadi_int> mapping;
     return sp.sub(sparsity_out(oind).find(), sparsity_in(iind).find(), mapping);
   }
 
-  Sparsity FunctionInternal::from_compact(casadi_int ind, const Sparsity& sp) const {
-    // Get input/output indices
-    casadi_int oind = ind / n_in_, iind = ind % n_in_;
+  Sparsity FunctionInternal::from_compact(casadi_int oind, casadi_int iind,
+      const Sparsity& sp) const {
     // Return value
     Sparsity r = sp;
     // Insert rows if sparse output
@@ -1714,12 +1712,13 @@ namespace casadi {
     // Return non-compact pattern
     return r;
   }
-
   Sparsity& FunctionInternal::jac_sparsity(casadi_int ind, bool compact, bool symmetric) const {
     // If first call, allocate cache
     for (bool c : {false, true}) {
       if (jac_sparsity_[c].empty()) jac_sparsity_[c].resize(n_in_ * n_out_);
     }
+    // Input/output indices to the block
+    casadi_int iind = ind % n_in_, oind = ind / n_in_;
     // Reference to the block
     Sparsity& jsp = jac_sparsity_[compact].at(ind);
     // If null, generate
@@ -1727,10 +1726,8 @@ namespace casadi {
       // Use (non)-compact pattern, if given
       Sparsity& jsp_other = jac_sparsity_[!compact].at(ind);
       if (!jsp_other.is_null()) {
-        jsp = compact ? to_compact(ind, jsp_other) : from_compact(ind, jsp_other);
+        jsp = compact ? to_compact(oind, iind, jsp_other) : from_compact(oind, iind, jsp_other);
       } else {
-        // Input/output indices to the block
-        casadi_int iind = ind % n_in_, oind = ind / n_in_;
         // Use internal routine to determine sparsity
         Sparsity sp = getJacSparsity(iind, oind, symmetric);
         // Is the return the compact pattern?
@@ -1740,7 +1737,7 @@ namespace casadi {
           jsp = sp;
         } else {
           jsp_other = sp;
-          jsp = compact ? to_compact(ind, sp) : from_compact(ind, sp);
+          jsp = compact ? to_compact(oind, iind, sp) : from_compact(oind, iind, sp);
         }
       }
     }
@@ -3300,10 +3297,11 @@ namespace casadi {
   }
 
   void FunctionInternal::set_jac_sparsity(casadi_int ind, const Sparsity& sp) {
+    casadi_int iind = ind % n_in_, oind = ind / n_in_;
     jac_sparsity_[false].resize(n_in_ * n_out_);
     jac_sparsity_[false].at(ind) = sp;
     jac_sparsity_[true].resize(n_in_ * n_out_);
-    jac_sparsity_[true].at(ind) = to_compact(ind, sp);
+    jac_sparsity_[true].at(ind) = to_compact(oind, iind, sp);
   }
 
   int FunctionInternal::
