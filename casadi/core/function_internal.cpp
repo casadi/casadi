@@ -979,9 +979,7 @@ namespace casadi {
   };
 
   template<bool fwd>
-  Sparsity FunctionInternal::
-  getJacSparsityGen(casadi_int iind, casadi_int oind, bool symmetric,
-      casadi_int gr_i, casadi_int gr_o) const {
+  Sparsity FunctionInternal::get_jac_sparsity_gen(casadi_int oind, casadi_int iind) const {
     // Number of nonzero inputs and outputs
     casadi_int nz_in = nnz_in(iind);
     casadi_int nz_out = nnz_out(oind);
@@ -1086,8 +1084,8 @@ namespace casadi {
     return ret;
   }
 
-  Sparsity FunctionInternal::
-  getJacSparsityHierarchicalSymm(casadi_int iind, casadi_int oind) const {
+  Sparsity FunctionInternal::get_jac_sparsity_hierarchical_symm(casadi_int oind,
+      casadi_int iind) const {
     casadi_assert_dev(has_spfwd());
 
     // Number of nonzero inputs
@@ -1321,8 +1319,7 @@ namespace casadi {
     return r.T();
   }
 
-  Sparsity FunctionInternal::
-  getJacSparsityHierarchical(casadi_int iind, casadi_int oind) const {
+  Sparsity FunctionInternal::get_jac_sparsity_hierarchical(casadi_int oind, casadi_int iind) const {
     // Number of nonzero inputs
     casadi_int nz_in = nnz_in(iind);
 
@@ -1642,12 +1639,12 @@ namespace casadi {
     // Check if we are able to propagate dependencies through the function
     if (has_spfwd() || has_sprev()) {
       Sparsity sp;
-      if (nnz_in(iind)>3*bvec_size && nnz_out(oind)>3*bvec_size &&
+      if (nnz_in(iind) > 3*bvec_size && nnz_out(oind) > 3*bvec_size &&
             GlobalOptions::hierarchical_sparsity) {
         if (symmetric) {
-          sp = getJacSparsityHierarchicalSymm(iind, oind);
+          sp = get_jac_sparsity_hierarchical_symm(oind, iind);
         } else {
-          sp = getJacSparsityHierarchical(iind, oind);
+          sp = get_jac_sparsity_hierarchical(oind, iind);
         }
       } else {
         // Number of nonzero inputs and outputs
@@ -1670,9 +1667,9 @@ namespace casadi {
 
         // Use forward mode?
         if (w*static_cast<double>(nsweep_fwd) <= (1-w)*static_cast<double>(nsweep_adj)) {
-          sp = getJacSparsityGen<true>(iind, oind, false);
+          sp = get_jac_sparsity_gen<true>(oind, iind);
         } else {
-          sp = getJacSparsityGen<false>(iind, oind, false);
+          sp = get_jac_sparsity_gen<false>(oind, iind);
         }
       }
       // There may be false positives here that are not present

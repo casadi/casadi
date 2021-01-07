@@ -700,18 +700,17 @@ namespace casadi {
     /// Convert from compact Jacobian sparsity pattern
     Sparsity from_compact(casadi_int oind, casadi_int iind, const Sparsity& sp) const;
 
-    /// Get the sparsity pattern, forward mode
+    /// Get the sparsity pattern via sparsity seed propagation
     template<bool fwd>
-    Sparsity getJacSparsityGen(casadi_int iind, casadi_int oind, bool symmetric,
-                                casadi_int gr_i=1, casadi_int gr_o=1) const;
+    Sparsity get_jac_sparsity_gen(casadi_int oind, casadi_int iind) const;
 
-    /// A flavor of getJacSparsity that does hierarchical block structure recognition
-    Sparsity getJacSparsityHierarchical(casadi_int iind, casadi_int oind) const;
+    /// A flavor of get_jac_sparsity_gen that does hierarchical block structure recognition
+    Sparsity get_jac_sparsity_hierarchical(casadi_int oind, casadi_int iind) const;
 
-    /** A flavor of getJacSparsity that does hierarchical block
+    /** A flavor of get_jac_sparsity_gen that does hierarchical block
     * structure recognition for symmetric Jacobians
     */
-    Sparsity getJacSparsityHierarchicalSymm(casadi_int iind, casadi_int oind) const;
+    Sparsity get_jac_sparsity_hierarchical_symm(casadi_int oind, casadi_int iind) const;
 
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolic_output(const std::vector<MX>& arg) const;
