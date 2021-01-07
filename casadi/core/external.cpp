@@ -220,7 +220,8 @@ namespace casadi {
     }
   }
 
-  Sparsity GenericExternal::get_jac_sparsity(casadi_int oind, casadi_int iind) const {
+  Sparsity GenericExternal::get_jac_sparsity(casadi_int oind, casadi_int iind,
+      bool symmetric) const {
     // Flat index
     casadi_int ind = iind + oind * n_in_;
     // Use sparsity retrieval function, if present
@@ -231,7 +232,7 @@ namespace casadi {
         li_.meta_vector<casadi_int>("jac_" + name_ + "_SPARSITY_OUT", ind));
     } else {
       // Fall back to base class
-      return FunctionInternal::get_jac_sparsity(oind, iind);
+      return FunctionInternal::get_jac_sparsity(oind, iind, symmetric);
     }
   }
 
@@ -281,14 +282,6 @@ namespace casadi {
       sz_res = v[1];
       sz_iw = v[2];
       sz_w = v[3];
-    }
-
-    // Set Jacobian blocks
-    for (casadi_int oind = 0; oind < n_out_; ++oind) {
-      for (casadi_int iind = 0; iind < n_in_; ++iind) {
-        if (has_jac_sparsity(oind, iind))
-          set_jac_sparsity(oind, iind, get_jac_sparsity(oind, iind));
-      }
     }
 
     // Work vectors

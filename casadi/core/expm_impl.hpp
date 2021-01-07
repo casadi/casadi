@@ -79,8 +79,12 @@ namespace casadi {
     bool has_reverse(casadi_int nadj) const override { return true;}
     ///@}
 
+    /** \brief Which inputs are differentiable */
+    bool get_diff_in(casadi_int i) override { return i != 0 || !const_A_;}
+
     /// Generate the sparsity of a Jacobian block
-    Sparsity getJacSparsity(casadi_int iind, casadi_int oind, bool symmetric) const override;
+    Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
+    bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override { return true;}
 
     // Creator function for internal class
     typedef Expm* (*Creator)(const std::string& name, const Sparsity& A);

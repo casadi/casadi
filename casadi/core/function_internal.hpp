@@ -452,7 +452,7 @@ namespace casadi {
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& jac_sparsity(casadi_int oind, casadi_int iind, bool compact, bool symmetric) const;
     virtual bool has_jac_sparsity(casadi_int oind, casadi_int iind) const { return false;}
-    virtual Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind) const { return Sparsity(); }
+    virtual Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const;
     ///@}
 
     ///@{
@@ -699,9 +699,6 @@ namespace casadi {
 
     /// Convert from compact Jacobian sparsity pattern
     Sparsity from_compact(casadi_int oind, casadi_int iind, const Sparsity& sp) const;
-
-    /// Generate the sparsity of a Jacobian block
-    virtual Sparsity getJacSparsity(casadi_int iind, casadi_int oind, bool symmetric) const;
 
     /// Get the sparsity pattern, forward mode
     template<bool fwd>

@@ -78,8 +78,9 @@ namespace casadi {
     TRY_CALL(has_jac_sparsity, self_, oind, iind);
   }
 
-  Sparsity CallbackInternal::get_jac_sparsity(casadi_int oind, casadi_int iind) const {
-    TRY_CALL(get_jac_sparsity, self_, oind, iind);
+  Sparsity CallbackInternal::get_jac_sparsity(casadi_int oind, casadi_int iind,
+      bool symmetric) const {
+    TRY_CALL(get_jac_sparsity, self_, oind, iind, symmetric);
   }
 
   void CallbackInternal::init(const Dict& opts) {
@@ -89,14 +90,6 @@ namespace casadi {
     // Initialize this
     casadi_assert(self_!=nullptr, "Callback object has been deleted");
     self_->init();
-
-    // Set Jacobian blocks
-    for (casadi_int oind = 0; oind < n_out_; ++oind) {
-      for (casadi_int iind = 0; iind < n_in_; ++iind) {
-        if (has_jac_sparsity(oind, iind))
-          set_jac_sparsity(oind, iind, get_jac_sparsity(oind, iind));
-      }
-    }
   }
 
   void CallbackInternal::finalize() {

@@ -169,7 +169,8 @@ namespace casadi {
     /** \brief Return sparsity of Jacobian of all input elements
      * with respect to all output elements */
     virtual bool has_jac_sparsity(casadi_int oind, casadi_int iind) const { return false; }
-    virtual Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind) const { return Sparsity(); }
+    virtual Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const {
+      return Sparsity(); }
     ///@}
   };
 

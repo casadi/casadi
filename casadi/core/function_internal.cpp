@@ -1637,7 +1637,7 @@ namespace casadi {
     return false;
   }
 
-  Sparsity FunctionInternal::getJacSparsity(casadi_int iind, casadi_int oind,
+  Sparsity FunctionInternal::get_jac_sparsity(casadi_int oind, casadi_int iind,
       bool symmetric) const {
     // Check if we are able to propagate dependencies through the function
     if (has_spfwd() || has_sprev()) {
@@ -1665,9 +1665,8 @@ namespace casadi {
         // Get weighting factor
         double w = sp_weight();
 
-        if (w==-1) {
-          return Sparsity::dense(nnz_out(oind), nnz_in(iind));
-        }
+        // Skip generation, assume dense
+        if (w == -1) return Sparsity();
 
         // Use forward mode?
         if (w*static_cast<double>(nsweep_fwd) <= (1-w)*static_cast<double>(nsweep_adj)) {
@@ -1683,8 +1682,8 @@ namespace casadi {
       if (symmetric) sp=sp*sp.T();
       return sp;
     } else {
-      // Dense sparsity by default
-      return Sparsity::dense(nnz_out(oind), nnz_in(iind));
+      // Not calculated
+      return Sparsity();
     }
   }
 
@@ -1730,12 +1729,24 @@ namespace casadi {
       if (!jsp_other.is_null()) {
         jsp = compact ? to_compact(oind, iind, jsp_other) : from_compact(oind, iind, jsp_other);
       } else {
-        // Use internal routine to determine sparsity
-        Sparsity sp = getJacSparsity(iind, oind, symmetric);
-        // Is the return the compact pattern?
-        bool sp_compact = sp.size1() == nnz_out(oind) && sp.size2() == nnz_in(iind);
+        // Generate pattern
+        Sparsity sp;
+        bool sp_is_compact = false;
+        if (false /* !is_diff_out_.at(oind) || !is_diff_in_.at(iind) */) {
+          // All-zero sparse
+          sp = Sparsity(nnz_out(oind), nnz_in(iind));
+        } else {
+          // Use internal routine to determine sparsity
+          if (has_spfwd() || has_sprev() || has_jac_sparsity(oind, iind)) {
+            sp = get_jac_sparsity(oind, iind, symmetric);
+          }
+          // If null, dense
+          if (sp.is_null()) sp = Sparsity::dense(nnz_out(oind), nnz_in(iind));
+          // Is the return the compact pattern?
+          sp_is_compact = sp.size1() == nnz_out(oind) && sp.size2() == nnz_in(iind);
+        }
         // Save to cache and convert if needed
-        if (sp_compact == compact) {
+        if (sp_is_compact == compact) {
           jsp = sp;
         } else {
           jsp_other = sp;

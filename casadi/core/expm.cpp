@@ -163,11 +163,12 @@ namespace casadi {
       std::vector<casadi_int>{0, 1, 2}, std::vector<casadi_int>{});
   }
 
-  Sparsity Expm::getJacSparsity(casadi_int iind, casadi_int oind, bool symmetric) const {
-    if (const_A_ && iind==0) {
+  Sparsity Expm::get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const {
+    if (const_A_ && iind == 0) {
       return Sparsity(nnz_out(oind), nnz_in(iind));
     }
-    return Sparsity::dense(nnz_out(oind), nnz_in(iind));
+    // Fallback to base class
+    return FunctionInternal::get_jac_sparsity(oind, iind, symmetric);
   }
 
   Expm::~Expm() {

@@ -1567,7 +1567,7 @@ class Functiontests(casadiTestCase):
 
           def has_jac_sparsity(self,oind,iind): return with_jac_sparsity
 
-          def get_jac_sparsity(self,oind,iind):
+          def get_jac_sparsity(self,oind,iind,symmetric):
             assert(oind == 0)
             assert(iind == 0)
             return Sparsity.diag(2)
