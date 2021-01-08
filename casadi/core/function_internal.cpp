@@ -1728,10 +1728,11 @@ namespace casadi {
       } else {
         // Generate pattern
         Sparsity sp;
-        bool sp_is_compact = false;
-        if (false /* !is_diff_out_.at(oind) || !is_diff_in_.at(iind) */) {
+        bool sp_is_compact;
+        if (!is_diff_out_.at(oind) || !is_diff_in_.at(iind)) {
           // All-zero sparse
           sp = Sparsity(nnz_out(oind), nnz_in(iind));
+          sp_is_compact = true;
         } else {
           // Use internal routine to determine sparsity
           if (has_spfwd() || has_sprev() || has_jac_sparsity(oind, iind)) {
