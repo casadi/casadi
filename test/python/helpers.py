@@ -408,7 +408,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.n_in()):
       if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
-      message = "input(%d)" % i
+      message = "input(%d: '%s')" % (i, trial.name_in(i))
 
     for i in range(2): # repeated evaluation
       try:
@@ -421,7 +421,7 @@ class casadiTestCase(unittest.TestCase):
       self.assertEqual(trial.n_in(),solution.n_in(),failmessage+": trial has %d inputs while solution has %d." % (trial.n_in(),solution.n_in()) )
 
       for i in range(trial.n_out()):
-        message = "output(%d)" % i
+        message = "output(%d: '%s')" % (i, trial.name_out(i))
         if (allow_empty and (trial.sparsity_out(i).is_empty() or solution.sparsity_out(i).is_empty() )): continue
         if (allow_nondiff and (trial.sparsity_out(i).nnz()==0 or solution.sparsity_out(i).nnz()==0 )): continue
         self.checkarray(trial_outputs[i],solution_outputs[i],"",digits=digits,failmessage=failmessage+": "+message)
