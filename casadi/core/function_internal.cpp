@@ -3190,7 +3190,7 @@ namespace casadi {
         const Sparsity& sp_in = derivative_of_.sparsity_in(iind);
         const Sparsity& sp_out = derivative_of_.sparsity_out(oind);
         // Handle Jacobian blocks corresponding to non-differentiable inputs or outputs
-        if (!derivative_of_->is_diff_out_[oind] || !derivative_of_->is_diff_in_[iind]) {
+        if (!derivative_of_.is_diff_out(oind) || !derivative_of_.is_diff_in(iind)) {
           return Sparsity(sp_out.numel(), sp_in.numel());
         }
         // Construct sparsity pattern
