@@ -3171,8 +3171,11 @@ namespace casadi {
         if (i < derivative_of_.n_in()) {
           // Same as nondifferentiated function
           return derivative_of_.sparsity_in(i);
+        } else if (uses_output()) {
+          // Nondifferentiated output used
+          return derivative_of_.sparsity_out(i - derivative_of_.n_in());
         } else {
-          // Dummy output
+          // Nondifferentiated output not needed
           return Sparsity(derivative_of_.size_out(i-derivative_of_.n_in()));
         }
       }
