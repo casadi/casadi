@@ -193,7 +193,7 @@ namespace casadi {
     mutable std::vector<void*> mem_;
 
     /// Unused memory objects
-    mutable std::stack<casadi_int> unused_;
+    mutable std::stack<int> unused_;
   };
 
   /** \brief Internal class for Function

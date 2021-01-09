@@ -3246,7 +3246,7 @@ namespace casadi {
       return mem_.size()-1;
     } else {
       // Use an unused memory object
-      casadi_int m = unused_.top();
+      int m = unused_.top();
       unused_.pop();
       return m;
     }

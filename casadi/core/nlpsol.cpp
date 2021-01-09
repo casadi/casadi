@@ -945,6 +945,7 @@ namespace casadi {
       // Evaluate
       fcallback_(m->arg, m->res, m->iw, m->w, 0);
     } catch(KeyboardInterruptException& ex) {
+      (void)ex;  // unused
       throw;
     } catch(exception& ex) {
       print("WARNING: intermediate_callback error: %s\n", ex.what());
