@@ -117,12 +117,12 @@ namespace casadi {
      */
     virtual Sparsity get_sparsity_out(casadi_int i);
 
-    /** \brief Get the sparsity of an input
+    /** \brief Get the name of an input
      * This function is called during construction.
      */
     virtual std::string get_name_in(casadi_int i);
 
-    /** \brief Get the sparsity of an output
+    /** \brief Get the name of an output
      * This function is called during construction.
      */
     virtual std::string get_name_out(casadi_int i);
