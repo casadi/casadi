@@ -206,6 +206,9 @@ namespace casadi {
      */
     ///@{
 
+    /// Lift problem formulation by extracting shared subexpressions
+    void lift(bool lift_shared = true, bool lift_calls = true);
+
     /// Identify and separate the algebraic variables and equations in the DAE
     void split_dae();
 

@@ -1179,6 +1179,21 @@ namespace casadi {
     return ret;
   }
 
+  void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
+    // Partially implemented
+    casadi_assert(lift_shared, "Not implemented");
+    casadi_assert(!lift_calls, "Not implemented");
+    if (x.size() > 0 || s.size() > 0)
+      casadi_warning("Only lifting algebraic variables");
+    // Lift algebraic expressions
+    std::vector<MX> new_v, new_vdef;
+    shared(this->alg, new_v, new_vdef);
+    // Register as dependent variables
+    for (size_t i = 0; i < new_v.size(); ++i) {
+      register_v(new_v.at(i), new_vdef.at(i));
+    }
+  }
+
   void DaeBuilder::split_dae() {
     // Only works if there are no d
     eliminate_v();
