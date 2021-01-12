@@ -736,33 +736,45 @@ namespace casadi {
   }
 
   template<>
-  void CASADI_EXPORT SX::shared(vector<SX >& ex,
-                         vector<SX >& v_sx,
-                         vector<SX >& vdef_sx,
-                         const string& v_prefix,
-                         const string& v_suffix) {
-
+  void SX::extract(std::vector<SX>& ex, std::vector<SX>& v_sx,
+      std::vector<SX>& vdef_sx, const Dict& opts) {
+    // Read options
+    std::string v_prefix = "v_", v_suffix = "";
+    bool lift_shared = true, lift_calls = false;
+    casadi_int v_ind = 0;
+    for (auto&& op : opts) {
+      if (op.first == "prefix") {
+        v_prefix = string(op.second);
+      } else if (op.first == "suffix") {
+        v_suffix = string(op.second);
+      } else if (op.first == "lift_shared") {
+        lift_shared = op.second;
+      } else if (op.first == "lift_calls") {
+        lift_calls = op.second;
+      } else if (op.first == "offset") {
+        v_ind = op.second;
+      } else {
+        casadi_error("No such option: " + string(op.first));
+      }
+    }
+    // Partially implemented
+    casadi_assert(lift_shared, "Not implemented");
+    casadi_assert(!lift_calls, "Not implemented");
     // Sort the expression
     Function f("tmp", vector<SX>(), ex);
     SXFunction *ff = f.get<SXFunction>();
-
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
     vector<SXElem> work(f.sz_w());
     vector<SXElem> work2 = work;
-
     // Iterator to the binary operations
     vector<SXElem>::const_iterator b_it=ff->operations_.begin();
-
     // Iterator to stack of constants
     vector<SXElem>::const_iterator c_it = ff->constants_.begin();
-
     // Iterator to free variables
     vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
-
     // Count how many times an expression has been used
     vector<casadi_int> usecount(work.size(), 0);
-
     // Evaluate the algorithm
     vector<SXElem> v, vdef;
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
@@ -789,7 +801,6 @@ namespace casadi {
           usecount[it->i1]=-1; // Extracted, do not extract again
         }
       }
-
       // Perform the operation
       switch (it->op) {
       case OP_OUTPUT:
@@ -804,28 +815,23 @@ namespace casadi {
         break;
       }
     }
-
     // Create intermediate variables
     stringstream v_name;
     for (casadi_int i=0; i<vdef.size(); ++i) {
       v_name.str(string());
-      v_name << v_prefix << i << v_suffix;
+      v_name << v_prefix << (v_ind++) << v_suffix;
       v.push_back(SXElem::sym(v_name.str()));
     }
-
+    // Consistency check
     casadi_assert(vdef.size()<numeric_limits<int>::max(), "Integer overflow");
-
     // Mark the above expressions
     for (casadi_int i=0; i<vdef.size(); ++i) {
       vdef[i].set_temp(static_cast<int>(i)+1);
     }
-
     // Save the marked nodes for later cleanup
     vector<SXElem> marked = vdef;
-
     // Reset iterator
     b_it=ff->operations_.begin();
-
     // Evaluate the algorithm
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       switch (it->op) {
@@ -838,7 +844,6 @@ namespace casadi {
             CASADI_MATH_FUN_BUILTIN(work[it->i1], work[it->i2], work[it->i0])
               }
           work2[it->i0] = *b_it++;
-
           // Replace with intermediate variables
           casadi_int ind = work2[it->i0].get_temp()-1;
           if (ind>=0) {
@@ -848,17 +853,26 @@ namespace casadi {
         }
       }
     }
-
     // Unmark the expressions
     for (vector<SXElem>::iterator it=marked.begin(); it!=marked.end(); ++it) {
       it->set_temp(0);
     }
-
     // Save v, vdef
     v_sx.resize(v.size());
     copy(v.begin(), v.end(), v_sx.begin());
     vdef_sx.resize(vdef.size());
     copy(vdef.begin(), vdef.end(), vdef_sx.begin());
+  }
+
+  template<>
+  void CASADI_EXPORT SX::shared(vector<SX >& ex,
+                         vector<SX >& v,
+                         vector<SX >& vdef,
+                         const string& v_prefix,
+                         const string& v_suffix) {
+     // Call new, more generic function
+     return extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
+       {"prefix", v_prefix}, {"suffix", v_suffix}});
   }
 
   template<>

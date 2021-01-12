@@ -2572,6 +2572,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::extract(std::vector<Matrix<Scalar>>& ex, std::vector<Matrix<Scalar>>& v,
+      std::vector<Matrix<Scalar>>& vdef, const Dict& opts) {
+    casadi_error("'extract' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::shared(std::vector<Matrix<Scalar> >& ex,
                                        std::vector<Matrix<Scalar> >& v,
                                        std::vector<Matrix<Scalar> >& vdef,

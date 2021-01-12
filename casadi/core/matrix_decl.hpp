@@ -307,6 +307,8 @@ namespace casadi {
     static casadi_int n_nodes(const Matrix<Scalar> &x);
     static std::string print_operator(const Matrix<Scalar> &x,
                                       const std::vector<std::string>& args);
+    static void extract(std::vector<Matrix<Scalar>>& ex, std::vector<Matrix<Scalar>>& v,
+      std::vector<Matrix<Scalar>>& vdef, const Dict& opts = Dict());
     static void shared(std::vector<Matrix<Scalar> >& ex,
                               std::vector<Matrix<Scalar> >& v,
                               std::vector<Matrix<Scalar> >& vdef,

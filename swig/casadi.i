@@ -3283,6 +3283,15 @@ DECL void casadi_substitute_inplace(const std::vector< M >& v,
   return substitute_inplace(v, INOUT1, INOUT2, reverse);
 }
 
+DECL void casadi_extract(const std::vector< M >& ex,
+    std::vector< M >& OUTPUT1,
+    std::vector< M >& OUTPUT2,
+    std::vector< M >& OUTPUT3,
+    const Dict& opts = Dict()) {
+  OUTPUT1 = ex;
+  extract(OUTPUT1, OUTPUT2, OUTPUT3, opts);
+}
+
 DECL void casadi_shared(const std::vector< M >& ex,
                                std::vector< M >& OUTPUT1,
                                std::vector< M >& OUTPUT2,
@@ -3291,6 +3300,7 @@ DECL void casadi_shared(const std::vector< M >& ex,
                                const std::string& v_suffix="") {
   shared(ex, OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
 }
+
 DECL M casadi_blockcat(const std::vector< std::vector< M > > &v) {
  return blockcat(v);
 }

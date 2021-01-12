@@ -1517,26 +1517,43 @@ namespace casadi {
 
   }
 
-  void MX::shared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
-                         const std::string& v_prefix, const std::string& v_suffix) {
+  void MX::extract(std::vector<MX>& ex, std::vector<MX>& v,
+      std::vector<MX>& vdef, const Dict& opts) {
     try {
+      // Read options
+      std::string v_prefix = "v_", v_suffix = "";
+      bool lift_shared = true, lift_calls = false;
+      casadi_int v_ind = 0;
+      for (auto&& op : opts) {
+        if (op.first == "prefix") {
+          v_prefix = string(op.second);
+        } else if (op.first == "suffix") {
+          v_suffix = string(op.second);
+        } else if (op.first == "lift_shared") {
+          lift_shared = op.second;
+        } else if (op.first == "lift_calls") {
+          lift_calls = op.second;
+        } else if (op.first == "offset") {
+          v_ind = op.second;
+        } else {
+          casadi_error("No such option: " + string(op.first));
+        }
+      }
+      // Partially implemented
+      casadi_assert(lift_shared, "Not implemented");
+      casadi_assert(!lift_calls, "Not implemented");
       // Sort the expression
       Function f("tmp", vector<MX>{}, ex);
       auto *ff = f.get<MXFunction>();
-
       // Get references to the internal data structures
       const vector<MXAlgEl>& algorithm = ff->algorithm_;
       vector<MX> work(ff->workloc_.size()-1);
-
       // Count how many times an expression has been used
       vector<casadi_int> usecount(work.size(), 0);
-
       // Remember the origin of every calculation
       vector<pair<casadi_int, casadi_int> > origin(work.size(), make_pair(-1, -1));
-
       // Which evaluations to replace
       vector<pair<casadi_int, casadi_int> > replace;
-
       // Evaluate the algorithm to identify which evaluations to replace
       casadi_int k=0;
       for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
@@ -1555,7 +1572,6 @@ namespace casadi {
             }
           }
         }
-
         // Perform the operation
         switch (it->op) {
         case OP_OUTPUT:
@@ -1575,26 +1591,20 @@ namespace casadi {
           break;
         }
       }
-
       // New variables and definitions
       v.clear();
       v.reserve(replace.size());
       vdef.clear();
       vdef.reserve(replace.size());
-
       // Quick return
       if (replace.empty()) return;
-
       // Sort the elements to be replaced in the order of appearence in the algorithm
       sort(replace.begin(), replace.end());
       vector<pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
-
       // Name of intermediate variables
       stringstream v_name;
-
       // Arguments for calling the atomic operations
       vector<MX> oarg, ores;
-
       // Evaluate the algorithm
       k=0;
       for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
@@ -1615,32 +1625,26 @@ namespace casadi {
               casadi_int el = it->arg[i];
               oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
             }
-
             // Perform the operation
             ores.resize(it->res.size());
             it->data->eval_mx(oarg, ores);
-
             // Get the result
             for (casadi_int i=0; i<ores.size(); ++i) {
               casadi_int el = it->res[i];
               if (el>=0) work.at(el) = ores[i];
             }
-
             // Possibly replace results with new variables
             for (casadi_int c=0; c<it->res.size(); ++c) {
               casadi_int ind = it->res[c];
               if (ind>=0 && replace_it->first==k && replace_it->second==c) {
                 // Store the result
                 vdef.push_back(work[ind]);
-
                 // Create a new variable
                 v_name.str(string());
-                v_name << v_prefix << v.size() << v_suffix;
+                v_name << v_prefix << (v_ind++) << v_suffix;
                 v.push_back(MX::sym(v_name.str()));
-
                 // Use in calculations
                 work[ind] = v.back();
-
                 // Go to the next element to be replaced
                 replace_it++;
               }
@@ -1649,8 +1653,15 @@ namespace casadi {
         }
       }
     } catch (std::exception& e) {
-      CASADI_THROW_ERROR("shared", e.what());
+      CASADI_THROW_ERROR("extract", e.what());
     }
+  }
+
+  void MX::shared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
+      const std::string& v_prefix, const std::string& v_suffix) {
+    // Call new, more generic function
+    return extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
+      {"prefix", v_prefix}, {"suffix", v_suffix}});
   }
 
   MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {

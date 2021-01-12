@@ -502,9 +502,10 @@ namespace casadi {
     static MX expm(const MX& A);
     static casadi_int n_nodes(const MX& x);
     static std::string print_operator(const MX& x, const std::vector<std::string>& args);
+    static void extract(std::vector<MX>& ex, std::vector<MX>& v,
+      std::vector<MX>& vdef, const Dict& opts = Dict());
     static void shared(std::vector<MX>& ex, std::vector<MX>& v,
-                              std::vector<MX>& vdef, const std::string& v_prefix,
-                              const std::string& v_suffix);
+      std::vector<MX>& vdef, const std::string& v_prefix, const std::string& v_suffix);
     static MX if_else(const MX& cond, const MX& if_true,
                       const MX& if_false, bool short_circuit=false);
     static MX conditional(const MX& ind, const std::vector<MX> &x, const MX& x_default,
