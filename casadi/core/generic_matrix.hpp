@@ -742,17 +742,6 @@ namespace casadi {
       return MatType::shared(ex, v, vdef, v_prefix, v_suffix);
     }
 
-    /** \brief Extract shared subexpressions from an set of expressions */
-    inline friend void shared(const std::vector<MatType>& ex,
-                                     std::vector<MatType>& ex_output,
-                                     std::vector<MatType>& v,
-                                     std::vector<MatType>& vdef,
-                                     const std::string& v_prefix="v_",
-                                     const std::string& v_suffix="") {
-      ex_output = ex;
-      shared(ex_output, v, vdef, v_prefix, v_suffix);
-    }
-
     /** \brief Given a repeated matrix, computes the sum of repeated parts
      */
     inline friend MatType repsum(const MatType &A, casadi_int n, casadi_int m=1) {

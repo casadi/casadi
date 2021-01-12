@@ -3298,7 +3298,8 @@ DECL void casadi_shared(const std::vector< M >& ex,
                                std::vector< M >& OUTPUT3,
                                const std::string& v_prefix="v_",
                                const std::string& v_suffix="") {
-  shared(ex, OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
+  OUTPUT1 = ex;
+  shared(OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
 }
 
 DECL M casadi_blockcat(const std::vector< std::vector< M > > &v) {
