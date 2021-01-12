@@ -4,13 +4,15 @@
 #include <Eigen/LU>
 
 TEST(LBFGS, quadratic) {
-    Eigen::MatrixXd H(2, 2);
+    pa::mat H(2, 2);
     H << 2, -1, -1, 3;
 
     std::cout << "Inverse Hessian: \n" << H.inverse() << std::endl;
 
     auto f      = [&H](const pa::vec &v) { return 0.5 * v.dot(H * v); };
     auto grad_f = [&H](const pa::vec &v) { return pa::vec(H * v); };
+
+    pa::mat B = pa::mat::Identity(2, 2);
 
     pa::LBFGS lbfgs(2, 5);
     pa::vec x(2);
@@ -22,11 +24,13 @@ TEST(LBFGS, quadratic) {
             std::cout << "x:    " << x.transpose() << std::endl;
             std::cout << "f(x): " << f(x) << std::endl;
 
-            Eigen::MatrixXd H⁻¹(2, 2);
-            Eigen::MatrixXd I = Eigen::MatrixXd::Identity(2, 2);
+            pa::mat H⁻¹(2, 2);
+            pa::mat I = pa::mat::Identity(2, 2);
             lbfgs.apply(1, I.col(0), H⁻¹.col(0));
             lbfgs.apply(1, I.col(1), H⁻¹.col(1));
-            std::cout << std::endl << H⁻¹ << std::endl;
+            std::cout << std::endl << "LB⁻¹ = \n" << H⁻¹ << std::endl;
+            std::cout << "B⁻¹  = \n" << B.inverse() << std::endl;
+            std::cout << "B    = \n" << B << std::endl;
         }
 
         pa::vec d(2);
@@ -35,6 +39,11 @@ TEST(LBFGS, quadratic) {
         auto r_new = grad_f(x);
         auto y     = r_new - r;
         lbfgs.update(-d, y);
+
+        auto s = -d;
+        B      = B + y * y.transpose() / y.dot(s) -
+            (B * s) * (s.transpose() * B.transpose()) / (s.transpose() * B * s);
+
         r = std::move(r_new);
     }
     std::cout << std::endl << "final" << std::endl;

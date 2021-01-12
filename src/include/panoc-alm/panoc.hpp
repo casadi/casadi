@@ -11,9 +11,9 @@ namespace pa {
 /// Tuning parameters for the PANOC algorithm.
 struct PANOCParams {
     struct {
-        /// Relative step size for finite difference Lipschitz estimate.
+        /// Relative step size for initial finite difference Lipschitz estimate.
         real_t ε = 1e-6;
-        /// Minimum step size for finite difference Lipschitz estimate.
+        /// Minimum step size for initial finite difference Lipschitz estimate.
         real_t δ = 1e-12;
         /// Factor that relates step size γ and Lipschitz constant.
         real_t Lγ_factor = 0.95;
@@ -31,15 +31,21 @@ class PANOCSolver {
   public:
     using Params = PANOCParams;
 
+    struct Stats {
+        unsigned iterations = 0;
+        bool converged      = false;
+        bool failed         = true;
+    };
+
     PANOCSolver(Params params) : params(params) {}
 
-    void operator()(const Problem &problem, // in
-                    vec &x,                 // inout
-                    vec &z,                 // out
-                    vec &y,                 // inout
-                    vec &err_z,             // out
-                    const vec &Σ,           // in
-                    real_t ε);
+    Stats operator()(const Problem &problem, // in
+                     vec &x,                 // inout
+                     vec &z,                 // out
+                     vec &y,                 // inout
+                     vec &err_z,             // out
+                     const vec &Σ,           // in
+                     real_t ε);
 
   private:
     Params params;

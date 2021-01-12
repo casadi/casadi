@@ -1,3 +1,4 @@
+#include <cfenv>
 #include <panoc-alm/alm.hpp>
 
 namespace pa {
@@ -25,6 +26,7 @@ void project_y(vec &y,          // inout
 
 void update_penalty_weights(const ALMParams &params, unsigned iteration, vec &e,
                             vec &old_e, real_t norm_e, vec &Σ) {
+#if 1
     for (Eigen::Index i = 0; i < e.rows(); ++i) {
         if (iteration == 0 || std::abs(e(i)) > params.θ * std::abs(old_e(i))) {
             Σ(i) = std::fmin(params.σₘₐₓ,
@@ -32,35 +34,50 @@ void update_penalty_weights(const ALMParams &params, unsigned iteration, vec &e,
                                  Σ(i));
         }
     }
+    // std::cout << "[ALM]   Σ = " << Σ.transpose() << std::endl;
+#else
+    Σ *= params.Δ; // OpEn-style penalty update
+    std::cout << "[ALM]   Σ = " << Σ(0) << std::endl;
+#endif
 }
 
 } // namespace detail
 
-void ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
-    vec Σ(problem.m);
-    vec z(problem.m);
-    vec error(problem.m);
-    vec error_old(problem.m);
+ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
+    feenableexcept(FE_INVALID); // TODO
+    auto sigNaN   = std::numeric_limits<real_t>::signaling_NaN();
+    vec Σ         = vec::Constant(problem.m, sigNaN);
+    vec z         = vec::Constant(problem.m, sigNaN);
+    vec error     = vec::Constant(problem.m, sigNaN);
+    vec error_old = vec::Constant(problem.m, sigNaN);
+
+    Stats s;
 
     // Initialize the penalty weights
     Σ.fill(params.Σ₀);
     real_t ε = params.ε₀;
 
     for (unsigned int i = 0; i < params.max_iter; ++i) {
+#ifdef PRINT_DEBUG_COUT
         std::cout << std::endl;
         std::cout << "[ALM]   "
                   << "Iteration #" << i << std::endl;
+#endif
         detail::project_y(y, problem.D.lowerbound, problem.D.upperbound,
                           params.M);
-        panoc(problem, x, z, y, error, Σ, ε);
+        auto ps = panoc(problem, x, z, y, error, Σ, ε);
+        s.inner_iterations += ps.iterations;
         real_t norm_e = vec_util::norm_inf(error);
 
         if (ε <= params.ε && norm_e <= params.δ) {
-            return;
+            s.outer_iterations = i;
+            return s;
         }
         detail::update_penalty_weights(params, i, error, error_old, norm_e, Σ);
-        ε = params.ρ * ε;
+        ε = std::fmax(params.ρ * ε, params.ε);
+        std::swap(error_old, error);
     }
+    throw std::runtime_error("[ALM]   Maximum iterations exceeded");
 }
 
 } // namespace pa

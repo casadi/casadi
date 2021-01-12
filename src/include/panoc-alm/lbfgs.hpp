@@ -1,9 +1,13 @@
 #pragma once
 
 #include "vec.hpp"
+#include <iostream>
+
+#include <Eigen/LU>
 
 namespace pa {
 
+/// Limited memory Broyden–Fletcher–Goldfarb–Shanno (BFGS) algorithm
 class LBFGS {
     using storage_t = Eigen::Matrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
@@ -13,7 +17,9 @@ class LBFGS {
 
   public:
     LBFGS() = default;
-    LBFGS(size_t n, size_t history) : storage(n + 1, history * 2) {}
+    LBFGS(size_t n, size_t history) : storage(n + 1, history * 2) {
+        storage.fill(std::numeric_limits<real_t>::quiet_NaN());
+    }
 
     size_t n() const { return storage.rows() - 1; }
     size_t history() const { return storage.cols() / 2; }
@@ -30,9 +36,36 @@ class LBFGS {
 
     template <class VecS, class VecY>
     void update(const VecS &s, const VecY &y) {
-        this->s(idx) = s;
-        this->y(idx) = y;
-        this->ρ(idx) = 1. / this->s(idx).dot(this->y(idx));
+        auto ys        = s.dot(y);
+        auto norm_sq_s = s.squaredNorm();
+
+        if (!std::isfinite(ys)) {
+            std::cerr << "[LBFGS] "
+                         "\x1b[0;31m"
+                         "Warning: L-BFGS update failed (yᵀs = inf/NaN)"
+                         "\x1b[0m"
+                      << std::endl;
+            return;
+        } else if (norm_sq_s <= std::numeric_limits<real_t>::min()) {
+            std::cerr << "[LBFGS] "
+                         "\x1b[0;31m"
+                         "Warning: L-BFGS update failed (‖s‖² <= ε)"
+                         "\x1b[0m"
+                      << std::endl;
+            return;
+        } else if (std::abs(ys) <= std::numeric_limits<real_t>::min()) {
+            std::cerr << "[LBFGS] "
+                         "\x1b[0;31m"
+                         "Warning: L-BFGS update failed (yᵀs <= ε)"
+                         "\x1b[0m"
+                      << std::endl;
+            return;
+        }
+        // TODO: CBFGS
+
+        this->s(idx)   = s;
+        this->y(idx)   = y;
+        this->ρ(idx)   = 1. / ys;
 
         if (++idx >= history()) {
             idx  = 0;
@@ -80,6 +113,29 @@ class LBFGS {
     void resize(size_t n, size_t history) {
         storage.resize(n + 1, history * 2);
         reset();
+    }
+};
+
+/// For tests only, to compare L-BFGS and BFGS
+class BFGS {
+    using storage_t = Eigen::Matrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
+    storage_t B;
+
+  public:
+    BFGS() = default;
+    BFGS(size_t n) : B(n, n) { reset(); }
+
+    void reset() { B = storage_t::Identity(B.rows(), B.cols()); }
+
+    template <class VecOut>
+    void apply(real_t γ, vec v, VecOut &&Hv) {
+        Hv = γ * B.partialPivLu().solve(v);
+    }
+
+    template <class VecS, class VecY>
+    void update(const VecS &s, const VecY &y) {
+        B = B + y * y.transpose() / y.dot(s) -
+            (B * s) * (s.transpose() * B.transpose()) / (s.transpose() * B * s);
     }
 };
 

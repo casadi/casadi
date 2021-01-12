@@ -74,8 +74,12 @@
         "eigen": "cpp"
     },
     "cSpell.words": [
+        "BFGS",
         "Eigen",
         "Lipschitz",
+        "casadi",
+        "cwise",
+        "ipopt",
         "lbfgs",
         "panoc",
         "r",

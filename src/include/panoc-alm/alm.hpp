@@ -25,10 +25,15 @@ class ALMSolver {
   public:
     using Params = ALMParams;
 
+    struct Stats {
+        unsigned inner_iterations = 0;
+        unsigned outer_iterations = 0;
+    };
+
     ALMSolver(Params params, PANOCSolver::Params panoc_params)
         : params(params), panoc(panoc_params) {}
 
-    void operator()(const Problem &problem, vec &y, vec &x);
+    Stats operator()(const Problem &problem, vec &y, vec &x);
 
   private:
     Params params;
