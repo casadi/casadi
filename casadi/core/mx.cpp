@@ -1541,7 +1541,6 @@ namespace casadi {
       }
       // Partially implemented
       casadi_assert(lift_shared, "Not implemented");
-      casadi_assert(!lift_calls, "Not implemented");
       // Sort the expression
       Function f("tmp", vector<MX>{}, ex);
       auto *ff = f.get<MXFunction>();
@@ -1563,12 +1562,13 @@ namespace casadi {
         case OP_PARAMETER:
           break;
         default: // Unary operation, binary operation or output
+          // Lift shared
           for (casadi_int c=0; c<it->arg.size(); ++c) {
-            if (usecount[it->arg[c]]==0) {
-              usecount[it->arg[c]]=1;
-            } else if (usecount[it->arg[c]]==1) {
-              replace.push_back(origin[it->arg[c]]);
-              usecount[it->arg[c]]=-1; // Extracted, do not extract again
+            if (usecount.at(it->arg[c]) == 0) {
+              usecount.at(it->arg[c]) = 1;
+            } else if (usecount.at(it->arg[c]) == 1) {
+              replace.push_back(origin.at(it->arg[c]));
+              usecount.at(it->arg[c]) = -1; // Extracted, do not extract again
             }
           }
         }
@@ -1624,6 +1624,18 @@ namespace casadi {
             for (casadi_int i=0; i<oarg.size(); ++i) {
               casadi_int el = it->arg[i];
               oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
+              // Lift call arguments (unless symbolic primitive or constant)
+              if (lift_calls && it->op == OP_CALL && !oarg[i].is_symbolic()
+                  && !oarg[i].is_constant()) {
+                // Store the result
+                vdef.push_back(oarg[i]);
+                // Create a new variable
+                v_name.str(string());
+                v_name << v_prefix << (v_ind++) << v_suffix;
+                v.push_back(MX::sym(v_name.str()));
+                // Use in calculations
+                oarg[i] = v.back();
+              }
             }
             // Perform the operation
             ores.resize(it->res.size());
@@ -1636,7 +1648,11 @@ namespace casadi {
             // Possibly replace results with new variables
             for (casadi_int c=0; c<it->res.size(); ++c) {
               casadi_int ind = it->res[c];
-              if (ind>=0 && replace_it->first==k && replace_it->second==c) {
+              if (ind < 0) continue;
+              bool replace_shared = replace_it != replace.end() &&
+                replace_it->first==k && replace_it->second==c;
+              bool replace_call = lift_calls && it->op == OP_CALL;
+              if (replace_shared || replace_call) {
                 // Store the result
                 vdef.push_back(work[ind]);
                 // Create a new variable
@@ -1646,7 +1662,7 @@ namespace casadi {
                 // Use in calculations
                 work[ind] = v.back();
                 // Go to the next element to be replaced
-                replace_it++;
+                if (replace_shared) replace_it++;
               }
             }
           }
