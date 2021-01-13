@@ -1732,18 +1732,26 @@ namespace casadi {
   }
 
   void DaeBuilder::clear_cache() {
-    for (bool elim_v : {false, true}) {
-      if (!mx_oracle_[elim_v].is_null()) mx_oracle_[elim_v] = Function();
-      if (!sx_oracle_[elim_v].is_null()) sx_oracle_[elim_v] = Function();
+    for (bool sx : {false, true}) {
+      for (bool elim_v : {false, true}) {
+        for (bool lifted_calls : {false, true}) {
+          Function& fref = oracle_[sx][elim_v][lifted_calls];
+          if (!fref.is_null()) fref = Function();
+        }
+      }
     }
   }
 
-  const Function& DaeBuilder::oracle(bool sx, bool elim_v) const {
+  const Function& DaeBuilder::oracle(bool sx, bool elim_v, bool lifted_calls) const {
     // Create an MX oracle, if needed
-    if (mx_oracle_[elim_v].is_null()) {
+    if (oracle_[false][elim_v][lifted_calls].is_null()) {
       // Oracle function inputs and outputs
       std::vector<MX> f_in, f_out, v;
       std::vector<std::string> f_in_name, f_out_name;
+      // Index for vdef
+      casadi_int vdef_ind = -1;
+      // Options consistency check
+      casadi_assert(!(elim_v && lifted_calls), "Incompatible options");
       // Do we need to substitute out v
       bool subst_v = false;
       // Collect all DAE input variables with at least one entry
@@ -1764,6 +1772,7 @@ namespace casadi {
         if (!v.empty()) {
           f_out.push_back(vertcat(v));
           f_out_name.push_back(name_out(static_cast<DaeBuilderOut>(i)));
+          if (i == DAE_BUILDER_VDEF) vdef_ind = i;
         }
       }
       // Eliminate v from inputs
@@ -1772,18 +1781,27 @@ namespace casadi {
         std::vector<MX> vdef(this->vdef);
         // Perform in-place substitution
         substitute_inplace(this->v, vdef, f_out, false);
+      } else if (lifted_calls && vdef_ind >= 0) {
+        // Make a copy of dependent variable definitions to avoid modifying member variable
+        std::vector<MX> vdef(this->vdef);
+        // Remove references to call nodes
+        for (MX& vdefref : vdef) {
+          if (vdefref.is_output()) vdefref = MX::zeros(vdefref.sparsity());
+        }
+        // Save to oracle outputs
+        f_out.at(vdef_ind) = vertcat(vdef);
       }
       // Create oracle
-      mx_oracle_[elim_v] = Function("mx_oracle", f_in, f_out, f_in_name, f_out_name);
+      oracle_[false][elim_v][lifted_calls]
+        = Function("mx_oracle", f_in, f_out, f_in_name, f_out_name);
     }
     // Return MX oracle, if requested
-    if (!sx) return mx_oracle_[elim_v];
+    if (!sx) return oracle_[false][elim_v][lifted_calls];
     // Create SX oracle, if needed
-    if (sx_oracle_[elim_v].is_null()) {
-      sx_oracle_[elim_v] = mx_oracle_[elim_v].expand("sx_oracle");
-    }
-    // Return SX oracle
-    return sx_oracle_[elim_v];
+    Function& sx_oracle = oracle_[true][elim_v][lifted_calls];
+    if (sx_oracle.is_null()) sx_oracle = oracle_[false][elim_v][lifted_calls].expand("sx_oracle");
+    // Return SX oracle reference
+    return sx_oracle;
   }
 
 } // namespace casadi

@@ -475,7 +475,7 @@ namespace casadi {
     ///@}
 
       /// Get the (cached) oracle, SX or MX
-    const Function& oracle(bool sx = false, bool elim_v = false) const;
+    const Function& oracle(bool sx = false, bool elim_v = false, bool lifted_calls = false) const;
 
 #ifndef SWIG
     // Internal methods
@@ -495,7 +495,7 @@ namespace casadi {
     std::vector<Function> fun_;
 
     /** \brief Function oracles (cached) */
-    mutable Function sx_oracle_[2], mx_oracle_[2];
+    mutable Function oracle_[2][2][2];
 
     /// Read an equation
     MX read_expr(const XmlNode& node);
