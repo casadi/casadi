@@ -2883,11 +2883,11 @@ namespace casadi {
   }
 
   const SX FunctionInternal::sx_in(casadi_int ind) const {
-    return SX::sym("x_" + str(ind), sparsity_in(ind));
+    return SX::sym(name_in_.at(ind), sparsity_in(ind));
   }
 
   const SX FunctionInternal::sx_out(casadi_int ind) const {
-    return SX::sym("r_" + str(ind), sparsity_out(ind));
+    return SX::sym(name_out_.at(ind), sparsity_out(ind));
   }
 
   const DM FunctionInternal::dm_in(casadi_int ind) const {
@@ -2931,11 +2931,11 @@ namespace casadi {
   }
 
   const MX FunctionInternal::mx_in(casadi_int ind) const {
-    return MX::sym("x_" + str(ind), sparsity_in(ind));
+    return MX::sym(name_in_.at(ind), sparsity_in(ind));
   }
 
   const MX FunctionInternal::mx_out(casadi_int ind) const {
-    return MX::sym("r_" + str(ind), sparsity_out(ind));
+    return MX::sym(name_out_.at(ind), sparsity_out(ind));
   }
 
   const std::vector<MX> FunctionInternal::mx_in() const {
