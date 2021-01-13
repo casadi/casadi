@@ -1643,7 +1643,7 @@ namespace casadi {
 
   Function DaeBuilder::create(const std::string& fname,
       const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out, bool sx) const {
+      const std::vector<std::string>& s_out, bool sx, bool lifted_calls) const {
     // Are there any '_' in the names?
     bool with_underscore = false;
     for (auto s_io : {&s_in, &s_out}) {
@@ -1658,7 +1658,7 @@ namespace casadi {
         for (std::string& s : *s_io) replace(s.begin(), s.end(), '_', ':');
       }
       // Recursive call
-      return create(fname, s_in_mod, s_out_mod, sx);
+      return create(fname, s_in_mod, s_out_mod, sx, lifted_calls);
     }
     // Check if dependent variables are given and needed
     bool elim_v;
@@ -1676,8 +1676,134 @@ namespace casadi {
         }
       }
     }
+    // Are lifted calls really needed?
+    if (lifted_calls) {
+      // Consistency check
+      casadi_assert(!elim_v, "Lifted calls cannot be used if dependent variables are eliminated");
+      // Only lift calls if really needed
+      lifted_calls = false;
+      for (const MX& vdef_comp : this->vdef) {
+        if (vdef_comp.is_output()) {
+          // There are indeed function calls present
+          lifted_calls = true;
+          break;
+        }
+      }
+    }
     // Call factory
-    return oracle(sx, elim_v).factory(fname, s_in, s_out, lc_);
+    Function ret = oracle(sx, elim_v, lifted_calls).factory(fname, s_in, s_out, lc_);
+    // If no lifted calls, done
+    if (!lifted_calls) return ret;
+    // MX expressions for ret without lifted calls
+    std::vector<MX> ret_in = ret.mx_in();
+    std::vector<MX> ret_out = ret(ret_in);
+    // Split "v" into components
+    std::vector<MX> v_in;
+    std::vector<casadi_int> h_offsets;
+    for (size_t i = 0; i < s_in.size(); ++i) {
+      if (s_in[i] == "v") {
+        h_offsets = offset(this->v);
+        v_in = vertsplit(ret_in[i], h_offsets);
+        break;
+      }
+    }
+    // Map dependent variables into index in vector
+    std::map<MXNode*, size_t> v_map;
+    for (size_t i = 0; i < this->v.size(); ++i) {
+      v_map[this->v.at(i).get()] = i;
+    }
+    // Row offsets in jac_vdef_v
+    casadi_int voffset_begin = 0, voffset_end = 0, voffset_last = 0;
+    // Vertical and horizontal slices of jac_vdef_v
+    std::vector<MX> vblocks, hblocks;
+    // All blocks for this block row
+    std::map<size_t, MX> jac_brow;
+    // Evaluate all Jacobian expressions
+    std::map<MXNode*, std::vector<MX>> call_jac;
+    for (size_t vdefind = 0; vdefind < this->vdef.size(); ++vdefind) {
+      // Current element handled
+      const MX& vdefref = this->vdef.at(vdefind);
+      // Update vertical offset
+      voffset_begin = voffset_end;
+      voffset_end += vdefref.numel();
+      // Handle function call nodes
+      if (vdefref.is_output()) {
+        // Which output of the function are we calculating
+        casadi_int oind = vdefref.which_output();
+        // All blocks for this block row
+        jac_brow.clear();
+        // Get function call node
+        MX c = vdefref.dep(0);
+        // Number of inputs and outputs
+        casadi_int n_c_in = c.n_dep(), n_c_out = c.n_out();
+        // Get the outputs of the corresponding Jacobian call
+        auto call_it = call_jac.find(c.get());
+        // If not found, calculate
+        if (call_it == call_jac.end()) {
+          // Expressions for function call inputs
+          std::vector<MX> call_in(n_c_in + n_c_out);
+          for (casadi_int i = 0; i < n_c_in; ++i) {
+            size_t v_ind = v_map.at(c.dep(i).get());
+            call_in.at(i) = v_in.at(v_ind);
+          }
+          // Expression for function call outputs
+          for (casadi_int i = 0; i < n_c_out; ++i) {
+            call_in.at(n_c_in + i) = c.get_output(i);
+          }
+          // Get/generate the (cached) Jacobian function
+          Function J = c.which_function().jacobian();
+          // Create expressions for Jacobian call
+          std::vector<MX> call_out = J(call_in);
+          // Save to map and update iterator
+          call_it = call_jac.insert(std::make_pair(c.get(), call_out)).first;
+        }
+        // Collect all blocks
+        for (casadi_int iind = 0; iind < n_c_in; ++iind) {
+          // Flat index for Jacobian output
+          casadi_int ind = iind + oind * n_c_in;
+          // Get the corresponding v
+          size_t v_ind = v_map.at(c.dep(iind).get());
+          // Save to jac_brow
+          jac_brow[v_ind] = call_it->second.at(ind);
+        }
+        // Add empty rows to vblocks, if any
+        if (voffset_last != voffset_begin) {
+          vblocks.push_back(MX(voffset_begin - voffset_last, h_offsets.back()));
+        }
+        // Collect horizontal blocks
+        hblocks.clear();
+        casadi_int hoffset = 0;
+        for (auto e : jac_brow) {
+          // Add empty block before Jacobian block, if needed
+          if (hoffset < h_offsets.at(e.first))
+            hblocks.push_back(MX(vdefref.numel(), h_offsets.at(e.first) - hoffset));
+          // Add Jacobian block
+          hblocks.push_back(e.second);
+          // Update offsets
+          hoffset = h_offsets.at(e.first + 1);
+        }
+        // Add trailing empty block, if needed
+        if (hoffset < h_offsets.back())
+          hblocks.push_back(MX(vdefref.numel(), h_offsets.back() - hoffset));
+        // Add new block row to vblocks
+        vblocks.push_back(horzcat(hblocks));
+        // Keep track of the offset handled in jac_brow
+        voffset_last = voffset_end;
+      }
+    }
+    // Add empty trailing row to vblocks, if any
+    if (voffset_last != voffset_end) {
+      vblocks.push_back(MX(voffset_end - voffset_last, h_offsets.back()));
+    }
+    // Additional term in jac_vdef_v
+    for (size_t i = 0; i < ret_out.size(); ++i) {
+      if (ret.name_out(i) == "jac_vdef_v") {
+        ret_out.at(i) += vertcat(vblocks);
+      }
+    }
+    // Assemble modified return function and return
+    ret = Function(ret.name(), ret_in, ret_out, ret.name_in(), ret.name_out());
+    return ret;
   }
 
   Function DaeBuilder::add_fun(const Function& f) {

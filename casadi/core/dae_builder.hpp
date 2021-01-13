@@ -347,7 +347,7 @@ namespace casadi {
     /// Construct a function object
     Function create(const std::string& fname,
         const std::vector<std::string>& s_in,
-        const std::vector<std::string>& s_out, bool sx = false) const;
+        const std::vector<std::string>& s_out, bool sx = false, bool lifted_calls = false) const;
     ///@}
 
     /// Get variable expression by name
