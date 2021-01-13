@@ -736,7 +736,7 @@ namespace casadi {
   }
 
   template<>
-  void SX::extract(std::vector<SX>& ex, std::vector<SX>& v_sx,
+  void CASADI_EXPORT SX::extract(std::vector<SX>& ex, std::vector<SX>& v_sx,
       std::vector<SX>& vdef_sx, const Dict& opts) {
     // Read options
     std::string v_prefix = "v_", v_suffix = "";
