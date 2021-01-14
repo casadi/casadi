@@ -1712,6 +1712,44 @@ namespace casadi {
     for (size_t i = 0; i < this->v.size(); ++i) {
       v_map[this->v.at(i).get()] = i;
     }
+    // Collect all the call nodes
+    std::map<MXNode*, CallIO> call_nodes;
+    for (size_t vdefind = 0; vdefind < this->vdef.size(); ++vdefind) {
+      // Current element handled
+      const MX& vdefref = this->vdef.at(vdefind);
+      // Handle function call nodes
+      if (vdefref.is_output()) {
+        // Get function call node
+        MX c = vdefref.dep(0);
+        // Find the corresponding call node in the map
+        auto call_it = call_nodes.find(c.get());
+        // If first time this call node is encountered
+        if (call_it == call_nodes.end()) {
+          // Create new CallIO struct
+          CallIO cio;
+          // Save function instance
+          cio.f = c.which_function();
+          // Expressions for function call inputs
+          cio.arg.resize(c.n_dep());
+          for (casadi_int i = 0; i < cio.arg.size(); ++i) {
+            size_t v_ind = v_map.at(c.dep(i).get());
+            cio.arg.at(i) = v_in.at(v_ind);
+          }
+          // Allocate memory for function call outputs
+          cio.res.resize(c.n_out());
+          // Save to map and update iterator
+          call_it = call_nodes.insert(std::make_pair(c.get(), cio)).first;
+        }
+        // Which output of the function are we calculating?
+        casadi_int oind = vdefref.which_output();
+        // Save output expression to structure
+        call_it->second.res.at(oind) = v_in.at(vdefind);
+      }
+    }
+    // Calculate all Jacobian expressions
+    for (auto call_it = call_nodes.begin(); call_it != call_nodes.end(); ++call_it) {
+      call_it->second.calc_jac();
+    }
     // Row offsets in jac_vdef_v
     casadi_int voffset_begin = 0, voffset_end = 0, voffset_last = 0;
     // Vertical and horizontal slices of jac_vdef_v
@@ -1719,7 +1757,6 @@ namespace casadi {
     // All blocks for this block row
     std::map<size_t, MX> jac_brow;
     // Evaluate all Jacobian expressions
-    std::map<MXNode*, std::vector<MX>> call_jac;
     for (size_t vdefind = 0; vdefind < this->vdef.size(); ++vdefind) {
       // Current element handled
       const MX& vdefref = this->vdef.at(vdefind);
@@ -1728,43 +1765,21 @@ namespace casadi {
       voffset_end += vdefref.numel();
       // Handle function call nodes
       if (vdefref.is_output()) {
-        // Which output of the function are we calculating
+        // Which output of the function are we calculating?
         casadi_int oind = vdefref.which_output();
-        // All blocks for this block row
-        jac_brow.clear();
         // Get function call node
         MX c = vdefref.dep(0);
-        // Number of inputs and outputs
-        casadi_int n_c_in = c.n_dep(), n_c_out = c.n_out();
-        // Get the outputs of the corresponding Jacobian call
-        auto call_it = call_jac.find(c.get());
-        // If not found, calculate
-        if (call_it == call_jac.end()) {
-          // Expressions for function call inputs
-          std::vector<MX> call_in(n_c_in + n_c_out);
-          for (casadi_int i = 0; i < n_c_in; ++i) {
-            size_t v_ind = v_map.at(c.dep(i).get());
-            call_in.at(i) = v_in.at(v_ind);
-          }
-          // Expression for function call outputs
-          for (casadi_int i = 0; i < n_c_out; ++i) {
-            call_in.at(n_c_in + i) = c.get_output(i);
-          }
-          // Get/generate the (cached) Jacobian function
-          Function J = c.which_function().jacobian();
-          // Create expressions for Jacobian call
-          std::vector<MX> call_out = J(call_in);
-          // Save to map and update iterator
-          call_it = call_jac.insert(std::make_pair(c.get(), call_out)).first;
-        }
+        // Find data about inputs and outputs
+        auto call_it = call_nodes.find(c.get());
+        casadi_assert_dev(call_it != call_nodes.end());
+        // All blocks for this block row
+        jac_brow.clear();
         // Collect all blocks
-        for (casadi_int iind = 0; iind < n_c_in; ++iind) {
-          // Flat index for Jacobian output
-          casadi_int ind = iind + oind * n_c_in;
+        for (casadi_int iind = 0; iind < call_it->second.arg.size(); ++iind) {
           // Get the corresponding v
           size_t v_ind = v_map.at(c.dep(iind).get());
           // Save to jac_brow
-          jac_brow[v_ind] = call_it->second.at(ind);
+          jac_brow[v_ind] = call_it->second.jac(oind, iind);
         }
         // Add empty rows to vblocks, if any
         if (voffset_last != voffset_begin) {
@@ -1928,6 +1943,27 @@ namespace casadi {
     if (sx_oracle.is_null()) sx_oracle = oracle_[false][elim_v][lifted_calls].expand("sx_oracle");
     // Return SX oracle reference
     return sx_oracle;
+  }
+
+  void DaeBuilder::CallIO::calc_jac() {
+    // Make sure that all inputs have been provided
+    for (casadi_int i = 0; i < this->f.n_in(); ++i) {
+      casadi_assert(this->f.size_in(i) == this->arg.at(i).size(), "Dimension mismatch");
+    }
+    // Get/generate the (cached) Jacobian function
+    Function J = this->f.jacobian();
+    // Input expressions for the call to J
+    std::vector<MX> call_in = this->arg;
+    call_in.insert(call_in.end(), this->res.begin(), this->res.end());
+    // Create expressions for Jacobian blocks and save to struct
+    this->jac_res = J(call_in);
+  }
+
+  const MX& DaeBuilder::CallIO::jac(casadi_int oind, casadi_int iind) const {
+    // Flat index
+    casadi_int ind = iind + oind * this->arg.size();
+    // Return reference
+    return this->jac_res.at(ind);
   }
 
 } // namespace casadi

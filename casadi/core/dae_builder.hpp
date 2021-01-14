@@ -522,6 +522,22 @@ namespace casadi {
     /// Problem structure has changed: Clear cache
     void clear_cache();
 
+    /// Helper class, represents inputs and outputs for a function call node
+    struct CallIO {
+      // Function instance
+      Function f;
+      // Nondifferentiated inputs
+      std::vector<MX> arg;
+      // Nondifferentiated inputs
+      std::vector<MX> res;
+      // Jacobian outputs
+      std::vector<MX> jac_res;
+      // Calculate Jacobian blocks
+      void calc_jac();
+      // Access a specific Jacobian block
+      const MX& jac(casadi_int oind, casadi_int iind) const;
+    };
+
 #endif // SWIG
 
   };
