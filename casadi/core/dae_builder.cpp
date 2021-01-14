@@ -1697,14 +1697,15 @@ namespace casadi {
     // MX expressions for ret without lifted calls
     std::vector<MX> ret_in = ret.mx_in();
     std::vector<MX> ret_out = ret(ret_in);
-    // Split "v" into components
-    std::vector<MX> v_in;
-    std::vector<casadi_int> h_offsets;
+    // Offsets in v
+    std::vector<casadi_int> h_offsets = offset(this->v);
+    // Split "v", "lam_vdef" into components
+    std::vector<MX> v_in, lam_vdef_in;
     for (size_t i = 0; i < s_in.size(); ++i) {
       if (s_in[i] == "v") {
-        h_offsets = offset(this->v);
         v_in = vertsplit(ret_in[i], h_offsets);
-        break;
+      } else if (s_in[i] == "lam_vdef") {
+        lam_vdef_in = vertsplit(ret_in[i], h_offsets);
       }
     }
     // Map dependent variables into index in vector
@@ -1737,6 +1738,8 @@ namespace casadi {
           }
           // Allocate memory for function call outputs
           cio.res.resize(c.n_out());
+          // Allocate memory for adjoint seeds, if any
+          if (!lam_vdef_in.empty()) cio.adj1_arg.resize(c.n_out());
           // Save to map and update iterator
           call_it = call_nodes.insert(std::make_pair(c.get(), cio)).first;
         }
@@ -1744,6 +1747,8 @@ namespace casadi {
         casadi_int oind = vdefref.which_output();
         // Save output expression to structure
         call_it->second.res.at(oind) = v_in.at(vdefind);
+        // Save adjoint seed to structure, if any
+        if (!lam_vdef_in.empty()) call_it->second.adj1_arg.at(oind) = lam_vdef_in.at(vdefind);
       }
     }
     // Additional term in jac_vdef_v
@@ -1953,17 +1958,55 @@ namespace casadi {
   }
 
   void DaeBuilder::CallIO::calc_jac() {
-    // Make sure that all inputs have been provided
+    // Consistency checks
     for (casadi_int i = 0; i < this->f.n_in(); ++i) {
-      casadi_assert(this->f.size_in(i) == this->arg.at(i).size(), "Dimension mismatch");
+      casadi_assert(this->f.size_in(i) == this->arg.at(i).size(), "Call input not provided");
+    }
+    for (casadi_int i = 0; i < this->f.n_out(); ++i) {
+      casadi_assert(this->f.size_out(i) == this->res.at(i).size(), "Call output not provided");
     }
     // Get/generate the (cached) Jacobian function
-    Function J = this->f.jacobian();
+    this->J = this->f.jacobian();
     // Input expressions for the call to J
     std::vector<MX> call_in = this->arg;
     call_in.insert(call_in.end(), this->res.begin(), this->res.end());
     // Create expressions for Jacobian blocks and save to struct
-    this->jac_res = J(call_in);
+    this->jac_res = this->J(call_in);
+  }
+
+  void DaeBuilder::CallIO::calc_grad() {
+    // Consistency checks
+    for (casadi_int i = 0; i < this->f.n_in(); ++i) {
+      casadi_assert(this->f.size_in(i) == this->arg.at(i).size(), "Call input not provided");
+    }
+    for (casadi_int i = 0; i < this->f.n_out(); ++i) {
+      casadi_assert(this->f.size_out(i) == this->res.at(i).size(), "Call output not provided");
+      casadi_assert(this->adj1_arg.at(i).size() == this->res.at(i).size(),
+        "Call adjoint seed not provided");
+    }
+    // We should make use of the Jacobian blocks here, if available
+    if (!this->jac_res.empty())
+      casadi_warning("Jacobian blocks currently not reused for gradient calculation");
+    // Get/generate the (cached) adjoint function
+    this->adj1_f = this->f.reverse(1);
+    // Input expressions for the call to adj1_f
+    std::vector<MX> call_in = this->arg;
+    call_in.insert(call_in.end(), this->res.begin(), this->res.end());
+    call_in.insert(call_in.end(), this->adj1_arg.begin(), this->adj1_arg.end());
+    // Create expressions for adjoint sweep and save to struct
+    this->adj1_res = this->adj1_f(call_in);
+  }
+
+  void DaeBuilder::CallIO::calc_hess() {
+    // Get/generate the (cached) Hessian function
+    this->H = this->adj1_f.jacobian();
+    // Input expressions for the call to H
+    std::vector<MX> call_in = this->arg;
+    call_in.insert(call_in.end(), this->res.begin(), this->res.end());
+    call_in.insert(call_in.end(), this->adj1_arg.begin(), this->adj1_arg.end());
+    call_in.insert(call_in.end(), this->adj1_res.begin(), this->adj1_res.end());
+    // Create expressions for Hessian blocks and save to struct
+    this->hess_res = this->H(call_in);
   }
 
   const MX& DaeBuilder::CallIO::jac(casadi_int oind, casadi_int iind) const {
@@ -1971,6 +2014,13 @@ namespace casadi {
     casadi_int ind = iind + oind * this->arg.size();
     // Return reference
     return this->jac_res.at(ind);
+  }
+
+  const MX& DaeBuilder::CallIO::hess(casadi_int iind1, casadi_int iind2) const {
+    // Flat index
+    casadi_int ind = iind1 + iind1 * this->adj1_arg.size();
+    // Return reference
+    return this->hess_res.at(ind);
   }
 
 } // namespace casadi

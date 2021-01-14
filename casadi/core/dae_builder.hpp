@@ -524,18 +524,30 @@ namespace casadi {
 
     /// Helper class, represents inputs and outputs for a function call node
     struct CallIO {
-      // Function instance
-      Function f;
+      // Function instances
+      Function f, adj1_f, J, H;
       // Nondifferentiated inputs
       std::vector<MX> arg;
       // Nondifferentiated inputs
       std::vector<MX> res;
       // Jacobian outputs
       std::vector<MX> jac_res;
+      // Adjoint seeds
+      std::vector<MX> adj1_arg;
+      // Adjoint sensitivities
+      std::vector<MX> adj1_res;
+      // Hessian outputs
+      std::vector<MX> hess_res;
       // Calculate Jacobian blocks
       void calc_jac();
+      // Calculate gradient of Lagrangian
+      void calc_grad();
+      // Calculate Hessian of Lagrangian
+      void calc_hess();
       // Access a specific Jacobian block
       const MX& jac(casadi_int oind, casadi_int iind) const;
+      // Access a specific Hessian block
+      const MX& hess(casadi_int iind1, casadi_int iind2) const;
     };
 
     /// Calculate contribution to jac_vdef_v from lifted calls
