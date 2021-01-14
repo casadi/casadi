@@ -1746,6 +1746,20 @@ namespace casadi {
         call_it->second.res.at(oind) = v_in.at(vdefind);
       }
     }
+    // Additional term in jac_vdef_v
+    for (size_t i = 0; i < ret_out.size(); ++i) {
+      if (ret.name_out(i) == "jac_vdef_v") {
+        ret_out.at(i) += jac_vdef_v_calls(call_nodes, v_map, h_offsets);
+      }
+    }
+    // Assemble modified return function and return
+    ret = Function(ret.name(), ret_in, ret_out, ret.name_in(), ret.name_out());
+    return ret;
+  }
+
+  MX DaeBuilder::jac_vdef_v_calls(std::map<MXNode*, CallIO>& call_nodes,
+      const std::map<MXNode*, size_t>& v_map,
+      const std::vector<casadi_int>& h_offsets) const {
     // Calculate all Jacobian expressions
     for (auto call_it = call_nodes.begin(); call_it != call_nodes.end(); ++call_it) {
       call_it->second.calc_jac();
@@ -1810,15 +1824,8 @@ namespace casadi {
     if (voffset_last != voffset_end) {
       vblocks.push_back(MX(voffset_end - voffset_last, h_offsets.back()));
     }
-    // Additional term in jac_vdef_v
-    for (size_t i = 0; i < ret_out.size(); ++i) {
-      if (ret.name_out(i) == "jac_vdef_v") {
-        ret_out.at(i) += vertcat(vblocks);
-      }
-    }
-    // Assemble modified return function and return
-    ret = Function(ret.name(), ret_in, ret_out, ret.name_in(), ret.name_out());
-    return ret;
+    // Return additional term in jac_vdef_v
+    return vertcat(vblocks);
   }
 
   Function DaeBuilder::add_fun(const Function& f) {

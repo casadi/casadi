@@ -538,8 +538,12 @@ namespace casadi {
       const MX& jac(casadi_int oind, casadi_int iind) const;
     };
 
-#endif // SWIG
+    /// Calculate contribution to jac_vdef_v from lifted calls
+    MX jac_vdef_v_calls(std::map<MXNode*, CallIO>& call_nodes,
+      const std::map<MXNode*, size_t>& v_map,
+      const std::vector<casadi_int>& h_offsets) const;
 
+#endif // SWIG
   };
 
 } // namespace casadi
