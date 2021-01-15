@@ -180,27 +180,24 @@ namespace casadi {
   template<typename MatType>
   std::string Factory<MatType>::
   request_input(const std::string& s) {
-    using namespace std;
-
-    // Quick return if already available
-    if (has_in(s)) return s;
-
-    // Get prefix
-    casadi_assert(has_prefix(s), "Cannot process \"" + s + "\" as input."
-      " Available: " + join(iname()) + ".");
-    pair<string, string> ss = split_prefix(s);
-
-    if (ss.first=="fwd") {
-      // Forward mode directional derivative
-      fwd_in_.push_back(imap(ss.second));
-    } else if (ss.first=="adj") {
-      // Reverse mode directional derivative
-      adj_in_.push_back(omap(ss.second));
+    // Add input if not already available
+    if (!has_in(s)) {
+      // Get prefix
+      casadi_assert(has_prefix(s), "Cannot process \"" + s + "\" as input."
+        " Available: " + join(iname()) + ".");
+      std::pair<std::string, std::string> ss = split_prefix(s);
+      // Process specific prefixes
+      if (ss.first=="fwd") {
+        // Forward mode directional derivative
+        fwd_in_.push_back(imap(ss.second));
+      } else if (ss.first=="adj") {
+        // Reverse mode directional derivative
+        adj_in_.push_back(omap(ss.second));
+      }
     }
-
     // Replace colons with underscore
-    string ret = s;
-    replace(ret.begin(), ret.end(), ':', '_');
+    std::string ret = s;
+    std::replace(ret.begin(), ret.end(), ':', '_');
     return ret;
   }
 
