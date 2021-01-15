@@ -1690,8 +1690,9 @@ namespace casadi {
         }
       }
     }
-    // Call factory
-    Function ret = oracle(sx, elim_v, lifted_calls).factory(fname, s_in, s_out, lc_);
+    // Call factory without lifted calls
+    std::string fname_nocalls = lifted_calls ? fname + "_nocalls" : fname;
+    Function ret = oracle(sx, elim_v, lifted_calls).factory(fname_nocalls, s_in, s_out, lc_);
     // If no lifted calls, done
     if (!lifted_calls) return ret;
     // MX expressions for ret without lifted calls
@@ -1702,9 +1703,9 @@ namespace casadi {
     // Split "v", "lam_vdef" into components
     std::vector<MX> v_in, lam_vdef_in;
     for (size_t i = 0; i < s_in.size(); ++i) {
-      if (s_in[i] == "v") {
+      if (ret.name_in(i) == "v") {
         v_in = vertsplit(ret_in[i], h_offsets);
-      } else if (s_in[i] == "lam_vdef") {
+      } else if (ret.name_in(i) == "lam_vdef") {
         lam_vdef_in = vertsplit(ret_in[i], h_offsets);
       }
     }
@@ -1731,13 +1732,16 @@ namespace casadi {
           // Save function instance
           cio.f = c.which_function();
           // Expressions for function call inputs
-          cio.arg.resize(c.n_dep());
-          for (casadi_int i = 0; i < cio.arg.size(); ++i) {
+          cio.v.resize(c.n_dep(), -1);
+          cio.arg.resize(cio.v.size());
+          for (casadi_int i = 0; i < cio.v.size(); ++i) {
             size_t v_ind = v_map.at(c.dep(i).get());
+            cio.v.at(i) = v_ind;
             cio.arg.at(i) = v_in.at(v_ind);
           }
           // Allocate memory for function call outputs
-          cio.res.resize(c.n_out());
+          cio.vdef.resize(c.n_out(), -1);
+          cio.res.resize(cio.vdef.size());
           // Allocate memory for adjoint seeds, if any
           if (!lam_vdef_in.empty()) cio.adj1_arg.resize(c.n_out());
           // Save to map and update iterator
@@ -1746,6 +1750,7 @@ namespace casadi {
         // Which output of the function are we calculating?
         casadi_int oind = vdefref.which_output();
         // Save output expression to structure
+        call_it->second.vdef.at(oind) = vdefind;
         call_it->second.res.at(oind) = v_in.at(vdefind);
         // Save adjoint seed to structure, if any
         if (!lam_vdef_in.empty()) call_it->second.adj1_arg.at(oind) = lam_vdef_in.at(vdefind);
@@ -1754,16 +1759,39 @@ namespace casadi {
     // Additional term in jac_vdef_v
     for (size_t i = 0; i < ret_out.size(); ++i) {
       if (ret.name_out(i) == "jac_vdef_v") {
-        ret_out.at(i) += jac_vdef_v_calls(call_nodes, v_map, h_offsets);
+        ret_out.at(i) += jac_vdef_v_from_calls(call_nodes, h_offsets);
+      }
+    }
+    // Additional term in hess_?_v_v where ? is any linear combination containing vdef
+    MX extra_hess_v_v;  // same for all linear combinations, if multiple
+    for (auto&& e : lc_) {
+      // Find out of vdef is part of the linear combination
+      bool has_vdef = false;
+      for (const std::string& r : e.second) {
+        if (r == "vdef") {
+          has_vdef = true;
+          break;
+        }
+      }
+      // Skip if linear combination does not depend on vdef
+      if (!has_vdef) continue;
+      // Search for matching function outputs
+      for (size_t i = 0; i < ret_out.size(); ++i) {
+        if (ret.name_out(i) == "hess_" + e.first + "_v_v") {
+          // Calculate contribution to hess_?_v_v
+          if (extra_hess_v_v.is_empty())
+            extra_hess_v_v = hess_v_v_from_calls(call_nodes, h_offsets);
+          // Add contribution to output
+          ret_out.at(i) += extra_hess_v_v;
+        }
       }
     }
     // Assemble modified return function and return
-    ret = Function(ret.name(), ret_in, ret_out, ret.name_in(), ret.name_out());
+    ret = Function(fname, ret_in, ret_out, ret.name_in(), ret.name_out());
     return ret;
   }
 
-  MX DaeBuilder::jac_vdef_v_calls(std::map<MXNode*, CallIO>& call_nodes,
-      const std::map<MXNode*, size_t>& v_map,
+  MX DaeBuilder::jac_vdef_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
       const std::vector<casadi_int>& h_offsets) const {
     // Calculate all Jacobian expressions
     for (auto call_it = call_nodes.begin(); call_it != call_nodes.end(); ++call_it) {
@@ -1775,7 +1803,7 @@ namespace casadi {
     std::vector<MX> vblocks, hblocks;
     // All blocks for this block row
     std::map<size_t, MX> jac_brow;
-    // Evaluate all Jacobian expressions
+    // Collect all Jacobian blocks
     for (size_t vdefind = 0; vdefind < this->vdef.size(); ++vdefind) {
       // Current element handled
       const MX& vdefref = this->vdef.at(vdefind);
@@ -1791,14 +1819,10 @@ namespace casadi {
         // Find data about inputs and outputs
         auto call_it = call_nodes.find(c.get());
         casadi_assert_dev(call_it != call_nodes.end());
-        // All blocks for this block row
+        // Collect all blocks for this block row
         jac_brow.clear();
-        // Collect all blocks
         for (casadi_int iind = 0; iind < call_it->second.arg.size(); ++iind) {
-          // Get the corresponding v
-          size_t v_ind = v_map.at(c.dep(iind).get());
-          // Save to jac_brow
-          jac_brow[v_ind] = call_it->second.jac(oind, iind);
+          jac_brow[call_it->second.v.at(iind)] = call_it->second.jac(oind, iind);
         }
         // Add empty rows to vblocks, if any
         if (voffset_last != voffset_begin) {
@@ -1824,6 +1848,82 @@ namespace casadi {
         // Keep track of the offset handled in jac_brow
         voffset_last = voffset_end;
       }
+    }
+    // Add empty trailing row to vblocks, if any
+    if (voffset_last != voffset_end) {
+      vblocks.push_back(MX(voffset_end - voffset_last, h_offsets.back()));
+    }
+    // Return additional term in jac_vdef_v
+    return vertcat(vblocks);
+  }
+
+  MX DaeBuilder::hess_v_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
+      const std::vector<casadi_int>& h_offsets) const {
+    // Calculate all Hessian expressions
+    for (auto&& call_ref : call_nodes) call_ref.second.calc_hess();
+    // Row offsets in hess_v_v
+    casadi_int voffset_begin = 0, voffset_end = 0, voffset_last = 0;
+    // Vertical and horizontal slices of hess_v_v
+    std::vector<MX> vblocks, hblocks;
+    // All blocks for a block row
+    std::map<size_t, MX> hess_brow;
+    // Loop over block rows
+    for (size_t vind1 = 0; vind1 < this->v.size(); ++vind1) {
+      // Current element handled
+      const MX& vref = this->v.at(vind1);
+      // Update vertical offset
+      voffset_begin = voffset_end;
+      voffset_end += vref.numel();
+      // Collect all blocks for this block row
+      hess_brow.clear();
+      for (auto&& call_ref : call_nodes) {
+        // Locate the specific index
+        for (size_t iind1 = 0; iind1 < call_ref.second.v.size(); ++iind1) {
+          if (call_ref.second.v.at(iind1) == vind1) {
+            // Add contribution to block row
+            for (size_t iind2 = 0; iind2 < call_ref.second.v.size(); ++iind2) {
+              // Corresponding index in v
+              size_t vind2 = call_ref.second.v[iind2];
+              // Hessian contribution
+              MX H_contr = call_ref.second.hess(iind1, iind2);
+              // Insert new block or add to existing one
+              auto it = hess_brow.find(vind2);
+              if (it != hess_brow.end()) {
+                it->second += H_contr;
+              } else {
+                hess_brow[vind2] = H_contr;
+              }
+            }
+            // An index can only appear once
+            break;
+          }
+        }
+      }
+      // If no blocks, skip row
+      if (hess_brow.empty()) continue;
+      // Add empty rows to vblocks, if any
+      if (voffset_last != voffset_begin) {
+        vblocks.push_back(MX(voffset_begin - voffset_last, h_offsets.back()));
+      }
+      // Collect horizontal blocks
+      hblocks.clear();
+      casadi_int hoffset = 0;
+      for (auto e : hess_brow) {
+        // Add empty block before Jacobian block, if needed
+        if (hoffset < h_offsets.at(e.first))
+          hblocks.push_back(MX(vref.numel(), h_offsets.at(e.first) - hoffset));
+        // Add Jacobian block
+        hblocks.push_back(e.second);
+        // Update offsets
+        hoffset = h_offsets.at(e.first + 1);
+      }
+      // Add trailing empty block, if needed
+      if (hoffset < h_offsets.back())
+        hblocks.push_back(MX(vref.numel(), h_offsets.back() - hoffset));
+      // Add new block row to vblocks
+      vblocks.push_back(horzcat(hblocks));
+      // Keep track of the offset handled in jac_brow
+      voffset_last = voffset_end;
     }
     // Add empty trailing row to vblocks, if any
     if (voffset_last != voffset_end) {
@@ -1979,6 +2079,7 @@ namespace casadi {
     for (casadi_int i = 0; i < this->f.n_in(); ++i) {
       casadi_assert(this->f.size_in(i) == this->arg.at(i).size(), "Call input not provided");
     }
+    casadi_assert(this->adj1_arg.size() == this->res.size(), "Input 'lam_vdef' not provided");
     for (casadi_int i = 0; i < this->f.n_out(); ++i) {
       casadi_assert(this->f.size_out(i) == this->res.at(i).size(), "Call output not provided");
       casadi_assert(this->adj1_arg.at(i).size() == this->res.at(i).size(),
@@ -1998,6 +2099,8 @@ namespace casadi {
   }
 
   void DaeBuilder::CallIO::calc_hess() {
+    // Calculate gradient, if needed
+    if (this->adj1_f.is_null()) calc_grad();
     // Get/generate the (cached) Hessian function
     this->H = this->adj1_f.jacobian();
     // Input expressions for the call to H

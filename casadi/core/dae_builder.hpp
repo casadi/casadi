@@ -526,6 +526,8 @@ namespace casadi {
     struct CallIO {
       // Function instances
       Function f, adj1_f, J, H;
+      // Index in v and vdef
+      std::vector<size_t> v, vdef;
       // Nondifferentiated inputs
       std::vector<MX> arg;
       // Nondifferentiated inputs
@@ -551,8 +553,11 @@ namespace casadi {
     };
 
     /// Calculate contribution to jac_vdef_v from lifted calls
-    MX jac_vdef_v_calls(std::map<MXNode*, CallIO>& call_nodes,
-      const std::map<MXNode*, size_t>& v_map,
+    MX jac_vdef_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
+      const std::vector<casadi_int>& h_offsets) const;
+
+    /// Calculate contribution to hess_?_v_v from lifted calls
+    MX hess_v_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
       const std::vector<casadi_int>& h_offsets) const;
 
 #endif // SWIG
