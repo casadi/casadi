@@ -1197,57 +1197,59 @@ namespace casadi {
   void DaeBuilder::split_dae() {
     // Only works if there are no d
     eliminate_v();
-
     // Quick return if no s
     if (this->s.empty()) return;
-
     // We investigate the interdependencies in sdot -> dae
-    Function f("f", {vertcat(this->sdot)}, {vertcat(this->dae)});
-
-    // Number of s
-    casadi_int ns = f.nnz_in(0);
-    casadi_assert_dev(f.nnz_out(0)==ns);
-
+    Function f("f", {vertcat(this->sdot)}, {vertcat(this->dae)}, {"sdot"}, {"dae"});
+    // Nonzeros in s
+    casadi_int nnz_s = f.nnz_in(0);
+    casadi_assert_dev(f.nnz_out(0) == nnz_s);
     // Input/output buffers
-    std::vector<bvec_t> f_sdot(ns, 1);
-    std::vector<bvec_t> f_dae(ns, 0);
-
+    std::vector<bvec_t> f_sdot(nnz_s, 1);  // seed all sdot
+    std::vector<bvec_t> f_dae(nnz_s, 0);
     // Propagate to f_dae
     f({get_ptr(f_sdot)}, {get_ptr(f_dae)});
-
     // Get the new differential and algebraic equations
     std::vector<MX> new_dae, new_alg;
-    for (casadi_int i=0; i<ns; ++i) {
-      if (f_dae[i]==bvec_t(1)) {
-        new_dae.push_back(this->dae[i]);
+    casadi_int nnz_off = 0;
+    for (const MX& dae_el : this->dae) {
+      // Check if dae element depends on sdot
+      if (f_dae.at(nnz_off) == bvec_t(1)) {
+        // Keep in dae
+        new_dae.push_back(dae_el);
       } else {
-        casadi_assert_dev(f_dae[i]==bvec_t(0));
-        new_alg.push_back(this->dae[i]);
+        // Move to alg
+        casadi_assert_dev(f_dae.at(nnz_off) == bvec_t(0));
+        new_alg.push_back(dae_el);
       }
+      // Update offset
+      nnz_off += dae_el.nnz();
     }
-
+    casadi_assert_dev(nnz_off == nnz_s);
     // Seed all outputs
     std::fill(f_dae.begin(), f_dae.end(), 1);
-
     // Propagate to f_sdot
     std::fill(f_sdot.begin(), f_sdot.end(), 0);
     f.rev({get_ptr(f_sdot)}, {get_ptr(f_dae)});
-
     // Get the new algebraic variables and new states
     std::vector<MX> new_s, new_sdot, new_z;
-    for (casadi_int i=0; i<ns; ++i) {
-      if (f_sdot[i]==bvec_t(1)) {
-        new_s.push_back(this->s[i]);
-        new_sdot.push_back(this->sdot[i]);
+    nnz_off = 0;
+    for (casadi_int i = 0; i < this->s.size(); ++i) {
+      if (f_sdot.at(nnz_off) == bvec_t(1)) {
+        // Keep in s/sdot
+        new_s.push_back(this->s.at(i));
+        new_sdot.push_back(this->sdot.at(i));
       } else {
-        casadi_assert_dev(f_sdot[i]==bvec_t(0));
-        new_z.push_back(this->s[i]);
+        // Move to z
+        casadi_assert_dev(f_sdot.at(nnz_off) == bvec_t(0));
+        new_z.push_back(this->s.at(i));
       }
+      // Update offset
+      nnz_off += this->s.at(i).nnz();
     }
-
+    casadi_assert_dev(nnz_off == nnz_s);
     // Make sure split was successful
-    casadi_assert_dev(new_dae.size()==new_s.size());
-
+    casadi_assert(new_dae.size() == new_s.size(), "Failed to split DAE");
     // Divide up the s and dae
     this->dae = new_dae;
     this->s = new_s;
