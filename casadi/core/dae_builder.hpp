@@ -212,9 +212,6 @@ namespace casadi {
     /// Identify and separate the algebraic variables and equations in the DAE
     void split_dae();
 
-    /// Eliminate algebraic variables and equations transforming them into outputs
-    void eliminate_alg();
-
     /// Sort dependent variables
     void sort_v();
 
