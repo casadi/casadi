@@ -215,9 +215,6 @@ namespace casadi {
     /// Eliminate algebraic variables and equations transforming them into outputs
     void eliminate_alg();
 
-    /// Transform the implicit DAE to a semi-explicit DAE
-    void make_semi_explicit();
-
     /// Sort dependent variables
     void sort_v();
 
