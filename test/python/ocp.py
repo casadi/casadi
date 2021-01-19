@@ -193,9 +193,6 @@ class OCPtests(casadiTestCase):
     ivp = DaeBuilder()
     ivp.parse_fmi('data/cstr.xml')
 
-    # Separate differential and algebraic variables
-    ivp.split_dae()
-
     self.assertTrue(len(ivp.q)==0)
     self.assertTrue(len(ivp.y)==1)
     m = vertcat(*ivp.ydef)
@@ -241,4 +238,3 @@ class OCPtests(casadiTestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
