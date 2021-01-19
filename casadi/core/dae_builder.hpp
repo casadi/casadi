@@ -209,15 +209,6 @@ namespace casadi {
     /// Lift problem formulation by extracting shared subexpressions
     void lift(bool lift_shared = true, bool lift_calls = true);
 
-    /// Sort dependent variables
-    void sort_v();
-
-    /// Eliminate interdependencies amongst dependent parameters
-    void split_v();
-
-    /// Eliminate dependent parameters
-    void eliminate_v();
-
     /// Eliminate quadrature states and turn them into ODE states
     void eliminate_quad();
 
