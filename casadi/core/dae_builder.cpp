@@ -583,60 +583,6 @@ namespace casadi {
     }
   }
 
-  void DaeBuilder::sort_dae() {
-    // Quick return if no differential states
-    if (this->x.empty()) return;
-
-    // Find out which differential equation depends on which differential state
-    Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
-    Sparsity sp = f.jac_sparsity().at(0);
-    casadi_assert_dev(sp.is_square());
-
-    // BLT transformation
-    std::vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
-
-    // Resort equations and variables
-    std::vector<MX> daenew(this->s.size()), snew(this->s.size()), sdotnew(this->s.size());
-    for (casadi_int i=0; i<rowperm.size(); ++i) {
-      // Permute equations
-      daenew[i] = this->dae[rowperm[i]];
-
-      // Permute variables
-      snew[i] = this->s[colperm[i]];
-      sdotnew[i] = this->sdot[colperm[i]];
-    }
-    this->dae = daenew;
-    this->s = snew;
-    this->sdot = sdotnew;
-  }
-
-  void DaeBuilder::sort_alg() {
-    // Quick return if no algebraic states
-    if (this->z.empty()) return;
-
-    // Find out which algebraic equation depends on which algebraic state
-    Function f("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
-    Sparsity sp = f.jac_sparsity().at(0);
-    casadi_assert_dev(sp.is_square());
-
-    // BLT transformation
-    std::vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
-
-    // Resort equations and variables
-    std::vector<MX> algnew(this->z.size()), znew(this->z.size());
-    for (casadi_int i=0; i<rowperm.size(); ++i) {
-      // Permute equations
-      algnew[i] = this->alg[rowperm[i]];
-
-      // Permute variables
-      znew[i] = this->z[colperm[i]];
-    }
-    this->alg = algnew;
-    this->z = znew;
-  }
-
   const Variable& DaeBuilder::variable(const std::string& name) const {
     return const_cast<DaeBuilder*>(this)->variable(name);
   }

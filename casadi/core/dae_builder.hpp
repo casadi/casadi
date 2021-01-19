@@ -212,12 +212,6 @@ namespace casadi {
     /// Eliminate quadrature states and turn them into ODE states
     void eliminate_quad();
 
-    /// Sort the DAE and implicitly defined states
-    void sort_dae();
-
-    /// Sort the algebraic equations and algebraic states
-    void sort_alg();
-
     /// Scale the variables
     void scale_variables();
     ///@}
