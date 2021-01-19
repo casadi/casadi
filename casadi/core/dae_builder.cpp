@@ -654,10 +654,6 @@ namespace casadi {
     casadi_assert_dev(it==ex.end());
   }
 
-  void DaeBuilder::scale_equations() {
-    casadi_error("DaeBuilder::scale_equations broken");
-  }
-
   void DaeBuilder::sort_dae() {
     // Quick return if no differential states
     if (this->x.empty()) return;

@@ -241,9 +241,6 @@ namespace casadi {
 
     /// Scale the variables
     void scale_variables();
-
-    /// Scale the implicit equations
-    void scale_equations();
     ///@}
 
     /** @name Functions
