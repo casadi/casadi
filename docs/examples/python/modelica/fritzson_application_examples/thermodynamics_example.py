@@ -26,7 +26,6 @@ import os
 import sys
 import numpy as NP
 from numpy import *
-import matplotlib.pyplot as plt
 import zipfile
 import time
 import shutil
@@ -44,9 +43,6 @@ except:
 # CasADi
 from casadi import *
 
-# Matplotlib interactive mode
-#plt.ion()
-
 # Compile Modelica code to XML
 def comp(name):
   curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -60,137 +56,15 @@ def comp(name):
     os.remove(modname+'.jmu')
     os.rename('modelDescription.xml',modname+'.xml')
 
-# Compile the simplemost example (conservation of mass in control volume)
-comp("BasicVolumeMassConservation")
-
-# Read a model from XML
-ivp = DaeBuilder()
-ivp.parse_fmi('BasicVolumeMassConservation.xml')
-
-# Transform into an explicit ODE
-ivp.make_explicit()
-
-# Create an integrator
-dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': vertcat(*ivp.ode)}
-grid = NP.linspace(0,1,100)
-F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
-
-# Integrate
-x0 = ivp.start(vertcat(*ivp.x))
-res = F(x0=x0)
-
-# Output function
-output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.v, ivp.vdef)
-output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
-output_fcn = Function("output", output_fcn_in, output_fcn_out)
-output_fcn = output_fcn.map(len(grid))
-m_out, P_out = output_fcn(grid, res["xf"], res["zf"])
-
-# Plot
-plt.figure(1)
-plt.subplot(1,2,1)
-plt.plot(grid, m_out.T)
-plt.xlabel("t")
-plt.ylabel("m(t)")
-plt.title("c.f. Fritzson figure 15-6 (left)")
-
-plt.subplot(1,2,2)
-plt.plot(grid, P_out.T)
-plt.xlabel("t")
-plt.ylabel("P(t)")
-plt.title("c.f. Fritzson figure 15-6 (right)")
-plt.draw()
-
-# Compile the next example (conservation of energy in control volume)
-comp("BasicVolumeEnergyConservation")
-
-# Allocate a parser and load the xml
-ivp = DaeBuilder()
-ivp.parse_fmi('BasicVolumeEnergyConservation.xml')
-
-# Transform into an explicit ODE
-ivp.make_explicit()
-
-# Create an integrator
-dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': vertcat(*ivp.ode)}
-grid = NP.linspace(0,10,100)
-F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
-
-# Integrate
-x0 = ivp.start(vertcat(*ivp.x))
-res = F(x0=x0)
-
-# Output function
-output_fcn_out = substitute([ivp("T")], ivp.v, ivp.vdef)
-output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
-output_fcn = Function("output", output_fcn_in, output_fcn_out)
-output_fcn = output_fcn.map(len(grid))
-T_out = output_fcn(grid, res["xf"], res["zf"])
-
-# Plot
-plt.figure(2)
-plt.plot(grid, T_out.T)
-plt.xlabel("t")
-plt.ylabel("T(t)")
-plt.title("c.f. Fritzson figure 15-9")
-plt.draw()
-
-# Compile the next example (Heat transfer and work)
-comp("BasicVolumeTest")
-
-# Allocate a parser and load the xml
-ivp = DaeBuilder()
-ivp.parse_fmi('BasicVolumeTest.xml')
-
-# Transform into an explicit ODE
-ivp.make_explicit()
-
-# Create an integrator
-dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': densify(vertcat(*ivp.ode))}
-grid = NP.linspace(0,2,100)
-F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
-
-# Integrate
-x0 = ivp.start(vertcat(*ivp.x))
-res = F(x0=x0)
-
-# Output function
-output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.v, ivp.vdef)
-output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
-output_fcn = Function("output", output_fcn_in, output_fcn_out)
-output_fcn = output_fcn.map(len(grid))
-T_out, U_out, V_out = output_fcn(grid, res["xf"], res["zf"])
-
-# Plot
-plt.figure(3)
-p1, = plt.plot(grid, T_out.T)
-p2, = plt.plot(grid, U_out.T)
-plt.xlabel("t")
-plt.ylabel("T(t)")
-plt.legend([p2, p1], ["T", "U"])
-plt.title("c.f. Fritzson figure 15-14")
-
-plt.figure(4)
-plt.plot(grid, V_out.T)
-plt.xlabel("t")
-plt.ylabel("V(t)")
-plt.title("Approximation of V")
-plt.draw()
-
-# Compile the next example (conservation of energy in control volume)
-comp("CtrlFlowSystem")
-
-# Allocate a parser and load the xml
-ivp = DaeBuilder()
-ivp.parse_fmi('CtrlFlowSystem.xml')
-
-# Transform into a semi-explicit ODE
-ivp.make_semi_explicit()
-
-# Print the ivp
-print(ivp)
-
-# The problem has no differential states, so instead of integrating, we just solve for mdot...
-
-
-plt.show()
+# Loop over tests
+for ex in ['BasicVolumeMassConservation', 'BasicVolumeEnergyConservation',
+        'BasicVolumeTest', 'CtrlFlowSystem']:
+    # Print progress
+    print('=== Testing example ' + ex + ' ===')
+    # Generate/retrieve FMU
+    comp(ex)
+    # Read a model from XML
+    dae = DaeBuilder()
+    dae.parse_fmi(ex + '.xml')
+    # Dump to screen
+    dae.disp(True)
