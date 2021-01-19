@@ -185,19 +185,14 @@ namespace casadi {
                            const std::vector<casadi_int>& col,
                            casadi_int nrow, casadi_int ncol);
 
-    /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form
-    **/
+    ///@{
+    /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form **/
     static Sparsity triplet(casadi_int nrow, casadi_int ncol,
                             const std::vector<casadi_int>& row, const std::vector<casadi_int>& col,
                             std::vector<casadi_int>& SWIG_OUTPUT(mapping), bool invert_mapping);
-
-    /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form
-        (no nonzero mapping)
-        rows_are_sorted==true means that the row entries already in increasing order
-        for each col and without any duplicates
-    **/
     static Sparsity triplet(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& row,
                             const std::vector<casadi_int>& col);
+    ///@}
 
     /** \brrief Create a sparsity from nonzeros
     *

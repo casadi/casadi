@@ -1172,11 +1172,7 @@ namespace casadi {
 
   MX DaeBuilder::der(const MX& var) const {
     casadi_assert_dev(var.is_column() && var.is_symbolic());
-    MX ret = MX::zeros(var.sparsity());
-    for (casadi_int i=0; i<ret.nnz(); ++i) {
-      ret.nz(i) = der(var.nz(i).name());
-    }
-    return ret;
+    return der(var.name());
   }
 
   void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
