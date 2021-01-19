@@ -886,20 +886,6 @@ namespace casadi {
     eliminate_v();
   }
 
-  void DaeBuilder::make_explicit() {
-    // Only works if there are no i
-    eliminate_v();
-
-    // Start by transforming to semi-explicit form
-    make_semi_explicit();
-
-    // Then eliminate the algebraic variables
-    eliminate_alg();
-
-    // Error if still algebraic variables
-    casadi_assert(this->z.empty(), "Failed to eliminate algebraic variables");
-  }
-
   const Variable& DaeBuilder::variable(const std::string& name) const {
     return const_cast<DaeBuilder*>(this)->variable(name);
   }
