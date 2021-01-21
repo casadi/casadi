@@ -37,6 +37,7 @@ namespace casadi {
     this->verbose = true;
     this->verbose_runtime = false;
     this->mex = false;
+    this->with_sfunction = false;
     this->cpp = false;
     this->main = false;
     this->casadi_real_type = "double";
@@ -63,13 +64,15 @@ namespace casadi {
         this->verbose_runtime = e.second;
       } else if (e.first=="mex") {
         this->mex = e.second;
+      } else if (e.first=="with_sfunction") {
+        this->with_sfunction = e.second;
       } else if (e.first=="cpp") {
         this->cpp = e.second;
       } else if (e.first=="main") {
         this->main = e.second;
       } else if (e.first=="casadi_real") {
         this->casadi_real_type = e.second.to_string();
-      }  else if (e.first=="casadi_int") {
+      } else if (e.first=="casadi_int") {
         this->casadi_int_type = e.second.to_string();
       } else if (e.first=="codegen_scalars") {
         this->codegen_scalars = e.second;
@@ -154,6 +157,14 @@ namespace casadi {
     // Mex
     if (this->mex) {
       add_include("mex.h", false, "MATLAB_MEX_FILE");
+    }
+
+    // s-Function
+    if (this->with_sfunction) {
+      this->casadi_real_type = "real_T";
+      this->casadi_int_type = "int_T";
+      this->with_header = true;
+      add_include("simstruc.h");
     }
 
     // Memory struct entry point
@@ -297,6 +308,9 @@ namespace casadi {
       flush(this->body);
     }
 
+    // Generate function specific code for Simulink sfunction
+    if (this->with_sfunction) this->added_sfunctions.push_back( this->codegen_sfunction(f) );
+
     // Add to list of exposed symbols
     this->exposed_fname.push_back(f.name());
   }
@@ -417,6 +431,15 @@ namespace casadi {
     // Finalize file
     file_close(s, this->cpp);
 
+    // Generate s-function
+    if (this->with_sfunction) {
+      for( unsigned ii=0; ii<this->added_sfunctions.size(); ii++) {
+        std::string sfunction_code = this->added_sfunctions.at(ii);
+        std::string sfunction_name = this->exposed_fname.at(ii);
+        generate_sfunction(sfunction_name, sfunction_code);
+      }
+    }
+
     // Generate header
     if (this->with_header) {
       // Create a header file
@@ -485,6 +508,184 @@ namespace casadi {
     // End conditional compilation and function
     s << "}\n"
          << "#endif\n";
+  }
+
+  void CodeGenerator::generate_sfunction(const string& name, const string& sfunction) const {
+    // Create c file
+    ofstream f;
+    f.open("sfun_"+ name + ".c");
+
+    // Print header
+    f << "// Must specify the S_FUNCTION_NAME as the name of the S-function\n"
+      << "#define S_FUNCTION_NAME sfun_" << name << "\n"
+      << "#define S_FUNCTION_LEVEL 2\n\n"
+      << "// Need to include simstruc.h for the definition of the SimStruct and its\n"
+      << "// associated macro definitions\n"
+      << "#ifndef __SIMSTRUC__\n"
+      << "#include \"simstruc.h\"\n"
+      << "#endif\n\n"
+      << "// Specific header file(s) required by the legacy code function\n"
+      << "#include \"" << this->name << ".h\"\n\n\n";
+
+    // Codegenerate s-function
+    f << sfunction;
+
+    // Close file(s)
+    f.close();
+  }
+
+  std::string CodeGenerator::codegen_sfunction(const Function& f) const {
+    stringstream g;
+    
+    // Initialize function
+    g << "/* Function: mdlInitializeSizes ===========================================\n"
+      << "* Abstract:\n"
+      << "*   The sizes information is used by Simulink to determine the S-function\n"
+      << "*   blocks characteristics (number of inputs, outputs, states, etc.).\n"
+      << "*/\n"
+      << "static void mdlInitializeSizes(SimStruct *S)\n"
+      << "{\n\n"
+      << "  /* Declare auxilary variables */\n"
+      << "  int_T ii;\n"
+      << "  const int_T* sp;\n\n"
+      << "  /* Set number of simulink s-function block parameters (the ones which appear by double click on simulink block) */\n"
+      << "  ssSetNumSFcnParams(S, 0);\n\n"
+      << "  /* Report if parameter mismatch occurs */\n"
+      << "  if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) return;\n\n"
+      << "  /* Specify the number of states for which a block detects zero crossings that occur between sample points */\n"
+      << "  ssSetNumNonsampledZCs(S, 0);\n\n"
+      << "  /* Set number of simulink input ports */\n"
+      << "  if (!ssSetNumInputPorts(S, " << f->n_in_ << ")) return;\n\n"
+      << "  /* Configure simulink input ports (inputs are assumed to be dense vectors or matrices) */\n"
+      << "  for (ii=0; ii<" << f->n_in_ << "; ++ii) {\n"
+      << "    sp = " << f.name() << "_sparsity_in(ii);\n"
+      << "    if (sp[1]==1) {\n"
+      << "      ssSetInputPortWidth(S, ii, sp[0]);\n"
+      << "    }\n"
+      << "    else {\n"
+      << "      ssSetInputPortMatrixDimensions(S, ii, sp[0], sp[1]);\n"
+      << "    }\n"
+      << "    ssSetInputPortDirectFeedThrough(S, ii, 1);\n"
+      << "  }\n\n"
+      << "  /* Set number of simulink output ports */\n"
+      << "  if (!ssSetNumOutputPorts(S, " << f->n_out_ << ")) return;\n\n"
+      << "  /* Configure simulink output ports (dense or sparse vectors or matrices allowed) */\n"
+      << "  for (ii=0; ii<" << f->n_out_ << "; ++ii) {\n"
+      << "    sp = " << f.name() << "_sparsity_out(ii);\n"
+      << "    if (sp[1]==1) {\n"
+      << "      ssSetOutputPortWidth(S, ii, sp[0]);\n"
+      << "    }\n"
+      << "    else {\n"
+      << "      ssSetOutputPortMatrixDimensions(S, ii, sp[0], sp[1]);\n"
+      << "    }\n"
+      << "  }\n"
+      << "  ssSetOutputPortOutputExprInRTW(S, 0, 0);\n\n"
+      << "  /* This S-function can be used in referenced model simulating in normal mode */\n"
+      << "  ssSetModelReferenceNormalModeSupport(S, MDL_START_AND_MDL_PROCESS_PARAMS_OK);\n\n"
+      << "  /* Set the number of sample time */\n"
+      << "  ssSetNumSampleTimes(S, 1);\n\n"
+      << "  /* Set the compliance with the SimState feature */\n"
+      << "  ssSetSimStateCompliance(S, USE_DEFAULT_SIM_STATE);\n\n"
+      << "  /**\n"
+      << "  * All options have the form SS_OPTION_<name> and are documented in\n"
+      << "    * matlabroot/simulink/include/simstruc.h. The options should be\n"
+      << "    * bitwise ord together as in\n"
+      << "    *    ssSetOptions(S, (SS_OPTION_name1 | SS_OPTION_name2))\n"
+      << "    */\n"
+      << "}\n\n\n";
+
+    // Initialize sample times function
+    g << "/* Function: mdlInitializeSampleTimes =====================================\n"
+      << " * Abstract:\n"
+      << " *   This function is used to specify the sample time(s) for your\n"
+      << " *   S-function. You must register the same number of sample times as\n"
+      << " *   specified in ssSetNumSampleTimes.\n"
+      << " */\n"
+      << "static void mdlInitializeSampleTimes(SimStruct *S)\n"
+      << "{\n"
+      << "    ssSetSampleTime(S, 0, INHERITED_SAMPLE_TIME);\n"
+      << "    ssSetOffsetTime(S, 0, FIXED_IN_MINOR_STEP_OFFSET);\n"
+      << "    #if defined(ssSetModelReferenceSampleTimeDefaultInheritance)\n"
+      << "    ssSetModelReferenceSampleTimeDefaultInheritance(S);\n"
+      << "    #endif\n"
+      << "}\n\n\n";
+
+    // Model output function
+    g << "/* Function: mdlOutputs ===================================================\n"
+      << " * Abstract:\n"
+      << " *   In this function, you compute the outputs of your S-function\n"
+      << " *   block. Generally outputs are placed in the output vector(s),\n"
+      << " *   ssGetOutputPortSignal.\n"
+      << " */\n"
+      << "static void mdlOutputs(SimStruct *S, int_T tid)\n"
+      << "{\n\n"
+      << "  /* Declare auxilary variables */\n"
+      << "  int_T ii, jj, row, col, nnz_col, ind_start_row_index, offset = 0, jj_total = 0;\n"
+      << "  const int_T* sp;\n\n"
+      << "  /* Allocate buffers for casadi input and output and simulink output */\n"
+      << "  " + CodeGenerator::array("real_T", "w", f->sz_w()+f->nnz_out())
+      << "  " + CodeGenerator::array("int_T", "iw", f->sz_iw())
+      << "  const real_T* arg[" << f->sz_arg() <<"] = {0};\n"
+      << "  real_T* res[" << f->sz_res() << "] = {0};\n"
+      << "  real_T* y[" << f->n_out_ << "] = {0};\n\n"
+      << "  /* Point inputs directly to casadi input buffer */\n"
+      << "  for (ii=0; ii<" << f->n_in_ << ";++ii) {\n"
+      << "    arg[ii] = *ssGetInputPortRealSignalPtrs( S, ii );\n"
+      << "  }\n\n"
+      << "  /* Point outputs to buffer */\n"
+      << "  for (ii=0; ii<" << f->n_out_ << ";++ii) {\n"
+      << "    y[ii] = ssGetOutputPortRealSignal( S, ii );\n"
+      << "  }\n\n"
+      << "  /* Point allocated working array to casadi output buffer */\n";
+    for (casadi_int ii=0; ii<f->n_out_; ++ii) {
+      g << "  res[" << ii << "] = w + offset;\n"
+        << "  offset += " << f.nnz_out(ii) << ";\n";
+    }
+    g << "  \n"
+      << "  /* Call CasADi function */\n"
+      << "  " << f.name() << "( arg, res, iw, w+offset, 0 );\n\n"
+      << "  /* Assign results to Simulink output array */\n"
+      << "  for (ii=0; ii<" << f->n_out_ << "; ++ii){\n\n"
+      << "    /* Get sparsity information of casadi function output (sp[0] - n_rows, sp[1] - n_cols, sp[2] - dense/sparse) */\n"
+      << "    sp = " << f.name() << "_sparsity_out(ii);\n\n"
+      << "    /* Check if output is dense (sp[2]=1) or sparse (sp[2]=0) */\n"
+      << "    if (sp[2]==0) {\n"
+      << "      ind_start_row_index = 2 + sp[1] + 1;\n\n"
+      << "      /* Distribute nonzero elements column by column */\n"
+      << "      for (col=0; col<sp[1]; col++) {\n\n"
+      << "        /* The cumulative sum of nonzero elements after each column starts at index 2, after last entry of CCS array col_ptr; number of nonzero elements in current column is obtained by the difference of two consecutive values */\n"
+      << "        nnz_col = sp[2+col+1] - sp[2+col];\n\n"
+      << "        /* Distribute nonzero elements of current column to correct row position */\n"
+      << "        for (jj=0; jj<nnz_col; jj++) {\n"
+      << "          row = sp[ind_start_row_index+jj_total];\n"
+      << "          y[ii][row + sp[0]*col] = res[ii][jj_total];\n"
+      << "          jj_total++;\n"
+      << "        }\n"
+      << "      }\n"
+      << "    }\n"
+      << "    else {\n"
+      << "      y[ii] = res[ii];\n"
+      << "    }\n"
+      << "  }\n"
+      << "}\n\n\n";
+
+    // Model terminate function
+    g << "/* Function: mdlTerminate =================================================\n"
+      << " * Abstract:\n"
+      << " *   In this function, you should perform any actions that are necessary\n"
+      << " *   at the termination of a simulation.\n"
+      << " */\n"
+      << "static void mdlTerminate(SimStruct *S)\n"
+      << "{\n"
+      << "}\n\n\n"
+      << "/* Required S-function trailer */\n"
+      << "#ifdef MATLAB_MEX_FILE\n"
+      << "# include \"simulink.c\"\n"
+      << "#else\n"
+      << "# include \"cg_sfun.h\"\n"
+      << "#endif";
+
+    return g.str();
   }
 
   void CodeGenerator::generate_main(std::ostream &s) const {
