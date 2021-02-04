@@ -66,10 +66,10 @@ namespace casadi {
         // Get the attributes
         std::string name = vnode.get_attribute("name");
         casadi_int valueReference;
-        vnode.readAttribute("valueReference", valueReference);
+        (void)vnode.read_attribute("valueReference", valueReference);
         std::string variability = vnode.get_attribute("variability");
         std::string causality = vnode.get_attribute("causality");
-        std::string alias = vnode.get_attribute("alias");
+        std::string alias = vnode.get_attribute("alias", "noAlias");
 
         // Skip to the next variable if its an alias
         if (alias == "alias" || alias == "negatedAlias")
@@ -123,14 +123,14 @@ namespace casadi {
           // Other properties
           if (vnode.hasChild("Real")) {
             const XmlNode& props = vnode["Real"];
-            props.readAttribute("unit", var.unit, false);
-            props.readAttribute("displayUnit", var.display_unit, false);
-            props.readAttribute("min", var.min, false);
-            props.readAttribute("max", var.max, false);
-            props.readAttribute("initialGuess", var.guess, false);
-            props.readAttribute("start", var.start, false);
-            props.readAttribute("nominal", var.nominal, false);
-            props.readAttribute("free", var.free, false);
+            (void)props.read_attribute("unit", var.unit, false);
+            (void)props.read_attribute("displayUnit", var.display_unit, false);
+            (void)props.read_attribute("min", var.min, false);
+            (void)props.read_attribute("max", var.max, false);
+            (void)props.read_attribute("initialGuess", var.guess, false);
+            (void)props.read_attribute("start", var.start, false);
+            (void)props.read_attribute("nominal", var.nominal, false);
+            (void)props.read_attribute("free", var.free, false);
           }
 
           // Variable category

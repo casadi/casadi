@@ -53,13 +53,25 @@ namespace casadi {
     /** \brief  Get an attribute by its name */
     std::string get_attribute(const std::string& att_name) const {
       std::string ret;
-      readAttribute(att_name, ret, true);
+      (void)read_attribute(att_name, ret, true);
       return ret;
+    }
+
+    /** \brief  Get an attribute by its name, default value if not found */
+    std::string get_attribute(const std::string& att_name, const std::string& def_att) const {
+      std::string att;
+      if (read_attribute(att_name, att, false)) {
+        // Atribute found
+        return att;
+      } else {
+        // No such attribute, return default value
+        return def_att;
+      }
     }
 
     /** \brief  Read the value of an attribute */
     template<typename T>
-    void readAttribute(const std::string& attribute_name, T& val,
+    bool read_attribute(const std::string& attribute_name, T& val,
         bool assert_existance=true) const {
       // find the attribute
       std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
@@ -67,9 +79,11 @@ namespace casadi {
       // check if the attribute exists
       if (it == attributes_.end()) {
         casadi_assert(!assert_existance,
-                              "Error in XmlNode::readAttribute: could not find " + attribute_name);
+          "Error in XmlNode::read_attribute: could not find " + attribute_name);
+        return false;
       } else {
         readString(it->second, val);
+        return true;
       }
     }
 
