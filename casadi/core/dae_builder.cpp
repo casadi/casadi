@@ -75,9 +75,13 @@ namespace casadi {
         if (alias == "alias" || alias == "negatedAlias")
           continue;
 
-        // Get the name
-        const XmlNode& nn = vnode["QualifiedName"];
-        std::string qn = qualified_name(nn);
+        // Get the qualified name (relevant for FMI 2.0?)
+        std::string qn;
+        if (vnode.has_child("QualifiedName")) {
+          qn = qualified_name(vnode["QualifiedName"]);
+        } else {
+          qn = name;
+        }
 
         // Add variable, if not already added
         if (varmap_.find(qn)==varmap_.end()) {
@@ -98,7 +102,7 @@ namespace casadi {
           else if (variability=="continuous")
             var.variability = CONTINUOUS;
           else
-            throw CasadiException("Unknown variability");
+            casadi_error("Unknown variability: " + variability);
 
           // Causality
           if (causality=="input")
@@ -108,7 +112,7 @@ namespace casadi {
           else if (causality=="internal")
             var.causality = INTERNAL;
           else
-            throw CasadiException("Unknown causality");
+            casadi_error("Unknown causality: " + causality);
 
           // Alias
           if (alias=="noAlias")
@@ -118,10 +122,10 @@ namespace casadi {
           else if (alias=="negatedAlias")
             var.alias = NEGATED_ALIAS;
           else
-            throw CasadiException("Unknown alias");
+            casadi_error("Unknown alias: " + alias);
 
           // Other properties
-          if (vnode.hasChild("Real")) {
+          if (vnode.has_child("Real")) {
             const XmlNode& props = vnode["Real"];
             (void)props.read_attribute("unit", var.unit, false);
             (void)props.read_attribute("displayUnit", var.display_unit, false);
@@ -134,7 +138,7 @@ namespace casadi {
           }
 
           // Variable category
-          if (vnode.hasChild("VariableCategory")) {
+          if (vnode.has_child("VariableCategory")) {
             std::string cat = vnode["VariableCategory"].getText();
             if (cat=="derivative")
               var.category = CAT_DERIVATIVE;
@@ -250,7 +254,7 @@ namespace casadi {
     }
 
     // **** Add optimization ****
-    if (document[0].hasChild("opt:Optimization")) {
+    if (document[0].has_child("opt:Optimization")) {
 
       // Get a reference to the DynamicEquations node
       const XmlNode& opts = document[0]["opt:Optimization"];

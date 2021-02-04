@@ -49,7 +49,7 @@ namespace casadi {
     return const_cast<XmlNode*>(this)->operator[](i); // NOLINT
   }
 
-  bool XmlNode::hasChild(const string& childname) const {
+  bool XmlNode::has_child(const string& childname) const {
     auto it = child_indices_.find(childname);
     return it!=child_indices_.end();
   }

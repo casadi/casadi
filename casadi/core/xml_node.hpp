@@ -100,7 +100,7 @@ namespace casadi {
     XmlNode& operator[](const std::string& childname);
 
     /** \brief  Check if a child is present */
-    bool hasChild(const std::string& childname) const;
+    bool has_child(const std::string& childname) const;
 
     /** \brief  Get the number of children */
     casadi_int size() const;
