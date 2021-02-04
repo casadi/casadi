@@ -64,12 +64,12 @@ namespace casadi {
         const XmlNode& vnode = modvars[i];
 
         // Get the attributes
-        std::string name        = vnode.getAttribute("name");
+        std::string name = vnode.get_attribute("name");
         casadi_int valueReference;
         vnode.readAttribute("valueReference", valueReference);
-        std::string variability = vnode.getAttribute("variability");
-        std::string causality   = vnode.getAttribute("causality");
-        std::string alias       = vnode.getAttribute("alias");
+        std::string variability = vnode.get_attribute("variability");
+        std::string causality = vnode.get_attribute("causality");
+        std::string alias = vnode.get_attribute("alias");
 
         // Skip to the next variable if its an alias
         if (alias == "alias" || alias == "negatedAlias")
@@ -827,7 +827,7 @@ namespace casadi {
       if (i!=0) qn << ".";
 
       // Get the name part
-      qn << nn[i].getAttribute("name");
+      qn << nn[i].get_attribute("name");
 
       // Get the index, if any
       if (nn[i].size()>0) {

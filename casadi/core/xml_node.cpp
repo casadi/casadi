@@ -35,9 +35,8 @@ namespace casadi {
   XmlNode::~XmlNode() {
   }
 
-  bool XmlNode::hasAttribute(const string& attribute_name) const {
-    auto it = attributes_.find(attribute_name);
-    return it!=attributes_.end();
+  bool XmlNode::has_attribute(const string& att_name) const {
+    return attributes_.find(att_name) != attributes_.end();
   }
 
   XmlNode& XmlNode::operator[](casadi_int i) {

@@ -38,23 +38,29 @@ namespace casadi {
 
   class CASADI_EXPORT XmlNode {
   public:
+    /** \brief Constructor */
     XmlNode();
+
+    /** \brief Destructor */
     ~XmlNode();
 
+    /** \brief  Check if an attribute is present */
+    bool has_attribute(const std::string& att_name) const;
+
     /** \brief  Add an attribute */
-    void set_attribute(const std::string& attribute_name, const std::string& attribute);
+    void set_attribute(const std::string& att_name, const std::string& att);
 
     /** \brief  Get an attribute by its name */
-    std::string getAttribute(const std::string& attribute_name) const {
+    std::string get_attribute(const std::string& att_name) const {
       std::string ret;
-      readAttribute(attribute_name, ret, true);
+      readAttribute(att_name, ret, true);
       return ret;
     }
 
     /** \brief  Read the value of an attribute */
     template<typename T>
-      void readAttribute(const std::string& attribute_name, T& val,
-                         bool assert_existance=true) const {
+    void readAttribute(const std::string& attribute_name, T& val,
+        bool assert_existance=true) const {
       // find the attribute
       std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
 
@@ -81,9 +87,6 @@ namespace casadi {
 
     /** \brief  Check if a child is present */
     bool hasChild(const std::string& childname) const;
-
-    /** \brief  Check if an attribute is present */
-    bool hasAttribute(const std::string& attribute_name) const;
 
     /** \brief  Get the number of children */
     casadi_int size() const;
