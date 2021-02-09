@@ -698,11 +698,11 @@ void casadi_ipqp_corrector(casadi_ipqp_data<T1>* d) {
     }
     // Mehrotra's heuristic as in in OOQP per communication with S. Wright
     if (flag & IPQP_PRIMAL) {
-      d->tau = (0.01 * mu_test / (dual_slack + max_tau * dual_slack)
+      d->tau = (0.01 * mu_test / (dual_slack + max_tau * dual_step)
         - primal_slack) / primal_step;
     } else {
       d->tau = (0.01 * mu_test / (primal_slack + max_tau * primal_step)
-        - dual_slack) / dual_slack;
+        - dual_slack) / dual_step;
     }
     d->tau = fmax(d->tau, 0.99 * max_tau);
   }
