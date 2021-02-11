@@ -59,28 +59,21 @@ namespace casadi {
 
       // Add variables
       for (casadi_int i=0; i<modvars.size(); ++i) {
-
         // Get a reference to the variable
         const XmlNode& vnode = modvars[i];
-
-        // Get the attributes
+        // Name attributes
         std::string name = vnode.get_attribute("name");
+        // valueReference attribute
         casadi_int valueReference;
         (void)vnode.read_attribute("valueReference", valueReference);
+        // causality attribute
+        Causality causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
+        // variability attribute
         Variability variability = to_enum<Variability>(
           vnode.get_attribute("variability", "continuous"));
-        Causality causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
-
-        // Get the qualified name (relevant for FMI 2.0?)
-        std::string qn;
-        if (vnode.has_child("QualifiedName")) {
-          qn = qualified_name(vnode["QualifiedName"]);
-        } else {
-          qn = name;
-        }
 
         // Add variable, if not already added
-        if (varmap_.find(qn)==varmap_.end()) {
+        if (varmap_.find(name)==varmap_.end()) {
 
           // Create variable
           Variable var(name);
@@ -123,7 +116,7 @@ namespace casadi {
           }
 
           // Add to list of variables
-          add_variable(qn, var);
+          add_variable(name, var);
 
           // Sort expression
           switch (var.category) {
