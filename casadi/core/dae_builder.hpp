@@ -91,19 +91,14 @@ template<> struct enum_traits<Initial> {
 /// Convert to string
 CASADI_EXPORT std::string to_string(Initial v);
 
+#ifndef SWIG
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
  */
-struct CASADI_EXPORT Variable :
-  public SWIG_IF_ELSE(PrintableCommon, Printable<Variable>) {
-#ifndef SWIG
+struct CASADI_EXPORT Variable : public Printable<Variable> {
   /// Constructor
-  Variable(const DaeBuilder* self = 0, const std::string& name = "");
-
-  /// Reference to owning DaeBuilder instance
-  const DaeBuilder* self;
-#endif  // SWIG
+  Variable(const std::string& name = "");
 
   /** Attributes common to all types of variables, cf. FMI specification */
   ///@{
@@ -153,6 +148,7 @@ struct CASADI_EXPORT Variable :
   // Default initial attribute, per specification
   static Initial default_initial(Variability variability, Causality causality);
 };
+#endif  // SWIG
 
 /** \brief An initial-value problem in differential-algebraic equations
     <H3>Independent variables:  </H3>
