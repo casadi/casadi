@@ -101,196 +101,9 @@ namespace casadi {
           (void)props.read_attribute("free", var.free, false);
         }
 
-        // Variable category
-        if (vnode.has_child("VariableCategory")) {
-          std::string cat = vnode["VariableCategory"].getText();
-          if (cat=="derivative")
-            var.category = CAT_DERIVATIVE;
-          else if (cat=="state")
-            var.category = CAT_STATE;
-          else if (cat=="dependentConstant")
-            var.category = CAT_DEPENDENT_CONSTANT;
-          else if (cat=="independentConstant")
-            var.category = CAT_INDEPENDENT_CONSTANT;
-          else if (cat=="dependentParameter")
-            var.category = CAT_DEPENDENT_PARAMETER;
-          else if (cat=="independentParameter")
-            var.category = CAT_INDEPENDENT_PARAMETER;
-          else if (cat=="algebraic")
-            var.category = CAT_ALGEBRAIC;
-          else
-            casadi_error("Unknown variable category: " + cat);
-        }
-
         // Add to list of variables
         add_variable(name, var);
-
-        // Sort expression
-        switch (var.category) {
-        case CAT_DERIVATIVE:
-          // Skip - meta information about time derivatives is
-          //        kept together with its parent variable
-          break;
-        case CAT_STATE:
-          this->s.push_back(var.v);
-          this->sdot.push_back(var.d);
-          break;
-        case CAT_DEPENDENT_CONSTANT:
-          // Skip
-          break;
-        case CAT_INDEPENDENT_CONSTANT:
-          // Skip
-          break;
-        case CAT_DEPENDENT_PARAMETER:
-          // Skip
-          break;
-        case CAT_INDEPENDENT_PARAMETER:
-          if (var.free) {
-            this->p.push_back(var.v);
-          } else {
-            // Skip
-          }
-          break;
-        case CAT_ALGEBRAIC:
-          if (var.causality == LOCAL) {
-            this->s.push_back(var.v);
-            this->sdot.push_back(var.d);
-          } else if (var.causality == INPUT) {
-            this->u.push_back(var.v);
-          }
-          break;
-        default:
-          casadi_warning("Unknown category for " + name);
-        }
       }
-    }
-
-    // **** Add binding equations ****
-    if (document[0].has_child("equ:BindingEquations")) {
-      // Get a reference to the BindingEquations node
-      const XmlNode& bindeqs = document[0]["equ:BindingEquations"];
-
-      for (casadi_int i=0; i<bindeqs.size(); ++i) {
-        const XmlNode& beq = bindeqs[i];
-
-        // Get the variable and binding expression
-        Variable& var = read_variable(beq[0]);
-        MX bexpr = read_expr(beq[1][0]);
-        this->v.push_back(var.v);
-        this->vdef.push_back(bexpr);
-      }
-    }
-
-    // **** Add dynamic equations ****
-    if (document[0].has_child("equ:DynamicEquations")) {
-      // Get a reference to the DynamicEquations node
-      const XmlNode& dyneqs = document[0]["equ:DynamicEquations"];
-
-      // Add equations
-      for (casadi_int i=0; i<dyneqs.size(); ++i) {
-
-        // Get a reference to the variable
-        const XmlNode& dnode = dyneqs[i];
-
-        // Add the differential equation
-        MX de_new = read_expr(dnode[0]);
-        this->dae.push_back(de_new);
-      }
-    }
-
-    // **** Add initial equations ****
-    if (document[0].has_child("equ:InitialEquations")) {
-      // Get a reference to the DynamicEquations node
-      const XmlNode& initeqs = document[0]["equ:InitialEquations"];
-
-      // Add equations
-      for (casadi_int i=0; i<initeqs.size(); ++i) {
-
-        // Get a reference to the node
-        const XmlNode& inode = initeqs[i];
-
-        // Add the differential equations
-        for (casadi_int i=0; i<inode.size(); ++i) {
-          this->init.push_back(read_expr(inode[i]));
-        }
-      }
-    }
-
-    // **** Add optimization ****
-    if (document[0].has_child("opt:Optimization")) {
-      // Get a reference to the DynamicEquations node
-      const XmlNode& opts = document[0]["opt:Optimization"];
-      for (casadi_int i=0; i<opts.size(); ++i) {
-
-        // Get a reference to the node
-        const XmlNode& onode = opts[i];
-
-        // Get the type
-        if (onode.checkName("opt:ObjectiveFunction")) { // mayer term
-          try {
-            // Add components
-            for (casadi_int i=0; i<onode.size(); ++i) {
-              const XmlNode& var = onode[i];
-
-              // If string literal, ignore
-              if (var.checkName("exp:StringLiteral"))
-                continue;
-
-              // Read expression
-              MX v = read_expr(var);
-
-              // Treat as an output
-              add_y("mterm", v);
-            }
-          } catch(std::exception& ex) {
-            throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
-          }
-        } else if (onode.checkName("opt:IntegrandObjectiveFunction")) {
-          try {
-            for (casadi_int i=0; i<onode.size(); ++i) {
-              const XmlNode& var = onode[i];
-
-              // If string literal, ignore
-              if (var.checkName("exp:StringLiteral")) continue;
-
-              // Read expression
-              MX v = read_expr(var);
-
-              // Treat as a quadrature state
-              add_q("lterm");
-              add_quad("lterm_rhs", v);
-            }
-          } catch(std::exception& ex) {
-            throw CasadiException(std::string("addIntegrandObjectiveFunction failed: ")
-                                  + ex.what());
-          }
-        } else if (onode.checkName("opt:IntervalStartTime")) {
-          // Ignore, treated above
-        } else if (onode.checkName("opt:IntervalFinalTime")) {
-          // Ignore, treated above
-        } else if (onode.checkName("opt:TimePoints")) {
-          // Ignore, treated above
-        } else if (onode.checkName("opt:PointConstraints")) {
-          casadi_warning("opt:PointConstraints not supported, ignored");
-        } else if (onode.checkName("opt:Constraints")) {
-          casadi_warning("opt:Constraints not supported, ignored");
-        } else if (onode.checkName("opt:PathConstraints")) {
-          casadi_warning("opt:PointConstraints not supported, ignored");
-        } else {
-          casadi_warning("DaeBuilder::addOptimization: Unknown node " + str(onode.name()));
-        }
-      }
-    }
-
-    // Make sure that the dimensions are consistent at this point
-    if (this->s.size()!=this->dae.size()) {
-      casadi_warning("The number of differential-algebraic equations does not match "
-                     "the number of implicitly defined states.");
-    }
-    if (this->z.size()!=this->alg.size()) {
-      casadi_warning("The number of algebraic equations (equations not involving "
-                    "differentiated variables) does not match the number of "
-                    "algebraic variables.");
     }
   }
 
@@ -406,8 +219,7 @@ namespace casadi {
     if (more) sanity_check();
 
     // Print dimensions
-    stream << "ns = " << this->s.size() << ", "
-           << "nx = " << this->x.size() << ", "
+    stream << "nx = " << this->x.size() << ", "
            << "nz = " << this->z.size() << ", "
            << "nq = " << this->q.size() << ", "
            << "ny = " << this->y.size() << ", "
@@ -430,7 +242,6 @@ namespace casadi {
     // Print the variables
     stream << "Variables" << std::endl;
     stream << "  t = " << str(this->t) << std::endl;
-    if (!this->s.empty()) stream << "  s = " << str(this->s) << std::endl;
     if (!this->x.empty()) stream << "  x = " << str(this->x) << std::endl;
     if (!this->z.empty()) stream << "  z =  " << str(this->z) << std::endl;
     if (!this->q.empty()) stream << "  q =  " << str(this->q) << std::endl;
@@ -443,13 +254,6 @@ namespace casadi {
       stream << "Dependent variables" << std::endl;
       for (casadi_int i=0; i<this->v.size(); ++i)
         stream << "  " << str(this->v[i]) << " == " << str(this->vdef[i]) << std::endl;
-    }
-
-    if (!this->dae.empty()) {
-      stream << "Fully-implicit differential-algebraic equations" << std::endl;
-      for (casadi_int k=0; k<this->dae.size(); ++k) {
-        stream << "  0 == " << this->dae[k] << std::endl;
-      }
     }
 
     if (!this->x.empty()) {
@@ -522,7 +326,6 @@ namespace casadi {
     // Collect all expressions to be replaced
     std::vector<MX> ex;
     ex.insert(ex.end(), this->ode.begin(), this->ode.end());
-    ex.insert(ex.end(), this->dae.begin(), this->dae.end());
     ex.insert(ex.end(), this->alg.begin(), this->alg.end());
     ex.insert(ex.end(), this->quad.begin(), this->quad.end());
     ex.insert(ex.end(), this->vdef.begin(), this->vdef.end());
@@ -535,7 +338,6 @@ namespace casadi {
     // Get the modified expressions
     std::vector<MX>::const_iterator it=ex.begin();
     for (casadi_int i=0; i<this->x.size(); ++i) this->ode[i] = *it++ / nominal(this->x[i]);
-    for (casadi_int i=0; i<this->s.size(); ++i) this->dae[i] = *it++;
     for (casadi_int i=0; i<this->z.size(); ++i) this->alg[i] = *it++;
     for (casadi_int i=0; i<this->q.size(); ++i) this->quad[i] = *it++ / nominal(this->q[i]);
     for (casadi_int i=0; i<this->v.size(); ++i) this->vdef[i] = *it++ / nominal(this->v[i]);
@@ -633,15 +435,6 @@ namespace casadi {
     return new_q;
   }
 
-  std::pair<MX, MX> DaeBuilder::add_s(const std::string& name, casadi_int n) {
-    if (name.empty()) return add_s("s" + str(this->s.size()), n);
-    Variable v(name, Sparsity::dense(n));
-    add_variable(name, v);
-    this->s.push_back(v.v);
-    this->sdot.push_back(v.d);
-    return std::pair<MX, MX>(v.v, v.d);
-  }
-
   MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
     if (name.empty()) return add_z("z" + str(this->z.size()), n);
     MX new_z = add_variable(name, n);
@@ -692,12 +485,6 @@ namespace casadi {
     clear_cache();
   }
 
-  void DaeBuilder::add_dae(const std::string& name, const MX& new_dae) {
-    this->dae.push_back(new_dae);
-    this->lam_dae.push_back(MX::sym("lam_" + name, new_dae.sparsity()));
-    clear_cache();
-  }
-
   void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
     this->alg.push_back(new_alg);
     this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
@@ -722,19 +509,6 @@ namespace casadi {
       casadi_assert(this->x[i].size()==this->ode[i].size(),
                             "ode has wrong dimensions");
       casadi_assert(this->x[i].is_symbolic(), "Non-symbolic state x");
-    }
-
-    // DAE
-    casadi_assert(this->s.size()==this->sdot.size(),
-                          "s and sdot have different lengths");
-    casadi_assert(this->s.size()==this->dae.size(),
-                          "s and dae have different lengths");
-    for (casadi_int i=0; i<this->s.size(); ++i) {
-      casadi_assert(this->s[i].is_symbolic(), "Non-symbolic state s");
-      casadi_assert(this->s[i].size()==this->sdot[i].size(),
-                            "sdot has wrong dimensions");
-      casadi_assert(this->s[i].size()==this->dae[i].size(),
-                            "dae has wrong dimensions");
     }
 
     // Algebraic variables/equations
@@ -822,8 +596,7 @@ namespace casadi {
 
   void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
     // Partially implemented
-    if (x.size() > 0 || s.size() > 0)
-      casadi_warning("Only lifting algebraic variables");
+    if (x.size() > 0) casadi_warning("Only lifting algebraic variables");
     // Lift algebraic expressions
     std::vector<MX> new_v, new_vdef;
     Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
@@ -1038,8 +811,6 @@ namespace casadi {
     case DAE_BUILDER_V: return "v";
     case DAE_BUILDER_U: return "u";
     case DAE_BUILDER_X: return "x";
-    case DAE_BUILDER_S: return "s";
-    case DAE_BUILDER_SDOT: return "sdot";
     case DAE_BUILDER_Z: return "z";
     case DAE_BUILDER_Q: return "q";
     case DAE_BUILDER_Y: return "y";
@@ -1060,10 +831,6 @@ namespace casadi {
       return DAE_BUILDER_U;
     } else if (id=="x") {
       return DAE_BUILDER_X;
-    } else if (id=="s") {
-      return DAE_BUILDER_S;
-    } else if (id=="sdot") {
-      return DAE_BUILDER_SDOT;
     } else if (id=="z") {
       return DAE_BUILDER_Z;
     } else if (id=="q") {
@@ -1088,7 +855,6 @@ namespace casadi {
     switch (ind) {
     case DAE_BUILDER_VDEF: return "vdef";
     case DAE_BUILDER_ODE: return "ode";
-    case DAE_BUILDER_DAE: return "dae";
     case DAE_BUILDER_ALG: return "alg";
     case DAE_BUILDER_QUAD: return "quad";
     case DAE_BUILDER_YDEF: return "ydef";
@@ -1101,8 +867,6 @@ namespace casadi {
       return DAE_BUILDER_VDEF;
     } else if (id=="ode") {
       return DAE_BUILDER_ODE;
-    } else if (id=="dae") {
-      return DAE_BUILDER_DAE;
     } else if (id=="alg") {
       return DAE_BUILDER_ALG;
     } else if (id=="quad") {
@@ -1153,8 +917,6 @@ namespace casadi {
     case DAE_BUILDER_V: return this->v;
     case DAE_BUILDER_U: return this->u;
     case DAE_BUILDER_X: return this->x;
-    case DAE_BUILDER_S: return this->s;
-    case DAE_BUILDER_SDOT: return this->sdot;
     case DAE_BUILDER_Z: return this->z;
     case DAE_BUILDER_Q: return this->q;
     case DAE_BUILDER_Y: return this->y;
@@ -1174,7 +936,6 @@ namespace casadi {
     switch (ind) {
     case DAE_BUILDER_VDEF: return this->vdef;
     case DAE_BUILDER_ODE: return this->ode;
-    case DAE_BUILDER_DAE: return this->dae;
     case DAE_BUILDER_ALG: return this->alg;
     case DAE_BUILDER_QUAD: return this->quad;
     case DAE_BUILDER_YDEF: return this->ydef;

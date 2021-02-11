@@ -42,7 +42,7 @@ namespace casadi {
 
       <H3>Variables:  </H3>
       \verbatim
-      x:      states defined by ODE
+      x:      differential states
       s:      implicitly defined states
       z:      algebraic variables
       u:      control signals
@@ -54,20 +54,19 @@ namespace casadi {
 
       <H3>Dynamic constraints (imposed everywhere):  </H3>
       \verbatim
-      ODE                    \dot{x} ==  ode(t, x, s, z, u, p, v)
-      DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, v, sdot)
-      algebraic equations:         0 ==  alg(t, x, s, z, u, p, v)
-      quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, v)
-      dependent parameters:        d == ddef(t, x, s, z, u, p, v)
-      output equations:            y == ydef(t, x, s, z, u, p, v)
+      ODE                    \dot{x} ==  ode(t, x, z, u, p, v)
+      algebraic equations:         0 ==  alg(t, x, z, u, p, v)
+      quadrature equations:  \dot{q} == quad(t, x, z, u, p, v)
+      dependent parameters:        d == ddef(t, x, z, u, p, v)
+      output equations:            y == ydef(t, x, z, u, p, v)
       \endverbatim
 
       <H3>Point constraints (imposed pointwise):  </H3>
       \verbatim
-      Initial equations:           0 == init(t, x, s, z, u, p, v, sdot)
+      Initial equations:           0 == init(t, x, z, u, p, v, sdot)
       \endverbatim
 
-      \date 2012-2015
+      \date 2012-2021
       \author Joel Andersson
   */
   class CASADI_EXPORT DaeBuilder
@@ -87,11 +86,6 @@ namespace casadi {
     /** \brief Differential states defined by ordinary differential equations (ODE)
      */
     std::vector<MX> x, ode, lam_ode;
-
-    /** \brief Differential-algebraic equation (DAE) with corresponding state vector,
-     * state derivatives.
-     */
-    std::vector<MX> s, sdot, dae, lam_dae;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and
@@ -152,9 +146,6 @@ namespace casadi {
     /// Add a new differential state
     MX add_x(const std::string& name=std::string(), casadi_int n=1);
 
-    /// Add a implicit state
-    std::pair<MX, MX> add_s(const std::string& name=std::string(), casadi_int n=1);
-
     /// Add a new algebraic variable
     MX add_z(const std::string& name=std::string(), casadi_int n=1);
 
@@ -169,9 +160,6 @@ namespace casadi {
 
     /// Add an ordinary differential equation
     void add_ode(const std::string& name, const MX& new_ode);
-
-    /// Add a differential-algebraic equation
-    void add_dae(const std::string& name, const MX& new_dae);
 
     /// Add an algebraic equation
     void add_alg(const std::string& name, const MX& new_alg);
@@ -255,8 +243,6 @@ namespace casadi {
       DAE_BUILDER_V,
       DAE_BUILDER_U,
       DAE_BUILDER_X,
-      DAE_BUILDER_S,
-      DAE_BUILDER_SDOT,
       DAE_BUILDER_Z,
       DAE_BUILDER_Q,
       DAE_BUILDER_Y,
@@ -267,7 +253,6 @@ namespace casadi {
     enum DaeBuilderOut {
       DAE_BUILDER_VDEF,
       DAE_BUILDER_ODE,
-      DAE_BUILDER_DAE,
       DAE_BUILDER_ALG,
       DAE_BUILDER_QUAD,
       DAE_BUILDER_YDEF,
