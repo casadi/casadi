@@ -63,7 +63,7 @@ namespace casadi {
   };
 
   /// Convert to string
-  CASADI_EXPORT const char* to_string(Causality v);
+  CASADI_EXPORT std::string to_string(Causality v);
 
   /// Variability: FMI 2.0 specification, section 2.2.7
   enum Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, N_VARIABILITY};
@@ -74,7 +74,18 @@ namespace casadi {
   };
 
   /// Convert to string
-  CASADI_EXPORT const char* to_string(Variability v);
+  CASADI_EXPORT std::string to_string(Variability v);
+
+  /// Initial: FMI 2.0 specification, section 2.2.7
+  enum Initial {EXACT, APPROX, CALCULATED, INITIAL_NA, N_INITIAL};
+
+  /// Number of entries
+  template<> struct enum_traits<Initial> {
+    static const Initial n_enum = N_INITIAL;
+  };
+
+  /// Convert to string
+  CASADI_EXPORT std::string to_string(Initial v);
 
   /// Dynamics of the variable
   enum Dynamics {ALGEBRAIC, DIFFERENTIAL};
@@ -141,20 +152,23 @@ namespace casadi {
     /// Derivative at time 0
     double derivative_start;
 
-    /// Variability (see Fritzon)
-    Variability variability;
-
-    /// Causality (see Fritzon)
-    Causality causality;
-
-    /// Variable category
-    Category category;
+    /// Variable reference (XML)
+    casadi_int valueReference;
 
     /// Description
     std::string description;
 
-    /// Variable reference (XML)
-    casadi_int valueReference;
+    /// Causality
+    Causality causality;
+
+    /// Variability
+    Variability variability;
+
+    // Initial value
+    Initial initial;
+
+    /// Variable category
+    Category category;
 
     /// Unit
     std::string unit;
@@ -177,6 +191,9 @@ namespace casadi {
       disp(ss, more);
       return ss.str();
     }
+
+    // Default initial attribute, per specification
+    static Initial default_initial(Variability variability, Causality causality);
   };
 } // namespace casadi
 

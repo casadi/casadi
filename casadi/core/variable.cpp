@@ -29,7 +29,7 @@
 using namespace std;
 namespace casadi {
 
-const char* to_string(Causality v) {
+std::string to_string(Causality v) {
   switch (v) {
   case PARAMETER: return "parameter";
   case CALCULATED_PARAMETER: return "calculatedParameter";
@@ -38,10 +38,10 @@ const char* to_string(Causality v) {
   case LOCAL: return "local";
   case INDEPENDENT: return "independent";
   }
-  return 0;
+  return "";
 }
 
-const char* to_string(Variability v) {
+std::string to_string(Variability v) {
   switch (v) {
   case CONSTANT: return "constant";
   case FIXED: return "fixed";
@@ -49,7 +49,43 @@ const char* to_string(Variability v) {
   case DISCRETE: return "discrete";
   case CONTINUOUS: return "continuous";
   }
-  return 0;
+  return "";
+}
+
+std::string to_string(Initial v) {
+  switch (v) {
+  case EXACT: return "exact";
+  case APPROX: return "approx";
+  case CALCULATED: return "calculated";
+  case INITIAL_NA: return "initial_na";
+  }
+  return "";
+}
+
+Initial Variable::default_initial(Variability variability, Causality causality) {
+  // According to table in FMI 2.0.2 specification, section 2.2.7
+  switch (variability) {
+  case CONSTANT:
+    if (causality == OUTPUT || causality == LOCAL)
+      return EXACT;
+    break;
+  case FIXED:
+    // Fall-through
+  case TUNABLE:
+    if (causality == PARAMETER)
+      return EXACT;
+    else if (causality == CALCULATED_PARAMETER || causality == LOCAL)
+      return CALCULATED;
+    break;
+  case DISCRETE:
+  // Fall-through
+  case CONTINUOUS:
+    if (causality == OUTPUT || causality == LOCAL)
+      return CALCULATED;
+    break;
+  }
+  // Initial value not available
+  return INITIAL_NA;
 }
 
 Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, const MX& d)

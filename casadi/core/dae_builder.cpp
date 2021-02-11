@@ -69,7 +69,19 @@ namespace casadi {
         Causality causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
         Variability variability = to_enum<Variability>(
           vnode.get_attribute("variability", "continuous"));
-
+        std::string initial_str = vnode.get_attribute("initial", "");
+        Initial initial;
+        if (initial_str.empty()) {
+          // Default value
+          initial = Variable::default_initial(variability, causality);
+        } else {
+          // Consistency check
+          casadi_assert(causality != INPUT && causality != INDEPENDENT,
+            "The combination causality = '" + to_string(causality) + "', initial = '" + initial_str
+            + "' is not allowed per FMI 2.0 specification.");
+          // Value specified
+          initial = to_enum<Initial>(initial_str);
+        }
         // Add variable, if not already added
         if (varmap_.find(name)==varmap_.end()) {
 
@@ -79,6 +91,7 @@ namespace casadi {
           var.causality = causality;
           var.variability = variability;
           var.description = description;
+          var.initial = initial;
 
           // Other properties
           if (vnode.has_child("Real")) {
