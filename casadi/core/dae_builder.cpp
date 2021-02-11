@@ -166,7 +166,7 @@ namespace casadi {
     }
 
     // **** Add binding equations ****
-    {
+    if (document[0].has_child("equ:BindingEquations")) {
       // Get a reference to the BindingEquations node
       const XmlNode& bindeqs = document[0]["equ:BindingEquations"];
 
@@ -182,7 +182,7 @@ namespace casadi {
     }
 
     // **** Add dynamic equations ****
-    {
+    if (document[0].has_child("equ:DynamicEquations")) {
       // Get a reference to the DynamicEquations node
       const XmlNode& dyneqs = document[0]["equ:DynamicEquations"];
 
@@ -199,7 +199,7 @@ namespace casadi {
     }
 
     // **** Add initial equations ****
-    {
+    if (document[0].has_child("equ:InitialEquations")) {
       // Get a reference to the DynamicEquations node
       const XmlNode& initeqs = document[0]["equ:InitialEquations"];
 
@@ -218,7 +218,6 @@ namespace casadi {
 
     // **** Add optimization ****
     if (document[0].has_child("opt:Optimization")) {
-
       // Get a reference to the DynamicEquations node
       const XmlNode& opts = document[0]["opt:Optimization"];
       for (casadi_int i=0; i<opts.size(); ++i) {
