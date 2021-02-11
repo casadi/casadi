@@ -54,7 +54,7 @@ namespace casadi {
     return enum_traits<T>::n_enum;  // never reached
   }
 
-  /// Causality of a variable: FMI 2.0 specification, section 2.2.7
+  /// Causality: FMI 2.0 specification, section 2.2.7
   enum Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, N_CAUSALITY};
 
   /// Number of entries
@@ -65,8 +65,16 @@ namespace casadi {
   /// Convert to string
   CASADI_EXPORT const char* to_string(Causality v);
 
-  /// Time variability of a variable (see Fritzon page 89)
-  enum Variability {CONSTANT, PARAMETER2, DISCRETE, CONTINUOUS, FIXED};
+  /// Variability: FMI 2.0 specification, section 2.2.7
+  enum Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, N_VARIABILITY};
+
+  /// Number of entries
+  template<> struct enum_traits<Variability> {
+    static const Variability n_enum = N_VARIABILITY;
+  };
+
+  /// Convert to string
+  CASADI_EXPORT const char* to_string(Variability v);
 
   /// Dynamics of the variable
   enum Dynamics {ALGEBRAIC, DIFFERENTIAL};

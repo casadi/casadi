@@ -41,6 +41,17 @@ const char* to_string(Causality v) {
   return 0;
 }
 
+const char* to_string(Variability v) {
+  switch (v) {
+  case CONSTANT: return "constant";
+  case FIXED: return "fixed";
+  case TUNABLE: return "tunable";
+  case DISCRETE: return "discrete";
+  case CONTINUOUS: return "continuous";
+  }
+  return 0;
+}
+
 Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, const MX& d)
     : v(v), d(d) {
   if (this->v.is_empty()) this->v = MX::sym(name, sp);

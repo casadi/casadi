@@ -67,7 +67,8 @@ namespace casadi {
         std::string name = vnode.get_attribute("name");
         casadi_int valueReference;
         (void)vnode.read_attribute("valueReference", valueReference);
-        std::string variability = vnode.get_attribute("variability");
+        Variability variability = to_enum<Variability>(
+          vnode.get_attribute("variability", "continuous"));
         Causality causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
         std::string alias = vnode.get_attribute("alias", "noAlias");
 
@@ -88,26 +89,9 @@ namespace casadi {
 
           // Create variable
           Variable var(name);
-
-          // Value reference
           var.valueReference = valueReference;
-
-          // Variability
-          if (variability == "constant")
-            var.variability = CONSTANT;
-          else if (variability == "parameter")
-            var.variability = PARAMETER2;
-          else if (variability == "discrete")
-            var.variability = DISCRETE;
-          else if (variability == "continuous")
-            var.variability = CONTINUOUS;
-          else if (variability == "fixed")
-            var.variability = FIXED;
-          else
-            casadi_error("Unknown variability: " + variability);
-
-          // Causality
           var.causality = causality;
+          var.variability = variability;
 
           // Alias
           if (alias=="noAlias")
