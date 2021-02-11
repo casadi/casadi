@@ -61,112 +61,106 @@ namespace casadi {
       for (casadi_int i=0; i<modvars.size(); ++i) {
         // Get a reference to the variable
         const XmlNode& vnode = modvars[i];
-        // Read attributes, cf. FMI 2.0.2 specification, 2.2.7
+
+        // Name of variable, ensure unique
         std::string name = vnode.get_attribute("name");
-        casadi_int valueReference;
-        (void)vnode.read_attribute("valueReference", valueReference);
-        std::string description = vnode.get_attribute("description", "");
-        Causality causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
-        Variability variability = to_enum<Variability>(
+        casadi_assert(varmap_.find(name)==varmap_.end(), "Duplicate variable: " + name);
+
+        // Create new variable
+        Variable var(name);
+
+        // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
+        (void)vnode.read_attribute("valueReference", var.valueReference);
+        var.description = vnode.get_attribute("description", "");
+        var.causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
+        var.variability = to_enum<Variability>(
           vnode.get_attribute("variability", "continuous"));
         std::string initial_str = vnode.get_attribute("initial", "");
-        Initial initial;
         if (initial_str.empty()) {
           // Default value
-          initial = Variable::default_initial(variability, causality);
+          var.initial = Variable::default_initial(var.variability, var.causality);
         } else {
           // Consistency check
-          casadi_assert(causality != INPUT && causality != INDEPENDENT,
-            "The combination causality = '" + to_string(causality) + "', initial = '" + initial_str
-            + "' is not allowed per FMI 2.0 specification.");
+          casadi_assert(var.causality != INPUT && var.causality != INDEPENDENT,
+            "The combination causality = '" + to_string(var.causality) + "', "
+            "initial = '" + initial_str + "' is not allowed per FMI 2.0 specification.");
           // Value specified
-          initial = to_enum<Initial>(initial_str);
+          var.initial = to_enum<Initial>(initial_str);
         }
-        // Add variable, if not already added
-        if (varmap_.find(name)==varmap_.end()) {
 
-          // Create variable
-          Variable var(name);
-          var.valueReference = valueReference;
-          var.causality = causality;
-          var.variability = variability;
-          var.description = description;
-          var.initial = initial;
+        // Other properties
+        if (vnode.has_child("Real")) {
+          const XmlNode& props = vnode["Real"];
+          (void)props.read_attribute("unit", var.unit, false);
+          (void)props.read_attribute("displayUnit", var.display_unit, false);
+          (void)props.read_attribute("min", var.min, false);
+          (void)props.read_attribute("max", var.max, false);
+          (void)props.read_attribute("initialGuess", var.guess, false);
+          (void)props.read_attribute("start", var.start, false);
+          (void)props.read_attribute("nominal", var.nominal, false);
+          (void)props.read_attribute("free", var.free, false);
+        }
 
-          // Other properties
-          if (vnode.has_child("Real")) {
-            const XmlNode& props = vnode["Real"];
-            (void)props.read_attribute("unit", var.unit, false);
-            (void)props.read_attribute("displayUnit", var.display_unit, false);
-            (void)props.read_attribute("min", var.min, false);
-            (void)props.read_attribute("max", var.max, false);
-            (void)props.read_attribute("initialGuess", var.guess, false);
-            (void)props.read_attribute("start", var.start, false);
-            (void)props.read_attribute("nominal", var.nominal, false);
-            (void)props.read_attribute("free", var.free, false);
+        // Variable category
+        if (vnode.has_child("VariableCategory")) {
+          std::string cat = vnode["VariableCategory"].getText();
+          if (cat=="derivative")
+            var.category = CAT_DERIVATIVE;
+          else if (cat=="state")
+            var.category = CAT_STATE;
+          else if (cat=="dependentConstant")
+            var.category = CAT_DEPENDENT_CONSTANT;
+          else if (cat=="independentConstant")
+            var.category = CAT_INDEPENDENT_CONSTANT;
+          else if (cat=="dependentParameter")
+            var.category = CAT_DEPENDENT_PARAMETER;
+          else if (cat=="independentParameter")
+            var.category = CAT_INDEPENDENT_PARAMETER;
+          else if (cat=="algebraic")
+            var.category = CAT_ALGEBRAIC;
+          else
+            casadi_error("Unknown variable category: " + cat);
+        }
+
+        // Add to list of variables
+        add_variable(name, var);
+
+        // Sort expression
+        switch (var.category) {
+        case CAT_DERIVATIVE:
+          // Skip - meta information about time derivatives is
+          //        kept together with its parent variable
+          break;
+        case CAT_STATE:
+          this->s.push_back(var.v);
+          this->sdot.push_back(var.d);
+          break;
+        case CAT_DEPENDENT_CONSTANT:
+          // Skip
+          break;
+        case CAT_INDEPENDENT_CONSTANT:
+          // Skip
+          break;
+        case CAT_DEPENDENT_PARAMETER:
+          // Skip
+          break;
+        case CAT_INDEPENDENT_PARAMETER:
+          if (var.free) {
+            this->p.push_back(var.v);
+          } else {
+            // Skip
           }
-
-          // Variable category
-          if (vnode.has_child("VariableCategory")) {
-            std::string cat = vnode["VariableCategory"].getText();
-            if (cat=="derivative")
-              var.category = CAT_DERIVATIVE;
-            else if (cat=="state")
-              var.category = CAT_STATE;
-            else if (cat=="dependentConstant")
-              var.category = CAT_DEPENDENT_CONSTANT;
-            else if (cat=="independentConstant")
-              var.category = CAT_INDEPENDENT_CONSTANT;
-            else if (cat=="dependentParameter")
-              var.category = CAT_DEPENDENT_PARAMETER;
-            else if (cat=="independentParameter")
-              var.category = CAT_INDEPENDENT_PARAMETER;
-            else if (cat=="algebraic")
-              var.category = CAT_ALGEBRAIC;
-            else
-              casadi_error("Unknown variable category: " + cat);
-          }
-
-          // Add to list of variables
-          add_variable(name, var);
-
-          // Sort expression
-          switch (var.category) {
-          case CAT_DERIVATIVE:
-            // Skip - meta information about time derivatives is
-            //        kept together with its parent variable
-            break;
-          case CAT_STATE:
+          break;
+        case CAT_ALGEBRAIC:
+          if (var.causality == LOCAL) {
             this->s.push_back(var.v);
             this->sdot.push_back(var.d);
-            break;
-          case CAT_DEPENDENT_CONSTANT:
-            // Skip
-            break;
-          case CAT_INDEPENDENT_CONSTANT:
-            // Skip
-            break;
-          case CAT_DEPENDENT_PARAMETER:
-            // Skip
-            break;
-          case CAT_INDEPENDENT_PARAMETER:
-            if (var.free) {
-              this->p.push_back(var.v);
-            } else {
-              // Skip
-            }
-            break;
-          case CAT_ALGEBRAIC:
-            if (var.causality == LOCAL) {
-              this->s.push_back(var.v);
-              this->sdot.push_back(var.d);
-            } else if (var.causality == INPUT) {
-              this->u.push_back(var.v);
-            }
-            break;
-          default:
-            casadi_warning("Unknown category for " + name);
+          } else if (var.causality == INPUT) {
+            this->u.push_back(var.v);
           }
+          break;
+        default:
+          casadi_warning("Unknown category for " + name);
         }
       }
     }
