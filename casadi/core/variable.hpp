@@ -30,12 +30,43 @@
 #include <iostream>
 
 namespace casadi {
+  /// Helper class: Specify number of entries in an enum
+  template<typename T>
+  struct enum_traits {};
+
+  // Helper function: Convert string to enum
+  template<typename T>
+  T to_enum(const std::string& s) {
+    // Linear search over permitted values
+    for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
+      if (s == to_string(static_cast<T>(i))) return static_cast<T>(i);
+    }
+    // Informative error message
+    std::stringstream ss;
+    ss << "No such enum: '" << s << "'. Permitted values: ";
+    for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
+      // Separate strings
+      if (i > 0) ss << ", ";
+      // Print enum name
+      ss << "'" << to_string(static_cast<T>(i)) << "'";
+    }
+    casadi_error(ss.str());
+    return enum_traits<T>::n_enum;  // never reached
+  }
+
+  /// Causality of a variable: FMI 2.0 specification, section 2.2.7
+  enum Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, N_CAUSALITY};
+
+  /// Number of entries
+  template<> struct enum_traits<Causality> {
+    static const Causality n_enum = N_CAUSALITY;
+  };
+
+  /// Convert to string
+  CASADI_EXPORT const char* to_string(Causality v);
 
   /// Time variability of a variable (see Fritzon page 89)
-  enum Variability {CONSTANT, PARAMETER, DISCRETE, CONTINUOUS};
-
-  /// Causality of a variable
-  enum Causality {INPUT, OUTPUT, INTERNAL};
+  enum Variability {CONSTANT, PARAMETER2, DISCRETE, CONTINUOUS, FIXED};
 
   /// Dynamics of the variable
   enum Dynamics {ALGEBRAIC, DIFFERENTIAL};

@@ -29,33 +29,45 @@
 using namespace std;
 namespace casadi {
 
-  Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, const MX& d)
-      : v(v), d(d) {
-    if (this->v.is_empty()) this->v = MX::sym(name, sp);
-    if (this->d.is_empty()) this->d = MX::sym("der_" + name, sp);
-    this->variability = CONTINUOUS;
-    this->causality = INTERNAL;
-    this->category = CAT_UNKNOWN;
-    this->alias = NO_ALIAS;
-    this->description = "";
-    this->valueReference = -1;
-    this->min = -numeric_limits<double>::infinity();
-    this->max = numeric_limits<double>::infinity();
-    this->guess = 0;
-    this->nominal = 1.0;
-    this->start = 0.0;
-    this->derivative_start = 0.0;
-    this->unit = "";
-    this->display_unit = "";
-    this->free = false;
+const char* to_string(Causality v) {
+  switch (v) {
+  case PARAMETER: return "parameter";
+  case CALCULATED_PARAMETER: return "calculatedParameter";
+  case INPUT: return "input";
+  case OUTPUT: return "output";
+  case LOCAL: return "local";
+  case INDEPENDENT: return "independent";
   }
+  return 0;
+}
 
-  string Variable::name() const {
-    return this->v.name();
-  }
+Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, const MX& d)
+    : v(v), d(d) {
+  if (this->v.is_empty()) this->v = MX::sym(name, sp);
+  if (this->d.is_empty()) this->d = MX::sym("der_" + name, sp);
+  this->variability = CONTINUOUS;
+  this->causality = LOCAL;
+  this->category = CAT_UNKNOWN;
+  this->alias = NO_ALIAS;
+  this->description = "";
+  this->valueReference = -1;
+  this->min = -numeric_limits<double>::infinity();
+  this->max = numeric_limits<double>::infinity();
+  this->guess = 0;
+  this->nominal = 1.0;
+  this->start = 0.0;
+  this->derivative_start = 0.0;
+  this->unit = "";
+  this->display_unit = "";
+  this->free = false;
+}
 
-  void Variable::disp(ostream &stream, bool more) const {
-    stream << name();
-  }
+string Variable::name() const {
+  return this->v.name();
+}
+
+void Variable::disp(ostream &stream, bool more) const {
+  stream << name();
+}
 
 } // namespace casadi

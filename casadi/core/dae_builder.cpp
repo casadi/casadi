@@ -68,7 +68,7 @@ namespace casadi {
         casadi_int valueReference;
         (void)vnode.read_attribute("valueReference", valueReference);
         std::string variability = vnode.get_attribute("variability");
-        std::string causality = vnode.get_attribute("causality");
+        Causality causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
         std::string alias = vnode.get_attribute("alias", "noAlias");
 
         // Skip to the next variable if its an alias
@@ -93,26 +93,21 @@ namespace casadi {
           var.valueReference = valueReference;
 
           // Variability
-          if (variability=="constant")
+          if (variability == "constant")
             var.variability = CONSTANT;
-          else if (variability=="parameter")
-            var.variability = PARAMETER;
-          else if (variability=="discrete")
+          else if (variability == "parameter")
+            var.variability = PARAMETER2;
+          else if (variability == "discrete")
             var.variability = DISCRETE;
-          else if (variability=="continuous")
+          else if (variability == "continuous")
             var.variability = CONTINUOUS;
+          else if (variability == "fixed")
+            var.variability = FIXED;
           else
             casadi_error("Unknown variability: " + variability);
 
           // Causality
-          if (causality=="input")
-            var.causality = INPUT;
-          else if (causality=="output")
-            var.causality = OUTPUT;
-          else if (causality=="internal")
-            var.causality = INTERNAL;
-          else
-            casadi_error("Unknown causality: " + causality);
+          var.causality = causality;
 
           // Alias
           if (alias=="noAlias")
@@ -155,7 +150,7 @@ namespace casadi {
             else if (cat=="algebraic")
               var.category = CAT_ALGEBRAIC;
             else
-              throw CasadiException("Unknown variable category: " + cat);
+              casadi_error("Unknown variable category: " + cat);
           }
 
           // Add to list of variables
@@ -188,7 +183,7 @@ namespace casadi {
             }
             break;
           case CAT_ALGEBRAIC:
-            if (var.causality == INTERNAL) {
+            if (var.causality == LOCAL) {
               this->s.push_back(var.v);
               this->sdot.push_back(var.d);
             } else if (var.causality == INPUT) {
@@ -196,7 +191,7 @@ namespace casadi {
             }
             break;
           default:
-            casadi_error("Unknown category");
+            casadi_warning("Unknown category for " + name);
           }
         }
       }
