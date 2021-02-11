@@ -70,11 +70,6 @@ namespace casadi {
         Variability variability = to_enum<Variability>(
           vnode.get_attribute("variability", "continuous"));
         Causality causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
-        std::string alias = vnode.get_attribute("alias", "noAlias");
-
-        // Skip to the next variable if its an alias
-        if (alias == "alias" || alias == "negatedAlias")
-          continue;
 
         // Get the qualified name (relevant for FMI 2.0?)
         std::string qn;
@@ -92,16 +87,6 @@ namespace casadi {
           var.valueReference = valueReference;
           var.causality = causality;
           var.variability = variability;
-
-          // Alias
-          if (alias=="noAlias")
-            var.alias = NO_ALIAS;
-          else if (alias=="alias")
-            var.alias = ALIAS;
-          else if (alias=="negatedAlias")
-            var.alias = NEGATED_ALIAS;
-          else
-            casadi_error("Unknown alias: " + alias);
 
           // Other properties
           if (vnode.has_child("Real")) {

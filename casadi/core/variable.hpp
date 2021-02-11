@@ -79,9 +79,6 @@ namespace casadi {
   /// Dynamics of the variable
   enum Dynamics {ALGEBRAIC, DIFFERENTIAL};
 
-  /// Dynamics of the variable
-  enum Alias {NO_ALIAS, ALIAS, NEGATED_ALIAS};
-
   /// Variable category
   enum Category {
     /** Unknown, not set */
@@ -152,9 +149,6 @@ namespace casadi {
 
     /// Variable category
     Category category;
-
-    /// Is the variable is an alias variable?
-    Alias alias;
 
     /// Description
     std::string description;

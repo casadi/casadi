@@ -59,7 +59,6 @@ Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, con
   this->variability = CONTINUOUS;
   this->causality = LOCAL;
   this->category = CAT_UNKNOWN;
-  this->alias = NO_ALIAS;
   this->description = "";
   this->valueReference = -1;
   this->min = -numeric_limits<double>::infinity();
