@@ -87,31 +87,8 @@ namespace casadi {
   /// Convert to string
   CASADI_EXPORT std::string to_string(Initial v);
 
-  /// Dynamics of the variable
-  enum Dynamics {ALGEBRAIC, DIFFERENTIAL};
-
-  /// Variable category
-  enum Category {
-    /** Unknown, not set */
-    CAT_UNKNOWN,
-    /** A state derivative */
-    CAT_DERIVATIVE,
-    /** A differential state, i.e. a variable that appears differentiated in the model */
-    CAT_STATE,
-    /** An independent constant: <tt>constant Real c1 = 3</tt> */
-    CAT_DEPENDENT_CONSTANT,
-    /** A dependent constant <tt>constant Real c2=c1*3</tt>. */
-    CAT_INDEPENDENT_CONSTANT,
-    /** A dependent parameter <tt>parameter Real p1=p2</tt>*/
-    CAT_DEPENDENT_PARAMETER,
-    /** An independent parameter <tt>parameter Real p2=3</tt>*/
-    CAT_INDEPENDENT_PARAMETER,
-    /** An algebraic variable or input */
-    CAT_ALGEBRAIC
-  };
-
   /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
-      \date 2012-2014
+      \date 2012-2021
       \author Joel Andersson
    */
   struct CASADI_EXPORT Variable :
@@ -127,6 +104,15 @@ namespace casadi {
 
     /// Variable name
     std::string name() const;
+
+    /** Attributes common to all types of variables, cf. FMI specification */
+    ///@{
+    casadi_int valueReference;
+    std::string description;
+    Causality causality;
+    Variability variability;
+    Initial initial;
+    ///@}
 
     /// Variable expression
     MX v;
@@ -151,24 +137,6 @@ namespace casadi {
 
     /// Derivative at time 0
     double derivative_start;
-
-    /// Variable reference (XML)
-    casadi_int valueReference;
-
-    /// Description
-    std::string description;
-
-    /// Causality
-    Causality causality;
-
-    /// Variability
-    Variability variability;
-
-    // Initial value
-    Initial initial;
-
-    /// Variable category
-    Category category;
 
     /// Unit
     std::string unit;

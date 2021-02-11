@@ -94,7 +94,6 @@ Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, con
   if (this->d.is_empty()) this->d = MX::sym("der_" + name, sp);
   this->variability = CONTINUOUS;
   this->causality = LOCAL;
-  this->category = CAT_UNKNOWN;
   this->description = "";
   this->valueReference = -1;
   this->min = -numeric_limits<double>::infinity();
