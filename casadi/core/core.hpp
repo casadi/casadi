@@ -61,7 +61,6 @@
 #include "integration_tools.hpp"
 #include "nlp_tools.hpp"
 #include "nlp_builder.hpp"
-#include "variable.hpp"
 #include "dae_builder.hpp"
 #include "xml_file.hpp"
 #include "optistack.hpp"

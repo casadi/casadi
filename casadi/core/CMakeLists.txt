@@ -67,7 +67,6 @@ set(CASADI_PUBLIC
   nlp_builder.hpp
   xml_node.hpp
   xml_file.hpp
-  variable.hpp
   dae_builder.hpp
   optistack.hpp
   serializer.hpp
@@ -183,7 +182,6 @@ set(CASADI_INTERNAL
   nlp_builder.cpp
   xml_node.cpp
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
-  variable.cpp
   dae_builder.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
   serializer.cpp              serializing_stream.cpp
