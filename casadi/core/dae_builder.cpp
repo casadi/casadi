@@ -108,16 +108,13 @@ Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, con
   this->variability = CONTINUOUS;
   this->causality = LOCAL;
   this->description = "";
-  this->valueReference = -1;
+  this->value_reference = -1;
   this->min = -std::numeric_limits<double>::infinity();
   this->max = std::numeric_limits<double>::infinity();
-  this->guess = 0;
   this->nominal = 1.0;
   this->start = 0.0;
-  this->derivative_start = 0.0;
   this->unit = "";
   this->display_unit = "";
-  this->free = false;
 }
 
 std::string Variable::name() const {
@@ -156,7 +153,7 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       Variable var(name);
 
       // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
-      (void)vnode.read_attribute("valueReference", var.valueReference);
+      (void)vnode.read_attribute("valueReference", var.value_reference);
       var.description = vnode.get_attribute("description", "");
       var.causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
       var.variability = to_enum<Variability>(
@@ -181,10 +178,8 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         (void)props.read_attribute("displayUnit", var.display_unit, false);
         (void)props.read_attribute("min", var.min, false);
         (void)props.read_attribute("max", var.max, false);
-        (void)props.read_attribute("initialGuess", var.guess, false);
-        (void)props.read_attribute("start", var.start, false);
         (void)props.read_attribute("nominal", var.nominal, false);
-        (void)props.read_attribute("free", var.free, false);
+        (void)props.read_attribute("start", var.start, false);
       }
 
       // Add to list of variables
@@ -397,8 +392,6 @@ void DaeBuilder::scale_variables() {
       v.min /= v.nominal;
       v.max /= v.nominal;
       v.start /= v.nominal;
-      v.derivative_start /= v.nominal;
-      v.guess /= v.nominal;
       v_id.push_back(v.v);
       v_id.push_back(v.d);
       v_rep.push_back(v.v * v.nominal);
@@ -833,25 +826,6 @@ void DaeBuilder::set_max(const MX& var, const std::vector<double>& val, bool nor
   set_attribute(&DaeBuilder::set_max, var, val, normalized);
 }
 
-double DaeBuilder::guess(const std::string& name, bool normalized) const {
-  const Variable& v = variable(name);
-  return normalized ? v.guess / v.nominal : v.guess;
-}
-
-std::vector<double> DaeBuilder::guess(const MX& var, bool normalized) const {
-  return attribute(&DaeBuilder::guess, var, normalized);
-}
-
-void DaeBuilder::set_guess(const std::string& name, double val, bool normalized) {
-  Variable& v = variable(name);
-  v.guess = normalized ? val*v.nominal : val;
-}
-
-void DaeBuilder::set_guess(const MX& var, const std::vector<double>& val,
-                                  bool normalized) {
-  set_attribute(&DaeBuilder::set_guess, var, val, normalized);
-}
-
 double DaeBuilder::start(const std::string& name, bool normalized) const {
   const Variable& v = variable(name);
   return normalized ? v.start / v.nominal : v.start;
@@ -868,25 +842,6 @@ void DaeBuilder::set_start(const std::string& name, double val, bool normalized)
 
 void DaeBuilder::set_start(const MX& var, const std::vector<double>& val, bool normalized) {
   set_attribute(&DaeBuilder::set_start, var, val, normalized);
-}
-
-double DaeBuilder::derivative_start(const std::string& name, bool normalized) const {
-  const Variable& v = variable(name);
-  return normalized ? v.derivative_start / v.nominal : v.derivative_start;
-}
-
-std::vector<double> DaeBuilder::derivative_start(const MX& var, bool normalized) const {
-  return attribute(&DaeBuilder::derivative_start, var, normalized);
-}
-
-void DaeBuilder::set_derivative_start(const std::string& name, double val, bool normalized) {
-  Variable& v = variable(name);
-  v.derivative_start = normalized ? val*v.nominal : val;
-}
-
-void DaeBuilder::set_derivative_start(const MX& var, const std::vector<double>& val,
-                                     bool normalized) {
-  set_attribute(&DaeBuilder::set_derivative_start, var, val, normalized);
 }
 
 std::string DaeBuilder::name_in(DaeBuilderIn ind) {

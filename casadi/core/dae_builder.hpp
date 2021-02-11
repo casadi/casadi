@@ -110,11 +110,27 @@ struct CASADI_EXPORT Variable :
 
   /** Attributes common to all types of variables, cf. FMI specification */
   ///@{
-  casadi_int valueReference;
+  casadi_int value_reference;
   std::string description;
   Causality causality;
   Variability variability;
   Initial initial;
+  ///@}
+
+  /** Attributes specific to Real, cf. FMI specification */
+  ///@{
+  // std::string declared_type;
+  // std::string quantity;
+  std::string unit;
+  std::string display_unit;
+  // bool relative_quantity;
+  double min;
+  double max;
+  double nominal;
+  // bool unbounded;
+  double start;
+  // casadi_int derivative;
+  // bool reinit;
   ///@}
 
   /// Variable expression
@@ -122,33 +138,6 @@ struct CASADI_EXPORT Variable :
 
   /// Derivative expression
   MX d;
-
-  /// Nominal value
-  double nominal;
-
-  /// Value at time 0
-  double start;
-
-  /// Lower bound
-  double min;
-
-  /// Upper bound
-  double max;
-
-  /// Initial guess
-  double guess;
-
-  /// Derivative at time 0
-  double derivative_start;
-
-  /// Unit
-  std::string unit;
-
-  /// Display unit
-  std::string display_unit;
-
-  /// Free attribute
-  bool free;
 
   /// Readable name of the class
   std::string type_name() const {return "Variable";}
@@ -486,18 +475,6 @@ public:
   /// Set the upper bound(s) by expression
   void set_max(const MX& var, const std::vector<double>& val, bool normalized=false);
 
-  /// Get the initial guess by name
-  double guess(const std::string& name, bool normalized=false) const;
-
-  /// Get the initial guess(es) by expression
-  std::vector<double> guess(const MX& var, bool normalized=false) const;
-
-  /// Set the initial guess by name
-  void set_guess(const std::string& name, double val, bool normalized=false);
-
-  /// Set the initial guess(es) by expression
-  void set_guess(const MX& var, const std::vector<double>& val, bool normalized=false);
-
   /// Get the (optionally normalized) value at time 0 by name
   double start(const std::string& name, bool normalized=false) const;
 
@@ -509,18 +486,6 @@ public:
 
   /// Set the (optionally normalized) value(s) at time 0 by expression
   void set_start(const MX& var, const std::vector<double>& val, bool normalized=false);
-
-  /// Get the (optionally normalized) derivative value at time 0 by name
-  double derivative_start(const std::string& name, bool normalized=false) const;
-
-  /// Get the (optionally normalized) derivative value(s) at time 0 by expression
-  std::vector<double> derivative_start(const MX& var, bool normalized=false) const;
-
-  /// Set the (optionally normalized) derivative value at time 0 by name
-  void set_derivative_start(const std::string& name, double val, bool normalized=false);
-
-  /// Set the (optionally normalized) derivative value(s) at time 0 by expression
-  void set_derivative_start(const MX& var, const std::vector<double>& val, bool normalized=false);
 
   /// Get the unit for a component
   std::string unit(const std::string& name) const;
