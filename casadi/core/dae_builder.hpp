@@ -32,6 +32,7 @@ namespace casadi {
 
 // Forward declarations
 class XmlNode;
+class DaeBuilder;
 
 /// Helper class: Specify number of entries in an enum
 template<typename T>
@@ -96,20 +97,17 @@ CASADI_EXPORT std::string to_string(Initial v);
  */
 struct CASADI_EXPORT Variable :
   public SWIG_IF_ELSE(PrintableCommon, Printable<Variable>) {
-  /// Default constructor
-  Variable() {}
-
+#ifndef SWIG
   /// Constructor
-  explicit Variable(const std::string& name,
-    const Sparsity& sp = Sparsity::scalar(),
-    const MX& v = MX(),
-    const MX& d = MX());
+  Variable(const DaeBuilder* self = 0, const std::string& name = "");
 
-  /// Variable name
-  std::string name() const;
+  /// Reference to owning DaeBuilder instance
+  const DaeBuilder* self;
+#endif  // SWIG
 
   /** Attributes common to all types of variables, cf. FMI specification */
   ///@{
+  std::string name;
   casadi_int value_reference;
   std::string description;
   Causality causality;
@@ -129,7 +127,7 @@ struct CASADI_EXPORT Variable :
   double nominal;
   // bool unbounded;
   double start;
-  // casadi_int derivative;
+  casadi_int derivative;
   // bool reinit;
   ///@}
 

@@ -101,28 +101,14 @@ Initial Variable::default_initial(Variability variability, Causality causality) 
   return INITIAL_NA;
 }
 
-Variable::Variable(const std::string& name, const Sparsity& sp, const MX& v, const MX& d)
-    : v(v), d(d) {
-  if (this->v.is_empty()) this->v = MX::sym(name, sp);
-  if (this->d.is_empty()) this->d = MX::sym("der_" + name, sp);
-  this->variability = CONTINUOUS;
-  this->causality = LOCAL;
-  this->description = "";
-  this->value_reference = -1;
-  this->min = -std::numeric_limits<double>::infinity();
-  this->max = std::numeric_limits<double>::infinity();
-  this->nominal = 1.0;
-  this->start = 0.0;
-  this->unit = "";
-  this->display_unit = "";
-}
-
-std::string Variable::name() const {
-  return this->v.name();
+Variable::Variable(const DaeBuilder* self, const std::string& name) : self(self), name(name),
+    variability(CONTINUOUS), causality(LOCAL), description(""), value_reference(-1),
+    min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
+    nominal(1.0), start(0.0), unit(""), display_unit(""), derivative(-1) {
 }
 
 void Variable::disp(std::ostream &stream, bool more) const {
-  stream << name();
+  stream << name;
 }
 
 DaeBuilder::DaeBuilder() {
@@ -150,7 +136,9 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       casadi_assert(varmap_.find(name)==varmap_.end(), "Duplicate variable: " + name);
 
       // Create new variable
-      Variable var(name);
+      Variable var(this, name);
+      var.v = MX::sym(name);
+      var.d = MX::sym("der_" + name);
 
       // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
       (void)vnode.read_attribute("valueReference", var.value_reference);
@@ -180,6 +168,7 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         (void)props.read_attribute("max", var.max, false);
         (void)props.read_attribute("nominal", var.nominal, false);
         (void)props.read_attribute("start", var.start, false);
+        (void)vnode.read_attribute("derivative", var.derivative, false);
       }
 
       // Add to list of variables
@@ -462,13 +451,17 @@ MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
 }
 
 MX DaeBuilder::add_variable(const std::string& name, const Sparsity& sp) {
-  Variable v(name, sp);
+  Variable v(this, name);
+  v.v = MX::sym(name, sp);
+  v.d = MX::sym("der_" + name, sp);
   add_variable(name, v);
   return v.v;
 }
 
 void DaeBuilder::add_variable(const MX& new_v, const MX& new_der_v) {
-  Variable v(new_v.name(), new_v.sparsity(), new_v, new_der_v);
+  Variable v(this, new_v.name());
+  v.v = new_v;
+  v.d = new_der_v;
   add_variable(new_v.name(), v);
 }
 
