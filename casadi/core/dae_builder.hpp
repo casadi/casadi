@@ -126,9 +126,6 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   // bool reinit;
   ///@}
 
-  /// Variable expression
-  MX v;
-
   /// Derivative expression
   MX d;
 
@@ -196,6 +193,9 @@ public:
    *  Public data members
    */
   ///@{
+  /** \brief All variables */
+  std::vector<MX> value;
+
   /** \brief Independent variable (usually time) */
   MX t;
 

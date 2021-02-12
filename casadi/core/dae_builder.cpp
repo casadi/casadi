@@ -32,6 +32,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include <unordered_map>
 
 #include "casadi_misc.hpp"
 #include "exception.hpp"
@@ -126,6 +127,12 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
     // Get a reference to the ModelVariables node
     const XmlNode& modvars = document[0]["ModelVariables"];
 
+    // Map imported valueReferences into positions in a vector
+    std::unordered_map<size_t, size_t> var_map;
+
+    // Assume no variables (can be relaxed)
+    casadi_assert(value.empty(), "Instance already has variables");
+
     // Add variables
     for (casadi_int i=0; i<modvars.size(); ++i) {
       // Get a reference to the variable
@@ -137,7 +144,6 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
 
       // Create new variable
       Variable var(name);
-      var.v = MX::sym(name);
       var.d = MX::sym("der_" + name);
 
       // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
@@ -170,6 +176,11 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         (void)props.read_attribute("start", var.start, false);
         (void)vnode.read_attribute("derivative", var.derivative, false);
       }
+
+      // Map to position in DaeBuilder::value
+      var_map[var.value_reference] = value.size();
+      var.value_reference = value.size();
+      value.push_back(MX::sym(name));
 
       // Add to list of variables
       add_variable(name, var);
@@ -216,7 +227,7 @@ MX DaeBuilder::read_expr(const XmlNode& node) {
   } else if (name=="Exp") {
     return exp(read_expr(node[0]));
   } else if (name=="Identifier") {
-    return read_variable(node).v;
+    return value.at(read_variable(node).value_reference);
   } else if (name=="IntegerLiteral") {
     casadi_int val;
     node.getText(val);
@@ -276,7 +287,7 @@ MX DaeBuilder::read_expr(const XmlNode& node) {
   } else if (name=="Time") {
     return t;
   } else if (name=="TimedVariable") {
-    return read_variable(node[0]).v;
+    return value.at(read_variable(node[0]).value_reference);
   }
 
   // throw error if reached this point
@@ -381,9 +392,9 @@ void DaeBuilder::scale_variables() {
       v.min /= v.nominal;
       v.max /= v.nominal;
       v.start /= v.nominal;
-      v_id.push_back(v.v);
+      v_id.push_back(value.at(v.value_reference));
       v_id.push_back(v.d);
-      v_rep.push_back(v.v * v.nominal);
+      v_rep.push_back(v_id.back() * v.nominal);
       v_rep.push_back(v.d * v.nominal);
     }
   }
@@ -452,15 +463,17 @@ MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
 
 MX DaeBuilder::add_variable(const std::string& name, const Sparsity& sp) {
   Variable v(name);
-  v.v = MX::sym(name, sp);
+  v.value_reference = value.size();
+  value.push_back(MX::sym(name, sp));
   v.d = MX::sym("der_" + name, sp);
   add_variable(name, v);
-  return v.v;
+  return value.back();
 }
 
 void DaeBuilder::add_variable(const MX& new_v, const MX& new_der_v) {
   Variable v(new_v.name());
-  v.v = new_v;
+  v.value_reference = value.size();
+  value.push_back(new_v);
   v.d = new_der_v;
   add_variable(new_v.name(), v);
 }
@@ -654,7 +667,7 @@ std::string DaeBuilder::qualified_name(const XmlNode& nn) {
 }
 
 MX DaeBuilder::var(const std::string& name) const {
-  return variable(name).v;
+  return value.at(variable(name).value_reference);
 }
 
 MX DaeBuilder::der(const std::string& name) const {
