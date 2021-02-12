@@ -127,10 +127,10 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
     const XmlNode& modvars = document[0]["ModelVariables"];
 
     // Map imported valueReferences into positions in a vector
-    std::unordered_map<size_t, size_t> var_map;
+    std::unordered_map<size_t, size_t> val_map;
 
-    // Assume no variables (can be relaxed)
-    casadi_assert(value.empty(), "Instance already has variables");
+    // Number of variables before adding new ones
+    size_t n_vars_before = variables_.size();
 
     // Add variables
     for (casadi_int i=0; i<modvars.size(); ++i) {
@@ -177,12 +177,46 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       }
 
       // Map to position in DaeBuilder::value
-      var_map[var.value_reference] = value.size();
+      val_map[var.value_reference] = this->value.size();
       var.value_reference = value.size();
-      value.push_back(MX::sym(name));
+      this->value.push_back(MX::sym(name));
 
       // Add to list of variables
       add_variable(name, var);
+    }
+    // Process added variables
+    for (auto it = variables_.begin() + n_vars_before; it != variables_.end(); ++it) {
+      // Expression for the value
+      MX& v = this->value.at(it->value_reference);
+      // Sort by types
+      if (it->derivative >= 0) {
+        // Differential state: Update reference to new value map
+        it->derivative = val_map.at(it->derivative);
+        // Add to list of differential variables, equations
+        this->x.push_back(v);
+        add_ode("ode_" + it->name, this->value.at(it->derivative));
+      } else if (it->variability == CONTINUOUS || it->variability == DISCRETE) {
+        if (it->causality == INPUT) {
+          this->u.push_back(v);
+        } else {
+          // Algebraic variable
+          this->z.push_back(v);
+        }
+      } else if (it->variability == CONSTANT) {
+        if (it->causality == OUTPUT) {
+          // Constant output
+          this->y.push_back(v);
+          this->ydef.push_back(it->start);
+        } else {
+          // Named constant
+          this->c.push_back(v);
+          this->cdef.push_back(it->start);
+        }
+      } else if (it->variability == FIXED || it->variability == TUNABLE) {
+        this->p.push_back(v);
+      } else {
+        casadi_warning("Cannot sort " + it->name);
+      }
     }
   }
 }
@@ -304,6 +338,7 @@ void DaeBuilder::disp(std::ostream& stream, bool more) const {
          << "nq = " << this->q.size() << ", "
          << "ny = " << this->y.size() << ", "
          << "np = " << this->p.size() << ", "
+         << "nc = " << this->c.size() << ", "
          << "nv = " << this->v.size() << ", "
          << "nu = " << this->u.size();
 
@@ -327,7 +362,8 @@ void DaeBuilder::disp(std::ostream& stream, bool more) const {
   if (!this->q.empty()) stream << "  q =  " << str(this->q) << std::endl;
   if (!this->y.empty()) stream << "  y =  " << str(this->y) << std::endl;
   if (!this->p.empty()) stream << "  p =  " << str(this->p) << std::endl;
-  if (!this->v.empty()) stream << "  d =  " << str(this->v) << std::endl;
+  if (!this->c.empty()) stream << "  c =  " << str(this->c) << std::endl;
+  if (!this->v.empty()) stream << "  v =  " << str(this->v) << std::endl;
   if (!this->u.empty()) stream << "  u =  " << str(this->u) << std::endl;
 
   if (!this->v.empty()) {

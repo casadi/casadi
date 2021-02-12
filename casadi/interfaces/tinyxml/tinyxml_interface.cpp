@@ -99,7 +99,7 @@ namespace casadi {
       } else if (childtype == TiXmlNode::TINYXML_TEXT) {
         ret.text_ = child->ToText()->Value();
       } else if (childtype == TiXmlNode::TINYXML_DECLARATION) {
-        uout() << "Warning: Skipped TiXmlNode::TINYXML_DECLARATION" << endl;
+        // uout() << "Warning: Skipped TiXmlNode::TINYXML_DECLARATION" << endl;
       } else {
         casadi_error("addNode: Unknown node type");
       }
