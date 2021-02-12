@@ -18,6 +18,9 @@ enable_testing()
 # Eigen
 find_package(Eigen3 REQUIRED)
 
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/py-venv")
+find_package(casadi)
+
 # ----
 
 add_subdirectory(src)

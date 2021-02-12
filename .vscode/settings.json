@@ -84,5 +84,6 @@
         "panoc",
         "r",
         "ψₖᵀrₖ"
-    ]
+    ],
+    "python.pythonPath": "py-venv/bin/python"
 }

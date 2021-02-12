@@ -25,22 +25,38 @@ jobs:
       working-directory: scripts
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.7 - 3.9'
-    - name: Install Python Dependencies 
-      run: python -m pip install -r requirements.txt
-      working-directory: test/python
+        python-version: '3.9'
+    - name: Cache Virtual Environment
+      id: cache-venv
+      uses: actions/cache@v2
+      with:
+        path: "/tmp/py-venv"
+        key: ${{ runner.os }}-${{ hashFiles('scripts/install-casadi.sh') }}-${{ hashFiles('scripts/requirements.txt') }}
+    - name: Install Casadi and other Python Dependencies 
+      if: steps.cache-venv.outputs.cache-hit != 'true'
+      run: |
+        python3 -m venv /tmp/py-venv
+        source /tmp/py-venv/bin/activate
+        python -m pip install -r scripts/requirements.txt
+        bash scripts/install-casadi.sh
     - name: Create build directory
       run: mkdir -p build
     - name: CMake
-      run: cmake .. -DCMAKE_BUILD_TYPE=Asan
+      run: |
+        source /tmp/py-venv/bin/activate
+        cmake .. -DCMAKE_BUILD_TYPE=Asan
       working-directory: build
       env:
         CC: clang-10
         CXX: clang++-10
-        CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen"
+        CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen:/tmp/py-venv"
     - name: Build
-      run: make -j4
+      run: |
+        source /tmp/py-venv/bin/activate
+        make -j4
       working-directory: build
     - name: Run tests
-      run: ./test/tests --gtest_color=yes
+      run: |
+        source /tmp/py-venv/bin/activate
+        ./test/tests --gtest_color=yes
       working-directory: build
