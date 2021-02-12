@@ -143,7 +143,6 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
 
       // Create new variable
       Variable var(name);
-      var.d = MX::sym("der_" + name);
 
       // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
       (void)vnode.read_attribute("valueReference", var.value_reference);
@@ -253,8 +252,7 @@ MX DaeBuilder::read_expr(const XmlNode& node) {
   } else if (name=="Cos") {
     return cos(read_expr(node[0]));
   } else if (name=="Der") {
-    const Variable& v = read_variable(node[0]);
-    return v.d;
+    return value.at(read_variable(node[0]).derivative);
   } else if (name=="Div") {
     return read_expr(node[0]) / read_expr(node[1]);
   } else if (name=="Exp") {
@@ -414,54 +412,6 @@ void DaeBuilder::eliminate_quad() {
   this->q.clear();
 }
 
-void DaeBuilder::scale_variables() {
-  // Assert correctness
-  sanity_check();
-
-  // Gather variables and expressions to replace
-  std::vector<MX> v_id, v_rep;
-  for (auto&& v : variables_) {
-    if (v.nominal != 1) {
-      casadi_assert_dev(v.nominal != 0);
-      v.min /= v.nominal;
-      v.max /= v.nominal;
-      v.start /= v.nominal;
-      v_id.push_back(value.at(v.value_reference));
-      v_id.push_back(v.d);
-      v_rep.push_back(v_id.back() * v.nominal);
-      v_rep.push_back(v.d * v.nominal);
-    }
-  }
-
-  // Quick return if no expressions to substitute
-  if (v_id.empty()) return;
-
-  // Collect all expressions to be replaced
-  std::vector<MX> ex;
-  ex.insert(ex.end(), this->ode.begin(), this->ode.end());
-  ex.insert(ex.end(), this->alg.begin(), this->alg.end());
-  ex.insert(ex.end(), this->quad.begin(), this->quad.end());
-  ex.insert(ex.end(), this->vdef.begin(), this->vdef.end());
-  ex.insert(ex.end(), this->ydef.begin(), this->ydef.end());
-  ex.insert(ex.end(), this->init.begin(), this->init.end());
-
-  // Substitute all at once (more efficient since they may have common subexpressions)
-  ex = substitute(ex, v_id, v_rep);
-
-  // Get the modified expressions
-  std::vector<MX>::const_iterator it=ex.begin();
-  for (casadi_int i=0; i<this->x.size(); ++i) this->ode[i] = *it++ / nominal(this->x[i]);
-  for (casadi_int i=0; i<this->z.size(); ++i) this->alg[i] = *it++;
-  for (casadi_int i=0; i<this->q.size(); ++i) this->quad[i] = *it++ / nominal(this->q[i]);
-  for (casadi_int i=0; i<this->v.size(); ++i) this->vdef[i] = *it++ / nominal(this->v[i]);
-  for (casadi_int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++ / nominal(this->y[i]);
-  for (casadi_int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
-  casadi_assert_dev(it==ex.end());
-
-  // Nominal value is 1 after scaling
-  for (auto&& v : variables_) v.nominal = 1;
-}
-
 const Variable& DaeBuilder::variable(const std::string& name) const {
   return const_cast<DaeBuilder*>(this)->variable(name);
 }
@@ -495,16 +445,14 @@ MX DaeBuilder::add_variable(const std::string& name, const Sparsity& sp) {
   Variable v(name);
   v.value_reference = value.size();
   value.push_back(MX::sym(name, sp));
-  v.d = MX::sym("der_" + name, sp);
   add_variable(name, v);
   return value.back();
 }
 
-void DaeBuilder::add_variable(const MX& new_v, const MX& new_der_v) {
+void DaeBuilder::add_variable(const MX& new_v) {
   Variable v(new_v.name());
   v.value_reference = value.size();
   value.push_back(new_v);
-  v.d = new_der_v;
   add_variable(new_v.name(), v);
 }
 
@@ -515,29 +463,29 @@ MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
   return new_x;
 }
 
-void DaeBuilder::register_x(const MX& new_x, const MX& new_der_x) {
-  add_variable(new_x, new_der_x);
+void DaeBuilder::register_x(const MX& new_x) {
+  add_variable(new_x);
   this->x.push_back(new_x);
 }
 
-void DaeBuilder::register_z(const MX& new_z, const MX& new_der_z) {
-  add_variable(new_z, new_der_z);
+void DaeBuilder::register_z(const MX& new_z) {
+  add_variable(new_z);
   this->z.push_back(new_z);
 }
 
-void DaeBuilder::register_v(const MX& new_v, const MX& new_vdef, const MX& new_der_v) {
+void DaeBuilder::register_v(const MX& new_v, const MX& new_vdef) {
   if (new_v.sparsity() != new_vdef.sparsity())
     casadi_error("Mismatching sparsity in DaeBuilder::register_v");
-  add_variable(new_v, new_der_v);
+  add_variable(new_v);
   this->v.push_back(new_v);
   this->vdef.push_back(new_vdef);
   this->lam_vdef.push_back(MX::sym("lam_" + new_v.name(), new_v.sparsity()));
 }
 
-void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef, const MX& new_der_y) {
+void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef) {
   if (new_y.sparsity() != new_ydef.sparsity())
     casadi_error("Mismatching sparsity in DaeBuilder::register_y");
-  add_variable(new_y, new_der_y);
+  add_variable(new_y);
   this->y.push_back(new_y);
   this->ydef.push_back(new_ydef);
   this->lam_ydef.push_back(MX::sym("lam_" + new_y.name(), new_y.sparsity()));
@@ -701,7 +649,7 @@ MX DaeBuilder::var(const std::string& name) const {
 }
 
 MX DaeBuilder::der(const std::string& name) const {
-  return variable(name).d;
+  return value.at(variable(name).derivative);
 }
 
 MX DaeBuilder::der(const MX& var) const {

@@ -128,9 +128,6 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   // bool reinit;
   ///@}
 
-  /// Derivative expression
-  MX d;
-
   /// Readable name of the class
   std::string type_name() const {return "Variable";}
 
@@ -295,16 +292,16 @@ public:
   /** @name Register an existing variable */
   ///@{
   /// Register differential state
-  void register_x(const MX& new_x, const MX& new_der_x = MX());
+  void register_x(const MX& new_x);
 
   /// Register algebraic variable
-  void register_z(const MX& new_z, const MX& new_der_z = MX());
+  void register_z(const MX& new_z);
 
   /// Register dependent variable
-  void register_v(const MX& new_v, const MX& new_vdef, const MX& new_der_v = MX());
+  void register_v(const MX& new_v, const MX& new_vdef);
 
   /// Register output variable
-  void register_y(const MX& new_y, const MX& new_ydef, const MX& new_der_y = MX());
+  void register_y(const MX& new_y, const MX& new_ydef);
   ///@}
 
   /** @name Manipulation
@@ -317,9 +314,6 @@ public:
 
   /// Eliminate quadrature states and turn them into ODE states
   void eliminate_quad();
-
-  /// Scale the variables
-  void scale_variables();
   ///@}
 
   /** @name Functions
@@ -515,7 +509,7 @@ public:
   MX add_variable(const std::string& name, const Sparsity& sp);
 
   /// Add a new variable from symbolic expressions
-  void add_variable(const MX& new_v, const MX& new_der_v);
+  void add_variable(const MX& new_v);
 
   ///@{
   /// Access a variable by name
