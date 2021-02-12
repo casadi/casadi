@@ -26,6 +26,8 @@
 #ifndef CASADI_DAE_BUILDER_HPP
 #define CASADI_DAE_BUILDER_HPP
 
+#include <unordered_map>
+
 #include "function.hpp"
 
 namespace casadi {
@@ -531,9 +533,11 @@ protected:
   /// Get the qualified name
   static std::string qualified_name(const XmlNode& nn);
 
+  /// All variables
+  std::vector<Variable> variables_;
+
   /// Find of variable by name
-  typedef std::map<std::string, Variable> VarMap;
-  VarMap varmap_;
+  std::unordered_map<std::string, size_t> varind_;
 
   /// Linear combinations of output expressions
   Function::AuxOut lc_;

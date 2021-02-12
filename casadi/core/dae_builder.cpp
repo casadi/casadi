@@ -32,7 +32,6 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
-#include <unordered_map>
 
 #include "casadi_misc.hpp"
 #include "exception.hpp"
@@ -140,7 +139,7 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
 
       // Name of variable, ensure unique
       std::string name = vnode.get_attribute("name");
-      casadi_assert(varmap_.find(name)==varmap_.end(), "Duplicate variable: " + name);
+      casadi_assert(varind_.find(name) == varind_.end(), "Duplicate variable: " + name);
 
       // Create new variable
       Variable var(name);
@@ -385,10 +384,9 @@ void DaeBuilder::scale_variables() {
 
   // Gather variables and expressions to replace
   std::vector<MX> v_id, v_rep;
-  for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
-    if (it->second.nominal!=1) {
-      Variable& v=it->second;
-      casadi_assert_dev(v.nominal!=0);
+  for (auto&& v : variables_) {
+    if (v.nominal != 1) {
+      casadi_assert_dev(v.nominal != 0);
       v.min /= v.nominal;
       v.max /= v.nominal;
       v.start /= v.nominal;
@@ -425,9 +423,7 @@ void DaeBuilder::scale_variables() {
   casadi_assert_dev(it==ex.end());
 
   // Nominal value is 1 after scaling
-  for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
-    it->second.nominal=1;
-  }
+  for (auto&& v : variables_) v.nominal = 1;
 }
 
 const Variable& DaeBuilder::variable(const std::string& name) const {
@@ -436,23 +432,21 @@ const Variable& DaeBuilder::variable(const std::string& name) const {
 
 Variable& DaeBuilder::variable(const std::string& name) {
   // Find the variable
-  VarMap::iterator it = varmap_.find(name);
-  if (it==varmap_.end()) {
-    casadi_error("No such variable: \"" + name + "\".");
-  }
+  auto it = varind_.find(name);
+  if (it == varind_.end()) casadi_error("No such variable: \"" + name + "\".");
 
   // Return the variable
-  return it->second;
+  return variables_.at(it->second);
 }
 
 void DaeBuilder::add_variable(const std::string& name, const Variable& var) {
   // Try to find the component
-  if (varmap_.find(name)!=varmap_.end()) {
-    std::stringstream ss;
+  if (varind_.find(name) != varind_.end()) {
     casadi_error("Variable \"" + name + "\" has already been added.");
   }
   // Add to the map of all variables
-  varmap_[name] = var;
+  varind_[name] = variables_.size();
+  variables_.push_back(var);
   // Clear cache
   clear_cache();
 }
