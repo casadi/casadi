@@ -54,9 +54,13 @@ jobs:
       run: |
         source /tmp/py-venv/bin/activate
         make -j4
+      env:
+        LD_LIBRARY_PATH: "/tmp/py-venv/lib"
       working-directory: build
     - name: Run tests
       run: |
         source /tmp/py-venv/bin/activate
         ./test/tests --gtest_color=yes
+      env:
+        LD_LIBRARY_PATH: "/tmp/py-venv/lib"
       working-directory: build
