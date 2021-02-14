@@ -142,6 +142,21 @@ namespace casadi {
         print("Linear combination of columns:\n[");
         for (casadi_int k=0; k<ncol(); ++k) print(k==0 ? "%g" : ", %g", m->w[k]);
         print("]\n");
+        if (regularity_check_) {
+          // Collect nonzeros
+          std::vector<std::string> nonzeros(sp_.nnz());
+          for (size_t nz = 0; nz < nonzeros.size(); ++nz) nonzeros[nz] = std::to_string(A[nz]);
+          // Create .m file
+          ofstream mfile;
+          std::string fname = class_name() + "_debug.m";
+          mfile.open(fname.c_str());
+          Dict opts;
+          opts["name"] = "A";
+          opts["nonzeros"] = nonzeros;
+          sp_.export_code("matlab", mfile, opts);
+          mfile.close();
+          casadi_error("Factorization failed. Linear system saved to '" + fname + "'");
+        }
       }
       return 1;
     }

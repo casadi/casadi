@@ -3564,6 +3564,7 @@ namespace casadi {
     std::string name = "sp";
     bool as_matrix = true;
     casadi_int indent_level = 0;
+    std::vector<std::string> nonzeros;
 
     // Read options
     for (auto&& op : options) {
@@ -3575,6 +3576,8 @@ namespace casadi {
         as_matrix = op.second;
       } else if (op.first=="indent_level") {
         indent_level = op.second;
+      } else if (op.first=="nonzeros") {
+        nonzeros = op.second;
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }
@@ -3582,15 +3585,12 @@ namespace casadi {
 
     // Construct indent string
     std::string indent;
-    for (casadi_int i=0;i<indent_level;++i) {
-      indent += "  ";
-    }
-
+    for (casadi_int i=0; i < indent_level; ++i) indent += "  ";
     casadi_assert(!opt_inline, "Inline not supported for now.");
 
     // Export dimensions
-    stream << indent << name << "_m = " << size1() << ";" << endl;
-    stream << indent << name << "_n = " << size2() << ";" << endl;
+    stream << indent << name << "_m = " << size1() << ";\n";
+    stream << indent << name << "_n = " << size2() << ";\n";
 
     // Matlab indices are one-based
     const casadi_int index_offset = 1;
@@ -3607,7 +3607,7 @@ namespace casadi {
         first = false;
       }
     }
-    stream << "];" << endl;
+    stream << "];\n";
 
     // Print rows
     stream << indent << name << "_i = [";
@@ -3618,13 +3618,25 @@ namespace casadi {
       stream << (row[i]+index_offset);
       first = false;
     }
-    stream << "];" << endl;
+    stream << "];\n";
+
+    // Print nonzeros
+    stream << indent << name << "_v = ";
+    if (nonzeros.empty()) {
+      stream << "ones(size(" << name << "_i));\n";
+    } else {
+      stream << "[";
+      for (casadi_int i = 0; i < nonzeros.size(); ++i) {
+        if (i > 0) stream << ", ";
+        stream << nonzeros.at(i);
+      }
+      stream << "];\n";
+    }
 
     if (as_matrix) {
       // Generate matrix
       stream << indent << name << " = sparse(" << name << "_i, " << name << "_j, ";
-      stream << "ones(size(" << name << "_i)), ";
-      stream << name << "_m, " << name << "_n);" << endl;
+      stream << name << "_v, " << name << "_m, " << name << "_n);\n";
     }
 
   }
