@@ -108,9 +108,6 @@ namespace casadi {
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
 
-    /** \brief  Copy constructor */
-    MX(const MX& x);
-
 #ifndef SWIG
     /** \brief  Create vector constant (also implicit type conversion) */
     MX(const std::vector<double> &x);
