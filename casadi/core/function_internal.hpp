@@ -183,6 +183,9 @@ namespace casadi {
     // Print timing statistics
     bool record_time_;
 
+    /// Errors are thrown when NaN is produced
+    bool regularity_check_;
+
 #ifdef CASADI_WITH_THREAD
     /// Mutex for thread safety
     mutable std::mutex mtx_;
@@ -924,9 +927,6 @@ namespace casadi {
 
     /// Maximum number of sensitivity directions
     casadi_int max_num_dir_;
-
-    /// Errors are thrown when NaN is produced
-    bool regularity_check_;
 
     /// Errors are thrown if numerical values of inputs look bad
     bool inputs_check_;
