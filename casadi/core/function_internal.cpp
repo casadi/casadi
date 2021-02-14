@@ -778,6 +778,22 @@ namespace casadi {
         }
       }
     }
+    // Check all outputs for NaNs
+    if (regularity_check_) {
+      for (casadi_int i = 0; i < n_out_; ++i) {
+        // Skip of not calculated
+        if (!res[i]) continue;
+        // Loop over nonzeros
+        casadi_int nnz = this->nnz_out(i);
+        for (casadi_int nz = 0; nz < nnz; ++nz) {
+          if (isnan(res[i][nz])) {
+            // Throw readable error message
+            casadi_error("NaN detected for output " + name_out_[i] + " at "
+              + sparsity_out(i).repr_el(nz));
+          }
+        }
+      }
+    }
     return ret;
   }
 
