@@ -374,6 +374,7 @@ namespace casadi {
     opts["dump"] = dump_;
     opts["forward_options"] = forward_options_;
     opts["reverse_options"] = reverse_options_;
+    opts["regularity_check"] = regularity_check_;
     //opts["is_diff_in"] = is_diff_in_;
     //opts["is_diff_out"] = is_diff_out_;
     return opts;
@@ -1905,7 +1906,6 @@ namespace casadi {
       Dict opts = combine(forward_options_, generate_options());
       if (!enable_forward_) opts = fd_options_;
       opts["derivative_of"] = self();
-      if (regularity_check_) opts["regularity_check"] = true;
       // Generate derivative function
       casadi_assert_dev(enable_forward_ || enable_fd_);
       if (enable_forward_) {
@@ -1963,7 +1963,6 @@ namespace casadi {
       // Options
       Dict opts = combine(reverse_options_, generate_options());
       opts["derivative_of"] = self();
-      if (regularity_check_) opts["regularity_check"] = true;
       // Generate derivative function
       casadi_assert_dev(enable_reverse_);
       f = get_reverse(nadj, fname, inames, onames, opts);
@@ -2081,7 +2080,6 @@ namespace casadi {
       // Options
       Dict opts;
       opts["derivative_of"] = self();
-      if (regularity_check_) opts["regularity_check"] = true;
       // Generate derivative function
       casadi_assert_dev(enable_jacobian_);
       f = get_jacobian(fname, inames, onames, opts);

@@ -76,12 +76,15 @@ namespace casadi {
     // Options for the oracle
     Dict oracle_options;
     Dict::const_iterator it = opts.find("oracle_options");
-    if (it!=opts.end()) {
+    if (it != opts.end()) {
       // "oracle_options" has been set
       oracle_options = it->second;
-    } else if ((it=opts.find("verbose")) != opts.end()) {
-      // "oracle_options" has not been set, but "verbose" has
-      oracle_options["verbose"] = it->second;
+    } else {
+      // Propagate selected options from Nlpsol to oracle by default
+      for (const char* op : {"verbose", "regularity_check"})
+      if ((it = opts.find(op)) != opts.end()) {
+        oracle_options[op] = it->second;
+      }
     }
 
     // Create oracle
