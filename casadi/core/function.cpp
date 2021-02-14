@@ -941,7 +941,7 @@ namespace casadi {
     try {
       return (*this)->is_diff_in_.at(ind);
     } catch (exception& e) {
-      THROW_ERROR("is_dif_in", e.what());
+      THROW_ERROR("is_diff_in", e.what());
     }
   }
 
@@ -949,7 +949,7 @@ namespace casadi {
     try {
       return (*this)->is_diff_out_.at(ind);
     } catch (exception& e) {
-      THROW_ERROR("is_dif_in", e.what());
+      THROW_ERROR("is_diff_out", e.what());
     }
   }
 
@@ -957,7 +957,7 @@ namespace casadi {
     try {
       return (*this)->is_diff_in_;
     } catch (exception& e) {
-      THROW_ERROR("is_dif_in", e.what());
+      THROW_ERROR("is_diff_in", e.what());
     }
   }
 
@@ -965,7 +965,7 @@ namespace casadi {
     try {
       return (*this)->is_diff_out_;
     } catch (exception& e) {
-      THROW_ERROR("is_dif_in", e.what());
+      THROW_ERROR("is_diff_out", e.what());
     }
   }
 
@@ -1318,17 +1318,29 @@ namespace casadi {
 
   void Function::call(const DMDict& arg, DMDict& res,
                       bool always_inline, bool never_inline) const {
-    return call_gen(arg, res, always_inline, never_inline);
+    try {
+      call_gen(arg, res, always_inline, never_inline);
+    } catch (exception& e) {
+      THROW_ERROR("call", e.what());
+    }
   }
 
   void Function::call(const SXDict& arg, SXDict& res,
                       bool always_inline, bool never_inline) const {
-    return call_gen(arg, res, always_inline, never_inline);
+    try {
+      call_gen(arg, res, always_inline, never_inline);
+    } catch (exception& e) {
+      THROW_ERROR("call", e.what());
+    }
   }
 
   void Function::call(const MXDict& arg, MXDict& res,
                       bool always_inline, bool never_inline) const {
-    return call_gen(arg, res, always_inline, never_inline);
+    try {
+      call_gen(arg, res, always_inline, never_inline);
+    } catch (exception& e) {
+      THROW_ERROR("call", e.what());
+    }
   }
 
   double Function::default_in(casadi_int ind) const {
