@@ -50,6 +50,7 @@ std::string to_string(Causality v) {
   case OUTPUT: return "output";
   case LOCAL: return "local";
   case INDEPENDENT: return "independent";
+  default: break;
   }
   return "";
 }
@@ -61,6 +62,7 @@ std::string to_string(Variability v) {
   case TUNABLE: return "tunable";
   case DISCRETE: return "discrete";
   case CONTINUOUS: return "continuous";
+  default: break;
   }
   return "";
 }
@@ -71,11 +73,12 @@ std::string to_string(Initial v) {
   case APPROX: return "approx";
   case CALCULATED: return "calculated";
   case INITIAL_NA: return "initial_na";
+  default: break;
   }
   return "";
 }
 
-Initial Variable::default_initial(Variability variability, Causality causality) {
+Initial Variable::default_initial(Causality causality, Variability variability) {
   // According to table in FMI 2.0.2 specification, section 2.2.7
   switch (variability) {
   case CONSTANT:
@@ -96,15 +99,17 @@ Initial Variable::default_initial(Variability variability, Causality causality) 
     if (causality == OUTPUT || causality == LOCAL)
       return CALCULATED;
     break;
+  default: break;
   }
   // Initial value not available
   return INITIAL_NA;
 }
 
 Variable::Variable(const std::string& name) : name(name),
-    variability(CONTINUOUS), causality(LOCAL), description(""), value_reference(-1),
+    value_reference(-1), description(""), causality(LOCAL), variability(CONTINUOUS),
+    unit(""), display_unit(""),
     min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
-    nominal(1.0), start(0.0), unit(""), display_unit(""), derivative(-1) {
+    nominal(1.0), start(0.0), derivative(-1) {
 }
 
 void Variable::disp(std::ostream &stream, bool more) const {
@@ -153,7 +158,7 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       std::string initial_str = vnode.get_attribute("initial", "");
       if (initial_str.empty()) {
         // Default value
-        var.initial = Variable::default_initial(var.variability, var.causality);
+        var.initial = Variable::default_initial(var.causality, var.variability);
       } else {
         // Consistency check
         casadi_assert(var.causality != INPUT && var.causality != INDEPENDENT,

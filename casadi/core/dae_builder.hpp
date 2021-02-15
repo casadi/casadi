@@ -142,7 +142,7 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   }
 
   // Default initial attribute, per specification
-  static Initial default_initial(Variability variability, Causality causality);
+  static Initial default_initial(Causality causality, Variability variability);
 };
 #endif  // SWIG
 
