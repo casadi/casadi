@@ -177,7 +177,7 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         (void)props.read_attribute("max", var.max, false);
         (void)props.read_attribute("nominal", var.nominal, false);
         (void)props.read_attribute("start", var.start, false);
-        (void)vnode.read_attribute("derivative", var.derivative, false);
+        (void)props.read_attribute("derivative", var.derivative, false);
       }
 
       // Map to position in DaeBuilder::value
