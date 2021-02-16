@@ -194,11 +194,13 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       MX& v = this->value.at(it->value_reference);
       // Sort by types
       if (it->derivative >= 0) {
-        // Differential state: Update reference to new value map
-        it->derivative = val_map.at(it->derivative);
+        // Add variable offset, make index 1
+        it->derivative += n_vars_before - 1;
+        // Corresponding state variable
+        const Variable& x = variables_.at(it->derivative);
         // Add to list of differential variables, equations
-        this->x.push_back(v);
-        add_ode("ode_" + it->name, this->value.at(it->derivative));
+        this->x.push_back(this->value.at(x.value_reference));
+        add_ode("ode_" + x.name, v);
       } else if (it->variability == CONTINUOUS || it->variability == DISCRETE) {
         if (it->causality == INPUT) {
           this->u.push_back(v);
@@ -257,7 +259,7 @@ MX DaeBuilder::read_expr(const XmlNode& node) {
   } else if (name=="Cos") {
     return cos(read_expr(node[0]));
   } else if (name=="Der") {
-    return value.at(read_variable(node[0]).derivative);
+    return value.at(variables_.at(read_variable(node[0]).derivative).value_reference);
   } else if (name=="Div") {
     return read_expr(node[0]) / read_expr(node[1]);
   } else if (name=="Exp") {
@@ -654,7 +656,7 @@ MX DaeBuilder::var(const std::string& name) const {
 }
 
 MX DaeBuilder::der(const std::string& name) const {
-  return value.at(variable(name).derivative);
+  return value.at(variables_.at(variable(name).derivative).value_reference);
 }
 
 MX DaeBuilder::der(const MX& var) const {
