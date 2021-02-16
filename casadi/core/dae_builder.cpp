@@ -197,23 +197,19 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         // Add to list of differential variables, equations
         this->x.push_back(x.v);
         add_ode("ode_" + x.name, v);
+      } else if (it->causality == OUTPUT) {
+        // Constant output
+        this->y.push_back(v);
+        this->ydef.push_back(it->start);
+      } else if (it->causality == INPUT) {
+        this->u.push_back(v);
       } else if (it->variability == CONTINUOUS || it->variability == DISCRETE) {
-        if (it->causality == INPUT) {
-          this->u.push_back(v);
-        } else {
-          // Algebraic variable
-          this->z.push_back(v);
-        }
+        // Algebraic variable
+        this->z.push_back(v);
       } else if (it->variability == CONSTANT) {
-        if (it->causality == OUTPUT) {
-          // Constant output
-          this->y.push_back(v);
-          this->ydef.push_back(it->start);
-        } else {
-          // Named constant
-          this->c.push_back(v);
-          this->cdef.push_back(it->start);
-        }
+        // Named constant
+        this->c.push_back(v);
+        this->cdef.push_back(it->start);
       } else if (it->variability == FIXED || it->variability == TUNABLE) {
         this->p.push_back(v);
       } else {
