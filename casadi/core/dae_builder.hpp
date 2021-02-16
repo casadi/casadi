@@ -128,6 +128,9 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   // bool reinit;
   ///@}
 
+  /// Variable expression
+  MX v;
+
   /// Readable name of the class
   std::string type_name() const {return "Variable";}
 
@@ -192,9 +195,6 @@ public:
    *  Public data members
    */
   ///@{
-  /** \brief All variables */
-  std::vector<MX> value;
-
   /** \brief Independent variable (usually time) */
   MX t;
 
