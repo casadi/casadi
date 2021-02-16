@@ -184,9 +184,12 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
     // Process added variables
     for (auto it = variables_.begin() + n_vars_before; it != variables_.end(); ++it) {
       // Expression for the value
-      MX& v = it->v;
+      const MX& v = it->v;
       // Sort by types
-      if (it->derivative >= 0) {
+      if (it->causality == INDEPENDENT) {
+        // Independent (time) variable
+        this->t = v;
+      } else if (it->derivative >= 0) {
         // Add variable offset, make index 1
         it->derivative += n_vars_before - 1;
         // Corresponding state variable
