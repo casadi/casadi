@@ -125,8 +125,12 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   // bool unbounded;
   double start;
   casadi_int derivative;
+  casadi_int antiderivative;
   // bool reinit;
   ///@}
+
+  /// Do other expressions depend on this variable
+  bool dependency;
 
   /// Variable expression
   MX v;

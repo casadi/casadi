@@ -133,6 +133,9 @@ namespace casadi {
     /** \brief  Read the double value of a string */
     static void readString(const std::string& str, double& val);
 
+    /** \brief  Read a vector of integer values of a string */
+    static void readString(const std::string& str, std::vector<casadi_int>& val);
+
     CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                        const XmlNode& node);
 

@@ -145,4 +145,15 @@ namespace casadi {
     buffer >> val;
   }
 
+  void XmlNode::readString(const std::string& str, std::vector<casadi_int>& val) {
+    val.clear();
+    std::istringstream buffer(str);
+    while (true) {
+      casadi_int v;
+      buffer >> v;
+      if (buffer.fail()) break;
+      val.push_back(v);
+    }
+  }
+
 } // namespace casadi

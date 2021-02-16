@@ -109,7 +109,7 @@ Variable::Variable(const std::string& name) : name(name),
     value_reference(-1), description(""), causality(LOCAL), variability(CONTINUOUS),
     unit(""), display_unit(""),
     min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
-    nominal(1.0), start(0.0), derivative(-1) {
+    nominal(1.0), start(0.0), derivative(-1), antiderivative(-1), dependency(false) {
 }
 
 void Variable::disp(std::ostream &stream, bool more) const {
@@ -126,16 +126,16 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
   XmlFile xml_file("tinyxml");
   XmlNode document = xml_file.parse(filename);
 
+  // Number of variables before adding new ones
+  size_t n_vars_before = variables_.size();
+
   // **** Add model variables ****
   {
     // Get a reference to the ModelVariables node
     const XmlNode& modvars = document[0]["ModelVariables"];
 
-    // Number of variables before adding new ones
-    size_t n_vars_before = variables_.size();
-
     // Add variables
-    for (casadi_int i=0; i<modvars.size(); ++i) {
+    for (casadi_int i = 0; i < modvars.size(); ++i) {
       // Get a reference to the variable
       const XmlNode& vnode = modvars[i];
 
@@ -165,7 +165,6 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         // Value specified
         var.initial = to_enum<Initial>(initial_str);
       }
-
       // Other properties
       if (vnode.has_child("Real")) {
         const XmlNode& props = vnode["Real"];
@@ -177,44 +176,92 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         (void)props.read_attribute("start", var.start, false);
         (void)props.read_attribute("derivative", var.derivative, false);
       }
-
       // Add to list of variables
       add_variable(name, var);
     }
-    // Process added variables
+    // Handle derivatives/antiderivatives
     for (auto it = variables_.begin() + n_vars_before; it != variables_.end(); ++it) {
-      // Expression for the value
-      const MX& v = it->v;
-      // Sort by types
-      if (it->causality == INDEPENDENT) {
-        // Independent (time) variable
-        this->t = v;
-      } else if (it->derivative >= 0) {
+      if (it->derivative >= 0) {
         // Add variable offset, make index 1
         it->derivative += n_vars_before - 1;
-        // Corresponding state variable
-        const Variable& x = variables_.at(it->derivative);
-        // Add to list of differential variables, equations
-        this->x.push_back(x.v);
-        add_ode("ode_" + x.name, v);
-      } else if (it->causality == OUTPUT) {
-        // Constant output
-        this->y.push_back(v);
-        this->ydef.push_back(it->start);
-      } else if (it->causality == INPUT) {
-        this->u.push_back(v);
-      } else if (it->variability == CONTINUOUS || it->variability == DISCRETE) {
-        // Algebraic variable
-        this->z.push_back(v);
-      } else if (it->variability == CONSTANT) {
-        // Named constant
-        this->c.push_back(v);
-        this->cdef.push_back(it->start);
-      } else if (it->variability == FIXED || it->variability == TUNABLE) {
-        this->p.push_back(v);
-      } else {
-        casadi_warning("Cannot sort " + it->name);
+        // Set antiderivative
+        variables_.at(it->derivative).antiderivative = it - variables_.begin();
       }
+    }
+  }
+
+  // **** Process model structure ****
+  if (document[0].has_child("ModelStructure")) {
+    // Get a reference to the ModelVariables node
+    const XmlNode& modst = document[0]["ModelStructure"];
+    // Test both Outputs and Derivatives
+    for (const char* dtype : {"Outputs", "Derivatives"}) {
+      // Derivative variables
+      if (modst.has_child(dtype)) {
+        const XmlNode& outputs = modst[dtype];
+        for (casadi_int i = 0; i < outputs.size(); ++i) {
+          // Get a reference to the output
+          const XmlNode& onode = outputs[i];
+          // Read attribute
+          casadi_int index = -1;
+          (void)onode.read_attribute("index", index, false);
+          casadi_assert(index >= 1, "Non-positive output index");
+          // Convert to index in variables list
+          index += n_vars_before - 1;
+          // Get dependencies
+          std::vector<casadi_int> dependencies;
+          (void)onode.read_attribute("dependencies", dependencies, false);
+          // Convert to indices in variables list
+          for (casadi_int& d : dependencies) {
+            // Consistency check, add offset
+            casadi_assert(d >= 1, "Non-positive dependency index");
+            d += n_vars_before - 1;
+            // Mark corresponding variable as dependency
+            variables_.at(d).dependency = true;
+          }
+        }
+      }
+    }
+  }
+
+  // **** Postprocess / sort variables ****
+  for (auto it = variables_.begin() + n_vars_before; it != variables_.end(); ++it) {
+    // Sort by types
+    if (it->causality == INDEPENDENT) {
+      // Independent (time) variable
+      this->t = it->v;
+    } else if (it->causality == INPUT) {
+      this->u.push_back(it->v);
+    } else if (it->variability == CONSTANT) {
+      // Named constant
+      this->c.push_back(it->v);
+      this->cdef.push_back(it->start);
+    } else if (it->variability == FIXED || it->variability == TUNABLE) {
+      this->p.push_back(it->v);
+    } else if (it->variability == CONTINUOUS) {
+      if (it->antiderivative >= 0) {
+        // Is the variable needed to calculate other states, algebraic variables?
+        if (it->dependency) {
+          // Add to list of differential equations
+          this->x.push_back(it->v);
+          add_ode("ode_" + it->name, variables_.at(it->antiderivative).v);
+        } else {
+          // Add to list of quadrature equations
+          this->q.push_back(it->v);
+          add_quad("quad_" + it->name, variables_.at(it->antiderivative).v);
+        }
+      } else if (it->dependency || it->derivative >= 0) {
+        // Add to list of algebraic equations
+        this->z.push_back(it->v);
+        add_alg("alg_" + it->name, it->v - nan);
+      }
+      // Is it (also) an output variable?
+      if (it->causality == OUTPUT) {
+        this->y.push_back(it->v);
+        this->ydef.push_back(it->v);
+      }
+    } else if (it->dependency) {
+      casadi_warning("Cannot sort " + it->name);
     }
   }
 }
