@@ -302,17 +302,29 @@ namespace casadi {
 
   void Function::call(const vector<DM> &arg, vector<DM> &res,
                       bool always_inline, bool never_inline) const {
-    (*this)->call(arg, res, always_inline, never_inline);
+    try {
+      (*this)->call(arg, res, always_inline, never_inline);
+    } catch (exception& e) {
+      THROW_ERROR("call", e.what());
+    }
   }
 
   void Function::call(const vector<SX> &arg, vector<SX>& res,
                       bool always_inline, bool never_inline) const {
-    (*this)->call(arg, res, always_inline, never_inline);
+    try {
+      (*this)->call(arg, res, always_inline, never_inline);
+    } catch (exception& e) {
+      THROW_ERROR("call", e.what());
+    }
   }
 
   void Function::call(const vector<MX> &arg, vector<MX>& res,
                       bool always_inline, bool never_inline) const {
-    (*this)->call(arg, res, always_inline, never_inline);
+    try {
+      (*this)->call(arg, res, always_inline, never_inline);
+    } catch (exception& e) {
+      THROW_ERROR("call", e.what());
+    }
   }
 
   vector<const double*> Function::buf_in(Function::VecArg arg) const {

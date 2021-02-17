@@ -787,9 +787,9 @@ namespace casadi {
         // Loop over nonzeros
         casadi_int nnz = this->nnz_out(i);
         for (casadi_int nz = 0; nz < nnz; ++nz) {
-          if (isnan(res[i][nz])) {
+          if (isnan(res[i][nz]) || isinf(res[i][nz])) {
             // Throw readable error message
-            casadi_error("NaN detected for output " + name_out_[i] + " at "
+            casadi_error(str(res[i][nz]) + " detected for output " + name_out_[i] + " at "
               + sparsity_out(i).repr_el(nz));
           }
         }
