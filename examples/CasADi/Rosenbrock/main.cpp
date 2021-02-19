@@ -1,6 +1,78 @@
-#include <casadi/casadi.hpp>
+#include <casadi/core/function.hpp>
 #include <panoc-alm/alm.hpp>
 
+/// Class for evaluating CasADi functions, allocating the necessary workspace
+/// storage in advance for allocation-free evaluations.
+template <size_t N_in, size_t N_out>
+class CasADiFunctionEvaluator {
+  public:
+    CasADiFunctionEvaluator(casadi::Function &&f)
+        : fun(std::move(f)), iwork(fun.sz_iw()), dwork(fun.sz_w()) {
+        assert(N_in == fun.n_in());
+        assert(N_out == fun.n_out());
+    }
+
+  protected:
+    void operator()(const double *const *in, double *const *out) const {
+        fun(const_cast<const double **>(in), const_cast<double **>(out),
+            iwork.data(), dwork.data(), 0);
+    }
+
+  public:
+    void operator()(const double *const (&in)[N_in],
+                    double *const (&out)[N_out]) const {
+        this->operator()(&in[0], &out[0]);
+    }
+
+  private:
+    casadi::Function fun;
+    mutable std::vector<casadi_int> iwork;
+    mutable std::vector<double> dwork;
+};
+
+/// Wrapper for CasADiFunctionEvaluator with 1 vector input, scalar output.
+class CasADiFun_1iso {
+  public:
+    CasADiFun_1iso(casadi::Function &&f) : fun(std::move(f)) {}
+
+    double operator()(const pa::vec &x) const {
+        double out;
+        fun({x.data()}, {&out});
+        return out;
+    }
+
+  private:
+    CasADiFunctionEvaluator<1, 1> fun;
+};
+
+/// Wrapper for CasADiFunctionEvaluator with 1 vector input, 1 vector output.
+class CasADiFun_1i1o {
+  public:
+    CasADiFun_1i1o(casadi::Function &&f) : fun(std::move(f)) {}
+
+    void operator()(const pa::vec &in, pa::vec &out) const {
+        fun({in.data()}, {out.data()});
+    }
+
+  private:
+    CasADiFunctionEvaluator<1, 1> fun;
+};
+
+/// Wrapper for CasADiFunctionEvaluator with 2 vector inputs, 1 vector output.
+class CasADiFun_2i1o {
+  public:
+    CasADiFun_2i1o(casadi::Function &&f) : fun(std::move(f)) {}
+
+    void operator()(const pa::vec &in1, const pa::vec &in2,
+                    pa::vec &out) const {
+        fun({in1.data(), in2.data()}, {out.data()});
+    }
+
+  private:
+    CasADiFunctionEvaluator<2, 1> fun;
+};
+
+#include <casadi/core/external.hpp>
 namespace cs = casadi;
 
 int main(int argc, char *argv[]) {
@@ -8,10 +80,6 @@ int main(int argc, char *argv[]) {
         "./examples/CasADi/Rosenbrock/librosenbrock_functions.so";
     if (argc > 1)
         so_name = argv[1];
-    cs::Function f      = cs::external("f", so_name);
-    cs::Function grad_f = cs::external("grad_f", so_name);
-    cs::Function g      = cs::external("g", so_name);
-    cs::Function grad_g = cs::external("grad_g_v", so_name);
 
     constexpr auto inf = std::numeric_limits<double>::infinity();
     using pa::real_t;
@@ -20,41 +88,24 @@ int main(int argc, char *argv[]) {
     pa::Problem p;
     p.n = 3;
     p.m = 1;
-    p.C = pa::Box{vec::Constant(3, inf), vec::Constant(3, -inf)};
-    p.D = pa::Box{vec::Constant(1, 0.), vec::Constant(1, 0.)};
-    p.f = [f{std::move(f)}](const vec &x) -> real_t {
-        double f_x;
-        std::vector<const double *> in{x.data()};
-        std::vector<double *> out{&f_x};
-        // TODO: optimize allocations (including work allocations)
-        f(in, out);
-        return f_x;
+    p.C = pa::Box{
+        vec::Constant(3, inf),
+        vec::Constant(3, -inf),
     };
-    p.grad_f = [grad_f{std::move(grad_f)}](const vec &x, vec &grad_fx) {
-        std::vector<const double *> in{x.data()};
-        std::vector<double *> out{grad_fx.data()};
-        // TODO: optimize allocations (including work allocations)
-        grad_f(in, out);
+    p.D = pa::Box{
+        vec::Constant(1, 0.),
+        vec::Constant(1, 0.),
     };
-    p.g = [g{std::move(g)}](const vec &x, vec &gx) {
-        std::vector<const double *> in{x.data()};
-        std::vector<double *> out{gx.data()};
-        // TODO: optimize allocations (including work allocations)
-        g(in, out);
-    };
-    p.grad_g = [grad_g{std::move(grad_g)}](const vec &x, const vec &y,
-                                           vec &grad_gxy) {
-        std::vector<const double *> in{x.data(), y.data()};
-        std::vector<double *> out{grad_gxy.data()};
-        // TODO: optimize allocations (including work allocations)
-        grad_g(in, out);
-    };
+    p.f      = CasADiFun_1iso(cs::external("f", so_name));
+    p.grad_f = CasADiFun_1i1o(cs::external("grad_f", so_name));
+    p.g      = CasADiFun_1i1o(cs::external("g", so_name));
+    p.grad_g = CasADiFun_2i1o(cs::external("grad_g_v", so_name));
 
     pa::ALMParams almparam;
     almparam.ε        = 1e-8;
     almparam.δ        = 1e-8;
-    almparam.Δ        = 100;
-    almparam.Σ₀       = 1e-2;
+    almparam.Δ        = 10;
+    almparam.Σ₀       = 2;
     almparam.ε₀       = 1;
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;

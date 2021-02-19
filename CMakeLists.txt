@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 # Import file with some custom compiler warnings and debug/sanitizer flags 
 include(cmake/GlobalCompilerOptions.cmake)
+# Macro for generating objective/constraint functions and derivatives in Python
+# using CasADi
+include(cmake/CasADiFunctionCodeGenPython.cmake)
 
 # ----
 

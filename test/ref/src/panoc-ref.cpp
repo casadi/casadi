@@ -236,7 +236,6 @@ PANOCSolver::Stats PANOCSolver::operator()(
             vec rₖ_tmp = rₖ;
             lbfgs.apply(1, rₖ_tmp, dₖ);
         }
-        dₖ(0) = 2.4;
 
         std::cout << "      "
                   << "xₖ    = " << xₖ.transpose() << "\n";
