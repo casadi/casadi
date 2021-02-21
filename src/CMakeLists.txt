@@ -22,15 +22,26 @@ target_link_libraries(panoc-alm PUBLIC Eigen3::Eigen)
 # Interop
 # -------
 
+# CUTEst
 if (TARGET CUTEst::headers)
     add_library(cutest-loader STATIC src/interop/cutest/CUTEstLoader.cpp)
     target_link_libraries(cutest-loader 
-        PRIVATE 
+        PRIVATE
             CUTEst::headers
             ${CMAKE_DL_LIBS}
-        PUBLIC 
+        PUBLIC
             panoc-alm::panoc-alm)
     add_library(panoc-alm::cutest-loader ALIAS cutest-loader)
+endif()
+
+# CasADi
+if (TARGET casadi)
+    add_library(casadi-loader STATIC src/interop/casadi/CasADiLoader.cpp)
+    target_link_libraries(casadi-loader 
+        PUBLIC
+            casadi
+            panoc-alm::panoc-alm)
+    add_library(panoc-alm::casadi-loader ALIAS casadi-loader)
 endif()
 
 # Target installation

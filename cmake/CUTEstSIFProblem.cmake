@@ -21,17 +21,18 @@ macro(cutest_sif_problem PROBLEM_NAME)
         WORKING_DIRECTORY
             ${PROBLEM_DIR}
     )
-    add_library(CUTEst_${PROBLEM_NAME} SHARED 
+    add_library(cutest-${PROBLEM_NAME} SHARED 
         ${PROBLEM_DIR}/ELFUN.f
         ${PROBLEM_DIR}/EXTER.f
         ${PROBLEM_DIR}/GROUP.f
         ${PROBLEM_DIR}/RANGE.f
     )
-    target_link_libraries(CUTEst_${PROBLEM_NAME} PRIVATE CUTEst::objects)
-    set_target_properties(CUTEst_${PROBLEM_NAME}
+    target_link_libraries(cutest-${PROBLEM_NAME} PRIVATE CUTEst::objects)
+    set_target_properties(cutest-${PROBLEM_NAME}
         PROPERTIES
             LIBRARY_OUTPUT_DIRECTORY ${PROBLEM_DIR}
             DEBUG_POSTFIX ""
             ASAN_POSTFIX ""
             TSAN_POSTFIX "")
+    add_library(CUTEst::${PROBLEM_NAME} ALIAS cutest-${PROBLEM_NAME})
 endmacro()

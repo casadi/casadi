@@ -4,11 +4,11 @@
 int main() {
     const char *so_fname =
         "/home/pieter/GitHub/PANOC-ALM/build/examples/CUTEst/"
-        "Rosenbrock/CUTEst/ROSENBR/libCUTEst_ROSENBR.so";
+        "Rosenbrock/CUTEst/ROSENBR/libcutest-ROSENBR.so";
     const char *outsdif_fname = "/home/pieter/GitHub/PANOC-ALM/build/examples/"
                                 "CUTEst/Rosenbrock/CUTEst/ROSENBR/OUTSDIF.d";
 
-    auto p = load_CUTEst(so_fname, outsdif_fname);
+    auto p = load_CUTEst_problem(so_fname, outsdif_fname);
     
     pa::ALMParams almparam;
     almparam.ε        = 1e-8;
@@ -33,7 +33,6 @@ int main() {
 
     std::cout << "x = " << p.x0.transpose() << std::endl;
     std::cout << "y = " << p.y0.transpose() << std::endl;
-
 
     std::cout << "x_l = " << p.problem.C.lowerbound.transpose() << std::endl;
     std::cout << "x_u = " << p.problem.C.upperbound.transpose() << std::endl;

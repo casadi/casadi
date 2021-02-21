@@ -26,7 +26,7 @@ cg.add(Function("grad_f", [unknwns],
 cg.add(Function("g", [unknwns],
                 [g],
                 ["x"], ["g"]))
-cg.add(Function("grad_g_v", [unknwns, w],
+cg.add(Function("grad_g", [unknwns, w],
                 [jtimes(g, unknwns, w, True)],
-                ["x", "w"], ["grad_g_v"]))
+                ["x", "w"], ["grad_g"]))
 cg.generate()

@@ -10,7 +10,9 @@ export CUTEST_ROOT="${VIRTUAL_ENV}/opt/CUTEst"
 mkdir -p "$CUTEST_ROOT"
 cd "$CUTEST_ROOT"
 
-# rm -rf cutest
+rm -rf archdefs
+rm -rf sifdecode
+rm -rf cutest
 [ -d archdefs ] || git clone https://github.com/ralna/ARCHDefs --depth 1 ./archdefs
 [ -d sifdecode ] || git clone https://github.com/ralna/SIFDecode --depth 1 ./sifdecode
 [ -d cutest ] || git clone https://github.com/ralna/CUTEst --depth 1 ./cutest
@@ -83,6 +85,3 @@ if [[ ! $? ]]; then
     error 'An error occurred while installing CUTEst.'
     exit $?
 fi
-
-install -v "$CUTEST/objects/$VERSION/double/libcutest.a" "$VIRTUAL_ENV/lib"
-install -v "$CUTEST/include/cutest.h" "$VIRTUAL_ENV/include"

@@ -228,7 +228,8 @@ CUTEstProblem::CUTEstProblem(CUTEstProblem &&) = default;
 CUTEstProblem &CUTEstProblem::operator=(CUTEstProblem &&) = default;
 CUTEstProblem::~CUTEstProblem()                           = default;
 
-CUTEstProblem load_CUTEst(const char *so_fname, const char *outsdif_fname) {
+CUTEstProblem load_CUTEst_problem(const char *so_fname,
+                                  const char *outsdif_fname) {
     CUTEstProblem p;
     p.implementation = std::make_unique<CUTEstLoader>(so_fname, outsdif_fname);
     auto *l          = p.implementation.get();
