@@ -19,6 +19,20 @@ target_include_directories(panoc-alm
 target_link_libraries(panoc-alm PUBLIC Eigen3::Eigen)
 # target_compile_definitions(panoc-alm PUBLIC PRINT_DEBUG_COUT=1)
 
+# Interop
+# -------
+
+if (TARGET CUTEst::headers)
+    add_library(cutest-loader STATIC src/interop/cutest/CUTEstLoader.cpp)
+    target_link_libraries(cutest-loader 
+        PRIVATE 
+            CUTEst::headers
+            ${CMAKE_DL_LIBS}
+        PUBLIC 
+            panoc-alm::panoc-alm)
+    add_library(panoc-alm::cutest-loader ALIAS cutest-loader)
+endif()
+
 # Target installation
 # -------------------
 
