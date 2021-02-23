@@ -49,6 +49,7 @@ class CUTEstLoader {
         integer e_order = 0;
         integer l_order = 0;
         integer v_order = 0;
+
         // Constrained problem
         if (ncon > 0) {
             auto rosenbr_csetup =
@@ -99,6 +100,7 @@ class CUTEstLoader {
     }
 
     doublereal eval_objective_constrained(const pa::vec &x) const {
+        assert(x.size() == nvar);
         assert(ncon > 0);
         integer status;
         doublereal f;
@@ -109,6 +111,7 @@ class CUTEstLoader {
     }
 
     doublereal eval_objective_unconstrained(const pa::vec &x) const {
+        assert(x.size() == nvar);
         assert(ncon == 0);
         integer status;
         doublereal f;
@@ -120,6 +123,8 @@ class CUTEstLoader {
 
     void eval_objective_grad_constrained(const pa::vec &x,
                                          pa::vec &grad_f) const {
+        assert(x.size() == nvar);
+        assert(grad_f.size() == nvar);
         assert(ncon > 0);
         integer status;
         logical grad = true;
@@ -130,6 +135,8 @@ class CUTEstLoader {
 
     void eval_objective_grad_unconstrained(const pa::vec &x,
                                            pa::vec &grad_f) const {
+        assert(x.size() == nvar);
+        assert(grad_f.size() == nvar);
         assert(ncon == 0);
         integer status;
         call_as<decltype(CUTEST_ugr)>(eval_objective_grad_p)(
@@ -138,6 +145,8 @@ class CUTEstLoader {
     }
 
     void eval_constraints(const pa::vec &x, pa::vec &g) const {
+        assert(x.size() == nvar);
+        assert(g.size() == ncon);
         if (ncon == 0)
             return;
         integer status;
@@ -148,6 +157,9 @@ class CUTEstLoader {
 
     void eval_constraints_grad(const pa::vec &x, const pa::vec &v,
                                pa::vec &grad_g_v) const {
+        assert(x.size() == nvar);
+        assert(v.size() == ncon);
+        assert(grad_g_v.size() == nvar);
         if (ncon == 0) {
             grad_g_v.setZero();
             return;
@@ -155,7 +167,7 @@ class CUTEstLoader {
         integer status;
         logical gotJ   = false;
         logical jtrans = true;
-        call_as<decltype(CUTEST_cjprod)>(eval_constraints_p)(
+        call_as<decltype(CUTEST_cjprod)>(eval_constraints_grad_p)(
             &status, &nvar, &ncon, &gotJ, &jtrans, x.data(), v.data(), &ncon,
             grad_g_v.data(), &nvar);
         throw_if_error("Failed to call cutest_cjprod", status);
