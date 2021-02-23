@@ -24,10 +24,10 @@ TEST(PANOC, cosh1D) {
 
     real_t a = 0.5;
     auto obj_f = [=](const vec &x) {
-        return std::cosh(a * x(0));
+        return std::cosh(a * (x(0) - 10));
     };
     auto grad_f = [=](const vec &x, vec &grad_f) {
-        grad_f(0) = a * std::sinh(a * x(0));
+        grad_f(0) = a * std::sinh(a * (x(0) - 10));
     };
     auto g = [=](const vec &x, vec &g_x) { g_x(0) = x(0); };
 
@@ -40,14 +40,13 @@ TEST(PANOC, cosh1D) {
 
     pa::PANOCParams params;
     params.lbfgs_mem = 20;
-    params.max_iter  = 1;
+    params.max_iter  = 100;
     params.τ_min     = 1. / 16;
 
     pa_ref::PANOCSolver solver{params};
 
     vec y     = vec::Ones(m);
-    vec x     = vec(n);
-    x << 1;
+    vec x     = vec::Ones(n);
     vec z     = vec::Constant(m, NaN);
     vec err_z = vec::Constant(m, NaN);
 

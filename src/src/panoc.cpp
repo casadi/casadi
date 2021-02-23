@@ -1,3 +1,5 @@
+#include "panoc-alm/box.hpp"
+#include "panoc-alm/vec.hpp"
 #include <cassert>
 #include <cmath>
 
@@ -12,73 +14,134 @@ namespace pa {
 
 namespace detail {
 
-/// ẑ ← Π(g(x) + Σ⁻¹y, D)
-/// @f[ \hat{z}(x) = \Pi_D\left(g(x) + \Sigma^{-1}y\right) @f]
-void calc_ẑ(const Problem &p, ///< [in]  Problem description
-            const vec &g,     ///< [in]  Constraint value @f$ g(x) @f$
-            const vec &Σ⁻¹y,  ///< [in]  @f$ \Sigma^{-1} y @f$
-            vec &ẑ            ///< [out] Slack variable @f$ \hat{z}(x) @f$
+/// Calculate both ψ(x) and the vector ŷ that can later be used to compute ∇ψ.
+/// @f[ \psi(x^k) = f(x^k) + \frac{1}{2}
+/// \text{dist}_\Sigma^2\left(g(x^k) + \Sigma^{-1}y,\;D\right) @f]
+/// @f[ \hat{y}  @f]
+real_t calc_ψ_ŷ(const Problem &p, ///< [in]  Problem description
+                const vec &x,     ///< [in]  Decision variable @f$ x @f$
+                const vec &y,     ///< [in]  Lagrange multipliers @f$ y @f$
+                const vec &Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
+                vec &ŷ            ///< [out] @f$ \hat{y} @f$
 ) {
-    ẑ = project(g + Σ⁻¹y, p.D);
+    // g(x)
+    p.g(x, ŷ);
+    // ζ = g(x) + Σ⁻¹y
+    ŷ += (y.array() / Σ.array()).matrix();
+    // d = ζ - Π(ζ, D)
+    ŷ = projecting_difference(ŷ, p.D);
+    // dᵀŷ, ŷ = Σ d
+    real_t dᵀŷ = 0;
+    for (unsigned i = 0; i < p.m; ++i) {
+        dᵀŷ += ŷ(i) * Σ(i) * ŷ(i); // TODO: vectorize
+        ŷ(i) = Σ(i) * ŷ(i);
+    }
+    // ψ(x) = f(x) + ½ dᵀŷ
+    real_t ψ = p.f(x) + 0.5 * dᵀŷ;
+
+    return ψ;
 }
 
-/// ŷ ← Σ (g(x) - ẑ)
-/// @f[ \hat{y}(x) = \Sigma\left(g(x) - \hat{z}(x)\right) + y @f]
-void calc_ŷ(const vec &ẑ, ///< [in]  Slack variable @f$ \hat{z}(x) @f$
-            const vec &g, ///< [in]  Constraint value @f$ g(x) @f$
-            const vec &y, ///< [in]  Lagrange multipliers
-            const vec &Σ, ///< [in]  Constraint weights @f$ \Sigma @f$
-            vec &ŷ        ///< [out] @f$ \hat{y}(x) @f$
+/// Calculate ∇ψ(x) using ŷ.
+void calc_grad_ψ_from_ŷ(const Problem &p, ///< [in]  Problem description
+                        const vec &x,     ///< [in]  Decision variable @f$ x @f$
+                        const vec &ŷ,     ///< [in   @f$ \hat{y} @f$
+                        vec &grad_ψ,      ///< [out] @f$ \nabla \psi(x) @f$
+                        vec &work_n       ///<       Dimension n
 ) {
-    ŷ = Σ.asDiagonal() * (g - ẑ) + y;
+    // ∇ψ = ∇f(x) + ∇g(x) ŷ
+    p.grad_f(x, grad_ψ);
+    p.grad_g(x, ŷ, work_n);
+    grad_ψ += work_n;
 }
 
-/// @f[ \hat{y}(x) = \Sigma\left(g(x) - \hat{z}(x)\right) + y @f]
-/// @f$ \hat{z}(x) @f$ is computed implicitly.
-void calc_ẑŷ(const Problem &p, ///< [in]  Problem description
-             const vec &g,     ///< [in]  Constraint @f$ g(\hat{x}) @f$
-             const vec &Σ⁻¹y,  ///< [in]  @f$ \Sigma^{-1} y @f$
-             const vec &y,     ///< [in]  Lagrange multipliers
-             const vec &Σ,     ///< [in]  Constraint weights @f$ \Sigma @f$
-             vec &ŷ            ///< [out] @f$ \hat{y}(x) @f$
-) {
-    auto ẑ = project(g + Σ⁻¹y, p.D);
-    ŷ      = Σ.asDiagonal() * (g - ẑ) + y;
-}
-
-/// @f[ \psi(x) = f(x) + \textstyle\frac{1}{2}\displaystyle
-/// \text{dist}_\Sigma^2\left(g(x) + \Sigma^{-1}y\right) @f]
-real_t calc_ψ(const Problem &p, ///< [in]  Problem description
-              const vec &x,     ///< [in]  Decision variable @f$ x @f$
-              const vec &g,     ///< [in]  Constraint @f$ g(\hat{x}) @f$
-              const vec &Σ⁻¹y,  ///< [in]  @f$ \Sigma^{-1} y @f$
-              const vec &ẑ,     ///< [in]  Slack variable @f$ \hat{z}(x) @f$
-              const vec &Σ      ///< [in]  Constraint weights @f$ \Sigma @f$
-) {
-    auto diff    = g + Σ⁻¹y - ẑ; // TODO: this could have been cached
-    auto dist_sq = vec_util::norm_squared_weighted(diff, Σ);
-    return p.f(x) + 0.5 * dist_sq;
-}
-
+/// Calculate both ψ(x) and its gradient ∇ψ(x).
+/// @f[ \psi(x^k) = f(x^k) + \frac{1}{2}
+/// \text{dist}_\Sigma^2\left(g(x^k) + \Sigma^{-1}y,\;D\right) @f]
 /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\ \hat{y}(x) @f]
-void calc_grad_ψ(
-    const Problem &p, ///< [in]  Problem description
-    const vec &x,     ///< [in]  Decision variable @f$ x @f$
-    const vec &ŷ,     ///< [in]  @f$ \hat{y}(x) = \Sigma\left(g(x) - \Pi_D\left(
-                      ///            g(x) + \Sigma^{-1}y\right) + y\right) @f$
-    vec &grad_g,      ///< [out] @f$ \nabla g(x) @f$
-    vec &grad_ψ       ///< [out] @f$ \nabla \psi(x) @f$
+real_t calc_ψ_grad_ψ(const Problem &p, ///< [in]  Problem description
+                     const vec &x,     ///< [in]  Decision variable @f$ x @f$
+                     const vec &y,     ///< [in]  Lagrange multipliers @f$ y @f$
+                     const vec &Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
+                     vec &grad_ψ,      ///< [out] @f$ \nabla \psi(x) @f$
+                     vec &work_n,      ///<       Dimension n
+                     vec &work_m       ///<       Dimension m
 ) {
-    p.grad_f(x, grad_ψ);    // ∇ψ ← ∇f(x)
-    p.grad_g(x, ŷ, grad_g); // ∇g ← ∇g(x) ŷ
-    grad_ψ += grad_g;       // ∇ψ ← ∇f(x) + ∇g(x) ŷ
+    // ψ(x) = f(x) + ½ dᵀŷ
+    real_t ψ = calc_ψ_ŷ(p, x, y, Σ, work_m);
+    // ∇ψ = ∇f(x) + ∇g(x) ŷ
+    calc_grad_ψ_from_ŷ(p, x, work_m, grad_ψ, work_n);
+    return ψ;
+}
+
+/// Calculate the gradient ∇ψ(x).
+/// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\ \hat{y}(x) @f]
+void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
+                 const vec &x,     ///< [in]  Decision variable @f$ x @f$
+                 const vec &y,     ///< [in]  Lagrange multipliers @f$ y @f$
+                 const vec &Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
+                 vec &grad_ψ,      ///< [out] @f$ \nabla \psi(x) @f$
+                 vec &work_n,      ///<       Dimension n
+                 vec &work_m       ///<       Dimension m
+) {
+    // g(x)
+    p.g(x, work_m);
+    // ζ = g(x) + Σ⁻¹y
+    work_m += (y.array() / Σ.array()).matrix();
+    // d = ζ - Π(ζ, D)
+    work_m = projecting_difference(work_m, p.D);
+    // ŷ = Σ d
+    work_m = Σ.asDiagonal() * work_m;
+
+    // ∇ψ = ∇f(x) + ∇g(x) ŷ
+    p.grad_f(x, grad_ψ);
+    p.grad_g(x, work_m, work_n);
+    grad_ψ += work_n;
+}
+
+/// Calculate the gradient ∇ψ(x).
+/// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\ \hat{y}(x) @f]
+void calc_ẑ(const Problem &p, ///< [in]  Problem description
+            const vec &x̂,     ///< [in]  Decision variable @f$ \hat{x} @f$
+            const vec &y,     ///< [in]  Lagrange multipliers @f$ y @f$
+            const vec &Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
+            vec &ẑ,           ///< [out] @f$ \hat{z} @f$
+            vec &err_z        ///< [out] @f$ g(\hat{x}) - \hat{z} @f$
+) {
+    // g(x̂)
+    p.g(x̂, err_z);
+    // ζ = g(x̂) + Σ⁻¹y
+    ẑ = err_z + (y.array() / Σ.array()).matrix();
+    // ẑ = Π(ζ, D)
+    ẑ = project(ẑ, p.D);
+    // g(x̂) - ẑ
+    err_z -= ẑ;
+}
+
+/**
+ * Projected gradient step
+ * @f[ \begin{aligned} 
+ * \hat{x}^k &= T_{\gamma^k}\left(x^k\right) \\ 
+ * &= \Pi_C\left(x^k - \gamma^k \nabla \psi(x^k)\right) \\ 
+ * p^k &= \hat{x}^k - x^k \\ 
+ * \end{aligned} @f]
+ */
+void calc_x̂(const Problem &prob, ///< [in]  Problem description
+            real_t γ,            ///< [in]  Step size
+            const vec &x,        ///< [in]  Decision variable @f$ x @f$
+            const vec &grad_ψ,   ///< [in]  @f$ \nabla \psi(x^k) @f$
+            vec &x̂, ///< [out] @f$ \hat{x}^k = T_{\gamma^k}(x^k) @f$
+            vec &p  ///< [out] @f$ \hat{x}^k - x^k @f$
+) {
+    x̂ = project(x - γ * grad_ψ, prob.C);
+    p = x̂ - x;
 }
 
 /// @f[ \left\| \gamma^{-1} (x - \hat{x}) + \nabla \psi(\hat{x}) -
 /// \nabla \psi(x) \right\|_\infty @f]
-real_t calc_error_stop_crit(real_t γ, const vec &rₖ, const vec &grad_̂ψₖ,
+real_t calc_error_stop_crit(const vec &pₖ, real_t γ, const vec &grad_̂ψₖ,
                             const vec &grad_ψₖ) {
-    auto err = (1 / γ) * rₖ + grad_̂ψₖ - grad_ψₖ;
+    auto err = (1 / γ) * pₖ + grad_̂ψₖ - grad_ψₖ;
     return vec_util::norm_inf(err);
 }
 
@@ -93,6 +156,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
     const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
     real_t ε                ///< [in]    Tolerance @f$ \epsilon @f$
 ) {
+    std::cout << std::scientific;
+
     using namespace detail;
 
     const auto n = x.size();
@@ -104,24 +169,19 @@ PANOCSolver::Stats PANOCSolver::operator()(
     vec xₖ = x;       // Value of x at the beginning of the iteration
     vec x̂ₖ(n);        // Value of x after a projected gradient step
     vec xₖ₊₁(n);      // xₖ for next iteration
-    vec xₖ₋₁(n);      // xₖ of previous iteration (TODO)
-    vec rₖ₋₁(n);      // rₖ of previous iteration (TODO)
     vec x̂ₖ₊₁(n);      // x̂ₖ for next iteration
-    vec ẑₖ(m);        // ẑ(xₖ) = Π(g(xₖ) + Σ⁻¹y, D)
-    vec ẑₖ₊₁(m);      // ẑ(xₖ) for next iteration
-    vec ŷₖ(m);        // Σ (g(xₖ) - ẑₖ)
-    vec rₖ(n);        // xₖ - x̂ₖ
-    vec rₖ_tmp(n);    // Workspace for L-BFGS
-    vec rₖ₊₁(n);      // xₖ₊₁ - x̂ₖ₊₁
-    vec dₖ(n);        // Newton step Hₖ rₖ
+    vec ŷx̂ₖ(m);       // Σ (g(x̂ₖ) - ẑₖ)
+    vec ŷx̂ₖ₊₁(m);     // ŷ(x̂ₖ) for next iteration
+    vec pₖ(n);        // xₖ - x̂ₖ
+    vec pₖ_tmp(n);    // Workspace for L-BFGS
+    vec pₖ₊₁(n);      // xₖ₊₁ - x̂ₖ₊₁
+    vec qₖ(n);        // Newton step Hₖ pₖ
     vec grad_ψₖ(n);   // ∇ψ(xₖ)
     vec grad_̂ψₖ(n);   // ∇ψ(x̂ₖ)
     vec grad_ψₖ₊₁(n); // ∇ψ(xₖ₊₁)
-    vec g(m);         // g(x)
-    vec grad_g(n);    // ∇g(x)
 
-    // Σ and y are constant in PANOC, so calculate Σ⁻¹y once in advance
-    vec Σ⁻¹y = y.array() / Σ.array();
+    vec work_n(n);
+    vec work_m(m);
 
     // Estimate Lipschitz constant using finite difference
     vec h(n);
@@ -130,114 +190,94 @@ PANOCSolver::Stats PANOCSolver::operator()(
     x += h;
 
     // Calculate ∇ψ(x₀ + h)
-    problem.g(x, g);
-    calc_ẑŷ(problem, g, Σ⁻¹y, y, Σ, ŷₖ);
-    calc_grad_ψ(problem, x, ŷₖ, grad_g, grad_ψₖ₊₁);
-
-    // Calculate ẑ(x₀), ∇ψ(x₀)
-    problem.g(xₖ, g);
-    calc_ẑ(problem, g, Σ⁻¹y, ẑₖ);
-    calc_ŷ(ẑₖ, g, y, Σ, ŷₖ);
-    calc_grad_ψ(problem, xₖ, ŷₖ, grad_g, grad_ψₖ);
+    calc_grad_ψ(problem, x, y, Σ, // in
+                grad_ψₖ₊₁,        // out
+                work_n, work_m);  // work
+    // Calculate ψ(xₖ), ∇ψ(x₀)
+    real_t ψₖ = calc_ψ_grad_ψ(problem, xₖ, y, Σ, // in
+                              grad_ψₖ,           // out
+                              work_n, work_m);   // work
 
     // Estimate Lipschitz constant
-    real_t L = (grad_ψₖ₊₁ - grad_ψₖ).norm() / h.norm();
-    if (L < std::numeric_limits<real_t>::epsilon())
-        L = std::numeric_limits<real_t>::epsilon();
-    real_t γ = params.Lipschitz.Lγ_factor / L;
-    real_t σ = γ * (1 - γ * L) / 2;
+    real_t Lₖ = (grad_ψₖ₊₁ - grad_ψₖ).norm() / h.norm();
+    // TODO: fail if L is nan?
+    if (Lₖ < std::numeric_limits<real_t>::epsilon())
+        Lₖ = std::numeric_limits<real_t>::epsilon();
+    real_t γₖ                     = params.Lipschitz.Lγ_factor / Lₖ;
+    real_t σₖ                     = γₖ * (1 - γₖ * Lₖ) / 2;
+    [[maybe_unused]] real_t old_γ = γₖ;
 
 #ifdef PRINT_DEBUG_COUT
     std::cout << "[PANOC] "
                  "Initial step size: γ = "
-              << γ << std::endl;
+              << γₖ << std::endl;
 #endif
 
-    // Calculate x̂₀, r₀ (gradient step)
-    x̂ₖ = project(xₖ - γ * grad_ψₖ, problem.C);
-    rₖ = xₖ - x̂ₖ;
+    // Calculate x̂₀, p₀ (projected gradient step)
+    calc_x̂(problem, γₖ, xₖ, grad_ψₖ, // in
+           x̂ₖ, pₖ);                  // out
+    // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
+    real_t ψ̂xₖ = calc_ψ_ŷ(problem, x̂ₖ, y, Σ, // in
+                          ŷx̂ₖ);              // out
 
-    // Calculate ψ(x₀), ∇ψ(x₀)ᵀr₀, ‖r₀‖²
-    real_t ψₖ         = calc_ψ(problem, x, g, Σ⁻¹y, ẑₖ, Σ);
-    real_t grad_ψₖᵀrₖ = grad_ψₖ.dot(rₖ);
-    real_t norm_sq_rₖ = rₖ.squaredNorm();
+    real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO: OpEn did this. Why?
+    real_t grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
+    real_t norm_sq_pₖ = pₖ.squaredNorm();
+    // Decrease step size until quadratic upper bound is satisfied
+    while (ψ̂xₖ > ψₖ + margin + grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ) {
+        lbfgs.reset();
+        Lₖ *= 2;
+        σₖ /= 2;
+        γₖ /= 2;
 
-    std::cout << std::scientific;
+        // Calculate x̂ₖ and pₖ (with new step size)
+        calc_x̂(problem, γₖ, xₖ, grad_ψₖ, // in
+               x̂ₖ, pₖ);                  // out
+        // Calculate ∇ψ(xₖ)ᵀpₖ and ‖pₖ‖²
+        grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
+        norm_sq_pₖ = pₖ.squaredNorm();
 
-    // std::cout << "Initial γ = " << γ << std::endl;
+        // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
+        ψ̂xₖ = calc_ψ_ŷ(problem, x̂ₖ, y, Σ, // in
+                       ŷx̂ₖ);              // out
+    }
 
     for (unsigned k = 0; k <= params.max_iter; ++k) {
-#if 0
-        constexpr auto digits = std::numeric_limits<real_t>::digits10 + 1;
-        std::cout << "[" << std::setw(3) << k << "] "
-                  << "ψ(xₖ) = " << std::setprecision(digits) << ψₖ << std::endl
-                  << "      "
-                  << "γ     = " << γ << std::endl;
-        std::cout << std::endl;
+#if PRINT_DEBUG_COUT
+        std::cout << "[" << k << "]" << std::endl;
 #endif
-#ifdef PRINT_DEBUG_COUT
-        std::cout << "[PANOC] "
-                  << "Iteration #" << k << std::endl;
-        std::cout << "[PANOC] "
-                  << "xₖ     = " << xₖ.transpose() << std::endl;
-        std::cout << "[PANOC] "
-                  << "γ      = " << γ << std::endl;
-        std::cout << "[PANOC] "
-                  << "ψ(xₖ)  = " << ψₖ << std::endl;
-        std::cout << "[PANOC] "
-                  << "∇ψ(xₖ) = " << grad_ψₖ.transpose() << std::endl;
-        problem.g(xₖ, g);
-        std::cout << "[PANOC] "
-                  << "g(xₖ)  = " << g.transpose() << std::endl;
-#endif
-
-        // Calculate g(x̂ₖ), ŷ, ∇ψ(x̂ₖ)
-        problem.g(x̂ₖ, g);
-        calc_ẑŷ(problem, g, Σ⁻¹y, y, Σ, ŷₖ);
-        calc_grad_ψ(problem, x̂ₖ, ŷₖ, grad_g, grad_̂ψₖ);
-
-        // std::cout << "\x1b[0;35m"
-        //              "rₖ    = "
-        //           << rₖ.transpose() << "\x1b[0m" << std::endl;
-        // std::cout << "\x1b[0;35m"
-        //              "‖rₖ‖    = "
-        //           << rₖ.norm() << "\x1b[0m" << std::endl;
-        // std::cout << "\x1b[0;35m"
-        //              "grad_̂ψₖ = "
-        //           << grad_̂ψₖ.transpose() << "\x1b[0m" << std::endl;
-        // std::cout << "\x1b[0;35m"
-        //              "grad_ψₖ = "
-        //           << grad_ψₖ.transpose() << "\x1b[0m" << std::endl;
-        // std::cout << "\x1b[0;35m"
-        //              "grad_̂ψₖ - grad_ψₖ = "
-        //           << (grad_̂ψₖ - grad_ψₖ).transpose() << "\x1b[0m" << std::endl;
-        // std::cout << "\x1b[0;35m"
-        //              "‖grad_̂ψₖ - grad_ψₖ‖ = "
-        //           << (grad_̂ψₖ - grad_ψₖ).norm() << "\x1b[0m" << std::endl;
-        // std::cout << "\x1b[0;35m"
-        //              "ε = "
-        //           << ε << "\x1b[0m" << std::endl;
-
+        // Calculate ∇ψ(x̂ₖ)
+        calc_grad_ψ_from_ŷ(problem, x̂ₖ, ŷx̂ₖ, // in
+                           grad_̂ψₖ,          // out
+                           work_n);          // work
         // Check stop condition
-        real_t εₖ = calc_error_stop_crit(γ, rₖ, grad_̂ψₖ, grad_ψₖ);
+        real_t εₖ = calc_error_stop_crit(pₖ, γₖ, grad_̂ψₖ, grad_ψₖ);
         if (εₖ <= ε || k == params.max_iter) {
-            x     = std::move(x̂ₖ);
-            z     = std::move(ẑₖ);
-            y     = std::move(ŷₖ);
-            err_z = g - z;
+            // TODO: We could cache g(x) and ẑ, but would that faster?
+            //       It saves 1 evaluation of g per ALM iteration, but requires
+            //       many extra stores in the inner loops of PANOC.
+            // TODO: move the computation of ẑ and g(x) to ALM?
+            calc_ẑ(problem, x̂ₖ, y, Σ, z, err_z);
+            x = std::move(x̂ₖ);
+            y = std::move(ŷx̂ₖ);
 
             Stats s;
             s.iterations = k;
             s.converged  = εₖ <= ε;
             s.failed     = false;
             return s;
-        }
-        if (!std::isfinite(εₖ)) {
+        } else if (!std::isfinite(εₖ)) {
             std::cerr << "[PANOC] "
                          "\x1b[0;31m"
                          "inf/NaN"
                          "\x1b[0m"
                       << std::endl;
+            std::cout << "x̂ₖ: " << x̂ₖ.transpose() << std::endl;
+            std::cout << "ŷx̂ₖ: " << ŷx̂ₖ.transpose() << std::endl;
+            std::cout << "pₖ: " << pₖ.transpose() << std::endl;
+            std::cout << "γₖ: " << γₖ << std::endl;
+            std::cout << "grad_̂ψₖ: " << grad_̂ψₖ.transpose() << std::endl;
+            std::cout << "grad_ψₖ: " << grad_ψₖ.transpose() << std::endl;
 
             Stats s;
             s.iterations = k;
@@ -246,102 +286,106 @@ PANOCSolver::Stats PANOCSolver::operator()(
             return s;
         }
 
-        // Calculate ψ(x̂ₖ)
-        calc_ẑ(problem, g, Σ⁻¹y, ẑₖ);
-        real_t ψ̂xₖ    = calc_ψ(problem, x̂ₖ, g, Σ⁻¹y, ẑₖ, Σ);
-        real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO: OpEn did this. Why?
-        while (ψ̂xₖ > ψₖ + margin - grad_ψₖᵀrₖ + 0.5 * L * norm_sq_rₖ) {
-            lbfgs.reset();
-            L *= 2;
-            σ /= 2;
-            γ /= 2;
-
-            // Calculate x̂ₖ and rₖ (with new step size)
-            x̂ₖ = project(xₖ - γ * grad_ψₖ, problem.C);
-            rₖ = xₖ - x̂ₖ;
-
-            // Calculate ∇ψ(xₖ)ᵀrₖ, ‖rₖ‖²
-            grad_ψₖᵀrₖ = grad_ψₖ.dot(rₖ);
-            norm_sq_rₖ = rₖ.squaredNorm();
-
-            // Calculate ψ(x̂ₖ)
-            problem.g(x̂ₖ, g);
-            calc_ẑ(problem, g, Σ⁻¹y, ẑₖ);
-            ψ̂xₖ = calc_ψ(problem, x̂ₖ, g, Σ⁻¹y, ẑₖ, Σ);
+        // Calculate Newton step
+        pₖ_tmp = pₖ;
+        lbfgs.apply(1, pₖ_tmp, qₖ);
 
 #ifdef PRINT_DEBUG_COUT
+        if (old_γ != γₖ) {
             std::cerr << "[PANOC] "
                       << "\x1b[0;34m"
                       << "(" << k << ") "
-                      << "Update step size: γ = " << γ << "\x1b[0m"
+                      << "Update step size: γ = " << γₖ << "\x1b[0m"
                       << std::endl;
             std::cout << "[PANOC] "
                       << "\x1b[0;34m"
                          "Update L <<<<<<<<"
                          "\x1b[0m"
                       << std::endl;
-            std::cout << "[PANOC] "
-                      << "L = " << L << std::endl;
-            std::cout << "[PANOC] "
-                      << "γ = " << γ << std::endl;
-            std::cout << "[PANOC] "
-                      << "∇ψ(xₖ) = " << grad_ψₖ.transpose() << std::endl;
-            std::cout << "[PANOC] "
-                      << "x̂ₖ     = " << x̂ₖ.transpose() << std::endl;
-            std::cout << "[PANOC] "
-                      << "rₖ     = " << rₖ.transpose() << std::endl;
-            std::cout << "[PANOC] "
-                      << "∇ψₖᵀrₖ = " << grad_ψₖᵀrₖ << std::endl;
-            std::cout << "[PANOC] "
-                      << "‖rₖ‖²  = " << norm_sq_rₖ << std::endl;
-            std::cout << "[PANOC] "
-                      << "ψ(x̂ₖ)  = " << ψ̂xₖ << std::endl;
-            std::cout << "[PANOC] "
-                      << "g(x̂ₖ)  = " << g.transpose() << std::endl;
-            std::cout << "[PANOC] "
-                      << "-----------" << std::endl;
-#endif
         }
-
-        // Calculate Newton step
-        rₖ_tmp = rₖ;
-        lbfgs.apply(1, rₖ_tmp, dₖ);
+        std::cout << "[PANOC] "
+                  << "L = " << Lₖ << std::endl;
+        std::cout << "[PANOC] "
+                  << "γ = " << γₖ << std::endl;
+        std::cout << "[PANOC] "
+                  << "∇ψ(xₖ) = " << grad_ψₖ.transpose() << std::endl;
+        std::cout << "[PANOC] "
+                  << "xₖ     = " << xₖ.transpose() << std::endl;
+        std::cout << "[PANOC] "
+                  << "x̂ₖ     = " << x̂ₖ.transpose() << std::endl;
+        std::cout << "[PANOC] "
+                  << "pₖ     = " << pₖ.transpose() << std::endl;
+        std::cout << "[PANOC] "
+                  << "qₖ     = " << qₖ.transpose() << std::endl;
+        std::cout << "[PANOC] "
+                  << "∇ψₖᵀrₖ = " << grad_ψₖᵀpₖ << std::endl;
+        std::cout << "[PANOC] "
+                  << "‖rₖ‖²  = " << norm_sq_pₖ << std::endl;
+        std::cout << "[PANOC] "
+                  << "ψ(x̂ₖ)  = " << ψ̂xₖ << std::endl;
+        std::cout << "[PANOC] "
+                  << "-----------" << std::endl;
+#endif
 
         // Line search
-        real_t φₖ =
-            ψₖ - 0.5 * γ * grad_ψₖ.squaredNorm() +
-            0.5 / γ * (xₖ - γ * grad_ψₖ - x̂ₖ).squaredNorm(); // TODO: optimize
-        real_t σ_norm_γ⁻¹rₖ = σ * norm_sq_rₖ / (γ * γ);
-        real_t φₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁ᵀrₖ₊₁, norm_sq_rₖ₊₁;
+        // TODO: don't we already have this from the previous iteration?
+        real_t φₖ = ψₖ + 1 / (2 * γₖ) * norm_sq_pₖ + grad_ψₖᵀpₖ;
+        real_t σ_norm_γ⁻¹pₖ = σₖ * norm_sq_pₖ / (γₖ * γₖ);
+        real_t φₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, norm_sq_pₖ₊₁;
         real_t τ = 1;
+        real_t Lₖ₊₁, σₖ₊₁, γₖ₊₁;
+        real_t ls_cond;
         do {
-            if (τ >= params.τ_min) {
+            Lₖ₊₁  = Lₖ;
+            σₖ₊₁  = σₖ;
+            γₖ₊₁  = γₖ;
+            old_γ = γₖ;
+            if (τ / 2 >= params.τ_min) {
                 // Calculate xₖ₊₁
-                xₖ₊₁ = xₖ - (1 - τ) * rₖ - τ * dₖ;
+                xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ;
             } else {
                 xₖ₊₁ = x̂ₖ;
             }
-            // xₖ₊₁ = project(xₖ₊₁, problem.C);
-            // Calculate ẑ(xₖ₊₁), ∇ψ(xₖ₊₁)
-            problem.g(xₖ₊₁, g);
-            calc_ẑ(problem, g, Σ⁻¹y, ẑₖ₊₁);
-            calc_ŷ(ẑₖ₊₁, g, y, Σ, ŷₖ);
-            calc_grad_ψ(problem, xₖ₊₁, ŷₖ, grad_g, grad_ψₖ₊₁);
-            // Calculate x̂ₖ₊₁, rₖ₊₁ (next gradient step)
-            x̂ₖ₊₁ = project(xₖ₊₁ - γ * grad_ψₖ₊₁, problem.C);
-            rₖ₊₁ = xₖ₊₁ - x̂ₖ₊₁;
+            // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
+            ψₖ₊₁ = calc_ψ_grad_ψ(problem, xₖ₊₁, y, Σ, // in
+                                 grad_ψₖ₊₁,           // out
+                                 work_n, work_m);     // work
+            // Calculate x̂ₖ₊₁, pₖ₊₁ (projected gradient step)
+            calc_x̂(problem, γₖ₊₁, xₖ₊₁, grad_ψₖ₊₁, // in
+                   x̂ₖ₊₁, pₖ₊₁);                    // out
+            // Calculate ψ(x̂ₖ₊₁) and ŷ(x̂ₖ₊₁)
+            real_t ψ̂xₖ₊₁ = calc_ψ_ŷ(problem, x̂ₖ₊₁, y, Σ, // in
+                                    ŷx̂ₖ₊₁);              // out
 
-            // Calculate ψ(xₖ₊₁), ‖∇ψ(xₖ₊₁)‖², ‖rₖ₊₁‖²
-            ψₖ₊₁ = calc_ψ(problem, xₖ₊₁, g, Σ⁻¹y, ẑₖ₊₁, Σ);
-            grad_ψₖ₊₁ᵀrₖ₊₁ = grad_ψₖ₊₁.dot(rₖ₊₁);
-            norm_sq_rₖ₊₁   = rₖ₊₁.squaredNorm();
-            // Calculate φ(xₖ₊₁)
-            // TODO: optimize
-            φₖ₊₁ = ψₖ₊₁ - 0.5 * γ * grad_ψₖ₊₁.squaredNorm() +
-                   0.5 / γ * (xₖ₊₁ - γ * grad_ψₖ₊₁ - x̂ₖ₊₁).squaredNorm();
+            real_t margin =
+                0; // 1e-6 * std::abs(ψₖ); // TODO: OpEn did this. Why?
+            grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
+            norm_sq_pₖ₊₁   = pₖ₊₁.squaredNorm();
+            // Decrease step size until quadratic upper bound is satisfied
+            while (ψ̂xₖ₊₁ > ψₖ₊₁ + margin + grad_ψₖ₊₁ᵀpₖ₊₁ +
+                               0.5 * Lₖ₊₁ * norm_sq_pₖ₊₁ &&
+                   params.experimental.update_lipschitz_in_linesearch) {
+                lbfgs.reset();
+                Lₖ₊₁ *= 2;
+                σₖ₊₁ /= 2;
+                γₖ₊₁ /= 2;
+
+                // Calculate x̂ₖ₊₁ and pₖ₊₁ (with new step size)
+                calc_x̂(problem, γₖ₊₁, xₖ₊₁, grad_ψₖ₊₁, // in
+                       x̂ₖ₊₁, pₖ₊₁);                    //out
+                // Calculate ∇ψ(xₖ₊₁)ᵀpₖ₊₁ and ‖pₖ₊₁‖²
+                grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
+                norm_sq_pₖ₊₁   = pₖ₊₁.squaredNorm();
+                // Calculate ψ(x̂ₖ₊₁) and ŷ(x̂ₖ₊₁)
+                ψ̂xₖ₊₁ = calc_ψ_ŷ(problem, x̂ₖ₊₁, y, Σ, ŷx̂ₖ₊₁);
+            }
+
+            φₖ₊₁ = ψₖ₊₁ + 1 / (2 * γₖ₊₁) * norm_sq_pₖ₊₁ + grad_ψₖ₊₁ᵀpₖ₊₁;
 
             τ /= 2;
-        } while ((φₖ₊₁ > φₖ - σ_norm_γ⁻¹rₖ || ψₖ₊₁ > ψₖ) && τ >= params.τ_min);
+
+            ls_cond = φₖ₊₁ - (φₖ - σ_norm_γ⁻¹pₖ);
+        } while (ls_cond > 0 && τ >= params.τ_min);
 
 #if 0
         std::cout << "γ = " << γ << std::endl;
@@ -355,12 +399,6 @@ PANOCSolver::Stats PANOCSolver::operator()(
                       << τ * 2 << "\x1b[0m" << std::endl;
         }
 #endif
-        // std::cout << "\x1b[0;33m"
-        //              "rₖ = "
-        //           << rₖ.transpose() << "\x1b[0m" << std::endl;
-        // std::cout << "\x1b[0;33m"
-        //              "dₖ = "
-        //           << dₖ.transpose() << "\x1b[0m" << std::endl;
 
         if (τ < params.τ_min) {
             std::cerr << "[PANOC] "
@@ -371,19 +409,23 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 
         // Update L-BFGS
-        lbfgs.update(xₖ₊₁ - xₖ, rₖ₊₁ - rₖ);
+        lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
 
         // Advance step
-        ψₖ         = ψₖ₊₁;
-        xₖ₋₁       = std::move(xₖ);
-        rₖ₋₁       = std::move(rₖ);
-        xₖ         = std::move(xₖ₊₁);
-        x̂ₖ         = std::move(x̂ₖ₊₁);
-        ẑₖ         = std::move(ẑₖ₊₁);
-        rₖ         = std::move(rₖ₊₁);
+        Lₖ = Lₖ₊₁;
+        σₖ = σₖ₊₁;
+        γₖ = γₖ₊₁;
+
+        xₖ = std::move(xₖ₊₁);
+        ψₖ = ψₖ₊₁;
+
+        x̂ₖ  = std::move(x̂ₖ₊₁);
+        ŷx̂ₖ = std::move(ŷx̂ₖ₊₁);
+        pₖ  = std::move(pₖ₊₁);
+
         grad_ψₖ    = std::move(grad_ψₖ₊₁);
-        grad_ψₖᵀrₖ = grad_ψₖ₊₁ᵀrₖ₊₁;
-        norm_sq_rₖ = norm_sq_rₖ₊₁;
+        grad_ψₖᵀpₖ = grad_ψₖ₊₁ᵀpₖ₊₁;
+        norm_sq_pₖ = norm_sq_pₖ₊₁;
     }
     throw std::logic_error("[PANOC] loop error");
 }

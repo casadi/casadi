@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cmath>
 
+#include <limits>
 #include <panoc-alm-ref/panoc-ref.hpp>
 #include <panoc-alm/lbfgs.hpp>
 
@@ -56,22 +57,11 @@ vec T_γ(const Problem &p, const vec &x, const vec &y, const vec &Σ, real_t γ)
     return project(gradient_step(p, x, y, Σ, γ), p.C);
 }
 
-real_t eval_φ(const Problem &p, const vec &x, const vec &y, const vec &Σ,
-              real_t γ) {
-    std::cout << "eval_φ" << std::endl;
-    std::cout << "x     = " << x.transpose() << std::endl;
-    std::cout << "g     = " << eval_g(p, x).transpose() << std::endl;
-    std::cout << "ẑ     = " << eval_ẑ(p, x, y, Σ).transpose() << std::endl;
-    std::cout << "ŷ     = " << eval_ŷ(p, x, y, Σ).transpose() << std::endl;
-    std::cout << "ψ     = " << eval_ψ(p, x, y, Σ) << std::endl;
-    std::cout << "∇ψ    = " << eval_grad_ψ(p, x, y, Σ).transpose() << std::endl;
-    std::cout << "‖∇ψ‖² = " << eval_grad_ψ(p, x, y, Σ).squaredNorm()
-              << std::endl;
-    std::cout << "dist² = " << dist_squared(gradient_step(p, x, y, Σ, γ), p.C)
-              << std::endl;
-    return eval_ψ(p, x, y, Σ)                              //
-           - γ / 2 * eval_grad_ψ(p, x, y, Σ).squaredNorm() //
-           + 1 / (2 * γ) * dist_squared(gradient_step(p, x, y, Σ, γ), p.C);
+real_t eval_φ(const Problem &p, const vec &x, const vec &r, const vec &y,
+              const vec &Σ, real_t γ) {
+    return eval_ψ(p, x, y, Σ)                //
+           + 1. / (2 * γ) * r.squaredNorm()  //
+           + eval_grad_ψ(p, x, y, Σ).dot(r); //
 }
 
 real_t estimate_lipschitz(const Problem &p, const vec &x, const vec &y,
@@ -79,9 +69,9 @@ real_t estimate_lipschitz(const Problem &p, const vec &x, const vec &y,
     // Estimate Lipschitz constant using finite difference
     vec h = (x * params.Lipschitz.ε).cwiseMax(params.Lipschitz.δ);
     // Calculate ∇ψ(x₀ + h) and ∇ψ(x₀)
+    vec diff = eval_grad_ψ(p, x + h, y, Σ) - eval_grad_ψ(p, x, y, Σ);
     // Estimate Lipschitz constant
-    real_t L = (eval_grad_ψ(p, x + h, y, Σ) - eval_grad_ψ(p, x, y, Σ)).norm() /
-               h.norm();
+    real_t L = diff.norm() / h.norm();
     return L;
 }
 
@@ -104,16 +94,6 @@ bool lipschitz_check(const Problem &p, const vec &xₖ, const vec &x̂ₖ,
                      + L / 2 * rₖ.squaredNorm();
 }
 
-bool linesearch_condition(const Problem &p, const vec &xₖ, const vec &xₖ₊₁,
-                          const vec &rₖ, const vec &y, const vec &Σ, real_t γ,
-                          real_t σ) {
-    real_t φₖ   = eval_φ(p, xₖ, y, Σ, γ);
-    real_t φₖ₊₁ = eval_φ(p, xₖ₊₁, y, Σ, γ);
-    std::cout << "φγₖ = " << φₖ << std::endl;
-    std::cout << "φγₖ₊₁ = " << φₖ₊₁ << std::endl;
-    return φₖ₊₁ <= φₖ - σ * ((1 / γ) * rₖ).squaredNorm();
-}
-
 } // namespace detail
 
 PANOCSolver::Stats PANOCSolver::operator()(
@@ -134,6 +114,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
     vec xₖ = x; // Value of x at the beginning of the iteration
 
     real_t L = estimate_lipschitz(problem, x, y, Σ, params);
+    if (L < 10 * std::numeric_limits<real_t>::epsilon())
+        L = 10 * std::numeric_limits<real_t>::epsilon();
     real_t γ = params.Lipschitz.Lγ_factor / L;
     real_t σ = γ * (1 - γ * L) / 2;
 
@@ -141,33 +123,26 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
     std::cout << "Initial γ = " << γ << "\n";
 
-    real_t ψₖ₋₁ = eval_ψ(problem, xₖ, y, Σ);
+    // Calculate x̂ₖ, rₖ (gradient step)
+    vec x̂ₖ = T_γ(problem, xₖ, y, Σ, γ);
+    // Increase L until quadratic upper bound is satisfied
+    real_t old_γ = γ;
+    while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γ, L) && γ != 0) {
+        L *= 2;
+        σ /= 2;
+        γ /= 2;
+
+        // Calculate x̂ₖ (with new step size)
+        x̂ₖ = T_γ(problem, xₖ, y, Σ, γ);
+    }
+    if (old_γ != γ)
+        std::cout << "      update γ = " << γ << "\n";
+    vec rₖ = xₖ - x̂ₖ;
 
     for (unsigned k = 0; k <= params.max_iter; ++k) {
-        {
-            constexpr auto digits = std::numeric_limits<real_t>::digits10 + 1;
-            real_t ψₖ             = eval_ψ(problem, xₖ, y, Σ);
-            std::cout << "[" << std::setw(3) << k << "] "
-                      << "ψ(xₖ) = " << std::setprecision(digits) << ψₖ << "\n"
-                      << "      "
-                      << "γ     = " << γ << "\n";
-            if (ψₖ > ψₖ₋₁) {
-                std::cout << "\x1b[0;35m"
-                             "Huh <<<<<<<<<<"
-                             "\x1b[0m"
-                          << "\n";
-            }
-            ψₖ₋₁ = ψₖ;
-        }
-
-        // Calculate x̂ₖ, rₖ (gradient step)
-        vec x̂ₖ = T_γ(problem, xₖ, y, Σ, γ);
-        vec rₖ = xₖ - x̂ₖ;
-
         // Check stop condition
         real_t εₖ = calc_error_stop_crit(problem, xₖ, x̂ₖ, y, Σ, γ);
-        std::cout << "      "
-                  << "εₖ    = " << εₖ << "\n";
+        std::cout << "      εₖ    = " << εₖ << "\n";
         if (εₖ <= ε || k == params.max_iter) {
             x     = std::move(x̂ₖ);
             z     = eval_ẑ(problem, xₖ, y, Σ);
@@ -214,75 +189,41 @@ PANOCSolver::Stats PANOCSolver::operator()(
             return s;
         }
 
-        // Calculate ψ(x̂ₖ)
-        real_t old_γ = γ;
-        while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γ, L) && γ != 0) {
-            lbfgs.reset();
-            L *= 2;
-            σ /= 2;
-            γ /= 2;
-
-            // Calculate x̂ₖ and rₖ (with new step size)
-            x̂ₖ = T_γ(problem, xₖ, y, Σ, γ);
-            rₖ = xₖ - x̂ₖ;
-        }
-        if (old_γ != γ) {
-            std::cout << "      "
-                      << "update γ = " << γ << "\n";
-        }
-
         vec dₖ(n);
         { // Calculate Newton step
             vec rₖ_tmp = rₖ;
             lbfgs.apply(1, rₖ_tmp, dₖ);
         }
 
-        std::cout << "      "
-                  << "xₖ    = " << xₖ.transpose() << "\n";
-        std::cout << "      "
-                  << "step  = "
-                  << gradient_step(problem, xₖ, y, Σ, γ).transpose() << "\n";
-        std::cout << "      "
-                  << "x̂ₖ    = " << x̂ₖ.transpose() << "\n";
-        std::cout << "      "
-                  << "rₖ    = " << rₖ.transpose() << "\n";
-        std::cout << "      "
-                  << "dₖ    = " << dₖ.transpose() << "\n";
-        std::cout << "      "
-                  << "∇ψ(x) = " << eval_grad_ψ(problem, xₖ, y, Σ).transpose()
-                  << "\n";
-        std::cout << "      "
-                  << "ẑ(x)  = " << eval_ẑ(problem, xₖ, y, Σ).transpose()
-                  << "\n";
-        std::cout << "      "
-                  << "ŷ(x)  = " << eval_ŷ(problem, xₖ, y, Σ).transpose()
-                  << "\n";
-
         // Line search
         real_t τ = 1;
         vec xₖ₊₁, x̂ₖ₊₁, rₖ₊₁;
+        real_t Lₖ₊₁, σₖ₊₁, γₖ₊₁;
         do {
+            Lₖ₊₁ = L;
+            σₖ₊₁ = σ;
+            γₖ₊₁ = γ;
+
             // Calculate xₖ₊₁
             xₖ₊₁ = xₖ - (1 - τ) * rₖ - τ * dₖ;
             x̂ₖ₊₁ = T_γ(problem, xₖ₊₁, y, Σ, γ);
+            while (lipschitz_check(problem, xₖ₊₁, x̂ₖ₊₁, y, Σ, γₖ₊₁, Lₖ₊₁) &&
+                   γₖ₊₁ != 0) {
+                Lₖ₊₁ *= 2;
+                σₖ₊₁ /= 2;
+                γₖ₊₁ /= 2;
+
+                // Calculate x̂ₖ (with new step size)
+                x̂ₖ₊₁ = T_γ(problem, xₖ₊₁, y, Σ, γₖ₊₁);
+            }
             rₖ₊₁ = xₖ₊₁ - x̂ₖ₊₁;
+
             // Update τ
             τ /= 2;
-        } while (!linesearch_condition(problem, xₖ, xₖ₊₁, rₖ, y, Σ, γ, σ) &&
+        } while (eval_φ(problem, xₖ₊₁, rₖ₊₁, y, Σ, γₖ₊₁) >
+                     eval_φ(problem, xₖ, rₖ, y, Σ, γ) -
+                         σ / (γ * γ) * rₖ.squaredNorm() &&
                  τ >= params.τ_min);
-
-#if 0
-        std::cout << "γ = " << γ << "\n";
-        if (τ * 2 != 1) {
-            std::cout << "\x1b[0;35m"
-                         "τ = "
-                      << τ * 2 << "\x1b[0m" << "\n";
-        } else {
-            std::cout << "\x1b[0;33m"
-                         "τ = "
-                      << τ * 2 << "\x1b[0m" << "\n";
-        }
-#endif
 
         if (τ < params.τ_min) {
             std::cerr << "[PANOC] "
@@ -292,6 +233,9 @@ PANOCSolver::Stats PANOCSolver::operator()(
                       << "\n";
             xₖ₊₁ = x̂ₖ;
             rₖ₊₁ = xₖ₊₁ - x̂ₖ₊₁;
+            Lₖ₊₁ = L;
+            σₖ₊₁ = σ;
+            γₖ₊₁ = γ; // I know ...
         }
 
         // Update L-BFGS
@@ -299,6 +243,11 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
         // Advance step
         xₖ = std::move(xₖ₊₁);
+        rₖ = std::move(rₖ₊₁);
+        x̂ₖ = std::move(x̂ₖ₊₁);
+        L  = Lₖ₊₁;
+        σ  = σₖ₊₁;
+        γ  = γₖ₊₁;
     }
     throw std::logic_error("[PANOC] loop error");
 }

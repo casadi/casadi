@@ -9,26 +9,46 @@ struct Box {
     vec lowerbound;
 };
 
+/// Project a vector onto a box.
+/// @f[ \Pi_C(v) @f]
 template <class Vec>
-inline auto project(const Vec &v,  // in
-                    const Box &box // in
+inline auto project(const Vec &v,  ///< [in] The vector to project
+                    const Box &box ///< [in] The box to project onto
 ) {
     using binary_real_f = real_t (*)(real_t, real_t);
     return v.binaryExpr(box.lowerbound, binary_real_f(std::fmax))
         .binaryExpr(box.upperbound, binary_real_f(std::fmin));
 }
 
-inline real_t dist_squared(const vec &v, const Box &box) {
-    // TODO: does this allocate?
-    auto d = v - project(v, box);
-    return d.squaredNorm();
+/// Get the difference between the given vector and its projection.
+/// @f[ v - \Pi_C(v) @f]
+template <class Vec>
+inline auto
+projecting_difference(const Vec &v,  ///< [in] The vector to project
+                      const Box &box ///< [in] The box to project onto
+) {
+    return v - project(v, box);
 }
 
-inline real_t dist_squared(const vec &v, const Box &box, const vec &Σ) {
+/// Get the distance squared between the given vector and its projection.
+/// @f[ \left\| v - \Pi_C(v) \right\|_2^2 @f]
+inline real_t dist_squared(const vec &v,  ///< [in] The vector to project
+                           const Box &box ///< [in] The box to project onto
+) {
+    return projecting_difference(v, box).squaredNorm();
+}
+
+/// Get the distance squared between the given vector and its projection in the
+/// Σ norm.
+/// @f[ \left\| v - \Pi_C(v) \right\|_\Sigma^2
+/// = \left(v - \Pi_C(v)\right)^\top \Sigma \left(v - \Pi_C(v)\right) @f]
+inline real_t dist_squared(const vec &v,   ///< [in] The vector to project
+                           const Box &box, ///< [in] The box to project onto
+                           const vec &Σ ///< [in] Diagonal matrix defining norm
+) {
     // TODO: does this allocate?
-    auto d  = v - project(v, box);
-    auto Σd = (Σ.array() * d.array()).matrix();
-    return Σd.dot(d);
+    auto d = v - project(v, box);
+    return d.dot(Σ.asDiagonal() * d);
 }
 
 } // namespace pa

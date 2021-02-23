@@ -25,6 +25,10 @@ struct PANOCParams {
     unsigned max_iter = 100;
     /// Minimum weight factor between Newton step and projected gradient step.
     real_t τ_min = 1e-12;
+
+    struct {
+        bool update_lipschitz_in_linesearch = true;
+    } experimental;
 };
 
 class PANOCSolver {

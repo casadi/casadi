@@ -89,8 +89,8 @@ TEST(ALM, riskaverse) {
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g};
 
     ALMParams almparam;
-    almparam.ε        = 1e-4;
-    almparam.δ        = 1e-4;
+    almparam.ε        = 1e-5;
+    almparam.δ        = 1e-5;
     almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
     almparam.Σ₀       = 1e-2; ///< Initial penalty parameter
     almparam.ε₀       = 1e-4; ///< Initial tolerance on x
@@ -114,13 +114,14 @@ TEST(ALM, riskaverse) {
     λ.fill(0);
 
     auto stats = solver(p, λ, x);
-    x.fill(0);
-    λ.fill(0);
 
-    constexpr unsigned N = 1000;
+    constexpr unsigned N = 10;
     auto begin           = std::chrono::high_resolution_clock::now();
-    for (volatile unsigned i = 0; i < N; ++i)
+    for (volatile unsigned i = 0; i < N; ++i) {
+        x.fill(0);
+        λ.fill(0);
         stats = solver(p, λ, x);
+    }
     auto end = std::chrono::high_resolution_clock::now();
 
     std::cout << "u = " << x.topRows(nu).transpose() << std::endl;

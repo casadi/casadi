@@ -18,7 +18,8 @@ add_custom_command(
         --output ${CMAKE_CURRENT_BINARY_DIR}/gen --name test_alm_mcp_24x24
     MAIN_DEPENDENCY ${PYTHON_TEST_GEN_FILE}
 )
-set(gen_test_files ${CMAKE_CURRENT_BINARY_DIR}/gen/test_alm_mcp_24x24.cpp)
+# set(gen_test_files ${CMAKE_CURRENT_BINARY_DIR}/gen/test_alm_mcp_24x24.cpp)
+set(gen_test_files "")
 
 # Test executable compilation and linking
 file(GLOB test_files *.cpp)
