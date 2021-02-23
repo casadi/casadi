@@ -44,7 +44,7 @@ void update_penalty_weights(const ALMParams &params, unsigned iteration, vec &e,
 } // namespace detail
 
 ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
-    feenableexcept(FE_INVALID); // TODO
+    // feenableexcept(FE_INVALID); // TODO
     auto sigNaN   = std::numeric_limits<real_t>::signaling_NaN();
     vec Σ         = vec::Constant(problem.m, sigNaN);
     vec z         = vec::Constant(problem.m, sigNaN);

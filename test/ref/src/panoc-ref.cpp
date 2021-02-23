@@ -189,11 +189,10 @@ PANOCSolver::Stats PANOCSolver::operator()(
             return s;
         }
 
+        // Calculate Newton step
         vec dₖ(n);
-        { // Calculate Newton step
-            vec rₖ_tmp = rₖ;
-            lbfgs.apply(1, rₖ_tmp, dₖ);
-        }
+        dₖ = rₖ;
+        lbfgs.apply(dₖ);
 
         // Line search
         real_t τ = 1;

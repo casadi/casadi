@@ -28,6 +28,7 @@ struct PANOCParams {
 
     struct {
         bool update_lipschitz_in_linesearch = true;
+        bool specialized_lbfgs = true;
     } experimental;
 };
 

@@ -164,7 +164,12 @@ PANOCSolver::Stats PANOCSolver::operator()(
     const auto m = z.size();
 
     // TODO: allocates
-    LBFGS lbfgs(n, params.lbfgs_mem);
+    LBFGS lbfgs;
+    SpecializedLBFGS slbfgs;
+    if (params.experimental.specialized_lbfgs)
+        slbfgs.resize(n, params.lbfgs_mem);
+    else
+        lbfgs.resize(n, params.lbfgs_mem);
 
     vec xₖ = x;       // Value of x at the beginning of the iteration
     vec x̂ₖ(n);        // Value of x after a projected gradient step
@@ -173,7 +178,6 @@ PANOCSolver::Stats PANOCSolver::operator()(
     vec ŷx̂ₖ(m);       // Σ (g(x̂ₖ) - ẑₖ)
     vec ŷx̂ₖ₊₁(m);     // ŷ(x̂ₖ) for next iteration
     vec pₖ(n);        // xₖ - x̂ₖ
-    vec pₖ_tmp(n);    // Workspace for L-BFGS
     vec pₖ₊₁(n);      // xₖ₊₁ - x̂ₖ₊₁
     vec qₖ(n);        // Newton step Hₖ pₖ
     vec grad_ψₖ(n);   // ∇ψ(xₖ)
@@ -242,6 +246,9 @@ PANOCSolver::Stats PANOCSolver::operator()(
                        ŷx̂ₖ);              // out
     }
 
+    if (params.experimental.specialized_lbfgs)
+        slbfgs.initialize(xₖ, grad_ψₖ, x̂ₖ, γₖ);
+
     for (unsigned k = 0; k <= params.max_iter; ++k) {
 #if PRINT_DEBUG_COUT
         std::cout << "[" << k << "]" << std::endl;
@@ -272,12 +279,15 @@ PANOCSolver::Stats PANOCSolver::operator()(
                          "inf/NaN"
                          "\x1b[0m"
                       << std::endl;
-            std::cout << "x̂ₖ: " << x̂ₖ.transpose() << std::endl;
-            std::cout << "ŷx̂ₖ: " << ŷx̂ₖ.transpose() << std::endl;
-            std::cout << "pₖ: " << pₖ.transpose() << std::endl;
-            std::cout << "γₖ: " << γₖ << std::endl;
-            std::cout << "grad_̂ψₖ: " << grad_̂ψₖ.transpose() << std::endl;
-            std::cout << "grad_ψₖ: " << grad_ψₖ.transpose() << std::endl;
+            std::cout << "[k]   " << k << std::endl;
+            std::cout << "qₖ₋₁: " << qₖ.transpose() << std::endl;
+            std::cout << "xₖ:   " << xₖ.transpose() << std::endl;
+            std::cout << "x̂ₖ:   " << x̂ₖ.transpose() << std::endl;
+            std::cout << "ŷx̂ₖ:  " << ŷx̂ₖ.transpose() << std::endl;
+            std::cout << "pₖ:   " << pₖ.transpose() << std::endl;
+            std::cout << "γₖ:   " << γₖ << std::endl;
+            std::cout << "∇ψₖ:  " << grad_̂ψₖ.transpose() << std::endl;
+            std::cout << "∇ψₖ:  " << grad_ψₖ.transpose() << std::endl;
 
             Stats s;
             s.iterations = k;
@@ -287,8 +297,11 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 
         // Calculate Newton step
-        pₖ_tmp = pₖ;
-        lbfgs.apply(1, pₖ_tmp, qₖ);
+        qₖ = pₖ;
+        if (params.experimental.specialized_lbfgs)
+            slbfgs.apply(qₖ);
+        else
+            lbfgs.apply(qₖ);
 
 #ifdef PRINT_DEBUG_COUT
         if (old_γ != γₖ) {
@@ -335,6 +348,17 @@ PANOCSolver::Stats PANOCSolver::operator()(
         real_t τ = 1;
         real_t Lₖ₊₁, σₖ₊₁, γₖ₊₁;
         real_t ls_cond;
+
+        if (qₖ.hasNaN()) {
+            lbfgs.reset();
+            slbfgs.reset();
+            std::cerr << "[PANOC] "
+                         "\x1b[0;34m"
+                         "Newton step NaN"
+                         "\x1b[0m"
+                      << std::endl;
+            τ = 0;
+        }
         do {
             Lₖ₊₁  = Lₖ;
             σₖ₊₁  = σₖ;
@@ -409,7 +433,10 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 
         // Update L-BFGS
-        lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
+        if (params.experimental.specialized_lbfgs)
+            slbfgs.update(xₖ₊₁, grad_ψₖ₊₁, x̂ₖ₊₁, problem.C, γₖ₊₁);
+        else
+            lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
 
         // Advance step
         Lₖ = Lₖ₊₁;

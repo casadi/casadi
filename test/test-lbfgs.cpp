@@ -1,4 +1,8 @@
+#include <panoc-alm/box.hpp>
 #include <panoc-alm/lbfgs.hpp>
+#include <panoc-alm/vec.hpp>
+
+#include <limits>
 
 #include "eigen-matchers.hpp"
 #include <Eigen/LU>
@@ -24,17 +28,16 @@ TEST(LBFGS, quadratic) {
             std::cout << "x:    " << x.transpose() << std::endl;
             std::cout << "f(x): " << f(x) << std::endl;
 
-            pa::mat H⁻¹(2, 2);
-            pa::mat I = pa::mat::Identity(2, 2);
-            lbfgs.apply(1, I.col(0), H⁻¹.col(0));
-            lbfgs.apply(1, I.col(1), H⁻¹.col(1));
+            pa::mat H⁻¹ = pa::mat::Identity(2, 2);
+            lbfgs.apply(H⁻¹.col(0));
+            lbfgs.apply(H⁻¹.col(1));
             std::cout << std::endl << "LB⁻¹ = \n" << H⁻¹ << std::endl;
             std::cout << "B⁻¹  = \n" << B.inverse() << std::endl;
             std::cout << "B    = \n" << B << std::endl;
         }
 
-        pa::vec d(2);
-        lbfgs.apply(1, r, d);
+        pa::vec d = r;
+        lbfgs.apply(d);
         x -= d;
         auto r_new = grad_f(x);
         auto y     = r_new - r;

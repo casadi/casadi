@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
     p.grad_g = load_CasADi_gradient_constraints(so_name);
 
     pa::ALMParams almparam;
-    almparam.ε        = 1e-8;
-    almparam.δ        = 1e-8;
+    almparam.ε        = 1e-15;
+    almparam.δ        = 1e-15;
     almparam.Δ        = 10;
     almparam.Σ₀       = 2;
     almparam.ε₀       = 1;
@@ -37,13 +37,13 @@ int main(int argc, char *argv[]) {
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
     almparam.σₘₐₓ     = 1e9;
-    almparam.max_iter = 10;
+    almparam.max_iter = 100;
 
     pa::PANOCParams panocparam;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
     panocparam.lbfgs_mem   = 10;
-    panocparam.max_iter    = 50;
+    panocparam.max_iter    = 500;
 
     pa::ALMSolver solver{almparam, panocparam};
 
@@ -56,6 +56,10 @@ int main(int argc, char *argv[]) {
 
     std::cout << "x = " << x.transpose() << std::endl;
     std::cout << "y = " << y.transpose() << std::endl;
+    vec g(p.m);
+    p.g(x, g);
+    std::cout << "g = " << g.transpose() << std::endl;
+    std::cout << "f = " << p.f(x) << std::endl;
 
     std::cout << "inner: " << stats.inner_iterations << std::endl;
     std::cout << "outer: " << stats.outer_iterations << std::endl;
