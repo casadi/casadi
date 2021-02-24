@@ -457,7 +457,7 @@ namespace casadi {
       alg_counter++;
     }
     // Fatal error
-    if (fail) casadi_error("Illegal values detected during evaluation:" + err_ss.str());
+    if (fail) casadi_warning("Illegal values in evaluation of '" + name_ + "':" + err_ss.str());
     return 0;
   }
 
