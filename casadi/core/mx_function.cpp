@@ -406,6 +406,9 @@ namespace casadi {
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
+    casadi_int alg_counter = 0;
+    bool fail = false;
+    std::stringstream err_ss;
     for (auto&& e : algorithm_) {
       if (e.op==OP_INPUT) {
         // Pass an input
@@ -431,11 +434,30 @@ namespace casadi {
           arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : nullptr;
         for (casadi_int i=0; i<e.res.size(); ++i)
           res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
-
         // Evaluate
         if (e.data->eval(arg1, res1, iw, w)) return 1;
+        // Check outputs
+        if (regularity_check_) {
+          for (casadi_int i = 0; i < e.res.size(); ++i) {
+            // Skip if not calculated
+            if (!res1[i]) continue;
+            // Check all nonzeros
+            casadi_int nnz = e.data->nnz(i);
+            for (casadi_int nz = 0; nz < nnz; ++nz) {
+              if (isnan(res1[i][nz]) || isinf(res1[i][nz])) {
+                err_ss << "\n" << res1[i][nz] << " detected in operation " << alg_counter
+                  << ", output " << i << ", nonzero " << nz << ": " << print(e);
+                fail = true;
+              }
+            }
+          }
+        }
       }
+      // Next operation
+      alg_counter++;
     }
+    // Fatal error
+    if (fail) casadi_error("Illegal values detected during evaluation:" + err_ss.str());
     return 0;
   }
 
