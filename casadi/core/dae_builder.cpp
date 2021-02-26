@@ -42,6 +42,18 @@
 
 namespace casadi {
 
+std::string to_string(Variable::Type v) {
+  switch (v) {
+  case Variable::REAL: return "real";
+  case Variable::INTEGER: return "integer";
+  case Variable::BOOLEAN: return "boolean";
+  case Variable::STRING: return "string";
+  case Variable::ENUM: return "enum";
+  default: break;
+  }
+  return "";
+}
+
 std::string to_string(Variable::Causality v) {
   switch (v) {
   case Variable::PARAMETER: return "parameter";
@@ -107,7 +119,8 @@ Variable::Initial Variable::default_initial(Variable::Causality causality,
 }
 
 Variable::Variable(const std::string& name) : name(name),
-    value_reference(-1), description(""), causality(LOCAL), variability(CONTINUOUS),
+    value_reference(-1), description(""),
+    type(REAL), causality(LOCAL), variability(CONTINUOUS),
     unit(""), display_unit(""),
     min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
     nominal(1.0), start(0.0), derivative(-1), antiderivative(-1), dependency(false) {
