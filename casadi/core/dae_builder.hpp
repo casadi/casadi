@@ -67,7 +67,7 @@ T to_enum(const std::string& s) {
  */
 struct CASADI_EXPORT Variable : public Printable<Variable> {
   /// Variable type
-  //enum Type {REAL, INTEGER, BOOLEAN, STRING, ENUM, N_TYPE};
+  enum Type {REAL, INTEGER, BOOLEAN, STRING, ENUM, N_TYPE};
 
   /// Causality: FMI 2.0 specification, section 2.2.7
   enum Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, N_CAUSALITY};
@@ -86,6 +86,7 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   std::string name;
   casadi_int value_reference;
   std::string description;
+  Type type;
   Causality causality;
   Variability variability;
   Initial initial;
@@ -133,6 +134,9 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
 
 ///@{
 /// Number of entries in enums
+template<> struct enum_traits<Variable::Type> {
+  static const Variable::Type n_enum = Variable::N_TYPE;
+};
 template<> struct enum_traits<Variable::Causality> {
   static const Variable::Causality n_enum = Variable::N_CAUSALITY;
 };
@@ -146,6 +150,7 @@ template<> struct enum_traits<Variable::Initial> {
 
 ///@{
 /// Convert to string
+CASADI_EXPORT std::string to_string(Variable::Type v);
 CASADI_EXPORT std::string to_string(Variable::Causality v);
 CASADI_EXPORT std::string to_string(Variable::Variability v);
 CASADI_EXPORT std::string to_string(Variable::Initial v);
