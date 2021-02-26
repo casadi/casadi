@@ -438,62 +438,44 @@ public:
   /// Get a derivative expression by non-differentiated expression
   MX der(const MX& var) const;
 
-  /// Get the nominal value by name
-  double nominal(const std::string& name) const;
-
-  /// Get the nominal value(s) by expression
-  std::vector<double> nominal(const MX& var) const;
-
-  /// Set the nominal value by name
-  void set_nominal(const std::string& name, double val);
-
-  /// Set the nominal value(s) by expression
-  void set_nominal(const MX& var, const std::vector<double>& val);
-
-  /// Get the lower bound by name
-  double min(const std::string& name, bool normalized=false) const;
-
-  /// Get the lower bound(s) by expression
-  std::vector<double> min(const MX& var, bool normalized=false) const;
-
-  /// Set the lower bound by name
-  void set_min(const std::string& name, double val, bool normalized=false);
-
-  /// Set the lower bound(s) by expression
-  void set_min(const MX& var, const std::vector<double>& val, bool normalized=false);
-
-  /// Get the upper bound by name
-  double max(const std::string& name, bool normalized=false) const;
-
-  /// Get the upper bound(s) by expression
-  std::vector<double> max(const MX& var, bool normalized=false) const;
-
-  /// Set the upper bound by name
-  void set_max(const std::string& name, double val, bool normalized=false);
-
-  /// Set the upper bound(s) by expression
-  void set_max(const MX& var, const std::vector<double>& val, bool normalized=false);
-
-  /// Get the (optionally normalized) value at time 0 by name
-  double start(const std::string& name, bool normalized=false) const;
-
-  /// Get the (optionally normalized) value(s) at time 0 by expression
-  std::vector<double> start(const MX& var, bool normalized=false) const;
-
-  /// Set the (optionally normalized) value at time 0 by name
-  void set_start(const std::string& name, double val, bool normalized=false);
-
-  /// Set the (optionally normalized) value(s) at time 0 by expression
-  void set_start(const MX& var, const std::vector<double>& val, bool normalized=false);
-
-  /// Get the unit for a component
+  ///@{
+  /// Get/set the unit for a component
   std::string unit(const std::string& name) const;
-
-  /// Get the unit given a vector of symbolic variables (all units must be identical)
   std::string unit(const MX& var) const;
-
-  /// Set the unit for a component
   void set_unit(const std::string& name, const std::string& val);
+  ///@}
+
+  ///@{
+  /// Get/set the lower bound
+  double min(const std::string& name, bool normalized=false) const;
+  std::vector<double> min(const MX& var, bool normalized=false) const;
+  void set_min(const std::string& name, double val, bool normalized=false);
+  void set_min(const MX& var, const std::vector<double>& val, bool normalized=false);
+  ///@}
+
+  ///@{
+  /// Get/set the upper bound
+  double max(const std::string& name, bool normalized=false) const;
+  std::vector<double> max(const MX& var, bool normalized=false) const;
+  void set_max(const std::string& name, double val, bool normalized=false);
+  void set_max(const MX& var, const std::vector<double>& val, bool normalized=false);
+  ///@}
+
+  ///@{
+  /// Get/set the nominal value
+  double nominal(const std::string& name) const;
+  std::vector<double> nominal(const MX& var) const;
+  void set_nominal(const std::string& name, double val);
+  void set_nominal(const MX& var, const std::vector<double>& val);
+  ///@}
+
+  ///@{
+  /// Get/set the (optionally normalized) value at time 0
+  double start(const std::string& name, bool normalized=false) const;
+  std::vector<double> start(const MX& var, bool normalized=false) const;
+  void set_start(const std::string& name, double val, bool normalized=false);
+  void set_start(const MX& var, const std::vector<double>& val, bool normalized=false);
+  ///@}
 
   /// Readable name of the class
   std::string type_name() const {return "DaeBuilder";}
