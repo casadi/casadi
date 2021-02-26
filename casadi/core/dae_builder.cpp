@@ -42,43 +42,44 @@
 
 namespace casadi {
 
-std::string to_string(Causality v) {
+std::string to_string(Variable::Causality v) {
   switch (v) {
-  case PARAMETER: return "parameter";
-  case CALCULATED_PARAMETER: return "calculatedParameter";
-  case INPUT: return "input";
-  case OUTPUT: return "output";
-  case LOCAL: return "local";
-  case INDEPENDENT: return "independent";
+  case Variable::PARAMETER: return "parameter";
+  case Variable::CALCULATED_PARAMETER: return "calculatedParameter";
+  case Variable::INPUT: return "input";
+  case Variable::OUTPUT: return "output";
+  case Variable::LOCAL: return "local";
+  case Variable::INDEPENDENT: return "independent";
   default: break;
   }
   return "";
 }
 
-std::string to_string(Variability v) {
+std::string to_string(Variable::Variability v) {
   switch (v) {
-  case CONSTANT: return "constant";
-  case FIXED: return "fixed";
-  case TUNABLE: return "tunable";
-  case DISCRETE: return "discrete";
-  case CONTINUOUS: return "continuous";
+  case Variable::CONSTANT: return "constant";
+  case Variable::FIXED: return "fixed";
+  case Variable::TUNABLE: return "tunable";
+  case Variable::DISCRETE: return "discrete";
+  case Variable::CONTINUOUS: return "continuous";
   default: break;
   }
   return "";
 }
 
-std::string to_string(Initial v) {
+std::string to_string(Variable::Initial v) {
   switch (v) {
-  case EXACT: return "exact";
-  case APPROX: return "approx";
-  case CALCULATED: return "calculated";
-  case INITIAL_NA: return "initial_na";
+  case Variable::EXACT: return "exact";
+  case Variable::APPROX: return "approx";
+  case Variable::CALCULATED: return "calculated";
+  case Variable::INITIAL_NA: return "initial_na";
   default: break;
   }
   return "";
 }
 
-Initial Variable::default_initial(Causality causality, Variability variability) {
+Variable::Initial Variable::default_initial(Variable::Causality causality,
+    Variable::Variability variability) {
   // According to table in FMI 2.0.2 specification, section 2.2.7
   switch (variability) {
   case CONSTANT:
@@ -150,8 +151,8 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
       (void)vnode.read_attribute("valueReference", var.value_reference);
       var.description = vnode.get_attribute("description", "");
-      var.causality = to_enum<Causality>(vnode.get_attribute("causality", "local"));
-      var.variability = to_enum<Variability>(
+      var.causality = to_enum<Variable::Causality>(vnode.get_attribute("causality", "local"));
+      var.variability = to_enum<Variable::Variability>(
         vnode.get_attribute("variability", "continuous"));
       std::string initial_str = vnode.get_attribute("initial", "");
       if (initial_str.empty()) {
@@ -159,11 +160,11 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         var.initial = Variable::default_initial(var.causality, var.variability);
       } else {
         // Consistency check
-        casadi_assert(var.causality != INPUT && var.causality != INDEPENDENT,
+        casadi_assert(var.causality != Variable::INPUT && var.causality != Variable::INDEPENDENT,
           "The combination causality = '" + to_string(var.causality) + "', "
           "initial = '" + initial_str + "' is not allowed per FMI 2.0 specification.");
         // Value specified
-        var.initial = to_enum<Initial>(initial_str);
+        var.initial = to_enum<Variable::Initial>(initial_str);
       }
       // Other properties
       if (vnode.has_child("Real")) {
@@ -227,18 +228,18 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
   // **** Postprocess / sort variables ****
   for (auto it = variables_.begin() + n_vars_before; it != variables_.end(); ++it) {
     // Sort by types
-    if (it->causality == INDEPENDENT) {
+    if (it->causality == Variable::INDEPENDENT) {
       // Independent (time) variable
       this->t = it->v;
-    } else if (it->causality == INPUT) {
+    } else if (it->causality == Variable::INPUT) {
       this->u.push_back(it->v);
-    } else if (it->variability == CONSTANT) {
+    } else if (it->variability == Variable::CONSTANT) {
       // Named constant
       this->c.push_back(it->v);
       this->cdef.push_back(it->start);
-    } else if (it->variability == FIXED || it->variability == TUNABLE) {
+    } else if (it->variability == Variable::FIXED || it->variability == Variable::TUNABLE) {
       this->p.push_back(it->v);
-    } else if (it->variability == CONTINUOUS) {
+    } else if (it->variability == Variable::CONTINUOUS) {
       if (it->antiderivative >= 0) {
         // Is the variable needed to calculate other states, algebraic variables?
         if (it->dependency) {
@@ -256,7 +257,7 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         add_alg("alg_" + it->name, it->v - nan);
       }
       // Is it (also) an output variable?
-      if (it->causality == OUTPUT) {
+      if (it->causality == Variable::OUTPUT) {
         this->y.push_back(it->v);
         this->ydef.push_back(it->v);
       }

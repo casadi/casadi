@@ -36,6 +36,7 @@ namespace casadi {
 class XmlNode;
 class DaeBuilder;
 
+#ifndef SWIG
 /// Helper class: Specify number of entries in an enum
 template<typename T>
 struct enum_traits {};
@@ -60,45 +61,23 @@ T to_enum(const std::string& s) {
   return enum_traits<T>::n_enum;  // never reached
 }
 
-/// Causality: FMI 2.0 specification, section 2.2.7
-enum Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, N_CAUSALITY};
-
-/// Number of entries
-template<> struct enum_traits<Causality> {
-  static const Causality n_enum = N_CAUSALITY;
-};
-
-/// Convert to string
-CASADI_EXPORT std::string to_string(Causality v);
-
-/// Variability: FMI 2.0 specification, section 2.2.7
-enum Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, N_VARIABILITY};
-
-/// Number of entries
-template<> struct enum_traits<Variability> {
-  static const Variability n_enum = N_VARIABILITY;
-};
-
-/// Convert to string
-CASADI_EXPORT std::string to_string(Variability v);
-
-/// Initial: FMI 2.0 specification, section 2.2.7
-enum Initial {EXACT, APPROX, CALCULATED, INITIAL_NA, N_INITIAL};
-
-/// Number of entries
-template<> struct enum_traits<Initial> {
-  static const Initial n_enum = N_INITIAL;
-};
-
-/// Convert to string
-CASADI_EXPORT std::string to_string(Initial v);
-
-#ifndef SWIG
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
  */
 struct CASADI_EXPORT Variable : public Printable<Variable> {
+  /// Variable type
+  //enum Type {REAL, INTEGER, BOOLEAN, STRING, ENUM, N_TYPE};
+
+  /// Causality: FMI 2.0 specification, section 2.2.7
+  enum Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, N_CAUSALITY};
+
+  /// Variability: FMI 2.0 specification, section 2.2.7
+  enum Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, N_VARIABILITY};
+
+  /// Initial: FMI 2.0 specification, section 2.2.7
+  enum Initial {EXACT, APPROX, CALCULATED, INITIAL_NA, N_INITIAL};
+
   /// Constructor
   Variable(const std::string& name = "");
 
@@ -151,6 +130,27 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   // Default initial attribute, per specification
   static Initial default_initial(Causality causality, Variability variability);
 };
+
+///@{
+/// Number of entries in enums
+template<> struct enum_traits<Variable::Causality> {
+  static const Variable::Causality n_enum = Variable::N_CAUSALITY;
+};
+template<> struct enum_traits<Variable::Variability> {
+  static const Variable::Variability n_enum = Variable::N_VARIABILITY;
+};
+template<> struct enum_traits<Variable::Initial> {
+  static const Variable::Initial n_enum = Variable::N_INITIAL;
+};
+///@}
+
+///@{
+/// Convert to string
+CASADI_EXPORT std::string to_string(Variable::Causality v);
+CASADI_EXPORT std::string to_string(Variable::Variability v);
+CASADI_EXPORT std::string to_string(Variable::Initial v);
+///@}
+
 #endif  // SWIG
 
 /** \brief An initial-value problem in differential-algebraic equations
