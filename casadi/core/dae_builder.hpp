@@ -439,6 +439,36 @@ public:
   MX der(const MX& var) const;
 
   ///@{
+  /// Get/set description
+  std::string description(const std::string& name) const;
+  void set_description(const std::string& name, const std::string& val);
+  ///@}
+
+  ///@{
+  /// Get/set the type
+  std::string type(const std::string& name) const;
+  void set_type(const std::string& name, const std::string& val);
+  ///@}
+
+  ///@{
+  /// Get/set the causality
+  std::string causality(const std::string& name) const;
+  void set_causality(const std::string& name, const std::string& val);
+  ///@}
+
+  ///@{
+  /// Get/set the variability
+  std::string variability(const std::string& name) const;
+  void set_variability(const std::string& name, const std::string& val);
+  ///@}
+
+  ///@{
+  /// Get/set the initial property
+  std::string initial(const std::string& name) const;
+  void set_initial(const std::string& name, const std::string& val);
+  ///@}
+
+  ///@{
   /// Get/set the unit for a component
   std::string unit(const std::string& name) const;
   std::string unit(const MX& var) const;
