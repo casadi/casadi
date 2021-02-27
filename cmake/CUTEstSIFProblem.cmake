@@ -22,7 +22,7 @@ macro(cutest_sif_problem PROBLEM_NAME)
             WORKING_DIRECTORY
                 ${PROBLEM_DIR}
         )
-        add_library(cutest-problem-${PROBLEM_NAME} SHARED 
+        add_library(cutest-problem-${PROBLEM_NAME} SHARED EXCLUDE_FROM_ALL
             ${PROBLEM_DIR}/ELFUN.f
             ${PROBLEM_DIR}/EXTER.f
             ${PROBLEM_DIR}/GROUP.f
