@@ -134,17 +134,14 @@ TEST(PANOC, DISABLED_ref) {
     std::cout << "u = " << u(x).transpose() << "\ts = " << s(x).transpose()
               << "\ty = " << y(x).transpose() << std::endl;
     std::cout << stats.iterations << std::endl;
-    std::cout << (stats.failed ? "fail" : "ok") << std::endl;
-    std::cout << (stats.converged ? "converged" : "fail") << std::endl
-              << std::endl;
+    std::cout << stats.status << std::endl << std::endl;
 
     std::cout << "Ref" << std::endl;
     std::cout << "u = " << u(x_ref).transpose()
               << "\ts = " << s(x_ref).transpose()
               << "\ty = " << y(x_ref).transpose() << std::endl;
     std::cout << stats_ref.iterations << std::endl;
-    std::cout << (stats_ref.failed ? "fail" : "ok") << std::endl;
-    std::cout << (stats_ref.converged ? "converged" : "fail") << std::endl;
+    std::cout << stats_ref.status << std::endl << std::endl;
 
     {
         vec x = vec::Ones(n);
