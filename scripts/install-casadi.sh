@@ -7,8 +7,6 @@ if [ -z "${VIRTUAL_ENV+x}" ]; then
 fi
 
 set -ex
-python --version
-which python
 export CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH"
 export PKG_CONFIG_PATH="$VIRTUAL_ENV/lib/pkgconfig:$PKG_CONFIG_PATH"
 
@@ -16,10 +14,10 @@ pushd /tmp
 
 # MUMPS linear solver
 rm -rf ThirdParty-Mumps
-git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git --branch "releases/1.6.2" --depth 1 --recursive
+git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git --branch "master" --depth 1 --recursive
 pushd ThirdParty-Mumps
 ./get.Mumps
-./configure --prefix="$VIRTUAL_ENV"
+./configure --prefix="$VIRTUAL_ENV" --with-lapack-lflags="$(pkg-config --libs-only-l openblas) -pthread -lm" LDFLAGS="$(pkg-config --libs-only-L openblas)"
 make -j$(nproc)
 make install
 popd
@@ -29,7 +27,7 @@ popd
 rm -rf Ipopt/build
 mkdir -p Ipopt/build
 pushd Ipopt/build
-../configure --prefix="$VIRTUAL_ENV"
+../configure --prefix="$VIRTUAL_ENV" --with-lapack-lflags="$(pkg-config --libs-only-l openblas) -pthread -lm" LDFLAGS="$(pkg-config --libs-only-L openblas)"
 make -j$(nproc)
 make install
 popd

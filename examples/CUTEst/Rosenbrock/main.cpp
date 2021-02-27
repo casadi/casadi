@@ -2,11 +2,8 @@
 #include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
 
 int main() {
-    const char *so_fname =
-        "/home/pieter/GitHub/PANOC-ALM/build/examples/CUTEst/"
-        "Rosenbrock/CUTEst/ROSENBR/libcutest-ROSENBR.so";
-    const char *outsdif_fname = "/home/pieter/GitHub/PANOC-ALM/build/examples/"
-                                "CUTEst/Rosenbrock/CUTEst/ROSENBR/OUTSDIF.d";
+    const char *so_fname = "/home/pieter/GitHub/PANOC-ALM/build/CUTEst/ROSENBR/libcutest-problem-ROSENBR.so";
+    const char *outsdif_fname = "/home/pieter/GitHub/PANOC-ALM/build/CUTEst/ROSENBR/OUTSDIF.d";
 
     CUTEstProblem p(so_fname, outsdif_fname);
 
