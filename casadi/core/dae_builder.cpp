@@ -784,14 +784,14 @@ void DaeBuilder::set_nominal(const MX& var, const std::vector<double>& val) {
   }
 }
 
-std::vector<double> DaeBuilder::attribute(getAtt f, const MX& var, bool normalized) const {
+std::vector<double> DaeBuilder::attribute(getAtt f, const MX& var) const {
   casadi_assert(var.is_column() && var.is_valid_input(),
                         "DaeBuilder::attribute: Argument must be a symbolic vector");
   std::vector<double> ret(var.nnz());
   std::vector<MX> prim = var.primitives();
   for (casadi_int i=0; i<prim.size(); ++i) {
     casadi_assert_dev(prim[i].nnz()==1);
-    ret[i] = (this->*f)(prim[i].name(), normalized);
+    ret[i] = (this->*f)(prim[i].name());
   }
   return ret;
 }
@@ -808,15 +808,14 @@ MX DaeBuilder::attribute(getAttS f, const MX& var) const {
   return ret;
 }
 
-void DaeBuilder::set_attribute(setAtt f, const MX& var, const std::vector<double>& val,
-                               bool normalized) {
+void DaeBuilder::set_attribute(setAtt f, const MX& var, const std::vector<double>& val) {
   casadi_assert(var.is_column() && var.is_valid_input(),
                         "DaeBuilder::set_attribute: Argument must be a symbolic vector");
   casadi_assert(var.nnz()==val.size(), "DaeBuilder::set_attribute: Dimension mismatch");
   std::vector<MX> prim = var.primitives();
   for (casadi_int i=0; i<prim.size(); ++i) {
     casadi_assert_dev(prim[i].nnz()==1);
-    (this->*f)(prim[i].name(), val[i], normalized);
+    (this->*f)(prim[i].name(), val[i]);
   }
 }
 
@@ -832,58 +831,52 @@ void DaeBuilder::set_attribute(setAttS f, const MX& var, const MX& val) {
   }
 }
 
-double DaeBuilder::min(const std::string& name, bool normalized) const {
-  const Variable& v = variable(name);
-  return normalized ? v.min / v.nominal : v.min;
+double DaeBuilder::min(const std::string& name) const {
+  return variable(name).min;
 }
 
-std::vector<double> DaeBuilder::min(const MX& var, bool normalized) const {
-  return attribute(&DaeBuilder::min, var, normalized);
+std::vector<double> DaeBuilder::min(const MX& var) const {
+  return attribute(&DaeBuilder::min, var);
 }
 
-void DaeBuilder::set_min(const std::string& name, double val, bool normalized) {
-  Variable& v = variable(name);
-  v.min = normalized ? val*v.nominal : val;
+void DaeBuilder::set_min(const std::string& name, double val) {
+  variable(name).min = val;
 }
 
-void DaeBuilder::set_min(const MX& var, const std::vector<double>& val, bool normalized) {
-  set_attribute(&DaeBuilder::set_min, var, val, normalized);
+void DaeBuilder::set_min(const MX& var, const std::vector<double>& val) {
+  set_attribute(&DaeBuilder::set_min, var, val);
 }
 
-double DaeBuilder::max(const std::string& name, bool normalized) const {
-  const Variable& v = variable(name);
-  return normalized ? v.max / v.nominal : v.max;
+double DaeBuilder::max(const std::string& name) const {
+  return variable(name).max;
 }
 
-std::vector<double> DaeBuilder::max(const MX& var, bool normalized) const {
-  return attribute(&DaeBuilder::max, var, normalized);
+std::vector<double> DaeBuilder::max(const MX& var) const {
+  return attribute(&DaeBuilder::max, var);
 }
 
-void DaeBuilder::set_max(const std::string& name, double val, bool normalized) {
-  Variable& v = variable(name);
-  v.max = normalized ? val*v.nominal : val;
+void DaeBuilder::set_max(const std::string& name, double val) {
+  variable(name).max = val;
 }
 
-void DaeBuilder::set_max(const MX& var, const std::vector<double>& val, bool normalized) {
-  set_attribute(&DaeBuilder::set_max, var, val, normalized);
+void DaeBuilder::set_max(const MX& var, const std::vector<double>& val) {
+  set_attribute(&DaeBuilder::set_max, var, val);
 }
 
-double DaeBuilder::start(const std::string& name, bool normalized) const {
-  const Variable& v = variable(name);
-  return normalized ? v.start / v.nominal : v.start;
+double DaeBuilder::start(const std::string& name) const {
+  return variable(name).start;
 }
 
-std::vector<double> DaeBuilder::start(const MX& var, bool normalized) const {
-  return attribute(&DaeBuilder::start, var, normalized);
+std::vector<double> DaeBuilder::start(const MX& var) const {
+  return attribute(&DaeBuilder::start, var);
 }
 
-void DaeBuilder::set_start(const std::string& name, double val, bool normalized) {
-  Variable& v = variable(name);
-  v.start = normalized ? val*v.nominal : val;
+void DaeBuilder::set_start(const std::string& name, double val) {
+  variable(name).start = val;
 }
 
-void DaeBuilder::set_start(const MX& var, const std::vector<double>& val, bool normalized) {
-  set_attribute(&DaeBuilder::set_start, var, val, normalized);
+void DaeBuilder::set_start(const MX& var, const std::vector<double>& val) {
+  set_attribute(&DaeBuilder::set_start, var, val);
 }
 
 std::string DaeBuilder::name_in(DaeBuilderIn ind) {
