@@ -15,11 +15,7 @@ class PANOCSolver {
   public:
     using Params = PANOCParams;
 
-    struct Stats {
-        unsigned iterations = 0;
-        bool converged      = false;
-        bool failed         = true;
-    };
+    using Stats = pa::PANOCSolver::Stats;
 
     PANOCSolver(Params params) : params(params) {}
 

@@ -1,3 +1,4 @@
+#include "panoc-alm/solverstatus.hpp"
 #include <cassert>
 #include <cmath>
 
@@ -151,8 +152,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
             Stats s;
             s.iterations = k;
-            s.converged  = εₖ <= ε;
-            s.failed     = false;
+            s.status     = εₖ <= ε ? pa::SolverStatus::Converged
+                                   : pa::SolverStatus::MaxIter;
             return s;
         }
         if (!std::isfinite(εₖ)) {
@@ -184,8 +185,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
             Stats s;
             s.iterations = k;
-            s.converged  = false;
-            s.failed     = true;
+            s.status     = pa::SolverStatus::NotFinite;
             return s;
         }
 

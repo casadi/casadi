@@ -22,11 +22,9 @@ TEST(PANOC, quadratic) {
     D.lowerbound.fill(-inf);
     D.upperbound.fill(inf);
 
-    real_t a = 1;
-    real_t b = -10;
-    auto obj_f = [=](const vec &x) {
-        return a * x(0) * x(0) + b * x(0);
-    };
+    real_t a    = 1;
+    real_t b    = -10;
+    auto obj_f  = [=](const vec &x) { return a * x(0) * x(0) + b * x(0); };
     auto grad_f = [=](const vec &x, vec &grad_f) {
         grad_f(0) = 2 * a * x(0) + b;
     };
@@ -46,8 +44,8 @@ TEST(PANOC, quadratic) {
 
     pa_ref::PANOCSolver solver{params};
 
-    vec y     = vec::Ones(m);
-    vec x     = vec(n);
+    vec y = vec::Ones(m);
+    vec x = vec(n);
     x << 1;
     vec z     = vec::Constant(m, NaN);
     vec err_z = vec::Constant(m, NaN);
@@ -66,8 +64,5 @@ TEST(PANOC, quadratic) {
     std::cout << "z        = " << z.transpose() << std::endl;
     std::cout << "g(x) - z = " << err_z.transpose() << std::endl;
     std::cout << "Iter:   " << stats.iterations << std::endl;
-    std::cout << "Finite: " << (stats.failed ? "fail" : "ok") << std::endl;
-    std::cout << "Conv:   " << (stats.converged ? "converged" : "fail")
-              << std::endl
-              << std::endl;
+    std::cout << "Status: " << stats.status << std::endl << std::endl;
 }

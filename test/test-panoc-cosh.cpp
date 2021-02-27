@@ -49,8 +49,8 @@ TEST(PANOC, cosh) {
 
     pa_ref::PANOCSolver solver{params};
 
-    vec y     = vec::Ones(m);
-    vec x     = vec(n);
+    vec y = vec::Ones(m);
+    vec x = vec(n);
     x << 1e-3, -1e8;
     vec z     = vec::Constant(m, NaN);
     vec err_z = vec::Constant(m, NaN);
@@ -69,8 +69,5 @@ TEST(PANOC, cosh) {
     std::cout << "z        = " << z.transpose() << std::endl;
     std::cout << "g(x) - z = " << err_z.transpose() << std::endl;
     std::cout << "Iter:   " << stats.iterations << std::endl;
-    std::cout << "Finite: " << (stats.failed ? "fail" : "ok") << std::endl;
-    std::cout << "Conv:   " << (stats.converged ? "converged" : "fail")
-              << std::endl
-              << std::endl;
+    std::cout << "Status: " << stats.status << std::endl << std::endl;
 }
