@@ -447,18 +447,18 @@ public:
 
   ///@{
   /// Get/set the lower bound
-  double min(const std::string& name, bool normalized=false) const;
-  std::vector<double> min(const MX& var, bool normalized=false) const;
-  void set_min(const std::string& name, double val, bool normalized=false);
-  void set_min(const MX& var, const std::vector<double>& val, bool normalized=false);
+  double min(const std::string& name) const;
+  std::vector<double> min(const MX& var) const;
+  void set_min(const std::string& name, double val);
+  void set_min(const MX& var, const std::vector<double>& val);
   ///@}
 
   ///@{
   /// Get/set the upper bound
-  double max(const std::string& name, bool normalized=false) const;
-  std::vector<double> max(const MX& var, bool normalized=false) const;
-  void set_max(const std::string& name, double val, bool normalized=false);
-  void set_max(const MX& var, const std::vector<double>& val, bool normalized=false);
+  double max(const std::string& name) const;
+  std::vector<double> max(const MX& var) const;
+  void set_max(const std::string& name, double val);
+  void set_max(const MX& var, const std::vector<double>& val);
   ///@}
 
   ///@{
@@ -470,11 +470,11 @@ public:
   ///@}
 
   ///@{
-  /// Get/set the (optionally normalized) value at time 0
-  double start(const std::string& name, bool normalized=false) const;
-  std::vector<double> start(const MX& var, bool normalized=false) const;
-  void set_start(const std::string& name, double val, bool normalized=false);
-  void set_start(const MX& var, const std::vector<double>& val, bool normalized=false);
+  /// Get/set the value at time 0
+  double start(const std::string& name) const;
+  std::vector<double> start(const MX& var) const;
+  void set_start(const std::string& name, double val);
+  void set_start(const MX& var, const std::vector<double>& val);
   ///@}
 
   /// Readable name of the class
@@ -540,16 +540,16 @@ protected:
   Variable& read_variable(const XmlNode& node);
 
   /// Get an attribute by expression
-  typedef double (DaeBuilder::*getAtt)(const std::string& name, bool normalized) const;
-  std::vector<double> attribute(getAtt f, const MX& var, bool normalized) const;
+  typedef double (DaeBuilder::*getAtt)(const std::string& name) const;
+  std::vector<double> attribute(getAtt f, const MX& var) const;
 
   /// Get a symbolic attribute by expression
   typedef MX (DaeBuilder::*getAttS)(const std::string& name) const;
   MX attribute(getAttS f, const MX& var) const;
 
   /// Set an attribute by expression
-  typedef void (DaeBuilder::*setAtt)(const std::string& name, double val, bool normalized);
-  void set_attribute(setAtt f, const MX& var, const std::vector<double>& val, bool normalized);
+  typedef void (DaeBuilder::*setAtt)(const std::string& name, double val);
+  void set_attribute(setAtt f, const MX& var, const std::vector<double>& val);
 
   /// Set a symbolic attribute by expression
   typedef void (DaeBuilder::*setAttS)(const std::string& name, const MX& val);
