@@ -485,11 +485,13 @@ Variable& DaeBuilder::variable(const std::string& name) {
   return variables_.at(it->second);
 }
 
+bool DaeBuilder::has_variable(const std::string& name) const {
+  return varind_.find(name) != varind_.end();
+}
+
 void DaeBuilder::add_variable(const std::string& name, const Variable& var) {
   // Try to find the component
-  if (varind_.find(name) != varind_.end()) {
-    casadi_error("Variable \"" + name + "\" has already been added.");
-  }
+  casadi_assert(!has_variable(name), "Variable \"" + name + "\" has already been added.");
   // Add to the map of all variables
   varind_[name] = variables_.size();
   variables_.push_back(var);

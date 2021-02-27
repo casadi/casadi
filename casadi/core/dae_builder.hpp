@@ -538,6 +538,9 @@ public:
   /// Add a new variable from symbolic expressions
   void add_variable(const MX& new_v);
 
+  /// Check if a particular variable exists
+  bool has_variable(const std::string& name) const;
+
   ///@{
   /// Access a variable by name
   Variable& variable(const std::string& name);
