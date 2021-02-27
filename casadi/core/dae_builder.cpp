@@ -729,6 +729,46 @@ void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   }
 }
 
+std::string DaeBuilder::description(const std::string& name) const {
+  return variable(name).description;
+}
+
+void DaeBuilder::set_description(const std::string& name, const std::string& val) {
+  variable(name).description = val;
+}
+
+std::string DaeBuilder::type(const std::string& name) const {
+  return to_string(variable(name).type);
+}
+
+void DaeBuilder::set_type(const std::string& name, const std::string& val) {
+  variable(name).type = to_enum<Variable::Type>(val);
+}
+
+std::string DaeBuilder::causality(const std::string& name) const {
+  return to_string(variable(name).causality);
+}
+
+void DaeBuilder::set_causality(const std::string& name, const std::string& val) {
+  variable(name).causality = to_enum<Variable::Causality>(val);
+}
+
+std::string DaeBuilder::variability(const std::string& name) const {
+  return to_string(variable(name).variability);
+}
+
+void DaeBuilder::set_variability(const std::string& name, const std::string& val) {
+  variable(name).variability = to_enum<Variable::Variability>(val);
+}
+
+std::string DaeBuilder::initial(const std::string& name) const {
+  return to_string(variable(name).initial);
+}
+
+void DaeBuilder::set_initial(const std::string& name, const std::string& val) {
+  variable(name).initial = to_enum<Variable::Initial>(val);
+}
+
 std::string DaeBuilder::unit(const std::string& name) const {
   return variable(name).unit;
 }
