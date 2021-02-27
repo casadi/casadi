@@ -9,20 +9,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - uses: actions/cache@v2
-      with:
-        path: "/tmp/lib-install/gtest"
-        key: ${{ runner.os }}-${{ hashFiles('scripts/ci/install-gtest.sh') }}
-    - name: Install Google Test
-      run: ./ci/install-gtest.sh /tmp/lib-install/gtest
-      working-directory: scripts
-    - uses: actions/cache@v2
-      with:
-        path: "/tmp/lib-install/eigen"
-        key: ${{ runner.os }}-${{ hashFiles('scripts/ci/install-eigen.sh') }}
-    - name: Install Eigen
-      run: ./ci/install-eigen.sh /tmp/lib-install/eigen
-      working-directory: scripts
     - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
@@ -31,15 +17,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: "/tmp/py-venv"
-        key: ${{ runner.os }}-${{ hashFiles('scripts/install-casadi.sh') }}-${{ hashFiles('scripts/install-cutest.sh') }}-${{ hashFiles('scripts/requirements.txt') }}
+        key: ${{ runner.os }}-${{ hashFiles('scripts/ci/install-dependencies.sh') }}-${{ hashFiles('scripts/requirements.txt') }}
     - name: Install Casadi and other Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       run: |
         python3 -m venv /tmp/py-venv
         source /tmp/py-venv/bin/activate
         python -m pip install -r scripts/requirements.txt
-        bash scripts/install-casadi.sh
-        bash scripts/install-cutest.sh
+        bash scripts/ci/install-dependencies.sh
     - name: Create build directory
       run: mkdir -p build
     - name: CMake
@@ -50,18 +35,14 @@ jobs:
       env:
         CC: clang-10
         CXX: clang++-10
-        CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen:/tmp/py-venv"
+        CMAKE_PREFIX_PATH: "/tmp/py-venv"
     - name: Build
       run: |
         source /tmp/py-venv/bin/activate
         make -j4
-      env:
-        LD_LIBRARY_PATH: "/tmp/py-venv/lib"
       working-directory: build
     - name: Run tests
       run: |
         source /tmp/py-venv/bin/activate
         ./test/tests --gtest_color=yes
-      env:
-        LD_LIBRARY_PATH: "/tmp/py-venv/lib"
       working-directory: build
