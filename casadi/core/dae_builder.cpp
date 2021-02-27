@@ -525,28 +525,34 @@ MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
 }
 
 void DaeBuilder::register_x(const MX& new_x) {
-  add_variable(new_x);
+  // Consistency checks
+  casadi_assert(has_variable(new_x.name()), "No such variable: " + new_x.name());
+  // Add to list
   this->x.push_back(new_x);
 }
 
 void DaeBuilder::register_z(const MX& new_z) {
-  add_variable(new_z);
+  // Consistency checks
+  casadi_assert(has_variable(new_z.name()), "No such variable: " + new_z.name());
+  // Add to list
   this->z.push_back(new_z);
 }
 
 void DaeBuilder::register_v(const MX& new_v, const MX& new_vdef) {
-  if (new_v.sparsity() != new_vdef.sparsity())
-    casadi_error("Mismatching sparsity in DaeBuilder::register_v");
-  add_variable(new_v);
+  // Consistency checks
+  casadi_assert(new_v.sparsity() == new_vdef.sparsity(), "Mismatching sparsity");
+  casadi_assert(has_variable(new_v.name()), "No such variable: " + new_v.name());
+  // Add to lists
   this->v.push_back(new_v);
   this->vdef.push_back(new_vdef);
   this->lam_vdef.push_back(MX::sym("lam_" + new_v.name(), new_v.sparsity()));
 }
 
 void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef) {
-  if (new_y.sparsity() != new_ydef.sparsity())
-    casadi_error("Mismatching sparsity in DaeBuilder::register_y");
-  add_variable(new_y);
+  // Consistency checks
+  casadi_assert(new_y.sparsity() == new_ydef.sparsity(), "Mismatching sparsity");
+  casadi_assert(has_variable(new_y.name()), "No such variable: " + new_y.name());
+  // Add to lists
   this->y.push_back(new_y);
   this->ydef.push_back(new_ydef);
   this->lam_ydef.push_back(MX::sym("lam_" + new_y.name(), new_y.sparsity()));
@@ -728,6 +734,7 @@ void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   extract(this->alg, new_v, new_vdef, opts);
   // Register as dependent variables
   for (size_t i = 0; i < new_v.size(); ++i) {
+    add_variable(new_v.at(i));
     register_v(new_v.at(i), new_vdef.at(i));
   }
 }
