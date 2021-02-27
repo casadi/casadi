@@ -538,6 +538,9 @@ public:
   /// Add a new variable from symbolic expressions
   void add_variable(const MX& new_v);
 
+  /// Check if a particular variable exists
+  bool has_variable(const std::string& name) const;
+
   ///@{
   /// Access a variable by name
   Variable& variable(const std::string& name);
@@ -569,6 +572,9 @@ protected:
   /** \brief Function oracles (cached) */
   mutable Function oracle_[2][2][2];
 
+  /// Should the cache be cleared?
+  mutable bool clear_cache_;
+
   /// Read an equation
   MX read_expr(const XmlNode& node);
 
@@ -592,7 +598,7 @@ protected:
   void set_attribute(setAttS f, const MX& var, const MX& val);
 
   /// Problem structure has changed: Clear cache
-  void clear_cache();
+  void clear_cache() const;
 
   /// Helper class, represents inputs and outputs for a function call node
   struct CallIO {

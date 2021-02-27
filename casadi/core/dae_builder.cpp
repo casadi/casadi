@@ -132,6 +132,7 @@ void Variable::disp(std::ostream &stream, bool more) const {
 
 DaeBuilder::DaeBuilder() {
   this->t = MX::sym("t");
+  clear_cache_ = false;
 }
 
 void DaeBuilder::parse_fmi(const std::string& filename) {
@@ -485,16 +486,18 @@ Variable& DaeBuilder::variable(const std::string& name) {
   return variables_.at(it->second);
 }
 
+bool DaeBuilder::has_variable(const std::string& name) const {
+  return varind_.find(name) != varind_.end();
+}
+
 void DaeBuilder::add_variable(const std::string& name, const Variable& var) {
   // Try to find the component
-  if (varind_.find(name) != varind_.end()) {
-    casadi_error("Variable \"" + name + "\" has already been added.");
-  }
+  casadi_assert(!has_variable(name), "Variable \"" + name + "\" has already been added.");
   // Add to the map of all variables
   varind_[name] = variables_.size();
   variables_.push_back(var);
   // Clear cache
-  clear_cache();
+  clear_cache_ = true;
 }
 
 MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
@@ -522,28 +525,34 @@ MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
 }
 
 void DaeBuilder::register_x(const MX& new_x) {
-  add_variable(new_x);
+  // Consistency checks
+  casadi_assert(has_variable(new_x.name()), "No such variable: " + new_x.name());
+  // Add to list
   this->x.push_back(new_x);
 }
 
 void DaeBuilder::register_z(const MX& new_z) {
-  add_variable(new_z);
+  // Consistency checks
+  casadi_assert(has_variable(new_z.name()), "No such variable: " + new_z.name());
+  // Add to list
   this->z.push_back(new_z);
 }
 
 void DaeBuilder::register_v(const MX& new_v, const MX& new_vdef) {
-  if (new_v.sparsity() != new_vdef.sparsity())
-    casadi_error("Mismatching sparsity in DaeBuilder::register_v");
-  add_variable(new_v);
+  // Consistency checks
+  casadi_assert(new_v.sparsity() == new_vdef.sparsity(), "Mismatching sparsity");
+  casadi_assert(has_variable(new_v.name()), "No such variable: " + new_v.name());
+  // Add to lists
   this->v.push_back(new_v);
   this->vdef.push_back(new_vdef);
   this->lam_vdef.push_back(MX::sym("lam_" + new_v.name(), new_v.sparsity()));
 }
 
 void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef) {
-  if (new_y.sparsity() != new_ydef.sparsity())
-    casadi_error("Mismatching sparsity in DaeBuilder::register_y");
-  add_variable(new_y);
+  // Consistency checks
+  casadi_assert(new_y.sparsity() == new_ydef.sparsity(), "Mismatching sparsity");
+  casadi_assert(has_variable(new_y.name()), "No such variable: " + new_y.name());
+  // Add to lists
   this->y.push_back(new_y);
   this->ydef.push_back(new_ydef);
   this->lam_ydef.push_back(MX::sym("lam_" + new_y.name(), new_y.sparsity()));
@@ -603,19 +612,19 @@ MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
 void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
   this->ode.push_back(new_ode);
   this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
-  clear_cache();
+  clear_cache_ = true;
 }
 
 void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
   this->alg.push_back(new_alg);
   this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
-  clear_cache();
+  clear_cache_ = true;
 }
 
 void DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
   this->quad.push_back(new_quad);
   this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
-  clear_cache();
+  clear_cache_ = true;
 }
 
 void DaeBuilder::sanity_check() const {
@@ -725,6 +734,7 @@ void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   extract(this->alg, new_v, new_vdef, opts);
   // Register as dependent variables
   for (size_t i = 0; i < new_v.size(); ++i) {
+    add_variable(new_v.at(i));
     register_v(new_v.at(i), new_vdef.at(i));
   }
 }
@@ -1448,7 +1458,7 @@ Function DaeBuilder::fun(const std::string& name) const {
   return Function();
 }
 
-void DaeBuilder::clear_cache() {
+void DaeBuilder::clear_cache() const {
   for (bool sx : {false, true}) {
     for (bool elim_v : {false, true}) {
       for (bool lifted_calls : {false, true}) {
@@ -1457,9 +1467,12 @@ void DaeBuilder::clear_cache() {
       }
     }
   }
+  clear_cache_ = false;
 }
 
 const Function& DaeBuilder::oracle(bool sx, bool elim_v, bool lifted_calls) const {
+  // Clear cache now, if necessary
+  if (clear_cache_) clear_cache();
   // Create an MX oracle, if needed
   if (oracle_[false][elim_v][lifted_calls].is_null()) {
     // Oracle function inputs and outputs
