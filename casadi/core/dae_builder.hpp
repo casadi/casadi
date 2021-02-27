@@ -119,22 +119,23 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
     <H3>Variables:  </H3>
     \verbatim
     x:      differential states
-    s:      implicitly defined states
     z:      algebraic variables
     u:      control signals
     q:      quadrature states
     p:      free parameters
-    v:      dependent variables
+    d:      dependent parameters
+    w:      dependent variables
     y:      outputs
     \endverbatim
 
     <H3>Dynamic constraints (imposed everywhere):  </H3>
     \verbatim
-    ODE                    \dot{x} ==  ode(t, x, z, u, p, v)
-    algebraic equations:         0 ==  alg(t, x, z, u, p, v)
-    quadrature equations:  \dot{q} == quad(t, x, z, u, p, v)
-    dependent parameters:        d == ddef(t, x, z, u, p, v)
-    output equations:            y == ydef(t, x, z, u, p, v)
+    ODE                    \dot{x} ==  ode(t, x, z, u, p, w, d)
+    algebraic equations:         0 ==  alg(t, x, z, u, p, w, d)
+    quadrature equations:  \dot{q} == quad(t, x, z, u, p, w, d)
+    dependent parameters:        d == ddef(t, x, z, u, p, w, d)
+    dependent parameters:        w == wdef(t, x, z, u, p, w, d)
+    output equations:            y == ydef(t, x, z, u, p, w, d)
     \endverbatim
 
     <H3>Point constraints (imposed pointwise):  </H3>
@@ -196,7 +197,13 @@ public:
   /** \brief Dependent parameters and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  std::vector<MX> v, vdef, lam_vdef;
+  std::vector<MX> d, ddef, lam_ddef;
+  ///@}
+
+  /** \brief Dependent variables and corresponding definitions
+   * Interdependencies are allowed but must be non-cyclic.
+   */
+  std::vector<MX> w, wdef, lam_wdef;
   ///@}
 
   /** \brief Auxiliary variables: Used e.g. to define functions */
@@ -229,7 +236,10 @@ public:
   MX add_q(const std::string& name=std::string(), casadi_int n=1);
 
   /// Add a new dependent parameter
-  MX add_v(const std::string& name, const MX& new_vdef);
+  MX add_d(const std::string& name, const MX& new_ddef);
+
+  /// Add a new dependent variable
+  MX add_w(const std::string& name, const MX& new_wdef);
 
   /// Add a new output
   MX add_y(const std::string& name, const MX& new_ydef);
@@ -258,8 +268,11 @@ public:
   /// Register algebraic variable
   void register_z(const MX& new_z);
 
+  /// Register dependent parameter
+  void register_d(const MX& new_d, const MX& new_ddef);
+
   /// Register dependent variable
-  void register_v(const MX& new_v, const MX& new_vdef);
+  void register_w(const MX& new_w, const MX& new_wdef);
 
   /// Register output variable
   void register_y(const MX& new_y, const MX& new_ydef);
@@ -313,7 +326,8 @@ public:
     DAE_BUILDER_T,
     DAE_BUILDER_C,
     DAE_BUILDER_P,
-    DAE_BUILDER_V,
+    DAE_BUILDER_D,
+    DAE_BUILDER_W,
     DAE_BUILDER_U,
     DAE_BUILDER_X,
     DAE_BUILDER_Z,
@@ -324,7 +338,8 @@ public:
 
   // Output convension in codegen
   enum DaeBuilderOut {
-    DAE_BUILDER_VDEF,
+    DAE_BUILDER_DDEF,
+    DAE_BUILDER_WDEF,
     DAE_BUILDER_ODE,
     DAE_BUILDER_ALG,
     DAE_BUILDER_QUAD,
