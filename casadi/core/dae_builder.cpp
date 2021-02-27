@@ -937,52 +937,19 @@ void DaeBuilder::set_start(const MX& var, const std::vector<double>& val) {
   set_attribute(&DaeBuilder::set_start, var, val);
 }
 
-std::string DaeBuilder::name_in(DaeBuilderIn ind) {
-  switch (ind) {
-  case DAE_BUILDER_T: return "t";
-  case DAE_BUILDER_C: return "c";
-  case DAE_BUILDER_P: return "p";
-  case DAE_BUILDER_V: return "v";
-  case DAE_BUILDER_U: return "u";
-  case DAE_BUILDER_X: return "x";
-  case DAE_BUILDER_Z: return "z";
-  case DAE_BUILDER_Q: return "q";
-  case DAE_BUILDER_Y: return "y";
+std::string to_string(DaeBuilder::DaeBuilderIn v) {
+  switch (v) {
+  case DaeBuilder::DAE_BUILDER_T: return "t";
+  case DaeBuilder::DAE_BUILDER_C: return "c";
+  case DaeBuilder::DAE_BUILDER_P: return "p";
+  case DaeBuilder::DAE_BUILDER_V: return "v";
+  case DaeBuilder::DAE_BUILDER_U: return "u";
+  case DaeBuilder::DAE_BUILDER_X: return "x";
+  case DaeBuilder::DAE_BUILDER_Z: return "z";
+  case DaeBuilder::DAE_BUILDER_Q: return "q";
+  case DaeBuilder::DAE_BUILDER_Y: return "y";
   default: return "";
   }
-}
-
-DaeBuilder::DaeBuilderIn DaeBuilder::enum_in(const std::string& id) {
-  if (id=="t") {
-    return DAE_BUILDER_T;
-  } else if (id=="c") {
-    return DAE_BUILDER_C;
-  } else if (id=="p") {
-    return DAE_BUILDER_P;
-  } else if (id=="v") {
-    return DAE_BUILDER_V;
-  } else if (id=="u") {
-    return DAE_BUILDER_U;
-  } else if (id=="x") {
-    return DAE_BUILDER_X;
-  } else if (id=="z") {
-    return DAE_BUILDER_Z;
-  } else if (id=="q") {
-    return DAE_BUILDER_Q;
-  } else if (id=="y") {
-    return DAE_BUILDER_Y;
-  } else {
-    return DAE_BUILDER_NUM_IN;
-  }
-}
-
-std::vector<DaeBuilder::DaeBuilderIn>
-DaeBuilder::enum_in(const std::vector<std::string>& id) {
-  std::vector<DaeBuilderIn> ret(id.size());
-  for (casadi_int i=0; i<id.size(); ++i) {
-    ret[i] = enum_in(id[i]);
-  }
-  return ret;
 }
 
 std::string DaeBuilder::name_out(DaeBuilderOut ind) {
@@ -1019,17 +986,6 @@ DaeBuilder::enum_out(const std::vector<std::string>& id) {
     ret[i] = enum_out(id[i]);
   }
   return ret;
-}
-
-std::string DaeBuilder::name_in() {
-  std::stringstream ss;
-  ss << "[";
-  for (casadi_int i=0; i!=DAE_BUILDER_NUM_IN; ++i) {
-    if (i!=0) ss << ",";
-    ss << name_in(static_cast<DaeBuilderIn>(i));
-  }
-  ss << "]";
-  return ss.str();
 }
 
 std::string DaeBuilder::name_out() {
@@ -1492,7 +1448,7 @@ const Function& DaeBuilder::oracle(bool sx, bool elim_v, bool lifted_calls) cons
           subst_v = true;
         } else {
           f_in.push_back(vertcat(v));
-          f_in_name.push_back(name_in(static_cast<DaeBuilderIn>(i)));
+          f_in_name.push_back(to_string(static_cast<DaeBuilderIn>(i)));
         }
       }
     }

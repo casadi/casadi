@@ -132,30 +132,6 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   static Initial default_initial(Causality causality, Variability variability);
 };
 
-///@{
-/// Number of entries in enums
-template<> struct enum_traits<Variable::Type> {
-  static const Variable::Type n_enum = Variable::N_TYPE;
-};
-template<> struct enum_traits<Variable::Causality> {
-  static const Variable::Causality n_enum = Variable::N_CAUSALITY;
-};
-template<> struct enum_traits<Variable::Variability> {
-  static const Variable::Variability n_enum = Variable::N_VARIABILITY;
-};
-template<> struct enum_traits<Variable::Initial> {
-  static const Variable::Initial n_enum = Variable::N_INITIAL;
-};
-///@}
-
-///@{
-/// Convert to string
-CASADI_EXPORT std::string to_string(Variable::Type v);
-CASADI_EXPORT std::string to_string(Variable::Causality v);
-CASADI_EXPORT std::string to_string(Variable::Variability v);
-CASADI_EXPORT std::string to_string(Variable::Initial v);
-///@}
-
 #endif  // SWIG
 
 /** \brief An initial-value problem in differential-algebraic equations
@@ -379,12 +355,6 @@ public:
     DAE_BUILDER_YDEF,
     DAE_BUILDER_NUM_OUT
   };
-
-  // Get string representation for input, given enum
-  static std::string name_in(DaeBuilderIn ind);
-
-  // Get string representation for all inputs
-  static std::string name_in();
 
   // Get enum representation for input, given string
   static DaeBuilderIn enum_in(const std::string& id);
@@ -640,6 +610,38 @@ protected:
 
 #endif // SWIG
 };
+
+#ifndef SWIG
+
+///@{
+/// Number of entries in enums
+template<> struct enum_traits<Variable::Type> {
+  static const Variable::Type n_enum = Variable::N_TYPE;
+};
+template<> struct enum_traits<Variable::Causality> {
+  static const Variable::Causality n_enum = Variable::N_CAUSALITY;
+};
+template<> struct enum_traits<Variable::Variability> {
+  static const Variable::Variability n_enum = Variable::N_VARIABILITY;
+};
+template<> struct enum_traits<Variable::Initial> {
+  static const Variable::Initial n_enum = Variable::N_INITIAL;
+};
+template<> struct enum_traits<DaeBuilder::DaeBuilderIn> {
+  static const DaeBuilder::DaeBuilderIn n_enum = DaeBuilder::DAE_BUILDER_NUM_IN;
+};
+///@}
+
+///@{
+/// Convert to string
+CASADI_EXPORT std::string to_string(Variable::Type v);
+CASADI_EXPORT std::string to_string(Variable::Causality v);
+CASADI_EXPORT std::string to_string(Variable::Variability v);
+CASADI_EXPORT std::string to_string(Variable::Initial v);
+CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderIn v);
+///@}
+
+#endif  // SWIG
 
 } // namespace casadi
 
