@@ -12,8 +12,9 @@ using namespace std::chrono_literals;
 
 int main(int argc, char *argv[]) {
     using namespace std::string_literals;
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <problem name>" << std::endl;
+    if (argc < 3) {
+        std::cerr << "Usage: " << argv[0] << " <problem name> <output folder>"
+                  << std::endl;
         return 1;
     }
     std::string prob_dir = "CUTEst/"s + argv[1];
@@ -22,7 +23,7 @@ int main(int argc, char *argv[]) {
 
     pa::ALMParams almparams;
     almparams.max_iter        = 1000;
-    almparams.max_time        = 3min;
+    almparams.max_time        = 2min + 30s;
     almparams.preconditioning = false;
     pa::PANOCParams panocparams;
     panocparams.max_iter                                    = 1000;
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
     out << YAML::EndMap;
     out << report;
 
-    std::ofstream("testresults/CUTEst/"s + argv[1] + ".yaml")
+    std::ofstream(argv[2] + "/"s + argv[1] + ".yaml")
         << out.c_str() << std::endl;
 
     std::cout << out.c_str() << std::endl;

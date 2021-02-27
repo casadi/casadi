@@ -223,7 +223,7 @@ if (yaml-cpp_FOUND)
 
     foreach(P ${CUTEst_PROBLEM_LIST})
         add_custom_command(OUTPUT ${TESTRESULT_DIR}/${P}.yaml
-                           COMMAND driver ${P}
+                           COMMAND driver ${P} ${TESTRESULT_DIR}
                            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                            DEPENDS CUTEst::problem-${P} driver)
         add_custom_target(cutest-result-${P}-${TESTNAME}
