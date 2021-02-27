@@ -263,7 +263,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         real_t εₖ = calc_error_stop_crit(pₖ, γₖ, grad_̂ψₖ, grad_ψₖ);
 
         // Print progress
-        if (k % 100 == 0) {
+        if (params.print_interval != 0  && k % params.print_interval == 0) {
             std::cout << "[PANOC] " << std::setw(6) << k
                       << ": ψ = " << std::setw(13) << ψₖ
                       << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()

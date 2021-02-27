@@ -23,6 +23,8 @@ struct ALMParams {
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
 
+    unsigned print_interval = 0;
+
     bool preconditioning = true;
 
     void verify();

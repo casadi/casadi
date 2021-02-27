@@ -142,10 +142,12 @@ ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
         s.inner_convergence_failures += ps.status != SolverStatus::Converged;
         real_t norm_e = vec_util::norm_inf(error);
 
-        std::cout << "[\x1b[0;34mALM\x1b[0m]   " << std::setw(5) << i
-                  << ": ‖Σ‖ = " << std::setw(13) << Σ.norm()
-                  << ", δ = " << std::setw(13) << norm_e
-                  << ", ε = " << std::setw(13) << ps.ε << "\r\n";
+        if (params.print_interval != 0 && i % params.print_interval == 0) {
+            std::cout << "[\x1b[0;34mALM\x1b[0m]   " << std::setw(5) << i
+                      << ": ‖Σ‖ = " << std::setw(13) << Σ.norm()
+                      << ", δ = " << std::setw(13) << norm_e
+                      << ", ε = " << std::setw(13) << ps.ε << "\r\n";
+        }
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         // TODO: check penalty size?

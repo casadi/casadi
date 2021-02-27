@@ -30,6 +30,8 @@ struct PANOCParams {
     /// Minimum weight factor between Newton step and projected gradient step.
     real_t τ_min = 1e-12;
 
+    unsigned print_interval = 0;
+
     struct {
         bool update_lipschitz_in_linesearch = true;
         bool specialized_lbfgs              = true;
