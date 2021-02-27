@@ -132,6 +132,7 @@ void Variable::disp(std::ostream &stream, bool more) const {
 
 DaeBuilder::DaeBuilder() {
   this->t = MX::sym("t");
+  clear_cache_ = false;
 }
 
 void DaeBuilder::parse_fmi(const std::string& filename) {
@@ -496,7 +497,7 @@ void DaeBuilder::add_variable(const std::string& name, const Variable& var) {
   varind_[name] = variables_.size();
   variables_.push_back(var);
   // Clear cache
-  clear_cache();
+  clear_cache_ = true;
 }
 
 MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
@@ -605,19 +606,19 @@ MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
 void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
   this->ode.push_back(new_ode);
   this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
-  clear_cache();
+  clear_cache_ = true;
 }
 
 void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
   this->alg.push_back(new_alg);
   this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
-  clear_cache();
+  clear_cache_ = true;
 }
 
 void DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
   this->quad.push_back(new_quad);
   this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
-  clear_cache();
+  clear_cache_ = true;
 }
 
 void DaeBuilder::sanity_check() const {
@@ -1450,7 +1451,7 @@ Function DaeBuilder::fun(const std::string& name) const {
   return Function();
 }
 
-void DaeBuilder::clear_cache() {
+void DaeBuilder::clear_cache() const {
   for (bool sx : {false, true}) {
     for (bool elim_v : {false, true}) {
       for (bool lifted_calls : {false, true}) {
@@ -1459,9 +1460,12 @@ void DaeBuilder::clear_cache() {
       }
     }
   }
+  clear_cache_ = false;
 }
 
 const Function& DaeBuilder::oracle(bool sx, bool elim_v, bool lifted_calls) const {
+  // Clear cache now, if necessary
+  if (clear_cache_) clear_cache();
   // Create an MX oracle, if needed
   if (oracle_[false][elim_v][lifted_calls].is_null()) {
     // Oracle function inputs and outputs
