@@ -6,16 +6,19 @@
 namespace pa {
 
 struct ALMParams {
-    real_t ε;
-    real_t δ;
-    real_t Δ;  ///< Factor used in updating the penalty parameters
-    real_t Σ₀; ///< Initial penalty parameter
-    real_t ε₀; ///< Initial tolerance on x
-    real_t ρ;  ///< Update factor for tolerance on x
-    real_t θ;
-    real_t M;
-    real_t σₘₐₓ;
-    unsigned int max_iter;
+    real_t ε    = 1e-5; ///< Primal tolerance.
+    real_t δ    = 1e-5; ///< Dual tolerance.
+    real_t Δ    = 10;   ///< Factor used in updating the penalty parameters.
+    real_t Σ₀   = 1;    ///< Initial penalty parameter.
+    real_t σ₀   = 20;   ///< Initial penalty parameter factor.
+    real_t ε₀   = 1;    ///< Initial primal tolerance.
+    real_t θ    = 0.25; ///< Error tolerance for penalty increase
+    real_t ρ    = 1e-1; ///< Update factor for primal tolerance.
+    real_t M    = 1e9;
+    real_t σₘₐₓ = 1e15;
+    unsigned int max_iter = 100;
+
+    bool preconditioning = true;
 
     void verify();
 };
@@ -26,8 +29,13 @@ class ALMSolver {
     using Params = ALMParams;
 
     struct Stats {
-        unsigned inner_iterations = 0;
-        unsigned outer_iterations = 0;
+        unsigned inner_iterations           = 0;
+        unsigned outer_iterations           = 0;
+        unsigned inner_convergence_failures = 0;
+        real_t ε       = std::numeric_limits<real_t>::infinity();
+        real_t δ       = std::numeric_limits<real_t>::infinity();
+        bool converged = false;
+        bool failed    = true;
     };
 
     ALMSolver(Params params, PANOCSolver::Params panoc_params)

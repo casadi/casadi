@@ -45,7 +45,7 @@ real_t calc_ψ_ŷ(const Problem &p, ///< [in]  Problem description
 /// Calculate ∇ψ(x) using ŷ.
 void calc_grad_ψ_from_ŷ(const Problem &p, ///< [in]  Problem description
                         const vec &x,     ///< [in]  Decision variable @f$ x @f$
-                        const vec &ŷ,     ///< [in   @f$ \hat{y} @f$
+                        const vec &ŷ,     ///< [in]  @f$ \hat{y} @f$
                         vec &grad_ψ,      ///< [out] @f$ \nabla \psi(x) @f$
                         vec &work_n       ///<       Dimension n
 ) {
@@ -99,8 +99,8 @@ void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
     grad_ψ += work_n;
 }
 
-/// Calculate the gradient ∇ψ(x).
-/// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\ \hat{y}(x) @f]
+/// Calculate ẑ.
+/// @f[ \hat{z}^k = \Pi_D\left(g(x^k) + \Sigma^{-1}y\right) @f]
 void calc_ẑ(const Problem &p, ///< [in]  Problem description
             const vec &x̂,     ///< [in]  Decision variable @f$ \hat{x} @f$
             const vec &y,     ///< [in]  Lagrange multipliers @f$ y @f$
@@ -228,7 +228,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
     real_t grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
     real_t norm_sq_pₖ = pₖ.squaredNorm();
     // Decrease step size until quadratic upper bound is satisfied
-    while (ψ̂xₖ > ψₖ + margin + grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ) {
+    while (!params.experimental.update_lipschitz_in_linesearch &&
+           (ψ̂xₖ > ψₖ + margin + grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ)) {
         lbfgs.reset();
         Lₖ *= 2;
         σₖ /= 2;
@@ -253,10 +254,20 @@ PANOCSolver::Stats PANOCSolver::operator()(
 #if PRINT_DEBUG_COUT
         std::cout << "[" << k << "]" << std::endl;
 #endif
+
+        if (k % 100 == 0) {
+            std::cout << "[PANOC] " << std::setw(5) << k
+                      << ": ψ = " << std::setw(13) << ψₖ
+                      << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()
+                      << ", ‖p‖ = " << std::setw(13) << std::sqrt(norm_sq_pₖ)
+                      << ", γ = " << std::setw(13) << γₖ << "\r\n";
+        }
+
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(problem, x̂ₖ, ŷx̂ₖ, // in
                            grad_̂ψₖ,          // out
                            work_n);          // work
+
         // Check stop condition
         real_t εₖ = calc_error_stop_crit(pₖ, γₖ, grad_̂ψₖ, grad_ψₖ);
         if (εₖ <= ε || k == params.max_iter) {
@@ -270,6 +281,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
             Stats s;
             s.iterations = k;
+            s.ε          = εₖ;
             s.converged  = εₖ <= ε;
             s.failed     = false;
             return s;
@@ -286,7 +298,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
             std::cout << "ŷx̂ₖ:  " << ŷx̂ₖ.transpose() << std::endl;
             std::cout << "pₖ:   " << pₖ.transpose() << std::endl;
             std::cout << "γₖ:   " << γₖ << std::endl;
-            std::cout << "∇ψₖ:  " << grad_̂ψₖ.transpose() << std::endl;
+            std::cout << "∇_̂ψₖ:  " << grad_̂ψₖ.transpose() << std::endl;
             std::cout << "∇ψₖ:  " << grad_ψₖ.transpose() << std::endl;
 
             Stats s;
@@ -297,11 +309,13 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 
         // Calculate Newton step
-        qₖ = pₖ;
-        if (params.experimental.specialized_lbfgs)
-            slbfgs.apply(qₖ);
-        else
-            lbfgs.apply(qₖ);
+        if (k > 0) {
+            qₖ = pₖ;
+            if (params.experimental.specialized_lbfgs)
+                slbfgs.apply(qₖ);
+            else
+                lbfgs.apply(qₖ);
+        }
 
 #ifdef PRINT_DEBUG_COUT
         if (old_γ != γₖ) {
@@ -342,13 +356,15 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
         // Line search
         // TODO: don't we already have this from the previous iteration?
-        real_t φₖ = ψₖ + 1 / (2 * γₖ) * norm_sq_pₖ + grad_ψₖᵀpₖ;
-        real_t σ_norm_γ⁻¹pₖ = σₖ * norm_sq_pₖ / (γₖ * γₖ);
+        const real_t φₖ = ψₖ + 1 / (2 * γₖ) * norm_sq_pₖ + grad_ψₖᵀpₖ;
+        const real_t σ_norm_γ⁻¹pₖ = σₖ * norm_sq_pₖ / (γₖ * γₖ);
         real_t φₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, norm_sq_pₖ₊₁;
         real_t τ = 1;
         real_t Lₖ₊₁, σₖ₊₁, γₖ₊₁;
         real_t ls_cond;
 
+        if (k == 0)
+            τ = 0;
         if (qₖ.hasNaN()) {
             lbfgs.reset();
             slbfgs.reset();
@@ -424,7 +440,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 #endif
 
-        if (τ < params.τ_min) {
+        if (τ < params.τ_min && k != 0) {
             std::cerr << "[PANOC] "
                          "\x1b[0;31m"
                          "Warning: Line search failed"

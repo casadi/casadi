@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
     p.grad_g = load_CasADi_gradient_constraints(so_name);
 
     pa::ALMParams almparam;
-    almparam.ε        = 1e-15;
-    almparam.δ        = 1e-15;
+    almparam.ε        = 1e-8;
+    almparam.δ        = 1e-8;
     almparam.Δ        = 10;
     almparam.Σ₀       = 2;
     almparam.ε₀       = 1;

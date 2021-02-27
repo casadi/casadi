@@ -28,7 +28,7 @@ struct PANOCParams {
 
     struct {
         bool update_lipschitz_in_linesearch = true;
-        bool specialized_lbfgs = true;
+        bool specialized_lbfgs              = true;
     } experimental;
 };
 
@@ -38,6 +38,7 @@ class PANOCSolver {
 
     struct Stats {
         unsigned iterations = 0;
+        real_t ε            = std::numeric_limits<real_t>::infinity();
         bool converged      = false;
         bool failed         = true;
     };

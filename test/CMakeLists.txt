@@ -1,4 +1,5 @@
 add_subdirectory(ref)
+add_subdirectory(drivers)
 
 # cmake_policy(SET CMP0094 NEW)
 # set(Python3_FIND_STRATEGY "LOCATION")

@@ -2,8 +2,11 @@
 
 #include <cutest.h>
 #include <dlfcn.h>
+
+#include <iostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 using namespace std::string_literals;
 
@@ -26,15 +29,15 @@ class CUTEstLoader {
 
         // Open the OUTSDIF.d file
         integer ierr;
-        auto rosenbr_open = dlfun<decltype(FORTRAN_open)>("fortran_open_");
-        rosenbr_open(&funit, outsdif_fname, &ierr);
+        auto fptr_open = dlfun<decltype(FORTRAN_open)>("fortran_open_");
+        fptr_open(&funit, outsdif_fname, &ierr);
         if (ierr)
             throw std::runtime_error("Failed to open "s + outsdif_fname);
 
         // Get the dimensions of the problem
         integer status;
-        auto rosenbr_cdimen = dlfun<decltype(CUTEST_cdimen)>("cutest_cdimen_");
-        rosenbr_cdimen(&status, &funit, &nvar, &ncon);
+        auto fptr_cdimen = dlfun<decltype(CUTEST_cdimen)>("cutest_cdimen_");
+        fptr_cdimen(&status, &funit, &nvar, &ncon);
         throw_if_error("Failed to call cutest_cdimen", status);
 
         // Set up the datastructures
@@ -52,21 +55,19 @@ class CUTEstLoader {
 
         // Constrained problem
         if (ncon > 0) {
-            auto rosenbr_csetup =
+            auto fptr_csetup =
                 dlfun<decltype(CUTEST_csetup)>("cutest_cint_csetup_");
-            rosenbr_csetup(&status, &funit, &iout, &io_buffer, &nvar, &ncon,
-                           x.data(), x_l.data(), x_u.data(), y.data(),
-                           c_l.data(), c_u.data(), (logical *)equatn.data(),
-                           (logical *)linear.data(), &e_order, &l_order,
-                           &v_order);
+            fptr_csetup(&status, &funit, &iout, &io_buffer, &nvar, &ncon,
+                        x.data(), x_l.data(), x_u.data(), y.data(), c_l.data(),
+                        c_u.data(), (logical *)equatn.data(),
+                        (logical *)linear.data(), &e_order, &l_order, &v_order);
             throw_if_error("Failed to call cutest_csetup", status);
         }
         // Unconstrained problem
         else {
-            auto rosenbr_usetup =
-                dlfun<decltype(CUTEST_usetup)>("cutest_usetup_");
-            rosenbr_usetup(&status, &funit, &iout, &io_buffer, &nvar, x.data(),
-                           x_l.data(), x_u.data());
+            auto fptr_usetup = dlfun<decltype(CUTEST_usetup)>("cutest_usetup_");
+            fptr_usetup(&status, &funit, &iout, &io_buffer, &nvar, x.data(),
+                        x_l.data(), x_u.data());
             throw_if_error("Failed to call cutest_usetup", status);
         }
         if (ncon > 0)
@@ -173,26 +174,48 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cjprod", status);
     }
 
+    std::string get_name() {
+        std::string name;
+        name.resize(10);
+        integer status;
+        dlfun<decltype(CUTEST_probname)>("cutest_probname_")(&status,
+                                                             name.data());
+        throw_if_error("Failed to call cutest_probname", status);
+        auto nspace = std::find_if(name.rbegin(), name.rend(),
+                                   [](char c) { return c != ' '; });
+        name.resize(name.size() - (nspace - name.rbegin()));
+        return name;
+    }
+
+    integer get_report(doublereal *calls, doublereal *time) {
+        integer status;
+        auto fptr_report =
+            ncon > 0 ? dlfun<decltype(CUTEST_creport)>("cutest_creport_")
+                     : dlfun<decltype(CUTEST_ureport)>("cutest_ureport_");
+        fptr_report(&status, calls, time);
+        return status;
+    }
+
     ~CUTEstLoader() {
         // Terminate CUTEst
         if (ncon > 0) {
             integer status;
-            auto rosenbr_cterminate =
+            auto fptr_cterminate =
                 dlfun<decltype(CUTEST_cterminate)>("cutest_cterminate_");
-            rosenbr_cterminate(&status);
+            fptr_cterminate(&status);
             throw_if_error("Failed to call cutest_cterminate", status);
         } else {
             integer status;
-            auto rosenbr_uterminate =
+            auto fptr_uterminate =
                 dlfun<decltype(CUTEST_uterminate)>("cutest_uterminate_");
-            rosenbr_uterminate(&status);
+            fptr_uterminate(&status);
             throw_if_error("Failed to call cutest_uterminate", status);
         }
 
         // Close the OUTSDIF.d file
         integer ierr;
-        auto rosenbr_close = dlfun<decltype(FORTRAN_close)>("fortran_close_");
-        rosenbr_close(&funit, &ierr);
+        auto fptr_close = dlfun<decltype(FORTRAN_close)>("fortran_close_");
+        fptr_close(&funit, &ierr);
         throw_if_error("Failed to close OUTSDIF.d file", ierr);
 
         // Close the shared library
@@ -235,38 +258,93 @@ class CUTEstLoader {
     void *eval_constraints_grad_p = nullptr;
 };
 
-CUTEstProblem::CUTEstProblem()                 = default;
+CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname) {
+    implementation = std::make_unique<CUTEstLoader>(so_fname, outsdif_fname);
+    auto *l        = implementation.get();
+    problem.n      = l->nvar;
+    problem.m      = l->ncon;
+    problem.C.lowerbound = std::move(l->x_l);
+    problem.C.upperbound = std::move(l->x_u);
+    problem.D.lowerbound = std::move(l->c_l);
+    problem.D.upperbound = std::move(l->c_u);
+    using namespace std::placeholders;
+    if (problem.m > 0) {
+        problem.f = std::bind(&CUTEstLoader::eval_objective_constrained, l, _1);
+        problem.grad_f = std::bind(
+            &CUTEstLoader::eval_objective_grad_constrained, l, _1, _2);
+    } else {
+        problem.f =
+            std::bind(&CUTEstLoader::eval_objective_unconstrained, l, _1);
+        problem.grad_f = std::bind(
+            &CUTEstLoader::eval_objective_grad_unconstrained, l, _1, _2);
+    }
+    problem.g = std::bind(&CUTEstLoader::eval_constraints, l, _1, _2);
+    problem.grad_g =
+        std::bind(&CUTEstLoader::eval_constraints_grad, l, _1, _2, _3);
+    x0 = std::move(l->x);
+    y0 = std::move(l->y);
+}
+
+CUTEstProblem::CUTEstProblem(const std::string &so_fname,
+                             const std::string &outsdif_fname)
+    : CUTEstProblem(so_fname.c_str(), outsdif_fname.c_str()) {}
+
 CUTEstProblem::CUTEstProblem(CUTEstProblem &&) = default;
 CUTEstProblem &CUTEstProblem::operator=(CUTEstProblem &&) = default;
 CUTEstProblem::~CUTEstProblem()                           = default;
 
-CUTEstProblem load_CUTEst_problem(const char *so_fname,
-                                  const char *outsdif_fname) {
-    CUTEstProblem p;
-    p.implementation = std::make_unique<CUTEstLoader>(so_fname, outsdif_fname);
-    auto *l          = p.implementation.get();
-    p.problem.n      = l->nvar;
-    p.problem.m      = l->ncon;
-    p.problem.C.lowerbound = std::move(l->x_l);
-    p.problem.C.upperbound = std::move(l->x_u);
-    p.problem.D.lowerbound = std::move(l->c_l);
-    p.problem.D.upperbound = std::move(l->c_u);
-    using namespace std::placeholders;
-    if (p.problem.m > 0) {
-        p.problem.f =
-            std::bind(&CUTEstLoader::eval_objective_constrained, l, _1);
-        p.problem.grad_f = std::bind(
-            &CUTEstLoader::eval_objective_grad_constrained, l, _1, _2);
-    } else {
-        p.problem.f =
-            std::bind(&CUTEstLoader::eval_objective_unconstrained, l, _1);
-        p.problem.grad_f = std::bind(
-            &CUTEstLoader::eval_objective_grad_unconstrained, l, _1, _2);
+CUTEstProblem::Report CUTEstProblem::get_report() const {
+    doublereal calls[7];
+    doublereal time[2];
+    Report r;
+    using stat_t = decltype(r.status);
+    r.status     = static_cast<stat_t>(implementation->get_report(calls, time));
+    r.name       = implementation->get_name();
+    r.nvar       = implementation->nvar;
+    r.ncon       = implementation->ncon;
+    r.calls.objective            = calls[0];
+    r.calls.objective_grad       = calls[1];
+    r.calls.objective_hess       = calls[2];
+    r.calls.hessian_times_vector = calls[3];
+    r.calls.constraints          = implementation->ncon > 0 ? calls[4] : 0;
+    r.calls.constraints_grad     = implementation->ncon > 0 ? calls[5] : 0;
+    r.calls.constraints_hess     = implementation->ncon > 0 ? calls[6] : 0;
+    r.time_setup                 = time[0];
+    r.time                       = time[1];
+    return r;
+}
+
+std::ostream &operator<<(std::ostream &os, CUTEstProblem::Report::Status s) {
+    const char *names[]{
+        "Success",
+        "AllocationError",
+        "ArrayBoundError",
+        "EvaluationError",
+    };
+    return os << names[s];
+}
+
+std::ostream &operator<<(std::ostream &os, const CUTEstProblem::Report &r) {
+    os << "CUTEst problem: " << r.name << "\r\n\n"                 //
+       << "Number of variables:   " << r.nvar << "\r\n"            //
+       << "Number of constraints: " << r.ncon << "\r\n\n"          //
+       << "Status: " << r.status << " (" << +r.status << ")\r\n\n" //
+       << "Objective function evaluations:            " << r.calls.objective
+       << "\r\n"
+       << "Objective function gradient evaluations:   "
+       << r.calls.objective_grad << "\r\n"
+       << "Objective function Hessian evaluations:    "
+       << r.calls.objective_hess << "\r\n"
+       << "Hessian times vector products:             "
+       << r.calls.objective_hess << "\r\n\n";
+    if (r.ncon > 0) {
+        os << "Constraint function evaluations:           "
+           << r.calls.constraints << "\r\n"
+           << "Constraint function gradients evaluations: "
+           << r.calls.constraints_grad << "\r\n"
+           << "Constraint function Hessian evaluations:   "
+           << r.calls.constraints_hess << "\r\n\n";
     }
-    p.problem.g = std::bind(&CUTEstLoader::eval_constraints, l, _1, _2);
-    p.problem.grad_g =
-        std::bind(&CUTEstLoader::eval_constraints_grad, l, _1, _2, _3);
-    p.x0 = std::move(l->x);
-    p.y0 = std::move(l->y);
-    return p;
+    return os << "Setup time:       " << r.time_setup << "s\r\n"
+              << "Time since setup: " << r.time << "s";
 }
