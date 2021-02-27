@@ -793,6 +793,14 @@ void DaeBuilder::set_unit(const std::string& name, const std::string& val) {
   variable(name).unit = val;
 }
 
+std::string DaeBuilder::display_unit(const std::string& name) const {
+  return variable(name).display_unit;
+}
+
+void DaeBuilder::set_display_unit(const std::string& name, const std::string& val) {
+  variable(name).display_unit = val;
+}
+
 double DaeBuilder::nominal(const std::string& name) const {
   return variable(name).nominal;
 }
