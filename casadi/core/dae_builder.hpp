@@ -469,10 +469,16 @@ public:
   ///@}
 
   ///@{
-  /// Get/set the unit for a component
+  /// Get/set the unit
   std::string unit(const std::string& name) const;
   std::string unit(const MX& var) const;
   void set_unit(const std::string& name, const std::string& val);
+  ///@}
+
+  ///@{
+  /// Get/set the display unit
+  std::string display_unit(const std::string& name) const;
+  void set_display_unit(const std::string& name, const std::string& val);
   ///@}
 
   ///@{
