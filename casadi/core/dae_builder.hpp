@@ -37,30 +37,6 @@ class XmlNode;
 class DaeBuilder;
 
 #ifndef SWIG
-/// Helper class: Specify number of entries in an enum
-template<typename T>
-struct enum_traits {};
-
-// Helper function: Convert string to enum
-template<typename T>
-T to_enum(const std::string& s) {
-  // Linear search over permitted values
-  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
-    if (s == to_string(static_cast<T>(i))) return static_cast<T>(i);
-  }
-  // Informative error message
-  std::stringstream ss;
-  ss << "No such enum: '" << s << "'. Permitted values: ";
-  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
-    // Separate strings
-    if (i > 0) ss << ", ";
-    // Print enum name
-    ss << "'" << to_string(static_cast<T>(i)) << "'";
-  }
-  casadi_error(ss.str());
-  return enum_traits<T>::n_enum;  // never reached
-}
-
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
@@ -356,24 +332,6 @@ public:
     DAE_BUILDER_NUM_OUT
   };
 
-  // Get enum representation for input, given string
-  static DaeBuilderIn enum_in(const std::string& id);
-
-  // Get enum representation for input, given vector of strings
-  static std::vector<DaeBuilderIn> enum_in(const std::vector<std::string>& id);
-
-  // Get string representation for output, given enum
-  static std::string name_out(DaeBuilderOut ind);
-
-  // Get string representation for all outputs
-  static std::string name_out();
-
-  // Get enum representation for output, given string
-  static DaeBuilderOut enum_out(const std::string& id);
-
-  // Get enum representation for output, given vector of strings
-  static std::vector<DaeBuilderOut> enum_out(const std::vector<std::string>& id);
-
   // Get input expression, given enum
   std::vector<MX> input(DaeBuilderIn ind) const;
 
@@ -613,6 +571,30 @@ protected:
 
 #ifndef SWIG
 
+/// Helper class: Specify number of entries in an enum
+template<typename T>
+struct enum_traits {};
+
+// Helper function: Convert string to enum
+template<typename T>
+T to_enum(const std::string& s) {
+  // Linear search over permitted values
+  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
+    if (s == to_string(static_cast<T>(i))) return static_cast<T>(i);
+  }
+  // Informative error message
+  std::stringstream ss;
+  ss << "No such enum: '" << s << "'. Permitted values: ";
+  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
+    // Separate strings
+    if (i > 0) ss << ", ";
+    // Print enum name
+    ss << "'" << to_string(static_cast<T>(i)) << "'";
+  }
+  casadi_error(ss.str());
+  return enum_traits<T>::n_enum;  // never reached
+}
+
 ///@{
 /// Number of entries in enums
 template<> struct enum_traits<Variable::Type> {
@@ -630,6 +612,9 @@ template<> struct enum_traits<Variable::Initial> {
 template<> struct enum_traits<DaeBuilder::DaeBuilderIn> {
   static const DaeBuilder::DaeBuilderIn n_enum = DaeBuilder::DAE_BUILDER_NUM_IN;
 };
+template<> struct enum_traits<DaeBuilder::DaeBuilderOut> {
+  static const DaeBuilder::DaeBuilderOut n_enum = DaeBuilder::DAE_BUILDER_NUM_OUT;
+};
 ///@}
 
 ///@{
@@ -639,6 +624,7 @@ CASADI_EXPORT std::string to_string(Variable::Causality v);
 CASADI_EXPORT std::string to_string(Variable::Variability v);
 CASADI_EXPORT std::string to_string(Variable::Initial v);
 CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderIn v);
+CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderOut v);
 ///@}
 
 #endif  // SWIG

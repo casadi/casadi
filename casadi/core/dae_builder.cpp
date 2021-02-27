@@ -948,55 +948,21 @@ std::string to_string(DaeBuilder::DaeBuilderIn v) {
   case DaeBuilder::DAE_BUILDER_Z: return "z";
   case DaeBuilder::DAE_BUILDER_Q: return "q";
   case DaeBuilder::DAE_BUILDER_Y: return "y";
-  default: return "";
+  default: break;
   }
+  return "";
 }
 
-std::string DaeBuilder::name_out(DaeBuilderOut ind) {
-  switch (ind) {
-  case DAE_BUILDER_VDEF: return "vdef";
-  case DAE_BUILDER_ODE: return "ode";
-  case DAE_BUILDER_ALG: return "alg";
-  case DAE_BUILDER_QUAD: return "quad";
-  case DAE_BUILDER_YDEF: return "ydef";
-  default: return "";
+std::string to_string(DaeBuilder::DaeBuilderOut v) {
+  switch (v) {
+  case DaeBuilder::DAE_BUILDER_VDEF: return "vdef";
+  case DaeBuilder::DAE_BUILDER_ODE: return "ode";
+  case DaeBuilder::DAE_BUILDER_ALG: return "alg";
+  case DaeBuilder::DAE_BUILDER_QUAD: return "quad";
+  case DaeBuilder::DAE_BUILDER_YDEF: return "ydef";
+  default: break;
   }
-}
-
-DaeBuilder::DaeBuilderOut DaeBuilder::enum_out(const std::string& id) {
-  if (id=="vdef") {
-    return DAE_BUILDER_VDEF;
-  } else if (id=="ode") {
-    return DAE_BUILDER_ODE;
-  } else if (id=="alg") {
-    return DAE_BUILDER_ALG;
-  } else if (id=="quad") {
-    return DAE_BUILDER_QUAD;
-  } else if (id=="ydef") {
-    return DAE_BUILDER_YDEF;
-  } else {
-    return DAE_BUILDER_NUM_OUT;
-  }
-}
-
-std::vector<DaeBuilder::DaeBuilderOut>
-DaeBuilder::enum_out(const std::vector<std::string>& id) {
-  std::vector<DaeBuilderOut> ret(id.size());
-  for (casadi_int i=0; i<id.size(); ++i) {
-    ret[i] = enum_out(id[i]);
-  }
-  return ret;
-}
-
-std::string DaeBuilder::name_out() {
-  std::stringstream ss;
-  ss << "[";
-  for (casadi_int i=0; i!=DAE_BUILDER_NUM_OUT; ++i) {
-    if (i!=0) ss << ",";
-    ss << name_out(static_cast<DaeBuilderOut>(i));
-  }
-  ss << "]";
-  return ss.str();
+  return "";
 }
 
 std::vector<MX> DaeBuilder::input(DaeBuilderIn ind) const {
@@ -1057,12 +1023,8 @@ void DaeBuilder::add_lc(const std::string& name,
   casadi_assert(!f_out.empty(), "DaeBuilder::add_lc: Linear combination is empty");
   std::vector<bool> in_use(DAE_BUILDER_NUM_OUT, false);
   for (casadi_int i=0; i<f_out.size(); ++i) {
-    DaeBuilderOut oind = enum_out(f_out[i]);
-    casadi_assert(oind!=DAE_BUILDER_NUM_OUT,
-      "DaeBuilder::add_lc: No output expression " + f_out[i] + ". "
-      "Valid expressions are " + name_out());
-    casadi_assert(!in_use[oind],
-      "DaeBuilder::add_lc: Duplicate expression " + f_out[i]);
+    DaeBuilderOut oind = to_enum<DaeBuilderOut>(f_out[i]);
+    casadi_assert(!in_use[oind], "DaeBuilder::add_lc: Duplicate expression " + f_out[i]);
     in_use[oind] = true;
   }
 
@@ -1457,7 +1419,7 @@ const Function& DaeBuilder::oracle(bool sx, bool elim_v, bool lifted_calls) cons
       v = output(static_cast<DaeBuilderOut>(i));
       if (!v.empty()) {
         f_out.push_back(vertcat(v));
-        f_out_name.push_back(name_out(static_cast<DaeBuilderOut>(i)));
+        f_out_name.push_back(to_string(static_cast<DaeBuilderOut>(i)));
         if (i == DAE_BUILDER_VDEF) vdef_ind = i;
       }
     }
