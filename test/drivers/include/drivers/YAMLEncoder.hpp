@@ -1,4 +1,6 @@
 #include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
+#include <panoc-alm/problem.hpp>
+#include <panoc-alm/solverstatus.hpp>
 
 #include <sstream>
 #include <yaml-cpp/emitter.h>
@@ -16,9 +18,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::vec &v) {
 
 inline YAML::Emitter &operator<<(YAML::Emitter &out,
                                  CUTEstProblem::Report::Status s) {
-    std::stringstream ss;
-    ss << s;
-    return out << ss.str();
+    return out << enum_name(s);
 }
 
 inline YAML::Emitter &operator<<(YAML::Emitter &out,
@@ -49,4 +49,18 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
         << YAML::Key << "time" << YAML::Value << r.time;
     out << YAML::EndMap << YAML::EndMap;
     return out;
+}
+
+inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::EvalCounter ctr) {
+    out << YAML::BeginMap;
+    out << YAML::Key << "f" << YAML::Value << ctr.f;
+    out << YAML::Key << "grad_f" << YAML::Value << ctr.grad_f;
+    out << YAML::Key << "g" << YAML::Value << ctr.g;
+    out << YAML::Key << "grad_g" << YAML::Value << ctr.grad_g;
+    out << YAML::EndMap;
+    return out;
+}
+
+inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::SolverStatus s) {
+    return out << enum_name(s);
 }

@@ -38,35 +38,35 @@ class LBFGS {
     decltype(auto) α(size_t i) const { return storage.coeff(n(), 2 * i + 1); }
 
     template <class VecS, class VecY>
-    void update(const VecS &s, const VecY &y) {
+    bool update(const VecS &s, const VecY &y) {
         auto ys        = s.dot(y);
         auto norm_sq_s = s.squaredNorm();
 
         if (!std::isfinite(ys)) {
-            std::cerr << "[LBFGS] "
-                         "\x1b[0;31m"
-                         "Warning: L-BFGS update failed (yᵀs = inf/NaN)"
-                         "\x1b[0m"
-                      << std::endl;
-            return;
+            // std::cerr << "[LBFGS] "
+            //              "\x1b[0;31m"
+            //              "Warning: L-BFGS update failed (yᵀs = inf/NaN)"
+            //              "\x1b[0m"
+            //           << std::endl;
+            return false;
         }
         // TODO: this means it's essentially zero (or denorm)
         else if (norm_sq_s <= std::numeric_limits<real_t>::min()) {
-            std::cerr << "[LBFGS] "
-                         "\x1b[0;31m"
-                         "Warning: L-BFGS update failed (‖s‖² <= ε)"
-                         "\x1b[0m"
-                      << std::endl;
-            return;
+            // std::cerr << "[LBFGS] "
+            //              "\x1b[0;31m"
+            //              "Warning: L-BFGS update failed (‖s‖² <= ε)"
+            //              "\x1b[0m"
+            //           << std::endl;
+            return false;
         }
         // TODO: this means it's essentially zero (or denorm)
         else if (std::abs(ys) <= std::numeric_limits<real_t>::min()) {
-            std::cerr << "[LBFGS] "
-                         "\x1b[0;31m"
-                         "Warning: L-BFGS update failed (yᵀs <= ε)"
-                         "\x1b[0m"
-                      << std::endl;
-            return;
+            // std::cerr << "[LBFGS] "
+            //              "\x1b[0;31m"
+            //              "Warning: L-BFGS update failed (yᵀs <= ε)"
+            //              "\x1b[0m"
+            //           << std::endl;
+            return false;
         }
         // TODO: CBFGS
 
@@ -78,6 +78,7 @@ class LBFGS {
             idx  = 0;
             full = true;
         }
+        return true;
     }
 
     template <class Vec>
@@ -176,7 +177,7 @@ class SpecializedLBFGS {
     size_t succ() const { return succ(idx); }
 
     template <class VecX, class VecG, class VecXh>
-    void update(const VecX &new_x, const VecG &new_g, const VecXh &new_x̂,
+    bool update(const VecX &new_x, const VecG &new_g, const VecXh &new_x̂,
                 const Box &C, real_t γ) {
         s(idx) = new_x /* i+1 */ - x(idx);
         // If the step size γ changed
@@ -206,35 +207,37 @@ class SpecializedLBFGS {
         ρ(idx)         = 1. / ys;
 
         if (!std::isfinite(ys)) {
-            std::cerr << "[LBFGS] "
-                         "\x1b[0;31m"
-                         "Warning: L-BFGS update failed (yᵀs = inf/NaN)"
-                         "\x1b[0m"
-                      << std::endl;
-            return;
+            // std::cerr << "[LBFGS] "
+            //              "\x1b[0;31m"
+            //              "Warning: L-BFGS update failed (yᵀs = inf/NaN)"
+            //              "\x1b[0m"
+            //           << std::endl;
+            return false;
         }
         // TODO: this means it's essentially zero (or denorm)
         else if (norm_sq_s <= std::numeric_limits<real_t>::min()) {
-            std::cerr << "[LBFGS] "
-                         "\x1b[0;31m"
-                         "Warning: L-BFGS update failed (‖s‖² <= ε)"
-                         "\x1b[0m"
-                      << std::endl;
-            return;
+            // std::cerr << "[LBFGS] "
+            //              "\x1b[0;31m"
+            //              "Warning: L-BFGS update failed (‖s‖² <= ε)"
+            //              "\x1b[0m"
+            //           << std::endl;
+            return false;
         }
         // TODO: this means it's essentially zero (or denorm)
         else if (std::abs(ys) <= std::numeric_limits<real_t>::min()) {
-            std::cerr << "[LBFGS] "
-                         "\x1b[0;31m"
-                         "Warning: L-BFGS update failed (yᵀs <= ε)"
-                         "\x1b[0m"
-                      << std::endl;
-            return;
+            // std::cerr << "[LBFGS] "
+            //              "\x1b[0;31m"
+            //              "Warning: L-BFGS update failed (yᵀs <= ε)"
+            //              "\x1b[0m"
+            //           << std::endl;
+            return false;
         }
         // TODO: CBFGS
 
         idx = succ(idx);
         full |= idx == 0;
+
+        return true;
     }
 
     template <class Vec>

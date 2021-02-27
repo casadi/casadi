@@ -63,4 +63,45 @@ struct Problem {
     std::function<grad_g_sig> grad_g;
 };
 
+struct EvalCounter {
+    unsigned f      = 0;
+    unsigned grad_f = 0;
+    unsigned g      = 0;
+    unsigned grad_g = 0;
+
+    void reset() { *this = {}; }
+};
+
+inline EvalCounter &operator+=(EvalCounter &a, EvalCounter b) {
+    a.f += b.f;
+    a.grad_f += b.grad_f;
+    a.g += b.g;
+    a.grad_g += b.grad_g;
+    return a;
+}
+
+inline EvalCounter operator+(EvalCounter a, EvalCounter b) { return a += b; }
+
+class ProblemWithCounters : public Problem {
+  public:
+    ProblemWithCounters(Problem &&p) : Problem(std::move(p)) {
+        attach_counters(*this);
+    }
+    ProblemWithCounters(const Problem &p) : Problem(p) {
+        attach_counters(*this);
+    }
+
+    ProblemWithCounters()                            = delete;
+    ProblemWithCounters(const ProblemWithCounters &) = delete;
+    ProblemWithCounters(ProblemWithCounters &&)      = delete;
+    ProblemWithCounters &operator=(const ProblemWithCounters &) = delete;
+    ProblemWithCounters &operator=(ProblemWithCounters &&) = delete;
+
+  public:
+    EvalCounter evaluations;
+
+  private:
+    static void attach_counters(ProblemWithCounters &);
+};
+
 } // namespace pa

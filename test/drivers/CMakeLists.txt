@@ -211,7 +211,8 @@ if (yaml-cpp_FOUND)
     configure_file(include/drivers/CUTEstProblemList.h.in
                    include/drivers/CUTEstProblemList.h @ONLY)
 
-    set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/CUTEst)
+    set(TESTNAME "baseline")
+    set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}/CUTEst)
     file(MAKE_DIRECTORY ${TESTRESULT_DIR})
     foreach(P ${CUTEst_PROBLEM_LIST})
         cutest_sif_problem(${P})
@@ -225,8 +226,11 @@ if (yaml-cpp_FOUND)
                            COMMAND driver ${P}
                            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                            DEPENDS CUTEst::problem-${P} driver)
-        add_custom_target(cutest-result-${P} DEPENDS ${TESTRESULT_DIR}/${P}.yaml)
-        list(APPEND CUTEst_PROBLEMS_RESULT_TARGETS cutest-result-${P})
+        add_custom_target(cutest-result-${P}-${TESTNAME}
+                          DEPENDS ${TESTRESULT_DIR}/${P}.yaml)
+        list(APPEND CUTEst_PROBLEMS_RESULT_TARGETS 
+                    cutest-result-${P}-${TESTNAME})
     endforeach()
-    add_custom_target(cutest-results DEPENDS ${CUTEst_PROBLEMS_RESULT_TARGETS})
+    add_custom_target(cutest-results-${TESTNAME}
+                      DEPENDS ${CUTEst_PROBLEMS_RESULT_TARGETS})
 endif()

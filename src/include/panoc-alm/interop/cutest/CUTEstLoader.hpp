@@ -86,4 +86,6 @@ class CUTEstProblem {
 /// @related    CUTEstProblem::Report
 std::ostream &operator<<(std::ostream &, const CUTEstProblem::Report &);
 /// @related    CUTEstProblem::Report::Status
+const char *enum_name(CUTEstProblem::Report::Status);
+/// @related    CUTEstProblem::Report::Status
 std::ostream &operator<<(std::ostream &, CUTEstProblem::Report::Status);

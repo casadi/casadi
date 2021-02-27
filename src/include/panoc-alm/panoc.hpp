@@ -1,7 +1,9 @@
 #pragma once
 
 #include "problem.hpp"
+#include "solverstatus.hpp"
 #include <algorithm>
+#include <chrono>
 #include <limits>
 #include <type_traits>
 #include <vector>
@@ -23,6 +25,8 @@ struct PANOCParams {
     unsigned lbfgs_mem = 10;
     /// Maximum number of inner PANOC iterations.
     unsigned max_iter = 100;
+    /// Maximum duration.
+    std::chrono::microseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step.
     real_t τ_min = 1e-12;
 
@@ -39,8 +43,11 @@ class PANOCSolver {
     struct Stats {
         unsigned iterations = 0;
         real_t ε            = std::numeric_limits<real_t>::infinity();
-        bool converged      = false;
-        bool failed         = true;
+        std::chrono::microseconds elapsed_time;
+        SolverStatus status          = SolverStatus::Unknown;
+        unsigned linesearch_failures = 0;
+        unsigned lbfgs_failures      = 0;
+        unsigned lbfgs_rejected      = 0;
     };
 
     PANOCSolver(Params params) : params(params) {}

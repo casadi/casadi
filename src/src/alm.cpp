@@ -1,13 +1,16 @@
-#include "panoc-alm/problem.hpp"
-#include "panoc-alm/vec.hpp"
-#include <Eigen/src/Core/util/Constants.h>
-#include <Eigen/src/Core/util/Meta.h>
 #include <cfenv>
 #include <iomanip>
 #include <iostream>
 #include <panoc-alm/alm.hpp>
+#include <panoc-alm/problem.hpp>
+#include <panoc-alm/solverstatus.hpp>
+#include <panoc-alm/vec.hpp>
 
 namespace pa {
+
+using std::chrono::duration_cast;
+using std::chrono::microseconds;
+
 namespace detail {
 
 void project_y(vec &y,          // inout
@@ -63,6 +66,8 @@ void initialize_penalty(const Problem &p, const ALMParams &params,
 } // namespace detail
 
 ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
+    auto start_time = std::chrono::steady_clock::now();
+
     auto sigNaN   = std::numeric_limits<real_t>::signaling_NaN();
     vec Σ         = vec::Constant(problem.m, sigNaN);
     vec z         = vec::Constant(problem.m, sigNaN);
@@ -131,7 +136,10 @@ ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
         detail::project_y(y, p.D.lowerbound, p.D.upperbound, params.M);
         auto ps = panoc(p, x, z, y, error, Σ, ε);
         s.inner_iterations += ps.iterations;
-        s.inner_convergence_failures += !ps.converged;
+        s.inner_linesearch_failures += ps.linesearch_failures;
+        s.inner_lbfgs_failures += ps.lbfgs_failures;
+        s.inner_lbfgs_rejected += ps.lbfgs_rejected;
+        s.inner_convergence_failures += ps.status != SolverStatus::Converged;
         real_t norm_e = vec_util::norm_inf(error);
 
         std::cout << "[\x1b[0;34mALM\x1b[0m]   " << std::setw(5) << i
@@ -139,25 +147,31 @@ ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
                   << ", δ = " << std::setw(13) << norm_e
                   << ", ε = " << std::setw(13) << ps.ε << "\r\n";
 
+        auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         // TODO: check penalty size?
-        if (ps.failed) {
+        if (ps.status == SolverStatus::NotFinite) {
             s.ε                = ps.ε;
             s.δ                = norm_e;
             s.outer_iterations = i;
-            s.converged        = false;
-            s.failed           = true;
+            s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
+            s.status           = SolverStatus::NotFinite;
             if (params.preconditioning)
                 y = prec_g.asDiagonal() * y / prec_f;
             return s;
         }
 
-        bool converged = ε <= params.ε && ps.converged && norm_e <= params.δ;
-        if (converged || i + 1 == params.max_iter) {
+        bool converged = ε <= params.ε &&
+                         ps.status == SolverStatus::Converged &&
+                         norm_e <= params.δ;
+        bool out_of_time = time_elapsed > params.max_time;
+        if (converged || i + 1 == params.max_iter || out_of_time) {
             s.ε                = ps.ε;
             s.δ                = norm_e;
             s.outer_iterations = i + 1;
-            s.converged        = converged;
-            s.failed           = false;
+            s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
+            s.status           = converged     ? SolverStatus::Converged
+                                 : out_of_time ? SolverStatus::MaxTime
+                                               : SolverStatus::MaxIter;
             if (params.preconditioning)
                 y = prec_g.asDiagonal() * y / prec_f;
             return s;

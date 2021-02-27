@@ -314,14 +314,20 @@ CUTEstProblem::Report CUTEstProblem::get_report() const {
     return r;
 }
 
+const char *enum_name(CUTEstProblem::Report::Status s) {
+    using Status = CUTEstProblem::Report::Status;
+    switch (s) {
+        case Status::Success: return "Success";
+        case Status::AllocationError: return "AllocationError";
+        case Status::ArrayBoundError: return "ArrayBoundError";
+        case Status::EvaluationError: return "EvaluationError";
+    }
+    throw std::out_of_range(
+        "invalid value for pa::CUTEstProblem::Report::Status");
+}
+
 std::ostream &operator<<(std::ostream &os, CUTEstProblem::Report::Status s) {
-    const char *names[]{
-        "Success",
-        "AllocationError",
-        "ArrayBoundError",
-        "EvaluationError",
-    };
-    return os << names[s];
+    return os << enum_name(s);
 }
 
 std::ostream &operator<<(std::ostream &os, const CUTEstProblem::Report &r) {

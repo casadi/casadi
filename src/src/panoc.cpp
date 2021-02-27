@@ -1,16 +1,20 @@
-#include "panoc-alm/box.hpp"
-#include "panoc-alm/vec.hpp"
 #include <cassert>
+#include <chrono>
 #include <cmath>
 
+#include <panoc-alm/box.hpp>
 #include <panoc-alm/lbfgs.hpp>
 #include <panoc-alm/panoc.hpp>
+#include <panoc-alm/vec.hpp>
 
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
 
 namespace pa {
+
+using std::chrono::duration_cast;
+using std::chrono::microseconds;
 
 namespace detail {
 
@@ -156,6 +160,11 @@ PANOCSolver::Stats PANOCSolver::operator()(
     const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
     real_t ε                ///< [in]    Tolerance @f$ \epsilon @f$
 ) {
+    auto start_time              = std::chrono::steady_clock::now();
+    unsigned linesearch_failures = 0;
+    unsigned lbfgs_failures      = 0;
+    unsigned lbfgs_rejected      = 0;
+
     std::cout << std::scientific;
 
     using namespace detail;
@@ -211,12 +220,6 @@ PANOCSolver::Stats PANOCSolver::operator()(
     real_t σₖ                     = γₖ * (1 - γₖ * Lₖ) / 2;
     [[maybe_unused]] real_t old_γ = γₖ;
 
-#ifdef PRINT_DEBUG_COUT
-    std::cout << "[PANOC] "
-                 "Initial step size: γ = "
-              << γₖ << std::endl;
-#endif
-
     // Calculate x̂₀, p₀ (projected gradient step)
     calc_x̂(problem, γₖ, xₖ, grad_ψₖ, // in
            x̂ₖ, pₖ);                  // out
@@ -251,18 +254,6 @@ PANOCSolver::Stats PANOCSolver::operator()(
         slbfgs.initialize(xₖ, grad_ψₖ, x̂ₖ, γₖ);
 
     for (unsigned k = 0; k <= params.max_iter; ++k) {
-#if PRINT_DEBUG_COUT
-        std::cout << "[" << k << "]" << std::endl;
-#endif
-
-        if (k % 100 == 0) {
-            std::cout << "[PANOC] " << std::setw(5) << k
-                      << ": ψ = " << std::setw(13) << ψₖ
-                      << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()
-                      << ", ‖p‖ = " << std::setw(13) << std::sqrt(norm_sq_pₖ)
-                      << ", γ = " << std::setw(13) << γₖ << "\r\n";
-        }
-
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(problem, x̂ₖ, ŷx̂ₖ, // in
                            grad_̂ψₖ,          // out
@@ -270,7 +261,20 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
         // Check stop condition
         real_t εₖ = calc_error_stop_crit(pₖ, γₖ, grad_̂ψₖ, grad_ψₖ);
-        if (εₖ <= ε || k == params.max_iter) {
+
+        // Print progress
+        if (k % 100 == 0) {
+            std::cout << "[PANOC] " << std::setw(6) << k
+                      << ": ψ = " << std::setw(13) << ψₖ
+                      << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()
+                      << ", ‖p‖ = " << std::setw(13) << std::sqrt(norm_sq_pₖ)
+                      << ", γ = " << std::setw(13) << γₖ
+                      << ", εₖ = " << std::setw(13) << εₖ << "\r\n";
+        }
+
+        auto time_elapsed = std::chrono::steady_clock::now() - start_time;
+        bool out_of_time  = time_elapsed > params.max_time;
+        if (εₖ <= ε || k == params.max_iter || out_of_time) {
             // TODO: We could cache g(x) and ẑ, but would that faster?
             //       It saves 1 evaluation of g per ALM iteration, but requires
             //       many extra stores in the inner loops of PANOC.
@@ -280,10 +284,15 @@ PANOCSolver::Stats PANOCSolver::operator()(
             y = std::move(ŷx̂ₖ);
 
             Stats s;
-            s.iterations = k;
-            s.ε          = εₖ;
-            s.converged  = εₖ <= ε;
-            s.failed     = false;
+            s.iterations          = k;
+            s.ε                   = εₖ;
+            s.elapsed_time        = duration_cast<microseconds>(time_elapsed);
+            s.status              = εₖ <= ε       ? SolverStatus::Converged
+                                    : out_of_time ? SolverStatus::MaxTime
+                                                  : SolverStatus::MaxIter;
+            s.lbfgs_failures      = lbfgs_failures;
+            s.lbfgs_rejected      = lbfgs_rejected;
+            s.linesearch_failures = linesearch_failures;
             return s;
         } else if (!std::isfinite(εₖ)) {
             std::cerr << "[PANOC] "
@@ -302,9 +311,13 @@ PANOCSolver::Stats PANOCSolver::operator()(
             std::cout << "∇ψₖ:  " << grad_ψₖ.transpose() << std::endl;
 
             Stats s;
-            s.iterations = k;
-            s.converged  = false;
-            s.failed     = true;
+            s.iterations          = k;
+            s.ε                   = εₖ;
+            s.elapsed_time        = duration_cast<microseconds>(time_elapsed);
+            s.status              = SolverStatus::NotFinite;
+            s.lbfgs_failures      = lbfgs_failures;
+            s.lbfgs_rejected      = lbfgs_rejected;
+            s.linesearch_failures = linesearch_failures;
             return s;
         }
 
@@ -374,6 +387,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
                          "\x1b[0m"
                       << std::endl;
             τ = 0;
+            ++lbfgs_failures;
         }
         do {
             Lₖ₊₁  = Lₖ;
@@ -441,18 +455,20 @@ PANOCSolver::Stats PANOCSolver::operator()(
 #endif
 
         if (τ < params.τ_min && k != 0) {
-            std::cerr << "[PANOC] "
-                         "\x1b[0;31m"
-                         "Warning: Line search failed"
-                         "\x1b[0m"
-                      << std::endl;
+            // std::cerr << "[PANOC] "
+            //              "\x1b[0;31m"
+            //              "Warning: Line search failed"
+            //              "\x1b[0m"
+            //           << std::endl;
+            ++linesearch_failures;
         }
 
         // Update L-BFGS
         if (params.experimental.specialized_lbfgs)
-            slbfgs.update(xₖ₊₁, grad_ψₖ₊₁, x̂ₖ₊₁, problem.C, γₖ₊₁);
+            lbfgs_rejected +=
+                !slbfgs.update(xₖ₊₁, grad_ψₖ₊₁, x̂ₖ₊₁, problem.C, γₖ₊₁);
         else
-            lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
+            lbfgs_rejected += !lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
 
         // Advance step
         Lₖ = Lₖ₊₁;

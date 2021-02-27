@@ -6,6 +6,8 @@ add_library(panoc-alm SHARED
     "src/box.cpp"
     "src/lbfgs.cpp"
     "src/alm.cpp"
+    "src/problem.cpp"
+    "src/solverstatus.cpp"
 )
 add_library(panoc-alm::panoc-alm ALIAS panoc-alm)
 set_target_properties(panoc-alm PROPERTIES EXPORT_NAME panoc-alm::panoc-alm)

@@ -1,0 +1,24 @@
+#include <panoc-alm/solverstatus.hpp>
+
+#include <ostream>
+#include <stdexcept>
+
+namespace pa {
+
+const char *enum_name(SolverStatus s) {
+    using Status = SolverStatus;
+    switch (s) {
+        case Status::Unknown: return "Unknown";
+        case Status::Converged: return "Converged";
+        case Status::MaxTime: return "MaxTime";
+        case Status::MaxIter: return "MaxIter";
+        case Status::NotFinite: return "NotFinite";
+    }
+    throw std::out_of_range("invalid value for pa::SolverStatus");
+}
+
+std::ostream &operator<<(std::ostream &os, SolverStatus s) {
+    return os << enum_name(s);
+}
+
+} // namespace pa
