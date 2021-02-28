@@ -262,11 +262,8 @@ public:
 
   /** @name Register an existing variable */
   ///@{
-  /// Register differential state
-  void register_x(const MX& new_x);
-
-  /// Register algebraic variable
-  void register_z(const MX& new_z);
+  /// Register time variable
+  void register_t(const MX& new_t);
 
   /// Register constant
   void register_c(const MX& new_c, const MX& new_cdef);
@@ -276,6 +273,12 @@ public:
 
   /// Register dependent variable
   void register_w(const MX& new_w, const MX& new_wdef);
+
+  /// Register differential state
+  void register_x(const MX& new_x);
+
+  /// Register algebraic variable
+  void register_z(const MX& new_z);
 
   /// Register output variable
   void register_y(const MX& new_y, const MX& new_ydef);
