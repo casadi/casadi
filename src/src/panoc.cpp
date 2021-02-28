@@ -263,7 +263,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         real_t εₖ = calc_error_stop_crit(pₖ, γₖ, grad_̂ψₖ, grad_ψₖ);
 
         // Print progress
-        if (params.print_interval != 0  && k % params.print_interval == 0) {
+        if (params.print_interval != 0 && k % params.print_interval == 0) {
             std::cout << "[PANOC] " << std::setw(6) << k
                       << ": ψ = " << std::setw(13) << ψₖ
                       << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()
@@ -379,8 +379,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
         if (k == 0)
             τ = 0;
         if (qₖ.hasNaN()) {
-            lbfgs.reset();
-            slbfgs.reset();
+            params.experimental.specialized_lbfgs ? slbfgs.reset()
+                                                  : lbfgs.reset();
             std::cerr << "[PANOC] "
                          "\x1b[0;34m"
                          "Newton step NaN"
