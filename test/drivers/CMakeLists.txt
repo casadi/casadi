@@ -1,5 +1,5 @@
 find_package(yaml-cpp)
-if (yaml-cpp_FOUND)
+if (yaml-cpp_FOUND AND CUTEst_FOUND)
     add_library(yaml-encoder src/YAMLEncoder.cpp)
     target_include_directories(yaml-encoder
         PUBLIC
