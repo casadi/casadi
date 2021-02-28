@@ -37,30 +37,6 @@ class XmlNode;
 class DaeBuilder;
 
 #ifndef SWIG
-/// Helper class: Specify number of entries in an enum
-template<typename T>
-struct enum_traits {};
-
-// Helper function: Convert string to enum
-template<typename T>
-T to_enum(const std::string& s) {
-  // Linear search over permitted values
-  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
-    if (s == to_string(static_cast<T>(i))) return static_cast<T>(i);
-  }
-  // Informative error message
-  std::stringstream ss;
-  ss << "No such enum: '" << s << "'. Permitted values: ";
-  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
-    // Separate strings
-    if (i > 0) ss << ", ";
-    // Print enum name
-    ss << "'" << to_string(static_cast<T>(i)) << "'";
-  }
-  casadi_error(ss.str());
-  return enum_traits<T>::n_enum;  // never reached
-}
-
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
@@ -132,30 +108,6 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   static Initial default_initial(Causality causality, Variability variability);
 };
 
-///@{
-/// Number of entries in enums
-template<> struct enum_traits<Variable::Type> {
-  static const Variable::Type n_enum = Variable::N_TYPE;
-};
-template<> struct enum_traits<Variable::Causality> {
-  static const Variable::Causality n_enum = Variable::N_CAUSALITY;
-};
-template<> struct enum_traits<Variable::Variability> {
-  static const Variable::Variability n_enum = Variable::N_VARIABILITY;
-};
-template<> struct enum_traits<Variable::Initial> {
-  static const Variable::Initial n_enum = Variable::N_INITIAL;
-};
-///@}
-
-///@{
-/// Convert to string
-CASADI_EXPORT std::string to_string(Variable::Type v);
-CASADI_EXPORT std::string to_string(Variable::Causality v);
-CASADI_EXPORT std::string to_string(Variable::Variability v);
-CASADI_EXPORT std::string to_string(Variable::Initial v);
-///@}
-
 #endif  // SWIG
 
 /** \brief An initial-value problem in differential-algebraic equations
@@ -167,22 +119,23 @@ CASADI_EXPORT std::string to_string(Variable::Initial v);
     <H3>Variables:  </H3>
     \verbatim
     x:      differential states
-    s:      implicitly defined states
     z:      algebraic variables
     u:      control signals
     q:      quadrature states
     p:      free parameters
-    v:      dependent variables
+    d:      dependent parameters
+    w:      dependent variables
     y:      outputs
     \endverbatim
 
     <H3>Dynamic constraints (imposed everywhere):  </H3>
     \verbatim
-    ODE                    \dot{x} ==  ode(t, x, z, u, p, v)
-    algebraic equations:         0 ==  alg(t, x, z, u, p, v)
-    quadrature equations:  \dot{q} == quad(t, x, z, u, p, v)
-    dependent parameters:        d == ddef(t, x, z, u, p, v)
-    output equations:            y == ydef(t, x, z, u, p, v)
+    ODE                    \dot{x} ==  ode(t, x, z, u, p, w, d)
+    algebraic equations:         0 ==  alg(t, x, z, u, p, w, d)
+    quadrature equations:  \dot{q} == quad(t, x, z, u, p, w, d)
+    dependent parameters:        d == ddef(t, x, z, u, p, w, d)
+    dependent parameters:        w == wdef(t, x, z, u, p, w, d)
+    output equations:            y == ydef(t, x, z, u, p, w, d)
     \endverbatim
 
     <H3>Point constraints (imposed pointwise):  </H3>
@@ -244,7 +197,13 @@ public:
   /** \brief Dependent parameters and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  std::vector<MX> v, vdef, lam_vdef;
+  std::vector<MX> d, ddef, lam_ddef;
+  ///@}
+
+  /** \brief Dependent variables and corresponding definitions
+   * Interdependencies are allowed but must be non-cyclic.
+   */
+  std::vector<MX> w, wdef, lam_wdef;
   ///@}
 
   /** \brief Auxiliary variables: Used e.g. to define functions */
@@ -277,7 +236,10 @@ public:
   MX add_q(const std::string& name=std::string(), casadi_int n=1);
 
   /// Add a new dependent parameter
-  MX add_v(const std::string& name, const MX& new_vdef);
+  MX add_d(const std::string& name, const MX& new_ddef);
+
+  /// Add a new dependent variable
+  MX add_w(const std::string& name, const MX& new_wdef);
 
   /// Add a new output
   MX add_y(const std::string& name, const MX& new_ydef);
@@ -306,8 +268,11 @@ public:
   /// Register algebraic variable
   void register_z(const MX& new_z);
 
+  /// Register dependent parameter
+  void register_d(const MX& new_d, const MX& new_ddef);
+
   /// Register dependent variable
-  void register_v(const MX& new_v, const MX& new_vdef);
+  void register_w(const MX& new_w, const MX& new_wdef);
 
   /// Register output variable
   void register_y(const MX& new_y, const MX& new_ydef);
@@ -361,7 +326,8 @@ public:
     DAE_BUILDER_T,
     DAE_BUILDER_C,
     DAE_BUILDER_P,
-    DAE_BUILDER_V,
+    DAE_BUILDER_D,
+    DAE_BUILDER_W,
     DAE_BUILDER_U,
     DAE_BUILDER_X,
     DAE_BUILDER_Z,
@@ -372,37 +338,14 @@ public:
 
   // Output convension in codegen
   enum DaeBuilderOut {
-    DAE_BUILDER_VDEF,
+    DAE_BUILDER_DDEF,
+    DAE_BUILDER_WDEF,
     DAE_BUILDER_ODE,
     DAE_BUILDER_ALG,
     DAE_BUILDER_QUAD,
     DAE_BUILDER_YDEF,
     DAE_BUILDER_NUM_OUT
   };
-
-  // Get string representation for input, given enum
-  static std::string name_in(DaeBuilderIn ind);
-
-  // Get string representation for all inputs
-  static std::string name_in();
-
-  // Get enum representation for input, given string
-  static DaeBuilderIn enum_in(const std::string& id);
-
-  // Get enum representation for input, given vector of strings
-  static std::vector<DaeBuilderIn> enum_in(const std::vector<std::string>& id);
-
-  // Get string representation for output, given enum
-  static std::string name_out(DaeBuilderOut ind);
-
-  // Get string representation for all outputs
-  static std::string name_out();
-
-  // Get enum representation for output, given string
-  static DaeBuilderOut enum_out(const std::string& id);
-
-  // Get enum representation for output, given vector of strings
-  static std::vector<DaeBuilderOut> enum_out(const std::vector<std::string>& id);
 
   // Get input expression, given enum
   std::vector<MX> input(DaeBuilderIn ind) const;
@@ -640,6 +583,66 @@ protected:
 
 #endif // SWIG
 };
+
+#ifndef SWIG
+
+/// Helper class: Specify number of entries in an enum
+template<typename T>
+struct enum_traits {};
+
+// Helper function: Convert string to enum
+template<typename T>
+T to_enum(const std::string& s) {
+  // Linear search over permitted values
+  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
+    if (s == to_string(static_cast<T>(i))) return static_cast<T>(i);
+  }
+  // Informative error message
+  std::stringstream ss;
+  ss << "No such enum: '" << s << "'. Permitted values: ";
+  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
+    // Separate strings
+    if (i > 0) ss << ", ";
+    // Print enum name
+    ss << "'" << to_string(static_cast<T>(i)) << "'";
+  }
+  casadi_error(ss.str());
+  return enum_traits<T>::n_enum;  // never reached
+}
+
+///@{
+/// Number of entries in enums
+template<> struct enum_traits<Variable::Type> {
+  static const Variable::Type n_enum = Variable::N_TYPE;
+};
+template<> struct enum_traits<Variable::Causality> {
+  static const Variable::Causality n_enum = Variable::N_CAUSALITY;
+};
+template<> struct enum_traits<Variable::Variability> {
+  static const Variable::Variability n_enum = Variable::N_VARIABILITY;
+};
+template<> struct enum_traits<Variable::Initial> {
+  static const Variable::Initial n_enum = Variable::N_INITIAL;
+};
+template<> struct enum_traits<DaeBuilder::DaeBuilderIn> {
+  static const DaeBuilder::DaeBuilderIn n_enum = DaeBuilder::DAE_BUILDER_NUM_IN;
+};
+template<> struct enum_traits<DaeBuilder::DaeBuilderOut> {
+  static const DaeBuilder::DaeBuilderOut n_enum = DaeBuilder::DAE_BUILDER_NUM_OUT;
+};
+///@}
+
+///@{
+/// Convert to string
+CASADI_EXPORT std::string to_string(Variable::Type v);
+CASADI_EXPORT std::string to_string(Variable::Causality v);
+CASADI_EXPORT std::string to_string(Variable::Variability v);
+CASADI_EXPORT std::string to_string(Variable::Initial v);
+CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderIn v);
+CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderOut v);
+///@}
+
+#endif  // SWIG
 
 } // namespace casadi
 
