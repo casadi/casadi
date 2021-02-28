@@ -268,6 +268,9 @@ public:
   /// Register algebraic variable
   void register_z(const MX& new_z);
 
+  /// Register constant
+  void register_c(const MX& new_c, const MX& new_cdef);
+
   /// Register dependent parameter
   void register_d(const MX& new_d, const MX& new_ddef);
 

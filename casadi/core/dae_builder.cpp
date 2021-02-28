@@ -552,6 +552,15 @@ void DaeBuilder::register_z(const MX& new_z) {
   this->z.push_back(new_z);
 }
 
+void DaeBuilder::register_c(const MX& new_c, const MX& new_cdef) {
+  // Consistency check
+  casadi_assert(new_c.sparsity() == new_cdef.sparsity(), "Mismatching sparsity");
+  casadi_assert(has_variable(new_c.name()), "No such variable: " + new_c.name());
+  // Add to lists
+  this->c.push_back(new_c);
+  this->cdef.push_back(new_cdef);
+}
+
 void DaeBuilder::register_d(const MX& new_d, const MX& new_ddef) {
   // Consistency checks
   casadi_assert(new_d.sparsity() == new_ddef.sparsity(), "Mismatching sparsity");
