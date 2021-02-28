@@ -280,6 +280,12 @@ public:
   /// Register algebraic variable
   void register_z(const MX& new_z);
 
+  /// Register input
+  void register_u(const MX& new_u);
+
+  /// Register free parameter
+  void register_p(const MX& new_p);
+
   /// Register output variable
   void register_y(const MX& new_y, const MX& new_ydef);
   ///@}
