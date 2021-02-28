@@ -211,7 +211,7 @@ if (yaml-cpp_FOUND)
     configure_file(include/drivers/CUTEstProblemList.h.in
                    include/drivers/CUTEstProblemList.h @ONLY)
 
-    set(TESTNAME "linesearch-lipschitz")
+    set(TESTNAME "special-lbfgs")
     set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}/CUTEst)
     file(MAKE_DIRECTORY ${TESTRESULT_DIR})
     foreach(P ${CUTEst_PROBLEM_LIST})
@@ -233,4 +233,9 @@ if (yaml-cpp_FOUND)
     endforeach()
     add_custom_target(cutest-results-${TESTNAME}
                       DEPENDS ${CUTEst_PROBLEMS_RESULT_TARGETS})
+    add_custom_target(cutest-results-${TESTNAME}-export
+        COMMAND ${CMAKE_COMMAND} -E copy_directory 
+            ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}
+            ${CMAKE_CURRENT_LIST_DIR}/../testresults/${TESTNAME}
+        DEPENDS cutest-results-${TESTNAME})
 endif()
