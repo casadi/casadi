@@ -211,21 +211,21 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     configure_file(include/drivers/CUTEstProblemList.h.in
                    include/drivers/CUTEstProblemList.h @ONLY)
 
-    set(TESTNAME "special-lbfgs")
+    set(TESTNAME "baseline")
     set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}/CUTEst)
     file(MAKE_DIRECTORY ${TESTRESULT_DIR})
     foreach(P ${CUTEst_PROBLEM_LIST})
         cutest_sif_problem(${P})
     endforeach()
 
-    add_executable(driver src/driver.cpp)
-    target_link_libraries(driver PRIVATE yaml-encoder)
+    add_executable(cutest-driver src/driver.cpp)
+    target_link_libraries(cutest-driver PRIVATE yaml-encoder)
 
     foreach(P ${CUTEst_PROBLEM_LIST})
         add_custom_command(OUTPUT ${TESTRESULT_DIR}/${P}.yaml
-                           COMMAND driver ${P} ${TESTRESULT_DIR}
+                           COMMAND cutest-driver ${P} ${TESTRESULT_DIR}
                            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                           DEPENDS CUTEst::problem-${P} driver)
+                           DEPENDS CUTEst::problem-${P} cutest-driver)
         add_custom_target(cutest-result-${P}-${TESTNAME}
                           DEPENDS ${TESTRESULT_DIR}/${P}.yaml)
         list(APPEND CUTEst_PROBLEMS_RESULT_TARGETS 
@@ -233,9 +233,11 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     endforeach()
     add_custom_target(cutest-results-${TESTNAME}
                       DEPENDS ${CUTEst_PROBLEMS_RESULT_TARGETS})
+    cmake_host_system_information(RESULT HOSTNAME QUERY HOSTNAME)
+    message("${HOSTNAME}")
     add_custom_target(cutest-results-${TESTNAME}-export
         COMMAND ${CMAKE_COMMAND} -E copy_directory 
             ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}
-            ${CMAKE_CURRENT_LIST_DIR}/../testresults/${TESTNAME}
+            ${CMAKE_CURRENT_LIST_DIR}/../testresults/${HOSTNAME}/${TESTNAME}
         DEPENDS cutest-results-${TESTNAME})
 endif()
