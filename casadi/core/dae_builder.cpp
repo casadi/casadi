@@ -538,6 +538,20 @@ MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
   return new_x;
 }
 
+void DaeBuilder::register_p(const MX& new_p) {
+  // Consistency checks
+  casadi_assert(has_variable(new_p.name()), "No such variable: " + new_p.name());
+  // Add to list
+  this->p.push_back(new_p);
+}
+
+void DaeBuilder::register_u(const MX& new_u) {
+  // Consistency checks
+  casadi_assert(has_variable(new_u.name()), "No such variable: " + new_u.name());
+  // Add to list
+  this->u.push_back(new_u);
+}
+
 void DaeBuilder::register_x(const MX& new_x) {
   // Consistency checks
   casadi_assert(has_variable(new_x.name()), "No such variable: " + new_x.name());
