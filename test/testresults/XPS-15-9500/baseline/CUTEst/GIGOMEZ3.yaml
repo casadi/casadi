@@ -1,0 +1,33 @@
+status: NotFinite
+outer iterations: 3
+inner iterations: 141
+inner convergence failures: 1
+elapsed time: 0.0016260000000000001
+ε: .inf
+δ: 0.28858046145421035
+f: 1.9982204672363393
+counters:
+  f: 2188
+  grad_f: 1241
+  g: 2195
+  grad_g: 1241
+linesearch failures: 24
+L-BFGS failures: 0
+L-BFGS rejected: 3
+x: [1.0015371852346067, 0.9982538998378917, 1.9982204672363393]
+y: [-0.33307341112511157, -0.49987901864485762, -0.17029184741273459]
+---
+GIGOMEZ3:
+  nvar: 3
+  ncon: 3
+  status: Success
+  calls:
+    objective: 5624
+    objective_grad: 1241
+    objective_hess: 0
+    hessian_times_vector: 0
+    constraints: 4383
+    constraints_grad: 1241
+    constraints_hess: 0
+  time_setup: 6.6999928094446659e-05
+  time: 0.0016490000998601317

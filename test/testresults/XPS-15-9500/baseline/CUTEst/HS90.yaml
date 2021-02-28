@@ -1,0 +1,33 @@
+status: MaxIter
+outer iterations: 1000
+inner iterations: 2035
+inner convergence failures: 2
+elapsed time: 8.3434880000000007
+ε: 9.8754536882502648e-309
+δ: 0.13323333333333334
+f: 0
+counters:
+  f: 47369
+  grad_f: 27718
+  g: 49369
+  grad_g: 27718
+linesearch failures: 474
+L-BFGS failures: 0
+L-BFGS rejected: 0
+x: [0, -1.4821969375237396e-323, 0, 3.6066792146410998e-322]
+y: [-133234333333333.34]
+---
+HS90:
+  nvar: 4
+  ncon: 1
+  status: Success
+  calls:
+    objective: 124456
+    objective_grad: 27718
+    objective_hess: 0
+    hessian_times_vector: 0
+    constraints: 96738
+    constraints_grad: 27718
+    constraints_hess: 0
+  time_setup: 6.5000029280781746e-05
+  time: 8.3355569839477539
