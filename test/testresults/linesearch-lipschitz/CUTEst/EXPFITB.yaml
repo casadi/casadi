@@ -1,0 +1,33 @@
+status: Converged
+outer iterations: 8
+inner iterations: 1171
+inner convergence failures: 0
+elapsed time: 0.068215999999999999
+ε: 4.3862494322130358e-06
+δ: 5.9921455708433768e-07
+f: 0.0050193698613642526
+counters:
+  f: 2701
+  grad_f: 2482
+  g: 2717
+  grad_g: 2482
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+x: [12.299265573734615, 6.8208975934487395, 4.0803762186491008, -0.58358972662552344, 0.32202409994238557]
+y: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.01273136188258041, 0, -0.0038384384176558925, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.0051975367592298483, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.00076839868339106943, 0]
+---
+EXPFITB:
+  nvar: 5
+  ncon: 102
+  status: Success
+  calls:
+    objective: 7900
+    objective_grad: 2482
+    objective_hess: 0
+    hessian_times_vector: 0
+    constraints: 5418
+    constraints_grad: 2482
+    constraints_hess: 0
+  time_setup: 0.00061800004914402962
+  time: 0.043377000838518143

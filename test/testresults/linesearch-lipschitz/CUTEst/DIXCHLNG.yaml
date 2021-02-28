@@ -1,0 +1,33 @@
+status: Converged
+outer iterations: 10
+inner iterations: 531
+inner convergence failures: 0
+elapsed time: 0.016116999999999999
+ε: 6.0211089674364073e-06
+δ: 7.1185246112159817e-06
+f: 8.2752471996666558e-08
+counters:
+  f: 1145
+  grad_f: 1097
+  g: 1165
+  grad_g: 1097
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+x: [1.0000018041320224, 1.0000006702342317, 0.9999968876444798, 0.99999829673136387, 1.0000045410366201, 1.0000036869097548, 0.99999520503444128, 0.99999178979759074, 1.0000007189509923, 1.0000070461551989]
+y: [-0.005493262284860561, 0.011481134579513701, -0.012951304742799563, 0.0067716707450705587, -0.00098641038144543476]
+---
+DIXCHLNG:
+  nvar: 10
+  ncon: 5
+  status: Success
+  calls:
+    objective: 3407
+    objective_grad: 1097
+    objective_hess: 0
+    hessian_times_vector: 0
+    constraints: 2310
+    constraints_grad: 1097
+    constraints_hess: 0
+  time_setup: 0.00036299997009336948
+  time: 0.0088659999892115593

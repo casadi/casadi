@@ -1,0 +1,33 @@
+status: Converged
+outer iterations: 13
+inner iterations: 200
+inner convergence failures: 0
+elapsed time: 0.0027309999999999999
+ε: 1.5670276866518853e-07
+δ: 4.4995568079242432e-06
+f: 33.258885865112795
+counters:
+  f: 531
+  grad_f: 464
+  g: 557
+  grad_g: 464
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 1
+x: [-0.0021212158796156968, 1, 0.2521224952043048, 2]
+y: [4420.206653439157, 0, 0, -7.4218990091889658]
+---
+ALLINITA:
+  nvar: 4
+  ncon: 4
+  status: Success
+  calls:
+    objective: 1552
+    objective_grad: 464
+    objective_hess: 0
+    hessian_times_vector: 0
+    constraints: 1088
+    constraints_grad: 464
+    constraints_hess: 0
+  time_setup: 0.0001680001150816679
+  time: 0.0017540000844746828

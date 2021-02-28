@@ -1,0 +1,33 @@
+status: NotFinite
+outer iterations: 2
+inner iterations: 204
+inner convergence failures: 1
+elapsed time: 0.0026489999999999999
+ε: .nan
+δ: 0.21131767160554116
+f: 0
+counters:
+  f: 1252
+  grad_f: 675
+  g: 1257
+  grad_g: 675
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+x: [0.12934231823715858, 30.896280607383968, 5.6903332730259972]
+y: [-1.925648949062432, 1.4523399482092674, -0.5101938089508663]
+---
+PFIT3:
+  nvar: 3
+  ncon: 3
+  status: Success
+  calls:
+    objective: 3184
+    objective_grad: 675
+    objective_hess: 0
+    hessian_times_vector: 0
+    constraints: 2509
+    constraints_grad: 675
+    constraints_hess: 0
+  time_setup: 8.2000158727169037e-05
+  time: 0.0016719999257475138

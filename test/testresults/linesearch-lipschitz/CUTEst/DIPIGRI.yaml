@@ -1,0 +1,33 @@
+status: Converged
+outer iterations: 7
+inner iterations: 862
+inner convergence failures: 0
+elapsed time: 0.0083960000000000007
+ε: 0
+δ: 5.4287106598938095e-07
+f: 680.63005723403182
+counters:
+  f: 1933
+  grad_f: 1789
+  g: 1947
+  grad_g: 1789
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 12
+x: [2.3304992513542224, 1.9513730804693372, -0.47753828838289641, 4.3657246221645201, -0.62448866680602011, 1.0381292826454378, 1.5942250928938748]
+y: [1.1397205221450406, 0, 0, 0.3686140831309665]
+---
+DIPIGRI:
+  nvar: 7
+  ncon: 4
+  status: Success
+  calls:
+    objective: 5669
+    objective_grad: 1789
+    objective_hess: 0
+    hessian_times_vector: 0
+    constraints: 3880
+    constraints_grad: 1789
+    constraints_hess: 0
+  time_setup: 0.00013699987903237343
+  time: 0.0041180001571774483
