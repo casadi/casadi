@@ -15,8 +15,8 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     # almparams.preconditioning = true;
     # pa::PANOCParams panocparams;
     # panocparams.max_iter = 1000;
-    # panocparams.experimental.specialized_lbfgs = true;
-    # panocparams.experimental.update_lipschitz_in_linesearch = true;
+    # panocparams.specialized_lbfgs = true;
+    # panocparams.update_lipschitz_in_linesearch = true;
     set(CUTEst_PROBLEM_LIST
         "ROSENBR"
         "HS111LNP"
@@ -211,7 +211,7 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     configure_file(include/drivers/CUTEstProblemList.h.in
                    include/drivers/CUTEstProblemList.h @ONLY)
 
-    set(TESTNAME "baseline")
+    set(TESTNAME "lipschitz-linesearch-new")
     set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}/CUTEst)
     file(MAKE_DIRECTORY ${TESTRESULT_DIR})
     foreach(P ${CUTEst_PROBLEM_LIST})
@@ -234,7 +234,6 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     add_custom_target(cutest-results-${TESTNAME}
                       DEPENDS ${CUTEst_PROBLEMS_RESULT_TARGETS})
     cmake_host_system_information(RESULT HOSTNAME QUERY HOSTNAME)
-    message("${HOSTNAME}")
     add_custom_target(cutest-results-${TESTNAME}-export
         COMMAND ${CMAKE_COMMAND} -E copy_directory 
             ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}

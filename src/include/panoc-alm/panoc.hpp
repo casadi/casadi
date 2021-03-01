@@ -32,10 +32,8 @@ struct PANOCParams {
 
     unsigned print_interval = 0;
 
-    struct {
-        bool update_lipschitz_in_linesearch = true;
-        bool specialized_lbfgs              = true;
-    } experimental;
+    bool update_lipschitz_in_linesearch = true;
+    bool specialized_lbfgs              = true;
 };
 
 class PANOCSolver {

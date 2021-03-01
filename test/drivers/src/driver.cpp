@@ -26,9 +26,9 @@ int main(int argc, char *argv[]) {
     almparams.max_time        = 2min + 30s;
     almparams.preconditioning = false;
     pa::PANOCParams panocparams;
-    panocparams.max_iter                                    = 1000;
-    panocparams.experimental.specialized_lbfgs              = false;
-    panocparams.experimental.update_lipschitz_in_linesearch = false;
+    panocparams.max_iter                       = 1000;
+    panocparams.specialized_lbfgs              = false;
+    panocparams.update_lipschitz_in_linesearch = true;
 
     pa::ALMSolver solver(almparams, panocparams);
 
