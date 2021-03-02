@@ -1,0 +1,19 @@
+status: MaxIter
+outer iterations: 200
+inner iterations: 198000
+inner convergence failures: 198
+elapsed time: 12.954245999999999
+ε: 16950.640433923065
+δ: 3.2713144801454867e-06
+f: 8.1325930983001467
+counters:
+  f: 398719
+  grad_f: 397485
+  g: 399119
+  grad_g: 397485
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+‖Σ‖: 17831655801901.309
+‖x‖: 2851.3779379262382
+‖y‖: 52822106.152301282

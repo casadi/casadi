@@ -1,0 +1,19 @@
+status: NotFinite
+outer iterations: 15
+inner iterations: 10798
+inner convergence failures: 11
+elapsed time: 1.381038
+ε: .nan
+δ: 0.18413869149507334
+f: 0
+counters:
+  f: 63926
+  grad_f: 42516
+  g: 63957
+  grad_g: 42516
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 2836
+‖Σ‖: 960674592.80743253
+‖x‖: 1899.173381048349
+‖y‖: 28711283.913588688
