@@ -140,8 +140,16 @@ bool calc_x̂(const Problem &prob, ///< [in]  Problem description
             vec &x̂, ///< [out] @f$ \hat{x}^k = T_{\gamma^k}(x^k) @f$
             vec &p  ///< [out] @f$ \hat{x}^k - x^k @f$
 ) {
-    x̂ = project(x - γ * grad_ψ, prob.C);
-    p = x̂ - x;
+    using binary_real_f = real_t (*)(real_t, real_t);
+    if (0) { // Naive
+        x̂ = project(x - γ * grad_ψ, prob.C);
+        p = x̂ - x; // catastrophic cancellation if step is small or x is large
+    } else {
+        p = (-γ * grad_ψ)
+                .binaryExpr(prob.C.lowerbound - x, binary_real_f(std::fmax))
+                .binaryExpr(prob.C.upperbound - x, binary_real_f(std::fmin));
+        x̂ = x + p;
+    }
 
     // TODO: verify and optimize (‖p‖² is needed later)
     // TODO: don't do this on every iteration
@@ -154,14 +162,9 @@ bool calc_x̂(const Problem &prob, ///< [in]  Problem description
 real_t calc_error_stop_crit(const vec &pₖ, real_t γ, const vec &grad_̂ψₖ,
                             const vec &grad_ψₖ) {
     auto err = (1 / γ) * pₖ + (grad_̂ψₖ - grad_ψₖ);
-    auto ε   = vec_util::norm_inf(err);
-    // if (ε == 0) {
-    //     std::cout << "grad_ψₖ: " << grad_ψₖ.transpose() << std::endl;
-    //     std::cout << "grad_̂ψₖ: " << grad_̂ψₖ.transpose() << std::endl;
-    //     std::cout << "pₖ:      " << pₖ.transpose() << std::endl;
-    //     std::cout << "pₖ / γ:  " << (1 / γ) * pₖ.transpose() << std::endl;
-    //     std::cout << "γ:       " << γ << std::endl;
-    // }
+    // These parentheses     ^^^               ^^^
+    // are important to prevent catastrophic cancellation when the step is small
+    auto ε = vec_util::norm_inf(err);
     return ε;
 }
 
@@ -297,6 +300,35 @@ PANOCSolver::Stats PANOCSolver::operator()(
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         bool out_of_time  = time_elapsed > params.max_time;
         if (εₖ <= ε || k == params.max_iter || out_of_time) {
+            if (params.print_interval > 0) {
+                const Eigen::IOFormat fmt(16, 0, "\t", " ", "", "", "", "");
+                std::cout << "∇ψₖ:       " << grad_ψₖ.transpose().format(fmt)
+                          << std::endl;
+                std::cout << "∇̂ψₖ:       " << grad_̂ψₖ.transpose().format(fmt)
+                          << std::endl;
+                std::cout << "∇̂ψₖ - ∇ψₖ: "
+                          << (grad_̂ψₖ - grad_ψₖ).transpose().format(fmt)
+                          << std::endl;
+                std::cout << "p/γ:       " << (pₖ / γₖ).transpose().format(fmt)
+                          << std::endl;
+                std::cout << "p:         " << pₖ.transpose().format(fmt)
+                          << std::endl;
+                std::cout << "γ·∇ψₖ:     "
+                          << (γₖ * grad_ψₖ.transpose()).format(fmt)
+                          << std::endl;
+                std::cout << "xl:        "
+                          << problem.C.lowerbound.transpose().format(fmt)
+                          << std::endl;
+                std::cout << "x:         " << xₖ.transpose().format(fmt)
+                          << std::endl;
+                std::cout << "xu:        "
+                          << problem.C.upperbound.transpose().format(fmt)
+                          << std::endl;
+                std::cout << "x̂:         " << x̂ₖ.transpose().format(fmt)
+                          << std::endl;
+                std::cout << "γ:         " << γₖ << std::endl;
+            }
+
             // TODO: We could cache g(x) and ẑ, but would that faster?
             //       It saves 1 evaluation of g per ALM iteration, but requires
             //       many extra stores in the inner loops of PANOC.
