@@ -212,11 +212,8 @@ public:
   /** \brief Auxiliary variables: Used e.g. to define functions */
   std::vector<MX> aux;
 
-  /** \brief Initial conditions
-   * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to
-   * the ode and/or dae.
-   */
-  std::vector<MX> init;
+  /** \brief Initial conditions */
+  std::vector<MX> init_lhs, init_rhs;
   ///@}
 
   /** @name Symbolic modeling
@@ -258,6 +255,9 @@ public:
 
   /// Add an auxiliary variable
   MX add_aux(const std::string& name=std::string(), casadi_int n=1);
+
+  /// Add an initial equation
+  void add_init(const MX& lhs, const MX& rhs);
 
   /// Check if dimensions match
   void sanity_check() const;
