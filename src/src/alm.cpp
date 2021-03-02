@@ -151,9 +151,11 @@ ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         // TODO: check penalty size?
-        if (ps.status == SolverStatus::NotFinite) {
+        if (ps.status == SolverStatus::NotFinite ||
+            ps.status == SolverStatus::Interrupted) {
             s.ε                = ps.ε;
             s.δ                = norm_e;
+            s.norm_penalty     = Σ.norm();
             s.outer_iterations = i;
             s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
             s.status           = ps.status;
@@ -169,6 +171,7 @@ ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
         if (converged || i + 1 == params.max_iter || out_of_time) {
             s.ε                = ps.ε;
             s.δ                = norm_e;
+            s.norm_penalty     = Σ.norm();
             s.outer_iterations = i + 1;
             s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
             s.status           = converged     ? SolverStatus::Converged

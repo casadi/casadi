@@ -1,3 +1,4 @@
+#include <atomic>
 #include <cassert>
 #include <chrono>
 #include <cmath>
@@ -364,6 +365,16 @@ PANOCSolver::Stats PANOCSolver::operator()(
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<microseconds>(time_elapsed);
             s.status       = SolverStatus::NotFinite;
+            return s;
+        } else if (stop_signal.load(std::memory_order_relaxed)) {
+            calc_ẑ(problem, x̂ₖ, y, Σ, z, err_z);
+            x = std::move(x̂ₖ);
+            y = std::move(ŷx̂ₖ);
+
+            s.iterations   = k;
+            s.ε            = εₖ;
+            s.elapsed_time = duration_cast<microseconds>(time_elapsed);
+            s.status = SolverStatus::Interrupted;
             return s;
         }
 

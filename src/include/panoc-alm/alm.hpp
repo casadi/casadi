@@ -45,6 +45,7 @@ class ALMSolver {
         unsigned inner_lbfgs_rejected       = 0;
         real_t ε = std::numeric_limits<real_t>::infinity();
         real_t δ = std::numeric_limits<real_t>::infinity();
+        real_t norm_penalty = 0;
 
         SolverStatus status = SolverStatus::Unknown;
     };
@@ -53,6 +54,8 @@ class ALMSolver {
         : params(params), panoc(panoc_params) {}
 
     Stats operator()(const Problem &problem, vec &y, vec &x);
+
+    void stop() { panoc.stop(); }
 
   private:
     Params params;

@@ -9,6 +9,7 @@ enum class SolverStatus {
     MaxTime,
     MaxIter,
     NotFinite,
+    Interrupted,
 };
 
 /// @related    SolverStatus
