@@ -91,6 +91,9 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   /// Variable expression
   MX v;
 
+  /// Binding equation
+  MX beq;
+
   /// Readable name of the class
   std::string type_name() const {return "Variable";}
 
@@ -472,6 +475,12 @@ public:
   std::vector<double> start(const MX& var) const;
   void set_start(const std::string& name, double val);
   void set_start(const MX& var, const std::vector<double>& val);
+  ///@}
+
+  ///@{
+  /// Get/set the binding equation
+  const casadi::MX& binding_equation(const std::string& name) const;
+  void set_binding_equation(const std::string& name, const MX& val);
   ///@}
 
   /// Readable name of the class

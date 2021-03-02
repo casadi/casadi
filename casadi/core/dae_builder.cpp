@@ -1007,6 +1007,14 @@ void DaeBuilder::set_start(const MX& var, const std::vector<double>& val) {
   set_attribute(&DaeBuilder::set_start, var, val);
 }
 
+const casadi::MX& DaeBuilder::binding_equation(const std::string& name) const {
+  return variable(name).beq;
+}
+
+void DaeBuilder::set_binding_equation(const std::string& name, const MX& val) {
+  variable(name).beq = val;
+}
+
 std::string to_string(DaeBuilder::DaeBuilderIn v) {
   switch (v) {
   case DaeBuilder::DAE_BUILDER_T: return "t";
