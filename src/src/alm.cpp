@@ -156,13 +156,13 @@ ALMSolver::Stats ALMSolver::operator()(const Problem &problem, vec &y, vec &x) {
             s.δ                = norm_e;
             s.outer_iterations = i;
             s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
-            s.status           = SolverStatus::NotFinite;
+            s.status           = ps.status;
             if (params.preconditioning)
                 y = prec_g.asDiagonal() * y / prec_f;
             return s;
         }
 
-        bool converged = ε <= params.ε &&
+        bool converged = ps.ε <= params.ε &&
                          ps.status == SolverStatus::Converged &&
                          norm_e <= params.δ;
         bool out_of_time = time_elapsed > params.max_time;
