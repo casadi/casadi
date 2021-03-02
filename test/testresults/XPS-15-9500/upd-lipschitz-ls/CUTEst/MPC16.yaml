@@ -1,0 +1,19 @@
+status: MaxTime
+outer iterations: 130
+inner iterations: 130000
+inner convergence failures: 130
+elapsed time: 90.162824999999998
+ε: 2415276765.4239068
+δ: 63.985024868003379
+f: -9922813.5437693596
+counters:
+  f: 280946
+  grad_f: 269929
+  g: 281206
+  grad_g: 269929
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+‖Σ‖: 553325777.46757782
+‖x‖: 11357.788499669803
+‖y‖: 6616859604.8092871

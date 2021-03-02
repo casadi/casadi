@@ -1,6 +1,8 @@
-#include "panoc-alm/alm.hpp"
-#include "panoc-alm/panoc.hpp"
+#include <panoc-alm/alm.hpp>
+#include <panoc-alm/panoc.hpp>
+#include <atomic>
 #include <chrono>
+#include <csignal>
 #include <drivers/YAMLEncoder.hpp>
 #include <fstream>
 #include <iostream>
@@ -9,6 +11,16 @@
 #include <yaml-cpp/emittermanip.h>
 
 using namespace std::chrono_literals;
+
+std::atomic<pa::ALMSolver *> acitve_solver{nullptr};
+void signal_callback_handler(int signum) {
+    if (signum == SIGINT) {
+        if (auto *s = acitve_solver.load(std::memory_order_relaxed)) {
+            std::atomic_signal_fence(std::memory_order_acquire);
+            s->stop();
+        }
+    }
+}
 
 int main(int argc, char *argv[]) {
     using namespace std::string_literals;
@@ -22,19 +34,31 @@ int main(int argc, char *argv[]) {
                      prob_dir + "/OUTSDIF.d");
 
     pa::ALMParams almparams;
-    almparams.max_iter        = 1000;
-    almparams.max_time        = 2min + 30s;
+    almparams.max_iter        = 200;
+    almparams.max_time        = 1min + 30s;
     almparams.preconditioning = false;
+    // almparams.print_interval  = 1;
+    // almparams.Σ₀ = 1e-2;
+    // almparams.ε₀ = 1e-5;
+    // almparams.Δ = 1.1;
     pa::PANOCParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.specialized_lbfgs              = false;
     panocparams.update_lipschitz_in_linesearch = true;
+    panocparams.lbfgs_mem                      = 20;
+    // panocparams.print_interval = 500;
 
     pa::ALMSolver solver(almparams, panocparams);
+    std::atomic_signal_fence(std::memory_order_release);
+    acitve_solver.store(&solver, std::memory_order_relaxed);
+    signal(SIGINT, signal_callback_handler);
 
     auto problem = pa::ProblemWithCounters(cp.problem);
 
     auto status = solver(problem, cp.y0, cp.x0);
+    // ??? TODO: fence
+    acitve_solver.store(nullptr, std::memory_order_relaxed);
+    // ??? TODO: fence
     auto report = cp.get_report();
 
     auto f_star = cp.problem.f(cp.x0);
@@ -60,10 +84,13 @@ int main(int argc, char *argv[]) {
         << status.inner_lbfgs_failures;
     out << YAML::Key << "L-BFGS rejected" << YAML::Value
         << status.inner_lbfgs_rejected;
-    out << YAML::Key << "x" << YAML::Value << cp.x0;
-    out << YAML::Key << "y" << YAML::Value << cp.y0;
+    out << YAML::Key << "‖Σ‖" << YAML::Value << status.norm_penalty;
+    out << YAML::Key << "‖x‖" << YAML::Value << cp.x0.norm();
+    out << YAML::Key << "‖y‖" << YAML::Value << cp.y0.norm();
+    // out << YAML::Key << "x" << YAML::Value << cp.x0;
+    // out << YAML::Key << "y" << YAML::Value << cp.y0;
     out << YAML::EndMap;
-    out << report;
+    // out << report;
 
     std::ofstream(argv[2] + "/"s + argv[1] + ".yaml")
         << out.c_str() << std::endl;

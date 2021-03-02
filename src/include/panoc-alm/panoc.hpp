@@ -3,6 +3,7 @@
 #include "problem.hpp"
 #include "solverstatus.hpp"
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <limits>
 #include <type_traits>
@@ -60,8 +61,11 @@ class PANOCSolver {
                      const vec &Σ,           // in
                      real_t ε);
 
+    void stop() { stop_signal.store(true, std::memory_order_relaxed); }
+
   private:
     Params params;
+    std::atomic<bool> stop_signal{false};
 };
 
 } // namespace pa
