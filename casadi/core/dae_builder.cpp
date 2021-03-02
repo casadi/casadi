@@ -466,10 +466,11 @@ void DaeBuilder::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!this->init.empty()) {
+  if (!this->init_lhs.empty()) {
     stream << "Initial equations" << std::endl;
-    for (casadi_int k=0; k<this->init.size(); ++k) {
-      stream << "  0 == " << str(this->init[k]) << std::endl;
+    for (casadi_int k=0; k<this->init_lhs.size(); ++k) {
+      stream << "  " << str(this->init_lhs.at(k)) << " == " << str(this->init_rhs.at(k))
+        << std::endl;
     }
   }
 
@@ -653,6 +654,11 @@ MX DaeBuilder::add_aux(const std::string& name, casadi_int n) {
   return new_aux;
 }
 
+void DaeBuilder::add_init(const MX& lhs, const MX& rhs) {
+  this->init_lhs.push_back(lhs);
+  this->init_rhs.push_back(rhs);
+}
+
 MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
   MX new_d = add_variable(name, new_ddef.sparsity());
   this->d.push_back(new_d);
@@ -756,6 +762,10 @@ void DaeBuilder::sanity_check() const {
   for (casadi_int i=0; i<this->p.size(); ++i) {
     casadi_assert(this->p[i].is_symbolic(), "Non-symbolic parameter p");
   }
+
+  // Initial equations
+  casadi_assert(this->init_lhs.size() == this->init_rhs.size(),
+    "init_lhs and init_rhs have different lengths");
 }
 
 std::string DaeBuilder::qualified_name(const XmlNode& nn) {
