@@ -786,6 +786,328 @@ MX DaeBuilder::der(const MX& var) const {
   return der(var.name());
 }
 
+void DaeBuilder::classify() {
+  // Clear the existing classification
+  this->x.clear();
+  this->ode.clear();
+  this->lam_ode.clear();
+  this->z.clear();
+  this->alg.clear();
+  this->lam_alg.clear();
+  this->q.clear();
+  this->quad.clear();
+  this->lam_quad.clear();
+  this->y.clear();
+  this->ydef.clear();
+  this->lam_ydef.clear();
+  this->u.clear();
+  this->p.clear();
+  this->c.clear();
+  this->cdef.clear();
+  this->d.clear();
+  this->ddef.clear();
+  this->lam_ddef.clear();
+  this->w.clear();
+  this->wdef.clear();
+  this->lam_wdef.clear();
+  // Iteration variables and expressions for variables on hold
+  std::vector<casadi::MX> itvar, itvar_hold;
+  // Residual expressions and expressions for equations on hold / inactive
+  std::vector<casadi::MX> res, res_hold;
+  // Prefixes and suffixes
+  const std::string iter_prefix = "iter_", res_prefix = "res_", hold_suffix = "_hold";
+  // Loop over variables
+  for (const Variable& v : variables_) {
+    // Check prefix
+    if (v.name.rfind(iter_prefix, 0) == 0) {
+      // Name starts with "iter_"
+      std::string s = v.name.substr(iter_prefix.size());
+      if (s.size() > hold_suffix.size()
+          && s.compare(s.size() - hold_suffix.size(), hold_suffix.size(), hold_suffix) == 0) {
+        // Interation variable hold marker
+        size_t ind = std::stoi(s.substr(0, s.size() - hold_suffix.size()));
+        itvar_hold.resize(std::max(itvar_hold.size(), ind + 1), false);
+        itvar_hold.at(ind) = v.beq;
+      } else {
+        // Iteration variable
+        size_t ind = std::stoi(s);
+        itvar.resize(std::max(itvar.size(), ind + 1));
+        itvar.at(ind) = variable(v.description).v;
+      }
+    } else if (v.name.rfind(res_prefix, 0) == 0) {
+      // Name starts with "res_"
+      std::string s = v.name.substr(res_prefix.size());
+      if (s.size() > hold_suffix.size()
+          && s.compare(s.size() - hold_suffix.size(), hold_suffix.size(), hold_suffix) == 0) {
+        // Residual equation hold marker
+        size_t ind = std::stoi(s.substr(0, s.size() - hold_suffix.size()));
+        res_hold.resize(std::max(res_hold.size(), ind + 1), false);
+        res_hold.at(ind) = v.beq;
+      } else {
+        // Residual equation
+        size_t ind = std::stoi(s);
+        res.resize(std::max(res.size(), ind + 1));
+        res.at(ind) = v.beq;
+      }
+    }
+    // Sort by variability
+    switch (v.variability) {
+    case Variable::CONSTANT:
+      if (v.beq.is_empty()) {
+        casadi_warning("Cannot classify " + v.name);
+      } else {
+        register_c(v.v, v.beq);
+      }
+      break;
+    case Variable::TUNABLE:
+    case Variable::FIXED:
+      if (v.beq.is_empty()) {
+        register_p(v.v);
+      } else {
+        register_d(v.v, v.beq);
+      }
+      break;
+    case Variable::CONTINUOUS:
+      if (v.causality == Variable::OUTPUT) {
+        register_y(v.v, v.v);
+      } else if (v.causality == Variable::INPUT) {
+        register_u(v.v);
+      }
+      break;
+    default:
+      casadi_warning("Cannot classify " + v.name + ", variability = " + to_string(v.variability));
+      break;
+    }
+  }
+  // Fix and sort dependent variables
+  Function dfcn("dfcn", {vertcat(this->c), vertcat(this->d), MX()}, {vertcat(this->ddef)},
+    {"c", "d", "freevars"}, {"ddef"});
+  // Find any free variables HACK! This should not be necessary!
+  std::vector<MX> freevars = dfcn.free_mx();
+  if (!freevars.empty()) {
+    casadi_warning("Variables " + str(freevars) + " have not been defined. Setting to NaN");
+  }
+  // Create the sparsity pattern ddef w.r.t. d
+  Sparsity J_ddef_d = dfcn.jac_sparsity(dfcn.index_out("ddef"), dfcn.index_in("d"));
+  // Add a diagonal (equation is d - ddef = 0)
+  J_ddef_d = J_ddef_d + Sparsity::diag(J_ddef_d.size1());
+  // If lower triangular, no modification needed
+  if (!J_ddef_d.is_tril()) {
+    // The following assumes all variables are scalar
+    for (const MX& dk : this->d) casadi_assert(dk.is_scalar(), "Not implemented");
+    // Find which variables depend on what other variables
+    std::vector<casadi_int> index, offset;
+    casadi_int nc = J_ddef_d.T().scc(index, offset);
+    casadi_assert(nc == J_ddef_d.size1(), "Cannot resolve interdependencies");
+    // Permute Jacobian, equations
+    std::vector<casadi_int> mapping;
+    J_ddef_d = J_ddef_d.sub(index, index, mapping);
+    casadi_assert(J_ddef_d.is_tril(), "Failure in resolving interdependencies");
+    // New dependent parameters
+    std::vector<MX> new_d(this->d.size()), new_ddef(this->ddef.size());
+    for (size_t k = 0; k < index.size(); ++k) {
+      new_d.at(k) = this->d.at(index[k]);
+      new_ddef.at(k) = this->ddef.at(index[k]);
+    }
+    this->d = new_d;
+    this->ddef = new_ddef;
+  }
+  // Eliminate interdependencies in ddef, itvar_hold, res_hold
+  std::vector<MX> all_hold = itvar_hold;
+  all_hold.insert(all_hold.end(), res_hold.begin(), res_hold.end());
+  substitute_inplace(this->d, this->ddef, all_hold);
+  std::copy(all_hold.begin(), all_hold.begin() + itvar_hold.size(), itvar_hold.begin());
+  std::copy(all_hold.begin() + itvar_hold.size(), all_hold.end(), res_hold.begin());
+  // Count number of non-held variables
+  std::vector<MX> z_free, z_held;
+  for (size_t k = 0; k < itvar.size(); ++k) {
+    const casadi::MX& h = itvar_hold.at(k);
+    casadi_assert(h.is_scalar(), "Not implemented");
+    casadi_assert(h.is_constant(), "itvar_hold not resolved: " + str(h));
+    double hv(h);
+    if (hv == 0.) {
+      z_free.push_back(itvar.at(k));
+    } else {
+      z_held.push_back(itvar.at(k));
+      casadi_assert(hv == 1., "itvar_hold should be 0 or 1, got: " + str(hv));
+    }
+  }
+  casadi_message("n_itvar_free = " + str(z_free.size()));
+  // Count number of non-held residuals
+  std::vector<MX> res_free, res_held;
+  for (size_t k = 0; k < res_hold.size(); ++k) {
+    const casadi::MX& h = res_hold.at(k);
+    casadi_assert(h.is_scalar(), "Not implemented");
+    casadi_assert(h.is_constant(), "res_hold not resolved: " + str(h));
+    double hv(h);
+    if (hv == 0.) {
+      res_free.push_back(itvar.at(k));
+    } else {
+      res_held.push_back(itvar.at(k));
+      casadi_assert(hv == 1., "res_hold should be 0 or 1, got: " + str(hv));
+    }
+  }
+  casadi_message("n_res_free = " + str(res_free.size()));
+
+  // Recreate ddef without any free variables or interdependencies
+  // dfcn = Function("dfcn", {vertcat(this->c), vertcat(freevars)},
+  //   {vertcat(this->ddef)}, {"c", "freevars"}, {"ddef"});
+  // Get numerical values for d
+
+
+
+  // Substitute constants in itvar_hold, res_hold
+//  substitute(itvar_hold, this->c, this->cdef);
+  //substitute(res_hold, this->c, this->cdef);
+
+  uout() << "ddef depends on d: "<< depends_on(vertcat(this->ddef), vertcat(d)) << "\n";
+
+  uout() << "all_hold depends on d: "<< depends_on(vertcat(all_hold), vertcat(d)) << "\n";
+
+  uout() << "itvar_hold depends on c: "<< depends_on(vertcat(itvar_hold), vertcat(c)) << "\n";
+  uout() << "itvar_hold depends on d: "<< depends_on(vertcat(itvar_hold), vertcat(d)) << "\n";
+  uout() << "itvar_hold depends on p: "<< depends_on(vertcat(itvar_hold), vertcat(p)) << "\n";
+
+  uout() << "res_hold depends on c: "<< depends_on(vertcat(res_hold), vertcat(c)) << "\n";
+  uout() << "res_hold depends on d: "<< depends_on(vertcat(res_hold), vertcat(d)) << "\n";
+  uout() << "res_hold depends on p: "<< depends_on(vertcat(res_hold), vertcat(p)) << "\n";
+
+
+  // ..
+  uout() << "itvar.size() = " << itvar.size() << "\n";
+  uout() << "itvar_hold.size() = " << itvar_hold.size() << "\n";
+  uout() << "res.size() = " << res.size() << "\n";
+  uout() << "res_hold.size() = " << res_hold.size() << "\n";
+
+  uout() << "itvar = " << itvar << "\n";
+  uout() << "itvar_hold = " << itvar_hold << "\n";
+  uout() << "res = " << res << "\n";
+  uout() << "res_hold = " << res_hold << "\n";
+
+  std::vector<MX> either_hold = res_hold;
+  for (size_t k = 0; k < either_hold.size(); ++k) {
+    either_hold.at(k) = either_hold.at(k) || itvar_hold.at(k);
+  }
+  uout() << "either_hold = " << either_hold << "\n";
+
+  // Count number of non-held residuals
+  std::vector<MX> either_free, either_held;
+  for (size_t k = 0; k < either_hold.size(); ++k) {
+    const casadi::MX& h = either_hold.at(k);
+    casadi_assert(h.is_scalar(), "Not implemented");
+    casadi_assert(h.is_constant(), "either_hold not resolved: " + str(h));
+    double hv(h);
+    if (hv == 0.) {
+      either_free.push_back(itvar.at(k));
+    } else {
+      either_held.push_back(itvar.at(k));
+      casadi_assert(hv == 1., "either_hold should be 0 or 1, got: " + str(hv));
+    }
+  }
+  casadi_message("n_either_free = " + str(either_free.size()));
+
+
+}
+
+void DaeBuilder::simplify() {
+  // Assume all algebraic equations are references to w
+  for (const MX& a : this->alg)
+    casadi_assert(a.is_symbolic(), "All algebraic equations must be symbolic");
+  // Function for calculating wdef from w
+  Function wfcn("wfcn", {vertcat(this->w), vertcat(this->z)},
+    {vertcat(this->wdef), vertcat(this->alg), vertcat(this->ydef)},
+    {"w", "z"}, {"wdef", "alg", "ydef"});
+  // Get inderdependencies by calculating the sparsity pattern of dwdef/dw
+  Sparsity Jgw = wfcn.jac_sparsity(0, 0);
+  // Get diagonal entries
+  std::vector<casadi_int> Jgw_diag;
+  casadi_assert(Jgw_diag.empty(), "Not implemented");
+  // Add diagonal entries to Jw since, really, we're interested in d(wdef - w)/dw)
+  Jgw = Jgw + Sparsity::diag(Jgw.size1());
+  // Add other blocks
+  Sparsity Jgz = wfcn.jac_sparsity(0, 1);
+  Sparsity Jaw = wfcn.jac_sparsity(1, 0);
+  Sparsity Jaz = wfcn.jac_sparsity(1, 1);
+  // Create block matrix
+  Sparsity JB = Sparsity::blockcat({{Jgw, Jgz}, {Jaw, Jaz}});
+  JB.spy_matlab("JB.m");
+  // Find the order of rows and columns that produces a block triangular form
+  std::vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  casadi_int nc = JB.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+  uout() << "nc = " << nc << ", JB.size() = " << JB.size() << "\n";
+  uout() << "rowblock.size() = " << rowblock.size() << "\n";
+  uout() << "colblock.size() = " << colblock.size() << "\n";
+  uout() << "coarse_rowblock.size() = " << coarse_rowblock.size() << "\n";
+  uout() << "coarse_colblock.size() = " << coarse_colblock.size() << "\n";
+  // Loop over components
+  for (casadi_int c = 0; c < nc; ++c) {
+    casadi_int blocksize = rowblock.at(c + 1) - rowblock.at(c);
+    if (blocksize > 1) uout() << " " << blocksize;
+  }
+  uout() << "\n";
+  std::vector<casadi_int> mapping;
+  Sparsity JB2 = JB.sub(rowperm, colperm, mapping);
+  JB2.spy_matlab("JB2.m");
+  // Which w depend on any of the y
+  std::vector<bvec_t*> arg(wfcn.n_in(), 0);
+  std::vector<bvec_t> sp_w(wfcn.nnz_in("w"), bvec_t(0));
+  arg.at(wfcn.index_in("w")) = &sp_w.front();
+  std::vector<bvec_t*> res(wfcn.n_out(), 0);
+  std::vector<bvec_t> sp_ydef(wfcn.nnz_out("ydef"), bvec_t(1));
+  res.at(wfcn.index_out("ydef")) = &sp_ydef.front();
+  wfcn.rev(arg, res);
+  casadi_int nn = 0;
+  for (bvec_t k : sp_w) {
+    uout() << " " << k;
+    nn += casadi_int(k);
+  }
+  uout() << "\n";
+  uout() << nn << "/" << sp_w.size() << " depend directly\n";
+  // Resolve interdependencies
+  size_t nnz_w = sp_w.size();
+  sp_w.resize(nnz_w + wfcn.nnz_in("z"), bvec_t(0));
+  sp_ydef.resize(sp_w.size());
+  std::fill(sp_ydef.begin(), sp_ydef.end(), bvec_t(0));
+  JB.spsolve(&sp_ydef.front(), &sp_w.front(), true);
+  // Count variables that influence y, directly or indirectly
+  casadi_int nz_new = 0, nw_new = 0;
+  for (size_t i = 0; i < sp_ydef.size(); ++i) {
+    if (sp_ydef[i]) {
+      if (i < nnz_w) {
+        nw_new++;
+      } else {
+        nz_new++;
+      }
+    }
+  }
+  uout() << "new #w: " << nw_new << ", new #z: " << nz_new << "\n";
+  // Which wdef depend on any of the y?
+
+
+
+  // Find all row/columns that need to be eliminated in order to get a lower triangular system
+  std::vector<bool> elim(JB2.size1(), false);
+  for (casadi_int c = 0; c < JB2.size2(); ++c) {
+    casadi_assert(JB2.colind(c) < JB2.colind(c + 1), "Matrix has zero columns");
+    if (JB2.row(JB2.colind(c)) < c) elim.at(c) = true;
+  }
+  // Rows that are kept
+  std::vector<casadi_int> new_alg, new_wdef;
+  for (casadi_int k = 0; k < elim.size(); ++k) {
+    if (elim.at(k)) {
+      new_alg.push_back(k);
+    } else {
+      new_wdef.push_back(k);
+    }
+  }
+  Sparsity JB3 = JB2.sub(new_wdef, new_wdef, mapping);
+  JB3.spy_matlab("JB3.m");
+  Sparsity JB4 = JB2.sub(new_alg, new_alg, mapping);
+  JB4.spy_matlab("JB4.m");
+  // New residual equations
+  uout() << new_alg.size() << " equations left in alg/z\n";
+}
+
 void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   // Partially implemented
   if (x.size() > 0) casadi_warning("Only lifting algebraic variables");

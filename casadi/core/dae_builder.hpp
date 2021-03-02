@@ -298,6 +298,12 @@ public:
    */
   ///@{
 
+  /// Classify the variables based on OCT naming convention
+  void classify();
+
+  /// Simplify residual equations
+  void simplify();
+
   /// Lift problem formulation by extracting shared subexpressions
   void lift(bool lift_shared = true, bool lift_calls = true);
 
