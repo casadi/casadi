@@ -1824,9 +1824,9 @@ const Function& DaeBuilder::oracle(bool sx, bool elim_v, bool lifted_calls) cons
     for (casadi_int i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
       v = output(static_cast<DaeBuilderOut>(i));
       if (!v.empty()) {
+        if (i == DAE_BUILDER_WDEF) vdef_ind = f_out.size();
         f_out.push_back(vertcat(v));
         f_out_name.push_back(to_string(static_cast<DaeBuilderOut>(i)));
-        if (i == DAE_BUILDER_WDEF) vdef_ind = i;
       }
     }
     // Eliminate v from inputs
