@@ -1,0 +1,19 @@
+status: Converged
+outer iterations: 7
+inner iterations: 126
+inner convergence failures: 0
+elapsed time: 0.001196
+ε: 7.9113003991669267e-07
+δ: 3.6457975744026055e-06
+f: 0
+counters:
+  f: 1549
+  grad_f: 900
+  g: 1563
+  grad_g: 900
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+‖Σ‖: 6191.0615174288132
+‖x‖: 1.0358984099542206
+‖y‖: 2.9621479531068228e-05
