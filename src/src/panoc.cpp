@@ -245,6 +245,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
             real_t margin  = 0; // 1e-6 * std::abs(ψₖ₊₁); // TODO: Why?
             grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
             norm_sq_pₖ₊₁   = pₖ₊₁.squaredNorm();
+            real_t norm_sq_pₖ₊₁_ₖ = norm_sq_pₖ₊₁; // prox step with step size γₖ
             if (params.update_lipschitz_in_linesearch == true) {
                 // Decrease step size until quadratic upper bound is satisfied
                 while (ψ̂xₖ₊₁ > ψₖ₊₁ + margin + grad_ψₖ₊₁ᵀpₖ₊₁ +
@@ -272,6 +273,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
             τ /= 2;
 
             ls_cond = φₖ₊₁ - (φₖ - σ_norm_γ⁻¹pₖ);
+            if (params.alternative_linesearch_cond)
+                ls_cond -= (0.5 / γₖ₊₁ - 0.5 / γₖ) * norm_sq_pₖ₊₁_ₖ;
         } while (ls_cond > 0 && τ >= params.τ_min);
 
         // τ < τ_min the line search failed and we accepted the prox step

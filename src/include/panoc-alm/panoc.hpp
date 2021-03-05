@@ -35,6 +35,7 @@ struct PANOCParams {
 
     bool update_lipschitz_in_linesearch = true;
     bool specialized_lbfgs              = true;
+    bool alternative_linesearch_cond    = false;
 };
 
 class PANOCSolver {
