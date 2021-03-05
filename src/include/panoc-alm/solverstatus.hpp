@@ -3,13 +3,14 @@
 
 namespace pa {
 
+/// Exit status of a numerical solver such as ALM or PANOC.
 enum class SolverStatus {
-    Unknown = 0,
-    Converged,
-    MaxTime,
-    MaxIter,
-    NotFinite,
-    Interrupted,
+    Unknown = 0, ///< Initial value.
+    Converged,   ///< Converged and reached given tolerance.
+    MaxTime,     ///< Maximum allowed execution time exceeded.
+    MaxIter,     ///< Maximum number of iterations exceeded.
+    NotFinite,   ///< Intermediate results were infinite or not-a-number.
+    Interrupted, ///< Solver was interrupted by the user.
 };
 
 /// @related    SolverStatus

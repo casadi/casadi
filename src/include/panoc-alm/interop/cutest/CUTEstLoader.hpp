@@ -35,6 +35,8 @@ class CUTEstProblem {
         /// Number of constraints.
         unsigned ncon = 0;
 
+        /// Status returned by CUTEst.
+        /// @todo   I don't think this is useful, remove it.
         enum Status {
             Success         = 0,    ///< Successful call.
             AllocationError = 1,    ///< Array allocation/deallocation error.
