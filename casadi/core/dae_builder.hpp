@@ -298,6 +298,9 @@ public:
    */
   ///@{
 
+  /// Eliminate all dependent variables
+  void eliminate_dependent(bool elim_d = true, bool elim_w = true);
+
   /// Lift problem formulation by extracting shared subexpressions
   void lift(bool lift_shared = true, bool lift_calls = true);
 

@@ -804,6 +804,39 @@ MX DaeBuilder::der(const MX& var) const {
   return der(var.name());
 }
 
+void DaeBuilder::eliminate_dependent(bool elim_d, bool elim_w) {
+  // Ensure variables are sorted
+  if (elim_d) sort_d();
+  if (elim_w) sort_w();
+  // Variables to be substituted
+  std::vector<MX> dw, dwdef;
+  if (elim_d) {
+    dw.insert(dw.end(), this->d.begin(), this->d.end());
+    dwdef.insert(dwdef.end(), this->ddef.begin(), this->ddef.end());
+  }
+  if (elim_w) {
+    dw.insert(dw.end(), this->w.begin(), this->w.end());
+    dwdef.insert(dwdef.end(), this->wdef.begin(), this->wdef.end());
+  }
+  // Expressions where the variables are also being used
+  std::vector<MX> ex;
+  ex.insert(ex.end(), this->alg.begin(), this->alg.end());
+  // Perform elimination
+  substitute_inplace(dw, dwdef, ex);
+  // Eliminate d
+  if (elim_d) {
+    this->d.clear();
+    this->ddef.clear();
+  }
+  // Eliminate w
+  if (elim_w) {
+    this->w.clear();
+    this->wdef.clear();
+  }
+  // Get auxiliary variables
+  std::copy(ex.begin(), ex.begin() + this->alg.size(), this->alg.begin());
+}
+
 void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   // Partially implemented
   if (x.size() > 0) casadi_warning("Only lifting algebraic variables");
