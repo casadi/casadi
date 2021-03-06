@@ -792,7 +792,7 @@ void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   // Lift algebraic expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
-    {"prefix", "v_"}, {"suffix", ""}, {"offset", static_cast<casadi_int>(this->w.size())}};
+    {"prefix", "w_"}, {"suffix", ""}, {"offset", static_cast<casadi_int>(this->w.size())}};
   extract(this->alg, new_w, new_wdef, opts);
   // Register as dependent variables
   for (size_t i = 0; i < new_w.size(); ++i) {
@@ -1193,9 +1193,13 @@ Function DaeBuilder::create(const std::string& fname,
         cio.v.resize(c.n_dep(), -1);
         cio.arg.resize(cio.v.size());
         for (casadi_int i = 0; i < cio.v.size(); ++i) {
-          size_t v_ind = v_map.at(c.dep(i).get());
-          cio.v.at(i) = v_ind;
-          cio.arg.at(i) = v_in.at(v_ind);
+          if (c.dep(i).is_constant()) {
+            cio.arg.at(i) = c.dep(i);
+          } else {
+            size_t v_ind = v_map.at(c.dep(i).get());
+            cio.v.at(i) = v_ind;
+            cio.arg.at(i) = v_in.at(v_ind);
+          }
         }
         // Allocate memory for function call outputs
         cio.vdef.resize(c.n_out(), -1);
@@ -1216,7 +1220,7 @@ Function DaeBuilder::create(const std::string& fname,
   }
   // Additional term in jac_vdef_v
   for (size_t i = 0; i < ret_out.size(); ++i) {
-    if (ret.name_out(i) == "jac_vdef_v") {
+    if (ret.name_out(i) == "jac_wdef_w") {
       ret_out.at(i) += jac_vdef_v_from_calls(call_nodes, h_offsets);
     }
   }
@@ -1226,7 +1230,7 @@ Function DaeBuilder::create(const std::string& fname,
     // Find out of vdef is part of the linear combination
     bool has_vdef = false;
     for (const std::string& r : e.second) {
-      if (r == "vdef") {
+      if (r == "wdef") {
         has_vdef = true;
         break;
       }
@@ -1235,7 +1239,7 @@ Function DaeBuilder::create(const std::string& fname,
     if (!has_vdef) continue;
     // Search for matching function outputs
     for (size_t i = 0; i < ret_out.size(); ++i) {
-      if (ret.name_out(i) == "hess_" + e.first + "_v_v") {
+      if (ret.name_out(i) == "hess_" + e.first + "_w_w") {
         // Calculate contribution to hess_?_v_v
         if (extra_hess_v_v.is_empty())
           extra_hess_v_v = hess_v_v_from_calls(call_nodes, h_offsets);
@@ -1280,7 +1284,10 @@ MX DaeBuilder::jac_vdef_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
       // Collect all blocks for this block row
       jac_brow.clear();
       for (casadi_int iind = 0; iind < call_it->second.arg.size(); ++iind) {
-        jac_brow[call_it->second.v.at(iind)] = call_it->second.jac(oind, iind);
+        size_t vind = call_it->second.v.at(iind);
+        if (vind != size_t(-1)) {
+          jac_brow[vind] = call_it->second.jac(oind, iind);
+        }
       }
       // Add empty rows to vblocks, if any
       if (voffset_last != voffset_begin) {
@@ -1342,6 +1349,7 @@ MX DaeBuilder::hess_v_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
           for (size_t iind2 = 0; iind2 < call_ref.second.v.size(); ++iind2) {
             // Corresponding index in v
             size_t vind2 = call_ref.second.v[iind2];
+            if (vind2 == size_t(-1)) continue;
             // Hessian contribution
             MX H_contr = call_ref.second.hess(iind1, iind2);
             // Insert new block or add to existing one
@@ -1527,7 +1535,9 @@ void DaeBuilder::CallIO::calc_jac() {
     casadi_assert(this->f.size_out(i) == this->res.at(i).size(), "Call output not provided");
   }
   // Get/generate the (cached) Jacobian function
+  // casadi_message("Retrieving the Jacobian of " + str(this->f));
   this->J = this->f.jacobian();
+  // casadi_message("Retrieving the Jacobian of " + str(this->f) + " done");
   // Input expressions for the call to J
   std::vector<MX> call_in = this->arg;
   call_in.insert(call_in.end(), this->res.begin(), this->res.end());
@@ -1550,7 +1560,9 @@ void DaeBuilder::CallIO::calc_grad() {
   if (!this->jac_res.empty())
     casadi_warning("Jacobian blocks currently not reused for gradient calculation");
   // Get/generate the (cached) adjoint function
+  // casadi_message("Retrieving the gradient of " + str(this->f));
   this->adj1_f = this->f.reverse(1);
+  // casadi_message("Retrieving the gradient of " + str(this->f) + " done");
   // Input expressions for the call to adj1_f
   std::vector<MX> call_in = this->arg;
   call_in.insert(call_in.end(), this->res.begin(), this->res.end());
@@ -1563,7 +1575,9 @@ void DaeBuilder::CallIO::calc_hess() {
   // Calculate gradient, if needed
   if (this->adj1_f.is_null()) calc_grad();
   // Get/generate the (cached) Hessian function
+  // casadi_message("Retrieving the Hessian of " + str(this->f));
   this->H = this->adj1_f.jacobian();
+  // casadi_message("Retrieving the Hessian of " + str(this->f) + " done");
   // Input expressions for the call to H
   std::vector<MX> call_in = this->arg;
   call_in.insert(call_in.end(), this->res.begin(), this->res.end());
