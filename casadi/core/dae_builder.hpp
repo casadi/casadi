@@ -300,6 +300,12 @@ public:
 
   /// Eliminate quadrature states and turn them into ODE states
   void eliminate_quad();
+
+  /// Sort dependent parameters
+  void sort_d();
+
+  /// Sort dependent variables
+  void sort_w();
   ///@}
 
   /** @name Functions
@@ -592,6 +598,9 @@ protected:
   /// Calculate contribution to hess_?_v_v from lifted calls
   MX hess_v_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
     const std::vector<casadi_int>& h_offsets) const;
+
+  // Sort dependent variables/parameters
+  void sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef);
 
 #endif // SWIG
 };

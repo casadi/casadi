@@ -487,6 +487,14 @@ void DaeBuilder::eliminate_quad() {
   this->q.clear();
 }
 
+void DaeBuilder::sort_d() {
+  sort_dependent(this->d, this->ddef);
+}
+
+void DaeBuilder::sort_w() {
+  sort_dependent(this->w, this->wdef);
+}
+
 const Variable& DaeBuilder::variable(const std::string& name) const {
   return const_cast<DaeBuilder*>(this)->variable(name);
 }
@@ -1599,6 +1607,26 @@ const MX& DaeBuilder::CallIO::hess(casadi_int iind1, casadi_int iind2) const {
   casadi_int ind = iind1 + iind1 * this->adj1_arg.size();
   // Return reference
   return this->hess_res.at(ind);
+}
+
+void DaeBuilder::sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef) {
+  // Calculate sparsity pattern of dvdef/dv
+  Function vfcn("vfcn", {vertcat(v)}, {vertcat(vdef)}, {"v"}, {"vdef"});
+  Sparsity Jv = vfcn.jac_sparsity(0, 0);
+  // Add diagonal (equation is v-vdef = 0)
+  Jv = Jv + Sparsity::diag(Jv.size1());
+  // If lower triangular, nothing to do
+  if (Jv.is_triu()) return;
+  // Perform a Dulmage-Mendelsohn decomposition
+  std::vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  casadi_int nz = Jv.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+  // Reorder the variables
+  std::vector<MX> tmp(v.size());
+  for (size_t k = 0; k < v.size(); ++k) tmp[k] = v.at(colperm.at(k));
+  std::copy(tmp.begin(), tmp.end(), v.begin());
+  // Reorder the equations
+  for (size_t k = 0; k < v.size(); ++k) tmp[k] = vdef.at(rowperm.at(k));
+  std::copy(tmp.begin(), tmp.end(), vdef.begin());
 }
 
 } // namespace casadi
