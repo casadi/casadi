@@ -155,7 +155,7 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       const XmlNode& vnode = modvars[i];
 
       // Name of variable, ensure unique
-      std::string name = vnode.get_attribute("name");
+      std::string name = vnode.attribute<std::string>("name");
       casadi_assert(varind_.find(name) == varind_.end(), "Duplicate variable: " + name);
 
       // Create new variable
@@ -163,12 +163,13 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       var.v = MX::sym(name);
 
       // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
-      (void)vnode.read_attribute("valueReference", var.value_reference);
-      var.description = vnode.get_attribute("description", "");
-      var.causality = to_enum<Variable::Causality>(vnode.get_attribute("causality", "local"));
+      var.value_reference = vnode.attribute<casadi_int>("valueReference");
+      var.description = vnode.attribute<std::string>("description", "");
+      var.causality = to_enum<Variable::Causality>(
+        vnode.attribute<std::string>("causality", "local"));
       var.variability = to_enum<Variable::Variability>(
-        vnode.get_attribute("variability", "continuous"));
-      std::string initial_str = vnode.get_attribute("initial", "");
+        vnode.attribute<std::string>("variability", "continuous"));
+      std::string initial_str = vnode.attribute<std::string>("initial", "");
       if (initial_str.empty()) {
         // Default value
         var.initial = Variable::default_initial(var.causality, var.variability);
@@ -183,13 +184,13 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
       // Other properties
       if (vnode.has_child("Real")) {
         const XmlNode& props = vnode["Real"];
-        (void)props.read_attribute("unit", var.unit, false);
-        (void)props.read_attribute("displayUnit", var.display_unit, false);
-        (void)props.read_attribute("min", var.min, false);
-        (void)props.read_attribute("max", var.max, false);
-        (void)props.read_attribute("nominal", var.nominal, false);
-        (void)props.read_attribute("start", var.start, false);
-        (void)props.read_attribute("derivative", var.derivative, false);
+        var.unit = props.attribute<std::string>("unit", var.unit);
+        var.display_unit = props.attribute<std::string>("displayUnit", var.display_unit);
+        var.min = props.attribute<double>("min", var.min);
+        var.max = props.attribute<double>("max", var.max);
+        var.nominal = props.attribute<double>("nominal", var.nominal);
+        var.start = props.attribute<double>("start", var.start);
+        var.derivative = props.attribute<casadi_int>("derivative", var.derivative);
       }
       // Add to list of variables
       add_variable(name, var);
@@ -218,14 +219,13 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
           // Get a reference to the output
           const XmlNode& onode = outputs[i];
           // Read attribute
-          casadi_int index = -1;
-          (void)onode.read_attribute("index", index, false);
+          casadi_int index = onode.attribute<casadi_int>("index", -1);
           casadi_assert(index >= 1, "Non-positive output index");
           // Convert to index in variables list
           index += n_vars_before - 1;
           // Get dependencies
-          std::vector<casadi_int> dependencies;
-          (void)onode.read_attribute("dependencies", dependencies, false);
+          std::vector<casadi_int> dependencies = onode.attribute<std::vector<casadi_int>>(
+            "dependencies", {});
           // Convert to indices in variables list
           for (casadi_int& d : dependencies) {
             // Consistency check, add offset
@@ -856,7 +856,7 @@ std::string DaeBuilder::qualified_name(const XmlNode& nn) {
     if (i!=0) qn << ".";
 
     // Get the name part
-    qn << nn[i].get_attribute("name");
+    qn << nn[i].attribute<std::string>("name");
 
     // Get the index, if any
     if (nn[i].size()>0) {

@@ -51,39 +51,30 @@ namespace casadi {
     void set_attribute(const std::string& att_name, const std::string& att);
 
     /** \brief  Get an attribute by its name */
-    std::string get_attribute(const std::string& att_name) const {
-      std::string ret;
-      (void)read_attribute(att_name, ret, true);
+    template<typename T>
+    T attribute(const std::string& att_name) const {
+      // Find the attribute, if any
+      auto it = attributes_.find(att_name);
+      casadi_assert(it != attributes_.end(), "Could not find attribute " + att_name);
+      // Attribute found, read it
+      T ret;
+      readString(it->second, ret);
       return ret;
     }
 
     /** \brief  Get an attribute by its name, default value if not found */
-    std::string get_attribute(const std::string& att_name, const std::string& def_att) const {
-      std::string att;
-      if (read_attribute(att_name, att, false)) {
-        // Atribute found
-        return att;
-      } else {
+    template<typename T>
+    T attribute(const std::string& att_name, const T& def_att) const {
+      // Find the attribute, if any
+      auto it = attributes_.find(att_name);
+      if (it == attributes_.end()) {
         // No such attribute, return default value
         return def_att;
-      }
-    }
-
-    /** \brief  Read the value of an attribute */
-    template<typename T>
-    bool read_attribute(const std::string& attribute_name, T& val,
-        bool assert_existance=true) const {
-      // find the attribute
-      std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
-
-      // check if the attribute exists
-      if (it == attributes_.end()) {
-        casadi_assert(!assert_existance,
-          "Error in XmlNode::read_attribute: could not find " + attribute_name);
-        return false;
       } else {
-        readString(it->second, val);
-        return true;
+        // Attribute found, read it
+        T ret;
+        readString(it->second, ret);
+        return ret;
       }
     }
 
