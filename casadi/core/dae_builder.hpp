@@ -313,6 +313,9 @@ public:
   /// Sort dependent variables
   void sort_w();
 
+  /// Sort algebraic variables
+  void sort_z(const std::vector<std::string>& z_order);
+
   /// Prune unused controls
   void prune(bool prune_p = true, bool prune_u = true);
   ///@}

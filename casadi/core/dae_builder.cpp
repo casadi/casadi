@@ -496,6 +496,30 @@ void DaeBuilder::sort_w() {
   sort_dependent(this->w, this->wdef);
 }
 
+void DaeBuilder::sort_z(const std::vector<std::string>& z_order) {
+  // Make sure lengths agree
+  casadi_assert(z_order.size() == this->z.size(), "Dimension mismatch");
+  // Mark existing components in z
+  std::vector<bool> old_z(variables_.size(), false);
+  for (size_t i = 0; i < this->z.size(); ++i) {
+    std::string s = this->z.at(i).name();
+    auto it = varind_.find(s);
+    casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
+    old_z.at(it->second) = true;
+  }
+  // New vector of z
+  std::vector<MX> new_z;
+  new_z.reserve(z_order.size());
+  for (const std::string& s : z_order) {
+    auto it = varind_.find(s);
+    casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
+    casadi_assert(old_z.at(it->second), "Variable \"" + s + "\" is not an algebraic variable.");
+    new_z.push_back(variables_.at(it->second).v);
+  }
+  // Success: Update z
+  std::copy(new_z.begin(), new_z.end(), this->z.begin());
+}
+
 void DaeBuilder::prune(bool prune_p, bool prune_u) {
   // Function inputs and outputs
   std::vector<MX> f_in, f_out, v;
