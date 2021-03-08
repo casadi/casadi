@@ -496,6 +496,61 @@ void DaeBuilder::sort_w() {
   sort_dependent(this->w, this->wdef);
 }
 
+void DaeBuilder::prune(bool prune_p, bool prune_u) {
+  // Function inputs and outputs
+  std::vector<MX> f_in, f_out, v;
+  std::vector<std::string> f_in_name, f_out_name;
+  // Collect all DAE input variables with at least one entry, skip u
+  for (casadi_int i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
+    if (prune_p && i == DAE_BUILDER_P) continue;
+    if (prune_u && i == DAE_BUILDER_U) continue;
+    v = input(static_cast<DaeBuilderIn>(i));
+    if (!v.empty()) {
+      f_in.push_back(vertcat(v));
+      f_in_name.push_back(to_string(static_cast<DaeBuilderIn>(i)));
+    }
+  }
+  // Collect all DAE output variables with at least one entry
+  for (casadi_int i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
+    v = output(static_cast<DaeBuilderOut>(i));
+    if (!v.empty()) {
+      f_out.push_back(vertcat(v));
+      f_out_name.push_back(to_string(static_cast<DaeBuilderOut>(i)));
+    }
+  }
+  // Create a function
+  Function f("prune_fcn", f_in, f_out, f_in_name, f_out_name);
+  // Mark which variables are free
+  std::vector<bool> free_variables(variables_.size(), false);
+  for (const std::string& s : f.get_free()) {
+    auto it = varind_.find(s);
+    casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
+    free_variables.at(it->second) = true;
+  }
+  // Prune p
+  if (prune_p) {
+    size_t np = 0;
+    for (size_t i = 0; i < this->p.size(); ++i) {
+      std::string s = this->p.at(i).name();
+      auto it = varind_.find(s);
+      casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
+      if (!free_variables.at(it->second)) this->p.at(np++) = this->p.at(i);
+    }
+    this->p.resize(np);
+  }
+  // Prune u
+  if (prune_u) {
+    size_t nu = 0;
+    for (size_t i = 0; i < this->u.size(); ++i) {
+      std::string s = this->u.at(i).name();
+      auto it = varind_.find(s);
+      casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
+      if (!free_variables.at(it->second)) this->u.at(nu++) = this->u.at(i);
+    }
+    this->u.resize(nu);
+  }
+}
+
 const Variable& DaeBuilder::variable(const std::string& name) const {
   return const_cast<DaeBuilder*>(this)->variable(name);
 }

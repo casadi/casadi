@@ -312,6 +312,9 @@ public:
 
   /// Sort dependent variables
   void sort_w();
+
+  /// Prune unused controls
+  void prune(bool prune_p = true, bool prune_u = true);
   ///@}
 
   /** @name Functions
