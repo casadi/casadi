@@ -54,6 +54,9 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   /// Initial: FMI 2.0 specification, section 2.2.7
   enum Initial {EXACT, APPROX, CALCULATED, INITIAL_NA, N_INITIAL};
 
+  // Attributes
+  enum Attribute {MIN, MAX, NOMINAL, START, N_ATTRIBUTE};
+
   /// Constructor
   Variable(const std::string& name = "");
 
@@ -109,6 +112,9 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
 
   // Default initial attribute, per specification
   static Initial default_initial(Causality causality, Variability variability);
+
+  // Get attribute by enum
+  MX attribute(Attribute att) const;
 };
 
 #endif  // SWIG
@@ -397,6 +403,11 @@ public:
   Function create(const std::string& fname,
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out, bool sx = false, bool lifted_calls = false) const;
+
+  /// Construct a function object for evaluating attributes
+  Function attribute_fun(const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out) const;
   ///@}
 
   /// Get variable expression by name
@@ -639,6 +650,9 @@ template<> struct enum_traits<Variable::Variability> {
 template<> struct enum_traits<Variable::Initial> {
   static const Variable::Initial n_enum = Variable::N_INITIAL;
 };
+template<> struct enum_traits<Variable::Attribute> {
+  static const Variable::Attribute n_enum = Variable::N_ATTRIBUTE;
+};
 template<> struct enum_traits<DaeBuilder::DaeBuilderIn> {
   static const DaeBuilder::DaeBuilderIn n_enum = DaeBuilder::DAE_BUILDER_NUM_IN;
 };
@@ -653,6 +667,7 @@ CASADI_EXPORT std::string to_string(Variable::Type v);
 CASADI_EXPORT std::string to_string(Variable::Causality v);
 CASADI_EXPORT std::string to_string(Variable::Variability v);
 CASADI_EXPORT std::string to_string(Variable::Initial v);
+CASADI_EXPORT std::string to_string(Variable::Attribute v);
 CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderIn v);
 CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderOut v);
 ///@}

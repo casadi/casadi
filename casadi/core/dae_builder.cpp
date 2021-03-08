@@ -90,6 +90,17 @@ std::string to_string(Variable::Initial v) {
   return "";
 }
 
+CASADI_EXPORT std::string to_string(Variable::Attribute v) {
+  switch (v) {
+  case Variable::MIN: return "min";
+  case Variable::MAX: return "max";
+  case Variable::NOMINAL: return "nominal";
+  case Variable::START: return "start";
+  default: break;
+  }
+  return "";
+}
+
 Variable::Initial Variable::default_initial(Variable::Causality causality,
     Variable::Variability variability) {
   // According to table in FMI 2.0.2 specification, section 2.2.7
@@ -1663,6 +1674,66 @@ void DaeBuilder::sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef) {
   // Reorder the equations
   for (size_t k = 0; k < v.size(); ++k) tmp[k] = vdef.at(rowperm.at(k));
   std::copy(tmp.begin(), tmp.end(), vdef.begin());
+}
+
+MX Variable::attribute(Attribute att) const {
+  switch (att) {
+  case MIN:
+    return this->min;
+  case MAX:
+    return this->max;
+  case NOMINAL:
+    return this->nominal;
+  case START:
+    return this->start;
+  default:
+    casadi_error("Cannot process attribute '" + to_string(att) + "'");
+    return MX();
+  }
+}
+
+Function DaeBuilder::attribute_fun(const std::string& fname,
+    const std::vector<std::string>& s_in,
+    const std::vector<std::string>& s_out) const {
+  // Convert inputs to enums
+  std::vector<DaeBuilderIn> v_in;
+  v_in.reserve(v_in.size());
+  for (const std::string& s : s_in) v_in.push_back(to_enum<DaeBuilderIn>(s));
+  // Convert outputs to enums
+  std::vector<Variable::Attribute> a_out;
+  std::vector<DaeBuilderIn> v_out;
+  a_out.reserve(s_out.size());
+  v_out.reserve(s_out.size());
+  for (const std::string& s : s_out) {
+    // Locate the underscore divider
+    size_t pos = s.find('_');
+    casadi_assert(pos < s.size(), "Cannot process \"" + s + "\"");
+    // Get attribute
+    a_out.push_back(to_enum<Variable::Attribute>(s.substr(0, pos)));
+    // Get variable
+    v_out.push_back(to_enum<DaeBuilderIn>(s.substr(pos + 1, std::string::npos)));
+  }
+  // Collect input expressions
+  std::vector<MX> f_in;
+  f_in.reserve(s_in.size());
+  for (DaeBuilderIn v : v_in) f_in.push_back(vertcat(input(v)));
+  // Collect output expressions
+  std::vector<MX> f_out;
+  f_out.reserve(s_out.size());
+  for (size_t i = 0; i < s_out.size(); ++i) {
+    // Get expressions for which attributes are requested
+    std::vector<MX> vars = input(v_out.at(i));
+    // Expressions for the attributes
+    std::vector<MX> attr;
+    attr.reserve(vars.size());
+    // Collect attributes
+    for (const MX& vi : vars)
+      attr.push_back(variable(vi.name()).attribute(a_out.at(i)));
+    // Add to output expressions
+    f_out.push_back(vertcat(attr));
+  }
+  // Assemble return function
+  return Function(fname, f_in, f_out, s_in, s_out);
 }
 
 } // namespace casadi
