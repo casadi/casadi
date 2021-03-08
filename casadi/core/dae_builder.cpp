@@ -1011,122 +1011,28 @@ void DaeBuilder::set_nominal(const std::string& name, double val) {
   variable(name).nominal = val;
 }
 
-std::vector<double> DaeBuilder::nominal(const MX& var) const {
-  casadi_assert(var.is_column() && var.is_valid_input(),
-                        "DaeBuilder::nominal: Argument must be a symbolic vector");
-  std::vector<double> ret(var.nnz());
-  std::vector<MX> prim = var.primitives();
-  for (casadi_int i=0; i<prim.size(); ++i) {
-    casadi_assert_dev(prim[i].nnz()==1);
-    ret[i] = nominal(prim.at(i).name());
-  }
-  return ret;
-}
-
-void DaeBuilder::set_nominal(const MX& var, const std::vector<double>& val) {
-  casadi_assert(var.is_column() && var.is_valid_input(),
-                        "DaeBuilder::nominal: Argument must be a symbolic vector");
-  casadi_assert(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
-  std::vector<MX> prim = var.primitives();
-  for (casadi_int i=0; i<prim.size(); ++i) {
-    casadi_assert_dev(prim[i].nnz()==1);
-    set_nominal(prim.at(i).name(), val.at(i));
-  }
-}
-
-std::vector<double> DaeBuilder::attribute(getAtt f, const MX& var) const {
-  casadi_assert(var.is_column() && var.is_valid_input(),
-                        "DaeBuilder::attribute: Argument must be a symbolic vector");
-  std::vector<double> ret(var.nnz());
-  std::vector<MX> prim = var.primitives();
-  for (casadi_int i=0; i<prim.size(); ++i) {
-    casadi_assert_dev(prim[i].nnz()==1);
-    ret[i] = (this->*f)(prim[i].name());
-  }
-  return ret;
-}
-
-MX DaeBuilder::attribute(getAttS f, const MX& var) const {
-  casadi_assert(var.is_column() && var.is_valid_input(),
-                        "DaeBuilder::attribute: Argument must be a symbolic vector");
-  MX ret = MX::zeros(var.sparsity());
-  std::vector<MX> prim = var.primitives();
-  for (casadi_int i=0; i<prim.size(); ++i) {
-    casadi_assert_dev(prim[i].nnz()==1);
-    ret.nz(i) = (this->*f)(prim[i].name());
-  }
-  return ret;
-}
-
-void DaeBuilder::set_attribute(setAtt f, const MX& var, const std::vector<double>& val) {
-  casadi_assert(var.is_column() && var.is_valid_input(),
-                        "DaeBuilder::set_attribute: Argument must be a symbolic vector");
-  casadi_assert(var.nnz()==val.size(), "DaeBuilder::set_attribute: Dimension mismatch");
-  std::vector<MX> prim = var.primitives();
-  for (casadi_int i=0; i<prim.size(); ++i) {
-    casadi_assert_dev(prim[i].nnz()==1);
-    (this->*f)(prim[i].name(), val[i]);
-  }
-}
-
-void DaeBuilder::set_attribute(setAttS f, const MX& var, const MX& val) {
-  casadi_assert(var.is_column() && var.is_valid_input(),
-                        "DaeBuilder::set_attribute: Argument must be a symbolic vector");
-  casadi_assert(var.sparsity()==val.sparsity(),
-                        "DaeBuilder::set_attribute: Sparsity mismatch");
-  std::vector<MX> prim = var.primitives();
-  for (casadi_int i=0; i<prim.size(); ++i) {
-    casadi_assert_dev(prim[i].nnz()==1);
-    (this->*f)(var.nz(i).name(), val.nz(i));
-  }
-}
-
 double DaeBuilder::min(const std::string& name) const {
   return variable(name).min;
-}
-
-std::vector<double> DaeBuilder::min(const MX& var) const {
-  return attribute(&DaeBuilder::min, var);
 }
 
 void DaeBuilder::set_min(const std::string& name, double val) {
   variable(name).min = val;
 }
 
-void DaeBuilder::set_min(const MX& var, const std::vector<double>& val) {
-  set_attribute(&DaeBuilder::set_min, var, val);
-}
-
 double DaeBuilder::max(const std::string& name) const {
   return variable(name).max;
-}
-
-std::vector<double> DaeBuilder::max(const MX& var) const {
-  return attribute(&DaeBuilder::max, var);
 }
 
 void DaeBuilder::set_max(const std::string& name, double val) {
   variable(name).max = val;
 }
 
-void DaeBuilder::set_max(const MX& var, const std::vector<double>& val) {
-  set_attribute(&DaeBuilder::set_max, var, val);
-}
-
 double DaeBuilder::start(const std::string& name) const {
   return variable(name).start;
 }
 
-std::vector<double> DaeBuilder::start(const MX& var) const {
-  return attribute(&DaeBuilder::start, var);
-}
-
 void DaeBuilder::set_start(const std::string& name, double val) {
   variable(name).start = val;
-}
-
-void DaeBuilder::set_start(const MX& var, const std::vector<double>& val) {
-  set_attribute(&DaeBuilder::set_start, var, val);
 }
 
 const casadi::MX& DaeBuilder::binding_equation(const std::string& name) const {

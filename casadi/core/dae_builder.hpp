@@ -457,33 +457,25 @@ public:
   ///@{
   /// Get/set the lower bound
   double min(const std::string& name) const;
-  std::vector<double> min(const MX& var) const;
   void set_min(const std::string& name, double val);
-  void set_min(const MX& var, const std::vector<double>& val);
   ///@}
 
   ///@{
   /// Get/set the upper bound
   double max(const std::string& name) const;
-  std::vector<double> max(const MX& var) const;
   void set_max(const std::string& name, double val);
-  void set_max(const MX& var, const std::vector<double>& val);
   ///@}
 
   ///@{
   /// Get/set the nominal value
   double nominal(const std::string& name) const;
-  std::vector<double> nominal(const MX& var) const;
   void set_nominal(const std::string& name, double val);
-  void set_nominal(const MX& var, const std::vector<double>& val);
   ///@}
 
   ///@{
   /// Get/set the value at time 0
   double start(const std::string& name) const;
-  std::vector<double> start(const MX& var) const;
   void set_start(const std::string& name, double val);
-  void set_start(const MX& var, const std::vector<double>& val);
   ///@}
 
   ///@{
@@ -559,22 +551,6 @@ protected:
 
   /// Read a variable
   Variable& read_variable(const XmlNode& node);
-
-  /// Get an attribute by expression
-  typedef double (DaeBuilder::*getAtt)(const std::string& name) const;
-  std::vector<double> attribute(getAtt f, const MX& var) const;
-
-  /// Get a symbolic attribute by expression
-  typedef MX (DaeBuilder::*getAttS)(const std::string& name) const;
-  MX attribute(getAttS f, const MX& var) const;
-
-  /// Set an attribute by expression
-  typedef void (DaeBuilder::*setAtt)(const std::string& name, double val);
-  void set_attribute(setAtt f, const MX& var, const std::vector<double>& val);
-
-  /// Set a symbolic attribute by expression
-  typedef void (DaeBuilder::*setAttS)(const std::string& name, const MX& val);
-  void set_attribute(setAttS f, const MX& var, const MX& val);
 
   /// Problem structure has changed: Clear cache
   void clear_cache() const;
