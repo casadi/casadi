@@ -186,10 +186,10 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
         const XmlNode& props = vnode["Real"];
         var.unit = props.attribute<std::string>("unit", var.unit);
         var.display_unit = props.attribute<std::string>("displayUnit", var.display_unit);
-        var.min = props.attribute<double>("min", var.min);
-        var.max = props.attribute<double>("max", var.max);
-        var.nominal = props.attribute<double>("nominal", var.nominal);
-        var.start = props.attribute<double>("start", var.start);
+        var.min = props.attribute<double>("min", -inf);
+        var.max = props.attribute<double>("max", inf);
+        var.nominal = props.attribute<double>("nominal", 1.);
+        var.start = props.attribute<double>("start", 0.);
         var.derivative = props.attribute<casadi_int>("derivative", var.derivative);
       }
       // Add to list of variables
@@ -1003,35 +1003,35 @@ void DaeBuilder::set_display_unit(const std::string& name, const std::string& va
   variable(name).display_unit = val;
 }
 
-double DaeBuilder::nominal(const std::string& name) const {
+MX DaeBuilder::nominal(const std::string& name) const {
   return variable(name).nominal;
 }
 
-void DaeBuilder::set_nominal(const std::string& name, double val) {
+void DaeBuilder::set_nominal(const std::string& name, const MX& val) {
   variable(name).nominal = val;
 }
 
-double DaeBuilder::min(const std::string& name) const {
+MX DaeBuilder::min(const std::string& name) const {
   return variable(name).min;
 }
 
-void DaeBuilder::set_min(const std::string& name, double val) {
+void DaeBuilder::set_min(const std::string& name, const MX& val) {
   variable(name).min = val;
 }
 
-double DaeBuilder::max(const std::string& name) const {
+MX DaeBuilder::max(const std::string& name) const {
   return variable(name).max;
 }
 
-void DaeBuilder::set_max(const std::string& name, double val) {
+void DaeBuilder::set_max(const std::string& name, const MX& val) {
   variable(name).max = val;
 }
 
-double DaeBuilder::start(const std::string& name) const {
+MX DaeBuilder::start(const std::string& name) const {
   return variable(name).start;
 }
 
-void DaeBuilder::set_start(const std::string& name, double val) {
+void DaeBuilder::set_start(const std::string& name, const MX& val) {
   variable(name).start = val;
 }
 

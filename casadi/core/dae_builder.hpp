@@ -75,11 +75,11 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   std::string unit;
   std::string display_unit;
   // bool relative_quantity;
-  double min;
-  double max;
-  double nominal;
+  MX min;
+  MX max;
+  MX nominal;
   // bool unbounded;
-  double start;
+  MX start;
   casadi_int derivative;
   casadi_int antiderivative;
   // bool reinit;
@@ -456,26 +456,26 @@ public:
 
   ///@{
   /// Get/set the lower bound
-  double min(const std::string& name) const;
-  void set_min(const std::string& name, double val);
+  MX min(const std::string& name) const;
+  void set_min(const std::string& name, const MX& val);
   ///@}
 
   ///@{
   /// Get/set the upper bound
-  double max(const std::string& name) const;
-  void set_max(const std::string& name, double val);
+  MX max(const std::string& name) const;
+  void set_max(const std::string& name, const MX& val);
   ///@}
 
   ///@{
   /// Get/set the nominal value
-  double nominal(const std::string& name) const;
-  void set_nominal(const std::string& name, double val);
+  MX nominal(const std::string& name) const;
+  void set_nominal(const std::string& name, const MX& val);
   ///@}
 
   ///@{
   /// Get/set the value at time 0
-  double start(const std::string& name) const;
-  void set_start(const std::string& name, double val);
+  MX start(const std::string& name) const;
+  void set_start(const std::string& name, const MX& val);
   ///@}
 
   ///@{
