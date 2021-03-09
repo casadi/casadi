@@ -1,22 +1,29 @@
 #pragma once
 
+#include <Eigen/Eigen>
 #include <gmock/gmock-matchers.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <iomanip>
 
 /// @file
 /// https://stackoverflow.com/questions/25146997/teach-google-test-how-to-print-eigen-matrix
 
-MATCHER_P(EigenEqual, expect,
-          std::string(negation ? "isn't" : "is") + " equal to" +
-              testing::PrintToString(expect)) {
+MATCHER_P(EigenEqual, expect, testing::PrintToString(expect)) {
     return arg == expect;
+}
+
+MATCHER_P2(EigenAlmostEqual, expect, atol, testing::PrintToString(expect)) {
+    return (arg - expect).template lpNorm<Eigen::Infinity>() <= atol;
 }
 
 template <class Base>
 class EigenPrintWrap : public Base {
     friend void PrintTo(const EigenPrintWrap &m, std::ostream *o) {
-        *o << "\n" << m;
+        if (m.cols() == 1)
+            *o << std::scientific << std::setprecision(17) << m.transpose();
+        else
+            *o << "\n" << std::scientific << std::setprecision(17) << m;
     }
 };
 

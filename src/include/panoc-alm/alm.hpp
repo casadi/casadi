@@ -1,9 +1,8 @@
 #pragma once
 
-#include "panoc-alm/problem.hpp"
-#include "panoc-alm/solverstatus.hpp"
-#include "panoc.hpp"
-#include <iostream>
+#include <panoc-alm/panoc.hpp>
+#include <panoc-alm/problem.hpp>
+#include <panoc-alm/solverstatus.hpp>
 
 namespace pa {
 
@@ -43,9 +42,9 @@ class ALMSolver {
         unsigned inner_linesearch_failures  = 0;
         unsigned inner_lbfgs_failures       = 0;
         unsigned inner_lbfgs_rejected       = 0;
-        real_t ε = std::numeric_limits<real_t>::infinity();
-        real_t δ = std::numeric_limits<real_t>::infinity();
-        real_t norm_penalty = 0;
+        real_t ε                            = inf;
+        real_t δ                            = inf;
+        real_t norm_penalty                 = 0;
 
         SolverStatus status = SolverStatus::Unknown;
     };
@@ -59,6 +58,8 @@ class ALMSolver {
 
   private:
     Params params;
+
+  public:
     PANOCSolver panoc;
 };
 

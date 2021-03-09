@@ -10,6 +10,7 @@ enum class SolverStatus {
     MaxTime,     ///< Maximum allowed execution time exceeded.
     MaxIter,     ///< Maximum number of iterations exceeded.
     NotFinite,   ///< Intermediate results were infinite or not-a-number.
+    NoProgress,  ///< No progress was made in the last iteration.
     Interrupted, ///< Solver was interrupted by the user.
 };
 

@@ -2,7 +2,7 @@
 
 #include <panoc-alm/panoc.hpp>
 
-/// Reference implementations that are more readable than the optimized 
+/// Reference implementations that are more readable than the optimized
 /// implementations, used for tests as well
 namespace pa_ref {
 
@@ -20,15 +20,17 @@ class PANOCSolver {
     PANOCSolver(Params params) : params(params) {}
 
     Stats operator()(const Problem &problem, // in
-                     vec &x,                 // inout
-                     vec &z,                 // out
-                     vec &y,                 // inout
-                     vec &err_z,             // out
                      const vec &Σ,           // in
-                     real_t ε);
+                     real_t ε,               // in
+                     vec &x,                 // inout
+                     vec &y,                 // inout
+                     vec &err_z);            // out
+
+    void stop() { stop_signal.store(true, std::memory_order_relaxed); }
 
   private:
     Params params;
+    std::atomic<bool> stop_signal{false};
 };
 
 namespace detail {

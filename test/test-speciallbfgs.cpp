@@ -11,6 +11,7 @@
 };
 
 TEST(SpecializedLBFGS, constantgamma) {
+    using pa::inf;
     using pa::real_t;
     using pa::vec;
     pa::SpecializedLBFGS l(2, 3);
@@ -20,10 +21,9 @@ TEST(SpecializedLBFGS, constantgamma) {
     g0 << -1, 1;
     real_t γ = 1;
     pa::Box C;
-    constexpr auto inf = std::numeric_limits<real_t>::infinity();
-    C.lowerbound       = vec::Constant(2, 0.);
-    C.upperbound       = vec::Constant(2, inf);
-    vec x̂0             = pa::project(x0 - γ * g0, C);
+    C.lowerbound = vec::Constant(2, 0.);
+    C.upperbound = vec::Constant(2, inf);
+    vec x̂0       = pa::project(x0 - γ * g0, C);
 
     l.initialize(x0, g0, x̂0, γ);
 
@@ -129,6 +129,7 @@ TEST(SpecializedLBFGS, constantgamma) {
 }
 
 TEST(SpecializedLBFGS, updategamma1) {
+    using pa::inf;
     using pa::real_t;
     using pa::vec;
     pa::SpecializedLBFGS l(2, 3);
@@ -138,10 +139,9 @@ TEST(SpecializedLBFGS, updategamma1) {
     g0 << -1, 1;
     real_t γ = 1;
     pa::Box C;
-    constexpr auto inf = std::numeric_limits<real_t>::infinity();
-    C.lowerbound       = vec::Constant(2, 0.);
-    C.upperbound       = vec::Constant(2, inf);
-    vec x̂0             = pa::project(x0 - γ * g0, C);
+    C.lowerbound = vec::Constant(2, 0.);
+    C.upperbound = vec::Constant(2, inf);
+    vec x̂0       = pa::project(x0 - γ * g0, C);
 
     l.initialize(x0, g0, x̂0, γ);
 
@@ -251,6 +251,7 @@ TEST(SpecializedLBFGS, updategamma1) {
 }
 
 TEST(SpecializedLBFGS, updategamma2) {
+    using pa::inf;
     using pa::real_t;
     using pa::vec;
     pa::SpecializedLBFGS l(2, 3);
@@ -260,10 +261,9 @@ TEST(SpecializedLBFGS, updategamma2) {
     g0 << -1, 1;
     real_t γ = 1;
     pa::Box C;
-    constexpr auto inf = std::numeric_limits<real_t>::infinity();
-    C.lowerbound       = vec::Constant(2, 0.);
-    C.upperbound       = vec::Constant(2, inf);
-    vec x̂0             = pa::project(x0 - γ * g0, C);
+    C.lowerbound = vec::Constant(2, 0.);
+    C.upperbound = vec::Constant(2, inf);
+    vec x̂0       = pa::project(x0 - γ * g0, C);
 
     l.initialize(x0, g0, x̂0, γ);
 

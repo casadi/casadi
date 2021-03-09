@@ -1,10 +1,9 @@
 #include <panoc-alm/alm.hpp>
 
 #include "eigen-matchers.hpp"
+#include "panoc-alm/problem.hpp"
 
 #include <chrono>
-
-constexpr static auto inf = std::numeric_limits<pa::real_t>::infinity();
 
 TEST(ALM, riskaverse) {
     using namespace pa;
@@ -57,10 +56,6 @@ TEST(ALM, riskaverse) {
         (void)ux;
         grad_f.fill(0);
         s(grad_f)(0) = 1;
-        // std::cout << "∇f = " << grad_f.transpose() << std::endl;
-        // std::cout << "u  = " << u(ux).transpose() << std::endl;
-        // std::cout << "s  = " << s(ux).transpose() << std::endl;
-        // std::cout << "y  = " << y(ux).transpose() << std::endl;
     };
     auto g = [&](const vec &ux, vec &g_u) {
         g_u(0) = y(ux)(0) - y(ux)(1) - s(ux)(0);
@@ -87,24 +82,32 @@ TEST(ALM, riskaverse) {
     };
 
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g};
+    ProblemWithCounters pc(p);
 
     ALMParams almparam;
     almparam.ε        = 1e-5;
     almparam.δ        = 1e-5;
-    almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
-    almparam.Σ₀       = 1e-2; ///< Initial penalty parameter
-    almparam.ε₀       = 1e-4; ///< Initial tolerance on x
+    almparam.Δ        = 2; ///< Factor used in updating the penalty parameters
+    almparam.Σ₀       = 0; ///< Initial penalty parameter
+    almparam.σ₀       = 1; ///< Initial penalty parameter factor
+    almparam.ε₀       = 1e-1; ///< Initial tolerance on x
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
     almparam.σₘₐₓ     = 1e9;
     almparam.max_iter = 100;
+    almparam.preconditioning = true;
 
     PANOCParams panocparam;
-    panocparam.Lipschitz.ε = 1e-6;
-    panocparam.Lipschitz.δ = 1e-12;
-    panocparam.lbfgs_mem   = 10;
-    panocparam.max_iter    = 200;
+    panocparam.Lipschitz.ε                    = 1e-6;
+    panocparam.Lipschitz.δ                    = 1e-12;
+    panocparam.lbfgs_mem                      = 20;
+    panocparam.max_iter                       = 1000;
+    panocparam.update_lipschitz_in_linesearch = true;
+    panocparam.specialized_lbfgs              = true;
+
+    panocparam.print_interval = 0;
+    almparam.print_interval   = 1;
 
     ALMSolver solver{almparam, panocparam};
 
@@ -113,14 +116,14 @@ TEST(ALM, riskaverse) {
     vec λ(m);
     λ.fill(0);
 
-    auto stats = solver(p, λ, x);
+    ALMSolver::Stats stats;
 
-    constexpr unsigned N = 10;
+    constexpr unsigned N = 1;
     auto begin           = std::chrono::high_resolution_clock::now();
     for (volatile unsigned i = 0; i < N; ++i) {
         x.fill(0);
         λ.fill(0);
-        stats = solver(p, λ, x);
+        stats = solver(pc, λ, x);
     }
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -137,6 +140,13 @@ TEST(ALM, riskaverse) {
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
         (end - begin) / N);
     std::cout << duration.count() << "µs" << std::endl;
+
+    std::cout << "# eval f:  " << pc.evaluations.f << std::endl;
+    std::cout << "# eval ∇f: " << pc.evaluations.grad_f << std::endl;
+    std::cout << "# eval g:  " << pc.evaluations.g << std::endl;
+    std::cout << "# eval ∇g: " << pc.evaluations.grad_g << std::endl;
+
+    std::cout << "Status: " << stats.status << std::endl;
 
     // EXPECT_NEAR(x(0), -0.454545, 1e-4);
 }

@@ -4,8 +4,6 @@
 
 #include <chrono>
 
-auto inf = std::numeric_limits<pa::real_t>::infinity();
-
 TEST(ALM, singleshooting1D) {
     using namespace pa;
 

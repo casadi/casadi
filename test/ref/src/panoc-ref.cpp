@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cmath>
 
+#include <ios>
 #include <limits>
 #include <panoc-alm-ref/panoc-ref.hpp>
 #include <panoc-alm/lbfgs.hpp>
@@ -18,235 +19,245 @@ using pa::project;
 
 namespace detail {
 
-vec eval_g(const Problem &p, const vec &x) {
-    vec g(p.m);
-    p.g(x, g);
+vec eval_g(const Problem &prob, const vec &x) {
+    vec g(prob.m);
+    prob.g(x, g);
     return g;
 }
 
-vec eval_ẑ(const Problem &p, const vec &x, const vec &y, const vec &Σ) {
-    vec g = eval_g(p, x);
-    return project(g + Σ.asDiagonal().inverse() * y, p.D);
+vec eval_ẑ(const Problem &prob, const vec &x, const vec &y, const vec &Σ) {
+    vec g = eval_g(prob, x);
+    return project(g + Σ.asDiagonal().inverse() * y, prob.D);
 }
 
-vec eval_ŷ(const Problem &p, const vec &x, const vec &y, const vec &Σ) {
-    vec g = eval_g(p, x);
-    vec ẑ = eval_ẑ(p, x, y, Σ);
+vec eval_ŷ(const Problem &prob, const vec &x, const vec &y, const vec &Σ) {
+    vec g = eval_g(prob, x);
+    vec ẑ = eval_ẑ(prob, x, y, Σ);
     return Σ.asDiagonal() * (g - ẑ) + y;
 }
 
-real_t eval_ψ(const Problem &p, const vec &x, const vec &y, const vec &Σ) {
-    vec g = eval_g(p, x);
-    return p.f(x) +
-           0.5 * dist_squared(g + Σ.asDiagonal().inverse() * y, p.D, Σ);
+real_t eval_ψ(const Problem &prob, const vec &x, const vec &y, const vec &Σ) {
+    vec g = eval_g(prob, x);
+    return prob.f(x) +
+           0.5 * dist_squared(g + Σ.asDiagonal().inverse() * y, prob.D, Σ);
 }
 
-vec eval_grad_ψ(const Problem &p, const vec &x, const vec &y, const vec &Σ) {
-    vec ŷ = eval_ŷ(p, x, y, Σ);
-    vec grad_f(p.n), grad_gŷ(p.n);
-    p.grad_f(x, grad_f);
-    p.grad_g(x, ŷ, grad_gŷ);
+vec eval_grad_ψ(const Problem &prob, const vec &x, const vec &y, const vec &Σ) {
+    vec ŷ = eval_ŷ(prob, x, y, Σ);
+    vec grad_f(prob.n), grad_gŷ(prob.n);
+    prob.grad_f(x, grad_f);
+    prob.grad_g(x, ŷ, grad_gŷ);
     return grad_f + grad_gŷ;
 }
 
-vec gradient_step(const Problem &p, const vec &x, const vec &y, const vec &Σ,
-                  real_t γ) {
-    return x - γ * eval_grad_ψ(p, x, y, Σ);
+vec projected_gradient_step(const Problem &prob, const vec &x, const vec &y,
+                            const vec &Σ, real_t γ) {
+    using binary_real_f = real_t (*)(real_t, real_t);
+    return (-γ * eval_grad_ψ(prob, x, y, Σ))
+        .binaryExpr(prob.C.lowerbound - x, binary_real_f(std::fmax))
+        .binaryExpr(prob.C.upperbound - x, binary_real_f(std::fmin));
 }
 
-vec T_γ(const Problem &p, const vec &x, const vec &y, const vec &Σ, real_t γ) {
-    return project(gradient_step(p, x, y, Σ, γ), p.C);
+real_t eval_φ(const Problem &prob, const vec &x, const vec &y, const vec &Σ,
+              real_t γ) {
+    vec p = projected_gradient_step(prob, x, y, Σ, γ);
+    return eval_ψ(prob, x, y, Σ)                //
+           + 1. / (2 * γ) * p.squaredNorm()     //
+           + eval_grad_ψ(prob, x, y, Σ).dot(p); //
 }
 
-real_t eval_φ(const Problem &p, const vec &x, const vec &r, const vec &y,
-              const vec &Σ, real_t γ) {
-    return eval_ψ(p, x, y, Σ)                //
-           + 1. / (2 * γ) * r.squaredNorm()  //
-           + eval_grad_ψ(p, x, y, Σ).dot(r); //
-}
-
-real_t estimate_lipschitz(const Problem &p, const vec &x, const vec &y,
+real_t estimate_lipschitz(const Problem &prob, const vec &x, const vec &y,
                           const vec &Σ, const PANOCParams &params) {
     // Estimate Lipschitz constant using finite difference
-    vec h = (x * params.Lipschitz.ε).cwiseMax(params.Lipschitz.δ);
+    vec h = (x * params.Lipschitz.ε).cwiseAbs().cwiseMax(params.Lipschitz.δ);
     // Calculate ∇ψ(x₀ + h) and ∇ψ(x₀)
-    vec diff = eval_grad_ψ(p, x + h, y, Σ) - eval_grad_ψ(p, x, y, Σ);
+    vec diff = eval_grad_ψ(prob, x + h, y, Σ) - eval_grad_ψ(prob, x, y, Σ);
     // Estimate Lipschitz constant
     real_t L = diff.norm() / h.norm();
     return L;
 }
 
-real_t calc_error_stop_crit(const Problem &p, const vec &xₖ, const vec &x̂ₖ,
+real_t calc_error_stop_crit(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
                             const vec &y, const vec &Σ, real_t γ) {
-    return ((1 / γ) * (xₖ - x̂ₖ)        //
-            + eval_grad_ψ(p, x̂ₖ, y, Σ) //
-            - eval_grad_ψ(p, xₖ, y, Σ))
+    return ((1 / γ) * (xₖ - x̂ₖ)           //
+            + eval_grad_ψ(prob, x̂ₖ, y, Σ) //
+            - eval_grad_ψ(prob, xₖ, y, Σ))
         .lpNorm<Eigen::Infinity>();
 }
 
-bool lipschitz_check(const Problem &p, const vec &xₖ, const vec &x̂ₖ,
+bool lipschitz_check(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
                      const vec &y, const vec &Σ, real_t γ, real_t L) {
-    real_t ψₖ     = eval_ψ(p, xₖ, y, Σ);
-    real_t ψ̂xₖ    = eval_ψ(p, x̂ₖ, y, Σ);
+    real_t ψₖ     = eval_ψ(prob, xₖ, y, Σ);
+    real_t ψ̂xₖ    = eval_ψ(prob, x̂ₖ, y, Σ);
+    std::cout << std::scientific;
+    std::cout << "ψₖ:  " << ψₖ << std::endl;
+    std::cout << "ψ̂xₖ: " << ψ̂xₖ << std::endl;
     real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO: why?
-    vec rₖ        = xₖ - x̂ₖ;
-    return ψ̂xₖ > margin + ψₖ                            //
-                     - eval_grad_ψ(p, xₖ, y, Σ).dot(rₖ) //
-                     + L / 2 * rₖ.squaredNorm();
+    vec pₖ        = projected_gradient_step(prob, xₖ, y, Σ, γ);
+    return ψ̂xₖ > margin + ψₖ                               //
+                     + eval_grad_ψ(prob, xₖ, y, Σ).dot(pₖ) //
+                     + L / 2 * pₖ.squaredNorm();
 }
 
 } // namespace detail
 
+using pa::LBFGS;
+using pa::SolverStatus;
+using pa::SpecializedLBFGS;
+using std::chrono::duration_cast;
+using std::chrono::microseconds;
+
 PANOCSolver::Stats PANOCSolver::operator()(
     const Problem &problem, ///< [in]    Problem description
-    vec &x,                 ///< [inout] Decision variable @f$ x @f$
-    vec &z,                 ///< [out]   Slack variable @f$ x @f$
-    vec &y,                 ///< [inout] Lagrange multiplier @f$ x @f$
-    vec &err_z,             ///< [out]   Slack variable error @f$ g(x) - z @f$
     const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
-    real_t ε                ///< [in]    Tolerance @f$ \epsilon @f$
+    real_t ε,               ///< [in]    Tolerance @f$ \epsilon @f$
+    vec &x,                 ///< [inout] Decision variable @f$ x @f$
+    vec &y,                 ///< [inout] Lagrange multiplier @f$ x @f$
+    vec &err_z              ///< [out]   Slack variable error @f$ g(x) - z @f$
 ) {
     using namespace detail;
+    auto start_time = std::chrono::steady_clock::now();
+    Stats s;
 
     const auto n = problem.n;
 
-    LBFGS lbfgs(n, params.lbfgs_mem);
+    LBFGS lbfgs;
+    SpecializedLBFGS slbfgs;
+    params.specialized_lbfgs ? slbfgs.resize(n, params.lbfgs_mem)
+                             : lbfgs.resize(n, params.lbfgs_mem);
 
     vec xₖ = x; // Value of x at the beginning of the iteration
 
-    real_t L = estimate_lipschitz(problem, x, y, Σ, params);
-    if (L < 10 * std::numeric_limits<real_t>::epsilon())
-        L = 10 * std::numeric_limits<real_t>::epsilon();
-    real_t γ = params.Lipschitz.Lγ_factor / L;
-    real_t σ = γ * (1 - γ * L) / 2;
-
-    std::cout << std::scientific;
-
-    std::cout << "Initial γ = " << γ << "\n";
-
-    // Calculate x̂ₖ, rₖ (gradient step)
-    vec x̂ₖ = T_γ(problem, xₖ, y, Σ, γ);
-    // Increase L until quadratic upper bound is satisfied
-    real_t old_γ = γ;
-    while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γ, L) && γ != 0) {
-        L *= 2;
-        σ /= 2;
-        γ /= 2;
-
-        // Calculate x̂ₖ (with new step size)
-        x̂ₖ = T_γ(problem, xₖ, y, Σ, γ);
-    }
-    if (old_γ != γ)
-        std::cout << "      update γ = " << γ << "\n";
-    vec rₖ = xₖ - x̂ₖ;
+    real_t Lₖ = estimate_lipschitz(problem, x, y, Σ, params);
+    if (Lₖ < 10 * std::numeric_limits<real_t>::epsilon())
+        Lₖ = 10 * std::numeric_limits<real_t>::epsilon();
+    real_t γₖ = params.Lipschitz.Lγ_factor / Lₖ;
+    real_t σₖ = γₖ * (1 - γₖ * Lₖ) / 2;
 
     for (unsigned k = 0; k <= params.max_iter; ++k) {
+        // Calculate x̂ₖ, pₖ (gradient step)
+        vec x̂ₖ = xₖ + projected_gradient_step(problem, xₖ, y, Σ, γₖ);
+
+        while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γₖ, Lₖ) && γₖ > 0) {
+            assert(not params.update_lipschitz_in_linesearch || k == 0);
+
+            Lₖ *= 2;
+            σₖ /= 2;
+            γₖ /= 2;
+
+            // Calculate x̂ₖ (with new step size)
+            x̂ₖ = xₖ + projected_gradient_step(problem, xₖ, y, Σ, γₖ);
+        }
+
+        // Initialize the L-BFGS
+        if (params.specialized_lbfgs == true && k == 0)
+            slbfgs.initialize(xₖ, eval_grad_ψ(problem, xₖ, y, Σ), x̂ₖ, γₖ);
+
         // Check stop condition
-        real_t εₖ = calc_error_stop_crit(problem, xₖ, x̂ₖ, y, Σ, γ);
-        std::cout << "      εₖ    = " << εₖ << "\n";
-        if (εₖ <= ε || k == params.max_iter) {
-            x     = std::move(x̂ₖ);
-            z     = eval_ẑ(problem, xₖ, y, Σ);
-            y     = eval_ŷ(problem, xₖ, y, Σ);
-            err_z = eval_g(problem, x) - z;
+        real_t εₖ = calc_error_stop_crit(problem, xₖ, x̂ₖ, y, Σ, γₖ);
 
-            Stats s;
-            s.iterations = k;
-            s.status     = εₖ <= ε ? pa::SolverStatus::Converged
-                                   : pa::SolverStatus::MaxIter;
-            return s;
-        }
-        if (!std::isfinite(εₖ)) {
-            std::cerr << "[PANOC] "
-                         "\x1b[0;31m"
-                         "inf/NaN"
-                         "\x1b[0m"
-                      << "\n";
-
-            std::cout << "      "
-                      << "xₖ    = " << xₖ.transpose() << "\n";
-            std::cout << "      "
-                      << "step  = "
-                      << gradient_step(problem, xₖ, y, Σ, γ).transpose()
-                      << "\n";
-            std::cout << "      "
-                      << "x̂ₖ    = " << x̂ₖ.transpose() << "\n";
-            std::cout << "      "
-                      << "rₖ    = " << rₖ.transpose() << "\n";
-            std::cout << "      "
-                      << "∇ψ(x) = "
-                      << eval_grad_ψ(problem, xₖ, y, Σ).transpose() << "\n";
-            std::cout << "      "
-                      << "ẑ(x)  = " << eval_ẑ(problem, xₖ, y, Σ).transpose()
-                      << "\n";
-            std::cout << "      "
-                      << "ŷ(x)  = " << eval_ŷ(problem, xₖ, y, Σ).transpose()
-                      << "\n";
-
-            Stats s;
-            s.iterations = k;
-            s.status     = pa::SolverStatus::NotFinite;
+        auto time_elapsed = std::chrono::steady_clock::now() - start_time;
+        bool out_of_time  = time_elapsed > params.max_time;
+        bool out_of_iter  = k == params.max_iter;
+        bool interrupted  = stop_signal.load(std::memory_order_relaxed);
+        bool not_finite   = not std::isfinite(εₖ);
+        bool conv         = εₖ <= ε;
+        if (conv || out_of_iter || out_of_time || not_finite || interrupted) {
+            err_z        = eval_g(problem, x) - eval_ẑ(problem, xₖ, y, Σ);
+            x            = std::move(x̂ₖ);
+            y            = eval_ŷ(problem, xₖ, y, Σ);
+            s.iterations = k; // TODO: what do we count as an iteration?
+            s.ε          = εₖ;
+            s.elapsed_time = duration_cast<microseconds>(time_elapsed);
+            s.status       = conv          ? SolverStatus::Converged
+                             : out_of_time ? SolverStatus::MaxTime
+                             : out_of_iter ? SolverStatus::MaxIter
+                             : not_finite  ? SolverStatus::NotFinite
+                                           : SolverStatus::Interrupted;
             return s;
         }
 
-        // Calculate Newton step
-        vec dₖ(n);
-        dₖ = rₖ;
-        lbfgs.apply(dₖ);
+        // Calculate quasi-Newton step -----------------------------------------
+        vec pₖ = projected_gradient_step(problem, xₖ, y, Σ, γₖ);
+        vec qₖ = pₖ;
+        if (k > 0)
+            params.specialized_lbfgs ? slbfgs.apply(qₖ) : lbfgs.apply(qₖ);
+
+        std::cout << "ψ:  " << eval_ψ(problem, xₖ, y, Σ) << std::endl;
+        std::cout << "∇ψ: " << eval_grad_ψ(problem, xₖ, y, Σ).transpose()
+                  << std::endl;
+        std::cout << "p:  " << pₖ.transpose() << std::endl;
+        std::cout << "q:  " << qₖ.transpose() << std::endl << std::endl;
 
         // Line search
         real_t τ = 1;
-        vec xₖ₊₁, x̂ₖ₊₁, rₖ₊₁;
+        if (k == 0) {
+            τ = 0;
+        } else if (not qₖ.allFinite()) {
+            τ = 0;
+            ++s.lbfgs_failures;
+            params.specialized_lbfgs ? slbfgs.reset() : lbfgs.reset();
+        }
         real_t Lₖ₊₁, σₖ₊₁, γₖ₊₁;
+        vec xₖ₊₁(n), pₖ₊₁(n), x̂ₖ₊₁(n);
         do {
-            Lₖ₊₁ = L;
-            σₖ₊₁ = σ;
-            γₖ₊₁ = γ;
+            Lₖ₊₁ = Lₖ;
+            σₖ₊₁ = σₖ;
+            γₖ₊₁ = γₖ;
 
             // Calculate xₖ₊₁
-            xₖ₊₁ = xₖ - (1 - τ) * rₖ - τ * dₖ;
-            x̂ₖ₊₁ = T_γ(problem, xₖ₊₁, y, Σ, γ);
-            while (lipschitz_check(problem, xₖ₊₁, x̂ₖ₊₁, y, Σ, γₖ₊₁, Lₖ₊₁) &&
-                   γₖ₊₁ != 0) {
-                Lₖ₊₁ *= 2;
-                σₖ₊₁ /= 2;
-                γₖ₊₁ /= 2;
+            if (τ / 2 >= params.τ_min)
+                xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ;
+            else
+                xₖ₊₁ = x̂ₖ;
 
-                // Calculate x̂ₖ (with new step size)
-                x̂ₖ₊₁ = T_γ(problem, xₖ₊₁, y, Σ, γₖ₊₁);
+            pₖ₊₁ = projected_gradient_step(problem, xₖ₊₁, y, Σ, γₖ₊₁);
+            x̂ₖ₊₁ = xₖ₊₁ + pₖ₊₁;
+
+            if (params.update_lipschitz_in_linesearch) {
+                while (lipschitz_check(problem, xₖ₊₁, x̂ₖ₊₁, y, Σ, γₖ₊₁, Lₖ₊₁) &&
+                       γₖ₊₁ > 0) {
+                    Lₖ₊₁ *= 2;
+                    σₖ₊₁ /= 2;
+                    γₖ₊₁ /= 2;
+
+                    // Calculate x̂ₖ (with new step size)
+                    pₖ₊₁ = projected_gradient_step(problem, xₖ₊₁, y, Σ, γₖ₊₁);
+                    x̂ₖ₊₁ = xₖ₊₁ + pₖ₊₁;
+                }
             }
-            rₖ₊₁ = xₖ₊₁ - x̂ₖ₊₁;
+
+std::cout << "γ:  " << γₖ₊₁ << std::endl;
+            std::cout << "φₖ:   " << eval_φ(problem, xₖ, y, Σ, γₖ) << std::endl;
+            std::cout << "φₖ₊₁: " << eval_φ(problem, xₖ₊₁, y, Σ, γₖ₊₁)
+                      << std::endl;
 
             // Update τ
             τ /= 2;
-        } while (eval_φ(problem, xₖ₊₁, rₖ₊₁, y, Σ, γₖ₊₁) >
-                     eval_φ(problem, xₖ, rₖ, y, Σ, γ) -
-                         σ / (γ * γ) * rₖ.squaredNorm() &&
+        } while (eval_φ(problem, xₖ₊₁, y, Σ, γₖ₊₁) >
+                     eval_φ(problem, xₖ, y, Σ, γₖ) -
+                         σₖ / (γₖ * γₖ) * pₖ.squaredNorm() &&
                  τ >= params.τ_min);
 
-        if (τ < params.τ_min) {
-            std::cerr << "[PANOC] "
-                         "\x1b[0;31m"
-                         "Warning: Line search failed"
-                         "\x1b[0m"
-                      << "\n";
-            xₖ₊₁ = x̂ₖ;
-            rₖ₊₁ = xₖ₊₁ - x̂ₖ₊₁;
-            Lₖ₊₁ = L;
-            σₖ₊₁ = σ;
-            γₖ₊₁ = γ; // I know ...
+        // τ < τ_min the line search failed and we accepted the prox step
+        if (τ < params.τ_min && k != 0) {
+            std::cout << "ls fail" << std::endl;
+            ++s.linesearch_failures;
         }
+        std::cout << std::endl;
 
-        // Update L-BFGS
-        lbfgs.update(xₖ₊₁ - xₖ, rₖ₊₁ - rₖ);
+        // Update L-BFGS -------------------------------------------------------
+        s.lbfgs_rejected +=
+            params.specialized_lbfgs
+                ? not slbfgs.update(xₖ₊₁, eval_grad_ψ(problem, xₖ₊₁, y, Σ),
+                                    x̂ₖ₊₁, problem.C, γₖ₊₁)
+                : not lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
 
         // Advance step
         xₖ = std::move(xₖ₊₁);
-        rₖ = std::move(rₖ₊₁);
-        x̂ₖ = std::move(x̂ₖ₊₁);
-        L  = Lₖ₊₁;
-        σ  = σₖ₊₁;
-        γ  = γₖ₊₁;
+        Lₖ = Lₖ₊₁;
+        σₖ = σₖ₊₁;
+        γₖ = γₖ₊₁;
     }
     throw std::logic_error("[PANOC] loop error");
 }

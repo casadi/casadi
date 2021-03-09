@@ -44,7 +44,7 @@ class PANOCSolver {
 
     struct Stats {
         unsigned iterations = 0;
-        real_t ε            = std::numeric_limits<real_t>::infinity();
+        real_t ε            = inf;
         std::chrono::microseconds elapsed_time;
         SolverStatus status          = SolverStatus::Unknown;
         unsigned linesearch_failures = 0;
@@ -52,21 +52,45 @@ class PANOCSolver {
         unsigned lbfgs_rejected      = 0;
     };
 
+    struct ProgressInfo {
+        unsigned k;
+        const vec &x;
+        const vec &p;
+        real_t norm_sq_p;
+        const vec &x_hat;
+        real_t ψ;
+        const vec &grad_ψ;
+        real_t ψ_hat;
+        const vec &grad_ψ_hat;
+        real_t γ;
+        real_t ε;
+        const vec &Σ;
+        const vec &y;
+        const Problem &problem;
+        const Params &params;
+    };
+
     PANOCSolver(Params params) : params(params) {}
 
     Stats operator()(const Problem &problem, // in
-                     vec &x,                 // inout
-                     vec &z,                 // out
-                     vec &y,                 // inout
-                     vec &err_z,             // out
                      const vec &Σ,           // in
-                     real_t ε);
+                     real_t ε,               // in
+                     vec &x,                 // inout
+                     vec &y,                 // inout
+                     vec &err_z);            // out
+
+    PANOCSolver &
+    set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
+        this->progress_cb = cb;
+        return *this;
+    }
 
     void stop() { stop_signal.store(true, std::memory_order_relaxed); }
 
   private:
     Params params;
     std::atomic<bool> stop_signal{false};
+    std::function<void(const ProgressInfo &)> progress_cb;
 };
 
 } // namespace pa

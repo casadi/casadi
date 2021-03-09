@@ -13,6 +13,7 @@ const char *enum_name(SolverStatus s) {
         case Status::MaxTime: return "MaxTime";
         case Status::MaxIter: return "MaxIter";
         case Status::NotFinite: return "NotFinite";
+        case Status::NoProgress: return "NoProgress";
         case Status::Interrupted: return "Interrupted";
     }
     throw std::out_of_range("invalid value for pa::SolverStatus");

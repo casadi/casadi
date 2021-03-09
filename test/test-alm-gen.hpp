@@ -9,7 +9,6 @@
 template <class Data>
 inline pa::Problem make_problem() {
     using namespace pa;
-    auto inf = std::numeric_limits<pa::real_t>::infinity();
 
     unsigned nx = Data::nx(), nu = Data::nu();
     unsigned n = nu + nx;

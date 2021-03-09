@@ -92,23 +92,21 @@ inline void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
     grad_ψ += work_n;
 }
 
-/// Calculate ẑ.
+/// Calculate the error between ẑ and g(x).
 /// @f[ \hat{z}^k = \Pi_D\left(g(x^k) + \Sigma^{-1}y\right) @f]
-inline void calc_ẑ(const Problem &p, ///< [in]  Problem description
-                   const vec &x̂, ///< [in]  Decision variable @f$ \hat{x} @f$
-                   const vec &y, ///< [in]  Lagrange multipliers @f$ y @f$
-                   const vec &Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
-                   vec &ẑ,       ///< [out] @f$ \hat{z} @f$
-                   vec &err_z    ///< [out] @f$ g(\hat{x}) - \hat{z} @f$
+inline void
+calc_err_z(const Problem &p, ///< [in]  Problem description
+           const vec &x̂,     ///< [in]  Decision variable @f$ \hat{x} @f$
+           const vec &y,     ///< [in]  Lagrange multipliers @f$ y @f$
+           const vec &Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
+           vec &err_z        ///< [out] @f$ g(\hat{x}) - \hat{z} @f$
 ) {
     // g(x̂)
     p.g(x̂, err_z);
     // ζ = g(x̂) + Σ⁻¹y
-    ẑ = err_z + (y.array() / Σ.array()).matrix();
     // ẑ = Π(ζ, D)
-    ẑ = project(ẑ, p.D);
-    // g(x̂) - ẑ
-    err_z -= ẑ;
+    // g(x) - ẑ
+    err_z = err_z - project(err_z + Σ.asDiagonal().inverse() * y, p.D); // TODO: catastrophic cancellation?
 }
 
 /**

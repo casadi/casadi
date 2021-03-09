@@ -9,6 +9,8 @@ using realvec = Eigen::Matrix<real_t, Eigen::Dynamic, 1>;
 using realmat = Eigen::Matrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 using vec     = realvec;
 using mat     = realmat;
+constexpr real_t inf = std::numeric_limits<real_t>::infinity();
+constexpr real_t NaN = std::numeric_limits<real_t>::quiet_NaN();
 
 namespace vec_util {
 

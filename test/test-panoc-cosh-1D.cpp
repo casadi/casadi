@@ -3,11 +3,10 @@
 #include <panoc-alm-ref/panoc-ref.hpp>
 #include <panoc-alm/panoc.hpp>
 
-constexpr static auto inf = std::numeric_limits<pa::real_t>::infinity();
-constexpr static auto NaN = std::numeric_limits<pa::real_t>::quiet_NaN();
-
 TEST(PANOC, cosh1D) {
     using pa::Box;
+    using pa::inf;
+    using pa::NaN;
     using pa::Problem;
     using pa::real_t;
     using pa::vec;
@@ -22,16 +21,15 @@ TEST(PANOC, cosh1D) {
     D.lowerbound.fill(-inf);
     D.upperbound.fill(inf);
 
-    real_t a = 0.5;
-    auto obj_f = [=](const vec &x) {
-        return std::cosh(a * (x(0) - 10));
-    };
+    real_t a    = 0.5;
+    auto obj_f  = [=](const vec &x) { return std::cosh(a * (x(0) - 10)); };
     auto grad_f = [=](const vec &x, vec &grad_f) {
         grad_f(0) = a * std::sinh(a * (x(0) - 10));
     };
     auto g = [=](const vec &x, vec &g_x) { g_x(0) = x(0); };
 
-    auto grad_g = [=](const vec &x, const vec &v, vec &grad_u_v) {
+    auto grad_g = [=]([[maybe_unused]] const vec &x, const vec &v,
+                      vec &grad_u_v) {
         pa::mat grad = pa::mat::Ones(n, m);
         grad_u_v     = grad * v;
     };
@@ -47,7 +45,6 @@ TEST(PANOC, cosh1D) {
 
     vec y     = vec::Ones(m);
     vec x     = vec::Ones(n);
-    vec z     = vec::Constant(m, NaN);
     vec err_z = vec::Constant(m, NaN);
 
     vec Σ(m);
@@ -55,13 +52,12 @@ TEST(PANOC, cosh1D) {
 
     real_t ε = 1e-4;
 
-    auto stats = solver(p, x, z, y, err_z, Σ, ε);
+    auto stats = solver(p, Σ, ε, x, y, err_z);
 
     std::cout << "\n===========\n" << std::endl;
     std::cout << "f(x)     = " << obj_f(x) << std::endl;
     std::cout << "x        = " << x.transpose() << std::endl;
     std::cout << "y        = " << y.transpose() << std::endl;
-    std::cout << "z        = " << z.transpose() << std::endl;
     std::cout << "g(x) - z = " << err_z.transpose() << std::endl;
     std::cout << "Iter:   " << stats.iterations << std::endl;
     std::cout << "Status: " << stats.status << std::endl << std::endl;

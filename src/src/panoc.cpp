@@ -20,18 +20,17 @@ using std::chrono::microseconds;
 
 PANOCSolver::Stats PANOCSolver::operator()(
     const Problem &problem, ///< [in]    Problem description
-    vec &x,                 ///< [inout] Decision variable @f$ x @f$
-    vec &z,                 ///< [out]   Slack variable @f$ z @f$
-    vec &y,                 ///< [inout] Lagrange multipliers @f$ y @f$
-    vec &err_z,             ///< [out]   Slack variable error @f$ g(x) - z @f$
     const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
-    real_t ε                ///< [in]    Tolerance @f$ \epsilon @f$
+    real_t ε,               ///< [in]    Tolerance @f$ \epsilon @f$
+    vec &x,                 ///< [inout] Decision variable @f$ x @f$
+    vec &y,                 ///< [inout] Lagrange multipliers @f$ y @f$
+    vec &err_z              ///< [out]   Slack variable error @f$ g(x) - z @f$
 ) {
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
-    const auto n = x.size();
-    const auto m = z.size();
+    const auto n = problem.n;
+    const auto m = problem.m;
 
     // Allocate vectors, init L-BFGS -------------------------------------------
 
@@ -60,9 +59,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
     // Helper functions --------------------------------------------------------
 
-    // Wrappers for helper functions that automatically pass constant along any
-    // arguments that are constant within PANOC (for readability in the main
-    // algorithm)
+    // Wrappers for helper functions that automatically pass along any arguments
+    // that are constant within PANOC (for readability in the main algorithm)
     auto calc_ψ_ŷ = [&problem, &y, &Σ](const vec &x, vec &ŷ) {
         return detail::calc_ψ_ŷ(problem, x, y, Σ, ŷ);
     };
@@ -82,8 +80,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
                              vec &p) {
         detail::calc_x̂(problem, γ, x, grad_ψ, x̂, p);
     };
-    auto calc_ẑ = [&problem, &y, &Σ](const vec &x̂, vec &ẑ, vec &err_z) {
-        detail::calc_ẑ(problem, x̂, y, Σ, ẑ, err_z);
+    auto calc_err_z = [&problem, &y, &Σ](const vec &x̂, vec &err_z) {
+        detail::calc_err_z(problem, x̂, y, Σ, err_z);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, const vec &grad_ψₖ,
                               real_t norm_sq_pₖ, real_t γₖ, real_t εₖ) {
@@ -133,6 +131,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
     // Compute forward-backward envelope
     real_t φₖ = ψₖ + 1 / (2 * γₖ) * norm_sq_pₖ + grad_ψₖᵀpₖ;
 
+    unsigned no_progress = 0;
+
     // Main PANOC loop
     // =========================================================================
     for (unsigned k = 0; k <= params.max_iter; ++k) {
@@ -175,28 +175,36 @@ PANOCSolver::Stats PANOCSolver::operator()(
         if (params.print_interval != 0 && k % params.print_interval == 0)
             print_progress(k, ψₖ, grad_ψₖ, norm_sq_pₖ, γₖ, εₖ);
 
-        auto time_elapsed = std::chrono::steady_clock::now() - start_time;
-        bool out_of_time  = time_elapsed > params.max_time;
-        bool out_of_iter  = k == params.max_iter;
-        bool interrupted  = stop_signal.load(std::memory_order_relaxed);
-        bool not_finite   = not std::isfinite(εₖ);
-        bool conv         = εₖ <= ε;
-        if (conv || out_of_iter || out_of_time || not_finite || interrupted) {
+        if (progress_cb)
+            progress_cb({k, xₖ, pₖ, norm_sq_pₖ, x̂ₖ, ψₖ, grad_ψₖ, ψ̂xₖ, grad_̂ψₖ,
+                         γₖ, εₖ, Σ, y, problem, params});
+
+        auto time_elapsed    = std::chrono::steady_clock::now() - start_time;
+        bool out_of_time     = time_elapsed > params.max_time;
+        bool out_of_iter     = k == params.max_iter;
+        bool interrupted     = stop_signal.load(std::memory_order_relaxed);
+        bool not_finite      = not std::isfinite(εₖ);
+        bool conv            = εₖ <= ε;
+        bool max_no_progress = no_progress > params.lbfgs_mem;
+        bool exit = conv || out_of_iter || out_of_time || not_finite ||
+                    interrupted || max_no_progress;
+        if (exit) {
             // TODO: We could cache g(x) and ẑ, but would that faster?
             //       It saves 1 evaluation of g per ALM iteration, but requires
             //       many extra stores in the inner loops of PANOC.
             // TODO: move the computation of ẑ and g(x) to ALM?
-            calc_ẑ(x̂ₖ, /* in ⟹ out */ z, err_z);
+            calc_err_z(x̂ₖ, /* in ⟹ out */ err_z);
             x              = std::move(x̂ₖ);
             y              = std::move(ŷx̂ₖ);
             s.iterations   = k; // TODO: what do we count as an iteration?
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<microseconds>(time_elapsed);
-            s.status       = conv          ? SolverStatus::Converged
-                             : out_of_time ? SolverStatus::MaxTime
-                             : out_of_iter ? SolverStatus::MaxIter
-                             : not_finite  ? SolverStatus::NotFinite
-                                           : SolverStatus::Interrupted;
+            s.status       = conv              ? SolverStatus::Converged
+                             : out_of_time     ? SolverStatus::MaxTime
+                             : out_of_iter     ? SolverStatus::MaxIter
+                             : not_finite      ? SolverStatus::NotFinite
+                             : max_no_progress ? SolverStatus::NoProgress
+                                               : SolverStatus::Interrupted;
             return s;
         }
 
@@ -287,6 +295,10 @@ PANOCSolver::Stats PANOCSolver::operator()(
             params.specialized_lbfgs
                 ? not slbfgs.update(xₖ₊₁, grad_ψₖ₊₁, x̂ₖ₊₁, problem.C, γₖ₊₁)
                 : not lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
+
+        // Check if we made any progress
+        if (no_progress > 0 || k % params.lbfgs_mem == 0)
+            no_progress = xₖ == xₖ₊₁ ? no_progress + 1 : 0;
 
         // Advance step --------------------------------------------------------
         Lₖ = Lₖ₊₁;

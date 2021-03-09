@@ -1,13 +1,13 @@
+#include "panoc-alm/vec.hpp"
 #include <gtest/gtest.h>
 #include <panoc-alm-ref/fd.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
 #include <panoc-alm/panoc.hpp>
 
-constexpr static auto inf = std::numeric_limits<pa::real_t>::infinity();
-constexpr static auto NaN = std::numeric_limits<pa::real_t>::quiet_NaN();
-
 TEST(PANOC, cosh) {
     using pa::Box;
+    using pa::inf;
+    using pa::NaN;
     using pa::Problem;
     using pa::real_t;
     using pa::vec;
@@ -35,7 +35,8 @@ TEST(PANOC, cosh) {
     };
     auto g = [=](const vec &x, vec &g_x) { g_x(0) = x(0) + x(1); };
 
-    auto grad_g = [=](const vec &x, const vec &v, vec &grad_u_v) {
+    auto grad_g = [=]([[maybe_unused]] const vec &x, const vec &v,
+                      vec &grad_u_v) {
         pa::mat grad = pa::mat::Ones(n, m);
         grad_u_v     = grad * v;
     };
@@ -60,7 +61,7 @@ TEST(PANOC, cosh) {
 
     real_t ε = 1e-4;
 
-    auto stats = solver(p, x, z, y, err_z, Σ, ε);
+    auto stats = solver(p, Σ, ε, x, y, err_z);
 
     std::cout << "\n===========\n" << std::endl;
     std::cout << "f(x)     = " << obj_f(x) << std::endl;
