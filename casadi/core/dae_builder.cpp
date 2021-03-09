@@ -1174,17 +1174,14 @@ Function DaeBuilder::create(const std::string& fname,
     return create(fname, s_in_mod, s_out_mod, sx, lifted_calls);
   }
   // Check if dependent variables are given and needed
-  bool elim_v;
-  if (this->w.empty()) {
-    // No dependent variables, no substitution needed
-    elim_v = false;
-  } else {
+  bool elim_w = false;
+  if (!this->w.empty()) {
     // Dependent variables exists, eliminate unless v is given
-    elim_v = true;
+    elim_w = true;
     for (const std::string& s : s_in) {
       if (s == "w") {
         // Dependent variables are given
-        elim_v = false;
+        elim_w = false;
         break;
       }
     }
@@ -1192,7 +1189,7 @@ Function DaeBuilder::create(const std::string& fname,
   // Are lifted calls really needed?
   if (lifted_calls) {
     // Consistency check
-    casadi_assert(!elim_v, "Lifted calls cannot be used if dependent variables are eliminated");
+    casadi_assert(!elim_w, "Lifted calls cannot be used if dependent variables are eliminated");
     // Only lift calls if really needed
     lifted_calls = false;
     for (const MX& vdef_comp : this->wdef) {
@@ -1205,7 +1202,7 @@ Function DaeBuilder::create(const std::string& fname,
   }
   // Call factory without lifted calls
   std::string fname_nocalls = lifted_calls ? fname + "_nocalls" : fname;
-  Function ret = oracle(sx, elim_v, lifted_calls).factory(fname_nocalls, s_in, s_out, lc_);
+  Function ret = oracle(sx, elim_w, lifted_calls).factory(fname_nocalls, s_in, s_out, lc_);
   // If no lifted calls, done
   if (!lifted_calls) return ret;
   // MX expressions for ret without lifted calls
@@ -1507,9 +1504,9 @@ Function DaeBuilder::fun(const std::string& name) const {
 
 void DaeBuilder::clear_cache() const {
   for (bool sx : {false, true}) {
-    for (bool elim_v : {false, true}) {
+    for (bool elim_w : {false, true}) {
       for (bool lifted_calls : {false, true}) {
-        Function& fref = oracle_[sx][elim_v][lifted_calls];
+        Function& fref = oracle_[sx][elim_w][lifted_calls];
         if (!fref.is_null()) fref = Function();
       }
     }
@@ -1517,25 +1514,25 @@ void DaeBuilder::clear_cache() const {
   clear_cache_ = false;
 }
 
-const Function& DaeBuilder::oracle(bool sx, bool elim_v, bool lifted_calls) const {
+const Function& DaeBuilder::oracle(bool sx, bool elim_w, bool lifted_calls) const {
   // Clear cache now, if necessary
   if (clear_cache_) clear_cache();
   // Create an MX oracle, if needed
-  if (oracle_[false][elim_v][lifted_calls].is_null()) {
+  if (oracle_[false][elim_w][lifted_calls].is_null()) {
     // Oracle function inputs and outputs
     std::vector<MX> f_in, f_out, v;
     std::vector<std::string> f_in_name, f_out_name;
     // Index for vdef
     casadi_int vdef_ind = -1;
     // Options consistency check
-    casadi_assert(!(elim_v && lifted_calls), "Incompatible options");
+    casadi_assert(!(elim_w && lifted_calls), "Incompatible options");
     // Do we need to substitute out v
     bool subst_v = false;
     // Collect all DAE input variables with at least one entry
     for (casadi_int i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
       v = input(static_cast<DaeBuilderIn>(i));
       if (!v.empty()) {
-        if (elim_v && i == DAE_BUILDER_W) {
+        if (elim_w && i == DAE_BUILDER_W) {
           subst_v = true;
         } else {
           f_in.push_back(vertcat(v));
@@ -1569,14 +1566,14 @@ const Function& DaeBuilder::oracle(bool sx, bool elim_v, bool lifted_calls) cons
       f_out.at(vdef_ind) = vertcat(vdef);
     }
     // Create oracle
-    oracle_[false][elim_v][lifted_calls]
+    oracle_[false][elim_w][lifted_calls]
       = Function("mx_oracle", f_in, f_out, f_in_name, f_out_name);
   }
   // Return MX oracle, if requested
-  if (!sx) return oracle_[false][elim_v][lifted_calls];
+  if (!sx) return oracle_[false][elim_w][lifted_calls];
   // Create SX oracle, if needed
-  Function& sx_oracle = oracle_[true][elim_v][lifted_calls];
-  if (sx_oracle.is_null()) sx_oracle = oracle_[false][elim_v][lifted_calls].expand("sx_oracle");
+  Function& sx_oracle = oracle_[true][elim_w][lifted_calls];
+  if (sx_oracle.is_null()) sx_oracle = oracle_[false][elim_w][lifted_calls].expand("sx_oracle");
   // Return SX oracle reference
   return sx_oracle;
 }
@@ -1732,6 +1729,60 @@ Function DaeBuilder::attribute_fun(const std::string& fname,
     // Add to output expressions
     f_out.push_back(vertcat(attr));
   }
+  // Assemble return function
+  return Function(fname, f_in, f_out, s_in, s_out);
+}
+
+Function DaeBuilder::dependent_fun(const std::string& fname,
+    const std::vector<std::string>& s_in,
+    const std::vector<std::string>& s_out) const {
+  // Are we calculating d and/or w
+  bool calc_d = false, calc_w = false;
+  // Convert outputs to enums
+  std::vector<DaeBuilderIn> v_out;
+  v_out.reserve(v_out.size());
+  for (const std::string& s : s_out) {
+    DaeBuilderIn e = to_enum<DaeBuilderIn>(s);
+    if (e == DAE_BUILDER_D) {
+      calc_d = true;
+    } else if (e == DAE_BUILDER_W) {
+      calc_w = true;
+    } else {
+      casadi_error("Can only calculate d and/or w");
+    }
+    v_out.push_back(e);
+  }
+  // Consistency check
+  casadi_assert(calc_d || calc_w, "Nothing to calculate");
+  // Convert inputs to enums
+  std::vector<DaeBuilderIn> v_in;
+  v_in.reserve(v_in.size());
+  for (const std::string& s : s_in) {
+    DaeBuilderIn e = to_enum<DaeBuilderIn>(s);
+    if (calc_d && e == DAE_BUILDER_D) casadi_error("'d' cannot be both input and output");
+    if (calc_w && e == DAE_BUILDER_W) casadi_error("'w' cannot be both input and output");
+    v_in.push_back(e);
+  }
+  // Collect input expressions
+  std::vector<MX> f_in;
+  f_in.reserve(s_in.size());
+  for (DaeBuilderIn v : v_in) f_in.push_back(vertcat(input(v)));
+  // Collect output expressions
+  std::vector<MX> f_out;
+  f_out.reserve(s_out.size());
+  for (DaeBuilderIn v : v_out) f_out.push_back(vertcat(input(v)));
+  // Variables to be substituted
+  std::vector<MX> dw, dwdef;
+  if (calc_d) {
+    dw.insert(dw.end(), this->d.begin(), this->d.end());
+    dwdef.insert(dwdef.end(), this->ddef.begin(), this->ddef.end());
+  }
+  if (calc_w) {
+    dw.insert(dw.end(), this->w.begin(), this->w.end());
+    dwdef.insert(dwdef.end(), this->wdef.begin(), this->wdef.end());
+  }
+  // Perform elimination
+  substitute_inplace(dw, dwdef, f_out);
   // Assemble return function
   return Function(fname, f_in, f_out, s_in, s_out);
 }

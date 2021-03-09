@@ -408,6 +408,11 @@ public:
   Function attribute_fun(const std::string& fname,
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const;
+
+  /// Construct a function for evaluating dependent parameters
+  Function dependent_fun(const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out) const;
   ///@}
 
   /// Get variable expression by name
@@ -530,7 +535,7 @@ public:
   ///@}
 
     /// Get the (cached) oracle, SX or MX
-  const Function& oracle(bool sx = false, bool elim_v = false, bool lifted_calls = false) const;
+  const Function& oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
 
 #ifndef SWIG
   // Internal methods
