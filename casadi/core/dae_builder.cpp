@@ -1787,4 +1787,55 @@ Function DaeBuilder::dependent_fun(const std::string& fname,
   return Function(fname, f_in, f_out, s_in, s_out);
 }
 
+void DaeBuilder::prune_d() {
+  // If no d, quick return
+  if (this->d.empty()) return;
+  // Create a dependent function with all inputs except for d itself
+  Function dfun = dependent_fun("dfun", {"c"}, {"d"});
+  // If no free variables, all good
+  if (!dfun.has_free()) return;
+  // Print progress
+  casadi_message("Eliminating " + str(dfun.get_free()));
+  // Variables to be eliminated
+  MX elim = vertcat(dfun.free_mx());
+  // Create a function for identifying which d cannot be calculated
+  dfun = Function("dfun", {vertcat(this->d), elim}, {vertcat(this->ddef)}, {"d", "elim"}, {"ddef"});
+  // Seed all elim
+  std::vector<bvec_t> elim_sp(dfun.nnz_in("elim"), static_cast<bvec_t>(1));
+  // Do not seed d
+  std::vector<bvec_t> d_sp(dfun.nnz_in("d"), static_cast<bvec_t>(0));
+  // Propagate dependencies to ddef
+  std::vector<bvec_t> ddef_sp(dfun.nnz_out("ddef"), static_cast<bvec_t>(0));
+  dfun({&d_sp.front(), &elim_sp.front()}, {&ddef_sp.front()});
+  // Get vertical offsets in d vector
+  std::vector<casadi_int> d_off = offset(this->d);
+  // Eliminate dependent variables that depend on any free variable
+  std::vector<MX> d_new, ddef_new;
+  d_new.reserve(this->d.size());
+  ddef_new.reserve(this->ddef.size());
+  for (size_t k = 0; k < this->d.size(); ++k) {
+    // Does the dependence enter in the definition of the variable?
+    bvec_t ddef_sp_any(0);
+    for (casadi_int i = d_off.at(k); i < d_off.at(k + 1); ++i) {
+      ddef_sp_any = ddef_sp_any | ddef_sp.at(i);
+    }
+    // If there is a dependence?
+    if (ddef_sp_any) {
+      // Yes: Eliminate
+      casadi_message("Eliminating 'd' that depends on free variables: " + this->d.at(k).name());
+    } else {
+      // No: Keep
+      d_new.push_back(this->d.at(k));
+      ddef_new.push_back(this->ddef.at(k));
+    }
+  }
+  // Update d, ddef
+  this->d.resize(d_new.size());
+  std::copy(d_new.begin(), d_new.end(), this->d.begin());
+  this->ddef.resize(ddef_new.size());
+  std::copy(ddef_new.begin(), ddef_new.end(), this->ddef.begin());
+  // Tail recursive call to handle dependencies of these eliminated dependent parameters
+  prune_d();
+}
+
 } // namespace casadi
