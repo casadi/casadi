@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
-#include <panoc-alm-ref/fd.hpp>
+
+#include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
+
 #include <panoc-alm-ref/panoc-ref.hpp>
-#include <panoc-alm/panoc.hpp>
 
 TEST(PANOC, cosh1D) {
     using pa::Box;

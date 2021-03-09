@@ -1,24 +1,22 @@
-#include <atomic>
+#pragma once
+
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/detail/panoc-helpers.hpp>
+
 #include <cassert>
-#include <chrono>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <limits>
 #include <stdexcept>
-
-#include <panoc-alm/lbfgs.hpp>
-#include <panoc-alm/panoc.hpp>
-#include <panoc-alm/solverstatus.hpp>
-#include <panoc-alm/vec.hpp>
-#include <private/panoc-helpers.hpp>
 
 namespace pa {
 
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
-PANOCSolver::Stats PANOCSolver::operator()(
+template <class DirectionProviderT>
+typename PANOCSolver<DirectionProviderT>::Stats
+PANOCSolver<DirectionProviderT>::operator()(
     const Problem &problem, ///< [in]    Problem description
     const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
     real_t ε,               ///< [in]    Tolerance @f$ \epsilon @f$
@@ -51,11 +49,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         grad_ψₖ₊₁(n); // ∇ψ(xₖ₊₁)
 
     vec work_n(n), work_m(m);
-
-    LBFGS lbfgs;
-    SpecializedLBFGS slbfgs;
-    params.specialized_lbfgs ? slbfgs.resize(n, params.lbfgs_mem)
-                             : lbfgs.resize(n, params.lbfgs_mem);
+    direction_provider.resize(n, params.lbfgs_mem);
 
     // Helper functions --------------------------------------------------------
 
@@ -147,8 +141,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
                 γₖ /= 2;
 
                 // Flush L-BFGS if γ changed
-                if (k > 0 && params.specialized_lbfgs == false)
-                    lbfgs.reset();
+                if (k > 0)
+                    direction_provider.gamma_changed();
 
                 // Calculate x̂ₖ and pₖ (with new step size)
                 calc_x̂(γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
@@ -162,8 +156,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 
         // Initialize the L-BFGS
-        if (params.specialized_lbfgs == true && k == 0)
-            slbfgs.initialize(xₖ, grad_ψₖ, x̂ₖ, γₖ);
+        if (k == 0)
+            direction_provider.initialize(xₖ, pₖ, grad_ψₖ, γₖ);
 
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
@@ -182,7 +176,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         auto time_elapsed    = std::chrono::steady_clock::now() - start_time;
         bool out_of_time     = time_elapsed > params.max_time;
         bool out_of_iter     = k == params.max_iter;
-        bool interrupted     = stop_signal.load(std::memory_order_relaxed);
+        bool interrupted     = stop_signal.stop_requested();
         bool not_finite      = not std::isfinite(εₖ);
         bool conv            = εₖ <= ε;
         bool max_no_progress = no_progress > params.lbfgs_mem;
@@ -211,7 +205,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         // Calculate quasi-Newton step -----------------------------------------
         if (k > 0) {
             qₖ = pₖ;
-            params.specialized_lbfgs ? slbfgs.apply(qₖ) : lbfgs.apply(qₖ);
+            direction_provider.apply(qₖ);
         }
 
         // Line search initialization ------------------------------------------
@@ -227,7 +221,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         } else if (not qₖ.allFinite()) {
             τ = 0;
             ++s.lbfgs_failures;
-            params.specialized_lbfgs ? slbfgs.reset() : lbfgs.reset();
+            direction_provider.reset(); // Is there anything else we can do?
         }
 
         // Line search loop ----------------------------------------------------
@@ -262,8 +256,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
                     σₖ₊₁ /= 2;
                     γₖ₊₁ /= 2;
                     // Flush L-BFGS if γ changed
-                    if (params.specialized_lbfgs == false)
-                        lbfgs.reset();
+                    direction_provider.gamma_changed();
 
                     // Calculate x̂ₖ₊₁ and pₖ₊₁ (with new step size)
                     calc_x̂(γₖ₊₁, xₖ₊₁, grad_ψₖ₊₁, /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁);
@@ -291,10 +284,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 
         // Update L-BFGS -------------------------------------------------------
-        s.lbfgs_rejected +=
-            params.specialized_lbfgs
-                ? not slbfgs.update(xₖ₊₁, grad_ψₖ₊₁, x̂ₖ₊₁, problem.C, γₖ₊₁)
-                : not lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
+        s.lbfgs_rejected += not direction_provider.update(
+            xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.lbfgs_mem == 0)

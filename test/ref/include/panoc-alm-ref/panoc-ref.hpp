@@ -1,6 +1,7 @@
 #pragma once
 
-#include <panoc-alm/panoc.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
 
 /// Reference implementations that are more readable than the optimized
 /// implementations, used for tests as well
@@ -15,7 +16,7 @@ class PANOCSolver {
   public:
     using Params = PANOCParams;
 
-    using Stats = pa::PANOCSolver::Stats;
+    using Stats = pa::PANOCSolver<>::Stats;
 
     PANOCSolver(Params params) : params(params) {}
 

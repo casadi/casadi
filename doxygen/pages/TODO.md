@@ -6,3 +6,6 @@
  - Why is a margin needed in the Lipschitz check of PANOC?
  - Implement memory pool to optimize vector allocations
  - Handle NaN correctly in min/max functions
+ - Check if L-BFGS should use r or p
+ - Adapt SpecializedLBFGS to use new generic API
+ - LBFGSParam

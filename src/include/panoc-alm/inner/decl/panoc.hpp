@@ -1,13 +1,12 @@
 #pragma once
 
-#include "problem.hpp"
-#include "solverstatus.hpp"
-#include <algorithm>
+#include <panoc-alm/inner/decl/panoc-fwd.hpp>
+#include <panoc-alm/util/problem.hpp>
+#include <panoc-alm/util/solverstatus.hpp>
+#include <panoc-alm/util/atomic_stop_signal.hpp>
+
 #include <atomic>
 #include <chrono>
-#include <limits>
-#include <type_traits>
-#include <vector>
 
 namespace pa {
 
@@ -23,7 +22,7 @@ struct PANOCParams {
     } Lipschitz; ///< Parameters related to the Lipschitz constant estimate
                  ///  and step size.
     /// Length of the history to keep in the L-BFGS algorithm.
-    unsigned lbfgs_mem = 10;
+    unsigned lbfgs_mem = 10; // TODO: move to LBFGS params
     /// Maximum number of inner PANOC iterations.
     unsigned max_iter = 100;
     /// Maximum duration.
@@ -38,9 +37,11 @@ struct PANOCParams {
     bool alternative_linesearch_cond    = false;
 };
 
+template <class DirectionProviderT>
 class PANOCSolver {
   public:
-    using Params = PANOCParams;
+    using Params            = PANOCParams;
+    using DirectionProvider = DirectionProviderT;
 
     struct Stats {
         unsigned iterations = 0;
@@ -48,7 +49,7 @@ class PANOCSolver {
         std::chrono::microseconds elapsed_time;
         SolverStatus status          = SolverStatus::Unknown;
         unsigned linesearch_failures = 0;
-        unsigned lbfgs_failures      = 0;
+        unsigned lbfgs_failures      = 0; // TODO: more generic name
         unsigned lbfgs_rejected      = 0;
     };
 
@@ -71,6 +72,8 @@ class PANOCSolver {
     };
 
     PANOCSolver(Params params) : params(params) {}
+    PANOCSolver(PANOCSolver &&) = default;
+    PANOCSolver &operator=(PANOCSolver &&) = default;
 
     Stats operator()(const Problem &problem, // in
                      const vec &Σ,           // in
@@ -85,12 +88,15 @@ class PANOCSolver {
         return *this;
     }
 
-    void stop() { stop_signal.store(true, std::memory_order_relaxed); }
+    void stop() { stop_signal.stop(); }
 
   private:
     Params params;
-    std::atomic<bool> stop_signal{false};
+    AtomicStopSignal stop_signal;
     std::function<void(const ProgressInfo &)> progress_cb;
+
+  public:
+    DirectionProvider direction_provider;
 };
 
 } // namespace pa

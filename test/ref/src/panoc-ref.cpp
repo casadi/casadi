@@ -1,14 +1,11 @@
-#include "panoc-alm/solverstatus.hpp"
+#include <panoc-alm-ref/panoc-ref.hpp>
+
 #include <cassert>
 #include <cmath>
-
-#include <ios>
-#include <limits>
-#include <panoc-alm-ref/panoc-ref.hpp>
-#include <panoc-alm/lbfgs.hpp>
-
 #include <iomanip>
+#include <ios>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 
 namespace pa_ref {
@@ -87,8 +84,8 @@ real_t calc_error_stop_crit(const Problem &prob, const vec &xₖ, const vec &x̂
 
 bool lipschitz_check(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
                      const vec &y, const vec &Σ, real_t γ, real_t L) {
-    real_t ψₖ     = eval_ψ(prob, xₖ, y, Σ);
-    real_t ψ̂xₖ    = eval_ψ(prob, x̂ₖ, y, Σ);
+    real_t ψₖ  = eval_ψ(prob, xₖ, y, Σ);
+    real_t ψ̂xₖ = eval_ψ(prob, x̂ₖ, y, Σ);
     std::cout << std::scientific;
     std::cout << "ψₖ:  " << ψₖ << std::endl;
     std::cout << "ψ̂xₖ: " << ψ̂xₖ << std::endl;
@@ -227,7 +224,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
                 }
             }
 
-std::cout << "γ:  " << γₖ₊₁ << std::endl;
+            std::cout << "γ:  " << γₖ₊₁ << std::endl;
             std::cout << "φₖ:   " << eval_φ(problem, xₖ, y, Σ, γₖ) << std::endl;
             std::cout << "φₖ₊₁: " << eval_φ(problem, xₖ₊₁, y, Σ, γₖ₊₁)
                       << std::endl;

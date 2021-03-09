@@ -1,6 +1,8 @@
 #pragma once
 
-#include <panoc-alm/alm.hpp>
+#include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
 
 #include "eigen-matchers.hpp"
 
@@ -83,7 +85,7 @@ inline void do_test(const pa::Problem &p, const pa::vec &expected_sol,
     panocparam.lbfgs_mem   = 20;
     panocparam.max_iter    = 10000;
 
-    ALMSolver solver{almparam, panocparam};
+    ALMSolver<> solver{almparam, panocparam};
 
     vec x(p.n);
     x.fill(0);

@@ -1,4 +1,4 @@
-#include <panoc-alm/box.hpp>
+#include <panoc-alm/util/box.hpp>
 
 #include "eigen-matchers.hpp"
 

@@ -1,11 +1,11 @@
 #include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
-#include <panoc-alm/problem.hpp>
-#include <panoc-alm/solverstatus.hpp>
+#include <panoc-alm/util/solverstatus.hpp>
 
-#include <sstream>
 #include <yaml-cpp/emitter.h>
 #include <yaml-cpp/emittermanip.h>
 #include <yaml-cpp/yaml.h>
+
+#include <sstream>
 
 inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::vec &v) {
     out << YAML::Flow;

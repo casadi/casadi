@@ -1,8 +1,9 @@
 #pragma once
 
+#include <panoc-alm/util/problem.hpp>
+
 #include <iosfwd>
 #include <memory>
-#include <panoc-alm/problem.hpp>
 #include <string>
 
 /// Wrapper for CUTEst problems loaded from an external shared library.

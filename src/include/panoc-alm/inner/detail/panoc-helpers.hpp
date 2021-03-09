@@ -1,9 +1,8 @@
 #pragma once
 
-#include <panoc-alm/problem.hpp>
+#include <panoc-alm/util/problem.hpp>
 
-namespace pa {
-namespace detail {
+namespace pa::detail {
 
 /// Calculate both ψ(x) and the vector ŷ that can later be used to compute ∇ψ.
 /// @f[ \psi(x^k) = f(x^k) + \frac{1}{2}
@@ -106,7 +105,8 @@ calc_err_z(const Problem &p, ///< [in]  Problem description
     // ζ = g(x̂) + Σ⁻¹y
     // ẑ = Π(ζ, D)
     // g(x) - ẑ
-    err_z = err_z - project(err_z + Σ.asDiagonal().inverse() * y, p.D); // TODO: catastrophic cancellation?
+    err_z = err_z - project(err_z + Σ.asDiagonal().inverse() * y,
+                            p.D); // TODO: catastrophic cancellation?
 }
 
 /**
@@ -151,5 +151,4 @@ inline real_t calc_error_stop_crit(
     return ε;
 }
 
-} // namespace detail
-} // namespace pa
+} // namespace pa::detail

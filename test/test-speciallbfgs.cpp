@@ -1,9 +1,6 @@
-#include <limits>
-#include <panoc-alm/lbfgs.hpp>
-
 #include "eigen-matchers.hpp"
-#include "panoc-alm/box.hpp"
-#include "panoc-alm/vec.hpp"
+
+#include <panoc-alm/inner/lbfgs.hpp>
 
 [[maybe_unused]] const static auto printvec = [](const char *name,
                                                  const auto &vec) {

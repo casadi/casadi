@@ -1,9 +1,8 @@
-#include <panoc-alm/alm.hpp>
+#include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
 
 #include "eigen-matchers.hpp"
-#include "panoc-alm/problem.hpp"
-
-#include <chrono>
 
 TEST(ALM, riskaverse) {
     using namespace pa;
@@ -109,14 +108,14 @@ TEST(ALM, riskaverse) {
     panocparam.print_interval = 0;
     almparam.print_interval   = 1;
 
-    ALMSolver solver{almparam, panocparam};
+    ALMSolver<> solver{almparam, panocparam};
 
     vec x(n);
     x.fill(0);
     vec λ(m);
     λ.fill(0);
 
-    ALMSolver::Stats stats;
+    ALMSolver<>::Stats stats;
 
     constexpr unsigned N = 1;
     auto begin           = std::chrono::high_resolution_clock::now();

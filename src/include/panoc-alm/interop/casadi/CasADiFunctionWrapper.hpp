@@ -1,8 +1,10 @@
 #pragma once
 
 #include <casadi/core/function.hpp>
+
+#include <panoc-alm/util/vec.hpp>
+
 #include <cassert>
-#include <panoc-alm/vec.hpp>
 #include <vector>
 
 /// Class for evaluating CasADi functions, allocating the necessary workspace

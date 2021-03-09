@@ -1,9 +1,14 @@
-#include <panoc-alm/alm.hpp>
+#include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
+
 #include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
 
 int main() {
-    const char *so_fname = "/home/pieter/GitHub/PANOC-ALM/build/CUTEst/ROSENBR/libcutest-problem-ROSENBR.so";
-    const char *outsdif_fname = "/home/pieter/GitHub/PANOC-ALM/build/CUTEst/ROSENBR/OUTSDIF.d";
+    const char *so_fname = "/home/pieter/GitHub/PANOC-ALM/build/CUTEst/ROSENBR/"
+                           "libcutest-problem-ROSENBR.so";
+    const char *outsdif_fname =
+        "/home/pieter/GitHub/PANOC-ALM/build/CUTEst/ROSENBR/OUTSDIF.d";
 
     CUTEstProblem p(so_fname, outsdif_fname);
 
@@ -25,15 +30,14 @@ int main() {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 50;
 
-    pa::ALMSolver solver{almparam, panocparam};
+    pa::ALMSolver<> solver{almparam, panocparam};
     auto stats = solver(p.problem, p.y0, p.x0);
 
-    std::cout << "\r\n" << p.get_report()<< "\r\n" << std::endl;
+    std::cout << "\r\n" << p.get_report() << "\r\n" << std::endl;
 
     std::cout << "x = " << p.x0.transpose() << std::endl;
     std::cout << "y = " << p.y0.transpose() << std::endl;
 
     std::cout << "inner: " << stats.inner_iterations << std::endl;
     std::cout << "outer: " << stats.outer_iterations << std::endl;
-
 }

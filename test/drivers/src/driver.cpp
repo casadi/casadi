@@ -1,18 +1,23 @@
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/panoc.hpp>
+#include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
+
+#include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
+
+#include <drivers/YAMLEncoder.hpp>
+
+#include <yaml-cpp/emittermanip.h>
+
 #include <atomic>
 #include <chrono>
 #include <csignal>
-#include <drivers/YAMLEncoder.hpp>
 #include <fstream>
 #include <iostream>
-#include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
 #include <sstream>
-#include <yaml-cpp/emittermanip.h>
 
 using namespace std::chrono_literals;
 
-std::atomic<pa::ALMSolver *> acitve_solver{nullptr};
+std::atomic<pa::ALMSolver<> *> acitve_solver{nullptr};
 void signal_callback_handler(int signum) {
     if (signum == SIGINT) {
         if (auto *s = acitve_solver.load(std::memory_order_relaxed)) {
@@ -48,7 +53,7 @@ int main(int argc, char *argv[]) {
     panocparams.lbfgs_mem                      = 20;
     // panocparams.print_interval = 500;
 
-    pa::ALMSolver solver(almparams, panocparams);
+    pa::ALMSolver<> solver(almparams, panocparams);
     std::atomic_signal_fence(std::memory_order_release);
     acitve_solver.store(&solver, std::memory_order_relaxed);
     signal(SIGINT, signal_callback_handler);

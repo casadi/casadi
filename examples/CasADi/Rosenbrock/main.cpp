@@ -1,4 +1,7 @@
-#include <panoc-alm/alm.hpp>
+#include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
+
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
 
 int main(int argc, char *argv[]) {
@@ -45,7 +48,7 @@ int main(int argc, char *argv[]) {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 500;
 
-    pa::ALMSolver solver{almparam, panocparam};
+    pa::ALMSolver<> solver{almparam, panocparam};
 
     vec x(3);
     x << 2.5, 3.0, 0.75;

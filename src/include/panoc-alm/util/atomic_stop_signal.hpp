@@ -1,0 +1,24 @@
+#pragma once
+
+#include <atomic>
+
+namespace pa {
+
+class AtomicStopSignal {
+  public:
+    AtomicStopSignal()                         = default;
+    AtomicStopSignal(const AtomicStopSignal &) = delete;
+    AtomicStopSignal &operator=(const AtomicStopSignal &) = delete;
+    AtomicStopSignal(AtomicStopSignal &&) {}
+    AtomicStopSignal &operator=(AtomicStopSignal &&) { return *this; }
+
+    void stop() { stop_flag.store(true, std::memory_order_relaxed); }
+    bool stop_requested() const {
+        return stop_flag.load(std::memory_order_relaxed);
+    }
+
+  private:
+    std::atomic<bool> stop_flag{false};
+};
+
+} // namespace pa

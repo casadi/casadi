@@ -1,7 +1,7 @@
 #pragma once
 
-#include <panoc-alm/box.hpp>
-#include <panoc-alm/vec.hpp>
+#include <panoc-alm/util/box.hpp>
+#include <panoc-alm/util/vec.hpp>
 
 #include <iostream>
 #include <limits>
@@ -81,6 +81,17 @@ class LBFGS {
         return true;
     }
 
+    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
+                const vec &grad_new, Box C, real_t γ_new) {
+        // TODO: CBFGS
+        // bool ret = update(xₖ₊₁ - xₖ, pₖ₊₁ - pₖ); // TODO: what's with the sign here?
+        bool ret = update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
+        (void)grad_new;
+        (void)C;
+        (void)γ_new;
+        return ret;
+    }
+
     template <class Vec>
     void apply(Vec &&q) {
         auto update1 = [&](size_t i) {
@@ -107,6 +118,15 @@ class LBFGS {
             update2(i);
     }
 
+    void initialize(const vec &x, const vec &p, const vec &grad_ψ, real_t γ) {
+        (void)x;
+        (void)p;
+        (void)grad_ψ;
+        (void)γ;
+    }
+
+    void gamma_changed() { reset(); }
+
     void reset() {
         idx  = 0;
         full = false;
@@ -118,7 +138,7 @@ class LBFGS {
     }
 };
 
-/// Limited memory Broyden–Fletcher–Goldfarb–Shanno (BFGS) algorithm that can 
+/// Limited memory Broyden–Fletcher–Goldfarb–Shanno (BFGS) algorithm that can
 /// handle updates of the γ parameter.
 class SpecializedLBFGS {
     using storage_t = Eigen::Matrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
@@ -129,10 +149,13 @@ class SpecializedLBFGS {
     real_t old_γ = 0;
 
   public:
-    SpecializedLBFGS() = default;
+    SpecializedLBFGS() {
+        assert(!"Fix the arguments passed by PANOC before using"); // TODO
+    }
     SpecializedLBFGS(size_t n, size_t history)
         : storage(n + 1, history * 4 + 1) {
         storage.fill(std::numeric_limits<real_t>::quiet_NaN());
+        assert(!"Fix the arguments passed by PANOC before using"); // TODO
     }
 
     size_t n() const { return storage.rows() - 1; }

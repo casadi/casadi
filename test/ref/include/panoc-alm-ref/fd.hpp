@@ -1,7 +1,8 @@
 #pragma once
 
+#include <panoc-alm/util/vec.hpp>
+
 #include <functional>
-#include <panoc-alm/vec.hpp>
 
 namespace pa_ref {
 

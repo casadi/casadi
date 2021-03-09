@@ -1,15 +1,11 @@
 #include "eigen-matchers.hpp"
-#include "panoc-alm/box.hpp"
-#include "panoc-alm/problem.hpp"
-#include "panoc-alm/solverstatus.hpp"
-#include "panoc-alm/vec.hpp"
-#include <cmath>
 #include <gtest/gtest.h>
-#include <ios>
+
 #include <panoc-alm-ref/fd.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
-#include <panoc-alm/panoc.hpp>
-#include <private/panoc-helpers.hpp>
+
+#include <panoc-alm/inner/detail/panoc-helpers.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
 
 using pa::inf;
 using pa::Problem;

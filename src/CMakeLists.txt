@@ -2,12 +2,12 @@
 # --------------
 
 add_library(panoc-alm SHARED
-    "src/panoc.cpp"
-    "src/box.cpp"
-    "src/lbfgs.cpp"
+    "src/inner/panoc.cpp"
+    "src/util/box.cpp"
+    "src/inner/lbfgs.cpp"
     "src/alm.cpp"
-    "src/problem.cpp"
-    "src/solverstatus.cpp"
+    "src/util/problem.cpp"
+    "src/util/solverstatus.cpp"
 )
 add_library(panoc-alm::panoc-alm ALIAS panoc-alm)
 set_target_properties(panoc-alm PROPERTIES EXPORT_NAME panoc-alm::panoc-alm)

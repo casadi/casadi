@@ -1,8 +1,8 @@
-#include <panoc-alm/alm.hpp>
+#include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
 
 #include "eigen-matchers.hpp"
-
-#include <chrono>
 
 TEST(ALM, singleshooting1D) {
     using namespace pa;
@@ -57,7 +57,7 @@ TEST(ALM, singleshooting1D) {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 100;
 
-    ALMSolver solver{almparam, panocparam};
+    ALMSolver<> solver{almparam, panocparam};
 
     vec x(1);
     x << 1;
@@ -134,7 +134,7 @@ TEST(ALM, multipleshooting1D) {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 100;
 
-    ALMSolver solver{almparam, panocparam};
+    ALMSolver<> solver{almparam, panocparam};
 
     vec x(2);
     x << 0.5, 0.5;
@@ -227,7 +227,7 @@ TEST(ALM, multipleshooting8D) {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 200;
 
-    ALMSolver solver{almparam, panocparam};
+    ALMSolver<> solver{almparam, panocparam};
 
     vec x(n);
     x.fill(5);

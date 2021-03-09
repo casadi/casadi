@@ -1,6 +1,4 @@
-#include <panoc-alm/box.hpp>
-#include <panoc-alm/lbfgs.hpp>
-#include <panoc-alm/vec.hpp>
+#include <panoc-alm/inner/lbfgs.hpp>
 
 #include <limits>
 

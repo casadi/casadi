@@ -1,8 +1,7 @@
-#include "panoc-alm/vec.hpp"
 #include <gtest/gtest.h>
+
 #include <panoc-alm-ref/fd.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
-#include <panoc-alm/panoc.hpp>
 
 TEST(PANOC, cosh) {
     using pa::Box;
