@@ -928,18 +928,39 @@ void DaeBuilder::eliminate_w() {
 }
 
 void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
-  // Partially implemented
-  if (x.size() > 0) casadi_warning("Only lifting algebraic variables");
-  // Lift algebraic expressions
+  // Not tested if w is non-empty before
+  if (!this->w.empty()) casadi_warning("'w' already has entries");
+  // Expressions where the variables are also being used
+  std::vector<MX> ex;
+  ex.insert(ex.end(), this->alg.begin(), this->alg.end());
+  ex.insert(ex.end(), this->ode.begin(), this->ode.end());
+  ex.insert(ex.end(), this->quad.begin(), this->quad.end());
+  ex.insert(ex.end(), this->ydef.begin(), this->ydef.end());
+  // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
     {"prefix", "w_"}, {"suffix", ""}, {"offset", static_cast<casadi_int>(this->w.size())}};
-  extract(this->alg, new_w, new_wdef, opts);
+  extract(ex, new_w, new_wdef, opts);
   // Register as dependent variables
   for (size_t i = 0; i < new_w.size(); ++i) {
     add_variable(new_w.at(i));
     register_w(new_w.at(i), new_wdef.at(i));
   }
+  // Get algebraic equations
+  auto it = ex.begin();
+  std::copy(it, it + this->alg.size(), this->alg.begin());
+  it += this->alg.size();
+  // Get differential equations
+  std::copy(it, it + this->ode.size(), this->ode.begin());
+  it += this->ode.size();
+  // Get quadrature equations
+  std::copy(it, it + this->quad.size(), this->quad.begin());
+  it += this->quad.size();
+  // Get output equations
+  std::copy(it, it + this->ydef.size(), this->ydef.begin());
+  it += this->ydef.size();
+  // Consistency check
+  casadi_assert_dev(it == ex.end());
 }
 
 std::string DaeBuilder::description(const std::string& name) const {
