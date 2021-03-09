@@ -894,37 +894,37 @@ MX DaeBuilder::der(const MX& var) const {
   return der(var.name());
 }
 
-void DaeBuilder::eliminate_dependent(bool elim_d, bool elim_w) {
+void DaeBuilder::eliminate_w() {
+  // Quick return if no w
+  if (this->w.empty()) return;
   // Ensure variables are sorted
-  if (elim_d) sort_d();
-  if (elim_w) sort_w();
-  // Variables to be substituted
-  std::vector<MX> dw, dwdef;
-  if (elim_d) {
-    dw.insert(dw.end(), this->d.begin(), this->d.end());
-    dwdef.insert(dwdef.end(), this->ddef.begin(), this->ddef.end());
-  }
-  if (elim_w) {
-    dw.insert(dw.end(), this->w.begin(), this->w.end());
-    dwdef.insert(dwdef.end(), this->wdef.begin(), this->wdef.end());
-  }
+  sort_w();
   // Expressions where the variables are also being used
   std::vector<MX> ex;
   ex.insert(ex.end(), this->alg.begin(), this->alg.end());
+  ex.insert(ex.end(), this->ode.begin(), this->ode.end());
+  ex.insert(ex.end(), this->quad.begin(), this->quad.end());
+  ex.insert(ex.end(), this->ydef.begin(), this->ydef.end());
   // Perform elimination
-  substitute_inplace(dw, dwdef, ex);
-  // Eliminate d
-  if (elim_d) {
-    this->d.clear();
-    this->ddef.clear();
-  }
-  // Eliminate w
-  if (elim_w) {
-    this->w.clear();
-    this->wdef.clear();
-  }
-  // Get auxiliary variables
-  std::copy(ex.begin(), ex.begin() + this->alg.size(), this->alg.begin());
+  substitute_inplace(this->w, this->wdef, ex);
+  // Clear lists
+  this->w.clear();
+  this->wdef.clear();
+  // Get algebraic equations
+  auto it = ex.begin();
+  std::copy(it, it + this->alg.size(), this->alg.begin());
+  it += this->alg.size();
+  // Get differential equations
+  std::copy(it, it + this->ode.size(), this->ode.begin());
+  it += this->ode.size();
+  // Get quadrature equations
+  std::copy(it, it + this->quad.size(), this->quad.begin());
+  it += this->quad.size();
+  // Get output equations
+  std::copy(it, it + this->ydef.size(), this->ydef.begin());
+  it += this->ydef.size();
+  // Consistency check
+  casadi_assert_dev(it == ex.end());
 }
 
 void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
