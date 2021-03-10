@@ -16,7 +16,7 @@ TEST(LBFGS, quadratic) {
 
     pa::mat B = pa::mat::Identity(2, 2);
 
-    pa::LBFGS lbfgs(2, 5);
+    pa::LBFGS lbfgs(pa::LBFGSParams{}, 2, 5);
     pa::vec x(2);
     x << 10, -5;
     auto r = grad_f(x);
@@ -36,16 +36,17 @@ TEST(LBFGS, quadratic) {
 
         pa::vec d = r;
         lbfgs.apply(d);
-        x -= d;
-        auto r_new = grad_f(x);
-        auto y     = r_new - r;
-        lbfgs.update(-d, y);
+        pa::vec x_new = x - d;
+        pa::vec r_new = grad_f(x_new);
+        pa::vec y     = r_new - r;
+        lbfgs.update(x, x_new, -r, -r_new);
 
-        auto s = -d;
+        pa::vec s = -d;
         B      = B + y * y.transpose() / y.dot(s) -
             (B * s) * (s.transpose() * B.transpose()) / (s.transpose() * B * s);
 
         r = std::move(r_new);
+        x = std::move(x_new);
     }
     std::cout << std::endl << "final" << std::endl;
     std::cout << "x:    " << x.transpose() << std::endl;

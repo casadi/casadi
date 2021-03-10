@@ -76,19 +76,17 @@ real_t estimate_lipschitz(const Problem &prob, const vec &x, const vec &y,
 
 real_t calc_error_stop_crit(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
                             const vec &y, const vec &Σ, real_t γ) {
-    return ((1 / γ) * (xₖ - x̂ₖ)           //
-            + eval_grad_ψ(prob, x̂ₖ, y, Σ) //
-            - eval_grad_ψ(prob, xₖ, y, Σ))
+    vec p = projected_gradient_step(prob, xₖ, y, Σ, γ);
+    return ((1 / γ) * p                    //
+            + (eval_grad_ψ(prob, xₖ, y, Σ) //
+               - eval_grad_ψ(prob, x̂ₖ, y, Σ)))
         .lpNorm<Eigen::Infinity>();
 }
 
 bool lipschitz_check(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
                      const vec &y, const vec &Σ, real_t γ, real_t L) {
-    real_t ψₖ  = eval_ψ(prob, xₖ, y, Σ);
-    real_t ψ̂xₖ = eval_ψ(prob, x̂ₖ, y, Σ);
-    std::cout << std::scientific;
-    std::cout << "ψₖ:  " << ψₖ << std::endl;
-    std::cout << "ψ̂xₖ: " << ψ̂xₖ << std::endl;
+    real_t ψₖ     = eval_ψ(prob, xₖ, y, Σ);
+    real_t ψ̂xₖ    = eval_ψ(prob, x̂ₖ, y, Σ);
     real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO: why?
     vec pₖ        = projected_gradient_step(prob, xₖ, y, Σ, γ);
     return ψ̂xₖ > margin + ψₖ                               //
@@ -118,8 +116,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
     const auto n = problem.n;
 
-    LBFGS lbfgs;
-    SpecializedLBFGS slbfgs;
+    LBFGS lbfgs{{}}; // TODO: make members like standard PANOC
+    SpecializedLBFGS slbfgs{{}};
     params.specialized_lbfgs ? slbfgs.resize(n, params.lbfgs_mem)
                              : lbfgs.resize(n, params.lbfgs_mem);
 
@@ -137,18 +135,17 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
         while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γₖ, Lₖ) && γₖ > 0) {
             assert(not params.update_lipschitz_in_linesearch || k == 0);
-
             Lₖ *= 2;
             σₖ /= 2;
             γₖ /= 2;
+            // Flush L-BFGS if γ changed
+            if (k > 0)
+                params.specialized_lbfgs ? slbfgs.gamma_changed()
+                                         : lbfgs.gamma_changed();
 
             // Calculate x̂ₖ (with new step size)
             x̂ₖ = xₖ + projected_gradient_step(problem, xₖ, y, Σ, γₖ);
         }
-
-        // Initialize the L-BFGS
-        if (params.specialized_lbfgs == true && k == 0)
-            slbfgs.initialize(xₖ, eval_grad_ψ(problem, xₖ, y, Σ), x̂ₖ, γₖ);
 
         // Check stop condition
         real_t εₖ = calc_error_stop_crit(problem, xₖ, x̂ₖ, y, Σ, γₖ);
@@ -179,12 +176,11 @@ PANOCSolver::Stats PANOCSolver::operator()(
         vec qₖ = pₖ;
         if (k > 0)
             params.specialized_lbfgs ? slbfgs.apply(qₖ) : lbfgs.apply(qₖ);
-
-        std::cout << "ψ:  " << eval_ψ(problem, xₖ, y, Σ) << std::endl;
-        std::cout << "∇ψ: " << eval_grad_ψ(problem, xₖ, y, Σ).transpose()
-                  << std::endl;
-        std::cout << "p:  " << pₖ.transpose() << std::endl;
-        std::cout << "q:  " << qₖ.transpose() << std::endl << std::endl;
+        else
+            // Initialize the L-BFGS
+            params.specialized_lbfgs
+                ? slbfgs.initialize(xₖ, pₖ, eval_grad_ψ(problem, xₖ, y, Σ), γₖ)
+                : lbfgs.initialize(xₖ, pₖ, eval_grad_ψ(problem, xₖ, y, Σ), γₖ);
 
         // Line search
         real_t τ = 1;
@@ -217,17 +213,15 @@ PANOCSolver::Stats PANOCSolver::operator()(
                     Lₖ₊₁ *= 2;
                     σₖ₊₁ /= 2;
                     γₖ₊₁ /= 2;
+                    // Flush L-BFGS if γ changed
+                    params.specialized_lbfgs ? slbfgs.gamma_changed()
+                                             : lbfgs.gamma_changed();
 
                     // Calculate x̂ₖ (with new step size)
                     pₖ₊₁ = projected_gradient_step(problem, xₖ₊₁, y, Σ, γₖ₊₁);
                     x̂ₖ₊₁ = xₖ₊₁ + pₖ₊₁;
                 }
             }
-
-            std::cout << "γ:  " << γₖ₊₁ << std::endl;
-            std::cout << "φₖ:   " << eval_φ(problem, xₖ, y, Σ, γₖ) << std::endl;
-            std::cout << "φₖ₊₁: " << eval_φ(problem, xₖ₊₁, y, Σ, γₖ₊₁)
-                      << std::endl;
 
             // Update τ
             τ /= 2;
@@ -238,17 +232,18 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
         // τ < τ_min the line search failed and we accepted the prox step
         if (τ < params.τ_min && k != 0) {
-            std::cout << "ls fail" << std::endl;
             ++s.linesearch_failures;
         }
-        std::cout << std::endl;
 
         // Update L-BFGS -------------------------------------------------------
         s.lbfgs_rejected +=
             params.specialized_lbfgs
-                ? not slbfgs.update(xₖ₊₁, eval_grad_ψ(problem, xₖ₊₁, y, Σ),
-                                    x̂ₖ₊₁, problem.C, γₖ₊₁)
-                : not lbfgs.update(xₖ₊₁ - xₖ, pₖ - pₖ₊₁);
+                ? not slbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁,
+                                    eval_grad_ψ(problem, xₖ₊₁, y, Σ), problem.C,
+                                    γₖ₊₁)
+                : not lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁,
+                                   eval_grad_ψ(problem, xₖ₊₁, y, Σ), problem.C,
+                                   γₖ₊₁);
 
         // Advance step
         xₖ = std::move(xₖ₊₁);

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <panoc-alm/inner/decl/panoc-fwd.hpp>
+#include <panoc-alm/util/atomic_stop_signal.hpp>
 #include <panoc-alm/util/problem.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
-#include <panoc-alm/util/atomic_stop_signal.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -71,7 +71,8 @@ class PANOCSolver {
         const Params &params;
     };
 
-    PANOCSolver(Params params) : params(params) {}
+    PANOCSolver(Params params)
+        : params(params), direction_provider({/* TODO: parameters */}) {}
     PANOCSolver(PANOCSolver &&) = default;
     PANOCSolver &operator=(PANOCSolver &&) = default;
 
