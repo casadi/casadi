@@ -17,7 +17,7 @@ inline real_t calc_ψ_ŷ(const Problem &p, ///< [in]  Problem description
     // g(x)
     p.g(x, ŷ);
     // ζ = g(x) + Σ⁻¹y
-    ŷ += (y.array() / Σ.array()).matrix();
+    ŷ += Σ.asDiagonal().inverse() * y;
     // d = ζ - Π(ζ, D)
     ŷ = projecting_difference(ŷ, p.D);
     // dᵀŷ, ŷ = Σ d
@@ -117,6 +117,18 @@ calc_err_z(const Problem &p, ///< [in]  Problem description
  * p^k &= \hat{x}^k - x^k \\ 
  * \end{aligned} @f]
  */
+inline auto
+projected_gradient_step(const Box &C,     ///< [in]  Set to project onto
+                        real_t γ,         ///< [in]  Step size
+                        const vec &x,     ///< [in]  Decision variable @f$ x @f$
+                        const vec &grad_ψ ///< [in]  @f$ \nabla \psi(x^k) @f$) {
+) {
+    using binary_real_f = real_t (*)(real_t, real_t);
+    return (-γ * grad_ψ)
+        .binaryExpr(C.lowerbound - x, binary_real_f(std::fmax))
+        .binaryExpr(C.upperbound - x, binary_real_f(std::fmin));
+}
+
 inline void calc_x̂(const Problem &prob, ///< [in]  Problem description
                    real_t γ,            ///< [in]  Step size
                    const vec &x,        ///< [in]  Decision variable @f$ x @f$
@@ -124,16 +136,8 @@ inline void calc_x̂(const Problem &prob, ///< [in]  Problem description
                    vec &x̂, ///< [out] @f$ \hat{x}^k = T_{\gamma^k}(x^k) @f$
                    vec &p  ///< [out] @f$ \hat{x}^k - x^k @f$
 ) {
-    using binary_real_f = real_t (*)(real_t, real_t);
-    if (0) { // Naive
-        x̂ = project(x - γ * grad_ψ, prob.C);
-        p = x̂ - x; // catastrophic cancellation if step is small or x is large
-    } else {
-        p = (-γ * grad_ψ)
-                .binaryExpr(prob.C.lowerbound - x, binary_real_f(std::fmax))
-                .binaryExpr(prob.C.upperbound - x, binary_real_f(std::fmin));
-        x̂ = x + p;
-    }
+    p = projected_gradient_step(prob.C, γ, x, grad_ψ);
+    x̂ = x + p;
 }
 
 /// @f[ \left\| \gamma_k^{-1} (x^k - \hat x^k) + \nabla \psi(\hat x^k) -
@@ -144,7 +148,7 @@ inline real_t calc_error_stop_crit(
     const vec &grad_̂ψₖ, ///< [in]  Gradient in @f$ \hat x^k @f$
     const vec &grad_ψₖ  ///< [in]  Gradient in @f$ x^k @f$
 ) {
-    auto err = (1 / γ) * pₖ + (grad_̂ψₖ - grad_ψₖ);
+    auto err = (1 / γ) * pₖ + (grad_ψₖ - grad_̂ψₖ);
     // These parentheses     ^^^               ^^^
     // are important to prevent catastrophic cancellation when the step is small
     auto ε = vec_util::norm_inf(err);
