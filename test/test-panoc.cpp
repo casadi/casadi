@@ -268,9 +268,11 @@ TEST(PANOC, ref) {
 
     EXPECT_EQ(stats.status, pa::SolverStatus::Converged);
     EXPECT_EQ(stats.status, stats_ref.status);
-    EXPECT_EQ(stats.iterations, stats_ref.iterations);
-    EXPECT_EQ(stats.lbfgs_failures, stats_ref.lbfgs_failures);
-    EXPECT_EQ(stats.lbfgs_rejected, stats_ref.lbfgs_rejected);
+    EXPECT_LT(std::abs(int(stats.iterations) - int(stats_ref.iterations)), 2);
+    EXPECT_LT(
+        std::abs(int(stats.lbfgs_failures) - int(stats_ref.lbfgs_failures)), 2);
+    EXPECT_LT(
+        std::abs(int(stats.lbfgs_rejected) - int(stats_ref.lbfgs_rejected)), 2);
     EXPECT_THAT(print_wrap(x), EigenAlmostEqual(print_wrap(x_ref), 1e-8 * 9e3));
     EXPECT_THAT(print_wrap(λ), EigenAlmostEqual(print_wrap(λ_ref), 1e-8 * 9e3));
     // TODO: they're not _exactly_ equal, is that a problem?
