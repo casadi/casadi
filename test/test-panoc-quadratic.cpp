@@ -1,5 +1,7 @@
+#include "eigen-matchers.hpp"
 #include <gtest/gtest.h>
 
+#include <iomanip>
 #include <panoc-alm-ref/fd.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
 
@@ -18,7 +20,7 @@ TEST(PANOC, quadratic) {
     C.lowerbound(0) = -inf;
     C.upperbound(0) = inf;
     Box D{vec(m), vec(m)};
-    D.lowerbound.fill(-inf);
+    D.lowerbound.fill(6);
     D.upperbound.fill(inf);
 
     real_t a    = 1;
@@ -34,33 +36,50 @@ TEST(PANOC, quadratic) {
         pa::mat grad = pa::mat::Ones(n, m);
         grad_u_v     = grad * v;
     };
+    auto g_fun = [=](const vec &x) {
+        vec gg(m);
+        g(x, gg);
+        return gg;
+    };
 
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g};
 
     pa::PANOCParams params;
     params.lbfgs_mem = 20;
-    params.max_iter  = 1;
+    params.max_iter  = 10;
     params.τ_min     = 1. / 16;
 
     pa_ref::PANOCSolver solver{params};
 
-    vec y = vec::Ones(m);
+    vec y₀ = vec::Ones(m);
+    vec y = y₀;
     vec x = vec(n);
     x << 1;
     vec err_z = vec::Constant(m, NaN);
 
     vec Σ(m);
-    Σ.fill(1);
+    Σ.fill(1e10);
 
-    real_t ε = 1e-4;
+    real_t ε = 1e-10;
 
     auto stats = solver(p, Σ, ε, x, y, err_z);
 
+    std::cout << std::setprecision(17);
+
+    vec gg = g_fun(x);
+    vec z = pa::project(gg + Σ.asDiagonal().inverse() * y₀, D);
     std::cout << "\n===========\n" << std::endl;
     std::cout << "f(x)     = " << obj_f(x) << std::endl;
     std::cout << "x        = " << x.transpose() << std::endl;
     std::cout << "y        = " << y.transpose() << std::endl;
+    std::cout << "z        = " << z.transpose() << std::endl;
+    std::cout << "g(x)     = " << gg.transpose() << std::endl;
     std::cout << "g(x) - z = " << err_z.transpose() << std::endl;
     std::cout << "Iter:   " << stats.iterations << std::endl;
     std::cout << "Status: " << stats.status << std::endl << std::endl;
+    
+    EXPECT_FLOAT_EQ(x(0), 6);
+    EXPECT_FLOAT_EQ(y(0), -2);
+    EXPECT_THAT(print_wrap(err_z), EigenAlmostEqual(gg - z, 1e-15));
+
 }

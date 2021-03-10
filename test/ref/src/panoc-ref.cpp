@@ -157,11 +157,11 @@ PANOCSolver::Stats PANOCSolver::operator()(
         bool not_finite   = not std::isfinite(εₖ);
         bool conv         = εₖ <= ε;
         if (conv || out_of_iter || out_of_time || not_finite || interrupted) {
-            err_z        = eval_g(problem, x) - eval_ẑ(problem, xₖ, y, Σ);
-            x            = std::move(x̂ₖ);
-            y            = eval_ŷ(problem, xₖ, y, Σ);
-            s.iterations = k; // TODO: what do we count as an iteration?
-            s.ε          = εₖ;
+            err_z = eval_g(problem, x̂ₖ) - eval_ẑ(problem, x̂ₖ, y, Σ);
+            y     = eval_ŷ(problem, x̂ₖ, y, Σ);
+            x     = std::move(x̂ₖ);
+            s.iterations   = k; // TODO: what do we count as an iteration?
+            s.ε            = εₖ;
             s.elapsed_time = duration_cast<microseconds>(time_elapsed);
             s.status       = conv          ? SolverStatus::Converged
                              : out_of_time ? SolverStatus::MaxTime

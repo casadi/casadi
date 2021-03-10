@@ -128,12 +128,11 @@ class LBFGS {
             update2(i);
     }
 
-    void initialize(const vec &x, const vec &p, const vec &grad_ψ, real_t γ) {
-        (void)x;
-        (void)p;
-        (void)grad_ψ;
-        (void)γ;
-        std::cout << "init: " << n() << ", " << history() << std::endl;
+    void initialize(const vec &x₀, const vec &p₀, const vec &grad₀, real_t γ₀) {
+        (void)x₀;
+        (void)p₀;
+        (void)grad₀;
+        (void)γ₀;
     }
 
     void gamma_changed() { reset(); }
@@ -196,13 +195,13 @@ class SpecializedLBFGS {
     decltype(auto) α(size_t i) { return sto.coeffRef(n(), 2 * i + 1); }
     decltype(auto) α(size_t i) const { return sto.coeff(n(), 2 * i + 1); }
 
-    void initialize(const vec &x₀, const vec &p, const vec &grad₀, real_t γ) {
+    void initialize(const vec &x₀, const vec &p₀, const vec &grad₀, real_t γ₀) {
         idx   = 0;
         full  = false;
         x(0)  = x₀;
         g(0)  = grad₀;
-        old_γ = γ;
-        (void)p; // TODO: remove this parameter?
+        old_γ = γ₀;
+        (void)p₀;
     }
 
     size_t succ(size_t i) const { return i + 1 < history() ? i + 1 : 0; }

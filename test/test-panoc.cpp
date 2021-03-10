@@ -248,18 +248,18 @@ TEST(PANOC, ref) {
     vec Σ(m);
     Σ.fill(1e-2);
 
-    real_t ε = 1e-10;
+    real_t ε = 1e-8;
 
     auto stats     = solver(p, Σ, ε, x, λ, err_z);
     auto stats_ref = solver_ref(p, Σ, ε, x_ref, λ_ref, err_z_ref);
 
-    std::cout << "Normal" << std::endl;
+    std::cout << "Optimized" << std::endl;
     std::cout << "u = " << u(x).transpose() << "\ts = " << s(x).transpose()
               << "\ty = " << y(x).transpose() << std::endl;
     std::cout << stats.iterations << std::endl;
     std::cout << stats.status << std::endl << std::endl;
 
-    std::cout << "Ref" << std::endl;
+    std::cout << "Reference" << std::endl;
     std::cout << "u = " << u(x_ref).transpose()
               << "\ts = " << s(x_ref).transpose()
               << "\ty = " << y(x_ref).transpose() << std::endl;
