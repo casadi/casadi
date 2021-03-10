@@ -588,7 +588,7 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     configure_file(include/drivers/CUTEstProblemList.h.in
                    include/drivers/CUTEstProblemList.h @ONLY)
 
-    set(TESTNAME "upd-lipschitz-ls")
+    set(TESTNAME "upd-lipschitz-ls-new")
     set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}/CUTEst)
     file(MAKE_DIRECTORY ${TESTRESULT_DIR})
     foreach(P ${CUTEst_PROBLEM_LIST})
