@@ -686,7 +686,6 @@ void DaeBuilder::register_d(const MX& new_d, const MX& new_ddef) {
   // Add to lists
   d_.push_back(new_d);
   ddef_.push_back(new_ddef);
-  lam_ddef_.push_back(MX::sym("lam_" + new_d.name(), new_d.sparsity()));
 }
 
 void DaeBuilder::register_w(const MX& new_w, const MX& new_wdef) {
@@ -696,7 +695,6 @@ void DaeBuilder::register_w(const MX& new_w, const MX& new_wdef) {
   // Add to lists
   w_.push_back(new_w);
   wdef_.push_back(new_wdef);
-  lam_wdef_.push_back(MX::sym("lam_" + new_w.name(), new_w.sparsity()));
 }
 
 void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef) {
@@ -706,7 +704,6 @@ void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef) {
   // Add to lists
   y_.push_back(new_y);
   ydef_.push_back(new_ydef);
-  lam_ydef_.push_back(MX::sym("lam_" + new_y.name(), new_y.sparsity()));
 }
 
 MX DaeBuilder::add_q(const std::string& name, casadi_int n) {
@@ -753,7 +750,6 @@ MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
   MX new_d = add_variable(name, new_ddef.sparsity());
   d_.push_back(new_d);
   ddef_.push_back(new_ddef);
-  lam_ddef_.push_back(MX::sym("lam_" + name, new_ddef.sparsity()));
   return new_d;
 }
 
@@ -761,7 +757,6 @@ MX DaeBuilder::add_w(const std::string& name, const MX& new_wdef) {
   MX new_w = add_variable(name, new_wdef.sparsity());
   w_.push_back(new_w);
   wdef_.push_back(new_wdef);
-  lam_wdef_.push_back(MX::sym("lam_" + name, new_wdef.sparsity()));
   return new_w;
 }
 
@@ -769,25 +764,21 @@ MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
   MX new_y = add_variable(name, new_ydef.sparsity());
   y_.push_back(new_y);
   ydef_.push_back(new_ydef);
-  lam_ydef_.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
   return new_y;
 }
 
 void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
   ode_.push_back(new_ode);
-  lam_ode_.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
   clear_cache_ = true;
 }
 
 void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
   alg_.push_back(new_alg);
-  lam_alg_.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
   clear_cache_ = true;
 }
 
 void DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
   quad_.push_back(new_quad);
-  lam_quad_.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   clear_cache_ = true;
 }
 

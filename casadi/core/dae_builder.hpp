@@ -171,22 +171,22 @@ public:
 
   /** \brief Differential states defined by ordinary differential equations (ODE)
    */
-  std::vector<MX> x_, ode_, lam_ode_;
+  std::vector<MX> x_, ode_;
 
   /** \brief Algebraic equations and corresponding algebraic variables
    * \a alg and \a z have matching dimensions and
    * <tt>0 == alg(z, ...)</tt> implicitly defines \a z.
    */
-  std::vector<MX> z_, alg_, lam_alg_;
+  std::vector<MX> z_, alg_;
 
   /** \brief Quadrature states
    * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
    */
-  std::vector<MX> q_, quad_, lam_quad_;
+  std::vector<MX> q_, quad_;
 
   /** \brief Output variables and corresponding definitions
    */
-  std::vector<MX> y_, ydef_, lam_ydef_;
+  std::vector<MX> y_, ydef_;
 
   /** \brief Free controls
    * The trajectories of the free controls are decision variables of the optimal control problem.
@@ -206,13 +206,13 @@ public:
   /** \brief Dependent parameters and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  std::vector<MX> d_, ddef_, lam_ddef_;
+  std::vector<MX> d_, ddef_;
   ///@}
 
   /** \brief Dependent variables and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  std::vector<MX> w_, wdef_, lam_wdef_;
+  std::vector<MX> w_, wdef_;
   ///@}
 
   /** \brief Auxiliary variables: Used e.g. to define functions */
