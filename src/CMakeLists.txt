@@ -19,6 +19,10 @@ target_include_directories(panoc-alm
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 target_link_libraries(panoc-alm PUBLIC Eigen3::Eigen)
+if (LBFGSpp_FOUND)
+    target_link_libraries(panoc-alm PUBLIC LBFGSpp::LBFGSpp)
+endif()
+
 # target_compile_definitions(panoc-alm PUBLIC PRINT_DEBUG_COUT=1)
 
 # Interop

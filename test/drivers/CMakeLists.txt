@@ -588,14 +588,14 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     configure_file(include/drivers/CUTEstProblemList.h.in
                    include/drivers/CUTEstProblemList.h @ONLY)
 
-    set(TESTNAME "upd-lipschitz-ls-new")
+    set(TESTNAME "only-D-lbfgspp")
     set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}/CUTEst)
     file(MAKE_DIRECTORY ${TESTRESULT_DIR})
     foreach(P ${CUTEst_PROBLEM_LIST})
         cutest_sif_problem(${P})
     endforeach()
 
-    add_executable(cutest-driver src/driver.cpp)
+    add_executable(cutest-driver src/driver-only-D-lbfgs.cpp)
     target_link_libraries(cutest-driver PRIVATE yaml-encoder)
 
     foreach(P ${CUTEst_PROBLEM_LIST})

@@ -3,6 +3,7 @@
 #include "box.hpp"
 
 #include <functional>
+#include <type_traits>
 
 namespace pa {
 
@@ -102,6 +103,22 @@ class ProblemWithCounters : public Problem {
 
   private:
     static void attach_counters(ProblemWithCounters &);
+};
+
+/// Moves the state constraints in the set C to the set D, resulting in an
+/// unconstraint inner problem. The new constraints function g becomes the
+/// concatenation of the original g function and the identity function. The
+/// new set D is the cartesian product of the original D × C.
+class ProblemOnlyD : public Problem {
+  public:
+    ProblemOnlyD(Problem &&p) : original(std::move(p)) { transform(); }
+    ProblemOnlyD(const Problem &p) : original(p) { transform(); }
+
+  private:
+    Problem original; // TODO: Keeping this copy around is unnecessary.
+    vec work;
+
+    void transform();
 };
 
 } // namespace pa

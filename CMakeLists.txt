@@ -32,6 +32,9 @@ find_package(casadi)
 # CUTEst
 find_package(CUTEst)
 
+# LBFGSpp
+find_package(LBFGSpp)
+
 # ----
 
 add_subdirectory(src)
