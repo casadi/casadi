@@ -30,7 +30,7 @@ struct PANOCParams {
     std::chrono::microseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step.
     /// @todo   The default is too small, log₂(10⁻¹²) = 39 iterations.
-    real_t τ_min = 1e-12; 
+    real_t τ_min = 1e-12;
 
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
@@ -98,6 +98,8 @@ class PANOCSolver {
     }
 
     void stop() { stop_signal.stop(); }
+
+    const Params &get_params() const { return params; }
 
   private:
     Params params;

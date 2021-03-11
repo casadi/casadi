@@ -85,6 +85,8 @@ class ALMSolver {
     /// Can be called from other threads or signal handlers.
     void stop() { inner_solver.stop(); }
 
+    const Params &get_params() const { return params; }
+
   private:
     Params params;
 

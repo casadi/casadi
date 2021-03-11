@@ -5,6 +5,7 @@
 #include <atomic>
 #include <chrono>
 #include <csignal>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -24,8 +25,8 @@ using pa::vec;
 using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
 #elif SOLVER == SOLVER_PANOC_LBFGS
 #include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/decl/lbfgs.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
 using Solver = pa::ALMSolver<>;
 #elif SOLVER == SOLVER_LBFGSpp
 #include <panoc-alm/alm.hpp>
@@ -103,9 +104,6 @@ int main(int argc, char *argv[]) {
                   << std::endl;
         return 1;
     }
-    std::string prob_dir = "CUTEst/"s + argv[1];
-    CUTEstProblem cp(prob_dir + "/libcutest-problem-" + argv[1] + ".so",
-                     prob_dir + "/OUTSDIF.d");
 
     pa::ALMParams almparams;
     almparams.max_iter        = 200;
@@ -117,6 +115,22 @@ int main(int argc, char *argv[]) {
     // almparams.Δ = 1.1;
 
     Solver solver{almparams, get_inner_solver()};
+
+    if (std::strcmp(argv[1], "parameters") == 0) {
+        std::ofstream f(argv[2] + "/"s + argv[1] + ".yaml");
+        YAML::Emitter out(f);
+        out << YAML::BeginMap;
+        out << YAML::Key << "outer" << YAML::Value << solver.get_params();
+        out << YAML::Key << "inner" << YAML::Value
+            << solver.inner_solver.get_params();
+        out << YAML::EndMap;
+        return 0;
+    }
+
+    std::string prob_dir = "CUTEst/"s + argv[1];
+    CUTEstProblem cp(prob_dir + "/libcutest-problem-" + argv[1] + ".so",
+                     prob_dir + "/OUTSDIF.d");
+
     std::atomic_signal_fence(std::memory_order_release);
     acitve_solver.store(&solver, std::memory_order_relaxed);
     signal(SIGINT, signal_callback_handler);

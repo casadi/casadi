@@ -609,6 +609,15 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
         list(APPEND CUTEst_PROBLEMS_RESULT_TARGETS 
                     cutest-result-${TESTNAME}-${P})
     endforeach()
+    add_custom_command(OUTPUT ${TESTRESULT_DIR}/parameters.yaml
+                       COMMAND cutest-driver parameters ${TESTRESULT_DIR}
+                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                       DEPENDS cutest-driver)
+    add_custom_target(cutest-result-${TESTNAME}-parameters
+                      DEPENDS ${TESTRESULT_DIR}/parameters.yaml)
+    list(APPEND CUTEst_PROBLEMS_RESULT_TARGETS 
+                cutest-result-${TESTNAME}-parameters)
+    message(STATUS cutest-result-${TESTNAME}-parameters)
     add_custom_target(cutest-results-${TESTNAME}
                       DEPENDS ${CUTEst_PROBLEMS_RESULT_TARGETS})
     cmake_host_system_information(RESULT HOSTNAME QUERY HOSTNAME)

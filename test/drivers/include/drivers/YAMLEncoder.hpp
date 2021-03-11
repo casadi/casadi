@@ -1,3 +1,5 @@
+#include "panoc-alm/decl/alm.hpp"
+#include "panoc-alm/inner/decl/panoc.hpp"
 #include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
 
@@ -63,4 +65,43 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::EvalCounter ctr) {
 
 inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::SolverStatus s) {
     return out << enum_name(s);
+}
+
+inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PANOCParams &p) {
+    out << YAML::BeginMap;
+    out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
+    out << YAML::Key << "δ" << YAML::Value << p.Lipschitz.δ;
+    out << YAML::Key << "Lγ_factor" << YAML::Value << p.Lipschitz.Lγ_factor;
+    out << YAML::EndMap;
+    out << YAML::Key << "lbfgs_mem" << YAML::Value << p.lbfgs_mem;
+    out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
+    out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
+    out << YAML::Key << "τ_min" << YAML::Value << p.τ_min;
+    out << YAML::Key << "update_lipschitz_in_linesearch" << YAML::Value
+        << p.update_lipschitz_in_linesearch;
+    out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
+        << p.alternative_linesearch_cond;
+    out << YAML::EndMap;
+    return out;
+}
+
+inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::ALMParams &p) {
+    out << YAML::BeginMap;
+    out << YAML::Key << "ε" << YAML::Value << p.ε;
+    out << YAML::Key << "δ" << YAML::Value << p.δ;
+    out << YAML::Key << "Δ" << YAML::Value << p.Δ;
+    out << YAML::Key << "Σ₀" << YAML::Value << p.Σ₀;
+    out << YAML::Key << "σ₀" << YAML::Value << p.σ₀;
+    out << YAML::Key << "ε₀" << YAML::Value << p.ε₀;
+    out << YAML::Key << "θ" << YAML::Value << p.θ;
+    out << YAML::Key << "ρ" << YAML::Value << p.ρ;
+    out << YAML::Key << "M" << YAML::Value << p.M;
+    out << YAML::Key << "Σₘₐₓ" << YAML::Value << p.Σₘₐₓ;
+    out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
+    out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
+    out << YAML::Key << "print_interval" << YAML::Value << p.print_interval;
+    out << YAML::Key << "preconditioning" << YAML::Value << p.preconditioning;
+    out << YAML::EndMap;
+    return out;
 }
