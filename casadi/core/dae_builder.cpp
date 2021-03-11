@@ -1684,7 +1684,7 @@ void DaeBuilder::sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef) {
   if (Jv.is_triu()) return;
   // Perform a Dulmage-Mendelsohn decomposition
   std::vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-  casadi_int nz = Jv.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+  (void)Jv.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
   // Reorder the variables
   std::vector<MX> tmp(v.size());
   for (size_t k = 0; k < v.size(); ++k) tmp[k] = v.at(colperm.at(k));
