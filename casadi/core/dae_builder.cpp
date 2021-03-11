@@ -141,7 +141,7 @@ void Variable::disp(std::ostream &stream, bool more) const {
   stream << name;
 }
 
-DaeBuilder::DaeBuilder() {
+DaeBuilder::DaeBuilder(const std::string& name) : name_(name) {
   this->t = MX::sym("t");
   clear_cache_ = false;
 }

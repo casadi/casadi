@@ -34,7 +34,7 @@ int main(){
   // Joel Andersson, UW Madison 2017
 
   // Start with an empty DaeBuilder instance
-  DaeBuilder dae;
+  DaeBuilder dae("rocket");
 
   // Add input expressions
   auto a = dae.add_p("a");

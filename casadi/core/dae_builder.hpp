@@ -159,8 +159,8 @@ class CASADI_EXPORT DaeBuilder
   : public SWIG_IF_ELSE(PrintableCommon, Printable<DaeBuilder>) {
 public:
 
-  /// Default constructor
-  DaeBuilder();
+  /// Constructor
+  DaeBuilder(const std::string& name);
 
   /** @name Variables and equations
    *  Public data members
@@ -546,6 +546,9 @@ protected:
 
   /// Get the qualified name
   static std::string qualified_name(const XmlNode& nn);
+
+  /// Name of instance
+  std::string name_;
 
   /// All variables
   std::vector<Variable> variables_;

@@ -28,7 +28,7 @@ from casadi import *
 # Joel Andersson, UW Madison 2017
 
 # Start with an empty DaeBuilder instance
-dae = DaeBuilder()
+dae = DaeBuilder('rocket')
 
 # Add input expressions
 a = dae.add_p('a')
