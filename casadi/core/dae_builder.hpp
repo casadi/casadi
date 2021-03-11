@@ -162,68 +162,75 @@ public:
   /// Constructor
   DaeBuilder(const std::string& name);
 
-  /** @name Variables and equations
-   *  Public data members
-   */
+  /** @name Variables and equations */
   ///@{
   /** \brief Independent variable (usually time) */
-  MX t_;
+  const MX t() const {return t_;}
 
-  /** \brief Differential states defined by ordinary differential equations (ODE)
-   */
-  std::vector<MX> x_, ode_;
+  /** \brief Differential states */
+  const std::vector<MX>& x() const {return x_;}
 
-  /** \brief Algebraic equations and corresponding algebraic variables
-   * \a alg and \a z have matching dimensions and
-   * <tt>0 == alg(z, ...)</tt> implicitly defines \a z.
-   */
-  std::vector<MX> z_, alg_;
+  /** \brief Ordinary differential equations (ODE) */
+  const std::vector<MX>& ode() const {return ode_;}
 
-  /** \brief Quadrature states
-   * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
-   */
-  std::vector<MX> q_, quad_;
+  /** \brief Algebraic variables */
+  const std::vector<MX>& z() const {return z_;}
 
-  /** \brief Output variables and corresponding definitions
-   */
-  std::vector<MX> y_, ydef_;
+  /** \brief Algebraic equations */
+  const std::vector<MX>& alg() const {return alg_;}
 
-  /** \brief Free controls
-   * The trajectories of the free controls are decision variables of the optimal control problem.
-   * They are chosen by the optimization algorithm in order to minimize the cost functional.
-   */
-  std::vector<MX> u_;
+  /** \brief Quadrature states */
+  const std::vector<MX>& q() const {return q_;}
 
-  /** \brief Parameters
-   * A parameter is constant over time, but whose value is chosen by e.g. an
-   * optimization algorithm.
-   */
-  std::vector<MX> p_;
+  /** \brief Quadrature equations */
+  const std::vector<MX>& quad() const {return quad_;}
+
+  /** \brief Output variables */
+  const std::vector<MX>& y() const {return y_;}
+
+  /** \brief Definitions of output variables */
+  const std::vector<MX>& ydef() const {return ydef_;}
+
+  /** \brief Free controls */
+  const std::vector<MX>& u() const {return u_;}
+
+  /** \brief Parameters */
+  const std::vector<MX>& p() const {return p_;}
 
   /** \brief Named constants */
-  std::vector<MX> c_, cdef_;
+  const std::vector<MX>& c() const {return c_;}
 
-  /** \brief Dependent parameters and corresponding definitions
-   * Interdependencies are allowed but must be non-cyclic.
-   */
-  std::vector<MX> d_, ddef_;
-  ///@}
+  /** \brief Definitions of named constants */
+  const std::vector<MX>& cdef() const {return cdef_;}
+
+  /** \brief Dependent parameters */
+  const std::vector<MX>& d() const {return d_;}
+
+  /** \brief Definitions of dependent parameters
+    * Interdependencies are allowed but must be non-cyclic.
+    */
+  const std::vector<MX>& ddef() const {return ddef_;}
+
+  /** \brief Dependent variables */
+  const std::vector<MX>& w() const {return w_;}
 
   /** \brief Dependent variables and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  std::vector<MX> w_, wdef_;
-  ///@}
+  const std::vector<MX>& wdef() const {return wdef_;}
 
   /** \brief Auxiliary variables: Used e.g. to define functions */
-  std::vector<MX> aux_;
+  const std::vector<MX>& aux() const {return aux_;}
 
-  /** \brief Initial conditions */
-  std::vector<MX> init_lhs_, init_rhs_;
+  /** \brief Initial conditions, left-hand-side */
+  const std::vector<MX>& init_lhs() const {return init_lhs_;}
+
+  /** \brief Initial conditions, right-hand-side */
+  const std::vector<MX>& init_rhs() const {return init_rhs_;}
   ///@}
 
   /** @name Symbolic modeling
-   *  Formulate an optimal control problem
+   *  Formulate a dynamic system model
    */
   ///@{
   /// Add a new parameter
@@ -555,6 +562,22 @@ protected:
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
+
+  ///@{
+  /// Ordered variables and equations
+  MX t_;
+  std::vector<MX> x_, ode_;
+  std::vector<MX> z_, alg_;
+  std::vector<MX> q_, quad_;
+  std::vector<MX> y_, ydef_;
+  std::vector<MX> u_;
+  std::vector<MX> p_;
+  std::vector<MX> c_, cdef_;
+  std::vector<MX> d_, ddef_;
+  std::vector<MX> w_, wdef_;
+  std::vector<MX> aux_;
+  std::vector<MX> init_lhs_, init_rhs_;
+  ///@}
 
   /// Linear combinations of output expressions
   Function::AuxOut lc_;
