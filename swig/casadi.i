@@ -202,14 +202,16 @@
 
 import contextlib
 
-class _copyableObject(_object):
+class _copyableObject(object):
   def __copy__(self):
     return self.__class__(self)
 
   def __deepcopy__(self,dummy=None):
     return self.__class__(self)
 
-_object = _copyableObject
+object = _copyableObject
+	    
+	    
 
 _swig_repr_default = _swig_repr
 def _swig_repr(self):
