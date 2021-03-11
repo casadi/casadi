@@ -153,6 +153,37 @@ public:
   const std::vector<MX>& init_rhs() const;
   ///@}
 
+  /** @name Variables and equations */
+  ///@{
+
+  /** \brief Differential states */
+  casadi_int nx() const {return x().size();}
+
+  /** \brief Algebraic variables */
+  casadi_int nz() const {return z().size();}
+
+  /** \brief Quadrature states */
+  casadi_int nq() const {return q().size();}
+
+  /** \brief Output variables */
+  casadi_int ny() const {return y().size();}
+
+  /** \brief Free controls */
+  casadi_int nu() const {return u().size();}
+
+  /** \brief Parameters */
+  casadi_int np() const {return p().size();}
+
+  /** \brief Named constants */
+  casadi_int nc() const {return c().size();}
+
+  /** \brief Dependent parameters */
+  casadi_int nd() const {return d().size();}
+
+  /** \brief Dependent variables */
+  casadi_int nw() const {return w().size();}
+  ///@}
+
   /** @name Symbolic modeling
    *  Formulate a dynamic system model
    */
