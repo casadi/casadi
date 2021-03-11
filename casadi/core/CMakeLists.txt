@@ -182,7 +182,7 @@ set(CASADI_INTERNAL
   nlp_builder.cpp
   xml_node.cpp
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
-  dae_builder.cpp
+  dae_builder.cpp             dae_builder_internal.hpp             dae_builder_internal.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
   serializer.cpp              serializing_stream.cpp
   casadi_c.cpp

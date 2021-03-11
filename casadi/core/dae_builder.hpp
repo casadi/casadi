@@ -26,98 +26,12 @@
 #ifndef CASADI_DAE_BUILDER_HPP
 #define CASADI_DAE_BUILDER_HPP
 
-#include <unordered_map>
-
 #include "function.hpp"
 
 namespace casadi {
 
 // Forward declarations
-class XmlNode;
-class DaeBuilder;
-
-#ifndef SWIG
-/** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
-    \date 2012-2021
-    \author Joel Andersson
- */
-struct CASADI_EXPORT Variable : public Printable<Variable> {
-  /// Variable type
-  enum Type {REAL, INTEGER, BOOLEAN, STRING, ENUM, N_TYPE};
-
-  /// Causality: FMI 2.0 specification, section 2.2.7
-  enum Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, N_CAUSALITY};
-
-  /// Variability: FMI 2.0 specification, section 2.2.7
-  enum Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, N_VARIABILITY};
-
-  /// Initial: FMI 2.0 specification, section 2.2.7
-  enum Initial {EXACT, APPROX, CALCULATED, INITIAL_NA, N_INITIAL};
-
-  // Attributes
-  enum Attribute {MIN, MAX, NOMINAL, START, N_ATTRIBUTE};
-
-  /// Constructor
-  Variable(const std::string& name = "");
-
-  /** Attributes common to all types of variables, cf. FMI specification */
-  ///@{
-  std::string name;
-  casadi_int value_reference;
-  std::string description;
-  Type type;
-  Causality causality;
-  Variability variability;
-  Initial initial;
-  ///@}
-
-  /** Attributes specific to Real, cf. FMI specification */
-  ///@{
-  // std::string declared_type;
-  // std::string quantity;
-  std::string unit;
-  std::string display_unit;
-  // bool relative_quantity;
-  MX min;
-  MX max;
-  MX nominal;
-  // bool unbounded;
-  MX start;
-  casadi_int derivative;
-  casadi_int antiderivative;
-  // bool reinit;
-  ///@}
-
-  /// Do other expressions depend on this variable
-  bool dependency;
-
-  /// Variable expression
-  MX v;
-
-  /// Binding equation
-  MX beq;
-
-  /// Readable name of the class
-  std::string type_name() const {return "Variable";}
-
-  /// Print a description of the object
-  void disp(std::ostream& stream, bool more=false) const;
-
-  /// Get string representation
-  std::string get_str(bool more=false) const {
-    std::stringstream ss;
-    disp(ss, more);
-    return ss.str();
-  }
-
-  // Default initial attribute, per specification
-  static Initial default_initial(Causality causality, Variability variability);
-
-  // Get attribute by enum
-  MX attribute(Attribute att) const;
-};
-
-#endif  // SWIG
+class DaeBuilderInternal;
 
 /** \brief An initial-value problem in differential-algebraic equations
     <H3>Independent variables:  </H3>
@@ -156,77 +70,87 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
     \author Joel Andersson
 */
 class CASADI_EXPORT DaeBuilder
-  : public SWIG_IF_ELSE(PrintableCommon, Printable<DaeBuilder>) {
+  : public SharedObject,
+    public SWIG_IF_ELSE(PrintableCommon, Printable<DaeBuilder>) {
 public:
 
+  /// Readable name of the class
+  std::string type_name() const {return "DaeBuilder";}
+
+  /// Default constructor
+  DaeBuilder();
+
   /// Constructor
-  DaeBuilder(const std::string& name);
+  explicit DaeBuilder(const std::string& name);
+
+  /** \brief Name of instance */
+  const std::string& name() const;
 
   /** @name Variables and equations */
   ///@{
   /** \brief Independent variable (usually time) */
-  const MX t() const {return t_;}
+  const MX& t() const;
 
   /** \brief Differential states */
-  const std::vector<MX>& x() const {return x_;}
+  const std::vector<MX>& x() const;
 
   /** \brief Ordinary differential equations (ODE) */
-  const std::vector<MX>& ode() const {return ode_;}
+  const std::vector<MX>& ode() const;
 
   /** \brief Algebraic variables */
-  const std::vector<MX>& z() const {return z_;}
+  const std::vector<MX>& z() const;
 
   /** \brief Algebraic equations */
-  const std::vector<MX>& alg() const {return alg_;}
+  const std::vector<MX>& alg() const;
 
   /** \brief Quadrature states */
-  const std::vector<MX>& q() const {return q_;}
+  const std::vector<MX>& q() const;
 
   /** \brief Quadrature equations */
-  const std::vector<MX>& quad() const {return quad_;}
+  const std::vector<MX>& quad() const;
 
   /** \brief Output variables */
-  const std::vector<MX>& y() const {return y_;}
+  const std::vector<MX>& y() const;
 
   /** \brief Definitions of output variables */
-  const std::vector<MX>& ydef() const {return ydef_;}
+  const std::vector<MX>& ydef() const;
 
   /** \brief Free controls */
-  const std::vector<MX>& u() const {return u_;}
+  const std::vector<MX>& u() const;
 
   /** \brief Parameters */
-  const std::vector<MX>& p() const {return p_;}
+  const std::vector<MX>& p() const;
 
   /** \brief Named constants */
-  const std::vector<MX>& c() const {return c_;}
+  const std::vector<MX>& c() const;
 
   /** \brief Definitions of named constants */
-  const std::vector<MX>& cdef() const {return cdef_;}
+  const std::vector<MX>& cdef() const;
 
   /** \brief Dependent parameters */
-  const std::vector<MX>& d() const {return d_;}
+  const std::vector<MX>& d() const;
 
   /** \brief Definitions of dependent parameters
     * Interdependencies are allowed but must be non-cyclic.
     */
-  const std::vector<MX>& ddef() const {return ddef_;}
+  const std::vector<MX>& ddef() const;
 
   /** \brief Dependent variables */
-  const std::vector<MX>& w() const {return w_;}
+  const std::vector<MX>& w() const;
 
   /** \brief Dependent variables and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  const std::vector<MX>& wdef() const {return wdef_;}
+  const std::vector<MX>& wdef() const;
 
   /** \brief Auxiliary variables: Used e.g. to define functions */
-  const std::vector<MX>& aux() const {return aux_;}
+  const std::vector<MX>& aux() const;
 
   /** \brief Initial conditions, left-hand-side */
-  const std::vector<MX>& init_lhs() const {return init_lhs_;}
+  const std::vector<MX>& init_lhs() const;
 
   /** \brief Initial conditions, right-hand-side */
-  const std::vector<MX>& init_rhs() const {return init_rhs_;}
+  const std::vector<MX>& init_rhs() const;
   ///@}
 
   /** @name Symbolic modeling
@@ -366,46 +290,6 @@ public:
   /// Import existing problem from FMI/XML
   void parse_fmi(const std::string& filename);
 
-#ifndef SWIG
-  // Input convension in codegen
-  enum DaeBuilderIn {
-    DAE_BUILDER_T,
-    DAE_BUILDER_C,
-    DAE_BUILDER_P,
-    DAE_BUILDER_D,
-    DAE_BUILDER_W,
-    DAE_BUILDER_U,
-    DAE_BUILDER_X,
-    DAE_BUILDER_Z,
-    DAE_BUILDER_Q,
-    DAE_BUILDER_Y,
-    DAE_BUILDER_NUM_IN
-  };
-
-  // Output convension in codegen
-  enum DaeBuilderOut {
-    DAE_BUILDER_DDEF,
-    DAE_BUILDER_WDEF,
-    DAE_BUILDER_ODE,
-    DAE_BUILDER_ALG,
-    DAE_BUILDER_QUAD,
-    DAE_BUILDER_YDEF,
-    DAE_BUILDER_NUM_OUT
-  };
-
-  // Get input expression, given enum
-  std::vector<MX> input(DaeBuilderIn ind) const;
-
-  // Get output expression, given enum
-  std::vector<MX> output(DaeBuilderOut ind) const;
-
-  // Get input expression, given enum
-  std::vector<MX> input(const std::vector<DaeBuilderIn>& ind) const;
-
-  // Get output expression, given enum
-  std::vector<MX> output(const std::vector<DaeBuilderOut>& ind) const;
-#endif // SWIG
-
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 
@@ -470,7 +354,6 @@ public:
   ///@{
   /// Get/set the unit
   std::string unit(const std::string& name) const;
-  std::string unit(const MX& var) const;
   void set_unit(const std::string& name, const std::string& val);
   ///@}
 
@@ -510,22 +393,6 @@ public:
   void set_binding_equation(const std::string& name, const MX& val);
   ///@}
 
-  /// Readable name of the class
-  std::string type_name() const {return "DaeBuilder";}
-
-  ///  Print representation
-  void disp(std::ostream& stream, bool more=false) const;
-
-  /// Get string representation
-  std::string get_str(bool more=false) const {
-    std::stringstream ss;
-    disp(ss, more);
-    return ss.str();
-  }
-
-  /// Add a variable
-  void add_variable(const std::string& name, const Variable& var);
-
   /// Add a new variable: returns corresponding symbolic expression
   MX add_variable(const std::string& name, casadi_int n=1);
 
@@ -538,175 +405,27 @@ public:
   /// Check if a particular variable exists
   bool has_variable(const std::string& name) const;
 
+    /// Get the (cached) oracle, SX or MX
+  Function oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
+
+#ifndef SWIG
+  /// Add a variable
+  void add_variable(const std::string& name, const Variable& var);
+
   ///@{
   /// Access a variable by name
   Variable& variable(const std::string& name);
   const Variable& variable(const std::string& name) const;
   ///@}
 
-    /// Get the (cached) oracle, SX or MX
-  const Function& oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
+  /// Access a member function or object
+  const DaeBuilderInternal* operator->() const;
 
-#ifndef SWIG
-  // Internal methods
-protected:
-
-  /// Get the qualified name
-  static std::string qualified_name(const XmlNode& nn);
-
-  /// Name of instance
-  std::string name_;
-
-  /// All variables
-  std::vector<Variable> variables_;
-
-  /// Find of variable by name
-  std::unordered_map<std::string, size_t> varind_;
-
-  ///@{
-  /// Ordered variables and equations
-  MX t_;
-  std::vector<MX> x_, ode_;
-  std::vector<MX> z_, alg_;
-  std::vector<MX> q_, quad_;
-  std::vector<MX> y_, ydef_;
-  std::vector<MX> u_;
-  std::vector<MX> p_;
-  std::vector<MX> c_, cdef_;
-  std::vector<MX> d_, ddef_;
-  std::vector<MX> w_, wdef_;
-  std::vector<MX> aux_;
-  std::vector<MX> init_lhs_, init_rhs_;
-  ///@}
-
-  /// Linear combinations of output expressions
-  Function::AuxOut lc_;
-
-  /** \brief Functions */
-  std::vector<Function> fun_;
-
-  /** \brief Function oracles (cached) */
-  mutable Function oracle_[2][2][2];
-
-  /// Should the cache be cleared?
-  mutable bool clear_cache_;
-
-  /// Read an equation
-  MX read_expr(const XmlNode& node);
-
-  /// Read a variable
-  Variable& read_variable(const XmlNode& node);
-
-  /// Problem structure has changed: Clear cache
-  void clear_cache() const;
-
-  /// Helper class, represents inputs and outputs for a function call node
-  struct CallIO {
-    // Function instances
-    Function f, adj1_f, J, H;
-    // Index in v and vdef
-    std::vector<size_t> v, vdef;
-    // Nondifferentiated inputs
-    std::vector<MX> arg;
-    // Nondifferentiated inputs
-    std::vector<MX> res;
-    // Jacobian outputs
-    std::vector<MX> jac_res;
-    // Adjoint seeds
-    std::vector<MX> adj1_arg;
-    // Adjoint sensitivities
-    std::vector<MX> adj1_res;
-    // Hessian outputs
-    std::vector<MX> hess_res;
-    // Calculate Jacobian blocks
-    void calc_jac();
-    // Calculate gradient of Lagrangian
-    void calc_grad();
-    // Calculate Hessian of Lagrangian
-    void calc_hess();
-    // Access a specific Jacobian block
-    const MX& jac(casadi_int oind, casadi_int iind) const;
-    // Access a specific Hessian block
-    const MX& hess(casadi_int iind1, casadi_int iind2) const;
-  };
-
-  /// Calculate contribution to jac_vdef_v from lifted calls
-  MX jac_vdef_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
-    const std::vector<casadi_int>& h_offsets) const;
-
-  /// Calculate contribution to hess_?_v_v from lifted calls
-  MX hess_v_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
-    const std::vector<casadi_int>& h_offsets) const;
-
-  // Sort dependent variables/parameters
-  void sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef);
+  /// Access a member function or object
+  DaeBuilderInternal* operator->();
 
 #endif // SWIG
 };
-
-#ifndef SWIG
-
-/// Helper class: Specify number of entries in an enum
-template<typename T>
-struct enum_traits {};
-
-// Helper function: Convert string to enum
-template<typename T>
-T to_enum(const std::string& s) {
-  // Linear search over permitted values
-  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
-    if (s == to_string(static_cast<T>(i))) return static_cast<T>(i);
-  }
-  // Informative error message
-  std::stringstream ss;
-  ss << "No such enum: '" << s << "'. Permitted values: ";
-  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
-    // Separate strings
-    if (i > 0) ss << ", ";
-    // Print enum name
-    ss << "'" << to_string(static_cast<T>(i)) << "'";
-  }
-  casadi_error(ss.str());
-  return enum_traits<T>::n_enum;  // never reached
-}
-
-///@{
-/// Number of entries in enums
-template<> struct enum_traits<Variable::Type> {
-  static const Variable::Type n_enum = Variable::N_TYPE;
-};
-template<> struct enum_traits<Variable::Causality> {
-  static const Variable::Causality n_enum = Variable::N_CAUSALITY;
-};
-template<> struct enum_traits<Variable::Variability> {
-  static const Variable::Variability n_enum = Variable::N_VARIABILITY;
-};
-template<> struct enum_traits<Variable::Initial> {
-  static const Variable::Initial n_enum = Variable::N_INITIAL;
-};
-template<> struct enum_traits<Variable::Attribute> {
-  static const Variable::Attribute n_enum = Variable::N_ATTRIBUTE;
-};
-template<> struct enum_traits<DaeBuilder::DaeBuilderIn> {
-  static const DaeBuilder::DaeBuilderIn n_enum = DaeBuilder::DAE_BUILDER_NUM_IN;
-};
-template<> struct enum_traits<DaeBuilder::DaeBuilderOut> {
-  static const DaeBuilder::DaeBuilderOut n_enum = DaeBuilder::DAE_BUILDER_NUM_OUT;
-};
-///@}
-
-///@{
-/// Convert to string
-CASADI_EXPORT std::string to_string(Variable::Type v);
-CASADI_EXPORT std::string to_string(Variable::Causality v);
-CASADI_EXPORT std::string to_string(Variable::Variability v);
-CASADI_EXPORT std::string to_string(Variable::Initial v);
-CASADI_EXPORT std::string to_string(Variable::Attribute v);
-CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderIn v);
-CASADI_EXPORT std::string to_string(DaeBuilder::DaeBuilderOut v);
-///@}
-
-#endif  // SWIG
 
 } // namespace casadi
 
