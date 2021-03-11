@@ -459,7 +459,7 @@ void DaeBuilder::disp(std::ostream& stream, bool more) const {
   if (!this->x.empty()) {
     stream << "Differential equations" << std::endl;
     for (casadi_int k=0; k<this->x.size(); ++k) {
-      stream << "  " << str(der(this->x[k])) << " == " << str(this->ode[k]) << std::endl;
+      stream << "  der(" << str(this->x[k]) << ") == " << str(this->ode[k]) << std::endl;
     }
   }
 
