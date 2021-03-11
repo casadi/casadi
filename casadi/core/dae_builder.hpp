@@ -167,59 +167,59 @@ public:
    */
   ///@{
   /** \brief Independent variable (usually time) */
-  MX t;
+  MX t_;
 
   /** \brief Differential states defined by ordinary differential equations (ODE)
    */
-  std::vector<MX> x, ode, lam_ode;
+  std::vector<MX> x_, ode_, lam_ode_;
 
   /** \brief Algebraic equations and corresponding algebraic variables
    * \a alg and \a z have matching dimensions and
    * <tt>0 == alg(z, ...)</tt> implicitly defines \a z.
    */
-  std::vector<MX> z, alg, lam_alg;
+  std::vector<MX> z_, alg_, lam_alg_;
 
   /** \brief Quadrature states
    * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
    */
-  std::vector<MX> q, quad, lam_quad;
+  std::vector<MX> q_, quad_, lam_quad_;
 
   /** \brief Output variables and corresponding definitions
    */
-  std::vector<MX> y, ydef, lam_ydef;
+  std::vector<MX> y_, ydef_, lam_ydef_;
 
   /** \brief Free controls
    * The trajectories of the free controls are decision variables of the optimal control problem.
    * They are chosen by the optimization algorithm in order to minimize the cost functional.
    */
-  std::vector<MX> u;
+  std::vector<MX> u_;
 
   /** \brief Parameters
    * A parameter is constant over time, but whose value is chosen by e.g. an
    * optimization algorithm.
    */
-  std::vector<MX> p;
+  std::vector<MX> p_;
 
   /** \brief Named constants */
-  std::vector<MX> c, cdef;
+  std::vector<MX> c_, cdef_;
 
   /** \brief Dependent parameters and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  std::vector<MX> d, ddef, lam_ddef;
+  std::vector<MX> d_, ddef_, lam_ddef_;
   ///@}
 
   /** \brief Dependent variables and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  std::vector<MX> w, wdef, lam_wdef;
+  std::vector<MX> w_, wdef_, lam_wdef_;
   ///@}
 
   /** \brief Auxiliary variables: Used e.g. to define functions */
-  std::vector<MX> aux;
+  std::vector<MX> aux_;
 
   /** \brief Initial conditions */
-  std::vector<MX> init_lhs, init_rhs;
+  std::vector<MX> init_lhs_, init_rhs_;
   ///@}
 
   /** @name Symbolic modeling

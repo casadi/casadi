@@ -142,7 +142,7 @@ void Variable::disp(std::ostream &stream, bool more) const {
 }
 
 DaeBuilder::DaeBuilder(const std::string& name) : name_(name) {
-  this->t = MX::sym("t");
+  t_ = MX::sym("t");
   clear_cache_ = false;
 }
 
@@ -255,36 +255,36 @@ void DaeBuilder::parse_fmi(const std::string& filename) {
     // Sort by types
     if (it->causality == Variable::INDEPENDENT) {
       // Independent (time) variable
-      this->t = it->v;
+      t_ = it->v;
     } else if (it->causality == Variable::INPUT) {
-      this->u.push_back(it->v);
+      u_.push_back(it->v);
     } else if (it->variability == Variable::CONSTANT) {
       // Named constant
-      this->c.push_back(it->v);
-      this->cdef.push_back(it->start);
+      c_.push_back(it->v);
+      cdef_.push_back(it->start);
     } else if (it->variability == Variable::FIXED || it->variability == Variable::TUNABLE) {
-      this->p.push_back(it->v);
+      p_.push_back(it->v);
     } else if (it->variability == Variable::CONTINUOUS) {
       if (it->antiderivative >= 0) {
         // Is the variable needed to calculate other states, algebraic variables?
         if (it->dependency) {
           // Add to list of differential equations
-          this->x.push_back(it->v);
+          x_.push_back(it->v);
           add_ode("ode_" + it->name, variables_.at(it->antiderivative).v);
         } else {
           // Add to list of quadrature equations
-          this->q.push_back(it->v);
+          q_.push_back(it->v);
           add_quad("quad_" + it->name, variables_.at(it->antiderivative).v);
         }
       } else if (it->dependency || it->derivative >= 0) {
         // Add to list of algebraic equations
-        this->z.push_back(it->v);
+        z_.push_back(it->v);
         add_alg("alg_" + it->name, it->v - nan);
       }
       // Is it (also) an output variable?
       if (it->causality == Variable::OUTPUT) {
-        this->y.push_back(it->v);
-        this->ydef.push_back(it->v);
+        y_.push_back(it->v);
+        ydef_.push_back(it->v);
       }
     } else if (it->dependency) {
       casadi_warning("Cannot sort " + it->name);
@@ -388,7 +388,7 @@ MX DaeBuilder::read_expr(const XmlNode& node) {
   } else if (name=="Tan") {
     return tan(read_expr(node[0]));
   } else if (name=="Time") {
-    return t;
+    return t_;
   } else if (name=="TimedVariable") {
     return read_variable(node[0]).v;
   }
@@ -403,15 +403,15 @@ void DaeBuilder::disp(std::ostream& stream, bool more) const {
   if (more) sanity_check();
 
   // Print dimensions
-  stream << "nx = " << this->x.size() << ", "
-         << "nz = " << this->z.size() << ", "
-         << "nq = " << this->q.size() << ", "
-         << "ny = " << this->y.size() << ", "
-         << "np = " << this->p.size() << ", "
-         << "nc = " << this->c.size() << ", "
-         << "nd = " << this->d.size() << ", "
-         << "nw = " << this->w.size() << ", "
-         << "nu = " << this->u.size();
+  stream << "nx = " << x_.size() << ", "
+         << "nz = " << z_.size() << ", "
+         << "nq = " << q_.size() << ", "
+         << "ny = " << y_.size() << ", "
+         << "np = " << p_.size() << ", "
+         << "nc = " << c_.size() << ", "
+         << "nd = " << d_.size() << ", "
+         << "nw = " << w_.size() << ", "
+         << "nu = " << u_.size();
 
   // Quick return?
   if (!more) return;
@@ -427,93 +427,93 @@ void DaeBuilder::disp(std::ostream& stream, bool more) const {
 
   // Print the variables
   stream << "Variables" << std::endl;
-  stream << "  t = " << str(this->t) << std::endl;
-  if (!this->c.empty()) stream << "  c = " << str(this->c) << std::endl;
-  if (!this->p.empty()) stream << "  p = " << str(this->p) << std::endl;
-  if (!this->d.empty()) stream << "  d = " << str(this->d) << std::endl;
-  if (!this->x.empty()) stream << "  x = " << str(this->x) << std::endl;
-  if (!this->z.empty()) stream << "  z = " << str(this->z) << std::endl;
-  if (!this->q.empty()) stream << "  q = " << str(this->q) << std::endl;
-  if (!this->y.empty()) stream << "  y = " << str(this->y) << std::endl;
-  if (!this->w.empty()) stream << "  w = " << str(this->w) << std::endl;
-  if (!this->u.empty()) stream << "  u = " << str(this->u) << std::endl;
+  stream << "  t = " << str(t_) << std::endl;
+  if (!c_.empty()) stream << "  c = " << str(c_) << std::endl;
+  if (!p_.empty()) stream << "  p = " << str(p_) << std::endl;
+  if (!d_.empty()) stream << "  d = " << str(d_) << std::endl;
+  if (!x_.empty()) stream << "  x = " << str(x_) << std::endl;
+  if (!z_.empty()) stream << "  z = " << str(z_) << std::endl;
+  if (!q_.empty()) stream << "  q = " << str(q_) << std::endl;
+  if (!y_.empty()) stream << "  y = " << str(y_) << std::endl;
+  if (!w_.empty()) stream << "  w = " << str(w_) << std::endl;
+  if (!u_.empty()) stream << "  u = " << str(u_) << std::endl;
 
-  if (!this->c.empty()) {
+  if (!c_.empty()) {
     stream << "Constants" << std::endl;
-    for (casadi_int i=0; i<this->c.size(); ++i)
-      stream << "  " << str(this->c[i]) << " == " << str(this->cdef[i]) << std::endl;
+    for (casadi_int i=0; i<c_.size(); ++i)
+      stream << "  " << str(c_[i]) << " == " << str(cdef_[i]) << std::endl;
   }
 
-  if (!this->d.empty()) {
+  if (!d_.empty()) {
     stream << "Dependent parameters" << std::endl;
-    for (casadi_int i=0; i<this->d.size(); ++i)
-      stream << "  " << str(this->d[i]) << " == " << str(this->ddef[i]) << std::endl;
+    for (casadi_int i=0; i<d_.size(); ++i)
+      stream << "  " << str(d_[i]) << " == " << str(ddef_[i]) << std::endl;
   }
 
-  if (!this->w.empty()) {
+  if (!w_.empty()) {
     stream << "Dependent variables" << std::endl;
-    for (casadi_int i=0; i<this->w.size(); ++i)
-      stream << "  " << str(this->w[i]) << " == " << str(this->wdef[i]) << std::endl;
+    for (casadi_int i=0; i<w_.size(); ++i)
+      stream << "  " << str(w_[i]) << " == " << str(wdef_[i]) << std::endl;
   }
 
-  if (!this->x.empty()) {
+  if (!x_.empty()) {
     stream << "Differential equations" << std::endl;
-    for (casadi_int k=0; k<this->x.size(); ++k) {
-      stream << "  der(" << str(this->x[k]) << ") == " << str(this->ode[k]) << std::endl;
+    for (casadi_int k=0; k<x_.size(); ++k) {
+      stream << "  der(" << str(x_[k]) << ") == " << str(ode_[k]) << std::endl;
     }
   }
 
-  if (!this->alg.empty()) {
+  if (!alg_.empty()) {
     stream << "Algebraic equations" << std::endl;
-    for (casadi_int k=0; k<this->z.size(); ++k) {
-      stream << "  0 == " << str(this->alg[k]) << std::endl;
+    for (casadi_int k=0; k<z_.size(); ++k) {
+      stream << "  0 == " << str(alg_[k]) << std::endl;
     }
   }
 
-  if (!this->q.empty()) {
+  if (!q_.empty()) {
     stream << "Quadrature equations" << std::endl;
-    for (casadi_int k=0; k<this->q.size(); ++k) {
-      stream << "  " << str(der(this->q[k])) << " == " << str(this->quad[k]) << std::endl;
+    for (casadi_int k=0; k<q_.size(); ++k) {
+      stream << "  " << str(der(q_[k])) << " == " << str(quad_[k]) << std::endl;
     }
   }
 
-  if (!this->init_lhs.empty()) {
+  if (!init_lhs_.empty()) {
     stream << "Initial equations" << std::endl;
-    for (casadi_int k=0; k<this->init_lhs.size(); ++k) {
-      stream << "  " << str(this->init_lhs.at(k)) << " == " << str(this->init_rhs.at(k))
+    for (casadi_int k=0; k<init_lhs_.size(); ++k) {
+      stream << "  " << str(init_lhs_.at(k)) << " == " << str(init_rhs_.at(k))
         << std::endl;
     }
   }
 
-  if (!this->y.empty()) {
+  if (!y_.empty()) {
     stream << "Output variables" << std::endl;
-    for (casadi_int i=0; i<this->y.size(); ++i) {
-      stream << "  " << str(this->y[i]) << " == " << str(this->ydef[i]) << std::endl;
+    for (casadi_int i=0; i<y_.size(); ++i) {
+      stream << "  " << str(y_[i]) << " == " << str(ydef_[i]) << std::endl;
     }
   }
 }
 
 void DaeBuilder::eliminate_quad() {
   // Move all the quadratures to the list of differential states
-  this->x.insert(this->x.end(), this->q.begin(), this->q.end());
-  this->q.clear();
+  x_.insert(x_.end(), q_.begin(), q_.end());
+  q_.clear();
 }
 
 void DaeBuilder::sort_d() {
-  sort_dependent(this->d, this->ddef);
+  sort_dependent(d_, ddef_);
 }
 
 void DaeBuilder::sort_w() {
-  sort_dependent(this->w, this->wdef);
+  sort_dependent(w_, wdef_);
 }
 
 void DaeBuilder::sort_z(const std::vector<std::string>& z_order) {
   // Make sure lengths agree
-  casadi_assert(z_order.size() == this->z.size(), "Dimension mismatch");
+  casadi_assert(z_order.size() == z_.size(), "Dimension mismatch");
   // Mark existing components in z
   std::vector<bool> old_z(variables_.size(), false);
-  for (size_t i = 0; i < this->z.size(); ++i) {
-    std::string s = this->z.at(i).name();
+  for (size_t i = 0; i < z_.size(); ++i) {
+    std::string s = z_.at(i).name();
     auto it = varind_.find(s);
     casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
     old_z.at(it->second) = true;
@@ -528,7 +528,7 @@ void DaeBuilder::sort_z(const std::vector<std::string>& z_order) {
     new_z.push_back(variables_.at(it->second).v);
   }
   // Success: Update z
-  std::copy(new_z.begin(), new_z.end(), this->z.begin());
+  std::copy(new_z.begin(), new_z.end(), z_.begin());
 }
 
 void DaeBuilder::prune(bool prune_p, bool prune_u) {
@@ -565,24 +565,24 @@ void DaeBuilder::prune(bool prune_p, bool prune_u) {
   // Prune p
   if (prune_p) {
     size_t np = 0;
-    for (size_t i = 0; i < this->p.size(); ++i) {
-      std::string s = this->p.at(i).name();
+    for (size_t i = 0; i < p_.size(); ++i) {
+      std::string s = p_.at(i).name();
       auto it = varind_.find(s);
       casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
-      if (!free_variables.at(it->second)) this->p.at(np++) = this->p.at(i);
+      if (!free_variables.at(it->second)) p_.at(np++) = p_.at(i);
     }
-    this->p.resize(np);
+    p_.resize(np);
   }
   // Prune u
   if (prune_u) {
     size_t nu = 0;
-    for (size_t i = 0; i < this->u.size(); ++i) {
-      std::string s = this->u.at(i).name();
+    for (size_t i = 0; i < u_.size(); ++i) {
+      std::string s = u_.at(i).name();
       auto it = varind_.find(s);
       casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
-      if (!free_variables.at(it->second)) this->u.at(nu++) = this->u.at(i);
+      if (!free_variables.at(it->second)) u_.at(nu++) = u_.at(i);
     }
-    this->u.resize(nu);
+    u_.resize(nu);
   }
 }
 
@@ -631,9 +631,9 @@ void DaeBuilder::add_variable(const MX& new_v) {
 }
 
 MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
-  if (name.empty()) return add_x("x" + str(this->x.size()), n);
+  if (name.empty()) return add_x("x" + str(x_.size()), n);
   MX new_x = add_variable(name, n);
-  this->x.push_back(new_x);
+  x_.push_back(new_x);
   return new_x;
 }
 
@@ -641,33 +641,33 @@ void DaeBuilder::register_p(const MX& new_p) {
   // Consistency checks
   casadi_assert(has_variable(new_p.name()), "No such variable: " + new_p.name());
   // Add to list
-  this->p.push_back(new_p);
+  p_.push_back(new_p);
 }
 
 void DaeBuilder::register_u(const MX& new_u) {
   // Consistency checks
   casadi_assert(has_variable(new_u.name()), "No such variable: " + new_u.name());
   // Add to list
-  this->u.push_back(new_u);
+  u_.push_back(new_u);
 }
 
 void DaeBuilder::register_x(const MX& new_x) {
   // Consistency checks
   casadi_assert(has_variable(new_x.name()), "No such variable: " + new_x.name());
   // Add to list
-  this->x.push_back(new_x);
+  x_.push_back(new_x);
 }
 
 void DaeBuilder::register_z(const MX& new_z) {
   // Consistency checks
   casadi_assert(has_variable(new_z.name()), "No such variable: " + new_z.name());
   // Add to list
-  this->z.push_back(new_z);
+  z_.push_back(new_z);
 }
 
 void DaeBuilder::register_t(const MX& new_t) {
   // Save to class
-  this->t = new_t;
+  t_ = new_t;
 }
 
 void DaeBuilder::register_c(const MX& new_c, const MX& new_cdef) {
@@ -675,8 +675,8 @@ void DaeBuilder::register_c(const MX& new_c, const MX& new_cdef) {
   casadi_assert(new_c.sparsity() == new_cdef.sparsity(), "Mismatching sparsity");
   casadi_assert(has_variable(new_c.name()), "No such variable: " + new_c.name());
   // Add to lists
-  this->c.push_back(new_c);
-  this->cdef.push_back(new_cdef);
+  c_.push_back(new_c);
+  cdef_.push_back(new_cdef);
 }
 
 void DaeBuilder::register_d(const MX& new_d, const MX& new_ddef) {
@@ -684,9 +684,9 @@ void DaeBuilder::register_d(const MX& new_d, const MX& new_ddef) {
   casadi_assert(new_d.sparsity() == new_ddef.sparsity(), "Mismatching sparsity");
   casadi_assert(has_variable(new_d.name()), "No such variable: " + new_d.name());
   // Add to lists
-  this->d.push_back(new_d);
-  this->ddef.push_back(new_ddef);
-  this->lam_ddef.push_back(MX::sym("lam_" + new_d.name(), new_d.sparsity()));
+  d_.push_back(new_d);
+  ddef_.push_back(new_ddef);
+  lam_ddef_.push_back(MX::sym("lam_" + new_d.name(), new_d.sparsity()));
 }
 
 void DaeBuilder::register_w(const MX& new_w, const MX& new_wdef) {
@@ -694,9 +694,9 @@ void DaeBuilder::register_w(const MX& new_w, const MX& new_wdef) {
   casadi_assert(new_w.sparsity() == new_wdef.sparsity(), "Mismatching sparsity");
   casadi_assert(has_variable(new_w.name()), "No such variable: " + new_w.name());
   // Add to lists
-  this->w.push_back(new_w);
-  this->wdef.push_back(new_wdef);
-  this->lam_wdef.push_back(MX::sym("lam_" + new_w.name(), new_w.sparsity()));
+  w_.push_back(new_w);
+  wdef_.push_back(new_wdef);
+  lam_wdef_.push_back(MX::sym("lam_" + new_w.name(), new_w.sparsity()));
 }
 
 void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef) {
@@ -704,157 +704,157 @@ void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef) {
   casadi_assert(new_y.sparsity() == new_ydef.sparsity(), "Mismatching sparsity");
   casadi_assert(has_variable(new_y.name()), "No such variable: " + new_y.name());
   // Add to lists
-  this->y.push_back(new_y);
-  this->ydef.push_back(new_ydef);
-  this->lam_ydef.push_back(MX::sym("lam_" + new_y.name(), new_y.sparsity()));
+  y_.push_back(new_y);
+  ydef_.push_back(new_ydef);
+  lam_ydef_.push_back(MX::sym("lam_" + new_y.name(), new_y.sparsity()));
 }
 
 MX DaeBuilder::add_q(const std::string& name, casadi_int n) {
-  if (name.empty()) return add_q("q" + str(this->q.size()), n);
+  if (name.empty()) return add_q("q" + str(q_.size()), n);
   MX new_q = add_variable(name, n);
-  this->q.push_back(new_q);
+  q_.push_back(new_q);
   return new_q;
 }
 
 MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
-  if (name.empty()) return add_z("z" + str(this->z.size()), n);
+  if (name.empty()) return add_z("z" + str(z_.size()), n);
   MX new_z = add_variable(name, n);
-  this->z.push_back(new_z);
+  z_.push_back(new_z);
   return new_z;
 }
 
 MX DaeBuilder::add_p(const std::string& name, casadi_int n) {
-  if (name.empty()) return add_p("p" + str(this->p.size()), n);
+  if (name.empty()) return add_p("p" + str(p_.size()), n);
   MX new_p = add_variable(name, n);
-  this->p.push_back(new_p);
+  p_.push_back(new_p);
   return new_p;
 }
 
 MX DaeBuilder::add_u(const std::string& name, casadi_int n) {
-  if (name.empty()) return add_u("u" + str(this->u.size()), n);
+  if (name.empty()) return add_u("u" + str(u_.size()), n);
   MX new_u = add_variable(name, n);
-  this->u.push_back(new_u);
+  u_.push_back(new_u);
   return new_u;
 }
 
 MX DaeBuilder::add_aux(const std::string& name, casadi_int n) {
-  if (name.empty()) return add_aux("aux" + str(this->aux.size()), n);
+  if (name.empty()) return add_aux("aux" + str(aux_.size()), n);
   MX new_aux = add_variable(name, n);
-  this->aux.push_back(new_aux);
+  aux_.push_back(new_aux);
   return new_aux;
 }
 
 void DaeBuilder::add_init(const MX& lhs, const MX& rhs) {
-  this->init_lhs.push_back(lhs);
-  this->init_rhs.push_back(rhs);
+  init_lhs_.push_back(lhs);
+  init_rhs_.push_back(rhs);
 }
 
 MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
   MX new_d = add_variable(name, new_ddef.sparsity());
-  this->d.push_back(new_d);
-  this->ddef.push_back(new_ddef);
-  this->lam_ddef.push_back(MX::sym("lam_" + name, new_ddef.sparsity()));
+  d_.push_back(new_d);
+  ddef_.push_back(new_ddef);
+  lam_ddef_.push_back(MX::sym("lam_" + name, new_ddef.sparsity()));
   return new_d;
 }
 
 MX DaeBuilder::add_w(const std::string& name, const MX& new_wdef) {
   MX new_w = add_variable(name, new_wdef.sparsity());
-  this->w.push_back(new_w);
-  this->wdef.push_back(new_wdef);
-  this->lam_wdef.push_back(MX::sym("lam_" + name, new_wdef.sparsity()));
+  w_.push_back(new_w);
+  wdef_.push_back(new_wdef);
+  lam_wdef_.push_back(MX::sym("lam_" + name, new_wdef.sparsity()));
   return new_w;
 }
 
 MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
   MX new_y = add_variable(name, new_ydef.sparsity());
-  this->y.push_back(new_y);
-  this->ydef.push_back(new_ydef);
-  this->lam_ydef.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
+  y_.push_back(new_y);
+  ydef_.push_back(new_ydef);
+  lam_ydef_.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
   return new_y;
 }
 
 void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
-  this->ode.push_back(new_ode);
-  this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
+  ode_.push_back(new_ode);
+  lam_ode_.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
   clear_cache_ = true;
 }
 
 void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
-  this->alg.push_back(new_alg);
-  this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
+  alg_.push_back(new_alg);
+  lam_alg_.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
   clear_cache_ = true;
 }
 
 void DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
-  this->quad.push_back(new_quad);
-  this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
+  quad_.push_back(new_quad);
+  lam_quad_.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   clear_cache_ = true;
 }
 
 void DaeBuilder::sanity_check() const {
   // Time
-  casadi_assert(this->t.is_symbolic(), "Non-symbolic time t");
-  casadi_assert(this->t.is_scalar(), "Non-scalar time t");
+  casadi_assert(t_.is_symbolic(), "Non-symbolic time t");
+  casadi_assert(t_.is_scalar(), "Non-scalar time t");
 
   // Differential states
-  casadi_assert(this->x.size()==this->ode.size(),
+  casadi_assert(x_.size()==ode_.size(),
                         "x and ode have different lengths");
-  for (casadi_int i=0; i<this->x.size(); ++i) {
-    casadi_assert(this->x[i].size()==this->ode[i].size(),
+  for (casadi_int i=0; i<x_.size(); ++i) {
+    casadi_assert(x_[i].size()==ode_[i].size(),
                           "ode has wrong dimensions");
-    casadi_assert(this->x[i].is_symbolic(), "Non-symbolic state x");
+    casadi_assert(x_[i].is_symbolic(), "Non-symbolic state x");
   }
 
   // Algebraic variables/equations
-  casadi_assert(this->z.size()==this->alg.size(),
+  casadi_assert(z_.size()==alg_.size(),
                         "z and alg have different lengths");
-  for (casadi_int i=0; i<this->z.size(); ++i) {
-    casadi_assert(this->z[i].is_symbolic(), "Non-symbolic algebraic variable z");
-    casadi_assert(this->z[i].size()==this->alg[i].size(),
+  for (casadi_int i=0; i<z_.size(); ++i) {
+    casadi_assert(z_[i].is_symbolic(), "Non-symbolic algebraic variable z");
+    casadi_assert(z_[i].size()==alg_[i].size(),
                           "alg has wrong dimensions");
   }
 
   // Quadrature states/equations
-  casadi_assert(this->q.size()==this->quad.size(), "q and quad have different lengths");
-  for (casadi_int i=0; i<this->q.size(); ++i) {
-    casadi_assert(this->q[i].is_symbolic(), "Non-symbolic quadrature state q");
-    casadi_assert(this->q[i].size()==this->quad[i].size(),
+  casadi_assert(q_.size()==quad_.size(), "q and quad have different lengths");
+  for (casadi_int i=0; i<q_.size(); ++i) {
+    casadi_assert(q_[i].is_symbolic(), "Non-symbolic quadrature state q");
+    casadi_assert(q_[i].size()==quad_[i].size(),
                           "quad has wrong dimensions");
   }
 
   // Dependent parameters
-  casadi_assert(this->d.size()==this->ddef.size(), "d and ddef have different lengths");
-  for (casadi_int i=0; i<this->d.size(); ++i) {
-    casadi_assert(this->d[i].is_symbolic(), "Non-symbolic dependent parameter d");
-    casadi_assert(this->d[i].size()==this->ddef[i].size(), "ddef has wrong dimensions");
+  casadi_assert(d_.size()==ddef_.size(), "d and ddef have different lengths");
+  for (casadi_int i=0; i<d_.size(); ++i) {
+    casadi_assert(d_[i].is_symbolic(), "Non-symbolic dependent parameter d");
+    casadi_assert(d_[i].size()==ddef_[i].size(), "ddef has wrong dimensions");
   }
 
   // Dependent variables
-  casadi_assert(this->w.size()==this->wdef.size(), "w and wdef have different lengths");
-  for (casadi_int i=0; i<this->w.size(); ++i) {
-    casadi_assert(this->w[i].is_symbolic(), "Non-symbolic dependent parameter v");
-    casadi_assert(this->w[i].size()==this->wdef[i].size(), "wdef has wrong dimensions");
+  casadi_assert(w_.size()==wdef_.size(), "w and wdef have different lengths");
+  for (casadi_int i=0; i<w_.size(); ++i) {
+    casadi_assert(w_[i].is_symbolic(), "Non-symbolic dependent parameter v");
+    casadi_assert(w_[i].size()==wdef_[i].size(), "wdef has wrong dimensions");
   }
 
   // Output equations
-  casadi_assert(this->y.size()==this->ydef.size(), "y and ydef have different lengths");
-  for (casadi_int i=0; i<this->y.size(); ++i) {
-    casadi_assert(this->y[i].is_symbolic(), "Non-symbolic output y");
-    casadi_assert(this->y[i].size()==this->ydef[i].size(), "ydef has wrong dimensions");
+  casadi_assert(y_.size()==ydef_.size(), "y and ydef have different lengths");
+  for (casadi_int i=0; i<y_.size(); ++i) {
+    casadi_assert(y_[i].is_symbolic(), "Non-symbolic output y");
+    casadi_assert(y_[i].size()==ydef_[i].size(), "ydef has wrong dimensions");
   }
 
   // Control
-  for (casadi_int i=0; i<this->u.size(); ++i) {
-    casadi_assert(this->u[i].is_symbolic(), "Non-symbolic control u");
+  for (casadi_int i=0; i<u_.size(); ++i) {
+    casadi_assert(u_[i].is_symbolic(), "Non-symbolic control u");
   }
 
   // Parameter
-  for (casadi_int i=0; i<this->p.size(); ++i) {
-    casadi_assert(this->p[i].is_symbolic(), "Non-symbolic parameter p");
+  for (casadi_int i=0; i<p_.size(); ++i) {
+    casadi_assert(p_[i].is_symbolic(), "Non-symbolic parameter p");
   }
 
   // Initial equations
-  casadi_assert(this->init_lhs.size() == this->init_rhs.size(),
+  casadi_assert(init_lhs_.size() == init_rhs_.size(),
     "init_lhs and init_rhs have different lengths");
 }
 
@@ -896,50 +896,50 @@ MX DaeBuilder::der(const MX& var) const {
 
 void DaeBuilder::eliminate_w() {
   // Quick return if no w
-  if (this->w.empty()) return;
+  if (w_.empty()) return;
   // Ensure variables are sorted
   sort_w();
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  ex.insert(ex.end(), this->alg.begin(), this->alg.end());
-  ex.insert(ex.end(), this->ode.begin(), this->ode.end());
-  ex.insert(ex.end(), this->quad.begin(), this->quad.end());
-  ex.insert(ex.end(), this->ydef.begin(), this->ydef.end());
+  ex.insert(ex.end(), alg_.begin(), alg_.end());
+  ex.insert(ex.end(), ode_.begin(), ode_.end());
+  ex.insert(ex.end(), quad_.begin(), quad_.end());
+  ex.insert(ex.end(), ydef_.begin(), ydef_.end());
   // Perform elimination
-  substitute_inplace(this->w, this->wdef, ex);
+  substitute_inplace(w_, wdef_, ex);
   // Clear lists
-  this->w.clear();
-  this->wdef.clear();
+  w_.clear();
+  wdef_.clear();
   // Get algebraic equations
   auto it = ex.begin();
-  std::copy(it, it + this->alg.size(), this->alg.begin());
-  it += this->alg.size();
+  std::copy(it, it + alg_.size(), alg_.begin());
+  it += alg_.size();
   // Get differential equations
-  std::copy(it, it + this->ode.size(), this->ode.begin());
-  it += this->ode.size();
+  std::copy(it, it + ode_.size(), ode_.begin());
+  it += ode_.size();
   // Get quadrature equations
-  std::copy(it, it + this->quad.size(), this->quad.begin());
-  it += this->quad.size();
+  std::copy(it, it + quad_.size(), quad_.begin());
+  it += quad_.size();
   // Get output equations
-  std::copy(it, it + this->ydef.size(), this->ydef.begin());
-  it += this->ydef.size();
+  std::copy(it, it + ydef_.size(), ydef_.begin());
+  it += ydef_.size();
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
 
 void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   // Not tested if w is non-empty before
-  if (!this->w.empty()) casadi_warning("'w' already has entries");
+  if (!w_.empty()) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  ex.insert(ex.end(), this->alg.begin(), this->alg.end());
-  ex.insert(ex.end(), this->ode.begin(), this->ode.end());
-  ex.insert(ex.end(), this->quad.begin(), this->quad.end());
-  ex.insert(ex.end(), this->ydef.begin(), this->ydef.end());
+  ex.insert(ex.end(), alg_.begin(), alg_.end());
+  ex.insert(ex.end(), ode_.begin(), ode_.end());
+  ex.insert(ex.end(), quad_.begin(), quad_.end());
+  ex.insert(ex.end(), ydef_.begin(), ydef_.end());
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
-    {"prefix", "w_"}, {"suffix", ""}, {"offset", static_cast<casadi_int>(this->w.size())}};
+    {"prefix", "w_"}, {"suffix", ""}, {"offset", static_cast<casadi_int>(w_.size())}};
   extract(ex, new_w, new_wdef, opts);
   // Register as dependent variables
   for (size_t i = 0; i < new_w.size(); ++i) {
@@ -948,17 +948,17 @@ void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   }
   // Get algebraic equations
   auto it = ex.begin();
-  std::copy(it, it + this->alg.size(), this->alg.begin());
-  it += this->alg.size();
+  std::copy(it, it + alg_.size(), alg_.begin());
+  it += alg_.size();
   // Get differential equations
-  std::copy(it, it + this->ode.size(), this->ode.begin());
-  it += this->ode.size();
+  std::copy(it, it + ode_.size(), ode_.begin());
+  it += ode_.size();
   // Get quadrature equations
-  std::copy(it, it + this->quad.size(), this->quad.begin());
-  it += this->quad.size();
+  std::copy(it, it + quad_.size(), quad_.begin());
+  it += quad_.size();
   // Get output equations
-  std::copy(it, it + this->ydef.size(), this->ydef.begin());
-  it += this->ydef.size();
+  std::copy(it, it + ydef_.size(), ydef_.begin());
+  it += ydef_.size();
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
@@ -1107,16 +1107,16 @@ std::string to_string(DaeBuilder::DaeBuilderOut v) {
 
 std::vector<MX> DaeBuilder::input(DaeBuilderIn ind) const {
   switch (ind) {
-  case DAE_BUILDER_T: return std::vector<MX>(1, this->t);
-  case DAE_BUILDER_C: return this->c;
-  case DAE_BUILDER_P: return this->p;
-  case DAE_BUILDER_D: return this->d;
-  case DAE_BUILDER_W: return this->w;
-  case DAE_BUILDER_U: return this->u;
-  case DAE_BUILDER_X: return this->x;
-  case DAE_BUILDER_Z: return this->z;
-  case DAE_BUILDER_Q: return this->q;
-  case DAE_BUILDER_Y: return this->y;
+  case DAE_BUILDER_T: return std::vector<MX>(1, t_);
+  case DAE_BUILDER_C: return c_;
+  case DAE_BUILDER_P: return p_;
+  case DAE_BUILDER_D: return d_;
+  case DAE_BUILDER_W: return w_;
+  case DAE_BUILDER_U: return u_;
+  case DAE_BUILDER_X: return x_;
+  case DAE_BUILDER_Z: return z_;
+  case DAE_BUILDER_Q: return q_;
+  case DAE_BUILDER_Y: return y_;
   default: return std::vector<MX>();
   }
 }
@@ -1131,12 +1131,12 @@ std::vector<MX> DaeBuilder::input(const std::vector<DaeBuilderIn>& ind) const {
 
 std::vector<MX> DaeBuilder::output(DaeBuilderOut ind) const {
   switch (ind) {
-  case DAE_BUILDER_DDEF: return this->ddef;
-  case DAE_BUILDER_WDEF: return this->wdef;
-  case DAE_BUILDER_ODE: return this->ode;
-  case DAE_BUILDER_ALG: return this->alg;
-  case DAE_BUILDER_QUAD: return this->quad;
-  case DAE_BUILDER_YDEF: return this->ydef;
+  case DAE_BUILDER_DDEF: return ddef_;
+  case DAE_BUILDER_WDEF: return wdef_;
+  case DAE_BUILDER_ODE: return ode_;
+  case DAE_BUILDER_ALG: return alg_;
+  case DAE_BUILDER_QUAD: return quad_;
+  case DAE_BUILDER_YDEF: return ydef_;
   default: return std::vector<MX>();
   }
 }
@@ -1196,7 +1196,7 @@ Function DaeBuilder::create(const std::string& fname,
   }
   // Check if dependent variables are given and needed
   bool elim_w = false;
-  if (!this->w.empty()) {
+  if (!w_.empty()) {
     // Dependent variables exists, eliminate unless v is given
     elim_w = true;
     for (const std::string& s : s_in) {
@@ -1213,7 +1213,7 @@ Function DaeBuilder::create(const std::string& fname,
     casadi_assert(!elim_w, "Lifted calls cannot be used if dependent variables are eliminated");
     // Only lift calls if really needed
     lifted_calls = false;
-    for (const MX& vdef_comp : this->wdef) {
+    for (const MX& vdef_comp : wdef_) {
       if (vdef_comp.is_output()) {
         // There are indeed function calls present
         lifted_calls = true;
@@ -1230,7 +1230,7 @@ Function DaeBuilder::create(const std::string& fname,
   std::vector<MX> ret_in = ret.mx_in();
   std::vector<MX> ret_out = ret(ret_in);
   // Offsets in v
-  std::vector<casadi_int> h_offsets = offset(this->w);
+  std::vector<casadi_int> h_offsets = offset(w_);
   // Split "w", "lam_wdef" into components
   std::vector<MX> v_in, lam_vdef_in;
   for (size_t i = 0; i < s_in.size(); ++i) {
@@ -1242,14 +1242,14 @@ Function DaeBuilder::create(const std::string& fname,
   }
   // Map dependent variables into index in vector
   std::map<MXNode*, size_t> v_map;
-  for (size_t i = 0; i < this->w.size(); ++i) {
-    v_map[this->w.at(i).get()] = i;
+  for (size_t i = 0; i < w_.size(); ++i) {
+    v_map[w_.at(i).get()] = i;
   }
   // Collect all the call nodes
   std::map<MXNode*, CallIO> call_nodes;
-  for (size_t vdefind = 0; vdefind < this->wdef.size(); ++vdefind) {
+  for (size_t vdefind = 0; vdefind < wdef_.size(); ++vdefind) {
     // Current element handled
-    const MX& vdefref = this->wdef.at(vdefind);
+    const MX& vdefref = wdef_.at(vdefind);
     // Handle function call nodes
     if (vdefref.is_output()) {
       // Get function call node
@@ -1339,9 +1339,9 @@ MX DaeBuilder::jac_vdef_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
   // All blocks for this block row
   std::map<size_t, MX> jac_brow;
   // Collect all Jacobian blocks
-  for (size_t vdefind = 0; vdefind < this->wdef.size(); ++vdefind) {
+  for (size_t vdefind = 0; vdefind < wdef_.size(); ++vdefind) {
     // Current element handled
-    const MX& vdefref = this->wdef.at(vdefind);
+    const MX& vdefref = wdef_.at(vdefind);
     // Update vertical offset
     voffset_begin = voffset_end;
     voffset_end += vdefref.numel();
@@ -1406,9 +1406,9 @@ MX DaeBuilder::hess_v_v_from_calls(std::map<MXNode*, CallIO>& call_nodes,
   // All blocks for a block row
   std::map<size_t, MX> hess_brow;
   // Loop over block rows
-  for (size_t vind1 = 0; vind1 < this->w.size(); ++vind1) {
+  for (size_t vind1 = 0; vind1 < w_.size(); ++vind1) {
     // Current element handled
-    const MX& vref = this->w.at(vind1);
+    const MX& vref = w_.at(vind1);
     // Update vertical offset
     voffset_begin = voffset_end;
     voffset_end += vref.numel();
@@ -1490,13 +1490,13 @@ Function DaeBuilder::add_fun(const std::string& name,
   for (auto&& s : res) {
     // Find the binding expression FIXME(@jaeandersson)
     casadi_int v_ind;
-    for (v_ind=0; v_ind<this->w.size(); ++v_ind) {
-      if (s==this->w.at(v_ind).name()) {
-        res_ex.push_back(this->wdef.at(v_ind));
+    for (v_ind=0; v_ind<w_.size(); ++v_ind) {
+      if (s==w_.at(v_ind).name()) {
+        res_ex.push_back(wdef_.at(v_ind));
         break;
       }
     }
-    casadi_assert(v_ind<this->w.size(), "Cannot find dependent '" + s + "'");
+    casadi_assert(v_ind<w_.size(), "Cannot find dependent '" + s + "'");
   }
   Function ret(name, arg_ex, res_ex, arg, res, opts);
   return add_fun(ret);
@@ -1573,12 +1573,12 @@ const Function& DaeBuilder::oracle(bool sx, bool elim_w, bool lifted_calls) cons
     // Eliminate v from inputs
     if (subst_v) {
       // Make a copy of dependent variable definitions to avoid modifying member variable
-      std::vector<MX> vdef(this->wdef);
+      std::vector<MX> vdef(wdef_);
       // Perform in-place substitution
-      substitute_inplace(this->w, vdef, f_out, false);
+      substitute_inplace(w_, vdef, f_out, false);
     } else if (lifted_calls && vdef_ind >= 0) {
       // Make a copy of dependent variable definitions to avoid modifying member variable
-      std::vector<MX> vdef(this->wdef);
+      std::vector<MX> vdef(wdef_);
       // Remove references to call nodes
       for (MX& vdefref : vdef) {
         if (vdefref.is_output()) vdefref = MX::zeros(vdefref.sparsity());
@@ -1795,12 +1795,12 @@ Function DaeBuilder::dependent_fun(const std::string& fname,
   // Variables to be substituted
   std::vector<MX> dw, dwdef;
   if (calc_d) {
-    dw.insert(dw.end(), this->d.begin(), this->d.end());
-    dwdef.insert(dwdef.end(), this->ddef.begin(), this->ddef.end());
+    dw.insert(dw.end(), d_.begin(), d_.end());
+    dwdef.insert(dwdef.end(), ddef_.begin(), ddef_.end());
   }
   if (calc_w) {
-    dw.insert(dw.end(), this->w.begin(), this->w.end());
-    dwdef.insert(dwdef.end(), this->wdef.begin(), this->wdef.end());
+    dw.insert(dw.end(), w_.begin(), w_.end());
+    dwdef.insert(dwdef.end(), wdef_.begin(), wdef_.end());
   }
   // Perform elimination
   substitute_inplace(dw, dwdef, f_out);
@@ -1810,7 +1810,7 @@ Function DaeBuilder::dependent_fun(const std::string& fname,
 
 void DaeBuilder::prune_d() {
   // If no d, quick return
-  if (this->d.empty()) return;
+  if (d_.empty()) return;
   // Create a dependent function with all inputs except for d itself
   Function dfun = dependent_fun("dfun", {"c"}, {"d"});
   // If no free variables, all good
@@ -1820,7 +1820,7 @@ void DaeBuilder::prune_d() {
   // Variables to be eliminated
   MX elim = vertcat(dfun.free_mx());
   // Create a function for identifying which d cannot be calculated
-  dfun = Function("dfun", {vertcat(this->d), elim}, {vertcat(this->ddef)}, {"d", "elim"}, {"ddef"});
+  dfun = Function("dfun", {vertcat(d_), elim}, {vertcat(ddef_)}, {"d", "elim"}, {"ddef"});
   // Seed all elim
   std::vector<bvec_t> elim_sp(dfun.nnz_in("elim"), static_cast<bvec_t>(1));
   // Do not seed d
@@ -1829,12 +1829,12 @@ void DaeBuilder::prune_d() {
   std::vector<bvec_t> ddef_sp(dfun.nnz_out("ddef"), static_cast<bvec_t>(0));
   dfun({&d_sp.front(), &elim_sp.front()}, {&ddef_sp.front()});
   // Get vertical offsets in d vector
-  std::vector<casadi_int> d_off = offset(this->d);
+  std::vector<casadi_int> d_off = offset(d_);
   // Eliminate dependent variables that depend on any free variable
   std::vector<MX> d_new, ddef_new;
-  d_new.reserve(this->d.size());
-  ddef_new.reserve(this->ddef.size());
-  for (size_t k = 0; k < this->d.size(); ++k) {
+  d_new.reserve(d_.size());
+  ddef_new.reserve(ddef_.size());
+  for (size_t k = 0; k < d_.size(); ++k) {
     // Does the dependence enter in the definition of the variable?
     bvec_t ddef_sp_any(0);
     for (casadi_int i = d_off.at(k); i < d_off.at(k + 1); ++i) {
@@ -1843,18 +1843,18 @@ void DaeBuilder::prune_d() {
     // If there is a dependence?
     if (ddef_sp_any) {
       // Yes: Eliminate
-      casadi_message("Eliminating 'd' that depends on free variables: " + this->d.at(k).name());
+      casadi_message("Eliminating 'd' that depends on free variables: " + d_.at(k).name());
     } else {
       // No: Keep
-      d_new.push_back(this->d.at(k));
-      ddef_new.push_back(this->ddef.at(k));
+      d_new.push_back(d_.at(k));
+      ddef_new.push_back(ddef_.at(k));
     }
   }
   // Update d, ddef
-  this->d.resize(d_new.size());
-  std::copy(d_new.begin(), d_new.end(), this->d.begin());
-  this->ddef.resize(ddef_new.size());
-  std::copy(ddef_new.begin(), ddef_new.end(), this->ddef.begin());
+  d_.resize(d_new.size());
+  std::copy(d_new.begin(), d_new.end(), d_.begin());
+  ddef_.resize(ddef_new.size());
+  std::copy(ddef_new.begin(), ddef_new.end(), ddef_.begin());
   // Tail recursive call to handle dependencies of these eliminated dependent parameters
   prune_d();
 }
