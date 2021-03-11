@@ -1,7 +1,3 @@
-#include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
-
 #include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
 
 #include <drivers/YAMLEncoder.hpp>
@@ -14,14 +10,31 @@
 #include <sstream>
 
 using namespace std::chrono_literals;
+using pa::vec;
 
-#if 0
+#define SOLVER_PANOC_LBFGS 1
+#define SOLVER_PANOC_SLBFGS 2
+#define SOLVER_LBFGSpp 3
+#define SOLVER_LBFGSBpp 4
+
+#if SOLVER == SOLVER_PANOC_SLBFGS
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/specialized-lbfgs.hpp>
 using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
-#else
+#elif SOLVER == SOLVER_PANOC_LBFGS
+#include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/decl/lbfgs.hpp>
 using Solver = pa::ALMSolver<>;
+#elif SOLVER == SOLVER_LBFGSpp
+#include <panoc-alm/alm.hpp>
+#include <panoc-alm/inner/lbfgspp.hpp>
+using Solver = pa::ALMSolver<pa::LBFGSSolver<>>;
+#elif SOLVER == SOLVER_LBFGSBpp
+#include <panoc-alm/alm.hpp>
+#include <panoc-alm/inner/lbfgspp.hpp>
+using Solver = pa::ALMSolver<pa::LBFGSBSolver<>>;
 #endif
 
 std::atomic<Solver *> acitve_solver{nullptr};
@@ -33,6 +46,55 @@ void signal_callback_handler(int signum) {
         }
     }
 }
+
+#if SOLVER == SOLVER_PANOC_SLBFGS
+auto get_inner_solver() {
+    pa::PANOCParams panocparams;
+    panocparams.max_iter                       = 1000;
+    panocparams.update_lipschitz_in_linesearch = true;
+    panocparams.lbfgs_mem                      = 20;
+
+    pa::LBFGSParams lbfgsparams;
+    return Solver::InnerSolver(panocparams, lbfgsparams);
+}
+auto get_problem(const pa::Problem &p) { return p; }
+const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+#elif SOLVER == SOLVER_PANOC_LBFGS
+auto get_inner_solver() {
+    pa::PANOCParams panocparams;
+    panocparams.max_iter                       = 1000;
+    panocparams.update_lipschitz_in_linesearch = true;
+    panocparams.lbfgs_mem                      = 20;
+
+    pa::LBFGSParams lbfgsparams;
+    return Solver::InnerSolver(panocparams, lbfgsparams);
+}
+auto get_problem(const pa::Problem &p) { return p; }
+const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+#elif SOLVER == SOLVER_LBFGSpp
+auto get_inner_solver() {
+    Solver::InnerSolver::Params params;
+    params.max_iterations = 1000;
+    params.m              = 20;
+    return Solver::InnerSolver(params);
+}
+auto get_problem(const pa::Problem &p) { return pa::ProblemOnlyD(p); }
+vec get_y(const pa::Problem &p, const vec &y) {
+    vec r(p.m);
+    r.topRows(p.m - p.n) = y;
+    r.bottomRows(p.n).setZero();
+    return r;
+}
+#elif SOLVER == SOLVER_LBFGSBpp
+auto get_inner_solver() {
+    Solver::InnerSolver::Params params;
+    params.max_iterations = 1000;
+    params.m              = 20;
+    return Solver::InnerSolver(params);
+}
+auto get_problem(const pa::Problem &p) { return p; }
+const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+#endif
 
 int main(int argc, char *argv[]) {
     using namespace std::string_literals;
@@ -53,28 +115,25 @@ int main(int argc, char *argv[]) {
     // almparams.Σ₀ = 1e-2;
     // almparams.ε₀ = 1e-5;
     // almparams.Δ = 1.1;
-    pa::PANOCParams panocparams;
-    panocparams.max_iter                       = 1000;
-    panocparams.update_lipschitz_in_linesearch = true;
-    panocparams.lbfgs_mem                      = 20;
-    // panocparams.print_interval = 500;
 
-    pa::LBFGSParams lbfgsparams;
-
-    Solver solver{almparams, {panocparams, lbfgsparams}};
+    Solver solver{almparams, get_inner_solver()};
     std::atomic_signal_fence(std::memory_order_release);
     acitve_solver.store(&solver, std::memory_order_relaxed);
     signal(SIGINT, signal_callback_handler);
 
-    auto problem = pa::ProblemWithCounters(cp.problem);
+    auto problem_cnt = pa::ProblemWithCounters(cp.problem);
+    auto problem     = get_problem(problem_cnt);
 
-    auto status = solver(problem, cp.y0, cp.x0);
+    vec x = cp.x0;
+    vec y = get_y(problem, cp.y0);
+
+    auto status = solver(problem, y, x);
     // ??? TODO: fence
     acitve_solver.store(nullptr, std::memory_order_relaxed);
     // ??? TODO: fence
     auto report = cp.get_report();
 
-    auto f_star = cp.problem.f(cp.x0);
+    auto f_star = cp.problem.f(x);
 
     YAML::Emitter out;
     out << YAML::BeginMap;
@@ -91,7 +150,7 @@ int main(int argc, char *argv[]) {
     out << YAML::Key << "ε" << YAML::Value << status.ε;
     out << YAML::Key << "δ" << YAML::Value << status.δ;
     out << YAML::Key << "f" << YAML::Value << f_star;
-    out << YAML::Key << "counters" << YAML::Value << problem.evaluations;
+    out << YAML::Key << "counters" << YAML::Value << problem_cnt.evaluations;
     out << YAML::Key << "linesearch failures" << YAML::Value
         << status.inner_linesearch_failures;
     out << YAML::Key << "L-BFGS failures" << YAML::Value
@@ -99,10 +158,10 @@ int main(int argc, char *argv[]) {
     out << YAML::Key << "L-BFGS rejected" << YAML::Value
         << status.inner_lbfgs_rejected;
     out << YAML::Key << "‖Σ‖" << YAML::Value << status.norm_penalty;
-    out << YAML::Key << "‖x‖" << YAML::Value << cp.x0.norm();
-    out << YAML::Key << "‖y‖" << YAML::Value << cp.y0.norm();
-    // out << YAML::Key << "x" << YAML::Value << cp.x0;
-    // out << YAML::Key << "y" << YAML::Value << cp.y0;
+    out << YAML::Key << "‖x‖" << YAML::Value << x.norm();
+    out << YAML::Key << "‖y‖" << YAML::Value << y.norm();
+    // out << YAML::Key << "x" << YAML::Value << x;
+    // out << YAML::Key << "y" << YAML::Value << y;
     out << YAML::EndMap;
     // out << report;
 

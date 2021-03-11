@@ -92,7 +92,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &problem, vec &y, vec &x) {
         }
         detail::update_penalty_weights(params, i, error, error_old, norm_e, Σ);
         ε = std::fmax(params.ρ * ε, params.ε);
-        std::swap(error_old, error);
+        error_old.swap(error);
     }
     throw std::logic_error("[ALM]   loop error");
 }

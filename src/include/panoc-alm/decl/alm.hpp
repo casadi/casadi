@@ -20,7 +20,8 @@ struct ALMParams {
     /// Initial penalty parameter. When set to zero (which is the default),
     /// it is computed automatically, based on the constraint violation in the
     /// starting point and the parameter @ref ALMParams::σ₀.
-    real_t Σ₀ = 0;
+    /// @todo Change default to 0.
+    real_t Σ₀ = 1;
     /// Initial penalty parameter factor. Active if @ref ALMParams::Σ₀ is set
     /// to zero.
     real_t σ₀ = 20;
@@ -33,7 +34,7 @@ struct ALMParams {
     /// Lagrange multiplier bound.
     real_t M = 1e9;
     /// Maximum penalty factor.
-    real_t Σₘₐₓ = 1e9;
+    real_t Σₘₐₓ = 1e15;
     /// Maximum number of outer ALM iterations.
     unsigned int max_iter = 100;
     /// Maximum duration.
