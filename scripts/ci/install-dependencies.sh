@@ -7,3 +7,4 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"/../..
 ./scripts/install-cutest.sh
 ./scripts/install-yaml-cpp.sh
 ./scripts/install-gtest.sh
+./scripts/install-lbfgspp.sh
