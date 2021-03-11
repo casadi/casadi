@@ -8,9 +8,11 @@
 
 /// Wrapper for CUTEst problems loaded from an external shared library.
 ///
-/// @warning    The lifetime of the wrapper should be at least as long as the
-///             lifetime of the @ref CUTEstProblem::problem member. Do not make
-///             a copy of the problem that could outlive the wrapper.
+/// @warning  The lifetime of the wrapper should be at least as long as the
+///           lifetime of the @ref CUTEstProblem::problem member. Do not make
+///           a copy of the problem that could outlive the wrapper.
+///
+/// @ingroup  grp_ExternalProblemLoaders
 class CUTEstProblem {
 
   public:

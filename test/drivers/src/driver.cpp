@@ -6,8 +6,6 @@
 
 #include <drivers/YAMLEncoder.hpp>
 
-#include <yaml-cpp/emittermanip.h>
-
 #include <atomic>
 #include <chrono>
 #include <csignal>
@@ -19,8 +17,8 @@ using namespace std::chrono_literals;
 
 #if 0
 #include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
 #include <panoc-alm/inner/panoc.hpp>
+#include <panoc-alm/inner/specialized-lbfgs.hpp>
 using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
 #else
 using Solver = pa::ALMSolver<>;
@@ -57,12 +55,13 @@ int main(int argc, char *argv[]) {
     // almparams.Δ = 1.1;
     pa::PANOCParams panocparams;
     panocparams.max_iter                       = 1000;
-    panocparams.specialized_lbfgs              = false;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.lbfgs_mem                      = 20;
     // panocparams.print_interval = 500;
 
-    Solver solver(almparams, panocparams);
+    pa::LBFGSParams lbfgsparams;
+
+    Solver solver{almparams, {panocparams, lbfgsparams}};
     std::atomic_signal_fence(std::memory_order_release);
     acitve_solver.store(&solver, std::memory_order_relaxed);
     signal(SIGINT, signal_callback_handler);
@@ -79,6 +78,7 @@ int main(int argc, char *argv[]) {
 
     YAML::Emitter out;
     out << YAML::BeginMap;
+    out << YAML::Key << "solver" << YAML::Value << solver.get_name();
     out << YAML::Key << "status" << YAML::Value << status.status;
     out << YAML::Key << "outer iterations" << YAML::Value
         << status.outer_iterations;

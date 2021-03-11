@@ -1,0 +1,4 @@
+/**
+ * @defgroup    grp_ALMSolver Augmented Lagrangian Method solver 
+ * @brief   Augmented Lagrangian Method solver (ALM).
+ */

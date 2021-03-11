@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <string>
 
 namespace pa {
 
@@ -28,15 +29,19 @@ struct PANOCParams {
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step.
-    real_t τ_min = 1e-12;
+    /// @todo   The default is too small, log₂(10⁻¹²) = 39 iterations.
+    real_t τ_min = 1e-12; 
 
+    /// When to print progress. If set to zero, nothing will be printed.
+    /// If set to N != 0, progress is printed every N iterations.
     unsigned print_interval = 0;
 
     bool update_lipschitz_in_linesearch = true;
-    bool specialized_lbfgs              = true;
     bool alternative_linesearch_cond    = false;
 };
 
+/// PANOC solver for ALM.
+/// @ingroup    grp_InnerSolvers
 template <class DirectionProviderT>
 class PANOCSolver {
   public:
@@ -71,10 +76,9 @@ class PANOCSolver {
         const Params &params;
     };
 
-    PANOCSolver(Params params)
-        : params(params), direction_provider({/* TODO: parameters */}) {}
-    PANOCSolver(PANOCSolver &&) = default;
-    PANOCSolver &operator=(PANOCSolver &&) = default;
+    PANOCSolver(Params params, DirectionProvider &&direction_provider)
+        : params(params), direction_provider(std::forward<DirectionProvider>(
+                              direction_provider)) {}
 
     Stats operator()(const Problem &problem, // in
                      const vec &Σ,           // in
@@ -87,6 +91,10 @@ class PANOCSolver {
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
         this->progress_cb = cb;
         return *this;
+    }
+
+    std::string get_name() const {
+        return "PANOCSolver<" + direction_provider.get_name() + ">";
     }
 
     void stop() { stop_signal.stop(); }

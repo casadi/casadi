@@ -1,0 +1,12 @@
+/**
+ * @defgroup    grp_InnerSolvers Inner solvers
+ * @ingroup grp_ALMSolver
+ * @brief   Solvers for the inner problem, such as PANOC.
+ */
+
+/**
+ * @defgroup    grp_PANOCDirectionProviders PANOC direction providers
+ * @ingroup grp_InnerSolvers
+ * @brief   Algorithms that provide quasi-Newton steps for the PANOC solver, 
+ *          such as L-BFGS.
+ */

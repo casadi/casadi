@@ -1,9 +1,10 @@
 #include "eigen-matchers.hpp"
 #include <gtest/gtest.h>
 
-#include <iomanip>
 #include <panoc-alm-ref/fd.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
+
+#include <iomanip>
 
 TEST(PANOC, quadratic) {
     using pa::Box;
@@ -78,8 +79,7 @@ TEST(PANOC, quadratic) {
     std::cout << "Iter:   " << stats.iterations << std::endl;
     std::cout << "Status: " << stats.status << std::endl << std::endl;
     
-    EXPECT_FLOAT_EQ(x(0), 6);
-    EXPECT_FLOAT_EQ(y(0), -2);
+    EXPECT_NEAR(x(0), 6, 2e-5);
+    EXPECT_NEAR(y(0), -2, 2e-5);
     EXPECT_THAT(print_wrap(err_z), EigenAlmostEqual(gg - z, 1e-15));
-
 }

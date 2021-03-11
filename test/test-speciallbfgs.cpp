@@ -1,7 +1,7 @@
 #include "eigen-matchers.hpp"
-#include "panoc-alm/inner/detail/panoc-helpers.hpp"
 
-#include <panoc-alm/inner/lbfgs.hpp>
+#include <panoc-alm/inner/detail/panoc-helpers.hpp>
+#include <panoc-alm/inner/specialized-lbfgs.hpp>
 
 [[maybe_unused]] const static auto printvec = [](const char *name,
                                                  const auto &vec) {
@@ -23,7 +23,7 @@ TEST(SpecializedLBFGS, constantgamma) {
     C.upperbound = vec::Constant(2, inf);
     vec p0       = pa::detail::projected_gradient_step(C, γ, x0, g0);
 
-    l.initialize(x0, p0, g0, γ);
+    l.initialize(x0, g0);
 
     EXPECT_EQ(l.x(0), x0);
     EXPECT_EQ(l.g(0), g0);
@@ -136,7 +136,7 @@ TEST(SpecializedLBFGS, updategamma1) {
     C.upperbound = vec::Constant(2, inf);
     vec p0       = pa::detail::projected_gradient_step(C, γ, x0, g0);
 
-    l.initialize(x0, p0, g0, γ);
+    l.initialize(x0, g0);
 
     EXPECT_EQ(l.x(0), x0);
     EXPECT_EQ(l.g(0), g0);
@@ -168,8 +168,8 @@ TEST(SpecializedLBFGS, updategamma1) {
     vec p2 = pa::detail::projected_gradient_step(C, γ, x2, g2);
 
     ASSERT_TRUE(l.update(x1, x2, p1, p2, g2, C, γ));
-    p0     = pa::detail::projected_gradient_step(C, γ, x0, g0);
-    p1     = pa::detail::projected_gradient_step(C, γ, x1, g1);
+    p0 = pa::detail::projected_gradient_step(C, γ, x0, g0);
+    p1 = pa::detail::projected_gradient_step(C, γ, x1, g1);
     EXPECT_EQ(l.x(0), x0);
     EXPECT_EQ(l.g(0), g0);
 
@@ -253,7 +253,7 @@ TEST(SpecializedLBFGS, updategamma2) {
     C.upperbound = vec::Constant(2, inf);
     vec p0       = pa::detail::projected_gradient_step(C, γ, x0, g0);
 
-    l.initialize(x0, p0, g0, γ);
+    l.initialize(x0, g0);
 
     EXPECT_EQ(l.x(0), x0);
     EXPECT_EQ(l.g(0), g0);
@@ -304,7 +304,7 @@ TEST(SpecializedLBFGS, updategamma2) {
     x3 << 4, -3;
     g3 << -9, -1;
 
-    γ = 0.5;
+    γ      = 0.5;
     vec p3 = pa::detail::projected_gradient_step(C, γ, x3, g3);
 
     ASSERT_TRUE(l.update(x2, x3, p2, p3, g3, C, γ));
@@ -371,7 +371,7 @@ TEST(SpecializedLBFGS, updategamma3) {
     C.upperbound = vec::Constant(2, inf);
     vec p0       = pa::detail::projected_gradient_step(C, γ, x0, g0);
 
-    l.initialize(x0, p0, g0, γ);
+    l.initialize(x0, g0);
 
     EXPECT_EQ(l.x(0), x0);
     EXPECT_EQ(l.g(0), g0);
@@ -448,7 +448,7 @@ TEST(SpecializedLBFGS, updategamma3) {
     x4 << -1, -8;
     g4 << 3, -15;
 
-    γ = 0.5;
+    γ      = 0.5;
     vec p4 = pa::detail::projected_gradient_step(C, γ, x4, g4);
 
     ASSERT_TRUE(l.update(x3, x4, p3, p4, g4, C, γ));

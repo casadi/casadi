@@ -1,0 +1,5 @@
+/**
+ * @defgroup    grp_ExternalProblemLoaders  External problem loaders
+ * @brief   Utilities for loading external problems, such as problems from the
+ *          CUTEst test problems or functions exported by CasADi.
+ */

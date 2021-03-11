@@ -7,6 +7,9 @@
 #include <cassert>
 #include <vector>
 
+/// @addtogroup grp_ExternalProblemLoaders
+/// @{
+
 /// Class for evaluating CasADi functions, allocating the necessary workspace
 /// storage in advance for allocation-free evaluations.
 template <size_t N_in, size_t N_out>
@@ -77,3 +80,5 @@ class CasADiFun_2i1o {
   private:
     CasADiFunctionEvaluator<2, 1> fun;
 };
+
+/// @}

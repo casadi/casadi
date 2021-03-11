@@ -142,7 +142,7 @@ PANOCSolver<DirectionProviderT>::operator()(
 
                 // Flush L-BFGS if γ changed
                 if (k > 0)
-                    direction_provider.gamma_changed();
+                    direction_provider.changed_γ();
 
                 // Calculate x̂ₖ and pₖ (with new step size)
                 calc_x̂(γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
@@ -157,7 +157,7 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Initialize the L-BFGS
         if (k == 0)
-            direction_provider.initialize(xₖ, pₖ, grad_ψₖ, γₖ);
+            direction_provider.initialize(xₖ, grad_ψₖ);
 
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
@@ -256,7 +256,7 @@ PANOCSolver<DirectionProviderT>::operator()(
                     σₖ₊₁ /= 2;
                     γₖ₊₁ /= 2;
                     // Flush L-BFGS if γ changed
-                    direction_provider.gamma_changed();
+                    direction_provider.changed_γ();
 
                     // Calculate x̂ₖ₊₁ and pₖ₊₁ (with new step size)
                     calc_x̂(γₖ₊₁, xₖ₊₁, grad_ψₖ₊₁, /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁);

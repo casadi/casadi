@@ -2,7 +2,7 @@
 
 #include <panoc-alm/decl/alm.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
+#include <panoc-alm/inner/decl/lbfgs.hpp>
 
 #include "eigen-matchers.hpp"
 
@@ -76,7 +76,7 @@ inline void do_test(const pa::Problem &p, const pa::vec &expected_sol,
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.σₘₐₓ     = 1e9;
+    almparam.Σₘₐₓ     = 1e9;
     almparam.max_iter = 100;
 
     PANOCParams panocparam;
@@ -85,7 +85,9 @@ inline void do_test(const pa::Problem &p, const pa::vec &expected_sol,
     panocparam.lbfgs_mem   = 20;
     panocparam.max_iter    = 10000;
 
-    ALMSolver<> solver{almparam, panocparam};
+    LBFGSParams lbfgsparam;
+
+    ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 
     vec x(p.n);
     x.fill(0);

@@ -1,8 +1,10 @@
 #include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
 
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
+
+#include <iostream>
 
 int main(int argc, char *argv[]) {
     const char *so_name =
@@ -39,7 +41,7 @@ int main(int argc, char *argv[]) {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.σₘₐₓ     = 1e9;
+    almparam.Σₘₐₓ     = 1e9;
     almparam.max_iter = 100;
 
     pa::PANOCParams panocparam;
@@ -48,7 +50,9 @@ int main(int argc, char *argv[]) {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 500;
 
-    pa::ALMSolver<> solver{almparam, panocparam};
+    pa::LBFGSParams lbfgsparam;
+
+    pa::ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 
     vec x(3);
     x << 2.5, 3.0, 0.75;

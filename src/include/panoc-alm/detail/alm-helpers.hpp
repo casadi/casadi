@@ -27,7 +27,7 @@ inline void update_penalty_weights(const ALMParams &params, unsigned iteration,
         return;
     for (Eigen::Index i = 0; i < e.rows(); ++i) {
         if (iteration == 0 || std::abs(e(i)) > params.θ * std::abs(old_e(i))) {
-            Σ(i) = std::fmin(params.σₘₐₓ,
+            Σ(i) = std::fmin(params.Σₘₐₓ,
                              std::fmax(params.Δ * std::abs(e(i)) / norm_e, 1) *
                                  Σ(i));
         }

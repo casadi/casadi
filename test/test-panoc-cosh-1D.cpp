@@ -2,7 +2,7 @@
 
 #include <panoc-alm/decl/alm.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
+#include <panoc-alm/inner/decl/lbfgs.hpp>
 
 #include <panoc-alm-ref/panoc-ref.hpp>
 

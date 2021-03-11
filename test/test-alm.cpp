@@ -1,6 +1,6 @@
 #include <panoc-alm/decl/alm.hpp>
+#include <panoc-alm/inner/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
 
 #include "eigen-matchers.hpp"
 
@@ -48,7 +48,7 @@ TEST(ALM, singleshooting1D) {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.σₘₐₓ     = 1e9;
+    almparam.Σₘₐₓ     = 1e9;
     almparam.max_iter = 10;
 
     PANOCParams panocparam;
@@ -57,7 +57,9 @@ TEST(ALM, singleshooting1D) {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 100;
 
-    ALMSolver<> solver{almparam, panocparam};
+    LBFGSParams lbfgsparam;
+
+    ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 
     vec x(1);
     x << 1;
@@ -125,7 +127,7 @@ TEST(ALM, multipleshooting1D) {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.σₘₐₓ     = 1e9;
+    almparam.Σₘₐₓ     = 1e9;
     almparam.max_iter = 10;
 
     PANOCParams panocparam;
@@ -134,7 +136,9 @@ TEST(ALM, multipleshooting1D) {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 100;
 
-    ALMSolver<> solver{almparam, panocparam};
+    LBFGSParams lbfgsparam;
+
+    ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 
     vec x(2);
     x << 0.5, 0.5;
@@ -218,7 +222,7 @@ TEST(ALM, multipleshooting8D) {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.σₘₐₓ     = 1e9;
+    almparam.Σₘₐₓ     = 1e9;
     almparam.max_iter = 20;
 
     PANOCParams panocparam;
@@ -227,7 +231,9 @@ TEST(ALM, multipleshooting8D) {
     panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 200;
 
-    ALMSolver<> solver{almparam, panocparam};
+    LBFGSParams lbfgsparam;
+
+    ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 
     vec x(n);
     x.fill(5);

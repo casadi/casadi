@@ -1,33 +1,51 @@
 #pragma once
 
-#include <chrono>
 #include <panoc-alm/inner/decl/panoc-fwd.hpp>
 #include <panoc-alm/util/problem.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
 
+#include <chrono>
+#include <string>
+
 namespace pa {
 
+/// Parameters for the Augmented Lagrangian solver.
 struct ALMParams {
-    real_t ε    = 1e-5; ///< Primal tolerance.
-    real_t δ    = 1e-5; ///< Dual tolerance.
-    real_t Δ    = 10;   ///< Factor used in updating the penalty parameters.
-    real_t Σ₀   = 1;    ///< Initial penalty parameter.
-    real_t σ₀   = 20;   ///< Initial penalty parameter factor.
-    real_t ε₀   = 1;    ///< Initial primal tolerance.
-    real_t θ    = 0.25; ///< Error tolerance for penalty increase
-    real_t ρ    = 1e-1; ///< Update factor for primal tolerance.
-    real_t M    = 1e9;
-    real_t σₘₐₓ = 1e15;
+    /// Primal tolerance.
+    real_t ε = 1e-5;
+    /// Dual tolerance.
+    real_t δ = 1e-5;
+    /// Factor used in updating the penalty parameters.
+    real_t Δ = 10;
+    /// Initial penalty parameter. When set to zero (which is the default),
+    /// it is computed automatically, based on the constraint violation in the
+    /// starting point and the parameter @ref ALMParams::σ₀.
+    real_t Σ₀ = 0;
+    /// Initial penalty parameter factor. Active if @ref ALMParams::Σ₀ is set
+    /// to zero.
+    real_t σ₀ = 20;
+    /// Initial primal tolerance.
+    real_t ε₀ = 1;
+    /// Error tolerance for penalty increase
+    real_t θ = 0.25;
+    /// Update factor for primal tolerance.
+    real_t ρ = 1e-1;
+    /// Lagrange multiplier bound.
+    real_t M = 1e9;
+    /// Maximum penalty factor.
+    real_t Σₘₐₓ = 1e9;
     /// Maximum number of outer ALM iterations.
     unsigned int max_iter = 100;
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
 
+    /// When to print progress. If set to zero, nothing will be printed.
+    /// If set to N != 0, progress is printed every N iterations.
     unsigned print_interval = 0;
 
+    /// Apply preconditioning to the problem, based on the gradients in the
+    /// starting point.
     bool preconditioning = true;
-
-    void verify();
 };
 
 /// Augmented Lagrangian Method solver
@@ -58,6 +76,12 @@ class ALMSolver {
 
     Stats operator()(const Problem &problem, vec &y, vec &x);
 
+    std::string get_name() const {
+        return "ALMSolver<" + inner_solver.get_name() + ">";
+    }
+
+    /// Abort the computation and return the result so far.
+    /// Can be called from other threads or signal handlers.
     void stop() { inner_solver.stop(); }
 
   private:

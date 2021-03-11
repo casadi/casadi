@@ -4,6 +4,7 @@
 #include <panoc-alm-ref/fd.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
 
+#include <panoc-alm/inner/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
 
@@ -229,11 +230,11 @@ TEST(PANOC, ref) {
     params.max_iter                       = 1000;
     params.τ_min                          = 1. / (1 << 10);
     params.update_lipschitz_in_linesearch = true;
-    params.specialized_lbfgs              = false;
+    pa::LBFGSParams lbfgsparams;
 
     pa::PANOCParams params_ref = params;
 
-    pa::PANOCSolver<> solver{params};
+    pa::PANOCSolver<> solver{params, lbfgsparams};
     pa_ref::PANOCSolver solver_ref{params_ref};
 
     vec λ     = vec::Ones(m);

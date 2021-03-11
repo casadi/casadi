@@ -1,6 +1,6 @@
 #include <panoc-alm/decl/alm.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
+#include <panoc-alm/inner/decl/lbfgs.hpp>
 
 #include "eigen-matchers.hpp"
 
@@ -93,7 +93,7 @@ TEST(ALM, riskaverse) {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.σₘₐₓ     = 1e9;
+    almparam.Σₘₐₓ     = 1e9;
     almparam.max_iter = 100;
     almparam.preconditioning = true;
 
@@ -103,12 +103,13 @@ TEST(ALM, riskaverse) {
     panocparam.lbfgs_mem                      = 20;
     panocparam.max_iter                       = 1000;
     panocparam.update_lipschitz_in_linesearch = true;
-    panocparam.specialized_lbfgs              = true;
 
     panocparam.print_interval = 0;
     almparam.print_interval   = 1;
 
-    ALMSolver<> solver{almparam, panocparam};
+    LBFGSParams lbfgsparam;
+
+    ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 
     vec x(n);
     x.fill(0);
