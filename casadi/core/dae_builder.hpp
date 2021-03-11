@@ -33,37 +33,31 @@ namespace casadi {
 // Forward declarations
 class DaeBuilderInternal;
 
-/** \brief An initial-value problem in differential-algebraic equations
-    <H3>Independent variables:  </H3>
-    \verbatim
-    t:      time
-    \endverbatim
+/** \brief A symbolic representation of a differential-algebraic equations model
 
     <H3>Variables:  </H3>
     \verbatim
+    t:      independent variable (usually time)
+    c:      constants
+    p:      parameters
+    d:      dependent parameters
+    u:      controls
+    w:      dependent variables
     x:      differential states
     z:      algebraic variables
-    u:      control signals
     q:      quadrature states
-    p:      free parameters
-    d:      dependent parameters
-    w:      dependent variables
     y:      outputs
     \endverbatim
 
-    <H3>Dynamic constraints (imposed everywhere):  </H3>
+    <H3>Equations:  </H3>
     \verbatim
-    ODE                    \dot{x} ==  ode(t, x, z, u, p, w, d)
-    algebraic equations:         0 ==  alg(t, x, z, u, p, w, d)
-    quadrature equations:  \dot{q} == quad(t, x, z, u, p, w, d)
-    dependent parameters:        d == ddef(t, x, z, u, p, w, d)
-    dependent parameters:        w == wdef(t, x, z, u, p, w, d)
-    output equations:            y == ydef(t, x, z, u, p, w, d)
-    \endverbatim
-
-    <H3>Point constraints (imposed pointwise):  </H3>
-    \verbatim
-    Initial equations:           0 == init(t, x, z, u, p, v, sdot)
+    differential equations: \dot{x} ==  ode(...)
+    algebraic equations:          0 ==  alg(...)
+    quadrature equations:   \dot{q} == quad(...)
+    dependent parameters:         d == ddef(...)
+    dependent parameters:         w == wdef(...)
+    output equations:             y == ydef(...)
+    Initial equations:     init_lhs == init_rhs(...)
     \endverbatim
 
     \date 2012-2021
