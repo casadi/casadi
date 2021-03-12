@@ -3530,7 +3530,7 @@ namespace casadi {
     s.pack("ProtoFunction::verbose", verbose_);
     s.pack("ProtoFunction::print_time", print_time_);
     s.pack("ProtoFunction::record_time", record_time_);
-    s.pack("FunctionInternal::regularity_check", regularity_check_);
+    s.pack("ProtoFunction::regularity_check", regularity_check_);
   }
 
   ProtoFunction::ProtoFunction(DeserializingStream& s) {
