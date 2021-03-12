@@ -584,6 +584,20 @@ class GenericExpression : public GenericExpressionCommon {
      }
      ///@}
 
+     ///@{
+     /** \brief Regularization function:
+         regularize(x) := 0   if x is NAN or +/- INF
+         regularize(x) := x   otherwise
+     */
+     static ExType regularize(const ExType& x) {
+       return ExType::unary(OP_REGULARIZE, x);
+     }
+     friend inline ExType regularize(const ExType& x) {
+       return ExType::regularize(x);
+     }
+     ///@}
+
+
 /** @} */
 };
 #endif // SWIG
