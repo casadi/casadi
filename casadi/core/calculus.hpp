@@ -941,7 +941,7 @@ namespace casadi {
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
         f = if_else_zero(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=0; d[1]=if_else_zero(x, T(1));}
+        d[0]=0; d[1]=x;}
   };
 
   /// Inverse of error function
