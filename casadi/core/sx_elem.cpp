@@ -413,10 +413,6 @@ namespace casadi {
           if (x.is_op(OP_SQ))
             return fabs(x.dep());
           break;
-        case OP_REGULARIZE:
-          if (x.is_op(OP_REGULARIZE))
-            return x.dep();
-          break;
       }
     }
     return UnarySX::create(Operation(op), x);

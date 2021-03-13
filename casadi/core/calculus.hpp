@@ -74,7 +74,6 @@ namespace casadi {
     OP_SINH,  OP_COSH,  OP_TANH,
     OP_ASINH, OP_ACOSH, OP_ATANH,
     OP_ATAN2,
-    OP_REGULARIZE,
 
     // Double constant
     OP_CONST,
@@ -248,7 +247,6 @@ namespace casadi {
 
   ///@{
   /** \brief  CasADi additions */
-  inline double regularize(double x) {return isnan(x) || isinf(x) ? 0 : x;}
   inline double simplify(double x) { return x;}
   inline double constpow(double x, double y) { return pow(x, y);}
   inline double printme(double x, double y) {
@@ -492,7 +490,6 @@ namespace casadi {
   template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_AND>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_REGULARIZE>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -952,14 +949,6 @@ namespace casadi {
         d[0] = 1; d[1] = 0; }
   };
 
-  /// Regularize, removing NaN and Inf
-  template<>
-  struct UnaryOperation<OP_REGULARIZE>{
-  public:
-    template<typename T> static inline void fcn(const T& x, T& f) { f = regularize(x);}
-    template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=regularize(x);}
-  };
-
   template<template<casadi_int> class F, typename T>
   T operation_getter(casadi_int op) {
     switch (static_cast<Operation>(op)) {
@@ -1007,7 +996,6 @@ namespace casadi {
     case OP_ACOSH:         return F<OP_ACOSH>::check;
     case OP_ATANH:         return F<OP_ATANH>::check;
     case OP_ATAN2:         return F<OP_ATAN2>::check;
-    case OP_REGULARIZE:    return F<OP_REGULARIZE>::check;
     case OP_CONST:         return F<OP_CONST>::check;
     case OP_INPUT:         return F<OP_INPUT>::check;
     case OP_OUTPUT:        return F<OP_OUTPUT>::check;
@@ -1244,7 +1232,6 @@ namespace casadi {
   case OP_ACOSH:     CNAME<OP_ACOSH>::fcn(X, Y, F, N);         break;   \
   case OP_ATANH:     CNAME<OP_ATANH>::fcn(X, Y, F, N);         break;   \
   case OP_ATAN2:     CNAME<OP_ATAN2>::fcn(X, Y, F, N);         break;   \
-  case OP_REGULARIZE: CNAME<OP_REGULARIZE>::fcn(X, Y, F, N);   break;   \
   case OP_ERFINV:    CNAME<OP_ERFINV>::fcn(X, Y, F, N);        break;   \
   case OP_LIFT:      CNAME<OP_LIFT>::fcn(X, Y, F, N);          break;   \
   case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X, Y, F, N);       break;
@@ -1309,7 +1296,7 @@ namespace casadi {
   case OP_NOT:       BinaryOperation<OP_NOT>::der(X, Y, F, D);        break; \
   case OP_AND:       BinaryOperation<OP_AND>::der(X, Y, F, D);        break; \
   case OP_OR:        BinaryOperation<OP_OR>::der(X, Y, F, D);         break; \
-  case OP_IF_ELSE_ZERO: BinaryOperation<OP_IF_ELSE_ZERO>::der(X, Y, F, D); break; \
+  case OP_IF_ELSE_ZERO: BinaryOperation<OP_IF_ELSE_ZERO>::der(X, Y, F, D);         break; \
   case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X, Y, F, D);      break; \
   case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X, Y, F, D);       break; \
   case OP_FMOD:      BinaryOperation<OP_FMOD>::der(X, Y, F, D);       break; \
@@ -1327,7 +1314,6 @@ namespace casadi {
   case OP_ACOSH:     BinaryOperation<OP_ACOSH>::der(X, Y, F, D);      break; \
   case OP_ATANH:     BinaryOperation<OP_ATANH>::der(X, Y, F, D);      break; \
   case OP_ATAN2:     BinaryOperation<OP_ATAN2>::der(X, Y, F, D);      break; \
-  case OP_REGULARIZE: BinaryOperation<OP_REGULARIZE>::der(X, Y, F, D); break; \
   case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X, Y, F, D);     break; \
   case OP_LIFT:      BinaryOperation<OP_LIFT>::der(X, Y, F, D);       break; \
   case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X, Y, F, D);    break;
@@ -1387,7 +1373,6 @@ namespace casadi {
   case OP_ACOSH:     DerBinaryOpertion<OP_ACOSH>::derf(X, Y, F, D);      break; \
   case OP_ATANH:     DerBinaryOpertion<OP_ATANH>::derf(X, Y, F, D);      break; \
   case OP_ATAN2:     DerBinaryOpertion<OP_ATAN2>::derf(X, Y, F, D);      break; \
-  case OP_REGULARIZE: DerBinaryOpertion<OP_REGULARIZE>::derf(X, Y, F, D); break; \
   case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X, Y, F, D);     break; \
   case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X, Y, F, D);       break; \
   case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X, Y, F, D);    break;
@@ -1445,8 +1430,7 @@ namespace casadi {
     case OP_ASINH:                               \
     case OP_ACOSH:                               \
     case OP_ATANH:                               \
-    case OP_ERFINV:                              \
-    case OP_REGULARIZE:
+    case OP_ERFINV:
 
   template<typename T>
   bool casadi_math<T>::is_binary(unsigned char op) {
@@ -1546,7 +1530,6 @@ namespace casadi {
     case OP_ACOSH:          return "acosh";
     case OP_ATANH:          return "atanh";
     case OP_ATAN2:          return "atan2";
-    case OP_REGULARIZE:     return "regularize";
     case OP_CONST:          return "const";
     case OP_INPUT:          return "input";
     case OP_OUTPUT:         return "output";

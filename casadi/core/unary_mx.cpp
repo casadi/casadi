@@ -157,9 +157,6 @@ namespace casadi {
     case OP_INV:
       if (op==OP_INV) return dep();
       break;
-    case OP_REGULARIZE:
-      if (op==OP_REGULARIZE) return dep();
-      break;
     default: break; // no rule
     }
 
