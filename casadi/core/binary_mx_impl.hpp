@@ -70,7 +70,11 @@ namespace casadi {
 
     // Propagate forward seeds
     for (casadi_int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = pd[0]*fseed[d][0] + pd[1]*fseed[d][1];
+      if (op_ == OP_IF_ELSE_ZERO) {
+        fsens[d][0] = if_else_zero(pd[0], fseed[d][0]);
+      } else {
+        fsens[d][0] = pd[0]*fseed[d][0] + pd[1]*fseed[d][1];
+      }
     }
   }
 
@@ -84,18 +88,28 @@ namespace casadi {
     // Propagate adjoint seeds
     for (casadi_int d=0; d<aseed.size(); ++d) {
       MX s = aseed[d][0];
-      for (casadi_int c=0; c<2; ++c) {
-        // Get increment of sensitivity c
-        MX t = pd[c]*s;
-
-        // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
-        if (!t.is_scalar() && t.size() != dep(c).size()) {
-          if (pd[c].size()!=s.size()) pd[c] = MX(s.sparsity(), pd[c]);
-          t = dot(pd[c], s);
+      if (op_ == OP_IF_ELSE_ZERO) {
+        // Special case to avoid NaN propagation
+        if (!s.is_scalar() && dep(1).is_scalar()) {
+          asens[d][1] += dot(dep(0), s);
+        } else {
+          asens[d][1] += if_else_zero(dep(0), s);
         }
+      } else {
+        // General case
+        for (casadi_int c=0; c<2; ++c) {
+          // Get increment of sensitivity c
+          MX t = pd[c]*s;
 
-        // Propagate the seeds
-        asens[d][c] += t;
+          // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
+          if (!t.is_scalar() && t.size() != dep(c).size()) {
+            if (pd[c].size()!=s.size()) pd[c] = MX(s.sparsity(), pd[c]);
+            t = dot(pd[c], s);
+          }
+
+          // Propagate the seeds
+          asens[d][c] += t;
+        }
       }
     }
   }
