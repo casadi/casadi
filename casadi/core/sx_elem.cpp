@@ -192,6 +192,9 @@ namespace casadi {
         // the addition node can prevent rule (1.) from working in subsequent steps.
         return if_else_zero(y.dep(0), x.dep(1) + y.dep(1));
       }
+    } else if (x.op() == OP_IF_ELSE_ZERO && op == OP_MUL) {
+      // Same as Rule 1. above, but with factors swapped. For symmetry.
+      return if_else_zero(x.dep(0), x.dep(1) * y);
     }
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {

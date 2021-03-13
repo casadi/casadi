@@ -688,6 +688,9 @@ namespace casadi {
         // the addition node can prevent rule (1.) from working in subsequent steps.
         return if_else_zero(y.dep(0), dep(1) + y.dep(1));
       }
+    } else if (this->op() == OP_IF_ELSE_ZERO && op == OP_MUL) {
+      // Same as Rule 1. above, but with factors swapped. For symmetry.
+      return if_else_zero(dep(0), dep(1) * y);
     }
     // Create binary node
     if (sparsity().is_scalar(false)) {
