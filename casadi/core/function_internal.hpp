@@ -944,6 +944,9 @@ namespace casadi {
     bool print_in_;
     bool print_out_;
 
+    // Warn when number of inputs or outputs exceed this value
+    casadi_int max_io_;
+
     // Dump input/output
     bool dump_in_, dump_out_, dump_;
 

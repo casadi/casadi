@@ -98,6 +98,7 @@ namespace casadi {
     enable_fd_op_ = false;
     print_in_ = false;
     print_out_ = false;
+    max_io_ = 10000;
     dump_in_ = false;
     dump_out_ = false;
     dump_dir_ = ".";
@@ -286,6 +287,9 @@ namespace casadi {
       {"print_out",
        {OT_BOOL,
         "Print numerical values of outputs [default: false]"}},
+      {"max_io",
+       {OT_INT,
+        "Acceptable number of inputs and outputs. Warn if exceeded."}},
       {"dump_in",
        {OT_BOOL,
         "Dump numerical values of inputs to file (readable with DM.from_file) [default: false]"}},
@@ -370,6 +374,7 @@ namespace casadi {
     opts["fd_method"] = fd_method_;
     opts["print_in"] = print_in_;
     opts["print_out"] = print_out_;
+    opts["max_io"] = max_io_;
     opts["dump_in"] = dump_in_;
     opts["dump_out"] = dump_out_;
     opts["dump_dir"] = dump_dir_;
@@ -443,6 +448,8 @@ namespace casadi {
         print_in_ = op.second;
       } else if (op.first=="print_out") {
         print_out_ = op.second;
+      } else if (op.first=="max_io") {
+        max_io_ = op.second;
       } else if (op.first=="dump_in") {
         dump_in_ = op.second;
       } else if (op.first=="dump_out") {
@@ -481,14 +488,14 @@ namespace casadi {
 
     // Get the number of inputs
     n_in_ = get_n_in();
-    if (n_in_>=10000) {
+    if (max_io_ > 0 && n_in_ >= max_io_) {
       casadi_warning("Function " + name_ + " has many inputs (" + str(n_in_) + "). "
                      "Changing the problem formulation is strongly encouraged.");
     }
 
     // Get the number of outputs
     n_out_ = get_n_out();
-    if (n_out_>=10000) {
+    if (max_io_ > 0 && n_out_ >= max_io_) {
       casadi_warning("Function " + name_ + " has many outputs (" + str(n_out_) + "). "
                      "Changing the problem formulation is strongly encouraged.");
     }
@@ -3548,7 +3555,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 3);
+    s.version("FunctionInternal", 4);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -3600,6 +3607,7 @@ namespace casadi {
     s.pack("FunctionInternal::fd_method", fd_method_);
     s.pack("FunctionInternal::print_in", print_in_);
     s.pack("FunctionInternal::print_out", print_out_);
+    s.pack("FunctionInternal::max_io", max_io_);
     s.pack("FunctionInternal::dump_in", dump_in_);
     s.pack("FunctionInternal::dump_out", dump_out_);
     s.pack("FunctionInternal::dump_dir", dump_dir_);
@@ -3619,7 +3627,7 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
-    int version = s.version("FunctionInternal", 1, 3);
+    int version = s.version("FunctionInternal", 1, 4);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -3686,6 +3694,7 @@ namespace casadi {
     s.unpack("FunctionInternal::fd_method", fd_method_);
     s.unpack("FunctionInternal::print_in", print_in_);
     s.unpack("FunctionInternal::print_out", print_out_);
+    if (version >= 4) s.unpack("FunctionInternal::max_io", max_io_);
     s.unpack("FunctionInternal::dump_in", dump_in_);
     s.unpack("FunctionInternal::dump_out", dump_out_);
     s.unpack("FunctionInternal::dump_dir", dump_dir_);
