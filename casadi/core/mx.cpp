@@ -1302,7 +1302,7 @@ namespace casadi {
   }
 
   casadi_int MX::n_nodes(const MX& x) {
-    Function f("tmp_n_nodes", vector<MX>{}, {x});
+    Function f("tmp_n_nodes", vector<MX>{}, {x}, Dict{{"max_io", 0}});
     return f.n_nodes();
   }
 
@@ -1370,7 +1370,7 @@ namespace casadi {
     // implemented in MXFunction
     std::vector<MX> f_out = vdef;
     f_out.insert(f_out.end(), ex.begin(), ex.end());
-    Function temp("tmp_substitute_inplace", {v}, f_out);
+    Function temp("tmp_substitute_inplace", {v}, f_out, Dict{{"max_io", 0}});
     temp.get<MXFunction>()->substitute_inplace(vdef, ex);
   }
 
@@ -1394,7 +1394,7 @@ namespace casadi {
     if (all_equal) return ex;
 
     // Otherwise, evaluate symbolically
-    Function F("tmp_substitute", v, ex);
+    Function F("tmp_substitute", v, ex, Dict{{"max_io", 0}});
     std::vector<MX> ret;
     F.call(vdef, ret, true);
     return ret;
@@ -1413,7 +1413,7 @@ namespace casadi {
       + str(expr.size()) + " <-> " + str(exprs.size()) + ".");
 
     // Sort the expression
-    Function f("tmp_graph_substitute", vector<MX>{}, ex);
+    Function f("tmp_graph_substitute", vector<MX>{}, ex, Dict{{"max_io", 0}});
     MXFunction *ff = f.get<MXFunction>();
 
     // Get references to the internal data structures
@@ -1537,7 +1537,7 @@ namespace casadi {
         }
       }
       // Sort the expression
-      Function f("tmp_extract", vector<MX>{}, ex);
+      Function f("tmp_extract", vector<MX>{}, ex, Dict{{"max_io", 0}});
       auto *ff = f.get<MXFunction>();
       // Get references to the internal data structures
       const vector<MXAlgEl>& algorithm = ff->algorithm_;
@@ -1829,7 +1829,7 @@ namespace casadi {
     std::vector<MX> v = symvar(veccat(ret));
 
     // Construct an MXFunction with it
-    Function f("tmp_matrix_expand", v, ret);
+    Function f("tmp_matrix_expand", v, ret, Dict{{"max_io", 0}});
 
     // Expand to SXFunction
     Function s = f.expand("expand_" + f.name(), options);
@@ -1919,7 +1919,7 @@ namespace casadi {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp("tmp_depends_on", {arg}, {x});
+    Function temp("tmp_depends_on", {arg}, {x}, Dict{{"max_io", 0}});
 
     // Perform a single dependency sweep
     vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
