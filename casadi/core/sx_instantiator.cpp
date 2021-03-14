@@ -116,7 +116,7 @@ namespace casadi {
   template<>
   bool CASADI_EXPORT SX::is_smooth() const {
     // Make a function
-    Function temp("temp", {SX()}, {*this});
+    Function temp("tmp_is_smooth", {SX()}, {*this});
 
     // Run the function on the temporary variable
     SXFunction* t = temp.get<SXFunction>();
@@ -464,7 +464,7 @@ namespace casadi {
 
 
     // Otherwise, evaluate symbolically
-    Function F("tmp", v, ex);
+    Function F("tmp_substitute", v, ex);
     return F(vdef);
   }
 
@@ -496,7 +496,7 @@ namespace casadi {
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    Function f("tmp", f_in, f_out);
+    Function f("tmp_substitute_inplace", f_in, f_out);
 
     // Get references to the internal data structures
     SXFunction *ff = f.get<SXFunction>();
@@ -552,7 +552,7 @@ namespace casadi {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp("temp", {arg}, {x});
+    Function temp("tmp_depends_on", {arg}, {x});
 
     // Perform a single dependency sweep
     vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
@@ -711,7 +711,7 @@ namespace casadi {
 
   template<>
   casadi_int CASADI_EXPORT SX::n_nodes(const SX& x) {
-    Function f("tmp", {SX()}, {x});
+    Function f("tmp_n_nodes", {SX()}, {x});
     return f.n_nodes();
   }
 
@@ -731,7 +731,7 @@ namespace casadi {
 
   template<>
   vector<SX> CASADI_EXPORT SX::symvar(const SX& x) {
-    Function f("tmp", vector<SX>{}, {x});
+    Function f("tmp_symvar", vector<SX>{}, {x});
     return f.free_sx();
   }
 
@@ -761,7 +761,7 @@ namespace casadi {
     casadi_assert(lift_shared, "Not implemented");
     casadi_assert(!lift_calls, "Not implemented");
     // Sort the expression
-    Function f("tmp", vector<SX>(), ex);
+    Function f("tmp_extract", vector<SX>(), ex);
     SXFunction *ff = f.get<SXFunction>();
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;

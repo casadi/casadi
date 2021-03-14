@@ -703,7 +703,7 @@ namespace casadi {
 
     // Initial guesses not used for derivative calculations
     for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
-      std::string name = arg[i].is_symbolic() ? arg[i].name() : "temp";
+      std::string name = arg[i].is_symbolic() ? arg[i].name() : "tmp_get_forward";
       arg[i] = MX::sym(name, Sparsity(arg[i].size()));
     }
 
@@ -828,7 +828,7 @@ namespace casadi {
 
     // Initial guesses not used for derivative calculations
     for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
-      std::string name = arg[i].is_symbolic() ? arg[i].name() : "temp";
+      std::string name = arg[i].is_symbolic() ? arg[i].name() : "tmp_get_reverse";
       arg[i] = MX::sym(name, Sparsity(arg[i].size()));
     }
 

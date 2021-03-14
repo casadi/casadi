@@ -34,7 +34,7 @@ namespace casadi {
   DM CASADI_EXPORT DM::
   solve(const DM& A, const DM& b,
         const string& lsolver, const Dict& dict) {
-    Linsol mysolver("tmp", lsolver, A.sparsity(), dict);
+    Linsol mysolver("tmp_solve", lsolver, A.sparsity(), dict);
     return mysolver.solve(A, b, false);
   }
 

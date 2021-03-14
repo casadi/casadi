@@ -49,7 +49,7 @@ void detect_simple_bounds_gen(const T& x, const T& p,
     casadi_assert(x.is_column(), "Dimension mismatch");
 
     // Get constraint Jacobian sparsity
-    Function temp("temp", {x, p}, {g});
+    Function temp("temp_detect_simple_bounds_gen", {x, p}, {g});
     Sparsity sp = temp.jac_sparsity().at(0);
     Sparsity spT = sp.T();
 

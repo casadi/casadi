@@ -140,7 +140,7 @@ namespace casadi {
 #define SERIALIZEX(TYPE, BaseType, Type, type, arg) \
     void SerializerBase::pack(const Type& e) { \
       serializer().pack(static_cast<char>(SERIALIZED_ ## TYPE));\
-      serializer().pack(Function("temp", std::vector< BaseType >{}, arg)); \
+      serializer().pack(Function("tmp_serializer", std::vector< BaseType >{}, arg)); \
       serializer().pack(e); \
     } \
     \
