@@ -1065,6 +1065,27 @@ namespace casadi {
     (*this)->print_option(name, stream);
   }
 
+  bool Function::has_option(const std::string &option_name) const {
+    try {
+      return (*this)->has_option(option_name);
+    } catch (exception& e) {
+      THROW_ERROR("has_option", e.what());
+      return false;  // never reached
+    }
+  }
+
+  void Function::change_option(const std::string& option_name, const GenericType& option_value) {
+    try {
+      // Assert existance
+      if (!has_option(option_name))
+        casadi_error("Option '" + option_name + "' does not exist");
+      // Call internal class
+      (*this)->change_option(option_name, option_value);
+    } catch (exception& e) {
+      THROW_ERROR("change_option", e.what());
+    }
+  }
+
   std::vector<std::string> Function::get_free() const {
     return (*this)->get_free();
   }

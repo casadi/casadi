@@ -361,6 +361,15 @@ namespace casadi {
     /** \brief Print all information there is to know about a certain option */
     void print_option(const std::string &name, std::ostream &stream = casadi::uout()) const;
 
+    /** \brief Does a particular option exist */
+    bool has_option(const std::string &option_name) const;
+
+    /** \brief Change option after object creation for debugging
+      * This is only possible for a selected number of options that do not change the numerical
+      * results of the computation, e.g. to enable a more verbose output or saving to file.
+      */
+    void change_option(const std::string& option_name, const GenericType& option_value);
+
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const;
 

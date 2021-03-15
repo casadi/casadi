@@ -387,6 +387,18 @@ namespace casadi {
     return opts;
   }
 
+  void FunctionInternal::change_option(const std::string& option_name,
+      const GenericType& option_value) {
+    if (option_name == "print_in") {
+      print_in_ = option_value;
+    } else if (option_name == "print_out") {
+      print_out_ = option_value;
+    } else {
+      // Option not found - continue to base classes
+      ProtoFunction::change_option(option_name, option_value);
+    }
+  }
+
   void FunctionInternal::init(const Dict& opts) {
     // Call the initialization method of the base class
     ProtoFunction::init(opts);
@@ -818,12 +830,28 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::print_options(std::ostream &stream) const {
+  void ProtoFunction::print_options(std::ostream &stream) const {
     get_options().print_all(stream);
   }
 
-  void FunctionInternal::print_option(const std::string &name, std::ostream &stream) const {
+  void ProtoFunction::print_option(const std::string &name, std::ostream &stream) const {
     get_options().print_one(name, stream);
+  }
+
+  bool ProtoFunction::has_option(const std::string &option_name) const {
+    return get_options().find(option_name) != 0;
+  }
+
+  void ProtoFunction::change_option(const std::string& option_name,
+      const GenericType& option_value) {
+    if (option_name == "verbose") {
+      verbose_ = option_value;
+    } else if (option_name == "regularity_check") {
+      regularity_check_ = option_value;
+    } else {
+      // Failure
+      casadi_error("Option '" + option_name + "' cannot be changed");
+    }
   }
 
   std::vector<std::string> FunctionInternal::get_free() const {
