@@ -417,10 +417,12 @@ template<> struct enum_traits<Variable::Attribute> {
   static const Variable::Attribute n_enum = Variable::N_ATTRIBUTE;
 };
 template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalIn> {
-  static const DaeBuilderInternal::DaeBuilderInternalIn n_enum = DaeBuilderInternal::DAE_BUILDER_NUM_IN;
+  static const DaeBuilderInternal::DaeBuilderInternalIn n_enum
+    = DaeBuilderInternal::DAE_BUILDER_NUM_IN;
 };
 template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalOut> {
-  static const DaeBuilderInternal::DaeBuilderInternalOut n_enum = DaeBuilderInternal::DAE_BUILDER_NUM_OUT;
+  static const DaeBuilderInternal::DaeBuilderInternalOut n_enum
+    = DaeBuilderInternal::DAE_BUILDER_NUM_OUT;
 };
 ///@}
 
