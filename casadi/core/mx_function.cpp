@@ -1727,9 +1727,10 @@ namespace casadi {
     return new MXFunction(s);
   }
 
-  void MXFunction::find(std::map<FunctionInternal*, Function>& all_fun) const {
+  void MXFunction::find(std::map<FunctionInternal*, Function>& all_fun,
+      casadi_int max_depth) const {
     for (auto&& e : algorithm_) {
-      if (e.op == OP_CALL) add_embedded(all_fun, e.data.which_function());
+      if (e.op == OP_CALL) add_embedded(all_fun, e.data.which_function(), max_depth);
     }
   }
 

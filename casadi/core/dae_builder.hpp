@@ -312,7 +312,7 @@ public:
   std::vector<Function> fun() const;
 
   /// Collect embedded functions from the expression graph
-  void gather_fun();
+  void gather_fun(casadi_int max_depth = -1);
 ///@}
 
   /** @name Import and export

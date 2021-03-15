@@ -973,20 +973,25 @@ namespace casadi {
     void* memory(int ind) const;
 #endif // SWIG
 
-    // Get a list of all functions
+    /** \brief Get a list of all functions */
     std::vector<std::string> get_function() const;
 
-    // Get a dependency function
+    /** \brief Get a dependency function */
     Function get_function(const std::string &name) const;
 
-    // Check if a particular dependency exists
+    /** \brief Check if a particular dependency exists */
     bool has_function(const std::string& fname) const;
 
-    // Get all functions embedded in the expression graphs
-    std::vector<Function> find() const;
+    /** \brief Get all functions embedded in the expression graphs
+      * \param[in] max_depth  Maximum depth - a negative number indicates no maximum
+      */
+    std::vector<Function> find(casadi_int max_depth = -1) const;
 
-    // Get a specific function embedded in the expression graphs
-    Function find(const std::string &name) const;
+    /** \brief  Get a specific function embedded in the expression graphs
+      * \param[in] max_depth  Maximum depth - a negative number indicates no maximum
+      * \param[in] name  Name of function needed
+      */
+    Function find(casadi_int max_depth, const std::string &name) const;
 
     /** Obtain information about function */
     Dict info() const;

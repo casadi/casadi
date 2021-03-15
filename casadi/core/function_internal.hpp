@@ -265,10 +265,11 @@ namespace casadi {
     virtual bool has_function(const std::string& fname) const {return false;}
 
     // Add embedded function to map, helper function
-    void add_embedded(std::map<FunctionInternal*, Function>& all_fun, const Function& dep) const;
+    void add_embedded(std::map<FunctionInternal*, Function>& all_fun,
+      const Function& dep, casadi_int max_depth) const;
 
     // Get all embedded functions, recursively
-    virtual void find(std::map<FunctionInternal*, Function>& all_fun) const {}
+    virtual void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const {}
 
     /** \brief Which variables enter with some order
     * \param[in] s_in Input name
