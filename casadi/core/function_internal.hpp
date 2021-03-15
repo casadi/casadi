@@ -249,6 +249,12 @@ namespace casadi {
     // Check if a particular dependency exists
     virtual bool has_function(const std::string& fname) const {return false;}
 
+    // Add embedded function to map, helper function
+    void add_embedded(std::map<FunctionInternal*, Function>& all_fun, const Function& dep) const;
+
+    // Get all embedded functions, recursively
+    virtual void find(std::map<FunctionInternal*, Function>& all_fun) const {}
+
     /** \brief Which variables enter with some order
     * \param[in] s_in Input name
     * \param[in] s_out Output name(s)

@@ -216,6 +216,9 @@ namespace casadi {
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
 
+    // Get all embedded functions, recursively
+    void find(std::map<FunctionInternal*, Function>& all_fun) const override;
+
   protected:
     /** \brief Deserializing constructor */
     explicit MXFunction(DeserializingStream& s);

@@ -973,6 +973,12 @@ namespace casadi {
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const;
 
+    // Get all functions embedded in the expression graphs
+    std::vector<Function> find() const;
+
+    // Get a specific function embedded in the expression graphs
+    Function find(const std::string &name) const;
+
     /** Obtain information about function */
     Dict info() const;
 

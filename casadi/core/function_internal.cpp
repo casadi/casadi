@@ -3303,6 +3303,17 @@ namespace casadi {
     return singleton;
   }
 
+  void FunctionInternal::add_embedded(std::map<FunctionInternal*, Function>& all_fun,
+      const Function& dep) const {
+    // Add, if not already in graph and not null
+    if (!dep.is_null() && all_fun.find(dep.get()) == all_fun.end()) {
+      // Add to map
+      all_fun[dep.get()] = dep;
+      // Also add its dependencies
+      dep->find(all_fun);
+    }
+  }
+
   vector<bool> FunctionInternal::
   which_depends(const string& s_in, const vector<string>& s_out, casadi_int order, bool tr) const {
     casadi_error("'which_depends' not defined for " + class_name());
