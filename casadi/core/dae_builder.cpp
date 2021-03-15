@@ -576,6 +576,30 @@ Function DaeBuilder::fun(const std::string& name) const {
   return Function();
 }
 
+void DaeBuilder::gather_fun() {
+  try {
+    // Get a function corresponding to all equations (no inputs)
+    Function all_eq = (*this)->gather_eq();
+    // Gather all functions
+    std::vector<Function> allfun = all_eq.find();
+    // Add to list of functions
+    for (const Function& f : allfun) {
+      if (has_fun(f.name())) {
+        // Skip functions with duplicate names
+        casadi_warning("Duplicate function: '" + f.name() + "', ignored");
+      } else {
+        // Add to list of functions
+        add_fun(f);
+      }
+    }
+  } catch (std::exception& e) {
+    THROW_ERROR("gather_fun", e.what());
+  }
+}
+
+std::vector<Function> DaeBuilder::fun() const {
+  return (*this)->fun_;
+}
 
 Function DaeBuilder::oracle(bool sx, bool elim_w, bool lifted_calls) const {
   try {

@@ -233,6 +233,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
       const std::vector<std::string>& s_out) const;
   ///@}
 
+  /// Function corresponding to all equations
+  Function gather_eq() const;
+
   /// Get variable expression by name
   MX var(const std::string& name) const;
 

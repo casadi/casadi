@@ -1524,4 +1524,21 @@ void DaeBuilderInternal::prune_d() {
   prune_d();
 }
 
+Function DaeBuilderInternal::gather_eq() const {
+  // Output expressions
+  std::vector<MX> f_out;
+  // Names of outputs
+  std::vector<std::string> f_out_name;
+  // Get all expressions
+  for (casadi_int i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
+    std::vector<MX> v = output(static_cast<DaeBuilderInternalOut>(i));
+    if (!v.empty()) {
+      f_out.push_back(vertcat(v));
+      f_out_name.push_back(to_string(static_cast<DaeBuilderInternalOut>(i)));
+    }
+  }
+  // Construct function
+  return Function("all_eq", {}, f_out, {}, f_out_name);
+}
+
 } // namespace casadi

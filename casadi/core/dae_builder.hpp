@@ -307,6 +307,12 @@ public:
 
   /// Get function by name
   Function fun(const std::string& name) const;
+
+  /// Get all functions
+  std::vector<Function> fun() const;
+
+  /// Collect embedded functions from the expression graph
+  void gather_fun();
 ///@}
 
   /** @name Import and export
