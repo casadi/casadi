@@ -840,15 +840,19 @@ namespace casadi {
   }
 
   MX MX::project(const MX& x, const Sparsity& sp, bool intersect) {
-    if (x.is_empty() || (sp==x.sparsity())) {
-      return x;
-    } else {
-      casadi_assert(sp.size()==x.size(), "Dimension mismatch");
-      if (intersect) {
-        return x->get_project(sp.intersect(x.sparsity()));
+    try {
+      if (x.is_empty() || (sp==x.sparsity())) {
+        return x;
       } else {
-        return x->get_project(sp);
+        casadi_assert(sp.size()==x.size(), "Cannot project " + x.dim() + " to " + sp.dim());
+        if (intersect) {
+          return x->get_project(sp.intersect(x.sparsity()));
+        } else {
+          return x->get_project(sp);
+        }
       }
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("project", e.what());
     }
   }
 
