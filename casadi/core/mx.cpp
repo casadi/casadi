@@ -1662,7 +1662,8 @@ namespace casadi {
               // Skip if no reason to replace
               if (!replace_node && !output_node) continue;
               // Create a new variable
-              v.push_back(MX::sym(v_prefix + std::to_string(v_ind++) + v_suffix));
+              v.push_back(MX::sym(v_prefix + std::to_string(v_ind++) + v_suffix,
+                ores.at(c).sparsity()));
               // Add definition of new variable
               if (ind >= 0) {
                 // Replace existing call
