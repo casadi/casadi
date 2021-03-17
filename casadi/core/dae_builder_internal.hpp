@@ -147,7 +147,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   void eliminate_w();
 
   /// Lift problem formulation by extracting shared subexpressions
-  void lift(bool lift_shared = true, bool lift_calls = true);
+  void lift(bool lift_shared, bool lift_calls, bool inline_calls);
 
   /// Eliminate quadrature states and turn them into ODE states
   void eliminate_quad();
@@ -165,7 +165,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   void prune_d();
 
   /// Prune unused controls
-  void prune(bool prune_p = true, bool prune_u = true);
+  void prune(bool prune_p, bool prune_u);
   ///@}
 
   /** @name Import and export
