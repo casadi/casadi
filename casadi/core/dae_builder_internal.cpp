@@ -1340,8 +1340,41 @@ const MX& DaeBuilderInternal::CallIO::hess(casadi_int iind1, casadi_int iind2) c
 }
 
 void DaeBuilderInternal::sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef) {
-  // Calculate sparsity pattern of dvdef/dv
+  // Form function to evaluate dependent variables
   Function vfcn("vfcn", {vertcat(v)}, {vertcat(vdef)}, {"v"}, {"vdef"});
+  // Is any variable vector-valued?
+  bool any_vector_valued = false;
+  for (const MX& v_i : v) {
+    casadi_assert(!v_i.is_empty(), "Cannot have zero-dimension dependent variables");
+    if (!v_i.is_scalar()) {
+      any_vector_valued = true;
+      break;
+    }
+  }
+  // If vector-valued variables exists, collapse them
+  if (any_vector_valued) {
+    // New v corresponding to one scalar input per v argument
+    std::vector<MX> vfcn_in(v), vfcn_arg(v);
+    for (size_t i = 0; i < v.size(); ++i) {
+      if (!v.at(i).is_scalar()) {
+        vfcn_in.at(i) = MX::sym(v.at(i).name());
+        vfcn_arg.at(i) = repmat(vfcn_in.at(i), v.at(i).size1());
+      }
+    }
+    // Wrap vfcn
+    std::vector<MX> vfcn_out = vfcn(vertcat(vfcn_arg));
+    vfcn_out = vertsplit(vfcn_out.at(0), offset(v));
+    // Collapse vector-valued outputs
+    for (size_t i = 0; i < v.size(); ++i) {
+      if (!v.at(i).is_scalar()) {
+        vfcn_out.at(i) = dot(vfcn_out.at(i), vfcn_out.at(i));
+      }
+    }
+    // Recreate vfcn with smaller dimensions
+    vfcn = Function(vfcn.name(), {vertcat(vfcn_in)}, {vertcat(vfcn_out)},
+      vfcn.name_in(), vfcn.name_out());
+  }
+  // Calculate sparsity pattern of dvdef/dv
   Sparsity Jv = vfcn.jac_sparsity(0, 0);
   // Add diagonal (equation is v-vdef = 0)
   Jv = Jv + Sparsity::diag(Jv.size1());
