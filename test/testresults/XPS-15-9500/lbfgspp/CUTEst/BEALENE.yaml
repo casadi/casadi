@@ -1,0 +1,20 @@
+solver: ALMSolver<LBFGSSolver<?>>
+status: Converged
+outer iterations: 8
+inner iterations: 41
+inner convergence failures: 1
+elapsed time: 0.00043300000000000001
+ε: 1.0000000000000001e-05
+δ: 5.3359887597359545e-06
+f: 0
+counters:
+  f: 149
+  grad_f: 141
+  g: 157
+  grad_g: 141
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+‖Σ‖: 14.961406227550274
+‖x‖: 3.0413745144918973
+‖y‖: 0.13246875305100303

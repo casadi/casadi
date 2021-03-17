@@ -1,0 +1,20 @@
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner iterations: 24
+inner convergence failures: 0
+elapsed time: 9.2e-05
+ε: 3.7891582004999003e-06
+δ: 5.2712194573700799e-06
+f: 0
+counters:
+  f: 65
+  grad_f: 66
+  g: 77
+  grad_g: 66
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+‖Σ‖: 13.8815851805272
+‖x‖: 3.1622808091294701
+‖y‖: 2.026797943249309e-06

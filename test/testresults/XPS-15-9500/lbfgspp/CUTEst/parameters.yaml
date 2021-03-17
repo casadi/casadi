@@ -1,0 +1,17 @@
+solver: ALMSolver<LBFGSSolver<?>>
+outer:
+  ε: 1.0000000000000001e-05
+  δ: 1.0000000000000001e-05
+  Δ: 10
+  Σ₀: 1
+  σ₀: 20
+  ε₀: 1
+  θ: 0.25
+  ρ: 0.10000000000000001
+  M: 1000000000
+  Σₘₐₓ: 1000000000000000
+  max_iter: 200
+  max_time: 90000000
+  print_interval: 0
+  preconditioning: false
+inner: todo

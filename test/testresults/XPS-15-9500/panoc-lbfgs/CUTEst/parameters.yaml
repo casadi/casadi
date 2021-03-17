@@ -1,0 +1,27 @@
+solver: ALMSolver<PANOCSolver<LBFGS>>
+outer:
+  ε: 1.0000000000000001e-05
+  δ: 1.0000000000000001e-05
+  Δ: 10
+  Σ₀: 1
+  σ₀: 20
+  ε₀: 1
+  θ: 0.25
+  ρ: 0.10000000000000001
+  M: 1000000000
+  Σₘₐₓ: 1000000000000000
+  max_iter: 200
+  max_time: 90000000
+  print_interval: 0
+  preconditioning: false
+inner:
+  Lipschitz:
+    ε: 9.9999999999999995e-07
+    δ: 9.9999999999999998e-13
+    Lγ_factor: 0.94999999999999996
+  lbfgs_mem: 20
+  max_iter: 1000
+  max_time: 300000000
+  τ_min: 9.9999999999999998e-13
+  update_lipschitz_in_linesearch: true
+  alternative_linesearch_cond: false

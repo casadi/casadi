@@ -1,0 +1,20 @@
+solver: ALMSolver<LBFGSSolver<?>>
+status: MaxIter
+outer iterations: 200
+inner iterations: 6
+inner convergence failures: 198
+elapsed time: 0.0041200000000000004
+ε: 1.0000000000000001e-05
+δ: .nan
+f: .nan
+counters:
+  f: 4369
+  grad_f: 4169
+  g: 4569
+  grad_g: 4169
+linesearch failures: 0
+L-BFGS failures: 0
+L-BFGS rejected: 0
+‖Σ‖: 14.09199161923261
+‖x‖: .nan
+‖y‖: .nan
