@@ -1347,30 +1347,6 @@ namespace casadi {
     // quick return if nothing to replace
     if (v.empty()) return;
 
-    // If ex can be split up, call recursively
-    for (const MX& e1 : ex) {
-      if (e1.n_primitives()!=1) {
-        // Split ex into its primitives
-        vector<MX> ex1;
-        for (const MX& e : ex) {
-          vector<MX> prim = e.primitives();
-          ex1.insert(ex1.end(), prim.begin(), prim.end());
-        }
-
-        // Call recursively
-        substitute_inplace(v, vdef, ex1, reverse);
-
-        // Join primitives
-        vector<MX>::const_iterator start, stop=ex1.begin();
-        for (MX& e : ex) {
-          start = stop;
-          stop = start + e.n_primitives();
-          e = e.join_primitives(vector<MX>(start, stop));
-        }
-        return;
-      }
-    }
-
     // implemented in MXFunction
     std::vector<MX> f_out = vdef;
     f_out.insert(f_out.end(), ex.begin(), ex.end());

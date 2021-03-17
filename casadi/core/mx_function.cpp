@@ -1295,23 +1295,24 @@ namespace casadi {
     vector<MX> work(workloc_.size()-1);
     vector<MX> oarg, ores;
 
+    // Output segments
+    vector<vector<MX>> out_split(out_.size());
+    for (casadi_int i = 0; i < out_split.size(); ++i) out_split[i].resize(out_[i].n_primitives());
+
+    // Evaluate algorithm
     for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
         casadi_assert(it->data->segment()==0, "Not implemented");
-        work.at(it->res.front()) = vdef.at(it->data->ind());
+        work.at(it->res.front())
+          = out_.at(it->data->ind()).join_primitives(out_split.at(it->data->ind()));
         break;
       case OP_PARAMETER:
       case OP_CONST:
         work.at(it->res.front()) = it->data;
         break;
       case OP_OUTPUT:
-        casadi_assert(it->data->segment()==0, "Not implemented");
-        if (it->data->ind()<vdef.size()) {
-          vdef.at(it->data->ind()) = work.at(it->arg.front());
-        } else {
-          ex.at(it->data->ind()-vdef.size()) = work.at(it->arg.front());
-        }
+        out_split.at(it->data->ind()).at(it->data->segment()) = work.at(it->arg.front());
         break;
       default:
         {
@@ -1332,6 +1333,15 @@ namespace casadi {
             if (el>=0) work.at(el) = ores[i];
           }
         }
+      }
+    }
+    // Join primitives
+    for (size_t k = 0; k < out_split.size(); ++k) {
+      MX a = out_.at(k).join_primitives(out_split.at(k));
+      if (k < vdef.size()) {
+        vdef.at(k) = a;
+      } else {
+        ex.at(k - vdef.size()) = a;
       }
     }
   }
