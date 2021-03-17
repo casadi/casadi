@@ -83,6 +83,8 @@ class LBFGSSolver {
 
     std::string get_name() const { return "LBFGSSolver<?>"; }
 
+    const Params &get_params() const { return params; }
+
     void stop() { stop_signal.stop(); }
 
   private:
@@ -157,6 +159,8 @@ class LBFGSBSolver {
     }
 
     std::string get_name() const { return "LBFGSBSolver<?>"; }
+
+    const Params &get_params() const { return params; }
 
     void stop() { stop_signal.stop(); }
 

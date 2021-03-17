@@ -97,6 +97,16 @@ auto get_problem(const pa::Problem &p) { return p; }
 const vec &get_y(const pa::Problem &, const vec &y) { return y; }
 #endif
 
+YAML::Emitter &operator<<(YAML::Emitter &out, const pa::LBFGSSolver<>::Params &) {
+    out << "todo";
+    return out;
+}
+
+YAML::Emitter &operator<<(YAML::Emitter &out, const pa::LBFGSBSolver<>::Params &) {
+    out << "todo";
+    return out;
+}
+
 int main(int argc, char *argv[]) {
     using namespace std::string_literals;
     if (argc < 3) {
@@ -120,6 +130,7 @@ int main(int argc, char *argv[]) {
         std::ofstream f(argv[2] + "/"s + argv[1] + ".yaml");
         YAML::Emitter out(f);
         out << YAML::BeginMap;
+        out << YAML::Key << "solver" << YAML::Value << solver.get_name();
         out << YAML::Key << "outer" << YAML::Value << solver.get_params();
         out << YAML::Key << "inner" << YAML::Value
             << solver.inner_solver.get_params();
