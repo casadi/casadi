@@ -86,6 +86,11 @@ vec get_y(const pa::Problem &p, const vec &y) {
     r.bottomRows(p.n).setZero();
     return r;
 }
+YAML::Emitter &operator<<(YAML::Emitter &out,
+                          const pa::LBFGSSolver<>::Params &) {
+    out << "todo";
+    return out;
+}
 #elif SOLVER == SOLVER_LBFGSBpp
 auto get_inner_solver() {
     Solver::InnerSolver::Params params;
@@ -95,17 +100,12 @@ auto get_inner_solver() {
 }
 auto get_problem(const pa::Problem &p) { return p; }
 const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+YAML::Emitter &operator<<(YAML::Emitter &out,
+                          const pa::LBFGSBSolver<>::Params &) {
+    out << "todo";
+    return out;
+}
 #endif
-
-YAML::Emitter &operator<<(YAML::Emitter &out, const pa::LBFGSSolver<>::Params &) {
-    out << "todo";
-    return out;
-}
-
-YAML::Emitter &operator<<(YAML::Emitter &out, const pa::LBFGSBSolver<>::Params &) {
-    out << "todo";
-    return out;
-}
 
 int main(int argc, char *argv[]) {
     using namespace std::string_literals;
