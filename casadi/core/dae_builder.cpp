@@ -520,7 +520,7 @@ Function DaeBuilder::create(const std::string& fname,
   try {
     return (*this)->create(fname, s_in, s_out, sx, lifted_calls);
   } catch (std::exception& e) {
-    THROW_ERROR("add_lc", e.what());
+    THROW_ERROR("create", e.what());
     return Function();  // never reached
   }
 }
