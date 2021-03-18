@@ -162,6 +162,11 @@ int main(int argc, char *argv[]) {
 
     YAML::Emitter out;
     out << YAML::BeginMap;
+    out << YAML::Key << "name" << YAML::Value << cp.name;
+    out << YAML::Key << "n" << YAML::Value << problem.n;
+    out << YAML::Key << "m" << YAML::Value << problem.m;
+    out << YAML::Key << "box constraints x" << YAML::Value
+        << cp.number_box_constraints;
     out << YAML::Key << "solver" << YAML::Value << solver.get_name();
     out << YAML::Key << "status" << YAML::Value << status.status;
     out << YAML::Key << "outer iterations" << YAML::Value

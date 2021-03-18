@@ -81,8 +81,10 @@ class CUTEstProblem {
 
   public:
     pa::Problem problem; ///< Problem statement (bounds, objective, constraints)
-    pa::vec x0;          ///< Initial value of decision variables
-    pa::vec y0;          ///< Initial value of Lagrange multipliers
+    std::string name                = "<UNKNOWN>"; ///< Problem name
+    unsigned number_box_constraints = 0; ///< The number of box constraints on x
+    pa::vec x0; ///< Initial value of decision variables
+    pa::vec y0; ///< Initial value of Lagrange multipliers
 
   private:
     std::unique_ptr<class CUTEstLoader> implementation;
