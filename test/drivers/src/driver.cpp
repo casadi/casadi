@@ -21,11 +21,11 @@ using pa::vec;
 #if SOLVER == SOLVER_PANOC_SLBFGS
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/panoc.hpp>
-#include <panoc-alm/inner/specialized-lbfgs.hpp>
+#include <panoc-alm/inner/directions/specialized-lbfgs.hpp>
 using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
 #elif SOLVER == SOLVER_PANOC_LBFGS
 #include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/lbfgs.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 using Solver = pa::ALMSolver<>;
 #elif SOLVER == SOLVER_LBFGSpp
