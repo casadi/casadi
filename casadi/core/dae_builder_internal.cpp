@@ -752,7 +752,7 @@ void DaeBuilderInternal::eliminate_w() {
   casadi_assert_dev(it == ex.end());
 }
 
-void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
+void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls, bool inline_calls) {
   // Not tested if w is non-empty before
   if (!w_.empty()) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
@@ -766,11 +766,8 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
     {"prefix", "w_"}, {"suffix", ""}, {"offset", static_cast<casadi_int>(w_.size())}};
   extract(ex, new_w, new_wdef, opts);
-  // Register as dependent variables
+  // Update w_, wdef_
   for (size_t i = 0; i < new_w.size(); ++i) {
-    Variable v(new_w.at(i).name());
-    v.v = new_w.at(i);
-    add_variable(v.name, v);
     w_.push_back(new_w.at(i));
     wdef_.push_back(new_wdef.at(i));
   }
@@ -789,6 +786,65 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   it += ydef_.size();
   // Consistency check
   casadi_assert_dev(it == ex.end());
+  // Have any call node been eliminated?
+  bool any_inlined = false;
+  if (inline_calls) {
+    // Loop over call nodes in wdef
+    std::map<MXNode*, CallIO> call_nodes;
+    for (MX& wdefref : wdef_) {
+      // Handle function call nodes
+      if (wdefref.is_output()) {
+        // Get function call node
+        MX c = wdefref.dep(0);
+        // Get function instance
+        Function f = c.which_function();
+        // casadi_message("Found " + f.name() + ", class = " + f.class_name());
+        // Only inline MXFunction
+        if (f.class_name() != "MXFunction") continue;
+        // Find the corresponding call node in the map
+        auto call_it = call_nodes.find(c.get());
+        // If first time this call node is encountered
+        if (call_it == call_nodes.end()) {
+          // Create new CallIO struct
+          CallIO cio;
+          // Save function instance
+          casadi_message("Inlining '" + f.name() + "'");
+          cio.f = f;
+          // Expressions for function call inputs
+          cio.arg.resize(f.n_in());
+          for (casadi_int i = 0; i < cio.arg.size(); ++i) {
+            cio.arg.at(i) = c.dep(i);
+          }
+          // Inline function call
+          f.call(cio.arg, cio.res, true);
+          // Save to map and update iterator
+          call_it = call_nodes.insert(std::make_pair(c.get(), cio)).first;
+        }
+        // Which output of the function are we calculating?
+        casadi_int oind = wdefref.which_output();
+        // Save output expression to wdef_
+        wdefref = call_it->second.res.at(oind);
+      }
+    }
+    // Was any call node actually been inlined?
+    any_inlined = !call_nodes.empty();
+  }
+  // If no calls were inlined, done
+  if (!any_inlined) {
+    // Register as dependent variables
+    for (const MX& w_k : w_) {
+      Variable v(w_k.name());
+      v.v = w_k;
+      add_variable(v.name, v);
+    }
+    return;
+  }
+  // Start over again, removing lifted expressions
+  casadi_message("Eliminating dependent variables before recursive call");
+  eliminate_w();
+  // Tail recursive call
+  casadi_message("Calling 'lift' recursively");
+  lift(lift_shared, lift_calls, inline_calls);
 }
 
 std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v) {
@@ -1250,6 +1306,13 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
       }
       // Save to oracle outputs
       f_out.at(vdef_ind) = vertcat(vdef);
+      // Hack: Also clear ddef, ydef
+      // for (size_t i = 0; i < f_out.size(); ++i) {
+      //   if (f_out_name.at(i) == "ddef" || f_out_name.at(i) == "ydef") {
+      //     casadi_warning("Removing " + f_out_name.at(i) + " from oracle with lifted calls");
+      //     f_out.at(i) = MX::zeros(f_out.at(i).sparsity());
+      //   }
+      // }
     }
     // Create oracle
     oracle_[false][elim_w][lifted_calls]

@@ -401,9 +401,9 @@ void DaeBuilder::eliminate_w() {
   }
 }
 
-void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
+void DaeBuilder::lift(bool lift_shared, bool lift_calls, bool inline_calls) {
   try {
-    (*this)->lift(lift_shared, lift_calls);
+    (*this)->lift(lift_shared, lift_calls, inline_calls);
   } catch (std::exception& e) {
     THROW_ERROR("lift", e.what());
   }

@@ -264,7 +264,7 @@ public:
   void eliminate_w();
 
   /// Lift problem formulation by extracting shared subexpressions
-  void lift(bool lift_shared = true, bool lift_calls = true);
+  void lift(bool lift_shared = true, bool lift_calls = true, bool inline_calls = false);
 
   /// Eliminate quadrature states and turn them into ODE states
   void eliminate_quad();
