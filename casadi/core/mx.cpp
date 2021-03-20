@@ -1638,8 +1638,8 @@ namespace casadi {
               // Skip if no reason to replace
               if (!replace_node && !output_node) continue;
               // Create a new variable
-              v.push_back(MX::sym(v_prefix + std::to_string(v_ind++) + v_suffix,
-                ores.at(c).sparsity()));
+              Sparsity v_sp = it->op == OP_PARAMETER ? it->data.sparsity() : ores.at(c).sparsity();
+              v.push_back(MX::sym(v_prefix + std::to_string(v_ind++) + v_suffix, v_sp));
               // Add definition of new variable
               if (ind >= 0) {
                 // Replace existing call
@@ -1654,7 +1654,7 @@ namespace casadi {
                 // New node corresponding to an output
                 casadi_assert(output_node, "Consistency check");
                 // Store the result
-                vdef.push_back(ores[c]);
+                vdef.push_back(ores.at(c));
               }
             }
           }
