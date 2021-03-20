@@ -368,7 +368,7 @@ protected:
     const std::vector<casadi_int>& h_offsets) const;
 
   // Sort dependent variables/parameters
-  void sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef);
+  static void sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef);
 
 #endif // SWIG
 };

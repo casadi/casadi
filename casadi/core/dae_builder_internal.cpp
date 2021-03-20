@@ -1526,6 +1526,16 @@ Function DaeBuilderInternal::attribute_fun(const std::string& fname,
       attr.push_back(variable(vi.name()).attribute(a_out.at(i)));
     // Add to output expressions
     f_out.push_back(vertcat(attr));
+    // Handle interdependencies
+    if (depends_on(f_out.back(), vertcat(vars))) {
+      // Make copies of vars and attr and sort
+      std::vector<MX> vars_sorted = vars, attr_sorted = attr;
+      sort_dependent(vars_sorted, attr_sorted);
+      // Eliminate interdependencies
+      substitute_inplace(vars_sorted, attr_sorted, attr, false);
+      // Update f_out
+      f_out.back() = vertcat(attr);
+    }
   }
   // Assemble return function
   return Function(fname, f_in, f_out, s_in, s_out);
