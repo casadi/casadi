@@ -730,6 +730,14 @@ void DaeBuilderInternal::eliminate_w() {
   ex.insert(ex.end(), ode_.begin(), ode_.end());
   ex.insert(ex.end(), quad_.begin(), quad_.end());
   ex.insert(ex.end(), ydef_.begin(), ydef_.end());
+  // Also include certain attributes in variables
+  for (const Variable& v : variables_) {
+    if (!v.min.is_constant()) ex.push_back(v.min);
+    if (!v.max.is_constant()) ex.push_back(v.max);
+    if (!v.nominal.is_constant()) ex.push_back(v.nominal);
+    if (!v.start.is_constant()) ex.push_back(v.start);
+    if (!v.beq.is_constant()) ex.push_back(v.beq);
+  }
   // Perform elimination
   substitute_inplace(w_, wdef_, ex);
   // Clear lists
@@ -748,6 +756,14 @@ void DaeBuilderInternal::eliminate_w() {
   // Get output equations
   std::copy(it, it + ydef_.size(), ydef_.begin());
   it += ydef_.size();
+  // Get variable attributes
+  for (Variable& v : variables_) {
+    if (!v.min.is_constant()) v.min = *it++;
+    if (!v.max.is_constant()) v.max = *it++;
+    if (!v.nominal.is_constant()) v.nominal = *it++;
+    if (!v.start.is_constant()) v.start = *it++;
+    if (!v.beq.is_constant()) v.beq = *it++;
+  }
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
