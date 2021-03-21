@@ -500,16 +500,16 @@ namespace casadi {
 
     // Get the number of inputs
     n_in_ = get_n_in();
-    if (max_io_ > 0 && n_in_ >= max_io_) {
-      casadi_warning("Function " + name_ + " has many inputs (" + str(n_in_) + "). "
-                     "Changing the problem formulation is strongly encouraged.");
+    if (max_io_ > 0 && n_in_ > max_io_) {
+      casadi_warning("Function " + name_ + " has many inputs (" + str(n_in_) + " > "
+        + str(max_io_) + "). Changing the problem formulation is strongly encouraged.");
     }
 
     // Get the number of outputs
     n_out_ = get_n_out();
-    if (max_io_ > 0 && n_out_ >= max_io_) {
-      casadi_warning("Function " + name_ + " has many outputs (" + str(n_out_) + "). "
-                     "Changing the problem formulation is strongly encouraged.");
+    if (max_io_ > 0 && n_out_ > max_io_) {
+      casadi_warning("Function " + name_ + " has many outputs (" + str(n_out_) + " > "
+        + str(max_io_) + "). Changing the problem formulation is strongly encouraged.");
     }
 
     // Query which inputs are differentiable if not already provided
