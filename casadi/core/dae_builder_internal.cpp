@@ -535,11 +535,20 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
 }
 
 void DaeBuilderInternal::clear_in(const std::string& v) {
-  input(to_enum<DaeBuilderInternalIn>(v)).clear();
+  switch(to_enum<DaeBuilderInternalIn>(v)) {
+  case DAE_BUILDER_U:
+    u_.clear();
+    break;
+  default:
+    casadi_error("Not implemented: " + v);
+  }
 }
 
 void DaeBuilderInternal::clear_out(const std::string& v) {
-  output(to_enum<DaeBuilderInternalOut>(v)).clear();
+  switch(to_enum<DaeBuilderInternalOut>(v)) {
+    default:
+      casadi_error("Not implemented: " + v);
+  }
 }
 
 void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
