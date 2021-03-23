@@ -534,6 +534,14 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
   std::copy(new_z.begin(), new_z.end(), z_.begin());
 }
 
+void DaeBuilderInternal::clear_in(const std::string& v) {
+  input(to_enum<DaeBuilderInternalIn>(v)).clear();
+}
+
+void DaeBuilderInternal::clear_out(const std::string& v) {
+  output(to_enum<DaeBuilderInternalOut>(v)).clear();
+}
+
 void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Function inputs and outputs
   std::vector<MX> f_in, f_out, v;

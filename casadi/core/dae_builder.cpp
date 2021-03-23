@@ -296,6 +296,22 @@ void DaeBuilder::register_y(const MX& new_y, const MX& new_ydef) {
   (*this)->ydef_.push_back(new_ydef);
 }
 
+void DaeBuilder::clear_in(const std::string& v) {
+  try {
+    (*this)->clear_in(v);
+  } catch (std::exception& e) {
+    THROW_ERROR("clear_in", e.what());
+  }
+}
+
+void DaeBuilder::clear_out(const std::string& v) {
+  try {
+    (*this)->clear_out(v);
+  } catch (std::exception& e) {
+    THROW_ERROR("clear_out", e.what());
+  }
+}
+
 MX DaeBuilder::add_q(const std::string& name, casadi_int n) {
   if (name.empty()) return add_q("q" + str(q().size()), n);
   MX new_q = add_variable(name, n);

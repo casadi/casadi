@@ -161,6 +161,12 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Sort algebraic variables
   void sort_z(const std::vector<std::string>& z_order);
 
+  /// Clear input variable
+  void clear_in(const std::string& v);
+
+  /// Clear output variable
+  void clear_out(const std::string& v);
+
   /// Prune dependent parameters that cannot be evaluated
   void prune_d();
 

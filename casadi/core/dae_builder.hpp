@@ -253,6 +253,12 @@ public:
 
   /// Register output variable
   void register_y(const MX& new_y, const MX& new_ydef);
+
+  /// Clear input variable
+  void clear_in(const std::string& v);
+
+  /// Clear output variable
+  void clear_out(const std::string& v);
   ///@}
 
   /** @name Manipulation
