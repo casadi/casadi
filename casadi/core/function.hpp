@@ -639,6 +639,10 @@ namespace casadi {
     static Function conditional(const std::string& name, const std::vector<Function>& f,
                                 const Function& f_def, const Dict& opts=Dict());
 
+    /** \brief Conditional call to a function */
+    static Function conditional(const std::string& name,
+      const Function& f, const Dict& opts=Dict());
+
     /** \brief BSpline evaluator function
      *
      *  Requires a known coefficient tensor

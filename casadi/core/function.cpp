@@ -717,6 +717,23 @@ namespace casadi {
     }
   }
 
+  Function Function::conditional(const std::string& name,
+      const Function& f, const Dict& opts) {
+    try {
+      // Create a dummy function with the same signature as f
+      std::vector<MX> dummy_in = f.mx_in();
+      std::vector<MX> dummy_out(f.n_out());
+      for (casadi_int i = 0; i < dummy_out.size(); ++i) {
+        dummy_out.at(i) = MX::nan(f.sparsity_out(i));
+      }
+      Function dummy("dummy_" + f.name(), dummy_in, dummy_out, f.name_in(), f.name_out());
+      // Form a conditional call
+      return if_else(name, f, dummy, opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("conditional", e.what(), "Switch");
+    }
+  }
+
   Function Function::bspline(const std::string &name,
       const std::vector< std::vector<double> >& knots,
       const vector<double>& coeffs, const vector<casadi_int>& degree,
