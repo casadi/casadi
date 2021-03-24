@@ -154,6 +154,10 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   std::vector<SX> SX::symvar(const SX& x);
 
   template<>
+  void SX::extract(std::vector<SX>& ex, std::vector<SX>& v_sx,
+      std::vector<SX>& vdef_sx, const Dict& opts);
+
+  template<>
   void SX::shared(std::vector<SX>& ex,
                          std::vector<SX>& v_sx,
                          std::vector<SX> & vdef_sx,
