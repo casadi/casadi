@@ -71,7 +71,7 @@ namespace casadi {
     // Propagate forward seeds
     for (casadi_int d=0; d<fsens.size(); ++d) {
       if (op_ == OP_IF_ELSE_ZERO) {
-        fsens[d][0] = if_else_zero(pd[0], fseed[d][0]);
+        fsens[d][0] = if_else_zero(pd[1], fseed[d][1]);
       } else {
         fsens[d][0] = pd[0]*fseed[d][0] + pd[1]*fseed[d][1];
       }
