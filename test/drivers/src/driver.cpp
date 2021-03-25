@@ -17,17 +17,18 @@ using pa::vec;
 #define SOLVER_PANOC_SLBFGS 2
 #define SOLVER_LBFGSpp 3
 #define SOLVER_LBFGSBpp 4
-#define SOLVER_GAAPGA 5
+#define SOLVER_PGA 5
+#define SOLVER_GAAPGA 6
 
 #if SOLVER == SOLVER_PANOC_SLBFGS
 #include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/directions/specialized-lbfgs.hpp>
+#include <panoc-alm/inner/panoc.hpp>
 using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
 #elif SOLVER == SOLVER_PANOC_LBFGS
 #include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 using Solver = pa::ALMSolver<>;
 #elif SOLVER == SOLVER_LBFGSpp
 #include <panoc-alm/alm.hpp>
@@ -37,6 +38,10 @@ using Solver = pa::ALMSolver<pa::LBFGSSolver<>>;
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/lbfgspp.hpp>
 using Solver = pa::ALMSolver<pa::LBFGSBSolver<>>;
+#elif SOLVER == SOLVER_PGA
+#include <panoc-alm/alm.hpp>
+#include <panoc-alm/inner/pga.hpp>
+using Solver = pa::ALMSolver<pa::PGA>;
 #elif SOLVER == SOLVER_GAAPGA
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
@@ -108,6 +113,27 @@ const vec &get_y(const pa::Problem &, const vec &y) { return y; }
 YAML::Emitter &operator<<(YAML::Emitter &out,
                           const pa::LBFGSBSolver<>::Params &) {
     out << "todo";
+    return out;
+}
+#elif SOLVER == SOLVER_PGA
+auto get_inner_solver() {
+    pa::PGAParams params;
+    params.max_iter = 1000;
+
+    return Solver::InnerSolver(params);
+}
+auto get_problem(const pa::Problem &p) { return p; }
+const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PGAParams &p) {
+    out << YAML::BeginMap;
+    out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
+    out << YAML::Key << "δ" << YAML::Value << p.Lipschitz.δ;
+    out << YAML::Key << "Lγ_factor" << YAML::Value << p.Lipschitz.Lγ_factor;
+    out << YAML::EndMap;
+    out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
+    out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
+    out << YAML::EndMap;
     return out;
 }
 #elif SOLVER == SOLVER_GAAPGA

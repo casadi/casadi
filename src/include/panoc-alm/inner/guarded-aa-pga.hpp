@@ -42,6 +42,8 @@ struct GuardedAAPGAParams {
 /// Guarded Anderson Accelerated Proximal Gradient Algorithm
 /// Vien V. Mai and Mikael Johansson, Anderson Acceleration of Proximal Gradient Methods.
 /// https://arxiv.org/abs/1910.08590v2
+///
+/// @ingroup    grp_InnerSolvers
 class GuardedAAPGA {
   public:
     using Params = GuardedAAPGAParams;
