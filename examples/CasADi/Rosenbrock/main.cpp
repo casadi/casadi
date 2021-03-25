@@ -1,5 +1,5 @@
 #include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/lbfgs.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>

@@ -4,7 +4,7 @@
 #include <panoc-alm-ref/fd.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
 
-#include <panoc-alm/inner/decl/lbfgs.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
 

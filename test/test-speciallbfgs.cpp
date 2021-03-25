@@ -1,7 +1,7 @@
 #include "eigen-matchers.hpp"
 
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
-#include <panoc-alm/inner/specialized-lbfgs.hpp>
+#include <panoc-alm/inner/directions/specialized-lbfgs.hpp>
 
 [[maybe_unused]] const static auto printvec = [](const char *name,
                                                  const auto &vec) {

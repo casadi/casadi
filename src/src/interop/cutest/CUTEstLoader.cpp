@@ -174,6 +174,13 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cjprod", status);
     }
 
+    unsigned count_box_constraints() const {
+        return std::count_if(x_l.data(), x_l.data() + nvar,
+                             [](pa::real_t x) { return x > -CUTE_INF; }) +
+               std::count_if(x_u.data(), x_u.data() + nvar,
+                             [](pa::real_t x) { return x < +CUTE_INF; });
+    }
+
     std::string get_name() {
         std::string name;
         name.resize(10);
@@ -261,12 +268,14 @@ class CUTEstLoader {
 CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname) {
     implementation = std::make_unique<CUTEstLoader>(so_fname, outsdif_fname);
     auto *l        = implementation.get();
-    problem.n      = l->nvar;
-    problem.m      = l->ncon;
-    problem.C.lowerbound = std::move(l->x_l);
-    problem.C.upperbound = std::move(l->x_u);
-    problem.D.lowerbound = std::move(l->c_l);
-    problem.D.upperbound = std::move(l->c_u);
+    name           = l->get_name();
+    number_box_constraints = l->count_box_constraints();
+    problem.n              = l->nvar;
+    problem.m              = l->ncon;
+    problem.C.lowerbound   = std::move(l->x_l);
+    problem.C.upperbound   = std::move(l->x_u);
+    problem.D.lowerbound   = std::move(l->c_l);
+    problem.D.upperbound   = std::move(l->c_u);
     using namespace std::placeholders;
     if (problem.m > 0) {
         problem.f = std::bind(&CUTEstLoader::eval_objective_constrained, l, _1);

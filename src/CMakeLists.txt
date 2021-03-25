@@ -4,7 +4,7 @@
 add_library(panoc-alm SHARED
     "src/inner/panoc.cpp"
     "src/util/box.cpp"
-    "src/inner/lbfgs.cpp"
+    "src/inner/directions/lbfgs.cpp"
     "src/alm.cpp"
     "src/util/problem.cpp"
     "src/util/solverstatus.cpp"

@@ -3,7 +3,7 @@
 #include <panoc-alm/util/box.hpp>
 #include <panoc-alm/util/vec.hpp>
 
-#include <panoc-alm/inner/decl/lbfgs-fwd.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs-fwd.hpp>
 
 namespace pa {
 

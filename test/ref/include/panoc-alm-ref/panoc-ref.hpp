@@ -1,7 +1,7 @@
 #pragma once
 
 #include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
+#include <panoc-alm/inner/directions/lbfgs.hpp>
 
 /// Reference implementations that are more readable than the optimized
 /// implementations, used for tests as well

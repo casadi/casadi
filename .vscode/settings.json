@@ -1,5 +1,6 @@
 {
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "clangd.semanticHighlighting": true,
     "files.associations": {
         "*.dox": "cpp",
         "*.ipp": "cpp",
@@ -79,10 +80,16 @@
         "Lipschitz",
         "casadi",
         "cwise",
+        "grad",
         "ipopt",
         "lbfgs",
+        "p",
         "panoc",
         "r",
+        "slbfgs",
+        "σₘₐₓ",
+        "ψₖ",
+        "ψₖᵀpₖ",
         "ψₖᵀrₖ"
     ],
     "python.pythonPath": "py-venv/bin/python"

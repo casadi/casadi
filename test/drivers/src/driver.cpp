@@ -22,11 +22,11 @@ using pa::vec;
 #if SOLVER == SOLVER_PANOC_SLBFGS
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/panoc.hpp>
-#include <panoc-alm/inner/specialized-lbfgs.hpp>
+#include <panoc-alm/inner/directions/specialized-lbfgs.hpp>
 using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
 #elif SOLVER == SOLVER_PANOC_LBFGS
 #include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/lbfgs.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 using Solver = pa::ALMSolver<>;
 #elif SOLVER == SOLVER_LBFGSpp
@@ -191,6 +191,11 @@ int main(int argc, char *argv[]) {
 
     YAML::Emitter out;
     out << YAML::BeginMap;
+    out << YAML::Key << "name" << YAML::Value << cp.name;
+    out << YAML::Key << "n" << YAML::Value << problem.n;
+    out << YAML::Key << "m" << YAML::Value << problem.m;
+    out << YAML::Key << "box constraints x" << YAML::Value
+        << cp.number_box_constraints;
     out << YAML::Key << "solver" << YAML::Value << solver.get_name();
     out << YAML::Key << "status" << YAML::Value << status.status;
     out << YAML::Key << "outer iterations" << YAML::Value

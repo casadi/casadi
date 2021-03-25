@@ -1,8 +1,8 @@
 #pragma once
 
-#include <panoc-alm/inner/decl/specialized-lbfgs.hpp>
+#include <panoc-alm/inner/directions/decl/specialized-lbfgs.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
-#include <panoc-alm/inner/lbfgs.hpp>
+#include <panoc-alm/inner/directions/lbfgs.hpp>
 
 #include <cmath>
 

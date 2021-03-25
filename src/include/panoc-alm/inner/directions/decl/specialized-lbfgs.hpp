@@ -1,6 +1,6 @@
 #pragma once
 
-#include <panoc-alm/inner/decl/lbfgs.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 
 namespace pa {
 
