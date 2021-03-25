@@ -9,3 +9,14 @@
  - Check if L-BFGS should use r or p
  - Adapt SpecializedLBFGS to use new generic API
  - LBFGSParam
+
+ # Questions for Panos
+
+- Why no accelerated proximal gradient in PANOC?  
+  yₖ = xₖ + βₖ(xₖ - xₖ₋₁)  
+  xₖ₊₁ = proxₕ(yₖ - γₖ ∇ψ(yₖ))
+- More efficient stopping criterion AA-PGA?
+- Regularization of least squares Anderson acceleration?
+- Underdetermined system Anderson acceleration?
+- QR with column pivoting? (Much more expensive, faster alternative?)
+- Incremental condition number estimation for dropping columns?
