@@ -182,7 +182,7 @@ GuardedAAPGA::operator()(const Problem &problem, // in
     xₖ       = project(yₖ, problem.C);
     G.col(0) = yₖ;
 
-    unsigned no_progress = 0; // TODO
+    unsigned no_progress = 0;
 
     // Calculate gradient in second iterate ------------------------------------
 
@@ -342,6 +342,7 @@ GuardedAAPGA::operator()(const Problem &problem, // in
 
         // Calculate the objective at the projected accelerated point
         real_t ψₖ₊₁ = calc_ψ_ŷ(xₖ, /* in ⟹ out */ ŷₖ);
+        real_t old_ψ = ψₖ;
 
         // Check sufficient decrease condition for Anderson iterate
         bool sufficient_decrease;
@@ -372,6 +373,11 @@ GuardedAAPGA::operator()(const Problem &problem, // in
             //           << std::endl;
         }
         rₖ.swap(rₖ₋₁);
+
+        if (ψₖ == old_ψ) // TODO: is this a valid test?
+            ++no_progress;
+        else
+            no_progress = 0;
     }
     throw std::logic_error("[AAPGA] loop error");
 }
