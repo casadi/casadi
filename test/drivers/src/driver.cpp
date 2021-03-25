@@ -113,9 +113,8 @@ YAML::Emitter &operator<<(YAML::Emitter &out,
 #elif SOLVER == SOLVER_GAAPGA
 auto get_inner_solver() {
     pa::GuardedAAPGAParams params;
-    params.max_iter      = 10;
+    params.max_iter      = 1000;
     params.limitedqr_mem = 20;
-    params.print_interval = 1;
 
     return Solver::InnerSolver(params);
 }
