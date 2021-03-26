@@ -393,6 +393,10 @@ namespace casadi {
       print_in_ = option_value;
     } else if (option_name == "print_out") {
       print_out_ = option_value;
+    } else if (option_name=="ad_weight") {
+      ad_weight_ = option_value;
+    } else if (option_name=="ad_weight_sp") {
+      ad_weight_sp_ = option_value;
     } else {
       // Option not found - continue to base classes
       ProtoFunction::change_option(option_name, option_value);
