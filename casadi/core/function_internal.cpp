@@ -756,6 +756,19 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::print_out(std::ostream &stream, double** res, bool truncate) const {
+    stream << "Function " << name_ << " (" << this << ")" << std::endl;
+    for (casadi_int i=0; i<n_out_; ++i) {
+      stream << "Output " << i << " (" << name_out_[i] << "): ";
+      if (res[i]) {
+        DM::print_default(stream, sparsity_out_[i], res[i], truncate);
+        stream << std::endl;
+      } else {
+        stream << "NULL" << std::endl;
+      }
+    }
+  }
+
   int FunctionInternal::
   eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : 0;
@@ -791,18 +804,7 @@ namespace casadi {
     print_time(m->fstats);
 
     if (dump_out_) dump_out(dump_id, res);
-    if (print_out_) {
-      uout() << "Function " << name_ << " (" << this << ")" << std::endl;
-      for (casadi_int i=0; i<n_out_; ++i) {
-        uout() << "Output " << i << " (" << name_out_[i] << "): ";
-        if (res[i]) {
-          DM::print_dense(uout(), sparsity_out_[i], res[i], false);
-          uout() << std::endl;
-        } else {
-          uout() << "NULL" << std::endl;
-        }
-      }
-    }
+    if (print_out_) print_out(uout(), res, false);
     // Check all outputs for NaNs
     if (regularity_check_) {
       for (casadi_int i = 0; i < n_out_; ++i) {

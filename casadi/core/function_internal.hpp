@@ -1021,6 +1021,9 @@ namespace casadi {
     /** \brief Print inputs */
     void print_in(std::ostream &stream, const double** arg, bool truncate) const;
 
+    /** \brief Print outputs */
+    void print_out(std::ostream &stream, double** res, bool truncate) const;
+
   protected:
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
     void set_jac_sparsity(casadi_int oind, casadi_int iind, const Sparsity& sp);
