@@ -34,10 +34,7 @@ class SpecializedLBFGS {
 
     /// Initialize with the starting point x₀ and the gradient in that point.
     void initialize(const vec &x₀, const vec &grad₀);
-    /// Function called by PANOC when the step size γ changes. It is a no-op for
-    /// this specialized L-BFGS implementation, the γ change will cause all 
-    /// previous vectors y to be recalculated next time @ref update is called.
-    void changed_γ() {}
+
     /// Throw away the approximation and all previous vectors s and y.
     void reset();
     /// Re-allocate storage for a problem with a different size. 

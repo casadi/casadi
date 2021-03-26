@@ -52,15 +52,6 @@ inline bool LBFGS::update(const vec &xₖ, const vec &xₖ₊₁, const vec &p�
     return true;
 }
 
-inline bool LBFGS::update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ,
-                          const vec &pₖ₊₁, const vec &grad_new, const Box &C,
-                          real_t γ_new) {
-    (void)grad_new;
-    (void)C;
-    (void)γ_new;
-    return update(xₖ, xₖ₊₁, pₖ, pₖ₊₁);
-}
-
 template <class Vec>
 void LBFGS::apply(Vec &&q) {
     auto update1 = [&](size_t i) {
@@ -87,13 +78,6 @@ void LBFGS::apply(Vec &&q) {
         update2(i);
 }
 
-inline void LBFGS::initialize(const vec &x₀, const vec &grad₀) {
-    (void)x₀;
-    (void)grad₀;
-}
-
-inline void LBFGS::changed_γ() { reset(); }
-
 inline void LBFGS::reset() {
     idx  = 0;
     full = false;
@@ -103,5 +87,48 @@ inline void LBFGS::resize(size_t n, size_t history) {
     sto.resize(n + 1, history * 2);
     reset();
 }
+
+} // namespace pa
+
+#include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
+
+namespace pa {
+
+template <>
+struct PANOCDirection<LBFGS> {
+
+    static void initialize(LBFGS &lbfgs, const vec &x₀, const vec &x̂₀,
+                           const vec &p₀, const vec &grad₀) {
+        (void)lbfgs;
+        (void)x₀;
+        (void)x̂₀;
+        (void)p₀;
+        (void)grad₀;
+    }
+
+    static bool update(LBFGS &lbfgs, const vec &xₖ, const vec &xₖ₊₁,
+                       const vec &pₖ, const vec &pₖ₊₁, const vec &grad_new,
+                       const Box &C, real_t γ_new) {
+        (void)grad_new;
+        (void)C;
+        (void)γ_new;
+        return lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁);
+    }
+
+    static bool apply(LBFGS &lbfgs, const vec &xₖ, const vec &x̂ₖ, const vec &pₖ,
+                      vec &qₖ) {
+        (void)xₖ;
+        (void)x̂ₖ;
+        qₖ = pₖ;
+        lbfgs.apply(qₖ);
+        return true;
+    }
+
+    static void changed_γ(LBFGS &lbfgs, real_t γₖ, real_t old_γₖ) {
+        (void)γₖ;
+        (void)old_γₖ;
+        lbfgs.reset(); // TODO: Do we really want to flush every time γ changes?
+    }
+};
 
 } // namespace pa

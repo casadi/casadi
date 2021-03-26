@@ -22,7 +22,7 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     configure_file(include/drivers/CUTEstProblemList.h.in
                    include/drivers/CUTEstProblemList.h @ONLY)
 
-    set(TESTNAME "pga-boxnqp")
+    set(TESTNAME "panoc-aa-boxnqp")
     set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}/CUTEst)
     file(MAKE_DIRECTORY ${TESTRESULT_DIR})
     foreach(P ${CUTEst_PROBLEM_LIST})
@@ -30,7 +30,7 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     endforeach()
 
     add_executable(cutest-driver src/driver.cpp)
-    target_compile_definitions(cutest-driver PRIVATE "SOLVER=SOLVER_PGA")
+    target_compile_definitions(cutest-driver PRIVATE "SOLVER=SOLVER_PANOC_ANDERSON")
     target_link_libraries(cutest-driver PRIVATE yaml-encoder)
 
     foreach(P ${CUTEst_PROBLEM_LIST})

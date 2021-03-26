@@ -12,6 +12,8 @@ namespace pa {
 /// column of A or adding new columns at the end of A.
 class LimitedMemoryQR {
   public:
+    LimitedMemoryQR() = default;
+
     /// @param  n
     ///         The size of the vectors, the number of rows of A.
     /// @param  m

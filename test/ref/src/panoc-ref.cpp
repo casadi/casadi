@@ -1,3 +1,4 @@
+#include <panoc-alm/inner/directions/lbfgs.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
 
 #include <cassert>
@@ -86,10 +87,10 @@ real_t calc_error_stop_crit(const Problem &prob, const vec &xₖ, const vec &x̂
 bool lipschitz_check(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
                      const vec &y, const vec &Σ, real_t γ, real_t L) {
     real_t ψₖ     = eval_ψ(prob, xₖ, y, Σ);
-    real_t ψ̂xₖ    = eval_ψ(prob, x̂ₖ, y, Σ);
+    real_t ψx̂ₖ    = eval_ψ(prob, x̂ₖ, y, Σ);
     real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO: why?
     vec pₖ        = projected_gradient_step(prob, xₖ, y, Σ, γ);
-    return ψ̂xₖ > margin + ψₖ                               //
+    return ψx̂ₖ > margin + ψₖ                               //
                      + eval_grad_ψ(prob, xₖ, y, Σ).dot(pₖ) //
                      + L / 2 * pₖ.squaredNorm();
 }
@@ -130,18 +131,19 @@ PANOCSolver::Stats PANOCSolver::operator()(
         // Calculate x̂ₖ, pₖ (gradient step)
         vec x̂ₖ = xₖ + projected_gradient_step(problem, xₖ, y, Σ, γₖ);
 
+        real_t old_γₖ = γₖ;
         while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γₖ, Lₖ) && γₖ > 0) {
             assert(not params.update_lipschitz_in_linesearch || k == 0);
             Lₖ *= 2;
             σₖ /= 2;
             γₖ /= 2;
-            // Flush L-BFGS if γ changed
-            if (k > 0)
-                lbfgs.changed_γ();
 
             // Calculate x̂ₖ (with new step size)
             x̂ₖ = xₖ + projected_gradient_step(problem, xₖ, y, Σ, γₖ);
         }
+        // Flush L-BFGS if γ changed
+        if (k > 0 && γₖ != old_γₖ)
+            pa::PANOCDirection<pa::LBFGS>::changed_γ(lbfgs, γₖ, old_γₖ);
 
         // Check stop condition
         real_t εₖ = calc_error_stop_crit(problem, xₖ, x̂ₖ, y, Σ, γₖ);
@@ -174,7 +176,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
             lbfgs.apply(qₖ);
         else
             // Initialize the L-BFGS
-            lbfgs.initialize(xₖ, eval_grad_ψ(problem, xₖ, y, Σ));
+            pa::PANOCDirection<pa::LBFGS>::initialize(
+                lbfgs, xₖ, x̂ₖ, pₖ, eval_grad_ψ(problem, xₖ, y, Σ));
 
         // Line search
         real_t τ = 1;
@@ -202,18 +205,21 @@ PANOCSolver::Stats PANOCSolver::operator()(
             x̂ₖ₊₁ = xₖ₊₁ + pₖ₊₁;
 
             if (params.update_lipschitz_in_linesearch) {
+                real_t old_γₖ₊₁ = γₖ₊₁;
                 while (lipschitz_check(problem, xₖ₊₁, x̂ₖ₊₁, y, Σ, γₖ₊₁, Lₖ₊₁) &&
                        γₖ₊₁ > 0) {
                     Lₖ₊₁ *= 2;
                     σₖ₊₁ /= 2;
                     γₖ₊₁ /= 2;
-                    // Flush L-BFGS if γ changed
-                    lbfgs.changed_γ();
 
                     // Calculate x̂ₖ (with new step size)
                     pₖ₊₁ = projected_gradient_step(problem, xₖ₊₁, y, Σ, γₖ₊₁);
                     x̂ₖ₊₁ = xₖ₊₁ + pₖ₊₁;
                 }
+                // Flush L-BFGS if γ changed
+                if (γₖ₊₁ != old_γₖ₊₁)
+                    pa::PANOCDirection<pa::LBFGS>::changed_γ(lbfgs, γₖ₊₁,
+                                                             old_γₖ₊₁);
             }
 
             // Update τ
@@ -229,9 +235,9 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 
         // Update L-BFGS -------------------------------------------------------
-        s.lbfgs_rejected +=
-            not lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁,
-                             eval_grad_ψ(problem, xₖ₊₁, y, Σ), problem.C, γₖ₊₁);
+        s.lbfgs_rejected += not pa::PANOCDirection<pa::LBFGS>::update(
+            lbfgs, xₖ, xₖ₊₁, pₖ, pₖ₊₁, eval_grad_ψ(problem, xₖ₊₁, y, Σ),
+            problem.C, γₖ₊₁);
 
         // Advance step
         xₖ = std::move(xₖ₊₁);

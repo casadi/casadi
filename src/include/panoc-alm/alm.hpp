@@ -55,7 +55,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &problem, vec &y, vec &x) {
                       << ": ‖Σ‖ = " << std::setw(13) << Σ.norm()
                       << ", ‖y‖ = " << std::setw(13) << y.norm()
                       << ", δ = " << std::setw(13) << norm_e
-                      << ", ε = " << std::setw(13) << ps.ε << "\r\n";
+                      << ", ε = " << std::setw(13) << ps.ε 
+                      << ", status = " << ps.status << "\r\n";
         }
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;

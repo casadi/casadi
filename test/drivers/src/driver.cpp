@@ -19,6 +19,7 @@ using pa::vec;
 #define SOLVER_LBFGSBpp 4
 #define SOLVER_PGA 5
 #define SOLVER_GAAPGA 6
+#define SOLVER_PANOC_ANDERSON 7
 
 #if SOLVER == SOLVER_PANOC_SLBFGS
 #include <panoc-alm/alm.hpp>
@@ -46,6 +47,11 @@ using Solver = pa::ALMSolver<pa::PGA>;
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
 using Solver = pa::ALMSolver<pa::GuardedAAPGA>;
+#elif SOLVER == SOLVER_PANOC_ANDERSON
+#include <panoc-alm/alm.hpp>
+#include <panoc-alm/inner/directions/anderson-acceleration.hpp>
+#include <panoc-alm/inner/panoc.hpp>
+using Solver = pa::ALMSolver<pa::PANOCSolver<pa::AndersonAccel>>;
 #endif
 
 std::atomic<Solver *> acitve_solver{nullptr};
@@ -160,6 +166,17 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
     out << YAML::EndMap;
     return out;
 }
+#elif SOLVER == SOLVER_PANOC_ANDERSON
+auto get_inner_solver() {
+    pa::PANOCParams params;
+    params.max_iter                       = 1000;
+    params.update_lipschitz_in_linesearch = true;
+    params.lbfgs_mem                      = 20;
+
+    return Solver::InnerSolver(params, {});
+}
+auto get_problem(const pa::Problem &p) { return p; }
+const vec &get_y(const pa::Problem &, const vec &y) { return y; }
 #endif
 
 int main(int argc, char *argv[]) {

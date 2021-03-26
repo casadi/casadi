@@ -38,23 +38,11 @@ class LBFGS {
     /// Update the inverse Hessian approximation using the new vectors xₖ₊₁
     /// and pₖ₊₁.
     bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁);
-    /// Update the inverse Hessian approximation using the new vectors xₖ₊₁
-    /// and pₖ₊₁. Overload for generic interface used by PANOC.
-    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
-                const vec &gradₖ₊₁, const Box &C, real_t γₖ₊₁);
 
     /// Apply the inverse Hessian approximation to the given vector q.
     template <class Vec>
     void apply(Vec &&q);
 
-    /// Initialize with the starting point x₀ and the gradient in that point.
-    /// Provided as part of the generic interface used by PANOC, it doesn't
-    /// have any effect for this basic L-BFGS implementation.
-    void initialize(const vec &x₀, const vec &grad₀);
-    /// Function called by PANOC when the step size γ changes. When this
-    /// happens, all previous vectors y are no longer valid, so the entire
-    /// approximation is thrown away.
-    void changed_γ();
     /// Throw away the approximation and all previous vectors s and y.
     void reset();
     /// Re-allocate storage for a problem with a different size. Causes

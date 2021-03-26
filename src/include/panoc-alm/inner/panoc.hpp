@@ -1,7 +1,9 @@
 #pragma once
 
+#include "panoc-alm/util/vec.hpp"
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
+#include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -24,6 +26,7 @@ PANOCSolver<DirectionProviderT>::operator()(
     vec &y,                 ///< [inout] Lagrange multipliers @f$ y @f$
     vec &err_z              ///< [out]   Slack variable error @f$ g(x) - z @f$
 ) {
+    using Direction = PANOCDirection<DirectionProvider>;
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
@@ -117,7 +120,7 @@ PANOCSolver<DirectionProviderT>::operator()(
     // Calculate x̂₀, p₀ (projected gradient step)
     calc_x̂(γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
     // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
-    real_t ψ̂xₖ = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷx̂ₖ);
+    real_t ψx̂ₖ = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷx̂ₖ);
 
     real_t grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
     real_t norm_sq_pₖ = pₖ.squaredNorm();
@@ -133,16 +136,13 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Quadratic upper bound -----------------------------------------------
         // Decrease step size until quadratic upper bound is satisfied
+        real_t old_γₖ = γₖ;
         if (k == 0 || params.update_lipschitz_in_linesearch == false) {
             real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO: Why?
-            while (ψ̂xₖ > ψₖ + margin + grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ) {
+            while (ψx̂ₖ > ψₖ + margin + grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ) {
                 Lₖ *= 2;
                 σₖ /= 2;
                 γₖ /= 2;
-
-                // Flush L-BFGS if γ changed
-                if (k > 0)
-                    direction_provider.changed_γ();
 
                 // Calculate x̂ₖ and pₖ (with new step size)
                 calc_x̂(γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
@@ -151,13 +151,17 @@ PANOCSolver<DirectionProviderT>::operator()(
                 norm_sq_pₖ = pₖ.squaredNorm();
 
                 // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
-                ψ̂xₖ = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷx̂ₖ);
+                ψx̂ₖ = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷx̂ₖ);
             }
         }
 
+        // Flush L-BFGS if γ changed
+        if (k > 0 && γₖ != old_γₖ)
+            Direction::changed_γ(direction_provider, γₖ, old_γₖ);
+
         // Initialize the L-BFGS
         if (k == 0)
-            direction_provider.initialize(xₖ, grad_ψₖ);
+            Direction::initialize(direction_provider, xₖ, x̂ₖ, pₖ, grad_ψₖ);
 
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
@@ -170,7 +174,7 @@ PANOCSolver<DirectionProviderT>::operator()(
             print_progress(k, ψₖ, grad_ψₖ, norm_sq_pₖ, γₖ, εₖ);
 
         if (progress_cb)
-            progress_cb({k, xₖ, pₖ, norm_sq_pₖ, x̂ₖ, ψₖ, grad_ψₖ, ψ̂xₖ, grad_̂ψₖ,
+            progress_cb({k, xₖ, pₖ, norm_sq_pₖ, x̂ₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ,
                          γₖ, εₖ, Σ, y, problem, params});
 
         auto time_elapsed    = std::chrono::steady_clock::now() - start_time;
@@ -203,15 +207,13 @@ PANOCSolver<DirectionProviderT>::operator()(
         }
 
         // Calculate quasi-Newton step -----------------------------------------
-        if (k > 0) {
-            qₖ = pₖ;
-            direction_provider.apply(qₖ);
-        }
+        if (k > 0)
+            Direction::apply(direction_provider, xₖ, x̂ₖ, pₖ, /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
         real_t τ            = 1;
         real_t σ_norm_γ⁻¹pₖ = σₖ * norm_sq_pₖ / (γₖ * γₖ);
-        real_t φₖ₊₁, ψₖ₊₁, ψ̂xₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, norm_sq_pₖ₊₁;
+        real_t φₖ₊₁, ψₖ₊₁, ψx̂ₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, norm_sq_pₖ₊₁;
         real_t Lₖ₊₁, σₖ₊₁, γₖ₊₁;
         real_t ls_cond;
 
@@ -241,7 +243,7 @@ PANOCSolver<DirectionProviderT>::operator()(
             // Calculate x̂ₖ₊₁, pₖ₊₁ (projected gradient step)
             calc_x̂(γₖ₊₁, xₖ₊₁, grad_ψₖ₊₁, /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁);
             // Calculate ψ(x̂ₖ₊₁) and ŷ(x̂ₖ₊₁)
-            ψ̂xₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
+            ψx̂ₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
 
             // Quadratic upper bound -------------------------------------------
             real_t margin  = 0; // 1e-6 * std::abs(ψₖ₊₁); // TODO: Why?
@@ -250,13 +252,12 @@ PANOCSolver<DirectionProviderT>::operator()(
             real_t norm_sq_pₖ₊₁_ₖ = norm_sq_pₖ₊₁; // prox step with step size γₖ
             if (params.update_lipschitz_in_linesearch == true) {
                 // Decrease step size until quadratic upper bound is satisfied
-                while (ψ̂xₖ₊₁ > ψₖ₊₁ + margin + grad_ψₖ₊₁ᵀpₖ₊₁ +
+                real_t old_γₖ₊₁ = γₖ₊₁;
+                while (ψx̂ₖ₊₁ > ψₖ₊₁ + margin + grad_ψₖ₊₁ᵀpₖ₊₁ +
                                    0.5 * Lₖ₊₁ * norm_sq_pₖ₊₁) {
                     Lₖ₊₁ *= 2;
                     σₖ₊₁ /= 2;
                     γₖ₊₁ /= 2;
-                    // Flush L-BFGS if γ changed
-                    direction_provider.changed_γ();
 
                     // Calculate x̂ₖ₊₁ and pₖ₊₁ (with new step size)
                     calc_x̂(γₖ₊₁, xₖ₊₁, grad_ψₖ₊₁, /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁);
@@ -264,8 +265,11 @@ PANOCSolver<DirectionProviderT>::operator()(
                     grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
                     norm_sq_pₖ₊₁   = pₖ₊₁.squaredNorm();
                     // Calculate ψ(x̂ₖ₊₁) and ŷ(x̂ₖ₊₁)
-                    ψ̂xₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
+                    ψx̂ₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
                 }
+                // Flush L-BFGS if γ changed
+                if (γₖ₊₁ != old_γₖ₊₁)
+                    Direction::changed_γ(direction_provider, γₖ₊₁, old_γₖ₊₁);
             }
 
             // Compute forward-backward envelope
@@ -284,8 +288,8 @@ PANOCSolver<DirectionProviderT>::operator()(
         }
 
         // Update L-BFGS -------------------------------------------------------
-        s.lbfgs_rejected += not direction_provider.update(
-            xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
+        s.lbfgs_rejected += not Direction::update(
+            direction_provider, xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.lbfgs_mem == 0)
@@ -297,7 +301,7 @@ PANOCSolver<DirectionProviderT>::operator()(
         γₖ = γₖ₊₁;
 
         ψₖ  = ψₖ₊₁;
-        ψ̂xₖ = ψ̂xₖ₊₁;
+        ψx̂ₖ = ψx̂ₖ₊₁;
         φₖ  = φₖ₊₁;
 
         xₖ.swap(xₖ₊₁);

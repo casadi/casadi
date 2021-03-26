@@ -1,7 +1,7 @@
 #pragma once
 
-#include <panoc-alm/inner/directions/decl/specialized-lbfgs.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
+#include <panoc-alm/inner/directions/decl/specialized-lbfgs.hpp>
 #include <panoc-alm/inner/directions/lbfgs.hpp>
 
 #include <cmath>
@@ -69,7 +69,6 @@ inline bool SpecializedLBFGS::full_update(const vec &xₖ, const vec &xₖ₊₁
     if (not LBFGS::update_valid(params, yᵀs, sᵀs, pᵀp))
         return false;
 
-
     // Recompute all residuals with new γ
     // yₖ = pₖ - pₖ₊₁
     // pₖ = Π(-γ∇ψ(xₖ), C - xₖ)
@@ -100,9 +99,9 @@ inline bool SpecializedLBFGS::update(const vec &xₖ, const vec &xₖ₊₁,
                                      const vec &gradₖ₊₁, const Box &C,
                                      real_t γ) {
     bool ret = (γ == old_γ || old_γ == 0)
-               ? standard_update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, gradₖ₊₁)
-               : full_update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, gradₖ₊₁, C, γ);
-    old_γ = γ;
+                   ? standard_update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, gradₖ₊₁)
+                   : full_update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, gradₖ₊₁, C, γ);
+    old_γ    = γ;
     return ret;
 }
 
@@ -146,5 +145,43 @@ inline void SpecializedLBFGS::reset() {
     idx  = 0;
     full = false;
 }
+
+} // namespace pa
+
+#include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
+
+namespace pa {
+
+template <>
+struct PANOCDirection<SpecializedLBFGS> {
+
+    static void initialize(SpecializedLBFGS &lbfgs, const vec &x₀,
+                           const vec &x̂₀, const vec &p₀, const vec &grad₀) {
+        lbfgs.initialize(x₀, grad₀);
+        (void)x̂₀;
+        (void)p₀;
+    }
+
+    static bool update(SpecializedLBFGS &lbfgs, const vec &xₖ, const vec &xₖ₊₁,
+                       const vec &pₖ, const vec &pₖ₊₁, const vec &gradₖ₊₁,
+                       const Box &C, real_t γ) {
+        return lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, gradₖ₊₁, C, γ);
+    }
+
+    static bool apply(SpecializedLBFGS &lbfgs, const vec &xₖ, const vec &x̂ₖ,
+                      const vec &pₖ, vec &qₖ) {
+        (void)xₖ;
+        (void)x̂ₖ;
+        qₖ = pₖ;
+        lbfgs.apply(qₖ);
+        return true;
+    }
+
+    static void changed_γ(SpecializedLBFGS &lbfgs, real_t γₖ, real_t old_γₖ) {
+        (void)lbfgs;
+        (void)γₖ;
+        (void)old_γₖ;
+    }
+};
 
 } // namespace pa

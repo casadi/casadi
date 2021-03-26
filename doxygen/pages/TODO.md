@@ -45,3 +45,10 @@
 - Underdetermined system Anderson acceleration?
 - QR with column pivoting? (Much more expensive, faster alternative?)
 - Incremental condition number estimation for dropping columns?
+- Is checking that ψₖ == ψₖ₋₁ for N iterations a valid check instead of
+  xₖ == xₖ₋₁?
+- Do we really have to flush L-BFGS if γ changes? 
+  Since Rγ(x) = γ⁻¹ (x - Tγ(x)) = γ⁻¹ (x - Π(x - γ∇ψ(x))), and if we're not 
+  at the boundaries of the feasible set, Π(x - γ∇ψ(x)) = x - γ∇ψ(x), and 
+  Rγ(x) = γ⁻¹ (-γ∇ψ(x)) = ∇ψ(x) which is independent of γ.
+  This might be useful for Anderson as well.
