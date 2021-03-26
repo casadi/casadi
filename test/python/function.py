@@ -2125,8 +2125,8 @@ class Functiontests(casadiTestCase):
         with capture_stdout() as out:
           fgrad(0)
 
-        self.assertTrue("[[-1e-07]," in out[0] or "[[-1e-007]," in out[0] )
-        self.assertTrue("[[1e-07]," in out[0] or "[[1e-007]," in out[0] )
+        self.assertTrue("-1e-07," in out[0] or "-1e-007," in out[0] )
+        self.assertTrue("1e-07," in out[0] or "1e-007," in out[0] )
 
   @requires_nlpsol("ipopt")
   @requiresPlugin(Importer,"shell")
