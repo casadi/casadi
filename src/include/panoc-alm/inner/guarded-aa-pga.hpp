@@ -227,6 +227,9 @@ GuardedAAPGA::operator()(const Problem &problem, // in
 
         // Flush Anderson buffers if γ changed
         if (γₖ != old_γₖ) {
+            size_t newest_g_idx = qr.ring_tail();
+            if (newest_g_idx != 0)
+                G.col(0) = G.col(newest_g_idx);
             qr.reset();
             // TODO: show mathematically that this is a sensible thing to do:
             rₖ₋₁ *= γₖ / old_γₖ;
@@ -302,8 +305,8 @@ GuardedAAPGA::operator()(const Problem &problem, // in
         // Compute Anderson acceleration next iterate yₑₓₜ = ∑ₙ₌₀ αₙ gₙ
         size_t g_idx = qr.ring_head();
         // α₀ = γ₀      for n = 0
-        real_t α      = γ_LS(0);
-        yₖ            = α * G.col(g_idx);
+        real_t α = γ_LS(0);
+        yₖ       = α * G.col(g_idx);
 #if 0
         G_full.col(0) = G.col(g_idx);
 #endif
@@ -341,7 +344,7 @@ GuardedAAPGA::operator()(const Problem &problem, // in
         xₖ = project(yₖ, problem.C);
 
         // Calculate the objective at the projected accelerated point
-        real_t ψₖ₊₁ = calc_ψ_ŷ(xₖ, /* in ⟹ out */ ŷₖ);
+        real_t ψₖ₊₁  = calc_ψ_ŷ(xₖ, /* in ⟹ out */ ŷₖ);
         real_t old_ψ = ψₖ;
 
         // Check sufficient decrease condition for Anderson iterate
