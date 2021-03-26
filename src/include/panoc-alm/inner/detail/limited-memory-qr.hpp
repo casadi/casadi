@@ -175,6 +175,14 @@ class LimitedMemoryQR {
     /// @note   Meant for tests only, creates a copy.
     mat get_Q() const { return Q.block(0, 0, n(), q_idx); }
 
+    void scale_R(real_t scal) {
+        size_t r_idx = r_idx_start;
+        for (size_t i = 0; i < q_idx; ++i) {
+            R.col(r_idx).topRows(i + 1) *= scal;
+            r_idx = r_succ(r_idx);
+        }
+    }
+
     /// Get the number of MGS reorthogonalizations.
     size_t get_reorth_count() const { return reorth_count; }
     /// Reset the number of MGS reorthogonalizations.

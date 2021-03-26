@@ -147,6 +147,7 @@ auto get_inner_solver() {
     pa::GuardedAAPGAParams params;
     params.max_iter      = 1000;
     params.limitedqr_mem = 20;
+    // params.full_flush_on_γ_change = false;
 
     return Solver::InnerSolver(params);
 }

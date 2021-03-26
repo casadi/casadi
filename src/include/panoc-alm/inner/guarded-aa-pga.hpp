@@ -37,6 +37,8 @@ struct GuardedAAPGAParams {
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
     unsigned print_interval = 0;
+
+    bool full_flush_on_γ_change = true;
 };
 
 /// Guarded Anderson Accelerated Proximal Gradient Algorithm
@@ -227,10 +229,14 @@ GuardedAAPGA::operator()(const Problem &problem, // in
 
         // Flush Anderson buffers if γ changed
         if (γₖ != old_γₖ) {
-            size_t newest_g_idx = qr.ring_tail();
-            if (newest_g_idx != 0)
-                G.col(0) = G.col(newest_g_idx);
-            qr.reset();
+            if (params.full_flush_on_γ_change) {
+                size_t newest_g_idx = qr.ring_tail();
+                if (newest_g_idx != 0)
+                    G.col(0) = G.col(newest_g_idx);
+                qr.reset();
+            } else {
+                qr.scale_R(γₖ / old_γₖ);
+            }
             // TODO: show mathematically that this is a sensible thing to do:
             rₖ₋₁ *= γₖ / old_γₖ;
         }
