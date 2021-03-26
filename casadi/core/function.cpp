@@ -1442,6 +1442,7 @@ namespace casadi {
 #ifdef WITH_EXTRA_CHECKS
       call_depth_--;
 #endif // WITH_EXTRA_CHECKS
+      (*this)->print_in(uerr(), arg, true);
       THROW_ERROR("operator()", e.what());
     }
   }

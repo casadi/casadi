@@ -739,24 +739,25 @@ namespace casadi {
     return 0;
   }
 
+  void FunctionInternal::print_in(std::ostream &stream, const double** arg, bool truncate) const {
+    stream << "Function " << name_ << " (" << this << ")" << std::endl;
+    for (casadi_int i=0; i<n_in_; ++i) {
+      stream << "Input " << i << " (" << name_in_[i] << "): ";
+      if (arg[i]) {
+        DM::print_default(stream, sparsity_in_[i], arg[i], truncate);
+        stream << std::endl;
+      } else {
+        stream << "NULL" << std::endl;
+      }
+    }
+  }
+
   int FunctionInternal::
   eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : 0;
     if (dump_in_) dump_in(dump_id, arg);
     if (dump_ && dump_id==0) dump();
-    if (print_in_) {
-      uout() << "Function " << name_ << " (" << this << ")" << std::endl;
-      for (casadi_int i=0; i<n_in_; ++i) {
-        uout() << "Input " << i << " (" << name_in_[i] << "): ";
-        if (arg[i]) {
-          DM::print_dense(uout(), sparsity_in_[i], arg[i], false);
-          uout() << std::endl;
-        } else {
-          uout() << "NULL" << std::endl;
-        }
-      }
-    }
-
+    if (print_in_) print_in(uout(), arg, false);
     auto m = static_cast<ProtoFunctionMemory*>(mem);
 
     // Reset statistics

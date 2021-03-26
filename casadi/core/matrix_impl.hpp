@@ -621,11 +621,17 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::print_vector(std::ostream &stream, bool truncate) const {
-    casadi_assert(is_column(), "Not a vector");
+    print_vector(stream, sparsity(), ptr(), truncate);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_vector(std::ostream &stream, const Sparsity& sp,
+      const Scalar* nonzeros, bool truncate) {
+    casadi_assert(sp.is_column(), "Not a vector");
 
     // Get components
     std::vector<std::string> nz, inter;
-    print_split(nz, inter);
+    print_split(sp.nnz(), nonzeros, nz, inter);
 
     // Print intermediate expressions
     for (casadi_int i=0; i<inter.size(); ++i)
@@ -633,9 +639,9 @@ namespace casadi {
     inter.clear();
 
     // Access data structures
-    const casadi_int* row = this->row();
-    casadi_int nnz = this->nnz();
-    casadi_int size1 = this->size1();
+    const casadi_int* row = sp.row();
+    casadi_int nnz = sp.nnz();
+    casadi_int size1 = sp.size1();
 
     // No need to truncate if less than 1000 entries
     const casadi_int max_numel = 1000;
@@ -678,6 +684,28 @@ namespace casadi {
                                     std::vector<std::string>& inter) const {
 
     print_split(nnz(), ptr(), nz, inter);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_default(std::ostream &stream, const Sparsity& sp,
+      const Scalar* nonzeros, bool truncate) {
+    if (sp.is_empty()) {
+      stream << "[]";
+    } else if (sp.numel()==1) {
+      if (sp.nnz()==0) {
+        stream << "00";
+      } else {
+        print_scalar(stream, *nonzeros);
+      }
+    } else if (sp.is_column()) {
+      print_vector(stream, sp, nonzeros, truncate);
+    } else if (std::max(sp.size1(), sp.size2())<=10 ||
+        static_cast<double>(sp.nnz())/static_cast<double>(sp.numel())>=0.5) {
+      // if "small" or "dense"
+      print_dense(stream, sp, nonzeros, truncate);
+    } else {
+      print_sparse(stream, sp, nonzeros, truncate);
+    }
   }
 
   template<typename Scalar>
@@ -860,19 +888,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::disp(std::ostream& stream, bool more) const {
-    if (is_empty()) {
-      stream << "[]";
-    } else if (numel()==1) {
-      print_scalar(stream);
-    } else if (is_column()) {
-      print_vector(stream);
-    } else if (std::max(size1(), size2())<=10 ||
-        static_cast<double>(nnz())/static_cast<double>(numel())>=0.5) {
-      // if "small" or "dense"
-      print_dense(stream);
-    } else {
-      print_sparse(stream);
-    }
+    print_default(stream, sparsity(), ptr());
   }
 
   template<typename Scalar>

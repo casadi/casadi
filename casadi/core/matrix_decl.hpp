@@ -824,8 +824,16 @@ namespace casadi {
     void print_sparse(std::ostream &stream, bool truncate=true) const;
 
 #ifndef SWIG
+    /// Print default style
+    static void print_default(std::ostream &stream, const Sparsity& sp, const Scalar* nonzeros,
+      bool truncate=true);
+
     /// Print scalar
     static void print_scalar(std::ostream &stream, const Scalar& e);
+
+    /// Print vector-style
+    static void print_vector(std::ostream &stream, const Sparsity& sp, const Scalar* nonzeros,
+      bool truncate=true);
 
     /// Print scalar
     static void print_sparse(std::ostream &stream, const Sparsity& sp, const Scalar* nonzeros,

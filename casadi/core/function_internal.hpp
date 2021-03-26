@@ -1016,8 +1016,10 @@ namespace casadi {
 
     /** \brief Deserialize with type disambiguation */
     static Function deserialize(DeserializingStream& s);
-
     static std::map<std::string, ProtoFunction* (*)(DeserializingStream&)> deserialize_map;
+
+    /** \brief Print inputs */
+    void print_in(std::ostream &stream, const double** arg, bool truncate) const;
 
   protected:
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
