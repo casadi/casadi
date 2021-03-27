@@ -51,4 +51,9 @@
   Since Rγ(x) = γ⁻¹ (x - Tγ(x)) = γ⁻¹ (x - Π(x - γ∇ψ(x))), and if we're not 
   at the boundaries of the feasible set, Π(x - γ∇ψ(x)) = x - γ∇ψ(x), and 
   Rγ(x) = γ⁻¹ (-γ∇ψ(x)) = ∇ψ(x) which is independent of γ.
-  This might be useful for Anderson as well.
+  This might be useful for Anderson as well.  
+  _Update: I tried this for Anderson, and it nicely speeds up the algorithm and results in more test problems converging._
+- Trust region? Lancelot?
+- Does it make sense to include the Wolfe curvature condition in our line
+  search? Maybe this results in fewer L-BFGS updates being rejected? This
+  condition can be evaluated relatively inexpensively.
