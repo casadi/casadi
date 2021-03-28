@@ -171,11 +171,13 @@ TEST(LimitedMemoryQR, solve) {
     std::cout << std::setprecision(16) << std::scientific;
     pa::LimitedMemoryQR qr(4, 3);
 
+    qr.add_column(vec::Constant(4, 13));
     qr.add_column(A.col(0));
     qr.add_column(A.col(1));
+    qr.remove_column();
     qr.add_column(A.col(2));
-    EXPECT_THAT(print_wrap(A.block(0, 0, 4, 3)),
-                EigenAlmostEqual(print_wrap(qr.get_Q() * qr.get_R()), ε));
+    EXPECT_THAT(print_wrap(qr.get_Q() * qr.get_R()),
+                EigenAlmostEqual(print_wrap(A.block(0, 0, 4, 3)), ε));
 
     mat b(4, 2);
     b << 1, 2, 3, 4, //
@@ -189,6 +191,31 @@ TEST(LimitedMemoryQR, solve) {
     mat x_exp = A.householderQr().solve(b);
     std::cout << "x_exp:\n" << x_exp.transpose() << std::endl;
 
-    EXPECT_THAT(print_wrap(x_exp), EigenAlmostEqual(print_wrap(x1), ε));
-    EXPECT_THAT(print_wrap(x_exp), EigenAlmostEqual(print_wrap(x2), ε));
+    EXPECT_THAT(print_wrap(x1), EigenAlmostEqual(print_wrap(x_exp), ε));
+    EXPECT_THAT(print_wrap(x2), EigenAlmostEqual(print_wrap(x_exp), ε));
+}
+
+TEST(LimitedMemoryQR, scale_R) {
+    using pa::mat;
+    using pa::real_t;
+    using pa::vec;
+
+    mat A(4, 3);
+    A << 3, 3, 2, //
+        4, 4, 1,  //
+        0, 6, 2,  //
+        0, 8, 1;
+
+    constexpr real_t ε = 1e-15;
+    std::cout << std::setprecision(16) << std::scientific;
+    pa::LimitedMemoryQR qr(4, 3);
+
+    qr.add_column(vec::Constant(4, 13));
+    qr.add_column(A.col(0));
+    qr.add_column(A.col(1));
+    qr.remove_column();
+    qr.add_column(A.col(2));
+    qr.scale_R(0.5);
+    EXPECT_THAT(print_wrap(qr.get_Q() * qr.get_R()),
+                EigenAlmostEqual(print_wrap(0.5 * A.block(0, 0, 4, 3)), ε));
 }

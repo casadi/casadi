@@ -1,6 +1,6 @@
 #include <Eigen/Jacobi>
-#include <Eigen/src/Core/util/Meta.h>
 #include <cstddef>
+#include <panoc-alm/util/ringbuffer.hpp>
 #include <panoc-alm/util/vec.hpp>
 
 namespace pa {
@@ -110,25 +110,46 @@ class LimitedMemoryQR {
 
     /// Solve the least squares problem Ax = b.
     template <class VecB, class VecX>
-    void solve(const VecB &B, VecX &X) const {
-        for (Eigen::Index i = 0; i < B.cols(); ++i) {
-            size_t r = q_idx;
-            size_t c = r_pred(r_idx_end);
-            while (r-- > 0) {
-                X(r, i)   = Q.col(r).transpose() * B.col(i);
-                size_t jr = r_succ(c);
-                size_t jx = r + 1;
-                while (jx < q_idx) {
-                    X(r, i) -= R(r, jr) * X(jx, i);
-                    jr = r_succ(jr);
-                    ++jx;
-                }
-                X(r, i) /= R(r, c);
-                c = r_pred(c);
+    void solve_col(const VecB &b, VecX &x) const {
+        // Iterate over the diagonal of R, starting at the bottom right,
+        // this is standard back substitution
+        // (recall that R is stored in a circular buffer, so R.col(i) is
+        // not the mathematical i-th column)
+        auto rev_bgn = ring_reverse_iter().begin();
+        auto rev_end = ring_reverse_iter().end();
+        auto fwd_end = ring_iter().end();
+        for (auto it_d = rev_bgn; it_d != rev_end; ++it_d) {
+            // Row/column index of diagonal element of R
+            auto [rR, cR] = *it_d;
+            // (r is the zero-based mathematical index, c is the index in
+            // the circular buffer)
+            x(rR) = Q.col(rR).transpose() * b; // Compute rhs Qᵀb
+            // In the current row of R, iterate over the elements to the
+            // right of the diagonal
+            // Iterating from left to right seems to give better results
+            for (auto it_c = it_d.forwardit; it_c != fwd_end; ++it_c) {
+                auto [rX2, cR2] = *it_c;
+                x(rR) -= R(rR, cR2) * x(rX2);
             }
+            x(rR) /= R(rR, cR); // Divide by diagonal element
         }
     }
-    /// Solve the least squares problem Ax = b.
+
+    /// Solve the least squares problem AX = B.
+    template <class MatB, class MatX>
+    void solve(const MatB &B, MatX &X) const {
+        assert(B.cols() <= X.cols());
+        assert(B.rows() >= Q.rows());
+        assert(X.rows() >= Eigen::Index(num_columns()));
+        // Each column of the right hand side is solved as an individual system
+        for (Eigen::Index cB = 0; cB < B.cols(); ++cB) {
+            auto b = B.col(cB);
+            auto x = X.col(cB);
+            solve_col(b, x);
+        }
+    }
+
+    /// Solve the least squares problem AX = B.
     mat solve(const mat &B) {
         mat X(m(), B.cols());
         solve(B, X);
@@ -157,7 +178,7 @@ class LimitedMemoryQR {
             return R;
         // Using a permutation matrix here isn't as efficient as rotating the
         // matrix manually, but this function is only used in tests, so it
-        // shoudln't matter.
+        // shouldn't matter.
         Eigen::PermutationMatrix<Eigen::Dynamic> P(R.cols());
         P.setIdentity();
         std::rotate(P.indices().data(), P.indices().data() + r_idx_start,
@@ -175,12 +196,10 @@ class LimitedMemoryQR {
     /// @note   Meant for tests only, creates a copy.
     mat get_Q() const { return Q.block(0, 0, n(), q_idx); }
 
+    /// Multiply the matrix R by a scalar.
     void scale_R(real_t scal) {
-        size_t r_idx = r_idx_start;
-        for (size_t i = 0; i < q_idx; ++i) {
+        for (auto [i, r_idx] : ring_iter())
             R.col(r_idx).topRows(i + 1) *= scal;
-            r_idx = r_succ(r_idx);
-        }
     }
 
     /// Get the number of MGS reorthogonalizations.
@@ -216,6 +235,15 @@ class LimitedMemoryQR {
     size_t ring_next(size_t i) const { return r_succ(i); }
     /// Get the previous index in the circular buffer.
     size_t ring_prev(size_t i) const { return r_pred(i); }
+
+    /// Get iterators in the circular buffer.
+    CircularRange<size_t> ring_iter() const {
+        return {q_idx, r_idx_start, r_idx_end, m()};
+    }
+    /// Get reverse iterators in the circular buffer.
+    ReverseCircularRange<size_t> ring_reverse_iter() const {
+        return ring_iter();
+    }
 
   private:
     mat Q; ///< Storage for orthogonal factor Q.
