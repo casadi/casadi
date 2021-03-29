@@ -119,6 +119,9 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override;
 
+    // Get all embedded functions, recursively
+    void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
+
   protected:
     /** \brief Deserializing constructor */
     explicit Switch(DeserializingStream& s);

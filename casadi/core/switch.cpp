@@ -483,4 +483,12 @@ namespace casadi {
             {"f_def", f_def_}, {"f", f_}};
   }
 
+  void Switch::find(std::map<FunctionInternal*, Function>& all_fun,
+      casadi_int max_depth) const {
+    for (const Function& f_k : f_) {
+      if (!f_k.is_null()) add_embedded(all_fun, f_k, max_depth);
+    }
+    if (!f_def_.is_null()) add_embedded(all_fun, f_def_, max_depth);
+  }
+
 } // namespace casadi
