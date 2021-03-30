@@ -689,7 +689,9 @@ namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::print_default(std::ostream &stream, const Sparsity& sp,
       const Scalar* nonzeros, bool truncate) {
-    if (sp.is_empty()) {
+    if (nonzeros == 0) {
+      stream << "NULL";
+    } else if (sp.is_empty()) {
       stream << "[]";
     } else if (sp.numel()==1) {
       if (sp.nnz()==0) {

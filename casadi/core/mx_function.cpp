@@ -61,7 +61,10 @@ namespace casadi {
         "Default input values"}},
       {"live_variables",
        {OT_BOOL,
-        "Reuse variables in the work vector"}}
+        "Reuse variables in the work vector"}},
+      {"print_instructions",
+       {OT_BOOL,
+        "Print each operation during evaluation"}}
      }
   };
 
@@ -69,6 +72,7 @@ namespace casadi {
     Dict opts = FunctionInternal::generate_options(is_temp);
     //opts["default_in"] = default_in_;
     opts["live_variables"] = live_variables_;
+    opts["print_instructions"] = print_instructions_;
     return opts;
   }
 
@@ -103,6 +107,7 @@ namespace casadi {
 
     // Default (temporary) options
     live_variables_ = true;
+    print_instructions_ = false;
 
     // Read options
     for (auto&& op : opts) {
@@ -110,6 +115,8 @@ namespace casadi {
         default_in_ = op.second;
       } else if (op.first=="live_variables") {
         live_variables_ = op.second;
+      } else if (op.first=="print_instructions") {
+        print_instructions_ = op.second;
       }
     }
 
@@ -404,9 +411,13 @@ namespace casadi {
                    + str(free_vars_) + " are free.");
     }
 
+    // Operation number (for printing)
+    casadi_int k = 0;
+
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
     for (auto&& e : algorithm_) {
+      // Perform the operation
       if (e.op==OP_INPUT) {
         // Pass an input
         double *w1 = w+workloc_[e.res.front()];
@@ -433,8 +444,12 @@ namespace casadi {
           res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
 
         // Evaluate
+        if (print_instructions_) print_arg(uout(), k, e, arg1);
         if (e.data->eval(arg1, res1, iw, w)) return 1;
+        if (print_instructions_) print_res(uout(), k, e, res1);
       }
+      // Increase counter
+      k++;
     }
     return 0;
   }
@@ -481,6 +496,26 @@ namespace casadi {
       s << el.data->disp(arg);
     }
     return s.str();
+  }
+
+  void MXFunction::print_arg(std::ostream &stream, casadi_int k, const AlgEl& el,
+      const double** arg) const {
+    stream << name_ << ":" << k << ": " << print(el) << " inputs:" << std::endl;
+    for (size_t i = 0; i < el.arg.size(); ++i) {
+      stream << i << ": ";
+      DM::print_default(stream, el.data->dep(i).sparsity(), arg[i], true);
+      stream << std::endl;
+    }
+  }
+
+  void MXFunction::print_res(std::ostream &stream, casadi_int k, const AlgEl& el,
+      double** res) const {
+    stream << name_ << ":" << k << ": " << print(el) << " outputs:" << std::endl;
+    for (size_t i = 0; i < el.res.size(); ++i) {
+      stream << i << ": ";
+      DM::print_default(stream, el.data->sparsity(i), res[i], true);
+      stream << std::endl;
+    }
   }
 
   void MXFunction::disp_more(ostream &stream) const {
@@ -1693,7 +1728,7 @@ namespace casadi {
   void MXFunction::serialize_body(SerializingStream &s) const {
     XFunction<MXFunction, MX, MXNode>::serialize_body(s);
 
-    s.version("MXFunction", 1);
+    s.version("MXFunction", 2);
     s.pack("MXFunction::n_instr", algorithm_.size());
 
     // Loop over algorithm
@@ -1707,13 +1742,14 @@ namespace casadi {
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
     s.pack("MXFunction::live_variables", live_variables_);
+    s.pack("MXFunction::print_instructions", print_instructions_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_serialize_members(s);
   }
 
 
   MXFunction::MXFunction(DeserializingStream& s) : XFunction<MXFunction, MX, MXNode>(s) {
-    s.version("MXFunction", 1);
+    int version = s.version("MXFunction", 1, 2);
     size_t n_instructions;
     s.unpack("MXFunction::n_instr", n_instructions);
     algorithm_.resize(n_instructions);
@@ -1729,6 +1765,8 @@ namespace casadi {
     s.unpack("MXFunction::free_vars", free_vars_);
     s.unpack("MXFunction::default_in", default_in_);
     s.unpack("MXFunction::live_variables", live_variables_);
+    print_instructions_ = false;
+    if (version >= 2) s.unpack("MXFunction::print_instructions", print_instructions_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
   }
@@ -1741,6 +1779,16 @@ namespace casadi {
       casadi_int max_depth) const {
     for (auto&& e : algorithm_) {
       if (e.op == OP_CALL) add_embedded(all_fun, e.data.which_function(), max_depth);
+    }
+  }
+
+  void MXFunction::change_option(const std::string& option_name,
+      const GenericType& option_value) {
+    if (option_name == "print_instructions") {
+      print_instructions_ = option_value;
+    } else {
+      // Option not found - continue to base classes
+      XFunction<MXFunction, MX, MXNode>::change_option(option_name, option_value);
     }
   }
 

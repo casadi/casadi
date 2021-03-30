@@ -80,6 +80,9 @@ namespace casadi {
     /// Live variables?
     bool live_variables_;
 
+    /// Print instructions during evaluation
+    bool print_instructions_;
+
     /** \brief Constructor */
     MXFunction(const std::string& name,
       const std::vector<MX>& input, const std::vector<MX>& output,
@@ -170,6 +173,12 @@ namespace casadi {
     // print an element of an algorithm
     std::string print(const AlgEl& el) const;
 
+    // Print the input arguments of an instruction
+    void print_arg(std::ostream &stream, casadi_int k, const AlgEl& el, const double** arg) const;
+
+    // Print the output arguments of an instruction
+    void print_res(std::ostream &stream, casadi_int k, const AlgEl& el, double** res) const;
+
     ///@{
     /** \brief Get function input(s) and output(s)  */
     const MX mx_in(casadi_int ind) const override;
@@ -218,6 +227,9 @@ namespace casadi {
 
     // Get all embedded functions, recursively
     void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
+
+    /** \brief Change option after object creation for debugging */
+    virtual void change_option(const std::string& option_name, const GenericType& option_value);
 
   protected:
     /** \brief Deserializing constructor */
