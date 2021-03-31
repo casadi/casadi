@@ -53,8 +53,8 @@ TEST(PANOC, quadratic) {
     pa_ref::PANOCSolver solver{params};
 
     vec y₀ = vec::Ones(m);
-    vec y = y₀;
-    vec x = vec(n);
+    vec y  = y₀;
+    vec x  = vec(n);
     x << 1;
     vec err_z = vec::Constant(m, NaN);
 
@@ -63,12 +63,12 @@ TEST(PANOC, quadratic) {
 
     real_t ε = 1e-10;
 
-    auto stats = solver(p, Σ, ε, x, y, err_z);
+    auto stats = solver(p, Σ, ε, true, x, y, err_z);
 
     std::cout << std::setprecision(17);
 
     vec gg = g_fun(x);
-    vec z = pa::project(gg + Σ.asDiagonal().inverse() * y₀, D);
+    vec z  = pa::project(gg + Σ.asDiagonal().inverse() * y₀, D);
     std::cout << "\n===========\n" << std::endl;
     std::cout << "f(x)     = " << obj_f(x) << std::endl;
     std::cout << "x        = " << x.transpose() << std::endl;
@@ -78,7 +78,7 @@ TEST(PANOC, quadratic) {
     std::cout << "g(x) - z = " << err_z.transpose() << std::endl;
     std::cout << "Iter:   " << stats.iterations << std::endl;
     std::cout << "Status: " << stats.status << std::endl << std::endl;
-    
+
     EXPECT_NEAR(x(0), 6, 2e-5);
     EXPECT_NEAR(y(0), -2, 2e-5);
     EXPECT_THAT(print_wrap(err_z), EigenAlmostEqual(gg - z, 1e-15));

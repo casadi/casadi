@@ -55,7 +55,7 @@ TEST(PANOC, cosh1D) {
 
     real_t ε = 1e-4;
 
-    auto stats = solver(p, Σ, ε, x, y, err_z);
+    auto stats = solver(p, Σ, ε, true, x, y, err_z);
 
     std::cout << "\n===========\n" << std::endl;
     std::cout << "f(x)     = " << obj_f(x) << std::endl;

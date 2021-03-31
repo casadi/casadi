@@ -20,12 +20,13 @@ class PANOCSolver {
 
     PANOCSolver(Params params) : params(params) {}
 
-    Stats operator()(const Problem &problem, // in
-                     const vec &Σ,           // in
-                     real_t ε,               // in
-                     vec &x,                 // inout
-                     vec &y,                 // inout
-                     vec &err_z);            // out
+    Stats operator()(const Problem &problem,        // in
+                     const vec &Σ,                  // in
+                     real_t ε,                      // in
+                     bool always_overwrite_results, // in
+                     vec &x,                        // inout
+                     vec &y,                        // inout
+                     vec &err_z);                   // out
 
     void stop() { stop_signal.store(true, std::memory_order_relaxed); }
 

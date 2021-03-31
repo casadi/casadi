@@ -22,9 +22,11 @@ PANOCSolver<DirectionProviderT>::operator()(
     const Problem &problem, ///< [in]    Problem description
     const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
     real_t ε,               ///< [in]    Tolerance @f$ \epsilon @f$
-    vec &x,                 ///< [inout] Decision variable @f$ x @f$
-    vec &y,                 ///< [inout] Lagrange multipliers @f$ y @f$
-    vec &err_z              ///< [out]   Slack variable error @f$ g(x) - z @f$
+    bool
+        always_overwrite_results, ///< [in] Overwrite x, y and err_z even if not converged
+    vec &x,                       ///< [inout] Decision variable @f$ x @f$
+    vec &y,                       ///< [inout] Lagrange multipliers @f$ y @f$
+    vec &err_z ///< [out]   Slack variable error @f$ g(x) - z @f$
 ) {
     using Direction = PANOCDirection<DirectionProvider>;
     auto start_time = std::chrono::steady_clock::now();
@@ -93,12 +95,11 @@ PANOCSolver<DirectionProviderT>::operator()(
     // Estimate Lipschitz constant ---------------------------------------------
 
     // Finite difference approximation of ∇²ψ in starting point
-    vec h(n);
-    h = (x * params.Lipschitz.ε).cwiseAbs().cwiseMax(params.Lipschitz.δ);
-    x += h;
+    auto h = (xₖ * params.Lipschitz.ε).cwiseAbs().cwiseMax(params.Lipschitz.δ);
+    xₖ₊₁ = xₖ + h;
 
     // Calculate ∇ψ(x₀ + h)
-    calc_grad_ψ(x, /* in ⟹ out */ grad_ψₖ₊₁);
+    calc_grad_ψ(xₖ₊₁, /* in ⟹ out */ grad_ψₖ₊₁);
 
     // Calculate ψ(xₖ), ∇ψ(x₀)
     real_t ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
@@ -191,9 +192,11 @@ PANOCSolver<DirectionProviderT>::operator()(
             //       It saves 1 evaluation of g per ALM iteration, but requires
             //       many extra stores in the inner loops of PANOC.
             // TODO: move the computation of ẑ and g(x) to ALM?
-            calc_err_z(x̂ₖ, /* in ⟹ out */ err_z);
-            x              = std::move(x̂ₖ);
-            y              = std::move(ŷx̂ₖ);
+            if (conv || interrupted || always_overwrite_results) {
+                calc_err_z(x̂ₖ, /* in ⟹ out */ err_z);
+                x = std::move(x̂ₖ);
+                y = std::move(ŷx̂ₖ);
+            }
             s.iterations   = k; // TODO: what do we count as an iteration?
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<microseconds>(time_elapsed);

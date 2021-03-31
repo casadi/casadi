@@ -4,9 +4,9 @@
 #include <panoc-alm-ref/fd.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
 
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 
 using pa::inf;
 using pa::Problem;
@@ -251,8 +251,8 @@ TEST(PANOC, ref) {
 
     real_t ε = 1e-8;
 
-    auto stats     = solver(p, Σ, ε, x, λ, err_z);
-    auto stats_ref = solver_ref(p, Σ, ε, x_ref, λ_ref, err_z_ref);
+    auto stats     = solver(p, Σ, ε, true, x, λ, err_z);
+    auto stats_ref = solver_ref(p, Σ, ε, true, x_ref, λ_ref, err_z_ref);
 
     std::cout << "Optimized" << std::endl;
     std::cout << "u = " << u(x).transpose() << "\ts = " << s(x).transpose()

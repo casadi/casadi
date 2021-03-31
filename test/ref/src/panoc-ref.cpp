@@ -1,5 +1,5 @@
-#include <panoc-alm/inner/directions/lbfgs.hpp>
 #include <panoc-alm-ref/panoc-ref.hpp>
+#include <panoc-alm/inner/directions/lbfgs.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -106,9 +106,11 @@ PANOCSolver::Stats PANOCSolver::operator()(
     const Problem &problem, ///< [in]    Problem description
     const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
     real_t ε,               ///< [in]    Tolerance @f$ \epsilon @f$
-    vec &x,                 ///< [inout] Decision variable @f$ x @f$
-    vec &y,                 ///< [inout] Lagrange multiplier @f$ x @f$
-    vec &err_z              ///< [out]   Slack variable error @f$ g(x) - z @f$
+    bool
+        always_overwrite_results, ///< [in] Overwrite x, y and err_z even if not converged
+    vec &x,                       ///< [inout] Decision variable @f$ x @f$
+    vec &y,                       ///< [inout] Lagrange multiplier @f$ x @f$
+    vec &err_z ///< [out]   Slack variable error @f$ g(x) - z @f$
 ) {
     using namespace detail;
     auto start_time = std::chrono::steady_clock::now();
@@ -121,7 +123,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
     vec xₖ = x; // Value of x at the beginning of the iteration
 
-    real_t Lₖ = estimate_lipschitz(problem, x, y, Σ, params);
+    real_t Lₖ = estimate_lipschitz(problem, xₖ, y, Σ, params);
     if (Lₖ < 10 * std::numeric_limits<real_t>::epsilon())
         Lₖ = 10 * std::numeric_limits<real_t>::epsilon();
     real_t γₖ = params.Lipschitz.Lγ_factor / Lₖ;
@@ -155,9 +157,11 @@ PANOCSolver::Stats PANOCSolver::operator()(
         bool not_finite   = not std::isfinite(εₖ);
         bool conv         = εₖ <= ε;
         if (conv || out_of_iter || out_of_time || not_finite || interrupted) {
-            err_z = eval_g(problem, x̂ₖ) - eval_ẑ(problem, x̂ₖ, y, Σ);
-            y     = eval_ŷ(problem, x̂ₖ, y, Σ);
-            x     = std::move(x̂ₖ);
+            if (conv || interrupted || always_overwrite_results) {
+                err_z = eval_g(problem, x̂ₖ) - eval_ẑ(problem, x̂ₖ, y, Σ);
+                y     = eval_ŷ(problem, x̂ₖ, y, Σ);
+                x     = std::move(x̂ₖ);
+            }
             s.iterations   = k; // TODO: what do we count as an iteration?
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<microseconds>(time_elapsed);

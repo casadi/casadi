@@ -40,12 +40,13 @@ class LBFGSSolver {
 
     LBFGSSolver(Params params) : params(params) {}
 
-    Stats operator()(const Problem &problem, // in
-                     const vec &Σ,           // in
-                     real_t ε,               // in
-                     vec &x,                 // inout
-                     vec &y,                 // inout
-                     vec &err_z              // out
+    Stats operator()(const Problem &problem,        // in
+                     const vec &Σ,                  // in
+                     real_t ε,                      // in
+                     bool always_overwrite_results, // in
+                     vec &x,                        // inout
+                     vec &y,                        // inout
+                     vec &err_z                     // out
     ) {
         Stats s;
         auto start_time = std::chrono::steady_clock::now();
@@ -58,9 +59,10 @@ class LBFGSSolver {
         };
         real_t ψ٭;
         params.epsilon = ε;
+        vec x٭         = x;
         try {
             LBFGSpp::LBFGSSolver<double> solver(params);
-            s.iterations = solver.minimize(calc_ψ_grad_ψ, x, ψ٭);
+            s.iterations = solver.minimize(calc_ψ_grad_ψ, x٭, ψ٭);
             s.status     = SolverStatus::Converged; // TODO: <?>
         } catch (std::runtime_error &) {
             s.status = SolverStatus::MaxIter;
@@ -72,12 +74,17 @@ class LBFGSSolver {
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         s.elapsed_time    = duration_cast<microseconds>(time_elapsed);
         s.ε               = ε; // TODO: <?>
-        // TODO: could be optimized
-        work_m.swap(y);
-        (void)detail::calc_ψ_ŷ(problem, x, work_m, Σ, y);
-        detail::calc_err_z(problem, x, work_m, Σ, err_z);
         if (stop_signal.stop_requested())
             s.status = SolverStatus::Interrupted;
+        bool conv        = s.status == SolverStatus::Converged;
+        bool interrupted = s.status == SolverStatus::Interrupted;
+        if (conv || interrupted || always_overwrite_results) {
+            x٭.swap(x);
+            work_m.swap(y);
+            // TODO: could be optimized
+            (void)detail::calc_ψ_ŷ(problem, x, work_m, Σ, y);
+            detail::calc_err_z(problem, x, work_m, Σ, err_z);
+        }
         return s;
     }
 
@@ -115,12 +122,13 @@ class LBFGSBSolver {
 
     LBFGSBSolver(Params params) : params(params) {}
 
-    Stats operator()(const Problem &problem, // in
-                     const vec &Σ,           // in
-                     real_t ε,               // in
-                     vec &x,                 // inout
-                     vec &y,                 // inout
-                     vec &err_z              // out
+    Stats operator()(const Problem &problem,        // in
+                     const vec &Σ,                  // in
+                     real_t ε,                      // in
+                     bool always_overwrite_results, // in
+                     vec &x,                        // inout
+                     vec &y,                        // inout
+                     vec &err_z                     // out
     ) {
         Stats s;
         auto start_time = std::chrono::steady_clock::now();
@@ -133,10 +141,11 @@ class LBFGSBSolver {
         };
         real_t ψ٭;
         params.epsilon = ε;
+        vec x٭         = x;
         try {
             LBFGSpp::LBFGSBSolver<double> solver(params);
             s.iterations =
-                solver.minimize(calc_ψ_grad_ψ, x, ψ٭, problem.C.lowerbound,
+                solver.minimize(calc_ψ_grad_ψ, x٭, ψ٭, problem.C.lowerbound,
                                 problem.C.upperbound);
             s.status = SolverStatus::Converged; // TODO: <?>
         } catch (std::runtime_error &) {
@@ -149,12 +158,17 @@ class LBFGSBSolver {
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         s.elapsed_time    = duration_cast<microseconds>(time_elapsed);
         s.ε               = ε; // TODO: <?>
-        // TODO: could be optimized
-        work_m.swap(y);
-        (void)detail::calc_ψ_ŷ(problem, x, work_m, Σ, y);
-        detail::calc_err_z(problem, x, work_m, Σ, err_z);
         if (stop_signal.stop_requested())
             s.status = SolverStatus::Interrupted;
+        bool conv        = s.status == SolverStatus::Converged;
+        bool interrupted = s.status == SolverStatus::Interrupted;
+        if (conv || interrupted || always_overwrite_results) {
+            x٭.swap(x);
+            work_m.swap(y);
+            // TODO: could be optimized
+            (void)detail::calc_ψ_ŷ(problem, x, work_m, Σ, y);
+            detail::calc_err_z(problem, x, work_m, Σ, err_z);
+        }
         return s;
     }
 

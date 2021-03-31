@@ -54,12 +54,13 @@ class PGA {
         unsigned lbfgs_rejected      = 0; // TODO: unused
     };
 
-    Stats operator()(const Problem &problem, // in
-                     const vec &Σ,           // in
-                     real_t ε,               // in
-                     vec &x,                 // inout
-                     vec &λ,                 // inout
-                     vec &err_z);            // out
+    Stats operator()(const Problem &problem,        // in
+                     const vec &Σ,                  // in
+                     real_t ε,                      // in
+                     bool always_overwrite_results, // in
+                     vec &x,                        // inout
+                     vec &λ,                        // inout
+                     vec &err_z);                   // out
 
     std::string get_name() const { return "PGA"; }
 
@@ -75,12 +76,13 @@ class PGA {
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
-inline PGA::Stats PGA::operator()(const Problem &problem, // in
-                                  const vec &Σ,           // in
-                                  real_t ε,               // in
-                                  vec &x,                 // inout
-                                  vec &y,                 // inout
-                                  vec &err_z              // out
+inline PGA::Stats PGA::operator()(const Problem &problem,        // in
+                                  const vec &Σ,                  // in
+                                  real_t ε,                      // in
+                                  bool always_overwrite_results, // in
+                                  vec &x,                        // inout
+                                  vec &y,                        // inout
+                                  vec &err_z                     // out
 ) {
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
@@ -136,12 +138,11 @@ inline PGA::Stats PGA::operator()(const Problem &problem, // in
     // Estimate Lipschitz constant ---------------------------------------------
 
     // Finite difference approximation of ∇²ψ in starting point
-    vec h(n);
-    h = (x * params.Lipschitz.ε).cwiseAbs().cwiseMax(params.Lipschitz.δ);
-    x += h;
+    auto h = (xₖ * params.Lipschitz.ε).cwiseAbs().cwiseMax(params.Lipschitz.δ);
+    x̂ₖ     = xₖ + h;
 
     // Calculate ∇ψ(x₀ + h)
-    calc_grad_ψ(x, /* in ⟹ out */ grad_ψx̂ₖ);
+    calc_grad_ψ(x̂ₖ, /* in ⟹ out */ grad_ψx̂ₖ);
 
     // Calculate ∇ψ(x₀)
     real_t ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
@@ -217,9 +218,11 @@ inline PGA::Stats PGA::operator()(const Problem &problem, // in
             //       It saves 1 evaluation of g per ALM iteration, but requires
             //       many extra stores in the inner loops.
             // TODO: move the computation of ẑ and g(x) to ALM?
-            calc_err_z(x̂ₖ, /* in ⟹ out */ err_z);
-            x              = std::move(x̂ₖ);
-            y              = std::move(ŷₖ);
+            if (conv || interrupted || always_overwrite_results) {
+                calc_err_z(x̂ₖ, /* in ⟹ out */ err_z);
+                x = std::move(x̂ₖ);
+                y = std::move(ŷₖ);
+            }
             s.iterations   = k; // TODO: what do we count as an iteration?
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<microseconds>(time_elapsed);

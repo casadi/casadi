@@ -21,15 +21,20 @@ inline void project_y(vec &y,          // inout
     y = y.binaryExpr(z_lb, max_lb).binaryExpr(z_ub, min_ub);
 }
 
-inline void update_penalty_weights(const ALMParams &params, unsigned iteration,
-                                   vec &e, vec &old_e, real_t norm_e, vec &Σ) {
-    if (norm_e <= params.δ)
+inline void update_penalty_weights(const ALMParams &params, real_t Δ,
+                                   bool first_iter, vec &e, vec &old_e,
+                                   real_t norm_e, const vec &Σ_old, vec &Σ) {
+    if (norm_e <= params.δ) {
+        Σ = Σ_old;
         return;
+    }
     for (Eigen::Index i = 0; i < e.rows(); ++i) {
-        if (iteration == 0 || std::abs(e(i)) > params.θ * std::abs(old_e(i))) {
-            Σ(i) = std::fmin(params.Σₘₐₓ,
-                             std::fmax(params.Δ * std::abs(e(i)) / norm_e, 1) *
-                                 Σ(i));
+        if (first_iter || std::abs(e(i)) > params.θ * std::abs(old_e(i))) {
+            Σ(i) =
+                std::fmin(params.Σₘₐₓ,
+                          std::fmax(Δ * std::abs(e(i)) / norm_e, 1) * Σ_old(i));
+        } else {
+            Σ(i) = Σ_old(i);
         }
     }
 }

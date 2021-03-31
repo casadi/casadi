@@ -1,9 +1,11 @@
-from os.path import join, basename, splitext
+from os.path import join, basename, splitext, exists
 from glob import glob
 import yaml
 import pandas as pd
 
 def load_raw_data(folder):
+    if not exists(folder):
+        raise FileNotFoundError(folder)
     output_files = glob(join(folder, '*.yaml'))
     raw_data = {}
     for filename in output_files:
@@ -27,6 +29,8 @@ def convert_data(raw_data):
             'inner iterations': content['inner iterations'],
             'outer iterations': content['outer iterations'],
             'inner convergence failures': content['inner convergence failures'],
+            'initial penalty reduced': content.get('initial penalty reduced', -1),
+            'penalty reduced': content.get('penalty reduced', -1),
             'f': float(content['f']),
             'ε': float(content['ε']),
             'δ': float(content['δ']),

@@ -145,9 +145,9 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PGAParams &p) {
 #elif SOLVER == SOLVER_GAAPGA
 auto get_inner_solver() {
     pa::GuardedAAPGAParams params;
-    params.max_iter      = 1000;
-    params.limitedqr_mem = 20;
-    // params.full_flush_on_γ_change = false;
+    params.max_iter               = 1000;
+    params.limitedqr_mem          = 20;
+    params.full_flush_on_γ_change = false;
 
     return Solver::InnerSolver(params);
 }
@@ -189,13 +189,20 @@ int main(int argc, char *argv[]) {
     }
 
     pa::ALMParams almparams;
-    almparams.max_iter        = 200;
-    almparams.max_time        = 1min + 30s;
+    almparams.max_iter = 240;
+    almparams.max_time = 30s;
+    // almparams.max_time        = 1min + 30s;
     almparams.preconditioning = false;
     // almparams.print_interval  = 1;
-    // almparams.Σ₀ = 1e-2;
+    almparams.Σ₀                      = 1;
+    almparams.Δ                       = 10;
+    almparams.max_num_initial_retries = 20;
+    almparams.max_num_retries         = 20;
+    almparams.max_total_num_retries   = 40;
+    almparams.Δ_lower                 = 0.8;
+    almparams.ρ_increase              = 2;
+    // almparams.σ₀ = 2e-1;
     // almparams.ε₀ = 1e-5;
-    // almparams.Δ = 1.1;
 
     Solver solver{almparams, get_inner_solver()};
 
@@ -248,6 +255,10 @@ int main(int argc, char *argv[]) {
         << status.inner_iterations;
     out << YAML::Key << "inner convergence failures" << YAML::Value
         << status.inner_convergence_failures;
+    out << YAML::Key << "initial penalty reduced" << YAML::Value
+        << status.initial_penalty_reduced;
+    out << YAML::Key << "penalty reduced" << YAML::Value
+        << status.penalty_reduced;
     out << YAML::Key << "elapsed time" << YAML::Value
         << std::chrono::duration<double>(status.elapsed_time).count();
     out << YAML::Key << "ε" << YAML::Value << status.ε;

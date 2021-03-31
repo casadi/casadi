@@ -91,15 +91,24 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::ALMParams &p) {
     out << YAML::Key << "ε" << YAML::Value << p.ε;
     out << YAML::Key << "δ" << YAML::Value << p.δ;
     out << YAML::Key << "Δ" << YAML::Value << p.Δ;
+    out << YAML::Key << "Δ_lower" << YAML::Value << p.Δ_lower;
     out << YAML::Key << "Σ₀" << YAML::Value << p.Σ₀;
     out << YAML::Key << "σ₀" << YAML::Value << p.σ₀;
+    out << YAML::Key << "Σ₀_lower" << YAML::Value << p.Σ₀_lower;
     out << YAML::Key << "ε₀" << YAML::Value << p.ε₀;
-    out << YAML::Key << "θ" << YAML::Value << p.θ;
+    out << YAML::Key << "ε₀_increase" << YAML::Value << p.ε₀_increase;
     out << YAML::Key << "ρ" << YAML::Value << p.ρ;
+    out << YAML::Key << "ρ_increase" << YAML::Value << p.ρ_increase;
+    out << YAML::Key << "θ" << YAML::Value << p.θ;
     out << YAML::Key << "M" << YAML::Value << p.M;
     out << YAML::Key << "Σₘₐₓ" << YAML::Value << p.Σₘₐₓ;
     out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
     out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
+    out << YAML::Key << "max_num_initial_retries" << YAML::Value
+        << p.max_num_initial_retries;
+    out << YAML::Key << "max_num_retries" << YAML::Value << p.max_num_retries;
+    out << YAML::Key << "max_total_num_retries" << YAML::Value
+        << p.max_total_num_retries;
     out << YAML::Key << "print_interval" << YAML::Value << p.print_interval;
     out << YAML::Key << "preconditioning" << YAML::Value << p.preconditioning;
     out << YAML::EndMap;

@@ -79,12 +79,13 @@ class PANOCSolver {
         : params(params), direction_provider(std::forward<DirectionProvider>(
                               direction_provider)) {}
 
-    Stats operator()(const Problem &problem, // in
-                     const vec &Σ,           // in
-                     real_t ε,               // in
-                     vec &x,                 // inout
-                     vec &y,                 // inout
-                     vec &err_z);            // out
+    Stats operator()(const Problem &problem,        // in
+                     const vec &Σ,                  // in
+                     real_t ε,                      // in
+                     bool always_overwrite_results, // in
+                     vec &x,                        // inout
+                     vec &y,                        // inout
+                     vec &err_z);                   // out
 
     PANOCSolver &
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
