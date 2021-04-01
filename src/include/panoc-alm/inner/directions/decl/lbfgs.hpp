@@ -17,6 +17,8 @@ struct LBFGSParams {
     /// @f[ \frac{y^\top s}{s^\top s} \ge \epsilon \| g \|^\alpha @f]
     /// @see https://epubs.siam.org/doi/10.1137/S1052623499354242
     cbfgs;
+
+    bool rescale_when_γ_changes = false;
 };
 
 /// Limited memory Broyden–Fletcher–Goldfarb–Shanno (L-BFGS) algorithm
@@ -49,7 +51,12 @@ class LBFGS {
     /// a @ref reset.
     void resize(size_t n, size_t history);
 
+    /// Scale the stored y vectors by the given factor.
+    void scale_y(real_t factor);
+
     std::string get_name() const { return "LBFGS"; }
+
+    const Params &get_params() const { return params; }
 
     /// Get the size of the s and y vectors in the buffer.
     size_t n() const { return sto.rows() - 1; }

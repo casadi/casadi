@@ -88,6 +88,20 @@ inline void LBFGS::resize(size_t n, size_t history) {
     reset();
 }
 
+inline void LBFGS::scale_y(real_t factor) {
+    if (full) {
+        for (size_t i = 0; i < history(); ++i) {
+            y(i) *= factor;
+            ρ(i) *= 1. / factor;
+        }
+    } else {
+        for (size_t i = 0; i < idx; ++i) {
+            y(i) *= factor;
+            ρ(i) *= 1. / factor;
+        }
+    }
+}
+
 } // namespace pa
 
 #include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
@@ -125,9 +139,11 @@ struct PANOCDirection<LBFGS> {
     }
 
     static void changed_γ(LBFGS &lbfgs, real_t γₖ, real_t old_γₖ) {
-        (void)γₖ;
-        (void)old_γₖ;
-        lbfgs.reset(); // TODO: Do we really want to flush every time γ changes?
+        if (lbfgs.get_params().rescale_when_γ_changes) {
+            lbfgs.scale_y(γₖ / old_γₖ);
+        } else {
+            lbfgs.reset();
+        }
     }
 };
 

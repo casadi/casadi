@@ -28,7 +28,6 @@ struct PANOCDirection {
     static bool apply(DirectionProviderT &dp, const vec &xₖ, const vec &x̂ₖ,
                       const vec &pₖ, vec &qₖ) = delete;
 
-    /// @todo   Add γ and old_γ parameters?
     static void changed_γ(DirectionProviderT &dp, real_t γₖ,
                           real_t old_γₖ) = delete;
 };
