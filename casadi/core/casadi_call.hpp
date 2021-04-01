@@ -131,6 +131,9 @@ namespace casadi {
     /** \brief Deserializing constructor */
     explicit Call(DeserializingStream& s);
 
+    /** \brief Find a common conditional argument for all seeds */
+    static MX common_cond(const std::vector<std::vector<MX>>& seed);
+
     // Function to be evaluated
     Function fcn_;
   };
