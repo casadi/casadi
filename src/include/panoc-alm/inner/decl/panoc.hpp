@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <limits>
 #include <string>
 
 namespace pa {
@@ -22,6 +23,10 @@ struct PANOCParams {
         real_t Lγ_factor = 0.95;
     } Lipschitz; ///< Parameters related to the Lipschitz constant estimate
                  ///  and step size.
+    /// Length of the history to keep for the Anderson acceleration of fixed
+    /// point iteration.
+    /// @todo Implement this.
+    unsigned anderson_acceleration = 0;
     /// Length of the history to keep in the L-BFGS algorithm.
     unsigned lbfgs_mem = 10; // TODO: move to LBFGS params
     /// Maximum number of inner PANOC iterations.
@@ -34,6 +39,9 @@ struct PANOCParams {
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
     unsigned print_interval = 0;
+
+    real_t quadratic_upperbound_margin =
+        std::sqrt(std::numeric_limits<real_t>::epsilon());
 
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "panoc-alm/util/vec.hpp"
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
 #include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
@@ -139,7 +138,7 @@ PANOCSolver<DirectionProviderT>::operator()(
         // Decrease step size until quadratic upper bound is satisfied
         real_t old_γₖ = γₖ;
         if (k == 0 || params.update_lipschitz_in_linesearch == false) {
-            real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO: Why?
+            real_t margin = params.quadratic_upperbound_margin * std::abs(ψₖ);
             while (ψx̂ₖ > ψₖ + margin + grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ) {
                 Lₖ *= 2;
                 σₖ /= 2;
@@ -249,7 +248,7 @@ PANOCSolver<DirectionProviderT>::operator()(
             ψx̂ₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
 
             // Quadratic upper bound -------------------------------------------
-            real_t margin  = 0; // 1e-6 * std::abs(ψₖ₊₁); // TODO: Why?
+            real_t margin = params.quadratic_upperbound_margin * std::abs(ψₖ₊₁);
             grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
             norm_sq_pₖ₊₁   = pₖ₊₁.squaredNorm();
             real_t norm_sq_pₖ₊₁_ₖ = norm_sq_pₖ₊₁; // prox step with step size γₖ
