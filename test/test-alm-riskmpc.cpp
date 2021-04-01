@@ -83,7 +83,6 @@ TEST(ALM, riskaverse) {
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g};
     ProblemWithCounters pc(p);
 
-#if 0 // TODO: find out what goes wrong in iteration 5
     ALMParams almparam;
     almparam.ε        = 1e-8;
     almparam.δ        = 1e-8;
@@ -99,39 +98,14 @@ TEST(ALM, riskaverse) {
     almparam.preconditioning = false;
 
     PANOCParams panocparam;
-    panocparam.Lipschitz.ε                    = 1e-6;
-    panocparam.Lipschitz.δ                    = 1e-12;
+    panocparam.Lipschitz.ε                    = 1e-11;
+    panocparam.Lipschitz.δ                    = 1e-11;
     panocparam.lbfgs_mem                      = 20;
     panocparam.max_iter                       = 1000;
     panocparam.update_lipschitz_in_linesearch = true;
 
     panocparam.print_interval = 0;
     almparam.print_interval   = 1;
-#else
-    ALMParams almparam;
-    almparam.ε        = 1e-5;
-    almparam.δ        = 1e-5;
-    almparam.Δ        = 20; ///< Factor used in updating the penalty parameters
-    almparam.Σ₀       = 0;   ///< Initial penalty parameter
-    almparam.σ₀       = 1e-2; ///< Initial penalty parameter factor
-    almparam.ε₀       = 1e-1; ///< Initial tolerance on x
-    almparam.θ        = 0.25;
-    almparam.ρ        = 1e-1;
-    almparam.M        = 1e9;
-    almparam.Σₘₐₓ     = 1e9;
-    almparam.max_iter = 100;
-    almparam.preconditioning = false;
-
-    PANOCParams panocparam;
-    panocparam.Lipschitz.ε                    = 1e-6;
-    panocparam.Lipschitz.δ                    = 1e-12;
-    panocparam.lbfgs_mem                      = 20;
-    panocparam.max_iter                       = 1000;
-    panocparam.update_lipschitz_in_linesearch = true;
-
-    panocparam.print_interval = 0;
-    almparam.print_interval   = 1;
-    #endif
 
     LBFGSParams lbfgsparam;
 

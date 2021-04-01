@@ -40,8 +40,8 @@ struct PANOCParams {
     /// If set to N != 0, progress is printed every N iterations.
     unsigned print_interval = 0;
 
-    real_t quadratic_upperbound_margin =
-        std::sqrt(std::numeric_limits<real_t>::epsilon());
+    real_t quadratic_upperbound_threshold =
+        10 * std::numeric_limits<real_t>::epsilon();
 
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;
@@ -75,6 +75,7 @@ class PANOCSolver {
         const vec &grad_ψ;
         real_t ψ_hat;
         const vec &grad_ψ_hat;
+        real_t L;
         real_t γ;
         real_t ε;
         const vec &Σ;

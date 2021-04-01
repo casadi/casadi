@@ -138,8 +138,9 @@ PANOCSolver<DirectionProviderT>::operator()(
         // Decrease step size until quadratic upper bound is satisfied
         real_t old_γₖ = γₖ;
         if (k == 0 || params.update_lipschitz_in_linesearch == false) {
-            real_t margin = params.quadratic_upperbound_margin * std::abs(ψₖ);
-            while (ψx̂ₖ > ψₖ + margin + grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ) {
+            while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ &&
+                   std::abs(grad_ψₖᵀpₖ / ψₖ) >
+                       params.quadratic_upperbound_threshold) {
                 Lₖ *= 2;
                 σₖ /= 2;
                 γₖ /= 2;
@@ -175,7 +176,7 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         if (progress_cb)
             progress_cb({k, xₖ, pₖ, norm_sq_pₖ, x̂ₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ,
-                         γₖ, εₖ, Σ, y, problem, params});
+                         Lₖ, γₖ, εₖ, Σ, y, problem, params});
 
         auto time_elapsed    = std::chrono::steady_clock::now() - start_time;
         bool out_of_time     = time_elapsed > params.max_time;
@@ -248,15 +249,16 @@ PANOCSolver<DirectionProviderT>::operator()(
             ψx̂ₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
 
             // Quadratic upper bound -------------------------------------------
-            real_t margin = params.quadratic_upperbound_margin * std::abs(ψₖ₊₁);
             grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
             norm_sq_pₖ₊₁   = pₖ₊₁.squaredNorm();
             real_t norm_sq_pₖ₊₁_ₖ = norm_sq_pₖ₊₁; // prox step with step size γₖ
             if (params.update_lipschitz_in_linesearch == true) {
                 // Decrease step size until quadratic upper bound is satisfied
                 real_t old_γₖ₊₁ = γₖ₊₁;
-                while (ψx̂ₖ₊₁ > ψₖ₊₁ + margin + grad_ψₖ₊₁ᵀpₖ₊₁ +
-                                   0.5 * Lₖ₊₁ * norm_sq_pₖ₊₁) {
+                while (ψx̂ₖ₊₁ - ψₖ₊₁ >
+                           grad_ψₖ₊₁ᵀpₖ₊₁ + 0.5 * Lₖ₊₁ * norm_sq_pₖ₊₁ &&
+                       std::abs(grad_ψₖ₊₁ᵀpₖ₊₁ / ψₖ₊₁) >
+                           params.quadratic_upperbound_threshold) {
                     Lₖ₊₁ *= 2;
                     σₖ₊₁ /= 2;
                     γₖ₊₁ /= 2;
