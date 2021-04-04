@@ -264,6 +264,7 @@ namespace casadi {
       local.stride_out[j] = vectorize_f() ? n_padded() : 1;
     }
     g.add_dependency(f_, local);
+    uout() << "codegen_dec" << local.arg_null << f_ << std::endl;
   }
 
   void Map::codegen_body(CodeGenerator& g,
@@ -277,6 +278,7 @@ namespace casadi {
     for (casadi_int j=0; j<n_out_; ++j) {
       local.stride_out[j] = vectorize_f() ? n_padded() : 1;
     }
+    uout() << "codegen_body" << local.arg_null << f_ << std::endl;
     g.local("i", "casadi_int");
     g.local("arg1[" + str(f_.sz_arg()) + "]", "const casadi_real*");
     g.local("res1[" + str(f_.sz_res()) + "]", "casadi_real*");

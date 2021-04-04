@@ -178,14 +178,14 @@ namespace casadi {
     g.local("arg1", "const casadi_real", "**");
     for (casadi_int i=0; i<arg.size(); ++i) {
       g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
-      arg_null.push_back(arg[i]<0);
+      arg_null.push_back(arg[i]==-1);
     }
 
     // Collect output arguments
     g.local("res1", "casadi_real", "**");
     for (casadi_int i=0; i<res.size(); ++i) {
       g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
-      res_null.push_back(res[i]<0);
+      res_null.push_back(res[i]==-1);
     }
 
 

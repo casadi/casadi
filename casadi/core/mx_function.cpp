@@ -1423,6 +1423,8 @@ namespace casadi {
         casadi_int j=e.arg.at(i);
         if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
           arg_null.at(i) = false;
+        } else if (j<=-2) {
+          arg_null.at(i) = false;
         } else {
           arg_null.at(i) = true;
         }
@@ -1433,6 +1435,8 @@ namespace casadi {
       for (casadi_int i=0; i<e.res.size(); ++i) {
         casadi_int j=e.res.at(i);
         if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+          res_null.at(i) = false;
+        } else if (j<=-2) {
           res_null.at(i) = false;
         } else {
           res_null.at(i) = true;

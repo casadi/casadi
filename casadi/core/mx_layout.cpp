@@ -175,10 +175,10 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
   }
 
   void PermuteLayout::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    uout() << "eval_mx" << std::endl;
-    sparsity().spy();
-    uout() << "foo" << std::endl;
-    arg[0].sparsity().spy();
+    //uout() << "eval_mx" << std::endl;
+    //s//parsity().spy();
+    //uout() << "foo" << std::endl;
+    //arg[0].sparsity().spy();
     res[0] = project(arg[0],sparsity())->get_permute_layout(Relayout(relay_.source(), relay_.perms(), relay_.target(), "eval_mx_"+relay_.label_));
   }
 
