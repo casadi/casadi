@@ -37,6 +37,7 @@ try:
 except:
   pass
 
+#GlobalOptions.setVectorWidthReal(4)
 
 class Functiontests(casadiTestCase):
 

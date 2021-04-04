@@ -52,6 +52,7 @@ namespace casadi {
   }
 
   Relayout Relayout::push_right(casadi_int n) const {
+    uout() << "push_right" << std::endl;
     return Relayout(source().push_right(n), join(perms(), {source().n_dims()}), target().push_right(n));
   }
 
@@ -82,11 +83,11 @@ namespace casadi {
   }
 
   LayoutNode* Layout::operator->() {
-    return static_cast<LayoutNode*>(SharedObject::operator->());
+    return dynamic_cast<LayoutNode*>(SharedObject::operator->());
   }
 
   const LayoutNode* Layout::operator->() const {
-    return static_cast<const LayoutNode*>(SharedObject::operator->());
+    return dynamic_cast<const LayoutNode*>(SharedObject::operator->());
   }
 
   Layout::operator const casadi_int*() const {
@@ -131,8 +132,14 @@ namespace casadi {
   }
 
   Relayout::Relayout(const Layout& source, const std::vector<casadi_int>& perms, const Layout& target, const std::string& label) : source_(source), perms_(perms), target_(target), label_(label) {
-    const StridedLayout* s = static_cast<const StridedLayout*>(source.get());
-    const StridedLayout* t = static_cast<const StridedLayout*>(target.get());
+    const StridedLayout* s = dynamic_cast<const StridedLayout*>(source.get());
+    const StridedLayout* t = dynamic_cast<const StridedLayout*>(target.get());
+
+    uout() << "debug Relayout" << source << perms << target << std::endl;
+
+
+    casadi_assert_dev(!source_.is_default());
+    casadi_assert_dev(!target_.is_default());
 
     casadi_assert(is_permutation(perms), "Not a valid permutation");
     casadi_assert(perms.size()==s->n_dims(), "Not a valid permutation");
@@ -149,12 +156,15 @@ namespace casadi {
 
 
   size_t Relayout::sz_iw() const {
-    const StridedLayout* s = static_cast<const StridedLayout*>(source_.get());
+    if (dynamic_cast<const DefaultLayout*>(source_.get())) return 0;
+
+    const StridedLayout* s = dynamic_cast<const StridedLayout*>(source_.get());
     return s->n_dims()*2;
   }
 
   bool Relayout::absorbs(const Relayout& other) const {
     if (target()==other.source()) return true;
+    return false;
   }
 
   Relayout Relayout::absorbed(const Relayout& other) const {
@@ -170,6 +180,7 @@ namespace casadi {
   }
 
   bool Relayout::cancels(const Relayout& other) const {
+    return false;
     uout() << "cancels?" << source_ << target_ << std::endl;
     uout() << "cancels?" <<  other.source() << other.target() << std::endl;
     //if (source_==other.target() && target_==other.source() && invert_permutation(perms_)==other.perms()) return true;
@@ -180,7 +191,7 @@ namespace casadi {
     size_t size = max(max(max(source_.size(), target_.size()), other.source().size()), other.target().size());
 
 
-    const StridedLayout* s = static_cast<const StridedLayout*>(source_.get());
+    const StridedLayout* s = dynamic_cast<const StridedLayout*>(source_.get());
 
     std::vector<casadi_int> arg = range(size);
     std::vector<casadi_int> res(size, -1);
@@ -218,9 +229,9 @@ namespace casadi {
   void Relayout::generate(CodeGenerator& g,
                         const std::string& arg,
                         const std::string& res) const {
-
-    const StridedLayout* s = static_cast<const StridedLayout*>(source_.get());
-    const StridedLayout* t = static_cast<const StridedLayout*>(target_.get());
+    uout() << "debug generate" << std::endl;
+    const StridedLayout* s = dynamic_cast<const StridedLayout*>(source_.get());
+    const StridedLayout* t = dynamic_cast<const StridedLayout*>(target_.get());
 
     casadi_int n_dims = s->n_dims();
     
@@ -256,11 +267,13 @@ namespace casadi {
 
 
   bool Relayout::is_trivial() const {
+    if (perms_.empty()) return true;
+    return false;
     if (source_.size()!=target_.size()) return false;
     std::vector<casadi_int> iw(sz_iw());
     size_t size = source_.size();
 
-    const StridedLayout* s = static_cast<const StridedLayout*>(source_.get());
+    const StridedLayout* s = dynamic_cast<const StridedLayout*>(source_.get());
     std::vector<casadi_int> arg = range(size);
     std::vector<casadi_int> res(size, -1);
     Layout unpadded_source = Layout(s->get_dims());

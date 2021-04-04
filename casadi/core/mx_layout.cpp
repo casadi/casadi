@@ -175,7 +175,10 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
   }
 
   void PermuteLayout::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    //casadi_assert(sparsity()==arg[0].sparsity(), "error in eval_mx");
+    uout() << "eval_mx" << std::endl;
+    sparsity().spy();
+    uout() << "foo" << std::endl;
+    arg[0].sparsity().spy();
     res[0] = project(arg[0],sparsity())->get_permute_layout(Relayout(relay_.source(), relay_.perms(), relay_.target(), "eval_mx_"+relay_.label_));
   }
 
@@ -196,6 +199,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
   }
 
   MX PermuteLayout::get_permute_layout(const Relayout& relay) const {
+    return MXNode::get_permute_layout(relay);
     if (relay_.cancels(relay)) { // cancellation
       return dep(0);
     } else if (relay_.absorbs(relay)) {

@@ -234,13 +234,13 @@ namespace casadi {
     virtual const Layout& layout(casadi_int oind) const;
 
     /// Alignment (bytes) for specific input argument
-    virtual size_t align_in(casadi_int iind) const { return 32; }
+    virtual size_t align_in(casadi_int iind) const { return 1; }
 
     /// Alignment (bytes) for specific output argument
-    virtual size_t align_out(casadi_int oind) const { return 32; }
+    virtual size_t align_out(casadi_int oind) const { return 1; }
 
     /// Alignment (bytes) for work vector
-    virtual size_t align_w() const { return 32; }
+    virtual size_t align_w() const { return 1; }
 
     /// Get shape
     casadi_int numel() const { return sparsity().numel(); }
