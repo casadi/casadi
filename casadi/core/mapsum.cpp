@@ -80,6 +80,7 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_(n), reduce_in_(reduce_in), reduce_out_(reduce_out) {
     casadi_assert_dev(reduce_in.size()==f.n_in());
     casadi_assert_dev(reduce_out.size()==f.n_out());
+    uout() << "It's map sum!" << std::endl;
   }
 
   Layout MapSum::get_layout_in(casadi_int i) {
@@ -543,44 +544,33 @@ namespace casadi {
     Function dm = MapSum::create("mapsum" + str(n_) + "_" + df.name(), parallelization(),
       df, n_, reduce_in, reduce_out_);
 
-    // Input expressions
-    vector<MX> arg = dm.mx_in();
+    // Strip permuting layer when vectorized
+    if (dm.is_a("MXFunction")) {
+      dm = dm.get_function(dm.get_function()[0]);
+    }
 
-    // Need to reorder sensitivity inputs
+    // Input expressions
+    vector<MX> arg = dm.mx_in(); // change to layout of reinterpret_layout
+
     vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<casadi_int> ind;
-    for (casadi_int i=0; i<n_in_; ++i, ++it) {
-      if (reduce_in_[i]) continue;
-      casadi_int sz = f_.size2_in(i);
-      ind.clear();
-      for (casadi_int k=0; k<n_; ++k) {
-        for (casadi_int d=0; d<nfwd; ++d) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((d*n_ + k)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      MX& x = res[f_.n_in()+f_.n_out()+i];
+      if (!vectorize_f() || reduce_in_[i]) {
+        Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd,reduce_in_[i] ? 1 : n_,nfwd});
+        Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd, nfwd, reduce_in_[i] ? 1 : n_});
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
     res = dm(res);
 
-    // Reorder sensitivity outputs
-    it = res.begin();
-    for (casadi_int i=0; i<n_out_; ++i, ++it) {
-      if (reduce_out_[i]) continue;
-      casadi_int sz = f_.size2_out(i);
-      ind.clear();
-      for (casadi_int d=0; d<nfwd; ++d) {
-        for (casadi_int k=0; k<n_; ++k) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((k*nfwd + d)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      if (!vectorize_f() || reduce_out_[i]) {
+        Layout source({df.nnz_out(i)/nfwd,nfwd,reduce_out_[i] ? 1 : n_});
+        Layout target({df.nnz_out(i)/nfwd,reduce_out_[i] ? 1 : n_,nfwd});
+        res[i] = permute_layout(res[i],Relayout(source, {0, 2, 1}, target,"get_forward_out"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function

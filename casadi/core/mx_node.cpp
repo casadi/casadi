@@ -989,7 +989,7 @@ namespace casadi {
   }
 
   MX MXNode::get_permute_layout(const Relayout& relay) const {
-    if (nnz()==0|| relay.source()==relay.target()) {
+    if (nnz()==0) {
       return shared_from_this<MX>();
     } else {
       return PermuteLayout::create(shared_from_this<MX>(), relay);

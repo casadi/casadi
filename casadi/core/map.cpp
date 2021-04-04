@@ -109,7 +109,7 @@ namespace casadi {
 
   Map::Map(const std::string& name, const Function& f, casadi_int n)
     : FunctionInternal(name), f_(f), n_(n) {
-
+    uout() << "It's map!" << std::endl;
   }
 
   bool Map::is_a(const std::string& type, bool recursive) const {
@@ -356,9 +356,11 @@ namespace casadi {
     for (casadi_int i=0;i<f_.n_in();++i) {
       MX& x = res[f_.n_in()+f_.n_out()+i];
       if (!vectorize_f()) {
+        uout() << "here" << std::endl;
         Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd,n_,nfwd});
         Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd, nfwd, n_});
         x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
+        uout() << "baz" << x << "source" << source << "target" << target << std::endl;
       }
     }
 
@@ -367,15 +369,17 @@ namespace casadi {
 
     for (casadi_int i=0;i<f_.n_out();++i) {
       if (!vectorize_f()) {
+        uout() << "there" << std::endl;
         Layout source({df.nnz_out(i)/nfwd,nfwd,n_});
         Layout target({df.nnz_out(i)/nfwd,n_,nfwd});
         res[i] = permute_layout(res[i],Relayout(source, {0, 2, 1}, target,"get_forward_out"));
+        uout() << "baz" << res[i] << "source" << source << "target" << target << std::endl;
       }
     }
 
     // Construct return function
     Dict custom_opts = opts;
-    custom_opts["always_inline"] = true;
+    //custom_opts["always_inline"] = true;
     Function retf(name, arg, res, inames, onames, custom_opts);
     static std::vector<Function> leaking;
     leaking.push_back(retf);
