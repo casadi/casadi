@@ -25,6 +25,7 @@
 
 #include "map.hpp"
 #include "serializing_stream.hpp"
+#include "global_options.hpp"
 
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
@@ -39,21 +40,76 @@ using namespace std;
 namespace casadi {
 
   Function Map::create(const std::string& parallelization, const Function& f, casadi_int n) {
+    Function ret;
     // Create instance of the right class
     string suffix = str(n) + "_" + f.name();
     if (parallelization == "serial") {
-      return Function::create(new Map("map" + suffix, f, n), Dict());
+      ret = Function::create(new Map("map" + suffix, f, n), Dict());
     } else if (parallelization== "openmp") {
-      return Function::create(new OmpMap("ompmap" + suffix, f, n), Dict());
+      ret = Function::create(new OmpMap("ompmap" + suffix, f, n), Dict());
     } else if (parallelization== "thread") {
-      return Function::create(new ThreadMap("threadmap" + suffix, f, n), Dict());
+      ret = Function::create(new ThreadMap("threadmap" + suffix, f, n), Dict());
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
+
+    if (GlobalOptions::vector_width_real==1) return ret;
+
+    if (!f.is_a("SXFunction")) { return ret; }
+
+    const Map& m = *static_cast<const Map*>(ret.get());
+
+
+    // Input expressions
+    vector<MX> arg = ret.mx_in(); // change to layout of reinterpret_layout
+
+    vector<MX> res = m.permute_out(ret(m.permute_in(arg)));
+
+    // Construct return function
+    Dict custom_opts;
+    custom_opts["always_inline"] = true;
+    Function retf(ret.name(), arg, res, custom_opts);
+    static std::vector<Function> leaking;
+    leaking.push_back(retf);
+    return retf;
+  }
+
+  vector<MX> Map::permute_in(const vector<MX> & arg, bool invert) const {
+    vector<MX> ret(arg.size());
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      ret[i] = permute_layout(arg[i], permute_in(i, invert));
+    }
+    uout() << "testje" << ret << std::endl;
+    return ret;
+  }
+
+  vector<MX> Map::permute_out(const vector<MX> & res, bool invert) const {
+    vector<MX> ret(res.size());
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      ret[i] = permute_layout(res[i], permute_out(i, invert));
+    }
+    return ret;
+  }
+
+  Relayout Map::permute_in(casadi_int i, bool invert) const {
+    Layout source({f_.nnz_in(i), n_});
+    Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
+    Relayout ret = Relayout(source, {1, 0}, target);
+    if (invert) return ret.invert();
+    return ret;
+  }
+
+  Relayout Map::permute_out(casadi_int i, bool invert) const {
+    Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+    Layout target({f_.nnz_out(i), n_});
+    Relayout ret = Relayout(source, {1, 0}, target);
+    if (invert) return ret.invert();
+    return ret;
   }
 
   Map::Map(const std::string& name, const Function& f, casadi_int n)
     : FunctionInternal(name), f_(f), n_(n) {
+
   }
 
   bool Map::is_a(const std::string& type, bool recursive) const {
@@ -84,6 +140,21 @@ namespace casadi {
 
   bool Map::has_function(const std::string& fname) const {
     return fname=="f";
+  }
+
+  bool Map::vectorize_f() const {
+    return GlobalOptions::vector_width_real>1 && f_.is_a("SXFunction");
+  }
+
+  Layout Map::get_layout_in(casadi_int i) {
+    if (!vectorize_f()) return Layout();
+    return Layout({f_.nnz_in(i), n_}, {f_.nnz_in(i), n_padded()});
+  }
+
+  Layout Map::get_layout_out(casadi_int i) {
+    if (!vectorize_f()) return Layout();
+    // Just here to allocate enough sz_self for outputs
+    return Layout({f_.nnz_out(i), n_}, {f_.nnz_out(i), n_padded()});
   }
 
   void Map::serialize_body(SerializingStream &s) const {
@@ -137,6 +208,7 @@ namespace casadi {
 
   template<typename T>
   int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
+    uout() << "local_eval_gen Map:" << name_ << ":" << dump_in_ << std::endl;
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
@@ -144,10 +216,12 @@ namespace casadi {
     for (casadi_int i=0; i<n_; ++i) {
       if (f_(arg1, res1, iw, w, mem)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
-        if (arg1[j]) arg1[j] += f_.nnz_in(j);
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_in(j);
+        if (arg1[j]) arg1[j] += stride;
       }
       for (casadi_int j=0; j<n_out_; ++j) {
-        if (res1[j]) res1[j] += f_.nnz_out(j);
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_out(j);
+        if (res1[j]) res1[j] += stride;
       }
     }
     return 0;
@@ -180,12 +254,29 @@ namespace casadi {
   }
 
   void Map::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
-    uout() << "inst" << inst.arg_null << std::endl;
-    g.add_dependency(f_, inst);
+    Instance local = inst;
+    local.stride_in.resize(f_.n_in());
+    for (casadi_int j=0; j<n_in_; ++j) {
+      local.stride_in[j] = vectorize_f() ? n_padded() : 1;
+    }
+    local.stride_out.resize(f_.n_out());
+    for (casadi_int j=0; j<n_out_; ++j) {
+      local.stride_out[j] = vectorize_f() ? n_padded() : 1;
+    }
+    g.add_dependency(f_, local);
   }
 
   void Map::codegen_body(CodeGenerator& g,
       const Instance& inst) const {
+    Instance local = inst;
+    local.stride_in.resize(f_.n_in());
+    for (casadi_int j=0; j<n_in_; ++j) {
+      local.stride_in[j] = vectorize_f() ? n_padded() : 1;
+    }
+    local.stride_out.resize(f_.n_out());
+    for (casadi_int j=0; j<n_out_; ++j) {
+      local.stride_out[j] = vectorize_f() ? n_padded() : 1;
+    }
     g.local("i", "casadi_int");
     g.local("arg1[" + str(f_.sz_arg()) + "]", "const casadi_real*");
     g.local("res1[" + str(f_.sz_res()) + "]", "casadi_real*");
@@ -193,36 +284,55 @@ namespace casadi {
     // Input buffer
     g << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
-      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n";
+    if (vectorize_f()) {
+      g << "#pragma omp simd\n";
+    }
+    g << "for (i=0; i<" << (vectorize_f() ? n_padded() : n_) << "; ++i) {\n";
     // Evaluate
     if (str(f_).find("SXFunction")!= std::string::npos) {
-      g << g(f_, "arg1", "res1", "iw", "w", inst) << ";\n";
+      g << g(f_, "arg1", "res1", "iw", "w", local) << ";\n";
     } else {
-      g << "if (" << g(f_, "arg1", "res1", "iw", "w", inst) << ") return 1;\n";
+      g << "if (" << g(f_, "arg1", "res1", "iw", "w", local) << ") return 1;\n";
     }
 
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
       if (f_.nnz_in(j)) {
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_in(j);
         if (inst.arg_null.empty()) {
-          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << stride << ";\n";
         } else {
-          if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+          if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << stride << ";\n";
         }
       }
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
       if (f_.nnz_out(j)) {
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_out(j);
         if (inst.res_null.empty()) {
-          g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+          g << "if (res1[" << j << "]) res1[" << j << "]+=" << stride << ";\n";
         } else {
-          if (!inst.res_null[j]) g << "res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+          if (!inst.res_null[j]) g << "res1[" << j << "]+=" << stride << ";\n";
         }
       }
     }
     g << "}\n";
+  }
+
+  casadi_int Map::n_padded() const {
+    if (vectorize_f()) {
+      return n_;
+      return n_padded(n_);
+    }
+    return n_;
+  }
+
+  casadi_int Map::n_padded(casadi_int n) {
+    casadi_int rem = n % GlobalOptions::vector_width_real;
+    if (rem==0) return n;
+    return n + GlobalOptions::vector_width_real - rem;
   }
 
   Function Map
@@ -234,48 +344,43 @@ namespace casadi {
     Function df = f_.forward(nfwd);
     Function dm = df.map(n_, parallelization());
 
-    // Input expressions
-    vector<MX> arg = dm.mx_in();
+    // Strip permuting layer when vectorized
+    if (dm.is_a("MXFunction")) {
+      dm = dm.get_function(dm.get_function()[0]);
+    }
 
-    // Need to reorder sensitivity inputs
+    // Input expressions
+    vector<MX> arg = dm.mx_in(); // change to layout of reinterpret_layout
+
     vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<casadi_int> ind;
-    for (casadi_int i=0; i<n_in_; ++i, ++it) {
-      casadi_int sz = f_.size2_in(i);
-      ind.clear();
-      for (casadi_int k=0; k<n_; ++k) {
-        for (casadi_int d=0; d<nfwd; ++d) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((d*n_ + k)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      MX& x = res[f_.n_in()+f_.n_out()+i];
+      if (!vectorize_f()) {
+        Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd,n_,nfwd});
+        Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd, nfwd, n_});
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
     res = dm(res);
 
-    // Reorder sensitivity outputs
-    it = res.begin();
-    for (casadi_int i=0; i<n_out_; ++i, ++it) {
-      casadi_int sz = f_.size2_out(i);
-      ind.clear();
-      for (casadi_int d=0; d<nfwd; ++d) {
-        for (casadi_int k=0; k<n_; ++k) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((k*nfwd + d)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      if (!vectorize_f()) {
+        Layout source({df.nnz_out(i)/nfwd,nfwd,n_});
+        Layout target({df.nnz_out(i)/nfwd,n_,nfwd});
+        res[i] = permute_layout(res[i],Relayout(source, {0, 2, 1}, target,"get_forward_out"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function
     Dict custom_opts = opts;
     custom_opts["always_inline"] = true;
-    return Function(name, arg, res, inames, onames, custom_opts);
+    Function retf(name, arg, res, inames, onames, custom_opts);
+    static std::vector<Function> leaking;
+    leaking.push_back(retf);
+    return retf;
+
   }
 
   Function Map
@@ -287,54 +392,53 @@ namespace casadi {
     Function df = f_.reverse(nadj);
     Function dm = df.map(n_, parallelization());
 
+    // Strip permuting layer when vectorized
+    if (dm.is_a("MXFunction")) {
+      dm = dm.get_function(dm.get_function()[0]);
+    }
+
     // Input expressions
     vector<MX> arg = dm.mx_in();
 
-    // Need to reorder sensitivity inputs
     vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<casadi_int> ind;
-    for (casadi_int i=0; i<n_out_; ++i, ++it) {
-      casadi_int sz = f_.size2_out(i);
-      ind.clear();
-      for (casadi_int k=0; k<n_; ++k) {
-        for (casadi_int d=0; d<nadj; ++d) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((d*n_ + k)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      std::vector<casadi_int> dims = {df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,n_,nadj};
+      std::vector<casadi_int> dims_in = {df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,nadj,n_};
+      MX& x = res[f_.n_in()+f_.n_out()+i];
+      if (!vectorize_f()) {
+        Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,n_,nadj});
+        Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,nadj,n_});
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
     res = dm(res);
 
-    // Reorder sensitivity outputs
-    it = res.begin();
-    for (casadi_int i=0; i<n_in_; ++i, ++it) {
-      casadi_int sz = f_.size2_in(i);
-      ind.clear();
-      for (casadi_int d=0; d<nadj; ++d) {
-        for (casadi_int k=0; k<n_; ++k) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((k*nadj + d)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      MX& x = res[i];
+      if (!vectorize_f()) {
+        Layout source({df.nnz_out(i)/nadj,nadj,n_});
+        Layout target({df.nnz_out(i)/nadj,n_,nadj});
+        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     Dict custom_opts = opts;
     custom_opts["always_inline"] = true;
     // Construct return function
-    return Function(name, arg, res, inames, onames, custom_opts);
+    Function retf(name, arg, res, inames, onames, custom_opts);
+    static std::vector<Function> leaking;
+    leaking.push_back(retf);
+    return retf;
   }
 
   Function Map::get_jacobian(const std::string& name,
                                   const std::vector<std::string>& inames,
                                   const std::vector<std::string>& onames,
                                   const Dict& opts) const {
+
+    casadi_error("foo");
     // Generate map of derivative
     Function jf = f_.jacobian();
     Function jm = jf.map(n_, parallelization());
