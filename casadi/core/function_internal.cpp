@@ -541,6 +541,22 @@ namespace casadi {
       casadi_assert_dev(name_out_.size()==n_out_);
     }
 
+    // Query input sparsities if not already provided
+    if (layout_in_.empty()) {
+      layout_in_.resize(n_in_);
+      for (casadi_int i=0; i<n_in_; ++i) layout_in_[i] = get_layout_in(i);
+    } else {
+      casadi_assert_dev(layout_in_.size() == n_in_);
+    }
+
+    // Query output sparsities if not already provided
+    if (layout_out_.empty()) {
+      layout_out_.resize(n_out_);
+      for (casadi_int i=0; i<n_out_; ++i) layout_out_[i] = get_layout_out(i);
+    } else {
+      casadi_assert_dev(layout_out_.size() == n_out_);
+    }
+
     // Allocate memory for function inputs and outputs
     sz_arg_per_ += n_in_;
     sz_res_per_ += n_out_;
@@ -675,6 +691,7 @@ namespace casadi {
         dump_format_, sparsity_in_[i], arg[i]);
     }
     generate_in(dump_dir_+ filesep + name_ + "." + count + ".in.txt", arg);
+    uout() << "dump for joy" << dump_dir_+ filesep + name_ + "." + count + ".in.txt" << std::endl;
   }
 
   void FunctionInternal::dump_out(casadi_int id, double** res) const {
@@ -823,6 +840,7 @@ namespace casadi {
       s << name_out_[i] << sparsity_out_[i].postfix_dim() << (i==n_out_-1 ? "" : ",");
     }
     s << ")";
+    s << layout_in_ << "->" << layout_out_;
 
     return s.str();
   }
@@ -850,12 +868,13 @@ namespace casadi {
     // Add to cache
     cache_.insert(make_pair(f.name()+":"+suffix, f));
     // Remove a lost reference, if any, to prevent uncontrolled growth
-    for (auto it = cache_.begin(); it!=cache_.end(); ++it) {
-      if (!it->second.alive()) {
-        cache_.erase(it);
-        break; // just one dead reference is enough
-      }
-    }
+    // TODO: why does this prevent proper map
+    //for (auto it = cache_.begin(); it!=cache_.end(); ++it) {
+    //  if (!it->second.alive()) {
+    //    cache_.erase(it);
+    //    break; // just one dead reference is enough
+    //  }
+    //}
   }
 
   Function FunctionInternal::map(casadi_int n, const std::string& parallelization) const {
@@ -2375,7 +2394,7 @@ namespace casadi {
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
       g << "r = w+" << nnz_in() << ";\n"
         << "for (j=0; j<" << nnz_out() << "; ++j) "
-        << g.printf("%g ", "*r++") << "\n";
+        << g.printf("%.16e\\n", "*r++") << "\n";
 
       // End with newline
       g << g.printf("\\n") << "\n";
@@ -3229,6 +3248,14 @@ namespace casadi {
     return Sparsity::scalar();
   }
 
+  Layout FunctionInternal::get_layout_in(casadi_int i) {
+    return Layout();
+  }
+
+  Layout FunctionInternal::get_layout_out(casadi_int i) {
+    return Layout();
+  }
+
   void* ProtoFunction::memory(int ind) const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
@@ -3605,6 +3632,8 @@ namespace casadi {
     s.pack("FunctionInternal::sz_iw_tmp", sz_iw_tmp_);
     s.pack("FunctionInternal::sz_w_tmp", sz_w_tmp_);
     s.pack("FunctionInternal::align_w", align_w_);
+    s.pack("FunctionInternal::layout_in", layout_in_);
+    s.pack("FunctionInternal::layout_out", layout_out_);
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
@@ -3705,6 +3734,8 @@ namespace casadi {
 
     if (version>=2) {
       s.unpack("FunctionInternal::align_w", align_w_);
+      s.unpack("FunctionInternal::layout_in", layout_in_);
+      s.unpack("FunctionInternal::layout_out", layout_out_);
     } else {
       align_w_ = 1;
     }

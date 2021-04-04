@@ -144,6 +144,9 @@ namespace casadi {
 
   Horzsplit::Horzsplit(const MX& x, const std::vector<casadi_int>& offset) : Split(x, offset) {
 
+    //uout() << "test" << x.layout() << std::endl;
+    //output_layout_.resize(offset.size()-1, x.layout().split(offset.size()-1));
+
     // Split up the sparsity pattern
     output_sparsity_ = horzsplit(x.sparsity(), offset_);
 

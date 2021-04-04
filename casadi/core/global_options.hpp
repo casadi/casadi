@@ -68,6 +68,8 @@ namespace casadi {
 
       static casadi_int start_index;
 
+      static casadi_int vector_width_real;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -85,6 +87,9 @@ namespace casadi {
 
       static void setMaxNumDir(casadi_int ndir) { max_num_dir=ndir; }
       static casadi_int getMaxNumDir() { return max_num_dir; }
+
+      static void setVectorWidthReal(casadi_int w) { vector_width_real = w; }
+      static casadi_int getVectorWidthReal() { return vector_width_real; }
 
   };
 

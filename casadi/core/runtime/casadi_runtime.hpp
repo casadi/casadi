@@ -228,6 +228,9 @@ namespace casadi {
   template<typename T1>
   int casadi_newton(const casadi_newton_mem<T1>* m);
 
+  template<typename T1>
+  void casadi_relayout(const casadi_int* source, const casadi_int* target, const T1* arg, T1* res, casadi_int *iw, T1 *w);
+
   // Dense matrix multiplication
   #define CASADI_GEMM_NT(M, N, K, A, LDA, B, LDB, C, LDC) \
     for (i=0, rr=C; i<M; ++i) \
@@ -295,6 +298,7 @@ namespace casadi {
   #include "casadi_convexify.hpp"
   #include "casadi_weave.hpp"
   #include "casadi_align.hpp"
+  #include "casadi_relayout.hpp"
 
 } // namespace casadi
 

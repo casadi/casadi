@@ -42,8 +42,14 @@ namespace casadi {
     set_dep(x, y);
     if (ScX) {
       set_sparsity(y.sparsity());
+      //set_layout(y->layout());
     } else {
       set_sparsity(x.sparsity());
+      //if (x->layout_dims()==y->layout_dims()) {
+      //  set_layout_dims(x->layout_dims());
+      //} else {
+      //  set_layout_dims({x.sparsity().nnz()});
+      //}
     }
   }
 

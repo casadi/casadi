@@ -26,6 +26,7 @@
 #include "mx.hpp"
 
 #include "casadi_misc.hpp"
+#include "global_options.hpp"
 #ifdef HAVE_MKSTEMPS
 #define CASADI_NEED_UNISTD
 #else // HAVE_MKSTEMPS
@@ -167,6 +168,21 @@ namespace casadi {
   std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v) {
     casadi_assert_dev(!has_negative(v));
     return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
+  }
+
+  std::vector<casadi_int> invert_permutation(const std::vector<casadi_int> &a) {
+    casadi_assert(is_permutation(a), "Not a permutation");
+    std::vector<casadi_int> ret(a.size());
+    for (casadi_int i=0;i<a.size();++i) {
+      ret[a[i]] = i;
+    }
+    return ret;
+  }
+
+  size_t vectorize_real_size(size_t s) {
+    if (s==1 || s==2) return s;
+    if (s % GlobalOptions::vector_width_real==0) return s;
+    return (s/GlobalOptions::vector_width_real + 1)*GlobalOptions::vector_width_real;
   }
 
   // Better have a bool return flag saying if we need reorer at all
@@ -404,6 +420,10 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
       acc |= arg[i];
     }
     return acc;
+  }
+
+  bool is_pow2(unsigned int a) {
+    return a && !(a & (a - 1));
   }
 
 

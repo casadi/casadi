@@ -125,6 +125,8 @@ private:
 
   CASADI_EXPORT std::string str_bvec(bvec_t v);
 
+  CASADI_EXPORT size_t vectorize_real_size(size_t s);
+
   /**  \brief Slicing vector
   *  \param v Vector to slice
   *  \param i List of indices
@@ -151,6 +153,10 @@ private:
   */
   template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order);
+
+  /** \brief inverse permute
+  */
+  std::vector<casadi_int> invert_permutation(const std::vector<casadi_int> &a);
 
   /** \brief find nonzeros */
   template<typename T>
@@ -201,6 +207,9 @@ private:
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v,
                                                      casadi_int size);
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v);
+
+  /// Check if the vector has negative entries
+  CASADI_EXPORT bool is_pow2(unsigned int a);
 
   /** \brief Flatten a nested std::vector tot a single flattened vector
    * 
@@ -259,6 +268,10 @@ private:
   /// Check if the vector is strictly monotone
   template<typename T>
   bool is_strictly_monotone(const std::vector<T> &v);
+
+  /// Check if the vector is a permutation of range(n)
+  template<typename T>
+  bool is_permutation(const std::vector<T> &v);
 
   /// Check if the vector has negative entries
   template<typename T>
@@ -681,6 +694,16 @@ namespace casadi {
   template<typename T>
   bool is_strictly_monotone(const std::vector<T> &v) {
     return is_decreasing(v) || is_increasing(v);
+  }
+
+  template<typename T>
+  bool is_permutation(const std::vector<T> &v) {
+    std::vector<bool> log(v.size(), false);
+    for (auto e : v) {
+      if (e<0 || e>=v.size()) return false;
+      log[e] = true;
+    }
+    return all(log);
   }
 
   template<typename T>

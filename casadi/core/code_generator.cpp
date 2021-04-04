@@ -99,6 +99,9 @@ namespace casadi {
       } else if (e.first=="prefix") {
         this->prefix = e.second.to_string();
         prefix_set = true;
+      } else if (e.first=="vector_width") {
+        vector_width_ = e.second.to_int();
+        casadi_assert(is_pow2(vector_width_), "vector width must be power of 2");
       } else {
         casadi_error("Unrecongnized option: " + str(e.first));
       }
@@ -184,11 +187,13 @@ namespace casadi {
     // Codegen local variables
     for (auto&& e : local_variables_by_type) {
       body << "  " << e.first;
+      casadi_int count = 0;
       for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
         body << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
         // Insert definition, if any
         auto k=local_default_.find(it->first);
         if (k!=local_default_.end()) body << "=" << k->second;
+        if (++count % 200==0) body << "\\\n";
       }
       body << ";\n";
     }
@@ -213,7 +218,7 @@ namespace casadi {
     f->codegen_declarations(*this, inst);
 
 
-    comment("inst: " + str(inst.arg_null) + ":" + str(inst.res_null));
+    comment("inst: " + str(inst.arg_null) + ":" + str(inst.res_null) + str(inst.stride_in) + str(inst.stride_out));
 
     // Print to file
     f->codegen(*this, fname, inst);
@@ -304,7 +309,14 @@ namespace casadi {
 
     void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
     // Add if not already added
-    string codegen_name = add_dependency(f);
+
+    // 
+    Instance inst;
+    inst.arg_null.resize(f.n_in(), false);
+    inst.res_null.resize(f.n_out(), false);
+    inst.stride_in.resize(f.n_in(), 1);
+    inst.stride_out.resize(f.n_out(), 1);
+    string codegen_name = add_dependency(f, inst);
 
     if (f.align_w()>1) {
       add_auxiliary(AUX_ALIGN);
@@ -827,6 +839,11 @@ namespace casadi {
     return shorthand("s" + str(add_sparsity(sp)));
   }
 
+
+  string CodeGenerator::layout(const Layout& layout) {
+    return constant(layout.get_compressed());
+  }
+
   casadi_int CodeGenerator::get_sparsity(const Sparsity& sp) const {
     return const_cast<CodeGenerator&>(*this).get_constant(sp, false);
   }
@@ -1286,6 +1303,10 @@ namespace casadi {
       add_auxiliary(AUX_CLEAR);
       this->auxiliaries << sanitize_source(casadi_weave_str, inst);
       break;
+    case AUX_RELAYOUT:
+      add_auxiliary(AUX_CLEAR);
+      this->auxiliaries << sanitize_source(casadi_relayout_str, inst);
+      break;
     }
   }
 
@@ -1341,6 +1362,7 @@ namespace casadi {
     s << "{";
     for (casadi_int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
+      if ((i+1) % 200==0) s << "\\\n";
       s << constant(v[i]);
     }
     s << "}";
@@ -1352,6 +1374,7 @@ namespace casadi {
     s << "{";
     for (casadi_int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
+      if ((i+1) % 200==0) s << "\\\n";
       s << v[i];
     }
     s << "}";
@@ -2009,6 +2032,26 @@ namespace casadi {
   debug_assert(const std::string& test) {
     add_auxiliary(CodeGenerator::AUX_ASSERT);
     return "assert(" + test + ");";
+  }
+
+
+  std::string CodeGenerator::
+  relayout(const std::string& arg, const std::string& res, const Relayout& relayout, const std::string& iw) {
+    add_auxiliary(AUX_RELAYOUT);
+    //std::string plan
+    //return "casadi_relayout()"
+
+
+
+    //return "casadi_relayout(" + arg + ", " + res + ", " + layout(relayout.source()) + ", "  + constant(relayout.perms()) + ", " + layout(relayout.target()) + ", " + iw + ");";
+  }
+
+  unsigned int CodeGenerator::vector_width_real() const {
+    if (casadi_real_type=="double") {
+      return vector_width()/sizeof(double);
+    } else if (casadi_real_type=="float") {
+      return vector_width()/sizeof(float);
+    }
   }
 
 } // namespace casadi

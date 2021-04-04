@@ -201,6 +201,10 @@ namespace casadi {
     OP_BSPLINE,
 
     OP_CONVEXIFY,
+
+    OP_REINTERPRET_LAYOUT,
+
+    OP_PERMUTE_LAYOUT,
   };
   #define NUM_BUILT_IN_OPS (OP_CONVEXIFY+1)
 

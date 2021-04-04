@@ -62,7 +62,13 @@ namespace casadi {
         "Default input values"}},
       {"live_variables",
        {OT_BOOL,
-        "Reuse variables in the work vector"}}
+        "Reuse variables in the work vector"}},
+      {"layout_in",
+       {OT_LAYOUTVECTOR,
+        "Layout in"}},
+      {"layout_out",
+       {OT_LAYOUTVECTOR,
+        "Layout out"}},
      }
   };
 
@@ -235,7 +241,7 @@ namespace casadi {
         // Add an output instruction ("data" below will take ownership)
         nodes.push_back(new Output(prim[p], ind, p, nz_offset));
         // Update offset
-        nz_offset += prim[p].nnz();
+        nz_offset += prim[p]->sz_self();
       }
     }
 
@@ -250,6 +256,7 @@ namespace casadi {
 
     // Construct input element data, loop over inputs
     for (casadi_int ind=0; ind<in_.size(); ++ind) {
+      uout() << "foo" << in_[ind] << std::endl;
       // Loop over symbolic primitives of each input
       vector<MX> prim = in_[ind].primitives();
       for (casadi_int p=0; p<prim.size(); ++p) {
@@ -257,16 +264,16 @@ namespace casadi {
         if (i>=0 && prim[p]->nnz()>=10) {
           // Mark read
           prim[p].set_temp(-(n_ce_++)-2);
-          nz_max = max(nz_max, prim[p]->nnz());
-          ce_off_.push_back(ce_off_.back()+prim[p]->nnz());
+          nz_max = max(nz_max, prim[p]->sz_self());
+          ce_off_.push_back(ce_off_.back()+prim[p]->sz_self());
         }
       }
     }
     for (MXNode* n : nodes) {
       if (n->elide_copy()) {
         n->temp = -(n_ce_++)-2;
-        nz_max = max(nz_max, n->nnz());
-        ce_off_.push_back(ce_off_.back()+n->nnz());
+        nz_max = max(nz_max, n->sz_self());
+        ce_off_.push_back(ce_off_.back()+n->sz_self());
       }
     }
 
@@ -389,7 +396,7 @@ namespace casadi {
             if (live_variables_ && remaining==0) {
 
               // Get a pointer to the sparsity pattern of the argument that can be freed
-              casadi_int nnz = nodes[ch_ind]->sparsity().nnz();
+              casadi_int nnz = nodes[ch_ind]->sz_self();
 
               // Add to the stack of unused work vector elements for the current sparsity
               unused_all[nnz].push(place[ch_ind]);
@@ -414,7 +421,7 @@ namespace casadi {
             // Are reuse of variables (live variables) enabled?
             if (live_variables_) {
               // Get a pointer to the sparsity pattern node
-              casadi_int nnz = e.data->sparsity(c).nnz();
+              casadi_int nnz = e.data->sz_self(c);
 
               // Get a reference to the stack for the current sparsity
               stack<casadi_int>& unused = unused_all[nnz];
@@ -461,6 +468,7 @@ namespace casadi {
 
     // Allocate work vectors (numeric)
     workloc_.resize(worksize+1);
+    workloc_sz_self_.resize(worksize+1, false);
     fill(workloc_.begin(), workloc_.end(), -1);
     // (double/8 byte) offset into fully aligned work-vector
     size_t wind=0;
@@ -482,7 +490,8 @@ namespace casadi {
               wind = round_pow2(wind, sizeof(double), align[e.res[c]]);
               // Determine index
               workloc_[e.res[c]] = wind;
-              wind += e.data->sparsity(c).nnz();
+              wind += e.data->sz_self(c);
+              workloc_sz_self_[e.res[c]] = e.data->sz_self(c);
             }
           } else {
             ce_active_ = true;
@@ -550,7 +559,7 @@ namespace casadi {
           // Mark read
           prim[p].set_temp(0);
         }
-        nz_offset += prim[p]->nnz();
+        nz_offset += prim[p]->sz_self();
       }
     }
 
@@ -769,6 +778,33 @@ namespace casadi {
     }
     return 0;
   }
+
+  std::vector<std::string> MXFunction::get_function() const {
+    std::map<std::string, bool> flagged; 
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); it++) {
+      if (it->op==OP_CALL) {
+        const Function &f = it->data->which_function();
+        if (flagged.find(f.name())==flagged.end()) {
+          flagged[f.name()] = true;
+        }
+      }
+    }
+    std::vector<std::string> ret;
+    for (auto it : flagged) {
+      ret.push_back(it.first);
+    }
+    return ret;
+  }
+
+  const Function& MXFunction::get_function(const std::string &name) const {
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); it++) {
+      if (it->op==OP_CALL) {
+        const Function &f = it->data->which_function();
+        if (name==f.name()) return f;
+      }
+    }
+  }
+
 
   int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
@@ -1434,6 +1470,7 @@ namespace casadi {
     bool first = true;
     for (casadi_int i=0; i<workloc_.size()-1; ++i) {
       casadi_int n=workloc_[i+1]-workloc_[i];
+      n=workloc_sz_self_.at(i);
       if (n==0) continue;
       if (first) {
         g << "casadi_real ";
@@ -1453,6 +1490,7 @@ namespace casadi {
       } else {
         g << "*w" << i << "=w+" << workloc_[i];
       }
+      if ((i+1) % 200==0) g << "\\\n";
     }
     if (!first) g << ";\n";
     if (w_extra_offset_) g << "w+= " << w_extra_offset_ << ";\n";
@@ -1474,7 +1512,7 @@ namespace casadi {
         casadi_int j=e.arg.at(i);
         if (j>=0) {
           size_t a = e.data->align_in(i);
-          if (a>1) {
+          if (a>1 && e.data.dep(i).nnz()>1) {
             std::string rem = "(uintptr_t) " + g.work(j, e.data.dep(i).nnz())+"%"+str(a);
             g << g.debug_assert(rem + "==0") + "\n";
           }
@@ -1485,7 +1523,7 @@ namespace casadi {
         casadi_int j=e.res.at(i);
         if (j>=0) {
           size_t a = e.data->align_out(i);
-          if (a>1) {
+          if (a>1 && e.data->sparsity(i).nnz()>1) {
             std::string rem = "(uintptr_t) " + g.work(j, e.data->sparsity(i).nnz())+"%"+str(a);
             g << g.debug_assert(rem +"==0") + "\n";
           }
@@ -2042,6 +2080,7 @@ namespace casadi {
     }
 
     s.pack("MXFunction::workloc", workloc_);
+    s.pack("MXFunction::workloc", workloc_sz_self_);
     s.pack("MXFunction::w_offset", w_extra_offset_);
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
@@ -2069,6 +2108,7 @@ namespace casadi {
     }
 
     s.unpack("MXFunction::workloc", workloc_);
+    s.unpack("MXFunction::workloc", workloc_sz_self_);
     s.unpack("MXFunction::w_offset", w_extra_offset_);
     s.unpack("MXFunction::free_vars", free_vars_);
     s.unpack("MXFunction::default_in", default_in_);

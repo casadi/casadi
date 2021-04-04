@@ -27,6 +27,7 @@
 #define CASADI_CODE_GENERATOR_HPP
 
 #include "function.hpp"
+#include "instance.hpp"
 
 #include <map>
 #include <set>
@@ -80,6 +81,9 @@ namespace casadi {
 
     // Add a sparsity pattern
     std::string sparsity(const Sparsity& sp);
+
+    // Add a sparsity pattern
+    std::string layout(const Layout& layout);
 
     // Add a sparsity pattern, get index
     casadi_int add_sparsity(const Sparsity& sp);
@@ -394,7 +398,8 @@ namespace casadi {
       AUX_CACHE,
       AUX_WEAVE,
       AUX_ALIGN,
-      AUX_ASSERT
+      AUX_ASSERT,
+      AUX_RELAYOUT
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -499,6 +504,9 @@ namespace casadi {
 
     /** \brief Add an assertion */
     std::string debug_assert(const std::string& test);
+
+    /** \brief Add a relayout */
+    std::string relayout(const std::string& arg, const std::string& res, const Relayout& relayout, const std::string& iw);
 
   private:
 
@@ -634,6 +642,15 @@ namespace casadi {
 
     // Amount of zeros needed
     casadi_int sz_zeros_;
+
+    /// Vector width in bits
+    unsigned int vector_width_;
+
+    /// Vector width in bits
+    unsigned int vector_width() const { return vector_width_; }
+
+    /// How many casadi_real nunbers fit in one vector?
+    unsigned int vector_width_real() const;
 
     // Hash a vector
     static size_t hash(const std::vector<double>& v);

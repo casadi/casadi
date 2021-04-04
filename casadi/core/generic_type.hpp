@@ -54,7 +54,8 @@ namespace casadi {
     OT_FUNCTION,
     OT_FUNCTIONVECTOR,
     OT_VOIDPTR,
-    OT_UNKNOWN};
+    OT_UNKNOWN,
+    OT_LAYOUTVECTOR};
 #endif // SWIG
 
   /** \brief Generic data type, can hold different types such as bool, casadi_int, string etc.
@@ -94,6 +95,7 @@ namespace casadi {
     GenericType(const std::vector<Function>& f);
     GenericType(const Dict& dict);
     GenericType(void* ptr);
+    GenericType(const std::vector<Layout>& lv);
 
     /// Public class name
     static std::string type_name() {return "GenericType";}
@@ -137,6 +139,7 @@ namespace casadi {
     operator const Function&() const { return as_function();}
     operator const std::vector<Function>&() const { return as_function_vector();}
     operator const Dict&() const { return as_dict();}
+    operator const std::vector<Layout>&() const { return as_layout_vector();}
     ///@}
 
     bool can_cast_to(TypeID other) const;
@@ -165,6 +168,7 @@ namespace casadi {
     bool is_function() const;
     bool is_function_vector() const;
     bool is_void_pointer() const;
+    bool is_layout_vector() const;
     ///@}
 
     ///@{
@@ -183,6 +187,7 @@ namespace casadi {
     const Function& as_function() const;
     const std::vector<Function>& as_function_vector() const;
     void* const & as_void_pointer() const;
+    const std::vector<Layout>& as_layout_vector() const;
     ///@}
 
     ///@{
@@ -202,6 +207,7 @@ namespace casadi {
     std::vector<Function> to_function_vector() const;
     void* to_void_pointer() const;
     std::vector<int> to_int_type_vector() const;
+    std::vector<Layout> to_layout_vector() const;
     ///@}
 
     //! \brief Equality

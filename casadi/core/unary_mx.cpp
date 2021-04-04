@@ -42,6 +42,7 @@ namespace casadi {
 
     set_dep(x);
     set_sparsity(x->sparsity());
+    //set_layout_dims(x->layout_dims());
   }
 
   std::string UnaryMX::disp(const std::vector<std::string>& arg) const {

@@ -33,10 +33,12 @@ namespace casadi {
 
   SymbolicMX::SymbolicMX(const std::string& name, casadi_int nrow, casadi_int ncol) : name_(name) {
     set_sparsity(Sparsity::dense(nrow, ncol));
+    //set_layout_dims({nrow*ncol});
   }
 
   SymbolicMX::SymbolicMX(const std::string& name, const Sparsity & sp) : name_(name) {
     set_sparsity(sp);
+    //set_layout_dims({sp.nnz()});
   }
 
   std::string SymbolicMX::disp(const std::vector<std::string>& arg) const {

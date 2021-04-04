@@ -27,6 +27,7 @@
 #define CASADI_FUNCTION_INTERNAL_HPP
 
 #include "function.hpp"
+#include "layout.hpp"
 #include <set>
 #include <stack>
 #include "code_generator.hpp"
@@ -51,6 +52,7 @@
 /// \cond INTERNAL
 
 namespace casadi {
+
   template<typename T>
   std::vector<std::pair<std::string, T>> zip(const std::vector<std::string>& id,
                                              const std::vector<T>& mat) {
@@ -766,6 +768,12 @@ namespace casadi {
     /** \brief Which outputs are differentiable */
     virtual bool get_diff_out(casadi_int i) { return true; }
 
+    /** \brief Get sparsity of a given input */
+    virtual Layout get_layout_in(casadi_int i);
+
+    /** \brief Get sparsity of a given output */
+    virtual Layout get_layout_out(casadi_int i);
+
     /** \brief Get input scheme index by name */
     casadi_int index_in(const std::string &name) const {
       for (casadi_int i=0; i<name_in_.size(); ++i) {
@@ -968,6 +976,8 @@ namespace casadi {
 
     // Alignment of work-vector
     size_t align_w_;
+
+    std::vector<Layout> layout_in_, layout_out_;
 
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;

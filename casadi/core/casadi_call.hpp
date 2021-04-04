@@ -103,6 +103,9 @@ namespace casadi {
     /** \brief  Get the sparsity of output oind */
     const Sparsity& sparsity(casadi_int oind) const override;
 
+    /** \brief  Get the sparsity of output oind */
+    const Layout& layout(casadi_int oind) const override;
+
     /** \brief Get the operation */
     casadi_int op() const override { return OP_CALL;}
 

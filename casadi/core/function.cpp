@@ -572,7 +572,7 @@ namespace casadi {
     const std::vector<bool>& reduce_in,
     const std::vector<bool>& reduce_out,
     const Dict& opts) const {
-    return MapSum::create("mapsum_" + str(n) + "_" + name(), "serial",
+    return MapSum::create("mapssum_" + str(n) + "_" + name(), "serial",
       *this, n, reduce_in, reduce_out, opts);
   }
 

@@ -100,6 +100,10 @@ namespace casadi {
     return fcn_.sparsity_out(oind);
   }
 
+  const Layout& Call::layout(casadi_int oind) const {
+    return fcn_->layout_out_[oind];
+  }
+
   int Call::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     return fcn_(arg, res, iw, w);
   }
@@ -157,7 +161,10 @@ namespace casadi {
   }
 
   void Call::add_dependency(CodeGenerator& g, const Instance& inst) const {
-    g.add_dependency(fcn_, inst);
+    Instance local = inst;
+    local.stride_in.resize(fcn_.n_in(), 1);
+    local.stride_out.resize(fcn_.n_out(), 1);
+    g.add_dependency(fcn_, local);
   }
 
   bool Call::has_refcount() const {
@@ -181,7 +188,11 @@ namespace casadi {
       res_null.push_back(res[i]<0);
     }
 
+
+
     Instance inst = {arg_null, res_null};
+    inst.stride_in.resize(fcn_.n_in(), 1);
+    inst.stride_out.resize(fcn_.n_out(), 1);
 
     // Call function
     std::string flag = g(fcn_, "arg1", "res1", "iw", "w", inst);

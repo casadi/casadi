@@ -536,5 +536,174 @@ class Misctests(casadiTestCase):
       self.assertTrue("t_proc_total" in solver.stats())
       self.assertTrue(solver.stats()["t_proc_total"]>=0)
 
+  def test_layout(self):
+
+    # Basic tests: <dims> tensor, but peculiar traversal order when flattening
+
+    x = MX(DM(range(6)))
+    # Layout([2,3],[0,1])  interpreted as 2-by-3 [0 2 4
+    #                                             1 3 5]
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[0,1])),Layout([6]))),DM([0,1,2,3,4,5]))
+    # source.permute_layout(target,range()) = find y such that interpret(x,source) == interpret(y,target)
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[0,1])),Layout([2,3],[1,0]))),DM([0,2,4,1,3,5]))
+    # Layout([3,2],[0,1])  interpreted as 3-by-2 [0 3
+    #                                             1 4 
+    #                                             2 5
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[0,1])),Layout([6]))),DM([0,1,2,3,4,5]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[0,1])),Layout([2,3]))),DM([0,1,2,3,4,5]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[0,1])),Layout([3,2],[1,0]))),DM([0,3,1,4,2,5]))
+    # Layout([2,3],[1,0])  interpreted as 2-by-3 [0 1 2
+    #                                             3 4 5]
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[1,0])),Layout([6]))),DM([0,3,1,4,2,5]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[1,0])),Layout([2,3]))),DM([0,3,1,4,2,5]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[1,0])),Layout([2,3],[0,1]))),DM([0,3,1,4,2,5]))
+    # Layout([3,2],[1,0])  interpreted as 3-by-2 [0 1
+    #                                             2 3 
+    #                                             4 5]
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[1,0])),Layout([6]))),DM([0,2,4,1,3,5]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[1,0])),Layout([3,2]))),DM([0,2,4,1,3,5]))
+
+    # Identity: source_layout==target_layout && permute = identity => preserve order
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[0,1])),Layout([2,3],[0,1]))),DM([0,1,2,3,4,5]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[0,1])),Layout([3,2],[0,1]))),DM([0,1,2,3,4,5]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[1,0])),Layout([2,3],[1,0]))),DM([0,1,2,3,4,5]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[1,0])),Layout([3,2],[1,0]))),DM([0,1,2,3,4,5]))
+
+
+    # permute
+
+    # Layout([2,3],[0,1])  interpreted as 2-by-3 [0 2 4
+    #                                             1 3 5]
+    #self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[0,1])),Layout([6]),[1,0])),DM([0,2,4,1,3,5]))
+
+    # Strides
+
+    # [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29]
+    # Layout([2,3],[0,1])  interpreted as 2-by-3 [0 10 20
+    #                                             5 15 25]
+
+    x = MX(DM(range(6*5)))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[0,1],[5,2])),Layout([6]))),DM([0,5,10,15,20,25]))
+
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[0,1],[5,2])),Layout([2,3],[1,0],[2,3]))),DM([0,0,10,0,20,0,5,0,15,0,25,0]))
+
+    x = MX(DM(range(9)))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[0,1],[1,3])),Layout([6]))),DM([0,1,3,4,6,7]))
+
+    # Layout([3,2],[0,1])  interpreted as 3-by-2 [0  15
+    #                                             5  20 
+    #                                             10 25]
+
+    x = MX(DM(range(6*5)))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[0,1],[5,3])),Layout([6]))),DM([0,5,10,15,20,25]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[0,1],[5,3])),Layout([3,2],[1,0],[2,2]))),DM([0,0,15,0,5,0,20,0,10,0,25,0]))
+
+    x = MX(DM(range(8)))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[0,1],[1,4])),Layout([6]))),DM([0,1,2,4,5,6]))
+
+    # Layout([2,3],[1,0])  interpreted as 2-by-3 [0  5  10
+    #                                             15 20 25]
+
+    x = MX(DM(range(6*5)))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[1,0],[5,3])),Layout([6]))),DM([0,15,5,20,10,25]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[1,0],[5,3])),Layout([2,3],[0,1],[2,2]))),DM([0,0,15,0,5,0,20,0,10,0,25,0]))
+
+    x = MX(DM(range(8)))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([2,3],[1,0],[1,4])),Layout([6]))),DM([0,4,1,5,2,6]))
+
+
+    # Layout([3,2],[1,0])  interpreted as 3-by-2 [0  5
+    #                                             10 15 
+    #                                             20 25]
+    x = MX(DM(range(6*5)))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[1,0],[5,2])),Layout([6]))),DM([0,10,20,5,15,25]))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[1,0],[5,2])),Layout([3,2],[0,1],[2,3]))),DM([0,0,10,0,20,0,5,0,15,0,25,0]))
+
+    x = MX(DM(range(9)))
+    self.checkarray(evalf(permute_layout(reinterpret_layout(x,Layout([3,2],[1,0],[1,3])),Layout([6]))),DM([0,3,6,1,4,7]))
+
+    DM.rng(0)  
+    """ 
+    x = MX.sym("x",2,3)
+    
+    L = Layout([2,3],[0,1])
+
+    y = reinterpret_layout(x,L)
+
+    LT = Layout([2,3],[1,0])
+
+    print(LT)
+    print(Layout([3,2]))
+
+    z = permute_layout(y,LT,[1,0])
+
+    f = Function('f',[x],[z])
+
+    source = DM([[1,2,3],[4,5,6]])
+    res = f(source)
+    self.checkarray(source.T,res.reshape((3,2)))
+
+    x = MX.sym("x",2,3)
+    
+    L = Layout([2,3],[0,1])
+
+    y = reinterpret_layout(x,L)
+
+    LT = Layout([2,3],[1,0])
+    z = permute_layout(y,LT,[1,0])
+
+    f = Function('f',[x],[z])
+
+    source = DM([[1,2,3],[4,5,6]])
+    res = f(source)
+    self.checkarray(source.T,res.reshape((3,2)))
+    """
+
+    size = [2,3,4]
+
+    x = MX.sym("x",np.product(size))
+    y = reinterpret_layout(x,Layout(size))
+
+    for perm in itertools.permutations(range(3)):
+      print(perm)
+      LT = Layout(size,perm)
+      z = permute_layout(y,LT)
+
+      f = Function('f',[x],[z])
+      f.disp(True)
+      arg = DM.rand(x.sparsity())
+      print(arg)
+      res = f(arg)
+      arg_np = np.array(arg).reshape(size,order='F')
+      print(arg_np)
+      print(arg_np.ravel(order='F'))
+
+      res_np = arg_np.transpose(perm)
+      print(res_np)
+      ref = res_np.ravel(order='F')
+      print(ref)
+
+      print("--")
+      print(arg,res)
+      self.checkarray(res, ref)
+
+
+
+
+    DM.rng(0)
+
+    x = MX.sym("x",5)
+
+    A = DM.rand(2,5)
+
+    f = Function("f",[x],[sin(A @ x)])
+    fmf1 = f.map(4).forward(3)
+    fmf2 = f.map(4).expand().forward(3)
+
+    args = [DM.rand(fmf1.sparsity_in(i)) for i in range(fmf1.n_in())]
+    self.check_codegen(fmf1,args)
+    self.checkfunction_light(fmf1,fmf2,args)
+
+
 if __name__ == '__main__':
     unittest.main()

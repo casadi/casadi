@@ -33,12 +33,6 @@
 
 namespace casadi {
 
-  struct Instance {
-    std::vector<bool> arg_null;
-    std::vector<bool> res_null;
-    bool operator==(const Instance &rhs) { return rhs.arg_null==arg_null && rhs.res_null==res_null; }
-  };
-
 #ifndef SWIG
   /** Forward declaration of internal class */
   class FunctionInternal;
