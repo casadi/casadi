@@ -25,6 +25,7 @@
 
 #include "mapsum.hpp"
 #include "serializing_stream.hpp"
+#include "global_options.hpp"
 
 using namespace std;
 
@@ -40,9 +41,9 @@ namespace casadi {
     casadi_assert(reduce_in.size()==f.n_in(), "Dimension mismatch");
     casadi_assert(reduce_out.size()==f.n_out(), "Dimension mismatch");
 
+    Function ret;
     if (parallelization == "serial") {
       string suffix = str(reduce_in)+str(reduce_out);
-      Function ret;
       if (!f->incache(name, ret, suffix)) {
         // Create new serial map
         ret = Function::create(new MapSum(name, f, n, reduce_in, reduce_out), opts);
@@ -50,10 +51,27 @@ namespace casadi {
         // Save in cache
         f->tocache(ret, suffix);
       }
-      return ret.wrap_as_needed(opts);
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
+
+    if (GlobalOptions::vector_width_real==1) return ret.wrap_as_needed(opts);
+
+    if (!f.is_a("SXFunction")) { return ret; }
+
+    const MapSum& m = *static_cast<const MapSum*>(ret.get());
+
+    // Input expressions
+    vector<MX> arg = ret.mx_in(); // change to layout of reinterpret_layout
+
+    vector<MX> res = m.permute_out(ret(m.permute_in(arg)));
+
+    // Construct return function
+    Dict custom_opts = opts;
+    custom_opts["always_inline"] = true;
+    uout() << "opts" << opts << std::endl;
+    return Function(ret.name(), arg, res, custom_opts);
+
   }
 
   MapSum::MapSum(const std::string& name, const Function& f, casadi_int n,
@@ -62,6 +80,16 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_(n), reduce_in_(reduce_in), reduce_out_(reduce_out) {
     casadi_assert_dev(reduce_in.size()==f.n_in());
     casadi_assert_dev(reduce_out.size()==f.n_out());
+  }
+
+  Layout MapSum::get_layout_in(casadi_int i) {
+    if (!vectorize_f()) return Layout();
+    return permute_in(i).target();
+  }
+
+  Layout MapSum::get_layout_out(casadi_int i) {
+    if (!vectorize_f()) return Layout();
+    return permute_out(i).source();
   }
 
   void MapSum::serialize_body(SerializingStream &s) const {
@@ -123,13 +151,65 @@ namespace casadi {
     // Allocate sufficient memory for serial evaluation
     alloc_arg(f_.sz_arg());
     alloc_res(f_.sz_res());
-    alloc_w(f_.sz_w(), true);
+    alloc_w(f_.sz_w()*GlobalOptions::vector_width_real, true);
     alloc_iw(f_.sz_iw());
 
     // Allocate scratch space for dummping result of reduced outputs
     for (casadi_int j=0;j<n_out_;++j) {
       if (reduce_out_[j]) alloc_w(f_.nnz_out(j), true);
     }
+
+    dump_in_ = true;
+    dump_out_ = true;
+
+  }
+
+  casadi_int MapSum::n_padded() const {
+    if (vectorize_f()) {
+      return n_;
+      return n_padded(n_);
+    }
+    return n_;
+  }
+
+  casadi_int MapSum::n_padded(casadi_int n) {
+    casadi_int rem = n % GlobalOptions::vector_width_real;
+    if (rem==0) return n;
+    return n + GlobalOptions::vector_width_real - rem;
+  }
+
+  vector<MX> MapSum::permute_in(const vector<MX> & arg, bool invert) const {
+    vector<MX> ret = arg;
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      ret[i] = permute_layout(ret[i], permute_in(i, invert));
+    }
+    return ret;
+  }
+
+  vector<MX> MapSum::permute_out(const vector<MX> & res, bool invert) const {
+    vector<MX> ret = res;
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      ret[i] = permute_layout(ret[i], permute_out(i, invert));
+    }
+    return ret;
+  }
+
+  Relayout MapSum::permute_in(casadi_int i, bool invert) const {
+    if (reduce_in_[i]) return Relayout();
+    Layout source({f_.nnz_in(i), n_});
+    Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
+    Relayout ret = Relayout(source, {1, 0}, target);
+    if (invert) return ret.invert();
+    return ret;
+  }
+
+  Relayout MapSum::permute_out(casadi_int i, bool invert) const {
+    if (reduce_out_[i]) return Relayout();
+    Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+    Layout target({f_.nnz_out(i), n_});
+    Relayout ret = Relayout(source, {1, 0}, target);
+    if (invert) return ret.invert();
+    return ret;
   }
 
   template<typename T1>
@@ -147,7 +227,10 @@ namespace casadi {
   }
 
   template<typename T>
-  int MapSum::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
+  int MapSum::local_eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
+
+
+    uout() << "local_eval_gen:" << name_ << ":" << dump_in_ << std::endl;
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
@@ -165,14 +248,14 @@ namespace casadi {
     for (casadi_int i=0; i<n_; ++i) {
       if (f_(arg1, res1, iw, w, mem)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
-        if (arg1[j] && !reduce_in_[j]) arg1[j] += f_.nnz_in(j);
+        if (arg1[j] && !reduce_in_[j]) arg1[j] += vectorize_f() ? 1 : f_.nnz_in(j);
       }
       for (casadi_int j=0; j<n_out_; ++j) {
         if (res1[j]) {
           if (reduce_out_[j]) {
             casadi_add(f_.nnz_out(j), res1[j], res[j]); // Perform sum
           } else {
-            res1[j] += f_.nnz_out(j);
+            res1[j] += vectorize_f() ? 1 : f_.nnz_out(j);
           }
         }
       }
@@ -182,12 +265,12 @@ namespace casadi {
 
   int MapSum::eval_sx(const SXElem** arg, SXElem** res,
       casadi_int* iw, SXElem* w, void* mem) const {
-    return eval_gen(arg, res, iw, w);
+    return local_eval_gen(arg, res, iw, w);
   }
 
   int MapSum::sp_forward(const bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
-    return eval_gen(arg, res, iw, w);
+    return local_eval_gen(arg, res, iw, w);
   }
 
   int MapSum::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
@@ -344,6 +427,10 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, custom_opts);
   }
 
+  bool MapSum::vectorize_f() const {
+    return GlobalOptions::vector_width_real>1 && f_.is_a("SXFunction");
+  }
+
   Function MapSum
   ::get_reverse(casadi_int nadj, const std::string& name,
                 const std::vector<std::string>& inames,
@@ -403,6 +490,7 @@ namespace casadi {
     // Construct return function
     Dict custom_opts = opts;
     custom_opts["always_inline"] = true;
+
     return Function(name, arg, res, inames, onames, custom_opts);
   }
 
@@ -411,7 +499,7 @@ namespace casadi {
     // Could also use the thread-safe variant f_(arg1, res1, iw, w)
     // in Map::eval_gen
     scoped_checkout<Function> m(f_);
-    return eval_gen(arg, res, iw, w, m);
+    return local_eval_gen(arg, res, iw, w, m);
   }
 
 } // namespace casadi
