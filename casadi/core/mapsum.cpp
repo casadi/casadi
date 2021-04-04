@@ -297,57 +297,219 @@ namespace casadi {
   }
 
   void MapSum::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
-    g.add_dependency(f_);
+    Instance local = inst;
+    local.stride_in.resize(f_.n_in());
+    for (casadi_int j=0; j<n_in_; ++j) {
+      local.stride_in[j] = (vectorize_f() && !reduce_in_[j]) ? n_padded() : 1;
+    }
+    local.stride_out.resize(f_.n_out());
+    for (casadi_int j=0; j<n_out_; ++j) {
+      local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded()) : 1;
+    }
+    g.add_dependency(f_, local);
   }
 
   void MapSum::codegen_body(CodeGenerator& g, const Instance& inst) const {
+    Instance local = inst;
+    local.stride_in.resize(f_.n_in());
+    for (casadi_int j=0; j<n_in_; ++j) {
+      local.stride_in[j] = (vectorize_f() && !reduce_in_[j]) ? n_padded() : 1;
+    }
+    local.stride_out.resize(f_.n_out());
+    for (casadi_int j=0; j<n_out_; ++j) {
+      local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded()) : 1;
+    }
+
+    bool any_reduce_out = any(reduce_out_);
+
+    // Outer loop is needed to make reduction on outputs
+    bool outer_loop = vectorize_f() && any_reduce_out;
+
+    g.add_dependency(f_, local);
     g.add_auxiliary(CodeGenerator::AUX_CLEAR);
     g.local("i", "casadi_int");
-    g.local("arg1", "const casadi_real*", "*");
-    g.local("res1", "casadi_real*", "*");
-    g.local("w_scratch", "casadi_real*", "*");
+    g.local("arg1[" + str(n_in_) + "]", "const casadi_real*");
+
+    g.local("res1[" + str(n_out_) + "]", "casadi_real*");
+    if (any_reduce_out) {
+      g.local("w_scratch", "casadi_real*", "*");
+    }
+
+
+
+    // loop bug: if inner body contains branches, and outer_loop is active, gcc-8 gets confused.
+    // about data dependency (gcc-9 not)
+    bool loop_bug = outer_loop;
     // Input buffer
-    g << "arg1 = arg+" << n_in_ << ";\n"
-      << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
+    g  << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
+    if (loop_bug) {
+      g  << "for (i=0; i<" << n_in_ << "; ++i) arg2[i]=arg[i];\n";
+    }
     // Output buffer
-    g << "res1 = res+" << n_out_ << ";\n";
-    g << "w_scratch = w+" << f_.sz_w() << ";\n";
+    if (any_reduce_out) {
+      g << "w_scratch = w+" << f_.sz_w() << ";\n";
+    }
     for (casadi_int j=0;j<n_out_;++j) {
       if (reduce_out_[j]) {
         g << "if (res[" << j << "]) {\n";
         g << "casadi_clear(res[" << j << "], " << f_.nnz_out(j) << ");\n";
-        g << "res1[" << j << "] = w_scratch;\n";
-        g << "w_scratch+=" << f_.nnz_out(j) << ";\n";
+        //if (vectorize_f()) {
+        //  g << "res1[" << j << "] = res[" << j << "];\n";
+        //} else {
+          g << "res"<< (loop_bug? "2" : "1") <<"[" << j << "] = w_scratch;\n";
+          g << "w_scratch+=" << f_.nnz_out(j)*GlobalOptions::vector_width_real << ";\n";
+        //}
         g << "} else {\n";
-        g << "res1[" << j << "] = res[" << j << "];\n";
+        g << "res"<< (loop_bug? "2" : "1") <<"[" << j << "] = res[" << j << "];\n";
         g << "}\n";
+        if (loop_bug) g << "res1[" << j << "] = res2[" << j << "];\n";
       } else {
-        g << "res1[" << j << "] = res[" << j << "];\n";
+        g << "res"<< (loop_bug? "2" : "1") <<"[" << j << "] = res[" << j << "];\n";
       }
+      
     }
 
-    g << "for (i=0; i<" << n_ << "; ++i) {\n";
+    if (loop_bug) {
+      g.local("arg2[" + str(n_in_) + "]", "const casadi_real*", "*");
+      g.local("res2[" + str(n_out_) + "]", "casadi_real*", "*");
+    }
+
+    if (vectorize_f()) {
+      g.local("j", "casadi_int");
+      if (outer_loop) {
+        g << "for (i=0; i<" << n_padded() / GlobalOptions::vector_width_real << "; ++i) {\n";
+        if (loop_bug) {
+          for (casadi_int j=0; j<n_in_; ++j) {
+            if (!reduce_in_[j] && f_.nnz_in(j)) {
+              g << "arg1[" << j << "]=arg2[" << j << "];\n";
+            }
+          }
+          for (casadi_int j=0; j<n_out_; ++j) {
+            if (f_.nnz_out(j)) {
+              g << "res1[" << j << "]=res2[" << j << "];\n";
+            }
+          }
+        }
+        g << "#pragma omp simd\n";
+        g << "for (j=0; j<" << GlobalOptions::vector_width_real << "; ++j) {\n";
+      } else {
+        g << "#pragma omp simd\n";
+        g << "for (j=0; j<" << n_padded() << "; ++j) {\n";
+      }
+    } else {
+      g << "for (i=0; i<" << n_ << "; ++i) {\n";
+    }
+
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    if (str(f_).find("SXFunction")!= std::string::npos) {
+      g << g(f_, "arg1", "res1", "iw", "w", local) << ";\n";
+    } else {
+      g << "if (" << g(f_, "arg1", "res1", "iw", "w", local) << ") return 1;\n";
+    }
+
+    uout() << "debug" << name_ << std::endl;
+    uout() << "n_in_" << n_in_ << std::endl;
+    uout() << "reduce_in_" << reduce_in_ << std::endl;
+    uout() << "inst.arg_null" << inst.arg_null << std::endl;
+    uout() << "inst.arg_null" << inst.arg_null << std::endl;
+
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
+      uout() << "j nnz" << j << ":" << f_.nnz_in(j) << std::endl;
       if (!reduce_in_[j] && f_.nnz_in(j)) {
-        g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+        if (inst.arg_null.empty()) {
+          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
+        } else {
+          if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
+        }
       }
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
       if (reduce_out_[j]) {
-        g << "if (res1[" << j << "]) ";
-        g << g.axpy(f_.nnz_out(j), "1.0", "res1[" + str(j) + "]", "res[" + str(j) + "]") << "\n";
+        if (vectorize_f()) {
+          g << "res1[" << j << "]+=1;\n";
+        } else {
+          g << "if (res1[" << j << "]) ";
+          g << g.axpy(f_.nnz_out(j), "1.0", "res1[" + str(j) + "]", "res[" + str(j) + "]") << "\n";
+        }
       } else {
         if (f_.nnz_out(j)) {
-          g << "if (res1[" << j << "]) ";
-          g << "res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+          if (inst.res_null.empty()) {
+            g << "if (res1[" << j << "]) ";
+            g << "res1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_out(j)) << ";\n";
+          } else {
+            if (!inst.res_null[j]) g << "res1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_out(j)) << ";\n";
+          }
         }
       }
     }
+
+    bool has_rem = n_ != n_padded();
+    casadi_int rem = GlobalOptions::vector_width_real-(n_padded()-n_);
+    casadi_int n_outer_it = n_padded() / GlobalOptions::vector_width_real; 
+    if (outer_loop) {
+      g << "}\n";
+      if (loop_bug) {
+        for (casadi_int j=0; j<n_in_; ++j) {
+          if (!reduce_in_[j] && f_.nnz_in(j)) {
+            if (inst.arg_null.empty()) {
+              g << "if (arg1[" << j << "]) arg2[" << j << "]+=" << GlobalOptions::vector_width_real << ";\n";
+            } else {
+              if (!inst.arg_null[j]) g << "arg2[" << j << "]+=" << GlobalOptions::vector_width_real << ";\n";
+            }
+          }
+        }
+      }
+      for (casadi_int j=0; j<n_out_; ++j) {
+        if (reduce_out_[j]) {
+          if (!loop_bug)
+            g << "res1[" << j << "]-= " << GlobalOptions::vector_width_real << " ;\n";
+          g.local("sum", "casadi_real", "*");
+          g << "sum = res[" << j << "];\n";
+          if (has_rem && n_outer_it>1) {
+            // avoid adding nans
+            g << "if (i<" << ((n_padded() / GlobalOptions::vector_width_real)-1) << ") {\n";
+          }
+          if (!has_rem || n_outer_it>1) {
+            g.local("k", "casadi_int");
+            g.local("j", "casadi_int");
+            g << "#pragma omp simd reduction(+:sum[:" << f_.nnz_out(j) << "])\n";
+            g << "for (k=0; k<" << f_.nnz_out(j) << "; ++k) {\n";
+            g << "for (j=0; j<" << GlobalOptions::vector_width_real << "; ++j) ";
+            std::string res = loop_bug ? "res2" : "res1";
+            g << "sum[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
+            g << "}\n";
+          }
+          if (has_rem && n_outer_it>1) {
+            g << "}\n";
+          }
+        } else {
+          if (loop_bug) {
+            if (f_.nnz_out(j)) {
+              g << "res2[" << j << "]+=" << GlobalOptions::vector_width_real << ";\n";
+            }
+          }
+        }
+      }
+
+    }
     g << "}\n";
+    if (has_rem && outer_loop) {
+      for (casadi_int j=0; j<n_out_; ++j) {
+        if (reduce_out_[j]) {
+          g.local("k", "casadi_int");
+          g.local("k", "casadi_int");
+          g << "for (k=0; k<" << f_.nnz_out(j) << "; ++k) {\n";
+          // you might be adding stray numbers
+          g << "for (j=0; j<" << rem << "; ++j) ";
+          std::string res = loop_bug ? "res2" : "res1";
+          g << "sum[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
+          g << "}\n";
+        }
+      }
+    }
+
   }
 
   Function MapSum
@@ -429,47 +591,41 @@ namespace casadi {
     }
 
     std::vector<bool> reduce_in = join(reduce_in_, reduce_out_, reduce_out_);
+    Dict options;
+    options["dump_in"] = true;
+    options["dump_out"] = true;
+    options["print_in"] = true;
     Function dm = MapSum::create("mapsum" + str(n_) + "_" + df.name(), parallelization(),
-      df, n_, reduce_in, reduce_in_);
+      df, n_, reduce_in, reduce_in_, options);
+
+    // Strip permuting layer when vectorized
+    if (dm.is_a("MXFunction")) {
+      dm = dm.get_function(dm.get_function()[0]);
+    }
 
     // Input expressions
     vector<MX> arg = dm.mx_in();
 
-    // Need to reorder sensitivity inputs
     vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<casadi_int> ind;
-    for (casadi_int i=0; i<n_out_; ++i, ++it) {
-      if (reduce_out_[i]) continue;
-      casadi_int sz = f_.size2_out(i);
-      ind.clear();
-      for (casadi_int k=0; k<n_; ++k) {
-        for (casadi_int d=0; d<nadj; ++d) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((d*n_ + k)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      MX& x = res[f_.n_in()+f_.n_out()+i];
+      if (!vectorize_f() || reduce_out_[i]) {
+        Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,reduce_out_[i] ? 1 : n_,nadj});
+        Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,nadj,reduce_out_[i] ? 1 : n_});
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
     res = dm(res);
 
-    // Reorder sensitivity outputs
-    it = res.begin();
-    for (casadi_int i=0; i<n_in_; ++i, ++it) {
-      if (reduce_in_[i]) continue;
-      casadi_int sz = f_.size2_in(i);
-      ind.clear();
-      for (casadi_int d=0; d<nadj; ++d) {
-        for (casadi_int k=0; k<n_; ++k) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((k*nadj + d)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      MX& x = res[i];
+      if (!vectorize_f() || reduce_in_[i]) {
+        Layout source({df.nnz_out(i)/nadj,nadj,reduce_in_[i] ? 1 : n_});
+        Layout target({df.nnz_out(i)/nadj,reduce_in_[i] ? 1 : n_,nadj});
+        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function
