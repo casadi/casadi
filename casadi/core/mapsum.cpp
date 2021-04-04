@@ -152,7 +152,7 @@ namespace casadi {
 
   casadi_int MapSum::n_padded() const {
     if (vectorize_f()) {
-      return n_;
+      //return n_;
       return n_padded(n_);
     }
     return n_;
