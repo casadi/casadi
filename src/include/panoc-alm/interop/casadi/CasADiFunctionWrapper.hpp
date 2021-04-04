@@ -40,9 +40,9 @@ class CasADiFunctionEvaluator {
 };
 
 /// Wrapper for CasADiFunctionEvaluator with 1 vector input, scalar output.
-class CasADiFun_1iso {
+class CasADiFun_1Vi1So {
   public:
-    CasADiFun_1iso(casadi::Function &&f) : fun(std::move(f)) {}
+    CasADiFun_1Vi1So(casadi::Function &&f) : fun(std::move(f)) {}
 
     double operator()(const pa::vec &x) const {
         double out;
@@ -55,9 +55,9 @@ class CasADiFun_1iso {
 };
 
 /// Wrapper for CasADiFunctionEvaluator with 1 vector input, 1 vector output.
-class CasADiFun_1i1o {
+class CasADiFun_1Vi1Vo {
   public:
-    CasADiFun_1i1o(casadi::Function &&f) : fun(std::move(f)) {}
+    CasADiFun_1Vi1Vo(casadi::Function &&f) : fun(std::move(f)) {}
 
     void operator()(const pa::vec &in, pa::vec &out) const {
         fun({in.data()}, {out.data()});
@@ -68,12 +68,26 @@ class CasADiFun_1i1o {
 };
 
 /// Wrapper for CasADiFunctionEvaluator with 2 vector inputs, 1 vector output.
-class CasADiFun_2i1o {
+class CasADiFun_2Vi1Vo {
   public:
-    CasADiFun_2i1o(casadi::Function &&f) : fun(std::move(f)) {}
+    CasADiFun_2Vi1Vo(casadi::Function &&f) : fun(std::move(f)) {}
 
     void operator()(const pa::vec &in1, const pa::vec &in2,
                     pa::vec &out) const {
+        fun({in1.data(), in2.data()}, {out.data()});
+    }
+
+  private:
+    CasADiFunctionEvaluator<2, 1> fun;
+};
+
+/// Wrapper for CasADiFunctionEvaluator with 2 vector inputs, 1 matrix output.
+class CasADiFun_2Vi1Mo {
+  public:
+    CasADiFun_2Vi1Mo(casadi::Function &&f) : fun(std::move(f)) {}
+
+    void operator()(const pa::vec &in1, const pa::vec &in2,
+                    pa::mat &out) const {
         fun({in1.data(), in2.data()}, {out.data()});
     }
 

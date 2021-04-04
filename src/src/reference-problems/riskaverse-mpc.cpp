@@ -121,6 +121,7 @@ Problem riskaverse_mpc_problem() {
         [rptr](const vec &ux, const vec &v, vec &grad_u_v) {
             rptr->grad_g(ux, v, grad_u_v);
         },
+        {},
     };
 }
 

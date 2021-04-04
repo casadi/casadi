@@ -27,32 +27,43 @@ struct Problem {
     Box D;          ///< Other constraints, @f$ g(x) \in D @f$
 
     /// Signature of the function that evaluates the cost @f$ f(x) @f$
-    /// @param  x
-    ///   [in]  Decision variable: @f$ x @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \mathbb{R}^n @f$
     using f_sig = real_t(const vec &x);
     /// Signature of the function that evaluates the gradient of the cost
     /// function @f$ \nabla f(x) @f$
-    /// @param  x
-    ///   [in]  Decision variable: @f$ x @f$
-    /// @param  grad_fx
-    ///  [out]  Gradient of cost function: @f$ \nabla f(x) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \mathbb{R}^n @f$
+    /// @param  [out] grad_fx
+    ///         Gradient of cost function @f$ \nabla f(x) \in \mathbb{R}^n @f$
     using grad_f_sig = void(const vec &x, vec &grad_fx);
     /// Signature of the function that evaluates the constraints @f$ g(x) @f$
-    /// @param  x
-    ///   [in]  Decision variable: @f$ x @f$
-    /// @param  gx
-    ///  [out]  Value of the constraints: @f$ g(x) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \mathbb{R}^n @f$
+    /// @param  [out] gx
+    ///         Value of the constraints @f$ g(x) \in \mathbb{R}^m @f$
     using g_sig = void(const vec &x, vec &gx);
     /// Signature of the function that evaluates the gradient of the constraints
     /// times a vector
     /// @f$ \nabla g(x)\ y @f$
-    /// @param  x
-    ///   [in]  Decision variable: @f$ x @f$
-    /// @param  y
-    ///   [in]  Vector to multiply the gradient by: @f$ y @f$
-    /// @param  grad_gxy
-    ///  [out]  Gradient of the constraints: @f$ \nabla g(x)\ y @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \mathbb{R}^n @f$
+    /// @param  [in] y
+    ///         Vector @f$ y \in \mathbb{R}^m @f$ to multiply the gradient by
+    /// @param  [out] grad_gxy
+    ///         Gradient of the constraints
+    ///         @f$ \nabla g(x)\ y \in \mathbb{R}^n @f$
     using grad_g_sig = void(const vec &x, const vec &y, vec &grad_gxy);
+
+    /// Signature of the function that evaluates the Hessian of the Lagrangian
+    /// @f$ \nabla_{xx}^2L(x, y) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \mathbb{R}^n @f$
+    /// @param  [in] y
+    ///         Lagrange multipliers @f$ y \in \mathbb{R}^m @f$
+    /// @param  [out] H
+    ///         Hessian @f$ \nabla_{xx}^2 L(x, y) \in \mathbb{R}^{n\times n} @f$
+    using hess_L_sig = void(const vec &x, const vec &y, mat &H);
 
     /// Cost function @f$ f(x) @f$
     std::function<f_sig> f;
@@ -62,6 +73,8 @@ struct Problem {
     std::function<g_sig> g;
     /// Gradient of the constraint function times vector @f$ \nabla g(x)\ y @f$
     std::function<grad_g_sig> grad_g;
+    /// Hessian of the Lagrangian function @f$ \nabla_{xx}^2 L(x, y) @f$
+    std::function<hess_L_sig> hess_L;
 };
 
 struct EvalCounter {
@@ -69,6 +82,7 @@ struct EvalCounter {
     unsigned grad_f = 0;
     unsigned g      = 0;
     unsigned grad_g = 0;
+    unsigned hess_L = 0;
 
     void reset() { *this = {}; }
 };
@@ -78,6 +92,7 @@ inline EvalCounter &operator+=(EvalCounter &a, EvalCounter b) {
     a.grad_f += b.grad_f;
     a.g += b.g;
     a.grad_g += b.grad_g;
+    a.hess_L += b.hess_L;
     return a;
 }
 

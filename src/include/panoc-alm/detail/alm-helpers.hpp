@@ -1,6 +1,7 @@
 #pragma once
 
 #include <panoc-alm/decl/alm.hpp>
+#include <stdexcept>
 
 namespace pa::detail {
 
@@ -89,6 +90,10 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
         std::move(prec_grad_f_fun),
         std::move(prec_g_fun),
         std::move(prec_grad_g_fun),
+        [](const vec &, const vec &, mat &) {
+            throw std::logic_error("Preconditioning for second-order solvers "
+                                   "has not yet been implemented");
+        },
     };
 
     // if (prec_g.size() <= 10) {

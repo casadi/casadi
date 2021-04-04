@@ -79,7 +79,7 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
         grad_u_v = grad * v;
     };
 
-    Problem p{n, m, C, D, obj_f, grad_f, g, grad_g};
+    Problem p{n, m, C, D, obj_f, grad_f, g, grad_g, {}};
     ProblemWithCounters pc(p);
 
     ALMParams almparam;

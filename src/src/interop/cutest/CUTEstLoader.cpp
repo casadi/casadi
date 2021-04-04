@@ -85,6 +85,9 @@ class CUTEstLoader {
         eval_constraints_grad_p = ncon > 0                                 //
                                       ? dlfun<void>("cutest_cint_cjprod_") //
                                       : nullptr;
+        eval_lagrangian_hess_p  = ncon > 0                         //
+                                      ? dlfun<void>("cutest_cdh_") //
+                                      : dlfun<void>("cutest_udh_");
     }
 
     // template <typename Ret, typename... Args>
@@ -174,6 +177,25 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cjprod", status);
     }
 
+    void eval_lagrangian_hess(const pa::vec &x, const pa::vec &y,
+                              pa::mat &H) const {
+        assert(x.size() == nvar);
+        assert(y.size() == ncon);
+        assert(H.rows() >= nvar);
+        assert(H.cols() >= nvar);
+        integer status;
+        integer ldH = H.rows();
+        if (ncon == 0) {
+            call_as<decltype(CUTEST_udh)>(eval_lagrangian_hess_p)(
+                &status, &nvar, x.data(), &ldH, H.data());
+            throw_if_error("Failed to call cutest_udh", status);
+        } else {
+            call_as<decltype(CUTEST_cdh)>(eval_lagrangian_hess_p)(
+                &status, &nvar, &ncon, x.data(), y.data(), &ldH, H.data());
+            throw_if_error("Failed to call cutest_cdh", status);
+        }
+    }
+
     unsigned count_box_constraints() const {
         return std::count_if(x_l.data(), x_l.data() + nvar,
                              [](pa::real_t x) { return x > -CUTE_INF; }) +
@@ -259,10 +281,12 @@ class CUTEstLoader {
     logical_vec linear;   ///< whether the constraint is linear
     mutable pa::vec work; ///< work vector
 
-    void *eval_objective_p        = nullptr;
-    void *eval_objective_grad_p   = nullptr;
-    void *eval_constraints_p      = nullptr;
-    void *eval_constraints_grad_p = nullptr;
+    void *eval_objective_p                = nullptr;
+    void *eval_objective_grad_p           = nullptr;
+    void *eval_constraints_p              = nullptr;
+    void *eval_constraints_grad_p         = nullptr;
+    void *eval_specific_constraint_grad_p = nullptr;
+    void *eval_lagrangian_hess_p          = nullptr;
 };
 
 CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname) {
@@ -290,6 +314,8 @@ CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname) {
     problem.g = std::bind(&CUTEstLoader::eval_constraints, l, _1, _2);
     problem.grad_g =
         std::bind(&CUTEstLoader::eval_constraints_grad, l, _1, _2, _3);
+    problem.hess_L =
+        std::bind(&CUTEstLoader::eval_lagrangian_hess, l, _1, _2, _3);
     x0 = std::move(l->x);
     y0 = std::move(l->y);
 }
