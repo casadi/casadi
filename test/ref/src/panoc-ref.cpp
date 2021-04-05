@@ -105,7 +105,7 @@ using std::chrono::microseconds;
 PANOCSolver::Stats PANOCSolver::operator()(
     const Problem &problem, ///< [in]    Problem description
     const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
-    real_t ε,               ///< [in]    Tolerance @f$ \epsilon @f$
+    real_t ε,               ///< [in]    Tolerance @f$ \varepsilon @f$
     bool
         always_overwrite_results, ///< [in] Overwrite x, y and err_z even if not converged
     vec &x,                       ///< [inout] Decision variable @f$ x @f$

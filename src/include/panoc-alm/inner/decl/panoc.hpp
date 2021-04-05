@@ -35,6 +35,8 @@ struct PANOCParams {
     std::chrono::microseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step.
     real_t τ_min = 1. / 256;
+    /// Maximum number of iterations without any progress before giving up.
+    unsigned max_no_progress = 10;
 
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
