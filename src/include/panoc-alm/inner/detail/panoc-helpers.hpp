@@ -206,15 +206,12 @@ inline real_t descent_lemma(
     /// [inout] Lipschitz constant estimate @f$ L_{\nabla\psi}^k @f$
     real_t &Lₖ,
     /// [inout] Step size @f$ \gamma^k @f$
-    real_t &γₖ,
-    /// [inout] PANOC line search constant @f$ \sigma^k @f$
-    real_t &σₖ) {
+    real_t &γₖ) {
 
     real_t old_γₖ = γₖ;
     while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ &&
            std::abs(grad_ψₖᵀpₖ / ψₖ) > rounding_threshold) {
         Lₖ *= 2;
-        σₖ /= 2;
         γₖ /= 2;
 
         // Calculate x̂ₖ and pₖ (with new step size)

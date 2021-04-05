@@ -85,14 +85,15 @@ real_t calc_error_stop_crit(const Problem &prob, const vec &xₖ, const vec &x̂
 }
 
 bool lipschitz_check(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
-                     const vec &y, const vec &Σ, real_t γ, real_t L) {
-    real_t ψₖ     = eval_ψ(prob, xₖ, y, Σ);
-    real_t ψx̂ₖ    = eval_ψ(prob, x̂ₖ, y, Σ);
-    real_t margin = 0; // 1e-6 * std::abs(ψₖ); // TODO: why?
-    vec pₖ        = projected_gradient_step(prob, xₖ, y, Σ, γ);
-    return ψx̂ₖ > margin + ψₖ                               //
-                     + eval_grad_ψ(prob, xₖ, y, Σ).dot(pₖ) //
-                     + L / 2 * pₖ.squaredNorm();
+                     const vec &y, const vec &Σ, real_t γ, real_t L,
+                     real_t rounding_threshold) {
+    real_t ψₖ   = eval_ψ(prob, xₖ, y, Σ);
+    real_t ψx̂ₖ  = eval_ψ(prob, x̂ₖ, y, Σ);
+    vec grad_ψₖ = eval_grad_ψ(prob, xₖ, y, Σ);
+    vec pₖ      = projected_gradient_step(prob, xₖ, y, Σ, γ);
+    if (std::abs(grad_ψₖ.dot(pₖ) / ψₖ) <= rounding_threshold)
+        return false;
+    return ψx̂ₖ > ψₖ + grad_ψₖ.dot(pₖ) + L / 2 * pₖ.squaredNorm();
 }
 
 } // namespace detail
@@ -134,7 +135,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
         vec x̂ₖ = xₖ + projected_gradient_step(problem, xₖ, y, Σ, γₖ);
 
         real_t old_γₖ = γₖ;
-        while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γₖ, Lₖ) && γₖ > 0) {
+        while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γₖ, Lₖ,
+                               params.quadratic_upperbound_threshold)) {
             assert(not params.update_lipschitz_in_linesearch || k == 0);
             Lₖ *= 2;
             σₖ /= 2;
@@ -210,8 +212,8 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
             if (params.update_lipschitz_in_linesearch) {
                 real_t old_γₖ₊₁ = γₖ₊₁;
-                while (lipschitz_check(problem, xₖ₊₁, x̂ₖ₊₁, y, Σ, γₖ₊₁, Lₖ₊₁) &&
-                       γₖ₊₁ > 0) {
+                while (lipschitz_check(problem, xₖ₊₁, x̂ₖ₊₁, y, Σ, γₖ₊₁, Lₖ₊₁,
+                                       params.quadratic_upperbound_threshold)) {
                     Lₖ₊₁ *= 2;
                     σₖ₊₁ /= 2;
                     γₖ₊₁ /= 2;

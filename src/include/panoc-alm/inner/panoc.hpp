@@ -94,18 +94,18 @@ PANOCSolver<DirectionProviderT>::operator()(
     auto descent_lemma = [this, &problem, &y,
                           &Σ](const vec &xₖ, real_t ψₖ, const vec &grad_ψₖ,
                               vec &x̂ₖ, vec &pₖ, vec &ŷx̂ₖ, real_t &ψx̂ₖ,
-                              real_t &norm_sq_pₖ, real_t &grad_ψₖᵀpₖ,
-                              real_t &Lₖ, real_t &γₖ, real_t &σₖ) {
+                              real_t &pₖᵀpₖ, real_t &grad_ψₖᵀpₖ, real_t &Lₖ,
+                              real_t &γₖ) {
         return detail::descent_lemma(
             problem, params.quadratic_upperbound_threshold, xₖ, ψₖ, grad_ψₖ, y,
-            Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, norm_sq_pₖ, grad_ψₖᵀpₖ, Lₖ, γₖ, σₖ);
+            Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, const vec &grad_ψₖ,
-                              real_t norm_sq_pₖ, real_t γₖ, real_t εₖ) {
+                              real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
         std::cout << "[PANOC] " << std::setw(6) << k
                   << ": ψ = " << std::setw(13) << ψₖ
                   << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()
-                  << ", ‖p‖ = " << std::setw(13) << std::sqrt(norm_sq_pₖ)
+                  << ", ‖p‖ = " << std::setw(13) << std::sqrt(pₖᵀpₖ)
                   << ", γ = " << std::setw(13) << γₖ
                   << ", εₖ = " << std::setw(13) << εₖ << "\r\n";
     };
@@ -129,7 +129,6 @@ PANOCSolver<DirectionProviderT>::operator()(
         return s;
     }
     real_t γₖ = params.Lipschitz.Lγ_factor / Lₖ;
-    real_t σₖ = γₖ * (1 - γₖ * Lₖ) / 2;
 
     // First projected gradient step -------------------------------------------
 
@@ -138,9 +137,9 @@ PANOCSolver<DirectionProviderT>::operator()(
     // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
     real_t ψx̂ₖ        = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷx̂ₖ);
     real_t grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
-    real_t norm_sq_pₖ = pₖ.squaredNorm();
+    real_t pₖᵀpₖ      = pₖ.squaredNorm();
     // Compute forward-backward envelope
-    real_t φₖ = ψₖ + 1 / (2 * γₖ) * norm_sq_pₖ + grad_ψₖᵀpₖ;
+    real_t φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
 
     // Main PANOC loop
     // =========================================================================
@@ -149,10 +148,10 @@ PANOCSolver<DirectionProviderT>::operator()(
         // Quadratic upper bound -----------------------------------------------
         if (k == 0 || params.update_lipschitz_in_linesearch == false) {
             // Decrease step size until quadratic upper bound is satisfied
-            real_t old_γₖ = descent_lemma(xₖ, ψₖ, grad_ψₖ,
-                                          /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
-                                          /* inout */ ψx̂ₖ, norm_sq_pₖ,
-                                          grad_ψₖᵀpₖ, Lₖ, γₖ, σₖ);
+            real_t old_γₖ =
+                descent_lemma(xₖ, ψₖ, grad_ψₖ,
+                              /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
+                              /* inout */ ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
             if (k > 0 && γₖ != old_γₖ) // Flush L-BFGS if γ changed
                 Direction::changed_γ(direction_provider, γₖ, old_γₖ);
             else if (k == 0) // Initialize L-BFGS
@@ -166,10 +165,10 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
-            print_progress(k, ψₖ, grad_ψₖ, norm_sq_pₖ, γₖ, εₖ);
+            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, εₖ);
         if (progress_cb)
-            progress_cb({k, xₖ, pₖ, norm_sq_pₖ, x̂ₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ,
-                         Lₖ, γₖ, εₖ, Σ, y, problem, params});
+            progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ, Lₖ,
+                         γₖ, εₖ, Σ, y, problem, params});
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status  = detail::check_all_stop_conditions(
@@ -198,10 +197,10 @@ PANOCSolver<DirectionProviderT>::operator()(
             Direction::apply(direction_provider, xₖ, x̂ₖ, pₖ, /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
-        real_t τ            = 1;
-        real_t σ_norm_γ⁻¹pₖ = σₖ * norm_sq_pₖ / (γₖ * γₖ);
-        real_t φₖ₊₁, ψₖ₊₁, ψx̂ₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, norm_sq_pₖ₊₁;
-        real_t Lₖ₊₁, σₖ₊₁, γₖ₊₁;
+        real_t τ           = 1;
+        real_t σₖγₖ⁻¹pₖᵀpₖ = (1 - γₖ * Lₖ) * pₖᵀpₖ / (2 * γₖ);
+        real_t φₖ₊₁, ψₖ₊₁, ψx̂ₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, pₖ₊₁ᵀpₖ₊₁;
+        real_t Lₖ₊₁, γₖ₊₁;
         real_t ls_cond;
 
         // Make sure quasi-Newton step is valid
@@ -216,7 +215,6 @@ PANOCSolver<DirectionProviderT>::operator()(
         // Line search loop ----------------------------------------------------
         do {
             Lₖ₊₁ = Lₖ;
-            σₖ₊₁ = σₖ;
             γₖ₊₁ = γₖ;
 
             // Calculate xₖ₊₁
@@ -237,26 +235,25 @@ PANOCSolver<DirectionProviderT>::operator()(
 
             // Quadratic upper bound -------------------------------------------
             grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
-            norm_sq_pₖ₊₁   = pₖ₊₁.squaredNorm();
-            real_t norm_sq_pₖ₊₁_ₖ = norm_sq_pₖ₊₁; // prox step with step size γₖ
+            pₖ₊₁ᵀpₖ₊₁      = pₖ₊₁.squaredNorm();
+            real_t pₖ₊₁ᵀpₖ₊₁_ₖ = pₖ₊₁ᵀpₖ₊₁; // prox step with step size γₖ
 
             if (params.update_lipschitz_in_linesearch == true) {
                 // Decrease step size until quadratic upper bound is satisfied
-                real_t old_γₖ₊₁ =
-                    descent_lemma(xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
-                                  /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
-                                  /* inout */ ψx̂ₖ₊₁, norm_sq_pₖ₊₁,
-                                  grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁, σₖ₊₁);
+                real_t old_γₖ₊₁ = descent_lemma(
+                    xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
+                    /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
+                    /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁);
                 if (old_γₖ₊₁ != γₖ₊₁) // Flush L-BFGS if γ changed
                     Direction::changed_γ(direction_provider, γₖ₊₁, old_γₖ₊₁);
             }
 
             // Compute forward-backward envelope
-            φₖ₊₁ = ψₖ₊₁ + 1 / (2 * γₖ₊₁) * norm_sq_pₖ₊₁ + grad_ψₖ₊₁ᵀpₖ₊₁;
+            φₖ₊₁ = ψₖ₊₁ + 1 / (2 * γₖ₊₁) * pₖ₊₁ᵀpₖ₊₁ + grad_ψₖ₊₁ᵀpₖ₊₁;
             // Compute line search condition
-            ls_cond = φₖ₊₁ - (φₖ - σ_norm_γ⁻¹pₖ);
+            ls_cond = φₖ₊₁ - (φₖ - σₖγₖ⁻¹pₖᵀpₖ);
             if (params.alternative_linesearch_cond)
-                ls_cond -= (0.5 / γₖ₊₁ - 0.5 / γₖ) * norm_sq_pₖ₊₁_ₖ;
+                ls_cond -= (0.5 / γₖ₊₁ - 0.5 / γₖ) * pₖ₊₁ᵀpₖ₊₁_ₖ;
 
             τ /= 2;
         } while (ls_cond > 0 && τ >= params.τ_min);
@@ -276,7 +273,6 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Advance step --------------------------------------------------------
         Lₖ = Lₖ₊₁;
-        σₖ = σₖ₊₁;
         γₖ = γₖ₊₁;
 
         ψₖ  = ψₖ₊₁;
@@ -289,7 +285,7 @@ PANOCSolver<DirectionProviderT>::operator()(
         pₖ.swap(pₖ₊₁);
         grad_ψₖ.swap(grad_ψₖ₊₁);
         grad_ψₖᵀpₖ = grad_ψₖ₊₁ᵀpₖ₊₁;
-        norm_sq_pₖ = norm_sq_pₖ₊₁;
+        pₖᵀpₖ      = pₖ₊₁ᵀpₖ₊₁;
     }
     throw std::logic_error("[PANOC] loop error");
 }
