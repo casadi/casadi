@@ -381,7 +381,7 @@ namespace casadi {
 
     // Construct return function
     Dict custom_opts = opts;
-    //custom_opts["always_inline"] = true;
+    custom_opts["always_inline"] = true;
     Function retf(name, arg, res, inames, onames, custom_opts);
     static std::vector<Function> leaking;
     leaking.push_back(retf);
