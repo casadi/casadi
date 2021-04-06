@@ -680,9 +680,6 @@ namespace casadi {
     /// 1-norm
     virtual MX get_permute_layout(const Relayout& relay) const;
 
-    /// 1-norm
-    virtual MX get_reinterpret_layout(const Layout& target) const;
-
     /// Min
     virtual MX get_mmin() const;
 

@@ -996,14 +996,6 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_reinterpret_layout(const Layout& target) const {
-    if (nnz()==0 || layout()==target) {
-      return shared_from_this<MX>();
-    } else {
-      return MX::create(new ReinterpretLayout(shared_from_this<MX>(), target));
-    }
-  }
-
   MX MXNode::get_mmin() const {
     if (sparsity_.is_empty()) return MX();
     return MX::create(new MMin(shared_from_this<MX>()));

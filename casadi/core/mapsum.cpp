@@ -481,8 +481,8 @@ namespace casadi {
         if (reduce_out_[j]) {
           if (!loop_bug)
             g << "res1[" << j << "]-= " << GlobalOptions::vector_width_real << " ;\n";
-          g.local("sum", "casadi_real", "*");
-          g << "sum = res[" << j << "];\n";
+          g.local("sum"+str(j), "casadi_real", "*");
+          g << "sum" << j << " = res[" << j << "];\n";
           if (has_rem && n_outer_it>1) {
             // avoid adding nans
             g << "if (i<" << ((n_padded() / GlobalOptions::vector_width_real)-1) << ") {\n";
@@ -490,11 +490,11 @@ namespace casadi {
           if (!has_rem || n_outer_it>1) {
             g.local("k", "casadi_int");
             g.local("j", "casadi_int");
-            g << "#pragma omp simd reduction(+:sum[:" << f_.nnz_out(j) << "])\n";
+            g << "#pragma omp simd reduction(+:sum" << j << "[:" << f_.nnz_out(j) << "])\n";
             g << "for (k=0; k<" << f_.nnz_out(j) << "; ++k) {\n";
             g << "for (j=0; j<" << GlobalOptions::vector_width_real << "; ++j) ";
             std::string res = loop_bug ? "res2" : "res1";
-            g << "sum[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
+            g << "sum" << j << "[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
             g << "}\n";
           }
           if (has_rem && n_outer_it>1) {
@@ -520,7 +520,7 @@ namespace casadi {
           // you might be adding stray numbers
           g << "for (j=0; j<" << rem << "; ++j) ";
           std::string res = loop_bug ? "res2" : "res1";
-          g << "sum[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
+          g << "sum" << j << "[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
           g << "}\n";
         }
       }

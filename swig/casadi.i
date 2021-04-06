@@ -3634,9 +3634,6 @@ DECL M casadi_convexify(const M& H,
         const Dict& opts = Dict()) {
   return convexify(H, opts);
 }
-DECL M casadi_reinterpret_layout(const M& x, const Layout& target) {
-  return reinterpret_layout(x, target);
-}
 DECL M casadi_permute_layout(const M& x, const Relayout& relay) {
   return permute_layout(x, relay);
 }
