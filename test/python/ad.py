@@ -521,6 +521,7 @@ class ADtests(casadiTestCase):
     xx = horzcat(sin(x),cos(x))
 
     for inputs,values,out, jac, with_sx, std in [
+          (in1,v1,permute_layout(horzcat(x[0]*y,x[1]*y,sin(x[0]*y),cos(x[1]*y)),Relayout(Layout([4,2,2]),[0,2,1],Layout([4,2,2]))),blockcat([[casadi.vec(y),MX(4,1)],[casadi.vec(cos(x[0]*y)*y),MX(4,1)],[MX(4,1),casadi.vec(y)],[MX(4,1),-casadi.vec(sin(x[1]*y)*y)]]),False,"c89"),
           (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[y[:,0],:],blockcat([[0,cos(x[1])],[cos(x[0]),0],[0,-sin(x[1])],[-sin(x[0]),0]]),False,"c99"),
           (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[:,y[:,0]],blockcat([[-sin(x[0]),0],[0,-sin(x[1])],[cos(x[0]),0],[0,cos(x[1])]]),False,"c99"),
           (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[y[:,0],y[:,0]],blockcat([[0,-sin(x[1])],[-sin(x[0]),0],[0,cos(x[1])],[cos(x[0]),0]]),False,"c99"),
@@ -627,7 +628,7 @@ class ADtests(casadiTestCase):
         self.checkarray(fun_out[1],funsx_out[1])
       else:
         funsx_ad = None
-      self.check_codegen(fun,inputs=values,std=std)
+      self.check_codegen(fun,inputs=values,std=std,main=True)
       self.check_serialize(fun,inputs=values)
 
       J_ = fun_out[1]
@@ -681,7 +682,7 @@ class ADtests(casadiTestCase):
               vf_in.append(0)
 
             vf_out = vf.call(vf_in)
-            self.check_codegen(vf,inputs=vf_in,std=std)
+            self.check_codegen(vf,inputs=vf_in,std=std,main=True)
             self.check_serialize(vf,inputs=vf_in)
 
             offset = len(res)
@@ -794,6 +795,6 @@ class ADtests(casadiTestCase):
           if H_ is None:
             H_ = Hf_out[0]
           self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
-
+      break 
 if __name__ == '__main__':
     unittest.main()

@@ -634,10 +634,10 @@ class casadiTestCase(unittest.TestCase):
 
       if isinstance(inputs, dict):
         for k in F.name_out():
-          self.checkarray(Fout[k],Fout2[k],digits=15)
+          self.checkarray(Fout[k],Fout2[k],digits=15,failmessage="Output %s" % k)
       else:
         for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i],digits=15)
+          self.checkarray(Fout[i],Fout2[i],digits=15,failmessage="Output %d" % i)
 
 
 
@@ -705,7 +705,7 @@ class casadiTestCase(unittest.TestCase):
         else:
           defs = " ".join(["-D"+d for d in definitions])
           output = "./" + name + (".so" if shared else "")
-          commands = compiler + " -pedantic -std={std} {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir}".format(shared="-fPIC -shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir,definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = compiler + " -pedantic -std={std} {shared} -Wall  -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir}".format(shared="-fPIC -shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir,definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
           return [commands, output]
 
       if not static:
@@ -741,6 +741,7 @@ class casadiTestCase(unittest.TestCase):
       if main:
         with open(F.name()+"_out.txt","w") as stdout:
           with open(F.name()+"_in.txt","r") as stdin:
+            print(exename+" "+F.name())
             p = subprocess.Popen(exename+" "+F.name(),shell=True,stdin=stdin,stdout=stdout).communicate()
 
         outputs = F.generate_out(F.name()+"_out.txt")

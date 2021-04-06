@@ -1985,10 +1985,6 @@ namespace casadi {
     return H->get_convexify(opts);
   }
 
-  MX MX::reinterpret_layout(const MX& x, const Layout& target) {
-    return x->get_reinterpret_layout(target);
-  }
-
   MX MX::permute_layout(const MX& x, const Relayout& relay) {
     return x->get_permute_layout(relay);
   }
