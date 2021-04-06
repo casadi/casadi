@@ -122,6 +122,10 @@ namespace casadi {
     return (*this)->get_compressed();
   }
 
+  std::vector<casadi_int> Layout::dims() const {
+    return (*this)->dim();
+  }
+
 
   void Layout::serialize(SerializingStream& s) const {
     return (*this)->serialize(s);

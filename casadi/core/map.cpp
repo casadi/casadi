@@ -357,10 +357,21 @@ namespace casadi {
     vector<MX> res = arg;
     for (casadi_int i=0;i<f_.n_in();++i) {
       MX& x = res[f_.n_in()+f_.n_out()+i];
+      casadi_int df_in = df.nnz_in(f_.n_in()+f_.n_out()+i);
+      if (false && vectorize_f()) {
+        Layout source({n_, df_in}, {n_padded(), df_in});
+        Layout target({df_in, n_});
+        Relayout ret = Relayout(source, {1, 0}, target);
+        uout() << "FOO " << i << std::endl;
+        //x = permute_layout(x, ret);
+
+        // Layout source({f_.nnz_in(i), n_});
+        // Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
+      }
       if (!vectorize_f()) {
         uout() << "here" << std::endl;
-        Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd,n_,nfwd});
-        Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd, nfwd, n_});
+        Layout source({df_in/nfwd,n_,nfwd});
+        Layout target({df_in/nfwd, nfwd, n_});
         x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
         uout() << "baz" << x << "source" << source << "target" << target << std::endl;
       }
@@ -370,11 +381,24 @@ namespace casadi {
     res = dm(res);
 
     for (casadi_int i=0;i<f_.n_out();++i) {
+      casadi_int df_out = df.nnz_out(i);
+      MX& x = res[i];
+      if (false && vectorize_f()) {
+
+      //Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+      //Layout target({f_.nnz_out(i), n_});
+      //  Relayout ret = Relayout(source, {1, 0}, target);
+        Layout source({df_out, n_});
+        Layout target({n_, df_out}, {n_padded(), df_out});
+        Relayout ret = Relayout(source, {1, 0}, target);
+        uout() << "BAR " << i << std::endl;
+        //x = permute_layout(x, ret);
+      }
       if (!vectorize_f()) {
         uout() << "there" << std::endl;
-        Layout source({df.nnz_out(i)/nfwd,nfwd,n_});
-        Layout target({df.nnz_out(i)/nfwd,n_,nfwd});
-        res[i] = permute_layout(res[i],Relayout(source, {0, 2, 1}, target,"get_forward_out"));
+        Layout source({df_out/nfwd,nfwd,n_});
+        Layout target({df_out/nfwd,n_,nfwd});
+        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
         uout() << "baz" << res[i] << "source" << source << "target" << target << std::endl;
       }
     }
