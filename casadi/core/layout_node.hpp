@@ -59,6 +59,7 @@ namespace casadi {
     virtual bool has_padding() const = 0;
     virtual bool is_default() const { return false; }
     std::vector<casadi_int> get_compressed() const { return layout_; }
+    virtual std::vector<casadi_int> dim() const = 0;
     operator const casadi_int*() const;
     std::vector<casadi_int> layout_;
 
@@ -108,6 +109,7 @@ namespace casadi {
     size_t size() const override;
     size_t nnz() const override;
     size_t n_dims() const override;
+    std::vector<casadi_int> dim() const override { return {}; }
 
     bool is_default() const override { return true; }
     bool has_padding() const override { return false; }
@@ -193,6 +195,7 @@ namespace casadi {
     size_t size() const override;
     size_t nnz() const override;
     size_t n_dims() const override;
+    virtual std::vector<casadi_int> dim() const override { return get_dims(); }
     void assert_valid_permutation(const Layout& target) const override;
 
     bool operator==(const Layout& other) const override;

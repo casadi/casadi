@@ -41,6 +41,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
   }
 
   MX PermuteLayout::create(const MX& x, const Relayout& relay) {
+    if (relay.is_trivial()) return x;
     //if (relay.is_trivial()) return x;
     return MX::create(new PermuteLayout(x, relay));
     //casadi_assert(x.is_dense(), "must be dense");
@@ -57,10 +58,16 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     set_dep(x);
     set_sparsity(x.sparsity());
     sparsity().spy();
-    uout() << nnz() << std::endl;
-    uout() << relay.source().size() << std::endl;
+    uout() << "PermuteLayout" << std::endl;
+    uout() << relay.perms() << std::endl;
+    uout() << relay.source() << std::endl;
+    uout() << relay.target() << std::endl;
     casadi_assert(x->nnz()==relay.source().nnz(), "Invalid permutation");
-    //casadi_assert(x->sz_self()==relay.source().size(), "Invalid permutation sz_self" + str(x->sz_self()) + str(relay.source()));   
+    if (x->sz_self()<relay.source().size()) {
+
+      relay_ = Relayout(Layout(relay_.source().dims()),relay_.perms(), relay_.target(), relay.label());
+    }
+    casadi_assert(x->sz_self()==relay_.source().size(), "Invalid permutation sz_self" + str(x->sz_self()) + str(relay.source()));   
     /*const Layout& source = dep(0).layout();
     if (source.has_padding() || target.has_padding()) {
       set_sparsity(Sparsity::dense(target.is_default() ? source.size() : target.size(), 1));
@@ -75,7 +82,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     //  uout() << x << std::endl;
     //}
     //casadi_assert(x.is_dense(), "Sparsity not supported");
-    set_layout(relay.target());
+    set_layout(relay_.target());
     relay_.source().assert_valid_permutation(relay_.target());
     //uout() << "okay" << std::endl;
   }

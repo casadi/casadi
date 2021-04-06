@@ -75,6 +75,8 @@ namespace casadi {
 
     size_t n_dims() const;
 
+    std::vector<casadi_int> dims() const;
+
     /** \brief Serialize an object */
     void serialize(SerializingStream& s) const;
 
@@ -124,6 +126,7 @@ namespace casadi {
     inline const Layout& source() const { return source_; }
     inline const Layout& target() const { return target_; }
     inline const std::vector<casadi_int>& perms() const { return perms_; }
+    inline const std::string& label() const { return label_; }
     size_t sz_iw() const;
 
     std::vector<casadi_int> nz_ref() const;
