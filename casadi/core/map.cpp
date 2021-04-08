@@ -53,9 +53,7 @@ namespace casadi {
       casadi_error("Unknown parallelization: " + parallelization);
     }
 
-    if (GlobalOptions::vector_width_real==1) return ret;
-
-    if (!f.is_a("SXFunction")) { return ret; }
+    if (!vectorize_f(f, n)) return ret;
 
     const Map& m = *static_cast<const Map*>(ret.get());
 
@@ -112,15 +110,15 @@ namespace casadi {
     uout() << "It's map!" << std::endl;
 
     f_orig_ = f;
-    if (vectorize_f(f)) {
+    if (vectorize_f(f, n_)) {
 
       std::vector<casadi_int> stride_in(f_.n_in());
       std::vector<casadi_int> stride_out(f_.n_out());
       for (casadi_int j=0; j<f_.n_in(); ++j) {
-        stride_in[j] = vectorize_f(f) ? n_padded(n) : 1;
+        stride_in[j] = vectorize_f(f, n_) ? n_padded(n) : 1;
       }
       for (casadi_int j=0; j<f_.n_out(); ++j) {
-        stride_out[j] = vectorize_f(f) ? n_padded(n) : 1;
+        stride_out[j] = vectorize_f(f, n_) ? n_padded(n) : 1;
       }
 
       Dict opts;
@@ -170,11 +168,11 @@ namespace casadi {
   }
 
   bool Map::vectorize_f() const {
-    return vectorize_f(f_);
+    return vectorize_f(f_, n_);
   }
 
-  bool Map::vectorize_f(const Function& f) {
-    return GlobalOptions::vector_width_real>1 && f.is_a("SXFunction");
+  bool Map::vectorize_f(const Function& f, casadi_int n) {
+    return GlobalOptions::vector_width_real>1 && f.is_a("SXFunction") && n>=GlobalOptions::vector_width_real;
   }
 
   Layout Map::get_layout_in(casadi_int i) {

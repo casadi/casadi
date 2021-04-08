@@ -161,6 +161,17 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     return MXNode::get_nzref(sp, nz);
   }
 
+  MX PermuteLayout::as_nzref() const {
+    const casadi_int* source = relay_.source();
+    const casadi_int* target = relay_.target();
+    const casadi_int* perms = get_ptr(relay_.perms());
+    std::vector<casadi_int> arg = range(nnz());
+    std::vector<casadi_int> res(nnz());
+    std::vector<casadi_int> iw(sz_iw());
+    casadi_relayout(get_ptr(arg), get_ptr(res), source, perms, target, iw);
+    return dep(0)->get_nzref(sparsity(), res);
+  }
+
   void PermuteLayout::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     //uout() << "eval_mx" << std::endl;
     //s//parsity().spy();
@@ -249,7 +260,6 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
   
 
   MX PermuteLayout::get_permute_layout(const Relayout& relay) const {
-    return MXNode::get_permute_layout(relay);
     if (relay_.cancels(relay)) { // cancellation
       return dep(0);
     } else if (relay_.absorbs(relay)) {

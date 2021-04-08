@@ -78,7 +78,7 @@ namespace casadi {
 
     bool vectorize_f() const;
 
-    static bool vectorize_f(const Function& f);
+    static bool vectorize_f(const Function& f, casadi_int n);
 
     /** \brief Get default input value */
     double get_default_in(casadi_int ind) const override { return f_.default_in(ind);}
