@@ -113,6 +113,8 @@ namespace casadi {
 
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
 
+    MX as_nzref() const;
+
   private:
     Relayout relay_;
 

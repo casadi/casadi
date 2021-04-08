@@ -184,7 +184,6 @@ namespace casadi {
   }
 
   bool Relayout::cancels(const Relayout& other) const {
-    return false;
     uout() << "cancels?" << source_ << target_ << std::endl;
     uout() << "cancels?" <<  other.source() << other.target() << std::endl;
     //if (source_==other.target() && target_==other.source() && invert_permutation(perms_)==other.perms()) return true;
@@ -272,7 +271,6 @@ namespace casadi {
 
   bool Relayout::is_trivial() const {
     if (perms_.empty()) return true;
-    return false;
     if (source_.size()!=target_.size()) return false;
     std::vector<casadi_int> iw(sz_iw());
     size_t size = source_.size();

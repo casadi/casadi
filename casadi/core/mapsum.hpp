@@ -220,7 +220,7 @@ namespace casadi {
     std::vector<MX> permute_in(const std::vector<MX>& arg, bool invert=false) const;
     std::vector<MX> permute_out(const std::vector<MX>& res, bool invert=false) const;
     bool vectorize_f() const;
-    static bool vectorize_f(const Function& f);
+    static bool vectorize_f(const Function& f, casadi_int n);
 
 
   protected:

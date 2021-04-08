@@ -86,7 +86,7 @@ namespace casadi {
 
     bool vectorize_f() const;
 
-    static bool vectorize_f(const Function& f);
+    static bool vectorize_f(const Function& f, casadi_int n);
 
     /** \brief Get default input value
 
