@@ -303,16 +303,25 @@ protected:
 
   ///@{
   /// Ordered variables and equations
-  std::vector<MX> ode_;
-  std::vector<MX> alg_;
-  std::vector<MX> quad_;
+  std::vector<MX> ode_, alg_, quad_;
   std::vector<MX> ydef_;
-  std::vector<MX> cdef_;
   std::vector<MX> ddef_;
   std::vector<MX> wdef_;
   std::vector<MX> aux_;
   std::vector<MX> init_lhs_, init_rhs_;
   ///@}
+
+  /** \brief Definitions of dependent constants */
+  std::vector<MX> cdef() const;
+
+  /** \brief Definitions of dependent parameters */
+  std::vector<MX> ddef() const;
+
+  /** \brief Definitions of dependent variables */
+  std::vector<MX> wdef() const;
+
+  /** \brief Definitions of output variables */
+  std::vector<MX> ydef() const;
 
   ///@{
   /// Add a new variable

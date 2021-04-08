@@ -240,7 +240,7 @@ public:
   void register_t(const MX& new_t);
 
   /// Register constant
-  void register_c(const MX& new_c, const MX& new_cdef);
+  void register_c(const MX& new_c);
 
   /// Register dependent parameter
   void register_d(const MX& new_d, const MX& new_ddef);

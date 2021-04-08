@@ -107,7 +107,7 @@ const std::vector<MX>& DaeBuilder::c() const {
 }
 
 std::vector<MX> DaeBuilder::cdef() const {
-  return (*this)->cdef_;
+  return (*this)->cdef();
 }
 
 const std::vector<MX>& DaeBuilder::d() const {
@@ -259,13 +259,11 @@ void DaeBuilder::register_t(const MX& new_t) {
   (*this)->t_.push_back(new_t);
 }
 
-void DaeBuilder::register_c(const MX& new_c, const MX& new_cdef) {
+void DaeBuilder::register_c(const MX& new_c) {
   // Consistency check
-  casadi_assert(new_c.sparsity() == new_cdef.sparsity(), "Mismatching sparsity");
   casadi_assert(has_variable(new_c.name()), "No such variable: " + new_c.name());
   // Add to lists
   (*this)->c_.push_back(new_c);
-  (*this)->cdef_.push_back(new_cdef);
 }
 
 void DaeBuilder::register_d(const MX& new_d, const MX& new_ddef) {

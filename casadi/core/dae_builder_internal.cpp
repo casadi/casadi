@@ -263,7 +263,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
     } else if (it->variability == Variable::CONSTANT) {
       // Named constant
       c_.push_back(it->v);
-      cdef_.push_back(it->start);
+      it->beq = it->start;
     } else if (it->variability == Variable::FIXED || it->variability == Variable::TUNABLE) {
       p_.push_back(it->v);
     } else if (it->variability == Variable::CONTINUOUS) {
@@ -442,8 +442,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (!c_.empty()) {
     stream << "Constants" << std::endl;
-    for (casadi_int i=0; i<c_.size(); ++i)
-      stream << "  " << str(c_[i]) << " == " << str(cdef_[i]) << std::endl;
+    for (const MX& c : c_) {
+      stream << "  " << str(c) << " == " << str(variable(c.name()).beq) << std::endl;
+    }
   }
 
   if (!d_.empty()) {
@@ -1696,6 +1697,34 @@ Function DaeBuilderInternal::gather_eq() const {
   return Function("all_eq", {}, f_out, {}, f_out_name);
 }
 
+std::vector<MX> DaeBuilderInternal::cdef() const {
+  std::vector<MX> ret;
+  ret.reserve(c_.size());
+  for (const MX& c : c_) ret.push_back(variable(c.name()).beq);
+  return ret;
+}
+
+std::vector<MX> DaeBuilderInternal::ddef() const {
+  std::vector<MX> ret;
+  ret.reserve(d_.size());
+  for (const MX& d : d_) ret.push_back(variable(d.name()).beq);
+  return ret;
+}
+
+std::vector<MX> DaeBuilderInternal::wdef() const {
+  std::vector<MX> ret;
+  ret.reserve(w_.size());
+  for (const MX& w : w_) ret.push_back(variable(w.name()).beq);
+  return ret;
+}
+
+std::vector<MX> DaeBuilderInternal::ydef() const {
+  std::vector<MX> ret;
+  ret.reserve(y_.size());
+  for (const MX& y : y_) ret.push_back(variable(y.name()).beq);
+  return ret;
+}
+
 MX DaeBuilderInternal::add_t(const std::string& name) {
   casadi_assert(t_.empty(), "'t' already defined");
   Variable v(name);
@@ -1763,7 +1792,6 @@ MX DaeBuilderInternal::add_c(const std::string& name, const MX& new_cdef) {
   v.beq = new_cdef;
   add_variable(name, v);
   c_.push_back(v.v);
-  cdef_.push_back(new_cdef);
   return v.v;
 }
 
