@@ -107,7 +107,7 @@ public:
   const std::vector<MX>& y() const;
 
   /** \brief Definitions of output variables */
-  const std::vector<MX>& ydef() const;
+  std::vector<MX> ydef() const;
 
   /** \brief Free controls */
   const std::vector<MX>& u() const;
@@ -119,7 +119,7 @@ public:
   const std::vector<MX>& c() const;
 
   /** \brief Definitions of named constants */
-  const std::vector<MX>& cdef() const;
+  std::vector<MX> cdef() const;
 
   /** \brief Dependent parameters */
   const std::vector<MX>& d() const;
@@ -127,7 +127,7 @@ public:
   /** \brief Definitions of dependent parameters
     * Interdependencies are allowed but must be non-cyclic.
     */
-  const std::vector<MX>& ddef() const;
+  std::vector<MX> ddef() const;
 
   /** \brief Dependent variables */
   const std::vector<MX>& w() const;
@@ -135,7 +135,7 @@ public:
   /** \brief Dependent variables and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
    */
-  const std::vector<MX>& wdef() const;
+  std::vector<MX> wdef() const;
 
   /** \brief Auxiliary variables: Used e.g. to define functions */
   const std::vector<MX>& aux() const;

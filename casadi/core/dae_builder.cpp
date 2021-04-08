@@ -90,7 +90,7 @@ const std::vector<MX>& DaeBuilder::y() const {
   return (*this)->y_;
 }
 
-const std::vector<MX>& DaeBuilder::ydef() const {
+std::vector<MX> DaeBuilder::ydef() const {
   return (*this)->ydef_;
 }
 
@@ -106,7 +106,7 @@ const std::vector<MX>& DaeBuilder::c() const {
   return (*this)->c_;
 }
 
-const std::vector<MX>& DaeBuilder::cdef() const {
+std::vector<MX> DaeBuilder::cdef() const {
   return (*this)->cdef_;
 }
 
@@ -114,7 +114,7 @@ const std::vector<MX>& DaeBuilder::d() const {
   return (*this)->d_;
 }
 
-const std::vector<MX>& DaeBuilder::ddef() const {
+std::vector<MX> DaeBuilder::ddef() const {
   return (*this)->ddef_;
 }
 
@@ -122,7 +122,7 @@ const std::vector<MX>& DaeBuilder::w() const {
   return (*this)->w_;
 }
 
-const std::vector<MX>& DaeBuilder::wdef() const {
+std::vector<MX> DaeBuilder::wdef() const {
   return (*this)->wdef_;
 }
 
