@@ -67,7 +67,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
 
       relay_ = Relayout(Layout(relay_.source().dims()),relay_.perms(), relay_.target(), relay.label());
     }
-    casadi_assert(x->sz_self()==relay_.source().size(), "Invalid permutation sz_self" + str(x->sz_self()) + str(relay.source()));   
+    casadi_assert(x->sz_self()==relay_.source().size(), "Invalid permutation sz_self" + str(x->sz_self()) + str(relay.source())  + str(relay_.source()) );   
     /*const Layout& source = dep(0).layout();
     if (source.has_padding() || target.has_padding()) {
       set_sparsity(Sparsity::dense(target.is_default() ? source.size() : target.size(), 1));
@@ -101,6 +101,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
       std::vector<MX> seeds;
       for (casadi_int d=0; d<n; ++d) {
         seeds.push_back(fseed[d][0]);//, Relayout(relay_.source(), relay_.target(),"fwdseed"));
+        casadi_assert_dev(fseed[d][0]->sz_self()==fseed[d][0]->nnz());
         //uout() << "seed" << std::endl;
         //seeds[d].sparsity().spy();
       }
@@ -163,7 +164,11 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
   void PermuteLayout::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     //uout() << "eval_mx" << std::endl;
     //s//parsity().spy();
-    uout() << "eval_mx" << std::endl;
+    //uout() << "eval_mx" << arg[0]->sz_self() << std::endl;
+    //uout() << "eval_mx" << project(arg[0],sparsity())->sz_self() << std::endl;
+    //uout() << "eval_mx" << relay_.source() << std::endl;
+    //uout() << "eval_mx" << arg[0] << std::endl;
+    //casadi_assert_dev(arg[0]->sz_self()==project(arg[0],sparsity())->sz_self());    
     //arg[0].sparsity().spy();
     res[0] = project(arg[0],sparsity())->get_permute_layout(Relayout(relay_.source(), relay_.perms(), relay_.target(), "eval_mx_"+relay_.label_));
   }
@@ -173,6 +178,14 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
   }
 
   int PermuteLayout::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    const casadi_int* source = relay_.source();
+    const casadi_int* target = relay_.target();
+    const casadi_int* perms = get_ptr(relay_.perms());
+    if (arg[0] && res[0]) casadi_relayout(arg[0], res[0], source, perms, target, iw);
+    return 0;
+  }
+
+  int PermuteLayout::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     const casadi_int* source = relay_.source();
     const casadi_int* target = relay_.target();
     const casadi_int* perms = get_ptr(relay_.perms());

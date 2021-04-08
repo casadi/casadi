@@ -744,6 +744,8 @@ namespace casadi {
         \identifier{lj} */
     Function wrap_as_needed(const Dict& opts) const;
 
+    virtual Function with_options(const Dict& opts) const;
+
     /** \brief Get function in cache
 
         \identifier{lk} */
@@ -1327,6 +1329,7 @@ namespace casadi {
     size_t align_w_;
 
     std::vector<Layout> layout_in_, layout_out_;
+    std::vector<casadi_int> stride_in_, stride_out_;
 
     /** \brief Check if the function is of a particular type
 

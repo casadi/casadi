@@ -74,6 +74,12 @@ namespace casadi {
         "Layout in"}},
       {"layout_out",
        {OT_LAYOUTVECTOR,
+        "Layout out"}},
+      {"stride_in",
+       {OT_INTVECTOR,
+        "Layout in"}},
+      {"stride_out",
+       {OT_INTVECTOR,
         "Layout out"}}
      }
   };
@@ -215,6 +221,9 @@ namespace casadi {
     print_instructions_ = false;
     bool cse_opt = false;
 
+    stride_in_.resize(n_in_, 1);
+    stride_out_.resize(n_out_, 1);
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
@@ -225,6 +234,10 @@ namespace casadi {
         print_instructions_ = op.second;
       } else if (op.first=="cse") {
         cse_opt = op.second;
+      } else if (op.first=="stride_in") {
+        stride_in_ = op.second;
+      } else if (op.first=="stride_out") {
+        stride_out_ = op.second;
       }
     }
 

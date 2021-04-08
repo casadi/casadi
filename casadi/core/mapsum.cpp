@@ -81,6 +81,24 @@ namespace casadi {
     casadi_assert_dev(reduce_in.size()==f.n_in());
     casadi_assert_dev(reduce_out.size()==f.n_out());
     uout() << "It's map sum!" << std::endl;
+
+    f_orig_ = f;
+
+    if (vectorize_f(f)) {
+      std::vector<casadi_int> stride_in(f_.n_in());
+      std::vector<casadi_int> stride_out(f_.n_out());
+      for (casadi_int j=0; j<f_.n_in(); ++j) {
+        stride_in[j] = vectorize_f(f) && !reduce_in[j] ? n_padded(n) : 1;
+      }
+      for (casadi_int j=0; j<f_.n_out(); ++j) {
+        stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded(n)) : 1;
+      }
+
+      Dict opts;
+      opts["stride_in"] = stride_in;
+      opts["stride_out"] = stride_out;
+      f_ = f_->with_options(opts);
+    }
   }
 
   Layout MapSum::get_layout_in(casadi_int i) {
@@ -96,6 +114,7 @@ namespace casadi {
   void MapSum::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
     s.pack("MapSum::f", f_);
+    s.pack("MapSum::f_orig", f_orig_);
     s.pack("MapSum::n", n_);
     s.pack("MapSum::reduce_in", reduce_in_);
     s.pack("MapSum::reduce_out", reduce_out_);
@@ -108,6 +127,7 @@ namespace casadi {
 
   MapSum::MapSum(DeserializingStream& s) : FunctionInternal(s) {
     s.unpack("MapSum::f", f_);
+    s.unpack("MapSum::f_orig", f_orig_);
     s.unpack("MapSum::n", n_);
     s.unpack("MapSum::reduce_in", reduce_in_);
     s.unpack("MapSum::reduce_out", reduce_out_);
@@ -167,13 +187,13 @@ namespace casadi {
 
   casadi_int MapSum::n_padded() const {
     if (vectorize_f()) {
-      //return n_;
       return n_padded(n_);
     }
     return n_;
   }
 
   casadi_int MapSum::n_padded(casadi_int n) {
+    return n;
     casadi_int rem = n % GlobalOptions::vector_width_real;
     if (rem==0) return n;
     return n + GlobalOptions::vector_width_real - rem;
@@ -534,7 +554,7 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Generate map of derivative
-    Function df = f_.forward(nfwd);
+    Function df = f_orig_.forward(nfwd);
 
     for (casadi_int i=0;i<n_out_;++i) {
       if (reduce_out_[i]) casadi_assert(df.nnz_in(n_in_+i)==0, "Case not implemented");
@@ -580,7 +600,11 @@ namespace casadi {
   }
 
   bool MapSum::vectorize_f() const {
-    return GlobalOptions::vector_width_real>1 && f_.is_a("SXFunction");
+    return vectorize_f(f_);
+  }
+
+  bool MapSum::vectorize_f(const Function& f) {
+    return GlobalOptions::vector_width_real>1 && f.is_a("SXFunction");
   }
 
   Function MapSum
@@ -589,7 +613,7 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Generate map of derivative
-    Function df = f_.reverse(nadj);
+    Function df = f_orig_.reverse(nadj);
 
     for (casadi_int i=0;i<n_out_;++i) {
       if (reduce_out_[i]) casadi_assert(df.nnz_in(n_in_+i)==0, "Case not implemented");

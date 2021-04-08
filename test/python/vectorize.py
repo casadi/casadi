@@ -61,7 +61,7 @@ class Vectorizetests(casadiTestCase):
         A = DM.rand(n,n)
 
         expand = ab.branch()
-        mode = ab.branch(range(2))
+        mode = ab.branch(range(4))
         
 
         for vw in vector_widths([1, 4]):
@@ -69,7 +69,7 @@ class Vectorizetests(casadiTestCase):
           if expand:
             f = f.expand()
           fm = f.map(nmap)
-          F = [fm, fm.forward(5)][mode]#, fm.forward(5), fm.reverse(5)][mode]#, fm.forward(5).map(7).reverse(2)][mode]
+          F = [fm, fm.forward(5), fm.reverse(5), fm.forward(5).map(7).reverse(2)][mode]
 
           DM.rng(0)
           args = [DM.rand(F.sparsity_in(i)) for i in range(F.n_in())]
@@ -96,13 +96,13 @@ class Vectorizetests(casadiTestCase):
 
     for ab in AutoBrancher():
 
-      nmap = 3#ab.branch([3,5])
+      nmap = ab.branch([3,5])
 
-      expand = True#ab.branch()
-      mode = 5#ab.branch(range(5))
+      expand = ab.branch()
+      mode = ab.branch(range(5))
       #mode = 2
-      reduce_in = False#ab.branch()
-      reduce_out = True#ab.branch()
+      reduce_in = ab.branch()
+      reduce_out = ab.branch()
 
       for vw in vector_widths([1, 4]):
         print("cache reset")
