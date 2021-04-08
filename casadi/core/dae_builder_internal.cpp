@@ -146,6 +146,7 @@ DaeBuilderInternal::~DaeBuilderInternal() {
 
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name) : name_(name) {
   clear_cache_ = false;
+  in_.resize(DAE_BUILDER_NUM_IN);
 }
 
 void DaeBuilderInternal::parse_fmi(const std::string& filename) {
@@ -257,7 +258,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
     // Sort by types
     if (it->causality == Variable::INDEPENDENT) {
       // Independent (time) variable
-      t_.push_back(it->v);
+      in_[DAE_BUILDER_T].push_back(it->v);
     } else if (it->causality == Variable::INPUT) {
       u_.push_back(it->v);
     } else if (it->variability == Variable::CONSTANT) {
@@ -390,7 +391,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
   } else if (name=="Tan") {
     return tan(read_expr(node[0]));
   } else if (name=="Time") {
-    return t_.at(0);
+    return t();
   } else if (name=="TimedVariable") {
     return read_variable(node[0]).v;
   }
@@ -429,7 +430,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   // Print the variables
   stream << "Variables" << std::endl;
-  if (!t_.empty()) stream << "  t = " << str(t_.at(0)) << std::endl;
+  if (has_t()) stream << "  t = " << str(t()) << std::endl;
   if (!c_.empty()) stream << "  c = " << str(c_) << std::endl;
   if (!p_.empty()) stream << "  p = " << str(p_) << std::endl;
   if (!d_.empty()) stream << "  d = " << str(d_) << std::endl;
@@ -634,10 +635,10 @@ void DaeBuilderInternal::add_variable(const std::string& name, const Variable& v
 
 void DaeBuilderInternal::sanity_check() const {
   // Time
-  if (!t_.empty()) {
-    casadi_assert(t_.size() == 1, "At most one time variable allowed");
-    casadi_assert(t_[0].is_symbolic(), "Non-symbolic time t");
-    casadi_assert(t_[0].is_scalar(), "Non-scalar time t");
+  if (has_t()) {
+    casadi_assert(in_[DAE_BUILDER_T].size() == 1, "At most one time variable allowed");
+    casadi_assert(t().is_symbolic(), "Non-symbolic time t");
+    casadi_assert(t().is_scalar(), "Non-scalar time t");
   }
 
   // Differential states
@@ -912,9 +913,8 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
   return "";
 }
 
-std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
+const std::vector<MX>& DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   switch (ind) {
-  case DAE_BUILDER_T: return t_;
   case DAE_BUILDER_C: return c_;
   case DAE_BUILDER_P: return p_;
   case DAE_BUILDER_D: return d_;
@@ -924,7 +924,7 @@ std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   case DAE_BUILDER_Z: return z_;
   case DAE_BUILDER_Q: return q_;
   case DAE_BUILDER_Y: return y_;
-  default: return std::vector<MX>();
+  default: return in_[ind];
   }
 }
 
@@ -1690,6 +1690,23 @@ Function DaeBuilderInternal::gather_eq() const {
   }
   // Construct function
   return Function("all_eq", {}, f_out, {}, f_out_name);
+}
+
+
+MX DaeBuilderInternal::add_t(const std::string& name) {
+  casadi_assert(!has_t(), "'t' already defined");
+  Variable v(name);
+  v.v = MX::sym(name);
+  v.causality = Variable::INDEPENDENT;
+  add_variable(name, v);
+  in_.at(DAE_BUILDER_T).push_back(v.v);
+}
+
+void DaeBuilderInternal::register_t(const MX& new_t) {
+  // Save to class
+  casadi_assert(!has_t(), "'t' already defined");
+  casadi_assert(has_variable(new_t.name()), "No such variable: " + new_t.name());
+  in_[DAE_BUILDER_T].push_back(new_t);
 }
 
 } // namespace casadi

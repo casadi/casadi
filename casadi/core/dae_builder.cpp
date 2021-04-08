@@ -59,7 +59,8 @@ const std::string& DaeBuilder::name() const {
 }
 
 const MX& DaeBuilder::t() const {
-  return (*this)->t_.at(0);
+  casadi_assert(has_t(), "No time variable");
+  return (*this)->t();
 }
 
 const std::vector<MX>& DaeBuilder::x() const {
@@ -139,7 +140,7 @@ const std::vector<MX>& DaeBuilder::init_rhs() const {
 }
 
 bool DaeBuilder::has_t() const {
-  return !(*this)->t_.empty();
+  return (*this)->has_t();
 }
 
 void DaeBuilder::parse_fmi(const std::string& filename) {
@@ -260,10 +261,11 @@ void DaeBuilder::register_z(const MX& new_z) {
 }
 
 void DaeBuilder::register_t(const MX& new_t) {
-  // Save to class
-  casadi_assert((*this)->t_.empty(), "'t' already defined");
-  casadi_assert(has_variable(new_t.name()), "No such variable: " + new_t.name());
-  (*this)->t_.push_back(new_t);
+  try {
+    (*this)->register_t(new_t);
+  } catch (std::exception& e) {
+    THROW_ERROR("register_t", e.what());
+  }
 }
 
 void DaeBuilder::register_c(const MX& new_c, const MX& new_cdef) {
@@ -333,9 +335,12 @@ MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
 }
 
 MX DaeBuilder::add_t(const std::string& name) {
-  casadi_assert((*this)->t_.empty(), "'t' already defined");
-  MX new_t = add_variable(name);
-  (*this)->t_.push_back(new_t);
+  try {
+    return (*this)->add_t(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("add_t", e.what());
+    return MX();
+  }
 }
 
 MX DaeBuilder::add_p(const std::string& name, casadi_int n) {

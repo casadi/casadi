@@ -208,7 +208,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   };
 
   // Get input expression, given enum
-  std::vector<MX> input(DaeBuilderInternalIn ind) const;
+  const std::vector<MX>& input(DaeBuilderInternalIn ind) const;
 
   // Get output expression, given enum
   std::vector<MX> output(DaeBuilderInternalOut ind) const;
@@ -298,9 +298,28 @@ protected:
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
 
+  /// All input variables
+  std::vector<std::vector<MX>> in_;
+
+  /// Explicit time dependence?
+  bool has_t() const { return !in_[DAE_BUILDER_T].empty();};
+
+  /** \brief Shorthands for variable sets */
+  ///@{
+  const MX& t() const { return in_[DAE_BUILDER_T].at(0);}
+  const std::vector<MX>& x() const { return in_[DAE_BUILDER_X];}
+  const std::vector<MX>& z() const { return in_[DAE_BUILDER_Z];}
+  const std::vector<MX>& q() const { return in_[DAE_BUILDER_Q];}
+  const std::vector<MX>& y() const { return in_[DAE_BUILDER_Y];}
+  const std::vector<MX>& u() const { return in_[DAE_BUILDER_U];}
+  const std::vector<MX>& p() const { return in_[DAE_BUILDER_P];}
+  const std::vector<MX>& c() const { return in_[DAE_BUILDER_C];}
+  const std::vector<MX>& d() const { return in_[DAE_BUILDER_D];}
+  const std::vector<MX>& w() const { return in_[DAE_BUILDER_W];}
+  ///@}
+
   ///@{
   /// Ordered variables and equations
-  std::vector<MX> t_;
   std::vector<MX> x_, ode_;
   std::vector<MX> z_, alg_;
   std::vector<MX> q_, quad_;
@@ -312,6 +331,16 @@ protected:
   std::vector<MX> w_, wdef_;
   std::vector<MX> aux_;
   std::vector<MX> init_lhs_, init_rhs_;
+  ///@}
+
+  ///@{
+  /// Add a new variable
+  MX add_t(const std::string& name);
+  ///@}
+
+  ///@{
+  /// Register an existing variable
+  void register_t(const MX& new_t);
   ///@}
 
   /// Linear combinations of output expressions
