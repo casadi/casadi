@@ -59,7 +59,7 @@ const std::string& DaeBuilder::name() const {
 }
 
 const MX& DaeBuilder::t() const {
-  return (*this)->t_;
+  return (*this)->tt_.at(0);
 }
 
 const std::vector<MX>& DaeBuilder::x() const {
@@ -257,7 +257,8 @@ void DaeBuilder::register_z(const MX& new_z) {
 
 void DaeBuilder::register_t(const MX& new_t) {
   // Save to class
-  (*this)->t_ = new_t;
+  (*this)->tt_.clear();
+  (*this)->tt_.push_back(new_t);
 }
 
 void DaeBuilder::register_c(const MX& new_c, const MX& new_cdef) {
