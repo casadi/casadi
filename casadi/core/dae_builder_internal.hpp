@@ -338,8 +338,6 @@ protected:
   std::vector<MX> alg_;
   std::vector<MX> quad_;
   std::vector<MX> y_, ydef_;
-  std::vector<MX> u_;
-  std::vector<MX> p_;
   std::vector<MX> c_, cdef_;
   std::vector<MX> d_, ddef_;
   std::vector<MX> w_, wdef_;

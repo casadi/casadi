@@ -64,11 +64,11 @@ const MX& DaeBuilder::t() const {
 }
 
 const std::vector<MX>& DaeBuilder::p() const {
-  return (*this)->p_;
+  return (*this)->p();
 }
 
 const std::vector<MX>& DaeBuilder::u() const {
-  return (*this)->u_;
+  return (*this)->u();
 }
 
 const std::vector<MX>& DaeBuilder::x() const {
@@ -229,28 +229,28 @@ void DaeBuilder::register_p(const MX& new_p) {
   // Consistency checks
   casadi_assert(has_variable(new_p.name()), "No such variable: " + new_p.name());
   // Add to list
-  (*this)->p_.push_back(new_p);
+  (*this)->p().push_back(new_p);
 }
 
 void DaeBuilder::register_u(const MX& new_u) {
   // Consistency checks
   casadi_assert(has_variable(new_u.name()), "No such variable: " + new_u.name());
   // Add to list
-  (*this)->u_.push_back(new_u);
+  (*this)->u().push_back(new_u);
 }
 
 void DaeBuilder::register_x(const MX& new_x) {
   // Consistency checks
   casadi_assert(has_variable(new_x.name()), "No such variable: " + new_x.name());
   // Add to list
-  (*this)->in_[DaeBuilderInternal::DAE_BUILDER_X].push_back(new_x);
+  (*this)->x().push_back(new_x);
 }
 
 void DaeBuilder::register_z(const MX& new_z) {
   // Consistency checks
   casadi_assert(has_variable(new_z.name()), "No such variable: " + new_z.name());
   // Add to list
-  (*this)->in_[DaeBuilderInternal::DAE_BUILDER_Z].push_back(new_z);
+  (*this)->z().push_back(new_z);
 }
 
 void DaeBuilder::register_t(const MX& new_t) {
