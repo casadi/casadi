@@ -318,11 +318,25 @@ protected:
   const std::vector<MX>& w() const { return in_[DAE_BUILDER_W];}
   ///@}
 
+  /** \brief Shorthands for variable sets: Non-const access */
+  ///@{
+  MX& t() { return in_[DAE_BUILDER_T].at(0);}
+  std::vector<MX>& x() { return in_[DAE_BUILDER_X];}
+  std::vector<MX>& z() { return in_[DAE_BUILDER_Z];}
+  std::vector<MX>& q() { return in_[DAE_BUILDER_Q];}
+  std::vector<MX>& y() { return in_[DAE_BUILDER_Y];}
+  std::vector<MX>& u() { return in_[DAE_BUILDER_U];}
+  std::vector<MX>& p() { return in_[DAE_BUILDER_P];}
+  std::vector<MX>& c() { return in_[DAE_BUILDER_C];}
+  std::vector<MX>& d() { return in_[DAE_BUILDER_D];}
+  std::vector<MX>& w() { return in_[DAE_BUILDER_W];}
+  ///@}
+
   ///@{
   /// Ordered variables and equations
-  std::vector<MX> x_, ode_;
-  std::vector<MX> z_, alg_;
-  std::vector<MX> q_, quad_;
+  std::vector<MX> ode_;
+  std::vector<MX> alg_;
+  std::vector<MX> quad_;
   std::vector<MX> y_, ydef_;
   std::vector<MX> u_;
   std::vector<MX> p_;
