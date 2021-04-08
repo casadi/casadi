@@ -69,6 +69,12 @@ namespace casadi {
       {"layout_out",
        {OT_LAYOUTVECTOR,
         "Layout out"}},
+      {"stride_in",
+       {OT_INTVECTOR,
+        "Layout in"}},
+      {"stride_out",
+       {OT_INTVECTOR,
+        "Layout out"}},
      }
   };
 
@@ -206,12 +212,19 @@ namespace casadi {
     // Default (temporary) options
     live_variables_ = true;
 
+    stride_in_.resize(n_in_, 1);
+    stride_out_.resize(n_out_, 1);
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
         default_in_ = op.second;
       } else if (op.first=="live_variables") {
         live_variables_ = op.second;
+      } else if (op.first=="stride_in") {
+        stride_in_ = op.second;
+      } else if (op.first=="stride_out") {
+        stride_out_ = op.second;
       }
     }
 

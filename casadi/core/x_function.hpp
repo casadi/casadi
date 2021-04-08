@@ -139,6 +139,8 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g, const Instance& inst) const override = 0;
 
+    Function with_options(const Dict& opts) const override;
+
     /** \brief Export function in a specific language */
     void export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const override;
@@ -1025,6 +1027,14 @@ namespace casadi {
       Function f("tmp", arg, res);
       static_cast<DerivedType *>(f.get())->ad_reverse(aseed, asens);
     }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>::
+    with_options(const Dict& opts) const {
+
+    Dict my_opts = combine(opts, generate_options());
+    return Function(name_, in_, out_, name_in_, name_out_, my_opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

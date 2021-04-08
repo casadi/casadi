@@ -78,6 +78,8 @@ namespace casadi {
 
     bool vectorize_f() const;
 
+    static bool vectorize_f(const Function& f);
+
     /** \brief Get default input value */
     double get_default_in(casadi_int ind) const override { return f_.default_in(ind);}
 
@@ -197,7 +199,7 @@ namespace casadi {
     Map(const std::string& name, const Function& f, casadi_int n);
 
     // The function which is to be evaluated in parallel
-    Function f_;
+    Function f_, f_orig_;
 
     // Number of times to evaluate this function
     casadi_int n_;

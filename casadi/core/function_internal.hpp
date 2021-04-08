@@ -560,6 +560,8 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap_as_needed(const Dict& opts) const;
 
+    virtual Function with_options(const Dict& opts) const;
+
     /** \brief Get function in cache */
     bool incache(const std::string& fname, Function& f, const std::string& suffix="") const;
 
@@ -978,6 +980,7 @@ namespace casadi {
     size_t align_w_;
 
     std::vector<Layout> layout_in_, layout_out_;
+    std::vector<casadi_int> stride_in_, stride_out_;
 
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;

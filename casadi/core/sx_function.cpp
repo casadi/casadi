@@ -209,6 +209,7 @@ namespace casadi {
       const AlgEl& a = *ins[i];
       g.local("in"+str(i), "casadi_real");
       int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
+      stride = 1;
       g << "in" << i << " = " << g.arg(a.i1) << "[" << a.i2*stride << "]" << ";\n";
       lookup_ins[&a] = i;
     }
@@ -219,6 +220,7 @@ namespace casadi {
         if (inst.res_null.empty()) {
           g << "if (res[" << a.i0 << "]!=0) ";
           int stride = inst.stride_out.empty() ? 1 : inst.stride_out.at(a.i0);
+          stride = 1;
           g << g.res(a.i0) << "[" << a.i2*abs(stride) << "]" << (stride<0? "+": "")<<  "=" << g.sx_work(a.i1);
         } else {
           if (!inst.res_null[a.i0]) {
@@ -259,6 +261,7 @@ namespace casadi {
     for (casadi_int i=0;i<rets.size();++i) {
       const AlgEl& a = *rets[i];
       casadi_int stride = inst.stride_out.empty() ? 1 : inst.stride_out[a.i0];
+      stride = 1;
       g << g.res(a.i0) << "[" << a.i2*abs(stride)  << "]" << (stride<0? "+": "")<< "= ret" << i << ";\n";
     }
   }
@@ -284,6 +287,12 @@ namespace casadi {
       {"layout_out",
        {OT_LAYOUTVECTOR,
         "Layout out"}},
+      {"stride_in",
+       {OT_INTVECTOR,
+        "Layout in"}},
+      {"stride_out",
+       {OT_INTVECTOR,
+        "Layout out"}},
      }
   };
 
@@ -304,7 +313,8 @@ namespace casadi {
     // Default (temporary) options
     live_variables_ = true;
 
-
+    stride_in_.resize(n_in_, 1);
+    stride_out_.resize(n_out_, 1);
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
@@ -315,6 +325,10 @@ namespace casadi {
         just_in_time_opencl_ = op.second;
       } else if (op.first=="just_in_time_sparsity") {
         just_in_time_sparsity_ = op.second;
+      } else if (op.first=="stride_in") {
+        stride_in_ = op.second;
+      } else if (op.first=="stride_out") {
+        stride_out_ = op.second;
       }
     }
 
@@ -411,7 +425,7 @@ namespace casadi {
       case OP_OUTPUT: // output instruction
         ae.i0 = curr_oind;
         ae.i1 = out_[curr_oind]->at(curr_nz)->temp;
-        ae.i2 = curr_nz;//*layout_out_[ae.i0].stride();
+        ae.i2 = curr_nz*stride_out_[ae.i0];
 
         // Go to the next nonzero
         casadi_assert(curr_nz < std::numeric_limits<int>::max(), "Integer overflow");
@@ -533,7 +547,7 @@ namespace casadi {
 
           // Location of the input
           algorithm_[i].i1 = ind;
-          algorithm_[i].i2 = nz;//*layout_in_[ind].stride();
+          algorithm_[i].i2 = nz*stride_in_[ind];
 
           // Mark input as read
           itc->set_temp(0);
@@ -1048,6 +1062,8 @@ namespace casadi {
     s.unpack("SXFunction::operations", operations_);
     s.unpack("SXFunction::constants", constants_);
     s.unpack("SXFunction::default_in", default_in_);
+    s.unpack("SXFunction::stride_in", stride_in_);
+    s.unpack("SXFunction::stride_out", stride_out_);
 
     algorithm_.resize(n_instructions);
     for (casadi_int k=0;k<n_instructions;++k) {
@@ -1077,7 +1093,8 @@ namespace casadi {
     s.pack("SXFunction::operations", operations_);
     s.pack("SXFunction::constants", constants_);
     s.pack("SXFunction::default_in", default_in_);
-
+    s.pack("SXFunction::stride_in", stride_in_);
+    s.pack("SXFunction::stride_out", stride_out_);
     // Loop over algorithm
     for (const auto& e : algorithm_) {
       s.pack("SXFunction::ScalarAtomic::op", e.op);
