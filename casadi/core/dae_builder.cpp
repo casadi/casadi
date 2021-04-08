@@ -63,32 +63,24 @@ const MX& DaeBuilder::t() const {
   return (*this)->t();
 }
 
-const std::vector<MX>& DaeBuilder::p() const {
-  return (*this)->p_;
-}
-
-const std::vector<MX>& DaeBuilder::u() const {
-  return (*this)->u_;
-}
-
 const std::vector<MX>& DaeBuilder::x() const {
-  return (*this)->x();
-}
-
-const std::vector<MX>& DaeBuilder::z() const {
-  return (*this)->z();
-}
-
-const std::vector<MX>& DaeBuilder::q() const {
-  return (*this)->q();
+  return (*this)->x_;
 }
 
 const std::vector<MX>& DaeBuilder::ode() const {
   return (*this)->ode_;
 }
 
+const std::vector<MX>& DaeBuilder::z() const {
+  return (*this)->z_;
+}
+
 const std::vector<MX>& DaeBuilder::alg() const {
   return (*this)->alg_;
+}
+
+const std::vector<MX>& DaeBuilder::q() const {
+  return (*this)->q_;
 }
 
 const std::vector<MX>& DaeBuilder::quad() const {
@@ -101,6 +93,14 @@ const std::vector<MX>& DaeBuilder::y() const {
 
 std::vector<MX> DaeBuilder::ydef() const {
   return (*this)->ydef_;
+}
+
+const std::vector<MX>& DaeBuilder::u() const {
+  return (*this)->u_;
+}
+
+const std::vector<MX>& DaeBuilder::p() const {
+  return (*this)->p_;
 }
 
 const std::vector<MX>& DaeBuilder::c() const {
@@ -243,14 +243,14 @@ void DaeBuilder::register_x(const MX& new_x) {
   // Consistency checks
   casadi_assert(has_variable(new_x.name()), "No such variable: " + new_x.name());
   // Add to list
-  (*this)->in_[DaeBuilderInternal::DAE_BUILDER_X].push_back(new_x);
+  (*this)->x_.push_back(new_x);
 }
 
 void DaeBuilder::register_z(const MX& new_z) {
   // Consistency checks
   casadi_assert(has_variable(new_z.name()), "No such variable: " + new_z.name());
   // Add to list
-  (*this)->in_[DaeBuilderInternal::DAE_BUILDER_Z].push_back(new_z);
+  (*this)->z_.push_back(new_z);
 }
 
 void DaeBuilder::register_t(const MX& new_t) {

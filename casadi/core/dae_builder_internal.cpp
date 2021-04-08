@@ -272,16 +272,16 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
         // Is the variable needed to calculate other states, algebraic variables?
         if (it->dependency) {
           // Add to list of differential equations
-          in_[DAE_BUILDER_X].push_back(it->v);
+          x_.push_back(it->v);
           ode_.push_back(variables_.at(it->antiderivative).v);
         } else {
           // Add to list of quadrature equations
-          in_[DAE_BUILDER_Q].push_back(it->v);
+          q_.push_back(it->v);
           quad_.push_back(variables_.at(it->antiderivative).v);
         }
       } else if (it->dependency || it->derivative >= 0) {
         // Add to list of algebraic equations
-        in_[DAE_BUILDER_Z].push_back(it->v);
+        z_.push_back(it->v);
         alg_.push_back(it->v - nan);
       }
       // Is it (also) an output variable?
@@ -406,9 +406,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (more) sanity_check();
 
   // Print dimensions
-  stream << "nx = " << x().size() << ", "
-         << "nz = " << z().size() << ", "
-         << "nq = " << q().size() << ", "
+  stream << "nx = " << x_.size() << ", "
+         << "nz = " << z_.size() << ", "
+         << "nq = " << q_.size() << ", "
          << "ny = " << y_.size() << ", "
          << "np = " << p_.size() << ", "
          << "nc = " << c_.size() << ", "
@@ -431,52 +431,52 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   // Print the variables
   stream << "Variables" << std::endl;
   if (has_t()) stream << "  t = " << str(t()) << std::endl;
-  if (!p_.empty()) stream << "  p = " << str(p_) << std::endl;
-  if (!u_.empty()) stream << "  u = " << str(u_) << std::endl;
-  if (!x().empty()) stream << "  x = " << str(x()) << std::endl;
-  if (!z().empty()) stream << "  z = " << str(z()) << std::endl;
-  if (!q().empty()) stream << "  q = " << str(q()) << std::endl;
   if (!c_.empty()) stream << "  c = " << str(c_) << std::endl;
+  if (!p_.empty()) stream << "  p = " << str(p_) << std::endl;
   if (!d_.empty()) stream << "  d = " << str(d_) << std::endl;
-  if (!w_.empty()) stream << "  w = " << str(w_) << std::endl;
+  if (!x_.empty()) stream << "  x = " << str(x_) << std::endl;
+  if (!z_.empty()) stream << "  z = " << str(z_) << std::endl;
+  if (!q_.empty()) stream << "  q = " << str(q_) << std::endl;
   if (!y_.empty()) stream << "  y = " << str(y_) << std::endl;
+  if (!w_.empty()) stream << "  w = " << str(w_) << std::endl;
+  if (!u_.empty()) stream << "  u = " << str(u_) << std::endl;
 
   if (!c_.empty()) {
     stream << "Constants" << std::endl;
-    for (casadi_int i = 0; i < c_.size(); ++i)
+    for (casadi_int i=0; i<c_.size(); ++i)
       stream << "  " << str(c_[i]) << " == " << str(cdef_[i]) << std::endl;
   }
 
   if (!d_.empty()) {
     stream << "Dependent parameters" << std::endl;
-    for (casadi_int i = 0; i < d_.size(); ++i)
+    for (casadi_int i=0; i<d_.size(); ++i)
       stream << "  " << str(d_[i]) << " == " << str(ddef_[i]) << std::endl;
   }
 
   if (!w_.empty()) {
     stream << "Dependent variables" << std::endl;
-    for (casadi_int i = 0; i < w_.size(); ++i)
+    for (casadi_int i=0; i<w_.size(); ++i)
       stream << "  " << str(w_[i]) << " == " << str(wdef_[i]) << std::endl;
   }
 
-  if (!x().empty()) {
+  if (!x_.empty()) {
     stream << "Differential equations" << std::endl;
-    for (casadi_int k = 0; k < x().size(); ++k) {
-      stream << "  der(" << str(x().at(k)) << ") == " << str(ode_.at(k)) << std::endl;
+    for (casadi_int k=0; k<x_.size(); ++k) {
+      stream << "  der(" << str(x_[k]) << ") == " << str(ode_[k]) << std::endl;
     }
   }
 
-  if (!z().empty()) {
+  if (!alg_.empty()) {
     stream << "Algebraic equations" << std::endl;
-    for (casadi_int k = 0; k < z().size(); ++k) {
-      stream << "  0 == " << str(alg_.at(k)) << std::endl;
+    for (casadi_int k=0; k<z_.size(); ++k) {
+      stream << "  0 == " << str(alg_[k]) << std::endl;
     }
   }
 
-  if (!q().empty()) {
+  if (!q_.empty()) {
     stream << "Quadrature equations" << std::endl;
-    for (casadi_int k = 0; k < q().size(); ++k) {
-      stream << "  " << str(der(q().at(k))) << " == " << str(quad_.at(k)) << std::endl;
+    for (casadi_int k=0; k<q_.size(); ++k) {
+      stream << "  " << str(der(q_[k])) << " == " << str(quad_[k]) << std::endl;
     }
   }
 
@@ -498,8 +498,8 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
 void DaeBuilderInternal::eliminate_quad() {
   // Move all the quadratures to the list of differential states
-  x().insert(x().end(), q().begin(), q().end());
-  q().clear();
+  x_.insert(x_.end(), q_.begin(), q_.end());
+  q_.clear();
 }
 
 void DaeBuilderInternal::sort_d() {
@@ -512,11 +512,11 @@ void DaeBuilderInternal::sort_w() {
 
 void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
   // Make sure lengths agree
-  casadi_assert(z_order.size() == z().size(), "Dimension mismatch");
+  casadi_assert(z_order.size() == z_.size(), "Dimension mismatch");
   // Mark existing components in z
   std::vector<bool> old_z(variables_.size(), false);
-  for (size_t i = 0; i < z().size(); ++i) {
-    std::string s = z().at(i).name();
+  for (size_t i = 0; i < z_.size(); ++i) {
+    std::string s = z_.at(i).name();
     auto it = varind_.find(s);
     casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
     old_z.at(it->second) = true;
@@ -531,7 +531,7 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
     new_z.push_back(variables_.at(it->second).v);
   }
   // Success: Update z
-  std::copy(new_z.begin(), new_z.end(), z().begin());
+  std::copy(new_z.begin(), new_z.end(), z_.begin());
 }
 
 void DaeBuilderInternal::clear_in(const std::string& v) {
@@ -641,35 +641,30 @@ void DaeBuilderInternal::sanity_check() const {
     casadi_assert(t().is_scalar(), "Non-scalar time t");
   }
 
-  // Parameters
-  for (casadi_int i = 0; i < p_.size(); ++i) {
-    casadi_assert(p_[i].is_symbolic(), "Non-symbolic parameter p");
-  }
-
-  // Controls
-  for (casadi_int i = 0; i < u_.size(); ++i) {
-    casadi_assert(u_[i].is_symbolic(), "Non-symbolic control u");
-  }
-
   // Differential states
-  casadi_assert(x().size()==ode_.size(), "x and ode have different lengths");
-  for (casadi_int i = 0; i < x().size(); ++i) {
-    casadi_assert(x()[i].size() == ode_[i].size(), "ode has wrong dimensions");
-    casadi_assert(x()[i].is_symbolic(), "Non-symbolic state x");
+  casadi_assert(x_.size()==ode_.size(),
+                        "x and ode have different lengths");
+  for (casadi_int i=0; i<x_.size(); ++i) {
+    casadi_assert(x_[i].size()==ode_[i].size(),
+                          "ode has wrong dimensions");
+    casadi_assert(x_[i].is_symbolic(), "Non-symbolic state x");
   }
 
   // Algebraic variables/equations
-  casadi_assert(z().size()==alg_.size(), "z and alg have different lengths");
-  for (casadi_int i = 0; i < z().size(); ++i) {
-    casadi_assert(z()[i].is_symbolic(), "Non-symbolic algebraic variable z");
-    casadi_assert(z()[i].size() == alg_[i].size(), "alg has wrong dimensions");
+  casadi_assert(z_.size()==alg_.size(),
+                        "z and alg have different lengths");
+  for (casadi_int i=0; i<z_.size(); ++i) {
+    casadi_assert(z_[i].is_symbolic(), "Non-symbolic algebraic variable z");
+    casadi_assert(z_[i].size()==alg_[i].size(),
+                          "alg has wrong dimensions");
   }
 
   // Quadrature states/equations
-  casadi_assert(q().size()==quad_.size(), "q and quad have different lengths");
-  for (casadi_int i = 0; i < q().size(); ++i) {
-    casadi_assert(q()[i].is_symbolic(), "Non-symbolic quadrature state q");
-    casadi_assert(q()[i].size() == quad_[i].size(), "quad has wrong dimensions");
+  casadi_assert(q_.size()==quad_.size(), "q and quad have different lengths");
+  for (casadi_int i=0; i<q_.size(); ++i) {
+    casadi_assert(q_[i].is_symbolic(), "Non-symbolic quadrature state q");
+    casadi_assert(q_[i].size()==quad_[i].size(),
+                          "quad has wrong dimensions");
   }
 
   // Dependent parameters
@@ -691,6 +686,16 @@ void DaeBuilderInternal::sanity_check() const {
   for (casadi_int i=0; i<y_.size(); ++i) {
     casadi_assert(y_[i].is_symbolic(), "Non-symbolic output y");
     casadi_assert(y_[i].size()==ydef_[i].size(), "ydef has wrong dimensions");
+  }
+
+  // Control
+  for (casadi_int i=0; i<u_.size(); ++i) {
+    casadi_assert(u_[i].is_symbolic(), "Non-symbolic control u");
+  }
+
+  // Parameter
+  for (casadi_int i=0; i<p_.size(); ++i) {
+    casadi_assert(p_[i].is_symbolic(), "Non-symbolic parameter p");
   }
 
   // Initial equations
@@ -915,6 +920,9 @@ const std::vector<MX>& DaeBuilderInternal::input(DaeBuilderInternalIn ind) const
   case DAE_BUILDER_D: return d_;
   case DAE_BUILDER_W: return w_;
   case DAE_BUILDER_U: return u_;
+  case DAE_BUILDER_X: return x_;
+  case DAE_BUILDER_Z: return z_;
+  case DAE_BUILDER_Q: return q_;
   case DAE_BUILDER_Y: return y_;
   default: return in_[ind];
   }
@@ -1721,7 +1729,7 @@ MX DaeBuilderInternal::add_x(const std::string& name, casadi_int n) {
   v.variability = Variable::CONTINUOUS;
   v.causality = Variable::LOCAL;
   add_variable(name, v);
-  x().push_back(v.v);
+  x_.push_back(v.v);
   return v.v;
 }
 
@@ -1731,7 +1739,7 @@ MX DaeBuilderInternal::add_z(const std::string& name, casadi_int n) {
   v.variability = Variable::CONTINUOUS;
   v.causality = Variable::LOCAL;
   add_variable(name, v);
-  z().push_back(v.v);
+  z_.push_back(v.v);
   return v.v;
 }
 
@@ -1741,7 +1749,7 @@ MX DaeBuilderInternal::add_q(const std::string& name, casadi_int n) {
   v.variability = Variable::CONTINUOUS;
   v.causality = Variable::LOCAL;
   add_variable(name, v);
-  q().push_back(v.v);
+  q_.push_back(v.v);
   return v.v;
 }
 
