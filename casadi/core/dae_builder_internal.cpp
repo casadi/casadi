@@ -260,13 +260,13 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
       // Independent (time) variable
       in_[DAE_BUILDER_T].push_back(it->v);
     } else if (it->causality == Variable::INPUT) {
-      u().push_back(it->v);
+      u_.push_back(it->v);
     } else if (it->variability == Variable::CONSTANT) {
       // Named constant
       c_.push_back(it->v);
       cdef_.push_back(it->start);
     } else if (it->variability == Variable::FIXED || it->variability == Variable::TUNABLE) {
-      p().push_back(it->v);
+      p_.push_back(it->v);
     } else if (it->variability == Variable::CONTINUOUS) {
       if (it->antiderivative >= 0) {
         // Is the variable needed to calculate other states, algebraic variables?
@@ -410,11 +410,11 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
          << "nz = " << z().size() << ", "
          << "nq = " << q().size() << ", "
          << "ny = " << y_.size() << ", "
-         << "np = " << p().size() << ", "
+         << "np = " << p_.size() << ", "
          << "nc = " << c_.size() << ", "
          << "nd = " << d_.size() << ", "
          << "nw = " << w_.size() << ", "
-         << "nu = " << u().size();
+         << "nu = " << u_.size();
 
   // Quick return?
   if (!more) return;
@@ -431,8 +431,8 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   // Print the variables
   stream << "Variables" << std::endl;
   if (has_t()) stream << "  t = " << str(t()) << std::endl;
-  if (!p().empty()) stream << "  p = " << str(p()) << std::endl;
-  if (!u().empty()) stream << "  u = " << str(u()) << std::endl;
+  if (!p_.empty()) stream << "  p = " << str(p_) << std::endl;
+  if (!u_.empty()) stream << "  u = " << str(u_) << std::endl;
   if (!x().empty()) stream << "  x = " << str(x()) << std::endl;
   if (!z().empty()) stream << "  z = " << str(z()) << std::endl;
   if (!q().empty()) stream << "  q = " << str(q()) << std::endl;
@@ -535,7 +535,13 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
 }
 
 void DaeBuilderInternal::clear_in(const std::string& v) {
-  in_.at(to_enum<DaeBuilderInternalIn>(v)).clear();
+  switch(to_enum<DaeBuilderInternalIn>(v)) {
+  case DAE_BUILDER_U:
+    u_.clear();
+    break;
+  default:
+    casadi_error("Not implemented: " + v);
+  }
 }
 
 void DaeBuilderInternal::clear_out(const std::string& v) {
@@ -579,24 +585,24 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Prune p
   if (prune_p) {
     size_t np = 0;
-    for (size_t i = 0; i < p().size(); ++i) {
-      std::string s = p().at(i).name();
+    for (size_t i = 0; i < p_.size(); ++i) {
+      std::string s = p_.at(i).name();
       auto it = varind_.find(s);
       casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
-      if (!free_variables.at(it->second)) p().at(np++) = p().at(i);
+      if (!free_variables.at(it->second)) p_.at(np++) = p_.at(i);
     }
-    p().resize(np);
+    p_.resize(np);
   }
   // Prune u
   if (prune_u) {
     size_t nu = 0;
-    for (size_t i = 0; i < u().size(); ++i) {
-      std::string s = u().at(i).name();
+    for (size_t i = 0; i < u_.size(); ++i) {
+      std::string s = u_.at(i).name();
       auto it = varind_.find(s);
       casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
-      if (!free_variables.at(it->second)) u().at(nu++) = u().at(i);
+      if (!free_variables.at(it->second)) u_.at(nu++) = u_.at(i);
     }
-    u().resize(nu);
+    u_.resize(nu);
   }
 }
 
@@ -636,13 +642,13 @@ void DaeBuilderInternal::sanity_check() const {
   }
 
   // Parameters
-  for (casadi_int i = 0; i < p().size(); ++i) {
-    casadi_assert(p()[i].is_symbolic(), "Non-symbolic parameter p");
+  for (casadi_int i = 0; i < p_.size(); ++i) {
+    casadi_assert(p_[i].is_symbolic(), "Non-symbolic parameter p");
   }
 
   // Controls
-  for (casadi_int i = 0; i < u().size(); ++i) {
-    casadi_assert(u()[i].is_symbolic(), "Non-symbolic control u");
+  for (casadi_int i = 0; i < u_.size(); ++i) {
+    casadi_assert(u_[i].is_symbolic(), "Non-symbolic control u");
   }
 
   // Differential states
@@ -905,8 +911,10 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
 const std::vector<MX>& DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   switch (ind) {
   case DAE_BUILDER_C: return c_;
+  case DAE_BUILDER_P: return p_;
   case DAE_BUILDER_D: return d_;
   case DAE_BUILDER_W: return w_;
+  case DAE_BUILDER_U: return u_;
   case DAE_BUILDER_Y: return y_;
   default: return in_[ind];
   }
@@ -1693,7 +1701,7 @@ MX DaeBuilderInternal::add_p(const std::string& name, casadi_int n) {
   v.variability = Variable::FIXED;
   v.causality = Variable::INPUT;
   add_variable(name, v);
-  p().push_back(v.v);
+  p_.push_back(v.v);
   return v.v;
 }
 
@@ -1703,7 +1711,7 @@ MX DaeBuilderInternal::add_u(const std::string& name, casadi_int n) {
   v.variability = Variable::CONTINUOUS;
   v.causality = Variable::INPUT;
   add_variable(name, v);
-  u().push_back(v.v);
+  u_.push_back(v.v);
   return v.v;
 }
 
