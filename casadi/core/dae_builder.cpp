@@ -138,6 +138,10 @@ const std::vector<MX>& DaeBuilder::init_rhs() const {
   return (*this)->init_rhs_;
 }
 
+bool DaeBuilder::has_t() const {
+  return !(*this)->t_.empty();
+}
+
 void DaeBuilder::parse_fmi(const std::string& filename) {
   try {
     (*this)->parse_fmi(filename);

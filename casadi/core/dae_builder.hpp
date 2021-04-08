@@ -150,6 +150,9 @@ public:
   /** @name Variables and equations */
   ///@{
 
+  /** \brief Is there a time variable? */
+  bool has_t() const;
+
   /** \brief Differential states */
   casadi_int nx() const {return x().size();}
 
