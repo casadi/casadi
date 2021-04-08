@@ -203,6 +203,9 @@ public:
   /// Add a new quadrature state
   MX add_q(const std::string& name=std::string(), casadi_int n=1);
 
+  /// Add a new constant
+  MX add_c(const std::string& name, const MX& new_cdef);
+
   /// Add a new dependent parameter
   MX add_d(const std::string& name, const MX& new_ddef);
 

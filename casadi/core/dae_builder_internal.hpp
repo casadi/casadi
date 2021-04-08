@@ -336,11 +336,28 @@ protected:
   ///@{
   /// Add a new variable
   MX add_t(const std::string& name);
+  MX add_p(const std::string& name, casadi_int n);
+  MX add_u(const std::string& name, casadi_int n);
+  MX add_x(const std::string& name, casadi_int n);
+  MX add_z(const std::string& name, casadi_int n);
+  MX add_q(const std::string& name, casadi_int n);
+  MX add_c(const std::string& name, const MX& new_cdef);
+  MX add_d(const std::string& name, const MX& new_ddef);
+  MX add_w(const std::string& name, const MX& new_wdef);
+  MX add_y(const std::string& name, const MX& new_ydef);
   ///@}
 
   ///@{
   /// Register an existing variable
   void register_t(const MX& new_t);
+  void register_x(const MX& new_x);
+  void register_z(const MX& new_z);
+  void register_u(const MX& new_u);
+  void register_p(const MX& new_p);
+  void register_c(const MX& new_c, const MX& new_cdef);
+  void register_d(const MX& new_d, const MX& new_ddef);
+  void register_w(const MX& new_w, const MX& new_wdef);
+  void register_y(const MX& new_y, const MX& new_ydef);
   ///@}
 
   /// Linear combinations of output expressions
