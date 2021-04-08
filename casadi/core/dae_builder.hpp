@@ -182,6 +182,9 @@ public:
    *  Formulate a dynamic system model
    */
   ///@{
+  /// Add an independent variable (time)
+  MX add_t(const std::string& name="t");
+
   /// Add a new parameter
   MX add_p(const std::string& name=std::string(), casadi_int n=1);
 

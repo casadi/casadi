@@ -59,7 +59,7 @@ const std::string& DaeBuilder::name() const {
 }
 
 const MX& DaeBuilder::t() const {
-  return (*this)->tt_.at(0);
+  return (*this)->t_.at(0);
 }
 
 const std::vector<MX>& DaeBuilder::x() const {
@@ -257,8 +257,9 @@ void DaeBuilder::register_z(const MX& new_z) {
 
 void DaeBuilder::register_t(const MX& new_t) {
   // Save to class
-  (*this)->tt_.clear();
-  (*this)->tt_.push_back(new_t);
+  casadi_assert((*this)->t_.empty(), "'t' already defined");
+  casadi_assert(has_variable(new_t.name()), "No such variable: " + new_t.name());
+  (*this)->t_.push_back(new_t);
 }
 
 void DaeBuilder::register_c(const MX& new_c, const MX& new_cdef) {
@@ -325,6 +326,12 @@ MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
   MX new_z = add_variable(name, n);
   (*this)->z_.push_back(new_z);
   return new_z;
+}
+
+MX DaeBuilder::add_t(const std::string& name) {
+  casadi_assert((*this)->t_.empty(), "'t' already defined");
+  MX new_t = add_variable(name);
+  (*this)->t_.push_back(new_t);
 }
 
 MX DaeBuilder::add_p(const std::string& name, casadi_int n) {

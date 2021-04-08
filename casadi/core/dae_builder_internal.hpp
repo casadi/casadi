@@ -300,7 +300,7 @@ protected:
 
   ///@{
   /// Ordered variables and equations
-  std::vector<MX> tt_;
+  std::vector<MX> t_;
   std::vector<MX> x_, ode_;
   std::vector<MX> z_, alg_;
   std::vector<MX> q_, quad_;

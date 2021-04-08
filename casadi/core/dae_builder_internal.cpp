@@ -145,7 +145,6 @@ DaeBuilderInternal::~DaeBuilderInternal() {
 }
 
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name) : name_(name) {
-  tt_.push_back(MX::sym("t"));
   clear_cache_ = false;
 }
 
@@ -258,8 +257,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
     // Sort by types
     if (it->causality == Variable::INDEPENDENT) {
       // Independent (time) variable
-      tt_.clear();
-      tt_.push_back(it->v);
+      t_.push_back(it->v);
     } else if (it->causality == Variable::INPUT) {
       u_.push_back(it->v);
     } else if (it->variability == Variable::CONSTANT) {
@@ -392,7 +390,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
   } else if (name=="Tan") {
     return tan(read_expr(node[0]));
   } else if (name=="Time") {
-    return tt_.at(0);
+    return t_.at(0);
   } else if (name=="TimedVariable") {
     return read_variable(node[0]).v;
   }
@@ -431,7 +429,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   // Print the variables
   stream << "Variables" << std::endl;
-  if (!tt_.empty()) stream << "  t = " << str(tt_.at(0)) << std::endl;
+  if (!t_.empty()) stream << "  t = " << str(t_.at(0)) << std::endl;
   if (!c_.empty()) stream << "  c = " << str(c_) << std::endl;
   if (!p_.empty()) stream << "  p = " << str(p_) << std::endl;
   if (!d_.empty()) stream << "  d = " << str(d_) << std::endl;
@@ -636,10 +634,10 @@ void DaeBuilderInternal::add_variable(const std::string& name, const Variable& v
 
 void DaeBuilderInternal::sanity_check() const {
   // Time
-  if (!tt_.empty()) {
-    casadi_assert(tt_.size() == 1, "At most one time variable allowed");
-    casadi_assert(tt_[0].is_symbolic(), "Non-symbolic time t");
-    casadi_assert(tt_[0].is_scalar(), "Non-scalar time t");
+  if (!t_.empty()) {
+    casadi_assert(t_.size() == 1, "At most one time variable allowed");
+    casadi_assert(t_[0].is_symbolic(), "Non-symbolic time t");
+    casadi_assert(t_[0].is_scalar(), "Non-scalar time t");
   }
 
   // Differential states
@@ -916,7 +914,7 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
 
 std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   switch (ind) {
-  case DAE_BUILDER_T: return tt_;
+  case DAE_BUILDER_T: return t_;
   case DAE_BUILDER_C: return c_;
   case DAE_BUILDER_P: return p_;
   case DAE_BUILDER_D: return d_;
