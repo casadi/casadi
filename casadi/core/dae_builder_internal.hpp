@@ -167,9 +167,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Clear output variable
   void clear_out(const std::string& v);
 
-  /// Prune dependent parameters that cannot be evaluated
-  void prune_d();
-
   /// Prune unused controls
   void prune(bool prune_p, bool prune_u);
   ///@}
@@ -198,11 +195,11 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   // Output convension in codegen
   enum DaeBuilderInternalOut {
-    DAE_BUILDER_DDEF,
-    DAE_BUILDER_WDEF,
     DAE_BUILDER_ODE,
     DAE_BUILDER_ALG,
     DAE_BUILDER_QUAD,
+    DAE_BUILDER_DDEF,
+    DAE_BUILDER_WDEF,
     DAE_BUILDER_YDEF,
     DAE_BUILDER_NUM_OUT
   };
@@ -305,7 +302,6 @@ protected:
   /// Ordered variables and equations
   std::vector<MX> ode_, alg_, quad_;
   std::vector<MX> ydef_;
-  std::vector<MX> ddef_;
   std::vector<MX> wdef_;
   std::vector<MX> aux_;
   std::vector<MX> init_lhs_, init_rhs_;

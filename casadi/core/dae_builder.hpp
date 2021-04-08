@@ -243,7 +243,7 @@ public:
   void register_c(const MX& new_c);
 
   /// Register dependent parameter
-  void register_d(const MX& new_d, const MX& new_ddef);
+  void register_d(const MX& new_d);
 
   /// Register dependent variable
   void register_w(const MX& new_w, const MX& new_wdef);
@@ -292,9 +292,6 @@ public:
 
   /// Sort algebraic variables
   void sort_z(const std::vector<std::string>& z_order);
-
-  /// Prune dependent parameters that cannot be evaluated
-  void prune_d();
 
   /// Prune unused controls
   void prune(bool prune_p = true, bool prune_u = true);

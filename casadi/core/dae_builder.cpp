@@ -115,7 +115,7 @@ const std::vector<MX>& DaeBuilder::d() const {
 }
 
 std::vector<MX> DaeBuilder::ddef() const {
-  return (*this)->ddef_;
+  return (*this)->ddef();
 }
 
 const std::vector<MX>& DaeBuilder::w() const {
@@ -266,13 +266,11 @@ void DaeBuilder::register_c(const MX& new_c) {
   (*this)->c_.push_back(new_c);
 }
 
-void DaeBuilder::register_d(const MX& new_d, const MX& new_ddef) {
-  // Consistency checks
-  casadi_assert(new_d.sparsity() == new_ddef.sparsity(), "Mismatching sparsity");
+void DaeBuilder::register_d(const MX& new_d) {
+  // Consistency check
   casadi_assert(has_variable(new_d.name()), "No such variable: " + new_d.name());
   // Add to lists
   (*this)->d_.push_back(new_d);
-  (*this)->ddef_.push_back(new_ddef);
 }
 
 void DaeBuilder::register_w(const MX& new_w, const MX& new_wdef) {
@@ -685,14 +683,6 @@ Function DaeBuilder::dependent_fun(const std::string& fname,
   } catch (std::exception& e) {
     THROW_ERROR("dependent_fun", e.what());
     return Function(); // never reached
-  }
-}
-
-void DaeBuilder::prune_d() {
-  try {
-    (*this)->prune_d();
-  } catch (std::exception& e) {
-    THROW_ERROR("prune_d", e.what());
   }
 }
 

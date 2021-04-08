@@ -449,8 +449,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (!d_.empty()) {
     stream << "Dependent parameters" << std::endl;
-    for (casadi_int i=0; i<d_.size(); ++i)
-      stream << "  " << str(d_[i]) << " == " << str(ddef_[i]) << std::endl;
+    for (const MX& d : d_) {
+      stream << "  " << str(d) << " == " << str(variable(d.name()).beq) << std::endl;
+    }
   }
 
   if (!w_.empty()) {
@@ -503,7 +504,8 @@ void DaeBuilderInternal::eliminate_quad() {
 }
 
 void DaeBuilderInternal::sort_d() {
-  sort_dependent(d_, ddef_);
+  std::vector<MX> ddef = this->ddef();
+  sort_dependent(d_, ddef);
 }
 
 void DaeBuilderInternal::sort_w() {
@@ -668,10 +670,8 @@ void DaeBuilderInternal::sanity_check() const {
   }
 
   // Dependent parameters
-  casadi_assert(d_.size()==ddef_.size(), "d and ddef have different lengths");
   for (casadi_int i=0; i<d_.size(); ++i) {
     casadi_assert(d_[i].is_symbolic(), "Non-symbolic dependent parameter d");
-    casadi_assert(d_[i].size()==ddef_[i].size(), "ddef has wrong dimensions");
   }
 
   // Dependent variables
@@ -886,14 +886,14 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls, bool inline_cal
 std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v) {
   switch (v) {
   case DaeBuilderInternal::DAE_BUILDER_T: return "t";
-  case DaeBuilderInternal::DAE_BUILDER_C: return "c";
   case DaeBuilderInternal::DAE_BUILDER_P: return "p";
-  case DaeBuilderInternal::DAE_BUILDER_D: return "d";
-  case DaeBuilderInternal::DAE_BUILDER_W: return "w";
   case DaeBuilderInternal::DAE_BUILDER_U: return "u";
   case DaeBuilderInternal::DAE_BUILDER_X: return "x";
   case DaeBuilderInternal::DAE_BUILDER_Z: return "z";
   case DaeBuilderInternal::DAE_BUILDER_Q: return "q";
+  case DaeBuilderInternal::DAE_BUILDER_C: return "c";
+  case DaeBuilderInternal::DAE_BUILDER_D: return "d";
+  case DaeBuilderInternal::DAE_BUILDER_W: return "w";
   case DaeBuilderInternal::DAE_BUILDER_Y: return "y";
   default: break;
   }
@@ -902,11 +902,11 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v) {
 
 std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
   switch (v) {
-  case DaeBuilderInternal::DAE_BUILDER_DDEF: return "ddef";
-  case DaeBuilderInternal::DAE_BUILDER_WDEF: return "wdef";
   case DaeBuilderInternal::DAE_BUILDER_ODE: return "ode";
   case DaeBuilderInternal::DAE_BUILDER_ALG: return "alg";
   case DaeBuilderInternal::DAE_BUILDER_QUAD: return "quad";
+  case DaeBuilderInternal::DAE_BUILDER_DDEF: return "ddef";
+  case DaeBuilderInternal::DAE_BUILDER_WDEF: return "wdef";
   case DaeBuilderInternal::DAE_BUILDER_YDEF: return "ydef";
   default: break;
   }
@@ -943,11 +943,11 @@ std::vector<MX> DaeBuilderInternal::input(const std::vector<DaeBuilderInternalIn
 
 std::vector<MX> DaeBuilderInternal::output(DaeBuilderInternalOut ind) const {
   switch (ind) {
-  case DAE_BUILDER_DDEF: return ddef_;
-  case DAE_BUILDER_WDEF: return wdef_;
   case DAE_BUILDER_ODE: return ode_;
   case DAE_BUILDER_ALG: return alg_;
   case DAE_BUILDER_QUAD: return quad_;
+  case DAE_BUILDER_DDEF: return ddef();
+  case DAE_BUILDER_WDEF: return wdef_;
   case DAE_BUILDER_YDEF: return ydef_;
   default: return std::vector<MX>();
   }
@@ -1346,13 +1346,6 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
       }
       // Save to oracle outputs
       f_out.at(vdef_ind) = vertcat(vdef);
-      // Hack: Also clear ddef, ydef
-      // for (size_t i = 0; i < f_out.size(); ++i) {
-      //   if (f_out_name.at(i) == "ddef" || f_out_name.at(i) == "ydef") {
-      //     casadi_warning("Removing " + f_out_name.at(i) + " from oracle with lifted calls");
-      //     f_out.at(i) = MX::zeros(f_out.at(i).sparsity());
-      //   }
-      // }
     }
     // Create oracle
     oracle_[false][elim_w][lifted_calls]
@@ -1617,7 +1610,8 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   std::vector<MX> dw, dwdef;
   if (calc_d) {
     dw.insert(dw.end(), d_.begin(), d_.end());
-    dwdef.insert(dwdef.end(), ddef_.begin(), ddef_.end());
+    std::vector<MX> ddef = this->ddef();
+    dwdef.insert(dwdef.end(), ddef.begin(), ddef.end());
   }
   if (calc_w) {
     dw.insert(dw.end(), w_.begin(), w_.end());
@@ -1627,57 +1621,6 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   substitute_inplace(dw, dwdef, f_out);
   // Assemble return function
   return Function(fname, f_in, f_out, s_in, s_out);
-}
-
-void DaeBuilderInternal::prune_d() {
-  // If no d, quick return
-  if (d_.empty()) return;
-  // Create a dependent function with all inputs except for d itself
-  Function dfun = dependent_fun("dfun", {"c"}, {"d"});
-  // If no free variables, all good
-  if (!dfun.has_free()) return;
-  // Print progress
-  casadi_message("Eliminating " + str(dfun.get_free()));
-  // Variables to be eliminated
-  MX elim = vertcat(dfun.free_mx());
-  // Create a function for identifying which d cannot be calculated
-  dfun = Function("dfun", {vertcat(d_), elim}, {vertcat(ddef_)}, {"d", "elim"}, {"ddef"});
-  // Seed all elim
-  std::vector<bvec_t> elim_sp(dfun.nnz_in("elim"), static_cast<bvec_t>(1));
-  // Do not seed d
-  std::vector<bvec_t> d_sp(dfun.nnz_in("d"), static_cast<bvec_t>(0));
-  // Propagate dependencies to ddef
-  std::vector<bvec_t> ddef_sp(dfun.nnz_out("ddef"), static_cast<bvec_t>(0));
-  dfun({&d_sp.front(), &elim_sp.front()}, {&ddef_sp.front()});
-  // Get vertical offsets in d vector
-  std::vector<casadi_int> d_off = offset(d_);
-  // Eliminate dependent variables that depend on any free variable
-  std::vector<MX> d_new, ddef_new;
-  d_new.reserve(d_.size());
-  ddef_new.reserve(ddef_.size());
-  for (size_t k = 0; k < d_.size(); ++k) {
-    // Does the dependence enter in the definition of the variable?
-    bvec_t ddef_sp_any(0);
-    for (casadi_int i = d_off.at(k); i < d_off.at(k + 1); ++i) {
-      ddef_sp_any = ddef_sp_any | ddef_sp.at(i);
-    }
-    // If there is a dependence?
-    if (ddef_sp_any) {
-      // Yes: Eliminate
-      casadi_message("Eliminating 'd' that depends on free variables: " + d_.at(k).name());
-    } else {
-      // No: Keep
-      d_new.push_back(d_.at(k));
-      ddef_new.push_back(ddef_.at(k));
-    }
-  }
-  // Update d, ddef
-  d_.resize(d_new.size());
-  std::copy(d_new.begin(), d_new.end(), d_.begin());
-  ddef_.resize(ddef_new.size());
-  std::copy(ddef_new.begin(), ddef_new.end(), ddef_.begin());
-  // Tail recursive call to handle dependencies of these eliminated dependent parameters
-  prune_d();
 }
 
 Function DaeBuilderInternal::gather_eq() const {
@@ -1802,7 +1745,6 @@ MX DaeBuilderInternal::add_d(const std::string& name, const MX& new_ddef) {
   v.causality = Variable::CALCULATED_PARAMETER;
   v.beq = new_ddef;
   d_.push_back(v.v);
-  ddef_.push_back(new_ddef);
   return v.v;
 }
 
