@@ -298,37 +298,18 @@ protected:
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
 
-  /// All input variables
-  std::vector<std::vector<MX>> in_;
-
-  /// Explicit time dependence?
-  bool has_t() const { return !in_[DAE_BUILDER_T].empty();};
-
-  /** \brief Shorthands for variable sets */
-  ///@{
-  const MX& t() const { return in_[DAE_BUILDER_T].at(0);}
-  const std::vector<MX>& x() const { return in_[DAE_BUILDER_X];}
-  const std::vector<MX>& z() const { return in_[DAE_BUILDER_Z];}
-  const std::vector<MX>& q() const { return in_[DAE_BUILDER_Q];}
-  const std::vector<MX>& y() const { return in_[DAE_BUILDER_Y];}
-  const std::vector<MX>& u() const { return in_[DAE_BUILDER_U];}
-  const std::vector<MX>& p() const { return in_[DAE_BUILDER_P];}
-  const std::vector<MX>& c() const { return in_[DAE_BUILDER_C];}
-  const std::vector<MX>& d() const { return in_[DAE_BUILDER_D];}
-  const std::vector<MX>& w() const { return in_[DAE_BUILDER_W];}
-  ///@}
+  /// Ordered variables
+  std::vector<MX> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_;
 
   ///@{
   /// Ordered variables and equations
-  std::vector<MX> x_, ode_;
-  std::vector<MX> z_, alg_;
-  std::vector<MX> q_, quad_;
-  std::vector<MX> y_, ydef_;
-  std::vector<MX> u_;
-  std::vector<MX> p_;
-  std::vector<MX> c_, cdef_;
-  std::vector<MX> d_, ddef_;
-  std::vector<MX> w_, wdef_;
+  std::vector<MX> ode_;
+  std::vector<MX> alg_;
+  std::vector<MX> quad_;
+  std::vector<MX> ydef_;
+  std::vector<MX> cdef_;
+  std::vector<MX> ddef_;
+  std::vector<MX> wdef_;
   std::vector<MX> aux_;
   std::vector<MX> init_lhs_, init_rhs_;
   ///@}
@@ -345,19 +326,6 @@ protected:
   MX add_d(const std::string& name, const MX& new_ddef);
   MX add_w(const std::string& name, const MX& new_wdef);
   MX add_y(const std::string& name, const MX& new_ydef);
-  ///@}
-
-  ///@{
-  /// Register an existing variable
-  void register_t(const MX& new_t);
-  void register_x(const MX& new_x);
-  void register_z(const MX& new_z);
-  void register_u(const MX& new_u);
-  void register_p(const MX& new_p);
-  void register_c(const MX& new_c, const MX& new_cdef);
-  void register_d(const MX& new_d, const MX& new_ddef);
-  void register_w(const MX& new_w, const MX& new_wdef);
-  void register_y(const MX& new_y, const MX& new_ydef);
   ///@}
 
   /// Linear combinations of output expressions
