@@ -261,7 +261,7 @@ public:
   void register_p(const MX& new_p);
 
   /// Register output variable
-  void register_y(const MX& new_y, const MX& new_ydef);
+  void register_y(const MX& new_y);
 
   /// Clear input variable
   void clear_in(const std::string& v);

@@ -301,7 +301,6 @@ protected:
   ///@{
   /// Ordered variables and equations
   std::vector<MX> ode_, alg_, quad_;
-  std::vector<MX> ydef_;
   std::vector<MX> aux_;
   std::vector<MX> init_lhs_, init_rhs_;
   ///@}
