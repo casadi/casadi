@@ -147,7 +147,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   void eliminate_w();
 
   /// Lift problem formulation by extracting shared subexpressions
-  void lift(bool lift_shared, bool lift_calls, bool inline_calls);
+  void lift(bool lift_shared, bool lift_calls);
 
   /// Eliminate quadrature states and turn them into ODE states
   void eliminate_quad();
@@ -302,7 +302,6 @@ protected:
   /// Ordered variables and equations
   std::vector<MX> ode_, alg_, quad_;
   std::vector<MX> ydef_;
-  std::vector<MX> wdef_;
   std::vector<MX> aux_;
   std::vector<MX> init_lhs_, init_rhs_;
   ///@}

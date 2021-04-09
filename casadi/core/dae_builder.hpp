@@ -246,7 +246,7 @@ public:
   void register_d(const MX& new_d);
 
   /// Register dependent variable
-  void register_w(const MX& new_w, const MX& new_wdef);
+  void register_w(const MX& new_w);
 
   /// Register differential state
   void register_x(const MX& new_x);
@@ -279,7 +279,7 @@ public:
   void eliminate_w();
 
   /// Lift problem formulation by extracting shared subexpressions
-  void lift(bool lift_shared = true, bool lift_calls = true, bool inline_calls = false);
+  void lift(bool lift_shared = true, bool lift_calls = true);
 
   /// Eliminate quadrature states and turn them into ODE states
   void eliminate_quad();
