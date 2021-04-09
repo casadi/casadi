@@ -539,20 +539,28 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
 }
 
 void DaeBuilderInternal::clear_in(const std::string& v) {
-  switch(to_enum<DaeBuilderInternalIn>(v)) {
-  case DAE_BUILDER_U:
-    u_.clear();
-    break;
-  default:
-    casadi_error("Not implemented: " + v);
+  switch (to_enum<DaeBuilderInternalIn>(v)) {
+  case DAE_BUILDER_T: return t_.clear();
+  case DAE_BUILDER_P: return p_.clear();
+  case DAE_BUILDER_U: return u_.clear();
+  case DAE_BUILDER_X: return x_.clear();
+  case DAE_BUILDER_Z: return z_.clear();
+  case DAE_BUILDER_Q: return q_.clear();
+  case DAE_BUILDER_C: return c_.clear();
+  case DAE_BUILDER_D: return d_.clear();
+  case DAE_BUILDER_W: return w_.clear();
+  case DAE_BUILDER_Y: return y_.clear();
   }
+  casadi_error("Cannot clear input: " + v);
 }
 
 void DaeBuilderInternal::clear_out(const std::string& v) {
-  switch(to_enum<DaeBuilderInternalOut>(v)) {
-    default:
-      casadi_error("Not implemented: " + v);
+  switch (to_enum<DaeBuilderInternalOut>(v)) {
+  case DAE_BUILDER_ODE: return ode_.clear();
+  case DAE_BUILDER_ALG: return alg_.clear();
+  case DAE_BUILDER_QUAD: return quad_.clear();
   }
+  casadi_error("Cannot clear output: " + v);
 }
 
 void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
