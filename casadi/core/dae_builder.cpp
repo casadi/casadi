@@ -224,67 +224,46 @@ void DaeBuilder::add_variable(const MX& new_v) {
   add_variable(new_v.name(), v);
 }
 
-void DaeBuilder::register_p(const MX& new_p) {
-  // Consistency checks
-  casadi_assert(has_variable(new_p.name()), "No such variable: " + new_p.name());
-  // Add to list
-  (*this)->p_.push_back(new_p);
-}
-
-void DaeBuilder::register_u(const MX& new_u) {
-  // Consistency checks
-  casadi_assert(has_variable(new_u.name()), "No such variable: " + new_u.name());
-  // Add to list
-  (*this)->u_.push_back(new_u);
-}
-
-void DaeBuilder::register_x(const MX& new_x) {
-  // Consistency checks
-  casadi_assert(has_variable(new_x.name()), "No such variable: " + new_x.name());
-  // Add to list
-  (*this)->x_.push_back(new_x);
-}
-
-void DaeBuilder::register_z(const MX& new_z) {
-  // Consistency checks
-  casadi_assert(has_variable(new_z.name()), "No such variable: " + new_z.name());
-  // Add to list
-  (*this)->z_.push_back(new_z);
-}
-
-void DaeBuilder::register_t(const MX& new_t) {
+void DaeBuilder::register_t(const std::string& name) {
   // Save to class
   casadi_assert(!has_t(), "'t' already defined");
-  casadi_assert(has_variable(new_t.name()), "No such variable: " + new_t.name());
-  (*this)->t_.push_back(new_t);
+  (*this)->t_.push_back(var(name));
 }
 
-void DaeBuilder::register_c(const MX& new_c) {
-  // Consistency check
-  casadi_assert(has_variable(new_c.name()), "No such variable: " + new_c.name());
-  // Add to lists
-  (*this)->c_.push_back(new_c);
+void DaeBuilder::register_p(const std::string& name) {
+  (*this)->p_.push_back(var(name));
 }
 
-void DaeBuilder::register_d(const MX& new_d) {
-  // Consistency check
-  casadi_assert(has_variable(new_d.name()), "No such variable: " + new_d.name());
-  // Add to lists
-  (*this)->d_.push_back(new_d);
+void DaeBuilder::register_u(const std::string& name) {
+  (*this)->u_.push_back(var(name));
 }
 
-void DaeBuilder::register_w(const MX& new_w) {
-  // Consistency checks
-  casadi_assert(has_variable(new_w.name()), "No such variable: " + new_w.name());
-  // Add to lists
-  (*this)->w_.push_back(new_w);
+void DaeBuilder::register_x(const std::string& name) {
+  (*this)->x_.push_back(var(name));
 }
 
-void DaeBuilder::register_y(const MX& new_y) {
-  // Consistency checks
-  casadi_assert(has_variable(new_y.name()), "No such variable: " + new_y.name());
-  // Add to lists
-  (*this)->y_.push_back(new_y);
+void DaeBuilder::register_z(const std::string& name) {
+  (*this)->z_.push_back(var(name));
+}
+
+void DaeBuilder::register_q(const std::string& name) {
+  (*this)->q_.push_back(var(name));
+}
+
+void DaeBuilder::register_c(const std::string& name) {
+  (*this)->c_.push_back(var(name));
+}
+
+void DaeBuilder::register_d(const std::string& name) {
+  (*this)->d_.push_back(var(name));
+}
+
+void DaeBuilder::register_w(const std::string& name) {
+  (*this)->w_.push_back(var(name));
+}
+
+void DaeBuilder::register_y(const std::string& name) {
+  (*this)->y_.push_back(var(name));
 }
 
 void DaeBuilder::clear_in(const std::string& v) {

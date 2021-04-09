@@ -236,44 +236,28 @@ public:
 
   /** @name Register an existing variable */
   ///@{
-  /// Register time variable
-  void register_t(const MX& new_t);
-
-  /// Register constant
-  void register_c(const MX& new_c);
-
-  /// Register dependent parameter
-  void register_d(const MX& new_d);
-
-  /// Register dependent variable
-  void register_w(const MX& new_w);
-
-  /// Register differential state
-  void register_x(const MX& new_x);
-
-  /// Register algebraic variable
-  void register_z(const MX& new_z);
-
-  /// Register input
-  void register_u(const MX& new_u);
-
-  /// Register free parameter
-  void register_p(const MX& new_p);
-
-  /// Register output variable
-  void register_y(const MX& new_y);
-
-  /// Clear input variable
-  void clear_in(const std::string& v);
-
-  /// Clear output variable
-  void clear_out(const std::string& v);
+  void register_t(const std::string& name);
+  void register_p(const std::string& name);
+  void register_u(const std::string& name);
+  void register_x(const std::string& name);
+  void register_z(const std::string& name);
+  void register_q(const std::string& name);
+  void register_c(const std::string& name);
+  void register_d(const std::string& name);
+  void register_w(const std::string& name);
+  void register_y(const std::string& name);
   ///@}
 
   /** @name Manipulation
    *  Reformulate the dynamic optimization problem.
    */
   ///@{
+
+  /// Clear input variable
+  void clear_in(const std::string& v);
+
+  /// Clear output variable
+  void clear_out(const std::string& v);
 
   /// Eliminate all dependent variables
   void eliminate_w();
