@@ -2498,39 +2498,42 @@ namespace casadi {
       if (needs_mem) g << "int mem;\n";
 
 
-
       // Work vectors and input and output buffers
-      std::string nr = str(sz_w()) + "+" +  str(align_w_) + "/sizeof(casadi_real) + " + str(nnz_in()+nnz_out());
       g << CodeGenerator::array("casadi_int", "iw", sz_iw())
-        << CodeGenerator::array("casadi_real", "w", nr);
+        << CodeGenerator::array("casadi_real", "w", sz_w(), "", 32);
 
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << CodeGenerator::array("casadi_real", "w_in" + str(i), nnz_in(i), "", 32);
+      }
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << CodeGenerator::array("casadi_real", "w_out" + str(i), nnz_out(i), "", 32);
+      }
       // Input buffers
       g << "const casadi_real* arg[" << sz_arg() << "];\n";
 
       // Output buffers
       g << "casadi_real* res[" << sz_res() << "];\n";
 
-      casadi_int off=0;
       for (casadi_int i=0; i<n_in_; ++i) {
-        g << "arg[" << i << "] = w+" << off << ";\n";
-        off += nnz_in(i);
+        g << "arg[" << i << "] = w_in" << i << ";\n";
       }
       for (casadi_int i=0; i<n_out_; ++i) {
-        g << "res[" << i << "] = w+" << off << ";\n";
-        off += nnz_out(i);
+        g << "res[" << i << "] = w_out" << i << ";\n";
       }
 
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
-      g << "a = w;\n"
-        << "for (j=0; j<" << nnz_in() << "; ++j) "
-        << "if (scanf(\"%lg\", a++)<=0) return 2;\n";
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << "a = w_in" << i << ";\n"
+          << "for (j=0; j<" << nnz_in(i) << "; ++j) "
+          << "if (scanf(\"%lg\", a++)<=0) return 2;\n";
+      }
 
       if (needs_mem) {
         g << "mem = " << name_ << "_checkout();\n";
       }
 
       // Call the function
-      g << "flag = " << name_ << "(arg, res, iw, w+" << off << ", ";
+      g << "flag = " << name_ << "(arg, res, iw, w, ";
       if (needs_mem) {
         g << "mem";
       } else {
@@ -2543,9 +2546,11 @@ namespace casadi {
       g << "if (flag) return flag;\n";
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-      g << "r = w+" << nnz_in() << ";\n"
-        << "for (j=0; j<" << nnz_out() << "; ++j) "
-        << g.printf("%.16e\\n", "*r++") << "\n";
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << "r = w_out" << i << ";\n"
+          << "for (j=0; j<" << nnz_out(i) << "; ++j) "
+          << g.printf("%.16e\\n", "*r++") << "\n";
+      }
 
       // End with newline
       g << g.printf("\\n") << "\n";

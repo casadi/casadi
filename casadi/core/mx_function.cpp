@@ -126,7 +126,6 @@ namespace casadi {
     return (s - rem + cache_size)/sz;
   }
 
-
   /* Re-order work vector from large to small alignment, to avoid excessive padding
    *  
    * Algorithm elements arg and res will be updated
@@ -1523,10 +1522,23 @@ namespace casadi {
     g << g.debug_assert("(uintptr_t) w% 32 ==0") + "\n";
     g.local("i","casadi_int");
 
-    g << "for (i=0;i<" << n_in_ << ";++i) arg[i] = __builtin_assume_aligned (arg[i], 32);\n";
+    for (casadi_int i=0;i<n_in_;++i) {
+      if (nnz_in(i)>1) {
+        g << "arg[" << i << "] = __builtin_assume_aligned (arg[" << i << "], 32);\n";
+        g << g.debug_assert("(uintptr_t) arg[" + str(i) + "]% 32 ==0") + "\n";
+      }
+    }
+    for (casadi_int i=0;i<n_out_;++i) {
+      if (nnz_out(i)>1) {
+        g << "res[" << i << "] = __builtin_assume_aligned (res[" << i << "], 32);\n";
+        g << g.debug_assert("(uintptr_t) res[" + str(i) + "]% 32 ==0") + "\n";
+      }
+    }
+
+    /*g << "for (i=0;i<" << n_in_ << ";++i) arg[i] = __builtin_assume_aligned (arg[i], 32);\n";
     g << "for (i=0;i<" << n_in_ << ";++i) " << g.debug_assert("(uintptr_t) arg[i]% 32 ==0") + "\n";
     g << "for (i=0;i<" << n_out_ << ";++i) res[i] = __builtin_assume_aligned (res[i], 32);\n";
-    g << "for (i=0;i<" << n_out_ << ";++i) " << g.debug_assert("(uintptr_t) res[i]% 32 ==0") + "\n";
+    g << "for (i=0;i<" << n_out_ << ";++i) " << g.debug_assert("(uintptr_t) res[i]% 32 ==0") + "\n";*/
 
     // Temporary variables and vectors
     if (ce_active_) {

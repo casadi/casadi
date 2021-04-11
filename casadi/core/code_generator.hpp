@@ -571,11 +571,11 @@ namespace casadi {
 
     /** Declare an array */
     static std::string array(const std::string& type, const std::string& name, casadi_int len,
-                             const std::string& def=std::string());
+                             const std::string& def=std::string(), casadi_int align=1);
 
     /** Declare an array */
     static std::string array(const std::string& type, const std::string& name, const std::string& len,
-                             const std::string& def=std::string());
+                             const std::string& def=std::string(), casadi_int align=1);
 
     /** \brief  Print casadi_int vector to a c file
 
