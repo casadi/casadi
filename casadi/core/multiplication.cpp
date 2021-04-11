@@ -132,23 +132,42 @@ namespace casadi {
                           g.work(res[0], nnz())) << '\n';
     }
     casadi_int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
-    g << "cblas_dgemm(CblasColMajor,CblasNoTrans,CblasNoTrans," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
+    casadi_int flops = ncol_y*nrow_x*nrow_y;
+
+    if (flops>100) {
+      /*g << "cblas_dgemm(CblasColMajor,CblasNoTrans,CblasNoTrans," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
+      g << g.work(arg[1], dep(1).nnz()) << "," << nrow_x << ",";
+      g << g.work(arg[2], dep(2).nnz()) << "," << nrow_y << ",";
+      g << "1.0,";
+      g << g.work(res[0], dep(0).nnz()) << "," << nrow_x << ");\n";*/
+
+      g << "blasfeo_dgemm_normal('N','N'," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
+      g << g.work(arg[1], dep(1).nnz()) << "," << nrow_x << ",";
+      g << g.work(arg[2], dep(2).nnz()) << "," << nrow_y << ",";
+      g << "1.0,";
+      g << g.work(res[0], dep(0).nnz()) << "," << nrow_x << ");\n";
+    } else {
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g.local("tt", "const casadi_real", "*");
+      g.local("i", "casadi_int");
+      g.local("j", "casadi_int");
+      g.local("k", "casadi_int");
+      g << "for (i=0, rr=" << g.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)"
+        << " for (j=0; j<" << nrow_x << "; ++j, ++rr)"
+        << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="
+        << g.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)"
+        << " *rr += ss[k*" << nrow_x << "]**tt++;\n";
+    }
+
+    /*g << "blasfeo_dgemm_normal('N','N'," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
     g << g.work(arg[1], dep(1).nnz()) << "," << nrow_x << ",";
     g << g.work(arg[2], dep(2).nnz()) << "," << nrow_y << ",";
     g << "1.0,";
-    g << g.work(res[0], dep(0).nnz()) << "," << nrow_x << ");\n";
+    g << g.work(res[0], dep(0).nnz()) << "," << nrow_x << ");\n";*/
+    
     /*
-    g.local("rr", "casadi_real", "*");
-    g.local("ss", "const casadi_real", "*");
-    g.local("tt", "const casadi_real", "*");
-    g.local("i", "casadi_int");
-    g.local("j", "casadi_int");
-    g.local("k", "casadi_int");
-    g << "for (i=0, rr=" << g.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)"
-      << " for (j=0; j<" << nrow_x << "; ++j, ++rr)"
-      << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="
-      << g.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)"
-      << " *rr += ss[k*" << nrow_x << "]**tt++;\n";*/
+*/
   }
 
   void Multiplication::serialize_type(SerializingStream& s) const {

@@ -143,7 +143,9 @@ namespace casadi {
          dep().nnz() << "; ++cii) " << dst << "[*cii] = *ss++;\n";
      } else {
        g << g.densify(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
-                             g.work(res.front(), nnz())) << "\n";
+                             g.work(res.front(), nnz()));
+       g << "// " << dep().sparsity().nnz() << " of " << nnz();
+       g << "\n";
      }
   }
 

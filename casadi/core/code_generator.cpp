@@ -715,7 +715,7 @@ namespace casadi {
   }
 
   string CodeGenerator::array(const string& type, const string& name, const std::string& len,
-                                   const string& def) {
+                                   const string& def, casadi_int align) {
     stringstream s;
     s << type << " ";
     if (len=="0") {
@@ -724,14 +724,17 @@ namespace casadi {
       s << name << "[" << len << "]";
       if (!def.empty()) s << " = " << def;
     }
+    if (align>1) {
+      s << " __attribute__((aligned (" << align << ")))";
+    }
     s << ";\n";
     return s.str();
   }
 
 
   string CodeGenerator::array(const string& type, const string& name, casadi_int len,
-                                   const string& def) {
-    return array(type, name, str(len), def);
+                                   const string& def, casadi_int align) {
+    return array(type, name, str(len), def, align);
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const string& name,
