@@ -156,9 +156,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
   }
 
   MX PermuteLayout::get_nzref(const Sparsity& sp, const vector<casadi_int>& nz) const {
-    // TODO correct 
-    //return dep(0)->get_nzref(sp, nz);
-    return MXNode::get_nzref(sp, nz);
+    return as_nzref()->get_nzref(sp, nz);
   }
 
   MX PermuteLayout::as_nzref() const {
@@ -168,7 +166,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     std::vector<casadi_int> arg = range(nnz());
     std::vector<casadi_int> res(nnz());
     std::vector<casadi_int> iw(sz_iw());
-    casadi_relayout(get_ptr(arg), get_ptr(res), source, perms, target, iw);
+    casadi_relayout(get_ptr(arg), get_ptr(res), source, perms, target, get_ptr(iw));
     return dep(0)->get_nzref(sparsity(), res);
   }
 

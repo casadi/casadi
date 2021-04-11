@@ -160,6 +160,14 @@ namespace casadi {
     std::map<const AlgEl*, casadi_int> lookup_rets, lookup_ins;
     std::vector< const AlgEl* > rets, ins;
 
+    bool vectorize = false;
+    for (auto e : inst.stride_in) {
+      if (e>1) vectorize = true;
+    }
+    for (auto e : inst.stride_out) {
+      if (e>1) vectorize = true;
+    }
+
     // Run the algorithm
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
@@ -197,21 +205,26 @@ namespace casadi {
       };
     } sortme_ins;
 
+    bool intro = vectorize;
+    bool outro = vectorize;
 
-    std::sort(rets.begin(), rets.end(), sortme_rets);
-    for (casadi_int i=0;i<rets.size();++i) {
-      const AlgEl& a = *rets[i];
-      g.local("ret"+str(i), "casadi_real");
-      lookup_rets[&a] = i;
-    }
-    std::sort(ins.begin(), ins.end(), sortme_ins);
-    for (casadi_int i=0;i<ins.size();++i) {
-      const AlgEl& a = *ins[i];
-      g.local("in"+str(i), "casadi_real");
-      int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
-      stride = 1;
-      g << "in" << i << " = " << g.arg(a.i1) << "[" << a.i2*stride << "]" << ";\n";
-      lookup_ins[&a] = i;
+
+    if (intro) {
+      std::sort(rets.begin(), rets.end(), sortme_rets);
+      for (casadi_int i=0;i<rets.size();++i) {
+        const AlgEl& a = *rets[i];
+        g.local("ret"+str(i), "casadi_real");
+        lookup_rets[&a] = i;
+      }
+      std::sort(ins.begin(), ins.end(), sortme_ins);
+      for (casadi_int i=0;i<ins.size();++i) {
+        const AlgEl& a = *ins[i];
+        g.local("in"+str(i), "casadi_real");
+        int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
+        stride = 1;
+        g << "in" << i << " = " << g.arg(a.i1) << "[" << a.i2*stride << "]" << ";\n";
+        lookup_ins[&a] = i;
+      }
     }
 
     // Run the algorithm
@@ -224,9 +237,12 @@ namespace casadi {
           g << g.res(a.i0) << "[" << a.i2*abs(stride) << "]" << (stride<0? "+": "")<<  "=" << g.sx_work(a.i1);
         } else {
           if (!inst.res_null[a.i0]) {
-            g << "ret" << lookup_rets[&a] << " =" << g.sx_work(a.i1);
-            //int stride = inst.stride_out.empty() ? 1 : inst.stride_out.at(a.i0);
-            //g << g.res(a.i0) << "[" << a.i2*abs(stride) << "]" << " =" << g.sx_work(a.i1);
+            if (outro) {
+              g << "ret" << lookup_rets[&a] << " =" << g.sx_work(a.i1);
+            } else {
+              int stride = inst.stride_out.empty() ? 1 : inst.stride_out.at(a.i0);
+              g << g.res(a.i0) << "[" << a.i2*abs(stride) << "]" << " =" << g.sx_work(a.i1);
+            }
           }
         }
       } else {
@@ -244,9 +260,12 @@ namespace casadi {
             if (inst.arg_null[a.i1]) {
               g << "0";
             } else {
-              g << "in" << lookup_ins[&a]; //g.arg(a.i1) << "[" << a.i2 << "]";
-              //int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
-              //g << g.arg(a.i1) << "[" << a.i2*stride << "]";
+              if (intro) {
+                g << "in" << lookup_ins[&a]; //g.arg(a.i1) << "[" << a.i2 << "]";
+              } else {
+                int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
+                g << g.arg(a.i1) << "[" << a.i2*stride << "]";
+              }
             }
           }
         } else {
@@ -258,11 +277,13 @@ namespace casadi {
       }
       g  << ";\n";
     }
-    for (casadi_int i=0;i<rets.size();++i) {
-      const AlgEl& a = *rets[i];
-      casadi_int stride = inst.stride_out.empty() ? 1 : inst.stride_out[a.i0];
-      stride = 1;
-      g << g.res(a.i0) << "[" << a.i2*abs(stride)  << "]" << (stride<0? "+": "")<< "= ret" << i << ";\n";
+    if (outro) {
+      for (casadi_int i=0;i<rets.size();++i) {
+        const AlgEl& a = *rets[i];
+        casadi_int stride = inst.stride_out.empty() ? 1 : inst.stride_out[a.i0];
+        stride = 1;
+        g << g.res(a.i0) << "[" << a.i2*abs(stride)  << "]" << (stride<0? "+": "")<< "= ret" << i << ";\n";
+      }
     }
   }
 

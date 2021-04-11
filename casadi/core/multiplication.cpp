@@ -42,6 +42,7 @@ namespace casadi {
       + x.dim() + " with " + y.dim()
       + " and add the result to " + z.dim());
 
+    //if (x->is_zero()) {}
     set_dep(z, x, y);
     set_sparsity(z.sparsity());
   }
@@ -130,8 +131,13 @@ namespace casadi {
       g << g.copy(g.work(arg[0], nnz()), nnz(),
                           g.work(res[0], nnz())) << '\n';
     }
-
     casadi_int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
+    g << "cblas_dgemm(CblasColMajor,CblasNoTrans,CblasNoTrans," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
+    g << g.work(arg[1], dep(1).nnz()) << "," << nrow_x << ",";
+    g << g.work(arg[2], dep(2).nnz()) << "," << nrow_y << ",";
+    g << "1.0,";
+    g << g.work(res[0], dep(0).nnz()) << "," << nrow_x << ");\n";
+    /*
     g.local("rr", "casadi_real", "*");
     g.local("ss", "const casadi_real", "*");
     g.local("tt", "const casadi_real", "*");
@@ -142,7 +148,7 @@ namespace casadi {
       << " for (j=0; j<" << nrow_x << "; ++j, ++rr)"
       << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="
       << g.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)"
-      << " *rr += ss[k*" << nrow_x << "]**tt++;\n";
+      << " *rr += ss[k*" << nrow_x << "]**tt++;\n";*/
   }
 
   void Multiplication::serialize_type(SerializingStream& s) const {

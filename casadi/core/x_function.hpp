@@ -30,6 +30,7 @@
 #include "function_internal.hpp"
 #include "factory.hpp"
 #include "serializing_stream.hpp"
+#include "global_options.hpp"
 
 // To reuse variables we need to be able to sort by sparsity pattern
 #include <unordered_map>
@@ -726,6 +727,13 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     try {
+      /*if (is_a("SXFunction", false) && nfwd>=GlobalOptions::vector_width_real && GlobalOptions::vector_width_real>1) {
+        Function fwd = forward(1);
+        std::vector<bool> reduce_in = join(std::vector<bool>(n_in_+n_out_, true), std::vector<bool>(n_in_, false));
+        return fwd.map(nfwd, reduce_in);
+      }*/
+
+
       // Seeds
       std::vector<std::vector<MatType> > fseed = fwd_seed<MatType>(nfwd), fsens;
 

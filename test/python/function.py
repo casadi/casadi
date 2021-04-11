@@ -536,7 +536,7 @@ class Functiontests(casadiTestCase):
 
   @memory_heavy()
   def test_map_node(self):
-    for vw in vector_widths([1, 4]):
+    for vw in vector_widths([1]):
       x = SX.sym("x")
       y = SX.sym("y",2)
       z = SX.sym("z",2,2)
