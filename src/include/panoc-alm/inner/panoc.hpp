@@ -46,15 +46,15 @@ PANOCSolver<DirectionProviderT>::operator()(
     // TODO: the L-BFGS objects and vectors allocate on each iteration of ALM,
     //       and there are more vectors than strictly necessary.
 
-    vec xₖ = x,       // Value of x at the beginning of the iteration
-        x̂ₖ(n),        // Value of x after a projected gradient step
-        xₖ₊₁(n),      // xₖ for next iteration
-        x̂ₖ₊₁(n),      // x̂ₖ for next iteration
-        ŷx̂ₖ(m),       // ŷ(x̂ₖ) = Σ (g(x̂ₖ) - ẑₖ)
-        ŷx̂ₖ₊₁(m),     // ŷ(x̂ₖ) for next iteration
-        pₖ(n),        // Projected gradient step pₖ = x̂ₖ - xₖ
-        pₖ₊₁(n),      // Projected gradient step pₖ₊₁ = x̂ₖ₊₁ - xₖ₊₁
-        qₖ(n),        // Newton step Hₖ pₖ
+    vec xₖ = x,   // Value of x at the beginning of the iteration
+        x̂ₖ(n),    // Value of x after a projected gradient step
+        xₖ₊₁(n),  // xₖ for next iteration
+        x̂ₖ₊₁(n),  // x̂ₖ for next iteration
+        ŷx̂ₖ(m),   // ŷ(x̂ₖ) = Σ (g(x̂ₖ) - ẑₖ)
+        ŷx̂ₖ₊₁(m), // ŷ(x̂ₖ) for next iteration
+        pₖ(n),    // Projected gradient step pₖ = x̂ₖ - xₖ
+        pₖ₊₁(n), // Projected gradient step pₖ₊₁ = x̂ₖ₊₁ - xₖ₊₁
+        qₖ(n),   // Newton step Hₖ pₖ
         grad_ψₖ(n),   // ∇ψ(xₖ)
         grad_̂ψₖ(n),   // ∇ψ(x̂ₖ)
         grad_ψₖ₊₁(n); // ∇ψ(xₖ₊₁)
@@ -156,6 +156,8 @@ PANOCSolver<DirectionProviderT>::operator()(
                 Direction::changed_γ(direction_provider, γₖ, old_γₖ);
             else if (k == 0) // Initialize L-BFGS
                 Direction::initialize(direction_provider, xₖ, x̂ₖ, pₖ, grad_ψₖ);
+            if (γₖ != old_γₖ)
+                φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
         }
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
@@ -194,7 +196,8 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Calculate quasi-Newton step -----------------------------------------
         if (k > 0)
-            Direction::apply(direction_provider, xₖ, x̂ₖ, pₖ, /* in ⟹ out */ qₖ);
+            Direction::apply(direction_provider, xₖ, x̂ₖ, pₖ,
+                             /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
         real_t τ           = 1;
@@ -240,12 +243,10 @@ PANOCSolver<DirectionProviderT>::operator()(
 
             if (params.update_lipschitz_in_linesearch == true) {
                 // Decrease step size until quadratic upper bound is satisfied
-                real_t old_γₖ₊₁ = descent_lemma(
-                    xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
-                    /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
-                    /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁);
-                if (old_γₖ₊₁ != γₖ₊₁) // Flush L-BFGS if γ changed
-                    Direction::changed_γ(direction_provider, γₖ₊₁, old_γₖ₊₁);
+                (void)descent_lemma(xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
+                                    /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
+                                    /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁,
+                                    grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁);
             }
 
             // Compute forward-backward envelope
@@ -259,11 +260,13 @@ PANOCSolver<DirectionProviderT>::operator()(
         } while (ls_cond > 0 && τ >= params.τ_min);
 
         // τ < τ_min the line search failed and we accepted the prox step
-        if (τ < params.τ_min && k != 0) {
+        if (τ < params.τ_min && k != 0)
             ++s.linesearch_failures;
-        }
 
         // Update L-BFGS -------------------------------------------------------
+        if (γₖ != γₖ₊₁) // Flush L-BFGS if γ changed
+            Direction::changed_γ(direction_provider, γₖ₊₁, γₖ);
+
         s.lbfgs_rejected += not Direction::update(
             direction_provider, xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
 
