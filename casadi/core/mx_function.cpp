@@ -1476,6 +1476,7 @@ namespace casadi {
   void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g << "w = __builtin_assume_aligned (w, 32);\n";
     g << g.debug_assert("(uintptr_t) w% 32 ==0") + "\n";
+    g.local("i","casadi_int");
 
     g << "for (i=0;i<" << n_in_ << ";++i) arg[i] = __builtin_assume_aligned (arg[i], 32);\n";
     g << "for (i=0;i<" << n_in_ << ";++i) " << g.debug_assert("(uintptr_t) arg[i]% 32 ==0") + "\n";
