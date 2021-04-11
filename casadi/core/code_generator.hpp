@@ -434,6 +434,7 @@ namespace casadi {
 
     /** \brief Create a copy operation */
     std::string copy(const std::string& arg, std::size_t n, const std::string& res);
+    std::string copy_nocheck(const std::string& arg, std::size_t n, const std::string& res);
     void copy_check(const std::string& arg, std::size_t n, const std::string& res,
       bool check_lhs=true, bool check_rhs=true);
     void copy_default(const std::string& arg, std::size_t n, const std::string& res,

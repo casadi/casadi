@@ -130,23 +130,79 @@ namespace casadi {
   void Densify::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const {
-     if (false && size1()==1 && dep().nnz()>1) {
-       // Codegen the indices
-       string col = g.constant(dep().sparsity().T().get_row());
-       g.local("cii", "const casadi_int", "*");
-       g.local("ss", "const casadi_real", "*");
-       std::string src = g.work(arg.front(), dep().nnz());
-       std::string dst = g.work(res.front(), nnz());
 
-       g << g.clear(dst, nnz()) << "\n";
-       g << "for (cii=" << col << ", ss=" << src << "; cii!=" << col << "+" <<
-         dep().nnz() << "; ++cii) " << dst << "[*cii] = *ss++;\n";
-     } else {
-       g << g.densify(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
-                             g.work(res.front(), nnz()));
-       g << "// " << dep().sparsity().nnz() << " of " << nnz();
-       g << "\n";
-     }
+      casadi_int nrow_x, ncol_x, i, el;
+      const casadi_int *colind_x, *row_x;
+      const casadi_int* sp_x = dep(0).sparsity();
+      nrow_x = sp_x[0]; ncol_x = sp_x[1];
+      colind_x = sp_x+2; row_x = sp_x+ncol_x+3;
+      std::vector<casadi_int> streaks_target;
+      std::vector<casadi_int> streaks_len;
+      casadi_int streak_len = 0;
+      casadi_int streak_target = 0;
+
+      casadi_int iy_prev = -1;
+      casadi_int iy;
+      casadi_int offset = 0;
+      for (i=0; i<ncol_x; ++i) {
+        for (el=colind_x[i]; el!=colind_x[i+1]; ++el) {
+          iy = offset+row_x[el];
+          if (iy!=iy_prev+1) {
+            if (streak_len>0) {
+              streaks_len.push_back(streak_len);
+              streaks_target.push_back(streak_target);
+              streak_len = 0;
+              streak_target = iy;
+            }
+            if (streak_len==0) streak_target = iy;
+          }
+          streak_len++;
+          iy_prev = iy;
+        }
+        offset += nrow_x;
+      }
+      if (streak_len>0) {
+        streaks_len.push_back(streak_len);
+        streaks_target.push_back(streak_target);
+        streak_target = iy;
+      }
+      casadi_assert_dev(sum(streaks_len)==dep().sparsity().nnz());
+
+      if (false && size1()==1 && dep().nnz()>1) {
+        // Codegen the indices
+        string col = g.constant(dep().sparsity().T().get_row());
+        g.local("cii", "const casadi_int", "*");
+        g.local("ss", "const casadi_real", "*");
+        std::string src = g.work(arg.front(), dep().nnz());
+        std::string dst = g.work(res.front(), nnz());
+
+        g << g.clear(dst, nnz()) << "\n";
+        g << "for (cii=" << col << ", ss=" << src << "; cii!=" << col << "+" <<
+          dep().nnz() << "; ++cii) " << dst << "[*cii] = *ss++;\n";
+      } else {
+        std::string src = g.work(arg.front(), dep().nnz());
+        std::string dst = g.work(res.front(), nnz());
+
+        if (streaks_len.size()<4) {
+          g.comment("compact_densify" + str(streaks_len)+str(streaks_target));
+          casadi_int offset = 0;
+          casadi_int target_prev = 0;
+          for (casadi_int i=0;i<streaks_len.size();++i) {
+            if (streaks_target.at(i)-target_prev)
+              g << g.clear(dst + "+" + str(target_prev), streaks_target.at(i)-target_prev) << "\n";
+            g << g.copy_nocheck(src + "+" + str(offset), streaks_len.at(i), dst + "+" + str(streaks_target.at(i))) << "\n";
+            offset += streaks_len.at(i);
+            target_prev = streaks_target.at(i)+streaks_len.at(i);
+          }
+          if (nnz()-target_prev)
+            g << g.clear(dst + "+" + str(target_prev), nnz()-target_prev) << "\n";
+        } else {
+          g << g.densify(src, dep(0).sparsity(), dst);
+          g << "// " << dep().sparsity().nnz() << " of " << nnz();
+          g << "\n";
+        }
+      }
+      uout() << "yay" << std::endl;
   }
 
   void Sparsify::generate(CodeGenerator& g,

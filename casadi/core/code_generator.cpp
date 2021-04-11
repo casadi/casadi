@@ -1393,6 +1393,14 @@ namespace casadi {
     return s.str();
   }
 
+  std::string CodeGenerator::copy_nocheck(const std::string& arg, std::size_t n, const std::string& res) {
+    if (n==0) return "";
+    stringstream s;
+    local("i","casadi_int");
+    s << "for (i=0;i<" << n << ";++i) (" << res << ")[i] = (" << arg << ")[i];";
+    return s.str();
+  }
+
   void CodeGenerator::copy_check(const string& arg, size_t n, const string& res,
       bool check_lhs, bool check_rhs) {
     std::vector<std::string> checks;
