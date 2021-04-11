@@ -92,5 +92,18 @@
         "ψₖᵀpₖ",
         "ψₖᵀrₖ"
     ],
-    "python.pythonPath": "py-venv/bin/python"
+    "python.pythonPath": "py-venv/bin/python",
+    "editor.rulers": [
+        80
+    ],
+    "[html]": {
+        "editor.rulers": [
+            120
+        ]
+    },
+    "[latex]": {
+        "editor.rulers": [
+            120
+        ]
+    },
 }
