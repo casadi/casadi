@@ -1519,6 +1519,15 @@ namespace casadi {
   }
 
   void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
+    g << "w = __builtin_assume_aligned (w, 32);\n";
+    g << g.debug_assert("(uintptr_t) w% 32 ==0") + "\n";
+    g.local("i","casadi_int");
+
+    g << "for (i=0;i<" << n_in_ << ";++i) arg[i] = __builtin_assume_aligned (arg[i], 32);\n";
+    g << "for (i=0;i<" << n_in_ << ";++i) " << g.debug_assert("(uintptr_t) arg[i]% 32 ==0") + "\n";
+    g << "for (i=0;i<" << n_out_ << ";++i) res[i] = __builtin_assume_aligned (res[i], 32);\n";
+    g << "for (i=0;i<" << n_out_ << ";++i) " << g.debug_assert("(uintptr_t) res[i]% 32 ==0") + "\n";
+
     // Temporary variables and vectors
     if (ce_active_) {
       g.local("r", "const casadi_real*", "*");
@@ -1567,7 +1576,7 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       // Generate comment
       if (g.verbose) {
-        g << "/* #" << k++ << ": " << print(e) << " */\n";
+        g << "/* #" << k++ << ": " << e.op << ":" << print(e) << " */\n";
       }
 
       for (casadi_int i=0; i<e.arg.size(); ++i) {

@@ -362,9 +362,9 @@ namespace casadi {
     g.add_dependency(f_, local);
     g.add_auxiliary(CodeGenerator::AUX_CLEAR);
     g.local("i", "casadi_int");
-    g.local("arg1[" + str(n_in_) + "]", "const casadi_real*");
+    g.local("arg1[" + str(f_.sz_arg()) + "]", "const casadi_real*");
 
-    g.local("res1[" + str(n_out_) + "]", "casadi_real*");
+    g.local("res1[" + str(f_.sz_res()) + "]", "casadi_real*");
     if (any_reduce_out) {
       g.local("w_scratch", "casadi_real*", "*");
     }

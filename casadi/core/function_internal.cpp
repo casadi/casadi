@@ -2196,7 +2196,19 @@ namespace casadi {
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname, const Instance& inst) const {
     // Define function
     g << "/* " << definition() << " */\n";
-    g << "static " << signature(fname) << " {\n";
+
+    bool vectorize = false;
+    for (auto e : inst.stride_in) {
+      if (e>1) vectorize = true;
+    }
+    for (auto e : inst.stride_out) {
+      if (e>1) vectorize = true;
+    }
+    if (vectorize) {
+      g << "static " << signature(fname) << " {\n";
+    } else {
+      g << "static __attribute__((noinline)) " << signature(fname) << " {\n";
+    }
 
     // Reset local variables, flush buffer
     g.flush(g.body);

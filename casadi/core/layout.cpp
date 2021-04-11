@@ -247,7 +247,7 @@ namespace casadi {
     std::vector<casadi_int> dummy, order;
     sort(strides, dummy, order);
 
-    g.comment(str(order));
+    //g.comment(str(order));
 
     for (casadi_int i=0;i<n_dims;++i) {
       if (s->dims()[i]>1) {
