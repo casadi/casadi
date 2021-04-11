@@ -1,6 +1,6 @@
 #include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
 
@@ -27,10 +27,10 @@ int main(int argc, char *argv[]) {
         vec::Constant(1, 0.),
         vec::Constant(1, 0.),
     };
-    p.f      = load_CasADi_objective(so_name);
-    p.grad_f = load_CasADi_gradient_objective(so_name);
-    p.g      = load_CasADi_constraints(so_name);
-    p.grad_g = load_CasADi_gradient_constraints(so_name);
+    p.f           = load_CasADi_objective(so_name);
+    p.grad_f      = load_CasADi_gradient_objective(so_name);
+    p.g           = load_CasADi_constraints(so_name);
+    p.grad_g_prod = load_CasADi_gradient_constraints_prod(so_name);
 
     pa::ALMParams almparam;
     almparam.ε        = 1e-8;

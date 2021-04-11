@@ -43,7 +43,7 @@ TEST(PANOC, quadratic) {
         return gg;
     };
 
-    Problem p{n, m, C, D, obj_f, grad_f, g, grad_g, {}};
+    Problem p{n, m, C, D, obj_f, grad_f, g, grad_g, {}, {}};
 
     pa::PANOCParams params;
     params.lbfgs_mem = 20;

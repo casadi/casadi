@@ -79,7 +79,7 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
         grad_u_v = grad * v;
     };
 
-    Problem p{n, m, C, D, obj_f, grad_f, g, grad_g, {}};
+    Problem p{n, m, C, D, obj_f, grad_f, g, grad_g, {}, {}};
     ProblemWithCounters pc(p);
 
     ALMParams almparam;
@@ -141,7 +141,7 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
     std::cout << "# eval f:  " << pc.evaluations.f << std::endl;
     std::cout << "# eval ∇f: " << pc.evaluations.grad_f << std::endl;
     std::cout << "# eval g:  " << pc.evaluations.g << std::endl;
-    std::cout << "# eval ∇g: " << pc.evaluations.grad_g << std::endl;
+    std::cout << "# eval ∇g: " << pc.evaluations.grad_g_prod << std::endl;
 
     std::cout << "Status: " << stats.status << std::endl;
 

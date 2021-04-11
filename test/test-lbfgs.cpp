@@ -19,7 +19,8 @@ TEST(LBFGS, quadratic) {
     pa::LBFGS lbfgs(pa::LBFGSParams{}, 2, 5);
     pa::vec x(2);
     x << 10, -5;
-    auto r = grad_f(x);
+    auto r                = grad_f(x);
+    unsigned update_count = 0;
     for (size_t i = 0; i < 10; ++i) {
         { // Print L-BFGS inverse Hessian estimate
             std::cout << std::endl << i << std::endl;
@@ -27,22 +28,26 @@ TEST(LBFGS, quadratic) {
             std::cout << "f(x): " << f(x) << std::endl;
 
             pa::mat H⁻¹ = pa::mat::Identity(2, 2);
-            lbfgs.apply(H⁻¹.col(0));
-            lbfgs.apply(H⁻¹.col(1));
+            if (i > 0) {
+                lbfgs.apply(H⁻¹.col(0), 1);
+                lbfgs.apply(H⁻¹.col(1), 1);
+            }
             std::cout << std::endl << "LB⁻¹ = \n" << H⁻¹ << std::endl;
             std::cout << "B⁻¹  = \n" << B.inverse() << std::endl;
-            std::cout << "B    = \n" << B << std::endl;
+            std::cout << "   " << update_count << std::endl;
         }
 
         pa::vec d = r;
-        lbfgs.apply(d);
+        if (i > 0)
+            lbfgs.apply(d, 1);
         pa::vec x_new = x - d;
         pa::vec r_new = grad_f(x_new);
-        pa::vec y     = r_new - r;
-        lbfgs.update(x, x_new, -r, -r_new);
+        lbfgs.update(x, x_new, r, r_new, pa::LBFGS::Sign::Positive);
+        ++update_count;
 
+        pa::vec y = r_new - r;
         pa::vec s = -d;
-        B      = B + y * y.transpose() / y.dot(s) -
+        B         = B + y * y.transpose() / y.dot(s) -
             (B * s) * (s.transpose() * B.transpose()) / (s.transpose() * B * s);
 
         r = std::move(r_new);

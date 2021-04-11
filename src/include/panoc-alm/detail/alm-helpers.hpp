@@ -62,7 +62,7 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
 
     for (Eigen::Index i = 0; i < problem.m; ++i) {
         v(i) = 1;
-        problem.grad_g(x, v, grad_g);
+        problem.grad_g_prod(x, v, grad_g);
         v(i)      = 0;
         prec_g(i) = 1. / std::max(grad_g.lpNorm<Eigen::Infinity>(), 1.);
     }
@@ -78,7 +78,7 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
     };
     auto prec_grad_g_fun = [&](const vec &x, const vec &v, vec &grad_g) {
         vec prec_v = prec_g.asDiagonal() * v;
-        problem.grad_g(x, prec_v, grad_g);
+        problem.grad_g_prod(x, prec_v, grad_g);
     };
     prec_problem = Problem{
         problem.n,
@@ -90,18 +90,15 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
         std::move(prec_grad_f_fun),
         std::move(prec_g_fun),
         std::move(prec_grad_g_fun),
+        [](const vec &, unsigned, vec &) {
+            throw std::logic_error("Preconditioning for second-order solvers "
+                                   "has not yet been implemented");
+        },
         [](const vec &, const vec &, mat &) {
             throw std::logic_error("Preconditioning for second-order solvers "
                                    "has not yet been implemented");
         },
     };
-
-    // if (prec_g.size() <= 10) {
-    //     std::cout << "prec_g:   " << prec_g.transpose() << std::endl;
-    // } else {
-    //     std::cout << "‖prec_g‖: " << prec_g.norm() << std::endl;
-    // }
-    // std::cout << "prec_f:   " << prec_f << std::endl;
 }
 
 } // namespace pa::detail

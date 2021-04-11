@@ -20,6 +20,8 @@ using pa::vec;
 #define SOLVER_PGA 5
 #define SOLVER_GAAPGA 6
 #define SOLVER_PANOC_ANDERSON 7
+#define SOLVER_PANOC_2ND 8
+#define SOLVER_PANOC_2ND_LBFGS 9
 
 #if SOLVER == SOLVER_PANOC_SLBFGS
 #include <panoc-alm/alm.hpp>
@@ -31,6 +33,14 @@ using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 using Solver = pa::ALMSolver<>;
+#elif SOLVER == SOLVER_PANOC_2ND
+#include <panoc-alm/alm.hpp>
+#include <panoc-alm/inner/second-order-panoc.hpp>
+using Solver = pa::ALMSolver<pa::SecondOrderPANOCSolver>;
+#elif SOLVER == SOLVER_PANOC_2ND_LBFGS
+#include <panoc-alm/alm.hpp>
+#include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
+using Solver = pa::ALMSolver<pa::SecondOrderPANOCLBFGSSolver>;
 #elif SOLVER == SOLVER_LBFGSpp
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/lbfgspp.hpp>
@@ -88,6 +98,65 @@ auto get_inner_solver() {
 }
 auto get_problem(const pa::Problem &p) { return p; }
 const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+#elif SOLVER == SOLVER_PANOC_2ND
+auto get_inner_solver() {
+    pa::SecondOrderPANOCParams panocparams;
+    panocparams.max_iter                       = 1000;
+    panocparams.update_lipschitz_in_linesearch = true;
+    panocparams.max_time                       = 30s;
+
+    return Solver::InnerSolver(panocparams);
+}
+auto get_problem(const pa::Problem &p) { return p; }
+const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+inline YAML::Emitter &operator<<(YAML::Emitter &out,
+                                 const pa::SecondOrderPANOCParams &p) {
+    out << YAML::BeginMap;
+    out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
+    out << YAML::Key << "δ" << YAML::Value << p.Lipschitz.δ;
+    out << YAML::Key << "Lγ_factor" << YAML::Value << p.Lipschitz.Lγ_factor;
+    out << YAML::EndMap;
+    out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
+    out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
+    out << YAML::Key << "τ_min" << YAML::Value << p.τ_min;
+    out << YAML::Key << "update_lipschitz_in_linesearch" << YAML::Value
+        << p.update_lipschitz_in_linesearch;
+    out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
+        << p.alternative_linesearch_cond;
+    out << YAML::EndMap;
+    return out;
+}
+#elif SOLVER == SOLVER_PANOC_2ND_LBFGS
+auto get_inner_solver() {
+    pa::SecondOrderPANOCLBFGSParams panocparams;
+    panocparams.max_iter                       = 1000;
+    panocparams.update_lipschitz_in_linesearch = true;
+    panocparams.max_time                       = 30s;
+    pa::LBFGSParams lbfgsparams;
+
+    return Solver::InnerSolver(panocparams, lbfgsparams);
+}
+auto get_problem(const pa::Problem &p) { return p; }
+const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+inline YAML::Emitter &operator<<(YAML::Emitter &out,
+                                 const pa::SecondOrderPANOCLBFGSParams &p) {
+    out << YAML::BeginMap;
+    out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
+    out << YAML::Key << "δ" << YAML::Value << p.Lipschitz.δ;
+    out << YAML::Key << "Lγ_factor" << YAML::Value << p.Lipschitz.Lγ_factor;
+    out << YAML::EndMap;
+    out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
+    out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
+    out << YAML::Key << "τ_min" << YAML::Value << p.τ_min;
+    out << YAML::Key << "update_lipschitz_in_linesearch" << YAML::Value
+        << p.update_lipschitz_in_linesearch;
+    out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
+        << p.alternative_linesearch_cond;
+    out << YAML::EndMap;
+    return out;
+}
 #elif SOLVER == SOLVER_LBFGSpp
 auto get_inner_solver() {
     Solver::InnerSolver::Params params;

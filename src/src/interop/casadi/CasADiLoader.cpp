@@ -14,8 +14,9 @@ std::function<pa::Problem::g_sig>
 load_CasADi_constraints(const char *so_name, const char *fun_name) {
     return CasADiFun_1Vi1Vo(casadi::external(fun_name, so_name));
 }
-std::function<pa::Problem::grad_g_sig>
-load_CasADi_gradient_constraints(const char *so_name, const char *fun_name) {
+std::function<pa::Problem::grad_g_prod_sig>
+load_CasADi_gradient_constraints_prod(const char *so_name,
+                                      const char *fun_name) {
     return CasADiFun_2Vi1Vo(casadi::external(fun_name, so_name));
 }
 std::function<pa::Problem::hess_L_sig>

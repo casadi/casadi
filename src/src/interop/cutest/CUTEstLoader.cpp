@@ -73,17 +73,20 @@ class CUTEstLoader {
         if (ncon > 0)
             work.resize(std::max(nvar, ncon));
 
-        eval_objective_p        = ncon > 0                         //
+        eval_obj_p              = ncon > 0                         //
                                       ? dlfun<void>("cutest_cfn_") //
                                       : dlfun<void>("cutest_ufn_");
-        eval_objective_grad_p   = ncon > 0                               //
+        eval_obj_grad_p         = ncon > 0                               //
                                       ? dlfun<void>("cutest_cint_cofg_") //
                                       : dlfun<void>("cutest_ugr_");
-        eval_constraints_p      = ncon > 0               //
-                                      ? eval_objective_p //
+        eval_constr_p           = ncon > 0         //
+                                      ? eval_obj_p //
                                       : nullptr;
-        eval_constraints_grad_p = ncon > 0                                 //
+        eval_constr_grad_prod_p = ncon > 0                                 //
                                       ? dlfun<void>("cutest_cint_cjprod_") //
+                                      : nullptr;
+        eval_constr_i_grad_p    = ncon > 0                                //
+                                      ? dlfun<void>("cutest_cint_ccifg_") //
                                       : nullptr;
         eval_lagrangian_hess_p  = ncon > 0                         //
                                       ? dlfun<void>("cutest_cdh_") //
@@ -108,8 +111,8 @@ class CUTEstLoader {
         assert(ncon > 0);
         integer status;
         doublereal f;
-        call_as<decltype(CUTEST_cfn)>(eval_objective_p)(
-            &status, &nvar, &ncon, x.data(), &f, work.data());
+        call_as<decltype(CUTEST_cfn)>(eval_obj_p)(&status, &nvar, &ncon,
+                                                  x.data(), &f, work.data());
         throw_if_error("Failed to call cutest_cfn", status);
         return f;
     }
@@ -119,8 +122,7 @@ class CUTEstLoader {
         assert(ncon == 0);
         integer status;
         doublereal f;
-        call_as<decltype(CUTEST_ufn)>(eval_objective_p)(&status, &nvar,
-                                                        x.data(), &f);
+        call_as<decltype(CUTEST_ufn)>(eval_obj_p)(&status, &nvar, x.data(), &f);
         throw_if_error("Failed to call cutest_ufn", status);
         return f;
     }
@@ -132,7 +134,7 @@ class CUTEstLoader {
         assert(ncon > 0);
         integer status;
         logical grad = true;
-        call_as<decltype(CUTEST_cofg)>(eval_objective_grad_p)(
+        call_as<decltype(CUTEST_cofg)>(eval_obj_grad_p)(
             &status, &nvar, x.data(), work.data(), grad_f.data(), &grad);
         throw_if_error("Failed to call cutest_cfn", status);
     }
@@ -143,8 +145,8 @@ class CUTEstLoader {
         assert(grad_f.size() == nvar);
         assert(ncon == 0);
         integer status;
-        call_as<decltype(CUTEST_ugr)>(eval_objective_grad_p)(
-            &status, &nvar, x.data(), grad_f.data());
+        call_as<decltype(CUTEST_ugr)>(eval_obj_grad_p)(&status, &nvar, x.data(),
+                                                       grad_f.data());
         throw_if_error("Failed to call cutest_ugr", status);
     }
 
@@ -154,13 +156,13 @@ class CUTEstLoader {
         if (ncon == 0)
             return;
         integer status;
-        call_as<decltype(CUTEST_cfn)>(eval_constraints_p)(
+        call_as<decltype(CUTEST_cfn)>(eval_constr_p)(
             &status, &nvar, &ncon, x.data(), work.data(), g.data());
         throw_if_error("Failed to call cutest_cfn", status);
     }
 
-    void eval_constraints_grad(const pa::vec &x, const pa::vec &v,
-                               pa::vec &grad_g_v) const {
+    void eval_constraints_grad_prod(const pa::vec &x, const pa::vec &v,
+                                    pa::vec &grad_g_v) const {
         assert(x.size() == nvar);
         assert(v.size() == ncon);
         assert(grad_g_v.size() == nvar);
@@ -171,10 +173,29 @@ class CUTEstLoader {
         integer status;
         logical gotJ   = false;
         logical jtrans = true;
-        call_as<decltype(CUTEST_cjprod)>(eval_constraints_grad_p)(
+        call_as<decltype(CUTEST_cjprod)>(eval_constr_grad_prod_p)(
             &status, &nvar, &ncon, &gotJ, &jtrans, x.data(), v.data(), &ncon,
             grad_g_v.data(), &nvar);
         throw_if_error("Failed to call cutest_cjprod", status);
+    }
+
+    void eval_constraint_i_grad(const pa::vec &x, unsigned i,
+                                pa::vec &grad_gi) const {
+        assert(x.size() == nvar);
+        assert(grad_gi.size() == nvar);
+        if (ncon == 0) {
+            grad_gi.setZero();
+            return;
+        }
+        integer status;
+        integer icon = i + 1;
+        assert(icon >= 1);
+        assert(icon <= ncon);
+        pa::real_t ci;
+        logical grad = true;
+        call_as<decltype(CUTEST_ccifg)>(eval_constr_i_grad_p)(
+            &status, &nvar, &icon, x.data(), &ci, grad_gi.data(), &grad);
+        throw_if_error("Failed to call cutest_ccifg", status);
     }
 
     void eval_lagrangian_hess(const pa::vec &x, const pa::vec &y,
@@ -281,12 +302,12 @@ class CUTEstLoader {
     logical_vec linear;   ///< whether the constraint is linear
     mutable pa::vec work; ///< work vector
 
-    void *eval_objective_p                = nullptr;
-    void *eval_objective_grad_p           = nullptr;
-    void *eval_constraints_p              = nullptr;
-    void *eval_constraints_grad_p         = nullptr;
-    void *eval_specific_constraint_grad_p = nullptr;
-    void *eval_lagrangian_hess_p          = nullptr;
+    void *eval_obj_p              = nullptr;
+    void *eval_obj_grad_p         = nullptr;
+    void *eval_constr_p           = nullptr;
+    void *eval_constr_grad_prod_p = nullptr;
+    void *eval_constr_i_grad_p    = nullptr;
+    void *eval_lagrangian_hess_p  = nullptr;
 };
 
 CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname) {
@@ -312,8 +333,10 @@ CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname) {
             &CUTEstLoader::eval_objective_grad_unconstrained, l, _1, _2);
     }
     problem.g = std::bind(&CUTEstLoader::eval_constraints, l, _1, _2);
-    problem.grad_g =
-        std::bind(&CUTEstLoader::eval_constraints_grad, l, _1, _2, _3);
+    problem.grad_g_prod =
+        std::bind(&CUTEstLoader::eval_constraints_grad_prod, l, _1, _2, _3);
+    problem.grad_gi =
+        std::bind(&CUTEstLoader::eval_constraint_i_grad, l, _1, _2, _3);
     problem.hess_L =
         std::bind(&CUTEstLoader::eval_lagrangian_hess, l, _1, _2, _3);
     x0 = std::move(l->x);

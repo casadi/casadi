@@ -10,6 +10,7 @@ y = SX.sym("y")
 unknwns = vertcat(x, y)
 
 w = SX.sym("w", 2)
+v = SX.sym("v", 2)
 λ = SX.sym("λ", 2)
 
 # Formulate the NLP
@@ -35,4 +36,7 @@ cg.add(Function("grad_g", [unknwns, w],
 cg.add(Function("hess_L", [unknwns, λ],
                 [hessian(L, unknwns)[0]],
                 ["x", "y"], ["hess_L"]))
+cg.add(Function("hess_L_prod", [unknwns, λ, v],
+                [gradient(jtimes(L, unknwns, v, False), unknwns)],
+                ["x", "y", "v"], ["hess_L_prod"]))
 cg.generate()

@@ -15,10 +15,15 @@ void ProblemWithCounters::attach_counters(ProblemWithCounters &wc) {
         ++wc.evaluations.g;
         g(x, gx);
     };
-    wc.grad_g = [&wc, grad_g{std::move(wc.grad_g)}](const vec &x, const vec &y,
-                                                    vec &grad) {
-        ++wc.evaluations.grad_g;
-        grad_g(x, y, grad);
+    wc.grad_g_prod = [&wc, grad_g_prod{std::move(wc.grad_g_prod)}](
+                         const vec &x, const vec &y, vec &grad) {
+        ++wc.evaluations.grad_g_prod;
+        grad_g_prod(x, y, grad);
+    };
+    wc.grad_gi = [&wc, grad_gi{std::move(wc.grad_gi)}](const vec &x, unsigned i,
+                                                       vec &grad) {
+        ++wc.evaluations.grad_g_prod;
+        grad_gi(x, i, grad);
     };
     wc.hess_L = [&wc, hess_L{std::move(wc.hess_L)}](const vec &x, const vec &y,
                                                     mat &H) {
@@ -40,10 +45,13 @@ void ProblemOnlyD::transform() {
         gg.topRows(original.m)    = work;
         gg.bottomRows(original.n) = x;
     };
-    this->grad_g = [this](const vec &x, const vec &y, vec &gg) {
+    this->grad_g_prod = [this](const vec &x, const vec &y, vec &gg) {
         work = y.topRows(original.m);
-        original.grad_g(x, work, gg);
+        original.grad_g_prod(x, work, gg);
         gg += y.bottomRows(original.n);
+    };
+    this->grad_gi = [](const vec &, unsigned, vec &) {
+        assert(!"Not implemented");
     };
     this->hess_L = [](const vec &, const vec &, mat &) {
         assert(!"Not implemented");

@@ -122,6 +122,7 @@ Problem riskaverse_mpc_problem() {
             rptr->grad_g(ux, v, grad_u_v);
         },
         {},
+        {},
     };
 }
 

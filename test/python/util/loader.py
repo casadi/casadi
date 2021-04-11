@@ -37,7 +37,7 @@ def convert_data(raw_data):
             'f evaluations': content['counters']['f'],
             'grad_f evaluations': content['counters']['grad_f'],
             'g evaluations': content['counters']['g'],
-            'grad_g evaluations': content['counters']['grad_g'],
+            'grad_g evaluations': content['counters'].get('grad_g_prod', content['counters'].get('grad_g', -1)),
             'linesearch failures': content['linesearch failures'],
             'L-BFGS failures': content['L-BFGS failures'],
             'L-BFGS rejected': content['L-BFGS rejected'],

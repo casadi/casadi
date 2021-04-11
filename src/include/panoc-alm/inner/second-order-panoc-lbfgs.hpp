@@ -1,9 +1,8 @@
 #pragma once
 
-#include "panoc-alm/util/vec.hpp"
-#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
-#include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
+#include <panoc-alm/inner/directions/lbfgs.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -16,9 +15,8 @@ namespace pa {
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
-template <class DirectionProviderT>
-typename PANOCSolver<DirectionProviderT>::Stats
-PANOCSolver<DirectionProviderT>::operator()(
+inline SecondOrderPANOCLBFGSSolver::Stats
+SecondOrderPANOCLBFGSSolver::operator()(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Constraint weights @f$ \Sigma @f$
@@ -34,7 +32,6 @@ PANOCSolver<DirectionProviderT>::operator()(
     /// [out]   Slack variable error @f$ g(x) - z @f$
     vec &err_z) {
 
-    using Direction = PANOCDirection<DirectionProvider>;
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
@@ -60,7 +57,17 @@ PANOCSolver<DirectionProviderT>::operator()(
         grad_ψₖ₊₁(n); // ∇ψ(xₖ₊₁)
 
     vec work_n(n), work_m(m);
-    direction_provider.resize(n, params.lbfgs_mem);
+
+    lbfgs.resize(n, params.lbfgs_mem);
+
+    vec work_n2(n);
+    vec rhs(n);
+    vec dK(n);
+
+    using indexvec = std::vector<vec::Index>;
+    indexvec J, K;
+    J.reserve(n);
+    K.reserve(n);
 
     // Keep track of how many successive iterations didn't update the iterate
     unsigned no_progress = 0;
@@ -152,10 +159,6 @@ PANOCSolver<DirectionProviderT>::operator()(
                 descent_lemma(xₖ, ψₖ, grad_ψₖ,
                               /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
                               /* inout */ ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
-            if (k > 0 && γₖ != old_γₖ) // Flush L-BFGS if γ changed
-                Direction::changed_γ(direction_provider, γₖ, old_γₖ);
-            else if (k == 0) // Initialize L-BFGS
-                Direction::initialize(direction_provider, xₖ, x̂ₖ, pₖ, grad_ψₖ);
             if (γₖ != old_γₖ)
                 φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
         }
@@ -194,10 +197,40 @@ PANOCSolver<DirectionProviderT>::operator()(
             return s;
         }
 
-        // Calculate quasi-Newton step -----------------------------------------
-        if (k > 0)
-            Direction::apply(direction_provider, xₖ, x̂ₖ, pₖ, 1,
-                             /* in ⟹ out */ qₖ);
+        // Calculate Newton step -----------------------------------------------
+
+        // TODO: all of this is suboptimal and ugly :(
+
+        // TODO: write helper lambda above
+        // detail::calc_augmented_lagrangian_hessian(problem, xₖ, ŷx̂ₖ, y, Σ, g,
+        //                                           H, grad_gi);
+
+        K.clear();
+        J.clear();
+        for (vec::Index i = 0; i < n; ++i) {
+            real_t gd_step = xₖ(i) - γₖ * grad_ψₖ(i);
+            if (gd_step < problem.C.lowerbound(i)) {
+                K.push_back(i);
+                dK(i) = pₖ(i);
+            } else if (problem.C.upperbound(i) < gd_step) {
+                K.push_back(i);
+                dK(i) = pₖ(i);
+            } else {
+                J.push_back(i);
+                dK(i) = 0;
+            }
+        }
+        qₖ = pₖ;
+        if (k > 0 && not J.empty()) {
+            // Compute right-hand side of 6.1c
+            // TODO: optimize (using AD Hess×vec product)
+            detail::calc_augmented_lagrangian_hessian_prod_fd(
+                problem, xₖ, y, Σ, grad_ψₖ, dK, rhs, work_n, work_n2, work_m);
+            for (auto j : J) {
+                qₖ(j) = -grad_ψₖ(j) - rhs(j);
+            }
+            lbfgs.apply(qₖ, γₖ, J);
+        }
 
         // Line search initialization ------------------------------------------
         real_t τ           = 1;
@@ -212,7 +245,6 @@ PANOCSolver<DirectionProviderT>::operator()(
         } else if (not qₖ.allFinite()) {
             τ = 0;
             ++s.lbfgs_failures;
-            direction_provider.reset(); // Is there anything else we can do?
         }
 
         // Line search loop ----------------------------------------------------
@@ -263,16 +295,13 @@ PANOCSolver<DirectionProviderT>::operator()(
         if (τ < params.τ_min && k != 0)
             ++s.linesearch_failures;
 
-        // Update L-BFGS -------------------------------------------------------
-        if (γₖ != γₖ₊₁) // Flush L-BFGS if γ changed
-            Direction::changed_γ(direction_provider, γₖ₊₁, γₖ);
-
-        s.lbfgs_rejected += not Direction::update(
-            direction_provider, xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
-
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)
             no_progress = xₖ == xₖ₊₁ ? no_progress + 1 : 0;
+
+        // Update L-BFGS
+        s.lbfgs_rejected += not lbfgs.update(xₖ, xₖ₊₁, grad_ψₖ, grad_ψₖ₊₁,
+                                             LBFGS::Sign::Positive);
 
         // Advance step --------------------------------------------------------
         Lₖ = Lₖ₊₁;

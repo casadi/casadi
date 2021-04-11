@@ -1,9 +1,7 @@
 #pragma once
 
-#include "panoc-alm/util/vec.hpp"
-#include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/decl/second-order-panoc.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
-#include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -11,14 +9,14 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <Eigen/Cholesky>
+
 namespace pa {
 
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
-template <class DirectionProviderT>
-typename PANOCSolver<DirectionProviderT>::Stats
-PANOCSolver<DirectionProviderT>::operator()(
+inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Constraint weights @f$ \Sigma @f$
@@ -34,7 +32,6 @@ PANOCSolver<DirectionProviderT>::operator()(
     /// [out]   Slack variable error @f$ g(x) - z @f$
     vec &err_z) {
 
-    using Direction = PANOCDirection<DirectionProvider>;
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
@@ -60,7 +57,20 @@ PANOCSolver<DirectionProviderT>::operator()(
         grad_ψₖ₊₁(n); // ∇ψ(xₖ₊₁)
 
     vec work_n(n), work_m(m);
-    direction_provider.resize(n, params.lbfgs_mem);
+
+    mat H(n, n);    // Hessian of the (augmented) Lagrangian function and ψ
+    vec g(m),       // Value of the constraint function
+        grad_gi(n); // Gradient of one of the constraints
+
+    using indexvec  = std::vector<vec::Index>;
+    using bvec      = Eigen::Matrix<bool, Eigen::Dynamic, 1>;
+    bvec inactive_C = bvec::Zero(n);
+
+    indexvec J, K;
+    J.reserve(n);
+    K.reserve(n);
+    vec qJ(n); // Solution of Newton Hessian system
+    vec rhs(n);
 
     // Keep track of how many successive iterations didn't update the iterate
     unsigned no_progress = 0;
@@ -138,8 +148,8 @@ PANOCSolver<DirectionProviderT>::operator()(
     real_t ψx̂ₖ        = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷx̂ₖ);
     real_t grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
     real_t pₖᵀpₖ      = pₖ.squaredNorm();
-    // Compute forward-backward envelope
-    real_t φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
+    // Forward-backward envelope
+    real_t φₖ;
 
     // Main PANOC loop
     // =========================================================================
@@ -148,16 +158,13 @@ PANOCSolver<DirectionProviderT>::operator()(
         // Quadratic upper bound -----------------------------------------------
         if (k == 0 || params.update_lipschitz_in_linesearch == false) {
             // Decrease step size until quadratic upper bound is satisfied
-            real_t old_γₖ =
-                descent_lemma(xₖ, ψₖ, grad_ψₖ,
-                              /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
-                              /* inout */ ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
-            if (k > 0 && γₖ != old_γₖ) // Flush L-BFGS if γ changed
-                Direction::changed_γ(direction_provider, γₖ, old_γₖ);
-            else if (k == 0) // Initialize L-BFGS
-                Direction::initialize(direction_provider, xₖ, x̂ₖ, pₖ, grad_ψₖ);
-            if (γₖ != old_γₖ)
-                φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
+            descent_lemma(xₖ, ψₖ, grad_ψₖ,
+                          /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
+                          /* inout */ ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
+            φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
+            std::cout << "γ₀: " << γₖ << std::endl;
+            std::cout << "ψ₀: " << ψₖ << std::endl;
+            std::cout << "φ₀: " << φₖ << std::endl;
         }
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
@@ -194,10 +201,67 @@ PANOCSolver<DirectionProviderT>::operator()(
             return s;
         }
 
-        // Calculate quasi-Newton step -----------------------------------------
-        if (k > 0)
-            Direction::apply(direction_provider, xₖ, x̂ₖ, pₖ, 1,
-                             /* in ⟹ out */ qₖ);
+        // Calculate Newton step -----------------------------------------------
+
+        // TODO: all of this is suboptimal and ugly :(
+
+        // TODO: write helper lambda above
+        detail::calc_augmented_lagrangian_hessian(problem, xₖ, ŷx̂ₖ, y, Σ, g, H,
+                                                  grad_gi);
+
+        K.clear();
+        J.clear();
+        for (vec::Index i = 0; i < n; ++i) {
+            real_t gd_step = xₖ(i) - γₖ * grad_ψₖ(i);
+            if (gd_step < problem.C.lowerbound(i)) {
+                K.push_back(i);
+            } else if (problem.C.upperbound(i) < gd_step) {
+                K.push_back(i);
+            } else {
+                J.push_back(i);
+            }
+        }
+        qₖ                  = pₖ;
+        bool newton_success = true;
+        if (not J.empty()) {
+            // Compute right-hand side of 6.1c
+            vec::Index ri = 0;
+            for (auto j : J) {
+                real_t hess_q = 0;
+                for (auto k : K)
+                    hess_q += H(j, k) * qₖ(k);
+                rhs(ri++) = -grad_ψₖ(j) - hess_q;
+            }
+
+            // Permute H to get the xJxJ block in the top left
+            auto hess_Ljj = H.block(0, 0, J.size(), J.size());
+            vec::Index r  = 0;
+            for (auto rj : J) {
+                vec::Index c = 0;
+                for (auto cj : J) {
+                    hess_Ljj(r, c) = H(rj, cj);
+                    ++c;
+                }
+                ++r;
+            }
+            auto ldl = hess_Ljj.ldlt(); // TODO: does this allocate?
+            if (ldl.isPositive()) {
+                qJ.topRows(J.size()) = ldl.solve(rhs).topRows(J.size());
+            } else {
+                std::cout << "\x1b[0;31m"
+                             "not PD"
+                             "\x1b[0m"
+                          << std::endl;
+                // newton_success = false;
+            }
+
+            r = 0;
+            for (auto j : J)
+                qₖ(j) = qJ(r++);
+        }
+
+        std::cout << "x: " << xₖ.transpose() << std::endl;
+        std::cout << "q: " << qₖ.transpose() << std::endl;
 
         // Line search initialization ------------------------------------------
         real_t τ           = 1;
@@ -207,12 +271,9 @@ PANOCSolver<DirectionProviderT>::operator()(
         real_t ls_cond;
 
         // Make sure quasi-Newton step is valid
-        if (k == 0) {
-            τ = 0; // Always use prox step on first iteration
-        } else if (not qₖ.allFinite()) {
+        if (not newton_success || not qₖ.allFinite()) {
             τ = 0;
-            ++s.lbfgs_failures;
-            direction_provider.reset(); // Is there anything else we can do?
+            ++s.newton_failures;
         }
 
         // Line search loop ----------------------------------------------------
@@ -229,6 +290,8 @@ PANOCSolver<DirectionProviderT>::operator()(
                 xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ; // → faster quasi-Newton step
                 // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
                 ψₖ₊₁ = calc_ψ_grad_ψ(xₖ₊₁, /* in ⟹ out */ grad_ψₖ₊₁);
+                std::cout << "xk+1: " << xₖ₊₁.transpose() << std::endl;
+                std::cout << "ψₖ₊₁: " << ψₖ₊₁ << std::endl;
             }
 
             // Calculate x̂ₖ₊₁, pₖ₊₁ (projected gradient step in xₖ₊₁)
@@ -243,14 +306,16 @@ PANOCSolver<DirectionProviderT>::operator()(
 
             if (params.update_lipschitz_in_linesearch == true) {
                 // Decrease step size until quadratic upper bound is satisfied
-                (void)descent_lemma(xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
-                                    /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
-                                    /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁,
-                                    grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁);
+                descent_lemma(xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
+                              /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
+                              /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁,
+                              Lₖ₊₁, γₖ₊₁);
             }
 
             // Compute forward-backward envelope
             φₖ₊₁ = ψₖ₊₁ + 1 / (2 * γₖ₊₁) * pₖ₊₁ᵀpₖ₊₁ + grad_ψₖ₊₁ᵀpₖ₊₁;
+            std::cout << "φₖ:   " << φₖ << std::endl;
+            std::cout << "φₖ₊₁: " << φₖ₊₁ << std::endl;
             // Compute line search condition
             ls_cond = φₖ₊₁ - (φₖ - σₖγₖ⁻¹pₖᵀpₖ);
             if (params.alternative_linesearch_cond)
@@ -260,15 +325,9 @@ PANOCSolver<DirectionProviderT>::operator()(
         } while (ls_cond > 0 && τ >= params.τ_min);
 
         // τ < τ_min the line search failed and we accepted the prox step
-        if (τ < params.τ_min && k != 0)
+        if (τ < params.τ_min && k != 0) {
             ++s.linesearch_failures;
-
-        // Update L-BFGS -------------------------------------------------------
-        if (γₖ != γₖ₊₁) // Flush L-BFGS if γ changed
-            Direction::changed_γ(direction_provider, γₖ₊₁, γₖ);
-
-        s.lbfgs_rejected += not Direction::update(
-            direction_provider, xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
+        }
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)

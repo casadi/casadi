@@ -44,7 +44,7 @@ vec eval_grad_ψ(const Problem &prob, const vec &x, const vec &y, const vec &Σ)
     vec ŷ = eval_ŷ(prob, x, y, Σ);
     vec grad_f(prob.n), grad_gŷ(prob.n);
     prob.grad_f(x, grad_f);
-    prob.grad_g(x, ŷ, grad_gŷ);
+    prob.grad_g_prod(x, ŷ, grad_gŷ);
     return grad_f + grad_gŷ;
 }
 
@@ -179,7 +179,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         vec pₖ = projected_gradient_step(problem, xₖ, y, Σ, γₖ);
         vec qₖ = pₖ;
         if (k > 0)
-            lbfgs.apply(qₖ);
+            lbfgs.apply(qₖ, 1);
         else
             // Initialize the L-BFGS
             pa::PANOCDirection<pa::LBFGS>::initialize(

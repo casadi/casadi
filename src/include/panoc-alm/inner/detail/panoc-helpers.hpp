@@ -44,7 +44,7 @@ calc_grad_ψ_from_ŷ(const Problem &p, ///< [in]  Problem description
 ) {
     // ∇ψ = ∇f(x) + ∇g(x) ŷ
     p.grad_f(x, grad_ψ);
-    p.grad_g(x, ŷ, work_n);
+    p.grad_g_prod(x, ŷ, work_n);
     grad_ψ += work_n;
 }
 
@@ -89,7 +89,7 @@ inline void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
 
     // ∇ψ = ∇f(x) + ∇g(x) ŷ
     p.grad_f(x, grad_ψ);
-    p.grad_g(x, work_m, work_n);
+    p.grad_g_prod(x, work_m, work_n);
     grad_ψ += work_n;
 }
 
@@ -123,7 +123,7 @@ inline auto
 projected_gradient_step(const Box &C,     ///< [in]  Set to project onto
                         real_t γ,         ///< [in]  Step size
                         const vec &x,     ///< [in]  Decision variable @f$ x @f$
-                        const vec &grad_ψ ///< [in]  @f$ \nabla \psi(x^k) @f$) {
+                        const vec &grad_ψ ///< [in]  @f$ \nabla \psi(x^k) @f$
 ) {
     using binary_real_f = real_t (*)(real_t, real_t);
     return (-γ * grad_ψ)
@@ -259,6 +259,77 @@ inline SolverStatus check_all_stop_conditions(
            : max_no_progress ? SolverStatus::NoProgress
            : interrupted     ? SolverStatus::Interrupted
                              : SolverStatus::Unknown;
+}
+
+/// Compute the Hessian matrix of the augmented Lagrangian function
+/// @f[ \nabla^2_{xx} L_\Sigma(x, y) =
+///     \Big. \nabla_{xx}^2 L(x, y) \Big|_{\big(x,\, \hat y(x, y)\big)}
+///   + \sum_{i\in\mathcal{I}} \Sigma_i\,\nabla g_i(x) \nabla g_i(x)^\top @f]
+inline void calc_augmented_lagrangian_hessian(
+    /// [in]  Problem description
+    const Problem &problem,
+    /// [in]    Current iterate @f$ x^k @f$
+    const vec &xₖ,
+    /// [in]   Intermediate vector @f$ \hat y(x^k) @f$
+    const vec &ŷxₖ,
+    /// [in]    Lagrange multipliers @f$ y @f$
+    const vec &y,
+    /// [in]    Penalty weights @f$ \Sigma @f$
+    const vec &Σ,
+    /// [out]   The constraint values @f$ g(x^k) @f$
+    vec &g,
+    /// [out]   Hessian matrix @f$ H(x, y) @f$
+    mat &H,
+    ///         Dimension n
+    vec &work_n) {
+
+    // Compute the Hessian of the Lagrangian
+    problem.hess_L(xₖ, ŷxₖ, H);
+    // Compute the Hessian of the augmented Lagrangian
+    problem.g(xₖ, g);
+    for (vec::Index i = 0; i < problem.m; ++i) {
+        real_t ζ = g(i) + y(i) / Σ(i);
+        bool inactive =
+            problem.D.lowerbound(i) < ζ && ζ < problem.D.upperbound(i);
+        if (not inactive) {
+            problem.grad_gi(xₖ, i, work_n);
+            H += work_n * Σ(i) * work_n.transpose();
+        }
+    }
+}
+
+/// Compute the Hessian matrix of the augmented Lagrangian function multiplied
+/// by the given vector, using finite differences.
+/// @f[ \nabla^2_{xx} L_\Sigma(x, y)\, v \approx
+///     \frac{\nabla_x L_\Sigma(x+hv, y) - \nabla_x L_\Sigma(x, y)}{h} @f]
+inline void calc_augmented_lagrangian_hessian_prod_fd(
+    /// [in]    Problem description
+    const Problem &problem,
+    /// [in]    Current iterate @f$ x^k @f$
+    const vec &xₖ,
+    /// [in]    Lagrange multipliers @f$ y @f$
+    const vec &y,
+    /// [in]    Penalty weights @f$ \Sigma @f$
+    const vec &Σ,
+    /// [in]    Gradient @f$ \nabla \psi(x^k) @f$
+    const vec &grad_ψ,
+    /// [in]    Vector to multiply with the Hessian
+    const vec &v,
+    /// [out]   Hessian-vector product
+    vec &Hv,
+    ///         Dimension n
+    vec &work_n1,
+    ///         Dimension n
+    vec &work_n2,
+    ///         Dimension m
+    vec &work_m) {
+
+    real_t h = std::sqrt(std::numeric_limits<real_t>::epsilon());
+    vec &xₖh = work_n1;
+    xₖh      = xₖ + h * v;
+    calc_grad_ψ(problem, xₖh, y, Σ, Hv, work_n2, work_m);
+    Hv -= grad_ψ;
+    Hv /= h;
 }
 
 } // namespace pa::detail

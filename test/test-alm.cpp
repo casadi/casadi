@@ -37,7 +37,7 @@ TEST(ALM, singleshooting1D) {
         (void)u, (void)v, grad_u_v(0) = 0;
     };
 
-    Problem p{1, 0, C, D, f, grad_f, g, grad_g, {}};
+    Problem p{1, 0, C, D, f, grad_f, g, grad_g, {}, {}};
 
     ALMParams almparam;
     almparam.ε        = 1e-4;
@@ -116,7 +116,7 @@ TEST(ALM, multipleshooting1D) {
         grad_u_v.bottomRows(1) = -pa::mat::Identity(1, 1) * v;
     };
 
-    Problem p{2, 1, C, D, f, grad_f, g, grad_g, {}};
+    Problem p{2, 1, C, D, f, grad_f, g, grad_g, {}, {}};
 
     ALMParams almparam;
     almparam.ε        = 1e-4;
@@ -211,7 +211,7 @@ TEST(ALM, multipleshooting8D) {
         grad_u_v.bottomRows(nx) = -pa::mat::Identity(nx, nx) * v;
     };
 
-    Problem p{n, m, C, D, f, grad_f, g, grad_g, {}};
+    Problem p{n, m, C, D, f, grad_f, g, grad_g, {}, {}};
 
     ALMParams almparam;
     almparam.ε        = 1e-4;

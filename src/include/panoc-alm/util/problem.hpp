@@ -53,8 +53,18 @@ struct Problem {
     /// @param  [out] grad_gxy
     ///         Gradient of the constraints
     ///         @f$ \nabla g(x)\ y \in \mathbb{R}^n @f$
-    using grad_g_sig = void(const vec &x, const vec &y, vec &grad_gxy);
-
+    using grad_g_prod_sig = void(const vec &x, const vec &y, vec &grad_gxy);
+    /// Signature of the function that evaluates the gradient of one specific
+    /// constraints
+    /// @f$ \nabla g_i(x) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \mathbb{R}^n @f$
+    /// @param  [in] i
+    ///         Which constraint @f$ 0 \le i \lt m @f$
+    /// @param  [out] grad_gi
+    ///         Gradient of the constraint
+    ///         @f$ \nabla g_i(x) \mathbb{R}^n @f$
+    using grad_gi_sig = void(const vec &x, unsigned i, vec &grad_gi);
     /// Signature of the function that evaluates the Hessian of the Lagrangian
     /// @f$ \nabla_{xx}^2L(x, y) @f$
     /// @param  [in] x
@@ -72,17 +82,20 @@ struct Problem {
     /// Constraint function @f$ g(x) @f$
     std::function<g_sig> g;
     /// Gradient of the constraint function times vector @f$ \nabla g(x)\ y @f$
-    std::function<grad_g_sig> grad_g;
+    std::function<grad_g_prod_sig> grad_g_prod;
+    /// Gradient of a specific constraint @f$ \nabla g_i(x) @f$
+    std::function<grad_gi_sig> grad_gi;
     /// Hessian of the Lagrangian function @f$ \nabla_{xx}^2 L(x, y) @f$
     std::function<hess_L_sig> hess_L;
 };
 
 struct EvalCounter {
-    unsigned f      = 0;
-    unsigned grad_f = 0;
-    unsigned g      = 0;
-    unsigned grad_g = 0;
-    unsigned hess_L = 0;
+    unsigned f           = 0;
+    unsigned grad_f      = 0;
+    unsigned g           = 0;
+    unsigned grad_g_prod = 0;
+    unsigned grad_gi     = 0;
+    unsigned hess_L      = 0;
 
     void reset() { *this = {}; }
 };
@@ -91,7 +104,8 @@ inline EvalCounter &operator+=(EvalCounter &a, EvalCounter b) {
     a.f += b.f;
     a.grad_f += b.grad_f;
     a.g += b.g;
-    a.grad_g += b.grad_g;
+    a.grad_g_prod += b.grad_g_prod;
+    a.grad_gi += b.grad_gi;
     a.hess_L += b.hess_L;
     return a;
 }

@@ -27,6 +27,13 @@ class LBFGS {
   public:
     using Params = LBFGSParams;
 
+    /// The sign of the vectors @f$ p @f$ passed to the @ref LBFGS::update
+    /// method.
+    enum class Sign {
+        Positive, ///< @f$ p \sim \nabla \psi(x) @f$
+        Negative, ///< @f$ p \sim -\nabla \psi(x) @f$
+    };
+
     LBFGS(Params params) : params(params) {}
     LBFGS(Params params, size_t n, size_t history) : params(params) {
         resize(n, history);
@@ -39,11 +46,17 @@ class LBFGS {
 
     /// Update the inverse Hessian approximation using the new vectors xₖ₊₁
     /// and pₖ₊₁.
-    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁);
+    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
+                Sign sign);
 
     /// Apply the inverse Hessian approximation to the given vector q.
     template <class Vec>
-    void apply(Vec &&q);
+    void apply(Vec &&q, real_t γ);
+
+    /// Apply the inverse Hessian approximation to the given vector q, applying
+    /// only the columns and rows of the Hessian in the index set J.
+    template <class Vec, class IndexVec>
+    void apply(Vec &&q, real_t γ, const IndexVec &indices);
 
     /// Throw away the approximation and all previous vectors s and y.
     void reset();

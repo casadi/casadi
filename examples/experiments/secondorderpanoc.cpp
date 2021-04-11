@@ -24,11 +24,11 @@ int main() {
         vec::Constant(p.m, 2.),
         vec::Constant(p.m, 0.),
     };
-    p.f      = load_CasADi_objective(so_name);
-    p.grad_f = load_CasADi_gradient_objective(so_name);
-    p.g      = load_CasADi_constraints(so_name);
-    p.grad_g = load_CasADi_gradient_constraints(so_name);
-    p.hess_L = load_CasADi_hessian_lagrangian(so_name);
+    p.f           = load_CasADi_objective(so_name);
+    p.grad_f      = load_CasADi_gradient_objective(so_name);
+    p.g           = load_CasADi_constraints(so_name);
+    p.grad_g_prod = load_CasADi_gradient_constraints_prod(so_name);
+    p.hess_L      = load_CasADi_hessian_lagrangian(so_name);
 
     LBFGS lbfgs({}, p.n, 5);
 
@@ -60,7 +60,7 @@ int main() {
             bool inactive = p.D.lowerbound(i) < ζ && ζ < p.D.upperbound(i);
             vec ei        = vec::Zero(p.m);
             ei(i)         = 1;
-            p.grad_g(x, ei, grad_g);
+            p.grad_g_prod(x, ei, grad_g);
             if (inactive)
                 H += Σ(i) * grad_g * grad_g.transpose();
         }
@@ -124,13 +124,13 @@ int main() {
         }
 
         if (use_lbfgs) {
-            lbfgs.apply(d);
+            lbfgs.apply(d, 1);
             vec pₖ   = detail::projected_gradient_step(p.C, γ, x, grad_L);
             vec xₖ₊₁ = x + d;
             vec grad_Lₖ₊₁(p.n);
             detail::calc_grad_ψ(p, xₖ₊₁, y, Σ, grad_Lₖ₊₁, work_n, ŷ);
             vec pₖ₊₁ = detail::projected_gradient_step(p.C, γ, xₖ₊₁, grad_Lₖ₊₁);
-            lbfgs.update(x, xₖ₊₁, pₖ, pₖ₊₁);
+            lbfgs.update(x, xₖ₊₁, pₖ, pₖ₊₁, LBFGS::Sign::Negative);
         }
 
         x += d;

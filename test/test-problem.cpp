@@ -28,7 +28,7 @@ TEST(Problem, onlyD) {
         g(0) = 71 * x(0) * x(1) + 83 * x(1) * x(2);
         g(1) = 97 * x(1) * x(1) + 29 * x(0) * x(2);
     };
-    original.grad_g = [](const vec &x, const vec &y, vec &g) {
+    original.grad_g_prod = [](const vec &x, const vec &y, vec &g) {
         mat grad(3, 2);
         grad << 71 * x(1), 29 * x(2),             //
             71 * x(0) + 83 * x(2), 2 * 97 * x(1), //
@@ -58,8 +58,8 @@ TEST(Problem, onlyD) {
     vec fd_g0             = pa_ref::finite_diff(orig_g_component(0), x);
     vec fd_g1             = pa_ref::finite_diff(orig_g_component(1), x);
     vec gr_g0(3), gr_g1(3);
-    original.grad_g(x, mat::Identity(2, 2).col(0), gr_g0);
-    original.grad_g(x, mat::Identity(2, 2).col(1), gr_g1);
+    original.grad_g_prod(x, mat::Identity(2, 2).col(0), gr_g0);
+    original.grad_g_prod(x, mat::Identity(2, 2).col(1), gr_g1);
     ASSERT_THAT(print_wrap(gr_g0), EigenAlmostEqual(print_wrap(fd_g0), 1e-4));
     ASSERT_THAT(print_wrap(gr_g1), EigenAlmostEqual(print_wrap(fd_g1), 1e-4));
     // std::cout << std::setprecision(17);
@@ -103,11 +103,11 @@ TEST(Problem, onlyD) {
     vec fd_gD3        = pa_ref::finite_diff(gD_component(3), x);
     vec fd_gD4        = pa_ref::finite_diff(gD_component(4), x);
     vec gr_gD0(5), gr_gD1(5), gr_gD2(5), gr_gD3(5), gr_gD4(5);
-    onlyD.grad_g(x, mat::Identity(5, 5).col(0), gr_gD0);
-    onlyD.grad_g(x, mat::Identity(5, 5).col(1), gr_gD1);
-    onlyD.grad_g(x, mat::Identity(5, 5).col(2), gr_gD2);
-    onlyD.grad_g(x, mat::Identity(5, 5).col(3), gr_gD3);
-    onlyD.grad_g(x, mat::Identity(5, 5).col(4), gr_gD4);
+    onlyD.grad_g_prod(x, mat::Identity(5, 5).col(0), gr_gD0);
+    onlyD.grad_g_prod(x, mat::Identity(5, 5).col(1), gr_gD1);
+    onlyD.grad_g_prod(x, mat::Identity(5, 5).col(2), gr_gD2);
+    onlyD.grad_g_prod(x, mat::Identity(5, 5).col(3), gr_gD3);
+    onlyD.grad_g_prod(x, mat::Identity(5, 5).col(4), gr_gD4);
     EXPECT_THAT(print_wrap(gr_gD0), EigenAlmostEqual(print_wrap(fd_gD0), 1e-4));
     EXPECT_THAT(print_wrap(gr_gD1), EigenAlmostEqual(print_wrap(fd_gD1), 1e-4));
     EXPECT_THAT(print_wrap(gr_gD2), EigenAlmostEqual(print_wrap(fd_gD2), 1e-4));
