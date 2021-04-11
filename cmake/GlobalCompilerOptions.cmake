@@ -15,6 +15,8 @@ set(CMAKE_DEBUG_POSTFIX "-debug")
 
 set(CMAKE_CXX_FLAGS_ASAN "-g3 -O0 \
     -fsanitize=address,leak,undefined,pointer-compare,pointer-subtract \
+    -fsanitize-address-use-after-scope \
+    -fstack-protector-all \
     -DEIGEN_INITIALIZE_MATRICES_BY_NAN")
 set(CMAKE_C_FLAGS_ASAN   "-g3 -O0 \
     -fsanitize=address,leak,undefined,pointer-compare,pointer-subtract")
