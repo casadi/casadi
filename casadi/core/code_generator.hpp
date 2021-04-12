@@ -581,13 +581,13 @@ namespace casadi {
 
         \identifier{tr} */
     void print_vector(std::ostream &s, const std::string& name,
-                             const std::vector<casadi_int>& v);
+                             const std::vector<casadi_int>& v, casadi_int align=1);
 
     /** \brief  Print real vector to a c file
 
         \identifier{ts} */
     void print_vector(std::ostream &s, const std::string& name,
-                             const std::vector<double>& v);
+                             const std::vector<double>& v, casadi_int align=1);
 
     /** \brief Create a copy operation
 
@@ -612,12 +612,12 @@ namespace casadi {
     /** \brief Refer to argument
 
         \identifier{tw} */
-    std::string arg(casadi_int i) const;
+    std::string arg(casadi_int i, bool sx=false) const;
 
     /** \brief Refer to resuly
 
         \identifier{tx} */
-    std::string res(casadi_int i) const;
+    std::string res(casadi_int i, bool sx=false) const;
 
     /** \brief Access thread-local memory
 

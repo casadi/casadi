@@ -219,7 +219,7 @@ namespace casadi {
         g.local("in"+str(i), "casadi_real");
         int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
         stride = 1;
-        g << "in" << i << " = " << g.arg(a.i1) << "[" << a.i2*stride << "]" << ";\n";
+        g << "in" << i << " = " << g.arg(a.i1, true) << "[" << a.i2*stride << "]" << ";\n";
         lookup_ins[&a] = i;
       }
     }
@@ -231,14 +231,14 @@ namespace casadi {
           g << "if (res[" << a.i0 << "]!=0) ";
           int stride = inst.stride_out.empty() ? 1 : inst.stride_out.at(a.i0);
           stride = 1;
-          g << g.res(a.i0) << "[" << a.i2*abs(stride) << "]" << (stride<0? "+": "")<<  "=" << g.sx_work(a.i1);
+          g << g.res(a.i0, true) << "[" << a.i2*abs(stride) << "]" << (stride<0? "+": "")<<  "=" << g.sx_work(a.i1);
         } else {
           if (!inst.res_null[a.i0]) {
             if (outro) {
               g << "ret" << lookup_rets[&a] << " =" << g.sx_work(a.i1);
             } else {
               int stride = inst.stride_out.empty() ? 1 : inst.stride_out.at(a.i0);
-              g << g.res(a.i0) << "[" << a.i2*abs(stride) << "]" << " =" << g.sx_work(a.i1);
+              g << g.res(a.i0, true) << "[" << a.i2*abs(stride) << "]" << " =" << g.sx_work(a.i1);
             }
           }
         }
@@ -252,7 +252,7 @@ namespace casadi {
           g << g.constant(a.d);
         } else if (a.op==OP_INPUT) {
           if (inst.arg_null.empty()) {
-            g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
+            g << g.arg(a.i1, true) << "? " << g.arg(a.i1, true) << "[" << a.i2 << "] : 0";
           } else {
             if (inst.arg_null[a.i1]) {
               g << "0";
@@ -261,7 +261,7 @@ namespace casadi {
                 g << "in" << lookup_ins[&a]; //g.arg(a.i1) << "[" << a.i2 << "]";
               } else {
                 int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
-                g << g.arg(a.i1) << "[" << a.i2*stride << "]";
+                g << g.arg(a.i1, true) << "[" << a.i2*stride << "]";
               }
             }
           }
@@ -279,7 +279,7 @@ namespace casadi {
         const AlgEl& a = *rets[i];
         casadi_int stride = inst.stride_out.empty() ? 1 : inst.stride_out[a.i0];
         stride = 1;
-        g << g.res(a.i0) << "[" << a.i2*abs(stride)  << "]" << (stride<0? "+": "")<< "= ret" << i << ";\n";
+        g << g.res(a.i0, true) << "[" << a.i2*abs(stride)  << "]" << (stride<0? "+": "")<< "= ret" << i << ";\n";
       }
     }
   }

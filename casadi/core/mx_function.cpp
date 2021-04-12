@@ -1522,16 +1522,24 @@ namespace casadi {
     g << g.debug_assert("(uintptr_t) w% 32 ==0") + "\n";
     g.local("i","casadi_int");
 
+    bool align = name_=="all_cat" || name_=="f";
+
     for (casadi_int i=0;i<n_in_;++i) {
-      if (nnz_in(i)>1) {
-        g << "arg[" << i << "] = __builtin_assume_aligned (arg[" << i << "], 32);\n";
-        g << g.debug_assert("(uintptr_t) arg[" + str(i) + "]% 32 ==0") + "\n";
+      g.local("args"+str(i),"const casadi_real", "*");
+      if (nnz_in(i)>1 && align) {
+        g << "args" << i << " = __builtin_assume_aligned (arg[" << i << "], 32);\n";
+        g << g.debug_assert("(uintptr_t) args" + str(i) + "% 32 ==0") + "\n";
+      } else {
+        g << "args" << i << " = arg[" << i << "];\n";
       }
     }
     for (casadi_int i=0;i<n_out_;++i) {
-      if (nnz_out(i)>1) {
-        g << "res[" << i << "] = __builtin_assume_aligned (res[" << i << "], 32);\n";
-        g << g.debug_assert("(uintptr_t) res[" + str(i) + "]% 32 ==0") + "\n";
+      g.local("ress"+str(i),"casadi_real", "*");
+      if (nnz_out(i)>1 && align) {
+        g << "ress" << i << " = __builtin_assume_aligned (res[" << i << "], 32);\n";
+        g << g.debug_assert("(uintptr_t) ress" + str(i) + "% 32 ==0") + "\n";
+      } else {
+        g << "ress" << i << " = res[" << i << "];\n";
       }
     }
 
@@ -1542,8 +1550,10 @@ namespace casadi {
 
     // Temporary variables and vectors
     if (ce_active_) {
-      g.local("r", "const casadi_real*", "*");
-      g.init_local("r", "arg+" + str(n_in_));
+      for (casadi_int i=0;i<ce_off_.size();++i) {
+        g.local("r"+str(i), "const casadi_real", "*");
+      }
+      //g.init_local("r", "arg+" + str(n_in_));
       g.require_zeros(n_ce_);
     }
     g.init_local("arg1", "arg+" + str(n_ce_+n_in_));
@@ -1588,7 +1598,7 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       // Generate comment
       if (g.verbose) {
-        g << "/* #" << k++ << ": " << e.op << ":" << print(e) << " */\n";
+        g << "/* #" << k++ << ": " << e.op << ":" << print(e) << "nnz_res" << e.data->nnz() << " */\n";
       }
 
       for (casadi_int i=0; i<e.arg.size(); ++i) {

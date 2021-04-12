@@ -632,7 +632,7 @@ namespace casadi {
     }
 
     if (sz_zeros_>=0) {
-      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros_));
+      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros_), 32);
       s << endl;
     }
 
@@ -672,7 +672,7 @@ namespace casadi {
 
   string CodeGenerator::work(casadi_int n, casadi_int sz) const {
     if (n<=-2) {
-      return "r[" + str(-n-2) + "]";
+      return "r" + str(-n-2);
     }
     if (n<0 || sz==0) {
       return "0";
@@ -703,10 +703,10 @@ namespace casadi {
       s << "*" << name << " = 0";
     } else {
       s << name << "[" << len << "]";
+      if (align>1) {
+        s << " __attribute__((aligned (" << align << ")))";
+      }
       if (!def.empty()) s << " = " << def;
-    }
-    if (align>1) {
-      s << " __attribute__((aligned (" << align << ")))";
     }
     s << ";\n";
     return s.str();
@@ -719,13 +719,13 @@ namespace casadi {
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const string& name,
-      const vector<casadi_int>& v) {
-    s << array("static const casadi_int", name, v.size(), initializer(v));
+      const vector<casadi_int>& v, casadi_int align) {
+    s << array("static const casadi_int", name, v.size(), initializer(v), align);
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const string& name,
-                                  const vector<double>& v) {
-    s << array("static const casadi_real", name, v.size(), initializer(v));
+                                  const vector<double>& v, casadi_int align) {
+    s << array("static const casadi_real", name, v.size(), initializer(v), align);
   }
 
   std::string CodeGenerator::print_op(casadi_int op, const std::string& a0) {
@@ -1469,12 +1469,14 @@ namespace casadi {
     return s.str();
   }
 
-  string CodeGenerator::arg(casadi_int i) const {
-    return "arg[" + str(i) + "]";
+  string CodeGenerator::arg(casadi_int i, bool sx) const {
+    if (sx) return "arg["+str(i)+"]";
+    return "args" + str(i);
   }
 
-  string CodeGenerator::res(casadi_int i) const {
-    return "res[" + str(i) + "]";
+  string CodeGenerator::res(casadi_int i, bool sx) const {
+    if (sx) return "res["+str(i)+"]";
+    return "ress" + str(i);
   }
 
   std::string CodeGenerator::mem(const Function& f) {
