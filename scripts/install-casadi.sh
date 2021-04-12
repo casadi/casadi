@@ -17,7 +17,7 @@ rm -rf ThirdParty-Mumps
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git --branch "master" --depth 1 --recursive
 pushd ThirdParty-Mumps
 ./get.Mumps
-./configure --prefix="$VIRTUAL_ENV" --with-lapack-lflags="$(pkg-config --libs-only-l openblas) -pthread -lm" LDFLAGS="$(pkg-config --libs-only-L openblas)"
+./configure --prefix="$VIRTUAL_ENV" --with-lapack="$(pkg-config --libs openblas) -pthread -lm"
 make -j$(nproc)
 make install
 popd
@@ -27,7 +27,7 @@ popd
 rm -rf Ipopt/build
 mkdir -p Ipopt/build
 pushd Ipopt/build
-../configure --prefix="$VIRTUAL_ENV" --with-lapack-lflags="$(pkg-config --libs-only-l openblas) -pthread -lm" LDFLAGS="$(pkg-config --libs-only-L openblas)"
+../configure --prefix="$VIRTUAL_ENV" --with-lapack="$(pkg-config --libs openblas) -pthread -lm"
 make -j$(nproc)
 make install
 popd
@@ -35,8 +35,8 @@ popd
 # SWIG
 rm -rf swig
 git clone https://github.com/swig/swig --branch v4.0.2 --depth 1
-pushd swig 
-./autogen.sh 
+pushd swig
+./autogen.sh
 ./configure --prefix="$VIRTUAL_ENV"
 make -j$(nproc)
 make install
