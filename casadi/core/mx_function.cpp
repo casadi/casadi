@@ -1553,7 +1553,7 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       // Generate comment
       if (g.verbose) {
-        g << "/* #" << k++ << ": " << e.op << ":" << print(e) << "nnz_res" << e.data->nnz() << " */\n";
+        g << "/* #" << k++ << ": " << e.op << ":" << print(e) << "nnz_res" << (e.data->sparsity(0).is_null() ? 0 : e.data.nnz()) << " */\n";
       }
 
       for (casadi_int i=0; i<e.arg.size(); ++i) {
