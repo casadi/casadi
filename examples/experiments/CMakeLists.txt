@@ -24,4 +24,11 @@ if (yaml-cpp_FOUND)
             yaml-cpp
             panoc-alm::panoc-alm
     )
+
+    add_executable(experiment-second experiment-second.cpp)
+    target_link_libraries(experiment-second
+        PRIVATE 
+            yaml-cpp
+            panoc-alm::panoc-alm
+    )
 endif()

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <csignal>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <yaml-cpp/emitter.h>
@@ -73,6 +74,8 @@ int main(int argc, char *argv[]) {
         ymlout << YAML::EndMap;
     };
 
+    std::cout << std::setprecision(17);
+
     pa::PANOCParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
@@ -95,7 +98,7 @@ int main(int argc, char *argv[]) {
 
     pa::vec Σ(problem.m);
     Σ << 3.0797607617330747, 3.9569193214493699, 4.9537113927653671;
-    pa::real_t ε = 1.0000000000000004e-11;
+    pa::real_t ε = 1e-11;
     pa::vec x(problem.n);
     x << -4.8780397699768994, -4.8780397699768994, 8156.220204170053,
         4108.6295384399791, 8156.792300872844, 0.57213825479611202, 0;
