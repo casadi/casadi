@@ -112,13 +112,13 @@ namespace casadi {
       x = g.workel(arg[0]);
     } else {
       // Vector assignment
-      g.local("cs", "const casadi_real", "*");
-      g.local("rr", "casadi_real", "*");
-      g.local("i", "casadi_int");
-      g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
-        << "; i<" << sparsity().nnz() << "; ++i) ";
-      r = "*rr++";
-      x = "*cs++";
+      //g.local("cs", "const casadi_real", "*");
+      //g.local("rr", "casadi_real", "*");
+      //g.local("i", "casadi_int");
+      g << "#pragma omp simd\n";
+      g << "for (i=0;" << " i<" << sparsity().nnz() << "; ++i) ";
+      r = "(" + g.work(res[0], nnz()) + ")[i]";
+      x = "(" + g.work(arg[0], nnz()) + ")[i]";
     }
 
     // Output the operation

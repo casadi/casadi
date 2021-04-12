@@ -190,7 +190,7 @@ namespace casadi {
           for (casadi_int i=0;i<streaks_len.size();++i) {
             if (streaks_target.at(i)-target_prev)
               g << g.clear(dst + "+" + str(target_prev), streaks_target.at(i)-target_prev) << "\n";
-            g << g.copy_nocheck(src + "+" + str(offset), streaks_len.at(i), dst + "+" + str(streaks_target.at(i))) << "\n";
+            g << g.copy(src + "+" + str(offset), streaks_len.at(i), dst + "+" + str(streaks_target.at(i))) << "\n";
             offset += streaks_len.at(i);
             target_prev = streaks_target.at(i)+streaks_len.at(i);
           }
