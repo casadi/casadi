@@ -136,7 +136,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
         real_t old_γₖ = γₖ;
         while (lipschitz_check(problem, xₖ, x̂ₖ, y, Σ, γₖ, Lₖ,
-                               params.quadratic_upperbound_threshold)) {
+                               params.quadratic_upperbound_tolerance_factor)) {
             assert(not params.update_lipschitz_in_linesearch || k == 0);
             Lₖ *= 2;
             σₖ /= 2;
@@ -178,8 +178,10 @@ PANOCSolver::Stats PANOCSolver::operator()(
         // Calculate quasi-Newton step -----------------------------------------
         vec pₖ = projected_gradient_step(problem, xₖ, y, Σ, γₖ);
         vec qₖ = pₖ;
+        real_t step_size =
+            params.lbfgs_stepsize == Params::BasedOnGradientStepSize ? 1 : -1;
         if (k > 0)
-            lbfgs.apply(qₖ, 1);
+            lbfgs.apply(qₖ, step_size);
         else
             // Initialize the L-BFGS
             pa::PANOCDirection<pa::LBFGS>::initialize(
@@ -212,8 +214,9 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
             if (params.update_lipschitz_in_linesearch) {
                 real_t old_γₖ₊₁ = γₖ₊₁;
-                while (lipschitz_check(problem, xₖ₊₁, x̂ₖ₊₁, y, Σ, γₖ₊₁, Lₖ₊₁,
-                                       params.quadratic_upperbound_threshold)) {
+                while (lipschitz_check(
+                    problem, xₖ₊₁, x̂ₖ₊₁, y, Σ, γₖ₊₁, Lₖ₊₁,
+                    params.quadratic_upperbound_tolerance_factor)) {
                     Lₖ₊₁ *= 2;
                     σₖ₊₁ /= 2;
                     γₖ₊₁ /= 2;

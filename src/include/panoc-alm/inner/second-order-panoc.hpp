@@ -107,8 +107,8 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
                               real_t &pₖᵀpₖ, real_t &grad_ψₖᵀpₖ, real_t &Lₖ,
                               real_t &γₖ) {
         return detail::descent_lemma(
-            problem, params.quadratic_upperbound_threshold, xₖ, ψₖ, grad_ψₖ, y,
-            Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
+            problem, params.quadratic_upperbound_tolerance_factor, xₖ, ψₖ,
+            grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, const vec &grad_ψₖ,
                               real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
