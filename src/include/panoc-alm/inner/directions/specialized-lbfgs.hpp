@@ -169,9 +169,10 @@ struct PANOCDirection<SpecializedLBFGS> {
     }
 
     static bool apply(SpecializedLBFGS &lbfgs, const vec &xₖ, const vec &x̂ₖ,
-                      const vec &pₖ, vec &qₖ) {
+                      const vec &pₖ, real_t γ, vec &qₖ) {
         (void)xₖ;
         (void)x̂ₖ;
+        (void)γ; // TODO: add this parameter to SLBFGS
         qₖ = pₖ;
         lbfgs.apply(qₖ);
         return true;

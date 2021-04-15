@@ -75,9 +75,10 @@ struct PANOCDirection<AndersonAccel> {
     }
 
     static bool apply(AndersonAccel &aa, const vec &xₖ, const vec &x̂ₖ,
-                      const vec &pₖ, vec &qₖ) {
+                      const vec &pₖ, real_t γ, vec &qₖ) {
         (void)xₖ;
         (void)x̂ₖ;
+        (void)γ;
         qₖ = pₖ;
         aa.compute(x̂ₖ, pₖ, qₖ);
         return true;
