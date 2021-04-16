@@ -9,6 +9,7 @@ add_library(panoc-alm SHARED
     "src/util/problem.cpp"
     "src/util/solverstatus.cpp"
     "src/reference-problems/riskaverse-mpc.cpp"
+    "src/reference-problems/himmelblau.cpp"
 )
 add_library(panoc-alm::panoc-alm ALIAS panoc-alm)
 set_target_properties(panoc-alm PROPERTIES EXPORT_NAME panoc-alm::panoc-alm)
