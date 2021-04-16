@@ -40,7 +40,7 @@ struct SecondOrderPANOCLBFGSParams {
     /// If set to N != 0, progress is printed every N iterations.
     unsigned print_interval = 0;
 
-    real_t quadratic_upperbound_threshold =
+    real_t quadratic_upperbound_tolerance_factor =
         10 * std::numeric_limits<real_t>::epsilon();
 
     bool update_lipschitz_in_linesearch = true;

@@ -23,10 +23,12 @@ struct PANOCDirection {
     ///             Result of proximal gradient step in current iterate.
     /// @param[in]  pₖ
     ///             Proximal gradient step between x̂ₖ and xₖ.
+    /// @param[in]  γ
+    ///             H₀ = γI for L-BFGS
     /// @param[out] qₖ
     ///             Resulting step.
     static bool apply(DirectionProviderT &dp, const vec &xₖ, const vec &x̂ₖ,
-                      const vec &pₖ, vec &qₖ) = delete;
+                      const vec &pₖ, real_t γ, vec &qₖ) = delete;
 
     static void changed_γ(DirectionProviderT &dp, real_t γₖ,
                           real_t old_γₖ) = delete;

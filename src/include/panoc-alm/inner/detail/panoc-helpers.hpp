@@ -172,15 +172,12 @@ inline real_t calc_error_stop_crit(
 inline real_t descent_lemma(
     /// [in]  Problem description
     const Problem &problem,
-    /// [in]    Minimum value of
-    ///         @f$ |\nabla\psi(x^k)^\top p^k| / |\psi(x^k)| @f$. Used to
-    ///         prevent rounding errors when the function @f$ \psi(x) @f$ is
-    ///         relatively flat or the step size is very small, which could
-    ///         cause @f$ \psi(x^k) < \psi(\hat x^k) @f$, which is
-    ///         mathematically impossible but could occur in finite precision
-    ///         floating point arithmetic. If the value is smaller than this
-    ///         threshold, the step size is no longer updated.
-    real_t rounding_threshold,
+    /// [in]    Tolerance used to ignore rounding errors when the function
+    ///         @f$ \psi(x) @f$ is relatively flat or the step size is very
+    ///         small, which could cause @f$ \psi(x^k) < \psi(\hat x^k) @f$,
+    ///         which is mathematically impossible but could occur in finite
+    ///         precision floating point arithmetic.
+    real_t rounding_tolerance,
     /// [in]    Current iterate @f$ x^k @f$
     const vec &xₖ,
     /// [in]    Objective function @f$ \psi(x^k) @f$
@@ -209,8 +206,8 @@ inline real_t descent_lemma(
     real_t &γₖ) {
 
     real_t old_γₖ = γₖ;
-    while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ &&
-           std::abs(grad_ψₖᵀpₖ / ψₖ) > rounding_threshold) {
+    real_t margin = (1 + std::abs(ψₖ)) * rounding_tolerance;
+    while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ + margin) {
         Lₖ *= 2;
         γₖ /= 2;
 
