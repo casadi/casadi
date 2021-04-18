@@ -27,6 +27,7 @@
 #define CASADI_CASADI_RUNTIME_HPP
 
 #include "../calculus.hpp"
+#include <string.h>
 
 #define CASADI_PREFIX(ID) casadi_##ID
 #define CASADI_CAST(TYPE, ARG) static_cast<TYPE>(ARG)
