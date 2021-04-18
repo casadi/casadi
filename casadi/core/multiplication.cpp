@@ -141,7 +141,7 @@ namespace casadi {
       g << "1.0,";
       g << g.work(res[0], dep(0).nnz()) << "," << nrow_x << ");\n";*/
 
-      g << "blasfeo_dgemm_normal('N','N'," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
+      g << "blasfeo_" << (g.casadi_real_type=="double"? "d" : "s") << "gemm_normal('N','N'," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
       g << g.work(arg[1], dep(1).nnz()) << "," << nrow_x << ",";
       g << g.work(arg[2], dep(2).nnz()) << "," << nrow_y << ",";
       g << "1.0,";
