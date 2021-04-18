@@ -51,12 +51,12 @@ class LBFGS {
 
     /// Apply the inverse Hessian approximation to the given vector q.
     template <class Vec>
-    void apply(Vec &&q, real_t γ);
+    bool apply(Vec &&q, real_t γ);
 
     /// Apply the inverse Hessian approximation to the given vector q, applying
     /// only the columns and rows of the Hessian in the index set J.
     template <class Vec, class IndexVec>
-    void apply(Vec &&q, real_t γ, const IndexVec &indices);
+    bool apply(Vec &&q, real_t γ, const IndexVec &J);
 
     /// Throw away the approximation and all previous vectors s and y.
     void reset();

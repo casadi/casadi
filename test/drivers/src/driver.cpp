@@ -133,6 +133,7 @@ auto get_inner_solver() {
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.max_time                       = 30s;
+    panocparams.lbfgs_stepsize                 = panocparams.BasedOnCurvature;
     pa::LBFGSParams lbfgsparams;
 
     return Solver::InnerSolver(panocparams, lbfgsparams);

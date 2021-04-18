@@ -53,12 +53,17 @@ inline bool LBFGS::update(const vec &xₖ, const vec &xₖ₊₁, const vec &p�
 }
 
 template <class Vec>
-void LBFGS::apply(Vec &&q, real_t γ) {
+bool LBFGS::apply(Vec &&q, real_t γ) {
+    // Only apply if we have previous vectors s and y
     if (idx == 0 && not full)
-        return;
-    auto new_idx = idx > 0 ? idx - 1 : history() - 1;
-    if (γ < 0)
-        γ = 1. / (ρ(new_idx) * y(new_idx).squaredNorm());
+        return false;
+
+    // If the step size is negative, compute it as sᵀy/yᵀy
+    if (γ < 0) {
+        auto new_idx = idx > 0 ? idx - 1 : history() - 1;
+        real_t yᵀy   = y(new_idx).squaredNorm();
+        γ            = 1. / (ρ(new_idx) * yᵀy);
+    }
 
     auto update1 = [&](size_t i) {
         α(i) = ρ(i) * (s(i).dot(q));
@@ -71,6 +76,7 @@ void LBFGS::apply(Vec &&q, real_t γ) {
         for (size_t i = history(); i-- > idx;)
             update1(i);
 
+    // r ← H₀ q
     q *= γ;
 
     auto update2 = [&](size_t i) {
@@ -82,28 +88,43 @@ void LBFGS::apply(Vec &&q, real_t γ) {
             update2(i);
     for (size_t i = 0; i < idx; ++i)
         update2(i);
+
+    return true;
 }
 
 template <class Vec, class IndexVec>
-void LBFGS::apply(Vec &&q, real_t γ, const IndexVec &indices) {
+bool LBFGS::apply(Vec &&q, real_t γ, const IndexVec &J) {
+    // Only apply if we have previous vectors s and y
     if (idx == 0 && not full)
-        return;
+        return false;
+
     // Eigen 3.3.9 doesn't yet support indexing using a vector of indices
     // so we'll have to do it manually
-    // TODO: abstract this away in an expression template?
-    auto dot_ll = [&indices](const auto &a, const auto &b) {
+    // TODO: Abstract this away in an expression template / nullary expression?
+    //       Or wait for Eigen update?
+
+    // Dot product of two vectors, adding only the indices in set J
+    auto dotJ = [&J](const auto &a, const auto &b) {
         real_t acc = 0;
-        for (auto j : indices)
+        for (auto j : J)
             acc += a(j) * b(j);
         return acc;
     };
+
+    bool at_least_one_valid_update = false;
+
     auto update1 = [&](size_t i) {
-        ρ(i) = 1. / dot_ll(s(i), y(i));
-        if (ρ(i) <= 0)
+        // Recompute ρ, it depends on the index set J. Note that even if ρ was
+        // positive for the full vectors s and y, that's not necessarily the
+        // case for the smaller vectors s(J) and y(J).
+        ρ(i) = 1. / dotJ(s(i), y(i));
+        if (ρ(i) <= 0) // Reject negative ρ to ensure positive definiteness
             return;
-        α(i) = ρ(i) * dot_ll(s(i), q);
-        for (auto j : indices)
+
+        α(i) = ρ(i) * dotJ(s(i), q);
+        for (auto j : J)
             q(j) -= α(i) * y(i)(j);
+        at_least_one_valid_update = true; // Update with ρ > 0
     };
     if (idx)
         for (size_t i = idx; i-- > 0;)
@@ -112,14 +133,31 @@ void LBFGS::apply(Vec &&q, real_t γ, const IndexVec &indices) {
         for (size_t i = history(); i-- > idx;)
             update1(i);
 
-    for (auto j : indices)
+    // If all ρ <= 0, fail
+    if (not at_least_one_valid_update)
+        return false;
+
+    // Compute step size based on most recent yᵀs/yᵀy > 0
+    auto newest_valid_idx = idx > 0 ? idx - 1 : history() - 1;
+    while (γ < 0) {
+        if (ρ(newest_valid_idx) > 0) {
+            real_t yᵀy = dotJ(y(newest_valid_idx), y(newest_valid_idx));
+            γ          = 1. / (ρ(newest_valid_idx) * yᵀy);
+        } else {
+            newest_valid_idx =
+                newest_valid_idx > 0 ? newest_valid_idx - 1 : history() - 1;
+        }
+    }
+
+    // r ← H₀ q
+    for (auto j : J)
         q(j) *= γ;
 
     auto update2 = [&](size_t i) {
         if (ρ(i) <= 0)
             return;
-        real_t β = ρ(i) * dot_ll(y(i), q);
-        for (auto j : indices)
+        real_t β = ρ(i) * dotJ(y(i), q);
+        for (auto j : J)
             q(j) += (α(i) - β) * s(i)(j);
     };
     if (full)
@@ -127,6 +165,8 @@ void LBFGS::apply(Vec &&q, real_t γ, const IndexVec &indices) {
             update2(i);
     for (size_t i = 0; i < idx; ++i)
         update2(i);
+
+    return true;
 }
 
 inline void LBFGS::reset() {
@@ -185,8 +225,7 @@ struct PANOCDirection<LBFGS> {
         (void)xₖ;
         (void)x̂ₖ;
         qₖ = pₖ;
-        lbfgs.apply(qₖ, γ);
-        return true;
+        return lbfgs.apply(qₖ, γ);
     }
 
     static void changed_γ(LBFGS &lbfgs, real_t γₖ, real_t old_γₖ) {

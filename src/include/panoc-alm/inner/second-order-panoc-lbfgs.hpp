@@ -223,13 +223,23 @@ SecondOrderPANOCLBFGSSolver::operator()(
         qₖ = pₖ;
         if (k > 0 && not J.empty()) {
             // Compute right-hand side of 6.1c
-            // TODO: optimize (using AD Hess×vec product)
+            // TODO: use AD Hess×vec product
             detail::calc_augmented_lagrangian_hessian_prod_fd(
                 problem, xₖ, y, Σ, grad_ψₖ, dK, rhs, work_n, work_n2, work_m);
-            for (auto j : J) {
+            for (auto j : J)
                 qₖ(j) = -grad_ψₖ(j) - rhs(j);
-            }
-            lbfgs.apply(qₖ, γₖ, J);
+
+            real_t stepsize =
+                params.lbfgs_stepsize == params.BasedOnGradientStepSize ? γₖ
+                                                                        : -1;
+            bool success = lbfgs.apply(qₖ, stepsize, J);
+            // If L-BFGS application failed, qₖ(J) still contains 
+            // -∇ψ(x)(J) - rhs(J), which is not a valid step.
+            // A good alternative is to use H₀ = γI as an L-BFGS estimate.
+            // This seems to be better than just falling back to prox step.
+            if (not success)
+                for (auto j : J)
+                    qₖ(j) *= γₖ; 
         }
 
         // Line search initialization ------------------------------------------

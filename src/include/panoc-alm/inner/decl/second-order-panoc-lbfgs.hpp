@@ -45,6 +45,11 @@ struct SecondOrderPANOCLBFGSParams {
 
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;
+
+    enum {
+        BasedOnGradientStepSize = 0,
+        BasedOnCurvature        = 1,
+    } lbfgs_stepsize = BasedOnCurvature;
 };
 
 /// Second order PANOC solver for ALM.
