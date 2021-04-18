@@ -78,7 +78,7 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_(n), reduce_in_(reduce_in), reduce_out_(reduce_out) {
     casadi_assert_dev(reduce_in.size()==f.n_in());
     casadi_assert_dev(reduce_out.size()==f.n_out());
-    uout() << "It's map sum!" << std::endl;
+    uout() << "init It's map sum!" << std::endl;
 
     f_orig_ = f;
 
