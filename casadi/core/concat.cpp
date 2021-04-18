@@ -83,18 +83,21 @@ namespace casadi {
   void Concat::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
                         const std::vector<casadi_int>& res) const {
-    g.local("rr", "casadi_real", "*");
-    g << "rr=" << g.work(res[0], nnz()) << ";\n";
+   // g.local("rr", "casadi_real", "*");
+    //g << "rr=" << g.work(res[0], nnz()) << ";\n";
+    casadi_int offset=0;
     for (casadi_int i=0; i<arg.size(); ++i) {
       casadi_int nz = dep(i)->sz_self();
       if (nz==1) {
-        g << "*rr++ = " << g.workel(arg[i]) << ";\n";
+        g << g.work(res[0], nnz())+"[" + str(offset) + "]=" << g.workel(arg[i]) << ";\n";
       } else if (nz!=0) {
-        g.local("i", "casadi_int");
+        g << g.copy(g.work(arg[i], nz), nz, g.work(res[0], nnz()) + "+"+str(offset));
+        /*g.local("i", "casadi_int");
         g.local("cs", "const casadi_real", "*");
         g << "for (i=0, " << "cs=" << g.work(arg[i], nz) << "; "
-          << "i<" << nz << "; ++i) *rr++ = *cs++;\n";
+          << "i<" << nz << "; ++i) *rr++ = *cs++;\n";*/
       }
+      offset+= nz;
     }
   }
 

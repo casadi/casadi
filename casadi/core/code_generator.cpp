@@ -1460,8 +1460,8 @@ namespace casadi {
                                  const string& y) {
     add_auxiliary(AUX_DOT);
     stringstream s;
-    s << "casadi_dot(" << n << ", " << x << ", " << y << ")";
-    //s << "cblas_ddot(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
+    //s << "casadi_dot(" << n << ", " << x << ", " << y << ")";
+    s << "cblas_ddot(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
     //s << "blasfeo_ddot_blas_normal(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
     return s.str();
   }
