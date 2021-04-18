@@ -8,7 +8,8 @@ void casadi_copy(const T1* __restrict__ x, casadi_int n, T1* __restrict__ y) {
       //for (i=0; i<n; ++i) *y++ = *x++;
       memcpy(y, x, n*sizeof(T1));
     } else {
-      for (i=0; i<n; ++i) *y++ = 0.;
+      memset(y, 0, n*sizeof(T1));
+      //for (i=0; i<n; ++i) *y++ = 0.;
     }
   }
 }
