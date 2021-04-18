@@ -205,17 +205,19 @@ namespace casadi {
       };
     } sortme_ins;
 
-    bool intro = vectorize;
-    bool outro = vectorize;
+    bool intro = false;//vectorize;
+    bool outro = false;//vectorize;
 
 
-    if (intro) {
+    if (outro) {
       std::sort(rets.begin(), rets.end(), sortme_rets);
       for (casadi_int i=0;i<rets.size();++i) {
         const AlgEl& a = *rets[i];
         g.local("ret"+str(i), "casadi_real");
         lookup_rets[&a] = i;
       }
+    }
+    if (intro) {
       std::sort(ins.begin(), ins.end(), sortme_ins);
       for (casadi_int i=0;i<ins.size();++i) {
         const AlgEl& a = *ins[i];
@@ -241,6 +243,7 @@ namespace casadi {
               g << "ret" << lookup_rets[&a] << " =" << g.sx_work(a.i1);
             } else {
               int stride = inst.stride_out.empty() ? 1 : inst.stride_out.at(a.i0);
+              stride = 1;
               g << g.res(a.i0, true) << "[" << a.i2*abs(stride) << "]" << " =" << g.sx_work(a.i1);
             }
           }
@@ -264,6 +267,7 @@ namespace casadi {
                 g << "in" << lookup_ins[&a]; //g.arg(a.i1) << "[" << a.i2 << "]";
               } else {
                 int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
+                stride=1;
                 g << g.arg(a.i1, true) << "[" << a.i2*stride << "]";
               }
             }

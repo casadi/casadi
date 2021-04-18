@@ -1390,6 +1390,7 @@ namespace casadi {
     // Perform operation
     add_auxiliary(AUX_COPY);
     s << "casadi_copy(" << arg << ", " << n << ", " << res << ");";
+    //s << "memcpy(" << res << ", " << arg << ", " << n << "*sizeof(casadi_real));"; // handle null
     return s.str();
   }
 
@@ -1460,6 +1461,8 @@ namespace casadi {
     add_auxiliary(AUX_DOT);
     stringstream s;
     s << "casadi_dot(" << n << ", " << x << ", " << y << ")";
+    //s << "cblas_ddot(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
+    //s << "blasfeo_ddot_blas_normal(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
     return s.str();
   }
 
