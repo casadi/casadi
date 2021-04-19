@@ -86,10 +86,6 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
                                                               vec &grad_ψ) {
         return detail::calc_ψ_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
     };
-    auto calc_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](const vec &x,
-                                                            vec &grad_ψ) {
-        detail::calc_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
-    };
     auto calc_grad_ψ_from_ŷ = [&problem, &work_n](const vec &x, const vec &ŷ,
                                                   vec &grad_ψ) {
         detail::calc_grad_ψ_from_ŷ(problem, x, ŷ, grad_ψ, work_n);
@@ -122,19 +118,20 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
 
     // Estimate Lipschitz constant ---------------------------------------------
 
+    real_t ψₖ, Lₖ;
     // Finite difference approximation of ∇²ψ in starting point
-    auto h = (xₖ * params.Lipschitz.ε).cwiseAbs().cwiseMax(params.Lipschitz.δ);
-    xₖ₊₁ = xₖ + h;
-    // Calculate ∇ψ(x₀ + h)
-    calc_grad_ψ(xₖ₊₁, /* in ⟹ out */ grad_ψₖ₊₁);
-    // Calculate ψ(xₖ), ∇ψ(x₀)
-    real_t ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
-
-    // Estimate Lipschitz constant
-    real_t Lₖ = (grad_ψₖ₊₁ - grad_ψₖ).norm() / h.norm();
-    if (Lₖ < std::numeric_limits<real_t>::epsilon()) {
-        Lₖ = std::numeric_limits<real_t>::epsilon();
-    } else if (not std::isfinite(Lₖ)) {
+    if (params.Lipschitz.L₀ <= 0) {
+        Lₖ = detail::initial_lipschitz_estimate(
+            problem, xₖ, y, Σ, params.Lipschitz.ε, params.Lipschitz.δ,
+            /* in ⟹ out */ ψₖ, grad_ψₖ, x̂ₖ, grad_̂ψₖ, work_n, work_m);
+    }
+    // Initial Lipschitz constant provided by the user
+    else {
+        Lₖ = params.Lipschitz.L₀;
+        // Calculate ψ(xₖ), ∇ψ(x₀)
+        ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
+    }
+    if (not std::isfinite(Lₖ)) {
         s.status = SolverStatus::NotFinite;
         return s;
     }
@@ -246,7 +243,7 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
             }
             auto ldl = hess_Ljj.ldlt(); // TODO: does this allocate?
             if (ldl.isPositive()) {
-                qJ.topRows(J.size()) = ldl.solve(rhs).topRows(J.size());
+                qJ.topRows(J.size()) = ldl.solve(rhs.topRows(J.size()));
             } else {
                 std::cout << "\x1b[0;31m"
                              "not PD"

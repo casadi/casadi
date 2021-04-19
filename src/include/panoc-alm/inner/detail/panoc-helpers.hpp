@@ -329,4 +329,47 @@ inline void calc_augmented_lagrangian_hessian_prod_fd(
     Hv /= h;
 }
 
+inline real_t initial_lipschitz_estimate(
+    /// [in]    Problem description
+    const Problem &problem,
+    /// [in]    Current iterate @f$ x^k @f$
+    const vec &xₖ,
+    /// [in]    Lagrange multipliers @f$ y @f$
+    const vec &y,
+    /// [in]    Penalty weights @f$ \Sigma @f$
+    const vec &Σ,
+    /// [in]    Finite difference step size relative to xₖ
+    real_t ε,
+    /// [in]    Minimum absolute finite difference step size
+    real_t δ,
+    /// [out]   @f$ \psi(x^k) @f$
+    real_t &ψ,
+    /// [out]   Gradient @f$ \nabla \psi(x^k) @f$
+    vec &grad_ψ,
+    ///         Dimension n
+    vec &work_n1,
+    ///         Dimension n
+    vec &work_n2,
+    ///         Dimension n
+    vec &work_n3,
+    ///         Dimension m
+    vec &work_m) {
+
+    auto h        = (xₖ * ε).cwiseAbs().cwiseMax(δ);
+    work_n1       = xₖ + h;
+    real_t norm_h = h.norm();
+    // Calculate ∇ψ(x₀ + h)
+    calc_grad_ψ(problem, work_n1, y, Σ, /* in ⟹ out */ work_n2, work_n3,
+                work_m);
+    // Calculate ψ(xₖ), ∇ψ(x₀)
+    ψ = calc_ψ_grad_ψ(problem, xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1,
+                      work_m);
+
+    // Estimate Lipschitz constant
+    real_t L = (work_n2 - grad_ψ).norm() / norm_h;
+    if (L < std::numeric_limits<real_t>::epsilon())
+        L = std::numeric_limits<real_t>::epsilon();
+    return L;
+}
+
 } // namespace pa::detail

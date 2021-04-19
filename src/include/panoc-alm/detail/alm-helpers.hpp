@@ -57,14 +57,14 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
     vec v = vec::Zero(problem.m);
     vec grad_g(problem.n);
     problem.grad_f(x, grad_f);
-    prec_f = 1. / std::max(grad_f.lpNorm<Eigen::Infinity>(), 1.);
+    prec_f = 1. / std::max(grad_f.lpNorm<Eigen::Infinity>(), real_t{1});
     prec_g.resize(problem.m);
 
     for (Eigen::Index i = 0; i < problem.m; ++i) {
         v(i) = 1;
         problem.grad_g_prod(x, v, grad_g);
         v(i)      = 0;
-        prec_g(i) = 1. / std::max(grad_g.lpNorm<Eigen::Infinity>(), 1.);
+        prec_g(i) = 1. / std::max(grad_g.lpNorm<Eigen::Infinity>(), real_t{1});
     }
 
     auto prec_f_fun      = [&](const vec &x) { return problem.f(x) * prec_f; };

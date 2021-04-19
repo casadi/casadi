@@ -15,6 +15,8 @@ namespace pa {
 /// Tuning parameters for the PANOC algorithm.
 struct PANOCParams {
     struct {
+        /// Initial estimate of the Lipschitz constant of ∇ψ(x)
+        real_t L₀ = 0;
         /// Relative step size for initial finite difference Lipschitz estimate.
         real_t ε = 1e-6;
         /// Minimum step size for initial finite difference Lipschitz estimate.
