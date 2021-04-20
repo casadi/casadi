@@ -99,7 +99,7 @@ struct Problem {
     std::function<grad_g_prod_sig> grad_g_prod;
     /// Gradient of a specific constraint @f$ \nabla g_i(x) @f$
     std::function<grad_gi_sig> grad_gi;
-    /// Hessian of the Lagrangian function times vector 
+    /// Hessian of the Lagrangian function times vector
     /// @f$ \nabla_{xx}^2 L(x, y)\ v @f$
     std::function<hess_L_prod_sig> hess_L_prod;
     /// Hessian of the Lagrangian function @f$ \nabla_{xx}^2 L(x, y) @f$
@@ -112,6 +112,7 @@ struct EvalCounter {
     unsigned g           = 0;
     unsigned grad_g_prod = 0;
     unsigned grad_gi     = 0;
+    unsigned hess_L_prod = 0;
     unsigned hess_L      = 0;
 
     void reset() { *this = {}; }
@@ -123,6 +124,7 @@ inline EvalCounter &operator+=(EvalCounter &a, EvalCounter b) {
     a.g += b.g;
     a.grad_g_prod += b.grad_g_prod;
     a.grad_gi += b.grad_gi;
+    a.hess_L_prod += b.hess_L_prod;
     a.hess_L += b.hess_L;
     return a;
 }

@@ -25,6 +25,11 @@ void ProblemWithCounters::attach_counters(ProblemWithCounters &wc) {
         ++wc.evaluations.grad_g_prod;
         grad_gi(x, i, grad);
     };
+    wc.hess_L_prod = [&wc, hess_L_prod{std::move(wc.hess_L_prod)}](
+                         const vec &x, const vec &y, const vec &v, vec &Hv) {
+        ++wc.evaluations.hess_L_prod;
+        hess_L_prod(x, y, v, Hv);
+    };
     wc.hess_L = [&wc, hess_L{std::move(wc.hess_L)}](const vec &x, const vec &y,
                                                     mat &H) {
         ++wc.evaluations.hess_L;
@@ -51,10 +56,13 @@ void ProblemOnlyD::transform() {
         gg += y.bottomRows(original.n);
     };
     this->grad_gi = [](const vec &, unsigned, vec &) {
-        assert(!"Not implemented");
+        throw std::logic_error("ProblemOnlyD::grad_gi: Not implemented");
+    };
+    this->hess_L_prod = [](const vec &, const vec &, const vec &, vec &) {
+        throw std::logic_error("ProblemOnlyD::hess_L_prod: Not implemented");
     };
     this->hess_L = [](const vec &, const vec &, mat &) {
-        assert(!"Not implemented");
+        throw std::logic_error("ProblemOnlyD::hess_L: Not implemented");
     };
     this->C.lowerbound = vec::Constant(original.n, -inf);
     this->C.upperbound = vec::Constant(original.n, +inf);

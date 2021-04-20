@@ -60,6 +60,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::EvalCounter ctr) {
     out << YAML::Key << "g" << YAML::Value << ctr.g;
     out << YAML::Key << "grad_g_prod" << YAML::Value << ctr.grad_g_prod;
     out << YAML::Key << "grad_gi" << YAML::Value << ctr.grad_gi;
+    out << YAML::Key << "hess_L_prod" << YAML::Value << ctr.hess_L_prod;
     out << YAML::Key << "hess_L" << YAML::Value << ctr.hess_L;
     out << YAML::EndMap;
     return out;
