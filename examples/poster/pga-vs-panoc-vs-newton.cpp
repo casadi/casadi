@@ -21,9 +21,9 @@ using namespace std::chrono_literals;
 Problem build_test_problem() {
     pa::Problem p     = pa::problems::himmelblau_problem();
     p.C.lowerbound(0) = -inf;
-    p.C.lowerbound(1) = -inf;
+    p.C.lowerbound(1) = 2.1;
     p.C.upperbound(0) = +inf;
-    p.C.upperbound(1) = 1.95;
+    p.C.upperbound(1) = +inf;
     return p;
 }
 
@@ -89,8 +89,8 @@ int main(int argc, char *argv[]) {
     auto p = build_test_problem();
 
     vec x0(p.n), y0(p.m);
-    x0(0) = 3.125;
-    x0(1) = 1.86;
+    x0(0) = 3.3;
+    x0(1) = 3;
     y0.fill(0);
     vec x1 = x0, y1 = y0;
     vec x2 = x0, y2 = y0;
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
     std::ofstream outf3(pf + "panoc-2newton" + sf);
     YAML::Emitter ymlout3(outf3);
 
-    auto L₀        = 160;
+    auto L₀        = 0.95/5e-3;
     auto lbfgs_mem = 5;
 
     pa::PGAParams pgaparams0;
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
     panocparams1.alternative_linesearch_cond    = false;
     panocparams1.lbfgs_mem                      = lbfgs_mem;
     panocparams1.print_interval                 = 1;
-    panocparams1.lbfgs_stepsize                 = panocparams1.BasedOnCurvature;
+    panocparams1.lbfgs_stepsize                 = panocparams1.BasedOnGradientStepSize;
     pa::LBFGSParams lbfgsparams;
     lbfgsparams.rescale_when_γ_changes = false;
 
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
     panocparams2.alternative_linesearch_cond    = false;
     panocparams2.lbfgs_mem                      = lbfgs_mem;
     panocparams2.print_interval                 = 1;
-    panocparams2.lbfgs_stepsize                 = panocparams2.BasedOnCurvature;
+    panocparams2.lbfgs_stepsize                 = panocparams2.BasedOnGradientStepSize;
     pa::LBFGSParams lbfgsparams2;
 
     PGASolver solver0{pgaparams0};

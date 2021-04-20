@@ -3,6 +3,7 @@
 #include <cutest.h>
 #include <dlfcn.h>
 
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -88,19 +89,14 @@ class CUTEstLoader {
         eval_constr_i_grad_p    = ncon > 0                                //
                                       ? dlfun<void>("cutest_cint_ccifg_") //
                                       : nullptr;
-        eval_lagrangian_hess_p  = ncon > 0                         //
+        eval_lagr_hess_prod_p   = ncon > 0 //
+                                      ? dlfun<void>("cutest_cint_chprod_")
+                                      : dlfun<void>("cutest_cint_uhprod_");
+        eval_lagr_hess_p        = ncon > 0                         //
                                       ? dlfun<void>("cutest_cdh_") //
                                       : dlfun<void>("cutest_udh_");
     }
 
-    // template <typename Ret, typename... Args>
-    // static inline constexpr __attribute__((always_inline)) auto
-    // call_as(void *funp, Ret (*)(Args...)) {
-    //     // return [funp](Args... args) -> Ret {
-    //     //     return ((Ret(*)(Args...))funp)(args...);
-    //     // };
-    //     return (Ret(*)(Args...))funp;
-    // }
     template <class F>
     static inline constexpr auto call_as(void *funp) {
         return (F *)funp;
@@ -198,8 +194,28 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_ccifg", status);
     }
 
-    void eval_lagrangian_hess(const pa::vec &x, const pa::vec &y,
-                              pa::mat &H) const {
+    void eval_lagr_hess_prod(const pa::vec &x, const pa::vec &y,
+                             const pa::vec &v, pa::vec &Hv) const {
+        assert(x.size() == nvar);
+        assert(y.size() == ncon);
+        assert(v.rows() == nvar);
+        assert(Hv.rows() == nvar);
+        integer status;
+        logical gotH = false;
+        if (ncon == 0) {
+            call_as<decltype(CUTEST_uhprod)>(eval_lagr_hess_prod_p)(
+                &status, &nvar, &gotH, x.data(), v.data(), Hv.data());
+            throw_if_error("Failed to call cutest_uhprod", status);
+        } else {
+            call_as<decltype(CUTEST_chprod)>(eval_lagr_hess_prod_p)(
+                &status, &nvar, &ncon, &gotH, x.data(), y.data(),
+                const_cast<pa::real_t *>(v.data()), Hv.data());
+            // TODO: why is the VECTOR argument not const?
+            throw_if_error("Failed to call cutest_chprod", status);
+        }
+    }
+
+    void eval_lagr_hess(const pa::vec &x, const pa::vec &y, pa::mat &H) const {
         assert(x.size() == nvar);
         assert(y.size() == ncon);
         assert(H.rows() >= nvar);
@@ -207,11 +223,11 @@ class CUTEstLoader {
         integer status;
         integer ldH = H.rows();
         if (ncon == 0) {
-            call_as<decltype(CUTEST_udh)>(eval_lagrangian_hess_p)(
+            call_as<decltype(CUTEST_udh)>(eval_lagr_hess_p)(
                 &status, &nvar, x.data(), &ldH, H.data());
             throw_if_error("Failed to call cutest_udh", status);
         } else {
-            call_as<decltype(CUTEST_cdh)>(eval_lagrangian_hess_p)(
+            call_as<decltype(CUTEST_cdh)>(eval_lagr_hess_p)(
                 &status, &nvar, &ncon, x.data(), y.data(), &ldH, H.data());
             throw_if_error("Failed to call cutest_cdh", status);
         }
@@ -307,7 +323,8 @@ class CUTEstLoader {
     void *eval_constr_p           = nullptr;
     void *eval_constr_grad_prod_p = nullptr;
     void *eval_constr_i_grad_p    = nullptr;
-    void *eval_lagrangian_hess_p  = nullptr;
+    void *eval_lagr_hess_prod_p   = nullptr;
+    void *eval_lagr_hess_p        = nullptr;
 };
 
 CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname) {
@@ -337,10 +354,11 @@ CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname) {
         std::bind(&CUTEstLoader::eval_constraints_grad_prod, l, _1, _2, _3);
     problem.grad_gi =
         std::bind(&CUTEstLoader::eval_constraint_i_grad, l, _1, _2, _3);
-    problem.hess_L =
-        std::bind(&CUTEstLoader::eval_lagrangian_hess, l, _1, _2, _3);
-    x0 = std::move(l->x);
-    y0 = std::move(l->y);
+    problem.hess_L_prod =
+        std::bind(&CUTEstLoader::eval_lagr_hess_prod, l, _1, _2, _3, _4);
+    problem.hess_L = std::bind(&CUTEstLoader::eval_lagr_hess, l, _1, _2, _3);
+    x0             = std::move(l->x);
+    y0             = std::move(l->y);
 }
 
 CUTEstProblem::CUTEstProblem(const std::string &so_fname,

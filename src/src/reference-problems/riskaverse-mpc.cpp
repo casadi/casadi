@@ -123,6 +123,7 @@ Problem riskaverse_mpc_problem() {
         },
         {},
         {},
+        {},
     };
 }
 

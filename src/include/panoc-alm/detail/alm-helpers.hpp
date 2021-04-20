@@ -94,6 +94,10 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
             throw std::logic_error("Preconditioning for second-order solvers "
                                    "has not yet been implemented");
         },
+        [](const vec &, const vec &, const vec &, vec &) {
+            throw std::logic_error("Preconditioning for second-order solvers "
+                                   "has not yet been implemented");
+        },
         [](const vec &, const vec &, mat &) {
             throw std::logic_error("Preconditioning for second-order solvers "
                                    "has not yet been implemented");

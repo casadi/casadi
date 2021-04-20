@@ -66,6 +66,20 @@ struct Problem {
     ///         @f$ \nabla g_i(x) \mathbb{R}^n @f$
     using grad_gi_sig = void(const vec &x, unsigned i, vec &grad_gi);
     /// Signature of the function that evaluates the Hessian of the Lagrangian
+    /// multiplied by a vector
+    /// @f$ \nabla_{xx}^2L(x, y)\ v @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \mathbb{R}^n @f$
+    /// @param  [in] y
+    ///         Lagrange multipliers @f$ y \in \mathbb{R}^m @f$
+    /// @param  [in] v
+    ///         Vector to multiply by @f$ v \in \mathbb{R}^n @f$
+    /// @param  [out] Hv
+    ///         Hessian-vector product
+    ///         @f$ \nabla_{xx}^2 L(x, y)\ v \in \mathbb{R}^{n} @f$
+    using hess_L_prod_sig = void(const vec &x, const vec &y, const vec &v,
+                                 vec &Hv);
+    /// Signature of the function that evaluates the Hessian of the Lagrangian
     /// @f$ \nabla_{xx}^2L(x, y) @f$
     /// @param  [in] x
     ///         Decision variable @f$ x \in \mathbb{R}^n @f$
@@ -85,6 +99,9 @@ struct Problem {
     std::function<grad_g_prod_sig> grad_g_prod;
     /// Gradient of a specific constraint @f$ \nabla g_i(x) @f$
     std::function<grad_gi_sig> grad_gi;
+    /// Hessian of the Lagrangian function times vector 
+    /// @f$ \nabla_{xx}^2 L(x, y)\ v @f$
+    std::function<hess_L_prod_sig> hess_L_prod;
     /// Hessian of the Lagrangian function @f$ \nabla_{xx}^2 L(x, y) @f$
     std::function<hess_L_sig> hess_L;
 };
