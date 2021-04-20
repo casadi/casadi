@@ -220,9 +220,7 @@ SecondOrderPANOCLBFGSSolver::operator()(
         qₖ = pₖ;
         if (k > 0 && not J.empty()) {
             // Compute right-hand side of 6.1c
-            // TODO: use AD Hess×vec product
-            detail::calc_augmented_lagrangian_hessian_prod_fd(
-                problem, xₖ, y, Σ, grad_ψₖ, dK, rhs, work_n, work_n2, work_m);
+            problem.hess_L_prod(xₖ, y, dK, rhs);
             for (auto j : J)
                 qₖ(j) = -grad_ψₖ(j) - rhs(j);
 

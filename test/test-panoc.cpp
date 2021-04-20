@@ -470,7 +470,7 @@ TEST(PANOC, ref) {
         grad_u_v = grad_g_mat(ux) * v;
     };
 
-    Problem p{n, m, C, D, obj_f, grad_f, g, grad_g_prod, {}, {}};
+    Problem p{n, m, C, D, obj_f, grad_f, g, grad_g_prod, {}, {}, {}};
 
     pa::PANOCParams params;
     params.lbfgs_mem                      = 20;
