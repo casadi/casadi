@@ -3394,6 +3394,7 @@ DECL M casadi_sign(const M& x) { using casadi::sign; return sign(x); }
 DECL M casadi_power(const M& x, const M& n) { return pow(x, n); }
 DECL M casadi_mod(const M& x, const M& y) { return fmod(x, y); }
 DECL M casadi_fmod(const M& x, const M& y) { return fmod(x, y); }
+DECL M casadi_remainder(const M& x, const M& y) { return remainder(x, y); }
 DECL M casadi_atan2(const M& x, const M& y) { return atan2(x, y); }
 DECL M casadi_fmin(const M& x, const M& y) { return fmin(x, y); }
 DECL M casadi_fmax(const M& x, const M& y) { return fmax(x, y); }
@@ -4299,6 +4300,7 @@ namespace casadi {
       def erf(x): return _casadi.erf(x)
       def sign(x): return _casadi.sign(x)
       def fmod(x, y): return _casadi.mod(x, y)
+      def remainder(x, y): return _casadi.remainder(x, y)
       def __copysign__(x, y): return _casadi.copysign(x, y)
       def __rcopysign__(y, x): return _casadi.copysign(x, y)
       def copysign(x, y): return _casadi.copysign(x, y)

@@ -205,6 +205,8 @@ namespace casadi {
     OP_REINTERPRET_LAYOUT,
 
     OP_PERMUTE_LAYOUT,
+
+    OP_REMAINDER
   };
   #define NUM_BUILT_IN_OPS (OP_CONVEXIFY+1)
 
@@ -234,6 +236,7 @@ namespace casadi {
   using std::ceil;
   using std::pow;
   using std::fmod;
+  using std::remainder;
   using std::atan2;
   using std::erf;
   using std::fmin;
@@ -460,6 +463,7 @@ namespace casadi {
   template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_CEIL>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_FMOD>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_REMAINDER>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_EQ>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_NE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
@@ -489,6 +493,7 @@ namespace casadi {
   template<>      struct F0XChecker<OP_FLOOR>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_CEIL>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_FMOD>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_REMAINDER>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_FABS>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SIGN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_COPYSIGN>{ static const bool check=true;};
@@ -570,6 +575,7 @@ namespace casadi {
   template<>      struct NargChecker<OP_ATAN2>{ static const casadi_int check=2;};
   template<>      struct NargChecker<OP_IF_ELSE_ZERO>{ static const casadi_int check=2;};
   template<>      struct NargChecker<OP_FMOD>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_REMAINDER>{ static const casadi_int check=2;};
   template<>      struct NargChecker<OP_COPYSIGN>{ static const casadi_int check=2;};
   template<>      struct NargChecker<OP_CONST>{ static const casadi_int check=0;};
   template<>      struct NargChecker<OP_PARAMETER>{ static const casadi_int check=0;};
@@ -774,6 +780,14 @@ namespace casadi {
   template<>
   struct BinaryOperation<OP_FMOD>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmod(x, y);}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
+      d[0]=1; d[1]=(f-x)/y;}
+  };
+
+  /// Remainder of division
+  template<>
+  struct BinaryOperation<OP_REMAINDER>{
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = remainder(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
       d[0]=1; d[1]=(f-x)/y;}
   };
@@ -991,6 +1005,7 @@ namespace casadi {
     case OP_FLOOR:         return F<OP_FLOOR>::check;
     case OP_CEIL:          return F<OP_CEIL>::check;
     case OP_FMOD:          return F<OP_FMOD>::check;
+    case OP_REMAINDER:     return F<OP_REMAINDER>::check;
     case OP_FABS:          return F<OP_FABS>::check;
     case OP_SIGN:          return F<OP_SIGN>::check;
     case OP_COPYSIGN:      return F<OP_COPYSIGN>::check;
@@ -1230,6 +1245,7 @@ namespace casadi {
   case OP_FLOOR:     CNAME<OP_FLOOR>::fcn(X, Y, F, N);         break;   \
   case OP_CEIL:      CNAME<OP_CEIL>::fcn(X, Y, F, N);          break;   \
   case OP_FMOD:      CNAME<OP_FMOD>::fcn(X, Y, F, N);          break;   \
+  case OP_REMAINDER: CNAME<OP_REMAINDER>::fcn(X, Y, F, N);     break;   \
   case OP_FABS:      CNAME<OP_FABS>::fcn(X, Y, F, N);          break;   \
   case OP_SIGN:      CNAME<OP_SIGN>::fcn(X, Y, F, N);          break;   \
   case OP_COPYSIGN:  CNAME<OP_COPYSIGN>::fcn(X, Y, F, N);      break;   \
@@ -1312,6 +1328,7 @@ namespace casadi {
   case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X, Y, F, D);      break; \
   case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X, Y, F, D);       break; \
   case OP_FMOD:      BinaryOperation<OP_FMOD>::der(X, Y, F, D);       break; \
+  case OP_REMAINDER: BinaryOperation<OP_REMAINDER>::der(X, Y, F, D);  break; \
   case OP_FABS:      BinaryOperation<OP_FABS>::der(X, Y, F, D);       break; \
   case OP_SIGN:      BinaryOperation<OP_SIGN>::der(X, Y, F, D);       break; \
   case OP_COPYSIGN:  BinaryOperation<OP_COPYSIGN>::der(X, Y, F, D);   break; \
@@ -1371,6 +1388,7 @@ namespace casadi {
   case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X, Y, F, D);      break; \
   case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X, Y, F, D);       break; \
   case OP_FMOD:      DerBinaryOpertion<OP_FMOD>::derf(X, Y, F, D);       break; \
+  case OP_REMAINDER: DerBinaryOpertion<OP_REMAINDER>::derf(X, Y, F, D);  break; \
   case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X, Y, F, D);       break; \
   case OP_SIGN:      DerBinaryOpertion<OP_SIGN>::derf(X, Y, F, D);       break; \
   case OP_COPYSIGN:  DerBinaryOpertion<OP_COPYSIGN>::derf(X, Y, F, D);   break; \
@@ -1410,6 +1428,7 @@ namespace casadi {
     case OP_IF_ELSE_ZERO:                         \
     case OP_COPYSIGN:                             \
     case OP_FMOD:                                 \
+    case OP_REMAINDER:                            \
     case OP_FMIN:                                 \
     case OP_FMAX:                                 \
     case OP_ATAN2:                                \
@@ -1526,6 +1545,7 @@ namespace casadi {
     case OP_FLOOR:          return "floor";
     case OP_CEIL:           return "ceil";
     case OP_FMOD:           return "fmod";
+    case OP_REMAINDER:      return "remainder";
     case OP_FABS:           return "fabs";
     case OP_SIGN:           return "sign";
     case OP_COPYSIGN:       return "copysign";
