@@ -25,8 +25,13 @@ Problem himmelblau_problem() {
         },
         [](const vec &, vec &) {},
         [](const vec &, const vec &, vec &grad) { grad.setZero(); },
-        {},
-        {},
+        [](const vec &, unsigned, vec &grad_gi) { grad_gi.setZero(); },
+        [sq](const vec &x, const vec &, mat &H) {
+            H(0, 0) = 4 * (sq(x(0)) + x(1) - 11) + 8 * sq(x(0)) + 2;
+            H(0, 1) = 4 * x(0) + 4 * x(1);
+            H(1, 0) = 4 * x(0) + 4 * x(1);
+            H(1, 1) = 4 * (x(0) + sq(x(1)) - 7) + 8 * sq(x(1)) + 2;
+        },
     };
 }
 
