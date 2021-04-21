@@ -159,9 +159,6 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
                           /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
                           /* inout */ ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
             φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
-            std::cout << "γ₀: " << γₖ << std::endl;
-            std::cout << "ψ₀: " << ψₖ << std::endl;
-            std::cout << "φ₀: " << φₖ << std::endl;
         }
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
@@ -245,20 +242,17 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
             if (ldl.isPositive()) {
                 qJ.topRows(J.size()) = ldl.solve(rhs.topRows(J.size()));
             } else {
-                std::cout << "\x1b[0;31m"
+                std::cerr << "\x1b[0;31m"
                              "not PD"
                              "\x1b[0m"
                           << std::endl;
-                // newton_success = false;
+                // newton_success = false; // TODO
             }
 
             r = 0;
             for (auto j : J)
                 qₖ(j) = qJ(r++);
         }
-
-        std::cout << "x: " << xₖ.transpose() << std::endl;
-        std::cout << "q: " << qₖ.transpose() << std::endl;
 
         // Line search initialization ------------------------------------------
         real_t τ           = 1;
@@ -283,12 +277,13 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
                 xₖ₊₁.swap(x̂ₖ);          // → safe prox step
                 ψₖ₊₁ = ψx̂ₖ;
                 grad_ψₖ₊₁.swap(grad_̂ψₖ);
-            } else { // line search didn't fail (yet)
-                xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ; // → faster quasi-Newton step
+            } else {        // line search didn't fail (yet)
+                if (τ == 1) // → faster quasi-Newton step
+                    xₖ₊₁ = xₖ + qₖ;
+                else
+                    xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ;
                 // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
                 ψₖ₊₁ = calc_ψ_grad_ψ(xₖ₊₁, /* in ⟹ out */ grad_ψₖ₊₁);
-                std::cout << "xk+1: " << xₖ₊₁.transpose() << std::endl;
-                std::cout << "ψₖ₊₁: " << ψₖ₊₁ << std::endl;
             }
 
             // Calculate x̂ₖ₊₁, pₖ₊₁ (projected gradient step in xₖ₊₁)
@@ -311,8 +306,6 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
 
             // Compute forward-backward envelope
             φₖ₊₁ = ψₖ₊₁ + 1 / (2 * γₖ₊₁) * pₖ₊₁ᵀpₖ₊₁ + grad_ψₖ₊₁ᵀpₖ₊₁;
-            std::cout << "φₖ:   " << φₖ << std::endl;
-            std::cout << "φₖ₊₁: " << φₖ₊₁ << std::endl;
             // Compute line search condition
             ls_cond = φₖ₊₁ - (φₖ - σₖγₖ⁻¹pₖᵀpₖ);
             if (params.alternative_linesearch_cond)

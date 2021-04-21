@@ -51,16 +51,11 @@ class GuardedAAPGA {
     GuardedAAPGA(const Params &params) : params(params) {}
 
     struct Stats {
-        unsigned iterations = 0;
+        SolverStatus status = SolverStatus::Unknown;
         real_t ε            = inf;
         std::chrono::microseconds elapsed_time;
-        SolverStatus status = SolverStatus::Unknown;
-
+        unsigned iterations                 = 0;
         unsigned accelerated_steps_accepted = 0;
-
-        unsigned linesearch_failures = 0; // TODO: unused
-        unsigned lbfgs_failures      = 0; // TODO: unused
-        unsigned lbfgs_rejected      = 0; // TODO: unused
     };
 
     Stats operator()(const Problem &problem,        // in
@@ -332,6 +327,25 @@ GuardedAAPGA::operator()(const Problem &problem,        // in
         no_progress = (ψₖ == old_ψ) ? no_progress + 1 : 0;
     }
     throw std::logic_error("[AAPGA] loop error");
+}
+
+template <class InnerSolver>
+struct InnerStatsAccumulator;
+
+template <>
+struct InnerStatsAccumulator<GuardedAAPGA> {
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations                 = 0;
+    unsigned accelerated_steps_accepted = 0;
+};
+
+inline InnerStatsAccumulator<GuardedAAPGA> &
+operator+=(InnerStatsAccumulator<GuardedAAPGA> &acc,
+           const GuardedAAPGA::Stats s) {
+    acc.elapsed_time += s.elapsed_time;
+    acc.iterations += s.iterations;
+    acc.accelerated_steps_accepted += s.accelerated_steps_accepted;
+    return acc;
 }
 
 } // namespace pa

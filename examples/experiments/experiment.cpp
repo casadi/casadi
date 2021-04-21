@@ -113,5 +113,5 @@ int main(int argc, char *argv[]) {
 
     ymlout << YAML::EndMap << YAML::EndSeq << YAML::EndMap;
     std::cout << status.status << ": (" << status.outer_iterations << ", "
-              << status.inner_iterations << ")" << std::endl;
+              << status.inner.iterations << ")" << std::endl;
 }

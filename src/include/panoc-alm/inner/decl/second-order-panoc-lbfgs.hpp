@@ -61,14 +61,15 @@ class SecondOrderPANOCLBFGSSolver {
     using Params = SecondOrderPANOCLBFGSParams;
 
     struct Stats {
-        unsigned iterations = 0;
+        SolverStatus status = SolverStatus::Unknown;
         real_t ε            = inf;
         std::chrono::microseconds elapsed_time;
-        SolverStatus status          = SolverStatus::Unknown;
+        unsigned iterations          = 0;
         unsigned linesearch_failures = 0;
-
-        unsigned lbfgs_failures = 0; // TODO: remove
-        unsigned lbfgs_rejected = 0; // TODO: remove
+        unsigned lbfgs_failures      = 0;
+        unsigned lbfgs_rejected      = 0;
+        unsigned τ_1_accepted        = 0;
+        real_t sum_τ                 = 0;
     };
 
     struct ProgressInfo {
@@ -121,5 +122,32 @@ class SecondOrderPANOCLBFGSSolver {
   public:
     LBFGS lbfgs;
 };
+
+template <class InnerSolver>
+struct InnerStatsAccumulator;
+
+template <>
+struct InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> {
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations          = 0;
+    unsigned linesearch_failures = 0;
+    unsigned lbfgs_failures      = 0;
+    unsigned lbfgs_rejected      = 0;
+    unsigned τ_1_accepted        = 0;
+    real_t sum_τ                 = 0;
+};
+
+inline InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &
+operator+=(InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &acc,
+           const SecondOrderPANOCLBFGSSolver::Stats s) {
+    acc.iterations += s.iterations;
+    acc.elapsed_time += s.elapsed_time;
+    acc.linesearch_failures += s.linesearch_failures;
+    acc.lbfgs_failures += s.lbfgs_failures;
+    acc.lbfgs_rejected += s.lbfgs_rejected;
+    acc.τ_1_accepted += s.τ_1_accepted;
+    acc.sum_τ += s.sum_τ;
+    return acc;
+}
 
 } // namespace pa

@@ -92,6 +92,7 @@ auto get_inner_solver() {
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.lbfgs_mem                      = 20;
+    panocparams.lbfgs_stepsize                 = panocparams.BasedOnCurvature;
 
     pa::LBFGSParams lbfgsparams;
     return Solver::InnerSolver(panocparams, lbfgsparams);
@@ -132,7 +133,7 @@ auto get_inner_solver() {
     pa::SecondOrderPANOCLBFGSParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
-    panocparams.max_time                       = 30s;
+    panocparams.lbfgs_mem                      = 20;
     panocparams.lbfgs_stepsize                 = panocparams.BasedOnCurvature;
     pa::LBFGSParams lbfgsparams;
 
@@ -321,8 +322,6 @@ int main(int argc, char *argv[]) {
     out << YAML::Key << "status" << YAML::Value << status.status;
     out << YAML::Key << "outer iterations" << YAML::Value
         << status.outer_iterations;
-    out << YAML::Key << "inner iterations" << YAML::Value
-        << status.inner_iterations;
     out << YAML::Key << "inner convergence failures" << YAML::Value
         << status.inner_convergence_failures;
     out << YAML::Key << "initial penalty reduced" << YAML::Value
@@ -333,17 +332,12 @@ int main(int argc, char *argv[]) {
         << std::chrono::duration<double>(status.elapsed_time).count();
     out << YAML::Key << "ε" << YAML::Value << status.ε;
     out << YAML::Key << "δ" << YAML::Value << status.δ;
-    out << YAML::Key << "f" << YAML::Value << f_star;
-    out << YAML::Key << "counters" << YAML::Value << problem_cnt.evaluations;
-    out << YAML::Key << "linesearch failures" << YAML::Value
-        << status.inner_linesearch_failures;
-    out << YAML::Key << "L-BFGS failures" << YAML::Value
-        << status.inner_lbfgs_failures;
-    out << YAML::Key << "L-BFGS rejected" << YAML::Value
-        << status.inner_lbfgs_rejected;
+    out << YAML::Key << "inner" << YAML::Value << status.inner;
     out << YAML::Key << "‖Σ‖" << YAML::Value << status.norm_penalty;
     out << YAML::Key << "‖x‖" << YAML::Value << x.norm();
     out << YAML::Key << "‖y‖" << YAML::Value << y.norm();
+    out << YAML::Key << "f" << YAML::Value << f_star;
+    out << YAML::Key << "counters" << YAML::Value << problem_cnt.evaluations;
     // out << YAML::Key << "x" << YAML::Value << x;
     // out << YAML::Key << "y" << YAML::Value << y;
     out << YAML::EndMap;

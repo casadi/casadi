@@ -65,13 +65,15 @@ class PANOCSolver {
     using DirectionProvider = DirectionProviderT;
 
     struct Stats {
-        unsigned iterations = 0;
+        SolverStatus status = SolverStatus::Unknown;
         real_t ε            = inf;
         std::chrono::microseconds elapsed_time;
-        SolverStatus status          = SolverStatus::Unknown;
+        unsigned iterations          = 0;
         unsigned linesearch_failures = 0;
-        unsigned lbfgs_failures      = 0; // TODO: more generic name
+        unsigned lbfgs_failures      = 0;
         unsigned lbfgs_rejected      = 0;
+        unsigned τ_1_accepted        = 0;
+        real_t sum_τ                 = 0;
     };
 
     struct ProgressInfo {
@@ -127,5 +129,33 @@ class PANOCSolver {
   public:
     DirectionProvider direction_provider;
 };
+
+template <class InnerSolver>
+struct InnerStatsAccumulator;
+
+template <class DirectionProvider>
+struct InnerStatsAccumulator<PANOCSolver<DirectionProvider>> {
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations          = 0;
+    unsigned linesearch_failures = 0;
+    unsigned lbfgs_failures      = 0;
+    unsigned lbfgs_rejected      = 0;
+    unsigned τ_1_accepted        = 0;
+    real_t sum_τ                 = 0;
+};
+
+template <class DirectionProvider>
+inline InnerStatsAccumulator<PANOCSolver<DirectionProvider>> &
+operator+=(InnerStatsAccumulator<PANOCSolver<DirectionProvider>> &acc,
+           const typename PANOCSolver<DirectionProvider>::Stats s) {
+    acc.iterations += s.iterations;
+    acc.elapsed_time += s.elapsed_time;
+    acc.linesearch_failures += s.linesearch_failures;
+    acc.lbfgs_failures += s.lbfgs_failures;
+    acc.lbfgs_rejected += s.lbfgs_rejected;
+    acc.τ_1_accepted += s.τ_1_accepted;
+    acc.sum_τ += s.sum_τ;
+    return acc;
+}
 
 } // namespace pa

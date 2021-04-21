@@ -79,20 +79,18 @@ class ALMSolver {
     using InnerSolver = InnerSolverT;
 
     struct Stats {
-        unsigned inner_iterations = 0;
         unsigned outer_iterations = 0;
         std::chrono::microseconds elapsed_time;
         unsigned initial_penalty_reduced    = 0;
         unsigned penalty_reduced            = 0;
         unsigned inner_convergence_failures = 0;
-        unsigned inner_linesearch_failures  = 0;
-        unsigned inner_lbfgs_failures       = 0;
-        unsigned inner_lbfgs_rejected       = 0;
         real_t ε                            = inf;
         real_t δ                            = inf;
         real_t norm_penalty                 = 0;
 
         SolverStatus status = SolverStatus::Unknown;
+
+        InnerStatsAccumulator<InnerSolver> inner;
     };
 
     ALMSolver(Params params, InnerSolver &&inner_solver)

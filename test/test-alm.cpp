@@ -1,6 +1,6 @@
 #include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 
 #include "eigen-matchers.hpp"
 
@@ -151,7 +151,7 @@ TEST(ALM, multipleshooting1D) {
 
     std::cout << "u = " << x.topRows(1).transpose() << std::endl;
     std::cout << "x = " << x.bottomRows(1).transpose() << std::endl;
-    std::cout << "Inner: " << stats.inner_iterations
+    std::cout << "Inner: " << stats.inner.iterations
               << ", Outer: " << stats.outer_iterations << std::endl;
 
     auto duration =
@@ -251,7 +251,7 @@ TEST(ALM, multipleshooting8D) {
     auto gx = vec(m);
     g(x, gx);
     std::cout << "g(x) = " << gx.transpose() << std::endl;
-    std::cout << "Inner: " << stats.inner_iterations
+    std::cout << "Inner: " << stats.inner.iterations
               << ", Outer: " << stats.outer_iterations << std::endl;
 
     auto duration =

@@ -74,11 +74,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &problem, vec &y, vec &x) {
         auto ps = inner_solver(p, Σ, ε, overwrite_results, x, y, error₂);
         bool inner_converged = ps.status == SolverStatus::Converged;
         // Accumulate the inner solver statistics
-        s.inner_iterations += ps.iterations;
         s.inner_convergence_failures += not inner_converged;
-        s.inner_linesearch_failures += ps.linesearch_failures;
-        s.inner_lbfgs_failures += ps.lbfgs_failures;
-        s.inner_lbfgs_rejected += ps.lbfgs_rejected;
+        s.inner += ps;
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         bool out_of_time  = time_elapsed > params.max_time;

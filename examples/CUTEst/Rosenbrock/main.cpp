@@ -43,6 +43,6 @@ int main() {
     std::cout << "x = " << p.x0.transpose() << std::endl;
     std::cout << "y = " << p.y0.transpose() << std::endl;
 
-    std::cout << "inner: " << stats.inner_iterations << std::endl;
+    std::cout << "inner: " << stats.inner.iterations << std::endl;
     std::cout << "outer: " << stats.outer_iterations << std::endl;
 }

@@ -49,14 +49,10 @@ class PGASolver {
     PGASolver(const Params &params) : params(params) {}
 
     struct Stats {
-        unsigned iterations = 0;
+        SolverStatus status = SolverStatus::Unknown;
         real_t ε            = inf;
         std::chrono::microseconds elapsed_time;
-        SolverStatus status = SolverStatus::Unknown;
-
-        unsigned linesearch_failures = 0; // TODO: unused
-        unsigned lbfgs_failures      = 0; // TODO: unused
-        unsigned lbfgs_rejected      = 0; // TODO: unused
+        unsigned iterations = 0;
     };
 
     struct ProgressInfo {
@@ -272,6 +268,22 @@ PGASolver::operator()(const Problem &problem,        // in
         ψₖ = ψx̂ₖ;
     }
     throw std::logic_error("[PGA]   loop error");
+}
+
+template <class InnerSolver>
+struct InnerStatsAccumulator;
+
+template <>
+struct InnerStatsAccumulator<PGASolver> {
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations = 0;
+};
+
+inline InnerStatsAccumulator<PGASolver> &
+operator+=(InnerStatsAccumulator<PGASolver> &acc, const PGASolver::Stats s) {
+    acc.elapsed_time += s.elapsed_time;
+    acc.iterations += s.iterations;
+    return acc;
 }
 
 } // namespace pa

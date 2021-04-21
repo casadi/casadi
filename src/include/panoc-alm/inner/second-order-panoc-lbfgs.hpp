@@ -267,8 +267,11 @@ SecondOrderPANOCLBFGSSolver::operator()(
                 xₖ₊₁.swap(x̂ₖ);          // → safe prox step
                 ψₖ₊₁ = ψx̂ₖ;
                 grad_ψₖ₊₁.swap(grad_̂ψₖ);
-            } else { // line search didn't fail (yet)
-                xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ; // → faster quasi-Newton step
+            } else {        // line search didn't fail (yet)
+                if (τ == 1) // → faster quasi-Newton step
+                    xₖ₊₁ = xₖ + qₖ;
+                else
+                    xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ;
                 // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
                 ψₖ₊₁ = calc_ψ_grad_ψ(xₖ₊₁, /* in ⟹ out */ grad_ψₖ₊₁);
             }
@@ -301,9 +304,13 @@ SecondOrderPANOCLBFGSSolver::operator()(
             τ /= 2;
         } while (ls_cond > 0 && τ >= params.τ_min);
 
-        // τ < τ_min the line search failed and we accepted the prox step
-        if (τ < params.τ_min && k != 0)
+        // If τ < τ_min the line search failed and we accepted the prox step
+        if (τ < params.τ_min && k != 0) {
             ++s.linesearch_failures;
+        } else {
+            s.sum_τ += τ * 2;
+            s.τ_1_accepted += τ * 2 == 1;
+        }
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)

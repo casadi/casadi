@@ -53,15 +53,14 @@ class SecondOrderPANOCSolver {
     using Params = SecondOrderPANOCParams;
 
     struct Stats {
-        unsigned iterations = 0;
+        SolverStatus status = SolverStatus::Unknown;
         real_t ε            = inf;
         std::chrono::microseconds elapsed_time;
-        SolverStatus status          = SolverStatus::Unknown;
+        unsigned iterations          = 0;
         unsigned newton_failures     = 0;
         unsigned linesearch_failures = 0;
-
-        unsigned lbfgs_failures = 0; // TODO: remove
-        unsigned lbfgs_rejected = 0; // TODO: remove
+        unsigned τ_1_accepted        = 0;
+        real_t sum_τ                 = 0;
     };
 
     struct ProgressInfo {
@@ -110,5 +109,30 @@ class SecondOrderPANOCSolver {
     AtomicStopSignal stop_signal;
     std::function<void(const ProgressInfo &)> progress_cb;
 };
+
+template <class InnerSolver>
+struct InnerStatsAccumulator;
+
+template <>
+struct InnerStatsAccumulator<SecondOrderPANOCSolver> {
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations          = 0;
+    unsigned newton_failures     = 0;
+    unsigned linesearch_failures = 0;
+    unsigned τ_1_accepted        = 0;
+    real_t sum_τ                 = 0;
+};
+
+inline InnerStatsAccumulator<SecondOrderPANOCSolver> &
+operator+=(InnerStatsAccumulator<SecondOrderPANOCSolver> &acc,
+           const SecondOrderPANOCSolver::Stats s) {
+    acc.elapsed_time += s.elapsed_time;
+    acc.iterations += s.iterations;
+    acc.newton_failures += s.newton_failures;
+    acc.linesearch_failures += s.linesearch_failures;
+    acc.τ_1_accepted += s.τ_1_accepted;
+    acc.sum_τ += s.sum_τ;
+    return acc;
+}
 
 } // namespace pa

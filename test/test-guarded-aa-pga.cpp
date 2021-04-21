@@ -131,7 +131,7 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
     auto gx = vec(m);
     g(x, gx);
     std::cout << "g(x) = " << gx.transpose() << std::endl;
-    std::cout << "Inner: " << stats.inner_iterations
+    std::cout << "Inner: " << stats.inner.iterations
               << ", Outer: " << stats.outer_iterations << std::endl;
 
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(

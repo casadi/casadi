@@ -68,6 +68,6 @@ int main(int argc, char *argv[]) {
     std::cout << "g = " << g.transpose() << std::endl;
     std::cout << "f = " << p.f(x) << std::endl;
 
-    std::cout << "inner: " << stats.inner_iterations << std::endl;
+    std::cout << "inner: " << stats.inner.iterations << std::endl;
     std::cout << "outer: " << stats.outer_iterations << std::endl;
 }
