@@ -29,16 +29,17 @@ inline bool LBFGS::update_valid(LBFGSParams params, real_t yᵀs, real_t sᵀs,
 }
 
 inline bool LBFGS::update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ,
-                          const vec &pₖ₊₁, Sign sign) {
+                          const vec &pₖ₊₁, Sign sign, bool forced) {
     const auto s = xₖ₊₁ - xₖ;
     const auto y = sign == Sign::Positive ? pₖ₊₁ - pₖ : pₖ - pₖ₊₁;
     real_t yᵀs   = y.dot(s);
-    real_t sᵀs   = s.squaredNorm();
-    real_t pᵀp   = pₖ₊₁.squaredNorm();
     real_t ρ     = 1 / yᵀs;
-
-    if (not update_valid(params, yᵀs, sᵀs, pᵀp))
-        return false;
+    if (not forced) {
+        real_t sᵀs = s.squaredNorm();
+        real_t pᵀp = pₖ₊₁.squaredNorm();
+        if (not update_valid(params, yᵀs, sᵀs, pᵀp))
+            return false;
+    }
 
     // Store the new s and y vectors
     this->s(idx) = s;
@@ -97,6 +98,7 @@ bool LBFGS::apply(Vec &&q, real_t γ, const IndexVec &J) {
     // Only apply if we have previous vectors s and y
     if (idx == 0 && not full)
         return false;
+    bool fullJ = q.size() == Vec::Index(J.size());
 
     // Eigen 3.3.9 doesn't yet support indexing using a vector of indices
     // so we'll have to do it manually
@@ -104,27 +106,39 @@ bool LBFGS::apply(Vec &&q, real_t γ, const IndexVec &J) {
     //       Or wait for Eigen update?
 
     // Dot product of two vectors, adding only the indices in set J
-    auto dotJ = [&J](const auto &a, const auto &b) {
-        real_t acc = 0;
-        for (auto j : J)
-            acc += a(j) * b(j);
-        return acc;
+    auto dotJ = [&J, fullJ](const auto &a, const auto &b) {
+        if (fullJ) {
+            return a.dot(b);
+        } else {
+            real_t acc = 0;
+            for (auto j : J)
+                acc += a(j) * b(j);
+            return acc;
+        }
     };
-
-    bool at_least_one_valid_update = false;
 
     auto update1 = [&](size_t i) {
         // Recompute ρ, it depends on the index set J. Note that even if ρ was
         // positive for the full vectors s and y, that's not necessarily the
         // case for the smaller vectors s(J) and y(J).
-        ρ(i) = 1. / dotJ(s(i), y(i));
+        if (not fullJ)
+            ρ(i) = 1. / dotJ(s(i), y(i));
+
         if (ρ(i) <= 0) // Reject negative ρ to ensure positive definiteness
             return;
 
         α(i) = ρ(i) * dotJ(s(i), q);
-        for (auto j : J)
-            q(j) -= α(i) * y(i)(j);
-        at_least_one_valid_update = true; // Update with ρ > 0
+        if (fullJ)
+            q -= α(i) * y(i);
+        else
+            for (auto j : J)
+                q(j) -= α(i) * y(i)(j);
+
+        if (γ < 0) {
+            // Compute step size based on most recent yᵀs/yᵀy > 0
+            real_t yᵀy = dotJ(y(i), y(i));
+            γ          = 1. / (ρ(i) * yᵀy);
+        }
     };
     if (idx)
         for (size_t i = idx; i-- > 0;)
@@ -134,31 +148,25 @@ bool LBFGS::apply(Vec &&q, real_t γ, const IndexVec &J) {
             update1(i);
 
     // If all ρ <= 0, fail
-    if (not at_least_one_valid_update)
+    if (γ < 0)
         return false;
 
-    // Compute step size based on most recent yᵀs/yᵀy > 0
-    auto newest_valid_idx = idx > 0 ? idx - 1 : history() - 1;
-    while (γ < 0) {
-        if (ρ(newest_valid_idx) > 0) {
-            real_t yᵀy = dotJ(y(newest_valid_idx), y(newest_valid_idx));
-            γ          = 1. / (ρ(newest_valid_idx) * yᵀy);
-        } else {
-            newest_valid_idx =
-                newest_valid_idx > 0 ? newest_valid_idx - 1 : history() - 1;
-        }
-    }
-
     // r ← H₀ q
-    for (auto j : J)
-        q(j) *= γ;
+    if (fullJ)
+        q *= γ;
+    else
+        for (auto j : J)
+            q(j) *= γ;
 
     auto update2 = [&](size_t i) {
         if (ρ(i) <= 0)
             return;
         real_t β = ρ(i) * dotJ(y(i), q);
-        for (auto j : J)
-            q(j) += (α(i) - β) * s(i)(j);
+        if (fullJ)
+            q += (α(i) - β) * s(i);
+        else
+            for (auto j : J)
+                q(j) += (α(i) - β) * s(i)(j);
     };
     if (full)
         for (size_t i = idx; i < history(); ++i)

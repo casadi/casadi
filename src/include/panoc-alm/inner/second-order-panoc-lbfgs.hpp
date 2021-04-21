@@ -225,8 +225,7 @@ SecondOrderPANOCLBFGSSolver::operator()(
                 // If all indices are inactive, we can use standard L-BFGS,
                 // if there are active indices, we need the specialized version
                 // that only applies L-BFGS to the inactive indices
-                bool success = J.size() == n ? lbfgs.apply(qₖ, stepsize)
-                                             : lbfgs.apply(qₖ, stepsize, J);
+                bool success = lbfgs.apply(qₖ, stepsize, J);
                 // If L-BFGS application failed, qₖ(J) still contains
                 // -∇ψ(x)(J) - HqK(J) or -∇ψ(x)(J), which is not a valid step.
                 // A good alternative is to use H₀ = γI as an L-BFGS estimate.
@@ -319,8 +318,9 @@ SecondOrderPANOCLBFGSSolver::operator()(
             no_progress = xₖ == xₖ₊₁ ? no_progress + 1 : 0;
 
         // Update L-BFGS
+        const bool force = true;
         s.lbfgs_rejected += not lbfgs.update(xₖ, xₖ₊₁, grad_ψₖ, grad_ψₖ₊₁,
-                                             LBFGS::Sign::Positive);
+                                             LBFGS::Sign::Positive, force);
 
         // Advance step --------------------------------------------------------
         Lₖ = Lₖ₊₁;

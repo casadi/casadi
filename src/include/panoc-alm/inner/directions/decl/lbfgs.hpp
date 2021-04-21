@@ -47,7 +47,7 @@ class LBFGS {
     /// Update the inverse Hessian approximation using the new vectors xₖ₊₁
     /// and pₖ₊₁.
     bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
-                Sign sign);
+                Sign sign, bool forced = false);
 
     /// Apply the inverse Hessian approximation to the given vector q.
     template <class Vec>
