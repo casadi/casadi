@@ -558,6 +558,7 @@ void DaeBuilderInternal::clear_in(const std::string& v) {
   case DAE_BUILDER_D: return d_.clear();
   case DAE_BUILDER_W: return w_.clear();
   case DAE_BUILDER_Y: return y_.clear();
+  default: break;
   }
   casadi_error("Cannot clear input: " + v);
 }
@@ -567,6 +568,7 @@ void DaeBuilderInternal::clear_out(const std::string& v) {
   case DAE_BUILDER_ODE: return ode_.clear();
   case DAE_BUILDER_ALG: return alg_.clear();
   case DAE_BUILDER_QUAD: return quad_.clear();
+  default: break;
   }
   casadi_error("Cannot clear output: " + v);
 }

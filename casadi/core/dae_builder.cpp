@@ -298,6 +298,7 @@ MX DaeBuilder::add_t(const std::string& name) {
   casadi_assert((*this)->t_.empty(), "'t' already defined");
   MX new_t = add_variable(name);
   (*this)->t_.push_back(new_t);
+  return new_t;
 }
 
 MX DaeBuilder::add_p(const std::string& name, casadi_int n) {
