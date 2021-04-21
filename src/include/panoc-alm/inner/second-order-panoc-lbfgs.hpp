@@ -61,13 +61,11 @@ SecondOrderPANOCLBFGSSolver::operator()(
     lbfgs.resize(n, params.lbfgs_mem);
 
     vec work_n2(n);
-    vec rhs(n);
-    vec dK(n);
+    vec HqK(n);
 
     using indexvec = std::vector<vec::Index>;
-    indexvec J, K;
+    indexvec J;
     J.reserve(n);
-    K.reserve(n);
 
     // Keep track of how many successive iterations didn't update the iterate
     unsigned no_progress = 0;
@@ -196,50 +194,52 @@ SecondOrderPANOCLBFGSSolver::operator()(
 
         // Calculate Newton step -----------------------------------------------
 
-        // TODO: all of this is suboptimal and ugly :(
-
-        // TODO: write helper lambda above
-        // detail::calc_augmented_lagrangian_hessian(problem, xₖ, ŷx̂ₖ, y, Σ, g,
-        //                                           H, grad_gi);
-
-        K.clear();
-        J.clear();
-        for (vec::Index i = 0; i < n; ++i) {
-            real_t gd_step = xₖ(i) - γₖ * grad_ψₖ(i);
-            if (gd_step < problem.C.lowerbound(i)) {
-                K.push_back(i);
-                dK(i) = pₖ(i);
-            } else if (problem.C.upperbound(i) < gd_step) {
-                K.push_back(i);
-                dK(i) = pₖ(i);
-            } else {
-                J.push_back(i);
-                dK(i) = 0;
-            }
-        }
-        qₖ = pₖ;
-        if (k > 0 && not J.empty()) {
-            // Compute right-hand side of 6.1c
-            if (not K.empty()) {
-                problem.hess_L_prod(xₖ, y, dK, rhs);
-                for (auto j : J)
-                    qₖ(j) = -grad_ψₖ(j) - rhs(j);
-            } else {
-                for (auto j : J)
-                    qₖ(j) = -grad_ψₖ(j);
+        if (k > 0) { // No L-BFGS estimate on first iteration → no Newton step
+            J.clear();
+            // Find inactive indices J
+            for (vec::Index i = 0; i < n; ++i) {
+                real_t gd = xₖ(i) - γₖ * grad_ψₖ(i);
+                if (gd < problem.C.lowerbound(i)) {        // i ∊ J̲ ⊆ K
+                    qₖ(i) = pₖ(i);                         //
+                } else if (problem.C.upperbound(i) < gd) { // i ∊ J̅ ⊆ K
+                    qₖ(i) = pₖ(i);                         //
+                } else {                                   // i ∊ J
+                    J.push_back(i);
+                    qₖ(i) = 0;
+                }
             }
 
-            real_t stepsize =
-                params.lbfgs_stepsize == params.BasedOnGradientStepSize ? γₖ
-                                                                        : -1;
-            bool success = lbfgs.apply(qₖ, stepsize, J);
-            // If L-BFGS application failed, qₖ(J) still contains
-            // -∇ψ(x)(J) - rhs(J), which is not a valid step.
-            // A good alternative is to use H₀ = γI as an L-BFGS estimate.
-            // This seems to be better than just falling back to prox step.
-            if (not success)
-                for (auto j : J)
-                    qₖ(j) *= γₖ;
+            if (not J.empty()) {     // There are inactive indices J
+                if (J.size() == n) { // There are no active indices K
+                    qₖ = -grad_ψₖ;
+                } else { //             There are active indices K
+                    problem.hess_L_prod(xₖ, y, qₖ, HqK);
+                    for (auto j : J) // Compute right-hand side of 6.1c
+                        qₖ(j) = -grad_ψₖ(j) - HqK(j);
+                }
+
+                real_t stepsize =
+                    params.lbfgs_stepsize == params.BasedOnGradientStepSize
+                        ? γₖ
+                        : -1;
+                // If all indices are inactive, we can use standard L-BFGS,
+                // if there are active indices, we need the specialized version
+                // that only applies L-BFGS to the inactive indices
+                bool success = J.size() == n ? lbfgs.apply(qₖ, stepsize)
+                                             : lbfgs.apply(qₖ, stepsize, J);
+                // If L-BFGS application failed, qₖ(J) still contains
+                // -∇ψ(x)(J) - HqK(J) or -∇ψ(x)(J), which is not a valid step.
+                // A good alternative is to use H₀ = γI as an L-BFGS estimate.
+                // This seems to be better than just falling back to a projected
+                // gradient step.
+                if (not success) {
+                    if (J.size() < n)
+                        for (auto j : J)
+                            qₖ(j) *= γₖ;
+                    else
+                        qₖ *= γₖ;
+                }
+            }
         }
 
         // Line search initialization ------------------------------------------
@@ -255,6 +255,8 @@ SecondOrderPANOCLBFGSSolver::operator()(
         } else if (not qₖ.allFinite()) {
             τ = 0;
             ++s.lbfgs_failures;
+        } else if (J.empty()) {
+            τ = 0; // All constraints are active, no Newton step possible
         }
 
         // Line search loop ----------------------------------------------------
