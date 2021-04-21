@@ -138,6 +138,18 @@ const std::vector<MX>& DaeBuilder::init_rhs() const {
   return (*this)->init_rhs_;
 }
 
+const std::vector<MX>& DaeBuilder::when_cond() const {
+  return (*this)->when_cond_;
+}
+
+const std::vector<MX>& DaeBuilder::when_lhs() const {
+  return (*this)->when_lhs_;
+}
+
+const std::vector<MX>& DaeBuilder::when_rhs() const {
+  return (*this)->when_rhs_;
+}
+
 bool DaeBuilder::has_t() const {
   return !(*this)->t_.empty();
 }
@@ -384,6 +396,12 @@ MX DaeBuilder::add_aux(const std::string& name, casadi_int n) {
 void DaeBuilder::add_init(const MX& lhs, const MX& rhs) {
   (*this)->init_lhs_.push_back(lhs);
   (*this)->init_rhs_.push_back(rhs);
+}
+
+void DaeBuilder::add_when(const MX& cond, const MX& lhs, const MX& rhs) {
+  (*this)->when_cond_.push_back(cond);
+  (*this)->when_lhs_.push_back(lhs);
+  (*this)->when_rhs_.push_back(rhs);
 }
 
 void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {

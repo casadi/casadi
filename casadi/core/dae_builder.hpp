@@ -57,7 +57,8 @@ class DaeBuilderInternal;
     dependent parameters:         d == ddef(...)
     dependent parameters:         w == wdef(...)
     output equations:             y == ydef(...)
-    Initial equations:     init_lhs == init_rhs(...)
+    initial equations:     init_lhs == init_rhs(...)
+    events:      when when_cond < 0: when_lhs := when_rhs
     \endverbatim
 
     \date 2012-2021
@@ -145,6 +146,15 @@ public:
 
   /** \brief Initial conditions, right-hand-side */
   const std::vector<MX>& init_rhs() const;
+
+  /** \brief When statement: triggering condition */
+  const std::vector<MX>& when_cond() const;
+
+  /** \brief When statement: left-hand-side */
+  const std::vector<MX>& when_lhs() const;
+
+  /** \brief When statement: right-hand-side */
+  const std::vector<MX>& when_rhs() const;
   ///@}
 
   /** @name Variables and equations */
@@ -229,6 +239,9 @@ public:
 
   /// Add an initial equation
   void add_init(const MX& lhs, const MX& rhs);
+
+  /// Add a when statement
+  void add_when(const MX& cond, const MX& lhs, const MX& rhs);
 
   /// Check if dimensions match
   void sanity_check() const;

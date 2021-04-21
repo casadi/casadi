@@ -484,9 +484,17 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (!init_lhs_.empty()) {
     stream << "Initial equations" << std::endl;
-    for (casadi_int k=0; k<init_lhs_.size(); ++k) {
+    for (casadi_int k=0; k < init_lhs_.size(); ++k) {
       stream << "  " << str(init_lhs_.at(k)) << " == " << str(init_rhs_.at(k))
         << std::endl;
+    }
+  }
+
+  if (!when_cond_.empty()) {
+    stream << "When statements" << std::endl;
+    for (casadi_int k=0; k < when_cond_.size(); ++k) {
+      stream << "  when " << str(when_cond_.at(k)) << " < 0: " << str(when_lhs_.at(k))
+        << " := " << str(when_rhs_.at(k)) << std::endl;
     }
   }
 
@@ -707,6 +715,10 @@ void DaeBuilderInternal::sanity_check() const {
   // Initial equations
   casadi_assert(init_lhs_.size() == init_rhs_.size(),
     "init_lhs and init_rhs have different lengths");
+
+  // When statements
+  casadi_assert(when_cond_.size() == when_lhs_.size() && when_lhs_.size() == when_rhs_.size(),
+    "when_cond, when_lhs and when_rhs must all have the the same length");
 }
 
 std::string DaeBuilderInternal::qualified_name(const XmlNode& nn) {

@@ -303,6 +303,7 @@ protected:
   std::vector<MX> ode_, alg_, quad_;
   std::vector<MX> aux_;
   std::vector<MX> init_lhs_, init_rhs_;
+  std::vector<MX> when_cond_, when_lhs_, when_rhs_;
   ///@}
 
   /** \brief Definitions of dependent constants */
