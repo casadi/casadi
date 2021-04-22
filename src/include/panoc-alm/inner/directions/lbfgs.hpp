@@ -1,6 +1,7 @@
 #pragma once
 
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>
+#include <type_traits>
 
 namespace pa {
 
@@ -98,7 +99,8 @@ bool LBFGS::apply(Vec &&q, real_t γ, const IndexVec &J) {
     // Only apply if we have previous vectors s and y
     if (idx == 0 && not full)
         return false;
-    bool fullJ = q.size() == Vec::Index(J.size());
+    using Index = typename std::remove_reference_t<Vec>::Index;
+    bool fullJ = q.size() == Index(J.size());
 
     // Eigen 3.3.9 doesn't yet support indexing using a vector of indices
     // so we'll have to do it manually
