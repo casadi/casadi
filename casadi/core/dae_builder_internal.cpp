@@ -178,10 +178,12 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
       // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
       var.value_reference = vnode.attribute<casadi_int>("valueReference");
       var.description = vnode.attribute<std::string>("description", "");
-      var.causality = to_enum<Variable::Causality>(
-        vnode.attribute<std::string>("causality", "local"));
-      var.variability = to_enum<Variable::Variability>(
-        vnode.attribute<std::string>("variability", "continuous"));
+      std::string causality_str = vnode.attribute<std::string>("causality", "local");
+      if (causality_str == "internal") causality_str = "local";  // FMI 1.0 -> FMI 2.0
+      var.causality = to_enum<Variable::Causality>(causality_str);
+      std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
+      if (variability_str == "parameter") variability_str = "fixed";  // FMI 1.0 -> FMI 2.0
+      var.variability = to_enum<Variable::Variability>(variability_str);
       std::string initial_str = vnode.attribute<std::string>("initial", "");
       if (initial_str.empty()) {
         // Default value
@@ -221,7 +223,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
 
   // **** Process model structure ****
   if (document[0].has_child("ModelStructure")) {
-    // Get a reference to the ModelVariables node
+    // Get a reference to the ModelStructure node
     const XmlNode& modst = document[0]["ModelStructure"];
     // Test both Outputs and Derivatives
     for (const char* dtype : {"Outputs", "Derivatives"}) {
@@ -292,6 +294,30 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
       casadi_warning("Cannot sort " + it->name);
     }
   }
+
+  // **** Add binding equations ****
+  if (document[0].has_child("equ:BindingEquations")) {
+    // Get a reference to the BindingEquations node
+    const XmlNode& bindeqs = document[0]["equ:BindingEquations"];
+    // Loop over binding equations
+    for (casadi_int i=0; i < bindeqs.size(); ++i) {
+      // Reference to the binding equation
+      const XmlNode& beq_node = bindeqs[i];
+      // Get the variable and binding expression
+      Variable& var = read_variable(beq_node[0]);
+      if (beq_node[1].size() == 1) {
+        // Regular expression
+        var.beq = read_expr(beq_node[1][0]);
+      } else {
+        // OpenModelica 1.17 occationally generates integer values without type specifier (bug?)
+        casadi_assert(beq_node[1].size() == 0, "Not implemented");
+        casadi_int val;
+        beq_node[1].getText(val);
+        casadi_warning(var.name + " has binding equation without type specifier: " + str(val));
+        var.beq = val;
+      }
+    }
+  }
 }
 
 Variable& DaeBuilderInternal::read_variable(const XmlNode& node) {
@@ -333,7 +359,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
     return exp(read_expr(node[0]));
   } else if (name=="Identifier") {
     return read_variable(node).v;
-  } else if (name=="IntegerLiteral") {
+  } else if (name=="IntegerLiteral" || name=="BooleanLiteral") {
     casadi_int val;
     node.getText(val);
     return val;
