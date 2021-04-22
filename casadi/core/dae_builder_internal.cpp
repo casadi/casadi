@@ -319,30 +319,38 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
     }
   }
 
-  // **** Add dynamic equations ****
-  if (document[0].has_child("equ:DynamicEquations")) {
-    // Get a reference to the DynamicEquations node
-    const XmlNode& dyneqs = document[0]["equ:DynamicEquations"];
-    // Add equations
-    for (casadi_int i = 0; i < dyneqs.size(); ++i) {
-      // Get a reference to the variable
-      const XmlNode& n = dyneqs[i];
-      try {
-        // Consistency check
-        casadi_assert(n.name() == "equ:Equation", "Expected equ:Equation");
-        casadi_assert(n.size() == 1 && n[0].name() == "exp:Sub", "Expected one entry: exp:Sub");
-        // Get the left-hand-sides and right-hand-sides
-        const XmlNode& lhs = n[0][0];
-        const XmlNode& rhs = n[0][1];
-        // Left-hand-side needs to be a variable
-        Variable& v = read_variable(lhs);
-        // Right-hand-side is the binding equation
-        MX beq = read_expr(rhs);
-        // Set the equation
-        w_.push_back(v.v);
-        v.beq = beq;
-      } catch (std::exception& e) {
-        uerr() << "Failed to read dynamic equation " << i << ": " << e.what() << std::endl;
+  // **** Add dynamic equations, initial equations ****
+  for (bool init_eq : {true, false}) {
+    const char* equ = init_eq ? "equ:InitialEquations" : "equ:DynamicEquations";
+    if (document[0].has_child(equ)) {
+      // Get a reference to the DynamicEquations node
+      const XmlNode& dyneqs = document[0][equ];
+      // Add equations
+      for (casadi_int i = 0; i < dyneqs.size(); ++i) {
+        // Get a reference to the variable
+        const XmlNode& n = dyneqs[i];
+        try {
+          // Consistency checks
+          casadi_assert_dev(n.name() == "equ:Equation");
+          casadi_assert_dev(n.size() == 1 && n[0].name() == "exp:Sub");
+          // Get the left-hand-sides and right-hand-sides
+          const XmlNode& lhs = n[0][0];
+          const XmlNode& rhs = n[0][1];
+          // Left-hand-side needs to be a variable
+          Variable& v = read_variable(lhs);
+          // Right-hand-side is the binding equation
+          MX beq = read_expr(rhs);
+          // Set the equation
+          w_.push_back(v.v);
+          v.beq = beq;
+          // Also add to list of initial equations
+          if (init_eq) {
+            init_lhs_.push_back(v.v);
+            init_rhs_.push_back(beq);
+          }
+        } catch (std::exception& e) {
+          uerr() << "Failed to read " << equ << "#" << i << ": " << e.what() << std::endl;
+        }
       }
     }
   }
