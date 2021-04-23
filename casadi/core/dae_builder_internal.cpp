@@ -482,6 +482,11 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
     w_.push_back(r.v);
     // Return output variable
     return r.v;
+  } else if (name=="Array") {
+    // Array of arguments
+    std::vector<MX> v(node.size());
+    for (casadi_int i = 0; i < v.size(); ++i) v[i] = read_expr(node[i]);
+    return vertcat(v);
   }
 
   // throw error if reached this point
