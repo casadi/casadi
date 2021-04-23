@@ -7,4 +7,5 @@ if (TARGET panoc-alm::cutest-loader)
 endif()
 
 add_subdirectory(experiments)
+add_subdirectory(mpc)
 add_subdirectory(poster)

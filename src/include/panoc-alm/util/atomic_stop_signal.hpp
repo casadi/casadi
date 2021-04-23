@@ -7,9 +7,9 @@ namespace pa {
 class AtomicStopSignal {
   public:
     AtomicStopSignal()                         = default;
-    AtomicStopSignal(const AtomicStopSignal &) = delete;
+    AtomicStopSignal(const AtomicStopSignal &) : AtomicStopSignal() {}
     AtomicStopSignal &operator=(const AtomicStopSignal &) = delete;
-    AtomicStopSignal(AtomicStopSignal &&) {}
+    AtomicStopSignal(AtomicStopSignal &&) : AtomicStopSignal() {}
     AtomicStopSignal &operator=(AtomicStopSignal &&) { return *this; }
 
     void stop() { stop_flag.store(true, std::memory_order_relaxed); }
