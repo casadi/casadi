@@ -60,6 +60,7 @@ class SecondOrderPANOCSolver {
         unsigned newton_failures     = 0;
         unsigned linesearch_failures = 0;
         unsigned τ_1_accepted        = 0;
+        unsigned count_τ             = 0;
         real_t sum_τ                 = 0;
     };
 
@@ -120,6 +121,7 @@ struct InnerStatsAccumulator<SecondOrderPANOCSolver> {
     unsigned newton_failures     = 0;
     unsigned linesearch_failures = 0;
     unsigned τ_1_accepted        = 0;
+    unsigned count_τ             = 0;
     real_t sum_τ                 = 0;
 };
 
@@ -131,6 +133,7 @@ operator+=(InnerStatsAccumulator<SecondOrderPANOCSolver> &acc,
     acc.newton_failures += s.newton_failures;
     acc.linesearch_failures += s.linesearch_failures;
     acc.τ_1_accepted += s.τ_1_accepted;
+    acc.count_τ += s.count_τ;
     acc.sum_τ += s.sum_τ;
     return acc;
 }

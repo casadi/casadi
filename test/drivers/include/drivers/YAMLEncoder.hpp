@@ -2,6 +2,7 @@
 #include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
 #include <panoc-alm/inner/decl/second-order-panoc.hpp>
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
+#include <panoc-alm/inner/lbfgspp.hpp>
 #include <panoc-alm/inner/pga.hpp>
 
 #include <panoc-alm/decl/alm.hpp>
@@ -136,6 +137,7 @@ inline YAML::Emitter &operator<<(
     out << YAML::Key << "lbfgs_rejected" << YAML::Value << s.lbfgs_rejected;
     out << YAML::Key << "τ_1_accepted" << YAML::Value << s.τ_1_accepted;
     out << YAML::Key << "sum_τ" << YAML::Value << s.sum_τ;
+    out << YAML::Key << "count_τ" << YAML::Value << s.count_τ;
     out << YAML::EndMap;
     return out;
 }
@@ -152,6 +154,7 @@ inline YAML::Emitter &operator<<(
     out << YAML::Key << "lbfgs_rejected" << YAML::Value << s.lbfgs_rejected;
     out << YAML::Key << "τ_1_accepted" << YAML::Value << s.τ_1_accepted;
     out << YAML::Key << "sum_τ" << YAML::Value << s.sum_τ;
+    out << YAML::Key << "count_τ" << YAML::Value << s.count_τ;
     out << YAML::EndMap;
     return out;
 }
@@ -189,6 +192,18 @@ operator<<(YAML::Emitter &out,
         << s.linesearch_failures;
     out << YAML::Key << "τ_1_accepted" << YAML::Value << s.τ_1_accepted;
     out << YAML::Key << "sum_τ" << YAML::Value << s.sum_τ;
+    out << YAML::Key << "count_τ" << YAML::Value << s.count_τ;
+    out << YAML::EndMap;
+    return out;
+}
+
+template <template <class> class LineSearchT>
+inline YAML::Emitter &
+operator<<(YAML::Emitter &out,
+           const pa::InnerStatsAccumulator<pa::LBFGSBSolver<LineSearchT>> &s) {
+    out << YAML::BeginMap;
+    out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
+    out << YAML::Key << "iterations" << YAML::Value << s.iterations;
     out << YAML::EndMap;
     return out;
 }

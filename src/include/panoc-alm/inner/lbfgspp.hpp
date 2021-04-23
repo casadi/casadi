@@ -109,15 +109,10 @@ class LBFGSBSolver {
     using LineSearch = LineSearchT<real_t>;
 
     struct Stats {
-        unsigned iterations = 0;
+        SolverStatus status = SolverStatus::Unknown;
         real_t ε            = inf;
         std::chrono::microseconds elapsed_time;
-        SolverStatus status = SolverStatus::Unknown;
-
-        // TODO: find more generic way of handling this
-        unsigned linesearch_failures = 0;
-        unsigned lbfgs_failures      = 0; // TODO: more generic name
-        unsigned lbfgs_rejected      = 0;
+        unsigned iterations = 0;
     };
 
     LBFGSBSolver(Params params) : params(params) {}
@@ -183,5 +178,23 @@ class LBFGSBSolver {
     AtomicStopSignal stop_signal;
     vec work_n, work_m;
 };
+
+template <class InnerSolver>
+struct InnerStatsAccumulator;
+
+template <template <class> class LineSearchT>
+struct InnerStatsAccumulator<LBFGSBSolver<LineSearchT>> {
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations          = 0;
+};
+
+template <template <class> class LineSearchT>
+inline InnerStatsAccumulator<LBFGSBSolver<LineSearchT>> &
+operator+=(InnerStatsAccumulator<LBFGSBSolver<LineSearchT>> &acc,
+           const typename LBFGSBSolver<LineSearchT>::Stats s) {
+    acc.iterations += s.iterations;
+    acc.elapsed_time += s.elapsed_time;
+    return acc;
+}
 
 } // namespace pa

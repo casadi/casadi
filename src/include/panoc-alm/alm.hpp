@@ -103,7 +103,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &problem, vec &y, vec &x) {
             s.ε                = ps.ε;
             s.δ                = vec_util::norm_inf(error₂);
             s.norm_penalty     = Σ.norm();
-            s.outer_iterations = i;
+            s.outer_iterations = i + 1;
             s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
             s.status           = ps.status;
             if (params.preconditioning)

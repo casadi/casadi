@@ -69,6 +69,7 @@ class SecondOrderPANOCLBFGSSolver {
         unsigned lbfgs_failures      = 0;
         unsigned lbfgs_rejected      = 0;
         unsigned τ_1_accepted        = 0;
+        unsigned count_τ             = 0;
         real_t sum_τ                 = 0;
     };
 
@@ -84,6 +85,7 @@ class SecondOrderPANOCLBFGSSolver {
         const vec &grad_ψ_hat;
         real_t L;
         real_t γ;
+        real_t τ;
         real_t ε;
         const vec &Σ;
         const vec &y;
@@ -134,6 +136,7 @@ struct InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> {
     unsigned lbfgs_failures      = 0;
     unsigned lbfgs_rejected      = 0;
     unsigned τ_1_accepted        = 0;
+    unsigned count_τ             = 0;
     real_t sum_τ                 = 0;
 };
 
@@ -146,6 +149,7 @@ operator+=(InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &acc,
     acc.lbfgs_failures += s.lbfgs_failures;
     acc.lbfgs_rejected += s.lbfgs_rejected;
     acc.τ_1_accepted += s.τ_1_accepted;
+    acc.count_τ += s.count_τ;
     acc.sum_τ += s.sum_τ;
     return acc;
 }

@@ -131,6 +131,7 @@ SecondOrderPANOCLBFGSSolver::operator()(
         return s;
     }
     real_t γₖ = params.Lipschitz.Lγ_factor / Lₖ;
+    real_t τ  = NaN;
 
     // First projected gradient step -------------------------------------------
 
@@ -168,7 +169,7 @@ SecondOrderPANOCLBFGSSolver::operator()(
             print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, εₖ);
         if (progress_cb)
             progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ, Lₖ,
-                         γₖ, εₖ, Σ, y, problem, params});
+                         γₖ, τ, εₖ, Σ, y, problem, params});
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status  = detail::check_all_stop_conditions(
@@ -232,21 +233,24 @@ SecondOrderPANOCLBFGSSolver::operator()(
                 // This seems to be better than just falling back to a projected
                 // gradient step.
                 if (not success) {
-                    if (J.size() < n)
+                    if (J.size() == n)
+                        qₖ *= γₖ;
+                    else
                         for (auto j : J)
                             qₖ(j) *= γₖ;
-                    else
-                        qₖ *= γₖ;
                 }
             }
         }
 
         // Line search initialization ------------------------------------------
-        real_t τ           = 1;
+        τ                  = 1;
         real_t σₖγₖ⁻¹pₖᵀpₖ = (1 - γₖ * Lₖ) * pₖᵀpₖ / (2 * γₖ);
         real_t φₖ₊₁, ψₖ₊₁, ψx̂ₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, pₖ₊₁ᵀpₖ₊₁;
         real_t Lₖ₊₁, γₖ₊₁;
         real_t ls_cond;
+        // TODO: make separate parameter
+        real_t margin =
+            (1 + std::abs(φₖ)) * params.quadratic_upperbound_tolerance_factor;
 
         // Make sure quasi-Newton step is valid
         if (k == 0) {
@@ -303,14 +307,18 @@ SecondOrderPANOCLBFGSSolver::operator()(
                 ls_cond -= (0.5 / γₖ₊₁ - 0.5 / γₖ) * pₖ₊₁ᵀpₖ₊₁_ₖ;
 
             τ /= 2;
-        } while (ls_cond > 0 && τ >= params.τ_min);
+        } while (ls_cond > margin && τ >= params.τ_min);
 
         // If τ < τ_min the line search failed and we accepted the prox step
         if (τ < params.τ_min && k != 0) {
             ++s.linesearch_failures;
-        } else {
+            τ = 0;
+        }
+        if (k != 0) {
+            s.count_τ += 1;
             s.sum_τ += τ * 2;
             s.τ_1_accepted += τ * 2 == 1;
+            // std::cout << J.size() << "," << τ*2 << "\r\n";
         }
 
         // Check if we made any progress

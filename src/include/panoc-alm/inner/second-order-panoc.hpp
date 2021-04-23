@@ -317,6 +317,12 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
         // τ < τ_min the line search failed and we accepted the prox step
         if (τ < params.τ_min && k != 0) {
             ++s.linesearch_failures;
+            τ = 0;
+        }
+        if (k != 0) {
+            s.count_τ += 1;
+            s.sum_τ += τ * 2;
+            s.τ_1_accepted += τ * 2 == 1;
         }
 
         // Check if we made any progress
