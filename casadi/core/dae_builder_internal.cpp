@@ -455,11 +455,37 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
     return t_.at(0);
   } else if (name=="TimedVariable") {
     return read_variable(node[0]).v;
+  } else if (name=="FunctionCall") {
+    // Get the name of the function
+    std::string fname = qualified_name(node["exp:Name"]);
+    casadi_warning("Function call to '" + fname + "' incomplete");
+    // Collect the arguments
+    const XmlNode& args = node["exp:Arguments"];
+    std::vector<MX> farg(args.size());
+    for (casadi_int i = 0; i < args.size(); ++i) {
+      // Lift input arguments
+      Variable v("w_" + str(w_.size()));
+      v.v = MX::sym(v.name);
+      // Add to list of variables
+      add_variable(v.name, v);
+      w_.push_back(v.v);
+      // Set binding expression
+      v.beq = read_expr(args[i]);
+      // Add to list of function arguments
+      farg[i] = v.v;
+    }
+    // Return argument (scalar for now)
+    Variable r("w_" + str(w_.size()));
+    r.v = MX::sym(r.name);
+    // Add to list of variables
+    add_variable(r.name, r);
+    w_.push_back(r.v);
+    // Return output variable
+    return r.v;
   }
 
   // throw error if reached this point
-  throw CasadiException(std::string("DaeBuilderInternal::read_expr: Unknown node: ") + name);
-
+  casadi_error("Unknown node: " + name);
 }
 
 void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
