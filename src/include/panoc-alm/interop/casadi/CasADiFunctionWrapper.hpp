@@ -95,4 +95,18 @@ class CasADiFun_2Vi1Mo {
     CasADiFunctionEvaluator<2, 1> fun;
 };
 
+/// Wrapper for CasADiFunctionEvaluator with 3 vector inputs, 1 vector output.
+class CasADiFun_3Vi1Vo {
+  public:
+    CasADiFun_3Vi1Vo(casadi::Function &&f) : fun(std::move(f)) {}
+
+    void operator()(const pa::vec &in1, const pa::vec &in2, const pa::vec &in3,
+                    pa::vec &out) const {
+        fun({in1.data(), in2.data(), in3.data()}, {out.data()});
+    }
+
+  private:
+    CasADiFunctionEvaluator<3, 1> fun;
+};
+
 /// @}

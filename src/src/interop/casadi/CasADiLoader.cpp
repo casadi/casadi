@@ -38,3 +38,7 @@ load_CasADi_hessian_lagrangian(const char *so_name, const char *fun_name) {
         }
     };
 }
+std::function<pa::Problem::hess_L_prod_sig>
+load_CasADi_hessian_lagrangian_prod(const char *so_name, const char *fun_name) {
+    return CasADiFun_3Vi1Vo(casadi::external(fun_name, so_name));
+}
