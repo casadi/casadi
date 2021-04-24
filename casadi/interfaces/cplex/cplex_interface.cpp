@@ -152,7 +152,7 @@ namespace casadi {
 
     // Are we solving a mixed-integer problem?
     mip_ = !discrete_.empty()
-      && find(discrete_.begin(), discrete_.end(), true)!=discrete_.end();
+      && std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end();
 
     // Type of variable
     if (mip_) {
