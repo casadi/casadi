@@ -13,3 +13,7 @@ PANOC + Augmented Lagrangian Method.
 
 The [**modules**](https://tttapa.github.io/PANOC-ALM/Doxygen/modules.html)
 page is the best place to start.
+
+## Test results
+
+See [test/testresults/XPS-15-9560](test/testresults/XPS-15-9560).
