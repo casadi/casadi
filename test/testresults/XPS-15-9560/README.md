@@ -51,7 +51,7 @@ iterations are cheaper. For small problems, PANOC is faster, for large problems,
 L-BFGS-B is much faster than PANOC.  
 PANOC also requires significantly fewer ALM iterations for some reason.
 
-|     | Problems converged [s] | Total time [s] | Time of converged problems |
+|     | Problems converged | Total time [s] | Time of converged problems [s] |
 |:----|:------------------:|:----------:|:--------------------------:|
 | Standard PANOC | 155 | 893 | 53 |
 | 2nd order PANOC (L-BFGS, FD) | 160 | 880 | 74 |
