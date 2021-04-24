@@ -40,9 +40,9 @@ class DaeBuilderInternal;
     t:      independent variable (usually time)
     c:      constants
     p:      parameters
-    d:      dependent parameters
+    d:      dependent parameters (time independent)
     u:      controls
-    w:      dependent variables
+    w:      dependent variables  (time dependent)
     x:      differential states
     z:      algebraic variables
     q:      quadrature states
@@ -54,8 +54,8 @@ class DaeBuilderInternal;
     differential equations: \dot{x} ==  ode(...)
     algebraic equations:          0 ==  alg(...)
     quadrature equations:   \dot{q} == quad(...)
-    dependent parameters:         d == ddef(...)
-    dependent parameters:         w == wdef(...)
+    dependent parameters:         d == ddef(d_prev,p)
+    dependent variables:          w == wdef(w_prev,x,z,u,p,t)
     output equations:             y == ydef(...)
     initial equations:     init_lhs == init_rhs(...)
     events:      when when_cond < 0: when_lhs := when_rhs
