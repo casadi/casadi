@@ -314,7 +314,7 @@ MX DaeBuilder::add_p(const std::string& name, casadi_int n) {
 MX DaeBuilder::add_u(const std::string& name, casadi_int n) {
   try {
     if (name.empty()) return add_u("u" + str(u().size()), n);
-    return (*this)->add_p(name, n);
+    return (*this)->add_u(name, n);
   } catch (std::exception& e) {
     THROW_ERROR("add_u", e.what());
     return MX();
@@ -344,7 +344,7 @@ MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
 MX DaeBuilder::add_q(const std::string& name, casadi_int n) {
   try {
     if (name.empty()) return add_q("q" + str(q().size()), n);
-    return (*this)->add_x(name, n);
+    return (*this)->add_q(name, n);
   } catch (std::exception& e) {
     THROW_ERROR("add_q", e.what());
     return MX();
