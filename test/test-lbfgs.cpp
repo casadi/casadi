@@ -16,7 +16,9 @@ TEST(LBFGS, quadratic) {
 
     pa::mat B = pa::mat::Identity(2, 2);
 
-    pa::LBFGS lbfgs(pa::LBFGSParams{}, 2, 5);
+    pa::LBFGSParams param;
+    param.memory = 5;
+    pa::LBFGS lbfgs(param, 2);
     pa::vec x(2);
     x << 10, -5;
     auto r                = grad_f(x);

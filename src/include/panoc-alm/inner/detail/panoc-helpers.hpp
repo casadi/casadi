@@ -11,10 +11,10 @@ namespace pa::detail {
 /// \text{dist}_\Sigma^2\left(g(x^k) + \Sigma^{-1}y,\;D\right) @f]
 /// @f[ \hat{y}  @f]
 inline real_t calc_ψ_ŷ(const Problem &p, ///< [in]  Problem description
-                       const vec &x,     ///< [in]  Decision variable @f$ x @f$
-                       const vec &y, ///< [in]  Lagrange multipliers @f$ y @f$
-                       const vec &Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
-                       vec &ŷ        ///< [out] @f$ \hat{y} @f$
+                       crvec x,          ///< [in]  Decision variable @f$ x @f$
+                       crvec y, ///< [in]  Lagrange multipliers @f$ y @f$
+                       crvec Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
+                       rvec ŷ   ///< [out] @f$ \hat{y} @f$
 ) {
     // g(x)
     p.g(x, ŷ);
@@ -35,12 +35,11 @@ inline real_t calc_ψ_ŷ(const Problem &p, ///< [in]  Problem description
 }
 
 /// Calculate ∇ψ(x) using ŷ.
-inline void
-calc_grad_ψ_from_ŷ(const Problem &p, ///< [in]  Problem description
-                   const vec &x,     ///< [in]  Decision variable @f$ x @f$
-                   const vec &ŷ,     ///< [in]  @f$ \hat{y} @f$
-                   vec &grad_ψ,      ///< [out] @f$ \nabla \psi(x) @f$
-                   vec &work_n       ///<       Dimension n
+inline void calc_grad_ψ_from_ŷ(const Problem &p, ///< [in]  Problem description
+                               crvec x, ///< [in]  Decision variable @f$ x @f$
+                               crvec ŷ, ///< [in]  @f$ \hat{y} @f$
+                               rvec grad_ψ, ///< [out] @f$ \nabla \psi(x) @f$
+                               rvec work_n  ///<       Dimension n
 ) {
     // ∇ψ = ∇f(x) + ∇g(x) ŷ
     p.grad_f(x, grad_ψ);
@@ -52,14 +51,13 @@ calc_grad_ψ_from_ŷ(const Problem &p, ///< [in]  Problem description
 /// @f[ \psi(x^k) = f(x^k) + \frac{1}{2}
 /// \text{dist}_\Sigma^2\left(g(x^k) + \Sigma^{-1}y,\;D\right) @f]
 /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\ \hat{y}(x) @f]
-inline real_t
-calc_ψ_grad_ψ(const Problem &p, ///< [in]  Problem description
-              const vec &x,     ///< [in]  Decision variable @f$ x @f$
-              const vec &y,     ///< [in]  Lagrange multipliers @f$ y @f$
-              const vec &Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
-              vec &grad_ψ,      ///< [out] @f$ \nabla \psi(x) @f$
-              vec &work_n,      ///<       Dimension n
-              vec &work_m       ///<       Dimension m
+inline real_t calc_ψ_grad_ψ(const Problem &p, ///< [in]  Problem description
+                            crvec x, ///< [in]  Decision variable @f$ x @f$
+                            crvec y, ///< [in]  Lagrange multipliers @f$ y @f$
+                            crvec Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
+                            rvec grad_ψ, ///< [out] @f$ \nabla \psi(x) @f$
+                            rvec work_n, ///<       Dimension n
+                            rvec work_m  ///<       Dimension m
 ) {
     // ψ(x) = f(x) + ½ dᵀŷ
     real_t ψ = calc_ψ_ŷ(p, x, y, Σ, work_m);
@@ -71,12 +69,12 @@ calc_ψ_grad_ψ(const Problem &p, ///< [in]  Problem description
 /// Calculate the gradient ∇ψ(x).
 /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\ \hat{y}(x) @f]
 inline void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
-                        const vec &x,     ///< [in]  Decision variable @f$ x @f$
-                        const vec &y, ///< [in]  Lagrange multipliers @f$ y @f$
-                        const vec &Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
-                        vec &grad_ψ,  ///< [out] @f$ \nabla \psi(x) @f$
-                        vec &work_n,  ///<       Dimension n
-                        vec &work_m   ///<       Dimension m
+                        crvec x,          ///< [in]  Decision variable @f$ x @f$
+                        crvec y,     ///< [in]  Lagrange multipliers @f$ y @f$
+                        crvec Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
+                        rvec grad_ψ, ///< [out] @f$ \nabla \psi(x) @f$
+                        rvec work_n, ///<       Dimension n
+                        rvec work_m  ///<       Dimension m
 ) {
     // g(x)
     p.g(x, work_m);
@@ -95,20 +93,19 @@ inline void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
 
 /// Calculate the error between ẑ and g(x).
 /// @f[ \hat{z}^k = \Pi_D\left(g(x^k) + \Sigma^{-1}y\right) @f]
-inline void
-calc_err_z(const Problem &p, ///< [in]  Problem description
-           const vec &x̂,     ///< [in]  Decision variable @f$ \hat{x} @f$
-           const vec &y,     ///< [in]  Lagrange multipliers @f$ y @f$
-           const vec &Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
-           vec &err_z        ///< [out] @f$ g(\hat{x}) - \hat{z} @f$
+inline void calc_err_z(const Problem &p, ///< [in]  Problem description
+                       crvec x̂,   ///< [in]  Decision variable @f$ \hat{x} @f$
+                       crvec y,   ///< [in]  Lagrange multipliers @f$ y @f$
+                       crvec Σ,   ///< [in]  Penalty weights @f$ \Sigma @f$
+                       rvec err_z ///< [out] @f$ g(\hat{x}) - \hat{z} @f$
 ) {
     // g(x̂)
     p.g(x̂, err_z);
     // ζ = g(x̂) + Σ⁻¹y
     // ẑ = Π(ζ, D)
     // g(x) - ẑ
-    err_z = err_z - project(err_z + Σ.asDiagonal().inverse() * y,
-                            p.D); // TODO: catastrophic cancellation?
+    err_z = err_z - project(err_z + Σ.asDiagonal().inverse() * y, p.D);
+    // TODO: catastrophic cancellation?
 }
 
 /**
@@ -120,10 +117,10 @@ calc_err_z(const Problem &p, ///< [in]  Problem description
  * \end{aligned} @f]
  */
 inline auto
-projected_gradient_step(const Box &C,     ///< [in]  Set to project onto
-                        real_t γ,         ///< [in]  Step size
-                        const vec &x,     ///< [in]  Decision variable @f$ x @f$
-                        const vec &grad_ψ ///< [in]  @f$ \nabla \psi(x^k) @f$
+projected_gradient_step(const Box &C, ///< [in]  Set to project onto
+                        real_t γ,     ///< [in]  Step size
+                        crvec x,      ///< [in]  Decision variable @f$ x @f$
+                        crvec grad_ψ  ///< [in]  @f$ \nabla \psi(x^k) @f$
 ) {
     using binary_real_f = real_t (*)(real_t, real_t);
     return (-γ * grad_ψ)
@@ -133,10 +130,10 @@ projected_gradient_step(const Box &C,     ///< [in]  Set to project onto
 
 inline void calc_x̂(const Problem &prob, ///< [in]  Problem description
                    real_t γ,            ///< [in]  Step size
-                   const vec &x,        ///< [in]  Decision variable @f$ x @f$
-                   const vec &grad_ψ,   ///< [in]  @f$ \nabla \psi(x^k) @f$
-                   vec &x̂, ///< [out] @f$ \hat{x}^k = T_{\gamma^k}(x^k) @f$
-                   vec &p  ///< [out] @f$ \hat{x}^k - x^k @f$
+                   crvec x,             ///< [in]  Decision variable @f$ x @f$
+                   crvec grad_ψ,        ///< [in]  @f$ \nabla \psi(x^k) @f$
+                   rvec x̂, ///< [out] @f$ \hat{x}^k = T_{\gamma^k}(x^k) @f$
+                   rvec p  ///< [out] @f$ \hat{x}^k - x^k @f$
 ) {
     p = projected_gradient_step(prob.C, γ, x, grad_ψ);
     x̂ = x + p;
@@ -145,10 +142,10 @@ inline void calc_x̂(const Problem &prob, ///< [in]  Problem description
 /// @f[ \left\| \gamma_k^{-1} (x^k - \hat x^k) + \nabla \psi(\hat x^k) -
 /// \nabla \psi(x^k) \right\|_\infty @f]
 inline real_t calc_error_stop_crit(
-    const vec &pₖ, ///< [in]  Projected gradient step @f$ \hat x^k - x^k @f$
+    crvec pₖ,      ///< [in]  Projected gradient step @f$ \hat x^k - x^k @f$
     real_t γ,      ///< [in]  Step size
-    const vec &grad_̂ψₖ, ///< [in]  Gradient in @f$ \hat x^k @f$
-    const vec &grad_ψₖ  ///< [in]  Gradient in @f$ x^k @f$
+    crvec grad_̂ψₖ, ///< [in]  Gradient in @f$ \hat x^k @f$
+    crvec grad_ψₖ  ///< [in]  Gradient in @f$ x^k @f$
 ) {
     auto err = (1 / γ) * pₖ + (grad_ψₖ - grad_̂ψₖ);
     // These parentheses     ^^^               ^^^
@@ -179,21 +176,21 @@ inline real_t descent_lemma(
     ///         precision floating point arithmetic.
     real_t rounding_tolerance,
     /// [in]    Current iterate @f$ x^k @f$
-    const vec &xₖ,
+    crvec xₖ,
     /// [in]    Objective function @f$ \psi(x^k) @f$
     real_t ψₖ,
     /// [in]    Gradient of objective @f$ \nabla\psi(x^k) @f$
-    const vec &grad_ψₖ,
+    crvec grad_ψₖ,
     /// [in]    Lagrange multipliers @f$ y @f$
-    const vec &y,
+    crvec y,
     /// [in]    Penalty weights @f$ \Sigma @f$
-    const vec &Σ,
+    crvec Σ,
     /// [out]   Projected gradient iterate @f$ \hat x^k @f$
-    vec &x̂ₖ,
+    rvec x̂ₖ,
     /// [out]   Projected gradient step @f$ p^k @f$
-    vec &pₖ,
+    rvec pₖ,
     /// [out]   Intermediate vector @f$ \hat y(x^k) @f$
-    vec &ŷx̂ₖ,
+    rvec ŷx̂ₖ,
     /// [inout] Objective function @f$ \psi(\hat x^k) @f$
     real_t &ψx̂ₖ,
     /// [inout] Squared norm of the step @f$ \left\| p^k \right\|^2 @f$
@@ -266,19 +263,19 @@ inline void calc_augmented_lagrangian_hessian(
     /// [in]  Problem description
     const Problem &problem,
     /// [in]    Current iterate @f$ x^k @f$
-    const vec &xₖ,
+    crvec xₖ,
     /// [in]   Intermediate vector @f$ \hat y(x^k) @f$
-    const vec &ŷxₖ,
+    crvec ŷxₖ,
     /// [in]    Lagrange multipliers @f$ y @f$
-    const vec &y,
+    crvec y,
     /// [in]    Penalty weights @f$ \Sigma @f$
-    const vec &Σ,
+    crvec Σ,
     /// [out]   The constraint values @f$ g(x^k) @f$
-    vec &g,
+    rvec g,
     /// [out]   Hessian matrix @f$ H(x, y) @f$
     mat &H,
     ///         Dimension n
-    vec &work_n) {
+    rvec work_n) {
 
     // Compute the Hessian of the Lagrangian
     problem.hess_L(xₖ, ŷxₖ, H);
@@ -303,27 +300,28 @@ inline void calc_augmented_lagrangian_hessian_prod_fd(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Current iterate @f$ x^k @f$
-    const vec &xₖ,
+    crvec xₖ,
     /// [in]    Lagrange multipliers @f$ y @f$
-    const vec &y,
+    crvec y,
     /// [in]    Penalty weights @f$ \Sigma @f$
-    const vec &Σ,
+    crvec Σ,
     /// [in]    Gradient @f$ \nabla \psi(x^k) @f$
-    const vec &grad_ψ,
+    crvec grad_ψ,
     /// [in]    Vector to multiply with the Hessian
-    const vec &v,
+    crvec v,
     /// [out]   Hessian-vector product
-    vec &Hv,
+    rvec Hv,
     ///         Dimension n
-    vec &work_n1,
+    rvec work_n1,
     ///         Dimension n
-    vec &work_n2,
+    rvec work_n2,
     ///         Dimension m
-    vec &work_m) {
+    rvec work_m) {
 
-    real_t h = std::sqrt(std::numeric_limits<real_t>::epsilon());
-    vec &xₖh = work_n1;
-    xₖh      = xₖ + h * v;
+    real_t cbrt_ε = std::cbrt(std::numeric_limits<real_t>::epsilon());
+    real_t h      = cbrt_ε * (1 + xₖ.norm());
+    rvec xₖh      = work_n1;
+    xₖh           = xₖ + h * v;
     calc_grad_ψ(problem, xₖh, y, Σ, Hv, work_n2, work_m);
     Hv -= grad_ψ;
     Hv /= h;
@@ -333,11 +331,11 @@ inline real_t initial_lipschitz_estimate(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Current iterate @f$ x^k @f$
-    const vec &xₖ,
+    crvec xₖ,
     /// [in]    Lagrange multipliers @f$ y @f$
-    const vec &y,
+    crvec y,
     /// [in]    Penalty weights @f$ \Sigma @f$
-    const vec &Σ,
+    crvec Σ,
     /// [in]    Finite difference step size relative to xₖ
     real_t ε,
     /// [in]    Minimum absolute finite difference step size
@@ -345,15 +343,15 @@ inline real_t initial_lipschitz_estimate(
     /// [out]   @f$ \psi(x^k) @f$
     real_t &ψ,
     /// [out]   Gradient @f$ \nabla \psi(x^k) @f$
-    vec &grad_ψ,
+    rvec grad_ψ,
     ///         Dimension n
-    vec &work_n1,
+    rvec work_n1,
     ///         Dimension n
-    vec &work_n2,
+    rvec work_n2,
     ///         Dimension n
-    vec &work_n3,
+    rvec work_n3,
     ///         Dimension m
-    vec &work_m) {
+    rvec work_m) {
 
     auto h        = (xₖ * ε).cwiseAbs().cwiseMax(δ);
     work_n1       = xₖ + h;

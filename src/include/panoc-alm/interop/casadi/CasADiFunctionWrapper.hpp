@@ -44,7 +44,7 @@ class CasADiFun_1Vi1So {
   public:
     CasADiFun_1Vi1So(casadi::Function &&f) : fun(std::move(f)) {}
 
-    double operator()(const pa::vec &x) const {
+    double operator()(pa::crvec x) const {
         double out;
         fun({x.data()}, {&out});
         return out;
@@ -59,7 +59,7 @@ class CasADiFun_1Vi1Vo {
   public:
     CasADiFun_1Vi1Vo(casadi::Function &&f) : fun(std::move(f)) {}
 
-    void operator()(const pa::vec &in, pa::vec &out) const {
+    void operator()(pa::crvec in, pa::rvec out) const {
         fun({in.data()}, {out.data()});
     }
 
@@ -72,8 +72,7 @@ class CasADiFun_2Vi1Vo {
   public:
     CasADiFun_2Vi1Vo(casadi::Function &&f) : fun(std::move(f)) {}
 
-    void operator()(const pa::vec &in1, const pa::vec &in2,
-                    pa::vec &out) const {
+    void operator()(pa::crvec in1, pa::crvec in2, pa::rvec out) const {
         fun({in1.data(), in2.data()}, {out.data()});
     }
 
@@ -86,8 +85,7 @@ class CasADiFun_2Vi1Mo {
   public:
     CasADiFun_2Vi1Mo(casadi::Function &&f) : fun(std::move(f)) {}
 
-    void operator()(const pa::vec &in1, const pa::vec &in2,
-                    pa::mat &out) const {
+    void operator()(pa::crvec in1, pa::crvec in2, pa::rmat out) const {
         fun({in1.data(), in2.data()}, {out.data()});
     }
 
@@ -100,8 +98,8 @@ class CasADiFun_3Vi1Vo {
   public:
     CasADiFun_3Vi1Vo(casadi::Function &&f) : fun(std::move(f)) {}
 
-    void operator()(const pa::vec &in1, const pa::vec &in2, const pa::vec &in3,
-                    pa::vec &out) const {
+    void operator()(pa::crvec in1, pa::crvec in2, pa::crvec in3,
+                    pa::rvec out) const {
         fun({in1.data(), in2.data(), in3.data()}, {out.data()});
     }
 

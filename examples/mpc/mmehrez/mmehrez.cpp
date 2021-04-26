@@ -38,7 +38,9 @@ M load_csv(const std::string &path) {
                                                           values.size() / rows);
 }
 
+using pa::crvec;
 using pa::real_t;
+using pa::rvec;
 using pa::vec;
 
 int main(int argc, char *argv[]) {
@@ -61,7 +63,7 @@ int main(int argc, char *argv[]) {
     p.g           = load_CasADi_constraints(so_name.c_str());
     p.grad_g_prod = load_CasADi_gradient_constraints_prod(so_name.c_str());
     vec w         = vec::Zero(p.m);
-    p.grad_gi     = [&p, w](const vec &x, unsigned i, vec &g) mutable {
+    p.grad_gi     = [&p, w](crvec x, unsigned i, rvec g) mutable {
         w(i) = 1;
         p.grad_g_prod(x, w, g);
         w(i) = 0;
@@ -80,22 +82,21 @@ int main(int argc, char *argv[]) {
     almparam.max_num_retries = 5;
 
     pa::PANOCParams panocparam;
-    panocparam.lbfgs_mem      = 20;
     panocparam.max_iter       = 1000;
     panocparam.print_interval = 50;
 
     pa::SecondOrderPANOCLBFGSParams secondpanocparam;
-    secondpanocparam.lbfgs_mem      = panocparam.lbfgs_mem;
     secondpanocparam.max_iter       = panocparam.max_iter;
     secondpanocparam.print_interval = panocparam.print_interval;
 
     pa::LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 20;
 
     using Stats =
         std::variant<pa::ALMSolver<pa::PANOCSolver<pa::LBFGS>>::Stats,
                      pa::ALMSolver<pa::SecondOrderPANOCLBFGSSolver>::Stats>;
     using Solver_sig =
-        std::function<Stats(const pa::Problem &p, vec &x, vec &y)>;
+        std::function<Stats(const pa::Problem &p, rvec x, rvec y)>;
 
     std::vector<Solver_sig> solvers{
         pa::ALMSolver<pa::PANOCSolver<pa::LBFGS>>{

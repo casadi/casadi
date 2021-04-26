@@ -18,17 +18,17 @@ TEST(Problem, onlyD) {
     original.C.upperbound << 11, 17, 23;
     original.D.lowerbound << -51, 5;
     original.D.upperbound << 41, 37;
-    original.f = [](const vec &x) { return 43 * x(0) + 41 * x(1) + 61 * x(2); };
-    original.grad_f = [](const vec &, vec &g) {
+    original.f      = [](crvec x) { return 43 * x(0) + 41 * x(1) + 61 * x(2); };
+    original.grad_f = [](crvec, rvec g) {
         g(0) = 43;
         g(1) = 41;
         g(2) = 61;
     };
-    original.g = [](const vec &x, vec &g) {
+    original.g = [](crvec x, rvec g) {
         g(0) = 71 * x(0) * x(1) + 83 * x(1) * x(2);
         g(1) = 97 * x(1) * x(1) + 29 * x(0) * x(2);
     };
-    original.grad_g_prod = [](const vec &x, const vec &y, vec &g) {
+    original.grad_g_prod = [](crvec x, crvec y, rvec g) {
         mat grad(3, 2);
         grad << 71 * x(1), 29 * x(2),             //
             71 * x(0) + 83 * x(2), 2 * 97 * x(1), //
@@ -38,8 +38,7 @@ TEST(Problem, onlyD) {
 
     auto g_component = [](const Problem &problem) {
         return [&problem](size_t component) {
-            return [&problem, component,
-                    g = vec(problem.m)](const vec &x) mutable {
+            return [&problem, component, g = vec(problem.m)](crvec x) mutable {
                 problem.g(x, g);
                 return g(component);
             };
@@ -102,7 +101,7 @@ TEST(Problem, onlyD) {
     vec fd_gD2        = pa_ref::finite_diff(gD_component(2), x);
     vec fd_gD3        = pa_ref::finite_diff(gD_component(3), x);
     vec fd_gD4        = pa_ref::finite_diff(gD_component(4), x);
-    vec gr_gD0(5), gr_gD1(5), gr_gD2(5), gr_gD3(5), gr_gD4(5);
+    vec gr_gD0(3), gr_gD1(3), gr_gD2(3), gr_gD3(3), gr_gD4(3);
     onlyD.grad_g_prod(x, mat::Identity(5, 5).col(0), gr_gD0);
     onlyD.grad_g_prod(x, mat::Identity(5, 5).col(1), gr_gD1);
     onlyD.grad_g_prod(x, mat::Identity(5, 5).col(2), gr_gD2);

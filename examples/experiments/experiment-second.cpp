@@ -24,21 +24,21 @@ Problem build_test_problem2() {
     p.D.upperbound << -1, 0;
     p.D.lowerbound.resize(2);
     p.D.lowerbound << -inf, -inf;
-    p.f = [](const vec &x) { // f(x) = 1/48 x₁⁴ - 2x₁x₂ + 1/24 x₁²x₂⁴ + 10
+    p.f = [](crvec x) { // f(x) = 1/48 x₁⁴ - 2x₁x₂ + 1/24 x₁²x₂⁴ + 10
         return 1. / 48 * std::pow(x(0), 4) - 2 * x(0) * x(1) +
                1. / 24 * std::pow(x(0), 2) * std::pow(x(1), 4) + 10;
     };
-    p.grad_f = [](const vec &x, vec &grad) {
+    p.grad_f = [](crvec x, rvec grad) {
         grad(0) = 1. / 12 * std::pow(x(0), 3) - 2 * x(1) +
                   1. / 12 * x(0) * std::pow(x(1), 4);
         grad(1) = -2 * x(0) + 1. / 6 * std::pow(x(0), 2) * std::pow(x(1), 3);
     };
-    p.g = [](const vec &x, vec &g) {
+    p.g = [](crvec x, rvec g) {
         g(0) = -4 * std::pow(x(0), 2) +
                0.25 * std::pow(x(0), 2) * std::pow(x(1), 2);
         g(1) = 0.125 * std::pow(x(0), 4) - x(0) * x(1);
     };
-    p.grad_g_prod = [](const vec &x, const vec &y, vec &grad) {
+    p.grad_g_prod = [](crvec x, crvec y, rvec grad) {
         pa::mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
@@ -47,7 +47,7 @@ Problem build_test_problem2() {
             -x(0);
         grad = gradmat * y;
     };
-    p.grad_gi = [](const vec &x, unsigned i, vec &grad) {
+    p.grad_gi = [](crvec x, unsigned i, rvec grad) {
         pa::mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
@@ -56,7 +56,7 @@ Problem build_test_problem2() {
             -x(0);
         grad = gradmat.col(i);
     };
-    p.hess_L = [](const vec &x, const vec &y, mat &H) {
+    p.hess_L = [](crvec x, crvec y, rmat H) {
         // Hessian of f
         H(0, 0) = 1. / 4 * std::pow(x(0), 2) + 1. / 12 * std::pow(x(1), 4);
         H(0, 1) = -2 + 1. / 3 * x(0) * std::pow(x(1), 3);
@@ -88,15 +88,15 @@ Problem build_test_problem3() {
     p.C.lowerbound = vec::Constant(2, -inf);
     mat A(2, 2);
     A << 4, -2, -2, 3;
-    p.f           = [A](const vec &x) { return 0.5 * x.transpose() * A * x; };
-    p.grad_f      = [A](const vec &x, vec &g) { g = A * x; };
-    p.g           = [](const vec &, vec &) {};
-    p.grad_g_prod = [](const vec &, const vec &, vec &grad) { grad.setZero(); };
-    p.hess_L      = [A](const vec &, const vec &, mat &H) { H = A; };
+    p.f           = [A](crvec x) { return 0.5 * x.transpose() * A * x; };
+    p.grad_f      = [A](crvec x, rvec g) { g = A * x; };
+    p.g           = [](crvec, rvec) {};
+    p.grad_g_prod = [](crvec, crvec, rvec grad) { grad.setZero(); };
+    p.hess_L      = [A](crvec, crvec, rmat H) { H = A; };
     return p;
 }
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::vec &v) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, crvec v) {
     out << YAML::Flow;
     out << YAML::BeginSeq;
     for (pa::vec::Index i = 0; i < v.size(); ++i)
@@ -171,10 +171,10 @@ int main(int argc, char *argv[]) {
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.alternative_linesearch_cond    = false;
-    panocparams.lbfgs_mem                      = 5;
     panocparams.print_interval                 = 1;
     pa::LBFGSParams lbfgsparams;
     lbfgsparams.rescale_when_γ_changes = false;
+    lbfgsparams.memory                 = 5;
 
     pa::SecondOrderPANOCParams panocparams2;
     panocparams2.max_iter                       = 1000;

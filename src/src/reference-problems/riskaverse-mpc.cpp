@@ -71,24 +71,24 @@ struct RiskaverseProblem {
         x0.fill(10);
     }
 
-    auto mpc_dynamics(const vec &x, const vec &u) const {
+    auto mpc_dynamics(crvec x, crvec u) const {
         return A * x + B * u;
     };
 
-    real_t f(const vec &ux) const { return s(ux)(0); }
-    void grad_f(const vec &ux, vec &grad_f) const {
+    real_t f(crvec ux) const { return s(ux)(0); }
+    void grad_f(crvec ux, rvec grad_f) const {
         (void)ux;
         grad_f.setZero();
         s(grad_f)(0) = 1;
     }
-    void g(const vec &ux, vec &g_u) const {
+    void g(crvec ux, rvec g_u) const {
         g_u(0) = y(ux)(0) - y(ux)(1) - s(ux)(0);
         g_u(1) =
             mpc_dynamics(x0, u(ux)).dot(Q * mpc_dynamics(x0, u(ux))) - s(ux)(1);
         g_u(2) = x0.dot(Q * x0) + u(ux).dot(R * u(ux)) -
                  (y(ux)(0) - y(ux)(1) - y(ux)(2) - s(ux)(1));
     }
-    void grad_g(const vec &ux, const vec &v, vec &grad_u_v) const {
+    void grad_g(crvec ux, crvec v, rvec grad_u_v) const {
         pa::mat grad      = pa::mat::Zero(n, m);
         s(grad.col(0))(0) = -1;
         y(grad.col(0))(0) = 1;
@@ -115,10 +115,10 @@ Problem riskaverse_mpc_problem() {
         r.m,
         r.get_C(),
         r.get_D(),
-        [rptr](const vec &ux) { return rptr->f(ux); },
-        [rptr](const vec &ux, vec &g_u) { rptr->grad_f(ux, g_u); },
-        [rptr](const vec &ux, vec &g_u) { rptr->g(ux, g_u); },
-        [rptr](const vec &ux, const vec &v, vec &grad_u_v) {
+        [rptr](crvec ux) { return rptr->f(ux); },
+        [rptr](crvec ux, rvec g_u) { rptr->grad_f(ux, g_u); },
+        [rptr](crvec ux, rvec g_u) { rptr->g(ux, g_u); },
+        [rptr](crvec ux, crvec v, rvec grad_u_v) {
             rptr->grad_g(ux, v, grad_u_v);
         },
         {},

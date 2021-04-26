@@ -96,8 +96,10 @@ class ALMSolver {
     ALMSolver(Params params, InnerSolver &&inner_solver)
         : params(params),
           inner_solver(std::forward<InnerSolver>(inner_solver)) {}
+    ALMSolver(Params params, const InnerSolver &inner_solver)
+        : params(params), inner_solver(inner_solver) {}
 
-    Stats operator()(const Problem &problem, vec &y, vec &x);
+    Stats operator()(const Problem &problem, rvec y, rvec x);
 
     std::string get_name() const {
         return "ALMSolver<" + inner_solver.get_name() + ">";

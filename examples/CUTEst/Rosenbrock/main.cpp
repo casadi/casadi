@@ -1,11 +1,10 @@
 #include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
+#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 
 #include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
 
 #include <iostream>
-
 
 int main() {
     const char *so_fname = "/home/pieter/GitHub/PANOC-ALM/build/CUTEst/ROSENBR/"
@@ -30,10 +29,10 @@ int main() {
     pa::PANOCParams panocparam;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
-    panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 50;
 
     pa::LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 10;
 
     pa::ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
     auto stats = solver(p.problem, p.y0, p.x0);

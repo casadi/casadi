@@ -22,7 +22,7 @@ load_CasADi_gradient_constraints_prod(const char *so_name,
 std::function<pa::Problem::hess_L_sig>
 load_CasADi_hessian_lagrangian(const char *so_name, const char *fun_name) {
     return [csf{CasADiFun_2Vi1Mo(casadi::external(fun_name, so_name))}](
-               const pa::vec &x, const pa::vec &y, pa::mat &H) {
+               pa::crvec x, pa::crvec y, pa::rmat H) {
         // Fix the stride if the matrix is larger than n
         if (x.rows() != H.rows()) { // TODO: this is probably unnecessary
             for (auto c = x.rows(); c-- > 1;)

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <panoc-alm/inner/decl/lbfgs-stepsize.hpp>
 #include <panoc-alm/inner/decl/panoc-fwd.hpp>
+#include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
 #include <panoc-alm/util/atomic_stop_signal.hpp>
 #include <panoc-alm/util/problem.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
@@ -25,12 +27,6 @@ struct PANOCParams {
         real_t Lγ_factor = 0.95;
     } Lipschitz; ///< Parameters related to the Lipschitz constant estimate
                  ///  and step size.
-    /// Length of the history to keep for the Anderson acceleration of fixed
-    /// point iteration.
-    /// @todo Implement this.
-    unsigned anderson_acceleration = 0;
-    /// Length of the history to keep in the L-BFGS algorithm.
-    unsigned lbfgs_mem = 10; // TODO: move to LBFGS params
     /// Maximum number of inner PANOC iterations.
     unsigned max_iter = 100;
     /// Maximum duration.
@@ -50,10 +46,7 @@ struct PANOCParams {
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;
 
-    enum {
-        BasedOnGradientStepSize = 0,
-        BasedOnCurvature        = 1,
-    } lbfgs_stepsize = BasedOnGradientStepSize;
+    LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnGradientStepSize;
 };
 
 /// PANOC solver for ALM.
@@ -97,17 +90,20 @@ class PANOCSolver {
         const Params &params;
     };
 
-    PANOCSolver(Params params, DirectionProvider &&direction_provider)
-        : params(params), direction_provider(std::forward<DirectionProvider>(
-                              direction_provider)) {}
+    PANOCSolver(Params params,
+                PANOCDirection<DirectionProvider> &&direction_provider)
+        : params(params), direction_provider(std::move(direction_provider)) {}
+    PANOCSolver(Params params,
+                const PANOCDirection<DirectionProvider> &direction_provider)
+        : params(params), direction_provider(direction_provider) {}
 
     Stats operator()(const Problem &problem,        // in
-                     const vec &Σ,                  // in
+                     crvec Σ,                       // in
                      real_t ε,                      // in
                      bool always_overwrite_results, // in
-                     vec &x,                        // inout
-                     vec &y,                        // inout
-                     vec &err_z);                   // out
+                     rvec x,                        // inout
+                     rvec y,                        // inout
+                     rvec err_z);                   // out
 
     PANOCSolver &
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
@@ -129,7 +125,7 @@ class PANOCSolver {
     std::function<void(const ProgressInfo &)> progress_cb;
 
   public:
-    DirectionProvider direction_provider;
+    PANOCDirection<DirectionProvider> direction_provider;
 };
 
 template <class InnerSolver>

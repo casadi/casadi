@@ -47,10 +47,10 @@ int main(int argc, char *argv[]) {
     pa::PANOCParams panocparam;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
-    panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 500;
 
     pa::LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 10;
 
     pa::ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 

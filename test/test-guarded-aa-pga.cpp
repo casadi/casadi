@@ -37,7 +37,7 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
     B(2, 0)   = Ts;
     B(3, 1)   = Ts;
 
-    auto f = [&](const vec &x, const vec &u) { return A * x + B * u; };
+    auto f = [&](crvec x, crvec u) { return A * x + B * u; };
 
     using Diag = Eigen::DiagonalMatrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
@@ -49,19 +49,19 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
     auto x0 = vec(nx);
     x0.fill(10);
 
-    auto obj_f  = [&](const vec &ux) { return s(ux)(0); };
-    auto grad_f = [&](const vec &ux, vec &grad_f) {
+    auto obj_f  = [&](crvec ux) { return s(ux)(0); };
+    auto grad_f = [&](crvec ux, rvec grad_f) {
         (void)ux;
         grad_f.fill(0);
         s(grad_f)(0) = 1;
     };
-    auto g = [&](const vec &ux, vec &g_u) {
+    auto g = [&](crvec ux, rvec g_u) {
         g_u(0) = y(ux)(0) - y(ux)(1) - s(ux)(0);
         g_u(1) = f(x0, u(ux)).dot(Q * f(x0, u(ux))) - s(ux)(1);
         g_u(2) = x0.dot(Q * x0) + u(ux).dot(R * u(ux)) -
                  (y(ux)(0) - y(ux)(1) - y(ux)(2) - s(ux)(1));
     };
-    auto grad_g = [&](const vec &ux, const vec &v, vec &grad_u_v) {
+    auto grad_g = [&](crvec ux, crvec v, rvec grad_u_v) {
         pa::mat grad      = pa::mat::Zero(n, m);
         s(grad.col(0))(0) = -1;
         y(grad.col(0))(0) = 1;

@@ -25,15 +25,15 @@ TEST(ALM, singleshooting1D) {
     auto x0 = vec(1);
     x0 << 1;
 
-    auto f = [&](const vec &u) {
+    auto f = [&](crvec u) {
         auto x1 = A * x0 + B * u;
         return x1.dot(Q * x1) + u.dot(R * u);
     };
-    auto grad_f = [&](const vec &u, vec &grad_f) {
+    auto grad_f = [&](crvec u, rvec grad_f) {
         grad_f = 2 * B * Q * (A * x0 + B * u) + 2 * R * u;
     };
-    auto g      = [&](const vec &u, vec &g_u) { (void)u, void(g_u); };
-    auto grad_g = [&](const vec &u, const vec &v, vec &grad_u_v) {
+    auto g      = [&](crvec u, rvec g_u) { (void)u, void(g_u); };
+    auto grad_g = [&](crvec u, crvec v, rvec grad_u_v) {
         (void)u, (void)v, grad_u_v(0) = 0;
     };
 
@@ -54,10 +54,10 @@ TEST(ALM, singleshooting1D) {
     PANOCParams panocparam;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
-    panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 100;
 
     LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 10;
 
     ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 
@@ -94,23 +94,23 @@ TEST(ALM, multipleshooting1D) {
     auto x0 = vec(1);
     x0 << 1;
 
-    auto f = [&](const vec &ux) {
+    auto f = [&](crvec ux) {
         auto u = ux.topRows(1);
         auto x = ux.bottomRows(1);
         return x.dot(Q * x) + u.dot(R * u);
     };
-    auto grad_f = [&](const vec &ux, vec &grad_f) {
+    auto grad_f = [&](crvec ux, rvec grad_f) {
         auto u               = ux.topRows(1);
         auto x               = ux.bottomRows(1);
         grad_f.topRows(1)    = 2 * R * u;
         grad_f.bottomRows(1) = 2 * Q * x;
     };
-    auto g = [&](const vec &ux, vec &g_u) {
+    auto g = [&](crvec ux, rvec g_u) {
         auto u         = ux.topRows(1);
         auto x         = ux.bottomRows(1);
         g_u.topRows(1) = A * x0 + B * u - x;
     };
-    auto grad_g = [&](const vec &ux, const vec &v, vec &grad_u_v) {
+    auto grad_g = [&](crvec ux, crvec v, rvec grad_u_v) {
         (void)ux;
         grad_u_v.topRows(1)    = B * v;
         grad_u_v.bottomRows(1) = -pa::mat::Identity(1, 1) * v;
@@ -133,10 +133,10 @@ TEST(ALM, multipleshooting1D) {
     PANOCParams panocparam;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
-    panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 100;
 
     LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 10;
 
     ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 
@@ -189,23 +189,23 @@ TEST(ALM, multipleshooting8D) {
     auto x0 = vec(nx);
     x0.fill(1);
 
-    auto f = [&](const vec &ux) {
+    auto f = [&](crvec ux) {
         auto u = ux.topRows(nu);
         auto x = ux.bottomRows(nx);
         return x.dot(Q * x) + u.dot(R * u);
     };
-    auto grad_f = [&](const vec &ux, vec &grad_f) {
+    auto grad_f = [&](crvec ux, rvec grad_f) {
         auto u                = ux.topRows(nu);
         auto x                = ux.bottomRows(nx);
         grad_f.topRows(nu)    = 2 * (R * u);
         grad_f.bottomRows(nx) = 2 * (Q * x);
     };
-    auto g = [&](const vec &ux, vec &g_u) {
+    auto g = [&](crvec ux, rvec g_u) {
         auto u         = ux.topRows(nu);
         auto x         = ux.bottomRows(nx);
         g_u.topRows(m) = A * x0 + B * u - x;
     };
-    auto grad_g = [&](const vec &ux, const vec &v, vec &grad_u_v) {
+    auto grad_g = [&](crvec ux, crvec v, rvec grad_u_v) {
         (void)ux;
         grad_u_v.topRows(nu)    = v.transpose() * B;
         grad_u_v.bottomRows(nx) = -pa::mat::Identity(nx, nx) * v;
@@ -228,10 +228,10 @@ TEST(ALM, multipleshooting8D) {
     PANOCParams panocparam;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
-    panocparam.lbfgs_mem   = 10;
     panocparam.max_iter    = 200;
 
     LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 10;
 
     ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 

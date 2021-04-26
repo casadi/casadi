@@ -76,6 +76,20 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::SolverStatus s) {
     return out << enum_name(s);
 }
 
+inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::LBFGSParams &p) {
+    out << YAML::BeginMap;
+    out << YAML::Key << "memory" << YAML::Value << p.memory;
+    out << YAML::BeginMap;
+    out << YAML::Key << "cbfgs" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "α" << YAML::Value << p.cbfgs.α;
+    out << YAML::Key << "ϵ" << YAML::Value << p.cbfgs.ϵ;
+    out << YAML::EndMap;
+    out << YAML::Key << "rescale_when_γ_changes" << YAML::Value
+        << p.rescale_when_γ_changes;
+    out << YAML::EndMap;
+    return out;
+}
+
 inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PANOCParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
@@ -83,7 +97,6 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PANOCParams &p) {
     out << YAML::Key << "δ" << YAML::Value << p.Lipschitz.δ;
     out << YAML::Key << "Lγ_factor" << YAML::Value << p.Lipschitz.Lγ_factor;
     out << YAML::EndMap;
-    out << YAML::Key << "lbfgs_mem" << YAML::Value << p.lbfgs_mem;
     out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
     out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
     out << YAML::Key << "τ_min" << YAML::Value << p.τ_min;

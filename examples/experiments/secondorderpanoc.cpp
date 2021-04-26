@@ -30,7 +30,9 @@ int main() {
     p.grad_g_prod = load_CasADi_gradient_constraints_prod(so_name);
     p.hess_L      = load_CasADi_hessian_lagrangian(so_name);
 
-    LBFGS lbfgs({}, p.n, 5);
+    LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 5;
+    LBFGS lbfgs(lbfgsparam, p.n);
 
     mat H(p.n, p.n);
     vec x(p.n), y(p.m), g(p.m), Σ(p.m), ŷ(p.m), grad_f(p.n), grad_g(p.n);

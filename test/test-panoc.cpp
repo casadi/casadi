@@ -8,10 +8,13 @@
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 
+using pa::crvec;
 using pa::inf;
 using pa::mat;
 using pa::Problem;
 using pa::real_t;
+using pa::rmat;
+using pa::rvec;
 using pa::vec;
 
 Problem build_test_problem() {
@@ -22,18 +25,18 @@ Problem build_test_problem() {
     p.C.lowerbound = vec::Constant(2, -inf);
     p.D.upperbound = vec::Constant(2, 350);
     p.D.lowerbound = vec::Constant(2, -1);
-    p.f = [](const vec &x) { // f(x) = 1/6 x₁⁴ + 2x₂ + x₂² + 1
+    p.f            = [](crvec x) { // f(x) = 1/6 x₁⁴ + 2x₂ + x₂² + 1
         return 1. / 6 * std::pow(x(0), 4) + 2 * x(1) + std::pow(x(1), 2) + 1;
     };
-    p.grad_f = [](const vec &x, vec &grad) {
+    p.grad_f = [](crvec x, rvec grad) {
         grad(0) = 2. / 3 * std::pow(x(0), 3);
         grad(1) = 2 * x(1) + 2;
     };
-    p.g = [](const vec &x, vec &g) {
+    p.g = [](crvec x, rvec g) {
         g(0) = 2 * x(0) + 2 * x(1);
         g(1) = 3 * std::pow(x(0), 3);
     };
-    p.grad_g_prod = [](const vec &x, const vec &y, vec &grad) {
+    p.grad_g_prod = [](crvec x, crvec y, rvec grad) {
         pa::mat jacᵀ = pa::mat::Zero(2, 2);
         jacᵀ << 2, 9 * std::pow(x(0), 2), 2, 0;
         grad = jacᵀ * y;
@@ -46,17 +49,17 @@ TEST(PANOC, calc_ψ_grad_ψ) {
     auto p = build_test_problem();
 
     auto f = p.f;
-    auto g = [&p](const vec &x) {
+    auto g = [&p](crvec x) {
         vec g(p.m);
         p.g(x, g);
         return g;
     };
-    auto grad_f = [&p](const vec &x) {
+    auto grad_f = [&p](crvec x) {
         vec grad(p.n);
         p.grad_f(x, grad);
         return grad;
     };
-    auto grad_g_y = [&](const vec &x, const vec &y) {
+    auto grad_g_y = [&](crvec x, crvec y) {
         vec grad(p.n);
         p.grad_g_prod(x, y, grad);
         return grad;
@@ -73,7 +76,7 @@ TEST(PANOC, calc_ψ_grad_ψ) {
     y << 0.3, 0.7;
     vec Σ⁻¹y = Σ.asDiagonal().inverse() * y;
 
-    auto ψ_fun = [&p, &f, &g, &Σ, &Σ⁻¹y](const vec &x) -> real_t {
+    auto ψ_fun = [&p, &f, &g, &Σ, &Σ⁻¹y](crvec x) -> real_t {
         return f(x) + 0.5 * pa::dist_squared(g(x) + Σ⁻¹y, p.D, Σ);
     };
 
@@ -148,21 +151,21 @@ Problem build_test_problem2() {
     p.D.upperbound << -1, 0;
     p.D.lowerbound.resize(2);
     p.D.lowerbound << -inf, -inf;
-    p.f = [](const vec &x) { // f(x) = 1/48 x₁⁴ - 2x₁x₂ + 1/24 x₁²x₂⁴ + 10
+    p.f = [](crvec x) { // f(x) = 1/48 x₁⁴ - 2x₁x₂ + 1/24 x₁²x₂⁴ + 10
         return 1. / 48 * std::pow(x(0), 4) - 2 * x(0) * x(1) +
                1. / 24 * std::pow(x(0), 2) * std::pow(x(1), 4) + 10;
     };
-    p.grad_f = [](const vec &x, vec &grad) {
+    p.grad_f = [](crvec x, rvec grad) {
         grad(0) = 1. / 12 * std::pow(x(0), 3) - 2 * x(1) +
                   1. / 12 * x(0) * std::pow(x(1), 4);
         grad(1) = -2 * x(0) + 1. / 6 * std::pow(x(0), 2) * std::pow(x(1), 3);
     };
-    p.g = [](const vec &x, vec &g) {
+    p.g = [](crvec x, rvec g) {
         g(0) = -4 * std::pow(x(0), 2) +
                0.25 * std::pow(x(0), 2) * std::pow(x(1), 2);
         g(1) = 0.125 * std::pow(x(0), 4) - x(0) * x(1);
     };
-    p.grad_g_prod = [](const vec &x, const vec &y, vec &grad) {
+    p.grad_g_prod = [](crvec x, crvec y, rvec grad) {
         pa::mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
@@ -171,7 +174,7 @@ Problem build_test_problem2() {
             -x(0);
         grad = gradmat * y;
     };
-    p.grad_gi = [](const vec &x, unsigned i, vec &grad) {
+    p.grad_gi = [](crvec x, unsigned i, rvec grad) {
         pa::mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
@@ -180,7 +183,7 @@ Problem build_test_problem2() {
             -x(0);
         grad = gradmat.col(i);
     };
-    p.hess_L = [](const vec &x, const vec &y, mat &H) {
+    p.hess_L = [](crvec x, crvec y, rmat H) {
         // Hessian of f
         H(0, 0) = 1. / 4 * std::pow(x(0), 2) + 1. / 12 * std::pow(x(1), 4);
         H(0, 1) = -2 + 1. / 3 * x(0) * std::pow(x(1), 3);
@@ -210,30 +213,30 @@ TEST(PANOC, hessian) {
     auto p = build_test_problem2();
 
     auto f = p.f;
-    auto g = [&p](const vec &x) {
+    auto g = [&p](crvec x) {
         vec g(p.m);
         p.g(x, g);
         return g;
     };
-    auto g1     = [&g](const vec &x) { return g(x)(0); };
-    auto g2     = [&g](const vec &x) { return g(x)(1); };
-    auto grad_f = [&p](const vec &x) {
+    auto g1     = [&g](crvec x) { return g(x)(0); };
+    auto g2     = [&g](crvec x) { return g(x)(1); };
+    auto grad_f = [&p](crvec x) {
         vec grad(p.n);
         p.grad_f(x, grad);
         return grad;
     };
-    auto grad_g_y = [&p](const vec &x, const vec &y) {
+    auto grad_g_y = [&p](crvec x, crvec y) {
         vec grad(p.n);
         p.grad_g_prod(x, y, grad);
         return grad;
     };
-    auto grad_gi = [&p](const vec &x, unsigned i) {
+    auto grad_gi = [&p](crvec x, unsigned i) {
         vec grad(p.n);
         p.grad_gi(x, i, grad);
         return grad;
     };
-    auto grad_g1 = [&grad_gi](const vec &x) { return grad_gi(x, 0); };
-    auto grad_g2 = [&grad_gi](const vec &x) { return grad_gi(x, 1); };
+    auto grad_g1 = [&grad_gi](crvec x) { return grad_gi(x, 0); };
+    auto grad_g2 = [&grad_gi](crvec x) { return grad_gi(x, 1); };
 
     std::scientific(std::cout);
 
@@ -246,7 +249,7 @@ TEST(PANOC, hessian) {
     y << 0.3, 0.7;
     vec Σ⁻¹y = Σ.asDiagonal().inverse() * y;
 
-    auto ψ_fun = [&p, &f, &g, &Σ, &Σ⁻¹y](const vec &x) -> real_t {
+    auto ψ_fun = [&p, &f, &g, &Σ, &Σ⁻¹y](crvec x) -> real_t {
         return f(x) + 0.5 * pa::dist_squared(g(x) + Σ⁻¹y, p.D, Σ);
     };
 
@@ -333,7 +336,7 @@ TEST(PANOC, hessian) {
 
     // Hessian of f
     auto grad_fi = [&](unsigned i) {
-        return [&, i](const vec &x) { return grad_f(x)(i); };
+        return [&, i](crvec x) { return grad_f(x)(i); };
     };
     vec hess_f1_fd = pa_ref::finite_diff(grad_fi(0), x);
     vec hess_f2_fd = pa_ref::finite_diff(grad_fi(1), x);
@@ -348,7 +351,7 @@ TEST(PANOC, hessian) {
 
     // Hessian of Lagrangian
     auto grad_Li = [&](unsigned i) {
-        return [&, i](const vec &x) {
+        return [&, i](crvec x) {
             vec grad_L_res = grad_f(x) + grad_g_y(x, y);
             return grad_L_res(i);
         };
@@ -365,7 +368,7 @@ TEST(PANOC, hessian) {
 
     // Hessian of augmented Lagrangian
     auto grad_ψi = [&](unsigned i) {
-        return [&, i](const vec &x) {
+        return [&, i](crvec x) {
             vec grad_ψ_res(2);
             pa::detail::calc_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
             return grad_ψ_res(i);
@@ -424,7 +427,7 @@ TEST(PANOC, ref) {
     B(2, 0)   = Ts;
     B(3, 1)   = Ts;
 
-    auto f = [=](const vec &x, const vec &u) { return A * x + B * u; };
+    auto f = [=](crvec x, crvec u) { return A * x + B * u; };
 
     using Diag = Eigen::DiagonalMatrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
@@ -437,19 +440,19 @@ TEST(PANOC, ref) {
     x0.fill(10);
 
     real_t scale = 1;
-    auto obj_f   = [=](const vec &ux) { return scale * s(ux)(0); };
-    auto grad_f  = [=](const vec &ux, vec &grad_f) {
+    auto obj_f   = [=](crvec ux) { return scale * s(ux)(0); };
+    auto grad_f  = [=](crvec ux, rvec grad_f) {
         (void)ux;
         grad_f.fill(0);
         s(grad_f)(0) = scale;
     };
-    auto g = [=](const vec &ux, vec &g_u) {
+    auto g = [=](crvec ux, rvec g_u) {
         g_u(0) = y(ux)(0) - y(ux)(1) - s(ux)(0);
         g_u(1) = f(x0, u(ux)).dot(Q * f(x0, u(ux))) - s(ux)(1);
         g_u(2) = x0.dot(Q * x0) + u(ux).dot(R * u(ux)) -
                  (y(ux)(0) - y(ux)(1) - y(ux)(2) - s(ux)(1));
     };
-    auto grad_g_mat = [=](const vec &ux) {
+    auto grad_g_mat = [=](crvec ux) {
         pa::mat grad      = pa::mat::Zero(n, m);
         s(grad.col(0))(0) = -1;
         y(grad.col(0))(0) = 1;
@@ -466,23 +469,23 @@ TEST(PANOC, ref) {
 
         return grad;
     };
-    auto grad_g_prod = [=](const vec &ux, const vec &v, vec &grad_u_v) {
+    auto grad_g_prod = [=](crvec ux, crvec v, rvec grad_u_v) {
         grad_u_v = grad_g_mat(ux) * v;
     };
 
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g_prod, {}, {}, {}};
 
     pa::PANOCParams params;
-    params.lbfgs_mem                      = 20;
     params.max_iter                       = 1000;
     params.τ_min                          = 1. / (1 << 10);
     params.update_lipschitz_in_linesearch = true;
     pa::LBFGSParams lbfgsparams;
+    lbfgsparams.memory = 20;
 
     pa::PANOCParams params_ref = params;
 
     pa::PANOCSolver<> solver{params, lbfgsparams};
-    pa_ref::PANOCSolver solver_ref{params_ref};
+    pa_ref::PANOCSolver solver_ref{params_ref, lbfgsparams};
 
     vec λ     = vec::Ones(m);
     vec λ_ref = vec::Ones(m);

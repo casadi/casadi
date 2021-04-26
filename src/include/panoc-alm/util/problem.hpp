@@ -29,20 +29,20 @@ struct Problem {
     /// Signature of the function that evaluates the cost @f$ f(x) @f$
     /// @param  [in] x
     ///         Decision variable @f$ x \in \mathbb{R}^n @f$
-    using f_sig = real_t(const vec &x);
+    using f_sig = real_t(crvec x);
     /// Signature of the function that evaluates the gradient of the cost
     /// function @f$ \nabla f(x) @f$
     /// @param  [in] x
     ///         Decision variable @f$ x \in \mathbb{R}^n @f$
     /// @param  [out] grad_fx
     ///         Gradient of cost function @f$ \nabla f(x) \in \mathbb{R}^n @f$
-    using grad_f_sig = void(const vec &x, vec &grad_fx);
+    using grad_f_sig = void(crvec x, rvec grad_fx);
     /// Signature of the function that evaluates the constraints @f$ g(x) @f$
     /// @param  [in] x
     ///         Decision variable @f$ x \in \mathbb{R}^n @f$
     /// @param  [out] gx
     ///         Value of the constraints @f$ g(x) \in \mathbb{R}^m @f$
-    using g_sig = void(const vec &x, vec &gx);
+    using g_sig = void(crvec x, rvec gx);
     /// Signature of the function that evaluates the gradient of the constraints
     /// times a vector
     /// @f$ \nabla g(x)\ y @f$
@@ -53,7 +53,7 @@ struct Problem {
     /// @param  [out] grad_gxy
     ///         Gradient of the constraints
     ///         @f$ \nabla g(x)\ y \in \mathbb{R}^n @f$
-    using grad_g_prod_sig = void(const vec &x, const vec &y, vec &grad_gxy);
+    using grad_g_prod_sig = void(crvec x, crvec y, rvec grad_gxy);
     /// Signature of the function that evaluates the gradient of one specific
     /// constraints
     /// @f$ \nabla g_i(x) @f$
@@ -64,7 +64,7 @@ struct Problem {
     /// @param  [out] grad_gi
     ///         Gradient of the constraint
     ///         @f$ \nabla g_i(x) \mathbb{R}^n @f$
-    using grad_gi_sig = void(const vec &x, unsigned i, vec &grad_gi);
+    using grad_gi_sig = void(crvec x, unsigned i, rvec grad_gi);
     /// Signature of the function that evaluates the Hessian of the Lagrangian
     /// multiplied by a vector
     /// @f$ \nabla_{xx}^2L(x, y)\ v @f$
@@ -77,8 +77,7 @@ struct Problem {
     /// @param  [out] Hv
     ///         Hessian-vector product
     ///         @f$ \nabla_{xx}^2 L(x, y)\ v \in \mathbb{R}^{n} @f$
-    using hess_L_prod_sig = void(const vec &x, const vec &y, const vec &v,
-                                 vec &Hv);
+    using hess_L_prod_sig = void(crvec x, crvec y, crvec v, rvec Hv);
     /// Signature of the function that evaluates the Hessian of the Lagrangian
     /// @f$ \nabla_{xx}^2L(x, y) @f$
     /// @param  [in] x
@@ -87,7 +86,7 @@ struct Problem {
     ///         Lagrange multipliers @f$ y \in \mathbb{R}^m @f$
     /// @param  [out] H
     ///         Hessian @f$ \nabla_{xx}^2 L(x, y) \in \mathbb{R}^{n\times n} @f$
-    using hess_L_sig = void(const vec &x, const vec &y, mat &H);
+    using hess_L_sig = void(crvec x, crvec y, rmat H);
 
     /// Cost function @f$ f(x) @f$
     std::function<f_sig> f;
@@ -104,6 +103,21 @@ struct Problem {
     std::function<hess_L_prod_sig> hess_L_prod;
     /// Hessian of the Lagrangian function @f$ \nabla_{xx}^2 L(x, y) @f$
     std::function<hess_L_sig> hess_L;
+
+    Problem() = default;
+    Problem(unsigned int n, unsigned int m)
+        : n(n), m(m), C{vec::Constant(n, +inf), vec::Constant(n, -inf)},
+          D{vec::Constant(m, +inf), vec::Constant(m, -inf)} {}
+    Problem(unsigned n, unsigned int m, Box C, Box D, std::function<f_sig> f,
+            std::function<grad_f_sig> grad_f, std::function<g_sig> g,
+            std::function<grad_g_prod_sig> grad_g_prod,
+            std::function<grad_gi_sig> grad_gi,
+            std::function<hess_L_prod_sig> hess_L_prod,
+            std::function<hess_L_sig> hess_L)
+        : n(n), m(m), C(std::move(C)), D(std::move(D)), f(std::move(f)),
+          grad_f(std::move(grad_f)), g(std::move(g)),
+          grad_g_prod(std::move(grad_g_prod)), grad_gi(std::move(grad_gi)),
+          hess_L_prod(std::move(hess_L_prod)), hess_L(std::move(hess_L)) {}
 };
 
 struct EvalCounter {

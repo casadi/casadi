@@ -134,7 +134,7 @@ auto get_inner_solver() {
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.lbfgs_mem                      = 20;
-    panocparams.lbfgs_stepsize                 = panocparams.BasedOnCurvature;
+    panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
     pa::LBFGSParams lbfgsparams;
 
     return Solver::InnerSolver(panocparams, lbfgsparams);
@@ -156,6 +156,10 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
         << p.update_lipschitz_in_linesearch;
     out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
         << p.alternative_linesearch_cond;
+    out << YAML::Key << "hessian_vec_finited_differences" << YAML::Value
+        << p.hessian_vec_finited_differences;
+    out << YAML::Key << "full_augmented_hessian" << YAML::Value
+        << p.full_augmented_hessian;
     out << YAML::EndMap;
     return out;
 }
@@ -285,6 +289,8 @@ int main(int argc, char *argv[]) {
         out << YAML::Key << "outer" << YAML::Value << solver.get_params();
         out << YAML::Key << "inner" << YAML::Value
             << solver.inner_solver.get_params();
+        out << YAML::Key << "directions" << YAML::Value
+            << solver.inner_solver.lbfgs.get_params();
         out << YAML::EndMap;
         return 0;
     }

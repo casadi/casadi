@@ -59,12 +59,12 @@ class GuardedAAPGA {
     };
 
     Stats operator()(const Problem &problem,        // in
-                     const vec &Σ,                  // in
+                     crvec Σ,                       // in
                      real_t ε,                      // in
                      bool always_overwrite_results, // in
-                     vec &x,                        // inout
-                     vec &λ,                        // inout
-                     vec &err_z);                   // out
+                     rvec x,                        // inout
+                     rvec λ,                        // inout
+                     rvec err_z);                   // out
 
     std::string get_name() const { return "GuardedAAPGA"; }
 
@@ -82,12 +82,12 @@ using std::chrono::microseconds;
 
 inline GuardedAAPGA::Stats
 GuardedAAPGA::operator()(const Problem &problem,        // in
-                         const vec &Σ,                  // in
+                         crvec Σ,                       // in
                          real_t ε,                      // in
                          bool always_overwrite_results, // in
-                         vec &x,                        // inout
-                         vec &y,                        // inout
-                         vec &err_z                     // out
+                         rvec x,                        // inout
+                         rvec y,                        // inout
+                         rvec err_z                     // out
 ) {
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
@@ -118,30 +118,29 @@ GuardedAAPGA::operator()(const Problem &problem,        // in
 
     // Wrappers for helper functions that automatically pass along any arguments
     // that are constant within AAPGA (for readability in the main algorithm)
-    auto calc_ψ_ŷ = [&problem, &y, &Σ](const vec &x, vec &ŷ) {
+    auto calc_ψ_ŷ = [&problem, &y, &Σ](crvec x, rvec ŷ) {
         return detail::calc_ψ_ŷ(problem, x, y, Σ, ŷ);
     };
-    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](const vec &x,
-                                                              vec &grad_ψ) {
+    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
+                                                              rvec grad_ψ) {
         return detail::calc_ψ_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
     };
-    auto calc_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](const vec &x,
-                                                            vec &grad_ψ) {
+    auto calc_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
+                                                            rvec grad_ψ) {
         detail::calc_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
     };
-    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](const vec &x, const vec &ŷ,
-                                                  vec &grad_ψ) {
+    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](crvec x, crvec ŷ,
+                                                  rvec grad_ψ) {
         detail::calc_grad_ψ_from_ŷ(problem, x, ŷ, grad_ψ, work_n);
     };
-    auto calc_x̂ = [&problem](real_t γ, const vec &x, const vec &grad_ψ, vec &x̂,
-                             vec &p) {
+    auto calc_x̂ = [&problem](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
         detail::calc_x̂(problem, γ, x, grad_ψ, x̂, p);
     };
-    auto calc_err_z = [&problem, &y, &Σ](const vec &x̂, vec &err_z) {
+    auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
         detail::calc_err_z(problem, x̂, y, Σ, err_z);
     };
-    auto print_progress = [&](unsigned k, real_t ψₖ, const vec &grad_ψₖ,
-                              const vec &pₖ, real_t γₖ, real_t εₖ) {
+    auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ, crvec pₖ,
+                              real_t γₖ, real_t εₖ) {
         std::cout << "[AAPGA] " << std::setw(6) << k
                   << ": ψ = " << std::setw(13) << ψₖ
                   << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()

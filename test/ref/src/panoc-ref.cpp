@@ -119,9 +119,6 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
     const auto n = problem.n;
 
-    LBFGS lbfgs{{}}; // TODO: make members like standard PANOC
-    lbfgs.resize(n, params.lbfgs_mem);
-
     vec xₖ = x; // Value of x at the beginning of the iteration
 
     real_t Lₖ = estimate_lipschitz(problem, xₖ, y, Σ, params);
@@ -147,7 +144,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
         // Flush L-BFGS if γ changed
         if (k > 0 && γₖ != old_γₖ)
-            pa::PANOCDirection<pa::LBFGS>::changed_γ(lbfgs, γₖ, old_γₖ);
+            lbfgs.changed_γ(γₖ, old_γₖ);
 
         // Check stop condition
         real_t εₖ = calc_error_stop_crit(problem, xₖ, x̂ₖ, y, Σ, γₖ);
@@ -177,15 +174,14 @@ PANOCSolver::Stats PANOCSolver::operator()(
 
         // Calculate quasi-Newton step -----------------------------------------
         vec pₖ = projected_gradient_step(problem, xₖ, y, Σ, γₖ);
-        vec qₖ = pₖ;
+        vec qₖ(n);
         real_t step_size =
-            params.lbfgs_stepsize == Params::BasedOnGradientStepSize ? 1 : -1;
+            params.lbfgs_stepsize == pa::LBFGSStepSize::BasedOnGradientStepSize ? 1 : -1;
         if (k > 0)
-            lbfgs.apply(qₖ, step_size);
+            lbfgs.apply(xₖ, x̂ₖ, pₖ, step_size, qₖ);
         else
             // Initialize the L-BFGS
-            pa::PANOCDirection<pa::LBFGS>::initialize(
-                lbfgs, xₖ, x̂ₖ, pₖ, eval_grad_ψ(problem, xₖ, y, Σ));
+            lbfgs.initialize(xₖ, x̂ₖ, pₖ, eval_grad_ψ(problem, xₖ, y, Σ));
 
         // Line search
         real_t τ = 1;
@@ -227,8 +223,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
                 }
                 // Flush L-BFGS if γ changed
                 if (γₖ₊₁ != old_γₖ₊₁)
-                    pa::PANOCDirection<pa::LBFGS>::changed_γ(lbfgs, γₖ₊₁,
-                                                             old_γₖ₊₁);
+                    lbfgs.changed_γ(γₖ₊₁, old_γₖ₊₁);
             }
 
             // Update τ
@@ -244,9 +239,9 @@ PANOCSolver::Stats PANOCSolver::operator()(
         }
 
         // Update L-BFGS -------------------------------------------------------
-        s.lbfgs_rejected += not pa::PANOCDirection<pa::LBFGS>::update(
-            lbfgs, xₖ, xₖ₊₁, pₖ, pₖ₊₁, eval_grad_ψ(problem, xₖ₊₁, y, Σ),
-            problem.C, γₖ₊₁);
+        s.lbfgs_rejected +=
+            not lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁,
+                             eval_grad_ψ(problem, xₖ₊₁, y, Σ), problem.C, γₖ₊₁);
 
         // Advance step
         xₖ = std::move(xₖ₊₁);

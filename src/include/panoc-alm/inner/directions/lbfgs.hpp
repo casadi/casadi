@@ -100,7 +100,7 @@ bool LBFGS::apply(Vec &&q, real_t γ, const IndexVec &J) {
     if (idx == 0 && not full)
         return false;
     using Index = typename std::remove_reference_t<Vec>::Index;
-    bool fullJ = q.size() == Index(J.size());
+    bool fullJ  = q.size() == Index(J.size());
 
     // Eigen 3.3.9 doesn't yet support indexing using a vector of indices
     // so we'll have to do it manually
@@ -184,8 +184,8 @@ inline void LBFGS::reset() {
     full = false;
 }
 
-inline void LBFGS::resize(size_t n, size_t history) {
-    sto.resize(n + 1, history * 2);
+inline void LBFGS::resize(size_t n) {
+    sto.resize(n + 1, params.memory * 2);
     reset();
 }
 
@@ -203,47 +203,43 @@ inline void LBFGS::scale_y(real_t factor) {
     }
 }
 
-} // namespace pa
+inline void PANOCDirection<LBFGS>::initialize(const vec &x₀, const vec &x̂₀,
+                                              const vec &p₀, const vec &grad₀) {
+    lbfgs.resize(x₀.size());
+    (void)x̂₀;
+    (void)p₀;
+    (void)grad₀;
+}
 
-#include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
+inline bool PANOCDirection<LBFGS>::update(const vec &xₖ, const vec &xₖ₊₁,
+                                          const vec &pₖ, const vec &pₖ₊₁,
+                                          const vec &grad_new, const Box &C,
+                                          real_t γ_new) {
+    (void)grad_new;
+    (void)C;
+    (void)γ_new;
+    return lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, LBFGS::Sign::Negative);
+}
 
-namespace pa {
+inline bool PANOCDirection<LBFGS>::apply(const vec &xₖ, const vec &x̂ₖ,
+                                         const vec &pₖ, real_t γ, vec &qₖ) {
+    (void)xₖ;
+    (void)x̂ₖ;
+    qₖ = pₖ;
+    return lbfgs.apply(qₖ, γ);
+}
 
-template <>
-struct PANOCDirection<LBFGS> {
+inline void PANOCDirection<LBFGS>::changed_γ(real_t γₖ, real_t old_γₖ) {
+    if (lbfgs.get_params().rescale_when_γ_changes)
+        lbfgs.scale_y(γₖ / old_γₖ);
+    else
+        lbfgs.reset();
+}
 
-    static void initialize(LBFGS &lbfgs, const vec &x₀, const vec &x̂₀,
-                           const vec &p₀, const vec &grad₀) {
-        (void)lbfgs;
-        (void)x₀;
-        (void)x̂₀;
-        (void)p₀;
-        (void)grad₀;
-    }
+inline void PANOCDirection<LBFGS>::reset() { lbfgs.reset(); }
 
-    static bool update(LBFGS &lbfgs, const vec &xₖ, const vec &xₖ₊₁,
-                       const vec &pₖ, const vec &pₖ₊₁, const vec &grad_new,
-                       const Box &C, real_t γ_new) {
-        (void)grad_new;
-        (void)C;
-        (void)γ_new;
-        return lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, LBFGS::Sign::Negative);
-    }
-
-    static bool apply(LBFGS &lbfgs, const vec &xₖ, const vec &x̂ₖ, const vec &pₖ,
-                      real_t γ, vec &qₖ) {
-        (void)xₖ;
-        (void)x̂ₖ;
-        qₖ = pₖ;
-        return lbfgs.apply(qₖ, γ);
-    }
-
-    static void changed_γ(LBFGS &lbfgs, real_t γₖ, real_t old_γₖ) {
-        if (lbfgs.get_params().rescale_when_γ_changes)
-            lbfgs.scale_y(γₖ / old_γₖ);
-        else
-            lbfgs.reset();
-    }
-};
+inline std::string PANOCDirection<LBFGS>::get_name() const {
+    return lbfgs.get_name();
+}
 
 } // namespace pa

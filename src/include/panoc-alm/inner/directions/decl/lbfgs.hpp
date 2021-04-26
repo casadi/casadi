@@ -4,11 +4,14 @@
 #include <panoc-alm/util/vec.hpp>
 
 #include <panoc-alm/inner/directions/decl/lbfgs-fwd.hpp>
+#include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
 
 namespace pa {
 
 /// Parameters for the @ref LBFGS and @ref SpecializedLBFGS classes.
 struct LBFGSParams {
+    /// Length of the history to keep.
+    unsigned memory = 10;
     struct {
         real_t α = 1;
         real_t ϵ = 1e-10;
@@ -35,9 +38,7 @@ class LBFGS {
     };
 
     LBFGS(Params params) : params(params) {}
-    LBFGS(Params params, size_t n, size_t history) : params(params) {
-        resize(n, history);
-    }
+    LBFGS(Params params, size_t n) : params(params) { resize(n); }
 
     /// Check if the new vectors s and y allow for a valid BFGS update that
     /// preserves the positive definiteness of the Hessian approximation.
@@ -62,7 +63,7 @@ class LBFGS {
     void reset();
     /// Re-allocate storage for a problem with a different size. Causes
     /// a @ref reset.
-    void resize(size_t n, size_t history);
+    void resize(size_t n);
 
     /// Scale the stored y vectors by the given factor.
     void scale_y(real_t factor);
@@ -94,6 +95,23 @@ class LBFGS {
     size_t idx = 0;
     bool full  = false;
     Params params;
+};
+
+template <>
+struct PANOCDirection<LBFGS> {
+    LBFGS lbfgs;
+    PANOCDirection(const LBFGSParams &params) : lbfgs(params) {}
+    PANOCDirection(const LBFGS &lbfgs) : lbfgs(lbfgs) {}
+    PANOCDirection(LBFGS &&lbfgs) : lbfgs(std::move(lbfgs)) {}
+
+    void initialize(const vec &x₀, const vec &x̂₀, const vec &p₀,
+                    const vec &grad₀);
+    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
+                const vec &grad_new, const Box &C, real_t γ_new);
+    bool apply(const vec &xₖ, const vec &x̂ₖ, const vec &pₖ, real_t γ, vec &qₖ);
+    void changed_γ(real_t γₖ, real_t old_γₖ);
+    void reset();
+    std::string get_name() const;
 };
 
 } // namespace pa

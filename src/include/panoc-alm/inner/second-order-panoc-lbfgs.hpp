@@ -20,17 +20,17 @@ SecondOrderPANOCLBFGSSolver::operator()(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Constraint weights @f$ \Sigma @f$
-    const vec &Σ,
+    crvec Σ,
     /// [in]    Tolerance @f$ \varepsilon @f$
     real_t ε,
     /// [in]    Overwrite @p x, @p y and @p err_z even if not converged
     bool always_overwrite_results,
     /// [inout] Decision variable @f$ x @f$
-    vec &x,
+    rvec x,
     /// [inout] Lagrange multipliers @f$ y @f$
-    vec &y,
+    rvec y,
     /// [out]   Slack variable error @f$ g(x) - z @f$
-    vec &err_z) {
+    rvec err_z) {
 
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
@@ -58,8 +58,6 @@ SecondOrderPANOCLBFGSSolver::operator()(
 
     vec work_n(n), work_m(m);
 
-    lbfgs.resize(n, params.lbfgs_mem);
-
     vec work_n2(n);
     vec HqK(n);
 
@@ -74,34 +72,32 @@ SecondOrderPANOCLBFGSSolver::operator()(
 
     // Wrappers for helper functions that automatically pass along any arguments
     // that are constant within PANOC (for readability in the main algorithm)
-    auto calc_ψ_ŷ = [&problem, &y, &Σ](const vec &x, vec &ŷ) {
+    auto calc_ψ_ŷ = [&problem, &y, &Σ](crvec x, rvec ŷ) {
         return detail::calc_ψ_ŷ(problem, x, y, Σ, ŷ);
     };
-    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](const vec &x,
-                                                              vec &grad_ψ) {
+    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
+                                                              rvec grad_ψ) {
         return detail::calc_ψ_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
     };
-    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](const vec &x, const vec &ŷ,
-                                                  vec &grad_ψ) {
+    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](crvec x, crvec ŷ,
+                                                  rvec grad_ψ) {
         detail::calc_grad_ψ_from_ŷ(problem, x, ŷ, grad_ψ, work_n);
     };
-    auto calc_x̂ = [&problem](real_t γ, const vec &x, const vec &grad_ψ, vec &x̂,
-                             vec &p) {
+    auto calc_x̂ = [&problem](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
         detail::calc_x̂(problem, γ, x, grad_ψ, x̂, p);
     };
-    auto calc_err_z = [&problem, &y, &Σ](const vec &x̂, vec &err_z) {
+    auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
         detail::calc_err_z(problem, x̂, y, Σ, err_z);
     };
     auto descent_lemma = [this, &problem, &y,
-                          &Σ](const vec &xₖ, real_t ψₖ, const vec &grad_ψₖ,
-                              vec &x̂ₖ, vec &pₖ, vec &ŷx̂ₖ, real_t &ψx̂ₖ,
-                              real_t &pₖᵀpₖ, real_t &grad_ψₖᵀpₖ, real_t &Lₖ,
-                              real_t &γₖ) {
+                          &Σ](crvec xₖ, real_t ψₖ, crvec grad_ψₖ, rvec x̂ₖ,
+                              rvec pₖ, rvec ŷx̂ₖ, real_t &ψx̂ₖ, real_t &pₖᵀpₖ,
+                              real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
         return detail::descent_lemma(
             problem, params.quadratic_upperbound_tolerance_factor, xₖ, ψₖ,
             grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
-    auto print_progress = [&](unsigned k, real_t ψₖ, const vec &grad_ψₖ,
+    auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
                               real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
         std::cout << "[PANOC] " << std::setw(6) << k
                   << ": ψ = " << std::setw(13) << ψₖ
@@ -214,15 +210,39 @@ SecondOrderPANOCLBFGSSolver::operator()(
                 if (J.size() == n) { // There are no active indices K
                     qₖ = -grad_ψₖ;
                 } else { //             There are active indices K
-                    problem.hess_L_prod(xₖ, y, qₖ, HqK);
+                    if (params.hessian_vec_finited_differences) {
+                        detail::calc_augmented_lagrangian_hessian_prod_fd(
+                            problem, xₖ, y, Σ, grad_ψₖ, qₖ, HqK, work_n,
+                            work_n2, work_m);
+                    } else {
+                        problem.hess_L_prod(xₖ, y, qₖ, HqK);
+                        if (params.full_augmented_hessian) {
+                            auto &g = work_m;
+                            problem.g(xₖ, g);
+                            for (vec::Index i = 0; i < m; ++i) {
+                                real_t ζ      = g(i) + y(i) / Σ(i);
+                                bool inactive = problem.D.lowerbound(i) < ζ &&
+                                                ζ < problem.D.upperbound(i);
+                                if (not inactive) {
+                                    problem.grad_gi(xₖ, i, work_n);
+                                    auto t = Σ(i) * work_n.dot(qₖ);
+                                    // TODO: the dot product is more work than
+                                    //       strictly necessary (only over K)
+                                    for (auto j : J)
+                                        HqK(j) += work_n(j) * t;
+                                }
+                            }
+                        }
+                    }
+
                     for (auto j : J) // Compute right-hand side of 6.1c
                         qₖ(j) = -grad_ψₖ(j) - HqK(j);
                 }
 
-                real_t stepsize =
-                    params.lbfgs_stepsize == params.BasedOnGradientStepSize
-                        ? γₖ
-                        : -1;
+                real_t stepsize = params.lbfgs_stepsize ==
+                                          LBFGSStepSize::BasedOnGradientStepSize
+                                      ? γₖ
+                                      : -1;
                 // If all indices are inactive, we can use standard L-BFGS,
                 // if there are active indices, we need the specialized version
                 // that only applies L-BFGS to the inactive indices

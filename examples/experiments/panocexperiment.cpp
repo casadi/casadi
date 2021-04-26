@@ -80,9 +80,9 @@ int main(int argc, char *argv[]) {
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.alternative_linesearch_cond    = false;
-    panocparams.lbfgs_mem                      = 20;
     // panocparams.print_interval = 500;
     pa::LBFGSParams lbfgsparams;
+    lbfgsparams.memory = 20;
 
     Solver solver{panocparams, lbfgsparams};
     solver.set_progress_callback(logger);

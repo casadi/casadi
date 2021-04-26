@@ -27,7 +27,6 @@ TEST(ALM, riskaverse) {
     almparam.preconditioning = false;
 
     PANOCParams panocparam;
-    panocparam.lbfgs_mem                      = 20;
     panocparam.max_iter                       = 1000;
     panocparam.update_lipschitz_in_linesearch = true;
 
@@ -35,6 +34,7 @@ TEST(ALM, riskaverse) {
     almparam.print_interval   = 1;
 
     LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 20;
 
     ALMSolver<> solver{almparam, {panocparam, lbfgsparam}};
 

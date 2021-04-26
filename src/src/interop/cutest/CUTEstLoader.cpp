@@ -102,7 +102,7 @@ class CUTEstLoader {
         return (F *)funp;
     }
 
-    doublereal eval_objective_constrained(const pa::vec &x) const {
+    doublereal eval_objective_constrained(pa::crvec x) const {
         assert(x.size() == nvar);
         assert(ncon > 0);
         integer status;
@@ -113,7 +113,7 @@ class CUTEstLoader {
         return f;
     }
 
-    doublereal eval_objective_unconstrained(const pa::vec &x) const {
+    doublereal eval_objective_unconstrained(pa::crvec x) const {
         assert(x.size() == nvar);
         assert(ncon == 0);
         integer status;
@@ -123,8 +123,7 @@ class CUTEstLoader {
         return f;
     }
 
-    void eval_objective_grad_constrained(const pa::vec &x,
-                                         pa::vec &grad_f) const {
+    void eval_objective_grad_constrained(pa::crvec x, pa::rvec grad_f) const {
         assert(x.size() == nvar);
         assert(grad_f.size() == nvar);
         assert(ncon > 0);
@@ -135,8 +134,7 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cfn", status);
     }
 
-    void eval_objective_grad_unconstrained(const pa::vec &x,
-                                           pa::vec &grad_f) const {
+    void eval_objective_grad_unconstrained(pa::crvec x, pa::rvec grad_f) const {
         assert(x.size() == nvar);
         assert(grad_f.size() == nvar);
         assert(ncon == 0);
@@ -146,7 +144,7 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_ugr", status);
     }
 
-    void eval_constraints(const pa::vec &x, pa::vec &g) const {
+    void eval_constraints(pa::crvec x, pa::rvec g) const {
         assert(x.size() == nvar);
         assert(g.size() == ncon);
         if (ncon == 0)
@@ -157,8 +155,8 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cfn", status);
     }
 
-    void eval_constraints_grad_prod(const pa::vec &x, const pa::vec &v,
-                                    pa::vec &grad_g_v) const {
+    void eval_constraints_grad_prod(pa::crvec x, pa::crvec v,
+                                    pa::rvec grad_g_v) const {
         assert(x.size() == nvar);
         assert(v.size() == ncon);
         assert(grad_g_v.size() == nvar);
@@ -175,8 +173,8 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cjprod", status);
     }
 
-    void eval_constraint_i_grad(const pa::vec &x, unsigned i,
-                                pa::vec &grad_gi) const {
+    void eval_constraint_i_grad(pa::crvec x, unsigned i,
+                                pa::rvec grad_gi) const {
         assert(x.size() == nvar);
         assert(grad_gi.size() == nvar);
         if (ncon == 0) {
@@ -194,8 +192,8 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_ccifg", status);
     }
 
-    void eval_lagr_hess_prod(const pa::vec &x, const pa::vec &y,
-                             const pa::vec &v, pa::vec &Hv) const {
+    void eval_lagr_hess_prod(pa::crvec x, pa::crvec y, pa::crvec v,
+                             pa::rvec Hv) const {
         assert(x.size() == nvar);
         assert(y.size() == ncon);
         assert(v.rows() == nvar);
@@ -215,7 +213,7 @@ class CUTEstLoader {
         }
     }
 
-    void eval_lagr_hess(const pa::vec &x, const pa::vec &y, pa::mat &H) const {
+    void eval_lagr_hess(pa::crvec x, pa::crvec y, pa::rmat H) const {
         assert(x.size() == nvar);
         assert(y.size() == ncon);
         assert(H.rows() >= nvar);

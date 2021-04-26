@@ -5,10 +5,10 @@
 
 namespace pa::detail {
 
-inline void project_y(vec &y,          // inout
-                      const vec &z_lb, // in
-                      const vec &z_ub, // in
-                      real_t M         // in
+inline void project_y(rvec y,     // inout
+                      crvec z_lb, // in
+                      crvec z_ub, // in
+                      real_t M    // in
 ) {
     // TODO: Handle NaN correctly
     auto max_lb = [M](real_t y, real_t z_lb) {
@@ -23,8 +23,8 @@ inline void project_y(vec &y,          // inout
 }
 
 inline void update_penalty_weights(const ALMParams &params, real_t Δ,
-                                   bool first_iter, vec &e, vec &old_e,
-                                   real_t norm_e, const vec &Σ_old, vec &Σ) {
+                                   bool first_iter, rvec e, rvec old_e,
+                                   real_t norm_e, crvec Σ_old, rvec Σ) {
     if (norm_e <= params.δ) {
         Σ = Σ_old;
         return;
@@ -41,7 +41,7 @@ inline void update_penalty_weights(const ALMParams &params, real_t Δ,
 }
 
 inline void initialize_penalty(const Problem &p, const ALMParams &params,
-                               const vec &x0, vec &Σ) {
+                               crvec x0, rvec Σ) {
     real_t f0 = p.f(x0);
     vec g0(p.m);
     p.g(x0, g0);
@@ -52,7 +52,7 @@ inline void initialize_penalty(const Problem &p, const ALMParams &params,
 }
 
 inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
-                                  const vec &x, real_t &prec_f, vec &prec_g) {
+                                  crvec x, real_t &prec_f, vec &prec_g) {
     vec grad_f(problem.n);
     vec v = vec::Zero(problem.m);
     vec grad_g(problem.n);
@@ -67,16 +67,16 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
         prec_g(i) = 1. / std::max(grad_g.lpNorm<Eigen::Infinity>(), real_t{1});
     }
 
-    auto prec_f_fun      = [&](const vec &x) { return problem.f(x) * prec_f; };
-    auto prec_grad_f_fun = [&](const vec &x, vec &grad_f) {
+    auto prec_f_fun      = [&](crvec x) { return problem.f(x) * prec_f; };
+    auto prec_grad_f_fun = [&](crvec x, rvec grad_f) {
         problem.grad_f(x, grad_f);
         grad_f *= prec_f;
     };
-    auto prec_g_fun = [&](const vec &x, vec &g) {
+    auto prec_g_fun = [&](crvec x, rvec g) {
         problem.g(x, g);
         g = prec_g.asDiagonal() * g;
     };
-    auto prec_grad_g_fun = [&](const vec &x, const vec &v, vec &grad_g) {
+    auto prec_grad_g_fun = [&](crvec x, crvec v, rvec grad_g) {
         vec prec_v = prec_g.asDiagonal() * v;
         problem.grad_g_prod(x, prec_v, grad_g);
     };
@@ -90,15 +90,15 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
         std::move(prec_grad_f_fun),
         std::move(prec_g_fun),
         std::move(prec_grad_g_fun),
-        [](const vec &, unsigned, vec &) {
+        [](crvec, unsigned, rvec) {
             throw std::logic_error("Preconditioning for second-order solvers "
                                    "has not yet been implemented");
         },
-        [](const vec &, const vec &, const vec &, vec &) {
+        [](crvec, crvec, crvec, rvec) {
             throw std::logic_error("Preconditioning for second-order solvers "
                                    "has not yet been implemented");
         },
-        [](const vec &, const vec &, mat &) {
+        [](crvec, crvec, rmat) {
             throw std::logic_error("Preconditioning for second-order solvers "
                                    "has not yet been implemented");
         },

@@ -4,11 +4,15 @@
 
 namespace pa {
 
-using real_t  = double; // TODO: make template?
-using realvec = Eigen::Matrix<real_t, Eigen::Dynamic, 1>;
-using realmat = Eigen::Matrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
-using vec     = realvec;
-using mat     = realmat;
+using real_t         = double; // TODO: make template?
+using realvec        = Eigen::Matrix<real_t, Eigen::Dynamic, 1>;
+using realmat        = Eigen::Matrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
+using vec            = realvec;
+using rvec           = Eigen::Ref<vec>;
+using crvec          = Eigen::Ref<const vec>;
+using mat            = realmat;
+using rmat           = Eigen::Ref<mat>;
+using crmat          = Eigen::Ref<const mat>;
 constexpr real_t inf = std::numeric_limits<real_t>::infinity();
 constexpr real_t NaN = std::numeric_limits<real_t>::quiet_NaN();
 

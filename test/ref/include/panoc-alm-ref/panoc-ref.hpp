@@ -18,7 +18,8 @@ class PANOCSolver {
 
     using Stats = pa::PANOCSolver<>::Stats;
 
-    PANOCSolver(Params params) : params(params) {}
+    PANOCSolver(Params params, pa::LBFGSParams lbfgsparams)
+        : params(params), lbfgs(lbfgsparams) {}
 
     Stats operator()(const Problem &problem,        // in
                      const vec &Σ,                  // in
@@ -32,6 +33,7 @@ class PANOCSolver {
 
   private:
     Params params;
+    pa::PANOCDirection<pa::LBFGS> lbfgs;
     std::atomic<bool> stop_signal{false};
 };
 

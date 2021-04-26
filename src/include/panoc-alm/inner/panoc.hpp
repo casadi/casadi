@@ -1,6 +1,5 @@
 #pragma once
 
-#include "panoc-alm/util/vec.hpp"
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
 #include <panoc-alm/inner/directions/decl/panoc-direction-update.hpp>
@@ -22,19 +21,18 @@ PANOCSolver<DirectionProviderT>::operator()(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Constraint weights @f$ \Sigma @f$
-    const vec &Σ,
+    crvec Σ,
     /// [in]    Tolerance @f$ \varepsilon @f$
     real_t ε,
     /// [in]    Overwrite @p x, @p y and @p err_z even if not converged
     bool always_overwrite_results,
     /// [inout] Decision variable @f$ x @f$
-    vec &x,
+    rvec x,
     /// [inout] Lagrange multipliers @f$ y @f$
-    vec &y,
+    rvec y,
     /// [out]   Slack variable error @f$ g(x) - z @f$
-    vec &err_z) {
+    rvec err_z) {
 
-    using Direction = PANOCDirection<DirectionProvider>;
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
@@ -60,7 +58,6 @@ PANOCSolver<DirectionProviderT>::operator()(
         grad_ψₖ₊₁(n); // ∇ψ(xₖ₊₁)
 
     vec work_n(n), work_m(m);
-    direction_provider.resize(n, params.lbfgs_mem);
 
     // Keep track of how many successive iterations didn't update the iterate
     unsigned no_progress = 0;
@@ -69,34 +66,32 @@ PANOCSolver<DirectionProviderT>::operator()(
 
     // Wrappers for helper functions that automatically pass along any arguments
     // that are constant within PANOC (for readability in the main algorithm)
-    auto calc_ψ_ŷ = [&problem, &y, &Σ](const vec &x, vec &ŷ) {
+    auto calc_ψ_ŷ = [&problem, &y, &Σ](crvec x, rvec ŷ) {
         return detail::calc_ψ_ŷ(problem, x, y, Σ, ŷ);
     };
-    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](const vec &x,
-                                                              vec &grad_ψ) {
+    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
+                                                              rvec grad_ψ) {
         return detail::calc_ψ_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
     };
-    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](const vec &x, const vec &ŷ,
-                                                  vec &grad_ψ) {
+    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](crvec x, crvec ŷ,
+                                                  rvec grad_ψ) {
         detail::calc_grad_ψ_from_ŷ(problem, x, ŷ, grad_ψ, work_n);
     };
-    auto calc_x̂ = [&problem](real_t γ, const vec &x, const vec &grad_ψ, vec &x̂,
-                             vec &p) {
+    auto calc_x̂ = [&problem](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
         detail::calc_x̂(problem, γ, x, grad_ψ, x̂, p);
     };
-    auto calc_err_z = [&problem, &y, &Σ](const vec &x̂, vec &err_z) {
+    auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
         detail::calc_err_z(problem, x̂, y, Σ, err_z);
     };
     auto descent_lemma = [this, &problem, &y,
-                          &Σ](const vec &xₖ, real_t ψₖ, const vec &grad_ψₖ,
-                              vec &x̂ₖ, vec &pₖ, vec &ŷx̂ₖ, real_t &ψx̂ₖ,
-                              real_t &pₖᵀpₖ, real_t &grad_ψₖᵀpₖ, real_t &Lₖ,
-                              real_t &γₖ) {
+                          &Σ](crvec xₖ, real_t ψₖ, crvec grad_ψₖ, rvec x̂ₖ,
+                              rvec pₖ, rvec ŷx̂ₖ, real_t &ψx̂ₖ, real_t &pₖᵀpₖ,
+                              real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
         return detail::descent_lemma(
             problem, params.quadratic_upperbound_tolerance_factor, xₖ, ψₖ,
             grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
-    auto print_progress = [&](unsigned k, real_t ψₖ, const vec &grad_ψₖ,
+    auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
                               real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
         std::cout << "[PANOC] " << std::setw(6) << k
                   << ": ψ = " << std::setw(13) << ψₖ
@@ -151,9 +146,9 @@ PANOCSolver<DirectionProviderT>::operator()(
                               /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
                               /* inout */ ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
             if (k > 0 && γₖ != old_γₖ) // Flush L-BFGS if γ changed
-                Direction::changed_γ(direction_provider, γₖ, old_γₖ);
+                direction_provider.changed_γ(γₖ, old_γₖ);
             else if (k == 0) // Initialize L-BFGS
-                Direction::initialize(direction_provider, xₖ, x̂ₖ, pₖ, grad_ψₖ);
+                direction_provider.initialize(xₖ, x̂ₖ, pₖ, grad_ψₖ);
             if (γₖ != old_γₖ)
                 φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
         }
@@ -194,10 +189,12 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Calculate quasi-Newton step -----------------------------------------
         real_t step_size =
-            params.lbfgs_stepsize == Params::BasedOnGradientStepSize ? 1 : -1;
+            params.lbfgs_stepsize == LBFGSStepSize::BasedOnGradientStepSize
+                ? 1
+                : -1;
         if (k > 0)
-            Direction::apply(direction_provider, xₖ, x̂ₖ, pₖ, step_size,
-                             /* in ⟹ out */ qₖ);
+            direction_provider.apply(xₖ, x̂ₖ, pₖ, step_size,
+                                     /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
         τ                  = 1;
@@ -278,10 +275,10 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Update L-BFGS -------------------------------------------------------
         if (γₖ != γₖ₊₁) // Flush L-BFGS if γ changed
-            Direction::changed_γ(direction_provider, γₖ₊₁, γₖ);
+            direction_provider.changed_γ(γₖ₊₁, γₖ);
 
-        s.lbfgs_rejected += not Direction::update(
-            direction_provider, xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
+        s.lbfgs_rejected += not direction_provider.update(
+            xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)

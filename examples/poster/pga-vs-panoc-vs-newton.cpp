@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
     std::ofstream outf3(pf + "panoc-2newton" + sf);
     YAML::Emitter ymlout3(outf3);
 
-    auto L₀        = 0.95/5e-3;
+    auto L₀        = 0.95 / 5e-3;
     auto lbfgs_mem = 5;
 
     pa::PGAParams pgaparams0;
@@ -121,11 +121,11 @@ int main(int argc, char *argv[]) {
     panocparams1.max_iter                       = 1000;
     panocparams1.update_lipschitz_in_linesearch = true;
     panocparams1.alternative_linesearch_cond    = false;
-    panocparams1.lbfgs_mem                      = lbfgs_mem;
     panocparams1.print_interval                 = 1;
-    panocparams1.lbfgs_stepsize                 = panocparams1.BasedOnGradientStepSize;
+    panocparams1.lbfgs_stepsize = LBFGSStepSize::BasedOnGradientStepSize;
     pa::LBFGSParams lbfgsparams;
     lbfgsparams.rescale_when_γ_changes = false;
+    lbfgsparams.memory                 = lbfgs_mem;
 
     pa::SecondOrderPANOCParams panocparams3;
     panocparams3.Lipschitz.L₀                   = L₀;
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
     panocparams2.alternative_linesearch_cond    = false;
     panocparams2.lbfgs_mem                      = lbfgs_mem;
     panocparams2.print_interval                 = 1;
-    panocparams2.lbfgs_stepsize                 = panocparams2.BasedOnGradientStepSize;
+    panocparams2.lbfgs_stepsize = LBFGSStepSize::BasedOnGradientStepSize;
     pa::LBFGSParams lbfgsparams2;
 
     PGASolver solver0{pgaparams0};

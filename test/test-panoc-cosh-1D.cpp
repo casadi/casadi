@@ -8,10 +8,12 @@
 
 TEST(PANOC, cosh1D) {
     using pa::Box;
+    using pa::crvec;
     using pa::inf;
     using pa::NaN;
     using pa::Problem;
     using pa::real_t;
+    using pa::rvec;
     using pa::vec;
 
     const unsigned n = 1;
@@ -25,14 +27,13 @@ TEST(PANOC, cosh1D) {
     D.upperbound.fill(inf);
 
     real_t a    = 0.5;
-    auto obj_f  = [=](const vec &x) { return std::cosh(a * (x(0) - 10)); };
-    auto grad_f = [=](const vec &x, vec &grad_f) {
+    auto obj_f  = [=](crvec x) { return std::cosh(a * (x(0) - 10)); };
+    auto grad_f = [=](crvec x, rvec grad_f) {
         grad_f(0) = a * std::sinh(a * (x(0) - 10));
     };
-    auto g = [=](const vec &x, vec &g_x) { g_x(0) = x(0); };
+    auto g = [=](crvec x, rvec g_x) { g_x(0) = x(0); };
 
-    auto grad_g = [=]([[maybe_unused]] const vec &x, const vec &v,
-                      vec &grad_u_v) {
+    auto grad_g = [=]([[maybe_unused]] crvec x, crvec v, rvec grad_u_v) {
         pa::mat grad = pa::mat::Ones(n, m);
         grad_u_v     = grad * v;
     };
@@ -40,11 +41,12 @@ TEST(PANOC, cosh1D) {
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g, {}, {}, {}};
 
     pa::PANOCParams params;
-    params.lbfgs_mem = 20;
-    params.max_iter  = 100;
-    params.τ_min     = 1. / 16;
+    params.max_iter = 100;
+    params.τ_min    = 1. / 16;
+    pa::LBFGSParams lbfgsparams;
+    lbfgsparams.memory = 20;
 
-    pa_ref::PANOCSolver solver{params};
+    pa_ref::PANOCSolver solver{params, lbfgsparams};
 
     vec y     = vec::Ones(m);
     vec x     = vec::Ones(n);

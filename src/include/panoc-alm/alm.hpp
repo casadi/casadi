@@ -13,7 +13,7 @@ using std::chrono::microseconds;
 
 template <class InnerSolverT>
 typename ALMSolver<InnerSolverT>::Stats
-ALMSolver<InnerSolverT>::operator()(const Problem &problem, vec &y, vec &x) {
+ALMSolver<InnerSolverT>::operator()(const Problem &problem, rvec y, rvec x) {
     auto start_time = std::chrono::steady_clock::now();
 
     constexpr auto sigNaN = std::numeric_limits<real_t>::signaling_NaN();

@@ -8,10 +8,12 @@
 
 TEST(PANOC, quadratic) {
     using pa::Box;
+    using pa::crvec;
     using pa::inf;
     using pa::NaN;
     using pa::Problem;
     using pa::real_t;
+    using pa::rvec;
     using pa::vec;
 
     const unsigned n = 1;
@@ -26,18 +28,15 @@ TEST(PANOC, quadratic) {
 
     real_t a    = 1;
     real_t b    = -10;
-    auto obj_f  = [=](const vec &x) { return a * x(0) * x(0) + b * x(0); };
-    auto grad_f = [=](const vec &x, vec &grad_f) {
-        grad_f(0) = 2 * a * x(0) + b;
-    };
-    auto g = [=](const vec &x, vec &g_x) { g_x(0) = x(0); };
+    auto obj_f  = [=](crvec x) { return a * x(0) * x(0) + b * x(0); };
+    auto grad_f = [=](crvec x, rvec grad_f) { grad_f(0) = 2 * a * x(0) + b; };
+    auto g      = [=](crvec x, rvec g_x) { g_x(0) = x(0); };
 
-    auto grad_g = [=]([[maybe_unused]] const vec &x, const vec &v,
-                      vec &grad_u_v) {
+    auto grad_g = [=]([[maybe_unused]] crvec x, crvec v, rvec grad_u_v) {
         pa::mat grad = pa::mat::Ones(n, m);
         grad_u_v     = grad * v;
     };
-    auto g_fun = [=](const vec &x) {
+    auto g_fun = [=](crvec x) {
         vec gg(m);
         g(x, gg);
         return gg;
@@ -46,11 +45,13 @@ TEST(PANOC, quadratic) {
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g, {}, {}, {}};
 
     pa::PANOCParams params;
-    params.lbfgs_mem = 20;
-    params.max_iter  = 10;
-    params.τ_min     = 1. / 16;
+    params.max_iter = 10;
+    params.τ_min    = 1. / 16;
 
-    pa_ref::PANOCSolver solver{params};
+    pa::LBFGSParams lbfgsparam;
+    lbfgsparam.memory = 20;
+
+    pa_ref::PANOCSolver solver{params, lbfgsparam};
 
     vec y₀ = vec::Ones(m);
     vec y  = y₀;

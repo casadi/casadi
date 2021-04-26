@@ -35,12 +35,12 @@ Problem build_test_problem() {
     p.f      = std::move(himmel.f);
     p.grad_f = std::move(himmel.grad_f);
 
-    p.g = [](const vec &x, vec &g) {
+    p.g = [](crvec x, rvec g) {
         g(0) = -4 * std::pow(x(0), 2) +
                0.25 * std::pow(x(0), 2) * std::pow(x(1), 2);
         g(1) = 0.125 * std::pow(x(0), 4) - x(0) * x(1);
     };
-    p.grad_g_prod = [](const vec &x, const vec &y, vec &grad) {
+    p.grad_g_prod = [](crvec x, crvec y, rvec grad) {
         pa::mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
@@ -49,7 +49,7 @@ Problem build_test_problem() {
             -x(0);
         grad = gradmat * y;
     };
-    p.grad_gi = [](const vec &x, unsigned i, vec &grad) {
+    p.grad_gi = [](crvec x, unsigned i, rvec grad) {
         pa::mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
@@ -59,8 +59,7 @@ Problem build_test_problem() {
         grad = gradmat.col(i);
     };
 
-    p.hess_L = [uc_hess_L{std::move(himmel.hess_L)}](const vec &x, const vec &y,
-                                                     mat &H) {
+    p.hess_L = [uc_hess_L{std::move(himmel.hess_L)}](crvec x, crvec y, rmat H) {
         // Hessian of f
         uc_hess_L(x, y, H);
 
@@ -82,7 +81,7 @@ Problem build_test_problem() {
     return p;
 }
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::vec &v) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, crvec v) {
     out << YAML::Flow;
     out << YAML::BeginSeq;
     for (pa::vec::Index i = 0; i < v.size(); ++i)
@@ -157,11 +156,11 @@ int main(int argc, char *argv[]) {
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.alternative_linesearch_cond    = false;
-    panocparams.lbfgs_mem                      = 3;
     panocparams.print_interval                 = 1;
-    panocparams.lbfgs_stepsize                 = panocparams.BasedOnCurvature;
+    panocparams.lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
     pa::LBFGSParams lbfgsparams;
     lbfgsparams.rescale_when_γ_changes = false;
+    lbfgsparams.memory                 = 3;
 
     pa::SecondOrderPANOCParams panocparams2;
     panocparams2.max_iter                       = 1000;
@@ -175,7 +174,7 @@ int main(int argc, char *argv[]) {
     panocparams3.alternative_linesearch_cond    = false;
     panocparams3.lbfgs_mem                      = 3;
     panocparams3.print_interval                 = 1;
-    panocparams3.lbfgs_stepsize                 = panocparams3.BasedOnCurvature;
+    panocparams3.lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
     pa::LBFGSParams lbfgsparams3;
 
     ALMSolver<PANOCSolver<>> solver1{almparams, {panocparams, lbfgsparams}};

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <panoc-alm/inner/decl/lbfgs-stepsize.hpp>
 #include <panoc-alm/inner/decl/panoc-fwd.hpp>
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/util/atomic_stop_signal.hpp>
@@ -48,10 +49,10 @@ struct SecondOrderPANOCLBFGSParams {
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;
 
-    enum {
-        BasedOnGradientStepSize = 0,
-        BasedOnCurvature        = 1,
-    } lbfgs_stepsize = BasedOnCurvature;
+    bool hessian_vec_finited_differences = true;
+    bool full_augmented_hessian          = true;
+
+    LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
 /// Second order PANOC solver for ALM.
@@ -75,20 +76,20 @@ class SecondOrderPANOCLBFGSSolver {
 
     struct ProgressInfo {
         unsigned k;
-        const vec &x;
-        const vec &p;
+        crvec x;
+        crvec p;
         real_t norm_sq_p;
-        const vec &x_hat;
+        crvec x_hat;
         real_t ψ;
-        const vec &grad_ψ;
+        crvec grad_ψ;
         real_t ψ_hat;
-        const vec &grad_ψ_hat;
+        crvec grad_ψ_hat;
         real_t L;
         real_t γ;
         real_t τ;
         real_t ε;
-        const vec &Σ;
-        const vec &y;
+        crvec Σ;
+        crvec y;
         const Problem &problem;
         const Params &params;
     };
@@ -97,12 +98,12 @@ class SecondOrderPANOCLBFGSSolver {
         : params(params), lbfgs(lbfgsparams) {}
 
     Stats operator()(const Problem &problem,        // in
-                     const vec &Σ,                  // in
+                     crvec Σ,                       // in
                      real_t ε,                      // in
                      bool always_overwrite_results, // in
-                     vec &x,                        // inout
-                     vec &y,                        // inout
-                     vec &err_z);                   // out
+                     rvec x,                        // inout
+                     rvec y,                        // inout
+                     rvec err_z);                   // out
 
     SecondOrderPANOCLBFGSSolver &
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
