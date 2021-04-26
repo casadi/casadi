@@ -1,5 +1,8 @@
 build
+_skbuild
 py-venv
 .cache
 __pycache__
+dist
+panocpy.egg-info
 .ipynb_checkpoints

@@ -114,3 +114,8 @@ export(EXPORT PANOC-ALMTargets
 # This registers the build tree with a global CMake-registry, so you can use
 # find_package(PANOC-ALM) to find the package in the build tree
 export(PACKAGE PANOC-ALM)
+
+# Python bindings
+# ---------------
+
+add_subdirectory(panocpy)
