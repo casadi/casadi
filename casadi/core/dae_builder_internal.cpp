@@ -167,9 +167,14 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
       // Get a reference to the variable
       const XmlNode& vnode = modvars[i];
 
-      // Name of variable, ensure unique
+      // Name of variable
       std::string name = vnode.attribute<std::string>("name");
-      casadi_assert(varind_.find(name) == varind_.end(), "Duplicate variable: " + name);
+
+      // Ignore duplicate variables
+      if (varind_.find(name) != varind_.end()) {
+        casadi_warning("Duplicate variable '" + name + "' ignored");
+        continue;
+      }
 
       // Create new variable
       Variable var(name);
