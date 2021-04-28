@@ -338,6 +338,11 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
           // Consistency checks
           casadi_assert_dev(n.name() == "equ:Equation");
           casadi_assert_dev(n.size() == 1 && n[0].name() == "exp:Sub");
+          // Ensure not empty
+          if (n[0].size() == 0) {
+            casadi_warning(str(equ) + "#" + str(i) + " is empty, ignored.");
+            continue;
+          }
           // Get the left-hand-sides and right-hand-sides
           const XmlNode& lhs = n[0][0];
           const XmlNode& rhs = n[0][1];
