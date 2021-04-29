@@ -64,6 +64,7 @@ SecondOrderPANOCLBFGSSolver::operator()(
     using indexvec = std::vector<vec::Index>;
     indexvec J;
     J.reserve(n);
+    lbfgs.resize(n);
 
     // Keep track of how many successive iterations didn't update the iterate
     unsigned no_progress = 0;
