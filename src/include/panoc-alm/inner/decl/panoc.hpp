@@ -111,9 +111,7 @@ class PANOCSolver {
         return *this;
     }
 
-    std::string get_name() const {
-        return "PANOCSolver<" + direction_provider.get_name() + ">";
-    }
+    std::string get_name() const;
 
     void stop() { stop_signal.stop(); }
 

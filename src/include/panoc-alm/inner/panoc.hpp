@@ -16,6 +16,11 @@ using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
 template <class DirectionProviderT>
+std::string PANOCSolver<DirectionProviderT>::get_name() const {
+    return "PANOCSolver<" + direction_provider.get_name() + ">";
+}
+
+template <class DirectionProviderT>
 typename PANOCSolver<DirectionProviderT>::Stats
 PANOCSolver<DirectionProviderT>::operator()(
     /// [in]    Problem description
