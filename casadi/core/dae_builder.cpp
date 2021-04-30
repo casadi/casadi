@@ -202,6 +202,15 @@ void DaeBuilder::prune(bool prune_p, bool prune_u) {
   }
 }
 
+std::pair<std::vector<std::string>, std::vector<std::string>> DaeBuilder::tear() const {
+  try {
+    return (*this)->tear();
+  } catch (std::exception& e) {
+    THROW_ERROR("tear", e.what());
+    return {};
+  }
+}
+
 bool DaeBuilder::has_variable(const std::string& name) const {
   try {
     return (*this)->has_variable(name);

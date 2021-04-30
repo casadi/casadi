@@ -169,6 +169,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Prune unused controls
   void prune(bool prune_p, bool prune_u);
+
+  /// Identify free variables and residual equations
+  std::pair<std::vector<std::string>, std::vector<std::string>> tear() const;
   ///@}
 
   /** @name Import and export

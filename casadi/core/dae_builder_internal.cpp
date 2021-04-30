@@ -731,6 +731,116 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   }
 }
 
+std::pair<std::vector<std::string>, std::vector<std::string>> DaeBuilderInternal::tear() const {
+  // Return value
+  std::pair<std::vector<std::string>, std::vector<std::string>> ret;
+  // Prefix
+  const std::string res_prefix = "res__";
+  // Collect hold indices
+  std::vector<MX> r_hold, iv_hold;
+  // Any hold variable?
+  bool any_hold = false;
+  // Collect residual variables, iteration variables, expression for hold indices, if any
+  for (const Variable& v : variables_) {
+    // Residual variables are specified with a "res__" prefix
+    if (v.name.rfind(res_prefix, 0) == 0) {
+      // Process iteration variable name, names of hold markers
+      std::string iv_name, res_hold_name, iv_hold_name;
+      // Iteration variable, hold markers are contained in the remainder of the name
+      try {
+        size_t pos = res_prefix.size();
+        // Find the next "__", if any
+        size_t end = v.name.find("__", pos);
+        if (end == std::string::npos) end = v.name.size();
+        // Look up iteration variable
+        iv_name = v.name.substr(pos, end - pos);
+        // Ensure that the variable exists
+        casadi_assert(has_variable(iv_name), "No such variable: " + iv_name);
+        // Get hold indices, if any
+        if (end != v.name.size()) {
+          // Find next "__", read hold index for residual variable
+          pos = end + 2;
+          end = v.name.find("__", pos);
+          if (end == std::string::npos) end = v.name.size();
+          res_hold_name = v.name.substr(pos, end - pos);
+          // Ensure that the variable exists
+          casadi_assert(has_variable(res_hold_name), "No such variable: " + res_hold_name);
+          // The remainder of the name contains iv_hold_name
+          if (end != v.name.size()) {
+            iv_hold_name = v.name.substr(end + 2);
+            casadi_assert(has_variable(iv_hold_name), "No such variable: " + iv_hold_name);
+          }
+        }
+      } catch (std::exception& e) {
+        // Generate warning
+        casadi_warning("Cannot process residual variable: " + v.name + ":" + std::string(e.what()));
+        continue;
+      }
+      // Add residual variable, corresponding hold variable
+      if (res_hold_name.empty()) {
+        r_hold.push_back(false);
+      } else {
+        any_hold = true;
+        r_hold.push_back(variable(res_hold_name).v);
+        casadi_assert(r_hold.back().is_scalar(), "Non-scalar hold variable for " + res_hold_name);
+      }
+      ret.first.push_back(v.name);
+      // Add iteration variable, corresponding hold variable
+      if (iv_hold_name.empty()) {
+        iv_hold.push_back(false);
+      } else {
+        any_hold = true;
+        iv_hold.push_back(variable(iv_hold_name).v);
+        casadi_assert(iv_hold.back().is_scalar(), "Non-scalar hold variable for " + iv_hold_name);
+      }
+      ret.second.push_back(iv_name);
+    }
+  }
+  // Evaluate hold variables, if needed
+  if (any_hold) {
+    try {
+      // Get start attributes for p
+      Function startfun_p = attribute_fun("startfun_p", {}, {"start_p"});
+      if (startfun_p.has_free()) {
+        casadi_error("startfun has free variables: " + str(startfun_p.get_free()));
+      }
+      DM p0 = startfun_p(std::vector<DM>{}).at(0);
+      // Create function to evaluate the hold attributes
+      Function holdfun("holdfun", {vertcat(p_)},
+        {vertcat(r_hold), vertcat(iv_hold)}, {"p"}, {"r_hold", "iv_hold"});
+      if (holdfun.has_free()) {
+        casadi_error("holdfun has free variables: " + str(holdfun.get_free()));
+      }
+      // Evaluate holdfun to get hold attributes
+      std::vector<DM> hold0 = holdfun({p0});
+      std::vector<double> r_hold0 = hold0.at(0).nonzeros();
+      std::vector<double> iv_hold0 = hold0.at(1).nonzeros();
+      casadi_assert_dev(r_hold0.size() == ret.first.size());
+      casadi_assert_dev(iv_hold0.size() == ret.second.size());
+      // Remove hold variables from residual variables
+      size_t sz = 0;
+      for (size_t k = 0; k < ret.first.size(); ++k) {
+        if (!static_cast<bool>(r_hold0.at(k))) {
+          ret.first[sz++] = ret.first[k];
+        }
+      }
+      ret.first.resize(sz);
+      // Remove hold variables from iteration variables
+      sz = 0;
+      for (size_t k = 0; k < ret.second.size(); ++k) {
+        if (!static_cast<bool>(iv_hold0.at(k))) {
+          ret.second[sz++] = ret.second[k];
+        }
+      }
+      ret.second.resize(sz);
+    } catch (std::exception& e) {
+      // Warning instead of error
+      casadi_warning("Failed to evaluate hold variables: " + std::string(e.what()));
+    }
+  }
+  return ret;
+}
+
 const Variable& DaeBuilderInternal::variable(const std::string& name) const {
   return const_cast<DaeBuilderInternal*>(this)->variable(name);
 }

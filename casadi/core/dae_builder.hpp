@@ -292,6 +292,9 @@ public:
 
   /// Prune unused controls
   void prune(bool prune_p = true, bool prune_u = true);
+
+  /// Identify iteration variables and residual equations using naming convention
+  std::pair<std::vector<std::string>, std::vector<std::string>> tear() const;
   ///@}
 
   /** @name Functions
