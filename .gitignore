@@ -4,5 +4,5 @@ py-venv
 .cache
 __pycache__
 dist
-panocpy.egg-info
+*.egg-info
 .ipynb_checkpoints

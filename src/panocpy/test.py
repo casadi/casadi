@@ -1,9 +1,16 @@
+#%%
+
 import panocpy as pa
 import numpy as np
+from pprint import pprint
 
+print("1")
 solver = pa.PANOCSolver(pa.PANOCParams(), pa.LBFGSDirection(pa.LBFGSParams()))
+print("2")
 assert str(solver) == "PANOCSolver<LBFGS>"
+print("3")
 solver = pa.PANOCSolver(pa.PANOCParams(), pa.LBFGSParams())
+print("4")
 assert str(solver) == "PANOCSolver<LBFGS>"
 
 
@@ -64,13 +71,110 @@ y0 = np.zeros((m,))
 ε = 1e-8
 solver = pa.PANOCSolver(
     pa.PANOCParams(max_iter=200, print_interval=1),
-    pa.LBFGSDirection(pa.LBFGSParams(cbfgs=pa.LBFGSParamsCBFGS(α=2))),
+    pa.LBFGSParams(memory=5),
 )
 x, y, err_z, stats = solver(p, Σ, ε, True, x0, y0)
 print(x)
 print(y)
 print(err_z)
-print(stats.ε)
-print(stats.iterations)
-print(stats.status)
-print(stats.elapsed_time)
+pprint(stats)
+
+solver = pa.PANOCSolver(
+    pa.PANOCParams(max_iter=200, print_interval=1),
+    pa.LBFGSParams(memory=5),
+)
+almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
+almsolver = pa.ALMSolver(almparams, solver)
+y, x, stats = almsolver(p, y0, x0)
+
+print(y)
+print(x)
+pprint(stats)
+
+solver = pa.SecondOrderPANOCLBFGSSolver(
+    pa.SecondOrderPANOCLBFGSParams(max_iter=200, print_interval=1),
+    pa.LBFGSParams(memory=5),
+)
+almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
+almsolver = pa.ALMSolver(almparams, solver)
+y, x, stats = almsolver(p, y0, x0)
+
+print(y)
+print(x)
+pprint(stats)
+
+
+class CustomInnerSolver(pa.InnerSolver):
+    def __init__(self):
+        super().__init__()
+        self.solver = pa.PANOCSolver(
+            pa.PANOCParams(max_iter=200, print_interval=1),
+            pa.LBFGSParams(memory=5),
+        )
+
+    def get_name(self):
+        return self.solver.get_name()
+
+    def stop(self):
+        return self.solver.stop()
+
+    def __call__(self, problem, Σ, ε, always_overwrite_results, x, y):
+        x, y, err_z, stats = self.solver(problem, Σ, ε, always_overwrite_results, x, y)
+
+        def accumulate(acc: dict, s: dict):
+            for k, v in s.items():
+                if not k in ["status", "ε", "accumulator"]:
+                    acc[k] = acc[k] + v if k in acc else v
+
+        stats["accumulator"] = {"accumulate": accumulate}
+        return x, y, err_z, stats
+
+
+solver = CustomInnerSolver()
+almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
+almsolver = pa.ALMSolver(almparams, solver)
+y, x, stats = almsolver(p, y0, x0)
+
+print(y)
+print(x)
+pprint(stats)
+# %%
+
+import os
+from os.path import join
+from tempfile import TemporaryDirectory
+
+print(x.size)
+print(g_.size1())
+
+n = 2
+m = 2
+x = cs.SX.sym("x", n)
+λ = cs.SX.sym("λ", m)
+v = cs.SX.sym("v", n)
+
+Q = np.array([[1.5, 0.5], [0.5, 1.5]])
+f_ = x.T @ Q @ x
+g_ = x
+
+name = "testproblem"
+with TemporaryDirectory(prefix="") as tmpdir:
+    print(join(tmpdir, "testprob"))
+    cgen = pa.generate_casadi_problem(name, x, f_, g_, tmpdir)
+    sofile = join(tmpdir, f"{name}.so")
+    os.system(f"cc -fPIC -shared -O3 {cgen} -o {sofile}")
+    p = pa.load_casadi_problem(sofile, n, m)
+    p.D.lowerbound = [-np.inf, 0.5]
+    p.D.upperbound = [+np.inf, +np.inf]
+solver = pa.SecondOrderPANOCLBFGSSolver(
+    pa.SecondOrderPANOCLBFGSParams(max_iter=200, print_interval=1),
+    pa.LBFGSParams(memory=5),
+)
+almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
+almsolver = pa.ALMSolver(almparams, solver)
+y, x, stats = almsolver(p, y0, x0)
+
+print(y)
+print(x)
+pprint(stats)
+# %%

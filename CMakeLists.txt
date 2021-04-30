@@ -38,8 +38,10 @@ find_package(LBFGSpp)
 # ----
 
 add_subdirectory(src)
-add_subdirectory(test)
-add_subdirectory(examples)
+if (NOT SKBUILD)
+    add_subdirectory(test)
+    add_subdirectory(examples)
+endif()
 
 # ----
 
