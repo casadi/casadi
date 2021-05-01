@@ -166,8 +166,8 @@ namespace casadi {
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
-    //virtual bool fwdViaJac(casadi_int nfwd) const { return f_->fwdViaJac(nfwd); }
-    //virtual bool adjViaJac(casadi_int nadj) const { return f_->adjViaJac(nadj); }
+    bool fwdViaJac(casadi_int nfwd) const override { return f_->fwdViaJac(nfwd); }
+    bool adjViaJac(casadi_int nadj) const override { return f_->adjViaJac(nadj); }
     ///@}
 
     ///@{

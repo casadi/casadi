@@ -905,8 +905,10 @@ namespace casadi {
         \identifier{me} */
     casadi_int nnz_in() const;
     casadi_int nnz_in(casadi_int ind) const { return sparsity_in(ind).nnz(); }
+    casadi_int nnz_in_diff() const;
     casadi_int nnz_out() const;
     casadi_int nnz_out(casadi_int ind) const { return sparsity_out(ind).nnz(); }
+    casadi_int nnz_out_diff() const;
     ///@}
 
     ///@{

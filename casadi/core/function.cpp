@@ -278,6 +278,7 @@ namespace casadi {
     opts["max_num_dir"] = (*this)->max_num_dir_;
     opts["is_diff_in"] = (*this)->is_diff_in_;
     opts["is_diff_out"] = (*this)->is_diff_out_;
+    opts["jac_penalty"] = (*this)->jac_penalty_;
     return expand(name(), opts);
   }
 

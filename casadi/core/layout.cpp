@@ -52,7 +52,7 @@ namespace casadi {
   }
 
   Relayout Relayout::push_right(casadi_int n) const {
-    uout() << "push_right" << std::endl;
+    uout() << "push_right" << perms() << source().n_dims() << join(perms(), {source().n_dims()}) << std::endl;
     return Relayout(source().push_right(n), join(perms(), {source().n_dims()}), target().push_right(n));
   }
 

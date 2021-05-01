@@ -2110,9 +2110,21 @@ namespace casadi {
     return ret;
   }
 
+  casadi_int FunctionInternal::nnz_in_diff() const {
+    casadi_int ret=0;
+    for (casadi_int iind=0; iind<n_in_; ++iind) if (is_diff_in_[iind]) ret += nnz_in(iind);
+    return ret;
+  }
+
   casadi_int FunctionInternal::nnz_out() const {
     casadi_int ret=0;
     for (casadi_int oind=0; oind<n_out_; ++oind) ret += nnz_out(oind);
+    return ret;
+  }
+
+  casadi_int FunctionInternal::nnz_out_diff() const {
+    casadi_int ret=0;
+    for (casadi_int oind=0; oind<n_out_; ++oind)  if (is_diff_out_[oind]) ret += nnz_out(oind);
     return ret;
   }
 
@@ -2205,7 +2217,11 @@ namespace casadi {
       if (e>1) vectorize = true;
     }
     if (vectorize) {
-      g << "static " << signature(fname) << " {\n";
+      if (is_a("SXFunction", false)) {
+        g << "static __attribute__((always_inline)) inline " << signature(fname) << " {\n";
+      } else {
+        g << "static " << signature(fname) << " {\n";
+      }
     } else {
       g << "static __attribute__((noinline)) " << signature(fname) << " {\n";
     }
@@ -2761,16 +2777,17 @@ namespace casadi {
   }
 
   bool FunctionInternal::fwdViaJac(casadi_int nfwd) const {
+    uout() << "fwdViaJac" << name_ << jac_penalty_ << jac_penalty_ << ":" << static_cast<double>(nnz_in_diff()) <<"/" << static_cast<double>(nnz_in()) << ":" << nfwd << std::endl;
     if (!enable_forward_ && !enable_fd_) return true;
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
-    if (jac_penalty_*static_cast<double>(nnz_in())<nfwd) return true;
+    if (jac_penalty_*static_cast<double>(nnz_in_diff())<nfwd) return true;
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = ad_weight();
     if (enable_reverse_ &&
-        jac_penalty_*(1-w)*static_cast<double>(nnz_out())<w*static_cast<double>(nfwd))
+        jac_penalty_*(1-w)*static_cast<double>(nnz_out_diff())<w*static_cast<double>(nfwd))
       return true; // NOLINT
 
     return false;
@@ -2781,12 +2798,12 @@ namespace casadi {
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
-    if (jac_penalty_*static_cast<double>(nnz_out())<nadj) return true;
+    if (jac_penalty_*static_cast<double>(nnz_out_diff())<nadj) return true;
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = ad_weight();
     if ((enable_forward_ || enable_fd_) &&
-        jac_penalty_*w*static_cast<double>(nnz_in())<(1-w)*static_cast<double>(nadj))
+        jac_penalty_*w*static_cast<double>(nnz_in_diff())<(1-w)*static_cast<double>(nadj))
       return true; // NOLINT
 
     return false;
