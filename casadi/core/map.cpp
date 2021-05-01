@@ -502,25 +502,29 @@ namespace casadi {
                                   const std::vector<std::string>& onames,
                                   const Dict& opts) const {
 
-    casadi_error("foo");
-    // Generate map of derivative
-    Function jf = f_.jacobian();
-    Function jm = jf.map(n_, parallelization());
+// Generate map of derivative
+    Function Jf = f_.jacobian();
+
+    Function Jmap = Jf.map(n_);
 
     // Input expressions
-    vector<MX> arg = jm.mx_in();
+    vector<MX> arg = Jmap.mx_in();
 
-    // Need to reorder sensitivity inputs
-    vector<MX> res = jm(arg);
+    vector<MX> res = Jmap(arg);
 
-    casadi_assert_dev(res.size()==1);
-    MX y = sparsity_cast(res[0], Sparsity::kron(Sparsity::diag(n_), jf.sparsity_out(0)));
+    size_t i=0;
+    for (size_t oind = 0; oind < n_out_; ++oind) {
+      for (size_t iind = 0; iind < n_in_; ++iind) {
+        MX& r = res[i];
+        r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
+        i++;
+      }
+    }
 
+    // Construct return function
     Dict custom_opts = opts;
     custom_opts["always_inline"] = true;
-    Function f(name, arg, {y},  inames, onames, custom_opts);
-
-    return f;
+    return Function(name, arg, res, inames, onames, custom_opts);
   }
 
   int Map::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {

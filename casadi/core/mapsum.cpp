@@ -647,6 +647,64 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, custom_opts);
   }
 
+  Function MapSum::get_jacobian(const std::string& name,
+                      const std::vector<std::string>& inames,
+                      const std::vector<std::string>& onames,
+                      const Dict& opts) const {
+    // Generate map of derivative
+    Function Jf = f_.jacobian();
+
+    Jf.disp(uout());
+
+    uout() << "goal" << std::endl;
+
+    std::vector<bool> reduce_in = reduce_in_;
+    for (size_t oind = 0; oind < n_out_; ++oind) { // Nominal outputs
+      reduce_in.push_back(reduce_out_[oind]);
+    }
+    std::vector<bool> reduce_out;
+    reduce_out.reserve(n_in_ * n_out_);
+    for (size_t oind = 0; oind < n_out_; ++oind) {
+      for (size_t iind = 0; iind < n_in_; ++iind) {
+        reduce_out.push_back(reduce_out_[oind] && reduce_in_[iind]);
+      }
+    }
+    Function Jmap = Jf.map(n_, reduce_in, reduce_out);
+
+    // Input expressions
+    vector<MX> arg = Jmap.mx_in();
+
+    vector<MX> res = Jmap(arg);
+
+    size_t i=0;
+    for (size_t oind = 0; oind < n_out_; ++oind) {
+      for (size_t iind = 0; iind < n_in_; ++iind) {
+        MX& r = res[i];
+        if (!reduce_out_[oind]) {
+          if (reduce_in_[iind]) {
+            // is_dense is conservative: colums of equal nnz count is sufficient
+            if (Jf.sparsity_out(i).is_dense()) {
+              Layout source({Jf.size1_out(i), Jf.size2_out(i), n_});
+              Layout target({Jf.size1_out(i), n_, Jf.size2_out(i)});
+              r = permute_layout(r,Relayout(source, {0, 2, 1}, target));
+              r = sparsity_cast(r, vertcat(horzsplit(r.sparsity(), Jf.size2_out(i))));
+            } else {
+              r = vertcat(horzsplit(r, Jf.size2_out(i)));
+            }
+          } else {
+            r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
+          }
+        }
+        i++;
+      }
+    }
+
+    // Construct return function
+    Dict custom_opts = opts;
+    custom_opts["always_inline"] = true;
+    return Function(name, arg, res, inames, onames, custom_opts);
+  }
+
   int MapSum::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     // This checkout/release dance is an optimization.
     // Could also use the thread-safe variant f_(arg1, res1, iw, w)

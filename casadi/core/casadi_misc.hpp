@@ -516,15 +516,17 @@ namespace casadi {
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b) {
     std::vector<T> ret = a;
-    ret.insert(ret.end(), b.begin(), b.end());
+    // bug in std::vector<bool
+    for (T e : b) ret.push_back(e);
     return ret;
   }
 
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c) {
     std::vector<T> ret = a;
-    ret.insert(ret.end(), b.begin(), b.end());
-    ret.insert(ret.end(), c.begin(), c.end());
+    // bug in std::vector<bool>
+    for (T e : b) ret.push_back(e);
+    for (T e : c) ret.push_back(e);
     return ret;
   }
 

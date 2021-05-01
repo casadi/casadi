@@ -77,6 +77,12 @@ namespace casadi {
     /** \brief Get sparsity of a given output */
     Layout get_layout_out(casadi_int i) override;
 
+    //@{
+    /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
+    bool fwdViaJac(casadi_int nfwd) const override { return f_->fwdViaJac(nfwd); }
+    bool adjViaJac(casadi_int nadj) const override { return f_->adjViaJac(nadj); }
+    //@}
+
     /** \brief Get default input value */
     double get_default_in(casadi_int ind) const override { return f_.default_in(ind);}
 
@@ -149,6 +155,14 @@ namespace casadi {
                          const Dict& opts) const override;
     ///@}
 
+    ///@{
+    /** \brief Full Jacobian */
+    bool has_jacobian() const override { return true; }
+    Function get_jacobian(const std::string& name,
+                                     const std::vector<std::string>& inames,
+                                     const std::vector<std::string>& onames,
+                                     const Dict& opts) const override;
+    ///@}
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
