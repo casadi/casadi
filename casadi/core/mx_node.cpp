@@ -490,6 +490,9 @@ namespace casadi {
       "Dimension error x.mac(z). Got x=" + x.dim() + " and z=" + z.dim() + ".");
     casadi_assert(y.size1()==x.size2(),
       "Dimension error x.mac(z). Got y=" + str(y.size1()) + " and x" + x.dim() + ".");
+
+    if (x.is_row() && y.is_column()) return z+dot(x,y.T());
+
     if (x.is_dense() && y.is_dense() && z.is_dense()) {
       return MX::create(new DenseMultiplication(z, x, y));
     } else {

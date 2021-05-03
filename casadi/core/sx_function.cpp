@@ -207,7 +207,10 @@ namespace casadi {
 
     bool intro = false;//vectorize;
     bool outro = false;//vectorize;
+    intro = vectorize;
+    outro = vectorize;
 
+    bool intro2_step = vectorize;
 
     if (outro) {
       std::sort(rets.begin(), rets.end(), sortme_rets);
@@ -217,6 +220,12 @@ namespace casadi {
         lookup_rets[&a] = i;
       }
     }
+    if (intro2_step) {
+      for (casadi_int i=0;i<n_in_;++i) {
+        g.local("inp"+str(i), "const casadi_real", "*");
+        g << "inp" << i << " = " << g.arg(i, true) << ";\n";
+      }
+    }
     if (intro) {
       std::sort(ins.begin(), ins.end(), sortme_ins);
       for (casadi_int i=0;i<ins.size();++i) {
@@ -224,7 +233,8 @@ namespace casadi {
         g.local("in"+str(i), "casadi_real");
         int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
         stride = 1;
-        g << "in" << i << " = " << g.arg(a.i1, true) << "[" << a.i2*stride << "]" << ";\n";
+        bool external_i = inst.stride_in.empty() ? true : inst.stride_in.at(a.i1)>0;
+        g << "in" << i << " = " << ( intro2_step ? "inp" + str(a.i1): g.arg(a.i1, true)) << "[" << a.i2*stride << (external_i ? "+i": "") << "]" << ";\n";
         lookup_ins[&a] = i;
       }
     }
@@ -275,8 +285,8 @@ namespace casadi {
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);
-          if (ndep==1) g << g.print_op(a.op, g.sx_work(a.i1));
-          if (ndep==2) g << g.print_op(a.op, g.sx_work(a.i1), g.sx_work(a.i2));
+          if (ndep==1) g << g.print_op(a.op, g.sx_work(a.i1)); // a.op OP_NEG
+          if (ndep==2) g << g.print_op(a.op, g.sx_work(a.i1), g.sx_work(a.i2)); // OP_MUL OP_ADD
         }
       }
       g  << ";\n";
@@ -286,7 +296,8 @@ namespace casadi {
         const AlgEl& a = *rets[i];
         casadi_int stride = inst.stride_out.empty() ? 1 : inst.stride_out[a.i0];
         stride = 1;
-        g << g.res(a.i0, true) << "[" << a.i2*abs(stride)  << "]" << (stride<0? "+": "")<< "= ret" << i << ";\n";
+        bool external_i = inst.stride_out.empty() ? true : inst.stride_out.at(a.i0)>0;
+        g << g.res(a.i0, true) << "[" << a.i2*abs(stride) << (external_i ? "+i": "") << "]" << (stride<0? "+": "")<< "= ret" << i << ";\n";
       }
     }
   }
@@ -572,7 +583,7 @@ namespace casadi {
 
           // Location of the input
           algorithm_[i].i1 = ind;
-          algorithm_[i].i2 = nz*stride_in_[ind];
+          algorithm_[i].i2 = nz*std::abs(stride_in_[ind]);
 
           // Mark input as read
           itc->set_temp(0);

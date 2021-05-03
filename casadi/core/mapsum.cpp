@@ -87,9 +87,11 @@ namespace casadi {
       std::vector<casadi_int> stride_out(f_.n_out());
       for (casadi_int j=0; j<f_.n_in(); ++j) {
         stride_in[j] = vectorize_f(f, n_) && !reduce_in[j] ? n_padded(n) : 1;
+        if (reduce_in_[j]) stride_in[j]*= -1;
       }
       for (casadi_int j=0; j<f_.n_out(); ++j) {
         stride_out[j] = vectorize_f(f, n_) ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded(n)) : 1;
+        if (reduce_out_[j]) stride_out[j]*= -1;
       }
 
       Dict opts;
@@ -320,10 +322,12 @@ namespace casadi {
     local.stride_in.resize(f_.n_in());
     for (casadi_int j=0; j<n_in_; ++j) {
       local.stride_in[j] = (vectorize_f() && !reduce_in_[j]) ? n_padded() : 1;
+      if (reduce_in_[j]) local.stride_in[j]*= -1;
     }
     local.stride_out.resize(f_.n_out());
     for (casadi_int j=0; j<n_out_; ++j) {
       local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded()) : 1;
+      if (reduce_out_[j]) local.stride_out[j]*= -1;
     }
     g.add_dependency(f_, local);
   }
@@ -333,10 +337,12 @@ namespace casadi {
     local.stride_in.resize(f_.n_in());
     for (casadi_int j=0; j<n_in_; ++j) {
       local.stride_in[j] = (vectorize_f() && !reduce_in_[j]) ? n_padded() : 1;
+      if (reduce_in_[j]) local.stride_in[j]*= -1;
     }
     local.stride_out.resize(f_.n_out());
     for (casadi_int j=0; j<n_out_; ++j) {
       local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded()) : 1;
+      if (reduce_out_[j]) local.stride_out[j]*= -1;
     }
 
     bool any_reduce_out = any(reduce_out_);
@@ -412,7 +418,7 @@ namespace casadi {
         g << "#pragma omp simd\n";
         g << "for (j=0; j<" << GlobalOptions::vector_width_real << "; ++j) {\n";
       } else {
-        g << "#pragma omp simd\n";
+        g << "#pragma omp simd safelen(" << n_padded() << ")\n";
         g << "for (j=0; j<" << n_padded() << "; ++j) {\n";
       }
     } else {
@@ -421,7 +427,7 @@ namespace casadi {
 
     // Evaluate
     if (str(f_).find("SXFunction")!= std::string::npos) {
-      g << g(f_, "arg1", "res1", "iw", "w", local) << ";\n";
+      g << g(f_, "arg1", "res1", "iw", "w", local, "j") << ";\n";
     } else {
       g << "if (" << g(f_, "arg1", "res1", "iw", "w", local) << ") return 1;\n";
     }
@@ -437,9 +443,9 @@ namespace casadi {
       uout() << "j nnz" << j << ":" << f_.nnz_in(j) << std::endl;
       if (!reduce_in_[j] && f_.nnz_in(j)) {
         if (inst.arg_null.empty()) {
-          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
+          //g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
         } else {
-          if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
+          //if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
         }
       }
     }
@@ -447,7 +453,7 @@ namespace casadi {
     for (casadi_int j=0; j<n_out_; ++j) {
       if (reduce_out_[j]) {
         if (vectorize_f()) {
-          g << "res1[" << j << "]+=1;\n";
+          //g << "res1[" << j << "]+=1;\n";
         } else {
           g << "if (res1[" << j << "]) ";
           g << g.axpy(f_.nnz_out(j), "1.0", "res1[" + str(j) + "]", "res[" + str(j) + "]") << "\n";
@@ -458,7 +464,7 @@ namespace casadi {
             g << "if (res1[" << j << "]) ";
             g << "res1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_out(j)) << ";\n";
           } else {
-            if (!inst.res_null[j]) g << "res1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_out(j)) << ";\n";
+            //if (!inst.res_null[j]) g << "res1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_out(j)) << ";\n";
           }
         }
       }

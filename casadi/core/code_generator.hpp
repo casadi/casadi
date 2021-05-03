@@ -121,7 +121,7 @@ namespace casadi {
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const Instance& inst=Instance());
+                           const std::string& w, const Instance& inst=Instance(), const std::string& it="");
 
     /** \brief Print a string to buffer  */
     CodeGenerator& operator<<(const std::string& s);

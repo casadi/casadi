@@ -798,7 +798,7 @@ namespace casadi {
   operator()(const Function& f, const string& arg,
              const string& res, const string& iw,
              const string& w,
-             const Instance& inst) {
+             const Instance& inst, const std::string& iter) {
     std::string name = add_dependency(f, inst);
     bool needs_mem = !f->codegen_mem_type().empty();
     if (needs_mem) {
@@ -813,7 +813,7 @@ namespace casadi {
       return "flag";
     } else {
       return name + "(" + arg + ", " + res + ", "
-              + iw + ", " + w + ", 0)";
+              + iw + ", " + w + ", 0" + (iter.empty() ? "": ", "+iter) + ")";
     }
   }
 

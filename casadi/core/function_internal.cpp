@@ -2134,7 +2134,8 @@ namespace casadi {
     }
     if (vectorize) {
       if (is_a("SXFunction", false)) {
-        g << "static __attribute__((always_inline)) inline " << signature(fname) << " {\n";
+        g << "#pragma omp declare simd uniform(arg, res, iw, w) linear(i:1) simdlen(" << GlobalOptions::vector_width_real << ") notinbranch\n";
+        g << "static __attribute__((noinline)) " << signature(fname, true) << " {\n";
       } else {
         g << "static " << signature(fname) << " {\n";
       }
@@ -2147,22 +2148,28 @@ namespace casadi {
 
     g.scope_enter();
 
+
     // Generate function body (to buffer)
     codegen_body(g, inst);
 
     g.scope_exit();
 
     // Finalize the function
-    g << "return 0;\n";
+    if (!vectorize || !is_a("SXFunction", false)) g << "return 0;\n";
     g << "}\n\n";
 
     // Flush to function body
     g.flush(g.body);
   }
 
-  std::string FunctionInternal::signature(const std::string& fname) const {
-    return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
+  std::string FunctionInternal::signature(const std::string& fname, bool vectorize) const {
+    if (vectorize) {
+      return "void " + fname + "(const casadi_real**const arg, casadi_real**const res, "
+                            "casadi_int* iw, casadi_real* w, int mem, int i)";
+    } else {
+      return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
                             "casadi_int* iw, casadi_real* w, int mem)";
+    }
   }
 
   void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
