@@ -819,7 +819,7 @@ namespace casadi {
     /** \brief Code generate the function
 
         \identifier{ly} */
-    std::string signature(const std::string& fname) const;
+    std::string signature(const std::string& fname, bool vectorize=false) const;
 
     /** \brief Generate code for the declarations of the C function
 
