@@ -731,9 +731,52 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   }
 }
 
-std::pair<std::vector<std::string>, std::vector<std::string>> DaeBuilderInternal::tear() const {
-  // Return value
-  std::pair<std::vector<std::string>, std::vector<std::string>> ret;
+void DaeBuilderInternal::tear() {
+  // Prefix
+  const std::string res_prefix = "res__";
+  // Get residual variables, iteration variables
+  std::vector<std::string> res, iv, iv_on_hold;
+  tearing_variables(&res, &iv, &iv_on_hold);
+  // All iteration variables
+  std::set<std::string> iv_set;
+  for (auto& e : iv) iv_set.insert(e);
+  for (auto& e : iv_on_hold) iv_set.insert(e);
+  // Remove any (held or not held) iteration variables, equations from z and alg
+  size_t sz = 0;
+  casadi_assert(z_.size()==alg_.size(), "z and alg have different lengths");
+  for (size_t k = 0; k < z_.size(); ++k) {
+    if (!iv_set.count(z_[k].name())) {
+      // Non-iteration variable: Keep
+      z_.at(k) = z_.at(sz);
+      alg_.at(k) = alg_.at(sz);
+      sz++;
+    }
+  }
+  z_.resize(sz);
+  alg_.resize(sz);
+  // Remove any (held or not held) iteration variables, equations from u
+  sz = 0;
+  for (size_t k = 0; k < u_.size(); ++k) {
+    if (!iv_set.count(u_[k].name())) {
+      // Non-iteration variable: Keep
+      u_.at(k) = u_.at(sz++);
+    }
+  }
+  u_.resize(sz);
+  // Add algebraic variables
+  for (auto& e : iv) z_.push_back(variable(e).v);
+  // Add residual variables
+  for (auto& e : res) alg_.push_back(variable(e).v);
+  // Add output variables
+  for (auto& e : iv_on_hold) u_.push_back(variable(e).v);
+}
+
+void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
+    std::vector<std::string>* iv, std::vector<std::string>* iv_on_hold) const {
+  // Clear output
+  if (res) res->clear();
+  if (iv) iv->clear();
+  if (iv_on_hold) iv_on_hold->clear();
   // Prefix
   const std::string res_prefix = "res__";
   // Collect hold indices
@@ -784,7 +827,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> DaeBuilderInternal
         r_hold.push_back(variable(res_hold_name).v);
         casadi_assert(r_hold.back().is_scalar(), "Non-scalar hold variable for " + res_hold_name);
       }
-      ret.first.push_back(v.name);
+      if (res) res->push_back(v.name);
       // Add iteration variable, corresponding hold variable
       if (iv_hold_name.empty()) {
         iv_hold.push_back(false);
@@ -793,7 +836,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> DaeBuilderInternal
         iv_hold.push_back(variable(iv_hold_name).v);
         casadi_assert(iv_hold.back().is_scalar(), "Non-scalar hold variable for " + iv_hold_name);
       }
-      ret.second.push_back(iv_name);
+      if (iv) iv->push_back(iv_name);
     }
   }
   // Evaluate hold variables, if needed
@@ -815,30 +858,33 @@ std::pair<std::vector<std::string>, std::vector<std::string>> DaeBuilderInternal
       std::vector<DM> hold0 = holdfun({p0});
       std::vector<double> r_hold0 = hold0.at(0).nonzeros();
       std::vector<double> iv_hold0 = hold0.at(1).nonzeros();
-      casadi_assert_dev(r_hold0.size() == ret.first.size());
-      casadi_assert_dev(iv_hold0.size() == ret.second.size());
+      casadi_assert_dev(r_hold0.size() == res->size());
+      casadi_assert_dev(iv_hold0.size() == iv->size());
       // Remove hold variables from residual variables
       size_t sz = 0;
-      for (size_t k = 0; k < ret.first.size(); ++k) {
-        if (!static_cast<bool>(r_hold0.at(k))) {
-          ret.first[sz++] = ret.first[k];
+      if (res) {
+        for (size_t k = 0; k < res->size(); ++k) {
+          if (!static_cast<bool>(r_hold0.at(k))) {
+            res->at(sz++) = res->at(k);
+          }
         }
+        res->resize(sz);
       }
-      ret.first.resize(sz);
       // Remove hold variables from iteration variables
       sz = 0;
-      for (size_t k = 0; k < ret.second.size(); ++k) {
+      for (size_t k = 0; k < iv->size(); ++k) {
         if (!static_cast<bool>(iv_hold0.at(k))) {
-          ret.second[sz++] = ret.second[k];
+          if (iv) iv->at(sz++) = iv->at(k);
+        } else {
+          if (iv_on_hold) iv_on_hold->push_back(iv->at(k));
         }
       }
-      ret.second.resize(sz);
+      if (iv) iv->resize(sz);
     } catch (std::exception& e) {
       // Warning instead of error
       casadi_warning("Failed to evaluate hold variables: " + std::string(e.what()));
     }
   }
-  return ret;
 }
 
 const Variable& DaeBuilderInternal::variable(const std::string& name) const {

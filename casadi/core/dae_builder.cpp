@@ -202,12 +202,11 @@ void DaeBuilder::prune(bool prune_p, bool prune_u) {
   }
 }
 
-std::pair<std::vector<std::string>, std::vector<std::string>> DaeBuilder::tear() const {
+void DaeBuilder::tear() {
   try {
-    return (*this)->tear();
+    (*this)->tear();
   } catch (std::exception& e) {
     THROW_ERROR("tear", e.what());
-    return {};
   }
 }
 

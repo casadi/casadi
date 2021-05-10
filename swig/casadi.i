@@ -2307,7 +2307,6 @@ namespace std {
 
 %casadi_typemaps(L_STR, PREC_STRING, std::string)
 %casadi_template(LL L_STR LR, PREC_VECTOR, std::vector<std::string>)
-%casadi_template(LPAIR(LL L_STR LR, LL L_STR LR), PREC_VECTOR, std::pair<std::vector<std::string>, std::vector<std::string> >)
 %casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
 %casadi_template(LL "Sparsity" LR, PREC_SPARSITY, std::vector< casadi::Sparsity>)
 %casadi_template(LL LL "Sparsity"  LR  LR, PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
