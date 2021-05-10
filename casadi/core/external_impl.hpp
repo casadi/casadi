@@ -45,172 +45,170 @@
 
 /// \cond INTERNAL
 
-
 namespace casadi {
 
-  class CASADI_EXPORT External : public FunctionInternal {
-  protected:
-    /** \brief Information about the library */
-    Importer li_;
+class CASADI_EXPORT External : public FunctionInternal {
+ protected:
+  /** \brief Information about the library */
+  Importer li_;
 
-    /** \brief Increase/decrease reference counter */
-    signal_t incref_, decref_;
+  /** \brief Increase/decrease reference counter */
+  signal_t incref_, decref_;
 
-    /** \brief Number of inputs and outputs */
-    getint_t get_n_in_, get_n_out_;
+  /** \brief Number of inputs and outputs */
+  getint_t get_n_in_, get_n_out_;
 
-    /** \brief Names of inputs and outputs */
-    name_t get_name_in_, get_name_out_;
+  /** \brief Names of inputs and outputs */
+  name_t get_name_in_, get_name_out_;
 
-    /** \brief Get default inputs */
-    default_t get_default_in_;
+  /** \brief Get default inputs */
+  default_t get_default_in_;
 
-    /** \brief Work vector sizes */
-    work_t work_;
+  /** \brief Work vector sizes */
+  work_t work_;
 
-    ///@{
-    /** \brief Data vectors */
-    std::vector<casadi_int> int_data_;
-    std::vector<double> real_data_;
-    std::string string_data_;
-    ///@}
-  public:
+  ///@{
+  /** \brief Data vectors */
+  std::vector<casadi_int> int_data_;
+  std::vector<double> real_data_;
+  std::string string_data_;
+  ///@}
+ public:
 
-    /** \brief Constructor */
-    External(const std::string& name, const Importer& li);
+  /** \brief Constructor */
+  External(const std::string& name, const Importer& li);
 
-    /** \brief Destructor */
-    ~External() override = 0;
+  /** \brief Destructor */
+  ~External() override = 0;
 
-    /** \brief Any symbol found? */
-    virtual bool any_symbol_found() const;
+  /** \brief Any symbol found? */
+  virtual bool any_symbol_found() const;
 
-    // Factory
-    Function factory(const std::string& name,
-                             const std::vector<std::string>& s_in,
-                             const std::vector<std::string>& s_out,
-                             const Function::AuxOut& aux,
-                             const Dict& opts) const override;
+  // Factory
+  Function factory(const std::string& name,
+                           const std::vector<std::string>& s_in,
+                           const std::vector<std::string>& s_out,
+                           const Function::AuxOut& aux,
+                           const Dict& opts) const override;
 
-    /** \brief Get type name */
-    std::string class_name() const override { return "External";}
+  /** \brief Get type name */
+  std::string class_name() const override { return "External";}
 
-    /** \brief Initialize members that are unique */
-    virtual void init_external();
+  /** \brief Initialize members that are unique */
+  virtual void init_external();
 
-    /// Initialize
-    void init(const Dict& opts) override;
+  /// Initialize
+  void init(const Dict& opts) override;
 
-    /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+  /** \brief Generate code for the declarations of the C function */
+  void codegen_declarations(CodeGenerator& g) const override;
 
-    /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
+  /** \brief Generate code for the body of the C function */
+  void codegen_body(CodeGenerator& g) const override;
 
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override;
-    size_t get_n_out() override;
-    ///@}
+  ///@{
+  /** \brief Number of function inputs and outputs */
+  size_t get_n_in() override;
+  size_t get_n_out() override;
+  ///@}
 
-    /** \brief Default inputs */
-    double get_default_in(casadi_int i) const override;
+  /** \brief Default inputs */
+  double get_default_in(casadi_int i) const override;
 
-    ///@{
-    /** \brief Names of function input and outputs */
-    std::string get_name_in(casadi_int i) override;
-    std::string get_name_out(casadi_int i) override;
-    /// @}
+  ///@{
+  /** \brief Names of function input and outputs */
+  std::string get_name_in(casadi_int i) override;
+  std::string get_name_out(casadi_int i) override;
+  /// @}
 
-    ///@{
-    /** \brief Forward mode derivatives */
-    Function get_forward(casadi_int nfwd, const std::string& name,
-                                 const std::vector<std::string>& inames,
-                                 const std::vector<std::string>& onames,
-                                 const Dict& opts) const override;
-    bool has_forward(casadi_int nfwd) const override;
-    ///@}
+  ///@{
+  /** \brief Forward mode derivatives */
+  Function get_forward(casadi_int nfwd, const std::string& name,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
+                               const Dict& opts) const override;
+  bool has_forward(casadi_int nfwd) const override;
+  ///@}
 
-    ///@{
-    /** \brief Reverse mode derivatives */
-    Function get_reverse(casadi_int nadj, const std::string& name,
-                                 const std::vector<std::string>& inames,
-                                 const std::vector<std::string>& onames,
-                                 const Dict& opts) const override;
-    bool has_reverse(casadi_int nadj) const override;
-    ///@}
+  ///@{
+  /** \brief Reverse mode derivatives */
+  Function get_reverse(casadi_int nadj, const std::string& name,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
+                               const Dict& opts) const override;
+  bool has_reverse(casadi_int nadj) const override;
+  ///@}
 
-    ///@{
-    /** \brief Full Jacobian */
-    bool has_jacobian() const override;
-    Function get_jacobian(const std::string& name,
-                                     const std::vector<std::string>& inames,
-                                     const std::vector<std::string>& onames,
-                                     const Dict& opts) const override;
-    ///@}
+  ///@{
+  /** \brief Full Jacobian */
+  bool has_jacobian() const override;
+  Function get_jacobian(const std::string& name,
+                                   const std::vector<std::string>& inames,
+                                   const std::vector<std::string>& onames,
+                                   const Dict& opts) const override;
+  ///@}
 
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
+  /** \brief Serialize an object without type information */
+  void serialize_body(SerializingStream &s) const override;
 
-    /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeserializingStream& s);
+  /** \brief Deserialize into MX */
+  static ProtoFunction* deserialize(DeserializingStream& s);
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
-    std::string serialize_base_function() const override { return "External"; }
+  /** \brief String used to identify the immediate FunctionInternal subclass */
+  std::string serialize_base_function() const override { return "External"; }
 
-  protected:
-    /** \brief Deserializing constructor */
-    explicit External(DeserializingStream& s);
-  };
+ protected:
+  /** \brief Deserializing constructor */
+  explicit External(DeserializingStream& s);
+};
 
-  class CASADI_EXPORT GenericExternal : public External {
-    // Sparsities
-    sparsity_t get_sparsity_in_, get_sparsity_out_, get_jac_sparsity_;
-    // Differentiability
-    diff_t get_diff_in_, get_diff_out_;
+class CASADI_EXPORT GenericExternal : public External {
+  // Sparsities
+  sparsity_t get_sparsity_in_, get_sparsity_out_, get_jac_sparsity_;
+  // Differentiability
+  diff_t get_diff_in_, get_diff_out_;
 
-  public:
-    /** \brief Constructor */
-    GenericExternal(const std::string& name, const Importer& li);
+ public:
+  /** \brief Constructor */
+  GenericExternal(const std::string& name, const Importer& li);
 
-    /** \brief  Destructor */
-    ~GenericExternal() override { this->clear_mem();}
+  /** \brief  Destructor */
+  ~GenericExternal() override { this->clear_mem();}
 
-    /** \brief Any symbol found? */
-    bool any_symbol_found() const override;
+  /** \brief Any symbol found? */
+  bool any_symbol_found() const override;
 
-    /** \brief Initialize members that are unique */
-    void init_external() override;
+  /** \brief Initialize members that are unique */
+  void init_external() override;
 
-    /// Initialize
-    void init(const Dict& opts) override;
+  /// Initialize
+  void init(const Dict& opts) override;
 
-    /// @{
-    /** \brief Retreive sparsities */
-    Sparsity get_sparsity_in(casadi_int i) override;
-    Sparsity get_sparsity_out(casadi_int i) override;
-    /// @}
+  /// @{
+  /** \brief Retreive sparsities */
+  Sparsity get_sparsity_in(casadi_int i) override;
+  Sparsity get_sparsity_out(casadi_int i) override;
+  /// @}
 
-    ///@{
-    /** \brief Return sparsity of Jacobian of an output respect to an input */
-    bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override;
-    Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
-    ///@}
+  ///@{
+  /** \brief Return sparsity of Jacobian of an output respect to an input */
+  bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override;
+  Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
+  ///@}
 
-    /// @{
-    /** \brief Retreive differentiability */
-    bool get_diff_in(casadi_int i) override;
-    bool get_diff_out(casadi_int i) override;
-    /// @}
+  /// @{
+  /** \brief Retreive differentiability */
+  bool get_diff_in(casadi_int i) override;
+  bool get_diff_out(casadi_int i) override;
+  /// @}
 
-    /** \brief Serialize type information */
-    void serialize_type(SerializingStream &s) const override;
+  /** \brief Serialize type information */
+  void serialize_type(SerializingStream &s) const override;
 
-    /** \brief Deserializing constructor */
-    explicit GenericExternal(DeserializingStream& s);
+  /** \brief Deserializing constructor */
+  explicit GenericExternal(DeserializingStream& s);
 
-  };
-
+};
 
 } // namespace casadi
 /// \endcond
