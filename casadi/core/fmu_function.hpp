@@ -23,48 +23,26 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#ifndef CASADI_FMU_FUNCTION_HPP
+#define CASADI_FMU_FUNCTION_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+#include "function.hpp"
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+namespace casadi {
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+/** \brief  Load a function from an FMU DLL
+  \param name    Name assigned to the resulting function object
+  \param guid    Global unique identifier, from the corresponding modelDescription.xml file
+  \param id_in   Identifiers of all the inputs, separated by differentiable and non-differentiable
+  \param id_out  Identifiers of all the outputs, separated by differentiable and non-differentiable
+  \param opts    Optional settings
+*/
+CASADI_EXPORT Function fmu_function(const std::string& name, const std::string& guid,
+    const std::string& resource_loc,
+    const std::vector<std::vector<casadi_int>>& id_in,
+    const std::vector<std::vector<casadi_int>>& id_out,
+    const Dict& opts=Dict());
 
-// Matrix expressions
-#include "mx.hpp"
+} // namespace casadi
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "fmu_function.hpp"
-
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-
-#endif // CASADI_CORE_HPP
+#endif // CASADI_FMU_FUNCTION_HPP

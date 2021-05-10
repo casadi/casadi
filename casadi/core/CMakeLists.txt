@@ -60,6 +60,7 @@ set(CASADI_PUBLIC
   expm.hpp
   code_generator.hpp
   importer.hpp
+  fmu_function.hpp
 
   # MISC useful stuff
   integration_tools.hpp
@@ -159,6 +160,7 @@ set(CASADI_INTERNAL
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
   external_impl.hpp       external.cpp
+  fmu_function_impl.hpp   fmu_function.cpp
   jit_function.hpp        jit_function.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
   rootfinder_impl.hpp     rootfinder.cpp

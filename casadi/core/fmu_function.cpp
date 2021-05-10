@@ -23,48 +23,39 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
-
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
-
-// Generic tools
-#include "polynomial.hpp"
+#include "fmu_function_impl.hpp"
 #include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+#include "serializing_stream.hpp"
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
-// Matrix expressions
-#include "mx.hpp"
+namespace casadi {
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "fmu_function.hpp"
+Function fmu_function(const std::string& name, const std::string& guid,
+    const std::string& resource_loc,
+    const std::vector<std::vector<casadi_int>>& id_in,
+    const std::vector<std::vector<casadi_int>>& id_out,
+    const Dict& opts) {
+  return Function::create(new FmuFunction(name, guid, resource_loc, id_in, id_out), opts);
+}
 
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
+FmuFunction::FmuFunction(const std::string& name, const std::string& guid,
+    const std::string& resource_loc,
+    const std::vector<std::vector<casadi_int>>& id_in,
+    const std::vector<std::vector<casadi_int>>& id_out)
+  : FunctionInternal(name),
+    guid_(guid), resource_loc_(resource_loc), id_in_(id_in), id_out_(id_out) {
+}
 
-#endif // CASADI_CORE_HPP
+FmuFunction::~FmuFunction() {
+  clear_mem();
+}
+
+void FmuFunction::init(const Dict& opts) {
+  // Call the initialization method of the base class
+  FunctionInternal::init(opts);
+}
+
+} // namespace casadi
