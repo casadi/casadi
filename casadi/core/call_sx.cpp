@@ -26,6 +26,7 @@
 #include "function.hpp"
 #include "call_sx.hpp"
 #include "code_generator.hpp"
+#include "global_options.hpp"
 
 namespace casadi {
 
@@ -60,15 +61,38 @@ namespace casadi {
     d[1] = 0;
   }
 
-  std::string CallSX::codegen(CodeGenerator& g, int i0, int i1, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w)const {
+  std::string CallSX::codegen(CodeGenerator& g, const Instance& inst, int i0, int i1, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w)const {
+    /*g << "#pragma omp ordered simd\n";
+    g << "{\n";
     g << "(" << arg << ")[0] = &" << g.sx_work(i1) << ";\n";
     g << "(" << res << ")[0] = &" << g.sx_work(i0) << ";\n";
     g << g(f_, arg, res, iw, w);
-    return "";
+    g << ";}";*/
+    std::string fname = g.add_dependency(f_, inst);
+    std::string name = fname+"_wrap";
+    return g.sx_work(i0) + " = "  + name + "(" + g.sx_work(i1)  + ")";
   }
 
-  void CallSX::codegen_dependency(CodeGenerator& g) const {
-    g.add_dependency(f_);
+  void CallSX::codegen_dependency(CodeGenerator& g, const Instance& inst) const {
+    bool added = g.has_dependency(f_, inst);
+    if (!added) {
+      std::string fname = g.add_dependency(f_, inst);
+
+      std::string name = fname+"_wrap";
+
+      g << "#pragma omp declare simd simdlen("<< GlobalOptions::vector_width_real << ")\n";
+      g << "static __attribute__((noinline)) __attribute__((pure)) casadi_real " << name << "(casadi_real x) {\n";
+      g << "const casadi_real* arg[" << f_.sz_arg() << "];\n";
+      g << "casadi_real* res[" << f_.sz_res() << "];\n";
+      g << "casadi_int iw[" << f_.sz_iw() << "];\n";
+      g << "casadi_real w[" << f_.sz_w() << "];\n";
+      g << "casadi_real r;\n";
+      g << "arg[0] = &x;\n";
+      g << "res[0] = &r;\n";
+      g << g(f_, "arg", "res", "iw", "w",  inst) << ";\n";
+      g << "return r;\n";
+      g << "}\n";
+    }
   }
 
   std::string CallSX::print(const std::string& arg1, const std::string& arg2) const {

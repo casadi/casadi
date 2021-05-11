@@ -157,7 +157,10 @@ namespace casadi {
     // Run the algorithm
     for (auto&& a : algorithm_) {
       if (a.op==OP_CALL) {
-        call_nodes_[a.i2]->codegen_dependency(g);
+        Instance local;
+        local.stride_in.resize(1, 1);
+        local.stride_out.resize(1, 1);
+        call_nodes_[a.i2]->codegen_dependency(g, local);
       }
     }
   }
@@ -265,7 +268,10 @@ namespace casadi {
           }
         }
       } else if (a.op==OP_CALL) {
-        g << call_nodes_[a.i2]->codegen(g, a.i0, a.i1, "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w+" + str(worksize_)); 
+        Instance local;
+        local.stride_in.resize(1, 1);
+        local.stride_out.resize(1, 1);
+        g << call_nodes_[a.i2]->codegen(g, local, a.i0, a.i1, "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w+" + str(worksize_)); 
       } else {
 
         // Where to store the result

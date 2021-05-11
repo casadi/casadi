@@ -74,6 +74,9 @@ namespace casadi {
     /// Add a function dependency
     std::string add_dependency(const Function& f, const Instance& inst=Instance());
 
+    /// Has a function dependency
+    bool has_dependency(const Function& f, const Instance& inst=Instance()) const;
+
     /// Add an external function declaration
     void add_external(const std::string& new_external);
 
