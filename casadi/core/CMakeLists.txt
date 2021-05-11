@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 2.8.6)
 # Create runtime
 add_subdirectory(runtime)
 
+# FMU headers
+if(WITH_FMU)
+  # FMU C API
+  include_directories(${FMU_INCLUDE_DIR})
+endif()
+
 set(CASADI_PUBLIC
   # MISC
   casadi_limits.hpp

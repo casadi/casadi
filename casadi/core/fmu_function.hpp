@@ -32,15 +32,17 @@ namespace casadi {
 
 /** \brief  Load a function from an FMU DLL
   \param name    Name assigned to the resulting function object
-  \param guid    Global unique identifier, from the corresponding modelDescription.xml file
+  \param path    Path to the unpacked FMU, where the modelDescription.xml file is located
   \param id_in   Identifiers of all the inputs, separated by differentiable and non-differentiable
   \param id_out  Identifiers of all the outputs, separated by differentiable and non-differentiable
+  \param guid    Global unique identifier, from the corresponding modelDescription.xml file
   \param opts    Optional settings
 */
-CASADI_EXPORT Function fmu_function(const std::string& name, const std::string& guid,
-    const std::string& resource_loc,
+CASADI_EXPORT Function fmu_function(const std::string& name,
+    const std::string& path,
     const std::vector<std::vector<casadi_int>>& id_in,
     const std::vector<std::vector<casadi_int>>& id_out,
+    const std::string& guid,
     const Dict& opts=Dict());
 
 } // namespace casadi

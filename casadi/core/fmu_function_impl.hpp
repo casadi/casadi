@@ -28,6 +28,13 @@
 
 #include "fmu_function.hpp"
 #include "function_internal.hpp"
+#include "importer.hpp"
+
+#ifdef WITH_FMU
+//#include <fmi2FunctionTypes.h>
+#include <fmi2Functions.h>
+//#include <fmi2TypesPlatform.h>
+#endif  // WITH_FMU
 
 #ifdef WITH_DL
 #ifdef _WIN32 // also for 64-bit
@@ -49,22 +56,49 @@ namespace casadi {
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
-   // Global unique identifier
-   const std::string guid_;
-
-   // Path to the FMU resource directory
-   std::string resource_loc_;
+   // Path to the unpacked FMU
+   std::string path_;
 
    // Value reference to the inputs and outputs
    std::vector<std::vector<casadi_int>> id_in_, id_out_;
 
+   // Global unique identifier
+   const std::string guid_;
+
+   /** \brief Information about the library */
+   Importer li_;
+
+   // Path to the FMU resource directory
+   std::string resource_loc_;
+
+#ifdef WITH_FMU
+  // Component references
+  std::vector<fmi2ValueReference> xd_, xn_, yd_, yn_;
+
+  // FMU C API function prototypes. Cf. FMI specification 2.0.2
+  fmi2InstantiateTYPE* instantiate_;
+  fmi2FreeInstanceTYPE* free_instance_;
+  fmi2SetupExperimentTYPE* setup_experiment_;
+  fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
+  fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
+  fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
+  fmi2SetRealTYPE* set_real_;
+  fmi2SetBooleanTYPE* set_boolean_;
+  fmi2GetRealTYPE* get_real_;
+  fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
+
+  // Pointer to instance
+  fmi2Component c_;
+
+#endif  // WITH_FMU
+
  public:
 
   /** \brief Constructor */
-  FmuFunction(const std::string& name, const std::string& guid,
-      const std::string& resource_loc,
+  FmuFunction(const std::string& name, const std::string& path,
       const std::vector<std::vector<casadi_int>>& id_in,
-      const std::vector<std::vector<casadi_int>>& id_out);
+      const std::vector<std::vector<casadi_int>>& id_out,
+      const std::string& guid);
 
   /** \brief Destructor */
   ~FmuFunction() override;
@@ -93,6 +127,23 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   bool get_diff_out(casadi_int i) override {return i == 0;}
   /// @}
 
+  /// @{
+  /** \brief Retreive sparsities */
+  Sparsity get_sparsity_in(casadi_int i) override;
+  Sparsity get_sparsity_out(casadi_int i) override;
+  /// @}
+
+  // Evaluate numerically
+  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+
+  // Name of system, per the FMI specification
+  static std::string system_infix();
+
+  // DLL suffix, per the FMI specification
+  static std::string dll_suffix();
+
+  // Load an FMI function
+  signal_t get_function(const std::string& symname);
 };
 
 } // namespace casadi
