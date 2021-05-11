@@ -34,6 +34,7 @@
 namespace casadi {
 
 class CodeGenerator;
+struct Instance;
 
 class CallSX : public SXNode {
 public:
@@ -63,9 +64,9 @@ public:
 
   static void der(const SXElem& x, const SXElem& y, const SXElem& f, SXElem* d);
 
-  std::string codegen(CodeGenerator& g, int i0, int i1, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w) const;
+  std::string codegen(CodeGenerator& g, const Instance& inst, int i0, int i1, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w) const;
 
-  void codegen_dependency(CodeGenerator& g) const;
+  void codegen_dependency(CodeGenerator& g, const Instance& inst) const;
 
   void serialize_node(SerializingStream& s) const override;
 

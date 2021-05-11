@@ -199,6 +199,12 @@ namespace casadi {
     }
   }
 
+  bool CodeGenerator::has_dependency(const Function& f, const Instance& inst) const {
+    bool ret = false;
+    for (const auto& e : added_functions_) if (e.f==f && e.inst==inst) ret = true;
+    return ret;
+  }
+
   string CodeGenerator::add_dependency(const Function& f, const Instance& inst) {
 
     /*std::string prefix = "_";
