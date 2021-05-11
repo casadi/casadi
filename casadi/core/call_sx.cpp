@@ -81,7 +81,7 @@ namespace casadi {
       std::string name = fname+"_wrap";
 
       g << "#pragma omp declare simd simdlen("<< GlobalOptions::vector_width_real << ")\n";
-      g << "static __attribute__((noinline)) __attribute__((pure)) casadi_real " << name << "(casadi_real x) {\n";
+      g << "static __attribute__((noinline)) __attribute__((const)) casadi_real " << name << "(casadi_real x) {\n";
       g << "const casadi_real* arg[" << f_.sz_arg() << "];\n";
       g << "casadi_real* res[" << f_.sz_res() << "];\n";
       g << "casadi_int iw[" << f_.sz_iw() << "];\n";
