@@ -46,10 +46,20 @@ struct CASADI_EXPORT FmiUnknown {
   std::vector<std::string> dependenciesKind;
   // Default constructor
   FmiUnknown() : index(-1) {}
-  // Construct from Node
+  // Construct from node
   explicit FmiUnknown(const XmlNode& n);
   // Apply index offset
   void offset(casadi_int off);
+};
+
+// FMI Unknown
+struct CASADI_EXPORT FmiModelStructure {
+  // Process model structure
+  std::vector<FmiUnknown> outputs, derivatives, initial_unknowns;
+  // Default constructor
+  FmiModelStructure() {}
+  // Construct from node
+  explicit FmiModelStructure(const XmlNode& n);
 };
 
 // Load FMI list as an std::vector
@@ -60,7 +70,7 @@ std::vector<T> read_list(const XmlNode& n);
     \date 2012-2021
     \author Joel Andersson
  */
-struct CASADI_EXPORT Variable : public Printable<Variable> {
+struct CASADI_EXPORT Variable {
   /// Variable type
   enum Type {REAL, INTEGER, BOOLEAN, STRING, ENUM, N_TYPE};
 
@@ -115,19 +125,6 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
 
   /// Binding equation
   MX beq;
-
-  /// Readable name of the class
-  std::string type_name() const {return "Variable";}
-
-  /// Print a description of the object
-  void disp(std::ostream& stream, bool more=false) const;
-
-  /// Get string representation
-  std::string get_str(bool more=false) const {
-    std::stringstream ss;
-    disp(ss, more);
-    return ss.str();
-  }
 
   // Default initial attribute, per specification
   static Initial default_initial(Causality causality, Variability variability);
