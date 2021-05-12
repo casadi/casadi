@@ -32,16 +32,6 @@ bool XmlNode::has_attribute(const std::string& att_name) const {
   return attributes_.find(att_name) != attributes_.end();
 }
 
-XmlNode& XmlNode::operator[](casadi_int i) {
-  casadi_assert(i>=0 && i < size(),
-    "index out of bounds for element " + str(i) + " of node " + name());
-  return children_.at(i);
-}
-
-const XmlNode& XmlNode::operator[](casadi_int i) const {
-  return const_cast<XmlNode*>(this)->operator[](i); // NOLINT
-}
-
 bool XmlNode::has_child(const std::string& childname) const {
   auto it = child_indices_.find(childname);
   return it!=child_indices_.end();
@@ -71,14 +61,6 @@ void XmlNode::set_attribute(const std::string& attribute_name, const std::string
 std::ostream& operator<<(std::ostream &stream, const XmlNode& node) {
   node.dump(stream);
   return stream;
-}
-
-casadi_int XmlNode::size() const {
-  return children_.size();
-}
-
-const std::string& XmlNode::name() const {
-  return name_;
 }
 
 void XmlNode::setName(const std::string& name) {

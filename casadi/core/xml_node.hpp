@@ -90,10 +90,10 @@ struct CASADI_EXPORT XmlNode {
   }
 
   /** \brief  Get a reference to a child by its index */
-  const XmlNode& operator[](casadi_int i) const;
+  const XmlNode& operator[](size_t i) const { return children_.at(i);}
 
   /** \brief  Get a reference to a child by its index */
-  XmlNode& operator[](casadi_int i);
+  XmlNode& operator[](size_t i) { return children_.at(i);}
 
   /** \brief  Get a reference to a child by its name */
   const XmlNode& operator[](const std::string& childname) const;
@@ -105,10 +105,7 @@ struct CASADI_EXPORT XmlNode {
   bool has_child(const std::string& childname) const;
 
   /** \brief  Get the number of children */
-  casadi_int size() const;
-
-  /** \brief  Get the name of the node */
-  const std::string& name() const;
+  size_t size() const { return children_.size();}
 
   /** \brief  Set the name of the node */
   void setName(const std::string& name);
