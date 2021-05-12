@@ -69,7 +69,7 @@ struct CASADI_EXPORT XmlNode {
     casadi_assert(it != attributes_.end(), "Could not find attribute " + att_name);
     // Attribute found, read it
     T ret;
-    readString(it->second, ret);
+    read(it->second, ret);
     return ret;
   }
 
@@ -84,7 +84,7 @@ struct CASADI_EXPORT XmlNode {
     } else {
       // Attribute found, read it
       T ret;
-      readString(it->second, ret);
+      read(it->second, ret);
       return ret;
     }
   }
@@ -112,22 +112,22 @@ struct CASADI_EXPORT XmlNode {
 
   /** \brief  Get value of text field */
   template<typename T>
-    void getText(T& val) const { readString(text_, val);}
+    void getText(T& val) const { read(text_, val);}
 
   /** \brief  Read the string value of a string (i.e. copy) */
-  static void readString(const std::string& str, std::string& val);
+  static void read(const std::string& str, std::string& val);
 
   /** \brief  Read the boolean value of a string */
-  static void readString(const std::string& str, bool& val);
+  static void read(const std::string& str, bool& val);
 
   /** \brief  Read the integer value of a string */
-  static void readString(const std::string& str, casadi_int& val);
+  static void read(const std::string& str, casadi_int& val);
 
   /** \brief  Read the double value of a string */
-  static void readString(const std::string& str, double& val);
+  static void read(const std::string& str, double& val);
 
   /** \brief  Read a vector of integer values of a string */
-  static void readString(const std::string& str, std::vector<casadi_int>& val);
+  static void read(const std::string& str, std::vector<casadi_int>& val);
 
   /** \brief Print to stream */
   CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream, const XmlNode& node);
