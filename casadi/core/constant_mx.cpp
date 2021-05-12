@@ -89,7 +89,7 @@ namespace casadi {
   }
 
   int ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    if (res[0]) fill_n(res[0], nnz(), 0);
     return 0;
   }
 
@@ -97,13 +97,13 @@ namespace casadi {
     if (iw[0]) {
       res[0] = const_cast<bvec_t*>(get_ptr(bvec_zeros_));
     } else {
-      fill_n(res[0], nnz(), 0);
+      if (res[0]) fill_n(res[0], nnz(), 0);
     }
     return 0;
   }
 
   int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    if (res[0]) fill_n(res[0], nnz(), 0);
     return 0;
   }
 

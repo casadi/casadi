@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CALL_SXElem_HPP
-#define CALL_SXElem_HPP
+#ifndef FUN_INT_ARG_HPP
+#define FUN_INT_ARG_HPP
 
 #include "function.hpp"
 #include "sx_node.hpp"
@@ -36,46 +36,46 @@ namespace casadi {
 class CodeGenerator;
 struct Instance;
 
-class CallSX : public SXNode {
+class FunRef : public SXNode {
 public:
-  explicit CallSX(const SXElem& ref, const SXElem& arg);
-  ~CallSX() override {}
+  explicit FunRef(const Function &f, const SXElem& dep);
+  ~FunRef() override {}
 
   /** \brief  Get the operation */
-  casadi_int op() const override { return OP_CALL;}
+  casadi_int op() const override { return OP_FUNREF;}
 
-  bool is_op(casadi_int op) const override { return op==OP_CALL; }
+  bool is_op(casadi_int op) const override { return op==OP_FUNREF; }
 
   // Class name
-  std::string class_name() const override {return "CallSX";}
+  std::string class_name() const override {return "FunRef";}
 
   /** \brief  Print expression */
   std::string print(const std::string& arg1, const std::string& arg2) const override;
 
   /** \brief  Number of dependencies */
-  casadi_int n_dep() const override { return 2;}
+  casadi_int n_dep() const override { return 1;}
 
   /** \brief  get the reference of a dependency */
-  const SXElem& dep(casadi_int i) const override { return i==0 ? ref_ : arg_ ; }
-  SXElem& dep(casadi_int i) override { return i==0 ? ref_ : arg_ ; }
+  const SXElem& dep(casadi_int i) const override { return dep_; }
+  SXElem& dep(casadi_int i) override { return dep_; }
+
+  int fcn(double& result, double x, const double** arg, double** res, casadi_int* iw, double* w) const;
 
   static void der(const SXElem& x, const SXElem& y, const SXElem& f, SXElem* d);
-
-  static std::string codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w);
-
-  static void codegen_dependency(CodeGenerator& g, const Function& f, const Instance& inst);
 
   void serialize_node(SerializingStream& s) const override;
 
   /** \brief Deserialize without type information */
   static SXNode* deserialize(DeserializingStream& s);
 
-  static int call(const Function &f, double& result, double arg1, double arg2, const double** arg, double** res, casadi_int* iw, double* w);
+  static double pack(int id, double index);
+  static void unpack(double v, int& id, double& index);
 
-  SXElem ref_;
-  SXElem arg_;
+  SXElem dep_;
+  Function f_;
+  bool has_dep_;
 };
 
 } // namespace casadi
 /// \endcond
-#endif // CALL_SXElem_HPP
+#endif // FUN_INT_ARG_HPP

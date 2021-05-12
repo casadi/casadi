@@ -160,6 +160,7 @@ set(CASADI_INTERNAL
   repmat.hpp              repmat.cpp              # RepMat
   convexify.hpp           convexify.cpp           # Convexify
   logsumexp.hpp           logsumexp.cpp           # Logsumexp
+  fun_ref.hpp             fun_ref.cpp
   call_sx.hpp             call_sx.cpp             # Function calls in SX
 
   # A dynamically created function with AD capabilities

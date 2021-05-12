@@ -214,9 +214,11 @@ namespace casadi {
 
     OP_REINTERPRET_LAYOUT,
 
-    OP_PERMUTE_LAYOUT
+    OP_PERMUTE_LAYOUT,
+
+    OP_FUNREF
   };
-  #define NUM_BUILT_IN_OPS (OP_PERMUTE_LAYOUT+1)
+  #define NUM_BUILT_IN_OPS (OP_FUNREF+1)
 
   #define OP_
 
@@ -1578,8 +1580,9 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
       case OP_PARAMETER:
       case OP_INPUT:
         return 0;
-        CASADI_MATH_BINARY_BUILTIN
-          return 2;
+      CASADI_MATH_BINARY_BUILTIN
+      case OP_CALL:
+        return 2;
       default:
         return 1;
     }
@@ -1691,6 +1694,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_EXPM1:          return "expm1";
     case OP_HYPOT:          return "hypot";
     case OP_LOGSUMEXP:      return "logsumexp";
+    case OP_FUNREF:         return "funref";
     }
     return nullptr;
   }

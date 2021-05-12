@@ -537,7 +537,8 @@ namespace casadi {
 
   void CodeGenerator::define_rom_double(const void* id, casadi_int size) {
     auto it = file_scope_double_.find(id);
-    casadi_assert(it==file_scope_double_.end(), "Already defined.");
+    if (it!=file_scope_double_.end()) casadi_assert_dev(size==it->second);
+    //casadi_assert(it==file_scope_double_.end(), "Already defined.");
     shorthand("rd" + str(file_scope_double_.size()));
     file_scope_double_[id] = size;
   }
