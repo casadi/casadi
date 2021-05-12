@@ -83,7 +83,7 @@ namespace casadi {
     for (TiXmlNode* child = n->FirstChild(); child != nullptr; child= child->NextSibling()) {
       num_children++;
     }
-    ret.children_.reserve(num_children);
+    ret.children.reserve(num_children);
 
     // add children
     casadi_int ch = 0;
@@ -92,12 +92,12 @@ namespace casadi {
 
       if (childtype == TiXmlNode::TINYXML_ELEMENT) {
         XmlNode newnode = addNode(child);
-        ret.children_.push_back(newnode);
+        ret.children.push_back(newnode);
         ret.child_indices_[newnode.name] = ch;
       } else if (childtype == TiXmlNode::TINYXML_COMMENT) {
-        ret.comment_ = child->Value();
+        ret.comment = child->Value();
       } else if (childtype == TiXmlNode::TINYXML_TEXT) {
-        ret.text_ = child->ToText()->Value();
+        ret.text = child->ToText()->Value();
       } else if (childtype == TiXmlNode::TINYXML_DECLARATION) {
         // uout() << "Warning: Skipped TiXmlNode::TINYXML_DECLARATION" << endl;
       } else {

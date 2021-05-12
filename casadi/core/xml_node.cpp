@@ -29,7 +29,7 @@
 namespace casadi {
 
 bool XmlNode::has_attribute(const std::string& att_name) const {
-  return attributes_.find(att_name) != attributes_.end();
+  return this->attributes.find(att_name) != this->attributes.end();
 }
 
 bool XmlNode::has_child(const std::string& childname) const {
@@ -47,7 +47,7 @@ XmlNode& XmlNode::operator[](const std::string& childname) {
   }
 
   // Return an index to the child
-  return children_[it->second];
+  return this->children[it->second];
 }
 
 const XmlNode& XmlNode::operator[](const std::string& childname) const {
@@ -55,7 +55,7 @@ const XmlNode& XmlNode::operator[](const std::string& childname) const {
 }
 
 void XmlNode::set_attribute(const std::string& attribute_name, const std::string& attribute) {
-  attributes_[attribute_name] = attribute;
+  this->attributes[attribute_name] = attribute;
 }
 
 std::ostream& operator<<(std::ostream &stream, const XmlNode& node) {
@@ -69,18 +69,18 @@ void XmlNode::dump(std::ostream &stream, casadi_int indent) const {
   stream << std::string(indent, ' ') << "Node: " << this->name << std::endl;
 
   // Print comment
-  if (!comment_.empty()) {
+  if (!this->comment.empty()) {
     stream << std::string(indent, ' ') << "----- comment starts ----- "  << std::endl;
-    stream << comment_ << std::endl;
+    stream << this->comment << std::endl;
     stream << std::string(indent, ' ') << "----- comment ends ----- "  << std::endl;
   }
 
   // Print text
-  if (!text_.empty())
-    stream << std::string(indent+2, ' ') << "Text: " << text_ << std::endl;
+  if (!this->text.empty())
+    stream << std::string(indent+2, ' ') << "Text: " << this->text << std::endl;
 
   // Print attributes
-  for (auto it=attributes_.begin(); it != attributes_.end(); ++it)
+  for (auto it = this->attributes.begin(); it != this->attributes.end(); ++it)
     stream << std::string(indent+2, ' ') << "attribute " << it->first
       << " = " << it->second << std::endl;
 

@@ -38,10 +38,10 @@ namespace casadi {
 
 struct CASADI_EXPORT XmlNode {
   // All attributes
-  std::map<std::string, std::string> attributes_;
+  std::map<std::string, std::string> attributes;
 
   // All children
-  std::vector<XmlNode> children_;
+  std::vector<XmlNode> children;
 
   // Child index by name
   std::map<std::string, casadi_int> child_indices_;
@@ -50,10 +50,10 @@ struct CASADI_EXPORT XmlNode {
   std::string name;
 
   // Comment
-  std::string comment_;
+  std::string comment;
 
   // Text
-  std::string text_;
+  std::string text;
 
   /** \brief  Check if an attribute is present */
   bool has_attribute(const std::string& att_name) const;
@@ -65,8 +65,8 @@ struct CASADI_EXPORT XmlNode {
   template<typename T>
   T attribute(const std::string& att_name) const {
     // Find the attribute, if any
-    auto it = attributes_.find(att_name);
-    casadi_assert(it != attributes_.end(), "Could not find attribute " + att_name);
+    auto it = this->attributes.find(att_name);
+    casadi_assert(it != this->attributes.end(), "Could not find attribute " + att_name);
     // Attribute found, read it
     T ret;
     read(it->second, ret);
@@ -77,8 +77,8 @@ struct CASADI_EXPORT XmlNode {
   template<typename T>
   T attribute(const std::string& att_name, const T& def_att) const {
     // Find the attribute, if any
-    auto it = attributes_.find(att_name);
-    if (it == attributes_.end()) {
+    auto it = this->attributes.find(att_name);
+    if (it == this->attributes.end()) {
       // No such attribute, return default value
       return def_att;
     } else {
@@ -90,10 +90,10 @@ struct CASADI_EXPORT XmlNode {
   }
 
   /** \brief  Get a reference to a child by its index */
-  const XmlNode& operator[](size_t i) const { return children_.at(i);}
+  const XmlNode& operator[](size_t i) const { return this->children.at(i);}
 
   /** \brief  Get a reference to a child by its index */
-  XmlNode& operator[](size_t i) { return children_.at(i);}
+  XmlNode& operator[](size_t i) { return this->children.at(i);}
 
   /** \brief  Get a reference to a child by its name */
   const XmlNode& operator[](const std::string& childname) const;
@@ -105,14 +105,11 @@ struct CASADI_EXPORT XmlNode {
   bool has_child(const std::string& childname) const;
 
   /** \brief  Get the number of children */
-  size_t size() const { return children_.size();}
-
-  /** \brief  Get the text field */
-  std::string getText() const { return text_; }
+  size_t size() const { return this->children.size();}
 
   /** \brief  Get value of text field */
   template<typename T>
-    void getText(T& val) const { read(text_, val);}
+    void getText(T& val) const { read(this->text, val);}
 
   /** \brief  Read the string value of a string (i.e. copy) */
   static void read(const std::string& str, std::string& val);

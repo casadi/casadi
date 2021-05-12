@@ -430,7 +430,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
   } else if (name=="Sqrt") {
     return sqrt(read_expr(node[0]));
   } else if (name=="StringLiteral") {
-    throw CasadiException(node.getText());
+    casadi_error(node.text);
   } else if (name=="Sub") {
     return read_expr(node[0]) - read_expr(node[1]);
   } else if (name=="Tan") {
