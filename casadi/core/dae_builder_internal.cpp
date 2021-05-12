@@ -310,8 +310,8 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
         const XmlNode& n = dyneqs[i];
         try {
           // Consistency checks
-          casadi_assert_dev(n.name_ == "equ:Equation");
-          casadi_assert_dev(n.size() == 1 && n[0].name_ == "exp:Sub");
+          casadi_assert_dev(n.name == "equ:Equation");
+          casadi_assert_dev(n.size() == 1 && n[0].name == "exp:Sub");
           // Ensure not empty
           if (n[0].size() == 0) {
             casadi_warning(str(equ) + "#" + str(i) + " is empty, ignored.");
@@ -349,7 +349,7 @@ Variable& DaeBuilderInternal::read_variable(const XmlNode& node) {
 }
 
 MX DaeBuilderInternal::read_expr(const XmlNode& node) {
-  const std::string& fullname = node.name_;
+  const std::string& fullname = node.name;
   if (fullname.find("exp:")== std::string::npos) {
     casadi_error("DaeBuilderInternal::read_expr: unknown - expression is supposed to "
                  "start with 'exp:' , got " + fullname);

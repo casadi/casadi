@@ -63,13 +63,10 @@ std::ostream& operator<<(std::ostream &stream, const XmlNode& node) {
   return stream;
 }
 
-void XmlNode::setName(const std::string& name) {
-  name_ = name;
-}
 
 void XmlNode::dump(std::ostream &stream, casadi_int indent) const {
   // Print name
-  stream << std::string(indent, ' ') << "Node: " << name_ << std::endl;
+  stream << std::string(indent, ' ') << "Node: " << this->name << std::endl;
 
   // Print comment
   if (!comment_.empty()) {
@@ -92,10 +89,6 @@ void XmlNode::dump(std::ostream &stream, casadi_int indent) const {
     stream << std::string(indent, ' ') << "Child " << i << ":" << std::endl;
     (*this)[i].dump(stream, indent+2);
   }
-}
-
-bool XmlNode::checkName(const std::string& str) const {
-  return name_ == str;
 }
 
 void XmlNode::readString(const std::string& str, std::string& val) {

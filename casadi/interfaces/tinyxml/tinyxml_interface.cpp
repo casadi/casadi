@@ -60,7 +60,7 @@ namespace casadi {
     XmlNode ret;
 
     // Save name
-    ret.setName(n->Value());
+    ret.name = n->Value();
 
     // Save attributes
     casadi_int type = n->Type();
@@ -93,7 +93,7 @@ namespace casadi {
       if (childtype == TiXmlNode::TINYXML_ELEMENT) {
         XmlNode newnode = addNode(child);
         ret.children_.push_back(newnode);
-        ret.child_indices_[newnode.name_] = ch;
+        ret.child_indices_[newnode.name] = ch;
       } else if (childtype == TiXmlNode::TINYXML_COMMENT) {
         ret.comment_ = child->Value();
       } else if (childtype == TiXmlNode::TINYXML_TEXT) {

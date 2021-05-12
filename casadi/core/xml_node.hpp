@@ -47,7 +47,7 @@ struct CASADI_EXPORT XmlNode {
   std::map<std::string, casadi_int> child_indices_;
 
   // Name of the node
-  std::string name_;
+  std::string name;
 
   // Comment
   std::string comment_;
@@ -106,12 +106,6 @@ struct CASADI_EXPORT XmlNode {
 
   /** \brief  Get the number of children */
   size_t size() const { return children_.size();}
-
-  /** \brief  Set the name of the node */
-  void setName(const std::string& name);
-
-  /** \brief  check if the name is equal to something */
-  bool checkName(const std::string& str) const;
 
   /** \brief  Get the text field */
   std::string getText() const { return text_; }
