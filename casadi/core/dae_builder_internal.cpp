@@ -291,7 +291,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
         // OpenModelica 1.17 occationally generates integer values without type specifier (bug?)
         casadi_assert(beq_node[1].size() == 0, "Not implemented");
         casadi_int val;
-        beq_node[1].getText(val);
+        beq_node[1].get(&val);
         casadi_warning(var.name + " has binding equation without type specifier: " + str(val));
         var.beq = val;
       }
@@ -381,11 +381,11 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
     return read_variable(node).v;
   } else if (name=="IntegerLiteral" || name=="BooleanLiteral") {
     casadi_int val;
-    node.getText(val);
+    node.get(&val);
     return val;
   } else if (name=="Instant") {
     double val;
-    node.getText(val);
+    node.get(&val);
     return val;
   } else if (name=="Log") {
     return log(read_expr(node[0]));
@@ -423,7 +423,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
     return pow(read_expr(node[0]), read_expr(node[1]));
   } else if (name=="RealLiteral") {
     double val;
-    node.getText(val);
+    node.get(&val);
     return val;
   } else if (name=="Sin") {
     return sin(read_expr(node[0]));
@@ -970,7 +970,7 @@ std::string DaeBuilderInternal::qualified_name(const XmlNode& nn) {
     // Get the index, if any
     if (nn[i].size()>0) {
       casadi_int ind;
-      nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText(ind);
+      nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].get(&ind);
       qn << "[" << ind << "]";
     }
   }

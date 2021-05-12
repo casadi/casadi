@@ -91,38 +91,38 @@ void XmlNode::dump(std::ostream &stream, casadi_int indent) const {
   }
 }
 
-void XmlNode::read(const std::string& str, std::string& val) {
-  val = str;
+void XmlNode::read(const std::string& str, std::string* val) {
+  *val = str;
 }
 
-void XmlNode::read(const std::string& str, bool& val) {
+void XmlNode::read(const std::string& str, bool* val) {
   if (str == "true") {
-    val = true;
+    *val = true;
   } else if (str == "false") {
-    val = false;
+    *val = false;
   } else {
     casadi_error("XML argument not 'true' or 'false'");
   }
 }
 
-void XmlNode::read(const std::string& str, casadi_int& val) {
+void XmlNode::read(const std::string& str, casadi_int* val) {
   std::istringstream buffer(str);
-  buffer >> val;
+  buffer >> *val;
 }
 
-void XmlNode::read(const std::string& str, double& val) {
+void XmlNode::read(const std::string& str, double* val) {
   std::istringstream buffer(str);
-  buffer >> val;
+  buffer >> *val;
 }
 
-void XmlNode::read(const std::string& str, std::vector<casadi_int>& val) {
-  val.clear();
+void XmlNode::read(const std::string& str, std::vector<casadi_int>* val) {
+  val->clear();
   std::istringstream buffer(str);
   while (true) {
     casadi_int v;
     buffer >> v;
     if (buffer.fail()) break;
-    val.push_back(v);
+    val->push_back(v);
   }
 }
 
