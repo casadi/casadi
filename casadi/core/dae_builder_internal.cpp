@@ -154,8 +154,8 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
   XmlFile xml_file("tinyxml");
   XmlNode document = xml_file.parse(filename);
 
-  // Number of variables before adding new ones
-  size_t n_vars_before = variables_.size();
+  // Ensure no variables already
+  casadi_assert(variables_.empty(), "Instance already has variables");
 
   // **** Add model variables ****
   {
@@ -216,10 +216,10 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
       add_variable(name, var);
     }
     // Handle derivatives/antiderivatives
-    for (auto it = variables_.begin() + n_vars_before; it != variables_.end(); ++it) {
+    for (auto it = variables_.begin(); it != variables_.end(); ++it) {
       if (it->derivative >= 0) {
         // Add variable offset, make index 1
-        it->derivative += n_vars_before - 1;
+        it->derivative -= 1;
         // Set antiderivative
         variables_.at(it->derivative).antiderivative = it - variables_.begin();
       }
@@ -232,30 +232,25 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
     // Get a reference to the ModelStructure node
     const XmlNode& n = document[0]["ModelStructure"];
     // Outputs
-    if (n.has_child("Outputs")) {
+    if (n.has_child("Outputs"))
       Outputs = read_list<FmiUnknown>(n["Outputs"]);
-      for (auto&& e : Outputs) e.offset(n_vars_before);
-    }
     // Outputs
-    if (n.has_child("Derivatives")) {
+    if (n.has_child("Derivatives"))
       Derivatives = read_list<FmiUnknown>(n["Derivatives"]);
-      for (auto&& e : Derivatives) e.offset(n_vars_before);
-    }
     // Initial unknowns
-    if (n.has_child("InitialUnknowns")) {
+    if (n.has_child("InitialUnknowns"))
       InitialUnknowns = read_list<FmiUnknown>(n["InitialUnknowns"]);
-      for (auto&& e : InitialUnknowns) e.offset(n_vars_before);
-    }
-    // Mark corresponding variables as dependency
-    for (auto&& v : {Outputs, Derivatives, InitialUnknowns}) {
-      for (const FmiUnknown& e : v) {
-        for (casadi_int d : e.dependencies) variables_.at(d).dependency = true;
-      }
+  }
+
+  // Mark corresponding variables as dependency
+  for (auto&& v : {Outputs, Derivatives, InitialUnknowns}) {
+    for (const FmiUnknown& e : v) {
+      for (casadi_int d : e.dependencies) variables_.at(d).dependency = true;
     }
   }
 
   // **** Postprocess / sort variables ****
-  for (auto it = variables_.begin() + n_vars_before; it != variables_.end(); ++it) {
+  for (auto it = variables_.begin(); it != variables_.end(); ++it) {
     // Sort by types
     if (it->causality == Variable::INDEPENDENT) {
       // Independent (time) variable
