@@ -36,7 +36,26 @@ namespace casadi {
 // Forward declarations
 class XmlNode;
 
-#ifndef SWIG
+// FMI Unknown
+struct CASADI_EXPORT FmiUnknown {
+  // Index to the corresponding model variable
+  casadi_int index;
+  // Dependencies on other variables
+  std::vector<casadi_int> dependencies;
+  // Type of dependency
+  std::vector<std::string> dependenciesKind;
+  // Default constructor
+  FmiUnknown() : index(-1) {}
+  // Construct from Node
+  explicit FmiUnknown(const XmlNode& n);
+  // Apply index offset
+  void offset(casadi_int off);
+};
+
+// Load FMI list as an std::vector
+template<typename T>
+std::vector<T> read_list(const XmlNode& n);
+
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
@@ -117,8 +136,6 @@ struct CASADI_EXPORT Variable : public Printable<Variable> {
   MX attribute(Attribute att) const;
 };
 
-#endif  // SWIG
-
 /// \cond INTERNAL
 /// Internal class for DaeBuilder, see comments on the public class.
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
@@ -184,7 +201,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Import existing problem from FMI/XML
   void parse_fmi(const std::string& filename);
 
-#ifndef SWIG
   // Input convension in codegen
   enum DaeBuilderInternalIn {
     DAE_BUILDER_T,
@@ -222,7 +238,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   // Get output expression, given enum
   std::vector<MX> output(const std::vector<DaeBuilderInternalOut>& ind) const;
-#endif // SWIG
 
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
@@ -286,7 +301,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
     /// Get the (cached) oracle, SX or MX
   const Function& oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
 
-#ifndef SWIG
   // Internal methods
 protected:
 
@@ -400,11 +414,7 @@ protected:
 
   // Sort dependent variables/parameters
   static void sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef);
-
-#endif // SWIG
 };
-
-#ifndef SWIG
 
 /// Helper class: Specify number of entries in an enum
 template<typename T>
@@ -467,8 +477,6 @@ CASADI_EXPORT std::string to_string(Variable::Attribute v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
 ///@}
-
-#endif  // SWIG
 
 } // namespace casadi
 
