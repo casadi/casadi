@@ -25,37 +25,36 @@
 
 #include "xml_file_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
-  XmlFile::XmlFile() {
-  }
+XmlFile::XmlFile() {
+}
 
-  XmlFile::XmlFile(const std::string& name) {
-    own(XmlFileInternal::getPlugin(name).creator());
-  }
+XmlFile::XmlFile(const std::string& name) {
+  own(XmlFileInternal::getPlugin(name).creator());
+}
 
-  XmlFile::~XmlFile() {
-  }
+XmlFile::~XmlFile() {
+}
 
-  const XmlFileInternal* XmlFile::operator->() const {
-    return static_cast<const XmlFileInternal*>(SharedObject::operator->());
-  }
+const XmlFileInternal* XmlFile::operator->() const {
+  return static_cast<const XmlFileInternal*>(SharedObject::operator->());
+}
 
-  XmlFileInternal* XmlFile::operator->() {
-    return static_cast<XmlFileInternal*>(SharedObject::operator->());
-  }
+XmlFileInternal* XmlFile::operator->() {
+  return static_cast<XmlFileInternal*>(SharedObject::operator->());
+}
 
-  XmlNode XmlFile::parse(const std::string& filename) {
-    return (*this)->parse(filename);
-  }
+XmlNode XmlFile::parse(const std::string& filename) {
+  return (*this)->parse(filename);
+}
 
-  void XmlFile::load_plugin(const std::string& name) {
-    XmlFileInternal::load_plugin(name);
-  }
+void XmlFile::load_plugin(const std::string& name) {
+  XmlFileInternal::load_plugin(name);
+}
 
-  std::string XmlFile::doc(const std::string& name) {
-    return XmlFileInternal::getPlugin(name).doc;
-  }
+std::string XmlFile::doc(const std::string& name) {
+  return XmlFileInternal::getPlugin(name).doc;
+}
 
 } // namespace casadi

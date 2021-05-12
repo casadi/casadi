@@ -223,12 +223,11 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
   }
 
   // Process model structure
-  FmiModelStructure ms;
   if (document[0].has_child("ModelStructure"))
-    ms = FmiModelStructure(document[0]["ModelStructure"]);
+    import_model_structure(document[0]["ModelStructure"]);
 
   // Mark corresponding variables as dependency
-  for (auto&& v : {ms.outputs, ms.derivatives, ms.initial_unknowns}) {
+  for (auto&& v : {outputs_, derivatives_, initial_unknowns_}) {
     for (const FmiUnknown& e : v) {
       for (casadi_int d : e.dependencies) variables_.at(d).dependency = true;
     }
@@ -1991,16 +1990,16 @@ std::vector<T> read_list(const XmlNode& n) {
   return r;
 }
 
-FmiModelStructure::FmiModelStructure(const XmlNode& n) {
+void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   // Outputs
   if (n.has_child("Outputs"))
-    this->outputs = read_list<FmiUnknown>(n["Outputs"]);
+    outputs_ = read_list<FmiUnknown>(n["Outputs"]);
   // Outputs
   if (n.has_child("Derivatives"))
-    this->derivatives = read_list<FmiUnknown>(n["Derivatives"]);
+    derivatives_ = read_list<FmiUnknown>(n["Derivatives"]);
   // Initial unknowns
   if (n.has_child("InitialUnknowns"))
-    this->initial_unknowns = read_list<FmiUnknown>(n["InitialUnknowns"]);
+    initial_unknowns_ = read_list<FmiUnknown>(n["InitialUnknowns"]);
 }
 
 } // namespace casadi

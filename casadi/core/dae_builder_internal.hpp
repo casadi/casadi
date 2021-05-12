@@ -52,20 +52,6 @@ struct CASADI_EXPORT FmiUnknown {
   void offset(casadi_int off);
 };
 
-// FMI Unknown
-struct CASADI_EXPORT FmiModelStructure {
-  // Process model structure
-  std::vector<FmiUnknown> outputs, derivatives, initial_unknowns;
-  // Default constructor
-  FmiModelStructure() {}
-  // Construct from node
-  explicit FmiModelStructure(const XmlNode& n);
-};
-
-// Load FMI list as an std::vector
-template<typename T>
-std::vector<T> read_list(const XmlNode& n);
-
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
@@ -310,6 +296,9 @@ protected:
   /// All variables
   std::vector<Variable> variables_;
 
+  // Model structure
+  std::vector<FmiUnknown> outputs_, derivatives_, initial_unknowns_;
+
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
 
@@ -367,6 +356,9 @@ protected:
 
   /// Read a variable
   Variable& read_variable(const XmlNode& node);
+
+  // Read ModelStructure
+  void import_model_structure(const XmlNode& n);
 
   /// Problem structure has changed: Clear cache
   void clear_cache() const;
