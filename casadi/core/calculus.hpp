@@ -206,7 +206,9 @@ namespace casadi {
 
     OP_PERMUTE_LAYOUT,
 
-    OP_REMAINDER
+    OP_REMAINDER,
+
+    OP_FUNREF
   };
   #define NUM_BUILT_IN_OPS (OP_CONVEXIFY+1)
 
@@ -1492,6 +1494,7 @@ namespace casadi {
       case OP_INPUT:
         return 0;
         CASADI_MATH_BINARY_BUILTIN
+        case OP_CALL:
           return 2;
       default:
         return 1;
@@ -1600,6 +1603,7 @@ namespace casadi {
     case OP_EINSTEIN:       return "einstein";
     case OP_BSPLINE:        return "bspline";
     case OP_CONVEXIFY:      return "convexify";
+    case OP_FUNREF:           return "funref";
     }
     return nullptr;
   }

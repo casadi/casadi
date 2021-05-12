@@ -38,7 +38,7 @@ struct Instance;
 
 class CallSX : public SXNode {
 public:
-  explicit CallSX(const Function &f, const SXElem& dep);
+  explicit CallSX(const SXElem& ref, const SXElem& arg);
   ~CallSX() override {}
 
   /** \brief  Get the operation */
@@ -53,28 +53,27 @@ public:
   std::string print(const std::string& arg1, const std::string& arg2) const override;
 
   /** \brief  Number of dependencies */
-  casadi_int n_dep() const override { return 1;}
+  casadi_int n_dep() const override { return 2;}
 
   /** \brief  get the reference of a dependency */
-  const SXElem& dep(casadi_int i) const override { return dep_; }
-  SXElem& dep(casadi_int i) override { return dep_; }
-
-  int fcn(double& result, double x, const double** arg, double** res, casadi_int* iw, double* w) const;
-  SXElem fcn(const SXElem& arg) const;
+  const SXElem& dep(casadi_int i) const override { return i==0 ? ref_ : arg_ ; }
+  SXElem& dep(casadi_int i) override { return i==0 ? ref_ : arg_ ; }
 
   static void der(const SXElem& x, const SXElem& y, const SXElem& f, SXElem* d);
 
-  std::string codegen(CodeGenerator& g, const Instance& inst, int i0, int i1, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w) const;
+  static std::string codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w);
 
-  void codegen_dependency(CodeGenerator& g, const Instance& inst) const;
+  static void codegen_dependency(CodeGenerator& g, const Function& f, const Instance& inst);
 
   void serialize_node(SerializingStream& s) const override;
 
   /** \brief Deserialize without type information */
   static SXNode* deserialize(DeserializingStream& s);
 
-  SXElem dep_;
-  Function f_;
+  static int call(const Function &f, double& result, double arg1, double arg2, const double** arg, double** res, casadi_int* iw, double* w);
+
+  SXElem ref_;
+  SXElem arg_;
 };
 
 } // namespace casadi

@@ -152,6 +152,7 @@ set(CASADI_INTERNAL
   monitor.hpp             monitor.cpp             # Monitor
   repmat.hpp              repmat.cpp              # RepMat
   convexify.hpp           convexify.cpp           # Convexify
+  fun_ref.hpp             fun_ref.cpp
   call_sx.hpp             call_sx.cpp
 
   # A dynamically created function with AD capabilities

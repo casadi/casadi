@@ -2776,9 +2776,15 @@ class Functiontests(casadiTestCase):
 
     ff = Function('ff',[y],[y2,jacobian(y2,y)])
 
-    ff_ref = Function('ff',[y],[y_ref,jacobian(y_ref,y)])
+    ff.disp(True)
 
-    self.checkfunction(ff,ff_ref, inputs=[0.2])
+    ff_ref = Function('ff',[y],[y_ref,jacobian(y_ref,y)])
+    print(ff)
+    print(ff_ref)
+    print(ff(0.2))
+    print(ff_ref(0.2))
+
+    self.checkfunction(ff,ff_ref, inputs=[0.2],hessian=False)
     self.check_codegen(ff,inputs=[0.2])
     self.check_serialize(ff,inputs=[0.2])
 

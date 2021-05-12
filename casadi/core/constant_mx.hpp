@@ -226,6 +226,9 @@ namespace casadi {
     /** \brief Codegen incref */
     void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
 
+    /** \brief Is reference counting needed in codegen? */
+    bool has_refcount() const { return true;}
+
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
 
@@ -237,14 +240,18 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
-      std::copy(x_.begin(), x_.end(), res[0]);
+      if (iw[0]) {
+        res[0] = const_cast<double*>(get_ptr(x_));
+      } else {
+        if (res[0]) std::copy(x_.begin(), x_.end(), res[0]);
+      }
       return 0;
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
     int eval_sx(const SXElem** arg, SXElem** res,
                          casadi_int* iw, SXElem* w) const override {
-      std::copy(x_.begin(), x_.end(), res[0]);
+      casadi_error("eval_sx not supported");
       return 0;
     }
 

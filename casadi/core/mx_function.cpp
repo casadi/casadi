@@ -1354,7 +1354,7 @@ namespace casadi {
     SXElem** res1 = get_ptr(resp);
     std::vector<SXElem> zero_array(zero_array_.size());
 
-
+    uout() << "MXFunction::eval_sx" << name_ << std::endl;
 
     SXElem* w_eval = w+w_extra_offset_;
 
@@ -1474,6 +1474,7 @@ namespace casadi {
 
   void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g << "w = __builtin_assume_aligned (w, 32);\n";
+    g.add_include("stdint.h");
     g << g.debug_assert("(uintptr_t) w% 32 ==0") + "\n";
     g.local("i","casadi_int");
 

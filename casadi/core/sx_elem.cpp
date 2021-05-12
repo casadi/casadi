@@ -34,6 +34,7 @@
 #include "binary_sx.hpp"
 #include "global_options.hpp"
 #include "sx_function.hpp"
+#include "fun_ref.hpp"
 #include "call_sx.hpp"
 
 using namespace std;
@@ -86,13 +87,9 @@ namespace casadi {
     return create(new SymbolicSX(name));
   }
 
-  SXElem SXElem::apply(const Function &f, const SXElem& arg) {
-    casadi_assert_dev(f.n_in()==1);
-    casadi_assert_dev(f.n_out()==1);
-    casadi_assert_dev(f.nnz_in()==1);
-    if (f.nnz_out()==0) return SXElem(0);
-    casadi_assert_dev(f.nnz_out()==1);
-    return create(new CallSX(f, arg));
+  SXElem SXElem::apply(const Function &f, const SXElem& arg, const SXElem& index) {
+    SXElem funref = create(new FunRef(f, index));
+    return create(new CallSX(funref, arg));
   }
 
   SXElem::~SXElem() {
