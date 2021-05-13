@@ -2350,10 +2350,11 @@ namespace casadi {
 
     // Reference counter routines
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
-    codegen_incref(g);
+    Instance inst;
+    codegen_incref(g, inst);
     g << "}\n\n"
       << g.declare("void " + name_ + "_decref(void)") << " {\n";
-    codegen_decref(g);
+    codegen_decref(g, inst);
     g << "}\n\n";
 
     // Number of inputs and outptus
@@ -2513,7 +2514,7 @@ namespace casadi {
     if (g.main) {
       // Declare wrapper
       g << "casadi_int main_" << name_ << "(casadi_int argc, char* argv[]) {\n";
-
+      g << "int mem;\n";
       g << "casadi_int j;\n";
       g << "casadi_real* a;\n";
       g << "const casadi_real* r;\n";
@@ -2567,6 +2568,9 @@ namespace casadi {
         g << name_ << "_release(mem);\n";
       }
       g << "if (flag) return flag;\n";
+
+      g << name_ << "_release(mem);\n";
+      g << name_ << "_decref();\n";
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
       for (casadi_int i=0; i<n_out_; ++i) {

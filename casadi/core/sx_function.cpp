@@ -165,8 +165,8 @@ namespace casadi {
     // Run the algorithm
     for (auto&& f : functions_) {
       Instance local;
-      local.stride_in.resize(1, 1);
-      local.stride_out.resize(1, 1);
+      local.stride_in.resize(f.n_in(), 1);
+      local.stride_out.resize(f.n_out(), 1);
       CallSX::codegen_dependency(g, f, local);
     }
   }
@@ -277,14 +277,8 @@ namespace casadi {
             }
           }
         }
-      } else if (a.op==OP_FUNREF) {
-        g.comment("FunRef");
       } else if (a.op==OP_CALL) {
-        Instance local;
-        local.stride_in.resize(1, 1);
-        local.stride_out.resize(1, 1);
-        g.comment(str(a.i0)+str(a.i1)+str(a.i2));
-        g << CallSX::codegen(g, (*node_ptr)->dep(0), local, a.i0, a.i1, a.i2, "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w+" + str(worksize_)); 
+        g << CallSX::codegen(g, (*node_ptr)->dep(0), Instance(), a.i0, a.i1, a.i2, "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w+" + str(worksize_)); 
       } else {
 
         // Where to store the result
@@ -309,6 +303,8 @@ namespace casadi {
               }
             }
           }
+        } else if (a.op==OP_FUNREF) {
+          g << g.sx_work(a.i1);
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);
@@ -677,6 +673,30 @@ namespace casadi {
 
     // Print
     if (verbose_) casadi_message(str(algorithm_.size()) + " elementary operations");
+  }
+
+  void SXFunction::codegen_incref(CodeGenerator& g, const Instance& inst) const {
+    set<void*> added;
+    for (auto&& f : functions_) {
+      if (f->has_refcount_) {
+        Instance local = inst;
+        local.stride_in.resize(f.n_in(), 1);
+        local.stride_out.resize(f.n_out(), 1);
+        g << g.add_dependency(f, local) << "_incref();\n";
+      }
+    }
+  }
+
+  void SXFunction::codegen_decref(CodeGenerator& g, const Instance& inst) const {
+    set<void*> added;
+    for (auto&& f : functions_) {
+      if (f->has_refcount_) {
+        Instance local = inst;
+        local.stride_in.resize(f.n_in(), 1);
+        local.stride_out.resize(f.n_out(), 1);
+        g << g.add_dependency(f, local) << "_decref();\n";
+      }
+    }
   }
 
   SX SXFunction::instructions_sx() const {

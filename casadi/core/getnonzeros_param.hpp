@@ -147,8 +147,7 @@ namespace casadi {
 
     /// Constructor
     GetNonzerosSliceParam(const Sparsity& sp, const MX& x, const Slice& inner,
-                      const MX& outer) :
-                      GetNonzerosParam(sp, x, outer), inner_(inner) {}
+                      const MX& outer);
 
     /// Destructor
     ~GetNonzerosSliceParam() override {}
@@ -160,6 +159,9 @@ namespace casadi {
 
         \identifier{89} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
+    /** \brief  Propagate sparsity forward */
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -188,8 +190,12 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override { return {{"inner", inner_.info()}}; }
 
+    bool elide_copy() const override { return is_trivial_; }
+
     // Data members
     Slice inner_;
+    bool is_trivial_;
+    std::vector<bvec_t> bvec_zeros_;
 
     /** \brief Serialize an object without type information
 

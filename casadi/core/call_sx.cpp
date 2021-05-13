@@ -38,10 +38,13 @@ namespace casadi {
     }
 
 
-  int CallSX::call(const Function &f, double& result, double arg1, double arg2, const double** arg, double** res, casadi_int* iw, double* w) {
-    arg[0] = &arg1;
+  int CallSX::call(const Function &f, double& result, double dep, double index, const double** arg, double** res, casadi_int* iw, double* w) {
+
     if (f.nnz_in()==2) {
-      arg[1] = &arg2;
+      arg[0] = &index;
+      arg[1] = &dep;
+    } else {
+      arg[0] = &dep;
     }
     res[0] = &result;
     int mem = f.checkout();
@@ -61,6 +64,9 @@ namespace casadi {
   std::string CallSX::codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w) {
     const FunRef* n = dynamic_cast<const FunRef*>(funref.get());
     const Function& f = n->f_;
+    Instance local = inst;
+    local.stride_in.resize(f.n_in(), 1);
+    local.stride_out.resize(f.n_out(), 1);
     /*g << "#pragma omp ordered simd\n";
     g << "{\n";
     g << "(" << arg << ")[0] = &" << g.sx_work(i1) << ";\n";
@@ -68,7 +74,7 @@ namespace casadi {
     g << g(f_, arg, res, iw, w);
     g << ";}";*/
 
-    std::string fname = g.add_dependency(f, inst);
+    std::string fname = g.add_dependency(f, local);
     std::string name = fname+"_wrap";
     return g.sx_work(i0) + "=" + name + "(" + g.sx_work(i1) + "," + g.sx_work(i2) + ")";
   }

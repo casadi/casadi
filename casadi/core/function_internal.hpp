@@ -784,12 +784,12 @@ namespace casadi {
     /** \brief Codegen incref for dependencies
 
         \identifier{lr} */
-    virtual void codegen_incref(CodeGenerator& g) const {}
+    virtual void codegen_incref(CodeGenerator& g, const Instance& inst) const {}
 
     /** \brief Codegen decref for dependencies
 
         \identifier{ls} */
-    virtual void codegen_decref(CodeGenerator& g) const {}
+    virtual void codegen_decref(CodeGenerator& g, const Instance& inst) const {}
 
     /** \brief Codegen decref for alloc_mem
 

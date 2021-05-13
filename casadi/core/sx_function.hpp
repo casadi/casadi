@@ -262,6 +262,12 @@ class CASADI_EXPORT SXFunction :
       \identifier{v3} */
   void init(const Dict& opts) override;
 
+  /** \brief Codegen incref for dependencies */
+  void codegen_incref(CodeGenerator& g, const Instance& inst) const override;
+
+  /** \brief Codegen decref for dependencies */
+  void codegen_decref(CodeGenerator& g, const Instance& inst) const override;
+
   /** \brief Generate code for the declarations of the C function
 
       \identifier{v4} */

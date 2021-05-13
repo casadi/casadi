@@ -106,12 +106,12 @@ namespace casadi {
     try {
       return fcn_(arg, res, iw, w);
     } catch (const CasadiException& e) {
-      uout() << fcn_ << std::endl;
+      // Expad is not possible
       if (fcn_.n_in()==1 && fcn_.nnz_in()==1 && fcn_.n_out()==1 && fcn_.nnz_out()==1) {
         res[0][0] = SXElem::apply(fcn_, arg[0][0]);
         return 0;
       } else if (fcn_.n_in()==2 && fcn_.nnz_in(0)==1 && fcn_.nnz_in(1)==1 && fcn_.n_out()==1 && fcn_.nnz_out()==1) {
-        res[0][0] = SXElem::apply(fcn_, arg[0][0], arg[1][0]);
+        res[0][0] = SXElem::apply(fcn_, arg[1][0], arg[0][0]);
         return 0;
       } else {
         throw e;
