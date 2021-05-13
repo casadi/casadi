@@ -195,7 +195,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   };
 
   // Get input expression, given enum
-  const std::vector<MX>& input(DaeBuilderInternalIn ind) const;
+  std::vector<MX> input(DaeBuilderInternalIn ind) const;
 
   // Get output expression, given enum
   std::vector<MX> output(DaeBuilderInternalOut ind) const;
@@ -229,10 +229,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   Function gather_eq() const;
 
   /// Get variable expression by name
-  MX var(const std::string& name) const;
-
-  /// Get variable expression by name
-  MX operator()(const std::string& name) const {return var(name);}
+  const MX& var(const std::string& name) const;
 
   /// Get a derivative expression by name
   MX der(const std::string& name) const;
@@ -254,7 +251,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   }
 
   /// Add a variable
-  void add_variable(const std::string& name, const Variable& var);
+  size_t add_variable(const std::string& name, const Variable& var);
 
   /// Check if a particular variable exists
   bool has_variable(const std::string& name) const;
@@ -264,6 +261,15 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   Variable& variable(const std::string& name);
   const Variable& variable(const std::string& name) const;
   ///@}
+
+  /// Get variable expression by index
+  const MX& var(size_t ind) const;
+
+  /// Get variable expressions by index
+  std::vector<MX> var(const std::vector<size_t>& ind) const;
+
+  /// Get index of variable
+  size_t find(const std::string& name) const;
 
     /// Get the (cached) oracle, SX or MX
   const Function& oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
@@ -300,7 +306,8 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<MX> tt_, pp_, uu_, xx_, zz_, qq_, cc_, dd_, ww_, yy_;
+  std::vector<size_t> t_;
+  std::vector<MX> pp_, uu_, xx_, zz_, qq_, cc_, dd_, ww_, yy_;
 
   ///@{
   /// Ordered variables and equations

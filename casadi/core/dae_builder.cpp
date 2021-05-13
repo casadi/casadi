@@ -59,7 +59,7 @@ const std::string& DaeBuilder::name() const {
 }
 
 const MX& DaeBuilder::t() const {
-  return (*this)->tt_.at(0);
+  return var((*this)->t_.at(0));
 }
 
 const std::vector<MX>& DaeBuilder::x() const {
@@ -151,7 +151,7 @@ const std::vector<MX>& DaeBuilder::when_rhs() const {
 }
 
 bool DaeBuilder::has_t() const {
-  return !(*this)->tt_.empty();
+  return !(*this)->t_.empty();
 }
 
 void DaeBuilder::parse_fmi(const std::string& filename) {
@@ -219,7 +219,7 @@ bool DaeBuilder::has_variable(const std::string& name) const {
   }
 }
 
-void DaeBuilder::add_variable(const std::string& name, const Variable& var) {
+size_t DaeBuilder::add_variable(const std::string& name, const Variable& var) {
   try {
     return (*this)->add_variable(name, var);
   } catch (std::exception& e) {
@@ -234,20 +234,36 @@ MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
 MX DaeBuilder::add_variable(const std::string& name, const Sparsity& sp) {
   Variable v(name);
   v.v = MX::sym(name, sp);
-  add_variable(name, v);
+  (void)add_variable(name, v);
   return v.v;
 }
 
 void DaeBuilder::add_variable(const MX& new_v) {
   Variable v(new_v.name());
   v.v = new_v;
-  add_variable(new_v.name(), v);
+  (void)add_variable(new_v.name(), v);
+}
+
+size_t DaeBuilder::add_variable_new(const std::string& name, casadi_int n) {
+  return add_variable_new(name, Sparsity::dense(n));
+}
+
+size_t DaeBuilder::add_variable_new(const std::string& name, const Sparsity& sp) {
+  Variable v(name);
+  v.v = MX::sym(name, sp);
+  return add_variable(name, v);
+}
+
+size_t DaeBuilder::add_variable_new(const MX& new_v) {
+  Variable v(new_v.name());
+  v.v = new_v;
+  return add_variable(new_v.name(), v);
 }
 
 void DaeBuilder::register_t(const std::string& name) {
   // Save to class
   casadi_assert(!has_t(), "'t' already defined");
-  (*this)->tt_.push_back(var(name));
+  (*this)->t_.push_back(find(name));
 }
 
 void DaeBuilder::register_p(const std::string& name) {
@@ -303,10 +319,10 @@ void DaeBuilder::clear_out(const std::string& v) {
 }
 
 MX DaeBuilder::add_t(const std::string& name) {
-  casadi_assert((*this)->tt_.empty(), "'t' already defined");
-  MX new_t = add_variable(name);
-  (*this)->tt_.push_back(new_t);
-  return new_t;
+  casadi_assert((*this)->t_.empty(), "'t' already defined");
+  size_t new_t = add_variable_new(name);
+  (*this)->t_.push_back(new_t);
+  return var(new_t);
 }
 
 MX DaeBuilder::add_p(const std::string& name, casadi_int n) {
@@ -712,6 +728,34 @@ DaeBuilderInternal* DaeBuilder::operator->() {
 
 const DaeBuilderInternal* DaeBuilder::operator->() const {
   return static_cast<const DaeBuilderInternal*>(SharedObject::operator->());
+}
+
+const MX& DaeBuilder::var(size_t ind) const {
+  try {
+    return (*this)->var(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("var", e.what());
+    static MX dummy;
+    return dummy; // never reached
+  }
+}
+
+std::vector<MX> DaeBuilder::var(const std::vector<size_t>& ind) const {
+  try {
+    return (*this)->var(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("var", e.what());
+    return {}; // never reached
+  }
+}
+
+size_t DaeBuilder::find(const std::string& name) const {
+  try {
+    return (*this)->find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("find", e.what());
+    return -1; // never reached
+  }
 }
 
 } // namespace casadi

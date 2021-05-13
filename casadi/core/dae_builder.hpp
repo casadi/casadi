@@ -445,6 +445,15 @@ public:
   /// Add a new variable from symbolic expressions
   void add_variable(const MX& new_v);
 
+  /// Add a new variable: returns corresponding symbolic expression
+  size_t add_variable_new(const std::string& name, casadi_int n=1);
+
+  /// Add a new variable: returns corresponding symbolic expression
+  size_t add_variable_new(const std::string& name, const Sparsity& sp);
+
+  /// Add a new variable from symbolic expressions
+  size_t add_variable_new(const MX& new_v);
+
   /// Check if a particular variable exists
   bool has_variable(const std::string& name) const;
 
@@ -453,7 +462,7 @@ public:
 
 #ifndef SWIG
   /// Add a variable
-  void add_variable(const std::string& name, const Variable& var);
+  size_t add_variable(const std::string& name, const Variable& var);
 
   ///@{
   /// Access a variable by name
@@ -466,6 +475,15 @@ public:
 
   /// Access a member function or object
   DaeBuilderInternal* operator->();
+
+  /// Get variable expression by index
+  const MX& var(size_t ind) const;
+
+  /// Get variable expressions by index
+  std::vector<MX> var(const std::vector<size_t>& ind) const;
+
+  /// Get index of variable
+  size_t find(const std::string& name) const;
 
 #endif // SWIG
 };
