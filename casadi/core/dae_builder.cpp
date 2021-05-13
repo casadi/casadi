@@ -94,8 +94,8 @@ std::vector<MX> DaeBuilder::ydef() const {
   return (*this)->ydef();
 }
 
-const std::vector<MX>& DaeBuilder::u() const {
-  return (*this)->uu_;
+std::vector<MX> DaeBuilder::u() const {
+  return var((*this)->u_);
 }
 
 std::vector<MX> DaeBuilder::p() const {
@@ -271,7 +271,7 @@ void DaeBuilder::register_p(const std::string& name) {
 }
 
 void DaeBuilder::register_u(const std::string& name) {
-  (*this)->uu_.push_back(var(name));
+  (*this)->u_.push_back(find(name));
 }
 
 void DaeBuilder::register_x(const std::string& name) {

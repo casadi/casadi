@@ -257,9 +257,15 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   bool has_variable(const std::string& name) const;
 
   ///@{
+  /// Access a variable by index
+  Variable& variable(size_t ind) {return variables_.at(ind);}
+  const Variable& variable(size_t ind) const {return variables_.at(ind);}
+  ///@}
+
+  ///@{
   /// Access a variable by name
-  Variable& variable(const std::string& name);
-  const Variable& variable(const std::string& name) const;
+  Variable& variable(const std::string& name) {return variable(find(name));}
+  const Variable& variable(const std::string& name) const {return variable(find(name));}
   ///@}
 
   /// Get variable expression by index
@@ -306,8 +312,8 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<size_t> t_, p_;
-  std::vector<MX> uu_, xx_, zz_, qq_, cc_, dd_, ww_, yy_;
+  std::vector<size_t> t_, p_, u_;
+  std::vector<MX> xx_, zz_, qq_, cc_, dd_, ww_, yy_;
 
   ///@{
   /// Ordered variables and equations

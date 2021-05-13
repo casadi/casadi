@@ -111,7 +111,7 @@ public:
   std::vector<MX> ydef() const;
 
   /** \brief Free controls */
-  const std::vector<MX>& u() const;
+  std::vector<MX> u() const;
 
   /** \brief Parameters */
   std::vector<MX> p() const;

@@ -182,7 +182,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
       // Independent (time) variable
       t_.push_back(k);
     } else if (v.causality == Variable::INPUT) {
-      uu_.push_back(v.v);
+      u_.push_back(k);
     } else if (v.variability == Variable::CONSTANT) {
       // Named constant
       cc_.push_back(v.v);
@@ -432,7 +432,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
          << "nc = " << cc_.size() << ", "
          << "nd = " << dd_.size() << ", "
          << "nw = " << ww_.size() << ", "
-         << "nu = " << uu_.size();
+         << "nu = " << u_.size();
 
   // Quick return?
   if (!more) return;
@@ -457,7 +457,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!qq_.empty()) stream << "  q = " << str(qq_) << std::endl;
   if (!yy_.empty()) stream << "  y = " << str(yy_) << std::endl;
   if (!ww_.empty()) stream << "  w = " << str(ww_) << std::endl;
-  if (!uu_.empty()) stream << "  u = " << str(uu_) << std::endl;
+  if (!u_.empty()) stream << "  u = " << var(u_) << std::endl;
 
   if (!cc_.empty()) {
     stream << "Constants" << std::endl;
@@ -569,7 +569,7 @@ void DaeBuilderInternal::clear_in(const std::string& v) {
   switch (to_enum<DaeBuilderInternalIn>(v)) {
   case DAE_BUILDER_T: return t_.clear();
   case DAE_BUILDER_P: return p_.clear();
-  case DAE_BUILDER_U: return uu_.clear();
+  case DAE_BUILDER_U: return u_.clear();
   case DAE_BUILDER_X: return xx_.clear();
   case DAE_BUILDER_Z: return zz_.clear();
   case DAE_BUILDER_Q: return qq_.clear();
@@ -634,13 +634,10 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Prune u
   if (prune_u) {
     size_t nu = 0;
-    for (size_t i = 0; i < uu_.size(); ++i) {
-      std::string s = uu_.at(i).name();
-      auto it = varind_.find(s);
-      casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
-      if (!free_variables.at(it->second)) uu_.at(nu++) = uu_.at(i);
+    for (size_t i = 0; i < u_.size(); ++i) {
+      if (!free_variables.at(u_.at(i))) u_.at(nu++) = u_.at(i);
     }
-    uu_.resize(nu);
+    u_.resize(nu);
   }
 }
 
@@ -669,19 +666,19 @@ void DaeBuilderInternal::tear() {
   alg_.resize(sz);
   // Remove any (held or not held) iteration variables, equations from u
   sz = 0;
-  for (size_t k = 0; k < uu_.size(); ++k) {
-    if (!iv_set.count(uu_[k].name())) {
+  for (size_t k = 0; k < u_.size(); ++k) {
+    if (!iv_set.count(variable(u_[k]).name)) {
       // Non-iteration variable: Keep
-      uu_.at(k) = uu_.at(sz++);
+      u_.at(k) = u_.at(sz++);
     }
   }
-  uu_.resize(sz);
+  u_.resize(sz);
   // Add algebraic variables
   for (auto& e : iv) zz_.push_back(variable(e).v);
   // Add residual variables
   for (auto& e : res) alg_.push_back(variable(e).v);
   // Add output variables
-  for (auto& e : iv_on_hold) uu_.push_back(variable(e).v);
+  for (auto& e : iv_on_hold) u_.push_back(find(e));
 }
 
 void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
@@ -800,19 +797,6 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
   }
 }
 
-const Variable& DaeBuilderInternal::variable(const std::string& name) const {
-  return const_cast<DaeBuilderInternal*>(this)->variable(name);
-}
-
-Variable& DaeBuilderInternal::variable(const std::string& name) {
-  // Find the variable
-  auto it = varind_.find(name);
-  if (it == varind_.end()) casadi_error("No such variable: \"" + name + "\".");
-
-  // Return the variable
-  return variables_.at(it->second);
-}
-
 bool DaeBuilderInternal::has_variable(const std::string& name) const {
   return varind_.find(name) != varind_.end();
 }
@@ -872,11 +856,6 @@ void DaeBuilderInternal::sanity_check() const {
   // Output equations
   for (casadi_int i = 0; i < yy_.size(); ++i) {
     casadi_assert(yy_[i].is_symbolic(), "Non-symbolic output y");
-  }
-
-  // Control
-  for (casadi_int i = 0; i < uu_.size(); ++i) {
-    casadi_assert(uu_[i].is_symbolic(), "Non-symbolic control u");
   }
 
   // Initial equations
@@ -1044,7 +1023,7 @@ std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   case DAE_BUILDER_P: return var(p_);
   case DAE_BUILDER_D: return dd_;
   case DAE_BUILDER_W: return ww_;
-  case DAE_BUILDER_U: return uu_;
+  case DAE_BUILDER_U: return var(u_);
   case DAE_BUILDER_X: return xx_;
   case DAE_BUILDER_Z: return zz_;
   case DAE_BUILDER_Q: return qq_;
@@ -1816,8 +1795,7 @@ MX DaeBuilderInternal::add_u(const std::string& name, casadi_int n) {
   v.v = MX::sym(name, n);
   v.variability = Variable::CONTINUOUS;
   v.causality = Variable::INPUT;
-  (void)add_variable(name, v);
-  uu_.push_back(v.v);
+  u_.push_back(add_variable(name, v));
   return v.v;
 }
 
