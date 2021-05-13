@@ -93,7 +93,7 @@ public:
   const std::vector<MX>& ode() const;
 
   /** \brief Algebraic variables */
-  const std::vector<MX>& z() const;
+  std::vector<MX> z() const;
 
   /** \brief Algebraic equations */
   const std::vector<MX>& alg() const;

@@ -70,8 +70,8 @@ const std::vector<MX>& DaeBuilder::ode() const {
   return (*this)->ode_;
 }
 
-const std::vector<MX>& DaeBuilder::z() const {
-  return (*this)->zz_;
+std::vector<MX> DaeBuilder::z() const {
+  return var((*this)->z_);
 }
 
 const std::vector<MX>& DaeBuilder::alg() const {
@@ -159,7 +159,7 @@ casadi_int DaeBuilder::nx() const {
 }
 
 casadi_int DaeBuilder::nz() const {
-  return (*this)->zz_.size();
+  return (*this)->z_.size();
 }
 
 casadi_int DaeBuilder::nq() const {
@@ -315,7 +315,7 @@ void DaeBuilder::register_x(const std::string& name) {
 }
 
 void DaeBuilder::register_z(const std::string& name) {
-  (*this)->zz_.push_back(var(name));
+  (*this)->z_.push_back(find(name));
 }
 
 void DaeBuilder::register_q(const std::string& name) {

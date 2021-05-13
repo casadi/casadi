@@ -203,7 +203,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
         }
       } else if (v.dependency || v.derivative >= 0) {
         // Add to list of algebraic equations
-        zz_.push_back(v.v);
+        z_.push_back(k);
         alg_.push_back(v.v - nan);
       }
       // Is it (also) an output variable?
@@ -425,7 +425,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   // Print dimensions
   stream << "nx = " << x_.size() << ", "
-         << "nz = " << zz_.size() << ", "
+         << "nz = " << z_.size() << ", "
          << "nq = " << q_.size() << ", "
          << "ny = " << yy_.size() << ", "
          << "np = " << p_.size() << ", "
@@ -453,7 +453,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!p_.empty()) stream << "  p = " << var(p_) << std::endl;
   if (!dd_.empty()) stream << "  d = " << str(dd_) << std::endl;
   if (!x_.empty()) stream << "  x = " << var(x_) << std::endl;
-  if (!zz_.empty()) stream << "  z = " << str(zz_) << std::endl;
+  if (!z_.empty()) stream << "  z = " << var(z_) << std::endl;
   if (!q_.empty()) stream << "  q = " << var(q_) << std::endl;
   if (!yy_.empty()) stream << "  y = " << str(yy_) << std::endl;
   if (!ww_.empty()) stream << "  w = " << str(ww_) << std::endl;
@@ -489,7 +489,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (!alg_.empty()) {
     stream << "Algebraic equations" << std::endl;
-    for (casadi_int k = 0; k < zz_.size(); ++k) {
+    for (casadi_int k = 0; k < alg_.size(); ++k) {
       stream << "  0 == " << str(alg_[k]) << std::endl;
     }
   }
@@ -543,26 +543,20 @@ void DaeBuilderInternal::sort_w() {
 
 void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
   // Make sure lengths agree
-  casadi_assert(z_order.size() == zz_.size(), "Dimension mismatch");
+  casadi_assert(z_order.size() == z_.size(), "Dimension mismatch");
   // Mark existing components in z
   std::vector<bool> old_z(variables_.size(), false);
-  for (size_t i = 0; i < zz_.size(); ++i) {
-    std::string s = zz_.at(i).name();
-    auto it = varind_.find(s);
-    casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
-    old_z.at(it->second) = true;
-  }
+  for (size_t i : z_) old_z.at(i) = true;
   // New vector of z
-  std::vector<MX> new_z;
+  std::vector<size_t> new_z;
   new_z.reserve(z_order.size());
   for (const std::string& s : z_order) {
-    auto it = varind_.find(s);
-    casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
-    casadi_assert(old_z.at(it->second), "Variable \"" + s + "\" is not an algebraic variable.");
-    new_z.push_back(variables_.at(it->second).v);
+    size_t i = find(s);
+    casadi_assert(old_z.at(i), "Variable \"" + s + "\" is not an algebraic variable.");
+    new_z.push_back(i);
   }
   // Success: Update z
-  std::copy(new_z.begin(), new_z.end(), zz_.begin());
+  std::copy(new_z.begin(), new_z.end(), z_.begin());
 }
 
 void DaeBuilderInternal::clear_in(const std::string& v) {
@@ -571,7 +565,7 @@ void DaeBuilderInternal::clear_in(const std::string& v) {
   case DAE_BUILDER_P: return p_.clear();
   case DAE_BUILDER_U: return u_.clear();
   case DAE_BUILDER_X: return x_.clear();
-  case DAE_BUILDER_Z: return zz_.clear();
+  case DAE_BUILDER_Z: return z_.clear();
   case DAE_BUILDER_Q: return q_.clear();
   case DAE_BUILDER_C: return cc_.clear();
   case DAE_BUILDER_D: return dd_.clear();
@@ -653,16 +647,16 @@ void DaeBuilderInternal::tear() {
   for (auto& e : iv_on_hold) iv_set.insert(e);
   // Remove any (held or not held) iteration variables, equations from z and alg
   size_t sz = 0;
-  casadi_assert(zz_.size() == alg_.size(), "z and alg have different lengths");
-  for (size_t k = 0; k < zz_.size(); ++k) {
-    if (!iv_set.count(zz_[k].name())) {
+  casadi_assert(z_.size() == alg_.size(), "z and alg have different lengths");
+  for (size_t k = 0; k < z_.size(); ++k) {
+    if (!iv_set.count(variable(z_[k]).name)) {
       // Non-iteration variable: Keep
-      zz_.at(k) = zz_.at(sz);
+      z_.at(k) = z_.at(sz);
       alg_.at(k) = alg_.at(sz);
       sz++;
     }
   }
-  zz_.resize(sz);
+  z_.resize(sz);
   alg_.resize(sz);
   // Remove any (held or not held) iteration variables, equations from u
   sz = 0;
@@ -674,7 +668,7 @@ void DaeBuilderInternal::tear() {
   }
   u_.resize(sz);
   // Add algebraic variables
-  for (auto& e : iv) zz_.push_back(variable(e).v);
+  for (auto& e : iv) z_.push_back(find(e));
   // Add residual variables
   for (auto& e : res) alg_.push_back(variable(e).v);
   // Add output variables
@@ -829,10 +823,9 @@ void DaeBuilderInternal::sanity_check() const {
   }
 
   // Algebraic variables/equations
-  casadi_assert(zz_.size() == alg_.size(), "z and alg have different lengths");
-  for (casadi_int i = 0; i < zz_.size(); ++i) {
-    casadi_assert(zz_[i].is_symbolic(), "Non-symbolic algebraic variable z");
-    casadi_assert(zz_[i].size()==alg_[i].size(), "alg has wrong dimensions");
+  casadi_assert(z_.size() == alg_.size(), "z and alg have different lengths");
+  for (casadi_int i = 0; i < z_.size(); ++i) {
+    casadi_assert(var(z_[i]).size() == alg_[i].size(), "alg has wrong dimensions");
   }
 
   // Quadrature states/equations
@@ -1023,7 +1016,7 @@ std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   case DAE_BUILDER_W: return ww_;
   case DAE_BUILDER_U: return var(u_);
   case DAE_BUILDER_X: return var(x_);
-  case DAE_BUILDER_Z: return zz_;
+  case DAE_BUILDER_Z: return var(z_);
   case DAE_BUILDER_Q: return var(q_);
   case DAE_BUILDER_Y: return yy_;
   default: return std::vector<MX>{};
@@ -1811,8 +1804,7 @@ MX DaeBuilderInternal::add_z(const std::string& name, casadi_int n) {
   v.v = MX::sym(name, n);
   v.variability = Variable::CONTINUOUS;
   v.causality = Variable::LOCAL;
-  (void)add_variable(name, v);
-  zz_.push_back(v.v);
+  z_.push_back(add_variable(name, v));
   return v.v;
 }
 
