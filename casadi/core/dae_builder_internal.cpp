@@ -226,13 +226,6 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
   if (document[0].has_child("ModelStructure"))
     import_model_structure(document[0]["ModelStructure"]);
 
-  // Mark corresponding variables as dependency
-  for (auto&& v : {outputs_, derivatives_, initial_unknowns_}) {
-    for (const FmiUnknown& e : v) {
-      for (casadi_int d : e.dependencies) variables_.at(d).dependency = true;
-    }
-  }
-
   // **** Postprocess / sort variables ****
   for (auto it = variables_.begin(); it != variables_.end(); ++it) {
     // Sort by types
@@ -1963,20 +1956,6 @@ MX DaeBuilderInternal::add_y(const std::string& name, const MX& new_ydef) {
   return v.v;
 }
 
-FmiUnknown::FmiUnknown(const XmlNode& n) {
-  this->index = n.attribute<casadi_int>("index", 0);
-  this->dependencies = n.attribute<std::vector<casadi_int>>("dependencies", {});
-  // this->dependenciesKind = n.attribute<std::vector<std::string>>("dependenciesKind", {});
-  // Index-1 offset
-  offset(-1);
-}
-
-void FmiUnknown::offset(casadi_int off) {
-  if (off == 0) return;
-  this->index += off;
-  for (casadi_int& e : this->dependencies) e += off;
-}
-
 template<typename T>
 std::vector<T> read_list(const XmlNode& n) {
   // Number of elements
@@ -1992,14 +1971,38 @@ std::vector<T> read_list(const XmlNode& n) {
 
 void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   // Outputs
-  if (n.has_child("Outputs"))
-    outputs_ = read_list<FmiUnknown>(n["Outputs"]);
-  // Outputs
-  if (n.has_child("Derivatives"))
-    derivatives_ = read_list<FmiUnknown>(n["Derivatives"]);
+  if (n.has_child("Outputs")) {
+    for (auto& e : n["Outputs"].children) {
+      // Get index
+      outputs_.push_back(e.attribute<casadi_int>("index", 0));
+      // Get dependencies
+      for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
+        variables_.at(d - 1).dependency = true;
+      }
+    }
+  }
+  // Derivatives
+  if (n.has_child("Derivatives")) {
+    for (auto& e : n["Derivatives"].children) {
+      // Get index
+      derivatives_.push_back(e.attribute<casadi_int>("index", 0));
+      // Get dependencies
+      for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
+        variables_.at(d - 1).dependency = true;
+      }
+    }
+  }
   // Initial unknowns
-  if (n.has_child("InitialUnknowns"))
-    initial_unknowns_ = read_list<FmiUnknown>(n["InitialUnknowns"]);
+  if (n.has_child("InitialUnknowns")) {
+    for (auto& e : n["InitialUnknowns"].children) {
+      // Get index
+      initial_unknowns_.push_back(e.attribute<casadi_int>("index", 0));
+      // Get dependencies
+      for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
+        variables_.at(d - 1).dependency = true;
+      }
+    }
+  }
 }
 
 } // namespace casadi

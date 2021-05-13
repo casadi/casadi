@@ -36,22 +36,6 @@ namespace casadi {
 // Forward declarations
 class XmlNode;
 
-// FMI Unknown
-struct CASADI_EXPORT FmiUnknown {
-  // Index to the corresponding model variable
-  casadi_int index;
-  // Dependencies on other variables
-  std::vector<casadi_int> dependencies;
-  // Type of dependency
-  std::vector<std::string> dependenciesKind;
-  // Default constructor
-  FmiUnknown() : index(-1) {}
-  // Construct from node
-  explicit FmiUnknown(const XmlNode& n);
-  // Apply index offset
-  void offset(casadi_int off);
-};
-
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
@@ -297,7 +281,7 @@ protected:
   std::vector<Variable> variables_;
 
   // Model structure
-  std::vector<FmiUnknown> outputs_, derivatives_, initial_unknowns_;
+  std::vector<size_t> outputs_, derivatives_, initial_unknowns_;
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;

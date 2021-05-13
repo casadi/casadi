@@ -109,7 +109,7 @@ struct CASADI_EXPORT XmlNode {
 
   /** \brief  Get value of text field */
   template<typename T>
-    void get(T* val) const { read(this->text, val);}
+  void get(T* val) const { read(this->text, val);}
 
   /** \brief  Read the string value of a string (i.e. copy) */
   static void read(const std::string& str, std::string* val);
