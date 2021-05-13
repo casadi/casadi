@@ -2388,7 +2388,7 @@ namespace casadi {
       g << "void mex_" << name_
         << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
         << "casadi_int i;\n";
-
+      g << "int mem;\n";
       // Work vectors, including input and output buffers
       casadi_int i_nnz = nnz_in(), o_nnz = nnz_out();
       size_t sz_w = this->sz_w();
@@ -2437,11 +2437,15 @@ namespace casadi {
         g << g.res(i) << " = w+" << str(offset) << ";\n";
         offset += nnz_out(i);
       }
+      g << name_ << "_incref();\n";
+      g << "mem = " << name_ << "_checkout();\n";
 
       // Call the function
-      g << "i = " << name_ << "(arg, res, iw, " << fw << ", 0);\n"
+      g << "i = " << name_ << "(arg, res, iw, " << fw << ", mem);\n"
         << "if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << name_
         << "\\\" failed.\");\n";
+      g << name_ << "_release(mem);\n";
+      g << name_ << "_decref();\n";
 
       // Save results
       for (casadi_int i=0; i<n_out_; ++i) {
