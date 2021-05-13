@@ -129,4 +129,18 @@ void XmlNode::read(const std::string& str, std::vector<casadi_int>* val) {
   }
 }
 
+std::vector<std::string> XmlNode::child_names() const {
+  std::vector<std::string> ret;
+  ret.reserve(this->children.size());
+  for (auto& c : this->children) ret.push_back(c.name);
+  return ret;
+}
+
+std::vector<std::string> XmlNode::attribute_names() const {
+  std::vector<std::string> ret;
+  ret.reserve(this->attributes.size());
+  for (auto& a : this->attributes) ret.push_back(a.first);
+  return ret;
+}
+
 } // namespace casadi

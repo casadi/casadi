@@ -145,86 +145,33 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name) : name_(name) {
 }
 
 void DaeBuilderInternal::parse_fmi(const std::string& filename) {
-
-  // Load
-  XmlFile xml_file("tinyxml");
-  XmlNode document = xml_file.parse(filename);
-
   // Ensure no variables already
   casadi_assert(variables_.empty(), "Instance already has variables");
 
-  // **** Add model variables ****
-  {
-    // Get a reference to the ModelVariables node
-    const XmlNode& modvars = document[0]["ModelVariables"];
+  // Parse XML
+  XmlFile xml_file("tinyxml");
+  XmlNode fmi_desc = xml_file.parse(filename)[0];  // One child; fmiModelDescription
 
-    // Add variables
-    for (casadi_int i = 0; i < modvars.size(); ++i) {
-      // Get a reference to the variable
-      const XmlNode& vnode = modvars[i];
+  // Read attributes
+  fmi_version_ = fmi_desc.attribute<std::string>("fmiVersion", "");
+  model_name_ = fmi_desc.attribute<std::string>("modelName", "");
+  guid_ = fmi_desc.attribute<std::string>("guid", "");
+  description_ = fmi_desc.attribute<std::string>("description", "");
+  author_ = fmi_desc.attribute<std::string>("author", "");
+  copyright_ = fmi_desc.attribute<std::string>("copyright", "");
+  license_ = fmi_desc.attribute<std::string>("license", "");
+  generation_tool_ = fmi_desc.attribute<std::string>("generationTool", "");
+  generation_date_and_time_ = fmi_desc.attribute<std::string>("generationDateAndTime", "");
+  variable_naming_convention_ = fmi_desc.attribute<std::string>("variableNamingConvention", "");
+  number_of_event_indicators_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
 
-      // Name of variable
-      std::string name = vnode.attribute<std::string>("name");
-
-      // Ignore duplicate variables
-      if (varind_.find(name) != varind_.end()) {
-        casadi_warning("Duplicate variable '" + name + "' ignored");
-        continue;
-      }
-
-      // Create new variable
-      Variable var(name);
-      var.v = MX::sym(name);
-
-      // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
-      var.value_reference = vnode.attribute<casadi_int>("valueReference");
-      var.description = vnode.attribute<std::string>("description", "");
-      std::string causality_str = vnode.attribute<std::string>("causality", "local");
-      if (causality_str == "internal") causality_str = "local";  // FMI 1.0 -> FMI 2.0
-      var.causality = to_enum<Variable::Causality>(causality_str);
-      std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
-      if (variability_str == "parameter") variability_str = "fixed";  // FMI 1.0 -> FMI 2.0
-      var.variability = to_enum<Variable::Variability>(variability_str);
-      std::string initial_str = vnode.attribute<std::string>("initial", "");
-      if (initial_str.empty()) {
-        // Default value
-        var.initial = Variable::default_initial(var.causality, var.variability);
-      } else {
-        // Consistency check
-        casadi_assert(var.causality != Variable::INPUT && var.causality != Variable::INDEPENDENT,
-          "The combination causality = '" + to_string(var.causality) + "', "
-          "initial = '" + initial_str + "' is not allowed per FMI 2.0 specification.");
-        // Value specified
-        var.initial = to_enum<Variable::Initial>(initial_str);
-      }
-      // Other properties
-      if (vnode.has_child("Real")) {
-        const XmlNode& props = vnode["Real"];
-        var.unit = props.attribute<std::string>("unit", var.unit);
-        var.display_unit = props.attribute<std::string>("displayUnit", var.display_unit);
-        var.min = props.attribute<double>("min", -inf);
-        var.max = props.attribute<double>("max", inf);
-        var.nominal = props.attribute<double>("nominal", 1.);
-        var.start = props.attribute<double>("start", 0.);
-        var.derivative = props.attribute<casadi_int>("derivative", var.derivative);
-      }
-      // Add to list of variables
-      add_variable(name, var);
-    }
-    // Handle derivatives/antiderivatives
-    for (auto it = variables_.begin(); it != variables_.end(); ++it) {
-      if (it->derivative >= 0) {
-        // Add variable offset, make index 1
-        it->derivative -= 1;
-        // Set antiderivative
-        variables_.at(it->derivative).antiderivative = it - variables_.begin();
-      }
-    }
-  }
+  // Process ModelVariables
+  casadi_assert(fmi_desc.has_child("ModelVariables"), "Missing 'ModelVariables'");
+  import_model_variables(fmi_desc["ModelVariables"]);
 
   // Process model structure
-  if (document[0].has_child("ModelStructure"))
-    import_model_structure(document[0]["ModelStructure"]);
+  if (fmi_desc.has_child("ModelStructure"))
+    import_model_structure(fmi_desc["ModelStructure"]);
 
   // **** Postprocess / sort variables ****
   for (auto it = variables_.begin(); it != variables_.end(); ++it) {
@@ -268,9 +215,9 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
   }
 
   // **** Add binding equations ****
-  if (document[0].has_child("equ:BindingEquations")) {
+  if (fmi_desc.has_child("equ:BindingEquations")) {
     // Get a reference to the BindingEquations node
-    const XmlNode& bindeqs = document[0]["equ:BindingEquations"];
+    const XmlNode& bindeqs = fmi_desc["equ:BindingEquations"];
     // Loop over binding equations
     for (casadi_int i = 0; i < bindeqs.size(); ++i) {
       // Reference to the binding equation
@@ -294,9 +241,9 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
   // **** Add dynamic equations, initial equations ****
   for (bool init_eq : {true, false}) {
     const char* equ = init_eq ? "equ:InitialEquations" : "equ:DynamicEquations";
-    if (document[0].has_child(equ)) {
+    if (fmi_desc.has_child(equ)) {
       // Get a reference to the DynamicEquations node
-      const XmlNode& dyneqs = document[0][equ];
+      const XmlNode& dyneqs = fmi_desc[equ];
       // Add equations
       for (casadi_int i = 0; i < dyneqs.size(); ++i) {
         // Get a reference to the variable
@@ -1967,6 +1914,71 @@ std::vector<T> read_list(const XmlNode& n) {
     r.push_back(T(n[i]));
   }
   return r;
+}
+
+void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
+  // Add variables
+  for (casadi_int i = 0; i < modvars.size(); ++i) {
+    // Get a reference to the variable
+    const XmlNode& vnode = modvars[i];
+
+    // Name of variable
+    std::string name = vnode.attribute<std::string>("name");
+
+    // Ignore duplicate variables
+    if (varind_.find(name) != varind_.end()) {
+      casadi_warning("Duplicate variable '" + name + "' ignored");
+      continue;
+    }
+
+    // Create new variable
+    Variable var(name);
+    var.v = MX::sym(name);
+
+    // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
+    var.value_reference = vnode.attribute<casadi_int>("valueReference");
+    var.description = vnode.attribute<std::string>("description", "");
+    std::string causality_str = vnode.attribute<std::string>("causality", "local");
+    if (causality_str == "internal") causality_str = "local";  // FMI 1.0 -> FMI 2.0
+    var.causality = to_enum<Variable::Causality>(causality_str);
+    std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
+    if (variability_str == "parameter") variability_str = "fixed";  // FMI 1.0 -> FMI 2.0
+    var.variability = to_enum<Variable::Variability>(variability_str);
+    std::string initial_str = vnode.attribute<std::string>("initial", "");
+    if (initial_str.empty()) {
+      // Default value
+      var.initial = Variable::default_initial(var.causality, var.variability);
+    } else {
+      // Consistency check
+      casadi_assert(var.causality != Variable::INPUT && var.causality != Variable::INDEPENDENT,
+        "The combination causality = '" + to_string(var.causality) + "', "
+        "initial = '" + initial_str + "' is not allowed per FMI 2.0 specification.");
+      // Value specified
+      var.initial = to_enum<Variable::Initial>(initial_str);
+    }
+    // Other properties
+    if (vnode.has_child("Real")) {
+      const XmlNode& props = vnode["Real"];
+      var.unit = props.attribute<std::string>("unit", var.unit);
+      var.display_unit = props.attribute<std::string>("displayUnit", var.display_unit);
+      var.min = props.attribute<double>("min", -inf);
+      var.max = props.attribute<double>("max", inf);
+      var.nominal = props.attribute<double>("nominal", 1.);
+      var.start = props.attribute<double>("start", 0.);
+      var.derivative = props.attribute<casadi_int>("derivative", var.derivative);
+    }
+    // Add to list of variables
+    add_variable(name, var);
+  }
+  // Handle derivatives/antiderivatives
+  for (auto it = variables_.begin(); it != variables_.end(); ++it) {
+    if (it->derivative >= 0) {
+      // Add variable offset, make index 1
+      it->derivative -= 1;
+      // Set antiderivative
+      variables_.at(it->derivative).antiderivative = it - variables_.begin();
+    }
+  }
 }
 
 void DaeBuilderInternal::import_model_structure(const XmlNode& n) {

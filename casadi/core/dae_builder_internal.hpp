@@ -274,6 +274,19 @@ protected:
   /// Get the qualified name
   static std::string qualified_name(const XmlNode& nn);
 
+  // FMI attributes
+  std::string fmi_version_;
+  std::string model_name_;
+  std::string guid_;
+  std::string description_;
+  std::string author_;
+  std::string copyright_;
+  std::string license_;
+  std::string generation_tool_;
+  std::string generation_date_and_time_;
+  std::string variable_naming_convention_;
+  casadi_int number_of_event_indicators_;
+
   /// Name of instance
   std::string name_;
 
@@ -340,6 +353,9 @@ protected:
 
   /// Read a variable
   Variable& read_variable(const XmlNode& node);
+
+  // Read ModelVariables
+  void import_model_variables(const XmlNode& modvars);
 
   // Read ModelStructure
   void import_model_structure(const XmlNode& n);

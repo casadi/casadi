@@ -58,6 +58,12 @@ struct CASADI_EXPORT XmlNode {
   /** \brief  Add an attribute */
   void set_attribute(const std::string& att_name, const std::string& att);
 
+  /** \brief  Names of children */
+  std::vector<std::string> child_names() const;
+
+  /** \brief  Names of attributes */
+  std::vector<std::string> attribute_names() const;
+
   /** \brief  Get an attribute by its name */
   template<typename T>
   T attribute(const std::string& att_name) const {
