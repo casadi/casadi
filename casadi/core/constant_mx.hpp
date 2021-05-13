@@ -341,7 +341,7 @@ namespace casadi {
         \identifier{zt} */
     std::vector<double> x_;
 
-    bool elide_copy() const override { return nnz()>=100; }
+    bool elide_copy() const override { return nnz()>=50; }
 
     /** \brief Serialize an object without type information
 
