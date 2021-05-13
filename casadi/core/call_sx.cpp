@@ -56,9 +56,15 @@ namespace casadi {
   void CallSX::der(const SXElem& x, const SXElem& y, const SXElem& f, SXElem* d) {
     const FunRef* n = dynamic_cast<const FunRef*>(f.dep(0).get());
     const Function& orig = n->f_;
-    Function ff = orig.factory("der_"+orig.name(),{orig.name_in(0)},{"jac:"+orig.name_out(0)+":"+orig.name_in(0)});
-    d[0] = 0;
-    d[1] = SXElem::apply(ff, f.dep(1), f.dep(0).dep(0));
+    if (orig.nnz_in()==2) {
+      Function ff = orig.factory("der_"+orig.name(),{orig.name_in(0),orig.name_in(1)},{"jac:"+orig.name_out(0)+":"+orig.name_in(1)});
+      d[0] = 0;
+      d[1] = SXElem::apply(ff, f.dep(1), f.dep(0).dep(0));
+    } else {
+      Function ff = orig.factory("der_"+orig.name(),{orig.name_in(0)},{"jac:"+orig.name_out(0)+":"+orig.name_in(0)});
+      d[0] = 0;
+      d[1] = SXElem::apply(ff, f.dep(1));
+    }
   }
 
   std::string CallSX::codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w) {
