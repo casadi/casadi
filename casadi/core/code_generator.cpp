@@ -233,12 +233,12 @@ namespace casadi {
     if (f->has_refcount_) {
       // Increase reference counter
       *this << "void " << fname << "_incref(void) {\n";
-      f->codegen_incref(*this);
+      f->codegen_incref(*this, inst);
       *this << "}\n\n";
 
       // Decrease reference counter
       *this << "void " << fname << "_decref(void) {\n";
-      f->codegen_decref(*this);
+      f->codegen_decref(*this, inst);
       *this << "}\n\n";
     }
 

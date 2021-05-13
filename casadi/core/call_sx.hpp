@@ -70,7 +70,7 @@ public:
   /** \brief Deserialize without type information */
   static SXNode* deserialize(DeserializingStream& s);
 
-  static int call(const Function &f, double& result, double arg1, double arg2, const double** arg, double** res, casadi_int* iw, double* w);
+  static int call(const Function &f, double& result, double dep, double index, const double** arg, double** res, casadi_int* iw, double* w);
 
   SXElem ref_;
   SXElem arg_;

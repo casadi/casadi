@@ -85,6 +85,16 @@ namespace casadi {
     return 0;
   }
 
+  /// Constructor
+  GetNonzerosSliceParam::GetNonzerosSliceParam(const Sparsity& sp, const MX& x, const Slice& inner,
+                      const MX& outer) :
+                      GetNonzerosParam(sp, x, outer), inner_(inner), is_trivial_(false) {
+    uout() << "test" << dep(0).is_dense() << ":" << (inner_.start==0) << ":" << (inner_.stop==dep(0).size1()) << ":" << (inner_.step==1) << ":" << x.is_scalar() << x << x.size() << std::endl;
+    if (dep(0).is_dense() && inner_.start==0 && inner_.stop==dep(0).size1() && inner_.step==1 && dep(1).is_scalar()) is_trivial_ = true;
+    if (is_trivial_) bvec_zeros_.resize(nnz(), bvec_t(0));
+  }
+
+
   size_t GetNonzerosParamSlice::sz_iw() const {
     return dep(1).nnz();
   }
@@ -121,17 +131,24 @@ namespace casadi {
     const double* idata = arg[0];
     const double* nz = arg[1];
     double* odata = res[0];
-    // Dimensions
-    casadi_int nnz = dep(1).nnz();
-    casadi_int max_ind = dep(0).nnz();
-    // Get elements
-    for (casadi_int i=0; i<nnz; ++i) {
-      // Get index
-      casadi_int ind = static_cast<casadi_int>(*nz++);
-      for (casadi_int j=inner_.start;j<inner_.stop;j+= inner_.step) {
-        casadi_int index = ind+j;
-        // Make assignment if in bounds, else NaN
-        *odata++ = index>=0 && index<max_ind ? idata[index] : nan;
+
+
+    if (is_trivial_ && iw[0]) {
+      casadi_int ind = static_cast<casadi_int>(*nz);
+      res[0] = const_cast<double*>(idata+ind);
+    } else {
+      // Dimensions
+      casadi_int nnz = dep(1).nnz();
+      casadi_int max_ind = dep(0).nnz();
+      // Get elements
+      for (casadi_int i=0; i<nnz; ++i) {
+        // Get index
+        casadi_int ind = static_cast<casadi_int>(*nz++);
+        for (casadi_int j=inner_.start;j<inner_.stop;j+= inner_.step) {
+          casadi_int index = ind+j;
+          // Make assignment if in bounds, else NaN
+          *odata++ = index>=0 && index<max_ind ? idata[index] : nan;
+        }
       }
     }
     return 0;
@@ -179,6 +196,15 @@ namespace casadi {
     bvec_t *r = res[0];
     std::fill(r, r+nnz(), a);
     return 0;
+  }
+
+  int GetNonzerosSliceParam::
+  sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    if (is_trivial_ && iw[0]) {
+      res[0] = const_cast<bvec_t*>(get_ptr(bvec_zeros_));
+    } else {
+      return GetNonzerosParam::sp_forward(arg, res, iw, w);
+    }
   }
 
   int GetNonzerosParam::
@@ -358,20 +384,24 @@ namespace casadi {
   void GetNonzerosSliceParam::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res) const {
-    g.local("i", "casadi_int");
-    g.local("j", "casadi_int");
-    g.local("rr", "casadi_real", "*");
-    g.local("k", "casadi_int");
-    g.local("cr", "const casadi_real", "*");
-    g << "for (cr=" << g.work(arg[1], dep(1).nnz())
-      << ", rr=" << g.work(res[0], nnz())
-      << "; cr!=" << g.work(arg[1], dep(1).nnz()) << "+" << dep(1).nnz()
-      << "; ++cr) ";
-    g << "for (j=(int) *cr, "
-      << "k=" << inner_.start << ";k<" << inner_.stop << ";k+=" << inner_.step << ") ";
-    g << "{ i=k+j; "
-      << "*rr++ = i>=0 && i<" << dep(0).nnz() << " ? "
-      << g.work(arg[0], dep(0).nnz()) <<  "[i] : " << g.constant(nan) << "; }\n";
+    if (res[0]<=-2) {
+      g << g.work(res[0], nnz()) << " = " << g.work(arg[0], dep(0).nnz()) << "+ ((casadi_int)" << g.workel(arg[1]) << ")" << ";\n";
+    } else {
+      g.local("i", "casadi_int");
+      g.local("j", "casadi_int");
+      g.local("rr", "casadi_real", "*");
+      g.local("k", "casadi_int");
+      g.local("cr", "const casadi_real", "*");
+      g << "for (cr=" << g.work(arg[1], dep(1).nnz())
+        << ", rr=" << g.work(res[0], nnz())
+        << "; cr!=" << g.work(arg[1], dep(1).nnz()) << "+" << dep(1).nnz()
+        << "; ++cr) ";
+      g << "for (j=(int) *cr, "
+        << "k=" << inner_.start << ";k<" << inner_.stop << ";k+=" << inner_.step << ") ";
+      g << "{ i=k+j; "
+        << "*rr++ = i>=0 && i<" << dep(0).nnz() << " ? "
+        << g.work(arg[0], dep(0).nnz()) <<  "[i] : " << g.constant(nan) << "; }\n";
+    }
 
   }
 

@@ -1458,14 +1458,14 @@ namespace casadi {
     }
   }
 
-  void MXFunction::codegen_incref(CodeGenerator& g) const {
+  void MXFunction::codegen_incref(CodeGenerator& g, const Instance& inst) const {
     set<void*> added;
     for (auto&& a : algorithm_) {
       a.data->codegen_incref(g, added);
     }
   }
 
-  void MXFunction::codegen_decref(CodeGenerator& g) const {
+  void MXFunction::codegen_decref(CodeGenerator& g, const Instance& inst) const {
     set<void*> added;
     for (auto&& a : algorithm_) {
       a.data->codegen_decref(g, added);

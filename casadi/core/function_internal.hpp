@@ -584,10 +584,10 @@ namespace casadi {
     std::string codegen_mem(CodeGenerator& g, const std::string& index="mem") const;
 
     /** \brief Codegen incref for dependencies */
-    virtual void codegen_incref(CodeGenerator& g) const {}
+    virtual void codegen_incref(CodeGenerator& g, const Instance& inst) const {}
 
     /** \brief Codegen decref for dependencies */
-    virtual void codegen_decref(CodeGenerator& g) const {}
+    virtual void codegen_decref(CodeGenerator& g, const Instance& inst) const {}
 
     /** \brief Codegen decref for alloc_mem */
     virtual void codegen_alloc_mem(CodeGenerator& g) const;
