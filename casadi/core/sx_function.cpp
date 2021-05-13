@@ -782,7 +782,7 @@ namespace casadi {
   int SXFunction::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     // Fall back when forward mode not allowed
-    if (sp_weight()==1) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
+    if (sp_weight()==1 || sp_weight()==-1) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -805,7 +805,7 @@ namespace casadi {
   int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
     // Fall back when reverse mode not allowed
-    if (sp_weight()==0) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
+    if (sp_weight()==0 || sp_weight()==-1) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
