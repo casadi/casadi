@@ -1662,6 +1662,11 @@ namespace casadi {
       bool symmetric) const {
     // Check if we are able to propagate dependencies through the function
     if (has_spfwd() || has_sprev()) {
+      // Get weighting factor
+      double w = sp_weight();
+
+      // Skip generation, assume dense
+      if (w == -1) return Sparsity();
       Sparsity sp;
       if (nnz_in(iind) > 3*bvec_size && nnz_out(oind) > 3*bvec_size &&
             GlobalOptions::hierarchical_sparsity) {
@@ -1682,12 +1687,6 @@ namespace casadi {
         // Number of adjoint sweeps we must make
         casadi_int nsweep_adj = nz_out/bvec_size;
         if (nz_out%bvec_size) nsweep_adj++;
-
-        // Get weighting factor
-        double w = sp_weight();
-
-        // Skip generation, assume dense
-        if (w == -1) return Sparsity();
 
         // Use forward mode?
         if (w*static_cast<double>(nsweep_fwd) <= (1-w)*static_cast<double>(nsweep_adj)) {
