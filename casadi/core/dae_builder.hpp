@@ -105,7 +105,7 @@ public:
   const std::vector<MX>& quad() const;
 
   /** \brief Output variables */
-  const std::vector<MX>& y() const;
+  std::vector<MX> y() const;
 
   /** \brief Definitions of output variables */
   std::vector<MX> ydef() const;
@@ -123,7 +123,7 @@ public:
   std::vector<MX> cdef() const;
 
   /** \brief Dependent parameters */
-  const std::vector<MX>& d() const;
+  std::vector<MX> d() const;
 
   /** \brief Definitions of dependent parameters
     * Interdependencies are allowed but must be non-cyclic.
@@ -131,7 +131,7 @@ public:
   std::vector<MX> ddef() const;
 
   /** \brief Dependent variables */
-  const std::vector<MX>& w() const;
+  std::vector<MX> w() const;
 
   /** \brief Dependent variables and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.

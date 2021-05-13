@@ -86,8 +86,8 @@ const std::vector<MX>& DaeBuilder::quad() const {
   return (*this)->quad_;
 }
 
-const std::vector<MX>& DaeBuilder::y() const {
-  return (*this)->yy_;
+std::vector<MX> DaeBuilder::y() const {
+  return var((*this)->y_);
 }
 
 std::vector<MX> DaeBuilder::ydef() const {
@@ -110,16 +110,16 @@ std::vector<MX> DaeBuilder::cdef() const {
   return (*this)->cdef();
 }
 
-const std::vector<MX>& DaeBuilder::d() const {
-  return (*this)->dd_;
+std::vector<MX> DaeBuilder::d() const {
+  return var((*this)->d_);
 }
 
 std::vector<MX> DaeBuilder::ddef() const {
   return (*this)->ddef();
 }
 
-const std::vector<MX>& DaeBuilder::w() const {
-  return (*this)->ww_;
+std::vector<MX> DaeBuilder::w() const {
+  return var((*this)->w_);
 }
 
 std::vector<MX> DaeBuilder::wdef() const {
@@ -167,7 +167,7 @@ casadi_int DaeBuilder::nq() const {
 }
 
 casadi_int DaeBuilder::ny() const {
-  return (*this)->yy_.size();
+  return (*this)->y_.size();
 }
 
 casadi_int DaeBuilder::nu() const {
@@ -183,11 +183,11 @@ casadi_int DaeBuilder::nc() const {
 }
 
 casadi_int DaeBuilder::nd() const {
-  return (*this)->dd_.size();
+  return (*this)->d_.size();
 }
 
 casadi_int DaeBuilder::nw() const {
-  return (*this)->ww_.size();
+  return (*this)->w_.size();
 }
 
 void DaeBuilder::parse_fmi(const std::string& filename) {
@@ -327,15 +327,15 @@ void DaeBuilder::register_c(const std::string& name) {
 }
 
 void DaeBuilder::register_d(const std::string& name) {
-  (*this)->dd_.push_back(var(name));
+  (*this)->d_.push_back(find(name));
 }
 
 void DaeBuilder::register_w(const std::string& name) {
-  (*this)->ww_.push_back(var(name));
+  (*this)->w_.push_back(find(name));
 }
 
 void DaeBuilder::register_y(const std::string& name) {
-  (*this)->yy_.push_back(var(name));
+  (*this)->y_.push_back(find(name));
 }
 
 void DaeBuilder::clear_in(const std::string& v) {
@@ -653,13 +653,13 @@ Function DaeBuilder::add_fun(const std::string& name,
   for (auto&& s : res) {
     // Find the binding expression FIXME(@jaeandersson)
     casadi_int v_ind;
-    for (v_ind=0; v_ind < (*this)->ww_.size(); ++v_ind) {
-      if (s == (*this)->ww_.at(v_ind).name()) {
+    for (v_ind = 0; v_ind < (*this)->w_.size(); ++v_ind) {
+      if (s == (*this)->variable((*this)->w_.at(v_ind)).name) {
         res_ex.push_back(wdef.at(v_ind));
         break;
       }
     }
-    casadi_assert(v_ind < (*this)->ww_.size(), "Cannot find dependent '" + s + "'");
+    casadi_assert(v_ind < (*this)->w_.size(), "Cannot find dependent '" + s + "'");
   }
   Function ret(name, arg_ex, res_ex, arg, res, opts);
   return add_fun(ret);
