@@ -86,23 +86,26 @@ namespace casadi {
     ret.children.reserve(num_children);
 
     // add children
-    casadi_int ch = 0;
-    for (TiXmlNode* child = n->FirstChild(); child != nullptr; child= child->NextSibling(), ++ch) {
-      casadi_int childtype = child->Type();
-
-      if (childtype == TiXmlNode::TINYXML_ELEMENT) {
-        XmlNode newnode = addNode(child);
-        ret.children.push_back(newnode);
-        ret.child_indices_[newnode.name] = ch;
-      } else if (childtype == TiXmlNode::TINYXML_COMMENT) {
-        ret.comment = child->Value();
-      } else if (childtype == TiXmlNode::TINYXML_TEXT) {
-        ret.text = child->ToText()->Value();
-      } else if (childtype == TiXmlNode::TINYXML_DECLARATION) {
-        // uout() << "Warning: Skipped TiXmlNode::TINYXML_DECLARATION" << endl;
-      } else {
-        casadi_error("addNode: Unknown node type");
-      }
+    for (TiXmlNode* child = n->FirstChild(); child != nullptr; child= child->NextSibling()) {
+      switch (child->Type()) {
+        case TiXmlNode::TINYXML_ELEMENT:
+        {
+          XmlNode newnode = addNode(child);
+          ret.child_indices_[newnode.name] = ret.children.size();
+          ret.children.push_back(newnode);
+          break;
+        }
+        case TiXmlNode::TINYXML_COMMENT:
+          ret.comment = child->Value();
+          break;
+        case TiXmlNode::TINYXML_TEXT:
+          ret.text = child->ToText()->Value();
+          break;
+        case TiXmlNode::TINYXML_DECLARATION:
+          break;
+        default:
+          casadi_error("Unknown node type");
+        }
     }
 
     // Note: Return value optimization
