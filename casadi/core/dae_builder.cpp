@@ -62,8 +62,8 @@ const MX& DaeBuilder::t() const {
   return var((*this)->t_.at(0));
 }
 
-const std::vector<MX>& DaeBuilder::x() const {
-  return (*this)->xx_;
+std::vector<MX> DaeBuilder::x() const {
+  return var((*this)->x_);
 }
 
 const std::vector<MX>& DaeBuilder::ode() const {
@@ -78,8 +78,8 @@ const std::vector<MX>& DaeBuilder::alg() const {
   return (*this)->alg_;
 }
 
-const std::vector<MX>& DaeBuilder::q() const {
-  return (*this)->qq_;
+std::vector<MX> DaeBuilder::q() const {
+  return var((*this)->q_);
 }
 
 const std::vector<MX>& DaeBuilder::quad() const {
@@ -152,6 +152,42 @@ const std::vector<MX>& DaeBuilder::when_rhs() const {
 
 bool DaeBuilder::has_t() const {
   return !(*this)->t_.empty();
+}
+
+casadi_int DaeBuilder::nx() const {
+  return (*this)->x_.size();
+}
+
+casadi_int DaeBuilder::nz() const {
+  return (*this)->zz_.size();
+}
+
+casadi_int DaeBuilder::nq() const {
+  return (*this)->q_.size();
+}
+
+casadi_int DaeBuilder::ny() const {
+  return (*this)->yy_.size();
+}
+
+casadi_int DaeBuilder::nu() const {
+  return (*this)->u_.size();
+}
+
+casadi_int DaeBuilder::np() const {
+  return (*this)->p_.size();
+}
+
+casadi_int DaeBuilder::nc() const {
+  return (*this)->cc_.size();
+}
+
+casadi_int DaeBuilder::nd() const {
+  return (*this)->dd_.size();
+}
+
+casadi_int DaeBuilder::nw() const {
+  return (*this)->ww_.size();
 }
 
 void DaeBuilder::parse_fmi(const std::string& filename) {
@@ -275,7 +311,7 @@ void DaeBuilder::register_u(const std::string& name) {
 }
 
 void DaeBuilder::register_x(const std::string& name) {
-  (*this)->xx_.push_back(var(name));
+  (*this)->x_.push_back(find(name));
 }
 
 void DaeBuilder::register_z(const std::string& name) {
@@ -283,7 +319,7 @@ void DaeBuilder::register_z(const std::string& name) {
 }
 
 void DaeBuilder::register_q(const std::string& name) {
-  (*this)->qq_.push_back(var(name));
+  (*this)->q_.push_back(find(name));
 }
 
 void DaeBuilder::register_c(const std::string& name) {
@@ -327,7 +363,7 @@ MX DaeBuilder::add_t(const std::string& name) {
 
 MX DaeBuilder::add_p(const std::string& name, casadi_int n) {
   try {
-    if (name.empty()) return add_p("p" + str(p().size()), n);
+    if (name.empty()) return add_p("p" + str(np()), n);
     return (*this)->add_p(name, n);
   } catch (std::exception& e) {
     THROW_ERROR("add_p", e.what());
@@ -337,7 +373,7 @@ MX DaeBuilder::add_p(const std::string& name, casadi_int n) {
 
 MX DaeBuilder::add_u(const std::string& name, casadi_int n) {
   try {
-    if (name.empty()) return add_u("u" + str(u().size()), n);
+    if (name.empty()) return add_u("u" + str(nu()), n);
     return (*this)->add_u(name, n);
   } catch (std::exception& e) {
     THROW_ERROR("add_u", e.what());
@@ -347,7 +383,7 @@ MX DaeBuilder::add_u(const std::string& name, casadi_int n) {
 
 MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
   try {
-    if (name.empty()) return add_x("x" + str(x().size()), n);
+    if (name.empty()) return add_x("x" + str(nx()), n);
     return (*this)->add_x(name, n);
   } catch (std::exception& e) {
     THROW_ERROR("add_x", e.what());
@@ -357,7 +393,7 @@ MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
 
 MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
   try {
-    if (name.empty()) return add_z("z" + str(z().size()), n);
+    if (name.empty()) return add_z("z" + str(nz()), n);
     return (*this)->add_z(name, n);
   } catch (std::exception& e) {
     THROW_ERROR("add_z", e.what());
@@ -367,7 +403,7 @@ MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
 
 MX DaeBuilder::add_q(const std::string& name, casadi_int n) {
   try {
-    if (name.empty()) return add_q("q" + str(q().size()), n);
+    if (name.empty()) return add_q("q" + str(nq()), n);
     return (*this)->add_q(name, n);
   } catch (std::exception& e) {
     THROW_ERROR("add_q", e.what());

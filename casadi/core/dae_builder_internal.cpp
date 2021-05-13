@@ -194,11 +194,11 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
         // Is the variable needed to calculate other states, algebraic variables?
         if (v.dependency) {
           // Add to list of differential equations
-          xx_.push_back(v.v);
+          x_.push_back(k);
           ode_.push_back(variables_.at(v.antiderivative).v);
         } else {
           // Add to list of quadrature equations
-          qq_.push_back(v.v);
+          q_.push_back(k);
           quad_.push_back(variables_.at(v.antiderivative).v);
         }
       } else if (v.dependency || v.derivative >= 0) {
@@ -424,9 +424,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (more) sanity_check();
 
   // Print dimensions
-  stream << "nx = " << xx_.size() << ", "
+  stream << "nx = " << x_.size() << ", "
          << "nz = " << zz_.size() << ", "
-         << "nq = " << qq_.size() << ", "
+         << "nq = " << q_.size() << ", "
          << "ny = " << yy_.size() << ", "
          << "np = " << p_.size() << ", "
          << "nc = " << cc_.size() << ", "
@@ -452,9 +452,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!cc_.empty()) stream << "  c = " << str(cc_) << std::endl;
   if (!p_.empty()) stream << "  p = " << var(p_) << std::endl;
   if (!dd_.empty()) stream << "  d = " << str(dd_) << std::endl;
-  if (!xx_.empty()) stream << "  x = " << str(xx_) << std::endl;
+  if (!x_.empty()) stream << "  x = " << var(x_) << std::endl;
   if (!zz_.empty()) stream << "  z = " << str(zz_) << std::endl;
-  if (!qq_.empty()) stream << "  q = " << str(qq_) << std::endl;
+  if (!q_.empty()) stream << "  q = " << var(q_) << std::endl;
   if (!yy_.empty()) stream << "  y = " << str(yy_) << std::endl;
   if (!ww_.empty()) stream << "  w = " << str(ww_) << std::endl;
   if (!u_.empty()) stream << "  u = " << var(u_) << std::endl;
@@ -480,10 +480,10 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!xx_.empty()) {
+  if (!x_.empty()) {
     stream << "Differential equations" << std::endl;
-    for (casadi_int k = 0; k < xx_.size(); ++k) {
-      stream << "  der(" << str(xx_[k]) << ") == " << str(ode_[k]) << std::endl;
+    for (casadi_int k = 0; k < x_.size(); ++k) {
+      stream << "  der(" << var(x_[k]) << ") == " << str(ode_[k]) << std::endl;
     }
   }
 
@@ -494,10 +494,10 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!qq_.empty()) {
+  if (!q_.empty()) {
     stream << "Quadrature equations" << std::endl;
-    for (casadi_int k = 0; k < qq_.size(); ++k) {
-      stream << "  " << str(der(qq_[k])) << " == " << str(quad_[k]) << std::endl;
+    for (casadi_int k = 0; k < q_.size(); ++k) {
+      stream << "  der(" << var(q_[k]) << ") == " << str(quad_[k]) << std::endl;
     }
   }
 
@@ -527,8 +527,8 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
 void DaeBuilderInternal::eliminate_quad() {
   // Move all the quadratures to the list of differential states
-  xx_.insert(xx_.end(), qq_.begin(), qq_.end());
-  qq_.clear();
+  x_.insert(x_.end(), q_.begin(), q_.end());
+  q_.clear();
 }
 
 void DaeBuilderInternal::sort_d() {
@@ -570,9 +570,9 @@ void DaeBuilderInternal::clear_in(const std::string& v) {
   case DAE_BUILDER_T: return t_.clear();
   case DAE_BUILDER_P: return p_.clear();
   case DAE_BUILDER_U: return u_.clear();
-  case DAE_BUILDER_X: return xx_.clear();
+  case DAE_BUILDER_X: return x_.clear();
   case DAE_BUILDER_Z: return zz_.clear();
-  case DAE_BUILDER_Q: return qq_.clear();
+  case DAE_BUILDER_Q: return q_.clear();
   case DAE_BUILDER_C: return cc_.clear();
   case DAE_BUILDER_D: return dd_.clear();
   case DAE_BUILDER_W: return ww_.clear();
@@ -823,10 +823,9 @@ void DaeBuilderInternal::sanity_check() const {
   }
 
   // Differential states
-  casadi_assert(xx_.size() == ode_.size(), "x and ode have different lengths");
-  for (casadi_int i = 0; i < xx_.size(); ++i) {
-    casadi_assert(xx_[i].size() == ode_[i].size(), "ode has wrong dimensions");
-    casadi_assert(xx_[i].is_symbolic(), "Non-symbolic state x");
+  casadi_assert(x_.size() == ode_.size(), "x and ode have different lengths");
+  for (casadi_int i = 0; i < x_.size(); ++i) {
+    casadi_assert(var(x_[i]).size() == ode_[i].size(), "ode has wrong dimensions");
   }
 
   // Algebraic variables/equations
@@ -837,10 +836,9 @@ void DaeBuilderInternal::sanity_check() const {
   }
 
   // Quadrature states/equations
-  casadi_assert(qq_.size()==quad_.size(), "q and quad have different lengths");
-  for (casadi_int i = 0; i < qq_.size(); ++i) {
-    casadi_assert(qq_[i].is_symbolic(), "Non-symbolic quadrature state q");
-    casadi_assert(qq_[i].size() == quad_[i].size(), "quad has wrong dimensions");
+  casadi_assert(q_.size()==quad_.size(), "q and quad have different lengths");
+  for (casadi_int i = 0; i < q_.size(); ++i) {
+    casadi_assert(var(q_[i]).size() == quad_[i].size(), "quad has wrong dimensions");
   }
 
   // Dependent parameters
@@ -1024,9 +1022,9 @@ std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   case DAE_BUILDER_D: return dd_;
   case DAE_BUILDER_W: return ww_;
   case DAE_BUILDER_U: return var(u_);
-  case DAE_BUILDER_X: return xx_;
+  case DAE_BUILDER_X: return var(x_);
   case DAE_BUILDER_Z: return zz_;
-  case DAE_BUILDER_Q: return qq_;
+  case DAE_BUILDER_Q: return var(q_);
   case DAE_BUILDER_Y: return yy_;
   default: return std::vector<MX>{};
   }
@@ -1804,8 +1802,7 @@ MX DaeBuilderInternal::add_x(const std::string& name, casadi_int n) {
   v.v = MX::sym(name, n);
   v.variability = Variable::CONTINUOUS;
   v.causality = Variable::LOCAL;
-  (void)add_variable(name, v);
-  xx_.push_back(v.v);
+  x_.push_back(add_variable(name, v));
   return v.v;
 }
 
@@ -1824,8 +1821,7 @@ MX DaeBuilderInternal::add_q(const std::string& name, casadi_int n) {
   v.v = MX::sym(name, n);
   v.variability = Variable::CONTINUOUS;
   v.causality = Variable::LOCAL;
-  (void)add_variable(name, v);
-  qq_.push_back(v.v);
+  q_.push_back(add_variable(name, v));
   return v.v;
 }
 

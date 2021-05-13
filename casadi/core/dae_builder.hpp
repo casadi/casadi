@@ -87,7 +87,7 @@ public:
   const MX& t() const;
 
   /** \brief Differential states */
-  const std::vector<MX>& x() const;
+  std::vector<MX> x() const;
 
   /** \brief Ordinary differential equations (ODE) */
   const std::vector<MX>& ode() const;
@@ -99,7 +99,7 @@ public:
   const std::vector<MX>& alg() const;
 
   /** \brief Quadrature states */
-  const std::vector<MX>& q() const;
+  std::vector<MX> q() const;
 
   /** \brief Quadrature equations */
   const std::vector<MX>& quad() const;
@@ -164,31 +164,31 @@ public:
   bool has_t() const;
 
   /** \brief Differential states */
-  casadi_int nx() const {return x().size();}
+  casadi_int nx() const;
 
   /** \brief Algebraic variables */
-  casadi_int nz() const {return z().size();}
+  casadi_int nz() const;
 
   /** \brief Quadrature states */
-  casadi_int nq() const {return q().size();}
+  casadi_int nq() const;
 
   /** \brief Output variables */
-  casadi_int ny() const {return y().size();}
+  casadi_int ny() const;
 
   /** \brief Free controls */
-  casadi_int nu() const {return u().size();}
+  casadi_int nu() const;
 
   /** \brief Parameters */
-  casadi_int np() const {return p().size();}
+  casadi_int np() const;
 
   /** \brief Named constants */
-  casadi_int nc() const {return c().size();}
+  casadi_int nc() const;
 
   /** \brief Dependent parameters */
-  casadi_int nd() const {return d().size();}
+  casadi_int nd() const;
 
   /** \brief Dependent variables */
-  casadi_int nw() const {return w().size();}
+  casadi_int nw() const;
   ///@}
 
   /** @name Symbolic modeling
