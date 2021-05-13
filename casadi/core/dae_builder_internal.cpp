@@ -188,7 +188,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
       cc_.push_back(v.v);
       v.beq = v.start;
     } else if (v.variability == Variable::FIXED || v.variability == Variable::TUNABLE) {
-      pp_.push_back(v.v);
+      p_.push_back(k);
     } else if (v.variability == Variable::CONTINUOUS) {
       if (v.antiderivative >= 0) {
         // Is the variable needed to calculate other states, algebraic variables?
@@ -428,7 +428,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
          << "nz = " << zz_.size() << ", "
          << "nq = " << qq_.size() << ", "
          << "ny = " << yy_.size() << ", "
-         << "np = " << pp_.size() << ", "
+         << "np = " << p_.size() << ", "
          << "nc = " << cc_.size() << ", "
          << "nd = " << dd_.size() << ", "
          << "nw = " << ww_.size() << ", "
@@ -450,7 +450,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   stream << "Variables" << std::endl;
   if (!t_.empty()) stream << "  t = " << var(t_.at(0)) << std::endl;
   if (!cc_.empty()) stream << "  c = " << str(cc_) << std::endl;
-  if (!pp_.empty()) stream << "  p = " << str(pp_) << std::endl;
+  if (!p_.empty()) stream << "  p = " << var(p_) << std::endl;
   if (!dd_.empty()) stream << "  d = " << str(dd_) << std::endl;
   if (!xx_.empty()) stream << "  x = " << str(xx_) << std::endl;
   if (!zz_.empty()) stream << "  z = " << str(zz_) << std::endl;
@@ -568,7 +568,7 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
 void DaeBuilderInternal::clear_in(const std::string& v) {
   switch (to_enum<DaeBuilderInternalIn>(v)) {
   case DAE_BUILDER_T: return t_.clear();
-  case DAE_BUILDER_P: return pp_.clear();
+  case DAE_BUILDER_P: return p_.clear();
   case DAE_BUILDER_U: return uu_.clear();
   case DAE_BUILDER_X: return xx_.clear();
   case DAE_BUILDER_Z: return zz_.clear();
@@ -626,13 +626,10 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Prune p
   if (prune_p) {
     size_t np = 0;
-    for (size_t i = 0; i < pp_.size(); ++i) {
-      std::string s = pp_.at(i).name();
-      auto it = varind_.find(s);
-      casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
-      if (!free_variables.at(it->second)) pp_.at(np++) = pp_.at(i);
+    for (size_t i = 0; i < p_.size(); ++i) {
+      if (!free_variables.at(p_.at(i))) p_.at(np++) = p_.at(i);
     }
-    pp_.resize(np);
+    p_.resize(np);
   }
   // Prune u
   if (prune_u) {
@@ -765,7 +762,7 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
       }
       DM p0 = startfun_p(std::vector<DM>{}).at(0);
       // Create function to evaluate the hold attributes
-      Function holdfun("holdfun", {vertcat(pp_)},
+      Function holdfun("holdfun", {vertcat(var(p_))},
         {vertcat(r_hold), vertcat(iv_hold)}, {"p"}, {"r_hold", "iv_hold"});
       if (holdfun.has_free()) {
         casadi_error("holdfun has free variables: " + str(holdfun.get_free()));
@@ -838,7 +835,6 @@ void DaeBuilderInternal::sanity_check() const {
   // Time
   if (!t_.empty()) {
     casadi_assert(t_.size() == 1, "At most one time variable allowed");
-    casadi_assert(var(t_[0]).is_symbolic(), "Non-symbolic time t");
     casadi_assert(var(t_[0]).is_scalar(), "Non-scalar time t");
   }
 
@@ -881,11 +877,6 @@ void DaeBuilderInternal::sanity_check() const {
   // Control
   for (casadi_int i = 0; i < uu_.size(); ++i) {
     casadi_assert(uu_[i].is_symbolic(), "Non-symbolic control u");
-  }
-
-  // Parameter
-  for (casadi_int i = 0; i < pp_.size(); ++i) {
-    casadi_assert(pp_[i].is_symbolic(), "Non-symbolic parameter p");
   }
 
   // Initial equations
@@ -1050,7 +1041,7 @@ std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   switch (ind) {
   case DAE_BUILDER_T: return var(t_);
   case DAE_BUILDER_C: return cc_;
-  case DAE_BUILDER_P: return pp_;
+  case DAE_BUILDER_P: return var(p_);
   case DAE_BUILDER_D: return dd_;
   case DAE_BUILDER_W: return ww_;
   case DAE_BUILDER_U: return uu_;
@@ -1816,8 +1807,7 @@ MX DaeBuilderInternal::add_p(const std::string& name, casadi_int n) {
   v.v = MX::sym(name, n);
   v.variability = Variable::FIXED;
   v.causality = Variable::INPUT;
-  (void)add_variable(name, v);
-  pp_.push_back(v.v);
+  p_.push_back(add_variable(name, v));
   return v.v;
 }
 

@@ -306,8 +306,8 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<size_t> t_;
-  std::vector<MX> pp_, uu_, xx_, zz_, qq_, cc_, dd_, ww_, yy_;
+  std::vector<size_t> t_, p_;
+  std::vector<MX> uu_, xx_, zz_, qq_, cc_, dd_, ww_, yy_;
 
   ///@{
   /// Ordered variables and equations

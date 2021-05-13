@@ -114,7 +114,7 @@ public:
   const std::vector<MX>& u() const;
 
   /** \brief Parameters */
-  const std::vector<MX>& p() const;
+  std::vector<MX> p() const;
 
   /** \brief Named constants */
   const std::vector<MX>& c() const;
