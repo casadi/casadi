@@ -877,7 +877,6 @@ namespace casadi {
           break;
           CASADI_MATH_BINARY_BUILTIN // Binary operation
           case OP_CALL:
-            if (a.op==OP_CALL) uout() << "OP_CALL" << it2->d[1] << ":" << w[a.i2] << std::endl;
             w[a.i0] = it2->d[0] * w[a.i1] + it2->d[1] * w[a.i2];it2++;break;
         default: // Unary operation
           w[a.i0] = it2->d[0] * w[a.i1]; it2++;
