@@ -43,9 +43,6 @@ struct CASADI_EXPORT XmlNode {
   // All children
   std::vector<XmlNode> children;
 
-  // Child index by name
-  std::map<std::string, casadi_int> child_indices_;
-
   // Name of the node
   std::string name;
 

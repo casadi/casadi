@@ -80,21 +80,17 @@ namespace casadi {
 
     // Count the number of children
     casadi_int num_children = 0;
-    for (TiXmlNode* child = n->FirstChild(); child != nullptr; child= child->NextSibling()) {
+    for (TiXmlNode* child = n->FirstChild(); child != nullptr; child = child->NextSibling()) {
       num_children++;
     }
     ret.children.reserve(num_children);
 
     // add children
-    for (TiXmlNode* child = n->FirstChild(); child != nullptr; child= child->NextSibling()) {
+    for (TiXmlNode* child = n->FirstChild(); child != nullptr; child = child->NextSibling()) {
       switch (child->Type()) {
         case TiXmlNode::TINYXML_ELEMENT:
-        {
-          XmlNode newnode = addNode(child);
-          ret.child_indices_[newnode.name] = ret.children.size();
-          ret.children.push_back(newnode);
+          ret.children.push_back(addNode(child));
           break;
-        }
         case TiXmlNode::TINYXML_COMMENT:
           ret.comment = child->Value();
           break;

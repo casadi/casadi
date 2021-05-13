@@ -33,27 +33,24 @@ bool XmlNode::has_attribute(const std::string& att_name) const {
 }
 
 bool XmlNode::has_child(const std::string& childname) const {
-  auto it = child_indices_.find(childname);
-  if (it != child_indices_.end())
-    casadi_assert(childname == children.at(it->second).name, "Here: " + childname + " != " + children.at(it->second).name);
-
-  return it!=child_indices_.end();
+  // Linear search over the elements
+  for (auto& c : this->children) {
+    if (c.name == childname) return true;
+  }
+  // Not found
+  return false;
 }
 
 XmlNode& XmlNode::operator[](const std::string& childname) {
-  // Find the child
-  auto it = child_indices_.find(childname);
-
-  // check that the child was indeed found
-  if (it == child_indices_.end()) {
-    casadi_error("could not find " + childname);
+  // Linear search over the elements
+  auto it = this->children.begin();
+  for (; it != this->children.end(); ++it) {
+    if (it->name == childname) break;
   }
-
-  casadi_assert(childname == this->children[it->second].name,
-    "Here: " + childname + " != " + this->children[it->second].name);
-
-  // Return an index to the child
-  return this->children[it->second];
+  // Check that the child was indeed found
+  casadi_assert(it != this->children.end(), "Could not find " + childname);
+  // Return a reference to the child
+  return *it;
 }
 
 const XmlNode& XmlNode::operator[](const std::string& childname) const {
