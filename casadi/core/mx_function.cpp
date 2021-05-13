@@ -723,7 +723,7 @@ namespace casadi {
   int MXFunction::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     // Fall back when forward mode not allowed
-    if (sp_weight()==1) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
+    if (sp_weight()==1 || sp_weight()==-1) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** r=arg+n_in_;
     const bvec_t** arg1=r+n_ce_;
@@ -821,7 +821,7 @@ namespace casadi {
   int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
     // Fall back when reverse mode not allowed
-    if (sp_weight()==0) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
+    if (sp_weight()==0 || sp_weight()==-1) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in_;
     bvec_t** res1=res+n_out_;
