@@ -59,11 +59,11 @@ const std::string& DaeBuilder::name() const {
 }
 
 const MX& DaeBuilder::t() const {
-  return (*this)->t_.at(0);
+  return (*this)->tt_.at(0);
 }
 
 const std::vector<MX>& DaeBuilder::x() const {
-  return (*this)->x_;
+  return (*this)->xx_;
 }
 
 const std::vector<MX>& DaeBuilder::ode() const {
@@ -71,7 +71,7 @@ const std::vector<MX>& DaeBuilder::ode() const {
 }
 
 const std::vector<MX>& DaeBuilder::z() const {
-  return (*this)->z_;
+  return (*this)->zz_;
 }
 
 const std::vector<MX>& DaeBuilder::alg() const {
@@ -79,7 +79,7 @@ const std::vector<MX>& DaeBuilder::alg() const {
 }
 
 const std::vector<MX>& DaeBuilder::q() const {
-  return (*this)->q_;
+  return (*this)->qq_;
 }
 
 const std::vector<MX>& DaeBuilder::quad() const {
@@ -87,7 +87,7 @@ const std::vector<MX>& DaeBuilder::quad() const {
 }
 
 const std::vector<MX>& DaeBuilder::y() const {
-  return (*this)->y_;
+  return (*this)->yy_;
 }
 
 std::vector<MX> DaeBuilder::ydef() const {
@@ -95,15 +95,15 @@ std::vector<MX> DaeBuilder::ydef() const {
 }
 
 const std::vector<MX>& DaeBuilder::u() const {
-  return (*this)->u_;
+  return (*this)->uu_;
 }
 
 const std::vector<MX>& DaeBuilder::p() const {
-  return (*this)->p_;
+  return (*this)->pp_;
 }
 
 const std::vector<MX>& DaeBuilder::c() const {
-  return (*this)->c_;
+  return (*this)->cc_;
 }
 
 std::vector<MX> DaeBuilder::cdef() const {
@@ -111,7 +111,7 @@ std::vector<MX> DaeBuilder::cdef() const {
 }
 
 const std::vector<MX>& DaeBuilder::d() const {
-  return (*this)->d_;
+  return (*this)->dd_;
 }
 
 std::vector<MX> DaeBuilder::ddef() const {
@@ -119,7 +119,7 @@ std::vector<MX> DaeBuilder::ddef() const {
 }
 
 const std::vector<MX>& DaeBuilder::w() const {
-  return (*this)->w_;
+  return (*this)->ww_;
 }
 
 std::vector<MX> DaeBuilder::wdef() const {
@@ -151,7 +151,7 @@ const std::vector<MX>& DaeBuilder::when_rhs() const {
 }
 
 bool DaeBuilder::has_t() const {
-  return !(*this)->t_.empty();
+  return !(*this)->tt_.empty();
 }
 
 void DaeBuilder::parse_fmi(const std::string& filename) {
@@ -247,43 +247,43 @@ void DaeBuilder::add_variable(const MX& new_v) {
 void DaeBuilder::register_t(const std::string& name) {
   // Save to class
   casadi_assert(!has_t(), "'t' already defined");
-  (*this)->t_.push_back(var(name));
+  (*this)->tt_.push_back(var(name));
 }
 
 void DaeBuilder::register_p(const std::string& name) {
-  (*this)->p_.push_back(var(name));
+  (*this)->pp_.push_back(var(name));
 }
 
 void DaeBuilder::register_u(const std::string& name) {
-  (*this)->u_.push_back(var(name));
+  (*this)->uu_.push_back(var(name));
 }
 
 void DaeBuilder::register_x(const std::string& name) {
-  (*this)->x_.push_back(var(name));
+  (*this)->xx_.push_back(var(name));
 }
 
 void DaeBuilder::register_z(const std::string& name) {
-  (*this)->z_.push_back(var(name));
+  (*this)->zz_.push_back(var(name));
 }
 
 void DaeBuilder::register_q(const std::string& name) {
-  (*this)->q_.push_back(var(name));
+  (*this)->qq_.push_back(var(name));
 }
 
 void DaeBuilder::register_c(const std::string& name) {
-  (*this)->c_.push_back(var(name));
+  (*this)->cc_.push_back(var(name));
 }
 
 void DaeBuilder::register_d(const std::string& name) {
-  (*this)->d_.push_back(var(name));
+  (*this)->dd_.push_back(var(name));
 }
 
 void DaeBuilder::register_w(const std::string& name) {
-  (*this)->w_.push_back(var(name));
+  (*this)->ww_.push_back(var(name));
 }
 
 void DaeBuilder::register_y(const std::string& name) {
-  (*this)->y_.push_back(var(name));
+  (*this)->yy_.push_back(var(name));
 }
 
 void DaeBuilder::clear_in(const std::string& v) {
@@ -303,9 +303,9 @@ void DaeBuilder::clear_out(const std::string& v) {
 }
 
 MX DaeBuilder::add_t(const std::string& name) {
-  casadi_assert((*this)->t_.empty(), "'t' already defined");
+  casadi_assert((*this)->tt_.empty(), "'t' already defined");
   MX new_t = add_variable(name);
-  (*this)->t_.push_back(new_t);
+  (*this)->tt_.push_back(new_t);
   return new_t;
 }
 
@@ -601,13 +601,13 @@ Function DaeBuilder::add_fun(const std::string& name,
   for (auto&& s : res) {
     // Find the binding expression FIXME(@jaeandersson)
     casadi_int v_ind;
-    for (v_ind=0; v_ind < (*this)->w_.size(); ++v_ind) {
-      if (s == (*this)->w_.at(v_ind).name()) {
+    for (v_ind=0; v_ind < (*this)->ww_.size(); ++v_ind) {
+      if (s == (*this)->ww_.at(v_ind).name()) {
         res_ex.push_back(wdef.at(v_ind));
         break;
       }
     }
-    casadi_assert(v_ind < (*this)->w_.size(), "Cannot find dependent '" + s + "'");
+    casadi_assert(v_ind < (*this)->ww_.size(), "Cannot find dependent '" + s + "'");
   }
   Function ret(name, arg_ex, res_ex, arg, res, opts);
   return add_fun(ret);

@@ -300,7 +300,7 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<MX> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_;
+  std::vector<MX> tt_, pp_, uu_, xx_, zz_, qq_, cc_, dd_, ww_, yy_;
 
   ///@{
   /// Ordered variables and equations
