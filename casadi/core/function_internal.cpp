@@ -2373,11 +2373,15 @@ namespace casadi {
         g << g.res(i) << " = w+" << str(offset) << ";\n";
         offset += nnz_out(i);
       }
+      g << name_ << "_incref();\n";
+      g << "mem = " << name_ << "_checkout();\n";
 
       // Call the function
-      g << "i = " << name_ << "(arg, res, iw, " << fw << ", 0);\n"
+      g << "i = " << name_ << "(arg, res, iw, " << fw << ", mem);\n"
         << "if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << name_
         << "\\\" failed.\");\n";
+      g << name_ << "_release(mem);\n";
+      g << name_ << "_decref();\n";
 
       // Save results
       for (casadi_int i=0; i<n_out_; ++i) {
