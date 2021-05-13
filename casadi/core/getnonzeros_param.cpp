@@ -457,6 +457,7 @@ namespace casadi {
   void GetNonzerosSliceParam::serialize_body(SerializingStream& s) const {
     GetNonzerosParam::serialize_body(s);
     s.pack("GetNonzerosSliceParam::inner", inner_);
+    s.pack("GetNonzerosSliceParam::is_trivial",is_trivial_);
   }
 
   void GetNonzerosSliceParam::serialize_type(SerializingStream& s) const {
@@ -466,6 +467,7 @@ namespace casadi {
 
   GetNonzerosSliceParam::GetNonzerosSliceParam(DeserializingStream& s) : GetNonzerosParam(s) {
     s.unpack("GetNonzerosSliceParam::inner", inner_);
+    s.unpack("GetNonzerosSliceParam::is_trivial",is_trivial_);
   }
 
   void GetNonzerosParamParam::serialize_type(SerializingStream& s) const {
