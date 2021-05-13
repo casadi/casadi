@@ -117,7 +117,7 @@ public:
   std::vector<MX> p() const;
 
   /** \brief Named constants */
-  const std::vector<MX>& c() const;
+  std::vector<MX> c() const;
 
   /** \brief Definitions of named constants */
   std::vector<MX> cdef() const;

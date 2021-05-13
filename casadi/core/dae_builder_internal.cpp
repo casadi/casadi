@@ -185,7 +185,7 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
       u_.push_back(k);
     } else if (v.variability == Variable::CONSTANT) {
       // Named constant
-      cc_.push_back(v.v);
+      c_.push_back(k);
       v.beq = v.start;
     } else if (v.variability == Variable::FIXED || v.variability == Variable::TUNABLE) {
       p_.push_back(k);
@@ -429,7 +429,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
          << "nq = " << q_.size() << ", "
          << "ny = " << yy_.size() << ", "
          << "np = " << p_.size() << ", "
-         << "nc = " << cc_.size() << ", "
+         << "nc = " << c_.size() << ", "
          << "nd = " << dd_.size() << ", "
          << "nw = " << ww_.size() << ", "
          << "nu = " << u_.size();
@@ -449,7 +449,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   // Print the variables
   stream << "Variables" << std::endl;
   if (!t_.empty()) stream << "  t = " << var(t_.at(0)) << std::endl;
-  if (!cc_.empty()) stream << "  c = " << str(cc_) << std::endl;
+  if (!c_.empty()) stream << "  c = " << var(c_) << std::endl;
   if (!p_.empty()) stream << "  p = " << var(p_) << std::endl;
   if (!dd_.empty()) stream << "  d = " << str(dd_) << std::endl;
   if (!x_.empty()) stream << "  x = " << var(x_) << std::endl;
@@ -459,10 +459,10 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!ww_.empty()) stream << "  w = " << str(ww_) << std::endl;
   if (!u_.empty()) stream << "  u = " << var(u_) << std::endl;
 
-  if (!cc_.empty()) {
+  if (!c_.empty()) {
     stream << "Constants" << std::endl;
-    for (const MX& c : cc_) {
-      stream << "  " << str(c) << " == " << str(variable(c.name()).beq) << std::endl;
+    for (size_t c : c_) {
+      stream << "  " << var(c) << " == " << variable(c).beq << std::endl;
     }
   }
 
@@ -567,7 +567,7 @@ void DaeBuilderInternal::clear_in(const std::string& v) {
   case DAE_BUILDER_X: return x_.clear();
   case DAE_BUILDER_Z: return z_.clear();
   case DAE_BUILDER_Q: return q_.clear();
-  case DAE_BUILDER_C: return cc_.clear();
+  case DAE_BUILDER_C: return c_.clear();
   case DAE_BUILDER_D: return dd_.clear();
   case DAE_BUILDER_W: return ww_.clear();
   case DAE_BUILDER_Y: return yy_.clear();
@@ -1010,7 +1010,7 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
 std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   switch (ind) {
   case DAE_BUILDER_T: return var(t_);
-  case DAE_BUILDER_C: return cc_;
+  case DAE_BUILDER_C: return var(c_);
   case DAE_BUILDER_P: return var(p_);
   case DAE_BUILDER_D: return dd_;
   case DAE_BUILDER_W: return ww_;
@@ -1737,8 +1737,8 @@ Function DaeBuilderInternal::gather_eq() const {
 
 std::vector<MX> DaeBuilderInternal::cdef() const {
   std::vector<MX> ret;
-  ret.reserve(cc_.size());
-  for (const MX& c : cc_) ret.push_back(variable(c.name()).beq);
+  ret.reserve(c_.size());
+  for (size_t c : c_) ret.push_back(variable(c).beq);
   return ret;
 }
 
@@ -1822,8 +1822,7 @@ MX DaeBuilderInternal::add_c(const std::string& name, const MX& new_cdef) {
   v.v = MX::sym(name);
   v.variability = Variable::CONSTANT;
   v.beq = new_cdef;
-  (void)add_variable(name, v);
-  cc_.push_back(v.v);
+  c_.push_back(add_variable(name, v));
   return v.v;
 }
 
