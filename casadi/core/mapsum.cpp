@@ -67,7 +67,7 @@ namespace casadi {
     // Construct return function
     Dict custom_opts = opts;
     custom_opts["always_inline"] = true;
-    uout() << "opts" << opts << std::endl;
+    //REMOVE uout() << "opts" << opts << std::endl;
     return Function(ret.name(), arg, res, custom_opts);
 
   }
@@ -78,7 +78,7 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_(n), reduce_in_(reduce_in), reduce_out_(reduce_out) {
     casadi_assert_dev(reduce_in.size()==f.n_in());
     casadi_assert_dev(reduce_out.size()==f.n_out());
-    uout() << "init It's map sum!" << std::endl;
+    //REMOVE uout() << "init It's map sum!" << std::endl;
 
     f_orig_ = f;
 
@@ -236,7 +236,7 @@ namespace casadi {
   int MapSum::local_eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
 
 
-    uout() << "local_eval_gen:" << name_ << ":" << dump_in_ << std::endl;
+    //REMOVE uout() << "local_eval_gen:" << name_ << ":" << dump_in_ << std::endl;
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
@@ -432,15 +432,15 @@ namespace casadi {
       g << "if (" << g(f_, "arg1", "res1", "iw", "w", local) << ") return 1;\n";
     }
 
-    uout() << "debug" << name_ << std::endl;
-    uout() << "n_in_" << n_in_ << std::endl;
-    uout() << "reduce_in_" << reduce_in_ << std::endl;
-    uout() << "inst.arg_null" << inst.arg_null << std::endl;
-    uout() << "inst.arg_null" << inst.arg_null << std::endl;
+   //REMOVE  uout() << "debug" << name_ << std::endl;
+    //REMOVE uout() << "n_in_" << n_in_ << std::endl;
+    //REMOVE uout() << "reduce_in_" << reduce_in_ << std::endl;
+    //REMOVE uout() << "inst.arg_null" << inst.arg_null << std::endl;
+   //REMOVE  uout() << "inst.arg_null" << inst.arg_null << std::endl;
 
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
-      uout() << "j nnz" << j << ":" << f_.nnz_in(j) << std::endl;
+      //REMOVE uout() << "j nnz" << j << ":" << f_.nnz_in(j) << std::endl;
       if (!reduce_in_[j] && f_.nnz_in(j)) {
         if (inst.arg_null.empty()) {
           //g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
@@ -660,9 +660,9 @@ namespace casadi {
     // Generate map of derivative
     Function Jf = f_.jacobian();
 
-    Jf.disp(uout());
+    //REMOVE Jf.disp(uout());
 
-    uout() << "goal" << std::endl;
+    //REMOVE uout() << "goal" << std::endl;
 
     std::vector<bool> reduce_in = reduce_in_;
     for (size_t oind = 0; oind < n_out_; ++oind) { // Nominal outputs

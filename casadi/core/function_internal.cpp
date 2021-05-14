@@ -691,7 +691,7 @@ namespace casadi {
         dump_format_, sparsity_in_[i], arg[i]);
     }
     generate_in(dump_dir_+ filesep + name_ + "." + count + ".in.txt", arg);
-    uout() << "dump for joy" << dump_dir_+ filesep + name_ + "." + count + ".in.txt" << std::endl;
+    //REMOVE uout() << "dump for joy" << dump_dir_+ filesep + name_ + "." + count + ".in.txt" << std::endl;
   }
 
   void FunctionInternal::dump_out(casadi_int id, double** res) const {
@@ -2402,16 +2402,17 @@ namespace casadi {
       g << "const casadi_real* r;\n";
       g << "casadi_int flag;\n";
 
+      int align_bytes = g.casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
 
       // Work vectors and input and output buffers
       g << CodeGenerator::array("casadi_int", "iw", sz_iw())
-        << CodeGenerator::array("casadi_real", "w", sz_w(), "", 32);
+        << CodeGenerator::array("casadi_real", "w", sz_w(), "", align_bytes);
 
       for (casadi_int i=0; i<n_in_; ++i) {
-        g << CodeGenerator::array("casadi_real", "w_in" + str(i), nnz_in(i), "", 32);
+        g << CodeGenerator::array("casadi_real", "w_in" + str(i), nnz_in(i), "", align_bytes);
       }
       for (casadi_int i=0; i<n_out_; ++i) {
-        g << CodeGenerator::array("casadi_real", "w_out" + str(i), nnz_out(i), "", 32);
+        g << CodeGenerator::array("casadi_real", "w_out" + str(i), nnz_out(i), "", align_bytes);
       }
       // Input buffers
       g << "const casadi_real* arg[" << sz_arg() << "];\n";
@@ -2656,7 +2657,6 @@ namespace casadi {
   }
 
   bool FunctionInternal::fwdViaJac(casadi_int nfwd) const {
-    uout() << "fwdViaJac" << name_ << jac_penalty_ << jac_penalty_ << ":" << static_cast<double>(nnz_in_diff()) <<"/" << static_cast<double>(nnz_in()) << ":" << nfwd << std::endl;
     if (!enable_forward_ && !enable_fd_) return true;
     if (jac_penalty_==-1) return false;
 

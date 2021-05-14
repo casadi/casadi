@@ -57,11 +57,11 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
 
     set_dep(x);
     set_sparsity(x.sparsity());
-    sparsity().spy();
-    uout() << "PermuteLayout" << std::endl;
-    uout() << relay.perms() << std::endl;
-    uout() << relay.source() << std::endl;
-    uout() << relay.target() << std::endl;
+    //REMOVE sparsity().spy();
+    //REMOVE uout() << "PermuteLayout" << std::endl;
+    //REMOVE uout() << relay.perms() << std::endl;
+    //REMOVE uout() << relay.source() << std::endl;
+    //REMOVE uout() << relay.target() << std::endl;
     casadi_assert(x->nnz()==relay.source().nnz(), "Invalid permutation");
     if (x->sz_self()<relay.source().size()) {
 
@@ -112,11 +112,11 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
       Sparsity target_sp = repmat(sparsity(), 1, n);
       casadi_assert((target_sp+all_seeds.sparsity()).nnz()==target_sp.nnz(), "seed sparsity must be subset");
       if (all_seeds.sparsity()!=target_sp) all_seeds = project(all_seeds, target_sp);
-      uout() << "here" << std::endl;
+      //REMOVE uout() << "here" << std::endl;
       Relayout temp = relay_.push_right(n);
-      uout() << temp << std::endl;
+      //REMOVE uout() << temp << std::endl;
       MX sens = permute_layout(all_seeds, relay_.push_right(n));//Relayout(relay_.source().push_right(n), relay_.target().push_right(n), "fwdseed"));
-      uout() << "here reached" << std::endl;
+      //REMOVE uout() << "here reached" << std::endl;
       //uout() << "ad_forward" << sens.size() << std::endl;
       std::vector<MX> senss = horzsplit(sens, sens.size2()/n);
       //uout() << "ad_forward post" << senss << std::endl;

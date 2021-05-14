@@ -58,13 +58,13 @@ namespace casadi {
     std::copy(dims.begin(), dims.end(), this->dims());
     std::copy(outer_sizes.begin(), outer_sizes.end(), this->outer_sizes());
 
-    uout() << "fool outer_sizes" << outer_sizes << std::endl;
+    //REMOVE uout() << "fool outer_sizes" << outer_sizes << std::endl;
 
     strides()[0] = 1;
     for (casadi_int j=0;j<dims.size()-1;++j) {
       strides()[j+1] = strides()[j]*outer_sizes[j];
     }
-    uout() << "fool" << get_strides() << std::endl;
+    //REMOVE uout() << "fool" << get_strides() << std::endl;
   }
 
   /** \brief Get name of public class */
@@ -102,7 +102,7 @@ namespace casadi {
   }
 
   size_t StridedLayout::size() const {
-    uout() << "size query" << get_strides() << get_dims() << ":" << strides()[n_dims()-1]*dims()[n_dims()-1] << std::endl;
+    //REMOVE uout() << "size query" << get_strides() << get_dims() << ":" << strides()[n_dims()-1]*dims()[n_dims()-1] << std::endl;
     return strides()[n_dims()-1]*outer_sizes()[n_dims()-1];
   }
 

@@ -268,7 +268,7 @@ namespace casadi {
 
     // Construct input element data, loop over inputs
     for (casadi_int ind=0; ind<in_.size(); ++ind) {
-      uout() << "foo" << in_[ind] << std::endl;
+      //REMOVE uout() << "foo" << in_[ind] << std::endl;
       // Loop over symbolic primitives of each input
       vector<MX> prim = in_[ind].primitives();
       for (casadi_int p=0; p<prim.size(); ++p) {
@@ -1354,8 +1354,6 @@ namespace casadi {
     SXElem** res1 = get_ptr(resp);
     std::vector<SXElem> zero_array(zero_array_.size());
 
-    uout() << "MXFunction::eval_sx" << name_ << std::endl;
-
     SXElem* w_eval = w+w_extra_offset_;
 
     // Evaluate all of the nodes of the algorithm:
@@ -1473,9 +1471,10 @@ namespace casadi {
   }
 
   void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
-    g << "w = __builtin_assume_aligned (w, 32);\n";
+    int align_bytes = g.casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+    g << "w = __builtin_assume_aligned (w, " << align_bytes << ");\n";
     g.add_include("stdint.h");
-    g << g.debug_assert("(uintptr_t) w% 32 ==0") + "\n";
+    g << g.debug_assert("(uintptr_t) w% " + str(align_bytes) + " ==0") + "\n";
     g.local("i","casadi_int");
 
     bool align = name_=="all_cat" || name_=="f";
@@ -1483,8 +1482,8 @@ namespace casadi {
     for (casadi_int i=0;i<n_in_;++i) {
       g.local("args"+str(i),"const casadi_real", "*");
       if (nnz_in(i)>1 && align) {
-        g << "args" << i << " = __builtin_assume_aligned (arg[" << i << "], 32);\n";
-        g << g.debug_assert("(uintptr_t) args" + str(i) + "% 32 ==0") + "\n";
+        g << "args" << i << " = __builtin_assume_aligned (arg[" << i << "], " << align_bytes << ");\n";
+        g << g.debug_assert("(uintptr_t) args" + str(i) + "% " + str(align_bytes) + " ==0") + "\n";
       } else {
         g << "args" << i << " = arg[" << i << "];\n";
       }
@@ -1492,17 +1491,12 @@ namespace casadi {
     for (casadi_int i=0;i<n_out_;++i) {
       g.local("ress"+str(i),"casadi_real", "*");
       if (nnz_out(i)>1 && align) {
-        g << "ress" << i << " = __builtin_assume_aligned (res[" << i << "], 32);\n";
-        g << g.debug_assert("(uintptr_t) ress" + str(i) + "% 32 ==0") + "\n";
+        g << "ress" << i << " = __builtin_assume_aligned (res[" << i << "], " << align_bytes << ");\n";
+        g << g.debug_assert("(uintptr_t) ress" + str(i) + "% " + str(align_bytes) + " ==0") + "\n";
       } else {
         g << "ress" << i << " = res[" << i << "];\n";
       }
     }
-
-    /*g << "for (i=0;i<" << n_in_ << ";++i) arg[i] = __builtin_assume_aligned (arg[i], 32);\n";
-    g << "for (i=0;i<" << n_in_ << ";++i) " << g.debug_assert("(uintptr_t) arg[i]% 32 ==0") + "\n";
-    g << "for (i=0;i<" << n_out_ << ";++i) res[i] = __builtin_assume_aligned (res[i], 32);\n";
-    g << "for (i=0;i<" << n_out_ << ";++i) " << g.debug_assert("(uintptr_t) res[i]% 32 ==0") + "\n";*/
 
     // Temporary variables and vectors
     if (ce_active_) {

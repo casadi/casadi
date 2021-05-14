@@ -77,7 +77,7 @@ namespace casadi {
     for (casadi_int i=0;i<f_.n_in();++i) {
       ret[i] = permute_layout(arg[i], permute_in(i, invert));
     }
-    uout() << "testje" << ret << std::endl;
+    //REMOVE uout() << "testje" << ret << std::endl;
     return ret;
   }
 
@@ -107,7 +107,7 @@ namespace casadi {
 
   Map::Map(const std::string& name, const Function& f, casadi_int n)
     : FunctionInternal(name), f_(f), n_(n) {
-    uout() << "It's map!" << std::endl;
+    //REMOVE uout() << "It's map!" << std::endl;
 
     f_orig_ = f;
     if (vectorize_f(f, n_)) {
@@ -239,7 +239,7 @@ namespace casadi {
 
   template<typename T>
   int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
-    uout() << "local_eval_gen Map:" << name_ << ":" << dump_in_ << std::endl;
+    //REMOVE uout() << "local_eval_gen Map:" << name_ << ":" << dump_in_ << std::endl;
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
@@ -297,7 +297,7 @@ namespace casadi {
       local.stride_out[j] = vectorize_f() ? n_padded() : 1;
     }
     g.add_dependency(f_, local);
-    uout() << "codegen_dec" << local.arg_null << f_ << std::endl;
+    //REMOVE uout() << "codegen_dec" << local.arg_null << f_ << std::endl;
   }
 
   void Map::codegen_body(CodeGenerator& g,
@@ -311,7 +311,7 @@ namespace casadi {
     for (casadi_int j=0; j<n_out_; ++j) {
       local.stride_out[j] = vectorize_f() ? n_padded() : 1;
     }
-    uout() << "codegen_body" << local.arg_null << f_ << std::endl;
+    //REMOVE uout() << "codegen_body" << local.arg_null << f_ << std::endl;
     g.local("i", "casadi_int");
     g.local("arg1[" + str(f_.sz_arg()) + "]", "const casadi_real*");
     g.local("res1[" + str(f_.sz_res()) + "]", "casadi_real*");
@@ -396,18 +396,18 @@ namespace casadi {
         Layout source({n_, df_in}, {n_padded(), df_in});
         Layout target({df_in, n_});
         Relayout ret = Relayout(source, {1, 0}, target);
-        uout() << "FOO " << i << std::endl;
+        //REMOVE uout() << "FOO " << i << std::endl;
         x = permute_layout(x, ret);
 
         // Layout source({f_.nnz_in(i), n_});
         // Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
       }
       if (!vectorize_f()) {
-        uout() << "here" << std::endl;
+        //REMOVE uout() << "here" << std::endl;
         Layout source({df_in/nfwd,n_,nfwd});
         Layout target({df_in/nfwd, nfwd, n_});
         x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
-        uout() << "baz" << x << "source" << source << "target" << target << std::endl;
+        //REMOVE uout() << "baz" << x << "source" << source << "target" << target << std::endl;
       }
     }
 
@@ -425,15 +425,15 @@ namespace casadi {
         Layout source({df_out, n_});
         Layout target({n_, df_out}, {n_padded(), f_.nnz_out()});
         Relayout ret = Relayout(source, {1, 0}, target);
-        uout() << "BAR " << i << std::endl;
+        //REMOVE uout() << "BAR " << i << std::endl;
         x = permute_layout(x, ret);
       }
       if (!vectorize_f()) {
-        uout() << "there" << std::endl;
+        //REMOVE uout() << "there" << std::endl;
         Layout source({df_out/nfwd,nfwd,n_});
         Layout target({df_out/nfwd,n_,nfwd});
         x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
-        uout() << "baz" << res[i] << "source" << source << "target" << target << std::endl;
+       //REMOVE  uout() << "baz" << res[i] << "source" << source << "target" << target << std::endl;
       }
     }
 

@@ -32,6 +32,7 @@
 #include "calculus.hpp"
 #include "code_generator.hpp"
 #include "linsol.hpp"
+#include "global_options.hpp"
 #include <vector>
 #include <stack>
 
@@ -234,13 +235,13 @@ namespace casadi {
     virtual const Layout& layout(casadi_int oind) const;
 
     /// Alignment (bytes) for specific input argument
-    virtual size_t align_in(casadi_int iind) const { return 32; }
+    virtual size_t align_in(casadi_int iind) const { return GlobalOptions::vector_width_real*sizeof(double); }
 
     /// Alignment (bytes) for specific output argument
-    virtual size_t align_out(casadi_int oind) const { return 32; }
+    virtual size_t align_out(casadi_int oind) const { return GlobalOptions::vector_width_real*sizeof(double); }
 
     /// Alignment (bytes) for work vector
-    virtual size_t align_w() const { return 32; }
+    virtual size_t align_w() const { return GlobalOptions::vector_width_real*sizeof(double); }
 
     /// Get shape
     casadi_int numel() const { return sparsity().numel(); }
