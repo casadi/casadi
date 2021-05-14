@@ -1063,7 +1063,7 @@ namespace casadi {
       for (casadi_int i=0;i<ne.size();i++) {
         casadi_assert(ne[i].size2()==ne[0].size2(),
           "vertcat dimension mismatch  x[" + str(i) + "]:" + ne[i].dim() +
-          " and x[0]: " + ne[0].dim() + ".");
+          " and x[0]: " + ne[0].dim() + "." + str(ne));
       }
     }
 

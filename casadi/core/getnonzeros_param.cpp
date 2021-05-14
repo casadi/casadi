@@ -89,7 +89,6 @@ namespace casadi {
   GetNonzerosSliceParam::GetNonzerosSliceParam(const Sparsity& sp, const MX& x, const Slice& inner,
                       const MX& outer) :
                       GetNonzerosParam(sp, x, outer), inner_(inner), is_trivial_(false) {
-    uout() << "test" << dep(0).is_dense() << ":" << (inner_.start==0) << ":" << (inner_.stop==dep(0).size1()) << ":" << (inner_.step==1) << ":" << x.is_scalar() << x << x.size() << std::endl;
     if (dep(0).is_dense() && inner_.start==0 && inner_.stop==dep(0).size1() && inner_.step==1 && dep(1).is_scalar()) is_trivial_ = true;
     if (is_trivial_) bvec_zeros_.resize(nnz(), bvec_t(0));
   }

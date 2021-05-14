@@ -52,7 +52,7 @@ namespace casadi {
   }
 
   Relayout Relayout::push_right(casadi_int n) const {
-    uout() << "push_right" << perms() << source().n_dims() << join(perms(), {source().n_dims()}) << std::endl;
+    //REMOVE uout() << "push_right" << perms() << source().n_dims() << join(perms(), {source().n_dims()}) << std::endl;
     return Relayout(source().push_right(n), join(perms(), {source().n_dims()}), target().push_right(n));
   }
 
@@ -139,7 +139,7 @@ namespace casadi {
     const StridedLayout* s = dynamic_cast<const StridedLayout*>(source.get());
     const StridedLayout* t = dynamic_cast<const StridedLayout*>(target.get());
 
-    uout() << "debug Relayout" << source << perms << target << std::endl;
+    //REMOVE uout() << "debug Relayout" << source << perms << target << std::endl;
 
 
     casadi_assert_dev(!source_.is_default());
@@ -184,8 +184,8 @@ namespace casadi {
   }
 
   bool Relayout::cancels(const Relayout& other) const {
-    uout() << "cancels?" << source_ << target_ << std::endl;
-    uout() << "cancels?" <<  other.source() << other.target() << std::endl;
+    //REMOVE uout() << "cancels?" << source_ << target_ << std::endl;
+    //REMOVE uout() << "cancels?" <<  other.source() << other.target() << std::endl;
     //if (source_==other.target() && target_==other.source() && invert_permutation(perms_)==other.perms()) return true;
     if (source_.size()!=other.target().size()) return false;
     size_t sz = max(sz_iw(), other.sz_iw());
@@ -204,27 +204,27 @@ namespace casadi {
     const casadi_int* target = source_;
     casadi_relayout(get_ptr(arg), get_ptr(res), source, get_ptr(perms), target,  get_ptr(iw));
     std::vector<casadi_int> ref = res;
-    uout() << "a:" << ref << std::endl;
+   //REMOVE  uout() << "a:" << ref << std::endl;
     std::copy(res.begin(), res.end(), arg.begin());
 
     source = source_;
     target = target_;
-    uout() << "bef:" << arg << std::endl;
+    //REMOVE uout() << "bef:" << arg << std::endl;
     casadi_relayout(get_ptr(arg), get_ptr(res), source, get_ptr(perms_), target,  get_ptr(iw));
     std::copy(res.begin(), res.end(), arg.begin());
     std::fill(res.begin(), res.end(), -1);
     source = other.source();
     target = other.target();
     casadi_relayout(get_ptr(arg), get_ptr(res), source, get_ptr(other.perms()), target, get_ptr(iw));
-    uout() << "arg:" << arg << std::endl;
-    uout() << "res:" << res << std::endl;
+    //REMOVE uout() << "arg:" << arg << std::endl;
+    //REMOVE uout() << "res:" << res << std::endl;
     for (casadi_int i=0;i<source_.size();++i) {
       if (ref[i]!=res[i]) {
-        uout() << "not cancelled" << std::endl;
+        //REMOVE uout() << "not cancelled" << std::endl;
         return false;
       }
     }
-    uout() << "cancelled" << std::endl;
+    //REMOVE uout() << "cancelled" << std::endl;
     return true;
   }
 
@@ -232,7 +232,7 @@ namespace casadi {
   void Relayout::generate(CodeGenerator& g,
                         const std::string& arg,
                         const std::string& res) const {
-    uout() << "debug generate" << std::endl;
+    //REMOVE uout() << "debug generate" << std::endl;
     const StridedLayout* s = dynamic_cast<const StridedLayout*>(source_.get());
     const StridedLayout* t = dynamic_cast<const StridedLayout*>(target_.get());
 
@@ -284,22 +284,22 @@ namespace casadi {
     const casadi_int* target = source_;
     casadi_relayout(get_ptr(arg), get_ptr(res), source, get_ptr(perms), target,  get_ptr(iw));
     std::vector<casadi_int> ref = res;
-    uout() << "a:" << ref << std::endl;
+    //REMOVE uout() << "a:" << ref << std::endl;
     std::copy(res.begin(), res.end(), arg.begin());
     std::fill(res.begin(), res.end(), -1);
     source = source_;
     target = target_;
-    uout() << "bef:" << arg << std::endl;
+    //REMOVE uout() << "bef:" << arg << std::endl;
     casadi_relayout(get_ptr(arg), get_ptr(res), source, get_ptr(perms_), target,  get_ptr(iw));
-    uout() << "ref:" << ref << std::endl;
-    uout() << "res:" << res << std::endl;
+    //REMOVE uout() << "ref:" << ref << std::endl;
+    //REMOVE uout() << "res:" << res << std::endl;
     for (casadi_int i=0;i<source_.size();++i) {
       if (ref[i]!=res[i]) {
-        uout() << "not cancelled" << std::endl;
+        //REMOVE uout() << "not cancelled" << std::endl;
         return false;
       }
     }
-    uout() << "cancelled" << std::endl;
+    //REMOVE uout() << "cancelled" << std::endl;
     return true;
   }
 

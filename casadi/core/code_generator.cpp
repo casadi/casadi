@@ -639,7 +639,8 @@ namespace casadi {
     }
 
     if (sz_zeros_>=0) {
-      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros_), 32);
+      int align_bytes = casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros_), align_bytes);
       s << endl;
     }
 
