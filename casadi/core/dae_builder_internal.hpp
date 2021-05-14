@@ -166,7 +166,10 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
    */
   ///@{
   /// Import existing problem from FMI/XML
-  void parse_fmi(const std::string& filename);
+  void load_fmi_description(const std::string& filename);
+
+  /// Import FMI functions
+  void load_fmi_functions(const std::string& path);
 
   // Input convension in codegen
   enum DaeBuilderInternalIn {

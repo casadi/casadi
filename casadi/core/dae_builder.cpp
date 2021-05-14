@@ -190,11 +190,19 @@ casadi_int DaeBuilder::nw() const {
   return (*this)->w_.size();
 }
 
-void DaeBuilder::parse_fmi(const std::string& filename) {
+void DaeBuilder::load_fmi_description(const std::string& filename) {
   try {
-    (*this)->parse_fmi(filename);
+    (*this)->load_fmi_description(filename);
   } catch (std::exception& e) {
-    THROW_ERROR("parse_fmi", e.what());
+    THROW_ERROR("load_fmi_description", e.what());
+  }
+}
+
+void DaeBuilder::load_fmi_functions(const std::string& path) {
+  try {
+    (*this)->load_fmi_functions(path);
+  } catch (std::exception& e) {
+    THROW_ERROR("load_fmi_functions", e.what());
   }
 }
 

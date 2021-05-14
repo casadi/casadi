@@ -39,6 +39,7 @@
 #include "calculus.hpp"
 #include "xml_file.hpp"
 #include "external.hpp"
+#include "fmu_function.hpp"
 
 namespace casadi {
 
@@ -144,11 +145,11 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name) : name_(name) {
   clear_cache_ = false;
 }
 
-void DaeBuilderInternal::parse_fmi(const std::string& filename) {
+void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Ensure no variables already
   casadi_assert(variables_.empty(), "Instance already has variables");
 
-  // Parse XML
+  // Parse XML file
   XmlFile xml_file("tinyxml");
   XmlNode fmi_desc = xml_file.parse(filename)[0];  // One child; fmiModelDescription
 
@@ -279,6 +280,41 @@ void DaeBuilderInternal::parse_fmi(const std::string& filename) {
         }
       }
     }
+  }
+}
+
+void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
+  // All value references
+  std::vector<casadi_int> id_xd, id_xn, id_yd, id_yn;
+  // Get the IDs of the initial unknowns
+  id_xd.reserve(u_.size());
+  for (size_t k : u_) id_xd.push_back(variable(k).value_reference);
+  // Get the IDs of the output variables
+  id_yd.reserve(outputs_.size());
+  for (size_t k : outputs_) id_yd.push_back(variable(k).value_reference);
+  // Create an FMU function
+  Function fmu = fmu_function(model_name_, path, {id_xd, id_xn}, {id_yd, id_yn}, guid_);
+  // Auxiliary variables for xd
+  Variable xd(model_name_ + "_xd");
+  xd.v = MX::sym(xd.name, id_xd.size());
+  xd.variability = Variable::CONTINUOUS;
+  xd.beq = vertcat(var(u_));
+  w_.push_back(add_variable(xd.name, xd));
+  // Create function call to fmu
+  std::vector<MX> fmu_lhs = fmu(std::vector<MX>{xd.v, MX()});
+  // Auxiliary variables for yd
+  Variable yd(model_name_ + "_yd");
+  yd.v = MX::sym(yd.name, id_yd.size());
+  yd.variability = Variable::CONTINUOUS;
+  yd.beq = fmu_lhs.at(0);
+  w_.push_back(add_variable(yd.name, yd));
+  // Split up yd.v
+  std::vector<MX> yd_split = vertsplit(yd.v);
+  // Update binding equations for yd, add to list of dependent variables
+  casadi_assert_dev(yd_split.size() == outputs_.size());
+  for (size_t k = 0; k < outputs_.size(); ++k) {
+    variable(outputs_[k]).beq = yd_split[k];
+    w_.push_back(outputs_[k]);
   }
 }
 
@@ -1925,7 +1961,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   if (n.has_child("Outputs")) {
     for (auto& e : n["Outputs"].children) {
       // Get index
-      outputs_.push_back(e.attribute<casadi_int>("index", 0));
+      outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Get dependencies
       for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
         variables_.at(d - 1).dependency = true;
@@ -1936,7 +1972,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   if (n.has_child("Derivatives")) {
     for (auto& e : n["Derivatives"].children) {
       // Get index
-      derivatives_.push_back(e.attribute<casadi_int>("index", 0));
+      derivatives_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Get dependencies
       for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
         variables_.at(d - 1).dependency = true;
@@ -1947,7 +1983,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   if (n.has_child("InitialUnknowns")) {
     for (auto& e : n["InitialUnknowns"].children) {
       // Get index
-      initial_unknowns_.push_back(e.attribute<casadi_int>("index", 0));
+      initial_unknowns_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Get dependencies
       for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
         variables_.at(d - 1).dependency = true;
