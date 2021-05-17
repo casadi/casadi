@@ -72,12 +72,12 @@ namespace casadi {
     /** \brief Codegen incref
 
         \identifier{6p} */
-    void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
+    void codegen_incref(CodeGenerator& g, std::set<const void*>& added) const override;
 
     /** \brief Codegen decref
 
         \identifier{6q} */
-    void codegen_decref(CodeGenerator& g, std::set<void*>& added) const override;
+    void codegen_decref(CodeGenerator& g, std::set<const void*>& added) const override;
 
     /** \brief Generate code for the operation
 

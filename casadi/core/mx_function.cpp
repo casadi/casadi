@@ -1502,22 +1502,20 @@ namespace casadi {
   }
 
   void MXFunction::codegen_incref(CodeGenerator& g, const Instance& inst) const {
-    set<void*> added;
     for (auto&& a : algorithm_) {
-      a.data->codegen_incref(g, added);
+      a.data->codegen_incref(g, g.incref_added_);
     }
   }
 
   void MXFunction::codegen_decref(CodeGenerator& g, const Instance& inst) const {
-    set<void*> added;
     for (auto&& a : algorithm_) {
-      a.data->codegen_decref(g, added);
+      a.data->codegen_decref(g, g.decref_added_);
     }
   }
 
   void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
     int align_bytes = g.casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
-    g << "w = __builtin_assume_aligned (w, " << align_bytes << ");\n";
+    g << "w = (double*) __builtin_assume_aligned (w, " << align_bytes << ");\n";
     g.add_include("stdint.h");
     g << g.debug_assert("(uintptr_t) w% " + str(align_bytes) + " ==0") + "\n";
     g.local("i","casadi_int");

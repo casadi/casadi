@@ -209,7 +209,7 @@ namespace casadi {
     g << "if (" << flag << ") return 1;\n";
   }
 
-  void Call::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
+  void Call::codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {
     if (has_refcount()) {
       auto i = added.insert(fcn_.get());
       if (i.second) { // prevent duplicate calls
@@ -218,7 +218,7 @@ namespace casadi {
     }
   }
 
-  void Call::codegen_decref(CodeGenerator& g, std::set<void*>& added) const {
+  void Call::codegen_decref(CodeGenerator& g, std::set<const void*>& added) const {
     if (has_refcount()) {
       auto i = added.insert(fcn_.get());
       if (i.second) { // prevent duplicate calls

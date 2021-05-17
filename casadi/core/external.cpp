@@ -343,13 +343,13 @@ void External::codegen_release(CodeGenerator& g) const {
   }
 }
 
-void External::codegen_incref(CodeGenerator& g) const {
+void External::codegen_incref(CodeGenerator& g, const Instance& inst) const {
   if (incref_) {
     g << name_ << "_incref();\n";
   }
 }
 
-void External::codegen_decref(CodeGenerator& g) const {
+void External::codegen_decref(CodeGenerator& g, const Instance& inst) const {
   if (decref_) {
     g << name_ << "_decref();\n";
   }

@@ -129,12 +129,12 @@ namespace casadi {
     /** \brief Codegen incref
 
         \identifier{1qq} */
-    virtual void codegen_incref(CodeGenerator& g, std::set<void*>& added) const {}
+    virtual void codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {}
 
     /** \brief Codegen decref
 
         \identifier{1qr} */
-    virtual void codegen_decref(CodeGenerator& g, std::set<void*>& added) const {}
+    virtual void codegen_decref(CodeGenerator& g, std::set<const void*>& added) const {}
 
     /** \brief Generate code for the operation
 

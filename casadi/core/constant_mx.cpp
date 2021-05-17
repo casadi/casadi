@@ -356,8 +356,19 @@ namespace casadi {
     casadi_error("Not defined for ConstantFile");
   }
 
-  void ConstantFile::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
-    g << g.file_slurp(fname_, nnz(), g.rom_double(this)) << ";\n";
+  void ConstantFile::codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {
+    auto i = g.incref_added_.insert(this);
+    if (i.second) { // prevent duplicate calls
+      std::string init =  g.rom_double(this) + "_initialise";
+      g << "static int " << init << " = 1;\n";
+      g << "if (" << init << ") {\n";
+      g << "if (" << g.file_slurp(fname_, nnz(), g.rom_double(this)) << ") {\n";
+        g << g.printf("Failed to load file '" + fname_ + "'.\\n") << "\n";
+        g << "exit(1);\n";
+      g << "}\n";
+      g << init << " = 0;\n";
+      g << "}\n";
+    }
   }
 
   void ConstantFile::add_dependency(CodeGenerator& g, const Instance& inst) const {

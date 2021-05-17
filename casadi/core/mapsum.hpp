@@ -160,6 +160,12 @@ namespace casadi {
         \identifier{53} */
     void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
+    /** \brief Codegen incref for dependencies */
+    void codegen_incref(CodeGenerator& g, const Instance& inst) const override;
+
+    /** \brief Codegen decref for dependencies */
+    void codegen_decref(CodeGenerator& g, const Instance& inst) const override;
+
     /** \brief  Initialize
 
         \identifier{54} */
