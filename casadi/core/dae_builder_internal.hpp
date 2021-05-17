@@ -302,6 +302,10 @@ protected:
   std::string variable_naming_convention_;
   casadi_int number_of_event_indicators_;
 
+  // Model Exchange
+  bool provides_directional_derivative_;
+  std::vector<std::string> source_files_;
+
   /// Name of instance
   std::string name_;
 
@@ -368,6 +372,9 @@ protected:
 
   /// Read a variable
   Variable& read_variable(const XmlNode& node);
+
+  // Read ModelExchange
+  void import_model_exchange(const XmlNode& n);
 
   // Read ModelVariables
   void import_model_variables(const XmlNode& modvars);

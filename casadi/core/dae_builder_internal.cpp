@@ -143,6 +143,8 @@ DaeBuilderInternal::~DaeBuilderInternal() {
 
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name) : name_(name) {
   clear_cache_ = false;
+  number_of_event_indicators_ = 0;
+  provides_directional_derivative_ = 0;
 }
 
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
@@ -165,6 +167,10 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   generation_date_and_time_ = fmi_desc.attribute<std::string>("generationDateAndTime", "");
   variable_naming_convention_ = fmi_desc.attribute<std::string>("variableNamingConvention", "");
   number_of_event_indicators_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
+
+  // Process ModelExchange
+  if (fmi_desc.has_child("ModelExchange"))
+    import_model_exchange(fmi_desc["ModelExchange"]);
 
   // Process ModelVariables
   casadi_assert(fmi_desc.has_child("ModelVariables"), "Missing 'ModelVariables'");
@@ -1894,6 +1900,18 @@ std::vector<T> read_list(const XmlNode& n) {
     r.push_back(T(n[i]));
   }
   return r;
+}
+
+void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
+  // Read attributes
+  provides_directional_derivative_
+    = n.attribute<bool>("providesDirectionalDerivative", false);
+  // Get list of source files
+  if (n.has_child("SourceFiles")) {
+    for (const XmlNode& sf : n["SourceFiles"].children) {
+      source_files_.push_back(sf.attribute<std::string>("name"));
+    }
+  }
 }
 
 void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
