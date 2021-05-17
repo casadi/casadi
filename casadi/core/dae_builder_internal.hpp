@@ -378,6 +378,20 @@ protected:
   /// Problem structure has changed: Clear cache
   void clear_cache() const;
 
+  /// Add a function from loaded expressions
+  Function add_fun(const std::string& name,
+                   const std::vector<std::string>& arg,
+                   const std::vector<std::string>& res, const Dict& opts=Dict());
+
+  /// Add an already existing function
+  Function add_fun(const Function& f);
+
+  /// Does a particular function already exist?
+  bool has_fun(const std::string& name) const;
+
+  /// Get function by name
+  Function fun(const std::string& name) const;
+
   /// Helper class, represents inputs and outputs for a function call node
   struct CallIO {
     // Function instances

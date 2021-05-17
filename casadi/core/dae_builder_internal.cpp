@@ -293,7 +293,9 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   id_yd.reserve(outputs_.size());
   for (size_t k : outputs_) id_yd.push_back(variable(k).value_reference);
   // Create an FMU function
-  Function fmu = fmu_function(model_name_, path, {id_xd, id_xn}, {id_yd, id_yn}, guid_);
+  Dict opts = {{"enable_fd", true}, {"fd_method", "smoothing"}};
+  Function fmu = fmu_function(model_name_, path, {id_xd, id_xn}, {id_yd, id_yn}, guid_, opts);
+  add_fun(fmu);
   // Auxiliary variables for xd
   Variable xd(model_name_ + "_xd");
   xd.v = MX::sym(xd.name, id_xd.size());
@@ -920,6 +922,8 @@ MX DaeBuilderInternal::der(const MX& var) const {
 void DaeBuilderInternal::eliminate_w() {
   // Quick return if no w
   if (w_.empty()) return;
+  // Clear cache after this
+  clear_cache_ = true;
   // Ensure variables are sorted
   sort_w();
   // Expressions where the variables are also being used
@@ -1428,6 +1432,7 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     bool subst_v = false;
     // Collect all DAE input variables with at least one entry
     for (casadi_int i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
+      if (i == DAE_BUILDER_Y) continue;  // fixme
       v = input(static_cast<DaeBuilderInternalIn>(i));
       if (!v.empty()) {
         if (elim_w && i == DAE_BUILDER_W) {
@@ -2007,6 +2012,52 @@ size_t DaeBuilderInternal::find(const std::string& name) const {
   auto it = varind_.find(name);
   casadi_assert(it != varind_.end(), "No such variable: \"" + name + "\".");
   return it->second;
+}
+
+Function DaeBuilderInternal::add_fun(const Function& f) {
+  casadi_assert(!has_fun(f.name()), "Function '" + f.name() + "' already exists");
+  fun_.push_back(f);
+  return f;
+}
+
+Function DaeBuilderInternal::add_fun(const std::string& name,
+    const std::vector<std::string>& arg,
+    const std::vector<std::string>& res, const Dict& opts) {
+  casadi_assert(!has_fun(name), "Function '" + name + "' already exists");
+
+  // Dependent variable definitions
+  std::vector<MX> wdef = this->wdef();
+  // Get inputs
+  std::vector<MX> arg_ex, res_ex;
+  for (auto&& s : arg) arg_ex.push_back(var(s));
+  for (auto&& s : res) {
+    // Find the binding expression FIXME(@jaeandersson)
+    casadi_int v_ind;
+    for (v_ind = 0; v_ind < w_.size(); ++v_ind) {
+      if (s == variable(w_.at(v_ind)).name) {
+        res_ex.push_back(wdef.at(v_ind));
+        break;
+      }
+    }
+    casadi_assert(v_ind < w_.size(), "Cannot find dependent '" + s + "'");
+  }
+  Function ret(name, arg_ex, res_ex, arg, res, opts);
+  return add_fun(ret);
+}
+
+bool DaeBuilderInternal::has_fun(const std::string& name) const {
+  for (const Function& f : fun_) {
+    if (f.name()==name) return true;
+  }
+  return false;
+}
+
+Function DaeBuilderInternal::fun(const std::string& name) const {
+  casadi_assert(has_fun(name), "No such function: '" + name + "'");
+  for (const Function& f : fun_) {
+    if (f.name()==name) return f;
+  }
+  return Function();
 }
 
 } // namespace casadi

@@ -142,6 +142,10 @@ void FmuFunction::init(const Dict& opts) {
   fmi2Status status = setup_experiment_(c_, fmi2False, 0.0, 0., fmi2True, 1.);
   if (status != fmi2OK) casadi_error("fmi2SetupExperiment failed");
 
+  // Initialization mode begins
+  status = enter_initialization_mode_(c_);
+  if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
+
 #else  // WITH_FMU
   casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
 #endif  // WITH_FMU
@@ -201,8 +205,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   fmi2Status status;
 
   // Initialization mode begins
-  status = enter_initialization_mode_(c_);
-  if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed");
+  // status = enter_initialization_mode_(c_);
+  // if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
 
   // Pass differentiable inputs
   status = set_real_(c_, get_ptr(xd_), xd_.size(), arg[0]);
@@ -213,8 +217,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   if (status != fmi2OK) casadi_error("fmi2GetReal failed");
 
   // Initialization mode ends
-  status = exit_initialization_mode_(c_);
-  if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
+  // status = exit_initialization_mode_(c_);
+  // if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
 #endif  // WITH_FMU
 
   return 0;

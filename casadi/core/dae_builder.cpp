@@ -642,56 +642,45 @@ Function DaeBuilder::create(const std::string& fname,
 }
 
 Function DaeBuilder::add_fun(const Function& f) {
-  casadi_assert(!has_fun(f.name()), "Function '" + f.name() + "' already exists");
-  (*this)->fun_.push_back(f);
-  return f;
-}
-
-Function DaeBuilder::add_fun(const std::string& name,
-                             const std::vector<std::string>& arg,
-                             const std::vector<std::string>& res,
-                             const Dict& opts) {
-  casadi_assert(!has_fun(name), "Function '" + name + "' already exists");
-
-  // Dependent variable definitions
-  std::vector<MX> wdef = this->wdef();
-  // Get inputs
-  std::vector<MX> arg_ex, res_ex;
-  for (auto&& s : arg) arg_ex.push_back(var(s));
-  for (auto&& s : res) {
-    // Find the binding expression FIXME(@jaeandersson)
-    casadi_int v_ind;
-    for (v_ind = 0; v_ind < (*this)->w_.size(); ++v_ind) {
-      if (s == (*this)->variable((*this)->w_.at(v_ind)).name) {
-        res_ex.push_back(wdef.at(v_ind));
-        break;
-      }
-    }
-    casadi_assert(v_ind < (*this)->w_.size(), "Cannot find dependent '" + s + "'");
+  try {
+    return (*this)->add_fun(f);
+  } catch (std::exception& e) {
+    THROW_ERROR("add_fun", e.what());
+    return Function();  // never reached
   }
-  Function ret(name, arg_ex, res_ex, arg, res, opts);
-  return add_fun(ret);
 }
 
-Function DaeBuilder::add_fun(const std::string& name, const Importer& compiler,
-                             const Dict& opts) {
+Function DaeBuilder::add_fun(const std::string& name, const std::vector<std::string>& arg,
+    const std::vector<std::string>& res, const Dict& opts) {
+  try {
+    return (*this)->add_fun(name, arg, res, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("add_fun", e.what());
+    return Function();  // never reached
+  }
+}
+
+Function DaeBuilder::add_fun(const std::string& name, const Importer& compiler, const Dict& opts) {
   casadi_assert(!has_fun(name), "Function '" + name + "' already exists");
   return add_fun(external(name, compiler, opts));
 }
 
 bool DaeBuilder::has_fun(const std::string& name) const {
-  for (const Function& f : (*this)->fun_) {
-    if (f.name()==name) return true;
+  try {
+    return (*this)->has_fun(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("has_fun", e.what());
+    return false;  // never reached
   }
-  return false;
 }
 
 Function DaeBuilder::fun(const std::string& name) const {
-  casadi_assert(has_fun(name), "No such function: '" + name + "'");
-  for (const Function& f : (*this)->fun_) {
-    if (f.name()==name) return f;
+  try {
+    return (*this)->fun(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("fun", e.what());
+    return Function();  // never reached
   }
-  return Function();
 }
 
 void DaeBuilder::gather_fun(casadi_int max_depth) {
