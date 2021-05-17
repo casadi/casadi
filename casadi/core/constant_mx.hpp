@@ -224,7 +224,7 @@ namespace casadi {
     ~ConstantFile() override {}
 
     /** \brief Codegen incref */
-    void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
+    void codegen_incref(CodeGenerator& g, std::set<const void*>& added) const override;
 
     /** \brief Is reference counting needed in codegen? */
     bool has_refcount() const { return true;}

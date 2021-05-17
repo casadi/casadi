@@ -134,6 +134,12 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
+    /** \brief Codegen incref for dependencies */
+    void codegen_incref(CodeGenerator& g, const Instance& inst) const override;
+
+    /** \brief Codegen decref for dependencies */
+    void codegen_decref(CodeGenerator& g, const Instance& inst) const override;
+
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 

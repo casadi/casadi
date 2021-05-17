@@ -626,6 +626,8 @@ namespace casadi {
     std::map<std::string, std::string> local_default_;
     std::map<const void *, casadi_int> file_scope_double_;
     std::map<const void *, casadi_int> file_scope_integer_;
+    std::vector<casadi_int> file_scope_double_size_;
+    std::vector<casadi_int> file_scope_integer_size_;
 
     // Added functions
     struct FunctionMeta {
@@ -649,6 +651,12 @@ namespace casadi {
 
     /// Vector width in bits
     unsigned int vector_width_;
+
+    std::set<const void*> incref_added_;
+    std::set<const void*> decref_added_;
+
+    unsigned int vector_width_bits() const;
+    std::string vector_width_attribute() const;
 
     /// Vector width in bits
     unsigned int vector_width() const { return vector_width_; }

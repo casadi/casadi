@@ -556,31 +556,39 @@ namespace casadi {
 
   void CodeGenerator::define_rom_double(const void* id, casadi_int size) {
     auto it = file_scope_double_.find(id);
-    if (it!=file_scope_double_.end()) casadi_assert_dev(size==it->second);
-    //casadi_assert(it==file_scope_double_.end(), "Already defined.");
-    shorthand("rd" + str(file_scope_double_.size()));
-    file_scope_double_[id] = size;
+    if (it==file_scope_double_.end()) {
+      file_scope_double_size_.push_back(size);
+      casadi_int index = file_scope_double_.size();
+      shorthand("rd" + str(index));
+      file_scope_double_[id] = index;
+    } else {
+      casadi_assert_dev(size==file_scope_double_size_[it->second]);
+    }
+
   }
 
   std::string CodeGenerator::rom_double(const void* id) const {
     auto it = file_scope_double_.find(id);
     casadi_assert(it!=file_scope_double_.end(), "Not defined.");
-    casadi_int size = std::distance(file_scope_double_.begin(), it);
-    return "casadi_rd" + str(size);
+    return "casadi_rd" + str(it->second);
   }
 
   void CodeGenerator::define_rom_integer(const void* id, casadi_int size) {
-    auto it = file_scope_double_.find(id);
-    casadi_assert(it==file_scope_double_.end(), "Already defined.");
-    shorthand("ri" + str(file_scope_double_.size()));
-    file_scope_double_[id] = size;
+    auto it = file_scope_integer_.find(id);
+    if (it==file_scope_integer_.end()) {
+      file_scope_integer_size_.push_back(size);
+      casadi_int index = file_scope_integer_.size();
+      shorthand("ri" + str(index));
+      file_scope_integer_[id] = index;
+    } else {
+      casadi_assert_dev(size==file_scope_double_size_[it->second]);
+    }
   }
 
   std::string CodeGenerator::rom_integer(const void* id) const {
-    auto it = file_scope_double_.find(id);
-    casadi_assert(it!=file_scope_double_.end(), "Not defined.");
-    casadi_int size = std::distance(file_scope_double_.begin(), it);
-    return "casadi_ri" + str(size);
+    auto it = file_scope_integer_.find(id);
+    casadi_assert(it!=file_scope_integer_.end(), "Not defined.");
+    return "casadi_ri" + str(it->second);
   }
 
   void CodeGenerator::dump(std::ostream& s) {
@@ -666,8 +674,8 @@ namespace casadi {
     // Print file scope double work
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
-      for (const auto& it : file_scope_double_) {
-        s << "static casadi_real casadi_rd" + str(i++) + "[" + str(it.second) + "];\n";
+      for (auto size : file_scope_double_size_) {
+        s << "static casadi_real casadi_rd" + str(i++) + "[" + str(size) + "];\n";
       }
       s << endl;
     }
@@ -675,8 +683,8 @@ namespace casadi {
     // Print file scope integer work
     if (!file_scope_integer_.empty()) {
       casadi_int i=0;
-      for (const auto& it : file_scope_integer_) {
-        s << "static casadi_real casadi_ri" + str(i++) + "[" + str(it.second) + "];\n";
+      for (auto size : file_scope_integer_size_) {
+        s << "static casadi_real casadi_ri" + str(i++) + "[" + str(size) + "];\n";
       }
       s << endl;
     }
@@ -695,6 +703,19 @@ namespace casadi {
 
     // End with new line
     s << endl;
+  }
+
+  unsigned int CodeGenerator::vector_width_bits() const {
+    return casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float)*8 : GlobalOptions::vector_width_real*sizeof(double)*8;
+  }
+  std::string CodeGenerator::vector_width_attribute() const {
+    std::string flag = "prefer-vector-width=" + str(vector_width_bits());
+    if (vector_width_bits()==512) {
+      std::string flag = "avx512f,arch=skylake-avx512,tune=skylake-avx512";
+      return "__attribute__((target(\"" + flag + "\")))";
+    } else {
+      return "";
+    }
   }
 
   string CodeGenerator::work(casadi_int n, casadi_int sz) const {

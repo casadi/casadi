@@ -168,6 +168,8 @@ namespace casadi {
     dump_in_ = true;
     dump_out_ = true;
 
+    has_refcount_ = f_->has_refcount_;
+
   }
 
   casadi_int MapSum::n_padded() const {
@@ -535,6 +537,21 @@ namespace casadi {
       }
     }
 
+  }
+
+
+  void MapSum::codegen_incref(CodeGenerator& g, const Instance& inst) const {
+    auto i = g.incref_added_.insert(f_.get());
+    if (i.second) { // prevent duplicate calls
+      g << f_->codegen_name(g) << "_incref();\n";
+    }
+  }
+
+  void MapSum::codegen_decref(CodeGenerator& g, const Instance& inst) const {
+    auto i = g.decref_added_.insert(f_.get());
+    if (i.second) { // prevent duplicate calls
+      g << f_->codegen_name(g) << "_decref();\n";
+    }
   }
 
   Function MapSum

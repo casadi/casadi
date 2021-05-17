@@ -94,7 +94,8 @@ namespace casadi {
 
       g << "#pragma omp declare simd simdlen("<< GlobalOptions::vector_width_real << ")\n";
       // 'const' is needed to vectorize succesfully; 'pure' is not enough in some circumstances
-      g << "static __attribute__((noinline)) __attribute__((const)) casadi_real " << name << "(casadi_real index, casadi_real a) {\n";
+      // __attribute__((optimize("-O0")))
+      g << "static __attribute__((noinline)) __attribute__((const)) " << g.vector_width_attribute() << " casadi_real " << name << "(casadi_real index, casadi_real a) {\n";
       g << "const casadi_real* arg[" << f.sz_arg() << "];\n";
       g << "casadi_real* res[" << f.sz_res() << "];\n";
       g << "casadi_int iw[" << f.sz_iw() << "];\n";

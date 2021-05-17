@@ -98,10 +98,10 @@ namespace casadi {
     virtual bool has_refcount() const { return false;}
 
     /** \brief Codegen incref */
-    virtual void codegen_incref(CodeGenerator& g, std::set<void*>& added) const {}
+    virtual void codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {}
 
     /** \brief Codegen decref */
-    virtual void codegen_decref(CodeGenerator& g, std::set<void*>& added) const {}
+    virtual void codegen_decref(CodeGenerator& g, std::set<const void*>& added) const {}
 
     /** \brief Generate code for the operation */
     virtual void generate(CodeGenerator& g,

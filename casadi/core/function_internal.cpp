@@ -2134,12 +2134,16 @@ namespace casadi {
     if (vectorize) {
       if (is_a("SXFunction", false)) {
         g << "#pragma omp declare simd uniform(arg, res, iw, w) linear(i:1) simdlen(" << GlobalOptions::vector_width_real << ") notinbranch\n";
-        g << "static __attribute__((noinline)) " << signature(fname, true) << " {\n";
+        g << "static __attribute__((noinline)) " << g.vector_width_attribute() << " " << signature(fname, true) << " {\n";
       } else {
         g << "static " << signature(fname) << " {\n";
       }
     } else {
-      g << "static __attribute__((noinline)) " << signature(fname) << " {\n";
+      if (is_a("MapSum", false)) {
+        g << "static __attribute__((noinline)) " << g.vector_width_attribute() << " " << signature(fname) << " {\n";
+      } else {
+        g << "static __attribute__((noinline)) " << signature(fname) << " {\n";
+      }
     }
 
     // Reset local variables, flush buffer
@@ -2232,11 +2236,14 @@ namespace casadi {
 
     // Reference counter routines
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
-    Instance inst;
-    codegen_incref(g, inst);
+    if (has_refcount_) {
+      g << codegen_name(g) << "_incref();\n";
+    }
     g << "}\n\n"
       << g.declare("void " + name_ + "_decref(void)") << " {\n";
-    codegen_decref(g, inst);
+    if (has_refcount_) {
+      g << codegen_name(g) << "_decref();\n";
+    }
     g << "}\n\n";
 
     // Number of inputs and outptus

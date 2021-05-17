@@ -667,28 +667,37 @@ namespace casadi {
 
     // Print
     if (verbose_) casadi_message(str(algorithm_.size()) + " elementary operations");
+
+    // Do any dependencies need refcount?
+    for (auto&& f : functions_) {
+      has_refcount_ = has_refcount_ || f->has_refcount_;
+    }
   }
 
   void SXFunction::codegen_incref(CodeGenerator& g, const Instance& inst) const {
-    set<void*> added;
     for (auto&& f : functions_) {
       if (f->has_refcount_) {
-        Instance local = inst;
-        local.stride_in.resize(f.n_in(), 1);
-        local.stride_out.resize(f.n_out(), 1);
-        g << g.add_dependency(f, local) << "_incref();\n";
+        auto i = g.incref_added_.insert(f.get());
+        if (i.second) { // prevent duplicate calls
+          Instance local;
+          local.stride_in.resize(f.n_in(), 1);
+          local.stride_out.resize(f.n_out(), 1);
+          g << g.add_dependency(f, local) << "_incref(); // SXFunction::codegen_incref\n";
+        }
       }
     }
   }
 
   void SXFunction::codegen_decref(CodeGenerator& g, const Instance& inst) const {
-    set<void*> added;
     for (auto&& f : functions_) {
       if (f->has_refcount_) {
-        Instance local = inst;
-        local.stride_in.resize(f.n_in(), 1);
-        local.stride_out.resize(f.n_out(), 1);
-        g << g.add_dependency(f, local) << "_decref();\n";
+        auto i = g.decref_added_.insert(f.get());
+        if (i.second) { // prevent duplicate calls
+          Instance local;
+          local.stride_in.resize(f.n_in(), 1);
+          local.stride_out.resize(f.n_out(), 1);
+          g << g.add_dependency(f, local) << "_decref();\n";
+        }
       }
     }
   }
