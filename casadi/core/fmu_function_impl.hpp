@@ -71,6 +71,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
    // Path to the FMU resource directory
    std::string resource_loc_;
 
+   // User-set options
+   bool provides_directional_derivative_;
+
 #ifdef WITH_FMU
   // Component references
   std::vector<fmi2ValueReference> xd_, xn_, yd_, yn_;
@@ -106,6 +109,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunction";}
 
+  ///@{
+  /** \brief Options */
+  static const Options options_;
+  const Options& get_options() const override { return options_;}
+  ///@}
+
   /// Initialize
   void init(const Dict& opts) override;
 
@@ -136,6 +145,18 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Evaluate numerically
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
+  // Evaluate Jacobian numerically
+  int eval_jac(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+
+  ///@{
+  /** \brief Full Jacobian */
+  bool has_jacobian() const override { return provides_directional_derivative_;}
+  Function get_jacobian(const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const override;
+  ///@}
+
   // Name of system, per the FMI specification
   static std::string system_infix();
 
@@ -144,6 +165,25 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Load an FMI function
   signal_t get_function(const std::string& symname);
+};
+
+/** First order derivatives */
+class CASADI_EXPORT FmuFunctionJac : public FunctionInternal {
+ public:
+  /// Constructor
+  FmuFunctionJac(const std::string& name) : FunctionInternal(name) {}
+
+  /// Destructor
+  ~FmuFunctionJac() override;
+
+  /// Initialize
+  void init(const Dict& opts) override;
+
+  /** \brief Get type name */
+  std::string class_name() const override { return "FmuFunctionJac";}
+
+  /// Evaluate numerically
+  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 };
 
 } // namespace casadi

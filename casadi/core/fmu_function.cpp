@@ -46,6 +46,8 @@ FmuFunction::FmuFunction(const std::string& name, const std::string& path,
     const std::string& guid)
   : FunctionInternal(name),
     path_(path), id_in_(id_in), id_out_(id_out), guid_(guid) {
+  // Options
+  provides_directional_derivative_ = false;
 #ifdef WITH_FMU
   // Initialize to null pointers
   instantiate_ = 0;
@@ -70,12 +72,27 @@ FmuFunction::~FmuFunction() {
   clear_mem();
 }
 
+const Options FmuFunction::options_
+= {{&FunctionInternal::options_},
+   {{"provides_directional_derivative",
+    {OT_BOOL,
+      "Does the FMU support the calculation of directional derivatives "}}
+   }
+};
+
 void FmuFunction::init(const Dict& opts) {
   // Consistency checks
   casadi_assert(id_in_.size() == 2,
     "Expected two input lists: differentiated and nondifferentiated variables");
   casadi_assert(id_out_.size() == 2,
     "Expected two output lists: differentiated and nondifferentiated variables");
+
+  // Read options
+  for (auto&& op : opts) {
+    if (op.first=="provides_directional_derivative") {
+      provides_directional_derivative_ = op.second;
+    }
+  }
 
   // Call the initialization method of the base class
   FunctionInternal::init(opts);
@@ -116,8 +133,10 @@ void FmuFunction::init(const Dict& opts) {
   set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
   set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
   get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(get_function("fmi2GetReal"));
-  get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
-    get_function("fmi2GetDirectionalDerivative"));
+  if (provides_directional_derivative_) {
+    get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
+      get_function("fmi2GetDirectionalDerivative"));
+  }
 
   // Callback functions
   fmi2CallbackFunctions functions;
@@ -145,6 +164,17 @@ void FmuFunction::init(const Dict& opts) {
   // Initialization mode begins
   status = enter_initialization_mode_(c_);
   if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
+
+  // This should not be necessary
+  if (true) {
+    // Initialization mode ends
+    status = exit_initialization_mode_(c_);
+    if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
+
+    // Continuous time mode begins
+    status = enter_continuous_time_mode_(c_);
+    if (status != fmi2OK) casadi_error("fmi2EnterContinuousTimeMode failed: " + str(status));
+  }
 
 #else  // WITH_FMU
   casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
@@ -213,8 +243,10 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   if (status != fmi2OK) casadi_error("fmi2SetReal failed");
 
   // Evaluate
-  status = get_real_(c_, get_ptr(yd_), yd_.size(), res[0]);
-  if (status != fmi2OK) casadi_error("fmi2GetReal failed");
+  if (res[0]) {
+    status = get_real_(c_, get_ptr(yd_), yd_.size(), res[0]);
+    if (status != fmi2OK) casadi_error("fmi2GetReal failed");
+  }
 
   // Initialization mode ends
   // status = exit_initialization_mode_(c_);
@@ -222,6 +254,77 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
 #endif  // WITH_FMU
 
   return 0;
+}
+
+int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, double* w,
+    void* mem) const {
+  // Dimensions
+  casadi_int n_xd = nnz_in(0);
+  casadi_int n_yd = nnz_out(0);
+  // Inputs
+  const double* xd = arg[0];
+  // const double* xn = arg[1];
+  // Outputs
+  double* jac = res[0];
+  // Forward seed, sensitivity
+  double* fwd_xd = w; w += n_xd;
+  double* fwd_yd = w; w += n_yd;
+  // FMI return flag
+  fmi2Status status;
+  // Pass differentiable inputs
+  status = set_real_(c_, get_ptr(xd_), xd_.size(), xd);
+  if (status != fmi2OK) {
+    casadi_error("fmi2SetReal failed");
+    return 1;
+  }
+  // Clear seeds
+  casadi_clear(fwd_xd, n_xd);
+  // Calculate Jacobian, one column at a time
+  for (casadi_int i = 0; i < n_xd; ++i) {
+    // Set seed for column i
+    fwd_xd[i] = 1.;
+    // Calculate directional derivative
+    status = get_directional_derivative_(c_, get_ptr(yd_), yd_.size(),
+      get_ptr(xd_), xd_.size(), fwd_xd, fwd_yd);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetDirectionalDerivative failed");
+      return 1;
+    }
+    // Copy column to Jacobian
+    casadi_copy(fwd_yd, n_yd, jac);
+    jac += n_yd;
+    // Remove seed
+    fwd_xd[i] = 0;
+  }
+  // Successful return
+  return 0;
+}
+
+Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames, const Dict& opts) const {
+  Function ret;
+  ret.own(new FmuFunctionJac(name));
+  ret->construct(opts);
+  return ret;
+}
+
+FmuFunctionJac::~FmuFunctionJac() {
+  clear_mem();
+}
+
+void FmuFunctionJac::init(const Dict& opts) {
+  // Call the base class initializer
+  FunctionInternal::init(opts);
+  // Work vectors
+  alloc_w(derivative_of_.nnz_in(0), true);
+  alloc_w(derivative_of_.nnz_out(0), true);
+}
+
+int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, double* w,
+    void* mem) const {
+  // Redirect to non-differentiated class
+  auto m = derivative_of_.get<FmuFunction>();
+  return m->eval_jac(arg, res, iw, w, mem);
 }
 
 } // namespace casadi
