@@ -300,11 +300,75 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
   return 0;
 }
 
+int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, double* w,
+    void* mem) const {
+  // Dimensions
+  casadi_int n_xd = nnz_in(0);
+  casadi_int n_yd = nnz_out(0);
+  // Inputs
+  const double* xd = arg[0];
+  // const double* xn = arg[1];  // not implemented
+  // const double* out_yd = arg[2];  // not used
+  // const double* out_yn = arg[3];  // not used
+  const double* adj_yd = arg[4];
+  // const double* adj_yn = arg[5];  // non-differentiable
+  // Outputs
+  double* adj_xd = res[0];
+  // double* adj_xn = res[1];  // non-differentiable, not implemented
+  // Forward seed, sensitivity for calculating columns of the Jacobian
+  double* fwd_xd = w; w += n_xd;
+  double* fwd_yd = w; w += n_yd;
+  // FMI return flag
+  fmi2Status status;
+  // Pass differentiable inputs
+  status = set_real_(c_, get_ptr(xd_), xd_.size(), xd);
+  if (status != fmi2OK) {
+    casadi_error("fmi2SetReal failed");
+    return 1;
+  }
+  // Reset results
+  casadi_clear(adj_xd, n_xd);
+  // Clear seeds
+  casadi_clear(fwd_xd, n_xd);
+  // Calculate Jacobian, one column at a time
+  for (casadi_int i = 0; i < n_xd; ++i) {
+    // Set seed for column i
+    fwd_xd[i] = 1.;
+    // Calculate directional derivative
+    status = get_directional_derivative_(c_, get_ptr(yd_), yd_.size(),
+      get_ptr(xd_), xd_.size(), fwd_xd, fwd_yd);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetDirectionalDerivative failed");
+      return 1;
+    }
+    // Add contribution from first seed
+    adj_xd[i] += casadi_dot(n_yd, fwd_yd, adj_yd);
+    // Remove seed
+    fwd_xd[i] = 0;
+  }
+  // Successful return
+  return 0;
+}
+
 Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
     const std::vector<std::string>& onames, const Dict& opts) const {
   Function ret;
   ret.own(new FmuFunctionJac(name));
   ret->construct(opts);
+  return ret;
+}
+
+Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const {
+  casadi_assert(nadj == 1, "Not supported");
+  Function ret;
+  ret.own(new FmuFunctionAdj(name));
+  // Hack: Manually enable finite differncing (pending implementation in class)
+  Dict opts2 = opts;
+  opts2["enable_fd"] = true;
+  ret->construct(opts2);
   return ret;
 }
 
@@ -325,6 +389,25 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Redirect to non-differentiated class
   auto m = derivative_of_.get<FmuFunction>();
   return m->eval_jac(arg, res, iw, w, mem);
+}
+
+FmuFunctionAdj::~FmuFunctionAdj() {
+  clear_mem();
+}
+
+void FmuFunctionAdj::init(const Dict& opts) {
+  // Call the base class initializer
+  FunctionInternal::init(opts);
+  // Work vectors
+  alloc_w(derivative_of_.nnz_in(0), true);
+  alloc_w(derivative_of_.nnz_out(0), true);
+}
+
+int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, double* w,
+    void* mem) const {
+  // Redirect to non-differentiated class
+  auto m = derivative_of_.get<FmuFunction>();
+  return m->eval_adj(arg, res, iw, w, mem);
 }
 
 } // namespace casadi

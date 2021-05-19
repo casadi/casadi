@@ -148,6 +148,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Evaluate Jacobian numerically
   int eval_jac(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
 
+  // Evaluate adjoint numerically
+  int eval_adj(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+
   ///@{
   /** \brief Full Jacobian */
   bool has_jacobian() const override { return provides_directional_derivative_;}
@@ -156,6 +159,17 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& onames,
     const Dict& opts) const override;
   ///@}
+
+  ///@{
+  /** \brief Adjoint */
+  bool has_reverse(casadi_int nadj) const override {
+    return provides_directional_derivative_ && nadj == 1;
+  }
+  ///@}
+  Function get_reverse(casadi_int nadj, const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const override;
 
   // Name of system, per the FMI specification
   static std::string system_infix();
@@ -167,7 +181,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   signal_t get_function(const std::string& symname);
 };
 
-/** First order derivatives */
+/** Jacobian */
 class CASADI_EXPORT FmuFunctionJac : public FunctionInternal {
  public:
   /// Constructor
@@ -181,6 +195,25 @@ class CASADI_EXPORT FmuFunctionJac : public FunctionInternal {
 
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunctionJac";}
+
+  /// Evaluate numerically
+  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+};
+
+/** Adjoint */
+class CASADI_EXPORT FmuFunctionAdj : public FunctionInternal {
+ public:
+  /// Constructor
+  FmuFunctionAdj(const std::string& name) : FunctionInternal(name) {}
+
+  /// Destructor
+  ~FmuFunctionAdj() override;
+
+  /// Initialize
+  void init(const Dict& opts) override;
+
+  /** \brief Get type name */
+  std::string class_name() const override { return "FmuFunctionAdj";}
 
   /// Evaluate numerically
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;

@@ -581,13 +581,17 @@ namespace casadi {
   std::string FunctionInternal::get_name_in(casadi_int i) {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == "jac_" + n) {
+      if (name_ == "jac_" + n || name_ == "adj1_" + n) {
         if (i < derivative_of_.n_in()) {
           // Same as nondifferentiated function
           return derivative_of_.name_in(i);
-        } else {
+        } else if (i < derivative_of_.n_in() + derivative_of_.n_out()) {
           // Nondifferentiated output
           return "out_" + derivative_of_.name_out(i - derivative_of_.n_in());
+        } else {
+          // Adjoint seed
+          return "adj_" + derivative_of_.name_out(i - derivative_of_.n_in()
+            - derivative_of_.n_out());
         }
       }
     }
@@ -602,6 +606,9 @@ namespace casadi {
         // Jacobian block
         casadi_int oind = i / derivative_of_.n_in(), iind = i % derivative_of_.n_in();
         return "jac_" + derivative_of_.name_out(oind) + "_" + derivative_of_.name_in(iind);
+      } else if (name_ == "adj1_" + n) {
+        // Adjoint sensitivity
+        return "adj_" + derivative_of_.name_in(i);
       }
     }
     // Default name
@@ -3207,6 +3214,8 @@ namespace casadi {
       string n = derivative_of_.name();
       if (name_ == "jac_" + n) {
         return derivative_of_.n_in() + derivative_of_.n_out();
+      } else if (name_ == "adj1_" + n) {
+        return derivative_of_.n_in() + derivative_of_.n_out() + derivative_of_.n_out();
       }
     }
     // One by default
@@ -3218,6 +3227,8 @@ namespace casadi {
       string n = derivative_of_.name();
       if (name_ == "jac_" + n) {
         return derivative_of_.n_in() * derivative_of_.n_out();
+      } else if (name_ == "adj1_" + n) {
+        return derivative_of_.n_in();
       }
     }
     // One by default
@@ -3227,16 +3238,17 @@ namespace casadi {
   Sparsity FunctionInternal::get_sparsity_in(casadi_int i) {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == "jac_" + n) {
+      if (name_ == "jac_" + n || name_ == "adj1_" + n) {
         if (i < derivative_of_.n_in()) {
-          // Same as nondifferentiated function
+          // Input of nondifferentiated function
           return derivative_of_.sparsity_in(i);
-        } else if (uses_output()) {
-          // Nondifferentiated output used
-          return derivative_of_.sparsity_out(i - derivative_of_.n_in());
+        } else if (i < derivative_of_.n_in() + derivative_of_.n_out()) {
+          // Output of nondifferentiated function, if needed
+          return uses_output() ? derivative_of_.sparsity_out(i - derivative_of_.n_in()) :
+            Sparsity(derivative_of_.size_out(i - derivative_of_.n_in()));
         } else {
-          // Nondifferentiated output not needed
-          return Sparsity(derivative_of_.size_out(i-derivative_of_.n_in()));
+          // Adjoint seeds
+          return derivative_of_.sparsity_out(i - derivative_of_.n_in() - derivative_of_.n_out());
         }
       }
     }
@@ -3278,6 +3290,9 @@ namespace casadi {
         colind.resize(sp_in.numel() + 1, row.size());
         // Assemble and return sparsity pattern
         return Sparsity(sp_out.numel(), sp_in.numel(), colind, row);
+      } else if (name_ == "adj1_" + n) {
+        // Adjoint sensitivity
+        return derivative_of_.sparsity_in(i);
       }
     }
     // Scalar by default
