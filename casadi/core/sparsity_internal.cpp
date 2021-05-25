@@ -3683,6 +3683,14 @@ namespace casadi {
     return true;
   }
 
+  bool SparsityInternal::is_compactible(std::vector<casadi_int>& row, std::vector<casadi_int>& col) const {
+    Sparsity s1 = sum1(shared_from_this<Sparsity>());
+    Sparsity s2 = sum2(shared_from_this<Sparsity>());
+    row = s2.get_row();
+    col = s1.get_col();
+    return nnz()==row.size()*col.size();
+  }
+
   Sparsity SparsityInternal::_tril(bool includeDiagonal) const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();

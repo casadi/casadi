@@ -78,8 +78,8 @@ namespace casadi {
      }
   };
 
-  Dict MXFunction::generate_options(bool is_temp) const {
-    Dict opts = FunctionInternal::generate_options(is_temp);
+  Dict MXFunction::generate_options(bool is_temp, bool keep_dim) const {
+    Dict opts = FunctionInternal::generate_options(is_temp, keep_dim);
     //opts["default_in"] = default_in_;
     opts["live_variables"] = live_variables_;
     return opts;

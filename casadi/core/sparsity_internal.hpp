@@ -582,6 +582,8 @@ namespace casadi {
     /// Print description
     void disp(std::ostream& stream, bool more) const override;
 
+    bool is_compactible(std::vector<casadi_int>& row, std::vector<casadi_int>& col) const;
+
     /** \brief Perform a unidirectional coloring
      *
      * A greedy distance-2 coloring algorithm

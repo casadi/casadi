@@ -97,7 +97,9 @@ namespace casadi {
       Dict opts;
       opts["stride_in"] = stride_in;
       opts["stride_out"] = stride_out;
+      uout() << "before" << f_.is_diff_in() << std::endl;
       f_ = f_->with_options(opts);
+      uout() << "after" << f_.is_diff_in() << std::endl;
     }
   }
 
@@ -674,10 +676,12 @@ namespace casadi {
                       const std::vector<std::string>& inames,
                       const std::vector<std::string>& onames,
                       const Dict& opts) const {
+    uout() << "get_jacobian" << std::endl;
     // Generate map of derivative
     Function Jf = f_.jacobian();
 
-    //REMOVE Jf.disp(uout());
+    uout() << Jf << std::endl;
+    uout() << Jf.is_diff_in() << std::endl;
 
     //REMOVE uout() << "goal" << std::endl;
 
@@ -699,19 +703,25 @@ namespace casadi {
 
     vector<MX> res = Jmap(arg);
 
+    uout() << "foobar map" << Jf << std::endl;
     size_t i=0;
     for (size_t oind = 0; oind < n_out_; ++oind) {
       for (size_t iind = 0; iind < n_in_; ++iind) {
         MX& r = res[i];
         if (!reduce_out_[oind]) {
           if (reduce_in_[iind]) {
-            // is_dense is conservative: colums of equal nnz count is sufficient
-            if (Jf.sparsity_out(i).is_dense()) {
-              Layout source({Jf.size1_out(i), Jf.size2_out(i), n_});
-              Layout target({Jf.size1_out(i), n_, Jf.size2_out(i)});
+            std::vector<casadi_int> row, col;
+            // conservative: it is enough if non-empty columns have an equal number of nonzeros
+            if (Jf.sparsity_out(i).is_compactible(row, col)) {
+              Layout source({row.size(), col.size(), n_});
+              Layout target({row.size(), n_, col.size()});
+              Sparsity sp_target = vertcat(horzsplit(r.sparsity(), Jf.size2_out(i)));
+              r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
               r = permute_layout(r,Relayout(source, {0, 2, 1}, target));
-              r = sparsity_cast(r, vertcat(horzsplit(r.sparsity(), Jf.size2_out(i))));
+              r = sparsity_cast(r, sp_target);
+              uout() << "target" << r.sparsity() << std::endl;
             } else {
+              uout() << "foobar map" << Jf.size_out(i) << std::endl;
               r = vertcat(horzsplit(r, Jf.size2_out(i)));
             }
           } else {

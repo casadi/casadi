@@ -105,7 +105,7 @@ namespace casadi {
     ///@}
 
     /// Reconstruct options dict
-    virtual Dict generate_options(bool is_temp=false) const;
+    virtual Dict generate_options(bool is_temp=false, bool keep_dim=false) const;
 
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation.
@@ -221,7 +221,7 @@ namespace casadi {
     ///@}
 
     /// Reconstruct options dict
-    Dict generate_options(bool is_temp=false) const override;
+    Dict generate_options(bool is_temp=false, bool keep_dim=false) const override;
 
     /** \brief Initialize */
     void init(const Dict& opts) override;

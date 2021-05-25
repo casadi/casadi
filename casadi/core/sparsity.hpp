@@ -473,6 +473,8 @@ namespace casadi {
     /// Check if the sparsity is a reshape of another
     bool is_reshape(const Sparsity& y) const;
 
+    bool is_compactible(std::vector<casadi_int>& SWIG_OUTPUT(row), std::vector<casadi_int>& SWIG_OUTPUT(col)) const;
+
     /// @{
     /** \brief Combine two sparsity patterns
         Returns the new sparsity pattern as well as a mapping with the same length as

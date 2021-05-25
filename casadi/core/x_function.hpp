@@ -1041,7 +1041,7 @@ namespace casadi {
   Function XFunction<DerivedType, MatType, NodeType>::
     with_options(const Dict& opts) const {
 
-    Dict my_opts = combine(opts, generate_options());
+    Dict my_opts = combine(opts, generate_options(false, true));
     return Function(name_, in_, out_, name_in_, name_out_, my_opts);
   }
 
