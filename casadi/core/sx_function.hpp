@@ -255,7 +255,7 @@ class CASADI_EXPORT SXFunction :
   ///@}
 
   /// Reconstruct options dict
-  Dict generate_options(bool is_temp) const override;
+  Dict generate_options(bool is_temp, bool keep_dim) const override;
 
   /** \brief  Initialize
 

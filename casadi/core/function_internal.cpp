@@ -350,7 +350,7 @@ namespace casadi {
     }
   }
 
-  Dict ProtoFunction::generate_options(bool is_temp) const {
+  Dict ProtoFunction::generate_options(bool is_temp, bool keep_dim) const {
     Dict opts;
     opts["verbose"] = verbose_;
     opts["print_time"] = print_time_;
@@ -359,8 +359,8 @@ namespace casadi {
     return opts;
   }
 
-  Dict FunctionInternal::generate_options(bool is_temp) const {
-    Dict opts = ProtoFunction::generate_options(is_temp);
+  Dict FunctionInternal::generate_options(bool is_temp, bool keep_dim) const {
+    Dict opts = ProtoFunction::generate_options(is_temp, keep_dim);
     opts["jac_penalty"] = jac_penalty_;
     opts["user_data"] = user_data_;
     opts["inputs_check"] = inputs_check_;
@@ -386,6 +386,12 @@ namespace casadi {
     opts["dump_dir"] = dump_dir_;
     opts["dump_format"] = dump_format_;
     opts["dump"] = dump_;
+    opts["forward_options"] = forward_options_;
+    opts["reverse_options"] = reverse_options_;
+    if (keep_dim) {
+      opts["is_diff_in"] = is_diff_in_;
+      opts["is_diff_out"] = is_diff_out_;
+    }
     return opts;
   }
 
@@ -989,6 +995,8 @@ namespace casadi {
     my_opts["ad_weight"] = ad_weight();
     my_opts["ad_weight_sp"] = sp_weight();
     my_opts["max_num_dir"] = max_num_dir_;
+    my_opts["is_diff_in"] = is_diff_in_;
+    my_opts["is_diff_out"] = is_diff_out_;
     // Wrap the function
     vector<MX> arg = mx_in();
     vector<MX> res = self()(arg);

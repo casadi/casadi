@@ -797,6 +797,10 @@ namespace casadi {
     return (*this)->hash();
   }
 
+  bool Sparsity::is_compactible(std::vector<casadi_int>& row, std::vector<casadi_int>& col) const {
+    return (*this)->is_compactible(row, col);
+  }
+
   void Sparsity::assign_cached(casadi_int nrow, casadi_int ncol,
                                 const std::vector<casadi_int>& colind,
                                 const std::vector<casadi_int>& row, bool order_rows) {

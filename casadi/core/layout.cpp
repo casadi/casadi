@@ -166,17 +166,142 @@ namespace casadi {
     return s->n_dims()*2;
   }
 
+  bool canonical_dims(const std::vector<casadi_int>& t_dims, const std::vector<casadi_int>& s_dims,
+  std::vector<casadi_int>& c_dims,
+  std::vector<casadi_int>& t_contrib,
+  std::vector<casadi_int>& s_contrib) {
+    
+    // Example 1
+    // t_dims = [8,3,6,6]
+    // s_dims = [2,2,2,3,36]
+    // -> c_dims = [2,2,2,3,6,6]    (smallest components)
+    // -> t_contrib = [0,0,0,1,2,3] (which t_dim is present in this component)
+    // -> s_contrib = [0,1,2,3,4,4]
+
+    // Example 2
+    // t_dims = [3,4,4,4]
+    // s_dims = [3,2,2,16]
+    // -> c_dims = [3,2,2,4,4]      (smallest components)
+    // -> t_contrib = [0,1,1,2,3]
+    // -> s_contrib = [0,1,2,3,3]
+
+    casadi_int t_i = 0;
+    casadi_int s_i = 0;
+
+    casadi_int t_prod = 1;
+    casadi_int s_prod = 1;
+
+    c_dims.clear();
+    t_contrib.clear();
+    s_contrib.clear();
+
+    casadi_int goal = product(t_dims);
+
+    while (t_prod<goal) {
+      if (t_prod<s_prod) {
+        t_prod *= t_dims[t_i];
+        c_dims.push_back(t_dims[t_i]);
+        t_contrib.push_back(t_i);
+        s_contrib.push_back(s_i-1);
+        t_i++;
+      } else if (t_prod>s_prod) {
+        s_prod *= s_dims[s_i];
+        c_dims.push_back(s_dims[s_i]);
+        t_contrib.push_back(t_i-1);
+        s_contrib.push_back(s_i);
+        s_i++;
+      } else {
+        t_prod *= t_dims[t_i];
+        s_prod *= s_dims[s_i];
+        c_dims.push_back(min(t_dims[t_i], s_dims[s_i]));
+        t_contrib.push_back(t_i);
+        s_contrib.push_back(s_i);
+        t_i++;
+        s_i++;
+      }
+    }
+    uout() << "absorbs" << (product(c_dims)==goal) << ":" << product(c_dims) << ":" << goal<< std::endl;
+    uout() << "absorbs" << (t_contrib.back()==t_dims.size()) << ":" << t_contrib.back()<< ":" << t_dims.size() << std::endl;
+    uout() << "absorbs" << (s_contrib.back()==s_dims.size()) << ":" << s_contrib.back()<< ":" << s_dims.size() << std::endl;
+    return product(c_dims)==goal && t_contrib.back()+1==t_dims.size() && s_contrib.back()+1==s_dims.size();
+  }
+
   bool Relayout::absorbs(const Relayout& other) const {
     if (target()==other.source()) return true;
+    uout() << "absorbs" << target() << ":" << other.source() << std::endl;
+    const StridedLayout* t = dynamic_cast<const StridedLayout*>(target().get());
+    const StridedLayout* s = dynamic_cast<const StridedLayout*>(other.source().get());
+    if (s && t) {
+      std::vector<casadi_int> td = t->get_dims();
+      std::vector<casadi_int> sd = s->get_dims();
+      std::vector<casadi_int> c_dims, t_contrib, s_contrib;
+      bool success = canonical_dims(td, sd, c_dims, t_contrib, s_contrib);
+      if (success) return true;
+      uout() << "absorbs td" << td << "sd" << sd << ":" << c_dims << ":" << t_contrib << ":" << s_contrib << success << std::endl;
+    }
     return false;
   }
 
   Relayout Relayout::absorbed(const Relayout& other) const {
-    casadi_assert_dev(target()==other.source());
+    if (target()==other.source()) {
+      casadi_assert_dev(target()==other.source());
 
-    std::vector<casadi_int> perm = permute(perms(), other.perms());
+      std::vector<casadi_int> perm = permute(perms(), other.perms());
 
-    return Relayout(source(), perm, other.target());
+      return Relayout(source(), perm, other.target());
+    }
+    const StridedLayout* t = dynamic_cast<const StridedLayout*>(target().get());
+    const StridedLayout* s = dynamic_cast<const StridedLayout*>(other.source().get());
+    if (s && t) {
+      std::vector<casadi_int> td = t->get_dims();
+      std::vector<casadi_int> sd = s->get_dims();
+      std::vector<casadi_int> c_dims, t_contrib, s_contrib;
+      casadi_assert_dev(canonical_dims(td, sd, c_dims, t_contrib, s_contrib));
+      Relayout r_left = *this;
+      Relayout r_right = other;
+      if (td!=c_dims) {
+        // work on inverse permutation since c_dims corresponds to a target
+        std::vector<casadi_int> iperm = invert_permutation(perms());
+        std::vector<casadi_int> iperm_lookup = lookupvector(iperm, iperm.size());
+        std::vector< std::vector<casadi_int> > new_iperm(iperm.size());
+        casadi_int offset = 0;
+        for (casadi_int i=0;i<td.size();++i) {
+          casadi_int j = iperm_lookup[i];
+          casadi_int start = offset;
+          while (t_contrib[offset]==i) offset++;
+          new_iperm[j] = range(start, offset);
+        }
+        flatten_nested_vector(new_iperm, iperm);
+        uout() << "absorb" << iperm << std::endl;
+        uout() << "absorb" << permute(c_dims, iperm) << std::endl;
+        uout() << "absorb" << invert_permutation(iperm) << std::endl;
+        Layout source(permute(c_dims, iperm));
+        Layout target(c_dims);
+        r_left = Relayout(source, invert_permutation(iperm), target);
+      }
+      if (sd!=c_dims) {
+        // work on permutation since c_dims corresponds to a source
+        std::vector<casadi_int> perm = other.perms();
+        std::vector<casadi_int> perm_lookup = lookupvector(perm, perm.size());
+        std::vector< std::vector<casadi_int> > new_perm(perm.size());
+        casadi_int offset = 0;
+        for (casadi_int i=0;i<sd.size();++i) {
+          casadi_int j = perm_lookup[i];
+          casadi_int start = offset;
+          while (s_contrib[offset]==i) offset++;
+          new_perm[j] = range(start, offset);
+        }
+        flatten_nested_vector(new_perm, perm);
+        uout() << "absorb" << perm << std::endl;
+        uout() << "absorb" << permute(c_dims, perm) << std::endl;
+        Layout source(c_dims);
+        Layout target(permute(c_dims, perm));
+        r_right = Relayout(source, perm, target);
+      }
+      Relayout result = r_left.absorbed(r_right);
+      uout() << "simplify to " << result.source() << ":" << result.target() << std::endl;
+      return r_left.absorbed(r_right);
+    }
   }
 
   std::vector<casadi_int> Relayout::nz_ref() const {
