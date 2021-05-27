@@ -289,12 +289,19 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
 }
 
 void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
+  // All expressions
+  std::vector<MX> var_xd;
   // All value references
   std::vector<casadi_int> id_xd, id_xn, id_yd, id_yn;
-  // Get the IDs of the initial unknowns
+  // Get the IDs and expressions of the initial unknowns
   id_xd.reserve(u_.size() + x_.size());
-  for (auto& v : {u_, x_})
-    for (size_t k : v) id_xd.push_back(variable(k).value_reference);
+  var_xd.reserve(u_.size() + x_.size());
+  for (auto& v : {u_, x_}) {
+    for (size_t k : v) {
+      id_xd.push_back(variable(k).value_reference);
+      var_xd.push_back(variable(k).v);
+    }
+  }
   // Get the IDs of the output variables
   id_yd.reserve(outputs_.size() + derivatives_.size());
   for (auto& v : {outputs_, derivatives_})
@@ -310,7 +317,7 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   Variable xd(model_name_ + "_xd");
   xd.v = MX::sym(xd.name, id_xd.size());
   xd.variability = Variable::CONTINUOUS;
-  xd.beq = vertcat(var(u_));
+  xd.beq = vertcat(var_xd);
   w_.push_back(add_variable(xd.name, xd));
   // Create function call to fmu
   std::vector<MX> fmu_lhs = fmu(std::vector<MX>{xd.v, MX()});
