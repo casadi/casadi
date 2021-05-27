@@ -41,4 +41,6 @@ namespace casadi {
 
   casadi_int GlobalOptions::vector_width_real = 1;
 
+  casadi_int GlobalOptions::byte_width_real = 8;
+
 } // namespace casadi

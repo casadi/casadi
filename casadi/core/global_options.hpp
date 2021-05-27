@@ -70,6 +70,7 @@ namespace casadi {
 
       static casadi_int vector_width_real;
 
+      static casadi_int byte_width_real;
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -90,6 +91,9 @@ namespace casadi {
 
       static void setVectorWidthReal(casadi_int w) { vector_width_real = w; }
       static casadi_int getVectorWidthReal() { return vector_width_real; }
+
+      static void setByteWidthReal(casadi_int w) { byte_width_real = w; }
+      static casadi_int getByteWidthReal() { return byte_width_real; }
 
   };
 

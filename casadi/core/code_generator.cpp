@@ -666,7 +666,7 @@ namespace casadi {
     }
 
     if (sz_zeros_>=0) {
-      int align_bytes = casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+      int align_bytes = casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
       print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros_), align_bytes);
       s << endl;
     }
@@ -706,7 +706,7 @@ namespace casadi {
   }
 
   unsigned int CodeGenerator::vector_width_bits() const {
-    return casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float)*8 : GlobalOptions::vector_width_real*sizeof(double)*8;
+    return casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float)*8 : GlobalOptions::vector_width_real*sizeof(double)*8;
   }
   std::string CodeGenerator::vector_width_attribute() const {
     std::string flag = "prefer-vector-width=" + str(vector_width_bits());
@@ -1490,7 +1490,8 @@ namespace casadi {
     add_auxiliary(AUX_DOT);
     stringstream s;
     //s << "casadi_dot(" << n << ", " << x << ", " << y << ")";
-    s << "cblas_ddot(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
+    std::string t = casadi_real_type=="float" ? "s" : "d";
+    s << "cblas_" << t << "dot(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
     //s << "blasfeo_ddot_blas_normal(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
     return s.str();
   }
@@ -1792,6 +1793,9 @@ namespace casadi {
     for (casadi_int i=0; i<inst.size(); ++i) {
       rep.push_back(make_pair("T" + str(i+1), inst[i]));
     }
+
+    // Replace %g
+    rep.push_back(make_pair("SCANF_REAL",casadi_real_type=="float" ? "\"%g\"" : "\"%lg\""));
 
     // Return object
     stringstream ret;
