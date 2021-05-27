@@ -319,11 +319,11 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_;
+  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_, ode_, quad_;
 
   ///@{
   /// Ordered variables and equations
-  std::vector<MX> ode_, alg_, quad_;
+  std::vector<MX> alg_;
   std::vector<MX> aux_;
   std::vector<MX> init_lhs_, init_rhs_;
   std::vector<MX> when_cond_, when_lhs_, when_rhs_;
@@ -341,6 +341,12 @@ protected:
   /** \brief Definitions of output variables */
   std::vector<MX> ydef() const;
 
+  /** \brief ODE right hand sides */
+  std::vector<MX> ode() const;
+
+  /** \brief Quadrature right hand sides */
+  std::vector<MX> quad() const;
+
   ///@{
   /// Add a new variable
   MX add_t(const std::string& name);
@@ -353,6 +359,8 @@ protected:
   MX add_d(const std::string& name, const MX& new_ddef);
   MX add_w(const std::string& name, const MX& new_wdef);
   MX add_y(const std::string& name, const MX& new_ydef);
+  MX add_ode(const std::string& name, const MX& new_ode);
+  MX add_quad(const std::string& name, const MX& new_quad);
   ///@}
 
   /// Linear combinations of output expressions

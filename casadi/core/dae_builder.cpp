@@ -66,8 +66,8 @@ std::vector<MX> DaeBuilder::x() const {
   return var((*this)->x_);
 }
 
-const std::vector<MX>& DaeBuilder::ode() const {
-  return (*this)->ode_;
+std::vector<MX> DaeBuilder::ode() const {
+  return (*this)->ode();
 }
 
 std::vector<MX> DaeBuilder::z() const {
@@ -82,8 +82,8 @@ std::vector<MX> DaeBuilder::q() const {
   return var((*this)->q_);
 }
 
-const std::vector<MX>& DaeBuilder::quad() const {
-  return (*this)->quad_;
+std::vector<MX> DaeBuilder::quad() const {
+  return (*this)->quad();
 }
 
 std::vector<MX> DaeBuilder::y() const {
@@ -473,9 +473,13 @@ void DaeBuilder::add_when(const MX& cond, const MX& lhs, const MX& rhs) {
   (*this)->when_rhs_.push_back(rhs);
 }
 
-void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
-  (*this)->ode_.push_back(new_ode);
-  (*this)->clear_cache_ = true;
+MX DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
+  try {
+    return (*this)->add_ode(name, new_ode);
+  } catch (std::exception& e) {
+    THROW_ERROR("add_ode", e.what());
+    return MX();
+  }
 }
 
 void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
@@ -483,9 +487,13 @@ void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
   (*this)->clear_cache_ = true;
 }
 
-void DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
-  (*this)->quad_.push_back(new_quad);
-  (*this)->clear_cache_ = true;
+MX DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
+  try {
+    return (*this)->add_quad(name, new_quad);
+  } catch (std::exception& e) {
+    THROW_ERROR("add_quad", e.what());
+    return MX();
+  }
 }
 
 void DaeBuilder::sanity_check() const {

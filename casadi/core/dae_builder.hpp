@@ -90,7 +90,7 @@ public:
   std::vector<MX> x() const;
 
   /** \brief Ordinary differential equations (ODE) */
-  const std::vector<MX>& ode() const;
+  std::vector<MX> ode() const;
 
   /** \brief Algebraic variables */
   std::vector<MX> z() const;
@@ -102,7 +102,7 @@ public:
   std::vector<MX> q() const;
 
   /** \brief Quadrature equations */
-  const std::vector<MX>& quad() const;
+  std::vector<MX> quad() const;
 
   /** \brief Output variables */
   std::vector<MX> y() const;
@@ -226,13 +226,13 @@ public:
   MX add_y(const std::string& name, const MX& new_ydef);
 
   /// Add an ordinary differential equation
-  void add_ode(const std::string& name, const MX& new_ode);
+  MX add_ode(const std::string& name, const MX& new_ode);
 
   /// Add an algebraic equation
   void add_alg(const std::string& name, const MX& new_alg);
 
   /// Add a quadrature equation
-  void add_quad(const std::string& name, const MX& new_quad);
+  MX add_quad(const std::string& name, const MX& new_quad);
 
   /// Add an auxiliary variable
   MX add_aux(const std::string& name=std::string(), casadi_int n=1);
