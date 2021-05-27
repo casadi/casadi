@@ -2536,7 +2536,7 @@ namespace casadi {
       g << "casadi_int flag;\n";
       if (needs_mem) g << "int mem;\n";
 
-      int align_bytes = g.casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+      int align_bytes = g.casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
 
       // Work vectors and input and output buffers
       g << CodeGenerator::array("casadi_int", "iw", sz_iw())
@@ -2561,11 +2561,13 @@ namespace casadi {
         g << "res[" << i << "] = w_out" << i << ";\n";
       }
 
+      std::string t = g.casadi_real_type=="float" ? "%g" : "%lg";
+
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
       for (casadi_int i=0; i<n_in_; ++i) {
         g << "a = w_in" << i << ";\n"
           << "for (j=0; j<" << nnz_in(i) << "; ++j) "
-          << "if (scanf(\"%lg\", a++)<=0) return 2;\n";
+          << "if (scanf(\"" << t << "\", a++)<=0) return 2;\n";
       }
 
       if (needs_mem) {

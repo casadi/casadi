@@ -1514,8 +1514,8 @@ namespace casadi {
   }
 
   void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
-    int align_bytes = g.casadi_real_type=="single" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
-    g << "w = (double*) __builtin_assume_aligned (w, " << align_bytes << ");\n";
+    int align_bytes = g.casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+    g << "w = (casadi_real*) __builtin_assume_aligned (w, " << align_bytes << ");\n";
     g.add_include("stdint.h");
     g << g.debug_assert("(uintptr_t) w% " + str(align_bytes) + " ==0") + "\n";
     g.local("i","casadi_int");
@@ -1598,6 +1598,7 @@ namespace casadi {
         casadi_int j=e.arg.at(i);
         if (j>=0) {
           size_t a = e.data->align_in(i);
+          if (g.casadi_real_type=="float") a = a/2;
           if (a>1 && e.data.dep(i).nnz()>1) {
             std::string rem = "(uintptr_t) " + g.work(j, e.data.dep(i).nnz())+"%"+str(a);
             g << g.debug_assert(rem + "==0") + "\n";
@@ -1609,6 +1610,7 @@ namespace casadi {
         casadi_int j=e.res.at(i);
         if (j>=0) {
           size_t a = e.data->align_out(i);
+          if (g.casadi_real_type=="float") a = a/2;
           if (a>1 && e.data->sparsity(i).nnz()>1) {
             std::string rem = "(uintptr_t) " + g.work(j, e.data->sparsity(i).nnz())+"%"+str(a);
             g << g.debug_assert(rem +"==0") + "\n";
