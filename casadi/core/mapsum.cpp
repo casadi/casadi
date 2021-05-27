@@ -174,7 +174,7 @@ namespace casadi {
     // Allocate sufficient memory for serial evaluation
     alloc_arg(f_.sz_arg());
     alloc_res(f_.sz_res());
-    alloc_w(f_.sz_w()*GlobalOptions::vector_width_real, true);
+    alloc_w(f_.sz_w(), true);
     alloc_iw(f_.sz_iw());
 
     // Allocate scratch space for dummping result of reduced outputs
