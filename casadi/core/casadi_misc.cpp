@@ -179,12 +179,6 @@ namespace casadi {
     return ret;
   }
 
-  size_t vectorize_real_size(size_t s) {
-    if (s==1 || s==2) return s;
-    if (s % GlobalOptions::vector_width_real==0) return s;
-    return (s/GlobalOptions::vector_width_real + 1)*GlobalOptions::vector_width_real;
-  }
-
   // Better have a bool return flag saying if we need reorer at all
   std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
       const std::vector<casadi_int>& order) {
