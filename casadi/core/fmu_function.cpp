@@ -354,7 +354,10 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
     const std::vector<std::string>& onames, const Dict& opts) const {
   Function ret;
   ret.own(new FmuFunctionJac(name));
-  ret->construct(opts);
+  // Hack: Manually enable finite differenting (pending implementation in class)
+  Dict opts2 = opts;
+  opts2["enable_fd"] = true;
+  ret->construct(opts2);
   return ret;
 }
 
@@ -365,7 +368,7 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
   casadi_assert(nadj == 1, "Not supported");
   Function ret;
   ret.own(new FmuFunctionAdj(name));
-  // Hack: Manually enable finite differncing (pending implementation in class)
+  // Hack: Manually enable finite differenting (pending implementation in class)
   Dict opts2 = opts;
   opts2["enable_fd"] = true;
   ret->construct(opts2);
