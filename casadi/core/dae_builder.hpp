@@ -96,7 +96,7 @@ public:
   std::vector<MX> z() const;
 
   /** \brief Algebraic equations */
-  const std::vector<MX>& alg() const;
+  std::vector<MX> alg() const;
 
   /** \brief Quadrature states */
   std::vector<MX> q() const;
@@ -229,7 +229,7 @@ public:
   MX add_ode(const std::string& name, const MX& new_ode);
 
   /// Add an algebraic equation
-  void add_alg(const std::string& name, const MX& new_alg);
+  MX add_alg(const std::string& name, const MX& new_alg);
 
   /// Add a quadrature equation
   MX add_quad(const std::string& name, const MX& new_quad);

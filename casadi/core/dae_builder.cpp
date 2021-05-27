@@ -74,8 +74,8 @@ std::vector<MX> DaeBuilder::z() const {
   return var((*this)->z_);
 }
 
-const std::vector<MX>& DaeBuilder::alg() const {
-  return (*this)->alg_;
+std::vector<MX> DaeBuilder::alg() const {
+  return (*this)->alg();
 }
 
 std::vector<MX> DaeBuilder::q() const {
@@ -482,9 +482,13 @@ MX DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
   }
 }
 
-void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
-  (*this)->alg_.push_back(new_alg);
-  (*this)->clear_cache_ = true;
+MX DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
+  try {
+    return (*this)->add_alg(name, new_alg);
+  } catch (std::exception& e) {
+    THROW_ERROR("add_alg", e.what());
+    return MX();
+  }
 }
 
 MX DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {

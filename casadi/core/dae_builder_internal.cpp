@@ -211,7 +211,6 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       } else if (v.dependency && v.derivative < 0) {
         // Add to list of algebraic equations
         z_.push_back(k);
-        alg_.push_back(v.v - nan);
       }
       // Is it (also) an output variable?
       if (v.causality == Variable::OUTPUT) {
@@ -541,7 +540,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!alg_.empty()) {
     stream << "Algebraic equations" << std::endl;
     for (casadi_int k = 0; k < alg_.size(); ++k) {
-      stream << "  0 == " << str(alg_[k]) << std::endl;
+      stream << "  0 == " << var(alg_[k]) << std::endl;
     }
   }
 
@@ -725,7 +724,7 @@ void DaeBuilderInternal::tear() {
   // Add algebraic variables
   for (auto& e : iv) z_.push_back(find(e));
   // Add residual variables
-  for (auto& e : res) alg_.push_back(variable(e).v);
+  for (auto& e : res) alg_.push_back(find(e));
   // Add output variables
   for (auto& e : iv_on_hold) u_.push_back(find(e));
 }
@@ -880,7 +879,7 @@ void DaeBuilderInternal::sanity_check() const {
   // Algebraic variables/equations
   casadi_assert(z_.size() == alg_.size(), "z and alg have different lengths");
   for (casadi_int i = 0; i < z_.size(); ++i) {
-    casadi_assert(var(z_[i]).size() == alg_[i].size(), "alg has wrong dimensions");
+    casadi_assert(var(z_[i]).size() == var(alg_[i]).size(), "alg has wrong dimensions");
   }
 
   // Quadrature states/equations
@@ -943,8 +942,6 @@ void DaeBuilderInternal::eliminate_w() {
   sort_w();
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  ex.insert(ex.end(), alg_.begin(), alg_.end());
-  // Also include certain attributes in variables
   for (const Variable& v : variables_) {
     if (!v.min.is_constant()) ex.push_back(v.min);
     if (!v.max.is_constant()) ex.push_back(v.max);
@@ -958,11 +955,8 @@ void DaeBuilderInternal::eliminate_w() {
   substitute_inplace(w, wdef, ex);
   // Clear list of dependent variables
   w_.clear();
-  // Get algebraic equations
-  auto it = ex.begin();
-  std::copy(it, it + alg_.size(), alg_.begin());
-  it += alg_.size();
   // Get variable attributes
+  auto it = ex.begin();
   for (Variable& v : variables_) {
     if (!v.min.is_constant()) v.min = *it++;
     if (!v.max.is_constant()) v.max = *it++;
@@ -979,10 +973,8 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   if (!w_.empty()) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  ex.insert(ex.end(), alg_.begin(), alg_.end());
-  for (size_t v : ode_) ex.push_back(variable(v).beq);
-  for (size_t v : quad_) ex.push_back(variable(v).beq);
-  for (size_t v : y_) ex.push_back(variable(v).beq);
+  for (auto& vv : {ode_, alg_, quad_, y_})
+    for (size_t v : vv) ex.push_back(variable(v).beq);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
@@ -995,16 +987,10 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
     v.beq = new_wdef.at(i);
     w_.push_back(add_variable(v.name, v));
   }
-  // Get algebraic equations
+  // Get expressions
   auto it = ex.begin();
-  std::copy(it, it + alg_.size(), alg_.begin());
-  it += alg_.size();
-  // Get differential equations
-  for (size_t v : ode_) variable(v).beq = *it++;
-  // Get quadrature equations
-  for (size_t v : quad_) variable(v).beq = *it++;
-  // Get output equations
-  for (size_t v : y_) variable(v).beq = *it++;
+  for (auto& vv : {ode_, alg_, quad_, y_})
+    for (size_t v : vv) variable(v).beq = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
@@ -1066,7 +1052,7 @@ std::vector<MX> DaeBuilderInternal::input(const std::vector<DaeBuilderInternalIn
 std::vector<MX> DaeBuilderInternal::output(DaeBuilderInternalOut ind) const {
   switch (ind) {
   case DAE_BUILDER_ODE: return ode();
-  case DAE_BUILDER_ALG: return alg_;
+  case DAE_BUILDER_ALG: return alg();
   case DAE_BUILDER_QUAD: return quad();
   case DAE_BUILDER_DDEF: return ddef();
   case DAE_BUILDER_WDEF: return wdef();
@@ -1804,6 +1790,13 @@ std::vector<MX> DaeBuilderInternal::ode() const {
   return ret;
 }
 
+std::vector<MX> DaeBuilderInternal::alg() const {
+  std::vector<MX> ret;
+  ret.reserve(alg_.size());
+  for (size_t v : alg_) ret.push_back(variable(v).beq);
+  return ret;
+}
+
 std::vector<MX> DaeBuilderInternal::quad() const {
   std::vector<MX> ret;
   ret.reserve(quad_.size());
@@ -1908,6 +1901,15 @@ MX DaeBuilderInternal::add_ode(const std::string& name, const MX& new_ode) {
   v.causality = Variable::OUTPUT;
   v.beq = new_ode;
   ode_.push_back(add_variable(name, v));
+  return v.v;
+}
+
+MX DaeBuilderInternal::add_alg(const std::string& name, const MX& new_alg) {
+  Variable v(name);
+  v.v = MX::sym(name);
+  v.causality = Variable::OUTPUT;
+  v.beq = new_alg;
+  alg_.push_back(add_variable(name, v));
   return v.v;
 }
 
