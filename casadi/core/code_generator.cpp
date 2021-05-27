@@ -710,7 +710,7 @@ namespace casadi {
   }
   std::string CodeGenerator::vector_width_attribute() const {
     std::string flag = "prefer-vector-width=" + str(vector_width_bits());
-    if (vector_width_bits()==512) {
+    if (false && vector_width_bits()==512) {
       std::string flag = "avx512f,arch=skylake-avx512,tune=skylake-avx512";
       return "__attribute__((target(\"" + flag + "\")))";
     } else {
