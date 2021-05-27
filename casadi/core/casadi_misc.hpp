@@ -130,8 +130,6 @@ private:
 
   CASADI_EXPORT std::string str_bvec(bvec_t v);
 
-  CASADI_EXPORT size_t vectorize_real_size(size_t s);
-
   /**  \brief Slicing vector
 
   *  \param v Vector to slice
