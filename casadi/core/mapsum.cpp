@@ -97,9 +97,7 @@ namespace casadi {
       Dict opts;
       opts["stride_in"] = stride_in;
       opts["stride_out"] = stride_out;
-      uout() << "before" << f_.is_diff_in() << std::endl;
       f_ = f_->with_options(opts);
-      uout() << "after" << f_.is_diff_in() << std::endl;
     }
   }
 
