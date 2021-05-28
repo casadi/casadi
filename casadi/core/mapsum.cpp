@@ -167,11 +167,7 @@ namespace casadi {
       if (reduce_out_[j]) alloc_w(f_.nnz_out(j), true);
     }
 
-    dump_in_ = true;
-    dump_out_ = true;
-
     has_refcount_ = f_->has_refcount_;
-
   }
 
   casadi_int MapSum::n_padded() const {
