@@ -629,9 +629,6 @@ namespace casadi {
 
     std::vector<bool> reduce_in = join(reduce_in_, reduce_out_, reduce_out_);
     Dict options;
-    options["dump_in"] = true;
-    options["dump_out"] = true;
-    options["print_in"] = true;
     Function dm = MapSum::create("mapsum" + str(n_) + "_" + df.name(), parallelization(),
       df, n_, reduce_in, reduce_in_, options);
 
