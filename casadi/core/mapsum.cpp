@@ -97,9 +97,7 @@ namespace casadi {
       Dict opts;
       opts["stride_in"] = stride_in;
       opts["stride_out"] = stride_out;
-      uout() << "before" << f_.is_diff_in() << std::endl;
       f_ = f_->with_options(opts);
-      uout() << "after" << f_.is_diff_in() << std::endl;
     }
   }
 
@@ -182,11 +180,7 @@ namespace casadi {
       if (reduce_out_[j]) alloc_w(f_.nnz_out(j), true);
     }
 
-    dump_in_ = true;
-    dump_out_ = true;
-
     has_refcount_ = f_->has_refcount_;
-
   }
 
   casadi_int MapSum::n_padded() const {
@@ -254,8 +248,6 @@ namespace casadi {
   template<typename T>
   int MapSum::local_eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
 
-
-    //REMOVE uout() << "local_eval_gen:" << name_ << ":" << dump_in_ << std::endl;
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
@@ -644,9 +636,6 @@ namespace casadi {
 
     std::vector<bool> reduce_in = join(reduce_in_, reduce_out_, reduce_out_);
     Dict options;
-    options["dump_in"] = true;
-    options["dump_out"] = true;
-    options["print_in"] = true;
     Function dm = MapSum::create("mapsum" + str(n_) + "_" + df.name(), parallelization(),
       df, n_, reduce_in, reduce_in_, options);
 
@@ -691,14 +680,8 @@ namespace casadi {
                       const std::vector<std::string>& inames,
                       const std::vector<std::string>& onames,
                       const Dict& opts) const {
-    uout() << "get_jacobian" << std::endl;
     // Generate map of derivative
     Function Jf = f_.jacobian();
-
-    uout() << Jf << std::endl;
-    uout() << Jf.is_diff_in() << std::endl;
-
-    //REMOVE uout() << "goal" << std::endl;
 
     std::vector<bool> reduce_in = reduce_in_;
     for (size_t oind = 0; oind < n_out_; ++oind) { // Nominal outputs
@@ -718,7 +701,6 @@ namespace casadi {
 
     vector<MX> res = Jmap(arg);
 
-    uout() << "foobar map" << Jf << std::endl;
     size_t i=0;
     for (size_t oind = 0; oind < n_out_; ++oind) {
       for (size_t iind = 0; iind < n_in_; ++iind) {
@@ -734,9 +716,7 @@ namespace casadi {
               r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
               r = permute_layout(r,Relayout(source, {0, 2, 1}, target));
               r = sparsity_cast(r, sp_target);
-              uout() << "target" << r.sparsity() << std::endl;
             } else {
-              uout() << "foobar map" << Jf.size_out(i) << std::endl;
               r = vertcat(horzsplit(r, Jf.size2_out(i)));
             }
           } else {

@@ -220,15 +220,11 @@ namespace casadi {
         s_i++;
       }
     }
-    uout() << "absorbs" << (product(c_dims)==goal) << ":" << product(c_dims) << ":" << goal<< std::endl;
-    uout() << "absorbs" << (t_contrib.back()==t_dims.size()) << ":" << t_contrib.back()<< ":" << t_dims.size() << std::endl;
-    uout() << "absorbs" << (s_contrib.back()==s_dims.size()) << ":" << s_contrib.back()<< ":" << s_dims.size() << std::endl;
     return product(c_dims)==goal && t_contrib.back()+1==t_dims.size() && s_contrib.back()+1==s_dims.size();
   }
 
   bool Relayout::absorbs(const Relayout& other) const {
     if (target()==other.source()) return true;
-    uout() << "absorbs" << target() << ":" << other.source() << std::endl;
     const StridedLayout* t = dynamic_cast<const StridedLayout*>(target().get());
     const StridedLayout* s = dynamic_cast<const StridedLayout*>(other.source().get());
     if (s && t) {
@@ -237,7 +233,6 @@ namespace casadi {
       std::vector<casadi_int> c_dims, t_contrib, s_contrib;
       bool success = canonical_dims(td, sd, c_dims, t_contrib, s_contrib);
       if (success) return true;
-      uout() << "absorbs td" << td << "sd" << sd << ":" << c_dims << ":" << t_contrib << ":" << s_contrib << success << std::endl;
     }
     return false;
   }
