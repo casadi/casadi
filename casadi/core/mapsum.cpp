@@ -671,14 +671,8 @@ namespace casadi {
                       const std::vector<std::string>& inames,
                       const std::vector<std::string>& onames,
                       const Dict& opts) const {
-    uout() << "get_jacobian" << std::endl;
     // Generate map of derivative
     Function Jf = f_.jacobian();
-
-    uout() << Jf << std::endl;
-    uout() << Jf.is_diff_in() << std::endl;
-
-    //REMOVE uout() << "goal" << std::endl;
 
     std::vector<bool> reduce_in = reduce_in_;
     for (size_t oind = 0; oind < n_out_; ++oind) { // Nominal outputs
