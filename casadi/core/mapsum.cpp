@@ -239,8 +239,6 @@ namespace casadi {
   template<typename T>
   int MapSum::local_eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
 
-
-    //REMOVE uout() << "local_eval_gen:" << name_ << ":" << dump_in_ << std::endl;
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
@@ -700,7 +698,6 @@ namespace casadi {
 
     vector<MX> res = Jmap(arg);
 
-    uout() << "foobar map" << Jf << std::endl;
     size_t i=0;
     for (size_t oind = 0; oind < n_out_; ++oind) {
       for (size_t iind = 0; iind < n_in_; ++iind) {
@@ -716,9 +713,7 @@ namespace casadi {
               r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
               r = permute_layout(r,Relayout(source, {0, 2, 1}, target));
               r = sparsity_cast(r, sp_target);
-              uout() << "target" << r.sparsity() << std::endl;
             } else {
-              uout() << "foobar map" << Jf.size_out(i) << std::endl;
               r = vertcat(horzsplit(r, Jf.size2_out(i)));
             }
           } else {
