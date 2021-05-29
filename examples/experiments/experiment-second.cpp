@@ -186,9 +186,9 @@ int main(int argc, char *argv[]) {
     panocparams3.max_iter                       = 1000;
     panocparams3.update_lipschitz_in_linesearch = true;
     panocparams3.alternative_linesearch_cond    = false;
-    panocparams3.lbfgs_mem                      = 5;
     panocparams3.print_interval                 = 1;
     pa::LBFGSParams lbfgsparams3;
+    lbfgsparams3.memory = 5;
 
     ALMSolver<PANOCSolver<>> solver1{almparams, {panocparams, lbfgsparams}};
     ALMSolver<SecondOrderPANOCSolver> solver2{almparams, panocparams2};

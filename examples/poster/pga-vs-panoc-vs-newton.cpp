@@ -139,10 +139,10 @@ int main(int argc, char *argv[]) {
     panocparams2.max_iter                       = 1000;
     panocparams2.update_lipschitz_in_linesearch = true;
     panocparams2.alternative_linesearch_cond    = false;
-    panocparams2.lbfgs_mem                      = lbfgs_mem;
     panocparams2.print_interval                 = 1;
     panocparams2.lbfgs_stepsize = LBFGSStepSize::BasedOnGradientStepSize;
     pa::LBFGSParams lbfgsparams2;
+    lbfgsparams2.memory = lbfgs_mem;
 
     PGASolver solver0{pgaparams0};
     PANOCSolver<> solver1{panocparams1, lbfgsparams};
