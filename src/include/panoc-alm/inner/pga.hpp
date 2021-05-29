@@ -79,12 +79,12 @@ class PGASolver {
     };
 
     Stats operator()(const Problem &problem,        // in
-                     const vec &Σ,                  // in
+                     crvec Σ,                       // in
                      real_t ε,                      // in
                      bool always_overwrite_results, // in
-                     vec &x,                        // inout
-                     vec &λ,                        // inout
-                     vec &err_z);                   // out
+                     rvec x,                        // inout
+                     rvec λ,                        // inout
+                     rvec err_z);                   // out
 
     PGASolver &
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
@@ -109,12 +109,12 @@ using std::chrono::microseconds;
 
 inline PGASolver::Stats
 PGASolver::operator()(const Problem &problem,        // in
-                      const vec &Σ,                  // in
+                      crvec Σ,                       // in
                       real_t ε,                      // in
                       bool always_overwrite_results, // in
-                      vec &x,                        // inout
-                      vec &y,                        // inout
-                      vec &err_z                     // out
+                      rvec x,                        // inout
+                      rvec y,                        // inout
+                      rvec err_z                     // out
 ) {
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
@@ -138,32 +138,30 @@ PGASolver::operator()(const Problem &problem,        // in
     auto calc_ψ_ŷ = [&problem, &y, &Σ](const vec &x, vec &ŷ) {
         return detail::calc_ψ_ŷ(problem, x, y, Σ, ŷ);
     };
-    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](const vec &x,
-                                                              vec &grad_ψ) {
+    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
+                                                              rvec grad_ψ) {
         return detail::calc_ψ_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
     };
-    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](const vec &x, const vec &ŷ,
-                                                  vec &grad_ψ) {
+    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](crvec x, crvec ŷ,
+                                                  rvec grad_ψ) {
         detail::calc_grad_ψ_from_ŷ(problem, x, ŷ, grad_ψ, work_n);
     };
-    auto calc_x̂ = [&problem](real_t γ, const vec &x, const vec &grad_ψ, vec &x̂,
-                             vec &p) {
+    auto calc_x̂ = [&problem](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
         detail::calc_x̂(problem, γ, x, grad_ψ, x̂, p);
     };
-    auto calc_err_z = [&problem, &y, &Σ](const vec &x̂, vec &err_z) {
+    auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
         detail::calc_err_z(problem, x̂, y, Σ, err_z);
     };
     auto descent_lemma = [this, &problem, &y,
-                          &Σ](const vec &xₖ, real_t ψₖ, const vec &grad_ψₖ,
-                              vec &x̂ₖ, vec &pₖ, vec &ŷx̂ₖ, real_t &ψx̂ₖ,
-                              real_t &pₖᵀpₖ, real_t &grad_ψₖᵀpₖ, real_t &Lₖ,
-                              real_t &γₖ) {
+                          &Σ](crvec xₖ, real_t ψₖ, crvec grad_ψₖ, rvec x̂ₖ,
+                              rvec pₖ, rvec ŷx̂ₖ, real_t &ψx̂ₖ, real_t &pₖᵀpₖ,
+                              real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
         return detail::descent_lemma(
             problem, params.quadratic_upperbound_tolerance_factor, params.γ_min,
             xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
-    auto print_progress = [&](unsigned k, real_t ψₖ, const vec &grad_ψₖ,
-                              const vec &pₖ, real_t γₖ, real_t εₖ) {
+    auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
+                              crvec pₖ, real_t γₖ, real_t εₖ) {
         std::cout << "[PGA]   " << std::setw(6) << k
                   << ": ψ = " << std::setw(13) << ψₖ
                   << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()

@@ -31,12 +31,20 @@ struct GuardedAAPGAParams {
     unsigned max_iter = 100;
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
+    /// Minimum step size.
+    real_t γ_min = 1e-30;
     /// What stopping criterion to use.
     PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
 
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
     unsigned print_interval = 0;
+
+    real_t quadratic_upperbound_tolerance_factor =
+        10 * std::numeric_limits<real_t>::epsilon();
+
+    /// Maximum number of iterations without any progress before giving up.
+    unsigned max_no_progress = 10;
 
     bool full_flush_on_γ_change = true;
 };
@@ -141,6 +149,14 @@ GuardedAAPGA::operator()(const Problem &problem,        // in
     auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
         detail::calc_err_z(problem, x̂, y, Σ, err_z);
     };
+    auto descent_lemma = [this, &problem, &y,
+                          &Σ](crvec xₖ, real_t ψₖ, crvec grad_ψₖ, rvec x̂ₖ,
+                              rvec pₖ, rvec ŷx̂ₖ, real_t &ψx̂ₖ, real_t &pₖᵀpₖ,
+                              real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
+        return detail::descent_lemma(
+            problem, params.quadratic_upperbound_tolerance_factor, params.γ_min,
+            xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
+    };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ, crvec pₖ,
                               real_t γₖ, real_t εₖ) {
         std::cout << "[AAPGA] " << std::setw(6) << k
@@ -206,23 +222,10 @@ GuardedAAPGA::operator()(const Problem &problem,        // in
         real_t ψx̂ₖ = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷₖ);
         // Calculate ∇ψ(xₖ)ᵀpₖ and ‖pₖ‖²
         real_t grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
-        real_t norm_sq_pₖ = pₖ.squaredNorm();
-        real_t margin     = 0; // 1e-6 * std::abs(ψₖ₊₁); // TODO: Why?
+        real_t pₖᵀpₖ      = pₖ.squaredNorm();
 
-        real_t old_γₖ = γₖ;
-        // Decrease step size until quadratic upper bound is satisfied
-        while (ψx̂ₖ > ψₖ + margin + grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ) {
-            Lₖ *= 2;
-            γₖ /= 2;
-
-            // Projected gradient step: x̂ₖ and pₖ (with new step size)
-            calc_x̂(γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
-            // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
-            ψx̂ₖ = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷₖ);
-            // Calculate ∇ψ(xₖ)ᵀpₖ and ‖pₖ‖²
-            grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
-            norm_sq_pₖ = pₖ.squaredNorm();
-        }
+        real_t old_γₖ = descent_lemma(xₖ, ψₖ, grad_ψₖ, x̂ₖ, pₖ, ŷₖ, ψx̂ₖ, pₖᵀpₖ,
+                                      grad_ψₖᵀpₖ, Lₖ, γₖ);
 
         // Flush or update Anderson buffers if step size changed
         if (γₖ != old_γₖ) {
@@ -255,34 +258,25 @@ GuardedAAPGA::operator()(const Problem &problem,        // in
         if (params.print_interval != 0 && k % params.print_interval == 0)
             print_progress(k, ψₖ, grad_ψₖ, pₖ, γₖ, εₖ);
 
-        auto time_elapsed    = std::chrono::steady_clock::now() - start_time;
-        bool out_of_time     = time_elapsed > params.max_time;
-        bool out_of_iter     = k == params.max_iter;
-        bool interrupted     = stop_signal.stop_requested();
-        bool not_finite      = not std::isfinite(εₖ);
-        bool conv            = εₖ <= ε;
-        bool max_no_progress = no_progress > params.limitedqr_mem;
-        bool exit = conv || out_of_iter || out_of_time || not_finite ||
-                    interrupted || max_no_progress;
-        if (exit) {
+        auto time_elapsed = std::chrono::steady_clock::now() - start_time;
+        auto stop_status  = detail::check_all_stop_conditions(
+            params, time_elapsed, k, stop_signal, ε, εₖ, no_progress);
+        if (stop_status != SolverStatus::Unknown) {
             // TODO: We could cache g(x) and ẑ, but would that faster?
             //       It saves 1 evaluation of g per ALM iteration, but requires
-            //       many extra stores in the inner loops.
+            //       many extra stores in the inner loops of PANOC.
             // TODO: move the computation of ẑ and g(x) to ALM?
-            if (conv || interrupted || always_overwrite_results) {
+            if (stop_status == SolverStatus::Converged ||
+                stop_status == SolverStatus::Interrupted ||
+                always_overwrite_results) {
                 calc_err_z(x̂ₖ, /* in ⟹ out */ err_z);
                 x = std::move(x̂ₖ);
                 y = std::move(ŷₖ);
             }
-            s.iterations   = k; // TODO: what do we count as an iteration?
+            s.iterations   = k;
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<microseconds>(time_elapsed);
-            s.status       = conv              ? SolverStatus::Converged
-                             : out_of_time     ? SolverStatus::MaxTime
-                             : out_of_iter     ? SolverStatus::MaxIter
-                             : not_finite      ? SolverStatus::NotFinite
-                             : max_no_progress ? SolverStatus::NoProgress
-                                               : SolverStatus::Interrupted;
+            s.status       = stop_status;
             return s;
         }
 
