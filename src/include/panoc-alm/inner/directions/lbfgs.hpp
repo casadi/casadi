@@ -13,9 +13,9 @@ inline bool LBFGS::update_valid(LBFGSParams params, real_t yᵀs, real_t sᵀs,
     // Check if this L-BFGS update is accepted
     if (not std::isfinite(yᵀs))
         return false;
-    if (sᵀs < min_divisor)
-        return false;
     if (yᵀs < min_divisor)
+        return false;
+    if (sᵀs < min_divisor)
         return false;
 
     // CBFGS condition: https://epubs.siam.org/doi/10.1137/S1052623499354242
@@ -37,7 +37,7 @@ inline bool LBFGS::update(const vec &xₖ, const vec &xₖ₊₁, const vec &p�
     real_t ρ     = 1 / yᵀs;
     if (not forced) {
         real_t sᵀs = s.squaredNorm();
-        real_t pᵀp = pₖ₊₁.squaredNorm();
+        real_t pᵀp = params.cbfgs.ϵ > 0 ? pₖ₊₁.squaredNorm() : 0;
         if (not update_valid(params, yᵀs, sᵀs, pᵀp))
             return false;
     }

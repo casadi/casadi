@@ -3,6 +3,7 @@
  * This file defines all Python bindings.
  */
 
+#include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
 #include <panoc-alm/inner/directions/lbfgs.hpp>
 #include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
@@ -203,6 +204,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("max_iter", &pa::PANOCParams::max_iter)
         .def_readwrite("max_time", &pa::PANOCParams::max_time)
         .def_readwrite("τ_min", &pa::PANOCParams::τ_min)
+        .def_readwrite("γ_min", &pa::PANOCParams::γ_min)
         .def_readwrite("max_no_progress", &pa::PANOCParams::max_no_progress)
         .def_readwrite("print_interval", &pa::PANOCParams::print_interval)
         .def_readwrite("quadratic_upperbound_tolerance_factor",
@@ -257,6 +259,13 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                             py::scoped_estream_redirect>())
         .def("__str__", &pa::PolymorphicPANOCSolver::get_name);
 
+    py::enum_<pa::PANOCStopCrit>(m, "PANOCStopCrit")
+        .value("ApproxKKT", pa::PANOCStopCrit::ApproxKKT)
+        .value("ProjGradNorm", pa::PANOCStopCrit::ProjGradNorm)
+        .value("ProjGradUnitNorm", pa::PANOCStopCrit::ProjGradUnitNorm)
+        .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
+        .export_values();
+
     py::class_<pa::SecondOrderPANOCLBFGSParams>(m,
                                                 "SecondOrderPANOCLBFGSParams")
         .def(py::init(&kwargs_to_struct<pa::SecondOrderPANOCLBFGSParams>));
@@ -288,7 +297,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("ρ_increase", &pa::ALMParams::ρ_increase)
         .def_readwrite("θ", &pa::ALMParams::θ)
         .def_readwrite("M", &pa::ALMParams::M)
-        .def_readwrite("Σ_max", &pa::ALMParams::Σₘₐₓ)
+        .def_readwrite("Σ_max", &pa::ALMParams::Σ_max)
+        .def_readwrite("Σ_min", &pa::ALMParams::Σ_min)
         .def_readwrite("max_iter", &pa::ALMParams::max_iter)
         .def_readwrite("max_time", &pa::ALMParams::max_time)
         .def_readwrite("max_num_initial_retries",
@@ -297,7 +307,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("max_total_num_retries",
                        &pa::ALMParams::max_total_num_retries)
         .def_readwrite("print_interval", &pa::ALMParams::print_interval)
-        .def_readwrite("preconditioning", &pa::ALMParams::preconditioning);
+        .def_readwrite("preconditioning", &pa::ALMParams::preconditioning)
+        .def_readwrite("single_penalty_factor",
+                       &pa::ALMParams::single_penalty_factor);
 
     py::class_<pa::PolymorphicALMSolver>(m, "ALMSolver")
         .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPANOCSolver>()))

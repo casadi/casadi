@@ -2,6 +2,7 @@
 
 #include <panoc-alm/inner/decl/lbfgs-stepsize.hpp>
 #include <panoc-alm/inner/decl/panoc-fwd.hpp>
+#include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>
 #include <panoc-alm/util/atomic_stop_signal.hpp>
 #include <panoc-alm/util/problem.hpp>
@@ -28,14 +29,19 @@ struct SecondOrderPANOCLBFGSParams {
     } Lipschitz; ///< Parameters related to the Lipschitz constant estimate
                  ///  and step size.
 
-    /// Length of the history to keep in the L-BFGS algorithm.
-    unsigned lbfgs_mem = 10; // TODO: move to LBFGS params
     /// Maximum number of inner PANOC iterations.
     unsigned max_iter = 100;
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step.
     real_t τ_min = 1. / 256;
+    /// Minimum step size.
+    real_t γ_min = 1e-30;
+    /// Factor used in update for exponentially weighted nonmonotone line search.
+    /// Zero means monotone line search.
+    real_t nonmonotone_linesearch = 0;
+    /// What stopping criterion to use.
+    PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
     /// Maximum number of iterations without any progress before giving up.
     unsigned max_no_progress = 10;
 

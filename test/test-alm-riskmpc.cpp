@@ -15,16 +15,17 @@ TEST(ALM, riskaverse) {
     ALMParams almparam;
     almparam.ε        = 1e-8;
     almparam.δ        = 1e-8;
-    almparam.Δ        = 20; ///< Factor used in updating the penalty parameters
-    almparam.Σ₀       = 0;  ///< Initial penalty parameter
-    almparam.σ₀       = 1e-2; ///< Initial penalty parameter factor
+    almparam.Δ        = 20;  ///< Factor used in updating the penalty parameters
+    almparam.Σ₀       = 0;   ///< Initial penalty parameter
+    almparam.σ₀       = 1e3; ///< Initial penalty parameter factor
     almparam.ε₀       = 1e-1; ///< Initial tolerance on x
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.Σₘₐₓ     = 1e9;
+    almparam.Σ_max    = 1e9;
     almparam.max_iter = 100;
     almparam.preconditioning = false;
+    // almparam.single_penalty_factor = true;
 
     PANOCParams panocparam;
     panocparam.max_iter                       = 1000;

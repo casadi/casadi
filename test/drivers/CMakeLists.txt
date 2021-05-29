@@ -22,7 +22,7 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     configure_file(include/drivers/CUTEstProblemList.h.in
                    include/drivers/CUTEstProblemList.h @ONLY)
 
-    set(TESTNAME "panoc-aa-boxnqp")
+    set(TESTNAME "panoc-29-5")
     set(TESTRESULT_DIR ${CMAKE_BINARY_DIR}/testresults/${TESTNAME}/CUTEst)
     file(MAKE_DIRECTORY ${TESTRESULT_DIR})
     foreach(P ${CUTEst_PROBLEM_LIST})
@@ -30,7 +30,7 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
     endforeach()
 
     add_executable(cutest-driver src/driver.cpp)
-    target_compile_definitions(cutest-driver PRIVATE "SOLVER=SOLVER_PANOC_ANDERSON")
+    target_compile_definitions(cutest-driver PRIVATE "SOLVER=SOLVER_PANOC_LBFGS")
     target_link_libraries(cutest-driver PRIVATE yaml-encoder)
 
     foreach(P ${CUTEst_PROBLEM_LIST})
@@ -51,7 +51,7 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
                       DEPENDS ${TESTRESULT_DIR}/parameters.yaml)
     list(APPEND CUTEst_PROBLEMS_RESULT_TARGETS 
                 cutest-result-${TESTNAME}-parameters)
-    message(STATUS cutest-result-${TESTNAME}-parameters)
+    message(STATUS cutest-results-${TESTNAME}-export)
     add_custom_target(cutest-results-${TESTNAME}
                       DEPENDS ${CUTEst_PROBLEMS_RESULT_TARGETS})
     cmake_host_system_information(RESULT HOSTNAME QUERY HOSTNAME)

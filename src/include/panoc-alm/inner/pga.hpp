@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstddef>
+#include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
 #include <panoc-alm/util/atomic_stop_signal.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
@@ -30,6 +30,10 @@ struct PGAParams {
     unsigned max_iter = 100;
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
+    /// Minimum step size.
+    real_t γ_min = 1e-30;
+    /// What stop criterion to use.
+    PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
 
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
@@ -155,8 +159,8 @@ PGASolver::operator()(const Problem &problem,        // in
                               real_t &pₖᵀpₖ, real_t &grad_ψₖᵀpₖ, real_t &Lₖ,
                               real_t &γₖ) {
         return detail::descent_lemma(
-            problem, params.quadratic_upperbound_tolerance_factor, xₖ, ψₖ,
-            grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
+            problem, params.quadratic_upperbound_tolerance_factor, params.γ_min,
+            xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, const vec &grad_ψₖ,
                               const vec &pₖ, real_t γₖ, real_t εₖ) {
@@ -218,7 +222,8 @@ PGASolver::operator()(const Problem &problem,        // in
 
         // Check stop condition ------------------------------------------------
 
-        real_t εₖ = detail::calc_error_stop_crit(pₖ, γₖ, grad_ψx̂ₖ, grad_ψₖ);
+        real_t εₖ = detail::calc_error_stop_crit(params.stop_crit, pₖ, γₖ, xₖ,
+                                                 grad_ψx̂ₖ, grad_ψₖ, problem.C);
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)

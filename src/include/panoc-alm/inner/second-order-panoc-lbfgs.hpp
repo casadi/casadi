@@ -95,8 +95,8 @@ SecondOrderPANOCLBFGSSolver::operator()(
                               rvec pₖ, rvec ŷx̂ₖ, real_t &ψx̂ₖ, real_t &pₖᵀpₖ,
                               real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
         return detail::descent_lemma(
-            problem, params.quadratic_upperbound_tolerance_factor, xₖ, ψₖ,
-            grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
+            problem, params.quadratic_upperbound_tolerance_factor, params.γ_min,
+            xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
                               real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
@@ -139,7 +139,8 @@ SecondOrderPANOCLBFGSSolver::operator()(
     real_t grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
     real_t pₖᵀpₖ      = pₖ.squaredNorm();
     // Compute forward-backward envelope
-    real_t φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
+    real_t φₖ   = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
+    real_t nmΦₖ = φₖ;
 
     // Main PANOC loop
     // =========================================================================
@@ -159,7 +160,8 @@ SecondOrderPANOCLBFGSSolver::operator()(
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
 
         // Check stop condition ------------------------------------------------
-        real_t εₖ = detail::calc_error_stop_crit(pₖ, γₖ, grad_̂ψₖ, grad_ψₖ);
+        real_t εₖ = detail::calc_error_stop_crit(params.stop_crit, pₖ, γₖ, xₖ,
+                                                 grad_̂ψₖ, grad_ψₖ, problem.C);
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
@@ -269,9 +271,11 @@ SecondOrderPANOCLBFGSSolver::operator()(
         real_t φₖ₊₁, ψₖ₊₁, ψx̂ₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, pₖ₊₁ᵀpₖ₊₁;
         real_t Lₖ₊₁, γₖ₊₁;
         real_t ls_cond;
+        real_t w = params.nonmonotone_linesearch;
+        nmΦₖ     = k == 0 ? φₖ : w * nmΦₖ + (1 - w) * φₖ;
         // TODO: make separate parameter
         real_t margin =
-            (1 + std::abs(φₖ)) * params.quadratic_upperbound_tolerance_factor;
+            (1 + std::abs(nmΦₖ)) * params.quadratic_upperbound_tolerance_factor;
 
         // Make sure quasi-Newton step is valid
         if (k == 0) {
@@ -323,7 +327,7 @@ SecondOrderPANOCLBFGSSolver::operator()(
             // Compute forward-backward envelope
             φₖ₊₁ = ψₖ₊₁ + 1 / (2 * γₖ₊₁) * pₖ₊₁ᵀpₖ₊₁ + grad_ψₖ₊₁ᵀpₖ₊₁;
             // Compute line search condition
-            ls_cond = φₖ₊₁ - (φₖ - σₖγₖ⁻¹pₖᵀpₖ);
+            ls_cond = φₖ₊₁ - (nmΦₖ - σₖγₖ⁻¹pₖᵀpₖ);
             if (params.alternative_linesearch_cond)
                 ls_cond -= (0.5 / γₖ₊₁ - 0.5 / γₖ) * pₖ₊₁ᵀpₖ₊₁_ₖ;
 

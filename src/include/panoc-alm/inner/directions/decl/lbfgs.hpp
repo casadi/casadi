@@ -14,7 +14,7 @@ struct LBFGSParams {
     unsigned memory = 10;
     struct {
         real_t α = 1;
-        real_t ϵ = 1e-10;
+        real_t ϵ = 0;
     }
     /// Parameters in the cautious BFGS update condition
     /// @f[ \frac{y^\top s}{s^\top s} \ge \epsilon \| g \|^\alpha @f]

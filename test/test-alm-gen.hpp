@@ -76,13 +76,12 @@ inline void do_test(const pa::Problem &p, const pa::vec &expected_sol,
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.Σₘₐₓ     = 1e9;
+    almparam.Σ_max    = 1e9;
     almparam.max_iter = 100;
 
     PANOCParams panocparam;
     panocparam.Lipschitz.ε = 1e-6;
     panocparam.Lipschitz.δ = 1e-12;
-    panocparam.lbfgs_mem   = 20;
     panocparam.max_iter    = 10000;
 
     LBFGSParams lbfgsparam;
@@ -105,7 +104,7 @@ inline void do_test(const pa::Problem &p, const pa::vec &expected_sol,
         x.fill(0);
         y.fill(0);
         stats = solver(p, y, x);
-        it += stats.inner_iterations;
+        it += stats.inner.iterations;
     }
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -115,7 +114,7 @@ inline void do_test(const pa::Problem &p, const pa::vec &expected_sol,
     auto gx = vec(p.m);
     p.g(x, gx);
     std::cout << "g(x) = " << gx.transpose() << std::endl;
-    std::cout << "Inner: " << stats.inner_iterations
+    std::cout << "Inner: " << stats.inner.iterations
               << ", Outer: " << stats.outer_iterations << std::endl;
 
     std::cout << "Total iterations: " << it << std::endl;

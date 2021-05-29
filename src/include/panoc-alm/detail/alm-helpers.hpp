@@ -24,18 +24,28 @@ inline void project_y(rvec y,     // inout
 
 inline void update_penalty_weights(const ALMParams &params, real_t Δ,
                                    bool first_iter, rvec e, rvec old_e,
-                                   real_t norm_e, crvec Σ_old, rvec Σ) {
+                                   real_t norm_e, real_t old_norm_e,
+                                   crvec Σ_old, rvec Σ) {
     if (norm_e <= params.δ) {
         Σ = Σ_old;
         return;
     }
-    for (Eigen::Index i = 0; i < e.rows(); ++i) {
-        if (first_iter || std::abs(e(i)) > params.θ * std::abs(old_e(i))) {
-            Σ(i) =
-                std::fmin(params.Σₘₐₓ,
-                          std::fmax(Δ * std::abs(e(i)) / norm_e, 1) * Σ_old(i));
+    if (params.single_penalty_factor) {
+        if (first_iter || norm_e > params.θ * old_norm_e) {
+            real_t new_Σ = std::fmin(params.Σ_max, Δ * Σ_old(0));
+            Σ.setConstant(new_Σ);
         } else {
-            Σ(i) = Σ_old(i);
+            Σ = Σ_old;
+        }
+    } else {
+        for (Eigen::Index i = 0; i < e.rows(); ++i) {
+            if (first_iter || std::abs(e(i)) > params.θ * std::abs(old_e(i))) {
+                Σ(i) = std::fmin(params.Σ_max,
+                                 std::fmax(Δ * std::abs(e(i)) / norm_e, 1) *
+                                     Σ_old(i));
+            } else {
+                Σ(i) = Σ_old(i);
+            }
         }
     }
 }
@@ -46,8 +56,10 @@ inline void initialize_penalty(const Problem &p, const ALMParams &params,
     vec g0(p.m);
     p.g(x0, g0);
     // TODO: reuse evaluations of f ang g in PANOC?
-    real_t σ = params.σ₀ * std::abs(f0) / g0.squaredNorm();
-    σ        = std::max(σ, params.σ₀);
+    real_t σ = params.σ₀ * std::max(real_t(1), std::abs(f0)) /
+               std::max(real_t(1), 0.5 * g0.squaredNorm());
+    σ = std::max(σ, params.Σ_min);
+    σ = std::min(σ, params.Σ_max);
     Σ.fill(σ);
 }
 

@@ -21,6 +21,7 @@ setup(
     license="TBD",
     packages=find_packages(where = 'src'),
     package_dir={"": "src"},
+    cmake_args=["-DCMAKE_CXX_FLAGS=-march=native"],
     cmake_install_dir="src/panocpy",
     include_package_data = False,
 )

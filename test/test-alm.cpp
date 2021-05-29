@@ -48,7 +48,7 @@ TEST(ALM, singleshooting1D) {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.Σₘₐₓ     = 1e9;
+    almparam.Σ_max    = 1e9;
     almparam.max_iter = 10;
 
     PANOCParams panocparam;
@@ -127,7 +127,7 @@ TEST(ALM, multipleshooting1D) {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.Σₘₐₓ     = 1e9;
+    almparam.Σ_max    = 1e9;
     almparam.max_iter = 10;
 
     PANOCParams panocparam;
@@ -222,7 +222,7 @@ TEST(ALM, multipleshooting8D) {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.Σₘₐₓ     = 1e9;
+    almparam.Σ_max    = 1e9;
     almparam.max_iter = 20;
 
     PANOCParams panocparam;

@@ -23,7 +23,7 @@ int main() {
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
-    almparam.Σₘₐₓ     = 1e9;
+    almparam.Σ_max    = 1e9;
     almparam.max_iter = 20;
 
     pa::PANOCParams panocparam;

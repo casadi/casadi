@@ -45,7 +45,9 @@ struct ALMParams {
     /// Lagrange multiplier bound.
     real_t M = 1e9;
     /// Maximum penalty factor.
-    real_t Σₘₐₓ = 1e9;
+    real_t Σ_max = 1e9;
+    /// Minimum penalty factor (used during initialization).
+    real_t Σ_min = 1e-9;
     /// Maximum number of outer ALM iterations.
     unsigned int max_iter = 100;
     /// Maximum duration.
@@ -69,6 +71,8 @@ struct ALMParams {
     /// Apply preconditioning to the problem, based on the gradients in the
     /// starting point.
     bool preconditioning = true;
+    /// Use one penalty factor for all m constraints.
+    bool single_penalty_factor = false;
 };
 
 /// Augmented Lagrangian Method solver

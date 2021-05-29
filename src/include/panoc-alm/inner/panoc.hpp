@@ -93,8 +93,8 @@ PANOCSolver<DirectionProviderT>::operator()(
                               rvec pₖ, rvec ŷx̂ₖ, real_t &ψx̂ₖ, real_t &pₖᵀpₖ,
                               real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
         return detail::descent_lemma(
-            problem, params.quadratic_upperbound_tolerance_factor, xₖ, ψₖ,
-            grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
+            problem, params.quadratic_upperbound_tolerance_factor, params.γ_min,
+            xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
                               real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
@@ -161,7 +161,8 @@ PANOCSolver<DirectionProviderT>::operator()(
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
 
         // Check stop condition ------------------------------------------------
-        real_t εₖ = detail::calc_error_stop_crit(pₖ, γₖ, grad_̂ψₖ, grad_ψₖ);
+        real_t εₖ = detail::calc_error_stop_crit(params.stop_crit, pₖ, γₖ, xₖ,
+                                                 grad_̂ψₖ, grad_ψₖ, problem.C);
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)

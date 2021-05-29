@@ -1,3 +1,4 @@
+#include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
 #include <panoc-alm/inner/decl/second-order-panoc.hpp>
@@ -76,6 +77,10 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::SolverStatus s) {
     return out << enum_name(s);
 }
 
+inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::PANOCStopCrit p) {
+    return out << enum_name(p);
+}
+
 inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::LBFGSParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "memory" << YAML::Value << p.memory;
@@ -100,6 +105,8 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PANOCParams &p) {
     out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
     out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
     out << YAML::Key << "τ_min" << YAML::Value << p.τ_min;
+    out << YAML::Key << "γ_min" << YAML::Value << p.γ_min;
+    out << YAML::Key << "stop_crit" << YAML::Value << p.stop_crit;
     out << YAML::Key << "update_lipschitz_in_linesearch" << YAML::Value
         << p.update_lipschitz_in_linesearch;
     out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
@@ -123,7 +130,8 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::ALMParams &p) {
     out << YAML::Key << "ρ_increase" << YAML::Value << p.ρ_increase;
     out << YAML::Key << "θ" << YAML::Value << p.θ;
     out << YAML::Key << "M" << YAML::Value << p.M;
-    out << YAML::Key << "Σₘₐₓ" << YAML::Value << p.Σₘₐₓ;
+    out << YAML::Key << "Σ_max" << YAML::Value << p.Σ_max;
+    out << YAML::Key << "Σ_min" << YAML::Value << p.Σ_min;
     out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
     out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
     out << YAML::Key << "max_num_initial_retries" << YAML::Value
@@ -133,6 +141,8 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::ALMParams &p) {
         << p.max_total_num_retries;
     out << YAML::Key << "print_interval" << YAML::Value << p.print_interval;
     out << YAML::Key << "preconditioning" << YAML::Value << p.preconditioning;
+    out << YAML::Key << "single_penalty_factor" << YAML::Value
+        << p.single_penalty_factor;
     out << YAML::EndMap;
     return out;
 }

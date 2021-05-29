@@ -1,8 +1,11 @@
 #pragma once
 
+#include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
 #include <panoc-alm/util/atomic_stop_signal.hpp>
 #include <panoc-alm/util/problem.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
+
+#include <stdexcept>
 
 namespace pa::detail {
 
@@ -142,16 +145,34 @@ inline void calc_x̂(const Problem &prob, ///< [in]  Problem description
 /// @f[ \left\| \gamma_k^{-1} (x^k - \hat x^k) + \nabla \psi(\hat x^k) -
 /// \nabla \psi(x^k) \right\|_\infty @f]
 inline real_t calc_error_stop_crit(
+    PANOCStopCrit crit, ///< [in]  What stoppint criterion to use
     crvec pₖ,      ///< [in]  Projected gradient step @f$ \hat x^k - x^k @f$
     real_t γ,      ///< [in]  Step size
+    crvec xₖ,      ///< [in]  Current iterate
     crvec grad_̂ψₖ, ///< [in]  Gradient in @f$ \hat x^k @f$
-    crvec grad_ψₖ  ///< [in]  Gradient in @f$ x^k @f$
+    crvec grad_ψₖ, ///< [in]  Gradient in @f$ x^k @f$
+    const Box &C   ///< [in]  Feasible set @f$ C @f$
 ) {
-    auto err = (1 / γ) * pₖ + (grad_ψₖ - grad_̂ψₖ);
-    // These parentheses     ^^^               ^^^
-    // are important to prevent catastrophic cancellation when the step is small
-    auto ε = vec_util::norm_inf(err);
-    return ε;
+    switch (crit) {
+        case PANOCStopCrit::ApproxKKT: {
+            auto err = (1 / γ) * pₖ + (grad_ψₖ - grad_̂ψₖ);
+            // These parentheses     ^^^               ^^^     are important to
+            // prevent catastrophic cancellation when the step is small
+            auto ε = vec_util::norm_inf(err);
+            return ε;
+        }
+        case PANOCStopCrit::ProjGradUnitNorm: {
+            return vec_util::norm_inf(
+                projected_gradient_step(C, 1, xₖ, grad_ψₖ));
+        }
+        case PANOCStopCrit::ProjGradNorm: {
+            return vec_util::norm_inf(pₖ);
+        }
+        case PANOCStopCrit::FPRNorm: {
+            return vec_util::norm_inf(pₖ) / γ;
+        }
+    }
+    throw std::out_of_range("Invalid PANOCStopCrit");
 }
 
 /// Increase the estimate of the Lipschitz constant of the objective gradient
@@ -175,6 +196,9 @@ inline real_t descent_lemma(
     ///         which is mathematically impossible but could occur in finite
     ///         precision floating point arithmetic.
     real_t rounding_tolerance,
+    /// [in]    Minimum allowed step size (prevents infinite loop if function or
+    ///         are discontinuous)
+    real_t γ_min,
     /// [in]    Current iterate @f$ x^k @f$
     crvec xₖ,
     /// [in]    Objective function @f$ \psi(x^k) @f$
@@ -205,6 +229,9 @@ inline real_t descent_lemma(
     real_t old_γₖ = γₖ;
     real_t margin = (1 + std::abs(ψₖ)) * rounding_tolerance;
     while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ + margin) {
+        if (not(γₖ >= γ_min))
+            break;
+
         Lₖ *= 2;
         γₖ /= 2;
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "panoc-alm/util/solverstatus.hpp"
-#include "panoc-alm/util/vec.hpp"
+#include <panoc-alm/detail/alm-helpers.hpp>
+#include <panoc-alm/util/solverstatus.hpp>
+
 #include <iomanip>
 #include <iostream>
-#include <panoc-alm/detail/alm-helpers.hpp>
 
 namespace pa {
 
@@ -128,8 +128,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &problem, rvec y, rvec x) {
                 // Recompute penalty with smaller Δ
                 Δ = std::fmax(1., Δ * params.Δ_lower);
                 detail::update_penalty_weights(params, Δ, first_successful_iter,
-                                               error₁, error₂, norm_e₂, Σ_old,
-                                               Σ);
+                                               error₁, error₂, norm_e₁, norm_e₂,
+                                               Σ_old, Σ);
                 // Recompute the primal tolerance with larger ρ
                 ρ = std::fmin(0.5, ρ * params.ρ_increase); // keep ρ <= 0.5
                 ε = std::fmax(ρ * ε_old, params.ε);
@@ -174,7 +174,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &problem, rvec y, rvec x) {
             Σ_old.swap(Σ);
             // Update Σ to contain the penalty to use on the next iteration.
             detail::update_penalty_weights(params, Δ, first_successful_iter,
-                                           error₁, error₂, norm_e₁, Σ_old, Σ);
+                                           error₁, error₂, norm_e₁, norm_e₂,
+                                           Σ_old, Σ);
             // Lower the primal tolerance for the inner solver.
             ε_old = std::exchange(ε, std::fmax(ρ * ε, params.ε));
             first_successful_iter = false;

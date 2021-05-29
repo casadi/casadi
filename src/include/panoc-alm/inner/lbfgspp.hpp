@@ -41,18 +41,18 @@ class LBFGSSolver {
     LBFGSSolver(Params params) : params(params) {}
 
     Stats operator()(const Problem &problem,        // in
-                     const vec &Σ,                  // in
+                     crvec Σ,                       // in
                      real_t ε,                      // in
                      bool always_overwrite_results, // in
-                     vec &x,                        // inout
-                     vec &y,                        // inout
-                     vec &err_z                     // out
+                     rvec x,                        // inout
+                     rvec y,                        // inout
+                     rvec err_z                     // out
     ) {
         Stats s;
         auto start_time = std::chrono::steady_clock::now();
         work_n.resize(problem.n);
         work_m.resize(problem.m);
-        auto calc_ψ_grad_ψ = [&](const vec &x, vec &grad) {
+        auto calc_ψ_grad_ψ = [&](crvec x, rvec grad) {
             return detail::calc_ψ_grad_ψ(problem, x, y, Σ, // in
                                          grad,             // out
                                          work_n, work_m);  // work
@@ -118,18 +118,18 @@ class LBFGSBSolver {
     LBFGSBSolver(Params params) : params(params) {}
 
     Stats operator()(const Problem &problem,        // in
-                     const vec &Σ,                  // in
+                     crvec Σ,                       // in
                      real_t ε,                      // in
                      bool always_overwrite_results, // in
-                     vec &x,                        // inout
-                     vec &y,                        // inout
-                     vec &err_z                     // out
+                     rvec x,                        // inout
+                     rvec y,                        // inout
+                     rvec err_z                     // out
     ) {
         Stats s;
         auto start_time = std::chrono::steady_clock::now();
         work_n.resize(problem.n);
         work_m.resize(problem.m);
-        auto calc_ψ_grad_ψ = [&](const vec &x, vec &grad) {
+        auto calc_ψ_grad_ψ = [&](crvec x, rvec grad) {
             return detail::calc_ψ_grad_ψ(problem, x, y, Σ, // in
                                          grad,             // out
                                          work_n, work_m);  // work
@@ -185,7 +185,7 @@ struct InnerStatsAccumulator;
 template <template <class> class LineSearchT>
 struct InnerStatsAccumulator<LBFGSBSolver<LineSearchT>> {
     std::chrono::microseconds elapsed_time;
-    unsigned iterations          = 0;
+    unsigned iterations = 0;
 };
 
 template <template <class> class LineSearchT>

@@ -91,10 +91,14 @@ auto get_inner_solver() {
     pa::PANOCParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
-    panocparams.lbfgs_mem                      = 20;
-    panocparams.lbfgs_stepsize                 = panocparams.BasedOnCurvature;
+    panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
+    panocparams.stop_crit      = pa::PANOCStopCrit::ProjGradUnitNorm;
+    panocparams.max_time       = 30s;
 
     pa::LBFGSParams lbfgsparams;
+    lbfgsparams.memory = 20;
+    // lbfgsparams.cbfgs.ϵ = 0;
+
     return Solver::InnerSolver(panocparams, lbfgsparams);
 }
 auto get_problem(const pa::Problem &p) { return p; }
@@ -121,6 +125,8 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
     out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
     out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
     out << YAML::Key << "τ_min" << YAML::Value << p.τ_min;
+    out << YAML::Key << "γ_min" << YAML::Value << p.γ_min;
+    out << YAML::Key << "stop_crit" << YAML::Value << p.stop_crit;
     out << YAML::Key << "update_lipschitz_in_linesearch" << YAML::Value
         << p.update_lipschitz_in_linesearch;
     out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
@@ -133,9 +139,14 @@ auto get_inner_solver() {
     pa::SecondOrderPANOCLBFGSParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
-    panocparams.lbfgs_mem                      = 20;
-    panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
+    panocparams.lbfgs_stepsize         = pa::LBFGSStepSize::BasedOnCurvature;
+    panocparams.stop_crit              = pa::PANOCStopCrit::ProjGradUnitNorm;
+    panocparams.nonmonotone_linesearch = 0;
+    panocparams.max_time               = 30s;
+    // panocparams.print_interval         = 1;
+
     pa::LBFGSParams lbfgsparams;
+    lbfgsparams.memory = 20;
 
     return Solver::InnerSolver(panocparams, lbfgsparams);
 }
@@ -152,6 +163,10 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
     out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
     out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
     out << YAML::Key << "τ_min" << YAML::Value << p.τ_min;
+    out << YAML::Key << "γ_min" << YAML::Value << p.γ_min;
+    out << YAML::Key << "nonmonotone_linesearch" << YAML::Value
+        << p.nonmonotone_linesearch;
+    out << YAML::Key << "stop_crit" << YAML::Value << p.stop_crit;
     out << YAML::Key << "update_lipschitz_in_linesearch" << YAML::Value
         << p.update_lipschitz_in_linesearch;
     out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
@@ -276,7 +291,8 @@ int main(int argc, char *argv[]) {
     almparams.max_total_num_retries   = 40;
     almparams.Δ_lower                 = 0.8;
     almparams.ρ_increase              = 2;
-    // almparams.σ₀ = 2e-1;
+    // almparams.single_penalty_factor   = true;
+    almparams.σ₀ = 1e1;
     // almparams.ε₀ = 1e-5;
 
     Solver solver{almparams, get_inner_solver()};
@@ -289,8 +305,16 @@ int main(int argc, char *argv[]) {
         out << YAML::Key << "outer" << YAML::Value << solver.get_params();
         out << YAML::Key << "inner" << YAML::Value
             << solver.inner_solver.get_params();
-        out << YAML::Key << "directions" << YAML::Value
+#if SOLVER == SOLVER_PANOC_2ND_LBFGS
+        out << YAML::Key << "lbfgs" << YAML::Value
             << solver.inner_solver.lbfgs.get_params();
+#elif SOLVER == SOLVER_PANOC_LBFGS
+        out << YAML::Key << "directions" << YAML::Value
+            << solver.inner_solver.direction_provider.lbfgs.get_params();
+#elif SOLVER == SOLVER_LBFGSBpp
+        out << YAML::Key << "lbfgs" << YAML::Value
+            << solver.inner_solver.get_params();
+#endif
         out << YAML::EndMap;
         return 0;
     }
