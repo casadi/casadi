@@ -52,7 +52,7 @@ using Solver = pa::ALMSolver<pa::LBFGSBSolver<>>;
 #elif SOLVER == SOLVER_PGA
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/pga.hpp>
-using Solver = pa::ALMSolver<pa::PGA>;
+using Solver = pa::ALMSolver<pa::PGASolver>;
 #elif SOLVER == SOLVER_GAAPGA
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
@@ -79,9 +79,9 @@ auto get_inner_solver() {
     pa::PANOCParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
-    panocparams.lbfgs_mem                      = 20;
 
     pa::LBFGSParams lbfgsparams;
+    lbfgsparams.memory = 20;
     return Solver::InnerSolver(panocparams, lbfgsparams);
 }
 auto get_problem(const pa::Problem &p) { return p; }
@@ -90,14 +90,14 @@ const vec &get_y(const pa::Problem &, const vec &y) { return y; }
 auto get_inner_solver() {
     pa::PANOCParams panocparams;
     panocparams.max_iter                       = 1000;
-    panocparams.update_lipschitz_in_linesearch = true;
+    panocparams.update_lipschitz_in_linesearch = false;
     panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
     panocparams.stop_crit      = pa::PANOCStopCrit::ProjGradUnitNorm;
     panocparams.max_time       = 30s;
 
     pa::LBFGSParams lbfgsparams;
-    lbfgsparams.memory = 20;
-    // lbfgsparams.cbfgs.ϵ = 0;
+    lbfgsparams.memory  = 20;
+    lbfgsparams.cbfgs.ϵ = 1e-6;
 
     return Solver::InnerSolver(panocparams, lbfgsparams);
 }
@@ -139,11 +139,11 @@ auto get_inner_solver() {
     pa::SecondOrderPANOCLBFGSParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
-    panocparams.lbfgs_stepsize         = pa::LBFGSStepSize::BasedOnCurvature;
-    panocparams.stop_crit              = pa::PANOCStopCrit::ProjGradUnitNorm;
-    panocparams.nonmonotone_linesearch = 0;
-    panocparams.max_time               = 30s;
-    // panocparams.print_interval         = 1;
+    panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
+    panocparams.stop_crit      = pa::PANOCStopCrit::ProjGradUnitNorm;
+    panocparams.max_time       = 30s;
+    panocparams.hessian_vec_finited_differences = false;
+    // panocparams.full_augmented_hessian          = true;
 
     pa::LBFGSParams lbfgsparams;
     lbfgsparams.memory = 20;
@@ -214,7 +214,8 @@ YAML::Emitter &operator<<(YAML::Emitter &out,
 #elif SOLVER == SOLVER_PGA
 auto get_inner_solver() {
     pa::PGAParams params;
-    params.max_iter = 1000;
+    params.max_iter  = 1000;
+    params.stop_crit = pa::PANOCStopCrit::ProjGradUnitNorm;
 
     return Solver::InnerSolver(params);
 }
@@ -238,6 +239,9 @@ auto get_inner_solver() {
     params.max_iter               = 1000;
     params.limitedqr_mem          = 20;
     params.full_flush_on_γ_change = false;
+    params.stop_crit              = pa::PANOCStopCrit::ProjGradUnitNorm;
+    params.max_time               = 30s;
+    params.Lipschitz.ε            = 2e-6;
 
     return Solver::InnerSolver(params);
 }
