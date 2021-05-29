@@ -1,0 +1,28 @@
+name: HIMMELBK
+n: 24
+m: 14
+box constraints x: 24
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 18
+inner convergence failures: 3
+initial penalty reduced: 0
+penalty reduced: 3
+elapsed time: 0.029270000000000001
+ε: 1.0000000000000001e-05
+δ: 2.466149488483671e-06
+inner:
+  elapsed_time: 4906019910204128838
+  iterations: 401
+‖Σ‖: 316.49828599633236
+‖x‖: 0.72814972429734126
+‖y‖: 0.058687874611161935
+f: 0.051814305992301954
+counters:
+  f: 683
+  grad_f: 668
+  g: 698
+  grad_g_prod: 668
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

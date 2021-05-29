@@ -1,0 +1,34 @@
+name: AIRCRFTA
+n: 8
+m: 5
+box constraints x: 6
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00020699999999999999
+ε: 7.3057214128665151e-06
+δ: 1.1780616925537429e-07
+inner:
+  elapsed_time: 139814070386888
+  iterations: 69
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 61
+  sum_τ: 61.625
+  count_τ: 64
+‖Σ‖: 232.56077184176945
+‖x‖: 0.15901851496313241
+‖y‖: 2.7755343334086035e-06
+f: 0
+counters:
+  f: 168
+  grad_f: 155
+  g: 178
+  grad_g_prod: 155
+  grad_gi: 0
+  hess_L_prod: 64
+  hess_L: 0

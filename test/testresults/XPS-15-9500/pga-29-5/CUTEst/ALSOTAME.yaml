@@ -1,0 +1,28 @@
+name: ALSOTAME
+n: 2
+m: 1
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 21
+inner convergence failures: 6
+initial penalty reduced: 0
+penalty reduced: 6
+elapsed time: 0.003699
+ε: 5.2313760856570468e-06
+δ: 1.8138872182049681e-08
+inner:
+  elapsed_time: 94313186856548
+  iterations: 7561
+‖Σ‖: 472.23664828696531
+‖x‖: 1.5811388358202048
+‖y‖: 0.082082545616433952
+f: 0.082085000112828113
+counters:
+  f: 7632
+  grad_f: 7624
+  g: 7668
+  grad_g_prod: 7624
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: PORTFL4
+n: 12
+m: 1
+box constraints x: 24
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 33
+inner convergence failures: 21
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.207482
+ε: 9.9686946924536918e-06
+δ: 1.0089657082046344e-08
+inner:
+  elapsed_time: 140723589378845
+  iterations: 23805
+  accelerated_steps_accepted: 85
+‖Σ‖: 327.68000000000012
+‖x‖: 0.45460646322157333
+‖y‖: 0.01461340968519966
+f: 0.026306960664813177
+counters:
+  f: 47681
+  grad_f: 24022
+  g: 47760
+  grad_g_prod: 24022
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

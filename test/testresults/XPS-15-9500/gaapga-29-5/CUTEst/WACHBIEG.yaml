@@ -1,0 +1,29 @@
+name: WACHBIEG
+n: 3
+m: 2
+box constraints x: 2
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 7.1000000000000005e-05
+ε: 4.9585234374038833e-07
+δ: 1.1165515045874486e-06
+inner:
+  elapsed_time: 94356136525889
+  iterations: 46
+  accelerated_steps_accepted: 12
+‖Σ‖: 106.19204794323551
+‖x‖: 1.1180347343362893
+‖y‖: 0.49999967622617825
+f: 1.0000005582755964
+counters:
+  f: 105
+  grad_f: 78
+  g: 120
+  grad_g_prod: 78
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

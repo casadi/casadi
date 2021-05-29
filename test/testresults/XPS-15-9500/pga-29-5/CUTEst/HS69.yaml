@@ -1,0 +1,28 @@
+name: HS69
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.24578
+ε: 7.1632042610706499
+δ: 0.4461583082144509
+inner:
+  elapsed_time: 94467805921029
+  iterations: 237407
+‖Σ‖: 17.90378893400834
+‖x‖: 1.0438891746452459
+‖y‖: 46.680520391736465
+f: -962.33737389037174
+counters:
+  f: 239749
+  grad_f: 238127
+  g: 240209
+  grad_g_prod: 238127
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: ACOPP14
+n: 38
+m: 68
+box constraints x: 48
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 121
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.618401
+ε: 9.1651546595883024e-06
+δ: 0.39937758168582183
+inner:
+  elapsed_time: 94038311563098
+  iterations: 126189
+‖Σ‖: 16.649223171080212
+‖x‖: 3.9969276288458682
+‖y‖: 326.94912478149712
+f: 0
+counters:
+  f: 128770
+  grad_f: 126909
+  g: 129230
+  grad_g_prod: 126909
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

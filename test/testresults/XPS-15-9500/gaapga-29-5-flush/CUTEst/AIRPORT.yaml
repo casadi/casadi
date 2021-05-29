@@ -1,0 +1,29 @@
+name: AIRPORT
+n: 84
+m: 42
+box constraints x: 168
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 40
+inner convergence failures: 26
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.71794
+ε: 8.0616828199708834e-06
+δ: 2.0800512387855741e-06
+inner:
+  elapsed_time: 140729821995327
+  iterations: 26544
+  accelerated_steps_accepted: 1098
+‖Σ‖: 82631.930997813368
+‖x‖: 34.331079449820741
+‖y‖: 5031.3048078948686
+f: 47952.694557893461
+counters:
+  f: 53673
+  grad_f: 27802
+  g: 53773
+  grad_g_prod: 27802
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

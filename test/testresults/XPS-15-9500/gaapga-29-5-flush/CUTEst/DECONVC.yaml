@@ -1,0 +1,29 @@
+name: DECONVC
+n: 63
+m: 1
+box constraints x: 75
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 9
+inner convergence failures: 2
+initial penalty reduced: 0
+penalty reduced: 2
+elapsed time: 0.088636999999999994
+ε: 8.0931073723268994e-06
+δ: 2.8446178624613979e-08
+inner:
+  elapsed_time: 140725736114143
+  iterations: 3380
+  accelerated_steps_accepted: 567
+‖Σ‖: 100
+‖x‖: 4.5346975960052145
+‖y‖: 7.1919959028660898e-07
+f: 1.5057978279142081e-08
+counters:
+  f: 6787
+  grad_f: 3983
+  g: 6812
+  grad_g_prod: 3983
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

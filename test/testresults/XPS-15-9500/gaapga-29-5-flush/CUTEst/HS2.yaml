@@ -1,0 +1,29 @@
+name: HS2
+n: 2
+m: 0
+box constraints x: 1
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 4
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 8.3999999999999995e-05
+ε: 4.5575574425527066e-06
+δ: 0
+inner:
+  elapsed_time: 94364726460498
+  iterations: 125
+  accelerated_steps_accepted: 2
+‖Σ‖: 0
+‖x‖: 1.9341419504798456
+‖y‖: 0
+f: 4.9412293179891851
+counters:
+  f: 258
+  grad_f: 143
+  g: 270
+  grad_g_prod: 143
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

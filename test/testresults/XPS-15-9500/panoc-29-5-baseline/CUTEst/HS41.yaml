@@ -1,0 +1,34 @@
+name: HS41
+n: 4
+m: 1
+box constraints x: 8
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 7.2999999999999999e-05
+ε: 1.042050484165169e-06
+δ: 1.7758505945764114e-06
+inner:
+  elapsed_time: 139930034503745
+  iterations: 28
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 21
+  sum_τ: 21.75
+  count_τ: 23
+‖Σ‖: 100
+‖x‖: 2.1602459488304198
+‖y‖: 0.11111069408122635
+f: 1.9259261232435516
+counters:
+  f: 103
+  grad_f: 69
+  g: 113
+  grad_g_prod: 69
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

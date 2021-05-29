@@ -1,0 +1,28 @@
+name: HS16
+n: 2
+m: 2
+box constraints x: 3
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00031
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204099947
+  iterations: 20
+‖Σ‖: 100.00499987500625
+‖x‖: 0.55901697709789699
+‖y‖: 0
+f: 0.25000000000014927
+counters:
+  f: 32
+  grad_f: 25
+  g: 39
+  grad_g_prod: 25
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

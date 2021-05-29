@@ -1,0 +1,28 @@
+name: LSQFIT
+n: 2
+m: 1
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 8
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.0024450000000000001
+ε: 9.9926214596479657e-06
+δ: 6.3656591853256117e-07
+inner:
+  elapsed_time: 94523640252805
+  iterations: 4082
+‖Σ‖: 100
+‖x‖: 0.67796699622779433
+‖y‖: 0.24299063032608934
+f: 0.033787142663836749
+counters:
+  f: 4105
+  grad_f: 4106
+  g: 4120
+  grad_g_prod: 4106
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

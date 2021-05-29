@@ -1,0 +1,34 @@
+name: HS97
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0097959999999999992
+ε: 9.0999208168796031e-10
+δ: 1.0599379152154143e-09
+inner:
+  elapsed_time: 140157667780154
+  iterations: 976
+  linesearch_failures: 831
+  lbfgs_failures: 0
+  lbfgs_rejected: 768
+  τ_1_accepted: 93
+  sum_τ: 106.3515625
+  count_τ: 971
+‖Σ‖: 119.15775212331914
+‖x‖: 0.064724054156540353
+‖y‖: 0.30999020568480629
+f: 4.071246356841792
+counters:
+  f: 21721
+  grad_f: 7890
+  g: 21733
+  grad_g_prod: 7890
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

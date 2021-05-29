@@ -1,0 +1,29 @@
+name: HIMMELP2
+n: 2
+m: 1
+box constraints x: 4
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.1e-05
+ε: 2.763597673816065e-06
+δ: 0
+inner:
+  elapsed_time: 94807108091941
+  iterations: 4
+  accelerated_steps_accepted: 0
+‖Σ‖: 1
+‖x‖: 106.65317359966855
+‖y‖: 0
+f: -62.053935533822823
+counters:
+  f: 26
+  grad_f: 28
+  g: 44
+  grad_g_prod: 28
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

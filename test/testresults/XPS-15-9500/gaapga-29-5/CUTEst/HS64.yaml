@@ -1,0 +1,29 @@
+name: HS64
+n: 3
+m: 1
+box constraints x: 3
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00020900000000000001
+ε: 1.7205383784357764e-08
+δ: 2.6190970315864703e-06
+inner:
+  elapsed_time: 94059783782601
+  iterations: 164
+  accelerated_steps_accepted: 44
+‖Σ‖: 100000
+‖x‖: 246.6129605294451
+‖y‖: 2279.0244685760927
+f: 6299.8364589083303
+counters:
+  f: 354
+  grad_f: 244
+  g: 381
+  grad_g_prod: 244
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

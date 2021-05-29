@@ -1,0 +1,29 @@
+name: HS85
+n: 5
+m: 21
+box constraints x: 10
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 24
+inner convergence failures: 14
+initial penalty reduced: 9
+penalty reduced: 5
+elapsed time: 3.02691
+ε: 9.5766153394123091e-07
+δ: 3.420574103074614e-06
+inner:
+  elapsed_time: 140737278950494
+  iterations: 15834
+  accelerated_steps_accepted: 35
+‖Σ‖: 13.66471459170231
+‖x‖: 769.69936453352
+‖y‖: 0.060589294575655081
+f: -2.2156046958533646
+counters:
+  f: 32429
+  grad_f: 15965
+  g: 32487
+  grad_g_prod: 15965
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

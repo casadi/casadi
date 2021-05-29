@@ -1,0 +1,28 @@
+name: MISTAKE
+n: 9
+m: 13
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0036549999999999998
+ε: 9.9922183370848572e-06
+δ: 3.4107365322055827e-06
+inner:
+  elapsed_time: 94394791235138
+  iterations: 2667
+‖Σ‖: 212.77581001671678
+‖x‖: 2.520007821442515
+‖y‖: 0.49999543338652908
+f: -1.0000017032855686
+counters:
+  f: 2687
+  grad_f: 2685
+  g: 2699
+  grad_g_prod: 2685
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: BATCH
+n: 48
+m: 73
+box constraints x: 94
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 58
+initial penalty reduced: 4
+penalty reduced: 20
+elapsed time: 0.41075299999999998
+ε: 3.333158517193624e-06
+δ: 1.9550963589562884
+inner:
+  elapsed_time: 140732650743898
+  iterations: 49215
+  accelerated_steps_accepted: 3281
+‖Σ‖: 1.1073028853931521
+‖x‖: 19.171295796844564
+‖y‖: 199.81778577132749
+f: 45958.305813611412
+counters:
+  f: 99199
+  grad_f: 53456
+  g: 99895
+  grad_g_prod: 53456
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: TRUSPYR1
+n: 11
+m: 4
+box constraints x: 8
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 238
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.31038300000000002
+ε: 1.0376622604056143
+δ: 0.10641337473459195
+inner:
+  elapsed_time: 94545115397012
+  iterations: 238042
+‖Σ‖: 2
+‖x‖: 7.945838608797879
+‖y‖: 58.611734577234955
+f: 8.873258294416086
+counters:
+  f: 239003
+  grad_f: 238762
+  g: 239463
+  grad_g_prod: 238762
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

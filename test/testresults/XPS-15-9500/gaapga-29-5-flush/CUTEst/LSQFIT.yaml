@@ -1,0 +1,29 @@
+name: LSQFIT
+n: 2
+m: 1
+box constraints x: 1
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.1e-05
+ε: 1.6109058531554865e-12
+δ: 1.7541071107296524e-06
+inner:
+  elapsed_time: 140735255445187
+  iterations: 12
+  accelerated_steps_accepted: 5
+‖Σ‖: 99.999999999999986
+‖x‖: 0.6779622386895966
+‖y‖: 0.24296757077659809
+f: 0.033786561685779509
+counters:
+  f: 38
+  grad_f: 37
+  g: 53
+  grad_g_prod: 37
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

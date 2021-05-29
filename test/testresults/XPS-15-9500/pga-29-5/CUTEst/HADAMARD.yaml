@@ -1,0 +1,28 @@
+name: HADAMARD
+n: 401
+m: 1010
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 21.526492999999999
+ε: 0.40199139698365549
+δ: 31.491975746469972
+inner:
+  elapsed_time: 140730297222929
+  iterations: 220993
+‖Σ‖: 376.72108271918199
+‖x‖: 20.402017272827258
+‖y‖: 6300.0314662147694
+f: 1.2543161421815072
+counters:
+  f: 222642
+  grad_f: 221713
+  g: 223102
+  grad_g_prod: 221713
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

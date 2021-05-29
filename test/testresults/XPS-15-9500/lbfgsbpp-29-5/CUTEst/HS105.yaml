@@ -1,0 +1,28 @@
+name: HS105
+n: 8
+m: 1
+box constraints x: 16
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.014858
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204114236
+  iterations: 101
+‖Σ‖: 1
+‖x‖: 287.87596261564426
+‖y‖: 0
+f: 1044.611710555462
+counters:
+  f: 134
+  grad_f: 127
+  g: 141
+  grad_g_prod: 127
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

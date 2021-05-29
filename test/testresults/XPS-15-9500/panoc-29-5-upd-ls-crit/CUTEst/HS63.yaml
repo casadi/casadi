@@ -1,0 +1,34 @@
+name: HS63
+n: 3
+m: 2
+box constraints x: 3
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00010900000000000001
+ε: 5.9054511858391834e-07
+δ: 4.8402267083247352e-08
+inner:
+  elapsed_time: 99
+  iterations: 49
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 40
+  sum_τ: 41.03125
+  count_τ: 43
+‖Σ‖: 102.40888001082362
+‖x‖: 4.999999998662453
+‖y‖: 1.2539750859416257
+f: 961.71517213310926
+counters:
+  f: 123
+  grad_f: 117
+  g: 135
+  grad_g_prod: 117
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

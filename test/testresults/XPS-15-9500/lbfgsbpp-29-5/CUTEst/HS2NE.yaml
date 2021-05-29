@@ -1,0 +1,28 @@
+name: HS2NE
+n: 2
+m: 2
+box constraints x: 1
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 118
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.0016639999999999999
+ε: 1.0000000000000001e-05
+δ: 2.2247448713915894
+inner:
+  elapsed_time: 4906019910204101069
+  iterations: 150
+‖Σ‖: 1084536046.057693
+‖x‖: 1.9364916731037085
+‖y‖: 3227431040.0134501
+f: 0
+counters:
+  f: 1525
+  grad_f: 1305
+  g: 1745
+  grad_g_prod: 1305
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

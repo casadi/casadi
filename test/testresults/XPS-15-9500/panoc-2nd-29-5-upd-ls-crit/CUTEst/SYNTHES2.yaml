@@ -1,0 +1,34 @@
+name: SYNTHES2
+n: 11
+m: 14
+box constraints x: 20
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 11
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0012440000000000001
+ε: 3.2474850737429506e-06
+δ: 5.5590346415002045e-06
+inner:
+  elapsed_time: 140531329926351
+  iterations: 219
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 189
+  sum_τ: 195.46875
+  count_τ: 208
+‖Σ‖: 3240.5566217706355
+‖x‖: 4.3241484500857874
+‖y‖: 22.524039362648843
+f: -0.55463504868954772
+counters:
+  f: 629
+  grad_f: 704
+  g: 859
+  grad_g_prod: 704
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

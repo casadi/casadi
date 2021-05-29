@@ -1,0 +1,29 @@
+name: HS103
+n: 7
+m: 5
+box constraints x: 14
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 12
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.058948
+ε: 1.5821296983631328e-07
+δ: 1.8347146175934359e-06
+inner:
+  elapsed_time: 140725086405307
+  iterations: 4522
+  accelerated_steps_accepted: 418
+‖Σ‖: 195580.24679218611
+‖x‖: 6.4002225558989512
+‖y‖: 1536.8638795306344
+f: 543.66645022329931
+counters:
+  f: 9151
+  grad_f: 4988
+  g: 9186
+  grad_g_prod: 4988
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

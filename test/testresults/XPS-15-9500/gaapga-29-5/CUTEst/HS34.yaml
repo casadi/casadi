@@ -1,0 +1,29 @@
+name: HS34
+n: 3
+m: 2
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 206
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.095625000000000002
+ε: 0.096982865081795766
+δ: 0.99958593795983219
+inner:
+  elapsed_time: 94459215836364
+  iterations: 91122
+  accelerated_steps_accepted: 2953
+‖Σ‖: 14.142135623730951
+‖x‖: 9.9157051221331827
+‖y‖: 0.85811342566040227
+f: -0.15044093130167968
+counters:
+  f: 203088
+  grad_f: 95035
+  g: 203788
+  grad_g_prod: 95035
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

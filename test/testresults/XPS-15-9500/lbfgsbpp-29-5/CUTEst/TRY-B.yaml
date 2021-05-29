@@ -1,0 +1,28 @@
+name: TRY-B
+n: 2
+m: 1
+box constraints x: 2
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 19
+inner convergence failures: 12
+initial penalty reduced: 12
+penalty reduced: 0
+elapsed time: 0.000173
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204099804
+  iterations: 9
+‖Σ‖: 21.767823360000001
+‖x‖: 10
+‖y‖: 2.4111261293213921
+f: 1
+counters:
+  f: 57
+  grad_f: 50
+  g: 64
+  grad_g_prod: 50
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

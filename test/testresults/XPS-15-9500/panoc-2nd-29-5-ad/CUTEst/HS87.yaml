@@ -1,0 +1,34 @@
+name: HS87
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.70158699999999996
+ε: 2.6215585212786676
+δ: 0.0014540852921527403
+inner:
+  elapsed_time: 139801186186130
+  iterations: 236390
+  linesearch_failures: 234249
+  lbfgs_failures: 214284
+  lbfgs_rejected: 0
+  τ_1_accepted: 1527
+  sum_τ: 1576.046875
+  count_τ: 236150
+‖Σ‖: 36.839559469039649
+‖x‖: 606.52720914881218
+‖y‖: 43.688253902290931
+f: 8996.7997086089035
+counters:
+  f: 569215
+  grad_f: 400289
+  g: 606720
+  grad_g_prod: 548469
+  grad_gi: 0
+  hess_L_prod: 37045
+  hess_L: 0

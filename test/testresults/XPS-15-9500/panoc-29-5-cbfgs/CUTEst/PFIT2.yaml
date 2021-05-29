@@ -1,0 +1,34 @@
+name: PFIT2
+n: 3
+m: 3
+box constraints x: 1
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 235
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.0070289999999999997
+ε: .inf
+δ: 0.090329533289359665
+inner:
+  elapsed_time: 140265042239286
+  iterations: 2412
+  linesearch_failures: 15
+  lbfgs_failures: 0
+  lbfgs_rejected: 418
+  τ_1_accepted: 1960
+  sum_τ: 2104.0234375
+  count_τ: 2377
+‖Σ‖: 139.28292360998498
+‖x‖: 1.4142135623730951e+20
+‖y‖: 5969.9784077108761
+f: 0
+counters:
+  f: 7651
+  grad_f: 6087
+  g: 7906
+  grad_g_prod: 6087
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: CRESC50
+n: 6
+m: 100
+box constraints x: 5
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 30
+initial penalty reduced: 8
+penalty reduced: 20
+elapsed time: 0.73763599999999996
+ε: 3.2893404091210998e-06
+δ: 0.49069715497875621
+inner:
+  elapsed_time: 140737313383931
+  iterations: 33601
+  accelerated_steps_accepted: 1119
+‖Σ‖: 0.6153987976201114
+‖x‖: 27.403916189153882
+‖y‖: 7.3156702772757844
+f: 1.5198058735597597e-09
+counters:
+  f: 67802
+  grad_f: 35680
+  g: 68494
+  grad_g_prod: 35680
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

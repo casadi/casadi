@@ -1,0 +1,29 @@
+name: HS81
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 36
+inner convergence failures: 27
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.041889000000000003
+ε: 9.8739188255231314e-06
+δ: 3.8461739793049787e-07
+inner:
+  elapsed_time: 94377611404142
+  iterations: 27871
+  accelerated_steps_accepted: 35
+‖Σ‖: 80.058078826652959
+‖x‖: 3.1622775993550283
+‖y‖: 0.055507544325773768
+f: 0.053949867127912832
+counters:
+  f: 55835
+  grad_f: 28050
+  g: 55923
+  grad_g_prod: 28050
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

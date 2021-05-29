@@ -1,0 +1,28 @@
+name: CONCON
+n: 15
+m: 11
+box constraints x: 5
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 13
+penalty reduced: 20
+elapsed time: 0.34983300000000001
+ε: 111.88479593490879
+δ: 457.24472462526916
+inner:
+  elapsed_time: 140730402608627
+  iterations: 239028
+‖Σ‖: 0.0043317421552712017
+‖x‖: 2734.5535466404699
+‖y‖: 126.43104317782772
+f: -6068.9461671633462
+counters:
+  f: 240886
+  grad_f: 239748
+  g: 241333
+  grad_g_prod: 239748
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

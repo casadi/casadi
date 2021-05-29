@@ -1,0 +1,29 @@
+name: HYDROELM
+n: 505
+m: 504
+box constraints x: 1010
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 22
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.7108500000000002
+ε: 8.6575567232307976e-06
+δ: 0.022119967612695746
+inner:
+  elapsed_time: 140724406444820
+  iterations: 29744
+  accelerated_steps_accepted: 13471
+‖Σ‖: 153.65630065925359
+‖x‖: 14210888.770012511
+‖y‖: 1003.6254276152564
+f: -3582014.4645216195
+counters:
+  f: 62214
+  grad_f: 44175
+  g: 62914
+  grad_g_prod: 44175
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

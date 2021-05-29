@@ -1,0 +1,28 @@
+name: HS21MOD
+n: 7
+m: 1
+box constraints x: 8
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.3000000000000002e-05
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204099685
+  iterations: 7
+‖Σ‖: 1
+‖x‖: 2.8284271247461903
+‖y‖: 0
+f: -95.959999999999994
+counters:
+  f: 15
+  grad_f: 8
+  g: 22
+  grad_g_prod: 8
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

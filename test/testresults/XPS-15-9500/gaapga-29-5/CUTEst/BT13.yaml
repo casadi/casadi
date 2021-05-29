@@ -1,0 +1,29 @@
+name: BT13
+n: 5
+m: 1
+box constraints x: 1
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 10
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.001204
+ε: 8.2553970956403645e-06
+δ: 5.8090857285816234e-11
+inner:
+  elapsed_time: 140732731174601
+  iterations: 1059
+  accelerated_steps_accepted: 204
+‖Σ‖: 64
+‖x‖: 4.9937474269211958e-06
+‖y‖: 0.20055209228257723
+f: 0
+counters:
+  f: 2219
+  grad_f: 1303
+  g: 2248
+  grad_g_prod: 1303
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

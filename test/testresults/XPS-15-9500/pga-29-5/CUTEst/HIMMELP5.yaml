@@ -1,0 +1,28 @@
+name: HIMMELP5
+n: 2
+m: 3
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 26
+inner convergence failures: 24
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.016653999999999999
+ε: 0
+δ: 0
+inner:
+  elapsed_time: 140728014399479
+  iterations: 24019
+‖Σ‖: 1.7320508075688772
+‖x‖: 99.247166206396045
+‖y‖: 0
+f: -59.013177769121739
+counters:
+  f: 24101
+  grad_f: 24097
+  g: 24133
+  grad_g_prod: 24097
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: DECONVNE
+n: 63
+m: 40
+box constraints x: 24
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.1418430000000002
+ε: 0.0048721094459573807
+δ: 0.0042138349481058556
+inner:
+  elapsed_time: 94257354419269
+  iterations: 236884
+‖Σ‖: 128.39595923356305
+‖x‖: 4.6671181494510821
+‖y‖: 0.15109002334608293
+f: 0
+counters:
+  f: 237366
+  grad_f: 237604
+  g: 237826
+  grad_g_prod: 237604
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

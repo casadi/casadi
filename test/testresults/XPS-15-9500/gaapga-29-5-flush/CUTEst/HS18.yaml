@@ -1,0 +1,29 @@
+name: HS18
+n: 2
+m: 2
+box constraints x: 4
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 7
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.00096299999999999999
+ε: 8.6468010478957247e-06
+δ: 2.7953763748200799e-08
+inner:
+  elapsed_time: 140736204037212
+  iterations: 1104
+  accelerated_steps_accepted: 20
+‖Σ‖: 64.007812023221035
+‖x‖: 15.890143186311303
+‖y‖: 0.20000269674886439
+f: 5.0000000060487189
+counters:
+  f: 2254
+  grad_f: 1152
+  g: 2274
+  grad_g_prod: 1152
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

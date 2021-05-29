@@ -1,0 +1,29 @@
+name: HS108
+n: 9
+m: 13
+box constraints x: 1
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 8
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.002905
+ε: 4.6436033270813581e-06
+δ: 5.6248980229156587e-07
+inner:
+  elapsed_time: 140733309541229
+  iterations: 1121
+  accelerated_steps_accepted: 25
+‖Σ‖: 91.995539557590519
+‖x‖: 2.0927071266655908
+‖y‖: 0.5649220523586348
+f: -0.49999993317519859
+counters:
+  f: 2268
+  grad_f: 1178
+  g: 2291
+  grad_g_prod: 1178
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

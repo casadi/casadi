@@ -1,0 +1,28 @@
+name: RK23
+n: 17
+m: 11
+box constraints x: 6
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 8
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0077710000000000001
+ε: 1.0000000000000001e-05
+δ: 4.2351939231188851e-06
+inner:
+  elapsed_time: 4906019910204107405
+  iterations: 322
+‖Σ‖: 6894.2375550949737
+‖x‖: 1.5639544994489645
+‖y‖: 5.413908480835306
+f: 0.083331008619962316
+counters:
+  f: 372
+  grad_f: 364
+  g: 380
+  grad_g_prod: 364
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

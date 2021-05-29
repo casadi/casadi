@@ -1,0 +1,29 @@
+name: C-RELOAD
+n: 342
+m: 284
+box constraints x: 600
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 22.412814000000001
+ε: 0.14546596751321639
+δ: 0.04815001912750147
+inner:
+  elapsed_time: 140722587178026
+  iterations: 237318
+  accelerated_steps_accepted: 18837
+‖Σ‖: 375.62639998967251
+‖x‖: 11.062483429864074
+‖y‖: 4.0409480485110647
+f: -1.0851818667434123
+counters:
+  f: 475931
+  grad_f: 257115
+  g: 476631
+  grad_g_prod: 257115
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

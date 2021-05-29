@@ -1,0 +1,28 @@
+name: MESH
+n: 41
+m: 48
+box constraints x: 64
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.95295300000000005
+ε: 0.0060504334507049855
+δ: 1.0760219382177638e-09
+inner:
+  elapsed_time: 140720593031034
+  iterations: 236000
+‖Σ‖: 134.72389565247397
+‖x‖: 6.1571996681680226
+‖y‖: 7.6482459618268728e-05
+f: -0.0091870794530895927
+counters:
+  f: 236717
+  grad_f: 236720
+  g: 237177
+  grad_g_prod: 236720
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: HONG
+n: 4
+m: 1
+box constraints x: 8
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000102
+ε: 9.6268562046475381e-06
+δ: 3.9857181339808534e-06
+inner:
+  elapsed_time: 94777043320927
+  iterations: 44
+  accelerated_steps_accepted: 21
+‖Σ‖: 1000
+‖x‖: 0.55110103840141966
+‖y‖: 43.668013739887201
+f: 22.570913314515394
+counters:
+  f: 105
+  grad_f: 93
+  g: 126
+  grad_g_prod: 93
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

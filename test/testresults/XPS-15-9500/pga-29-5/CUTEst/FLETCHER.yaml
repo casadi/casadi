@@ -1,0 +1,28 @@
+name: FLETCHER
+n: 4
+m: 4
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 31
+inner convergence failures: 21
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.014781000000000001
+ε: 9.9811234104407731e-06
+δ: 2.9081665298136272e-07
+inner:
+  elapsed_time: 140730205738022
+  iterations: 23383
+‖Σ‖: 91.638763194684557
+‖x‖: 5.4901816037542721
+‖y‖: 8.3631030738486452
+f: 11.656856825907486
+counters:
+  f: 23545
+  grad_f: 23476
+  g: 23587
+  grad_g_prod: 23476
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

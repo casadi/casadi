@@ -1,0 +1,28 @@
+name: HS33
+n: 3
+m: 2
+box constraints x: 4
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 19
+inner convergence failures: 3
+initial penalty reduced: 0
+penalty reduced: 3
+elapsed time: 0.000185
+ε: 1.0000000000000001e-05
+δ: 2.8261382567507098e-08
+inner:
+  elapsed_time: 4906019910204099813
+  iterations: 18
+‖Σ‖: 134.22145323860119
+‖x‖: 2.0000000070653456
+‖y‖: 0.24999620651535565
+f: -3.9999999929346544
+counters:
+  f: 76
+  grad_f: 60
+  g: 92
+  grad_g_prod: 60
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

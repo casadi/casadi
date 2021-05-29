@@ -1,0 +1,28 @@
+name: HS98
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 90
+inner convergence failures: 82
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.061698999999999997
+ε: 9.6881913549395904e-06
+δ: 3.9695535747341637e-10
+inner:
+  elapsed_time: 140730022056954
+  iterations: 83546
+‖Σ‖: 2
+‖x‖: 0.064724054149560298
+‖y‖: 0.30999016067600749
+f: 4.0712463563901702
+counters:
+  f: 83868
+  grad_f: 83816
+  g: 84028
+  grad_g_prod: 83816
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

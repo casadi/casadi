@@ -1,0 +1,34 @@
+name: HS64
+n: 3
+m: 1
+box constraints x: 3
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00014899999999999999
+ε: 2.0700417272534466e-06
+δ: 2.6180791752317134e-06
+inner:
+  elapsed_time: 140161962737802
+  iterations: 84
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 75
+  sum_τ: 75
+  count_τ: 75
+‖Σ‖: 100000
+‖x‖: 246.6129528725526
+‖y‖: 2279.0244017545979
+f: 6299.8364612280748
+counters:
+  f: 186
+  grad_f: 186
+  g: 204
+  grad_g_prod: 186
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

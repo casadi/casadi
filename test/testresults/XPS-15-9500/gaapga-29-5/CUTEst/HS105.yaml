@@ -1,0 +1,29 @@
+name: HS105
+n: 8
+m: 1
+box constraints x: 16
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.036967
+ε: 6.9473936068209508e-06
+δ: 0
+inner:
+  elapsed_time: 94407676170262
+  iterations: 260
+  accelerated_steps_accepted: 53
+‖Σ‖: 1
+‖x‖: 287.86157359504176
+‖y‖: 0
+f: 1044.6116924990279
+counters:
+  f: 563
+  grad_f: 337
+  g: 581
+  grad_g_prod: 337
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

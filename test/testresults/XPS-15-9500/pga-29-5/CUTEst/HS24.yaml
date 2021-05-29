@@ -1,0 +1,28 @@
+name: HS24
+n: 2
+m: 3
+box constraints x: 2
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00015799999999999999
+ε: 9.7021998237241174e-06
+δ: 8.7303173401664935e-07
+inner:
+  elapsed_time: 140733021683798
+  iterations: 256
+‖Σ‖: 175.09593677305014
+‖x‖: 3.4641010600154019
+‖y‖: 1.0000017404047021
+f: -0.99999973092630146
+counters:
+  f: 287
+  grad_f: 277
+  g: 301
+  grad_g_prod: 277
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

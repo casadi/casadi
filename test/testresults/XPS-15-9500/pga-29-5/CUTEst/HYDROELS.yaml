@@ -1,0 +1,28 @@
+name: HYDROELS
+n: 169
+m: 168
+box constraints x: 338
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 32
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.54188000000000003
+ε: 8.6643529587185917e-06
+δ: 0.0044971556198447615
+inner:
+  elapsed_time: 94373316935951
+  iterations: 34936
+‖Σ‖: 101.07701064401969
+‖x‖: 8220035.5376122128
+‖y‖: 1734.0601704665999
+f: -3582266.839496396
+counters:
+  f: 36804
+  grad_f: 35656
+  g: 37264
+  grad_g_prod: 35656
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: WATER
+n: 31
+m: 10
+box constraints x: 62
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 28
+inner convergence failures: 11
+initial penalty reduced: 0
+penalty reduced: 11
+elapsed time: 0.066262000000000001
+ε: 9.9952115988344303e-06
+δ: 2.6968212125666469e-06
+inner:
+  elapsed_time: 140721818268591
+  iterations: 26392
+‖Σ‖: 9.6382092839977513
+‖x‖: 1254.0501421679221
+‖y‖: 284.41700312479037
+f: 10549.379371219184
+counters:
+  f: 26462
+  grad_f: 26476
+  g: 26507
+  grad_g_prod: 26476
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

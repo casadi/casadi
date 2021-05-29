@@ -1,0 +1,28 @@
+name: HS104
+n: 8
+m: 5
+box constraints x: 16
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 45
+inner convergence failures: 38
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.12295499999999999
+ε: 9.9877403491321903e-06
+δ: 6.2307533247318858e-06
+inner:
+  elapsed_time: 94343251746831
+  iterations: 39593
+‖Σ‖: 81.635027678145676
+‖x‖: 10.70135563547232
+‖y‖: 6.7566790185284278
+f: 3.9511505778095621
+counters:
+  f: 39779
+  grad_f: 39728
+  g: 39849
+  grad_g_prod: 39728
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: HS101
+n: 7
+m: 5
+box constraints x: 14
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.014142
+ε: 8.5538449638988823e-06
+δ: 4.5782161230134566e-07
+inner:
+  elapsed_time: 14109
+  iterations: 714
+  linesearch_failures: 1
+  lbfgs_failures: 0
+  lbfgs_rejected: 1
+  τ_1_accepted: 643
+  sum_τ: 664.0859375
+  count_τ: 705
+‖Σ‖: 1176366.818255665
+‖x‖: 6.1792923451205777
+‖y‖: 5918.7977279768847
+f: 1809.7609631697883
+counters:
+  f: 1758
+  grad_f: 1572
+  g: 1776
+  grad_g_prod: 1572
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: HIMMELBI
+n: 100
+m: 12
+box constraints x: 200
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 238
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.4750800000000002
+ε: 1.9747491832547426e-05
+δ: 3.8689671981728679e-06
+inner:
+  elapsed_time: 94029721485910
+  iterations: 238562
+‖Σ‖: 3.4641016151377544
+‖x‖: 229.43872365016537
+‖y‖: 0.28376364755669808
+f: -1735.5695795984018
+counters:
+  f: 239059
+  grad_f: 239282
+  g: 239519
+  grad_g_prod: 239282
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

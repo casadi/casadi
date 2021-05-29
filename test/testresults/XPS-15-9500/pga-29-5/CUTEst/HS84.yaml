@@ -1,0 +1,28 @@
+name: HS84
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 235
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 0.033577000000000003
+ε: 0.034013777039945126
+δ: 0.0031827648635953665
+inner:
+  elapsed_time: 94463510741609
+  iterations: 45613
+‖Σ‖: 6.3326521787108404e-05
+‖x‖: 61.333826548711073
+‖y‖: 19.136653079124628
+f: -5280335.0182907283
+counters:
+  f: 51801
+  grad_f: 46333
+  g: 52241
+  grad_g_prod: 46333
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

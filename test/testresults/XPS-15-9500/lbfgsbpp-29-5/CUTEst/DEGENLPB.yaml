@@ -1,0 +1,28 @@
+name: DEGENLPB
+n: 20
+m: 15
+box constraints x: 40
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 21
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.0073460000000000001
+ε: 1.0000000000000001e-05
+δ: 0.70784999999999998
+inner:
+  elapsed_time: 4906019910204106601
+  iterations: 306
+‖Σ‖: 109.35095887879457
+‖x‖: 0
+‖y‖: .nan
+f: 0
+counters:
+  f: 968
+  grad_f: 748
+  g: 1188
+  grad_g_prod: 748
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

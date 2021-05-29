@@ -1,0 +1,28 @@
+name: ALSOTAME
+n: 2
+m: 1
+box constraints x: 4
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00023499999999999999
+ε: 1.0000000000000001e-05
+δ: 6.7927651947741144e-08
+inner:
+  elapsed_time: 4906019910204099875
+  iterations: 18
+‖Σ‖: 100
+‖x‖: 1.5811388515648006
+‖y‖: 0.082071418668725499
+f: 0.0820850041997402
+counters:
+  f: 34
+  grad_f: 27
+  g: 41
+  grad_g_prod: 27
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

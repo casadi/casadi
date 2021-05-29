@@ -1,0 +1,28 @@
+name: KISSING2
+n: 100
+m: 625
+box constraints x: 12
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 234
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 15.009126
+ε: 0.010726545468655813
+δ: 0.062872695341998686
+inner:
+  elapsed_time: 140732680512430
+  iterations: 237245
+‖Σ‖: 31.483039021781259
+‖x‖: 10.255963833175359
+‖y‖: 2.1914223169008462
+f: 5.1847941474010231
+counters:
+  f: 238000
+  grad_f: 237965
+  g: 238460
+  grad_g_prod: 237965
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

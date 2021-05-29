@@ -1,0 +1,28 @@
+name: FLETCHER
+n: 4
+m: 4
+box constraints x: 1
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.011291000000000001
+ε: 1.0000000000000001e-05
+δ: 374440741576.3739
+inner:
+  elapsed_time: 4906019910204110648
+  iterations: 1
+‖Σ‖: 2
+‖x‖: 574513365860.42456
+‖y‖: 380625324993.10425
+f: -7.2056931942269893e+22
+counters:
+  f: 6131
+  grad_f: 5911
+  g: 6351
+  grad_g_prod: 5911
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

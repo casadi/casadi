@@ -1,0 +1,34 @@
+name: HS84
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 32
+inner convergence failures: 25
+initial penalty reduced: 4
+penalty reduced: 20
+elapsed time: 0.022915999999999999
+ε: 3.0165538191795349e-06
+δ: 2.3283064365386963e-10
+inner:
+  elapsed_time: 139998754003293
+  iterations: 4919
+  linesearch_failures: 2287
+  lbfgs_failures: 0
+  lbfgs_rejected: 4057
+  τ_1_accepted: 2502
+  sum_τ: 2524.2421875
+  count_τ: 4889
+‖Σ‖: 1.308895840011725
+‖x‖: 61.333826552565249
+‖y‖: 19.136652522409332
+f: -5280335.0791981779
+counters:
+  f: 44981
+  grad_f: 26240
+  g: 45021
+  grad_g_prod: 26240
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: HS32
+n: 3
+m: 2
+box constraints x: 3
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00010900000000000001
+ε: 1.8052226380405045e-12
+δ: 1.0283913600694916e-06
+inner:
+  elapsed_time: 94828582928488
+  iterations: 77
+  accelerated_steps_accepted: 10
+‖Σ‖: 84.508115993203134
+‖x‖: 1.0000010283913601
+‖y‖: 2.0000020567818879
+f: 1.0000020567837777
+counters:
+  f: 172
+  grad_f: 111
+  g: 190
+  grad_g_prod: 111
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

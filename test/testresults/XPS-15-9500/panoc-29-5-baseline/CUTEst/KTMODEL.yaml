@@ -1,0 +1,34 @@
+name: KTMODEL
+n: 726
+m: 450
+box constraints x: 713
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 6
+penalty reduced: 20
+elapsed time: 1.0236130000000001
+ε: .inf
+δ: .nan
+inner:
+  elapsed_time: 3522442
+  iterations: 6066
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 202
+  τ_1_accepted: 6041
+  sum_τ: 6047.0625
+  count_τ: 6059
+‖Σ‖: 0.98972321949118625
+‖x‖: 119.68746300510944
+‖y‖: 695.53529204590779
+f: 0
+counters:
+  f: 12476
+  grad_f: 12648
+  g: 12717
+  grad_g_prod: 12648
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

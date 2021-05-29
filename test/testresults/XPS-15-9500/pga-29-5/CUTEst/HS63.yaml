@@ -1,0 +1,28 @@
+name: HS63
+n: 3
+m: 2
+box constraints x: 3
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 27
+inner convergence failures: 11
+initial penalty reduced: 0
+penalty reduced: 11
+elapsed time: 0.014026
+ε: 9.9970642786217923e-06
+δ: 2.9692818870330484e-08
+inner:
+  elapsed_time: 140728887251851
+  iterations: 23914
+‖Σ‖: 10.826392404091548
+‖x‖: 4.9999999970307183
+‖y‖: 1.2539754002008396
+f: 961.71517215884774
+counters:
+  f: 23971
+  grad_f: 23995
+  g: 24014
+  grad_g_prod: 23995
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

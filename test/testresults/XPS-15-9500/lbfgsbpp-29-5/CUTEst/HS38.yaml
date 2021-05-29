@@ -1,0 +1,28 @@
+name: HS38
+n: 4
+m: 0
+box constraints x: 8
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0021229999999999999
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204101762
+  iterations: 91
+‖Σ‖: 0
+‖x‖: 1.9999993345678635
+‖y‖: 0
+f: 2.3673870473941926e-11
+counters:
+  f: 136
+  grad_f: 129
+  g: 143
+  grad_g_prod: 129
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

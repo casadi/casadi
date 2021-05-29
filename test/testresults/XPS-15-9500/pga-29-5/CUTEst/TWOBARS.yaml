@@ -1,0 +1,28 @@
+name: TWOBARS
+n: 2
+m: 2
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000146
+ε: 9.8926424801359936e-06
+δ: 7.3582878046263289e-07
+inner:
+  elapsed_time: 94102733455500
+  iterations: 217
+‖Σ‖: 100.01061979994263
+‖x‖: 1.4611255993486576
+‖y‖: 1.5086615998128214
+f: 1.5086535276230051
+counters:
+  f: 231
+  grad_f: 235
+  g: 243
+  grad_g_prod: 235
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

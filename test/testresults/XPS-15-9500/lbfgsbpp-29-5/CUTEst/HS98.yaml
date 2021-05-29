@@ -1,0 +1,28 @@
+name: HS98
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 40
+inner convergence failures: 35
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.0027320000000000001
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204102346
+  iterations: 55
+‖Σ‖: 76.856936330636543
+‖x‖: 0.064724054151462138
+‖y‖: 0.30999020568069585
+f: 4.071246356513222
+counters:
+  f: 934
+  grad_f: 914
+  g: 954
+  grad_g_prod: 914
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

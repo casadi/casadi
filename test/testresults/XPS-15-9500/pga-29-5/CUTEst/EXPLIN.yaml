@@ -1,0 +1,28 @@
+name: EXPLIN
+n: 1200
+m: 0
+box constraints x: 2400
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 44
+inner convergence failures: 24
+initial penalty reduced: 20
+penalty reduced: 3
+elapsed time: 0.54270300000000005
+ε: 9.6450169930761831e-06
+δ: 0
+inner:
+  elapsed_time: 140724494187585
+  iterations: 25476
+‖Σ‖: 0
+‖x‖: 341.11928368447332
+‖y‖: 0
+f: -71924709.143776357
+counters:
+  f: 26016
+  grad_f: 25608
+  g: 26081
+  grad_g_prod: 25608
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

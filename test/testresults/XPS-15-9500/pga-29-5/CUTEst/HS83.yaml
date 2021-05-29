@@ -1,0 +1,28 @@
+name: HS83
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 10
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00056400000000000005
+ε: 8.559307062228072e-06
+δ: 4.4234579519297768e-06
+inner:
+  elapsed_time: 94888712471083
+  iterations: 786
+‖Σ‖: 11731.569107869638
+‖x‖: 107.00549756616365
+‖y‖: 904.31892653154364
+f: -30665.542880680499
+counters:
+  f: 813
+  grad_f: 816
+  g: 833
+  grad_g_prod: 816
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

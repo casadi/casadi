@@ -1,0 +1,28 @@
+name: HIMMELP3
+n: 2
+m: 2
+box constraints x: 4
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 8.2999999999999998e-05
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204099721
+  iterations: 9
+‖Σ‖: 1.4142135623730951
+‖x‖: 99.247166206396045
+‖y‖: 0
+f: -59.013177769121739
+counters:
+  f: 19
+  grad_f: 12
+  g: 26
+  grad_g_prod: 12
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

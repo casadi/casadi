@@ -1,0 +1,34 @@
+name: TWOBARS
+n: 2
+m: 2
+box constraints x: 4
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.5999999999999999e-05
+ε: 2.2334623022146616e-06
+δ: 1.4725384154257171e-06
+inner:
+  elapsed_time: 140539919859763
+  iterations: 21
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 17
+  sum_τ: 17
+  count_τ: 17
+‖Σ‖: 100.01162111767755
+‖x‖: 1.4611229230120621
+‖y‖: 1.5086464069506997
+f: 1.5086501959564362
+counters:
+  f: 50
+  grad_f: 53
+  g: 60
+  grad_g_prod: 53
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

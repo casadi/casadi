@@ -1,0 +1,34 @@
+name: HS55
+n: 6
+m: 6
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000301
+ε: 6.1335926613281799e-06
+δ: 3.3624535966669811e-07
+inner:
+  elapsed_time: 140157667770663
+  iterations: 78
+  linesearch_failures: 10
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 53
+  sum_τ: 55.90625
+  count_τ: 74
+‖Σ‖: 92.11707197000068
+‖x‖: 2.4720661769309431
+‖y‖: 0.89112105091337668
+f: 6.3333334623013586
+counters:
+  f: 382
+  grad_f: 268
+  g: 392
+  grad_g_prod: 268
+  grad_gi: 0
+  hess_L_prod: 42
+  hess_L: 0

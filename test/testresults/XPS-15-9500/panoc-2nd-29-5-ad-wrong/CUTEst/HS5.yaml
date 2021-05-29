@@ -1,0 +1,34 @@
+name: HS5
+n: 2
+m: 0
+box constraints x: 4
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.3999999999999999e-05
+ε: 8.6901355422774884e-06
+δ: 0
+inner:
+  elapsed_time: 140110423130152
+  iterations: 8
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 2
+  sum_τ: 2
+  count_τ: 2
+‖Σ‖: 0
+‖x‖: 1.6411079931473098
+‖y‖: 0
+f: -1.9132229549707715
+counters:
+  f: 79
+  grad_f: 28
+  g: 91
+  grad_g_prod: 28
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

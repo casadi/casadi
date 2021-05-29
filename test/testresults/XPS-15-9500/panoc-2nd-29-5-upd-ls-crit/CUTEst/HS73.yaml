@@ -1,0 +1,34 @@
+name: HS73
+n: 4
+m: 3
+box constraints x: 4
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00082700000000000004
+ε: 2.4050999769542614e-06
+δ: 1.7831920345878771e-07
+inner:
+  elapsed_time: 820
+  iterations: 203
+  linesearch_failures: 78
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 97
+  sum_τ: 102
+  count_τ: 198
+‖Σ‖: 468.32540208178119
+‖x‖: 0.71017664129238056
+‖y‖: 18.384988416996013
+f: 29.894377242255686
+counters:
+  f: 1759
+  grad_f: 1072
+  g: 1808
+  grad_g_prod: 1072
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

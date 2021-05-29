@@ -1,0 +1,34 @@
+name: LEWISPOL
+n: 6
+m: 9
+box constraints x: 12
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.050311000000000002
+ε: 2.8135851364297082e-06
+δ: 1.9527305517507639e-05
+inner:
+  elapsed_time: 50049
+  iterations: 19361
+  linesearch_failures: 69
+  lbfgs_failures: 0
+  lbfgs_rejected: 98
+  τ_1_accepted: 18181
+  sum_τ: 18407.984375
+  count_τ: 19128
+‖Σ‖: 2449507128.4606299
+‖x‖: 1.1017198890554389
+‖y‖: 179276.10057289421
+f: 1.2137867139403287
+counters:
+  f: 44836
+  grad_f: 41973
+  g: 45316
+  grad_g_prod: 41973
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

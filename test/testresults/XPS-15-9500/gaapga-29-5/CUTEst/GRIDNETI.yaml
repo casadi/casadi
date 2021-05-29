@@ -1,0 +1,29 @@
+name: GRIDNETI
+n: 7564
+m: 3844
+box constraints x: 2521
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 30
+inner convergence failures: 6
+initial penalty reduced: 0
+penalty reduced: 6
+elapsed time: 31.052741000000001
+ε: 9.953784433053281e-06
+δ: 0.0240257115717743
+inner:
+  elapsed_time: 94089879600030
+  iterations: 19496
+  accelerated_steps_accepted: 17435
+‖Σ‖: 1607.9155185759275
+‖x‖: 28.748420914310636
+‖y‖: 198.12935285589188
+f: 221.96980730677805
+counters:
+  f: 39159
+  grad_f: 37051
+  g: 39243
+  grad_g_prod: 37051
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

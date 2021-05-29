@@ -1,0 +1,29 @@
+name: TWIRISM1
+n: 343
+m: 313
+box constraints x: 686
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 235
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 24.370532999999998
+ε: 0.016417719074725858
+δ: 0.034857938515178322
+inner:
+  elapsed_time: 94493599843290
+  iterations: 236451
+  accelerated_steps_accepted: 15541
+‖Σ‖: 106.1340780351089
+‖x‖: 11.148104743445083
+‖y‖: 2.6953798137525942
+f: -1.1313699282589784
+counters:
+  f: 474117
+  grad_f: 252952
+  g: 474817
+  grad_g_prod: 252952
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

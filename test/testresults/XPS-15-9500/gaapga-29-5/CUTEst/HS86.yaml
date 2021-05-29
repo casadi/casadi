@@ -1,0 +1,29 @@
+name: HS86
+n: 5
+m: 10
+box constraints x: 5
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000242
+ε: 1.7482435055171663e-06
+δ: 6.4650505451346874e-06
+inner:
+  elapsed_time: 140722520430505
+  iterations: 64
+  accelerated_steps_accepted: 30
+‖Σ‖: 345.99103485430567
+‖x‖: 0.77124004204780539
+‖y‖: 13.278754470707703
+f: -32.348737595107842
+counters:
+  f: 152
+  grad_f: 122
+  g: 173
+  grad_g_prod: 122
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

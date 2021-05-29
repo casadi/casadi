@@ -1,0 +1,34 @@
+name: HIMMELP2
+n: 2
+m: 1
+box constraints x: 4
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.8999999999999998e-05
+ε: 7.1108395744978736e-06
+δ: 0
+inner:
+  elapsed_time: 139629386793009
+  iterations: 10
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 2
+  τ_1_accepted: 5
+  sum_τ: 5
+  count_τ: 5
+‖Σ‖: 1
+‖x‖: 106.65321675549484
+‖y‖: 0
+f: -62.053935533714935
+counters:
+  f: 32
+  grad_f: 33
+  g: 44
+  grad_g_prod: 33
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

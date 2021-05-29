@@ -1,0 +1,29 @@
+name: HS97
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 115
+inner convergence failures: 110
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.15598699999999999
+ε: 3.0111737991944665e-08
+δ: 1.6824763804379472e-10
+inner:
+  elapsed_time: 140721312453632
+  iterations: 110483
+  accelerated_steps_accepted: 108
+‖Σ‖: 17.390626486220643
+‖x‖: 0.270352865905017
+‖y‖: 0.2514619900587256
+f: 3.1358091227647091
+counters:
+  f: 221748
+  grad_f: 111051
+  g: 222073
+  grad_g_prod: 111051
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: HS116
+n: 13
+m: 14
+box constraints x: 26
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 10
+penalty reduced: 20
+elapsed time: 0.316967
+ε: 0.0031869333786827426
+δ: 0.054462371210003635
+inner:
+  elapsed_time: 94502165730616
+  iterations: 237374
+‖Σ‖: 0.38801292742813792
+‖x‖: 933.25815309702102
+‖y‖: 1.0053711704286965
+f: 50.000000493054721
+counters:
+  f: 240085
+  grad_f: 238094
+  g: 240535
+  grad_g_prod: 238094
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

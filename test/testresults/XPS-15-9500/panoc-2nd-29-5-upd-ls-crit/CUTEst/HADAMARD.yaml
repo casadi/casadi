@@ -1,0 +1,34 @@
+name: HADAMARD
+n: 401
+m: 1010
+box constraints x: 1
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 188
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 26.569454
+ε: 1.6085803508758545e-05
+δ: 10.789671998020612
+inner:
+  elapsed_time: 139818391917799
+  iterations: 190967
+  linesearch_failures: 129990
+  lbfgs_failures: 129948
+  lbfgs_rejected: 0
+  τ_1_accepted: 59863
+  sum_τ: 60147.9296875
+  count_τ: 190727
+‖Σ‖: 2983086096.8430562
+‖x‖: 14.339771333775515
+‖y‖: 35084992135.31414
+f: 0.73449547302732054
+counters:
+  f: 264965
+  grad_f: 254483
+  g: 265425
+  grad_g_prod: 254483
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

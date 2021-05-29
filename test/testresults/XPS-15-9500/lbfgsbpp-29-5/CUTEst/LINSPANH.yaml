@@ -1,0 +1,28 @@
+name: LINSPANH
+n: 97
+m: 33
+box constraints x: 194
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.8999999999999998e-05
+ε: 1.0000000000000001e-05
+δ: 2.2737367544323206e-13
+inner:
+  elapsed_time: 4906019910204099680
+  iterations: 7
+‖Σ‖: 5.7445626465380286
+‖x‖: 4892.3877441490677
+‖y‖: 2.8411331113615258e-12
+f: -77
+counters:
+  f: 14
+  grad_f: 7
+  g: 21
+  grad_g_prod: 7
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

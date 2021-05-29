@@ -1,0 +1,28 @@
+name: CRESC50
+n: 6
+m: 100
+box constraints x: 5
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 13
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.013306999999999999
+ε: 1.0000000000000001e-05
+δ: 4.199152655925964e-06
+inner:
+  elapsed_time: 4906019910204112813
+  iterations: 242
+‖Σ‖: 10814.657703669958
+‖x‖: 15.199441126357128
+‖y‖: 0.8886252318392136
+f: 0.60829148865221061
+counters:
+  f: 437
+  grad_f: 425
+  g: 449
+  grad_g_prod: 425
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

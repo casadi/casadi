@@ -1,0 +1,28 @@
+name: HS105
+n: 8
+m: 1
+box constraints x: 16
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 238
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 21.675471000000002
+ε: 0.02228879881510511
+δ: 0
+inner:
+  elapsed_time: 94588086432356
+  iterations: 238008
+‖Σ‖: 1
+‖x‖: 246.19612610229427
+‖y‖: 0
+f: 1061.8983882505718
+counters:
+  f: 240865
+  grad_f: 238728
+  g: 241325
+  grad_g_prod: 238728
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

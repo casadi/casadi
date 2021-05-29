@@ -1,0 +1,34 @@
+name: ZAMB2-10
+n: 270
+m: 96
+box constraints x: 540
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 68
+inner convergence failures: 60
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 6.7546039999999996
+ε: 5.7657400003960361e-06
+δ: 8.5781953734764826e-06
+inner:
+  elapsed_time: 140355243020301
+  iterations: 62348
+  linesearch_failures: 5561
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 34674
+  sum_τ: 40765.7578125
+  count_τ: 62280
+‖Σ‖: 82.091661776580565
+‖x‖: 391.64807622979833
+‖y‖: 0.014161358212176189
+f: -1.5823762107035386
+counters:
+  f: 320975
+  grad_f: 281535
+  g: 383371
+  grad_g_prod: 281535
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

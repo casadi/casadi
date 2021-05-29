@@ -1,0 +1,28 @@
+name: HS110
+n: 10
+m: 0
+box constraints x: 20
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00010399999999999999
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204099744
+  iterations: 9
+‖Σ‖: 0
+‖x‖: 29.568136793027776
+‖y‖: 0
+f: -45.778475531886897
+counters:
+  f: 24
+  grad_f: 17
+  g: 31
+  grad_g_prod: 17
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

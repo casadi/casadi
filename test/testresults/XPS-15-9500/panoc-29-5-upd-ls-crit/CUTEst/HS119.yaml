@@ -1,0 +1,34 @@
+name: HS119
+n: 16
+m: 8
+box constraints x: 32
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0055830000000000003
+ε: 9.476101133998327e-06
+δ: 4.7216353737944416e-07
+inner:
+  elapsed_time: 5561
+  iterations: 293
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 269
+  sum_τ: 274.625
+  count_τ: 284
+‖Σ‖: 18904.601112758395
+‖x‖: 3.1735065363980919
+‖y‖: 121.90394931215653
+f: 244.89969060963307
+counters:
+  f: 658
+  grad_f: 627
+  g: 676
+  grad_g_prod: 627
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

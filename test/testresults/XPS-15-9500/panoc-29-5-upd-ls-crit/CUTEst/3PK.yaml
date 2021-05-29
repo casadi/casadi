@@ -1,0 +1,34 @@
+name: 3PK
+n: 30
+m: 0
+box constraints x: 30
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 39
+inner convergence failures: 34
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.155468
+ε: 7.8437478141942484e-06
+δ: 0
+inner:
+  elapsed_time: 140522740145918
+  iterations: 35509
+  linesearch_failures: 79
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 33810
+  sum_τ: 34477.4765625
+  count_τ: 35470
+‖Σ‖: 0
+‖x‖: 369.6173883112387
+‖y‖: 0
+f: 1.7201194373987609
+counters:
+  f: 76882
+  grad_f: 73810
+  g: 76940
+  grad_g_prod: 73810
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

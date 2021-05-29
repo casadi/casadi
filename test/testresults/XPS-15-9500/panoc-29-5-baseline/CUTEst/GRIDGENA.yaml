@@ -1,0 +1,34 @@
+name: GRIDGENA
+n: 6218
+m: 0
+box constraints x: 12436
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 12
+inner convergence failures: 12
+initial penalty reduced: 11
+penalty reduced: 0
+elapsed time: 31.229787000000002
+ε: 10.007920106862242
+δ: 0
+inner:
+  elapsed_time: 140359562463044
+  iterations: 12000
+  linesearch_failures: 1692
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 3288
+  sum_τ: 4312.59375
+  count_τ: 11988
+‖Σ‖: 0
+‖x‖: 413.26675231013576
+‖y‖: 0
+f: 23528.428282942456
+counters:
+  f: 102624
+  grad_f: 62484
+  g: 102636
+  grad_g_prod: 62484
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

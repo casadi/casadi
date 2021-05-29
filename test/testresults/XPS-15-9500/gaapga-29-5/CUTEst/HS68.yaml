@@ -1,0 +1,29 @@
+name: HS68
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 8
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00044900000000000002
+ε: 2.3004446347840712e-08
+δ: 3.6211201033253815e-06
+inner:
+  elapsed_time: 140733700069337
+  iterations: 203
+  accelerated_steps_accepted: 51
+‖Σ‖: 766539.74025170028
+‖x‖: 3.7549898289845545
+‖y‖: 13.662906930272676
+f: -0.92041842979875566
+counters:
+  f: 454
+  grad_f: 286
+  g: 478
+  grad_g_prod: 286
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

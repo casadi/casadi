@@ -1,0 +1,34 @@
+name: DALLASS
+n: 46
+m: 31
+box constraints x: 92
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.10403800000000001
+ε: 8.5576021679953373e-06
+δ: 1.5369850991930889e-06
+inner:
+  elapsed_time: 139852725196343
+  iterations: 2462
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 2342
+  sum_τ: 2390.6640625
+  count_τ: 2453
+‖Σ‖: 348.6943797000186
+‖x‖: 184.09355927793683
+‖y‖: 658.71364040808783
+f: -32393.224699509658
+counters:
+  f: 5233
+  grad_f: 5091
+  g: 5251
+  grad_g_prod: 5091
+  grad_gi: 0
+  hess_L_prod: 2405
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: PFIT3
+n: 3
+m: 3
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 3
+penalty reduced: 20
+elapsed time: 0.203794
+ε: 0.025150268219992
+δ: 0.0043795987601153996
+inner:
+  elapsed_time: 94845763001108
+  iterations: 239012
+‖Σ‖: 0.37412297443487746
+‖x‖: 4.6698180438420849
+‖y‖: 0.72211854619452354
+f: 0
+counters:
+  f: 239517
+  grad_f: 239732
+  g: 239974
+  grad_g_prod: 239732
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

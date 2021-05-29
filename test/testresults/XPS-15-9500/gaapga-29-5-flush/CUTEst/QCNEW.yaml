@@ -1,0 +1,29 @@
+name: QCNEW
+n: 9
+m: 3
+box constraints x: 18
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 235
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.013672
+ε: 0.17931163252611004
+δ: 0
+inner:
+  elapsed_time: 140722761668389
+  iterations: 3614
+  accelerated_steps_accepted: 280
+‖Σ‖: 1.7320508075688772
+‖x‖: 0.91550694818211265
+‖y‖: 0
+f: -806.03174521806523
+counters:
+  f: 7708
+  grad_f: 4854
+  g: 8408
+  grad_g_prod: 4854
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

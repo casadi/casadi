@@ -1,0 +1,29 @@
+name: FLOSP2TM
+n: 2883
+m: 2763
+box constraints x: 240
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 62
+inner convergence failures: 61
+initial penalty reduced: 15
+penalty reduced: 20
+elapsed time: 30.240186000000001
+ε: 1.917914338699835
+δ: 28.530678962871374
+inner:
+  elapsed_time: 140734108214590
+  iterations: 61900
+  accelerated_steps_accepted: 49471
+‖Σ‖: 0.024714919384622426
+‖x‖: 22.616411075256618
+‖y‖: 1.4233602819046978
+f: 0
+counters:
+  f: 125466
+  grad_f: 111619
+  g: 125617
+  grad_g_prod: 111619
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

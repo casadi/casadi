@@ -1,0 +1,29 @@
+name: JUNKTURN
+n: 10010
+m: 7000
+box constraints x: 28
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 20
+inner convergence failures: 16
+initial penalty reduced: 0
+penalty reduced: 15
+elapsed time: 30.114249999999998
+ε: 0.00056032788605657924
+δ: 0.13014675823287936
+inner:
+  elapsed_time: 140722635476977
+  iterations: 16795
+  accelerated_steps_accepted: 15949
+‖Σ‖: 256.57739394352745
+‖x‖: 58.710967386602398
+‖y‖: 1.9520458548127755
+f: 0.23191365525969596
+counters:
+  f: 33772
+  grad_f: 32824
+  g: 33816
+  grad_g_prod: 32824
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

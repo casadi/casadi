@@ -1,0 +1,34 @@
+name: MRIBASIS
+n: 36
+m: 55
+box constraints x: 72
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 10
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0067840000000000001
+ε: 7.5150433245382946e-06
+δ: 4.8967445104899124e-07
+inner:
+  elapsed_time: 6756
+  iterations: 451
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 415
+  sum_τ: 424.4765625
+  count_τ: 441
+‖Σ‖: 140721.85460846638
+‖x‖: 50.288826169127383
+‖y‖: 2.8334666487519808e-06
+f: 18.2179
+counters:
+  f: 1070
+  grad_f: 970
+  g: 1090
+  grad_g_prod: 970
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

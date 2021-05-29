@@ -1,0 +1,28 @@
+name: MATRIX2
+n: 6
+m: 2
+box constraints x: 4
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 21
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.00057899999999999998
+ε: 1.0000000000000001e-05
+δ: 1e+40
+inner:
+  elapsed_time: 4906019910204099930
+  iterations: 219
+‖Σ‖: 1.4142135623730951
+‖x‖: .nan
+‖y‖: .nan
+f: .nan
+counters:
+  f: 502
+  grad_f: 282
+  g: 722
+  grad_g_prod: 282
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

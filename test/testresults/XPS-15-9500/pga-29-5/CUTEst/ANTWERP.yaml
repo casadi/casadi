@@ -1,0 +1,28 @@
+name: ANTWERP
+n: 27
+m: 10
+box constraints x: 51
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 1
+penalty reduced: 20
+elapsed time: 0.91527700000000001
+ε: 0.95808611288531276
+δ: 0.52257628445700022
+inner:
+  elapsed_time: 140725478808461
+  iterations: 239306
+‖Σ‖: 1.8973665961010275
+‖x‖: 82583.651211724587
+‖y‖: 70.089444970104481
+f: 3283.8229489963378
+counters:
+  f: 243603
+  grad_f: 240026
+  g: 244062
+  grad_g_prod: 240026
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: HS114
+n: 10
+m: 11
+box constraints x: 20
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 11
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0091199999999999996
+ε: 9.5452443729313052e-06
+δ: 3.3976243685174268e-07
+inner:
+  elapsed_time: 140445430588296
+  iterations: 2146
+  linesearch_failures: 190
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 1651
+  sum_τ: 1732
+  count_τ: 2135
+‖Σ‖: 128169.66728291872
+‖x‖: 16319.412876570086
+‖y‖: 404.93067967544062
+f: -1768.807004741926
+counters:
+  f: 8702
+  grad_f: 6351
+  g: 8724
+  grad_g_prod: 6351
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

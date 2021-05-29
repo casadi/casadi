@@ -1,0 +1,34 @@
+name: HS71
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000212
+ε: 1.5230413237254936e-06
+δ: 8.2304612014638678e-09
+inner:
+  elapsed_time: 140569984630991
+  iterations: 80
+  linesearch_failures: 4
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 59
+  sum_τ: 61.3984375
+  count_τ: 74
+‖Σ‖: 216.27551478793183
+‖x‖: 6.3245553209874332
+‖y‖: 0.57541326955281091
+f: 17.014017287785645
+counters:
+  f: 299
+  grad_f: 234
+  g: 311
+  grad_g_prod: 234
+  grad_gi: 0
+  hess_L_prod: 40
+  hess_L: 0

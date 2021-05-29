@@ -1,0 +1,34 @@
+name: HS69
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00056099999999999998
+ε: 3.2393170386058046e-06
+δ: 7.9954665910264566e-07
+inner:
+  elapsed_time: 552
+  iterations: 111
+  linesearch_failures: 22
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 70
+  sum_τ: 73.984375
+  count_τ: 105
+‖Σ‖: 4531.5403499711729
+‖x‖: 1.4488051762085585
+‖y‖: 55.267257797290803
+f: -956.71292073589075
+counters:
+  f: 685
+  grad_f: 421
+  g: 699
+  grad_g_prod: 421
+  grad_gi: 0
+  hess_L_prod: 15
+  hess_L: 0

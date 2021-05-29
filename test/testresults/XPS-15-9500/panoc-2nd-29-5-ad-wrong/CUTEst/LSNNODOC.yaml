@@ -1,0 +1,34 @@
+name: LSNNODOC
+n: 5
+m: 4
+box constraints x: 6
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000136
+ε: 5.750830389672501e-08
+δ: 1.1665131856020139e-06
+inner:
+  elapsed_time: 130
+  iterations: 47
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 38
+  sum_τ: 38.5625
+  count_τ: 41
+‖Σ‖: 607.62087459382428
+‖x‖: 11.661902863848127
+‖y‖: 20.533843204942812
+f: 123.11242556404267
+counters:
+  f: 128
+  grad_f: 117
+  g: 140
+  grad_g_prod: 117
+  grad_gi: 0
+  hess_L_prod: 41
+  hess_L: 0

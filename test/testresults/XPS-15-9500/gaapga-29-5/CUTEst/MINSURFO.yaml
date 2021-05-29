@@ -1,0 +1,29 @@
+name: MINSURFO
+n: 5306
+m: 0
+box constraints x: 5610
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 2.169203
+ε: 9.8880684716801462e-06
+δ: 0
+inner:
+  elapsed_time: 140733536713391
+  iterations: 1659
+  accelerated_steps_accepted: 1080
+‖Σ‖: 0
+‖x‖: 55.920411182024388
+‖y‖: 0
+f: 2.5069533425741888
+counters:
+  f: 3399
+  grad_f: 2763
+  g: 3417
+  grad_g_prod: 2763
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

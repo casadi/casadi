@@ -1,0 +1,28 @@
+name: HS99EXP
+n: 31
+m: 21
+box constraints x: 20
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 0.58321000000000001
+ε: 59739.119789013224
+δ: 403872.98895117082
+inner:
+  elapsed_time: 140724914858411
+  iterations: 240000
+‖Σ‖: 0.00016754622804340244
+‖x‖: 141.89861892528435
+‖y‖: 3597.3115847724466
+f: -0.38830770977825213
+counters:
+  f: 240501
+  grad_f: 240720
+  g: 240941
+  grad_g_prod: 240720
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

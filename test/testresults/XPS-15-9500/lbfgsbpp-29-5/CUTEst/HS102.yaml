@@ -1,0 +1,28 @@
+name: HS102
+n: 7
+m: 5
+box constraints x: 14
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 11
+inner convergence failures: 1
+initial penalty reduced: 1
+penalty reduced: 0
+elapsed time: 0.021323999999999999
+ε: 1.0000000000000001e-05
+δ: 6.5764114615118885e-07
+inner:
+  elapsed_time: 4906019910204120898
+  iterations: 522
+‖Σ‖: 406011.65046199074
+‖x‖: 6.5846114781892444
+‖y‖: 2756.9377577297651
+f: 911.87989471051424
+counters:
+  f: 763
+  grad_f: 753
+  g: 773
+  grad_g_prod: 753
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

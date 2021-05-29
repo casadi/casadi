@@ -1,0 +1,28 @@
+name: HS119
+n: 16
+m: 8
+box constraints x: 32
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0053870000000000003
+ε: 1.0000000000000001e-05
+δ: 8.7546466598364958e-06
+inner:
+  elapsed_time: 4906019910204104990
+  iterations: 172
+‖Σ‖: 20944.304000101281
+‖x‖: 3.173506259466401
+‖y‖: 121.9025827381854
+f: 244.89974664010413
+counters:
+  f: 199
+  grad_f: 190
+  g: 208
+  grad_g_prod: 190
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

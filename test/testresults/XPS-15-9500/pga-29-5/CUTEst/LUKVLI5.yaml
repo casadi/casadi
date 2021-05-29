@@ -1,0 +1,28 @@
+name: LUKVLI5
+n: 10002
+m: 9996
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: MaxTime
+outer iterations: 13
+inner convergence failures: 7
+initial penalty reduced: 2
+penalty reduced: 4
+elapsed time: 32.807132000000003
+ε: 0.0037971715778292899
+δ: 0.00025779691749550082
+inner:
+  elapsed_time: 94025456847164
+  iterations: 10185
+‖Σ‖: 591.15268618369805
+‖x‖: 100.09072411385932
+‖y‖: 0.16913412292952915
+f: 0.53953365733552439
+counters:
+  f: 10283
+  grad_f: 10224
+  g: 10302
+  grad_g_prod: 10224
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

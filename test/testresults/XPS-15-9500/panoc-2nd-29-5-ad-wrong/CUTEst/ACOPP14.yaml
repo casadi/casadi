@@ -1,0 +1,34 @@
+name: ACOPP14
+n: 38
+m: 68
+box constraints x: 48
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 227
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 14.792025000000001
+ε: 0.00020650162001293966
+δ: 0.04875855715730637
+inner:
+  elapsed_time: 14790411
+  iterations: 235031
+  linesearch_failures: 1145
+  lbfgs_failures: 893
+  lbfgs_rejected: 0
+  τ_1_accepted: 228710
+  sum_τ: 230913.1171875
+  count_τ: 234791
+‖Σ‖: 8457.7790714699895
+‖x‖: 4.4777999373928807
+‖y‖: 14924.342772570169
+f: 8077.7482281475422
+counters:
+  f: 488791
+  grad_f: 477711
+  g: 489251
+  grad_g_prod: 477711
+  grad_gi: 0
+  hess_L_prod: 234791
+  hess_L: 0

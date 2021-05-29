@@ -1,0 +1,28 @@
+name: LEAKNET
+n: 156
+m: 153
+box constraints x: 82
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 4.2568330000000003
+ε: 0.011326507096617028
+δ: 0.018981778382232948
+inner:
+  elapsed_time: 94132802481974
+  iterations: 237000
+‖Σ‖: 81.670666244338776
+‖x‖: 2856.3631412978361
+‖y‖: 10.593287361583879
+f: 11.372592026345744
+counters:
+  f: 238337
+  grad_f: 237720
+  g: 238797
+  grad_g_prod: 237720
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

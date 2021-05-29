@@ -1,0 +1,28 @@
+name: HS38
+n: 4
+m: 0
+box constraints x: 8
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 91
+inner convergence failures: 85
+initial penalty reduced: 10
+penalty reduced: 20
+elapsed time: 0.039343000000000003
+ε: 9.9968883810585673e-06
+δ: 0
+inner:
+  elapsed_time: 94244467415408
+  iterations: 86803
+‖Σ‖: 0
+‖x‖: 2.0000000006977898
+‖y‖: 0
+f: 1.7308217431655221e-10
+counters:
+  f: 87001
+  grad_f: 87076
+  g: 87153
+  grad_g_prod: 87076
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

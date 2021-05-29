@@ -1,0 +1,29 @@
+name: ZIGZAG
+n: 3004
+m: 2500
+box constraints x: 3012
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 80
+inner convergence failures: 78
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.151736
+ε: 0.002945411586526489
+δ: 0.016483383229186466
+inner:
+  elapsed_time: 140732177202421
+  iterations: 78825
+  accelerated_steps_accepted: 49507
+‖Σ‖: 50
+‖x‖: 15.945393226335185
+‖y‖: 29.351900730385008
+f: 87.679136812190464
+counters:
+  f: 158877
+  grad_f: 128652
+  g: 159097
+  grad_g_prod: 128652
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

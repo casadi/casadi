@@ -1,0 +1,34 @@
+name: DEMBO7
+n: 16
+m: 20
+box constraints x: 32
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 12
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.01272
+ε: 8.8611370811231271e-06
+δ: 1.97031725890362e-06
+inner:
+  elapsed_time: 139908559679901
+  iterations: 798
+  linesearch_failures: 228
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 452
+  sum_τ: 480.2890625
+  count_τ: 786
+‖Σ‖: 1007125.6222095803
+‖x‖: 866.16643815256577
+‖y‖: 547.48049646757954
+f: 174.90969350369704
+counters:
+  f: 6159
+  grad_f: 3501
+  g: 6183
+  grad_g_prod: 3501
+  grad_gi: 0
+  hess_L_prod: 785
+  hess_L: 0

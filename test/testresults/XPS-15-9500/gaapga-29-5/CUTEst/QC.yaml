@@ -1,0 +1,29 @@
+name: QC
+n: 9
+m: 4
+box constraints x: 18
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 3
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00044499999999999997
+ε: 0
+δ: 0
+inner:
+  elapsed_time: 94901597372857
+  iterations: 110
+  accelerated_steps_accepted: 7
+‖Σ‖: 2
+‖x‖: 0.76754780365551134
+‖y‖: 0
+f: -950.99870206231367
+counters:
+  f: 226
+  grad_f: 129
+  g: 235
+  grad_g_prod: 129
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

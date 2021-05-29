@@ -1,0 +1,28 @@
+name: ZAMB2-8
+n: 138
+m: 48
+box constraints x: 276
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 10
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.039954000000000003
+ε: 1.0000000000000001e-05
+δ: 6.8924179286999898e-06
+inner:
+  elapsed_time: 4906019910204139539
+  iterations: 504
+‖Σ‖: 4310.0684871145604
+‖x‖: 225.75710448686303
+‖y‖: 0.04859622156847259
+f: -0.14943228390975313
+counters:
+  f: 545
+  grad_f: 535
+  g: 555
+  grad_g_prod: 535
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

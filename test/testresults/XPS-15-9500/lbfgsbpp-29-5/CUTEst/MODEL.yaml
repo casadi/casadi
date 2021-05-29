@@ -1,0 +1,28 @@
+name: MODEL
+n: 1542
+m: 38
+box constraints x: 3084
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.043519000000000002
+ε: 1.0000000000000001e-05
+δ: 0.68684683170787131
+inner:
+  elapsed_time: 4906019910204142450
+  iterations: 1
+‖Σ‖: 6.164414002968976
+‖x‖: 6.2754122969112824
+‖y‖: 250.62839637544241
+f: 0
+counters:
+  f: 6196
+  grad_f: 5976
+  g: 6416
+  grad_g_prod: 5976
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

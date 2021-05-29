@@ -1,0 +1,29 @@
+name: MISTAKE
+n: 9
+m: 13
+box constraints x: 1
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00036099999999999999
+ε: 9.1384508479341875e-06
+δ: 6.7032997874694189e-08
+inner:
+  elapsed_time: 140735489840384
+  iterations: 118
+  accelerated_steps_accepted: 14
+‖Σ‖: 157.61771890563151
+‖x‖: 2.518292191430378
+‖y‖: 0.5000017161510204
+f: -1.0000000083675329
+counters:
+  f: 257
+  grad_f: 156
+  g: 275
+  grad_g_prod: 156
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

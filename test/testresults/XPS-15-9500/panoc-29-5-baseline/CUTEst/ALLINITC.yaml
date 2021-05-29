@@ -1,0 +1,34 @@
+name: ALLINITC
+n: 4
+m: 1
+box constraints x: 5
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 11
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.00068400000000000004
+ε: 2.2977501856757954e-07
+δ: 4.2850723064313812e-06
+inner:
+  elapsed_time: 669
+  iterations: 193
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 20
+  τ_1_accepted: 181
+  sum_τ: 181.5
+  count_τ: 182
+‖Σ‖: 800000000
+‖x‖: 2.2861950999548073
+‖y‖: 6716.5133803855542
+f: 30.438887514279006
+counters:
+  f: 455
+  grad_f: 409
+  g: 476
+  grad_g_prod: 409
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

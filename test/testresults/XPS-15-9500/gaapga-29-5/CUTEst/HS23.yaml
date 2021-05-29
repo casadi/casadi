@@ -1,0 +1,29 @@
+name: HS23
+n: 2
+m: 5
+box constraints x: 4
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00034499999999999998
+ε: 5.1832666825291085e-07
+δ: 9.5547618648161858e-06
+inner:
+  elapsed_time: 94592359727444
+  iterations: 302
+  accelerated_steps_accepted: 22
+‖Σ‖: 130.22249441687438
+‖x‖: 3.0776711867865725
+‖y‖: 9.7879567991512104
+f: 9.4720599339762686
+counters:
+  f: 628
+  grad_f: 348
+  g: 646
+  grad_g_prod: 348
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

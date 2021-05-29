@@ -1,0 +1,28 @@
+name: HS2
+n: 2
+m: 0
+box constraints x: 1
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00015300000000000001
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204099796
+  iterations: 15
+‖Σ‖: 0
+‖x‖: 1.9341419502971331
+‖y‖: 0
+f: 4.941229317989186
+counters:
+  f: 39
+  grad_f: 32
+  g: 46
+  grad_g_prod: 32
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

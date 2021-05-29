@@ -1,0 +1,29 @@
+name: DEMBO7
+n: 16
+m: 20
+box constraints x: 32
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 56
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.283771
+ε: 8.7127734444969462e-06
+δ: 0.051899167409723002
+inner:
+  elapsed_time: 140734753078420
+  iterations: 66833
+  accelerated_steps_accepted: 54
+‖Σ‖: 4.4721359549995796
+‖x‖: 707.11098769590376
+‖y‖: 15.178101161568961
+f: 154.86202553231527
+counters:
+  f: 136003
+  grad_f: 67847
+  g: 136703
+  grad_g_prod: 67847
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: HS54
+n: 6
+m: 1
+box constraints x: 12
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00021800000000000001
+ε: 9.6733856480568647e-06
+δ: 6.108166417106986e-09
+inner:
+  elapsed_time: 94673964105940
+  iterations: 88
+  accelerated_steps_accepted: 1
+‖Σ‖: 1
+‖x‖: 50159746.147872671
+‖y‖: 8.567440090700984e-10
+f: -1.0924256153383105e-32
+counters:
+  f: 332
+  grad_f: 113
+  g: 350
+  grad_g_prod: 113
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

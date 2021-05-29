@@ -1,0 +1,29 @@
+name: HS119
+n: 16
+m: 8
+box constraints x: 32
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.003447
+ε: 2.8399691132108273e-07
+δ: 3.1778747322519507e-07
+inner:
+  elapsed_time: 94686849011043
+  iterations: 208
+  accelerated_steps_accepted: 118
+‖Σ‖: 20668.248008328526
+‖x‖: 3.1735064858776072
+‖y‖: 121.90396392870682
+f: 244.89969192799367
+counters:
+  f: 447
+  grad_f: 362
+  g: 474
+  grad_g_prod: 362
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

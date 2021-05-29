@@ -1,0 +1,28 @@
+name: HANGING
+n: 3600
+m: 2330
+box constraints x: 24
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 36
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 20.830801000000001
+ε: 1.0000000000000001e-05
+δ: 5.9671348828782556e-06
+inner:
+  elapsed_time: 4906019910224925225
+  iterations: 14951
+‖Σ‖: 16870854.793192256
+‖x‖: 1422.8939222250453
+‖y‖: 391.0767869740547
+f: -31474.057914925314
+counters:
+  f: 15399
+  grad_f: 15363
+  g: 15435
+  grad_g_prod: 15363
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

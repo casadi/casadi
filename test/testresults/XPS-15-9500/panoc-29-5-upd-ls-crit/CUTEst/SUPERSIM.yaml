@@ -1,0 +1,34 @@
+name: SUPERSIM
+n: 2
+m: 2
+box constraints x: 1
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.5999999999999999e-05
+ε: 7.5375810482114503e-08
+δ: 8.2370631648842618e-08
+inner:
+  elapsed_time: 139934329471023
+  iterations: 21
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 15
+  sum_τ: 15
+  count_τ: 15
+‖Σ‖: 36.971190959329832
+‖x‖: 0.9428090375732846
+‖y‖: 0.7453560623440102
+f: 0.66666658996531247
+counters:
+  f: 50
+  grad_f: 54
+  g: 62
+  grad_g_prod: 54
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

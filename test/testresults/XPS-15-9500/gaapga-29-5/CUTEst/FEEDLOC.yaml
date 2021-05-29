@@ -1,0 +1,29 @@
+name: FEEDLOC
+n: 90
+m: 259
+box constraints x: 180
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.023691
+ε: 4.0298895152557357e-06
+δ: 8.3380155130874378e-06
+inner:
+  elapsed_time: 140721102178273
+  iterations: 684
+  accelerated_steps_accepted: 188
+‖Σ‖: 175.26837909583338
+‖x‖: 80.236200800257549
+‖y‖: 1.9071569676456863
+f: 0
+counters:
+  f: 1427
+  grad_f: 896
+  g: 1445
+  grad_g_prod: 896
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

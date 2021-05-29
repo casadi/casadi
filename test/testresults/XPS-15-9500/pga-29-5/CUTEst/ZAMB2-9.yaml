@@ -1,0 +1,28 @@
+name: ZAMB2-9
+n: 138
+m: 48
+box constraints x: 276
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 234
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.403089
+ε: 0.00060560767598576788
+δ: 5.8947476022641609e-06
+inner:
+  elapsed_time: 94102735857826
+  iterations: 235739
+‖Σ‖: 25.555808701926068
+‖x‖: 238.94448754530097
+‖y‖: 0.0068934128436962394
+f: -0.34572638287730262
+counters:
+  f: 237432
+  grad_f: 236459
+  g: 237892
+  grad_g_prod: 236459
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

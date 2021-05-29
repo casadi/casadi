@@ -1,0 +1,28 @@
+name: CONCON
+n: 15
+m: 11
+box constraints x: 5
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 41
+initial penalty reduced: 1
+penalty reduced: 20
+elapsed time: 0.168272
+ε: 1.0000000000000001e-05
+δ: 0.0067211271135647621
+inner:
+  elapsed_time: 4906019910204267441
+  iterations: 4365
+‖Σ‖: 18.602097968355682
+‖x‖: 2763.2940079477307
+‖y‖: 0.56680707654337925
+f: -6227.3944689955842
+counters:
+  f: 6900
+  grad_f: 6681
+  g: 7119
+  grad_g_prod: 6681
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

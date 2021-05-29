@@ -1,0 +1,28 @@
+name: HUBFIT
+n: 2
+m: 1
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00063000000000000003
+ε: 9.9907780789776357e-06
+δ: 8.2827776595184588e-06
+inner:
+  elapsed_time: 140736265779855
+  iterations: 1009
+‖Σ‖: 10
+‖x‖: 0.67796442053980854
+‖y‖: 0.12150960269631216
+f: 0.016894500413044578
+counters:
+  f: 1025
+  grad_f: 1027
+  g: 1037
+  grad_g_prod: 1027
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

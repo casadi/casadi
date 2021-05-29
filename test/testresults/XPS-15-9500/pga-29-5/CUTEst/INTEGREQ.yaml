@@ -1,0 +1,28 @@
+name: INTEGREQ
+n: 502
+m: 500
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.53933399999999998
+ε: 9.5924855685007492e-06
+δ: 1.8927422423831344e-06
+inner:
+  elapsed_time: 140726130312644
+  iterations: 256
+‖Σ‖: 1696.9182076808529
+‖x‖: 2.7926912626451346
+‖y‖: 9.0672432179349259e-06
+f: 0
+counters:
+  f: 271
+  grad_f: 277
+  g: 285
+  grad_g_prod: 277
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

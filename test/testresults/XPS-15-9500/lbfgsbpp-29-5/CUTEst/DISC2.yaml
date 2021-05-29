@@ -1,0 +1,28 @@
+name: DISC2
+n: 29
+m: 23
+box constraints x: 14
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0078530000000000006
+ε: 1.0000000000000001e-05
+δ: 5.1591304393028281e-06
+inner:
+  elapsed_time: 4906019910204107479
+  iterations: 243
+‖Σ‖: 220.16079165799985
+‖x‖: 28.347565061246456
+‖y‖: 0.58238730762007607
+f: 1.5624994035770479
+counters:
+  f: 288
+  grad_f: 281
+  g: 295
+  grad_g_prod: 281
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

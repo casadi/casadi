@@ -1,0 +1,34 @@
+name: HS116
+n: 13
+m: 14
+box constraints x: 26
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 221
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 3.1061420000000002
+ε: 1
+δ: 0.79984796199055952
+inner:
+  elapsed_time: 3105835
+  iterations: 225200
+  linesearch_failures: 185940
+  lbfgs_failures: 0
+  lbfgs_rejected: 4594
+  τ_1_accepted: 30823
+  sum_τ: 32515.1875
+  count_τ: 224960
+‖Σ‖: 3.7416573867739413
+‖x‖: 609.80421420136645
+‖y‖: 57.685900694297821
+f: 145.58558211412816
+counters:
+  f: 3297980
+  grad_f: 1779854
+  g: 3298440
+  grad_g_prod: 1779854
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

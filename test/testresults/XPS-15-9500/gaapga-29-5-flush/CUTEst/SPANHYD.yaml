@@ -1,0 +1,29 @@
+name: SPANHYD
+n: 97
+m: 33
+box constraints x: 194
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 12
+penalty reduced: 20
+elapsed time: 2.6458140000000001
+ε: 44.600880534084602
+δ: 608.35000000000002
+inner:
+  elapsed_time: 94648196947386
+  iterations: 239034
+  accelerated_steps_accepted: 697
+‖Σ‖: 0.012504662497029388
+‖x‖: 5564.1225358860193
+‖y‖: 213.16272746598472
+f: 239.73904430094296
+counters:
+  f: 479984
+  grad_f: 240691
+  g: 480672
+  grad_g_prod: 240691
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

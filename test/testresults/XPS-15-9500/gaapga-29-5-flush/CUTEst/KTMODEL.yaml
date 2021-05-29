@@ -1,0 +1,29 @@
+name: KTMODEL
+n: 726
+m: 450
+box constraints x: 713
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 238
+initial penalty reduced: 3
+penalty reduced: 20
+elapsed time: 6.6014049999999997
+ε: .inf
+δ: 14086.789788503074
+inner:
+  elapsed_time: 94768525685699
+  iterations: 25295
+  accelerated_steps_accepted: 2064
+‖Σ‖: 4.582051942088829
+‖x‖: 69.848330627162397
+‖y‖: .nan
+f: 0
+counters:
+  f: 50642
+  grad_f: 27891
+  g: 51125
+  grad_g_prod: 27891
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

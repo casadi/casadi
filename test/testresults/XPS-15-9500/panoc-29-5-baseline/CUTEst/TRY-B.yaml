@@ -1,0 +1,34 @@
+name: TRY-B
+n: 2
+m: 1
+box constraints x: 2
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 4
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.1999999999999997e-05
+ε: 4.4312723106454399e-06
+δ: 3.9747961873004556e-06
+inner:
+  elapsed_time: 45
+  iterations: 18
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 14
+  sum_τ: 14
+  count_τ: 14
+‖Σ‖: 100.00000000000001
+‖x‖: 10.198039416946202
+‖y‖: 0.99999912610991404
+f: 1.0000039747961873
+counters:
+  f: 50
+  grad_f: 44
+  g: 58
+  grad_g_prod: 44
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: HELSBY
+n: 1408
+m: 1399
+box constraints x: 685
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 71
+inner convergence failures: 68
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.126287000000001
+ε: 0.0030511854188251257
+δ: 0.14334787387176434
+inner:
+  elapsed_time: 30122502
+  iterations: 68002
+  linesearch_failures: 1298
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 55440
+  sum_τ: 59486.40625
+  count_τ: 67933
+‖Σ‖: 115.32711313336161
+‖x‖: 3403.26104230494
+‖y‖: 5.5693743383123531
+f: 26.722609478321345
+counters:
+  f: 196581
+  grad_f: 165618
+  g: 196703
+  grad_g_prod: 165618
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

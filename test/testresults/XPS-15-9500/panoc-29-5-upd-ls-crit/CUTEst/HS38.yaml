@@ -1,0 +1,34 @@
+name: HS38
+n: 4
+m: 0
+box constraints x: 8
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 57
+inner convergence failures: 52
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.048036000000000002
+ε: 5.7225885829229567e-07
+δ: 0
+inner:
+  elapsed_time: 140316581608303
+  iterations: 52656
+  linesearch_failures: 2
+  lbfgs_failures: 0
+  lbfgs_rejected: 52584
+  τ_1_accepted: 52592
+  sum_τ: 52593.7890625
+  count_τ: 52600
+‖Σ‖: 0
+‖x‖: 1.9999999932974555
+‖y‖: 0
+f: 1.3097729943831142e-15
+counters:
+  f: 105593
+  grad_f: 105458
+  g: 105687
+  grad_g_prod: 105458
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

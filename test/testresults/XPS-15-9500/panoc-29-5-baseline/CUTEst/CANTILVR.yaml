@@ -1,0 +1,34 @@
+name: CANTILVR
+n: 5
+m: 1
+box constraints x: 5
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000115
+ε: 4.3354549112348262e-06
+δ: 3.3345559363739952e-07
+inner:
+  elapsed_time: 104
+  iterations: 59
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 53
+  sum_τ: 53
+  count_τ: 53
+‖Σ‖: 100
+‖x‖: 10.073390738377672
+‖y‖: 0.44663804003291724
+f: 1.3399565095586095
+counters:
+  f: 183
+  grad_f: 130
+  g: 195
+  grad_g_prod: 130
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

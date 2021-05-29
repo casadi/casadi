@@ -1,0 +1,34 @@
+name: MATRIX2
+n: 6
+m: 2
+box constraints x: 4
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00011
+ε: 8.1252308805942393e-06
+δ: 8.2105147173804959e-12
+inner:
+  elapsed_time: 139655156596836
+  iterations: 35
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 30
+  sum_τ: 30
+  count_τ: 30
+‖Σ‖: 10.04987562112089
+‖x‖: 4.8464120561789988e-06
+‖y‖: 0.11392592268087372
+f: 2.1765562195067295e-12
+counters:
+  f: 152
+  grad_f: 83
+  g: 164
+  grad_g_prod: 83
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

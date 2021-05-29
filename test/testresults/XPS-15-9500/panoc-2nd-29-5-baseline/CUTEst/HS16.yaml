@@ -1,0 +1,34 @@
+name: HS16
+n: 2
+m: 2
+box constraints x: 3
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 4
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.00015200000000000001
+ε: 0
+δ: 0
+inner:
+  elapsed_time: 146
+  iterations: 78
+  linesearch_failures: 39
+  lbfgs_failures: 36
+  lbfgs_rejected: 0
+  τ_1_accepted: 32
+  sum_τ: 33.625
+  count_τ: 75
+‖Σ‖: 8.0622577482985491
+‖x‖: 0.55901699437494745
+‖y‖: 0
+f: 0.25
+counters:
+  f: 220
+  grad_f: 168
+  g: 255
+  grad_g_prod: 168
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

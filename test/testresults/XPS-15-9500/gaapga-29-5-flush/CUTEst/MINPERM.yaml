@@ -1,0 +1,29 @@
+name: MINPERM
+n: 1113
+m: 1033
+box constraints x: 1213
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 11
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.12547900000000001
+ε: 9.9728322837458472e-06
+δ: 7.105682179181505e-07
+inner:
+  elapsed_time: 140720974237240
+  iterations: 480
+  accelerated_steps_accepted: 351
+‖Σ‖: 434959.76601011824
+‖x‖: 1.0119488335642239
+‖y‖: 1.0672871014005416
+f: 0.00036287840556848371
+counters:
+  f: 999
+  grad_f: 875
+  g: 1032
+  grad_g_prod: 875
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

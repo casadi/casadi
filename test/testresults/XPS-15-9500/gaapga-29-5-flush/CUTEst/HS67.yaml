@@ -1,0 +1,29 @@
+name: HS67
+n: 3
+m: 14
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 0.170348
+ε: .inf
+δ: 310.6344614931877
+inner:
+  elapsed_time: 140727404576701
+  iterations: 43457
+  accelerated_steps_accepted: 20094
+‖Σ‖: 0.0024807146818822462
+‖x‖: 16000.449993672053
+‖y‖: 3464101615.1377544
+f: -.inf
+counters:
+  f: 87068
+  grad_f: 64125
+  g: 87555
+  grad_g_prod: 64125
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

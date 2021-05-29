@@ -1,0 +1,28 @@
+name: PORTFL3
+n: 12
+m: 1
+box constraints x: 24
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 65
+inner convergence failures: 60
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.36416300000000001
+ε: 9.9989396533505664e-06
+δ: 1.040171643262866e-09
+inner:
+  elapsed_time: 140725192184365
+  iterations: 61670
+‖Σ‖: 10
+‖x‖: 0.52085712342802259
+‖y‖: 0.013869775793334836
+f: 0.032749720470570717
+counters:
+  f: 61804
+  grad_f: 61865
+  g: 61914
+  grad_g_prod: 61865
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

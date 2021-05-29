@@ -1,0 +1,34 @@
+name: LSQFIT
+n: 2
+m: 1
+box constraints x: 1
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 7.2999999999999999e-05
+ε: 7.412470043322017e-07
+δ: 8.2511076947289208e-06
+inner:
+  elapsed_time: 140681653780543
+  iterations: 24
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 19
+  sum_τ: 19
+  count_τ: 19
+‖Σ‖: 100
+‖x‖: 0.67797062965437227
+‖y‖: 0.24295936377292135
+f: 0.033784983150912717
+counters:
+  f: 58
+  grad_f: 58
+  g: 68
+  grad_g_prod: 58
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

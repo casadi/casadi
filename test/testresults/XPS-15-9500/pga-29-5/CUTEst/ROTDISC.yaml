@@ -1,0 +1,28 @@
+name: ROTDISC
+n: 905
+m: 1081
+box constraints x: 1269
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 2
+penalty reduced: 20
+elapsed time: 14.095371
+ε: 0.10033855330805788
+δ: 0.15992182463392379
+inner:
+  elapsed_time: 140732203352361
+  iterations: 239699
+‖Σ‖: 11.836283200396988
+‖x‖: 651639.8433082758
+‖y‖: 51.47465994426085
+f: 9.3572362710863306
+counters:
+  f: 243814
+  grad_f: 240419
+  g: 244272
+  grad_g_prod: 240419
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

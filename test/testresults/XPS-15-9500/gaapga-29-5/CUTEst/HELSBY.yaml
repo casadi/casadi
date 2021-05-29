@@ -1,0 +1,29 @@
+name: HELSBY
+n: 1408
+m: 1399
+box constraints x: 685
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 96
+inner convergence failures: 92
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.202380999999999
+ε: 1.1221505310437312e-05
+δ: 0.0096032400476695774
+inner:
+  elapsed_time: 93896605221879
+  iterations: 92869
+  accelerated_steps_accepted: 54511
+‖Σ‖: 212.49774579049546
+‖x‖: 3177.7524463259065
+‖y‖: 5.9539163002741491
+f: 26.711862576168002
+counters:
+  f: 186182
+  grad_f: 147764
+  g: 186450
+  grad_g_prod: 147764
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

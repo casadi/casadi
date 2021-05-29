@@ -1,0 +1,34 @@
+name: DISC2
+n: 29
+m: 23
+box constraints x: 14
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0020969999999999999
+ε: 8.7072890943701298e-06
+δ: 2.0904844564850755e-06
+inner:
+  elapsed_time: 2085
+  iterations: 419
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 368
+  sum_τ: 384.203125
+  count_τ: 413
+‖Σ‖: 191.11114481763809
+‖x‖: 28.366174707707771
+‖y‖: 0.58214956612301383
+f: 1.5625002794326901
+counters:
+  f: 1026
+  grad_f: 936
+  g: 1047
+  grad_g_prod: 936
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

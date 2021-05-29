@@ -1,0 +1,34 @@
+name: FCCU
+n: 19
+m: 8
+box constraints x: 19
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00058299999999999997
+ε: 5.7244893378882722e-06
+δ: 6.4261492127570818e-07
+inner:
+  elapsed_time: 140312286593595
+  iterations: 142
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 128
+  sum_τ: 131.25
+  count_τ: 135
+‖Σ‖: 672.09520863193177
+‖x‖: 62.693437639496651
+‖y‖: 5.243049396743741
+f: 11.149108538753813
+counters:
+  f: 348
+  grad_f: 306
+  g: 362
+  grad_g_prod: 306
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

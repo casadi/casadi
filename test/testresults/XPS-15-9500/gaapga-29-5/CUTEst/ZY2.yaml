@@ -1,0 +1,29 @@
+name: ZY2
+n: 3
+m: 2
+box constraints x: 4
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 3.8999999999999999e-05
+ε: 9.2463992351632385e-07
+δ: 2.0751089735426831e-08
+inner:
+  elapsed_time: 140725245056385
+  iterations: 7
+  accelerated_steps_accepted: 2
+‖Σ‖: 10.04987562112089
+‖x‖: 2.0000000051877724
+‖y‖: 0.24999998779210622
+f: 2.0000000051877724
+counters:
+  f: 31
+  grad_f: 33
+  g: 49
+  grad_g_prod: 33
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

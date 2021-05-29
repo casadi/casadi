@@ -1,0 +1,28 @@
+name: PORTFL4
+n: 12
+m: 1
+box constraints x: 24
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 108
+inner convergence failures: 103
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.61268100000000003
+ε: 9.9996213911088261e-06
+δ: 1.0099448499722996e-09
+inner:
+  elapsed_time: 94111324002420
+  iterations: 105064
+‖Σ‖: 20.971520000000009
+‖x‖: 0.45385114798385762
+‖y‖: 0.014615521113906188
+f: 0.026306962065600514
+counters:
+  f: 105284
+  grad_f: 105388
+  g: 105480
+  grad_g_prod: 105388
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

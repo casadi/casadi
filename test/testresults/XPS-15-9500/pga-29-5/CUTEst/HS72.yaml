@@ -1,0 +1,28 @@
+name: HS72
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 13
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0023519999999999999
+ε: 9.9744332775486555e-06
+δ: 3.2693130595133971e-07
+inner:
+  elapsed_time: 93969589471520
+  iterations: 4191
+‖Σ‖: 1011056954.38811
+‖x‖: 363.77650175070721
+‖y‖: 42169.360875710969
+f: 727.66774793855609
+counters:
+  f: 4223
+  grad_f: 4230
+  g: 4249
+  grad_g_prod: 4230
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

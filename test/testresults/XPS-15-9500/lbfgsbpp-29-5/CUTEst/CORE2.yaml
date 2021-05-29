@@ -1,0 +1,28 @@
+name: CORE2
+n: 157
+m: 134
+box constraints x: 273
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 41
+initial penalty reduced: 19
+penalty reduced: 20
+elapsed time: 0.115121
+ε: 1.0000000000000001e-05
+δ: 1419.8117556666489
+inner:
+  elapsed_time: 4906019910204213297
+  iterations: 1940
+‖Σ‖: 0.00070538489654881542
+‖x‖: 17176.749181505347
+‖y‖: 1.220050901533972
+f: 36.01108
+counters:
+  f: 3672
+  grad_f: 3471
+  g: 3873
+  grad_g_prod: 3471
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: ACOPP30
+n: 72
+m: 142
+box constraints x: 84
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 71
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 14.312405
+ε: 8.9646720766722865e-06
+δ: 0.03934685882402178
+inner:
+  elapsed_time: 94897316714889
+  iterations: 171545
+  accelerated_steps_accepted: 137035
+‖Σ‖: 140.23499026471976
+‖x‖: 5.7382644890622156
+‖y‖: 1673.4780941776085
+f: 188.40514178307467
+counters:
+  f: 346281
+  grad_f: 309540
+  g: 346981
+  grad_g_prod: 309540
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

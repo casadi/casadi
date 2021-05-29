@@ -1,0 +1,29 @@
+name: HS117
+n: 15
+m: 5
+box constraints x: 15
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 16
+inner convergence failures: 9
+initial penalty reduced: 9
+penalty reduced: 0
+elapsed time: 0.042759999999999999
+ε: 6.13763738610551e-06
+δ: 4.4124168052661616e-07
+inner:
+  elapsed_time: 94789928265451
+  iterations: 10277
+  accelerated_steps_accepted: 202
+‖Σ‖: 8.6335360296217925
+‖x‖: 13.301256198822362
+‖y‖: 0.7712384489668852
+f: 32.348679094174273
+counters:
+  f: 20892
+  grad_f: 10543
+  g: 20931
+  grad_g_prod: 10543
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

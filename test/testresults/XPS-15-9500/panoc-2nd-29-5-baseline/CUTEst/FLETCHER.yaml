@@ -1,0 +1,34 @@
+name: FLETCHER
+n: 4
+m: 4
+box constraints x: 1
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000222
+ε: 1.9073213888276541e-06
+δ: 2.4504687168303008e-07
+inner:
+  elapsed_time: 140256452018391
+  iterations: 96
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 87
+  sum_τ: 88.5
+  count_τ: 90
+‖Σ‖: 1526.1109311109785
+‖x‖: 5.4901857112557231
+‖y‖: 8.3630792872443873
+f: 11.656853181325067
+counters:
+  f: 233
+  grad_f: 292
+  g: 329
+  grad_g_prod: 292
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

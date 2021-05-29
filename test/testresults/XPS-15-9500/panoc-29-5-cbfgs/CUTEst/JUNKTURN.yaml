@@ -1,0 +1,34 @@
+name: JUNKTURN
+n: 10010
+m: 7000
+box constraints x: 28
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 15
+inner convergence failures: 11
+initial penalty reduced: 0
+penalty reduced: 10
+elapsed time: 31.375114
+ε: 0.03103761674510315
+δ: 0.077644954469937924
+inner:
+  elapsed_time: 140522771363024
+  iterations: 12101
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 12031
+  sum_τ: 12058.25
+  count_τ: 12086
+‖Σ‖: 504.39443708633814
+‖x‖: 36.020060569517831
+‖y‖: 2.7947973294997182
+f: 0.46788637482154732
+counters:
+  f: 24451
+  grad_f: 24288
+  g: 24470
+  grad_g_prod: 24288
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

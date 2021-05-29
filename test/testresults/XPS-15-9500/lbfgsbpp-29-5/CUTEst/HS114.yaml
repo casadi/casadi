@@ -1,0 +1,28 @@
+name: HS114
+n: 10
+m: 11
+box constraints x: 20
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 15
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.021838
+ε: 1.0000000000000001e-05
+δ: 1.5437063893841696e-06
+inner:
+  elapsed_time: 4906019910204121450
+  iterations: 760
+‖Σ‖: 1684068.9961671757
+‖x‖: 16362.113433361381
+‖y‖: 404.26550915798521
+f: -1768.7944967558906
+counters:
+  f: 863
+  grad_f: 848
+  g: 878
+  grad_g_prod: 848
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

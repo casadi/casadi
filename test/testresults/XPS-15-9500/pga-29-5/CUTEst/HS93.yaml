@@ -1,0 +1,28 @@
+name: HS93
+n: 6
+m: 2
+box constraints x: 6
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00074399999999999998
+ε: 0
+δ: 2.0699999999999998
+inner:
+  elapsed_time: 94240172409296
+  iterations: 293
+‖Σ‖: 1000000000
+‖x‖: 14.71391989646548
+‖y‖: 3070000000
+f: 0
+counters:
+  f: 777
+  grad_f: 1013
+  g: 1257
+  grad_g_prod: 1013
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

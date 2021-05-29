@@ -1,0 +1,28 @@
+name: SYNTHES1
+n: 6
+m: 6
+box constraints x: 12
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00091600000000000004
+ε: 1.0000000000000001e-05
+δ: 2.7156652743220988e-07
+inner:
+  elapsed_time: 4906019910204100554
+  iterations: 64
+‖Σ‖: 572.08578509765471
+‖x‖: 1.6667101515174274
+‖y‖: 4.2455009556665484
+f: 0.75928382796663563
+counters:
+  f: 90
+  grad_f: 83
+  g: 97
+  grad_g_prod: 83
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

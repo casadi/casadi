@@ -1,0 +1,28 @@
+name: WACHBIEG
+n: 3
+m: 2
+box constraints x: 2
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 10
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.00033599999999999998
+ε: 1.0000000000000001e-05
+δ: 3.3724538939239324e-08
+inner:
+  elapsed_time: 4906019910204099973
+  iterations: 29
+‖Σ‖: 71.588812646137256
+‖x‖: 1.1180340057316425
+‖y‖: 0.4999990677647761
+f: 1.0000000168622694
+counters:
+  f: 65
+  grad_f: 56
+  g: 74
+  grad_g_prod: 56
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: HS107
+n: 9
+m: 6
+box constraints x: 8
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 14
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0039490000000000003
+ε: 1.0000000000000001e-05
+δ: 2.8404406158255568e-06
+inner:
+  elapsed_time: 4906019910204103566
+  iterations: 190
+‖Σ‖: 501532.38269940641
+‖x‖: 2.2859438602263822
+‖y‖: 7914.88038031828
+f: 5055.0354391330484
+counters:
+  f: 244
+  grad_f: 230
+  g: 258
+  grad_g_prod: 230
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

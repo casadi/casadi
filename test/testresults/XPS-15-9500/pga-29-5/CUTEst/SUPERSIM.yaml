@@ -1,0 +1,28 @@
+name: SUPERSIM
+n: 2
+m: 2
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0001
+ε: 9.8014292072567955e-06
+δ: 3.0709331411138407e-07
+inner:
+  elapsed_time: 140733741517438
+  iterations: 192
+‖Σ‖: 370.55308381990068
+‖x‖: 0.94280904113842989
+‖y‖: 0.74534424126007737
+f: 0.66666636020088554
+counters:
+  f: 205
+  grad_f: 210
+  g: 217
+  grad_g_prod: 210
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

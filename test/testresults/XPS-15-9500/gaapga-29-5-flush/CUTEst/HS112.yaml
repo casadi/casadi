@@ -1,0 +1,29 @@
+name: HS112
+n: 10
+m: 3
+box constraints x: 10
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.002709
+ε: 6.4626648139665122e-06
+δ: 1.1318577801261442e-06
+inner:
+  elapsed_time: 94545115089547
+  iterations: 599
+  accelerated_steps_accepted: 68
+‖Σ‖: 112.41885824255162
+‖x‖: 0.94027915545768392
+‖y‖: 22.263228200978876
+f: -47.761099670157961
+counters:
+  f: 1247
+  grad_f: 691
+  g: 1265
+  grad_g_prod: 691
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

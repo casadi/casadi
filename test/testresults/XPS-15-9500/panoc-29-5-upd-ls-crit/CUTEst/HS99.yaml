@@ -1,0 +1,34 @@
+name: HS99
+n: 7
+m: 2
+box constraints x: 14
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 235
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.042472999999999997
+ε: 0.0047385692596435547
+δ: 4.6316017687786371e-10
+inner:
+  elapsed_time: 42201
+  iterations: 8985
+  linesearch_failures: 72
+  lbfgs_failures: 0
+  lbfgs_rejected: 3718
+  τ_1_accepted: 8514
+  sum_τ: 8548.0625
+  count_τ: 8746
+‖Σ‖: 216.70044180820989
+‖x‖: 1.2485263499589907
+‖y‖: 19341.430181342865
+f: -831079891.51009846
+counters:
+  f: 20575
+  grad_f: 19460
+  g: 21035
+  grad_g_prod: 19460
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

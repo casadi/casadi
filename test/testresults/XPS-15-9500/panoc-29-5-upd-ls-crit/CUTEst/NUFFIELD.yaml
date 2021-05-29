@@ -1,0 +1,34 @@
+name: NUFFIELD
+n: 940
+m: 5000
+box constraints x: 2
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 69
+inner convergence failures: 67
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.037198
+ε: 108.72367242569028
+δ: 0.0038503088373998823
+inner:
+  elapsed_time: 30031655
+  iterations: 67004
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 63302
+  sum_τ: 64878.84375
+  count_τ: 66936
+‖Σ‖: 70.710678118654755
+‖x‖: 0.066373048226182702
+‖y‖: 0.72680234587156922
+f: -0.062633029484131852
+counters:
+  f: 145545
+  grad_f: 138859
+  g: 145663
+  grad_g_prod: 138859
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

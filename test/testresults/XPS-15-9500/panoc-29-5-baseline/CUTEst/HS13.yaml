@@ -1,0 +1,34 @@
+name: HS13
+n: 2
+m: 1
+box constraints x: 2
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00010399999999999999
+ε: 3.6369146183545809e-07
+δ: 9.0799432257006839e-06
+inner:
+  elapsed_time: 93
+  iterations: 57
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 48
+  sum_τ: 48
+  count_τ: 48
+‖Σ‖: 100000000
+‖x‖: 1.0208622451448102
+‖y‖: 1499.790263317092
+f: 0.95871074298286185
+counters:
+  f: 124
+  grad_f: 132
+  g: 142
+  grad_g_prod: 132
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

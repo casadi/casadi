@@ -1,0 +1,29 @@
+name: HS99
+n: 7
+m: 2
+box constraints x: 14
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 234
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.17813799999999999
+ε: 0.0029534101486206055
+δ: 5.8207660913467407e-11
+inner:
+  elapsed_time: 94231582651981
+  iterations: 55395
+  accelerated_steps_accepted: 1581
+‖Σ‖: 167.90126735195926
+‖x‖: 1.2485263499514079
+‖y‖: 19341.430181909956
+f: -831079891.5101074
+counters:
+  f: 111296
+  grad_f: 57936
+  g: 111996
+  grad_g_prod: 57936
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

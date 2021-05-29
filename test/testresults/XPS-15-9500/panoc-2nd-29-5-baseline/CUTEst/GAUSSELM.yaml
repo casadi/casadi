@@ -1,0 +1,34 @@
+name: GAUSSELM
+n: 22140
+m: 61542
+box constraints x: 3239
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 25.330214999999999
+ε: 7.5611980819392594e-06
+δ: 6.4226786842513203e-06
+inner:
+  elapsed_time: 139715311460268
+  iterations: 2231
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 2211
+  sum_τ: 2217.5
+  count_τ: 2224
+‖Σ‖: 741.93848547796165
+‖x‖: 28.634874702943332
+‖y‖: 2.2119696220438279
+f: -0.99992479489744079
+counters:
+  f: 4579
+  grad_f: 6713
+  g: 6817
+  grad_g_prod: 6713
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

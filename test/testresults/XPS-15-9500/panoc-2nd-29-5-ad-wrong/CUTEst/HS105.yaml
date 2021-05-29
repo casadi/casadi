@@ -1,0 +1,34 @@
+name: HS105
+n: 8
+m: 1
+box constraints x: 16
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 9
+inner convergence failures: 2
+initial penalty reduced: 0
+penalty reduced: 2
+elapsed time: 0.399704
+ε: 9.4261608705181743e-06
+δ: 0
+inner:
+  elapsed_time: 399607
+  iterations: 2182
+  linesearch_failures: 1091
+  lbfgs_failures: 1042
+  lbfgs_rejected: 0
+  τ_1_accepted: 1076
+  sum_τ: 1077.90625
+  count_τ: 2174
+‖Σ‖: 1
+‖x‖: 245.30047528284229
+‖y‖: 0
+f: 1061.8782433112228
+counters:
+  f: 4223
+  grad_f: 3701
+  g: 4239
+  grad_g_prod: 3701
+  grad_gi: 0
+  hess_L_prod: 932
+  hess_L: 0

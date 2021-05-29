@@ -1,0 +1,34 @@
+name: HS69
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 113
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.34581899999999999
+ε: 3.8775415305281058e-06
+δ: 0.42534019563810699
+inner:
+  elapsed_time: 139723876419015
+  iterations: 32597
+  linesearch_failures: 24425
+  lbfgs_failures: 0
+  lbfgs_rejected: 2551
+  τ_1_accepted: 7517
+  sum_τ: 7598.9765625
+  count_τ: 32359
+‖Σ‖: 1.4142135623730951
+‖x‖: 0.97575628187643837
+‖y‖: 57.800972710813404
+f: -955.26243487938143
+counters:
+  f: 440310
+  grad_f: 238097
+  g: 440770
+  grad_g_prod: 238097
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

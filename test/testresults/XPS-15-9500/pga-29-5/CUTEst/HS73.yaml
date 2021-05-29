@@ -1,0 +1,28 @@
+name: HS73
+n: 4
+m: 3
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 49
+inner convergence failures: 45
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.027342000000000002
+ε: 9.9975442076072341e-06
+δ: 1.8622561029357776e-06
+inner:
+  elapsed_time: 140722089304773
+  iterations: 46904
+‖Σ‖: 24.444437762638682
+‖x‖: 0.7101745825827368
+‖y‖: 18.385002746667716
+f: 29.894344274786544
+counters:
+  f: 47017
+  grad_f: 47051
+  g: 47095
+  grad_g_prod: 47051
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

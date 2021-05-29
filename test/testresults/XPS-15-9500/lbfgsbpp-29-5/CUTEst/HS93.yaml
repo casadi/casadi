@@ -1,0 +1,28 @@
+name: HS93
+n: 6
+m: 2
+box constraints x: 6
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00044099999999999999
+ε: 1.0000000000000001e-05
+δ: 2.0699999999999998
+inner:
+  elapsed_time: 4906019910204099984
+  iterations: 244
+‖Σ‖: 1000000000
+‖x‖: 6.0507543205717802
+‖y‖: 3070000000
+f: 0
+counters:
+  f: 486
+  grad_f: 246
+  g: 726
+  grad_g_prod: 246
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

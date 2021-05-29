@@ -1,0 +1,29 @@
+name: HYDROELL
+n: 1009
+m: 1008
+box constraints x: 2018
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 30
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 8.1919419999999992
+ε: 9.1354054828563029e-06
+δ: 0.019564779293773427
+inner:
+  elapsed_time: 140735850349397
+  iterations: 44153
+  accelerated_steps_accepted: 26160
+‖Σ‖: 150.57691927776497
+‖x‖: 19859141.724052511
+‖y‖: 714.21569401040813
+f: -3585545.2655498371
+counters:
+  f: 91361
+  grad_f: 71273
+  g: 92061
+  grad_g_prod: 71273
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: HS104
+n: 8
+m: 5
+box constraints x: 16
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 26
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.27238400000000001
+ε: 9.4885396038080216e-06
+δ: 0.44530896498812783
+inner:
+  elapsed_time: 139869905233616
+  iterations: 32353
+  linesearch_failures: 14460
+  lbfgs_failures: 14438
+  lbfgs_rejected: 0
+  τ_1_accepted: 17540
+  sum_τ: 17585.5078125
+  count_τ: 32113
+‖Σ‖: 57.993692630087807
+‖x‖: 14.886465690225744
+‖y‖: 390.88285800258046
+f: 4.2061662111351845
+counters:
+  f: 52851
+  grad_f: 50935
+  g: 76925
+  grad_g_prod: 136474
+  grad_gi: 0
+  hess_L_prod: 23614
+  hess_L: 0

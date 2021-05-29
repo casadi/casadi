@@ -1,0 +1,28 @@
+name: HS74
+n: 4
+m: 5
+box constraints x: 8
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 9
+penalty reduced: 20
+elapsed time: 0.258357
+ε: 1050.1494412758918
+δ: 507.64778204822812
+inner:
+  elapsed_time: 94437741162587
+  iterations: 239000
+‖Σ‖: 0.022534413312577717
+‖x‖: 129.75924059188984
+‖y‖: 1874.1265991241555
+f: 459.8937174183676
+counters:
+  f: 241398
+  grad_f: 239720
+  g: 241849
+  grad_g_prod: 239720
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

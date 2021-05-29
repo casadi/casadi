@@ -1,0 +1,28 @@
+name: GILBERT
+n: 5000
+m: 1
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 20
+inner convergence failures: 10
+initial penalty reduced: 10
+penalty reduced: 0
+elapsed time: 3.242607
+ε: 6.6901917835648916e-06
+δ: 2.6934969675316714e-06
+inner:
+  elapsed_time: 140735465147687
+  iterations: 11197
+‖Σ‖: 604.66175999999996
+‖x‖: 1.0000026934933397
+‖y‖: 40.233254832020478
+f: 2459.4681570514717
+counters:
+  f: 11260
+  grad_f: 11257
+  g: 11290
+  grad_g_prod: 11257
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

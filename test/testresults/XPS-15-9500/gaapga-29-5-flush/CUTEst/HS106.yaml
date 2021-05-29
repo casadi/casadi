@@ -1,0 +1,29 @@
+name: HS106
+n: 8
+m: 6
+box constraints x: 16
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.35116199999999997
+ε: 2.2448507646340148
+δ: 1.3341240643277472
+inner:
+  elapsed_time: 94313187203640
+  iterations: 239000
+  accelerated_steps_accepted: 464
+‖Σ‖: 2.4494897427831779
+‖x‖: 2072.3124418224893
+‖y‖: 298.77672109095334
+f: 2772.6381010113128
+counters:
+  f: 481840
+  grad_f: 240424
+  g: 482540
+  grad_g_prod: 240424
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

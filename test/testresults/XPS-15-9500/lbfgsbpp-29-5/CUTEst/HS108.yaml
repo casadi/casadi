@@ -1,0 +1,28 @@
+name: HS108
+n: 9
+m: 13
+box constraints x: 1
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0022360000000000001
+ε: 1.0000000000000001e-05
+δ: 1.7553130519099014e-06
+inner:
+  elapsed_time: 4906019910204101870
+  iterations: 99
+‖Σ‖: 87.65120397550028
+‖x‖: 1.9999993382529311
+‖y‖: 0.44563017979252406
+f: -0.86602493021762306
+counters:
+  f: 151
+  grad_f: 144
+  g: 158
+  grad_g_prod: 144
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: HS74
+n: 4
+m: 5
+box constraints x: 8
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 53
+inner convergence failures: 43
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.080898999999999999
+ε: 2.7565458875500326e-06
+δ: 2.9068758067296585e-06
+inner:
+  elapsed_time: 140726616818493
+  iterations: 42285
+  accelerated_steps_accepted: 158
+‖Σ‖: 16.283698230435704
+‖x‖: 1230.9100797302287
+‖y‖: 8.1209128590724369
+f: 5126.4980724092638
+counters:
+  f: 85268
+  grad_f: 42655
+  g: 85407
+  grad_g_prod: 42655
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

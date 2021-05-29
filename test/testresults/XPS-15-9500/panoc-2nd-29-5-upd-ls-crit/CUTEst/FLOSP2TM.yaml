@@ -1,0 +1,34 @@
+name: FLOSP2TM
+n: 2883
+m: 2763
+box constraints x: 240
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxTime
+outer iterations: 39
+inner convergence failures: 38
+initial penalty reduced: 6
+penalty reduced: 20
+elapsed time: 30.701049999999999
+ε: 70112.832516965951
+δ: 73.371331989464778
+inner:
+  elapsed_time: 30698815
+  iterations: 38000
+  linesearch_failures: 120
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 37473
+  sum_τ: 37652.25
+  count_τ: 37962
+‖Σ‖: 2.4524374802159659
+‖x‖: 22.776456318478022
+‖y‖: 133.37882324972608
+f: 0
+counters:
+  f: 79437
+  grad_f: 115271
+  g: 117451
+  grad_g_prod: 115271
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: HS84
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 14
+inner convergence failures: 12
+initial penalty reduced: 11
+penalty reduced: 1
+elapsed time: 0.018964999999999999
+ε: 3.4645199775695801e-07
+δ: 1.0477378964424133e-09
+inner:
+  elapsed_time: 140733069633853
+  iterations: 12699
+  accelerated_steps_accepted: 22
+‖Σ‖: 0.0062838293382841111
+‖x‖: 61.333826552565249
+‖y‖: 19.136652522355117
+f: -5280335.0791981556
+counters:
+  f: 25600
+  grad_f: 12777
+  g: 25630
+  grad_g_prod: 12777
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

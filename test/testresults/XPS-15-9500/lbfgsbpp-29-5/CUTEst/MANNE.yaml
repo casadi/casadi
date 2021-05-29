@@ -1,0 +1,28 @@
+name: MANNE
+n: 6000
+m: 4000
+box constraints x: 7251
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.74145799999999995
+ε: 1.0000000000000001e-05
+δ: 0.021312305613803331
+inner:
+  elapsed_time: 4906019910204763562
+  iterations: 535
+‖Σ‖: 1124.759571630033
+‖x‖: 5278.8009653740082
+‖y‖: 0.021554834446594229
+f: -0.97457259325475276
+counters:
+  f: 1333
+  grad_f: 1093
+  g: 1573
+  grad_g_prod: 1093
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

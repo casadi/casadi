@@ -1,0 +1,28 @@
+name: TWIRISM1
+n: 343
+m: 313
+box constraints x: 686
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 15.382413
+ε: 0.021257162466963381
+δ: 0.058252717543351026
+inner:
+  elapsed_time: 140732487183646
+  iterations: 237108
+‖Σ‖: 44.639817079668703
+‖x‖: 10.986079212048727
+‖y‖: 2.1944677171437132
+f: -1.2
+counters:
+  f: 238315
+  grad_f: 237828
+  g: 238775
+  grad_g_prod: 237828
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

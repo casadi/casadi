@@ -1,0 +1,28 @@
+name: HS37
+n: 3
+m: 2
+box constraints x: 6
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 9
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.0017799999999999999
+ε: 5.4959608632998425e-06
+δ: 2.0884551332756018e-07
+inner:
+  elapsed_time: 93896575026925
+  iterations: 3642
+‖Σ‖: 80.006249755878443
+‖x‖: 29.393877501655354
+‖y‖: 144.00000169392283
+f: -3456.0000300737511
+counters:
+  f: 3668
+  grad_f: 3669
+  g: 3685
+  grad_g_prod: 3669
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

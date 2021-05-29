@@ -1,0 +1,29 @@
+name: HVYCRASH
+n: 4004
+m: 3000
+box constraints x: 4008
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 36
+inner convergence failures: 32
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.673487999999999
+ε: 0.0019446569453027696
+δ: 0.24944798667104584
+inner:
+  elapsed_time: 94588095429020
+  iterations: 33388
+  accelerated_steps_accepted: 28128
+‖Σ‖: 320.89558456109268
+‖x‖: 4555.9736385105407
+‖y‖: 106.59171288111958
+f: 34.799616161026002
+counters:
+  f: 67453
+  grad_f: 61660
+  g: 67541
+  grad_g_prod: 61660
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

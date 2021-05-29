@@ -1,0 +1,34 @@
+name: HS95
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.001519
+ε: 6.1535665452083776e-11
+δ: 6.9988459472369868e-13
+inner:
+  elapsed_time: 139719581107687
+  iterations: 249
+  linesearch_failures: 139
+  lbfgs_failures: 0
+  lbfgs_rejected: 162
+  τ_1_accepted: 84
+  sum_τ: 89.1953125
+  count_τ: 246
+‖Σ‖: 100.01499887516871
+‖x‖: 0.0033233032430629887
+‖y‖: 0.0031427616182355678
+f: 0.015619525242396048
+counters:
+  f: 2877
+  grad_f: 1552
+  g: 2887
+  grad_g_prod: 1552
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: HS5
+n: 2
+m: 0
+box constraints x: 4
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0001
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204099742
+  iterations: 11
+‖Σ‖: 0
+‖x‖: 1.6411135791313165
+‖y‖: 0
+f: -1.9132229549426372
+counters:
+  f: 23
+  grad_f: 16
+  g: 30
+  grad_g_prod: 16
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

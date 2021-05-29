@@ -1,0 +1,34 @@
+name: YORKNET
+n: 312
+m: 256
+box constraints x: 288
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 19.477858000000001
+ε: 1.0156250000112499e+20
+δ: 1e+20
+inner:
+  elapsed_time: 19475912
+  iterations: 237216
+  linesearch_failures: 125223
+  lbfgs_failures: 124469
+  lbfgs_rejected: 0
+  τ_1_accepted: 108300
+  sum_τ: 109528.234375
+  count_τ: 236976
+‖Σ‖: 16
+‖x‖: 4.5825756949558401e+20
+‖y‖: 4.6114666864694441e+20
+f: 27616.799484934614
+counters:
+  f: 378815
+  grad_f: 598927
+  g: 616218
+  grad_g_prod: 598927
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: ROBOT
+n: 14
+m: 2
+box constraints x: 28
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0024120000000000001
+ε: 9.8388795612969204e-06
+δ: 7.7723836584830952e-07
+inner:
+  elapsed_time: 140727884416195
+  iterations: 1302
+‖Σ‖: 560.73992404428145
+‖x‖: 2.5677405198897576
+‖y‖: 7.0623100759642634
+f: 6.5932913774837232
+counters:
+  f: 1319
+  grad_f: 1323
+  g: 1333
+  grad_g_prod: 1323
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

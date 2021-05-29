@@ -1,0 +1,28 @@
+name: HS5
+n: 2
+m: 0
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 3.6999999999999998e-05
+ε: 3.8287223209643173e-06
+δ: 0
+inner:
+  elapsed_time: 140728777482529
+  iterations: 8
+‖Σ‖: 0
+‖x‖: 1.6411104360002686
+‖y‖: 0
+f: -1.9132229549805082
+counters:
+  f: 74
+  grad_f: 26
+  g: 86
+  grad_g_prod: 26
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

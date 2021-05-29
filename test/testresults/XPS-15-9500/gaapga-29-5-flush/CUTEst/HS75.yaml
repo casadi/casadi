@@ -1,0 +1,29 @@
+name: HS75
+n: 4
+m: 5
+box constraints x: 8
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.41810399999999998
+ε: 0.16263366531227152
+δ: 0.035124704069919424
+inner:
+  elapsed_time: 94463511126038
+  iterations: 227204
+  accelerated_steps_accepted: 185
+‖Σ‖: 52.562276724510632
+‖x‖: 1230.922886030376
+‖y‖: 76.761313371989814
+f: 5126.4919591754324
+counters:
+  f: 457740
+  grad_f: 228349
+  g: 458440
+  grad_g_prod: 228349
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

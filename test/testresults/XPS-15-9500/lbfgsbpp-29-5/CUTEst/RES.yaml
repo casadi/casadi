@@ -1,0 +1,28 @@
+name: RES
+n: 20
+m: 14
+box constraints x: 40
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 3.8999999999999999e-05
+ε: 1.0000000000000001e-05
+δ: 9.2458999999999998e-15
+inner:
+  elapsed_time: 4906019910204099675
+  iterations: 7
+‖Σ‖: 3.7416573867739413
+‖x‖: 65890.455165669933
+‖y‖: 9.1744151048409061e-14
+f: 0
+counters:
+  f: 14
+  grad_f: 7
+  g: 21
+  grad_g_prod: 7
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

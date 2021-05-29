@@ -1,0 +1,29 @@
+name: HS80
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 33
+inner convergence failures: 22
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.029732000000000001
+ε: 6.7681481178277769e-06
+δ: 2.92792421419108e-08
+inner:
+  elapsed_time: 94253057340412
+  iterations: 22040
+  accelerated_steps_accepted: 56
+‖Σ‖: 81.97825006389445
+‖x‖: 3.1622776598390012
+‖y‖: 0.05550809104182456
+f: 0.053949848234437457
+counters:
+  f: 44149
+  grad_f: 22228
+  g: 44228
+  grad_g_prod: 22228
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

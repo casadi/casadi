@@ -1,0 +1,28 @@
+name: PORTFL6
+n: 12
+m: 1
+box constraints x: 24
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 32
+inner convergence failures: 22
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.0044980000000000003
+ε: 1.0000000000000001e-05
+δ: 1.0764494885462383e-06
+inner:
+  elapsed_time: 4906019910204104087
+  iterations: 36
+‖Σ‖: 10
+‖x‖: 0.47032566165426731
+‖y‖: 0.0095948025546802058
+f: 0.025791816890738572
+counters:
+  f: 636
+  grad_f: 624
+  g: 648
+  grad_g_prod: 624
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

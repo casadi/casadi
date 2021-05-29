@@ -1,0 +1,29 @@
+name: DEGENLPA
+n: 20
+m: 15
+box constraints x: 40
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 23
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.091984999999999997
+ε: 8.942390240171405e-07
+δ: 0.0047428704397670298
+inner:
+  elapsed_time: 140730056030008
+  iterations: 22515
+  accelerated_steps_accepted: 601
+‖Σ‖: 540.51317060635836
+‖x‖: 0.69440398441171192
+‖y‖: 157.35730520354679
+f: 0.14674534958040497
+counters:
+  f: 47938
+  grad_f: 24076
+  g: 48638
+  grad_g_prod: 24076
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

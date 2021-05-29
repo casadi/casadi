@@ -1,0 +1,34 @@
+name: ROTDISC
+n: 905
+m: 1081
+box constraints x: 1269
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 224
+inner convergence failures: 221
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.104116000000001
+ε: 0.65611286394188884
+δ: 0.062493560456033492
+inner:
+  elapsed_time: 30099773
+  iterations: 222973
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 203202
+  sum_τ: 211918.703125
+  count_τ: 222749
+‖Σ‖: 33.578429574311443
+‖x‖: 651644.75987195072
+‖y‖: 70.054952393328264
+f: 9.3974722032629554
+counters:
+  f: 498548
+  grad_f: 470786
+  g: 498976
+  grad_g_prod: 470786
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: HVYCRASH
+n: 4004
+m: 3000
+box constraints x: 4008
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxTime
+outer iterations: 25
+inner convergence failures: 22
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.182217999999999
+ε: 0.056482490416131403
+δ: 0.47509994254030136
+inner:
+  elapsed_time: 30180304
+  iterations: 23548
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 23461
+  sum_τ: 23491.75
+  count_τ: 23523
+‖Σ‖: 339.06102484203399
+‖x‖: 64972.606913254553
+‖y‖: 42.024956638771606
+f: 192.71415706639371
+counters:
+  f: 47693
+  grad_f: 70732
+  g: 71246
+  grad_g_prod: 70732
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

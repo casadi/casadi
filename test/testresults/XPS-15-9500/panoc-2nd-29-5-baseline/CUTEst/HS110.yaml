@@ -1,0 +1,34 @@
+name: HS110
+n: 10
+m: 0
+box constraints x: 20
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.1e-05
+ε: 5.3052368076400569e-07
+δ: 0
+inner:
+  elapsed_time: 140436840644654
+  iterations: 2
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 1
+  sum_τ: 1
+  count_τ: 1
+‖Σ‖: 0
+‖x‖: 29.568136847048226
+‖y‖: 0
+f: -45.778475531886784
+counters:
+  f: 18
+  grad_f: 21
+  g: 30
+  grad_g_prod: 21
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

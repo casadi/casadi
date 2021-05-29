@@ -1,0 +1,29 @@
+name: PFIT2
+n: 3
+m: 3
+box constraints x: 1
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 32
+inner convergence failures: 27
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.041376000000000003
+ε: 9.7759245889581642e-06
+δ: 1.3031041135036503e-07
+inner:
+  elapsed_time: 94274532188534
+  iterations: 28070
+  accelerated_steps_accepted: 2653
+‖Σ‖: 105.01427858446074
+‖x‖: 4.1231058770350124
+‖y‖: 9.1613228571995399e-07
+f: 0
+counters:
+  f: 56241
+  grad_f: 30851
+  g: 56317
+  grad_g_prod: 30851
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

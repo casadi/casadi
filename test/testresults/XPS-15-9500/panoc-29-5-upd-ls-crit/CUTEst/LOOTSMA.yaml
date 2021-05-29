@@ -1,0 +1,34 @@
+name: LOOTSMA
+n: 3
+m: 2
+box constraints x: 4
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00049899999999999999
+ε: 2.86102294921875e-06
+δ: 2.0000000000000004
+inner:
+  elapsed_time: 139912854634783
+  iterations: 18
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 9
+  sum_τ: 9.5
+  count_τ: 10
+‖Σ‖: 1414213562.373095
+‖x‖: 1.4142135623730951
+‖y‖: 4242640687.1192851
+f: 0
+counters:
+  f: 516
+  grad_f: 749
+  g: 996
+  grad_g_prod: 749
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

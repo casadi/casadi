@@ -1,0 +1,29 @@
+name: DISCS
+n: 36
+m: 66
+box constraints x: 18
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 56
+inner convergence failures: 27
+initial penalty reduced: 5
+penalty reduced: 20
+elapsed time: 0.38086199999999998
+ε: 9.0297919033144325e-06
+δ: 6.4067143084045597e-06
+inner:
+  elapsed_time: 140735488356393
+  iterations: 35019
+  accelerated_steps_accepted: 5762
+‖Σ‖: 7.635675873748327
+‖x‖: 16.064506535293731
+‖y‖: 0.77910102457045749
+f: 15.288217763308992
+counters:
+  f: 70251
+  grad_f: 41005
+  g: 70394
+  grad_g_prod: 41005
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

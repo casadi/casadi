@@ -1,0 +1,34 @@
+name: MINSURFO
+n: 5306
+m: 0
+box constraints x: 5610
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.43077700000000002
+ε: 8.3256074052834046e-06
+δ: 0
+inner:
+  elapsed_time: 140604344799889
+  iterations: 297
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 287
+  sum_τ: 290
+  count_τ: 293
+‖Σ‖: 0
+‖x‖: 55.922096181487213
+‖y‖: 0
+f: 2.506949542879966
+counters:
+  f: 684
+  grad_f: 614
+  g: 696
+  grad_g_prod: 614
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

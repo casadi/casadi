@@ -1,0 +1,28 @@
+name: DNIEPER
+n: 61
+m: 24
+box constraints x: 120
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 5
+penalty reduced: 20
+elapsed time: 0.97022900000000001
+ε: 0.0013187281688367136
+δ: 2.1194946410619542
+inner:
+  elapsed_time: 140729167540521
+  iterations: 239745
+‖Σ‖: 0.38094464479763984
+‖x‖: 192.9687876517394
+‖y‖: 153.45849238665676
+f: -172.1684918685182
+counters:
+  f: 242750
+  grad_f: 240465
+  g: 243205
+  grad_g_prod: 240465
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

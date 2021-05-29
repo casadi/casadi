@@ -1,0 +1,29 @@
+name: ALLINITC
+n: 4
+m: 1
+box constraints x: 5
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 18
+inner convergence failures: 8
+initial penalty reduced: 0
+penalty reduced: 8
+elapsed time: 0.016688000000000001
+ε: 6.1960474084798989e-08
+δ: 9.8357533812043485e-06
+inner:
+  elapsed_time: 140724223840889
+  iterations: 7398
+  accelerated_steps_accepted: 135
+‖Σ‖: 134217728.00000006
+‖x‖: 2.2863587716200358
+‖y‖: 4425.0898521594954
+f: 30.409268102157181
+counters:
+  f: 14892
+  grad_f: 7605
+  g: 14938
+  grad_g_prod: 7605
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

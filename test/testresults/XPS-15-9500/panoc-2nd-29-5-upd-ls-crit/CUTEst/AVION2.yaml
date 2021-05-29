@@ -1,0 +1,34 @@
+name: AVION2
+n: 49
+m: 15
+box constraints x: 98
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 2.922555
+ε: 1708.7442787063674
+δ: 45926.369919562363
+inner:
+  elapsed_time: 140217800234629
+  iterations: 238514
+  linesearch_failures: 105430
+  lbfgs_failures: 92463
+  lbfgs_rejected: 0
+  τ_1_accepted: 131489
+  sum_τ: 131742.1796875
+  count_τ: 238274
+‖Σ‖: 0.00014160240749459585
+‖x‖: 50273.363364879871
+‖y‖: 111.66461457581885
+f: 2382970.7404716667
+counters:
+  f: 597892
+  grad_f: 718761
+  g: 836507
+  grad_g_prod: 718761
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: HS114
+n: 10
+m: 11
+box constraints x: 20
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 238
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.26113500000000001
+ε: 0.041741726693967793
+δ: 0.46843958515308559
+inner:
+  elapsed_time: 94798518418225
+  iterations: 238277
+‖Σ‖: 3.3166247903553998
+‖x‖: 12651.913449536538
+‖y‖: 278.72734208687814
+f: -1973.9911196740813
+counters:
+  f: 241142
+  grad_f: 238997
+  g: 241602
+  grad_g_prod: 238997
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

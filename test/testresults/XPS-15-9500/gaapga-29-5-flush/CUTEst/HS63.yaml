@@ -1,0 +1,29 @@
+name: HS63
+n: 3
+m: 2
+box constraints x: 3
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 8.3999999999999995e-05
+ε: 4.4034133850345825e-07
+δ: 4.9359485387867608e-09
+inner:
+  elapsed_time: 94712618811469
+  iterations: 48
+  accelerated_steps_accepted: 16
+‖Σ‖: 65.207261202585272
+‖x‖: 4.9999999995064055
+‖y‖: 1.253975062936955
+f: 961.71517213502489
+counters:
+  f: 108
+  grad_f: 88
+  g: 126
+  grad_g_prod: 88
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

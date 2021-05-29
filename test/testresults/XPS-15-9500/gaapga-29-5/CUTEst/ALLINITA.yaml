@@ -1,0 +1,29 @@
+name: ALLINITA
+n: 4
+m: 4
+box constraints x: 5
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 10
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00044499999999999997
+ε: 3.0862520361552015e-07
+δ: 7.0635794384710238e-06
+inner:
+  elapsed_time: 140721459292690
+  iterations: 129
+  accelerated_steps_accepted: 69
+‖Σ‖: 269207541.08802462
+‖x‖: 2.2502985989940658
+‖y‖: 3522.4122237160418
+f: 33.24883464349854
+counters:
+  f: 296
+  grad_f: 238
+  g: 326
+  grad_g_prod: 238
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

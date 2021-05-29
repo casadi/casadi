@@ -1,0 +1,34 @@
+name: WATER
+n: 31
+m: 10
+box constraints x: 62
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 12
+inner convergence failures: 3
+initial penalty reduced: 2
+penalty reduced: 1
+elapsed time: 0.036539000000000002
+ε: 5.6494956037766997e-06
+δ: 3.8443301377810712e-06
+inner:
+  elapsed_time: 140015933886119
+  iterations: 3953
+  linesearch_failures: 2812
+  lbfgs_failures: 2812
+  lbfgs_rejected: 0
+  τ_1_accepted: 1111
+  sum_τ: 1118
+  count_τ: 3941
+‖Σ‖: 23.176535280544712
+‖x‖: 1254.0513933940283
+‖y‖: 284.29547016301757
+f: 10549.379483533199
+counters:
+  f: 5195
+  grad_f: 5147
+  g: 9134
+  grad_g_prod: 44327
+  grad_gi: 0
+  hess_L_prod: 3918
+  hess_L: 0

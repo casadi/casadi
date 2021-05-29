@@ -1,0 +1,29 @@
+name: HIMMELBI
+n: 100
+m: 12
+box constraints x: 200
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 37
+inner convergence failures: 31
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.59519200000000005
+ε: 5.2697623586208387e-06
+δ: 6.0097317771123926e-06
+inner:
+  elapsed_time: 94192928363703
+  iterations: 31487
+  accelerated_steps_accepted: 346
+‖Σ‖: 3.4641016151377544
+‖x‖: 229.44058820611647
+‖y‖: 0.28376280775897589
+f: -1735.5695799267296
+counters:
+  f: 63067
+  grad_f: 31981
+  g: 63158
+  grad_g_prod: 31981
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

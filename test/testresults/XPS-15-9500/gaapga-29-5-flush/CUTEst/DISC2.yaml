@@ -1,0 +1,29 @@
+name: DISC2
+n: 29
+m: 23
+box constraints x: 14
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0024220000000000001
+ε: 7.9700632442669672e-06
+δ: 6.029529417084234e-06
+inner:
+  elapsed_time: 94867237636459
+  iterations: 487
+  accelerated_steps_accepted: 146
+‖Σ‖: 227.90406965882173
+‖x‖: 28.310242618710106
+‖y‖: 0.58214746975953424
+f: 1.5624997880120601
+counters:
+  f: 1012
+  grad_f: 657
+  g: 1030
+  grad_g_prod: 657
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

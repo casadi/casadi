@@ -1,0 +1,28 @@
+name: READING7
+n: 1002
+m: 500
+box constraints x: 1004
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 12.492063999999999
+ε: 7175641360819504
+δ: 1.9948554188000002e+20
+inner:
+  elapsed_time: 140737191449516
+  iterations: 21438
+‖Σ‖: 0.0008175418808490406
+‖x‖: 2.222615301411048e+21
+‖y‖: 17802946613110582
+f: -4.9324999999999708e+42
+counters:
+  f: 21918
+  grad_f: 22158
+  g: 22358
+  grad_g_prod: 22158
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

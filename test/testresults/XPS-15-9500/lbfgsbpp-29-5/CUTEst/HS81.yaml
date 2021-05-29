@@ -1,0 +1,28 @@
+name: HS81
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00095600000000000004
+ε: 1.0000000000000001e-05
+δ: 7.5680925037957536e-07
+inner:
+  elapsed_time: 4906019910204100593
+  iterations: 53
+‖Σ‖: 103.03527727645003
+‖x‖: 3.16227769957045
+‖y‖: 0.055549598565659199
+f: 0.053949810588693303
+counters:
+  f: 74
+  grad_f: 67
+  g: 81
+  grad_g_prod: 67
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: DECONVC
+n: 63
+m: 1
+box constraints x: 75
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.023109000000000001
+ε: 0
+δ: 12.35
+inner:
+  elapsed_time: 140200617465747
+  iterations: 119
+  linesearch_failures: 27
+  lbfgs_failures: 3
+  lbfgs_rejected: 0
+  τ_1_accepted: 70
+  sum_τ: 74.3203125
+  count_τ: 115
+‖Σ‖: 1000000000
+‖x‖: 0
+‖y‖: 13350000000
+f: 110.354018598764
+counters:
+  f: 1352
+  grad_f: 1259
+  g: 1918
+  grad_g_prod: 1259
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: HS111
+n: 10
+m: 3
+box constraints x: 20
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0050429999999999997
+ε: 8.1307425778831544e-06
+δ: 1.0598040115356033e-06
+inner:
+  elapsed_time: 94600949666728
+  iterations: 522
+  accelerated_steps_accepted: 62
+‖Σ‖: 122.0658710192665
+‖x‖: 12.480330330859976
+‖y‖: 22.263245992074314
+f: -47.761095461565134
+counters:
+  f: 1079
+  grad_f: 608
+  g: 1097
+  grad_g_prod: 608
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

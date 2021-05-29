@@ -1,0 +1,34 @@
+name: PRODPL0
+n: 60
+m: 29
+box constraints x: 60
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 8
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0068110000000000002
+ε: 8.9882674920715999e-06
+δ: 6.8872119908525153e-07
+inner:
+  elapsed_time: 6796
+  iterations: 575
+  linesearch_failures: 17
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 422
+  sum_τ: 460.1328125
+  count_τ: 567
+‖Σ‖: 13029.379136516578
+‖x‖: 10.271089184890521
+‖y‖: 39.203372694665312
+f: 58.790074797790808
+counters:
+  f: 2142
+  grad_f: 1582
+  g: 2158
+  grad_g_prod: 1582
+  grad_gi: 0
+  hess_L_prod: 567
+  hess_L: 0

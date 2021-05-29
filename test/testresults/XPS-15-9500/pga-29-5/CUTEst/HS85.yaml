@@ -1,0 +1,28 @@
+name: HS85
+n: 5
+m: 21
+box constraints x: 10
+solver: ALMSolver<PGA>
+status: MaxTime
+outer iterations: 234
+inner convergence failures: 231
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.122406000000002
+ε: 0.0024295437810868763
+δ: 2.6085342277326617e-05
+inner:
+  elapsed_time: 140722877535028
+  iterations: 231006
+‖Σ‖: 9.1651513899116797
+‖x‖: 833.57215213652728
+‖y‖: 0.0524242430341667
+f: -2.0269656418565392
+counters:
+  f: 232780
+  grad_f: 231708
+  g: 233228
+  grad_g_prod: 231708
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

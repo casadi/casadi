@@ -1,0 +1,28 @@
+name: HS13
+n: 2
+m: 1
+box constraints x: 2
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 29
+inner convergence failures: 10
+initial penalty reduced: 0
+penalty reduced: 10
+elapsed time: 0.010661
+ε: 9.9031445739417023e-06
+δ: 9.7927907820867026e-06
+inner:
+  elapsed_time: 93960999545228
+  iterations: 22084
+‖Σ‖: 8958978.9687112719
+‖x‖: 1.0213945008594709
+‖y‖: 1425.3261094692002
+f: 0.95766872294808403
+counters:
+  f: 22144
+  grad_f: 22171
+  g: 22192
+  grad_g_prod: 22171
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

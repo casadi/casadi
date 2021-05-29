@@ -1,0 +1,34 @@
+name: SMMPSF
+n: 720
+m: 263
+box constraints x: 720
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 43
+initial penalty reduced: 11
+penalty reduced: 20
+elapsed time: 7.259379
+ε: 2.9027425396677131e-07
+δ: 1040972
+inner:
+  elapsed_time: 140565696921390
+  iterations: 45890
+  linesearch_failures: 23461
+  lbfgs_failures: 0
+  lbfgs_rejected: 21154
+  τ_1_accepted: 16906
+  sum_τ: 18403.046875
+  count_τ: 45686
+‖Σ‖: 0.058835795320974653
+‖x‖: 9319.3688724315653
+‖y‖: 139953956.34516159
+f: 5277679.5990063669
+counters:
+  f: 472448
+  grad_f: 269833
+  g: 472897
+  grad_g_prod: 269833
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

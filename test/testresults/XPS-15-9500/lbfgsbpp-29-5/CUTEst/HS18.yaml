@@ -1,0 +1,28 @@
+name: HS18
+n: 2
+m: 2
+box constraints x: 4
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 10
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.00062200000000000005
+ε: 1.0000000000000001e-05
+δ: 1.0588504295583334e-08
+inner:
+  elapsed_time: 4906019910204100258
+  iterations: 39
+‖Σ‖: 64.007812023221035
+‖x‖: 15.891395888636465
+‖y‖: 0.19997294385375497
+f: 5.0000000521371488
+counters:
+  f: 110
+  grad_f: 101
+  g: 119
+  grad_g_prod: 101
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

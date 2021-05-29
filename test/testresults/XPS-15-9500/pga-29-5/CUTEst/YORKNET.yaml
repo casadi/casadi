@@ -1,0 +1,28 @@
+name: YORKNET
+n: 312
+m: 256
+box constraints x: 288
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 9
+penalty reduced: 20
+elapsed time: 6.35982
+ε: 0.093381130403323159
+δ: 12.876387398224475
+inner:
+  elapsed_time: 94081264976967
+  iterations: 239955
+‖Σ‖: 0.16124313600000001
+‖x‖: 758.23095065303414
+‖y‖: 111.09950562241917
+f: -563.29496996911757
+counters:
+  f: 241666
+  grad_f: 240675
+  g: 242117
+  grad_g_prod: 240675
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

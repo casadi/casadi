@@ -1,0 +1,34 @@
+name: HS32
+n: 3
+m: 2
+box constraints x: 3
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000105
+ε: 9.5531635249113123e-06
+δ: 3.4540807347660518e-07
+inner:
+  elapsed_time: 140196322476127
+  iterations: 43
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 32
+  sum_τ: 34
+  count_τ: 38
+‖Σ‖: 101.44070500658408
+‖x‖: 0.99999726786504917
+‖y‖: 2.0000089149720193
+f: 0.99999930920675828
+counters:
+  f: 120
+  grad_f: 110
+  g: 132
+  grad_g_prod: 110
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

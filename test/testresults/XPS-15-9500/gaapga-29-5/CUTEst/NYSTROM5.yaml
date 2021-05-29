@@ -1,0 +1,29 @@
+name: NYSTROM5
+n: 18
+m: 20
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 21
+inner convergence failures: 8
+initial penalty reduced: 0
+penalty reduced: 8
+elapsed time: 0.076093999999999995
+ε: 7.091367555421297e-06
+δ: 9.9071240573035926e-06
+inner:
+  elapsed_time: 93969589545229
+  iterations: 13215
+  accelerated_steps_accepted: 1616
+‖Σ‖: 378.44832587706333
+‖x‖: 1.4936222605674028
+‖y‖: 0.087059878034519783
+f: 0
+counters:
+  f: 26494
+  grad_f: 14915
+  g: 26549
+  grad_g_prod: 14915
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

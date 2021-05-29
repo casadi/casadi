@@ -1,0 +1,28 @@
+name: SYNTHES1
+n: 6
+m: 6
+box constraints x: 12
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0017750000000000001
+ε: 9.990705231555097e-06
+δ: 8.5695276258457298e-07
+inner:
+  elapsed_time: 140736155118313
+  iterations: 2123
+‖Σ‖: 389.64968078133654
+‖x‖: 1.6667110097521098
+‖y‖: 4.2454816527172667
+f: 0.75928296482950053
+counters:
+  f: 2165
+  grad_f: 2144
+  g: 2179
+  grad_g_prod: 2144
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

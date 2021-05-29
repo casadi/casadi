@@ -1,0 +1,34 @@
+name: HS54
+n: 6
+m: 1
+box constraints x: 12
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 29
+inner convergence failures: 22
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.044792999999999999
+ε: 5.1982122106775108e-08
+δ: 1.6370904631912708e-11
+inner:
+  elapsed_time: 44763
+  iterations: 23009
+  linesearch_failures: 11
+  lbfgs_failures: 0
+  lbfgs_rejected: 21761
+  τ_1_accepted: 22942
+  sum_τ: 22944.515625
+  count_τ: 22980
+‖Σ‖: 10
+‖x‖: 50159746.522844732
+‖y‖: 4.6468305299640992e-05
+f: -0.86740880355886241
+counters:
+  f: 47112
+  grad_f: 46255
+  g: 47150
+  grad_g_prod: 46255
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

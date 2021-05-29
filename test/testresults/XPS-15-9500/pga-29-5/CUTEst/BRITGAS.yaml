@@ -1,0 +1,28 @@
+name: BRITGAS
+n: 450
+m: 360
+box constraints x: 474
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 11.765515000000001
+ε: 0.00013140929876743931
+δ: 0.026503939722327202
+inner:
+  elapsed_time: 94497882209000
+  iterations: 238875
+‖Σ‖: 128.87252429810891
+‖x‖: 51.510277160404911
+‖y‖: 8.2138022016846222
+f: 0
+counters:
+  f: 240684
+  grad_f: 239595
+  g: 241144
+  grad_g_prod: 239595
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

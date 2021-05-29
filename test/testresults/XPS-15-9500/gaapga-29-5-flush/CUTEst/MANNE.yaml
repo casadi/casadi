@@ -1,0 +1,29 @@
+name: MANNE
+n: 6000
+m: 4000
+box constraints x: 7251
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 14
+inner convergence failures: 7
+initial penalty reduced: 0
+penalty reduced: 6
+elapsed time: 30.586576000000001
+ε: 0.015920967882221027
+δ: 0.0048092876809206209
+inner:
+  elapsed_time: 94901627956954
+  iterations: 8428
+  accelerated_steps_accepted: 478
+‖Σ‖: 110.00030828503523
+‖x‖: 6912.782387399513
+‖y‖: 0.052943213821089082
+f: -0.97457259325387036
+counters:
+  f: 17113
+  grad_f: 8962
+  g: 17148
+  grad_g_prod: 8962
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

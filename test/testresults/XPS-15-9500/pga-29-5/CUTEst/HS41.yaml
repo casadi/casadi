@@ -1,0 +1,28 @@
+name: HS41
+n: 4
+m: 1
+box constraints x: 8
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 21
+inner convergence failures: 8
+initial penalty reduced: 0
+penalty reduced: 8
+elapsed time: 0.0063670000000000003
+ε: 9.9971138589755038e-06
+δ: 4.9432441251440196e-08
+inner:
+  elapsed_time: 94218697578701
+  iterations: 13695
+‖Σ‖: 28.147497671065626
+‖x‖: 2.1602572889685168
+‖y‖: 0.11111360308225897
+f: 1.9259259316706232
+counters:
+  f: 13923
+  grad_f: 13758
+  g: 13957
+  grad_g_prod: 13758
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

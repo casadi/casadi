@@ -1,0 +1,28 @@
+name: HS57
+n: 2
+m: 1
+box constraints x: 2
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000127
+ε: 8.7472737043681192e-06
+δ: 0
+inner:
+  elapsed_time: 140725254604950
+  iterations: 3
+‖Σ‖: 1
+‖x‖: 5.0177685430225702
+‖y‖: 0
+f: 0.030646305882586974
+counters:
+  f: 39
+  grad_f: 21
+  g: 51
+  grad_g_prod: 21
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: DALLASM
+n: 196
+m: 151
+box constraints x: 392
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 31
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 19.383894999999999
+ε: 7.252005339353218e-06
+δ: 0.054617407831873382
+inner:
+  elapsed_time: 140076082772285
+  iterations: 120583
+  linesearch_failures: 1618
+  lbfgs_failures: 0
+  lbfgs_rejected: 1075
+  τ_1_accepted: 111564
+  sum_τ: 114901.0078125
+  count_τ: 120343
+‖Σ‖: 376.03456343345971
+‖x‖: 144.27129654736819
+‖y‖: 1327.3654717772802
+f: -48209.158739921346
+counters:
+  f: 291605
+  grad_f: 261435
+  g: 292065
+  grad_g_prod: 261435
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

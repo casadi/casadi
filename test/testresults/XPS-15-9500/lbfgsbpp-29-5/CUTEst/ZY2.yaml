@@ -1,0 +1,28 @@
+name: ZY2
+n: 3
+m: 2
+box constraints x: 4
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00010900000000000001
+ε: 1.0000000000000001e-05
+δ: 1.6448551409808942e-07
+inner:
+  elapsed_time: 4906019910204099749
+  iterations: 12
+‖Σ‖: 10.04987562112089
+‖x‖: 1.999999958878621
+‖y‖: 0.25000329549822231
+f: 1.999999958878621
+counters:
+  f: 37
+  grad_f: 30
+  g: 44
+  grad_g_prod: 30
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

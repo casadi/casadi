@@ -1,0 +1,28 @@
+name: ZECEVIC3
+n: 2
+m: 2
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00017699999999999999
+ε: 9.8194363609138691e-06
+δ: 7.3393084731865343e-06
+inner:
+  elapsed_time: 94484985544875
+  iterations: 294
+‖Σ‖: 10.04987562112089
+‖x‖: 3.0000012232178292
+‖y‖: 8.0238976390772816
+f: 97.309391252089583
+counters:
+  f: 310
+  grad_f: 312
+  g: 322
+  grad_g_prod: 312
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

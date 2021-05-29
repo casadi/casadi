@@ -1,0 +1,29 @@
+name: LEWISPOL
+n: 6
+m: 9
+box constraints x: 12
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 22
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.10218000000000001
+ε: 1.068427061046151e-06
+δ: 2.4190534626816058e-05
+inner:
+  elapsed_time: 94562295057864
+  iterations: 48494
+  accelerated_steps_accepted: 15100
+‖Σ‖: 2449490437.7074656
+‖x‖: 1.7106554554568518
+‖y‖: 365294.28163875995
+f: 2.9263420872842896
+counters:
+  f: 97663
+  grad_f: 64554
+  g: 98363
+  grad_g_prod: 64554
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

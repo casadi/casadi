@@ -1,0 +1,34 @@
+name: HS45
+n: 5
+m: 0
+box constraints x: 10
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 2
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 2.0999999999999999e-05
+ε: 0
+δ: 0
+inner:
+  elapsed_time: 139826955288595
+  iterations: 5
+  linesearch_failures: 1
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 3
+  sum_τ: 3
+  count_τ: 4
+‖Σ‖: 0
+‖x‖: 7.416198487095663
+‖y‖: 0
+f: 1.0000000004
+counters:
+  f: 12
+  grad_f: 14
+  g: 16
+  grad_g_prod: 14
+  grad_gi: 0
+  hess_L_prod: 3
+  hess_L: 0

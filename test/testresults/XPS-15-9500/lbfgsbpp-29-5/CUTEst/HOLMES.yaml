@@ -1,0 +1,28 @@
+name: HOLMES
+n: 180
+m: 0
+box constraints x: 180
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 21
+inner convergence failures: 3
+initial penalty reduced: 0
+penalty reduced: 3
+elapsed time: 0.31111
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204400943
+  iterations: 57
+‖Σ‖: 0
+‖x‖: 0.77519698851832874
+‖y‖: 0
+f: 1248.1503481428172
+counters:
+  f: 181
+  grad_f: 163
+  g: 199
+  grad_g_prod: 163
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

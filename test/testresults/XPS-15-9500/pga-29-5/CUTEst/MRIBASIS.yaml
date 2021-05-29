@@ -1,0 +1,28 @@
+name: MRIBASIS
+n: 36
+m: 55
+box constraints x: 72
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 181
+initial penalty reduced: 2
+penalty reduced: 20
+elapsed time: 1.200895
+ε: 8.1803331549103699e-06
+δ: 1.4138044182487874e-05
+inner:
+  elapsed_time: 140724353541633
+  iterations: 184760
+‖Σ‖: 2.6698314553544384
+‖x‖: 50.293723696629492
+‖y‖: 0.61334079872335523
+f: 18.2179
+counters:
+  f: 186242
+  grad_f: 185480
+  g: 186700
+  grad_g_prod: 185480
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

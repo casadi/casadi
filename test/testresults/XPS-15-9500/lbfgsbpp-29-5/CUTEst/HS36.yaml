@@ -1,0 +1,28 @@
+name: HS36
+n: 3
+m: 1
+box constraints x: 6
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00023000000000000001
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204099870
+  iterations: 18
+‖Σ‖: 100
+‖x‖: 27.313000567495326
+‖y‖: 110.00000000000001
+f: -3300
+counters:
+  f: 48
+  grad_f: 41
+  g: 55
+  grad_g_prod: 41
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

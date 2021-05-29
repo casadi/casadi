@@ -1,0 +1,34 @@
+name: DEGENLPB
+n: 20
+m: 15
+box constraints x: 40
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 206
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.476553
+ε: 0.0077347934486684446
+δ: 0.00045157144120685458
+inner:
+  elapsed_time: 140677359289452
+  iterations: 53170
+  linesearch_failures: 27757
+  lbfgs_failures: 16362
+  lbfgs_rejected: 0
+  τ_1_accepted: 21766
+  sum_τ: 22539.296875
+  count_τ: 52931
+‖Σ‖: 3467153.5646274178
+‖x‖: 0.34445876085988458
+‖y‖: 7674.5524927235547
+f: -42.643494848992802
+counters:
+  f: 292864
+  grad_f: 180773
+  g: 346255
+  grad_g_prod: 974738
+  grad_gi: 0
+  hess_L_prod: 52931
+  hess_L: 0

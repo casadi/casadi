@@ -1,0 +1,34 @@
+name: HS19
+n: 2
+m: 2
+box constraints x: 4
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 8
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00011900000000000001
+ε: 1.6191634699680435e-08
+δ: 1.6349578331187331e-06
+inner:
+  elapsed_time: 110
+  iterations: 63
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 53
+  sum_τ: 53.375
+  count_τ: 55
+‖Σ‖: 132693.54405195755
+‖x‖: 14.120182609785536
+‖y‖: 1647.8592830531816
+f: -6961.8176155405436
+counters:
+  f: 149
+  grad_f: 158
+  g: 176
+  grad_g_prod: 158
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

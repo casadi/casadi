@@ -1,0 +1,34 @@
+name: MARINE
+n: 11215
+m: 11192
+box constraints x: 15
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 16
+inner convergence failures: 16
+initial penalty reduced: 15
+penalty reduced: 0
+elapsed time: 31.384302999999999
+ε: 1646.6508240628759
+δ: .nan
+inner:
+  elapsed_time: 31382784
+  iterations: 16000
+  linesearch_failures: 64
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 12707
+  sum_τ: 13754.453125
+  count_τ: 15984
+‖Σ‖: 0.049741927078817395
+‖x‖: 242135.15612772963
+‖y‖: 0
+f: 5566347228
+counters:
+  f: 46559
+  grad_f: 39004
+  g: 46575
+  grad_g_prod: 39004
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

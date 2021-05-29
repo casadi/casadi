@@ -1,0 +1,28 @@
+name: HS95
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00071699999999999997
+ε: 3.7641685350919829e-06
+δ: 1.3357581707396093e-10
+inner:
+  elapsed_time: 94222992540360
+  iterations: 904
+‖Σ‖: 10.148891565092219
+‖x‖: 0.0033233032431518395
+‖y‖: 0.0031427613196832738
+f: 0.015619525242813646
+counters:
+  f: 1065
+  grad_f: 922
+  g: 1077
+  grad_g_prod: 922
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

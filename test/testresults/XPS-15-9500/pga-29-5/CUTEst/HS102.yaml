@@ -1,0 +1,28 @@
+name: HS102
+n: 7
+m: 5
+box constraints x: 14
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 238
+initial penalty reduced: 8
+penalty reduced: 20
+elapsed time: 1.955795
+ε: 0.0014729069935857098
+δ: 0.87360121476021502
+inner:
+  elapsed_time: 94386203252124
+  iterations: 239245
+‖Σ‖: 0.037557355520962857
+‖x‖: 4.6047464359009007
+‖y‖: 4.8102601897074866
+f: 100.00856240196858
+counters:
+  f: 240596
+  grad_f: 239965
+  g: 241048
+  grad_g_prod: 239965
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: A4X12
+n: 130
+m: 385
+box constraints x: 30
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 86
+inner convergence failures: 84
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.147424999999998
+ε: 0.88749872240658145
+δ: 5.3295342848552263
+inner:
+  elapsed_time: 94386231441148
+  iterations: 84012
+  accelerated_steps_accepted: 14800
+‖Σ‖: 29.530251243277366
+‖x‖: 2002.2419697662453
+‖y‖: 57.066947968901339
+f: -467.69747772564801
+counters:
+  f: 168709
+  grad_f: 99156
+  g: 168947
+  grad_g_prod: 99156
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

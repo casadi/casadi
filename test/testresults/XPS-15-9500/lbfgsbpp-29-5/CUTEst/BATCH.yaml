@@ -1,0 +1,28 @@
+name: BATCH
+n: 48
+m: 73
+box constraints x: 94
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 74
+initial penalty reduced: 3
+penalty reduced: 20
+elapsed time: 0.29226600000000003
+ε: 1.0000000000000001e-05
+δ: 1.9565052888183421
+inner:
+  elapsed_time: 4906019910204390824
+  iterations: 2230
+‖Σ‖: 1.8455048089885866
+‖x‖: 19.075607784292533
+‖y‖: 334.13051594930317
+f: 45958.305813611412
+counters:
+  f: 12308
+  grad_f: 12091
+  g: 12525
+  grad_g_prod: 12091
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: RK23
+n: 17
+m: 11
+box constraints x: 6
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 169
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.239456
+ε: 0.0052698959165702192
+δ: 0.022462895014054046
+inner:
+  elapsed_time: 140727107057333
+  iterations: 183866
+‖Σ‖: 22.239285246120851
+‖x‖: 1.8375289549439433
+‖y‖: 2.1745972910286904
+f: 0
+counters:
+  f: 184416
+  grad_f: 184586
+  g: 184876
+  grad_g_prod: 184586
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

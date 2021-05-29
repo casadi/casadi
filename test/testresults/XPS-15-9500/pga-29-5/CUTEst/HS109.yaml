@@ -1,0 +1,28 @@
+name: HS109
+n: 9
+m: 10
+box constraints x: 16
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 0.50729000000000002
+ε: 5512.5178863810297
+δ: 16823.619062786966
+inner:
+  elapsed_time: 94411971607692
+  iterations: 240000
+‖Σ‖: 0.00011561788157047213
+‖x‖: 758.35095179744246
+‖y‖: 207.36341285370122
+f: 2188.7996727717564
+counters:
+  f: 243676
+  grad_f: 240720
+  g: 244116
+  grad_g_prod: 240720
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

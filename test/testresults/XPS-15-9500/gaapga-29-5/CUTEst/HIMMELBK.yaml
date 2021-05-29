@@ -1,0 +1,29 @@
+name: HIMMELBK
+n: 24
+m: 14
+box constraints x: 24
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 31
+inner convergence failures: 24
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.25870799999999999
+ε: 4.6364623120936921e-06
+δ: 2.6400570474205409e-07
+inner:
+  elapsed_time: 140722985257506
+  iterations: 26958
+  accelerated_steps_accepted: 1175
+‖Σ‖: 55.419741146337408
+‖x‖: 0.72814998687914567
+‖y‖: 0.05727124247157913
+f: 0.051814329896590725
+counters:
+  f: 54213
+  grad_f: 28257
+  g: 54286
+  grad_g_prod: 28257
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

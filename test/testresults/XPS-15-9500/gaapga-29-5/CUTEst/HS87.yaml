@@ -1,0 +1,29 @@
+name: HS87
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.49057299999999998
+ε: 0.15569941514063323
+δ: 0.022874723450627243
+inner:
+  elapsed_time: 94631014923094
+  iterations: 234185
+  accelerated_steps_accepted: 898
+‖Σ‖: 14.860076311233943
+‖x‖: 606.32441015502218
+‖y‖: 41.73692486228326
+f: 8996.9285820409295
+counters:
+  f: 471739
+  grad_f: 236043
+  g: 472439
+  grad_g_prod: 236043
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

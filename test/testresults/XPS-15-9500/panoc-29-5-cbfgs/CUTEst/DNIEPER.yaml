@@ -1,0 +1,34 @@
+name: DNIEPER
+n: 61
+m: 24
+box constraints x: 120
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 19
+inner convergence failures: 6
+initial penalty reduced: 0
+penalty reduced: 6
+elapsed time: 0.21020800000000001
+ε: 6.6820262292210941e-06
+δ: 2.9473700200455255e-06
+inner:
+  elapsed_time: 210140
+  iterations: 9251
+  linesearch_failures: 2802
+  lbfgs_failures: 0
+  lbfgs_rejected: 644
+  τ_1_accepted: 5713
+  sum_τ: 5941.3984375
+  count_τ: 9232
+‖Σ‖: 54354.487052106095
+‖x‖: 192.94474320655891
+‖y‖: 4591.8120652609741
+f: 18743.96445905506
+counters:
+  f: 64344
+  grad_f: 39812
+  g: 64376
+  grad_g_prod: 39812
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

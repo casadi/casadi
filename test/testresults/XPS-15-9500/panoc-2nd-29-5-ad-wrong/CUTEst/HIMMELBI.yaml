@@ -1,0 +1,34 @@
+name: HIMMELBI
+n: 100
+m: 12
+box constraints x: 200
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 24
+inner convergence failures: 7
+initial penalty reduced: 0
+penalty reduced: 7
+elapsed time: 0.22229699999999999
+ε: 8.6461927448766573e-06
+δ: 1.3003647865161838e-06
+inner:
+  elapsed_time: 222238
+  iterations: 5135
+  linesearch_failures: 3308
+  lbfgs_failures: 2878
+  lbfgs_rejected: 0
+  τ_1_accepted: 1048
+  sum_τ: 1221.296875
+  count_τ: 5111
+‖Σ‖: 28.713676133898428
+‖x‖: 229.44050743157644
+‖y‖: 0.28376555583313862
+f: -1735.5695798696424
+counters:
+  f: 21217
+  grad_f: 12697
+  g: 21258
+  grad_g_prod: 12697
+  grad_gi: 0
+  hess_L_prod: 5097
+  hess_L: 0

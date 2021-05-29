@@ -1,0 +1,28 @@
+name: HS24
+n: 2
+m: 3
+box constraints x: 2
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 238
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.0042160000000000001
+ε: 1.0000000000000001e-05
+δ: 24853.578082689219
+inner:
+  elapsed_time: 4906019910204103635
+  iterations: 2
+‖Σ‖: 1.7320508075688772
+‖x‖: 14350.829519923151
+‖y‖: 3227650.3929348197
+f: -565924136666.81177
+counters:
+  f: 5498
+  grad_f: 5278
+  g: 5718
+  grad_g_prod: 5278
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

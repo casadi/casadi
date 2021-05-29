@@ -1,0 +1,28 @@
+name: GRIDGENA
+n: 6218
+m: 0
+box constraints x: 12436
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.192852
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204291764
+  iterations: 86
+‖Σ‖: 0
+‖x‖: 412.71299484242354
+‖y‖: 0
+f: 23520.000064063483
+counters:
+  f: 104
+  grad_f: 97
+  g: 111
+  grad_g_prod: 97
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

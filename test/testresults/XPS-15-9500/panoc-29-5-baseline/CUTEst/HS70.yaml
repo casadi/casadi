@@ -1,0 +1,34 @@
+name: HS70
+n: 4
+m: 1
+box constraints x: 8
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0030720000000000001
+ε: 4.1809260877786244e-06
+δ: 0
+inner:
+  elapsed_time: 3048
+  iterations: 68
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 63
+  sum_τ: 63.25
+  count_τ: 64
+‖Σ‖: 1
+‖x‖: 13.28135175070264
+‖y‖: 0
+f: 0.0074984636737534206
+counters:
+  f: 169
+  grad_f: 152
+  g: 181
+  grad_g_prod: 152
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

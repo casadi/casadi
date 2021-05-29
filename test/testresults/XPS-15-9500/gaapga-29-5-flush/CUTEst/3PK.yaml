@@ -1,0 +1,29 @@
+name: 3PK
+n: 30
+m: 0
+box constraints x: 30
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 48
+inner convergence failures: 42
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.20746700000000001
+ε: 9.8383696288230696e-06
+δ: 0
+inner:
+  elapsed_time: 93952409807392
+  iterations: 43484
+  accelerated_steps_accepted: 10338
+‖Σ‖: 0
+‖x‖: 369.67956281747507
+‖y‖: 0
+f: 1.7201212922398355
+counters:
+  f: 87449
+  grad_f: 54014
+  g: 87573
+  grad_g_prod: 54014
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

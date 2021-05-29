@@ -1,0 +1,28 @@
+name: JANNSON3
+n: 20000
+m: 3
+box constraints x: 40000
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 21
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.1315149999999998
+ε: 1.0000000000000001e-05
+δ: 1.2614959612336931e-05
+inner:
+  elapsed_time: 4906019910206056723
+  iterations: 236
+‖Σ‖: 100.00999950005
+‖x‖: 0.43629839860403075
+‖y‖: 2.0005882568520081
+f: 19998.521841839109
+counters:
+  f: 1407
+  grad_f: 1187
+  g: 1627
+  grad_g_prod: 1187
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

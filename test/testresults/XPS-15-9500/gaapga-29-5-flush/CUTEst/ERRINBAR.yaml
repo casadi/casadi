@@ -1,0 +1,29 @@
+name: ERRINBAR
+n: 18
+m: 9
+box constraints x: 14
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 234
+initial penalty reduced: 3
+penalty reduced: 20
+elapsed time: 0.93105800000000005
+ε: 0.0016936473432901458
+δ: 0.0086060880375953275
+inner:
+  elapsed_time: 94850058695644
+  iterations: 239015
+  accelerated_steps_accepted: 9772
+‖Σ‖: 2.3264632136824641
+‖x‖: 2324.0348272280771
+‖y‖: 0.076604229333359336
+f: 28.442716432093505
+counters:
+  f: 481234
+  grad_f: 249747
+  g: 481931
+  grad_g_prod: 249747
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

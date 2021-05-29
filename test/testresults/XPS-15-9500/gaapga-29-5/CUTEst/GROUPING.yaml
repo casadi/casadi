@@ -1,0 +1,29 @@
+name: GROUPING
+n: 100
+m: 125
+box constraints x: 200
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 211
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 4.3274210000000002
+ε: 0.0079153030423677606
+δ: 0.095702463059377643
+inner:
+  elapsed_time: 140724047512390
+  iterations: 221018
+  accelerated_steps_accepted: 2501
+‖Σ‖: 16.780388790026489
+‖x‖: 4.4663071998934321
+‖y‖: 9.40892277821413
+f: 0.71326049400215985
+counters:
+  f: 442562
+  grad_f: 224479
+  g: 443262
+  grad_g_prod: 224479
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: MISTAKE
+n: 9
+m: 13
+box constraints x: 1
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00026499999999999999
+ε: 3.6552673387535428e-06
+δ: 5.3697197199831237e-07
+inner:
+  elapsed_time: 253
+  iterations: 62
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 50
+  sum_τ: 52.5
+  count_τ: 56
+‖Σ‖: 152.81204854593301
+‖x‖: 2.4836676878399997
+‖y‖: 0.50000008145872632
+f: -1.0000001730356995
+counters:
+  f: 155
+  grad_f: 144
+  g: 167
+  grad_g_prod: 144
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

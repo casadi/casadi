@@ -1,0 +1,34 @@
+name: A4X12
+n: 130
+m: 385
+box constraints x: 30
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 73
+inner convergence failures: 41
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.159597999999999
+ε: 0.00097390574078473624
+δ: 0.030660104769649088
+inner:
+  elapsed_time: 30157056
+  iterations: 61301
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 6
+  τ_1_accepted: 59533
+  sum_τ: 60340.96875
+  count_τ: 61229
+‖Σ‖: 12197.41331223101
+‖x‖: 85.699101731360827
+‖y‖: 490.00303311424386
+f: -24.205831242548285
+counters:
+  f: 127006
+  grad_f: 124628
+  g: 127132
+  grad_g_prod: 124628
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

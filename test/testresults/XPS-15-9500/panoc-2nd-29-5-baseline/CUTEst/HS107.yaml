@@ -1,0 +1,34 @@
+name: HS107
+n: 9
+m: 6
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 10
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0025660000000000001
+ε: 3.8328802777487514e-07
+δ: 4.9378627058338509e-06
+inner:
+  elapsed_time: 140054588557816
+  iterations: 402
+  linesearch_failures: 1
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 363
+  sum_τ: 370.203125
+  count_τ: 392
+‖Σ‖: 531351.11811306688
+‖x‖: 2.2859478900116983
+‖y‖: 7915.1071515065723
+f: 5055.0065441162551
+counters:
+  f: 999
+  grad_f: 1282
+  g: 1402
+  grad_g_prod: 1282
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

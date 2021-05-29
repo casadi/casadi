@@ -1,0 +1,28 @@
+name: HS64
+n: 3
+m: 1
+box constraints x: 3
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 39
+inner convergence failures: 23
+initial penalty reduced: 20
+penalty reduced: 2
+elapsed time: 0.013792
+ε: 9.9413297398598388e-06
+δ: 2.5954023353813582e-06
+inner:
+  elapsed_time: 94046898894267
+  iterations: 25557
+‖Σ‖: 172657.2007341437
+‖x‖: 246.61292735409631
+‖y‖: 2279.0265387206277
+f: 6299.83651290948
+counters:
+  f: 25645
+  grad_f: 25674
+  g: 25701
+  grad_g_prod: 25674
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

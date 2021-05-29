@@ -1,0 +1,28 @@
+name: NUFFIELD
+n: 940
+m: 5000
+box constraints x: 2
+solver: ALMSolver<PGA>
+status: MaxTime
+outer iterations: 146
+inner convergence failures: 144
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.041919
+ε: 0.15169199553723861
+δ: 0.00057904320349124957
+inner:
+  elapsed_time: 94673994137156
+  iterations: 144004
+‖Σ‖: 70.710678118654755
+‖x‖: 0.0049090008560957674
+‖y‖: 0.095755157400082461
+f: -0.0047030259581813142
+counters:
+  f: 146769
+  grad_f: 144442
+  g: 147041
+  grad_g_prod: 144442
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

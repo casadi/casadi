@@ -1,0 +1,28 @@
+name: MINPERM
+n: 1113
+m: 1033
+box constraints x: 1213
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 39
+inner convergence failures: 28
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 3.8874659999999999
+ε: 9.9950719970512804e-06
+δ: 9.6979585799136596e-06
+inner:
+  elapsed_time: 140728214538097
+  iterations: 32324
+‖Σ‖: 7582.965316365754
+‖x‖: 1.0119373483586309
+‖y‖: 1.0602582957759412
+f: 0.00035396929378444532
+counters:
+  f: 32561
+  grad_f: 32441
+  g: 32619
+  grad_g_prod: 32441
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

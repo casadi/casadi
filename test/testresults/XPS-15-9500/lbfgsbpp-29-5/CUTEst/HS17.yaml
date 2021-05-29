@@ -1,0 +1,28 @@
+name: HS17
+n: 2
+m: 2
+box constraints x: 3
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00065799999999999995
+ε: 1.0000000000000001e-05
+δ: 6.6139675743857541e-06
+inner:
+  elapsed_time: 4906019910204100297
+  iterations: 44
+‖Σ‖: 100.01034926527765
+‖x‖: 6.6151373001339936e-06
+‖y‖: 1.9999861109189792
+f: 1.0000002531685985
+counters:
+  f: 68
+  grad_f: 61
+  g: 75
+  grad_g_prod: 61
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

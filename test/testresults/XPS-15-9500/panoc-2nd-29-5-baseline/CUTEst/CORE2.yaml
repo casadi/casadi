@@ -1,0 +1,34 @@
+name: CORE2
+n: 157
+m: 134
+box constraints x: 273
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 35
+initial penalty reduced: 7
+penalty reduced: 20
+elapsed time: 1.8757140000000001
+ε: 5.2507966756820679e-06
+δ: 130438.56169859998
+inner:
+  elapsed_time: 1874919
+  iterations: 59896
+  linesearch_failures: 7717
+  lbfgs_failures: 4847
+  lbfgs_rejected: 0
+  τ_1_accepted: 47494
+  sum_τ: 48680.875
+  count_τ: 59656
+‖Σ‖: 0.32404934792194845
+‖x‖: 32068.388325202686
+‖y‖: 5196147035.4760942
+f: 99.030569999999983
+counters:
+  f: 183459
+  grad_f: 206771
+  g: 243527
+  grad_g_prod: 206771
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

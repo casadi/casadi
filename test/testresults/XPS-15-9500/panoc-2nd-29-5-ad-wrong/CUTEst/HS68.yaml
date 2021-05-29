@@ -1,0 +1,34 @@
+name: HS68
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00057899999999999998
+ε: 1.5676119442531444e-06
+δ: 1.5870728509170817e-08
+inner:
+  elapsed_time: 140088948294203
+  iterations: 148
+  linesearch_failures: 4
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 126
+  sum_τ: 128.515625
+  count_τ: 140
+‖Σ‖: 437597.10752444057
+‖x‖: 3.7550280097167388
+‖y‖: 13.664643357660735
+f: -0.92042521390461995
+counters:
+  f: 568
+  grad_f: 372
+  g: 586
+  grad_g_prod: 372
+  grad_gi: 0
+  hess_L_prod: 44
+  hess_L: 0

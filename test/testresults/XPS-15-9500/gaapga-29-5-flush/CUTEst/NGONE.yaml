@@ -1,0 +1,29 @@
+name: NGONE
+n: 200
+m: 5048
+box constraints x: 204
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 68
+inner convergence failures: 64
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.241185999999999
+ε: 0.14634620045734603
+δ: 0.55332060802340055
+inner:
+  elapsed_time: 140730742593876
+  iterations: 64181
+  accelerated_steps_accepted: 1528
+‖Σ‖: 71.532314010338013
+‖x‖: 7.3320001781896096
+‖y‖: 5.4419185236564607
+f: -6.3131756860925119
+counters:
+  f: 128577
+  grad_f: 65981
+  g: 128761
+  grad_g_prod: 65981
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

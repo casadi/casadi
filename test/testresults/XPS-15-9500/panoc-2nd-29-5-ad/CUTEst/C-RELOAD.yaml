@@ -1,0 +1,34 @@
+name: C-RELOAD
+n: 342
+m: 284
+box constraints x: 600
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxTime
+outer iterations: 68
+inner convergence failures: 64
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.306241
+ε: 0.012630858015012264
+δ: 0.15202822571018687
+inner:
+  elapsed_time: 139629417098460
+  iterations: 65473
+  linesearch_failures: 3425
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 37919
+  sum_τ: 45334.859375
+  count_τ: 65405
+‖Σ‖: 396.65898406118851
+‖x‖: 10.915047362452217
+‖y‖: 3.5486360041773506
+f: -1.4099999999999999
+counters:
+  f: 314036
+  grad_f: 207544
+  g: 379551
+  grad_g_prod: 14255864
+  grad_gi: 0
+  hess_L_prod: 65399
+  hess_L: 0

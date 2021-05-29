@@ -1,0 +1,28 @@
+name: FEEDLOC
+n: 90
+m: 259
+box constraints x: 180
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 200
+initial penalty reduced: 5
+penalty reduced: 20
+elapsed time: 3.8220019999999999
+ε: 9.9998414389013135e-06
+δ: 1.1372626866790192e-05
+inner:
+  elapsed_time: 140729531535312
+  iterations: 204676
+‖Σ‖: 1.2514287668101609
+‖x‖: 80.715611954671388
+‖y‖: 1.7368385390955667
+f: 0
+counters:
+  f: 206966
+  grad_f: 205396
+  g: 207421
+  grad_g_prod: 205396
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

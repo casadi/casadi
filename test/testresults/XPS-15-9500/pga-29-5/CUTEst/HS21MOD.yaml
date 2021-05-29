@@ -1,0 +1,28 @@
+name: HS21MOD
+n: 7
+m: 1
+box constraints x: 8
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.8000000000000001e-05
+ε: 5.0726335580689327e-06
+δ: 0
+inner:
+  elapsed_time: 140721156185643
+  iterations: 39
+‖Σ‖: 1
+‖x‖: 2.8284271247463124
+‖y‖: 0
+f: -95.959999999999297
+counters:
+  f: 56
+  grad_f: 57
+  g: 68
+  grad_g_prod: 57
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

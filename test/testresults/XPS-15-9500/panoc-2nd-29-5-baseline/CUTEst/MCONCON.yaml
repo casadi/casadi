@@ -1,0 +1,34 @@
+name: MCONCON
+n: 15
+m: 11
+box constraints x: 5
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 5
+penalty reduced: 20
+elapsed time: 0.50831999999999999
+ε: 1.9751587116269227e+20
+δ: 1.9751587116269227e+20
+inner:
+  elapsed_time: 508027
+  iterations: 33433
+  linesearch_failures: 30793
+  lbfgs_failures: 4711
+  lbfgs_rejected: 0
+  τ_1_accepted: 2155
+  sum_τ: 2250
+  count_τ: 33193
+‖Σ‖: 0.25790074369803589
+‖x‖: 2.5171973033321077e+20
+‖y‖: 2.6948803000064643e+19
+f: 2.3885559722503158e+18
+counters:
+  f: 455443
+  grad_f: 271216
+  g: 482152
+  grad_g_prod: 271216
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

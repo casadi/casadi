@@ -1,0 +1,29 @@
+name: HS96
+n: 6
+m: 4
+box constraints x: 12
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.31122300000000003
+ε: 0.013268130236863334
+δ: 0
+inner:
+  elapsed_time: 94188633112119
+  iterations: 237006
+  accelerated_steps_accepted: 476
+‖Σ‖: 10.148891565092219
+‖x‖: 0.013267997169493872
+‖y‖: 0
+f: 0.0623595866966212
+counters:
+  f: 492815
+  grad_f: 238442
+  g: 493515
+  grad_g_prod: 238442
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

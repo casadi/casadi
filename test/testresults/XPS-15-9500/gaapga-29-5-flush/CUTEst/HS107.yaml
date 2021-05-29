@@ -1,0 +1,29 @@
+name: HS107
+n: 9
+m: 6
+box constraints x: 8
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 10
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.001689
+ε: 7.3207856985391118e-06
+δ: 4.0998956994942048e-06
+inner:
+  elapsed_time: 94785633257103
+  iterations: 487
+  accelerated_steps_accepted: 84
+‖Σ‖: 540535.20741642592
+‖x‖: 2.2859478271946636
+‖y‖: 7915.1079480168946
+f: 5055.0067028843678
+counters:
+  f: 1026
+  grad_f: 611
+  g: 1056
+  grad_g_prod: 611
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

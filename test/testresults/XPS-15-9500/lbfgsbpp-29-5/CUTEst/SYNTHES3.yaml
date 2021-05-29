@@ -1,0 +1,28 @@
+name: SYNTHES3
+n: 17
+m: 23
+box constraints x: 34
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 11
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0048069999999999996
+ε: 1.0000000000000001e-05
+δ: 8.2737578456226757e-06
+inner:
+  elapsed_time: 4906019910204104429
+  iterations: 214
+‖Σ‖: 1388.8778368831486
+‖x‖: 3.8453642558688621
+‖y‖: 44.914115632276086
+f: 15.082130568887223
+counters:
+  f: 263
+  grad_f: 252
+  g: 274
+  grad_g_prod: 252
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: TRUSPYR1
+n: 11
+m: 4
+box constraints x: 8
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 24
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.065585000000000004
+ε: 1.0000000000000001e-05
+δ: 0.00045917380122600937
+inner:
+  elapsed_time: 4906019910204164939
+  iterations: 1029
+‖Σ‖: 10.876219493035475
+‖x‖: 12.912496862227417
+‖y‖: 34.353230022069297
+f: 11.213349798616196
+counters:
+  f: 3817
+  grad_f: 3597
+  g: 4037
+  grad_g_prod: 3597
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

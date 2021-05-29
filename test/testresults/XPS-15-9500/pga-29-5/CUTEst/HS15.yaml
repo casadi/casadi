@@ -1,0 +1,28 @@
+name: HS15
+n: 2
+m: 2
+box constraints x: 1
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 21
+inner convergence failures: 7
+initial penalty reduced: 5
+penalty reduced: 2
+elapsed time: 0.004372
+ε: 5.7563058817322599e-06
+δ: 1.6411196845922404e-09
+inner:
+  elapsed_time: 140733550058980
+  iterations: 8266
+‖Σ‖: 34199.209670435957
+‖x‖: 2.0615528159930703
+‖y‖: 699.99999121950998
+f: 306.50000114878378
+counters:
+  f: 8314
+  grad_f: 8329
+  g: 8349
+  grad_g_prod: 8329
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

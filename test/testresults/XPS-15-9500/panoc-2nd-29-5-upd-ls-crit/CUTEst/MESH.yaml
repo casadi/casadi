@@ -1,0 +1,34 @@
+name: MESH
+n: 41
+m: 48
+box constraints x: 64
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 10.070092000000001
+ε: 2989920178.4697223
+δ: 56409.562251210213
+inner:
+  elapsed_time: 10069331
+  iterations: 236000
+  linesearch_failures: 115866
+  lbfgs_failures: 21
+  lbfgs_rejected: 0
+  τ_1_accepted: 54705
+  sum_τ: 69395.4140625
+  count_τ: 235764
+‖Σ‖: 134.72389565247397
+‖x‖: 37564929.99675826
+‖y‖: 14749060.05183639
+f: -1411106615815.3481
+counters:
+  f: 3255048
+  grad_f: 1715777
+  g: 3491272
+  grad_g_prod: 1715777
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

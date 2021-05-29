@@ -1,0 +1,28 @@
+name: GRIDNETA
+n: 7564
+m: 3844
+box constraints x: 5089
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxTime
+outer iterations: 25
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 30.693840000000002
+ε: 1.0000000000000001e-05
+δ: 0.10067763558161995
+inner:
+  elapsed_time: 4906019910234787659
+  iterations: 12014
+‖Σ‖: 3382.0106095734832
+‖x‖: 44.670254841840581
+‖y‖: 464.27505810733931
+f: 253.10471980051412
+counters:
+  f: 12161
+  grad_f: 12136
+  g: 12186
+  grad_g_prod: 12136
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

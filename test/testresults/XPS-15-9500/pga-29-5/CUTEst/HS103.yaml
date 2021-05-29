@@ -1,0 +1,28 @@
+name: HS103
+n: 7
+m: 5
+box constraints x: 14
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 7
+penalty reduced: 20
+elapsed time: 1.9615
+ε: 0.0043868472923040969
+δ: 0.62742240374615932
+inner:
+  elapsed_time: 140735635504201
+  iterations: 239848
+‖Σ‖: 0.18268301695344963
+‖x‖: 5.29556657771011
+‖y‖: 21.754283473708941
+f: 100.02347152521226
+counters:
+  f: 241325
+  grad_f: 240568
+  g: 241778
+  grad_g_prod: 240568
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

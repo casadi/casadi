@@ -1,0 +1,29 @@
+name: HS38
+n: 4
+m: 0
+box constraints x: 8
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 34
+inner convergence failures: 27
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.024140000000000002
+ε: 6.7323905975857857e-06
+δ: 0
+inner:
+  elapsed_time: 140722549961762
+  iterations: 27894
+  accelerated_steps_accepted: 33
+‖Σ‖: 0
+‖x‖: 2.0000000247145673
+‖y‖: 0
+f: 2.2822490309597529e-11
+counters:
+  f: 55863
+  grad_f: 28063
+  g: 55945
+  grad_g_prod: 28063
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

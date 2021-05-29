@@ -1,0 +1,28 @@
+name: LIN
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00044700000000000002
+ε: 1.0000000000000001e-05
+δ: 1.3594437643345628e-07
+inner:
+  elapsed_time: 4906019910204100085
+  iterations: 31
+‖Σ‖: 148.40824588847045
+‖x‖: 0.68244949625589491
+‖y‖: 0.035466454274958897
+f: -0.019606285029246107
+counters:
+  f: 77
+  grad_f: 70
+  g: 84
+  grad_g_prod: 70
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

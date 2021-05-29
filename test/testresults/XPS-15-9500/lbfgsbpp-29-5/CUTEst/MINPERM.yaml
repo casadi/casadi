@@ -1,0 +1,28 @@
+name: MINPERM
+n: 1113
+m: 1033
+box constraints x: 1213
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 21
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.058360000000000002
+ε: 1.0000000000000001e-05
+δ: 1
+inner:
+  elapsed_time: 4906019910204140878
+  iterations: 219
+‖Σ‖: 32.140317359976393
+‖x‖: .nan
+‖y‖: .nan
+f: 0
+counters:
+  f: 502
+  grad_f: 282
+  g: 722
+  grad_g_prod: 282
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: LUKVLI5
+n: 10002
+m: 9996
+box constraints x: 4
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 9
+inner convergence failures: 5
+initial penalty reduced: 0
+penalty reduced: 5
+elapsed time: 31.293244000000001
+ε: 0.0076476311210374156
+δ: 0.00072699815715604466
+inner:
+  elapsed_time: 94360462782661
+  iterations: 6637
+  accelerated_steps_accepted: 127
+‖Σ‖: 101.96260268213136
+‖x‖: 99.992553843524576
+‖y‖: 0.16903992934202913
+f: 0.52678755717736414
+counters:
+  f: 13362
+  grad_f: 6800
+  g: 13384
+  grad_g_prod: 6800
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

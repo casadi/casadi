@@ -1,0 +1,34 @@
+name: HS37
+n: 3
+m: 2
+box constraints x: 6
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 8.6000000000000003e-05
+ε: 1.9907599266844045e-06
+δ: 2.0240209295252498e-06
+inner:
+  elapsed_time: 140716013518922
+  iterations: 37
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 2
+  τ_1_accepted: 29
+  sum_τ: 29.25
+  count_τ: 30
+‖Σ‖: 100.00499987500625
+‖x‖: 29.393876090968543
+‖y‖: 143.99999150621522
+f: -3455.9997085409941
+counters:
+  f: 92
+  grad_f: 90
+  g: 106
+  grad_g_prod: 90
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

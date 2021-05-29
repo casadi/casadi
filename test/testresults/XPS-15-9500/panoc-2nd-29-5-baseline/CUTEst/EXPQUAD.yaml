@@ -1,0 +1,34 @@
+name: EXPQUAD
+n: 1200
+m: 0
+box constraints x: 200
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 4.8295469999999998
+ε: .inf
+δ: 0
+inner:
+  elapsed_time: 139878536089675
+  iterations: 45000
+  linesearch_failures: 40488
+  lbfgs_failures: 40466
+  lbfgs_rejected: 0
+  τ_1_accepted: 4465
+  sum_τ: 4465.28125
+  count_τ: 44955
+‖Σ‖: 0
+‖x‖: 1.00104843274923e+20
+‖y‖: 0
+f: 4.008193873478165e+40
+counters:
+  f: 53938
+  grad_f: 68925
+  g: 73101
+  grad_g_prod: 68925
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

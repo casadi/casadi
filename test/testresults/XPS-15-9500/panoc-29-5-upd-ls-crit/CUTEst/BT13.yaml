@@ -1,0 +1,34 @@
+name: BT13
+n: 5
+m: 1
+box constraints x: 1
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 38
+inner convergence failures: 21
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.119024
+ε: 8.4237300995640345e-06
+δ: 1.1952400284201673e-10
+inner:
+  elapsed_time: 118983
+  iterations: 21033
+  linesearch_failures: 17887
+  lbfgs_failures: 0
+  lbfgs_rejected: 61
+  τ_1_accepted: 2363
+  sum_τ: 2601.5234375
+  count_τ: 21004
+‖Σ‖: 1
+‖x‖: 1.271135661078598e-05
+‖y‖: 0.5012023779298862
+f: 0
+counters:
+  f: 313972
+  grad_f: 168882
+  g: 314028
+  grad_g_prod: 168882
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

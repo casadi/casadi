@@ -1,0 +1,34 @@
+name: HS30
+n: 3
+m: 1
+box constraints x: 6
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 1
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 3.1000000000000001e-05
+ε: 0
+δ: 0
+inner:
+  elapsed_time: 140119013064732
+  iterations: 2
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 1
+  sum_τ: 1
+  count_τ: 1
+‖Σ‖: 1
+‖x‖: 1
+‖y‖: 0
+f: 1
+counters:
+  f: 6
+  grad_f: 6
+  g: 8
+  grad_g_prod: 6
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: JANNSON3
+n: 20000
+m: 3
+box constraints x: 40000
+solver: ALMSolver<GuardedAAPGA>
+status: MaxTime
+outer iterations: 33
+inner convergence failures: 30
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 31.128301
+ε: 0.063603982749105059
+δ: 4.5203555057797692e-05
+inner:
+  elapsed_time: 140727973405959
+  iterations: 9647
+  accelerated_steps_accepted: 3
+‖Σ‖: 10.099504938362077
+‖x‖: 0.4742910003800393
+‖y‖: 1.9999388752736691
+f: 19998.51881004879
+counters:
+  f: 20500
+  grad_f: 9782
+  g: 20579
+  grad_g_prod: 9782
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

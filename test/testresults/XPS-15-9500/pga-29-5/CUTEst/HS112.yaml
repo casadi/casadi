@@ -1,0 +1,28 @@
+name: HS112
+n: 10
+m: 3
+box constraints x: 10
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 210
+initial penalty reduced: 7
+penalty reduced: 20
+elapsed time: 0.55055399999999999
+ε: 0.00019988819252603207
+δ: 0.029114459433831022
+inner:
+  elapsed_time: 93909460477332
+  iterations: 211197
+‖Σ‖: 0.048486337486760123
+‖x‖: 0.94153000043739088
+‖y‖: 22.222189163428823
+f: -48.042929615393177
+counters:
+  f: 214936
+  grad_f: 211917
+  g: 215389
+  grad_g_prod: 211917
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

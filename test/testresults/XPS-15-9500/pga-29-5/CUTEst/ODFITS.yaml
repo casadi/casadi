@@ -1,0 +1,28 @@
+name: ODFITS
+n: 10
+m: 6
+box constraints x: 10
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 79
+inner convergence failures: 75
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.141483
+ε: 9.9986991456829655e-06
+δ: 7.9534481756127207e-07
+inner:
+  elapsed_time: 94476395751484
+  iterations: 76827
+‖Σ‖: 4.4419874516550557
+‖x‖: 1522.5798299688465
+‖y‖: 0.96200291069253263
+f: -2380.0267755030527
+counters:
+  f: 77986
+  grad_f: 77064
+  g: 78124
+  grad_g_prod: 77064
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

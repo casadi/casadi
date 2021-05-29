@@ -1,0 +1,34 @@
+name: HS62
+n: 3
+m: 1
+box constraints x: 6
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00021900000000000001
+ε: 3.2535717764403671e-07
+δ: 3.9346756811192707e-06
+inner:
+  elapsed_time: 208
+  iterations: 86
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 76
+  sum_τ: 76.625
+  count_τ: 78
+‖Σ‖: 100000
+‖x‖: 0.70166080109304685
+‖y‖: 6386.91112158134
+f: -26272.539778447408
+counters:
+  f: 219
+  grad_f: 207
+  g: 249
+  grad_g_prod: 207
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

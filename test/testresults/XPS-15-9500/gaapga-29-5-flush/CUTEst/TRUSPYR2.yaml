@@ -1,0 +1,29 @@
+name: TRUSPYR2
+n: 11
+m: 11
+box constraints x: 8
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 36
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.18600800000000001
+ε: 4.7372898219211201e-06
+δ: 0.00036908032207952541
+inner:
+  elapsed_time: 140724158985150
+  iterations: 56726
+  accelerated_steps_accepted: 4499
+‖Σ‖: 60.62817644835544
+‖x‖: 13.41762073765558
+‖y‖: 46.001723446496328
+f: 11.21547600497998
+counters:
+  f: 115028
+  grad_f: 62185
+  g: 115728
+  grad_g_prod: 62185
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

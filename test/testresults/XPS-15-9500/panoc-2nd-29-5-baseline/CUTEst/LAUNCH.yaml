@@ -1,0 +1,34 @@
+name: LAUNCH
+n: 25
+m: 28
+box constraints x: 50
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 6.6436510000000002
+ε: 9999.9999999813936
+δ: 3749999.9999821866
+inner:
+  elapsed_time: 140454027156638
+  iterations: 233950
+  linesearch_failures: 115081
+  lbfgs_failures: 104424
+  lbfgs_rejected: 0
+  τ_1_accepted: 116975
+  sum_τ: 117420.2890625
+  count_τ: 233711
+‖Σ‖: 11.410207898623762
+‖x‖: 15732.15961138973
+‖y‖: 103133353.73483658
+f: -36105.609355325498
+counters:
+  f: 545448
+  grad_f: 675530
+  g: 778644
+  grad_g_prod: 675530
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

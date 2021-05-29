@@ -1,0 +1,29 @@
+name: SMBANK
+n: 117
+m: 64
+box constraints x: 234
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 85
+initial penalty reduced: 3
+penalty reduced: 20
+elapsed time: 3.0471499999999998
+ε: 9.9943212508218489e-06
+δ: 8.9073800154437777e-05
+inner:
+  elapsed_time: 94283125128250
+  iterations: 146916
+  accelerated_steps_accepted: 79076
+‖Σ‖: 1.7279999999999998
+‖x‖: 2109758.0399017711
+‖y‖: 2.792257814223614e-05
+f: -7129291.9999681832
+counters:
+  f: 298792
+  grad_f: 226952
+  g: 299489
+  grad_g_prod: 226952
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

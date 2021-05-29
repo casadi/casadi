@@ -1,0 +1,34 @@
+name: DECONVU
+n: 63
+m: 0
+box constraints x: 24
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0016169999999999999
+ε: 4.6260414755343406e-06
+δ: 0
+inner:
+  elapsed_time: 1609
+  iterations: 76
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 68
+  sum_τ: 68.75
+  count_τ: 70
+‖Σ‖: 0
+‖x‖: 4.5174825262788172
+‖y‖: 0
+f: 4.6446779169873197e-08
+counters:
+  f: 171
+  grad_f: 167
+  g: 183
+  grad_g_prod: 167
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

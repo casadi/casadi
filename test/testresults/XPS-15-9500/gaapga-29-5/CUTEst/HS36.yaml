@@ -1,0 +1,29 @@
+name: HS36
+n: 3
+m: 1
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 3
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.8999999999999998e-05
+ε: 4.162646405347914e-08
+δ: 1.0584955134618212e-10
+inner:
+  elapsed_time: 94330366722095
+  iterations: 32
+  accelerated_steps_accepted: 4
+‖Σ‖: 100
+‖x‖: 27.313000567524391
+‖y‖: 110.00000001058497
+f: -3300.0000000116434
+counters:
+  f: 70
+  grad_f: 48
+  g: 79
+  grad_g_prod: 48
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

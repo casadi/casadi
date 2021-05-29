@@ -1,0 +1,29 @@
+name: HS60
+n: 3
+m: 1
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 5
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 9.0000000000000006e-05
+ε: 5.9846320713922985e-06
+δ: 3.1181696358295596e-07
+inner:
+  elapsed_time: 94360431493206
+  iterations: 56
+  accelerated_steps_accepted: 17
+‖Σ‖: 10
+‖x‖: 2.2382543844162881
+‖y‖: 0.010726521849325543
+f: 0.032568203647804619
+counters:
+  f: 126
+  grad_f: 93
+  g: 141
+  grad_g_prod: 93
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

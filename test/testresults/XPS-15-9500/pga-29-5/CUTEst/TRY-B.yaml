@@ -1,0 +1,28 @@
+name: TRY-B
+n: 2
+m: 1
+box constraints x: 2
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00016200000000000001
+ε: 7.0607395534771911e-06
+δ: 1.5841379086278806e-07
+inner:
+  elapsed_time: 94051193847966
+  iterations: 318
+‖Σ‖: 100
+‖x‖: 10.198039011651819
+‖y‖: 1.0000013934224974
+f: 0.99999984158620914
+counters:
+  f: 346
+  grad_f: 336
+  g: 358
+  grad_g_prod: 336
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

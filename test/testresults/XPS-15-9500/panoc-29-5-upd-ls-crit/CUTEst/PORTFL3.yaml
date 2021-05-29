@@ -1,0 +1,34 @@
+name: PORTFL3
+n: 12
+m: 1
+box constraints x: 24
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.011332
+ε: 6.7799714472890904e-06
+δ: 3.9168088453167549e-07
+inner:
+  elapsed_time: 11313
+  iterations: 311
+  linesearch_failures: 102
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 156
+  sum_τ: 165.546875
+  count_τ: 306
+‖Σ‖: 1000
+‖x‖: 0.52124991586881031
+‖y‖: 0.013870597669299201
+f: 0.032749704802654565
+counters:
+  f: 2485
+  grad_f: 1511
+  g: 2497
+  grad_g_prod: 1511
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

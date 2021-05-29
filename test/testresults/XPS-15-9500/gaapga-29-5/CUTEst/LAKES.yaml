@@ -1,0 +1,29 @@
+name: LAKES
+n: 90
+m: 78
+box constraints x: 18
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 206
+initial penalty reduced: 7
+penalty reduced: 20
+elapsed time: 4.0533640000000002
+ε: 139.23927030607001
+δ: 1676.684121894245
+inner:
+  elapsed_time: 94583773844999
+  iterations: 214306
+  accelerated_steps_accepted: 6351
+‖Σ‖: 18.009874287644895
+‖x‖: 857093.50343494059
+‖y‖: 72785.846125475335
+f: 10985446.777757311
+counters:
+  f: 433193
+  grad_f: 221617
+  g: 433886
+  grad_g_prod: 221617
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

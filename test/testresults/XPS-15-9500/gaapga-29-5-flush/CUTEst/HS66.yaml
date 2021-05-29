@@ -1,0 +1,29 @@
+name: HS66
+n: 3
+m: 2
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000121
+ε: 2.8668064744330479e-07
+δ: 4.5361370504259924e-07
+inner:
+  elapsed_time: 94132798226548
+  iterations: 44
+  accelerated_steps_accepted: 20
+‖Σ‖: 141.42135623730951
+‖x‖: 3.542624847953399
+‖y‖: 0.69486910554641867
+f: 0.51816363174132019
+counters:
+  f: 273
+  grad_f: 88
+  g: 291
+  grad_g_prod: 88
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: DALLASS
+n: 46
+m: 31
+box constraints x: 92
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.100482
+ε: 9.9500737469521735e-06
+δ: 1.2395946571430727e-06
+inner:
+  elapsed_time: 140726855637724
+  iterations: 3511
+  accelerated_steps_accepted: 2344
+‖Σ‖: 366.3833234718976
+‖x‖: 184.09357236324732
+‖y‖: 658.70836370114966
+f: -32393.224544079225
+counters:
+  f: 7042
+  grad_f: 5891
+  g: 7069
+  grad_g_prod: 5891
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

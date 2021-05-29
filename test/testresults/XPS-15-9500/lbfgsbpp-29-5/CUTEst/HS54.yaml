@@ -1,0 +1,28 @@
+name: HS54
+n: 6
+m: 1
+box constraints x: 12
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 9
+inner convergence failures: 1
+initial penalty reduced: 1
+penalty reduced: 0
+elapsed time: 0.00014100000000000001
+ε: 1.0000000000000001e-05
+δ: 2.4736436898820102e-08
+inner:
+  elapsed_time: 4906019910204099781
+  iterations: 9
+‖Σ‖: 6000000
+‖x‖: 50159745.237564221
+‖y‖: 0.074155551840164188
+f: -0.038905604396283669
+counters:
+  f: 62
+  grad_f: 54
+  g: 70
+  grad_g_prod: 54
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

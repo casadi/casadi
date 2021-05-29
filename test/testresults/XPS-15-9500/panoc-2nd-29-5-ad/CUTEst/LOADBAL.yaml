@@ -1,0 +1,34 @@
+name: LOADBAL
+n: 31
+m: 31
+box constraints x: 42
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.036505000000000003
+ε: 9.3298780043858926e-06
+δ: 3.4244582991505013e-06
+inner:
+  elapsed_time: 140273631923849
+  iterations: 896
+  linesearch_failures: 299
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 418
+  sum_τ: 454.3203125
+  count_τ: 891
+‖Σ‖: 217.06804794985879
+‖x‖: 196.46517307634815
+‖y‖: 0.017111269877726581
+f: 0.45285114297859203
+counters:
+  f: 7479
+  grad_f: 4472
+  g: 8241
+  grad_g_prod: 12722
+  grad_gi: 0
+  hess_L_prod: 750
+  hess_L: 0

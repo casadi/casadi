@@ -1,0 +1,34 @@
+name: HS34
+n: 3
+m: 2
+box constraints x: 6
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000135
+ε: 2.5942743947515723e-07
+δ: 3.0169877440755499e-07
+inner:
+  elapsed_time: 128
+  iterations: 41
+  linesearch_failures: 4
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 25
+  sum_τ: 27.1875
+  count_τ: 36
+‖Σ‖: 100.4987562112089
+‖x‖: 10.295509133156731
+‖y‖: 0.43646056313500731
+f: -0.8340324103401795
+counters:
+  f: 253
+  grad_f: 147
+  g: 275
+  grad_g_prod: 147
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

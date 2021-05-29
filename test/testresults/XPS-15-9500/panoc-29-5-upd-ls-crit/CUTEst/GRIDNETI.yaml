@@ -1,0 +1,34 @@
+name: GRIDNETI
+n: 7564
+m: 3844
+box constraints x: 2521
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 25
+inner convergence failures: 5
+initial penalty reduced: 0
+penalty reduced: 5
+elapsed time: 30.577218999999999
+ε: 7.9269500564416173e-06
+δ: 0.040560828787967296
+inner:
+  elapsed_time: 140316612133109
+  iterations: 17101
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 16843
+  sum_τ: 16956.8125
+  count_τ: 17076
+‖Σ‖: 1261.6049990092374
+‖x‖: 27.211827193894788
+‖y‖: 147.46071602110527
+f: 210.37652740233045
+counters:
+  f: 34824
+  grad_f: 34497
+  g: 34869
+  grad_g_prod: 34497
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: PORTFL1
+n: 12
+m: 1
+box constraints x: 24
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 135
+inner convergence failures: 130
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.77043899999999998
+ε: 9.9996400986859801e-06
+δ: 2.616454830572934e-10
+inner:
+  elapsed_time: 94356137295931
+  iterations: 131608
+‖Σ‖: 26.214400000000012
+‖x‖: 0.52605812108704553
+‖y‖: 0.0093774021920452078
+f: 0.020486286129005247
+counters:
+  f: 131884
+  grad_f: 132013
+  g: 132134
+  grad_g_prod: 132013
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

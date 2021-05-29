@@ -1,0 +1,34 @@
+name: HS25NE
+n: 3
+m: 99
+box constraints x: 6
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 5
+initial penalty reduced: 0
+penalty reduced: 5
+elapsed time: 0.22306500000000001
+ε: 3.6301266787089751e-26
+δ: 0.98999999999999999
+inner:
+  elapsed_time: 139809775641072
+  iterations: 5196
+  linesearch_failures: 1934
+  lbfgs_failures: 1934
+  lbfgs_rejected: 0
+  τ_1_accepted: 3242
+  sum_τ: 3244.7734375
+  count_τ: 5185
+‖Σ‖: 8185358964.5470753
+‖x‖: 42.133231735254803
+‖y‖: 13679704917.66037
+f: 0
+counters:
+  f: 9078
+  grad_f: 12776
+  g: 13138
+  grad_g_prod: 12776
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: CORE2
+n: 157
+m: 134
+box constraints x: 273
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 10
+penalty reduced: 20
+elapsed time: 1.7619549999999999
+ε: 2.4187714154994717
+δ: 104.13734313786867
+inner:
+  elapsed_time: 94596656455551
+  iterations: 239692
+‖Σ‖: 0.069994659151140851
+‖x‖: 12609.261705448087
+‖y‖: 87.768014148407644
+f: 40.271855309929215
+counters:
+  f: 241922
+  grad_f: 240412
+  g: 242372
+  grad_g_prod: 240412
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

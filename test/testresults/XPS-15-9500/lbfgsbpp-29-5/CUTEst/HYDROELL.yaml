@@ -1,0 +1,28 @@
+name: HYDROELL
+n: 1009
+m: 1008
+box constraints x: 2018
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0010870000000000001
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204100381
+  iterations: 7
+‖Σ‖: 31.749015732775089
+‖x‖: 23378863.616523366
+‖y‖: 0
+f: -3426913.8569073956
+counters:
+  f: 14
+  grad_f: 7
+  g: 21
+  grad_g_prod: 7
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

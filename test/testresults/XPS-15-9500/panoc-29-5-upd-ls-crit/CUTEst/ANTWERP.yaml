@@ -1,0 +1,34 @@
+name: ANTWERP
+n: 27
+m: 10
+box constraints x: 51
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 3.4850539999999999
+ε: 1.26167594195481
+δ: 0.99999999994373179
+inner:
+  elapsed_time: 140372419619884
+  iterations: 239014
+  linesearch_failures: 36968
+  lbfgs_failures: 0
+  lbfgs_rejected: 3
+  τ_1_accepted: 169815
+  sum_τ: 177844.2265625
+  count_τ: 238774
+‖Σ‖: 3.1622776601683795
+‖x‖: 82584.690290582075
+‖y‖: 129.5213553541565
+f: 3054.1008222754463
+counters:
+  f: 1218665
+  grad_f: 827635
+  g: 1219125
+  grad_g_prod: 827635
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

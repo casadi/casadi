@@ -1,0 +1,34 @@
+name: HS111
+n: 10
+m: 3
+box constraints x: 20
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.003901
+ε: 5.6016086880106286e-06
+δ: 2.2464168499963799e-06
+inner:
+  elapsed_time: 140527034961711
+  iterations: 267
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 2
+  τ_1_accepted: 245
+  sum_τ: 248.734375
+  count_τ: 261
+‖Σ‖: 173.00210378032
+‖x‖: 12.482923466419534
+‖y‖: 22.263221216391642
+f: -47.761102334345033
+counters:
+  f: 655
+  grad_f: 590
+  g: 667
+  grad_g_prod: 590
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

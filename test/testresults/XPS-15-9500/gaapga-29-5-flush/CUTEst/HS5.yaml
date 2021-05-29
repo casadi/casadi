@@ -1,0 +1,29 @@
+name: HS5
+n: 2
+m: 0
+box constraints x: 4
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.8999999999999998e-05
+ε: 5.3108900091025646e-06
+δ: 0
+inner:
+  elapsed_time: 94416266068013
+  iterations: 10
+  accelerated_steps_accepted: 4
+‖Σ‖: 0
+‖x‖: 1.6411133868526497
+‖y‖: 0
+f: -1.9132229549751973
+counters:
+  f: 90
+  grad_f: 38
+  g: 108
+  grad_g_prod: 38
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: SCOND1LS
+n: 5002
+m: 0
+box constraints x: 10004
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxTime
+outer iterations: 21
+inner convergence failures: 21
+initial penalty reduced: 20
+penalty reduced: 0
+elapsed time: 30.333047000000001
+ε: 710
+δ: 0
+inner:
+  elapsed_time: 30333010
+  iterations: 21000
+  linesearch_failures: 20727
+  lbfgs_failures: 20727
+  lbfgs_rejected: 0
+  τ_1_accepted: 168
+  sum_τ: 189
+  count_τ: 20979
+‖Σ‖: 0
+‖x‖: 22227.196179455474
+‖y‖: 0
+f: 8.3307255904910136e+171
+counters:
+  f: 29757
+  grad_f: 21504
+  g: 29779
+  grad_g_prod: 21504
+  grad_gi: 0
+  hess_L_prod: 20979
+  hess_L: 0

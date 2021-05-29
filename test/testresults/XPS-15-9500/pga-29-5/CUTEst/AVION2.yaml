@@ -1,0 +1,28 @@
+name: AVION2
+n: 49
+m: 15
+box constraints x: 98
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 0.72578500000000001
+ε: 11898.895645964545
+δ: 596.19834231238929
+inner:
+  elapsed_time: 94429151695376
+  iterations: 240000
+‖Σ‖: 0.00014160240749459585
+‖x‖: 34737.652765709609
+‖y‖: 2.7016685653987746
+f: 83303848.647673339
+counters:
+  f: 244780
+  grad_f: 240720
+  g: 245220
+  grad_g_prod: 240720
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: TRUSPYR1
+n: 11
+m: 4
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 10
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.059110999999999997
+ε: 5.8171289651909319e-06
+δ: 2.4626869006838525e-06
+inner:
+  elapsed_time: 59095
+  iterations: 4873
+  linesearch_failures: 2395
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 1823
+  sum_τ: 1977.015625
+  count_τ: 4864
+‖Σ‖: 4096.1569784726316
+‖x‖: 12.953798511739032
+‖y‖: 33.568555271178326
+f: 11.228658182139421
+counters:
+  f: 52913
+  grad_f: 28558
+  g: 55953
+  grad_g_prod: 40642
+  grad_gi: 0
+  hess_L_prod: 3021
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: HS15
+n: 2
+m: 2
+box constraints x: 1
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00012300000000000001
+ε: 6.8212102632969618e-13
+δ: 7.6029572337876772e-07
+inner:
+  elapsed_time: 139882789863535
+  iterations: 59
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 49
+  sum_τ: 49.25
+  count_τ: 50
+‖Σ‖: 10000.00029674341
+‖x‖: 2.0615513376184755
+‖y‖: 699.99939176341991
+f: 306.49946779322488
+counters:
+  f: 143
+  grad_f: 138
+  g: 161
+  grad_g_prod: 138
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

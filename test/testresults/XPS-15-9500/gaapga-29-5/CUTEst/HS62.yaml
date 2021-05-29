@@ -1,0 +1,29 @@
+name: HS62
+n: 3
+m: 1
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 9
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00086700000000000004
+ε: 1.2785676517523825e-08
+δ: 3.9342926229923858e-06
+inner:
+  elapsed_time: 140728821292537
+  iterations: 575
+  accelerated_steps_accepted: 49
+‖Σ‖: 100000
+‖x‖: 0.70166080079807069
+‖y‖: 6386.9111243952821
+f: -26272.539776000853
+counters:
+  f: 1212
+  grad_f: 660
+  g: 1239
+  grad_g_prod: 660
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

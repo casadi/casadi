@@ -1,0 +1,29 @@
+name: JANNSON4
+n: 10000
+m: 2
+box constraints x: 20000
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 34
+inner convergence failures: 27
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.1952739999999999
+ε: 9.0446757634587982e-06
+δ: 2.6482938268927269e-07
+inner:
+  elapsed_time: 94914484463546
+  iterations: 1528
+  accelerated_steps_accepted: 29
+‖Σ‖: 144.11865748104699
+‖x‖: 1.0000001324147729
+‖y‖: 99.014551392106952
+f: 9801.9704178609973
+counters:
+  f: 3947
+  grad_f: 1693
+  g: 4029
+  grad_g_prod: 1693
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

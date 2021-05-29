@@ -1,0 +1,34 @@
+name: FEEDLOC
+n: 90
+m: 259
+box constraints x: 180
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.18507699999999999
+ε: 9.9813594307058286e-06
+δ: 2.4855000049228693e-06
+inner:
+  elapsed_time: 140243567301324
+  iterations: 1639
+  linesearch_failures: 301
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 1040
+  sum_τ: 1106.6484375
+  count_τ: 1633
+‖Σ‖: 276.61958050741725
+‖x‖: 80.558824465820905
+‖y‖: 2.1693526285346785
+f: 0
+counters:
+  f: 10404
+  grad_f: 7894
+  g: 12049
+  grad_g_prod: 7894
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

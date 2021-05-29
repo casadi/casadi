@@ -1,0 +1,29 @@
+name: HS2NE
+n: 2
+m: 2
+box constraints x: 1
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 24
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.0015499999999999999
+ε: 8.58306884765625e-06
+δ: 2.2247448713915894
+inner:
+  elapsed_time: 140735863717525
+  iterations: 1418
+  accelerated_steps_accepted: 142
+‖Σ‖: 1037916003.3872747
+‖x‖: 1.9364916731037085
+‖y‖: 3227431040.0134501
+f: 0
+counters:
+  f: 3319
+  grad_f: 2520
+  g: 4019
+  grad_g_prod: 2520
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

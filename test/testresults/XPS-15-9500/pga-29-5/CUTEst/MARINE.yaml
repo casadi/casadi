@@ -1,0 +1,28 @@
+name: MARINE
+n: 11215
+m: 11192
+box constraints x: 15
+solver: ALMSolver<PGA>
+status: MaxTime
+outer iterations: 48
+inner convergence failures: 48
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 30.456226999999998
+ε: 3.9346581442755433
+δ: 13959.924273107248
+inner:
+  elapsed_time: 94618159982611
+  iterations: 48000
+‖Σ‖: 0.0038679322496489137
+‖x‖: 253654.03653119379
+‖y‖: 42.638598933975373
+f: 2023.806409435231
+counters:
+  f: 49290
+  grad_f: 48144
+  g: 49346
+  grad_g_prod: 48144
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

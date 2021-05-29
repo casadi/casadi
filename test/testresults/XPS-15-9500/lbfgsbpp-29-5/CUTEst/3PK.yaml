@@ -1,0 +1,28 @@
+name: 3PK
+n: 30
+m: 0
+box constraints x: 30
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.082897999999999999
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204182531
+  iterations: 2551
+‖Σ‖: 0
+‖x‖: 396.13496661554774
+‖y‖: 0
+f: 1.7963062698092611
+counters:
+  f: 2769
+  grad_f: 2762
+  g: 2776
+  grad_g_prod: 2762
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

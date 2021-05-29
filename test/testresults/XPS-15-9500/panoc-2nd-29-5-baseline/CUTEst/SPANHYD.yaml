@@ -1,0 +1,34 @@
+name: SPANHYD
+n: 97
+m: 33
+box constraints x: 194
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 161
+initial penalty reduced: 11
+penalty reduced: 20
+elapsed time: 5.9142190000000001
+ε: 1.1271013811153807e-07
+δ: 608.35000000000002
+inner:
+  elapsed_time: 139839846104250
+  iterations: 167813
+  linesearch_failures: 123134
+  lbfgs_failures: 24808
+  lbfgs_rejected: 0
+  τ_1_accepted: 20838
+  sum_τ: 24996.2421875
+  count_τ: 167573
+‖Σ‖: 0.02084110416171565
+‖x‖: 5013.8626084721272
+‖y‖: 1353.3181963121981
+f: 239.73859185439443
+counters:
+  f: 1960328
+  grad_f: 1251195
+  g: 2128336
+  grad_g_prod: 1251195
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

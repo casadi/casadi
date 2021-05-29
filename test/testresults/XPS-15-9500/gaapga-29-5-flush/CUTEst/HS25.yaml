@@ -1,0 +1,29 @@
+name: HS25
+n: 3
+m: 0
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 36
+inner convergence failures: 22
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.47636800000000001
+ε: 4.3124410993555087e-06
+δ: 0
+inner:
+  elapsed_time: 140735182751461
+  iterations: 23243
+  accelerated_steps_accepted: 218
+‖Σ‖: 0
+‖x‖: 55.915279339892223
+‖y‖: 0
+f: 3.7740616621204647e-10
+counters:
+  f: 46873
+  grad_f: 23605
+  g: 46961
+  grad_g_prod: 23605
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

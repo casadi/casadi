@@ -1,0 +1,29 @@
+name: SYNTHES3
+n: 17
+m: 23
+box constraints x: 34
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 11
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0032060000000000001
+ε: 5.0815012464511256e-07
+δ: 7.6797997206057289e-07
+inner:
+  elapsed_time: 94772748356724
+  iterations: 751
+  accelerated_steps_accepted: 64
+‖Σ‖: 1642.5221956294934
+‖x‖: 3.8453677049899828
+‖y‖: 44.913802451669675
+f: 15.082189892557622
+counters:
+  f: 1564
+  grad_f: 859
+  g: 1597
+  grad_g_prod: 859
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

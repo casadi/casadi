@@ -1,0 +1,34 @@
+name: GROUPING
+n: 100
+m: 125
+box constraints x: 200
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 11
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.079999000000000001
+ε: 6.7917296604491639e-06
+δ: 9.3402194710670653e-07
+inner:
+  elapsed_time: 79947
+  iterations: 3829
+  linesearch_failures: 1
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 2969
+  sum_τ: 3282.2578125
+  count_τ: 3819
+‖Σ‖: 6338.1699980416161
+‖x‖: 4.4721342906742043
+‖y‖: 20.058294978720493
+f: 2.3725722961410001
+counters:
+  f: 10584
+  grad_f: 9129
+  g: 10605
+  grad_g_prod: 9129
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

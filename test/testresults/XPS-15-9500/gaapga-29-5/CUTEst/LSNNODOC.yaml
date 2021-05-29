@@ -1,0 +1,29 @@
+name: LSNNODOC
+n: 5
+m: 4
+box constraints x: 6
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00012400000000000001
+ε: 1.9173995724486304e-11
+δ: 8.803850448657613e-07
+inner:
+  elapsed_time: 94180042866807
+  iterations: 56
+  accelerated_steps_accepted: 31
+‖Σ‖: 647.06438462120559
+‖x‖: 11.66190308329751
+‖y‖: 20.522969677891655
+f: 123.11243146949782
+counters:
+  f: 131
+  grad_f: 111
+  g: 149
+  grad_g_prod: 111
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

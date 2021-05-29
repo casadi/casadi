@@ -1,0 +1,28 @@
+name: FEEDLOC
+n: 90
+m: 259
+box constraints x: 180
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 16
+inner convergence failures: 2
+initial penalty reduced: 0
+penalty reduced: 2
+elapsed time: 0.056043999999999997
+ε: 1.0000000000000001e-05
+δ: 5.7271259758517878e-06
+inner:
+  elapsed_time: 4906019910204155461
+  iterations: 535
+‖Σ‖: 601.31476653772165
+‖x‖: 80.626558410440566
+‖y‖: 2.2197766573701632
+f: 0
+counters:
+  f: 850
+  grad_f: 836
+  g: 864
+  grad_g_prod: 836
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

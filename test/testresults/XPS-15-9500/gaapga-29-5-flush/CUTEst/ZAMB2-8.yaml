@@ -1,0 +1,29 @@
+name: ZAMB2-8
+n: 138
+m: 48
+box constraints x: 276
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 53
+inner convergence failures: 43
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 1.0040659999999999
+ε: 9.3755799966020197e-06
+δ: 3.0134386262807566e-06
+inner:
+  elapsed_time: 140732929200270
+  iterations: 47123
+  accelerated_steps_accepted: 13415
+‖Σ‖: 146.4819693257451
+‖x‖: 228.43134548170784
+‖y‖: 0.048884311156501645
+f: -0.1529342056733432
+counters:
+  f: 94742
+  grad_f: 60750
+  g: 94881
+  grad_g_prod: 60750
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

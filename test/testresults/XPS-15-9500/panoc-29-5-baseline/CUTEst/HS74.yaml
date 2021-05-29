@@ -1,0 +1,34 @@
+name: HS74
+n: 4
+m: 5
+box constraints x: 8
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00057700000000000004
+ε: 2.5685590117063839e-06
+δ: 7.5027456887255539e-06
+inner:
+  elapsed_time: 567
+  iterations: 200
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 191
+  sum_τ: 191.296875
+  count_τ: 194
+‖Σ‖: 14.956822499344703
+‖x‖: 1230.9100732566603
+‖y‖: 8.1209086531013188
+f: 5126.4982075027201
+counters:
+  f: 492
+  grad_f: 425
+  g: 504
+  grad_g_prod: 425
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

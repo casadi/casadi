@@ -1,0 +1,29 @@
+name: HOLMES
+n: 180
+m: 0
+box constraints x: 180
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 11
+inner convergence failures: 3
+initial penalty reduced: 0
+penalty reduced: 3
+elapsed time: 1.453309
+ε: 8.5377445928069839e-06
+δ: 0
+inner:
+  elapsed_time: 94377612815592
+  iterations: 692
+  accelerated_steps_accepted: 40
+‖Σ‖: 0
+‖x‖: 0.7751983765643472
+‖y‖: 0
+f: 1248.1503481413095
+counters:
+  f: 1500
+  grad_f: 776
+  g: 1530
+  grad_g_prod: 776
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

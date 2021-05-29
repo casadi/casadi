@@ -1,0 +1,29 @@
+name: SWOPF
+n: 83
+m: 92
+box constraints x: 20
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 238
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 2.98095
+ε: 7.6946339069181162
+δ: 0.73003679228561114
+inner:
+  elapsed_time: 140720674712523
+  iterations: 238591
+  accelerated_steps_accepted: 20641
+‖Σ‖: 41.609190628546806
+‖x‖: 13.612948381987112
+‖y‖: 107.73933253618708
+f: 1.7567845553333947
+counters:
+  f: 479851
+  grad_f: 260192
+  g: 480551
+  grad_g_prod: 260192
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

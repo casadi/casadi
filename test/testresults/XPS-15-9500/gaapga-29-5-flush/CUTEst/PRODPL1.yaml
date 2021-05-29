@@ -1,0 +1,29 @@
+name: PRODPL1
+n: 60
+m: 29
+box constraints x: 60
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 13
+inner convergence failures: 2
+initial penalty reduced: 0
+penalty reduced: 2
+elapsed time: 0.026232999999999999
+ε: 7.5096129137364187e-06
+δ: 1.8650637188307589e-06
+inner:
+  elapsed_time: 140721613256378
+  iterations: 4312
+  accelerated_steps_accepted: 230
+‖Σ‖: 703.3311069794072
+‖x‖: 10.053978300458333
+‖y‖: 23.528939316916933
+f: 35.738963494031566
+counters:
+  f: 8737
+  grad_f: 4594
+  g: 8774
+  grad_g_prod: 4594
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

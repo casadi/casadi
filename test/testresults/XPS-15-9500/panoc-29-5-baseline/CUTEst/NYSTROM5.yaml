@@ -1,0 +1,34 @@
+name: NYSTROM5
+n: 18
+m: 20
+box constraints x: 6
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 229
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 1.9675659999999999
+ε: 781.66139736866171
+δ: 0.378783500074452
+inner:
+  elapsed_time: 1967087
+  iterations: 224294
+  linesearch_failures: 18684
+  lbfgs_failures: 0
+  lbfgs_rejected: 27097
+  τ_1_accepted: 184028
+  sum_τ: 190195.703125
+  count_τ: 224054
+‖Σ‖: 232806.47253093257
+‖x‖: 25817.567195505748
+‖y‖: 1847517.8721671514
+f: 0
+counters:
+  f: 837565
+  grad_f: 630161
+  g: 838025
+  grad_g_prod: 630161
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

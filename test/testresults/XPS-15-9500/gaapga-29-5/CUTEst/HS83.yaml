@@ -1,0 +1,29 @@
+name: HS83
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 10
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000154
+ε: 3.8142161429277621e-08
+δ: 4.4236006147002627e-06
+inner:
+  elapsed_time: 140730963163634
+  iterations: 85
+  accelerated_steps_accepted: 19
+‖Σ‖: 11731.574471245125
+‖x‖: 107.00549756643291
+‖y‖: 904.31890843651865
+f: -30665.542880700123
+counters:
+  f: 197
+  grad_f: 144
+  g: 227
+  grad_g_prod: 144
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: HS70
+n: 4
+m: 1
+box constraints x: 8
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0013799999999999999
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204100955
+  iterations: 31
+‖Σ‖: 1
+‖x‖: 13.279604253960015
+‖y‖: 0
+f: 0.0074984926674253622
+counters:
+  f: 54
+  grad_f: 47
+  g: 61
+  grad_g_prod: 47
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

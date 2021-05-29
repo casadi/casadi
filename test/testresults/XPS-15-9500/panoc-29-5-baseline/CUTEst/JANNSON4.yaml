@@ -1,0 +1,34 @@
+name: JANNSON4
+n: 10000
+m: 2
+box constraints x: 20000
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: MaxTime
+outer iterations: 10
+inner convergence failures: 5
+initial penalty reduced: 0
+penalty reduced: 4
+elapsed time: 35.515262999999997
+ε: 0.00014631506636719749
+δ: 0.014296270748719182
+inner:
+  elapsed_time: 35514726
+  iterations: 5020
+  linesearch_failures: 4935
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 76
+  sum_τ: 76
+  count_τ: 5011
+‖Σ‖: 1000.000499999875
+‖x‖: 1.0003383473461946
+‖y‖: 98.983041740723479
+f: 9801.9034415728765
+counters:
+  f: 84238
+  grad_f: 44606
+  g: 84253
+  grad_g_prod: 44606
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

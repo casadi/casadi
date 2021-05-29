@@ -1,0 +1,34 @@
+name: PORTFL4
+n: 12
+m: 1
+box constraints x: 24
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.033692
+ε: 5.0050577678883296e-06
+δ: 2.9678506105468294e-07
+inner:
+  elapsed_time: 139646566695820
+  iterations: 518
+  linesearch_failures: 389
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 92
+  sum_τ: 96.7265625
+  count_τ: 513
+‖Σ‖: 100
+‖x‖: 0.45425819322350108
+‖y‖: 0.014614874215556503
+f: 0.026306955435788291
+counters:
+  f: 7142
+  grad_f: 3903
+  g: 7154
+  grad_g_prod: 3903
+  grad_gi: 0
+  hess_L_prod: 490
+  hess_L: 0

@@ -1,0 +1,29 @@
+name: HS70
+n: 4
+m: 1
+box constraints x: 8
+solver: ALMSolver<GuardedAAPGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0035439999999999998
+ε: 6.7471387003633504e-06
+δ: 0
+inner:
+  elapsed_time: 140726550785221
+  iterations: 120
+  accelerated_steps_accepted: 14
+‖Σ‖: 1
+‖x‖: 13.28124270308871
+‖y‖: 0
+f: 0.0074984636744978329
+counters:
+  f: 279
+  grad_f: 158
+  g: 297
+  grad_g_prod: 158
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

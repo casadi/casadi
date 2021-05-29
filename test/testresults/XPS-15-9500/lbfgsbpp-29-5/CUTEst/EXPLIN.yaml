@@ -1,0 +1,28 @@
+name: EXPLIN
+n: 1200
+m: 0
+box constraints x: 2400
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 61
+inner convergence failures: 45
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 0.027813999999999998
+ε: 1.0000000000000001e-05
+δ: 0
+inner:
+  elapsed_time: 4906019910204127346
+  iterations: 141
+‖Σ‖: 0
+‖x‖: 341.15582797864494
+‖y‖: 0
+f: -71924113.411340386
+counters:
+  f: 1189
+  grad_f: 1168
+  g: 1210
+  grad_g_prod: 1168
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

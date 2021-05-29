@@ -1,0 +1,29 @@
+name: MCONCON
+n: 15
+m: 11
+box constraints x: 5
+solver: ALMSolver<GuardedAAPGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 14
+penalty reduced: 20
+elapsed time: 0.81714699999999996
+ε: 39.805681809635999
+δ: 626.73639226562113
+inner:
+  elapsed_time: 94536525969111
+  iterations: 239878
+  accelerated_steps_accepted: 257
+‖Σ‖: 0.0025990452931627206
+‖x‖: 2535.9711086291136
+‖y‖: 45.644483795935876
+f: -5817.85905990213
+counters:
+  f: 481886
+  grad_f: 241095
+  g: 482572
+  grad_g_prod: 241095
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

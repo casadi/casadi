@@ -1,0 +1,34 @@
+name: HS67
+n: 3
+m: 14
+box constraints x: 6
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 2
+penalty reduced: 20
+elapsed time: 0.0067349999999999997
+ε: .inf
+δ: .nan
+inner:
+  elapsed_time: 10279
+  iterations: 2000
+  linesearch_failures: 1998
+  lbfgs_failures: 1000
+  lbfgs_rejected: 0
+  τ_1_accepted: 0
+  sum_τ: 0
+  count_τ: 1998
+‖Σ‖: 1.3469966592386189
+‖x‖: 16000
+‖y‖: 3464101615.1377544
+f: -.inf
+counters:
+  f: 2243
+  grad_f: 2483
+  g: 2484
+  grad_g_prod: 2483
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

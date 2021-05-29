@@ -1,0 +1,28 @@
+name: HS59
+n: 2
+m: 3
+box constraints x: 4
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00050600000000000005
+ε: 8.1064127219754312e-06
+δ: 0
+inner:
+  elapsed_time: 94884417503729
+  iterations: 92
+‖Σ‖: 1.7320508075688772
+‖x‖: 69.852447788413826
+‖y‖: 0
+f: -6.7495047191839035
+counters:
+  f: 106
+  grad_f: 110
+  g: 118
+  grad_g_prod: 110
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

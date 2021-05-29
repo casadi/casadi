@@ -1,0 +1,28 @@
+name: DECONVNE
+n: 63
+m: 40
+box constraints x: 24
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 13
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.028410999999999999
+ε: 1.0000000000000001e-05
+δ: 2.120079147280296e-06
+inner:
+  elapsed_time: 4906019910204127963
+  iterations: 597
+‖Σ‖: 776952.7904270764
+‖x‖: 4.5110463821348192
+‖y‖: 0.00076122368375766865
+f: 0
+counters:
+  f: 671
+  grad_f: 658
+  g: 684
+  grad_g_prod: 658
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

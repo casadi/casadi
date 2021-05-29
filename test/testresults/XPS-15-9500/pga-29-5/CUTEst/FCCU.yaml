@@ -1,0 +1,28 @@
+name: FCCU
+n: 19
+m: 8
+box constraints x: 19
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 8
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 1
+elapsed time: 0.006038
+ε: 9.9881266983903316e-06
+δ: 4.444278012272207e-07
+inner:
+  elapsed_time: 140721196018411
+  iterations: 3856
+‖Σ‖: 342.328931613039
+‖x‖: 62.693436219913075
+‖y‖: 5.2430538789025531
+f: 11.149107723990531
+counters:
+  f: 3916
+  grad_f: 3880
+  g: 3931
+  grad_g_prod: 3880
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

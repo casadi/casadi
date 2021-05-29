@@ -1,0 +1,34 @@
+name: HS72
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<PANOCSolver<LBFGS>>
+status: Converged
+outer iterations: 13
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00022599999999999999
+ε: 6.8919050888460731e-07
+δ: 3.0346271846695e-07
+inner:
+  elapsed_time: 139861315027157
+  iterations: 141
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 126
+  sum_τ: 127
+  count_τ: 128
+‖Σ‖: 1011814338.898088
+‖x‖: 363.77687801919245
+‖y‖: 42169.724935215876
+f: 727.66852177931867
+counters:
+  f: 307
+  grad_f: 310
+  g: 333
+  grad_g_prod: 310
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

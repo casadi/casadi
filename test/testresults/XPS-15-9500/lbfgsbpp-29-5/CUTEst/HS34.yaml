@@ -1,0 +1,28 @@
+name: HS34
+n: 3
+m: 2
+box constraints x: 6
+solver: ALMSolver<LBFGSBSolver<?>>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00037500000000000001
+ε: 1.0000000000000001e-05
+δ: 3.0926153993249272e-07
+inner:
+  elapsed_time: 4906019910204100014
+  iterations: 27
+‖Σ‖: 14.142135623730951
+‖x‖: 10.295509117911102
+‖y‖: 0.43645442342520469
+f: -0.83403231018969748
+counters:
+  f: 50
+  grad_f: 43
+  g: 57
+  grad_g_prod: 43
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: HS25NE
+n: 3
+m: 99
+box constraints x: 6
+solver: ALMSolver<PGA>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 226
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 5.0351460000000001
+ε: 0.0083518159951999921
+δ: 0.0063771719605152377
+inner:
+  elapsed_time: 94064083783478
+  iterations: 226104
+‖Σ‖: 9.9498743710661994
+‖x‖: 70.585683114944288
+‖y‖: 6.7149410035006367
+f: 0
+counters:
+  f: 228613
+  grad_f: 226824
+  g: 229073
+  grad_g_prod: 226824
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

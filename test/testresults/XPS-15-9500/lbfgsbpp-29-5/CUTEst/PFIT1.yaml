@@ -1,0 +1,28 @@
+name: PFIT1
+n: 3
+m: 3
+box constraints x: 1
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 34
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.076026999999999997
+ε: 1.0000000000000001e-05
+δ: 0.014899313651271395
+inner:
+  elapsed_time: 4906019910204175413
+  iterations: 1413
+‖Σ‖: 15.849962372603111
+‖x‖: 14.835156834105151
+‖y‖: 27.036659537611012
+f: 0
+counters:
+  f: 5161
+  grad_f: 4941
+  g: 5381
+  grad_g_prod: 4941
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

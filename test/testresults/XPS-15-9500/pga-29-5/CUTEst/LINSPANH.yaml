@@ -1,0 +1,28 @@
+name: LINSPANH
+n: 97
+m: 33
+box constraints x: 194
+solver: ALMSolver<PGA>
+status: Converged
+outer iterations: 40
+inner convergence failures: 32
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.097101000000000007
+ε: 9.0388166213983823e-06
+δ: 6.2798818376563759e-06
+inner:
+  elapsed_time: 140732383777176
+  iterations: 34785
+‖Σ‖: 806.61161010562421
+‖x‖: 4892.3877311394062
+‖y‖: 1.0025912895031734
+f: -77
+counters:
+  f: 34865
+  grad_f: 34905
+  g: 34925
+  grad_g_prod: 34905
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,28 @@
+name: GAUSSELM
+n: 22140
+m: 61542
+box constraints x: 3239
+solver: ALMSolver<LBFGSBSolver<?>>
+status: MaxTime
+outer iterations: 9
+inner convergence failures: 6
+initial penalty reduced: 0
+penalty reduced: 5
+elapsed time: 36.052061000000002
+ε: 0.025000000000000001
+δ: 0.30903480579935882
+inner:
+  elapsed_time: 4906019910240137606
+  iterations: 177
+‖Σ‖: 258.77931027393356
+‖x‖: 57.782996708879793
+‖y‖: 2.29589010854846
+f: -0.61591793561172659
+counters:
+  f: 2394
+  grad_f: 2391
+  g: 2397
+  grad_g_prod: 2391
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

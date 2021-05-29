@@ -1,0 +1,34 @@
+name: ERRINBAR
+n: 18
+m: 9
+box constraints x: 14
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.84212500000000001
+ε: 2e+20
+δ: 2.3910838743899999e+20
+inner:
+  elapsed_time: 841865
+  iterations: 239000
+  linesearch_failures: 220917
+  lbfgs_failures: 220000
+  lbfgs_rejected: 0
+  τ_1_accepted: 17534
+  sum_τ: 17615.203125
+  count_τ: 238761
+‖Σ‖: 3
+‖x‖: 2.4494897427831783e+20
+‖y‖: 4.48624945914799e+20
+f: 19.030207400399998
+counters:
+  f: 266030
+  grad_f: 498905
+  g: 504409
+  grad_g_prod: 498905
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0
