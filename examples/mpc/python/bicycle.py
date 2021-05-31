@@ -2,6 +2,7 @@
 import casadi as cs
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 
 # States:
 # [0] p_x   longitudinal position
@@ -195,8 +196,6 @@ for k in range(N_sim):
 
 #%% Plot
 
-import matplotlib.pyplot as plt
-
 fig, (ax_ipopt, ax_panoc, ax_open) = plt.subplots(3, 1)
 c = plt.Circle((0, 0), R_obstacle)
 ax_ipopt.set_aspect(1)
@@ -234,7 +233,7 @@ panocparams = {
     "max_iter": 1000,
     "print_interval": 1000 if verbose else 0,
     "stop_crit": pa.PANOCStopCrit.ApproxKKT,
-    "update_lipschitz_in_linesearch": True,
+    "update_lipschitz_in_linesearch": False,
 }
 lbfgsmem = N_hor * 4
 
@@ -265,6 +264,65 @@ almparams = pa.ALMParams(
 )
 almsolver = pa.ALMSolver(almparams, solvers[solverid])
 y0 = np.zeros((m,))
+
+#%% Print fpr
+
+# N_sim = 40
+xs = np.zeros((N_sim, n_states))
+panoc_times = np.zeros((N_sim,))
+avg_τs = np.zeros((N_sim,))
+panoc_inner_iters = np.zeros((N_sim,))
+
+state = np.array([-5, 0, 0, 0])
+dest = np.array([5, 0.1, 0, 0])
+if multipleshooting:
+    x_sol = np.concatenate((np.tile(state, N_hor), np.zeros((n_inputs * N_hor,))))
+else:
+    x_sol = np.zeros((n,))
+assert x_sol.size == n
+y_sol = np.zeros((m,))
+
+for k in range(0):
+    state = np.reshape(state, (n_states,))
+    xs[k] = state
+    prob.param = np.concatenate((state, dest))
+    t0 = time.perf_counter()
+    y_sol, x_sol, stats = almsolver(prob, y_sol, x_sol)
+    t1 = time.perf_counter()
+    panoc_times[k] = t1 - t0
+    # pprint(stats)
+    avg_τs[k] = stats['inner']['sum_τ'] / stats['inner']['count_τ'] if stats['inner']['count_τ'] > 0 else 1
+    panoc_inner_iters[k] = stats['inner']['iterations']
+    # print(stats["status"], stats["elapsed_time"], stats['outer_iterations'], stats['inner']['iterations'], avg_τs[k])
+    input = x_sol[first_input_idx : first_input_idx + 2]
+    state += Ts * f(state, input)
+
+class fpr_logger:
+    def __init__(self):
+        self.alm_it = -1
+        self.data = []
+    
+    def update(self, s):
+        if s.k == 0:
+            self.alm_it += 1
+            self.data.append([])
+        self.data[self.alm_it].append(s.fpr)
+
+logger = fpr_logger()
+
+state = np.reshape(state, (n_states,))
+prob.param = np.concatenate((state, dest))
+almsolver.inner_solver().set_progress_callback(logger.update)
+y_sol, x_sol, stats = almsolver(prob, y_sol, x_sol)
+
+from pprint import pprint
+
+pprint(logger.data)
+plt.figure()
+for i, fprs in enumerate(logger.data):
+    plt.semilogy(fprs, '.-', label=str(i))
+plt.legend()
+plt.savefig(f'fpr-upd-ls-cond={panocparams["update_lipschitz_in_linesearch"]}.pdf')
 
 #%% Simulate
 
@@ -301,6 +359,7 @@ for k in range(N_sim):
     state += Ts * f(state, input)
 
 print(panoc_inner_iters.sum())
+
 #%% Plot
 
 import matplotlib.pyplot as plt
@@ -437,5 +496,7 @@ plt.legend()
 plt.show()
 
 # %%
+
+
 
 # %%

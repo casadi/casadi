@@ -318,7 +318,7 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
     void stop() override { innersolver.stop(); }
     std::string get_name() const override { return innersolver.get_name(); }
 
-  private:
+  protected:
     InnerSolver innersolver;
 };
 
@@ -329,11 +329,27 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
 
 namespace pa {
 
-using PolymorphicPANOCSolver =
-    PolymorphicInnerSolver<PANOCSolver<PolymorphicPANOCDirectionBase>>;
+struct PolymorphicPANOCSolver
+    : PolymorphicInnerSolver<PANOCSolver<PolymorphicPANOCDirectionBase>> {
+    using PolymorphicInnerSolver<
+        PANOCSolver<PolymorphicPANOCDirectionBase>>::PolymorphicInnerSolver;
 
-using PolymorphicSecondOrderPANOCLBFGSSolver =
-    PolymorphicInnerSolver<SecondOrderPANOCLBFGSSolver>;
+    void
+    set_progress_callback(std::function<void(const PANOCProgressInfo &)> cb) {
+        this->innersolver.set_progress_callback(std::move(cb));
+    }
+};
+
+struct PolymorphicSecondOrderPANOCLBFGSSolver
+    : PolymorphicInnerSolver<SecondOrderPANOCLBFGSSolver> {
+    using PolymorphicInnerSolver<
+        SecondOrderPANOCLBFGSSolver>::PolymorphicInnerSolver;
+
+    void set_progress_callback(
+        std::function<void(const SecondOrderPANOCLBFGSProgressInfo &)> cb) {
+        this->innersolver.set_progress_callback(std::move(cb));
+    }
+};
 
 using PolymorphicALMSolver = ALMSolver<PolymorphicInnerSolverWrapper>;
 

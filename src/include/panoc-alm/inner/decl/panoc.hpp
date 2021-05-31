@@ -54,6 +54,26 @@ struct PANOCParams {
     LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnGradientStepSize;
 };
 
+struct PANOCProgressInfo {
+    unsigned k;
+    crvec x;
+    crvec p;
+    real_t norm_sq_p;
+    crvec x_hat;
+    real_t ψ;
+    crvec grad_ψ;
+    real_t ψ_hat;
+    crvec grad_ψ_hat;
+    real_t L;
+    real_t γ;
+    real_t τ;
+    real_t ε;
+    crvec Σ;
+    crvec y;
+    const Problem &problem;
+    const PANOCParams &params;
+};
+
 /// PANOC solver for ALM.
 /// @ingroup    grp_InnerSolvers
 template <class DirectionProviderT>
@@ -75,25 +95,7 @@ class PANOCSolver {
         real_t sum_τ                 = 0;
     };
 
-    struct ProgressInfo {
-        unsigned k;
-        const vec &x;
-        const vec &p;
-        real_t norm_sq_p;
-        const vec &x_hat;
-        real_t ψ;
-        const vec &grad_ψ;
-        real_t ψ_hat;
-        const vec &grad_ψ_hat;
-        real_t L;
-        real_t γ;
-        real_t τ;
-        real_t ε;
-        const vec &Σ;
-        const vec &y;
-        const Problem &problem;
-        const Params &params;
-    };
+    using ProgressInfo = PANOCProgressInfo;
 
     PANOCSolver(Params params,
                 PANOCDirection<DirectionProvider> &&direction_provider)

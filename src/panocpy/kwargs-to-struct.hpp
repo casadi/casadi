@@ -92,7 +92,6 @@ template <>
 inline const kwargs_to_struct_table_t<pa::SecondOrderPANOCLBFGSParams>
     kwargs_to_struct_table<pa::SecondOrderPANOCLBFGSParams>{
         {"Lipschitz", &pa::SecondOrderPANOCLBFGSParams::Lipschitz},
-        {"lbfgs_mem", &pa::SecondOrderPANOCLBFGSParams::lbfgs_mem},
         {"max_iter", &pa::SecondOrderPANOCLBFGSParams::max_iter},
         {"max_time", &pa::SecondOrderPANOCLBFGSParams::max_time},
         {"τ_min", &pa::SecondOrderPANOCLBFGSParams::τ_min},

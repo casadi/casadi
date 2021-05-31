@@ -28,6 +28,7 @@
 #include <utility>
 
 #include "kwargs-to-struct.hpp"
+#include "panoc-alm/inner/decl/panoc.hpp"
 #include "polymorphic-inner-solver.hpp"
 #include "polymorphic-panoc-direction.hpp"
 #include "problem.hpp"
@@ -243,6 +244,50 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("stop", &pa::PolymorphicInnerSolverBase::stop)
         .def("get_name", &pa::PolymorphicInnerSolverBase::get_name);
 
+    py::class_<pa::PANOCProgressInfo>(m, "PANOCProgressInfo")
+        .def_readonly("k", &pa::PANOCProgressInfo::k)
+        .def_readonly("x", &pa::PANOCProgressInfo::x)
+        .def_readonly("p", &pa::PANOCProgressInfo::p)
+        .def_readonly("norm_sq_p", &pa::PANOCProgressInfo::norm_sq_p)
+        .def_readonly("x_hat", &pa::PANOCProgressInfo::x_hat)
+        .def_readonly("ψ", &pa::PANOCProgressInfo::ψ)
+        .def_readonly("grad_ψ", &pa::PANOCProgressInfo::grad_ψ)
+        .def_readonly("ψ_hat", &pa::PANOCProgressInfo::ψ_hat)
+        .def_readonly("grad_ψ_hat", &pa::PANOCProgressInfo::grad_ψ_hat)
+        .def_readonly("L", &pa::PANOCProgressInfo::L)
+        .def_readonly("γ", &pa::PANOCProgressInfo::γ)
+        .def_readonly("τ", &pa::PANOCProgressInfo::τ)
+        .def_readonly("ε", &pa::PANOCProgressInfo::ε)
+        .def_readonly("Σ", &pa::PANOCProgressInfo::Σ)
+        .def_readonly("y", &pa::PANOCProgressInfo::y)
+        .def_property_readonly("fpr", [](const pa::PANOCProgressInfo &p) {
+            return std::sqrt(p.norm_sq_p) / p.γ;
+        });
+
+    py::class_<pa::SecondOrderPANOCLBFGSProgressInfo>(
+        m, "SecondOrderPANOCLBFGSProgressInfo")
+        .def_readonly("k", &pa::SecondOrderPANOCLBFGSProgressInfo::k)
+        .def_readonly("x", &pa::SecondOrderPANOCLBFGSProgressInfo::x)
+        .def_readonly("p", &pa::SecondOrderPANOCLBFGSProgressInfo::p)
+        .def_readonly("norm_sq_p",
+                      &pa::SecondOrderPANOCLBFGSProgressInfo::norm_sq_p)
+        .def_readonly("x_hat", &pa::SecondOrderPANOCLBFGSProgressInfo::x_hat)
+        .def_readonly("ψ", &pa::SecondOrderPANOCLBFGSProgressInfo::ψ)
+        .def_readonly("grad_ψ", &pa::SecondOrderPANOCLBFGSProgressInfo::grad_ψ)
+        .def_readonly("ψ_hat", &pa::SecondOrderPANOCLBFGSProgressInfo::ψ_hat)
+        .def_readonly("grad_ψ_hat",
+                      &pa::SecondOrderPANOCLBFGSProgressInfo::grad_ψ_hat)
+        .def_readonly("L", &pa::SecondOrderPANOCLBFGSProgressInfo::L)
+        .def_readonly("γ", &pa::SecondOrderPANOCLBFGSProgressInfo::γ)
+        .def_readonly("τ", &pa::SecondOrderPANOCLBFGSProgressInfo::τ)
+        .def_readonly("ε", &pa::SecondOrderPANOCLBFGSProgressInfo::ε)
+        .def_readonly("Σ", &pa::SecondOrderPANOCLBFGSProgressInfo::Σ)
+        .def_readonly("y", &pa::SecondOrderPANOCLBFGSProgressInfo::y)
+        .def_property_readonly(
+            "fpr", [](const pa::SecondOrderPANOCLBFGSProgressInfo &p) {
+                return std::sqrt(p.norm_sq_p) / p.γ;
+            });
+
     py::class_<pa::PolymorphicPANOCSolver,
                std::shared_ptr<pa::PolymorphicPANOCSolver>,
                pa::PolymorphicInnerSolverBase>(m, "PANOCSolver")
@@ -253,6 +298,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                       pa::LBFGSParams>()))
         .def(py::init(PolymorphicPANOCConstructor< //
                       pa::PolymorphicPANOCDirectionTrampoline>()))
+        .def("set_progress_callback",
+             &pa::PolymorphicPANOCSolver::set_progress_callback)
         .def("__call__",
              pa::InnerSolverCallWrapper<pa::PolymorphicPANOCSolver>(),
              py::call_guard<py::scoped_ostream_redirect,
@@ -274,6 +321,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                std::shared_ptr<pa::PolymorphicSecondOrderPANOCLBFGSSolver>,
                pa::PolymorphicInnerSolverBase>(m, "SecondOrderPANOCLBFGSSolver")
         .def(py::init<pa::SecondOrderPANOCLBFGSParams, pa::LBFGSParams>())
+        .def("set_progress_callback",
+             &pa::PolymorphicSecondOrderPANOCLBFGSSolver::set_progress_callback)
         .def("__call__",
              pa::InnerSolverCallWrapper<
                  pa::PolymorphicSecondOrderPANOCLBFGSSolver>(),
@@ -317,6 +366,10 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                       pa::PolymorphicSecondOrderPANOCLBFGSSolver>()))
         .def(py::init(
             PolymorphicALMConstructor<pa::PolymorphicInnerSolverTrampoline>()))
+        .def("inner_solver",
+             [](const pa::PolymorphicALMSolver &s) {
+                 return s.inner_solver.solver;
+             })
         .def(
             "__call__",
             [](pa::PolymorphicALMSolver &solver, const pa::Problem &p,

@@ -61,6 +61,26 @@ struct SecondOrderPANOCLBFGSParams {
     LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
+struct SecondOrderPANOCLBFGSProgressInfo {
+    unsigned k;
+    crvec x;
+    crvec p;
+    real_t norm_sq_p;
+    crvec x_hat;
+    real_t ψ;
+    crvec grad_ψ;
+    real_t ψ_hat;
+    crvec grad_ψ_hat;
+    real_t L;
+    real_t γ;
+    real_t τ;
+    real_t ε;
+    crvec Σ;
+    crvec y;
+    const Problem &problem;
+    const SecondOrderPANOCLBFGSParams &params;
+};
+
 /// Second order PANOC solver for ALM.
 /// @ingroup    grp_InnerSolvers
 class SecondOrderPANOCLBFGSSolver {
@@ -80,25 +100,7 @@ class SecondOrderPANOCLBFGSSolver {
         real_t sum_τ                 = 0;
     };
 
-    struct ProgressInfo {
-        unsigned k;
-        crvec x;
-        crvec p;
-        real_t norm_sq_p;
-        crvec x_hat;
-        real_t ψ;
-        crvec grad_ψ;
-        real_t ψ_hat;
-        crvec grad_ψ_hat;
-        real_t L;
-        real_t γ;
-        real_t τ;
-        real_t ε;
-        crvec Σ;
-        crvec y;
-        const Problem &problem;
-        const Params &params;
-    };
+    using ProgressInfo = SecondOrderPANOCLBFGSProgressInfo;
 
     SecondOrderPANOCLBFGSSolver(Params params, LBFGSParams lbfgsparams)
         : params(params), lbfgs(lbfgsparams) {}
