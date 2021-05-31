@@ -4,8 +4,10 @@
  */
 
 #include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
+#include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/directions/lbfgs.hpp>
 #include <panoc-alm/inner/panoc.hpp>
+#include <panoc-alm/inner/pga.hpp>
 #include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
@@ -28,7 +30,6 @@
 #include <utility>
 
 #include "kwargs-to-struct.hpp"
-#include "panoc-alm/inner/decl/panoc.hpp"
 #include "polymorphic-inner-solver.hpp"
 #include "polymorphic-panoc-direction.hpp"
 #include "problem.hpp"
@@ -216,6 +217,18 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                        &pa::PANOCParams::alternative_linesearch_cond)
         .def_readwrite("lbfgs_stepsize", &pa::PANOCParams::lbfgs_stepsize);
 
+    py::class_<pa::PGAParams>(m, "PGAParams")
+        .def(py::init())
+        .def(py::init(&kwargs_to_struct<pa::PGAParams>))
+        .def_readwrite("Lipschitz", &pa::PGAParams::Lipschitz)
+        .def_readwrite("max_iter", &pa::PGAParams::max_iter)
+        .def_readwrite("max_time", &pa::PGAParams::max_time)
+        .def_readwrite("γ_min", &pa::PGAParams::γ_min)
+        .def_readwrite("stop_crit", &pa::PGAParams::stop_crit)
+        .def_readwrite("print_interval", &pa::PGAParams::print_interval)
+        .def_readwrite("quadratic_upperbound_tolerance_factor",
+                       &pa::PGAParams::quadratic_upperbound_tolerance_factor);
+
     py::enum_<pa::SolverStatus>(m, "SolverStatus", py::arithmetic(),
                                 "Solver status")
         .value("Unknown", pa::SolverStatus::Unknown, "Initial value")
@@ -243,6 +256,25 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("__call__", &pa::PolymorphicInnerSolverBase::operator())
         .def("stop", &pa::PolymorphicInnerSolverBase::stop)
         .def("get_name", &pa::PolymorphicInnerSolverBase::get_name);
+
+    py::class_<pa::PGAProgressInfo>(m, "PGAProgressInfo")
+        .def_readonly("k", &pa::PGAProgressInfo::k)
+        .def_readonly("x", &pa::PGAProgressInfo::x)
+        .def_readonly("p", &pa::PGAProgressInfo::p)
+        .def_readonly("norm_sq_p", &pa::PGAProgressInfo::norm_sq_p)
+        .def_readonly("x_hat", &pa::PGAProgressInfo::x_hat)
+        .def_readonly("ψ", &pa::PGAProgressInfo::ψ)
+        .def_readonly("grad_ψ", &pa::PGAProgressInfo::grad_ψ)
+        .def_readonly("ψ_hat", &pa::PGAProgressInfo::ψ_hat)
+        .def_readonly("grad_ψ_hat", &pa::PGAProgressInfo::grad_ψ_hat)
+        .def_readonly("L", &pa::PGAProgressInfo::L)
+        .def_readonly("γ", &pa::PGAProgressInfo::γ)
+        .def_readonly("ε", &pa::PGAProgressInfo::ε)
+        .def_readonly("Σ", &pa::PGAProgressInfo::Σ)
+        .def_readonly("y", &pa::PGAProgressInfo::y)
+        .def_property_readonly("fpr", [](const pa::PGAProgressInfo &p) {
+            return std::sqrt(p.norm_sq_p) / p.γ;
+        });
 
     py::class_<pa::PANOCProgressInfo>(m, "PANOCProgressInfo")
         .def_readonly("k", &pa::PANOCProgressInfo::k)
@@ -306,6 +338,17 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                             py::scoped_estream_redirect>())
         .def("__str__", &pa::PolymorphicPANOCSolver::get_name);
 
+    py::class_<pa::PolymorphicPGASolver,
+               std::shared_ptr<pa::PolymorphicPGASolver>,
+               pa::PolymorphicInnerSolverBase>(m, "PGASolver")
+        .def(py::init<pa::PGAParams>())
+        .def("set_progress_callback",
+             &pa::PolymorphicPGASolver::set_progress_callback)
+        .def("__call__", pa::InnerSolverCallWrapper<pa::PolymorphicPGASolver>(),
+             py::call_guard<py::scoped_ostream_redirect,
+                            py::scoped_estream_redirect>())
+        .def("__str__", &pa::PolymorphicPGASolver::get_name);
+
     py::enum_<pa::PANOCStopCrit>(m, "PANOCStopCrit")
         .value("ApproxKKT", pa::PANOCStopCrit::ApproxKKT)
         .value("ProjGradNorm", pa::PANOCStopCrit::ProjGradNorm)
@@ -362,6 +405,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
 
     py::class_<pa::PolymorphicALMSolver>(m, "ALMSolver")
         .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPANOCSolver>()))
+        .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPGASolver>()))
         .def(py::init(PolymorphicALMConstructor<
                       pa::PolymorphicSecondOrderPANOCLBFGSSolver>()))
         .def(py::init(

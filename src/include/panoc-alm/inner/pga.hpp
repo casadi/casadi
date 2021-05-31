@@ -43,6 +43,25 @@ struct PGAParams {
         10 * std::numeric_limits<real_t>::epsilon();
 };
 
+struct PGAProgressInfo {
+    unsigned k;
+    crvec x;
+    crvec p;
+    real_t norm_sq_p;
+    crvec x_hat;
+    real_t ψ;
+    crvec grad_ψ;
+    real_t ψ_hat;
+    crvec grad_ψ_hat;
+    real_t L;
+    real_t γ;
+    real_t ε;
+    crvec Σ;
+    crvec y;
+    const Problem &problem;
+    const PGAParams &params;
+};
+
 /// Standard Proximal Gradient Algorithm without any bells and whistles.
 ///
 /// @ingroup    grp_InnerSolvers
@@ -59,24 +78,7 @@ class PGASolver {
         unsigned iterations = 0;
     };
 
-    struct ProgressInfo {
-        unsigned k;
-        const vec &x;
-        const vec &p;
-        real_t norm_sq_p;
-        const vec &x_hat;
-        real_t ψ;
-        const vec &grad_ψ;
-        real_t ψ_hat;
-        const vec &grad_ψ_hat;
-        real_t L;
-        real_t γ;
-        real_t ε;
-        const vec &Σ;
-        const vec &y;
-        const Problem &problem;
-        const Params &params;
-    };
+    using ProgressInfo = PGAProgressInfo;
 
     Stats operator()(const Problem &problem,        // in
                      crvec Σ,                       // in
@@ -160,8 +162,8 @@ PGASolver::operator()(const Problem &problem,        // in
             problem, params.quadratic_upperbound_tolerance_factor, params.γ_min,
             xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
-    auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
-                              crvec pₖ, real_t γₖ, real_t εₖ) {
+    auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ, crvec pₖ,
+                              real_t γₖ, real_t εₖ) {
         std::cout << "[PGA]   " << std::setw(6) << k
                   << ": ψ = " << std::setw(13) << ψₖ
                   << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()

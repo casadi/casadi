@@ -75,6 +75,21 @@ inline const kwargs_to_struct_table_t<pa::PANOCParams>
         {"lbfgs_stepsize", &pa::PANOCParams::lbfgs_stepsize},
     };
 
+#include <panoc-alm/inner/pga.hpp>
+
+template <>
+inline const kwargs_to_struct_table_t<pa::PGAParams>
+    kwargs_to_struct_table<pa::PGAParams>{
+        {"Lipschitz", &pa::PGAParams::Lipschitz},
+        {"max_iter", &pa::PGAParams::max_iter},
+        {"max_time", &pa::PGAParams::max_time},
+        {"γ_min", &pa::PGAParams::γ_min},
+        {"stop_crit", &pa::PGAParams::stop_crit},
+        {"print_interval", &pa::PGAParams::print_interval},
+        {"quadratic_upperbound_tolerance_factor",
+         &pa::PGAParams::quadratic_upperbound_tolerance_factor},
+    };
+
 template <>
 inline const kwargs_to_struct_table_t<decltype(pa::PANOCParams::Lipschitz)>
     kwargs_to_struct_table<decltype(pa::PANOCParams::Lipschitz)>{

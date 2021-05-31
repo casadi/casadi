@@ -1,9 +1,10 @@
 #pragma once
 
-#include "panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp"
-#include "panoc-alm/util/solverstatus.hpp"
+#include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
 #include <panoc-alm/inner/directions/lbfgs.hpp>
 #include <panoc-alm/inner/panoc.hpp>
+#include <panoc-alm/inner/pga.hpp>
+#include <panoc-alm/util/solverstatus.hpp>
 
 #include <memory>
 
@@ -237,6 +238,17 @@ inline py::dict stats_to_dict(const SecondOrderPANOCLBFGSSolver::Stats &s) {
 }
 
 template <class InnerSolver>
+inline py::dict stats_to_dict(const PGASolver::Stats &s) {
+    using py::operator""_a;
+    return py::dict{
+        "status"_a       = s.status,
+        "ε"_a            = s.ε,
+        "elapsed_time"_a = s.elapsed_time,
+        "iterations"_a   = s.iterations,
+    };
+}
+
+template <class InnerSolver>
 inline py::dict
 stats_to_dict(const InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &s) {
     using py::operator""_a;
@@ -249,6 +261,15 @@ stats_to_dict(const InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &s) {
         "τ_1_accepted"_a        = s.τ_1_accepted,
         "count_τ"_a             = s.count_τ,
         "sum_τ"_a               = s.sum_τ,
+    };
+}
+
+template <class InnerSolver>
+inline py::dict stats_to_dict(const InnerStatsAccumulator<PGASolver> &s) {
+    using py::operator""_a;
+    return py::dict{
+        "elapsed_time"_a = s.elapsed_time,
+        "iterations"_a   = s.iterations,
     };
 }
 
@@ -328,6 +349,15 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
 #include <panoc-alm/alm.hpp>
 
 namespace pa {
+
+struct PolymorphicPGASolver : PolymorphicInnerSolver<PGASolver> {
+    using PolymorphicInnerSolver<PGASolver>::PolymorphicInnerSolver;
+
+    void
+    set_progress_callback(std::function<void(const PGAProgressInfo &)> cb) {
+        this->innersolver.set_progress_callback(std::move(cb));
+    }
+};
 
 struct PolymorphicPANOCSolver
     : PolymorphicInnerSolver<PANOCSolver<PolymorphicPANOCDirectionBase>> {
