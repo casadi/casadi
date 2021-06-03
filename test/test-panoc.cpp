@@ -479,6 +479,7 @@ TEST(PANOC, ref) {
     params.max_iter                       = 1000;
     params.τ_min                          = 1. / (1 << 10);
     params.update_lipschitz_in_linesearch = true;
+    params.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnGradientStepSize;
     pa::LBFGSParams lbfgsparams;
     lbfgsparams.memory = 20;
 
