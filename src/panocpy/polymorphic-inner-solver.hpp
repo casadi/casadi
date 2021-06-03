@@ -2,6 +2,7 @@
 
 #include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
 #include <panoc-alm/inner/directions/lbfgs.hpp>
+#include <panoc-alm/inner/guarded-aa-pga.hpp>
 #include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/pga.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
@@ -249,6 +250,18 @@ inline py::dict stats_to_dict(const PGASolver::Stats &s) {
 }
 
 template <class InnerSolver>
+inline py::dict stats_to_dict(const GuardedAAPGA::Stats &s) {
+    using py::operator""_a;
+    return py::dict{
+        "status"_a                     = s.status,
+        "ε"_a                          = s.ε,
+        "elapsed_time"_a               = s.elapsed_time,
+        "iterations"_a                 = s.iterations,
+        "accelerated_steps_accepted"_a = s.accelerated_steps_accepted,
+    };
+}
+
+template <class InnerSolver>
 inline py::dict
 stats_to_dict(const InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &s) {
     using py::operator""_a;
@@ -270,6 +283,16 @@ inline py::dict stats_to_dict(const InnerStatsAccumulator<PGASolver> &s) {
     return py::dict{
         "elapsed_time"_a = s.elapsed_time,
         "iterations"_a   = s.iterations,
+    };
+}
+
+template <class InnerSolver>
+inline py::dict stats_to_dict(const InnerStatsAccumulator<GuardedAAPGA> &s) {
+    using py::operator""_a;
+    return py::dict{
+        "elapsed_time"_a               = s.elapsed_time,
+        "iterations"_a                 = s.iterations,
+        "accelerated_steps_accepted"_a = s.accelerated_steps_accepted,
     };
 }
 
@@ -339,6 +362,11 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
     void stop() override { innersolver.stop(); }
     std::string get_name() const override { return innersolver.get_name(); }
 
+    void set_progress_callback(
+        std::function<void(const typename InnerSolver::ProgressInfo &)> cb) {
+        this->innersolver.set_progress_callback(std::move(cb));
+    }
+
   protected:
     InnerSolver innersolver;
 };
@@ -350,36 +378,12 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
 
 namespace pa {
 
-struct PolymorphicPGASolver : PolymorphicInnerSolver<PGASolver> {
-    using PolymorphicInnerSolver<PGASolver>::PolymorphicInnerSolver;
-
-    void
-    set_progress_callback(std::function<void(const PGAProgressInfo &)> cb) {
-        this->innersolver.set_progress_callback(std::move(cb));
-    }
-};
-
-struct PolymorphicPANOCSolver
-    : PolymorphicInnerSolver<PANOCSolver<PolymorphicPANOCDirectionBase>> {
-    using PolymorphicInnerSolver<
-        PANOCSolver<PolymorphicPANOCDirectionBase>>::PolymorphicInnerSolver;
-
-    void
-    set_progress_callback(std::function<void(const PANOCProgressInfo &)> cb) {
-        this->innersolver.set_progress_callback(std::move(cb));
-    }
-};
-
-struct PolymorphicSecondOrderPANOCLBFGSSolver
-    : PolymorphicInnerSolver<SecondOrderPANOCLBFGSSolver> {
-    using PolymorphicInnerSolver<
-        SecondOrderPANOCLBFGSSolver>::PolymorphicInnerSolver;
-
-    void set_progress_callback(
-        std::function<void(const SecondOrderPANOCLBFGSProgressInfo &)> cb) {
-        this->innersolver.set_progress_callback(std::move(cb));
-    }
-};
+using PolymorphicPGASolver    = PolymorphicInnerSolver<PGASolver>;
+using PolymorphicGAAPGASolver = PolymorphicInnerSolver<GuardedAAPGA>;
+using PolymorphicPANOCSolver =
+    PolymorphicInnerSolver<PANOCSolver<PolymorphicPANOCDirectionBase>>;
+using PolymorphicSecondOrderPANOCLBFGSSolver =
+    PolymorphicInnerSolver<SecondOrderPANOCLBFGSSolver>;
 
 using PolymorphicALMSolver = ALMSolver<PolymorphicInnerSolverWrapper>;
 

@@ -51,7 +51,7 @@ struct PANOCParams {
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;
 
-    LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnGradientStepSize;
+    LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
 struct PANOCProgressInfo {
@@ -60,6 +60,7 @@ struct PANOCProgressInfo {
     crvec p;
     real_t norm_sq_p;
     crvec x_hat;
+    real_t φγ;
     real_t ψ;
     crvec grad_ψ;
     real_t ψ_hat;

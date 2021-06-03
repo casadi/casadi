@@ -3,9 +3,11 @@
  * This file defines all Python bindings.
  */
 
+#include <panoc-alm/decl/alm.hpp>
 #include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/directions/lbfgs.hpp>
+#include <panoc-alm/inner/guarded-aa-pga.hpp>
 #include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/pga.hpp>
 #include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
@@ -173,12 +175,14 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<paLBFGSParamCBFGS>(m, "LBFGSParamsCBFGS")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<paLBFGSParamCBFGS>))
+        .def("to_dict", &struct_to_dict<paLBFGSParamCBFGS>)
         .def_readwrite("α", &paLBFGSParamCBFGS::α)
         .def_readwrite("ϵ", &paLBFGSParamCBFGS::ϵ);
 
     py::class_<pa::LBFGSParams>(m, "LBFGSParams")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::LBFGSParams>))
+        .def("to_dict", &struct_to_dict<pa::LBFGSParams>)
         .def_readwrite("memory", &pa::LBFGSParams::memory)
         .def_readwrite("cbfgs", &pa::LBFGSParams::cbfgs)
         .def_readwrite("rescale_when_γ_changes",
@@ -194,6 +198,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<paPANOCParamsLipschitz>(m, "PANOCParamsLipschitz")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<paPANOCParamsLipschitz>))
+        .def("to_dict", &struct_to_dict<paPANOCParamsLipschitz>)
         .def_readwrite("L_0", &paPANOCParamsLipschitz::L₀)
         .def_readwrite("ε", &paPANOCParamsLipschitz::ε)
         .def_readwrite("δ", &paPANOCParamsLipschitz::δ)
@@ -202,6 +207,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<pa::PANOCParams>(m, "PANOCParams")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::PANOCParams>))
+        .def("to_dict", &struct_to_dict<pa::PANOCParams>)
         .def_readwrite("Lipschitz", &pa::PANOCParams::Lipschitz)
         .def_readwrite("max_iter", &pa::PANOCParams::max_iter)
         .def_readwrite("max_time", &pa::PANOCParams::max_time)
@@ -216,18 +222,6 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("alternative_linesearch_cond",
                        &pa::PANOCParams::alternative_linesearch_cond)
         .def_readwrite("lbfgs_stepsize", &pa::PANOCParams::lbfgs_stepsize);
-
-    py::class_<pa::PGAParams>(m, "PGAParams")
-        .def(py::init())
-        .def(py::init(&kwargs_to_struct<pa::PGAParams>))
-        .def_readwrite("Lipschitz", &pa::PGAParams::Lipschitz)
-        .def_readwrite("max_iter", &pa::PGAParams::max_iter)
-        .def_readwrite("max_time", &pa::PGAParams::max_time)
-        .def_readwrite("γ_min", &pa::PGAParams::γ_min)
-        .def_readwrite("stop_crit", &pa::PGAParams::stop_crit)
-        .def_readwrite("print_interval", &pa::PGAParams::print_interval)
-        .def_readwrite("quadratic_upperbound_tolerance_factor",
-                       &pa::PGAParams::quadratic_upperbound_tolerance_factor);
 
     py::enum_<pa::SolverStatus>(m, "SolverStatus", py::arithmetic(),
                                 "Solver status")
@@ -257,6 +251,29 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("stop", &pa::PolymorphicInnerSolverBase::stop)
         .def("get_name", &pa::PolymorphicInnerSolverBase::get_name);
 
+    using paPGAParamsLipschitz = decltype(pa::PGAParams::Lipschitz);
+    py::class_<paPGAParamsLipschitz>(m, "PGAParamsLipschitz")
+        .def(py::init())
+        .def(py::init(&kwargs_to_struct<paPGAParamsLipschitz>))
+        .def("to_dict", &struct_to_dict<paPGAParamsLipschitz>)
+        .def_readwrite("L_0", &paPGAParamsLipschitz::L₀)
+        .def_readwrite("ε", &paPGAParamsLipschitz::ε)
+        .def_readwrite("δ", &paPGAParamsLipschitz::δ)
+        .def_readwrite("Lγ_factor", &paPGAParamsLipschitz::Lγ_factor);
+
+    py::class_<pa::PGAParams>(m, "PGAParams")
+        .def(py::init())
+        .def(py::init(&kwargs_to_struct<pa::PGAParams>))
+        .def("to_dict", &struct_to_dict<pa::PGAParams>)
+        .def_readwrite("Lipschitz", &pa::PGAParams::Lipschitz)
+        .def_readwrite("max_iter", &pa::PGAParams::max_iter)
+        .def_readwrite("max_time", &pa::PGAParams::max_time)
+        .def_readwrite("γ_min", &pa::PGAParams::γ_min)
+        .def_readwrite("stop_crit", &pa::PGAParams::stop_crit)
+        .def_readwrite("print_interval", &pa::PGAParams::print_interval)
+        .def_readwrite("quadratic_upperbound_tolerance_factor",
+                       &pa::PGAParams::quadratic_upperbound_tolerance_factor);
+
     py::class_<pa::PGAProgressInfo>(m, "PGAProgressInfo")
         .def_readonly("k", &pa::PGAProgressInfo::k)
         .def_readonly("x", &pa::PGAProgressInfo::x)
@@ -276,12 +293,53 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             return std::sqrt(p.norm_sq_p) / p.γ;
         });
 
+    py::class_<pa::GuardedAAPGAParams>(m, "GAAPGAParams")
+        .def(py::init())
+        .def(py::init(&kwargs_to_struct<pa::GuardedAAPGAParams>))
+        .def("to_dict", &struct_to_dict<pa::GuardedAAPGAParams>)
+        .def_readwrite("Lipschitz", &pa::GuardedAAPGAParams::Lipschitz)
+        .def_readwrite("limitedqr_mem", &pa::GuardedAAPGAParams::limitedqr_mem)
+        .def_readwrite("max_iter", &pa::GuardedAAPGAParams::max_iter)
+        .def_readwrite("max_time", &pa::GuardedAAPGAParams::max_time)
+        .def_readwrite("γ_min", &pa::GuardedAAPGAParams::γ_min)
+        .def_readwrite("stop_crit", &pa::GuardedAAPGAParams::stop_crit)
+        .def_readwrite("print_interval",
+                       &pa::GuardedAAPGAParams::print_interval)
+        .def_readwrite(
+            "quadratic_upperbound_tolerance_factor",
+            &pa::GuardedAAPGAParams::quadratic_upperbound_tolerance_factor)
+        .def_readwrite("max_no_progress",
+                       &pa::GuardedAAPGAParams::max_no_progress)
+        .def_readwrite("full_flush_on_γ_change",
+                       &pa::GuardedAAPGAParams::full_flush_on_γ_change);
+
+    py::class_<pa::GuardedAAPGAProgressInfo>(m, "GAAPGAProgressInfo")
+        .def_readonly("k", &pa::GuardedAAPGAProgressInfo::k)
+        .def_readonly("x", &pa::GuardedAAPGAProgressInfo::x)
+        .def_readonly("p", &pa::GuardedAAPGAProgressInfo::p)
+        .def_readonly("norm_sq_p", &pa::GuardedAAPGAProgressInfo::norm_sq_p)
+        .def_readonly("x_hat", &pa::GuardedAAPGAProgressInfo::x_hat)
+        .def_readonly("ψ", &pa::GuardedAAPGAProgressInfo::ψ)
+        .def_readonly("grad_ψ", &pa::GuardedAAPGAProgressInfo::grad_ψ)
+        .def_readonly("ψ_hat", &pa::GuardedAAPGAProgressInfo::ψ_hat)
+        .def_readonly("grad_ψ_hat", &pa::GuardedAAPGAProgressInfo::grad_ψ_hat)
+        .def_readonly("L", &pa::GuardedAAPGAProgressInfo::L)
+        .def_readonly("γ", &pa::GuardedAAPGAProgressInfo::γ)
+        .def_readonly("ε", &pa::GuardedAAPGAProgressInfo::ε)
+        .def_readonly("Σ", &pa::GuardedAAPGAProgressInfo::Σ)
+        .def_readonly("y", &pa::GuardedAAPGAProgressInfo::y)
+        .def_property_readonly("fpr",
+                               [](const pa::GuardedAAPGAProgressInfo &p) {
+                                   return std::sqrt(p.norm_sq_p) / p.γ;
+                               });
+
     py::class_<pa::PANOCProgressInfo>(m, "PANOCProgressInfo")
         .def_readonly("k", &pa::PANOCProgressInfo::k)
         .def_readonly("x", &pa::PANOCProgressInfo::x)
         .def_readonly("p", &pa::PANOCProgressInfo::p)
         .def_readonly("norm_sq_p", &pa::PANOCProgressInfo::norm_sq_p)
         .def_readonly("x_hat", &pa::PANOCProgressInfo::x_hat)
+        .def_readonly("φγ", &pa::PANOCProgressInfo::ψ)
         .def_readonly("ψ", &pa::PANOCProgressInfo::ψ)
         .def_readonly("grad_ψ", &pa::PANOCProgressInfo::grad_ψ)
         .def_readonly("ψ_hat", &pa::PANOCProgressInfo::ψ_hat)
@@ -304,6 +362,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readonly("norm_sq_p",
                       &pa::SecondOrderPANOCLBFGSProgressInfo::norm_sq_p)
         .def_readonly("x_hat", &pa::SecondOrderPANOCLBFGSProgressInfo::x_hat)
+        .def_readonly("φγ", &pa::SecondOrderPANOCLBFGSProgressInfo::φγ)
         .def_readonly("ψ", &pa::SecondOrderPANOCLBFGSProgressInfo::ψ)
         .def_readonly("grad_ψ", &pa::SecondOrderPANOCLBFGSProgressInfo::grad_ψ)
         .def_readonly("ψ_hat", &pa::SecondOrderPANOCLBFGSProgressInfo::ψ_hat)
@@ -349,6 +408,18 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                             py::scoped_estream_redirect>())
         .def("__str__", &pa::PolymorphicPGASolver::get_name);
 
+    py::class_<pa::PolymorphicGAAPGASolver,
+               std::shared_ptr<pa::PolymorphicGAAPGASolver>,
+               pa::PolymorphicInnerSolverBase>(m, "GAAPGASolver")
+        .def(py::init<pa::GuardedAAPGAParams>())
+        .def("set_progress_callback",
+             &pa::PolymorphicGAAPGASolver::set_progress_callback)
+        .def("__call__",
+             pa::InnerSolverCallWrapper<pa::PolymorphicGAAPGASolver>(),
+             py::call_guard<py::scoped_ostream_redirect,
+                            py::scoped_estream_redirect>())
+        .def("__str__", &pa::PolymorphicGAAPGASolver::get_name);
+
     py::enum_<pa::PANOCStopCrit>(m, "PANOCStopCrit")
         .value("ApproxKKT", pa::PANOCStopCrit::ApproxKKT)
         .value("ProjGradNorm", pa::PANOCStopCrit::ProjGradNorm)
@@ -356,9 +427,25 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
         .export_values();
 
+    using paSecondOrderPANOCLBFGSParamsLipschitz =
+        decltype(pa::SecondOrderPANOCLBFGSParams::Lipschitz);
+    py::class_<paSecondOrderPANOCLBFGSParamsLipschitz>(
+        m, "SecondOrderPANOCLBFGSParamsLipschitz")
+        .def(py::init())
+        .def(
+            py::init(&kwargs_to_struct<paSecondOrderPANOCLBFGSParamsLipschitz>))
+        .def("to_dict", &struct_to_dict<paSecondOrderPANOCLBFGSParamsLipschitz>)
+        .def_readwrite("L_0", &paSecondOrderPANOCLBFGSParamsLipschitz::L₀)
+        .def_readwrite("ε", &paSecondOrderPANOCLBFGSParamsLipschitz::ε)
+        .def_readwrite("δ", &paSecondOrderPANOCLBFGSParamsLipschitz::δ)
+        .def_readwrite("Lγ_factor",
+                       &paSecondOrderPANOCLBFGSParamsLipschitz::Lγ_factor);
+
     py::class_<pa::SecondOrderPANOCLBFGSParams>(m,
                                                 "SecondOrderPANOCLBFGSParams")
-        .def(py::init(&kwargs_to_struct<pa::SecondOrderPANOCLBFGSParams>));
+        .def(py::init<pa::SecondOrderPANOCLBFGSParams>())
+        .def(py::init(&kwargs_to_struct<pa::SecondOrderPANOCLBFGSParams>))
+        .def("to_dict", &struct_to_dict<pa::SecondOrderPANOCLBFGSParams>);
 
     py::class_<pa::PolymorphicSecondOrderPANOCLBFGSSolver,
                std::shared_ptr<pa::PolymorphicSecondOrderPANOCLBFGSSolver>,
@@ -376,6 +463,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<pa::ALMParams>(m, "ALMParams")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::ALMParams>))
+        .def("to_dict", &struct_to_dict<pa::ALMParams>)
         .def_readwrite("ε", &pa::ALMParams::ε)
         .def_readwrite("δ", &pa::ALMParams::δ)
         .def_readwrite("Δ", &pa::ALMParams::Δ)

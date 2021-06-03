@@ -67,6 +67,7 @@ struct SecondOrderPANOCLBFGSProgressInfo {
     crvec p;
     real_t norm_sq_p;
     crvec x_hat;
+    real_t φγ;
     real_t ψ;
     crvec grad_ψ;
     real_t ψ_hat;

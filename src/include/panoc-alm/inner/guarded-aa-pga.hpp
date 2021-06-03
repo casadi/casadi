@@ -49,6 +49,25 @@ struct GuardedAAPGAParams {
     bool full_flush_on_γ_change = true;
 };
 
+struct GuardedAAPGAProgressInfo {
+    unsigned k;
+    crvec x;
+    crvec p;
+    real_t norm_sq_p;
+    crvec x_hat;
+    real_t ψ;
+    crvec grad_ψ;
+    real_t ψ_hat;
+    crvec grad_ψ_hat;
+    real_t L;
+    real_t γ;
+    real_t ε;
+    crvec Σ;
+    crvec y;
+    const Problem &problem;
+    const GuardedAAPGAParams &params;
+};
+
 /// Guarded Anderson Accelerated Proximal Gradient Algorithm
 /// Vien V. Mai and Mikael Johansson, Anderson Acceleration of Proximal Gradient Methods.
 /// https://arxiv.org/abs/1910.08590v2
@@ -68,6 +87,8 @@ class GuardedAAPGA {
         unsigned accelerated_steps_accepted = 0;
     };
 
+    using ProgressInfo = GuardedAAPGAProgressInfo;
+
     Stats operator()(const Problem &problem,        // in
                      crvec Σ,                       // in
                      real_t ε,                      // in
@@ -75,6 +96,12 @@ class GuardedAAPGA {
                      rvec x,                        // inout
                      rvec λ,                        // inout
                      rvec err_z);                   // out
+
+    GuardedAAPGA &
+    set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
+        this->progress_cb = cb;
+        return *this;
+    }
 
     std::string get_name() const { return "GuardedAAPGA"; }
 
@@ -85,6 +112,7 @@ class GuardedAAPGA {
   private:
     Params params;
     AtomicStopSignal stop_signal;
+    std::function<void(const ProgressInfo &)> progress_cb;
 };
 
 using std::chrono::duration_cast;
@@ -257,6 +285,9 @@ GuardedAAPGA::operator()(const Problem &problem,        // in
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
             print_progress(k, ψₖ, grad_ψₖ, pₖ, γₖ, εₖ);
+        if (progress_cb)
+            progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_ψx̂ₖ, Lₖ,
+                         γₖ, εₖ, Σ, y, problem, params});
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status  = detail::check_all_stop_conditions(

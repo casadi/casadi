@@ -167,8 +167,8 @@ SecondOrderPANOCLBFGSSolver::operator()(
         if (params.print_interval != 0 && k % params.print_interval == 0)
             print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, εₖ);
         if (progress_cb)
-            progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ, Lₖ,
-                         γₖ, τ, εₖ, Σ, y, problem, params});
+            progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, φₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ,
+                         Lₖ, γₖ, τ, εₖ, Σ, y, problem, params});
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status  = detail::check_all_stop_conditions(
