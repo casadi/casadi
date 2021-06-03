@@ -820,7 +820,7 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
         casadi_error("holdfun has free variables: " + str(holdfun.get_free()));
       }
       // Evaluate holdfun to get hold attributes
-      std::vector<DM> hold0 = holdfun({p0});
+      std::vector<DM> hold0 = holdfun(std::vector<DM>{p0});
       std::vector<double> r_hold0 = hold0.at(0).nonzeros();
       std::vector<double> iv_hold0 = hold0.at(1).nonzeros();
       casadi_assert_dev(r_hold0.size() == res->size());
