@@ -73,6 +73,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
    // User-set options
    bool provides_directional_derivative_;
+   std::string instance_name_;
 
 #ifdef WITH_FMU
   // Component references

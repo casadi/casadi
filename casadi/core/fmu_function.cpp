@@ -48,6 +48,7 @@ FmuFunction::FmuFunction(const std::string& name, const std::string& path,
     path_(path), id_in_(id_in), id_out_(id_out), guid_(guid) {
   // Options
   provides_directional_derivative_ = false;
+  instance_name_ = name_;
 #ifdef WITH_FMU
   // Initialize to null pointers
   instantiate_ = 0;
@@ -76,7 +77,10 @@ const Options FmuFunction::options_
 = {{&FunctionInternal::options_},
    {{"provides_directional_derivative",
     {OT_BOOL,
-      "Does the FMU support the calculation of directional derivatives "}}
+      "Does the FMU support the calculation of directional derivatives"}},
+    {"instance_name",
+     {OT_STRING,
+      "Name of the instance"}}
    }
 };
 
@@ -89,8 +93,10 @@ void FmuFunction::init(const Dict& opts) {
 
   // Read options
   for (auto&& op : opts) {
-    if (op.first=="provides_directional_derivative") {
+    if (op.first == "provides_directional_derivative") {
       provides_directional_derivative_ = op.second;
+    } else if (op.first == "instance_name") {
+      instance_name_ = op.second.to_string();
     }
   }
 
@@ -111,7 +117,10 @@ void FmuFunction::init(const Dict& opts) {
   std::copy(id_out_[1].begin(), id_out_[1].end(), yn_.begin());
 
   // Directory where the DLL is stored, per the FMI specification
-  std::string dll_path = path_ + "/binaries/" + system_infix() + "/" + name_ + dll_suffix();
+  std::string instance_name_no_dot = instance_name_;
+  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
+  std::string dll_path = path_ + "/binaries/" + system_infix()
+    + "/" + instance_name_no_dot + dll_suffix();
 
   // Path to resource directory
   resource_loc_ = "file:" + path_ + "/resources/";
@@ -147,7 +156,7 @@ void FmuFunction::init(const Dict& opts) {
   functions.componentEnvironment = 0;
 
   // Create instance
-  fmi2String instanceName = name_.c_str();
+  fmi2String instanceName = instance_name_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
   fmi2String fmuGUID = guid_.c_str();
   fmi2String fmuResourceLocation = resource_loc_.c_str();

@@ -310,11 +310,12 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   Dict opts = {
     {"enable_fd", !provides_directional_derivative_},
     {"fd_method", "smoothing"},
-    {"provides_directional_derivative", provides_directional_derivative_}};
-  Function fmu = fmu_function(model_name_, path, {id_xd, id_xn}, {id_yd, id_yn}, guid_, opts);
+    {"provides_directional_derivative", provides_directional_derivative_},
+    {"instance_name", model_name_}};
+  Function fmu = fmu_function(name_, path, {id_xd, id_xn}, {id_yd, id_yn}, guid_, opts);
   add_fun(fmu);
   // Auxiliary variables for xd
-  Variable xd(model_name_ + "_xd");
+  Variable xd(name_ + "_xd");
   xd.v = MX::sym(xd.name, id_xd.size());
   xd.variability = Variable::CONTINUOUS;
   xd.beq = vertcat(var_xd);
@@ -322,7 +323,7 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   // Create function call to fmu
   std::vector<MX> fmu_lhs = fmu(std::vector<MX>{xd.v, MX()});
   // Auxiliary variables for yd
-  Variable yd(model_name_ + "_yd");
+  Variable yd(name_ + "_yd");
   yd.v = MX::sym(yd.name, id_yd.size());
   yd.variability = Variable::CONTINUOUS;
   yd.beq = fmu_lhs.at(0);
@@ -1115,7 +1116,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
   if (with_underscore) {
     std::vector<std::string> s_in_mod(s_in), s_out_mod(s_out);
     for (auto s_io : {&s_in_mod, &s_out_mod}) {
-      for (std::string& s : *s_io) replace(s.begin(), s.end(), '_', ':');
+      for (std::string& s : *s_io) std::replace(s.begin(), s.end(), '_', ':');
     }
     // Recursive call
     return create(fname, s_in_mod, s_out_mod, sx, lifted_calls);
