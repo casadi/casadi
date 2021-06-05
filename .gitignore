@@ -6,3 +6,8 @@ __pycache__
 dist
 *.egg-info
 .ipynb_checkpoints
+.vscode/*
+!.vscode/cmake-variants.yaml
+!.vscode/launch.json
+!.vscode/settings.json
+.~lock.*

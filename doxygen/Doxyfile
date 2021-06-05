@@ -817,7 +817,6 @@ INPUT                  = "../src/" \
                          "../examples" \
                          "pages/Installation.md" \
                          "pages/External-Resources.md" \
-                         "pages/TODO.md" \
                          "../README.md"
 
 # This tag can be used to specify the character encoding of the source files

@@ -79,6 +79,7 @@
         "Eigen",
         "Lipschitz",
         "casadi",
+        "crvec",
         "cwise",
         "grad",
         "ipopt",
@@ -86,8 +87,10 @@
         "p",
         "panoc",
         "r",
+        "rmat",
+        "rvec",
         "slbfgs",
-        "σₘₐₓ",
+        "Σ_max",
         "ψₖ",
         "ψₖᵀpₖ",
         "ψₖᵀrₖ"
@@ -106,4 +109,6 @@
             120
         ]
     },
+    "git.ignoreLimitWarning": true,
+    "cmake.configureOnOpen": false,
 }
