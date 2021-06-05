@@ -10,7 +10,7 @@
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
 #include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/pga.hpp>
-#include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
+#include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
 

@@ -148,7 +148,7 @@ inline const kwargs_to_struct_table_t<pa::GAAPGAParams>
         {"full_flush_on_γ_change", &pa::GAAPGAParams::full_flush_on_γ_change},
     };
 
-#include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
+#include <panoc-alm/inner/decl/structured-panoc-lbfgs.hpp>
 
 // TODO: move Lipschitz to its own reusable struct
 

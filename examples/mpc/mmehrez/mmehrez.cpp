@@ -1,9 +1,8 @@
-#include "panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp"
 #include "panoc-alm/util/problem.hpp"
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>
-#include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
+#include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
 
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
 

@@ -39,7 +39,7 @@ using Solver = pa::ALMSolver<>;
 using Solver = pa::ALMSolver<pa::SecondOrderPANOCSolver>;
 #elif SOLVER == SOLVER_PANOC_2ND_LBFGS
 #include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
+#include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
 using Solver = pa::ALMSolver<pa::StructuredPANOCLBFGSSolver>;
 #elif SOLVER == SOLVER_LBFGSpp
 #include <panoc-alm/alm.hpp>

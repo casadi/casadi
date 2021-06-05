@@ -4,7 +4,7 @@
 add_library(panoc-alm SHARED
     "src/inner/panoc.cpp"
     "src/inner/second-order-panoc.cpp"
-    "src/inner/second-order-panoc-lbfgs.cpp"
+    "src/inner/structured-panoc-lbfgs.cpp"
     "src/util/box.cpp"
     "src/inner/directions/lbfgs.cpp"
     "src/alm.cpp"

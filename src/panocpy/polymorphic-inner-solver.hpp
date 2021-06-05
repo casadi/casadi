@@ -1,6 +1,6 @@
 #pragma once
 
-#include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
+#include <panoc-alm/inner/decl/structured-panoc-lbfgs.hpp>
 #include <panoc-alm/inner/directions/lbfgs.hpp>
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
 #include <panoc-alm/inner/panoc.hpp>

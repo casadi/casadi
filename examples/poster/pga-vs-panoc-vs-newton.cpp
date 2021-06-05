@@ -4,7 +4,7 @@
 #include <panoc-alm/inner/directions/lbfgs.hpp>
 #include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/pga.hpp>
-#include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
+#include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
 #include <panoc-alm/inner/second-order-panoc.hpp>
 #include <panoc-alm/reference-problems/himmelblau.hpp>
 

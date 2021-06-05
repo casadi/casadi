@@ -1,6 +1,6 @@
 #include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
+#include <panoc-alm/inner/decl/structured-panoc-lbfgs.hpp>
 #include <panoc-alm/inner/decl/second-order-panoc.hpp>
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
 #include <panoc-alm/inner/lbfgspp.hpp>
