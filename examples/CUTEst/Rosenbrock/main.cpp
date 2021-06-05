@@ -1,3 +1,9 @@
+/** 
+ * @example CUTEst/Rosenbrock/main.cpp
+ *
+ * This example shows how to load and solve CUTEst problems using PANOC-ALM.
+ */
+
 #include <panoc-alm/decl/alm.hpp>
 #include <panoc-alm/inner/decl/panoc.hpp>
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>
