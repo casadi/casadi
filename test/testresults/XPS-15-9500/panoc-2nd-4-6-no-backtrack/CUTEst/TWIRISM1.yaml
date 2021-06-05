@@ -1,0 +1,34 @@
+name: TWIRISM1
+n: 343
+m: 313
+box constraints x: 686
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 20
+inner convergence failures: 15
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.3161889999999996
+ε: 9.8550768368491862e-06
+δ: 7.8190187180471327e-07
+inner:
+  elapsed_time: 4315875
+  iterations: 15934
+  linesearch_failures: 669
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 11908
+  sum_τ: 13073.453125
+  count_τ: 15915
+‖Σ‖: 37690.013198061803
+‖x‖: 10.674721939976957
+‖y‖: 4.028273020878645
+f: -0.99894175556292908
+counters:
+  f: 55867
+  grad_f: 59303
+  g: 71822
+  grad_g_prod: 59303
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

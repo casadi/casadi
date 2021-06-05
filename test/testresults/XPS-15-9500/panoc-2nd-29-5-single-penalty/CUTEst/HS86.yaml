@@ -1,0 +1,34 @@
+name: HS86
+n: 5
+m: 10
+box constraints x: 5
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00043600000000000003
+ε: 7.8860524208579363e-06
+δ: 2.3437106044799094e-06
+inner:
+  elapsed_time: 427
+  iterations: 109
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 92
+  sum_τ: 95.25
+  count_τ: 102
+‖Σ‖: 316.22776601683796
+‖x‖: 0.7712398236741167
+‖y‖: 13.278781902671279
+f: -32.348713612963827
+counters:
+  f: 276
+  grad_f: 250
+  g: 290
+  grad_g_prod: 250
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

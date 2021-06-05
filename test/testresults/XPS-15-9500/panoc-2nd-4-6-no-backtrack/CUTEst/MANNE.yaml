@@ -1,0 +1,34 @@
+name: MANNE
+n: 6000
+m: 4000
+box constraints x: 7251
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.53376800000000002
+ε: 2.1514469310257578e-07
+δ: 1.6812439170010851e-07
+inner:
+  elapsed_time: 532553
+  iterations: 206
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 160
+  sum_τ: 173.0703125
+  count_τ: 202
+‖Σ‖: 543.45478937496489
+‖x‖: 5278.8019744585026
+‖y‖: 9.177068639731889e-08
+f: -0.97457259325475276
+counters:
+  f: 694
+  grad_f: 718
+  g: 908
+  grad_g_prod: 718
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

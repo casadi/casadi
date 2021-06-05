@@ -1,0 +1,34 @@
+name: HYDROELL
+n: 1009
+m: 1008
+box constraints x: 2018
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 21
+inner convergence failures: 4
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 2.1306129999999999
+ε: 9.6180698419359744e-06
+δ: 8.6823280298631289e-06
+inner:
+  elapsed_time: 2129915
+  iterations: 6769
+  linesearch_failures: 10
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 6345
+  sum_τ: 6486.3359375
+  count_τ: 6749
+‖Σ‖: 209857.98677131237
+‖x‖: 19859544.629156981
+‖y‖: 714.56679127004884
+f: -3585546.8012281652
+counters:
+  f: 15388
+  grad_f: 21115
+  g: 22179
+  grad_g_prod: 21115
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

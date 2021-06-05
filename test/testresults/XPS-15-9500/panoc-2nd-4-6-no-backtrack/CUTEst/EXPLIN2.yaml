@@ -1,0 +1,34 @@
+name: EXPLIN2
+n: 1200
+m: 0
+box constraints x: 2400
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 10
+inner convergence failures: 9
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.42875000000000002
+ε: 5.9760463955171872e-06
+δ: 0
+inner:
+  elapsed_time: 428729
+  iterations: 9047
+  linesearch_failures: 8732
+  lbfgs_failures: 8661
+  lbfgs_rejected: 0
+  τ_1_accepted: 206
+  sum_τ: 236.9296875
+  count_τ: 9037
+‖Σ‖: 0
+‖x‖: 345.33714869589545
+‖y‖: 0
+f: -71997847.102602586
+counters:
+  f: 11693
+  grad_f: 10312
+  g: 12113
+  grad_g_prod: 10312
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

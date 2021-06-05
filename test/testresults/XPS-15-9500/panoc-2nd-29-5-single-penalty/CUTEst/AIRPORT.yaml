@@ -1,0 +1,34 @@
+name: AIRPORT
+n: 84
+m: 42
+box constraints x: 168
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 8
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.187084
+ε: 9.5238579547185509e-06
+δ: 7.6141319221220694e-06
+inner:
+  elapsed_time: 140303696845397
+  iterations: 1203
+  linesearch_failures: 1
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 1105
+  sum_τ: 1141.03125
+  count_τ: 1195
+‖Σ‖: 6480740.6984078605
+‖x‖: 34.33107155957196
+‖y‖: 5031.1616422238803
+f: 47952.67473953982
+counters:
+  f: 2740
+  grad_f: 2563
+  g: 2756
+  grad_g_prod: 2563
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

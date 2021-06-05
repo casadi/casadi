@@ -1,0 +1,34 @@
+name: HS2NE
+n: 2
+m: 2
+box constraints x: 1
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 116
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0016900000000000001
+ε: 6.67572021484375e-06
+δ: 2.2247448713915894
+inner:
+  elapsed_time: 1461
+  iterations: 1481
+  linesearch_failures: 1194
+  lbfgs_failures: 1192
+  lbfgs_rejected: 0
+  τ_1_accepted: 46
+  sum_τ: 46.375
+  count_τ: 1242
+‖Σ‖: 1089273457.1961646
+‖x‖: 1.9364916731037085
+‖y‖: 3227431040.0134501
+f: 0
+counters:
+  f: 2083
+  grad_f: 3504
+  g: 3797
+  grad_g_prod: 3504
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

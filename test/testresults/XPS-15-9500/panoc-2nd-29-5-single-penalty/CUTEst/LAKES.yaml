@@ -1,0 +1,34 @@
+name: LAKES
+n: 90
+m: 78
+box constraints x: 18
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 235
+initial penalty reduced: 6
+penalty reduced: 20
+elapsed time: 0.617842
+ε: .inf
+δ: 41.795479469767997
+inner:
+  elapsed_time: 139736766624201
+  iterations: 29896
+  linesearch_failures: 4847
+  lbfgs_failures: 4842
+  lbfgs_rejected: 0
+  τ_1_accepted: 24257
+  sum_τ: 24584.5625
+  count_τ: 29863
+‖Σ‖: 442.44029535042665
+‖x‖: 6.9282032302457802e+20
+‖y‖: 8124038404.7348499
+f: 3.6999999999588058e+41
+counters:
+  f: 58653
+  grad_f: 63250
+  g: 65731
+  grad_g_prod: 63250
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

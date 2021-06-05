@@ -1,0 +1,34 @@
+name: CRESC50
+n: 6
+m: 100
+box constraints x: 5
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 237
+initial penalty reduced: 1
+penalty reduced: 20
+elapsed time: 0.56228500000000003
+ε: .inf
+δ: 1.9999999999999918e+40
+inner:
+  elapsed_time: 3522153
+  iterations: 13282
+  linesearch_failures: 5811
+  lbfgs_failures: 4733
+  lbfgs_rejected: 0
+  τ_1_accepted: 5573
+  sum_τ: 6226.6640625
+  count_τ: 13205
+‖Σ‖: 60
+‖x‖: 1.7320508075688775e+20
+‖y‖: 10000000000
+f: .nan
+counters:
+  f: 39577
+  grad_f: 29825
+  g: 44183
+  grad_g_prod: 29825
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -7,13 +7,13 @@ import sys
 from difflib import unified_diff
 from util.loader import load_raw_data, convert_data
 
-machine = "XPS-15-9560"
+machine = "XPS-15-9500"
 this_folder = dirname(__file__) if "__file__" in globals() else abspath("")
 root_folder = dirname(dirname(this_folder))
 out_folder = join(root_folder, "test", "testresults", machine)
 get_test_result_folder = lambda testname: join(out_folder, testname, "CUTEst")
 
-testnames = ["panoc-lbfgs-23-4-ls-margin", "panoc-2nd-lbfgs-23-4-ls-margin"]
+testnames = ["panoc-29-5-baseline", "panoc-29-5-cbfgs"]
 folders = list(map(get_test_result_folder, testnames))
 raw_data = list(map(load_raw_data, folders))
 dfs = list(map(convert_data, raw_data))
@@ -135,11 +135,13 @@ cmp_prop = [
         "inner iterations",
         "outer iterations",
         ("inner convergence failures", {"log": False}),
+        # "f",
     ],
     ["time", "f evaluations", "grad_f evaluations"],
     [
-        ("τ=1 accepted", {"lowerbetter": False}),
-        ("fraction τ=1 accepted", {"log": False, "lowerbetter": False}),
+        ("‖Σ‖"),
+        # ("fraction τ=1 accepted", {"log": False, "lowerbetter": False}),
+        ("L-BFGS rejected"),
         ("average τ", {"log": False, "lowerbetter": False}),
     ],
 ]
@@ -170,4 +172,23 @@ for r, rprop in enumerate(cmp_prop):
         ax.legend()
 plt.tight_layout()
 plt.savefig(join(out_folder, out_name + ".pdf"))
+
+
+fig, axs = plt.subplots(2, 1, squeeze=False, figsize=(20 * 1 / 3, 20 * 2 / 3), sharex='all', sharey='all')
+axs[0][0].loglog(
+    dfs[0][both_converged]["n"],
+    dfs[0][both_converged]["time"],
+    ".",
+)
+axs[0][0].set_title(f'{testnames[0]}\n({dfs[0]["solver"][0]})')
+axs[0][0].set_ylabel('Runtime')
+axs[1][0].loglog(
+    dfs[1][both_converged]["n"],
+    dfs[1][both_converged]["time"],
+    ".",
+)
+axs[1][0].set_title(f'{testnames[1]}\n({dfs[1]["solver"][0]})')
+axs[1][0].set_ylabel('Runtime')
+axs[1][0].set_xlabel('Problem size $n$')
+
 plt.show()

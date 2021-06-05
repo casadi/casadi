@@ -1,0 +1,34 @@
+name: ZY2
+n: 3
+m: 2
+box constraints x: 4
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 4
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 4.6999999999999997e-05
+ε: 8.990148024912159e-07
+δ: 2.5595981965054193e-06
+inner:
+  elapsed_time: 140037408686121
+  iterations: 13
+  linesearch_failures: 5
+  lbfgs_failures: 5
+  lbfgs_rejected: 0
+  τ_1_accepted: 4
+  sum_τ: 4.5
+  count_τ: 10
+‖Σ‖: 14.142135623730951
+‖x‖: 2.0000006398994468
+‖y‖: 0.24999980203596645
+f: 2.0000006398994468
+counters:
+  f: 56
+  grad_f: 41
+  g: 74
+  grad_g_prod: 41
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

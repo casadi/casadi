@@ -1,0 +1,34 @@
+name: HS109
+n: 9
+m: 10
+box constraints x: 16
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.71035000000000004
+ε: 3.5417943657166142
+δ: 6.6462871473049745e-07
+inner:
+  elapsed_time: 710044
+  iterations: 78742
+  linesearch_failures: 60471
+  lbfgs_failures: 47784
+  lbfgs_rejected: 0
+  τ_1_accepted: 15166
+  sum_τ: 15548.5546875
+  count_τ: 78502
+‖Σ‖: 33682.774510242925
+‖x‖: 1490.1082579415108
+‖y‖: 0.16601207170509477
+f: 5362.1827976711875
+counters:
+  f: 328028
+  grad_f: 266549
+  g: 383949
+  grad_g_prod: 266549
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

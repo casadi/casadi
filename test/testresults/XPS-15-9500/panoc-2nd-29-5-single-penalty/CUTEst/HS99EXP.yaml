@@ -1,0 +1,34 @@
+name: HS99EXP
+n: 31
+m: 21
+box constraints x: 20
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 2.670779
+ε: 1643509603.9805405
+δ: 1.4285714557548433e+19
+inner:
+  elapsed_time: 2670278
+  iterations: 240000
+  linesearch_failures: 8163
+  lbfgs_failures: 2
+  lbfgs_rejected: 0
+  τ_1_accepted: 225839
+  sum_τ: 227084.7578125
+  count_τ: 239760
+‖Σ‖: 0.00016754622804340244
+‖x‖: 1.6903086753868287e+20
+‖y‖: 1381900643791045.5
+f: -1e+40
+counters:
+  f: 640232
+  grad_f: 795334
+  g: 880432
+  grad_g_prod: 795334
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

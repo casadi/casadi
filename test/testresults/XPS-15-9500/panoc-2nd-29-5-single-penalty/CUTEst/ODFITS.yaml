@@ -1,0 +1,34 @@
+name: ODFITS
+n: 10
+m: 6
+box constraints x: 10
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00078399999999999997
+ε: 7.0519556094328362e-06
+δ: 9.2009665308978583e-07
+inner:
+  elapsed_time: 140415365808902
+  iterations: 158
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 148
+  sum_τ: 149.5
+  count_τ: 152
+‖Σ‖: 244.94897427831782
+‖x‖: 1522.5685678185253
+‖y‖: 0.96199889565478514
+f: -2380.0267748156889
+counters:
+  f: 424
+  grad_f: 334
+  g: 436
+  grad_g_prod: 334
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

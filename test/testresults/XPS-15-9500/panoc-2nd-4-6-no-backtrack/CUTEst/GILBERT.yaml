@@ -1,0 +1,34 @@
+name: GILBERT
+n: 5000
+m: 1
+box constraints x: 1
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.029971000000000001
+ε: 2.0198328967158119e-06
+δ: 7.2853957380359957e-06
+inner:
+  elapsed_time: 139719581135871
+  iterations: 45
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 39
+  sum_τ: 39
+  count_τ: 39
+‖Σ‖: 1000
+‖x‖: 1.0000072853691988
+‖y‖: 40.233057755580987
+f: 2459.4679723043364
+counters:
+  f: 98
+  grad_f: 102
+  g: 110
+  grad_g_prod: 102
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

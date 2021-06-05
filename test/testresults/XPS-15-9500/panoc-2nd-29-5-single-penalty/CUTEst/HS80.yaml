@@ -1,0 +1,34 @@
+name: HS80
+n: 5
+m: 3
+box constraints x: 10
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00012400000000000001
+ε: 4.116915532162424e-06
+δ: 5.3745494721368914e-08
+inner:
+  elapsed_time: 118
+  iterations: 50
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 41
+  sum_τ: 42.125
+  count_τ: 44
+‖Σ‖: 173.20508075688772
+‖x‖: 3.1622776516704705
+‖y‖: 0.055507688425572348
+f: 0.053949848221310041
+counters:
+  f: 120
+  grad_f: 117
+  g: 132
+  grad_g_prod: 117
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

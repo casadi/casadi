@@ -24,14 +24,16 @@ fig_out_folder = "/home/pieter/Documents/KUL/2020-2021/Master-Thesis-Pieter-Pas/
 
 names = {
     "gaapga-29-5": "Guarded Anderson accelerated PGA", 
-    "panoc-2nd-29-5-upd-ls-crit": "2\\textsuperscript{nd} order PANOC (FD, L-BFGS, impr.)",
+    "panoc-2nd-29-5-upd-ls-crit": "Structured PANOC (FD, L-BFGS, impr.)",
     "lbfgsbpp-29-5": "L-BFGS-B",
-    "panoc-2nd-29-5-ad": "2\\textsuperscript{nd} order PANOC (AD, L-BFGS, impr.)",
-    "panoc-2nd-29-5-baseline": "2\\textsuperscript{nd} order PANOC (FD, L-BFGS, orig.)",
+    "panoc-2nd-29-5-ad": "Structured PANOC (AD, L-BFGS, impr.)",
+    "panoc-2nd-29-5-baseline": "Structured PANOC (FD, L-BFGS, orig.)",
     "panoc-29-5-baseline": "PANOC (orig.)",
     "panoc-29-5-cbfgs": "PANOC (CBFGS, orig.)",
     "panoc-29-5-upd-ls-crit": "PANOC (impr.)",
     "pga-29-5": "Projected gradient",
+    "panoc-2nd-29-5-single-penalty": "Structured PANOC (single penalty factor)",
+    "panoc-2nd-4-6-no-backtrack": "Structured PANOC (no ALM backtracking)",
 }
 labelnames = {
     "time": "Time",
@@ -64,6 +66,8 @@ sel = [
     ["pga-29-5", "panoc-2nd-29-5-upd-ls-crit",                ["time", "inner iterations", "avg time per it", "outer iterations"]],
     ["gaapga-29-5", "panoc-2nd-29-5-upd-ls-crit",             ["time", "inner iterations", "avg time per it", "outer iterations"]],
     ["lbfgsbpp-29-5", "panoc-2nd-29-5-upd-ls-crit",           ["time", "inner iterations", "avg time per it", "f evaluations", "‖x‖", "‖y‖", "‖Σ‖"]],
+    ["panoc-2nd-29-5-single-penalty", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations", "‖Σ‖", "outer iterations"]],
+    ["panoc-2nd-4-6-no-backtrack", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations"]],
 ]
 
 outf = open('/tmp/input.tex', 'w')

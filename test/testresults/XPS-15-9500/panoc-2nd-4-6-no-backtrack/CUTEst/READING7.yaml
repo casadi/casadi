@@ -1,0 +1,34 @@
+name: READING7
+n: 1002
+m: 500
+box constraints x: 1004
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.7173850000000002
+ε: 2e+20
+δ: 1.9614284002476268e+20
+inner:
+  elapsed_time: 5681385
+  iterations: 3679
+  linesearch_failures: 2621
+  lbfgs_failures: 2440
+  lbfgs_rejected: 0
+  τ_1_accepted: 792
+  sum_τ: 795.4921875
+  count_τ: 3439
+‖Σ‖: 4000000000
+‖x‖: 2.2236491638590658e+21
+‖y‖: 4.665040310964641e+29
+f: -4.7978242539561732e+42
+counters:
+  f: 8087
+  grad_f: 10211
+  g: 12006
+  grad_g_prod: 10211
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

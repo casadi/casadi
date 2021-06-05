@@ -1,0 +1,34 @@
+name: DEGENLPA
+n: 20
+m: 15
+box constraints x: 40
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 33
+inner convergence failures: 2
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.05765
+ε: 4.6427105502289123e-06
+δ: 6.7658399901490322e-07
+inner:
+  elapsed_time: 140685948805374
+  iterations: 5879
+  linesearch_failures: 2525
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 2895
+  sum_τ: 2996.703125
+  count_τ: 5847
+‖Σ‖: 234303090.08977926
+‖x‖: 0.56312844011108931
+‖y‖: 5097.564567492348
+f: 3.0602436834671365
+counters:
+  f: 52792
+  grad_f: 36578
+  g: 58705
+  grad_g_prod: 36578
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: HS106
+n: 8
+m: 6
+box constraints x: 16
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 4.0683590000000001
+ε: 1
+δ: 3.2218342542609175
+inner:
+  elapsed_time: 139715290206751
+  iterations: 239002
+  linesearch_failures: 238109
+  lbfgs_failures: 28392
+  lbfgs_rejected: 0
+  τ_1_accepted: 412
+  sum_τ: 477.8046875
+  count_τ: 238762
+‖Σ‖: 2.4494897427831779
+‖x‖: 2345.9646378927423
+‖y‖: 86.630337338248012
+f: 3774.0209096857279
+counters:
+  f: 11230091
+  grad_f: 1918717
+  g: 11230551
+  grad_g_prod: 1918717
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

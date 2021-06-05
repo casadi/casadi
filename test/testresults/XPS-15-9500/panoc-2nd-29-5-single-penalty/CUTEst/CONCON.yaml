@@ -1,0 +1,34 @@
+name: CONCON
+n: 15
+m: 11
+box constraints x: 5
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 209
+inner convergence failures: 27
+initial penalty reduced: 4
+penalty reduced: 20
+elapsed time: 0.47521200000000002
+ε: 1.9696462182361429e-06
+δ: 8.2206028082509874e-06
+inner:
+  elapsed_time: 140496970661730
+  iterations: 32354
+  linesearch_failures: 23872
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 6844
+  sum_τ: 7139.8125
+  count_τ: 32181
+‖Σ‖: 0.42983457283005982
+‖x‖: 2762.1157156465019
+‖y‖: 1.034701724718458
+f: -6230.7955430706534
+counters:
+  f: 435161
+  grad_f: 251268
+  g: 449415
+  grad_g_prod: 251268
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

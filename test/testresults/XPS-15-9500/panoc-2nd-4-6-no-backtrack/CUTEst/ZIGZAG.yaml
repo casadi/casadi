@@ -1,0 +1,34 @@
+name: ZIGZAG
+n: 3004
+m: 2500
+box constraints x: 3012
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxTime
+outer iterations: 43
+inner convergence failures: 42
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 30.021782000000002
+ε: 3.2640502700036076
+δ: 6.1628250917350469e-06
+inner:
+  elapsed_time: 140544244845417
+  iterations: 42319
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 38989
+  sum_τ: 40220.140625
+  count_τ: 42276
+‖Σ‖: 15242797.331323484
+‖x‖: 19.018732000479712
+‖y‖: 28.663144883994786
+f: 86.419732658793066
+counters:
+  f: 96189
+  grad_f: 132398
+  g: 138551
+  grad_g_prod: 132398
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

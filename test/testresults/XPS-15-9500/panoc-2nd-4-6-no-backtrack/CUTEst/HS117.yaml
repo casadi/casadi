@@ -1,0 +1,34 @@
+name: HS117
+n: 15
+m: 5
+box constraints x: 15
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.0060769999999999999
+ε: 5.2854424132942057e-06
+δ: 7.66371473615024e-07
+inner:
+  elapsed_time: 6067
+  iterations: 570
+  linesearch_failures: 122
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 383
+  sum_τ: 398.4453125
+  count_τ: 564
+‖Σ‖: 199.06567711672494
+‖x‖: 13.301234875773643
+‖y‖: 0.77123914713033404
+f: 32.348678783149396
+counters:
+  f: 3372
+  grad_f: 2726
+  g: 3948
+  grad_g_prod: 2726
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

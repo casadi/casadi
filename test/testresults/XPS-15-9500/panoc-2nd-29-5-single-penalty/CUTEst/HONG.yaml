@@ -1,0 +1,34 @@
+name: HONG
+n: 4
+m: 1
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 7
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000103
+ε: 7.2811180871212855e-06
+δ: 4.0024357406132083e-06
+inner:
+  elapsed_time: 95
+  iterations: 41
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 35
+  sum_τ: 35
+  count_τ: 35
+‖Σ‖: 1000
+‖x‖: 0.55110103443918057
+‖y‖: 43.668012039517649
+f: 22.570912584490667
+counters:
+  f: 96
+  grad_f: 100
+  g: 113
+  grad_g_prod: 100
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

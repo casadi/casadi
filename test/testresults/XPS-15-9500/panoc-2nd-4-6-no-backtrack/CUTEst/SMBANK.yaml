@@ -1,0 +1,34 @@
+name: SMBANK
+n: 117
+m: 64
+box constraints x: 234
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 12.095470000000001
+ε: 1797.0942280107827
+δ: 3.8740690797567368e-06
+inner:
+  elapsed_time: 12094718
+  iterations: 117864
+  linesearch_failures: 109190
+  lbfgs_failures: 17800
+  lbfgs_rejected: 0
+  τ_1_accepted: 8120
+  sum_τ: 8199.578125
+  count_τ: 117624
+‖Σ‖: 8000000000
+‖x‖: 5017644.2512939796
+‖y‖: 1024890332.865795
+f: 32184434.504275635
+counters:
+  f: 1745256
+  grad_f: 876009
+  g: 1762736
+  grad_g_prod: 876009
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

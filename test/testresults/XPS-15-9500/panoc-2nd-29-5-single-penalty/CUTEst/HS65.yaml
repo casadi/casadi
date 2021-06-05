@@ -1,0 +1,34 @@
+name: HS65
+n: 3
+m: 1
+box constraints x: 6
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.000102
+ε: 3.6223936811241586e-06
+δ: 4.3445318453905202e-09
+inner:
+  elapsed_time: 140174847639647
+  iterations: 40
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 32
+  sum_τ: 32.6328125
+  count_τ: 35
+‖Σ‖: 10
+‖x‖: 6.9282032305890482
+‖y‖: 0.082153378630724916
+f: 0.95352885564224632
+counters:
+  f: 146
+  grad_f: 105
+  g: 159
+  grad_g_prod: 105
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

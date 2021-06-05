@@ -1,0 +1,34 @@
+name: HS31
+n: 3
+m: 1
+box constraints x: 6
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.5000000000000002e-05
+ε: 2.454710928277913e-06
+δ: 6.7900450495539388e-07
+inner:
+  elapsed_time: 140552804761650
+  iterations: 21
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 15
+  sum_τ: 15.25
+  count_τ: 16
+‖Σ‖: 100
+‖x‖: 1.8257412449377906
+‖y‖: 5.9999999870427656
+f: 5.9999959259731241
+counters:
+  f: 61
+  grad_f: 58
+  g: 74
+  grad_g_prod: 58
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

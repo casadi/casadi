@@ -1,0 +1,34 @@
+name: HS85
+n: 5
+m: 21
+box constraints x: 10
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 21
+inner convergence failures: 10
+initial penalty reduced: 0
+penalty reduced: 10
+elapsed time: 7.1281140000000001
+ε: 4.9313046151730489e-08
+δ: 2.7322874984747614e-07
+inner:
+  elapsed_time: 7127746
+  iterations: 10487
+  linesearch_failures: 2899
+  lbfgs_failures: 1853
+  lbfgs_rejected: 0
+  τ_1_accepted: 7143
+  sum_τ: 7246.984375
+  count_τ: 10468
+‖Σ‖: 70.227768182002464
+‖x‖: 769.69936350222019
+‖y‖: 0.062131289355104972
+f: -2.2156046884481566
+counters:
+  f: 88040
+  grad_f: 27890
+  g: 88366
+  grad_g_prod: 27890
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

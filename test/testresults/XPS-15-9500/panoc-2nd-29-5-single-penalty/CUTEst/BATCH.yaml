@@ -1,0 +1,34 @@
+name: BATCH
+n: 48
+m: 73
+box constraints x: 94
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 5
+penalty reduced: 20
+elapsed time: 2.6997049999999998
+ε: 878.60350000000278
+δ: 669.66198105493424
+inner:
+  elapsed_time: 2699238
+  iterations: 238053
+  linesearch_failures: 126546
+  lbfgs_failures: 120352
+  lbfgs_rejected: 0
+  τ_1_accepted: 111131
+  sum_τ: 111147.125
+  count_τ: 237813
+‖Σ‖: 0.66438173123589117
+‖x‖: 1208.4554713151331
+‖y‖: 54526.09868510333
+f: 182963.31167799127
+counters:
+  f: 451988
+  grad_f: 637995
+  g: 690256
+  grad_g_prod: 637995
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

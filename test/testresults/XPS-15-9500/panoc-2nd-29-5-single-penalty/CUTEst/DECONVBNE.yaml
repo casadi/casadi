@@ -1,0 +1,34 @@
+name: DECONVBNE
+n: 63
+m: 40
+box constraints x: 86
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 20
+inner convergence failures: 10
+initial penalty reduced: 0
+penalty reduced: 10
+elapsed time: 0.78713900000000003
+ε: 9.6504259394749281e-06
+δ: 1.1408279862075432e-06
+inner:
+  elapsed_time: 787097
+  iterations: 12102
+  linesearch_failures: 3832
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 6375
+  sum_τ: 6759.0859375
+  count_τ: 12082
+‖Σ‖: 34769.610576114173
+‖x‖: 4.5080689511247982
+‖y‖: 0.26950189515669548
+f: 0
+counters:
+  f: 94612
+  grad_f: 69476
+  g: 106690
+  grad_g_prod: 69476
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

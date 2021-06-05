@@ -1,0 +1,34 @@
+name: BRITGAS
+n: 450
+m: 360
+box constraints x: 474
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 19
+inner convergence failures: 3
+initial penalty reduced: 0
+penalty reduced: 3
+elapsed time: 0.99686300000000005
+ε: 9.574255664409438e-06
+δ: 1.7475039748582333e-08
+inner:
+  elapsed_time: 140192028505415
+  iterations: 5479
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 5193
+  sum_τ: 5304.4765625
+  count_τ: 5460
+‖Σ‖: 25466.023371177369
+‖x‖: 55.418275713632482
+‖y‖: 8.0352603507525942e-05
+f: 0
+counters:
+  f: 11928
+  grad_f: 16855
+  g: 17423
+  grad_g_prod: 16855
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

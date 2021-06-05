@@ -1,0 +1,34 @@
+name: SWOPF
+n: 83
+m: 92
+box constraints x: 20
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.6710739999999999
+ε: 0.20835579706819721
+δ: 6.3571614434820845e-06
+inner:
+  elapsed_time: 5670408
+  iterations: 239213
+  linesearch_failures: 155
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 228466
+  sum_τ: 232938.0546875
+  count_τ: 238973
+‖Σ‖: 320038.59354796424
+‖x‖: 12.653117742020065
+‖y‖: 5.4380274606669792
+f: 0.11767260954795811
+counters:
+  f: 510574
+  grad_f: 709085
+  g: 726447
+  grad_g_prod: 709085
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

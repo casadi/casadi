@@ -1,0 +1,34 @@
+name: MODEL
+n: 1542
+m: 38
+box constraints x: 3084
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxTime
+outer iterations: 85
+inner convergence failures: 79
+initial penalty reduced: 2
+penalty reduced: 20
+elapsed time: 30.008535999999999
+ε: 0.51823866335578439
+δ: 3
+inner:
+  elapsed_time: 30008283
+  iterations: 79028
+  linesearch_failures: 77737
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 1056
+  sum_τ: 1083.640625
+  count_τ: 78944
+‖Σ‖: 2.2191890410688315
+‖x‖: 9.3690042329791527
+‖y‖: 14.215595325745539
+f: 0
+counters:
+  f: 2275901
+  grad_f: 781855
+  g: 2354993
+  grad_g_prod: 781855
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

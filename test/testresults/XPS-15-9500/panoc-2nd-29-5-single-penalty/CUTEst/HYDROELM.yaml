@@ -1,0 +1,34 @@
+name: HYDROELM
+n: 505
+m: 504
+box constraints x: 1010
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 10
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.311778
+ε: 8.8581187262771165e-06
+δ: 1.4048181071757426e-06
+inner:
+  elapsed_time: 139753941156220
+  iterations: 1975
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 1804
+  sum_τ: 1871.09375
+  count_τ: 1966
+‖Σ‖: 2244994.4320643647
+‖x‖: 14210901.433759511
+‖y‖: 1003.5813217998925
+f: -3582015.495016031
+counters:
+  f: 4512
+  grad_f: 6165
+  g: 6498
+  grad_g_prod: 6165
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

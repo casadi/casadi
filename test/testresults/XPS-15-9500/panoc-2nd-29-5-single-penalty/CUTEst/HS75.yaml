@@ -1,0 +1,34 @@
+name: HS75
+n: 4
+m: 5
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 55
+inner convergence failures: 45
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 0.030797000000000001
+ε: 9.0667244876385666e-06
+δ: 2.8995896482475469e-08
+inner:
+  elapsed_time: 30742
+  iterations: 13565
+  linesearch_failures: 8522
+  lbfgs_failures: 8377
+  lbfgs_rejected: 0
+  τ_1_accepted: 4794
+  sum_τ: 4812.8203125
+  count_τ: 13510
+‖Σ‖: 1920767.7669988936
+‖x‖: 1207.6460963383111
+‖y‖: 2779.061863182973
+f: 5174.4126150606207
+counters:
+  f: 23880
+  grad_f: 20754
+  g: 23970
+  grad_g_prod: 20754
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

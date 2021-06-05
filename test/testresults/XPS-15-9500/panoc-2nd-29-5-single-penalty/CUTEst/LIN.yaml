@@ -1,0 +1,34 @@
+name: LIN
+n: 4
+m: 2
+box constraints x: 8
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 240
+initial penalty reduced: 20
+penalty reduced: 20
+elapsed time: 0.00061300000000000005
+ε: .inf
+δ: .nan
+inner:
+  elapsed_time: 481413120
+  iterations: 0
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 0
+  sum_τ: 0
+  count_τ: 0
+‖Σ‖: 5.1705888521219166e-05
+‖x‖: 0.70710678118654757
+‖y‖: 0
+f: .nan
+counters:
+  f: 240
+  grad_f: 480
+  g: 480
+  grad_g_prod: 480
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

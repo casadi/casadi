@@ -1,0 +1,34 @@
+name: HS102
+n: 7
+m: 5
+box constraints x: 14
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 239
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 5.2735300000000001
+ε: 9.9399443141225561
+δ: 205.52781861061487
+inner:
+  elapsed_time: 5272865
+  iterations: 239174
+  linesearch_failures: 99032
+  lbfgs_failures: 90218
+  lbfgs_rejected: 0
+  τ_1_accepted: 138994
+  sum_τ: 139264.328125
+  count_τ: 238934
+‖Σ‖: 2236067977.4997897
+‖x‖: 0.43074507473980378
+‖y‖: 210331170898.56558
+f: 3032.3065181118864
+counters:
+  f: 573560
+  grad_f: 606257
+  g: 728311
+  grad_g_prod: 606257
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

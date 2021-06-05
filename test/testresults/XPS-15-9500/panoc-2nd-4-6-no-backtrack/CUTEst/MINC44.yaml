@@ -1,0 +1,34 @@
+name: MINC44
+n: 1113
+m: 1032
+box constraints x: 1213
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 19
+inner convergence failures: 10
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 6.6208130000000001
+ε: 9.9396444342148005e-06
+δ: 7.3506385442144006e-06
+inner:
+  elapsed_time: 6619839
+  iterations: 11246
+  linesearch_failures: 1028
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 9389
+  sum_τ: 9632.84375
+  count_τ: 11228
+‖Σ‖: 97895.28484614614
+‖x‖: 1.0664528539984215
+‖y‖: 1.0664030144494931
+f: 0.00038360085518521821
+counters:
+  f: 42327
+  grad_f: 43061
+  g: 53593
+  grad_g_prod: 43061
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

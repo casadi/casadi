@@ -1,0 +1,34 @@
+name: LEAKNET
+n: 156
+m: 153
+box constraints x: 82
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxIter
+outer iterations: 240
+inner convergence failures: 236
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 12.099739
+ε: 39.106102872549151
+δ: 2.9433386856680954e-06
+inner:
+  elapsed_time: 139741068040731
+  iterations: 237420
+  linesearch_failures: 711
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 232917
+  sum_τ: 234524.328125
+  count_τ: 237182
+‖Σ‖: 8604669335.2001343
+‖x‖: 2865.4932396622339
+‖y‖: 60490.073836696938
+f: 8.0655887644757662
+counters:
+  f: 496264
+  grad_f: 581512
+  g: 593148
+  grad_g_prod: 581512
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

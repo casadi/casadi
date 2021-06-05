@@ -1,0 +1,34 @@
+name: ACOPP30
+n: 72
+m: 142
+box constraints x: 84
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxTime
+outer iterations: 207
+inner convergence failures: 205
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 30.336307000000001
+ε: 13.599456192493108
+δ: 1.7761304297668779e-07
+inner:
+  elapsed_time: 139749676211019
+  iterations: 183229
+  linesearch_failures: 38335
+  lbfgs_failures: 19122
+  lbfgs_rejected: 0
+  τ_1_accepted: 136389
+  sum_τ: 140217.8515625
+  count_τ: 183022
+‖Σ‖: 69991266.206367299
+‖x‖: 5.5982995735061865
+‖y‖: 2190.6526792012246
+f: 576.90049863868148
+counters:
+  f: 659635
+  grad_f: 628643
+  g: 796749
+  grad_g_prod: 628643
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

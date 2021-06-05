@@ -1,0 +1,34 @@
+name: HANGING
+n: 3600
+m: 2330
+box constraints x: 24
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: MaxTime
+outer iterations: 34
+inner convergence failures: 27
+initial penalty reduced: 0
+penalty reduced: 20
+elapsed time: 30.492540000000002
+ε: 0.00030006317118425052
+δ: 0.0057564733653809874
+inner:
+  elapsed_time: 30490467
+  iterations: 31720
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 31669
+  sum_τ: 31676.25
+  count_τ: 31687
+‖Σ‖: 8098.374501934527
+‖x‖: 1423.0565817575607
+‖y‖: 369.48580771731673
+f: -31487.220166382936
+counters:
+  f: 63890
+  grad_f: 95222
+  g: 95625
+  grad_g_prod: 95222
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

@@ -1,0 +1,34 @@
+name: ROBOT
+n: 14
+m: 2
+box constraints x: 28
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00027599999999999999
+ε: 8.3457659960650687e-06
+δ: 3.3261179817611897e-06
+inner:
+  elapsed_time: 140402480906507
+  iterations: 40
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 32
+  sum_τ: 32.3125
+  count_τ: 34
+‖Σ‖: 1414.2135623730951
+‖x‖: 2.5677358787231626
+‖y‖: 7.0622070463155007
+f: 6.5932675428822112
+counters:
+  f: 105
+  grad_f: 132
+  g: 151
+  grad_g_prod: 132
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

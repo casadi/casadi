@@ -1,0 +1,34 @@
+name: HS24
+n: 2
+m: 3
+box constraints x: 2
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 7.4999999999999993e-05
+ε: 9.6846792123628234e-06
+δ: 1.3806928089721282e-07
+inner:
+  elapsed_time: 140123308032068
+  iterations: 33
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 24
+  sum_τ: 25
+  count_τ: 28
+‖Σ‖: 173.20508075688772
+‖x‖: 3.4641016057145309
+‖y‖: 0.99999933559481402
+f: -0.99999989703303349
+counters:
+  f: 114
+  grad_f: 88
+  g: 126
+  grad_g_prod: 88
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

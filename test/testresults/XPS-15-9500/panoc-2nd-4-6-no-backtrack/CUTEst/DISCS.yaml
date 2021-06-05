@@ -1,0 +1,34 @@
+name: DISCS
+n: 36
+m: 66
+box constraints x: 18
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 11
+inner convergence failures: 1
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.095236000000000001
+ε: 8.7701239169929988e-06
+δ: 3.7064814861764717e-06
+inner:
+  elapsed_time: 95197
+  iterations: 4293
+  linesearch_failures: 46
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 3875
+  sum_τ: 4016.296875
+  count_τ: 4282
+‖Σ‖: 363.65756557881122
+‖x‖: 16.81742606092223
+‖y‖: 0.75234803044200949
+f: 21.376207125466134
+counters:
+  f: 11394
+  grad_f: 13792
+  g: 15698
+  grad_g_prod: 13792
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

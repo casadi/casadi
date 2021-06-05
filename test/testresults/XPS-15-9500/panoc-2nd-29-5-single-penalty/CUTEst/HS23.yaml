@@ -1,0 +1,34 @@
+name: HS23
+n: 2
+m: 5
+box constraints x: 4
+solver: ALMSolver<SecondOrderPANOCSolverLBFGS>
+status: Converged
+outer iterations: 6
+inner convergence failures: 0
+initial penalty reduced: 0
+penalty reduced: 0
+elapsed time: 0.00011900000000000001
+ε: 5.8811730552221775e-07
+δ: 2.7498119670177346e-08
+inner:
+  elapsed_time: 140166257705073
+  iterations: 48
+  linesearch_failures: 0
+  lbfgs_failures: 0
+  lbfgs_rejected: 0
+  τ_1_accepted: 33
+  sum_τ: 35.71875
+  count_τ: 42
+‖Σ‖: 2236.0679774997898
+‖x‖: 1.4142135238711535
+‖y‖: 2.8284277936332005
+f: 1.9999998911000658
+counters:
+  f: 178
+  grad_f: 128
+  g: 190
+  grad_g_prod: 128
+  grad_gi: 0
+  hess_L_prod: 0
+  hess_L: 0

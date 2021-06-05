@@ -69,6 +69,10 @@ def convert_data(raw_data):
                 element["τ=1 accepted"],
                 element["count τ"],
             )
+            element["avg time per it"] = np.divide(
+                element["time"],
+                element["inner iterations"],
+            )
         data.append(element)
     df = pd.DataFrame(data)
     df.set_index("name", inplace=True)
