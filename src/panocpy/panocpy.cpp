@@ -508,7 +508,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                            py::scoped_estream_redirect>());
 
     m.def("load_casadi_problem", &load_CasADi_problem, "so_name"_a, "n"_a,
-          "m"_a);
+          "m"_a, "second_order"_a = false);
     m.def("load_casadi_problem_with_param", &load_CasADi_problem_with_param,
-          "so_name"_a, "n"_a, "m"_a);
+          "so_name"_a, "n"_a, "m"_a, "second_order"_a = false);
 }

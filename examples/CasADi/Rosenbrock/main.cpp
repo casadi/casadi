@@ -25,22 +25,14 @@ int main(int argc, char *argv[]) {
     if (argc > 1)
         so_name = argv[1];
 
-    pa::Problem p;
-    // Specify the problem dimensions
-    p.n = 3;
-    p.m = 1;
+    // Load the problem (with 3 decision variables and 1 general constraint)
+    pa::Problem p = load_CasADi_problem(so_name, 3, 1);
 
     // Specify the bounds
     p.C.upperbound = vec::Constant(3, inf);
     p.C.lowerbound = vec::Constant(3, -inf);
     p.D.upperbound = vec::Constant(1, 0.);
     p.D.lowerbound = vec::Constant(1, 0.);
-
-    // Load the functions
-    p.f           = load_CasADi_objective(so_name);
-    p.grad_f      = load_CasADi_gradient_objective(so_name);
-    p.g           = load_CasADi_constraints(so_name);
-    p.grad_g_prod = load_CasADi_gradient_constraints_prod(so_name);
 
     // Settings for the outer augmented Lagrangian method
     pa::ALMParams almparam;

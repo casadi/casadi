@@ -3,7 +3,7 @@ import casadi as cs
 
 
 def generate_casadi_problem(
-    name: str, f: cs.Function, g: cs.Function
+    name: str, f: cs.Function, g: cs.Function, second_order: bool = False
 ) -> Tuple[cs.CodeGenerator, int, int, int]:
 
     assert f.n_in() in [1, 2]
@@ -63,22 +63,23 @@ def generate_casadi_problem(
             ["grad_g"],
         )
     )
-    cg.add(
-        cs.Function(
-            "hess_L",
-            [*xp, y],
-            [cs.hessian(L, x)[0]],
-            [*xp_names, "y"],
-            ["hess_L"],
+    if second_order:
+        cg.add(
+            cs.Function(
+                "hess_L",
+                [*xp, y],
+                [cs.hessian(L, x)[0]],
+                [*xp_names, "y"],
+                ["hess_L"],
+            )
         )
-    )
-    cg.add(
-        cs.Function(
-            "hess_L_prod",
-            [*xp, y, v],
-            [cs.gradient(cs.jtimes(L, x, v, False), x)],
-            [*xp_names, "y", "v"],
-            ["hess_L_prod"],
+        cg.add(
+            cs.Function(
+                "hess_L_prod",
+                [*xp, y, v],
+                [cs.gradient(cs.jtimes(L, x, v, False), x)],
+                [*xp_names, "y", "v"],
+                ["hess_L_prod"],
+            )
         )
-    )
     return cg, n, m, p
