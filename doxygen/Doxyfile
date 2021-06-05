@@ -849,7 +849,8 @@ FILE_PATTERNS          = *.cpp \
                          *.hpp \
                          *.ipp \
                          *.md \
-                         *.dox
+                         *.dox \
+                         *.py
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -905,7 +906,7 @@ EXAMPLE_PATH           = "../examples"
 # *.h) to filter out the source-files in the directories. If left blank all
 # files are included.
 
-EXAMPLE_PATTERNS       = *.cpp
+EXAMPLE_PATTERNS       = *.cpp *.py
 
 # If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be
 # searched for input files to be used with the \include or \dontinclude commands

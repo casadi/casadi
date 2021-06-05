@@ -1,3 +1,6 @@
+## @example mpc/python/bicycle-obstacle-avoidance-mpc.py
+# This example shows how to call the PANOC-ALM solver from Python code.
+
 #%% Import necessary libraries and generate the MPC problem
 
 import casadi as cs
