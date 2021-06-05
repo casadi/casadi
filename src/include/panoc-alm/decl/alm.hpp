@@ -76,6 +76,8 @@ struct ALMParams {
 };
 
 /// Augmented Lagrangian Method solver
+///
+/// @ingroup    grp_ALMSolver
 template <class InnerSolverT = PANOCSolver<>>
 class ALMSolver {
   public:
