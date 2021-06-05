@@ -3,14 +3,48 @@
 ## Linux
 
 ### Tools
-First, install a compiler, GNU Make and CMake:
+First, install a compiler, GNU Make, CMake, Git ...:
 ```sh
-sudo apt install build-essential cmake
+sudo apt install build-essential cmake git
 ```
 
-### Google Test
-See the installation instructions here: 
-https://tttapa.github.io/Pages/Ubuntu/Software-Installation/GoogleTest.html
+### Clone the repository
+
+```sh
+git clone git@github.com:tttapa/PANOC-ALM.git
+```
+For the purposes of these instructions, we'll refer to the PANOC-ALM repository 
+as the environment variable `PANOC_ALM_ROOT`, for example:
+```sh
+export PANOC_ALM_ROOT="$HOME/GitHub/PANOC-ALM"
+```
+
+### Create a virtual environment
+
+```sh
+cd "$PANOC_ALM_ROOT"
+python3 -m venv py-venv
+. ./py-venv/bin/activate
+```
+
+### Install dependencies
+
+The `scripts` folder contains some Bash scripts to install the necessary 
+dependencies. By default, these scripts install everything into the virtual
+environment, they require no root privileges, and won't change any other parts
+of your system. If you have some of these installed globally already (e.g. BLAS)
+you can skip these scripts.
+
+```sh
+pip install -r scripts/requirements.txt
+./scripts/install-openblas.sh   # https://www.openblas.net/
+./scripts/install-eigen.sh      # https://eigen.tuxfamily.org/index.php
+./scripts/install-casadi.sh     # https://web.casadi.org/
+./scripts/install-cutest.sh     # https://github.com/ralna/CUTEst
+./scripts/install-lbfgspp.sh    # https://github.com/yixuan/LBFGSpp
+./scripts/install-yaml-cpp.sh   # https://github.com/jbeder/yaml-cpp
+./scripts/install-gtest.sh      # https://google.github.io/googletest/
+```
 
 ### Build and install
 

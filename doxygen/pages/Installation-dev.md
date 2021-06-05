@@ -49,10 +49,21 @@ pip install -r scripts/requirements.txt
 ## Install Eigen, CasADi, Ipopt, CUTEst, yaml-cpp
 
 ```sh
-./scripts/install-openblas.sh
-./scripts/install-eigen.sh
-./scripts/install-casadi.sh
-./scripts/install-cutest.sh
-./scripts/install-gtest.sh
-./scripts/install-yaml-cpp.sh
+./scripts/install-openblas.sh   # https://www.openblas.net/
+./scripts/install-eigen.sh      # https://eigen.tuxfamily.org/index.php
+./scripts/install-casadi.sh     # https://web.casadi.org/
+./scripts/install-cutest.sh     # https://github.com/ralna/CUTEst
+./scripts/install-lbfgspp.sh    # https://github.com/yixuan/LBFGSpp
+./scripts/install-yaml-cpp.sh   # https://github.com/jbeder/yaml-cpp
+./scripts/install-gtest.sh      # https://google.github.io/googletest/
+```
+
+## Build tests
+
+```sh
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Asan
+cmake --build . -j$(nproc) -t tests
+./test/tests
 ```
