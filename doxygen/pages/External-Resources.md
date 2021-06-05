@@ -1,4 +1,4 @@
-# External Resources
+# External resources {#ext-resources}
 
 ## PANOC
 

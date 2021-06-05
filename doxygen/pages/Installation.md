@@ -1,4 +1,4 @@
-# Installation
+# Installation instructions {#installation}
 
 ## Linux
 
@@ -91,10 +91,11 @@ For example:
 
 **main.cpp**
 ```cpp
-#include <panoc-alm/panoc.hpp>
+#include <panoc-alm/alm.hpp>
+#include <panoc-alm/inner/panoc.hpp>
 
 int main() {
-    // TODO
+    // Use the solvers as shown in the examples
 }
 ```
 
@@ -109,4 +110,11 @@ find_package(PANOC-ALM)
 add_executable(main main.cpp)
 # Link your executable with the library:
 target_link_libraries(main PRIVATE panoc-alm::panoc-alm)
+```
+
+# Python
+
+The Python module can be installed using:
+```sh
+python setup.py install
 ```
