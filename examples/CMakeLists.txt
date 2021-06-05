@@ -5,7 +5,3 @@ endif()
 if (TARGET panoc-alm::cutest-loader)
     add_subdirectory(CUTEst)
 endif()
-
-add_subdirectory(experiments)
-add_subdirectory(mpc)
-add_subdirectory(poster)
