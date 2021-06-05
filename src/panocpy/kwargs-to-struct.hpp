@@ -133,20 +133,19 @@ inline const kwargs_to_struct_table_t<pa::PGAParams>
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
 
 template <>
-inline const kwargs_to_struct_table_t<pa::GuardedAAPGAParams>
-    kwargs_to_struct_table<pa::GuardedAAPGAParams>{
-        {"Lipschitz", &pa::GuardedAAPGAParams::Lipschitz},
-        {"limitedqr_mem", &pa::GuardedAAPGAParams::limitedqr_mem},
-        {"max_iter", &pa::GuardedAAPGAParams::max_iter},
-        {"max_time", &pa::GuardedAAPGAParams::max_time},
-        {"γ_min", &pa::GuardedAAPGAParams::γ_min},
-        {"stop_crit", &pa::GuardedAAPGAParams::stop_crit},
-        {"print_interval", &pa::GuardedAAPGAParams::print_interval},
+inline const kwargs_to_struct_table_t<pa::GAAPGAParams>
+    kwargs_to_struct_table<pa::GAAPGAParams>{
+        {"Lipschitz", &pa::GAAPGAParams::Lipschitz},
+        {"limitedqr_mem", &pa::GAAPGAParams::limitedqr_mem},
+        {"max_iter", &pa::GAAPGAParams::max_iter},
+        {"max_time", &pa::GAAPGAParams::max_time},
+        {"γ_min", &pa::GAAPGAParams::γ_min},
+        {"stop_crit", &pa::GAAPGAParams::stop_crit},
+        {"print_interval", &pa::GAAPGAParams::print_interval},
         {"quadratic_upperbound_tolerance_factor",
-         &pa::GuardedAAPGAParams::quadratic_upperbound_tolerance_factor},
-        {"max_no_progress", &pa::GuardedAAPGAParams::max_no_progress},
-        {"full_flush_on_γ_change",
-         &pa::GuardedAAPGAParams::full_flush_on_γ_change},
+         &pa::GAAPGAParams::quadratic_upperbound_tolerance_factor},
+        {"max_no_progress", &pa::GAAPGAParams::max_no_progress},
+        {"full_flush_on_γ_change", &pa::GAAPGAParams::full_flush_on_γ_change},
     };
 
 #include <panoc-alm/inner/decl/second-order-panoc-lbfgs.hpp>
@@ -155,41 +154,40 @@ inline const kwargs_to_struct_table_t<pa::GuardedAAPGAParams>
 
 template <>
 inline const kwargs_to_struct_table_t<decltype(
-    pa::SecondOrderPANOCLBFGSParams::Lipschitz)>
-    kwargs_to_struct_table<decltype(
-        pa::SecondOrderPANOCLBFGSParams::Lipschitz)>{
-        {"L_0", &decltype(pa::SecondOrderPANOCLBFGSParams::Lipschitz)::L₀},
-        {"δ", &decltype(pa::SecondOrderPANOCLBFGSParams::Lipschitz)::δ},
-        {"ε", &decltype(pa::SecondOrderPANOCLBFGSParams::Lipschitz)::ε},
+    pa::StructuredPANOCLBFGSParams::Lipschitz)>
+    kwargs_to_struct_table<decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)>{
+        {"L_0", &decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)::L₀},
+        {"δ", &decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)::δ},
+        {"ε", &decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)::ε},
         {"Lγ_factor",
-         &decltype(pa::SecondOrderPANOCLBFGSParams::Lipschitz)::Lγ_factor},
+         &decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)::Lγ_factor},
     };
 
 template <>
-inline const kwargs_to_struct_table_t<pa::SecondOrderPANOCLBFGSParams>
-    kwargs_to_struct_table<pa::SecondOrderPANOCLBFGSParams>{
-        {"Lipschitz", &pa::SecondOrderPANOCLBFGSParams::Lipschitz},
-        {"max_iter", &pa::SecondOrderPANOCLBFGSParams::max_iter},
-        {"max_time", &pa::SecondOrderPANOCLBFGSParams::max_time},
-        {"τ_min", &pa::SecondOrderPANOCLBFGSParams::τ_min},
-        {"γ_min", &pa::SecondOrderPANOCLBFGSParams::γ_min},
+inline const kwargs_to_struct_table_t<pa::StructuredPANOCLBFGSParams>
+    kwargs_to_struct_table<pa::StructuredPANOCLBFGSParams>{
+        {"Lipschitz", &pa::StructuredPANOCLBFGSParams::Lipschitz},
+        {"max_iter", &pa::StructuredPANOCLBFGSParams::max_iter},
+        {"max_time", &pa::StructuredPANOCLBFGSParams::max_time},
+        {"τ_min", &pa::StructuredPANOCLBFGSParams::τ_min},
+        {"γ_min", &pa::StructuredPANOCLBFGSParams::γ_min},
         {"nonmonotone_linesearch",
-         &pa::SecondOrderPANOCLBFGSParams::nonmonotone_linesearch},
-        {"stop_crit", &pa::SecondOrderPANOCLBFGSParams::stop_crit},
-        {"max_no_progress", &pa::SecondOrderPANOCLBFGSParams::max_no_progress},
-        {"print_interval", &pa::SecondOrderPANOCLBFGSParams::print_interval},
+         &pa::StructuredPANOCLBFGSParams::nonmonotone_linesearch},
+        {"stop_crit", &pa::StructuredPANOCLBFGSParams::stop_crit},
+        {"max_no_progress", &pa::StructuredPANOCLBFGSParams::max_no_progress},
+        {"print_interval", &pa::StructuredPANOCLBFGSParams::print_interval},
         {"quadratic_upperbound_tolerance_factor",
-         &pa::SecondOrderPANOCLBFGSParams::
+         &pa::StructuredPANOCLBFGSParams::
              quadratic_upperbound_tolerance_factor},
         {"update_lipschitz_in_linesearch",
-         &pa::SecondOrderPANOCLBFGSParams::update_lipschitz_in_linesearch},
+         &pa::StructuredPANOCLBFGSParams::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond",
-         &pa::SecondOrderPANOCLBFGSParams::alternative_linesearch_cond},
+         &pa::StructuredPANOCLBFGSParams::alternative_linesearch_cond},
         {"hessian_vec_finited_differences",
-         &pa::SecondOrderPANOCLBFGSParams::hessian_vec_finited_differences},
+         &pa::StructuredPANOCLBFGSParams::hessian_vec_finited_differences},
         {"full_augmented_hessian",
-         &pa::SecondOrderPANOCLBFGSParams::full_augmented_hessian},
-        {"lbfgs_stepsize", &pa::SecondOrderPANOCLBFGSParams::lbfgs_stepsize},
+         &pa::StructuredPANOCLBFGSParams::full_augmented_hessian},
+        {"lbfgs_stepsize", &pa::StructuredPANOCLBFGSParams::lbfgs_stepsize},
     };
 
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>

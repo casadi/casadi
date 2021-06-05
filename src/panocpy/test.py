@@ -91,8 +91,8 @@ print(y)
 print(x)
 pprint(stats)
 
-solver = pa.SecondOrderPANOCLBFGSSolver(
-    pa.SecondOrderPANOCLBFGSParams(max_iter=200, print_interval=1),
+solver = pa.StructuredPANOCLBFGSSolver(
+    pa.StructuredPANOCLBFGSParams(max_iter=200, print_interval=1),
     pa.LBFGSParams(memory=5),
 )
 almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
@@ -154,20 +154,24 @@ x = cs.SX.sym("x", n)
 v = cs.SX.sym("v", n)
 
 Q = np.array([[1.5, 0.5], [0.5, 1.5]])
-f_ = x.T @ Q @ x
+f_ = 0.5 * x.T @ Q @ x
 g_ = x
+f = cs.Function("f", [x], [f_])
+g = cs.Function("g", [x], [g_])
 
 name = "testproblem"
+cgen, n, m, num_p = pa.generate_casadi_problem(name, f, g)
+
 with TemporaryDirectory(prefix="") as tmpdir:
-    print(join(tmpdir, "testprob"))
-    cgen = pa.generate_casadi_problem(name, x, f_, g_, tmpdir)
+    cfile = cgen.generate(tmpdir)
     sofile = join(tmpdir, f"{name}.so")
-    os.system(f"cc -fPIC -shared -O3 {cgen} -o {sofile}")
+    os.system(f"cc -fPIC -shared -O3 {cfile} -o {sofile}")
+    print(sofile)
     p = pa.load_casadi_problem(sofile, n, m)
     p.D.lowerbound = [-np.inf, 0.5]
     p.D.upperbound = [+np.inf, +np.inf]
-solver = pa.SecondOrderPANOCLBFGSSolver(
-    pa.SecondOrderPANOCLBFGSParams(max_iter=200, print_interval=1),
+solver = pa.StructuredPANOCLBFGSSolver(
+    pa.StructuredPANOCLBFGSParams(max_iter=200, print_interval=1),
     pa.LBFGSParams(memory=5),
 )
 almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)

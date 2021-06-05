@@ -15,14 +15,14 @@ R_obstacle = 2
 
 f, nlp, bounds, n_states, n_inputs, first_input_idx = generate_problem(Ts, N_hor, R_obstacle, multipleshooting)
 
+#%% NLPSOL
+
 opts = {
     "verbose_init": False,
     "print_time": False,
     "ipopt.tol": tol,
     "ipopt.print_level": 0,
 }
-
-#%% NLPSOL
 
 solver = cs.nlpsol("solver", "ipopt", nlp, opts)
 p0 = np.array([*[-5, 0, 0, 0], *[0, 0, 0, 0]])  # initial state, desired state
@@ -94,8 +94,8 @@ solvers = [
         pa.PANOCParams(**panocparams),
         pa.LBFGSParams(memory=lbfgsmem),
     ),
-    pa.SecondOrderPANOCLBFGSSolver(
-        pa.SecondOrderPANOCLBFGSParams(**panocparams),
+    pa.StructuredPANOCLBFGSSolver(
+        pa.StructuredPANOCLBFGSParams(**panocparams),
         pa.LBFGSParams(memory=lbfgsmem),
     ),
 ]

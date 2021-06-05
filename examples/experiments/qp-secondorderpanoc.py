@@ -16,8 +16,8 @@ print(V)
 print(A)
 print(np.linalg.eigvals(A))
 
-x_lb = np.array([-np.inf, 0.25])
-x_ub = np.array([0., +np.inf])
+x_lb = np.array([-np.inf, 0.05])
+x_ub = np.array([-0.01, +np.inf])
 L = max(np.linalg.eigvals(A))
 L = 8
 γ = 0.95 * 1. / L
@@ -40,6 +40,7 @@ x0 = np.array([-2.4, 2])
 
 xlim, ylim = [-2.5, 1], [-1, 2.5]
 levels = np.linspace(0, 2.5**2*2, 50)
+# levels = np.linspace(0, 0.1, 50)
 
 X, Y, Z = meshplot(ψ, xlim, ylim, 0.01)
 
@@ -67,10 +68,11 @@ x_gd = np.nan * np.ones((N,2))
 x_gd[0] = x0
 for k in range(N-1):
     x_gd[k+1] = Tγ(x_gd[k])
-plt.plot(x_gd[:,0], x_gd[:,1], 'r.-', label='PGA')
+# plt.plot(x_gd[:,0], x_gd[:,1], 'r.-', label='PGA')
 
 x_2nd = np.nan * np.ones((N,2))
 x_2nd[0] = x0
+x_nw = np.nan * np.ones((N-1,2))
 τ = np.nan * np.ones((N,))
 τ_min = 1. / 256
 lbfgs = LBFGS(2, 5)
@@ -107,6 +109,8 @@ for k in range(N-1):
     τ[k] = 0. if k == 0 else 1.
     if len(J) == 0: τ[k] = 0
 
+    x_nw[k-1] = x + q
+
     # Line search
     σₖppγ = (1 - γ * L) * np.dot(p, p) / (2 * γ)
     φ = ψ(x) + 1 / (2 * γ) * np.dot(p, p) + np.dot(grad, p)
@@ -131,20 +135,36 @@ for k in range(N-1):
     x_2nd[k+1] = xkn
 
 plt.plot(x_2nd[:,0], x_2nd[:,1], 'b.-', linewidth=2, label=r'2\textsuperscript{nd} order PANOC + LBFGS (Python)')
+for i in range(len(x_2nd)):
+    x = x_2nd[i]
+    x_gd = x - γ * grad_ψ(x)
+    x_pg = Πc(x_gd)
+    plt.plot([x[0], x_gd[0]], [x[1], x_gd[1]], 'r+-', linewidth=0.5)
+    plt.plot([x_gd[0], x_pg[0]], [x_gd[1], x_pg[1]], 'r--', linewidth=0.5)
+for i in range(len(x_2nd)-5, len(x_2nd)-3):
+    x = x_2nd[i+1]
+    xnw = x_nw[i]
+    print(x, xnw)
+    # plt.plot([x[0], xnw[0]], [x[1], xnw[1]], '+:', color='purple', linewidth=1)
+    plt.arrow(x[0], x[1], (xnw - x)[0], (xnw - x)[1], color='k', length_includes_head=True)
+
+plt.axis('equal')
 
 import yaml
 def load_results(name, long = False):
     if long: name = "long-" + name
     with open("/tmp/" + name + ".yaml", "r") as file:
         return yaml.safe_load(file)
-cpp_data = load_results("panoc-2lbfgs-2")
-x_cpp = np.array([e["x"] for e in cpp_data[0]["PANOC"]])
-plt.plot(x_cpp[:,0], x_cpp[:,1], 'gx:', linewidth=2, markersize=8, label=r'2\textsuperscript{nd} order PANOC + LBFGS (C++)')
-plt.legend()
+if False:
+    cpp_data = load_results("panoc-2lbfgs-2")
+    x_cpp = np.array([e["x"] for e in cpp_data[0]["PANOC"]])
+    plt.plot(x_cpp[:,0], x_cpp[:,1], 'gx:', linewidth=2, markersize=8, label=r'2\textsuperscript{nd} order PANOC + LBFGS (C++)')
+    plt.legend()
 
-plt.figure()
-plt.plot(τ, '.-')
-plt.ylabel(r'$\tau$')
-plt.xlabel('Iteration')
+if False:
+    plt.figure()
+    plt.plot(τ, '.-')
+    plt.ylabel(r'$\tau$')
+    plt.xlabel('Iteration')
 
 plt.show()

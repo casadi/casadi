@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     panocparams3.alternative_linesearch_cond    = false;
     panocparams3.print_interval                 = 1;
 
-    pa::SecondOrderPANOCLBFGSParams panocparams2;
+    pa::StructuredPANOCLBFGSParams panocparams2;
     panocparams2.Lipschitz.L₀                   = L₀;
     panocparams2.max_iter                       = 1000;
     panocparams2.update_lipschitz_in_linesearch = true;
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
 
     PGASolver solver0{pgaparams0};
     PANOCSolver<> solver1{panocparams1, lbfgsparams};
-    SecondOrderPANOCLBFGSSolver solver2{panocparams2, lbfgsparams2};
+    StructuredPANOCLBFGSSolver solver2{panocparams2, lbfgsparams2};
     SecondOrderPANOCSolver solver3{panocparams3};
     solver0.set_progress_callback(logger<decltype(solver0)>(ymlout0));
     solver1.set_progress_callback(logger<decltype(solver1)>(ymlout1));

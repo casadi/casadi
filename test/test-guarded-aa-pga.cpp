@@ -96,7 +96,7 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
     almparam.max_iter = 100;
     almparam.preconditioning = true;
 
-    GuardedAAPGAParams pgaparam;
+    GAAPGAParams pgaparam;
     pgaparam.Lipschitz.ε   = 1e-6;
     pgaparam.Lipschitz.δ   = 1e-12;
     pgaparam.limitedqr_mem = n;
@@ -105,7 +105,7 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
     pgaparam.print_interval = 0;
     almparam.print_interval = 1;
 
-    using Solver = ALMSolver<GuardedAAPGA>;
+    using Solver = ALMSolver<GAAPGASolver>;
     Solver solver{almparam, pgaparam};
 
     vec x(n);

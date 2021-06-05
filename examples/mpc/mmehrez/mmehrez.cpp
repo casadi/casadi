@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     panocparam.max_iter       = 1000;
     panocparam.print_interval = 50;
 
-    pa::SecondOrderPANOCLBFGSParams secondpanocparam;
+    pa::StructuredPANOCLBFGSParams secondpanocparam;
     secondpanocparam.max_iter       = panocparam.max_iter;
     secondpanocparam.print_interval = panocparam.print_interval;
 
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 
     using Stats =
         std::variant<pa::ALMSolver<pa::PANOCSolver<pa::LBFGS>>::Stats,
-                     pa::ALMSolver<pa::SecondOrderPANOCLBFGSSolver>::Stats>;
+                     pa::ALMSolver<pa::StructuredPANOCLBFGSSolver>::Stats>;
     using Solver_sig =
         std::function<Stats(const pa::Problem &p, rvec x, rvec y)>;
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
             almparam,
             {panocparam, lbfgsparam},
         },
-        pa::ALMSolver<pa::SecondOrderPANOCLBFGSSolver>{
+        pa::ALMSolver<pa::StructuredPANOCLBFGSSolver>{
             almparam,
             {secondpanocparam, lbfgsparam},
         },

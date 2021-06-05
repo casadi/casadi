@@ -40,7 +40,7 @@ using Solver = pa::ALMSolver<pa::SecondOrderPANOCSolver>;
 #elif SOLVER == SOLVER_PANOC_2ND_LBFGS
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/second-order-panoc-lbfgs.hpp>
-using Solver = pa::ALMSolver<pa::SecondOrderPANOCLBFGSSolver>;
+using Solver = pa::ALMSolver<pa::StructuredPANOCLBFGSSolver>;
 #elif SOLVER == SOLVER_LBFGSpp
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/lbfgspp.hpp>
@@ -56,7 +56,7 @@ using Solver = pa::ALMSolver<pa::PGASolver>;
 #elif SOLVER == SOLVER_GAAPGA
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/guarded-aa-pga.hpp>
-using Solver = pa::ALMSolver<pa::GuardedAAPGA>;
+using Solver = pa::ALMSolver<pa::GAAPGA>;
 #elif SOLVER == SOLVER_PANOC_ANDERSON
 #include <panoc-alm/alm.hpp>
 #include <panoc-alm/inner/directions/anderson-acceleration.hpp>
@@ -136,7 +136,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
 }
 #elif SOLVER == SOLVER_PANOC_2ND_LBFGS
 auto get_inner_solver() {
-    pa::SecondOrderPANOCLBFGSParams panocparams;
+    pa::StructuredPANOCLBFGSParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
@@ -153,7 +153,7 @@ auto get_inner_solver() {
 auto get_problem(const pa::Problem &p) { return p; }
 const vec &get_y(const pa::Problem &, const vec &y) { return y; }
 inline YAML::Emitter &operator<<(YAML::Emitter &out,
-                                 const pa::SecondOrderPANOCLBFGSParams &p) {
+                                 const pa::StructuredPANOCLBFGSParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
@@ -235,7 +235,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PGAParams &p) {
 }
 #elif SOLVER == SOLVER_GAAPGA
 auto get_inner_solver() {
-    pa::GuardedAAPGAParams params;
+    pa::GAAPGAParams params;
     params.max_iter               = 1000;
     params.limitedqr_mem          = 20;
     params.full_flush_on_γ_change = false;
@@ -248,7 +248,7 @@ auto get_inner_solver() {
 auto get_problem(const pa::Problem &p) { return p; }
 const vec &get_y(const pa::Problem &, const vec &y) { return y; }
 inline YAML::Emitter &operator<<(YAML::Emitter &out,
-                                 const pa::GuardedAAPGAParams &p) {
+                                 const pa::GAAPGAParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;

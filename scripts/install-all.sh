@@ -6,17 +6,18 @@ python3.9 -m venv py-venv
 . ./py-venv/bin/activate
 pip install -r scripts/requirements.txt
 
-./scripts/install-openblas.sh
-./scripts/install-eigen.sh
-./scripts/install-casadi.sh
-./scripts/install-cutest.sh
-./scripts/install-yaml-cpp.sh
-./scripts/install-gtest.sh
+./scripts/install-openblas.sh   # https://www.openblas.net/
+./scripts/install-eigen.sh      # https://eigen.tuxfamily.org/index.php
+./scripts/install-casadi.sh     # https://web.casadi.org/
+./scripts/install-cutest.sh     # https://github.com/ralna/CUTEst
+./scripts/install-lbfgspp.sh    # https://github.com/yixuan/LBFGSpp
+./scripts/install-yaml-cpp.sh   # https://github.com/jbeder/yaml-cpp
+./scripts/install-gtest.sh      # https://google.github.io/googletest/
 
 mkdir build
 pushd build
 cmake .. -D CMAKE_BUILD_TYPE=Release
-make -j8 casadi-rosenbrock cutest-rosenbrock
+make -j$(nproc) casadi-rosenbrock cutest-rosenbrock
 ./examples/CasADi/Rosenbrock/casadi-rosenbrock
 ./examples/CUTEst/Rosenbrock/cutest-rosenbrock
 popd

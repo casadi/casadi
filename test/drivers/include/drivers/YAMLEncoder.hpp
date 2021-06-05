@@ -165,9 +165,9 @@ inline YAML::Emitter &operator<<(
     return out;
 }
 
-inline YAML::Emitter &operator<<(
-    YAML::Emitter &out,
-    const pa::InnerStatsAccumulator<pa::SecondOrderPANOCLBFGSSolver> &s) {
+inline YAML::Emitter &
+operator<<(YAML::Emitter &out,
+           const pa::InnerStatsAccumulator<pa::StructuredPANOCLBFGSSolver> &s) {
     out << YAML::BeginMap;
     out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
     out << YAML::Key << "iterations" << YAML::Value << s.iterations;
@@ -194,7 +194,7 @@ operator<<(YAML::Emitter &out,
 
 inline YAML::Emitter &
 operator<<(YAML::Emitter &out,
-           const pa::InnerStatsAccumulator<pa::GuardedAAPGA> &s) {
+           const pa::InnerStatsAccumulator<pa::GAAPGASolver> &s) {
     out << YAML::BeginMap;
     out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
     out << YAML::Key << "iterations" << YAML::Value << s.iterations;

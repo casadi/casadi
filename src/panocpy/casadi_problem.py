@@ -1,7 +1,11 @@
+from typing import Tuple
 import casadi as cs
 
 
-def generate_casadi_problem(name, f, g):
+def generate_casadi_problem(
+    name: str, f: cs.Function, g: cs.Function
+) -> Tuple[cs.CodeGenerator, int, int, int]:
+
     assert f.n_in() in [1, 2]
     assert f.n_in() == g.n_in()
     assert f.size1_in(0) == g.size1_in(0)

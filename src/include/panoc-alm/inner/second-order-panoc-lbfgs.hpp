@@ -15,8 +15,8 @@ namespace pa {
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
-inline SecondOrderPANOCLBFGSSolver::Stats
-SecondOrderPANOCLBFGSSolver::operator()(
+inline StructuredPANOCLBFGSSolver::Stats
+StructuredPANOCLBFGSSolver::operator()(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Constraint weights @f$ \Sigma @f$

@@ -293,45 +293,41 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             return std::sqrt(p.norm_sq_p) / p.γ;
         });
 
-    py::class_<pa::GuardedAAPGAParams>(m, "GAAPGAParams")
+    py::class_<pa::GAAPGAParams>(m, "GAAPGAParams")
         .def(py::init())
-        .def(py::init(&kwargs_to_struct<pa::GuardedAAPGAParams>))
-        .def("to_dict", &struct_to_dict<pa::GuardedAAPGAParams>)
-        .def_readwrite("Lipschitz", &pa::GuardedAAPGAParams::Lipschitz)
-        .def_readwrite("limitedqr_mem", &pa::GuardedAAPGAParams::limitedqr_mem)
-        .def_readwrite("max_iter", &pa::GuardedAAPGAParams::max_iter)
-        .def_readwrite("max_time", &pa::GuardedAAPGAParams::max_time)
-        .def_readwrite("γ_min", &pa::GuardedAAPGAParams::γ_min)
-        .def_readwrite("stop_crit", &pa::GuardedAAPGAParams::stop_crit)
-        .def_readwrite("print_interval",
-                       &pa::GuardedAAPGAParams::print_interval)
-        .def_readwrite(
-            "quadratic_upperbound_tolerance_factor",
-            &pa::GuardedAAPGAParams::quadratic_upperbound_tolerance_factor)
-        .def_readwrite("max_no_progress",
-                       &pa::GuardedAAPGAParams::max_no_progress)
+        .def(py::init(&kwargs_to_struct<pa::GAAPGAParams>))
+        .def("to_dict", &struct_to_dict<pa::GAAPGAParams>)
+        .def_readwrite("Lipschitz", &pa::GAAPGAParams::Lipschitz)
+        .def_readwrite("limitedqr_mem", &pa::GAAPGAParams::limitedqr_mem)
+        .def_readwrite("max_iter", &pa::GAAPGAParams::max_iter)
+        .def_readwrite("max_time", &pa::GAAPGAParams::max_time)
+        .def_readwrite("γ_min", &pa::GAAPGAParams::γ_min)
+        .def_readwrite("stop_crit", &pa::GAAPGAParams::stop_crit)
+        .def_readwrite("print_interval", &pa::GAAPGAParams::print_interval)
+        .def_readwrite("quadratic_upperbound_tolerance_factor",
+                       &pa::GAAPGAParams::quadratic_upperbound_tolerance_factor)
+        .def_readwrite("max_no_progress", &pa::GAAPGAParams::max_no_progress)
         .def_readwrite("full_flush_on_γ_change",
-                       &pa::GuardedAAPGAParams::full_flush_on_γ_change);
+                       &pa::GAAPGAParams::full_flush_on_γ_change);
 
-    py::class_<pa::GuardedAAPGAProgressInfo>(m, "GAAPGAProgressInfo")
-        .def_readonly("k", &pa::GuardedAAPGAProgressInfo::k)
-        .def_readonly("x", &pa::GuardedAAPGAProgressInfo::x)
-        .def_readonly("p", &pa::GuardedAAPGAProgressInfo::p)
-        .def_readonly("norm_sq_p", &pa::GuardedAAPGAProgressInfo::norm_sq_p)
-        .def_readonly("x_hat", &pa::GuardedAAPGAProgressInfo::x_hat)
-        .def_readonly("ψ", &pa::GuardedAAPGAProgressInfo::ψ)
-        .def_readonly("grad_ψ", &pa::GuardedAAPGAProgressInfo::grad_ψ)
-        .def_readonly("ψ_hat", &pa::GuardedAAPGAProgressInfo::ψ_hat)
-        .def_readonly("grad_ψ_hat", &pa::GuardedAAPGAProgressInfo::grad_ψ_hat)
-        .def_readonly("L", &pa::GuardedAAPGAProgressInfo::L)
-        .def_readonly("γ", &pa::GuardedAAPGAProgressInfo::γ)
-        .def_readonly("ε", &pa::GuardedAAPGAProgressInfo::ε)
-        .def_readonly("Σ", &pa::GuardedAAPGAProgressInfo::Σ)
-        .def_readonly("y", &pa::GuardedAAPGAProgressInfo::y)
-        .def_property_readonly("fpr",
-                               [](const pa::GuardedAAPGAProgressInfo &p) {
-                                   return std::sqrt(p.norm_sq_p) / p.γ;
-                               });
+    py::class_<pa::GAAPGAProgressInfo>(m, "GAAPGAProgressInfo")
+        .def_readonly("k", &pa::GAAPGAProgressInfo::k)
+        .def_readonly("x", &pa::GAAPGAProgressInfo::x)
+        .def_readonly("p", &pa::GAAPGAProgressInfo::p)
+        .def_readonly("norm_sq_p", &pa::GAAPGAProgressInfo::norm_sq_p)
+        .def_readonly("x_hat", &pa::GAAPGAProgressInfo::x_hat)
+        .def_readonly("ψ", &pa::GAAPGAProgressInfo::ψ)
+        .def_readonly("grad_ψ", &pa::GAAPGAProgressInfo::grad_ψ)
+        .def_readonly("ψ_hat", &pa::GAAPGAProgressInfo::ψ_hat)
+        .def_readonly("grad_ψ_hat", &pa::GAAPGAProgressInfo::grad_ψ_hat)
+        .def_readonly("L", &pa::GAAPGAProgressInfo::L)
+        .def_readonly("γ", &pa::GAAPGAProgressInfo::γ)
+        .def_readonly("ε", &pa::GAAPGAProgressInfo::ε)
+        .def_readonly("Σ", &pa::GAAPGAProgressInfo::Σ)
+        .def_readonly("y", &pa::GAAPGAProgressInfo::y)
+        .def_property_readonly("fpr", [](const pa::GAAPGAProgressInfo &p) {
+            return std::sqrt(p.norm_sq_p) / p.γ;
+        });
 
     py::class_<pa::PANOCProgressInfo>(m, "PANOCProgressInfo")
         .def_readonly("k", &pa::PANOCProgressInfo::k)
@@ -354,28 +350,28 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             return std::sqrt(p.norm_sq_p) / p.γ;
         });
 
-    py::class_<pa::SecondOrderPANOCLBFGSProgressInfo>(
-        m, "SecondOrderPANOCLBFGSProgressInfo")
-        .def_readonly("k", &pa::SecondOrderPANOCLBFGSProgressInfo::k)
-        .def_readonly("x", &pa::SecondOrderPANOCLBFGSProgressInfo::x)
-        .def_readonly("p", &pa::SecondOrderPANOCLBFGSProgressInfo::p)
+    py::class_<pa::StructuredPANOCLBFGSProgressInfo>(
+        m, "StructuredPANOCLBFGSProgressInfo")
+        .def_readonly("k", &pa::StructuredPANOCLBFGSProgressInfo::k)
+        .def_readonly("x", &pa::StructuredPANOCLBFGSProgressInfo::x)
+        .def_readonly("p", &pa::StructuredPANOCLBFGSProgressInfo::p)
         .def_readonly("norm_sq_p",
-                      &pa::SecondOrderPANOCLBFGSProgressInfo::norm_sq_p)
-        .def_readonly("x_hat", &pa::SecondOrderPANOCLBFGSProgressInfo::x_hat)
-        .def_readonly("φγ", &pa::SecondOrderPANOCLBFGSProgressInfo::φγ)
-        .def_readonly("ψ", &pa::SecondOrderPANOCLBFGSProgressInfo::ψ)
-        .def_readonly("grad_ψ", &pa::SecondOrderPANOCLBFGSProgressInfo::grad_ψ)
-        .def_readonly("ψ_hat", &pa::SecondOrderPANOCLBFGSProgressInfo::ψ_hat)
+                      &pa::StructuredPANOCLBFGSProgressInfo::norm_sq_p)
+        .def_readonly("x_hat", &pa::StructuredPANOCLBFGSProgressInfo::x_hat)
+        .def_readonly("φγ", &pa::StructuredPANOCLBFGSProgressInfo::φγ)
+        .def_readonly("ψ", &pa::StructuredPANOCLBFGSProgressInfo::ψ)
+        .def_readonly("grad_ψ", &pa::StructuredPANOCLBFGSProgressInfo::grad_ψ)
+        .def_readonly("ψ_hat", &pa::StructuredPANOCLBFGSProgressInfo::ψ_hat)
         .def_readonly("grad_ψ_hat",
-                      &pa::SecondOrderPANOCLBFGSProgressInfo::grad_ψ_hat)
-        .def_readonly("L", &pa::SecondOrderPANOCLBFGSProgressInfo::L)
-        .def_readonly("γ", &pa::SecondOrderPANOCLBFGSProgressInfo::γ)
-        .def_readonly("τ", &pa::SecondOrderPANOCLBFGSProgressInfo::τ)
-        .def_readonly("ε", &pa::SecondOrderPANOCLBFGSProgressInfo::ε)
-        .def_readonly("Σ", &pa::SecondOrderPANOCLBFGSProgressInfo::Σ)
-        .def_readonly("y", &pa::SecondOrderPANOCLBFGSProgressInfo::y)
+                      &pa::StructuredPANOCLBFGSProgressInfo::grad_ψ_hat)
+        .def_readonly("L", &pa::StructuredPANOCLBFGSProgressInfo::L)
+        .def_readonly("γ", &pa::StructuredPANOCLBFGSProgressInfo::γ)
+        .def_readonly("τ", &pa::StructuredPANOCLBFGSProgressInfo::τ)
+        .def_readonly("ε", &pa::StructuredPANOCLBFGSProgressInfo::ε)
+        .def_readonly("Σ", &pa::StructuredPANOCLBFGSProgressInfo::Σ)
+        .def_readonly("y", &pa::StructuredPANOCLBFGSProgressInfo::y)
         .def_property_readonly(
-            "fpr", [](const pa::SecondOrderPANOCLBFGSProgressInfo &p) {
+            "fpr", [](const pa::StructuredPANOCLBFGSProgressInfo &p) {
                 return std::sqrt(p.norm_sq_p) / p.γ;
             });
 
@@ -411,7 +407,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<pa::PolymorphicGAAPGASolver,
                std::shared_ptr<pa::PolymorphicGAAPGASolver>,
                pa::PolymorphicInnerSolverBase>(m, "GAAPGASolver")
-        .def(py::init<pa::GuardedAAPGAParams>())
+        .def(py::init<pa::GAAPGAParams>())
         .def("set_progress_callback",
              &pa::PolymorphicGAAPGASolver::set_progress_callback)
         .def("__call__",
@@ -427,38 +423,36 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
         .export_values();
 
-    using paSecondOrderPANOCLBFGSParamsLipschitz =
-        decltype(pa::SecondOrderPANOCLBFGSParams::Lipschitz);
-    py::class_<paSecondOrderPANOCLBFGSParamsLipschitz>(
-        m, "SecondOrderPANOCLBFGSParamsLipschitz")
+    using paStructuredPANOCLBFGSParamsLipschitz =
+        decltype(pa::StructuredPANOCLBFGSParams::Lipschitz);
+    py::class_<paStructuredPANOCLBFGSParamsLipschitz>(
+        m, "StructuredPANOCLBFGSParamsLipschitz")
         .def(py::init())
-        .def(
-            py::init(&kwargs_to_struct<paSecondOrderPANOCLBFGSParamsLipschitz>))
-        .def("to_dict", &struct_to_dict<paSecondOrderPANOCLBFGSParamsLipschitz>)
-        .def_readwrite("L_0", &paSecondOrderPANOCLBFGSParamsLipschitz::L₀)
-        .def_readwrite("ε", &paSecondOrderPANOCLBFGSParamsLipschitz::ε)
-        .def_readwrite("δ", &paSecondOrderPANOCLBFGSParamsLipschitz::δ)
+        .def(py::init(&kwargs_to_struct<paStructuredPANOCLBFGSParamsLipschitz>))
+        .def("to_dict", &struct_to_dict<paStructuredPANOCLBFGSParamsLipschitz>)
+        .def_readwrite("L_0", &paStructuredPANOCLBFGSParamsLipschitz::L₀)
+        .def_readwrite("ε", &paStructuredPANOCLBFGSParamsLipschitz::ε)
+        .def_readwrite("δ", &paStructuredPANOCLBFGSParamsLipschitz::δ)
         .def_readwrite("Lγ_factor",
-                       &paSecondOrderPANOCLBFGSParamsLipschitz::Lγ_factor);
+                       &paStructuredPANOCLBFGSParamsLipschitz::Lγ_factor);
 
-    py::class_<pa::SecondOrderPANOCLBFGSParams>(m,
-                                                "SecondOrderPANOCLBFGSParams")
-        .def(py::init<pa::SecondOrderPANOCLBFGSParams>())
-        .def(py::init(&kwargs_to_struct<pa::SecondOrderPANOCLBFGSParams>))
-        .def("to_dict", &struct_to_dict<pa::SecondOrderPANOCLBFGSParams>);
+    py::class_<pa::StructuredPANOCLBFGSParams>(m, "StructuredPANOCLBFGSParams")
+        .def(py::init<pa::StructuredPANOCLBFGSParams>())
+        .def(py::init(&kwargs_to_struct<pa::StructuredPANOCLBFGSParams>))
+        .def("to_dict", &struct_to_dict<pa::StructuredPANOCLBFGSParams>);
 
-    py::class_<pa::PolymorphicSecondOrderPANOCLBFGSSolver,
-               std::shared_ptr<pa::PolymorphicSecondOrderPANOCLBFGSSolver>,
-               pa::PolymorphicInnerSolverBase>(m, "SecondOrderPANOCLBFGSSolver")
-        .def(py::init<pa::SecondOrderPANOCLBFGSParams, pa::LBFGSParams>())
+    py::class_<pa::PolymorphicStructuredPANOCLBFGSSolver,
+               std::shared_ptr<pa::PolymorphicStructuredPANOCLBFGSSolver>,
+               pa::PolymorphicInnerSolverBase>(m, "StructuredPANOCLBFGSSolver")
+        .def(py::init<pa::StructuredPANOCLBFGSParams, pa::LBFGSParams>())
         .def("set_progress_callback",
-             &pa::PolymorphicSecondOrderPANOCLBFGSSolver::set_progress_callback)
+             &pa::PolymorphicStructuredPANOCLBFGSSolver::set_progress_callback)
         .def("__call__",
              pa::InnerSolverCallWrapper<
-                 pa::PolymorphicSecondOrderPANOCLBFGSSolver>(),
+                 pa::PolymorphicStructuredPANOCLBFGSSolver>(),
              py::call_guard<py::scoped_ostream_redirect,
                             py::scoped_estream_redirect>())
-        .def("__str__", &pa::PolymorphicSecondOrderPANOCLBFGSSolver::get_name);
+        .def("__str__", &pa::PolymorphicStructuredPANOCLBFGSSolver::get_name);
 
     py::class_<pa::ALMParams>(m, "ALMParams")
         .def(py::init())
@@ -495,7 +489,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPANOCSolver>()))
         .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPGASolver>()))
         .def(py::init(PolymorphicALMConstructor<
-                      pa::PolymorphicSecondOrderPANOCLBFGSSolver>()))
+                      pa::PolymorphicStructuredPANOCLBFGSSolver>()))
         .def(py::init(
             PolymorphicALMConstructor<pa::PolymorphicInnerSolverTrampoline>()))
         .def("inner_solver",

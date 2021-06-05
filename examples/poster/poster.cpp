@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
     panocparams2.alternative_linesearch_cond    = false;
     panocparams2.print_interval                 = 1;
 
-    pa::SecondOrderPANOCLBFGSParams panocparams3;
+    pa::StructuredPANOCLBFGSParams panocparams3;
     panocparams3.max_iter                       = 1000;
     panocparams3.update_lipschitz_in_linesearch = true;
     panocparams3.alternative_linesearch_cond    = false;
@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
 
     ALMSolver<PANOCSolver<>> solver1{almparams, {panocparams, lbfgsparams}};
     ALMSolver<SecondOrderPANOCSolver> solver2{almparams, panocparams2};
-    ALMSolver<SecondOrderPANOCLBFGSSolver> solver3{
+    ALMSolver<StructuredPANOCLBFGSSolver> solver3{
         almparams, {panocparams3, lbfgsparams3}};
     solver1.inner_solver.set_progress_callback(
         logger<decltype(solver1.inner_solver)>(ymlout1));

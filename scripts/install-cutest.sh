@@ -17,10 +17,10 @@ rm -rf cutest
 [ -d sifdecode ] || git clone https://github.com/ralna/SIFDecode --depth 1 ./sifdecode
 [ -d cutest ] || git clone https://github.com/ralna/CUTEst --depth 1 ./cutest
 # [ -d sif ] || git clone https://bitbucket.org/optrove/sif --depth 1 ./sif
-[ -d sif ] || { wget https://bitbucket.org/optrove/sif/get/master.tar.bz2 -O optrove-sif.tar.bz2 && \
-    tar xjf optrove-sif.tar.bz2 && \
+[ -d sif ] || { wget https://bitbucket.org/optrove/sif/get/master.tar.bz2 -O /tmp/optrove-sif.tar.bz2 && \
+    tar xjf /tmp/optrove-sif.tar.bz2 && \
     mv optrove-sif-* sif && \
-    rm optrove-sif.tar.bz2; }
+    rm /tmp/optrove-sif.tar.bz2; }
 
 export ARCH="$CUTEST_ROOT/archdefs"
 export ARCHDEFS="$CUTEST_ROOT/archdefs"

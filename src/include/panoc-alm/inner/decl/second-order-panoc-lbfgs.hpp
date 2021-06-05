@@ -16,7 +16,7 @@
 namespace pa {
 
 /// Tuning parameters for the second order PANOC algorithm.
-struct SecondOrderPANOCLBFGSParams {
+struct StructuredPANOCLBFGSParams {
     struct {
         /// Initial estimate of the Lipschitz constant of ∇ψ(x)
         real_t L₀ = 0;
@@ -61,7 +61,7 @@ struct SecondOrderPANOCLBFGSParams {
     LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
-struct SecondOrderPANOCLBFGSProgressInfo {
+struct StructuredPANOCLBFGSProgressInfo {
     unsigned k;
     crvec x;
     crvec p;
@@ -79,14 +79,14 @@ struct SecondOrderPANOCLBFGSProgressInfo {
     crvec Σ;
     crvec y;
     const Problem &problem;
-    const SecondOrderPANOCLBFGSParams &params;
+    const StructuredPANOCLBFGSParams &params;
 };
 
 /// Second order PANOC solver for ALM.
 /// @ingroup    grp_InnerSolvers
-class SecondOrderPANOCLBFGSSolver {
+class StructuredPANOCLBFGSSolver {
   public:
-    using Params = SecondOrderPANOCLBFGSParams;
+    using Params = StructuredPANOCLBFGSParams;
 
     struct Stats {
         SolverStatus status = SolverStatus::Unknown;
@@ -101,9 +101,9 @@ class SecondOrderPANOCLBFGSSolver {
         real_t sum_τ                 = 0;
     };
 
-    using ProgressInfo = SecondOrderPANOCLBFGSProgressInfo;
+    using ProgressInfo = StructuredPANOCLBFGSProgressInfo;
 
-    SecondOrderPANOCLBFGSSolver(Params params, LBFGSParams lbfgsparams)
+    StructuredPANOCLBFGSSolver(Params params, LBFGSParams lbfgsparams)
         : params(params), lbfgs(lbfgsparams) {}
 
     Stats operator()(const Problem &problem,        // in
@@ -114,7 +114,7 @@ class SecondOrderPANOCLBFGSSolver {
                      rvec y,                        // inout
                      rvec err_z);                   // out
 
-    SecondOrderPANOCLBFGSSolver &
+    StructuredPANOCLBFGSSolver &
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
         this->progress_cb = cb;
         return *this;
@@ -139,7 +139,7 @@ template <class InnerSolver>
 struct InnerStatsAccumulator;
 
 template <>
-struct InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> {
+struct InnerStatsAccumulator<StructuredPANOCLBFGSSolver> {
     std::chrono::microseconds elapsed_time;
     unsigned iterations          = 0;
     unsigned linesearch_failures = 0;
@@ -150,9 +150,9 @@ struct InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> {
     real_t sum_τ                 = 0;
 };
 
-inline InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &
-operator+=(InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &acc,
-           const SecondOrderPANOCLBFGSSolver::Stats s) {
+inline InnerStatsAccumulator<StructuredPANOCLBFGSSolver> &
+operator+=(InnerStatsAccumulator<StructuredPANOCLBFGSSolver> &acc,
+           const StructuredPANOCLBFGSSolver::Stats s) {
     acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
     acc.linesearch_failures += s.linesearch_failures;

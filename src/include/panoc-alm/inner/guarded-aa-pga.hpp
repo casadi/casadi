@@ -15,7 +15,7 @@
 
 namespace pa {
 
-struct GuardedAAPGAParams {
+struct GAAPGAParams {
     struct {
         /// Relative step size for initial finite difference Lipschitz estimate.
         real_t ε = 1e-6;
@@ -49,7 +49,7 @@ struct GuardedAAPGAParams {
     bool full_flush_on_γ_change = true;
 };
 
-struct GuardedAAPGAProgressInfo {
+struct GAAPGAProgressInfo {
     unsigned k;
     crvec x;
     crvec p;
@@ -65,19 +65,19 @@ struct GuardedAAPGAProgressInfo {
     crvec Σ;
     crvec y;
     const Problem &problem;
-    const GuardedAAPGAParams &params;
+    const GAAPGAParams &params;
 };
 
-/// Guarded Anderson Accelerated Proximal Gradient Algorithm
+/// Guarded Anderson Accelerated Proximal Gradient Algorithm.
 /// Vien V. Mai and Mikael Johansson, Anderson Acceleration of Proximal Gradient Methods.
 /// https://arxiv.org/abs/1910.08590v2
 ///
 /// @ingroup    grp_InnerSolvers
-class GuardedAAPGA {
+class GAAPGASolver {
   public:
-    using Params = GuardedAAPGAParams;
+    using Params = GAAPGAParams;
 
-    GuardedAAPGA(const Params &params) : params(params) {}
+    GAAPGASolver(const Params &params) : params(params) {}
 
     struct Stats {
         SolverStatus status = SolverStatus::Unknown;
@@ -87,7 +87,7 @@ class GuardedAAPGA {
         unsigned accelerated_steps_accepted = 0;
     };
 
-    using ProgressInfo = GuardedAAPGAProgressInfo;
+    using ProgressInfo = GAAPGAProgressInfo;
 
     Stats operator()(const Problem &problem,        // in
                      crvec Σ,                       // in
@@ -97,13 +97,13 @@ class GuardedAAPGA {
                      rvec λ,                        // inout
                      rvec err_z);                   // out
 
-    GuardedAAPGA &
+    GAAPGASolver &
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
         this->progress_cb = cb;
         return *this;
     }
 
-    std::string get_name() const { return "GuardedAAPGA"; }
+    std::string get_name() const { return "GAAPGA"; }
 
     void stop() { stop_signal.stop(); }
 
@@ -118,8 +118,8 @@ class GuardedAAPGA {
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
-inline GuardedAAPGA::Stats
-GuardedAAPGA::operator()(const Problem &problem,        // in
+inline GAAPGASolver::Stats
+GAAPGASolver::operator()(const Problem &problem,        // in
                          crvec Σ,                       // in
                          real_t ε,                      // in
                          bool always_overwrite_results, // in
@@ -360,15 +360,15 @@ template <class InnerSolver>
 struct InnerStatsAccumulator;
 
 template <>
-struct InnerStatsAccumulator<GuardedAAPGA> {
+struct InnerStatsAccumulator<GAAPGASolver> {
     std::chrono::microseconds elapsed_time;
     unsigned iterations                 = 0;
     unsigned accelerated_steps_accepted = 0;
 };
 
-inline InnerStatsAccumulator<GuardedAAPGA> &
-operator+=(InnerStatsAccumulator<GuardedAAPGA> &acc,
-           const GuardedAAPGA::Stats s) {
+inline InnerStatsAccumulator<GAAPGASolver> &
+operator+=(InnerStatsAccumulator<GAAPGASolver> &acc,
+           const GAAPGASolver::Stats s) {
     acc.elapsed_time += s.elapsed_time;
     acc.iterations += s.iterations;
     acc.accelerated_steps_accepted += s.accelerated_steps_accepted;

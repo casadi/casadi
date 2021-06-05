@@ -222,7 +222,7 @@ stats_to_dict(const InnerStatsAccumulator<InnerSolver> &s) {
 }
 
 template <class InnerSolver>
-inline py::dict stats_to_dict(const SecondOrderPANOCLBFGSSolver::Stats &s) {
+inline py::dict stats_to_dict(const StructuredPANOCLBFGSSolver::Stats &s) {
     using py::operator""_a;
     return py::dict{
         "status"_a              = s.status,
@@ -250,7 +250,7 @@ inline py::dict stats_to_dict(const PGASolver::Stats &s) {
 }
 
 template <class InnerSolver>
-inline py::dict stats_to_dict(const GuardedAAPGA::Stats &s) {
+inline py::dict stats_to_dict(const GAAPGASolver::Stats &s) {
     using py::operator""_a;
     return py::dict{
         "status"_a                     = s.status,
@@ -263,7 +263,7 @@ inline py::dict stats_to_dict(const GuardedAAPGA::Stats &s) {
 
 template <class InnerSolver>
 inline py::dict
-stats_to_dict(const InnerStatsAccumulator<SecondOrderPANOCLBFGSSolver> &s) {
+stats_to_dict(const InnerStatsAccumulator<StructuredPANOCLBFGSSolver> &s) {
     using py::operator""_a;
     return py::dict{
         "elapsed_time"_a        = s.elapsed_time,
@@ -287,7 +287,7 @@ inline py::dict stats_to_dict(const InnerStatsAccumulator<PGASolver> &s) {
 }
 
 template <class InnerSolver>
-inline py::dict stats_to_dict(const InnerStatsAccumulator<GuardedAAPGA> &s) {
+inline py::dict stats_to_dict(const InnerStatsAccumulator<GAAPGASolver> &s) {
     using py::operator""_a;
     return py::dict{
         "elapsed_time"_a               = s.elapsed_time,
@@ -379,11 +379,11 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
 namespace pa {
 
 using PolymorphicPGASolver    = PolymorphicInnerSolver<PGASolver>;
-using PolymorphicGAAPGASolver = PolymorphicInnerSolver<GuardedAAPGA>;
+using PolymorphicGAAPGASolver = PolymorphicInnerSolver<GAAPGASolver>;
 using PolymorphicPANOCSolver =
     PolymorphicInnerSolver<PANOCSolver<PolymorphicPANOCDirectionBase>>;
-using PolymorphicSecondOrderPANOCLBFGSSolver =
-    PolymorphicInnerSolver<SecondOrderPANOCLBFGSSolver>;
+using PolymorphicStructuredPANOCLBFGSSolver =
+    PolymorphicInnerSolver<StructuredPANOCLBFGSSolver>;
 
 using PolymorphicALMSolver = ALMSolver<PolymorphicInnerSolverWrapper>;
 
