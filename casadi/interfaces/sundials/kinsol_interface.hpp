@@ -120,6 +120,9 @@ namespace casadi {
     // Maximum number of iterations
     casadi_int max_iter_;
 
+    // Print information about iterations
+    casadi_int print_level_;
+
     // Use exact Jacobian?
     bool exact_jac_;
 
@@ -203,7 +206,8 @@ namespace casadi {
     static int lsetup(KINMem kin_mem);
     static int lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *sJpnorm, double *sFdotJp);
     static void ehfun(int error_code, const char *module, const char *function,
-                      char *msg, void *eh_data);
+      char *msg, void *eh_data);
+    static void ihfun(const char *module, const char *function, char *msg, void *ih_data);
   };
 
 } // namespace casadi

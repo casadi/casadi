@@ -73,6 +73,7 @@ namespace casadi {
     exact_jac_ = true;
     disable_internal_warnings_ = false;
     max_iter_ = 0;
+    print_level_ = 0;
     maxl_ = 0;
     upper_bandwidth_ = -1;
     lower_bandwidth_ = -1;
@@ -91,6 +92,9 @@ namespace casadi {
      {{"max_iter",
        {OT_INT,
         "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol."}},
+      {"print_level",
+       {OT_INT,
+        "Verbosity level"}},
       {"abstol",
        {OT_DOUBLE,
         "Stopping criterion tolerance"}},
@@ -158,6 +162,8 @@ namespace casadi {
         disable_internal_warnings_ = op.second;
       } else if (op.first=="max_iter") {
         max_iter_ = op.second;
+      } else if (op.first=="print_level") {
+        print_level_ = op.second;
       } else if (op.first=="linear_solver_type") {
         linear_solver_type = op.second.to_string();
       } else if (op.first=="max_krylov") {
@@ -546,9 +552,8 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::
-  ehfun(int error_code, const char *module, const char *function,
-                char *msg, void *eh_data) {
+  void KinsolInterface::ehfun(int error_code, const char *module, const char *function,
+      char *msg, void *eh_data) {
     try {
       auto m = to_mem(eh_data);
       auto& s = m->self;
@@ -557,6 +562,16 @@ namespace casadi {
       }
     } catch(exception& e) {
       uerr() << "ehfun failed: " << e.what() << endl;
+    }
+  }
+
+  void KinsolInterface::ihfun(const char *module, const char *function, char *msg, void *ih_data) {
+    try {
+      // auto m = to_mem(ih_data);
+      // auto& s = m->self;
+      uout() << "[" << module << "] " << function << "\n   " << msg << endl;
+    } catch(exception& e) {
+      uout() << "ihfun failed: " << e.what() << endl;
     }
   }
 
@@ -712,6 +727,14 @@ namespace casadi {
     // Set error handler function
     flag = KINSetErrHandlerFn(m->mem, ehfun, m);
     casadi_assert(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
+
+    // Set error handler function
+    flag = KINSetInfoHandlerFn(m->mem, ihfun, m);
+    casadi_assert(flag==KIN_SUCCESS, "KINSetInfoHandlerFn");
+
+    // Printing
+    flag = KINSetPrintLevel(m->mem, print_level_);
+    casadi_assert(flag==KIN_SUCCESS, "KINSetPrintLevel");
 
     // Initialize KINSOL
     flag = KINInit(m->mem, func_wrapper, m->u);
