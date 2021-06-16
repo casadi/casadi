@@ -303,6 +303,7 @@ protected:
   casadi_int number_of_event_indicators_;
 
   // Model Exchange
+  std::string model_identifier_;
   bool provides_directional_derivative_;
   std::vector<std::string> source_files_;
 

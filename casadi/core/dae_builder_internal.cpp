@@ -311,7 +311,7 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
     {"enable_fd", !provides_directional_derivative_},
     {"fd_method", "smoothing"},
     {"provides_directional_derivative", provides_directional_derivative_},
-    {"instance_name", model_name_}};
+    {"instance_name", model_identifier_}};
   Function fmu = fmu_function(name_, path, {id_xd, id_xn}, {id_yd, id_yn}, guid_, opts);
   add_fun(fmu);
   // Auxiliary variables for xd
@@ -1947,6 +1947,7 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   // Read attributes
   provides_directional_derivative_
     = n.attribute<bool>("providesDirectionalDerivative", false);
+  model_identifier_ = n.attribute<bool>("modelIdentifier");
   // Get list of source files
   if (n.has_child("SourceFiles")) {
     for (const XmlNode& sf : n["SourceFiles"].children) {
