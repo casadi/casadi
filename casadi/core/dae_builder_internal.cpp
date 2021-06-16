@@ -1947,7 +1947,7 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   // Read attributes
   provides_directional_derivative_
     = n.attribute<bool>("providesDirectionalDerivative", false);
-  model_identifier_ = n.attribute<bool>("modelIdentifier");
+  model_identifier_ = n.attribute<std::string>("modelIdentifier");
   // Get list of source files
   if (n.has_child("SourceFiles")) {
     for (const XmlNode& sf : n["SourceFiles"].children) {
