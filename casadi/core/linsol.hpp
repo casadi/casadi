@@ -124,6 +124,7 @@ namespace casadi {
     int sfact(const double* A, int mem=0) const;
     int nfact(const double* A, int mem=0) const;
     int solve(const double* A, double* x, casadi_int nrhs=1, bool tr=false, int mem=0) const;
+    double det(const double* A, int mem = 0) const;
     casadi_int neig(const double* A, int mem=0) const;
     casadi_int rank(const double* A, int mem=0) const;
     ///@}

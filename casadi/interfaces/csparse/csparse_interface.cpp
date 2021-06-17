@@ -5,6 +5,7 @@
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2018 Robert Bosch GmbH
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -177,6 +178,41 @@ namespace casadi {
       x += ncol();
     }
     return 0;
+  }
+
+  double CsparseInterface::det(void* mem, const double* A) const {
+    /**
+     * The code below uses an LU factorization routine from CSparse.
+     * Suppose the input matrix is called A, the LU factorization will return L, U, P such
+     * that: L*U = A, with L a lower-triangular matrix, U an upper-triangular matrix.
+     * 
+     * The determinant of A is equal to the product of the diagonal elements of L times 
+     * the product of the diagonal elements of U.
+     * 
+     * Note: CSparse permutes A as follows:
+     *   A = P^-1*L*U*Q with det(P^-1)*det(Q)=1.
+     * 
+     */
+    
+    auto m = static_cast<CsparseMemory*>(mem);
+
+    // Determinant of L
+    double detL = 1;
+    for (int i=0; i<m->N->L->n; ++i) {
+      for (int ii=m->N->L->p[i]; ii < m->N->L->p[i+1]; ++ii) {
+        if (i == m->N->L->i[ii]) detL *= m->N->L->x[ii];
+      }
+    }
+
+    // Determinant of U
+    double detU = 1;
+    for (int i=0; i<m->N->U->n; ++i) {
+      for (int ii=m->N->U->p[i]; ii < m->N->U->p[i+1]; ++ii) {
+        if (i == m->N->U->i[ii]) detU *= m->N->U->x[ii];
+      }
+    }
+
+    return detL*detU;
   }
 
 } // namespace casadi

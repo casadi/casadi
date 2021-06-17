@@ -93,6 +93,9 @@ namespace casadi {
     // Factorize the linear system
     int nfact(void* mem, const double* A) const override;
 
+    // Determinant
+    double det(void* mem, const double* A) const override;
+
     // Solve the linear system
     int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 

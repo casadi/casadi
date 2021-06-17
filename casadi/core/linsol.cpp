@@ -163,6 +163,12 @@ namespace casadi {
     return flag;
   }
 
+  double Linsol::det(const double* A, int mem) const {
+    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+    casadi_assert(m->is_nfact, "Linear system has not been factorized");
+    return (*this)->det(m, A);
+  }
+
   casadi_int Linsol::neig(const DM& A) const {
     if (A.sparsity()!=sparsity()) return neig(project(A, sparsity()));
     casadi_int n = neig(A.ptr());
