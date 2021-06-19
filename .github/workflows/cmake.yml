@@ -1,0 +1,22 @@
+name: source_package
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+          registry: ghcr.io
+          username: jgillis
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+    - name: generate Python 2
+      run: >
+        run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  ../casadi && make python source"
