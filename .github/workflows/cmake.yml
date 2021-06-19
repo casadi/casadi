@@ -25,3 +25,17 @@ jobs:
       run: >
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_PYTHON3=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python_source && cd .. && rm -rf build"
+
+    - name: build archives
+      run: tar czf ../source.tar.gz . && zip -r ../source.zip .
+      
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: source.tar.gz
+        path: source.tar.gz
+        
+    - uses: actions/upload-artifact@v2
+      with:
+        name: source.zip
+        path: source.zip
