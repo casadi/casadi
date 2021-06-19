@@ -18,5 +18,5 @@ jobs:
           
     - name: generate Python 2
       run: >
-        docker run --rm -v`pwd`/casadi/casadi:/local/casadi ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python source && cd .. && rm -rf build"
