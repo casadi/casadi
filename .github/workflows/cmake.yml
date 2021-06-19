@@ -27,7 +27,7 @@ jobs:
         "mkdir build && cd build && cmake -DWITH_PYTHON3=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python_source && cd .. && rm -rf build"
 
     - name: build archives
-      run: tar czf ../source.tar.gz . --exclude=.git && zip -rq ../source.zip . --exclude '*.git*' 
+      run: tar --exclude=.git czf ../source.tar.gz . && zip -rq ../source.zip . --exclude '*.git*' 
       
 
     - uses: actions/upload-artifact@v2
