@@ -1,0 +1,81 @@
+name: source_package
+
+on: push
+
+jobs:
+  swig:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+          registry: ghcr.io
+          username: jgillis
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+    - name: generate Python 2
+      run: >
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python_source && cd .. && rm -rf build"
+        
+    - name: generate Python 3
+      run: >
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_PYTHON3=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python_source && cd .. && rm -rf build"
+
+    - name: generate Matlab
+      run: >
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_MATLAB=ON -DSWIG_EXPORT=ON  .. && make matlab_source && cd .. && rm -rf build"
+    
+    - name: set CMAKE default options
+      run: |
+         sed -i 's/option(SWIG_IMPORT "Export SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
+
+    - name: build archives
+      run: |
+        zip -rq ../casadi_source.zip . --exclude '.*' --exclude '*/.*' --exclude 'appveyor.yml'
+        mv ../casadi_source.zip casadi_source.zip
+      
+    - uses: actions/upload-artifact@v2.2.4
+      with:
+        name: casadi_source_wrapper
+        path: casadi_source.zip
+
+  windows_matlab:
+    runs-on: windows-2016
+    needs: swig
+
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: casadi_source_wrapper
+
+    - uses: meco-group/mockups@master
+      with:
+        tag: win64_vs2017
+
+    - name: Unpack source
+      run: unzip casadi_source.zip
+
+    - name: Dir source
+      run: echo ${{ENV.MATLAB_ROOT}}
+
+    - name : cmake
+      run: |
+          cmake -B ${{github.workspace}}/build -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DMATLAB_ROOT=${{ENV.MATLAB_ROOT}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+          cmake --build ${{github.workspace}}/build --target install --config Release
+
+    - name: build archives
+      run: |
+        zip -rq  ${{github.workspace}}/casadi_windows_matlab.zip ${{github.workspace}}/install/*
+      shell: bash
+      
+    - uses: actions/upload-artifact@v2.2.4
+      with:
+        name: casadi_windows_matlab
+        path: ${{github.workspace}}/casadi_windows_matlab.zip
+      
