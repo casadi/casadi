@@ -25,6 +25,11 @@ jobs:
       run: >
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_PYTHON3=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python_source && cd .. && rm -rf build"
+
+    - name: generate Matlab
+      run: >
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_MATLAB=ON -DSWIG_EXPORT=ON  .. && make matlab_source && cd .. && rm -rf build"
     
     - name: set CMAKE default options
       run: |
@@ -32,7 +37,7 @@ jobs:
          sed -i 's/option(SWIG_IMPORT "Import SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
 
     - name: build archives
-      run: tar --exclude=.git -czf ../source.tar.gz . && zip -rq ../source.zip . --exclude '*.git*' 
+      run: tar --exclude='.git*' -czf ../source.tar.gz . && zip -rq ../source.zip . --exclude '*.git*' 
       
 
     - uses: actions/upload-artifact@v2.2.4
