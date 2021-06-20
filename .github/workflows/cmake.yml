@@ -35,12 +35,12 @@ jobs:
       run: tar --exclude=.git -czf ../source.tar.gz . && zip -rq ../source.zip . --exclude '*.git*' 
       
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v2.2.4
       with:
         name: source.tar.gz
-        path: ${{ github.workspace }}/../source.tar.gz
+        path: ../source.tar.gz
         
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v2.2.4
       with:
         name: source.zip
-        path: ${{ github.workspace }}/../source.zip
+        path: ../source.zip
