@@ -25,6 +25,11 @@ jobs:
       run: >
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_PYTHON3=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python_source && cd .. && rm -rf build"
+    
+    - name: set CMAKE default options
+      run: |
+         sed -i 's/option(SWIG_IMPORT "Export SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
+         sed -i 's/option(SWIG_IMPORT "Import SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
 
     - name: build archives
       run: tar --exclude=.git -czf ../source.tar.gz . && zip -rq ../source.zip . --exclude '*.git*' 
@@ -33,9 +38,9 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: source.tar.gz
-        path: ../source.tar.gz
+        path: ${{ github.workspace }}/source.tar.gz
         
     - uses: actions/upload-artifact@v2
       with:
         name: source.zip
-        path: ../source.zip
+        path: ${{ github.workspace }}/source.zip
