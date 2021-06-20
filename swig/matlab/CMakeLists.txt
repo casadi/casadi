@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.6)
 
 if(SWIG_EXPORT)
-  set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target_matlab/extra)
-  set(CMAKE_SWIG_WRAP_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target_matlab/source/dummy)
+  set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target/extra)
+  set(CMAKE_SWIG_WRAP_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target/source/dummy)
 endif()
 
 if(SWIG_IMPORT)
-  set(MEX_FILE ${CMAKE_CURRENT_SOURCE_DIR}/target_matlab/source/casadiMATLAB_wrap.cxx)
+  set(MEX_FILE ${CMAKE_CURRENT_SOURCE_DIR}/target/source/casadiMATLAB_wrap.cxx)
   set_source_files_properties(${MEX_FILE}  PROPERTIES  CPLUSPLUS ON)
 else()
   # Generate SWIG wrapper (for both MATLAB and Octave)
@@ -23,7 +23,7 @@ endif()
 
 set(SWIG_EXTRA ${CMAKE_CURRENT_BINARY_DIR})
 if(SWIG_IMPORT)
-  set(SWIG_EXTRA ${CMAKE_CURRENT_SOURCE_DIR}/target_matlab/extra)
+  set(SWIG_EXTRA ${CMAKE_CURRENT_SOURCE_DIR}/target/extra)
 endif()
 
 
