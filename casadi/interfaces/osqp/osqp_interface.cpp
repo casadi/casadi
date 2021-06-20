@@ -151,13 +151,16 @@ namespace casadi {
     if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<OsqpMemory*>(mem);
 
+    // convert H in a upper triangular matrix. This is required by osqp v0.6.0
+    Sparsity H_triu = Sparsity::triu(H_);
+
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
     std::vector<double> dummy(max(nx_+na_, max(Asp.nnz(), H_.nnz())));
 
     std::vector<c_int> A_row = vector_static_cast<c_int>(Asp.get_row());
     std::vector<c_int> A_colind = vector_static_cast<c_int>(Asp.get_colind());
-    std::vector<c_int> H_row = vector_static_cast<c_int>(H_.get_row());
-    std::vector<c_int> H_colind = vector_static_cast<c_int>(H_.get_colind());
+    std::vector<c_int> H_row = vector_static_cast<c_int>(H_triu.get_row());
+    std::vector<c_int> H_colind = vector_static_cast<c_int>(H_triu.get_colind());
 
     csc A;
     A.m = nx_ + na_;
@@ -171,8 +174,8 @@ namespace casadi {
     csc H;
     H.m = nx_;
     H.n = nx_;
-    H.nz = H_.nnz();
-    H.nzmax = H_.nnz();
+    H.nz = H_triu.nnz_upper();
+    H.nzmax = H_triu.nnz_upper();
     H.x = get_ptr(dummy);
     H.i = get_ptr(H_row);
     H.p = get_ptr(H_colind);
@@ -189,7 +192,7 @@ namespace casadi {
     data.u = get_ptr(dummy);
 
     // Setup workspace
-    m->work = osqp_setup(&data, &settings_);
+    if(osqp_setup(&m->work, &data, &settings_)) return 1;
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
