@@ -38,9 +38,9 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: source.tar.gz
-        path: ${{ github.workspace }}/source.tar.gz
+        path: ${{ github.workspace }}/../source.tar.gz
         
     - uses: actions/upload-artifact@v2
       with:
         name: source.zip
-        path: ${{ github.workspace }}/source.zip
+        path: ${{ github.workspace }}/../source.zip
