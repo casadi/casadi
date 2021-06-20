@@ -34,18 +34,21 @@ jobs:
     - name: set CMAKE default options
       run: |
          sed -i 's/option(SWIG_IMPORT "Export SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
-         sed -i 's/option(SWIG_IMPORT "Import SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
 
     - name: build archives
-      run: tar --exclude='.git*' -czf ../source.tar.gz . && zip -rq ../source.zip . --exclude '*.git*' 
+      run: |
+        tar --exclude='.git*' -czf ../source.tar.gz .
+        zip -rq ../source.zip . --exclude '*.git*'
+        mv ../source.tar.gz source.tar.gz
+        mv ../source.zip source.zip
       
 
     - uses: actions/upload-artifact@v2.2.4
       with:
         name: source.tar.gz
-        path: ../source.tar.gz
+        path: source.tar.gz
         
     - uses: actions/upload-artifact@v2.2.4
       with:
         name: source.zip
-        path: ../source.zip
+        path: source.zip
