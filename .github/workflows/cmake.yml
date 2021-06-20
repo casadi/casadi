@@ -37,8 +37,8 @@ jobs:
 
     - name: build archives
       run: |
-        tar --exclude='.git*' -czf ../source.tar.gz .
-        zip -rq ../source.zip . --exclude '*.git*'
+        tar --exclude='.[^/]*' --exclude=appveyor.yml -czf ../source.tar.gz .
+        zip -rq ../source.zip . --exclude '.*' --exclude '*/.*' --exclude 'appveyor.yml'
         mv ../source.tar.gz source.tar.gz
         mv ../source.zip source.zip
       
@@ -52,3 +52,4 @@ jobs:
       with:
         name: source.zip
         path: source.zip
+
