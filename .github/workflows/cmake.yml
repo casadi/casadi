@@ -37,19 +37,11 @@ jobs:
 
     - name: build archives
       run: |
-        tar --exclude='.[^/]*' --exclude=appveyor.yml -czf ../source.tar.gz .
-        zip -rq ../source.zip . --exclude '.*' --exclude '*/.*' --exclude 'appveyor.yml'
-        mv ../source.tar.gz source.tar.gz
-        mv ../source.zip source.zip
+        zip -rq ../casadi_source.zip . --exclude '.*' --exclude '*/.*' --exclude 'appveyor.yml'
+        mv ../casadi_source.zip casadi_source.zip
       
-
     - uses: actions/upload-artifact@v2.2.4
       with:
-        name: source.tar.gz
-        path: source.tar.gz
-        
-    - uses: actions/upload-artifact@v2.2.4
-      with:
-        name: source.zip
-        path: source.zip
+        name: casadi_source
+        path: casadi_source.zip
 
