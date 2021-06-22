@@ -698,9 +698,6 @@ namespace casadi {
     /** \brief Add an assertion */
     std::string debug_assert(const std::string& test);
 
-    /** \brief Add a relayout */
-    std::string relayout(const std::string& arg, const std::string& res, const Relayout& relayout, const std::string& iw);
-
   private:
 
     /// Print file header

@@ -53,7 +53,8 @@ namespace casadi {
 
   Relayout Relayout::push_right(casadi_int n) const {
     //REMOVE uout() << "push_right" << perms() << source().n_dims() << join(perms(), {source().n_dims()}) << std::endl;
-    return Relayout(source().push_right(n), join(perms(), {source().n_dims()}), target().push_right(n));
+    casadi_int t1 = source().n_dims();
+    return Relayout(source().push_right(n), join(perms(), {t1}), target().push_right(n));
   }
 
   void Layout::assert_valid_permutation(const Layout& target) const {
@@ -300,7 +301,7 @@ namespace casadi {
   }
 
   std::vector<casadi_int> Relayout::nz_ref() const {
-    
+    return {};
   }
 
   bool Relayout::cancels(const Relayout& other) const {

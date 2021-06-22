@@ -710,8 +710,10 @@ namespace casadi {
             std::vector<casadi_int> row, col;
             // conservative: it is enough if non-empty columns have an equal number of nonzeros
             if (Jf.sparsity_out(i).is_compactible(row, col)) {
-              Layout source({row.size(), col.size(), n_});
-              Layout target({row.size(), n_, col.size()});
+              casadi_int t1 = row.size();
+              casadi_int t2 = col.size();
+              Layout source({t1, t2, n_});
+              Layout target({t1, n_, t2});
               Sparsity sp_target = vertcat(horzsplit(r.sparsity(), Jf.size2_out(i)));
               r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
               r = permute_layout(r,Relayout(source, {0, 2, 1}, target));
