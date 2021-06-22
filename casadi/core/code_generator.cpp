@@ -2083,18 +2083,6 @@ namespace casadi {
     return "assert(" + test + ");";
   }
 
-
-  std::string CodeGenerator::
-  relayout(const std::string& arg, const std::string& res, const Relayout& relayout, const std::string& iw) {
-    add_auxiliary(AUX_RELAYOUT);
-    //std::string plan
-    //return "casadi_relayout()"
-
-
-
-    //return "casadi_relayout(" + arg + ", " + res + ", " + layout(relayout.source()) + ", "  + constant(relayout.perms()) + ", " + layout(relayout.target()) + ", " + iw + ");";
-  }
-
   unsigned int CodeGenerator::vector_width_real() const {
     if (casadi_real_type=="double") {
       return vector_width()/sizeof(double);
