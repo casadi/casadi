@@ -301,7 +301,7 @@ namespace casadi {
   }
 
   std::vector<casadi_int> Relayout::nz_ref() const {
-    
+    return {};
   }
 
   bool Relayout::cancels(const Relayout& other) const {
