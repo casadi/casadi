@@ -3,8 +3,8 @@ name: source_package
 on: push
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  swig:
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
@@ -45,3 +45,22 @@ jobs:
         name: casadi_source_wrapper
         path: casadi_source.zip
 
+  windows_matlab:
+    runs-on: windows-2016
+    needs: swig
+
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: casadi_source_wrapper
+
+    - name: Unpack source
+      run: unzip casadi_source.zip
+
+    - name: Dir source
+      run: dir
+
+    - name : cmake
+      run: |
+          cmake "-GVisual Studio 16 2019" -H. -B_builds
+          cmake --build _builds
