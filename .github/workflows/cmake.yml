@@ -54,7 +54,7 @@ jobs:
       with:
         name: casadi_source_wrapper
 
-    - uses: meco-group/mockups
+    - uses: meco-group/mockups@master
       with:
         tag: win64_vs2017
 
@@ -66,5 +66,16 @@ jobs:
 
     - name : cmake
       run: |
-          cmake -B ${{github.workspace}}/build -DWITH_MATLAB=ON -DMATLAB_ROOT=${{ENV.MATLAB_ROOT}}
-          cmake --build ${{github.workspace}}/build --config Release
+          cmake -B ${{github.workspace}}/build -DWITH_MATLAB=ON -DMATLAB_ROOT=${{ENV.MATLAB_ROOT}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+          cmake --build ${{github.workspace}}/build --target install --config Release
+
+    - name: build archives
+      run: |
+        zip -rq  ${{github.workspace}}/casadi_windows_matlab.zip ${{github.workspace}}/install/*
+      shell: bash
+      
+    - uses: actions/upload-artifact@v2.2.4
+      with:
+        name: casadi_windows_matlab
+        path: ${{github.workspace}}/casadi_windows_matlab.zip
+      
