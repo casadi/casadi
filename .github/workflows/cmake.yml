@@ -54,13 +54,17 @@ jobs:
       with:
         name: casadi_source_wrapper
 
+    - uses: meco-group/mockups
+      with:
+        tag: win64_vs2017
+
     - name: Unpack source
       run: unzip casadi_source.zip
 
     - name: Dir source
-      run: dir
+      run: echo ${{ENV.MATLAB_ROOT}}
 
     - name : cmake
       run: |
-          cmake -B ${{github.workspace}}/build
+          cmake -B ${{github.workspace}}/build -DWITH_MATLAB=ON -DMATLAB_ROOT=${{ENV.MATLAB_ROOT}}
           cmake --build ${{github.workspace}}/build --config Release
