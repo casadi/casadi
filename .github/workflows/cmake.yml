@@ -62,5 +62,5 @@ jobs:
 
     - name : cmake
       run: |
-          cmake "-GVisual Studio 16 2019" -H. -B_builds
-          cmake --build _builds
+          cmake -B{{github.workspace}}/build
+          cmake --build {{github.workspace}}/build --config Release
