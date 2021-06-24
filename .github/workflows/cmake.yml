@@ -48,6 +48,10 @@ jobs:
   windows_matlab:
     runs-on: windows-2016
     needs: swig
+    env:
+      bitness: 64
+      compiler: vs2017
+    
 
     steps:
     - uses: actions/download-artifact@v2
@@ -56,7 +60,7 @@ jobs:
 
     - uses: meco-group/mockups@master
       with:
-        tag: win64_vs2017
+        tag: win${{ENV.bitness}}_${{ENV.compiler}}
 
     - name: Unpack source
       run: unzip casadi_source.zip
@@ -66,7 +70,7 @@ jobs:
 
     - name : cmake
       run: |
-          cmake -B ${{github.workspace}}/build -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DMATLAB_ROOT=${{ENV.MATLAB_ROOT}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+          cmake -B ${{github.workspace}}/build -G "Visual Studio 15 2017" -A x64 -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DMATLAB_ROOT=${{ENV.MATLAB_ROOT}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
           cmake --build ${{github.workspace}}/build --target install --config Release
 
     - name: build archives
