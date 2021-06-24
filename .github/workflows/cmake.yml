@@ -66,7 +66,7 @@ jobs:
 
     - name : cmake
       run: |
-          cmake -B ${{github.workspace}}/build -DWITH_MATLAB=ON -DMATLAB_ROOT=${{ENV.MATLAB_ROOT}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+          cmake -B ${{github.workspace}}/build -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DMATLAB_ROOT=${{ENV.MATLAB_ROOT}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
           cmake --build ${{github.workspace}}/build --target install --config Release
 
     - name: build archives
