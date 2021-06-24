@@ -143,6 +143,13 @@ IF (NOT MATLAB_LIBRARIES)
       # If the compiler is Visual Studio, but not any of the specific
       # versions above, we try our luck with the microsoft directory
       set(MATLAB_LIBRARIES_DIR "${MATLAB_ROOT}/extern/lib/${WINDIR}/microsoft/")
+    elseif(${CMAKE_GENERATOR} MATCHES "MSYS Makefiles")
+      set(MATLAB_LIBRARIES_DIR "${MATLAB_ROOT}/extern/lib/${WINDIR}/mingw64/")
+      if(CMAKE_SIZEOF_VOID_P MATCHES "4")
+        set(MATLAB_MEX_EXT "mexw32")
+      elseif(CMAKE_SIZEOF_VOID_P MATCHES "8")
+        set(MATLAB_MEX_EXT "mexw64")
+      endif()
     endif()
 
   else(WIN32)
@@ -220,11 +227,13 @@ find_program( MATLAB_MEXEXT_PATH mexext${BATEXT}
             )
 
 # find mex extension
+if (NOT MATLAB_MEX_EXT)
 execute_process(
     COMMAND ${MATLAB_MEXEXT_PATH}
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE MATLAB_MEX_EXT
     )
+endif()
 
 set(MATLAB_LIBRARIES
   ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_UT_LIBRARY}
