@@ -75,8 +75,7 @@ jobs:
 
     - name: build archives
       run: |
-        zip -rq  ${{github.workspace}}/casadi_windows_matlab.zip ${{github.workspace}}/install/*
-      shell: bash
+        7z a ${{github.workspace}}/casadi_windows_matlab.zip ${{github.workspace}}/install/*
       
     - uses: actions/upload-artifact@v2.2.4
       with:
