@@ -129,16 +129,16 @@
     }
 #else
     // Undocumented matlab feature
-    extern "C" bool utIsInterruptPending(void);
-    extern "C" void utSetInterruptPending(bool);
+    //extern "C" bool utIsInterruptPending(void);
+    //extern "C" void utSetInterruptPending(bool);
 
     static bool mexcheckinterrupted() {
       if (!casadi::InterruptHandler::is_main_thread()) return false;
-      return utIsInterruptPending();
+      return false; //utIsInterruptPending();
     }
 
     void mexclearinterrupted() {
-      utSetInterruptPending(false);
+      //utSetInterruptPending(false);
     }
 
     // Flush the command window buffer (needed in gui mode)
@@ -149,7 +149,7 @@
       }
       if (!mexcheckinterrupted()) {
         if (mexEvalString("drawnow('update');pause(0.0001);")) {
-          utSetInterruptPending(true);
+          //utSetInterruptPending(true);
         }
       }
     }
