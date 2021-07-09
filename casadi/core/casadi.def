@@ -3,6 +3,7 @@ EXPORTS
     casadi_c_activate
     casadi_c_checkout
     casadi_c_checkout_id
+    casadi_c_clear
     casadi_c_decref
     casadi_c_decref_id
     casadi_c_default_in
