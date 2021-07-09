@@ -491,6 +491,12 @@ namespace casadi {
     // Generate mex entry point
     void generate_mex(std::ostream &s) const;
 
+    // Generate function specific code for Simulink s-Function
+    std::string codegen_sfunction(const Function& f) const;
+
+    // Export s-Function to file
+    void generate_sfunction(const std::string& name, const std::string& sfunction) const;
+
     // Generate main entry point
     void generate_main(std::ostream &s) const;
 
@@ -521,6 +527,10 @@ namespace casadi {
 
     // Are we creating a MEX file?
     bool mex;
+
+    // Are we creating a s-function?
+    bool with_sfunction;
+    std::vector<std::string> added_sfunctions;
 
     // Verbose codegen?
     bool verbose;
