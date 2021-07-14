@@ -54,28 +54,32 @@
 
 namespace casadi {
 
+#ifdef WITH_FMU
+
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
-   // Path to the unpacked FMU
-   std::string path_;
+  // Path to the unpacked FMU
+  std::string path_;
 
-   // Value reference to the inputs and outputs
-   std::vector<std::vector<casadi_int>> id_in_, id_out_;
+  // Value reference to the inputs and outputs
+  std::vector<std::vector<casadi_int>> id_in_, id_out_;
 
-   // Global unique identifier
-   const std::string guid_;
+  // Global unique identifier
+  const std::string guid_;
 
-   /** \brief Information about the library */
-   Importer li_;
+  /** \brief Information about the library */
+  Importer li_;
 
-   // Path to the FMU resource directory
-   std::string resource_loc_;
+  // Callback functions
+  fmi2CallbackFunctions functions_;
 
-   // User-set options
-   bool provides_directional_derivative_;
-   std::string instance_name_;
+  // Path to the FMU resource directory
+  std::string resource_loc_;
 
-#ifdef WITH_FMU
+  // User-set options
+  bool provides_directional_derivative_;
+  std::string instance_name_;
+
   // Component references
   std::vector<fmi2ValueReference> xd_, xn_, yd_, yn_;
 
@@ -93,8 +97,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Pointer to instance
   fmi2Component c_;
-
-#endif  // WITH_FMU
 
  public:
 
@@ -180,6 +182,13 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Load an FMI function
   signal_t get_function(const std::string& symname);
+
+  // Process message
+  static void logger(fmi2ComponentEnvironment componentEnvironment,
+    fmi2String instanceName,
+    fmi2Status status,
+    fmi2String category,
+    fmi2String message, ...);
 };
 
 /** Jacobian */
@@ -219,6 +228,8 @@ class CASADI_EXPORT FmuFunctionAdj : public FunctionInternal {
   /// Evaluate numerically
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 };
+
+#endif  // WITH_FMU
 
 } // namespace casadi
 /// \endcond

@@ -37,8 +37,15 @@ Function fmu_function(const std::string& name, const std::string& path,
     const std::vector<std::vector<casadi_int>>& id_in,
     const std::vector<std::vector<casadi_int>>& id_out,
     const std::string& guid, const Dict& opts) {
+#ifdef WITH_FMU
   return Function::create(new FmuFunction(name, path, id_in, id_out, guid), opts);
+#else  // WITH_FMU
+  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
+  return Function();
+#endif  // WITH_FMU
 }
+
+#ifdef WITH_FMU
 
 FmuFunction::FmuFunction(const std::string& name, const std::string& path,
     const std::vector<std::vector<casadi_int>>& id_in,
@@ -49,7 +56,6 @@ FmuFunction::FmuFunction(const std::string& name, const std::string& path,
   // Options
   provides_directional_derivative_ = false;
   instance_name_ = name_;
-#ifdef WITH_FMU
   // Initialize to null pointers
   instantiate_ = 0;
   free_instance_ = 0;
@@ -62,14 +68,11 @@ FmuFunction::FmuFunction(const std::string& name, const std::string& path,
   get_real_ = 0;
   get_directional_derivative_ = 0;
   c_ = 0;
-#endif  // WITH_FMU
 }
 
 FmuFunction::~FmuFunction() {
-#ifdef WITH_FMU
   // Free memory
   if (c_ && free_instance_) free_instance_(c_);
-#endif  // WITH_FMU
   clear_mem();
 }
 
@@ -103,7 +106,6 @@ void FmuFunction::init(const Dict& opts) {
   // Call the initialization method of the base class
   FunctionInternal::init(opts);
 
-#ifdef WITH_FMU
   // Input indices
   xd_.resize(id_in_[0].size());
   std::copy(id_in_[0].begin(), id_in_[0].end(), xd_.begin());
@@ -123,7 +125,7 @@ void FmuFunction::init(const Dict& opts) {
     + "/" + instance_name_no_dot + dll_suffix();
 
   // Path to resource directory
-  resource_loc_ = "file:" + path_ + "/resources/";
+  resource_loc_ = "file://" + path_ + "/resources";
 
   // Load the DLL
   li_ = Importer(dll_path, "dll");
@@ -148,12 +150,11 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Callback functions
-  fmi2CallbackFunctions functions;
-  functions.componentEnvironment = 0;
-  functions.allocateMemory = calloc;
-  functions.freeMemory = free;
-  functions.stepFinished = 0;
-  functions.componentEnvironment = 0;
+  functions_.logger = logger;
+  functions_.allocateMemory = calloc;
+  functions_.freeMemory = free;
+  functions_.stepFinished = 0;
+  functions_.componentEnvironment = 0;
 
   // Create instance
   fmi2String instanceName = instance_name_.c_str();
@@ -163,7 +164,7 @@ void FmuFunction::init(const Dict& opts) {
   fmi2Boolean visible = fmi2False;
   fmi2Boolean loggingOn = fmi2False;
   c_ = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
-    &functions, visible, loggingOn);
+    &functions_, visible, loggingOn);
   if (c_ == 0) casadi_error("fmi2Instantiate failed");
 
   // Reset solver
@@ -174,20 +175,14 @@ void FmuFunction::init(const Dict& opts) {
   status = enter_initialization_mode_(c_);
   if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
 
-  // This should not be necessary
-  if (true) {
-    // Initialization mode ends
-    status = exit_initialization_mode_(c_);
-    if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
+  // Initialization mode ends
+  status = exit_initialization_mode_(c_);
+  if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
 
-    // Continuous time mode begins
-    status = enter_continuous_time_mode_(c_);
-    if (status != fmi2OK) casadi_error("fmi2EnterContinuousTimeMode failed: " + str(status));
-  }
-
-#else  // WITH_FMU
-  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
-#endif  // WITH_FMU
+  // Continuous time mode only for event mode
+  // status = enter_continuous_time_mode_(c_);
+  // if (status != fmi2OK) casadi_error("fmi2EnterContinuousTimeMode failed: " + str(status));
+  // uout() << "enter_continuous_time_mode_ done" << std::endl;
 }
 
 std::string FmuFunction::system_infix() {
@@ -239,7 +234,6 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
-#ifdef WITH_FMU
   // Return flag
   fmi2Status status;
 
@@ -260,7 +254,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Initialization mode ends
   // status = exit_initialization_mode_(c_);
   // if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
-#endif  // WITH_FMU
 
   return 0;
 }
@@ -384,6 +377,38 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
   return ret;
 }
 
+void FmuFunction::logger(fmi2ComponentEnvironment componentEnvironment,
+    fmi2String instanceName,
+    fmi2Status status,
+    fmi2String category,
+    fmi2String message, ...) {
+  // Variable number of arguments
+  va_list args;
+  va_start(args, message);
+  // Static & dynamic buffers
+  char buf[256];
+  size_t buf_sz = sizeof(buf);
+  char* buf_dyn = nullptr;
+  // Try to print with a small buffer
+  int n = vsnprintf(buf, buf_sz, message, args);
+  // Need a larger buffer?
+  if (n > buf_sz) {
+    buf_sz = n + 1;
+    buf_dyn = new char[buf_sz];
+    n = vsnprintf(buf_dyn, buf_sz, message, args);
+  }
+  // Print buffer content
+  if (n >= 0) {
+    uout() << "[" << instanceName << ":" << category << "] "
+      << (buf_dyn ? buf_dyn : buf) << std::endl;
+  }
+  // Cleanup
+  delete[] buf_dyn;
+  va_end(args);
+  // Throw error if failure
+  casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
+}
+
 FmuFunctionJac::~FmuFunctionJac() {
   clear_mem();
 }
@@ -421,5 +446,7 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   auto m = derivative_of_.get<FmuFunction>();
   return m->eval_adj(arg, res, iw, w, mem);
 }
+
+#endif  // WITH_FMU
 
 } // namespace casadi
