@@ -36,9 +36,12 @@ namespace casadi {
 Function fmu_function(const std::string& name, const std::string& path,
     const std::vector<std::vector<casadi_int>>& id_in,
     const std::vector<std::vector<casadi_int>>& id_out,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
     const std::string& guid, const Dict& opts) {
 #ifdef WITH_FMU
-  return Function::create(new FmuFunction(name, path, id_in, id_out, guid), opts);
+  return Function::create(new FmuFunction(name, path, id_in, id_out, name_in, name_out, guid),
+    opts);
 #else  // WITH_FMU
   casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
   return Function();
@@ -50,9 +53,23 @@ Function fmu_function(const std::string& name, const std::string& path,
 FmuFunction::FmuFunction(const std::string& name, const std::string& path,
     const std::vector<std::vector<casadi_int>>& id_in,
     const std::vector<std::vector<casadi_int>>& id_out,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
     const std::string& guid)
   : FunctionInternal(name),
     path_(path), id_in_(id_in), id_out_(id_out), guid_(guid) {
+  // Names of inputs
+  if (!name_in.empty()) {
+    casadi_assert(id_in.size()==name_in.size(),
+    "Mismatching number of input names");
+    name_in_ = name_in;
+  }
+  // Names of outputs
+  if (!name_out.empty()) {
+    casadi_assert(id_out.size()==name_out.size(),
+    "Mismatching number of output names");
+    name_out_ = name_out;
+  }
   // Options
   provides_directional_derivative_ = false;
   instance_name_ = name_;

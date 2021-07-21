@@ -104,6 +104,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   FmuFunction(const std::string& name, const std::string& path,
       const std::vector<std::vector<casadi_int>>& id_in,
       const std::vector<std::vector<casadi_int>>& id_out,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
       const std::string& guid);
 
   /** \brief Destructor */
@@ -126,12 +128,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   size_t get_n_in() override { return 2;}
   size_t get_n_out() override {return 2;}
   ///@}
-
-  ///@{
-  /** \brief Names of function input and outputs */
-  std::string get_name_in(casadi_int i) override { return i == 0 ? "xd" : "xn";}
-  std::string get_name_out(casadi_int i) override { return i == 0 ? "yd" : "yn";}
-  /// @}
 
   /// @{
   /** \brief Retreive differentiability */
