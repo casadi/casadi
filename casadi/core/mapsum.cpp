@@ -422,7 +422,7 @@ namespace casadi {
     }
 
     // Evaluate
-    if (str(f_).find("SXFunction")!= std::string::npos) {
+    if (vectorize_f() && str(f_).find("SXFunction")!= std::string::npos) {
       g << g(f_, "arg1", "res1", "iw", "w", local, "j") << ";\n";
     } else {
       g << "if (" << g(f_, "arg1", "res1", "iw", "w", local) << ") return 1;\n";
