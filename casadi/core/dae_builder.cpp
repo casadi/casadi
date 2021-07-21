@@ -537,6 +537,14 @@ void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
   }
 }
 
+casadi_int DaeBuilder::value_reference(const std::string& name) const {
+  return variable(name).value_reference;
+}
+
+void DaeBuilder::set_value_reference(const std::string& name, casadi_int val) {
+  variable(name).value_reference = val;
+}
+
 std::string DaeBuilder::description(const std::string& name) const {
   return variable(name).description;
 }

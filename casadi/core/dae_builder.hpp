@@ -371,6 +371,12 @@ public:
   MX der(const MX& var) const;
 
   ///@{
+  /// Get/set value reference
+  casadi_int value_reference(const std::string& name) const;
+  void set_value_reference(const std::string& name, casadi_int val);
+  ///@}
+
+  ///@{
   /// Get/set description
   std::string description(const std::string& name) const;
   void set_description(const std::string& name, const std::string& val);
