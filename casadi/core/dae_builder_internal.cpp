@@ -292,7 +292,7 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   // All expressions
   std::vector<MX> var_xd;
   // All value references
-  std::vector<size_t> id_xd, id_xn, id_yd, id_yn;
+  std::vector<size_t> id_xd, id_yd;
   // Get the IDs and expressions of the initial unknowns
   id_xd.reserve(u_.size() + x_.size());
   var_xd.reserve(u_.size() + x_.size());
@@ -310,7 +310,7 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   Dict opts = {
     {"enable_fd", !provides_directional_derivative_},
     {"fd_method", "smoothing"}};
-  Function fmu = fmu_fun(name_, {id_xd, id_xn}, {id_yd, id_yn}, {"xd", "xn"}, {"yd", "yn"}, opts);
+  Function fmu = fmu_fun(name_, {id_xd}, {id_yd}, {"xd"}, {"yd"}, opts);
   add_fun(fmu);
   // Auxiliary variables for xd
   Variable xd(name_ + "_xd");
@@ -319,7 +319,7 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   xd.beq = vertcat(var_xd);
   w_.push_back(add_variable(xd.name, xd));
   // Create function call to fmu
-  std::vector<MX> fmu_lhs = fmu(std::vector<MX>{xd.v, MX()});
+  std::vector<MX> fmu_lhs = fmu(std::vector<MX>{xd.v});
   // Auxiliary variables for yd
   Variable yd(name_ + "_yd");
   yd.v = MX::sym(yd.name, id_yd.size());

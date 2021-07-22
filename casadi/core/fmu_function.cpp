@@ -310,14 +310,10 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
   casadi_int n_yd = nnz_out(0);
   // Inputs
   // const double* xd = arg[0];
-  // const double* xn = arg[1];  // not implemented
-  // const double* out_yd = arg[2];  // not used
-  // const double* out_yn = arg[3];  // not used
-  const double* adj_yd = arg[4];
-  // const double* adj_yn = arg[5];  // non-differentiable
+  // const double* out_yd = arg[1];  // not used
+  const double* adj_yd = arg[2];
   // Outputs
   double* adj_xd = res[0];
-  // double* adj_xn = res[1];  // non-differentiable, not implemented
   // Forward seed, sensitivity for calculating columns of the Jacobian
   double* fwd_xd = w; w += n_xd;
   double* fwd_yd = w; w += n_yd;
