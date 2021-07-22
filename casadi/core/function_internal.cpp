@@ -2334,7 +2334,7 @@ namespace casadi {
       g << "void mex_" << name_
         << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
         << "casadi_int i;\n";
-
+      g << "int mem;\n";
       // Work vectors, including input and output buffers
       casadi_int i_nnz = nnz_in(), o_nnz = nnz_out();
       size_t sz_w = this->sz_w();
@@ -2380,7 +2380,7 @@ namespace casadi {
           g << "if (--resc>=0) ";
         }
         // Create and get pointer
-        g << g.res(i) << " = w+" << str(offset) << ";\n";
+        g << g.res(i, true) << " = w+" << str(offset) << ";\n";
         offset += nnz_out(i);
       }
       g << name_ << "_incref();\n";
@@ -2395,8 +2395,8 @@ namespace casadi {
 
       // Save results
       for (casadi_int i=0; i<n_out_; ++i) {
-        g << "if (" << g.res(i) << ") resv[" << i << "] = "
-          << g.to_mex(sparsity_out_[i], g.res(i)) << "\n";
+        g << "if (" << g.res(i, true) << ") resv[" << i << "] = "
+          << g.to_mex(sparsity_out_[i], g.res(i, true)) << "\n";
       }
 
       // End conditional compilation and function
