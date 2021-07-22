@@ -202,7 +202,6 @@ namespace casadi {
           g << "\n";
         }
       }
-      uout() << "yay" << std::endl;
   }
 
   void Sparsify::generate(CodeGenerator& g,
