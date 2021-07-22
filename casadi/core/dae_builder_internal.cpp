@@ -39,7 +39,7 @@
 #include "calculus.hpp"
 #include "xml_file.hpp"
 #include "external.hpp"
-#include "fmu_function_impl.hpp"
+#include "fmu_function.hpp"
 
 namespace casadi {
 

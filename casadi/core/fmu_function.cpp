@@ -23,7 +23,7 @@
  */
 
 
-#include "fmu_function_impl.hpp"
+#include "fmu_function.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
