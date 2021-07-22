@@ -26,8 +26,8 @@
 #ifndef CASADI_FMU_FUNCTION_IMPL_HPP
 #define CASADI_FMU_FUNCTION_IMPL_HPP
 
-#include "dae_builder.hpp"
 #include "function_internal.hpp"
+#include "dae_builder.hpp"
 #include "importer.hpp"
 
 #ifdef WITH_FMU
@@ -63,12 +63,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Value reference to the inputs and outputs
   std::vector<std::vector<fmi2ValueReference>> id_in_, id_out_;
-
-  // Information from DaeBuilder instance
-  std::string path_;
-  std::string guid_;
-  std::string instance_name_;
-  bool provides_directional_derivative_;
 
   /** \brief Information about the library */
   Importer li_;
@@ -139,7 +133,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   ///@{
   /** \brief Full Jacobian */
-  bool has_jacobian() const override { return provides_directional_derivative_;}
+  bool has_jacobian() const override;
   Function get_jacobian(const std::string& name,
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,
@@ -148,9 +142,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   ///@{
   /** \brief Adjoint */
-  bool has_reverse(casadi_int nadj) const override {
-    return provides_directional_derivative_ && nadj == 1;
-  }
+  bool has_reverse(casadi_int nadj) const override;
   ///@}
   Function get_reverse(casadi_int nadj, const std::string& name,
     const std::vector<std::string>& inames,

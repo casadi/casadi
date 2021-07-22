@@ -64,11 +64,6 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     casadi_assert(id_out.size() == name_out.size(), "Mismatching number of output names");
     name_out_ = name_out;
   }
-  // Information from DaeBuilder instance
-  path_ = dae->path_;
-  guid_ = dae->guid_;
-  instance_name_ = dae->model_identifier_;
-  provides_directional_derivative_ = dae->provides_directional_derivative_;
   // Initialize to null pointers
   instantiate_ = 0;
   free_instance_ = 0;
@@ -94,13 +89,13 @@ void FmuFunction::init(const Dict& opts) {
   // Call the initialization method of the base class
   FunctionInternal::init(opts);
   // Directory where the DLL is stored, per the FMI specification
-  std::string instance_name_no_dot = instance_name_;
+  std::string instance_name_no_dot = dae_->model_identifier_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = path_ + "/binaries/" + system_infix()
+  std::string dll_path = dae_->path_ + "/binaries/" + system_infix()
     + "/" + instance_name_no_dot + dll_suffix();
 
   // Path to resource directory
-  resource_loc_ = "file://" + path_ + "/resources";
+  resource_loc_ = "file://" + dae_->path_ + "/resources";
 
   // Load the DLL
   li_ = Importer(dll_path, "dll");
@@ -120,7 +115,7 @@ void FmuFunction::init(const Dict& opts) {
   set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
   set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
   get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(get_function("fmi2GetReal"));
-  if (provides_directional_derivative_) {
+  if (dae_->provides_directional_derivative_) {
     get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
       get_function("fmi2GetDirectionalDerivative"));
   }
@@ -133,9 +128,9 @@ void FmuFunction::init(const Dict& opts) {
   functions_.componentEnvironment = 0;
 
   // Create instance
-  fmi2String instanceName = instance_name_.c_str();
+  fmi2String instanceName = dae_->model_identifier_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
-  fmi2String fmuGUID = guid_.c_str();
+  fmi2String fmuGUID = dae_->guid_.c_str();
   fmi2String fmuResourceLocation = resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
   fmi2Boolean loggingOn = fmi2False;
@@ -352,6 +347,10 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
   return 0;
 }
 
+bool FmuFunction::has_jacobian() const {
+  return dae_->provides_directional_derivative_;
+}
+
 Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
     const std::vector<std::string>& onames, const Dict& opts) const {
   Function ret;
@@ -361,6 +360,10 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
   opts2["enable_fd"] = true;
   ret->construct(opts2);
   return ret;
+}
+
+bool FmuFunction::has_reverse(casadi_int nadj) const {
+  return dae_->provides_directional_derivative_ && nadj == 1;
 }
 
 Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
