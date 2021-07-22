@@ -503,6 +503,9 @@ public:
   /// Access a member function or object
   DaeBuilderInternal* operator->();
 
+  /// Check if a particular cast is allowed
+  static bool test_cast(const SharedObjectInternal* ptr);
+
   /// Get variable expression by index
   const MX& var(size_t ind) const;
 

@@ -790,6 +790,10 @@ const Variable& DaeBuilder::variable(const std::string& name) const {
   }
 }
 
+bool DaeBuilder::test_cast(const SharedObjectInternal* ptr) {
+  return dynamic_cast<const DaeBuilderInternal*>(ptr) != nullptr;
+}
+
 DaeBuilderInternal* DaeBuilder::operator->() {
   return static_cast<DaeBuilderInternal*>(SharedObject::operator->());
 }

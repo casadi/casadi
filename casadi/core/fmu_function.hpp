@@ -26,7 +26,7 @@
 #ifndef CASADI_FMU_FUNCTION_IMPL_HPP
 #define CASADI_FMU_FUNCTION_IMPL_HPP
 
-#include "dae_builder_internal.hpp"
+#include "dae_builder.hpp"
 #include "function_internal.hpp"
 #include "importer.hpp"
 
@@ -58,6 +58,9 @@ namespace casadi {
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
+  // DaeBuilder instance
+  DaeBuilder dae_;
+
   // Value reference to the inputs and outputs
   std::vector<std::vector<fmi2ValueReference>> id_in_, id_out_;
 
@@ -98,8 +101,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
 
   /** \brief Constructor */
-  FmuFunction(const DaeBuilderInternal& dae,
-      const std::string& name,
+  FmuFunction(const std::string& name, const DaeBuilder& dae,
       const std::vector<std::vector<casadi_int>>& id_in,
       const std::vector<std::vector<casadi_int>>& id_out,
       const std::vector<std::string>& name_in,

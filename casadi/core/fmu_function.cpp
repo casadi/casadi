@@ -26,6 +26,7 @@
 #include "fmu_function.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
+#include "dae_builder_internal.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -35,13 +36,12 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
-FmuFunction::FmuFunction(const DaeBuilderInternal& dae,
-    const std::string& name,
+FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     const std::vector<std::vector<casadi_int>>& id_in,
     const std::vector<std::vector<casadi_int>>& id_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out)
-  : FunctionInternal(name) {
+  : FunctionInternal(name), dae_(dae) {
   // Cast id_in to right type
   id_in_.resize(id_in.size());
   for (size_t k = 0; k < id_in.size(); ++k) {
@@ -65,10 +65,10 @@ FmuFunction::FmuFunction(const DaeBuilderInternal& dae,
     name_out_ = name_out;
   }
   // Information from DaeBuilder instance
-  path_ = dae.path_;
-  guid_ = dae.guid_;
-  instance_name_ = dae.model_identifier_;
-  provides_directional_derivative_ = dae.provides_directional_derivative_;
+  path_ = dae->path_;
+  guid_ = dae->guid_;
+  instance_name_ = dae->model_identifier_;
+  provides_directional_derivative_ = dae->provides_directional_derivative_;
   // Initialize to null pointers
   instantiate_ = 0;
   free_instance_ = 0;

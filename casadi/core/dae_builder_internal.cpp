@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "dae_builder_internal.hpp"
 
 #include <cctype>
@@ -1752,7 +1751,8 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_out,
     const Dict& opts) const {
 #ifdef WITH_FMU
-  return Function::create(new FmuFunction(*this, name, id_in, id_out, name_in, name_out), opts);
+  return Function::create(new FmuFunction(name, shared_from_this<DaeBuilder>(),
+    id_in, id_out, name_in, name_out), opts);
 #else  // WITH_FMU
   casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
   return Function();
