@@ -56,7 +56,6 @@
 #include "expm.hpp"
 #include "interpolant.hpp"
 #include "external.hpp"
-#include "fmu_function.hpp"
 
 // Misc
 #include "integration_tools.hpp"

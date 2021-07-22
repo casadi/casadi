@@ -50,8 +50,9 @@ throw CasadiException("Error in DaeBuilder::" FNAME " for '" + this->name() \
 DaeBuilder::DaeBuilder() {
 }
 
-DaeBuilder::DaeBuilder(const std::string& name) {
-  own(new DaeBuilderInternal(name));
+DaeBuilder::DaeBuilder(const std::string& name, const std::string& path) {
+  own(new DaeBuilderInternal(name, path));
+  if (!path.empty()) load_fmi_description(path + "/modelDescription.xml");
 }
 
 const std::string& DaeBuilder::name() const {
@@ -755,6 +756,20 @@ Function DaeBuilder::dependent_fun(const std::string& fname,
     return (*this)->dependent_fun(fname, s_in, s_out);
   } catch (std::exception& e) {
     THROW_ERROR("dependent_fun", e.what());
+    return Function(); // never reached
+  }
+}
+
+Function DaeBuilder::fmu_fun(const std::string& name,
+    const std::vector<std::vector<casadi_int>>& id_in,
+    const std::vector<std::vector<casadi_int>>& id_out,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) const {
+  try {
+    return (*this)->fmu_fun(name, id_in, id_out, name_in, name_out, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("fmu_fun", e.what());
     return Function(); // never reached
   }
 }

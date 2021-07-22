@@ -39,7 +39,7 @@
 #include "calculus.hpp"
 #include "xml_file.hpp"
 #include "external.hpp"
-#include "fmu_function.hpp"
+#include "fmu_function_impl.hpp"
 
 namespace casadi {
 
@@ -141,7 +141,8 @@ Variable::Variable(const std::string& name) : name(name),
 DaeBuilderInternal::~DaeBuilderInternal() {
 }
 
-DaeBuilderInternal::DaeBuilderInternal(const std::string& name) : name_(name) {
+DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path)
+    : name_(name), path_(path) {
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
   provides_directional_derivative_ = 0;
@@ -312,8 +313,7 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
     {"fd_method", "smoothing"},
     {"provides_directional_derivative", provides_directional_derivative_},
     {"instance_name", model_identifier_}};
-  Function fmu = fmu_function(name_, path, {id_xd, id_xn}, {id_yd, id_yn},
-    {"xd", "xn"}, {"yd", "yn"}, guid_, opts);
+  Function fmu = fmu_fun(name_, {id_xd, id_xn}, {id_yd, id_yn}, {"xd", "xn"}, {"yd", "yn"}, opts);
   add_fun(fmu);
   // Auxiliary variables for xd
   Variable xd(name_ + "_xd");
@@ -1745,6 +1745,20 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   substitute_inplace(dw, dwdef, f_out);
   // Assemble return function
   return Function(fname, f_in, f_out, s_in, s_out);
+}
+
+Function DaeBuilderInternal::fmu_fun(const std::string& name,
+    const std::vector<std::vector<casadi_int>>& id_in,
+    const std::vector<std::vector<casadi_int>>& id_out,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) const {
+#ifdef WITH_FMU
+  return Function::create(new FmuFunction(*this, name, id_in, id_out, name_in, name_out), opts);
+#else  // WITH_FMU
+  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
+  return Function();
+#endif  // WITH_FMU
 }
 
 Function DaeBuilderInternal::gather_eq() const {

@@ -33,31 +33,16 @@
 
 namespace casadi {
 
-Function fmu_function(const std::string& name, const std::string& path,
+#ifdef WITH_FMU
+
+FmuFunction::FmuFunction(const DaeBuilderInternal& dae,
+    const std::string& name,
     const std::vector<std::vector<casadi_int>>& id_in,
     const std::vector<std::vector<casadi_int>>& id_out,
     const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out,
-    const std::string& guid, const Dict& opts) {
-#ifdef WITH_FMU
-  return Function::create(new FmuFunction(name, path, id_in, id_out, name_in, name_out, guid),
-    opts);
-#else  // WITH_FMU
-  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
-  return Function();
-#endif  // WITH_FMU
-}
-
-#ifdef WITH_FMU
-
-FmuFunction::FmuFunction(const std::string& name, const std::string& path,
-    const std::vector<std::vector<casadi_int>>& id_in,
-    const std::vector<std::vector<casadi_int>>& id_out,
-    const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out,
-    const std::string& guid)
+    const std::vector<std::string>& name_out)
   : FunctionInternal(name),
-    path_(path), id_in_(id_in), id_out_(id_out), guid_(guid) {
+    path_(dae.path_), id_in_(id_in), id_out_(id_out), guid_(dae.guid_) {
   // Names of inputs
   if (!name_in.empty()) {
     casadi_assert(id_in.size()==name_in.size(),

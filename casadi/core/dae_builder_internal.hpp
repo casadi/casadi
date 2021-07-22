@@ -107,11 +107,12 @@ struct CASADI_EXPORT Variable {
 /// Internal class for DaeBuilder, see comments on the public class.
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
+  friend class FmuFunction;
 
  public:
 
   /// Constructor
-  explicit DaeBuilderInternal(const std::string& name);
+  explicit DaeBuilderInternal(const std::string& name, const std::string& path);
 
   /// Destructor
   ~DaeBuilderInternal() override;
@@ -226,6 +227,14 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   Function dependent_fun(const std::string& fname,
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const;
+
+  /// Construct a function from an FMU DLL
+  Function fmu_fun(const std::string& name,
+      const std::vector<std::vector<casadi_int>>& id_in,
+      const std::vector<std::vector<casadi_int>>& id_out,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts) const;
   ///@}
 
   /// Function corresponding to all equations
@@ -309,6 +318,9 @@ protected:
 
   /// Name of instance
   std::string name_;
+
+  // Path to FMU, if any
+  std::string path_;
 
   /// All variables
   std::vector<Variable> variables_;

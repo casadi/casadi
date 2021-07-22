@@ -75,8 +75,8 @@ public:
   /// Default constructor
   DaeBuilder();
 
-  /// Constructor
-  explicit DaeBuilder(const std::string& name);
+  /// Construct a DaeBuilder instance
+  explicit DaeBuilder(const std::string& name, const std::string& path = "");
 
   /** \brief Name of instance */
   const std::string& name() const;
@@ -356,6 +356,21 @@ public:
   Function dependent_fun(const std::string& fname,
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const;
+
+  /** \brief  Load a function from an FMU DLL
+    \param name    Name assigned to the resulting function object
+    \param id_in   Identifiers of all the inputs
+    \param id_out  Identifiers of all the outputs
+    \param name_in   Names of all the inputs
+    \param name_out  Names of all the outputs
+    \param opts    Optional settings
+  */
+  Function fmu_fun(const std::string& name,
+      const std::vector<std::vector<casadi_int>>& id_in,
+      const std::vector<std::vector<casadi_int>>& id_out,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts=Dict()) const;
   ///@}
 
   /// Get variable expression by name

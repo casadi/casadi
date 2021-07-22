@@ -26,7 +26,7 @@
 #ifndef CASADI_FMU_FUNCTION_IMPL_HPP
 #define CASADI_FMU_FUNCTION_IMPL_HPP
 
-#include "fmu_function.hpp"
+#include "dae_builder_internal.hpp"
 #include "function_internal.hpp"
 #include "importer.hpp"
 
@@ -101,12 +101,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
 
   /** \brief Constructor */
-  FmuFunction(const std::string& name, const std::string& path,
+  FmuFunction(const DaeBuilderInternal& dae,
+      const std::string& name,
       const std::vector<std::vector<casadi_int>>& id_in,
       const std::vector<std::vector<casadi_int>>& id_out,
       const std::vector<std::string>& name_in,
-      const std::vector<std::string>& name_out,
-      const std::string& guid);
+      const std::vector<std::string>& name_out);
 
   /** \brief Destructor */
   ~FmuFunction() override;

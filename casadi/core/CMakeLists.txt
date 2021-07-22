@@ -66,7 +66,6 @@ set(CASADI_PUBLIC
   expm.hpp
   code_generator.hpp
   importer.hpp
-  fmu_function.hpp
 
   # MISC useful stuff
   integration_tools.hpp
