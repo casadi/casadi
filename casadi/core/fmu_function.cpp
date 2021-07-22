@@ -37,8 +37,8 @@ namespace casadi {
 #ifdef WITH_FMU
 
 FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
-    const std::vector<std::vector<casadi_int>>& id_in,
-    const std::vector<std::vector<casadi_int>>& id_out,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out)
   : FunctionInternal(name), dae_(dae) {
@@ -46,13 +46,15 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   id_in_.resize(id_in.size());
   for (size_t k = 0; k < id_in.size(); ++k) {
     id_in_[k].resize(id_in[k].size());
-    std::copy(id_in[k].begin(), id_in[k].end(), id_in_[k].begin());
+    for (size_t i = 0; i < id_in[k].size(); ++i)
+      id_in_[k][i] = dae_->variable(id_in[k][i]).value_reference;
   }
   // Cast id_out to right type
   id_out_.resize(id_out.size());
   for (size_t k = 0; k < id_out.size(); ++k) {
     id_out_[k].resize(id_out[k].size());
-    std::copy(id_out[k].begin(), id_out[k].end(), id_out_[k].begin());
+    for (size_t i = 0; i < id_out[k].size(); ++i)
+      id_out_[k][i] = dae_->variable(id_out[k][i]).value_reference;
   }
   // Names of inputs
   if (!name_in.empty()) {

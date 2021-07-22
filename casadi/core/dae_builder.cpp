@@ -767,7 +767,20 @@ Function DaeBuilder::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_out,
     const Dict& opts) const {
   try {
-    return (*this)->fmu_fun(name, id_in, id_out, name_in, name_out, opts);
+    // Convert id_in type
+    std::vector<std::vector<size_t>> id_in1(id_in.size());
+    for (size_t k = 0; k < id_in.size(); ++k) {
+      id_in1[k].resize(id_in[k].size());
+      std::copy(id_in[k].begin(), id_in[k].end(), id_in1[k].begin());
+    }
+    // Convert id_out type
+    std::vector<std::vector<size_t>> id_out1(id_out.size());
+    for (size_t k = 0; k < id_out.size(); ++k) {
+      id_out1[k].resize(id_out[k].size());
+      std::copy(id_out[k].begin(), id_out[k].end(), id_out1[k].begin());
+    }
+    // Call internal routine
+    return (*this)->fmu_fun(name, id_in1, id_out1, name_in, name_out, opts);
   } catch (std::exception& e) {
     THROW_ERROR("fmu_fun", e.what());
     return Function(); // never reached

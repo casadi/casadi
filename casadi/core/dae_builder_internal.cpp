@@ -292,13 +292,13 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   // All expressions
   std::vector<MX> var_xd;
   // All value references
-  std::vector<casadi_int> id_xd, id_xn, id_yd, id_yn;
+  std::vector<size_t> id_xd, id_xn, id_yd, id_yn;
   // Get the IDs and expressions of the initial unknowns
   id_xd.reserve(u_.size() + x_.size());
   var_xd.reserve(u_.size() + x_.size());
   for (auto& v : {u_, x_}) {
     for (size_t k : v) {
-      id_xd.push_back(variable(k).value_reference);
+      id_xd.push_back(k);
       var_xd.push_back(variable(k).v);
     }
   }
@@ -1745,8 +1745,8 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
 }
 
 Function DaeBuilderInternal::fmu_fun(const std::string& name,
-    const std::vector<std::vector<casadi_int>>& id_in,
-    const std::vector<std::vector<casadi_int>>& id_out,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
     const Dict& opts) const {

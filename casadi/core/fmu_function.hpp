@@ -96,8 +96,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /** \brief Constructor */
   FmuFunction(const std::string& name, const DaeBuilder& dae,
-      const std::vector<std::vector<casadi_int>>& id_in,
-      const std::vector<std::vector<casadi_int>>& id_out,
+      const std::vector<std::vector<size_t>>& id_in,
+      const std::vector<std::vector<size_t>>& id_out,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out);
 

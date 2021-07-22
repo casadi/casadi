@@ -230,8 +230,8 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Construct a function from an FMU DLL
   Function fmu_fun(const std::string& name,
-      const std::vector<std::vector<casadi_int>>& id_in,
-      const std::vector<std::vector<casadi_int>>& id_out,
+      const std::vector<std::vector<size_t>>& id_in,
+      const std::vector<std::vector<size_t>>& id_out,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const Dict& opts) const;
