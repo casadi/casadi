@@ -2656,7 +2656,16 @@ namespace casadi {
   std::string CodeGenerator::
   file_slurp(const std::string& fname, casadi_int n, const std::string& a) {
     add_auxiliary(CodeGenerator::AUX_FILE_SLURP);
-    return "casadi_file_slurp(\"" + fname + "\", " + str(n) + ", " + a + ")";
+
+    std::string escaped = fname;
+
+    std::string::size_type offset = 0;
+    while ((offset = escaped.find("\\", offset)) != std::string::npos) {
+      escaped.replace(offset, 1, "\\\\");
+      offset += 2;
+    }
+
+    return "casadi_file_slurp(\"" + escaped + "\", " + str(n) + ", " + a + ")";
   }
 
   std::string CodeGenerator::
