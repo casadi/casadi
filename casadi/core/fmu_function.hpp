@@ -59,7 +59,7 @@ namespace casadi {
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
   // Value reference to the inputs and outputs
-  std::vector<std::vector<casadi_int>> id_in_, id_out_;
+  std::vector<std::vector<fmi2ValueReference>> id_in_, id_out_;
 
   // Information from DaeBuilder instance
   std::string path_;
@@ -75,9 +75,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Path to the FMU resource directory
   std::string resource_loc_;
-
-  // Component references
-  std::vector<fmi2ValueReference> xd_, xn_, yd_, yn_;
 
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
@@ -118,12 +115,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   size_t get_n_in() override { return id_in_.size();}
   size_t get_n_out() override {return id_out_.size();}
   ///@}
-
-  /// @{
-  /** \brief Retreive differentiability */
-  bool get_diff_in(casadi_int i) override {return i == 0;}
-  bool get_diff_out(casadi_int i) override {return i == 0;}
-  /// @}
 
   /// @{
   /** \brief Retreive sparsities */
@@ -175,6 +166,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     fmi2Status status,
     fmi2String category,
     fmi2String message, ...);
+
+  // Pass inputs to FMU
+  int set_inputs(const double** x) const;
 };
 
 /** Jacobian */
