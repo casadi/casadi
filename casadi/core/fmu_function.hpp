@@ -79,6 +79,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
   fmi2FreeInstanceTYPE* free_instance_;
+  fmi2ResetTYPE* reset_;
   fmi2SetupExperimentTYPE* setup_experiment_;
   fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
   fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
@@ -88,8 +89,11 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   fmi2GetRealTYPE* get_real_;
   fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
 
-  // Pointer to instance
+  // Pointer to instance (move to memory class)
   fmi2Component c_;
+
+  // First run
+  mutable bool first_run_;
 
  public:
 
@@ -169,6 +173,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Pass inputs to FMU
   int set_inputs(const double** x) const;
+
+  // Get/calculate outputs
+  int get_outputs(double** r) const;
 };
 
 /** Jacobian */

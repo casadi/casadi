@@ -72,6 +72,7 @@ FmuFunction::FmuFunction(const DaeBuilderInternal& dae,
   // Initialize to null pointers
   instantiate_ = 0;
   free_instance_ = 0;
+  reset_ = 0;
   setup_experiment_ = 0;
   enter_initialization_mode_ = 0;
   exit_initialization_mode_ = 0;
@@ -107,6 +108,7 @@ void FmuFunction::init(const Dict& opts) {
   // Load functions
   instantiate_ = reinterpret_cast<fmi2InstantiateTYPE*>(get_function("fmi2Instantiate"));
   free_instance_ = reinterpret_cast<fmi2FreeInstanceTYPE*>(get_function("fmi2FreeInstance"));
+  reset_ = reinterpret_cast<fmi2ResetTYPE*>(get_function("fmi2Reset"));
   setup_experiment_ = reinterpret_cast<fmi2SetupExperimentTYPE*>(
     get_function("fmi2SetupExperiment"));
   enter_initialization_mode_ = reinterpret_cast<fmi2EnterInitializationModeTYPE*>(
@@ -140,23 +142,7 @@ void FmuFunction::init(const Dict& opts) {
   c_ = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
     &functions_, visible, loggingOn);
   if (c_ == 0) casadi_error("fmi2Instantiate failed");
-
-  // Reset solver
-  fmi2Status status = setup_experiment_(c_, fmi2False, 0.0, 0., fmi2True, 1.);
-  if (status != fmi2OK) casadi_error("fmi2SetupExperiment failed");
-
-  // Initialization mode begins
-  status = enter_initialization_mode_(c_);
-  if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
-
-  // Initialization mode ends
-  status = exit_initialization_mode_(c_);
-  if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
-
-  // Continuous time mode only for event mode
-  // status = enter_continuous_time_mode_(c_);
-  // if (status != fmi2OK) casadi_error("fmi2EnterContinuousTimeMode failed: " + str(status));
-  // uout() << "enter_continuous_time_mode_ done" << std::endl;
+  first_run_ = true;
 }
 
 std::string FmuFunction::system_infix() {
@@ -207,6 +193,24 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
 }
 
 int FmuFunction::set_inputs(const double** x) const {
+  // Reset solver
+  if (first_run_) {
+    // Need to reset if time called again
+    first_run_ = false;
+  } else {
+    // Reset solver
+    fmi2Status status = reset_(c_);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2Reset failed");
+      return 1;
+    }
+  }
+
+  // Reset solver
+  fmi2Status status = setup_experiment_(c_, fmi2False, 0.0, 0., fmi2True, 1.);
+  if (status != fmi2OK) casadi_error("fmi2SetupExperiment failed");
+
+  // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     // Set input k
     if (x[k]) {
@@ -229,32 +233,39 @@ int FmuFunction::set_inputs(const double** x) const {
       }
     }
   }
+
+  // Initialization mode begins
+  status = enter_initialization_mode_(c_);
+  if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
+
+  // Initialization mode ends
+  status = exit_initialization_mode_(c_);
+  if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
+
   // Success
+  return 0;
+}
+
+int FmuFunction::get_outputs(double** r) const {
+  for (size_t k = 0; k < id_out_.size(); ++k) {
+    if (r[k]) {
+      // If output is requested
+      fmi2Status status = get_real_(c_, get_ptr(id_out_[k]), id_out_[k].size(), r[k]);
+      if (status != fmi2OK) {
+        casadi_warning("fmi2GetReal failed for output '" + name_out_[k] + "'");
+        return 1;
+      }
+    }
+  }
   return 0;
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
-  // Return flag
-  fmi2Status status;
-
-  // Initialization mode begins
-  // status = enter_initialization_mode_(c_);
-  // if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
-
   // Pass inputs
   if (set_inputs(arg)) return 1;
-
-  // Evaluate
-  if (res[0]) {
-    status = get_real_(c_, get_ptr(id_out_[0]), id_out_[0].size(), res[0]);
-    if (status != fmi2OK) casadi_error("fmi2GetReal failed for output '" + name_out_[0] + "'");
-  }
-
-  // Initialization mode ends
-  // status = exit_initialization_mode_(c_);
-  // if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
-
+  // Evaluate and get outputs
+  if (get_outputs(res)) return 1;
   return 0;
 }
 
