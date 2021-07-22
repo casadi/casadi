@@ -310,9 +310,7 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   // Create an FMU function
   Dict opts = {
     {"enable_fd", !provides_directional_derivative_},
-    {"fd_method", "smoothing"},
-    {"provides_directional_derivative", provides_directional_derivative_},
-    {"instance_name", model_identifier_}};
+    {"fd_method", "smoothing"}};
   Function fmu = fmu_fun(name_, {id_xd, id_xn}, {id_yd, id_yn}, {"xd", "xn"}, {"yd", "yn"}, opts);
   add_fun(fmu);
   // Auxiliary variables for xd

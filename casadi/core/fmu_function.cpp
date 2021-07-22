@@ -41,8 +41,7 @@ FmuFunction::FmuFunction(const DaeBuilderInternal& dae,
     const std::vector<std::vector<casadi_int>>& id_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out)
-  : FunctionInternal(name),
-    path_(dae.path_), id_in_(id_in), id_out_(id_out), guid_(dae.guid_) {
+  : FunctionInternal(name), id_in_(id_in), id_out_(id_out) {
   // Names of inputs
   if (!name_in.empty()) {
     casadi_assert(id_in.size()==name_in.size(),
@@ -55,9 +54,11 @@ FmuFunction::FmuFunction(const DaeBuilderInternal& dae,
     "Mismatching number of output names");
     name_out_ = name_out;
   }
-  // Options
-  provides_directional_derivative_ = false;
-  instance_name_ = name_;
+  // Information from DaeBuilder instance
+  path_ = dae.path_;
+  guid_ = dae.guid_;
+  instance_name_ = dae.model_identifier_;
+  provides_directional_derivative_ = dae.provides_directional_derivative_;
   // Initialize to null pointers
   instantiate_ = 0;
   free_instance_ = 0;
@@ -78,32 +79,12 @@ FmuFunction::~FmuFunction() {
   clear_mem();
 }
 
-const Options FmuFunction::options_
-= {{&FunctionInternal::options_},
-   {{"provides_directional_derivative",
-    {OT_BOOL,
-      "Does the FMU support the calculation of directional derivatives"}},
-    {"instance_name",
-     {OT_STRING,
-      "Name of the instance"}}
-   }
-};
-
 void FmuFunction::init(const Dict& opts) {
   // Consistency checks
   casadi_assert(id_in_.size() == 2,
     "Expected two input lists: differentiated and nondifferentiated variables");
   casadi_assert(id_out_.size() == 2,
     "Expected two output lists: differentiated and nondifferentiated variables");
-
-  // Read options
-  for (auto&& op : opts) {
-    if (op.first == "provides_directional_derivative") {
-      provides_directional_derivative_ = op.second;
-    } else if (op.first == "instance_name") {
-      instance_name_ = op.second.to_string();
-    }
-  }
 
   // Call the initialization method of the base class
   FunctionInternal::init(opts);

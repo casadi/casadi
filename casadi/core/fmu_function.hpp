@@ -58,14 +58,14 @@ namespace casadi {
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
-  // Path to the unpacked FMU
-  std::string path_;
-
   // Value reference to the inputs and outputs
   std::vector<std::vector<casadi_int>> id_in_, id_out_;
 
-  // Global unique identifier
-  const std::string guid_;
+  // Information from DaeBuilder instance
+  std::string path_;
+  std::string guid_;
+  std::string instance_name_;
+  bool provides_directional_derivative_;
 
   /** \brief Information about the library */
   Importer li_;
@@ -75,10 +75,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Path to the FMU resource directory
   std::string resource_loc_;
-
-  // User-set options
-  bool provides_directional_derivative_;
-  std::string instance_name_;
 
   // Component references
   std::vector<fmi2ValueReference> xd_, xn_, yd_, yn_;
@@ -114,19 +110,13 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunction";}
 
-  ///@{
-  /** \brief Options */
-  static const Options options_;
-  const Options& get_options() const override { return options_;}
-  ///@}
-
   /// Initialize
   void init(const Dict& opts) override;
 
   ///@{
   /** \brief Number of function inputs and outputs */
-  size_t get_n_in() override { return 2;}
-  size_t get_n_out() override {return 2;}
+  size_t get_n_in() override { return id_in_.size();}
+  size_t get_n_out() override {return id_out_.size();}
   ///@}
 
   /// @{
