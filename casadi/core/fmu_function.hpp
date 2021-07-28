@@ -56,6 +56,15 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
+struct CASADI_EXPORT FmuFunctionMemory : public FunctionMemory {
+  // Pointer to instance
+  fmi2Component c;
+
+  // First run
+  bool first_run;
+};
+
+
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
   // DaeBuilder instance
@@ -86,12 +95,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   fmi2GetRealTYPE* get_real_;
   fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
 
-  // Pointer to instance (move to memory class)
-  fmi2Component c_;
-
-  // First run
-  mutable bool first_run_;
-
  public:
 
   /** \brief Constructor */
@@ -109,6 +112,15 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /// Initialize
   void init(const Dict& opts) override;
+
+  /** \brief Create memory block */
+  void* alloc_mem() const override { return new FmuFunctionMemory();}
+
+  /** \brief Initalize memory block */
+  int init_mem(void* mem) const override;
+
+  /** \brief Free memory block */
+  void free_mem(void *mem) const override;
 
   ///@{
   /** \brief Number of function inputs and outputs */
@@ -166,10 +178,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     fmi2String message, ...);
 
   // Pass inputs to FMU
-  int set_inputs(const double** x) const;
+  int set_inputs(FmuFunctionMemory* m, const double** x) const;
 
   // Get/calculate outputs
-  int get_outputs(double** r) const;
+  int get_outputs(FmuFunctionMemory* m, double** r) const;
 };
 
 /** Jacobian */
@@ -183,6 +195,15 @@ class CASADI_EXPORT FmuFunctionJac : public FunctionInternal {
 
   /// Initialize
   void init(const Dict& opts) override;
+
+  /** \brief Create memory block */
+  void* alloc_mem() const override { return new FmuFunctionMemory();}
+
+  /** \brief Initalize memory block */
+  int init_mem(void* mem) const override;
+
+  /** \brief Free memory block */
+  void free_mem(void *mem) const override;
 
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunctionJac";}
@@ -202,6 +223,15 @@ class CASADI_EXPORT FmuFunctionAdj : public FunctionInternal {
 
   /// Initialize
   void init(const Dict& opts) override;
+
+  /** \brief Create memory block */
+  void* alloc_mem() const override { return new FmuFunctionMemory();}
+
+  /** \brief Initalize memory block */
+  int init_mem(void* mem) const override;
+
+  /** \brief Free memory block */
+  void free_mem(void *mem) const override;
 
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunctionAdj";}
