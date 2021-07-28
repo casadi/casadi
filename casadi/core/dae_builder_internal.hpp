@@ -30,6 +30,13 @@
 
 #include "dae_builder.hpp"
 #include "shared_object_internal.hpp"
+#include "importer.hpp"
+
+#ifdef WITH_FMU
+//#include <fmi2FunctionTypes.h>
+#include <fmi2Functions.h>
+//#include <fmi2TypesPlatform.h>
+#endif  // WITH_FMU
 
 namespace casadi {
 

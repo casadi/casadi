@@ -36,6 +36,51 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
+Fmu::Fmu() {
+  // Initialize to null pointers
+  instantiate_ = 0;
+  free_instance_ = 0;
+  reset_ = 0;
+  setup_experiment_ = 0;
+  enter_initialization_mode_ = 0;
+  exit_initialization_mode_ = 0;
+  enter_continuous_time_mode_ = 0;
+  set_real_ = 0;
+  set_boolean_ = 0;
+  get_real_ = 0;
+  get_directional_derivative_ = 0;
+}
+
+void Fmu::init(bool provides_directional_derivative) {
+  instantiate_ = reinterpret_cast<fmi2InstantiateTYPE*>(get_function("fmi2Instantiate"));
+  free_instance_ = reinterpret_cast<fmi2FreeInstanceTYPE*>(get_function("fmi2FreeInstance"));
+  reset_ = reinterpret_cast<fmi2ResetTYPE*>(get_function("fmi2Reset"));
+  setup_experiment_ = reinterpret_cast<fmi2SetupExperimentTYPE*>(
+    get_function("fmi2SetupExperiment"));
+  enter_initialization_mode_ = reinterpret_cast<fmi2EnterInitializationModeTYPE*>(
+    get_function("fmi2EnterInitializationMode"));
+  exit_initialization_mode_ = reinterpret_cast<fmi2ExitInitializationModeTYPE*>(
+    get_function("fmi2ExitInitializationMode"));
+  enter_continuous_time_mode_ = reinterpret_cast<fmi2EnterContinuousTimeModeTYPE*>(
+    get_function("fmi2EnterContinuousTimeMode"));
+  set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
+  set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
+  get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(get_function("fmi2GetReal"));
+  if (provides_directional_derivative) {
+    get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
+      get_function("fmi2GetDirectionalDerivative"));
+  }
+}
+
+signal_t Fmu::get_function(const std::string& symname) {
+  // Load the function
+  signal_t f = li_.get_function(symname);
+  // Ensure that it was found
+  casadi_assert(f != 0, "Cannot retrieve '" + symname + "'");
+  // Return function to be type converted
+  return f;
+}
+
 FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     const std::vector<std::vector<size_t>>& id_in,
     const std::vector<std::vector<size_t>>& id_out,
@@ -52,18 +97,6 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     casadi_assert(id_out.size() == name_out.size(), "Mismatching number of output names");
     name_out_ = name_out;
   }
-  // Initialize to null pointers
-  instantiate_ = 0;
-  free_instance_ = 0;
-  reset_ = 0;
-  setup_experiment_ = 0;
-  enter_initialization_mode_ = 0;
-  exit_initialization_mode_ = 0;
-  enter_continuous_time_mode_ = 0;
-  set_real_ = 0;
-  set_boolean_ = 0;
-  get_real_ = 0;
-  get_directional_derivative_ = 0;
 }
 
 FmuFunction::~FmuFunction() {
@@ -104,27 +137,10 @@ void FmuFunction::init(const Dict& opts) {
   resource_loc_ = "file://" + dae->path_ + "/resources";
 
   // Load the DLL
-  li_ = Importer(dll_path, "dll");
+  fmu_.li_ = Importer(dll_path, "dll");
 
   // Load functions
-  instantiate_ = reinterpret_cast<fmi2InstantiateTYPE*>(get_function("fmi2Instantiate"));
-  free_instance_ = reinterpret_cast<fmi2FreeInstanceTYPE*>(get_function("fmi2FreeInstance"));
-  reset_ = reinterpret_cast<fmi2ResetTYPE*>(get_function("fmi2Reset"));
-  setup_experiment_ = reinterpret_cast<fmi2SetupExperimentTYPE*>(
-    get_function("fmi2SetupExperiment"));
-  enter_initialization_mode_ = reinterpret_cast<fmi2EnterInitializationModeTYPE*>(
-    get_function("fmi2EnterInitializationMode"));
-  exit_initialization_mode_ = reinterpret_cast<fmi2ExitInitializationModeTYPE*>(
-    get_function("fmi2ExitInitializationMode"));
-  enter_continuous_time_mode_ = reinterpret_cast<fmi2EnterContinuousTimeModeTYPE*>(
-    get_function("fmi2EnterContinuousTimeMode"));
-  set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
-  set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
-  get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(get_function("fmi2GetReal"));
-  if (dae->provides_directional_derivative_) {
-    get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
-      get_function("fmi2GetDirectionalDerivative"));
-  }
+  fmu_.init(dae->provides_directional_derivative_);
 
   // Callback functions
   functions_.logger = logger;
@@ -149,7 +165,7 @@ int FmuFunction::init_mem(void* mem) const {
   fmi2String fmuResourceLocation = resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
   fmi2Boolean loggingOn = fmi2False;
-  m->c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
+  m->c = fmu_.instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
     &functions_, visible, loggingOn);
   if (m->c == 0) casadi_error("fmi2Instantiate failed");
   m->first_run = true;
@@ -159,7 +175,7 @@ int FmuFunction::init_mem(void* mem) const {
 
 void FmuFunction::free_mem(void *mem) const {
   auto m = static_cast<FmuFunctionMemory*>(mem);
-  if (m->c && free_instance_) free_instance_(m->c);
+  if (m->c && fmu_.free_instance_) fmu_.free_instance_(m->c);
   delete m;
 }
 
@@ -209,15 +225,6 @@ std::string FmuFunction::dll_suffix() {
 #endif
 }
 
-signal_t FmuFunction::get_function(const std::string& symname) {
-  // Load the function
-  signal_t f = li_.get_function(symname);
-  // Ensure that it was found
-  casadi_assert(f != 0, "Cannot retrieve '" + symname + "'");
-  // Return function to be type converted
-  return f;
-}
-
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
   return Sparsity::dense(id_in_.at(i).size(), 1);
 }
@@ -233,7 +240,7 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
     m->first_run = false;
   } else {
     // Reset solver
-    fmi2Status status = reset_(m->c);
+    fmi2Status status = fmu_.reset_(m->c);
     if (status != fmi2OK) {
       casadi_warning("fmi2Reset failed");
       return 1;
@@ -241,7 +248,7 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   }
 
   // Reset solver
-  fmi2Status status = setup_experiment_(m->c, fmi2False, 0.0, 0., fmi2True, 1.);
+  fmi2Status status = fmu_.setup_experiment_(m->c, fmi2False, 0.0, 0., fmi2True, 1.);
   if (status != fmi2OK) casadi_error("fmi2SetupExperiment failed");
 
   // Set inputs
@@ -249,7 +256,7 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
     // Set input k
     if (x[k]) {
       // Input is available
-      fmi2Status status = set_real_(m->c, get_ptr(vref_in_[k]), vref_in_[k].size(), x[k]);
+      fmi2Status status = fmu_.set_real_(m->c, get_ptr(vref_in_[k]), vref_in_[k].size(), x[k]);
       if (status != fmi2OK) {
         casadi_warning("fmi2SetReal failed for input '" + name_in_[k] + "'");
         return 1;
@@ -258,7 +265,7 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
       // Input is null (zero)
       static const double zero = 0;
       for (size_t i = 0; i < vref_in_[k].size(); ++i) {
-        fmi2Status status = set_real_(m->c, &vref_in_[k][i], 1, &zero);
+        fmi2Status status = fmu_.set_real_(m->c, &vref_in_[k][i], 1, &zero);
         if (status != fmi2OK) {
           casadi_warning("fmi2SetReal failed for input '" + name_in_[k] + "', component " + str(i)
             + " (value reference " + str(vref_in_[k][i]) + ")" );
@@ -269,11 +276,11 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   }
 
   // Initialization mode begins
-  status = enter_initialization_mode_(m->c);
+  status = fmu_.enter_initialization_mode_(m->c);
   if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
 
   // Initialization mode ends
-  status = exit_initialization_mode_(m->c);
+  status = fmu_.exit_initialization_mode_(m->c);
   if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
 
   // Success
@@ -284,7 +291,7 @@ int FmuFunction::get_outputs(FmuFunctionMemory* m, double** r) const {
   for (size_t k = 0; k < vref_out_.size(); ++k) {
     if (r[k]) {
       // If output is requested
-      fmi2Status status = get_real_(m->c, get_ptr(vref_out_[k]), vref_out_[k].size(), r[k]);
+      fmi2Status status = fmu_.get_real_(m->c, get_ptr(vref_out_[k]), vref_out_[k].size(), r[k]);
       if (status != fmi2OK) {
         casadi_warning("fmi2GetReal failed for output '" + name_out_[k] + "'");
         return 1;
@@ -328,7 +335,7 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
     // Set seed for column i
     fwd_xd[i] = 1.;
     // Calculate directional derivative
-    status = get_directional_derivative_(m->c, get_ptr(vref_out_[0]), vref_out_[0].size(),
+    status = fmu_.get_directional_derivative_(m->c, get_ptr(vref_out_[0]), vref_out_[0].size(),
       get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetDirectionalDerivative failed");
@@ -373,7 +380,7 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
     // Set seed for column i
     fwd_xd[i] = 1.;
     // Calculate directional derivative
-    status = get_directional_derivative_(m->c, get_ptr(vref_out_[0]), vref_out_[0].size(),
+    status = fmu_.get_directional_derivative_(m->c, get_ptr(vref_out_[0]), vref_out_[0].size(),
       get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetDirectionalDerivative failed");

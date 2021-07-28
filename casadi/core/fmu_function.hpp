@@ -27,14 +27,8 @@
 #define CASADI_FMU_FUNCTION_IMPL_HPP
 
 #include "function_internal.hpp"
-#include "dae_builder.hpp"
-#include "importer.hpp"
+#include "dae_builder_internal.hpp"
 
-#ifdef WITH_FMU
-//#include <fmi2FunctionTypes.h>
-#include <fmi2Functions.h>
-//#include <fmi2TypesPlatform.h>
-#endif  // WITH_FMU
 
 /// \cond INTERNAL
 
@@ -50,25 +44,18 @@ struct CASADI_EXPORT FmuFunctionMemory : public FunctionMemory {
   bool first_run;
 };
 
-class CASADI_EXPORT FmuFunction : public FunctionInternal {
- protected:
-  // DaeBuilder instance (non-owning reference to avoid circular dependency)
-  WeakRef dae_;
+struct CASADI_EXPORT Fmu {
+  // Constructor
+  Fmu();
 
-  // Variable references for inputs and outputs
-  std::vector<std::vector<size_t>> id_in_, id_out_;
+  // Initialize
+  void init(bool provides_directional_derivative);
 
-  // Value reference to the inputs and outputs
-  std::vector<std::vector<fmi2ValueReference>> vref_in_, vref_out_;
+  // Load an FMI function
+  signal_t get_function(const std::string& symname);
 
-  /** \brief Information about the library */
+  // DLL
   Importer li_;
-
-  // Callback functions
-  fmi2CallbackFunctions functions_;
-
-  // Path to the FMU resource directory
-  std::string resource_loc_;
 
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
@@ -82,6 +69,28 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   fmi2SetBooleanTYPE* set_boolean_;
   fmi2GetRealTYPE* get_real_;
   fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
+};
+
+
+class CASADI_EXPORT FmuFunction : public FunctionInternal {
+ protected:
+  // DaeBuilder instance (non-owning reference to avoid circular dependency)
+  WeakRef dae_;
+
+  // Variable references for inputs and outputs
+  std::vector<std::vector<size_t>> id_in_, id_out_;
+
+  // Value reference to the inputs and outputs
+  std::vector<std::vector<fmi2ValueReference>> vref_in_, vref_out_;
+
+  // Callback functions
+  fmi2CallbackFunctions functions_;
+
+  // Path to the FMU resource directory
+  std::string resource_loc_;
+
+  // The actual FMU
+  Fmu fmu_;
 
  public:
 
@@ -154,9 +163,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // DLL suffix, per the FMI specification
   static std::string dll_suffix();
-
-  // Load an FMI function
-  signal_t get_function(const std::string& symname);
 
   // Process message
   static void logger(fmi2ComponentEnvironment componentEnvironment,
