@@ -50,11 +50,10 @@ struct CASADI_EXPORT FmuFunctionMemory : public FunctionMemory {
   bool first_run;
 };
 
-
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
-  // DaeBuilder instance
-  DaeBuilder dae_;
+  // DaeBuilder instance (non-owning reference to avoid circular dependency)
+  WeakRef dae_;
 
   // Variable references for inputs and outputs
   std::vector<std::vector<size_t>> id_in_, id_out_;

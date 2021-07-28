@@ -75,29 +75,33 @@ void FmuFunction::init(const Dict& opts) {
   // Call the initialization method of the base class
   FunctionInternal::init(opts);
 
+  // Get a pointer to the DaeBuilder class
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+
   // Cast id_in to right type
   vref_in_.resize(id_in_.size());
   for (size_t k = 0; k < id_in_.size(); ++k) {
     vref_in_[k].resize(id_in_[k].size());
     for (size_t i = 0; i < id_in_[k].size(); ++i)
-      vref_in_[k][i] = dae_->variable(id_in_[k][i]).value_reference;
+      vref_in_[k][i] = dae->variable(id_in_[k][i]).value_reference;
   }
   // Cast id_out to right type
   vref_out_.resize(id_out_.size());
   for (size_t k = 0; k < id_out_.size(); ++k) {
     vref_out_[k].resize(id_out_[k].size());
     for (size_t i = 0; i < id_out_[k].size(); ++i)
-      vref_out_[k][i] = dae_->variable(id_out_[k][i]).value_reference;
+      vref_out_[k][i] = dae->variable(id_out_[k][i]).value_reference;
   }
 
   // Directory where the DLL is stored, per the FMI specification
-  std::string instance_name_no_dot = dae_->model_identifier_;
+  std::string instance_name_no_dot = dae->model_identifier_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = dae_->path_ + "/binaries/" + system_infix()
+  std::string dll_path = dae->path_ + "/binaries/" + system_infix()
     + "/" + instance_name_no_dot + dll_suffix();
 
   // Path to resource directory
-  resource_loc_ = "file://" + dae_->path_ + "/resources";
+  resource_loc_ = "file://" + dae->path_ + "/resources";
 
   // Load the DLL
   li_ = Importer(dll_path, "dll");
@@ -117,7 +121,7 @@ void FmuFunction::init(const Dict& opts) {
   set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
   set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
   get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(get_function("fmi2GetReal"));
-  if (dae_->provides_directional_derivative_) {
+  if (dae->provides_directional_derivative_) {
     get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
       get_function("fmi2GetDirectionalDerivative"));
   }
@@ -134,10 +138,14 @@ int FmuFunction::init_mem(void* mem) const {
   if (FunctionInternal::init_mem(mem)) return 1;
   auto m = static_cast<FmuFunctionMemory*>(mem);
 
+  // Get a pointer to the DaeBuilder class
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+
   // Create instance
-  fmi2String instanceName = dae_->model_identifier_.c_str();
+  fmi2String instanceName = dae->model_identifier_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
-  fmi2String fmuGUID = dae_->guid_.c_str();
+  fmi2String fmuGUID = dae->guid_.c_str();
   fmi2String fmuResourceLocation = resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
   fmi2Boolean loggingOn = fmi2False;
@@ -381,7 +389,9 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
 }
 
 bool FmuFunction::has_jacobian() const {
-  return dae_->provides_directional_derivative_;
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  return dae->provides_directional_derivative_;
 }
 
 Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
@@ -396,7 +406,9 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
 }
 
 bool FmuFunction::has_reverse(casadi_int nadj) const {
-  return dae_->provides_directional_derivative_ && nadj == 1;
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  return dae->provides_directional_derivative_ && nadj == 1;
 }
 
 Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
