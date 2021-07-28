@@ -41,21 +41,7 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     const std::vector<std::vector<size_t>>& id_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out)
-  : FunctionInternal(name), dae_(dae) {
-  // Cast id_in to right type
-  vref_in_.resize(id_in.size());
-  for (size_t k = 0; k < id_in.size(); ++k) {
-    vref_in_[k].resize(id_in[k].size());
-    for (size_t i = 0; i < id_in[k].size(); ++i)
-      vref_in_[k][i] = dae_->variable(id_in[k][i]).value_reference;
-  }
-  // Cast id_out to right type
-  vref_out_.resize(id_out.size());
-  for (size_t k = 0; k < id_out.size(); ++k) {
-    vref_out_[k].resize(id_out[k].size());
-    for (size_t i = 0; i < id_out[k].size(); ++i)
-      vref_out_[k][i] = dae_->variable(id_out[k][i]).value_reference;
-  }
+  : FunctionInternal(name), dae_(dae), id_in_(id_in), id_out_(id_out) {
   // Names of inputs
   if (!name_in.empty()) {
     casadi_assert(id_in.size() == name_in.size(), "Mismatching number of input names");
@@ -88,6 +74,22 @@ FmuFunction::~FmuFunction() {
 void FmuFunction::init(const Dict& opts) {
   // Call the initialization method of the base class
   FunctionInternal::init(opts);
+
+  // Cast id_in to right type
+  vref_in_.resize(id_in_.size());
+  for (size_t k = 0; k < id_in_.size(); ++k) {
+    vref_in_[k].resize(id_in_[k].size());
+    for (size_t i = 0; i < id_in_[k].size(); ++i)
+      vref_in_[k][i] = dae_->variable(id_in_[k][i]).value_reference;
+  }
+  // Cast id_out to right type
+  vref_out_.resize(id_out_.size());
+  for (size_t k = 0; k < id_out_.size(); ++k) {
+    vref_out_[k].resize(id_out_[k].size());
+    for (size_t i = 0; i < id_out_[k].size(); ++i)
+      vref_out_[k][i] = dae_->variable(id_out_[k][i]).value_reference;
+  }
+
   // Directory where the DLL is stored, per the FMI specification
   std::string instance_name_no_dot = dae_->model_identifier_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
@@ -209,11 +211,11 @@ signal_t FmuFunction::get_function(const std::string& symname) {
 }
 
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
-  return Sparsity::dense(vref_in_.at(i).size(), 1);
+  return Sparsity::dense(id_in_.at(i).size(), 1);
 }
 
 Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
-  return Sparsity::dense(vref_out_.at(i).size(), 1);
+  return Sparsity::dense(id_out_.at(i).size(), 1);
 }
 
 int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {

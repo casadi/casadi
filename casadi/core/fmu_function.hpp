@@ -70,6 +70,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // DaeBuilder instance
   DaeBuilder dae_;
 
+  // Variable references for inputs and outputs
+  std::vector<std::vector<size_t>> id_in_, id_out_;
+
   // Value reference to the inputs and outputs
   std::vector<std::vector<fmi2ValueReference>> vref_in_, vref_out_;
 
@@ -124,8 +127,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   ///@{
   /** \brief Number of function inputs and outputs */
-  size_t get_n_in() override { return vref_in_.size();}
-  size_t get_n_out() override {return vref_out_.size();}
+  size_t get_n_in() override { return id_in_.size();}
+  size_t get_n_out() override {return id_out_.size();}
   ///@}
 
   /// @{
