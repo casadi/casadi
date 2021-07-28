@@ -36,20 +36,6 @@
 //#include <fmi2TypesPlatform.h>
 #endif  // WITH_FMU
 
-#ifdef WITH_DL
-#ifdef _WIN32 // also for 64-bit
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0502
-#endif
-#include <windows.h>
-#else // _WIN32
-#include <dlfcn.h>
-#endif // _WIN32
-#endif // WITH_DL
-
 /// \cond INTERNAL
 
 namespace casadi {
