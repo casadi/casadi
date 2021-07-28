@@ -128,18 +128,6 @@ void FmuFunction::init(const Dict& opts) {
   functions_.componentEnvironment = 0;
 }
 
-void* FmuFunction::alloc_mem() const {
-  return new FmuFunctionMemory(*this);
-}
-
-void* FmuFunctionJac::alloc_mem() const {
-  return new FmuFunctionMemory(*derivative_of_.get<FmuFunction>());
-}
-
-void* FmuFunctionAdj::alloc_mem() const {
-  return new FmuFunctionMemory(*derivative_of_.get<FmuFunction>());
-}
-
 int FmuFunction::init_mem(void* mem) const {
   if (FunctionInternal::init_mem(mem)) return 1;
   auto m = static_cast<FmuFunctionMemory*>(mem);
@@ -160,7 +148,9 @@ int FmuFunction::init_mem(void* mem) const {
 }
 
 void FmuFunction::free_mem(void *mem) const {
-  delete static_cast<FmuFunctionMemory*>(mem);
+  auto m = static_cast<FmuFunctionMemory*>(mem);
+  if (m->c && free_instance_) free_instance_(m->c);
+  delete m;
 }
 
 int FmuFunctionAdj::init_mem(void* mem) const {
@@ -168,7 +158,7 @@ int FmuFunctionAdj::init_mem(void* mem) const {
 }
 
 void FmuFunctionAdj::free_mem(void *mem) const {
-  delete static_cast<FmuFunctionMemory*>(mem);
+  return derivative_of_->free_mem(mem);
 }
 
 int FmuFunctionJac::init_mem(void* mem) const {
@@ -176,7 +166,7 @@ int FmuFunctionJac::init_mem(void* mem) const {
 }
 
 void FmuFunctionJac::free_mem(void *mem) const {
-  delete static_cast<FmuFunctionMemory*>(mem);
+  return derivative_of_->free_mem(mem);
 }
 
 std::string FmuFunction::system_infix() {
@@ -490,14 +480,6 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   auto m = derivative_of_.get<FmuFunction>();
   return m->eval_adj(arg, res, iw, w, mem);
 }
-
-FmuFunctionMemory::FmuFunctionMemory(const FmuFunction& s) : self(s) {
-}
-
-FmuFunctionMemory::~FmuFunctionMemory() {
-  if (this->c && self.free_instance_) self.free_instance_(this->c);
-}
-
 
 #endif  // WITH_FMU
 
