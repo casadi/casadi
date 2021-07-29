@@ -2318,6 +2318,24 @@ void Fmu::free_instance(int ind) {
   }
 }
 
+int Fmu::setup_experiment(int ind) {
+  fmi2Status status = setup_experiment_(mem(ind), fmi2False, 0.0, 0., fmi2True, 1.);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2SetupExperiment failed");
+    return 1;
+  }
+  return 0;
+}
+
+int Fmu::reset(int ind) {
+  fmi2Status status = reset_(mem(ind));
+  if (status != fmi2OK) {
+    casadi_warning("fmi2Reset failed");
+    return 1;
+  }
+  return 0;
+}
+
 #endif  // WITH_FMU
 
 } // namespace casadi

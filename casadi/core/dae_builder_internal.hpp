@@ -573,6 +573,12 @@ struct CASADI_EXPORT Fmu {
   // Free memory object
   void free_instance(int ind);
 
+  // Setup experiment
+  int setup_experiment(int ind);
+
+  // Reset solver
+  int reset(int ind);
+
   // Get memory object
   fmi2Component mem(int ind);
 

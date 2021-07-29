@@ -142,18 +142,10 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
     m->first_run = false;
   } else {
     // Reset solver
-    fmi2Status status = dae->fmu_->reset_(dae->fmu_->mem(m->mem));
-    if (status != fmi2OK) {
-      casadi_warning("fmi2Reset failed");
-      return 1;
-    }
+    if (dae->fmu_->reset(m->mem)) return 1;
   }
-
   // Reset solver
-  fmi2Status status = dae->fmu_->setup_experiment_(dae->fmu_->mem(m->mem), fmi2False,
-    0.0, 0., fmi2True, 1.);
-  if (status != fmi2OK) casadi_error("fmi2SetupExperiment failed");
-
+  if (dae->fmu_->setup_experiment(m->mem)) return 1;
   // Set inputs
   for (size_t k = 0; k < vref_in_.size(); ++k) {
     // Set input k
@@ -180,7 +172,7 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   }
 
   // Initialization mode begins
-  status = dae->fmu_->enter_initialization_mode_(dae->fmu_->mem(m->mem));
+  fmi2Status status = dae->fmu_->enter_initialization_mode_(dae->fmu_->mem(m->mem));
   if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
 
   // Initialization mode ends
