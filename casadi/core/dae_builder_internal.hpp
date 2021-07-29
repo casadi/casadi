@@ -400,8 +400,17 @@ protected:
   /// Should the cache be cleared?
   mutable bool clear_cache_;
 
-  /// FMU binary interface
+  /// FMU binary interface (cached)
   mutable Fmu* fmu_;
+
+  /// Initialize FMU binary interface
+  void init_fmu() const;
+
+  // Name of system, per the FMI specification
+  static std::string system_infix();
+
+  // DLL suffix, per the FMI specification
+  static std::string dll_suffix();
 
   /// Read an equation
   MX read_expr(const XmlNode& node);

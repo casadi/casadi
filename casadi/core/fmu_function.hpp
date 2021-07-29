@@ -128,12 +128,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& onames,
     const Dict& opts) const override;
 
-  // Name of system, per the FMI specification
-  static std::string system_infix();
-
-  // DLL suffix, per the FMI specification
-  static std::string dll_suffix();
-
   // Process message
   static void logger(fmi2ComponentEnvironment componentEnvironment,
     fmi2String instanceName,

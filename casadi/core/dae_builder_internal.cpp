@@ -2137,6 +2137,59 @@ Function DaeBuilderInternal::fun(const std::string& name) const {
   return Function();
 }
 
+std::string DaeBuilderInternal::system_infix() {
+#if defined(_WIN32)
+  // Windows system
+#ifdef _WIN64
+  return "win64";
+#else
+  return "win32";
+#endif
+#elif defined(__APPLE__)
+  // OSX
+  return sizeof(void*) == 4 ? "darwin32" : "darwin64";
+#else
+  // Linux
+  return sizeof(void*) == 4 ? "linux32" : "linux64";
+#endif
+}
+
+std::string DaeBuilderInternal::dll_suffix() {
+#if defined(_WIN32)
+  // Windows system
+  return ".dll";
+#elif defined(__APPLE__)
+  // OSX
+  return ".dylib";
+#else
+  // Linux
+  return ".so";
+#endif
+}
+
+void DaeBuilderInternal::init_fmu() const {
+#ifdef WITH_FMU
+  // Free existing instance, if any
+  if (fmu_) {
+    delete fmu_;
+    fmu_ = 0;
+  }
+  // Allocate new instance
+  fmu_ = new Fmu(*this);
+  // Directory where the DLL is stored, per the FMI specification
+  std::string instance_name_no_dot = model_identifier_;
+  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
+  std::string dll_path = path_ + "/binaries/" + system_infix()
+    + "/" + instance_name_no_dot + dll_suffix();
+  // Load DLL
+  fmu_->li_ = Importer(dll_path, "dll");
+  // Load functions
+  fmu_->init();
+#else  // WITH_FMU
+  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
+#endif  // WITH_FMU
+}
+
 #ifdef WITH_FMU
 
 Fmu::Fmu(const DaeBuilderInternal& self) : self_(self) {

@@ -82,25 +82,11 @@ void FmuFunction::init(const Dict& opts) {
       vref_out_[k][i] = dae->variable(id_out_[k][i]).value_reference;
   }
 
-  // Directory where the DLL is stored, per the FMI specification
-  std::string instance_name_no_dot = dae->model_identifier_;
-  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = dae->path_ + "/binaries/" + system_infix()
-    + "/" + instance_name_no_dot + dll_suffix();
-
   // Path to resource directory
   resource_loc_ = "file://" + dae->path_ + "/resources";
 
   // Load on first encounter
-  if (dae->fmu_ == 0) {
-    dae->fmu_ = new Fmu(*dae);
-
-    // Load the DLL
-    dae->fmu_->li_ = Importer(dll_path, "dll");
-
-    // Load functions
-    dae->fmu_->init();
-  }
+  if (dae->fmu_ == 0) dae->init_fmu();
 
   // Callback functions
   functions_.logger = logger;
@@ -155,36 +141,6 @@ int FmuFunctionJac::init_mem(void* mem) const {
 
 void FmuFunctionJac::free_mem(void *mem) const {
   return derivative_of_->free_mem(mem);
-}
-
-std::string FmuFunction::system_infix() {
-#if defined(_WIN32)
-  // Windows system
-#ifdef _WIN64
-  return "win64";
-#else
-  return "win32";
-#endif
-#elif defined(__APPLE__)
-  // OSX
-  return sizeof(void*) == 4 ? "darwin32" : "darwin64";
-#else
-  // Linux
-  return sizeof(void*) == 4 ? "linux32" : "linux64";
-#endif
-}
-
-std::string FmuFunction::dll_suffix() {
-#if defined(_WIN32)
-  // Windows system
-  return ".dll";
-#elif defined(__APPLE__)
-  // OSX
-  return ".dylib";
-#else
-  // Linux
-  return ".so";
-#endif
 }
 
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
