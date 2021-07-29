@@ -2279,7 +2279,7 @@ void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 
-fmi2Component Fmu::instantiate1() {
+int Fmu::instantiate() {
   // Create instance
   fmi2String instanceName = self_.model_identifier_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
@@ -2290,11 +2290,32 @@ fmi2Component Fmu::instantiate1() {
   fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
     &functions_, visible, loggingOn);
   if (c == 0) casadi_error("fmi2Instantiate failed");
-  return c;
+  // Reuse an element of the memory pool
+  for (int ind = 0; ind < mem_.size(); ++ind) {
+    if (mem_[ind] == 0) {
+      // Reuse
+      mem_[ind] = c;
+      return ind;
+    }
+  }
+  // New element in the memory pool
+  mem_.push_back(c);
+  return mem_.size() - 1;
 }
 
-void Fmu::free_instance1(fmi2Component c) {
-  if (c && free_instance_) free_instance_(c);
+fmi2Component Fmu::mem(int ind) {
+  return mem_.at(ind);
+}
+
+void Fmu::free_instance(int ind) {
+  if (ind >= 0) {
+    casadi_assert_dev(free_instance_ != 0);
+    // Remove component from memory pool
+    fmi2Component c = mem_.at(ind);
+    mem_.at(ind) = 0;
+    // Free memory
+    free_instance_(c);
+  }
 }
 
 #endif  // WITH_FMU

@@ -568,10 +568,13 @@ struct CASADI_EXPORT Fmu {
     fmi2String message, ...);
 
   // New memory object
-  fmi2Component instantiate1();
+  int instantiate();
 
   // Free memory object
-  void free_instance1(fmi2Component c);
+  void free_instance(int ind);
+
+  // Get memory object
+  fmi2Component mem(int ind);
 
   // DaeBuilder instance
   const DaeBuilderInternal& self_;
@@ -597,6 +600,9 @@ struct CASADI_EXPORT Fmu {
 
   // Path to the FMU resource directory
   std::string resource_loc_;
+
+  // Memory objects
+  std::vector<fmi2Component> mem_;
 };
 #endif  // WITH_FMU
 

@@ -95,13 +95,7 @@ int FmuFunction::init_mem(void* mem) const {
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
 
   // Create instance
-  fmi2String instanceName = dae->model_identifier_.c_str();
-  fmi2Type fmuType = fmi2ModelExchange;
-  fmi2String fmuGUID = dae->guid_.c_str();
-  fmi2String fmuResourceLocation = dae->fmu_->resource_loc_.c_str();
-  fmi2Boolean visible = fmi2False;
-  fmi2Boolean loggingOn = fmi2False;
-  m->c = dae->fmu_->instantiate1();
+  m->mem = dae->fmu_->instantiate();
   m->first_run = true;
 
   return 0;
@@ -111,7 +105,7 @@ void FmuFunction::free_mem(void *mem) const {
   auto m = static_cast<FmuFunctionMemory*>(mem);
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  if (dae->fmu_) dae->fmu_->free_instance1(m->c);
+  if (dae->fmu_) dae->fmu_->free_instance(m->mem);
   delete m;
 }
 
@@ -148,7 +142,7 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
     m->first_run = false;
   } else {
     // Reset solver
-    fmi2Status status = dae->fmu_->reset_(m->c);
+    fmi2Status status = dae->fmu_->reset_(dae->fmu_->mem(m->mem));
     if (status != fmi2OK) {
       casadi_warning("fmi2Reset failed");
       return 1;
@@ -156,7 +150,8 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   }
 
   // Reset solver
-  fmi2Status status = dae->fmu_->setup_experiment_(m->c, fmi2False, 0.0, 0., fmi2True, 1.);
+  fmi2Status status = dae->fmu_->setup_experiment_(dae->fmu_->mem(m->mem), fmi2False,
+    0.0, 0., fmi2True, 1.);
   if (status != fmi2OK) casadi_error("fmi2SetupExperiment failed");
 
   // Set inputs
@@ -164,7 +159,8 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
     // Set input k
     if (x[k]) {
       // Input is available
-      fmi2Status status = dae->fmu_->set_real_(m->c, get_ptr(vref_in_[k]), vref_in_[k].size(), x[k]);
+      fmi2Status status = dae->fmu_->set_real_(dae->fmu_->mem(m->mem), get_ptr(vref_in_[k]),
+        vref_in_[k].size(), x[k]);
       if (status != fmi2OK) {
         casadi_warning("fmi2SetReal failed for input '" + name_in_[k] + "'");
         return 1;
@@ -173,7 +169,7 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
       // Input is null (zero)
       static const double zero = 0;
       for (size_t i = 0; i < vref_in_[k].size(); ++i) {
-        fmi2Status status = dae->fmu_->set_real_(m->c, &vref_in_[k][i], 1, &zero);
+        fmi2Status status = dae->fmu_->set_real_(dae->fmu_->mem(m->mem), &vref_in_[k][i], 1, &zero);
         if (status != fmi2OK) {
           casadi_warning("fmi2SetReal failed for input '" + name_in_[k] + "', component " + str(i)
             + " (value reference " + str(vref_in_[k][i]) + ")" );
@@ -184,11 +180,11 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   }
 
   // Initialization mode begins
-  status = dae->fmu_->enter_initialization_mode_(m->c);
+  status = dae->fmu_->enter_initialization_mode_(dae->fmu_->mem(m->mem));
   if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
 
   // Initialization mode ends
-  status = dae->fmu_->exit_initialization_mode_(m->c);
+  status = dae->fmu_->exit_initialization_mode_(dae->fmu_->mem(m->mem));
   if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
 
   // Success
@@ -201,7 +197,8 @@ int FmuFunction::get_outputs(FmuFunctionMemory* m, double** r) const {
   for (size_t k = 0; k < vref_out_.size(); ++k) {
     if (r[k]) {
       // If output is requested
-      fmi2Status status = dae->fmu_->get_real_(m->c, get_ptr(vref_out_[k]), vref_out_[k].size(), r[k]);
+      fmi2Status status = dae->fmu_->get_real_(dae->fmu_->mem(m->mem), get_ptr(vref_out_[k]),
+        vref_out_[k].size(), r[k]);
       if (status != fmi2OK) {
         casadi_warning("fmi2GetReal failed for output '" + name_out_[k] + "'");
         return 1;
@@ -247,7 +244,8 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
     // Set seed for column i
     fwd_xd[i] = 1.;
     // Calculate directional derivative
-    status = dae->fmu_->get_directional_derivative_(m->c, get_ptr(vref_out_[0]), vref_out_[0].size(),
+    status = dae->fmu_->get_directional_derivative_(dae->fmu_->mem(m->mem), get_ptr(vref_out_[0]),
+      vref_out_[0].size(),
       get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetDirectionalDerivative failed");
@@ -294,8 +292,8 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
     // Set seed for column i
     fwd_xd[i] = 1.;
     // Calculate directional derivative
-    status = dae->fmu_->get_directional_derivative_(m->c, get_ptr(vref_out_[0]), vref_out_[0].size(),
-      get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
+    status = dae->fmu_->get_directional_derivative_(dae->fmu_->mem(m->mem), get_ptr(vref_out_[0]),
+      vref_out_[0].size(), get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetDirectionalDerivative failed");
       return 1;

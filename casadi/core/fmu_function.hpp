@@ -38,7 +38,7 @@ namespace casadi {
 
 struct CASADI_EXPORT FmuFunctionMemory : public FunctionMemory {
   // Pointer to instance
-  fmi2Component c;
+  int mem;
 
   // First run
   bool first_run;
