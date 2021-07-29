@@ -2457,25 +2457,39 @@ namespace casadi {
         << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
         << "casadi_int i;\n";
       g << "int mem;\n";
-      // Work vectors, including input and output buffers
-      casadi_int i_nnz = nnz_in(), o_nnz = nnz_out();
-      size_t sz_w = this->sz_w();
+
+      int align_bytes = g.casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+
+      // Work vectors and input and output buffers
+      g << CodeGenerator::array("casadi_int", "iw", sz_iw())
+        << CodeGenerator::array("casadi_real", "w", sz_w(), "", align_bytes);
+
+      // Extra work for from_mex
+      size_t sz_mw = 0;
       for (casadi_int i=0; i<n_in_; ++i) {
         const Sparsity& s = sparsity_in_[i];
-        sz_w = max(sz_w, static_cast<size_t>(s.size1())); // To be able to copy a column
-        sz_w = max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
+        sz_mw = max(sz_mw, static_cast<size_t>(s.size1())); // To be able to copy a column
+        sz_mw = max(sz_mw, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
-      sz_w += i_nnz + o_nnz;
-      g << CodeGenerator::array("casadi_real", "w", sz_w);
-      g << CodeGenerator::array("casadi_int", "iw", sz_iw());
-      string fw = "w+" + str(i_nnz + o_nnz);
+      g  << CodeGenerator::array("casadi_real", "mw", sz_mw);
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << CodeGenerator::array("casadi_real", "w_in" + str(i), nnz_in(i), "", align_bytes);
+      }
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << CodeGenerator::array("casadi_real", "w_out" + str(i), nnz_out(i), "", align_bytes);
+      }
+      // Input buffers
+      g << "const casadi_real* arg[" << sz_arg() << "];\n";
 
-      // Copy inputs to buffers
-      casadi_int offset=0;
-      g << CodeGenerator::array("const casadi_real*", "arg", sz_arg(), "{0}");
+      // Output buffers
+      g << "casadi_real* res[" << sz_res() << "];\n";
 
-      // Allocate output buffers
-      g << "casadi_real* res[" << sz_res() << "] = {0};\n";
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << "arg[" << i << "] = w_in" << i << ";\n";
+      }
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << "res[" << i << "] = 0;\n";
+      }
 
       // Check arguments
       g << "if (argc>" << n_in_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
@@ -2489,8 +2503,7 @@ namespace casadi {
       for (casadi_int i=0; i<n_in_; ++i) {
         std::string p = "argv[" + str(i) + "]";
         g << "if (--argc>=0) arg[" << i << "] = "
-          << g.from_mex(p, "w", offset, sparsity_in_[i], fw) << "\n";
-        offset += nnz_in(i);
+          << g.from_mex(p, "w_in" + str(i), 0, sparsity_in_[i], "mw") << "\n";
       }
 
       for (casadi_int i=0; i<n_out_; ++i) {
@@ -2502,14 +2515,13 @@ namespace casadi {
           g << "if (--resc>=0) ";
         }
         // Create and get pointer
-        g << g.res(i, true) << " = w+" << str(offset) << ";\n";
-        offset += nnz_out(i);
+        g << g.res(i, true) << " = w_out" << i << ";\n";
       }
       g << name_ << "_incref();\n";
       g << "mem = " << name_ << "_checkout();\n";
 
       // Call the function
-      g << "i = " << name_ << "(arg, res, iw, " << fw << ", mem);\n"
+      g << "i = " << name_ << "(arg, res, iw, w, mem);\n"
         << "if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << name_
         << "\\\" failed.\");\n";
       g << name_ << "_release(mem);\n";
