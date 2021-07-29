@@ -594,6 +594,9 @@ struct CASADI_EXPORT Fmu {
   // Get memory object
   fmi2Component memory(int mem);
 
+  // Get memory object and remove from pool
+  fmi2Component pop_memory(int mem);
+
   // DaeBuilder instance
   const DaeBuilderInternal& self_;
 
@@ -619,8 +622,16 @@ struct CASADI_EXPORT Fmu {
   // Path to the FMU resource directory
   std::string resource_loc_;
 
+  // Memory object
+  struct Memory {
+    // Component memory
+    fmi2Component c;
+    // Constructor
+    explicit Memory(fmi2Component c1 = 0) : c(c1) {}
+  };
+
   // Memory objects
-  std::vector<fmi2Component> mem_;
+  std::vector<Memory> mem_;
 };
 #endif  // WITH_FMU
 

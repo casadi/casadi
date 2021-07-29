@@ -2292,27 +2292,31 @@ int Fmu::instantiate() {
   if (c == 0) casadi_error("fmi2Instantiate failed");
   // Reuse an element of the memory pool
   for (int mem = 0; mem < mem_.size(); ++mem) {
-    if (mem_[mem] == 0) {
-      // Reuse
-      mem_[mem] = c;
+    if (mem_[mem].c == 0) {
+      mem_[mem] = Memory(c);
       return mem;
     }
   }
   // New element in the memory pool
-  mem_.push_back(c);
+  mem_.push_back(Memory(c));
   return mem_.size() - 1;
 }
 
 fmi2Component Fmu::memory(int mem) {
-  return mem_.at(mem);
+  return mem_.at(mem).c;
+}
+
+fmi2Component Fmu::pop_memory(int mem) {
+  fmi2Component c = mem_.at(mem).c;
+  mem_.at(mem).c = 0;
+  return c;
 }
 
 void Fmu::free_instance(int mem) {
   if (mem >= 0) {
     casadi_assert_dev(free_instance_ != 0);
     // Remove component from memory pool
-    fmi2Component c = mem_.at(mem);
-    mem_.at(mem) = 0;
+    fmi2Component c = pop_memory(mem);
     // Free memory
     free_instance_(c);
   }
