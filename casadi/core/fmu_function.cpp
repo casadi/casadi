@@ -133,7 +133,11 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
   return Sparsity::dense(id_out_.at(i).size(), 1);
 }
 
-int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
+int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
+    void* mem) const {
+  // Memory object
+  auto m = static_cast<FmuFunctionMemory*>(mem);
+  // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Reset solver
@@ -149,26 +153,13 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set(m->mem, id_in_[k][i], x[k] ? x[k][i] : 0)) return 1;
+      if (dae->fmu_->set(m->mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
   // Initialization mode begins
   if (dae->fmu_->enter_initialization_mode(m->mem)) return 1;
   // Initialization mode ends
   if (dae->fmu_->exit_initialization_mode(m->mem)) return 1;
-  // Success
-  return 0;
-}
-
-int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
-    void* mem) const {
-  // Memory object
-  auto m = static_cast<FmuFunctionMemory*>(mem);
-  // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Pass inputs
-  if (set_inputs(m, arg)) return 1;
   // Request outputs to be evaluated
   for (size_t k = 0; k < id_out_.size(); ++k) {
     if (res[k]) {
@@ -192,6 +183,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
 
 int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
+  // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Dimensions
@@ -206,8 +198,26 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
   fmi2Status status;
   // Memory object
   auto m = static_cast<FmuFunctionMemory*>(mem);
-  // Pass inputs
-  if (set_inputs(m, arg)) return 1;
+  // Reset solver
+  if (m->first_run) {
+    // Need to reset if time called again
+    m->first_run = false;
+  } else {
+    // Reset solver
+    if (dae->fmu_->reset(m->mem)) return 1;
+  }
+  // Reset solver
+  if (dae->fmu_->setup_experiment(m->mem)) return 1;
+  // Set inputs
+  for (size_t k = 0; k < id_in_.size(); ++k) {
+    for (size_t i = 0; i < id_in_[k].size(); ++i) {
+      if (dae->fmu_->set(m->mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+    }
+  }
+  // Initialization mode begins
+  if (dae->fmu_->enter_initialization_mode(m->mem)) return 1;
+  // Initialization mode ends
+  if (dae->fmu_->exit_initialization_mode(m->mem)) return 1;
   // Clear seeds
   casadi_clear(fwd_xd, n_xd);
   // Calculate Jacobian, one column at a time
@@ -252,8 +262,26 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
   fmi2Status status;
   // Memory object
   auto m = static_cast<FmuFunctionMemory*>(mem);
-  // Pass inputs
-  if (set_inputs(m, arg)) return 1;
+  // Reset solver
+  if (m->first_run) {
+    // Need to reset if time called again
+    m->first_run = false;
+  } else {
+    // Reset solver
+    if (dae->fmu_->reset(m->mem)) return 1;
+  }
+  // Reset solver
+  if (dae->fmu_->setup_experiment(m->mem)) return 1;
+  // Set inputs
+  for (size_t k = 0; k < id_in_.size(); ++k) {
+    for (size_t i = 0; i < id_in_[k].size(); ++i) {
+      if (dae->fmu_->set(m->mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+    }
+  }
+  // Initialization mode begins
+  if (dae->fmu_->enter_initialization_mode(m->mem)) return 1;
+  // Initialization mode ends
+  if (dae->fmu_->exit_initialization_mode(m->mem)) return 1;
   // Reset results
   casadi_clear(adj_xd, n_xd);
   // Clear seeds

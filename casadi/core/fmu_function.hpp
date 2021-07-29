@@ -121,9 +121,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,
     const Dict& opts) const override;
-
-  // Pass inputs to FMU
-  int set_inputs(FmuFunctionMemory* m, const double** x) const;
 };
 
 /** Jacobian */
