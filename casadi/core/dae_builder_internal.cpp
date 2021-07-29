@@ -138,6 +138,9 @@ Variable::Variable(const std::string& name) : name(name),
 }
 
 DaeBuilderInternal::~DaeBuilderInternal() {
+#ifdef WITH_FMU
+  if (fmu_) delete fmu_;
+#endif // WITH_FMU
 }
 
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path)
@@ -145,6 +148,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
   provides_directional_derivative_ = 0;
+  fmu_ = 0;
 }
 
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
@@ -2132,5 +2136,53 @@ Function DaeBuilderInternal::fun(const std::string& name) const {
   }
   return Function();
 }
+
+#ifdef WITH_FMU
+
+Fmu::Fmu(const DaeBuilderInternal& self) : self_(self) {
+  // Initialize to null pointers
+  instantiate_ = 0;
+  free_instance_ = 0;
+  reset_ = 0;
+  setup_experiment_ = 0;
+  enter_initialization_mode_ = 0;
+  exit_initialization_mode_ = 0;
+  enter_continuous_time_mode_ = 0;
+  set_real_ = 0;
+  set_boolean_ = 0;
+  get_real_ = 0;
+  get_directional_derivative_ = 0;
+}
+
+void Fmu::init() {
+  instantiate_ = reinterpret_cast<fmi2InstantiateTYPE*>(get_function("fmi2Instantiate"));
+  free_instance_ = reinterpret_cast<fmi2FreeInstanceTYPE*>(get_function("fmi2FreeInstance"));
+  reset_ = reinterpret_cast<fmi2ResetTYPE*>(get_function("fmi2Reset"));
+  setup_experiment_ = reinterpret_cast<fmi2SetupExperimentTYPE*>(
+    get_function("fmi2SetupExperiment"));
+  enter_initialization_mode_ = reinterpret_cast<fmi2EnterInitializationModeTYPE*>(
+    get_function("fmi2EnterInitializationMode"));
+  exit_initialization_mode_ = reinterpret_cast<fmi2ExitInitializationModeTYPE*>(
+    get_function("fmi2ExitInitializationMode"));
+  enter_continuous_time_mode_ = reinterpret_cast<fmi2EnterContinuousTimeModeTYPE*>(
+    get_function("fmi2EnterContinuousTimeMode"));
+  set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
+  set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
+  get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(get_function("fmi2GetReal"));
+  if (self_.provides_directional_derivative_) {
+    get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
+      get_function("fmi2GetDirectionalDerivative"));
+  }
+}
+
+signal_t Fmu::get_function(const std::string& symname) {
+  // Load the function
+  signal_t f = li_.get_function(symname);
+  // Ensure that it was found
+  casadi_assert(f != 0, "Cannot retrieve '" + symname + "'");
+  // Return function to be type converted
+  return f;
+}
+#endif  // WITH_FMU
 
 } // namespace casadi

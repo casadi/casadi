@@ -42,6 +42,7 @@ namespace casadi {
 
 // Forward declarations
 class XmlNode;
+class Fmu;
 
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
@@ -115,6 +116,7 @@ struct CASADI_EXPORT Variable {
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
   friend class FmuFunction;
+  friend class Fmu;
 
  public:
 
@@ -398,6 +400,9 @@ protected:
   /// Should the cache be cleared?
   mutable bool clear_cache_;
 
+  /// FMU binary interface
+  mutable Fmu* fmu_;
+
   /// Read an equation
   MX read_expr(const XmlNode& node);
 
@@ -533,6 +538,40 @@ CASADI_EXPORT std::string to_string(Variable::Attribute v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
 ///@}
+
+
+#ifdef WITH_FMU
+struct CASADI_EXPORT Fmu {
+  // Constructor
+  Fmu(const DaeBuilderInternal& self);
+
+  // Initialize
+  void init();
+
+  // Load an FMI function
+  signal_t get_function(const std::string& symname);
+
+  // DaeBuilder instance
+  const DaeBuilderInternal& self_;
+
+  // DLL
+  Importer li_;
+
+  // FMU C API function prototypes. Cf. FMI specification 2.0.2
+  fmi2InstantiateTYPE* instantiate_;
+  fmi2FreeInstanceTYPE* free_instance_;
+  fmi2ResetTYPE* reset_;
+  fmi2SetupExperimentTYPE* setup_experiment_;
+  fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
+  fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
+  fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
+  fmi2SetRealTYPE* set_real_;
+  fmi2SetBooleanTYPE* set_boolean_;
+  fmi2GetRealTYPE* get_real_;
+  fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
+};
+#endif  // WITH_FMU
+
 
 } // namespace casadi
 

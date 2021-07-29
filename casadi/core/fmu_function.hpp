@@ -44,33 +44,6 @@ struct CASADI_EXPORT FmuFunctionMemory : public FunctionMemory {
   bool first_run;
 };
 
-struct CASADI_EXPORT Fmu {
-  // Constructor
-  Fmu();
-
-  // Initialize
-  void init(bool provides_directional_derivative);
-
-  // Load an FMI function
-  signal_t get_function(const std::string& symname);
-
-  // DLL
-  Importer li_;
-
-  // FMU C API function prototypes. Cf. FMI specification 2.0.2
-  fmi2InstantiateTYPE* instantiate_;
-  fmi2FreeInstanceTYPE* free_instance_;
-  fmi2ResetTYPE* reset_;
-  fmi2SetupExperimentTYPE* setup_experiment_;
-  fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
-  fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
-  fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
-  fmi2SetRealTYPE* set_real_;
-  fmi2SetBooleanTYPE* set_boolean_;
-  fmi2GetRealTYPE* get_real_;
-  fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
-};
-
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
@@ -88,9 +61,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Path to the FMU resource directory
   std::string resource_loc_;
-
-  // The actual FMU
-  Fmu fmu_;
 
  public:
 
