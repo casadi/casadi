@@ -56,9 +56,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Value reference to the inputs and outputs
   std::vector<std::vector<fmi2ValueReference>> vref_in_, vref_out_;
 
-  // Callback functions
-  fmi2CallbackFunctions functions_;
-
   // Path to the FMU resource directory
   std::string resource_loc_;
 
@@ -127,13 +124,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,
     const Dict& opts) const override;
-
-  // Process message
-  static void logger(fmi2ComponentEnvironment componentEnvironment,
-    fmi2String instanceName,
-    fmi2Status status,
-    fmi2String category,
-    fmi2String message, ...);
 
   // Pass inputs to FMU
   int set_inputs(FmuFunctionMemory* m, const double** x) const;

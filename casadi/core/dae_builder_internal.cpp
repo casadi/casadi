@@ -2226,6 +2226,13 @@ void Fmu::init() {
     get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
       get_function("fmi2GetDirectionalDerivative"));
   }
+
+  // Callback functions
+  functions_.logger = logger;
+  functions_.allocateMemory = calloc;
+  functions_.freeMemory = free;
+  functions_.stepFinished = 0;
+  functions_.componentEnvironment = 0;
 }
 
 signal_t Fmu::get_function(const std::string& symname) {
@@ -2235,6 +2242,38 @@ signal_t Fmu::get_function(const std::string& symname) {
   casadi_assert(f != 0, "Cannot retrieve '" + symname + "'");
   // Return function to be type converted
   return f;
+}
+
+void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
+    fmi2String instanceName,
+    fmi2Status status,
+    fmi2String category,
+    fmi2String message, ...) {
+  // Variable number of arguments
+  va_list args;
+  va_start(args, message);
+  // Static & dynamic buffers
+  char buf[256];
+  size_t buf_sz = sizeof(buf);
+  char* buf_dyn = nullptr;
+  // Try to print with a small buffer
+  int n = vsnprintf(buf, buf_sz, message, args);
+  // Need a larger buffer?
+  if (n > buf_sz) {
+    buf_sz = n + 1;
+    buf_dyn = new char[buf_sz];
+    n = vsnprintf(buf_dyn, buf_sz, message, args);
+  }
+  // Print buffer content
+  if (n >= 0) {
+    uout() << "[" << instanceName << ":" << category << "] "
+      << (buf_dyn ? buf_dyn : buf) << std::endl;
+  }
+  // Cleanup
+  delete[] buf_dyn;
+  va_end(args);
+  // Throw error if failure
+  casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 #endif  // WITH_FMU
 

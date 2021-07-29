@@ -87,13 +87,6 @@ void FmuFunction::init(const Dict& opts) {
 
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
-
-  // Callback functions
-  functions_.logger = logger;
-  functions_.allocateMemory = calloc;
-  functions_.freeMemory = free;
-  functions_.stepFinished = 0;
-  functions_.componentEnvironment = 0;
 }
 
 int FmuFunction::init_mem(void* mem) const {
@@ -112,7 +105,7 @@ int FmuFunction::init_mem(void* mem) const {
   fmi2Boolean visible = fmi2False;
   fmi2Boolean loggingOn = fmi2False;
   m->c = dae->fmu_->instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
-    &functions_, visible, loggingOn);
+    &dae->fmu_->functions_, visible, loggingOn);
   if (m->c == 0) casadi_error("fmi2Instantiate failed");
   m->first_run = true;
 
@@ -356,38 +349,6 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
   opts2["enable_fd"] = true;
   ret->construct(opts2);
   return ret;
-}
-
-void FmuFunction::logger(fmi2ComponentEnvironment componentEnvironment,
-    fmi2String instanceName,
-    fmi2Status status,
-    fmi2String category,
-    fmi2String message, ...) {
-  // Variable number of arguments
-  va_list args;
-  va_start(args, message);
-  // Static & dynamic buffers
-  char buf[256];
-  size_t buf_sz = sizeof(buf);
-  char* buf_dyn = nullptr;
-  // Try to print with a small buffer
-  int n = vsnprintf(buf, buf_sz, message, args);
-  // Need a larger buffer?
-  if (n > buf_sz) {
-    buf_sz = n + 1;
-    buf_dyn = new char[buf_sz];
-    n = vsnprintf(buf_dyn, buf_sz, message, args);
-  }
-  // Print buffer content
-  if (n >= 0) {
-    uout() << "[" << instanceName << ":" << category << "] "
-      << (buf_dyn ? buf_dyn : buf) << std::endl;
-  }
-  // Cleanup
-  delete[] buf_dyn;
-  va_end(args);
-  // Throw error if failure
-  casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 
 FmuFunctionJac::~FmuFunctionJac() {

@@ -560,6 +560,13 @@ struct CASADI_EXPORT Fmu {
   // Load an FMI function
   signal_t get_function(const std::string& symname);
 
+  // Process message
+  static void logger(fmi2ComponentEnvironment componentEnvironment,
+    fmi2String instanceName,
+    fmi2Status status,
+    fmi2String category,
+    fmi2String message, ...);
+
   // DaeBuilder instance
   const DaeBuilderInternal& self_;
 
@@ -578,6 +585,9 @@ struct CASADI_EXPORT Fmu {
   fmi2SetBooleanTYPE* set_boolean_;
   fmi2GetRealTYPE* get_real_;
   fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
+
+  // Callback functions
+  fmi2CallbackFunctions functions_;
 };
 #endif  // WITH_FMU
 
