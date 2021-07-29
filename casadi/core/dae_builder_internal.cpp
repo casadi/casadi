@@ -2290,16 +2290,29 @@ int Fmu::instantiate() {
   fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
     &functions_, visible, loggingOn);
   if (c == 0) casadi_error("fmi2Instantiate failed");
-  // Reuse an element of the memory pool
-  for (int mem = 0; mem < mem_.size(); ++mem) {
+  // Reuse an element of the memory pool if possible
+  int mem;
+  for (mem = 0; mem < mem_.size(); ++mem) {
     if (mem_[mem].c == 0) {
-      mem_[mem] = Memory(c);
-      return mem;
+      mem_[mem].c = c;
+      break;
     }
   }
-  // New element in the memory pool
-  mem_.push_back(Memory(c));
-  return mem_.size() - 1;
+  // New element in the memory pool needed?
+  if (mem == mem_.size()) mem_.push_back(Memory(c));
+  // Set other fields
+  Memory& m = mem_.at(mem);
+  // Allocate/reset value buffer
+  m.buffer_.resize(self_.variables_.size());
+  std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
+  // Allocate/reset requested
+  m.changed_.resize(self_.variables_.size());
+  std::fill(m.changed_.begin(), m.changed_.end(), false);
+  // Allocate/reset requested
+  m.requested_.resize(self_.variables_.size());
+  std::fill(m.requested_.begin(), m.requested_.end(), false);
+  // Return memory object
+  return mem;
 }
 
 fmi2Component Fmu::memory(int mem) {
@@ -2358,11 +2371,18 @@ int Fmu::exit_initialization_mode(int mem) {
   return 0;
 }
 
-int Fmu::set_real(int mem, size_t id, double value) {
+int Fmu::set(int mem, size_t id, double value) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Update buffer
+  if (value != m.buffer_.at(id)) {
+    m.buffer_.at(id) = value;
+    m.changed_.at(id) = true;
+  }
   // Value reference
   fmi2ValueReference vr = self_.variable(id).value_reference;
   // Set the value
-  fmi2Status status = set_real_(memory(mem), &vr, 1, &value);
+  fmi2Status status = set_real_(m.c, &vr, 1, &value);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed for " + self_.variable(id).name);
     return 1;

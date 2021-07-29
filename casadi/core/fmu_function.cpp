@@ -149,7 +149,7 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set_real(m->mem, id_in_[k][i], x[k] ? x[k][i] : 0)) return 1;
+      if (dae->fmu_->set(m->mem, id_in_[k][i], x[k] ? x[k][i] : 0)) return 1;
     }
   }
   // Initialization mode begins

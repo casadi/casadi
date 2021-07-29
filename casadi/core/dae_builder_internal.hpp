@@ -585,8 +585,8 @@ struct CASADI_EXPORT Fmu {
   // Exit initialization mode
   int exit_initialization_mode(int mem);
 
-  // Set real value
-  int set_real(int mem, size_t id, double value);
+  // Set value
+  int set(int mem, size_t id, double value);
 
   // Get/calculate real value
   int get_real(int mem, size_t id, double* value);
@@ -626,6 +626,12 @@ struct CASADI_EXPORT Fmu {
   struct Memory {
     // Component memory
     fmi2Component c;
+    // Value buffer
+    std::vector<double> buffer_;
+    // Which entries have been changed
+    std::vector<bool> changed_;
+    // Which entries are being requested
+    std::vector<bool> requested_;
     // Constructor
     explicit Memory(fmi2Component c1 = 0) : c(c1) {}
   };
