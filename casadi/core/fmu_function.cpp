@@ -209,7 +209,7 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
     // Set seed for column i
     fwd_xd[i] = 1.;
     // Calculate directional derivative
-    status = dae->fmu_->get_directional_derivative_(dae->fmu_->mem(m->mem), get_ptr(vref_out_[0]),
+    status = dae->fmu_->get_directional_derivative_(dae->fmu_->memory(m->mem), get_ptr(vref_out_[0]),
       vref_out_[0].size(),
       get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
     if (status != fmi2OK) {
@@ -257,7 +257,7 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
     // Set seed for column i
     fwd_xd[i] = 1.;
     // Calculate directional derivative
-    status = dae->fmu_->get_directional_derivative_(dae->fmu_->mem(m->mem), get_ptr(vref_out_[0]),
+    status = dae->fmu_->get_directional_derivative_(dae->fmu_->memory(m->mem), get_ptr(vref_out_[0]),
       vref_out_[0].size(), get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetDirectionalDerivative failed");

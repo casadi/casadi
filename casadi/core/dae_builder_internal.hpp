@@ -571,28 +571,28 @@ struct CASADI_EXPORT Fmu {
   int instantiate();
 
   // Free memory object
-  void free_instance(int ind);
+  void free_instance(int mem);
 
   // Setup experiment
-  int setup_experiment(int ind);
+  int setup_experiment(int mem);
 
   // Reset solver
-  int reset(int ind);
+  int reset(int mem);
 
   // Enter initialization mode
-  int enter_initialization_mode(int ind);
+  int enter_initialization_mode(int mem);
 
   // Exit initialization mode
-  int exit_initialization_mode(int ind);
+  int exit_initialization_mode(int mem);
 
   // Set real value
-  int set_real(int ind, size_t id, double value);
+  int set_real(int mem, size_t id, double value);
 
   // Get/calculate real value
-  int get_real(int ind, size_t id, double* value);
+  int get_real(int mem, size_t id, double* value);
 
   // Get memory object
-  fmi2Component mem(int ind);
+  fmi2Component memory(int mem);
 
   // DaeBuilder instance
   const DaeBuilderInternal& self_;

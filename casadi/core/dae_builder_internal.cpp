@@ -2291,11 +2291,11 @@ int Fmu::instantiate() {
     &functions_, visible, loggingOn);
   if (c == 0) casadi_error("fmi2Instantiate failed");
   // Reuse an element of the memory pool
-  for (int ind = 0; ind < mem_.size(); ++ind) {
-    if (mem_[ind] == 0) {
+  for (int mem = 0; mem < mem_.size(); ++mem) {
+    if (mem_[mem] == 0) {
       // Reuse
-      mem_[ind] = c;
-      return ind;
+      mem_[mem] = c;
+      return mem;
     }
   }
   // New element in the memory pool
@@ -2303,23 +2303,23 @@ int Fmu::instantiate() {
   return mem_.size() - 1;
 }
 
-fmi2Component Fmu::mem(int ind) {
-  return mem_.at(ind);
+fmi2Component Fmu::memory(int mem) {
+  return mem_.at(mem);
 }
 
-void Fmu::free_instance(int ind) {
-  if (ind >= 0) {
+void Fmu::free_instance(int mem) {
+  if (mem >= 0) {
     casadi_assert_dev(free_instance_ != 0);
     // Remove component from memory pool
-    fmi2Component c = mem_.at(ind);
-    mem_.at(ind) = 0;
+    fmi2Component c = mem_.at(mem);
+    mem_.at(mem) = 0;
     // Free memory
     free_instance_(c);
   }
 }
 
-int Fmu::setup_experiment(int ind) {
-  fmi2Status status = setup_experiment_(mem(ind), fmi2False, 0.0, 0., fmi2True, 1.);
+int Fmu::setup_experiment(int mem) {
+  fmi2Status status = setup_experiment_(memory(mem), fmi2False, 0.0, 0., fmi2True, 1.);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetupExperiment failed");
     return 1;
@@ -2327,8 +2327,8 @@ int Fmu::setup_experiment(int ind) {
   return 0;
 }
 
-int Fmu::reset(int ind) {
-  fmi2Status status = reset_(mem(ind));
+int Fmu::reset(int mem) {
+  fmi2Status status = reset_(memory(mem));
   if (status != fmi2OK) {
     casadi_warning("fmi2Reset failed");
     return 1;
@@ -2336,8 +2336,8 @@ int Fmu::reset(int ind) {
   return 0;
 }
 
-int Fmu::enter_initialization_mode(int ind) {
-  fmi2Status status = enter_initialization_mode_(mem(ind));
+int Fmu::enter_initialization_mode(int mem) {
+  fmi2Status status = enter_initialization_mode_(memory(mem));
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterInitializationMode failed: " + str(status));
     return 1;
@@ -2345,8 +2345,8 @@ int Fmu::enter_initialization_mode(int ind) {
   return 0;
 }
 
-int Fmu::exit_initialization_mode(int ind) {
-  fmi2Status status = exit_initialization_mode_(mem(ind));
+int Fmu::exit_initialization_mode(int mem) {
+  fmi2Status status = exit_initialization_mode_(memory(mem));
   if (status != fmi2OK) {
     casadi_warning("fmi2ExitInitializationMode failed");
     return 1;
@@ -2354,11 +2354,11 @@ int Fmu::exit_initialization_mode(int ind) {
   return 0;
 }
 
-int Fmu::set_real(int ind, size_t id, double value) {
+int Fmu::set_real(int mem, size_t id, double value) {
   // Value reference
   fmi2ValueReference vr = self_.variable(id).value_reference;
   // Set the value
-  fmi2Status status = set_real_(mem(ind), &vr, 1, &value);
+  fmi2Status status = set_real_(memory(mem), &vr, 1, &value);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed for " + self_.variable(id).name);
     return 1;
@@ -2366,11 +2366,11 @@ int Fmu::set_real(int ind, size_t id, double value) {
   return 0;
 }
 
-int Fmu::get_real(int ind, size_t id, double* value) {
+int Fmu::get_real(int mem, size_t id, double* value) {
   // Value reference
   fmi2ValueReference vr = self_.variable(id).value_reference;
   // Set the value
-  fmi2Status status = get_real_(mem(ind), &vr, 1, value);
+  fmi2Status status = get_real_(memory(mem), &vr, 1, value);
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed for " + self_.variable(id).name);
     return 1;
