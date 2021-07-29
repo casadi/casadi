@@ -585,8 +585,11 @@ struct CASADI_EXPORT Fmu {
   // Exit initialization mode
   int exit_initialization_mode(int mem);
 
-  // Set value
+  // Set value (buffered)
   int set(int mem, size_t id, double value);
+
+  // Set value
+  int set_real(int mem, size_t id, double value);
 
   // Request the calculation of a variable
   int request(int mem, size_t id);
@@ -596,9 +599,6 @@ struct CASADI_EXPORT Fmu {
 
   // Get a calculated variable
   int get(int mem, size_t id, double* value);
-
-  // Get/calculate real value
-  int get_real(int mem, size_t id, double* value);
 
   // Get memory object
   fmi2Component memory(int mem);
