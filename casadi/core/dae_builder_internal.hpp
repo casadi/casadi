@@ -585,6 +585,9 @@ struct CASADI_EXPORT Fmu {
   // Exit initialization mode
   int exit_initialization_mode(int ind);
 
+  // Set real value
+  int set_real(int ind, size_t id, double value);
+
   // Get memory object
   fmi2Component mem(int ind);
 

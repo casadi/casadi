@@ -147,27 +147,9 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   // Reset solver
   if (dae->fmu_->setup_experiment(m->mem)) return 1;
   // Set inputs
-  for (size_t k = 0; k < vref_in_.size(); ++k) {
-    // Set input k
-    if (x[k]) {
-      // Input is available
-      fmi2Status status = dae->fmu_->set_real_(dae->fmu_->mem(m->mem), get_ptr(vref_in_[k]),
-        vref_in_[k].size(), x[k]);
-      if (status != fmi2OK) {
-        casadi_warning("fmi2SetReal failed for input '" + name_in_[k] + "'");
-        return 1;
-      }
-    } else {
-      // Input is null (zero)
-      static const double zero = 0;
-      for (size_t i = 0; i < vref_in_[k].size(); ++i) {
-        fmi2Status status = dae->fmu_->set_real_(dae->fmu_->mem(m->mem), &vref_in_[k][i], 1, &zero);
-        if (status != fmi2OK) {
-          casadi_warning("fmi2SetReal failed for input '" + name_in_[k] + "', component " + str(i)
-            + " (value reference " + str(vref_in_[k][i]) + ")" );
-          return 1;
-        }
-      }
+  for (size_t k = 0; k < id_in_.size(); ++k) {
+    for (size_t i = 0; i < id_in_[k].size(); ++i) {
+      if (dae->fmu_->set_real(m->mem, id_in_[k][i], x[k] ? x[k][i] : 0)) return 1;
     }
   }
   // Initialization mode begins
