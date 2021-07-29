@@ -579,6 +579,12 @@ struct CASADI_EXPORT Fmu {
   // Reset solver
   int reset(int ind);
 
+  // Enter initialization mode
+  int enter_initialization_mode(int ind);
+
+  // Exit initialization mode
+  int exit_initialization_mode(int ind);
+
   // Get memory object
   fmi2Component mem(int ind);
 

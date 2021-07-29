@@ -170,15 +170,10 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
       }
     }
   }
-
   // Initialization mode begins
-  fmi2Status status = dae->fmu_->enter_initialization_mode_(dae->fmu_->mem(m->mem));
-  if (status != fmi2OK) casadi_error("fmi2EnterInitializationMode failed: " + str(status));
-
+  if (dae->fmu_->enter_initialization_mode(m->mem)) return 1;
   // Initialization mode ends
-  status = dae->fmu_->exit_initialization_mode_(dae->fmu_->mem(m->mem));
-  if (status != fmi2OK) casadi_error("fmi2ExitInitializationMode failed");
-
+  if (dae->fmu_->exit_initialization_mode(m->mem)) return 1;
   // Success
   return 0;
 }

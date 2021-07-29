@@ -2336,6 +2336,24 @@ int Fmu::reset(int ind) {
   return 0;
 }
 
+int Fmu::enter_initialization_mode(int ind) {
+  fmi2Status status = enter_initialization_mode_(mem(ind));
+  if (status != fmi2OK) {
+    casadi_warning("fmi2EnterInitializationMode failed: " + str(status));
+    return 1;
+  }
+  return 0;
+}
+
+int Fmu::exit_initialization_mode(int ind) {
+  fmi2Status status = exit_initialization_mode_(mem(ind));
+  if (status != fmi2OK) {
+    casadi_warning("fmi2ExitInitializationMode failed");
+    return 1;
+  }
+  return 0;
+}
+
 #endif  // WITH_FMU
 
 } // namespace casadi
