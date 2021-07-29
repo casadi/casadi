@@ -2278,6 +2278,25 @@ void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
   // Throw error if failure
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
+
+fmi2Component Fmu::instantiate1() {
+  // Create instance
+  fmi2String instanceName = self_.model_identifier_.c_str();
+  fmi2Type fmuType = fmi2ModelExchange;
+  fmi2String fmuGUID = self_.guid_.c_str();
+  fmi2String fmuResourceLocation = resource_loc_.c_str();
+  fmi2Boolean visible = fmi2False;
+  fmi2Boolean loggingOn = fmi2False;
+  fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
+    &functions_, visible, loggingOn);
+  if (c == 0) casadi_error("fmi2Instantiate failed");
+  return c;
+}
+
+void Fmu::free_instance1(fmi2Component c) {
+  if (c && free_instance_) free_instance_(c);
+}
+
 #endif  // WITH_FMU
 
 } // namespace casadi

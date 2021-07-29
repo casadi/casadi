@@ -101,9 +101,7 @@ int FmuFunction::init_mem(void* mem) const {
   fmi2String fmuResourceLocation = dae->fmu_->resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
   fmi2Boolean loggingOn = fmi2False;
-  m->c = dae->fmu_->instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
-    &dae->fmu_->functions_, visible, loggingOn);
-  if (m->c == 0) casadi_error("fmi2Instantiate failed");
+  m->c = dae->fmu_->instantiate1();
   m->first_run = true;
 
   return 0;
@@ -113,7 +111,7 @@ void FmuFunction::free_mem(void *mem) const {
   auto m = static_cast<FmuFunctionMemory*>(mem);
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  if (m->c && dae->fmu_->free_instance_) dae->fmu_->free_instance_(m->c);
+  if (dae->fmu_) dae->fmu_->free_instance1(m->c);
   delete m;
 }
 

@@ -567,6 +567,12 @@ struct CASADI_EXPORT Fmu {
     fmi2String category,
     fmi2String message, ...);
 
+  // New memory object
+  fmi2Component instantiate1();
+
+  // Free memory object
+  void free_instance1(fmi2Component c);
+
   // DaeBuilder instance
   const DaeBuilderInternal& self_;
 
