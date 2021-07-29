@@ -124,9 +124,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Pass inputs to FMU
   int set_inputs(FmuFunctionMemory* m, const double** x) const;
-
-  // Get/calculate outputs
-  int get_outputs(FmuFunctionMemory* m, double** r) const;
 };
 
 /** Jacobian */

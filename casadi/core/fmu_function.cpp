@@ -160,27 +160,33 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
   return 0;
 }
 
-int FmuFunction::get_outputs(FmuFunctionMemory* m, double** r) const {
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  for (size_t k = 0; k < id_out_.size(); ++k) {
-    if (r[k]) {
-      for (size_t i = 0; i < id_out_[k].size(); ++i) {
-        if (dae->fmu_->get_real(m->mem, id_out_[k][i], &r[k][i])) return 1;
-      }
-    }
-  }
-  return 0;
-}
-
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
   // Memory object
   auto m = static_cast<FmuFunctionMemory*>(mem);
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Pass inputs
   if (set_inputs(m, arg)) return 1;
-  // Evaluate and get outputs
-  if (get_outputs(m, res)) return 1;
+  // Request outputs to be evaluated
+  for (size_t k = 0; k < id_out_.size(); ++k) {
+    if (res[k]) {
+      for (size_t i = 0; i < id_out_[k].size(); ++i) {
+        if (dae->fmu_->request(m->mem, id_out_[k][i])) return 1;
+      }
+    }
+  }
+  // Evaluate
+  if (dae->fmu_->eval(m->mem)) return 1;
+  // Get outputs
+  for (size_t k = 0; k < id_out_.size(); ++k) {
+    if (res[k]) {
+      for (size_t i = 0; i < id_out_[k].size(); ++i) {
+        if (dae->fmu_->get(m->mem, id_out_[k][i], &res[k][i])) return 1;
+      }
+    }
+  }
   return 0;
 }
 
