@@ -588,6 +588,9 @@ struct CASADI_EXPORT Fmu {
 
   // Callback functions
   fmi2CallbackFunctions functions_;
+
+  // Path to the FMU resource directory
+  std::string resource_loc_;
 };
 #endif  // WITH_FMU
 

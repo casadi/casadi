@@ -2233,6 +2233,9 @@ void Fmu::init() {
   functions_.freeMemory = free;
   functions_.stepFinished = 0;
   functions_.componentEnvironment = 0;
+
+  // Path to resource directory
+  resource_loc_ = "file://" + self_.path_ + "/resources";
 }
 
 signal_t Fmu::get_function(const std::string& symname) {

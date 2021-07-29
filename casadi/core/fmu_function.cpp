@@ -82,9 +82,6 @@ void FmuFunction::init(const Dict& opts) {
       vref_out_[k][i] = dae->variable(id_out_[k][i]).value_reference;
   }
 
-  // Path to resource directory
-  resource_loc_ = "file://" + dae->path_ + "/resources";
-
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
 }
@@ -101,7 +98,7 @@ int FmuFunction::init_mem(void* mem) const {
   fmi2String instanceName = dae->model_identifier_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
   fmi2String fmuGUID = dae->guid_.c_str();
-  fmi2String fmuResourceLocation = resource_loc_.c_str();
+  fmi2String fmuResourceLocation = dae->fmu_->resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
   fmi2Boolean loggingOn = fmi2False;
   m->c = dae->fmu_->instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
