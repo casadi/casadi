@@ -2390,6 +2390,46 @@ int Fmu::set(int mem, size_t id, double value) {
   return 0;
 }
 
+int Fmu::request(int mem, size_t id) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Mark as requested
+  m.requested_.at(id) = true;
+  // Successful return
+  return 0;
+}
+
+int Fmu::eval(int mem) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Loop over requested variables
+  for (size_t id = 0; id < m.requested_.size(); ++id) {
+    if (m.requested_[id]) {
+      // Value reference
+      fmi2ValueReference vr = self_.variable(id).value_reference;
+      // Calculate the value
+      fmi2Status status = get_real_(m.c, &vr, 1, &m.buffer_[id]);
+      if (status != fmi2OK) {
+        casadi_warning("fmi2GetReal failed for " + self_.variable(id).name);
+        return 1;
+      }
+      // No longer requested
+      m.requested_[id] = false;
+    }
+  }
+  // Successful return
+  return 0;
+}
+
+int Fmu::get(int mem, size_t id, double* value) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Save to return
+  *value = m.buffer_.at(id);
+  // Successful return
+  return 0;
+}
+
 int Fmu::get_real(int mem, size_t id, double* value) {
   // Value reference
   fmi2ValueReference vr = self_.variable(id).value_reference;

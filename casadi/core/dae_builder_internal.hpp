@@ -588,6 +588,15 @@ struct CASADI_EXPORT Fmu {
   // Set value
   int set(int mem, size_t id, double value);
 
+  // Request the calculation of a variable
+  int request(int mem, size_t id);
+
+  // Calculate all requested variables
+  int eval(int mem);
+
+  // Get a calculated variable
+  int get(int mem, size_t id, double* value);
+
   // Get/calculate real value
   int get_real(int mem, size_t id, double* value);
 
