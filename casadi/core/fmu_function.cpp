@@ -96,7 +96,6 @@ int FmuFunction::init_mem(void* mem) const {
 
   // Create instance
   m->mem = dae->fmu_->instantiate();
-  m->first_run = true;
 
   return 0;
 }
@@ -140,11 +139,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Reset solver
-  if (m->first_run) {
-    // Need to reset if time called again
-    m->first_run = false;
-  }
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
@@ -190,14 +184,6 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
   // Memory object
   auto m = static_cast<FmuFunctionMemory*>(mem);
   // Reset solver
-  if (m->first_run) {
-    // Need to reset if time called again
-    m->first_run = false;
-  } else {
-    // Reset solver
-    if (dae->fmu_->reset(m->mem)) return 1;
-  }
-  // Reset solver
   if (dae->fmu_->setup_experiment(m->mem)) return 1;
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
@@ -229,6 +215,8 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
     // Remove seed
     fwd_xd[i] = 0;
   }
+  // Reset solver
+  if (dae->fmu_->reset(m->mem)) return 1;
   // Successful return
   return 0;
 }
