@@ -163,14 +163,10 @@ int FmuFunction::set_inputs(FmuFunctionMemory* m, const double** x) const {
 int FmuFunction::get_outputs(FmuFunctionMemory* m, double** r) const {
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  for (size_t k = 0; k < vref_out_.size(); ++k) {
+  for (size_t k = 0; k < id_out_.size(); ++k) {
     if (r[k]) {
-      // If output is requested
-      fmi2Status status = dae->fmu_->get_real_(dae->fmu_->mem(m->mem), get_ptr(vref_out_[k]),
-        vref_out_[k].size(), r[k]);
-      if (status != fmi2OK) {
-        casadi_warning("fmi2GetReal failed for output '" + name_out_[k] + "'");
-        return 1;
+      for (size_t i = 0; i < id_out_[k].size(); ++i) {
+        if (dae->fmu_->get_real(m->mem, id_out_[k][i], &r[k][i])) return 1;
       }
     }
   }

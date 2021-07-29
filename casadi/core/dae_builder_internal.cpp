@@ -2366,6 +2366,19 @@ int Fmu::set_real(int ind, size_t id, double value) {
   return 0;
 }
 
+int Fmu::get_real(int ind, size_t id, double* value) {
+  // Value reference
+  fmi2ValueReference vr = self_.variable(id).value_reference;
+  // Set the value
+  fmi2Status status = get_real_(mem(ind), &vr, 1, value);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2GetReal failed for " + self_.variable(id).name);
+    return 1;
+  }
+  return 0;
+}
+
+
 #endif  // WITH_FMU
 
 } // namespace casadi

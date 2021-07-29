@@ -588,6 +588,9 @@ struct CASADI_EXPORT Fmu {
   // Set real value
   int set_real(int ind, size_t id, double value);
 
+  // Get/calculate real value
+  int get_real(int ind, size_t id, double* value);
+
   // Get memory object
   fmi2Component mem(int ind);
 
