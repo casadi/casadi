@@ -2207,6 +2207,13 @@ Fmu::Fmu(const DaeBuilderInternal& self) : self_(self) {
   get_directional_derivative_ = 0;
 }
 
+Fmu::~Fmu() {
+  // Free all memory objects
+  for (int id = 0; id < mem_.size(); ++id) {
+    if (mem_[id].c && free_instance_) free_instance_(mem_[id].c);
+  }
+}
+
 void Fmu::init() {
   instantiate_ = reinterpret_cast<fmi2InstantiateTYPE*>(get_function("fmi2Instantiate"));
   free_instance_ = reinterpret_cast<fmi2FreeInstanceTYPE*>(get_function("fmi2FreeInstance"));
@@ -2279,29 +2286,31 @@ void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 
-int Fmu::instantiate() {
-  // Create instance
-  fmi2String instanceName = self_.model_identifier_.c_str();
-  fmi2Type fmuType = fmi2ModelExchange;
-  fmi2String fmuGUID = self_.guid_.c_str();
-  fmi2String fmuResourceLocation = resource_loc_.c_str();
-  fmi2Boolean visible = fmi2False;
-  fmi2Boolean loggingOn = fmi2False;
-  fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
-    &functions_, visible, loggingOn);
-  if (c == 0) casadi_error("fmi2Instantiate failed");
+int Fmu::checkout() {
   // Reuse an element of the memory pool if possible
   int mem;
   for (mem = 0; mem < mem_.size(); ++mem) {
-    if (mem_[mem].c == 0) {
-      mem_[mem].c = c;
-      break;
-    }
+    if (!mem_[mem].in_use) break;
   }
-  // New element in the memory pool needed?
-  if (mem == mem_.size()) mem_.push_back(Memory(c));
-  // Set other fields
+  // Add new element necessary
+  if (mem == mem_.size()) mem_.push_back(Memory());
+  // Memory object
   Memory& m = mem_.at(mem);
+  // Mark as in use
+  casadi_assert(!m.in_use, "Memory object is already in use");
+  m.in_use = true;
+  // Create instance if one is not already allocated
+  if (m.c == 0) {
+    fmi2String instanceName = self_.model_identifier_.c_str();
+    fmi2Type fmuType = fmi2ModelExchange;
+    fmi2String fmuGUID = self_.guid_.c_str();
+    fmi2String fmuResourceLocation = resource_loc_.c_str();
+    fmi2Boolean visible = fmi2False;
+    fmi2Boolean loggingOn = fmi2False;
+    m.c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
+      &functions_, visible, loggingOn);
+    if (m.c == 0) casadi_error("fmi2Instantiate failed");
+  }
   // Allocate/reset value buffer
   m.buffer_.resize(self_.variables_.size());
   std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
@@ -2325,13 +2334,11 @@ fmi2Component Fmu::pop_memory(int mem) {
   return c;
 }
 
-void Fmu::free_instance(int mem) {
+void Fmu::release(int mem) {
+  // Mark as in not in use
   if (mem >= 0) {
-    casadi_assert_dev(free_instance_ != 0);
-    // Remove component from memory pool
-    fmi2Component c = pop_memory(mem);
-    // Free memory
-    free_instance_(c);
+    if (!mem_.at(mem).in_use) casadi_warning("Memory object not in use");
+    mem_.at(mem).in_use = false;
   }
 }
 

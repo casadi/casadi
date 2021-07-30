@@ -554,6 +554,9 @@ struct CASADI_EXPORT Fmu {
   // Constructor
   Fmu(const DaeBuilderInternal& self);
 
+  // Destructor
+  ~Fmu();
+
   // Initialize
   void init();
 
@@ -568,10 +571,10 @@ struct CASADI_EXPORT Fmu {
     fmi2String message, ...);
 
   // New memory object
-  int instantiate();
+  int checkout();
 
   // Free memory object
-  void free_instance(int mem);
+  void release(int mem);
 
   // Setup experiment
   int setup_experiment(int mem);
@@ -635,6 +638,8 @@ struct CASADI_EXPORT Fmu {
   struct Memory {
     // Component memory
     fmi2Component c;
+    // Currently in use
+    bool in_use;
     // Value buffer
     std::vector<double> buffer_;
     // Which entries have been changed
@@ -642,7 +647,7 @@ struct CASADI_EXPORT Fmu {
     // Which entries are being requested
     std::vector<bool> requested_;
     // Constructor
-    explicit Memory(fmi2Component c1 = 0) : c(c1) {}
+    explicit Memory() : c(0), in_use(false) {}
   };
 
   // Memory objects

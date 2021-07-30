@@ -95,7 +95,7 @@ int FmuFunction::init_mem(void* mem) const {
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
 
   // Create instance
-  m->mem = dae->fmu_->instantiate();
+  m->mem = dae->fmu_->checkout();
 
   return 0;
 }
@@ -104,7 +104,7 @@ void FmuFunction::free_mem(void *mem) const {
   auto m = static_cast<FmuFunctionMemory*>(mem);
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  if (dae->fmu_) dae->fmu_->free_instance(m->mem);
+  if (dae->fmu_) dae->fmu_->release(m->mem);
   delete m;
 }
 
