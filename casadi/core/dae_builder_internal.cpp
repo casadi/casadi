@@ -2323,6 +2323,9 @@ int Fmu::checkout() {
   // Allocate/reset requested
   m.requested_.resize(self_.variables_.size());
   std::fill(m.requested_.begin(), m.requested_.end(), false);
+  // Allocate/reset work vectors
+  m.work_.resize(self_.variables_.size());
+  m.vr_work_.resize(self_.variables_.size());
   // Return memory object
   return mem;
 }
@@ -2424,18 +2427,25 @@ int Fmu::eval(int mem) {
   if (exit_initialization_mode(mem)) return 1;
   // Get memory
   Memory& m = mem_.at(mem);
-  // Loop over changed variables
+  // Collect changed variables
+  size_t n_set = 0;
   for (size_t id = 0; id < m.changed_.size(); ++id) {
     if (m.changed_[id]) {
       // Value reference
-      fmi2ValueReference vr = self_.variable(id).value_reference;
-      // Calculate the value
-      fmi2Status status = set_real_(m.c, &vr, 1, &m.buffer_[id]);
-      if (status != fmi2OK) {
-        casadi_warning("fmi2SetReal failed for " + self_.variable(id).name);
-        return 1;
-      }
+      m.vr_work_[n_set] = self_.variable(id).value_reference;
+      // Value
+      m.work_[n_set] = m.buffer_[id];
+      // Mark as no longer changed
+      m.changed_[id] = false;
+      // Increase counter
+      n_set++;
     }
+  }
+  // Set all variables
+  fmi2Status status = set_real_(m.c, &m.vr_work_[0], n_set, &m.work_[0]);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2SetReal failed");
+    return 1;
   }
   // Loop over requested variables
   for (size_t id = 0; id < m.requested_.size(); ++id) {
