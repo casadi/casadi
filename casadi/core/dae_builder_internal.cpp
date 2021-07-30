@@ -2389,14 +2389,6 @@ int Fmu::set(int mem, size_t id, double value) {
     m.buffer_.at(id) = value;
     m.changed_.at(id) = true;
   }
-  // Value reference
-  fmi2ValueReference vr = self_.variable(id).value_reference;
-  // Set the value
-  fmi2Status status = set_real_(m.c, &vr, 1, &value);
-  if (status != fmi2OK) {
-    casadi_warning("fmi2SetReal failed for " + self_.variable(id).name);
-    return 1;
-  }
   return 0;
 }
 
