@@ -80,6 +80,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Evaluate numerically
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
+  // Evaluate, non-differentated
+  int eval_fmu(const DaeBuilderInternal* dae, int mem, const double** arg, double** res) const;
+
   // Evaluate Jacobian numerically
   int eval_jac(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
 

@@ -101,33 +101,41 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Create instance
   int m = dae->fmu_->checkout();
+  // Evaluate fmu
+  int flag = eval_fmu(dae, m, arg, res);
+  // Release memory object
+  dae->fmu_->release(m);
+  // Return error flag
+  return flag;
+}
+
+int FmuFunction::eval_fmu(const DaeBuilderInternal* dae, int mem,
+    const double** arg, double** res) const {
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set(m, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      if (dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
   // Request outputs to be evaluated
   for (size_t k = 0; k < id_out_.size(); ++k) {
     if (res[k]) {
       for (size_t i = 0; i < id_out_[k].size(); ++i) {
-        if (dae->fmu_->request(m, id_out_[k][i])) return 1;
+        if (dae->fmu_->request(mem, id_out_[k][i])) return 1;
       }
     }
   }
   // Evaluate
-  if (dae->fmu_->eval(m)) return 1;
+  if (dae->fmu_->eval(mem)) return 1;
   // Get outputs
   for (size_t k = 0; k < id_out_.size(); ++k) {
     if (res[k]) {
       for (size_t i = 0; i < id_out_[k].size(); ++i) {
-        if (dae->fmu_->get(m, id_out_[k][i], &res[k][i])) return 1;
+        if (dae->fmu_->get(mem, id_out_[k][i], &res[k][i])) return 1;
       }
     }
   }
-  // Release memory object
-  dae->fmu_->release(m);
-
+  // Successful return
   return 0;
 }
 
