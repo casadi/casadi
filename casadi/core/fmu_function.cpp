@@ -86,44 +86,6 @@ void FmuFunction::init(const Dict& opts) {
   if (dae->fmu_ == 0) dae->init_fmu();
 }
 
-int FmuFunction::init_mem(void* mem) const {
-  if (FunctionInternal::init_mem(mem)) return 1;
-  auto m = static_cast<FmuFunctionMemory*>(mem);
-
-  // Get a pointer to the DaeBuilder class
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-
-  // Create instance
-  m->mem = dae->fmu_->checkout();
-
-  return 0;
-}
-
-void FmuFunction::free_mem(void *mem) const {
-  auto m = static_cast<FmuFunctionMemory*>(mem);
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  if (dae->fmu_) dae->fmu_->release(m->mem);
-  delete m;
-}
-
-int FmuFunctionAdj::init_mem(void* mem) const {
-  return derivative_of_->init_mem(mem);
-}
-
-void FmuFunctionAdj::free_mem(void *mem) const {
-  return derivative_of_->free_mem(mem);
-}
-
-int FmuFunctionJac::init_mem(void* mem) const {
-  return derivative_of_->init_mem(mem);
-}
-
-void FmuFunctionJac::free_mem(void *mem) const {
-  return derivative_of_->free_mem(mem);
-}
-
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
   return Sparsity::dense(id_in_.at(i).size(), 1);
 }
@@ -134,35 +96,38 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
-  // Memory object
-  auto m = static_cast<FmuFunctionMemory*>(mem);
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Create instance
+  int m = dae->fmu_->checkout();
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set(m->mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      if (dae->fmu_->set(m, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
   // Request outputs to be evaluated
   for (size_t k = 0; k < id_out_.size(); ++k) {
     if (res[k]) {
       for (size_t i = 0; i < id_out_[k].size(); ++i) {
-        if (dae->fmu_->request(m->mem, id_out_[k][i])) return 1;
+        if (dae->fmu_->request(m, id_out_[k][i])) return 1;
       }
     }
   }
   // Evaluate
-  if (dae->fmu_->eval(m->mem)) return 1;
+  if (dae->fmu_->eval(m)) return 1;
   // Get outputs
   for (size_t k = 0; k < id_out_.size(); ++k) {
     if (res[k]) {
       for (size_t i = 0; i < id_out_[k].size(); ++i) {
-        if (dae->fmu_->get(m->mem, id_out_[k][i], &res[k][i])) return 1;
+        if (dae->fmu_->get(m, id_out_[k][i], &res[k][i])) return 1;
       }
     }
   }
+  // Release memory object
+  dae->fmu_->release(m);
+
   return 0;
 }
 
@@ -171,6 +136,8 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Create instance
+  int m = dae->fmu_->checkout();
   // Dimensions
   casadi_int n_xd = nnz_in(0);
   casadi_int n_yd = nnz_out(0);
@@ -181,20 +148,18 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
   double* fwd_yd = w; w += n_yd;
   // FMI return flag
   fmi2Status status;
-  // Memory object
-  auto m = static_cast<FmuFunctionMemory*>(mem);
   // Reset solver
-  if (dae->fmu_->setup_experiment(m->mem)) return 1;
+  if (dae->fmu_->setup_experiment(m)) return 1;
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set_real(m->mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      if (dae->fmu_->set_real(m, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
   // Initialization mode begins
-  if (dae->fmu_->enter_initialization_mode(m->mem)) return 1;
+  if (dae->fmu_->enter_initialization_mode(m)) return 1;
   // Initialization mode ends
-  if (dae->fmu_->exit_initialization_mode(m->mem)) return 1;
+  if (dae->fmu_->exit_initialization_mode(m)) return 1;
   // Clear seeds
   casadi_clear(fwd_xd, n_xd);
   // Calculate Jacobian, one column at a time
@@ -202,7 +167,7 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
     // Set seed for column i
     fwd_xd[i] = 1.;
     // Calculate directional derivative
-    status = dae->fmu_->get_directional_derivative_(dae->fmu_->memory(m->mem), get_ptr(vref_out_[0]),
+    status = dae->fmu_->get_directional_derivative_(dae->fmu_->memory(m), get_ptr(vref_out_[0]),
       vref_out_[0].size(),
       get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
     if (status != fmi2OK) {
@@ -216,7 +181,9 @@ int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, doub
     fwd_xd[i] = 0;
   }
   // Reset solver
-  if (dae->fmu_->reset(m->mem)) return 1;
+  if (dae->fmu_->reset(m)) return 1;
+  // Release memory object
+  dae->fmu_->release(m);
   // Successful return
   return 0;
 }
@@ -225,6 +192,8 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
     void* mem) const {
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Create instance
+  int m = dae->fmu_->checkout();
   // Dimensions
   casadi_int n_xd = nnz_in(0);
   casadi_int n_yd = nnz_out(0);
@@ -239,20 +208,18 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
   double* fwd_yd = w; w += n_yd;
   // FMI return flag
   fmi2Status status;
-  // Memory object
-  auto m = static_cast<FmuFunctionMemory*>(mem);
   // Setup experiment
-  if (dae->fmu_->setup_experiment(m->mem)) return 1;
+  if (dae->fmu_->setup_experiment(m)) return 1;
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set_real(m->mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      if (dae->fmu_->set_real(m, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
   // Initialization mode begins
-  if (dae->fmu_->enter_initialization_mode(m->mem)) return 1;
+  if (dae->fmu_->enter_initialization_mode(m)) return 1;
   // Initialization mode ends
-  if (dae->fmu_->exit_initialization_mode(m->mem)) return 1;
+  if (dae->fmu_->exit_initialization_mode(m)) return 1;
   // Reset results
   casadi_clear(adj_xd, n_xd);
   // Clear seeds
@@ -262,7 +229,7 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
     // Set seed for column i
     fwd_xd[i] = 1.;
     // Calculate directional derivative
-    status = dae->fmu_->get_directional_derivative_(dae->fmu_->memory(m->mem), get_ptr(vref_out_[0]),
+    status = dae->fmu_->get_directional_derivative_(dae->fmu_->memory(m), get_ptr(vref_out_[0]),
       vref_out_[0].size(), get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetDirectionalDerivative failed");
@@ -274,7 +241,9 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
     fwd_xd[i] = 0;
   }
   // Reset solver
-  if (dae->fmu_->reset(m->mem)) return 1;
+  if (dae->fmu_->reset(m)) return 1;
+  // Release memory object
+  dae->fmu_->release(m);
   // Successful return
   return 0;
 }
@@ -317,6 +286,7 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 }
 
 FmuFunctionJac::~FmuFunctionJac() {
+  // Free memory
   clear_mem();
 }
 
@@ -336,6 +306,7 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
 }
 
 FmuFunctionAdj::~FmuFunctionAdj() {
+  // Free memory
   clear_mem();
 }
 

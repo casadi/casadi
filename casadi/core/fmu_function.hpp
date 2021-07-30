@@ -36,12 +36,6 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
-struct CASADI_EXPORT FmuFunctionMemory : public FunctionMemory {
-  // Pointer to instance
-  int mem;
-};
-
-
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  protected:
   // DaeBuilder instance (non-owning reference to avoid circular dependency)
@@ -70,15 +64,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /// Initialize
   void init(const Dict& opts) override;
-
-  /** \brief Create memory block */
-  void* alloc_mem() const override { return new FmuFunctionMemory();}
-
-  /** \brief Initalize memory block */
-  int init_mem(void* mem) const override;
-
-  /** \brief Free memory block */
-  void free_mem(void *mem) const override;
 
   ///@{
   /** \brief Number of function inputs and outputs */
@@ -132,15 +117,6 @@ class CASADI_EXPORT FmuFunctionJac : public FunctionInternal {
   /// Initialize
   void init(const Dict& opts) override;
 
-  /** \brief Create memory block */
-  void* alloc_mem() const override { return new FmuFunctionMemory();}
-
-  /** \brief Initalize memory block */
-  int init_mem(void* mem) const override;
-
-  /** \brief Free memory block */
-  void free_mem(void *mem) const override;
-
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunctionJac";}
 
@@ -159,15 +135,6 @@ class CASADI_EXPORT FmuFunctionAdj : public FunctionInternal {
 
   /// Initialize
   void init(const Dict& opts) override;
-
-  /** \brief Create memory block */
-  void* alloc_mem() const override { return new FmuFunctionMemory();}
-
-  /** \brief Initalize memory block */
-  int init_mem(void* mem) const override;
-
-  /** \brief Free memory block */
-  void free_mem(void *mem) const override;
 
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunctionAdj";}
