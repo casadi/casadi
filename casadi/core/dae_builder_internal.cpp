@@ -2441,23 +2441,39 @@ int Fmu::eval(int mem) {
       n_set++;
     }
   }
+  // Collect requested variables
+  size_t n_requested = 0;
+  for (size_t id = 0; id < m.requested_.size(); ++id) {
+    if (m.requested_[id]) {
+      // Value reference
+      m.vr_work_[n_set + n_requested] = self_.variable(id).value_reference;
+      // Increase counter
+      n_requested++;
+    }
+  }
+  // Quick return if nothing requested
+  if (n_requested == 0) {
+    if (reset(mem)) return 1;
+    return 0;
+  }
   // Set all variables
   fmi2Status status = set_real_(m.c, &m.vr_work_[0], n_set, &m.work_[0]);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
   }
-  // Loop over requested variables
+  // Calculate all variables
+  status = get_real_(m.c, &m.vr_work_[n_set], n_requested, &m.work_[n_set]);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2GetReal failed");
+    return 1;
+  }
+  // Collect requested variables
+  size_t ind = n_set;
   for (size_t id = 0; id < m.requested_.size(); ++id) {
     if (m.requested_[id]) {
-      // Value reference
-      fmi2ValueReference vr = self_.variable(id).value_reference;
-      // Calculate the value
-      fmi2Status status = get_real_(m.c, &vr, 1, &m.buffer_[id]);
-      if (status != fmi2OK) {
-        casadi_warning("fmi2GetReal failed for " + self_.variable(id).name);
-        return 1;
-      }
+      // Get the value
+      m.buffer_[id] = m.work_[ind++];
       // No longer requested
       m.requested_[id] = false;
     }
