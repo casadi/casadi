@@ -576,6 +576,9 @@ struct CASADI_EXPORT Fmu {
   // Free memory object
   void release(int mem);
 
+  // New memory object
+  fmi2Component instantiate();
+
   // Setup experiment
   int setup_experiment(int mem);
 
