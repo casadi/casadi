@@ -99,14 +99,14 @@ int FmuFunction::eval_fmu(const DaeBuilderInternal* dae, int mem,
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0);
     }
   }
   // Request outputs to be evaluated
   for (size_t k = 0; k < id_out_.size(); ++k) {
     if (res[k]) {
       for (size_t i = 0; i < id_out_[k].size(); ++i) {
-        if (dae->fmu_->request(mem, id_out_[k][i])) return 1;
+        dae->fmu_->request(mem, id_out_[k][i]);
       }
     }
   }
@@ -124,7 +124,7 @@ int FmuFunction::eval_fmu(const DaeBuilderInternal* dae, int mem,
   for (size_t k = 0; k < id_out_.size(); ++k) {
     if (res[k]) {
       for (size_t i = 0; i < id_out_[k].size(); ++i) {
-        if (dae->fmu_->get(mem, id_out_[k][i], &res[k][i])) return 1;
+        dae->fmu_->get(mem, id_out_[k][i], &res[k][i]);
       }
     }
   }
@@ -137,7 +137,7 @@ int FmuFunction::eval_jac(const DaeBuilderInternal* dae, int mem,
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0);
     }
   }
   // Reset solver
@@ -156,12 +156,12 @@ int FmuFunction::eval_jac(const DaeBuilderInternal* dae, int mem,
     dae->fmu_->set_seed(mem, id_in_[0][i], 1.);
     // Request sensitivities
     for (size_t id : id_out_[0])
-      if (dae->fmu_->request(mem, id)) return 1;
+      dae->fmu_->request(mem, id);
     // Calculate derivatives
     if (dae->fmu_->eval_derivative(mem)) return 1;
     // Get sensitivities
     for (size_t id : id_out_[0])
-      if (dae->fmu_->get_sens(mem, id, jac++)) return 1;
+      dae->fmu_->get_sens(mem, id, jac++);
   }
   // Reset solver
   if (dae->fmu_->reset(mem)) return 1;
@@ -182,7 +182,7 @@ int FmuFunction::eval_adj(const DaeBuilderInternal* dae, int mem,
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0);
     }
   }
   // Setup experiment
@@ -201,13 +201,13 @@ int FmuFunction::eval_adj(const DaeBuilderInternal* dae, int mem,
     dae->fmu_->set_seed(mem, id_in_[0][i], 1.);
     // Request sensitivities
     for (size_t id : id_out_[0])
-      if (dae->fmu_->request(mem, id)) return 1;
+      dae->fmu_->request(mem, id);
     // Calculate derivatives
     if (dae->fmu_->eval_derivative(mem)) return 1;
     // Get sensitivities
     for (casadi_int j = 0; j < id_out_[0].size(); ++j) {
       double J_ij;
-      if (dae->fmu_->get_sens(mem, id_out_[0][j], &J_ij)) return 1;
+      dae->fmu_->get_sens(mem, id_out_[0][j], &J_ij);
       adj_xd[i] += adj_yd[j] * J_ij;
     }
   }

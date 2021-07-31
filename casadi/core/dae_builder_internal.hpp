@@ -594,25 +594,25 @@ struct CASADI_EXPORT Fmu {
   int exit_initialization_mode(int mem);
 
   // Set value
-  int set(int mem, size_t id, double value);
+  void set(int mem, size_t id, double value);
 
   // Request the calculation of a variable
-  int request(int mem, size_t id);
+  void request(int mem, size_t id);
 
   // Calculate all requested variables
   int eval(int mem);
 
   // Get a calculated variable
-  int get(int mem, size_t id, double* value);
+  void get(int mem, size_t id, double* value);
 
   // Set seed
-  int set_seed(int mem, size_t id, double value);
+  void set_seed(int mem, size_t id, double value);
 
   // Calculate directional derivatives
   int eval_derivative(int mem);
 
   // Get a derivative
-  int get_sens(int mem, size_t id, double* value);
+  void get_sens(int mem, size_t id, double* value);
 
   // Get memory object
   fmi2Component memory(int mem);

@@ -2387,7 +2387,7 @@ int Fmu::exit_initialization_mode(int mem) {
   return 0;
 }
 
-int Fmu::set(int mem, size_t id, double value) {
+void Fmu::set(int mem, size_t id, double value) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Update buffer
@@ -2395,10 +2395,9 @@ int Fmu::set(int mem, size_t id, double value) {
     m.buffer_.at(id) = value;
     m.changed_.at(id) = true;
   }
-  return 0;
 }
 
-int Fmu::set_seed(int mem, size_t id, double value) {
+void Fmu::set_seed(int mem, size_t id, double value) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Update buffer
@@ -2406,17 +2405,13 @@ int Fmu::set_seed(int mem, size_t id, double value) {
     m.sens_.at(id) = value;
     m.changed_.at(id) = true;
   }
-  // Successful return
-  return 0;
 }
 
-int Fmu::request(int mem, size_t id) {
+void Fmu::request(int mem, size_t id) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Mark as requested
   m.requested_.at(id) = true;
-  // Successful return
-  return 0;
 }
 
 int Fmu::eval(int mem) {
@@ -2474,13 +2469,11 @@ int Fmu::eval(int mem) {
   return 0;
 }
 
-int Fmu::get(int mem, size_t id, double* value) {
+void Fmu::get(int mem, size_t id, double* value) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Save to return
   *value = m.buffer_.at(id);
-  // Successful return
-  return 0;
 }
 
 int Fmu::eval_derivative(int mem) {
@@ -2538,13 +2531,11 @@ int Fmu::eval_derivative(int mem) {
   return 0;
 }
 
-int Fmu::get_sens(int mem, size_t id, double* value) {
+void Fmu::get_sens(int mem, size_t id, double* value) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Save to return
   *value = m.sens_.at(id);
-  // Successful return
-  return 0;
 }
 
 #endif  // WITH_FMU
