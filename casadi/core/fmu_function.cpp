@@ -148,24 +148,35 @@ int FmuFunction::eval_jac(const DaeBuilderInternal* dae, int mem,
   if (dae->fmu_->exit_initialization_mode(mem)) return 1;
   // Evaluate
   if (dae->fmu_->eval(mem)) return 1;
-  // Not implemented
-  casadi_assert_dev(id_out_.size() == 1);
   // Loop over function inputs
-  for (size_t k = 0; k < id_in_.size(); ++k) {
-    // Jacobian to be calculated
-    double* jac = res[k];
+  for (size_t i1 = 0; i1 < id_in_.size(); ++i1) {
     // Calculate Jacobian, one column at a time
-    for (casadi_int i = 0; i < id_in_[k].size(); ++i) {
-      // Set seed for column i
-      dae->fmu_->set_seed(mem, id_in_[k][i], 1.);
-      // Request sensitivities
-      for (size_t id : id_out_[0])
-        dae->fmu_->request(mem, id);
+    for (casadi_int i2 = 0; i2 < id_in_[i1].size(); ++i2) {
+      // Set seed for column
+      dae->fmu_->set_seed(mem, id_in_[i1][i2], 1.);
+      // Request all elements of the column
+      for (size_t j1 = 0; j1 < id_out_.size(); ++j1) {
+        if (res[j1 * id_in_.size() + i1]) {
+          for (size_t j2 = 0; j2 < id_out_[j1].size(); ++j2) {
+            dae->fmu_->request(mem, id_out_[j1][j2]);
+          }
+        }
+      }
       // Calculate derivatives
       if (dae->fmu_->eval_derivative(mem)) return 1;
-      // Get sensitivities
-      for (size_t id : id_out_[0])
-        dae->fmu_->get_sens(mem, id, jac++);
+      // Loop over function outputs
+      for (size_t j1 = 0; j1 < id_out_.size(); ++j1) {
+        // Corresponding Jacobian block, if any
+        double* J = res[j1 * id_in_.size() + i1];
+        if (J) {
+          // Shift to right column
+          J += id_out_[j1].size() * i2;
+          // Get column
+          for (size_t j2 = 0; j2 < id_out_[j1].size(); ++j2) {
+            dae->fmu_->get_sens(mem, id_out_[j1][j2], J++);
+          }
+        }
+      }
     }
   }
   // Reset solver
