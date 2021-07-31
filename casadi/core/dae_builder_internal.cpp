@@ -293,60 +293,78 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
 }
 
 void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
-  // All expressions
-  std::vector<MX> var_u, var_x;
-  for (size_t k : u_) var_u.push_back(variable(k).v);
-  for (size_t k : x_) var_x.push_back(variable(k).v);
-  // Get the IDs of the output variables
-  std::vector<size_t> id_yd;
-  id_yd.reserve(outputs_.size() + derivatives_.size());
-  for (auto& v : {outputs_, derivatives_})
-    for (size_t k : v) id_yd.push_back(variable(k).value_reference);
   // Create an FMU function
   Dict opts = {
     {"enable_fd", !provides_directional_derivative_},
     {"fd_method", "smoothing"}};
-  Function fmu = fmu_fun(name_, {u_, x_}, {id_yd}, {"u", "x"}, {"yd"}, opts);
+  Function fmu = fmu_fun(name_, {u_, x_}, {outputs_, derivatives_},
+    {"u", "x"}, {"y", "xdot"}, opts);
   add_fun(fmu);
   // FMU right-hand-side
   std::vector<MX> fmu_rhs(2);
   // Auxiliary variable for u
-  if (!var_u.empty()) {
+  if (!u_.empty()) {
+    // Collect expressions
+    std::vector<MX> var_u;
+    for (size_t k : u_) var_u.push_back(variable(k).v);
+    // New variable
     Variable u("fmu_u");
     u.v = MX::sym(u.name, var_u.size());
     u.variability = Variable::CONTINUOUS;
     u.beq = vertcat(var_u);
     w_.push_back(add_variable(u.name, u));
+    // Right-hand-side of FmuFunction call
     fmu_rhs.at(0) = u.v;
   }
   // Auxiliary variable for x
-  if (!var_x.empty()) {
+  if (!x_.empty()) {
+    // Collect expressions
+    std::vector<MX> var_x;
+    for (size_t k : x_) var_x.push_back(variable(k).v);
+    // New variable
     Variable x("fmu_x");
     x.v = MX::sym(x.name, var_x.size());
     x.variability = Variable::CONTINUOUS;
     x.beq = vertcat(var_x);
     w_.push_back(add_variable(x.name, x));
+    // Right-hand-side of FmuFunction call
     fmu_rhs.at(1) = x.v;
   }
   // Create function call to fmu
   std::vector<MX> fmu_lhs = fmu(fmu_rhs);
-  // Auxiliary variables for yd
-  Variable yd(name_ + "_yd");
-  yd.v = MX::sym(yd.name, id_yd.size());
-  yd.variability = Variable::CONTINUOUS;
-  yd.beq = fmu_lhs.at(0);
-  w_.push_back(add_variable(yd.name, yd));
-  // Split up yd.v
-  std::vector<MX> yd_split = vertsplit(yd.v);
-  // Update binding equations for yd, add to list of dependent variables
-  casadi_assert_dev(yd_split.size() == outputs_.size() + derivatives_.size());
-  for (size_t k = 0; k < outputs_.size(); ++k) {
-    variable(outputs_[k]).beq = yd_split.at(k);
-    w_.push_back(outputs_[k]);
+  // Outputs
+  if (!outputs_.empty()) {
+    // Auxiliary variables for yd
+    Variable y("fmu_y");
+    y.v = MX::sym(y.name, outputs_.size());
+    y.variability = Variable::CONTINUOUS;
+    y.beq = fmu_lhs.at(0);
+    w_.push_back(add_variable(y.name, y));
+    // Split up yd.v
+    std::vector<MX> y_split = vertsplit(y.v);
+    // Update binding equations for y, add to list of dependent variables
+    casadi_assert_dev(y_split.size() == outputs_.size());
+    for (size_t k = 0; k < outputs_.size(); ++k) {
+      variable(outputs_[k]).beq = y_split.at(k);
+      w_.push_back(outputs_[k]);
+    }
   }
-  for (size_t k = 0; k < derivatives_.size(); ++k) {
-    variable(derivatives_[k]).beq = yd_split.at(outputs_.size() + k);
-    w_.push_back(derivatives_[k]);
+  // State derivatives
+  if (!derivatives_.empty()) {
+    // Auxiliary variables for xdot
+    Variable xdot("fmu_xdot");
+    xdot.v = MX::sym(xdot.name, derivatives_.size());
+    xdot.variability = Variable::CONTINUOUS;
+    xdot.beq = fmu_lhs.at(1);
+    w_.push_back(add_variable(xdot.name, xdot));
+    // Split up yd.v
+    std::vector<MX> xdot_split = vertsplit(xdot.v);
+    // Update binding equations for yd, add to list of dependent variables
+    casadi_assert_dev(xdot_split.size() == derivatives_.size());
+    for (size_t k = 0; k < derivatives_.size(); ++k) {
+      variable(derivatives_[k]).beq = xdot_split.at(k);
+      w_.push_back(derivatives_[k]);
+    }
   }
 }
 
