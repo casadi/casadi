@@ -44,9 +44,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Variable references for inputs and outputs
   std::vector<std::vector<size_t>> id_in_, id_out_;
 
-  // Value reference to the inputs and outputs
-  std::vector<std::vector<fmi2ValueReference>> vref_in_, vref_out_;
-
   /** \brief Constructor */
   FmuFunction(const std::string& name, const DaeBuilder& dae,
       const std::vector<std::vector<size_t>>& id_in,

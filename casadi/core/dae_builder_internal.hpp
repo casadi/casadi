@@ -614,9 +614,6 @@ struct CASADI_EXPORT Fmu {
   // Get a derivative
   int get_sens(int mem, size_t id, double* value);
 
-  // Set value (legacy)
-  int set_real(int mem, size_t id, double value);
-
   // Get memory object
   fmi2Component memory(int mem);
 

@@ -2410,20 +2410,6 @@ int Fmu::set_seed(int mem, size_t id, double value) {
   return 0;
 }
 
-int Fmu::set_real(int mem, size_t id, double value) {
-  // Get memory
-  Memory& m = mem_.at(mem);
-  // Value reference
-  fmi2ValueReference vr = self_.variable(id).value_reference;
-  // Set the value
-  fmi2Status status = set_real_(m.c, &vr, 1, &value);
-  if (status != fmi2OK) {
-    casadi_warning("fmi2SetReal failed for " + self_.variable(id).name);
-    return 1;
-  }
-  return 0;
-}
-
 int Fmu::request(int mem, size_t id) {
   // Get memory
   Memory& m = mem_.at(mem);
@@ -2460,14 +2446,14 @@ int Fmu::eval(int mem) {
       n_requested++;
     }
   }
-  // Quick return if nothing requested
-  if (n_requested == 0) return 0;
   // Set all variables
   fmi2Status status = set_real_(m.c, &m.vr_work_[0], n_set, &m.work_[0]);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
   }
+  // Quick return if nothing requested
+  if (n_requested == 0) return 0;
   // Calculate all variables
   status = get_real_(m.c, &m.vr_work_[n_set], n_requested, &m.work_[n_set]);
   if (status != fmi2OK) {

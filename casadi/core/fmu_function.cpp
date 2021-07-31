@@ -67,21 +67,6 @@ void FmuFunction::init(const Dict& opts) {
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
 
-  // Cast id_in to right type
-  vref_in_.resize(id_in_.size());
-  for (size_t k = 0; k < id_in_.size(); ++k) {
-    vref_in_[k].resize(id_in_[k].size());
-    for (size_t i = 0; i < id_in_[k].size(); ++i)
-      vref_in_[k][i] = dae->variable(id_in_[k][i]).value_reference;
-  }
-  // Cast id_out to right type
-  vref_out_.resize(id_out_.size());
-  for (size_t k = 0; k < id_out_.size(); ++k) {
-    vref_out_[k].resize(id_out_[k].size());
-    for (size_t i = 0; i < id_out_[k].size(); ++i)
-      vref_out_[k][i] = dae->variable(id_out_[k][i]).value_reference;
-  }
-
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
 }
@@ -149,20 +134,22 @@ int FmuFunction::eval_fmu(const DaeBuilderInternal* dae, int mem,
 
 int FmuFunction::eval_jac(const DaeBuilderInternal* dae, int mem,
     const double** arg, double** res) const {
-  // Outputs
-  double* jac = res[0];
-  // Reset solver
-  if (dae->fmu_->setup_experiment(mem)) return 1;
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set_real(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      if (dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
+  // Reset solver
+  if (dae->fmu_->setup_experiment(mem)) return 1;
   // Initialization mode begins
   if (dae->fmu_->enter_initialization_mode(mem)) return 1;
   // Initialization mode ends
   if (dae->fmu_->exit_initialization_mode(mem)) return 1;
+  // Evaluate
+  if (dae->fmu_->eval(mem)) return 1;
+  // Outputs
+  double* jac = res[0];
   // Calculate Jacobian, one column at a time
   for (casadi_int i = 0; i < id_in_[0].size(); ++i) {
     // Set seed for column i
@@ -192,18 +179,20 @@ int FmuFunction::eval_adj(const DaeBuilderInternal* dae, int mem,
   const double* adj_yd = arg[2];
   // Outputs
   double* adj_xd = res[0];
-  // Setup experiment
-  if (dae->fmu_->setup_experiment(mem)) return 1;
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set_real(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      if (dae->fmu_->set(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
+  // Setup experiment
+  if (dae->fmu_->setup_experiment(mem)) return 1;
   // Initialization mode begins
   if (dae->fmu_->enter_initialization_mode(mem)) return 1;
   // Initialization mode ends
   if (dae->fmu_->exit_initialization_mode(mem)) return 1;
+  // Evaluate
+  if (dae->fmu_->eval(mem)) return 1;
   // Reset results
   casadi_clear(adj_xd, n_xd);
   // Calculate Jacobian, one column at a time
