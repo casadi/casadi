@@ -189,18 +189,12 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
   int m = dae->fmu_->checkout();
   // Dimensions
   casadi_int n_xd = nnz_in(0);
-  casadi_int n_yd = nnz_out(0);
   // Inputs
   // const double* xd = arg[0];
   // const double* out_yd = arg[1];  // not used
   const double* adj_yd = arg[2];
   // Outputs
   double* adj_xd = res[0];
-  // Forward seed, sensitivity for calculating columns of the Jacobian
-  double* fwd_xd = w; w += n_xd;
-  double* fwd_yd = w; w += n_yd;
-  // FMI return flag
-  fmi2Status status;
   // Setup experiment
   if (dae->fmu_->setup_experiment(m)) return 1;
   // Set inputs
@@ -215,23 +209,21 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
   if (dae->fmu_->exit_initialization_mode(m)) return 1;
   // Reset results
   casadi_clear(adj_xd, n_xd);
-  // Clear seeds
-  casadi_clear(fwd_xd, n_xd);
   // Calculate Jacobian, one column at a time
   for (casadi_int i = 0; i < n_xd; ++i) {
     // Set seed for column i
-    fwd_xd[i] = 1.;
-    // Calculate directional derivative
-    status = dae->fmu_->get_directional_derivative_(dae->fmu_->memory(m), get_ptr(vref_out_[0]),
-      vref_out_[0].size(), get_ptr(vref_in_[0]), vref_in_[0].size(), fwd_xd, fwd_yd);
-    if (status != fmi2OK) {
-      casadi_warning("fmi2GetDirectionalDerivative failed");
-      return 1;
+    dae->fmu_->set_seed(m, id_in_[0][i], 1.);
+    // Request sensitivities
+    for (size_t id : id_out_[0])
+      if (dae->fmu_->request(m, id)) return 1;
+    // Calculate derivatives
+    if (dae->fmu_->eval_derivative(m)) return 1;
+    // Get sensitivities
+    for (casadi_int j = 0; j < id_out_[0].size(); ++j) {
+      double J_ij;
+      if (dae->fmu_->get_sens(m, id_out_[0][j], &J_ij)) return 1;
+      adj_xd[i] += adj_yd[j] * J_ij;
     }
-    // Add contribution from first seed
-    adj_xd[i] += casadi_dot(n_yd, fwd_yd, adj_yd);
-    // Remove seed
-    fwd_xd[i] = 0;
   }
   // Reset solver
   if (dae->fmu_->reset(m)) return 1;
@@ -293,14 +285,6 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
 FmuFunctionAdj::~FmuFunctionAdj() {
   // Free memory
   clear_mem();
-}
-
-void FmuFunctionAdj::init(const Dict& opts) {
-  // Call the base class initializer
-  FunctionInternal::init(opts);
-  // Work vectors
-  alloc_w(derivative_of_.nnz_in(0), true);
-  alloc_w(derivative_of_.nnz_out(0), true);
 }
 
 int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, double* w,
