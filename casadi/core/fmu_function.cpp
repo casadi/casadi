@@ -139,54 +139,43 @@ int FmuFunction::eval_fmu(const DaeBuilderInternal* dae, int mem,
   return 0;
 }
 
-int FmuFunction::eval_jac(const double** arg, double** res, casadi_int* iw, double* w,
-    void* mem) const {
-  // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Create instance
-  int m = dae->fmu_->checkout();
+int FmuFunction::eval_jac(const DaeBuilderInternal* dae, int mem,
+    const double** arg, double** res) const {
   // Outputs
   double* jac = res[0];
   // Reset solver
-  if (dae->fmu_->setup_experiment(m)) return 1;
+  if (dae->fmu_->setup_experiment(mem)) return 1;
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set_real(m, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      if (dae->fmu_->set_real(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
   // Initialization mode begins
-  if (dae->fmu_->enter_initialization_mode(m)) return 1;
+  if (dae->fmu_->enter_initialization_mode(mem)) return 1;
   // Initialization mode ends
-  if (dae->fmu_->exit_initialization_mode(m)) return 1;
+  if (dae->fmu_->exit_initialization_mode(mem)) return 1;
   // Calculate Jacobian, one column at a time
   for (casadi_int i = 0; i < id_in_[0].size(); ++i) {
     // Set seed for column i
-    dae->fmu_->set_seed(m, id_in_[0][i], 1.);
+    dae->fmu_->set_seed(mem, id_in_[0][i], 1.);
     // Request sensitivities
     for (size_t id : id_out_[0])
-      if (dae->fmu_->request(m, id)) return 1;
+      if (dae->fmu_->request(mem, id)) return 1;
     // Calculate derivatives
-    if (dae->fmu_->eval_derivative(m)) return 1;
+    if (dae->fmu_->eval_derivative(mem)) return 1;
     // Get sensitivities
     for (size_t id : id_out_[0])
-      if (dae->fmu_->get_sens(m, id, jac++)) return 1;
+      if (dae->fmu_->get_sens(mem, id, jac++)) return 1;
   }
   // Reset solver
-  if (dae->fmu_->reset(m)) return 1;
-  // Release memory object
-  dae->fmu_->release(m);
+  if (dae->fmu_->reset(mem)) return 1;
   // Successful return
   return 0;
 }
 
-int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, double* w,
-    void* mem) const {
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Create instance
-  int m = dae->fmu_->checkout();
+int FmuFunction::eval_adj(const DaeBuilderInternal* dae, int mem,
+    const double** arg, double** res) const {
   // Dimensions
   casadi_int n_xd = nnz_in(0);
   // Inputs
@@ -196,39 +185,37 @@ int FmuFunction::eval_adj(const double** arg, double** res, casadi_int* iw, doub
   // Outputs
   double* adj_xd = res[0];
   // Setup experiment
-  if (dae->fmu_->setup_experiment(m)) return 1;
+  if (dae->fmu_->setup_experiment(mem)) return 1;
   // Set inputs
   for (size_t k = 0; k < id_in_.size(); ++k) {
     for (size_t i = 0; i < id_in_[k].size(); ++i) {
-      if (dae->fmu_->set_real(m, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
+      if (dae->fmu_->set_real(mem, id_in_[k][i], arg[k] ? arg[k][i] : 0)) return 1;
     }
   }
   // Initialization mode begins
-  if (dae->fmu_->enter_initialization_mode(m)) return 1;
+  if (dae->fmu_->enter_initialization_mode(mem)) return 1;
   // Initialization mode ends
-  if (dae->fmu_->exit_initialization_mode(m)) return 1;
+  if (dae->fmu_->exit_initialization_mode(mem)) return 1;
   // Reset results
   casadi_clear(adj_xd, n_xd);
   // Calculate Jacobian, one column at a time
   for (casadi_int i = 0; i < n_xd; ++i) {
     // Set seed for column i
-    dae->fmu_->set_seed(m, id_in_[0][i], 1.);
+    dae->fmu_->set_seed(mem, id_in_[0][i], 1.);
     // Request sensitivities
     for (size_t id : id_out_[0])
-      if (dae->fmu_->request(m, id)) return 1;
+      if (dae->fmu_->request(mem, id)) return 1;
     // Calculate derivatives
-    if (dae->fmu_->eval_derivative(m)) return 1;
+    if (dae->fmu_->eval_derivative(mem)) return 1;
     // Get sensitivities
     for (casadi_int j = 0; j < id_out_[0].size(); ++j) {
       double J_ij;
-      if (dae->fmu_->get_sens(m, id_out_[0][j], &J_ij)) return 1;
+      if (dae->fmu_->get_sens(mem, id_out_[0][j], &J_ij)) return 1;
       adj_xd[i] += adj_yd[j] * J_ij;
     }
   }
   // Reset solver
-  if (dae->fmu_->reset(m)) return 1;
-  // Release memory object
-  dae->fmu_->release(m);
+  if (dae->fmu_->reset(mem)) return 1;
   // Successful return
   return 0;
 }
@@ -277,9 +264,19 @@ FmuFunctionJac::~FmuFunctionJac() {
 
 int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
-  // Redirect to non-differentiated class
-  auto m = derivative_of_.get<FmuFunction>();
-  return m->eval_jac(arg, res, iw, w, mem);
+  // Non-differentiated class
+  auto self = derivative_of_.get<FmuFunction>();
+  // DaeBuilder instance
+  casadi_assert(self->dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(self->dae_->raw_);
+  // Create instance
+  int m = dae->fmu_->checkout();
+  // Evaluate fmu
+  int flag = self->eval_jac(dae, m, arg, res);
+  // Release memory object
+  dae->fmu_->release(m);
+  // Return error flag
+  return flag;
 }
 
 FmuFunctionAdj::~FmuFunctionAdj() {
@@ -289,9 +286,19 @@ FmuFunctionAdj::~FmuFunctionAdj() {
 
 int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
-  // Redirect to non-differentiated class
-  auto m = derivative_of_.get<FmuFunction>();
-  return m->eval_adj(arg, res, iw, w, mem);
+  // Non-differentiated class
+  auto self = derivative_of_.get<FmuFunction>();
+  // DaeBuilder instance
+  casadi_assert(self->dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(self->dae_->raw_);
+  // Create instance
+  int m = dae->fmu_->checkout();
+  // Evaluate fmu
+  int flag = self->eval_adj(dae, m, arg, res);
+  // Release memory object
+  dae->fmu_->release(m);
+  // Return error flag
+  return flag;
 }
 
 #endif  // WITH_FMU

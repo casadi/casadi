@@ -117,6 +117,8 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
   friend class FmuFunction;
   friend class Fmu;
+  friend class FmuFunctionJac;
+  friend class FmuFunctionAdj;
 
  public:
 

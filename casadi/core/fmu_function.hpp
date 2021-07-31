@@ -37,7 +37,7 @@ namespace casadi {
 #ifdef WITH_FMU
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
- protected:
+ public:
   // DaeBuilder instance (non-owning reference to avoid circular dependency)
   WeakRef dae_;
 
@@ -46,8 +46,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Value reference to the inputs and outputs
   std::vector<std::vector<fmi2ValueReference>> vref_in_, vref_out_;
-
- public:
 
   /** \brief Constructor */
   FmuFunction(const std::string& name, const DaeBuilder& dae,
@@ -84,10 +82,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   int eval_fmu(const DaeBuilderInternal* dae, int mem, const double** arg, double** res) const;
 
   // Evaluate Jacobian numerically
-  int eval_jac(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+  int eval_jac(const DaeBuilderInternal* dae, int mem, const double** arg, double** res) const;
 
   // Evaluate adjoint numerically
-  int eval_adj(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+  int eval_adj(const DaeBuilderInternal* dae, int mem, const double** arg, double** res) const;
 
   ///@{
   /** \brief Full Jacobian */
