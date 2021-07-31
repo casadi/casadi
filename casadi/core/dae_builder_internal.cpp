@@ -294,19 +294,11 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
 
 void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   // All expressions
-  std::vector<MX> var_xd;
-  // All value references
-  std::vector<size_t> id_xd, id_yd;
-  // Get the IDs and expressions of the initial unknowns
-  id_xd.reserve(u_.size() + x_.size());
-  var_xd.reserve(u_.size() + x_.size());
-  for (auto& v : {u_, x_}) {
-    for (size_t k : v) {
-      id_xd.push_back(k);
-      var_xd.push_back(variable(k).v);
-    }
-  }
+  std::vector<MX> var_u, var_x;
+  for (size_t k : u_) var_u.push_back(variable(k).v);
+  for (size_t k : x_) var_x.push_back(variable(k).v);
   // Get the IDs of the output variables
+  std::vector<size_t> id_yd;
   id_yd.reserve(outputs_.size() + derivatives_.size());
   for (auto& v : {outputs_, derivatives_})
     for (size_t k : v) id_yd.push_back(variable(k).value_reference);
@@ -314,16 +306,30 @@ void DaeBuilderInternal::load_fmi_functions(const std::string& path) {
   Dict opts = {
     {"enable_fd", !provides_directional_derivative_},
     {"fd_method", "smoothing"}};
-  Function fmu = fmu_fun(name_, {id_xd}, {id_yd}, {"xd"}, {"yd"}, opts);
+  Function fmu = fmu_fun(name_, {u_, x_}, {id_yd}, {"u", "x"}, {"yd"}, opts);
   add_fun(fmu);
-  // Auxiliary variables for xd
-  Variable xd(name_ + "_xd");
-  xd.v = MX::sym(xd.name, id_xd.size());
-  xd.variability = Variable::CONTINUOUS;
-  xd.beq = vertcat(var_xd);
-  w_.push_back(add_variable(xd.name, xd));
+  // FMU right-hand-side
+  std::vector<MX> fmu_rhs(2);
+  // Auxiliary variable for u
+  if (!var_u.empty()) {
+    Variable u("fmu_u");
+    u.v = MX::sym(u.name, var_u.size());
+    u.variability = Variable::CONTINUOUS;
+    u.beq = vertcat(var_u);
+    w_.push_back(add_variable(u.name, u));
+    fmu_rhs.at(0) = u.v;
+  }
+  // Auxiliary variable for x
+  if (!var_x.empty()) {
+    Variable x("fmu_x");
+    x.v = MX::sym(x.name, var_x.size());
+    x.variability = Variable::CONTINUOUS;
+    x.beq = vertcat(var_x);
+    w_.push_back(add_variable(x.name, x));
+    fmu_rhs.at(1) = x.v;
+  }
   // Create function call to fmu
-  std::vector<MX> fmu_lhs = fmu(std::vector<MX>{xd.v});
+  std::vector<MX> fmu_lhs = fmu(fmu_rhs);
   // Auxiliary variables for yd
   Variable yd(name_ + "_yd");
   yd.v = MX::sym(yd.name, id_yd.size());
