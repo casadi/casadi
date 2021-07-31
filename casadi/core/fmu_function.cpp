@@ -201,33 +201,38 @@ int FmuFunction::eval_adj(const DaeBuilderInternal* dae, int mem,
   if (dae->fmu_->exit_initialization_mode(mem)) return 1;
   // Evaluate
   if (dae->fmu_->eval(mem)) return 1;
-  // Not implemented
-  casadi_assert_dev(id_out_.size() == 1);
   // Loop over function inputs
-  for (size_t k = 0; k < id_in_.size(); ++k) {
+  for (size_t i1 = 0; i1 < id_in_.size(); ++i1) {
     // Sensitivities to be calculated
-    double* sens = res[k];
+    double* sens = res[i1];
     // Skip if not requested
     if (sens == 0) continue;
-    // Reset results
-    casadi_clear(sens, id_in_[k].size());
-    // Seeds
-    const double* seed = arg[id_in_.size() + id_out_.size()];
-    // Skip if zero
-    if (seed == 0) continue;
     // Calculate Jacobian, one column at a time
-    for (casadi_int i = 0; i < id_in_[k].size(); ++i) {
+    for (casadi_int i2 = 0; i2 < id_in_[i1].size(); ++i2) {
+      // Initialize return to zero
+      sens[i2] = 0;
       // Set seed for column i
-      dae->fmu_->set_seed(mem, id_in_[k][i], 1.);
-      // Request sensitivities
-      for (size_t id : id_out_[0]) dae->fmu_->request(mem, id);
+      dae->fmu_->set_seed(mem, id_in_[i1][i2], 1.);
+      // Request all elements of the column, unless corresponding seed is zero
+      for (size_t j1 = 0; j1 < id_out_.size(); ++j1) {
+        if (arg[id_in_.size() + id_out_.size() + j1]) {
+          for (size_t j2 = 0; j2 < id_out_[j1].size(); ++j2) {
+            dae->fmu_->request(mem, id_out_[j1][j2]);
+          }
+        }
+      }
       // Calculate derivatives
       if (dae->fmu_->eval_derivative(mem)) return 1;
       // Get sensitivities
-      for (casadi_int j = 0; j < id_out_[0].size(); ++j) {
-        double J_ij;
-        dae->fmu_->get_sens(mem, id_out_[0][j], &J_ij);
-        sens[i] += seed[j] * J_ij;
+      for (size_t j1 = 0; j1 < id_out_.size(); ++j1) {
+        const double* seed = arg[id_in_.size() + id_out_.size() + j1];
+        if (seed) {
+          for (size_t j2 = 0; j2 < id_out_[j1].size(); ++j2) {
+            double J_ij;
+            dae->fmu_->get_sens(mem, id_out_[j1][j2], &J_ij);
+            sens[i2] += seed[j2] * J_ij;
+          }
+        }
       }
     }
   }
