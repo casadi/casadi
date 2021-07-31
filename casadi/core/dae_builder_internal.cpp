@@ -2317,7 +2317,10 @@ int Fmu::checkout() {
   // Allocate/reset value buffer
   m.buffer_.resize(self_.variables_.size());
   std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
-  // Allocate/reset requested
+  // Allocate/reset sensitivities
+  m.sens_.resize(self_.variables_.size());
+  std::fill(m.sens_.begin(), m.sens_.end(), 0);
+  // Allocate/reset changed
   m.changed_.resize(self_.variables_.size());
   std::fill(m.changed_.begin(), m.changed_.end(), false);
   // Allocate/reset requested
@@ -2392,6 +2395,18 @@ int Fmu::set(int mem, size_t id, double value) {
     m.buffer_.at(id) = value;
     m.changed_.at(id) = true;
   }
+  return 0;
+}
+
+int Fmu::set_seed(int mem, size_t id, double value) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Update buffer
+  if (value != 0) {
+    m.sens_.at(id) = value;
+    m.changed_.at(id) = true;
+  }
+  // Successful return
   return 0;
 }
 
@@ -2489,6 +2504,70 @@ int Fmu::get(int mem, size_t id, double* value) {
   Memory& m = mem_.at(mem);
   // Save to return
   *value = m.buffer_.at(id);
+  // Successful return
+  return 0;
+}
+
+int Fmu::eval_derivative(int mem) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Collect known variables
+  size_t n_known = 0;
+  for (size_t id = 0; id < m.changed_.size(); ++id) {
+    if (m.changed_[id]) {
+      // Value reference
+      m.vr_work_[n_known] = self_.variable(id).value_reference;
+      // Value
+      m.work_[n_known] = m.sens_[id];
+      // Clear seed
+      m.sens_[id] = 0;
+      // Mark as no longer changed
+      m.changed_[id] = false;
+      // Increase counter
+      n_known++;
+    }
+  }
+  // Ensure at least one seed
+  casadi_assert(n_known != 0, "No seeds");
+  // Collect unknown variables
+  size_t n_unknown = 0;
+  for (size_t id = 0; id < m.requested_.size(); ++id) {
+    if (m.requested_[id]) {
+      // Value reference
+      m.vr_work_[n_known + n_unknown] = self_.variable(id).value_reference;
+      // Clear result
+      m.work_[n_known + n_unknown] = nan;
+      // Increase counter
+      n_unknown++;
+    }
+  }
+  // Quick return if nothing to be calculated
+  if (n_unknown == 0) return 0;
+  // Calculate directional derivative
+  fmi2Status status = get_directional_derivative_(m.c, &m.vr_work_[n_known], n_unknown,
+    &m.vr_work_[0], n_known, &m.work_[0], &m.work_[n_known]);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2GetDirectionalDerivative failed");
+    return 1;
+  }
+  // Collect requested variables
+  size_t ind = n_known;
+  for (size_t id = 0; id < m.requested_.size(); ++id) {
+    if (m.requested_[id]) {
+      // Get the value
+      m.sens_[id] = m.work_[ind++];
+      // No longer requested
+      m.requested_[id] = false;
+    }
+  }
+  return 0;
+}
+
+int Fmu::get_sens(int mem, size_t id, double* value) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Save to return
+  *value = m.sens_.at(id);
   // Successful return
   return 0;
 }

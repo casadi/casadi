@@ -117,9 +117,6 @@ class CASADI_EXPORT FmuFunctionJac : public FunctionInternal {
   /// Destructor
   ~FmuFunctionJac() override;
 
-  /// Initialize
-  void init(const Dict& opts) override;
-
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunctionJac";}
 

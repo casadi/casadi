@@ -591,11 +591,8 @@ struct CASADI_EXPORT Fmu {
   // Exit initialization mode
   int exit_initialization_mode(int mem);
 
-  // Set value (buffered)
-  int set(int mem, size_t id, double value);
-
   // Set value
-  int set_real(int mem, size_t id, double value);
+  int set(int mem, size_t id, double value);
 
   // Request the calculation of a variable
   int request(int mem, size_t id);
@@ -605,6 +602,18 @@ struct CASADI_EXPORT Fmu {
 
   // Get a calculated variable
   int get(int mem, size_t id, double* value);
+
+  // Set seed
+  int set_seed(int mem, size_t id, double value);
+
+  // Calculate directional derivatives
+  int eval_derivative(int mem);
+
+  // Get a derivative
+  int get_sens(int mem, size_t id, double* value);
+
+  // Set value (legacy)
+  int set_real(int mem, size_t id, double value);
 
   // Get memory object
   fmi2Component memory(int mem);
@@ -645,6 +654,8 @@ struct CASADI_EXPORT Fmu {
     bool in_use;
     // Value buffer
     std::vector<double> buffer_;
+    // Sensitivities
+    std::vector<double> sens_;
     // Which entries have been changed
     std::vector<bool> changed_;
     // Which entries are being requested
