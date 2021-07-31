@@ -2434,12 +2434,6 @@ int Fmu::request(int mem, size_t id) {
 }
 
 int Fmu::eval(int mem) {
-  // Reset solver
-  if (setup_experiment(mem)) return 1;
-  // Initialization mode begins
-  if (enter_initialization_mode(mem)) return 1;
-  // Initialization mode ends
-  if (exit_initialization_mode(mem)) return 1;
   // Get memory
   Memory& m = mem_.at(mem);
   // Collect changed variables
@@ -2467,10 +2461,7 @@ int Fmu::eval(int mem) {
     }
   }
   // Quick return if nothing requested
-  if (n_requested == 0) {
-    if (reset(mem)) return 1;
-    return 0;
-  }
+  if (n_requested == 0) return 0;
   // Set all variables
   fmi2Status status = set_real_(m.c, &m.vr_work_[0], n_set, &m.work_[0]);
   if (status != fmi2OK) {
@@ -2493,8 +2484,6 @@ int Fmu::eval(int mem) {
       m.requested_[id] = false;
     }
   }
-  // Reset solver
-  if (reset(mem)) return 1;
   // Successful return
   return 0;
 }

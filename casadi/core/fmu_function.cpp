@@ -125,8 +125,16 @@ int FmuFunction::eval_fmu(const DaeBuilderInternal* dae, int mem,
       }
     }
   }
+  // Reset solver
+  if (dae->fmu_->setup_experiment(mem)) return 1;
+  // Initialization mode begins
+  if (dae->fmu_->enter_initialization_mode(mem)) return 1;
+  // Initialization mode ends
+  if (dae->fmu_->exit_initialization_mode(mem)) return 1;
   // Evaluate
   if (dae->fmu_->eval(mem)) return 1;
+  // Reset solver
+  if (dae->fmu_->reset(mem)) return 1;
   // Get outputs
   for (size_t k = 0; k < id_out_.size(); ++k) {
     if (res[k]) {
