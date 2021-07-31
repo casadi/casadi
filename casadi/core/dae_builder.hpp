@@ -359,15 +359,15 @@ public:
 
   /** \brief  Load a function from an FMU DLL
     \param name    Name assigned to the resulting function object
-    \param id_in   Identifiers of all the inputs
-    \param id_out  Identifiers of all the outputs
+    \param comp_in   Names of all the input components
+    \param comp_out  Names of all the output components
     \param name_in   Names of all the inputs
     \param name_out  Names of all the outputs
     \param opts    Optional settings
   */
   Function fmu_fun(const std::string& name,
-      const std::vector<std::vector<casadi_int>>& id_in,
-      const std::vector<std::vector<casadi_int>>& id_out,
+      const std::vector<std::vector<std::string>>& comp_in,
+      const std::vector<std::vector<std::string>>& comp_out,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const Dict& opts=Dict()) const;
