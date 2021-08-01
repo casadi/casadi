@@ -622,7 +622,8 @@ struct CASADI_EXPORT Fmu {
   // Evaluate Jacobian numerically
   int eval_jac(int mem, const double** arg, double** res,
     const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out);
+    const std::vector<std::vector<size_t>>& id_out,
+    const std::vector<Sparsity>& sp_jac);
 
   // Evaluate adjoint numerically
   int eval_adj(int mem, const double** arg, double** res,

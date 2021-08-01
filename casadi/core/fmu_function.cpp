@@ -146,7 +146,7 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_jac(m, arg, res, self->id_in_, self->id_out_);
+  int flag = dae->fmu_->eval_jac(m, arg, res, self->id_in_, self->id_out_, sparsity_out_);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag

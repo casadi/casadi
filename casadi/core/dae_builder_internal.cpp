@@ -2603,7 +2603,8 @@ int Fmu::eval(int mem, const double** arg, double** res,
 
 int Fmu::eval_jac(int mem, const double** arg, double** res,
     const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out) {
+    const std::vector<std::vector<size_t>>& id_out,
+    const std::vector<Sparsity>& sp_jac) {
   // Set inputs
   for (size_t k = 0; k < id_in.size(); ++k) {
     for (size_t i = 0; i < id_in[k].size(); ++i) {
@@ -2624,11 +2625,18 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
     for (casadi_int i2 = 0; i2 < id_in[i1].size(); ++i2) {
       // Set seed for column
       set_seed(mem, id_in[i1][i2], 1.);
-      // Request all elements of the column
+      // Loop over function output
       for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
-        if (res[j1 * id_in.size() + i1]) {
-          for (size_t j2 = 0; j2 < id_out[j1].size(); ++j2) {
-            request(mem, id_out[j1][j2]);
+        // Index of the Jacobian block
+        size_t res_ind = j1 * id_in.size() + i1;
+        // Only calculate outputs that are requested
+        if (res[res_ind]) {
+          // Get sparsity
+          const casadi_int* colind = sp_jac[res_ind].colind();
+          const casadi_int* row = sp_jac[res_ind].row();
+          // Request all nonzero elements of the column
+          for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
+            request(mem, id_out[j1][row[k]]);
           }
         }
       }
@@ -2636,14 +2644,16 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
       if (eval_derivative(mem)) return 1;
       // Loop over function outputs
       for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
-        // Corresponding Jacobian block, if any
-        double* J = res[j1 * id_in.size() + i1];
-        if (J) {
-          // Shift to right column
-          J += id_out[j1].size() * i2;
-          // Get column
-          for (size_t j2 = 0; j2 < id_out[j1].size(); ++j2) {
-            get_sens(mem, id_out[j1][j2], J++);
+        // Index of the Jacobian block
+        size_t res_ind = j1 * id_in.size() + i1;
+        // Only calculate outputs that are requested
+        if (res[res_ind]) {
+          // Get sparsity
+          const casadi_int* colind = sp_jac[res_ind].colind();
+          const casadi_int* row = sp_jac[res_ind].row();
+          // Collect all nonzero elements of the column
+          for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
+            get_sens(mem, id_out[j1][row[k]], &res[res_ind][k]);
           }
         }
       }
