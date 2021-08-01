@@ -76,13 +76,19 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
   // Evaluate, non-differentated
-  int eval_fmu(const DaeBuilderInternal* dae, int mem, const double** arg, double** res) const;
+  int eval_fmu(const DaeBuilderInternal* dae, int mem, const double** arg, double** res,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out) const;
 
   // Evaluate Jacobian numerically
-  int eval_jac(const DaeBuilderInternal* dae, int mem, const double** arg, double** res) const;
+  int eval_jac(const DaeBuilderInternal* dae, int mem, const double** arg, double** res,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out) const;
 
   // Evaluate adjoint numerically
-  int eval_adj(const DaeBuilderInternal* dae, int mem, const double** arg, double** res) const;
+  int eval_adj(const DaeBuilderInternal* dae, int mem, const double** arg, double** res,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out) const;
 
   ///@{
   /** \brief Full Jacobian */
