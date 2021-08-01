@@ -79,6 +79,32 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
   return Sparsity::dense(id_out_.at(i).size(), 1);
 }
 
+Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
+    bool symmetric) const {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Lookup for inputs
+  std::vector<casadi_int> lookup(dae->variables_.size(), -1);
+  for (casadi_int i = 0; i < id_in_.at(iind).size(); ++i)
+    lookup.at(id_in_.at(iind).at(i)) = i;
+  // Nonzeros of the Jacobian
+  std::vector<casadi_int> row, col;
+  // Loop over output nonzeros
+  for (casadi_int j = 0; j < id_out_.at(oind).size(); ++j) {
+    // Loop over dependencies
+    for (casadi_int d : dae->variables_.at(id_out_.at(oind).at(j)).dependencies) {
+      casadi_int i = lookup.at(d);
+      if (i >= 0) {
+        row.push_back(j);
+        col.push_back(i);
+      }
+    }
+  }
+  // Assemble sparsity pattern
+  return Sparsity::triplet(id_out_.at(oind).size(), id_in_.at(iind).size(), row, col);
+}
+
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
   // DaeBuilder instance
@@ -174,6 +200,7 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Return error flag
   return flag;
 }
+
 
 #endif  // WITH_FMU
 

@@ -3268,6 +3268,10 @@ namespace casadi {
         if (!derivative_of_.is_diff_out(oind) || !derivative_of_.is_diff_in(iind)) {
           return Sparsity(sp_out.numel(), sp_in.numel());
         }
+        // Is there a routine for calculating the Jacobian?
+        if (derivative_of_->has_jac_sparsity(oind, iind)) {
+          return derivative_of_.jac_sparsity(oind, iind);
+        }
         // Construct sparsity pattern
         std::vector<casadi_int> row, colind;
         row.reserve(sp_out.nnz() * sp_in.nnz());

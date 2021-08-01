@@ -76,6 +76,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
   ///@{
+  /** \brief Return sparsity of Jacobian of an output respect to an input */
+  bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override {return true;}
+  Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
+  ///@}
+
+  ///@{
   /** \brief Full Jacobian */
   bool has_jacobian() const override;
   Function get_jacobian(const std::string& name,

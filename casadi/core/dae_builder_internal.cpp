@@ -2069,8 +2069,11 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       // Get index
       outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Get dependencies
-      for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
-        variables_.at(d - 1).dependency = true;
+      variables_.at(outputs_.back()).dependencies
+        = e.attribute<std::vector<casadi_int>>("dependencies", {});
+      // Mark interdependencies, change to index-0
+      for (casadi_int& d : variables_.at(outputs_.back()).dependencies) {
+        variables_.at(--d).dependency = true;
       }
     }
   }

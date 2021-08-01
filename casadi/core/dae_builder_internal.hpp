@@ -98,6 +98,9 @@ struct CASADI_EXPORT Variable {
   /// Do other expressions depend on this variable
   bool dependency;
 
+  /// Dependencies
+  std::vector<casadi_int> dependencies;
+
   /// Variable expression
   MX v;
 
