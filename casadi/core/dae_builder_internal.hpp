@@ -614,6 +614,21 @@ struct CASADI_EXPORT Fmu {
   // Get a derivative
   void get_sens(int mem, size_t id, double* value);
 
+  // Evaluate, non-differentated
+  int eval(int mem, const double** arg, double** res,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out);
+
+  // Evaluate Jacobian numerically
+  int eval_jac(int mem, const double** arg, double** res,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out);
+
+  // Evaluate adjoint numerically
+  int eval_adj(int mem, const double** arg, double** res,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out);
+
   // Get memory object
   fmi2Component memory(int mem);
 

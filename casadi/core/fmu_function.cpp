@@ -87,165 +87,11 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = eval_fmu(dae, m, arg, res, id_in_, id_out_);
+  int flag = dae->fmu_->eval(m, arg, res, id_in_, id_out_);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
   return flag;
-}
-
-int FmuFunction::eval_fmu(const DaeBuilderInternal* dae, int mem,
-    const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out) const {
-  // Set inputs
-  for (size_t k = 0; k < id_in.size(); ++k) {
-    for (size_t i = 0; i < id_in[k].size(); ++i) {
-      dae->fmu_->set(mem, id_in[k][i], arg[k] ? arg[k][i] : 0);
-    }
-  }
-  // Request outputs to be evaluated
-  for (size_t k = 0; k < id_out.size(); ++k) {
-    if (res[k]) {
-      for (size_t i = 0; i < id_out[k].size(); ++i) {
-        dae->fmu_->request(mem, id_out[k][i]);
-      }
-    }
-  }
-  // Reset solver
-  if (dae->fmu_->setup_experiment(mem)) return 1;
-  // Initialization mode begins
-  if (dae->fmu_->enter_initialization_mode(mem)) return 1;
-  // Initialization mode ends
-  if (dae->fmu_->exit_initialization_mode(mem)) return 1;
-  // Evaluate
-  if (dae->fmu_->eval(mem)) return 1;
-  // Reset solver
-  if (dae->fmu_->reset(mem)) return 1;
-  // Get outputs
-  for (size_t k = 0; k < id_out.size(); ++k) {
-    if (res[k]) {
-      for (size_t i = 0; i < id_out[k].size(); ++i) {
-        dae->fmu_->get(mem, id_out[k][i], &res[k][i]);
-      }
-    }
-  }
-  // Successful return
-  return 0;
-}
-
-int FmuFunction::eval_jac(const DaeBuilderInternal* dae, int mem,
-    const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out) const {
-  // Set inputs
-  for (size_t k = 0; k < id_in.size(); ++k) {
-    for (size_t i = 0; i < id_in[k].size(); ++i) {
-      dae->fmu_->set(mem, id_in[k][i], arg[k] ? arg[k][i] : 0);
-    }
-  }
-  // Reset solver
-  if (dae->fmu_->setup_experiment(mem)) return 1;
-  // Initialization mode begins
-  if (dae->fmu_->enter_initialization_mode(mem)) return 1;
-  // Initialization mode ends
-  if (dae->fmu_->exit_initialization_mode(mem)) return 1;
-  // Evaluate
-  if (dae->fmu_->eval(mem)) return 1;
-  // Loop over function inputs
-  for (size_t i1 = 0; i1 < id_in.size(); ++i1) {
-    // Calculate Jacobian, one column at a time
-    for (casadi_int i2 = 0; i2 < id_in[i1].size(); ++i2) {
-      // Set seed for column
-      dae->fmu_->set_seed(mem, id_in[i1][i2], 1.);
-      // Request all elements of the column
-      for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
-        if (res[j1 * id_in.size() + i1]) {
-          for (size_t j2 = 0; j2 < id_out[j1].size(); ++j2) {
-            dae->fmu_->request(mem, id_out[j1][j2]);
-          }
-        }
-      }
-      // Calculate derivatives
-      if (dae->fmu_->eval_derivative(mem)) return 1;
-      // Loop over function outputs
-      for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
-        // Corresponding Jacobian block, if any
-        double* J = res[j1 * id_in.size() + i1];
-        if (J) {
-          // Shift to right column
-          J += id_out[j1].size() * i2;
-          // Get column
-          for (size_t j2 = 0; j2 < id_out[j1].size(); ++j2) {
-            dae->fmu_->get_sens(mem, id_out[j1][j2], J++);
-          }
-        }
-      }
-    }
-  }
-  // Reset solver
-  if (dae->fmu_->reset(mem)) return 1;
-  // Successful return
-  return 0;
-}
-
-int FmuFunction::eval_adj(const DaeBuilderInternal* dae, int mem,
-    const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out) const {
-  // Set inputs
-  for (size_t k = 0; k < id_in.size(); ++k) {
-    for (size_t i = 0; i < id_in[k].size(); ++i) {
-      dae->fmu_->set(mem, id_in[k][i], arg[k] ? arg[k][i] : 0);
-    }
-  }
-  // Setup experiment
-  if (dae->fmu_->setup_experiment(mem)) return 1;
-  // Initialization mode begins
-  if (dae->fmu_->enter_initialization_mode(mem)) return 1;
-  // Initialization mode ends
-  if (dae->fmu_->exit_initialization_mode(mem)) return 1;
-  // Evaluate
-  if (dae->fmu_->eval(mem)) return 1;
-  // Loop over function inputs
-  for (size_t i1 = 0; i1 < id_in.size(); ++i1) {
-    // Sensitivities to be calculated
-    double* sens = res[i1];
-    // Skip if not requested
-    if (sens == 0) continue;
-    // Calculate Jacobian, one column at a time
-    for (casadi_int i2 = 0; i2 < id_in[i1].size(); ++i2) {
-      // Initialize return to zero
-      sens[i2] = 0;
-      // Set seed for column i
-      dae->fmu_->set_seed(mem, id_in[i1][i2], 1.);
-      // Request all elements of the column, unless corresponding seed is zero
-      for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
-        if (arg[id_in.size() + id_out.size() + j1]) {
-          for (size_t j2 = 0; j2 < id_out[j1].size(); ++j2) {
-            dae->fmu_->request(mem, id_out[j1][j2]);
-          }
-        }
-      }
-      // Calculate derivatives
-      if (dae->fmu_->eval_derivative(mem)) return 1;
-      // Get sensitivities
-      for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
-        const double* seed = arg[id_in.size() + id_out.size() + j1];
-        if (seed) {
-          for (size_t j2 = 0; j2 < id_out[j1].size(); ++j2) {
-            double J_ij;
-            dae->fmu_->get_sens(mem, id_out[j1][j2], &J_ij);
-            sens[i2] += seed[j2] * J_ij;
-          }
-        }
-      }
-    }
-  }
-  // Reset solver
-  if (dae->fmu_->reset(mem)) return 1;
-  // Successful return
-  return 0;
 }
 
 bool FmuFunction::has_jacobian() const {
@@ -300,7 +146,7 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = self->eval_jac(dae, m, arg, res, self->id_in_, self->id_out_);
+  int flag = dae->fmu_->eval_jac(m, arg, res, self->id_in_, self->id_out_);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
@@ -322,7 +168,7 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = self->eval_adj(dae, m, arg, res, self->id_in_, self->id_out_);
+  int flag = dae->fmu_->eval_adj(m, arg, res, self->id_in_, self->id_out_);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
