@@ -2355,6 +2355,8 @@ int Fmu::checkout() {
   std::fill(m.requested_.begin(), m.requested_.end(), false);
   // Allocate/reset work vectors
   m.work_.resize(self_.variables_.size());
+  m.dwork_.resize(self_.variables_.size());
+  // m.nominal_.resize(self_.variables_.size());
   m.vr_work_.resize(self_.variables_.size());
   // Return memory object
   return mem;
@@ -2507,17 +2509,23 @@ void Fmu::get(int mem, size_t id, double* value) {
   *value = m.buffer_.at(id);
 }
 
-int Fmu::eval_derivative(int mem) {
+int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Collect known variables
   size_t n_known = 0;
   for (size_t id = 0; id < m.changed_.size(); ++id) {
     if (m.changed_[id]) {
+      // Access variable
+      const Variable& v = self_.variable(id);
       // Value reference
-      m.vr_work_[n_known] = self_.variable(id).value_reference;
+      m.vr_work_[n_known] = v.value_reference;
+      // Nominal value
+      // m.nominal_[n_known] = double(v.nominal);
       // Value
-      m.work_[n_known] = m.sens_[id];
+      m.work_[n_known] = m.buffer_[id];
+      // Derivative
+      m.dwork_[n_known] = m.sens_[id];
       // Clear seed
       m.sens_[id] = 0;
       // Mark as no longer changed
@@ -2534,29 +2542,90 @@ int Fmu::eval_derivative(int mem) {
     if (m.requested_[id]) {
       // Value reference
       m.vr_work_[n_known + n_unknown] = self_.variable(id).value_reference;
-      // Clear result
-      m.work_[n_known + n_unknown] = nan;
+      // Get unperturbed result
+      m.work_[n_known + n_unknown] = m.buffer_[id];
+      // Clear derivative result
+      m.dwork_[n_known + n_unknown] = nan;
       // Increase counter
       n_unknown++;
     }
   }
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
-  // Calculate directional derivative
-  fmi2Status status = get_directional_derivative_(m.c, &m.vr_work_[n_known], n_unknown,
-    &m.vr_work_[0], n_known, &m.work_[0], &m.work_[n_known]);
-  if (status != fmi2OK) {
-    casadi_warning("fmi2GetDirectionalDerivative failed");
-    return 1;
+  // Calculate derivatives using FMU directional derivative support
+  if (enable_ad) {
+    fmi2Status status = get_directional_derivative_(m.c, &m.vr_work_[n_known], n_unknown,
+      &m.vr_work_[0], n_known, &m.dwork_[0], &m.dwork_[n_known]);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetDirectionalDerivative failed");
+      return 1;
+    }
+    // Collect requested variables
+    size_t ind = n_known;
+    for (size_t id = 0; id < m.requested_.size(); ++id) {
+      if (m.requested_[id]) {
+        // Get the value
+        m.sens_[id] = m.dwork_[ind++];
+        // No longer requested, unless we're also doing FD
+        if (!validate_ad) m.requested_[id] = false;
+      }
+    }
   }
-  // Collect requested variables
-  size_t ind = n_known;
-  for (size_t id = 0; id < m.requested_.size(); ++id) {
-    if (m.requested_[id]) {
-      // Get the value
-      m.sens_[id] = m.work_[ind++];
-      // No longer requested
-      m.requested_[id] = false;
+
+  // Calculate derivatives using finite differences
+  if (!enable_ad || validate_ad) {
+    // Get unperturbed outputs
+    fmi2Status status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.work_[n_known]);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetReal failed");
+      return 1;
+    }
+    // Step size (fixed for now)
+    double h = 1e-6;
+    // Copy non-differentiated output to derivative
+    casadi_copy(&m.work_[n_known], n_unknown, &m.dwork_[n_known]);
+    // Perturb input
+    casadi_axpy(n_known, h, &m.dwork_[0], &m.work_[0]);
+    // Pass perturb inputs to FMU
+    status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2SetReal failed");
+      return 1;
+    }
+    // Evaluate FMU
+    status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.work_[n_known]);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetReal failed");
+      return 1;
+    }
+    // Remove purburbation
+    casadi_axpy(n_known, -h, &m.dwork_[0], &m.work_[0]);
+    status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2SetReal failed");
+      return 1;
+    }
+    // Calculate difference in output value
+    casadi_axpy(n_unknown, -1., &m.work_[n_known], &m.dwork_[n_known]);
+    // Divide by negative step size to get finite difference approximation
+    casadi_scal(n_unknown, -1./h, &m.dwork_[n_known]);
+    // Collect requested variables
+    size_t ind = n_known;
+    for (size_t id = 0; id < m.requested_.size(); ++id) {
+      if (m.requested_[id]) {
+        // Get the value
+        double d = m.dwork_[ind++];
+        // Use FD instead of AD or to compare with AD
+        if (validate_ad) {
+          // Compare with AD
+          uout() << "Variable " << id << ":, AD = " << m.sens_[id] << ", FD = " << d << std::endl;
+        } else {
+          // Use instead of AD
+          m.sens_[id] = d;
+        }
+        // No longer requested
+        m.requested_[id] = false;
+      }
     }
   }
   return 0;
@@ -2607,6 +2676,7 @@ int Fmu::eval(int mem, const double** arg, double** res,
 int Fmu::eval_jac(int mem, const double** arg, double** res,
     const std::vector<std::vector<size_t>>& id_in,
     const std::vector<std::vector<size_t>>& id_out,
+    bool enable_ad, bool validate_ad,
     const std::vector<Sparsity>& sp_jac) {
   // Set inputs
   for (size_t k = 0; k < id_in.size(); ++k) {
@@ -2640,7 +2710,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
         }
       }
       // Calculate derivatives
-      if (eval_derivative(mem)) return 1;
+      if (eval_derivative(mem, enable_ad, validate_ad)) return 1;
       // Loop over function outputs
       for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
         // Index of the Jacobian block
@@ -2666,7 +2736,8 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
 
 int Fmu::eval_adj(int mem, const double** arg, double** res,
     const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out) {
+    const std::vector<std::vector<size_t>>& id_out,
+    bool enable_ad, bool validate_ad) {
   // Set inputs
   for (size_t k = 0; k < id_in.size(); ++k) {
     for (size_t i = 0; i < id_in[k].size(); ++i) {
@@ -2698,7 +2769,7 @@ int Fmu::eval_adj(int mem, const double** arg, double** res,
         }
       }
       // Calculate derivatives
-      if (eval_derivative(mem)) return 1;
+      if (eval_derivative(mem, enable_ad, validate_ad)) return 1;
       // Get sensitivities
       for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
         const double* seed = arg[id_in.size() + id_out.size() + j1];

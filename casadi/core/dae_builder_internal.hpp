@@ -612,7 +612,7 @@ struct CASADI_EXPORT Fmu {
   void set_seed(int mem, size_t id, double value);
 
   // Calculate directional derivatives
-  int eval_derivative(int mem);
+  int eval_derivative(int mem, bool enable_ad, bool validate_ad);
 
   // Get a derivative
   void get_sens(int mem, size_t id, double* value);
@@ -626,12 +626,14 @@ struct CASADI_EXPORT Fmu {
   int eval_jac(int mem, const double** arg, double** res,
     const std::vector<std::vector<size_t>>& id_in,
     const std::vector<std::vector<size_t>>& id_out,
+    bool enable_ad, bool validate_ad,
     const std::vector<Sparsity>& sp_jac);
 
   // Evaluate adjoint numerically
   int eval_adj(int mem, const double** arg, double** res,
     const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out);
+    const std::vector<std::vector<size_t>>& id_out,
+    bool enable_ad, bool validate_ad);
 
   // Get memory object
   fmi2Component memory(int mem);
@@ -679,7 +681,7 @@ struct CASADI_EXPORT Fmu {
     // Which entries are being requested
     std::vector<bool> requested_;
     // Work vector (reals)
-    std::vector<fmi2Real> work_;
+    std::vector<fmi2Real> work_, dwork_;
     // Work vector (value references)
     std::vector<fmi2ValueReference> vr_work_;
     // Constructor

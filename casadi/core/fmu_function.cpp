@@ -52,6 +52,10 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     casadi_assert(id_out.size() == name_out.size(), "Mismatching number of output names");
     name_out_ = name_out;
   }
+
+  // Default options
+  enable_ad_ = dae->provides_directional_derivative_;
+  validate_ad_ = false;
 }
 
 FmuFunction::~FmuFunction() {
@@ -59,13 +63,38 @@ FmuFunction::~FmuFunction() {
   clear_mem();
 }
 
+const Options FmuFunction::options_
+= {{&FunctionInternal::options_},
+   {{"enable_ad",
+     {OT_BOOL,
+      "Calculate first order derivatives using FMU directional derivative support"}},
+    {"validate_ad",
+     {OT_BOOL,
+      "Compare analytic derivatives with finite differences for validation"}}
+   }
+};
+
 void FmuFunction::init(const Dict& opts) {
+  // Read options
+  for (auto&& op : opts) {
+    if (op.first=="enable_ad") {
+      enable_ad_ = op.second;
+    } else if (op.first=="validate_ad") {
+      validate_ad_ = op.second;
+    }
+  }
+
   // Call the initialization method of the base class
   FunctionInternal::init(opts);
 
   // Get a pointer to the DaeBuilder class
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+
+  // Consistency checks
+  if (enable_ad_) casadi_assert(dae->provides_directional_derivative_,
+    "FMU does not provide support for analytic derivatives");
+  if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
@@ -120,12 +149,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   return flag;
 }
 
-bool FmuFunction::has_jacobian() const {
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  return dae->provides_directional_derivative_;
-}
-
 Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
     const std::vector<std::string>& onames, const Dict& opts) const {
   Function ret;
@@ -135,12 +158,6 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
   opts2["enable_fd"] = true;
   ret->construct(opts2);
   return ret;
-}
-
-bool FmuFunction::has_reverse(casadi_int nadj) const {
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  return dae->provides_directional_derivative_ && nadj == 1;
 }
 
 Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
@@ -172,7 +189,8 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_jac(m, arg, res, self->id_in_, self->id_out_, sparsity_out_);
+  int flag = dae->fmu_->eval_jac(m, arg, res, self->id_in_, self->id_out_,
+    self->enable_ad_, self->validate_ad_, sparsity_out_);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
@@ -194,7 +212,8 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_adj(m, arg, res, self->id_in_, self->id_out_);
+  int flag = dae->fmu_->eval_adj(m, arg, res, self->id_in_, self->id_out_,
+    self->enable_ad_, self->validate_ad_);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag

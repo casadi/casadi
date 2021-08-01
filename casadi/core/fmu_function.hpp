@@ -44,6 +44,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Variable references for inputs and outputs
   std::vector<std::vector<size_t>> id_in_, id_out_;
 
+  // User-set options
+  bool enable_ad_, validate_ad_;
+
   /** \brief Constructor */
   FmuFunction(const std::string& name, const DaeBuilder& dae,
       const std::vector<std::vector<size_t>>& id_in,
@@ -56,6 +59,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunction";}
+
+  ///@{
+  /** \brief Options */
+  static const Options options_;
+  const Options& get_options() const override { return options_;}
+  ///@}
 
   /// Initialize
   void init(const Dict& opts) override;
@@ -83,7 +92,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   ///@{
   /** \brief Full Jacobian */
-  bool has_jacobian() const override;
+  bool has_jacobian() const override {return true;}
   Function get_jacobian(const std::string& name,
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,
@@ -92,12 +101,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   ///@{
   /** \brief Adjoint */
-  bool has_reverse(casadi_int nadj) const override;
-  ///@}
+  bool has_reverse(casadi_int nadj) const override {return nadj == 1;}
   Function get_reverse(casadi_int nadj, const std::string& name,
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,
     const Dict& opts) const override;
+  ///@}
 };
 
 /** Jacobian */
