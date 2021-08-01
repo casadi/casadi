@@ -2474,6 +2474,10 @@ int Fmu::eval(int mem) {
     casadi_warning("fmi2SetReal failed");
     return 1;
   }
+  // Initialization mode begins
+  if (enter_initialization_mode(mem)) return 1;
+  // Initialization mode ends
+  if (exit_initialization_mode(mem)) return 1;
   // Quick return if nothing requested
   if (n_requested == 0) return 0;
   // Calculate all variables
@@ -2584,10 +2588,6 @@ int Fmu::eval(int mem, const double** arg, double** res,
   }
   // Reset solver
   if (setup_experiment(mem)) return 1;
-  // Initialization mode begins
-  if (enter_initialization_mode(mem)) return 1;
-  // Initialization mode ends
-  if (exit_initialization_mode(mem)) return 1;
   // Evaluate
   if (eval(mem)) return 1;
   // Reset solver
@@ -2616,10 +2616,6 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
   }
   // Reset solver
   if (setup_experiment(mem)) return 1;
-  // Initialization mode begins
-  if (enter_initialization_mode(mem)) return 1;
-  // Initialization mode ends
-  if (exit_initialization_mode(mem)) return 1;
   // Evaluate
   if (eval(mem)) return 1;
   // Loop over function inputs
@@ -2679,10 +2675,6 @@ int Fmu::eval_adj(int mem, const double** arg, double** res,
   }
   // Setup experiment
   if (setup_experiment(mem)) return 1;
-  // Initialization mode begins
-  if (enter_initialization_mode(mem)) return 1;
-  // Initialization mode ends
-  if (exit_initialization_mode(mem)) return 1;
   // Evaluate
   if (eval(mem)) return 1;
   // Loop over function inputs
