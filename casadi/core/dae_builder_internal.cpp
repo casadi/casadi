@@ -2483,6 +2483,12 @@ int Fmu::eval(int mem) {
   if (enter_initialization_mode(mem)) return 1;
   // Initialization mode ends
   if (exit_initialization_mode(mem)) return 1;
+  // Set all variables again (state variables get reset during initialization?)
+  status = set_real_(m.c, &m.vr_work_[0], n_set, &m.work_[0]);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2SetReal failed");
+    return 1;
+  }
   // Quick return if nothing requested
   if (n_requested == 0) return 0;
   // Calculate all variables
