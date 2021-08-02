@@ -41,6 +41,7 @@ namespace casadi {
 
 // Forward declarations
 class DaeBuilderInternal;
+class FmuFunction;
 
 struct CASADI_EXPORT Fmu {
   // Constructor
@@ -99,28 +100,20 @@ struct CASADI_EXPORT Fmu {
   void set_seed(int mem, size_t id, double value);
 
   // Calculate directional derivatives
-  int eval_derivative(int mem, bool enable_ad, bool validate_ad);
+  int eval_derivative(int mem, const FmuFunction& f);
 
   // Get a derivative
   void get_sens(int mem, size_t id, double* value);
 
   // Evaluate, non-differentated
-  int eval(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out);
+  int eval(int mem, const double** arg, double** res, const FmuFunction& f);
 
   // Evaluate Jacobian numerically
-  int eval_jac(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
-    bool enable_ad, bool validate_ad,
+  int eval_jac(int mem, const double** arg, double** res, const FmuFunction& f,
     const std::vector<Sparsity>& sp_jac);
 
   // Evaluate adjoint numerically
-  int eval_adj(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
-    bool enable_ad, bool validate_ad);
+  int eval_adj(int mem, const double** arg, double** res, const FmuFunction& f);
 
   // Get memory object
   fmi2Component memory(int mem);

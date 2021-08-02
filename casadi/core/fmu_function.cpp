@@ -332,7 +332,7 @@ void Fmu::get(int mem, size_t id, double* value) {
   *value = m.buffer_.at(id);
 }
 
-int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
+int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Average nominal value
@@ -386,7 +386,7 @@ int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Calculate derivatives using FMU directional derivative support
-  if (enable_ad) {
+  if (f.enable_ad_) {
     fmi2Status status = get_directional_derivative_(m.c, &m.vr_work_[n_known], n_unknown,
       &m.vr_work_[0], n_known, &m.dwork_[0], &m.dwork_[n_known]);
     if (status != fmi2OK) {
@@ -400,13 +400,13 @@ int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
         // Get the value
         m.sens_[id] = m.dwork_[ind++];
         // No longer requested, unless we're also doing FD
-        if (!validate_ad) m.requested_[id] = false;
+        if (!f.validate_ad_) m.requested_[id] = false;
       }
     }
   }
 
   // Calculate derivatives using finite differences
-  if (!enable_ad || validate_ad) {
+  if (!f.enable_ad_ || f.validate_ad_) {
     // Get unperturbed outputs
     fmi2Status status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.work_[n_known]);
     if (status != fmi2OK) {
@@ -453,7 +453,7 @@ int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
         // Get the value
         double d = m.dwork_[ind++];
         // Use FD instead of AD or to compare with AD
-        if (validate_ad) {
+        if (f.validate_ad_) {
           // Access variable
           const Variable& v = self_.variable(id);
           // Get the nominal value
@@ -485,20 +485,18 @@ void Fmu::get_sens(int mem, size_t id, double* value) {
   *value = m.sens_.at(id);
 }
 
-int Fmu::eval(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out) {
+int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
   // Set inputs
-  for (size_t k = 0; k < id_in.size(); ++k) {
-    for (size_t i = 0; i < id_in[k].size(); ++i) {
-      set(mem, id_in[k][i], arg[k] ? arg[k][i] : 0);
+  for (size_t k = 0; k < f.id_in_.size(); ++k) {
+    for (size_t i = 0; i < f.id_in_[k].size(); ++i) {
+      set(mem, f.id_in_[k][i], arg[k] ? arg[k][i] : 0);
     }
   }
   // Request outputs to be evaluated
-  for (size_t k = 0; k < id_out.size(); ++k) {
+  for (size_t k = 0; k < f.id_out_.size(); ++k) {
     if (res[k]) {
-      for (size_t i = 0; i < id_out[k].size(); ++i) {
-        request(mem, id_out[k][i]);
+      for (size_t i = 0; i < f.id_out_[k].size(); ++i) {
+        request(mem, f.id_out_[k][i]);
       }
     }
   }
@@ -509,10 +507,10 @@ int Fmu::eval(int mem, const double** arg, double** res,
   // Reset solver
   if (reset(mem)) return 1;
   // Get outputs
-  for (size_t k = 0; k < id_out.size(); ++k) {
+  for (size_t k = 0; k < f.id_out_.size(); ++k) {
     if (res[k]) {
-      for (size_t i = 0; i < id_out[k].size(); ++i) {
-        get(mem, id_out[k][i], &res[k][i]);
+      for (size_t i = 0; i < f.id_out_[k].size(); ++i) {
+        get(mem, f.id_out_[k][i], &res[k][i]);
       }
     }
   }
@@ -520,15 +518,12 @@ int Fmu::eval(int mem, const double** arg, double** res,
   return 0;
 }
 
-int Fmu::eval_jac(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
-    bool enable_ad, bool validate_ad,
+int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& f,
     const std::vector<Sparsity>& sp_jac) {
   // Set inputs
-  for (size_t k = 0; k < id_in.size(); ++k) {
-    for (size_t i = 0; i < id_in[k].size(); ++i) {
-      set(mem, id_in[k][i], arg[k] ? arg[k][i] : 0);
+  for (size_t k = 0; k < f.id_in_.size(); ++k) {
+    for (size_t i = 0; i < f.id_in_[k].size(); ++i) {
+      set(mem, f.id_in_[k][i], arg[k] ? arg[k][i] : 0);
     }
   }
   // Reset solver
@@ -536,15 +531,15 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
   // Evaluate
   if (eval(mem)) return 1;
   // Loop over function inputs
-  for (size_t i1 = 0; i1 < id_in.size(); ++i1) {
+  for (size_t i1 = 0; i1 < f.id_in_.size(); ++i1) {
     // Calculate Jacobian, one column at a time
-    for (casadi_int i2 = 0; i2 < id_in[i1].size(); ++i2) {
+    for (casadi_int i2 = 0; i2 < f.id_in_[i1].size(); ++i2) {
       // Set seed for column
-      set_seed(mem, id_in[i1][i2], 1.);
+      set_seed(mem, f.id_in_[i1][i2], 1.);
       // Loop over function output
-      for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
+      for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
         // Index of the Jacobian block
-        size_t res_ind = j1 * id_in.size() + i1;
+        size_t res_ind = j1 * f.id_in_.size() + i1;
         // Only calculate outputs that are requested
         if (res[res_ind]) {
           // Get sparsity
@@ -552,16 +547,16 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
           const casadi_int* row = sp_jac[res_ind].row();
           // Request all nonzero elements of the column
           for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-            request(mem, id_out[j1][row[k]]);
+            request(mem, f.id_out_[j1][row[k]]);
           }
         }
       }
       // Calculate derivatives
-      if (eval_derivative(mem, enable_ad, validate_ad)) return 1;
+      if (eval_derivative(mem, f)) return 1;
       // Loop over function outputs
-      for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
+      for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
         // Index of the Jacobian block
-        size_t res_ind = j1 * id_in.size() + i1;
+        size_t res_ind = j1 * f.id_in_.size() + i1;
         // Only calculate outputs that are requested
         if (res[res_ind]) {
           // Get sparsity
@@ -569,7 +564,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
           const casadi_int* row = sp_jac[res_ind].row();
           // Collect all nonzero elements of the column
           for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-            get_sens(mem, id_out[j1][row[k]], &res[res_ind][k]);
+            get_sens(mem, f.id_out_[j1][row[k]], &res[res_ind][k]);
           }
         }
       }
@@ -581,14 +576,11 @@ int Fmu::eval_jac(int mem, const double** arg, double** res,
   return 0;
 }
 
-int Fmu::eval_adj(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
-    bool enable_ad, bool validate_ad) {
+int Fmu::eval_adj(int mem, const double** arg, double** res, const FmuFunction& f) {
   // Set inputs
-  for (size_t k = 0; k < id_in.size(); ++k) {
-    for (size_t i = 0; i < id_in[k].size(); ++i) {
-      set(mem, id_in[k][i], arg[k] ? arg[k][i] : 0);
+  for (size_t k = 0; k < f.id_in_.size(); ++k) {
+    for (size_t i = 0; i < f.id_in_[k].size(); ++i) {
+      set(mem, f.id_in_[k][i], arg[k] ? arg[k][i] : 0);
     }
   }
   // Setup experiment
@@ -596,34 +588,34 @@ int Fmu::eval_adj(int mem, const double** arg, double** res,
   // Evaluate
   if (eval(mem)) return 1;
   // Loop over function inputs
-  for (size_t i1 = 0; i1 < id_in.size(); ++i1) {
+  for (size_t i1 = 0; i1 < f.id_in_.size(); ++i1) {
     // Sensitivities to be calculated
     double* sens = res[i1];
     // Skip if not requested
     if (sens == 0) continue;
     // Calculate Jacobian, one column at a time
-    for (casadi_int i2 = 0; i2 < id_in[i1].size(); ++i2) {
+    for (casadi_int i2 = 0; i2 < f.id_in_[i1].size(); ++i2) {
       // Initialize return to zero
       sens[i2] = 0;
       // Set seed for column i
-      set_seed(mem, id_in[i1][i2], 1.);
+      set_seed(mem, f.id_in_[i1][i2], 1.);
       // Request all elements of the column, unless corresponding seed is zero
-      for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
-        if (arg[id_in.size() + id_out.size() + j1]) {
-          for (size_t j2 = 0; j2 < id_out[j1].size(); ++j2) {
-            request(mem, id_out[j1][j2]);
+      for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
+        if (arg[f.id_in_.size() + f.id_out_.size() + j1]) {
+          for (size_t j2 = 0; j2 < f.id_out_[j1].size(); ++j2) {
+            request(mem, f.id_out_[j1][j2]);
           }
         }
       }
       // Calculate derivatives
-      if (eval_derivative(mem, enable_ad, validate_ad)) return 1;
+      if (eval_derivative(mem, f)) return 1;
       // Get sensitivities
-      for (size_t j1 = 0; j1 < id_out.size(); ++j1) {
-        const double* seed = arg[id_in.size() + id_out.size() + j1];
+      for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
+        const double* seed = arg[f.id_in_.size() + f.id_out_.size() + j1];
         if (seed) {
-          for (size_t j2 = 0; j2 < id_out[j1].size(); ++j2) {
+          for (size_t j2 = 0; j2 < f.id_out_[j1].size(); ++j2) {
             double J_ij;
-            get_sens(mem, id_out[j1][j2], &J_ij);
+            get_sens(mem, f.id_out_[j1][j2], &J_ij);
             sens[i2] += seed[j2] * J_ij;
           }
         }
@@ -742,7 +734,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval(m, arg, res, id_in_, id_out_);
+  int flag = dae->fmu_->eval(m, arg, res, *this);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
@@ -789,8 +781,7 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_jac(m, arg, res, self->id_in_, self->id_out_,
-    self->enable_ad_, self->validate_ad_, sparsity_out_);
+  int flag = dae->fmu_->eval_jac(m, arg, res, *self, sparsity_out_);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
@@ -812,8 +803,7 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_adj(m, arg, res, self->id_in_, self->id_out_,
-    self->enable_ad_, self->validate_ad_);
+  int flag = dae->fmu_->eval_adj(m, arg, res, *self);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
