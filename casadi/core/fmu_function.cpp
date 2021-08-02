@@ -413,12 +413,8 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       casadi_warning("fmi2GetReal failed");
       return 1;
     }
-    // Step size (relative)
-    const double rel_step = 1e-6;
-    // Tolerance
-    const double rel_tol = 1e-3;
     // Step size (fixed for now)
-    double h = nom * rel_step;
+    double h = nom * f.step_;
     // Copy non-differentiated output to derivative
     casadi_copy(&m.work_[n_known], n_unknown, &m.dwork_[n_known]);
     // Perturb input
@@ -458,8 +454,10 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
           const Variable& v = self_.variable(id);
           // Get the nominal value
           double nom_out = double(v.nominal);
+          // Maximum error
+          double etol = std::fabs(d) * f.rel_tol_ + nom_out * f.abs_tol_;
           // Check relative error
-          if (std::fabs(d - m.sens_[id]) > nom_out * rel_tol) {
+          if (std::fabs(m.sens_[id] - d) > etol) {
             // Issue warning
             std::stringstream ss;
             ss << "Inconsistent derivatives for " << v.name << ". Got " << m.sens_[id]
@@ -648,6 +646,9 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   // Default options
   enable_ad_ = dae->provides_directional_derivative_;
   validate_ad_ = false;
+  step_ = 1e-6;
+  abs_tol_ = 1e-3;
+  rel_tol_ = 1e-3;
 }
 
 FmuFunction::~FmuFunction() {
@@ -662,7 +663,16 @@ const Options FmuFunction::options_
       "Calculate first order derivatives using FMU directional derivative support"}},
     {"validate_ad",
      {OT_BOOL,
-      "Compare analytic derivatives with finite differences for validation"}}
+      "Compare analytic derivatives with finite differences for validation"}},
+    {"step",
+     {OT_DOUBLE,
+      "Step size, scaled by nominal value"}},
+    {"abs_tol",
+     {OT_DOUBLE,
+      "Absolute error tolerance, scaled by nominal value"}},
+    {"rel_tol",
+     {OT_DOUBLE,
+      "Relative error tolerance"}}
    }
 };
 
@@ -673,6 +683,12 @@ void FmuFunction::init(const Dict& opts) {
       enable_ad_ = op.second;
     } else if (op.first=="validate_ad") {
       validate_ad_ = op.second;
+    } else if (op.first=="step") {
+      step_ = op.second;
+    } else if (op.first=="abs_tol") {
+      abs_tol_ = op.second;
+    } else if (op.first=="rel_tol") {
+      rel_tol_ = op.second;
     }
   }
 

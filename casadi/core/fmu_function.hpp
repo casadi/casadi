@@ -182,6 +182,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // User-set options
   bool enable_ad_, validate_ad_;
+  double step_, abs_tol_, rel_tol_;
 
   /** \brief Constructor */
   FmuFunction(const std::string& name, const DaeBuilder& dae,
