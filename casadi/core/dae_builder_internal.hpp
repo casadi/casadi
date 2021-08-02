@@ -30,13 +30,6 @@
 
 #include "dae_builder.hpp"
 #include "shared_object_internal.hpp"
-#include "importer.hpp"
-
-#ifdef WITH_FMU
-//#include <fmi2FunctionTypes.h>
-#include <fmi2Functions.h>
-//#include <fmi2TypesPlatform.h>
-#endif  // WITH_FMU
 
 namespace casadi {
 
@@ -118,8 +111,8 @@ struct CASADI_EXPORT Variable {
 /// Internal class for DaeBuilder, see comments on the public class.
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
-  friend class FmuFunction;
   friend class Fmu;
+  friend class FmuFunction;
   friend class FmuFunctionJac;
   friend class FmuFunctionAdj;
 
@@ -552,147 +545,6 @@ CASADI_EXPORT std::string to_string(Variable::Attribute v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
 ///@}
-
-
-#ifdef WITH_FMU
-struct CASADI_EXPORT Fmu {
-  // Constructor
-  Fmu(const DaeBuilderInternal& self);
-
-  // Destructor
-  ~Fmu();
-
-  // Initialize
-  void init();
-
-  // Load an FMI function
-  signal_t get_function(const std::string& symname);
-
-  // Process message
-  static void logger(fmi2ComponentEnvironment componentEnvironment,
-    fmi2String instanceName,
-    fmi2Status status,
-    fmi2String category,
-    fmi2String message, ...);
-
-  // New memory object
-  int checkout();
-
-  // Free memory object
-  void release(int mem);
-
-  // New memory object
-  fmi2Component instantiate();
-
-  // Setup experiment
-  int setup_experiment(int mem);
-
-  // Reset solver
-  int reset(int mem);
-
-  // Enter initialization mode
-  int enter_initialization_mode(int mem);
-
-  // Exit initialization mode
-  int exit_initialization_mode(int mem);
-
-  // Set value
-  void set(int mem, size_t id, double value);
-
-  // Request the calculation of a variable
-  void request(int mem, size_t id);
-
-  // Calculate all requested variables
-  int eval(int mem);
-
-  // Get a calculated variable
-  void get(int mem, size_t id, double* value);
-
-  // Set seed
-  void set_seed(int mem, size_t id, double value);
-
-  // Calculate directional derivatives
-  int eval_derivative(int mem, bool enable_ad, bool validate_ad);
-
-  // Get a derivative
-  void get_sens(int mem, size_t id, double* value);
-
-  // Evaluate, non-differentated
-  int eval(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out);
-
-  // Evaluate Jacobian numerically
-  int eval_jac(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
-    bool enable_ad, bool validate_ad,
-    const std::vector<Sparsity>& sp_jac);
-
-  // Evaluate adjoint numerically
-  int eval_adj(int mem, const double** arg, double** res,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
-    bool enable_ad, bool validate_ad);
-
-  // Get memory object
-  fmi2Component memory(int mem);
-
-  // Get memory object and remove from pool
-  fmi2Component pop_memory(int mem);
-
-  // DaeBuilder instance
-  const DaeBuilderInternal& self_;
-
-  // DLL
-  Importer li_;
-
-  // FMU C API function prototypes. Cf. FMI specification 2.0.2
-  fmi2InstantiateTYPE* instantiate_;
-  fmi2FreeInstanceTYPE* free_instance_;
-  fmi2ResetTYPE* reset_;
-  fmi2SetupExperimentTYPE* setup_experiment_;
-  fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
-  fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
-  fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
-  fmi2SetRealTYPE* set_real_;
-  fmi2SetBooleanTYPE* set_boolean_;
-  fmi2GetRealTYPE* get_real_;
-  fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
-
-  // Callback functions
-  fmi2CallbackFunctions functions_;
-
-  // Path to the FMU resource directory
-  std::string resource_loc_;
-
-  // Memory object
-  struct Memory {
-    // Component memory
-    fmi2Component c;
-    // Currently in use
-    bool in_use;
-    // Value buffer
-    std::vector<double> buffer_;
-    // Sensitivities
-    std::vector<double> sens_;
-    // Which entries have been changed
-    std::vector<bool> changed_;
-    // Which entries are being requested
-    std::vector<bool> requested_;
-    // Work vector (reals)
-    std::vector<fmi2Real> work_, dwork_;
-    // Work vector (value references)
-    std::vector<fmi2ValueReference> vr_work_;
-    // Constructor
-    explicit Memory() : c(0), in_use(false) {}
-  };
-
-  // Memory objects
-  std::vector<Memory> mem_;
-};
-#endif  // WITH_FMU
-
 
 } // namespace casadi
 
