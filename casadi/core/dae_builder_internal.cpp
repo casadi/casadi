@@ -2521,6 +2521,10 @@ void Fmu::get(int mem, size_t id, double* value) {
 int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
   // Get memory
   Memory& m = mem_.at(mem);
+  // Average nominal value
+  double nom = 0;
+  // Maximum step size in positive/negative direction
+  double max_pos_step = inf, max_neg_step = inf;
   // Collect known variables
   size_t n_known = 0;
   for (size_t id = 0; id < m.changed_.size(); ++id) {
@@ -2529,10 +2533,14 @@ int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
       const Variable& v = self_.variable(id);
       // Value reference
       m.vr_work_[n_known] = v.value_reference;
-      // Nominal value
-      // m.nominal_[n_known] = double(v.nominal);
       // Value
       m.work_[n_known] = m.buffer_[id];
+      // Nominal value
+      nom += double(v.nominal);
+      // Maximum positive step
+      max_pos_step = std::min(max_pos_step, double(v.max) - m.work_[n_known]);
+      // Maximum positive step
+      max_neg_step = std::min(max_neg_step, m.work_[n_known] - double(v.min));
       // Derivative
       m.dwork_[n_known] = m.sens_[id];
       // Clear seed
@@ -2543,6 +2551,8 @@ int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
       n_known++;
     }
   }
+  // Average nominal value
+  nom /= n_known;
   // Ensure at least one seed
   casadi_assert(n_known != 0, "No seeds");
   // Collect unknown variables
@@ -2589,8 +2599,12 @@ int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
       casadi_warning("fmi2GetReal failed");
       return 1;
     }
+    // Step size (relative)
+    const double rel_step = 1e-6;
+    // Tolerance
+    const double rel_tol = 1e-3;
     // Step size (fixed for now)
-    double h = 1e-6;
+    double h = nom * rel_step;
     // Copy non-differentiated output to derivative
     casadi_copy(&m.work_[n_known], n_unknown, &m.dwork_[n_known]);
     // Perturb input
@@ -2626,8 +2640,18 @@ int Fmu::eval_derivative(int mem, bool enable_ad, bool validate_ad) {
         double d = m.dwork_[ind++];
         // Use FD instead of AD or to compare with AD
         if (validate_ad) {
-          // Compare with AD
-          uout() << "Variable " << id << ":, AD = " << m.sens_[id] << ", FD = " << d << std::endl;
+          // Access variable
+          const Variable& v = self_.variable(id);
+          // Get the nominal value
+          double nom_out = double(v.nominal);
+          // Check relative error
+          if (std::fabs(d - m.sens_[id]) > nom_out * rel_tol) {
+            // Issue warning
+            std::stringstream ss;
+            ss << "Inconsistent derivatives for " << v.name << ". Got " << m.sens_[id]
+              << " for AD vs. " << d << " for FD" << std::endl;
+            casadi_warning(ss.str());
+          }
         } else {
           // Use instead of AD
           m.sens_[id] = d;
