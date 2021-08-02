@@ -30,6 +30,7 @@
 
 #include "function_internal.hpp"
 #include "importer.hpp"
+#include "casadi_enum.hpp"
 
 //#include <fmi2FunctionTypes.h>
 #include <fmi2Functions.h>
@@ -44,6 +45,9 @@ class DaeBuilderInternal;
 class FmuFunction;
 
 struct CASADI_EXPORT Fmu {
+  /// Variable type
+  enum FdMode {FORWARD, BACKWARD, CENTRAL, SMOOTHING, N_FDMODE};
+
   // Constructor
   Fmu(const DaeBuilderInternal& self);
 
@@ -184,6 +188,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   bool enable_ad_, validate_ad_;
   double step_, abs_tol_, rel_tol_;
 
+  // FD method as an enum
+  Fmu::FdMode fd_;
+
   /** \brief Constructor */
   FmuFunction(const std::string& name, const DaeBuilder& dae,
       const std::vector<std::vector<size_t>>& id_in,
@@ -277,6 +284,14 @@ class CASADI_EXPORT FmuFunctionAdj : public FunctionInternal {
   /// Evaluate numerically
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 };
+
+/// Number of entries in enums
+template<> struct enum_traits<Fmu::FdMode> {
+  static const Fmu::FdMode n_enum = Fmu::N_FDMODE;
+};
+
+/// Convert to string
+CASADI_EXPORT std::string to_string(Fmu::FdMode v);
 
 } // namespace casadi
 /// \endcond

@@ -30,6 +30,7 @@
 
 #include "dae_builder.hpp"
 #include "shared_object_internal.hpp"
+#include "casadi_enum.hpp"
 
 namespace casadi {
 
@@ -483,30 +484,6 @@ protected:
   // Sort dependent variables/parameters
   static void sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef);
 };
-
-/// Helper class: Specify number of entries in an enum
-template<typename T>
-struct enum_traits {};
-
-// Helper function: Convert string to enum
-template<typename T>
-T to_enum(const std::string& s) {
-  // Linear search over permitted values
-  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
-    if (s == to_string(static_cast<T>(i))) return static_cast<T>(i);
-  }
-  // Informative error message
-  std::stringstream ss;
-  ss << "No such enum: '" << s << "'. Permitted values: ";
-  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
-    // Separate strings
-    if (i > 0) ss << ", ";
-    // Print enum name
-    ss << "'" << to_string(static_cast<T>(i)) << "'";
-  }
-  casadi_error(ss.str());
-  return enum_traits<T>::n_enum;  // never reached
-}
 
 ///@{
 /// Number of entries in enums

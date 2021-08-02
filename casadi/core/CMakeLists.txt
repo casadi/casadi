@@ -17,6 +17,7 @@ set(CASADI_PUBLIC
   casadi_logger.hpp
   casadi_interrupt.hpp
   exception.hpp
+  casadi_enum.hpp
   calculus.hpp
   global_options.hpp
   casadi_meta.hpp

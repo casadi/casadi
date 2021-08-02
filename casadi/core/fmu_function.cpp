@@ -407,6 +407,8 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
 
   // Calculate derivatives using finite differences
   if (!f.enable_ad_ || f.validate_ad_) {
+    // Only a (hacky) forward difference implementation below
+    casadi_assert(f.fd_ == FORWARD, "Not implemented");
     // Get unperturbed outputs
     fmi2Status status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.work_[n_known]);
     if (status != fmi2OK) {
@@ -695,6 +697,9 @@ void FmuFunction::init(const Dict& opts) {
   // Call the initialization method of the base class
   FunctionInternal::init(opts);
 
+  // Read FD mode
+  fd_ = to_enum<Fmu::FdMode>(fd_method_, "forward");
+
   // Get a pointer to the DaeBuilder class
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
@@ -824,6 +829,17 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   dae->fmu_->release(m);
   // Return error flag
   return flag;
+}
+
+std::string to_string(Fmu::FdMode v) {
+  switch (v) {
+  case Fmu::FORWARD: return "forward";
+  case Fmu::BACKWARD: return "backward";
+  case Fmu::CENTRAL: return "central";
+  case Fmu::SMOOTHING: return "smoothing";
+  default: break;
+  }
+  return "";
 }
 
 #endif  // WITH_FMU
