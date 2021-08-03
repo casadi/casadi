@@ -103,6 +103,9 @@ struct CASADI_EXPORT Fmu {
   // Set seed
   void set_seed(int mem, size_t id, double value);
 
+  // Gather user inputs and outputs
+  void gather_io(int mem);
+
   // Calculate directional derivatives
   int eval_derivative(int mem, const FmuFunction& f);
 
@@ -169,7 +172,7 @@ struct CASADI_EXPORT Fmu {
     // Value references
     std::vector<fmi2ValueReference> vr_in_, vr_out_;
     // Work vector (reals)
-    std::vector<fmi2Real> v_in_, v_out_, dwork_, fd_out_;
+    std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_;
     // Constructor
     explicit Memory() : c(0), in_use(false) {}
   };

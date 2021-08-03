@@ -170,8 +170,6 @@ int Fmu::checkout() {
   // Allocate/reset requested
   m.requested_.resize(self_.variables_.size());
   std::fill(m.requested_.begin(), m.requested_.end(), false);
-  // Allocate/reset work vectors
-  m.dwork_.resize(self_.variables_.size());
   // Return memory object
   return mem;
 }
@@ -333,7 +331,7 @@ void Fmu::get(int mem, size_t id, double* value) {
   *value = m.buffer_.at(id);
 }
 
-int Fmu::eval_derivative(int mem, const FmuFunction& f) {
+void Fmu::gather_io(int mem) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Collect input indices
@@ -341,28 +339,37 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   for (size_t id = 0; id < m.changed_.size(); ++id) {
     if (m.changed_[id]) m.id_in_.push_back(id);
   }
+  // Get corresponding value references
+  m.vr_in_.clear();
+  for (size_t id : m.id_in_) {
+    m.vr_in_.push_back(self_.variable(id).value_reference);
+  }
   // Collect output indices
   m.id_out_.clear();
   for (size_t id = 0; id < m.requested_.size(); ++id) {
     if (m.requested_[id]) m.id_out_.push_back(id);
   }
-  // Average nominal value
-  double nom = 0;
+  // Get corresponding value references
+  m.vr_out_.clear();
+  for (size_t id : m.id_out_) {
+    m.vr_out_.push_back(self_.variable(id).value_reference);
+  }
+}
+
+int Fmu::eval_derivative(int mem, const FmuFunction& f) {
+  // Gather input and output indices
+  gather_io(mem);
+  // Get memory
+  Memory& m = mem_.at(mem);
   // Loop over known variables
   size_t n_known = 0;
-  m.vr_in_.clear();
   m.v_in_.clear();
+  m.d_in_.clear();
   for (size_t id : m.id_in_) {
-    // Access variable
-    const Variable& v = self_.variable(id);
-    // Value reference
-    m.vr_in_.push_back(v.value_reference);
     // Value
     m.v_in_.push_back(m.buffer_[id]);
-    // Nominal value
-    nom += double(v.nominal);
     // Derivative
-    m.dwork_[n_known] = m.sens_[id];
+    m.d_in_.push_back(m.sens_[id]);
     // Clear seed
     m.sens_[id] = 0;
     // Mark as no longer changed
@@ -370,21 +377,17 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     // Increase counter
     n_known++;
   }
-  // Average nominal value
-  nom /= n_known;
   // Ensure at least one seed
   casadi_assert(n_known != 0, "No seeds");
   // Collect unknown variables
   size_t n_unknown = 0;
-  m.vr_out_.clear();
   m.v_out_.clear();
+  m.d_out_.clear();
   for (size_t id : m.id_out_) {
-    // Value reference
-    m.vr_out_.push_back(self_.variable(id).value_reference);
     // Get unperturbed result
     m.v_out_.push_back(m.buffer_[id]);
     // Clear derivative result
-    m.dwork_[n_known + n_unknown] = nan;
+    m.d_out_.push_back(nan);
     // Increase counter
     n_unknown++;
   }
@@ -393,16 +396,16 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   // Calculate derivatives using FMU directional derivative support
   if (f.enable_ad_) {
     fmi2Status status = get_directional_derivative_(m.c, get_ptr(m.vr_out_), n_unknown,
-      get_ptr(m.vr_in_), n_known, &m.dwork_[0], &m.dwork_[n_known]);
+      get_ptr(m.vr_in_), n_known, get_ptr(m.d_in_), get_ptr(m.d_out_));
     if (status != fmi2OK) {
       casadi_warning("fmi2GetDirectionalDerivative failed");
       return 1;
     }
     // Collect requested variables
-    size_t ind = n_known;
+    size_t ind = 0;
     for (size_t id : m.id_out_) {
       // Get the value
-      m.sens_[id] = m.dwork_[ind++];
+      m.sens_[id] = m.d_out_[ind++];
       // No longer requested, unless we're also doing FD
       if (!f.validate_ad_) m.requested_[id] = false;
     }
@@ -410,6 +413,12 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
 
   // Calculate derivatives using finite differences
   if (!f.enable_ad_ || f.validate_ad_) {
+    // Average nominal value
+    double nom = 0;
+    for (size_t id : m.id_in_) {
+      nom += double(self_.variable(id).nominal);
+    }
+    nom /= n_known;
     // Step size (fixed for now)
     double h = nom * f.step_;
     // For backward, negate h
@@ -446,7 +455,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
         break;
       }
       // Pass perturbed inputs to FMU
-      casadi_axpy(n_known, pert, &m.dwork_[0], get_ptr(m.v_in_));
+      casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
       status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
       if (status != fmi2OK) {
         casadi_warning("fmi2SetReal failed");
@@ -459,7 +468,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
         return 1;
       }
       // Remove purburbation
-      casadi_axpy(n_known, -pert, &m.dwork_[0], get_ptr(m.v_in_));
+      casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
     }
     // Restore FMU inputs
     status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
@@ -475,20 +484,20 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     switch (f.fd_) {
       case FORWARD:
       case BACKWARD:
-        (void)casadi_forward_diff(yk, y0, &m.dwork_[n_known], h, n_unknown, &fd_mem);
+        (void)casadi_forward_diff(yk, y0, get_ptr(m.d_out_), h, n_unknown, &fd_mem);
         break;
       case CENTRAL:
-        (void)casadi_central_diff(yk, y0, &m.dwork_[n_known], h, n_unknown, &fd_mem);
+        (void)casadi_central_diff(yk, y0, get_ptr(m.d_out_), h, n_unknown, &fd_mem);
         break;
       case SMOOTHING:
-        (void)casadi_smoothing_diff(yk, y0, &m.dwork_[n_known], h, n_unknown, &fd_mem);
+        (void)casadi_smoothing_diff(yk, y0, get_ptr(m.d_out_), h, n_unknown, &fd_mem);
         break;
     }
     // Collect requested variables
-    size_t ind = n_known;
+    size_t ind = 0;
     for (size_t id : m.id_out_) {
       // Get the value
-      double d = m.dwork_[ind++];
+      double d = m.d_out_[ind++];
       // Use FD instead of AD or to compare with AD
       if (f.validate_ad_) {
         // Access variable
