@@ -165,7 +165,7 @@ struct CASADI_EXPORT Fmu {
     // Which entries are being requested
     std::vector<bool> requested_;
     // Work vector (reals)
-    std::vector<fmi2Real> work_, dwork_;
+    std::vector<fmi2Real> work_, dwork_, fdwork_;
     // Work vector (value references)
     std::vector<fmi2ValueReference> vr_work_;
     // Constructor

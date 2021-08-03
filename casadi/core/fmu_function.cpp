@@ -407,28 +407,27 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
 
   // Calculate derivatives using finite differences
   if (!f.enable_ad_ || f.validate_ad_) {
-    // Only a (hacky) forward difference implementation below
+    // Only forward differences implementation below
     casadi_assert(f.fd_ == FORWARD, "Not implemented");
+    // Step size (fixed for now)
+    double h = nom * f.step_;
+    // Ensure enough memory allocated
+    if (m.fdwork_.size() < (1 + 1) * n_unknown) m.fdwork_.resize((1 + 1) * n_unknown);
     // Get unperturbed outputs
-    fmi2Status status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.work_[n_known]);
+    fmi2Status status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.fdwork_[0]);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetReal failed");
       return 1;
     }
-    // Step size (fixed for now)
-    double h = nom * f.step_;
-    // Copy non-differentiated output to derivative
-    casadi_copy(&m.work_[n_known], n_unknown, &m.dwork_[n_known]);
-    // Perturb input
+    // Pass perturbed inputs to FMU
     casadi_axpy(n_known, h, &m.dwork_[0], &m.work_[0]);
-    // Pass perturb inputs to FMU
     status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
     }
-    // Evaluate FMU
-    status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.work_[n_known]);
+    // Evaluate perturbed FMU
+    status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.fdwork_[n_unknown]);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetReal failed");
       return 1;
@@ -440,10 +439,14 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       casadi_warning("fmi2SetReal failed");
       return 1;
     }
-    // Calculate difference in output value
-    casadi_axpy(n_unknown, -1., &m.work_[n_known], &m.dwork_[n_known]);
-    // Divide by negative step size to get finite difference approximation
-    casadi_scal(n_unknown, -1./h, &m.dwork_[n_known]);
+    // Unperturned output
+    double* y0 = &m.fdwork_[0];
+    // Perturbed inputs
+    double* yk[1] = {&m.fdwork_[n_unknown]};
+    // FD memory
+    casadi_finite_diff_mem<double> fd_mem;
+    // Calculate finite difference approximation
+    (void)casadi_forward_diff(yk, y0, &m.dwork_[n_known], h, n_unknown, &fd_mem);
     // Collect requested variables
     size_t ind = n_known;
     for (size_t id = 0; id < m.requested_.size(); ++id) {
