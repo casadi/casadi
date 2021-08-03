@@ -407,46 +407,80 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
 
   // Calculate derivatives using finite differences
   if (!f.enable_ad_ || f.validate_ad_) {
-    // Only forward differences implementation below
-    casadi_assert(f.fd_ == FORWARD, "Not implemented");
     // Step size (fixed for now)
     double h = nom * f.step_;
+    // For backward, negate h
+    if (f.fd_ == BACKWARD) h = -h;
+    // Number of perturbations
+    casadi_int n_pert = f.fd_ == FORWARD || f.fd_ == BACKWARD ? 1 :
+      f.fd_ == CENTRAL ? 2 : 4;
     // Ensure enough memory allocated
-    if (m.fdwork_.size() < (1 + 1) * n_unknown) m.fdwork_.resize((1 + 1) * n_unknown);
+    if (m.fdwork_.size() < (1 + n_pert) * n_unknown) m.fdwork_.resize((1 + n_pert) * n_unknown);
     // Get unperturbed outputs
-    fmi2Status status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.fdwork_[0]);
-    if (status != fmi2OK) {
-      casadi_warning("fmi2GetReal failed");
-      return 1;
-    }
-    // Pass perturbed inputs to FMU
-    casadi_axpy(n_known, h, &m.dwork_[0], &m.work_[0]);
-    status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
-    if (status != fmi2OK) {
-      casadi_warning("fmi2SetReal failed");
-      return 1;
-    }
-    // Evaluate perturbed FMU
-    status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, &m.fdwork_[n_unknown]);
-    if (status != fmi2OK) {
-      casadi_warning("fmi2GetReal failed");
-      return 1;
-    }
-    // Remove purburbation
-    casadi_axpy(n_known, -h, &m.dwork_[0], &m.work_[0]);
-    status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
-    if (status != fmi2OK) {
-      casadi_warning("fmi2SetReal failed");
-      return 1;
-    }
-    // Unperturned output
     double* y0 = &m.fdwork_[0];
-    // Perturbed inputs
-    double* yk[1] = {&m.fdwork_[n_unknown]};
+    fmi2Status status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, y0);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetReal failed");
+      return 1;
+    }
+    // Calculate all perturbed outputs
+    double* yk[4];
+    for (casadi_int k = 0; k < n_pert; ++k) {
+      // Where to save the perturbed outputs
+      yk[k] = &m.fdwork_[n_unknown * (1 + k)];
+      // Get perturbation expression
+      double pert;
+      switch (f.fd_) {
+      case FORWARD:
+      case BACKWARD:
+        pert = h;
+        break;
+      case CENTRAL:
+        pert = (2 * static_cast<double>(k) - 1) * h;
+        break;
+      case SMOOTHING:
+        pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
+        break;
+      }
+      // Pass perturbed inputs to FMU
+      casadi_axpy(n_known, pert, &m.dwork_[0], &m.work_[0]);
+      status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
+      if (status != fmi2OK) {
+        casadi_warning("fmi2SetReal failed");
+        return 1;
+      }
+      // Evaluate perturbed FMU
+      status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, yk[k]);
+      if (status != fmi2OK) {
+        casadi_warning("fmi2GetReal failed");
+        return 1;
+      }
+      // Remove purburbation
+      casadi_axpy(n_known, -pert, &m.dwork_[0], &m.work_[0]);
+    }
+    // Restore FMU inputs
+    status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2SetReal failed");
+      return 1;
+    }
     // FD memory
     casadi_finite_diff_mem<double> fd_mem;
-    // Calculate finite difference approximation
-    (void)casadi_forward_diff(yk, y0, &m.dwork_[n_known], h, n_unknown, &fd_mem);
+    fd_mem.reltol = nan;
+    fd_mem.abstol = nan;
+    fd_mem.smoothing = eps;
+    switch (f.fd_) {
+      case FORWARD:
+      case BACKWARD:
+        (void)casadi_forward_diff(yk, y0, &m.dwork_[n_known], h, n_unknown, &fd_mem);
+        break;
+      case CENTRAL:
+        (void)casadi_central_diff(yk, y0, &m.dwork_[n_known], h, n_unknown, &fd_mem);
+        break;
+      case SMOOTHING:
+        (void)casadi_smoothing_diff(yk, y0, &m.dwork_[n_known], h, n_unknown, &fd_mem);
+        break;
+    }
     // Collect requested variables
     size_t ind = n_known;
     for (size_t id = 0; id < m.requested_.size(); ++id) {
