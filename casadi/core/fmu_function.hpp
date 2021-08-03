@@ -164,10 +164,12 @@ struct CASADI_EXPORT Fmu {
     std::vector<bool> changed_;
     // Which entries are being requested
     std::vector<bool> requested_;
+    // Current known/unknown variables
+    std::vector<size_t> id_in_, id_out_;
+    // Value references
+    std::vector<fmi2ValueReference> vr_in_, vr_out_;
     // Work vector (reals)
     std::vector<fmi2Real> work_, dwork_, fdwork_;
-    // Work vector (value references)
-    std::vector<fmi2ValueReference> vr_work_;
     // Constructor
     explicit Memory() : c(0), in_use(false) {}
   };

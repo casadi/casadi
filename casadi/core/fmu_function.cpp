@@ -173,8 +173,6 @@ int Fmu::checkout() {
   // Allocate/reset work vectors
   m.work_.resize(self_.variables_.size());
   m.dwork_.resize(self_.variables_.size());
-  // m.nominal_.resize(self_.variables_.size());
-  m.vr_work_.resize(self_.variables_.size());
   // Return memory object
   return mem;
 }
@@ -264,11 +262,12 @@ int Fmu::eval(int mem) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Collect changed variables
+  m.vr_in_.clear();
   size_t n_set = 0;
   for (size_t id = 0; id < m.changed_.size(); ++id) {
     if (m.changed_[id]) {
       // Value reference
-      m.vr_work_[n_set] = self_.variable(id).value_reference;
+      m.vr_in_.push_back(self_.variable(id).value_reference);
       // Value
       m.work_[n_set] = m.buffer_[id];
       // Mark as no longer changed
@@ -278,17 +277,18 @@ int Fmu::eval(int mem) {
     }
   }
   // Collect requested variables
+  m.vr_out_.clear();
   size_t n_requested = 0;
   for (size_t id = 0; id < m.requested_.size(); ++id) {
     if (m.requested_[id]) {
       // Value reference
-      m.vr_work_[n_set + n_requested] = self_.variable(id).value_reference;
+      m.vr_out_.push_back(self_.variable(id).value_reference);
       // Increase counter
       n_requested++;
     }
   }
   // Set all variables
-  fmi2Status status = set_real_(m.c, &m.vr_work_[0], n_set, &m.work_[0]);
+  fmi2Status status = set_real_(m.c, get_ptr(m.vr_in_), n_set, &m.work_[0]);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
@@ -298,7 +298,7 @@ int Fmu::eval(int mem) {
   // Initialization mode ends
   if (exit_initialization_mode(mem)) return 1;
   // Set all variables again (state variables get reset during initialization?)
-  status = set_real_(m.c, &m.vr_work_[0], n_set, &m.work_[0]);
+  status = set_real_(m.c, get_ptr(m.vr_in_), n_set, &m.work_[0]);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
@@ -306,7 +306,7 @@ int Fmu::eval(int mem) {
   // Quick return if nothing requested
   if (n_requested == 0) return 0;
   // Calculate all variables
-  status = get_real_(m.c, &m.vr_work_[n_set], n_requested, &m.work_[n_set]);
+  status = get_real_(m.c, get_ptr(m.vr_out_), n_requested, &m.work_[n_set]);
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
@@ -335,26 +335,31 @@ void Fmu::get(int mem, size_t id, double* value) {
 int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   // Get memory
   Memory& m = mem_.at(mem);
+  // Collect input indices
+  m.id_in_.clear();
+  for (size_t id = 0; id < m.changed_.size(); ++id) {
+    if (m.changed_[id]) m.id_in_.push_back(id);
+  }
+  // Collect output indices
+  m.id_out_.clear();
+  for (size_t id = 0; id < m.requested_.size(); ++id) {
+    if (m.requested_[id]) m.id_out_.push_back(id);
+  }
   // Average nominal value
   double nom = 0;
-  // Maximum step size in positive/negative direction
-  double max_pos_step = inf, max_neg_step = inf;
-  // Collect known variables
+  // Loop over known variables
   size_t n_known = 0;
-  for (size_t id = 0; id < m.changed_.size(); ++id) {
+  m.vr_in_.clear();
+  for (size_t id : m.id_in_) {
     if (m.changed_[id]) {
       // Access variable
       const Variable& v = self_.variable(id);
       // Value reference
-      m.vr_work_[n_known] = v.value_reference;
+      m.vr_in_.push_back(v.value_reference);
       // Value
       m.work_[n_known] = m.buffer_[id];
       // Nominal value
       nom += double(v.nominal);
-      // Maximum positive step
-      max_pos_step = std::min(max_pos_step, double(v.max) - m.work_[n_known]);
-      // Maximum positive step
-      max_neg_step = std::min(max_neg_step, m.work_[n_known] - double(v.min));
       // Derivative
       m.dwork_[n_known] = m.sens_[id];
       // Clear seed
@@ -371,10 +376,11 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   casadi_assert(n_known != 0, "No seeds");
   // Collect unknown variables
   size_t n_unknown = 0;
+  m.vr_out_.clear();
   for (size_t id = 0; id < m.requested_.size(); ++id) {
     if (m.requested_[id]) {
       // Value reference
-      m.vr_work_[n_known + n_unknown] = self_.variable(id).value_reference;
+      m.vr_out_.push_back(self_.variable(id).value_reference);
       // Get unperturbed result
       m.work_[n_known + n_unknown] = m.buffer_[id];
       // Clear derivative result
@@ -387,8 +393,8 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   if (n_unknown == 0) return 0;
   // Calculate derivatives using FMU directional derivative support
   if (f.enable_ad_) {
-    fmi2Status status = get_directional_derivative_(m.c, &m.vr_work_[n_known], n_unknown,
-      &m.vr_work_[0], n_known, &m.dwork_[0], &m.dwork_[n_known]);
+    fmi2Status status = get_directional_derivative_(m.c, get_ptr(m.vr_out_), n_unknown,
+      get_ptr(m.vr_in_), n_known, &m.dwork_[0], &m.dwork_[n_known]);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetDirectionalDerivative failed");
       return 1;
@@ -418,7 +424,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     if (m.fdwork_.size() < (1 + n_pert) * n_unknown) m.fdwork_.resize((1 + n_pert) * n_unknown);
     // Get unperturbed outputs
     double* y0 = &m.fdwork_[0];
-    fmi2Status status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, y0);
+    fmi2Status status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, y0);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetReal failed");
       return 1;
@@ -444,13 +450,13 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       }
       // Pass perturbed inputs to FMU
       casadi_axpy(n_known, pert, &m.dwork_[0], &m.work_[0]);
-      status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
+      status = set_real_(m.c, get_ptr(m.vr_in_), n_known, &m.work_[0]);
       if (status != fmi2OK) {
         casadi_warning("fmi2SetReal failed");
         return 1;
       }
       // Evaluate perturbed FMU
-      status = get_real_(m.c, &m.vr_work_[n_known], n_unknown, yk[k]);
+      status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
       if (status != fmi2OK) {
         casadi_warning("fmi2GetReal failed");
         return 1;
@@ -459,7 +465,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       casadi_axpy(n_known, -pert, &m.dwork_[0], &m.work_[0]);
     }
     // Restore FMU inputs
-    status = set_real_(m.c, &m.vr_work_[0], n_known, &m.work_[0]);
+    status = set_real_(m.c, get_ptr(m.vr_in_), n_known, &m.work_[0]);
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
