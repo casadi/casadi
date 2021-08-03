@@ -458,10 +458,11 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
         break;
     }
     // Collect requested variables
-    auto it = m.d_out_.begin();
-    for (size_t id : m.id_out_) {
+    for (size_t ind = 0; ind < m.id_out_.size(); ++ind) {
+      // Variable id
+      size_t id = m.id_out_[ind];
       // Get the value
-      double d = *it++;
+      double d = m.d_out_[ind];
       // Use FD instead of AD or to compare with AD
       if (f.validate_ad_) {
         // Access variable
@@ -479,7 +480,25 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
             if (j != 0) ss << ", ";
             ss << self_.variable(m.id_in_[j]).name;
           }
-          ss << ". Got " << m.sens_[id] << " for AD vs. " << d << " for FD" << std::endl;
+          ss << ". Got " << m.sens_[id] << " for AD vs. " << d << " for FD["
+            << to_string(f.fd_) << "]. ";
+          // Also print the stencil:
+          std::vector<double> stencil;
+          switch (f.fd_) {
+            case FORWARD:
+              stencil = {m.v_out_[ind], yk[0][ind]};
+              break;
+            case BACKWARD:
+              stencil = {yk[0][ind], m.v_out_[ind]};
+              break;
+            case CENTRAL:
+              stencil = {yk[0][ind], m.v_out_[ind], yk[1][ind]};
+              break;
+            case SMOOTHING:
+              stencil = {yk[1][ind], yk[0][ind], m.v_out_[ind], yk[2][ind], yk[3][ind]};
+              break;
+          }
+          ss << "Values for step size: " << h << ": " << stencil;
           casadi_warning(ss.str());
         }
       } else {
