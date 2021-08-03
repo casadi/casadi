@@ -351,24 +351,22 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   size_t n_known = 0;
   m.vr_in_.clear();
   for (size_t id : m.id_in_) {
-    if (m.changed_[id]) {
-      // Access variable
-      const Variable& v = self_.variable(id);
-      // Value reference
-      m.vr_in_.push_back(v.value_reference);
-      // Value
-      m.work_[n_known] = m.buffer_[id];
-      // Nominal value
-      nom += double(v.nominal);
-      // Derivative
-      m.dwork_[n_known] = m.sens_[id];
-      // Clear seed
-      m.sens_[id] = 0;
-      // Mark as no longer changed
-      m.changed_[id] = false;
-      // Increase counter
-      n_known++;
-    }
+    // Access variable
+    const Variable& v = self_.variable(id);
+    // Value reference
+    m.vr_in_.push_back(v.value_reference);
+    // Value
+    m.work_[n_known] = m.buffer_[id];
+    // Nominal value
+    nom += double(v.nominal);
+    // Derivative
+    m.dwork_[n_known] = m.sens_[id];
+    // Clear seed
+    m.sens_[id] = 0;
+    // Mark as no longer changed
+    m.changed_[id] = false;
+    // Increase counter
+    n_known++;
   }
   // Average nominal value
   nom /= n_known;
@@ -377,17 +375,15 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   // Collect unknown variables
   size_t n_unknown = 0;
   m.vr_out_.clear();
-  for (size_t id = 0; id < m.requested_.size(); ++id) {
-    if (m.requested_[id]) {
-      // Value reference
-      m.vr_out_.push_back(self_.variable(id).value_reference);
-      // Get unperturbed result
-      m.work_[n_known + n_unknown] = m.buffer_[id];
-      // Clear derivative result
-      m.dwork_[n_known + n_unknown] = nan;
-      // Increase counter
-      n_unknown++;
-    }
+  for (size_t id : m.id_out_) {
+    // Value reference
+    m.vr_out_.push_back(self_.variable(id).value_reference);
+    // Get unperturbed result
+    m.work_[n_known + n_unknown] = m.buffer_[id];
+    // Clear derivative result
+    m.dwork_[n_known + n_unknown] = nan;
+    // Increase counter
+    n_unknown++;
   }
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
@@ -401,13 +397,11 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     }
     // Collect requested variables
     size_t ind = n_known;
-    for (size_t id = 0; id < m.requested_.size(); ++id) {
-      if (m.requested_[id]) {
-        // Get the value
-        m.sens_[id] = m.dwork_[ind++];
-        // No longer requested, unless we're also doing FD
-        if (!f.validate_ad_) m.requested_[id] = false;
-      }
+    for (size_t id : m.id_out_) {
+      // Get the value
+      m.sens_[id] = m.dwork_[ind++];
+      // No longer requested, unless we're also doing FD
+      if (!f.validate_ad_) m.requested_[id] = false;
     }
   }
 
@@ -420,10 +414,10 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     // Number of perturbations
     casadi_int n_pert = f.fd_ == FORWARD || f.fd_ == BACKWARD ? 1 :
       f.fd_ == CENTRAL ? 2 : 4;
-    // Ensure enough memory allocated
-    if (m.fdwork_.size() < (1 + n_pert) * n_unknown) m.fdwork_.resize((1 + n_pert) * n_unknown);
+    // Allocate memory for perturbed outputs
+    m.fd_out_.resize((1 + n_pert) * n_unknown);
     // Get unperturbed outputs
-    double* y0 = &m.fdwork_[0];
+    double* y0 = &m.fd_out_[0];
     fmi2Status status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, y0);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetReal failed");
@@ -433,7 +427,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     double* yk[4];
     for (casadi_int k = 0; k < n_pert; ++k) {
       // Where to save the perturbed outputs
-      yk[k] = &m.fdwork_[n_unknown * (1 + k)];
+      yk[k] = &m.fd_out_[n_unknown * (1 + k)];
       // Get perturbation expression
       double pert;
       switch (f.fd_) {
@@ -489,33 +483,31 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     }
     // Collect requested variables
     size_t ind = n_known;
-    for (size_t id = 0; id < m.requested_.size(); ++id) {
-      if (m.requested_[id]) {
-        // Get the value
-        double d = m.dwork_[ind++];
-        // Use FD instead of AD or to compare with AD
-        if (f.validate_ad_) {
-          // Access variable
-          const Variable& v = self_.variable(id);
-          // Get the nominal value
-          double nom_out = double(v.nominal);
-          // Maximum error
-          double etol = std::fabs(d) * f.reltol_ + nom_out * f.abstol_;
-          // Check relative error
-          if (std::fabs(m.sens_[id] - d) > etol) {
-            // Issue warning
-            std::stringstream ss;
-            ss << "Inconsistent derivatives for " << v.name << ". Got " << m.sens_[id]
-              << " for AD vs. " << d << " for FD" << std::endl;
-            casadi_warning(ss.str());
-          }
-        } else {
-          // Use instead of AD
-          m.sens_[id] = d;
+    for (size_t id : m.id_out_) {
+      // Get the value
+      double d = m.dwork_[ind++];
+      // Use FD instead of AD or to compare with AD
+      if (f.validate_ad_) {
+        // Access variable
+        const Variable& v = self_.variable(id);
+        // Get the nominal value
+        double nom_out = double(v.nominal);
+        // Maximum error
+        double etol = std::fabs(d) * f.reltol_ + nom_out * f.abstol_;
+        // Check relative error
+        if (std::fabs(m.sens_[id] - d) > etol) {
+          // Issue warning
+          std::stringstream ss;
+          ss << "Inconsistent derivatives for " << v.name << ". Got " << m.sens_[id]
+            << " for AD vs. " << d << " for FD" << std::endl;
+          casadi_warning(ss.str());
         }
-        // No longer requested
-        m.requested_[id] = false;
+      } else {
+        // Use instead of AD
+        m.sens_[id] = d;
       }
+      // No longer requested
+      m.requested_[id] = false;
     }
   }
   return 0;
