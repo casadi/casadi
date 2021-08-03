@@ -143,12 +143,22 @@ DaeBuilderInternal::~DaeBuilderInternal() {
 #endif // WITH_FMU
 }
 
-DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path)
-    : name_(name), path_(path) {
+DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path,
+    const Dict& opts) : name_(name), path_(path) {
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
   provides_directional_derivative_ = 0;
   fmu_ = 0;
+  // Default options
+  debug_ = false;
+  // Read options
+  for (auto&& op : opts) {
+    if (op.first=="debug") {
+      debug_ = op.second;
+    } else {
+      casadi_error("No such option: " + op.first);
+    }
+  }
 }
 
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {

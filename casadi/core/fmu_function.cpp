@@ -136,7 +136,7 @@ fmi2Component Fmu::instantiate() {
   fmi2String fmuGUID = self_.guid_.c_str();
   fmi2String fmuResourceLocation = resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
-  fmi2Boolean loggingOn = fmi2False;
+  fmi2Boolean loggingOn = self_.debug_;
   fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
     &functions_, visible, loggingOn);
   if (c == 0) casadi_error("fmi2Instantiate failed");
@@ -197,8 +197,8 @@ void Fmu::release(int mem) {
   }
 }
 
-int Fmu::setup_experiment(int mem) {
-  fmi2Status status = setup_experiment_(memory(mem), fmi2False, 0.0, 0., fmi2True, 1.);
+int Fmu::setup_experiment(int mem, const FmuFunction& f) {
+  fmi2Status status = setup_experiment_(memory(mem), f.fmutol_ > 0, f.fmutol_, 0., fmi2True, 1.);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetupExperiment failed");
     return 1;
@@ -494,7 +494,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
           // Get the nominal value
           double nom_out = double(v.nominal);
           // Maximum error
-          double etol = std::fabs(d) * f.rel_tol_ + nom_out * f.abs_tol_;
+          double etol = std::fabs(d) * f.reltol_ + nom_out * f.abstol_;
           // Check relative error
           if (std::fabs(m.sens_[id] - d) > etol) {
             // Issue warning
@@ -538,7 +538,7 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
     }
   }
   // Reset solver
-  if (setup_experiment(mem)) return 1;
+  if (setup_experiment(mem, f)) return 1;
   // Evaluate
   if (eval(mem)) return 1;
   // Reset solver
@@ -564,7 +564,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
     }
   }
   // Reset solver
-  if (setup_experiment(mem)) return 1;
+  if (setup_experiment(mem, f)) return 1;
   // Evaluate
   if (eval(mem)) return 1;
   // Loop over function inputs
@@ -621,7 +621,7 @@ int Fmu::eval_adj(int mem, const double** arg, double** res, const FmuFunction& 
     }
   }
   // Setup experiment
-  if (setup_experiment(mem)) return 1;
+  if (setup_experiment(mem, f)) return 1;
   // Evaluate
   if (eval(mem)) return 1;
   // Loop over function inputs
@@ -686,8 +686,9 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   enable_ad_ = dae->provides_directional_derivative_;
   validate_ad_ = false;
   step_ = 1e-6;
-  abs_tol_ = 1e-3;
-  rel_tol_ = 1e-3;
+  abstol_ = 1e-3;
+  reltol_ = 1e-3;
+  fmutol_ = 0;
 }
 
 FmuFunction::~FmuFunction() {
@@ -706,12 +707,15 @@ const Options FmuFunction::options_
     {"step",
      {OT_DOUBLE,
       "Step size, scaled by nominal value"}},
-    {"abs_tol",
+    {"abstol",
      {OT_DOUBLE,
       "Absolute error tolerance, scaled by nominal value"}},
-    {"rel_tol",
+    {"reltol",
      {OT_DOUBLE,
-      "Relative error tolerance"}}
+      "Relative error tolerance"}},
+    {"fmutol",
+     {OT_DOUBLE,
+      "Tolerance to be passed to the fmu (0 if not defined)"}}
    }
 };
 
@@ -724,10 +728,12 @@ void FmuFunction::init(const Dict& opts) {
       validate_ad_ = op.second;
     } else if (op.first=="step") {
       step_ = op.second;
-    } else if (op.first=="abs_tol") {
-      abs_tol_ = op.second;
-    } else if (op.first=="rel_tol") {
-      rel_tol_ = op.second;
+    } else if (op.first=="abstol") {
+      abstol_ = op.second;
+    } else if (op.first=="reltol") {
+      reltol_ = op.second;
+    } else if (op.first=="fmutol") {
+      fmutol_ = op.second;
     }
   }
 

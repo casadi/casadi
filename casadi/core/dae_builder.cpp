@@ -50,8 +50,8 @@ throw CasadiException("Error in DaeBuilder::" FNAME " for '" + this->name() \
 DaeBuilder::DaeBuilder() {
 }
 
-DaeBuilder::DaeBuilder(const std::string& name, const std::string& path) {
-  own(new DaeBuilderInternal(name, path));
+DaeBuilder::DaeBuilder(const std::string& name, const std::string& path, const Dict& opts) {
+  own(new DaeBuilderInternal(name, path, opts));
   if (!path.empty()) load_fmi_description(path + "/modelDescription.xml");
 }
 

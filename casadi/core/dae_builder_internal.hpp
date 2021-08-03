@@ -120,7 +120,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
  public:
 
   /// Constructor
-  explicit DaeBuilderInternal(const std::string& name, const std::string& path);
+  explicit DaeBuilderInternal(const std::string& name, const std::string& path, const Dict& opts);
 
   /// Destructor
   ~DaeBuilderInternal() override;
@@ -305,6 +305,9 @@ protected:
 
   /// Get the qualified name
   static std::string qualified_name(const XmlNode& nn);
+
+  // User-set options
+  bool debug_;
 
   // FMI attributes
   std::string fmi_version_;

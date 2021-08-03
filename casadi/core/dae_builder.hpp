@@ -76,7 +76,8 @@ public:
   DaeBuilder();
 
   /// Construct a DaeBuilder instance
-  explicit DaeBuilder(const std::string& name, const std::string& path = "");
+  explicit DaeBuilder(const std::string& name, const std::string& path = "",
+    const Dict& opts = Dict());
 
   /** \brief Name of instance */
   const std::string& name() const;
