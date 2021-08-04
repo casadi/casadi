@@ -356,6 +356,13 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   casadi_assert(n_known != 0, "No seeds");
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
+  // Get unperturbed outputs (should not be necessary)
+  m.v_out_.resize(n_unknown);
+  fmi2Status status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, get_ptr(m.v_out_));
+  if (status != fmi2OK) {
+    casadi_warning("fmi2GetReal failed");
+    return 1;
+  }
   // Allocate result
   m.d_out_.resize(n_unknown);
   // Calculate derivatives using FMU directional derivative support
@@ -389,13 +396,6 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       f.fd_ == CENTRAL ? 2 : 4;
     // Allocate memory for perturbed outputs
     m.fd_out_.resize(n_pert * n_unknown);
-    // Get unperturbed outputs
-    m.v_out_.resize(n_unknown);
-    fmi2Status status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, get_ptr(m.v_out_));
-    if (status != fmi2OK) {
-      casadi_warning("fmi2GetReal failed");
-      return 1;
-    }
     // Calculate all perturbed outputs
     double* yk[4];
     for (casadi_int k = 0; k < n_pert; ++k) {
