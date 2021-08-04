@@ -173,6 +173,8 @@ struct CASADI_EXPORT Fmu {
     std::vector<fmi2ValueReference> vr_in_, vr_out_;
     // Work vector (reals)
     std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_;
+    // Nominal values
+    std::vector<fmi2Real> nominal_out_;
     // Constructor
     explicit Memory() : c(0), in_use(false) {}
   };

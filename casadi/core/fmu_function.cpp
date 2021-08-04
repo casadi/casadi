@@ -381,12 +381,18 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   }
   // Calculate derivatives using finite differences
   if (!f.enable_ad_ || f.validate_ad_) {
-    // Average nominal value
+    // Get average nominal values for inputs
     double nom = 0;
     for (size_t id : m.id_in_) {
       nom += double(self_.variable(id).nominal);
     }
     nom /= n_known;
+    // Get nominal values for outputs
+    m.nominal_out_.clear();
+    for (size_t id : m.id_out_)
+      m.nominal_out_.push_back(double(self_.variable(id).nominal));
+    // Make outputs dimensionless
+    for (size_t k = 0; k < n_unknown; ++k) m.v_out_[k] /= m.nominal_out_[k];
     // Step size (fixed for now)
     double h = nom * f.step_;
     // For backward, negate h
@@ -431,6 +437,8 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       }
       // Remove purburbation
       casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
+      // Make perturbed outputs dimensionless
+      for (size_t i = 0; i < n_unknown; ++i) yk[k][i] /= m.nominal_out_[i];
     }
     // Restore FMU inputs
     status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
@@ -438,23 +446,25 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       casadi_warning("fmi2SetReal failed");
       return 1;
     }
+    // Error estimate used to update step size
+    double u;
     // FD memory
     casadi_finite_diff_mem<double> fd_mem;
-    fd_mem.reltol = nan;
-    fd_mem.abstol = nan;
+    fd_mem.reltol = f.reltol_;
+    fd_mem.abstol = f.abstol_;
     fd_mem.smoothing = eps;
     switch (f.fd_) {
       case FORWARD:
       case BACKWARD:
-        (void)casadi_forward_diff(yk, get_ptr(m.v_out_),
+        u = casadi_forward_diff(yk, get_ptr(m.v_out_),
           get_ptr(m.d_out_), h, n_unknown, &fd_mem);
         break;
       case CENTRAL:
-        (void)casadi_central_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
+        u = casadi_central_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
           h, n_unknown, &fd_mem);
         break;
       case SMOOTHING:
-        (void)casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
+        u = casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
           h, n_unknown, &fd_mem);
         break;
       default: casadi_error("Not implemented");
@@ -465,16 +475,16 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       size_t id = m.id_out_[ind];
       // Get the value
       double d = m.d_out_[ind];
+      // Scale by nominal value
+      d *= m.nominal_out_[ind];
       // Use FD instead of AD or to compare with AD
       if (f.validate_ad_) {
-        // Access variable
-        const Variable& v = self_.variable(id);
-        // Get the nominal value
-        double nom_out = double(v.nominal);
         // Maximum error
-        double etol = std::fabs(d) * f.reltol_ + nom_out * f.abstol_;
+        double etol = std::fabs(d) * f.reltol_ + m.nominal_out_[ind] * f.abstol_;
         // Check relative error
         if (std::fabs(m.sens_[id] - d) > etol) {
+          // Access variable
+          const Variable& v = self_.variable(id);
           // Issue warning
           std::stringstream ss;
           ss << "Inconsistent derivatives of " << v.name << " w.r.t. ";
@@ -501,7 +511,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
               break;
             default: casadi_error("Not implemented");
           }
-          ss << "Values for step size: " << h << ": " << stencil;
+          ss << "Values for step size " << h << ", error ratio " << u << ": " << stencil;
           casadi_warning(ss.str());
         }
       } else {
