@@ -414,6 +414,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       case SMOOTHING:
         pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
         break;
+      default: casadi_error("Not implemented");
       }
       // Pass perturbed inputs to FMU
       casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
@@ -456,6 +457,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
         (void)casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
           h, n_unknown, &fd_mem);
         break;
+      default: casadi_error("Not implemented");
     }
     // Collect requested variables
     for (size_t ind = 0; ind < m.id_out_.size(); ++ind) {
@@ -497,6 +499,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
             case SMOOTHING:
               stencil = {yk[1][ind], yk[0][ind], m.v_out_[ind], yk[2][ind], yk[3][ind]};
               break;
+            default: casadi_error("Not implemented");
           }
           ss << "Values for step size: " << h << ": " << stencil;
           casadi_warning(ss.str());

@@ -42,6 +42,9 @@ class NonZeros : public M {
     /// Constructor
     NonZeros(M& mat, const K& k) : mat_(mat), k_(k) { mat.get_nz(*this, false, k); }
 
+    /// Default copy constructor
+    NonZeros(const NonZeros<M, K> &y) = default;
+
     ///@{
     /// Methods that modify a part of the parent object (A[k] = ?, A[k] += ?, etc.)
     const M& operator=(const NonZeros<M, K> &y);

@@ -49,6 +49,9 @@ namespace casadi {
       mat.get(*this, false, i, j);
     }
 
+    /// Default copy constructor
+    SubMatrix(const SubMatrix<M, I, J> &y) = default;
+
     ///@{
     /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)
     inline const M& operator=(const SubMatrix<M, I, J> &y) {
@@ -105,6 +108,9 @@ namespace casadi {
     SubIndex(M& mat, const I& i) : mat_(mat), i_(i) {
       mat.get(*this, false, i);
     }
+
+    /// Default copy constructor
+    SubIndex(const SubIndex<M, I> &y) = default;
 
     ///@{
     /// Methods that modify a part of the parent object (A(i) = ?, A(i) += ?, etc.)
