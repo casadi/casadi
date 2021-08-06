@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Generate SWIG wrapper (for both MATLAB and Octave)
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)

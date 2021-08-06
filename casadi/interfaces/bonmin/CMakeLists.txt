@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 2.8.12)
 include_directories(SYSTEM ${BONMIN_INCLUDE_DIRS})
 link_directories(${BONMIN_LIBRARY_DIRS})
 
