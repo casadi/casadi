@@ -3,7 +3,7 @@ include(GNUInstallDirs)
 set(INSTALL_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/PANOC-ALM")
 
 # Add the panoc-alm library to the "export-set", install the library files
-install(TARGETS panoc-alm
+install(TARGETS panoc-alm-obj panoc-alm
     EXPORT PANOC-ALMTargets
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         COMPONENT shlib

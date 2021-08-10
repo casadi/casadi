@@ -6,6 +6,8 @@ if [ -z "${VIRTUAL_ENV+x}" ]; then
     exit 1
 fi
 
+build_type="${1:-Release}"
+
 set -ex
 export CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH"
 export PKG_CONFIG_PATH="$VIRTUAL_ENV/lib/pkgconfig:$PKG_CONFIG_PATH"
@@ -19,7 +21,7 @@ mkdir -p OpenBLAS/build
 pushd OpenBLAS/build
 cmake .. \
     -D CMAKE_INSTALL_PREFIX="$VIRTUAL_ENV" \
-    -D CMAKE_BUILD_TYPE=Release
+    -D CMAKE_BUILD_TYPE="${build_type}"
 make -j$(nproc)
 make install
 popd

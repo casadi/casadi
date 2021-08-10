@@ -1,7 +1,7 @@
 # Target options
 # --------------
 
-add_library(panoc-alm SHARED
+add_library(panoc-alm-obj OBJECT
     "src/inner/panoc.cpp"
     "src/inner/second-order-panoc.cpp"
     "src/inner/structured-panoc-lbfgs.cpp"
@@ -13,19 +13,24 @@ add_library(panoc-alm SHARED
     "src/reference-problems/riskaverse-mpc.cpp"
     "src/reference-problems/himmelblau.cpp"
 )
-add_library(panoc-alm::panoc-alm ALIAS panoc-alm)
-set_target_properties(panoc-alm PROPERTIES EXPORT_NAME panoc-alm::panoc-alm)
-target_include_directories(panoc-alm
+add_library(panoc-alm::panoc-alm-obj ALIAS panoc-alm-obj)
+set_property(TARGET panoc-alm-obj PROPERTY POSITION_INDEPENDENT_CODE 1)
+target_include_directories(panoc-alm-obj
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
-target_link_libraries(panoc-alm PUBLIC Eigen3::Eigen)
+target_link_libraries(panoc-alm-obj PUBLIC Eigen3::Eigen)
 if (LBFGSpp_FOUND)
-    target_link_libraries(panoc-alm PUBLIC LBFGSpp::LBFGSpp)
+    target_link_libraries(panoc-alm-obj PUBLIC LBFGSpp::LBFGSpp)
 endif()
+
+add_library(panoc-alm SHARED)
+target_link_libraries(panoc-alm PUBLIC panoc-alm-obj)
+add_library(panoc-alm::panoc-alm ALIAS panoc-alm)
+set_target_properties(panoc-alm PROPERTIES EXPORT_NAME panoc-alm::panoc-alm)
 
 # target_compile_definitions(panoc-alm PUBLIC PRINT_DEBUG_COUT=1)
 
