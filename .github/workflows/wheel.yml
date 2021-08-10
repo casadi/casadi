@@ -19,13 +19,13 @@ jobs:
       if: steps.cache-venv.outputs.cache-hit != 'true'
       run: |
         python3 -m venv /tmp/py-venv
-        source /tmp/py-venv/bin/activate
+        . /tmp/py-venv/bin/activate
         python -m pip install -r scripts/requirements.txt -r scripts/requirements-wheel.txt
         FC=gfortran-10 \
           bash scripts/ci/install-dependencies-wheel.sh
     - name: Build
       run: |
-        source /tmp/py-venv/bin/activate
+        . /tmp/py-venv/bin/activate
         rm -rf _skbuild/
         CXXFLAGS="-march=skylake" CFLAGS="-march=skylake" \
           python setup.py bdist_wheel --build-type Release
