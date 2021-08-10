@@ -5,7 +5,11 @@ project(PANOC-ALM VERSION 0.0.1 LANGUAGES C CXX Fortran)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/py-venv")
+if (DEFINED ENV{VIRTUAL_ENV})
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{VIRTUAL_ENV}")
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/py-venv")
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/py-venv")
+endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
 # Import file with some custom compiler warnings and debug/sanitizer flags 

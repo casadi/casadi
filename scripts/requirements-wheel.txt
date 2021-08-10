@@ -1,0 +1,6 @@
+setuptools>=42
+wheel
+auditwheel
+pybind11~=2.7.1
+scikit-build
+ninja
