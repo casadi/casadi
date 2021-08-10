@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     container: tttapa/build-python-gcc:3.9.6-10
     
     steps:
