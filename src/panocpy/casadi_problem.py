@@ -1,6 +1,8 @@
 from typing import Tuple
 import casadi as cs
-
+import panocpy as pa
+from tempfile import TemporaryDirectory
+import os 
 
 def generate_casadi_problem(
     name: str, f: cs.Function, g: cs.Function, second_order: bool = False
@@ -16,7 +18,6 @@ def generate_casadi_problem(
     n = f.size1_in(0)
     m = g.size1_out(0)
     p = f.size1_in(1) if f.n_in() == 2 else 0
-    print(f"{n=}, {m=}, {p=}")
     xp = (f.sx_in(0), f.sx_in(1)) if f.n_in() == 2 else (f.sx_in(0),)
     xp_names = (f.name_in(0), f.name_in(1)) if f.n_in() == 2 else (f.name_in(0),)
     x = xp[0]
@@ -83,3 +84,17 @@ def generate_casadi_problem(
             )
         )
     return cg, n, m, p
+
+def generate_and_compile_casadi_problem(
+    name: str, f: cs.Function, g: cs.Function, second_order: bool = False
+) -> pa.Problem:
+    cgen, n, m, num_p = pa.generate_casadi_problem(name, f, g, second_order)
+
+    with TemporaryDirectory(prefix="") as tmpdir:
+        cfile = cgen.generate(tmpdir)
+        sofile = os.path.join(tmpdir, f"{name}.so")
+        os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
+        if num_p > 0:
+            return pa.load_casadi_problem_with_param(sofile, n, m)
+        else:
+            return pa.load_casadi_problem(sofile, n, m)
