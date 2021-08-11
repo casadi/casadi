@@ -4,6 +4,7 @@ py-venv
 .cache
 __pycache__
 dist
+wheelhouse
 *.egg-info
 .ipynb_checkpoints
 .vscode/*

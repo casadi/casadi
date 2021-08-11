@@ -6,6 +6,8 @@ if [ -z "${VIRTUAL_ENV+x}" ]; then
     exit 1
 fi
 
+build_type="${1:-RelWithDebInfo}"
+
 set -ex
 export CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH"
 
@@ -19,7 +21,7 @@ pushd yaml-cpp/build
 cmake .. \
     -D CMAKE_INSTALL_PREFIX="$VIRTUAL_ENV" \
     -D YAML_BUILD_SHARED_LIBS=On \
-    -D CMAKE_BUILD_TYPE=RelWithDebInfo \
+    -D CMAKE_BUILD_TYPE="${build_type}" \
     -D YAML_CPP_INSTALL=On
 make -j$(nproc)
 make install
