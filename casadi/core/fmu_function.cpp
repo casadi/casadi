@@ -393,81 +393,96 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       m.nominal_out_.push_back(double(self_.variable(id).nominal));
     // Make outputs dimensionless
     for (size_t k = 0; k < n_unknown; ++k) m.v_out_[k] /= m.nominal_out_[k];
-    // Step size (fixed for now)
-    double h = nom * f.step_;
-    // For backward, negate h
-    if (f.fd_ == BACKWARD) h = -h;
-    // Number of perturbations
-    casadi_int n_pert = f.fd_ == FORWARD || f.fd_ == BACKWARD ? 1 :
-      f.fd_ == CENTRAL ? 2 : 4;
-    // Allocate memory for perturbed outputs
-    m.fd_out_.resize(n_pert * n_unknown);
-    // Calculate all perturbed outputs
+    // Perturbed outputs
     double* yk[4];
-    for (casadi_int k = 0; k < n_pert; ++k) {
-      // Where to save the perturbed outputs
-      yk[k] = &m.fd_out_[n_unknown * k];
-      // Get perturbation expression
-      double pert;
-      switch (f.fd_) {
-      case FORWARD:
-      case BACKWARD:
-        pert = h;
-        break;
-      case CENTRAL:
-        pert = (2 * static_cast<double>(k) - 1) * h;
-        break;
-      case SMOOTHING:
-        pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
-        break;
-      default: casadi_error("Not implemented");
+    // Error estimate used to update step size
+    double u = nan;
+    // Initial step size
+    double h = nom * f.step_;
+    // Perform finite difference algorithm with different step sizes
+    for (casadi_int iter = 0; iter < 1 + f.h_iter_; ++iter) {
+      // For backward, negate h
+      if (f.fd_ == BACKWARD) h = -h;
+      // Number of perturbations
+      casadi_int n_pert = f.fd_ == FORWARD || f.fd_ == BACKWARD ? 1 :
+        f.fd_ == CENTRAL ? 2 : 4;
+      // Allocate memory for perturbed outputs
+      m.fd_out_.resize(n_pert * n_unknown);
+      // Calculate all perturbed outputs
+      for (casadi_int k = 0; k < n_pert; ++k) {
+        // Where to save the perturbed outputs
+        yk[k] = &m.fd_out_[n_unknown * k];
+        // Get perturbation expression
+        double pert;
+        switch (f.fd_) {
+        case FORWARD:
+        case BACKWARD:
+          pert = h;
+          break;
+        case CENTRAL:
+          pert = (2 * static_cast<double>(k) - 1) * h;
+          break;
+        case SMOOTHING:
+          pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
+          break;
+        default: casadi_error("Not implemented");
+        }
+        // Pass perturbed inputs to FMU
+        casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
+        status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
+        if (status != fmi2OK) {
+          casadi_warning("fmi2SetReal failed");
+          return 1;
+        }
+        // Evaluate perturbed FMU
+        status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
+        if (status != fmi2OK) {
+          casadi_warning("fmi2GetReal failed");
+          return 1;
+        }
+        // Remove purburbation
+        casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
+        // Make perturbed outputs dimensionless
+        for (size_t i = 0; i < n_unknown; ++i) yk[k][i] /= m.nominal_out_[i];
       }
-      // Pass perturbed inputs to FMU
-      casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
+      // Restore FMU inputs
       status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
       if (status != fmi2OK) {
         casadi_warning("fmi2SetReal failed");
         return 1;
       }
-      // Evaluate perturbed FMU
-      status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
-      if (status != fmi2OK) {
-        casadi_warning("fmi2GetReal failed");
-        return 1;
+      // FD memory
+      casadi_finite_diff_mem<double> fd_mem;
+      fd_mem.reltol = f.reltol_;
+      fd_mem.abstol = f.abstol_;
+      fd_mem.smoothing = eps;
+      switch (f.fd_) {
+        case FORWARD:
+        case BACKWARD:
+          u = casadi_forward_diff(yk, get_ptr(m.v_out_),
+            get_ptr(m.d_out_), h, n_unknown, &fd_mem);
+          break;
+        case CENTRAL:
+          u = casadi_central_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
+            h, n_unknown, &fd_mem);
+          break;
+        case SMOOTHING:
+          u = casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
+            h, n_unknown, &fd_mem);
+          break;
       }
-      // Remove purburbation
-      casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
-      // Make perturbed outputs dimensionless
-      for (size_t i = 0; i < n_unknown; ++i) yk[k][i] /= m.nominal_out_[i];
-    }
-    // Restore FMU inputs
-    status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
-    if (status != fmi2OK) {
-      casadi_warning("fmi2SetReal failed");
-      return 1;
-    }
-    // Error estimate used to update step size
-    double u;
-    // FD memory
-    casadi_finite_diff_mem<double> fd_mem;
-    fd_mem.reltol = f.reltol_;
-    fd_mem.abstol = f.abstol_;
-    fd_mem.smoothing = eps;
-    switch (f.fd_) {
-      case FORWARD:
-      case BACKWARD:
-        u = casadi_forward_diff(yk, get_ptr(m.v_out_),
-          get_ptr(m.d_out_), h, n_unknown, &fd_mem);
-        break;
-      case CENTRAL:
-        u = casadi_central_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
-          h, n_unknown, &fd_mem);
-        break;
-      case SMOOTHING:
-        u = casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
-          h, n_unknown, &fd_mem);
-        break;
-      default: casadi_error("Not implemented");
+      // Stop, if no more stepsize iterations
+      if (iter == f.h_iter_) break;
+      // Update step size
+      if (u < 0) {
+        // Perturbation failed, try a smaller step size
+        h /= f.u_aim_;
+      } else {
+        // Update h to get u near the target ratio
+        h *= sqrt(f.u_aim_ / fmax(1., u));
+      }
+      // Make sure h stays in the range [h_min_,h_max_]
+      h = fmin(fmax(h, f.h_min_), f.h_max_);
     }
     // Collect requested variables
     for (size_t ind = 0; ind < m.id_out_.size(); ++ind) {
@@ -479,8 +494,10 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       d *= m.nominal_out_[ind];
       // Use FD instead of AD or to compare with AD
       if (f.validate_ad_) {
+        // Nominal value
+        double n = m.nominal_out_[ind];
         // Maximum error
-        double etol = std::fabs(d) * f.reltol_ + m.nominal_out_[ind] * f.abstol_;
+        double etol = std::fabs(d) * f.reltol_ + n * f.abstol_;
         // Check relative error
         if (std::fabs(m.sens_[id] - d) > etol) {
           // Access variable
@@ -511,6 +528,8 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
               break;
             default: casadi_error("Not implemented");
           }
+          // Scale by nominal value
+          for (double& s : stencil) s *= n;
           ss << "Values for step size " << h << ", error ratio " << u << ": " << stencil;
           casadi_warning(ss.str());
         }
@@ -697,6 +716,10 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   abstol_ = 1e-3;
   reltol_ = 1e-3;
   fmutol_ = 0;
+  u_aim_ = 100.;
+  h_iter_ = 0;
+  h_min_ = 0;
+  h_max_ = inf;
 }
 
 FmuFunction::~FmuFunction() {
@@ -723,7 +746,19 @@ const Options FmuFunction::options_
       "Relative error tolerance"}},
     {"fmutol",
      {OT_DOUBLE,
-      "Tolerance to be passed to the fmu (0 if not defined)"}}
+      "Tolerance to be passed to the fmu (0 if not defined)"}},
+    {"h_iter",
+     {OT_INT,
+      "Number of step size iterations"}},
+    {"u_aim",
+     {OT_DOUBLE,
+      "Target ratio of truncation error to roundoff error"}},
+    {"h_min",
+     {OT_DOUBLE,
+      "Minimum step size"}},
+    {"h_max",
+     {OT_DOUBLE,
+      "Maximum step size"}}
    }
 };
 
@@ -742,6 +777,14 @@ void FmuFunction::init(const Dict& opts) {
       reltol_ = op.second;
     } else if (op.first=="fmutol") {
       fmutol_ = op.second;
+    } else if (op.first=="h_iter") {
+      h_iter_ = op.second;
+    } else if (op.first=="u_aim") {
+      u_aim_ = op.second;
+    } else if (op.first=="h_min") {
+      h_min_ = op.second;
+    } else if (op.first=="h_max") {
+      h_max_ = op.second;
     }
   }
 

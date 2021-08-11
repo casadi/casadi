@@ -193,7 +193,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // User-set options
   bool enable_ad_, validate_ad_;
-  double step_, abstol_, reltol_, fmutol_;
+  double step_, abstol_, reltol_, fmutol_, u_aim_, h_min_, h_max_;
+  casadi_int h_iter_;
 
   // FD method as an enum
   Fmu::FdMode fd_;
