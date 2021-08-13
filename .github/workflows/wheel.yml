@@ -29,10 +29,8 @@ jobs:
         rm -rf _skbuild/
         FC=gfortran-10 CXXFLAGS="-march=skylake" CFLAGS="-march=skylake" \
           python setup.py bdist_wheel --build-type Release
-        LD_LIBRARY_PATH="${VIRTUAL_ENV}/lib" \
-          auditwheel repair dist/panocpy-0.0.1-cp39-cp39-linux_x86_64.whl --plat linux_x86_64
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
-        path: wheelhouse/panocpy-0.0.1-cp39-cp39-linux_x86_64.whl
+        path: wheelhouse/panocpy-*.whl
       
