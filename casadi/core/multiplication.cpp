@@ -140,12 +140,31 @@ namespace casadi {
       g << g.work(arg[2], dep(2).nnz()) << "," << nrow_y << ",";
       g << "1.0,";
       g << g.work(res[0], dep(0).nnz()) << "," << nrow_x << ");\n";*/
-
-      g << "blasfeo_" << (g.casadi_real_type=="double"? "d" : "s") << "gemm_normal('N','N'," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
-      g << g.work(arg[1], dep(1).nnz()) << "," << nrow_x << ",";
-      g << g.work(arg[2], dep(2).nnz()) << "," << nrow_y << ",";
-      g << "1.0,";
-      g << g.work(res[0], dep(0).nnz()) << "," << nrow_x << ");\n";
+      g.local("ta", "char");
+      g.local("tb", "char");
+      g.local("blasfeo_m", "int");
+      g.local("blasfeo_n", "int");
+      g.local("blasfeo_k", "int");
+      g.local("blasfeo_lda", "int");
+      g.local("blasfeo_ldb", "int");
+      g.local("blasfeo_ldc", "int");
+      g.local("blasfeo_alpha", "casadi_real");
+      g.local("blasfeo_beta", "casadi_real");
+      g << "ta = 'N';\n";
+      g << "tb = 'N';\n";
+      g << "blasfeo_m = " << nrow_x << ";\n";
+      g << "blasfeo_n = " << ncol_y << ";\n";
+      g << "blasfeo_k = " << nrow_y << ";\n";
+      g << "blasfeo_lda = " << nrow_x << ";\n";
+      g << "blasfeo_ldb = " << nrow_y << ";\n";
+      g << "blasfeo_ldc = " << nrow_x << ";\n";
+      g << "blasfeo_alpha = 1.0;\n";
+      g << "blasfeo_beta = 1.0;\n";
+      g << "blas_" << (g.casadi_real_type=="double"? "d" : "s") << "gemm(&ta,&tb,&blasfeo_m,&blasfeo_n,&blasfeo_k,&blasfeo_alpha,";
+      g << "(casadi_real*)" << g.work(arg[1], dep(1).nnz()) << ",&blasfeo_lda,";
+      g << "(casadi_real*)" << g.work(arg[2], dep(2).nnz()) << ",&blasfeo_ldb,";
+      g << "&blasfeo_beta,";
+      g << g.work(res[0], dep(0).nnz()) << ",&blasfeo_ldc);\n";
     } else {
       g.local("rr", "casadi_real", "*");
       g.local("ss", "const casadi_real", "*");
