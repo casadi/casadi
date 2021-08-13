@@ -1,4 +1,5 @@
-FROM python:3.9.6-buster
+ARG PYTHON_VERSION
+FROM python:${PYTHON_VERSION}-buster
 
 RUN echo 'deb http://deb.debian.org/debian testing main' >> /etc/apt/sources.list && \
     apt-get update -y && \
