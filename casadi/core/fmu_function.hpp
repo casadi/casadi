@@ -199,6 +199,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // FD method as an enum
   Fmu::FdMode fd_;
 
+  // Number of perturbations
+  casadi_int n_pert() const;
+
   /** \brief Constructor */
   FmuFunction(const std::string& name, const DaeBuilder& dae,
       const std::vector<std::vector<size_t>>& id_in,

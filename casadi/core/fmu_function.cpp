@@ -381,12 +381,13 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   }
   // Calculate derivatives using finite differences
   if (!f.enable_ad_ || f.validate_ad_) {
-    // Get average nominal values for inputs
-    double nom = 0;
-    for (size_t id : m.id_in_) {
-      nom += double(self_.variable(id).nominal);
-    }
-    nom /= n_known;
+    // Only single input implemented
+    casadi_assert(m.id_in_.size() == 1, "Not implemented");
+    const Variable& var_in = self_.variable(m.id_in_[0]);
+    // Get min, max and nominal value
+    double min = double(var_in.min);
+    double max = double(var_in.max);
+    double nom = double(var_in.nominal);
     // Get nominal values for outputs
     m.nominal_out_.clear();
     for (size_t id : m.id_out_)
@@ -399,15 +400,14 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     double u = nan;
     // Initial step size
     double h = nom * f.step_;
+    // For backward, negate h
+    if (f.fd_ == BACKWARD) h = -h;
+    // Number of perturbations
+    casadi_int n_pert = f.n_pert();
+    // Allocate memory for perturbed outputs
+    m.fd_out_.resize(n_pert * n_unknown);
     // Perform finite difference algorithm with different step sizes
     for (casadi_int iter = 0; iter < 1 + f.h_iter_; ++iter) {
-      // For backward, negate h
-      if (f.fd_ == BACKWARD) h = -h;
-      // Number of perturbations
-      casadi_int n_pert = f.fd_ == FORWARD || f.fd_ == BACKWARD ? 1 :
-        f.fd_ == CENTRAL ? 2 : 4;
-      // Allocate memory for perturbed outputs
-      m.fd_out_.resize(n_pert * n_unknown);
       // Calculate all perturbed outputs
       for (casadi_int k = 0; k < n_pert; ++k) {
         // Where to save the perturbed outputs
@@ -427,23 +427,30 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
           break;
         default: casadi_error("Not implemented");
         }
-        // Pass perturbed inputs to FMU
-        casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
-        status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
-        if (status != fmi2OK) {
-          casadi_warning("fmi2SetReal failed");
-          return 1;
+        // Check if in bounds (or smoothing which currently doesn't implement bounds handling)
+        double test = m.v_in_[0] + pert * m.d_in_[0];
+        if (f.fd_ != SMOOTHING || (test >= min && test <= max)) {
+          // Pass perturbed inputs to FMU
+          casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
+          status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
+          if (status != fmi2OK) {
+            casadi_warning("fmi2SetReal failed");
+            return 1;
+          }
+          // Evaluate perturbed FMU
+          status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
+          if (status != fmi2OK) {
+            casadi_warning("fmi2GetReal failed");
+            return 1;
+          }
+          // Remove purburbation
+          casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
+          // Make perturbed outputs dimensionless
+          for (size_t i = 0; i < n_unknown; ++i) yk[k][i] /= m.nominal_out_[i];
+        } else {
+          // Input outside bounds, set to NaN
+          for (size_t i = 0; i < n_unknown; ++i) yk[k][i] = nan;
         }
-        // Evaluate perturbed FMU
-        status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
-        if (status != fmi2OK) {
-          casadi_warning("fmi2GetReal failed");
-          return 1;
-        }
-        // Remove purburbation
-        casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
-        // Make perturbed outputs dimensionless
-        for (size_t i = 0; i < n_unknown; ++i) yk[k][i] /= m.nominal_out_[i];
       }
       // Restore FMU inputs
       status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
@@ -489,28 +496,27 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
       // Variable id
       size_t id = m.id_out_[ind];
       // Get the value
-      double d = m.d_out_[ind];
+      double d_fd = m.d_out_[ind];
       // Scale by nominal value
-      d *= m.nominal_out_[ind];
+      d_fd *= m.nominal_out_[ind];
       // Use FD instead of AD or to compare with AD
       if (f.validate_ad_) {
         // Nominal value
         double n = m.nominal_out_[ind];
-        // Maximum error
-        double etol = std::fabs(d) * f.reltol_ + n * f.abstol_;
-        // Check relative error
-        if (std::fabs(m.sens_[id] - d) > etol) {
+        // Value to compare with
+        double d_ad = m.sens_[id];
+        // Magnitude of derivatives
+        double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
+        // Check if error exceeds thresholds
+        if (d_max > n * f.abstol_ && std::fabs(d_ad - d_fd) > d_max * f.reltol_) {
           // Access variable
           const Variable& v = self_.variable(id);
           // Issue warning
           std::stringstream ss;
-          ss << "Inconsistent derivatives of " << v.name << " w.r.t. ";
-          for (size_t j = 0; j < n_known; ++j) {
-            if (j != 0) ss << ", ";
-            ss << self_.variable(m.id_in_[j]).name;
-          }
-          ss << ". Got " << m.sens_[id] << " for AD vs. " << d << " for FD["
-            << to_string(f.fd_) << "]. ";
+          ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << var_in.name << "\n"
+            << "At " << m.v_in_ << ", direction " << m.d_in_ << ", nominal " << nom
+            << ", min " << min << ", max " << max << ", got " << d_ad
+            << " for AD vs. " << d_fd << " for FD[" << to_string(f.fd_) << "].\n";
           // Also print the stencil:
           std::vector<double> stencil;
           switch (f.fd_) {
@@ -535,7 +541,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
         }
       } else {
         // Use instead of AD
-        m.sens_[id] = d;
+        m.sens_[id] = d_fd;
       }
     }
   }
@@ -879,6 +885,20 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
   opts2["enable_fd"] = true;
   ret->construct(opts2);
   return ret;
+}
+
+casadi_int FmuFunction::n_pert() const {
+  switch (fd_) {
+  case Fmu::FORWARD:
+  case Fmu::BACKWARD:
+    return 1;
+  case Fmu::CENTRAL:
+    return 2;
+  case Fmu::SMOOTHING:
+    return 4;
+  default: break;
+  }
+  casadi_error("Not implemented");
 }
 
 FmuFunctionJac::~FmuFunctionJac() {
