@@ -86,9 +86,6 @@ namespace casadi {
     /** Helper for a more powerful 'simulator' factory */
     virtual Function create_advanced(const Dict& opts);
 
-    virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
-    virtual MX algebraic_state_output(const MX& Z) const { return Z; }
-
     /** \brief Reset the forward problem */
     virtual void reset(SimulatorMemory* mem, double t,
                        const double* x, const double* z, const double* p) const = 0;
@@ -111,48 +108,8 @@ namespace casadi {
     /** \brief  Print solver statistics */
     virtual void print_stats(SimulatorMemory* mem) const {}
 
-    /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res,
-      casadi_int* iw, bvec_t* w, void* mem) const override;
-
-    /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
-
-    ///@{
-    /// Is the class able to propagate seeds through the algorithm?
-    bool has_spfwd() const override { return true;}
-    bool has_sprev() const override { return true;}
-    ///@}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    Function get_forward(casadi_int nfwd, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    bool has_forward(casadi_int nfwd) const override { return true;}
-    ///@}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    Function get_reverse(casadi_int nadj, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    bool has_reverse(casadi_int nadj) const override { return true;}
-    ///@}
-
     /** \brief  Set stop time for the integration */
     virtual void setStopTime(SimulatorMemory* mem, double tf) const;
-
-    /** \brief Set solver specific options to generated augmented simulators */
-    virtual Dict getDerivativeOptions(bool fwd) const;
-
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities */
-    template<typename MatType> std::map<std::string, MatType> aug_fwd(casadi_int nfwd) const;
-
-    /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities */
-    template<typename MatType> std::map<std::string, MatType> aug_adj(casadi_int nadj) const;
 
     /// Create sparsity pattern of the extended Jacobian (forward problem)
     Sparsity sp_jac_dae();
@@ -192,14 +149,8 @@ namespace casadi {
     std::vector<double> grid_;
     casadi_int ngrid_;
 
-    // Augmented user option
-    Dict augmented_options_;
-
     // Copy of the options
     Dict opts_;
-
-    /// One step
-    Function onestep_;
 
     /// Options
     bool print_stats_;
@@ -219,27 +170,6 @@ namespace casadi {
 
     /// Infix
     static const std::string infix_;
-
-    /// Convert dictionary to Problem
-    template<typename XType>
-      static Function map2oracle(const std::string& name,
-        const std::map<std::string, XType>& d, const Dict& opts=Dict());
-
-
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
-    /** \brief Serialize type information */
-    void serialize_type(SerializingStream &s) const override;
-
-    /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeserializingStream& s);
-
-    /** \brief String used to identify the immediate FunctionInternal subclass */
-    std::string serialize_base_function() const override { return "Simulator"; }
-
-  protected:
-    /** \brief Deserializing constructor */
-    explicit Simulator(DeserializingStream& s);
   };
 
 } // namespace casadi

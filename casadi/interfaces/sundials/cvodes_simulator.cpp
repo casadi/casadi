@@ -40,7 +40,6 @@ namespace casadi {
     plugin->doc = CvodesSimulator::meta_doc.c_str();;
     plugin->version = CASADI_VERSION;
     plugin->options = &CvodesSimulator::options_;
-    plugin->deserialize = &CvodesSimulator::deserialize;
     return 0;
   }
 
@@ -864,28 +863,6 @@ namespace casadi {
 
   CvodesSimMemory::~CvodesSimMemory() {
     if (this->mem) CVodeFree(&this->mem);
-  }
-
-  CvodesSimulator::CvodesSimulator(DeserializingStream& s) : SundialsSimulator(s) {
-    int version = s.version("CvodesSimulator", 1, 2);
-    s.unpack("CvodesSimulator::lmm", lmm_);
-    s.unpack("CvodesSimulator::iter", iter_);
-
-    if (version>=2) {
-      s.unpack("CvodesSimulator::min_step_size", min_step_size_);
-    } else {
-      min_step_size_ = 0;
-    }
-  }
-
-  void CvodesSimulator::serialize_body(SerializingStream &s) const {
-    SundialsSimulator::serialize_body(s);
-    s.version("CvodesSimulator", 2);
-
-    s.pack("CvodesSimulator::lmm", lmm_);
-    s.pack("CvodesSimulator::iter", iter_);
-    s.pack("CvodesSimulator::min_step_size", min_step_size_);
-
   }
 
 } // namespace casadi

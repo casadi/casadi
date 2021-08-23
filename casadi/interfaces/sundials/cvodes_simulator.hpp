@@ -195,19 +195,6 @@ namespace casadi {
 
     casadi_int lmm_; // linear multistep method
     casadi_int iter_; // nonlinear solver iteration
-
-
-  public:
-
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
-
-    /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeserializingStream& s) { return new CvodesSimulator(s); }
-
-  protected:
-    /** \brief Deserializing constructor */
-    explicit CvodesSimulator(DeserializingStream& s);
   };
 
 } // namespace casadi

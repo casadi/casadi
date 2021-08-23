@@ -184,13 +184,6 @@ namespace casadi {
       std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
       uout() << id << " = " << tmp << std::endl;
     }
-
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
-
-  protected:
-    /** \brief Deserializing constructor */
-    explicit SundialsSimulator(DeserializingStream& s);
   };
 
   // Check if N_Vector is regular
