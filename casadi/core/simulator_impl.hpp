@@ -154,6 +154,11 @@ namespace casadi {
     /// Options
     bool print_stats_;
 
+    /// Convert dictionary to Problem
+    template<typename XType>
+      static Function map2oracle(const std::string& name,
+        const std::map<std::string, XType>& d, const Dict& opts=Dict());
+
     // Creator function for internal class
     typedef Simulator* (*Creator)(const std::string& name, const Function& oracle,
       const std::vector<double>& grid);

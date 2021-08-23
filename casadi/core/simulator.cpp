@@ -41,14 +41,24 @@ namespace casadi {
     return Simulator::getPlugin(name).doc;
   }
 
-  Function simulator(const string& name, const string& solver,
-                    const Function& dae, const std::vector<double>& grid, const Dict& opts) {
+  Function simulator(const string& name, const string& solver, const Function& dae,
+      const std::vector<double>& grid, const Dict& opts) {
     // Make sure that dae is sound
     if (dae.has_free()) {
       casadi_error("Cannot create '" + name + "' since " + str(dae.get_free()) + " are free.");
     }
     Simulator* intg = Simulator::getPlugin(solver).creator(name, dae, grid);
     return intg->create_advanced(opts);
+  }
+
+  Function simulator(const string& name, const string& solver, const SXDict& dae,
+      const std::vector<double>& grid, const Dict& opts) {
+    return simulator(name, solver, Simulator::map2oracle("dae", dae), grid, opts);
+  }
+
+  Function simulator(const string& name, const string& solver, const MXDict& dae,
+      const std::vector<double>& grid, const Dict& opts) {
+    return simulator(name, solver, Simulator::map2oracle("dae", dae), grid, opts);
   }
 
   vector<string> simulator_in() {
@@ -318,6 +328,86 @@ namespace casadi {
 
   void Simulator::setStopTime(SimulatorMemory* mem, double tf) const {
     casadi_error("setStopTime not defined for class " + class_name());
+  }
+
+  template<typename XType>
+  Function Simulator::map2oracle(const std::string& name,
+    const std::map<std::string, XType>& d, const Dict& opts) {
+    std::vector<XType> de_in(DE2_NUM_IN), de_out(DE2_NUM_OUT);
+
+    for (auto&& i : d) {
+      if (i.first=="t") {
+        de_in[DE2_T]=i.second;
+      } else if (i.first=="x") {
+        de_in[DE2_X]=i.second;
+      } else if (i.first=="z") {
+        de_in[DE2_Z]=i.second;
+      } else if (i.first=="p") {
+        de_in[DE2_P]=i.second;
+      } else if (i.first=="rx") {
+        de_in[DE2_RX]=i.second;
+      } else if (i.first=="rz") {
+        de_in[DE2_RZ]=i.second;
+      } else if (i.first=="rp") {
+        de_in[DE2_RP]=i.second;
+      } else if (i.first=="ode") {
+        de_out[DE2_ODE]=i.second;
+      } else if (i.first=="alg") {
+        de_out[DE2_ALG]=i.second;
+      } else if (i.first=="quad") {
+        de_out[DE2_QUAD]=i.second;
+      } else if (i.first=="rode") {
+        de_out[DE2_RODE]=i.second;
+      } else if (i.first=="ralg") {
+        de_out[DE2_RALG]=i.second;
+      } else if (i.first=="rquad") {
+        de_out[DE2_RQUAD]=i.second;
+      } else {
+        casadi_error("No such field: " + i.first);
+      }
+    }
+
+    // Make sure x and ode exist
+    casadi_assert(!de_in[DE2_X].is_empty(), "Ill-posed ODE - no state");
+
+    // Number of right-hand-sides
+    casadi_int nrhs = de_in[DE2_X].size2();
+
+    // Make sure consistent number of right-hand-sides
+    for (bool b : {true, false}) {
+      for (auto&& e : b ? de_in : de_out) {
+        // Skip time
+        if (&e == &de_in[DE2_T]) continue;
+        // Number of rows
+        casadi_int nr = e.size1();
+        // Make sure no change in number of elements
+        casadi_assert(e.numel()==nr*nrhs, "Inconsistent number of rhs");
+        e = reshape(e, nr, nrhs);
+      }
+    }
+
+    // Consistent sparsity for x
+    casadi_assert(de_in[DE2_X].size()==de_out[DE2_ODE].size(),
+      "Dimension mismatch for 'ode'");
+    de_out[DE2_ODE] = project(de_out[DE2_ODE], de_in[DE2_X].sparsity());
+
+    // Consistent sparsity for z
+    casadi_assert(de_in[DE2_Z].size()==de_out[DE2_ALG].size(),
+      "Dimension mismatch for 'alg'");
+    de_out[DE2_ALG] = project(de_out[DE2_ALG], de_in[DE2_Z].sparsity());
+
+    // Consistent sparsity for rx
+    casadi_assert(de_in[DE2_RX].size()==de_out[DE2_RODE].size(),
+      "Dimension mismatch for 'rode'");
+    de_out[DE2_RODE] = project(de_out[DE2_RODE], de_in[DE2_RX].sparsity());
+
+    // Consistent sparsity for rz
+    casadi_assert(de_in[DE2_RZ].size()==de_out[DE2_RALG].size(),
+      "Dimension mismatch for 'ralg'");
+    de_out[DE2_RALG] = project(de_out[DE2_RALG], de_in[DE2_RZ].sparsity());
+
+    // Construct
+    return Function(name, de_in, de_out, DE2_INPUTS, DE2_OUTPUTS, opts);
   }
 
 } // namespace casadi
