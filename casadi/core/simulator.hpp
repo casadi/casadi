@@ -121,31 +121,31 @@ namespace casadi {
 
 #ifndef SWIG
 /// Inputs of the symbolic representation of the DAE
-enum De2In {
-  DE2_T,
-  DE2_X,
-  DE2_Z,
-  DE2_P,
-  DE2_RX,
-  DE2_RZ,
-  DE2_RP,
-  DE2_NUM_IN};
+enum DynIn {
+  DYN_T,
+  DYN_X,
+  DYN_Z,
+  DYN_P,
+  DYN_RX,
+  DYN_RZ,
+  DYN_RP,
+  DYN_NUM_IN};
 
 /// Shortnames for DAE symbolic representation inputs
-const std::vector<std::string> DE2_INPUTS = {"t", "x", "z", "p", "rx", "rz", "rp"};
+const std::vector<std::string> DYN_INPUTS = {"t", "x", "z", "p", "rx", "rz", "rp"};
 
 /// Inputs of the symbolic representation of the DAE
-enum De2Out {
-  DE2_ODE,
-  DE2_ALG,
-  DE2_QUAD,
-  DE2_RODE,
-  DE2_RALG,
-  DE2_RQUAD,
-  DE2_NUM_OUT};
+enum DynOut {
+  DYN_ODE,
+  DYN_ALG,
+  DYN_QUAD,
+  DYN_RODE,
+  DYN_RALG,
+  DYN_RQUAD,
+  DYN_NUM_OUT};
 
 /// Shortnames for DAE symbolic representation outputs
-const std::vector<std::string> DE2_OUTPUTS = {"ode", "alg", "quad", "rode", "ralg", "rquad"};
+const std::vector<std::string> DYN_OUTPUTS = {"ode", "alg", "quad", "rode", "ralg", "rquad"};
 
 /// Input arguments of an ODE/DAE function
 enum DAE2Input {

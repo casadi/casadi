@@ -843,15 +843,15 @@ namespace casadi {
 
     // Get the Jacobian in the Newton iteration
     if (backward) {
-      MatType jac = c_x*MatType::jacobian(r[DE2_RODE], a[DE2_RX])
+      MatType jac = c_x*MatType::jacobian(r[DYN_RODE], a[DYN_RX])
                   + c_xdot*MatType::eye(nrx_);
       return Function("jacB",
-                      {a[DE2_T], a[DE2_RX], a[DE2_RP],
-                       a[DE2_X], a[DE2_P], c_x, c_xdot}, {jac});
+                      {a[DYN_T], a[DYN_RX], a[DYN_RP],
+                       a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
      } else {
-      MatType jac = c_x*MatType::jacobian(r[DE2_ODE], a[DE2_X])
+      MatType jac = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X])
                   + c_xdot*MatType::eye(nx_);
-      return Function("jacF", {a[DE2_T], a[DE2_X], a[DE2_P], c_x, c_xdot}, {jac});
+      return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
     }
   }
 

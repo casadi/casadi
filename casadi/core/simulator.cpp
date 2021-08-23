@@ -287,7 +287,7 @@ int Simulator::init_mem(void* mem) const {
 
 Sparsity Simulator::sp_jac_dae() {
   // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DE2_ODE, DE2_X);
+  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_ODE, DYN_X);
 
   // Add diagonal to get interdependencies
   jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
@@ -296,16 +296,16 @@ Sparsity Simulator::sp_jac_dae() {
   if (nz_==0) return jac_ode_x;
 
   // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DE2_ODE, DE2_Z);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DE2_ALG, DE2_X);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DE2_ALG, DE2_Z);
+  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_ODE, DYN_Z);
+  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_ALG, DYN_X);
+  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_ALG, DYN_Z);
   return blockcat(jac_ode_x, jac_ode_z,
                   jac_alg_x, jac_alg_z);
 }
 
 Sparsity Simulator::sp_jac_rdae() {
   // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DE2_RODE, DE2_RX);
+  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_RODE, DYN_RX);
 
   // Add diagonal to get interdependencies
   jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
@@ -314,9 +314,9 @@ Sparsity Simulator::sp_jac_rdae() {
   if (nrz_==0) return jac_ode_x;
 
   // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DE2_RODE, DE2_RZ);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DE2_RALG, DE2_RX);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DE2_RALG, DE2_RZ);
+  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_RODE, DYN_RZ);
+  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_RALG, DYN_RX);
+  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_RALG, DYN_RZ);
   return blockcat(jac_ode_x, jac_ode_z,
                   jac_alg_x, jac_alg_z);
 }
@@ -332,51 +332,51 @@ void Simulator::setStopTime(SimulatorMemory* mem, double tf) const {
 template<typename XType>
 Function Simulator::map2oracle(const std::string& name,
   const std::map<std::string, XType>& d, const Dict& opts) {
-  std::vector<XType> de_in(DE2_NUM_IN), de_out(DE2_NUM_OUT);
+  std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
 
   for (auto&& i : d) {
     if (i.first=="t") {
-      de_in[DE2_T]=i.second;
+      de_in[DYN_T]=i.second;
     } else if (i.first=="x") {
-      de_in[DE2_X]=i.second;
+      de_in[DYN_X]=i.second;
     } else if (i.first=="z") {
-      de_in[DE2_Z]=i.second;
+      de_in[DYN_Z]=i.second;
     } else if (i.first=="p") {
-      de_in[DE2_P]=i.second;
+      de_in[DYN_P]=i.second;
     } else if (i.first=="rx") {
-      de_in[DE2_RX]=i.second;
+      de_in[DYN_RX]=i.second;
     } else if (i.first=="rz") {
-      de_in[DE2_RZ]=i.second;
+      de_in[DYN_RZ]=i.second;
     } else if (i.first=="rp") {
-      de_in[DE2_RP]=i.second;
+      de_in[DYN_RP]=i.second;
     } else if (i.first=="ode") {
-      de_out[DE2_ODE]=i.second;
+      de_out[DYN_ODE]=i.second;
     } else if (i.first=="alg") {
-      de_out[DE2_ALG]=i.second;
+      de_out[DYN_ALG]=i.second;
     } else if (i.first=="quad") {
-      de_out[DE2_QUAD]=i.second;
+      de_out[DYN_QUAD]=i.second;
     } else if (i.first=="rode") {
-      de_out[DE2_RODE]=i.second;
+      de_out[DYN_RODE]=i.second;
     } else if (i.first=="ralg") {
-      de_out[DE2_RALG]=i.second;
+      de_out[DYN_RALG]=i.second;
     } else if (i.first=="rquad") {
-      de_out[DE2_RQUAD]=i.second;
+      de_out[DYN_RQUAD]=i.second;
     } else {
       casadi_error("No such field: " + i.first);
     }
   }
 
   // Make sure x and ode exist
-  casadi_assert(!de_in[DE2_X].is_empty(), "Ill-posed ODE - no state");
+  casadi_assert(!de_in[DYN_X].is_empty(), "Ill-posed ODE - no state");
 
   // Number of right-hand-sides
-  casadi_int nrhs = de_in[DE2_X].size2();
+  casadi_int nrhs = de_in[DYN_X].size2();
 
   // Make sure consistent number of right-hand-sides
   for (bool b : {true, false}) {
     for (auto&& e : b ? de_in : de_out) {
       // Skip time
-      if (&e == &de_in[DE2_T]) continue;
+      if (&e == &de_in[DYN_T]) continue;
       // Number of rows
       casadi_int nr = e.size1();
       // Make sure no change in number of elements
@@ -386,27 +386,27 @@ Function Simulator::map2oracle(const std::string& name,
   }
 
   // Consistent sparsity for x
-  casadi_assert(de_in[DE2_X].size()==de_out[DE2_ODE].size(),
+  casadi_assert(de_in[DYN_X].size()==de_out[DYN_ODE].size(),
     "Dimension mismatch for 'ode'");
-  de_out[DE2_ODE] = project(de_out[DE2_ODE], de_in[DE2_X].sparsity());
+  de_out[DYN_ODE] = project(de_out[DYN_ODE], de_in[DYN_X].sparsity());
 
   // Consistent sparsity for z
-  casadi_assert(de_in[DE2_Z].size()==de_out[DE2_ALG].size(),
+  casadi_assert(de_in[DYN_Z].size()==de_out[DYN_ALG].size(),
     "Dimension mismatch for 'alg'");
-  de_out[DE2_ALG] = project(de_out[DE2_ALG], de_in[DE2_Z].sparsity());
+  de_out[DYN_ALG] = project(de_out[DYN_ALG], de_in[DYN_Z].sparsity());
 
   // Consistent sparsity for rx
-  casadi_assert(de_in[DE2_RX].size()==de_out[DE2_RODE].size(),
+  casadi_assert(de_in[DYN_RX].size()==de_out[DYN_RODE].size(),
     "Dimension mismatch for 'rode'");
-  de_out[DE2_RODE] = project(de_out[DE2_RODE], de_in[DE2_RX].sparsity());
+  de_out[DYN_RODE] = project(de_out[DYN_RODE], de_in[DYN_RX].sparsity());
 
   // Consistent sparsity for rz
-  casadi_assert(de_in[DE2_RZ].size()==de_out[DE2_RALG].size(),
+  casadi_assert(de_in[DYN_RZ].size()==de_out[DYN_RALG].size(),
     "Dimension mismatch for 'ralg'");
-  de_out[DE2_RALG] = project(de_out[DE2_RALG], de_in[DE2_RZ].sparsity());
+  de_out[DYN_RALG] = project(de_out[DYN_RALG], de_in[DYN_RZ].sparsity());
 
   // Construct
-  return Function(name, de_in, de_out, DE2_INPUTS, DE2_OUTPUTS, opts);
+  return Function(name, de_in, de_out, DYN_INPUTS, DYN_OUTPUTS, opts);
 }
 
 } // namespace casadi

@@ -122,15 +122,15 @@ namespace casadi {
 
     ///@{
     // Shorthands
-    const Sparsity&  t() const { return oracle_.sparsity_in(DE2_T);}
-    const Sparsity&  x() const { return oracle_.sparsity_in(DE2_X);}
-    const Sparsity&  z() const { return oracle_.sparsity_in(DE2_Z);}
-    const Sparsity&  p() const { return oracle_.sparsity_in(DE2_P);}
-    const Sparsity&  q() const { return oracle_.sparsity_out(DE2_QUAD);}
-    const Sparsity& rx() const { return oracle_.sparsity_in(DE2_RX);}
-    const Sparsity& rz() const { return oracle_.sparsity_in(DE2_RZ);}
-    const Sparsity& rp() const { return oracle_.sparsity_in(DE2_RP);}
-    const Sparsity& rq() const { return oracle_.sparsity_out(DE2_RQUAD);}
+    const Sparsity&  t() const { return oracle_.sparsity_in(DYN_T);}
+    const Sparsity&  x() const { return oracle_.sparsity_in(DYN_X);}
+    const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
+    const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
+    const Sparsity&  q() const { return oracle_.sparsity_out(DYN_QUAD);}
+    const Sparsity& rx() const { return oracle_.sparsity_in(DYN_RX);}
+    const Sparsity& rz() const { return oracle_.sparsity_in(DYN_RZ);}
+    const Sparsity& rp() const { return oracle_.sparsity_in(DYN_RP);}
+    const Sparsity& rq() const { return oracle_.sparsity_out(DYN_RQUAD);}
     ///@}
 
     // Time grid
