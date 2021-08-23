@@ -33,8 +33,9 @@ OUTPUTSCHEME(SimulatorOutput)
 using namespace std;
 namespace casadi {
 
-  SundialsSimulator::SundialsSimulator(const std::string& name, const Function& dae)
-    : Simulator(name, dae) {
+  SundialsSimulator::SundialsSimulator(const std::string& name, const Function& dae,
+      const std::vector<double>& grid)
+    : Simulator(name, dae, grid) {
   }
 
   SundialsSimulator::~SundialsSimulator() {

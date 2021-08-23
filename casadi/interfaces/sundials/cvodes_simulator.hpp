@@ -84,11 +84,13 @@ namespace casadi {
   class CASADI_SIMULATOR_CVODES_EXPORT CvodesSimulator : public SundialsSimulator {
   public:
     /** \brief  Constructor */
-    explicit CvodesSimulator(const std::string& name, const Function& dae);
+    explicit CvodesSimulator(const std::string& name, const Function& dae,
+      const std::vector<double>& grid);
 
     /** \brief  Create a new simulator */
-    static Simulator* creator(const std::string& name, const Function& dae) {
-      return new CvodesSimulator(name, dae);
+    static Simulator* creator(const std::string& name, const Function& dae,
+        const std::vector<double>& grid) {
+      return new CvodesSimulator(name, dae, grid);
     }
 
     /** \brief  Destructor */

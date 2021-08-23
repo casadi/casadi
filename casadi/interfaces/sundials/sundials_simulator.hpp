@@ -89,7 +89,8 @@ namespace casadi {
   class CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimulator : public Simulator {
   public:
     /** \brief  Constructor */
-    SundialsSimulator(const std::string& name, const Function& dae);
+    SundialsSimulator(const std::string& name, const Function& dae,
+      const std::vector<double>& grid);
 
     /** \brief  Destructor */
     ~SundialsSimulator() override=0;

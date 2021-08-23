@@ -48,7 +48,7 @@ namespace casadi {
   Simulator : public OracleFunction, public PluginInterface<Simulator> {
   public:
     /** \brief  Constructor */
-    Simulator(const std::string& name, const Function& oracle);
+    Simulator(const std::string& name, const Function& oracle, const std::vector<double>& grid);
 
     /** \brief  Destructor */
     ~Simulator() override=0;
@@ -133,6 +133,9 @@ namespace casadi {
     const Sparsity& rq() const { return oracle_.sparsity_out(DE2_RQUAD);}
     ///@}
 
+    // Time grid
+    std::vector<double> grid_;
+
     /// Number of states for the forward integration
     casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
 
@@ -145,22 +148,15 @@ namespace casadi {
     /// Number of sensitivities
     casadi_int ns_;
 
-    // Time grid
-    std::vector<double> grid_;
-    casadi_int ngrid_;
-
     // Copy of the options
     Dict opts_;
 
     /// Options
     bool print_stats_;
 
-    /// Output the state at the initial time
-    bool output_t0_;
-    casadi_int ntout_;
-
     // Creator function for internal class
-    typedef Simulator* (*Creator)(const std::string& name, const Function& oracle);
+    typedef Simulator* (*Creator)(const std::string& name, const Function& oracle,
+      const std::vector<double>& grid);
 
     // No static functions exposed
     struct Exposed{ };

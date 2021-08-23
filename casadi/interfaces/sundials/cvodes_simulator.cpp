@@ -48,8 +48,9 @@ namespace casadi {
     Simulator::registerPlugin(casadi_register_simulator_cvodes);
   }
 
-  CvodesSimulator::CvodesSimulator(const std::string& name, const Function& dae)
-    : SundialsSimulator(name, dae) {
+  CvodesSimulator::CvodesSimulator(const std::string& name, const Function& dae,
+    const std::vector<double>& grid)
+    : SundialsSimulator(name, dae, grid) {
   }
 
   CvodesSimulator::~CvodesSimulator() {

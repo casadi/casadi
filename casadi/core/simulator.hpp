@@ -84,7 +84,8 @@ namespace casadi {
   */
   ///@{
   CASADI_EXPORT Function simulator(const std::string& name, const std::string& solver,
-                                    const Function& dae, const Dict& opts=Dict());
+                                  const Function& dae, const std::vector<double>& grid,
+                                  const Dict& opts=Dict());
   ///@}
 
   /// Check if a particular plugin is available

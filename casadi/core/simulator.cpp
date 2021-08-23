@@ -42,12 +42,12 @@ namespace casadi {
   }
 
   Function simulator(const string& name, const string& solver,
-                      const Function& dae, const Dict& opts) {
+                    const Function& dae, const std::vector<double>& grid, const Dict& opts) {
     // Make sure that dae is sound
     if (dae.has_free()) {
       casadi_error("Cannot create '" + name + "' since " + str(dae.get_free()) + " are free.");
     }
-    Simulator* intg = Simulator::getPlugin(solver).creator(name, dae);
+    Simulator* intg = Simulator::getPlugin(solver).creator(name, dae, grid);
     return intg->create_advanced(opts);
   }
 
@@ -97,15 +97,13 @@ namespace casadi {
     return SIMULATOR_NUM_OUT;
   }
 
-  Simulator::Simulator(const std::string& name, const Function& oracle)
-    : OracleFunction(name, oracle) {
-
+  Simulator::Simulator(const std::string& name, const Function& oracle,
+      const std::vector<double>& grid) : OracleFunction(name, oracle), grid_(grid) {
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
     // Default options
     print_stats_ = false;
-    output_t0_ = false;
   }
 
   Simulator::~Simulator() {
@@ -116,9 +114,9 @@ namespace casadi {
     case SIMULATOR_X0: return x();
     case SIMULATOR_P: return p();
     case SIMULATOR_Z0: return z();
-    case SIMULATOR_RX0: return repmat(rx(), 1, ntout_);
-    case SIMULATOR_RP: return repmat(rp(), 1, ntout_);
-    case SIMULATOR_RZ0: return repmat(rz(), 1, ntout_);
+    case SIMULATOR_RX0: return repmat(rx(), 1, grid_.size()-1);
+    case SIMULATOR_RP: return repmat(rp(), 1, grid_.size()-1);
+    case SIMULATOR_RZ0: return repmat(rz(), 1, grid_.size()-1);
     case SIMULATOR_NUM_IN: break;
     }
     return Sparsity();
@@ -126,9 +124,9 @@ namespace casadi {
 
   Sparsity Simulator::get_sparsity_out(casadi_int i) {
     switch (static_cast<SimulatorOutput>(i)) {
-    case SIMULATOR_XF: return repmat(x(), 1, ntout_);
-    case SIMULATOR_QF: return repmat(q(), 1, ntout_);
-    case SIMULATOR_ZF: return repmat(z(), 1, ntout_);
+    case SIMULATOR_XF: return repmat(x(), 1, grid_.size()-1);
+    case SIMULATOR_QF: return repmat(q(), 1, grid_.size()-1);
+    case SIMULATOR_ZF: return repmat(z(), 1, grid_.size()-1);
     case SIMULATOR_RXF: return rx();
     case SIMULATOR_RQF: return rq();
     case SIMULATOR_RZF: return rz();
@@ -144,7 +142,6 @@ namespace casadi {
   int Simulator::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<SimulatorMemory*>(mem);
-
     // Read inputs
     const double* x0 = arg[SIMULATOR_X0];
     const double* z0 = arg[SIMULATOR_Z0];
@@ -153,7 +150,6 @@ namespace casadi {
     const double* rz0 = arg[SIMULATOR_RZ0];
     const double* rp = arg[SIMULATOR_RP];
     arg += SIMULATOR_NUM_IN;
-
     // Read outputs
     double* x = res[SIMULATOR_XF];
     double* z = res[SIMULATOR_ZF];
@@ -162,34 +158,25 @@ namespace casadi {
     double* rz = res[SIMULATOR_RZF];
     double* rq = res[SIMULATOR_RQF];
     res += SIMULATOR_NUM_OUT;
-
     // Setup memory object
     setup(m, arg, res, iw, w);
-
     // Reset solver, take time to t0
     reset(m, grid_.front(), x0, z0, p);
-
     // Integrate forward
-    for (casadi_int k=0; k<grid_.size(); ++k) {
-      // Skip t0?
-      if (k==0 && !output_t0_) continue;
-
+    for (casadi_int k = 1; k < grid_.size(); ++k) {
       // Integrate forward
       advance(m, grid_[k], x, z, q);
       if (x) x += nx_;
       if (z) z += nz_;
       if (q) q += nq_;
     }
-
     // If backwards integration is needed
-    if (nrx_>0) {
+    if (nrx_ > 0) {
       // Integrate backward
       resetB(m, grid_.back(), rx0, rz0, rp);
-
       // Proceed to t0
       retreat(m, grid_.front(), rx, rz, rq);
     }
-
     if (print_stats_) print_stats(m);
 
     return 0;
@@ -205,45 +192,23 @@ namespace casadi {
         "Beginning of the time horizon"}},
       {"tf",
        {OT_DOUBLE,
-        "End of the time horizon"}},
-      {"grid",
-       {OT_DOUBLEVECTOR,
-        "Time grid"}},
-      {"output_t0",
-       {OT_BOOL,
-        "Output the state at the initial time"}}
+        "End of the time horizon"}}
      }
   };
 
   void Simulator::init(const Dict& opts) {
-    // Default (temporary) options
-    double t0=0, tf=1;
-
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="output_t0") {
-        output_t0_ = op.second;
-      } else if (op.first=="print_stats") {
+      if (op.first=="print_stats") {
         print_stats_ = op.second;
-      } else if (op.first=="grid") {
-        grid_ = op.second;
-      } else if (op.first=="t0") {
-        t0 = op.second;
-      } else if (op.first=="tf") {
-        tf = op.second;
       }
     }
 
     // Store a copy of the options, for creating augmented simulators
     opts_ = opts;
 
-    // If grid unset, default to [t0, tf]
-    if (grid_.empty()) {
-      grid_ = {t0, tf};
-    }
-
-    ngrid_ = grid_.size();
-    ntout_ = output_t0_ ? ngrid_ : ngrid_-1;
+    // Consistency check
+    casadi_assert(grid_.size() >= 2, "Need at least two grid points for simulation");
 
     // Call the base class method
     OracleFunction::init(opts);
