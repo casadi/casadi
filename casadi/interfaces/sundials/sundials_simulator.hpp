@@ -47,28 +47,17 @@ namespace casadi {
     // N-vectors for the forward integration
     N_Vector xz, xzdot, q;
 
-    // N-vectors for the backward integration
-    N_Vector rxz, rxzdot, rq;
-
-    // Initialize or reinitialize?
-    bool first_callB;
-
     // Parameters
-    double *p, *rp;
+    double *p;
 
     // Jacobian
-    double *jac, *jacB;
+    double *jac;
 
     /// Stats
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
     long nniters, nncfails;
-
-    long nstepsB, nfevalsB, nlinsetupsB, netfailsB;
-    int qlastB, qcurB;
-    double hinusedB, hlastB, hcurB, tcurB;
-    long nnitersB, nncfailsB;
 
     // Temporaries for [x;z] or [rx;rz]
     double *v1, *v2;
@@ -77,7 +66,7 @@ namespace casadi {
     int ncheck;
 
     /// Linear solver memory objects
-    int mem_linsolF, mem_linsolB;
+    int mem_linsolF;
 
     /// Constructor
     SundialsSimMemory();
@@ -117,7 +106,7 @@ namespace casadi {
     double get_abstol() const override { return abstol_;}
 
     // Get system Jacobian
-    virtual Function getJ(bool backward) const = 0;
+    virtual Function getJ() const = 0;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
@@ -128,10 +117,6 @@ namespace casadi {
     /** \brief  Reset the forward problem and bring the time back to t0 */
     void reset(SimulatorMemory* mem, double t, const double* x, const double* z,
       const double* p, double* y) const override;
-
-    /** \brief  Reset the backward problem and take time to tf */
-    void resetB(SimulatorMemory* mem, double t, const double* rx,
-                        const double* rz, const double* rp) const override;
 
     /** \brief Cast to memory object */
     static SundialsSimMemory* to_mem(void *mem) {
@@ -161,7 +146,7 @@ namespace casadi {
     ///@}
 
     /// Linear solver
-    Linsol linsolF_, linsolB_;
+    Linsol linsolF_;
 
     /// Supported iterative solvers in Sundials
     enum NewtonScheme {SD_DIRECT, SD_GMRES, SD_BCGSTAB, SD_TFQMR} newton_scheme_;

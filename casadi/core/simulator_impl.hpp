@@ -95,14 +95,6 @@ public:
   virtual void advance(SimulatorMemory* mem, double t, double* x, double* z, double* y,
     double* q) const = 0;
 
-  /** \brief Reset the backward problem */
-  virtual void resetB(SimulatorMemory* mem, double t,
-                      const double* rx, const double* rz, const double* rp) const = 0;
-
-  /** \brief  Retreat solution in time */
-  virtual void retreat(SimulatorMemory* mem, double t,
-                       double* rx, double* rz, double* rq) const = 0;
-
   /** \brief  Evaluate output function */
   virtual void eval_y(SimulatorMemory* mem, double t, const double* x, const double* z,
     const double* p, double* y) const;
@@ -116,14 +108,11 @@ public:
   /** \brief  Set stop time for the integration */
   virtual void setStopTime(SimulatorMemory* mem, double tf) const;
 
-  /// Create sparsity pattern of the extended Jacobian (forward problem)
+  /// Create sparsity pattern of the extended Jacobian
   Sparsity sp_jac_dae();
 
-  /// Create sparsity pattern of the extended Jacobian (backward problem)
-  Sparsity sp_jac_rdae();
-
   // Sparsity pattern of the extended Jacobians
-  Sparsity sp_jac_dae_, sp_jac_rdae_;
+  Sparsity sp_jac_dae_;
 
   ///@{
   // Shorthands
@@ -133,24 +122,19 @@ public:
   const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
   const Sparsity&  y() const { return oracle_.sparsity_out(DYN_Y);}
   const Sparsity&  q() const { return oracle_.sparsity_out(DYN_QUAD);}
-  const Sparsity& rx() const { return oracle_.sparsity_in(DYN_RX);}
-  const Sparsity& rz() const { return oracle_.sparsity_in(DYN_RZ);}
-  const Sparsity& ry() const { return oracle_.sparsity_out(DYN_RY);}
-  const Sparsity& rp() const { return oracle_.sparsity_in(DYN_RP);}
-  const Sparsity& rq() const { return oracle_.sparsity_out(DYN_RQUAD);}
   ///@}
 
   // Time grid
   std::vector<double> grid_;
 
-  /// Number of states for the forward integration
-  casadi_int nx_, nz_, ny_, nq_, nx1_, nz1_, ny1_, nq1_;
+  /// Number of states
+  casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
 
-  /// Number of states for the backward integration
-  casadi_int nrx_, nrz_, nry_, nrq_, nrx1_, nrz1_, nry1_, nrq1_;
+  /// Number of parameters
+  casadi_int np_, np1_;
 
-  /// Number of forward and backward parameters
-  casadi_int np_, nrp_, np1_, nrp1_;
+  // Number of outputs
+  casadi_int ny_, ny1_;
 
   /// Number of sensitivities
   casadi_int ns_;

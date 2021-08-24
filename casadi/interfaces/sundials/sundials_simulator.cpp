@@ -203,39 +203,28 @@ namespace casadi {
     }
 
     // Get or create Jacobians and linear system solvers
-    for (bool backward : {false, true}) {
-      // Skip backward?
-      if (backward && nrx_==0) continue;
-
-      // Get Jacobian function
-      Function J;
-      if (ns_==0) {
-        J = getJ(backward);
+    Function J;
+    if (ns_==0) {
+      J = getJ();
+    } else {
+      SundialsSimulator* d = derivative_of_.get<SundialsSimulator>();
+      casadi_assert_dev(d!=nullptr);
+      if (d->ns_==0) {
+        J = d->get_function("jacF");
       } else {
-        SundialsSimulator* d = derivative_of_.get<SundialsSimulator>();
-        casadi_assert_dev(d!=nullptr);
-        if (d->ns_==0) {
-          J = backward ? d->get_function("jacB") : d->get_function("jacF");
-        } else {
-          J = d->getJ(backward);
-        }
+        J = d->getJ();
       }
-      set_function(J, J.name(), true);
-      alloc_w(J.nnz_out(0), true);
     }
+    set_function(J, J.name(), true);
+    alloc_w(J.nnz_out(0), true);
 
     // Allocate work vectors
     alloc_w(np_, true); // p
-    alloc_w(nrp_, true); // rp
-    alloc_w(2*max(nx_+nz_, nrx_+nrz_), true); // v1, v2
+    alloc_w(2 * (nx_+nz_), true); // v1, v2
 
     // Allocate linear solvers
     linsolF_ = Linsol("linsolF", linear_solver_,
       get_function("jacF").sparsity_out(0), linear_solver_options_);
-    if (nrx_>0) {
-      linsolB_ = Linsol("linsolB", linear_solver_,
-        get_function("jacB").sparsity_out(0), linear_solver_options_);
-    }
   }
 
   int SundialsSimulator::init_mem(void* mem) const {
@@ -245,11 +234,8 @@ namespace casadi {
     // Allocate n-vectors
     m->xz = N_VNew_Serial(nx_+nz_);
     m->q = N_VNew_Serial(nq_);
-    m->rxz = N_VNew_Serial(nrx_+nrz_);
-    m->rq = N_VNew_Serial(nrq_);
 
     m->mem_linsolF = linsolF_.checkout();
-    if (!linsolB_.is_null()) m->mem_linsolB = linsolB_.checkout();
 
     return 0;
   }
@@ -259,7 +245,6 @@ namespace casadi {
     auto m = static_cast<SundialsSimMemory*>(mem);
 
     linsolF_.release(m->mem_linsolF);
-    if (!linsolB_.is_null()) linsolB_.release(m->mem_linsolB);
   }
 
   void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* z,
@@ -276,36 +261,14 @@ namespace casadi {
     N_VConst(0., m->q);
   }
 
-  void SundialsSimulator::resetB(SimulatorMemory* mem, double t, const double* rx,
-                                 const double* rz, const double* rp) const {
-    auto m = static_cast<SundialsSimMemory*>(mem);
-
-    // Update time
-    m->t = t;
-
-    // Set parameters
-    casadi_copy(rp, nrp_, m->rp);
-
-    // Get the backward state
-    casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
-
-    // Reset summation states
-    N_VConst(0., m->rq);
-  }
-
   SundialsSimMemory::SundialsSimMemory() {
     this->xz  = nullptr;
     this->q = nullptr;
-    this->rxz = nullptr;
-    this->rq = nullptr;
-    this->first_callB = true;
   }
 
   SundialsSimMemory::~SundialsSimMemory() {
     if (this->xz) N_VDestroy_Serial(this->xz);
     if (this->q) N_VDestroy_Serial(this->q);
-    if (this->rxz) N_VDestroy_Serial(this->rxz);
-    if (this->rq) N_VDestroy_Serial(this->rq);
   }
 
   Dict SundialsSimulator::get_stats(void* mem) const {
@@ -325,20 +288,6 @@ namespace casadi {
     stats["tcur"] = m->tcur;
     stats["nniters"] = static_cast<casadi_int>(m->nniters);
     stats["nncfails"] = static_cast<casadi_int>(m->nncfails);
-
-    // Counters, backward problem
-    stats["nstepsB"] = static_cast<casadi_int>(m->nstepsB);
-    stats["nfevalsB"] = static_cast<casadi_int>(m->nfevalsB);
-    stats["nlinsetupsB"] = static_cast<casadi_int>(m->nlinsetupsB);
-    stats["netfailsB"] = static_cast<casadi_int>(m->netfailsB);
-    stats["qlastB"] = m->qlastB;
-    stats["qcurB"] = m->qcurB;
-    stats["hinusedB"] = m->hinusedB;
-    stats["hlastB"] = m->hlastB;
-    stats["hcurB"] = m->hcurB;
-    stats["tcurB"] = m->tcurB;
-    stats["nnitersB"] = static_cast<casadi_int>(m->nnitersB);
-    stats["nncfailsB"] = static_cast<casadi_int>(m->nncfailsB);
     return stats;
   }
 
@@ -357,21 +306,6 @@ namespace casadi {
     print("Current internal time reached: %g\n");
     print("Number of nonlinear iterations performed: %ld\n", m->nniters);
     print("Number of nonlinear convergence failures: %ld\n", m->nncfails);
-    if (nrx_>0) {
-      print("BACKWARD INTEGRATION:\n");
-      print("Number of steps taken by SUNDIALS: %ld\n", m->nstepsB);
-      print("Number of calls to the user’s f function: %ld\n", m->nfevalsB);
-      print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetupsB);
-      print("Number of error test failures: %ld\n", m->netfailsB);
-      print("Method order used on the last internal step: %d\n" , m->qlastB);
-      print("Method order to be used on the next internal step: %d\n", m->qcurB);
-      print("Actual value of initial step size: %g\n", m->hinusedB);
-      print("Step size taken on the last internal step: %g\n", m->hlastB);
-      print("Step size to be attempted on the next internal step: %g\n", m->hcurB);
-      print("Current internal time reached: %g\n", m->tcurB);
-      print("Number of nonlinear iterations performed: %ld\n", m->nnitersB);
-      print("Number of nonlinear convergence failures: %ld\n", m->nncfailsB);
-    }
     print("\n");
   }
 
@@ -384,13 +318,9 @@ namespace casadi {
 
     // Work vectors
     m->p = w; w += np_;
-    m->rp = w; w += nrp_;
-    m->v1 = w; w += max(nx_+nz_, nrx_+nrz_);
-    m->v2 = w; w += max(nx_+nz_, nrx_+nrz_);
+    m->v1 = w; w += nx_ + nz_;
+    m->v2 = w; w += nx_ + nz_;
     m->jac = w; w += get_function("jacF").nnz_out(0);
-    if (nrx_>0) {
-      m->jacB = w; w += get_function("jacB").nnz_out(0);
-    }
   }
 
 } // namespace casadi

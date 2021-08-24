@@ -34,9 +34,6 @@ std::string to_string(DynIn v) {
   case DYN_X: return "x";
   case DYN_Z: return "z";
   case DYN_P: return "p";
-  case DYN_RX: return "rx";
-  case DYN_RZ: return "rz";
-  case DYN_RP: return "rp";
   default: break;
   }
   return "";
@@ -48,10 +45,6 @@ std::string to_string(DynOut v) {
   case DYN_ALG: return "alg";
   case DYN_Y: return "y";
   case DYN_QUAD: return "quad";
-  case DYN_RODE: return "rode";
-  case DYN_RALG: return "ralg";
-  case DYN_RY: return "ry";
-  case DYN_RQUAD: return "rquad";
   default: break;
   }
   return "";
@@ -106,9 +99,6 @@ std::string simulator_in(casadi_int ind) {
   case SIMULATOR_X0:  return "x0";
   case SIMULATOR_P:   return "p";
   case SIMULATOR_Z0:  return "z0";
-  case SIMULATOR_RX0: return "rx0";
-  case SIMULATOR_RP:  return "rp";
-  case SIMULATOR_RZ0: return "rz0";
   case SIMULATOR_NUM_IN: break;
   }
   return std::string();
@@ -120,10 +110,6 @@ std::string simulator_out(casadi_int ind) {
   case SIMULATOR_ZF:  return "zf";
   case SIMULATOR_Y:  return "y";
   case SIMULATOR_QF:  return "qf";
-  case SIMULATOR_RXF: return "rxf";
-  case SIMULATOR_RZF: return "rzf";
-  case SIMULATOR_RQF: return "rqf";
-  case SIMULATOR_RY: return "ry";
   case SIMULATOR_NUM_OUT: break;
   }
   return std::string();
@@ -154,9 +140,6 @@ Sparsity Simulator::get_sparsity_in(casadi_int i) {
   case SIMULATOR_X0: return x();
   case SIMULATOR_P: return p();
   case SIMULATOR_Z0: return z();
-  case SIMULATOR_RX0: return rx();
-  case SIMULATOR_RP: return rp();
-  case SIMULATOR_RZ0: return rz();
   case SIMULATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -168,10 +151,6 @@ Sparsity Simulator::get_sparsity_out(casadi_int i) {
   case SIMULATOR_ZF: return z();
   case SIMULATOR_Y: return repmat(y(), 1, grid_.size());
   case SIMULATOR_QF: return repmat(q(), 1, grid_.size() - 1);
-  case SIMULATOR_RXF: return rx();
-  case SIMULATOR_RZF: return rz();
-  case SIMULATOR_RY: return repmat(ry(), 1, grid_.size());
-  case SIMULATOR_RQF: return rq();
   case SIMULATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -188,19 +167,12 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   const double* x0 = arg[SIMULATOR_X0];
   const double* z0 = arg[SIMULATOR_Z0];
   const double* p = arg[SIMULATOR_P];
-  const double* rx0 = arg[SIMULATOR_RX0];
-  const double* rz0 = arg[SIMULATOR_RZ0];
-  const double* rp = arg[SIMULATOR_RP];
   arg += SIMULATOR_NUM_IN;
   // Read outputs
   double* x = res[SIMULATOR_XF];
   double* z = res[SIMULATOR_ZF];
   double* y = res[SIMULATOR_Y];
   double* q = res[SIMULATOR_QF];
-  double* rx = res[SIMULATOR_RXF];
-  double* rz = res[SIMULATOR_RZF];
-  // double* ry = res[SIMULATOR_RY];
-  double* rq = res[SIMULATOR_RQF];
   res += SIMULATOR_NUM_OUT;
   // Setup memory object
   setup(m, arg, res, iw, w);
@@ -213,13 +185,6 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
     advance(m, grid_[k], x, z, y, q);
     if (y) y += ny_;
     if (q) q += nq_;
-  }
-  // If backwards integration is needed
-  if (nrx_ > 0) {
-    // Integrate backward
-    resetB(m, grid_.back(), rx0, rz0, rp);
-    // Proceed to t0
-    retreat(m, grid_.front(), rx, rz, rq);
   }
   if (print_stats_) print_stats(m);
 
@@ -264,9 +229,6 @@ void Simulator::init(const Dict& opts) {
   casadi_assert(x().is_dense(), "Sparse DAE not supported");
   casadi_assert(z().is_dense(), "Sparse DAE not supported");
   casadi_assert(p().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rx().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rz().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rp().is_dense(), "Sparse DAE not supported");
 
   // Get dimensions (excluding sensitivity equations)
   nx1_ = x().size1();
@@ -274,11 +236,6 @@ void Simulator::init(const Dict& opts) {
   ny1_ = y().size1();
   nq1_ = q().size1();
   np1_  = p().size1();
-  nrx1_ = rx().size1();
-  nrz1_ = rz().size1();
-  nrp1_ = rp().size1();
-  nry1_ = ry().size1();
-  nrq1_ = rq().size1();
 
   // Get dimensions (including sensitivity equations)
   nx_ = x().nnz();
@@ -286,11 +243,6 @@ void Simulator::init(const Dict& opts) {
   ny_ = y().nnz();
   nq_ = q().nnz();
   np_  = p().nnz();
-  nrx_ = rx().nnz();
-  nrz_ = rz().nnz();
-  nrp_ = rp().nnz();
-  nry_ = ry().nnz();
-  nrq_ = rq().nnz();
 
   // Number of sensitivities
   ns_ = x().size2()-1;
@@ -301,20 +253,10 @@ void Simulator::init(const Dict& opts) {
                         "Jacobian of the forward problem is structurally rank-deficient. "
                         "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<"
                         + str(nx_+nz_));
-  if (nrx_>0) {
-    sp_jac_rdae_ = sp_jac_rdae();
-    casadi_assert(!sp_jac_rdae_.is_singular(),
-                          "Jacobian of the backward problem is structurally rank-deficient. "
-                          "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<"
-                          + str(nrx_+nrz_));
-  }
-
-  // Consistency check
 
   // Allocate sufficiently large work vectors
-  alloc_w(nx_+nz_);
-  alloc_w(nrx_+nrz_);
-  alloc_w(nx_ + nz_ + nrx_ + nrz_, true);
+  alloc_w(nx_ + nz_);
+  alloc_w(nx_ + nz_, true);
 }
 
 int Simulator::init_mem(void* mem) const {
@@ -338,24 +280,6 @@ Sparsity Simulator::sp_jac_dae() {
   Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_ODE, DYN_Z);
   Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_ALG, DYN_X);
   Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_ALG, DYN_Z);
-  return blockcat(jac_ode_x, jac_ode_z,
-                  jac_alg_x, jac_alg_z);
-}
-
-Sparsity Simulator::sp_jac_rdae() {
-  // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_RODE, DYN_RX);
-
-  // Add diagonal to get interdependencies
-  jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
-
-  // Quick return if no algebraic variables
-  if (nrz_==0) return jac_ode_x;
-
-  // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_RODE, DYN_RZ);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_RALG, DYN_RX);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_RALG, DYN_RZ);
   return blockcat(jac_ode_x, jac_ode_z,
                   jac_alg_x, jac_alg_z);
 }
@@ -406,14 +330,6 @@ Function Simulator::map2oracle(const std::string& name,
   casadi_assert(de_in[DYN_Z].size()==de_out[DYN_ALG].size(),
     "Dimension mismatch for 'alg'");
   de_out[DYN_ALG] = project(de_out[DYN_ALG], de_in[DYN_Z].sparsity());
-  // Consistent sparsity for rx
-  casadi_assert(de_in[DYN_RX].size()==de_out[DYN_RODE].size(),
-    "Dimension mismatch for 'rode'");
-  de_out[DYN_RODE] = project(de_out[DYN_RODE], de_in[DYN_RX].sparsity());
-  // Consistent sparsity for rz
-  casadi_assert(de_in[DYN_RZ].size()==de_out[DYN_RALG].size(),
-    "Dimension mismatch for 'ralg'");
-  de_out[DYN_RALG] = project(de_out[DYN_RALG], de_in[DYN_RZ].sparsity());
   // Construct
   return Function(name, de_in, de_out, enum_names<DynIn>(), enum_names<DynOut>(), opts);
 }

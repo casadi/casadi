@@ -126,9 +126,6 @@ enum DynIn {
   DYN_X,
   DYN_Z,
   DYN_P,
-  DYN_RX,
-  DYN_RZ,
-  DYN_RP,
   DYN_NUM_IN};
 
 /// Inputs of the symbolic representation of the DAE
@@ -137,10 +134,6 @@ enum DynOut {
   DYN_ALG,
   DYN_Y,
   DYN_QUAD,
-  DYN_RODE,
-  DYN_RALG,
-  DYN_RY,
-  DYN_RQUAD,
   DYN_NUM_OUT};
 
 /// Input arguments of an ODE/DAE function
@@ -169,38 +162,6 @@ enum DAE2Output {
   DAE2_NUM_OUT
 };
 
-/// Input arguments of an ODE/DAE backward integration function
-enum RDAE2Input {
-  /// Backward differential state
-  RDAE2_RX,
-  /// Backward algebraic state
-  RDAE2_RZ,
-  /// Backward  parameter vector
-  RDAE2_RP,
-  /// Forward differential state
-  RDAE2_X,
-  /// Forward algebraic state
-  RDAE2_Z,
-  /// Parameter vector
-  RDAE2_P,
-  /// Explicit time dependence
-  RDAE2_T,
-  /// Number of arguments
-  RDAE2_NUM_IN
-};
-
-/// Output arguments of an ODE/DAE backward integration function
-enum RDAE2Output {
-  /// Right hand side of ODE
-  RDAE2_ODE,
-  /// Right hand side of algebraic equations
-  RDAE2_ALG,
-  /// Right hand side of quadratures
-  RDAE2_QUAD,
-  /// Number of arguments
-  RDAE2_NUM_OUT
-};
-
 /// Input arguments of an simulator
 enum SimulatorInput {
   /// Differential state at the initial time
@@ -209,12 +170,6 @@ enum SimulatorInput {
   SIMULATOR_P,
   /// Initial guess for the algebraic variable
   SIMULATOR_Z0,
-  /// Backward differential state at the final time
-  SIMULATOR_RX0,
-  /// Backward parameter vector
-  SIMULATOR_RP,
-  /// Initial guess for the backwards algebraic variable
-  SIMULATOR_RZ0,
   /// Number of input arguments of an simulator
   SIMULATOR_NUM_IN
 };
@@ -229,14 +184,6 @@ enum SimulatorOutput {
   SIMULATOR_QF,
   /// Algebraic variable at the final time
   SIMULATOR_ZF,
-  /// Backward differential state at the initial time
-  SIMULATOR_RXF,
-  /// Backward outputs
-  SIMULATOR_RY,
-  /// Backward quadratures
-  SIMULATOR_RQF,
-  /// Backward algebraic variable at the initial time
-  SIMULATOR_RZF,
   /// Number of output arguments of an simulator
   SIMULATOR_NUM_OUT
 };

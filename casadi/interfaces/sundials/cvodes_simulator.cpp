@@ -99,12 +99,9 @@ namespace casadi {
     // Create function
     create_function("odeF", {"x", "p", "t"}, {"ode"});
     create_function("quadF", {"x", "p", "t"}, {"quad"});
-    create_function("odeB", {"rx", "rp", "x", "p", "t"}, {"rode"});
-    create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
 
     // Algebraic variables not supported
-    casadi_assert(nz_==0 && nrz_==0,
-      "CVODES does not support algebraic variables");
+    casadi_assert(nz_==0, "CVODES does not support algebraic variables");
 
     if (linear_multistep_method=="adams") {
       lmm_ = CV_ADAMS;
@@ -125,10 +122,6 @@ namespace casadi {
     // Attach functions for jacobian information
     if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
       create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
-      if (nrx_>0) {
-        create_function("jtimesB",
-                        {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
-      }
     }
   }
 
@@ -207,13 +200,6 @@ namespace casadi {
       }
     }
 
-    // Initialize adjoint sensitivities
-    if (nrx_>0) {
-      casadi_int interpType = interp_==SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
-      THROWING(CVodeAdjInit, m->mem, steps_per_checkpoint_, interpType);
-    }
-
-    m->first_callB = true;
     return 0;
   }
 
@@ -249,10 +235,6 @@ namespace casadi {
       N_VConst(0.0, m->q);
       THROWING(CVodeQuadReInit, m->mem, m->q);
     }
-    // Re-initialize backward integration
-    if (nrx_ > 0) {
-      THROWING(CVodeAdjReInit, m->mem);
-    }
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(m, grid_.back());
     // Get outputs
@@ -275,13 +257,7 @@ namespace casadi {
     const double ttol = 1e-9;
     if (fabs(m->t-t)>=ttol) {
       // Integrate forward ...
-      if (nrx_>0) {
-        // ... with taping
-        THROWING(CVodeF, m->mem, t, m->xz, &m->t, CV_NORMAL, &m->ncheck);
-      } else {
-        // ... without taping
-        THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
-      }
+      THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
 
       // Get quadratures
       if (nq_>0) {
@@ -302,83 +278,6 @@ namespace casadi {
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
              &m->hlast, &m->hcur, &m->tcur);
     THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
-  }
-
-  void CvodesSimulator::resetB(SimulatorMemory* mem, double t, const double* rx,
-                               const double* rz, const double* rp) const {
-    auto m = to_mem(mem);
-
-    // Reset the base classes
-    SundialsSimulator::resetB(mem, t, rx, rz, rp);
-
-    if (m->first_callB) {
-      // Create backward problem
-      THROWING(CVodeCreateB, m->mem, lmm_, iter_, &m->whichB);
-      THROWING(CVodeInitB, m->mem, m->whichB, rhsB, grid_.back(), m->rxz);
-      THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
-      THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
-      if (newton_scheme_==SD_DIRECT) {
-        // Direct scheme
-        CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
-        CVadjMem ca_mem = cv_mem->cv_adj_mem;
-        CVodeBMem cvB_mem = ca_mem->cvB_mem;
-        cvB_mem->cv_lmem   = m;
-        cvB_mem->cv_mem->cv_lmem = m;
-        cvB_mem->cv_mem->cv_lsetup = lsetupB;
-        cvB_mem->cv_mem->cv_lsolve = lsolveB;
-        cvB_mem->cv_mem->cv_setupNonNull = TRUE;
-      } else {
-        // Iterative scheme
-        casadi_int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
-        switch (newton_scheme_) {
-        case SD_DIRECT: casadi_assert_dev(0);
-        case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
-        case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylov_); break;
-        case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylov_); break;
-        }
-        THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-        if (use_precon_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-      }
-
-      // Quadratures for the backward problem
-      THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->rq);
-      if (quad_err_con_) {
-        THROWING(CVodeSetQuadErrConB, m->mem, m->whichB, true);
-        THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
-      }
-
-      // Mark initialized
-      m->first_callB = false;
-    } else {
-      THROWING(CVodeReInitB, m->mem, m->whichB, grid_.back(), m->rxz);
-      THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
-    }
-  }
-
-  void CvodesSimulator::retreat(SimulatorMemory* mem, double t,
-                                double* rx, double* rz, double* rq) const {
-    auto m = to_mem(mem);
-    // Integrate, unless already at desired time
-    if (t<m->t) {
-      THROWING(CVodeB, m->mem, t, CV_NORMAL);
-      THROWING(CVodeGetB, m->mem, m->whichB, &m->t, m->rxz);
-      if (nrq_>0) {
-        THROWING(CVodeGetQuadB, m->mem, m->whichB, &m->t, m->rq);
-      }
-    }
-
-    // Save outputs
-    casadi_copy(NV_DATA_S(m->rxz), nrx_, rx);
-    casadi_copy(NV_DATA_S(m->rq), nrq_, rq);
-
-    // Get stats
-    CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
-    CVadjMem ca_mem = cv_mem->cv_adj_mem;
-    CVodeBMem cvB_mem = ca_mem->cvB_mem;
-    THROWING(CVodeGetIntegratorStats, cvB_mem->cv_mem, &m->nstepsB,
-           &m->nfevalsB, &m->nlinsetupsB, &m->netfailsB, &m->qlastB,
-           &m->qcurB, &m->hinusedB, &m->hlastB, &m->hcurB, &m->tcurB);
-    THROWING(CVodeGetNonlinSolvStats, cvB_mem->cv_mem, &m->nnitersB, &m->nncfailsB);
   }
 
   void CvodesSimulator::cvodes_error(const char* module, int flag) {
@@ -424,58 +323,6 @@ namespace casadi {
     }
   }
 
-  int CvodesSimulator::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
-                            void *user_data) {
-    try {
-      casadi_assert_dev(user_data);
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      m->arg[0] = NV_DATA_S(rx);
-      m->arg[1] = m->rp;
-      m->arg[2] = NV_DATA_S(x);
-      m->arg[3] = m->p;
-      m->arg[4] = &t;
-      m->res[0] = NV_DATA_S(rxdot);
-      s.calc_function(m, "odeB");
-
-      // Negate (note definition of g)
-      casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));
-
-      return 0;
-    } catch(int flag) { // recoverable error
-      return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "rhsB failed: " << e.what() << endl;
-      return -1;
-    }
-  }
-
-  int CvodesSimulator::rhsQB(double t, N_Vector x, N_Vector rx,
-                             N_Vector rqdot, void *user_data) {
-    try {
-      casadi_assert_dev(user_data);
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      m->arg[0] = NV_DATA_S(rx);
-      m->arg[1] = m->rp;
-      m->arg[2] = NV_DATA_S(x);
-      m->arg[3] = m->p;
-      m->arg[4] = &t;
-      m->res[0] = NV_DATA_S(rqdot);
-      s.calc_function(m, "quadB");
-
-      // Negate (note definition of g)
-      casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
-
-      return 0;
-    } catch(int flag) { // recoverable error
-      return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "rhsQB failed: " << e.what() << endl;
-      return -1;
-    }
-  }
-
   int CvodesSimulator::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
                               N_Vector xdot, void *user_data, N_Vector tmp) {
     try {
@@ -489,29 +336,6 @@ namespace casadi {
       s.calc_function(m, "jtimesF");
       return 0;
     } catch(casadi_int flag) { // recoverable error
-      return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "jtimes failed: " << e.what() << endl;
-      return -1;
-    }
-  }
-
-  int CvodesSimulator::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
-                               N_Vector rx, N_Vector rxdot, void *user_data ,
-                               N_Vector tmpB) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = m->p;
-      m->arg[3] = NV_DATA_S(rx);
-      m->arg[4] = m->rp;
-      m->arg[5] = NV_DATA_S(v);
-      m->res[0] = NV_DATA_S(Jv);
-      s.calc_function(m, "jtimesB");
-      return 0;
-    } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
       uerr() << "jtimes failed: " << e.what() << endl;
@@ -576,60 +400,6 @@ namespace casadi {
     }
   }
 
-  int CvodesSimulator::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
-                               N_Vector rvecB, N_Vector zvecB, double gammaB,
-                               double deltaB, int lr, void *user_data, N_Vector tmpB) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-
-      // Get right-hand sides in m->v1
-      double* v = NV_DATA_S(rvecB);
-      casadi_copy(v, s.nrx_, m->v1);
-
-      // Solve for undifferentiated right-hand-side, save to output
-      if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB))
-        casadi_error("Linear solve failed");
-      v = NV_DATA_S(zvecB); // possibly different from rvecB
-      casadi_copy(m->v1, s.nrx1_, v);
-
-      // Sensitivity equations
-      if (s.ns_>0) {
-        // Second order correction
-        if (s.second_order_correction_) {
-          // The outputs will double as seeds for jtimesF
-          casadi_clear(v + s.nrx1_, s.nrx_ - s.nrx1_);
-          m->arg[0] = &t; // t
-          m->arg[1] = NV_DATA_S(x); // x
-          m->arg[2] = m->p; // p
-          m->arg[3] = NV_DATA_S(xB); // rx
-          m->arg[4] = m->rp; // rp
-          m->arg[5] = v; // fwd:rx
-          m->res[0] = m->v2; // fwd:rode
-          s.calc_function(m, "jtimesB");
-
-          // Subtract m->v2 from m->v1, scaled with gammaB
-          casadi_axpy(s.nrx_-s.nrx1_, -m->gammaB, m->v2 + s.nrx1_, m->v1 + s.nrx1_);
-        }
-
-        // Solve for sensitivity right-hand-sides
-        if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.ns_, false, m->mem_linsolB)) {
-          casadi_error("Linear solve failed");
-        }
-
-        // Save to output, reordered
-        casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
-      }
-
-      return 0;
-    } catch(int flag) { // recoverable error
-      return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "psolveB failed: " << e.what() << endl;
-      return -1;
-    }
-  }
-
   int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
                               booleantype *jcurPtr, double gamma, void *user_data,
                               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
@@ -661,39 +431,6 @@ namespace casadi {
     }
   }
 
-  int CvodesSimulator::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
-                               booleantype jokB, booleantype *jcurPtrB, double gammaB,
-                               void *user_data, N_Vector tmp1B, N_Vector tmp2B,
-                               N_Vector tmp3B) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      // Store gamma for later
-      m->gammaB = gammaB;
-      // Calculate Jacobian
-      double one=1;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(rx);
-      m->arg[2] = m->rp;
-      m->arg[3] = NV_DATA_S(x);
-      m->arg[4] = m->p;
-      m->arg[5] = &gammaB;
-      m->arg[6] = &one;
-      m->res[0] = m->jacB;
-      if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
-
-      // Prepare the solution of the linear system (e.g. factorize)
-      if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) casadi_error("'jacB' factorization failed");
-
-      return 0;
-    } catch(int flag) { // recoverable error
-      return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "psetupB failed: " << e.what() << endl;
-      return -1;
-    }
-  }
-
   int CvodesSimulator::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
                               booleantype *jcurPtr,
                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
@@ -716,42 +453,6 @@ namespace casadi {
       return flag;
     } catch(exception& e) { // non-recoverable error
       uerr() << "lsetup failed: " << e.what() << endl;
-      return -1;
-    }
-  }
-
-  int CvodesSimulator::lsetupB(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                               booleantype *jcurPtr,
-                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
-    try {
-      auto m = to_mem(cv_mem->cv_lmem);
-      CVadjMem ca_mem;
-      //CVodeBMem cvB_mem;
-
-      int flag;
-
-      // Current time
-      double t = cv_mem->cv_tn; // TODO(Joel): is this correct?
-      double gamma = cv_mem->cv_gamma;
-
-      cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
-
-      ca_mem = cv_mem->cv_adj_mem;
-      //cvB_mem = ca_mem->ca_bckpbCrt;
-
-      // Get FORWARD solution from interpolation.
-      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
-      if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
-
-      // Call the preconditioner setup function (which sets up the linear solver)
-      if (psetupB(t, ca_mem->ca_ytmp, x, xdot, FALSE, jcurPtr,
-                  gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
-
-      return 0;
-    } catch(int flag) { // recoverable error
-      return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "lsetupB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -787,72 +488,21 @@ namespace casadi {
     }
   }
 
-  int CvodesSimulator::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
-                               N_Vector x, N_Vector xdot) {
-    try {
-      auto m = to_mem(cv_mem->cv_lmem);
-      CVadjMem ca_mem;
-      //CVodeBMem cvB_mem;
-
-      int flag;
-
-      // Current time
-      double t = cv_mem->cv_tn; // TODO(Joel): is this correct?
-      double gamma = cv_mem->cv_gamma;
-
-      cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
-
-      ca_mem = cv_mem->cv_adj_mem;
-      //cvB_mem = ca_mem->ca_bckpbCrt;
-
-      // Get FORWARD solution from interpolation.
-      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
-      if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
-
-
-
-      // Accuracy
-      double delta = 0.0;
-
-      // Left/right preconditioner
-      int lr = 1;
-
-      // Call the preconditioner solve function (which solves the linear system)
-      if (psolveB(t, ca_mem->ca_ytmp, x, xdot, b, b, gamma, delta, lr,
-                  static_cast<void*>(m), nullptr)) return 1;
-
-      return 0;
-    } catch(int flag) { // recoverable error
-      return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "lsolveB failed: " << e.what() << endl;
-      return -1;
-    }
-  }
-
-  Function CvodesSimulator::getJ(bool b) const {
-    return oracle_.is_a("SXFunction") ? getJ<SX>(b) : getJ<MX>(b);
+  Function CvodesSimulator::getJ() const {
+    return oracle_.is_a("SXFunction") ? getJ<SX>() : getJ<MX>();
   }
 
   template<typename MatType>
-  Function CvodesSimulator::getJ(bool backward) const {
+  Function CvodesSimulator::getJ() const {
     vector<MatType> a = MatType::get_input(oracle_);
     vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
 
     // Get the Jacobian in the Newton iteration
-    if (backward) {
-      MatType jac = c_x*MatType::jacobian(r[DYN_RODE], a[DYN_RX])
-                  + c_xdot*MatType::eye(nrx_);
-      return Function("jacB",
-                      {a[DYN_T], a[DYN_RX], a[DYN_RP],
-                       a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
-     } else {
-      MatType jac = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X])
-                  + c_xdot*MatType::eye(nx_);
-      return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
-    }
+    MatType jac = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X])
+                + c_xdot*MatType::eye(nx_);
+    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
   }
 
   CvodesSimMemory::CvodesSimMemory(const CvodesSimulator& s) : self(s) {
