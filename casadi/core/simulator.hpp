@@ -34,9 +34,8 @@ namespace casadi {
 
   /** \defgroup main_simulator
       Create an ODE/DAE simulator
-      Solves an initial value problem (IVP) coupled to a terminal value problem
-      with differential equation given as an implicit ODE coupled to an algebraic
-      equation and a set of quadratures:
+      Solves an initial value problem (IVP) with the differential equation given as an
+      implicit ODE coupled to an algebraic equation and a set of quadratures:
 
       \verbatim
       Time grid: [t0, t1, ..., tN]
@@ -46,24 +45,12 @@ namespace casadi {
       qk(tk)  = 0, k = 0, ..., N-1
 
       Sequential forward integration from t=tk to t=t{k+1}
-      der(x) = function(t, x, z, p, uk)   Forward ODE
-      0 = fz(t, x, z, p, uk)              Forward algebraic equations
-      der(qk) = fq(t, x, z, p, uk)        Forward quadratures
-      yk = fy(t, x, z, p, uk)             Forward output equations
+      der(x) = fx(t, x, z, p, uk)         ODE
+      0 = fz(t, x, z, p, uk)              Algebraic equations
+      der(qk) = fq(t, x, z, p, uk)        Quadratures
+      yk = fy(t, x, z, p, uk)             Output equations
 
-      Terminal conditions for backward integration
-      rx(tf)  = rx0
-      rqk(tk{k+1})  = 0, k = N-1, ..., 0
-
-      Sequential backward integration from t=t{k+1} to t=tk
-      der(rx) = gx(t, rx, rz, rp, ruk, x, z, p, uk)    Backward ODE
-      0 = gz(t, rx, rz, rp, ruk, x, z, p, uk)          Backward algebraic equations
-      der(rq) = gq(t, rx, rz, rp, ruk, x, z, p, uk)    Backward quadratures
-      yk = gy(t, rx, rz, rp, ruk, x, z, p, uk)         Backward output equations
-
-      where we assume that both the forward and backwards integrations are index-1
-      (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-      gx, gz, gq and gy have a linear dependency on rx, rz, rp and ru.
+      where we assume that the problem is index-1 (i.e. dfz/dz, is invertible) and furthermore that
 
       \endverbatim
 
@@ -135,32 +122,6 @@ enum DynOut {
   DYN_Y,
   DYN_QUAD,
   DYN_NUM_OUT};
-
-/// Input arguments of an ODE/DAE function
-enum DAE2Input {
-  /// Differential state
-  DAE2_X,
-  /// Algebraic state
-  DAE2_Z,
-  /// Parameter
-  DAE2_P,
-  /// Explicit time dependence
-  DAE2_T,
-  /// Number of arguments
-  DAE2_NUM_IN
-};
-
-/// Output arguments of an DAE function
-enum DAE2Output {
-  /// Right hand side of the implicit ODE
-  DAE2_ODE,
-  /// Right hand side of algebraic equations
-  DAE2_ALG,
-  /// Right hand side of quadratures equations
-  DAE2_QUAD,
-  /// Number of arguments
-  DAE2_NUM_OUT
-};
 
 /// Input arguments of an simulator
 enum SimulatorInput {
