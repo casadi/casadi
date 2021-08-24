@@ -108,9 +108,6 @@ namespace casadi {
     /** \brief Get absolute tolerance */
     double get_abstol() const override { return abstol_;}
 
-    // Get system Jacobian
-    virtual Function getJ() const = 0;
-
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
@@ -127,6 +124,10 @@ namespace casadi {
       casadi_assert_dev(m);
       return m;
     }
+
+    /** \brief Add a diagonal contribution to a matrix */
+    static void add_diag(const casadi_int* sp, double *nz, double v,
+      const casadi_int* sp_new, double *w);
 
     ///@{
     /// Options

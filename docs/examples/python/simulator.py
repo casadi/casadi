@@ -44,7 +44,7 @@ tgrid = [T/N*k for k in range(N+1)]
 
 # CVODES from the SUNDIALS suite
 dae = {'x':x, 'u':u, 'ode':xdot, 'y' : L}
-F = simulator('F', 'cvodes', dae, tgrid)
+F = simulator('F', 'cvodes', dae, tgrid, dict(newton_scheme = 'direct', print_stats = True))
 
 # Test input
 import numpy as np

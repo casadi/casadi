@@ -137,12 +137,6 @@ namespace casadi {
       return m;
     }
 
-    ///@{
-    // Get system Jacobian
-    Function getJ() const override;
-    template<typename MatType> Function getJ() const;
-    ///@}
-
     /// A documentation string
     static const std::string meta_doc;
 

@@ -204,19 +204,18 @@ namespace casadi {
 
     // Get or create Jacobians and linear system solvers
     Function J;
-    if (ns_==0) {
-      J = getJ();
+    if (ns_ == 0) {
+      J = oracle_.jacobian();
     } else {
       SundialsSimulator* d = derivative_of_.get<SundialsSimulator>();
       casadi_assert_dev(d!=nullptr);
-      if (d->ns_==0) {
-        J = d->get_function("jacF");
+      if (d->ns_ == 0) {
+        J = d->get_function("jac");
       } else {
-        J = d->getJ();
+        J = d->oracle_.jacobian();
       }
     }
-    set_function(J, J.name(), true);
-    alloc_w(J.nnz_out(0), true);
+    set_function(J, "jac", true);
 
     // Allocate work vectors
     alloc_w(nu_, true); // u
@@ -224,8 +223,10 @@ namespace casadi {
     alloc_w(2 * (nx_+nz_), true); // v1, v2
 
     // Allocate linear solvers
-    linsolF_ = Linsol("linsolF", linear_solver_,
-      get_function("jacF").sparsity_out(0), linear_solver_options_);
+    Sparsity Jsp = J.sparsity_out("jac_ode_x");
+    Jsp = Jsp + Sparsity::diag(Jsp.size());
+    linsolF_ = Linsol("linsolF", linear_solver_, Jsp, linear_solver_options_);
+    alloc_w(linsolF_.sparsity().nnz(), true);
   }
 
   int SundialsSimulator::init_mem(void* mem) const {
@@ -318,7 +319,35 @@ namespace casadi {
     m->p = w; w += np_;
     m->v1 = w; w += nx_ + nz_;
     m->v2 = w; w += nx_ + nz_;
-    m->jac = w; w += get_function("jacF").nnz_out(0);
+    m->jac = w; w += get_function("jac").nnz_out(0);
+  }
+
+  void SundialsSimulator::add_diag(const casadi_int* sp, double *nz, double v,
+      const casadi_int* sp_new, double *w) {
+    // Local variables
+    casadi_int nrow, ncol, r, c, k;
+    const casadi_int *colind, *row, *colind_new, *row_new;
+    // Extract sparsities
+    nrow = sp[0];
+    ncol = sp[1];
+    colind = sp + 2;
+    row = colind + ncol + 1;
+    colind_new = sp_new + 2;
+    row_new = colind_new + ncol + 1;
+    // Clear work vector
+    for (r = 0; r < nrow; ++r) w[r] = 0;
+    // Loop over columns in reverse order
+    for (c = ncol; c-- > 0; ) {
+      // Copy content of column
+      for (k = colind[c]; k < colind[c + 1]; ++k) w[row[k]] = nz[k];
+      // Add diagonal shift
+      w[c] += v;
+      // Copy content of column to new matrix
+      for (k = colind_new[c]; k < colind_new[c + 1]; ++k) nz[k] = w[row_new[k]];
+      // Restore work vector
+      for (k = colind[c]; k < colind[c + 1]; ++k) w[row[k]] = 0;
+      w[c] = 0;
+    }
   }
 
 } // namespace casadi

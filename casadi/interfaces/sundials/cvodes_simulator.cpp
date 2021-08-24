@@ -367,19 +367,31 @@ namespace casadi {
       // Store gamma for later
       m->gamma = gamma;
 
-      // Calculate Jacobian
-      double d1 = -gamma, d2 = 1.;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = m->u;
-      m->arg[3] = m->p;
-      m->arg[4] = &d1;
-      m->arg[5] = &d2;
-      m->res[0] = m->jac;
-      if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
+      // Index of the Jacobian being calculated (jac:ode:x)
+      casadi_int jac_ind = DYN_X + DYN_NUM_IN * DYN_ODE;
+
+      // Set input and output buffers
+      fill_n(m->arg, DYN_NUM_IN + DYN_NUM_OUT, nullptr);
+      m->arg[DYN_T] = &t;  // t
+      m->arg[DYN_X] = NV_DATA_S(x);  // x
+      m->arg[DYN_U] = m->u;  // u
+      m->arg[DYN_P] = m->p;  // p
+      m->arg[DYN_NUM_IN + DYN_ODE] = NV_DATA_S(xdot);  // ode
+      fill_n(m->res, DYN_NUM_IN * DYN_NUM_OUT, nullptr);
+      m->res[jac_ind] = m->jac;  // jac:ode:x
+
+      // Evaluate
+      if (s.calc_function(m, "jac")) casadi_error("'jac' calculation failed");
+
+      // Scale with -gamma
+      casadi_scal(s.get_function("jac").sparsity_out(jac_ind).nnz(), -gamma, m->jac);
+
+      // Add diagonal contribution, project to correct sparsity
+      add_diag(s.get_function("jac").sparsity_out(jac_ind), m->jac, 1.,
+        s.linsolF_.sparsity(), NV_DATA_S(tmp1));
 
       // Prepare the solution of the linear system (e.g. factorize)
-      if (s.linsolF_.nfact(m->jac, m->mem_linsolF)) casadi_error("'jacF' factorization failed");
+      if (s.linsolF_.nfact(m->jac, m->mem_linsolF)) casadi_error("'jac' factorization failed");
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -444,23 +456,6 @@ namespace casadi {
       uerr() << "lsolve failed: " << e.what() << endl;
       return -1;
     }
-  }
-
-  Function CvodesSimulator::getJ() const {
-    return oracle_.is_a("SXFunction") ? getJ<SX>() : getJ<MX>();
-  }
-
-  template<typename MatType>
-  Function CvodesSimulator::getJ() const {
-    vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
-    MatType c_x = MatType::sym("c_x");
-    MatType c_xdot = MatType::sym("c_xdot");
-
-    // Get the Jacobian in the Newton iteration
-    MatType jac = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X])
-                + c_xdot*MatType::eye(nx_);
-    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_U], a[DYN_P], c_x, c_xdot}, {jac});
   }
 
   CvodesSimMemory::CvodesSimMemory(const CvodesSimulator& s) : self(s) {
