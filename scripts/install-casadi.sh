@@ -16,7 +16,7 @@ pushd /tmp
 
 # MUMPS linear solver
 rm -rf ThirdParty-Mumps
-git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git --branch "master" --depth 1 --recursive
+git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git --branch "releases/3.0.0" --depth 1 --recursive
 pushd ThirdParty-Mumps
 ./get.Mumps
 ./configure --prefix="$VIRTUAL_ENV" --with-lapack="$(pkg-config --libs openblas) -pthread -lm"
@@ -25,7 +25,7 @@ make install
 popd
 
 # Ipopt
-[ -d Ipopt ] || git clone https://github.com/coin-or/Ipopt.git --branch "releases/3.13.3" --depth 1 --recursive
+[ -d Ipopt ] || git clone https://github.com/coin-or/Ipopt.git --branch "releases/3.14.2" --depth 1 --recursive
 rm -rf Ipopt/build
 mkdir -p Ipopt/build
 pushd Ipopt/build
@@ -36,7 +36,7 @@ popd
 
 # SWIG
 rm -rf swig
-git clone https://github.com/swig/swig --branch v4.0.2 --depth 1
+git clone https://github.com/swig/swig --branch "v4.0.2" --depth 1
 pushd swig
 ./autogen.sh
 ./configure --prefix="$VIRTUAL_ENV"
@@ -45,7 +45,7 @@ make install
 popd
 
 # Casadi
-[ -d casadi ] || git clone https://github.com/casadi/casadi --branch 3.5.5 --depth 1 --recursive
+[ -d casadi ] || git clone https://github.com/casadi/casadi --branch "3.5.5" --depth 1 --recursive
 rm -rf casadi/build
 mkdir -p casadi/build
 pushd casadi/build

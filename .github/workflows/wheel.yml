@@ -5,7 +5,10 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: tttapa/build-python-gcc:3.9.6-10
+    container: tttapa/build-python-gcc:${{ matrix.python-version }}-10
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', 'rc']
     
     steps:
     - uses: actions/checkout@v1
@@ -14,7 +17,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: "/tmp/py-venv"
-        key: ${{ runner.os }}-${{ hashFiles('scripts/ci/install-dependencies-wheel.sh') }}-${{ hashFiles('scripts/requirements.txt') }}-${{ hashFiles('scripts/requirements-wheel.txt') }}-
+        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/ci/install-dependencies-wheel.sh') }}-${{ hashFiles('scripts/requirements.txt') }}-${{ hashFiles('scripts/requirements-wheel.txt') }}-
     - name: Install Casadi and other Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       run: |
@@ -29,10 +32,8 @@ jobs:
         rm -rf _skbuild/
         FC=gfortran-10 CXXFLAGS="-march=skylake" CFLAGS="-march=skylake" \
           python setup.py bdist_wheel --build-type Release
-        LD_LIBRARY_PATH="${VIRTUAL_ENV}/lib" \
-          auditwheel repair dist/panocpy-0.0.1-cp39-cp39-linux_x86_64.whl --plat linux_x86_64
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
-        path: wheelhouse/panocpy-0.0.1-cp39-cp39-linux_x86_64.whl
+        path: dist/panocpy-*.whl
       

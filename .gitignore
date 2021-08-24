@@ -1,6 +1,6 @@
 build
 _skbuild
-py-venv
+py*-venv
 .cache
 __pycache__
 dist
