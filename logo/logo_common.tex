@@ -1,0 +1,27 @@
+\newcommand{\constr}{(-0.1, 0.2) -- (1.5, 0.1) -- (4., -0.3) -- (4.2, -1.) -- (2.5, -1.4) -- (0.1, -0.8) -- cycle}
+        \tikzset{arrow/.style={->,>=stealth,arrowcolor}, 
+                 point/.style={circle, fill=panoccolor, draw=none, inner sep=0, minimum size=2pt}}
+        
+
+        \begin{scope}
+        
+        \draw[boundarycolor, fill=bg, fill opacity=0.3] \constr; 
+        \clip \constr; 
+        
+        \coordinate (pt1) at (0,0); 
+        \coordinate (pt2) at (4,-1); 
+        \coordinate (pt3) at (2,-1.2); 
+        \path[] (pt2) -- (pt3) coordinate[midway] (opt); 
+        \foreach \rad in {0,0.05, 0.1, 0.15,...,1} {
+            \pgfmathsetmacro{\radius}{2.5*\rad^2}
+            \pgfmathsetmacro{\weight}{int(100*\rad)}
+            \pgfmathsetmacro{\opacity}{1-\rad}
+            \draw[thin, bad!\weight!good, opacity=\opacity] ($(opt) + (0.6,-0.2)$) circle (\radius); 
+        }
+
+        \foreach \i in {1,2,3}{
+            \node[point] (node\i) at (pt\i) {};
+            \ifthenelse{\i>1}{
+                \draw[arrow] (node1) -- (node\i);
+            }{}
+        }
