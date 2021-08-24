@@ -295,7 +295,7 @@ template<typename XType>
 Function Simulator::map2oracle(const std::string& name,
     const std::map<std::string, XType>& d, const Dict& opts) {
   // Gather symbolic inputs and outputs
-  std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
+  std::vector<XType> de_in(enum_traits<DynIn>::n_enum), de_out(enum_traits<DynOut>::n_enum);
   for (auto&& i : d) {
     if (has_enum<DynIn>(i.first)) {
       de_in[to_enum<DynIn>(i.first)] = i.second;
@@ -336,13 +336,13 @@ Function Simulator::map2oracle(const std::string& name,
 void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const double* u,
     const double* z, const double* p, double* y) const {
   // Calculate outputs
-  std::fill_n(mem->arg, DYN_NUM_IN, nullptr);
+  std::fill_n(mem->arg, enum_traits<DynIn>::n_enum, nullptr);
   mem->arg[DYN_T] = &t;
   mem->arg[DYN_X] = x;
   mem->arg[DYN_U] = u;
   mem->arg[DYN_Z] = z;
   mem->arg[DYN_P] = p;
-  std::fill_n(mem->res, DYN_NUM_OUT, nullptr);
+  std::fill_n(mem->res, enum_traits<DynOut>::n_enum, nullptr);
   mem->res[DYN_Y] = y;
   if (calc_function(mem, "dae")) casadi_error("'dae' calculation failed");
 }

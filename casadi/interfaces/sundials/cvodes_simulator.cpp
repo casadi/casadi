@@ -184,12 +184,12 @@ int CvodesSimulator::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    std::fill_n(m->arg, DYN_NUM_IN, nullptr);
+    std::fill_n(m->arg, enum_traits<DynIn>::n_enum, nullptr);
     m->arg[DYN_T] = &t;
     m->arg[DYN_X] = NV_DATA_S(x);
     m->arg[DYN_U] = m->u;
     m->arg[DYN_P] = m->p;
-    std::fill_n(m->res, DYN_NUM_OUT, nullptr);
+    std::fill_n(m->res, enum_traits<DynOut>::n_enum, nullptr);
     m->res[DYN_ODE] = NV_DATA_S(xdot);
     s.calc_function(m, "dae");
     return 0;
@@ -272,14 +272,16 @@ int CvodesSimulator::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
     auto m = to_mem(user_data);
     auto& s = m->self;
     // Set input and output buffers
-    std::fill_n(m->arg, DYN_NUM_IN + DYN_NUM_OUT + DYN_NUM_IN, nullptr);
+    std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum
+      + enum_traits<DynIn>::n_enum, nullptr);
     m->arg[DYN_T] = &t;  // t
     m->arg[DYN_X] = NV_DATA_S(x);  // x
     m->arg[DYN_U] = m->u;  // u
     m->arg[DYN_P] = m->p;  // p
-    m->arg[DYN_NUM_IN + DYN_ODE] = NV_DATA_S(xdot);  // ode
-    m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_X] = NV_DATA_S(v);  // fwd:x
-    std::fill_n(m->res, DYN_NUM_OUT, nullptr);
+    m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
+    m->arg[enum_traits<DynIn>::n_enum
+      + enum_traits<DynOut>::n_enum + DYN_X] = NV_DATA_S(v);  // fwd:x
+    std::fill_n(m->res, enum_traits<DynOut>::n_enum, nullptr);
     m->res[DYN_ODE] = NV_DATA_S(Jv);  // fwd:ode
     // Evaluate
     s.calc_function(m, "jtimes");
@@ -322,14 +324,15 @@ int CvodesSimulator::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
         // The outputs will double as seeds for jtimes
         casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
         // Set input and output buffers
-        std::fill_n(m->arg, DYN_NUM_IN + DYN_NUM_OUT + DYN_NUM_IN, nullptr);
+        std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum
+          + enum_traits<DynIn>::n_enum, nullptr);
         m->arg[DYN_T] = &t;  // t
         m->arg[DYN_X] = NV_DATA_S(x);  // x
         m->arg[DYN_U] = m->u;  // u
         m->arg[DYN_P] = m->p;  // p
-        m->arg[DYN_NUM_IN + DYN_ODE] = NV_DATA_S(xdot);  // ode
-        m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_X] = v;  // fwd:x
-        std::fill_n(m->res, DYN_NUM_OUT, nullptr);
+        m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
+        m->arg[enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum + DYN_X] = v;  // fwd:x
+        std::fill_n(m->res, enum_traits<DynOut>::n_enum, nullptr);
         m->res[DYN_ODE] = m->v2;  // fwd:ode
         // Evaluate
         s.calc_function(m, "jtimes");
@@ -364,16 +367,16 @@ int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     m->gamma = gamma;
 
     // Index of the Jacobian being calculated (jac:ode:x)
-    casadi_int jac_ind = DYN_X + DYN_NUM_IN * DYN_ODE;
+    casadi_int jac_ind = DYN_X + enum_traits<DynIn>::n_enum * DYN_ODE;
 
     // Set input and output buffers
-    std::fill_n(m->arg, DYN_NUM_IN + DYN_NUM_OUT, nullptr);
+    std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum, nullptr);
     m->arg[DYN_T] = &t;  // t
     m->arg[DYN_X] = NV_DATA_S(x);  // x
     m->arg[DYN_U] = m->u;  // u
     m->arg[DYN_P] = m->p;  // p
-    m->arg[DYN_NUM_IN + DYN_ODE] = NV_DATA_S(xdot);  // ode
-    std::fill_n(m->res, DYN_NUM_IN * DYN_NUM_OUT, nullptr);
+    m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
+    std::fill_n(m->res, enum_traits<DynIn>::n_enum * enum_traits<DynOut>::n_enum, nullptr);
     m->res[jac_ind] = m->jac;  // jac:ode:x
 
     // Evaluate
