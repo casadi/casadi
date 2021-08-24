@@ -35,19 +35,17 @@ namespace casadi {
   /** \defgroup main_simulator
       Create an ODE/DAE simulator
       Solves an initial value problem (IVP) with the differential equation given as an
-      implicit ODE coupled to an algebraic equation and a set of quadratures:
+      implicit ODE coupled to an algebraic equation and a set of output equations:
 
       \verbatim
       Time grid: [t0, t1, ..., tN]
 
       Initial conditions for forward integration
       x(t0)  = x0
-      qk(tk)  = 0, k = 0, ..., N-1
 
       Sequential forward integration from t=tk to t=t{k+1}
       der(x) = fx(t, x, z, p, uk)         ODE
       0 = fz(t, x, z, p, uk)              Algebraic equations
-      der(qk) = fq(t, x, z, p, uk)        Quadratures
       yk = fy(t, x, z, p, uk)             Output equations
 
       where we assume that the problem is index-1 (i.e. dfz/dz, is invertible) and furthermore that

@@ -291,7 +291,6 @@ namespace casadi {
 
   void SundialsSimulator::print_stats(SimulatorMemory* mem) const {
     auto m = to_mem(mem);
-    print("FORWARD INTEGRATION:\n");
     print("Number of steps taken by SUNDIALS: %ld\n", m->nsteps);
     print("Number of calls to the user’s f function: %ld\n", m->nfevals);
     print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetups);

@@ -220,8 +220,8 @@ void Simulator::init(const Dict& opts) {
   // Call the base class method
   OracleFunction::init(opts);
 
-  // For sparsity pattern propagation
-  set_function(oracle_);
+  // Oracle can be evaluated directly
+  set_function(oracle_, "dae");
 
   // Error if sparse input
   casadi_assert(x().is_dense(), "Sparse DAE not supported");

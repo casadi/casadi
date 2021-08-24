@@ -96,9 +96,6 @@ namespace casadi {
       }
     }
 
-    // Create function
-    create_function("odeF", {"t", "x", "u", "p"}, {"ode"});
-
     // Algebraic variables not supported
     casadi_assert(nz_==0, "CVODES does not support algebraic variables");
 
@@ -120,7 +117,7 @@ namespace casadi {
 
     // Attach functions for jacobian information
     if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
-      create_function("jtimesF", {"t", "x", "u", "p", "fwd:x"}, {"fwd:ode"});
+      set_function(oracle_.forward(1), "jtimes");
     }
   }
 
@@ -191,12 +188,14 @@ namespace casadi {
       casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = m->u;
-      m->arg[3] = m->p;
-      m->res[0] = NV_DATA_S(xdot);
-      s.calc_function(m, "odeF");
+      fill_n(m->arg, DYN_NUM_IN, nullptr);
+      m->arg[DYN_T] = &t;
+      m->arg[DYN_X] = NV_DATA_S(x);
+      m->arg[DYN_U] = m->u;
+      m->arg[DYN_P] = m->p;
+      fill_n(m->res, DYN_NUM_OUT, nullptr);
+      m->res[DYN_ODE] = NV_DATA_S(xdot);
+      s.calc_function(m, "dae");
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
@@ -276,13 +275,18 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = m->u;
-      m->arg[3] = m->p;
-      m->arg[4] = NV_DATA_S(v);
-      m->res[0] = NV_DATA_S(Jv);
-      s.calc_function(m, "jtimesF");
+      // Set input and output buffers
+      fill_n(m->arg, DYN_NUM_IN + DYN_NUM_OUT + DYN_NUM_IN, nullptr);
+      m->arg[DYN_T] = &t;  // t
+      m->arg[DYN_X] = NV_DATA_S(x);  // x
+      m->arg[DYN_U] = m->u;  // u
+      m->arg[DYN_P] = m->p;  // p
+      m->arg[DYN_NUM_IN + DYN_ODE] = NV_DATA_S(xdot);  // ode
+      m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_X] = NV_DATA_S(v);  // fwd:x
+      fill_n(m->res, DYN_NUM_OUT, nullptr);
+      m->res[DYN_ODE] = NV_DATA_S(Jv);  // fwd:ode
+      // Evaluate
+      s.calc_function(m, "jtimes");
       return 0;
     } catch(casadi_int flag) { // recoverable error
       return flag;
@@ -319,16 +323,20 @@ namespace casadi {
       if (s.ns_>0) {
         // Second order correction
         if (s.second_order_correction_) {
-          // The outputs will double as seeds for jtimesF
+          // The outputs will double as seeds for jtimes
           casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
-          m->arg[0] = &t; // t
-          m->arg[1] = NV_DATA_S(x); // x
-          m->arg[2] = m->u; // u
-          m->arg[4] = m->p; // p
-          m->arg[5] = v; // fwd:x
-          m->res[0] = m->v2; // fwd:ode
-          s.calc_function(m, "jtimesF");
-
+          // Set input and output buffers
+          fill_n(m->arg, DYN_NUM_IN + DYN_NUM_OUT + DYN_NUM_IN, nullptr);
+          m->arg[DYN_T] = &t;  // t
+          m->arg[DYN_X] = NV_DATA_S(x);  // x
+          m->arg[DYN_U] = m->u;  // u
+          m->arg[DYN_P] = m->p;  // p
+          m->arg[DYN_NUM_IN + DYN_ODE] = NV_DATA_S(xdot);  // ode
+          m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_X] = v;  // fwd:x
+          fill_n(m->res, DYN_NUM_OUT, nullptr);
+          m->res[DYN_ODE] = m->v2;  // fwd:ode
+          // Evaluate
+          s.calc_function(m, "jtimes");
           // Subtract m->v2 from m->v1, scaled with -gamma
           casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
         }
