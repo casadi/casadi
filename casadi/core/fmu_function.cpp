@@ -385,13 +385,13 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     casadi_assert(m.id_in_.size() == 1, "Not implemented");
     const Variable& var_in = self_.variable(m.id_in_[0]);
     // Get min, max and nominal value
-    double min = double(var_in.min);
-    double max = double(var_in.max);
-    double nom = double(var_in.nominal);
+    double min = static_cast<double>(var_in.min);
+    double max = static_cast<double>(var_in.max);
+    double nom = static_cast<double>(var_in.nominal);
     // Get nominal values for outputs
     m.nominal_out_.clear();
     for (size_t id : m.id_out_)
-      m.nominal_out_.push_back(double(self_.variable(id).nominal));
+      m.nominal_out_.push_back(static_cast<double>(self_.variable(id).nominal));
     // Make outputs dimensionless
     for (size_t k = 0; k < n_unknown; ++k) m.v_out_[k] /= m.nominal_out_[k];
     // Perturbed outputs
@@ -477,6 +477,7 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
           u = casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
             h, n_unknown, &fd_mem);
           break;
+        default: casadi_error("Not implemented");
       }
       // Stop, if no more stepsize iterations
       if (iter == f.h_iter_) break;
