@@ -21,13 +21,6 @@ an efficient C++ implementation of an Augmented Lagrangian solver for general no
    usage/*
    install/*
    examples/examples_landing_page
+   api
    contribution/*
    changelog
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-
