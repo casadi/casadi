@@ -48,7 +48,6 @@ F = simulator('F', 'cvodes', dae, tgrid)
 
 # Simulate
 Fk = F(x0 = 0, p = 1)
-xf_sim = Fk['xf'].full()
 qf_sim = Fk['qf'].full()
 y_sim = Fk['y'].full()
 

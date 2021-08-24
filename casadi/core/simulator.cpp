@@ -154,9 +154,9 @@ Sparsity Simulator::get_sparsity_in(casadi_int i) {
   case SIMULATOR_X0: return x();
   case SIMULATOR_P: return p();
   case SIMULATOR_Z0: return z();
-  case SIMULATOR_RX0: return repmat(rx(), 1, grid_.size() - 1);
-  case SIMULATOR_RP: return repmat(rp(), 1, grid_.size() - 1);
-  case SIMULATOR_RZ0: return repmat(rz(), 1, grid_.size() - 1);
+  case SIMULATOR_RX0: return rx();
+  case SIMULATOR_RP: return rp();
+  case SIMULATOR_RZ0: return rz();
   case SIMULATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -164,13 +164,13 @@ Sparsity Simulator::get_sparsity_in(casadi_int i) {
 
 Sparsity Simulator::get_sparsity_out(casadi_int i) {
   switch (static_cast<SimulatorOutput>(i)) {
-  case SIMULATOR_XF: return repmat(x(), 1, grid_.size() - 1);
-  case SIMULATOR_ZF: return repmat(z(), 1, grid_.size() - 1);
+  case SIMULATOR_XF: return x();
+  case SIMULATOR_ZF: return z();
   case SIMULATOR_Y: return repmat(y(), 1, grid_.size());
   case SIMULATOR_QF: return repmat(q(), 1, grid_.size() - 1);
   case SIMULATOR_RXF: return rx();
   case SIMULATOR_RZF: return rz();
-  case SIMULATOR_RY: return repmat(ry(), 1, grid_.size() - 1);
+  case SIMULATOR_RY: return repmat(ry(), 1, grid_.size());
   case SIMULATOR_RQF: return rq();
   case SIMULATOR_NUM_OUT: break;
   }
@@ -211,8 +211,6 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   for (casadi_int k = 1; k < grid_.size(); ++k) {
     // Integrate forward
     advance(m, grid_[k], x, z, y, q);
-    if (x) x += nx_;
-    if (z) z += nz_;
     if (y) y += ny_;
     if (q) q += nq_;
   }
