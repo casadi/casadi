@@ -15,7 +15,7 @@ an efficient C++ implementation of an Augmented Lagrangian solver for general no
 .. toctree::
    :maxdepth: 2
    :glob:
-   :caption: Contents
+   :hidden:
 
    about/*
    usage/*
@@ -28,7 +28,6 @@ an efficient C++ implementation of an Augmented Lagrangian solver for general no
 Indices and tables
 ==================
 
-* :ref:`genindex`W
+* :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
 

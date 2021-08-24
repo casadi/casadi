@@ -80,7 +80,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'insegel'
+html_theme = 'furo'
 
 html_logo = "../../logo/panocpy_logo.svg"
 html_favicon = "../../logo/panocpy_favicon.png"
