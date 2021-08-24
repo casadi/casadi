@@ -44,7 +44,6 @@ std::string to_string(DynOut v) {
   case DYN_ODE: return "ode";
   case DYN_ALG: return "alg";
   case DYN_Y: return "y";
-  case DYN_QUAD: return "quad";
   default: break;
   }
   return "";
@@ -109,7 +108,6 @@ std::string simulator_out(casadi_int ind) {
   case SIMULATOR_XF:  return "xf";
   case SIMULATOR_ZF:  return "zf";
   case SIMULATOR_Y:  return "y";
-  case SIMULATOR_QF:  return "qf";
   case SIMULATOR_NUM_OUT: break;
   }
   return std::string();
@@ -150,7 +148,6 @@ Sparsity Simulator::get_sparsity_out(casadi_int i) {
   case SIMULATOR_XF: return x();
   case SIMULATOR_ZF: return z();
   case SIMULATOR_Y: return repmat(y(), 1, grid_.size());
-  case SIMULATOR_QF: return repmat(q(), 1, grid_.size() - 1);
   case SIMULATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -172,7 +169,6 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   double* x = res[SIMULATOR_XF];
   double* z = res[SIMULATOR_ZF];
   double* y = res[SIMULATOR_Y];
-  double* q = res[SIMULATOR_QF];
   res += SIMULATOR_NUM_OUT;
   // Setup memory object
   setup(m, arg, res, iw, w);
@@ -182,9 +178,8 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   // Integrate forward
   for (casadi_int k = 1; k < grid_.size(); ++k) {
     // Integrate forward
-    advance(m, grid_[k], x, z, y, q);
+    advance(m, grid_[k], x, z, y);
     if (y) y += ny_;
-    if (q) q += nq_;
   }
   if (print_stats_) print_stats(m);
 
@@ -234,14 +229,12 @@ void Simulator::init(const Dict& opts) {
   nx1_ = x().size1();
   nz1_ = z().size1();
   ny1_ = y().size1();
-  nq1_ = q().size1();
   np1_  = p().size1();
 
   // Get dimensions (including sensitivity equations)
   nx_ = x().nnz();
   nz_ = z().nnz();
   ny_ = y().nnz();
-  nq_ = q().nnz();
   np_  = p().nnz();
 
   // Number of sensitivities

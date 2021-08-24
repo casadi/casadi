@@ -45,7 +45,7 @@ namespace casadi {
     double t;
 
     // N-vectors for the forward integration
-    N_Vector xz, xzdot, q;
+    N_Vector xz, xzdot;
 
     // Parameters
     double *p;

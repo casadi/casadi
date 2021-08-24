@@ -98,7 +98,6 @@ namespace casadi {
 
     // Create function
     create_function("odeF", {"x", "p", "t"}, {"ode"});
-    create_function("quadF", {"x", "p", "t"}, {"quad"});
 
     // Algebraic variables not supported
     casadi_assert(nz_==0, "CVODES does not support algebraic variables");
@@ -184,22 +183,6 @@ namespace casadi {
       THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
       if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
     }
-
-    // Quadrature equations
-    if (nq_>0) {
-      // Initialize quadratures in CVodes
-      THROWING(CVodeQuadInit, m->mem, rhsQ, m->q);
-
-      // Should the quadrature errors be used for step size control?
-      if (quad_err_con_) {
-        THROWING(CVodeSetQuadErrCon, m->mem, true);
-
-        // Quadrature error tolerances
-        // TODO(Joel): vector absolute tolerances
-        THROWING(CVodeQuadSStolerances, m->mem, reltol_, abstol_);
-      }
-    }
-
     return 0;
   }
 
@@ -230,11 +213,6 @@ namespace casadi {
     SundialsSimulator::reset(mem, t, x, z, p, y);
     // Re-initialize
     THROWING(CVodeReInit, m->mem, t, m->xz);
-    // Re-initialize quadratures
-    if (nq_ > 0) {
-      N_VConst(0.0, m->q);
-      THROWING(CVodeQuadReInit, m->mem, m->q);
-    }
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(m, grid_.back());
     // Get outputs
@@ -242,7 +220,7 @@ namespace casadi {
   }
 
   void CvodesSimulator::advance(SimulatorMemory* mem, double t, double* x, double* z,
-      double* y, double* q) const {
+      double* y) const {
     auto m = to_mem(mem);
 
     casadi_assert(t >= grid_.front(),
@@ -252,27 +230,16 @@ namespace casadi {
       "CvodesSimulator::integrate(" + str(t) + "): "
       "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
       "unless stop_at_end is set to False.");
-
     // Integrate, unless already at desired time
     const double ttol = 1e-9;
     if (fabs(m->t-t)>=ttol) {
       // Integrate forward ...
       THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
-
-      // Get quadratures
-      if (nq_>0) {
-        double tret;
-        THROWING(CVodeGetQuad, m->mem, &tret, m->q);
-      }
     }
-
     // Set function outputs
     casadi_copy(NV_DATA_S(m->xz), nx_, x);
-    casadi_copy(NV_DATA_S(m->q), nq_, q);
-
     // Get outputs
     if (y && ny_ > 0) eval_y(m, t, x, z, m->p, y);
-
     // Get stats
     THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
@@ -302,24 +269,6 @@ namespace casadi {
       }
     } catch(exception& e) {
       uerr() << "ehfun failed: " << e.what() << endl;
-    }
-  }
-
-  int CvodesSimulator::rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      m->arg[0] = NV_DATA_S(x);
-      m->arg[1] = m->p;
-      m->arg[2] = &t;
-      m->res[0] = NV_DATA_S(qdot);
-      s.calc_function(m, "quadF");
-      return 0;
-    } catch(int flag) { // recoverable error
-      return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "rhsQ failed: " << e.what() << endl;
-      return -1;
     }
   }
 

@@ -233,7 +233,6 @@ namespace casadi {
 
     // Allocate n-vectors
     m->xz = N_VNew_Serial(nx_+nz_);
-    m->q = N_VNew_Serial(nq_);
 
     m->mem_linsolF = linsolF_.checkout();
 
@@ -256,19 +255,15 @@ namespace casadi {
     casadi_copy(p, np_, m->p);
     // Set the state
     casadi_copy(x, nx_, NV_DATA_S(m->xz));
-    casadi_copy(z, nz_, NV_DATA_S(m->xz)+nx_);
-    // Reset summation states
-    N_VConst(0., m->q);
+    casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
   }
 
   SundialsSimMemory::SundialsSimMemory() {
     this->xz  = nullptr;
-    this->q = nullptr;
   }
 
   SundialsSimMemory::~SundialsSimMemory() {
     if (this->xz) N_VDestroy_Serial(this->xz);
-    if (this->q) N_VDestroy_Serial(this->q);
   }
 
   Dict SundialsSimulator::get_stats(void* mem) const {

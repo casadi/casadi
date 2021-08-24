@@ -92,8 +92,7 @@ public:
     const double* p, double* y) const = 0;
 
   /** \brief  Advance solution in time */
-  virtual void advance(SimulatorMemory* mem, double t, double* x, double* z, double* y,
-    double* q) const = 0;
+  virtual void advance(SimulatorMemory* mem, double t, double* x, double* z, double* y) const = 0;
 
   /** \brief  Evaluate output function */
   virtual void eval_y(SimulatorMemory* mem, double t, const double* x, const double* z,
@@ -121,14 +120,13 @@ public:
   const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
   const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
   const Sparsity&  y() const { return oracle_.sparsity_out(DYN_Y);}
-  const Sparsity&  q() const { return oracle_.sparsity_out(DYN_QUAD);}
   ///@}
 
   // Time grid
   std::vector<double> grid_;
 
   /// Number of states
-  casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
+  casadi_int nx_, nz_, nx1_, nz1_;
 
   /// Number of parameters
   casadi_int np_, np1_;

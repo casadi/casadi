@@ -120,7 +120,6 @@ enum DynOut {
   DYN_ODE,
   DYN_ALG,
   DYN_Y,
-  DYN_QUAD,
   DYN_NUM_OUT};
 
 /// Input arguments of an simulator
@@ -141,8 +140,6 @@ enum SimulatorOutput {
   SIMULATOR_XF,
   /// Outputs
   SIMULATOR_Y,
-  /// Quadratures
-  SIMULATOR_QF,
   /// Algebraic variable at the final time
   SIMULATOR_ZF,
   /// Number of output arguments of an simulator
