@@ -1,0 +1,4 @@
+Minimal example 
+=================
+
+.. TODO 

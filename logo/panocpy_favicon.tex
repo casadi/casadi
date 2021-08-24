@@ -1,0 +1,54 @@
+\documentclass[tikz]{standalone}
+\usetikzlibrary{calc,arrows}
+
+\usepackage{ifthen}
+
+\begin{document}
+    \fontfamily{qag}\selectfont
+
+
+    \definecolor{good}{HTML}{13729D} 
+    \definecolor{bad}{HTML}{511C22} 
+    \definecolor{panoccolor}{HTML}{2E9ED5}
+    \definecolor{pycolor}{HTML}{D8AD2E}
+    \definecolor{pycolor}{HTML}{FFC600}
+    
+
+    \colorlet{bg}{white}
+    \colorlet{pointcolor}{panoccolor}
+    \colorlet{boundarycolor}{pycolor}
+    \colorlet{arrowcolor}{black!20}
+    \begin{tikzpicture}[xscale=0.372]
+        \newcommand{\constr}{(-0.1, 0.2) -- (1.5, 0.1) -- (4., -0.3) -- (4.2, -1.) -- (2.5, -1.4) -- (0.1, -0.8) -- cycle}
+        \tikzset{arrow/.style={->,>=stealth,arrowcolor}, 
+                 point/.style={circle, fill=panoccolor, draw=none, inner sep=0, minimum size=2pt}}
+        
+
+        \begin{scope}
+        
+        \draw[boundarycolor, fill=bg, fill opacity=0.7] \constr; 
+        \clip \constr; 
+        
+        \coordinate (pt1) at (0,0); 
+        \coordinate (pt2) at (4,-1); 
+        \coordinate (pt3) at (2,-1.2); 
+        \path[] (pt2) -- (pt3) coordinate[midway] (opt); 
+        \foreach \rad in {0,0.05, 0.1, 0.15,...,1} {
+            \pgfmathsetmacro{\radius}{2.5*\rad^2}
+            \pgfmathsetmacro{\weight}{int(100*\rad)}
+            \pgfmathsetmacro{\opacity}{1-\rad}
+            \draw[thin, bad!\weight!good, opacity=\opacity] ($(opt) + (0.6,-0.2)$) circle (\radius); 
+        }
+
+        \foreach \i in {1,2,3}{
+            \node[point] (node\i) at (pt\i) {};
+            \ifthenelse{\i>1}{
+                \draw[arrow] (node1) -- (node\i);
+            }{}
+        }
+
+        \node[anchor=north west, font=\Huge] at (pt1) {\textcolor{panoccolor}{\textsc{P}}\textcolor{pycolor}{P}};
+        
+        \end{scope}
+    \end{tikzpicture}
+\end{document}
