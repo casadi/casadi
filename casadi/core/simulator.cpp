@@ -105,8 +105,8 @@ std::string simulator_in(casadi_int ind) {
 
 std::string simulator_out(casadi_int ind) {
   switch (static_cast<SimulatorOutput>(ind)) {
-  case SIMULATOR_XF:  return "xf";
-  case SIMULATOR_ZF:  return "zf";
+  case SIMULATOR_X:  return "x";
+  case SIMULATOR_Z:  return "z";
   case SIMULATOR_Y:  return "y";
   case SIMULATOR_NUM_OUT: break;
   }
@@ -145,8 +145,8 @@ Sparsity Simulator::get_sparsity_in(casadi_int i) {
 
 Sparsity Simulator::get_sparsity_out(casadi_int i) {
   switch (static_cast<SimulatorOutput>(i)) {
-  case SIMULATOR_XF: return x();
-  case SIMULATOR_ZF: return z();
+  case SIMULATOR_X: return repmat(x(), 1, grid_.size());
+  case SIMULATOR_Z: return repmat(z(), 1, grid_.size());
   case SIMULATOR_Y: return repmat(y(), 1, grid_.size());
   case SIMULATOR_NUM_OUT: break;
   }
@@ -166,19 +166,23 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   const double* p = arg[SIMULATOR_P];
   arg += SIMULATOR_NUM_IN;
   // Read outputs
-  double* x = res[SIMULATOR_XF];
-  double* z = res[SIMULATOR_ZF];
+  double* x = res[SIMULATOR_X];
+  double* z = res[SIMULATOR_Z];
   double* y = res[SIMULATOR_Y];
   res += SIMULATOR_NUM_OUT;
   // Setup memory object
   setup(m, arg, res, iw, w);
   // Reset solver, take time to t0, calculate outputs at t0
   reset(m, grid_.front(), x0, z0, p, y);
+  if (x) x += nx_;
+  if (z) z += nz_;
   if (y) y += ny_;
   // Integrate forward
   for (casadi_int k = 1; k < grid_.size(); ++k) {
     // Integrate forward
     advance(m, grid_[k], x, z, y);
+    if (x) x += nx_;
+    if (z) z += nz_;
     if (y) y += ny_;
   }
   if (print_stats_) print_stats(m);
@@ -190,13 +194,7 @@ const Options Simulator::options_
 = {{&OracleFunction::options_},
    {{"print_stats",
      {OT_BOOL,
-      "Print out statistics after integration"}},
-    {"t0",
-     {OT_DOUBLE,
-      "Beginning of the time horizon"}},
-    {"tf",
-     {OT_DOUBLE,
-      "End of the time horizon"}}
+      "Print out statistics after integration"}}
    }
 };
 

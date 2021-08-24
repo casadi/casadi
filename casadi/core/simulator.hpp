@@ -128,7 +128,7 @@ enum SimulatorInput {
   SIMULATOR_X0,
   /// Parameters
   SIMULATOR_P,
-  /// Initial guess for the algebraic variable
+  /// Initial guess for the algebraic variable at the initial time
   SIMULATOR_Z0,
   /// Number of input arguments of an simulator
   SIMULATOR_NUM_IN
@@ -136,12 +136,12 @@ enum SimulatorInput {
 
 /// Output arguments of an simulator
 enum SimulatorOutput {
-  /// Differential state at the final time
-  SIMULATOR_XF,
+  /// Differential state
+  SIMULATOR_X,
   /// Outputs
   SIMULATOR_Y,
-  /// Algebraic variable at the final time
-  SIMULATOR_ZF,
+  /// Algebraic variable
+  SIMULATOR_Z,
   /// Number of output arguments of an simulator
   SIMULATOR_NUM_OUT
 };
