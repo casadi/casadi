@@ -111,6 +111,7 @@ namespace casadi {
 enum DynIn {
   DYN_T,
   DYN_X,
+  DYN_U,
   DYN_Z,
   DYN_P,
   DYN_NUM_IN};
@@ -126,10 +127,12 @@ enum DynOut {
 enum SimulatorInput {
   /// Differential state at the initial time
   SIMULATOR_X0,
-  /// Parameters
-  SIMULATOR_P,
+  /// Controls
+  SIMULATOR_U,
   /// Initial guess for the algebraic variable at the initial time
   SIMULATOR_Z0,
+  /// Parameters
+  SIMULATOR_P,
   /// Number of input arguments of an simulator
   SIMULATOR_NUM_IN
 };

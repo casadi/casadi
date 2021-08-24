@@ -219,6 +219,7 @@ namespace casadi {
     alloc_w(J.nnz_out(0), true);
 
     // Allocate work vectors
+    alloc_w(nu_, true); // u
     alloc_w(np_, true); // p
     alloc_w(2 * (nx_+nz_), true); // v1, v2
 
@@ -246,13 +247,15 @@ namespace casadi {
     linsolF_.release(m->mem_linsolF);
   }
 
-  void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* z,
-      const double* p, double* y) const {
+  void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* u,
+      const double* z, const double* p, double* y) const {
     auto m = static_cast<SundialsSimMemory*>(mem);
     // Update time
     m->t = t;
     // Set parameters
     casadi_copy(p, np_, m->p);
+    // Set controls
+    casadi_copy(u, nu_, m->u);
     // Set the state
     casadi_copy(x, nx_, NV_DATA_S(m->xz));
     casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
@@ -312,6 +315,7 @@ namespace casadi {
     Simulator::set_work(mem, arg, res, iw, w);
 
     // Work vectors
+    m->u = w; w += nu_;
     m->p = w; w += np_;
     m->v1 = w; w += nx_ + nz_;
     m->v2 = w; w += nx_ + nz_;

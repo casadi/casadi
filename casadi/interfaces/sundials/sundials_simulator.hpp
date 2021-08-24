@@ -47,6 +47,9 @@ namespace casadi {
     // N-vectors for the forward integration
     N_Vector xz, xzdot;
 
+    // Controls
+    double *u;
+
     // Parameters
     double *p;
 
@@ -115,7 +118,7 @@ namespace casadi {
     void print_stats(SimulatorMemory* mem) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(SimulatorMemory* mem, double t, const double* x, const double* z,
+    void reset(SimulatorMemory* mem, double t, const double* x, const double* u, const double* z,
       const double* p, double* y) const override;
 
     /** \brief Cast to memory object */

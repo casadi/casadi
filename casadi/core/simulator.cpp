@@ -32,6 +32,7 @@ std::string to_string(DynIn v) {
   switch (v) {
   case DYN_T: return "t";
   case DYN_X: return "x";
+  case DYN_U: return "u";
   case DYN_Z: return "z";
   case DYN_P: return "p";
   default: break;
@@ -96,8 +97,9 @@ std::vector<std::string> simulator_out() {
 std::string simulator_in(casadi_int ind) {
   switch (static_cast<SimulatorInput>(ind)) {
   case SIMULATOR_X0:  return "x0";
-  case SIMULATOR_P:   return "p";
+  case SIMULATOR_U:   return "u";
   case SIMULATOR_Z0:  return "z0";
+  case SIMULATOR_P:   return "p";
   case SIMULATOR_NUM_IN: break;
   }
   return std::string();
@@ -136,8 +138,9 @@ Simulator::~Simulator() {
 Sparsity Simulator::get_sparsity_in(casadi_int i) {
   switch (static_cast<SimulatorInput>(i)) {
   case SIMULATOR_X0: return x();
-  case SIMULATOR_P: return p();
+  case SIMULATOR_U: return repmat(u(), 1, grid_.size() - 1);
   case SIMULATOR_Z0: return z();
+  case SIMULATOR_P: return p();
   case SIMULATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -162,6 +165,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   auto m = static_cast<SimulatorMemory*>(mem);
   // Read inputs
   const double* x0 = arg[SIMULATOR_X0];
+  const double* u = arg[SIMULATOR_U];
   const double* z0 = arg[SIMULATOR_Z0];
   const double* p = arg[SIMULATOR_P];
   arg += SIMULATOR_NUM_IN;
@@ -173,15 +177,16 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   // Setup memory object
   setup(m, arg, res, iw, w);
   // Reset solver, take time to t0, calculate outputs at t0
-  reset(m, grid_.front(), x0, z0, p, y);
+  reset(m, grid_.front(), x0, u, z0, p, y);
   if (x) x += nx_;
   if (z) z += nz_;
   if (y) y += ny_;
   // Integrate forward
   for (casadi_int k = 1; k < grid_.size(); ++k) {
     // Integrate forward
-    advance(m, grid_[k], x, z, y);
+    advance(m, grid_[k], x, u, z, p, y);
     if (x) x += nx_;
+    if (u) u += nu_;
     if (z) z += nz_;
     if (y) y += ny_;
   }
@@ -220,20 +225,23 @@ void Simulator::init(const Dict& opts) {
 
   // Error if sparse input
   casadi_assert(x().is_dense(), "Sparse DAE not supported");
+  casadi_assert(u().is_dense(), "Sparse DAE not supported");
   casadi_assert(z().is_dense(), "Sparse DAE not supported");
   casadi_assert(p().is_dense(), "Sparse DAE not supported");
 
   // Get dimensions (excluding sensitivity equations)
   nx1_ = x().size1();
+  nu1_ = u().size1();
   nz1_ = z().size1();
+  np1_ = p().size1();
   ny1_ = y().size1();
-  np1_  = p().size1();
 
   // Get dimensions (including sensitivity equations)
   nx_ = x().nnz();
+  nu_ = u().nnz();
   nz_ = z().nnz();
+  np_ = p().nnz();
   ny_ = y().nnz();
-  np_  = p().nnz();
 
   // Number of sensitivities
   ns_ = x().size2()-1;
@@ -325,12 +333,13 @@ Function Simulator::map2oracle(const std::string& name,
   return Function(name, de_in, de_out, enum_names<DynIn>(), enum_names<DynOut>(), opts);
 }
 
-void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const double* z,
-    const double* p, double* y) const {
+void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const double* u,
+    const double* z, const double* p, double* y) const {
   // Calculate outputs
   std::fill_n(mem->arg, DYN_NUM_IN, nullptr);
   mem->arg[DYN_T] = &t;
   mem->arg[DYN_X] = x;
+  mem->arg[DYN_U] = u;
   mem->arg[DYN_Z] = z;
   mem->arg[DYN_P] = p;
   std::fill_n(mem->res, DYN_NUM_OUT, nullptr);

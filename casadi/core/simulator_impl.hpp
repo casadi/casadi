@@ -88,15 +88,16 @@ public:
   virtual Function create_advanced(const Dict& opts);
 
   /** \brief Reset the forward problem */
-  virtual void reset(SimulatorMemory* mem, double t, const double* x, const double* z,
-    const double* p, double* y) const = 0;
+  virtual void reset(SimulatorMemory* mem, double t, const double* x, const double* u,
+    const double* z, const double* p, double* y) const = 0;
 
   /** \brief  Advance solution in time */
-  virtual void advance(SimulatorMemory* mem, double t, double* x, double* z, double* y) const = 0;
+  virtual void advance(SimulatorMemory* mem, double t, double* x, const double* u, double* z,
+    const double* p, double* y) const = 0;
 
   /** \brief  Evaluate output function */
-  virtual void eval_y(SimulatorMemory* mem, double t, const double* x, const double* z,
-    const double* p, double* y) const;
+  virtual void eval_y(SimulatorMemory* mem, double t, const double* x, const double* u,
+    const double* z, const double* p, double* y) const;
 
   /** \brief  evaluate */
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
@@ -117,6 +118,7 @@ public:
   // Shorthands
   const Sparsity&  t() const { return oracle_.sparsity_in(DYN_T);}
   const Sparsity&  x() const { return oracle_.sparsity_in(DYN_X);}
+  const Sparsity&  u() const { return oracle_.sparsity_in(DYN_U);}
   const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
   const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
   const Sparsity&  y() const { return oracle_.sparsity_out(DYN_Y);}
@@ -127,6 +129,9 @@ public:
 
   /// Number of states
   casadi_int nx_, nz_, nx1_, nz1_;
+
+  /// Number of controls
+  casadi_int nu_, nu1_;
 
   /// Number of parameters
   casadi_int np_, np1_;

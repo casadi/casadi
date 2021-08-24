@@ -97,7 +97,7 @@ namespace casadi {
     }
 
     // Create function
-    create_function("odeF", {"x", "p", "t"}, {"ode"});
+    create_function("odeF", {"t", "x", "u", "p"}, {"ode"});
 
     // Algebraic variables not supported
     casadi_assert(nz_==0, "CVODES does not support algebraic variables");
@@ -120,7 +120,7 @@ namespace casadi {
 
     // Attach functions for jacobian information
     if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
-      create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
+      create_function("jtimesF", {"t", "x", "u", "p", "fwd:x"}, {"fwd:ode"});
     }
   }
 
@@ -191,9 +191,10 @@ namespace casadi {
       casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      m->arg[0] = NV_DATA_S(x);
-      m->arg[1] = m->p;
-      m->arg[2] = &t;
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(x);
+      m->arg[2] = m->u;
+      m->arg[3] = m->p;
       m->res[0] = NV_DATA_S(xdot);
       s.calc_function(m, "odeF");
       return 0;
@@ -205,24 +206,24 @@ namespace casadi {
     }
   }
 
-  void CvodesSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* z,
-      const double* p, double* y) const {
+  void CvodesSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* u,
+      const double* z, const double* p, double* y) const {
     if (verbose_) casadi_message(name_ + "::reset");
     auto m = to_mem(mem);
     // Reset the base classes
-    SundialsSimulator::reset(mem, t, x, z, p, y);
+    SundialsSimulator::reset(mem, t, x, u, z, p, y);
     // Re-initialize
     THROWING(CVodeReInit, m->mem, t, m->xz);
-    // Set the stop time of the integration -- don't integrate past this point
-    if (stop_at_end_) setStopTime(m, grid_.back());
+    // We we don't have any discrete input, then we can integrate till the end
+    if (nu_ == 0) setStopTime(m, grid_.back());
     // Get outputs
-    if (y && ny_ > 0) eval_y(m, t, x, z, p, y);
+    if (y && ny_ > 0) eval_y(m, t, x, u, z, p, y);
   }
 
-  void CvodesSimulator::advance(SimulatorMemory* mem, double t, double* x, double* z,
-      double* y) const {
+  void CvodesSimulator::advance(SimulatorMemory* mem, double t, double* x, const double* u,
+      double* z, const double* p, double* y) const {
     auto m = to_mem(mem);
-
+    // Consistency checks
     casadi_assert(t >= grid_.front(),
       "CvodesSimulator::integrate(" + str(t) + "): "
       "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
@@ -230,16 +231,14 @@ namespace casadi {
       "CvodesSimulator::integrate(" + str(t) + "): "
       "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
       "unless stop_at_end is set to False.");
-    // Integrate, unless already at desired time
-    const double ttol = 1e-9;
-    if (fabs(m->t-t)>=ttol) {
-      // Integrate forward ...
-      THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
-    }
+    // Do not integrate past change in input signal
+    if (nu_ > 0) setStopTime(m, t);
+    // Integrate
+    THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
     // Set function outputs
     casadi_copy(NV_DATA_S(m->xz), nx_, x);
     // Get outputs
-    if (y && ny_ > 0) eval_y(m, t, x, z, m->p, y);
+    if (y && ny_ > 0) eval_y(m, t, x, u, z, p, y);
     // Get stats
     THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
@@ -279,8 +278,9 @@ namespace casadi {
       auto& s = m->self;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = m->p;
-      m->arg[3] = NV_DATA_S(v);
+      m->arg[2] = m->u;
+      m->arg[3] = m->p;
+      m->arg[4] = NV_DATA_S(v);
       m->res[0] = NV_DATA_S(Jv);
       s.calc_function(m, "jtimesF");
       return 0;
@@ -323,8 +323,9 @@ namespace casadi {
           casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
           m->arg[0] = &t; // t
           m->arg[1] = NV_DATA_S(x); // x
-          m->arg[2] = m->p; // p
-          m->arg[3] = v; // fwd:x
+          m->arg[2] = m->u; // u
+          m->arg[4] = m->p; // p
+          m->arg[5] = v; // fwd:x
           m->res[0] = m->v2; // fwd:ode
           s.calc_function(m, "jtimesF");
 
@@ -362,9 +363,10 @@ namespace casadi {
       double d1 = -gamma, d2 = 1.;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = m->p;
-      m->arg[3] = &d1;
-      m->arg[4] = &d2;
+      m->arg[2] = m->u;
+      m->arg[3] = m->p;
+      m->arg[4] = &d1;
+      m->arg[5] = &d2;
       m->res[0] = m->jac;
       if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 
@@ -381,8 +383,7 @@ namespace casadi {
   }
 
   int CvodesSimulator::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                              booleantype *jcurPtr,
-                              N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+      booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
       auto m = to_mem(cv_mem->cv_lmem);
       //auto& s = m->self;
@@ -451,7 +452,7 @@ namespace casadi {
     // Get the Jacobian in the Newton iteration
     MatType jac = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X])
                 + c_xdot*MatType::eye(nx_);
-    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
+    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_U], a[DYN_P], c_x, c_xdot}, {jac});
   }
 
   CvodesSimMemory::CvodesSimMemory(const CvodesSimulator& s) : self(s) {

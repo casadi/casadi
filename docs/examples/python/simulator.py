@@ -43,22 +43,26 @@ L = x1**2 + x2**2 + u**2
 tgrid = [T/N*k for k in range(N+1)]
 
 # CVODES from the SUNDIALS suite
-dae = {'x':x, 'p':u, 'ode':xdot, 'y' : L}
+dae = {'x':x, 'u':u, 'ode':xdot, 'y' : L}
 F = simulator('F', 'cvodes', dae, tgrid)
 
+# Test input
+import numpy as np
+u = np.linspace(-1, 1, N)
+
 # Simulate
-Fk = F(x0 = 0, p = 1)
+Fk = F(x0 = 0, u = u)
 x_sim = Fk['x'].full()
 y_sim = Fk['y'].full()
 
 import matplotlib.pyplot as plt
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid, x_sim[0,:], '--')
-plt.plot(tgrid, x_sim[1,:], '-')
-plt.plot(tgrid, y_sim[0,:], '-.')
-#plt.step(tgrid, vertcat(DM.nan(1), u_opt), '-.')
+plt.plot(tgrid, x_sim[0,:], label = 'x1')
+plt.plot(tgrid, x_sim[1,:], label = 'x2')
+plt.plot(tgrid, y_sim[0,:], label = 'L')
+plt.step(tgrid, np.insert(u, 0, np.nan), label = 'u')
 plt.xlabel('t')
-#plt.legend(['x1','x2','u'])
+plt.legend()
 plt.grid()
 plt.show()
