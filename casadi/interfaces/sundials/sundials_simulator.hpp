@@ -126,8 +126,8 @@ namespace casadi {
     void print_stats(SimulatorMemory* mem) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(SimulatorMemory* mem, double t, const double* x,
-                       const double* z, const double* p) const override;
+    void reset(SimulatorMemory* mem, double t, const double* x, const double* z,
+      const double* p, double* y) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
     void resetB(SimulatorMemory* mem, double t, const double* rx,

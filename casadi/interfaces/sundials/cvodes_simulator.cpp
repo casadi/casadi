@@ -236,40 +236,37 @@ namespace casadi {
     }
   }
 
-  void CvodesSimulator::reset(SimulatorMemory* mem, double t, const double* x,
-                              const double* z, const double* _p) const {
+  void CvodesSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* z,
+      const double* p, double* y) const {
     if (verbose_) casadi_message(name_ + "::reset");
     auto m = to_mem(mem);
-
     // Reset the base classes
-    SundialsSimulator::reset(mem, t, x, z, _p);
-
+    SundialsSimulator::reset(mem, t, x, z, p, y);
     // Re-initialize
     THROWING(CVodeReInit, m->mem, t, m->xz);
-
     // Re-initialize quadratures
-    if (nq_>0) {
+    if (nq_ > 0) {
       N_VConst(0.0, m->q);
       THROWING(CVodeQuadReInit, m->mem, m->q);
     }
-
     // Re-initialize backward integration
-    if (nrx_>0) {
+    if (nrx_ > 0) {
       THROWING(CVodeAdjReInit, m->mem);
     }
-
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(m, grid_.back());
+    // Get outputs
+    if (y && ny_ > 0) eval_y(m, t, x, z, p, y);
   }
 
-  void CvodesSimulator::advance(SimulatorMemory* mem, double t, double* x,
-                                double* z, double* q) const {
+  void CvodesSimulator::advance(SimulatorMemory* mem, double t, double* x, double* z,
+      double* y, double* q) const {
     auto m = to_mem(mem);
 
-    casadi_assert(t>=grid_.front(),
+    casadi_assert(t >= grid_.front(),
       "CvodesSimulator::integrate(" + str(t) + "): "
       "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
-    casadi_assert(t<=grid_.back() || !stop_at_end_,
+    casadi_assert(t <= grid_.back() || !stop_at_end_,
       "CvodesSimulator::integrate(" + str(t) + "): "
       "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
       "unless stop_at_end is set to False.");
@@ -296,6 +293,9 @@ namespace casadi {
     // Set function outputs
     casadi_copy(NV_DATA_S(m->xz), nx_, x);
     casadi_copy(NV_DATA_S(m->q), nq_, q);
+
+    // Get outputs
+    if (y && ny_ > 0) eval_y(m, t, x, z, m->p, y);
 
     // Get stats
     THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,

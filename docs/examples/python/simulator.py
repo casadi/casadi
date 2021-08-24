@@ -43,19 +43,20 @@ L = x1**2 + x2**2 + u**2
 tgrid = [T/N*k for k in range(N+1)]
 
 # CVODES from the SUNDIALS suite
-dae = {'x':x, 'p':u, 'ode':xdot, 'quad':L}
+dae = {'x':x, 'p':u, 'ode':xdot, 'quad':L, 'y':x}
 F = simulator('F', 'cvodes', dae, tgrid)
 
 # Simulate
 Fk = F(x0 = 0, p = 1)
 xf_sim = Fk['xf'].full()
 qf_sim = Fk['qf'].full()
+y_sim = Fk['y'].full()
 
 import matplotlib.pyplot as plt
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid[1:], xf_sim[0,:], '--')
-plt.plot(tgrid[1:], xf_sim[1,:], '-')
+plt.plot(tgrid, y_sim[0,:], '--')
+plt.plot(tgrid, y_sim[1,:], '-')
 plt.plot(tgrid[1:], qf_sim[0,:], '-.')
 #plt.step(tgrid, vertcat(DM.nan(1), u_opt), '-.')
 plt.xlabel('t')

@@ -88,12 +88,12 @@ public:
   virtual Function create_advanced(const Dict& opts);
 
   /** \brief Reset the forward problem */
-  virtual void reset(SimulatorMemory* mem, double t,
-                     const double* x, const double* z, const double* p) const = 0;
+  virtual void reset(SimulatorMemory* mem, double t, const double* x, const double* z,
+    const double* p, double* y) const = 0;
 
   /** \brief  Advance solution in time */
-  virtual void advance(SimulatorMemory* mem, double t,
-                       double* x, double* z, double* q) const = 0;
+  virtual void advance(SimulatorMemory* mem, double t, double* x, double* z, double* y,
+    double* q) const = 0;
 
   /** \brief Reset the backward problem */
   virtual void resetB(SimulatorMemory* mem, double t,
@@ -102,6 +102,10 @@ public:
   /** \brief  Retreat solution in time */
   virtual void retreat(SimulatorMemory* mem, double t,
                        double* rx, double* rz, double* rq) const = 0;
+
+  /** \brief  Evaluate output function */
+  virtual void eval_y(SimulatorMemory* mem, double t, const double* x, const double* z,
+    const double* p, double* y) const;
 
   /** \brief  evaluate */
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
@@ -127,9 +131,11 @@ public:
   const Sparsity&  x() const { return oracle_.sparsity_in(DYN_X);}
   const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
   const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
+  const Sparsity&  y() const { return oracle_.sparsity_out(DYN_Y);}
   const Sparsity&  q() const { return oracle_.sparsity_out(DYN_QUAD);}
   const Sparsity& rx() const { return oracle_.sparsity_in(DYN_RX);}
   const Sparsity& rz() const { return oracle_.sparsity_in(DYN_RZ);}
+  const Sparsity& ry() const { return oracle_.sparsity_out(DYN_RY);}
   const Sparsity& rp() const { return oracle_.sparsity_in(DYN_RP);}
   const Sparsity& rq() const { return oracle_.sparsity_out(DYN_RQUAD);}
   ///@}
@@ -138,10 +144,10 @@ public:
   std::vector<double> grid_;
 
   /// Number of states for the forward integration
-  casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
+  casadi_int nx_, nz_, ny_, nq_, nx1_, nz1_, ny1_, nq1_;
 
   /// Number of states for the backward integration
-  casadi_int nrx_, nrz_, nrq_, nrx1_, nrz1_, nrq1_;
+  casadi_int nrx_, nrz_, nry_, nrq_, nrx1_, nrz1_, nry1_, nrq1_;
 
   /// Number of forward and backward parameters
   casadi_int np_, nrp_, np1_, nrp1_;

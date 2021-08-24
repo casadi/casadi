@@ -135,9 +135,11 @@ enum DynIn {
 enum DynOut {
   DYN_ODE,
   DYN_ALG,
+  DYN_Y,
   DYN_QUAD,
   DYN_RODE,
   DYN_RALG,
+  DYN_RY,
   DYN_RQUAD,
   DYN_NUM_OUT};
 
@@ -221,13 +223,17 @@ enum SimulatorInput {
 enum SimulatorOutput {
   /// Differential state at the final time
   SIMULATOR_XF,
-  /// Quadrature state at the final time
+  /// Outputs
+  SIMULATOR_Y,
+  /// Quadratures
   SIMULATOR_QF,
   /// Algebraic variable at the final time
   SIMULATOR_ZF,
   /// Backward differential state at the initial time
   SIMULATOR_RXF,
-  /// Backward quadrature state at the initial time
+  /// Backward outputs
+  SIMULATOR_RY,
+  /// Backward quadratures
   SIMULATOR_RQF,
   /// Backward algebraic variable at the initial time
   SIMULATOR_RZF,

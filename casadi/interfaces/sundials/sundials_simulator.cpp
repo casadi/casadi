@@ -262,20 +262,16 @@ namespace casadi {
     if (!linsolB_.is_null()) linsolB_.release(m->mem_linsolB);
   }
 
-  void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x,
-                                const double* z, const double* p) const {
+  void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* z,
+      const double* p, double* y) const {
     auto m = static_cast<SundialsSimMemory*>(mem);
-
     // Update time
     m->t = t;
-
     // Set parameters
     casadi_copy(p, np_, m->p);
-
     // Set the state
     casadi_copy(x, nx_, NV_DATA_S(m->xz));
     casadi_copy(z, nz_, NV_DATA_S(m->xz)+nx_);
-
     // Reset summation states
     N_VConst(0., m->q);
   }

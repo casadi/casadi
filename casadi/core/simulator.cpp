@@ -46,9 +46,11 @@ std::string to_string(DynOut v) {
   switch (v) {
   case DYN_ODE: return "ode";
   case DYN_ALG: return "alg";
+  case DYN_Y: return "y";
   case DYN_QUAD: return "quad";
   case DYN_RODE: return "rode";
   case DYN_RALG: return "ralg";
+  case DYN_RY: return "ry";
   case DYN_RQUAD: return "rquad";
   default: break;
   }
@@ -115,11 +117,13 @@ std::string simulator_in(casadi_int ind) {
 std::string simulator_out(casadi_int ind) {
   switch (static_cast<SimulatorOutput>(ind)) {
   case SIMULATOR_XF:  return "xf";
-  case SIMULATOR_QF:  return "qf";
   case SIMULATOR_ZF:  return "zf";
+  case SIMULATOR_Y:  return "y";
+  case SIMULATOR_QF:  return "qf";
   case SIMULATOR_RXF: return "rxf";
-  case SIMULATOR_RQF: return "rqf";
   case SIMULATOR_RZF: return "rzf";
+  case SIMULATOR_RQF: return "rqf";
+  case SIMULATOR_RY: return "ry";
   case SIMULATOR_NUM_OUT: break;
   }
   return std::string();
@@ -150,9 +154,9 @@ Sparsity Simulator::get_sparsity_in(casadi_int i) {
   case SIMULATOR_X0: return x();
   case SIMULATOR_P: return p();
   case SIMULATOR_Z0: return z();
-  case SIMULATOR_RX0: return repmat(rx(), 1, grid_.size()-1);
-  case SIMULATOR_RP: return repmat(rp(), 1, grid_.size()-1);
-  case SIMULATOR_RZ0: return repmat(rz(), 1, grid_.size()-1);
+  case SIMULATOR_RX0: return repmat(rx(), 1, grid_.size() - 1);
+  case SIMULATOR_RP: return repmat(rp(), 1, grid_.size() - 1);
+  case SIMULATOR_RZ0: return repmat(rz(), 1, grid_.size() - 1);
   case SIMULATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -160,12 +164,14 @@ Sparsity Simulator::get_sparsity_in(casadi_int i) {
 
 Sparsity Simulator::get_sparsity_out(casadi_int i) {
   switch (static_cast<SimulatorOutput>(i)) {
-  case SIMULATOR_XF: return repmat(x(), 1, grid_.size()-1);
-  case SIMULATOR_QF: return repmat(q(), 1, grid_.size()-1);
-  case SIMULATOR_ZF: return repmat(z(), 1, grid_.size()-1);
+  case SIMULATOR_XF: return repmat(x(), 1, grid_.size() - 1);
+  case SIMULATOR_ZF: return repmat(z(), 1, grid_.size() - 1);
+  case SIMULATOR_Y: return repmat(y(), 1, grid_.size());
+  case SIMULATOR_QF: return repmat(q(), 1, grid_.size() - 1);
   case SIMULATOR_RXF: return rx();
-  case SIMULATOR_RQF: return rq();
   case SIMULATOR_RZF: return rz();
+  case SIMULATOR_RY: return repmat(ry(), 1, grid_.size() - 1);
+  case SIMULATOR_RQF: return rq();
   case SIMULATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -189,21 +195,25 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   // Read outputs
   double* x = res[SIMULATOR_XF];
   double* z = res[SIMULATOR_ZF];
+  double* y = res[SIMULATOR_Y];
   double* q = res[SIMULATOR_QF];
   double* rx = res[SIMULATOR_RXF];
   double* rz = res[SIMULATOR_RZF];
+  // double* ry = res[SIMULATOR_RY];
   double* rq = res[SIMULATOR_RQF];
   res += SIMULATOR_NUM_OUT;
   // Setup memory object
   setup(m, arg, res, iw, w);
-  // Reset solver, take time to t0
-  reset(m, grid_.front(), x0, z0, p);
+  // Reset solver, take time to t0, calculate outputs at t0
+  reset(m, grid_.front(), x0, z0, p, y);
+  if (y) y += ny_;
   // Integrate forward
   for (casadi_int k = 1; k < grid_.size(); ++k) {
     // Integrate forward
-    advance(m, grid_[k], x, z, q);
+    advance(m, grid_[k], x, z, y, q);
     if (x) x += nx_;
     if (z) z += nz_;
+    if (y) y += ny_;
     if (q) q += nq_;
   }
   // If backwards integration is needed
@@ -250,7 +260,7 @@ void Simulator::init(const Dict& opts) {
   OracleFunction::init(opts);
 
   // For sparsity pattern propagation
-  alloc(oracle_);
+  set_function(oracle_);
 
   // Error if sparse input
   casadi_assert(x().is_dense(), "Sparse DAE not supported");
@@ -263,21 +273,25 @@ void Simulator::init(const Dict& opts) {
   // Get dimensions (excluding sensitivity equations)
   nx1_ = x().size1();
   nz1_ = z().size1();
+  ny1_ = y().size1();
   nq1_ = q().size1();
   np1_  = p().size1();
   nrx1_ = rx().size1();
   nrz1_ = rz().size1();
   nrp1_ = rp().size1();
+  nry1_ = ry().size1();
   nrq1_ = rq().size1();
 
   // Get dimensions (including sensitivity equations)
   nx_ = x().nnz();
   nz_ = z().nnz();
+  ny_ = y().nnz();
   nq_ = q().nnz();
   np_  = p().nnz();
   nrx_ = rx().nnz();
   nrz_ = rz().nnz();
   nrp_ = rp().nnz();
+  nry_ = ry().nnz();
   nrq_ = rq().nnz();
 
   // Number of sensitivities
@@ -404,6 +418,19 @@ Function Simulator::map2oracle(const std::string& name,
   de_out[DYN_RALG] = project(de_out[DYN_RALG], de_in[DYN_RZ].sparsity());
   // Construct
   return Function(name, de_in, de_out, enum_names<DynIn>(), enum_names<DynOut>(), opts);
+}
+
+void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const double* z,
+    const double* p, double* y) const {
+  // Calculate outputs
+  std::fill_n(mem->arg, DYN_NUM_IN, nullptr);
+  mem->arg[DYN_T] = &t;
+  mem->arg[DYN_X] = x;
+  mem->arg[DYN_Z] = z;
+  mem->arg[DYN_P] = p;
+  std::fill_n(mem->res, DYN_NUM_OUT, nullptr);
+  mem->res[DYN_Y] = y;
+  if (calc_function(mem, "dae")) casadi_error("'dae' calculation failed");
 }
 
 } // namespace casadi

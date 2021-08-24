@@ -123,12 +123,12 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<CvodesSimMemory*>(mem);}
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(SimulatorMemory* mem, double t, const double* x,
-                       const double* z, const double* p) const override;
+    void reset(SimulatorMemory* mem, double t, const double* x, const double* z,
+      const double* p, double* y) const override;
 
     /** \brief  Advance solution in time */
-    void advance(SimulatorMemory* mem, double t, double* x,
-                         double* z, double* q) const override;
+    void advance(SimulatorMemory* mem, double t, double* x, double* z, double* y,
+      double* q) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
     void resetB(SimulatorMemory* mem, double t,
