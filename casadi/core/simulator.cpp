@@ -28,6 +28,33 @@
 
 namespace casadi {
 
+std::string to_string(DynIn v) {
+  switch (v) {
+  case DYN_T: return "t";
+  case DYN_X: return "x";
+  case DYN_Z: return "z";
+  case DYN_P: return "p";
+  case DYN_RX: return "rx";
+  case DYN_RZ: return "rz";
+  case DYN_RP: return "rp";
+  default: break;
+  }
+  return "";
+}
+
+std::string to_string(DynOut v) {
+  switch (v) {
+  case DYN_ODE: return "ode";
+  case DYN_ALG: return "alg";
+  case DYN_QUAD: return "quad";
+  case DYN_RODE: return "rode";
+  case DYN_RALG: return "ralg";
+  case DYN_RQUAD: return "rquad";
+  default: break;
+  }
+  return "";
+}
+
 bool has_simulator(const std::string& name) {
   return Simulator::has_plugin(name);
 }
@@ -331,47 +358,22 @@ void Simulator::setStopTime(SimulatorMemory* mem, double tf) const {
 
 template<typename XType>
 Function Simulator::map2oracle(const std::string& name,
-  const std::map<std::string, XType>& d, const Dict& opts) {
+    const std::map<std::string, XType>& d, const Dict& opts) {
+  // Gather symbolic inputs and outputs
   std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
-
   for (auto&& i : d) {
-    if (i.first=="t") {
-      de_in[DYN_T]=i.second;
-    } else if (i.first=="x") {
-      de_in[DYN_X]=i.second;
-    } else if (i.first=="z") {
-      de_in[DYN_Z]=i.second;
-    } else if (i.first=="p") {
-      de_in[DYN_P]=i.second;
-    } else if (i.first=="rx") {
-      de_in[DYN_RX]=i.second;
-    } else if (i.first=="rz") {
-      de_in[DYN_RZ]=i.second;
-    } else if (i.first=="rp") {
-      de_in[DYN_RP]=i.second;
-    } else if (i.first=="ode") {
-      de_out[DYN_ODE]=i.second;
-    } else if (i.first=="alg") {
-      de_out[DYN_ALG]=i.second;
-    } else if (i.first=="quad") {
-      de_out[DYN_QUAD]=i.second;
-    } else if (i.first=="rode") {
-      de_out[DYN_RODE]=i.second;
-    } else if (i.first=="ralg") {
-      de_out[DYN_RALG]=i.second;
-    } else if (i.first=="rquad") {
-      de_out[DYN_RQUAD]=i.second;
+    if (has_enum<DynIn>(i.first)) {
+      de_in[to_enum<DynIn>(i.first)] = i.second;
+    } else if (has_enum<DynOut>(i.first)) {
+      de_out[to_enum<DynOut>(i.first)] = i.second;
     } else {
       casadi_error("No such field: " + i.first);
     }
   }
-
   // Make sure x and ode exist
   casadi_assert(!de_in[DYN_X].is_empty(), "Ill-posed ODE - no state");
-
   // Number of right-hand-sides
   casadi_int nrhs = de_in[DYN_X].size2();
-
   // Make sure consistent number of right-hand-sides
   for (bool b : {true, false}) {
     for (auto&& e : b ? de_in : de_out) {
@@ -384,29 +386,24 @@ Function Simulator::map2oracle(const std::string& name,
       e = reshape(e, nr, nrhs);
     }
   }
-
   // Consistent sparsity for x
   casadi_assert(de_in[DYN_X].size()==de_out[DYN_ODE].size(),
     "Dimension mismatch for 'ode'");
   de_out[DYN_ODE] = project(de_out[DYN_ODE], de_in[DYN_X].sparsity());
-
   // Consistent sparsity for z
   casadi_assert(de_in[DYN_Z].size()==de_out[DYN_ALG].size(),
     "Dimension mismatch for 'alg'");
   de_out[DYN_ALG] = project(de_out[DYN_ALG], de_in[DYN_Z].sparsity());
-
   // Consistent sparsity for rx
   casadi_assert(de_in[DYN_RX].size()==de_out[DYN_RODE].size(),
     "Dimension mismatch for 'rode'");
   de_out[DYN_RODE] = project(de_out[DYN_RODE], de_in[DYN_RX].sparsity());
-
   // Consistent sparsity for rz
   casadi_assert(de_in[DYN_RZ].size()==de_out[DYN_RALG].size(),
     "Dimension mismatch for 'ralg'");
   de_out[DYN_RALG] = project(de_out[DYN_RALG], de_in[DYN_RZ].sparsity());
-
   // Construct
-  return Function(name, de_in, de_out, DYN_INPUTS, DYN_OUTPUTS, opts);
+  return Function(name, de_in, de_out, enum_names<DynIn>(), enum_names<DynOut>(), opts);
 }
 
 } // namespace casadi

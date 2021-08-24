@@ -131,9 +131,6 @@ enum DynIn {
   DYN_RP,
   DYN_NUM_IN};
 
-/// Shortnames for DAE symbolic representation inputs
-const std::vector<std::string> DYN_INPUTS = {"t", "x", "z", "p", "rx", "rz", "rp"};
-
 /// Inputs of the symbolic representation of the DAE
 enum DynOut {
   DYN_ODE,
@@ -143,9 +140,6 @@ enum DynOut {
   DYN_RALG,
   DYN_RQUAD,
   DYN_NUM_OUT};
-
-/// Shortnames for DAE symbolic representation outputs
-const std::vector<std::string> DYN_OUTPUTS = {"ode", "alg", "quad", "rode", "ralg", "rquad"};
 
 /// Input arguments of an ODE/DAE function
 enum DAE2Input {

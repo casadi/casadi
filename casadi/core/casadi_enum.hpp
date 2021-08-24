@@ -40,6 +40,17 @@ namespace casadi {
 template<typename T>
 struct enum_traits {};
 
+/// Helper function: Check if enum exists
+template<typename T>
+bool has_enum(const std::string& s) {
+  // Look for a match
+  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i) {
+    if (s == to_string(static_cast<T>(i))) return true;
+  }
+  // Not found
+  return false;
+}
+
 /// Helper function: Convert string to enum
 template<typename T>
 T to_enum(const std::string& s, const std::string& s_def = "") {
@@ -60,6 +71,15 @@ T to_enum(const std::string& s, const std::string& s_def = "") {
   }
   casadi_error(ss.str());
   return enum_traits<T>::n_enum;  // never reached
+}
+
+/// Helper function: Get all fields
+template<typename T>
+std::vector<std::string> enum_names() {
+  std::vector<std::string> r(enum_traits<T>::n_enum);
+  for (size_t i = 0; i < enum_traits<T>::n_enum; ++i)
+    r[i] = to_string(static_cast<T>(i));
+  return r;
 }
 
 } // namespace casadi
