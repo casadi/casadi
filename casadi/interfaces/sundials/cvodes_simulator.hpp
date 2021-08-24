@@ -40,132 +40,128 @@
 /** \defgroup plugin_Simulator_cvodes
 
       Interface to CVodes from the Sundials suite.
-
-      A call to evaluate will integrate to the end.
-
-      You can retrieve the entire state trajectory as follows, after the evaluate call:
-      Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
 */
 
 /** \pluginsection{Simulator,cvodes} */
 
 /// \cond INTERNAL
 namespace casadi {
-  // Forward declaration
-  class CvodesSimulator;
 
-  // CvodesSimMemory
-  struct CASADI_SIMULATOR_CVODES_EXPORT CvodesSimMemory : public SundialsSimMemory {
-    /// Function object
-    const CvodesSimulator& self;
+// Forward declaration
+class CvodesSimulator;
 
-    // CVodes memory block
-    void* mem;
+// CvodesSimMemory
+struct CASADI_SIMULATOR_CVODES_EXPORT CvodesSimMemory : public SundialsSimMemory {
+  /// Function object
+  const CvodesSimulator& self;
 
-    // Remember the gamma and gammaB from last factorization
-    double gamma, gammaB;
+  // CVodes memory block
+  void* mem;
 
-    /// Constructor
-    CvodesSimMemory(const CvodesSimulator& s);
+  // Remember the gamma and gammaB from last factorization
+  double gamma, gammaB;
 
-    /// Destructor
-    ~CvodesSimMemory();
-  };
+  /// Constructor
+  CvodesSimMemory(const CvodesSimulator& s);
 
-  /** \brief \pluginbrief{Simulator,cvodes}
+  /// Destructor
+  ~CvodesSimMemory();
+};
 
-      @copydoc DAE_doc
-      @copydoc plugin_Simulator_cvodes
+/** \brief \pluginbrief{Simulator,cvodes}
 
-  */
-  class CASADI_SIMULATOR_CVODES_EXPORT CvodesSimulator : public SundialsSimulator {
-  public:
-    /** \brief  Constructor */
-    explicit CvodesSimulator(const std::string& name, const Function& dae,
-      const std::vector<double>& grid);
+    @copydoc DAE_doc
+    @copydoc plugin_Simulator_cvodes
 
-    /** \brief  Create a new simulator */
-    static Simulator* creator(const std::string& name, const Function& dae,
-        const std::vector<double>& grid) {
-      return new CvodesSimulator(name, dae, grid);
-    }
+*/
+class CASADI_SIMULATOR_CVODES_EXPORT CvodesSimulator : public SundialsSimulator {
+public:
+  /** \brief  Constructor */
+  explicit CvodesSimulator(const std::string& name, const Function& dae,
+    const std::vector<double>& grid);
 
-    /** \brief  Destructor */
-    ~CvodesSimulator() override;
+  /** \brief  Create a new simulator */
+  static Simulator* creator(const std::string& name, const Function& dae,
+      const std::vector<double>& grid) {
+    return new CvodesSimulator(name, dae, grid);
+  }
 
-    // Get name of the plugin
-    const char* plugin_name() const override { return "cvodes";}
+  /** \brief  Destructor */
+  ~CvodesSimulator() override;
 
-    // Get name of the class
-    std::string class_name() const override { return "CvodesSimulator";}
+  // Get name of the plugin
+  const char* plugin_name() const override { return "cvodes";}
 
-    ///@{
-    /** \brief Options */
-    static const Options options_;
-    const Options& get_options() const override { return options_;}
-    double min_step_size_;
-    ///@}
+  // Get name of the class
+  std::string class_name() const override { return "CvodesSimulator";}
+
+  ///@{
+  /** \brief Options */
+  static const Options options_;
+  const Options& get_options() const override { return options_;}
+  double min_step_size_;
+  ///@}
 
 
-    /** \brief  Initialize stage */
-    void init(const Dict& opts) override;
+  /** \brief  Initialize stage */
+  void init(const Dict& opts) override;
 
-    /** \brief Create memory block */
-    void* alloc_mem() const override { return new CvodesSimMemory(*this);}
+  /** \brief Create memory block */
+  void* alloc_mem() const override { return new CvodesSimMemory(*this);}
 
-    /** \brief Initalize memory block */
-    int init_mem(void* mem) const override;
+  /** \brief Initalize memory block */
+  int init_mem(void* mem) const override;
 
-    /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<CvodesSimMemory*>(mem);}
+  /** \brief Free memory block */
+  void free_mem(void *mem) const override { delete static_cast<CvodesSimMemory*>(mem);}
 
-    /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(SimulatorMemory* mem, double t, const double* x, const double* u, const double* z,
-      const double* p, double* y) const override;
+  /** \brief  Reset the forward problem and bring the time back to t0 */
+  void reset(SimulatorMemory* mem, double t, const double* x, const double* u, const double* z,
+    const double* p, double* y) const override;
 
-    /** \brief  Advance solution in time */
-    void advance(SimulatorMemory* mem, double t, double* x, const double* u, double* z,
-      const double* p, double* y) const override;
+  /** \brief  Advance solution in time */
+  void advance(SimulatorMemory* mem, double t, double* x, const double* u, double* z,
+    const double* p, double* y) const override;
 
-    /** \brief  Set the stop time of the forward integration */
-    void setStopTime(SimulatorMemory* mem, double tf) const override;
+  /** \brief  Set the stop time of the forward integration */
+  void setStopTime(SimulatorMemory* mem, double tf) const override;
 
-    /** \brief Cast to memory object */
-    static CvodesSimMemory* to_mem(void *mem) {
-      CvodesSimMemory* m = static_cast<CvodesSimMemory*>(mem);
-      casadi_assert_dev(m);
-      return m;
-    }
+  /** \brief Cast to memory object */
+  static CvodesSimMemory* to_mem(void *mem) {
+    CvodesSimMemory* m = static_cast<CvodesSimMemory*>(mem);
+    casadi_assert_dev(m);
+    return m;
+  }
 
-    /// A documentation string
-    static const std::string meta_doc;
+  /// A documentation string
+  static const std::string meta_doc;
 
-  protected:
+protected:
 
-    // Sundials callback functions
-    static int rhs(double t, N_Vector x, N_Vector xdot, void *user_data);
-    static void ehfun(int error_code, const char *module, const char *function, char *msg,
-                      void *user_data);
-    static int rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data);
-    static int jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
-                      void *user_data, N_Vector tmp);
-    static int psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
-                      double gamma, double delta, int lr, void *user_data, N_Vector tmp);
-    static int psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
-                      booleantype *jcurPtr, double gamma, void *user_data,
-                      N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                      booleantype *jcurPtr,
-                      N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-    static int lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x,
-                      N_Vector xdot);
+  // Sundials callback functions
+  static int rhs(double t, N_Vector x, N_Vector xdot, void *user_data);
+  static void ehfun(int error_code, const char *module, const char *function, char *msg,
+                    void *user_data);
+  static int rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data);
+  static int jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
+                    void *user_data, N_Vector tmp);
+  static int psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
+                    double gamma, double delta, int lr, void *user_data, N_Vector tmp);
+  static int psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
+                    booleantype *jcurPtr, double gamma, void *user_data,
+                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+                    booleantype *jcurPtr,
+                    N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x,
+                    N_Vector xdot);
 
-    // Throw error
-    static void cvodes_error(const char* module, int flag);
+  // Throw error
+  static void cvodes_error(const char* module, int flag);
 
-    casadi_int lmm_; // linear multistep method
-    casadi_int iter_; // nonlinear solver iteration
-  };
+  casadi_int lmm_; // linear multistep method
+  casadi_int iter_; // nonlinear solver iteration
+};
 
 } // namespace casadi
 
