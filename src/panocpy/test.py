@@ -85,10 +85,10 @@ solver = pa.PANOCSolver(
 )
 almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
 almsolver = pa.ALMSolver(almparams, solver)
-y, x, stats = almsolver(p, y0, x0)
+x, y, stats = almsolver(p, x=x0, y=y0)
 
-print(y)
 print(x)
+print(y)
 pprint(stats)
 
 solver = pa.StructuredPANOCLBFGSSolver(
@@ -97,11 +97,7 @@ solver = pa.StructuredPANOCLBFGSSolver(
 )
 almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
 almsolver = pa.ALMSolver(almparams, solver)
-y, x, stats = almsolver(p, y0, x0)
-
-print(y)
-print(x)
-pprint(stats)
+x, y, stats = almsolver(p, x=x0, y=y0)
 
 
 class CustomInnerSolver(pa.InnerSolver):
@@ -133,11 +129,21 @@ class CustomInnerSolver(pa.InnerSolver):
 solver = CustomInnerSolver()
 almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
 almsolver = pa.ALMSolver(almparams, solver)
-y, x, stats = almsolver(p, y0, x0)
+x, y, stats = almsolver(p, x=x0, y=y0)
 
-print(y)
 print(x)
+print(y)
 pprint(stats)
+
+try:
+    old_x0 = x0
+    x0 = np.zeros((666,))
+    sol = almsolver(p, x=x0, y=y0)
+except ValueError as e:
+    assert(e.args[0] == 'Length of x does not match problem size problem.n')
+
+x0 = old_x0
+
 # %%
 
 import os
@@ -176,9 +182,18 @@ solver = pa.StructuredPANOCLBFGSSolver(
 )
 almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
 almsolver = pa.ALMSolver(almparams, solver)
-y, x, stats = almsolver(p, y0, x0)
+x, y, stats = almsolver(p, x=x0, y=y0)
 
-print(y)
 print(x)
+print(y)
 pprint(stats)
+
+# %%
+
+x, y, stats = almsolver(p) # without initial guess
+
+print(x)
+print(y)
+pprint(stats)
+
 # %%
