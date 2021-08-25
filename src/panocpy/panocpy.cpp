@@ -598,7 +598,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             ":param problem: Problem to solve.\n"
             ":param y: Initial guess for Lagrange multipliers :math:`y`\n"
             ":param x: Initial guess for decision variables :math:`x`\n\n"
-            ":returns: (:math:`y`, :math:`x`, stats)");
+            ":return: * Lagrange multipliers :math:`y` at the solution\n"
+            "         * Solution :math:`x`\n"
+            "         * Statistics\n\n");
 
 #if !PANOCPY_HAVE_CASADI
     auto load_CasADi_problem = [](const char *, unsigned, unsigned,
