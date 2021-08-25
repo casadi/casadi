@@ -14,7 +14,6 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
     target_link_libraries(_panocpy
         PRIVATE
             panoc-alm::panoc-alm-obj
-            panoc-alm::casadi-loader
             pybind11::pybind11
     )
     target_compile_definitions(_panocpy PRIVATE VERSION_INFO=${PROJECT_VERSION})
@@ -27,6 +26,10 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         INSTALL_RPATH "${PANOCPY_RPATH}"
     )
     target_compile_definitions(_panocpy PRIVATE PANOCPY_MODULE_NAME=_panocpy)
+    if (TARGET panoc-alm::casadi-loader)
+        target_compile_definitions(_panocpy PRIVATE PANOCPY_HAVE_CASADI)
+        target_link_libraries(_panocpy PRIVATE panoc-alm::casadi-loader)
+    endif()
 
     if (SKBUILD)
         if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

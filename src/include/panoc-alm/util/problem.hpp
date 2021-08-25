@@ -3,6 +3,7 @@
 #include "box.hpp"
 
 #include <functional>
+#include <memory>
 #include <type_traits>
 
 namespace pa {
@@ -118,6 +119,19 @@ struct Problem {
           grad_f(std::move(grad_f)), g(std::move(g)),
           grad_g_prod(std::move(grad_g_prod)), grad_gi(std::move(grad_gi)),
           hess_L_prod(std::move(hess_L_prod)), hess_L(std::move(hess_L)) {}
+};
+
+class ProblemWithParam : public pa::Problem {
+  public:
+    using pa::Problem::Problem;
+    void set_param(pa::crvec p) { *param = p; }
+    void set_param(pa::vec &&p) { *param = std::move(p); }
+    pa::vec &get_param() { return *param; }
+    const pa::vec &get_param() const { return *param; }
+    std::shared_ptr<pa::vec> get_param_ptr() const { return param; }
+
+  private:
+    std::shared_ptr<pa::vec> param = std::make_shared<pa::vec>();
 };
 
 struct EvalCounter {

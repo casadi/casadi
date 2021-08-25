@@ -11,8 +11,11 @@
 #include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/pga.hpp>
 #include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
-#include <panoc-alm/interop/casadi/CasADiLoader.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
+
+#if PANOCPY_HAVE_CASADI
+#include <panoc-alm/interop/casadi/CasADiLoader.hpp>
+#endif
 
 #include <pybind11/attr.h>
 #include <pybind11/cast.h>
@@ -597,11 +600,27 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             ":param x: Initial guess for decision variables :math:`x`\n\n"
             ":returns: (:math:`y`, :math:`x`, stats)");
 
-    m.def("load_casadi_problem", &pa::load_CasADi_problem, "so_name"_a, "n"_a,
-          "m"_a, "second_order"_a = false,
+#if !PANOCPY_HAVE_CASADI
+    auto load_CasADi_problem = [](const char *, unsigned, unsigned,
+                                  bool) -> pa::Problem {
+        throw std::runtime_error(
+            "This version of panocpy was compiled without CasADi support");
+    };
+    auto load_CasADi_problem_with_param = [](const char *, unsigned, unsigned,
+                                             bool) -> pa::ProblemWithParam {
+        throw std::runtime_error(
+            "This version of panocpy was compiled without CasADi support");
+    };
+#else
+    using pa::load_CasADi_problem;
+    using pa::load_CasADi_problem_with_param;
+#endif
+
+    m.def("load_casadi_problem", load_CasADi_problem, "so_name"_a, "n"_a, "m"_a,
+          "second_order"_a = false,
           "Load a compiled CasADi problem without parameters.\n\n"
           "C++ documentation: :cpp:func:`pa::load_CasADi_problem`");
-    m.def("load_casadi_problem_with_param", &pa::load_CasADi_problem_with_param,
+    m.def("load_casadi_problem_with_param", load_CasADi_problem_with_param,
           "so_name"_a, "n"_a, "m"_a, "second_order"_a = false,
           "Load a compiled CasADi problem with parameters.\n\n"
           "C++ documentation: :cpp:func:`pa::load_CasADi_problem_with_param`");
