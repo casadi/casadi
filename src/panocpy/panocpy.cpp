@@ -23,8 +23,10 @@
 #include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
+#include <pybind11/stl.h>
 
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -499,16 +501,31 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def(
             "__call__",
             [](pa::PolymorphicALMSolver &solver, const pa::Problem &p,
-               pa::vec y, pa::vec x) -> std::tuple<pa::vec, pa::vec, py::dict> {
-                auto stats = solver(p, y, x);
-                return std::make_tuple(std::move(y), std::move(x),
+               std::optional<pa::vec> x, std::optional<pa::vec> y)
+                -> std::tuple<pa::vec, pa::vec, py::dict> {
+                if (!x)
+                    x = pa::vec::Zero(p.n);
+                else if (x->size() != p.n)
+                    throw std::invalid_argument(
+                        "Length of x does not match problem size problem.n");
+                if (!y)
+                    y = pa::vec::Zero(p.m);
+                else if (y->size() != p.m)
+                    throw std::invalid_argument(
+                        "Length of y does not match problem size problem.m");
+
+                auto stats = solver(p, *y, *x);
+                return std::make_tuple(std::move(*x), std::move(*y),
                                        stats_to_dict(stats));
             },
+            py::arg("problem"), py::arg("x") = std::nullopt,
+            py::arg("y") = std::nullopt,
             py::call_guard<py::scoped_ostream_redirect,
                            py::scoped_estream_redirect>());
 
-    m.def("load_casadi_problem", &load_CasADi_problem, "so_name"_a, "n"_a,
-          "m"_a, "second_order"_a = false);
+    m.def("load_casadi_problem", &load_CasADi_problem, py::arg("so_name"),
+          py::arg("n"), py::arg("m"), py::arg("second_order") = false);
     m.def("load_casadi_problem_with_param", &load_CasADi_problem_with_param,
-          "so_name"_a, "n"_a, "m"_a, "second_order"_a = false);
+          py::arg("so_name"), py::arg("n"), py::arg("m"),
+          py::arg("second_order") = false);
 }

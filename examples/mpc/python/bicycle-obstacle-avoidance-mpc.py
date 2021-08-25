@@ -98,7 +98,7 @@ def solve_ocp(state, y_sol, x_sol):
     state = np.reshape(state, (n_states,))
     prob.param = np.concatenate((state, dest))
     t0 = time.perf_counter()
-    y_sol, x_sol, stats = solver(prob, y_sol, x_sol)
+    x_sol, y_sol, stats = solver(problem=prob, x=x_sol, y=y_sol)
     t1 = time.perf_counter()
     return t1 - t0, stats, state, y_sol, x_sol
 
