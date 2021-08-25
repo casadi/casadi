@@ -41,11 +41,3 @@ All
     :members:
     :undoc-members:
     :special-members: __init__, __call__
-
-.. 
-    .. doxygenindex::
-    .. doxygenfunction::
-    .. doxygenstruct::
-    .. doxygenenum::
-    .. doxygentypedef::
-    .. doxygenclass::
