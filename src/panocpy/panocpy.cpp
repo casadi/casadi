@@ -94,9 +94,13 @@ auto PolymorphicALMConversion() {
 PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     using py::operator""_a;
 
+    py::options options;
+    options.enable_function_signatures();
+    options.enable_user_defined_docstrings();
+
     m.doc() = "PANOC+ALM solvers"; // TODO
 
-    py::class_<pa::Box>(m, "Box")
+    py::class_<pa::Box>(m, "Box", "C++ documentation: :cpp:class:`pa::Box`")
         .def(py::init([](unsigned n) {
                  return pa::Box{pa::vec::Constant(n, pa::inf),
                                 pa::vec::Constant(n, -pa::inf)};
@@ -107,7 +111,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("upperbound", &pa::Box::upperbound)
         .def_readwrite("lowerbound", &pa::Box::lowerbound);
 
-    py::class_<pa::Problem>(m, "Problem")
+    py::class_<pa::Problem>(m, "Problem",
+                            "C++ documentation: :cpp:class:`pa::Problem`")
         // .def(py::init())
         .def(py::init<unsigned, unsigned>(), "n"_a, "m"_a,
              ":param n: Number of unknowns\n"
@@ -141,7 +146,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                       "Hessian of the Lagrangian function times vector, "
                       ":math:`\\nabla^2_{xx} L(x,y)\\, v`");
 
-    py::class_<ProblemWithParam, pa::Problem>(m, "ProblemWithParam")
+    py::class_<pa::ProblemWithParam, pa::Problem>(
+        m, "ProblemWithParam",
+        "C++ documentation: :cpp:class:`pa::ProblemWithParam`")
         .def(py::init<unsigned, unsigned>(), "n"_a, "m"_a)
         .def_readwrite("n", &pa::Problem::n)
         .def_readwrite("m", &pa::Problem::m)
@@ -157,8 +164,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_property("hess_L_prod", prob_getter_hess_L_prod(),
                       prob_setter_hess_L_prod())
         .def_property(
-            "param", py::overload_cast<>(&ProblemWithParam::get_param),
-            py::overload_cast<pa::crvec>(&ProblemWithParam::set_param),
+            "param", py::overload_cast<>(&pa::ProblemWithParam::get_param),
+            py::overload_cast<pa::crvec>(&pa::ProblemWithParam::set_param),
             "Parameter vector :math:`p` of the problem");
 
     py::class_<pa::PolymorphicPANOCDirectionBase,
@@ -178,7 +185,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
 
     py::class_<pa::PolymorphicLBFGSDirection,
                std::shared_ptr<pa::PolymorphicLBFGSDirection>,
-               pa::PolymorphicPANOCDirectionBase>(m, "LBFGSDirection")
+               pa::PolymorphicPANOCDirectionBase>(
+        m, "LBFGSDirection",
+        "C++ documentation: :cpp:class:`pa::LBFGSDirection`")
         .def(py::init<pa::LBFGSParams>(), "params"_a)
         .def("initialize", &pa::PolymorphicLBFGSDirection::initialize)
         .def("update", &pa::PolymorphicLBFGSDirection::update)
@@ -189,14 +198,17 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("__str__", &pa::PolymorphicLBFGSDirection::get_name);
 
     using paLBFGSParamCBFGS = decltype(pa::LBFGSParams::cbfgs);
-    py::class_<paLBFGSParamCBFGS>(m, "LBFGSParamsCBFGS")
+    py::class_<paLBFGSParamCBFGS>(
+        m, "LBFGSParamsCBFGS",
+        "C++ documentation: :cpp:member:`pa::LBFGSParams::cbfgs`")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<paLBFGSParamCBFGS>))
         .def("to_dict", &struct_to_dict<paLBFGSParamCBFGS>)
         .def_readwrite("α", &paLBFGSParamCBFGS::α)
         .def_readwrite("ϵ", &paLBFGSParamCBFGS::ϵ);
 
-    py::class_<pa::LBFGSParams>(m, "LBFGSParams")
+    py::class_<pa::LBFGSParams>(
+        m, "LBFGSParams", "C++ documentation: :cpp:class:`pa::LBFGSParams`")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::LBFGSParams>))
         .def("to_dict", &struct_to_dict<pa::LBFGSParams>)
@@ -205,13 +217,16 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("rescale_when_γ_changes",
                        &pa::LBFGSParams::rescale_when_γ_changes);
 
-    py::enum_<pa::LBFGSStepSize>(m, "LBFGSStepsize")
+    py::enum_<pa::LBFGSStepSize>(
+        m, "LBFGSStepsize", "C++ documentation: :cpp:enum:`pa::LBFGSStepSize`")
         .value("BasedOnGradientStepSize",
                pa::LBFGSStepSize::BasedOnGradientStepSize)
         .value("BasedOnCurvature", pa::LBFGSStepSize::BasedOnCurvature)
         .export_values();
 
-    py::class_<pa::LipschitzEstimateParams>(m, "LipschitzEstimateParams")
+    py::class_<pa::LipschitzEstimateParams>(
+        m, "LipschitzEstimateParams",
+        "C++ documentation: :cpp:class:`pa::LipschitzEstimateParams`")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::LipschitzEstimateParams>))
         .def("to_dict", &struct_to_dict<pa::LipschitzEstimateParams>)
@@ -220,7 +235,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("δ", &pa::LipschitzEstimateParams::δ)
         .def_readwrite("Lγ_factor", &pa::LipschitzEstimateParams::Lγ_factor);
 
-    py::class_<pa::PANOCParams>(m, "PANOCParams")
+    py::class_<pa::PANOCParams>(
+        m, "PANOCParams", "C++ documentation: :cpp:class:`pa::PANOCParams`")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::PANOCParams>))
         .def("to_dict", &struct_to_dict<pa::PANOCParams>)
@@ -239,8 +255,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                        &pa::PANOCParams::alternative_linesearch_cond)
         .def_readwrite("lbfgs_stepsize", &pa::PANOCParams::lbfgs_stepsize);
 
-    py::enum_<pa::SolverStatus>(m, "SolverStatus", py::arithmetic(),
-                                "Solver status")
+    py::enum_<pa::SolverStatus>(
+        m, "SolverStatus", py::arithmetic(),
+        "C++ documentation: :cpp:enum:`pa::SolverStatus`")
         .value("Unknown", pa::SolverStatus::Unknown, "Initial value")
         .value("Converged", pa::SolverStatus::Converged,
                "Converged and reached given tolerance")
@@ -267,7 +284,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("stop", &pa::PolymorphicInnerSolverBase::stop)
         .def("get_name", &pa::PolymorphicInnerSolverBase::get_name);
 
-    py::class_<pa::PGAParams>(m, "PGAParams")
+    py::class_<pa::PGAParams>(m, "PGAParams",
+                              "C++ documentation: :cpp:class:`pa::PGAParams`")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::PGAParams>))
         .def("to_dict", &struct_to_dict<pa::PGAParams>)
@@ -280,7 +298,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("quadratic_upperbound_tolerance_factor",
                        &pa::PGAParams::quadratic_upperbound_tolerance_factor);
 
-    py::class_<pa::PGAProgressInfo>(m, "PGAProgressInfo")
+    py::class_<pa::PGAProgressInfo>(
+        m, "PGAProgressInfo",
+        "C++ documentation: :cpp:class:`pa::PGAProgressInfo`")
         .def_readonly("k", &pa::PGAProgressInfo::k)
         .def_readonly("x", &pa::PGAProgressInfo::x)
         .def_readonly("p", &pa::PGAProgressInfo::p)
@@ -299,7 +319,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             return std::sqrt(p.norm_sq_p) / p.γ;
         });
 
-    py::class_<pa::GAAPGAParams>(m, "GAAPGAParams")
+    py::class_<pa::GAAPGAParams>(
+        m, "GAAPGAParams", "C++ documentation: :cpp:class:`pa::GAAPGAParams`")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::GAAPGAParams>))
         .def("to_dict", &struct_to_dict<pa::GAAPGAParams>)
@@ -316,7 +337,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("full_flush_on_γ_change",
                        &pa::GAAPGAParams::full_flush_on_γ_change);
 
-    py::class_<pa::GAAPGAProgressInfo>(m, "GAAPGAProgressInfo")
+    py::class_<pa::GAAPGAProgressInfo>(
+        m, "GAAPGAProgressInfo",
+        "C++ documentation: :cpp:class:`pa::GAAPGAProgressInfo`")
         .def_readonly("k", &pa::GAAPGAProgressInfo::k)
         .def_readonly("x", &pa::GAAPGAProgressInfo::x)
         .def_readonly("p", &pa::GAAPGAProgressInfo::p)
@@ -336,7 +359,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         });
 
     py::class_<pa::PANOCProgressInfo>(
-        m, "PANOCProgressInfo", "Data passed to the PANOC progress callback")
+        m, "PANOCProgressInfo",
+        "Data passed to the PANOC progress callback.\n\n"
+        "C++ documentation: :cpp:class:`pa::PANOCProgressInfo`")
         .def_readonly("k", &pa::PANOCProgressInfo::k, //
                       "Iteration")
         .def_readonly("x", &pa::PANOCProgressInfo::x, //
@@ -376,7 +401,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
 
     py::class_<pa::StructuredPANOCLBFGSProgressInfo>(
-        m, "StructuredPANOCLBFGSProgressInfo")
+        m, "StructuredPANOCLBFGSProgressInfo",
+        "Data passed to the structured PANOC progress callback.\n\n"
+        "C++ documentation: :cpp:class:`pa::StructuredPANOCLBFGSProgressInfo`")
         .def_readonly("k", &pa::StructuredPANOCLBFGSProgressInfo::k)
         .def_readonly("x", &pa::StructuredPANOCLBFGSProgressInfo::x)
         .def_readonly("p", &pa::StructuredPANOCLBFGSProgressInfo::p)
@@ -402,7 +429,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
 
     py::class_<pa::PolymorphicPANOCSolver,
                std::shared_ptr<pa::PolymorphicPANOCSolver>,
-               pa::PolymorphicInnerSolverBase>(m, "PANOCSolver")
+               pa::PolymorphicInnerSolverBase>(
+        m, "PANOCSolver", "C++ documentation: :cpp:class:`pa::PANOCSolver`")
         .def(py::init([] {
             return std::make_shared<pa::PolymorphicPANOCSolver>(
                 pa::PANOCSolver<pa::PolymorphicPANOCDirectionBase>{
@@ -437,14 +465,15 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
              ":param x: Initial guess\n"
              ":param y: Initial Lagrange multipliers\n\n"
              ":return: * Solution :math:`x`\n"
-             "         * Lagrange multipliers :math:`y`\n"
+             "         * Updated Lagrange multipliers :math:`y`\n"
              "         * Slack variable error :math:`g(x) - z`\n"
              "         * Statistics\n\n")
         .def("__str__", &pa::PolymorphicPANOCSolver::get_name);
 
     py::class_<pa::PolymorphicPGASolver,
                std::shared_ptr<pa::PolymorphicPGASolver>,
-               pa::PolymorphicInnerSolverBase>(m, "PGASolver")
+               pa::PolymorphicInnerSolverBase>(
+        m, "PGASolver", "C++ documentation: :cpp:class:`pa::PGASolver`")
         .def(py::init<pa::PGAParams>())
         .def("set_progress_callback",
              &pa::PolymorphicPGASolver::set_progress_callback)
@@ -455,7 +484,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
 
     py::class_<pa::PolymorphicGAAPGASolver,
                std::shared_ptr<pa::PolymorphicGAAPGASolver>,
-               pa::PolymorphicInnerSolverBase>(m, "GAAPGASolver")
+               pa::PolymorphicInnerSolverBase>(
+        m, "GAAPGASolver", "C++ documentation: :cpp:class:`pa::GAAPGASolver`")
         .def(py::init<pa::GAAPGAParams>())
         .def("set_progress_callback",
              &pa::PolymorphicGAAPGASolver::set_progress_callback)
@@ -465,21 +495,26 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                             py::scoped_estream_redirect>())
         .def("__str__", &pa::PolymorphicGAAPGASolver::get_name);
 
-    py::enum_<pa::PANOCStopCrit>(m, "PANOCStopCrit")
+    py::enum_<pa::PANOCStopCrit>(
+        m, "PANOCStopCrit", "C++ documentation: :cpp:enum:`pa::PANOCStopCrit`")
         .value("ApproxKKT", pa::PANOCStopCrit::ApproxKKT)
         .value("ProjGradNorm", pa::PANOCStopCrit::ProjGradNorm)
         .value("ProjGradUnitNorm", pa::PANOCStopCrit::ProjGradUnitNorm)
         .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
         .export_values();
 
-    py::class_<pa::StructuredPANOCLBFGSParams>(m, "StructuredPANOCLBFGSParams")
+    py::class_<pa::StructuredPANOCLBFGSParams>(
+        m, "StructuredPANOCLBFGSParams",
+        "C++ documentation: :cpp:class:`pa::StructuredPANOCLBFGSParams`")
         .def(py::init<pa::StructuredPANOCLBFGSParams>())
         .def(py::init(&kwargs_to_struct<pa::StructuredPANOCLBFGSParams>))
         .def("to_dict", &struct_to_dict<pa::StructuredPANOCLBFGSParams>);
 
     py::class_<pa::PolymorphicStructuredPANOCLBFGSSolver,
                std::shared_ptr<pa::PolymorphicStructuredPANOCLBFGSSolver>,
-               pa::PolymorphicInnerSolverBase>(m, "StructuredPANOCLBFGSSolver")
+               pa::PolymorphicInnerSolverBase>(
+        m, "StructuredPANOCLBFGSSolver",
+        "C++ documentation: :cpp:class:`pa::StructuredPANOCLBFGSSolver`")
         .def(py::init<pa::StructuredPANOCLBFGSParams, pa::LBFGSParams>())
         .def("set_progress_callback",
              &pa::PolymorphicStructuredPANOCLBFGSSolver::set_progress_callback)
@@ -490,7 +525,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                             py::scoped_estream_redirect>())
         .def("__str__", &pa::PolymorphicStructuredPANOCLBFGSSolver::get_name);
 
-    py::class_<pa::ALMParams>(m, "ALMParams")
+    py::class_<pa::ALMParams>(m, "ALMParams",
+                              "C++ documentation: :cpp:class:`pa::ALMParams`")
         .def(py::init())
         .def(py::init(&kwargs_to_struct<pa::ALMParams>))
         .def("to_dict", &struct_to_dict<pa::ALMParams>)
@@ -521,18 +557,25 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("single_penalty_factor",
                        &pa::ALMParams::single_penalty_factor);
 
-    py::class_<pa::PolymorphicALMSolver>(m, "ALMSolver",
-                                         "Main augmented Lagrangian solver.")
+    py::class_<pa::PolymorphicALMSolver>(
+        m, "ALMSolver",
+        "Main augmented Lagrangian solver.\n\n"
+        "C++ documentation: :cpp:class:`pa::ALMSolver`")
         .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPANOCSolver>()),
-             "alm_params"_a, "panoc_solver"_a)
+             "alm_params"_a, "panoc_solver"_a,
+             "Build an ALM solver using PANOC as inner solver.")
         .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPGASolver>()),
-             "alm_params"_a, "pga_solver"_a)
+             "alm_params"_a, "pga_solver"_a,
+             "Build an ALM solver using the projected gradient algorithm as "
+             "inner solver.")
         .def(py::init(PolymorphicALMConstructor<
                       pa::PolymorphicStructuredPANOCLBFGSSolver>()),
-             "alm_params"_a, "structuredpanoc_solver"_a)
+             "alm_params"_a, "structuredpanoc_solver"_a,
+             "Build an ALM solver using Structured PANOC as inner solver.")
         .def(py::init(PolymorphicALMConstructor<
                       pa::PolymorphicInnerSolverTrampoline>()),
-             "alm_params"_a, "inner_solver"_a)
+             "alm_params"_a, "inner_solver"_a,
+             "Build an ALM solver using a custom inner solver.")
         .def_property_readonly("inner_solver",
                                [](const pa::PolymorphicALMSolver &s) {
                                    return s.inner_solver.solver;
@@ -554,10 +597,12 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             ":param x: Initial guess for decision variables :math:`x`\n\n"
             ":returns: (:math:`y`, :math:`x`, stats)");
 
-    m.def("load_casadi_problem", &load_CasADi_problem, "so_name"_a, "n"_a,
+    m.def("load_casadi_problem", &pa::load_CasADi_problem, "so_name"_a, "n"_a,
           "m"_a, "second_order"_a = false,
-          "Load a compiled CasADi problem without parameters");
-    m.def("load_casadi_problem_with_param", &load_CasADi_problem_with_param,
+          "Load a compiled CasADi problem without parameters.\n\n"
+          "C++ documentation: :cpp:func:`pa::load_CasADi_problem`");
+    m.def("load_casadi_problem_with_param", &pa::load_CasADi_problem_with_param,
           "so_name"_a, "n"_a, "m"_a, "second_order"_a = false,
-          "Load a compiled CasADi problem with parameters");
+          "Load a compiled CasADi problem with parameters.\n\n"
+          "C++ documentation: :cpp:func:`pa::load_CasADi_problem_with_param`");
 }

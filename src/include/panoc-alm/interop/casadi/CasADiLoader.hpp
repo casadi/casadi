@@ -4,6 +4,8 @@
 
 #include <memory>
 
+namespace pa {
+
 /// @addtogroup grp_ExternalProblemLoaders
 /// @{
 
@@ -72,3 +74,5 @@ ProblemWithParam load_CasADi_problem_with_param(const char *filename,
                                                 bool second_order = false);
 
 /// @}
+
+} // namespace pa
