@@ -50,7 +50,7 @@ We now build the optimization problem for |cpp_name| to solve::
     g = cs.vertcat(constraint_g_cubic, constraint_g_linear)
     g_function = cs.Function("g", [X, p], [g])
 
-Note that this is purely `|CasADi| <https://web.casadi.org/>`_ code, so thus far, everything we've done is independent of |pylib_name|. We now use the |CasADi| objects to build C-code of the cost and constraints for |cpp_name| to optimize::
+Note that this is purely `CasADi <https://web.casadi.org/>`_ code, so thus far, everything we've done is independent of |pylib_name|. We now use the |casadi| objects to build C-code of the cost and constraints for |cpp_name| to optimize::
 
     import panocpy as pa
     from tempfile import TemporaryDirectory
@@ -61,7 +61,7 @@ Note that this is purely `|CasADi| <https://web.casadi.org/>`_ code, so thus far
     # Compile and load the problem, and set the bounds 
     prob = compile_and_load_problem(cgen, n, m, name)
 
-The resulting object `prob` is an instance of `panocpy.Problem`. Before 
+The resulting object `prob` is an instance of :py:class:`panocpy._panocpy.Problem`. Before 
 we can solve the problem, we need to set a few numerical values to the 
 constraint bounds of this problem:: 
 
@@ -70,7 +70,7 @@ constraint bounds of this problem::
     prob.D.lowerbound = np.array([-np.inf, -np.inf])  # g_c <= 0 
     prob.D.upperbound = np.array([0, 0])              # g_l <= 0
 
-Next, we give the parameter $p$ some value::
+Next, we give the parameter :math:`p` some value::
 
     prob.param = np.array([100.])
 
