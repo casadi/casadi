@@ -1,8 +1,12 @@
 #pragma once
-#include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/directions/lbfgs.hpp>
+#include <panoc-alm/inner/panoc.hpp>
 
 #include <memory>
+
+#include <pybind11/cast.h>
+#include <pybind11/pytypes.h>
+namespace py = pybind11;
 
 namespace pa {
 
@@ -25,6 +29,7 @@ class PolymorphicPANOCDirectionBase
         apply(xₖ, x̂ₖ, pₖ, γ, qₖ);
         return qₖ;
     }
+    virtual py::object get_params() const = 0;
 };
 
 class PolymorphicPANOCDirectionTrampoline
@@ -55,6 +60,10 @@ class PolymorphicPANOCDirectionTrampoline
     std::string get_name() const override {
         PYBIND11_OVERRIDE_PURE(std::string, PolymorphicPANOCDirectionBase,
                                get_name, );
+    }
+    py::object get_params() const override {
+        PYBIND11_OVERRIDE_PURE(py::object, PolymorphicPANOCDirectionBase,
+                               get_params, );
     }
 };
 
@@ -115,6 +124,9 @@ class PolymorphicPANOCDirection : public PolymorphicPANOCDirectionBase {
     void reset() override { direction_provider.reset(); }
     std::string get_name() const override {
         return direction_provider.get_name();
+    }
+    py::object get_params() const override {
+        return py::cast(direction_provider.get_params());
     }
 
   private:

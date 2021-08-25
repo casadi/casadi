@@ -112,6 +112,7 @@ struct PANOCDirection<LBFGS> {
     void changed_γ(real_t γₖ, real_t old_γₖ);
     void reset();
     std::string get_name() const;
+    LBFGSParams get_params() const;
 };
 
 } // namespace pa

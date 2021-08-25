@@ -8,10 +8,10 @@
 #include <panoc-alm/util/solverstatus.hpp>
 
 #include <memory>
+#include <type_traits>
 
 #include <pybind11/cast.h>
 #include <pybind11/pybind11.h>
-#include <type_traits>
 namespace py = pybind11;
 
 namespace pa {
@@ -115,9 +115,10 @@ class PolymorphicInnerSolverBase
         /// [inout] Lagrange multipliers @f$ y @f$
         rvec y,
         /// [out]   Slack variable error @f$ g(x) - z @f$
-        rvec err_z)                      = 0;
-    virtual void stop()                  = 0;
-    virtual std::string get_name() const = 0;
+        rvec err_z)                       = 0;
+    virtual void stop()                   = 0;
+    virtual std::string get_name() const  = 0;
+    virtual py::object get_params() const = 0;
 };
 
 struct PolymorphicInnerSolverWrapper {
@@ -134,6 +135,8 @@ struct PolymorphicInnerSolverWrapper {
                                   err_z);
     }
     void stop() { solver->stop(); }
+    std::string get_name() const { return solver->get_name(); }
+    py::object get_params() const { return solver->get_params(); }
 };
 
 template <class InnerSolver>
@@ -176,6 +179,10 @@ class PolymorphicInnerSolverTrampoline : public PolymorphicInnerSolverBase {
     std::string get_name() const override {
         PYBIND11_OVERRIDE_PURE(std::string, PolymorphicInnerSolverBase,
                                get_name, );
+    }
+    py::object get_params() const override {
+        PYBIND11_OVERRIDE_PURE(py::object, PolymorphicInnerSolverBase,
+                               get_params, );
     }
     void stop() override {
         PYBIND11_OVERRIDE_PURE(void, PolymorphicInnerSolverBase, stop, );
@@ -363,13 +370,15 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
     }
     void stop() override { innersolver.stop(); }
     std::string get_name() const override { return innersolver.get_name(); }
+    py::object get_params() const override {
+        return py::cast(innersolver.get_params());
+    }
 
     void set_progress_callback(
         std::function<void(const typename InnerSolver::ProgressInfo &)> cb) {
         this->innersolver.set_progress_callback(std::move(cb));
     }
 
-  protected:
     InnerSolver innersolver;
 };
 

@@ -242,4 +242,8 @@ inline std::string PANOCDirection<LBFGS>::get_name() const {
     return lbfgs.get_name();
 }
 
+inline LBFGSParams PANOCDirection<LBFGS>::get_params() const {
+    return lbfgs.get_params();
+}
+
 } // namespace pa
