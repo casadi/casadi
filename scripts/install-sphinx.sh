@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 cd "$( dirname "${BASH_SOURCE[0]}" )"/..
 
-if [ -z "${VIRTUAL_ENV+x}" ]; then
+if [ -z "${VIRTUAL_ENV+x}" ] && [ $1 != "--force-install" ]; then
     echo "No active virtual environment, refusing to install."
     exit 1
 fi

@@ -41,6 +41,18 @@ function run_doxygen_coverage {
     rm -rf "$2/$dir"
     mv docs/Coverage "$2/$dir"
     popd
+
+    if [ "$1" = "main" ]; then dir="Sphinx"; else dir="$1/Sphinx"; fi
+    pushd ../..
+    rm -rf docs/Sphinx build
+    mkdir -p build
+    pushd doxygen
+    doxygen Doxyfile.breathe
+    popd 
+    sphinx-build -M html sphinx/source /tmp/sphinx-build
+    rm -rf "$2/$dir"
+    mv /tmp/sphinx-build/html "$2/$dir"
+    popd
 }
 
 # Generate the documentation for the current branch
