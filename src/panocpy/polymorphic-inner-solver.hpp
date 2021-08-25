@@ -32,14 +32,16 @@ class PolymorphicInnerSolverStatsAccumulatorBase
     : public std::enable_shared_from_this<
           PolymorphicInnerSolverStatsAccumulatorBase> {
   public:
-    virtual py::dict to_dict() const                                       = 0;
+    virtual ~PolymorphicInnerSolverStatsAccumulatorBase() = default;
+    virtual py::dict to_dict() const                      = 0;
     virtual void accumulate(const class PolymorphicInnerSolverStatsBase &) = 0;
 };
 
 class PolymorphicInnerSolverStatsBase
     : public std::enable_shared_from_this<PolymorphicInnerSolverStatsBase> {
   public:
-    virtual py::dict to_dict() const = 0;
+    virtual ~PolymorphicInnerSolverStatsBase() = default;
+    virtual py::dict to_dict() const           = 0;
     virtual std::shared_ptr<PolymorphicInnerSolverStatsAccumulatorBase>
     accumulator() const = 0;
 };
