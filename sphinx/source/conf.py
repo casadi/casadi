@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../../src/panocpy'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'panocpy'
+project = 'PanocPy'
 copyright = '2021, Pieter Pas'
 author = 'Pieter Pas'
 
@@ -137,8 +137,10 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
+title_string = 'PanocPy Documentation'
+
 latex_documents = [
-    (master_doc, 'panocpy.tex', 'panocpy Documentation',
+    (master_doc, 'panocpy.tex', title_string,
      'Pieter Pas', 'manual'),
 ]
 
@@ -148,7 +150,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'panocpy', 'panocpy Documentation',
+    (master_doc, 'panocpy', title_string,
      [author], 1)
 ]
 
@@ -159,7 +161,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'panocpy', 'panocpy Documentation',
+    (master_doc, 'panocpy', title_string,
      author, 'panocpy', 'One line description of project.',
      'Miscellaneous'),
 ]

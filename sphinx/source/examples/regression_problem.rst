@@ -1,4 +1,2 @@
 Nonlinear regression problem 
 ===============================
-
-.. TODO 
