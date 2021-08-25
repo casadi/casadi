@@ -3,6 +3,7 @@
 #include <panoc-alm/inner/decl/panoc-fwd.hpp>
 #include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
 #include <panoc-alm/util/atomic_stop_signal.hpp>
+#include <panoc-alm/util/lipschitz.hpp>
 #include <panoc-alm/util/problem.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
 
@@ -15,18 +16,8 @@ namespace pa {
 
 /// Tuning parameters for the second order PANOC algorithm.
 struct SecondOrderPANOCParams {
-    struct {
-        /// Initial estimate of the Lipschitz constant of ∇ψ(x)
-        real_t L₀ = 0;
-        /// Relative step size for initial finite difference Lipschitz estimate.
-        real_t ε = 1e-6;
-        /// Minimum step size for initial finite difference Lipschitz estimate.
-        real_t δ = 1e-12;
-        /// Factor that relates step size γ and Lipschitz constant.
-        real_t Lγ_factor = 0.95;
-    } Lipschitz; ///< Parameters related to the Lipschitz constant estimate
-                 ///  and step size.
-
+    /// Parameters related to the Lipschitz constant estimate and step size.
+    LipschitzEstimateParams Lipschitz;
     /// Maximum number of inner PANOC iterations.
     unsigned max_iter = 100;
     /// Maximum duration.

@@ -98,24 +98,15 @@ inline const kwargs_to_struct_table_t<pa::PANOCParams>
     };
 
 template <>
-inline const kwargs_to_struct_table_t<decltype(pa::PANOCParams::Lipschitz)>
-    kwargs_to_struct_table<decltype(pa::PANOCParams::Lipschitz)>{
-        {"L_0", &decltype(pa::PANOCParams::Lipschitz)::L₀},
-        {"δ", &decltype(pa::PANOCParams::Lipschitz)::δ},
-        {"ε", &decltype(pa::PANOCParams::Lipschitz)::ε},
-        {"Lγ_factor", &decltype(pa::PANOCParams::Lipschitz)::Lγ_factor},
+inline const kwargs_to_struct_table_t<pa::LipschitzEstimateParams>
+    kwargs_to_struct_table<pa::LipschitzEstimateParams>{
+        {"L_0", &pa::LipschitzEstimateParams::L₀},
+        {"δ", &pa::LipschitzEstimateParams::δ},
+        {"ε", &pa::LipschitzEstimateParams::ε},
+        {"Lγ_factor", &pa::LipschitzEstimateParams::Lγ_factor},
     };
 
 #include <panoc-alm/inner/pga.hpp>
-
-template <>
-inline const kwargs_to_struct_table_t<decltype(pa::PGAParams::Lipschitz)>
-    kwargs_to_struct_table<decltype(pa::PGAParams::Lipschitz)>{
-        {"L_0", &decltype(pa::PGAParams::Lipschitz)::L₀},
-        {"δ", &decltype(pa::PGAParams::Lipschitz)::δ},
-        {"ε", &decltype(pa::PGAParams::Lipschitz)::ε},
-        {"Lγ_factor", &decltype(pa::PGAParams::Lipschitz)::Lγ_factor},
-    };
 
 template <>
 inline const kwargs_to_struct_table_t<pa::PGAParams>
@@ -149,19 +140,6 @@ inline const kwargs_to_struct_table_t<pa::GAAPGAParams>
     };
 
 #include <panoc-alm/inner/decl/structured-panoc-lbfgs.hpp>
-
-// TODO: move Lipschitz to its own reusable struct
-
-template <>
-inline const kwargs_to_struct_table_t<decltype(
-    pa::StructuredPANOCLBFGSParams::Lipschitz)>
-    kwargs_to_struct_table<decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)>{
-        {"L_0", &decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)::L₀},
-        {"δ", &decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)::δ},
-        {"ε", &decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)::ε},
-        {"Lγ_factor",
-         &decltype(pa::StructuredPANOCLBFGSParams::Lipschitz)::Lγ_factor},
-    };
 
 template <>
 inline const kwargs_to_struct_table_t<pa::StructuredPANOCLBFGSParams>
