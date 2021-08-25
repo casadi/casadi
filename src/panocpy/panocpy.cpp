@@ -420,15 +420,26 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def(py::init(PolymorphicPANOCConstructor< //
                       pa::PolymorphicPANOCDirectionTrampoline>()),
              "panoc_params"_a, "direction"_a)
-        .def("set_progress_callback",
-             &pa::PolymorphicPANOCSolver::set_progress_callback, "callback"_a)
+        .def(
+            "set_progress_callback",
+            &pa::PolymorphicPANOCSolver::set_progress_callback, "callback"_a,
+            "Attach a callback that is called on each iteration of the solver.")
         .def("__call__",
              pa::InnerSolverCallWrapper<pa::PolymorphicPANOCSolver>(),
              py::call_guard<py::scoped_ostream_redirect,
                             py::scoped_estream_redirect>(),
              "problem"_a, "Σ"_a, "ε"_a, "x"_a,
              "y"_a, //
-             "Solve.\n\n:returns: (:math:`x`, :math:`y`, :math:`z`, stats)")
+             "Solve.\n\n"
+             ":param problem: Problem to solve\n"
+             ":param Σ: Penalty factor\n"
+             ":param ε: Desired tolerance\n"
+             ":param x: Initial guess\n"
+             ":param y: Initial Lagrange multipliers\n\n"
+             ":return: * Solution :math:`x`\n"
+             "         * Lagrange multipliers :math:`y`\n"
+             "         * Slack variable error :math:`g(x) - z`\n"
+             "         * Statistics\n\n")
         .def("__str__", &pa::PolymorphicPANOCSolver::get_name);
 
     py::class_<pa::PolymorphicPGASolver,
