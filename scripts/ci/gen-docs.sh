@@ -53,6 +53,7 @@ function run_doxygen_coverage {
     sphinx-build -M html sphinx/source /tmp/sphinx-build
     rm -rf "$2/$dir"
     mv /tmp/sphinx-build/html "$2/$dir"
+    touch "$2/$dir/.nojekyll"
     popd
 }
 
