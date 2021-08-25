@@ -110,4 +110,5 @@ include:
   - "_modules"
   - "_sources"
   - "_static"
+  - "_images"
 EOF
