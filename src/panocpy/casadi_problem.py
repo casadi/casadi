@@ -9,6 +9,19 @@ from panocpy import Problem
 def generate_casadi_problem(
     name: str, f: cs.Function, g: cs.Function, second_order: bool = False
 ) -> Tuple[cs.CodeGenerator, int, int, int]:
+    """Convert the objective and constraint functions into a CasADi code
+    generator.
+
+    :param f:            Objective function.
+    :param g:            Constraint function.
+    :param second_order: Whether to generate functions for evaluating Hessians.
+
+    :return:   * Code generator that generates the functions and derivatives
+                 used by the solvers.
+               * Dimensions of the decision variables (primal dimension).
+               * Number of nonlinear constraints (dual dimension).
+               * Number of parameters.
+    """
 
     assert f.n_in() in [1, 2]
     assert f.n_in() == g.n_in()
@@ -98,11 +111,13 @@ def compile_and_load_problem(
     """Compile the C-code using the given code-generator and load it as a
     panocpy Problem.
 
-    Args:
-        cgen (cs.CodeGenerator): Code generator to generate C-code for the costs and the constraints with.
-        n (int): Dimensions of the decision variables (primal dimension)
-        m (int): Number of nonlinear constraints (dual dimension)
-        name (str, optional): String description of the problem. Defaults to "PANOC_ALM_problem".
+    :param cgen: Code generator to generate C-code for the costs and the
+                 constraints with.
+    :param n:    Dimensions of the decision variables (primal dimension)
+    :param m:    Number of nonlinear constraints (dual dimension)
+    :param name: Optional string description of the problem (used for filename).
+
+    :return:   * Problem specification that can be passed to the solvers.
     """
 
     with TemporaryDirectory(prefix="") as tmpdir:
