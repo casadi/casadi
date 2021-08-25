@@ -62,6 +62,15 @@ Problem formulation
     :undoc-members:
     :special-members: __init__, __call__
 
+CasADi Interface
+----------------
+
+.. automodule:: panocpy.casadi_problem
+    :noindex:
+    :members:
+    :undoc-members:
+    :special-members: __init__, __call__
+
 All
 ---
 
