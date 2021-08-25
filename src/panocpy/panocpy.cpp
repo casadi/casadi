@@ -91,42 +91,55 @@ auto PolymorphicALMConversion() {
     };
 }
 
-struct ostream_redirect {
-    py::scoped_ostream_redirect stdout_stream{
-        std::cout,                                 // std::ostream&
-        py::module_::import("sys").attr("stdout"), // Python output
-    };
-    py::scoped_ostream_redirect stderr_stream{
-        std::cerr,                                 // std::ostream&
-        py::module_::import("sys").attr("stderr"), // Python output
-    };
-};
-
 PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     using py::operator""_a;
 
     m.doc() = "PANOC+ALM solvers"; // TODO
 
     py::class_<pa::Box>(m, "Box")
+        .def(py::init([](unsigned n) {
+                 return pa::Box{pa::vec::Constant(n, pa::inf),
+                                pa::vec::Constant(n, -pa::inf)};
+             }),
+             "n"_a,
+             "Create an :math:`n`-dimensional box at with bounds at "
+             ":math:`\\pm\\infty` (no constraints).")
         .def_readwrite("upperbound", &pa::Box::upperbound)
         .def_readwrite("lowerbound", &pa::Box::lowerbound);
 
     py::class_<pa::Problem>(m, "Problem")
         // .def(py::init())
-        .def(py::init<unsigned, unsigned>(), "n"_a, "m"_a)
-        .def_readwrite("n", &pa::Problem::n)
-        .def_readwrite("m", &pa::Problem::m)
-        .def_readwrite("C", &pa::Problem::C)
-        .def_readwrite("D", &pa::Problem::D)
-        .def_property("f", prob_getter_f(), prob_setter_f())
-        .def_property("grad_f", prob_getter_grad_f(), prob_setter_grad_f())
-        .def_property("g", prob_getter_g(), prob_setter_g())
+        .def(py::init<unsigned, unsigned>(), "n"_a, "m"_a,
+             ":param n: Number of unknowns\n"
+             ":param m: Number of constraints")
+        .def_readwrite("n", &pa::Problem::n,
+                       "Number of unknowns, dimension of :math:`x`")
+        .def_readwrite(
+            "m", &pa::Problem::m,
+            "Number of general constraints, dimension of :math:`g(x)`")
+        .def_readwrite("C", &pa::Problem::C, "Box constraints on :math:`x`")
+        .def_readwrite("D", &pa::Problem::D, "Box constraints on :math:`g(x)`")
+        .def_property("f", prob_getter_f(), prob_setter_f(),
+                      "Objective funcion, :math:`f(x)`")
+        .def_property(
+            "grad_f", prob_getter_grad_f(), prob_setter_grad_f(),
+            "Gradient of the objective function, :math:`\\nabla f(x)`")
+        .def_property("g", prob_getter_g(), prob_setter_g(),
+                      "Constraint function, :math:`g(x)`")
         .def_property("grad_g_prod", prob_getter_grad_g_prod(),
-                      prob_setter_grad_g_prod())
-        .def_property("grad_gi", prob_getter_grad_gi(), prob_setter_grad_gi())
-        .def_property("hess_L", prob_getter_hess_L(), prob_setter_hess_L())
+                      prob_setter_grad_g_prod(),
+                      "Gradient of constraint function times vector, "
+                      ":math:`\\nabla g(x)\\, v`")
+        .def_property("grad_gi", prob_getter_grad_gi(), prob_setter_grad_gi(),
+                      "Gradient vector of the :math:`i`-th component of the "
+                      "constriant function, :math:`\\nabla g_i(x)`")
+        .def_property(
+            "hess_L", prob_getter_hess_L(), prob_setter_hess_L(),
+            "Hessian of the Lagrangian function, :math:`\\nabla^2_{xx} L(x,y)`")
         .def_property("hess_L_prod", prob_getter_hess_L_prod(),
-                      prob_setter_hess_L_prod());
+                      prob_setter_hess_L_prod(),
+                      "Hessian of the Lagrangian function times vector, "
+                      ":math:`\\nabla^2_{xx} L(x,y)\\, v`");
 
     py::class_<ProblemWithParam, pa::Problem>(m, "ProblemWithParam")
         .def(py::init<unsigned, unsigned>(), "n"_a, "m"_a)
@@ -145,11 +158,15 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                       prob_setter_hess_L_prod())
         .def_property(
             "param", py::overload_cast<>(&ProblemWithParam::get_param),
-            py::overload_cast<pa::crvec>(&ProblemWithParam::set_param));
+            py::overload_cast<pa::crvec>(&ProblemWithParam::set_param),
+            "Parameter vector :math:`p` of the problem");
 
     py::class_<pa::PolymorphicPANOCDirectionBase,
                std::shared_ptr<pa::PolymorphicPANOCDirectionBase>,
-               pa::PolymorphicPANOCDirectionTrampoline>(m, "PANOCDirection")
+               pa::PolymorphicPANOCDirectionTrampoline>(
+        m, "PANOCDirection",
+        "Class that provides fast directions for the PANOC algorithm (e.g. "
+        "L-BFGS)")
         .def(py::init<>())
         .def("initialize", &pa::PolymorphicPANOCDirectionBase::initialize)
         .def("update", &pa::PolymorphicPANOCDirectionBase::update)
@@ -162,7 +179,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<pa::PolymorphicLBFGSDirection,
                std::shared_ptr<pa::PolymorphicLBFGSDirection>,
                pa::PolymorphicPANOCDirectionBase>(m, "LBFGSDirection")
-        .def(py::init<pa::LBFGSParams>())
+        .def(py::init<pa::LBFGSParams>(), "params"_a)
         .def("initialize", &pa::PolymorphicLBFGSDirection::initialize)
         .def("update", &pa::PolymorphicLBFGSDirection::update)
         .def("apply", &pa::PolymorphicLBFGSDirection::apply_ret)
@@ -194,15 +211,14 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .value("BasedOnCurvature", pa::LBFGSStepSize::BasedOnCurvature)
         .export_values();
 
-    using paPANOCParamsLipschitz = decltype(pa::PANOCParams::Lipschitz);
-    py::class_<paPANOCParamsLipschitz>(m, "PANOCParamsLipschitz")
+    py::class_<pa::LipschitzEstimateParams>(m, "LipschitzEstimateParams")
         .def(py::init())
-        .def(py::init(&kwargs_to_struct<paPANOCParamsLipschitz>))
-        .def("to_dict", &struct_to_dict<paPANOCParamsLipschitz>)
-        .def_readwrite("L_0", &paPANOCParamsLipschitz::L₀)
-        .def_readwrite("ε", &paPANOCParamsLipschitz::ε)
-        .def_readwrite("δ", &paPANOCParamsLipschitz::δ)
-        .def_readwrite("Lγ_factor", &paPANOCParamsLipschitz::Lγ_factor);
+        .def(py::init(&kwargs_to_struct<pa::LipschitzEstimateParams>))
+        .def("to_dict", &struct_to_dict<pa::LipschitzEstimateParams>)
+        .def_readwrite("L_0", &pa::LipschitzEstimateParams::L₀)
+        .def_readwrite("ε", &pa::LipschitzEstimateParams::ε)
+        .def_readwrite("δ", &pa::LipschitzEstimateParams::δ)
+        .def_readwrite("Lγ_factor", &pa::LipschitzEstimateParams::Lγ_factor);
 
     py::class_<pa::PANOCParams>(m, "PANOCParams")
         .def(py::init())
@@ -250,16 +266,6 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("__call__", &pa::PolymorphicInnerSolverBase::operator())
         .def("stop", &pa::PolymorphicInnerSolverBase::stop)
         .def("get_name", &pa::PolymorphicInnerSolverBase::get_name);
-
-    using paPGAParamsLipschitz = decltype(pa::PGAParams::Lipschitz);
-    py::class_<paPGAParamsLipschitz>(m, "PGAParamsLipschitz")
-        .def(py::init())
-        .def(py::init(&kwargs_to_struct<paPGAParamsLipschitz>))
-        .def("to_dict", &struct_to_dict<paPGAParamsLipschitz>)
-        .def_readwrite("L_0", &paPGAParamsLipschitz::L₀)
-        .def_readwrite("ε", &paPGAParamsLipschitz::ε)
-        .def_readwrite("δ", &paPGAParamsLipschitz::δ)
-        .def_readwrite("Lγ_factor", &paPGAParamsLipschitz::Lγ_factor);
 
     py::class_<pa::PGAParams>(m, "PGAParams")
         .def(py::init())
@@ -329,26 +335,45 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             return std::sqrt(p.norm_sq_p) / p.γ;
         });
 
-    py::class_<pa::PANOCProgressInfo>(m, "PANOCProgressInfo")
-        .def_readonly("k", &pa::PANOCProgressInfo::k)
-        .def_readonly("x", &pa::PANOCProgressInfo::x)
-        .def_readonly("p", &pa::PANOCProgressInfo::p)
-        .def_readonly("norm_sq_p", &pa::PANOCProgressInfo::norm_sq_p)
-        .def_readonly("x_hat", &pa::PANOCProgressInfo::x_hat)
-        .def_readonly("φγ", &pa::PANOCProgressInfo::ψ)
-        .def_readonly("ψ", &pa::PANOCProgressInfo::ψ)
-        .def_readonly("grad_ψ", &pa::PANOCProgressInfo::grad_ψ)
+    py::class_<pa::PANOCProgressInfo>(
+        m, "PANOCProgressInfo", "Data passed to the PANOC progress callback")
+        .def_readonly("k", &pa::PANOCProgressInfo::k, //
+                      "Iteration")
+        .def_readonly("x", &pa::PANOCProgressInfo::x, //
+                      "Decision variable :math:`x`")
+        .def_readonly("p", &pa::PANOCProgressInfo::p, //
+                      "Projected gradient step :math:`p`")
+        .def_readonly("norm_sq_p", &pa::PANOCProgressInfo::norm_sq_p, //
+                      ":math:`\\left\\|p\\right\\|^2`")
+        .def_readonly(
+            "x_hat", &pa::PANOCProgressInfo::x_hat, //
+            "Decision variable after projected gradient step :math:`\\hat x`")
+        .def_readonly("φγ", &pa::PANOCProgressInfo::φγ, //
+                      "Forward-backward envelope :math:`\\varphi_\\gamma(x)`")
+        .def_readonly("ψ", &pa::PANOCProgressInfo::ψ, //
+                      "Objective value :math:`\\psi(x)`")
+        .def_readonly("grad_ψ", &pa::PANOCProgressInfo::grad_ψ, //
+                      "Gradient of objective :math:`\\nabla\\psi(x)`")
         .def_readonly("ψ_hat", &pa::PANOCProgressInfo::ψ_hat)
         .def_readonly("grad_ψ_hat", &pa::PANOCProgressInfo::grad_ψ_hat)
-        .def_readonly("L", &pa::PANOCProgressInfo::L)
-        .def_readonly("γ", &pa::PANOCProgressInfo::γ)
-        .def_readonly("τ", &pa::PANOCProgressInfo::τ)
-        .def_readonly("ε", &pa::PANOCProgressInfo::ε)
-        .def_readonly("Σ", &pa::PANOCProgressInfo::Σ)
-        .def_readonly("y", &pa::PANOCProgressInfo::y)
-        .def_property_readonly("fpr", [](const pa::PANOCProgressInfo &p) {
-            return std::sqrt(p.norm_sq_p) / p.γ;
-        });
+        .def_readonly("L", &pa::PANOCProgressInfo::L, //
+                      "Estimate of Lipschitz constant of objective :math:`L`")
+        .def_readonly("γ", &pa::PANOCProgressInfo::γ,
+                      "Step size :math:`\\gamma`")
+        .def_readonly("τ", &pa::PANOCProgressInfo::τ, //
+                      "Line search parameter :math:`\\tau`")
+        .def_readonly("ε", &pa::PANOCProgressInfo::ε, //
+                      "Tolerance reached :math:`\\varepsilon_k`")
+        .def_readonly("Σ", &pa::PANOCProgressInfo::Σ, //
+                      "Penalty factor :math:`\\Sigma`")
+        .def_readonly("y", &pa::PANOCProgressInfo::y, //
+                      "Lagrange multipliers :math:`y`")
+        .def_property_readonly(
+            "fpr",
+            [](const pa::PANOCProgressInfo &p) {
+                return std::sqrt(p.norm_sq_p) / p.γ;
+            },
+            "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
 
     py::class_<pa::StructuredPANOCLBFGSProgressInfo>(
         m, "StructuredPANOCLBFGSProgressInfo")
@@ -378,19 +403,32 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<pa::PolymorphicPANOCSolver,
                std::shared_ptr<pa::PolymorphicPANOCSolver>,
                pa::PolymorphicInnerSolverBase>(m, "PANOCSolver")
+        .def(py::init([] {
+            return std::make_shared<pa::PolymorphicPANOCSolver>(
+                pa::PANOCSolver<pa::PolymorphicPANOCDirectionBase>{
+                    pa::PANOCParams{},
+                    std::static_pointer_cast<pa::PolymorphicPANOCDirectionBase>(
+                        std::make_shared<pa::PolymorphicLBFGSDirection>(
+                            pa::LBFGSParams{}))});
+        }))
         .def(py::init(PolymorphicPANOCConstructor< //
-                      pa::PolymorphicLBFGSDirection>()))
+                      pa::PolymorphicLBFGSDirection>()),
+             "panoc_params"_a, "lbfgs_direction"_a)
         .def(py::init(PolymorphicPANOCConversion< //
-                      pa::PolymorphicLBFGSDirection,
-                      pa::LBFGSParams>()))
+                      pa::PolymorphicLBFGSDirection, pa::LBFGSParams>()),
+             "panoc_params"_a, "lbfgs_params"_a)
         .def(py::init(PolymorphicPANOCConstructor< //
-                      pa::PolymorphicPANOCDirectionTrampoline>()))
+                      pa::PolymorphicPANOCDirectionTrampoline>()),
+             "panoc_params"_a, "direction"_a)
         .def("set_progress_callback",
-             &pa::PolymorphicPANOCSolver::set_progress_callback)
+             &pa::PolymorphicPANOCSolver::set_progress_callback, "callback"_a)
         .def("__call__",
              pa::InnerSolverCallWrapper<pa::PolymorphicPANOCSolver>(),
              py::call_guard<py::scoped_ostream_redirect,
-                            py::scoped_estream_redirect>())
+                            py::scoped_estream_redirect>(),
+             "problem"_a, "Σ"_a, "ε"_a, "x"_a,
+             "y"_a, //
+             "Solve.\n\n:returns: (:math:`x`, :math:`y`, :math:`z`, stats)")
         .def("__str__", &pa::PolymorphicPANOCSolver::get_name);
 
     py::class_<pa::PolymorphicPGASolver,
@@ -422,19 +460,6 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .value("ProjGradUnitNorm", pa::PANOCStopCrit::ProjGradUnitNorm)
         .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
         .export_values();
-
-    using paStructuredPANOCLBFGSParamsLipschitz =
-        decltype(pa::StructuredPANOCLBFGSParams::Lipschitz);
-    py::class_<paStructuredPANOCLBFGSParamsLipschitz>(
-        m, "StructuredPANOCLBFGSParamsLipschitz")
-        .def(py::init())
-        .def(py::init(&kwargs_to_struct<paStructuredPANOCLBFGSParamsLipschitz>))
-        .def("to_dict", &struct_to_dict<paStructuredPANOCLBFGSParamsLipschitz>)
-        .def_readwrite("L_0", &paStructuredPANOCLBFGSParamsLipschitz::L₀)
-        .def_readwrite("ε", &paStructuredPANOCLBFGSParamsLipschitz::ε)
-        .def_readwrite("δ", &paStructuredPANOCLBFGSParamsLipschitz::δ)
-        .def_readwrite("Lγ_factor",
-                       &paStructuredPANOCLBFGSParamsLipschitz::Lγ_factor);
 
     py::class_<pa::StructuredPANOCLBFGSParams>(m, "StructuredPANOCLBFGSParams")
         .def(py::init<pa::StructuredPANOCLBFGSParams>())
@@ -485,17 +510,22 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("single_penalty_factor",
                        &pa::ALMParams::single_penalty_factor);
 
-    py::class_<pa::PolymorphicALMSolver>(m, "ALMSolver")
-        .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPANOCSolver>()))
-        .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPGASolver>()))
+    py::class_<pa::PolymorphicALMSolver>(m, "ALMSolver",
+                                         "Main augmented Lagrangian solver.")
+        .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPANOCSolver>()),
+             "alm_params"_a, "panoc_solver"_a)
+        .def(py::init(PolymorphicALMConstructor<pa::PolymorphicPGASolver>()),
+             "alm_params"_a, "pga_solver"_a)
         .def(py::init(PolymorphicALMConstructor<
-                      pa::PolymorphicStructuredPANOCLBFGSSolver>()))
-        .def(py::init(
-            PolymorphicALMConstructor<pa::PolymorphicInnerSolverTrampoline>()))
-        .def("inner_solver",
-             [](const pa::PolymorphicALMSolver &s) {
-                 return s.inner_solver.solver;
-             })
+                      pa::PolymorphicStructuredPANOCLBFGSSolver>()),
+             "alm_params"_a, "structuredpanoc_solver"_a)
+        .def(py::init(PolymorphicALMConstructor<
+                      pa::PolymorphicInnerSolverTrampoline>()),
+             "alm_params"_a, "inner_solver"_a)
+        .def_property_readonly("inner_solver",
+                               [](const pa::PolymorphicALMSolver &s) {
+                                   return s.inner_solver.solver;
+                               })
         .def(
             "__call__",
             [](pa::PolymorphicALMSolver &solver, const pa::Problem &p,
@@ -505,10 +535,18 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                                        stats_to_dict(stats));
             },
             py::call_guard<py::scoped_ostream_redirect,
-                           py::scoped_estream_redirect>());
+                           py::scoped_estream_redirect>(),
+            "problem"_a, "y"_a, "x"_a,
+            "Solve.\n\n"
+            ":param problem: Problem to solve.\n"
+            ":param y: Initial guess for Lagrange multipliers :math:`y`\n"
+            ":param x: Initial guess for decision variables :math:`x`\n\n"
+            ":returns: (:math:`y`, :math:`x`, stats)");
 
     m.def("load_casadi_problem", &load_CasADi_problem, "so_name"_a, "n"_a,
-          "m"_a, "second_order"_a = false);
+          "m"_a, "second_order"_a = false,
+          "Load a compiled CasADi problem without parameters");
     m.def("load_casadi_problem_with_param", &load_CasADi_problem_with_param,
-          "so_name"_a, "n"_a, "m"_a, "second_order"_a = false);
+          "so_name"_a, "n"_a, "m"_a, "second_order"_a = false,
+          "Load a compiled CasADi problem with parameters");
 }
