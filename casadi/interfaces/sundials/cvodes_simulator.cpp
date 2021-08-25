@@ -215,8 +215,8 @@ void CvodesSimulator::reset(SimulatorMemory* mem, double t, const double* x, con
   if (y && ny_ > 0) eval_y(m, t, x, u, z, p, y);
 }
 
-void CvodesSimulator::advance(SimulatorMemory* mem, double t, double* x, const double* u,
-    double* z, const double* p, double* y) const {
+void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop, double* x,
+    const double* u, double* z, const double* p, double* y) const {
   auto m = to_mem(mem);
   // Consistency checks
   casadi_assert(t >= grid_.front(),
@@ -226,8 +226,8 @@ void CvodesSimulator::advance(SimulatorMemory* mem, double t, double* x, const d
     "CvodesSimulator::integrate(" + str(t) + "): "
     "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
     "unless stop_at_end is set to False.");
-  // Do not integrate past change in input signal
-  if (nu_ > 0) setStopTime(m, t);
+  // Do not integrate past change in input signals or past the end
+  THROWING(CVodeSetStopTime, m->mem, t_stop);
   // Integrate
   THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
   // Set function outputs
@@ -292,12 +292,6 @@ int CvodesSimulator::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
     uerr() << "jtimes failed: " << e.what() << std::endl;
     return -1;
   }
-}
-
-void CvodesSimulator::setStopTime(SimulatorMemory* mem, double tf) const {
-  // Set the stop time of the integration -- don't integrate past this point
-  auto m = to_mem(mem);
-  THROWING(CVodeSetStopTime, m->mem, tf);
 }
 
 int CvodesSimulator::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,

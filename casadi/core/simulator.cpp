@@ -181,10 +181,16 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   if (x) x += nx_;
   if (z) z += nz_;
   if (y) y += ny_;
+  // Next stop time due to step change in input
+  casadi_int k_stop = next_stop(1, u);
   // Integrate forward
   for (casadi_int k = 1; k < grid_.size(); ++k) {
+    // Update stopping time, if needed
+    if (k > k_stop) k_stop = next_stop(k, u);
     // Integrate forward
-    advance(m, grid_[k], x, u, z, p, y);
+    if (verbose_) casadi_message("Integrating to " + str(grid_[k])
+      + ", stopping time " + str(grid_[k_stop]));
+    advance(m, grid_[k], grid_[k_stop], x, u, z, p, y);
     if (x) x += nx_;
     if (u) u += nu_;
     if (z) z += nz_;
@@ -345,6 +351,25 @@ void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const do
   std::fill_n(mem->res, enum_traits<DynOut>::n_enum, nullptr);
   mem->res[DYN_Y] = y;
   if (calc_function(mem, "dae")) casadi_error("'dae' calculation failed");
+}
+
+casadi_int Simulator::next_stop(casadi_int k, const double* u) const {
+  // Integrate till the end if no input signals
+  if (nu_ == 0 || u == 0) return grid_.size() - 1;
+  // Find the next discontinuity, if any
+  for (; k + 1 < grid_.size(); ++k) {
+    // Next control value
+    const double *u_next = u + nu_;
+    // Check if there is any change in input from k to k + 1
+    for (casadi_int i = 0; i < nu_; ++i) {
+      // Step change detected: stop integration at k
+      if (u[i] != u_next[i]) return k;
+    }
+    // Shift u
+    u = u_next;
+  }
+  // No step changes detected
+  return k;
 }
 
 } // namespace casadi

@@ -92,8 +92,11 @@ public:
     const double* z, const double* p, double* y) const = 0;
 
   /** \brief  Advance solution in time */
-  virtual void advance(SimulatorMemory* mem, double t, double* x, const double* u, double* z,
-    const double* p, double* y) const = 0;
+  virtual void advance(SimulatorMemory* mem, double t, double t_stop, double* x, const double* u,
+    double* z, const double* p, double* y) const = 0;
+
+  /** \brief  Find next stop time */
+  casadi_int next_stop(casadi_int k, const double* u) const;
 
   /** \brief  Evaluate output function */
   virtual void eval_y(SimulatorMemory* mem, double t, const double* x, const double* u,

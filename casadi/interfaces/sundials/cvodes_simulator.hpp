@@ -120,11 +120,8 @@ public:
     const double* p, double* y) const override;
 
   /** \brief  Advance solution in time */
-  void advance(SimulatorMemory* mem, double t, double* x, const double* u, double* z,
-    const double* p, double* y) const override;
-
-  /** \brief  Set the stop time of the forward integration */
-  void setStopTime(SimulatorMemory* mem, double tf) const override;
+  void advance(SimulatorMemory* mem, double t, double t_stop, double* x, const double* u,
+    double* z, const double* p, double* y) const override;
 
   /** \brief Cast to memory object */
   static CvodesSimMemory* to_mem(void *mem) {
