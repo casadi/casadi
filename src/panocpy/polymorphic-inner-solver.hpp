@@ -326,7 +326,7 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
         WrappedStats(const Stats &stats) : stats(stats) {}
         Stats stats;
         std::shared_ptr<PolymorphicInnerSolverStatsAccumulatorBase>
-        accumulator() const {
+        accumulator() const override {
             return std::static_pointer_cast<
                 PolymorphicInnerSolverStatsAccumulatorBase>(
                 std::make_shared<WrappedStatsAccumulator>());
