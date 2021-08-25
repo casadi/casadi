@@ -53,7 +53,6 @@ function run_doxygen_coverage {
     sphinx-build -M html sphinx/source /tmp/sphinx-build
     rm -rf "$2/$dir"
     mv /tmp/sphinx-build/html "$2/$dir"
-    touch "$2/$dir/.nojekyll"
     popd
 }
 
@@ -106,3 +105,9 @@ done
 
 echo -e "\n***\n" >> "$README"
 # echo "<sup>Updated on $(date)</sup>" >> "$README"
+cat > "$output_folder/_config.yml" << EOF
+include:
+  - "_modules"
+  - "_sources"
+  - "_static"
+EOF
