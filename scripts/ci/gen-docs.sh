@@ -78,14 +78,18 @@ echo "Documentation for" \
 > "$README"
 # Always have a link to main, it's at the root of the docs folder
 echo -e '\n### Main Branch\n' >> "$README"
-echo '- [main](Doxygen/index.html)' >> "$README"
+echo "- **main**  " >> "$README"
+echo "  [Sphinx](Sphinx/index.html)"\
+        "─ [Doxygen](Doxygen/index.html)" >> "$README"
 # Find all tags with documentation (version numbers)
 echo -e '\n### Tags and Releases\n' >> "$README"
 git tag -l --sort=-creatordate \
  | while read tag; do
     index="$output_folder/$tag/Doxygen/index.html"
     if [ -e "$index" ]; then
-        echo "- [$tag]($tag/Doxygen/index.html)" >> "$README"
+        echo "- **$tag**  " >> "$README"
+        echo "  [Sphinx]($tag/Sphinx/index.html)"\
+             "─ [Doxygen]($tag/Doxygen/index.html)" >> "$README"
     else
         echo "tag $tag has no documentation"
     fi
@@ -97,7 +101,9 @@ git branch -r --sort=-committerdate | cut -d / -f 2 \
 do
     index="$output_folder/$branch/Doxygen/index.html"
     if [ -e "$index" ]; then
-        echo "- [$branch]($branch/Doxygen/index.html)" >> "$README"
+        echo "- **$branch**  " >> "$README"
+        echo "  [Sphinx]($branch/Sphinx/index.html)"\
+             "─ [Doxygen]($branch/Doxygen/index.html)" >> "$README"
     else
         echo "branch $branch has no documentation"
     fi
