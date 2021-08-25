@@ -44,11 +44,12 @@ function run_doxygen_coverage {
 
     if [ "$1" = "main" ]; then dir="Sphinx"; else dir="$1/Sphinx"; fi
     pushd ../..
-    rm -rf docs/Sphinx build
+    rm -rf docs/Sphinx build _skbuild
     mkdir -p build
     pushd doxygen
     doxygen Doxyfile.breathe
-    popd 
+    popd
+    python3 setup.py install
     sphinx-build -M html sphinx/source /tmp/sphinx-build
     rm -rf "$2/$dir"
     mv /tmp/sphinx-build/html "$2/$dir"
