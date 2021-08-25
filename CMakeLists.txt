@@ -49,10 +49,21 @@ endif()
 
 # ----
 
-# Add export documentation target
-add_custom_target(documentation 
+# Add documentation targets
+add_custom_target(documentation-doxygen
     doxygen
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/doxygen)
+add_custom_target(documentation-doxygen-breathe
+    doxygen Doxyfile.breathe
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/doxygen)
+add_custom_target(documentation-sphinx
+    sphinx-build -M html 
+        ${CMAKE_CURRENT_LIST_DIR}/sphinx/source 
+        ${CMAKE_CURRENT_LIST_DIR}/docs/Sphinx
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+add_dependencies(documentation-sphinx documentation-doxygen-breathe)
+add_custom_target(documentation)
+add_dependencies(documentation documentation-doxygen documentation-sphinx)
 
 # Add coverage target
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")

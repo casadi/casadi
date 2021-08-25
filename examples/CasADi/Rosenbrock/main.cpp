@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
         so_name = argv[1];
 
     // Load the problem (with 3 decision variables and 1 general constraint)
-    pa::Problem p = load_CasADi_problem(so_name, 3, 1);
+    pa::Problem p = pa::load_CasADi_problem(so_name, 3, 1);
 
     // Specify the bounds
     p.C.upperbound = vec::Constant(3, inf);

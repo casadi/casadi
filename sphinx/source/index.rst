@@ -15,6 +15,8 @@ an efficient C++ implementation of an Augmented Lagrangian solver for general no
    usage/*
    install/*
    examples/examples_landing_page
+   reference/python-api.rst
+   reference/cpp-api.rst
    api
    contribution/*
    changelog

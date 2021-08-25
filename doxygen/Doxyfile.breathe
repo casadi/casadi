@@ -1,0 +1,11 @@
+@INCLUDE               = "Doxyfile.common"
+FILE_PATTERNS          = *.cpp \
+                         *.h \
+                         *.hpp \
+                         *.ipp \
+                         *.md \
+                         *.dox
+GENERATE_HTML          = NO
+GENERATE_XML           = YES
+XML_OUTPUT             = ../build/xml
+EXCLUDE                = ../src/panocpy

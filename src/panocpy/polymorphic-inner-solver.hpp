@@ -19,10 +19,10 @@ namespace pa {
 template <class InnerSolver>
 auto InnerSolverCallWrapper() {
     return [](InnerSolver &solver, const pa::Problem &p, pa::crvec Σ,
-              pa::real_t ε, bool always_overwrite_results, pa::vec x,
+              pa::real_t ε, pa::vec x,
               pa::vec y) -> std::tuple<pa::vec, pa::vec, pa::vec, py::dict> {
         pa::vec z(p.m);
-        auto stats = solver(p, Σ, ε, always_overwrite_results, x, y, z);
+        auto stats = solver(p, Σ, ε, true, x, y, z);
         return std::make_tuple(std::move(x), std::move(y), std::move(z),
                                stats.ptr->to_dict());
     };
@@ -32,14 +32,16 @@ class PolymorphicInnerSolverStatsAccumulatorBase
     : public std::enable_shared_from_this<
           PolymorphicInnerSolverStatsAccumulatorBase> {
   public:
-    virtual py::dict to_dict() const                                       = 0;
+    virtual ~PolymorphicInnerSolverStatsAccumulatorBase() = default;
+    virtual py::dict to_dict() const                      = 0;
     virtual void accumulate(const class PolymorphicInnerSolverStatsBase &) = 0;
 };
 
 class PolymorphicInnerSolverStatsBase
     : public std::enable_shared_from_this<PolymorphicInnerSolverStatsBase> {
   public:
-    virtual py::dict to_dict() const = 0;
+    virtual ~PolymorphicInnerSolverStatsBase() = default;
+    virtual py::dict to_dict() const           = 0;
     virtual std::shared_ptr<PolymorphicInnerSolverStatsAccumulatorBase>
     accumulator() const = 0;
 };
@@ -324,7 +326,7 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
         WrappedStats(const Stats &stats) : stats(stats) {}
         Stats stats;
         std::shared_ptr<PolymorphicInnerSolverStatsAccumulatorBase>
-        accumulator() const {
+        accumulator() const override {
             return std::static_pointer_cast<
                 PolymorphicInnerSolverStatsAccumulatorBase>(
                 std::make_shared<WrappedStatsAccumulator>());

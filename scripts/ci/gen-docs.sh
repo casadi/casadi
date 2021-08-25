@@ -41,6 +41,19 @@ function run_doxygen_coverage {
     rm -rf "$2/$dir"
     mv docs/Coverage "$2/$dir"
     popd
+
+    if [ "$1" = "main" ]; then dir="Sphinx"; else dir="$1/Sphinx"; fi
+    pushd ../..
+    rm -rf docs/Sphinx build _skbuild
+    mkdir -p build
+    pushd doxygen
+    doxygen Doxyfile.breathe
+    popd
+    python3 setup.py install
+    sphinx-build -M html sphinx/source /tmp/sphinx-build
+    rm -rf "$2/$dir"
+    mv /tmp/sphinx-build/html "$2/$dir"
+    popd
 }
 
 # Generate the documentation for the current branch
@@ -92,3 +105,9 @@ done
 
 echo -e "\n***\n" >> "$README"
 # echo "<sup>Updated on $(date)</sup>" >> "$README"
+cat > "$output_folder/_config.yml" << EOF
+include:
+  - "_modules"
+  - "_sources"
+  - "_static"
+EOF

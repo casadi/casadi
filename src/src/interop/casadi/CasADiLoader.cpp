@@ -2,6 +2,8 @@
 #include <panoc-alm/interop/casadi/CasADiFunctionWrapper.hpp>
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
 
+namespace pa {
+
 std::function<pa::Problem::f_sig> load_CasADi_objective(const char *so_name,
                                                         const char *fun_name) {
     return CasADiFun_1Vi1So(casadi::external(fun_name, so_name));
@@ -106,3 +108,5 @@ ProblemWithParam load_CasADi_problem_with_param(const char *so_name, unsigned n,
     }
     return prob;
 }
+
+} // namespace pa

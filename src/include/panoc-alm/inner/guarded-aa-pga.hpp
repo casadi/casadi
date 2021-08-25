@@ -4,6 +4,7 @@
 #include <panoc-alm/inner/detail/anderson-helpers.hpp>
 #include <panoc-alm/inner/detail/panoc-helpers.hpp>
 #include <panoc-alm/util/atomic_stop_signal.hpp>
+#include <panoc-alm/util/lipschitz.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
 
 #include <cassert>
@@ -16,15 +17,8 @@
 namespace pa {
 
 struct GAAPGAParams {
-    struct {
-        /// Relative step size for initial finite difference Lipschitz estimate.
-        real_t ε = 1e-6;
-        /// Minimum step size for initial finite difference Lipschitz estimate.
-        real_t δ = 1e-12;
-        /// Factor that relates step size γ and Lipschitz constant.
-        real_t Lγ_factor = 0.95;
-    } Lipschitz; ///< Parameters related to the Lipschitz constant estimate
-                 ///  and step size.
+    /// Parameters related to the Lipschitz constant estimate and step size.
+    LipschitzEstimateParams Lipschitz;
     /// Length of the history to keep in the limited-memory QR algorithm.
     unsigned limitedqr_mem = 10;
     /// Maximum number of inner iterations.
