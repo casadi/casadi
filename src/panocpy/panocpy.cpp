@@ -605,11 +605,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                 return std::make_tuple(std::move(*x), std::move(*y),
                                        stats_to_dict(stats));
             },
-            py::arg("problem"), py::arg("x") = std::nullopt,
-            py::arg("y") = std::nullopt,
+            "problem"_a, "x"_a = std::nullopt, "y"_a = std::nullopt,
             py::call_guard<py::scoped_ostream_redirect,
                            py::scoped_estream_redirect>(),
-            "problem"_a, "y"_a, "x"_a,
             "Solve.\n\n"
             ":param problem: Problem to solve.\n"
             ":param y: Initial guess for Lagrange multipliers :math:`y`\n"
