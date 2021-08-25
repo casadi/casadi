@@ -34,6 +34,14 @@ Outer ALM solver
     :undoc-members:
     :special-members: __init__, __call__
 
+CasADi Interface
+-----------------
+
+.. automodule:: panocpy.casadi_problem
+    :members:
+    :undoc-members:
+    :special-members: __init__, __call__
+
 All
 ---
 
@@ -41,3 +49,4 @@ All
     :members:
     :undoc-members:
     :special-members: __init__, __call__
+

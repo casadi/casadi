@@ -1,5 +1,9 @@
 from typing import Tuple
 import casadi as cs
+from tempfile import TemporaryDirectory
+import os 
+from panocpy import load_casadi_problem_with_param
+from panocpy import Problem 
 
 
 def generate_casadi_problem(
@@ -83,3 +87,22 @@ def generate_casadi_problem(
             )
         )
     return cg, n, m, p
+
+
+def compile_and_load_problem(cgen: cs.CodeGenerator, n: int, m: int, name: str = "PANOC_ALM_problem", ) -> Problem:
+    """Compile the C-code using the given code-generator and load it as a 
+    panocpy Problem. 
+
+    Args:
+        cgen (cs.CodeGenerator): Code generator to generate C-code for the costs and the constraints with. 
+        n (int): Dimensions of the decision variables (primal dimension) 
+        m (int): Number of nonlinear constraints (dual dimension)
+        name (str, optional): String description of the problem. Defaults to "PANOC_ALM_problem".
+    """
+    
+    with TemporaryDirectory(prefix="") as tmpdir:
+        cfile = cgen.generate(tmpdir)
+        sofile = os.path.join(tmpdir, f"{name}.so")
+        os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
+        prob = load_casadi_problem_with_param(sofile, n, m)
+    return prob 
