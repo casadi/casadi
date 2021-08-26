@@ -13,7 +13,7 @@ b = np.array([-1])
 x = cs.SX.sym("x", 2)
 f = cs.Function("f", [x], [0.5 * cs.dot(x, H @ x)])
 g = cs.Function("g", [x], [A @ x])
-problem = pa.generate_and_compile_casadi_problem("example_name", f, g)
+problem = pa.generate_and_compile_casadi_problem(f, g, "example_name")
 
 # Specify the bounds
 problem.C.lowerbound = np.full((problem.n,), -np.inf)
@@ -50,7 +50,7 @@ x = np.array([2, 2]) # decision variables
 y = np.array([1])    # Lagrange multipliers
 
 # Solve the problem
-y_sol, x_sol, stats = solver(problem, y, x)
+x_sol, y_sol, stats = solver(problem, x, y)
 
 # Print the results
 print(f"""
