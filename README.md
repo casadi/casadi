@@ -9,9 +9,8 @@ PANOC + Augmented Lagrangian Method.
 
 ## Documentation
 
-[**Installation**](https://tttapa.github.io/PANOC-ALM/Doxygen/installation.html)  
-[**Examples**](https://tttapa.github.io/PANOC-ALM/Doxygen/examples.html)  
-[**Documentation**](https://tttapa.github.io/PANOC-ALM/Doxygen/index.html)  
-
-The [**modules**](https://tttapa.github.io/PANOC-ALM/Doxygen/modules.html)
-page is the best place to start.
+[**Sphinx documentation**](https://tttapa.github.io/PANOC-ALM/Sphinx/index.html)  
+[**Doxygen documentation**](https://tttapa.github.io/PANOC-ALM/Doxygen/index.html)  
+<!-- [**Installation** (C++)](https://tttapa.github.io/PANOC-ALM/Doxygen/installation.html)   -->
+<!-- [**Examples**](https://tttapa.github.io/PANOC-ALM/Doxygen/examples.html)   -->
+<!-- [**Documentation**](https://tttapa.github.io/PANOC-ALM/Doxygen/index.html)   -->
