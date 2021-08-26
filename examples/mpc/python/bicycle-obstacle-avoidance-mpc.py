@@ -136,5 +136,3 @@ ax.set_ylabel("Run time [s]")
 plt.show()
 
 # %%
-
-# %%

@@ -73,7 +73,7 @@ solver = pa.PANOCSolver(
     pa.PANOCParams(max_iter=200, print_interval=1),
     pa.LBFGSParams(memory=5),
 )
-x, y, err_z, stats = solver(p, Σ, ε, True, x0, y0)
+x, y, err_z, stats = solver(p, Σ, ε, x0, y0)
 print(x)
 print(y)
 print(err_z)
@@ -115,7 +115,8 @@ class CustomInnerSolver(pa.InnerSolver):
         return self.solver.stop()
 
     def __call__(self, problem, Σ, ε, always_overwrite_results, x, y):
-        x, y, err_z, stats = self.solver(problem, Σ, ε, always_overwrite_results, x, y)
+        # TODO: always_overwrite_results
+        x, y, err_z, stats = self.solver(problem, Σ, ε, x, y)
 
         def accumulate(acc: dict, s: dict):
             for k, v in s.items():
