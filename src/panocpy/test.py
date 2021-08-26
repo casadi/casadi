@@ -167,7 +167,7 @@ f = cs.Function("f", [x], [f_])
 g = cs.Function("g", [x], [g_])
 
 name = "testproblem"
-cgen, n, m, num_p = pa.generate_casadi_problem(name, f, g)
+cgen, n, m, num_p = pa.generate_casadi_problem(f, g, name=name)
 
 with TemporaryDirectory(prefix="") as tmpdir:
     cfile = cgen.generate(tmpdir)

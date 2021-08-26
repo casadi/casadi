@@ -6,7 +6,10 @@ import os
 
 
 def generate_casadi_problem(
-    name: str, f: cs.Function, g: cs.Function, second_order: bool = False
+    f: cs.Function,
+    g: cs.Function,
+    second_order: bool = False,
+    name: str = "PANOC_ALM_problem",
 ) -> Tuple[cs.CodeGenerator, int, int, int]:
     """Convert the objective and constraint functions into a CasADi code
     generator.
@@ -14,6 +17,7 @@ def generate_casadi_problem(
     :param f:            Objective function.
     :param g:            Constraint function.
     :param second_order: Whether to generate functions for evaluating Hessians.
+    :param name: Optional string description of the problem (used for filename).
 
     :return:   * Code generator that generates the functions and derivatives
                  used by the solvers.
@@ -146,5 +150,5 @@ def generate_and_compile_casadi_problem(
 
     :return:   * Problem specification that can be passed to the solvers.
     """
-    cgen = generate_casadi_problem(name, f, g, second_order)
+    cgen = generate_casadi_problem(f, g, second_order, name)
     return compile_and_load_problem(*cgen, name)

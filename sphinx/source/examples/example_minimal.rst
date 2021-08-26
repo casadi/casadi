@@ -46,11 +46,11 @@ Note that this is purely `CasADi <https://web.casadi.org/>`_ code, so thus far, 
     import panocpy as pa
     import numpy as np
 
-    cgen, n, m, num_p = pa.generate_casadi_problem(name, cost_function, g_function)
+    cgen, n, m, num_p = pa.generate_casadi_problem(cost_function, g_function, name=name)
     # Code generator, dimension of decision variables, number of constraints (dual dimension), parameter dimension
 
     # Compile and load the problem
-    prob = pa.compile_and_load_problem(cgen, n, m, num_p, name)
+    prob = pa.compile_and_load_problem(cgen, n, m, num_p, name=name)
 
 The resulting object `prob` is an instance of :py:class:`panocpy._panocpy.Problem`. Before 
 we can solve the problem, we need to set a few numerical values to the 

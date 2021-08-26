@@ -34,7 +34,7 @@ from tempfile import TemporaryDirectory
 name = "mpcproblem"
 f_prob = cs.Function("f", [nlp["x"], nlp["p"]], [nlp["f"]])
 g_prob = cs.Function("g", [nlp["x"], nlp["p"]], [nlp["g"]])
-cgen, n, m, num_p = pa.generate_casadi_problem(name, f_prob, g_prob)
+cgen, n, m, num_p = pa.generate_casadi_problem(f_prob, g_prob, name=name)
 
 with TemporaryDirectory(prefix="") as tmpdir:
     cfile = cgen.generate(tmpdir)

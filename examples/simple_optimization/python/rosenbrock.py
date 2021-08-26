@@ -30,7 +30,7 @@ g_function = cs.Function("g", [X, p], [g])
 import panocpy as pa
 import numpy as np
 
-cgen, n, m, num_p = pa.generate_casadi_problem(name, cost_function, g_function)
+cgen, n, m, num_p = pa.generate_casadi_problem(cost_function, g_function, name=name)
 # Code generator, dimension of decision variables, number of constraints (dual dimension), parameter dimension
 
 # Compile and load the problem, and set the bounds
