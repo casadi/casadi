@@ -58,7 +58,11 @@ cmake .. \
     -D WITH_DL=On \
     -D WITH_IPOPT=On \
     -D CMAKE_INSTALL_PREFIX="$VIRTUAL_ENV" \
-    -D CMAKE_BUILD_TYPE="${build_type}"
+    -D CMAKE_BUILD_TYPE="${build_type}" \
+    -D PYTHON_VERSION_STRING="$(python --version | cut -f2 -d' ')" \
+    -D PYTHON_EXECUTABLE="$(which python)" \
+    -D PYTHON_LIBRARY="$(python -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR") + "/" + sysconfig.get_config_var("LDLIBRARY"))')" \
+    -D PYTHON_INCLUDE_DIR="$(python -c 'import sysconfig; print(sysconfig.get_path("include"))')"
 make -j$(nproc)
 make install
 popd
