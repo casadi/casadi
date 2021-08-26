@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 import casadi as cs
 import panocpy as pa
 from tempfile import TemporaryDirectory
@@ -104,15 +104,17 @@ def compile_and_load_problem(
     cgen: cs.CodeGenerator,
     n: int,
     m: int,
+    p: int,
     name: str = "PANOC_ALM_problem",
-) -> pa.Problem:
+) -> Union[pa.Problem, pa.ProblemWithParam]:
     """Compile the C-code using the given code-generator and load it as a
     panocpy Problem.
 
     :param cgen: Code generator to generate C-code for the costs and the
                  constraints with.
-    :param n:    Dimensions of the decision variables (primal dimension)
-    :param m:    Number of nonlinear constraints (dual dimension)
+    :param n:    Dimensions of the decision variables (primal dimension).
+    :param m:    Number of nonlinear constraints (dual dimension).
+    :param p:    Number of parameters.
     :param name: Optional string description of the problem (used for filename).
 
     :return:   * Problem specification that can be passed to the solvers.
@@ -122,20 +124,27 @@ def compile_and_load_problem(
         cfile = cgen.generate(tmpdir)
         sofile = os.path.join(tmpdir, f"{name}.so")
         os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
-        prob = pa.load_casadi_problem_with_param(sofile, n, m)
+        if p > 0:
+            prob = pa.load_casadi_problem_with_param(sofile, n, m)
+        else:
+            prob = pa.load_casadi_problem(sofile, n, m)
     return prob
 
 
 def generate_and_compile_casadi_problem(
-    name: str, f: cs.Function, g: cs.Function, second_order: bool = False
-) -> pa.Problem:
-    cgen, n, m, num_p = pa.generate_casadi_problem(name, f, g, second_order)
+    f: cs.Function,
+    g: cs.Function,
+    second_order: bool = False,
+    name: str = "PANOC_ALM_problem",
+) -> Union[pa.Problem, pa.ProblemWithParam]:
+    """Compile the objective and constraint functions into a panocpy Problem.
 
-    with TemporaryDirectory(prefix="") as tmpdir:
-        cfile = cgen.generate(tmpdir)
-        sofile = os.path.join(tmpdir, f"{name}.so")
-        os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
-        if num_p > 0:
-            return pa.load_casadi_problem_with_param(sofile, n, m)
-        else:
-            return pa.load_casadi_problem(sofile, n, m)
+    :param f:            Objective function.
+    :param g:            Constraint function.
+    :param second_order: Whether to generate functions for evaluating Hessians.
+    :param name: Optional string description of the problem (used for filename).
+
+    :return:   * Problem specification that can be passed to the solvers.
+    """
+    cgen = generate_casadi_problem(name, f, g, second_order)
+    return compile_and_load_problem(*cgen, name)
