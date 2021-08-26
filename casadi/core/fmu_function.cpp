@@ -255,7 +255,7 @@ void Fmu::request(int mem, size_t id) {
   m.requested_.at(id) = true;
 }
 
-int Fmu::eval(int mem) {
+int Fmu::eval(int mem, const FmuFunction& f) {
   // Gather inputs and outputs
   gather_io(mem);
   // Get memory
@@ -263,7 +263,9 @@ int Fmu::eval(int mem) {
   // Number of inputs and outputs
   size_t n_set = m.id_in_.size();
   size_t n_out = m.id_out_.size();
-  // Set all variables
+  // Reset solver
+  if (setup_experiment(mem, f)) return 1;
+  // Set all variables before initialization
   fmi2Status status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
@@ -273,7 +275,7 @@ int Fmu::eval(int mem) {
   if (enter_initialization_mode(mem)) return 1;
   // Initialization mode ends
   if (exit_initialization_mode(mem)) return 1;
-  // Set all variables again (state variables get reset during initialization?)
+  // Set all variables
   status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
@@ -571,10 +573,8 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
       }
     }
   }
-  // Reset solver
-  if (setup_experiment(mem, f)) return 1;
   // Evaluate
-  if (eval(mem)) return 1;
+  if (eval(mem, f)) return 1;
   // Reset solver
   if (reset(mem)) return 1;
   // Get outputs
@@ -597,10 +597,8 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
       set(mem, f.id_in_[k][i], arg[k] ? arg[k][i] : 0);
     }
   }
-  // Reset solver
-  if (setup_experiment(mem, f)) return 1;
   // Evaluate
-  if (eval(mem)) return 1;
+  if (eval(mem, f)) return 1;
   // Loop over function inputs
   for (size_t i1 = 0; i1 < f.id_in_.size(); ++i1) {
     // Calculate Jacobian, one column at a time
@@ -654,10 +652,8 @@ int Fmu::eval_adj(int mem, const double** arg, double** res, const FmuFunction& 
       set(mem, f.id_in_[k][i], arg[k] ? arg[k][i] : 0);
     }
   }
-  // Setup experiment
-  if (setup_experiment(mem, f)) return 1;
   // Evaluate
-  if (eval(mem)) return 1;
+  if (eval(mem, f)) return 1;
   // Loop over function inputs
   for (size_t i1 = 0; i1 < f.id_in_.size(); ++i1) {
     // Sensitivities to be calculated

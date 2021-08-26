@@ -95,7 +95,7 @@ struct CASADI_EXPORT Fmu {
   void request(int mem, size_t id);
 
   // Calculate all requested variables
-  int eval(int mem);
+  int eval(int mem, const FmuFunction& f);
 
   // Get a calculated variable
   void get(int mem, size_t id, double* value);
