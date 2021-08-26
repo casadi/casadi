@@ -43,7 +43,7 @@ L = x1**2 + x2**2 + u**2
 tgrid = [T/N*k for k in range(N+1)]
 
 # CVODES from the SUNDIALS suite
-dae = {'x':x, 'u':u, 'ode':xdot, 'y' : L}
+dae = {'x':x, 'u':u, 'ode':xdot, 'ydef' : L}
 F = simulator('F', 'cvodes', dae, tgrid, dict(newton_scheme = 'direct', print_stats = True))
 
 # Test input

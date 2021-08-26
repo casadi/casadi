@@ -657,31 +657,55 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
   std::copy(new_z.begin(), new_z.end(), z_.begin());
 }
 
-void DaeBuilderInternal::clear_in(const std::string& v) {
+std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) {
   switch (to_enum<DaeBuilderInternalIn>(v)) {
-  case DAE_BUILDER_T: return t_.clear();
-  case DAE_BUILDER_P: return p_.clear();
-  case DAE_BUILDER_U: return u_.clear();
-  case DAE_BUILDER_X: return x_.clear();
-  case DAE_BUILDER_Z: return z_.clear();
-  case DAE_BUILDER_Q: return q_.clear();
-  case DAE_BUILDER_C: return c_.clear();
-  case DAE_BUILDER_D: return d_.clear();
-  case DAE_BUILDER_W: return w_.clear();
-  case DAE_BUILDER_Y: return y_.clear();
+  case DAE_BUILDER_T: return t_;
+  case DAE_BUILDER_P: return p_;
+  case DAE_BUILDER_U: return u_;
+  case DAE_BUILDER_X: return x_;
+  case DAE_BUILDER_Z: return z_;
+  case DAE_BUILDER_Q: return q_;
+  case DAE_BUILDER_C: return c_;
+  case DAE_BUILDER_D: return d_;
+  case DAE_BUILDER_W: return w_;
+  case DAE_BUILDER_Y: return y_;
   default: break;
   }
-  casadi_error("Cannot clear input: " + v);
+  // Unsuccessful
+  casadi_error("Cannot access input indices for " + v);
+  // Just to resolve warnings
+  static std::vector<size_t> dummy;
+  return dummy;
+}
+
+const std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) const {
+  return const_cast<DaeBuilderInternal*>(this)->ind_in(v);
+}
+
+std::vector<size_t>& DaeBuilderInternal::ind_out(const std::string& v) {
+  switch (to_enum<DaeBuilderInternalOut>(v)) {
+  case DAE_BUILDER_ODE: return ode_;
+  case DAE_BUILDER_ALG: return alg_;
+  case DAE_BUILDER_QUAD: return quad_;
+  default: break;
+  }
+  // Unsuccessful
+  casadi_error("Cannot access output indices for " + v);
+  // Just to resolve warnings
+  static std::vector<size_t> dummy;
+  return dummy;
+}
+
+const std::vector<size_t>& DaeBuilderInternal::ind_out(const std::string& v) const {
+  return const_cast<DaeBuilderInternal*>(this)->ind_out(v);
+}
+
+void DaeBuilderInternal::clear_in(const std::string& v) {
+  ind_in(v).clear();
 }
 
 void DaeBuilderInternal::clear_out(const std::string& v) {
-  switch (to_enum<DaeBuilderInternalOut>(v)) {
-  case DAE_BUILDER_ODE: return ode_.clear();
-  case DAE_BUILDER_ALG: return alg_.clear();
-  case DAE_BUILDER_QUAD: return quad_.clear();
-  default: break;
-  }
-  casadi_error("Cannot clear output: " + v);
+  ind_out(v).clear();
 }
 
 void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {

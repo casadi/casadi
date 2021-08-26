@@ -124,7 +124,7 @@ public:
   const Sparsity&  u() const { return oracle_.sparsity_in(DYN_U);}
   const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
   const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
-  const Sparsity&  y() const { return oracle_.sparsity_out(DYN_Y);}
+  const Sparsity&  y() const { return oracle_.sparsity_out(DYN_YDEF);}
   ///@}
 
   // Time grid

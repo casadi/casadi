@@ -358,7 +358,7 @@ public:
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const;
 
-  /** \brief  Load a function from an FMU DLL
+  /** \brief  Load a function from an FMU DLL, indices provided
     \param name    Name assigned to the resulting function object
     \param comp_in   Names of all the input components
     \param comp_out  Names of all the output components
@@ -373,6 +373,24 @@ public:
       const std::vector<std::string>& name_out,
       const Dict& opts=Dict()) const;
   ///@}
+
+  /** \brief  Load a function from an FMU DLL, names provided
+    \param name    Name assigned to the resulting function object
+    \param name_in   Names of all the inputs
+    \param name_out  Names of all the outputs
+    \param opts    Optional settings
+  */
+  Function fmu_fun(const std::string& name,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts=Dict()) const;
+  ///@}
+
+  /** \brief  Load a function from an FMU DLL, standard IO conforming with simulator
+    \param name    Name assigned to the resulting function object
+    \param opts    Optional settings
+  */
+  Function fmu_fun(const std::string& name, const Dict& opts=Dict()) const;
 
   /// Get variable expression by name
   MX var(const std::string& name) const;

@@ -44,7 +44,7 @@ std::string to_string(DynOut v) {
   switch (v) {
   case DYN_ODE: return "ode";
   case DYN_ALG: return "alg";
-  case DYN_Y: return "y";
+  case DYN_YDEF: return "ydef";
   default: break;
   }
   return "";
@@ -115,12 +115,20 @@ std::string simulator_out(casadi_int ind) {
   return std::string();
 }
 
-casadi_int simulator_n_in() {
-  return SIMULATOR_NUM_IN;
+std::vector<std::string> dyn_in() {
+  return enum_names<DynIn>();
 }
 
-casadi_int simulator_n_out() {
-  return SIMULATOR_NUM_OUT;
+std::vector<std::string> dyn_out() {
+  return enum_names<DynOut>();
+}
+
+std::string dyn_in(casadi_int ind) {
+  return to_string(static_cast<DynIn>(ind));
+}
+
+std::string dyn_out(casadi_int ind) {
+  return to_string(static_cast<DynOut>(ind));
 }
 
 Simulator::Simulator(const std::string& name, const Function& oracle,
@@ -336,7 +344,7 @@ Function Simulator::map2oracle(const std::string& name,
     "Dimension mismatch for 'alg'");
   de_out[DYN_ALG] = project(de_out[DYN_ALG], de_in[DYN_Z].sparsity());
   // Construct
-  return Function(name, de_in, de_out, enum_names<DynIn>(), enum_names<DynOut>(), opts);
+  return Function(name, de_in, de_out, dyn_in(), dyn_out(), opts);
 }
 
 void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const double* u,
@@ -349,7 +357,7 @@ void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const do
   mem->arg[DYN_Z] = z;
   mem->arg[DYN_P] = p;
   std::fill_n(mem->res, enum_traits<DynOut>::n_enum, nullptr);
-  mem->res[DYN_Y] = y;
+  mem->res[DYN_YDEF] = y;
   if (calc_function(mem, "dae")) casadi_error("'dae' calculation failed");
 }
 
