@@ -408,7 +408,10 @@ public:
   ///@}
 
   /// Get variable expression by name
+  ///@{
   MX operator()(const std::string& name) const {return var(name);}
+  std::vector<MX> operator()(const std::vector<std::string>& name) const {return var(name);}
+  ///@}
 
   /// Get a derivative expression by name
   MX der(const std::string& name) const;
