@@ -2231,13 +2231,21 @@ std::string DaeBuilderInternal::dll_suffix() {
 #endif
 }
 
-void DaeBuilderInternal::init_fmu() const {
+void DaeBuilderInternal::reset_fmu() const {
 #ifdef WITH_FMU
-  // Free existing instance, if any
   if (fmu_) {
     delete fmu_;
     fmu_ = 0;
   }
+#else  // WITH_FMU
+  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
+#endif  // WITH_FMU
+}
+
+void DaeBuilderInternal::init_fmu() const {
+#ifdef WITH_FMU
+  // Free existing instance, if any
+  if (fmu_) reset_fmu();
   // Allocate new instance
   fmu_ = new Fmu(*this);
   // Directory where the DLL is stored, per the FMI specification

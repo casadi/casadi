@@ -156,20 +156,25 @@ int Fmu::checkout() {
   // Mark as in use
   casadi_assert(!m.in_use, "Memory object is already in use");
   m.in_use = true;
-  // Create instance if one is not already allocated
-  if (m.c == 0) m.c = instantiate();
-  // Allocate/reset value buffer
-  m.buffer_.resize(self_.variables_.size());
-  std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
-  // Allocate/reset sensitivities
-  m.sens_.resize(self_.variables_.size());
-  std::fill(m.sens_.begin(), m.sens_.end(), 0);
-  // Allocate/reset changed
-  m.changed_.resize(self_.variables_.size());
-  std::fill(m.changed_.begin(), m.changed_.end(), false);
-  // Allocate/reset requested
-  m.requested_.resize(self_.variables_.size());
-  std::fill(m.requested_.begin(), m.requested_.end(), false);
+  // Check if already instantiated
+  if (m.c == 0) {
+    // Create instance
+    m.c = instantiate();
+    // Always initialize before first call
+    m.need_init = true;
+    // Allocate/reset value buffer
+    m.buffer_.resize(self_.variables_.size());
+    std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
+    // Allocate/reset sensitivities
+    m.sens_.resize(self_.variables_.size());
+    std::fill(m.sens_.begin(), m.sens_.end(), 0);
+    // Allocate/reset changed
+    m.changed_.resize(self_.variables_.size());
+    std::fill(m.changed_.begin(), m.changed_.end(), false);
+    // Allocate/reset requested
+    m.requested_.resize(self_.variables_.size());
+    std::fill(m.requested_.begin(), m.requested_.end(), false);
+  }
   // Return memory object
   return mem;
 }
@@ -263,18 +268,25 @@ int Fmu::eval(int mem, const FmuFunction& f) {
   // Number of inputs and outputs
   size_t n_set = m.id_in_.size();
   size_t n_out = m.id_out_.size();
-  // Reset solver
-  if (setup_experiment(mem, f)) return 1;
-  // Set all variables before initialization
-  fmi2Status status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
-  if (status != fmi2OK) {
-    casadi_warning("fmi2SetReal failed");
-    return 1;
+  // Fmi return flag
+  fmi2Status status;
+  // Initialize, if needed
+  if (m.need_init) {
+    // Reset solver
+    if (setup_experiment(mem, f)) return 1;
+    // Set all variables before initialization
+    status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
+    if (status != fmi2OK) {
+      casadi_warning("fmi2SetReal failed");
+      return 1;
+    }
+    // Initialization mode begins
+    if (enter_initialization_mode(mem)) return 1;
+    // Initialization mode ends
+    if (exit_initialization_mode(mem)) return 1;
+    // Initialized
+    m.need_init = false;
   }
-  // Initialization mode begins
-  if (enter_initialization_mode(mem)) return 1;
-  // Initialization mode ends
-  if (exit_initialization_mode(mem)) return 1;
   // Set all variables
   status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
   if (status != fmi2OK) {
@@ -576,7 +588,7 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
   // Evaluate
   if (eval(mem, f)) return 1;
   // Reset solver
-  if (reset(mem)) return 1;
+  //if (reset(mem)) return 1;
   // Get outputs
   for (size_t k = 0; k < f.id_out_.size(); ++k) {
     if (res[k]) {
@@ -640,7 +652,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
     }
   }
   // Reset solver
-  if (reset(mem)) return 1;
+  //if (reset(mem)) return 1;
   // Successful return
   return 0;
 }
@@ -690,7 +702,7 @@ int Fmu::eval_adj(int mem, const double** arg, double** res, const FmuFunction& 
     }
   }
   // Reset solver
-  if (reset(mem)) return 1;
+  //if (reset(mem)) return 1;
   // Successful return
   return 0;
 }

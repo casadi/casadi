@@ -257,6 +257,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
       const Dict& opts) const;
   ///@}
 
+  /// Free all FMU instances
+  void reset_fmu() const;
+
   /// Function corresponding to all equations
   Function gather_eq() const;
 

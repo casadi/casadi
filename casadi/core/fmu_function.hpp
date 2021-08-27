@@ -159,6 +159,8 @@ struct CASADI_EXPORT Fmu {
     fmi2Component c;
     // Currently in use
     bool in_use;
+    // Need to initialize
+    bool need_init;
     // Value buffer
     std::vector<double> buffer_;
     // Sensitivities

@@ -392,6 +392,9 @@ public:
   */
   Function fmu_fun(const std::string& name, const Dict& opts=Dict()) const;
 
+  /// Free all FMU instances
+  void reset_fmu() const;
+
   /// Get variable expression by name
   MX var(const std::string& name) const;
 

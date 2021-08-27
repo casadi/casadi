@@ -835,6 +835,14 @@ Function DaeBuilder::fmu_fun(const std::string& name, const Dict& opts) const {
   }
 }
 
+void DaeBuilder::reset_fmu() const {
+  try {
+    (*this)->reset_fmu();
+  } catch (std::exception& e) {
+    THROW_ERROR("reset_fmu", e.what());
+  }
+}
+
 Variable& DaeBuilder::variable(const std::string& name) {
   try {
     return (*this)->variable(name);
