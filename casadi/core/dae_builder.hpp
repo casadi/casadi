@@ -403,18 +403,21 @@ public:
 
   ///@{
   /// Get binding equation by name
-  MX beq(const std::string& name, bool derivative = false) const;
-  std::vector<MX> beq(const std::vector<std::string>& name, bool derivative = false) const;
+  MX beq(const std::string& name) const;
+  std::vector<MX> beq(const std::vector<std::string>& name) const;
   ///@}
 
-  /// Get variable expression by name
   ///@{
+  /// Get variable expression by name
   MX operator()(const std::string& name) const {return var(name);}
   std::vector<MX> operator()(const std::vector<std::string>& name) const {return var(name);}
   ///@}
 
-  /// Get a derivative expression by name
-  MX der(const std::string& name) const;
+  ///@{
+  /// Get the time derivative of an expression
+  std::string der(const std::string& name) const;
+  std::vector<std::string> der(const std::vector<std::string>& name) const;
+  ///@}
 
   ///@{
   /// Get/set value reference
@@ -526,6 +529,12 @@ public:
   /// Access a variable by name
   Variable& variable(const std::string& name);
   const Variable& variable(const std::string& name) const;
+  ///@}
+
+  ///@{
+  /// Access a variable by index
+  Variable& variable(size_t ind);
+  const Variable& variable(size_t ind) const;
   ///@}
 
   /// Access a member function or object

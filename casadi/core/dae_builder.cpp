@@ -530,42 +530,49 @@ std::vector<MX> DaeBuilder::var(const std::vector<std::string>& name) const {
   }
 }
 
-MX DaeBuilder::beq(const std::string& name, bool derivative) const {
+std::string DaeBuilder::der(const std::string& name) const {
   try {
     // Get variable index
     size_t ind = find(name);
-    // Differentiate, if requested
-    if (derivative) {
-      ind = (*this)->variable(ind).antiderivative;
-      casadi_assert(ind >= 0, "No derivative expression for " + name);
-    }
-    // Return binding equation
-    return (*this)->variable(name).beq;
+    // Differentiate
+    ind = variable(ind).antiderivative;
+    casadi_assert(ind >= 0, "No derivative expression for " + name);
+    // Return name
+    return variable(ind).name;
   } catch (std::exception& e) {
-    THROW_ERROR("beq", e.what());
-    return MX();  // never reached
+    THROW_ERROR("der", e.what());
+    return std::string();  // never reached
   }
 }
 
-std::vector<MX> DaeBuilder::beq(const std::vector<std::string>& name, bool derivative) const {
+std::vector<std::string> DaeBuilder::der(const std::vector<std::string>& name) const {
   try {
-    std::vector<MX> r(name.size());
-    for (size_t i = 0; i < r.size(); ++i) r[i] = beq(name[i], derivative);
+    std::vector<std::string> r(name.size());
+    for (size_t i = 0; i < r.size(); ++i) r[i] = der(name[i]);
     return r;
   } catch (std::exception& e) {
-    THROW_ERROR("beq", e.what());
+    THROW_ERROR("der", e.what());
     return {};  // never reached
   }
 }
 
-MX DaeBuilder::der(const std::string& name) const {
+MX DaeBuilder::beq(const std::string& name) const {
   try {
-    casadi_int ind = variable(name).antiderivative;
-    casadi_assert(ind >= 0, "No derivative expression found for " + name);
-    return (*this)->variables_.at(ind).v;
+    return variable(name).beq;
   } catch (std::exception& e) {
-    THROW_ERROR("der", e.what());
+    THROW_ERROR("beq", e.what());
     return MX();  // never reached
+  }
+}
+
+std::vector<MX> DaeBuilder::beq(const std::vector<std::string>& name) const {
+  try {
+    std::vector<MX> r(name.size());
+    for (size_t i = 0; i < r.size(); ++i) r[i] = beq(name[i]);
+    return r;
+  } catch (std::exception& e) {
+    THROW_ERROR("beq", e.what());
+    return {};  // never reached
   }
 }
 
@@ -903,6 +910,22 @@ const Variable& DaeBuilder::variable(const std::string& name) const {
   }
 }
 
+Variable& DaeBuilder::variable(size_t ind) {
+  try {
+    return (*this)->variable(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("variable", e.what());
+  }
+}
+
+const Variable& DaeBuilder::variable(size_t ind) const {
+  try {
+    return (*this)->variable(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("variable", e.what());
+  }
+}
+
 bool DaeBuilder::test_cast(const SharedObjectInternal* ptr) {
   return dynamic_cast<const DaeBuilderInternal*>(ptr) != nullptr;
 }
@@ -956,7 +979,7 @@ std::vector<size_t> DaeBuilder::find(const std::vector<std::string>& name) const
 
 const std::string& DaeBuilder::name(size_t ind) const {
   try {
-    return (*this)->variable(ind).name;
+    return variable(ind).name;
   } catch (std::exception& e) {
     THROW_ERROR("name", e.what());
     static std::string dummy;
