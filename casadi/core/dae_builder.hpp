@@ -88,43 +88,43 @@ public:
   const MX& t() const;
 
   /** \brief Differential states */
-  std::vector<MX> x() const;
+  std::vector<std::string> x() const;
 
   /** \brief Ordinary differential equations (ODE) */
   std::vector<MX> ode() const;
 
   /** \brief Algebraic variables */
-  std::vector<MX> z() const;
+  std::vector<std::string> z() const;
 
   /** \brief Algebraic equations */
   std::vector<MX> alg() const;
 
   /** \brief Quadrature states */
-  std::vector<MX> q() const;
+  std::vector<std::string> q() const;
 
   /** \brief Quadrature equations */
   std::vector<MX> quad() const;
 
   /** \brief Output variables */
-  std::vector<MX> y() const;
+  std::vector<std::string> y() const;
 
   /** \brief Definitions of output variables */
   std::vector<MX> ydef() const;
 
   /** \brief Free controls */
-  std::vector<MX> u() const;
+  std::vector<std::string> u() const;
 
   /** \brief Parameters */
-  std::vector<MX> p() const;
+  std::vector<std::string> p() const;
 
   /** \brief Named constants */
-  std::vector<MX> c() const;
+  std::vector<std::string> c() const;
 
   /** \brief Definitions of named constants */
   std::vector<MX> cdef() const;
 
   /** \brief Dependent parameters */
-  std::vector<MX> d() const;
+  std::vector<std::string> d() const;
 
   /** \brief Definitions of dependent parameters
     * Interdependencies are allowed but must be non-cyclic.
@@ -132,7 +132,7 @@ public:
   std::vector<MX> ddef() const;
 
   /** \brief Dependent variables */
-  std::vector<MX> w() const;
+  std::vector<std::string> w() const;
 
   /** \brief Dependent variables and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.

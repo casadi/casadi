@@ -64,64 +64,64 @@ const MX& DaeBuilder::t() const {
   return var((*this)->t_.at(0));
 }
 
-std::vector<MX> DaeBuilder::x() const {
-  return var((*this)->x_);
+std::vector<std::string> DaeBuilder::x() const {
+  return name((*this)->x_);
 }
 
 std::vector<MX> DaeBuilder::ode() const {
   return (*this)->ode();
 }
 
-std::vector<MX> DaeBuilder::z() const {
-  return var((*this)->z_);
+std::vector<std::string> DaeBuilder::z() const {
+  return name((*this)->z_);
 }
 
 std::vector<MX> DaeBuilder::alg() const {
   return (*this)->alg();
 }
 
-std::vector<MX> DaeBuilder::q() const {
-  return var((*this)->q_);
+std::vector<std::string> DaeBuilder::q() const {
+  return name((*this)->q_);
 }
 
 std::vector<MX> DaeBuilder::quad() const {
   return (*this)->quad();
 }
 
-std::vector<MX> DaeBuilder::y() const {
-  return var((*this)->y_);
+std::vector<std::string> DaeBuilder::y() const {
+  return name((*this)->y_);
 }
 
 std::vector<MX> DaeBuilder::ydef() const {
   return (*this)->ydef();
 }
 
-std::vector<MX> DaeBuilder::u() const {
-  return var((*this)->u_);
+std::vector<std::string> DaeBuilder::u() const {
+  return name((*this)->u_);
 }
 
-std::vector<MX> DaeBuilder::p() const {
-  return var((*this)->p_);
+std::vector<std::string> DaeBuilder::p() const {
+  return name((*this)->p_);
 }
 
-std::vector<MX> DaeBuilder::c() const {
-  return var((*this)->c_);
+std::vector<std::string> DaeBuilder::c() const {
+  return name((*this)->c_);
 }
 
 std::vector<MX> DaeBuilder::cdef() const {
   return (*this)->cdef();
 }
 
-std::vector<MX> DaeBuilder::d() const {
-  return var((*this)->d_);
+std::vector<std::string> DaeBuilder::d() const {
+  return name((*this)->d_);
 }
 
 std::vector<MX> DaeBuilder::ddef() const {
   return (*this)->ddef();
 }
 
-std::vector<MX> DaeBuilder::w() const {
-  return var((*this)->w_);
+std::vector<std::string> DaeBuilder::w() const {
+  return name((*this)->w_);
 }
 
 std::vector<MX> DaeBuilder::wdef() const {
