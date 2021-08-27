@@ -395,8 +395,17 @@ public:
   /// Free all FMU instances
   void reset_fmu() const;
 
+  ///@{
   /// Get variable expression by name
   MX var(const std::string& name) const;
+  std::vector<MX> var(const std::vector<std::string>& name) const;
+  ///@}
+
+  ///@{
+  /// Get binding equation by name
+  MX beq(const std::string& name, bool derivative = false) const;
+  std::vector<MX> beq(const std::vector<std::string>& name, bool derivative = false) const;
+  ///@}
 
   /// Get variable expression by name
   MX operator()(const std::string& name) const {return var(name);}
@@ -528,7 +537,7 @@ public:
   /// Check if a particular cast is allowed
   static bool test_cast(const SharedObjectInternal* ptr);
 
-  /// Get variable expression by index
+  /// Get single variable expression by index
   const MX& var(size_t ind) const;
 
   /// Get variable expressions by index
@@ -536,6 +545,15 @@ public:
 
   /// Get index of variable
   size_t find(const std::string& name) const;
+
+  /// Get indices of variable
+  std::vector<size_t> find(const std::vector<std::string>& name) const;
+
+  /** \brief Get variable name by index */
+  const std::string& name(size_t ind) const;
+
+  /** \brief Get variable names by indices */
+  std::vector<std::string> name(const std::vector<size_t>& ind) const;
 
 #endif // SWIG
 };
