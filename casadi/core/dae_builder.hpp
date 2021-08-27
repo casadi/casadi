@@ -413,9 +413,6 @@ public:
   /// Get a derivative expression by name
   MX der(const std::string& name) const;
 
-  /// Get a derivative expression by non-differentiated expression
-  MX der(const MX& var) const;
-
   ///@{
   /// Get/set value reference
   casadi_int value_reference(const std::string& name) const;

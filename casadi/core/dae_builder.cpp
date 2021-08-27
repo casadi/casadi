@@ -569,16 +569,6 @@ MX DaeBuilder::der(const std::string& name) const {
   }
 }
 
-MX DaeBuilder::der(const MX& var) const {
-  try {
-    casadi_assert_dev(var.is_column() && var.is_symbolic());
-    return der(var.name());
-  } catch (std::exception& e) {
-    THROW_ERROR("der", e.what());
-    return MX();  // never reached
-  }
-}
-
 void DaeBuilder::eliminate_w() {
   try {
     (*this)->eliminate_w();
