@@ -519,7 +519,7 @@ std::string DaeBuilder::der(const std::string& name) const {
     // Get variable index
     size_t ind = find(name);
     // Differentiate
-    ind = variable(ind).antiderivative;
+    ind = variable(ind).der;
     casadi_assert(ind >= 0, "No derivative expression for " + name);
     // Return name
     return variable(ind).name;
@@ -841,7 +841,7 @@ Function DaeBuilder::fmu_fun(const std::string& name,
       if (name_out[k] == "ode") {
         // Provide state derivative
         id_out[k] = (*this)->x_;
-        for (size_t& i : id_out[k]) i = (*this)->variable(i).antiderivative;
+        for (size_t& i : id_out[k]) i = (*this)->variable(i).der;
       } else if (name_out[k] == "alg") {
         // Provide residual variables
         casadi_assert(nz() == 0, "Not implemented)");

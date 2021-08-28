@@ -84,8 +84,8 @@ struct CASADI_EXPORT Variable {
   MX nominal;
   // bool unbounded;
   MX start;
-  casadi_int derivative;
-  casadi_int antiderivative;
+  casadi_int der_of;  // 'derivative' in FMI specification
+  casadi_int der;
   // bool reinit;
   ///@}
 

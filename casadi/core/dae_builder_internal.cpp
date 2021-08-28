@@ -134,7 +134,7 @@ Variable::Variable(const std::string& name) : name(name),
     type(REAL), causality(LOCAL), variability(CONTINUOUS),
     unit(""), display_unit(""),
     min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
-    nominal(1.0), start(0.0), derivative(-1), antiderivative(-1), dependency(false) {
+    nominal(1.0), start(0.0), der_of(-1), der(-1), dependency(false) {
   casadi_assert(!name.empty(), "Name is empty string");
 }
 
@@ -212,7 +212,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     } else if (v.variability == Variable::FIXED || v.variability == Variable::TUNABLE) {
       p_.push_back(k);
     } else if (v.variability == Variable::CONTINUOUS) {
-      if (v.antiderivative >= 0) {
+      if (v.der >= 0) {
         // Is the variable needed to calculate other states, algebraic variables?
         if (v.dependency) {
           // Add to list of differential equations
@@ -220,9 +220,9 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
         } else {
           // Add to list of quadrature equations
           q_.push_back(k);
-          quad_.push_back(v.antiderivative);
+          quad_.push_back(v.der);
         }
-      } else if (v.dependency && v.derivative < 0) {
+      } else if (v.dependency && v.der_of < 0) {
         // Add to list of algebraic equations
         z_.push_back(k);
       }
@@ -410,7 +410,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
   } else if (name=="Cos") {
     return cos(read_expr(node[0]));
   } else if (name=="Der") {
-    return variables_.at(read_variable(node[0]).derivative).v;
+    return variables_.at(read_variable(node[0]).der_of).v;
   } else if (name=="Div") {
     return read_expr(node[0]) / read_expr(node[1]);
   } else if (name=="Exp") {
@@ -578,8 +578,8 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     stream << "State derivatives" << std::endl;
     for (size_t k : x_) {
       const Variable& x = variable(k);
-      casadi_assert(x.antiderivative >= 0, "No derivative variable for " + x.name);
-      const Variable& xdot = variable(x.antiderivative);
+      casadi_assert(x.der >= 0, "No derivative variable for " + x.name);
+      const Variable& xdot = variable(x.der);
       stream << "  " << xdot.name << " == " << xdot.beq << std::endl;
     }
   }
@@ -989,7 +989,7 @@ const MX& DaeBuilderInternal::var(const std::string& name) const {
 }
 
 MX DaeBuilderInternal::der(const std::string& name) const {
-  return variables_.at(variable(name).derivative).v;
+  return variables_.at(variable(name).der_of).v;
 }
 
 MX DaeBuilderInternal::der(const MX& var) const {
@@ -1038,7 +1038,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   // Expressions where the variables are also being used
   std::vector<MX> ex;
   for (auto& vv : {x_})
-    for (size_t v : vv) ex.push_back(variable(variable(v).antiderivative).beq);
+    for (size_t v : vv) ex.push_back(variable(variable(v).der).beq);
   for (auto& vv : {alg_, quad_, y_})
     for (size_t v : vv) ex.push_back(variable(v).beq);
   // Lift expressions
@@ -1056,7 +1056,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   // Get expressions
   auto it = ex.begin();
   for (auto& vv : {x_})
-    for (size_t v : vv) variable(variable(v).antiderivative).beq = *it++;
+    for (size_t v : vv) variable(variable(v).der).beq = *it++;
   for (auto& vv : {alg_, quad_, y_})
     for (size_t v : vv) variable(v).beq = *it++;
   // Consistency check
@@ -1871,8 +1871,8 @@ std::vector<MX> DaeBuilderInternal::ode() const {
   ret.reserve(x_.size());
   for (size_t v : x_) {
     const Variable& x = variable(v);
-    casadi_assert(x.antiderivative >= 0, "No derivative variable for " + x.name);
-    const Variable& xdot = variable(x.antiderivative);
+    casadi_assert(x.der >= 0, "No derivative variable for " + x.name);
+    const Variable& xdot = variable(x.der);
     ret.push_back(xdot.beq);
   }
   return ret;
@@ -1987,18 +1987,18 @@ void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
   // Find the state variable
   const Variable& x = variable(name);
   // Check if derivative exists
-  if (x.antiderivative < 0) {
+  if (x.der < 0) {
     // New derivative variable
     Variable xdot("der(" + name + ")");
     xdot.v = MX::sym(xdot.name);
     xdot.causality = Variable::OUTPUT;
-    xdot.derivative = find(name);
+    xdot.der_of = find(name);
     xdot.beq = ode_rhs;
     size_t xdot_ind = add_variable(xdot.name, xdot);
-    variable(name).antiderivative = xdot_ind;
+    variable(name).der = xdot_ind;
   } else {
     // Variable exists: Update binding equation
-    variable(x.antiderivative).beq = ode_rhs;
+    variable(x.der).beq = ode_rhs;
   }
 }
 
@@ -2086,18 +2086,18 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       var.max = props.attribute<double>("max", inf);
       var.nominal = props.attribute<double>("nominal", 1.);
       var.start = props.attribute<double>("start", 0.);
-      var.derivative = props.attribute<casadi_int>("derivative", var.derivative);
+      var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
     }
     // Add to list of variables
     (void)add_variable(name, var);
   }
-  // Handle derivatives/antiderivatives
+  // Handle derivatives
   for (auto it = variables_.begin(); it != variables_.end(); ++it) {
-    if (it->derivative >= 0) {
+    if (it->der_of >= 0) {
       // Add variable offset, make index 1
-      it->derivative -= 1;
-      // Set antiderivative
-      variables_.at(it->derivative).antiderivative = it - variables_.begin();
+      it->der_of -= 1;
+      // Set der
+      variables_.at(it->der_of).der = it - variables_.begin();
     }
   }
 }
