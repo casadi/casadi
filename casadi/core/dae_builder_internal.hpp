@@ -358,7 +358,7 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_, ode_, alg_, quad_;
+  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_, alg_, quad_;
 
   ///@{
   /// Ordered variables and equations
@@ -400,7 +400,7 @@ protected:
   MX add_d(const std::string& name, const MX& new_ddef);
   MX add_w(const std::string& name, const MX& new_wdef);
   MX add_y(const std::string& name, const MX& new_ydef);
-  MX add_ode(const std::string& name, const MX& new_ode);
+  void set_ode(const std::string& name, const MX& ode_rhs);
   MX add_alg(const std::string& name, const MX& new_alg);
   MX add_quad(const std::string& name, const MX& new_quad);
   ///@}

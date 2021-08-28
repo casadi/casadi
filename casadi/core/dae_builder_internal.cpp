@@ -217,7 +217,6 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
         if (v.dependency) {
           // Add to list of differential equations
           x_.push_back(k);
-          ode_.push_back(v.antiderivative);
         } else {
           // Add to list of quadrature equations
           q_.push_back(k);
@@ -577,8 +576,11 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (!x_.empty()) {
     stream << "State derivatives" << std::endl;
-    for (casadi_int k = 0; k < x_.size(); ++k) {
-      stream << "  " << var(x_[k]) << ": " << var(ode_[k]) << std::endl;
+    for (size_t k : x_) {
+      const Variable& x = variable(k);
+      casadi_assert(x.antiderivative >= 0, "No derivative variable for " + x.name);
+      const Variable& xdot = variable(x.antiderivative);
+      stream << "  " << xdot.name << " == " << xdot.beq << std::endl;
     }
   }
 
@@ -685,7 +687,6 @@ const std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) cons
 
 std::vector<size_t>& DaeBuilderInternal::ind_out(const std::string& v) {
   switch (to_enum<DaeBuilderInternalOut>(v)) {
-  case DAE_BUILDER_ODE: return ode_;
   case DAE_BUILDER_ALG: return alg_;
   case DAE_BUILDER_QUAD: return quad_;
   default: break;
@@ -939,12 +940,6 @@ void DaeBuilderInternal::sanity_check() const {
     casadi_assert(var(t_[0]).is_scalar(), "Non-scalar time t");
   }
 
-  // Differential states
-  casadi_assert(x_.size() == ode_.size(), "x and ode have different lengths");
-  for (casadi_int i = 0; i < x_.size(); ++i) {
-    casadi_assert(var(x_[i]).size() == var(ode_[i]).size(), "ode has wrong dimensions");
-  }
-
   // Algebraic variables/equations
   casadi_assert(z_.size() == alg_.size(), "z and alg have different lengths");
   for (casadi_int i = 0; i < z_.size(); ++i) {
@@ -1042,7 +1037,9 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   if (!w_.empty()) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  for (auto& vv : {ode_, alg_, quad_, y_})
+  for (auto& vv : {x_})
+    for (size_t v : vv) ex.push_back(variable(variable(v).antiderivative).beq);
+  for (auto& vv : {alg_, quad_, y_})
     for (size_t v : vv) ex.push_back(variable(v).beq);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
@@ -1058,7 +1055,9 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   }
   // Get expressions
   auto it = ex.begin();
-  for (auto& vv : {ode_, alg_, quad_, y_})
+  for (auto& vv : {x_})
+    for (size_t v : vv) variable(variable(v).antiderivative).beq = *it++;
+  for (auto& vv : {alg_, quad_, y_})
     for (size_t v : vv) variable(v).beq = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
@@ -1869,8 +1868,13 @@ std::vector<MX> DaeBuilderInternal::ydef() const {
 
 std::vector<MX> DaeBuilderInternal::ode() const {
   std::vector<MX> ret;
-  ret.reserve(ode_.size());
-  for (size_t v : ode_) ret.push_back(variable(v).beq);
+  ret.reserve(x_.size());
+  for (size_t v : x_) {
+    const Variable& x = variable(v);
+    casadi_assert(x.antiderivative >= 0, "No derivative variable for " + x.name);
+    const Variable& xdot = variable(x.antiderivative);
+    ret.push_back(xdot.beq);
+  }
   return ret;
 }
 
@@ -1979,13 +1983,23 @@ MX DaeBuilderInternal::add_y(const std::string& name, const MX& new_ydef) {
   return v.v;
 }
 
-MX DaeBuilderInternal::add_ode(const std::string& name, const MX& new_ode) {
-  Variable v(name);
-  v.v = MX::sym(name);
-  v.causality = Variable::OUTPUT;
-  v.beq = new_ode;
-  ode_.push_back(add_variable(name, v));
-  return v.v;
+void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
+  // Find the state variable
+  const Variable& x = variable(name);
+  // Check if derivative exists
+  if (x.antiderivative < 0) {
+    // New derivative variable
+    Variable xdot("der(" + name + ")");
+    xdot.v = MX::sym(xdot.name);
+    xdot.causality = Variable::OUTPUT;
+    xdot.derivative = find(name);
+    xdot.beq = ode_rhs;
+    size_t xdot_ind = add_variable(xdot.name, xdot);
+    variable(name).antiderivative = xdot_ind;
+  } else {
+    // Variable exists: Update binding equation
+    variable(x.antiderivative).beq = ode_rhs;
+  }
 }
 
 MX DaeBuilderInternal::add_alg(const std::string& name, const MX& new_alg) {

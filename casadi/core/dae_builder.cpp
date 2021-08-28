@@ -469,12 +469,11 @@ void DaeBuilder::add_when(const MX& cond, const MX& lhs, const MX& rhs) {
   (*this)->when_rhs_.push_back(rhs);
 }
 
-MX DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
+void DaeBuilder::set_ode(const std::string& name, const MX& ode_rhs) {
   try {
-    return (*this)->add_ode(name, new_ode);
+    (*this)->set_ode(name, ode_rhs);
   } catch (std::exception& e) {
-    THROW_ERROR("add_ode", e.what());
-    return MX();
+    THROW_ERROR("set_ode", e.what());
   }
 }
 

@@ -227,7 +227,7 @@ public:
   MX add_y(const std::string& name, const MX& new_ydef);
 
   /// Add an ordinary differential equation
-  MX add_ode(const std::string& name, const MX& new_ode);
+  void set_ode(const std::string& name, const MX& ode_rhs);
 
   /// Add an algebraic equation
   MX add_alg(const std::string& name, const MX& new_alg);

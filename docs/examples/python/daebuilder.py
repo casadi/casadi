@@ -41,13 +41,10 @@ m = dae.add_x('m')
 # Constants
 g = 9.81 # gravity
 
-# Add output expressions
-hdot = v
-vdot = (u-a*v**2)/m-g
-mdot = -b*u**2
-dae.add_ode('hdot', hdot)
-dae.add_ode('vdot', vdot)
-dae.add_ode('mdot', mdot)
+# Set ODE right-hand-side
+dae.set_ode('h', v)
+dae.set_ode('v', (u-a*v**2)/m-g)
+dae.set_ode('m', -b*u**2)
 
 # Specify initial conditions
 dae.set_start('h', 0)
