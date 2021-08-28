@@ -2011,15 +2011,6 @@ MX DaeBuilderInternal::add_alg(const std::string& name, const MX& new_alg) {
   return v.v;
 }
 
-MX DaeBuilderInternal::add_quad(const std::string& name, const MX& new_quad) {
-  Variable v(name);
-  v.v = MX::sym(name);
-  v.causality = Variable::OUTPUT;
-  v.beq = new_quad;
-  quad_.push_back(add_variable(name, v));
-  return v.v;
-}
-
 template<typename T>
 std::vector<T> read_list(const XmlNode& n) {
   // Number of elements

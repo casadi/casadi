@@ -486,15 +486,6 @@ MX DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
   }
 }
 
-MX DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
-  try {
-    return (*this)->add_quad(name, new_quad);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_quad", e.what());
-    return MX();
-  }
-}
-
 void DaeBuilder::sanity_check() const {
   try {
     (*this)->sanity_check();

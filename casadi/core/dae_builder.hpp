@@ -232,9 +232,6 @@ public:
   /// Add an algebraic equation
   MX add_alg(const std::string& name, const MX& new_alg);
 
-  /// Add a quadrature equation
-  MX add_quad(const std::string& name, const MX& new_quad);
-
   /// Add an auxiliary variable
   MX add_aux(const std::string& name=std::string(), casadi_int n=1);
 

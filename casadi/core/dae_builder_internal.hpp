@@ -402,7 +402,6 @@ protected:
   MX add_y(const std::string& name, const MX& new_ydef);
   void set_ode(const std::string& name, const MX& ode_rhs);
   MX add_alg(const std::string& name, const MX& new_alg);
-  MX add_quad(const std::string& name, const MX& new_quad);
   ///@}
 
   /// Linear combinations of output expressions
