@@ -160,17 +160,8 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Input indices (immutable)
   const std::vector<size_t>& ind_in(const std::string& v) const;
 
-  /// Output indices (mutable)
-  std::vector<size_t>& ind_out(const std::string& v);
-
-  /// Output indices (immutable)
-  const std::vector<size_t>& ind_out(const std::string& v) const;
-
   /// Clear input variable
   void clear_in(const std::string& v);
-
-  /// Clear output variable
-  void clear_out(const std::string& v);
 
   /// Prune unused controls
   void prune(bool prune_p, bool prune_u);
@@ -358,7 +349,7 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_, alg_, quad_;
+  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_, alg_;
 
   ///@{
   /// Ordered variables and equations

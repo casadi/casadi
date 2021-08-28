@@ -267,9 +267,6 @@ public:
   /// Clear input variable
   void clear_in(const std::string& v);
 
-  /// Clear output variable
-  void clear_out(const std::string& v);
-
   /// Eliminate all dependent variables
   void eliminate_w();
 

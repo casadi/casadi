@@ -220,7 +220,6 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
         } else {
           // Add to list of quadrature equations
           q_.push_back(k);
-          quad_.push_back(v.der);
         }
       } else if (v.dependency && v.der_of < 0) {
         // Add to list of algebraic equations
@@ -592,9 +591,12 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   }
 
   if (!q_.empty()) {
-    stream << "Quadrature derivatives" << std::endl;
-    for (casadi_int k = 0; k < q_.size(); ++k) {
-      stream << "  " << var(q_[k]) << ": " << var(quad_[k]) << std::endl;
+    stream << "Quadrature equations" << std::endl;
+    for (size_t k : q_) {
+      const Variable& q = variable(k);
+      casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
+      const Variable& qdot = variable(q.der);
+      stream << "  " << qdot.name << " == " << qdot.beq << std::endl;
     }
   }
 
@@ -685,29 +687,8 @@ const std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) cons
   return const_cast<DaeBuilderInternal*>(this)->ind_in(v);
 }
 
-std::vector<size_t>& DaeBuilderInternal::ind_out(const std::string& v) {
-  switch (to_enum<DaeBuilderInternalOut>(v)) {
-  case DAE_BUILDER_ALG: return alg_;
-  case DAE_BUILDER_QUAD: return quad_;
-  default: break;
-  }
-  // Unsuccessful
-  casadi_error("Cannot access output indices for " + v);
-  // Just to resolve warnings
-  static std::vector<size_t> dummy;
-  return dummy;
-}
-
-const std::vector<size_t>& DaeBuilderInternal::ind_out(const std::string& v) const {
-  return const_cast<DaeBuilderInternal*>(this)->ind_out(v);
-}
-
 void DaeBuilderInternal::clear_in(const std::string& v) {
   ind_in(v).clear();
-}
-
-void DaeBuilderInternal::clear_out(const std::string& v) {
-  ind_out(v).clear();
 }
 
 void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
@@ -946,12 +927,6 @@ void DaeBuilderInternal::sanity_check() const {
     casadi_assert(var(z_[i]).size() == var(alg_[i]).size(), "alg has wrong dimensions");
   }
 
-  // Quadrature states/equations
-  casadi_assert(q_.size() == quad_.size(), "q and quad have different lengths");
-  for (casadi_int i = 0; i < q_.size(); ++i) {
-    casadi_assert(var(q_[i]).size() == var(quad_[i]).size(), "quad has wrong dimensions");
-  }
-
   // Initial equations
   casadi_assert(init_lhs_.size() == init_rhs_.size(),
     "init_lhs and init_rhs have different lengths");
@@ -1037,9 +1012,9 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   if (!w_.empty()) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  for (auto& vv : {x_})
-    for (size_t v : vv) ex.push_back(variable(variable(v).der).beq);
-  for (auto& vv : {alg_, quad_, y_})
+  for (size_t v : x_) ex.push_back(variable(variable(v).der).beq);
+  for (size_t v : q_) ex.push_back(variable(variable(v).der).beq);
+  for (auto& vv : {alg_, y_})
     for (size_t v : vv) ex.push_back(variable(v).beq);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
@@ -1055,9 +1030,9 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   }
   // Get expressions
   auto it = ex.begin();
-  for (auto& vv : {x_})
-    for (size_t v : vv) variable(variable(v).der).beq = *it++;
-  for (auto& vv : {alg_, quad_, y_})
+  for (size_t v : x_) variable(variable(v).der).beq = *it++;
+  for (size_t v : q_) variable(variable(v).der).beq = *it++;
+  for (auto& vv : {alg_, y_})
     for (size_t v : vv) variable(v).beq = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
@@ -1887,8 +1862,13 @@ std::vector<MX> DaeBuilderInternal::alg() const {
 
 std::vector<MX> DaeBuilderInternal::quad() const {
   std::vector<MX> ret;
-  ret.reserve(quad_.size());
-  for (size_t v : quad_) ret.push_back(variable(v).beq);
+  ret.reserve(q_.size());
+  for (size_t v : q_) {
+    const Variable& q = variable(v);
+    casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
+    const Variable& qdot = variable(q.der);
+    ret.push_back(qdot.beq);
+  }
   return ret;
 }
 

@@ -356,14 +356,6 @@ void DaeBuilder::clear_in(const std::string& v) {
   }
 }
 
-void DaeBuilder::clear_out(const std::string& v) {
-  try {
-    (*this)->clear_out(v);
-  } catch (std::exception& e) {
-    THROW_ERROR("clear_out", e.what());
-  }
-}
-
 MX DaeBuilder::add_t(const std::string& name) {
   casadi_assert((*this)->t_.empty(), "'t' already defined");
   size_t new_t = add_variable_new(name);
