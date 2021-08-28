@@ -85,7 +85,8 @@ struct CASADI_EXPORT Variable {
   // bool unbounded;
   MX start;
   casadi_int der_of;  // 'derivative' in FMI specification
-  casadi_int der;
+  casadi_int der;  // corresponding derivative variable
+  casadi_int alg;  // corresponding residual variable
   // bool reinit;
   ///@}
 
@@ -349,7 +350,7 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_, alg_;
+  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_;
 
   ///@{
   /// Ordered variables and equations
@@ -392,7 +393,7 @@ protected:
   MX add_w(const std::string& name, const MX& new_wdef);
   MX add_y(const std::string& name, const MX& new_ydef);
   void set_ode(const std::string& name, const MX& ode_rhs);
-  MX add_alg(const std::string& name, const MX& new_alg);
+  void set_alg(const std::string& name, const MX& alg_rhs);
   ///@}
 
   /// Linear combinations of output expressions

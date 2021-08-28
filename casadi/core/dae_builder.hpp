@@ -226,11 +226,11 @@ public:
   /// Add a new output
   MX add_y(const std::string& name, const MX& new_ydef);
 
-  /// Add an ordinary differential equation
+  /// Specify the ordinary differential equation for a state
   void set_ode(const std::string& name, const MX& ode_rhs);
 
-  /// Add an algebraic equation
-  MX add_alg(const std::string& name, const MX& new_alg);
+  /// Specificy the residual equation for an algebraic variable
+  void set_alg(const std::string& name, const MX& alg_rhs);
 
   /// Add an auxiliary variable
   MX add_aux(const std::string& name=std::string(), casadi_int n=1);

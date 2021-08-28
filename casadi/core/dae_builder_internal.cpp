@@ -134,7 +134,7 @@ Variable::Variable(const std::string& name) : name(name),
     type(REAL), causality(LOCAL), variability(CONTINUOUS),
     unit(""), display_unit(""),
     min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
-    nominal(1.0), start(0.0), der_of(-1), der(-1), dependency(false) {
+    nominal(1.0), start(0.0), der_of(-1), der(-1), alg(-1), dependency(false) {
   casadi_assert(!name.empty(), "Name is empty string");
 }
 
@@ -583,10 +583,13 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!alg_.empty()) {
+  if (!z_.empty()) {
     stream << "Algebraic equations" << std::endl;
-    for (casadi_int k = 0; k < alg_.size(); ++k) {
-      stream << "  0 == " << var(alg_[k]) << std::endl;
+    for (size_t k : z_) {
+      const Variable& z = variable(k);
+      casadi_assert(z.alg >= 0, "No residual variable for " + z.name);
+      const Variable& alg = variable(z.alg);
+      stream << "  0 == " << alg.beq << std::endl;
     }
   }
 
@@ -752,17 +755,14 @@ void DaeBuilderInternal::tear() {
   for (auto& e : iv_on_hold) iv_set.insert(e);
   // Remove any (held or not held) iteration variables, equations from z and alg
   size_t sz = 0;
-  casadi_assert(z_.size() == alg_.size(), "z and alg have different lengths");
   for (size_t k = 0; k < z_.size(); ++k) {
     if (!iv_set.count(variable(z_[k]).name)) {
       // Non-iteration variable: Keep
       z_.at(k) = z_.at(sz);
-      alg_.at(k) = alg_.at(sz);
       sz++;
     }
   }
   z_.resize(sz);
-  alg_.resize(sz);
   // Remove any (held or not held) iteration variables, equations from u
   sz = 0;
   for (size_t k = 0; k < u_.size(); ++k) {
@@ -774,8 +774,6 @@ void DaeBuilderInternal::tear() {
   u_.resize(sz);
   // Add algebraic variables
   for (auto& e : iv) z_.push_back(find(e));
-  // Add residual variables
-  for (auto& e : res) alg_.push_back(find(e));
   // Add output variables
   for (auto& e : iv_on_hold) u_.push_back(find(e));
 }
@@ -921,12 +919,6 @@ void DaeBuilderInternal::sanity_check() const {
     casadi_assert(var(t_[0]).is_scalar(), "Non-scalar time t");
   }
 
-  // Algebraic variables/equations
-  casadi_assert(z_.size() == alg_.size(), "z and alg have different lengths");
-  for (casadi_int i = 0; i < z_.size(); ++i) {
-    casadi_assert(var(z_[i]).size() == var(alg_[i]).size(), "alg has wrong dimensions");
-  }
-
   // Initial equations
   casadi_assert(init_lhs_.size() == init_rhs_.size(),
     "init_lhs and init_rhs have different lengths");
@@ -1014,8 +1006,8 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   std::vector<MX> ex;
   for (size_t v : x_) ex.push_back(variable(variable(v).der).beq);
   for (size_t v : q_) ex.push_back(variable(variable(v).der).beq);
-  for (auto& vv : {alg_, y_})
-    for (size_t v : vv) ex.push_back(variable(v).beq);
+  for (size_t v : z_) ex.push_back(variable(variable(v).alg).beq);
+  for (size_t v : y_) ex.push_back(variable(v).beq);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
@@ -1032,8 +1024,8 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   auto it = ex.begin();
   for (size_t v : x_) variable(variable(v).der).beq = *it++;
   for (size_t v : q_) variable(variable(v).der).beq = *it++;
-  for (auto& vv : {alg_, y_})
-    for (size_t v : vv) variable(v).beq = *it++;
+  for (size_t v : z_) variable(variable(v).alg).beq = *it++;
+  for (size_t v : y_) variable(v).beq = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
@@ -1855,8 +1847,13 @@ std::vector<MX> DaeBuilderInternal::ode() const {
 
 std::vector<MX> DaeBuilderInternal::alg() const {
   std::vector<MX> ret;
-  ret.reserve(alg_.size());
-  for (size_t v : alg_) ret.push_back(variable(v).beq);
+  ret.reserve(z_.size());
+  for (size_t v : z_) {
+    const Variable& z = variable(v);
+    casadi_assert(z.alg >= 0, "No residual variable for " + z.name);
+    const Variable& alg = variable(z.alg);
+    ret.push_back(alg.beq);
+  }
   return ret;
 }
 
@@ -1969,7 +1966,7 @@ void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
   // Check if derivative exists
   if (x.der < 0) {
     // New derivative variable
-    Variable xdot("der(" + name + ")");
+    Variable xdot("der_" + name);
     xdot.v = MX::sym(xdot.name);
     xdot.causality = Variable::OUTPUT;
     xdot.der_of = find(name);
@@ -1982,13 +1979,22 @@ void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
   }
 }
 
-MX DaeBuilderInternal::add_alg(const std::string& name, const MX& new_alg) {
-  Variable v(name);
-  v.v = MX::sym(name);
-  v.causality = Variable::OUTPUT;
-  v.beq = new_alg;
-  alg_.push_back(add_variable(name, v));
-  return v.v;
+void DaeBuilderInternal::set_alg(const std::string& name, const MX& alg_rhs) {
+  // Find the algebraic variable
+  const Variable& z = variable(name);
+  // Check if residual exists
+  if (z.alg < 0) {
+    // New derivative variable
+    Variable alg("alg_" + name);
+    alg.v = MX::sym(alg.name);
+    alg.causality = Variable::OUTPUT;
+    alg.beq = alg_rhs;
+    size_t alg_ind = add_variable(alg.name, alg);
+    variable(name).alg = alg_ind;
+  } else {
+    // Variable exists: Update binding equation
+    variable(z.alg).beq = alg_rhs;
+  }
 }
 
 template<typename T>

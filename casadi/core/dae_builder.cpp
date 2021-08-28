@@ -469,12 +469,11 @@ void DaeBuilder::set_ode(const std::string& name, const MX& ode_rhs) {
   }
 }
 
-MX DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
+void DaeBuilder::set_alg(const std::string& name, const MX& alg_rhs) {
   try {
-    return (*this)->add_alg(name, new_alg);
+    (*this)->set_alg(name, alg_rhs);
   } catch (std::exception& e) {
-    THROW_ERROR("add_alg", e.what());
-    return MX();
+    THROW_ERROR("set_alg", e.what());
   }
 }
 
