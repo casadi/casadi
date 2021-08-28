@@ -135,6 +135,7 @@ Variable::Variable(const std::string& name) : name(name),
     unit(""), display_unit(""),
     min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
     nominal(1.0), start(0.0), derivative(-1), antiderivative(-1), dependency(false) {
+  casadi_assert(!name.empty(), "Name is empty string");
 }
 
 DaeBuilderInternal::~DaeBuilderInternal() {

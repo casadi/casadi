@@ -373,7 +373,6 @@ MX DaeBuilder::add_t(const std::string& name) {
 
 MX DaeBuilder::add_p(const std::string& name) {
   try {
-    if (name.empty()) return add_p("p" + str(np()));
     return (*this)->add_p(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_p", e.what());
@@ -383,7 +382,6 @@ MX DaeBuilder::add_p(const std::string& name) {
 
 MX DaeBuilder::add_u(const std::string& name) {
   try {
-    if (name.empty()) return add_u("u" + str(nu()));
     return (*this)->add_u(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_u", e.what());
@@ -393,7 +391,6 @@ MX DaeBuilder::add_u(const std::string& name) {
 
 MX DaeBuilder::add_x(const std::string& name) {
   try {
-    if (name.empty()) return add_x("x" + str(nx()));
     return (*this)->add_x(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_x", e.what());
@@ -403,7 +400,6 @@ MX DaeBuilder::add_x(const std::string& name) {
 
 MX DaeBuilder::add_z(const std::string& name) {
   try {
-    if (name.empty()) return add_z("z" + str(nz()));
     return (*this)->add_z(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_z", e.what());
@@ -413,7 +409,6 @@ MX DaeBuilder::add_z(const std::string& name) {
 
 MX DaeBuilder::add_q(const std::string& name) {
   try {
-    if (name.empty()) return add_q("q" + str(nq()));
     return (*this)->add_q(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_q", e.what());
@@ -458,7 +453,6 @@ MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
 }
 
 MX DaeBuilder::add_aux(const std::string& name, casadi_int n) {
-  if (name.empty()) return add_aux("aux" + str(aux().size()), n);
   MX new_aux = add_variable(name, n);
   (*this)->aux_.push_back(new_aux);
   return new_aux;
