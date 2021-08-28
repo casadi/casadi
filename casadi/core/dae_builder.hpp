@@ -200,19 +200,19 @@ public:
   MX add_t(const std::string& name="t");
 
   /// Add a new parameter
-  MX add_p(const std::string& name=std::string(), casadi_int n=1);
+  MX add_p(const std::string& name=std::string());
 
   /// Add a new control
-  MX add_u(const std::string& name=std::string(), casadi_int n=1);
+  MX add_u(const std::string& name=std::string());
 
   /// Add a new differential state
-  MX add_x(const std::string& name=std::string(), casadi_int n=1);
+  MX add_x(const std::string& name=std::string());
 
   /// Add a new algebraic variable
-  MX add_z(const std::string& name=std::string(), casadi_int n=1);
+  MX add_z(const std::string& name=std::string());
 
   /// Add a new quadrature state
-  MX add_q(const std::string& name=std::string(), casadi_int n=1);
+  MX add_q(const std::string& name=std::string());
 
   /// Add a new constant
   MX add_c(const std::string& name, const MX& new_cdef);

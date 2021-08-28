@@ -371,50 +371,50 @@ MX DaeBuilder::add_t(const std::string& name) {
   return var(new_t);
 }
 
-MX DaeBuilder::add_p(const std::string& name, casadi_int n) {
+MX DaeBuilder::add_p(const std::string& name) {
   try {
-    if (name.empty()) return add_p("p" + str(np()), n);
-    return (*this)->add_p(name, n);
+    if (name.empty()) return add_p("p" + str(np()));
+    return (*this)->add_p(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_p", e.what());
     return MX();
   }
 }
 
-MX DaeBuilder::add_u(const std::string& name, casadi_int n) {
+MX DaeBuilder::add_u(const std::string& name) {
   try {
-    if (name.empty()) return add_u("u" + str(nu()), n);
-    return (*this)->add_u(name, n);
+    if (name.empty()) return add_u("u" + str(nu()));
+    return (*this)->add_u(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_u", e.what());
     return MX();
   }
 }
 
-MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
+MX DaeBuilder::add_x(const std::string& name) {
   try {
-    if (name.empty()) return add_x("x" + str(nx()), n);
-    return (*this)->add_x(name, n);
+    if (name.empty()) return add_x("x" + str(nx()));
+    return (*this)->add_x(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_x", e.what());
     return MX();
   }
 }
 
-MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
+MX DaeBuilder::add_z(const std::string& name) {
   try {
-    if (name.empty()) return add_z("z" + str(nz()), n);
-    return (*this)->add_z(name, n);
+    if (name.empty()) return add_z("z" + str(nz()));
+    return (*this)->add_z(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_z", e.what());
     return MX();
   }
 }
 
-MX DaeBuilder::add_q(const std::string& name, casadi_int n) {
+MX DaeBuilder::add_q(const std::string& name) {
   try {
-    if (name.empty()) return add_q("q" + str(nq()), n);
-    return (*this)->add_q(name, n);
+    if (name.empty()) return add_q("q" + str(nq()));
+    return (*this)->add_q(name);
   } catch (std::exception& e) {
     THROW_ERROR("add_q", e.what());
     return MX();
