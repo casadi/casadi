@@ -631,35 +631,35 @@ void DaeBuilder::set_display_unit(const std::string& name, const std::string& va
   variable(name).display_unit = val;
 }
 
-MX DaeBuilder::nominal(const std::string& name) const {
+double DaeBuilder::nominal(const std::string& name) const {
   return variable(name).nominal;
 }
 
-void DaeBuilder::set_nominal(const std::string& name, const MX& val) {
+void DaeBuilder::set_nominal(const std::string& name, double val) {
   variable(name).nominal = val;
 }
 
-MX DaeBuilder::min(const std::string& name) const {
+double DaeBuilder::min(const std::string& name) const {
   return variable(name).min;
 }
 
-void DaeBuilder::set_min(const std::string& name, const MX& val) {
+void DaeBuilder::set_min(const std::string& name, double val) {
   variable(name).min = val;
 }
 
-MX DaeBuilder::max(const std::string& name) const {
+double DaeBuilder::max(const std::string& name) const {
   return variable(name).max;
 }
 
-void DaeBuilder::set_max(const std::string& name, const MX& val) {
+void DaeBuilder::set_max(const std::string& name, double val) {
   variable(name).max = val;
 }
 
-MX DaeBuilder::start(const std::string& name) const {
+double DaeBuilder::start(const std::string& name) const {
   return variable(name).start;
 }
 
-void DaeBuilder::set_start(const std::string& name, const MX& val) {
+void DaeBuilder::set_start(const std::string& name, double val) {
   variable(name).start = val;
 }
 
@@ -763,17 +763,6 @@ Function DaeBuilder::oracle(bool sx, bool elim_w, bool lifted_calls) const {
     return (*this)->oracle(sx, elim_w, lifted_calls);
   } catch (std::exception& e) {
     THROW_ERROR("oracle", e.what());
-    return Function(); // never reached
-  }
-}
-
-Function DaeBuilder::attribute_fun(const std::string& fname,
-    const std::vector<std::string>& s_in,
-    const std::vector<std::string>& s_out) const {
-  try {
-    return (*this)->attribute_fun(fname, s_in, s_out);
-  } catch (std::exception& e) {
-    THROW_ERROR("attribute_fun", e.what());
     return Function(); // never reached
   }
 }

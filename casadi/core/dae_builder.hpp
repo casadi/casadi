@@ -342,11 +342,6 @@ public:
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out, bool sx = false, bool lifted_calls = false) const;
 
-  /// Construct a function object for evaluating attributes
-  Function attribute_fun(const std::string& fname,
-      const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out) const;
-
   /// Construct a function for evaluating dependent parameters
   Function dependent_fun(const std::string& fname,
       const std::vector<std::string>& s_in,
@@ -463,26 +458,26 @@ public:
 
   ///@{
   /// Get/set the lower bound
-  MX min(const std::string& name) const;
-  void set_min(const std::string& name, const MX& val);
+  double min(const std::string& name) const;
+  void set_min(const std::string& name, double val);
   ///@}
 
   ///@{
   /// Get/set the upper bound
-  MX max(const std::string& name) const;
-  void set_max(const std::string& name, const MX& val);
+  double max(const std::string& name) const;
+  void set_max(const std::string& name, double val);
   ///@}
 
   ///@{
   /// Get/set the nominal value
-  MX nominal(const std::string& name) const;
-  void set_nominal(const std::string& name, const MX& val);
+  double nominal(const std::string& name) const;
+  void set_nominal(const std::string& name, double val);
   ///@}
 
   ///@{
   /// Get/set the value at time 0
-  MX start(const std::string& name) const;
-  void set_start(const std::string& name, const MX& val);
+  double start(const std::string& name) const;
+  void set_start(const std::string& name, double val);
   ///@}
 
   ///@{

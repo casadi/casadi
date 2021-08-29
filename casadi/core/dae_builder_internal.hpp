@@ -79,11 +79,11 @@ struct CASADI_EXPORT Variable {
   std::string unit;
   std::string display_unit;
   // bool relative_quantity;
-  MX min;
-  MX max;
-  MX nominal;
+  double min;
+  double max;
+  double nominal;
   // bool unbounded;
-  MX start;
+  double start;
   casadi_int der_of;  // 'derivative' in FMI specification
   casadi_int der;  // corresponding derivative variable
   casadi_int alg;  // corresponding residual variable
@@ -104,9 +104,6 @@ struct CASADI_EXPORT Variable {
 
   // Default initial attribute, per specification
   static Initial default_initial(Causality causality, Variability variability);
-
-  // Get attribute by enum
-  MX attribute(Attribute att) const;
 };
 
 /// \cond INTERNAL
@@ -229,11 +226,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   Function create(const std::string& fname,
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out, bool sx = false, bool lifted_calls = false) const;
-
-  /// Construct a function object for evaluating attributes
-  Function attribute_fun(const std::string& fname,
-      const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out) const;
 
   /// Construct a function for evaluating dependent parameters
   Function dependent_fun(const std::string& fname,

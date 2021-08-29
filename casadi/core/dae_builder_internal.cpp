@@ -849,6 +849,9 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
   // Evaluate hold variables, if needed
   if (any_hold) {
     try {
+      // Code below needs to be refactored
+      casadi_error("not implemented");
+#if 0
       // Get start attributes for p
       Function startfun_p = attribute_fun("startfun_p", {}, {"start_p"});
       if (startfun_p.has_free()) {
@@ -887,6 +890,7 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
         }
       }
       if (iv) iv->resize(sz);
+#endif
     } catch (std::exception& e) {
       // Warning instead of error
       casadi_warning("Failed to evaluate hold variables: " + std::string(e.what()));
@@ -974,10 +978,6 @@ void DaeBuilderInternal::eliminate_w() {
   // Expressions where the variables are also being used
   std::vector<MX> ex;
   for (const Variable& v : variables_) {
-    if (!v.min.is_constant()) ex.push_back(v.min);
-    if (!v.max.is_constant()) ex.push_back(v.max);
-    if (!v.nominal.is_constant()) ex.push_back(v.nominal);
-    if (!v.start.is_constant()) ex.push_back(v.start);
     if (!v.beq.is_constant()) ex.push_back(v.beq);
   }
   // Perform elimination
@@ -986,13 +986,9 @@ void DaeBuilderInternal::eliminate_w() {
   substitute_inplace(w, wdef, ex);
   // Clear list of dependent variables
   w_.clear();
-  // Get variable attributes
+  // Get binding equations
   auto it = ex.begin();
   for (Variable& v : variables_) {
-    if (!v.min.is_constant()) v.min = *it++;
-    if (!v.max.is_constant()) v.max = *it++;
-    if (!v.nominal.is_constant()) v.nominal = *it++;
-    if (!v.start.is_constant()) v.start = *it++;
     if (!v.beq.is_constant()) v.beq = *it++;
   }
   // Consistency check
@@ -1633,86 +1629,6 @@ void DaeBuilderInternal::sort_dependent(std::vector<MX>& v, std::vector<MX>& vde
   // Reorder the equations
   for (size_t k = 0; k < v.size(); ++k) tmp[k] = vdef.at(rowperm.at(k));
   std::copy(tmp.begin(), tmp.end(), vdef.begin());
-}
-
-MX Variable::attribute(Attribute att) const {
-  switch (att) {
-  case MIN:
-    return this->min;
-  case MAX:
-    return this->max;
-  case NOMINAL:
-    return this->nominal;
-  case START:
-    return this->start;
-  default:
-    casadi_error("Cannot process attribute '" + to_string(att) + "'");
-    return MX();
-  }
-}
-
-Function DaeBuilderInternal::attribute_fun(const std::string& fname,
-    const std::vector<std::string>& s_in,
-    const std::vector<std::string>& s_out) const {
-  // Convert inputs to enums
-  std::vector<DaeBuilderInternalIn> v_in;
-  v_in.reserve(v_in.size());
-  for (const std::string& s : s_in) v_in.push_back(to_enum<DaeBuilderInternalIn>(s));
-  // Convert outputs to enums
-  std::vector<Variable::Attribute> a_out;
-  std::vector<DaeBuilderInternalIn> v_out;
-  a_out.reserve(s_out.size());
-  v_out.reserve(s_out.size());
-  for (const std::string& s : s_out) {
-    // Locate the underscore divider
-    size_t pos = s.find('_');
-    casadi_assert(pos < s.size(), "Cannot process \"" + s + "\"");
-    // Get attribute
-    a_out.push_back(to_enum<Variable::Attribute>(s.substr(0, pos)));
-    // Get variable
-    v_out.push_back(to_enum<DaeBuilderInternalIn>(s.substr(pos + 1, std::string::npos)));
-  }
-  // Collect input expressions
-  std::vector<MX> f_in;
-  f_in.reserve(s_in.size());
-  for (DaeBuilderInternalIn v : v_in) f_in.push_back(vertcat(input(v)));
-  // Collect output expressions
-  std::vector<MX> f_out;
-  f_out.reserve(s_out.size());
-  for (size_t i = 0; i < s_out.size(); ++i) {
-    // Get expressions for which attributes are requested
-    std::vector<MX> vars = input(v_out.at(i));
-    // Expressions for the attributes
-    std::vector<MX> attr;
-    attr.reserve(vars.size());
-    // Collect attributes
-    for (const MX& vi : vars)
-      attr.push_back(variable(vi.name()).attribute(a_out.at(i)));
-    // Add to output expressions
-    f_out.push_back(vertcat(attr));
-    // Handle dependency on w
-    if (depends_on(f_out.back(), vertcat(var(w_)))) {
-      // Make copies of w and wdef and sort
-      std::vector<MX> w_sorted = var(w_), wdef = this->wdef();
-      sort_dependent(w_sorted, wdef);
-      // Eliminate dependency on w
-      substitute_inplace(w_sorted, wdef, attr, false);
-      // Update f_out
-      f_out.back() = vertcat(attr);
-    }
-    // Handle interdependencies
-    if (depends_on(f_out.back(), vertcat(vars))) {
-      // Make copies of vars and attr and sort
-      std::vector<MX> vars_sorted = vars, attr_sorted = attr;
-      sort_dependent(vars_sorted, attr_sorted);
-      // Eliminate interdependencies
-      substitute_inplace(vars_sorted, attr_sorted, attr, false);
-      // Update f_out
-      f_out.back() = vertcat(attr);
-    }
-  }
-  // Assemble return function
-  return Function(fname, f_in, f_out, s_in, s_out);
 }
 
 Function DaeBuilderInternal::dependent_fun(const std::string& fname,
