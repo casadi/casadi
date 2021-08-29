@@ -391,9 +391,10 @@ public:
   ///@}
 
   ///@{
-  /// Get binding equation by name
+  /// Get/set the binding equation
   MX beq(const std::string& name) const;
   std::vector<MX> beq(const std::vector<std::string>& name) const;
+  void set_beq(const std::string& name, const MX& val);
   ///@}
 
   ///@{
@@ -478,12 +479,6 @@ public:
   /// Get/set the value at time 0
   double start(const std::string& name) const;
   void set_start(const std::string& name, double val);
-  ///@}
-
-  ///@{
-  /// Get/set the binding equation
-  const casadi::MX& binding_equation(const std::string& name) const;
-  void set_binding_equation(const std::string& name, const MX& val);
   ///@}
 
   /// Add a new variable: returns corresponding symbolic expression

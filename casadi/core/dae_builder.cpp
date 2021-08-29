@@ -551,6 +551,14 @@ std::vector<MX> DaeBuilder::beq(const std::vector<std::string>& name) const {
   }
 }
 
+void DaeBuilder::set_beq(const std::string& name, const MX& val) {
+  try {
+    variable(name).beq = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_beq", e.what());
+  }
+}
+
 void DaeBuilder::eliminate_w() {
   try {
     (*this)->eliminate_w();
@@ -661,14 +669,6 @@ double DaeBuilder::start(const std::string& name) const {
 
 void DaeBuilder::set_start(const std::string& name, double val) {
   variable(name).start = val;
-}
-
-const casadi::MX& DaeBuilder::binding_equation(const std::string& name) const {
-  return variable(name).beq;
-}
-
-void DaeBuilder::set_binding_equation(const std::string& name, const MX& val) {
-  variable(name).beq = val;
 }
 
 void DaeBuilder::add_lc(const std::string& name,
