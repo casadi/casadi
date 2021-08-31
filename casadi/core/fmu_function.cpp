@@ -321,35 +321,30 @@ void Fmu::get(int mem, size_t id, double* value) {
 void Fmu::gather_io(int mem) {
   // Get memory
   Memory& m = mem_.at(mem);
-  // Collect input indices
+  // Collect input indices and corresponding value references and values
   m.id_in_.clear();
+  m.vr_in_.clear();
+  m.v_in_.clear();
   for (size_t id = 0; id < m.changed_.size(); ++id) {
     if (m.changed_[id]) {
+      const Variable& v = self_.variable(id);
       m.id_in_.push_back(id);
+      m.vr_in_.push_back(v.value_reference);
+      m.v_in_.push_back(m.buffer_[id]);
       m.changed_[id] = false;
     }
   }
-  // Get corresponding value references
-  m.vr_in_.clear();
-  for (size_t id : m.id_in_) {
-    m.vr_in_.push_back(self_.variable(id).value_reference);
-  }
-  // Collect output indices
+  // Collect output indices, corresponding value references
   m.id_out_.clear();
+  m.vr_out_.clear();
   for (size_t id = 0; id < m.requested_.size(); ++id) {
     if (m.requested_[id]) {
+      const Variable& v = self_.variable(id);
       m.id_out_.push_back(id);
+      m.vr_out_.push_back(v.value_reference);
       m.requested_[id] = false;
     }
   }
-  // Get corresponding value references
-  m.vr_out_.clear();
-  for (size_t id : m.id_out_) {
-    m.vr_out_.push_back(self_.variable(id).value_reference);
-  }
-  // Get function inputs
-  m.v_in_.clear();
-  for (size_t id : m.id_in_) m.v_in_.push_back(m.buffer_[id]);
 }
 
 int Fmu::eval_derivative(int mem, const FmuFunction& f) {
@@ -399,13 +394,12 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
     casadi_assert(m.id_in_.size() == 1, "Not implemented");
     const Variable& var_in = self_.variable(m.id_in_[0]);
     // Get min, max and nominal value
-    double min = static_cast<double>(var_in.min);
-    double max = static_cast<double>(var_in.max);
-    double nom = static_cast<double>(var_in.nominal);
+    double min = var_in.min;
+    double max = var_in.max;
+    double nom = var_in.nominal;
     // Get nominal values for outputs
     m.nominal_out_.clear();
-    for (size_t id : m.id_out_)
-      m.nominal_out_.push_back(static_cast<double>(self_.variable(id).nominal));
+    for (size_t id : m.id_out_) m.nominal_out_.push_back(self_.variable(id).nominal);
     // Make outputs dimensionless
     for (size_t k = 0; k < n_unknown; ++k) m.v_out_[k] /= m.nominal_out_[k];
     // Perturbed outputs
