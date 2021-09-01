@@ -347,7 +347,7 @@ void Fmu::gather_io(int mem) {
   }
 }
 
-int Fmu::eval_derivative(int mem, const FmuFunction& f) {
+void Fmu::gather_sens(int mem) {
   // Gather input and output indices
   gather_io(mem);
   // Get memory
@@ -363,196 +363,234 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   }
   // Ensure at least one seed
   casadi_assert(n_known != 0, "No seeds");
+  // Allocate result vectors
+  m.v_out_.resize(n_unknown);
+  m.d_out_.resize(n_unknown);
+}
+
+int Fmu::eval_ad(int mem, const FmuFunction& f) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Number of inputs and outputs
+  size_t n_known = m.id_in_.size();
+  size_t n_unknown = m.id_out_.size();
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
-  // Get unperturbed outputs (should not be necessary)
-  m.v_out_.resize(n_unknown);
+  // Evalute (should not be necessary)
   fmi2Status status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, get_ptr(m.v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
   }
-  // Allocate result
-  m.d_out_.resize(n_unknown);
-  // Calculate derivatives using FMU directional derivative support
-  if (f.enable_ad_) {
-    fmi2Status status = get_directional_derivative_(m.c, get_ptr(m.vr_out_), n_unknown,
-      get_ptr(m.vr_in_), n_known, get_ptr(m.d_in_), get_ptr(m.d_out_));
+  // Evaluate directional derivatives
+  status = get_directional_derivative_(m.c, get_ptr(m.vr_out_), n_unknown,
+    get_ptr(m.vr_in_), n_known, get_ptr(m.d_in_), get_ptr(m.d_out_));
+  if (status != fmi2OK) {
+    casadi_warning("fmi2GetDirectionalDerivative failed");
+    return 1;
+  }
+  // Collect requested variables
+  auto it = m.d_out_.begin();
+  for (size_t id : m.id_out_) {
+    m.sens_[id] = *it++;
+  }
+  // Successful return
+  return 0;
+}
+
+int Fmu::eval_fd(int mem, const FmuFunction& f) {
+  // Get memory
+  Memory& m = mem_.at(mem);
+  // Number of inputs and outputs
+  size_t n_known = m.id_in_.size();
+  size_t n_unknown = m.id_out_.size();
+  // Quick return if nothing to be calculated
+  if (n_unknown == 0) return 0;
+  // Evalute (should not be necessary)
+  fmi2Status status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, get_ptr(m.v_out_));
+  if (status != fmi2OK) {
+    casadi_warning("fmi2GetReal failed");
+    return 1;
+  }
+  // Only single input implemented
+  casadi_assert(m.id_in_.size() == 1, "Not implemented");
+  const Variable& var_in = self_.variable(m.id_in_[0]);
+  // Get min, max and nominal value
+  double min = var_in.min;
+  double max = var_in.max;
+  double nom = var_in.nominal;
+  // Get nominal values for outputs
+  m.nominal_out_.clear();
+  for (size_t id : m.id_out_) m.nominal_out_.push_back(self_.variable(id).nominal);
+  // Make outputs dimensionless
+  for (size_t k = 0; k < n_unknown; ++k) m.v_out_[k] /= m.nominal_out_[k];
+  // Perturbed outputs
+  double* yk[4];
+  // Error estimate used to update step size
+  double u = nan;
+  // Initial step size
+  double h = nom * f.step_;
+  // For backward, negate h
+  if (f.fd_ == BACKWARD) h = -h;
+  // Number of perturbations
+  casadi_int n_pert = f.n_pert();
+  // Allocate memory for perturbed outputs
+  m.fd_out_.resize(n_pert * n_unknown);
+  // Perform finite difference algorithm with different step sizes
+  for (casadi_int iter = 0; iter < 1 + f.h_iter_; ++iter) {
+    // Calculate all perturbed outputs
+    for (casadi_int k = 0; k < n_pert; ++k) {
+      // Where to save the perturbed outputs
+      yk[k] = &m.fd_out_[n_unknown * k];
+      // Get perturbation expression
+      double pert;
+      switch (f.fd_) {
+      case FORWARD:
+      case BACKWARD:
+        pert = h;
+        break;
+      case CENTRAL:
+        pert = (2 * static_cast<double>(k) - 1) * h;
+        break;
+      case SMOOTHING:
+        pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
+        break;
+      default: casadi_error("Not implemented");
+      }
+      // Check if in bounds (or smoothing which currently doesn't implement bounds handling)
+      double test = m.v_in_[0] + pert * m.d_in_[0];
+      if (f.fd_ != SMOOTHING || (test >= min && test <= max)) {
+        // Pass perturbed inputs to FMU
+        casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
+        status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
+        if (status != fmi2OK) {
+          casadi_warning("fmi2SetReal failed");
+          return 1;
+        }
+        // Evaluate perturbed FMU
+        status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
+        if (status != fmi2OK) {
+          casadi_warning("fmi2GetReal failed");
+          return 1;
+        }
+        // Remove purburbation
+        casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
+        // Make perturbed outputs dimensionless
+        for (size_t i = 0; i < n_unknown; ++i) yk[k][i] /= m.nominal_out_[i];
+      } else {
+        // Input outside bounds, set to NaN
+        for (size_t i = 0; i < n_unknown; ++i) yk[k][i] = nan;
+      }
+    }
+    // Restore FMU inputs
+    status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
     if (status != fmi2OK) {
-      casadi_warning("fmi2GetDirectionalDerivative failed");
+      casadi_warning("fmi2SetReal failed");
       return 1;
     }
-    // Collect requested variables
-    auto it = m.d_out_.begin();
-    for (size_t id : m.id_out_) {
-      m.sens_[id] = *it++;
+    // FD memory
+    casadi_finite_diff_mem<double> fd_mem;
+    fd_mem.reltol = f.reltol_;
+    fd_mem.abstol = f.abstol_;
+    fd_mem.smoothing = eps;
+    switch (f.fd_) {
+      case FORWARD:
+      case BACKWARD:
+        u = casadi_forward_diff(yk, get_ptr(m.v_out_),
+          get_ptr(m.d_out_), h, n_unknown, &fd_mem);
+        break;
+      case CENTRAL:
+        u = casadi_central_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
+          h, n_unknown, &fd_mem);
+        break;
+      case SMOOTHING:
+        u = casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
+          h, n_unknown, &fd_mem);
+        break;
+      default: casadi_error("Not implemented");
     }
+    // Stop, if no more stepsize iterations
+    if (iter == f.h_iter_) break;
+    // Update step size
+    if (u < 0) {
+      // Perturbation failed, try a smaller step size
+      h /= f.u_aim_;
+    } else {
+      // Update h to get u near the target ratio
+      h *= sqrt(f.u_aim_ / fmax(1., u));
+    }
+    // Make sure h stays in the range [h_min_,h_max_]
+    h = fmin(fmax(h, f.h_min_), f.h_max_);
+  }
+  // Collect requested variables
+  for (size_t ind = 0; ind < m.id_out_.size(); ++ind) {
+    // Variable id
+    size_t id = m.id_out_[ind];
+    // Get the value
+    double d_fd = m.d_out_[ind];
+    // Scale by nominal value
+    d_fd *= m.nominal_out_[ind];
+    // Use FD instead of AD or to compare with AD
+    if (f.validate_ad_) {
+      // Nominal value
+      double n = m.nominal_out_[ind];
+      // Value to compare with
+      double d_ad = m.sens_[id];
+      // Magnitude of derivatives
+      double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
+      // Check if error exceeds thresholds
+      if (d_max > n * f.abstol_ && std::fabs(d_ad - d_fd) > d_max * f.reltol_) {
+        // Access variable
+        const Variable& v = self_.variable(id);
+        // Issue warning
+        std::stringstream ss;
+        ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << var_in.name << "\n"
+          << "At " << m.v_in_ << ", direction " << m.d_in_ << ", nominal " << nom
+          << ", min " << min << ", max " << max << ", got " << d_ad
+          << " for AD vs. " << d_fd << " for FD[" << to_string(f.fd_) << "].\n";
+        // Also print the stencil:
+        std::vector<double> stencil;
+        switch (f.fd_) {
+          case FORWARD:
+            stencil = {m.v_out_[ind], yk[0][ind]};
+            break;
+          case BACKWARD:
+            stencil = {yk[0][ind], m.v_out_[ind]};
+            break;
+          case CENTRAL:
+            stencil = {yk[0][ind], m.v_out_[ind], yk[1][ind]};
+            break;
+          case SMOOTHING:
+            stencil = {yk[1][ind], yk[0][ind], m.v_out_[ind], yk[2][ind], yk[3][ind]};
+            break;
+          default: casadi_error("Not implemented");
+        }
+        // Scale by nominal value
+        for (double& s : stencil) s *= n;
+        ss << "Values for step size " << h << ", error ratio " << u << ": " << stencil;
+        casadi_warning(ss.str());
+      }
+    } else {
+      // Use instead of AD
+      m.sens_[id] = d_fd;
+    }
+  }
+  // Successful return
+  return 0;
+}
+
+int Fmu::eval_derivative(int mem, const FmuFunction& f) {
+  // Gather input and output indices
+  gather_sens(mem);
+  // Calculate derivatives using FMU directional derivative support
+  if (f.enable_ad_) {
+    // Evaluate using AD
+    if (eval_ad(mem, f)) return 1;
   }
   // Calculate derivatives using finite differences
   if (!f.enable_ad_ || f.validate_ad_) {
-    // Only single input implemented
-    casadi_assert(m.id_in_.size() == 1, "Not implemented");
-    const Variable& var_in = self_.variable(m.id_in_[0]);
-    // Get min, max and nominal value
-    double min = var_in.min;
-    double max = var_in.max;
-    double nom = var_in.nominal;
-    // Get nominal values for outputs
-    m.nominal_out_.clear();
-    for (size_t id : m.id_out_) m.nominal_out_.push_back(self_.variable(id).nominal);
-    // Make outputs dimensionless
-    for (size_t k = 0; k < n_unknown; ++k) m.v_out_[k] /= m.nominal_out_[k];
-    // Perturbed outputs
-    double* yk[4];
-    // Error estimate used to update step size
-    double u = nan;
-    // Initial step size
-    double h = nom * f.step_;
-    // For backward, negate h
-    if (f.fd_ == BACKWARD) h = -h;
-    // Number of perturbations
-    casadi_int n_pert = f.n_pert();
-    // Allocate memory for perturbed outputs
-    m.fd_out_.resize(n_pert * n_unknown);
-    // Perform finite difference algorithm with different step sizes
-    for (casadi_int iter = 0; iter < 1 + f.h_iter_; ++iter) {
-      // Calculate all perturbed outputs
-      for (casadi_int k = 0; k < n_pert; ++k) {
-        // Where to save the perturbed outputs
-        yk[k] = &m.fd_out_[n_unknown * k];
-        // Get perturbation expression
-        double pert;
-        switch (f.fd_) {
-        case FORWARD:
-        case BACKWARD:
-          pert = h;
-          break;
-        case CENTRAL:
-          pert = (2 * static_cast<double>(k) - 1) * h;
-          break;
-        case SMOOTHING:
-          pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
-          break;
-        default: casadi_error("Not implemented");
-        }
-        // Check if in bounds (or smoothing which currently doesn't implement bounds handling)
-        double test = m.v_in_[0] + pert * m.d_in_[0];
-        if (f.fd_ != SMOOTHING || (test >= min && test <= max)) {
-          // Pass perturbed inputs to FMU
-          casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
-          status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
-          if (status != fmi2OK) {
-            casadi_warning("fmi2SetReal failed");
-            return 1;
-          }
-          // Evaluate perturbed FMU
-          status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2GetReal failed");
-            return 1;
-          }
-          // Remove purburbation
-          casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
-          // Make perturbed outputs dimensionless
-          for (size_t i = 0; i < n_unknown; ++i) yk[k][i] /= m.nominal_out_[i];
-        } else {
-          // Input outside bounds, set to NaN
-          for (size_t i = 0; i < n_unknown; ++i) yk[k][i] = nan;
-        }
-      }
-      // Restore FMU inputs
-      status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
-      if (status != fmi2OK) {
-        casadi_warning("fmi2SetReal failed");
-        return 1;
-      }
-      // FD memory
-      casadi_finite_diff_mem<double> fd_mem;
-      fd_mem.reltol = f.reltol_;
-      fd_mem.abstol = f.abstol_;
-      fd_mem.smoothing = eps;
-      switch (f.fd_) {
-        case FORWARD:
-        case BACKWARD:
-          u = casadi_forward_diff(yk, get_ptr(m.v_out_),
-            get_ptr(m.d_out_), h, n_unknown, &fd_mem);
-          break;
-        case CENTRAL:
-          u = casadi_central_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
-            h, n_unknown, &fd_mem);
-          break;
-        case SMOOTHING:
-          u = casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
-            h, n_unknown, &fd_mem);
-          break;
-        default: casadi_error("Not implemented");
-      }
-      // Stop, if no more stepsize iterations
-      if (iter == f.h_iter_) break;
-      // Update step size
-      if (u < 0) {
-        // Perturbation failed, try a smaller step size
-        h /= f.u_aim_;
-      } else {
-        // Update h to get u near the target ratio
-        h *= sqrt(f.u_aim_ / fmax(1., u));
-      }
-      // Make sure h stays in the range [h_min_,h_max_]
-      h = fmin(fmax(h, f.h_min_), f.h_max_);
-    }
-    // Collect requested variables
-    for (size_t ind = 0; ind < m.id_out_.size(); ++ind) {
-      // Variable id
-      size_t id = m.id_out_[ind];
-      // Get the value
-      double d_fd = m.d_out_[ind];
-      // Scale by nominal value
-      d_fd *= m.nominal_out_[ind];
-      // Use FD instead of AD or to compare with AD
-      if (f.validate_ad_) {
-        // Nominal value
-        double n = m.nominal_out_[ind];
-        // Value to compare with
-        double d_ad = m.sens_[id];
-        // Magnitude of derivatives
-        double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
-        // Check if error exceeds thresholds
-        if (d_max > n * f.abstol_ && std::fabs(d_ad - d_fd) > d_max * f.reltol_) {
-          // Access variable
-          const Variable& v = self_.variable(id);
-          // Issue warning
-          std::stringstream ss;
-          ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << var_in.name << "\n"
-            << "At " << m.v_in_ << ", direction " << m.d_in_ << ", nominal " << nom
-            << ", min " << min << ", max " << max << ", got " << d_ad
-            << " for AD vs. " << d_fd << " for FD[" << to_string(f.fd_) << "].\n";
-          // Also print the stencil:
-          std::vector<double> stencil;
-          switch (f.fd_) {
-            case FORWARD:
-              stencil = {m.v_out_[ind], yk[0][ind]};
-              break;
-            case BACKWARD:
-              stencil = {yk[0][ind], m.v_out_[ind]};
-              break;
-            case CENTRAL:
-              stencil = {yk[0][ind], m.v_out_[ind], yk[1][ind]};
-              break;
-            case SMOOTHING:
-              stencil = {yk[1][ind], yk[0][ind], m.v_out_[ind], yk[2][ind], yk[3][ind]};
-              break;
-            default: casadi_error("Not implemented");
-          }
-          // Scale by nominal value
-          for (double& s : stencil) s *= n;
-          ss << "Values for step size " << h << ", error ratio " << u << ": " << stencil;
-          casadi_warning(ss.str());
-        }
-      } else {
-        // Use instead of AD
-        m.sens_[id] = d_fd;
-      }
-    }
+    // Evaluate using FD
+    if (eval_fd(mem, f)) return 1;
   }
   return 0;
 }

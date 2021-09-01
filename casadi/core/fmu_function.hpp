@@ -106,6 +106,15 @@ struct CASADI_EXPORT Fmu {
   // Gather user inputs and outputs
   void gather_io(int mem);
 
+  // Gather user sensitivities
+  void gather_sens(int mem);
+
+  // Calculate directional derivatives using AD
+  int eval_ad(int mem, const FmuFunction& f);
+
+  // Calculate directional derivatives using FD
+  int eval_fd(int mem, const FmuFunction& f);
+
   // Calculate directional derivatives
   int eval_derivative(int mem, const FmuFunction& f);
 
