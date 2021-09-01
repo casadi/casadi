@@ -416,11 +416,6 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
     casadi_warning("fmi2GetReal failed");
     return 1;
   }
-  // Only single input implemented
-  casadi_assert(m.id_in_.size() == 1, "Not implemented");
-  const Variable& var_in = self_.variable(m.id_in_[0]);
-  // Get nominal value
-  double nom = var_in.nominal;
   // Get nominal values for outputs
   m.nominal_out_.clear();
   for (size_t id : m.id_out_) m.nominal_out_.push_back(self_.variable(id).nominal);
@@ -431,7 +426,7 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
   // Error estimate used to update step size
   double u = nan;
   // Initial step size
-  double h = nom * f.step_;
+  double h = f.step_;
   // For backward, negate h
   if (f.fd_ == BACKWARD) h = -h;
   // Number of perturbations
@@ -545,17 +540,19 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
     double d_fd = m.d_out_[ind] * n;
     // Use FD instead of AD or to compare with AD
     if (f.validate_ad_) {
+      // Access output variable
+      const Variable& v = self_.variable(id);
+      // With respect to what variable
+      size_t wrt_id = m.wrt_[id];
+      const Variable& wrt = self_.variable(wrt_id);
+      // Nominal value for input
+      double wrt_nom = wrt.nominal;
       // Value to compare with
       double d_ad = m.sens_[id];
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if error exceeds thresholds
-      if (d_max > n * f.abstol_ && std::fabs(d_ad - d_fd) > d_max * f.reltol_) {
-        // Access variables
-        const Variable& v = self_.variable(id);
-        // With respect to what variable
-        size_t wrt_id = m.wrt_[id];
-        const Variable& wrt = self_.variable(wrt_id);
+      if (d_max > wrt_nom * n * f.abstol_ && std::fabs(d_ad - d_fd) > d_max * f.reltol_) {
         // Which element in the vector
         size_t wrt_ind = 0;
         for (; wrt_ind < m.id_in_.size(); ++wrt_ind)
@@ -564,8 +561,8 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
         // Issue warning
         std::stringstream ss;
         ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << wrt.name << "\n"
-          << "At " << m.v_in_[wrt_ind] << ", direction " << m.d_in_[wrt_ind] << ", nominal "
-          << wrt.nominal << ", min " << wrt.min << ", max " << wrt.max << ", got " << d_ad
+          << "At " << m.v_in_[wrt_ind] << ", nominal " << wrt.nominal << ", min " << wrt.min
+          << ", max " << wrt.max << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(f.fd_) << "].\n";
         // Also print the stencil:
         std::vector<double> stencil;
@@ -670,10 +667,15 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
     if (adj && sens == 0) continue;
     // Calculate Jacobian, one column at a time
     for (casadi_int i2 = 0; i2 < f.id_in_[i1].size(); ++i2) {
+      // Differentiation with respect to what variable
+      size_t wrt_id = f.id_in_[i1][i2];
+      // Nominal value, its inverse
+      double nom = self_.variable(wrt_id).nominal;
+      double inv_nom = 1. / nom;
       // Adj: Initialize return to zero
       if (adj) sens[i2] = 0;
       // Set seed for column
-      set_seed(mem, f.id_in_[i1][i2], 1.);
+      set_seed(mem, wrt_id, nom);
       // Loop over function output
       for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
         // Index of the Jacobian block
@@ -685,7 +687,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
         const casadi_int* row = sp_jac[res_ind].row();
         // Request all nonzero elements of the column
         for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-          request(mem, f.id_out_[j1][row[k]], f.id_in_[i1][i2]);
+          request(mem, f.id_out_[j1][row[k]], wrt_id);
         }
       }
       // Calculate derivatives
@@ -707,6 +709,8 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
           // Get the Jacobian nonzero
           double J_nz;
           get_sens(mem, f.id_out_[j1][j2], &J_nz);
+          // Remove nominal value factor
+          J_nz *= inv_nom;
           // Save or multiply
           if (adj) {
             // Adjoint: Multiply with vector from left
