@@ -673,9 +673,8 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
       if (adj && sens == 0) continue;
       // Differentiation with respect to what variable
       size_t wrt_id = f.id_in_[i1][i2];
-      // Nominal value, its inverse
+      // Nominal value
       double nom = self_.variable(wrt_id).nominal;
-      double inv_nom = 1. / nom;
       // Adj: Initialize return to zero
       if (adj) sens[i2] = 0;
       // Set seed for column
@@ -694,8 +693,25 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
           request(mem, f.id_out_[j1][row[k]], wrt_id);
         }
       }
-      // Calculate derivatives
-      if (eval_derivative(mem, f)) return 1;
+    }
+
+    // Calculate derivatives
+    if (eval_derivative(mem, f)) return 1;
+
+    // Loop over flattened input indices for color
+    for (casadi_int kc = f.coloring_.colind(c); kc < f.coloring_.colind(c + 1); ++kc) {
+      casadi_int ind_flat = f.coloring_.row(kc);
+      // Corresponding function index, element index
+      casadi_int i1 = f.offset_map_[ind_flat];
+      casadi_int i2 = ind_flat - f.offset_[i1];
+      // Adj: Sensitivities to be calculated
+      double* sens = adj ? res[i1] : 0;
+      // Adj: Skip if not requested
+      if (adj && sens == 0) continue;
+      // Differentiation with respect to what variable
+      size_t wrt_id = f.id_in_[i1][i2];
+      // Inverse of nominal value
+      double inv_nom = 1. / self_.variable(wrt_id).nominal;
       // Loop over function outputs
       for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
         // Adj: Corresponding seed
