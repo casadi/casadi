@@ -92,7 +92,7 @@ struct CASADI_EXPORT Fmu {
   void set(int mem, size_t id, double value);
 
   // Request the calculation of a variable
-  void request(int mem, size_t id);
+  void request(int mem, size_t id, size_t wrt_id = -1);
 
   // Calculate all requested variables
   int eval(int mem, const FmuFunction& f);
@@ -175,6 +175,8 @@ struct CASADI_EXPORT Fmu {
     std::vector<bool> changed_;
     // Which entries are being requested
     std::vector<bool> requested_;
+    // Derivative with respect to
+    std::vector<size_t> wrt_;
     // Current known/unknown variables
     std::vector<size_t> id_in_, id_out_;
     // Value references

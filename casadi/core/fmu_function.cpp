@@ -174,6 +174,8 @@ int Fmu::checkout() {
     // Allocate/reset requested
     m.requested_.resize(self_.variables_.size());
     std::fill(m.requested_.begin(), m.requested_.end(), false);
+    // Also allocate memory for corresponding Jacobian entry (for debugging)
+    m.wrt_.resize(self_.variables_.size());
   }
   // Return memory object
   return mem;
@@ -253,11 +255,13 @@ void Fmu::set_seed(int mem, size_t id, double value) {
   }
 }
 
-void Fmu::request(int mem, size_t id) {
+void Fmu::request(int mem, size_t id, size_t wrt_id) {
   // Get memory
   Memory& m = mem_.at(mem);
   // Mark as requested
   m.requested_.at(id) = true;
+  // Also log corresponding input index
+  m.wrt_.at(id) = wrt_id;
 }
 
 int Fmu::eval(int mem, const FmuFunction& f) {
@@ -415,9 +419,7 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
   // Only single input implemented
   casadi_assert(m.id_in_.size() == 1, "Not implemented");
   const Variable& var_in = self_.variable(m.id_in_[0]);
-  // Get min, max and nominal value
-  double min = var_in.min;
-  double max = var_in.max;
+  // Get nominal value
   double nom = var_in.nominal;
   // Get nominal values for outputs
   m.nominal_out_.clear();
@@ -457,9 +459,20 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
         break;
       default: casadi_error("Not implemented");
       }
-      // Check if in bounds (or smoothing which currently doesn't implement bounds handling)
-      double test = m.v_in_[0] + pert * m.d_in_[0];
-      if (f.fd_ != SMOOTHING || (test >= min && test <= max)) {
+      // Check if perturbation is allowed
+      bool in_bounds = true;
+      for (size_t iind = 0; iind < m.id_in_.size(); ++iind) {
+        // Get bounds
+        const Variable& var_in = self_.variable(m.id_in_[iind]);
+        double min = var_in.min;
+        double max = var_in.max;
+        // Take step
+        double test = m.v_in_[iind] + pert * m.d_in_[iind];
+        // Check if in bounds
+        in_bounds = in_bounds && test >= min && test <= max;
+      }
+      // Check if in bounds (or not smoothing which currently doesn't implement bounds handling)
+      if (f.fd_ != SMOOTHING || in_bounds) {
         // Pass perturbed inputs to FMU
         casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
         status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
@@ -526,27 +539,33 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
   for (size_t ind = 0; ind < m.id_out_.size(); ++ind) {
     // Variable id
     size_t id = m.id_out_[ind];
+    // Nominal value
+    double n = m.nominal_out_[ind];
     // Get the value
-    double d_fd = m.d_out_[ind];
-    // Scale by nominal value
-    d_fd *= m.nominal_out_[ind];
+    double d_fd = m.d_out_[ind] * n;
     // Use FD instead of AD or to compare with AD
     if (f.validate_ad_) {
-      // Nominal value
-      double n = m.nominal_out_[ind];
       // Value to compare with
       double d_ad = m.sens_[id];
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if error exceeds thresholds
       if (d_max > n * f.abstol_ && std::fabs(d_ad - d_fd) > d_max * f.reltol_) {
-        // Access variable
+        // Access variables
         const Variable& v = self_.variable(id);
+        // With respect to what variable
+        size_t wrt_id = m.wrt_[id];
+        const Variable& wrt = self_.variable(wrt_id);
+        // Which element in the vector
+        size_t wrt_ind = 0;
+        for (; wrt_ind < m.id_in_.size(); ++wrt_ind)
+          if (m.id_in_[wrt_ind] == wrt_id) break;
+        casadi_assert(wrt_ind < m.id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
-        ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << var_in.name << "\n"
-          << "At " << m.v_in_ << ", direction " << m.d_in_ << ", nominal " << nom
-          << ", min " << min << ", max " << max << ", got " << d_ad
+        ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << wrt.name << "\n"
+          << "At " << m.v_in_[wrt_ind] << ", direction " << m.d_in_[wrt_ind] << ", nominal "
+          << wrt.nominal << ", min " << wrt.min << ", max " << wrt.max << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(f.fd_) << "].\n";
         // Also print the stencil:
         std::vector<double> stencil;
@@ -666,7 +685,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
         const casadi_int* row = sp_jac[res_ind].row();
         // Request all nonzero elements of the column
         for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-          request(mem, f.id_out_[j1][row[k]]);
+          request(mem, f.id_out_[j1][row[k]], f.id_in_[i1][i2]);
         }
       }
       // Calculate derivatives
