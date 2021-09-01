@@ -682,8 +682,8 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
         // Jac: Skip if block is not requested
         if (!adj && res[res_ind] == 0) continue;
         // Get sparsity
-        const casadi_int* colind = f.sp_jac_[res_ind].colind();
-        const casadi_int* row = f.sp_jac_[res_ind].row();
+        const casadi_int* colind = f.sp_jac_[j1][i1].colind();
+        const casadi_int* row = f.sp_jac_[j1][i1].row();
         // Request all nonzero elements of the column
         for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
           request(mem, f.id_out_[j1][row[k]], wrt_id);
@@ -700,8 +700,8 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
         // Jac: Skip if block is not requested
         if (!adj && res[res_ind] == 0) continue;
         // Get sparsity
-        const casadi_int* colind = f.sp_jac_[res_ind].colind();
-        const casadi_int* row = f.sp_jac_[res_ind].row();
+        const casadi_int* colind = f.sp_jac_[j1][i1].colind();
+        const casadi_int* row = f.sp_jac_[j1][i1].row();
         // Collect all nonzero elements of the column
         for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
           size_t j2 = row[k];
@@ -838,11 +838,11 @@ void FmuFunction::init(const Dict& opts) {
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
   // Get all Jacobian blocks
-  sp_jac_.clear();
-  sp_jac_.reserve(n_in_ * n_out_);
+  sp_jac_.resize(n_out_);
   std::vector<casadi_int> lookup(dae->variables_.size());
   std::vector<casadi_int> row, col;
   for (casadi_int oind = 0; oind < n_out_; ++oind) {
+    sp_jac_[oind].resize(n_in_);
     for (casadi_int iind = 0; iind < n_in_; ++iind) {
       // Clear lookup
       std::fill(lookup.begin(), lookup.end(), -1);
@@ -864,10 +864,17 @@ void FmuFunction::init(const Dict& opts) {
         }
       }
       // Assemble sparsity pattern
-      sp_jac_.push_back(Sparsity::triplet(id_out_.at(oind).size(),
-        id_in_.at(iind).size(), row, col));
+      sp_jac_[oind][iind] = Sparsity::triplet(id_out_.at(oind).size(),
+        id_in_.at(iind).size(), row, col);
     }
   }
+  // Concatenate blocks
+  Sparsity sp_jac_all = blockcat(sp_jac_);
+  // Calculate graph coloring
+  coloring_ = sp_jac_all.uni_coloring();
+  if (verbose_) casadi_message("Graph coloring: " + str(sp_jac_all.size2())
+    + " -> " + str(coloring_.size2()) + " directions");
+
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
 }
@@ -882,7 +889,7 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
 
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
-  return sp_jac_.at(iind + oind * n_in_);
+  return sp_jac_.at(oind).at(iind);
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,

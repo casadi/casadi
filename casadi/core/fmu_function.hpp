@@ -234,7 +234,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   void init(const Dict& opts) override;
 
   // Jacobian sparsity patterns
-  std::vector<Sparsity> sp_jac_;
+  std::vector<std::vector<Sparsity>> sp_jac_;
+
+  // Graph coloring
+  Sparsity coloring_;
 
   ///@{
   /** \brief Number of function inputs and outputs */
