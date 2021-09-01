@@ -649,8 +649,7 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
   return 0;
 }
 
-int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& f,
-    const std::vector<Sparsity>& sp_jac, bool adj) {
+int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& f, bool adj) {
   // Set inputs
   for (size_t k = 0; k < f.id_in_.size(); ++k) {
     for (size_t i = 0; i < f.id_in_[k].size(); ++i) {
@@ -683,8 +682,8 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
         // Jac: Skip if block is not requested
         if (!adj && res[res_ind] == 0) continue;
         // Get sparsity
-        const casadi_int* colind = sp_jac[res_ind].colind();
-        const casadi_int* row = sp_jac[res_ind].row();
+        const casadi_int* colind = f.sp_jac_[res_ind].colind();
+        const casadi_int* row = f.sp_jac_[res_ind].row();
         // Request all nonzero elements of the column
         for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
           request(mem, f.id_out_[j1][row[k]], wrt_id);
@@ -701,8 +700,8 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
         // Jac: Skip if block is not requested
         if (!adj && res[res_ind] == 0) continue;
         // Get sparsity
-        const casadi_int* colind = sp_jac[res_ind].colind();
-        const casadi_int* row = sp_jac[res_ind].row();
+        const casadi_int* colind = f.sp_jac_[res_ind].colind();
+        const casadi_int* row = f.sp_jac_[res_ind].row();
         // Collect all nonzero elements of the column
         for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
           size_t j2 = row[k];
@@ -838,6 +837,37 @@ void FmuFunction::init(const Dict& opts) {
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
+  // Get all Jacobian blocks
+  sp_jac_.clear();
+  sp_jac_.reserve(n_in_ * n_out_);
+  std::vector<casadi_int> lookup(dae->variables_.size());
+  std::vector<casadi_int> row, col;
+  for (casadi_int oind = 0; oind < n_out_; ++oind) {
+    for (casadi_int iind = 0; iind < n_in_; ++iind) {
+      // Clear lookup
+      std::fill(lookup.begin(), lookup.end(), -1);
+      // Mark inputs
+      for (casadi_int i = 0; i < id_in_.at(iind).size(); ++i)
+        lookup.at(id_in_.at(iind).at(i)) = i;
+      // Collect nonzeros of the Jacobian
+      row.clear();
+      col.clear();
+      // Loop over output nonzeros
+      for (casadi_int j = 0; j < id_out_.at(oind).size(); ++j) {
+        // Loop over dependencies
+        for (casadi_int d : dae->variables_.at(id_out_.at(oind).at(j)).dependencies) {
+          casadi_int i = lookup.at(d);
+          if (i >= 0) {
+            row.push_back(j);
+            col.push_back(i);
+          }
+        }
+      }
+      // Assemble sparsity pattern
+      sp_jac_.push_back(Sparsity::triplet(id_out_.at(oind).size(),
+        id_in_.at(iind).size(), row, col));
+    }
+  }
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
 }
@@ -852,28 +882,7 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
 
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
-  // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Lookup for inputs
-  std::vector<casadi_int> lookup(dae->variables_.size(), -1);
-  for (casadi_int i = 0; i < id_in_.at(iind).size(); ++i)
-    lookup.at(id_in_.at(iind).at(i)) = i;
-  // Nonzeros of the Jacobian
-  std::vector<casadi_int> row, col;
-  // Loop over output nonzeros
-  for (casadi_int j = 0; j < id_out_.at(oind).size(); ++j) {
-    // Loop over dependencies
-    for (casadi_int d : dae->variables_.at(id_out_.at(oind).at(j)).dependencies) {
-      casadi_int i = lookup.at(d);
-      if (i >= 0) {
-        row.push_back(j);
-        col.push_back(i);
-      }
-    }
-  }
-  // Assemble sparsity pattern
-  return Sparsity::triplet(id_out_.at(oind).size(), id_in_.at(iind).size(), row, col);
+  return sp_jac_.at(iind + oind * n_in_);
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
@@ -945,7 +954,7 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_jac(m, arg, res, *self, sparsity_out_, false);
+  int flag = dae->fmu_->eval_jac(m, arg, res, *self, false);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
@@ -967,7 +976,7 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_jac(m, arg, res, *self, sp_jac_, true);
+  int flag = dae->fmu_->eval_jac(m, arg, res, *self, true);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
@@ -983,21 +992,6 @@ std::string to_string(Fmu::FdMode v) {
   default: break;
   }
   return "";
-}
-
-void FmuFunctionAdj::init(const Dict& opts) {
-  // Call the initialization method of the base class
-  FunctionInternal::init(opts);
-  // Non-differentiated class
-  auto self = derivative_of_.get<FmuFunction>();
-  // Get all Jacobian blocks
-  sp_jac_.clear();
-  sp_jac_.reserve(self->n_in_ * self->n_out_);
-  for (casadi_int oind = 0; oind < self->n_out_; ++oind) {
-    for (casadi_int iind = 0; iind < self->n_in_; ++iind) {
-      sp_jac_.push_back(self->jac_sparsity(oind, iind, false, false));
-    }
-  }
 }
 
 #endif  // WITH_FMU
