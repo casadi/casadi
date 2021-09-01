@@ -634,7 +634,7 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
 }
 
 int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& f,
-    const std::vector<Sparsity>& sp_jac) {
+    const std::vector<Sparsity>& sp_jac, bool adj) {
   // Set inputs
   for (size_t k = 0; k < f.id_in_.size(); ++k) {
     for (size_t i = 0; i < f.id_in_[k].size(); ++i) {
@@ -645,96 +645,61 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
   if (eval(mem, f)) return 1;
   // Loop over function inputs
   for (size_t i1 = 0; i1 < f.id_in_.size(); ++i1) {
+    // Adj: Sensitivities to be calculated
+    double* sens = adj ? res[i1] : 0;
+    // Adj: Skip if not requested
+    if (adj && sens == 0) continue;
     // Calculate Jacobian, one column at a time
     for (casadi_int i2 = 0; i2 < f.id_in_[i1].size(); ++i2) {
+      // Adj: Initialize return to zero
+      if (adj) sens[i2] = 0;
       // Set seed for column
       set_seed(mem, f.id_in_[i1][i2], 1.);
       // Loop over function output
       for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
         // Index of the Jacobian block
         size_t res_ind = j1 * f.id_in_.size() + i1;
-        // Only calculate outputs that are requested
-        if (res[res_ind]) {
-          // Get sparsity
-          const casadi_int* colind = sp_jac[res_ind].colind();
-          const casadi_int* row = sp_jac[res_ind].row();
-          // Request all nonzero elements of the column
-          for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-            request(mem, f.id_out_[j1][row[k]]);
-          }
+        // Jac: Skip if block is not requested
+        if (!adj && res[res_ind] == 0) continue;
+        // Get sparsity
+        const casadi_int* colind = sp_jac[res_ind].colind();
+        const casadi_int* row = sp_jac[res_ind].row();
+        // Request all nonzero elements of the column
+        for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
+          request(mem, f.id_out_[j1][row[k]]);
         }
       }
       // Calculate derivatives
       if (eval_derivative(mem, f)) return 1;
       // Loop over function outputs
       for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
+        // Adj: Corresponding seed
+        const double* seed = adj ? arg[f.id_in_.size() + f.id_out_.size() + j1] : 0;
         // Index of the Jacobian block
         size_t res_ind = j1 * f.id_in_.size() + i1;
-        // Only calculate outputs that are requested
-        if (res[res_ind]) {
-          // Get sparsity
-          const casadi_int* colind = sp_jac[res_ind].colind();
-          const casadi_int* row = sp_jac[res_ind].row();
-          // Collect all nonzero elements of the column
-          for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-            get_sens(mem, f.id_out_[j1][row[k]], &res[res_ind][k]);
+        // Jac: Skip if block is not requested
+        if (!adj && res[res_ind] == 0) continue;
+        // Get sparsity
+        const casadi_int* colind = sp_jac[res_ind].colind();
+        const casadi_int* row = sp_jac[res_ind].row();
+        // Collect all nonzero elements of the column
+        for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
+          size_t j2 = row[k];
+          // Get the Jacobian nonzero
+          double J_nz;
+          get_sens(mem, f.id_out_[j1][j2], &J_nz);
+          // Save or multiply
+          if (adj) {
+            // Adjoint: Multiply with vector from left
+            sens[i2] += seed[j2] * J_nz;
+          } else {
+            // Jacobian: Copy nonzero
+            res[res_ind][k] = J_nz;
           }
         }
       }
     }
   }
-  // Reset solver
-  //if (reset(mem)) return 1;
-  // Successful return
-  return 0;
-}
-
-int Fmu::eval_adj(int mem, const double** arg, double** res, const FmuFunction& f) {
-  // Set inputs
-  for (size_t k = 0; k < f.id_in_.size(); ++k) {
-    for (size_t i = 0; i < f.id_in_[k].size(); ++i) {
-      set(mem, f.id_in_[k][i], arg[k] ? arg[k][i] : 0);
-    }
-  }
-  // Evaluate
-  if (eval(mem, f)) return 1;
-  // Loop over function inputs
-  for (size_t i1 = 0; i1 < f.id_in_.size(); ++i1) {
-    // Sensitivities to be calculated
-    double* sens = res[i1];
-    // Skip if not requested
-    if (sens == 0) continue;
-    // Calculate Jacobian, one column at a time
-    for (casadi_int i2 = 0; i2 < f.id_in_[i1].size(); ++i2) {
-      // Initialize return to zero
-      sens[i2] = 0;
-      // Set seed for column i
-      set_seed(mem, f.id_in_[i1][i2], 1.);
-      // Request all elements of the column, unless corresponding seed is zero
-      for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
-        if (arg[f.id_in_.size() + f.id_out_.size() + j1]) {
-          for (size_t j2 = 0; j2 < f.id_out_[j1].size(); ++j2) {
-            request(mem, f.id_out_[j1][j2]);
-          }
-        }
-      }
-      // Calculate derivatives
-      if (eval_derivative(mem, f)) return 1;
-      // Get sensitivities
-      for (size_t j1 = 0; j1 < f.id_out_.size(); ++j1) {
-        const double* seed = arg[f.id_in_.size() + f.id_out_.size() + j1];
-        if (seed) {
-          for (size_t j2 = 0; j2 < f.id_out_[j1].size(); ++j2) {
-            double J_ij;
-            get_sens(mem, f.id_out_[j1][j2], &J_ij);
-            sens[i2] += seed[j2] * J_ij;
-          }
-        }
-      }
-    }
-  }
-  // Reset solver
-  //if (reset(mem)) return 1;
   // Successful return
   return 0;
 }
@@ -957,7 +922,7 @@ int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_jac(m, arg, res, *self, sparsity_out_);
+  int flag = dae->fmu_->eval_jac(m, arg, res, *self, sparsity_out_, false);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
@@ -979,7 +944,7 @@ int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, doubl
   // Create instance
   int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval_adj(m, arg, res, *self);
+  int flag = dae->fmu_->eval_jac(m, arg, res, *self, sp_jac_, true);
   // Release memory object
   dae->fmu_->release(m);
   // Return error flag
@@ -995,6 +960,21 @@ std::string to_string(Fmu::FdMode v) {
   default: break;
   }
   return "";
+}
+
+void FmuFunctionAdj::init(const Dict& opts) {
+  // Call the initialization method of the base class
+  FunctionInternal::init(opts);
+  // Non-differentiated class
+  auto self = derivative_of_.get<FmuFunction>();
+  // Get all Jacobian blocks
+  sp_jac_.clear();
+  sp_jac_.reserve(self->n_in_ * self->n_out_);
+  for (casadi_int oind = 0; oind < self->n_out_; ++oind) {
+    for (casadi_int iind = 0; iind < self->n_in_; ++iind) {
+      sp_jac_.push_back(self->jac_sparsity(oind, iind, false, false));
+    }
+  }
 }
 
 #endif  // WITH_FMU

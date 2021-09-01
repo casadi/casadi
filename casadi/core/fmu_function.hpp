@@ -124,12 +124,9 @@ struct CASADI_EXPORT Fmu {
   // Evaluate, non-differentated
   int eval(int mem, const double** arg, double** res, const FmuFunction& f);
 
-  // Evaluate Jacobian numerically
+  // Evaluate Jacobian numerically, optionally multiply by vector from left
   int eval_jac(int mem, const double** arg, double** res, const FmuFunction& f,
-    const std::vector<Sparsity>& sp_jac);
-
-  // Evaluate adjoint numerically
-  int eval_adj(int mem, const double** arg, double** res, const FmuFunction& f);
+    const std::vector<Sparsity>& sp_jac, bool adj);
 
   // Get memory object
   fmi2Component memory(int mem);
@@ -303,8 +300,14 @@ class CASADI_EXPORT FmuFunctionAdj : public FunctionInternal {
   /** \brief Get type name */
   std::string class_name() const override { return "FmuFunctionAdj";}
 
+  /// Initialize
+  void init(const Dict& opts) override;
+
   /// Evaluate numerically
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+
+  // Jacobian sparsity patterns
+  std::vector<Sparsity> sp_jac_;
 };
 
 /// Number of entries in enums
