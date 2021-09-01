@@ -658,14 +658,19 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
   }
   // Evaluate
   if (eval(mem, f)) return 1;
-  // Loop over function inputs
-  for (size_t i1 = 0; i1 < f.id_in_.size(); ++i1) {
-    // Adj: Sensitivities to be calculated
-    double* sens = adj ? res[i1] : 0;
-    // Adj: Skip if not requested
-    if (adj && sens == 0) continue;
-    // Calculate Jacobian, one column at a time
-    for (casadi_int i2 = 0; i2 < f.id_in_[i1].size(); ++i2) {
+
+  // Loop over colors
+  for (casadi_int c = 0; c < f.coloring_.size2(); ++c) {
+    // Loop over flattened input indices for color
+    for (casadi_int kc = f.coloring_.colind(c); kc < f.coloring_.colind(c + 1); ++kc) {
+      casadi_int ind_flat = f.coloring_.row(kc);
+      // Corresponding function index, element index
+      casadi_int i1 = f.offset_map_[ind_flat];
+      casadi_int i2 = ind_flat - f.offset_[i1];
+      // Adj: Sensitivities to be calculated
+      double* sens = adj ? res[i1] : 0;
+      // Adj: Skip if not requested
+      if (adj && sens == 0) continue;
       // Differentiation with respect to what variable
       size_t wrt_id = f.id_in_[i1][i2];
       // Nominal value, its inverse
@@ -868,13 +873,30 @@ void FmuFunction::init(const Dict& opts) {
         id_in_.at(iind).size(), row, col);
     }
   }
+
   // Concatenate blocks
   Sparsity sp_jac_all = blockcat(sp_jac_);
+
   // Calculate graph coloring
   coloring_ = sp_jac_all.uni_coloring();
   if (verbose_) casadi_message("Graph coloring: " + str(sp_jac_all.size2())
     + " -> " + str(coloring_.size2()) + " directions");
 
+  // Get mappings from concatenated index to input/nz indices
+  offset_.resize(n_in_ + 1);
+  offset_[0] = 0;
+  for (casadi_int iind = 0; iind < n_in_; ++iind) {
+    offset_[iind + 1] = offset_[iind] + id_in_.at(iind).size();
+  }
+
+  // Get mapping the other way
+  offset_map_.clear();
+  offset_map_.reserve(sp_jac_all.size2());
+  for (casadi_int iind = 0; iind < n_in_; ++iind) {
+    for (casadi_int k = offset_[iind]; k < offset_[iind + 1]; ++k) {
+      offset_map_.push_back(iind);
+    }
+  }
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
 }

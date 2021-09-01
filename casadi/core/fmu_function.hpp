@@ -239,6 +239,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Graph coloring
   Sparsity coloring_;
 
+  // Index offset for concatenated inputs
+  std::vector<casadi_int> offset_;
+
+  // Input corresponding to a concatenated input index
+  std::vector<casadi_int> offset_map_;
+
   ///@{
   /** \brief Number of function inputs and outputs */
   size_t get_n_in() override { return id_in_.size();}
