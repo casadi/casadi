@@ -300,7 +300,6 @@ namespace casadi {
   #include "casadi_interpn_interpolate.hpp"
   #include "casadi_interpn.hpp"
   #include "casadi_interpn_grad.hpp"
-  #include "casadi_interp1_weights.hpp"
   #include "casadi_interp1.hpp"
   #include "casadi_interp1_grad.hpp"
   #include "casadi_mv_dense.hpp"

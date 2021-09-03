@@ -1012,7 +1012,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_interpn_str, inst);
       break;
     case AUX_INTERP1:
-      add_auxiliary(AUX_INTERP1_WEIGHTS);
+      add_auxiliary(AUX_LOW);
       this->auxiliaries << sanitize_source(casadi_interp1_str, inst);
       break;
     case AUX_INTERPN_GRAD:
@@ -1020,7 +1020,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_interpn_grad_str, inst);
       break;
     case AUX_INTERP1_GRAD:
-      add_auxiliary(AUX_INTERP1_WEIGHTS);
+      add_auxiliary(AUX_LOW);
       this->auxiliaries << sanitize_source(casadi_interp1_grad_str, inst);
       break;
     case AUX_DE_BOOR:
@@ -1047,10 +1047,6 @@ namespace casadi {
       break;
     case AUX_INTERPN_INTERPOLATE:
       this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, inst);
-      break;
-    case AUX_INTERP1_WEIGHTS:
-      add_auxiliary(AUX_LOW);
-      this->auxiliaries << sanitize_source(casadi_interp1_weights_str, inst);
       break;
     case AUX_NORM_1:
       this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);

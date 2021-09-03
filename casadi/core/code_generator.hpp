@@ -377,7 +377,6 @@ namespace casadi {
       AUX_INTERP1_GRAD,
       AUX_FLIP,
       AUX_INTERPN_WEIGHTS,
-      AUX_INTERP1_WEIGHTS,
       AUX_LOW,
       AUX_INTERPN_INTERPOLATE,
       AUX_DE_BOOR,
