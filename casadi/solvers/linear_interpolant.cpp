@@ -84,24 +84,38 @@ namespace casadi {
     alloc_iw(2*ndim_, true);
   }
 
+  bool LinearInterpolant::is_1d() const {
+    return ndim_==1 && m_==1;
+  }
+
   int LinearInterpolant::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (res[0]) {
       const double* values = has_parametric_values() ? arg[arg_values()] : get_ptr(values_);
       const double* grid = has_parametric_grid() ? arg[arg_grid()] : get_ptr(grid_);
-      casadi_interpn(res[0], ndim_, grid, get_ptr(offset_),
-                    values, arg[0], get_ptr(lookup_mode_), m_, iw, w);
+      if (is_1d()) {
+        res[0][0] = casadi_interp1(grid, get_ptr(offset_),
+          values, arg[0][0], lookup_mode_[0]);
+      } else {
+        casadi_interpn(res[0], ndim_, grid, get_ptr(offset_),
+          values, arg[0], get_ptr(lookup_mode_), m_, iw, w);
+      }
     }
     return 0;
   }
 
   void LinearInterpolant::codegen_body(CodeGenerator& g, const Instance& inst) const {
-    std::string values = has_parametric_values() ? g.arg(arg_values(), true) : g.constant(values_);
-    std::string grid = has_parametric_grid() ? g.arg(arg_grid(), true) : g.constant(grid_);
-    g << "  if (res[0]) {\n"
-      << "    " << g.interpn("res[0]", ndim_, grid, g.constant(offset_),
-      values, "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
-      << "  }\n";
+    std::string values = has_parametric_values() ? g.arg(arg_values()) : g.constant(values_);
+    std::string grid = has_parametric_grid() ? g.arg(arg_grid()) : g.constant(grid_);
+    g << "  if (res[0]) {\n";
+    if (is_1d()) {
+      g << "  res[0][0] = " << g.interp1(grid, g.constant(offset_),
+      values, "arg[0][0]", lookup_mode_[0]) << "\n";
+    } else {
+      g << "    " << g.interpn("res[0]", ndim_, grid, g.constant(offset_),
+      values, "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n";
+    }
+    g << "  }\n";
   }
 
   Function LinearInterpolant::
@@ -146,8 +160,14 @@ namespace casadi {
     const double* values = has_parametric_values() ? arg[m->arg_values()] : get_ptr(m->values_);
     const double* grid = has_parametric_grid() ? arg[m->arg_grid()] : get_ptr(m->grid_);
 
-    casadi_interpn_grad(res[0], m->ndim_, grid, get_ptr(m->offset_),
-                      values, arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
+    if (m->is_1d()) {
+      res[0][0] = casadi_interp1_grad(grid, get_ptr(m->offset_),
+                        values, arg[0][0], m->lookup_mode_[0]);
+    } else {
+      casadi_interpn_grad(res[0], m->ndim_, grid, get_ptr(m->offset_),
+                        values, arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
+    }
+
     return 0;
   }
 
@@ -167,9 +187,15 @@ namespace casadi {
     std::string values = has_parametric_values() ? g.arg(m->arg_values(), true) : g.constant(m->values_);
     std::string grid = has_parametric_grid() ? g.arg(m->arg_grid(), true) : g.constant(m->grid_);
 
-    g << "  " << g.interpn_grad("res[0]", m->ndim_,
-      grid, g.constant(m->offset_), values,
-      "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";
+    if (m->is_1d()) {
+      g << "  res[0][0] = " << g.interp1_grad(
+        grid, g.constant(m->offset_), values,
+        "arg[0][0]", m->lookup_mode_[0]) << "\n";
+    } else {
+      g << "  " << g.interpn_grad("res[0]", m->ndim_,
+        grid, g.constant(m->offset_), values,
+        "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";      
+    }
   }
 
 

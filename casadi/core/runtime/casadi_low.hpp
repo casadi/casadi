@@ -38,10 +38,11 @@ casadi_int casadi_low(T1 x, const T1* grid, casadi_int ng, casadi_int lookup_mod
     default: // linear
       {
         casadi_int i;
+        casadi_int cnt = 0;
         for (i=0; i<ng-2; ++i) {
-          if (x < grid[i+1]) break;
+          cnt+= (x >= grid[i+1]);
         }
-        return i;
+        return cnt;
       }
   }
 }

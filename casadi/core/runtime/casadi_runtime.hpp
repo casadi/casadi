@@ -182,6 +182,26 @@ namespace casadi {
   void casadi_interpn_grad(T1* grad, casadi_int ndim, const T1* grid, const casadi_int* offset,
                                    const T1* values, const T1* x, casadi_int* iw, T1* w);
 
+  // Get weights for the linear interpolant
+  template<typename T1>
+  void casadi_interp1_weights(const T1* grid, const casadi_int* offset,
+                                      T1 x, T1* alpha, casadi_int* index, casadi_int lookup_mode);
+
+  // Get coefficients for the linear interpolant
+  template<typename T1>
+  T1 casadi_interp1_interpolate(const casadi_int* offset, const T1* values,
+                                        T1 alpha, casadi_int index, T1* coeff);
+
+  // Linear interpolant
+  template<typename T1>
+  T1 casadi_interp1(const T1* grid, const casadi_int* offset, const T1* values,
+                            T1 x, casadi_int lookup_mode);
+
+  // Linear interpolant - calculate gradient
+  template<typename T1>
+  T1 casadi_interp1_grad(const T1* grid, const casadi_int* offset,
+                                   const T1* values, casadi_int lookup_mode);
+
   // De boor single basis evaluation
   template<typename T1>
   void casadi_de_boor(T1 x, const T1* knots, casadi_int n_knots, casadi_int degree, T1* boor);
@@ -280,6 +300,9 @@ namespace casadi {
   #include "casadi_interpn_interpolate.hpp"
   #include "casadi_interpn.hpp"
   #include "casadi_interpn_grad.hpp"
+  #include "casadi_interp1_weights.hpp"
+  #include "casadi_interp1.hpp"
+  #include "casadi_interp1_grad.hpp"
   #include "casadi_mv_dense.hpp"
   #include "casadi_finite_diff.hpp"
   #include "casadi_file_slurp.hpp"
