@@ -927,9 +927,17 @@ namespace casadi {
       add_auxiliary(AUX_CLEAR, {"casadi_int"});
       this->auxiliaries << sanitize_source(casadi_interpn_str, inst);
       break;
+    case AUX_INTERP1:
+      add_auxiliary(AUX_INTERP1_WEIGHTS);
+      this->auxiliaries << sanitize_source(casadi_interp1_str, inst);
+      break;
     case AUX_INTERPN_GRAD:
       add_auxiliary(AUX_INTERPN);
       this->auxiliaries << sanitize_source(casadi_interpn_grad_str, inst);
+      break;
+    case AUX_INTERP1_GRAD:
+      add_auxiliary(AUX_INTERP1_WEIGHTS);
+      this->auxiliaries << sanitize_source(casadi_interp1_grad_str, inst);
       break;
     case AUX_DE_BOOR:
       this->auxiliaries << sanitize_source(casadi_de_boor_str, inst);
@@ -955,6 +963,10 @@ namespace casadi {
       break;
     case AUX_INTERPN_INTERPOLATE:
       this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, inst);
+      break;
+    case AUX_INTERP1_WEIGHTS:
+      add_auxiliary(AUX_LOW);
+      this->auxiliaries << sanitize_source(casadi_interp1_weights_str, inst);
       break;
     case AUX_NORM_1:
       this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
@@ -1401,6 +1413,28 @@ namespace casadi {
     stringstream s;
     s << "casadi_interpn(" << res << ", " << ndim << ", " << grid << ", "  << offset << ", "
       << values << ", " << x << ", " << lookup_mode << ", " << m << ", " << iw << ", " << w << ");";
+    return s.str();
+  }
+
+  string CodeGenerator::interp1(const string& grid,
+                                   const string& offset,
+                                   const string& values, const string& x,
+                                   casadi_int lookup_mode) {
+    add_auxiliary(AUX_INTERP1);
+    stringstream s;
+    s << "casadi_interp1(" << grid << ", "  << offset << ", "
+      << values << ", " << x << ", " << lookup_mode << ");";
+    return s.str();
+  }
+
+
+  string CodeGenerator::interp1_grad(const string& grid, const string& offset,
+                                   const string& values, const string& x,
+                                   casadi_int lookup_mode) {
+    add_auxiliary(AUX_INTERP1_GRAD);
+    stringstream s;
+    s << "casadi_interp1_grad(" << grid << ", " << offset << ", "
+      << values << ", " << x << ", " << lookup_mode << ");";
     return s.str();
   }
 
