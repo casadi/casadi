@@ -40,7 +40,7 @@ casadi_int casadi_low(T1 x, const T1* grid, casadi_int ng, casadi_int lookup_mod
         casadi_int i;
         casadi_int cnt = 0;
         for (i=0; i<ng-2; ++i) {
-          cnt+= (x >= grid[i+1]);
+          cnt += (x >= grid[i+1]);
         }
         return cnt;
       }
