@@ -20,6 +20,9 @@ set(RUNTIME_SRC
   casadi_interpn_interpolate.hpp
   casadi_interpn_weights.hpp
   casadi_kron.hpp
+  casadi_interp1.hpp
+  casadi_interp1_grad.hpp
+  casadi_interp1_weights.hpp
   casadi_low.hpp
   casadi_max_viol.hpp
   casadi_mmin.hpp

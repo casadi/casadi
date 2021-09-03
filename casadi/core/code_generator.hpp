@@ -320,6 +320,18 @@ namespace casadi {
       const std::string& lookup_mode, casadi_int m,
       const std::string& iw, const std::string& w);
 
+    /** \brief Linear interpolation */
+    std::string interp1(const std::string& grid,
+                        const std::string& offset,
+                        const std::string& values, const std::string& x,
+                        casadi_int lookup_mode);
+
+    /** \brief Linear interpolation - calculate gradient */
+    std::string interp1_grad(const std::string& grid,
+      const std::string& offset,
+      const std::string& values, const std::string& x,
+      casadi_int lookup_mode);
+
     /** \brief Transpose
 
         \identifier{sy} */
@@ -503,9 +515,12 @@ namespace casadi {
       AUX_TO_MEX,
       AUX_FROM_MEX,
       AUX_INTERPN,
+      AUX_INTERP1,
       AUX_INTERPN_GRAD,
+      AUX_INTERP1_GRAD,
       AUX_FLIP,
       AUX_INTERPN_WEIGHTS,
+      AUX_INTERP1_WEIGHTS,
       AUX_LOW,
       AUX_INTERPN_INTERPOLATE,
       AUX_DE_BOOR,

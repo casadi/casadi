@@ -9,7 +9,7 @@ void casadi_interpn_weights(casadi_int ndim, const T1* grid, const casadi_int* o
     T1 xi;
     const T1* g;
     // Grid point
-    xi = x ? x[i] : 0;
+    xi = x[i];// : 0;
     // Grid
     g = grid + offset[i];
     ng = offset[i+1]-offset[i];
