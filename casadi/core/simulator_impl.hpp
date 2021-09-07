@@ -173,10 +173,10 @@ public:
 ///@{
 /// Number of entries in enums
 template<> struct enum_traits<DynIn> {
-  static const DynIn n_enum = DYN_NUM_IN;
+  static const size_t n_enum = DYN_NUM_IN;
 };
 template<> struct enum_traits<DynOut> {
-  static const DynOut n_enum = DYN_NUM_OUT;
+  static const size_t n_enum = DYN_NUM_OUT;
 };
 ///@}
 

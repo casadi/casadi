@@ -489,27 +489,25 @@ protected:
 ///@{
 /// Number of entries in enums
 template<> struct enum_traits<Variable::Type> {
-  static const Variable::Type n_enum = Variable::N_TYPE;
+  static const size_t n_enum = Variable::N_TYPE;
 };
 template<> struct enum_traits<Variable::Causality> {
-  static const Variable::Causality n_enum = Variable::N_CAUSALITY;
+  static const size_t n_enum = Variable::N_CAUSALITY;
 };
 template<> struct enum_traits<Variable::Variability> {
-  static const Variable::Variability n_enum = Variable::N_VARIABILITY;
+  static const size_t n_enum = Variable::N_VARIABILITY;
 };
 template<> struct enum_traits<Variable::Initial> {
-  static const Variable::Initial n_enum = Variable::N_INITIAL;
+  static const size_t n_enum = Variable::N_INITIAL;
 };
 template<> struct enum_traits<Variable::Attribute> {
-  static const Variable::Attribute n_enum = Variable::N_ATTRIBUTE;
+  static const size_t n_enum = Variable::N_ATTRIBUTE;
 };
 template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalIn> {
-  static const DaeBuilderInternal::DaeBuilderInternalIn n_enum
-    = DaeBuilderInternal::DAE_BUILDER_NUM_IN;
+  static const size_t n_enum = DaeBuilderInternal::DAE_BUILDER_NUM_IN;
 };
 template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalOut> {
-  static const DaeBuilderInternal::DaeBuilderInternalOut n_enum
-    = DaeBuilderInternal::DAE_BUILDER_NUM_OUT;
+  static const size_t n_enum = DaeBuilderInternal::DAE_BUILDER_NUM_OUT;
 };
 ///@}
 

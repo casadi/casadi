@@ -70,7 +70,7 @@ T to_enum(const std::string& s, const std::string& s_def = "") {
     ss << "'" << to_string(static_cast<T>(i)) << "'";
   }
   casadi_error(ss.str());
-  return enum_traits<T>::n_enum;  // never reached
+  return static_cast<T>(enum_traits<T>::n_enum);  // never reached
 }
 
 /// Helper function: Get all fields

@@ -319,7 +319,7 @@ class CASADI_EXPORT FmuFunctionAdj : public FunctionInternal {
 
 /// Number of entries in enums
 template<> struct enum_traits<Fmu::FdMode> {
-  static const Fmu::FdMode n_enum = Fmu::N_FDMODE;
+  static const size_t n_enum = Fmu::N_FDMODE;
 };
 
 /// Convert to string
