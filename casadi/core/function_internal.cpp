@@ -2135,18 +2135,22 @@ namespace casadi {
     for (auto e : inst.stride_out) {
       if (e>1) vectorize = true;
     }
+
+    std::string sig = signature(fname); 
+
     if (vectorize) {
       if (is_a("SXFunction", false)) {
+        sig = signature(fname, true);
         g << "#pragma omp declare simd uniform(arg, res, iw, w) linear(i:1) simdlen(" << GlobalOptions::vector_width_real << ") notinbranch\n";
-        g << "static __attribute__((noinline)) " << g.vector_width_attribute() << " " << signature(fname, true) << " {\n";
+        g << "__attribute__((noinline)) " << g.vector_width_attribute() << " " << sig << " {\n";
       } else {
-        g << "static " << signature(fname) << " {\n";
+        g << "" << sig << " {\n";
       }
     } else {
       if (is_a("MapSum", false)) {
-        g << "static __attribute__((noinline)) " << g.vector_width_attribute() << " " << signature(fname) << " {\n";
+        g << "__attribute__((noinline)) " << g.vector_width_attribute() << " " << sig << " {\n";
       } else {
-        g << "static __attribute__((noinline)) " << signature(fname) << " {\n";
+        g << "__attribute__((noinline)) " << sig << " {\n";
       }
     }
 
@@ -2170,7 +2174,7 @@ namespace casadi {
     g.flush(s);
     g.body_parts[fname] = s.str();
 
-    g.casadi_headers << signature(fname) << ";\n";
+    g.casadi_headers << sig << ";\n";
 
   }
 

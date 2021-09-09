@@ -770,9 +770,6 @@ namespace casadi {
       s << endl << endl;
     }
 
-    // Codegen auxiliary functions
-    s << this->auxiliaries.str();
-
     s << casadi_headers.str();
 
     // Codegen body
