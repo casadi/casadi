@@ -387,26 +387,16 @@ public:
   ///@{
   /// Get variable expression by name
   MX var(const std::string& name) const;
-  std::vector<MX> var(const std::vector<std::string>& name) const;
-  ///@}
-
-  ///@{
-  /// Get/set the binding equation
-  MX beq(const std::string& name) const;
-  std::vector<MX> beq(const std::vector<std::string>& name) const;
-  void set_beq(const std::string& name, const MX& val);
-  ///@}
-
-  ///@{
-  /// Get variable expression by name
   MX operator()(const std::string& name) const {return var(name);}
-  std::vector<MX> operator()(const std::vector<std::string>& name) const {return var(name);}
   ///@}
 
-  ///@{
   /// Get the time derivative of an expression
-  std::string der(const std::string& name) const;
   std::vector<std::string> der(const std::vector<std::string>& name) const;
+
+  ///@{
+  /// Get/set the binding equation for a variable
+  MX beq(const std::string& name) const;
+  void set_beq(const std::string& name, const MX& val);
   ///@}
 
   ///@{
@@ -457,51 +447,73 @@ public:
   void set_display_unit(const std::string& name, const std::string& val);
   ///@}
 
-  ///@{
-  /// Get by attribute name
-  double attribute(const std::string& a, const std::string& name) const;
-  std::vector<double> attribute(const std::string& a, const std::vector<std::string>& name) const;
-  ///@}
+  // The following routines are not needed in MATLAB and would cause ambiguity
+  // Note that a multirow strings can be interpreted as a vector of strings
+#if !(defined(SWIG) && defined(SWIGMATLAB))
+  /// Get the time derivative of an expression, single variable
+  std::string der(const std::string& name) const;
 
-  ///@{
-  /// Set by attribute name
+  /// Get an attribute, single variable
+  double attribute(const std::string& a, const std::string& name) const;
+
+  /// Set an attribute, single variable
   void set_attribute(const std::string& a, const std::string& name, double val);
+
+  /// Get the lower bound, single variable
+  double min(const std::string& name) const;
+
+  /// Set the lower bound, single variable
+  void set_min(const std::string& name, double val);
+
+  /// Get the upper bound, single variable
+  double max(const std::string& name) const;
+
+  /// Set the upper bound, single variable
+  void set_max(const std::string& name, double val);
+
+  /// Get the nominal value, single variable
+  double nominal(const std::string& name) const;
+
+  /// Set the nominal value, single variable
+  void set_nominal(const std::string& name, double val);
+
+  /// Get the start attribute, single variable
+  double start(const std::string& name) const;
+
+  /// Set the start attribute, single variable
+  void set_start(const std::string& name, double val);
+#endif  // !SWIGMATLAB
+
+  /// Get an attribute
+  std::vector<double> attribute(const std::string& a, const std::vector<std::string>& name) const;
+
+  /// Set an attribute
   void set_attribute(const std::string& a, const std::vector<std::string>& name,
     std::vector<double>& val);
-  ///@}
 
-  ///@{
-  /// Get/set the lower bound
-  double min(const std::string& name) const;
+  /// Get the lower bound
   std::vector<double> min(const std::vector<std::string>& name) const;
-  void set_min(const std::string& name, double val);
+
+  /// Set the lower bound
   void set_min(const std::vector<std::string>& name, std::vector<double>& val);
-  ///@}
 
-  ///@{
-  /// Get/set the upper bound
-  double max(const std::string& name) const;
+  /// Get the upper bound
   std::vector<double> max(const std::vector<std::string>& name) const;
-  void set_max(const std::string& name, double val);
-  void set_max(const std::vector<std::string>& name, std::vector<double>& val);
-  ///@}
 
-  ///@{
-  /// Get/set the nominal value
-  double nominal(const std::string& name) const;
+  /// Set the upper bound
+  void set_max(const std::vector<std::string>& name, std::vector<double>& val);
+
+  /// Get the nominal value
   std::vector<double> nominal(const std::vector<std::string>& name) const;
-  void set_nominal(const std::string& name, double val);
+
+  /// Set the nominal value
   void set_nominal(const std::vector<std::string>& name, std::vector<double>& val);
 
-  ///@}
-
-  ///@{
-  /// Get/set the value at time 0
-  double start(const std::string& name) const;
+  /// Get the start attribute
   std::vector<double> start(const std::vector<std::string>& name) const;
-  void set_start(const std::string& name, double val);
+
+  /// Set the start attribute
   void set_start(const std::vector<std::string>& name, std::vector<double>& val);
-  ///@}
 
   /// Add a new variable: returns corresponding symbolic expression
   MX add_variable(const std::string& name, casadi_int n=1);

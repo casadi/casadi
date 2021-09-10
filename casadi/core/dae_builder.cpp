@@ -503,17 +503,6 @@ MX DaeBuilder::var(const std::string& name) const {
   }
 }
 
-std::vector<MX> DaeBuilder::var(const std::vector<std::string>& name) const {
-  try {
-    std::vector<MX> r(name.size());
-    for (size_t i = 0; i < r.size(); ++i) r[i] = variable(name[i]).v;
-    return r;
-  } catch (std::exception& e) {
-    THROW_ERROR("var", e.what());
-    return {};  // never reached
-  }
-}
-
 std::string DaeBuilder::der(const std::string& name) const {
   try {
     // Get variable index
@@ -546,17 +535,6 @@ MX DaeBuilder::beq(const std::string& name) const {
   } catch (std::exception& e) {
     THROW_ERROR("beq", e.what());
     return MX();  // never reached
-  }
-}
-
-std::vector<MX> DaeBuilder::beq(const std::vector<std::string>& name) const {
-  try {
-    std::vector<MX> r(name.size());
-    for (size_t i = 0; i < r.size(); ++i) r[i] = beq(name[i]);
-    return r;
-  } catch (std::exception& e) {
-    THROW_ERROR("beq", e.what());
-    return {};  // never reached
   }
 }
 
