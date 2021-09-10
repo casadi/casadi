@@ -101,6 +101,43 @@ CASADI_EXPORT std::string to_string(Variable::Attribute v) {
   return "";
 }
 
+double Variable::attribute(Attribute a) const {
+  switch (a) {
+    case MIN:
+      return min;
+    case MAX:
+      return max;
+    case NOMINAL:
+      return nominal;
+    case START:
+      return start;
+    default:
+      break;
+  }
+  casadi_error("Cannot handle: " + to_string(a));
+  return 0;
+}
+
+void Variable::set_attribute(Attribute a, double val) {
+  switch (a) {
+    case MIN:
+      min = val;
+      return;
+    case MAX:
+      max = val;
+      return;
+    case NOMINAL:
+      nominal = val;
+      return;
+    case START:
+      start = val;
+      return;
+    default:
+      break;
+  }
+  casadi_error("Cannot handle: " + to_string(a));
+}
+
 Variable::Initial Variable::default_initial(Variable::Causality causality,
     Variable::Variability variability) {
   // According to table in FMI 2.0.2 specification, section 2.2.7
@@ -900,6 +937,13 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
 
 bool DaeBuilderInternal::has_variable(const std::string& name) const {
   return varind_.find(name) != varind_.end();
+}
+
+std::vector<std::string> DaeBuilderInternal::all_variables() const {
+  std::vector<std::string> r;
+  r.reserve(variables_.size());
+  for (const Variable& v : variables_) r.push_back(v.name);
+  return r;
 }
 
 size_t DaeBuilderInternal::add_variable(const std::string& name, const Variable& var) {
@@ -2107,6 +2151,28 @@ Function DaeBuilderInternal::fun(const std::string& name) const {
     if (f.name()==name) return f;
   }
   return Function();
+}
+
+double DaeBuilderInternal::attribute(Variable::Attribute a, const std::string& name) const {
+  return variable(name).attribute(a);
+}
+
+std::vector<double> DaeBuilderInternal::attribute(Variable::Attribute a,
+    const std::vector<std::string>& name) const {
+  std::vector<double> r;
+  r.reserve(name.size());
+  for (auto& n : name) r.push_back(variable(n).attribute(a));
+  return r;
+}
+
+void DaeBuilderInternal::set_attribute(Variable::Attribute a, const std::string& name, double val) {
+  variable(name).set_attribute(a, val);
+}
+
+void DaeBuilderInternal::set_attribute(Variable::Attribute a, const std::vector<std::string>& name,
+    std::vector<double>& val) {
+  casadi_assert(name.size() == val.size(), "Dimension mismatch");
+  for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_attribute(a, val[k]);
 }
 
 std::string DaeBuilderInternal::system_infix() {

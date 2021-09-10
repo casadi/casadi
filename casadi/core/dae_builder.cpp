@@ -265,6 +265,15 @@ bool DaeBuilder::has_variable(const std::string& name) const {
   }
 }
 
+std::vector<std::string> DaeBuilder::all_variables() const {
+  try {
+    return (*this)->all_variables();
+  } catch (std::exception& e) {
+    THROW_ERROR("all_variables", e.what());
+    return {};  // never reached
+  }
+}
+
 size_t DaeBuilder::add_variable(const std::string& name, const Variable& var) {
   try {
     return (*this)->add_variable(name, var);
@@ -663,14 +672,6 @@ void DaeBuilder::set_max(const std::string& name, double val) {
   variable(name).max = val;
 }
 
-double DaeBuilder::start(const std::string& name) const {
-  return variable(name).start;
-}
-
-void DaeBuilder::set_start(const std::string& name, double val) {
-  variable(name).start = val;
-}
-
 void DaeBuilder::add_lc(const std::string& name,
     const std::vector<std::string>& f_out) {
   try {
@@ -959,6 +960,76 @@ std::vector<std::string> DaeBuilder::name(const std::vector<size_t>& ind) const 
   } catch (std::exception& e) {
     THROW_ERROR("name", e.what());
     return {}; // never reached
+  }
+}
+
+double DaeBuilder::attribute(const std::string& a, const std::string& name) const {
+  try {
+    return (*this)->attribute(to_enum<Variable::Attribute>(a), name);
+  } catch (std::exception& e) {
+    THROW_ERROR("attribute", e.what());
+    return 0; // never reached
+  }
+}
+
+std::vector<double> DaeBuilder::attribute(const std::string& a,
+    const std::vector<std::string>& name) const {
+  try {
+    return (*this)->attribute(to_enum<Variable::Attribute>(a), name);
+  } catch (std::exception& e) {
+    THROW_ERROR("attribute", e.what());
+    return {}; // never reached
+  }
+}
+
+void DaeBuilder::set_attribute(const std::string& a, const std::string& name, double val) {
+  try {
+    (*this)->set_attribute(to_enum<Variable::Attribute>(a), name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_attribute", e.what());
+  }
+}
+
+void DaeBuilder::set_attribute(const std::string& a, const std::vector<std::string>& name,
+    std::vector<double>& val) {
+  try {
+    (*this)->set_attribute(to_enum<Variable::Attribute>(a), name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_attribute", e.what());
+  }
+}
+
+double DaeBuilder::start(const std::string& name) const {
+  try {
+    return variable(name).start;
+  } catch (std::exception& e) {
+    THROW_ERROR("start", e.what());
+    return 0; // never reached
+  }
+}
+
+std::vector<double> DaeBuilder::start(const std::vector<std::string>& name) const {
+  try {
+    return (*this)->attribute(Variable::START, name);
+  } catch (std::exception& e) {
+    THROW_ERROR("start", e.what());
+    return {}; // never reached
+  }
+}
+
+void DaeBuilder::set_start(const std::string& name, double val) {
+  try {
+    variable(name).start = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_start", e.what());
+  }
+}
+
+void DaeBuilder::set_start(const std::vector<std::string>& name, std::vector<double>& val) {
+  try {
+    (*this)->set_attribute(Variable::START, name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_start", e.what());
   }
 }
 

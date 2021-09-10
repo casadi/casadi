@@ -102,6 +102,12 @@ struct CASADI_EXPORT Variable {
   /// Binding equation
   MX beq;
 
+  /// Get by attribute name
+  double attribute(Attribute a) const;
+
+  /// Set by attribute name
+  void set_attribute(Attribute a, double val);
+
   // Default initial attribute, per specification
   static Initial default_initial(Causality causality, Variability variability);
 };
@@ -275,6 +281,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Check if a particular variable exists
   bool has_variable(const std::string& name) const;
 
+  /// Get a list of all variables
+  std::vector<std::string> all_variables() const;
+
   ///@{
   /// Access a variable by index
   Variable& variable(size_t ind) {return variables_.at(ind);}
@@ -443,6 +452,19 @@ protected:
 
   /// Get function by name
   Function fun(const std::string& name) const;
+
+  ///@{
+  /// Get by attribute name
+  double attribute(Variable::Attribute a, const std::string& name) const;
+  std::vector<double> attribute(Variable::Attribute a, const std::vector<std::string>& name) const;
+  ///@}
+
+  ///@{
+  /// Set by attribute name
+  void set_attribute(Variable::Attribute a, const std::string& name, double val);
+  void set_attribute(Variable::Attribute a, const std::vector<std::string>& name,
+    std::vector<double>& val);
+  ///@}
 
   /// Helper class, represents inputs and outputs for a function call node
   struct CallIO {

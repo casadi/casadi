@@ -458,6 +458,19 @@ public:
   ///@}
 
   ///@{
+  /// Get by attribute name
+  double attribute(const std::string& a, const std::string& name) const;
+  std::vector<double> attribute(const std::string& a, const std::vector<std::string>& name) const;
+  ///@}
+
+  ///@{
+  /// Set by attribute name
+  void set_attribute(const std::string& a, const std::string& name, double val);
+  void set_attribute(const std::string& a, const std::vector<std::string>& name,
+    std::vector<double>& val);
+  ///@}
+
+  ///@{
   /// Get/set the lower bound
   double min(const std::string& name) const;
   void set_min(const std::string& name, double val);
@@ -478,7 +491,9 @@ public:
   ///@{
   /// Get/set the value at time 0
   double start(const std::string& name) const;
+  std::vector<double> start(const std::vector<std::string>& name) const;
   void set_start(const std::string& name, double val);
+  void set_start(const std::vector<std::string>& name, std::vector<double>& val);
   ///@}
 
   /// Add a new variable: returns corresponding symbolic expression
@@ -502,7 +517,10 @@ public:
   /// Check if a particular variable exists
   bool has_variable(const std::string& name) const;
 
-    /// Get the (cached) oracle, SX or MX
+  /// Get a list of all variables
+  std::vector<std::string> all_variables() const;
+
+  /// Get the (cached) oracle, SX or MX
   Function oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
 
 #ifndef SWIG
