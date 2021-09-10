@@ -228,24 +228,38 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 
+  /// Construct a function object, component indices given
+  Function create(const std::string& name,
+      const std::vector<std::vector<size_t>>& id_in,
+      const std::vector<std::vector<size_t>>& id_out,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts) const;
+
   /// Construct a function object
   Function create(const std::string& fname,
-      const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out, bool sx = false, bool lifted_calls = false) const;
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts, bool sx, bool lifted_calls) const;
 
-  /// Construct a function for evaluating dependent parameters
-  Function dependent_fun(const std::string& fname,
-      const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out) const;
+  /// Construct function from an FMU DLL, names given
+  Function fmu_fun(const std::string& fname,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out,
+      const Dict& opts) const;
 
-  /// Construct a function from an FMU DLL
+  /// Construct function from an FMU DLL
   Function fmu_fun(const std::string& name,
       const std::vector<std::vector<size_t>>& id_in,
       const std::vector<std::vector<size_t>>& id_out,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const Dict& opts) const;
-  ///@}
+
+  /// Construct a function for evaluating dependent parameters
+  Function dependent_fun(const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out) const;
 
   /// Free all FMU instances
   void reset_fmu() const;
@@ -340,6 +354,9 @@ protected:
 
   // Path to FMU, if any
   std::string path_;
+
+  // Symbolic representation of the model equations?
+  bool symbolic_;
 
   /// All variables
   std::vector<Variable> variables_;

@@ -186,6 +186,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
   provides_directional_derivative_ = 0;
+  symbolic_ = true;
   fmu_ = 0;
   // Default options
   debug_ = false;
@@ -290,9 +291,12 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   }
 
   // **** Add dynamic equations, initial equations ****
+  symbolic_ = false;  // use DLL by default
   for (bool init_eq : {true, false}) {
     const char* equ = init_eq ? "equ:InitialEquations" : "equ:DynamicEquations";
     if (fmi_desc.has_child(equ)) {
+      // Symbolic model equations available
+      symbolic_ = true;
       // Get a reference to the DynamicEquations node
       const XmlNode& dyneqs = fmi_desc[equ];
       // Add equations
@@ -1162,15 +1166,37 @@ void DaeBuilderInternal::add_lc(const std::string& name, const std::vector<std::
   ret1 = f_out;
 }
 
+Function DaeBuilderInternal::create(const std::string& name,
+    const std::vector<std::vector<size_t>>& id_in,
+    const std::vector<std::vector<size_t>>& id_out,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) const {
+  // Currently only implemented for FMUs
+  casadi_assert(!symbolic_, "Not implemented");
+  return fmu_fun(name, id_in, id_out, name_in, name_out, opts);
+}
+
 Function DaeBuilderInternal::create(const std::string& fname,
     const std::vector<std::string>& s_in,
-    const std::vector<std::string>& s_out, bool sx, bool lifted_calls) const {
+    const std::vector<std::string>& s_out, const Dict& opts, bool sx, bool lifted_calls) const {
   // Are there any '_' in the names?
   bool with_underscore = false;
   for (auto s_io : {&s_in, &s_out}) {
     for (const std::string& s : *s_io) {
       with_underscore = with_underscore || std::count(s.begin(), s.end(), '_');
     }
+  }
+  // Model equations in DLL
+  if (!symbolic_) {
+    // General factory routine not implemented
+    casadi_assert(!with_underscore, "Not implemented");
+    // Cannot lift calls in an FMU
+    casadi_assert(!lifted_calls, "Lifting requires a symbolic representation");
+    // Cannot convert to SX
+    casadi_assert(!sx, "SX expansion requires a symbolic representation");
+    // Redirect to FmuFunction creation
+    return fmu_fun(fname, s_in, s_out, opts);
   }
   // Replace '_' with ':', if needed
   if (with_underscore) {
@@ -1179,7 +1205,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
       for (std::string& s : *s_io) std::replace(s.begin(), s.end(), '_', ':');
     }
     // Recursive call
-    return create(fname, s_in_mod, s_out_mod, sx, lifted_calls);
+    return create(fname, s_in_mod, s_out_mod, opts, sx, lifted_calls);
   }
   // Check if dependent variables are given and needed
   bool elim_w = false;
@@ -1739,6 +1765,36 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
   return Function();
 #endif  // WITH_FMU
+}
+
+Function DaeBuilderInternal::fmu_fun(const std::string& name,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) const {
+  // Collect input indices
+  std::vector<std::vector<size_t>> id_in(name_in.size());
+  for (size_t k = 0; k < name_in.size(); ++k) {
+    id_in[k] = ind_in(name_in[k]);
+  }
+  // Collect output indices
+  std::vector<std::vector<size_t>> id_out(name_out.size());
+  for (size_t k = 0; k < name_out.size(); ++k) {
+    if (name_out[k] == "ode") {
+      // Provide state derivative
+      id_out[k] = x_;
+      for (size_t& i : id_out[k]) i = variable(i).der;
+    } else if (name_out[k] == "alg") {
+      // Provide residual variables
+      casadi_assert(z_.empty(), "Not implemented)");
+    } else if (name_out[k] == "ydef") {
+      // Provide output
+      id_out[k] = y_;
+    } else {
+      casadi_error("Cannot handle " + name_out[k]);
+    }
+  }
+  // Create FmuFunction instance
+  return fmu_fun(name, id_in, id_out, name_in, name_out, opts);
 }
 
 Function DaeBuilderInternal::gather_eq() const {

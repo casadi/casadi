@@ -657,14 +657,61 @@ void DaeBuilder::add_lc(const std::string& name,
   }
 }
 
-Function DaeBuilder::create(const std::string& fname,
-    const std::vector<std::string>& s_in,
-    const std::vector<std::string>& s_out, bool sx, bool lifted_calls) const {
+Function DaeBuilder::create(const std::string& name,
+    const std::vector<std::vector<std::string>>& comp_in,
+    const std::vector<std::vector<std::string>>& comp_out,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts) const {
   try {
-    return (*this)->create(fname, s_in, s_out, sx, lifted_calls);
+    // Collect input indices
+    std::vector<std::vector<size_t>> id_in(comp_in.size());
+    for (size_t k = 0; k < comp_in.size(); ++k) {
+      id_in[k].reserve(comp_in[k].size());
+      for (const std::string& s : comp_in[k]) id_in[k].push_back(find(s));
+    }
+    // Collect output indices
+    std::vector<std::vector<size_t>> id_out(comp_out.size());
+    for (size_t k = 0; k < comp_out.size(); ++k) {
+      id_out[k].reserve(comp_out[k].size());
+      for (const std::string& s : comp_out[k]) id_out[k].push_back(find(s));
+    }
+    // Call internal routine
+    return (*this)->create(name, id_in, id_out, name_in, name_out, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("create", e.what());
+    return Function(); // never reached
+  }
+}
+
+Function DaeBuilder::create(const std::string& fname,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out, bool sx, bool lifted_calls) const {
+  try {
+    return (*this)->create(fname, name_in, name_out, Dict(), sx, lifted_calls);
   } catch (std::exception& e) {
     THROW_ERROR("create", e.what());
     return Function();  // never reached
+  }
+}
+
+Function DaeBuilder::create(const std::string& fname,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out, const Dict& opts) const {
+  try {
+    return (*this)->create(fname, name_in, name_out, opts, false, false);
+  } catch (std::exception& e) {
+    THROW_ERROR("create", e.what());
+    return Function();  // never reached
+  }
+}
+
+Function DaeBuilder::create(const std::string& name, const Dict& opts) const {
+  try {
+    return (*this)->create(name, dyn_in(), dyn_out(), opts, false, false);
+  } catch (std::exception& e) {
+    THROW_ERROR("create", e.what());
+    return Function(); // never reached
   }
 }
 
@@ -751,78 +798,6 @@ Function DaeBuilder::dependent_fun(const std::string& fname,
     return (*this)->dependent_fun(fname, s_in, s_out);
   } catch (std::exception& e) {
     THROW_ERROR("dependent_fun", e.what());
-    return Function(); // never reached
-  }
-}
-
-Function DaeBuilder::fmu_fun(const std::string& name,
-    const std::vector<std::vector<std::string>>& comp_in,
-    const std::vector<std::vector<std::string>>& comp_out,
-    const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out,
-    const Dict& opts) const {
-  try {
-    // Collect input indices
-    std::vector<std::vector<size_t>> id_in(comp_in.size());
-    for (size_t k = 0; k < comp_in.size(); ++k) {
-      id_in[k].reserve(comp_in[k].size());
-      for (const std::string& s : comp_in[k]) id_in[k].push_back(find(s));
-    }
-    // Collect output indices
-    std::vector<std::vector<size_t>> id_out(comp_out.size());
-    for (size_t k = 0; k < comp_out.size(); ++k) {
-      id_out[k].reserve(comp_out[k].size());
-      for (const std::string& s : comp_out[k]) id_out[k].push_back(find(s));
-    }
-    // Call internal routine
-    return (*this)->fmu_fun(name, id_in, id_out, name_in, name_out, opts);
-  } catch (std::exception& e) {
-    THROW_ERROR("fmu_fun", e.what());
-    return Function(); // never reached
-  }
-}
-
-Function DaeBuilder::fmu_fun(const std::string& name,
-    const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out,
-    const Dict& opts) const {
-  try {
-    // Collect input indices
-    std::vector<std::vector<size_t>> id_in(name_in.size());
-    for (size_t k = 0; k < name_in.size(); ++k) {
-      id_in[k] = (*this)->ind_in(name_in[k]);
-    }
-    // Collect output indices
-    std::vector<std::vector<size_t>> id_out(name_out.size());
-    for (size_t k = 0; k < name_out.size(); ++k) {
-      if (name_out[k] == "ode") {
-        // Provide state derivative
-        id_out[k] = (*this)->x_;
-        for (size_t& i : id_out[k]) i = (*this)->variable(i).der;
-      } else if (name_out[k] == "alg") {
-        // Provide residual variables
-        casadi_assert(nz() == 0, "Not implemented)");
-      } else if (name_out[k] == "ydef") {
-        // Provide output
-        id_out[k] = (*this)->y_;
-      } else {
-        casadi_error("Cannot handle " + name_out[k]);
-      }
-    }
-    // Call internal routine
-    return (*this)->fmu_fun(name, id_in, id_out, name_in, name_out, opts);
-  } catch (std::exception& e) {
-    THROW_ERROR("fmu_fun", e.what());
-    return Function(); // never reached
-  }
-}
-
-Function DaeBuilder::fmu_fun(const std::string& name, const Dict& opts) const {
-  try {
-    // Standard IO
-    return fmu_fun(name, dyn_in(), dyn_out(), opts);
-  } catch (std::exception& e) {
-    THROW_ERROR("fmu_fun", e.what());
     return Function(); // never reached
   }
 }

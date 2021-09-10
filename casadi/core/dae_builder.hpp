@@ -337,15 +337,10 @@ public:
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 
-  /// Construct a function object
+  /// Construct a function object, legacy syntax
   Function create(const std::string& fname,
-      const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out, bool sx = false, bool lifted_calls = false) const;
-
-  /// Construct a function for evaluating dependent parameters
-  Function dependent_fun(const std::string& fname,
-      const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out) const;
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out, bool sx = false, bool lifted_calls = false) const;
 
   /** \brief  Load a function from an FMU DLL, indices provided
     \param name    Name assigned to the resulting function object
@@ -355,7 +350,7 @@ public:
     \param name_out  Names of all the outputs
     \param opts    Optional settings
   */
-  Function fmu_fun(const std::string& name,
+  Function create(const std::string& name,
       const std::vector<std::vector<std::string>>& comp_in,
       const std::vector<std::vector<std::string>>& comp_out,
       const std::vector<std::string>& name_in,
@@ -363,13 +358,13 @@ public:
       const Dict& opts=Dict()) const;
   ///@}
 
-  /** \brief  Load a function from an FMU DLL, names provided
+  /** \brief  Construct a function object, names provided
     \param name    Name assigned to the resulting function object
     \param name_in   Names of all the inputs
     \param name_out  Names of all the outputs
     \param opts    Optional settings
   */
-  Function fmu_fun(const std::string& name,
+  Function create(const std::string& name,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const Dict& opts=Dict()) const;
@@ -379,10 +374,15 @@ public:
     \param name    Name assigned to the resulting function object
     \param opts    Optional settings
   */
-  Function fmu_fun(const std::string& name, const Dict& opts=Dict()) const;
+  Function create(const std::string& name, const Dict& opts=Dict()) const;
 
   /// Free all FMU instances
   void reset_fmu() const;
+
+  /// Construct a function for evaluating dependent parameters
+  Function dependent_fun(const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out) const;
 
   ///@{
   /// Get variable expression by name
