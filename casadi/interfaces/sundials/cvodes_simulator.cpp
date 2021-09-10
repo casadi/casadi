@@ -228,6 +228,8 @@ void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop, dou
     "unless stop_at_end is set to False.");
   // Do not integrate past change in input signals or past the end
   THROWING(CVodeSetStopTime, m->mem, t_stop);
+  // Set controls
+  casadi_copy(u, nu_, m->u);
   // Integrate
   THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
   // Set function outputs
