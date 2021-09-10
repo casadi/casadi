@@ -473,19 +473,26 @@ public:
   ///@{
   /// Get/set the lower bound
   double min(const std::string& name) const;
+  std::vector<double> min(const std::vector<std::string>& name) const;
   void set_min(const std::string& name, double val);
+  void set_min(const std::vector<std::string>& name, std::vector<double>& val);
   ///@}
 
   ///@{
   /// Get/set the upper bound
   double max(const std::string& name) const;
+  std::vector<double> max(const std::vector<std::string>& name) const;
   void set_max(const std::string& name, double val);
+  void set_max(const std::vector<std::string>& name, std::vector<double>& val);
   ///@}
 
   ///@{
   /// Get/set the nominal value
   double nominal(const std::string& name) const;
+  std::vector<double> nominal(const std::vector<std::string>& name) const;
   void set_nominal(const std::string& name, double val);
+  void set_nominal(const std::vector<std::string>& name, std::vector<double>& val);
+
   ///@}
 
   ///@{

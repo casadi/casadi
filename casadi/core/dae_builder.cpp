@@ -648,30 +648,6 @@ void DaeBuilder::set_display_unit(const std::string& name, const std::string& va
   variable(name).display_unit = val;
 }
 
-double DaeBuilder::nominal(const std::string& name) const {
-  return variable(name).nominal;
-}
-
-void DaeBuilder::set_nominal(const std::string& name, double val) {
-  variable(name).nominal = val;
-}
-
-double DaeBuilder::min(const std::string& name) const {
-  return variable(name).min;
-}
-
-void DaeBuilder::set_min(const std::string& name, double val) {
-  variable(name).min = val;
-}
-
-double DaeBuilder::max(const std::string& name) const {
-  return variable(name).max;
-}
-
-void DaeBuilder::set_max(const std::string& name, double val) {
-  variable(name).max = val;
-}
-
 void DaeBuilder::add_lc(const std::string& name,
     const std::vector<std::string>& f_out) {
   try {
@@ -996,6 +972,108 @@ void DaeBuilder::set_attribute(const std::string& a, const std::vector<std::stri
     (*this)->set_attribute(to_enum<Variable::Attribute>(a), name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_attribute", e.what());
+  }
+}
+
+double DaeBuilder::min(const std::string& name) const {
+  try {
+    return variable(name).min;
+  } catch (std::exception& e) {
+    THROW_ERROR("min", e.what());
+    return 0; // never reached
+  }
+}
+
+std::vector<double> DaeBuilder::min(const std::vector<std::string>& name) const {
+  try {
+    return (*this)->attribute(Variable::MIN, name);
+  } catch (std::exception& e) {
+    THROW_ERROR("min", e.what());
+    return {}; // never reached
+  }
+}
+
+void DaeBuilder::set_min(const std::string& name, double val) {
+  try {
+    variable(name).min = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_min", e.what());
+  }
+}
+
+void DaeBuilder::set_min(const std::vector<std::string>& name, std::vector<double>& val) {
+  try {
+    (*this)->set_attribute(Variable::MIN, name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_min", e.what());
+  }
+}
+
+double DaeBuilder::max(const std::string& name) const {
+  try {
+    return variable(name).max;
+  } catch (std::exception& e) {
+    THROW_ERROR("max", e.what());
+    return 0; // never reached
+  }
+}
+
+std::vector<double> DaeBuilder::max(const std::vector<std::string>& name) const {
+  try {
+    return (*this)->attribute(Variable::MAX, name);
+  } catch (std::exception& e) {
+    THROW_ERROR("max", e.what());
+    return {}; // never reached
+  }
+}
+
+void DaeBuilder::set_max(const std::string& name, double val) {
+  try {
+    variable(name).max = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_max", e.what());
+  }
+}
+
+void DaeBuilder::set_max(const std::vector<std::string>& name, std::vector<double>& val) {
+  try {
+    (*this)->set_attribute(Variable::MAX, name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_max", e.what());
+  }
+}
+
+double DaeBuilder::nominal(const std::string& name) const {
+  try {
+    return variable(name).nominal;
+  } catch (std::exception& e) {
+    THROW_ERROR("nominal", e.what());
+    return 0; // never reached
+  }
+}
+
+std::vector<double> DaeBuilder::nominal(const std::vector<std::string>& name) const {
+  try {
+    return (*this)->attribute(Variable::NOMINAL, name);
+  } catch (std::exception& e) {
+    THROW_ERROR("nominal", e.what());
+    return {}; // never reached
+  }
+}
+
+void DaeBuilder::set_nominal(const std::string& name, double val) {
+  try {
+    variable(name).nominal = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_nominal", e.what());
+  }
+}
+
+void DaeBuilder::set_nominal(const std::vector<std::string>& name, std::vector<double>& val) {
+  try {
+    (*this)->set_attribute(Variable::NOMINAL, name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_mininal", e.what());
   }
 }
 
