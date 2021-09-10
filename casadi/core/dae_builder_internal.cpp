@@ -236,6 +236,8 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   for (size_t k = 0; k < variables_.size(); ++k) {
     // Get reference to the variable
     Variable& v = variables_[k];
+    // Skip variable if name starts with underscore
+    if (v.name.rfind("_", 0) == 0) continue;
     // Sort by types
     if (v.causality == Variable::INDEPENDENT) {
       // Independent (time) variable
@@ -249,18 +251,9 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     } else if (v.variability == Variable::FIXED || v.variability == Variable::TUNABLE) {
       p_.push_back(k);
     } else if (v.variability == Variable::CONTINUOUS) {
+      // Add to list of differential equations?
       if (v.der >= 0) {
-        // Is the variable needed to calculate other states, algebraic variables?
-        if (v.dependency) {
-          // Add to list of differential equations
-          x_.push_back(k);
-        } else {
-          // Add to list of quadrature equations
-          q_.push_back(k);
-        }
-      } else if (v.dependency && v.der_of < 0) {
-        // Add to list of algebraic equations
-        z_.push_back(k);
+        x_.push_back(k);
       }
       // Is it (also) an output variable?
       if (v.causality == Variable::OUTPUT) {
@@ -611,12 +604,12 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   }
 
   if (!x_.empty()) {
-    stream << "State derivatives" << std::endl;
+    stream << "Differential equations" << std::endl;
     for (size_t k : x_) {
       const Variable& x = variable(k);
       casadi_assert(x.der >= 0, "No derivative variable for " + x.name);
       const Variable& xdot = variable(x.der);
-      stream << "  " << xdot.name << " == " << xdot.beq << std::endl;
+      stream << "  \\dot{" << x.name << "} == " << xdot.name << std::endl;
     }
   }
 
@@ -636,7 +629,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
       const Variable& q = variable(k);
       casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
       const Variable& qdot = variable(q.der);
-      stream << "  " << qdot.name << " == " << qdot.beq << std::endl;
+      stream << "  \\dot{" << q.name << "} == " << qdot.name << std::endl;
     }
   }
 
