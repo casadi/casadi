@@ -89,7 +89,7 @@ public:
 
   /** \brief Reset the forward problem */
   virtual void reset(SimulatorMemory* mem, double t, const double* x, const double* u,
-    const double* z, const double* p, double* y) const = 0;
+    double* z, const double* p, double* y) const = 0;
 
   /** \brief  Advance solution in time */
   virtual void advance(SimulatorMemory* mem, double t, double t_stop, double* x, const double* u,

@@ -248,7 +248,7 @@ void SundialsSimulator::free_mem(void *mem) const {
 }
 
 void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* u,
-    const double* z, const double* p, double* y) const {
+    double* z, const double* p, double* y) const {
   auto m = static_cast<SundialsSimMemory*>(mem);
   // Update time
   m->t = t;

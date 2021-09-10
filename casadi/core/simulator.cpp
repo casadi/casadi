@@ -184,8 +184,11 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   res += SIMULATOR_NUM_OUT;
   // Setup memory object
   setup(m, arg, res, iw, w);
+  // Get initial state, algebraic variable guess
+  casadi_copy(x0, nx_, x);
+  casadi_copy(z0, nz_, z);
   // Reset solver, take time to t0, calculate outputs at t0
-  reset(m, grid_.front(), x0, u, z0, p, y);
+  reset(m, grid_.front(), x0, u, z, p, y);
   if (x) x += nx_;
   if (z) z += nz_;
   if (y) y += ny_;

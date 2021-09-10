@@ -202,7 +202,7 @@ int CvodesSimulator::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
 }
 
 void CvodesSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* u,
-    const double* z, const double* p, double* y) const {
+    double* z, const double* p, double* y) const {
   if (verbose_) casadi_message(name_ + "::reset");
   auto m = to_mem(mem);
   // Reset the base classes
