@@ -748,22 +748,19 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
 }
 
 FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
     const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out)
-  : FunctionInternal(name), dae_(dae), id_in_(id_in), id_out_(id_out) {
-  // Names of inputs
-  if (!name_in.empty()) {
-    casadi_assert(id_in.size() == name_in.size(), "Mismatching number of input names");
-    name_in_ = name_in;
-  }
-  // Names of outputs
-  if (!name_out.empty()) {
-    casadi_assert(id_out.size() == name_out.size(), "Mismatching number of output names");
-    name_out_ = name_out;
-  }
-
+    const std::vector<std::string>& name_out,
+    const std::map<std::string, std::vector<size_t>>& scheme)
+    : FunctionInternal(name), dae_(dae) {
+  // Get input IDs
+  id_in_.resize(name_in.size());
+  for (size_t k = 0; k < name_in.size(); ++k) id_in_[k] = scheme.at(name_in[k]);
+  // Get input IDs
+  id_out_.resize(name_out.size());
+  for (size_t k = 0; k < name_out.size(); ++k) id_out_[k] = scheme.at(name_out[k]);
+  // Set input/output names
+  name_in_ = name_in;
+  name_out_ = name_out;
   // Default options
   enable_ad_ = dae->provides_directional_derivative_;
   validate_ad_ = false;

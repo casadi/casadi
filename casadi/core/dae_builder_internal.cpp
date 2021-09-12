@@ -1759,8 +1759,13 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_out,
     const Dict& opts) const {
 #ifdef WITH_FMU
+  std::map<std::string, std::vector<size_t>> scheme;
+  casadi_assert(id_in.size() == name_in.size(), "Mismatching number of inputs");
+  for (size_t k = 0; k < id_in.size(); ++k) scheme[name_in[k]] = id_in[k];
+  casadi_assert(id_out.size() == name_out.size(), "Mismatching number of outputs");
+  for (size_t k = 0; k < id_out.size(); ++k) scheme[name_out[k]] = id_out[k];
   return Function::create(new FmuFunction(name, shared_from_this<DaeBuilder>(),
-    id_in, id_out, name_in, name_out), opts);
+    name_in, name_out, scheme), opts);
 #else  // WITH_FMU
   casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
   return Function();
