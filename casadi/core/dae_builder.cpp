@@ -200,14 +200,6 @@ void DaeBuilder::load_fmi_description(const std::string& filename) {
   }
 }
 
-void DaeBuilder::load_fmi_functions(const std::string& path) {
-  try {
-    (*this)->load_fmi_functions(path);
-  } catch (std::exception& e) {
-    THROW_ERROR("load_fmi_functions", e.what());
-  }
-}
-
 void DaeBuilder::eliminate_quad() {
   try {
     (*this)->eliminate_quad();

@@ -331,9 +331,6 @@ public:
   /// Import problem description from FMI or XML
   void load_fmi_description(const std::string& filename);
 
-  /// Import FMI functions from DLL
-  void load_fmi_functions(const std::string& path);
-
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 
