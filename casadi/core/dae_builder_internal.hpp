@@ -227,10 +227,10 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Construct a function object, component indices given
   Function create(const std::string& name,
-      const std::vector<std::vector<size_t>>& id_in,
-      const std::vector<std::vector<size_t>>& id_out,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
+      const std::map<std::string, std::vector<size_t>>& scheme,
+      const std::map<std::string, std::vector<size_t>>& lc,
       const Dict& opts) const;
 
   /// Construct a function object
@@ -247,10 +247,10 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Construct function from an FMU DLL
   Function fmu_fun(const std::string& name,
-      const std::vector<std::vector<size_t>>& id_in,
-      const std::vector<std::vector<size_t>>& id_out,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
+      const std::map<std::string, std::vector<size_t>>& scheme,
+      const std::map<std::string, std::vector<size_t>>& lc,
       const Dict& opts) const;
 
   /// Construct a function for evaluating dependent parameters

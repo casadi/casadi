@@ -1091,14 +1091,14 @@ void DaeBuilderInternal::add_lc(const std::string& name, const std::vector<std::
 }
 
 Function DaeBuilderInternal::create(const std::string& name,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
+    const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::map<std::string, std::vector<size_t>>& lc,
     const Dict& opts) const {
   // Currently only implemented for FMUs
   casadi_assert(!symbolic_, "Not implemented");
-  return fmu_fun(name, id_in, id_out, name_in, name_out, opts);
+  return fmu_fun(name, name_in, name_out, scheme, lc, opts);
 }
 
 Function DaeBuilderInternal::create(const std::string& fname,
@@ -1677,19 +1677,14 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
 }
 
 Function DaeBuilderInternal::fmu_fun(const std::string& name,
-    const std::vector<std::vector<size_t>>& id_in,
-    const std::vector<std::vector<size_t>>& id_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
+    const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::map<std::string, std::vector<size_t>>& lc,
     const Dict& opts) const {
 #ifdef WITH_FMU
-  std::map<std::string, std::vector<size_t>> scheme;
-  casadi_assert(id_in.size() == name_in.size(), "Mismatching number of inputs");
-  for (size_t k = 0; k < id_in.size(); ++k) scheme[name_in[k]] = id_in[k];
-  casadi_assert(id_out.size() == name_out.size(), "Mismatching number of outputs");
-  for (size_t k = 0; k < id_out.size(); ++k) scheme[name_out[k]] = id_out[k];
   return Function::create(new FmuFunction(name, shared_from_this<DaeBuilder>(),
-    name_in, name_out, scheme), opts);
+    name_in, name_out, scheme, lc), opts);
 #else  // WITH_FMU
   casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
   return Function();
@@ -1700,30 +1695,31 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
     const Dict& opts) const {
+  // Generate IO scheme
+  std::map<std::string, std::vector<size_t>> scheme, lc;
   // Collect input indices
-  std::vector<std::vector<size_t>> id_in(name_in.size());
   for (size_t k = 0; k < name_in.size(); ++k) {
-    id_in[k] = ind_in(name_in[k]);
+    scheme[name_in[k]] = ind_in(name_in[k]);
   }
   // Collect output indices
-  std::vector<std::vector<size_t>> id_out(name_out.size());
   for (size_t k = 0; k < name_out.size(); ++k) {
     if (name_out[k] == "ode") {
       // Provide state derivative
-      id_out[k] = x_;
-      for (size_t& i : id_out[k]) i = variable(i).der;
+      scheme[name_out[k]] = x_;
+      for (size_t& i : scheme[name_out[k]]) i = variable(i).der;
     } else if (name_out[k] == "alg") {
       // Provide residual variables
+      scheme[name_out[k]] = z_;
       casadi_assert(z_.empty(), "Not implemented)");
     } else if (name_out[k] == "ydef") {
       // Provide output
-      id_out[k] = y_;
+      scheme[name_out[k]] = y_;
     } else {
       casadi_error("Cannot handle " + name_out[k]);
     }
   }
   // Create FmuFunction instance
-  return fmu_fun(name, id_in, id_out, name_in, name_out, opts);
+  return fmu_fun(name, name_in, name_out, scheme, lc, opts);
 }
 
 Function DaeBuilderInternal::gather_eq() const {
