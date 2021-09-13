@@ -200,9 +200,13 @@ class CASADI_EXPORT FmuInput {
   // Number of elements
   virtual size_t size() const = 0;
   // Access an index
-  virtual size_t ind(size_t k) const = 0;
+  virtual size_t ind(size_t k) const;
   // Get sparsity pattern
   virtual Sparsity sparsity() const = 0;
+  // Class name
+  virtual std::string class_name() const = 0;
+  // It it a regular input?
+  virtual bool is_reg() const {return false;}
 };
 
 // Regular input
@@ -221,6 +225,28 @@ class CASADI_EXPORT RegInput : public FmuInput {
   size_t ind(size_t k) const override { return ind_.at(k);}
   // Get sparsity pattern
   Sparsity sparsity() const override { return Sparsity::dense(size(), 1);}
+  // Class name
+  std::string class_name() const override { return "RegInput";}
+  // It it a regular input?
+  virtual bool is_reg() const {return true;}
+};
+
+// Regular input
+class CASADI_EXPORT DummyInput : public FmuInput {
+ private:
+  // Input indices
+  size_t dim_;
+ public:
+  // Constructor
+  DummyInput(size_t dim) : dim_(dim) {}
+  // Destructor
+  ~DummyInput() override;
+  // Number of elements
+  size_t size() const override { return dim_; }
+  // Get sparsity pattern
+  Sparsity sparsity() const override { return Sparsity(size(), 1);}
+  // Class name
+  std::string class_name() const override { return "DummyInput";}
 };
 
 // Output structure
@@ -234,6 +260,8 @@ class CASADI_EXPORT FmuOutput {
   virtual size_t ind(size_t k) const = 0;
   // Get sparsity pattern
   virtual Sparsity sparsity() const = 0;
+  // Class name
+  virtual std::string class_name() const = 0;
 };
 
 // Output structure
@@ -252,6 +280,8 @@ class CASADI_EXPORT RegOutput : public FmuOutput {
   size_t ind(size_t k) const override { return ind_.at(k);}
   // Get sparsity pattern
   Sparsity sparsity() const override { return Sparsity::dense(size(), 1);}
+  // Class name
+  std::string class_name() const override { return "RegOutput";}
 };
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
@@ -348,6 +378,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& onames,
     const Dict& opts) const override;
   ///@}
+
+  // Helper function
+  static bool has_prefix(const std::string& s);
+
+  // Split prefix
+  static std::string pop_prefix(const std::string& s, std::string* rem = 0);
 };
 
 /** Jacobian */

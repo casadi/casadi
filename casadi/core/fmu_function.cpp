@@ -750,7 +750,15 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
 FmuInput::~FmuInput() {
 }
 
+size_t FmuInput::ind(size_t k) const {
+  casadi_error("ind(k) not implemented for " + class_name());
+  return -1;
+}
+
 RegInput::~RegInput() {
+}
+
+DummyInput::~DummyInput() {
 }
 
 FmuOutput::~FmuOutput() {
@@ -768,7 +776,22 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
-    in_[k] = new RegInput(scheme.at(name_in[k]));
+    // Look for prefix
+    if (has_prefix(name_in[k])) {
+      // Get the prefix
+      std::string pref, rem;
+      pref = pop_prefix(name_in[k], &rem);
+      if (pref == "out") {
+        // Nondifferentiated function output (unused)
+        in_[k] = new DummyInput(scheme.at(rem).size());
+      } else {
+        // No such prefix
+        casadi_error("No such prefix: " + pref);
+      }
+    } else {
+      // No prefix - regular input
+      in_[k] = new RegInput(scheme.at(name_in[k]));
+    }
   }
   // Get input IDs
   out_.resize(name_out.size(), nullptr);
@@ -874,61 +897,74 @@ void FmuFunction::init(const Dict& opts) {
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
-  // Get all Jacobian blocks
-  sp_jac_.resize(n_out_);
-  std::vector<casadi_int> lookup(dae->variables_.size());
-  std::vector<casadi_int> row, col;
-  for (casadi_int oind = 0; oind < n_out_; ++oind) {
-    sp_jac_[oind].resize(n_in_);
-    for (casadi_int iind = 0; iind < n_in_; ++iind) {
-      // Clear lookup
-      std::fill(lookup.begin(), lookup.end(), -1);
-      // Mark inputs
-      for (casadi_int i = 0; i < in_.at(iind)->size(); ++i)
-        lookup.at(in_.at(iind)->ind(i)) = i;
-      // Collect nonzeros of the Jacobian
-      row.clear();
-      col.clear();
-      // Loop over output nonzeros
-      for (casadi_int j = 0; j < out_.at(oind)->size(); ++j) {
-        // Loop over dependencies
-        for (casadi_int d : dae->variables_.at(out_.at(oind)->ind(j)).dependencies) {
-          casadi_int i = lookup.at(d);
-          if (i >= 0) {
-            row.push_back(j);
-            col.push_back(i);
+  // Any non-regular?
+  bool any_nonreg = false;
+  for (casadi_int iind = 0; iind < n_in_; ++iind) {
+    if (!in_.at(iind)->is_reg()) {
+      any_nonreg = true;
+      break;
+    }
+  }
+
+  // The following code does not yet support generalized inputs
+  if (!any_nonreg) {
+    // Get all Jacobian blocks
+    sp_jac_.resize(n_out_);
+    std::vector<casadi_int> lookup(dae->variables_.size());
+    std::vector<casadi_int> row, col;
+    for (casadi_int oind = 0; oind < n_out_; ++oind) {
+      sp_jac_[oind].resize(n_in_);
+      for (casadi_int iind = 0; iind < n_in_; ++iind) {
+        // Clear lookup
+        std::fill(lookup.begin(), lookup.end(), -1);
+        // Mark inputs
+        for (casadi_int i = 0; i < in_.at(iind)->size(); ++i)
+          lookup.at(in_.at(iind)->ind(i)) = i;
+        // Collect nonzeros of the Jacobian
+        row.clear();
+        col.clear();
+        // Loop over output nonzeros
+        for (casadi_int j = 0; j < out_.at(oind)->size(); ++j) {
+          // Loop over dependencies
+          for (casadi_int d : dae->variables_.at(out_.at(oind)->ind(j)).dependencies) {
+            casadi_int i = lookup.at(d);
+            if (i >= 0) {
+              row.push_back(j);
+              col.push_back(i);
+            }
           }
         }
+        // Assemble sparsity pattern
+        sp_jac_[oind][iind] = Sparsity::triplet(out_.at(oind)->size(),
+          in_.at(iind)->size(), row, col);
       }
-      // Assemble sparsity pattern
-      sp_jac_[oind][iind] = Sparsity::triplet(out_.at(oind)->size(),
-        in_.at(iind)->size(), row, col);
+    }
+
+    // Concatenate blocks
+    Sparsity sp_jac_all = blockcat(sp_jac_);
+
+    // Calculate graph coloring
+    coloring_ = sp_jac_all.uni_coloring();
+    if (verbose_) casadi_message("Graph coloring: " + str(sp_jac_all.size2())
+      + " -> " + str(coloring_.size2()) + " directions");
+
+    // Get mappings from concatenated index to input/nz indices
+    offset_.resize(n_in_ + 1);
+    offset_[0] = 0;
+    for (casadi_int iind = 0; iind < n_in_; ++iind) {
+      offset_[iind + 1] = offset_[iind] + in_.at(iind)->size();
+    }
+
+    // Get mapping the other way
+    offset_map_.clear();
+    offset_map_.reserve(sp_jac_all.size2());
+    for (casadi_int iind = 0; iind < n_in_; ++iind) {
+      for (casadi_int k = offset_[iind]; k < offset_[iind + 1]; ++k) {
+        offset_map_.push_back(iind);
+      }
     }
   }
 
-  // Concatenate blocks
-  Sparsity sp_jac_all = blockcat(sp_jac_);
-
-  // Calculate graph coloring
-  coloring_ = sp_jac_all.uni_coloring();
-  if (verbose_) casadi_message("Graph coloring: " + str(sp_jac_all.size2())
-    + " -> " + str(coloring_.size2()) + " directions");
-
-  // Get mappings from concatenated index to input/nz indices
-  offset_.resize(n_in_ + 1);
-  offset_[0] = 0;
-  for (casadi_int iind = 0; iind < n_in_; ++iind) {
-    offset_[iind + 1] = offset_[iind] + in_.at(iind)->size();
-  }
-
-  // Get mapping the other way
-  offset_map_.clear();
-  offset_map_.reserve(sp_jac_all.size2());
-  for (casadi_int iind = 0; iind < n_in_; ++iind) {
-    for (casadi_int k = offset_[iind]; k < offset_[iind + 1]; ++k) {
-      offset_map_.push_back(iind);
-    }
-  }
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
 }
@@ -1046,6 +1082,24 @@ std::string to_string(Fmu::FdMode v) {
   }
   return "";
 }
+
+bool FmuFunction::has_prefix(const std::string& s) {
+  return s.find('_') < s.size();
+}
+
+std::string FmuFunction::pop_prefix(const std::string& s, std::string* rem) {
+  // Get prefix
+  casadi_assert_dev(!s.empty());
+  size_t pos = s.find('_');
+  casadi_assert(pos < s.size(), "Cannot process \"" + s + "\"");
+  // Get prefix
+  std::string r = s.substr(0, pos);
+  // Remainder, if requested (note that rem == &s is possible)
+  if (rem) *rem = s.substr(pos+1, std::string::npos);
+  // Return prefix
+  return r;
+}
+
 
 #endif  // WITH_FMU
 
