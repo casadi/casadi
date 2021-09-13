@@ -747,6 +747,18 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
   return 0;
 }
 
+FmuInput::~FmuInput() {
+}
+
+RegInput::~RegInput() {
+}
+
+FmuOutput::~FmuOutput() {
+}
+
+RegOutput::~RegOutput() {
+}
+
 FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
@@ -756,12 +768,12 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
-    in_[k] = new FmuInput(scheme.at(name_in[k]));
+    in_[k] = new RegInput(scheme.at(name_in[k]));
   }
   // Get input IDs
   out_.resize(name_out.size(), nullptr);
   for (size_t k = 0; k < name_out.size(); ++k) {
-    out_[k] = new FmuOutput(scheme.at(name_out[k]));
+    out_[k] = new RegOutput(scheme.at(name_out[k]));
   }
   // Set input/output names
   name_in_ = name_in;

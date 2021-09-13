@@ -192,47 +192,77 @@ struct CASADI_EXPORT Fmu {
   std::vector<Memory> mem_;
 };
 
+// Input structure
+class CASADI_EXPORT FmuInput {
+ public:
+  // Destructor
+  virtual ~FmuInput() = 0;
+  // Number of elements
+  virtual size_t size() const = 0;
+  // Access an index
+  virtual size_t ind(size_t k) const = 0;
+  // Get sparsity pattern
+  virtual Sparsity sparsity() const = 0;
+};
+
+// Regular input
+class CASADI_EXPORT RegInput : public FmuInput {
+ private:
+  // Input indices
+  std::vector<size_t> ind_;
+ public:
+  // Constructor
+  RegInput(const std::vector<size_t>& ind) : ind_(ind) {}
+  // Destructor
+  ~RegInput() override;
+  // Number of elements
+  size_t size() const override { return ind_.size(); }
+  // Access an index
+  size_t ind(size_t k) const override { return ind_.at(k);}
+  // Get sparsity pattern
+  Sparsity sparsity() const override { return Sparsity::dense(size(), 1);}
+};
+
+// Output structure
+class CASADI_EXPORT FmuOutput {
+ public:
+  // Destructor
+  virtual ~FmuOutput() = 0;
+  // Number of elements
+  virtual size_t size() const = 0;
+  // Access an index
+  virtual size_t ind(size_t k) const = 0;
+  // Get sparsity pattern
+  virtual Sparsity sparsity() const = 0;
+};
+
+// Output structure
+class CASADI_EXPORT RegOutput : public FmuOutput {
+ private:
+  // Output indices
+  std::vector<size_t> ind_;
+ public:
+  // Constructor
+  RegOutput(const std::vector<size_t>& ind) : ind_(ind) {}
+  // Destructor
+  ~RegOutput() override;
+  // Number of elements
+  size_t size() const override { return ind_.size(); }
+  // Access an index
+  size_t ind(size_t k) const override { return ind_.at(k);}
+  // Get sparsity pattern
+  Sparsity sparsity() const override { return Sparsity::dense(size(), 1);}
+};
+
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
   // DaeBuilder instance (non-owning reference to avoid circular dependency)
   WeakRef dae_;
 
-  // Input structure
-  class FmuInput {
-   private:
-    // Input indices
-    std::vector<size_t> ind_;
-   public:
-    // Constructor
-    FmuInput(const std::vector<size_t>& ind) : ind_(ind) {}
-    // Number of elements
-    size_t size() const { return ind_.size(); }
-    // Access an index
-    size_t ind(size_t k) const { return ind_.at(k);}
-    // Get sparsity pattern
-    Sparsity sparsity() const { return Sparsity::dense(size(), 1);}
-  };
-
   // Information about function inputs
   std::vector<FmuInput*> in_;
 
   // Information about function outputs
-  class FmuOutput {
-   private:
-    // Output indices
-    std::vector<size_t> ind_;
-   public:
-    // Constructor
-    FmuOutput(const std::vector<size_t>& ind) : ind_(ind) {}
-    // Number of elements
-    size_t size() const { return ind_.size(); }
-    // Access an index
-    size_t ind(size_t k) const { return ind_.at(k);}
-    // Get sparsity pattern
-    Sparsity sparsity() const { return Sparsity::dense(size(), 1);}
-  };
-
-  // Variable references for inputs and outputs
   std::vector<FmuOutput*> out_;
 
   // User-set options
