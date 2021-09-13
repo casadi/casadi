@@ -537,7 +537,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
       const Variable& x = variable(k);
       casadi_assert(x.der >= 0, "No derivative variable for " + x.name);
       const Variable& xdot = variable(x.der);
-      stream << "  \\dot{" << x.name << "} == " << xdot.name << std::endl;
+      stream << "  \\dot{" << x.name << "} == " << xdot.name;
+      if (!xdot.beq.is_empty()) stream << " := " << xdot.beq;
+      stream << std::endl;
     }
   }
 
@@ -547,7 +549,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
       const Variable& z = variable(k);
       casadi_assert(z.alg >= 0, "No residual variable for " + z.name);
       const Variable& alg = variable(z.alg);
-      stream << "  0 == " << alg.beq << std::endl;
+      stream << "  0 == " << alg.beq;
+      if (!alg.beq.is_empty()) stream << " := " << alg.beq;
+      stream << std::endl;
     }
   }
 
@@ -557,7 +561,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
       const Variable& q = variable(k);
       casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
       const Variable& qdot = variable(q.der);
-      stream << "  \\dot{" << q.name << "} == " << qdot.name << std::endl;
+      stream << "  \\dot{" << q.name << "} == " << qdot.name;
+      if (!qdot.beq.is_empty()) stream << " := " << qdot.beq;
+      stream << std::endl;
     }
   }
 
