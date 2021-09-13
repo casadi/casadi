@@ -197,8 +197,21 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // DaeBuilder instance (non-owning reference to avoid circular dependency)
   WeakRef dae_;
 
+  // Input structure
+  struct FmuInput {
+    std::vector<size_t> ind;
+  };
+
+  // Information about function inputs
+  std::vector<FmuInput*> in_;
+
+  // Information about function outputs
+  struct FmuOutput {
+    std::vector<size_t> ind;
+  };
+
   // Variable references for inputs and outputs
-  std::vector<std::vector<size_t>> id_in_, id_out_;
+  std::vector<FmuOutput*> out_;
 
   // User-set options
   bool enable_ad_, validate_ad_;
@@ -247,8 +260,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   ///@{
   /** \brief Number of function inputs and outputs */
-  size_t get_n_in() override { return id_in_.size();}
-  size_t get_n_out() override {return id_out_.size();}
+  size_t get_n_in() override { return in_.size();}
+  size_t get_n_out() override {return out_.size();}
   ///@}
 
   /// @{
