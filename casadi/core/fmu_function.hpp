@@ -198,16 +198,38 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   WeakRef dae_;
 
   // Input structure
-  struct FmuInput {
-    std::vector<size_t> ind;
+  class FmuInput {
+   private:
+    // Input indices
+    std::vector<size_t> ind_;
+   public:
+    // Constructor
+    FmuInput(const std::vector<size_t>& ind) : ind_(ind) {}
+    // Number of elements
+    size_t size() const { return ind_.size(); }
+    // Access an index
+    size_t ind(size_t k) const { return ind_.at(k);}
+    // Get sparsity pattern
+    Sparsity sparsity() const { return Sparsity::dense(size(), 1);}
   };
 
   // Information about function inputs
   std::vector<FmuInput*> in_;
 
   // Information about function outputs
-  struct FmuOutput {
-    std::vector<size_t> ind;
+  class FmuOutput {
+   private:
+    // Output indices
+    std::vector<size_t> ind_;
+   public:
+    // Constructor
+    FmuOutput(const std::vector<size_t>& ind) : ind_(ind) {}
+    // Number of elements
+    size_t size() const { return ind_.size(); }
+    // Access an index
+    size_t ind(size_t k) const { return ind_.at(k);}
+    // Get sparsity pattern
+    Sparsity sparsity() const { return Sparsity::dense(size(), 1);}
   };
 
   // Variable references for inputs and outputs
@@ -266,8 +288,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /// @{
   /** \brief Retreive sparsities */
-  Sparsity get_sparsity_in(casadi_int i) override;
-  Sparsity get_sparsity_out(casadi_int i) override;
+  Sparsity get_sparsity_in(casadi_int i) override {return in_.at(i)->sparsity();}
+  Sparsity get_sparsity_out(casadi_int i) override {return out_.at(i)->sparsity();}
   /// @}
 
   // Evaluate numerically

@@ -621,15 +621,15 @@ void Fmu::get_sens(int mem, size_t id, double* value) {
 int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
   // Set inputs
   for (size_t k = 0; k < f.in_.size(); ++k) {
-    for (size_t i = 0; i < f.in_[k]->ind.size(); ++i) {
-      set(mem, f.in_[k]->ind[i], arg[k] ? arg[k][i] : 0);
+    for (size_t i = 0; i < f.in_[k]->size(); ++i) {
+      set(mem, f.in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
     }
   }
   // Request outputs to be evaluated
   for (size_t k = 0; k < f.out_.size(); ++k) {
     if (res[k]) {
-      for (size_t i = 0; i < f.out_[k]->ind.size(); ++i) {
-        request(mem, f.out_[k]->ind[i]);
+      for (size_t i = 0; i < f.out_[k]->size(); ++i) {
+        request(mem, f.out_[k]->ind(i));
       }
     }
   }
@@ -640,8 +640,8 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
   // Get outputs
   for (size_t k = 0; k < f.out_.size(); ++k) {
     if (res[k]) {
-      for (size_t i = 0; i < f.out_[k]->ind.size(); ++i) {
-        get(mem, f.out_[k]->ind[i], &res[k][i]);
+      for (size_t i = 0; i < f.out_[k]->size(); ++i) {
+        get(mem, f.out_[k]->ind(i), &res[k][i]);
       }
     }
   }
@@ -652,8 +652,8 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
 int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& f, bool adj) {
   // Set inputs
   for (size_t k = 0; k < f.in_.size(); ++k) {
-    for (size_t i = 0; i < f.in_[k]->ind.size(); ++i) {
-      set(mem, f.in_[k]->ind[i], arg[k] ? arg[k][i] : 0);
+    for (size_t i = 0; i < f.in_[k]->size(); ++i) {
+      set(mem, f.in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
     }
   }
   // Evaluate
@@ -672,7 +672,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
       // Adj: Skip if not requested
       if (adj && sens == 0) continue;
       // Differentiation with respect to what variable
-      size_t wrt_id = f.in_[i1]->ind[i2];
+      size_t wrt_id = f.in_[i1]->ind(i2);
       // Nominal value
       double nom = self_.variable(wrt_id).nominal;
       // Adj: Initialize return to zero
@@ -690,7 +690,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
         const casadi_int* row = f.sp_jac_[j1][i1].row();
         // Request all nonzero elements of the column
         for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-          request(mem, f.out_[j1]->ind[row[k]], wrt_id);
+          request(mem, f.out_[j1]->ind(row[k]), wrt_id);
         }
       }
     }
@@ -709,7 +709,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
       // Adj: Skip if not requested
       if (adj && sens == 0) continue;
       // Differentiation with respect to what variable
-      size_t wrt_id = f.in_[i1]->ind[i2];
+      size_t wrt_id = f.in_[i1]->ind(i2);
       // Inverse of nominal value
       double inv_nom = 1. / self_.variable(wrt_id).nominal;
       // Loop over function outputs
@@ -728,7 +728,7 @@ int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& 
           size_t j2 = row[k];
           // Get the Jacobian nonzero
           double J_nz;
-          get_sens(mem, f.out_[j1]->ind[j2], &J_nz);
+          get_sens(mem, f.out_[j1]->ind(j2), &J_nz);
           // Remove nominal value factor
           J_nz *= inv_nom;
           // Save or multiply
@@ -756,14 +756,12 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
-    in_[k] = new FmuInput();
-    in_[k]->ind = scheme.at(name_in[k]);
+    in_[k] = new FmuInput(scheme.at(name_in[k]));
   }
   // Get input IDs
   out_.resize(name_out.size(), nullptr);
   for (size_t k = 0; k < name_out.size(); ++k) {
-    out_[k] = new FmuOutput();
-    out_[k]->ind = scheme.at(name_out[k]);
+    out_[k] = new FmuOutput(scheme.at(name_out[k]));
   }
   // Set input/output names
   name_in_ = name_in;
@@ -874,15 +872,15 @@ void FmuFunction::init(const Dict& opts) {
       // Clear lookup
       std::fill(lookup.begin(), lookup.end(), -1);
       // Mark inputs
-      for (casadi_int i = 0; i < in_.at(iind)->ind.size(); ++i)
-        lookup.at(in_.at(iind)->ind.at(i)) = i;
+      for (casadi_int i = 0; i < in_.at(iind)->size(); ++i)
+        lookup.at(in_.at(iind)->ind(i)) = i;
       // Collect nonzeros of the Jacobian
       row.clear();
       col.clear();
       // Loop over output nonzeros
-      for (casadi_int j = 0; j < out_.at(oind)->ind.size(); ++j) {
+      for (casadi_int j = 0; j < out_.at(oind)->size(); ++j) {
         // Loop over dependencies
-        for (casadi_int d : dae->variables_.at(out_.at(oind)->ind.at(j)).dependencies) {
+        for (casadi_int d : dae->variables_.at(out_.at(oind)->ind(j)).dependencies) {
           casadi_int i = lookup.at(d);
           if (i >= 0) {
             row.push_back(j);
@@ -891,8 +889,8 @@ void FmuFunction::init(const Dict& opts) {
         }
       }
       // Assemble sparsity pattern
-      sp_jac_[oind][iind] = Sparsity::triplet(out_.at(oind)->ind.size(),
-        in_.at(iind)->ind.size(), row, col);
+      sp_jac_[oind][iind] = Sparsity::triplet(out_.at(oind)->size(),
+        in_.at(iind)->size(), row, col);
     }
   }
 
@@ -908,7 +906,7 @@ void FmuFunction::init(const Dict& opts) {
   offset_.resize(n_in_ + 1);
   offset_[0] = 0;
   for (casadi_int iind = 0; iind < n_in_; ++iind) {
-    offset_[iind + 1] = offset_[iind] + in_.at(iind)->ind.size();
+    offset_[iind + 1] = offset_[iind] + in_.at(iind)->size();
   }
 
   // Get mapping the other way
@@ -921,14 +919,6 @@ void FmuFunction::init(const Dict& opts) {
   }
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
-}
-
-Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
-  return Sparsity::dense(in_.at(i)->ind.size(), 1);
-}
-
-Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
-  return Sparsity::dense(out_.at(i)->ind.size(), 1);
 }
 
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
