@@ -619,15 +619,17 @@ void Fmu::get_sens(int mem, size_t id, double* value) {
 }
 
 int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
-  // Set inputs
+  // Pass all regular inputs
   for (size_t k = 0; k < f.in_.size(); ++k) {
-    for (size_t i = 0; i < f.in_[k]->size(); ++i) {
-      set(mem, f.in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
+    if (f.in_[k]->is_reg()) {
+      for (size_t i = 0; i < f.in_[k]->size(); ++i) {
+        set(mem, f.in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
+      }
     }
   }
-  // Request outputs to be evaluated
+  // Request all regular outputs to be evaluated
   for (size_t k = 0; k < f.out_.size(); ++k) {
-    if (res[k]) {
+    if (res[k] && f.out_[k]->is_reg()) {
       for (size_t i = 0; i < f.out_[k]->size(); ++i) {
         request(mem, f.out_[k]->ind(i));
       }
@@ -635,15 +637,24 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
   }
   // Evaluate
   if (eval(mem, f)) return 1;
-  // Reset solver
-  //if (reset(mem)) return 1;
-  // Get outputs
+  // Get regular outputs
   for (size_t k = 0; k < f.out_.size(); ++k) {
-    if (res[k]) {
+    if (res[k] && f.out_[k]->is_reg()) {
       for (size_t i = 0; i < f.out_[k]->size(); ++i) {
         get(mem, f.out_[k]->ind(i), &res[k][i]);
       }
     }
+  }
+  // What other blocks are there?
+  bool any_jac = false;
+  for (size_t k = 0; k < f.out_.size(); ++k) {
+    if (res[k] && f.out_[k]->is_jac()) {
+      any_jac = true;
+    }
+  }
+  // Evalute Jacobian blocks
+  if (any_jac) {
+    casadi_error("Not implemented");
   }
   // Successful return
   return 0;
@@ -755,6 +766,11 @@ size_t FmuInput::ind(size_t k) const {
   return -1;
 }
 
+size_t FmuInput::size() const {
+  casadi_error("size() not implemented for " + class_name());
+  return -1;
+}
+
 RegInput::~RegInput() {
 }
 
@@ -765,6 +781,24 @@ FmuOutput::~FmuOutput() {
 }
 
 RegOutput::~RegOutput() {
+}
+
+size_t FmuOutput::ind(size_t k) const {
+  casadi_error("ind(k) not implemented for " + class_name());
+  return -1;
+}
+
+size_t FmuOutput::size() const {
+  casadi_error("size() not implemented for " + class_name());
+  return -1;
+}
+
+JacOutput::~JacOutput() {
+}
+
+Sparsity JacOutput::sparsity(const FmuFunction& f) const {
+  casadi_error("Not implemented");
+  return Sparsity();
 }
 
 FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
@@ -796,7 +830,24 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   // Get input IDs
   out_.resize(name_out.size(), nullptr);
   for (size_t k = 0; k < name_out.size(); ++k) {
-    out_[k] = new RegOutput(scheme.at(name_out[k]));
+    // Look for prefix
+    if (has_prefix(name_out[k])) {
+      // Get the prefix
+      std::string pref, arg1;
+      pref = pop_prefix(name_out[k], &arg1);
+      if (pref == "jac") {
+        // Jacobian block
+        casadi_assert(has_prefix(arg1), "Two arguments expected for Jacobian block");
+        std::string arg2 = pop_prefix(arg1, &arg1);
+        out_[k] = new JacOutput(scheme.at(arg1), scheme.at(arg2));
+      } else {
+        // No such prefix
+        casadi_error("No such prefix: " + pref);
+      }
+    } else {
+      // No prefix - regular output
+      out_[k] = new RegOutput(scheme.at(name_out[k]));
+    }
   }
   // Set input/output names
   name_in_ = name_in;
@@ -897,13 +948,13 @@ void FmuFunction::init(const Dict& opts) {
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
-  // Any non-regular?
+  // Any non-regular input or output?
   bool any_nonreg = false;
   for (casadi_int iind = 0; iind < n_in_; ++iind) {
-    if (!in_.at(iind)->is_reg()) {
-      any_nonreg = true;
-      break;
-    }
+    if (!in_.at(iind)->is_reg()) any_nonreg = true;
+  }
+  for (casadi_int oind = 0; oind < n_out_; ++oind) {
+    if (!out_.at(oind)->is_reg()) any_nonreg = true;
   }
 
   // The following code does not yet support generalized inputs
