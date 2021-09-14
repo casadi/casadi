@@ -228,7 +228,7 @@ class CASADI_EXPORT RegInput : public FmuInput {
   // Class name
   std::string class_name() const override { return "RegInput";}
   // It it a regular input?
-  virtual bool is_reg() const {return true;}
+  bool is_reg() const override {return true;}
 };
 
 // Regular input
