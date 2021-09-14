@@ -2216,4 +2216,27 @@ void DaeBuilderInternal::init_fmu() const {
 #endif  // WITH_FMU
 }
 
+Sparsity DaeBuilderInternal::jac_sparsity(const std::vector<size_t>& oind,
+    const std::vector<size_t>& iind) const {
+  // Mark inputs
+  std::vector<casadi_int> lookup(variables_.size(), -1);
+  for (size_t i = 0; i < iind.size(); ++i)
+    lookup.at(iind[i]) = i;
+  // Sparsity pattern for the Jacobian block
+  std::vector<casadi_int> row, col;
+  // Loop over output nonzeros
+  for (casadi_int j = 0; j < oind.size(); ++j) {
+    // Loop over dependencies
+    for (casadi_int d : variables_.at(oind[j]).dependencies) {
+      casadi_int i = lookup.at(d);
+      if (i >= 0) {
+        row.push_back(j);  // Note: May not be sorted in ascending order
+        col.push_back(i);
+      }
+    }
+  }
+  // Assemble sparsity in triplet format
+  return Sparsity::triplet(oind.size(), iind.size(), row, col);
+}
+
 } // namespace casadi

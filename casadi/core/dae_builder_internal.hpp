@@ -316,8 +316,11 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Get index of variable
   size_t find(const std::string& name) const;
 
-    /// Get the (cached) oracle, SX or MX
+  /// Get the (cached) oracle, SX or MX
   const Function& oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
+
+  /// Get Jacobian sparsity
+  Sparsity jac_sparsity(const std::vector<size_t>& oind, const std::vector<size_t>& iind) const;
 
   // Internal methods
 protected:

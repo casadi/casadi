@@ -211,6 +211,7 @@ class CASADI_EXPORT FmuInput {
 
 // Regular input
 class CASADI_EXPORT RegInput : public FmuInput {
+  friend class FmuFunction;  // workaround for FmuFunction::init
  private:
   // Input indices
   std::vector<size_t> ind_;
@@ -268,7 +269,8 @@ class CASADI_EXPORT FmuOutput {
 
 // Output structure
 class CASADI_EXPORT RegOutput : public FmuOutput {
- private:
+  friend class FmuFunction;  // workaround for FmuFunction::init
+ public:
   // Output indices
   std::vector<size_t> ind_;
  public:

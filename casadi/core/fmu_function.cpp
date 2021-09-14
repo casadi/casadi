@@ -797,8 +797,11 @@ JacOutput::~JacOutput() {
 }
 
 Sparsity JacOutput::sparsity(const FmuFunction& f) const {
-  casadi_error("Not implemented");
-  return Sparsity();
+  // DaeBuilder instance
+  casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(f.dae_->raw_);
+  // Get the Jacobian block
+  return dae->jac_sparsity(ind1_, ind2_);
 }
 
 FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
@@ -833,16 +836,16 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     // Look for prefix
     if (has_prefix(name_out[k])) {
       // Get the prefix
-      std::string pref, arg1;
-      pref = pop_prefix(name_out[k], &arg1);
-      if (pref == "jac") {
+      std::string part1, rem;
+      part1 = pop_prefix(name_out[k], &rem);
+      if (part1 == "jac") {
         // Jacobian block
-        casadi_assert(has_prefix(arg1), "Two arguments expected for Jacobian block");
-        std::string arg2 = pop_prefix(arg1, &arg1);
-        out_[k] = new JacOutput(scheme.at(arg1), scheme.at(arg2));
+        casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
+        std::string part2 = pop_prefix(rem, &rem);
+        out_[k] = new JacOutput(scheme.at(part2), scheme.at(rem));
       } else {
         // No such prefix
-        casadi_error("No such prefix: " + pref);
+        casadi_error("No such prefix: " + part1);
       }
     } else {
       // No prefix - regular output
@@ -961,33 +964,12 @@ void FmuFunction::init(const Dict& opts) {
   if (!any_nonreg) {
     // Get all Jacobian blocks
     sp_jac_.resize(n_out_);
-    std::vector<casadi_int> lookup(dae->variables_.size());
-    std::vector<casadi_int> row, col;
     for (casadi_int oind = 0; oind < n_out_; ++oind) {
+      auto ostruct = dynamic_cast<const RegOutput&>(*out_.at(oind));
       sp_jac_[oind].resize(n_in_);
       for (casadi_int iind = 0; iind < n_in_; ++iind) {
-        // Clear lookup
-        std::fill(lookup.begin(), lookup.end(), -1);
-        // Mark inputs
-        for (casadi_int i = 0; i < in_.at(iind)->size(); ++i)
-          lookup.at(in_.at(iind)->ind(i)) = i;
-        // Collect nonzeros of the Jacobian
-        row.clear();
-        col.clear();
-        // Loop over output nonzeros
-        for (casadi_int j = 0; j < out_.at(oind)->size(); ++j) {
-          // Loop over dependencies
-          for (casadi_int d : dae->variables_.at(out_.at(oind)->ind(j)).dependencies) {
-            casadi_int i = lookup.at(d);
-            if (i >= 0) {
-              row.push_back(j);
-              col.push_back(i);
-            }
-          }
-        }
-        // Assemble sparsity pattern
-        sp_jac_[oind][iind] = Sparsity::triplet(out_.at(oind)->size(),
-          in_.at(iind)->size(), row, col);
+        auto istruct = dynamic_cast<const RegInput&>(*in_.at(iind));
+        sp_jac_[oind][iind] = dae->jac_sparsity(ostruct.ind_, istruct.ind_);
       }
     }
 
