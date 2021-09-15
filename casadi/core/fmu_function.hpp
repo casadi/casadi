@@ -201,6 +201,8 @@ class CASADI_EXPORT FmuInput {
   virtual size_t size() const;
   // Access an index
   virtual size_t ind(size_t k) const;
+  // Access all indices
+  virtual const std::vector<size_t>& ind() const;
   // Get sparsity pattern
   virtual Sparsity sparsity() const = 0;
   // Class name
@@ -211,7 +213,6 @@ class CASADI_EXPORT FmuInput {
 
 // Regular input
 class CASADI_EXPORT RegInput : public FmuInput {
-  friend class FmuFunction;  // workaround for FmuFunction::init
  private:
   // Input indices
   std::vector<size_t> ind_;
@@ -224,6 +225,8 @@ class CASADI_EXPORT RegInput : public FmuInput {
   size_t size() const override { return ind_.size(); }
   // Access an index
   size_t ind(size_t k) const override { return ind_.at(k);}
+  // Access all indices
+  const std::vector<size_t>& ind() const override { return ind_;}
   // Get sparsity pattern
   Sparsity sparsity() const override { return Sparsity::dense(size(), 1);}
   // Class name
@@ -257,6 +260,12 @@ class CASADI_EXPORT FmuOutput {
   virtual size_t size() const;
   // Access an index
   virtual size_t ind(size_t k) const;
+  // Access all indices
+  virtual const std::vector<size_t>& ind() const;
+  // Access all indices
+  virtual const std::vector<size_t>& ind1() const;
+  // Access all indices
+  virtual const std::vector<size_t>& ind2() const;
   // Get sparsity pattern
   virtual Sparsity sparsity(const FmuFunction& f) const = 0;
   // Class name
@@ -269,7 +278,6 @@ class CASADI_EXPORT FmuOutput {
 
 // Output structure
 class CASADI_EXPORT RegOutput : public FmuOutput {
-  friend class FmuFunction;  // workaround for FmuFunction::init
  public:
   // Output indices
   std::vector<size_t> ind_;
@@ -282,6 +290,8 @@ class CASADI_EXPORT RegOutput : public FmuOutput {
   size_t size() const override { return ind_.size(); }
   // Access an index
   size_t ind(size_t k) const override { return ind_.at(k);}
+  // Access all indices
+  const std::vector<size_t>& ind() const override { return ind_;}
   // Get sparsity pattern
   Sparsity sparsity(const FmuFunction& f) const override { return Sparsity::dense(size(), 1);}
   // Class name
@@ -307,6 +317,10 @@ class CASADI_EXPORT JacOutput : public FmuOutput {
   std::string class_name() const override { return "JacOutput";}
   // It it a Jacobian block?
   bool is_jac() const override {return true;}
+  // Access all indices
+  const std::vector<size_t>& ind1() const override { return ind1_;}
+  // Access all indices
+  const std::vector<size_t>& ind2() const override { return ind2_;}
 };
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
@@ -319,6 +333,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Information about function outputs
   std::vector<FmuOutput*> out_;
+
+  // All Jacobian inputs and outputs
+  std::vector<size_t> jac_in_, jac_out_;
 
   // User-set options
   bool enable_ad_, validate_ad_;
@@ -355,6 +372,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Jacobian sparsity patterns
   std::vector<std::vector<Sparsity>> sp_jac_;
+
+  // Get sparsity pattern for extended Jacobian
+  Sparsity sp_ext_;
 
   // Graph coloring
   Sparsity coloring_;

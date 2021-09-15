@@ -1119,8 +1119,6 @@ Function DaeBuilderInternal::create(const std::string& fname,
   }
   // Model equations in DLL
   if (!symbolic_) {
-    // General factory routine not implemented
-    casadi_assert(!with_underscore, "Not implemented");
     // Cannot lift calls in an FMU
     casadi_assert(!lifted_calls, "Lifting requires a symbolic representation");
     // Cannot convert to SX
@@ -1703,27 +1701,16 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const Dict& opts) const {
   // Generate IO scheme
   std::map<std::string, std::vector<size_t>> scheme, lc;
-  // Collect input indices
-  for (size_t k = 0; k < name_in.size(); ++k) {
-    scheme[name_in[k]] = ind_in(name_in[k]);
-  }
-  // Collect output indices
-  for (size_t k = 0; k < name_out.size(); ++k) {
-    if (name_out[k] == "ode") {
-      // Provide state derivative
-      scheme[name_out[k]] = x_;
-      for (size_t& i : scheme[name_out[k]]) i = variable(i).der;
-    } else if (name_out[k] == "alg") {
-      // Provide residual variables
-      scheme[name_out[k]] = z_;
-      casadi_assert(z_.empty(), "Not implemented)");
-    } else if (name_out[k] == "ydef") {
-      // Provide output
-      scheme[name_out[k]] = y_;
-    } else {
-      casadi_error("Cannot handle " + name_out[k]);
-    }
-  }
+  scheme["t"] = ind_in("t");
+  scheme["x"] = ind_in("x");
+  scheme["u"] = ind_in("u");
+  scheme["z"] = ind_in("z");
+  scheme["p"] = ind_in("p");
+  scheme["ode"] = x_;
+  for (size_t& i : scheme["ode"]) i = variable(i).der;
+  scheme["alg"] = z_;
+  casadi_assert(z_.empty(), "Not implemented)");
+  scheme["ydef"] = y_;
   // Create FmuFunction instance
   return fmu_fun(name, name_in, name_out, scheme, lc, opts);
 }
