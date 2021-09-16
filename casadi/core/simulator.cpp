@@ -304,10 +304,6 @@ std::map<std::string, Simulator::Plugin> Simulator::solvers_;
 
 const std::string Simulator::infix_ = "simulator";
 
-void Simulator::setStopTime(SimulatorMemory* mem, double tf) const {
-  casadi_error("setStopTime not defined for class " + class_name());
-}
-
 template<typename XType>
 Function Simulator::map2oracle(const std::string& name,
     const std::map<std::string, XType>& d, const Dict& opts) {

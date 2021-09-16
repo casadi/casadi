@@ -108,9 +108,6 @@ public:
   /** \brief  Print solver statistics */
   virtual void print_stats(SimulatorMemory* mem) const {}
 
-  /** \brief  Set stop time for the integration */
-  virtual void setStopTime(SimulatorMemory* mem, double tf) const;
-
   /// Create sparsity pattern of the extended Jacobian
   Sparsity sp_jac_dae();
 

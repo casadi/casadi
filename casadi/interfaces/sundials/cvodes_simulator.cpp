@@ -209,8 +209,6 @@ void CvodesSimulator::reset(SimulatorMemory* mem, double t, const double* x, con
   SundialsSimulator::reset(mem, t, x, u, z, p, y);
   // Re-initialize
   THROWING(CVodeReInit, m->mem, t, m->xz);
-  // We we don't have any discrete input, then we can integrate till the end
-  if (nu_ == 0) setStopTime(m, grid_.back());
   // Get outputs
   if (y && ny_ > 0) eval_y(m, t, x, u, z, p, y);
 }
