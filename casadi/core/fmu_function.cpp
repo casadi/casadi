@@ -454,40 +454,51 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
         break;
       default: casadi_error("Not implemented");
       }
-      // Check if perturbation is allowed
-      bool in_bounds = true;
-      for (size_t iind = 0; iind < m.id_in_.size(); ++iind) {
-        // Get bounds
-        const Variable& var_in = self_.variable(m.id_in_[iind]);
-        double min = var_in.min;
-        double max = var_in.max;
-        // Take step
-        double test = m.v_in_[iind] + pert * m.d_in_[iind];
+      // Perturb inputs, if allowed
+      m.v_pert_.resize(n_known);
+      m.in_bounds_.clear();
+      for (size_t i = 0; i < n_known; ++i) {
+        // Try to take step
+        double test = m.v_in_[i] + pert * m.d_in_[i];
         // Check if in bounds
-        in_bounds = in_bounds && test >= min && test <= max;
+        const Variable& v = self_.variable(m.id_in_[i]);
+        bool in_bounds = test >= v.min && test <= v.max;
+        // Take step, if allowed
+        m.v_pert_[i] = in_bounds ? test : m.v_in_[i];
+        // Keep track for later
+        m.in_bounds_.push_back(in_bounds);
       }
-      // Check if in bounds (or not smoothing which currently doesn't implement bounds handling)
-      if (f.fd_ != SMOOTHING || in_bounds) {
-        // Pass perturbed inputs to FMU
-        casadi_axpy(n_known, pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
-        status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
-        if (status != fmi2OK) {
-          casadi_warning("fmi2SetReal failed");
-          return 1;
+      // Pass perturbed inputs to FMU
+      status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_pert_));
+      if (status != fmi2OK) {
+        casadi_warning("fmi2SetReal failed");
+        return 1;
+      }
+      // Evaluate perturbed FMU
+      status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
+      if (status != fmi2OK) {
+        casadi_warning("fmi2GetReal failed");
+        return 1;
+      }
+      // Post-process yk[k]
+      for (size_t i = 0; i < n_unknown; ++i) {
+        // Variable id
+        size_t id = m.id_out_[i];
+        // Differentiation with respect to what variable
+        size_t wrt_id = m.wrt_.at(id);
+        // Find the corresponding input variable
+        size_t wrt_i;
+        for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
+          if (m.id_in_[wrt_i] == wrt_id) break;
         }
-        // Evaluate perturbed FMU
-        status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
-        if (status != fmi2OK) {
-          casadi_warning("fmi2GetReal failed");
-          return 1;
+        // Check if in bounds
+        if (m.in_bounds_.at(wrt_i)) {
+          // Input was in bounds: Keep output, make dimensionless
+          yk[k][i] /= m.nominal_out_[i];
+        } else {
+          // Input was out of bounds: Discard output
+          yk[k][i] = nan;
         }
-        // Remove purburbation
-        casadi_axpy(n_known, -pert, get_ptr(m.d_in_), get_ptr(m.v_in_));
-        // Make perturbed outputs dimensionless
-        for (size_t i = 0; i < n_unknown; ++i) yk[k][i] /= m.nominal_out_[i];
-      } else {
-        // Input outside bounds, set to NaN
-        for (size_t i = 0; i < n_unknown; ++i) yk[k][i] = nan;
       }
     }
     // Restore FMU inputs

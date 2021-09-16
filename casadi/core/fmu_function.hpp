@@ -178,10 +178,12 @@ struct CASADI_EXPORT Fmu {
     std::vector<size_t> wrt_;
     // Current known/unknown variables
     std::vector<size_t> id_in_, id_out_;
+    // Which perturbations are permitted
+    std::vector<bool> in_bounds_;
     // Value references
     std::vector<fmi2ValueReference> vr_in_, vr_out_;
     // Work vector (reals)
-    std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_;
+    std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_, v_pert_;
     // Nominal values
     std::vector<fmi2Real> nominal_out_;
     // Constructor
