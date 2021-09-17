@@ -383,6 +383,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Graph coloring
   Sparsity coloring_;
 
+  // Memory instance
+  int mem_;
+
   ///@{
   /** \brief Number of function inputs and outputs */
   size_t get_n_in() override { return in_.size();}

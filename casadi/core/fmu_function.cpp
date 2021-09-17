@@ -978,11 +978,18 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   h_iter_ = 0;
   h_min_ = 0;
   h_max_ = inf;
+  // No memory object allocated
+  mem_ = -1;
 }
 
 FmuFunction::~FmuFunction() {
   // Free memory
   clear_mem();
+  // Get a pointer to the DaeBuilder class
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Release memory object
+  if (mem_ >= 0) dae->fmu_->release(mem_);
   // Free input memory structure
   for (FmuInput* e : in_) if (e) delete(e);
 }
@@ -1094,6 +1101,9 @@ void FmuFunction::init(const Dict& opts) {
 
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
+
+  // Create instance
+  mem_ = dae->fmu_->checkout();
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
@@ -1101,12 +1111,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Create instance
-  int m = dae->fmu_->checkout();
   // Evaluate fmu
-  int flag = dae->fmu_->eval(m, arg, res, *this);
-  // Release memory object
-  dae->fmu_->release(m);
+  int flag = dae->fmu_->eval(mem_, arg, res, *this);
   // Return error flag
   return flag;
 }
