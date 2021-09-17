@@ -70,9 +70,14 @@ void Fmu::init() {
     get_function("fmi2ExitInitializationMode"));
   enter_continuous_time_mode_ = reinterpret_cast<fmi2EnterContinuousTimeModeTYPE*>(
     get_function("fmi2EnterContinuousTimeMode"));
-  set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
-  set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
   get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(get_function("fmi2GetReal"));
+  set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
+  get_integer_ = reinterpret_cast<fmi2GetIntegerTYPE*>(get_function("fmi2GetInteger"));
+  set_integer_ = reinterpret_cast<fmi2SetIntegerTYPE*>(get_function("fmi2SetInteger"));
+  get_boolean_ = reinterpret_cast<fmi2GetBooleanTYPE*>(get_function("fmi2GetBoolean"));
+  set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
+  get_string_ = reinterpret_cast<fmi2GetStringTYPE*>(get_function("fmi2GetString"));
+  set_string_ = reinterpret_cast<fmi2SetStringTYPE*>(get_function("fmi2SetString"));
   if (self_.provides_directional_derivative_) {
     get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
       get_function("fmi2GetDirectionalDerivative"));
@@ -286,6 +291,69 @@ int Fmu::eval(int mem, const FmuFunction& f) {
     }
     // Initialization mode begins
     if (enter_initialization_mode(mem)) return 1;
+    // DaeBuilder instance
+    casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
+    auto dae = static_cast<DaeBuilderInternal*>(f.dae_->raw_);
+    // Get all values
+    for (Variable& v : dae->variables_) {
+      // Convert to expected type
+      fmi2ValueReference vr = v.value_reference;
+      // Get value
+      switch (v.type) {
+        case Variable::REAL:
+          {
+            // Real
+            fmi2Real value;
+            status = get_real_(m.c, &vr, 1, &value);
+            if (status != fmi2OK) {
+              casadi_warning("fmi2GetReal failed for " + v.name);
+              return 1;
+            }
+            v.value = value;
+            break;
+          }
+        case Variable::INTEGER:
+        case Variable::ENUM:
+          {
+            // Integer: Convert to double
+            fmi2Integer value;
+            status = get_integer_(m.c, &vr, 1, &value);
+            if (status != fmi2OK) {
+              casadi_warning("fmi2GetInteger failed for " + v.name);
+              return 1;
+            }
+            v.value = value;
+            break;
+          }
+        case Variable::BOOLEAN:
+          {
+            // Boolean: Convert to double
+            fmi2Boolean value;
+            status = get_boolean_(m.c, &vr, 1, &value);
+            if (status != fmi2OK) {
+              casadi_warning("fmi2GetBoolean failed for " + v.name);
+              return 1;
+            }
+            v.value = value;
+            break;
+          }
+        case Variable::STRING:
+          {
+            // String
+            fmi2String value;
+            status = get_string_(m.c, &vr, 1, &value);
+            if (status != fmi2OK) {
+              casadi_warning("fmi2GetString failed for " + v.name);
+              return 1;
+            }
+            v.stringvalue = value;
+            v.value = 0;
+            break;
+          }
+        default:
+          casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
+      }
+    }
     // Initialization mode ends
     if (exit_initialization_mode(mem)) return 1;
     // Initialized

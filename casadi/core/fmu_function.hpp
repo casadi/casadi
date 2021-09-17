@@ -147,9 +147,14 @@ struct CASADI_EXPORT Fmu {
   fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
   fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
   fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
-  fmi2SetRealTYPE* set_real_;
-  fmi2SetBooleanTYPE* set_boolean_;
   fmi2GetRealTYPE* get_real_;
+  fmi2SetRealTYPE* set_real_;
+  fmi2GetBooleanTYPE* get_boolean_;
+  fmi2SetBooleanTYPE* set_boolean_;
+  fmi2GetIntegerTYPE* get_integer_;
+  fmi2SetIntegerTYPE* set_integer_;
+  fmi2GetStringTYPE* get_string_;
+  fmi2SetStringTYPE* set_string_;
   fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
 
   // Callback functions
