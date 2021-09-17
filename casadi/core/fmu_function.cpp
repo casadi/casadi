@@ -846,104 +846,6 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
   return 0;
 }
 
-int Fmu::eval_jac(int mem, const double** arg, double** res, const FmuFunction& f, bool adj) {
-  // Set inputs
-  for (size_t k = 0; k < f.in_.size(); ++k) {
-    for (size_t i = 0; i < f.in_[k]->size(); ++i) {
-      set(mem, f.in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
-    }
-  }
-  // Evaluate
-  if (eval(mem, f)) return 1;
-
-  // Loop over colors
-  for (casadi_int c = 0; c < f.coloring_.size2(); ++c) {
-    // Loop over flattened input indices for color
-    for (casadi_int kc = f.coloring_.colind(c); kc < f.coloring_.colind(c + 1); ++kc) {
-      casadi_int ind_flat = f.coloring_.row(kc);
-      // Corresponding function index, element index
-      casadi_int i1 = f.offset_map_[ind_flat];
-      casadi_int i2 = ind_flat - f.offset_[i1];
-      // Adj: Sensitivities to be calculated
-      double* sens = adj ? res[i1] : 0;
-      // Adj: Skip if not requested
-      if (adj && sens == 0) continue;
-      // Differentiation with respect to what variable
-      size_t wrt_id = f.in_[i1]->ind(i2);
-      // Nominal value
-      double nom = self_.variable(wrt_id).nominal;
-      // Adj: Initialize return to zero
-      if (adj) sens[i2] = 0;
-      // Set seed for column
-      set_seed(mem, wrt_id, nom);
-      // Loop over function output
-      for (size_t j1 = 0; j1 < f.out_.size(); ++j1) {
-        // Index of the Jacobian block
-        size_t res_ind = j1 * f.in_.size() + i1;
-        // Jac: Skip if block is not requested
-        if (!adj && res[res_ind] == 0) continue;
-        // Get sparsity
-        const casadi_int* colind = f.sp_jac_[j1][i1].colind();
-        const casadi_int* row = f.sp_jac_[j1][i1].row();
-        // Request all nonzero elements of the column
-        for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-          request(mem, f.out_[j1]->ind(row[k]), wrt_id);
-        }
-      }
-    }
-
-    // Calculate derivatives
-    if (eval_derivative(mem, f)) return 1;
-
-    // Loop over flattened input indices for color
-    for (casadi_int kc = f.coloring_.colind(c); kc < f.coloring_.colind(c + 1); ++kc) {
-      casadi_int ind_flat = f.coloring_.row(kc);
-      // Corresponding function index, element index
-      casadi_int i1 = f.offset_map_[ind_flat];
-      casadi_int i2 = ind_flat - f.offset_[i1];
-      // Adj: Sensitivities to be calculated
-      double* sens = adj ? res[i1] : 0;
-      // Adj: Skip if not requested
-      if (adj && sens == 0) continue;
-      // Differentiation with respect to what variable
-      size_t wrt_id = f.in_[i1]->ind(i2);
-      // Inverse of nominal value
-      double inv_nom = 1. / self_.variable(wrt_id).nominal;
-      // Loop over function outputs
-      for (size_t j1 = 0; j1 < f.out_.size(); ++j1) {
-        // Adj: Corresponding seed
-        const double* seed = adj ? arg[f.in_.size() + f.out_.size() + j1] : 0;
-        // Index of the Jacobian block
-        size_t res_ind = j1 * f.in_.size() + i1;
-        // Jac: Skip if block is not requested
-        if (!adj && res[res_ind] == 0) continue;
-        // Get sparsity
-        const casadi_int* colind = f.sp_jac_[j1][i1].colind();
-        const casadi_int* row = f.sp_jac_[j1][i1].row();
-        // Collect all nonzero elements of the column
-        for (size_t k = colind[i2]; k < colind[i2 + 1]; ++k) {
-          size_t j2 = row[k];
-          // Get the Jacobian nonzero
-          double J_nz;
-          get_sens(mem, f.out_[j1]->ind(j2), &J_nz);
-          // Remove nominal value factor
-          J_nz *= inv_nom;
-          // Save or multiply
-          if (adj) {
-            // Adjoint: Multiply with vector from left
-            sens[i2] += seed[j2] * J_nz;
-          } else {
-            // Jacobian: Copy nonzero
-            res[res_ind][k] = J_nz;
-          }
-        }
-      }
-    }
-  }
-  // Successful return
-  return 0;
-}
-
 FmuInput::~FmuInput() {
 }
 
@@ -1019,7 +921,7 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc)
-    : FunctionInternal(name), dae_(dae) {
+    : FunctionInternal(name), dae_(dae), scheme_(scheme), lc_(lc) {
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
@@ -1161,88 +1063,37 @@ void FmuFunction::init(const Dict& opts) {
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
-  // Any non-regular input or output?
-  bool any_nonreg = false;
-  for (casadi_int iind = 0; iind < n_in_; ++iind) {
-    if (!in_.at(iind)->is_reg()) any_nonreg = true;
-  }
-  for (casadi_int oind = 0; oind < n_out_; ++oind) {
-    if (!out_.at(oind)->is_reg()) any_nonreg = true;
-  }
-
-  // The following code does not yet support generalized inputs
-  if (any_nonreg) {
-    // Collect all inputs in any Jacobian block
-    std::vector<bool> in_jac(dae->variables_.size(), false);
-    for (FmuOutput* i : out_) {
-      if (i->is_jac()) {
-        for (size_t j : i->ind2()) in_jac[j] = true;
-      }
-    }
-    jac_in_.clear();
-    for (size_t k = 0; k < in_jac.size(); ++k) {
-      if (in_jac[k]) jac_in_.push_back(k);
-    }
-    // Collect all outputs in any Jacobian block
-    std::fill(in_jac.begin(), in_jac.end(), false);
-    for (FmuOutput* i : out_) {
-      if (i->is_jac()) {
-        for (size_t j : i->ind1()) in_jac[j] = true;
-      }
-    }
-    jac_out_.clear();
-    for (size_t k = 0; k < in_jac.size(); ++k) {
-      if (in_jac[k]) jac_out_.push_back(k);
-    }
-    // Get sparsity pattern for extended Jacobian
-    sp_ext_ = dae->jac_sparsity(jac_out_, jac_in_);
-    // Calculate graph coloring
-    coloring_ = sp_ext_.uni_coloring();
-    if (verbose_) casadi_message("Graph coloring: " + str(sp_ext_.size2())
-      + " -> " + str(coloring_.size2()) + " directions");
-  } else {
-    // Legacy code
-    // Get all Jacobian blocks
-    sp_jac_.resize(n_out_);
-    for (casadi_int oind = 0; oind < n_out_; ++oind) {
-      sp_jac_[oind].resize(n_in_);
-      for (casadi_int iind = 0; iind < n_in_; ++iind) {
-        sp_jac_[oind][iind] = dae->jac_sparsity(out_.at(oind)->ind(), in_.at(iind)->ind());
-      }
-    }
-
-    // Concatenate blocks
-    Sparsity sp_jac_all = blockcat(sp_jac_);
-
-    // Calculate graph coloring
-    coloring_ = sp_jac_all.uni_coloring();
-    if (verbose_) casadi_message("Graph coloring: " + str(sp_jac_all.size2())
-      + " -> " + str(coloring_.size2()) + " directions");
-
-    // Get mappings from concatenated index to input/nz indices
-    offset_.resize(n_in_ + 1);
-    offset_[0] = 0;
-    for (casadi_int iind = 0; iind < n_in_; ++iind) {
-      offset_[iind + 1] = offset_[iind] + in_.at(iind)->size();
-    }
-
-    // Get mapping the other way
-    offset_map_.clear();
-    offset_map_.reserve(sp_jac_all.size2());
-    for (casadi_int iind = 0; iind < n_in_; ++iind) {
-      for (casadi_int k = offset_[iind]; k < offset_[iind + 1]; ++k) {
-        offset_map_.push_back(iind);
-      }
+  // Collect all inputs in any Jacobian block
+  std::vector<bool> in_jac(dae->variables_.size(), false);
+  for (FmuOutput* i : out_) {
+    if (i->is_jac()) {
+      for (size_t j : i->ind2()) in_jac[j] = true;
     }
   }
+  jac_in_.clear();
+  for (size_t k = 0; k < in_jac.size(); ++k) {
+    if (in_jac[k]) jac_in_.push_back(k);
+  }
+  // Collect all outputs in any Jacobian block
+  std::fill(in_jac.begin(), in_jac.end(), false);
+  for (FmuOutput* i : out_) {
+    if (i->is_jac()) {
+      for (size_t j : i->ind1()) in_jac[j] = true;
+    }
+  }
+  jac_out_.clear();
+  for (size_t k = 0; k < in_jac.size(); ++k) {
+    if (in_jac[k]) jac_out_.push_back(k);
+  }
+  // Get sparsity pattern for extended Jacobian
+  sp_ext_ = dae->jac_sparsity(jac_out_, jac_in_);
+  // Calculate graph coloring
+  coloring_ = sp_ext_.uni_coloring();
+  if (verbose_) casadi_message("Graph coloring: " + str(sp_ext_.size2())
+    + " -> " + str(coloring_.size2()) + " directions");
 
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
-}
-
-Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
-    bool symmetric) const {
-  return sp_jac_.at(oind).at(iind);
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
@@ -1260,31 +1111,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   return flag;
 }
 
-Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
-    const std::vector<std::string>& onames, const Dict& opts) const {
-  Function ret;
-  ret.own(new FmuFunctionJac(name));
-  // Hack: Manually enable finite differenting (pending implementation in class)
-  Dict opts2 = opts;
-  opts2["enable_fd"] = true;
-  ret->construct(opts2);
-  return ret;
-}
-
-Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
-    const std::vector<std::string>& inames,
-    const std::vector<std::string>& onames,
-    const Dict& opts) const {
-  casadi_assert(nadj == 1, "Not supported");
-  Function ret;
-  ret.own(new FmuFunctionAdj(name));
-  // Hack: Manually enable finite differenting (pending implementation in class)
-  Dict opts2 = opts;
-  opts2["enable_fd"] = true;
-  ret->construct(opts2);
-  return ret;
-}
-
 casadi_int FmuFunction::n_pert() const {
   switch (fd_) {
   case Fmu::FORWARD:
@@ -1297,50 +1123,6 @@ casadi_int FmuFunction::n_pert() const {
   default: break;
   }
   casadi_error("Not implemented");
-}
-
-FmuFunctionJac::~FmuFunctionJac() {
-  // Free memory
-  clear_mem();
-}
-
-int FmuFunctionJac::eval(const double** arg, double** res, casadi_int* iw, double* w,
-    void* mem) const {
-  // Non-differentiated class
-  auto self = derivative_of_.get<FmuFunction>();
-  // DaeBuilder instance
-  casadi_assert(self->dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(self->dae_->raw_);
-  // Create instance
-  int m = dae->fmu_->checkout();
-  // Evaluate fmu
-  int flag = dae->fmu_->eval_jac(m, arg, res, *self, false);
-  // Release memory object
-  dae->fmu_->release(m);
-  // Return error flag
-  return flag;
-}
-
-FmuFunctionAdj::~FmuFunctionAdj() {
-  // Free memory
-  clear_mem();
-}
-
-int FmuFunctionAdj::eval(const double** arg, double** res, casadi_int* iw, double* w,
-    void* mem) const {
-  // Non-differentiated class
-  auto self = derivative_of_.get<FmuFunction>();
-  // DaeBuilder instance
-  casadi_assert(self->dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(self->dae_->raw_);
-  // Create instance
-  int m = dae->fmu_->checkout();
-  // Evaluate fmu
-  int flag = dae->fmu_->eval_jac(m, arg, res, *self, true);
-  // Release memory object
-  dae->fmu_->release(m);
-  // Return error flag
-  return flag;
 }
 
 std::string to_string(Fmu::FdMode v) {
@@ -1371,6 +1153,33 @@ std::string FmuFunction::pop_prefix(const std::string& s, std::string* rem) {
   return r;
 }
 
+Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames, const Dict& opts) const {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  DaeBuilder dae = shared_cast<DaeBuilder>(const_cast<FmuFunction*>(this)->dae_.shared());
+  // Return value
+  Function ret;
+  ret.own(new FmuFunction(name, dae, inames, onames, scheme_, lc_));
+  // Hack: Manually enable finite differenting (pending implementation in class)
+  Dict opts2 = opts;
+  opts2["enable_fd"] = true;
+  ret->construct(opts2);
+  return ret;
+}
+
+bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
+  return in_.at(iind)->is_reg() && out_.at(oind)->is_reg();
+}
+
+Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
+    bool symmetric) const {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Get the Jacobian block
+  return dae->jac_sparsity(out_.at(oind)->ind(), in_.at(iind)->ind());
+}
 
 #endif  // WITH_FMU
 

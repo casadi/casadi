@@ -124,9 +124,6 @@ struct CASADI_EXPORT Fmu {
   // Evaluate, non-differentated
   int eval(int mem, const double** arg, double** res, const FmuFunction& f);
 
-  // Evaluate Jacobian numerically, optionally multiply by vector from left
-  int eval_jac(int mem, const double** arg, double** res, const FmuFunction& f, bool adj);
-
   // Get memory object
   fmi2Component memory(int mem);
 
@@ -335,6 +332,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // DaeBuilder instance (non-owning reference to avoid circular dependency)
   WeakRef dae_;
 
+  // IO scheme, linear combinations
+  std::map<std::string, std::vector<size_t>> scheme_, lc_;
+
   // Information about function inputs
   std::vector<FmuInput*> in_;
 
@@ -377,20 +377,11 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /// Initialize
   void init(const Dict& opts) override;
 
-  // Jacobian sparsity patterns
-  std::vector<std::vector<Sparsity>> sp_jac_;
-
   // Get sparsity pattern for extended Jacobian
   Sparsity sp_ext_;
 
   // Graph coloring
   Sparsity coloring_;
-
-  // Index offset for concatenated inputs
-  std::vector<casadi_int> offset_;
-
-  // Input corresponding to a concatenated input index
-  std::vector<casadi_int> offset_map_;
 
   ///@{
   /** \brief Number of function inputs and outputs */
@@ -409,7 +400,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   ///@{
   /** \brief Return sparsity of Jacobian of an output respect to an input */
-  bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override {return true;}
+  bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override;
   Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
   ///@}
 
@@ -422,52 +413,11 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const Dict& opts) const override;
   ///@}
 
-  ///@{
-  /** \brief Adjoint */
-  bool has_reverse(casadi_int nadj) const override {return nadj == 1;}
-  Function get_reverse(casadi_int nadj, const std::string& name,
-    const std::vector<std::string>& inames,
-    const std::vector<std::string>& onames,
-    const Dict& opts) const override;
-  ///@}
-
   // Helper function
   static bool has_prefix(const std::string& s);
 
   // Split prefix
   static std::string pop_prefix(const std::string& s, std::string* rem = 0);
-};
-
-/** Jacobian */
-class CASADI_EXPORT FmuFunctionJac : public FunctionInternal {
- public:
-  /// Constructor
-  FmuFunctionJac(const std::string& name) : FunctionInternal(name) {}
-
-  /// Destructor
-  ~FmuFunctionJac() override;
-
-  /** \brief Get type name */
-  std::string class_name() const override { return "FmuFunctionJac";}
-
-  /// Evaluate numerically
-  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
-};
-
-/** Adjoint */
-class CASADI_EXPORT FmuFunctionAdj : public FunctionInternal {
- public:
-  /// Constructor
-  FmuFunctionAdj(const std::string& name) : FunctionInternal(name) {}
-
-  /// Destructor
-  ~FmuFunctionAdj() override;
-
-  /** \brief Get type name */
-  std::string class_name() const override { return "FmuFunctionAdj";}
-
-  /// Evaluate numerically
-  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 };
 
 /// Number of entries in enums
