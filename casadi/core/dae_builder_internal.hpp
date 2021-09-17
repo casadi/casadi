@@ -56,7 +56,7 @@ struct CASADI_EXPORT Variable {
   enum Initial {EXACT, APPROX, CALCULATED, INITIAL_NA, N_INITIAL};
 
   // Attributes
-  enum Attribute {MIN, MAX, NOMINAL, START, N_ATTRIBUTE};
+  enum Attribute {MIN, MAX, NOMINAL, START, VALUE, STRINGVALUE, N_ATTRIBUTE};
 
   /// Constructor
   Variable(const std::string& name = "");
@@ -90,6 +90,12 @@ struct CASADI_EXPORT Variable {
   // bool reinit;
   ///@}
 
+  /// Numerical value (also for booleans, integers, enums)
+  double value;
+
+  /// String value (if string-valued)
+  std::string stringvalue;
+
   /// Do other expressions depend on this variable
   bool dependency;
 
@@ -107,6 +113,12 @@ struct CASADI_EXPORT Variable {
 
   /// Set by attribute name
   void set_attribute(Attribute a, double val);
+
+  /// Get by attribute name (string-valued)
+  std::string string_attribute(Attribute a) const;
+
+  /// Set by attribute name (string-valued)
+  void set_string_attribute(Attribute a, const std::string& val);
 
   // Default initial attribute, per specification
   static Initial default_initial(Causality causality, Variability variability);
@@ -480,8 +492,23 @@ protected:
   /// Set by attribute name
   void set_attribute(Variable::Attribute a, const std::string& name, double val);
   void set_attribute(Variable::Attribute a, const std::vector<std::string>& name,
-    std::vector<double>& val);
+    const std::vector<double>& val);
   ///@}
+
+  ///@{
+  /// Get by attribute name (string-valued)
+  std::string string_attribute(Variable::Attribute a, const std::string& name) const;
+  std::vector<std::string> string_attribute(Variable::Attribute a,
+    const std::vector<std::string>& name) const;
+  ///@}
+
+  ///@{
+  /// Set by attribute name (string-valued)
+  void set_string_attribute(Variable::Attribute a, const std::string& name, const std::string& val);
+  void set_string_attribute(Variable::Attribute a, const std::vector<std::string>& name,
+    const std::vector<std::string>& val);
+  ///@}
+
 
   /// Helper class, represents inputs and outputs for a function call node
   struct CallIO {

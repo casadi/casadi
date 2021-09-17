@@ -479,6 +479,18 @@ public:
 
   /// Set the start attribute, single variable
   void set_start(const std::string& name, double val);
+
+  // Get the current value, single value
+  double value(const std::string& name) const;
+
+  // Set the current value, single value
+  void set_value(const std::string& name, double val);
+
+  // Get the current value, single value (string)
+  std::string string_value(const std::string& name) const;
+
+  // Set the current value, single value (string)
+  void set_string_value(const std::string& name, const std::string& val);
 #endif  // !SWIGMATLAB
 
   /// Get an attribute
@@ -486,31 +498,43 @@ public:
 
   /// Set an attribute
   void set_attribute(const std::string& a, const std::vector<std::string>& name,
-    std::vector<double>& val);
+    const std::vector<double>& val);
 
   /// Get the lower bound
   std::vector<double> min(const std::vector<std::string>& name) const;
 
   /// Set the lower bound
-  void set_min(const std::vector<std::string>& name, std::vector<double>& val);
+  void set_min(const std::vector<std::string>& name, const std::vector<double>& val);
 
   /// Get the upper bound
   std::vector<double> max(const std::vector<std::string>& name) const;
 
   /// Set the upper bound
-  void set_max(const std::vector<std::string>& name, std::vector<double>& val);
+  void set_max(const std::vector<std::string>& name, const std::vector<double>& val);
 
   /// Get the nominal value
   std::vector<double> nominal(const std::vector<std::string>& name) const;
 
   /// Set the nominal value
-  void set_nominal(const std::vector<std::string>& name, std::vector<double>& val);
+  void set_nominal(const std::vector<std::string>& name, const std::vector<double>& val);
 
   /// Get the start attribute
   std::vector<double> start(const std::vector<std::string>& name) const;
 
   /// Set the start attribute
-  void set_start(const std::vector<std::string>& name, std::vector<double>& val);
+  void set_start(const std::vector<std::string>& name, const std::vector<double>& val);
+
+  /// Get the current value
+  std::vector<double> value(const std::vector<std::string>& name) const;
+
+  /// Set the current value
+  void set_value(const std::vector<std::string>& name, const std::vector<double>& val);
+
+  /// Get the current value (string)
+  std::vector<std::string> string_value(const std::vector<std::string>& name) const;
+
+  /// Set the current value (string)
+  void set_string_value(const std::vector<std::string>& name, const std::vector<std::string>& val);
 
   /// Add a new variable: returns corresponding symbolic expression
   MX add_variable(const std::string& name, casadi_int n=1);

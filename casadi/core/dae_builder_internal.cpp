@@ -96,6 +96,8 @@ CASADI_EXPORT std::string to_string(Variable::Attribute v) {
   case Variable::MAX: return "max";
   case Variable::NOMINAL: return "nominal";
   case Variable::START: return "start";
+  case Variable::VALUE: return "nominal";
+  case Variable::STRINGVALUE: return "STRINGVALUE";
   default: break;
   }
   return "";
@@ -111,6 +113,8 @@ double Variable::attribute(Attribute a) const {
       return nominal;
     case START:
       return start;
+    case VALUE:
+      return value;
     default:
       break;
   }
@@ -132,10 +136,34 @@ void Variable::set_attribute(Attribute a, double val) {
     case START:
       start = val;
       return;
+    case VALUE:
+      value = val;
+      return;
     default:
       break;
   }
   casadi_error("Cannot handle: " + to_string(a));
+}
+
+std::string Variable::string_attribute(Attribute a) const {
+  switch (a) {
+    case STRINGVALUE:
+      return stringvalue;
+    default:
+      break;
+  }
+  casadi_error("Cannot handle: " + to_string(a));
+  return std::string();
+}
+
+void Variable::set_string_attribute(Attribute a, const std::string& val) {
+  switch (a) {
+    case STRINGVALUE:
+      stringvalue = val;
+      return;
+    default:
+      break;
+  }
 }
 
 Variable::Initial Variable::default_initial(Variable::Causality causality,
@@ -171,7 +199,8 @@ Variable::Variable(const std::string& name) : name(name),
     type(REAL), causality(LOCAL), variability(CONTINUOUS),
     unit(""), display_unit(""),
     min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
-    nominal(1.0), start(0.0), der_of(-1), der(-1), alg(-1), dependency(false) {
+    nominal(1.0), start(0.0), der_of(-1), der(-1), alg(-1), value(nan), stringvalue(),
+    dependency(false) {
   casadi_assert(!name.empty(), "Name is empty string");
 }
 
@@ -2137,9 +2166,33 @@ void DaeBuilderInternal::set_attribute(Variable::Attribute a, const std::string&
 }
 
 void DaeBuilderInternal::set_attribute(Variable::Attribute a, const std::vector<std::string>& name,
-    std::vector<double>& val) {
+    const std::vector<double>& val) {
   casadi_assert(name.size() == val.size(), "Dimension mismatch");
   for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_attribute(a, val[k]);
+}
+
+std::string DaeBuilderInternal::string_attribute(Variable::Attribute a,
+    const std::string& name) const {
+  return variable(name).string_attribute(a);
+}
+
+std::vector<std::string> DaeBuilderInternal::string_attribute(Variable::Attribute a,
+    const std::vector<std::string>& name) const {
+  std::vector<std::string> r;
+  r.reserve(name.size());
+  for (auto& n : name) r.push_back(variable(n).string_attribute(a));
+  return r;
+}
+
+void DaeBuilderInternal::set_string_attribute(Variable::Attribute a, const std::string& name,
+    const std::string& val) {
+  variable(name).set_string_attribute(a, val);
+}
+
+void DaeBuilderInternal::set_string_attribute(Variable::Attribute a,
+    const std::vector<std::string>& name, const std::vector<std::string>& val) {
+  casadi_assert(name.size() == val.size(), "Dimension mismatch");
+  for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_string_attribute(a, val[k]);
 }
 
 std::string DaeBuilderInternal::system_infix() {
