@@ -2029,6 +2029,19 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       var.nominal = props.attribute<double>("nominal", 1.);
       var.start = props.attribute<double>("start", 0.);
       var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
+    } else if (vnode.has_child("Integer")) {
+      const XmlNode& props = vnode["Integer"];
+      var.type = Variable::INTEGER;
+      var.min = props.attribute<double>("min", -inf);
+      var.max = props.attribute<double>("max", inf);
+    } else if (vnode.has_child("Boolean")) {
+      var.type = Variable::BOOLEAN;
+    } else if (vnode.has_child("String")) {
+      var.type = Variable::STRING;
+    } else if (vnode.has_child("Enumeration")) {
+      var.type = Variable::ENUM;
+    } else {
+      casadi_warning("Unknown type for " + name);
     }
     // Add to list of variables
     (void)add_variable(name, var);
