@@ -283,6 +283,66 @@ int Fmu::eval(int mem, const FmuFunction& f) {
   if (m.need_init) {
     // Reset solver
     if (setup_experiment(mem, f)) return 1;
+    // DaeBuilder instance
+    casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
+    auto dae = static_cast<DaeBuilderInternal*>(f.dae_->raw_);
+    // Set all variables before initialization
+    for (const Variable& v : dae->variables_) {
+      // If nan - variable has not been set - keep default value
+      if (std::isnan(v.value)) continue;
+      // Convert to expected type
+      fmi2ValueReference vr = v.value_reference;
+      // Get value
+      switch (v.type) {
+        case Variable::REAL:
+          {
+            // Real
+            fmi2Real value = v.value;
+            status = set_real_(m.c, &vr, 1, &value);
+            if (status != fmi2OK) {
+              casadi_warning("fmi2SetReal failed for " + v.name);
+              return 1;
+            }
+            break;
+          }
+        case Variable::INTEGER:
+        case Variable::ENUM:
+          {
+            // Integer: Convert to double
+            fmi2Integer value = static_cast<casadi_int>(v.value);
+            status = set_integer_(m.c, &vr, 1, &value);
+            if (status != fmi2OK) {
+              casadi_warning("fmi2SetInteger failed for " + v.name);
+              return 1;
+            }
+            break;
+          }
+        case Variable::BOOLEAN:
+          {
+            // Boolean: Convert to double
+            fmi2Boolean value = static_cast<casadi_int>(v.value);
+            status = set_boolean_(m.c, &vr, 1, &value);
+            if (status != fmi2OK) {
+              casadi_warning("fmi2SetBoolean failed for " + v.name);
+              return 1;
+            }
+            break;
+          }
+        case Variable::STRING:
+          {
+            // String
+            fmi2String value = v.stringvalue.c_str();
+            status = set_string_(m.c, &vr, 1, &value);
+            if (status != fmi2OK) {
+              casadi_warning("fmi2SetString failed for " + v.name);
+              return 1;
+            }
+            break;
+          }
+        default:
+          casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
+      }
+    }
     // Set all variables before initialization
     status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
     if (status != fmi2OK) {
@@ -291,9 +351,6 @@ int Fmu::eval(int mem, const FmuFunction& f) {
     }
     // Initialization mode begins
     if (enter_initialization_mode(mem)) return 1;
-    // DaeBuilder instance
-    casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
-    auto dae = static_cast<DaeBuilderInternal*>(f.dae_->raw_);
     // Get all values
     for (Variable& v : dae->variables_) {
       // Convert to expected type
