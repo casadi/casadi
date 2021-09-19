@@ -346,6 +346,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // IO scheme, linear combinations
   std::map<std::string, std::vector<size_t>> scheme_, lc_;
 
+  // Fmu Instance
+  Fmu* fmu_;
+
   // Memory instance
   int mem_;
 

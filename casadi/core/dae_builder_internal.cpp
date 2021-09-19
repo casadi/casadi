@@ -205,9 +205,6 @@ Variable::Variable(const std::string& name) : name(name),
 }
 
 DaeBuilderInternal::~DaeBuilderInternal() {
-#ifdef WITH_FMU
-  if (fmu_) delete fmu_;
-#endif // WITH_FMU
 }
 
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path,
@@ -216,7 +213,6 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   number_of_event_indicators_ = 0;
   provides_directional_derivative_ = 0;
   symbolic_ = true;
-  fmu_ = 0;
   // Default options
   debug_ = false;
   fmutol_ = 0;
@@ -2216,30 +2212,6 @@ void DaeBuilderInternal::set_string_attribute(Variable::Attribute a,
     const std::vector<std::string>& name, const std::vector<std::string>& val) {
   casadi_assert(name.size() == val.size(), "Dimension mismatch");
   for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_string_attribute(a, val[k]);
-}
-
-void DaeBuilderInternal::reset_fmu() const {
-#ifdef WITH_FMU
-  if (fmu_) {
-    delete fmu_;
-    fmu_ = 0;
-  }
-#else  // WITH_FMU
-  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
-#endif  // WITH_FMU
-}
-
-void DaeBuilderInternal::init_fmu() const {
-#ifdef WITH_FMU
-  // Free existing instance, if any
-  if (fmu_) reset_fmu();
-  // Allocate new instance
-  fmu_ = new Fmu(*this);
-  // Load functions
-  fmu_->init();
-#else  // WITH_FMU
-  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
-#endif  // WITH_FMU
 }
 
 Sparsity DaeBuilderInternal::jac_sparsity(const std::vector<size_t>& oind,

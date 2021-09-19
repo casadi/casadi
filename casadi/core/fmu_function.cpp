@@ -951,7 +951,7 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc)
-    : FunctionInternal(name), dae_(dae), scheme_(scheme), lc_(lc) {
+    : FunctionInternal(name), dae_(dae), scheme_(scheme), lc_(lc), fmu_(nullptr) {
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
@@ -1017,11 +1017,11 @@ FmuFunction::~FmuFunction() {
   for (FmuOutput* e : out_) if (e) delete(e);
   // Release memory if DaeBuilder instance still exists
   if (mem_ >= 0 && dae_.alive()) {
-    // Get a pointer to the DaeBuilder class
-    auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
     // Release memory object
-    dae->fmu_->release(mem_);
+    fmu_->release(mem_);
   }
+  // Delete Fmu instance
+  if (fmu_) delete fmu_;
 }
 
 const Options FmuFunction::options_
@@ -1163,19 +1163,18 @@ void FmuFunction::init(const Dict& opts) {
         casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
     }
   }
-  // Load on first encounter
-  if (dae->fmu_ == 0) dae->init_fmu();
+  // Allocate new instance
+  fmu_ = new Fmu(*dae);
+  // Load functions
+  fmu_->init();
   // Create instance
-  mem_ = dae->fmu_->checkout(this);
+  mem_ = fmu_->checkout(this);
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
-  // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Evaluate fmu
-  int flag = dae->fmu_->eval(mem_, arg, res, *this);
+  int flag = fmu_->eval(mem_, arg, res, *this);
   // Return error flag
   return flag;
 }

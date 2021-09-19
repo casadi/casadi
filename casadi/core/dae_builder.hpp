@@ -373,9 +373,6 @@ public:
   */
   Function create(const std::string& name, const Dict& opts=Dict()) const;
 
-  /// Free all FMU instances
-  void reset_fmu() const;
-
   /// Construct a function for evaluating dependent parameters
   Function dependent_fun(const std::string& fname,
       const std::vector<std::string>& s_in,

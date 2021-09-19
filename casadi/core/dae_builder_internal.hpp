@@ -270,9 +270,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const;
 
-  /// Free all FMU instances
-  void reset_fmu() const;
-
   /// Function corresponding to all equations
   Function gather_eq() const;
 
@@ -438,12 +435,6 @@ protected:
 
   /// Should the cache be cleared?
   mutable bool clear_cache_;
-
-  /// FMU binary interface (cached)
-  mutable Fmu* fmu_;
-
-  /// Initialize FMU binary interface
-  void init_fmu() const;
 
   /// Read an equation
   MX read_expr(const XmlNode& node);
