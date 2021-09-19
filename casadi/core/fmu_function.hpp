@@ -73,6 +73,9 @@ struct CASADI_EXPORT Fmu {
   // Free memory object
   void release(int mem);
 
+  // Owning reference to memory object
+  int copy(int mem);
+
   // New memory object
   fmi2Component instantiate();
 
@@ -164,8 +167,8 @@ struct CASADI_EXPORT Fmu {
   struct Memory {
     // Component memory
     fmi2Component c;
-    // Currently in use
-    bool in_use;
+    // Number of owning references
+    int counter;
     // Need to initialize
     bool need_init;
     // Value buffer
@@ -189,7 +192,7 @@ struct CASADI_EXPORT Fmu {
     // Nominal values
     std::vector<fmi2Real> nominal_out_;
     // Constructor
-    explicit Memory() : c(0), in_use(false) {}
+    explicit Memory() : c(0), counter(0) {}
   };
 
   // Memory objects

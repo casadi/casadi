@@ -152,15 +152,15 @@ int Fmu::checkout() {
   // Reuse an element of the memory pool if possible
   int mem;
   for (mem = 0; mem < mem_.size(); ++mem) {
-    if (!mem_[mem].in_use) break;
+    if (mem_[mem].counter == 0) break;
   }
   // Add new element necessary
   if (mem == mem_.size()) mem_.push_back(Memory());
   // Memory object
   Memory& m = mem_.at(mem);
   // Mark as in use
-  casadi_assert(!m.in_use, "Memory object is already in use");
-  m.in_use = true;
+  casadi_assert(m.counter == 0, "Memory object is already in use");
+  m.counter++;
   // Make sure not already instantiated
   casadi_assert(m.c == 0, "Already instantiated");
   // Create instance
@@ -198,15 +198,22 @@ fmi2Component Fmu::pop_memory(int mem) {
 }
 
 void Fmu::release(int mem) {
-  // Mark as in not in use
-  if (mem >= 0) {
-    if (!mem_.at(mem).in_use) casadi_warning("Memory object not in use");
-    if (mem_.at(mem).c && free_instance_) {
-      free_instance_(mem_.at(mem).c);
-      mem_.at(mem).c = nullptr;
+  Memory& m = mem_.at(mem);
+  if (m.counter <= 0) {
+    casadi_warning("Memory object has already been freed");
+  } else if (--m.counter == 0) {
+    // No more references - free instance
+    if (m.c && free_instance_) {
+      free_instance_(m.c);
+      m.c = nullptr;
     }
-    mem_.at(mem).in_use = false;
   }
+}
+
+int Fmu::copy(int mem) {
+  Memory& m = mem_.at(mem);
+  m.counter++;
+  return mem;
 }
 
 void Fmu::setup_experiment(int mem) {
