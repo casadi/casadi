@@ -136,6 +136,12 @@ struct CASADI_EXPORT Fmu {
   // DaeBuilder instance
   const DaeBuilderInternal& self_;
 
+  // Name of system, per the FMI specification
+  static std::string system_infix();
+
+  // DLL suffix, per the FMI specification
+  static std::string dll_suffix();
+
   // DLL
   Importer li_;
 

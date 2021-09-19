@@ -445,12 +445,6 @@ protected:
   /// Initialize FMU binary interface
   void init_fmu() const;
 
-  // Name of system, per the FMI specification
-  static std::string system_infix();
-
-  // DLL suffix, per the FMI specification
-  static std::string dll_suffix();
-
   /// Read an equation
   MX read_expr(const XmlNode& node);
 

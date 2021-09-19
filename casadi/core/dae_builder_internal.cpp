@@ -2218,36 +2218,6 @@ void DaeBuilderInternal::set_string_attribute(Variable::Attribute a,
   for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_string_attribute(a, val[k]);
 }
 
-std::string DaeBuilderInternal::system_infix() {
-#if defined(_WIN32)
-  // Windows system
-#ifdef _WIN64
-  return "win64";
-#else
-  return "win32";
-#endif
-#elif defined(__APPLE__)
-  // OSX
-  return sizeof(void*) == 4 ? "darwin32" : "darwin64";
-#else
-  // Linux
-  return sizeof(void*) == 4 ? "linux32" : "linux64";
-#endif
-}
-
-std::string DaeBuilderInternal::dll_suffix() {
-#if defined(_WIN32)
-  // Windows system
-  return ".dll";
-#elif defined(__APPLE__)
-  // OSX
-  return ".dylib";
-#else
-  // Linux
-  return ".so";
-#endif
-}
-
 void DaeBuilderInternal::reset_fmu() const {
 #ifdef WITH_FMU
   if (fmu_) {
@@ -2265,13 +2235,6 @@ void DaeBuilderInternal::init_fmu() const {
   if (fmu_) reset_fmu();
   // Allocate new instance
   fmu_ = new Fmu(*this);
-  // Directory where the DLL is stored, per the FMI specification
-  std::string instance_name_no_dot = model_identifier_;
-  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = path_ + "/binaries/" + system_infix()
-    + "/" + instance_name_no_dot + dll_suffix();
-  // Load DLL
-  fmu_->li_ = Importer(dll_path, "dll");
   // Load functions
   fmu_->init();
 #else  // WITH_FMU

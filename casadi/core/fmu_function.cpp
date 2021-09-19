@@ -58,7 +58,45 @@ Fmu::~Fmu() {
   }
 }
 
+std::string Fmu::system_infix() {
+#if defined(_WIN32)
+  // Windows system
+#ifdef _WIN64
+  return "win64";
+#else
+  return "win32";
+#endif
+#elif defined(__APPLE__)
+  // OSX
+  return sizeof(void*) == 4 ? "darwin32" : "darwin64";
+#else
+  // Linux
+  return sizeof(void*) == 4 ? "linux32" : "linux64";
+#endif
+}
+
+std::string Fmu::dll_suffix() {
+#if defined(_WIN32)
+  // Windows system
+  return ".dll";
+#elif defined(__APPLE__)
+  // OSX
+  return ".dylib";
+#else
+  // Linux
+  return ".so";
+#endif
+}
+
 void Fmu::init() {
+  // Directory where the DLL is stored, per the FMI specification
+  std::string instance_name_no_dot = self_.model_identifier_;
+  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
+  std::string dll_path = self_.path_ + "/binaries/" + system_infix()
+    + "/" + instance_name_no_dot + dll_suffix();
+  // Load DLL
+  li_ = Importer(dll_path, "dll");
+  // Get FMI C functions
   instantiate_ = reinterpret_cast<fmi2InstantiateTYPE*>(get_function("fmi2Instantiate"));
   free_instance_ = reinterpret_cast<fmi2FreeInstanceTYPE*>(get_function("fmi2FreeInstance"));
   reset_ = reinterpret_cast<fmi2ResetTYPE*>(get_function("fmi2Reset"));
