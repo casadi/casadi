@@ -381,8 +381,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const std::map<std::string, std::vector<size_t>>& scheme,
-      const std::map<std::string, std::vector<size_t>>& lc,
-      int mem = -1);
+      const std::map<std::string, std::vector<size_t>>& lc);
 
   /** \brief Destructor */
   ~FmuFunction() override;

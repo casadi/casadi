@@ -950,8 +950,8 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
-    const std::map<std::string, std::vector<size_t>>& lc, int mem)
-    : FunctionInternal(name), dae_(dae), scheme_(scheme), lc_(lc), mem_(mem) {
+    const std::map<std::string, std::vector<size_t>>& lc)
+    : FunctionInternal(name), dae_(dae), scheme_(scheme), lc_(lc) {
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
@@ -1166,7 +1166,7 @@ void FmuFunction::init(const Dict& opts) {
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
   // Create instance
-  if (mem_ < 0) mem_ = dae->fmu_->checkout(this);
+  mem_ = dae->fmu_->checkout(this);
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
@@ -1229,7 +1229,7 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
   DaeBuilder dae = shared_cast<DaeBuilder>(const_cast<FmuFunction*>(this)->dae_.shared());
   // Return value
   Function ret;
-  ret.own(new FmuFunction(name, dae, inames, onames, scheme_, lc_, dae->fmu_->copy(mem_)));
+  ret.own(new FmuFunction(name, dae, inames, onames, scheme_, lc_));
   // Hack: Manually enable finite differenting (pending implementation in class)
   Dict opts2 = opts;
   opts2["enable_fd"] = true;
