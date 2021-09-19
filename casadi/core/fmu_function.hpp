@@ -294,7 +294,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     fmi2String message, ...);
 
   // New memory object
-  int checkout(const FmuFunction* fun);
+  int checkout();
 
   // Free memory object
   void release(int mem) const;
@@ -324,7 +324,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   void request(int mem, size_t id, size_t wrt_id = -1) const;
 
   // Calculate all requested variables
-  int eval(int mem, const FmuFunction& f) const;
+  int eval(int mem) const;
 
   // Get a calculated variable
   void get(int mem, size_t id, double* value) const;
@@ -339,19 +339,16 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   void gather_sens(int mem) const;
 
   // Calculate directional derivatives using AD
-  int eval_ad(int mem, const FmuFunction& f) const;
+  int eval_ad(int mem) const;
 
   // Calculate directional derivatives using FD
-  int eval_fd(int mem, const FmuFunction& f) const;
+  int eval_fd(int mem) const;
 
   // Calculate directional derivatives
-  int eval_derivative(int mem, const FmuFunction& f) const;
+  int eval_derivative(int mem) const;
 
   // Get a derivative
   void get_sens(int mem, size_t id, double* value) const;
-
-  // Evaluate, non-differentated
-  int eval(int mem, const double** arg, double** res, const FmuFunction& f) const;
 
   // Get memory object
   fmi2Component memory(int mem) const;

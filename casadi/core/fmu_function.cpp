@@ -171,7 +171,7 @@ fmi2Component FmuFunction::instantiate() {
   return c;
 }
 
-int FmuFunction::checkout(const FmuFunction* fun) {
+int FmuFunction::checkout() {
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
@@ -188,7 +188,7 @@ int FmuFunction::checkout(const FmuFunction* fun) {
   casadi_assert(m.counter == 0, "Memory object is already in use");
   m.counter++;
   // Assign function
-  m.fun = fun;
+  m.fun = this;
   // Make sure not already instantiated
   casadi_assert(m.c == 0, "Already instantiated");
   // Create instance
@@ -347,7 +347,7 @@ void FmuFunction::request(int mem, size_t id, size_t wrt_id) const {
   m.wrt_.at(id) = wrt_id;
 }
 
-int FmuFunction::eval(int mem, const FmuFunction& f) const {
+int FmuFunction::eval(int mem) const {
   // Gather inputs and outputs
   gather_io(mem);
   // Get memory
@@ -360,8 +360,8 @@ int FmuFunction::eval(int mem, const FmuFunction& f) const {
   // Initialize, if needed
   if (m.need_init) {
     // DaeBuilder instance
-    casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
-    auto dae = static_cast<DaeBuilderInternal*>(f.dae_->raw_);
+    casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+    auto dae = static_cast<DaeBuilderInternal*>(dae_->raw_);
     // Set all variables before initialization
     status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
     if (status != fmi2OK) {
@@ -522,7 +522,7 @@ void FmuFunction::gather_sens(int mem) const {
   m.d_out_.resize(n_unknown);
 }
 
-int FmuFunction::eval_ad(int mem, const FmuFunction& f) const {
+int FmuFunction::eval_ad(int mem) const {
   // Get memory
   Memory& m = mem_.at(mem);
   // Number of inputs and outputs
@@ -552,7 +552,7 @@ int FmuFunction::eval_ad(int mem, const FmuFunction& f) const {
   return 0;
 }
 
-int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
+int FmuFunction::eval_fd(int mem) const {
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
@@ -579,22 +579,22 @@ int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
   // Error estimate used to update step size
   double u = nan;
   // Initial step size
-  double h = f.step_;
+  double h = step_;
   // For backward, negate h
-  if (f.fd_ == BACKWARD) h = -h;
+  if (fd_ == BACKWARD) h = -h;
   // Number of perturbations
-  casadi_int n_pert = f.n_pert();
+  casadi_int n_pert = this->n_pert();
   // Allocate memory for perturbed outputs
   m.fd_out_.resize(n_pert * n_unknown);
   // Perform finite difference algorithm with different step sizes
-  for (casadi_int iter = 0; iter < 1 + f.h_iter_; ++iter) {
+  for (casadi_int iter = 0; iter < 1 + h_iter_; ++iter) {
     // Calculate all perturbed outputs
     for (casadi_int k = 0; k < n_pert; ++k) {
       // Where to save the perturbed outputs
       yk[k] = &m.fd_out_[n_unknown * k];
       // Get perturbation expression
       double pert;
-      switch (f.fd_) {
+      switch (fd_) {
       case FORWARD:
       case BACKWARD:
         pert = h;
@@ -662,10 +662,10 @@ int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
     }
     // FD memory
     casadi_finite_diff_mem<double> fd_mem;
-    fd_mem.reltol = f.reltol_;
-    fd_mem.abstol = f.abstol_;
+    fd_mem.reltol = reltol_;
+    fd_mem.abstol = abstol_;
     fd_mem.smoothing = eps;
-    switch (f.fd_) {
+    switch (fd_) {
       case FORWARD:
       case BACKWARD:
         u = casadi_forward_diff(yk, get_ptr(m.v_out_),
@@ -682,17 +682,17 @@ int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
       default: casadi_error("Not implemented");
     }
     // Stop, if no more stepsize iterations
-    if (iter == f.h_iter_) break;
+    if (iter == h_iter_) break;
     // Update step size
     if (u < 0) {
       // Perturbation failed, try a smaller step size
-      h /= f.u_aim_;
+      h /= u_aim_;
     } else {
       // Update h to get u near the target ratio
-      h *= sqrt(f.u_aim_ / fmax(1., u));
+      h *= sqrt(u_aim_ / fmax(1., u));
     }
     // Make sure h stays in the range [h_min_,h_max_]
-    h = fmin(fmax(h, f.h_min_), f.h_max_);
+    h = fmin(fmax(h, h_min_), h_max_);
   }
   // Collect requested variables
   for (size_t ind = 0; ind < m.id_out_.size(); ++ind) {
@@ -703,7 +703,7 @@ int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
     // Get the value
     double d_fd = m.d_out_[ind] * n;
     // Use FD instead of AD or to compare with AD
-    if (f.validate_ad_) {
+    if (validate_ad_) {
       // Access output variable
       const Variable& v = dae->variable(id);
       // With respect to what variable
@@ -716,7 +716,7 @@ int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if error exceeds thresholds
-      if (d_max > wrt_nom * n * f.abstol_ && std::fabs(d_ad - d_fd) > d_max * f.reltol_) {
+      if (d_max > wrt_nom * n * abstol_ && std::fabs(d_ad - d_fd) > d_max * reltol_) {
         // Which element in the vector
         size_t wrt_ind = 0;
         for (; wrt_ind < m.id_in_.size(); ++wrt_ind)
@@ -727,10 +727,10 @@ int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
         ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << wrt.name << "\n"
           << "At " << m.v_in_[wrt_ind] << ", nominal " << wrt.nominal << ", min " << wrt.min
           << ", max " << wrt.max << ", got " << d_ad
-          << " for AD vs. " << d_fd << " for FD[" << to_string(f.fd_) << "].\n";
+          << " for AD vs. " << d_fd << " for FD[" << to_string(fd_) << "].\n";
         // Also print the stencil:
         std::vector<double> stencil;
-        switch (f.fd_) {
+        switch (fd_) {
           case FORWARD:
             stencil = {m.v_out_[ind], yk[0][ind]};
             break;
@@ -759,18 +759,18 @@ int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
   return 0;
 }
 
-int FmuFunction::eval_derivative(int mem, const FmuFunction& f) const {
+int FmuFunction::eval_derivative(int mem) const {
   // Gather input and output indices
   gather_sens(mem);
   // Calculate derivatives using FMU directional derivative support
-  if (f.enable_ad_) {
+  if (enable_ad_) {
     // Evaluate using AD
-    if (eval_ad(mem, f)) return 1;
+    if (eval_ad(mem)) return 1;
   }
   // Calculate derivatives using finite differences
-  if (!f.enable_ad_ || f.validate_ad_) {
+  if (!enable_ad_ || validate_ad_) {
     // Evaluate using FD
-    if (eval_fd(mem, f)) return 1;
+    if (eval_fd(mem)) return 1;
   }
   return 0;
 }
@@ -780,101 +780,6 @@ void FmuFunction::get_sens(int mem, size_t id, double* value) const {
   Memory& m = mem_.at(mem);
   // Save to return
   *value = m.sens_.at(id);
-}
-
-int FmuFunction::eval(int mem, const double** arg, double** res, const FmuFunction& f) const {
-  // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Pass all regular inputs
-  for (size_t k = 0; k < f.in_.size(); ++k) {
-    if (f.in_[k]->is_reg()) {
-      for (size_t i = 0; i < f.in_[k]->size(); ++i) {
-        set(mem, f.in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
-      }
-    }
-  }
-  // Request all regular outputs to be evaluated
-  for (size_t k = 0; k < f.out_.size(); ++k) {
-    if (res[k] && f.out_[k]->is_reg()) {
-      for (size_t i = 0; i < f.out_[k]->size(); ++i) {
-        request(mem, f.out_[k]->ind(i));
-      }
-    }
-  }
-  // Evaluate
-  if (eval(mem, f)) return 1;
-  // Get regular outputs
-  for (size_t k = 0; k < f.out_.size(); ++k) {
-    if (res[k] && f.out_[k]->is_reg()) {
-      for (size_t i = 0; i < f.out_[k]->size(); ++i) {
-        get(mem, f.out_[k]->ind(i), &res[k][i]);
-      }
-    }
-  }
-  // What other blocks are there?
-  bool any_jac = false;
-  for (size_t k = 0; k < f.out_.size(); ++k) {
-    if (res[k] && f.out_[k]->is_jac()) {
-      any_jac = true;
-    }
-  }
-  // Evalute Jacobian blocks
-  if (any_jac) {
-    // Loop over colors
-    for (casadi_int c = 0; c < f.coloring_.size2(); ++c) {
-      // Loop over input indices for color
-      for (casadi_int kc = f.coloring_.colind(c); kc < f.coloring_.colind(c + 1); ++kc) {
-        casadi_int vind = f.coloring_.row(kc);
-        // Differentiation with respect to what variable
-        size_t Jc = f.jac_in_.at(vind);
-        // Nominal value
-        double nom = dae->variable(Jc).nominal;
-        // Set seed for column
-        set_seed(mem, Jc, nom);
-        // Request corresponding outputs
-        for (casadi_int Jk = f.sp_ext_.colind(vind); Jk < f.sp_ext_.colind(vind + 1); ++Jk) {
-          casadi_int Jr = f.sp_ext_.row(Jk);
-          request(mem, f.jac_out_.at(Jr), Jc);
-        }
-      }
-      // Calculate derivatives
-      if (eval_derivative(mem, f)) return 1;
-      // Loop over input indices for color
-      for (casadi_int kc = f.coloring_.colind(c); kc < f.coloring_.colind(c + 1); ++kc) {
-        casadi_int vind = f.coloring_.row(kc);
-        // Differentiation with respect to what variable
-        size_t Jc = f.jac_in_.at(vind);
-        // Inverse of nominal value
-        double inv_nom = 1. / dae->variable(Jc).nominal;
-        // Fetch Jacobian blocks
-        for (size_t k = 0; k < f.out_.size(); ++k) {
-          if (res[k] && f.out_[k]->is_jac()) {
-            // Find input index
-            const std::vector<size_t>& ind2 = f.out_[k]->ind2();
-            for (size_t Bc = 0; Bc < ind2.size(); ++Bc) {
-              if (ind2[Bc] == Jc) {
-                // Column exists in Jacobian block
-                const Sparsity& sp = f.sparsity_out(k);
-                const std::vector<size_t>& ind1 = f.out_[k]->ind1();
-                for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
-                  // Get the Jacobian nonzero
-                  double J_nz;
-                  get_sens(mem, ind1.at(sp.row(Bk)), &J_nz);
-                  // Remove nominal value factor
-                  J_nz *= inv_nom;
-                  // Save to output
-                  res[k][Bk] = J_nz;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  // Successful return
-  return 0;
 }
 
 FmuInput::~FmuInput() {
@@ -1181,15 +1086,103 @@ void FmuFunction::init(const Dict& opts) {
   // Load functions
   init();
   // Create instance
-  m_ = checkout(this);
+  m_ = checkout();
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
-  // Evaluate fmu
-  int flag = eval(m_, arg, res, *this);
-  // Return error flag
-  return flag;
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Pass all regular inputs
+  for (size_t k = 0; k < in_.size(); ++k) {
+    if (in_[k]->is_reg()) {
+      for (size_t i = 0; i < in_[k]->size(); ++i) {
+        set(m_, in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
+      }
+    }
+  }
+  // Request all regular outputs to be evaluated
+  for (size_t k = 0; k < out_.size(); ++k) {
+    if (res[k] && out_[k]->is_reg()) {
+      for (size_t i = 0; i < out_[k]->size(); ++i) {
+        request(m_, out_[k]->ind(i));
+      }
+    }
+  }
+  // Evaluate
+  if (eval(m_)) return 1;
+  // Get regular outputs
+  for (size_t k = 0; k < out_.size(); ++k) {
+    if (res[k] && out_[k]->is_reg()) {
+      for (size_t i = 0; i < out_[k]->size(); ++i) {
+        get(m_, out_[k]->ind(i), &res[k][i]);
+      }
+    }
+  }
+  // What other blocks are there?
+  bool any_jac = false;
+  for (size_t k = 0; k < out_.size(); ++k) {
+    if (res[k] && out_[k]->is_jac()) {
+      any_jac = true;
+    }
+  }
+  // Evalute Jacobian blocks
+  if (any_jac) {
+    // Loop over colors
+    for (casadi_int c = 0; c < coloring_.size2(); ++c) {
+      // Loop over input indices for color
+      for (casadi_int kc = coloring_.colind(c); kc < coloring_.colind(c + 1); ++kc) {
+        casadi_int vind = coloring_.row(kc);
+        // Differentiation with respect to what variable
+        size_t Jc = jac_in_.at(vind);
+        // Nominal value
+        double nom = dae->variable(Jc).nominal;
+        // Set seed for column
+        set_seed(m_, Jc, nom);
+        // Request corresponding outputs
+        for (casadi_int Jk = sp_ext_.colind(vind); Jk < sp_ext_.colind(vind + 1); ++Jk) {
+          casadi_int Jr = sp_ext_.row(Jk);
+          request(m_, jac_out_.at(Jr), Jc);
+        }
+      }
+      // Calculate derivatives
+      if (eval_derivative(m_)) return 1;
+      // Loop over input indices for color
+      for (casadi_int kc = coloring_.colind(c); kc < coloring_.colind(c + 1); ++kc) {
+        casadi_int vind = coloring_.row(kc);
+        // Differentiation with respect to what variable
+        size_t Jc = jac_in_.at(vind);
+        // Inverse of nominal value
+        double inv_nom = 1. / dae->variable(Jc).nominal;
+        // Fetch Jacobian blocks
+        for (size_t k = 0; k < out_.size(); ++k) {
+          if (res[k] && out_[k]->is_jac()) {
+            // Find input index
+            const std::vector<size_t>& ind2 = out_[k]->ind2();
+            for (size_t Bc = 0; Bc < ind2.size(); ++Bc) {
+              if (ind2[Bc] == Jc) {
+                // Column exists in Jacobian block
+                const Sparsity& sp = sparsity_out(k);
+                const std::vector<size_t>& ind1 = out_[k]->ind1();
+                for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
+                  // Get the Jacobian nonzero
+                  double J_nz;
+                  get_sens(m_, ind1.at(sp.row(Bk)), &J_nz);
+                  // Remove nominal value factor
+                  J_nz *= inv_nom;
+                  // Save to output
+                  res[k][Bk] = J_nz;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  // Successful return
+  return 0;
 }
 
 casadi_int FmuFunction::n_pert() const {
