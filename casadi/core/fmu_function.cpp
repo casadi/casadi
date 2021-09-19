@@ -207,8 +207,9 @@ void Fmu::release(int mem) {
   }
 }
 
-int Fmu::setup_experiment(int mem, const FmuFunction& f) {
-  fmi2Status status = setup_experiment_(memory(mem), f.fmutol_ > 0, f.fmutol_, 0., fmi2True, 1.);
+int Fmu::setup_experiment(int mem) {
+  fmi2Status status = setup_experiment_(memory(mem), self_.fmutol_ > 0, self_.fmutol_, 0.,
+    fmi2True, 1.);
   if (status != fmi2OK) {
     casadi_warning("fmi2SetupExperiment failed");
     return 1;
@@ -285,7 +286,7 @@ int Fmu::eval(int mem, const FmuFunction& f) {
   // Initialize, if needed
   if (m.need_init) {
     // Reset solver
-    if (setup_experiment(mem, f)) return 1;
+    if (setup_experiment(mem)) return 1;
     // DaeBuilder instance
     casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
     auto dae = static_cast<DaeBuilderInternal*>(f.dae_->raw_);
@@ -977,7 +978,6 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   step_ = 1e-6;
   abstol_ = 1e-3;
   reltol_ = 1e-3;
-  fmutol_ = 0;
   u_aim_ = 100.;
   h_iter_ = 0;
   h_min_ = 0;
@@ -1015,9 +1015,6 @@ const Options FmuFunction::options_
     {"reltol",
      {OT_DOUBLE,
       "Relative error tolerance"}},
-    {"fmutol",
-     {OT_DOUBLE,
-      "Tolerance to be passed to the fmu (0 if not defined)"}},
     {"h_iter",
      {OT_INT,
       "Number of step size iterations"}},
@@ -1046,8 +1043,6 @@ void FmuFunction::init(const Dict& opts) {
       abstol_ = op.second;
     } else if (op.first=="reltol") {
       reltol_ = op.second;
-    } else if (op.first=="fmutol") {
-      fmutol_ = op.second;
     } else if (op.first=="h_iter") {
       h_iter_ = op.second;
     } else if (op.first=="u_aim") {

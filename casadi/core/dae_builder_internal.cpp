@@ -219,10 +219,13 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   fmu_ = 0;
   // Default options
   debug_ = false;
+  fmutol_ = 0;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="debug") {
       debug_ = op.second;
+    } else if (op.first=="fmutol") {
+      fmutol_ = op.second;
     } else {
       casadi_error("No such option: " + op.first);
     }

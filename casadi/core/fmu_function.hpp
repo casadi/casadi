@@ -77,7 +77,7 @@ struct CASADI_EXPORT Fmu {
   fmi2Component instantiate();
 
   // Setup experiment
-  int setup_experiment(int mem, const FmuFunction& f);
+  int setup_experiment(int mem);
 
   // Reset solver
   int reset(int mem);
@@ -346,7 +346,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // User-set options
   bool enable_ad_, validate_ad_;
-  double step_, abstol_, reltol_, fmutol_, u_aim_, h_min_, h_max_;
+  double step_, abstol_, reltol_, u_aim_, h_min_, h_max_;
   casadi_int h_iter_;
 
   // FD method as an enum

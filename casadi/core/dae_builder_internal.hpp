@@ -342,6 +342,7 @@ protected:
 
   // User-set options
   bool debug_;
+  double fmutol_;
 
   // FMI attributes
   std::string fmi_version_;
