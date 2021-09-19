@@ -293,9 +293,10 @@ int Fmu::eval(int mem, const FmuFunction& f) {
     // DaeBuilder instance
     casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
     auto dae = static_cast<DaeBuilderInternal*>(f.dae_->raw_);
-    // Set all variables before initialization
+    // Initialize inputs and parameters before initialization
     for (const Variable& v : dae->variables_) {
-      continue;
+      // Skip if the wrong type
+      if (v.causality != Variable::PARAMETER && v.causality != Variable::INPUT) continue;
       // If nan - variable has not been set - keep default value
       if (std::isnan(v.value)) continue;
       // Convert to expected type
@@ -365,6 +366,9 @@ int Fmu::eval(int mem, const FmuFunction& f) {
       fmi2ValueReference vr = v.value_reference;
       // Get value
       switch (v.type) {
+        // Skip if the wrong type
+        if (v.causality == Variable::PARAMETER || v.causality == Variable::INPUT) continue;
+
         case Variable::REAL:
           {
             // Real
