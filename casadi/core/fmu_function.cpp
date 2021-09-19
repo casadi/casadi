@@ -148,7 +148,7 @@ fmi2Component Fmu::instantiate() {
   return c;
 }
 
-int Fmu::checkout() {
+int Fmu::checkout(const FmuFunction* fun) {
   // Reuse an element of the memory pool if possible
   int mem;
   for (mem = 0; mem < mem_.size(); ++mem) {
@@ -161,71 +161,49 @@ int Fmu::checkout() {
   // Mark as in use
   casadi_assert(m.counter == 0, "Memory object is already in use");
   m.counter++;
+  // Assign function
+  m.fun = fun;
   // Make sure not already instantiated
   casadi_assert(m.c == 0, "Already instantiated");
   // Create instance
   m.c = instantiate();
   // Reset solver
   setup_experiment(mem);
-  // Initialize inputs and parameters before initialization
-  for (const Variable& v : self_.variables_) {
-    // Skip if the wrong type
-    if (v.causality != Variable::PARAMETER && v.causality != Variable::INPUT) continue;
-    // If nan - variable has not been set - keep default value
-    if (std::isnan(v.value)) continue;
-    // Convert to expected type
-    fmi2ValueReference vr = v.value_reference;
-    // Return status
-    fmi2Status status;
-    // Get value
-    switch (v.type) {
-      case Variable::REAL:
-        {
-          // Real
-          fmi2Real value = v.value;
-          status = set_real_(m.c, &vr, 1, &value);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2SetReal failed for " + v.name + ", value: " + str(v.value));
-            return -1;
-          }
-          break;
-        }
-      case Variable::INTEGER:
-      case Variable::ENUM:
-        {
-          // Integer: Convert to double
-          fmi2Integer value = static_cast<casadi_int>(v.value);
-          status = set_integer_(m.c, &vr, 1, &value);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2SetInteger failed for " + v.name + ", value: " + str(v.value));
-            return -1;
-          }
-          break;
-        }
-      case Variable::BOOLEAN:
-        {
-          // Boolean: Convert to double
-          fmi2Boolean value = static_cast<casadi_int>(v.value);
-          status = set_boolean_(m.c, &vr, 1, &value);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2SetBoolean failed for " + v.name + ", value: " + str(v.value));
-            return -1;
-          }
-          break;
-        }
-      case Variable::STRING:
-        {
-          // String
-          fmi2String value = v.stringvalue.c_str();
-          status = set_string_(m.c, &vr, 1, &value);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2SetString failed for " + v.name + ", value: " + v.stringvalue);
-            return -1;
-          }
-          break;
-        }
-      default:
-        casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
+  // Pass real values before initialization
+  if (!m.fun->vr_real_.empty()) {
+    fmi2Status status = set_real_(m.c, get_ptr(m.fun->vr_real_), m.fun->vr_real_.size(),
+      get_ptr(m.fun->v_real_));
+    if (status != fmi2OK) {
+      casadi_warning("fmi2SetReal failed");
+      return -1;
+    }
+  }
+  // Pass integer values before initialization (also enums)
+  if (!m.fun->vr_integer_.empty()) {
+    fmi2Status status = set_integer_(m.c, get_ptr(m.fun->vr_integer_), m.fun->vr_integer_.size(),
+      get_ptr(m.fun->v_integer_));
+    if (status != fmi2OK) {
+      casadi_warning("fmi2SetInteger failed");
+      return -1;
+    }
+  }
+  // Pass boolean values before initialization
+  if (!m.fun->vr_boolean_.empty()) {
+    fmi2Status status = set_boolean_(m.c, get_ptr(m.fun->vr_boolean_), m.fun->vr_boolean_.size(),
+      get_ptr(m.fun->v_boolean_));
+    if (status != fmi2OK) {
+      casadi_warning("fmi2SetBoolean failed");
+      return -1;
+    }
+  }
+  // Pass string valeus before initialization
+  for (size_t k = 0; k < m.fun->vr_string_.size(); ++k) {
+    fmi2ValueReference vr = m.fun->vr_string_[k];
+    fmi2String value = m.fun->v_string_[k].c_str();
+    fmi2Status status = set_string_(m.c, &vr, 1, &value);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2SetString failed for value reference " + str(vr));
+      return -1;
     }
   }
   // Always initialize before first call
@@ -1107,12 +1085,50 @@ void FmuFunction::init(const Dict& opts) {
   coloring_ = sp_ext_.uni_coloring();
   if (verbose_) casadi_message("Graph coloring: " + str(sp_ext_.size2())
     + " -> " + str(coloring_.size2()) + " directions");
-
+  // Collect variables
+  vr_real_.clear();
+  vr_integer_.clear();
+  vr_boolean_.clear();
+  vr_string_.clear();
+  v_real_.clear();
+  v_integer_.clear();
+  v_boolean_.clear();
+  v_string_.clear();
+  // Collect input and parameter values
+  for (const Variable& v : dae->variables_) {
+    // Skip if the wrong type
+    if (v.causality != Variable::PARAMETER && v.causality != Variable::INPUT) continue;
+    // If nan - variable has not been set - keep default value
+    if (std::isnan(v.value)) continue;
+    // Value reference
+    fmi2ValueReference vr = v.value_reference;
+    // Get value
+    switch (v.type) {
+      case Variable::REAL:
+        v_real_.push_back(static_cast<fmi2Real>(v.value));
+        vr_real_.push_back(vr);
+        break;
+      case Variable::INTEGER:
+      case Variable::ENUM:
+        v_integer_.push_back(static_cast<fmi2Integer>(v.value));
+        vr_integer_.push_back(vr);
+        break;
+      case Variable::BOOLEAN:
+        v_boolean_.push_back(static_cast<fmi2Boolean>(v.value));
+        vr_boolean_.push_back(vr);
+        break;
+      case Variable::STRING:
+        v_string_.push_back(v.stringvalue);
+        vr_string_.push_back(vr);
+        break;
+      default:
+        casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
+    }
+  }
   // Load on first encounter
   if (dae->fmu_ == 0) dae->init_fmu();
-
   // Create instance
-  if (mem_ < 0) mem_ = dae->fmu_->checkout();
+  if (mem_ < 0) mem_ = dae->fmu_->checkout(this);
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,

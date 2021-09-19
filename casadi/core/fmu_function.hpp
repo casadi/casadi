@@ -68,7 +68,7 @@ struct CASADI_EXPORT Fmu {
     fmi2String message, ...);
 
   // New memory object
-  int checkout();
+  int checkout(const FmuFunction* fun);
 
   // Free memory object
   void release(int mem);
@@ -167,6 +167,8 @@ struct CASADI_EXPORT Fmu {
   struct Memory {
     // Component memory
     fmi2Component c;
+    // FmuFunction instance
+    const FmuFunction* fun;
     // Number of owning references
     int counter;
     // Need to initialize
@@ -357,6 +359,13 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // FD method as an enum
   Fmu::FdMode fd_;
+
+  // Variables used for initialization, by type
+  std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;
+  std::vector<fmi2Real> v_real_;
+  std::vector<fmi2Integer> v_integer_;
+  std::vector<fmi2Boolean> v_boolean_;
+  std::vector<std::string> v_string_;
 
   // Number of perturbations
   casadi_int n_pert() const;
