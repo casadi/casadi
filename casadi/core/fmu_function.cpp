@@ -985,13 +985,16 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
 FmuFunction::~FmuFunction() {
   // Free memory
   clear_mem();
-  // Get a pointer to the DaeBuilder class
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Release memory object
-  if (mem_ >= 0) dae->fmu_->release(mem_);
-  // Free input memory structure
+  // Free input and output memory structures
   for (FmuInput* e : in_) if (e) delete(e);
+  for (FmuOutput* e : out_) if (e) delete(e);
+  // Release memory if DaeBuilder instance still exists
+  if (mem_ >= 0 && dae_.alive()) {
+    // Get a pointer to the DaeBuilder class
+    auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+    // Release memory object
+    dae->fmu_->release(mem_);
+  }
 }
 
 const Options FmuFunction::options_
