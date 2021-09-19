@@ -165,6 +165,8 @@ int Fmu::checkout() {
   casadi_assert(m.c == 0, "Already instantiated");
   // Create instance
   m.c = instantiate();
+  // Reset solver
+  setup_experiment(mem);
   // Always initialize before first call
   m.need_init = true;
   // Allocate/reset value buffer
@@ -207,14 +209,10 @@ void Fmu::release(int mem) {
   }
 }
 
-int Fmu::setup_experiment(int mem) {
+void Fmu::setup_experiment(int mem) {
   fmi2Status status = setup_experiment_(memory(mem), self_.fmutol_ > 0, self_.fmutol_, 0.,
     fmi2True, 1.);
-  if (status != fmi2OK) {
-    casadi_warning("fmi2SetupExperiment failed");
-    return 1;
-  }
-  return 0;
+  casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
 }
 
 int Fmu::reset(int mem) {
@@ -285,8 +283,6 @@ int Fmu::eval(int mem, const FmuFunction& f) {
   fmi2Status status;
   // Initialize, if needed
   if (m.need_init) {
-    // Reset solver
-    if (setup_experiment(mem)) return 1;
     // DaeBuilder instance
     casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
     auto dae = static_cast<DaeBuilderInternal*>(f.dae_->raw_);

@@ -77,7 +77,7 @@ struct CASADI_EXPORT Fmu {
   fmi2Component instantiate();
 
   // Setup experiment
-  int setup_experiment(int mem);
+  void setup_experiment(int mem);
 
   // Reset solver
   int reset(int mem);
