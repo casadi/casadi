@@ -338,6 +338,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // IO scheme, linear combinations
   std::map<std::string, std::vector<size_t>> scheme_, lc_;
 
+  // Memory instance
+  int mem_;
+
   // Information about function inputs
   std::vector<FmuInput*> in_;
 
@@ -363,7 +366,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const std::map<std::string, std::vector<size_t>>& scheme,
-      const std::map<std::string, std::vector<size_t>>& lc);
+      const std::map<std::string, std::vector<size_t>>& lc,
+      int mem = -1);
 
   /** \brief Destructor */
   ~FmuFunction() override;
@@ -385,9 +389,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Graph coloring
   Sparsity coloring_;
-
-  // Memory instance
-  int mem_;
 
   ///@{
   /** \brief Number of function inputs and outputs */
