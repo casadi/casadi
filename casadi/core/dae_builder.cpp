@@ -1050,6 +1050,14 @@ void DaeBuilder::set_start(const std::vector<std::string>& name, const std::vect
   }
 }
 
+void DaeBuilder::clear_value() {
+  try {
+    (*this)->clear_value();
+  } catch (std::exception& e) {
+    THROW_ERROR("clear_value", e.what());
+  }
+}
+
 double DaeBuilder::value(const std::string& name) const {
   try {
     return (*this)->attribute(Variable::VALUE, name);

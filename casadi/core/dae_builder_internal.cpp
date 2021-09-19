@@ -2162,6 +2162,13 @@ Function DaeBuilderInternal::fun(const std::string& name) const {
   return Function();
 }
 
+void DaeBuilderInternal::clear_value() {
+  for (Variable& v : variables_) {
+    v.value = nan;
+    v.stringvalue = std::string();
+  }
+}
+
 double DaeBuilderInternal::attribute(Variable::Attribute a, const std::string& name) const {
   return variable(name).attribute(a);
 }

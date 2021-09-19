@@ -482,6 +482,9 @@ protected:
   /// Get function by name
   Function fun(const std::string& name) const;
 
+  // Reset value attributes
+  void clear_value();
+
   ///@{
   /// Get by attribute name
   double attribute(Variable::Attribute a, const std::string& name) const;

@@ -480,6 +480,9 @@ public:
   /// Set the start attribute, single variable
   void set_start(const std::string& name, double val);
 
+  // Clear all set values
+  void clear_value();
+
   // Get the current value, single value
   double value(const std::string& name) const;
 
