@@ -36,29 +36,7 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
-Fmu::Fmu(const DaeBuilderInternal& self) : self_(self) {
-  // Initialize to null pointers
-  instantiate_ = 0;
-  free_instance_ = 0;
-  reset_ = 0;
-  setup_experiment_ = 0;
-  enter_initialization_mode_ = 0;
-  exit_initialization_mode_ = 0;
-  enter_continuous_time_mode_ = 0;
-  set_real_ = 0;
-  set_boolean_ = 0;
-  get_real_ = 0;
-  get_directional_derivative_ = 0;
-}
-
-Fmu::~Fmu() {
-  // Free all memory objects
-  for (int id = 0; id < mem_.size(); ++id) {
-    if (mem_[id].c && free_instance_) free_instance_(mem_[id].c);
-  }
-}
-
-std::string Fmu::system_infix() {
+std::string FmuFunction::system_infix() {
 #if defined(_WIN32)
   // Windows system
 #ifdef _WIN64
@@ -75,7 +53,7 @@ std::string Fmu::system_infix() {
 #endif
 }
 
-std::string Fmu::dll_suffix() {
+std::string FmuFunction::dll_suffix() {
 #if defined(_WIN32)
   // Windows system
   return ".dll";
@@ -88,37 +66,40 @@ std::string Fmu::dll_suffix() {
 #endif
 }
 
-void Fmu::init() {
+void FmuFunction::init() {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Directory where the DLL is stored, per the FMI specification
-  std::string instance_name_no_dot = self_.model_identifier_;
+  std::string instance_name_no_dot = dae->model_identifier_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = self_.path_ + "/binaries/" + system_infix()
+  std::string dll_path = dae->path_ + "/binaries/" + system_infix()
     + "/" + instance_name_no_dot + dll_suffix();
   // Load DLL
   li_ = Importer(dll_path, "dll");
   // Get FMI C functions
-  instantiate_ = reinterpret_cast<fmi2InstantiateTYPE*>(get_function("fmi2Instantiate"));
-  free_instance_ = reinterpret_cast<fmi2FreeInstanceTYPE*>(get_function("fmi2FreeInstance"));
-  reset_ = reinterpret_cast<fmi2ResetTYPE*>(get_function("fmi2Reset"));
+  instantiate_ = reinterpret_cast<fmi2InstantiateTYPE*>(load_function("fmi2Instantiate"));
+  free_instance_ = reinterpret_cast<fmi2FreeInstanceTYPE*>(load_function("fmi2FreeInstance"));
+  reset_ = reinterpret_cast<fmi2ResetTYPE*>(load_function("fmi2Reset"));
   setup_experiment_ = reinterpret_cast<fmi2SetupExperimentTYPE*>(
-    get_function("fmi2SetupExperiment"));
+    load_function("fmi2SetupExperiment"));
   enter_initialization_mode_ = reinterpret_cast<fmi2EnterInitializationModeTYPE*>(
-    get_function("fmi2EnterInitializationMode"));
+    load_function("fmi2EnterInitializationMode"));
   exit_initialization_mode_ = reinterpret_cast<fmi2ExitInitializationModeTYPE*>(
-    get_function("fmi2ExitInitializationMode"));
+    load_function("fmi2ExitInitializationMode"));
   enter_continuous_time_mode_ = reinterpret_cast<fmi2EnterContinuousTimeModeTYPE*>(
-    get_function("fmi2EnterContinuousTimeMode"));
-  get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(get_function("fmi2GetReal"));
-  set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(get_function("fmi2SetReal"));
-  get_integer_ = reinterpret_cast<fmi2GetIntegerTYPE*>(get_function("fmi2GetInteger"));
-  set_integer_ = reinterpret_cast<fmi2SetIntegerTYPE*>(get_function("fmi2SetInteger"));
-  get_boolean_ = reinterpret_cast<fmi2GetBooleanTYPE*>(get_function("fmi2GetBoolean"));
-  set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(get_function("fmi2SetBoolean"));
-  get_string_ = reinterpret_cast<fmi2GetStringTYPE*>(get_function("fmi2GetString"));
-  set_string_ = reinterpret_cast<fmi2SetStringTYPE*>(get_function("fmi2SetString"));
-  if (self_.provides_directional_derivative_) {
+    load_function("fmi2EnterContinuousTimeMode"));
+  get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(load_function("fmi2GetReal"));
+  set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(load_function("fmi2SetReal"));
+  get_integer_ = reinterpret_cast<fmi2GetIntegerTYPE*>(load_function("fmi2GetInteger"));
+  set_integer_ = reinterpret_cast<fmi2SetIntegerTYPE*>(load_function("fmi2SetInteger"));
+  get_boolean_ = reinterpret_cast<fmi2GetBooleanTYPE*>(load_function("fmi2GetBoolean"));
+  set_boolean_ = reinterpret_cast<fmi2SetBooleanTYPE*>(load_function("fmi2SetBoolean"));
+  get_string_ = reinterpret_cast<fmi2GetStringTYPE*>(load_function("fmi2GetString"));
+  set_string_ = reinterpret_cast<fmi2SetStringTYPE*>(load_function("fmi2SetString"));
+  if (dae->provides_directional_derivative_) {
     get_directional_derivative_ = reinterpret_cast<fmi2GetDirectionalDerivativeTYPE*>(
-      get_function("fmi2GetDirectionalDerivative"));
+      load_function("fmi2GetDirectionalDerivative"));
   }
 
   // Callback functions
@@ -129,10 +110,10 @@ void Fmu::init() {
   functions_.componentEnvironment = 0;
 
   // Path to resource directory
-  resource_loc_ = "file://" + self_.path_ + "/resources";
+  resource_loc_ = "file://" + dae->path_ + "/resources";
 }
 
-signal_t Fmu::get_function(const std::string& symname) {
+signal_t FmuFunction::load_function(const std::string& symname) {
   // Load the function
   signal_t f = li_.get_function(symname);
   // Ensure that it was found
@@ -141,7 +122,7 @@ signal_t Fmu::get_function(const std::string& symname) {
   return f;
 }
 
-void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
+void FmuFunction::logger(fmi2ComponentEnvironment componentEnvironment,
     fmi2String instanceName,
     fmi2Status status,
     fmi2String category,
@@ -173,20 +154,27 @@ void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 
-fmi2Component Fmu::instantiate() {
-  fmi2String instanceName = self_.model_identifier_.c_str();
+fmi2Component FmuFunction::instantiate() {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Instantiate FMU
+  fmi2String instanceName = dae->model_identifier_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
-  fmi2String fmuGUID = self_.guid_.c_str();
+  fmi2String fmuGUID = dae->guid_.c_str();
   fmi2String fmuResourceLocation = resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
-  fmi2Boolean loggingOn = self_.debug_;
+  fmi2Boolean loggingOn = dae->debug_;
   fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
     &functions_, visible, loggingOn);
   if (c == 0) casadi_error("fmi2Instantiate failed");
   return c;
 }
 
-int Fmu::checkout(const FmuFunction* fun) {
+int FmuFunction::checkout(const FmuFunction* fun) {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Reuse an element of the memory pool if possible
   int mem;
   for (mem = 0; mem < mem_.size(); ++mem) {
@@ -247,34 +235,34 @@ int Fmu::checkout(const FmuFunction* fun) {
   // Always initialize before first call
   m.need_init = true;
   // Allocate/reset value buffer
-  m.buffer_.resize(self_.variables_.size());
+  m.buffer_.resize(dae->variables_.size());
   std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
   // Allocate/reset sensitivities
-  m.sens_.resize(self_.variables_.size());
+  m.sens_.resize(dae->variables_.size());
   std::fill(m.sens_.begin(), m.sens_.end(), 0);
   // Allocate/reset changed
-  m.changed_.resize(self_.variables_.size());
+  m.changed_.resize(dae->variables_.size());
   std::fill(m.changed_.begin(), m.changed_.end(), false);
   // Allocate/reset requested
-  m.requested_.resize(self_.variables_.size());
+  m.requested_.resize(dae->variables_.size());
   std::fill(m.requested_.begin(), m.requested_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
-  m.wrt_.resize(self_.variables_.size());
+  m.wrt_.resize(dae->variables_.size());
   // Return memory object
   return mem;
 }
 
-fmi2Component Fmu::memory(int mem) {
+fmi2Component FmuFunction::memory(int mem) const {
   return mem_.at(mem).c;
 }
 
-fmi2Component Fmu::pop_memory(int mem) {
+fmi2Component FmuFunction::pop_memory(int mem) const {
   fmi2Component c = mem_.at(mem).c;
   mem_.at(mem).c = 0;
   return c;
 }
 
-void Fmu::release(int mem) {
+void FmuFunction::release(int mem) const {
   Memory& m = mem_.at(mem);
   if (m.counter <= 0) {
     casadi_warning("Memory object has already been freed");
@@ -287,19 +275,23 @@ void Fmu::release(int mem) {
   }
 }
 
-int Fmu::copy(int mem) {
+int FmuFunction::copy(int mem) {
   Memory& m = mem_.at(mem);
   m.counter++;
   return mem;
 }
 
-void Fmu::setup_experiment(int mem) {
-  fmi2Status status = setup_experiment_(memory(mem), self_.fmutol_ > 0, self_.fmutol_, 0.,
+void FmuFunction::setup_experiment(int mem) {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  // Call fmi2SetupExperiment
+  fmi2Status status = setup_experiment_(memory(mem), dae->fmutol_ > 0, dae->fmutol_, 0.,
     fmi2True, 1.);
   casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
 }
 
-int Fmu::reset(int mem) {
+int FmuFunction::reset(int mem) {
   fmi2Status status = reset_(memory(mem));
   if (status != fmi2OK) {
     casadi_warning("fmi2Reset failed");
@@ -308,7 +300,7 @@ int Fmu::reset(int mem) {
   return 0;
 }
 
-int Fmu::enter_initialization_mode(int mem) {
+int FmuFunction::enter_initialization_mode(int mem) const {
   fmi2Status status = enter_initialization_mode_(memory(mem));
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterInitializationMode failed: " + str(status));
@@ -317,7 +309,7 @@ int Fmu::enter_initialization_mode(int mem) {
   return 0;
 }
 
-int Fmu::exit_initialization_mode(int mem) {
+int FmuFunction::exit_initialization_mode(int mem) const {
   fmi2Status status = exit_initialization_mode_(memory(mem));
   if (status != fmi2OK) {
     casadi_warning("fmi2ExitInitializationMode failed");
@@ -326,7 +318,7 @@ int Fmu::exit_initialization_mode(int mem) {
   return 0;
 }
 
-void Fmu::set(int mem, size_t id, double value) {
+void FmuFunction::set(int mem, size_t id, double value) const {
   // Get memory
   Memory& m = mem_.at(mem);
   // Update buffer
@@ -336,7 +328,7 @@ void Fmu::set(int mem, size_t id, double value) {
   }
 }
 
-void Fmu::set_seed(int mem, size_t id, double value) {
+void FmuFunction::set_seed(int mem, size_t id, double value) const {
   // Get memory
   Memory& m = mem_.at(mem);
   // Update buffer
@@ -346,7 +338,7 @@ void Fmu::set_seed(int mem, size_t id, double value) {
   }
 }
 
-void Fmu::request(int mem, size_t id, size_t wrt_id) {
+void FmuFunction::request(int mem, size_t id, size_t wrt_id) const {
   // Get memory
   Memory& m = mem_.at(mem);
   // Mark as requested
@@ -355,7 +347,7 @@ void Fmu::request(int mem, size_t id, size_t wrt_id) {
   m.wrt_.at(id) = wrt_id;
 }
 
-int Fmu::eval(int mem, const FmuFunction& f) {
+int FmuFunction::eval(int mem, const FmuFunction& f) const {
   // Gather inputs and outputs
   gather_io(mem);
   // Get memory
@@ -470,14 +462,17 @@ int Fmu::eval(int mem, const FmuFunction& f) {
   return 0;
 }
 
-void Fmu::get(int mem, size_t id, double* value) {
+void FmuFunction::get(int mem, size_t id, double* value) const {
   // Get memory
   Memory& m = mem_.at(mem);
   // Save to return
   *value = m.buffer_.at(id);
 }
 
-void Fmu::gather_io(int mem) {
+void FmuFunction::gather_io(int mem) const {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Get memory
   Memory& m = mem_.at(mem);
   // Collect input indices and corresponding value references and values
@@ -486,7 +481,7 @@ void Fmu::gather_io(int mem) {
   m.v_in_.clear();
   for (size_t id = 0; id < m.changed_.size(); ++id) {
     if (m.changed_[id]) {
-      const Variable& v = self_.variable(id);
+      const Variable& v = dae->variable(id);
       m.id_in_.push_back(id);
       m.vr_in_.push_back(v.value_reference);
       m.v_in_.push_back(m.buffer_[id]);
@@ -498,7 +493,7 @@ void Fmu::gather_io(int mem) {
   m.vr_out_.clear();
   for (size_t id = 0; id < m.requested_.size(); ++id) {
     if (m.requested_[id]) {
-      const Variable& v = self_.variable(id);
+      const Variable& v = dae->variable(id);
       m.id_out_.push_back(id);
       m.vr_out_.push_back(v.value_reference);
       m.requested_[id] = false;
@@ -506,7 +501,7 @@ void Fmu::gather_io(int mem) {
   }
 }
 
-void Fmu::gather_sens(int mem) {
+void FmuFunction::gather_sens(int mem) const {
   // Gather input and output indices
   gather_io(mem);
   // Get memory
@@ -527,7 +522,7 @@ void Fmu::gather_sens(int mem) {
   m.d_out_.resize(n_unknown);
 }
 
-int Fmu::eval_ad(int mem, const FmuFunction& f) {
+int FmuFunction::eval_ad(int mem, const FmuFunction& f) const {
   // Get memory
   Memory& m = mem_.at(mem);
   // Number of inputs and outputs
@@ -557,7 +552,10 @@ int Fmu::eval_ad(int mem, const FmuFunction& f) {
   return 0;
 }
 
-int Fmu::eval_fd(int mem, const FmuFunction& f) {
+int FmuFunction::eval_fd(int mem, const FmuFunction& f) const {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Get memory
   Memory& m = mem_.at(mem);
   // Number of inputs and outputs
@@ -573,7 +571,7 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
   }
   // Get nominal values for outputs
   m.nominal_out_.clear();
-  for (size_t id : m.id_out_) m.nominal_out_.push_back(self_.variable(id).nominal);
+  for (size_t id : m.id_out_) m.nominal_out_.push_back(dae->variable(id).nominal);
   // Make outputs dimensionless
   for (size_t k = 0; k < n_unknown; ++k) m.v_out_[k] /= m.nominal_out_[k];
   // Perturbed outputs
@@ -616,7 +614,7 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
         // Try to take step
         double test = m.v_in_[i] + pert * m.d_in_[i];
         // Check if in bounds
-        const Variable& v = self_.variable(m.id_in_[i]);
+        const Variable& v = dae->variable(m.id_in_[i]);
         bool in_bounds = test >= v.min && test <= v.max;
         // Take step, if allowed
         m.v_pert_[i] = in_bounds ? test : m.v_in_[i];
@@ -707,10 +705,10 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
     // Use FD instead of AD or to compare with AD
     if (f.validate_ad_) {
       // Access output variable
-      const Variable& v = self_.variable(id);
+      const Variable& v = dae->variable(id);
       // With respect to what variable
       size_t wrt_id = m.wrt_[id];
-      const Variable& wrt = self_.variable(wrt_id);
+      const Variable& wrt = dae->variable(wrt_id);
       // Nominal value for input
       double wrt_nom = wrt.nominal;
       // Value to compare with
@@ -761,7 +759,7 @@ int Fmu::eval_fd(int mem, const FmuFunction& f) {
   return 0;
 }
 
-int Fmu::eval_derivative(int mem, const FmuFunction& f) {
+int FmuFunction::eval_derivative(int mem, const FmuFunction& f) const {
   // Gather input and output indices
   gather_sens(mem);
   // Calculate derivatives using FMU directional derivative support
@@ -777,14 +775,17 @@ int Fmu::eval_derivative(int mem, const FmuFunction& f) {
   return 0;
 }
 
-void Fmu::get_sens(int mem, size_t id, double* value) {
+void FmuFunction::get_sens(int mem, size_t id, double* value) const {
   // Get memory
   Memory& m = mem_.at(mem);
   // Save to return
   *value = m.sens_.at(id);
 }
 
-int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
+int FmuFunction::eval(int mem, const double** arg, double** res, const FmuFunction& f) const {
+  // DaeBuilder instance
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Pass all regular inputs
   for (size_t k = 0; k < f.in_.size(); ++k) {
     if (f.in_[k]->is_reg()) {
@@ -828,7 +829,7 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
         // Differentiation with respect to what variable
         size_t Jc = f.jac_in_.at(vind);
         // Nominal value
-        double nom = self_.variable(Jc).nominal;
+        double nom = dae->variable(Jc).nominal;
         // Set seed for column
         set_seed(mem, Jc, nom);
         // Request corresponding outputs
@@ -845,7 +846,7 @@ int Fmu::eval(int mem, const double** arg, double** res, const FmuFunction& f) {
         // Differentiation with respect to what variable
         size_t Jc = f.jac_in_.at(vind);
         // Inverse of nominal value
-        double inv_nom = 1. / self_.variable(Jc).nominal;
+        double inv_nom = 1. / dae->variable(Jc).nominal;
         // Fetch Jacobian blocks
         for (size_t k = 0; k < f.out_.size(); ++k) {
           if (res[k] && f.out_[k]->is_jac()) {
@@ -951,7 +952,19 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc)
-    : FunctionInternal(name), dae_(dae), scheme_(scheme), lc_(lc), fmu_(nullptr) {
+    : FunctionInternal(name), dae_(dae), scheme_(scheme), lc_(lc) {
+  // Initialize to null pointers
+  instantiate_ = 0;
+  free_instance_ = 0;
+  reset_ = 0;
+  setup_experiment_ = 0;
+  enter_initialization_mode_ = 0;
+  exit_initialization_mode_ = 0;
+  enter_continuous_time_mode_ = 0;
+  set_real_ = 0;
+  set_boolean_ = 0;
+  get_real_ = 0;
+  get_directional_derivative_ = 0;
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
@@ -1016,12 +1029,14 @@ FmuFunction::~FmuFunction() {
   for (FmuInput* e : in_) if (e) delete(e);
   for (FmuOutput* e : out_) if (e) delete(e);
   // Release memory if DaeBuilder instance still exists
-  if (mem_ >= 0 && dae_.alive()) {
+  if (m_ >= 0 && dae_.alive()) {
     // Release memory object
-    fmu_->release(mem_);
+    release(m_);
   }
-  // Delete Fmu instance
-  if (fmu_) delete fmu_;
+  // Free all memory objects
+  for (int id = 0; id < mem_.size(); ++id) {
+    if (mem_[id].c && free_instance_) free_instance_(mem_[id].c);
+  }
 }
 
 const Options FmuFunction::options_
@@ -1084,7 +1099,7 @@ void FmuFunction::init(const Dict& opts) {
   FunctionInternal::init(opts);
 
   // Read FD mode
-  fd_ = to_enum<Fmu::FdMode>(fd_method_, "forward");
+  fd_ = to_enum<FmuFunction::FdMode>(fd_method_, "forward");
 
   // Get a pointer to the DaeBuilder class
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
@@ -1163,42 +1178,40 @@ void FmuFunction::init(const Dict& opts) {
         casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
     }
   }
-  // Allocate new instance
-  fmu_ = new Fmu(*dae);
   // Load functions
-  fmu_->init();
+  init();
   // Create instance
-  mem_ = fmu_->checkout(this);
+  m_ = checkout(this);
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
   // Evaluate fmu
-  int flag = fmu_->eval(mem_, arg, res, *this);
+  int flag = eval(m_, arg, res, *this);
   // Return error flag
   return flag;
 }
 
 casadi_int FmuFunction::n_pert() const {
   switch (fd_) {
-  case Fmu::FORWARD:
-  case Fmu::BACKWARD:
+  case FmuFunction::FORWARD:
+  case FmuFunction::BACKWARD:
     return 1;
-  case Fmu::CENTRAL:
+  case FmuFunction::CENTRAL:
     return 2;
-  case Fmu::SMOOTHING:
+  case FmuFunction::SMOOTHING:
     return 4;
   default: break;
   }
   casadi_error("Not implemented");
 }
 
-std::string to_string(Fmu::FdMode v) {
+std::string to_string(FmuFunction::FdMode v) {
   switch (v) {
-  case Fmu::FORWARD: return "forward";
-  case Fmu::BACKWARD: return "backward";
-  case Fmu::CENTRAL: return "central";
-  case Fmu::SMOOTHING: return "smoothing";
+  case FmuFunction::FORWARD: return "forward";
+  case FmuFunction::BACKWARD: return "backward";
+  case FmuFunction::CENTRAL: return "central";
+  case FmuFunction::SMOOTHING: return "smoothing";
   default: break;
   }
   return "";

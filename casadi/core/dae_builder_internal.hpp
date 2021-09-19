@@ -36,7 +36,6 @@ namespace casadi {
 
 // Forward declarations
 class XmlNode;
-class Fmu;
 
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
@@ -128,10 +127,7 @@ struct CASADI_EXPORT Variable {
 /// Internal class for DaeBuilder, see comments on the public class.
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
-  friend struct Fmu;
   friend class FmuFunction;
-  friend class FmuFunctionJac;
-  friend class FmuFunctionAdj;
 
  public:
 
