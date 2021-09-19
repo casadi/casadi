@@ -161,27 +161,26 @@ int Fmu::checkout() {
   // Mark as in use
   casadi_assert(!m.in_use, "Memory object is already in use");
   m.in_use = true;
-  // Check if already instantiated
-  if (m.c == 0) {
-    // Create instance
-    m.c = instantiate();
-    // Always initialize before first call
-    m.need_init = true;
-    // Allocate/reset value buffer
-    m.buffer_.resize(self_.variables_.size());
-    std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
-    // Allocate/reset sensitivities
-    m.sens_.resize(self_.variables_.size());
-    std::fill(m.sens_.begin(), m.sens_.end(), 0);
-    // Allocate/reset changed
-    m.changed_.resize(self_.variables_.size());
-    std::fill(m.changed_.begin(), m.changed_.end(), false);
-    // Allocate/reset requested
-    m.requested_.resize(self_.variables_.size());
-    std::fill(m.requested_.begin(), m.requested_.end(), false);
-    // Also allocate memory for corresponding Jacobian entry (for debugging)
-    m.wrt_.resize(self_.variables_.size());
-  }
+  // Make sure not already instantiated
+  casadi_assert(m.c == 0, "Already instantiated");
+  // Create instance
+  m.c = instantiate();
+  // Always initialize before first call
+  m.need_init = true;
+  // Allocate/reset value buffer
+  m.buffer_.resize(self_.variables_.size());
+  std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
+  // Allocate/reset sensitivities
+  m.sens_.resize(self_.variables_.size());
+  std::fill(m.sens_.begin(), m.sens_.end(), 0);
+  // Allocate/reset changed
+  m.changed_.resize(self_.variables_.size());
+  std::fill(m.changed_.begin(), m.changed_.end(), false);
+  // Allocate/reset requested
+  m.requested_.resize(self_.variables_.size());
+  std::fill(m.requested_.begin(), m.requested_.end(), false);
+  // Also allocate memory for corresponding Jacobian entry (for debugging)
+  m.wrt_.resize(self_.variables_.size());
   // Return memory object
   return mem;
 }
@@ -200,6 +199,10 @@ void Fmu::release(int mem) {
   // Mark as in not in use
   if (mem >= 0) {
     if (!mem_.at(mem).in_use) casadi_warning("Memory object not in use");
+    if (mem_.at(mem).c && free_instance_) {
+      free_instance_(mem_.at(mem).c);
+      mem_.at(mem).c = nullptr;
+    }
     mem_.at(mem).in_use = false;
   }
 }
