@@ -288,6 +288,7 @@ int Fmu::eval(int mem, const FmuFunction& f) {
     auto dae = static_cast<DaeBuilderInternal*>(f.dae_->raw_);
     // Set all variables before initialization
     for (const Variable& v : dae->variables_) {
+      continue;
       // If nan - variable has not been set - keep default value
       if (std::isnan(v.value)) continue;
       // Convert to expected type
@@ -300,7 +301,7 @@ int Fmu::eval(int mem, const FmuFunction& f) {
             fmi2Real value = v.value;
             status = set_real_(m.c, &vr, 1, &value);
             if (status != fmi2OK) {
-              casadi_warning("fmi2SetReal failed for " + v.name);
+              casadi_warning("fmi2SetReal failed for " + v.name + ", value: " + str(v.value));
               return 1;
             }
             break;
@@ -312,7 +313,7 @@ int Fmu::eval(int mem, const FmuFunction& f) {
             fmi2Integer value = static_cast<casadi_int>(v.value);
             status = set_integer_(m.c, &vr, 1, &value);
             if (status != fmi2OK) {
-              casadi_warning("fmi2SetInteger failed for " + v.name);
+              casadi_warning("fmi2SetInteger failed for " + v.name + ", value: " + str(v.value));
               return 1;
             }
             break;
@@ -323,7 +324,7 @@ int Fmu::eval(int mem, const FmuFunction& f) {
             fmi2Boolean value = static_cast<casadi_int>(v.value);
             status = set_boolean_(m.c, &vr, 1, &value);
             if (status != fmi2OK) {
-              casadi_warning("fmi2SetBoolean failed for " + v.name);
+              casadi_warning("fmi2SetBoolean failed for " + v.name + ", value: " + str(v.value));
               return 1;
             }
             break;
@@ -334,7 +335,7 @@ int Fmu::eval(int mem, const FmuFunction& f) {
             fmi2String value = v.stringvalue.c_str();
             status = set_string_(m.c, &vr, 1, &value);
             if (status != fmi2OK) {
-              casadi_warning("fmi2SetString failed for " + v.name);
+              casadi_warning("fmi2SetString failed for " + v.name + ", value: " + v.stringvalue);
               return 1;
             }
             break;
