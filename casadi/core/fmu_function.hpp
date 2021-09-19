@@ -175,6 +175,42 @@ class CASADI_EXPORT JacOutput : public FmuOutput {
   const std::vector<size_t>& ind2() const override { return ind2_;}
 };
 
+// Memory object
+struct FmuMemory {
+  // Function object
+  const FmuFunction& self;
+  // Component memory
+  fmi2Component c;
+  // FmuFunction instance
+  const FmuFunction* fun;
+  // Number of owning references
+  int counter;
+  // Need to initialize
+  bool need_init;
+  // Value buffer
+  std::vector<double> buffer_;
+  // Sensitivities
+  std::vector<double> sens_;
+  // Which entries have been changed
+  std::vector<bool> changed_;
+  // Which entries are being requested
+  std::vector<bool> requested_;
+  // Derivative with respect to
+  std::vector<size_t> wrt_;
+  // Current known/unknown variables
+  std::vector<size_t> id_in_, id_out_;
+  // Which perturbations are permitted
+  std::vector<bool> in_bounds_;
+  // Value references
+  std::vector<fmi2ValueReference> vr_in_, vr_out_;
+  // Work vector (reals)
+  std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_, v_pert_;
+  // Nominal values
+  std::vector<fmi2Real> nominal_out_;
+  // Constructor
+  explicit FmuMemory(const FmuFunction& self) : self(self), c(0), counter(0) {}
+};
+
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
   // DaeBuilder instance (non-owning reference to avoid circular dependency)
@@ -184,7 +220,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   std::map<std::string, std::vector<size_t>> scheme_, lc_;
 
   // Memory instance
-  int m_;
+  FmuMemory* m2_;
 
   // Information about function inputs
   std::vector<FmuInput*> in_;
@@ -294,67 +330,55 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     fmi2String message, ...);
 
   // New memory object
-  int checkout();
-
-  // Free memory object
-  void release(int mem) const;
-
-  // Owning reference to memory object
-  int copy(int mem);
+  FmuMemory* checkout();
 
   // New memory object
   fmi2Component instantiate();
 
   // Setup experiment
-  void setup_experiment(int mem);
+  void setup_experiment(FmuMemory* m);
 
   // Reset solver
-  int reset(int mem);
+  int reset(FmuMemory* m);
 
   // Enter initialization mode
-  int enter_initialization_mode(int mem) const;
+  int enter_initialization_mode(FmuMemory* m) const;
 
   // Exit initialization mode
-  int exit_initialization_mode(int mem) const;
+  int exit_initialization_mode(FmuMemory* m) const;
 
   // Set value
-  void set(int mem, size_t id, double value) const;
+  void set(FmuMemory* m, size_t id, double value) const;
 
   // Request the calculation of a variable
-  void request(int mem, size_t id, size_t wrt_id = -1) const;
+  void request(FmuMemory* m, size_t id, size_t wrt_id = -1) const;
 
   // Calculate all requested variables
-  int eval(int mem) const;
+  int eval(FmuMemory* m) const;
 
   // Get a calculated variable
-  void get(int mem, size_t id, double* value) const;
+  void get(FmuMemory* m, size_t id, double* value) const;
 
   // Set seed
-  void set_seed(int mem, size_t id, double value) const;
+  void set_seed(FmuMemory* m, size_t id, double value) const;
 
   // Gather user inputs and outputs
-  void gather_io(int mem) const;
+  void gather_io(FmuMemory* m) const;
 
   // Gather user sensitivities
-  void gather_sens(int mem) const;
+  void gather_sens(FmuMemory* m) const;
 
   // Calculate directional derivatives using AD
-  int eval_ad(int mem) const;
+  int eval_ad(FmuMemory* m) const;
 
   // Calculate directional derivatives using FD
-  int eval_fd(int mem) const;
+  int eval_fd(FmuMemory* m) const;
 
   // Calculate directional derivatives
-  int eval_derivative(int mem) const;
+  int eval_derivative(FmuMemory* m) const;
 
   // Get a derivative
-  void get_sens(int mem, size_t id, double* value) const;
-
-  // Get memory object
-  fmi2Component memory(int mem) const;
-
-  // Get memory object and remove from pool
-  fmi2Component pop_memory(int mem) const;
+  void get_sens(FmuMemory* m, size_t id, double* value) const;
 
   // Name of system, per the FMI specification
   static std::string system_infix();
@@ -388,43 +412,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Path to the FMU resource directory
   std::string resource_loc_;
-
-  // Memory object
-  struct Memory {
-    // Component memory
-    fmi2Component c;
-    // FmuFunction instance
-    const FmuFunction* fun;
-    // Number of owning references
-    int counter;
-    // Need to initialize
-    bool need_init;
-    // Value buffer
-    std::vector<double> buffer_;
-    // Sensitivities
-    std::vector<double> sens_;
-    // Which entries have been changed
-    std::vector<bool> changed_;
-    // Which entries are being requested
-    std::vector<bool> requested_;
-    // Derivative with respect to
-    std::vector<size_t> wrt_;
-    // Current known/unknown variables
-    std::vector<size_t> id_in_, id_out_;
-    // Which perturbations are permitted
-    std::vector<bool> in_bounds_;
-    // Value references
-    std::vector<fmi2ValueReference> vr_in_, vr_out_;
-    // Work vector (reals)
-    std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_, v_pert_;
-    // Nominal values
-    std::vector<fmi2Real> nominal_out_;
-    // Constructor
-    explicit Memory() : c(0), counter(0) {}
-  };
-
-  // Memory objects
-  mutable std::vector<Memory> mem_;
 };
 
 /// Number of entries in enums

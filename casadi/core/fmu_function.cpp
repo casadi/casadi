@@ -171,128 +171,95 @@ fmi2Component FmuFunction::instantiate() {
   return c;
 }
 
-int FmuFunction::checkout() {
+FmuMemory* FmuFunction::checkout() {
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Reuse an element of the memory pool if possible
-  int mem;
-  for (mem = 0; mem < mem_.size(); ++mem) {
-    if (mem_[mem].counter == 0) break;
-  }
-  // Add new element necessary
-  if (mem == mem_.size()) mem_.push_back(Memory());
   // Memory object
-  Memory& m = mem_.at(mem);
+  FmuMemory* m = new FmuMemory(*this);
   // Mark as in use
-  casadi_assert(m.counter == 0, "Memory object is already in use");
-  m.counter++;
+  casadi_assert(m->counter == 0, "Memory object is already in use");
+  m->counter++;
   // Assign function
-  m.fun = this;
+  m->fun = this;
   // Make sure not already instantiated
-  casadi_assert(m.c == 0, "Already instantiated");
+  casadi_assert(m->c == 0, "Already instantiated");
   // Create instance
-  m.c = instantiate();
+  m->c = instantiate();
   // Reset solver
-  setup_experiment(mem);
+  setup_experiment(m);
   // Pass real values before initialization
-  if (!m.fun->vr_real_.empty()) {
-    fmi2Status status = set_real_(m.c, get_ptr(m.fun->vr_real_), m.fun->vr_real_.size(),
-      get_ptr(m.fun->v_real_));
+  if (!vr_real_.empty()) {
+    fmi2Status status = set_real_(m->c, get_ptr(vr_real_), vr_real_.size(), get_ptr(v_real_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
-      return -1;
+      delete m;
+      return 0;
     }
   }
   // Pass integer values before initialization (also enums)
-  if (!m.fun->vr_integer_.empty()) {
-    fmi2Status status = set_integer_(m.c, get_ptr(m.fun->vr_integer_), m.fun->vr_integer_.size(),
-      get_ptr(m.fun->v_integer_));
+  if (!vr_integer_.empty()) {
+    fmi2Status status = set_integer_(m->c, get_ptr(vr_integer_), vr_integer_.size(),
+      get_ptr(v_integer_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetInteger failed");
-      return -1;
+      delete m;
+      return 0;
     }
   }
   // Pass boolean values before initialization
-  if (!m.fun->vr_boolean_.empty()) {
-    fmi2Status status = set_boolean_(m.c, get_ptr(m.fun->vr_boolean_), m.fun->vr_boolean_.size(),
-      get_ptr(m.fun->v_boolean_));
+  if (!vr_boolean_.empty()) {
+    fmi2Status status = set_boolean_(m->c, get_ptr(vr_boolean_), vr_boolean_.size(),
+      get_ptr(v_boolean_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetBoolean failed");
-      return -1;
+      delete m;
+      return 0;
     }
   }
   // Pass string valeus before initialization
-  for (size_t k = 0; k < m.fun->vr_string_.size(); ++k) {
-    fmi2ValueReference vr = m.fun->vr_string_[k];
-    fmi2String value = m.fun->v_string_[k].c_str();
-    fmi2Status status = set_string_(m.c, &vr, 1, &value);
+  for (size_t k = 0; k < vr_string_.size(); ++k) {
+    fmi2ValueReference vr = vr_string_[k];
+    fmi2String value = v_string_[k].c_str();
+    fmi2Status status = set_string_(m->c, &vr, 1, &value);
     if (status != fmi2OK) {
       casadi_warning("fmi2SetString failed for value reference " + str(vr));
-      return -1;
+      delete m;
+      return 0;
     }
   }
   // Always initialize before first call
-  m.need_init = true;
+  m->need_init = true;
   // Allocate/reset value buffer
-  m.buffer_.resize(dae->variables_.size());
-  std::fill(m.buffer_.begin(), m.buffer_.end(), casadi::nan);
+  m->buffer_.resize(dae->variables_.size());
+  std::fill(m->buffer_.begin(), m->buffer_.end(), casadi::nan);
   // Allocate/reset sensitivities
-  m.sens_.resize(dae->variables_.size());
-  std::fill(m.sens_.begin(), m.sens_.end(), 0);
+  m->sens_.resize(dae->variables_.size());
+  std::fill(m->sens_.begin(), m->sens_.end(), 0);
   // Allocate/reset changed
-  m.changed_.resize(dae->variables_.size());
-  std::fill(m.changed_.begin(), m.changed_.end(), false);
+  m->changed_.resize(dae->variables_.size());
+  std::fill(m->changed_.begin(), m->changed_.end(), false);
   // Allocate/reset requested
-  m.requested_.resize(dae->variables_.size());
-  std::fill(m.requested_.begin(), m.requested_.end(), false);
+  m->requested_.resize(dae->variables_.size());
+  std::fill(m->requested_.begin(), m->requested_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
-  m.wrt_.resize(dae->variables_.size());
+  m->wrt_.resize(dae->variables_.size());
   // Return memory object
-  return mem;
+  return m;
 }
 
-fmi2Component FmuFunction::memory(int mem) const {
-  return mem_.at(mem).c;
-}
-
-fmi2Component FmuFunction::pop_memory(int mem) const {
-  fmi2Component c = mem_.at(mem).c;
-  mem_.at(mem).c = 0;
-  return c;
-}
-
-void FmuFunction::release(int mem) const {
-  Memory& m = mem_.at(mem);
-  if (m.counter <= 0) {
-    casadi_warning("Memory object has already been freed");
-  } else if (--m.counter == 0) {
-    // No more references - free instance
-    if (m.c && free_instance_) {
-      free_instance_(m.c);
-      m.c = nullptr;
-    }
-  }
-}
-
-int FmuFunction::copy(int mem) {
-  Memory& m = mem_.at(mem);
-  m.counter++;
-  return mem;
-}
-
-void FmuFunction::setup_experiment(int mem) {
+void FmuFunction::setup_experiment(FmuMemory* m) {
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
   // Call fmi2SetupExperiment
-  fmi2Status status = setup_experiment_(memory(mem), dae->fmutol_ > 0, dae->fmutol_, 0.,
+  fmi2Status status = setup_experiment_(m->c, dae->fmutol_ > 0, dae->fmutol_, 0.,
     fmi2True, 1.);
   casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
 }
 
-int FmuFunction::reset(int mem) {
-  fmi2Status status = reset_(memory(mem));
+int FmuFunction::reset(FmuMemory* m) {
+  fmi2Status status = reset_(m->c);
   if (status != fmi2OK) {
     casadi_warning("fmi2Reset failed");
     return 1;
@@ -300,8 +267,8 @@ int FmuFunction::reset(int mem) {
   return 0;
 }
 
-int FmuFunction::enter_initialization_mode(int mem) const {
-  fmi2Status status = enter_initialization_mode_(memory(mem));
+int FmuFunction::enter_initialization_mode(FmuMemory* m) const {
+  fmi2Status status = enter_initialization_mode_(m->c);
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterInitializationMode failed: " + str(status));
     return 1;
@@ -309,8 +276,8 @@ int FmuFunction::enter_initialization_mode(int mem) const {
   return 0;
 }
 
-int FmuFunction::exit_initialization_mode(int mem) const {
-  fmi2Status status = exit_initialization_mode_(memory(mem));
+int FmuFunction::exit_initialization_mode(FmuMemory* m) const {
+  fmi2Status status = exit_initialization_mode_(m->c);
   if (status != fmi2OK) {
     casadi_warning("fmi2ExitInitializationMode failed");
     return 1;
@@ -318,58 +285,50 @@ int FmuFunction::exit_initialization_mode(int mem) const {
   return 0;
 }
 
-void FmuFunction::set(int mem, size_t id, double value) const {
-  // Get memory
-  Memory& m = mem_.at(mem);
+void FmuFunction::set(FmuMemory* m, size_t id, double value) const {
   // Update buffer
-  if (value != m.buffer_.at(id)) {
-    m.buffer_.at(id) = value;
-    m.changed_.at(id) = true;
+  if (value != m->buffer_.at(id)) {
+    m->buffer_.at(id) = value;
+    m->changed_.at(id) = true;
   }
 }
 
-void FmuFunction::set_seed(int mem, size_t id, double value) const {
-  // Get memory
-  Memory& m = mem_.at(mem);
+void FmuFunction::set_seed(FmuMemory* m, size_t id, double value) const {
   // Update buffer
   if (value != 0) {
-    m.sens_.at(id) = value;
-    m.changed_.at(id) = true;
+    m->sens_.at(id) = value;
+    m->changed_.at(id) = true;
   }
 }
 
-void FmuFunction::request(int mem, size_t id, size_t wrt_id) const {
-  // Get memory
-  Memory& m = mem_.at(mem);
+void FmuFunction::request(FmuMemory* m, size_t id, size_t wrt_id) const {
   // Mark as requested
-  m.requested_.at(id) = true;
+  m->requested_.at(id) = true;
   // Also log corresponding input index
-  m.wrt_.at(id) = wrt_id;
+  m->wrt_.at(id) = wrt_id;
 }
 
-int FmuFunction::eval(int mem) const {
+int FmuFunction::eval(FmuMemory* m) const {
   // Gather inputs and outputs
-  gather_io(mem);
-  // Get memory
-  Memory& m = mem_.at(mem);
+  gather_io(m);
   // Number of inputs and outputs
-  size_t n_set = m.id_in_.size();
-  size_t n_out = m.id_out_.size();
+  size_t n_set = m->id_in_.size();
+  size_t n_out = m->id_out_.size();
   // Fmi return flag
   fmi2Status status;
   // Initialize, if needed
-  if (m.need_init) {
+  if (m->need_init) {
     // DaeBuilder instance
     casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
     auto dae = static_cast<DaeBuilderInternal*>(dae_->raw_);
     // Set all variables before initialization
-    status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
+    status = set_real_(m->c, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
     }
     // Initialization mode begins
-    if (enter_initialization_mode(mem)) return 1;
+    if (enter_initialization_mode(m)) return 1;
     // Get all values
     for (Variable& v : dae->variables_) {
       // Convert to expected type
@@ -383,7 +342,7 @@ int FmuFunction::eval(int mem) const {
           {
             // Real
             fmi2Real value;
-            status = get_real_(m.c, &vr, 1, &value);
+            status = get_real_(m->c, &vr, 1, &value);
             if (status != fmi2OK) {
               casadi_warning("fmi2GetReal failed for " + v.name);
               return 1;
@@ -396,7 +355,7 @@ int FmuFunction::eval(int mem) const {
           {
             // Integer: Convert to double
             fmi2Integer value;
-            status = get_integer_(m.c, &vr, 1, &value);
+            status = get_integer_(m->c, &vr, 1, &value);
             if (status != fmi2OK) {
               casadi_warning("fmi2GetInteger failed for " + v.name);
               return 1;
@@ -408,7 +367,7 @@ int FmuFunction::eval(int mem) const {
           {
             // Boolean: Convert to double
             fmi2Boolean value;
-            status = get_boolean_(m.c, &vr, 1, &value);
+            status = get_boolean_(m->c, &vr, 1, &value);
             if (status != fmi2OK) {
               casadi_warning("fmi2GetBoolean failed for " + v.name);
               return 1;
@@ -420,7 +379,7 @@ int FmuFunction::eval(int mem) const {
           {
             // String
             fmi2String value;
-            status = get_string_(m.c, &vr, 1, &value);
+            status = get_string_(m->c, &vr, 1, &value);
             if (status != fmi2OK) {
               casadi_warning("fmi2GetString failed for " + v.name);
               return 1;
@@ -434,12 +393,12 @@ int FmuFunction::eval(int mem) const {
       }
     }
     // Initialization mode ends
-    if (exit_initialization_mode(mem)) return 1;
+    if (exit_initialization_mode(m)) return 1;
     // Initialized
-    m.need_init = false;
+    m->need_init = false;
   }
   // Set all variables
-  status = set_real_(m.c, get_ptr(m.vr_in_), n_set, get_ptr(m.v_in_));
+  status = set_real_(m->c, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
@@ -447,133 +406,123 @@ int FmuFunction::eval(int mem) const {
   // Quick return if nothing requested
   if (n_out == 0) return 0;
   // Calculate all variables
-  m.v_out_.resize(n_out);
-  status = get_real_(m.c, get_ptr(m.vr_out_), n_out, get_ptr(m.v_out_));
+  m->v_out_.resize(n_out);
+  status = get_real_(m->c, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
   }
   // Collect requested variables
-  auto it = m.v_out_.begin();
-  for (size_t id : m.id_out_) {
-    m.buffer_[id] = *it++;
+  auto it = m->v_out_.begin();
+  for (size_t id : m->id_out_) {
+    m->buffer_[id] = *it++;
   }
   // Successful return
   return 0;
 }
 
-void FmuFunction::get(int mem, size_t id, double* value) const {
-  // Get memory
-  Memory& m = mem_.at(mem);
+void FmuFunction::get(FmuMemory* m, size_t id, double* value) const {
   // Save to return
-  *value = m.buffer_.at(id);
+  *value = m->buffer_.at(id);
 }
 
-void FmuFunction::gather_io(int mem) const {
+void FmuFunction::gather_io(FmuMemory* m) const {
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Get memory
-  Memory& m = mem_.at(mem);
   // Collect input indices and corresponding value references and values
-  m.id_in_.clear();
-  m.vr_in_.clear();
-  m.v_in_.clear();
-  for (size_t id = 0; id < m.changed_.size(); ++id) {
-    if (m.changed_[id]) {
+  m->id_in_.clear();
+  m->vr_in_.clear();
+  m->v_in_.clear();
+  for (size_t id = 0; id < m->changed_.size(); ++id) {
+    if (m->changed_[id]) {
       const Variable& v = dae->variable(id);
-      m.id_in_.push_back(id);
-      m.vr_in_.push_back(v.value_reference);
-      m.v_in_.push_back(m.buffer_[id]);
-      m.changed_[id] = false;
+      m->id_in_.push_back(id);
+      m->vr_in_.push_back(v.value_reference);
+      m->v_in_.push_back(m->buffer_[id]);
+      m->changed_[id] = false;
     }
   }
   // Collect output indices, corresponding value references
-  m.id_out_.clear();
-  m.vr_out_.clear();
-  for (size_t id = 0; id < m.requested_.size(); ++id) {
-    if (m.requested_[id]) {
+  m->id_out_.clear();
+  m->vr_out_.clear();
+  for (size_t id = 0; id < m->requested_.size(); ++id) {
+    if (m->requested_[id]) {
       const Variable& v = dae->variable(id);
-      m.id_out_.push_back(id);
-      m.vr_out_.push_back(v.value_reference);
-      m.requested_[id] = false;
+      m->id_out_.push_back(id);
+      m->vr_out_.push_back(v.value_reference);
+      m->requested_[id] = false;
     }
   }
 }
 
-void FmuFunction::gather_sens(int mem) const {
+void FmuFunction::gather_sens(FmuMemory* m) const {
   // Gather input and output indices
-  gather_io(mem);
-  // Get memory
-  Memory& m = mem_.at(mem);
+  gather_io(m);
   // Number of inputs and outputs
-  size_t n_known = m.id_in_.size();
-  size_t n_unknown = m.id_out_.size();
+  size_t n_known = m->id_in_.size();
+  size_t n_unknown = m->id_out_.size();
   // Get/clear seeds
-  m.d_in_.clear();
-  for (size_t id : m.id_in_) {
-    m.d_in_.push_back(m.sens_[id]);
-    m.sens_[id] = 0;
+  m->d_in_.clear();
+  for (size_t id : m->id_in_) {
+    m->d_in_.push_back(m->sens_[id]);
+    m->sens_[id] = 0;
   }
   // Ensure at least one seed
   casadi_assert(n_known != 0, "No seeds");
   // Allocate result vectors
-  m.v_out_.resize(n_unknown);
-  m.d_out_.resize(n_unknown);
+  m->v_out_.resize(n_unknown);
+  m->d_out_.resize(n_unknown);
 }
 
-int FmuFunction::eval_ad(int mem) const {
-  // Get memory
-  Memory& m = mem_.at(mem);
+int FmuFunction::eval_ad(FmuMemory* m) const {
   // Number of inputs and outputs
-  size_t n_known = m.id_in_.size();
-  size_t n_unknown = m.id_out_.size();
+  size_t n_known = m->id_in_.size();
+  size_t n_unknown = m->id_out_.size();
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi2Status status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, get_ptr(m.v_out_));
+  fmi2Status status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
   }
   // Evaluate directional derivatives
-  status = get_directional_derivative_(m.c, get_ptr(m.vr_out_), n_unknown,
-    get_ptr(m.vr_in_), n_known, get_ptr(m.d_in_), get_ptr(m.d_out_));
+  status = get_directional_derivative_(m->c, get_ptr(m->vr_out_), n_unknown,
+    get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), get_ptr(m->d_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetDirectionalDerivative failed");
     return 1;
   }
   // Collect requested variables
-  auto it = m.d_out_.begin();
-  for (size_t id : m.id_out_) {
-    m.sens_[id] = *it++;
+  auto it = m->d_out_.begin();
+  for (size_t id : m->id_out_) {
+    m->sens_[id] = *it++;
   }
   // Successful return
   return 0;
 }
 
-int FmuFunction::eval_fd(int mem) const {
+int FmuFunction::eval_fd(FmuMemory* m) const {
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Get memory
-  Memory& m = mem_.at(mem);
   // Number of inputs and outputs
-  size_t n_known = m.id_in_.size();
-  size_t n_unknown = m.id_out_.size();
+  size_t n_known = m->id_in_.size();
+  size_t n_unknown = m->id_out_.size();
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi2Status status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, get_ptr(m.v_out_));
+  fmi2Status status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
   }
   // Get nominal values for outputs
-  m.nominal_out_.clear();
-  for (size_t id : m.id_out_) m.nominal_out_.push_back(dae->variable(id).nominal);
+  m->nominal_out_.clear();
+  for (size_t id : m->id_out_) m->nominal_out_.push_back(dae->variable(id).nominal);
   // Make outputs dimensionless
-  for (size_t k = 0; k < n_unknown; ++k) m.v_out_[k] /= m.nominal_out_[k];
+  for (size_t k = 0; k < n_unknown; ++k) m->v_out_[k] /= m->nominal_out_[k];
   // Perturbed outputs
   double* yk[4];
   // Error estimate used to update step size
@@ -585,13 +534,13 @@ int FmuFunction::eval_fd(int mem) const {
   // Number of perturbations
   casadi_int n_pert = this->n_pert();
   // Allocate memory for perturbed outputs
-  m.fd_out_.resize(n_pert * n_unknown);
+  m->fd_out_.resize(n_pert * n_unknown);
   // Perform finite difference algorithm with different step sizes
   for (casadi_int iter = 0; iter < 1 + h_iter_; ++iter) {
     // Calculate all perturbed outputs
     for (casadi_int k = 0; k < n_pert; ++k) {
       // Where to save the perturbed outputs
-      yk[k] = &m.fd_out_[n_unknown * k];
+      yk[k] = &m->fd_out_[n_unknown * k];
       // Get perturbation expression
       double pert;
       switch (fd_) {
@@ -608,27 +557,27 @@ int FmuFunction::eval_fd(int mem) const {
       default: casadi_error("Not implemented");
       }
       // Perturb inputs, if allowed
-      m.v_pert_.resize(n_known);
-      m.in_bounds_.clear();
+      m->v_pert_.resize(n_known);
+      m->in_bounds_.clear();
       for (size_t i = 0; i < n_known; ++i) {
         // Try to take step
-        double test = m.v_in_[i] + pert * m.d_in_[i];
+        double test = m->v_in_[i] + pert * m->d_in_[i];
         // Check if in bounds
-        const Variable& v = dae->variable(m.id_in_[i]);
+        const Variable& v = dae->variable(m->id_in_[i]);
         bool in_bounds = test >= v.min && test <= v.max;
         // Take step, if allowed
-        m.v_pert_[i] = in_bounds ? test : m.v_in_[i];
+        m->v_pert_[i] = in_bounds ? test : m->v_in_[i];
         // Keep track for later
-        m.in_bounds_.push_back(in_bounds);
+        m->in_bounds_.push_back(in_bounds);
       }
       // Pass perturbed inputs to FMU
-      status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_pert_));
+      status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
       if (status != fmi2OK) {
         casadi_warning("fmi2SetReal failed");
         return 1;
       }
       // Evaluate perturbed FMU
-      status = get_real_(m.c, get_ptr(m.vr_out_), n_unknown, yk[k]);
+      status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, yk[k]);
       if (status != fmi2OK) {
         casadi_warning("fmi2GetReal failed");
         return 1;
@@ -636,18 +585,18 @@ int FmuFunction::eval_fd(int mem) const {
       // Post-process yk[k]
       for (size_t i = 0; i < n_unknown; ++i) {
         // Variable id
-        size_t id = m.id_out_[i];
+        size_t id = m->id_out_[i];
         // Differentiation with respect to what variable
-        size_t wrt_id = m.wrt_.at(id);
+        size_t wrt_id = m->wrt_.at(id);
         // Find the corresponding input variable
         size_t wrt_i;
         for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
-          if (m.id_in_[wrt_i] == wrt_id) break;
+          if (m->id_in_[wrt_i] == wrt_id) break;
         }
         // Check if in bounds
-        if (m.in_bounds_.at(wrt_i)) {
+        if (m->in_bounds_.at(wrt_i)) {
           // Input was in bounds: Keep output, make dimensionless
-          yk[k][i] /= m.nominal_out_[i];
+          yk[k][i] /= m->nominal_out_[i];
         } else {
           // Input was out of bounds: Discard output
           yk[k][i] = nan;
@@ -655,7 +604,7 @@ int FmuFunction::eval_fd(int mem) const {
       }
     }
     // Restore FMU inputs
-    status = set_real_(m.c, get_ptr(m.vr_in_), n_known, get_ptr(m.v_in_));
+    status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
@@ -668,15 +617,15 @@ int FmuFunction::eval_fd(int mem) const {
     switch (fd_) {
       case FORWARD:
       case BACKWARD:
-        u = casadi_forward_diff(yk, get_ptr(m.v_out_),
-          get_ptr(m.d_out_), h, n_unknown, &fd_mem);
+        u = casadi_forward_diff(yk, get_ptr(m->v_out_),
+          get_ptr(m->d_out_), h, n_unknown, &fd_mem);
         break;
       case CENTRAL:
-        u = casadi_central_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
+        u = casadi_central_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
           h, n_unknown, &fd_mem);
         break;
       case SMOOTHING:
-        u = casadi_smoothing_diff(yk, get_ptr(m.v_out_), get_ptr(m.d_out_),
+        u = casadi_smoothing_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
           h, n_unknown, &fd_mem);
         break;
       default: casadi_error("Not implemented");
@@ -695,53 +644,53 @@ int FmuFunction::eval_fd(int mem) const {
     h = fmin(fmax(h, h_min_), h_max_);
   }
   // Collect requested variables
-  for (size_t ind = 0; ind < m.id_out_.size(); ++ind) {
+  for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {
     // Variable id
-    size_t id = m.id_out_[ind];
+    size_t id = m->id_out_[ind];
     // Nominal value
-    double n = m.nominal_out_[ind];
+    double n = m->nominal_out_[ind];
     // Get the value
-    double d_fd = m.d_out_[ind] * n;
+    double d_fd = m->d_out_[ind] * n;
     // Use FD instead of AD or to compare with AD
     if (validate_ad_) {
       // Access output variable
       const Variable& v = dae->variable(id);
       // With respect to what variable
-      size_t wrt_id = m.wrt_[id];
+      size_t wrt_id = m->wrt_[id];
       const Variable& wrt = dae->variable(wrt_id);
       // Nominal value for input
       double wrt_nom = wrt.nominal;
       // Value to compare with
-      double d_ad = m.sens_[id];
+      double d_ad = m->sens_[id];
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if error exceeds thresholds
       if (d_max > wrt_nom * n * abstol_ && std::fabs(d_ad - d_fd) > d_max * reltol_) {
         // Which element in the vector
         size_t wrt_ind = 0;
-        for (; wrt_ind < m.id_in_.size(); ++wrt_ind)
-          if (m.id_in_[wrt_ind] == wrt_id) break;
-        casadi_assert(wrt_ind < m.id_in_.size(), "Inconsistent variable index for validation");
+        for (; wrt_ind < m->id_in_.size(); ++wrt_ind)
+          if (m->id_in_[wrt_ind] == wrt_id) break;
+        casadi_assert(wrt_ind < m->id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
         ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << wrt.name << "\n"
-          << "At " << m.v_in_[wrt_ind] << ", nominal " << wrt.nominal << ", min " << wrt.min
+          << "At " << m->v_in_[wrt_ind] << ", nominal " << wrt.nominal << ", min " << wrt.min
           << ", max " << wrt.max << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(fd_) << "].\n";
         // Also print the stencil:
         std::vector<double> stencil;
         switch (fd_) {
           case FORWARD:
-            stencil = {m.v_out_[ind], yk[0][ind]};
+            stencil = {m->v_out_[ind], yk[0][ind]};
             break;
           case BACKWARD:
-            stencil = {yk[0][ind], m.v_out_[ind]};
+            stencil = {yk[0][ind], m->v_out_[ind]};
             break;
           case CENTRAL:
-            stencil = {yk[0][ind], m.v_out_[ind], yk[1][ind]};
+            stencil = {yk[0][ind], m->v_out_[ind], yk[1][ind]};
             break;
           case SMOOTHING:
-            stencil = {yk[1][ind], yk[0][ind], m.v_out_[ind], yk[2][ind], yk[3][ind]};
+            stencil = {yk[1][ind], yk[0][ind], m->v_out_[ind], yk[2][ind], yk[3][ind]};
             break;
           default: casadi_error("Not implemented");
         }
@@ -752,34 +701,32 @@ int FmuFunction::eval_fd(int mem) const {
       }
     } else {
       // Use instead of AD
-      m.sens_[id] = d_fd;
+      m->sens_[id] = d_fd;
     }
   }
   // Successful return
   return 0;
 }
 
-int FmuFunction::eval_derivative(int mem) const {
+int FmuFunction::eval_derivative(FmuMemory* m) const {
   // Gather input and output indices
-  gather_sens(mem);
+  gather_sens(m);
   // Calculate derivatives using FMU directional derivative support
   if (enable_ad_) {
     // Evaluate using AD
-    if (eval_ad(mem)) return 1;
+    if (eval_ad(m)) return 1;
   }
   // Calculate derivatives using finite differences
   if (!enable_ad_ || validate_ad_) {
     // Evaluate using FD
-    if (eval_fd(mem)) return 1;
+    if (eval_fd(m)) return 1;
   }
   return 0;
 }
 
-void FmuFunction::get_sens(int mem, size_t id, double* value) const {
-  // Get memory
-  Memory& m = mem_.at(mem);
+void FmuFunction::get_sens(FmuMemory* m, size_t id, double* value) const {
   // Save to return
-  *value = m.sens_.at(id);
+  *value = m->sens_.at(id);
 }
 
 FmuInput::~FmuInput() {
@@ -933,14 +880,10 @@ FmuFunction::~FmuFunction() {
   // Free input and output memory structures
   for (FmuInput* e : in_) if (e) delete(e);
   for (FmuOutput* e : out_) if (e) delete(e);
-  // Release memory if DaeBuilder instance still exists
-  if (m_ >= 0 && dae_.alive()) {
-    // Release memory object
-    release(m_);
-  }
-  // Free all memory objects
-  for (int id = 0; id < mem_.size(); ++id) {
-    if (mem_[id].c && free_instance_) free_instance_(mem_[id].c);
+  // Free FMU memory
+  if (m2_ != 0) {
+    if (m2_->c && free_instance_) free_instance_(m2_->c);
+    delete m2_;
   }
 }
 
@@ -1086,7 +1029,7 @@ void FmuFunction::init(const Dict& opts) {
   // Load functions
   init();
   // Create instance
-  m_ = checkout();
+  m2_ = checkout();
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
@@ -1098,7 +1041,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k]->is_reg()) {
       for (size_t i = 0; i < in_[k]->size(); ++i) {
-        set(m_, in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
+        set(m2_, in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
       }
     }
   }
@@ -1106,17 +1049,17 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k]->is_reg()) {
       for (size_t i = 0; i < out_[k]->size(); ++i) {
-        request(m_, out_[k]->ind(i));
+        request(m2_, out_[k]->ind(i));
       }
     }
   }
   // Evaluate
-  if (eval(m_)) return 1;
+  if (eval(m2_)) return 1;
   // Get regular outputs
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k]->is_reg()) {
       for (size_t i = 0; i < out_[k]->size(); ++i) {
-        get(m_, out_[k]->ind(i), &res[k][i]);
+        get(m2_, out_[k]->ind(i), &res[k][i]);
       }
     }
   }
@@ -1139,15 +1082,15 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         // Nominal value
         double nom = dae->variable(Jc).nominal;
         // Set seed for column
-        set_seed(m_, Jc, nom);
+        set_seed(m2_, Jc, nom);
         // Request corresponding outputs
         for (casadi_int Jk = sp_ext_.colind(vind); Jk < sp_ext_.colind(vind + 1); ++Jk) {
           casadi_int Jr = sp_ext_.row(Jk);
-          request(m_, jac_out_.at(Jr), Jc);
+          request(m2_, jac_out_.at(Jr), Jc);
         }
       }
       // Calculate derivatives
-      if (eval_derivative(m_)) return 1;
+      if (eval_derivative(m2_)) return 1;
       // Loop over input indices for color
       for (casadi_int kc = coloring_.colind(c); kc < coloring_.colind(c + 1); ++kc) {
         casadi_int vind = coloring_.row(kc);
@@ -1168,7 +1111,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
                 for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
                   // Get the Jacobian nonzero
                   double J_nz;
-                  get_sens(m_, ind1.at(sp.row(Bk)), &J_nz);
+                  get_sens(m2_, ind1.at(sp.row(Bk)), &J_nz);
                   // Remove nominal value factor
                   J_nz *= inv_nom;
                   // Save to output
