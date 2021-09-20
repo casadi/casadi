@@ -296,9 +296,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // IO scheme, linear combinations
   std::map<std::string, std::vector<size_t>> scheme_, lc_;
 
-  // Memory
-  void* m_;
-
   // Information about function inputs
   std::vector<FmuInput*> in_;
 
@@ -387,13 +384,13 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   static std::string pop_prefix(const std::string& s, std::string* rem = 0);
 
   /** \brief Create memory block */
-  void* alloc_mem2() const { return new FmuMemory(*this); }
+  void* alloc_mem() const override { return new FmuMemory(*this); }
 
   /** \brief Initalize memory block */
-  int init_mem2(void* mem) const;
+  int init_mem(void* mem) const override;
 
   /** \brief Free memory block */
-  void free_mem2(void *mem) const;
+  void free_mem(void *mem) const override;
 
   // Setup experiment
   void setup_experiment(FmuMemory* m) const;

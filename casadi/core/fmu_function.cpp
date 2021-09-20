@@ -213,9 +213,11 @@ fmi2Component FmuFunction::instantiate() const {
   return c;
 }
 
-int FmuFunction::init_mem2(void* mem) const {
+int FmuFunction::init_mem(void* mem) const {
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != 0, "Memory is null");
+  // Instantiate base classes
+  if (FunctionInternal::init_mem(mem)) return 1;
   // DaeBuilder instance
   auto dae = fmu_->dae();
   // Ensure not already instantiated
@@ -256,7 +258,7 @@ int FmuFunction::init_mem2(void* mem) const {
   return 0;
 }
 
-void FmuFunction::free_mem2(void *mem) const {
+void FmuFunction::free_mem(void *mem) const {
   if (mem == 0) {
     casadi_warning("Memory is null");
     return;
@@ -877,8 +879,6 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc)
     : FunctionInternal(name), fmu_(fmu), scheme_(scheme), lc_(lc) {
-  // Initialize to null pointers
-  m_ = 0;
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
@@ -943,8 +943,7 @@ FmuFunction::~FmuFunction() {
   // Free input and output memory structures
   for (FmuInput* e : in_) if (e) delete(e);
   for (FmuOutput* e : out_) if (e) delete(e);
-
-  if (m_) free_mem2(m_);
+  // Decrease reference pointer to Fmu instance
   if (fmu_ && fmu_->counter_-- == 0) delete fmu_;
 }
 
@@ -1049,17 +1048,12 @@ void FmuFunction::init(const Dict& opts) {
   coloring_ = sp_ext_.uni_coloring();
   if (verbose_) casadi_message("Graph coloring: " + str(sp_ext_.size2())
     + " -> " + str(coloring_.size2()) + " directions");
-
-  m_ = alloc_mem2();
-  casadi_assert(m_ != nullptr, "Alloc failed");
-  if (init_mem2(m_)) casadi_error("init_mem failed");
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
   // Get memory struct
-  // FmuMemory* m = static_cast<FmuMemory*>(mem);
-  FmuMemory* m = static_cast<FmuMemory*>(m_);
+  FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != 0, "Memory is null");
   // DaeBuilder instance
   auto dae = fmu_->dae();
