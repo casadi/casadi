@@ -279,12 +279,6 @@ int FmuFunction::eval(FmuMemory* m) const {
     // DaeBuilder instance
     casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
     auto dae = static_cast<DaeBuilderInternal*>(dae_->raw_);
-    // Set all variables before initialization
-    status = set_real_(m->c, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
-    if (status != fmi2OK) {
-      casadi_warning("fmi2SetReal failed");
-      return 1;
-    }
     // Initialization mode begins
     if (enter_initialization_mode(m)) return 1;
     // Get all values
