@@ -66,7 +66,8 @@ std::string Fmu::dll_suffix() {
 #endif
 }
 
-void Fmu::init(const DaeBuilderInternal* dae) {
+void Fmu::init() {
+  auto dae = this->dae();
   std::string instance_name_no_dot = dae->model_identifier_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
   std::string dll_path = dae->path_ + "/binaries/" + system_infix()
@@ -154,8 +155,7 @@ void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
 
 fmi2Component FmuFunction::instantiate() const {
   // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  auto dae = fmu_->dae();
   // Instantiate FMU
   fmi2String instanceName = dae->model_identifier_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
@@ -173,8 +173,7 @@ int FmuFunction::init_mem2(void* mem) const {
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != 0, "Memory is null");
   // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<DaeBuilderInternal*>(dae_->raw_);
+  auto dae = fmu_->dae();
   // Free if already instantiated
   if (m->c != 0) {
     fmu_->free_instance_(m->c);
@@ -318,8 +317,7 @@ void FmuFunction::free_mem2(void *mem) const {
 
 void FmuFunction::setup_experiment(FmuMemory* m) const {
   // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  auto dae = fmu_->dae();
   // Call fmi2SetupExperiment
   fmi2Status status = fmu_->setup_experiment_(m->c, dae->fmutol_ > 0, dae->fmutol_, 0.,
     fmi2True, 1.);
@@ -415,8 +413,7 @@ void FmuFunction::get(FmuMemory* m, size_t id, double* value) const {
 
 void FmuFunction::gather_io(FmuMemory* m) const {
   // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  auto dae = fmu_->dae();
   // Collect input indices and corresponding value references and values
   m->id_in_.clear();
   m->vr_in_.clear();
@@ -492,8 +489,7 @@ int FmuFunction::eval_ad(FmuMemory* m) const {
 
 int FmuFunction::eval_fd(FmuMemory* m) const {
   // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  auto dae = fmu_->dae();
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
@@ -780,13 +776,12 @@ JacOutput::~JacOutput() {
 
 Sparsity JacOutput::sparsity(const FmuFunction& f) const {
   // DaeBuilder instance
-  casadi_assert(f.dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(f.dae_->raw_);
+  auto dae = f.fmu_->dae();
   // Get the Jacobian block
   return dae->jac_sparsity(ind1_, ind2_);
 }
 
-Fmu::Fmu() {
+Fmu::Fmu(const DaeBuilder& dae) : dae_(dae) {
   counter_ = 0;
   instantiate_ = 0;
   free_instance_ = 0;
@@ -801,15 +796,20 @@ Fmu::Fmu() {
   get_directional_derivative_ = 0;
 }
 
-FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
+DaeBuilderInternal* Fmu::dae() const {
+  // Get a pointer to the DaeBuilder class
+  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
+  return static_cast<DaeBuilderInternal*>(dae_->raw_);
+}
+
+FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc)
-    : FunctionInternal(name), dae_(dae), scheme_(scheme), lc_(lc) {
+    : FunctionInternal(name), fmu_(fmu), scheme_(scheme), lc_(lc) {
   // Initialize to null pointers
   m_ = 0;
-  fmu_ = 0;
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
@@ -856,6 +856,7 @@ FmuFunction::FmuFunction(const std::string& name, const DaeBuilder& dae,
   name_in_ = name_in;
   name_out_ = name_out;
   // Default options
+  auto dae = fmu_->dae();
   enable_ad_ = dae->provides_directional_derivative_;
   validate_ad_ = false;
   step_ = 1e-6;
@@ -941,13 +942,7 @@ void FmuFunction::init(const Dict& opts) {
   fd_ = to_enum<FmuFunction::FdMode>(fd_method_, "forward");
 
   // Get a pointer to the DaeBuilder class
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-
-  // Create FMU
-  fmu_ = new Fmu();
-  fmu_->init(dae);
-  fmu_->counter_++;
+  auto dae = fmu_->dae();
 
   // Consistency checks
   if (enable_ad_) casadi_assert(dae->provides_directional_derivative_,
@@ -1040,8 +1035,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   FmuMemory* m = static_cast<FmuMemory*>(m_);
   casadi_assert(m != 0, "Memory is null");
   // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  auto dae = fmu_->dae();
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k]->is_reg()) {
@@ -1177,12 +1171,9 @@ std::string FmuFunction::pop_prefix(const std::string& s, std::string* rem) {
 
 Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
     const std::vector<std::string>& onames, const Dict& opts) const {
-  // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  DaeBuilder dae = shared_cast<DaeBuilder>(const_cast<FmuFunction*>(this)->dae_.shared());
   // Return value
   Function ret;
-  ret.own(new FmuFunction(name, dae, inames, onames, scheme_, lc_));
+  ret.own(new FmuFunction(name, fmu_, inames, onames, scheme_, lc_));
   // Hack: Manually enable finite differenting (pending implementation in class)
   Dict opts2 = opts;
   opts2["enable_fd"] = true;
@@ -1197,8 +1188,7 @@ bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
   // DaeBuilder instance
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  auto dae = fmu_->dae();
   // Get the Jacobian block
   return dae->jac_sparsity(out_.at(oind)->ind(), in_.at(iind)->ind());
 }

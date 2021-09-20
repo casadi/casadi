@@ -208,12 +208,16 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
 // Interface to binary FMU (shared between derivatives)
 struct CASADI_EXPORT Fmu {
   // Constructor
-  Fmu();
+  Fmu(const DaeBuilder& dae);
+
   // Initialize
-  void init(const DaeBuilderInternal* dae);
+  void init();
 
   // Reference counter
   int counter_;
+
+  // DaeBuilder instance (non-owning reference to avoid circular dependency)
+  WeakRef dae_;
 
   // DLL
   Importer li_;
@@ -241,6 +245,9 @@ struct CASADI_EXPORT Fmu {
 
   // Path to the FMU resource directory
   std::string resource_loc_;
+
+  // Get DaeBuilder instance
+  DaeBuilderInternal* dae() const;
 
   // Load an FMI function
   signal_t load_function(const std::string& symname);
@@ -270,8 +277,8 @@ struct CASADI_EXPORT Fmu {
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
-  // DaeBuilder instance (non-owning reference to avoid circular dependency)
-  WeakRef dae_;
+  // FMU (shared between derivative expressions
+  Fmu* fmu_;
 
   // IO scheme, linear combinations
   std::map<std::string, std::vector<size_t>> scheme_, lc_;
@@ -310,7 +317,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   casadi_int n_pert() const;
 
   /** \brief Constructor */
-  FmuFunction(const std::string& name, const DaeBuilder& dae,
+  FmuFunction(const std::string& name, Fmu* fmu,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const std::map<std::string, std::vector<size_t>>& scheme,
@@ -420,9 +427,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Get a derivative
   void get_sens(FmuMemory* m, size_t id, double* value) const;
-
-  // FMU (shared between derivative expressions
-  Fmu* fmu_;
 };
 
 /// Number of entries in enums
