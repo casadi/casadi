@@ -176,7 +176,7 @@ class CASADI_EXPORT JacOutput : public FmuOutput {
 };
 
 // Memory object
-struct FmuMemory {
+struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   // Function object
   const FmuFunction& self;
   // Component memory
@@ -204,7 +204,7 @@ struct FmuMemory {
   // Nominal values
   std::vector<fmi2Real> nominal_out_;
   // Constructor
-  explicit FmuMemory(const FmuFunction& self) : self(self), c(0) {}
+  explicit FmuMemory(const FmuFunction& self) : self(self), c(nullptr) {}
 };
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
@@ -215,8 +215,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // IO scheme, linear combinations
   std::map<std::string, std::vector<size_t>> scheme_, lc_;
 
-  // Memory instance
-  FmuMemory* m2_;
+  // Memory
+  void* m_;
 
   // Information about function inputs
   std::vector<FmuInput*> in_;
@@ -312,9 +312,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Split prefix
   static std::string pop_prefix(const std::string& s, std::string* rem = 0);
 
-  // Initialize
-  void init();
-
   // Load an FMI function
   signal_t load_function(const std::string& symname);
 
@@ -325,11 +322,14 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     fmi2String category,
     fmi2String message, ...);
 
-  // New memory object
-  FmuMemory* checkout();
+  /** \brief Create memory block */
+  void* alloc_mem2() const { return new FmuMemory(*this); }
 
-  // Initialize memory object
+  /** \brief Initalize memory block */
   int init_mem2(void* mem) const;
+
+  /** \brief Free memory block */
+  void free_mem2(void *mem) const;
 
   // New memory object
   fmi2Component instantiate() const;
