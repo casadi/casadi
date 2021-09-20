@@ -127,6 +127,7 @@ struct CASADI_EXPORT Variable {
 /// Internal class for DaeBuilder, see comments on the public class.
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
+  friend class Fmu;
   friend class FmuFunction;
 
  public:

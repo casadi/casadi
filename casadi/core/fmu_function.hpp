@@ -205,6 +205,69 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   explicit FmuMemory(const FmuFunction& self) : self(self), c(nullptr) {}
 };
 
+// Interface to binary FMU (shared between derivatives)
+struct CASADI_EXPORT Fmu {
+  // Constructor
+  Fmu();
+  // Initialize
+  void init(const DaeBuilderInternal* dae);
+
+  // Reference counter
+  int counter_;
+
+  // DLL
+  Importer li_;
+
+  // FMU C API function prototypes. Cf. FMI specification 2.0.2
+  fmi2InstantiateTYPE* instantiate_;
+  fmi2FreeInstanceTYPE* free_instance_;
+  fmi2ResetTYPE* reset_;
+  fmi2SetupExperimentTYPE* setup_experiment_;
+  fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
+  fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
+  fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
+  fmi2GetRealTYPE* get_real_;
+  fmi2SetRealTYPE* set_real_;
+  fmi2GetBooleanTYPE* get_boolean_;
+  fmi2SetBooleanTYPE* set_boolean_;
+  fmi2GetIntegerTYPE* get_integer_;
+  fmi2SetIntegerTYPE* set_integer_;
+  fmi2GetStringTYPE* get_string_;
+  fmi2SetStringTYPE* set_string_;
+  fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
+
+  // Callback functions
+  fmi2CallbackFunctions functions_;
+
+  // Path to the FMU resource directory
+  std::string resource_loc_;
+
+  // Load an FMI function
+  signal_t load_function(const std::string& symname);
+
+  // Reset solver
+  int reset(FmuMemory* m);
+
+  // Enter initialization mode
+  int enter_initialization_mode(FmuMemory* m) const;
+
+  // Exit initialization mode
+  int exit_initialization_mode(FmuMemory* m) const;
+
+  // Name of system, per the FMI specification
+  static std::string system_infix();
+
+  // DLL suffix, per the FMI specification
+  static std::string dll_suffix();
+
+  // Process message
+  static void logger(fmi2ComponentEnvironment componentEnvironment,
+    fmi2String instanceName,
+    fmi2Status status,
+    fmi2String category,
+    fmi2String message, ...);
+};
+
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
   // DaeBuilder instance (non-owning reference to avoid circular dependency)
@@ -310,16 +373,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Split prefix
   static std::string pop_prefix(const std::string& s, std::string* rem = 0);
 
-  // Load an FMI function
-  signal_t load_function(const std::string& symname);
-
-  // Process message
-  static void logger(fmi2ComponentEnvironment componentEnvironment,
-    fmi2String instanceName,
-    fmi2Status status,
-    fmi2String category,
-    fmi2String message, ...);
-
   /** \brief Create memory block */
   void* alloc_mem2() const { return new FmuMemory(*this); }
 
@@ -329,20 +382,11 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /** \brief Free memory block */
   void free_mem2(void *mem) const;
 
-  // New memory object
-  fmi2Component instantiate() const;
-
   // Setup experiment
   void setup_experiment(FmuMemory* m) const;
 
-  // Reset solver
-  int reset(FmuMemory* m);
-
-  // Enter initialization mode
-  int enter_initialization_mode(FmuMemory* m) const;
-
-  // Exit initialization mode
-  int exit_initialization_mode(FmuMemory* m) const;
+  // New memory object
+  fmi2Component instantiate() const;
 
   // Set value
   void set(FmuMemory* m, size_t id, double value) const;
@@ -377,38 +421,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Get a derivative
   void get_sens(FmuMemory* m, size_t id, double* value) const;
 
-  // Name of system, per the FMI specification
-  static std::string system_infix();
-
-  // DLL suffix, per the FMI specification
-  static std::string dll_suffix();
-
-  // DLL
-  Importer li_;
-
-  // FMU C API function prototypes. Cf. FMI specification 2.0.2
-  fmi2InstantiateTYPE* instantiate_;
-  fmi2FreeInstanceTYPE* free_instance_;
-  fmi2ResetTYPE* reset_;
-  fmi2SetupExperimentTYPE* setup_experiment_;
-  fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
-  fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
-  fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
-  fmi2GetRealTYPE* get_real_;
-  fmi2SetRealTYPE* set_real_;
-  fmi2GetBooleanTYPE* get_boolean_;
-  fmi2SetBooleanTYPE* set_boolean_;
-  fmi2GetIntegerTYPE* get_integer_;
-  fmi2SetIntegerTYPE* set_integer_;
-  fmi2GetStringTYPE* get_string_;
-  fmi2SetStringTYPE* set_string_;
-  fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
-
-  // Callback functions
-  fmi2CallbackFunctions functions_;
-
-  // Path to the FMU resource directory
-  std::string resource_loc_;
+  // FMU (shared between derivative expressions
+  Fmu* fmu_;
 };
 
 /// Number of entries in enums
