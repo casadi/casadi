@@ -154,7 +154,7 @@ void FmuFunction::logger(fmi2ComponentEnvironment componentEnvironment,
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 
-fmi2Component FmuFunction::instantiate() {
+fmi2Component FmuFunction::instantiate() const {
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
@@ -172,16 +172,14 @@ fmi2Component FmuFunction::instantiate() {
 }
 
 FmuMemory* FmuFunction::checkout() {
+  return new FmuMemory(*this);
+}
+
+int FmuFunction::init_mem2(void* mem) const {
+  FmuMemory* m = static_cast<FmuMemory*>(mem);
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
-  // Memory object
-  FmuMemory* m = new FmuMemory(*this);
-  // Mark as in use
-  casadi_assert(m->counter == 0, "Memory object is already in use");
-  m->counter++;
-  // Assign function
-  m->fun = this;
   // Make sure not already instantiated
   casadi_assert(m->c == 0, "Already instantiated");
   // Create instance
@@ -192,9 +190,7 @@ FmuMemory* FmuFunction::checkout() {
   if (!vr_real_.empty()) {
     fmi2Status status = set_real_(m->c, get_ptr(vr_real_), vr_real_.size(), get_ptr(v_real_));
     if (status != fmi2OK) {
-      casadi_warning("fmi2SetReal failed");
-      delete m;
-      return 0;
+      casadi_error("fmi2SetReal failed");
     }
   }
   // Pass integer values before initialization (also enums)
@@ -202,9 +198,7 @@ FmuMemory* FmuFunction::checkout() {
     fmi2Status status = set_integer_(m->c, get_ptr(vr_integer_), vr_integer_.size(),
       get_ptr(v_integer_));
     if (status != fmi2OK) {
-      casadi_warning("fmi2SetInteger failed");
-      delete m;
-      return 0;
+      casadi_error("fmi2SetInteger failed");
     }
   }
   // Pass boolean values before initialization
@@ -212,9 +206,7 @@ FmuMemory* FmuFunction::checkout() {
     fmi2Status status = set_boolean_(m->c, get_ptr(vr_boolean_), vr_boolean_.size(),
       get_ptr(v_boolean_));
     if (status != fmi2OK) {
-      casadi_warning("fmi2SetBoolean failed");
-      delete m;
-      return 0;
+      casadi_error("fmi2SetBoolean failed");
     }
   }
   // Pass string valeus before initialization
@@ -223,9 +215,7 @@ FmuMemory* FmuFunction::checkout() {
     fmi2String value = v_string_[k].c_str();
     fmi2Status status = set_string_(m->c, &vr, 1, &value);
     if (status != fmi2OK) {
-      casadi_warning("fmi2SetString failed for value reference " + str(vr));
-      delete m;
-      return 0;
+      casadi_error("fmi2SetString failed for value reference " + str(vr));
     }
   }
   // Always initialize before first call
@@ -244,11 +234,11 @@ FmuMemory* FmuFunction::checkout() {
   std::fill(m->requested_.begin(), m->requested_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
   m->wrt_.resize(dae->variables_.size());
-  // Return memory object
-  return m;
+  // Successful return
+  return 0;
 }
 
-void FmuFunction::setup_experiment(FmuMemory* m) {
+void FmuFunction::setup_experiment(FmuMemory* m) const {
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
   auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
@@ -1030,6 +1020,7 @@ void FmuFunction::init(const Dict& opts) {
   init();
   // Create instance
   m2_ = checkout();
+  if (init_mem2(m2_)) casadi_error("init_mem failed");
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,

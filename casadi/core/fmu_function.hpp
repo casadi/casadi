@@ -181,10 +181,6 @@ struct FmuMemory {
   const FmuFunction& self;
   // Component memory
   fmi2Component c;
-  // FmuFunction instance
-  const FmuFunction* fun;
-  // Number of owning references
-  int counter;
   // Need to initialize
   bool need_init;
   // Value buffer
@@ -208,7 +204,7 @@ struct FmuMemory {
   // Nominal values
   std::vector<fmi2Real> nominal_out_;
   // Constructor
-  explicit FmuMemory(const FmuFunction& self) : self(self), c(0), counter(0) {}
+  explicit FmuMemory(const FmuFunction& self) : self(self), c(0) {}
 };
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
@@ -332,11 +328,14 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // New memory object
   FmuMemory* checkout();
 
+  // Initialize memory object
+  int init_mem2(void* mem) const;
+
   // New memory object
-  fmi2Component instantiate();
+  fmi2Component instantiate() const;
 
   // Setup experiment
-  void setup_experiment(FmuMemory* m);
+  void setup_experiment(FmuMemory* m) const;
 
   // Reset solver
   int reset(FmuMemory* m);
