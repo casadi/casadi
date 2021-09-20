@@ -129,7 +129,7 @@ int FmuFunction::init_mem2(void* mem) const {
   casadi_assert(m != 0, "Memory is null");
   // DaeBuilder instance
   casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  auto dae = static_cast<const DaeBuilderInternal*>(dae_->raw_);
+  auto dae = static_cast<DaeBuilderInternal*>(dae_->raw_);
   // Free if already instantiated
   if (m->c != 0) {
     free_instance_(m->c);
@@ -175,8 +175,6 @@ int FmuFunction::init_mem2(void* mem) const {
       casadi_error("fmi2SetString failed for value reference " + str(vr));
     }
   }
-  // Always initialize before first call
-  m->need_init = true;
   // Allocate/reset value buffer
   m->buffer_.resize(dae->variables_.size());
   std::fill(m->buffer_.begin(), m->buffer_.end(), casadi::nan);
@@ -191,6 +189,73 @@ int FmuFunction::init_mem2(void* mem) const {
   std::fill(m->requested_.begin(), m->requested_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
   m->wrt_.resize(dae->variables_.size());
+  // Initialization mode begins
+  if (enter_initialization_mode(m)) return 1;
+  // Get all values
+  for (Variable& v : dae->variables_) {
+    // Convert to expected type
+    fmi2ValueReference vr = v.value_reference;
+    // Get value
+    switch (v.type) {
+      // Skip if the wrong type
+      if (v.causality == Variable::PARAMETER || v.causality == Variable::INPUT) continue;
+      // Get by type
+      case Variable::REAL:
+        {
+          // Real
+          fmi2Real value;
+          fmi2Status status = get_real_(m->c, &vr, 1, &value);
+          if (status != fmi2OK) {
+            casadi_warning("fmi2GetReal failed for " + v.name);
+            return 1;
+          }
+          v.value = value;
+          break;
+        }
+      case Variable::INTEGER:
+      case Variable::ENUM:
+        {
+          // Integer: Convert to double
+          fmi2Integer value;
+          fmi2Status status = get_integer_(m->c, &vr, 1, &value);
+          if (status != fmi2OK) {
+            casadi_warning("fmi2GetInteger failed for " + v.name);
+            return 1;
+          }
+          v.value = value;
+          break;
+        }
+      case Variable::BOOLEAN:
+        {
+          // Boolean: Convert to double
+          fmi2Boolean value;
+          fmi2Status status = get_boolean_(m->c, &vr, 1, &value);
+          if (status != fmi2OK) {
+            casadi_warning("fmi2GetBoolean failed for " + v.name);
+            return 1;
+          }
+          v.value = value;
+          break;
+        }
+      case Variable::STRING:
+        {
+          // String
+          fmi2String value;
+          fmi2Status status = get_string_(m->c, &vr, 1, &value);
+          if (status != fmi2OK) {
+            casadi_warning("fmi2GetString failed for " + v.name);
+            return 1;
+          }
+          v.stringvalue = value;
+          v.value = 0;
+          break;
+        }
+      default:
+        casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
+    }
+  }
+  // Initialization mode ends
+  if (exit_initialization_mode(m)) return 1;
   // Successful return
   return 0;
 }
@@ -274,81 +339,6 @@ int FmuFunction::eval(FmuMemory* m) const {
   size_t n_out = m->id_out_.size();
   // Fmi return flag
   fmi2Status status;
-  // Initialize, if needed
-  if (m->need_init) {
-    // DaeBuilder instance
-    casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-    auto dae = static_cast<DaeBuilderInternal*>(dae_->raw_);
-    // Initialization mode begins
-    if (enter_initialization_mode(m)) return 1;
-    // Get all values
-    for (Variable& v : dae->variables_) {
-      // Convert to expected type
-      fmi2ValueReference vr = v.value_reference;
-      // Get value
-      switch (v.type) {
-        // Skip if the wrong type
-        if (v.causality == Variable::PARAMETER || v.causality == Variable::INPUT) continue;
-
-        case Variable::REAL:
-          {
-            // Real
-            fmi2Real value;
-            status = get_real_(m->c, &vr, 1, &value);
-            if (status != fmi2OK) {
-              casadi_warning("fmi2GetReal failed for " + v.name);
-              return 1;
-            }
-            v.value = value;
-            break;
-          }
-        case Variable::INTEGER:
-        case Variable::ENUM:
-          {
-            // Integer: Convert to double
-            fmi2Integer value;
-            status = get_integer_(m->c, &vr, 1, &value);
-            if (status != fmi2OK) {
-              casadi_warning("fmi2GetInteger failed for " + v.name);
-              return 1;
-            }
-            v.value = value;
-            break;
-          }
-        case Variable::BOOLEAN:
-          {
-            // Boolean: Convert to double
-            fmi2Boolean value;
-            status = get_boolean_(m->c, &vr, 1, &value);
-            if (status != fmi2OK) {
-              casadi_warning("fmi2GetBoolean failed for " + v.name);
-              return 1;
-            }
-            v.value = value;
-            break;
-          }
-        case Variable::STRING:
-          {
-            // String
-            fmi2String value;
-            status = get_string_(m->c, &vr, 1, &value);
-            if (status != fmi2OK) {
-              casadi_warning("fmi2GetString failed for " + v.name);
-              return 1;
-            }
-            v.stringvalue = value;
-            v.value = 0;
-            break;
-          }
-        default:
-          casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
-      }
-    }
-    // Initialization mode ends
-    if (exit_initialization_mode(m)) return 1;
-    // Initialized
-    m->need_init = false;
-  }
   // Set all variables
   status = set_real_(m->c, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
   if (status != fmi2OK) {

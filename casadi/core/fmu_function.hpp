@@ -181,8 +181,6 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   const FmuFunction& self;
   // Component memory
   fmi2Component c;
-  // Need to initialize
-  bool need_init;
   // Value buffer
   std::vector<double> buffer_;
   // Sensitivities
