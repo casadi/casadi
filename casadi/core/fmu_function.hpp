@@ -246,6 +246,13 @@ struct CASADI_EXPORT Fmu {
   // Path to the FMU resource directory
   std::string resource_loc_;
 
+  // Variables used for initialization, by type
+  std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;
+  std::vector<fmi2Real> v_real_;
+  std::vector<fmi2Integer> v_integer_;
+  std::vector<fmi2Boolean> v_boolean_;
+  std::vector<std::string> v_string_;
+
   // Get DaeBuilder instance
   DaeBuilderInternal* dae() const;
 
@@ -260,6 +267,12 @@ struct CASADI_EXPORT Fmu {
 
   // Exit initialization mode
   int exit_initialization_mode(FmuMemory* m) const;
+
+  // Retrieve values from DaeBuilder, copy to FMU
+  int set_values(FmuMemory* m) const;
+
+  // Retrieve values from FMU, copy to DaeBuilder
+  int get_values(FmuMemory* m) const;
 
   // Name of system, per the FMI specification
   static std::string system_infix();
@@ -305,13 +318,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // FD method as an enum
   FdMode fd_;
-
-  // Variables used for initialization, by type
-  std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;
-  std::vector<fmi2Real> v_real_;
-  std::vector<fmi2Integer> v_integer_;
-  std::vector<fmi2Boolean> v_boolean_;
-  std::vector<std::string> v_string_;
 
   // Number of perturbations
   casadi_int n_pert() const;
