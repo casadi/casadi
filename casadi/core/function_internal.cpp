@@ -317,7 +317,10 @@ namespace casadi {
         "Indicate for each input if it should be differentiable."}},
       {"is_diff_out",
        {OT_BOOLVECTOR,
-        "Indicate for each output if it should be differentiable."}}
+        "Indicate for each output if it should be differentiable."}},
+      {"data_type",
+       {OT_STRINGVECTOR,
+        "Data types"}}
      }
   };
 
@@ -375,6 +378,7 @@ namespace casadi {
     opts["dump"] = dump_;
     opts["forward_options"] = forward_options_;
     opts["reverse_options"] = reverse_options_;
+    opts["data_type"] = data_type_;
     if (keep_dim) {
       opts["is_diff_in"] = is_diff_in_;
       opts["is_diff_out"] = is_diff_out_;
@@ -472,6 +476,8 @@ namespace casadi {
         is_diff_in_ = op.second;
       } else if (op.first=="is_diff_out") {
         is_diff_out_ = op.second;
+      } else if (op.first=="data_type") {
+        data_type_ = op.second;
       }
     }
 
@@ -2136,21 +2142,29 @@ namespace casadi {
       if (e>1) vectorize = true;
     }
 
-    std::string sig = signature(fname); 
+    bool prefer_inline = inst.prefer_inline;
+    uout() << fname << ":" << name_ << ":" << prefer_inline << std::endl;
+
+    std::string sig = signature(fname);
+    std::string decl = sig;
 
     if (vectorize) {
       if (is_a("SXFunction", false)) {
         sig = signature(fname, true);
-        g << "#pragma omp declare simd uniform(arg, res, iw, w) linear(i:1) simdlen(" << GlobalOptions::vector_width_real << ") notinbranch\n";
-        g << "__attribute__((noinline)) " << g.vector_width_attribute() << " " << sig << " {\n";
+        std::string omp = "#pragma omp declare simd uniform(arg, res, iw, w) linear(i:1) simdlen(" + str(GlobalOptions::vector_width_real) + ") notinbranch\n";
+        decl = omp + "static " + sig;
+        g << omp;
+        if (!prefer_inline) g << "__attribute__((noinline)) ";
+        g << g.vector_width_attribute() << " " << sig << " {\n";
       } else {
-        g << "" << sig << " {\n";
+        g << sig << " {\n";
       }
     } else {
+      if (!prefer_inline) g << "__attribute__((noinline)) ";
       if (is_a("MapSum", false)) {
-        g << "__attribute__((noinline)) " << g.vector_width_attribute() << " " << sig << " {\n";
+        g << g.vector_width_attribute() << " " << sig << " {\n";
       } else {
-        g << "__attribute__((noinline)) " << sig << " {\n";
+        g << sig << " {\n";
       }
     }
 
@@ -2172,9 +2186,9 @@ namespace casadi {
 
     // Flush to function body
     g.flush(s);
-    g.body_parts[fname] = s.str();
+    g.body_parts[codegen_name(g, false)] = s.str();
 
-    g.casadi_headers << sig << ";\n";
+    g.casadi_headers << decl << ";\n";
 
   }
 
@@ -3723,6 +3737,7 @@ namespace casadi {
     s.pack("FunctionInternal::align_w", align_w_);
     s.pack("FunctionInternal::layout_in", layout_in_);
     s.pack("FunctionInternal::layout_out", layout_out_);
+    s.pack("FunctionInternal::data_type", data_type_);
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
@@ -3825,6 +3840,7 @@ namespace casadi {
       s.unpack("FunctionInternal::align_w", align_w_);
       s.unpack("FunctionInternal::layout_in", layout_in_);
       s.unpack("FunctionInternal::layout_out", layout_out_);
+      s.unpack("FunctionInternal::data_type", data_type_);
     } else {
       align_w_ = 1;
     }

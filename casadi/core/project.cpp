@@ -92,7 +92,7 @@ namespace casadi {
 
   void Project::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
+                          const std::vector<casadi_int>& res, bool prefer_inline) const {
     g << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
                            g.work(res.front(), nnz()), sparsity(), "w") << "\n";
   }
@@ -129,7 +129,7 @@ namespace casadi {
 
   void Densify::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
+                          const std::vector<casadi_int>& res, bool prefer_inline) const {
 
       casadi_int nrow_x, ncol_x, i, el;
       const casadi_int *colind_x, *row_x;
@@ -206,7 +206,7 @@ namespace casadi {
 
   void Sparsify::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
+                          const std::vector<casadi_int>& res, bool prefer_inline) const {
     g << g.sparsify(g.work(arg.front(), dep().nnz()),
                            g.work(res.front(), nnz()), sparsity()) << "\n";
   }

@@ -483,7 +483,7 @@ namespace casadi {
 
   void GetNonzerosVector::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Codegen the indices
     string ind = g.constant(nz_);
 
@@ -553,7 +553,7 @@ namespace casadi {
 
   void GetNonzerosSlice::generate(CodeGenerator& g,
                                   const std::vector<casadi_int>& arg,
-                                  const std::vector<casadi_int>& res) const {
+                                  const std::vector<casadi_int>& res, bool prefer_inline) const {
     g.local("rr", "casadi_real", "*");
     g.local("ss", "const casadi_real", "*");
     // Simplify for scalar case
@@ -564,7 +564,7 @@ namespace casadi {
 
   void GetNonzerosSlice2::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res, bool prefer_inline) const {
     g.local("rr", "casadi_real", "*");
     g.local("ss", "const casadi_real", "*");
     g.local("tt", "const casadi_real", "*");

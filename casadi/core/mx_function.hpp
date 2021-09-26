@@ -52,6 +52,9 @@ namespace casadi {
 
     /// Work vector indices of the results
     std::vector<casadi_int> res;
+
+    /// Data type
+    std::string data_type;
   };
 #endif // SWIG
 
@@ -71,6 +74,7 @@ namespace casadi {
     /** \brief Offsets for elements in the w_ vector */
     std::vector<casadi_int> workloc_;
     std::vector<casadi_int> workloc_sz_self_;
+    std::vector<std::string> worktype_;
 
     /** \brief Offset for the 'extra' working memory (non-io) */
     size_t w_extra_offset_;

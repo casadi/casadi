@@ -34,6 +34,8 @@
  */
 
 #include "casadi/casadi.hpp"
+#include <iostream>
+
 
 using namespace casadi;
 using namespace std;
@@ -53,6 +55,13 @@ void print_binary(bvec_t v){
 }
 
 int main(){
+
+  std::stringstream preamble;
+  for (int i = 0;i<1000;++i) {
+    preamble << "foo bar baz\n";
+  }
+  uout() << preamble.str() << "stop" << std::endl;
+
   // Test both SX and MX
   for(int test=0; test<2; ++test){
 

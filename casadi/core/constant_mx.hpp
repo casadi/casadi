@@ -180,7 +180,8 @@ namespace casadi {
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  bool prefer_inline=false) const override;
 
     /** \brief  Check if a particular integer value */
     bool is_zero() const override;
@@ -258,10 +259,11 @@ namespace casadi {
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  bool prefer_inline=false) const override;
 
     /** \brief Add a dependent function */
-    void add_dependency(CodeGenerator& g, const Instance& inst) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const override;
 
     /** \brief file to read from */
     std::string fname_;
@@ -318,7 +320,7 @@ namespace casadi {
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override {}
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override {}
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override { return 0;}
@@ -436,7 +438,7 @@ namespace casadi {
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief  Check if a particular integer value */
     bool is_zero() const override { return v_.value==0;}
@@ -653,7 +655,7 @@ namespace casadi {
   template<typename Value>
   void Constant<Value>::generate(CodeGenerator& g,
                                  const std::vector<casadi_int>& arg,
-                                 const std::vector<casadi_int>& res) const {
+                                 const std::vector<casadi_int>& res, bool prefer_inline) const {
     if (nnz()==0) {
       // Quick return
     } else if (nnz()==1) {

@@ -109,7 +109,7 @@ namespace casadi {
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Quick return if nothing to do
     if (nnz()==0) return;
 

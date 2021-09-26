@@ -833,7 +833,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosVector<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
@@ -864,7 +864,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosSlice<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
@@ -884,7 +884,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosSlice2<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),

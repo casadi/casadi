@@ -506,7 +506,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosParam<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
@@ -517,7 +517,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosParamVector<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     SetNonzerosParam<Add>::generate(g, arg, res);
 
     casadi_int n = this->dep(1).nnz();
@@ -535,7 +535,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosParamSlice<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     SetNonzerosParam<Add>::generate(g, arg, res);
 
     casadi_int n = this->dep(1).nnz();
@@ -559,7 +559,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosSliceParam<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     SetNonzerosParam<Add>::generate(g, arg, res);
 
     casadi_int n = this->dep(1).nnz();
@@ -585,7 +585,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosParamParam<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
     SetNonzerosParam<Add>::generate(g, arg, res);
     casadi_int n = this->dep(1).nnz();
     casadi_int n_outer = this->dep(3).nnz();

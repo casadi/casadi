@@ -767,6 +767,8 @@ namespace casadi {
       Dict options = opts;
       options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
       options["is_diff_out"] = is_diff_out_;
+      if (!data_type_.empty())
+      options["data_type"] = join(data_type_, std::vector<std::string>(n_in_+n_out_, "any"));
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {

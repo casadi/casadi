@@ -205,14 +205,24 @@ namespace casadi {
     return ret;
   }
 
-  string CodeGenerator::add_dependency(const Function& f, const Instance& inst) {
+  string CodeGenerator::add_dependency(const Function& f, const Instance& inst, const Function& owner) {
 
     /*std::string prefix = "_";
     for (bool b : arg_null) prefix+= b ? 'n' : 'r';
     prefix += "_";
     for (bool b : res_null) prefix+= b ? 'n' : 'r';*/
     // Quick return if it already exists
-    for (auto&& e : added_functions_) if (e.f==f && e.inst==inst) return e.codegen_name;
+    for (auto&& e : added_functions_) if (e.f==f && e.inst==inst) {
+      if (inst.prefer_inline && !owner.is_null()) {
+      std::set<std::string>& dep = dependees_[owner->codegen_name(*this, false)];
+      dep.insert(f->codegen_name(*this, false));
+      // Add recursively
+      for (const auto& e : dependees_[f->codegen_name(*this, false)]) {
+        dep.insert(e);
+      }
+    }
+      return e.codegen_name;
+    }
 
     // Give it a name
     string fname = shorthand("f" + str(added_functions_.size()));
@@ -220,14 +230,25 @@ namespace casadi {
     // Add to list of functions
     added_functions_.push_back({f, fname, inst});
 
+    std::stringstream s;
+    // Reset local variables, flush buffer
+    flush(s);
+
     // Generate declarations
     f->codegen_declarations(*this, inst);
 
+    comment("dependees: " + str(dependees_[f->codegen_name(*this, false)]));
 
-    comment("inst: " + str(inst.arg_null) + ":" + str(inst.res_null) + str(inst.stride_in) + str(inst.stride_out));
+    comment("inst: " + str(inst.arg_null) + ":" + str(inst.res_null) + str(inst.stride_in) + str(inst.stride_out) + str(inst.prefer_inline));
+
+    // Flush to function body
+    flush(s);
+    std::string declarations = s.str();
 
     // Print to file
     f->codegen(*this, fname, inst);
+
+    body_parts[f->codegen_name(*this, false)] = declarations + body_parts[f->codegen_name(*this, false)];
 
     // Codegen reference count functions, if needed
     if (f->has_refcount_) {
@@ -310,6 +331,13 @@ namespace casadi {
       *this << "}\n\n";
     }
 
+    if (inst.prefer_inline && !owner.is_null()) {
+      std::set<std::string>& dep = dependees_[owner->codegen_name(*this, false)];
+      dep.insert(f->codegen_name(*this, false));
+      for (const auto& e : dependees_[f->codegen_name(*this, false)]) {
+        dep.insert(e);
+      }
+    }
     return fname;
   }
 
@@ -322,6 +350,7 @@ namespace casadi {
     inst.res_null.resize(f.n_out(), false);
     inst.stride_in.resize(f.n_in(), 1);
     inst.stride_out.resize(f.n_out(), 1);
+    inst.prefer_inline = false;
     string codegen_name = add_dependency(f, inst);
 
     if (f.align_w()>1) {
@@ -534,6 +563,19 @@ namespace casadi {
       // Finalize file
       file_close(s);
     }
+
+    // Add in dependencees into parts
+    /*for (casadi_int i=added_functions_.size()-1;i>=0;--i) {
+      std::string key = "f"+str(i);
+      auto it = dependees_.find(key);
+      if (it!=dependees_.end()) {
+        std::stringstream preamble;
+        for (const std::string& d : it->second) {
+          preamble << body_parts[d];
+        }
+        body_parts[key] = preamble.str() + body_parts[key];
+      }
+    }*/
     
     for (const auto& e : body_parts) {
       // Create c file
@@ -541,8 +583,14 @@ namespace casadi {
       string fullname = prefix + this->name + "_" + e.first + this->suffix;
       file_open(s, fullname);
 
+      stringstream tmp;
+      for (const std::string& d : dependees_[e.first]) {
+        tmp << body_parts[d];
+      }
+      tmp << e.second;
+
       // Dump code to file
-      dump(s, e.second);
+      dump(s, tmp.str());
 
       // Finalize file
       file_close(s);
@@ -551,6 +599,14 @@ namespace casadi {
 
     }
     return join(part_names,";");
+  }
+
+  void CodeGenerator::add_extra_declarations(const Function& f, const std::string& extra) {
+    body_parts[f->codegen_name(*this, false)] = extra + body_parts[f->codegen_name(*this, false)];
+  }
+
+  void CodeGenerator::add_extra_definitions(const Function& f, const std::string& extra) {
+    this->header << extra;
   }
 
   void CodeGenerator::generate_mex(std::ostream &s) const {
@@ -724,7 +780,7 @@ namespace casadi {
     // Print integer constants
     if (!integer_constants_.empty()) {
       for (casadi_int i=0; i<integer_constants_.size(); ++i) {
-        print_vector(s, "casadi_s" + str(i), integer_constants_[i], 1, true);
+        print_vector(s, "casadi_s" + str(i), integer_constants_[i], 1, false);
       }
       s << endl;
     }
@@ -732,7 +788,7 @@ namespace casadi {
     // Print double constants
     if (!double_constants_.empty()) {
       for (casadi_int i=0; i<double_constants_.size(); ++i) {
-        print_vector(s, "casadi_c" + str(i), double_constants_[i], 1, true);
+        print_vector(s, "casadi_c" + str(i), double_constants_[i], 1, false);
       }
       s << endl;
     }

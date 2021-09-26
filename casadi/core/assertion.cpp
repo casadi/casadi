@@ -101,7 +101,7 @@ namespace casadi {
 
   void Assertion::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Generate assertion
     g << "if (" << g.workel(arg[1]) << "!=1.) {\n"
       << "    /* " << fail_message_ << " */\n"

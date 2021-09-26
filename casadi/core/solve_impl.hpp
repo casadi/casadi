@@ -262,7 +262,7 @@ namespace casadi {
   template<bool Tr>
   void LinsolCall<Tr>::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
 
@@ -425,7 +425,7 @@ namespace casadi {
 
   template<bool Tr>
   void TriuSolve<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const {
+      const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
     // Copy first argument if not inplace
@@ -439,7 +439,7 @@ namespace casadi {
 
   template<bool Tr>
   void TrilSolve<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const {
+      const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
     // Copy first argument if not inplace
@@ -453,7 +453,7 @@ namespace casadi {
 
   template<bool Tr>
   void TriuSolveUnity<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const {
+      const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
     // Copy first argument if not inplace
@@ -467,7 +467,7 @@ namespace casadi {
 
   template<bool Tr>
   void TrilSolveUnity<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const {
+      const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
     // Copy first argument if not inplace

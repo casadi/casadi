@@ -173,11 +173,11 @@ namespace casadi {
     return fcn_.rev(arg, res, iw, w);
   }
 
-  void Call::add_dependency(CodeGenerator& g, const Instance& inst) const {
+  void Call::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
     Instance local = inst;
     local.stride_in.resize(fcn_.n_in(), 1);
     local.stride_out.resize(fcn_.n_out(), 1);
-    g.add_dependency(fcn_, local);
+    g.add_dependency(fcn_, local, owner);
   }
 
   bool Call::has_refcount() const {
@@ -185,7 +185,8 @@ namespace casadi {
   }
 
   void Call::generate(CodeGenerator& g,
-                      const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
+                      const vector<casadi_int>& arg, const vector<casadi_int>& res,
+                      bool prefer_inline) const {
     std::vector<bool> arg_null, res_null;
     // Collect input arguments
     g.local("arg1", "const casadi_real", "**");
@@ -206,6 +207,7 @@ namespace casadi {
     Instance inst = {arg_null, res_null};
     inst.stride_in.resize(fcn_.n_in(), 1);
     inst.stride_out.resize(fcn_.n_out(), 1);
+    inst.prefer_inline = prefer_inline;
 
     // Call function
     std::string flag = g(fcn_, "arg1", "res1", "iw", "w", inst);

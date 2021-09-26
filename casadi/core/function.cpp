@@ -874,6 +874,10 @@ namespace casadi {
     return (*this)->name_out_;
   }
 
+  const std::vector<std::string>& Function::data_type() const {
+    return (*this)->data_type_;    
+  }
+
   casadi_int Function::index_in(const string &name) const {
     try {
       return (*this)->index_in(name);

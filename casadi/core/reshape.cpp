@@ -95,7 +95,7 @@ namespace casadi {
 
   void Reshape::generate(CodeGenerator& g,
                          const std::vector<casadi_int>& arg,
-                         const std::vector<casadi_int>& res) const {
+                         const std::vector<casadi_int>& res, bool prefer_inline) const {
     if (arg[0]==res[0]) return;
     g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
   }

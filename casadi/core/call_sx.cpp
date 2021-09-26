@@ -67,12 +67,13 @@ namespace casadi {
     }
   }
 
-  std::string CallSX::codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w) {
+  std::string CallSX::codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w, const Function& owner) {
     const FunRef* n = dynamic_cast<const FunRef*>(funref.get());
     const Function& f = n->f_;
     Instance local = inst;
     local.stride_in.resize(f.n_in(), 1);
     local.stride_out.resize(f.n_out(), 1);
+    local.prefer_inline = true;
     /*g << "#pragma omp ordered simd\n";
     g << "{\n";
     g << "(" << arg << ")[0] = &" << g.sx_work(i1) << ";\n";
@@ -80,22 +81,28 @@ namespace casadi {
     g << g(f_, arg, res, iw, w);
     g << ";}";*/
 
-    std::string fname = g.add_dependency(f, local);
+    std::string fname = g.add_dependency(f, local, owner);
     std::string name = fname+"_wrap";
     return g.sx_work(i0) + "=" + name + "(" + g.sx_work(i1) + "," + g.sx_work(i2) + ")";
   }
 
-  void CallSX::codegen_dependency(CodeGenerator& g, const Function& f, const Instance& inst) {
+  void CallSX::codegen_dependency(CodeGenerator& g, const Function& f, const Instance& inst, const Function& owner) {
     bool added = g.has_dependency(f, inst);
+
+    std::string fname = g.add_dependency(f, inst, owner);
     if (!added) {
-      std::string fname = g.add_dependency(f, inst);
+
 
       std::string name = fname+"_wrap";
 
-      g << "#pragma omp declare simd simdlen("<< GlobalOptions::vector_width_real << ")\n";
+      //g.register_extra(this,f, inst, "code", inline);
+
+      std::stringstream s;
+      g.flush(s);
+      g << "#pragma omp declare simd simdlen("<< GlobalOptions::vector_width_real << ") notinbranch\n";
       // 'const' is needed to vectorize succesfully; 'pure' is not enough in some circumstances
       // __attribute__((optimize("-O0")))
-      g << "static __attribute__((noinline)) __attribute__((const)) " << g.vector_width_attribute() << " casadi_real " << name << "(casadi_real index, casadi_real a) {\n";
+      g << "__attribute__((noinline)) __attribute__((const)) " << g.vector_width_attribute() << " casadi_real " << name << "(casadi_int index, casadi_real a) {\n";
       g << "const casadi_real* arg[" << f.sz_arg() << "];\n";
       g << "casadi_real* res[" << f.sz_res() << "];\n";
       g << "casadi_int iw[" << f.sz_iw() << "];\n";
@@ -104,13 +111,18 @@ namespace casadi {
       if (f.nnz_in()==1) { 
         g << "arg[0] = &a;\n";
       } else {
-        g << "arg[0] = &index;\n";
+        g << "arg[0] = (double*) &index;\n";
         g << "arg[1] = &a;\n";
       }
       g << "res[0] = &r;\n";
       g << g(f, "arg", "res", "iw", "w",  inst) << ";\n";
       g << "return r;\n";
       g << "}\n";
+
+      g.flush(s);
+
+      g.add_extra_declarations(f, s.str());
+      g.add_extra_definitions(f, s.str());
     }
   }
 

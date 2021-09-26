@@ -75,7 +75,7 @@ namespace casadi {
 
   void Find::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res, bool prefer_inline) const {
     casadi_int nnz = dep(0).nnz();
     g.local("i", "casadi_int");
     g.local("cr", "const casadi_real", "*");

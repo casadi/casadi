@@ -984,6 +984,8 @@ namespace casadi {
     std::vector<Layout> layout_in_, layout_out_;
     std::vector<casadi_int> stride_in_, stride_out_;
 
+    std::vector<std::string> data_type_;
+
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 

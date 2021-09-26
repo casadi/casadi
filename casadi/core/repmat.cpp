@@ -96,7 +96,7 @@ namespace casadi {
 
   void HorzRepmat::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res, bool prefer_inline) const {
     casadi_int nnz = dep(0).nnz();
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << n_ << ";++i) {\n"
@@ -177,7 +177,7 @@ namespace casadi {
 
   void HorzRepsum::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res, bool prefer_inline) const {
     g.add_auxiliary(CodeGenerator::AUX_CLEAR);
     casadi_int nnz = sparsity().nnz();
     g.local("i", "casadi_int");
@@ -281,7 +281,7 @@ namespace casadi {
 
   void HorzRepWeave::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res, bool prefer_inline) const {
     casadi_int nnz = sparsity().nnz();
     g.add_auxiliary(CodeGenerator::AUX_WEAVE);
 

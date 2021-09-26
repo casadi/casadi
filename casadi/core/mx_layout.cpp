@@ -273,7 +273,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
 
   void PermuteLayout::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
-                        const std::vector<casadi_int>& res) const {
+                        const std::vector<casadi_int>& res, bool prefer_inline) const {
     relay_.generate(g, g.work(arg[0], nnz()), g.work(res[0], nnz()));
 
     //g << g.relayout(g.work(arg[0], nnz()), g.work(res[0], nnz()), relay_, "iw") << "\n";
