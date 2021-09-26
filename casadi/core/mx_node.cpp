@@ -389,7 +389,8 @@ namespace casadi {
   }
 
   void MXNode::generate(CodeGenerator& g,
-                        const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
+                        const vector<casadi_int>& arg, const vector<casadi_int>& res,
+                        bool prefer_inline) const {
     casadi_warning("Cannot code generate MX nodes of type " + class_name() +
                    "The generation will proceed, but compilation of the code will "
                    "not be possible.");

@@ -119,7 +119,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{1qo} */
-    virtual void add_dependency(CodeGenerator& g, const Instance& inst) const {}
+    virtual void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const {}
 
     /** \brief Is reference counting needed in codegen?
 
@@ -141,7 +141,8 @@ namespace casadi {
         \identifier{1qs} */
     virtual void generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const;
+                          const std::vector<casadi_int>& res,
+                          bool prefer_inline=false) const;
 
     /** \brief  Evaluate numerically
 

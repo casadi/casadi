@@ -122,7 +122,7 @@ namespace casadi {
         \identifier{1ym} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Generate code for the operation
 

@@ -122,7 +122,7 @@ namespace casadi {
 
   void Bilin::generate(CodeGenerator& g,
                        const std::vector<casadi_int>& arg,
-                       const std::vector<casadi_int>& res) const {
+                       const std::vector<casadi_int>& res, bool prefer_inline) const {
     g << g.workel(res[0]) << " = "
       << g.bilin(g.work(arg[0], dep(0).nnz()), dep(0).sparsity(),
                  g.work(arg[1], dep(1).nnz()),

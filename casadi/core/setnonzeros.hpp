@@ -158,7 +158,7 @@ namespace casadi {
         \identifier{wa} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth
 
@@ -235,7 +235,7 @@ namespace casadi {
         \identifier{wj} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth
 
@@ -313,7 +313,7 @@ namespace casadi {
         \identifier{ws} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth
 

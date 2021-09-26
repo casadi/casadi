@@ -73,7 +73,8 @@ namespace casadi {
 
   void LogSumExp::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
-                        const std::vector<casadi_int>& res) const {
+                        const std::vector<casadi_int>& res,
+                        bool prefer_inline) const {
     // Perform operation inplace
     g << g.workel(res[0]) << " = " << g.logsumexp(g.work(arg[0], dep(0).nnz()), dep(0).nnz()) << "\n";
   }

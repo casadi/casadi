@@ -408,7 +408,7 @@ namespace casadi {
 
   void BSplineCommon::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res, bool prefer_inline) const {
     casadi_int n_dims = offset_.size()-1;
 
     g.add_auxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);

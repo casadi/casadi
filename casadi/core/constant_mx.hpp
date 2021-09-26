@@ -222,7 +222,8 @@ namespace casadi {
         \identifier{ze} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  bool prefer_inline=false) const override;
 
     /** \brief  Check if a particular integer value
 
@@ -324,12 +325,13 @@ namespace casadi {
         \identifier{zq} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  bool prefer_inline=false) const override;
 
     /** \brief Add a dependent function
 
         \identifier{zr} */
-    void add_dependency(CodeGenerator& g, const Instance& inst) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const override;
 
     /** \brief file to read from
 
@@ -406,7 +408,7 @@ namespace casadi {
         \identifier{101} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override {}
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override {}
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override { return 0;}
@@ -544,7 +546,7 @@ namespace casadi {
         \identifier{10b} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief  Check if a particular integer value
 
@@ -769,7 +771,7 @@ namespace casadi {
   template<typename Value>
   void Constant<Value>::generate(CodeGenerator& g,
                                  const std::vector<casadi_int>& arg,
-                                 const std::vector<casadi_int>& res) const {
+                                 const std::vector<casadi_int>& res, bool prefer_inline) const {
     if (nnz()==0) {
       // Quick return
     } else if (nnz()==1) {

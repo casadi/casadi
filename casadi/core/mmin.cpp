@@ -83,7 +83,8 @@ namespace casadi {
 
   void MMin::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res,
+                      bool prefer_inline) const {
     g << g.workel(res[0]) << " = "
       << g.mmin(g.work(arg[0], dep(0).nnz()), dep(0).nnz(), dep(0).is_dense())
       << ";\n";
@@ -91,7 +92,8 @@ namespace casadi {
 
   void MMax::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res,
+                      bool prefer_inline) const {
     g << g.workel(res[0]) << " = "
       << g.mmax(g.work(arg[0], dep(0).nnz()), dep(0).nnz(), dep(0).is_dense())
       << ";\n";

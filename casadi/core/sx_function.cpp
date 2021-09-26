@@ -167,7 +167,9 @@ namespace casadi {
       Instance local;
       local.stride_in.resize(f.n_in(), 1);
       local.stride_out.resize(f.n_out(), 1);
-      CallSX::codegen_dependency(g, f, local);
+      local.prefer_inline = true;
+      CallSX::codegen_dependency(g, f, local, shared_from_this<Function>());
+      
     }
   }
 
@@ -278,7 +280,9 @@ namespace casadi {
           }
         }
       } else if (a.op==OP_CALL) {
-        g << CallSX::codegen(g, (*node_ptr)->dep(0), Instance(), a.i0, a.i1, a.i2, "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w+" + str(worksize_)); 
+        Instance local;
+        local.prefer_inline = true;
+        g << CallSX::codegen(g, (*node_ptr)->dep(0), local, a.i0, a.i1, a.i2, "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w+" + str(worksize_), shared_from_this<Function>()); 
       } else {
 
         // Where to store the result
@@ -688,7 +692,7 @@ namespace casadi {
           Instance local;
           local.stride_in.resize(f.n_in(), 1);
           local.stride_out.resize(f.n_out(), 1);
-          g << g.add_dependency(f, local) << "_incref(); // SXFunction::codegen_incref\n";
+          g << f->codegen_name(g) << "_incref(); // SXFunction::codegen_incref\n";
         }
       }
     }
@@ -702,7 +706,7 @@ namespace casadi {
           Instance local;
           local.stride_in.resize(f.n_in(), 1);
           local.stride_out.resize(f.n_out(), 1);
-          g << g.add_dependency(f, local) << "_decref();\n";
+          g << f->codegen_name(g) << "_decref();\n";
         }
       }
     }

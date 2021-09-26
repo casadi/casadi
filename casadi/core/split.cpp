@@ -107,7 +107,7 @@ namespace casadi {
 
   void Split::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
-                        const std::vector<casadi_int>& res) const {
+                        const std::vector<casadi_int>& res, bool prefer_inline) const {
     casadi_int nx = nout();
     for (casadi_int i=0; i<nx; ++i) {
       casadi_int nz_first = offset_[i];

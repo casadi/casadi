@@ -79,7 +79,7 @@ namespace casadi {
 
   void SubRef::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
-                        const std::vector<casadi_int>& res) const {
+                        const std::vector<casadi_int>& res, bool prefer_inline) const {
     casadi_error("not ready");
   }
 

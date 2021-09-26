@@ -109,7 +109,7 @@ namespace casadi {
 
   void ConstantDM::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res, bool prefer_inline) const {
     // Print the constant
     string ind = g.constant(x_.nonzeros());
 
@@ -371,13 +371,13 @@ namespace casadi {
     }
   }
 
-  void ConstantFile::add_dependency(CodeGenerator& g, const Instance& inst) const {
+  void ConstantFile::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
     g.define_rom_double(this, nnz());
   }
 
   void ConstantFile::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res, bool prefer_inline) const {
     if (res[0]<=-2) {
       g << g.work(res[0], nnz()) << " = " << g.rom_double(this) << ";\n";
     } else {

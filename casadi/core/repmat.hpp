@@ -96,7 +96,7 @@ namespace casadi {
         \identifier{20r} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Get the operation
 
@@ -184,7 +184,7 @@ namespace casadi {
         \identifier{213} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Get the operation
 
@@ -271,7 +271,7 @@ namespace casadi {
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Get the operation */
     casadi_int op() const override { return OP_HORZREPWEAVE;}

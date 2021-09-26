@@ -124,7 +124,7 @@ namespace casadi {
         \identifier{85} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Serialize an object without type information
 
@@ -185,7 +185,7 @@ namespace casadi {
         \identifier{8d} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** Obtain information about node */
     Dict info() const override { return {{"inner", inner_.info()}}; }
@@ -259,7 +259,7 @@ namespace casadi {
         \identifier{8m} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** Obtain information about node */
     Dict info() const override { return {{"outer", outer_.info()}}; }
@@ -330,7 +330,7 @@ namespace casadi {
         \identifier{8v} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** Obtain information about node */
     Dict info() const override { return {}; }

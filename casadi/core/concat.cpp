@@ -82,7 +82,7 @@ namespace casadi {
 
   void Concat::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
-                        const std::vector<casadi_int>& res) const {
+                        const std::vector<casadi_int>& res, bool prefer_inline) const {
    // g.local("rr", "casadi_real", "*");
     //g << "rr=" << g.work(res[0], nnz()) << ";\n";
     casadi_int offset=0;

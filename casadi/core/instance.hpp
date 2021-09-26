@@ -37,7 +37,8 @@ namespace casadi {
     std::vector<bool> res_null;
     std::vector<casadi_int> stride_in;
     std::vector<casadi_int> stride_out;
-    bool operator==(const Instance &rhs) const { return rhs.arg_null==arg_null && rhs.res_null==res_null && stride_in ==rhs.stride_in && stride_out==rhs.stride_out; }
+    bool prefer_inline;
+    bool operator==(const Instance &rhs) const { return rhs.arg_null==arg_null && rhs.res_null==res_null && stride_in ==rhs.stride_in && stride_out==rhs.stride_out && prefer_inline==rhs.prefer_inline; }
   };
 
 } // namespace casadi

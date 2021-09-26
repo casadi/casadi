@@ -61,7 +61,7 @@ namespace casadi {
         \identifier{11l} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /// Evaluate the function (template)
     template<typename T>
@@ -164,7 +164,7 @@ namespace casadi {
         \identifier{120} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Serialize specific part of node
 

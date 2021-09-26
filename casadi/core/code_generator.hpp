@@ -72,13 +72,16 @@ namespace casadi {
 
 #ifndef SWIG
     /// Add a function dependency
-    std::string add_dependency(const Function& f, const Instance& inst=Instance());
+    std::string add_dependency(const Function& f, const Instance& inst=Instance(), const Function& owner=Function());
 
     /// Has a function dependency
     bool has_dependency(const Function& f, const Instance& inst=Instance()) const;
 
     /// Add an external function declaration
     void add_external(const std::string& new_external);
+
+    void add_extra_definitions(const Function& f, const std::string& extra);
+    void add_extra_declarations(const Function& f, const std::string& extra);
 
     /// Get a shorthand
     std::string shorthand(const std::string& name) const;
@@ -805,6 +808,7 @@ namespace casadi {
     std::stringstream buffer;
 
     std::map<std::string, std::string> body_parts;
+    std::map<std::string, std::string> dependee_parts;
     std::stringstream casadi_headers;
 
     // Are we at a new line?
@@ -833,6 +837,8 @@ namespace casadi {
     std::map<const void *, casadi_int> file_scope_integer_;
     std::vector<casadi_int> file_scope_double_size_;
     std::vector<casadi_int> file_scope_integer_size_;
+
+    std::map<std::string, std::set<std::string> > dependees_; 
 
     // Added functions
     struct FunctionMeta {

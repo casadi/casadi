@@ -61,9 +61,9 @@ public:
 
   static void der(const SXElem& x, const SXElem& y, const SXElem& f, SXElem* d);
 
-  static std::string codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w);
+  static std::string codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w, const Function& owner);
 
-  static void codegen_dependency(CodeGenerator& g, const Function& f, const Instance& inst);
+  static void codegen_dependency(CodeGenerator& g, const Function& f, const Instance& inst, const Function& owner);
 
   void serialize_node(SerializingStream& s) const override;
 

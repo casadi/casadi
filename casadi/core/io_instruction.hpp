@@ -46,9 +46,12 @@ namespace casadi {
     // Nonzero offset
     casadi_int offset_;
 
+    // Data type
+    std::string data_type_;
+
     // Constructor (called from derived classes)
-    IOInstruction(casadi_int ind, casadi_int segment, casadi_int offset)
-      : ind_(ind), segment_(segment), offset_(offset) {}
+    IOInstruction(casadi_int ind, casadi_int segment, casadi_int offset, const std::string& data_type="any")
+      : ind_(ind), segment_(segment), offset_(offset), data_type_(data_type) {}
 
   public:
     /// Destructor
@@ -84,7 +87,7 @@ namespace casadi {
   class CASADI_EXPORT Input : public IOInstruction {
   public:
     // Constructor (called from derived classes)
-    Input(const Sparsity& sp, casadi_int ind, casadi_int segment, casadi_int offset);
+    Input(const Sparsity& sp, casadi_int ind, casadi_int segment, casadi_int offset, const std::string& data_type="any");
 
     /// Destructor
     ~Input() override {}
@@ -104,7 +107,7 @@ namespace casadi {
         \identifier{1pc} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Deserialize without type information
 
@@ -124,7 +127,7 @@ namespace casadi {
   class CASADI_EXPORT Output : public IOInstruction {
   public:
     // Constructor (called from derived classes)
-    Output(const MX& x, casadi_int ind, casadi_int segment, casadi_int offset);
+    Output(const MX& x, casadi_int ind, casadi_int segment, casadi_int offset, const std::string& data_type="any");
 
     /// Destructor
     ~Output() override {}
@@ -149,7 +152,7 @@ namespace casadi {
         \identifier{1pj} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res, bool prefer_inline=false) const override;
 
     /** \brief Deserialize without type information
 

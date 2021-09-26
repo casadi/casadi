@@ -352,7 +352,7 @@ namespace casadi {
 
   void GetNonzerosParamVector::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res, bool prefer_inline) const {
     g.local("i", "casadi_int");
     g.local("rr", "casadi_real", "*");
     g.local("cr", "const casadi_real", "*");
@@ -365,7 +365,7 @@ namespace casadi {
 
   void GetNonzerosParamSlice::generate(CodeGenerator& g,
                                   const std::vector<casadi_int>& arg,
-                                  const std::vector<casadi_int>& res) const {
+                                  const std::vector<casadi_int>& res, bool prefer_inline) const {
     g.local("cii", "const casadi_int", "*");
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << dep(1).nnz() << ";++i) iw[i] = (int) "
@@ -382,9 +382,9 @@ namespace casadi {
 
   void GetNonzerosSliceParam::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res, bool prefer_inline) const {
     if (res[0]<=-2) {
-      g << g.work(res[0], nnz()) << " = " << g.work(arg[0], dep(0).nnz()) << "+ ((casadi_int)" << g.workel(arg[1]) << ")" << ";\n";
+      g << g.work(res[0], nnz()) << " = " << g.work(arg[0], dep(0).nnz()) << "+" << g.workel(arg[1]) << ";\n";
     } else {
       g.local("i", "casadi_int");
       g.local("j", "casadi_int");
@@ -406,7 +406,7 @@ namespace casadi {
 
   void GetNonzerosParamParam::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res, bool prefer_inline) const {
     g.local("cii", "const casadi_int", "*");
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << dep(1).nnz() << ";++i) iw[i] = (int) "

@@ -497,6 +497,8 @@ namespace casadi {
     workloc_.resize(worksize+1);
     workloc_sz_self_.resize(worksize+1, false);
     fill(workloc_.begin(), workloc_.end(), -1);
+    worktype_.resize(worksize+1);
+    fill(worktype_.begin(), worktype_.end(), "any");
     // (double/8 byte) offset into fully aligned work-vector
     size_t wind=0;
     // non-io memory requirement
@@ -580,8 +582,12 @@ namespace casadi {
           prim[p].set_temp(0);
 
           // Replace parameter with input instruction
-          algorithm_[i].data.own(new Input(prim[p].sparsity(), ind, p, nz_offset));
+          algorithm_[i].data.own(new Input(prim[p].sparsity(), ind, p, nz_offset, data_type_.empty()? "real" : data_type_[ind]));
           algorithm_[i].op = OP_INPUT;
+
+          if (algorithm_[i].res.front()>=0) {
+            worktype_[algorithm_[i].res.front()] = data_type_.empty()? "real" : data_type_[ind];
+          }
         } else if (i<=-2) {
           // Mark read
           prim[p].set_temp(0);
@@ -610,6 +616,48 @@ namespace casadi {
         break;
       }
     }
+
+    for (auto&& e : algorithm_) {
+      if (e.op==OP_INPUT) {
+        casadi_int j=e.res.front();
+        if (j>=0) {
+          casadi_int ind = e.data->ind();
+          worktype_[j] = data_type_.empty()? "real" : data_type_[ind];
+        }
+      } else if (e.op==OP_CONST) {
+        if (e.data.is_scalar() && round(e.data->to_double())==e.data->to_double()) {
+          if (e.res.front()>=0)
+          worktype_[e.res.front()] = "int";
+        } else {
+          if (e.res.front()>=0)
+          worktype_[e.res.front()] = "real";
+        }
+      } else if (e.op==OP_OUTPUT) {
+        
+      } else {
+        bool is_real = false;
+        bool is_int = false;
+        // Point pointers to the data corresponding to the element
+        for (casadi_int i=0; i<e.arg.size(); ++i) {
+          if (e.arg[i]>=0) {
+            is_real |= worktype_[e.arg[i]]=="real";
+            is_int |= worktype_[e.arg[i]]=="int";
+          } 
+        }
+        for (casadi_int i=0; i<e.res.size(); ++i) {
+          if (e.res[i]>=0) {
+            if (is_real) {
+              worktype_[e.res[i]] = "real";
+            } else if (is_int) {
+              worktype_[e.res[i]] = "int";
+            } else {
+              worktype_[e.res[i]] = "any";
+            }
+          }
+        }
+      }
+    }
+
   }
 
   int MXFunction::eval(const double** arg, double** res,
@@ -1497,7 +1545,11 @@ namespace casadi {
           res_null.at(i) = true;
         }
       }
-      e.data->add_dependency(g, Instance{arg_null, res_null});
+      Instance local;
+      local.arg_null = arg_null;
+      local.res_null = res_null;
+      if (e.op==OP_CALL) local.prefer_inline = inst.prefer_inline;
+      e.data->add_dependency(g, local, shared_from_this<Function>());
     }
   }
 
@@ -1514,6 +1566,10 @@ namespace casadi {
   }
 
   void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
+    if (!data_type_.empty()) {
+      g.comment("datatype");
+      g.comment(str(worktype_));
+    }
     int align_bytes = g.casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
     g << "w = (casadi_real*) __builtin_assume_aligned (w, " << align_bytes << ");\n";
     g.add_include("stdint.h");
@@ -1566,6 +1622,7 @@ namespace casadi {
       casadi_int n=workloc_[i+1]-workloc_[i];
       n=workloc_sz_self_.at(i);
       if (n==0) continue;
+      if (worktype_[i]=="int") continue;
       if (first) {
         g << "casadi_real ";
         first = false;
@@ -1583,6 +1640,28 @@ namespace casadi {
         g << "w" << i;
       } else {
         g << "*w" << i << "=w+" << workloc_[i];
+      }
+      if ((i+1) % 200==0) g << "\\\n";
+    }
+    if (!first) g << ";\n";
+
+    // Declare scalar work vector elements as local variables
+    first = true;
+    for (casadi_int i=0; i<workloc_.size()-1; ++i) {
+      casadi_int n=workloc_[i+1]-workloc_[i];
+      n=workloc_sz_self_.at(i);
+      if (n==0) continue;
+      if (worktype_[i]!="int") continue;
+      if (first) {
+        g << "casadi_int ";
+        first = false;
+      } else {
+        g << ", ";
+      }
+      if (!g.codegen_scalars && n==1) {
+        g << "w" << i;
+      } else {
+        casadi_error("Not supported");
       }
       if ((i+1) % 200==0) g << "\\\n";
     }
@@ -1657,7 +1736,7 @@ namespace casadi {
       }
 
       // Generate operation
-      e.data->generate(g, arg, res);
+      e.data->generate(g, arg, res, inst.prefer_inline);
     }
   }
 
@@ -2189,8 +2268,10 @@ namespace casadi {
       s.pack("MXFunction::alg::res", e.res);
     }
 
+
     s.pack("MXFunction::workloc", workloc_);
-    s.pack("MXFunction::workloc", workloc_sz_self_);
+    s.pack("MXFunction::workloc_sz_self", workloc_sz_self_);
+    s.pack("MXFunction::worktype", worktype_);
     s.pack("MXFunction::w_offset", w_extra_offset_);
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
@@ -2217,9 +2298,10 @@ namespace casadi {
       s.unpack("MXFunction::alg::arg", e.arg);
       s.unpack("MXFunction::alg::res", e.res);
     }
-
+;
     s.unpack("MXFunction::workloc", workloc_);
-    s.unpack("MXFunction::workloc", workloc_sz_self_);
+    s.unpack("MXFunction::workloc_sz_self", workloc_sz_self_);
+    s.unpack("MXFunction::worktype", worktype_);
     s.unpack("MXFunction::w_offset", w_extra_offset_);
     s.unpack("MXFunction::free_vars", free_vars_);
     s.unpack("MXFunction::default_in", default_in_);
@@ -2235,6 +2317,7 @@ namespace casadi {
     s.unpack("MXFunction::ce_active", ce_active_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
+
   }
 
   ProtoFunction* MXFunction::deserialize(DeserializingStream& s) {

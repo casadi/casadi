@@ -114,7 +114,7 @@ namespace casadi {
 
   void Low::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res, bool prefer_inline) const {
     casadi_int n = dep(1).nnz();
     casadi_int ng = dep(0).nnz();
     g.local("cr", "const casadi_real", "*");

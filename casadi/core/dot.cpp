@@ -95,7 +95,7 @@ namespace casadi {
 
   void Dot::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res, bool prefer_inline) const {
     g << g.workel(res[0]) << " = "
       << g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()), g.work(arg[1], dep(1).nnz()))
       << ";\n";

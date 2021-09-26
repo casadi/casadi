@@ -130,7 +130,7 @@ namespace casadi {
 
   void Einstein::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
+                          const std::vector<casadi_int>& res, bool prefer_inline) const {
 
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
