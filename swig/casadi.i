@@ -59,10 +59,15 @@
   namespace casadi {
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
-      if (error) {
-        PySys_WriteStderr("%.*s", static_cast<int>(num), s);
-      } else {
-        PySys_WriteStdout("%.*s", static_cast<int>(num), s);
+      int n = num;
+      while (n>0) {
+        if (error) {
+          PySys_WriteStderr("%.*s", std::min(n, 1000), s);
+        } else {
+          PySys_WriteStdout("%.*s", std::min(n, 1000), s);
+        }
+        n -= 1000;
+        s += 1000;
       }
     }
 
