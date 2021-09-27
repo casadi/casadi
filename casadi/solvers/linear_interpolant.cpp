@@ -105,8 +105,8 @@ namespace casadi {
   }
 
   void LinearInterpolant::codegen_body(CodeGenerator& g, const Instance& inst) const {
-    std::string values = has_parametric_values() ? g.arg(arg_values()) : g.constant(values_);
-    std::string grid = has_parametric_grid() ? g.arg(arg_grid()) : g.constant(grid_);
+    std::string values = has_parametric_values() ? g.arg(arg_values(), true) : g.constant(values_);
+    std::string grid = has_parametric_grid() ? g.arg(arg_grid(), true) : g.constant(grid_);
     g << "  if (res[0]) {\n";
     if (is_1d()) {
       g << "  res[0][0] = " << g.interp1(grid, g.constant(offset_),
