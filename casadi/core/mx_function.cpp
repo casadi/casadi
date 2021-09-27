@@ -1517,9 +1517,11 @@ namespace casadi {
     int align_bytes = g.casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
     g << "w = (casadi_real*) __builtin_assume_aligned (w, " << align_bytes << ");\n";
     g.add_include("stdint.h");
-    g << "#if defined(_OPENMP)\n";
-    g << g.debug_assert("(uintptr_t) w% " + str(align_bytes) + " ==0") + "\n";
-    g << "#endif\n";
+    if (!inst.arg_null.empty() || !inst.res_null.empty()) {
+      g << "#if defined(_OPENMP)\n";
+      g << g.debug_assert("(uintptr_t) w% " + str(align_bytes) + " ==0") + "\n";
+      g << "#endif\n";
+    }
     g.local("i","casadi_int");
 
     bool align = name_=="all_cat" || name_=="f";
