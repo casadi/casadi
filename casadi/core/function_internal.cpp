@@ -2241,7 +2241,7 @@ namespace casadi {
       if (is_a("SXFunction", false)) {
         sig = signature(fname, true);
         std::string omp = "#pragma omp declare simd uniform(arg, res, iw, w) linear(i:1) simdlen(" + str(GlobalOptions::vector_width_real) + ") notinbranch\n";
-        decl = omp + "static " + sig;
+        decl = omp + "__attribute__((noinline)) " + sig;
         g << omp;
         if (!prefer_inline) g << "__attribute__((noinline)) ";
         g << g.vector_width_attribute() << " " << sig << " {\n";
@@ -2277,7 +2277,9 @@ namespace casadi {
     g.flush(s);
     g.body_parts[codegen_name(g, false)] = s.str();
 
-    g.casadi_headers << decl << ";\n";
+    
+    g.casadi_headers << "#ifndef DEF_" << codegen_name(g, false) << "\n"
+                     << decl << ";\n" << "#endif\n";
 
   }
 

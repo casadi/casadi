@@ -83,7 +83,7 @@ namespace casadi {
 
     std::string fname = g.add_dependency(f, local, owner);
     std::string name = fname+"_wrap";
-    return g.sx_work(i0) + "=" + name + "(" + g.sx_work(i1) + "," + g.sx_work(i2) + ")";
+    return g.sx_work(i0) + "=" + name + "(casadi_real2int(" + g.sx_work(i1) + ")," + g.sx_work(i2) + ")";
   }
 
   void CallSX::codegen_dependency(CodeGenerator& g, const Function& f, const Instance& inst, const Function& owner) {
@@ -102,7 +102,7 @@ namespace casadi {
       g << "#pragma omp declare simd simdlen("<< GlobalOptions::vector_width_real << ") notinbranch\n";
       // 'const' is needed to vectorize succesfully; 'pure' is not enough in some circumstances
       // __attribute__((optimize("-O0")))
-      g << "__attribute__((noinline)) __attribute__((const)) " << g.vector_width_attribute() << " casadi_real " << name << "(casadi_int index, casadi_real a) {\n";
+      g << "static __attribute__((noinline)) __attribute__((const)) " << g.vector_width_attribute() << " casadi_real " << name << "(casadi_int index, casadi_real a) {\n";
       g << "const casadi_real* arg[" << f.sz_arg() << "];\n";
       g << "casadi_real* res[" << f.sz_res() << "];\n";
       g << "casadi_int iw[" << f.sz_iw() << "];\n";
@@ -111,7 +111,7 @@ namespace casadi {
       if (f.nnz_in()==1) { 
         g << "arg[0] = &a;\n";
       } else {
-        g << "arg[0] = (double*) &index;\n";
+        g << "arg[0] = (casadi_real*) &index;\n";
         g << "arg[1] = &a;\n";
       }
       g << "res[0] = &r;\n";
