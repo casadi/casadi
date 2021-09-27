@@ -505,46 +505,25 @@ namespace casadi {
         s << endl;
       }
 
-      // Print integer constants
-      if (!integer_constants_.empty()) {
-        for (casadi_int i=0; i<integer_constants_.size(); ++i) {
-          print_vector(s, "casadi_s" + str(i), integer_constants_[i]);
-        }
-        s << endl;
-      }
+      part_names.push_back(fullname);
 
-      // Print double constants
-      if (!double_constants_.empty()) {
-        for (casadi_int i=0; i<double_constants_.size(); ++i) {
-          print_vector(s, "casadi_c" + str(i), double_constants_[i]);
-        }
-        s << endl;
-      }
+      // Dump code to file
+      dump(s, body.str());
+
+      // Mex entry point
+      if (this->mex) generate_mex(s);
+
+      // Main entry point
+      if (this->main) generate_main(s);
 
       // Finalize file
       file_close(s);
-      part_names.push_back(fullname);
+
     }
-
-    // Create c file
-    ofstream s;
-    string fullname = prefix + this->name + this->suffix;
-    file_open(s, fullname);
-
-    // Dump code to file
-    dump(s, body.str());
-
-    // Mex entry point
-    if (this->mex) generate_mex(s);
-
-    // Main entry point
-    if (this->main) generate_main(s);
-
-    // Finalize file
-    file_close(s);
 
     // Generate header
     if (this->with_header) {
+      std::ofstream s;
       // Create a header file
       file_open(s, prefix + this->name + ".h");
 
@@ -582,12 +561,22 @@ namespace casadi {
       ofstream s;
       string fullname = prefix + this->name + "_" + e.first + this->suffix;
       file_open(s, fullname);
+      s << "#define DEF_" + e.first << "\n";
+
+ 
 
       stringstream tmp;
+      tmp << "#pragma omp declare simd simdlen(4)\n";
+      tmp << "#pragma omp declare simd simdlen(8)\n";      
+      tmp << "static __attribute__((noinline)) casadi_int casadi_real2int(casadi_real a) {\n"
+        << "  return a;\n"
+        << "}\n";
       for (const std::string& d : dependees_[e.first]) {
         tmp << body_parts[d];
       }
       tmp << e.second;
+
+  
 
       // Dump code to file
       dump(s, tmp.str());
@@ -606,7 +595,7 @@ namespace casadi {
   }
 
   void CodeGenerator::add_extra_definitions(const Function& f, const std::string& extra) {
-    this->header << extra;
+    //this->header << extra;
   }
 
   void CodeGenerator::generate_mex(std::ostream &s) const {
@@ -1374,16 +1363,16 @@ namespace casadi {
       break;
     case AUX_SQ:
       shorthand("sq");
-      this->auxiliaries << "casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n";
+      this->auxiliaries << "static casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n";
       break;
     case AUX_SIGN:
       shorthand("sign");
-      this->auxiliaries << "casadi_real casadi_sign(casadi_real x) "
+      this->auxiliaries << "static casadi_real casadi_sign(casadi_real x) "
                         << "{ return x<0 ? -1 : x>0 ? 1 : x;}\n\n";
       break;
     case AUX_IF_ELSE:
       shorthand("if_else");
-      this->auxiliaries << "casadi_real casadi_if_else"
+      this->auxiliaries << "static casadi_real casadi_if_else"
                         << "(casadi_real c, casadi_real x, casadi_real y) "
                         << "{ return c!=0 ? x : y;}\n\n";
       break;
@@ -1402,7 +1391,7 @@ namespace casadi {
       break;
     case AUX_FMIN:
       shorthand("fmin");
-      this->auxiliaries << "casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
+      this->auxiliaries << "static casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x<y ? x : y;\n"
@@ -1413,7 +1402,7 @@ namespace casadi {
       break;
     case AUX_FMAX:
       shorthand("fmax");
-      this->auxiliaries << "casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
+      this->auxiliaries << "static casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x>y ? x : y;\n"
@@ -1424,7 +1413,7 @@ namespace casadi {
       break;
     case AUX_FABS:
       shorthand("fabs");
-      this->auxiliaries << "casadi_real casadi_fabs(casadi_real x) {\n"
+      this->auxiliaries << "static casadi_real casadi_fabs(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x>0 ? x : -x;\n"
@@ -1435,7 +1424,7 @@ namespace casadi {
       break;
     case AUX_ISINF:
       shorthand("isinf");
-      this->auxiliaries << "casadi_real casadi_isinf(casadi_real x) {\n"
+      this->auxiliaries << "static casadi_real casadi_isinf(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x== INFINITY || x==-INFINITY;\n"
@@ -1445,12 +1434,12 @@ namespace casadi {
                         << "}\n\n";
       break;
     case AUX_MIN:
-      this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
+      this->auxiliaries << "static casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? y : x;\n"
                         << "}\n\n";
       break;
     case AUX_MAX:
-      this->auxiliaries << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
+      this->auxiliaries << "static casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? x : y;\n"
                         << "}\n\n";
       break;
