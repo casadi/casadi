@@ -471,6 +471,8 @@ namespace casadi {
     s << this->includes.str();
     s << endl;
 
+      s << "#define DEF_common\n";
+
 
       // Define the casadi_real type (typically double)
       generate_casadi_real(s);
@@ -544,7 +546,9 @@ namespace casadi {
       string fullname = prefix + this->name + "_" + e.first + this->suffix;
       file_open(s, fullname);
       s << "#define DEF_" + e.first << "\n";
-
+      for (const std::string& d : dependees_[e.first]) {
+        s <<  "#define DEF_" + d << "\n";
+      }
  
 
       stringstream tmp;
@@ -774,7 +778,12 @@ namespace casadi {
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
       for (auto size : file_scope_double_size_) {
-        s << "static casadi_real casadi_rd" + str(i++) + "[" + str(size) + "];\n";
+        s << "#ifdef DEF_common\n";
+        s << "casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
+        s << "#else\n";
+        s << "extern casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
+        s << "#endif\n";
+        i++;
       }
       s << endl;
     }
