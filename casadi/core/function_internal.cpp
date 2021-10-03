@@ -2235,13 +2235,27 @@ namespace casadi {
     uout() << fname << ":" << name_ << ":" << prefer_inline << std::endl;
 
     std::string sig = signature(fname);
-    std::string decl = sig;
+    std::string decl = sig+";\n";
+
+    std::string resolved_name = g.name+"_"+codegen_name(g, false);
 
     if (vectorize) {
       if (is_a("SXFunction", false)) {
         sig = signature(fname, true);
-        std::string omp = "#pragma omp declare simd uniform(arg, res, iw, w) linear(i:1) simdlen(" + str(GlobalOptions::vector_width_real) + ") notinbranch\n";
-        decl = omp + "__attribute__((noinline)) " + sig;
+        std::string sig_intr = signature(fname, true, GlobalOptions::vector_width_real);
+        std::string omp = "#pragma omp declare simd uniform(arg, res, iw, w, mem) linear(i:1) simdlen(" + str(GlobalOptions::vector_width_real) + ") notinbranch\n";
+        decl = "#undef casadi_" + codegen_name(g, false) + "\n";
+        decl += omp;
+        decl += "static __attribute__((noinline)) __attribute__((used)) " + sig + ";\n";
+        decl += "extern " + signature(resolved_name, true, GlobalOptions::vector_width_real) + ";\n";
+        decl += "extern " + signature(resolved_name, true, 1) + ";\n";
+        decl += "static __attribute__((noinline)) __attribute__((used)) " + signature(fname, true, GlobalOptions::vector_width_real) + "{\n";
+        decl += codegen_self_call(resolved_name, true, GlobalOptions::vector_width_real) + ";\n";
+        decl += "}\n";
+        decl += "static __attribute__((noinline)) __attribute__((used)) " + signature(fname+"_alias", true, 1) + " asm(\"" + fname + "\");\n";
+        decl += "static " + signature(fname+"_alias", true, 1) + "{\n";
+        decl += codegen_self_call(resolved_name, true, 1) + ";\n";
+        decl += "}\n";
         g << omp;
         if (!prefer_inline) g << "__attribute__((noinline)) ";
         g << g.vector_width_attribute() << " " << sig << " {\n";
@@ -2279,17 +2293,41 @@ namespace casadi {
 
     
     g.casadi_headers << "#ifndef DEF_" << codegen_name(g, false) << "\n"
-                     << decl << ";\n" << "#endif\n";
+                     << decl << "#endif\n";
 
   }
 
-  std::string FunctionInternal::signature(const std::string& fname, bool vectorize) const {
+  std::string FunctionInternal::signature(const std::string& fname, bool vectorize, casadi_int vector_width_real) const {
+    std::string name = fname;
+    std::string int_type = "casadi_int";
+    if (vector_width_real==8) {
+      int_type = "__m512i";
+    } else if (vector_width_real==4) {
+      int_type = "__m256i";
+    }
     if (vectorize) {
-      return "void " + fname + "(const casadi_real**const arg, casadi_real**const res, "
-                            "casadi_int* iw, casadi_real* w, int mem, int i)";
+      if (vector_width_real==8) {
+        name = "_ZGVeN8uuuuul_" + name;
+      } else if (vector_width_real==4) {
+        name = "_ZGVdN4uuuuul_" + name;
+      }
+      return "void " + name + "(const casadi_real**const arg, casadi_real**const res, "
+                            "casadi_int* iw, casadi_real* w, int mem, " + int_type + " i)";
     } else {
-      return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
+      return "int " + name + "(const casadi_real** arg, casadi_real** res, "
                             "casadi_int* iw, casadi_real* w, int mem)";
+    }
+  }
+
+  std::string FunctionInternal::codegen_self_call(const std::string& fname, bool vectorize, casadi_int vector_width_real) const {
+    if (vector_width_real==1) {
+      return fname + "(arg, res, iw, w, mem, i)";
+    } else if (vector_width_real==8) {
+      return "_ZGVeN8uuuuul_" + fname + "(arg, res, iw, w, mem, i)";
+    } else if (vector_width_real==4) {
+      return "_ZGVdN4uuuuul_" + fname + "(arg, res, iw, w, mem, i)";
+    } else {
+      casadi_error("foo");
     }
   }
 

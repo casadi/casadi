@@ -819,7 +819,9 @@ namespace casadi {
     /** \brief Code generate the function
 
         \identifier{ly} */
-    std::string signature(const std::string& fname, bool vectorize=false) const;
+    std::string signature(const std::string& fname, bool vectorize=false, casadi_int vector_width_real=1) const;
+
+    std::string codegen_self_call(const std::string& fname, bool vectorize=false, casadi_int vector_width_real=1) const;
 
     /** \brief Generate code for the declarations of the C function
 
