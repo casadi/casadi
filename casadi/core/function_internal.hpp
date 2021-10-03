@@ -599,7 +599,9 @@ namespace casadi {
     virtual void codegen_free_mem(CodeGenerator& g) const {}
 
     /** \brief Code generate the function  */
-    std::string signature(const std::string& fname, bool vectorize=false) const;
+    std::string signature(const std::string& fname, bool vectorize=false, casadi_int vector_width_real=1) const;
+
+    std::string codegen_self_call(const std::string& fname, bool vectorize=false, casadi_int vector_width_real=1) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void codegen_declarations(CodeGenerator& g, const Instance& inst) const;
