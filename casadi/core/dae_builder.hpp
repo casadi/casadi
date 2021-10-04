@@ -158,6 +158,15 @@ public:
   const std::vector<MX>& when_rhs() const;
   ///@}
 
+  /** \brief Model structure: outputs */
+  std::vector<std::string> outputs() const;
+
+  /** \brief Model structure: derivatives */
+  std::vector<std::string> derivatives() const;
+
+  /** \brief Model structure: initial unknowns */
+  std::vector<std::string> initial_unknowns() const;
+
   /** @name Variables and equations */
   ///@{
 
@@ -257,6 +266,13 @@ public:
   void register_d(const std::string& name);
   void register_w(const std::string& name);
   void register_y(const std::string& name);
+  ///@}
+
+  /** @name Specify all variables of a type */
+  ///@{
+  void set_z(const std::vector<std::string>& name,
+    const std::vector<std::string>& alg = std::vector<std::string>());
+  void set_u(const std::vector<std::string>& name);
   ///@}
 
   /** @name Manipulation
@@ -562,6 +578,10 @@ public:
 
   /// Get the (cached) oracle, SX or MX
   Function oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
+
+  /** \brief Get Jacobian sparsity */
+  Sparsity jac_sparsity(const std::vector<std::string>& onames,
+    const std::vector<std::string>& inames) const;
 
 #ifndef SWIG
   /// Add a variable

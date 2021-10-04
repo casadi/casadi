@@ -682,6 +682,22 @@ const std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) cons
   return const_cast<DaeBuilderInternal*>(this)->ind_in(v);
 }
 
+void DaeBuilderInternal::set_z(const std::vector<std::string>& name,
+    const std::vector<std::string>& alg) {
+  // Remove existing z
+  z_.clear();
+  // New z
+  z_.resize(name.size());
+  for (size_t k = 0; k < z_.size(); ++k) z_[k] = find(name[k]);
+  // Specify algebraic variables, if any
+  if (!alg.empty()) {
+    // Consistency check
+    casadi_assert(alg.size() == name.size(), "Inconsistent number of algebraic variables");
+    // Set alg property
+    for (size_t k = 0; k < z_.size(); ++k) variable(z_[k]).alg = find(alg[k]);
+  }
+}
+
 void DaeBuilderInternal::clear_in(const std::string& v) {
   ind_in(v).clear();
 }

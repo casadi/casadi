@@ -783,23 +783,22 @@ void FmuFunction::get_sens(FmuMemory* m, size_t id, double* value) const {
   *value = m->sens_.at(id);
 }
 
-FmuInput::~FmuInput() {
+FmuIO::~FmuIO() {
 }
 
-size_t FmuInput::ind(size_t k) const {
-  casadi_error("ind(k) not implemented for " + class_name());
-  return -1;
-}
-
-const std::vector<size_t>& FmuInput::ind() const {
-  casadi_error("ind not implemented for " + class_name());
+const std::vector<size_t>& FmuIO::iind() const {
+  casadi_error("iind not implemented for " + class_name());
   static const std::vector<size_t> dummy;
   return dummy;
 }
 
-size_t FmuInput::size() const {
-  casadi_error("size() not implemented for " + class_name());
-  return -1;
+const std::vector<size_t>& FmuIO::oind() const {
+  casadi_error("oind not implemented for " + class_name());
+  static const std::vector<size_t> dummy;
+  return dummy;
+}
+
+FmuInput::~FmuInput() {
 }
 
 RegInput::~RegInput() {
@@ -808,48 +807,26 @@ RegInput::~RegInput() {
 DummyInput::~DummyInput() {
 }
 
+AdjInput::~AdjInput() {
+}
+
 FmuOutput::~FmuOutput() {
 }
 
 RegOutput::~RegOutput() {
 }
 
-size_t FmuOutput::ind(size_t k) const {
-  casadi_error("ind(k) not implemented for " + class_name());
-  return -1;
-}
-
-const std::vector<size_t>& FmuOutput::ind() const {
-  casadi_error("ind() not implemented for " + class_name());
-  static const std::vector<size_t> dummy;
-  return dummy;
-}
-
-const std::vector<size_t>& FmuOutput::ind1() const {
-  casadi_error("ind1() not implemented for " + class_name());
-  static const std::vector<size_t> dummy;
-  return dummy;
-}
-
-const std::vector<size_t>& FmuOutput::ind2() const {
-  casadi_error("ind2() not implemented for " + class_name());
-  static const std::vector<size_t> dummy;
-  return dummy;
-}
-
-size_t FmuOutput::size() const {
-  casadi_error("size() not implemented for " + class_name());
-  return -1;
-}
-
 JacOutput::~JacOutput() {
+}
+
+AdjOutput::~AdjOutput() {
 }
 
 Sparsity JacOutput::sparsity(const FmuFunction& f) const {
   // DaeBuilder instance
   auto dae = f.fmu_->dae();
   // Get the Jacobian block
-  return dae->jac_sparsity(ind1_, ind2_);
+  return dae->jac_sparsity(oind_, iind_);
 }
 
 Fmu::Fmu(const DaeBuilder& dae) : dae_(dae) {
@@ -890,6 +867,9 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
       if (pref == "out") {
         // Nondifferentiated function output (unused)
         in_[k] = new DummyInput(scheme.at(rem).size());
+      } else if (pref == "adj") {
+        // Adjoint seed
+        in_[k] = new AdjInput(scheme.at(rem));
       } else {
         // No such prefix
         casadi_error("No such prefix: " + pref);
@@ -912,6 +892,9 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
         casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
         std::string part2 = pop_prefix(rem, &rem);
         out_[k] = new JacOutput(scheme.at(part2), scheme.at(rem));
+      } else if (part1 == "adj") {
+        // Adjoint sensitivity
+        out_[k] = new AdjOutput(scheme.at(rem));
       } else {
         // No such prefix
         casadi_error("No such prefix: " + part1);
@@ -1017,11 +1000,11 @@ void FmuFunction::init(const Dict& opts) {
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
-  // Collect all inputs in any Jacobian block
+  // Collect all inputs in any Jacobian or adjoint block
   std::vector<bool> in_jac(dae->variables_.size(), false);
   for (FmuOutput* i : out_) {
-    if (i->is_jac()) {
-      for (size_t j : i->ind2()) in_jac[j] = true;
+    if (i->is_jac() || i->is_adj()) {
+      for (size_t j : i->iind()) in_jac[j] = true;
     }
   }
   jac_in_.clear();
@@ -1029,11 +1012,16 @@ void FmuFunction::init(const Dict& opts) {
     if (in_jac[k]) jac_in_.push_back(k);
   }
 
-  // Collect all outputs in any Jacobian block
+  // Collect all outputs in any Jacobian or adjoint block
   std::fill(in_jac.begin(), in_jac.end(), false);
   for (FmuOutput* i : out_) {
     if (i->is_jac()) {
-      for (size_t j : i->ind1()) in_jac[j] = true;
+      for (size_t j : i->oind()) in_jac[j] = true;
+    }
+  }
+  for (FmuInput* i : in_) {
+    if (i->is_adj()) {
+      for (size_t j : i->oind()) in_jac[j] = true;
     }
   }
   jac_out_.clear();
@@ -1060,16 +1048,16 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k]->is_reg()) {
-      for (size_t i = 0; i < in_[k]->size(); ++i) {
-        set(m, in_[k]->ind(i), arg[k] ? arg[k][i] : 0);
+      for (size_t i = 0; i < in_[k]->isz(); ++i) {
+        set(m, in_[k]->iind(i), arg[k] ? arg[k][i] : 0);
       }
     }
   }
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k]->is_reg()) {
-      for (size_t i = 0; i < out_[k]->size(); ++i) {
-        request(m, out_[k]->ind(i));
+      for (size_t i = 0; i < out_[k]->osz(); ++i) {
+        request(m, out_[k]->oind(i));
       }
     }
   }
@@ -1078,20 +1066,20 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Get regular outputs
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k]->is_reg()) {
-      for (size_t i = 0; i < out_[k]->size(); ++i) {
-        get(m, out_[k]->ind(i), &res[k][i]);
+      for (size_t i = 0; i < out_[k]->osz(); ++i) {
+        get(m, out_[k]->oind(i), &res[k][i]);
       }
     }
   }
   // What other blocks are there?
-  bool any_jac = false;
+  bool need_jac = false;
   for (size_t k = 0; k < out_.size(); ++k) {
-    if (res[k] && out_[k]->is_jac()) {
-      any_jac = true;
+    if (res[k] && (out_[k]->is_jac() || out_[k]->is_adj())) {
+      need_jac = true;
     }
   }
   // Evalute Jacobian blocks
-  if (any_jac) {
+  if (need_jac) {
     // Loop over colors
     for (casadi_int c = 0; c < coloring_.size2(); ++c) {
       // Loop over input indices for color
@@ -1120,18 +1108,19 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         double inv_nom = 1. / dae->variable(Jc).nominal;
         // Fetch Jacobian blocks
         for (size_t k = 0; k < out_.size(); ++k) {
+          casadi_assert(!out_[k]->is_adj(), "Not implemented");
           if (res[k] && out_[k]->is_jac()) {
             // Find input index
-            const std::vector<size_t>& ind2 = out_[k]->ind2();
-            for (size_t Bc = 0; Bc < ind2.size(); ++Bc) {
-              if (ind2[Bc] == Jc) {
+            const std::vector<size_t>& iind = out_[k]->iind();
+            for (size_t Bc = 0; Bc < iind.size(); ++Bc) {
+              if (iind[Bc] == Jc) {
                 // Column exists in Jacobian block
                 const Sparsity& sp = sparsity_out(k);
-                const std::vector<size_t>& ind1 = out_[k]->ind1();
+                const std::vector<size_t>& oind = out_[k]->oind();
                 for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
                   // Get the Jacobian nonzero
                   double J_nz;
-                  get_sens(m, ind1.at(sp.row(Bk)), &J_nz);
+                  get_sens(m, oind.at(sp.row(Bk)), &J_nz);
                   // Remove nominal value factor
                   J_nz *= inv_nom;
                   // Save to output
@@ -1211,7 +1200,7 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
   // DaeBuilder instance
   auto dae = fmu_->dae();
   // Get the Jacobian block
-  return dae->jac_sparsity(out_.at(oind)->ind(), in_.at(iind)->ind());
+  return dae->jac_sparsity(out_.at(oind)->oind(), in_.at(iind)->iind());
 }
 
 #endif  // WITH_FMU

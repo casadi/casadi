@@ -173,6 +173,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Input indices (immutable)
   const std::vector<size_t>& ind_in(const std::string& v) const;
 
+  // Set all algebraic variables
+  void set_z(const std::vector<std::string>& name, const std::vector<std::string>& alg);
+
   /// Clear input variable
   void clear_in(const std::string& v);
 

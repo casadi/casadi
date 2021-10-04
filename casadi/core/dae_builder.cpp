@@ -152,6 +152,33 @@ const std::vector<MX>& DaeBuilder::when_rhs() const {
   return (*this)->when_rhs_;
 }
 
+std::vector<std::string> DaeBuilder::outputs() const {
+  try {
+    return name((*this)->outputs_);
+  } catch (std::exception& e) {
+    THROW_ERROR("outputs", e.what());
+    return {};  // never reached
+  }
+}
+
+std::vector<std::string> DaeBuilder::derivatives() const {
+  try {
+    return name((*this)->derivatives_);
+  } catch (std::exception& e) {
+    THROW_ERROR("derivatives", e.what());
+    return {};  // never reached
+  }
+}
+
+std::vector<std::string> DaeBuilder::initial_unknowns() const {
+  try {
+    return name((*this)->initial_unknowns_);
+  } catch (std::exception& e) {
+    THROW_ERROR("initial_unknowns", e.what());
+    return {};  // never reached
+  }
+}
+
 bool DaeBuilder::has_t() const {
   return !(*this)->t_.empty();
 }
@@ -347,6 +374,22 @@ void DaeBuilder::register_w(const std::string& name) {
 
 void DaeBuilder::register_y(const std::string& name) {
   (*this)->y_.push_back(find(name));
+}
+
+void DaeBuilder::set_z(const std::vector<std::string>& name, const std::vector<std::string>& alg) {
+  try {
+    (*this)->set_z(name, alg);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_z", e.what());
+  }
+}
+
+void DaeBuilder::set_u(const std::vector<std::string>& name) {
+  try {
+    (*this)->u_ = find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_u", e.what());
+  }
 }
 
 void DaeBuilder::clear_in(const std::string& v) {
@@ -1116,6 +1159,16 @@ void DaeBuilder::set_string_value(const std::vector<std::string>& name,
     (*this)->set_string_attribute(Variable::STRINGVALUE, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_string_value", e.what());
+  }
+}
+
+Sparsity DaeBuilder::jac_sparsity(const std::vector<std::string>& onames,
+    const std::vector<std::string>& inames) const {
+  try {
+    return (*this)->jac_sparsity(find(onames), find(inames));
+  } catch (std::exception& e) {
+    THROW_ERROR("jac_sparsity", e.what());
+    return Sparsity();  // never reached
   }
 }
 
