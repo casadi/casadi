@@ -104,6 +104,9 @@ auto PolymorphicALMConversion() {
     };
 }
 
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
 PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     using py::operator""_a;
 
@@ -112,6 +115,12 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     options.enable_user_defined_docstrings();
 
     m.doc() = "PANOC+ALM solvers"; // TODO
+
+#ifdef VERSION_INFO
+    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#else
+    m.attr("__version__") = "dev";
+#endif
 
     py::class_<pa::Box>(m, "Box", "C++ documentation: :cpp:class:`pa::Box`")
         .def(py::init([](unsigned n) {
