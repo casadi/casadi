@@ -15,6 +15,8 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         PRIVATE
             panoc-alm::panoc-alm-obj
             pybind11::pybind11
+            -static-libstdc++
+            -static-libgcc
     )
     target_compile_definitions(_panocpy PRIVATE VERSION_INFO=${PROJECT_VERSION})
     set(PANOCPY_RPATH "\${ORIGIN}/../../../.." "\${ORIGIN}")
@@ -28,41 +30,10 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
     target_compile_definitions(_panocpy PRIVATE PANOCPY_MODULE_NAME=_panocpy)
     if (TARGET panoc-alm::casadi-loader)
         target_compile_definitions(_panocpy PRIVATE PANOCPY_HAVE_CASADI)
-        target_link_libraries(_panocpy PRIVATE panoc-alm::casadi-loader)
+        target_link_libraries(_panocpy PRIVATE panoc-alm::casadi-loader-obj)
     endif()
 
     if (SKBUILD)
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            execute_process(COMMAND bash -c "realpath \$(${CMAKE_CXX_COMPILER} -print-file-name=libstdc++.so)"
-                            OUTPUT_VARIABLE libstdcpp_file
-                            ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-        endif()
         install(TARGETS _panocpy DESTINATION .)
-        install(CODE "set(libstdcpp_file \"${libstdcpp_file}\")")
-        install(CODE [[
-            file(GET_RUNTIME_DEPENDENCIES
-                LIBRARIES $<TARGET_FILE:_panocpy>
-                RESOLVED_DEPENDENCIES_VAR _r_deps
-                UNRESOLVED_DEPENDENCIES_VAR _u_deps
-                POST_EXCLUDE_REGEXES ".*"
-                POST_INCLUDE_REGEXES "${CMAKE_BINARY_DIR}.*|.*libcasadi.*|.*libgcc.*"
-            )
-            foreach(_file ${_r_deps})
-                file(INSTALL
-                    DESTINATION "${CMAKE_INSTALL_PREFIX}"
-                    TYPE SHARED_LIBRARY
-                    FILES "${_file}"
-                )
-            endforeach()
-            if(libstdcpp_file)
-                file(INSTALL 
-                    DESTINATION "${CMAKE_INSTALL_PREFIX}"
-                    FILES "${libstdcpp_file}")
-            endif()
-            list(LENGTH _u_deps _u_length)
-            if("${_u_length}" GREATER 0)
-                message(WARNING "Unresolved dependencies detected!")
-            endif()
-        ]])
     endif()
 endif()

@@ -5,10 +5,10 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: tttapa/build-python-gcc:${{ matrix.python-version }}-10
+    container: tttapa/panoc-alm-build-python-gcc:${{ matrix.python-version }}-10
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', 'rc']
+        python-version: ['3.7', '3.8', '3.9', '3.10']
     
     steps:
     - uses: actions/checkout@v1
@@ -17,24 +17,33 @@ jobs:
       uses: actions/cache@v2
       with:
         path: "/tmp/py-venv"
-        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/ci/install-dependencies-wheel.sh') }}-${{ hashFiles('scripts/requirements.txt') }}-${{ hashFiles('scripts/requirements-wheel.txt') }}-
+        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/ci/install-dependencies-wheel.sh') }}-${{ hashFiles('scripts/requirements.txt') }}-${{ hashFiles('scripts/requirements-wheel.txt') }}-${{ hashFiles('scripts/ci/install-patchelf.sh') }}-
     - name: Install Casadi and other Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       run: |
         python3 -m venv /tmp/py-venv
         . /tmp/py-venv/bin/activate
         python -m pip install -r scripts/requirements.txt -r scripts/requirements-wheel.txt
-        FC=gfortran-10 \
-          bash scripts/ci/install-dependencies-wheel.sh
+        bash scripts/ci/install-dependencies-wheel.sh
+        bash scripts/ci/install-patchelf.sh
+      env:
+        CXXFLAGS: "-march=skylake -static-libstdc++ -static-libgcc"
+        LDFLAGS: "-static-libstdc++ -static-libgcc"
+        CFLAGS: "-march=skylake -static-libgcc"
+        FC: gfortran
     - name: Build
       run: |
         . /tmp/py-venv/bin/activate
         rm -rf _skbuild/
-        FC=gfortran-10 CXXFLAGS="-march=skylake" CFLAGS="-march=skylake" \
-          python setup.py bdist_wheel --build-type Release
+        python setup.py bdist_wheel --build-type Release
+      env:
+        CXXFLAGS: "-march=skylake -static-libstdc++ -static-libgcc"
+        LDFLAGS: "-static-libstdc++ -static-libgcc"
+        CFLAGS: "-march=skylake -static-libgcc"
+        FC: gfortran
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
         name: panocpy-whl-${{ matrix.python-version }}
-        path: dist/panocpy-*.whl
+        path: wheelhouse/panocpy-*manylinux*.whl
       
