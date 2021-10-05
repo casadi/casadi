@@ -77,6 +77,7 @@ lcov \
 lcov \
     --remove "$dest"/coverage_total.info \
     '/usr/*' "$HOME/.local/*" "/include/*" \
+    '/opt/hostedtoolcache/*' \
     '*/gtest/*' '*/gmock/*' '*/googletest/*' \
     '*/eigen/*' '*/eigen3/*' \
     '*/interop/*' \
