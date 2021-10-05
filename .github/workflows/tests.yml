@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.9.7'
+        python-version: '3.9.2'
     - name: Cache Virtual Environment
       id: cache-venv
       uses: actions/cache@v2
