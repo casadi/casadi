@@ -36,6 +36,9 @@ jobs:
         . /tmp/py-venv/bin/activate
         rm -rf _skbuild/
         python setup.py bdist_wheel --build-type Release
+        LD_LIBRARY_PATH=$VIRTUAL_ENV/lib \
+          auditwheel repair --plat manylinux_2_27_x86_64 \
+          dist/panocpy-*.whl
       env:
         CXXFLAGS: "-march=skylake -static-libstdc++ -static-libgcc"
         LDFLAGS: "-static-libstdc++ -static-libgcc"
