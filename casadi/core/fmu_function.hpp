@@ -344,6 +344,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // All Jacobian inputs and outputs
   std::vector<size_t> jac_in_, jac_out_;
 
+  // Number of variables
+  size_t nv_;
+
+  // What blocks exist?
+  bool has_jac_, has_adj_;
+
   // User-set options
   bool enable_ad_, validate_ad_;
   double step_, abstol_, reltol_, u_aim_, h_min_, h_max_;
@@ -416,6 +422,15 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const Dict& opts) const override;
   ///@}
 
+  ///@{
+  /** \brief Reverse mode AD */
+  bool has_reverse(casadi_int nadj) const override { return nadj == 1;}
+  Function get_reverse(casadi_int nadj, const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const override;
+  ///@}
+
   // Helper function
   static bool has_prefix(const std::string& s);
 
@@ -468,7 +483,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   int eval_derivative(FmuMemory* m) const;
 
   // Get a derivative
-  void get_sens(FmuMemory* m, size_t id, double* value) const;
+  double get_sens(FmuMemory* m, size_t id) const;
 };
 
 /// Number of entries in enums
