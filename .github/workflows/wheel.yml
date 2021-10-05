@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: tttapa/panoc-alm-build-python-gcc:${{ matrix.python-version }}-10
+    container: tttapa/panoc-alm-build-python-gcc:${{ matrix.python-version }}-11
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
