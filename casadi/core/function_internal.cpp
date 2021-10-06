@@ -2521,27 +2521,30 @@ namespace casadi {
     for (casadi_int oind=0; oind<n_out_; ++oind) {
       // Skip if nothing to assign
       if (res[oind]==nullptr || nnz_out(oind)==0) continue;
-
       // Clear result
       casadi_clear(res[oind], nnz_out(oind));
-
       // Loop over inputs
       for (casadi_int iind=0; iind<n_in_; ++iind) {
         // Skip if no seeds
         if (arg[iind]==nullptr || nnz_in(iind)==0) continue;
+        // Propagate sparsity for the specific block
+        if (sp_forward_block(arg, res, iw, w, mem, oind, iind)) return 1;
+      }
+    }
+    return 0;
+  }
 
-        // Get the sparsity of the Jacobian block
-        Sparsity sp = jac_sparsity(oind, iind, true, false);
-        if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
-
-        // Carry out the sparse matrix-vector multiplication
-        casadi_int d1 = sp.size2();
-        const casadi_int *colind = sp.colind(), *row = sp.row();
-        for (casadi_int cc=0; cc<d1; ++cc) {
-          for (casadi_int el = colind[cc]; el < colind[cc+1]; ++el) {
-            res[oind][row[el]] |= arg[iind][cc];
-          }
-        }
+  int FunctionInternal::sp_forward_block(const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem, casadi_int oind, casadi_int iind) const {
+    // Get the sparsity of the Jacobian block
+    Sparsity sp = jac_sparsity(oind, iind, true, false);
+    if (sp.is_null() || sp.nnz() == 0) return 0; // Skip if zero
+    // Carry out the sparse matrix-vector multiplication
+    casadi_int d1 = sp.size2();
+    const casadi_int *colind = sp.colind(), *row = sp.row();
+    for (casadi_int cc=0; cc<d1; ++cc) {
+      for (casadi_int el = colind[cc]; el < colind[cc+1]; ++el) {
+        res[oind][row[el]] |= arg[iind][cc];
       }
     }
     return 0;

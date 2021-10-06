@@ -808,6 +808,10 @@ namespace casadi {
     virtual int sp_forward(const bvec_t** arg, bvec_t** res,
                             casadi_int* iw, bvec_t* w, void* mem) const;
 
+    /** \brief  Propagate sparsity forward, specific block */
+    virtual int sp_forward_block(const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem, casadi_int oind, casadi_int iind) const;
+
     /** \brief  Propagate sparsity backwards */
     virtual int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const;
 
