@@ -42,62 +42,62 @@
 
 namespace casadi {
 
-std::string to_string(Variable::Type v) {
+std::string to_string(Type v) {
   switch (v) {
-  case Variable::REAL: return "real";
-  case Variable::INTEGER: return "integer";
-  case Variable::BOOLEAN: return "boolean";
-  case Variable::STRING: return "string";
-  case Variable::ENUM: return "enum";
+  case Type::REAL: return "real";
+  case Type::INTEGER: return "integer";
+  case Type::BOOLEAN: return "boolean";
+  case Type::STRING: return "string";
+  case Type::ENUM: return "enum";
   default: break;
   }
   return "";
 }
 
-std::string to_string(Variable::Causality v) {
+std::string to_string(Causality v) {
   switch (v) {
-  case Variable::PARAMETER: return "parameter";
-  case Variable::CALCULATED_PARAMETER: return "calculatedParameter";
-  case Variable::INPUT: return "input";
-  case Variable::OUTPUT: return "output";
-  case Variable::LOCAL: return "local";
-  case Variable::INDEPENDENT: return "independent";
+  case Causality::PARAMETER: return "parameter";
+  case Causality::CALCULATED_PARAMETER: return "calculatedParameter";
+  case Causality::INPUT: return "input";
+  case Causality::OUTPUT: return "output";
+  case Causality::LOCAL: return "local";
+  case Causality::INDEPENDENT: return "independent";
   default: break;
   }
   return "";
 }
 
-std::string to_string(Variable::Variability v) {
+std::string to_string(Variability v) {
   switch (v) {
-  case Variable::CONSTANT: return "constant";
-  case Variable::FIXED: return "fixed";
-  case Variable::TUNABLE: return "tunable";
-  case Variable::DISCRETE: return "discrete";
-  case Variable::CONTINUOUS: return "continuous";
+  case Variability::CONSTANT: return "constant";
+  case Variability::FIXED: return "fixed";
+  case Variability::TUNABLE: return "tunable";
+  case Variability::DISCRETE: return "discrete";
+  case Variability::CONTINUOUS: return "continuous";
   default: break;
   }
   return "";
 }
 
-std::string to_string(Variable::Initial v) {
+std::string to_string(Initial v) {
   switch (v) {
-  case Variable::EXACT: return "exact";
-  case Variable::APPROX: return "approx";
-  case Variable::CALCULATED: return "calculated";
-  case Variable::INITIAL_NA: return "initial_na";
+  case Initial::EXACT: return "exact";
+  case Initial::APPROX: return "approx";
+  case Initial::CALCULATED: return "calculated";
+  case Initial::NA: return "na";
   default: break;
   }
   return "";
 }
 
-CASADI_EXPORT std::string to_string(Variable::Attribute v) {
+CASADI_EXPORT std::string to_string(Attribute v) {
   switch (v) {
-  case Variable::MIN: return "min";
-  case Variable::MAX: return "max";
-  case Variable::NOMINAL: return "nominal";
-  case Variable::START: return "start";
-  case Variable::VALUE: return "nominal";
-  case Variable::STRINGVALUE: return "STRINGVALUE";
+  case Attribute::MIN: return "min";
+  case Attribute::MAX: return "max";
+  case Attribute::NOMINAL: return "nominal";
+  case Attribute::START: return "start";
+  case Attribute::VALUE: return "nominal";
+  case Attribute::STRINGVALUE: return "STRINGVALUE";
   default: break;
   }
   return "";
@@ -105,15 +105,15 @@ CASADI_EXPORT std::string to_string(Variable::Attribute v) {
 
 double Variable::attribute(Attribute a) const {
   switch (a) {
-    case MIN:
+    case Attribute::MIN:
       return min;
-    case MAX:
+    case Attribute::MAX:
       return max;
-    case NOMINAL:
+    case Attribute::NOMINAL:
       return nominal;
-    case START:
+    case Attribute::START:
       return start;
-    case VALUE:
+    case Attribute::VALUE:
       return value;
     default:
       break;
@@ -124,19 +124,19 @@ double Variable::attribute(Attribute a) const {
 
 void Variable::set_attribute(Attribute a, double val) {
   switch (a) {
-    case MIN:
+    case Attribute::MIN:
       min = val;
       return;
-    case MAX:
+    case Attribute::MAX:
       max = val;
       return;
-    case NOMINAL:
+    case Attribute::NOMINAL:
       nominal = val;
       return;
-    case START:
+    case Attribute::START:
       start = val;
       return;
-    case VALUE:
+    case Attribute::VALUE:
       value = val;
       return;
     default:
@@ -147,7 +147,7 @@ void Variable::set_attribute(Attribute a, double val) {
 
 std::string Variable::string_attribute(Attribute a) const {
   switch (a) {
-    case STRINGVALUE:
+    case Attribute::STRINGVALUE:
       return stringvalue;
     default:
       break;
@@ -158,7 +158,7 @@ std::string Variable::string_attribute(Attribute a) const {
 
 void Variable::set_string_attribute(Attribute a, const std::string& val) {
   switch (a) {
-    case STRINGVALUE:
+    case Attribute::STRINGVALUE:
       stringvalue = val;
       return;
     default:
@@ -166,37 +166,36 @@ void Variable::set_string_attribute(Attribute a, const std::string& val) {
   }
 }
 
-Variable::Initial Variable::default_initial(Variable::Causality causality,
-    Variable::Variability variability) {
+Initial Variable::default_initial(Causality causality, Variability variability) {
   // According to table in FMI 2.0.2 specification, section 2.2.7
   switch (variability) {
-  case CONSTANT:
-    if (causality == OUTPUT || causality == LOCAL)
-      return EXACT;
+  case Variability::CONSTANT:
+    if (causality == Causality::OUTPUT || causality == Causality::LOCAL)
+      return Initial::EXACT;
     break;
-  case FIXED:
+  case Variability::FIXED:
     // Fall-through
-  case TUNABLE:
-    if (causality == PARAMETER)
-      return EXACT;
-    else if (causality == CALCULATED_PARAMETER || causality == LOCAL)
-      return CALCULATED;
+  case Variability::TUNABLE:
+    if (causality == Causality::PARAMETER)
+      return Initial::EXACT;
+    else if (causality == Causality::CALCULATED_PARAMETER || causality == Causality::LOCAL)
+      return Initial::CALCULATED;
     break;
-  case DISCRETE:
+  case Variability::DISCRETE:
   // Fall-through
-  case CONTINUOUS:
-    if (causality == OUTPUT || causality == LOCAL)
-      return CALCULATED;
+  case Variability::CONTINUOUS:
+    if (causality == Causality::OUTPUT || causality == Causality::LOCAL)
+      return Initial::CALCULATED;
     break;
   default: break;
   }
   // Initial value not available
-  return INITIAL_NA;
+  return Initial::NA;
 }
 
 Variable::Variable(const std::string& name) : name(name),
     value_reference(-1), description(""),
-    type(REAL), causality(LOCAL), variability(CONTINUOUS),
+    type(Type::REAL), causality(Causality::LOCAL), variability(Variability::CONTINUOUS),
     unit(""), display_unit(""),
     min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
     nominal(1.0), start(0.0), der_of(-1), der(-1), alg(-1), value(nan), stringvalue(),
@@ -268,24 +267,24 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     // Skip variable if name starts with underscore
     if (v.name.rfind("_", 0) == 0) continue;
     // Sort by types
-    if (v.causality == Variable::INDEPENDENT) {
+    if (v.causality == Causality::INDEPENDENT) {
       // Independent (time) variable
       t_.push_back(k);
-    } else if (v.causality == Variable::INPUT) {
+    } else if (v.causality == Causality::INPUT) {
       u_.push_back(k);
-    } else if (v.variability == Variable::CONSTANT) {
+    } else if (v.variability == Variability::CONSTANT) {
       // Named constant
       c_.push_back(k);
       v.beq = v.start;
-    } else if (v.variability == Variable::FIXED || v.variability == Variable::TUNABLE) {
+    } else if (v.variability == Variability::FIXED || v.variability == Variability::TUNABLE) {
       p_.push_back(k);
-    } else if (v.variability == Variable::CONTINUOUS) {
+    } else if (v.variability == Variability::CONTINUOUS) {
       // Add to list of differential equations?
       if (v.der >= 0) {
         x_.push_back(k);
       }
       // Is it (also) an output variable?
-      if (v.causality == Variable::OUTPUT) {
+      if (v.causality == Causality::OUTPUT) {
         y_.push_back(k);
         v.beq = v.v;
       }
@@ -1847,7 +1846,7 @@ MX DaeBuilderInternal::add_t(const std::string& name) {
   casadi_assert(t_.empty(), "'t' already defined");
   Variable v(name);
   v.v = MX::sym(name);
-  v.causality = Variable::INDEPENDENT;
+  v.causality = Causality::INDEPENDENT;
   t_.push_back(add_variable(name, v));
   return v.v;
 }
@@ -1855,8 +1854,8 @@ MX DaeBuilderInternal::add_t(const std::string& name) {
 MX DaeBuilderInternal::add_p(const std::string& name) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.variability = Variable::FIXED;
-  v.causality = Variable::INPUT;
+  v.variability = Variability::FIXED;
+  v.causality = Causality::INPUT;
   p_.push_back(add_variable(name, v));
   return v.v;
 }
@@ -1864,8 +1863,8 @@ MX DaeBuilderInternal::add_p(const std::string& name) {
 MX DaeBuilderInternal::add_u(const std::string& name) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.variability = Variable::CONTINUOUS;
-  v.causality = Variable::INPUT;
+  v.variability = Variability::CONTINUOUS;
+  v.causality = Causality::INPUT;
   u_.push_back(add_variable(name, v));
   return v.v;
 }
@@ -1873,8 +1872,8 @@ MX DaeBuilderInternal::add_u(const std::string& name) {
 MX DaeBuilderInternal::add_x(const std::string& name) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.variability = Variable::CONTINUOUS;
-  v.causality = Variable::LOCAL;
+  v.variability = Variability::CONTINUOUS;
+  v.causality = Causality::LOCAL;
   x_.push_back(add_variable(name, v));
   return v.v;
 }
@@ -1882,8 +1881,8 @@ MX DaeBuilderInternal::add_x(const std::string& name) {
 MX DaeBuilderInternal::add_z(const std::string& name) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.variability = Variable::CONTINUOUS;
-  v.causality = Variable::LOCAL;
+  v.variability = Variability::CONTINUOUS;
+  v.causality = Causality::LOCAL;
   z_.push_back(add_variable(name, v));
   return v.v;
 }
@@ -1891,8 +1890,8 @@ MX DaeBuilderInternal::add_z(const std::string& name) {
 MX DaeBuilderInternal::add_q(const std::string& name) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.variability = Variable::CONTINUOUS;
-  v.causality = Variable::LOCAL;
+  v.variability = Variability::CONTINUOUS;
+  v.causality = Causality::LOCAL;
   q_.push_back(add_variable(name, v));
   return v.v;
 }
@@ -1900,7 +1899,7 @@ MX DaeBuilderInternal::add_q(const std::string& name) {
 MX DaeBuilderInternal::add_c(const std::string& name, const MX& new_cdef) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.variability = Variable::CONSTANT;
+  v.variability = Variability::CONSTANT;
   v.beq = new_cdef;
   c_.push_back(add_variable(name, v));
   return v.v;
@@ -1909,8 +1908,8 @@ MX DaeBuilderInternal::add_c(const std::string& name, const MX& new_cdef) {
 MX DaeBuilderInternal::add_d(const std::string& name, const MX& new_ddef) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.variability = Variable::FIXED;
-  v.causality = Variable::CALCULATED_PARAMETER;
+  v.variability = Variability::FIXED;
+  v.causality = Causality::CALCULATED_PARAMETER;
   v.beq = new_ddef;
   d_.push_back(add_variable(name, v));
   return v.v;
@@ -1919,7 +1918,7 @@ MX DaeBuilderInternal::add_d(const std::string& name, const MX& new_ddef) {
 MX DaeBuilderInternal::add_w(const std::string& name, const MX& new_wdef) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.variability = Variable::CONTINUOUS;
+  v.variability = Variability::CONTINUOUS;
   v.beq = new_wdef;
   w_.push_back(add_variable(name, v));
   return v.v;
@@ -1928,7 +1927,7 @@ MX DaeBuilderInternal::add_w(const std::string& name, const MX& new_wdef) {
 MX DaeBuilderInternal::add_y(const std::string& name, const MX& new_ydef) {
   Variable v(name);
   v.v = MX::sym(name);
-  v.causality = Variable::OUTPUT;
+  v.causality = Causality::OUTPUT;
   v.beq = new_ydef;
   y_.push_back(add_variable(name, v));
   return v.v;
@@ -1942,7 +1941,7 @@ void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
     // New derivative variable
     Variable xdot("der_" + name);
     xdot.v = MX::sym(xdot.name);
-    xdot.causality = Variable::OUTPUT;
+    xdot.causality = Causality::OUTPUT;
     xdot.der_of = find(name);
     xdot.beq = ode_rhs;
     size_t xdot_ind = add_variable(xdot.name, xdot);
@@ -1961,7 +1960,7 @@ void DaeBuilderInternal::set_alg(const std::string& name, const MX& alg_rhs) {
     // New derivative variable
     Variable alg("alg_" + name);
     alg.v = MX::sym(alg.name);
-    alg.causality = Variable::OUTPUT;
+    alg.causality = Causality::OUTPUT;
     alg.beq = alg_rhs;
     size_t alg_ind = add_variable(alg.name, alg);
     variable(name).alg = alg_ind;
@@ -2021,21 +2020,21 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     var.description = vnode.attribute<std::string>("description", "");
     std::string causality_str = vnode.attribute<std::string>("causality", "local");
     if (causality_str == "internal") causality_str = "local";  // FMI 1.0 -> FMI 2.0
-    var.causality = to_enum<Variable::Causality>(causality_str);
+    var.causality = to_enum<Causality>(causality_str);
     std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
     if (variability_str == "parameter") variability_str = "fixed";  // FMI 1.0 -> FMI 2.0
-    var.variability = to_enum<Variable::Variability>(variability_str);
+    var.variability = to_enum<Variability>(variability_str);
     std::string initial_str = vnode.attribute<std::string>("initial", "");
     if (initial_str.empty()) {
       // Default value
       var.initial = Variable::default_initial(var.causality, var.variability);
     } else {
       // Consistency check
-      casadi_assert(var.causality != Variable::INPUT && var.causality != Variable::INDEPENDENT,
+      casadi_assert(var.causality != Causality::INPUT && var.causality != Causality::INDEPENDENT,
         "The combination causality = '" + to_string(var.causality) + "', "
         "initial = '" + initial_str + "' is not allowed per FMI 2.0 specification.");
       // Value specified
-      var.initial = to_enum<Variable::Initial>(initial_str);
+      var.initial = to_enum<Initial>(initial_str);
     }
     // Other properties
     if (vnode.has_child("Real")) {
@@ -2049,15 +2048,15 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
     } else if (vnode.has_child("Integer")) {
       const XmlNode& props = vnode["Integer"];
-      var.type = Variable::INTEGER;
+      var.type = Type::INTEGER;
       var.min = props.attribute<double>("min", -inf);
       var.max = props.attribute<double>("max", inf);
     } else if (vnode.has_child("Boolean")) {
-      var.type = Variable::BOOLEAN;
+      var.type = Type::BOOLEAN;
     } else if (vnode.has_child("String")) {
-      var.type = Variable::STRING;
+      var.type = Type::STRING;
     } else if (vnode.has_child("Enumeration")) {
-      var.type = Variable::ENUM;
+      var.type = Type::ENUM;
     } else {
       casadi_warning("Unknown type for " + name);
     }
@@ -2187,11 +2186,11 @@ void DaeBuilderInternal::clear_value() {
   }
 }
 
-double DaeBuilderInternal::attribute(Variable::Attribute a, const std::string& name) const {
+double DaeBuilderInternal::attribute(Attribute a, const std::string& name) const {
   return variable(name).attribute(a);
 }
 
-std::vector<double> DaeBuilderInternal::attribute(Variable::Attribute a,
+std::vector<double> DaeBuilderInternal::attribute(Attribute a,
     const std::vector<std::string>& name) const {
   std::vector<double> r;
   r.reserve(name.size());
@@ -2199,22 +2198,22 @@ std::vector<double> DaeBuilderInternal::attribute(Variable::Attribute a,
   return r;
 }
 
-void DaeBuilderInternal::set_attribute(Variable::Attribute a, const std::string& name, double val) {
+void DaeBuilderInternal::set_attribute(Attribute a, const std::string& name, double val) {
   variable(name).set_attribute(a, val);
 }
 
-void DaeBuilderInternal::set_attribute(Variable::Attribute a, const std::vector<std::string>& name,
+void DaeBuilderInternal::set_attribute(Attribute a, const std::vector<std::string>& name,
     const std::vector<double>& val) {
   casadi_assert(name.size() == val.size(), "Dimension mismatch");
   for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_attribute(a, val[k]);
 }
 
-std::string DaeBuilderInternal::string_attribute(Variable::Attribute a,
+std::string DaeBuilderInternal::string_attribute(Attribute a,
     const std::string& name) const {
   return variable(name).string_attribute(a);
 }
 
-std::vector<std::string> DaeBuilderInternal::string_attribute(Variable::Attribute a,
+std::vector<std::string> DaeBuilderInternal::string_attribute(Attribute a,
     const std::vector<std::string>& name) const {
   std::vector<std::string> r;
   r.reserve(name.size());
@@ -2222,12 +2221,12 @@ std::vector<std::string> DaeBuilderInternal::string_attribute(Variable::Attribut
   return r;
 }
 
-void DaeBuilderInternal::set_string_attribute(Variable::Attribute a, const std::string& name,
+void DaeBuilderInternal::set_string_attribute(Attribute a, const std::string& name,
     const std::string& val) {
   variable(name).set_string_attribute(a, val);
 }
 
-void DaeBuilderInternal::set_string_attribute(Variable::Attribute a,
+void DaeBuilderInternal::set_string_attribute(Attribute a,
     const std::vector<std::string>& name, const std::vector<std::string>& val) {
   casadi_assert(name.size() == val.size(), "Dimension mismatch");
   for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_string_attribute(a, val[k]);

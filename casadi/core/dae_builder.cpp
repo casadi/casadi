@@ -618,7 +618,7 @@ std::string DaeBuilder::type(const std::string& name) const {
 }
 
 void DaeBuilder::set_type(const std::string& name, const std::string& val) {
-  variable(name).type = to_enum<Variable::Type>(val);
+  variable(name).type = to_enum<Type>(val);
 }
 
 std::string DaeBuilder::causality(const std::string& name) const {
@@ -626,7 +626,7 @@ std::string DaeBuilder::causality(const std::string& name) const {
 }
 
 void DaeBuilder::set_causality(const std::string& name, const std::string& val) {
-  variable(name).causality = to_enum<Variable::Causality>(val);
+  variable(name).causality = to_enum<Causality>(val);
 }
 
 std::string DaeBuilder::variability(const std::string& name) const {
@@ -634,7 +634,7 @@ std::string DaeBuilder::variability(const std::string& name) const {
 }
 
 void DaeBuilder::set_variability(const std::string& name, const std::string& val) {
-  variable(name).variability = to_enum<Variable::Variability>(val);
+  variable(name).variability = to_enum<Variability>(val);
 }
 
 std::string DaeBuilder::initial(const std::string& name) const {
@@ -642,7 +642,7 @@ std::string DaeBuilder::initial(const std::string& name) const {
 }
 
 void DaeBuilder::set_initial(const std::string& name, const std::string& val) {
-  variable(name).initial = to_enum<Variable::Initial>(val);
+  variable(name).initial = to_enum<Initial>(val);
 }
 
 std::string DaeBuilder::unit(const std::string& name) const {
@@ -915,7 +915,7 @@ std::vector<std::string> DaeBuilder::name(const std::vector<size_t>& ind) const 
 
 double DaeBuilder::attribute(const std::string& a, const std::string& name) const {
   try {
-    return (*this)->attribute(to_enum<Variable::Attribute>(a), name);
+    return (*this)->attribute(to_enum<Attribute>(a), name);
   } catch (std::exception& e) {
     THROW_ERROR("attribute", e.what());
     return 0; // never reached
@@ -925,7 +925,7 @@ double DaeBuilder::attribute(const std::string& a, const std::string& name) cons
 std::vector<double> DaeBuilder::attribute(const std::string& a,
     const std::vector<std::string>& name) const {
   try {
-    return (*this)->attribute(to_enum<Variable::Attribute>(a), name);
+    return (*this)->attribute(to_enum<Attribute>(a), name);
   } catch (std::exception& e) {
     THROW_ERROR("attribute", e.what());
     return {}; // never reached
@@ -934,7 +934,7 @@ std::vector<double> DaeBuilder::attribute(const std::string& a,
 
 void DaeBuilder::set_attribute(const std::string& a, const std::string& name, double val) {
   try {
-    (*this)->set_attribute(to_enum<Variable::Attribute>(a), name, val);
+    (*this)->set_attribute(to_enum<Attribute>(a), name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_attribute", e.what());
   }
@@ -943,7 +943,7 @@ void DaeBuilder::set_attribute(const std::string& a, const std::string& name, do
 void DaeBuilder::set_attribute(const std::string& a, const std::vector<std::string>& name,
     const std::vector<double>& val) {
   try {
-    (*this)->set_attribute(to_enum<Variable::Attribute>(a), name, val);
+    (*this)->set_attribute(to_enum<Attribute>(a), name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_attribute", e.what());
   }
@@ -960,7 +960,7 @@ double DaeBuilder::min(const std::string& name) const {
 
 std::vector<double> DaeBuilder::min(const std::vector<std::string>& name) const {
   try {
-    return (*this)->attribute(Variable::MIN, name);
+    return (*this)->attribute(Attribute::MIN, name);
   } catch (std::exception& e) {
     THROW_ERROR("min", e.what());
     return {}; // never reached
@@ -977,7 +977,7 @@ void DaeBuilder::set_min(const std::string& name, double val) {
 
 void DaeBuilder::set_min(const std::vector<std::string>& name, const std::vector<double>& val) {
   try {
-    (*this)->set_attribute(Variable::MIN, name, val);
+    (*this)->set_attribute(Attribute::MIN, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_min", e.what());
   }
@@ -994,7 +994,7 @@ double DaeBuilder::max(const std::string& name) const {
 
 std::vector<double> DaeBuilder::max(const std::vector<std::string>& name) const {
   try {
-    return (*this)->attribute(Variable::MAX, name);
+    return (*this)->attribute(Attribute::MAX, name);
   } catch (std::exception& e) {
     THROW_ERROR("max", e.what());
     return {}; // never reached
@@ -1011,7 +1011,7 @@ void DaeBuilder::set_max(const std::string& name, double val) {
 
 void DaeBuilder::set_max(const std::vector<std::string>& name, const std::vector<double>& val) {
   try {
-    (*this)->set_attribute(Variable::MAX, name, val);
+    (*this)->set_attribute(Attribute::MAX, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_max", e.what());
   }
@@ -1028,7 +1028,7 @@ double DaeBuilder::nominal(const std::string& name) const {
 
 std::vector<double> DaeBuilder::nominal(const std::vector<std::string>& name) const {
   try {
-    return (*this)->attribute(Variable::NOMINAL, name);
+    return (*this)->attribute(Attribute::NOMINAL, name);
   } catch (std::exception& e) {
     THROW_ERROR("nominal", e.what());
     return {}; // never reached
@@ -1045,7 +1045,7 @@ void DaeBuilder::set_nominal(const std::string& name, double val) {
 
 void DaeBuilder::set_nominal(const std::vector<std::string>& name, const std::vector<double>& val) {
   try {
-    (*this)->set_attribute(Variable::NOMINAL, name, val);
+    (*this)->set_attribute(Attribute::NOMINAL, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_mininal", e.what());
   }
@@ -1062,7 +1062,7 @@ double DaeBuilder::start(const std::string& name) const {
 
 std::vector<double> DaeBuilder::start(const std::vector<std::string>& name) const {
   try {
-    return (*this)->attribute(Variable::START, name);
+    return (*this)->attribute(Attribute::START, name);
   } catch (std::exception& e) {
     THROW_ERROR("start", e.what());
     return {}; // never reached
@@ -1079,7 +1079,7 @@ void DaeBuilder::set_start(const std::string& name, double val) {
 
 void DaeBuilder::set_start(const std::vector<std::string>& name, const std::vector<double>& val) {
   try {
-    (*this)->set_attribute(Variable::START, name, val);
+    (*this)->set_attribute(Attribute::START, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_start", e.what());
   }
@@ -1095,7 +1095,7 @@ void DaeBuilder::clear_value() {
 
 double DaeBuilder::value(const std::string& name) const {
   try {
-    return (*this)->attribute(Variable::VALUE, name);
+    return (*this)->attribute(Attribute::VALUE, name);
   } catch (std::exception& e) {
     THROW_ERROR("value", e.what());
     return {}; // never reached
@@ -1104,7 +1104,7 @@ double DaeBuilder::value(const std::string& name) const {
 
 void DaeBuilder::set_value(const std::string& name, double val) {
   try {
-    (*this)->set_attribute(Variable::VALUE, name, val);
+    (*this)->set_attribute(Attribute::VALUE, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_value", e.what());
   }
@@ -1112,7 +1112,7 @@ void DaeBuilder::set_value(const std::string& name, double val) {
 
 std::string DaeBuilder::string_value(const std::string& name) const {
   try {
-    return (*this)->string_attribute(Variable::STRINGVALUE, name);
+    return (*this)->string_attribute(Attribute::STRINGVALUE, name);
   } catch (std::exception& e) {
     THROW_ERROR("string_value", e.what());
     return {}; // never reached
@@ -1121,7 +1121,7 @@ std::string DaeBuilder::string_value(const std::string& name) const {
 
 void DaeBuilder::set_string_value(const std::string& name, const std::string& val) {
   try {
-    (*this)->set_string_attribute(Variable::STRINGVALUE, name, val);
+    (*this)->set_string_attribute(Attribute::STRINGVALUE, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_string_value", e.what());
   }
@@ -1129,7 +1129,7 @@ void DaeBuilder::set_string_value(const std::string& name, const std::string& va
 
 std::vector<double> DaeBuilder::value(const std::vector<std::string>& name) const {
   try {
-    return (*this)->attribute(Variable::VALUE, name);
+    return (*this)->attribute(Attribute::VALUE, name);
   } catch (std::exception& e) {
     THROW_ERROR("value", e.what());
     return {}; // never reached
@@ -1138,7 +1138,7 @@ std::vector<double> DaeBuilder::value(const std::vector<std::string>& name) cons
 
 void DaeBuilder::set_value(const std::vector<std::string>& name, const std::vector<double>& val) {
   try {
-    (*this)->set_attribute(Variable::VALUE, name, val);
+    (*this)->set_attribute(Attribute::VALUE, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_value", e.what());
   }
@@ -1146,7 +1146,7 @@ void DaeBuilder::set_value(const std::vector<std::string>& name, const std::vect
 
 std::vector<std::string> DaeBuilder::string_value(const std::vector<std::string>& name) const {
   try {
-    return (*this)->string_attribute(Variable::STRINGVALUE, name);
+    return (*this)->string_attribute(Attribute::STRINGVALUE, name);
   } catch (std::exception& e) {
     THROW_ERROR("string_value", e.what());
     return {}; // never reached
@@ -1156,7 +1156,7 @@ std::vector<std::string> DaeBuilder::string_value(const std::vector<std::string>
 void DaeBuilder::set_string_value(const std::vector<std::string>& name,
     const std::vector<std::string>& val) {
   try {
-    (*this)->set_string_attribute(Variable::STRINGVALUE, name, val);
+    (*this)->set_string_attribute(Attribute::STRINGVALUE, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_string_value", e.what());
   }

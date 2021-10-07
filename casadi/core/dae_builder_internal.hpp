@@ -37,26 +37,26 @@ namespace casadi {
 // Forward declarations
 class XmlNode;
 
+/// Variable type
+enum class Type {REAL, INTEGER, BOOLEAN, STRING, ENUM, NUMEL};
+
+/// Causality: FMI 2.0 specification, section 2.2.7
+enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, NUMEL};
+
+/// Variability: FMI 2.0 specification, section 2.2.7
+enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
+
+/// Initial: FMI 2.0 specification, section 2.2.7
+enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
+
+// Attributes
+enum class Attribute {MIN, MAX, NOMINAL, START, VALUE, STRINGVALUE, NUMEL};
+
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
  */
 struct CASADI_EXPORT Variable {
-  /// Variable type
-  enum Type {REAL, INTEGER, BOOLEAN, STRING, ENUM, N_TYPE};
-
-  /// Causality: FMI 2.0 specification, section 2.2.7
-  enum Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, N_CAUSALITY};
-
-  /// Variability: FMI 2.0 specification, section 2.2.7
-  enum Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, N_VARIABILITY};
-
-  /// Initial: FMI 2.0 specification, section 2.2.7
-  enum Initial {EXACT, APPROX, CALCULATED, INITIAL_NA, N_INITIAL};
-
-  // Attributes
-  enum Attribute {MIN, MAX, NOMINAL, START, VALUE, STRINGVALUE, N_ATTRIBUTE};
-
   /// Constructor
   Variable(const std::string& name = "");
 
@@ -473,28 +473,28 @@ protected:
 
   ///@{
   /// Get by attribute name
-  double attribute(Variable::Attribute a, const std::string& name) const;
-  std::vector<double> attribute(Variable::Attribute a, const std::vector<std::string>& name) const;
+  double attribute(Attribute a, const std::string& name) const;
+  std::vector<double> attribute(Attribute a, const std::vector<std::string>& name) const;
   ///@}
 
   ///@{
   /// Set by attribute name
-  void set_attribute(Variable::Attribute a, const std::string& name, double val);
-  void set_attribute(Variable::Attribute a, const std::vector<std::string>& name,
+  void set_attribute(Attribute a, const std::string& name, double val);
+  void set_attribute(Attribute a, const std::vector<std::string>& name,
     const std::vector<double>& val);
   ///@}
 
   ///@{
   /// Get by attribute name (string-valued)
-  std::string string_attribute(Variable::Attribute a, const std::string& name) const;
-  std::vector<std::string> string_attribute(Variable::Attribute a,
+  std::string string_attribute(Attribute a, const std::string& name) const;
+  std::vector<std::string> string_attribute(Attribute a,
     const std::vector<std::string>& name) const;
   ///@}
 
   ///@{
   /// Set by attribute name (string-valued)
-  void set_string_attribute(Variable::Attribute a, const std::string& name, const std::string& val);
-  void set_string_attribute(Variable::Attribute a, const std::vector<std::string>& name,
+  void set_string_attribute(Attribute a, const std::string& name, const std::string& val);
+  void set_string_attribute(Attribute a, const std::vector<std::string>& name,
     const std::vector<std::string>& val);
   ///@}
 
@@ -543,21 +543,6 @@ protected:
 
 ///@{
 /// Number of entries in enums
-template<> struct enum_traits<Variable::Type> {
-  static const size_t n_enum = Variable::N_TYPE;
-};
-template<> struct enum_traits<Variable::Causality> {
-  static const size_t n_enum = Variable::N_CAUSALITY;
-};
-template<> struct enum_traits<Variable::Variability> {
-  static const size_t n_enum = Variable::N_VARIABILITY;
-};
-template<> struct enum_traits<Variable::Initial> {
-  static const size_t n_enum = Variable::N_INITIAL;
-};
-template<> struct enum_traits<Variable::Attribute> {
-  static const size_t n_enum = Variable::N_ATTRIBUTE;
-};
 template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalIn> {
   static const size_t n_enum = DaeBuilderInternal::DAE_BUILDER_NUM_IN;
 };
@@ -568,11 +553,11 @@ template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalOut> {
 
 ///@{
 /// Convert to string
-CASADI_EXPORT std::string to_string(Variable::Type v);
-CASADI_EXPORT std::string to_string(Variable::Causality v);
-CASADI_EXPORT std::string to_string(Variable::Variability v);
-CASADI_EXPORT std::string to_string(Variable::Initial v);
-CASADI_EXPORT std::string to_string(Variable::Attribute v);
+CASADI_EXPORT std::string to_string(Type v);
+CASADI_EXPORT std::string to_string(Causality v);
+CASADI_EXPORT std::string to_string(Variability v);
+CASADI_EXPORT std::string to_string(Initial v);
+CASADI_EXPORT std::string to_string(Attribute v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
 ///@}

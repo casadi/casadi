@@ -38,7 +38,9 @@ namespace casadi {
 
 /// Helper class: Specify number of entries in an enum
 template<typename T>
-struct enum_traits {};
+struct enum_traits {
+  static const size_t n_enum = static_cast<size_t>(T::NUMEL);
+};
 
 /// Helper function: Check if enum exists
 template<typename T>

@@ -126,27 +126,27 @@ void Fmu::init() {
   // Collect input and parameter values
   for (const Variable& v : dae->variables_) {
     // Skip if the wrong type
-    if (v.causality != Variable::PARAMETER && v.causality != Variable::INPUT) continue;
+    if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
     // If nan - variable has not been set - keep default value
     if (std::isnan(v.value)) continue;
     // Value reference
     fmi2ValueReference vr = v.value_reference;
     // Get value
     switch (v.type) {
-      case Variable::REAL:
+      case Type::REAL:
         v_real_.push_back(static_cast<fmi2Real>(v.value));
         vr_real_.push_back(vr);
         break;
-      case Variable::INTEGER:
-      case Variable::ENUM:
+      case Type::INTEGER:
+      case Type::ENUM:
         v_integer_.push_back(static_cast<fmi2Integer>(v.value));
         vr_integer_.push_back(vr);
         break;
-      case Variable::BOOLEAN:
+      case Type::BOOLEAN:
         v_boolean_.push_back(static_cast<fmi2Boolean>(v.value));
         vr_boolean_.push_back(vr);
         break;
-      case Variable::STRING:
+      case Type::STRING:
         v_string_.push_back(v.stringvalue);
         vr_string_.push_back(vr);
         break;
@@ -362,9 +362,9 @@ int Fmu::get_values(FmuMemory* m) const {
     // Get value
     switch (v.type) {
       // Skip if the wrong type
-      if (v.causality == Variable::PARAMETER || v.causality == Variable::INPUT) continue;
+      if (v.causality == Causality::PARAMETER || v.causality == Causality::INPUT) continue;
       // Get by type
-      case Variable::REAL:
+      case Type::REAL:
         {
           // Real
           fmi2Real value;
@@ -376,8 +376,8 @@ int Fmu::get_values(FmuMemory* m) const {
           v.value = value;
           break;
         }
-      case Variable::INTEGER:
-      case Variable::ENUM:
+      case Type::INTEGER:
+      case Type::ENUM:
         {
           // Integer: Convert to double
           fmi2Integer value;
@@ -389,7 +389,7 @@ int Fmu::get_values(FmuMemory* m) const {
           v.value = value;
           break;
         }
-      case Variable::BOOLEAN:
+      case Type::BOOLEAN:
         {
           // Boolean: Convert to double
           fmi2Boolean value;
@@ -401,7 +401,7 @@ int Fmu::get_values(FmuMemory* m) const {
           v.value = value;
           break;
         }
-      case Variable::STRING:
+      case Type::STRING:
         {
           // String
           fmi2String value;
