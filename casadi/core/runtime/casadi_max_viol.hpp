@@ -11,6 +11,7 @@ T1 casadi_max_viol(casadi_int n, const T1* x, const T1* lb, const T1* ub) {
     x_i = x ? *x++ : zero;
     lb_i = lb ? *lb++ : zero;
     ub_i = ub ? *ub++ : zero;
+    // C-REPLACE "fmax" "casadi_fmax"
     r = fmax(r, fmax(x_i-ub_i, zero));
     r = fmax(r, fmax(lb_i-x_i, zero));
   }
