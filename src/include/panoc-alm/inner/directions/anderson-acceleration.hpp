@@ -18,12 +18,12 @@ class AndersonAccel {
         γ_LS.resize(m_AA);
     }
 
-    void initialize(const vec &g₀, const vec &r₀) {
+    void initialize(crvec g₀, crvec r₀) {
         G.col(0) = g₀;
         rₖ₋₁     = r₀;
     }
 
-    void compute(const vec &gₖ, const vec &rₖ, vec &xₖ_aa) {
+    void compute(crvec gₖ, crvec rₖ, rvec xₖ_aa) {
         minimize_update_anderson(qr, G, rₖ, rₖ₋₁, gₖ, γ_LS, xₖ_aa);
     }
 
@@ -52,16 +52,16 @@ class AndersonAccel {
 template <>
 struct PANOCDirection<AndersonAccel> {
 
-    static void initialize(AndersonAccel &aa, const vec &x₀, const vec &x̂₀,
-                           const vec &p₀, const vec &grad₀) {
+    static void initialize(AndersonAccel &aa, crvec x₀, crvec x̂₀,
+                           crvec p₀, crvec grad₀) {
         aa.initialize(x̂₀, p₀);
         (void)aa;
         (void)x₀;
         (void)grad₀;
     }
 
-    static bool update(AndersonAccel &aa, const vec &xₖ, const vec &xₖ₊₁,
-                       const vec &pₖ, const vec &pₖ₊₁, const vec &grad_new,
+    static bool update(AndersonAccel &aa, crvec xₖ, crvec xₖ₊₁,
+                       crvec pₖ, crvec pₖ₊₁, crvec grad_new,
                        const Box &C, real_t γ_new) {
         (void)aa;
         (void)xₖ;
@@ -74,8 +74,8 @@ struct PANOCDirection<AndersonAccel> {
         return true;
     }
 
-    static bool apply(AndersonAccel &aa, const vec &xₖ, const vec &x̂ₖ,
-                      const vec &pₖ, real_t γ, vec &qₖ) {
+    static bool apply(AndersonAccel &aa, crvec xₖ, crvec x̂ₖ,
+                      crvec pₖ, real_t γ, rvec qₖ) {
         (void)xₖ;
         (void)x̂ₖ;
         (void)γ;

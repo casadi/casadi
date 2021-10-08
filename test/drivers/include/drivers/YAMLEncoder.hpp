@@ -16,7 +16,7 @@
 
 #include <sstream>
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::vec &v) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::crvec v) {
     out << YAML::Flow;
     out << YAML::BeginSeq;
     for (pa::vec::Index i = 0; i < v.size(); ++i)

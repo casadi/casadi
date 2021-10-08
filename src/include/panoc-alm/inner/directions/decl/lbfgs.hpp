@@ -47,7 +47,7 @@ class LBFGS {
 
     /// Update the inverse Hessian approximation using the new vectors xₖ₊₁
     /// and pₖ₊₁.
-    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
+    bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁,
                 Sign sign, bool forced = false);
 
     /// Apply the inverse Hessian approximation to the given vector q.
@@ -104,11 +104,11 @@ struct PANOCDirection<LBFGS> {
     PANOCDirection(const LBFGS &lbfgs) : lbfgs(lbfgs) {}
     PANOCDirection(LBFGS &&lbfgs) : lbfgs(std::move(lbfgs)) {}
 
-    void initialize(const vec &x₀, const vec &x̂₀, const vec &p₀,
-                    const vec &grad₀);
-    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
-                const vec &grad_new, const Box &C, real_t γ_new);
-    bool apply(const vec &xₖ, const vec &x̂ₖ, const vec &pₖ, real_t γ, vec &qₖ);
+    void initialize(crvec x₀, crvec x̂₀, crvec p₀,
+                    crvec grad₀);
+    bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁,
+                crvec grad_new, const Box &C, real_t γ_new);
+    bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ);
     void changed_γ(real_t γₖ, real_t old_γₖ);
     void reset();
     std::string get_name() const;

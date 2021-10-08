@@ -17,30 +17,30 @@ using pa::project;
 
 namespace detail {
 
-vec eval_g(const Problem &prob, const vec &x) {
+vec eval_g(const Problem &prob, crvec x) {
     vec g(prob.m);
     prob.g(x, g);
     return g;
 }
 
-vec eval_ẑ(const Problem &prob, const vec &x, const vec &y, const vec &Σ) {
+vec eval_ẑ(const Problem &prob, crvec x, crvec y, crvec Σ) {
     vec g = eval_g(prob, x);
     return project(g + Σ.asDiagonal().inverse() * y, prob.D);
 }
 
-vec eval_ŷ(const Problem &prob, const vec &x, const vec &y, const vec &Σ) {
+vec eval_ŷ(const Problem &prob, crvec x, crvec y, crvec Σ) {
     vec g = eval_g(prob, x);
     vec ẑ = eval_ẑ(prob, x, y, Σ);
     return Σ.asDiagonal() * (g - ẑ) + y;
 }
 
-real_t eval_ψ(const Problem &prob, const vec &x, const vec &y, const vec &Σ) {
+real_t eval_ψ(const Problem &prob, crvec x, crvec y, crvec Σ) {
     vec g = eval_g(prob, x);
     return prob.f(x) +
            0.5 * dist_squared(g + Σ.asDiagonal().inverse() * y, prob.D, Σ);
 }
 
-vec eval_grad_ψ(const Problem &prob, const vec &x, const vec &y, const vec &Σ) {
+vec eval_grad_ψ(const Problem &prob, crvec x, crvec y, crvec Σ) {
     vec ŷ = eval_ŷ(prob, x, y, Σ);
     vec grad_f(prob.n), grad_gŷ(prob.n);
     prob.grad_f(x, grad_f);
@@ -48,24 +48,23 @@ vec eval_grad_ψ(const Problem &prob, const vec &x, const vec &y, const vec &Σ)
     return grad_f + grad_gŷ;
 }
 
-vec projected_gradient_step(const Problem &prob, const vec &x, const vec &y,
-                            const vec &Σ, real_t γ) {
+vec projected_gradient_step(const Problem &prob, crvec x, crvec y, crvec Σ,
+                            real_t γ) {
     using binary_real_f = real_t (*)(real_t, real_t);
     return (-γ * eval_grad_ψ(prob, x, y, Σ))
         .binaryExpr(prob.C.lowerbound - x, binary_real_f(std::fmax))
         .binaryExpr(prob.C.upperbound - x, binary_real_f(std::fmin));
 }
 
-real_t eval_φ(const Problem &prob, const vec &x, const vec &y, const vec &Σ,
-              real_t γ) {
+real_t eval_φ(const Problem &prob, crvec x, crvec y, crvec Σ, real_t γ) {
     vec p = projected_gradient_step(prob, x, y, Σ, γ);
     return eval_ψ(prob, x, y, Σ)                //
            + 1. / (2 * γ) * p.squaredNorm()     //
            + eval_grad_ψ(prob, x, y, Σ).dot(p); //
 }
 
-real_t estimate_lipschitz(const Problem &prob, const vec &x, const vec &y,
-                          const vec &Σ, const PANOCParams &params) {
+real_t estimate_lipschitz(const Problem &prob, crvec x, crvec y, crvec Σ,
+                          const PANOCParams &params) {
     // Estimate Lipschitz constant using finite difference
     vec h = (x * params.Lipschitz.ε).cwiseAbs().cwiseMax(params.Lipschitz.δ);
     // Calculate ∇ψ(x₀ + h) and ∇ψ(x₀)
@@ -75,8 +74,8 @@ real_t estimate_lipschitz(const Problem &prob, const vec &x, const vec &y,
     return L;
 }
 
-real_t calc_error_stop_crit(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
-                            const vec &y, const vec &Σ, real_t γ) {
+real_t calc_error_stop_crit(const Problem &prob, crvec xₖ, crvec x̂ₖ, crvec y,
+                            crvec Σ, real_t γ) {
     vec p = projected_gradient_step(prob, xₖ, y, Σ, γ);
     return ((1 / γ) * p                    //
             + (eval_grad_ψ(prob, xₖ, y, Σ) //
@@ -84,9 +83,8 @@ real_t calc_error_stop_crit(const Problem &prob, const vec &xₖ, const vec &x̂
         .lpNorm<Eigen::Infinity>();
 }
 
-bool lipschitz_check(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
-                     const vec &y, const vec &Σ, real_t γ, real_t L,
-                     real_t rounding_threshold) {
+bool lipschitz_check(const Problem &prob, crvec xₖ, crvec x̂ₖ, crvec y, crvec Σ,
+                     real_t γ, real_t L, real_t rounding_threshold) {
     real_t ψₖ   = eval_ψ(prob, xₖ, y, Σ);
     real_t ψx̂ₖ  = eval_ψ(prob, x̂ₖ, y, Σ);
     vec grad_ψₖ = eval_grad_ψ(prob, xₖ, y, Σ);
@@ -98,20 +96,19 @@ bool lipschitz_check(const Problem &prob, const vec &xₖ, const vec &x̂ₖ,
 
 } // namespace detail
 
-using pa::LBFGS;
 using pa::SolverStatus;
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
 PANOCSolver::Stats PANOCSolver::operator()(
     const Problem &problem, ///< [in]    Problem description
-    const vec &Σ,           ///< [in]    Constraint weights @f$ \Sigma @f$
+    crvec Σ,                ///< [in]    Constraint weights @f$ \Sigma @f$
     real_t ε,               ///< [in]    Tolerance @f$ \varepsilon @f$
     bool
         always_overwrite_results, ///< [in] Overwrite x, y and err_z even if not converged
-    vec &x,                       ///< [inout] Decision variable @f$ x @f$
-    vec &y,                       ///< [inout] Lagrange multiplier @f$ x @f$
-    vec &err_z ///< [out]   Slack variable error @f$ g(x) - z @f$
+    rvec x,                       ///< [inout] Decision variable @f$ x @f$
+    rvec y,                       ///< [inout] Lagrange multiplier @f$ x @f$
+    rvec err_z ///< [out]   Slack variable error @f$ g(x) - z @f$
 ) {
     using namespace detail;
     auto start_time = std::chrono::steady_clock::now();
@@ -176,7 +173,9 @@ PANOCSolver::Stats PANOCSolver::operator()(
         vec pₖ = projected_gradient_step(problem, xₖ, y, Σ, γₖ);
         vec qₖ(n);
         real_t step_size =
-            params.lbfgs_stepsize == pa::LBFGSStepSize::BasedOnGradientStepSize ? 1 : -1;
+            params.lbfgs_stepsize == pa::LBFGSStepSize::BasedOnGradientStepSize
+                ? 1
+                : -1;
         if (k > 0)
             lbfgs.apply(xₖ, x̂ₖ, pₖ, step_size, qₖ);
         else

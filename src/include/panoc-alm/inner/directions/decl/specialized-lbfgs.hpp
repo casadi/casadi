@@ -17,23 +17,23 @@ class SpecializedLBFGS {
     }
 
     /// Standard L-BFGS update without changing the step size γ.
-    bool standard_update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ,
-                         const vec &pₖ₊₁, const vec &gradₖ₊₁);
+    bool standard_update(crvec xₖ, crvec xₖ₊₁, crvec pₖ,
+                         crvec pₖ₊₁, crvec gradₖ₊₁);
     /// L-BFGS update when changing the step size γ, recomputing everything.
-    bool full_update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ_old_γ,
-                     const vec &pₖ₊₁, const vec &gradₖ₊₁, const Box &C,
+    bool full_update(crvec xₖ, crvec xₖ₊₁, crvec pₖ_old_γ,
+                     crvec pₖ₊₁, crvec gradₖ₊₁, const Box &C,
                      real_t γ);
     /// Update the inverse Hessian approximation using the new vectors xₖ₊₁
     /// and pₖ₊₁.
-    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
-                const vec &gradₖ₊₁, const Box &C, real_t γ);
+    bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁,
+                crvec gradₖ₊₁, const Box &C, real_t γ);
 
     /// Apply the inverse Hessian approximation to the given vector q.
     template <class Vec>
     void apply(Vec &&q);
 
     /// Initialize with the starting point x₀ and the gradient in that point.
-    void initialize(const vec &x₀, const vec &grad₀);
+    void initialize(crvec x₀, crvec grad₀);
 
     /// Throw away the approximation and all previous vectors s and y.
     void reset();

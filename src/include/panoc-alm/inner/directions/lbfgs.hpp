@@ -29,8 +29,8 @@ inline bool LBFGS::update_valid(LBFGSParams params, real_t yᵀs, real_t sᵀs,
     return true;
 }
 
-inline bool LBFGS::update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ,
-                          const vec &pₖ₊₁, Sign sign, bool forced) {
+inline bool LBFGS::update(crvec xₖ, crvec xₖ₊₁, crvec pₖ,
+                          crvec pₖ₊₁, Sign sign, bool forced) {
     const auto s = xₖ₊₁ - xₖ;
     const auto y = sign == Sign::Positive ? pₖ₊₁ - pₖ : pₖ - pₖ₊₁;
     real_t yᵀs   = y.dot(s);
@@ -203,17 +203,17 @@ inline void LBFGS::scale_y(real_t factor) {
     }
 }
 
-inline void PANOCDirection<LBFGS>::initialize(const vec &x₀, const vec &x̂₀,
-                                              const vec &p₀, const vec &grad₀) {
+inline void PANOCDirection<LBFGS>::initialize(crvec x₀, crvec x̂₀,
+                                              crvec p₀, crvec grad₀) {
     lbfgs.resize(x₀.size());
     (void)x̂₀;
     (void)p₀;
     (void)grad₀;
 }
 
-inline bool PANOCDirection<LBFGS>::update(const vec &xₖ, const vec &xₖ₊₁,
-                                          const vec &pₖ, const vec &pₖ₊₁,
-                                          const vec &grad_new, const Box &C,
+inline bool PANOCDirection<LBFGS>::update(crvec xₖ, crvec xₖ₊₁,
+                                          crvec pₖ, crvec pₖ₊₁,
+                                          crvec grad_new, const Box &C,
                                           real_t γ_new) {
     (void)grad_new;
     (void)C;
@@ -221,8 +221,8 @@ inline bool PANOCDirection<LBFGS>::update(const vec &xₖ, const vec &xₖ₊₁
     return lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, LBFGS::Sign::Negative);
 }
 
-inline bool PANOCDirection<LBFGS>::apply(const vec &xₖ, const vec &x̂ₖ,
-                                         const vec &pₖ, real_t γ, vec &qₖ) {
+inline bool PANOCDirection<LBFGS>::apply(crvec xₖ, crvec x̂ₖ,
+                                         crvec pₖ, real_t γ, rvec qₖ) {
     (void)xₖ;
     (void)x̂ₖ;
     qₖ = pₖ;

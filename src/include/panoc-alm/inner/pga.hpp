@@ -129,7 +129,7 @@ PGASolver::operator()(const Problem &problem,        // in
 
     // Wrappers for helper functions that automatically pass along any arguments
     // that are constant within PGA (for readability in the main algorithm)
-    auto calc_ψ_ŷ = [&problem, &y, &Σ](const vec &x, vec &ŷ) {
+    auto calc_ψ_ŷ = [&problem, &y, &Σ](crvec x, rvec ŷ) {
         return detail::calc_ψ_ŷ(problem, x, y, Σ, ŷ);
     };
     auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,

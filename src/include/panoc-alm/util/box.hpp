@@ -34,7 +34,7 @@ projecting_difference(const Vec &v,  ///< [in] The vector to project
 /// Get the distance squared between the given vector and its projection.
 /// @f[ \left\| v - \Pi_C(v) \right\|_2^2 @f]
 /// @warning    Beware catastrophic cancellation!
-inline real_t dist_squared(const vec &v,  ///< [in] The vector to project
+inline real_t dist_squared(crvec v,       ///< [in] The vector to project
                            const Box &box ///< [in] The box to project onto
 ) {
     return projecting_difference(v, box).squaredNorm();
@@ -45,11 +45,11 @@ inline real_t dist_squared(const vec &v,  ///< [in] The vector to project
 /// @f[ \left\| v - \Pi_C(v) \right\|_\Sigma^2
 /// = \left(v - \Pi_C(v)\right)^\top \Sigma \left(v - \Pi_C(v)\right) @f]
 /// @warning    Beware catastrophic cancellation!
-inline real_t dist_squared(const vec &v,   ///< [in] The vector to project
+inline real_t dist_squared(crvec v,        ///< [in] The vector to project
                            const Box &box, ///< [in] The box to project onto
-                           const vec &Σ ///< [in] Diagonal matrix defining norm
+                           crvec Σ ///< [in] Diagonal matrix defining norm
 ) {
-    // TODO: Does this allocate? 
+    // TODO: Does this allocate?
     //       Does it have dangling references to temporaries?
     auto d = v - project(v, box);
     return d.dot(Σ.asDiagonal() * d);

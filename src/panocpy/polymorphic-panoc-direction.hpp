@@ -13,18 +13,15 @@ namespace pa {
 class PolymorphicPANOCDirectionBase
     : public std::enable_shared_from_this<PolymorphicPANOCDirectionBase> {
   public:
-    virtual ~PolymorphicPANOCDirectionBase()         = default;
-    virtual void initialize(const vec &x₀, const vec &x̂₀, const vec &p₀,
-                            const vec &grad₀)        = 0;
-    virtual bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ,
-                        const vec &pₖ₊₁, const vec &grad_new, const Box &C,
-                        real_t γ_new)                = 0;
-    virtual bool apply(const vec &xₖ, const vec &x̂ₖ, const vec &pₖ, real_t γ,
-                       vec &qₖ)                      = 0;
-    virtual void changed_γ(real_t γₖ, real_t old_γₖ) = 0;
-    virtual void reset()                             = 0;
-    virtual std::string get_name() const             = 0;
-    vec apply_ret(const vec &xₖ, const vec &x̂ₖ, const vec &pₖ, real_t γ) {
+    virtual ~PolymorphicPANOCDirectionBase() = default;
+    virtual void initialize(crvec x₀, crvec x̂₀, crvec p₀, crvec grad₀)  = 0;
+    virtual bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁,
+                        crvec grad_new, const Box &C, real_t γ_new)     = 0;
+    virtual bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) = 0;
+    virtual void changed_γ(real_t γₖ, real_t old_γₖ)                    = 0;
+    virtual void reset()                                                = 0;
+    virtual std::string get_name() const                                = 0;
+    vec apply_ret(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ) {
         vec qₖ(pₖ.size());
         apply(xₖ, x̂ₖ, pₖ, γ, qₖ);
         return qₖ;
@@ -35,18 +32,16 @@ class PolymorphicPANOCDirectionBase
 class PolymorphicPANOCDirectionTrampoline
     : public PolymorphicPANOCDirectionBase {
   public:
-    void initialize(const vec &x₀, const vec &x̂₀, const vec &p₀,
-                    const vec &grad₀) override {
+    void initialize(crvec x₀, crvec x̂₀, crvec p₀, crvec grad₀) override {
         PYBIND11_OVERRIDE_PURE(void, PolymorphicPANOCDirectionBase, initialize,
                                x₀, x̂₀, p₀, grad₀);
     }
-    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
-                const vec &grad_new, const Box &C, real_t γ_new) override {
+    bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁, crvec grad_new,
+                const Box &C, real_t γ_new) override {
         PYBIND11_OVERRIDE_PURE(bool, PolymorphicPANOCDirectionBase, update, xₖ,
                                xₖ₊₁, pₖ, pₖ₊₁, grad_new, C, γ_new);
     }
-    bool apply(const vec &xₖ, const vec &x̂ₖ, const vec &pₖ, real_t γ,
-               vec &qₖ) override {
+    bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) override {
         PYBIND11_OVERRIDE_PURE(bool, PolymorphicPANOCDirectionBase, apply, xₖ,
                                x̂ₖ, pₖ, γ, qₖ);
     }
@@ -76,15 +71,14 @@ struct PANOCDirection<PolymorphicPANOCDirectionBase> {
     PANOCDirection(DirectionPtr &&direction)
         : direction(std::move(direction)) {}
 
-    void initialize(const vec &x₀, const vec &x̂₀, const vec &p₀,
-                    const vec &grad₀) {
+    void initialize(crvec x₀, crvec x̂₀, crvec p₀, crvec grad₀) {
         direction->initialize(x₀, x̂₀, p₀, grad₀);
     }
-    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
-                const vec &grad_new, const Box &C, real_t γ_new) {
+    bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁, crvec grad_new,
+                const Box &C, real_t γ_new) {
         return direction->update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_new, C, γ_new);
     }
-    bool apply(const vec &xₖ, const vec &x̂ₖ, const vec &pₖ, real_t γ, vec &qₖ) {
+    bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) {
         return direction->apply(xₖ, x̂ₖ, pₖ, γ, qₖ);
     }
     void changed_γ(real_t γₖ, real_t old_γₖ) {
@@ -105,17 +99,15 @@ class PolymorphicPANOCDirection : public PolymorphicPANOCDirectionBase {
     PolymorphicPANOCDirection(const DirectionProvider &direction)
         : direction_provider(direction) {}
 
-    void initialize(const vec &x₀, const vec &x̂₀, const vec &p₀,
-                    const vec &grad₀) override {
+    void initialize(crvec x₀, crvec x̂₀, crvec p₀, crvec grad₀) override {
         direction_provider.initialize(x₀, x̂₀, p₀, grad₀);
     }
-    bool update(const vec &xₖ, const vec &xₖ₊₁, const vec &pₖ, const vec &pₖ₊₁,
-                const vec &grad_new, const Box &C, real_t γ_new) override {
+    bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁, crvec grad_new,
+                const Box &C, real_t γ_new) override {
         return direction_provider.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_new, C,
                                          γ_new);
     }
-    bool apply(const vec &xₖ, const vec &x̂ₖ, const vec &pₖ, real_t γ,
-               vec &qₖ) override {
+    bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) override {
         return direction_provider.apply(xₖ, x̂ₖ, pₖ, γ, qₖ);
     }
     void changed_γ(real_t γₖ, real_t old_γₖ) override {

@@ -27,9 +27,9 @@ namespace pa {
  * x_{k+1} &= \sum_{i=0}^{m_k} \alpha_i\,g_i
  * \end{aligned} @f]
  */
-inline void minimize_update_anderson(LimitedMemoryQR &qr, mat &G, const vec &rₖ,
-                                     const vec &rₖ₋₁, const vec &gₖ, vec &γ_LS,
-                                     vec &xₖ_aa) {
+inline void minimize_update_anderson(LimitedMemoryQR &qr, rmat G, crvec rₖ,
+                                     crvec rₖ₋₁, crvec gₖ, rvec γ_LS,
+                                     rvec xₖ_aa) {
     // Update QR factorization for Anderson acceleration
     if (qr.num_columns() == qr.m()) // if the history buffer is full
         qr.remove_column();

@@ -5,7 +5,7 @@
 
 namespace pa_ref {
 
-vec finite_diff(std::function<real_t(const vec &)> f, const vec &x) {
+vec finite_diff(std::function<real_t(crvec )> f, crvec x) {
     const auto n = x.size();
     vec grad(n);
     vec h        = vec::Zero(n);

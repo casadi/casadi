@@ -4,11 +4,13 @@
 #include <Eigen/QR>
 #include <panoc-alm/inner/detail/anderson-helpers.hpp>
 
+using pa::crmat;
+using pa::crvec;
 using pa::mat;
 using pa::real_t;
 using pa::vec;
 
-mat rotate_add(const mat &m, const vec &v) {
+mat rotate_add(crmat m, crvec v) {
     mat result(m.rows(), m.cols());
     result.block(0, 0, m.rows(), m.cols() - 1) =
         m.block(0, 1, m.rows(), m.cols() - 1);

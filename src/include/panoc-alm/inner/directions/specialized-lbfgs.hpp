@@ -8,7 +8,7 @@
 
 namespace pa {
 
-inline void SpecializedLBFGS::initialize(const vec &x₀, const vec &grad₀) {
+inline void SpecializedLBFGS::initialize(crvec x₀, crvec grad₀) {
     idx  = 0;
     full = false;
     x(0) = x₀;
@@ -16,9 +16,9 @@ inline void SpecializedLBFGS::initialize(const vec &x₀, const vec &grad₀) {
 }
 
 /// Standard L-BFGS update without changing the step size γ.
-inline bool SpecializedLBFGS::standard_update(const vec &xₖ, const vec &xₖ₊₁,
-                                              const vec &pₖ, const vec &pₖ₊₁,
-                                              const vec &gradₖ₊₁) {
+inline bool SpecializedLBFGS::standard_update(crvec xₖ, crvec xₖ₊₁,
+                                              crvec pₖ, crvec pₖ₊₁,
+                                              crvec gradₖ₊₁) {
     const auto s = xₖ₊₁ - xₖ;
     const auto y = pₖ - pₖ₊₁;
 
@@ -47,9 +47,9 @@ inline bool SpecializedLBFGS::standard_update(const vec &xₖ, const vec &xₖ�
 }
 
 /// L-BFGS update when changing the step size γ, recomputing everything.
-inline bool SpecializedLBFGS::full_update(const vec &xₖ, const vec &xₖ₊₁,
-                                          const vec &pₖ_old_γ, const vec &pₖ₊₁,
-                                          const vec &gradₖ₊₁, const Box &C,
+inline bool SpecializedLBFGS::full_update(crvec xₖ, crvec xₖ₊₁,
+                                          crvec pₖ_old_γ, crvec pₖ₊₁,
+                                          crvec gradₖ₊₁, const Box &C,
                                           real_t γ) {
     auto &&sₖ = xₖ₊₁ - xₖ;
     auto &&yₖ = this->w(); // temporary workspace
@@ -94,9 +94,9 @@ inline bool SpecializedLBFGS::full_update(const vec &xₖ, const vec &xₖ₊₁
     return true;
 }
 
-inline bool SpecializedLBFGS::update(const vec &xₖ, const vec &xₖ₊₁,
-                                     const vec &pₖ, const vec &pₖ₊₁,
-                                     const vec &gradₖ₊₁, const Box &C,
+inline bool SpecializedLBFGS::update(crvec xₖ, crvec xₖ₊₁,
+                                     crvec pₖ, crvec pₖ₊₁,
+                                     crvec gradₖ₊₁, const Box &C,
                                      real_t γ) {
     bool ret = (γ == old_γ || old_γ == 0)
                    ? standard_update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, gradₖ₊₁)
@@ -155,21 +155,21 @@ namespace pa {
 template <>
 struct PANOCDirection<SpecializedLBFGS> {
 
-    static void initialize(SpecializedLBFGS &lbfgs, const vec &x₀,
-                           const vec &x̂₀, const vec &p₀, const vec &grad₀) {
+    static void initialize(SpecializedLBFGS &lbfgs, crvec x₀,
+                           crvec x̂₀, crvec p₀, crvec grad₀) {
         lbfgs.initialize(x₀, grad₀);
         (void)x̂₀;
         (void)p₀;
     }
 
-    static bool update(SpecializedLBFGS &lbfgs, const vec &xₖ, const vec &xₖ₊₁,
-                       const vec &pₖ, const vec &pₖ₊₁, const vec &gradₖ₊₁,
+    static bool update(SpecializedLBFGS &lbfgs, crvec xₖ, crvec xₖ₊₁,
+                       crvec pₖ, crvec pₖ₊₁, crvec gradₖ₊₁,
                        const Box &C, real_t γ) {
         return lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, gradₖ₊₁, C, γ);
     }
 
-    static bool apply(SpecializedLBFGS &lbfgs, const vec &xₖ, const vec &x̂ₖ,
-                      const vec &pₖ, real_t γ, vec &qₖ) {
+    static bool apply(SpecializedLBFGS &lbfgs, crvec xₖ, crvec x̂ₖ,
+                      crvec pₖ, real_t γ, rvec qₖ) {
         (void)xₖ;
         (void)x̂ₖ;
         (void)γ; // TODO: add this parameter to SLBFGS

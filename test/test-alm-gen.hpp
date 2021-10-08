@@ -38,23 +38,23 @@ inline pa::Problem make_problem() {
     auto x0 = vec(nx);
     x0.fill(1);
 
-    auto f = [=](const vec &ux) {
+    auto f = [=](crvec ux) {
         auto u = ux.topRows(nu);
         auto x = ux.bottomRows(nx);
         return x.dot(Q * x) + u.dot(R * u);
     };
-    auto grad_f = [=](const vec &ux, vec &grad_f) {
+    auto grad_f = [=](crvec ux, rvec grad_f) {
         auto u                = ux.topRows(nu);
         auto x                = ux.bottomRows(nx);
         grad_f.topRows(nu)    = 2 * (R * u);
         grad_f.bottomRows(nx) = 2 * (Q * x);
     };
-    auto g = [=](const vec &ux, vec &g_u) {
+    auto g = [=](crvec ux, rvec g_u) {
         auto u         = ux.topRows(nu);
         auto x         = ux.bottomRows(nx);
         g_u.topRows(m) = A * x0 + B * u - x;
     };
-    auto grad_g = [=](const vec &ux, const vec &v, vec &grad_u_v) {
+    auto grad_g = [=](crvec ux, crvec v, rvec grad_u_v) {
         (void)ux;
         grad_u_v.topRows(nu)    = B.transpose() * v;
         grad_u_v.bottomRows(nx) = -pa::mat::Identity(nx, nx) * v;
@@ -63,8 +63,8 @@ inline pa::Problem make_problem() {
     return Problem{n, m, C, D, f, grad_f, g, grad_g};
 }
 
-inline void do_test(const pa::Problem &p, const pa::vec &expected_sol,
-                    const pa::vec &expected_lagrange_multipliers) {
+inline void do_test(const pa::Problem &p, const pa::rvec expected_sol,
+                    const pa::rvec expected_lagrange_multipliers) {
     using namespace pa;
 
     ALMParams almparam;

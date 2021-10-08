@@ -11,8 +11,8 @@ TEST(LBFGS, quadratic) {
 
     std::cout << "Inverse Hessian: \n" << H.inverse() << std::endl;
 
-    auto f      = [&H](const pa::vec &v) { return 0.5 * v.dot(H * v); };
-    auto grad_f = [&H](const pa::vec &v) { return pa::vec(H * v); };
+    auto f      = [&H](pa::crvec v) { return 0.5 * v.dot(H * v); };
+    auto grad_f = [&H](pa::crvec v) { return pa::vec(H * v); };
 
     pa::mat B = pa::mat::Identity(2, 2);
 

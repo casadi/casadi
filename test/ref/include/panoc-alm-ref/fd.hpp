@@ -6,9 +6,10 @@
 
 namespace pa_ref {
 
+using pa::crvec;
 using pa::real_t;
 using pa::vec;
 
-vec finite_diff(std::function<real_t(const vec &)> f, const vec &x);
+vec finite_diff(std::function<real_t(crvec)> f, crvec x);
 
 } // namespace pa_ref

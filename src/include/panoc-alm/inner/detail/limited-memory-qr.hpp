@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <panoc-alm/util/ringbuffer.hpp>
 #include <panoc-alm/util/vec.hpp>
+#include <type_traits>
 
 namespace pa {
 
@@ -149,17 +150,16 @@ class LimitedMemoryQR {
         }
     }
 
+    template <class Derived>
+    using solve_ret_t = std::conditional_t<
+        Eigen::internal::traits<Derived>::ColsAtCompileTime == 1, vec, mat>;
+
     /// Solve the least squares problem AX = B.
-    mat solve(const mat &B) {
-        mat X(m(), B.cols());
+    template <class Derived>
+    solve_ret_t<Derived> solve(const Eigen::DenseBase<Derived> &B) {
+        solve_ret_t<Derived> X(m(), B.cols());
         solve(B, X);
         return X;
-    }
-    /// Solve the least squares problem Ax = b.
-    vec solve(const vec &b) {
-        vec x(m());
-        solve(b, x);
-        return x;
     }
 
     /// Get the full, raw storage for the orthogonal matrix Q.
