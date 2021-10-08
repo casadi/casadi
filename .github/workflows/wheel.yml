@@ -35,7 +35,7 @@ jobs:
       run: |
         . /tmp/py-venv/bin/activate
         rm -rf _skbuild/
-        python setup.py bdist_wheel --build-type Release
+        python setup.py bdist_wheel --build-type Release -j$(nproc) --generator Ninja --skip-generator-test
         LD_LIBRARY_PATH=$VIRTUAL_ENV/lib \
           auditwheel repair --plat manylinux_2_27_x86_64 \
           dist/panocpy-*.whl
