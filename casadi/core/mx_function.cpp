@@ -626,7 +626,7 @@ namespace casadi {
         }
       } else if (e.op==OP_CONST) {
         if (e.data.is_scalar() && round(e.data->to_double())==e.data->to_double()) {
-          if (e.res.front()>=0)
+          if (e.res.front()>=0 && !data_type_.empty())
           worktype_[e.res.front()] = "int";
         } else {
           if (e.res.front()>=0)
@@ -646,7 +646,7 @@ namespace casadi {
         }
         for (casadi_int i=0; i<e.res.size(); ++i) {
           if (e.res[i]>=0) {
-            if (is_real) {
+            if (is_real || data_type_.empty()) {
               worktype_[e.res[i]] = "real";
             } else if (is_int) {
               worktype_[e.res[i]] = "int";
