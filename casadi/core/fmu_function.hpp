@@ -248,6 +248,8 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
 struct CASADI_EXPORT Fmu {
   // Constructor
   Fmu(const DaeBuilderInternal* dae,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc);
 
@@ -264,10 +266,11 @@ struct CASADI_EXPORT Fmu {
   Importer li_;
 
   // IO scheme, linear combinations
+  std::vector<std::string> name_in_, name_out_;
   std::map<std::string, std::vector<size_t>> scheme_, lc_;
 
   // Mapping from scheme variable to and from FMU variable indices
-  std::vector<size_t> ind_, ind_map_;
+  std::vector<size_t> iind_, iind_map_, oind_, oind_map_;
 
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;

@@ -829,8 +829,11 @@ Sparsity JacOutput::sparsity(const FmuFunction& f) const {
 }
 
 Fmu::Fmu(const DaeBuilderInternal* dae,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
-    const std::map<std::string, std::vector<size_t>>& lc) : scheme_(scheme), lc_(lc) {
+    const std::map<std::string, std::vector<size_t>>& lc)
+    : name_in_(name_in), name_out_(name_out), scheme_(scheme), lc_(lc) {
   dae_ = dae->shared_from_this<DaeBuilder>();
   counter_ = 0;
   instantiate_ = 0;
@@ -844,29 +847,54 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
   set_boolean_ = 0;
   get_real_ = 0;
   get_directional_derivative_ = 0;
-  // Mark scheme indices
+  // Mark input indices
   size_t numel = 0;
   std::vector<bool> lookup(dae->variables_.size(), false);
-  for (auto&& e : scheme_) {
-    for (size_t i : e.second) {
+  for (auto&& n : name_in_) {
+    auto it = scheme_.find(n);
+    casadi_assert(it != scheme_.end(),
+      "Input not found in scheme: " + n + ", available: " + str(name_in_));
+    for (size_t i : it->second) {
       casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
       lookup.at(i) = true;
     }
-    numel += e.second.size();
+    numel += it->second.size();
   }
-  // Construct mappings
-  ind_.reserve(numel);
-  ind_map_.reserve(lookup.size());
+  // Input mappings
+  iind_.reserve(numel);
+  iind_map_.reserve(lookup.size());
   for (size_t k = 0; k < lookup.size(); ++k) {
     if (lookup[k]) {
-      ind_map_.push_back(ind_.size());
-      ind_.push_back(k);
+      iind_map_.push_back(iind_.size());
+      iind_.push_back(k);
     } else {
-      ind_map_.push_back(-1);
+      iind_map_.push_back(-1);
     }
   }
-
-
+  // Mark output indices
+  numel = 0;
+  std::fill(lookup.begin(), lookup.end(), false);
+  for (auto&& n : name_out_) {
+    auto it = scheme_.find(n);
+    casadi_assert(it != scheme_.end(),
+      "Output not found in scheme: " + n + ", available: " + str(name_out_));
+    for (size_t i : it->second) {
+      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
+      lookup.at(i) = true;
+    }
+    numel += it->second.size();
+  }
+  // Construct mappings
+  oind_.reserve(numel);
+  oind_map_.reserve(lookup.size());
+  for (size_t k = 0; k < lookup.size(); ++k) {
+    if (lookup[k]) {
+      oind_map_.push_back(oind_.size());
+      oind_.push_back(k);
+    } else {
+      oind_map_.push_back(-1);
+    }
+  }
 }
 
 DaeBuilderInternal* Fmu::dae() const {
