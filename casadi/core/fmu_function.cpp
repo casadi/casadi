@@ -833,7 +833,7 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc)
-    : name_in_(name_in), name_out_(name_out), scheme_(scheme), lc_(lc) {
+    : scheme_(scheme), lc_(lc) {
   dae_ = dae->shared_from_this<DaeBuilder>();
   counter_ = 0;
   instantiate_ = 0;
@@ -848,12 +848,13 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
   get_real_ = 0;
   get_directional_derivative_ = 0;
   // Mark input indices
+  name_in_.clear();
   size_t numel = 0;
   std::vector<bool> lookup(dae->variables_.size(), false);
-  for (auto&& n : name_in_) {
+  for (auto&& n : name_in) {
     auto it = scheme_.find(n);
-    casadi_assert(it != scheme_.end(),
-      "Input not found in scheme: " + n + ", available: " + str(name_in_));
+    if (it == scheme_.end()) continue;
+    name_in_.push_back(n);
     for (size_t i : it->second) {
       casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
       lookup.at(i) = true;
@@ -872,12 +873,13 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
     }
   }
   // Mark output indices
+  name_out_.clear();
   numel = 0;
   std::fill(lookup.begin(), lookup.end(), false);
-  for (auto&& n : name_out_) {
+  for (auto&& n : name_out) {
     auto it = scheme_.find(n);
-    casadi_assert(it != scheme_.end(),
-      "Output not found in scheme: " + n + ", available: " + str(name_out_));
+    if (it == scheme_.end()) continue;
+    name_out_.push_back(n);
     for (size_t i : it->second) {
       casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
       lookup.at(i) = true;
@@ -895,6 +897,44 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
       oind_map_.push_back(-1);
     }
   }
+  // Inputs
+  in_.resize(name_in_.size());
+  for (size_t i = 0; i < in_.size(); ++i) {
+    auto&& s = scheme_.at(name_in_[i]);
+    in_[i].resize(s.size());
+    for (size_t k = 0; k < s.size(); ++k) {
+      in_[i][k] = iind_map_.at(s[k]);
+    }
+  }
+  // Outputs
+  out_.resize(name_out_.size());
+  for (size_t i = 0; i < out_.size(); ++i) {
+    auto&& s = scheme_.at(name_out_[i]);
+    out_[i].resize(s.size());
+    for (size_t k = 0; k < s.size(); ++k) {
+      out_[i][k] = oind_map_.at(s[k]);
+    }
+  }
+}
+
+size_t Fmu::index_in(const std::string& n) const {
+  // Linear search for the input
+  for (size_t i = 0; i < name_in_.size(); ++i) {
+    if (name_in_[i] == n) return i;
+  }
+  // Not found
+  casadi_error("No such input: " + n);
+  return -1;
+}
+
+size_t Fmu::index_out(const std::string& n) const {
+  // Linear search for the input
+  for (size_t i = 0; i < name_out_.size(); ++i) {
+    if (name_out_[i] == n) return i;
+  }
+  // Not found
+  casadi_error("No such output: " + n);
+  return -1;
 }
 
 DaeBuilderInternal* Fmu::dae() const {

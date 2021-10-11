@@ -272,6 +272,9 @@ struct CASADI_EXPORT Fmu {
   // Mapping from scheme variable to and from FMU variable indices
   std::vector<size_t> iind_, iind_map_, oind_, oind_map_;
 
+  // Reduced space indices for all inputs and outputs
+  std::vector<std::vector<size_t>> in_, out_;
+
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
   fmi2FreeInstanceTYPE* free_instance_;
@@ -302,6 +305,12 @@ struct CASADI_EXPORT Fmu {
   std::vector<fmi2Integer> init_integer_;
   std::vector<fmi2Boolean> init_boolean_;
   std::vector<std::string> init_string_;
+
+  // Index lookup for input
+  size_t index_in(const std::string& n) const;
+
+  // Index lookup for output
+  size_t index_out(const std::string& n) const;
 
   // Get DaeBuilder instance
   DaeBuilderInternal* dae() const;
