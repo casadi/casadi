@@ -957,17 +957,17 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
       pref = pop_prefix(name_in[k], &rem);
       if (pref == "out") {
         // Nondifferentiated function output (unused)
-        in_[k] = new DummyInput(fmu->scheme_.at(rem).size());
+        in_[k] = new DummyInput(fmu, fmu->index_out(rem));
       } else if (pref == "adj") {
         // Adjoint seed
-        in_[k] = new AdjInput(fmu->scheme_.at(rem));
+        in_[k] = new AdjInput(fmu, fmu->index_out(rem));
       } else {
         // No such prefix
         casadi_error("No such prefix: " + pref);
       }
     } else {
       // No prefix - regular input
-      in_[k] = new RegInput(fmu->scheme_.at(name_in[k]));
+      in_[k] = new RegInput(fmu, fmu->index_in(name_in[k]));
     }
   }
   // Get input IDs
@@ -982,17 +982,17 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
         // Jacobian block
         casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
         std::string part2 = pop_prefix(rem, &rem);
-        out_[k] = new JacOutput(fmu->scheme_.at(part2), fmu->scheme_.at(rem));
+        out_[k] = new JacOutput(fmu, fmu->index_out(part2), fmu->index_in(rem));
       } else if (part1 == "adj") {
         // Adjoint sensitivity
-        out_[k] = new AdjOutput(fmu->scheme_.at(rem));
+        out_[k] = new AdjOutput(fmu, fmu->index_in(rem));
       } else {
         // No such prefix
         casadi_error("No such prefix: " + part1);
       }
     } else {
       // No prefix - regular output
-      out_[k] = new RegOutput(fmu->scheme_.at(name_out[k]));
+      out_[k] = new RegOutput(fmu, fmu->index_out(name_out[k]));
     }
   }
   // Set input/output names
