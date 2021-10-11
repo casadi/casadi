@@ -247,7 +247,9 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
 // Interface to binary FMU (shared between derivatives)
 struct CASADI_EXPORT Fmu {
   // Constructor
-  Fmu(const DaeBuilder& dae);
+  Fmu(const DaeBuilderInternal* dae,
+    const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::map<std::string, std::vector<size_t>>& lc);
 
   // Initialize
   void init();
@@ -260,6 +262,9 @@ struct CASADI_EXPORT Fmu {
 
   // DLL
   Importer li_;
+
+  // IO scheme, linear combinations
+  std::map<std::string, std::vector<size_t>> scheme_, lc_;
 
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
@@ -332,9 +337,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // FMU (shared between derivative expressions
   Fmu* fmu_;
 
-  // IO scheme, linear combinations
-  std::map<std::string, std::vector<size_t>> scheme_, lc_;
-
   // Information about function inputs
   std::vector<FmuInput*> in_;
 
@@ -367,9 +369,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /** \brief Constructor */
   FmuFunction(const std::string& name, Fmu* fmu,
       const std::vector<std::string>& name_in,
-      const std::vector<std::string>& name_out,
-      const std::map<std::string, std::vector<size_t>>& scheme,
-      const std::map<std::string, std::vector<size_t>>& lc);
+      const std::vector<std::string>& name_out);
 
   /** \brief Destructor */
   ~FmuFunction() override;

@@ -1731,10 +1731,10 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const Dict& opts) const {
 #ifdef WITH_FMU
   // New FMU instance (to be shared between derivative functions)
-  Fmu* fmu = new Fmu(shared_from_this<DaeBuilder>());
+  Fmu* fmu = new Fmu(this, scheme, lc);
   fmu->init();
   // Crete new function
-  return Function::create(new FmuFunction(name, fmu, name_in, name_out, scheme, lc), opts);
+  return Function::create(new FmuFunction(name, fmu, name_in, name_out), opts);
 #else  // WITH_FMU
   casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
   return Function();

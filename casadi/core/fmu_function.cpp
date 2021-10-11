@@ -828,7 +828,10 @@ Sparsity JacOutput::sparsity(const FmuFunction& f) const {
   return dae->jac_sparsity(oind_, iind_);
 }
 
-Fmu::Fmu(const DaeBuilder& dae) : dae_(dae) {
+Fmu::Fmu(const DaeBuilderInternal* dae,
+    const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::map<std::string, std::vector<size_t>>& lc) : scheme_(scheme), lc_(lc) {
+  dae_ = dae->shared_from_this<DaeBuilder>();
   counter_ = 0;
   instantiate_ = 0;
   free_instance_ = 0;
@@ -851,10 +854,8 @@ DaeBuilderInternal* Fmu::dae() const {
 
 FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
     const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out,
-    const std::map<std::string, std::vector<size_t>>& scheme,
-    const std::map<std::string, std::vector<size_t>>& lc)
-    : FunctionInternal(name), fmu_(fmu), scheme_(scheme), lc_(lc) {
+    const std::vector<std::string>& name_out)
+    : FunctionInternal(name), fmu_(fmu) {
   // Get input IDs
   in_.resize(name_in.size(), nullptr);
   for (size_t k = 0; k < name_in.size(); ++k) {
@@ -865,17 +866,17 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
       pref = pop_prefix(name_in[k], &rem);
       if (pref == "out") {
         // Nondifferentiated function output (unused)
-        in_[k] = new DummyInput(scheme.at(rem).size());
+        in_[k] = new DummyInput(fmu->scheme_.at(rem).size());
       } else if (pref == "adj") {
         // Adjoint seed
-        in_[k] = new AdjInput(scheme.at(rem));
+        in_[k] = new AdjInput(fmu->scheme_.at(rem));
       } else {
         // No such prefix
         casadi_error("No such prefix: " + pref);
       }
     } else {
       // No prefix - regular input
-      in_[k] = new RegInput(scheme.at(name_in[k]));
+      in_[k] = new RegInput(fmu->scheme_.at(name_in[k]));
     }
   }
   // Get input IDs
@@ -890,25 +891,24 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
         // Jacobian block
         casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
         std::string part2 = pop_prefix(rem, &rem);
-        out_[k] = new JacOutput(scheme.at(part2), scheme.at(rem));
+        out_[k] = new JacOutput(fmu->scheme_.at(part2), fmu->scheme_.at(rem));
       } else if (part1 == "adj") {
         // Adjoint sensitivity
-        out_[k] = new AdjOutput(scheme.at(rem));
+        out_[k] = new AdjOutput(fmu->scheme_.at(rem));
       } else {
         // No such prefix
         casadi_error("No such prefix: " + part1);
       }
     } else {
       // No prefix - regular output
-      out_[k] = new RegOutput(scheme.at(name_out[k]));
+      out_[k] = new RegOutput(fmu->scheme_.at(name_out[k]));
     }
   }
   // Set input/output names
   name_in_ = name_in;
   name_out_ = name_out;
   // Default options
-  auto dae = fmu_->dae();
-  enable_ad_ = dae->provides_directional_derivative_;
+  enable_ad_ = fmu_->get_directional_derivative_ != 0;
   validate_ad_ = false;
   step_ = 1e-6;
   abstol_ = 1e-3;
@@ -1224,7 +1224,7 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
     const std::vector<std::string>& onames, const Dict& opts) const {
   // Return value
   Function ret;
-  ret.own(new FmuFunction(name, fmu_, inames, onames, scheme_, lc_));
+  ret.own(new FmuFunction(name, fmu_, inames, onames));
   // Hack: Manually enable finite differenting (pending implementation in class)
   Dict opts2 = opts;
   opts2["enable_fd"] = true;
@@ -1240,7 +1240,7 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
   casadi_assert(nadj == 1, "Not implemented");
   // Return value
   Function ret;
-  ret.own(new FmuFunction(name, fmu_, inames, onames, scheme_, lc_));
+  ret.own(new FmuFunction(name, fmu_, inames, onames));
   // Hack: Manually enable finite differenting (pending implementation in class)
   Dict opts2 = opts;
   opts2["enable_fd"] = true;
