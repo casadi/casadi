@@ -287,10 +287,10 @@ struct CASADI_EXPORT Fmu {
 
   // Variables used for initialization, by type
   std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;
-  std::vector<fmi2Real> v_real_;
-  std::vector<fmi2Integer> v_integer_;
-  std::vector<fmi2Boolean> v_boolean_;
-  std::vector<std::string> v_string_;
+  std::vector<fmi2Real> init_real_;
+  std::vector<fmi2Integer> init_integer_;
+  std::vector<fmi2Boolean> init_boolean_;
+  std::vector<std::string> init_string_;
 
   // Get DaeBuilder instance
   DaeBuilderInternal* dae() const;

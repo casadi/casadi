@@ -118,10 +118,10 @@ void Fmu::init() {
   vr_integer_.clear();
   vr_boolean_.clear();
   vr_string_.clear();
-  v_real_.clear();
-  v_integer_.clear();
-  v_boolean_.clear();
-  v_string_.clear();
+  init_real_.clear();
+  init_integer_.clear();
+  init_boolean_.clear();
+  init_string_.clear();
 
   // Collect input and parameter values
   for (const Variable& v : dae->variables_) {
@@ -134,20 +134,20 @@ void Fmu::init() {
     // Get value
     switch (v.type) {
       case Type::REAL:
-        v_real_.push_back(static_cast<fmi2Real>(v.value));
+        init_real_.push_back(static_cast<fmi2Real>(v.value));
         vr_real_.push_back(vr);
         break;
       case Type::INTEGER:
       case Type::ENUM:
-        v_integer_.push_back(static_cast<fmi2Integer>(v.value));
+        init_integer_.push_back(static_cast<fmi2Integer>(v.value));
         vr_integer_.push_back(vr);
         break;
       case Type::BOOLEAN:
-        v_boolean_.push_back(static_cast<fmi2Boolean>(v.value));
+        init_boolean_.push_back(static_cast<fmi2Boolean>(v.value));
         vr_boolean_.push_back(vr);
         break;
       case Type::STRING:
-        v_string_.push_back(v.stringvalue);
+        init_string_.push_back(v.stringvalue);
         vr_string_.push_back(vr);
         break;
       default:
@@ -315,7 +315,7 @@ int Fmu::exit_initialization_mode(FmuMemory* m) const {
 int Fmu::set_values(FmuMemory* m) const {
   // Pass real values before initialization
   if (!vr_real_.empty()) {
-    fmi2Status status = set_real_(m->c, get_ptr(vr_real_), vr_real_.size(), get_ptr(v_real_));
+    fmi2Status status = set_real_(m->c, get_ptr(vr_real_), vr_real_.size(), get_ptr(init_real_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
@@ -324,7 +324,7 @@ int Fmu::set_values(FmuMemory* m) const {
   // Pass integer values before initialization (also enums)
   if (!vr_integer_.empty()) {
     fmi2Status status = set_integer_(m->c, get_ptr(vr_integer_), vr_integer_.size(),
-      get_ptr(v_integer_));
+      get_ptr(init_integer_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetInteger failed");
       return 1;
@@ -333,7 +333,7 @@ int Fmu::set_values(FmuMemory* m) const {
   // Pass boolean values before initialization
   if (!vr_boolean_.empty()) {
     fmi2Status status = set_boolean_(m->c, get_ptr(vr_boolean_), vr_boolean_.size(),
-      get_ptr(v_boolean_));
+      get_ptr(init_boolean_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetBoolean failed");
       return 1;
@@ -342,7 +342,7 @@ int Fmu::set_values(FmuMemory* m) const {
   // Pass string valeus before initialization
   for (size_t k = 0; k < vr_string_.size(); ++k) {
     fmi2ValueReference vr = vr_string_[k];
-    fmi2String value = v_string_[k].c_str();
+    fmi2String value = init_string_[k].c_str();
     fmi2Status status = set_string_(m->c, &vr, 1, &value);
     if (status != fmi2OK) {
       casadi_error("fmi2SetString failed for value reference " + str(vr));
