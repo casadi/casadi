@@ -844,6 +844,29 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
   set_boolean_ = 0;
   get_real_ = 0;
   get_directional_derivative_ = 0;
+  // Mark scheme indices
+  size_t numel = 0;
+  std::vector<bool> lookup(dae->variables_.size(), false);
+  for (auto&& e : scheme_) {
+    for (size_t i : e.second) {
+      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
+      lookup.at(i) = true;
+    }
+    numel += e.second.size();
+  }
+  // Construct mappings
+  ind_.reserve(numel);
+  ind_map_.reserve(lookup.size());
+  for (size_t k = 0; k < lookup.size(); ++k) {
+    if (lookup[k]) {
+      ind_map_.push_back(ind_.size());
+      ind_.push_back(k);
+    } else {
+      ind_map_.push_back(-1);
+    }
+  }
+
+
 }
 
 DaeBuilderInternal* Fmu::dae() const {

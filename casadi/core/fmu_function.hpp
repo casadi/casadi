@@ -266,6 +266,9 @@ struct CASADI_EXPORT Fmu {
   // IO scheme, linear combinations
   std::map<std::string, std::vector<size_t>> scheme_, lc_;
 
+  // Mapping from scheme variable to and from FMU variable indices
+  std::vector<size_t> ind_, ind_map_;
+
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
   fmi2FreeInstanceTYPE* free_instance_;
