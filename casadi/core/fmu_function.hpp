@@ -143,10 +143,10 @@ struct CASADI_EXPORT Fmu {
   size_t index_out(const std::string& n) const;
 
   // All input variables
-  std::vector<size_t> get_in(size_t i) const { return scheme_.at(name_in_.at(i));}
+  const std::vector<size_t>& get_in(size_t i) const { return scheme_.at(name_in_.at(i));}
 
   // All input variables
-  std::vector<size_t> get_out(size_t i) const { return scheme_.at(name_out_.at(i));}
+  const std::vector<size_t>& get_out(size_t i) const { return scheme_.at(name_out_.at(i));}
 
   // Get DaeBuilder instance
   DaeBuilderInternal* dae() const;
@@ -185,7 +185,7 @@ struct CASADI_EXPORT Fmu {
 
 // Input or output structure
 class CASADI_EXPORT FmuIO {
- private:
+ protected:
   const Fmu* fmu_;
  public:
   // Constructor
@@ -225,19 +225,19 @@ class CASADI_EXPORT FmuInput : public FmuIO {
 
 // Regular input
 class CASADI_EXPORT RegInput : public FmuInput {
- private:
+ protected:
   // Input indices
-  std::vector<size_t> iind_;
+  size_t i_;
  public:
   // Constructor
-  RegInput(const Fmu* fmu, size_t i) : FmuInput(fmu), iind_(fmu->get_in(i)) {}
+  RegInput(const Fmu* fmu, size_t i) : FmuInput(fmu), i_(i) {}
   // Destructor
   ~RegInput() override;
   // Access all indices
-  const std::vector<size_t>& iind() const override { return iind_;}
+  const std::vector<size_t>& iind() const override { return fmu_->get_in(i_);}
   // Get sparsity pattern
   Sparsity sparsity(const FmuFunction& f) const override {
-    return Sparsity::dense(iind_.size(), 1);
+    return Sparsity::dense(fmu_->in_[i_].size(), 1);
   }
   // Class name
   std::string class_name() const override { return "RegInput";}
@@ -247,19 +247,19 @@ class CASADI_EXPORT RegInput : public FmuInput {
 
 // Adjoint seed
 class CASADI_EXPORT AdjInput : public FmuInput {
- private:
+ protected:
   // Output indices
-  std::vector<size_t> oind_;
+  size_t i_;
  public:
   // Constructor
-  AdjInput(const Fmu* fmu, size_t i) : FmuInput(fmu), oind_(fmu->get_out(i)) {}
+  AdjInput(const Fmu* fmu, size_t i) : FmuInput(fmu), i_(i) {}
   // Destructor
   ~AdjInput() override;
   // Access all indices
-  const std::vector<size_t>& oind() const override { return oind_;}
+  const std::vector<size_t>& oind() const override { return fmu_->get_out(i_);}
   // Get sparsity pattern
   Sparsity sparsity(const FmuFunction& f) const override {
-    return Sparsity::dense(oind_.size(), 1);
+    return Sparsity::dense(fmu_->out_[i_].size(), 1);
   }
   // Class name
   std::string class_name() const override { return "AdjInput";}
@@ -269,16 +269,18 @@ class CASADI_EXPORT AdjInput : public FmuInput {
 
 // Regular input
 class CASADI_EXPORT DummyInput : public FmuInput {
- private:
+ protected:
   // Input indices
-  size_t dim_;
+  size_t i_;
  public:
   // Constructor
-  DummyInput(const Fmu* fmu, size_t i) : FmuInput(fmu), dim_(fmu->get_out(i).size()) {}
+  DummyInput(const Fmu* fmu, size_t i) : FmuInput(fmu), i_(i) {}
   // Destructor
   ~DummyInput() override;
   // Get sparsity pattern
-  Sparsity sparsity(const FmuFunction& f) const override { return Sparsity(dim_, 1);}
+  Sparsity sparsity(const FmuFunction& f) const override {
+    return Sparsity(fmu_->get_out(i_).size(), 1);
+  }
   // Class name
   std::string class_name() const override { return "DummyInput";}
 };
@@ -296,19 +298,19 @@ class CASADI_EXPORT FmuOutput : public FmuIO {
 
 // Output structure
 class CASADI_EXPORT RegOutput : public FmuOutput {
- public:
+ protected:
   // Output indices
-  std::vector<size_t> oind_;
+  size_t i_;
  public:
   // Constructor
-  RegOutput(const Fmu* fmu, size_t i) : FmuOutput(fmu), oind_(fmu->get_out(i)) {}
+  RegOutput(const Fmu* fmu, size_t i) : FmuOutput(fmu), i_(i) {}
   // Destructor
   ~RegOutput() override;
   // Access all indices
-  const std::vector<size_t>& oind() const override { return oind_;}
+  const std::vector<size_t>& oind() const override { return fmu_->get_out(i_);}
   // Get sparsity pattern
   Sparsity sparsity(const FmuFunction& f) const override {
-    return Sparsity::dense(oind_.size(), 1);
+    return Sparsity::dense(fmu_->out_[i_].size(), 1);
   }
   // Class name
   std::string class_name() const override { return "RegOutput";}
@@ -318,13 +320,13 @@ class CASADI_EXPORT RegOutput : public FmuOutput {
 
 // Jacobian block
 class CASADI_EXPORT JacOutput : public FmuOutput {
- private:
+ protected:
   // Output indices
-  std::vector<size_t> oind_, iind_;
+  size_t oi_, ii_;
  public:
   // Constructor
   JacOutput(const Fmu* fmu, size_t oi, size_t ii)
-    : FmuOutput(fmu), oind_(fmu->get_out(oi)), iind_(fmu->get_in(ii)) {}
+    : FmuOutput(fmu), oi_(oi), ii_(ii) {}
   // Destructor
   ~JacOutput() override;
   // Get sparsity pattern
@@ -334,26 +336,26 @@ class CASADI_EXPORT JacOutput : public FmuOutput {
   // It it a Jacobian block?
   bool is_jac() const override {return true;}
   // Access all indices
-  const std::vector<size_t>& oind() const override { return oind_;}
+  const std::vector<size_t>& oind() const override { return fmu_->get_out(oi_);}
   // Access all indices
-  const std::vector<size_t>& iind() const override { return iind_;}
+  const std::vector<size_t>& iind() const override { return fmu_->get_in(ii_);}
 };
 
 // Adjoint sensitivity block
 class CASADI_EXPORT AdjOutput : public FmuOutput {
- private:
+ protected:
   // Output indices
-  std::vector<size_t> iind_;
-  public:
+  size_t i_;
+ public:
   // Constructor
-  AdjOutput(const Fmu* fmu, size_t i) : FmuOutput(fmu), iind_(fmu->get_in(i)) {}
+  AdjOutput(const Fmu* fmu, size_t i) : FmuOutput(fmu), i_(i) {}
   // Destructor
   ~AdjOutput() override;
   // Access all indices
-  const std::vector<size_t>& iind() const override { return iind_;}
+  const std::vector<size_t>& iind() const override { return fmu_->get_in(i_);}
   // Get sparsity pattern
   Sparsity sparsity(const FmuFunction& f) const override {
-    return Sparsity::dense(iind_.size(), 1);
+    return Sparsity::dense(fmu_->in_[i_].size(), 1);
   }
   // Class name
   std::string class_name() const override { return "AdjOutput";}

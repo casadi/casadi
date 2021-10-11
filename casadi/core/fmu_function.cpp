@@ -825,7 +825,7 @@ Sparsity JacOutput::sparsity(const FmuFunction& f) const {
   // DaeBuilder instance
   auto dae = f.fmu_->dae();
   // Get the Jacobian block
-  return dae->jac_sparsity(oind_, iind_);
+  return dae->jac_sparsity(fmu_->get_out(oi_), fmu_->get_in(ii_));
 }
 
 Fmu::Fmu(const DaeBuilderInternal* dae,
