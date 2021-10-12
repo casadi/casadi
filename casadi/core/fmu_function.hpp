@@ -52,8 +52,8 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   fmi2Component c;
   // Value buffer
   std::vector<double> buffer_;
-  // Sensitivities
-  std::vector<double> sens_;
+  // Seeds, sensitivities
+  std::vector<double> seed_, sens_;
   // Which entries have been changed
   std::vector<bool> changed_;
   // Which entries are being requested

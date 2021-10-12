@@ -230,8 +230,11 @@ int Fmu::init(FmuMemory* m) const {
   // Allocate/reset value buffer
   m->buffer_.resize(dae->variables_.size());
   std::fill(m->buffer_.begin(), m->buffer_.end(), casadi::nan);
+  // Allocate/reset seeds
+  m->seed_.resize(iind_.size());
+  std::fill(m->seed_.begin(), m->seed_.end(), 0);
   // Allocate/reset sensitivities
-  m->sens_.resize(dae->variables_.size());
+  m->sens_.resize(oind_.size());
   std::fill(m->sens_.begin(), m->sens_.end(), 0);
   // Allocate/reset changed
   m->changed_.resize(iind_.size());
@@ -437,7 +440,7 @@ void Fmu::set(FmuMemory* m, size_t id, double value) const {
 void Fmu::set_seed(FmuMemory* m, size_t id, double value) const {
   // Update buffer
   if (value != 0) {
-    m->sens_.at(iind_[id]) = value;
+    m->seed_.at(id) = value;
     m->changed_.at(id) = true;
   }
 }
@@ -524,8 +527,8 @@ void Fmu::gather_sens(FmuMemory* m) const {
   // Get/clear seeds
   m->d_in_.clear();
   for (size_t id : m->id_in_) {
-    m->d_in_.push_back(m->sens_[iind_.at(id)]);
-    m->sens_[iind_.at(id)] = 0;
+    m->d_in_.push_back(m->seed_[id]);
+    m->seed_[id] = 0;
   }
   // Ensure at least one seed
   casadi_assert(n_known != 0, "No seeds");
@@ -556,7 +559,7 @@ int Fmu::eval_ad(FmuMemory* m) const {
   // Collect requested variables
   auto it = m->d_out_.begin();
   for (size_t id : m->id_out_) {
-    m->sens_[oind_.at(id)] = *it++;
+    m->sens_[id] = *it++;
   }
   // Successful return
   return 0;
@@ -728,7 +731,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
       // Nominal value for input
       double wrt_nom = wrt.nominal;
       // Value to compare with
-      double d_ad = m->sens_[oind_.at(id)];
+      double d_ad = m->sens_[id];
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if error exceeds thresholds
@@ -769,7 +772,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
       }
     } else {
       // Use instead of AD
-      m->sens_[oind_.at(id)] = d_fd;
+      m->sens_[id] = d_fd;
     }
   }
   // Successful return
@@ -793,7 +796,7 @@ int Fmu::eval_derivative(FmuMemory* m) const {
 }
 
 double Fmu::get_sens(FmuMemory* m, size_t id) const {
-  return m->sens_.at(oind_[id]);
+  return m->sens_.at(id);
 }
 
 Fmu::Fmu(const DaeBuilderInternal* dae,
