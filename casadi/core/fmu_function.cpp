@@ -234,10 +234,10 @@ int Fmu::init(FmuMemory* m) const {
   m->sens_.resize(dae->variables_.size());
   std::fill(m->sens_.begin(), m->sens_.end(), 0);
   // Allocate/reset changed
-  m->changed_.resize(dae->variables_.size());
+  m->changed_.resize(iind_.size());
   std::fill(m->changed_.begin(), m->changed_.end(), false);
   // Allocate/reset requested
-  m->requested_.resize(dae->variables_.size());
+  m->requested_.resize(oind_.size());
   std::fill(m->requested_.begin(), m->requested_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
   m->wrt_.resize(dae->variables_.size());
@@ -430,7 +430,7 @@ void Fmu::set(FmuMemory* m, size_t id, double value) const {
   // Update buffer
   if (value != m->buffer_.at(iind_[id])) {
     m->buffer_.at(iind_[id]) = value;
-    m->changed_.at(iind_[id]) = true;
+    m->changed_.at(id) = true;
   }
 }
 
@@ -438,13 +438,13 @@ void Fmu::set_seed(FmuMemory* m, size_t id, double value) const {
   // Update buffer
   if (value != 0) {
     m->sens_.at(iind_[id]) = value;
-    m->changed_.at(iind_[id]) = true;
+    m->changed_.at(id) = true;
   }
 }
 
 void Fmu::request(FmuMemory* m, size_t id, size_t wrt_id) const {
   // Mark as requested
-  m->requested_.at(oind_[id]) = true;
+  m->requested_.at(id) = true;
   // Also log corresponding input index
   m->wrt_.at(oind_[id]) = wrt_id;
 }
@@ -495,10 +495,10 @@ void Fmu::gather_io(FmuMemory* m) const {
   m->v_in_.clear();
   for (size_t id = 0; id < m->changed_.size(); ++id) {
     if (m->changed_[id]) {
-      const Variable& v = dae->variable(id);
-      m->id_in_.push_back(id);
+      const Variable& v = dae->variable(iind_.at(id));
+      m->id_in_.push_back(iind_.at(id));
       m->vr_in_.push_back(v.value_reference);
-      m->v_in_.push_back(m->buffer_[id]);
+      m->v_in_.push_back(m->buffer_[iind_.at(id)]);
       m->changed_[id] = false;
     }
   }
@@ -507,8 +507,8 @@ void Fmu::gather_io(FmuMemory* m) const {
   m->vr_out_.clear();
   for (size_t id = 0; id < m->requested_.size(); ++id) {
     if (m->requested_[id]) {
-      const Variable& v = dae->variable(id);
-      m->id_out_.push_back(id);
+      const Variable& v = dae->variable(oind_.at(id));
+      m->id_out_.push_back(oind_.at(id));
       m->vr_out_.push_back(v.value_reference);
       m->requested_[id] = false;
     }
