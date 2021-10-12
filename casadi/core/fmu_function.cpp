@@ -475,7 +475,7 @@ int Fmu::eval(FmuMemory* m) const {
   // Collect requested variables
   auto it = m->v_out_.begin();
   for (size_t id : m->id_out_) {
-    m->buffer_[id] = *it++;
+    m->buffer_[oind_.at(id)] = *it++;
   }
   // Successful return
   return 0;
@@ -508,7 +508,7 @@ void Fmu::gather_io(FmuMemory* m) const {
   for (size_t id = 0; id < m->requested_.size(); ++id) {
     if (m->requested_[id]) {
       const Variable& v = dae->variable(oind_.at(id));
-      m->id_out_.push_back(oind_.at(id));
+      m->id_out_.push_back(id);
       m->vr_out_.push_back(v.value_reference);
       m->requested_[id] = false;
     }
@@ -556,7 +556,7 @@ int Fmu::eval_ad(FmuMemory* m) const {
   // Collect requested variables
   auto it = m->d_out_.begin();
   for (size_t id : m->id_out_) {
-    m->sens_[id] = *it++;
+    m->sens_[oind_.at(id)] = *it++;
   }
   // Successful return
   return 0;
@@ -578,7 +578,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
   }
   // Get nominal values for outputs
   m->nominal_out_.clear();
-  for (size_t id : m->id_out_) m->nominal_out_.push_back(dae->variable(id).nominal);
+  for (size_t id : m->id_out_) m->nominal_out_.push_back(dae->variable(oind_.at(id)).nominal);
   // Make outputs dimensionless
   for (size_t k = 0; k < n_unknown; ++k) m->v_out_[k] /= m->nominal_out_[k];
   // Perturbed outputs
@@ -654,7 +654,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Variable id
         size_t id = m->id_out_[i];
         // Differentiation with respect to what variable
-        size_t wrt_id = m->wrt_.at(id);
+        size_t wrt_id = m->wrt_.at(oind_.at(id));
         // Find the corresponding input variable
         size_t wrt_i;
         for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
@@ -721,14 +721,14 @@ int Fmu::eval_fd(FmuMemory* m) const {
     // Use FD instead of AD or to compare with AD
     if (m->self.validate_ad_) {
       // Access output variable
-      const Variable& v = dae->variable(id);
+      const Variable& v = dae->variable(oind_.at(id));
       // With respect to what variable
-      size_t wrt_id = m->wrt_[id];
+      size_t wrt_id = m->wrt_[oind_.at(id)];
       const Variable& wrt = dae->variable(iind_.at(wrt_id));
       // Nominal value for input
       double wrt_nom = wrt.nominal;
       // Value to compare with
-      double d_ad = m->sens_[id];
+      double d_ad = m->sens_[oind_.at(id)];
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if error exceeds thresholds
@@ -769,7 +769,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
       }
     } else {
       // Use instead of AD
-      m->sens_[id] = d_fd;
+      m->sens_[oind_.at(id)] = d_fd;
     }
   }
   // Successful return
