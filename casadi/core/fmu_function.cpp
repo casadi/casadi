@@ -1061,9 +1061,9 @@ void FmuFunction::init(const Dict& opts) {
   // Collect all inputs in any Jacobian or adjoint block
   std::vector<bool> in_jac(nv_, false);
   for (FmuOutput* i : out_) {
-    if (i->is_jac()) {
+    if (i->type_ == JAC_OUTPUT) {
       for (size_t j : fmu_->in_[i->wrt_]) in_jac[fmu_->iind_[j]] = true;
-    } else if (i->is_adj()) {
+    } else if (i->type_ == ADJ_SENS) {
       for (size_t j : fmu_->in_[i->ind_]) in_jac[fmu_->iind_[j]] = true;
     }
   }
@@ -1078,7 +1078,7 @@ void FmuFunction::init(const Dict& opts) {
   // Collect all outputs in any Jacobian or adjoint block
   std::fill(in_jac.begin(), in_jac.end(), false);
   for (FmuOutput* i : out_) {
-    if (i->is_jac()) {
+    if (i->type_ == JAC_OUTPUT) {
       for (size_t j : fmu_->out_[i->ind_]) in_jac[fmu_->oind_[j]] = true;
       has_jac_ = true;
     }
@@ -1157,7 +1157,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   }
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
-    if (res[k] && out_[k]->is_reg()) {
+    if (res[k] && out_[k]->type_ == REG_OUTPUT) {
       const std::vector<size_t>& oind = fmu_->out_[out_[k]->ind_];
       for (size_t i = 0; i < oind.size(); ++i) {
         request(m, fmu_->oind_[oind[i]]);
@@ -1168,7 +1168,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   if (eval(m)) return 1;
   // Get regular outputs
   for (size_t k = 0; k < out_.size(); ++k) {
-    if (res[k] && out_[k]->is_reg()) {
+    if (res[k] && out_[k]->type_ == REG_OUTPUT) {
       const std::vector<size_t>& oind = fmu_->out_[out_[k]->ind_];
       for (size_t i = 0; i < oind.size(); ++i) {
         get(m, fmu_->oind_[oind[i]], &res[k][i]);
@@ -1179,7 +1179,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // What other blocks are there?
   bool need_jac = false;
   for (size_t k = 0; k < out_.size(); ++k) {
-    if (res[k] && (out_[k]->is_jac() || out_[k]->is_adj())) {
+    if (res[k] && (out_[k]->type_ == JAC_OUTPUT || out_[k]->type_ == ADJ_SENS)) {
      need_jac = true;
     }
   }
@@ -1224,7 +1224,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         double inv_nom = 1. / dae->variable(Jc).nominal;
         // Fetch Jacobian blocks
         for (size_t k = 0; k < out_.size(); ++k) {
-          if (res[k] && out_[k]->is_jac()) {
+          if (res[k] && out_[k]->type_ == JAC_OUTPUT) {
             // Find input index
             const std::vector<size_t>& iind = fmu_->in_[out_[k]->wrt_];
             for (size_t Bc = 0; Bc < iind.size(); ++Bc) {
@@ -1253,7 +1253,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     // Collect adjoint sensitivities
     if (has_adj_) {
       for (size_t i = 0; i < out_.size(); ++i) {
-        if (res[i] && out_[i]->is_adj()) {
+        if (res[i] && out_[i]->type_ == ADJ_SENS) {
           const std::vector<size_t>& iind = fmu_->in_[out_[i]->ind_];
           for (size_t k = 0; k < iind.size(); ++k) res[i][k] = adjw[fmu_->iind_[iind[k]]];
         }
@@ -1335,7 +1335,7 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 }
 
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
-  return in_.at(iind).type == REG_INPUT && out_.at(oind)->is_reg();
+  return in_.at(iind).type == REG_INPUT && out_.at(oind)->type_ == REG_OUTPUT;
 }
 
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,

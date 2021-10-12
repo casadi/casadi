@@ -195,68 +195,37 @@ class CASADI_EXPORT FmuOutput {
   size_t ind_;
   // With-respect-to index (for Jacobian blocks)
   size_t wrt_;
-  // FMU memory
-  const Fmu* fmu_;
   // Constructor
-  FmuOutput(OutputType type, size_t ind, size_t wrt, const Fmu* fmu)
-    : type_(type), ind_(ind), wrt_(wrt), fmu_(fmu) {}
+  FmuOutput(OutputType type, size_t ind, size_t wrt) : type_(type), ind_(ind), wrt_(wrt) {}
   // Destructor
   virtual ~FmuOutput();
-  // Class name
-  virtual std::string class_name() const = 0;
-  // It it a regular input?
-  virtual bool is_reg() const {return false;}
-  // It it an adjoint seed?
-  virtual bool is_adj() const {return false;}
-  // It it a Jacobian output?
-  virtual bool is_jac() const {return false;}
 };
 
 // Output structure
 class CASADI_EXPORT RegOutput : public FmuOutput {
  public:
   // Constructor
-  RegOutput(const Fmu* fmu, size_t i) : FmuOutput(REG_OUTPUT, i, -1, fmu) {}
+  RegOutput(const Fmu* fmu, size_t i) : FmuOutput(REG_OUTPUT, i, -1) {}
   // Destructor
   ~RegOutput() override;
-  // Access all indices
-  const std::vector<size_t>& oind2() const { return fmu_->out_[ind_];}
-  // Class name
-  std::string class_name() const override { return "RegOutput";}
-  // It it a regular output?
-  bool is_reg() const override {return true;}
 };
 
 // Jacobian block
 class CASADI_EXPORT JacOutput : public FmuOutput {
  public:
   // Constructor
-  JacOutput(const Fmu* fmu, size_t oi, size_t ii) : FmuOutput(JAC_OUTPUT, oi, ii, fmu) {}
+  JacOutput(const Fmu* fmu, size_t oi, size_t ii) : FmuOutput(JAC_OUTPUT, oi, ii) {}
   // Destructor
   ~JacOutput() override;
-  // Class name
-  std::string class_name() const override { return "JacOutput";}
-  // It it a Jacobian block?
-  bool is_jac() const override {return true;}
-  // Access all indices
-  const std::vector<size_t>& oind2() const { return fmu_->out_[ind_];}
-  // Access all indices
-  const std::vector<size_t>& iind2() const { return fmu_->in_[wrt_];}
 };
 
 // Adjoint sensitivity block
 class CASADI_EXPORT AdjOutput : public FmuOutput {
  public:
   // Constructor
-  AdjOutput(const Fmu* fmu, size_t i) : FmuOutput(ADJ_SENS, i, -1, fmu) {}
+  AdjOutput(const Fmu* fmu, size_t i) : FmuOutput(ADJ_SENS, i, -1) {}
   // Destructor
   ~AdjOutput() override;
-  // Access all indices
-  const std::vector<size_t>& iind2() const { return fmu_->in_[ind_];}
-  // Class name
-  std::string class_name() const override { return "AdjOutput";}
-  // It it a regular output?
-  bool is_adj() const override {return true;}
 };
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
