@@ -782,16 +782,25 @@ double FmuFunction::get_sens(FmuMemory* m, size_t id) const {
   return m->sens_.at(id);
 }
 
-FmuIO::~FmuIO() {
-}
-
-const std::vector<size_t>& FmuIO::iind2() const {
+const std::vector<size_t>& FmuInput::iind2() const {
   casadi_error("iind not implemented for " + class_name());
   static const std::vector<size_t> dummy;
   return dummy;
 }
 
-const std::vector<size_t>& FmuIO::oind2() const {
+const std::vector<size_t>& FmuInput::oind2() const {
+  casadi_error("oind not implemented for " + class_name());
+  static const std::vector<size_t> dummy;
+  return dummy;
+}
+
+const std::vector<size_t>& FmuOutput::iind2() const {
+  casadi_error("iind not implemented for " + class_name());
+  static const std::vector<size_t> dummy;
+  return dummy;
+}
+
+const std::vector<size_t>& FmuOutput::oind2() const {
   casadi_error("oind not implemented for " + class_name());
   static const std::vector<size_t> dummy;
   return dummy;

@@ -183,15 +183,15 @@ struct CASADI_EXPORT Fmu {
     fmi2String message, ...);
 };
 
-// Input or output structure
-class CASADI_EXPORT FmuIO {
+// Input structure
+class CASADI_EXPORT FmuInput {
  protected:
   const Fmu* fmu_;
  public:
   // Constructor
-  FmuIO(const Fmu* fmu) : fmu_(fmu) {}
+  FmuInput(const Fmu* fmu) : fmu_(fmu) {}
   // Destructor
-  virtual ~FmuIO() = 0;
+  virtual ~FmuInput();
   // Input indices
   virtual const std::vector<size_t>& iind2() const;
   // Output indices
@@ -204,15 +204,6 @@ class CASADI_EXPORT FmuIO {
   virtual bool is_reg() const {return false;}
   // It it an adjoint seed?
   virtual bool is_adj() const {return false;}
-};
-
-// Input structure
-class CASADI_EXPORT FmuInput : public FmuIO {
- public:
-  // Constructor
-  FmuInput(const Fmu* fmu) : FmuIO(fmu) {}
-  // Destructor
-  ~FmuInput() override;
 };
 
 // Regular input
@@ -278,12 +269,26 @@ class CASADI_EXPORT DummyInput : public FmuInput {
 };
 
 // Output structure
-class CASADI_EXPORT FmuOutput : public FmuIO {
+class CASADI_EXPORT FmuOutput {
+ protected:
+  const Fmu* fmu_;
  public:
   // Constructor
-  FmuOutput(const Fmu* fmu) : FmuIO(fmu) {}
+  FmuOutput(const Fmu* fmu) : fmu_(fmu) {}
   // Destructor
-  ~FmuOutput() override;
+  virtual ~FmuOutput();
+  // Input indices
+  virtual const std::vector<size_t>& iind2() const;
+  // Output indices
+  virtual const std::vector<size_t>& oind2() const;
+  // Get sparsity pattern
+  virtual Sparsity sparsity(const FmuFunction& f) const = 0;
+  // Class name
+  virtual std::string class_name() const = 0;
+  // It it a regular input?
+  virtual bool is_reg() const {return false;}
+  // It it an adjoint seed?
+  virtual bool is_adj() const {return false;}
   // It it a Jacobian output?
   virtual bool is_jac() const {return false;}
 };
