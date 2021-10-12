@@ -1126,7 +1126,7 @@ void FmuFunction::init(const Dict& opts) {
     }
   }
   for (FmuInput* i : in_) {
-    if (i->is_adj()) {
+    if (i->type_ == FmuInputType::ADJ_SEED) {
       for (size_t j : i->oind2()) in_jac[fmu_->oind_[j]] = true;
       has_adj_ = true;
     }
@@ -1148,6 +1148,18 @@ void FmuFunction::init(const Dict& opts) {
   if (has_adj_) alloc_w(nv_, false);  // adjw
 }
 
+Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
+  switch (in_.at(i)->type_) {
+    case FmuInputType::REG_INPUT:
+      return Sparsity::dense(fmu_->in_[in_.at(i)->ind_].size(), 1);
+    case FmuInputType::ADJ_SEED:
+      return Sparsity::dense(fmu_->out_[in_.at(i)->ind_].size(), 1);
+    case FmuInputType::DUMMY_OUTPUT:
+      return Sparsity(fmu_->out_[in_.at(i)->ind_].size(), 1);
+  }
+  return Sparsity();
+}
+
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
     void* mem) const {
   // Get memory struct
@@ -1165,7 +1177,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   auto dae = fmu_->dae();
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
-    if (in_[k]->is_reg()) {
+    if (in_[k]->type_ == FmuInputType::REG_INPUT) {
       const std::vector<size_t>& iind = in_[k]->iind2();
       for (size_t i = 0; i < iind.size(); ++i) {
         set(m, fmu_->iind_[iind[i]], arg[k] ? arg[k][i] : 0);
@@ -1207,7 +1219,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (has_adj_) {
       std::fill(adjw, adjw + nv_, 0);
       for (size_t i = 0; i < in_.size(); ++i) {
-        if (arg[i] && in_[i]->is_adj()) {
+        if (arg[i] && in_[i]->type_ == FmuInputType::ADJ_SEED) {
           const std::vector<size_t>& oind = in_[i]->oind2();
           for (size_t k = 0; k < oind.size(); ++k) adjw[fmu_->oind_[oind[k]]] = arg[i][k];
         }
@@ -1352,7 +1364,7 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 }
 
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
-  return in_.at(iind)->is_reg() && out_.at(oind)->is_reg();
+  return in_.at(iind)->type_ == FmuInputType::REG_INPUT && out_.at(oind)->is_reg();
 }
 
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,

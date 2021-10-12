@@ -200,14 +200,8 @@ class CASADI_EXPORT FmuInput {
   virtual const std::vector<size_t>& iind2() const;
   // Output indices
   virtual const std::vector<size_t>& oind2() const;
-  // Get sparsity pattern
-  virtual Sparsity sparsity(const FmuFunction& f) const = 0;
   // Class name
   virtual std::string class_name() const = 0;
-  // It it a regular input?
-  virtual bool is_reg() const {return false;}
-  // It it an adjoint seed?
-  virtual bool is_adj() const {return false;}
 };
 
 // Regular input
@@ -219,14 +213,8 @@ class CASADI_EXPORT RegInput : public FmuInput {
   ~RegInput() override;
   // Access all indices
   const std::vector<size_t>& iind2() const override { return fmu_->in_[ind_];}
-  // Get sparsity pattern
-  Sparsity sparsity(const FmuFunction& f) const override {
-    return Sparsity::dense(fmu_->in_[ind_].size(), 1);
-  }
   // Class name
   std::string class_name() const override { return "RegInput";}
-  // It it a regular input?
-  bool is_reg() const override {return true;}
 };
 
 // Adjoint seed
@@ -238,14 +226,8 @@ class CASADI_EXPORT AdjInput : public FmuInput {
   ~AdjInput() override;
   // Access all indices
   const std::vector<size_t>& oind2() const override { return fmu_->out_[ind_];}
-  // Get sparsity pattern
-  Sparsity sparsity(const FmuFunction& f) const override {
-    return Sparsity::dense(fmu_->out_[ind_].size(), 1);
-  }
   // Class name
   std::string class_name() const override { return "AdjInput";}
-  // It it a adjoint seed?
-  bool is_adj() const override {return true;}
 };
 
 // Regular input
@@ -255,10 +237,6 @@ class CASADI_EXPORT DummyInput : public FmuInput {
   DummyInput(const Fmu* fmu, size_t ind) : FmuInput(FmuInputType::DUMMY_OUTPUT, ind, fmu) {}
   // Destructor
   ~DummyInput() override;
-  // Get sparsity pattern
-  Sparsity sparsity(const FmuFunction& f) const override {
-    return Sparsity(fmu_->out_[ind_].size(), 1);
-  }
   // Class name
   std::string class_name() const override { return "DummyInput";}
 };
@@ -423,7 +401,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /// @{
   /** \brief Retreive sparsities */
-  Sparsity get_sparsity_in(casadi_int i) override {return in_.at(i)->sparsity(*this);}
+  Sparsity get_sparsity_in(casadi_int i) override;
   Sparsity get_sparsity_out(casadi_int i) override {return out_.at(i)->sparsity(*this);}
   /// @}
 
