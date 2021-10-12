@@ -424,25 +424,25 @@ int Fmu::get_values(FmuMemory* m) const {
 
 void Fmu::set(FmuMemory* m, size_t id, double value) const {
   // Update buffer
-  if (value != m->buffer_.at(id)) {
-    m->buffer_.at(id) = value;
-    m->changed_.at(id) = true;
+  if (value != m->buffer_.at(iind_[id])) {
+    m->buffer_.at(iind_[id]) = value;
+    m->changed_.at(iind_[id]) = true;
   }
 }
 
 void Fmu::set_seed(FmuMemory* m, size_t id, double value) const {
   // Update buffer
   if (value != 0) {
-    m->sens_.at(id) = value;
-    m->changed_.at(id) = true;
+    m->sens_.at(iind_[id]) = value;
+    m->changed_.at(iind_[id]) = true;
   }
 }
 
 void Fmu::request(FmuMemory* m, size_t id, size_t wrt_id) const {
   // Mark as requested
-  m->requested_.at(id) = true;
+  m->requested_.at(oind_[id]) = true;
   // Also log corresponding input index
-  m->wrt_.at(id) = wrt_id;
+  m->wrt_.at(oind_[id]) = wrt_id;
 }
 
 int Fmu::eval(FmuMemory* m) const {
@@ -479,7 +479,7 @@ int Fmu::eval(FmuMemory* m) const {
 
 void Fmu::get(FmuMemory* m, size_t id, double* value) const {
   // Save to return
-  *value = m->buffer_.at(id);
+  *value = m->buffer_.at(oind_[id]);
 }
 
 void Fmu::gather_io(FmuMemory* m) const {
@@ -654,7 +654,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Find the corresponding input variable
         size_t wrt_i;
         for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
-          if (m->id_in_[wrt_i] == wrt_id) break;
+          if (m->id_in_[wrt_i] == iind_.at(wrt_id)) break;
         }
         // Check if in bounds
         if (m->in_bounds_.at(wrt_i)) {
@@ -720,7 +720,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
       const Variable& v = dae->variable(id);
       // With respect to what variable
       size_t wrt_id = m->wrt_[id];
-      const Variable& wrt = dae->variable(wrt_id);
+      const Variable& wrt = dae->variable(iind_.at(wrt_id));
       // Nominal value for input
       double wrt_nom = wrt.nominal;
       // Value to compare with
@@ -789,7 +789,7 @@ int Fmu::eval_derivative(FmuMemory* m) const {
 }
 
 double Fmu::get_sens(FmuMemory* m, size_t id) const {
-  return m->sens_.at(id);
+  return m->sens_.at(oind_[id]);
 }
 
 Fmu::Fmu(const DaeBuilderInternal* dae,
@@ -1168,7 +1168,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (in_[k].type == REG_INPUT) {
       const std::vector<size_t>& iind = fmu_->in_[in_[k].ind];
       for (size_t i = 0; i < iind.size(); ++i) {
-        fmu_->set(m, fmu_->iind_[iind[i]], arg[k] ? arg[k][i] : 0);
+        fmu_->set(m, iind[i], arg[k] ? arg[k][i] : 0);
       }
     }
   }
@@ -1177,7 +1177,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (res[k] && out_[k].type == REG_OUTPUT) {
       const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
       for (size_t i = 0; i < oind.size(); ++i) {
-        fmu_->request(m, fmu_->oind_[oind[i]]);
+        fmu_->request(m, oind[i]);
       }
     }
   }
@@ -1188,7 +1188,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (res[k] && out_[k].type == REG_OUTPUT) {
       const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
       for (size_t i = 0; i < oind.size(); ++i) {
-        fmu_->get(m, fmu_->oind_[oind[i]], &res[k][i]);
+        fmu_->get(m, oind[i], &res[k][i]);
       }
     }
   }
@@ -1227,11 +1227,11 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         // Nominal value
         double nom = dae->variable(fmu_->iind_[Jc]).nominal;
         // Set seed for column
-        fmu_->set_seed(m, fmu_->iind_[Jc], nom);
+        fmu_->set_seed(m, Jc, nom);
         // Request corresponding outputs
         for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
           casadi_int vout = sp_ext_.row(Jk);
-          fmu_->request(m, fmu_->oind_[jac_out_.at(vout)], fmu_->iind_[Jc]);
+          fmu_->request(m, jac_out_.at(vout), Jc);
         }
       }
       // Calculate derivatives
@@ -1255,7 +1255,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
                 const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
                 for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
                   // Save Jacobian nonzero, scaled by nominal value factor
-                  res[k][Bk] = inv_nom * fmu_->get_sens(m, fmu_->oind_[oind.at(sp.row(Bk))]);
+                  res[k][Bk] = inv_nom * fmu_->get_sens(m, oind.at(sp.row(Bk)));
                 }
               }
             }
@@ -1266,7 +1266,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
           for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
             casadi_int vout = sp_ext_.row(Jk);
             size_t Jr = jac_out_.at(vout);
-            asens[Jc] += inv_nom * fmu_->get_sens(m, fmu_->oind_[Jr]) * aseed[Jr];
+            asens[Jc] += inv_nom * fmu_->get_sens(m, Jr) * aseed[Jr];
           }
         }
       }
