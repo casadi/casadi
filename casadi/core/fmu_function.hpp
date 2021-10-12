@@ -74,6 +74,12 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   explicit FmuMemory(const FmuFunction& self) : self(self), c(nullptr) {}
 };
 
+/// Variable type
+enum class FdMode {FORWARD, BACKWARD, CENTRAL, SMOOTHING, NUMEL};
+
+/// Convert to string
+CASADI_EXPORT std::string to_string(FdMode v);
+
 // Interface to binary FMU (shared between derivatives)
 struct CASADI_EXPORT Fmu {
   // Constructor
@@ -190,6 +196,24 @@ struct CASADI_EXPORT Fmu {
   // Get a calculated variable
   void get(FmuMemory* m, size_t id, double* value) const;
 
+  // Set seed
+  void set_seed(FmuMemory* m, size_t id, double value) const;
+
+  // Gather user sensitivities
+  void gather_sens(FmuMemory* m) const;
+
+  // Calculate directional derivatives using AD
+  int eval_ad(FmuMemory* m) const;
+
+  // Calculate directional derivatives using FD
+  int eval_fd(FmuMemory* m) const;
+
+  // Calculate directional derivatives
+  int eval_derivative(FmuMemory* m) const;
+
+  // Get a derivative
+  double get_sens(FmuMemory* m, size_t id) const;
+
   // Name of system, per the FMI specification
   static std::string system_infix();
 
@@ -250,14 +274,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   double step_, abstol_, reltol_, u_aim_, h_min_, h_max_;
   casadi_int h_iter_;
 
-  /// Variable type
-  enum FdMode {FORWARD, BACKWARD, CENTRAL, SMOOTHING, N_FDMODE};
-
   // FD method as an enum
   FdMode fd_;
-
-  // Number of perturbations
-  casadi_int n_pert() const;
 
   /** \brief Constructor */
   FmuFunction(const std::string& name, Fmu* fmu,
@@ -344,33 +362,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /** \brief Free memory block */
   void free_mem(void *mem) const override;
-
-  // Set seed
-  void set_seed(FmuMemory* m, size_t id, double value) const;
-
-  // Gather user sensitivities
-  void gather_sens(FmuMemory* m) const;
-
-  // Calculate directional derivatives using AD
-  int eval_ad(FmuMemory* m) const;
-
-  // Calculate directional derivatives using FD
-  int eval_fd(FmuMemory* m) const;
-
-  // Calculate directional derivatives
-  int eval_derivative(FmuMemory* m) const;
-
-  // Get a derivative
-  double get_sens(FmuMemory* m, size_t id) const;
 };
-
-/// Number of entries in enums
-template<> struct enum_traits<FmuFunction::FdMode> {
-  static const size_t n_enum = FmuFunction::N_FDMODE;
-};
-
-/// Convert to string
-CASADI_EXPORT std::string to_string(FmuFunction::FdMode v);
 
 } // namespace casadi
 /// \endcond

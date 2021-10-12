@@ -430,7 +430,7 @@ void Fmu::set(FmuMemory* m, size_t id, double value) const {
   }
 }
 
-void FmuFunction::set_seed(FmuMemory* m, size_t id, double value) const {
+void Fmu::set_seed(FmuMemory* m, size_t id, double value) const {
   // Update buffer
   if (value != 0) {
     m->sens_.at(id) = value;
@@ -511,9 +511,9 @@ void Fmu::gather_io(FmuMemory* m) const {
   }
 }
 
-void FmuFunction::gather_sens(FmuMemory* m) const {
+void Fmu::gather_sens(FmuMemory* m) const {
   // Gather input and output indices
-  fmu_->gather_io(m);
+  gather_io(m);
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
@@ -530,20 +530,20 @@ void FmuFunction::gather_sens(FmuMemory* m) const {
   m->d_out_.resize(n_unknown);
 }
 
-int FmuFunction::eval_ad(FmuMemory* m) const {
+int Fmu::eval_ad(FmuMemory* m) const {
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi2Status status = fmu_->get_real_(m->c, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
+  fmi2Status status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
   }
   // Evaluate directional derivatives
-  status = fmu_->get_directional_derivative_(m->c, get_ptr(m->vr_out_), n_unknown,
+  status = get_directional_derivative_(m->c, get_ptr(m->vr_out_), n_unknown,
     get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), get_ptr(m->d_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetDirectionalDerivative failed");
@@ -558,16 +558,16 @@ int FmuFunction::eval_ad(FmuMemory* m) const {
   return 0;
 }
 
-int FmuFunction::eval_fd(FmuMemory* m) const {
+int Fmu::eval_fd(FmuMemory* m) const {
   // DaeBuilder instance
-  auto dae = fmu_->dae();
+  auto dae = this->dae();
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi2Status status = fmu_->get_real_(m->c, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
+  fmi2Status status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
@@ -581,31 +581,40 @@ int FmuFunction::eval_fd(FmuMemory* m) const {
   double* yk[4];
   // Error estimate used to update step size
   double u = nan;
-  // Initial step size
-  double h = step_;
+  // Step size
+  double h = m->self.step_;
   // For backward, negate h
-  if (fd_ == BACKWARD) h = -h;
+  if (m->self.fd_ == FdMode::BACKWARD) h = -h;
   // Number of perturbations
-  casadi_int n_pert = this->n_pert();
+  casadi_int n_pert;
+  if (m->self.fd_ == FdMode::FORWARD || m->self.fd_ == FdMode::BACKWARD) {
+    n_pert = 1;
+  } else if (m->self.fd_ == FdMode::CENTRAL) {
+    n_pert = 2;
+  } else if (m->self.fd_ == FdMode::SMOOTHING) {
+    n_pert = 4;
+  } else {
+    casadi_error("Not implemented");
+  }
   // Allocate memory for perturbed outputs
   m->fd_out_.resize(n_pert * n_unknown);
   // Perform finite difference algorithm with different step sizes
-  for (casadi_int iter = 0; iter < 1 + h_iter_; ++iter) {
+  for (casadi_int iter = 0; iter < 1 + m->self.h_iter_; ++iter) {
     // Calculate all perturbed outputs
     for (casadi_int k = 0; k < n_pert; ++k) {
       // Where to save the perturbed outputs
       yk[k] = &m->fd_out_[n_unknown * k];
       // Get perturbation expression
       double pert;
-      switch (fd_) {
-      case FORWARD:
-      case BACKWARD:
+      switch (m->self.fd_) {
+      case FdMode::FORWARD:
+      case FdMode::BACKWARD:
         pert = h;
         break;
-      case CENTRAL:
+      case FdMode::CENTRAL:
         pert = (2 * static_cast<double>(k) - 1) * h;
         break;
-      case SMOOTHING:
+      case FdMode::SMOOTHING:
         pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
         break;
       default: casadi_error("Not implemented");
@@ -625,13 +634,13 @@ int FmuFunction::eval_fd(FmuMemory* m) const {
         m->in_bounds_.push_back(in_bounds);
       }
       // Pass perturbed inputs to FMU
-      status = fmu_->set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
+      status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
       if (status != fmi2OK) {
         casadi_warning("fmi2SetReal failed");
         return 1;
       }
       // Evaluate perturbed FMU
-      status = fmu_->get_real_(m->c, get_ptr(m->vr_out_), n_unknown, yk[k]);
+      status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, yk[k]);
       if (status != fmi2OK) {
         casadi_warning("fmi2GetReal failed");
         return 1;
@@ -658,44 +667,44 @@ int FmuFunction::eval_fd(FmuMemory* m) const {
       }
     }
     // Restore FMU inputs
-    status = fmu_->set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
+    status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
     }
     // FD memory
     casadi_finite_diff_mem<double> fd_mem;
-    fd_mem.reltol = reltol_;
-    fd_mem.abstol = abstol_;
+    fd_mem.reltol = m->self.reltol_;
+    fd_mem.abstol = m->self.abstol_;
     fd_mem.smoothing = eps;
-    switch (fd_) {
-      case FORWARD:
-      case BACKWARD:
+    switch (m->self.fd_) {
+      case FdMode::FORWARD:
+      case FdMode::BACKWARD:
         u = casadi_forward_diff(yk, get_ptr(m->v_out_),
           get_ptr(m->d_out_), h, n_unknown, &fd_mem);
         break;
-      case CENTRAL:
+      case FdMode::CENTRAL:
         u = casadi_central_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
           h, n_unknown, &fd_mem);
         break;
-      case SMOOTHING:
+      case FdMode::SMOOTHING:
         u = casadi_smoothing_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
           h, n_unknown, &fd_mem);
         break;
       default: casadi_error("Not implemented");
     }
     // Stop, if no more stepsize iterations
-    if (iter == h_iter_) break;
+    if (iter == m->self.h_iter_) break;
     // Update step size
     if (u < 0) {
       // Perturbation failed, try a smaller step size
-      h /= u_aim_;
+      h /= m->self.u_aim_;
     } else {
       // Update h to get u near the target ratio
-      h *= sqrt(u_aim_ / fmax(1., u));
+      h *= sqrt(m->self.u_aim_ / fmax(1., u));
     }
     // Make sure h stays in the range [h_min_,h_max_]
-    h = fmin(fmax(h, h_min_), h_max_);
+    h = fmin(fmax(h, m->self.h_min_), m->self.h_max_);
   }
   // Collect requested variables
   for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {
@@ -706,7 +715,7 @@ int FmuFunction::eval_fd(FmuMemory* m) const {
     // Get the value
     double d_fd = m->d_out_[ind] * n;
     // Use FD instead of AD or to compare with AD
-    if (validate_ad_) {
+    if (m->self.validate_ad_) {
       // Access output variable
       const Variable& v = dae->variable(id);
       // With respect to what variable
@@ -719,7 +728,8 @@ int FmuFunction::eval_fd(FmuMemory* m) const {
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if error exceeds thresholds
-      if (d_max > wrt_nom * n * abstol_ && std::fabs(d_ad - d_fd) > d_max * reltol_) {
+      if (d_max > wrt_nom * n * m->self.abstol_
+          && std::fabs(d_ad - d_fd) > d_max * m->self.reltol_) {
         // Which element in the vector
         size_t wrt_ind = 0;
         for (; wrt_ind < m->id_in_.size(); ++wrt_ind)
@@ -730,20 +740,20 @@ int FmuFunction::eval_fd(FmuMemory* m) const {
         ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << wrt.name << "\n"
           << "At " << m->v_in_[wrt_ind] << ", nominal " << wrt.nominal << ", min " << wrt.min
           << ", max " << wrt.max << ", got " << d_ad
-          << " for AD vs. " << d_fd << " for FD[" << to_string(fd_) << "].\n";
+          << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].\n";
         // Also print the stencil:
         std::vector<double> stencil;
-        switch (fd_) {
-          case FORWARD:
+        switch (m->self.fd_) {
+          case FdMode::FORWARD:
             stencil = {m->v_out_[ind], yk[0][ind]};
             break;
-          case BACKWARD:
+          case FdMode::BACKWARD:
             stencil = {yk[0][ind], m->v_out_[ind]};
             break;
-          case CENTRAL:
+          case FdMode::CENTRAL:
             stencil = {yk[0][ind], m->v_out_[ind], yk[1][ind]};
             break;
-          case SMOOTHING:
+          case FdMode::SMOOTHING:
             stencil = {yk[1][ind], yk[0][ind], m->v_out_[ind], yk[2][ind], yk[3][ind]};
             break;
           default: casadi_error("Not implemented");
@@ -762,23 +772,23 @@ int FmuFunction::eval_fd(FmuMemory* m) const {
   return 0;
 }
 
-int FmuFunction::eval_derivative(FmuMemory* m) const {
+int Fmu::eval_derivative(FmuMemory* m) const {
   // Gather input and output indices
   gather_sens(m);
   // Calculate derivatives using FMU directional derivative support
-  if (enable_ad_) {
+  if (m->self.enable_ad_) {
     // Evaluate using AD
     if (eval_ad(m)) return 1;
   }
   // Calculate derivatives using finite differences
-  if (!enable_ad_ || validate_ad_) {
+  if (!m->self.enable_ad_ || m->self.validate_ad_) {
     // Evaluate using FD
     if (eval_fd(m)) return 1;
   }
   return 0;
 }
 
-double FmuFunction::get_sens(FmuMemory* m, size_t id) const {
+double Fmu::get_sens(FmuMemory* m, size_t id) const {
   return m->sens_.at(id);
 }
 
@@ -991,7 +1001,7 @@ void FmuFunction::init(const Dict& opts) {
   FunctionInternal::init(opts);
 
   // Read FD mode
-  fd_ = to_enum<FmuFunction::FdMode>(fd_method_, "forward");
+  fd_ = to_enum<FdMode>(fd_method_, "forward");
 
   // Get a pointer to the DaeBuilder class
   auto dae = fmu_->dae();
@@ -1217,7 +1227,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         // Nominal value
         double nom = dae->variable(fmu_->iind_[Jc]).nominal;
         // Set seed for column
-        set_seed(m, fmu_->iind_[Jc], nom);
+        fmu_->set_seed(m, fmu_->iind_[Jc], nom);
         // Request corresponding outputs
         for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
           casadi_int vout = sp_ext_.row(Jk);
@@ -1225,7 +1235,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         }
       }
       // Calculate derivatives
-      if (eval_derivative(m)) return 1;
+      if (fmu_->eval_derivative(m)) return 1;
       // Loop over input indices for color
       for (casadi_int kc = coloring_.colind(c); kc < coloring_.colind(c + 1); ++kc) {
         casadi_int vin = coloring_.row(kc);
@@ -1245,7 +1255,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
                 const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
                 for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
                   // Save Jacobian nonzero, scaled by nominal value factor
-                  res[k][Bk] = inv_nom * get_sens(m, fmu_->oind_[oind.at(sp.row(Bk))]);
+                  res[k][Bk] = inv_nom * fmu_->get_sens(m, fmu_->oind_[oind.at(sp.row(Bk))]);
                 }
               }
             }
@@ -1256,7 +1266,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
           for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
             casadi_int vout = sp_ext_.row(Jk);
             size_t Jr = jac_out_.at(vout);
-            asens[Jc] += inv_nom * get_sens(m, fmu_->oind_[Jr]) * aseed[Jr];
+            asens[Jc] += inv_nom * fmu_->get_sens(m, fmu_->oind_[Jr]) * aseed[Jr];
           }
         }
       }
@@ -1275,26 +1285,12 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   return 0;
 }
 
-casadi_int FmuFunction::n_pert() const {
-  switch (fd_) {
-  case FmuFunction::FORWARD:
-  case FmuFunction::BACKWARD:
-    return 1;
-  case FmuFunction::CENTRAL:
-    return 2;
-  case FmuFunction::SMOOTHING:
-    return 4;
-  default: break;
-  }
-  casadi_error("Not implemented");
-}
-
-std::string to_string(FmuFunction::FdMode v) {
+std::string to_string(FdMode v) {
   switch (v) {
-  case FmuFunction::FORWARD: return "forward";
-  case FmuFunction::BACKWARD: return "backward";
-  case FmuFunction::CENTRAL: return "central";
-  case FmuFunction::SMOOTHING: return "smoothing";
+  case FdMode::FORWARD: return "forward";
+  case FdMode::BACKWARD: return "backward";
+  case FdMode::CENTRAL: return "central";
+  case FdMode::SMOOTHING: return "smoothing";
   default: break;
   }
   return "";
