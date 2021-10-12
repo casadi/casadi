@@ -580,11 +580,8 @@ int Fmu::eval_fd(FmuMemory* m) const {
     casadi_warning("fmi2GetReal failed");
     return 1;
   }
-  // Get nominal values for outputs
-  m->nominal_out_.clear();
-  for (size_t id : m->id_out_) m->nominal_out_.push_back(dae->variable(oind_.at(id)).nominal);
   // Make outputs dimensionless
-  for (size_t k = 0; k < n_unknown; ++k) m->v_out_[k] /= m->nominal_out_[k];
+  for (size_t k = 0; k < n_unknown; ++k) m->v_out_[k] /= nominal_out_[m->id_out_[k]];
   // Perturbed outputs
   double* yk[4];
   // Error estimate used to update step size
@@ -667,7 +664,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Check if in bounds
         if (m->in_bounds_.at(wrt_i)) {
           // Input was in bounds: Keep output, make dimensionless
-          yk[k][i] /= m->nominal_out_[i];
+          yk[k][i] /= nominal_out_[m->id_out_[i]];
         } else {
           // Input was out of bounds: Discard output
           yk[k][i] = nan;
@@ -719,7 +716,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
     // Variable id
     size_t id = m->id_out_[ind];
     // Nominal value
-    double n = m->nominal_out_[ind];
+    double n = nominal_out_[id];
     // Get the value
     double d_fd = m->d_out_[ind] * n;
     // Use FD instead of AD or to compare with AD
@@ -730,7 +727,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
       size_t wrt_id = m->wrt_[id];
       const Variable& wrt = dae->variable(iind_.at(wrt_id));
       // Nominal value for input
-      double wrt_nom = wrt.nominal;
+      double wrt_nom = nominal_in_[wrt_id];
       // Value to compare with
       double d_ad = m->sens_[id];
       // Magnitude of derivatives
@@ -746,7 +743,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Issue warning
         std::stringstream ss;
         ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << wrt.name << "\n"
-          << "At " << m->v_in_[wrt_ind] << ", nominal " << wrt.nominal << ", min " << wrt.min
+          << "At " << m->v_in_[wrt_ind] << ", nominal " << wrt_nom << ", min " << wrt.min
           << ", max " << wrt.max << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].\n";
         // Also print the stencil:
@@ -886,6 +883,18 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
     for (size_t k = 0; k < s.size(); ++k) {
       out_[i][k] = oind_map_.at(s[k]);
     }
+  }
+  // Collect meta information for inputs
+  nominal_in_.reserve(iind_.size());
+  for (size_t i : iind_) {
+    const Variable& v = dae->variables_.at(i);
+    nominal_in_.push_back(v.nominal);
+  }
+  // Collect meta information for outputs
+  nominal_out_.reserve(oind_.size());
+  for (size_t i : oind_) {
+    const Variable& v = dae->variables_.at(i);
+    nominal_out_.push_back(v.nominal);
   }
 }
 
@@ -1233,7 +1242,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         // Differentiation with respect to what variable
         size_t Jc = jac_in_.at(vin);
         // Nominal value
-        double nom = dae->variable(fmu_->iind_[Jc]).nominal;
+        double nom = fmu_->nominal_in_[Jc];
         // Set seed for column
         fmu_->set_seed(m, Jc, nom);
         // Request corresponding outputs
@@ -1250,7 +1259,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         // Differentiation with respect to what variable
         size_t Jc = jac_in_.at(vin);
         // Inverse of nominal value
-        double inv_nom = 1. / dae->variable(fmu_->iind_[Jc]).nominal;
+        double inv_nom = 1. / fmu_->nominal_in_[Jc];
         // Fetch Jacobian blocks
         for (size_t k = 0; k < out_.size(); ++k) {
           if (res[k] && out_[k].type == JAC_OUTPUT) {

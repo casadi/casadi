@@ -68,8 +68,6 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   std::vector<fmi2ValueReference> vr_in_, vr_out_;
   // Work vector (reals)
   std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_, v_pert_;
-  // Nominal values
-  std::vector<fmi2Real> nominal_out_;
   // Constructor
   explicit FmuMemory(const FmuFunction& self) : self(self), c(nullptr) {}
 };
@@ -107,6 +105,9 @@ struct CASADI_EXPORT Fmu {
 
   // Mapping from scheme variable to and from FMU variable indices
   std::vector<size_t> iind_, iind_map_, oind_, oind_map_;
+
+  // Meta information about the input/output variable subsets
+  std::vector<double> nominal_in_, nominal_out_;
 
   // Reduced space indices for all inputs and outputs
   std::vector<std::vector<size_t>> in_, out_;
