@@ -181,6 +181,9 @@ struct CASADI_EXPORT Fmu {
   // New memory object
   fmi2Component instantiate() const;
 
+  /** \brief Initalize memory block */
+  int init(FmuMemory* m) const;
+
   // Set value
   void set(FmuMemory* m, size_t id, double value) const;
 

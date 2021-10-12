@@ -213,21 +213,17 @@ fmi2Component Fmu::instantiate() const {
   return c;
 }
 
-int FmuFunction::init_mem(void* mem) const {
-  FmuMemory* m = static_cast<FmuMemory*>(mem);
-  casadi_assert(m != 0, "Memory is null");
-  // Instantiate base classes
-  if (FunctionInternal::init_mem(mem)) return 1;
+int Fmu::init(FmuMemory* m) const {
   // DaeBuilder instance
-  auto dae = fmu_->dae();
+  auto dae = this->dae();
   // Ensure not already instantiated
   casadi_assert(m->c == 0, "Already instantiated");
   // Create instance
-  m->c = fmu_->instantiate();
+  m->c = instantiate();
   // Reset solver
-  fmu_->setup_experiment(m);
+  setup_experiment(m);
   // Set all values
-  if (fmu_->set_values(m)) {
+  if (set_values(m)) {
     casadi_warning("Fmu::set_values failed");
     return 1;
   }
@@ -246,16 +242,24 @@ int FmuFunction::init_mem(void* mem) const {
   // Also allocate memory for corresponding Jacobian entry (for debugging)
   m->wrt_.resize(dae->variables_.size());
   // Initialization mode begins
-  if (fmu_->enter_initialization_mode(m)) return 1;
+  if (enter_initialization_mode(m)) return 1;
   // Get all values
-  if (fmu_->get_values(m)) {
+  if (get_values(m)) {
     casadi_warning("Fmu::get_values failed");
     return 1;
   }
   // Initialization mode ends
-  if (fmu_->exit_initialization_mode(m)) return 1;
+  if (exit_initialization_mode(m)) return 1;
   // Successful return
   return 0;
+}
+
+int FmuFunction::init_mem(void* mem) const {
+  casadi_assert(mem != 0, "Memory is null");
+  // Instantiate base classes
+  if (FunctionInternal::init_mem(mem)) return 1;
+  // Call initialization routine in Fmu
+  return fmu_->init(static_cast<FmuMemory*>(mem));
 }
 
 void FmuFunction::free_mem(void *mem) const {
