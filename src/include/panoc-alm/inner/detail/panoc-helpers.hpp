@@ -355,6 +355,8 @@ inline void calc_augmented_lagrangian_hessian_prod_fd(
     Hv /= h;
 }
 
+/// Estimate the Lipschitz constant of the gradient @f$ \nabla \psi @f$ using
+/// finite differences.
 inline real_t initial_lipschitz_estimate(
     /// [in]    Problem description
     const Problem &problem,
@@ -368,6 +370,8 @@ inline real_t initial_lipschitz_estimate(
     real_t ε,
     /// [in]    Minimum absolute finite difference step size
     real_t δ,
+    /// [in]    Maximum allowed Lipschitz estimate.
+    real_t L_max,
     /// [out]   @f$ \psi(x^k) @f$
     real_t &ψ,
     /// [out]   Gradient @f$ \nabla \psi(x^k) @f$
@@ -391,10 +395,12 @@ inline real_t initial_lipschitz_estimate(
     ψ = calc_ψ_grad_ψ(problem, xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1,
                       work_m);
 
-    // Estimate Lipschitz constant
+    // Estimate Lipschitz constant using finite differences
     real_t L = (work_n2 - grad_ψ).norm() / norm_h;
     if (L < std::numeric_limits<real_t>::epsilon())
         L = std::numeric_limits<real_t>::epsilon();
+    if (not(L <= L_max))
+        L = L_max;
     return L;
 }
 

@@ -114,6 +114,7 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
     if (params.Lipschitz.L₀ <= 0) {
         Lₖ = detail::initial_lipschitz_estimate(
             problem, xₖ, y, Σ, params.Lipschitz.ε, params.Lipschitz.δ,
+            params.L_max,
             /* in ⟹ out */ ψₖ, grad_ψₖ, x̂ₖ, grad_̂ψₖ, work_n, work_m);
     }
     // Initial Lipschitz constant provided by the user
