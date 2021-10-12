@@ -196,9 +196,10 @@ inline real_t descent_lemma(
     ///         which is mathematically impossible but could occur in finite
     ///         precision floating point arithmetic.
     real_t rounding_tolerance,
-    /// [in]    Minimum allowed step size (prevents infinite loop if function or
-    ///         are discontinuous)
-    real_t γ_min,
+    /// [in]    Maximum allowed Lipschitz constant estimate (prevents infinite
+    ///         loop if function or derivatives are discontinuous, and keeps
+    ///         step size bounded away from zero).
+    real_t L_max,
     /// [in]    Current iterate @f$ x^k @f$
     crvec xₖ,
     /// [in]    Objective function @f$ \psi(x^k) @f$
@@ -229,7 +230,7 @@ inline real_t descent_lemma(
     real_t old_γₖ = γₖ;
     real_t margin = (1 + std::abs(ψₖ)) * rounding_tolerance;
     while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + 0.5 * Lₖ * norm_sq_pₖ + margin) {
-        if (not(γₖ >= γ_min))
+        if (not(Lₖ * 2 <= L_max))
             break;
 
         Lₖ *= 2;

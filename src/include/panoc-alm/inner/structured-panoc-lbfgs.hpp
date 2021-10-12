@@ -15,8 +15,7 @@ namespace pa {
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
-inline StructuredPANOCLBFGSSolver::Stats
-StructuredPANOCLBFGSSolver::operator()(
+inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Constraint weights @f$ \Sigma @f$
@@ -95,7 +94,7 @@ StructuredPANOCLBFGSSolver::operator()(
                               rvec pₖ, rvec ŷx̂ₖ, real_t &ψx̂ₖ, real_t &pₖᵀpₖ,
                               real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
         return detail::descent_lemma(
-            problem, params.quadratic_upperbound_tolerance_factor, params.γ_min,
+            problem, params.quadratic_upperbound_tolerance_factor, params.L_max,
             xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,

@@ -26,8 +26,8 @@ struct PANOCParams {
     std::chrono::microseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step.
     real_t τ_min = 1. / 256;
-    /// Minimum step size.
-    real_t γ_min = 1e-30;
+    /// Maximum Lipschitz constant estimate.
+    real_t L_max = 1e9;
     /// What stopping criterion to use.
     PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
     /// Maximum number of iterations without any progress before giving up.

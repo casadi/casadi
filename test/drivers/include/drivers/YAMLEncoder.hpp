@@ -105,7 +105,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PANOCParams &p) {
     out << YAML::Key << "max_iter" << YAML::Value << p.max_iter;
     out << YAML::Key << "max_time" << YAML::Value << p.max_time.count();
     out << YAML::Key << "τ_min" << YAML::Value << p.τ_min;
-    out << YAML::Key << "γ_min" << YAML::Value << p.γ_min;
+    out << YAML::Key << "L_max" << YAML::Value << p.L_max;
     out << YAML::Key << "stop_crit" << YAML::Value << p.stop_crit;
     out << YAML::Key << "update_lipschitz_in_linesearch" << YAML::Value
         << p.update_lipschitz_in_linesearch;
