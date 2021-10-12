@@ -214,8 +214,6 @@ fmi2Component Fmu::instantiate() const {
 }
 
 int Fmu::init(FmuMemory* m) const {
-  // DaeBuilder instance
-  auto dae = this->dae();
   // Ensure not already instantiated
   casadi_assert(m->c == 0, "Already instantiated");
   // Create instance
@@ -227,9 +225,12 @@ int Fmu::init(FmuMemory* m) const {
     casadi_warning("Fmu::set_values failed");
     return 1;
   }
-  // Allocate/reset value buffer
-  m->buffer_.resize(dae->variables_.size());
-  std::fill(m->buffer_.begin(), m->buffer_.end(), casadi::nan);
+  // Allocate/reset input buffer
+  m->ibuf_.resize(iind_.size());
+  std::fill(m->ibuf_.begin(), m->ibuf_.end(), casadi::nan);
+  // Allocate/reset output buffer
+  m->obuf_.resize(oind_.size());
+  std::fill(m->obuf_.begin(), m->obuf_.end(), casadi::nan);
   // Allocate/reset seeds
   m->seed_.resize(iind_.size());
   std::fill(m->seed_.begin(), m->seed_.end(), 0);
@@ -431,8 +432,8 @@ int Fmu::get_values(FmuMemory* m) const {
 
 void Fmu::set(FmuMemory* m, size_t id, double value) const {
   // Update buffer
-  if (value != m->buffer_.at(iind_[id])) {
-    m->buffer_.at(iind_[id]) = value;
+  if (value != m->ibuf_.at(id)) {
+    m->ibuf_.at(id) = value;
     m->changed_.at(id) = true;
   }
 }
@@ -478,7 +479,7 @@ int Fmu::eval(FmuMemory* m) const {
   // Collect requested variables
   auto it = m->v_out_.begin();
   for (size_t id : m->id_out_) {
-    m->buffer_[oind_.at(id)] = *it++;
+    m->obuf_[id] = *it++;
   }
   // Successful return
   return 0;
@@ -486,7 +487,7 @@ int Fmu::eval(FmuMemory* m) const {
 
 void Fmu::get(FmuMemory* m, size_t id, double* value) const {
   // Save to return
-  *value = m->buffer_.at(oind_[id]);
+  *value = m->obuf_.at(id);
 }
 
 void Fmu::gather_io(FmuMemory* m) const {
@@ -501,7 +502,7 @@ void Fmu::gather_io(FmuMemory* m) const {
       const Variable& v = dae->variable(iind_.at(id));
       m->id_in_.push_back(id);
       m->vr_in_.push_back(v.value_reference);
-      m->v_in_.push_back(m->buffer_[iind_.at(id)]);
+      m->v_in_.push_back(m->ibuf_[id]);
       m->changed_[id] = false;
     }
   }
