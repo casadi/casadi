@@ -496,7 +496,7 @@ void Fmu::gather_io(FmuMemory* m) const {
   for (size_t id = 0; id < m->changed_.size(); ++id) {
     if (m->changed_[id]) {
       const Variable& v = dae->variable(iind_.at(id));
-      m->id_in_.push_back(iind_.at(id));
+      m->id_in_.push_back(id);
       m->vr_in_.push_back(v.value_reference);
       m->v_in_.push_back(m->buffer_[iind_.at(id)]);
       m->changed_[id] = false;
@@ -524,8 +524,8 @@ void Fmu::gather_sens(FmuMemory* m) const {
   // Get/clear seeds
   m->d_in_.clear();
   for (size_t id : m->id_in_) {
-    m->d_in_.push_back(m->sens_[id]);
-    m->sens_[id] = 0;
+    m->d_in_.push_back(m->sens_[iind_.at(id)]);
+    m->sens_[iind_.at(id)] = 0;
   }
   // Ensure at least one seed
   casadi_assert(n_known != 0, "No seeds");
@@ -630,7 +630,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Try to take step
         double test = m->v_in_[i] + pert * m->d_in_[i];
         // Check if in bounds
-        const Variable& v = dae->variable(m->id_in_[i]);
+        const Variable& v = dae->variable(iind_.at(m->id_in_[i]));
         bool in_bounds = test >= v.min && test <= v.max;
         // Take step, if allowed
         m->v_pert_[i] = in_bounds ? test : m->v_in_[i];
@@ -658,7 +658,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Find the corresponding input variable
         size_t wrt_i;
         for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
-          if (m->id_in_[wrt_i] == iind_.at(wrt_id)) break;
+          if (m->id_in_[wrt_i] == wrt_id) break;
         }
         // Check if in bounds
         if (m->in_bounds_.at(wrt_i)) {
@@ -737,7 +737,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Which element in the vector
         size_t wrt_ind = 0;
         for (; wrt_ind < m->id_in_.size(); ++wrt_ind)
-          if (m->id_in_[wrt_ind] == iind_.at(wrt_id)) break;
+          if (m->id_in_[wrt_ind] == wrt_id) break;
         casadi_assert(wrt_ind < m->id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
