@@ -1004,13 +1004,18 @@ void FmuFunction::init(const Dict& opts) {
   // Number of variables
   nv_ = dae->variables_.size();
 
+  // Do the outputs include Jacobian blocks and/or adjoint directional derivatives
+  has_adj_ = has_jac_ = false;
+
   // Collect all inputs in any Jacobian or adjoint block
-  std::vector<bool> in_jac(nv_, false);
+  std::vector<bool> in_jac(fmu_->iind_.size(), false);
   for (auto&& i : out_) {
     if (i.type == JAC_OUTPUT) {
-      for (size_t j : fmu_->in_[i.wrt]) in_jac[fmu_->iind_[j]] = true;
+      for (size_t j : fmu_->in_.at(i.wrt)) in_jac.at(j) = true;
+      has_jac_ = true;
     } else if (i.type == ADJ_SENS) {
-      for (size_t j : fmu_->in_[i.ind]) in_jac[fmu_->iind_[j]] = true;
+      for (size_t j : fmu_->in_.at(i.ind)) in_jac.at(j) = true;
+      has_adj_ = true;
     }
   }
   jac_in_.clear();
@@ -1018,21 +1023,17 @@ void FmuFunction::init(const Dict& opts) {
     if (in_jac[k]) jac_in_.push_back(k);
   }
 
-  // Do the outputs include Jacobian blocks and/or adjoint directional derivatives
-  has_adj_ = has_jac_ = false;
-
   // Collect all outputs in any Jacobian or adjoint block
+  in_jac.resize(fmu_->oind_.size());
   std::fill(in_jac.begin(), in_jac.end(), false);
   for (auto&& i : out_) {
     if (i.type == JAC_OUTPUT) {
-      for (size_t j : fmu_->out_[i.ind]) in_jac[fmu_->oind_[j]] = true;
-      has_jac_ = true;
+      for (size_t j : fmu_->out_.at(i.ind)) in_jac.at(j) = true;
     }
   }
   for (auto&& i : in_) {
     if (i.type == ADJ_SEED) {
-      for (size_t j : fmu_->out_[i.ind]) in_jac[fmu_->oind_[j]] = true;
-      has_adj_ = true;
+      for (size_t j : fmu_->out_.at(i.ind)) in_jac.at(j) = true;
     }
   }
   jac_out_.clear();
@@ -1040,8 +1041,13 @@ void FmuFunction::init(const Dict& opts) {
     if (in_jac[k]) jac_out_.push_back(k);
   }
 
+  // Convert to indices in FMU
+  std::vector<size_t> jac_in = jac_in_, jac_out = jac_out_;
+  for (size_t& i : jac_in) i = fmu_->iind_.at(i);
+  for (size_t& i : jac_out) i = fmu_->oind_.at(i);
+
   // Get sparsity pattern for extended Jacobian
-  sp_ext_ = dae->jac_sparsity(jac_out_, jac_in_);
+  sp_ext_ = dae->jac_sparsity(jac_out, jac_in);
 
   // Calculate graph coloring
   coloring_ = sp_ext_.uni_coloring();
@@ -1201,7 +1207,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       for (casadi_int kc = coloring_.colind(c); kc < coloring_.colind(c + 1); ++kc) {
         casadi_int vin = coloring_.row(kc);
         // Differentiation with respect to what variable
-        size_t Jc = jac_in_.at(vin);
+        size_t Jc = fmu_->iind_[jac_in_.at(vin)];
         // Nominal value
         double nom = dae->variable(Jc).nominal;
         // Set seed for column
@@ -1209,7 +1215,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         // Request corresponding outputs
         for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
           casadi_int vout = sp_ext_.row(Jk);
-          request(m, jac_out_.at(vout), Jc);
+          request(m, fmu_->oind_[jac_out_.at(vout)], Jc);
         }
       }
       // Calculate derivatives
@@ -1218,7 +1224,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       for (casadi_int kc = coloring_.colind(c); kc < coloring_.colind(c + 1); ++kc) {
         casadi_int vin = coloring_.row(kc);
         // Differentiation with respect to what variable
-        size_t Jc = jac_in_.at(vin);
+        size_t Jc = fmu_->iind_[jac_in_.at(vin)];
         // Inverse of nominal value
         double inv_nom = 1. / dae->variable(Jc).nominal;
         // Fetch Jacobian blocks
@@ -1243,7 +1249,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         if (has_adj_) {
           for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
             casadi_int vout = sp_ext_.row(Jk);
-            size_t Jr = jac_out_.at(vout);
+            size_t Jr = fmu_->oind_[jac_out_.at(vout)];
             adjw[Jc] += inv_nom * get_sens(m, Jr) * adjw[Jr];
           }
         }
