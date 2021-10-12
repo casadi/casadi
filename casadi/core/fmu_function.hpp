@@ -194,16 +194,8 @@ class CASADI_EXPORT FmuIO {
   virtual ~FmuIO() = 0;
   // Input indices
   virtual const std::vector<size_t>& iind() const;
-  // Access an input
-  size_t iind(size_t k) const {return iind().at(k);}
-  // Number of inputs
-  size_t isz() const {return iind().size();}
   // Output indices
   virtual const std::vector<size_t>& oind() const;
-  // Access an index
-  size_t oind(size_t k) const { return oind().at(k);}
-  // Number of outputs
-  size_t osz() const {return oind().size();}
   // Get sparsity pattern
   virtual Sparsity sparsity(const FmuFunction& f) const = 0;
   // Class name

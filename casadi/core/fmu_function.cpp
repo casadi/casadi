@@ -1157,16 +1157,18 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k]->is_reg()) {
-      for (size_t i = 0; i < in_[k]->isz(); ++i) {
-        set(m, in_[k]->iind(i), arg[k] ? arg[k][i] : 0);
+      const std::vector<size_t>& iind = in_[k]->iind();
+      for (size_t i = 0; i < iind.size(); ++i) {
+        set(m, iind[i], arg[k] ? arg[k][i] : 0);
       }
     }
   }
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k]->is_reg()) {
-      for (size_t i = 0; i < out_[k]->osz(); ++i) {
-        request(m, out_[k]->oind(i));
+      const std::vector<size_t>& oind = out_[k]->oind();
+      for (size_t i = 0; i < oind.size(); ++i) {
+        request(m, oind[i]);
       }
     }
   }
@@ -1175,8 +1177,9 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Get regular outputs
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k]->is_reg()) {
-      for (size_t i = 0; i < out_[k]->osz(); ++i) {
-        get(m, out_[k]->oind(i), &res[k][i]);
+      const std::vector<size_t>& oind = out_[k]->oind();
+      for (size_t i = 0; i < oind.size(); ++i) {
+        get(m, oind[i], &res[k][i]);
       }
     }
   }
