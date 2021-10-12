@@ -183,51 +183,6 @@ struct CASADI_EXPORT Fmu {
     fmi2String message, ...);
 };
 
-// Types of inputs
-enum OutputType {REG_OUTPUT, ADJ_SENS, JAC_OUTPUT};
-
-// Output structure
-class CASADI_EXPORT FmuOutput {
- public:
-  // Type of input
-  OutputType type_;
-  // Corresponding index in Fmu
-  size_t ind_;
-  // With-respect-to index (for Jacobian blocks)
-  size_t wrt_;
-  // Constructor
-  FmuOutput(OutputType type, size_t ind, size_t wrt) : type_(type), ind_(ind), wrt_(wrt) {}
-  // Destructor
-  virtual ~FmuOutput();
-};
-
-// Output structure
-class CASADI_EXPORT RegOutput : public FmuOutput {
- public:
-  // Constructor
-  RegOutput(const Fmu* fmu, size_t i) : FmuOutput(REG_OUTPUT, i, -1) {}
-  // Destructor
-  ~RegOutput() override;
-};
-
-// Jacobian block
-class CASADI_EXPORT JacOutput : public FmuOutput {
- public:
-  // Constructor
-  JacOutput(const Fmu* fmu, size_t oi, size_t ii) : FmuOutput(JAC_OUTPUT, oi, ii) {}
-  // Destructor
-  ~JacOutput() override;
-};
-
-// Adjoint sensitivity block
-class CASADI_EXPORT AdjOutput : public FmuOutput {
- public:
-  // Constructor
-  AdjOutput(const Fmu* fmu, size_t i) : FmuOutput(ADJ_SENS, i, -1) {}
-  // Destructor
-  ~AdjOutput() override;
-};
-
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
   // FMU (shared between derivative expressions
@@ -247,8 +202,21 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Information about function inputs
   std::vector<InputStruct> in_;
 
+  // Types of inputs
+  enum OutputType {REG_OUTPUT, ADJ_SENS, JAC_OUTPUT};
+
+  // Output structure
+  struct OutputStruct {
+    // Type of input
+    OutputType type;
+    // Corresponding index in Fmu
+    size_t ind;
+    // With-respect-to index (for Jacobian blocks)
+    size_t wrt;
+  };
+
   // Information about function outputs
-  std::vector<FmuOutput*> out_;
+  std::vector<OutputStruct> out_;
 
   // All Jacobian inputs and outputs
   std::vector<size_t> jac_in_, jac_out_;
@@ -292,6 +260,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /// Initialize
   void init(const Dict& opts) override;
+
+  // Parse input name
+  void parse_input(InputStruct* s, const std::string& n) const;
+
+  // Parse output name
+  void parse_output(OutputStruct* s, const std::string& n) const;
 
   // Get sparsity pattern for extended Jacobian
   Sparsity sp_ext_;
