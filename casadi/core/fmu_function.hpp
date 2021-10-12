@@ -196,12 +196,6 @@ class CASADI_EXPORT FmuInput {
   FmuInput(FmuInputType type, size_t ind, const Fmu* fmu) : type_(type), ind_(ind), fmu_(fmu) {}
   // Destructor
   virtual ~FmuInput();
-  // Input indices
-  virtual const std::vector<size_t>& iind2() const;
-  // Output indices
-  virtual const std::vector<size_t>& oind2() const;
-  // Class name
-  virtual std::string class_name() const = 0;
 };
 
 // Regular input
@@ -211,10 +205,6 @@ class CASADI_EXPORT RegInput : public FmuInput {
   RegInput(const Fmu* fmu, size_t ind) : FmuInput(FmuInputType::REG_INPUT, ind, fmu) {}
   // Destructor
   ~RegInput() override;
-  // Access all indices
-  const std::vector<size_t>& iind2() const override { return fmu_->in_[ind_];}
-  // Class name
-  std::string class_name() const override { return "RegInput";}
 };
 
 // Adjoint seed
@@ -224,10 +214,6 @@ class CASADI_EXPORT AdjInput : public FmuInput {
   AdjInput(const Fmu* fmu, size_t ind) : FmuInput(FmuInputType::ADJ_SEED, ind, fmu) {}
   // Destructor
   ~AdjInput() override;
-  // Access all indices
-  const std::vector<size_t>& oind2() const override { return fmu_->out_[ind_];}
-  // Class name
-  std::string class_name() const override { return "AdjInput";}
 };
 
 // Regular input
@@ -237,8 +223,6 @@ class CASADI_EXPORT DummyInput : public FmuInput {
   DummyInput(const Fmu* fmu, size_t ind) : FmuInput(FmuInputType::DUMMY_OUTPUT, ind, fmu) {}
   // Destructor
   ~DummyInput() override;
-  // Class name
-  std::string class_name() const override { return "DummyInput";}
 };
 
 // Output structure

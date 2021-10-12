@@ -782,18 +782,6 @@ double FmuFunction::get_sens(FmuMemory* m, size_t id) const {
   return m->sens_.at(id);
 }
 
-const std::vector<size_t>& FmuInput::iind2() const {
-  casadi_error("iind not implemented for " + class_name());
-  static const std::vector<size_t> dummy;
-  return dummy;
-}
-
-const std::vector<size_t>& FmuInput::oind2() const {
-  casadi_error("oind not implemented for " + class_name());
-  static const std::vector<size_t> dummy;
-  return dummy;
-}
-
 const std::vector<size_t>& FmuOutput::iind2() const {
   casadi_error("iind not implemented for " + class_name());
   static const std::vector<size_t> dummy;
@@ -1127,7 +1115,7 @@ void FmuFunction::init(const Dict& opts) {
   }
   for (FmuInput* i : in_) {
     if (i->type_ == FmuInputType::ADJ_SEED) {
-      for (size_t j : i->oind2()) in_jac[fmu_->oind_[j]] = true;
+      for (size_t j : fmu_->out_[i->ind_]) in_jac[fmu_->oind_[j]] = true;
       has_adj_ = true;
     }
   }
@@ -1178,7 +1166,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k]->type_ == FmuInputType::REG_INPUT) {
-      const std::vector<size_t>& iind = in_[k]->iind2();
+      const std::vector<size_t>& iind = fmu_->in_[in_[k]->ind_];
       for (size_t i = 0; i < iind.size(); ++i) {
         set(m, fmu_->iind_[iind[i]], arg[k] ? arg[k][i] : 0);
       }
@@ -1220,7 +1208,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       std::fill(adjw, adjw + nv_, 0);
       for (size_t i = 0; i < in_.size(); ++i) {
         if (arg[i] && in_[i]->type_ == FmuInputType::ADJ_SEED) {
-          const std::vector<size_t>& oind = in_[i]->oind2();
+          const std::vector<size_t>& oind = fmu_->out_[in_[i]->ind_];
           for (size_t k = 0; k < oind.size(); ++k) adjw[fmu_->oind_[oind[k]]] = arg[i][k];
         }
       }
@@ -1373,7 +1361,7 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
   auto dae = fmu_->dae();
   // Get the indices
   std::vector<size_t> oi = out_.at(oind)->oind2();
-  std::vector<size_t> ii = in_.at(iind)->iind2();
+  std::vector<size_t> ii = fmu_->in_[in_.at(iind)->ind_];
   // Convert to indices in FMU
   for (size_t& i : oi) i = fmu_->oind_.at(i);
   for (size_t& i : ii) i = fmu_->iind_.at(i);
