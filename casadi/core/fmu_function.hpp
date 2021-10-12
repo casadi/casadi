@@ -169,6 +169,27 @@ struct CASADI_EXPORT Fmu {
   // Retrieve values from FMU, copy to DaeBuilder
   int get_values(FmuMemory* m) const;
 
+  // Setup experiment
+  void setup_experiment(FmuMemory* m) const;
+
+  // New memory object
+  fmi2Component instantiate() const;
+
+  // Set value
+  void set(FmuMemory* m, size_t id, double value) const;
+
+  // Request the calculation of a variable
+  void request(FmuMemory* m, size_t id, size_t wrt_id = -1) const;
+
+  // Gather user inputs and outputs
+  void gather_io(FmuMemory* m) const;
+
+  // Calculate all requested variables
+  int eval(FmuMemory* m) const;
+
+  // Get a calculated variable
+  void get(FmuMemory* m, size_t id, double* value) const;
+
   // Name of system, per the FMI specification
   static std::string system_infix();
 
@@ -324,29 +345,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /** \brief Free memory block */
   void free_mem(void *mem) const override;
 
-  // Setup experiment
-  void setup_experiment(FmuMemory* m) const;
-
-  // New memory object
-  fmi2Component instantiate() const;
-
-  // Set value
-  void set(FmuMemory* m, size_t id, double value) const;
-
-  // Request the calculation of a variable
-  void request(FmuMemory* m, size_t id, size_t wrt_id = -1) const;
-
-  // Calculate all requested variables
-  int eval(FmuMemory* m) const;
-
-  // Get a calculated variable
-  void get(FmuMemory* m, size_t id, double* value) const;
-
   // Set seed
   void set_seed(FmuMemory* m, size_t id, double value) const;
-
-  // Gather user inputs and outputs
-  void gather_io(FmuMemory* m) const;
 
   // Gather user sensitivities
   void gather_sens(FmuMemory* m) const;

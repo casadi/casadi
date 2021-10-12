@@ -197,18 +197,18 @@ void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 
-fmi2Component FmuFunction::instantiate() const {
+fmi2Component Fmu::instantiate() const {
   // DaeBuilder instance
-  auto dae = fmu_->dae();
+  auto dae = this->dae();
   // Instantiate FMU
   fmi2String instanceName = dae->model_identifier_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
   fmi2String fmuGUID = dae->guid_.c_str();
-  fmi2String fmuResourceLocation = fmu_->resource_loc_.c_str();
+  fmi2String fmuResourceLocation = resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
   fmi2Boolean loggingOn = dae->debug_;
-  fmi2Component c = fmu_->instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
-    &fmu_->functions_, visible, loggingOn);
+  fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
+    &functions_, visible, loggingOn);
   if (c == 0) casadi_error("fmi2Instantiate failed");
   return c;
 }
@@ -223,9 +223,9 @@ int FmuFunction::init_mem(void* mem) const {
   // Ensure not already instantiated
   casadi_assert(m->c == 0, "Already instantiated");
   // Create instance
-  m->c = instantiate();
+  m->c = fmu_->instantiate();
   // Reset solver
-  setup_experiment(m);
+  fmu_->setup_experiment(m);
   // Set all values
   if (fmu_->set_values(m)) {
     casadi_warning("Fmu::set_values failed");
@@ -276,11 +276,11 @@ void FmuFunction::free_mem(void *mem) const {
   delete m;
 }
 
-void FmuFunction::setup_experiment(FmuMemory* m) const {
+void Fmu::setup_experiment(FmuMemory* m) const {
   // DaeBuilder instance
-  auto dae = fmu_->dae();
+  auto dae = this->dae();
   // Call fmi2SetupExperiment
-  fmi2Status status = fmu_->setup_experiment_(m->c, dae->fmutol_ > 0, dae->fmutol_, 0.,
+  fmi2Status status = setup_experiment_(m->c, dae->fmutol_ > 0, dae->fmutol_, 0.,
     fmi2True, 1.);
   casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
 }
@@ -422,7 +422,7 @@ int Fmu::get_values(FmuMemory* m) const {
   return 0;
 }
 
-void FmuFunction::set(FmuMemory* m, size_t id, double value) const {
+void Fmu::set(FmuMemory* m, size_t id, double value) const {
   // Update buffer
   if (value != m->buffer_.at(id)) {
     m->buffer_.at(id) = value;
@@ -438,14 +438,14 @@ void FmuFunction::set_seed(FmuMemory* m, size_t id, double value) const {
   }
 }
 
-void FmuFunction::request(FmuMemory* m, size_t id, size_t wrt_id) const {
+void Fmu::request(FmuMemory* m, size_t id, size_t wrt_id) const {
   // Mark as requested
   m->requested_.at(id) = true;
   // Also log corresponding input index
   m->wrt_.at(id) = wrt_id;
 }
 
-int FmuFunction::eval(FmuMemory* m) const {
+int Fmu::eval(FmuMemory* m) const {
   // Gather inputs and outputs
   gather_io(m);
   // Number of inputs and outputs
@@ -454,7 +454,7 @@ int FmuFunction::eval(FmuMemory* m) const {
   // Fmi return flag
   fmi2Status status;
   // Set all variables
-  status = fmu_->set_real_(m->c, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
+  status = set_real_(m->c, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
@@ -463,7 +463,7 @@ int FmuFunction::eval(FmuMemory* m) const {
   if (n_out == 0) return 0;
   // Calculate all variables
   m->v_out_.resize(n_out);
-  status = fmu_->get_real_(m->c, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_));
+  status = get_real_(m->c, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
@@ -477,14 +477,14 @@ int FmuFunction::eval(FmuMemory* m) const {
   return 0;
 }
 
-void FmuFunction::get(FmuMemory* m, size_t id, double* value) const {
+void Fmu::get(FmuMemory* m, size_t id, double* value) const {
   // Save to return
   *value = m->buffer_.at(id);
 }
 
-void FmuFunction::gather_io(FmuMemory* m) const {
+void Fmu::gather_io(FmuMemory* m) const {
   // DaeBuilder instance
-  auto dae = fmu_->dae();
+  auto dae = this->dae();
   // Collect input indices and corresponding value references and values
   m->id_in_.clear();
   m->vr_in_.clear();
@@ -513,7 +513,7 @@ void FmuFunction::gather_io(FmuMemory* m) const {
 
 void FmuFunction::gather_sens(FmuMemory* m) const {
   // Gather input and output indices
-  gather_io(m);
+  fmu_->gather_io(m);
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
@@ -1158,7 +1158,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (in_[k].type == REG_INPUT) {
       const std::vector<size_t>& iind = fmu_->in_[in_[k].ind];
       for (size_t i = 0; i < iind.size(); ++i) {
-        set(m, fmu_->iind_[iind[i]], arg[k] ? arg[k][i] : 0);
+        fmu_->set(m, fmu_->iind_[iind[i]], arg[k] ? arg[k][i] : 0);
       }
     }
   }
@@ -1167,18 +1167,18 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (res[k] && out_[k].type == REG_OUTPUT) {
       const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
       for (size_t i = 0; i < oind.size(); ++i) {
-        request(m, fmu_->oind_[oind[i]]);
+        fmu_->request(m, fmu_->oind_[oind[i]]);
       }
     }
   }
   // Evaluate
-  if (eval(m)) return 1;
+  if (fmu_->eval(m)) return 1;
   // Get regular outputs
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k].type == REG_OUTPUT) {
       const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
       for (size_t i = 0; i < oind.size(); ++i) {
-        get(m, fmu_->oind_[oind[i]], &res[k][i]);
+        fmu_->get(m, fmu_->oind_[oind[i]], &res[k][i]);
       }
     }
   }
@@ -1221,7 +1221,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         // Request corresponding outputs
         for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
           casadi_int vout = sp_ext_.row(Jk);
-          request(m, fmu_->oind_[jac_out_.at(vout)], fmu_->iind_[Jc]);
+          fmu_->request(m, fmu_->oind_[jac_out_.at(vout)], fmu_->iind_[Jc]);
         }
       }
       // Calculate derivatives
