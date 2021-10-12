@@ -737,7 +737,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Which element in the vector
         size_t wrt_ind = 0;
         for (; wrt_ind < m->id_in_.size(); ++wrt_ind)
-          if (m->id_in_[wrt_ind] == wrt_id) break;
+          if (m->id_in_[wrt_ind] == iind_.at(wrt_id)) break;
         casadi_assert(wrt_ind < m->id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
