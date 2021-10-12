@@ -240,7 +240,7 @@ int Fmu::init(FmuMemory* m) const {
   m->requested_.resize(oind_.size());
   std::fill(m->requested_.begin(), m->requested_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
-  m->wrt_.resize(dae->variables_.size());
+  m->wrt_.resize(oind_.size());
   // Initialization mode begins
   if (enter_initialization_mode(m)) return 1;
   // Get all values
@@ -446,7 +446,7 @@ void Fmu::request(FmuMemory* m, size_t id, size_t wrt_id) const {
   // Mark as requested
   m->requested_.at(id) = true;
   // Also log corresponding input index
-  m->wrt_.at(oind_[id]) = wrt_id;
+  m->wrt_.at(id) = wrt_id;
 }
 
 int Fmu::eval(FmuMemory* m) const {
@@ -654,7 +654,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Variable id
         size_t id = m->id_out_[i];
         // Differentiation with respect to what variable
-        size_t wrt_id = m->wrt_.at(oind_.at(id));
+        size_t wrt_id = m->wrt_.at(id);
         // Find the corresponding input variable
         size_t wrt_i;
         for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
@@ -723,7 +723,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
       // Access output variable
       const Variable& v = dae->variable(oind_.at(id));
       // With respect to what variable
-      size_t wrt_id = m->wrt_[oind_.at(id)];
+      size_t wrt_id = m->wrt_[id];
       const Variable& wrt = dae->variable(iind_.at(wrt_id));
       // Nominal value for input
       double wrt_nom = wrt.nominal;
