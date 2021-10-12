@@ -1001,9 +1001,6 @@ void FmuFunction::init(const Dict& opts) {
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
-  // Number of variables
-  nv_ = dae->variables_.size();
-
   // Do the outputs include Jacobian blocks and/or adjoint directional derivatives
   has_adj_ = has_jac_ = false;
 
@@ -1055,7 +1052,10 @@ void FmuFunction::init(const Dict& opts) {
     + " -> " + str(coloring_.size2()) + " directions");
 
   // Work vectors
-  if (has_adj_) alloc_w(nv_, false);  // adjw
+  if (has_adj_) {
+    alloc_w(fmu_->oind_.size(), true);  // aseed
+    alloc_w(fmu_->iind_.size(), true);  // asens
+  }
 }
 
 void FmuFunction::parse_input(InputStruct* s, const std::string& n) const {
@@ -1143,12 +1143,14 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   casadi_assert(m != 0, "Memory is null");
 
   // Work vector holding the adjoint seeds and sensitivities
-  double* adjw = 0;
+  double* aseed = 0;
+  double* asens = 0;
   if (has_adj_) {
-    adjw = w;
-    w += nv_;
+    aseed = w;
+    w += fmu_->oind_.size();
+    asens = w;
+    w += fmu_->iind_.size();
   }
-
   // DaeBuilder instance
   auto dae = fmu_->dae();
   // Pass all regular inputs
@@ -1191,15 +1193,19 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
 
   // Evalute Jacobian blocks
   if (need_jac) {
-    // Copy adjoint seeds to adjw
+    // Vectors for adjoint calculation
     if (has_adj_) {
-      std::fill(adjw, adjw + nv_, 0);
+      // Copy adjoint seeds to aseed
+      std::fill(aseed, aseed + fmu_->oind_.size(), 0);
       for (size_t i = 0; i < in_.size(); ++i) {
         if (arg[i] && in_[i].type == ADJ_SEED) {
           const std::vector<size_t>& oind = fmu_->out_[in_[i].ind];
-          for (size_t k = 0; k < oind.size(); ++k) adjw[fmu_->oind_[oind[k]]] = arg[i][k];
+          for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
         }
       }
+      std::fill(aseed, aseed + fmu_->oind_.size(), 0);
+      // Clear adjoint sensitivities
+      std::fill(asens, asens + fmu_->iind_.size(), 0);
     }
     // Loop over colors
     for (casadi_int c = 0; c < coloring_.size2(); ++c) {
@@ -1207,15 +1213,15 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       for (casadi_int kc = coloring_.colind(c); kc < coloring_.colind(c + 1); ++kc) {
         casadi_int vin = coloring_.row(kc);
         // Differentiation with respect to what variable
-        size_t Jc = fmu_->iind_[jac_in_.at(vin)];
+        size_t Jc = jac_in_.at(vin);
         // Nominal value
-        double nom = dae->variable(Jc).nominal;
+        double nom = dae->variable(fmu_->iind_[Jc]).nominal;
         // Set seed for column
-        set_seed(m, Jc, nom);
+        set_seed(m, fmu_->iind_[Jc], nom);
         // Request corresponding outputs
         for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
           casadi_int vout = sp_ext_.row(Jk);
-          request(m, fmu_->oind_[jac_out_.at(vout)], Jc);
+          request(m, fmu_->oind_[jac_out_.at(vout)], fmu_->iind_[Jc]);
         }
       }
       // Calculate derivatives
@@ -1224,16 +1230,16 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       for (casadi_int kc = coloring_.colind(c); kc < coloring_.colind(c + 1); ++kc) {
         casadi_int vin = coloring_.row(kc);
         // Differentiation with respect to what variable
-        size_t Jc = fmu_->iind_[jac_in_.at(vin)];
+        size_t Jc = jac_in_.at(vin);
         // Inverse of nominal value
-        double inv_nom = 1. / dae->variable(Jc).nominal;
+        double inv_nom = 1. / dae->variable(fmu_->iind_[Jc]).nominal;
         // Fetch Jacobian blocks
         for (size_t k = 0; k < out_.size(); ++k) {
           if (res[k] && out_[k].type == JAC_OUTPUT) {
             // Find input index
             const std::vector<size_t>& iind = fmu_->in_[out_[k].wrt];
             for (size_t Bc = 0; Bc < iind.size(); ++Bc) {
-              if (fmu_->iind_[iind[Bc]] == Jc) {
+              if (iind[Bc] == Jc) {
                 // Column exists in Jacobian block
                 const Sparsity& sp = sparsity_out(k);
                 const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
@@ -1249,8 +1255,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         if (has_adj_) {
           for (casadi_int Jk = sp_ext_.colind(vin); Jk < sp_ext_.colind(vin + 1); ++Jk) {
             casadi_int vout = sp_ext_.row(Jk);
-            size_t Jr = fmu_->oind_[jac_out_.at(vout)];
-            adjw[Jc] += inv_nom * get_sens(m, Jr) * adjw[Jr];
+            size_t Jr = jac_out_.at(vout);
+            asens[Jc] += inv_nom * get_sens(m, fmu_->oind_[Jr]) * aseed[Jr];
           }
         }
       }
@@ -1260,7 +1266,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       for (size_t i = 0; i < out_.size(); ++i) {
         if (res[i] && out_[i].type == ADJ_SENS) {
           const std::vector<size_t>& iind = fmu_->in_[out_[i].ind];
-          for (size_t k = 0; k < iind.size(); ++k) res[i][k] = adjw[fmu_->iind_[iind[k]]];
+          for (size_t k = 0; k < iind.size(); ++k) res[i][k] = asens[iind[k]];
         }
       }
     }
