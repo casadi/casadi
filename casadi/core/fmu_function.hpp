@@ -183,17 +183,6 @@ struct CASADI_EXPORT Fmu {
     fmi2String message, ...);
 };
 
-// Types of inputs
-enum class FmuInputType {REG_INPUT, ADJ_SEED, DUMMY_OUTPUT};
-
-// Input structure
-struct CASADI_EXPORT FmuInput {
-  // Type of input
-  FmuInputType type;
-  // Corresponding index in Fmu
-  size_t ind;
-};
-
 // Output structure
 class CASADI_EXPORT FmuOutput {
  protected:
@@ -291,8 +280,19 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // FMU (shared between derivative expressions
   Fmu* fmu_;
 
+  // Types of inputs
+  enum InputType {REG_INPUT, ADJ_SEED, DUMMY_OUTPUT};
+
+  // Input structure
+  struct InputStruct {
+    // Type of input
+    InputType type;
+    // Corresponding index in Fmu
+    size_t ind;
+  };
+
   // Information about function inputs
-  std::vector<FmuInput> in_;
+  std::vector<InputStruct> in_;
 
   // Information about function outputs
   std::vector<FmuOutput*> out_;
