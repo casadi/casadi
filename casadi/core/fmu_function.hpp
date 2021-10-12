@@ -202,10 +202,6 @@ class CASADI_EXPORT FmuOutput {
     : type_(type), ind_(ind), wrt_(wrt), fmu_(fmu) {}
   // Destructor
   virtual ~FmuOutput();
-  // Input indices
-  virtual const std::vector<size_t>& iind2() const;
-  // Output indices
-  virtual const std::vector<size_t>& oind2() const;
   // Class name
   virtual std::string class_name() const = 0;
   // It it a regular input?
@@ -224,7 +220,7 @@ class CASADI_EXPORT RegOutput : public FmuOutput {
   // Destructor
   ~RegOutput() override;
   // Access all indices
-  const std::vector<size_t>& oind2() const override { return fmu_->out_[ind_];}
+  const std::vector<size_t>& oind2() const { return fmu_->out_[ind_];}
   // Class name
   std::string class_name() const override { return "RegOutput";}
   // It it a regular output?
@@ -243,9 +239,9 @@ class CASADI_EXPORT JacOutput : public FmuOutput {
   // It it a Jacobian block?
   bool is_jac() const override {return true;}
   // Access all indices
-  const std::vector<size_t>& oind2() const override { return fmu_->out_[ind_];}
+  const std::vector<size_t>& oind2() const { return fmu_->out_[ind_];}
   // Access all indices
-  const std::vector<size_t>& iind2() const override { return fmu_->in_[wrt_];}
+  const std::vector<size_t>& iind2() const { return fmu_->in_[wrt_];}
 };
 
 // Adjoint sensitivity block
@@ -256,7 +252,7 @@ class CASADI_EXPORT AdjOutput : public FmuOutput {
   // Destructor
   ~AdjOutput() override;
   // Access all indices
-  const std::vector<size_t>& iind2() const override { return fmu_->in_[ind_];}
+  const std::vector<size_t>& iind2() const { return fmu_->in_[ind_];}
   // Class name
   std::string class_name() const override { return "AdjOutput";}
   // It it a regular output?

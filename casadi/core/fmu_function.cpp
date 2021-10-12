@@ -782,18 +782,6 @@ double FmuFunction::get_sens(FmuMemory* m, size_t id) const {
   return m->sens_.at(id);
 }
 
-const std::vector<size_t>& FmuOutput::iind2() const {
-  casadi_error("iind not implemented for " + class_name());
-  static const std::vector<size_t> dummy;
-  return dummy;
-}
-
-const std::vector<size_t>& FmuOutput::oind2() const {
-  casadi_error("oind not implemented for " + class_name());
-  static const std::vector<size_t> dummy;
-  return dummy;
-}
-
 FmuOutput::~FmuOutput() {
 }
 
@@ -1073,8 +1061,10 @@ void FmuFunction::init(const Dict& opts) {
   // Collect all inputs in any Jacobian or adjoint block
   std::vector<bool> in_jac(nv_, false);
   for (FmuOutput* i : out_) {
-    if (i->is_jac() || i->is_adj()) {
-      for (size_t j : i->iind2()) in_jac[fmu_->iind_[j]] = true;
+    if (i->is_jac()) {
+      for (size_t j : fmu_->in_[i->wrt_]) in_jac[fmu_->iind_[j]] = true;
+    } else if (i->is_adj()) {
+      for (size_t j : fmu_->in_[i->ind_]) in_jac[fmu_->iind_[j]] = true;
     }
   }
   jac_in_.clear();
@@ -1089,7 +1079,7 @@ void FmuFunction::init(const Dict& opts) {
   std::fill(in_jac.begin(), in_jac.end(), false);
   for (FmuOutput* i : out_) {
     if (i->is_jac()) {
-      for (size_t j : i->oind2()) in_jac[fmu_->oind_[j]] = true;
+      for (size_t j : fmu_->out_[i->ind_]) in_jac[fmu_->oind_[j]] = true;
       has_jac_ = true;
     }
   }
@@ -1168,7 +1158,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k]->is_reg()) {
-      const std::vector<size_t>& oind = out_[k]->oind2();
+      const std::vector<size_t>& oind = fmu_->out_[out_[k]->ind_];
       for (size_t i = 0; i < oind.size(); ++i) {
         request(m, fmu_->oind_[oind[i]]);
       }
@@ -1179,7 +1169,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Get regular outputs
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k]->is_reg()) {
-      const std::vector<size_t>& oind = out_[k]->oind2();
+      const std::vector<size_t>& oind = fmu_->out_[out_[k]->ind_];
       for (size_t i = 0; i < oind.size(); ++i) {
         get(m, fmu_->oind_[oind[i]], &res[k][i]);
       }
@@ -1236,12 +1226,12 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         for (size_t k = 0; k < out_.size(); ++k) {
           if (res[k] && out_[k]->is_jac()) {
             // Find input index
-            const std::vector<size_t>& iind = out_[k]->iind2();
+            const std::vector<size_t>& iind = fmu_->in_[out_[k]->wrt_];
             for (size_t Bc = 0; Bc < iind.size(); ++Bc) {
               if (fmu_->iind_[iind[Bc]] == Jc) {
                 // Column exists in Jacobian block
                 const Sparsity& sp = sparsity_out(k);
-                const std::vector<size_t>& oind = out_[k]->oind2();
+                const std::vector<size_t>& oind = fmu_->out_[out_[k]->ind_];
                 for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
                   // Save Jacobian nonzero, scaled by nominal value factor
                   res[k][Bk] = inv_nom * get_sens(m, fmu_->oind_[oind.at(sp.row(Bk))]);
@@ -1264,7 +1254,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (has_adj_) {
       for (size_t i = 0; i < out_.size(); ++i) {
         if (res[i] && out_[i]->is_adj()) {
-          const std::vector<size_t>& iind = out_[i]->iind2();
+          const std::vector<size_t>& iind = fmu_->in_[out_[i]->ind_];
           for (size_t k = 0; k < iind.size(); ++k) res[i][k] = adjw[fmu_->iind_[iind[k]]];
         }
       }
@@ -1353,7 +1343,7 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
   // DaeBuilder instance
   auto dae = fmu_->dae();
   // Get the indices
-  std::vector<size_t> oi = out_.at(oind)->oind2();
+  std::vector<size_t> oi = fmu_->out_[out_.at(oind)->ind_];
   std::vector<size_t> ii = fmu_->in_[in_.at(iind).ind];
   // Convert to indices in FMU
   for (size_t& i : oi) i = fmu_->oind_.at(i);
