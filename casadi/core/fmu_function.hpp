@@ -187,42 +187,11 @@ struct CASADI_EXPORT Fmu {
 enum class FmuInputType {REG_INPUT, ADJ_SEED, DUMMY_OUTPUT};
 
 // Input structure
-class CASADI_EXPORT FmuInput {
- public:
-  FmuInputType type_;
-  size_t ind_;
-  const Fmu* fmu_;
-  // Constructor
-  FmuInput(FmuInputType type, size_t ind, const Fmu* fmu) : type_(type), ind_(ind), fmu_(fmu) {}
-  // Destructor
-  virtual ~FmuInput();
-};
-
-// Regular input
-class CASADI_EXPORT RegInput : public FmuInput {
- public:
-  // Constructor
-  RegInput(const Fmu* fmu, size_t ind) : FmuInput(FmuInputType::REG_INPUT, ind, fmu) {}
-  // Destructor
-  ~RegInput() override;
-};
-
-// Adjoint seed
-class CASADI_EXPORT AdjInput : public FmuInput {
- public:
-  // Constructor
-  AdjInput(const Fmu* fmu, size_t ind) : FmuInput(FmuInputType::ADJ_SEED, ind, fmu) {}
-  // Destructor
-  ~AdjInput() override;
-};
-
-// Regular input
-class CASADI_EXPORT DummyInput : public FmuInput {
- public:
-  // Constructor
-  DummyInput(const Fmu* fmu, size_t ind) : FmuInput(FmuInputType::DUMMY_OUTPUT, ind, fmu) {}
-  // Destructor
-  ~DummyInput() override;
+struct CASADI_EXPORT FmuInput {
+  // Type of input
+  FmuInputType type;
+  // Corresponding index in Fmu
+  size_t ind;
 };
 
 // Output structure
@@ -323,7 +292,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   Fmu* fmu_;
 
   // Information about function inputs
-  std::vector<FmuInput*> in_;
+  std::vector<FmuInput> in_;
 
   // Information about function outputs
   std::vector<FmuOutput*> out_;

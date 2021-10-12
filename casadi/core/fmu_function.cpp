@@ -794,18 +794,6 @@ const std::vector<size_t>& FmuOutput::oind2() const {
   return dummy;
 }
 
-FmuInput::~FmuInput() {
-}
-
-RegInput::~RegInput() {
-}
-
-DummyInput::~DummyInput() {
-}
-
-AdjInput::~AdjInput() {
-}
-
 FmuOutput::~FmuOutput() {
 }
 
@@ -945,7 +933,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
     const std::vector<std::string>& name_out)
     : FunctionInternal(name), fmu_(fmu) {
   // Get input IDs
-  in_.resize(name_in.size(), nullptr);
+  in_.resize(name_in.size());
   for (size_t k = 0; k < name_in.size(); ++k) {
     // Look for prefix
     if (has_prefix(name_in[k])) {
@@ -954,17 +942,17 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
       pref = pop_prefix(name_in[k], &rem);
       if (pref == "out") {
         // Nondifferentiated function output (unused)
-        in_[k] = new DummyInput(fmu, fmu->index_out(rem));
+        in_[k] = {FmuInputType::DUMMY_OUTPUT, fmu->index_out(rem)};
       } else if (pref == "adj") {
         // Adjoint seed
-        in_[k] = new AdjInput(fmu, fmu->index_out(rem));
+        in_[k] = {FmuInputType::ADJ_SEED, fmu->index_out(rem)};
       } else {
         // No such prefix
         casadi_error("No such prefix: " + pref);
       }
     } else {
       // No prefix - regular input
-      in_[k] = new RegInput(fmu, fmu->index_in(name_in[k]));
+      in_[k] = {FmuInputType::REG_INPUT, fmu->index_in(name_in[k])};
     }
   }
   // Get input IDs
@@ -1010,8 +998,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
 FmuFunction::~FmuFunction() {
   // Free memory
   clear_mem();
-  // Free input and output memory structures
-  for (FmuInput* e : in_) if (e) delete(e);
+  // Free output memory structure
   for (FmuOutput* e : out_) if (e) delete(e);
   // Decrease reference pointer to Fmu instance
   if (fmu_ && fmu_->counter_-- == 0) delete fmu_;
@@ -1113,9 +1100,9 @@ void FmuFunction::init(const Dict& opts) {
       has_jac_ = true;
     }
   }
-  for (FmuInput* i : in_) {
-    if (i->type_ == FmuInputType::ADJ_SEED) {
-      for (size_t j : fmu_->out_[i->ind_]) in_jac[fmu_->oind_[j]] = true;
+  for (auto&& i : in_) {
+    if (i.type == FmuInputType::ADJ_SEED) {
+      for (size_t j : fmu_->out_[i.ind]) in_jac[fmu_->oind_[j]] = true;
       has_adj_ = true;
     }
   }
@@ -1137,13 +1124,13 @@ void FmuFunction::init(const Dict& opts) {
 }
 
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
-  switch (in_.at(i)->type_) {
+  switch (in_.at(i).type) {
     case FmuInputType::REG_INPUT:
-      return Sparsity::dense(fmu_->in_[in_.at(i)->ind_].size(), 1);
+      return Sparsity::dense(fmu_->in_[in_.at(i).ind].size(), 1);
     case FmuInputType::ADJ_SEED:
-      return Sparsity::dense(fmu_->out_[in_.at(i)->ind_].size(), 1);
+      return Sparsity::dense(fmu_->out_[in_.at(i).ind].size(), 1);
     case FmuInputType::DUMMY_OUTPUT:
-      return Sparsity(fmu_->out_[in_.at(i)->ind_].size(), 1);
+      return Sparsity(fmu_->out_[in_.at(i).ind].size(), 1);
   }
   return Sparsity();
 }
@@ -1165,8 +1152,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   auto dae = fmu_->dae();
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
-    if (in_[k]->type_ == FmuInputType::REG_INPUT) {
-      const std::vector<size_t>& iind = fmu_->in_[in_[k]->ind_];
+    if (in_[k].type == FmuInputType::REG_INPUT) {
+      const std::vector<size_t>& iind = fmu_->in_[in_[k].ind];
       for (size_t i = 0; i < iind.size(); ++i) {
         set(m, fmu_->iind_[iind[i]], arg[k] ? arg[k][i] : 0);
       }
@@ -1207,8 +1194,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (has_adj_) {
       std::fill(adjw, adjw + nv_, 0);
       for (size_t i = 0; i < in_.size(); ++i) {
-        if (arg[i] && in_[i]->type_ == FmuInputType::ADJ_SEED) {
-          const std::vector<size_t>& oind = fmu_->out_[in_[i]->ind_];
+        if (arg[i] && in_[i].type == FmuInputType::ADJ_SEED) {
+          const std::vector<size_t>& oind = fmu_->out_[in_[i].ind];
           for (size_t k = 0; k < oind.size(); ++k) adjw[fmu_->oind_[oind[k]]] = arg[i][k];
         }
       }
@@ -1352,7 +1339,7 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 }
 
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
-  return in_.at(iind)->type_ == FmuInputType::REG_INPUT && out_.at(oind)->is_reg();
+  return in_.at(iind).type == FmuInputType::REG_INPUT && out_.at(oind)->is_reg();
 }
 
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
@@ -1361,7 +1348,7 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
   auto dae = fmu_->dae();
   // Get the indices
   std::vector<size_t> oi = out_.at(oind)->oind2();
-  std::vector<size_t> ii = fmu_->in_[in_.at(iind)->ind_];
+  std::vector<size_t> ii = fmu_->in_[in_.at(iind).ind];
   // Convert to indices in FMU
   for (size_t& i : oi) i = fmu_->oind_.at(i);
   for (size_t& i : ii) i = fmu_->iind_.at(i);
