@@ -806,13 +806,6 @@ JacOutput::~JacOutput() {
 AdjOutput::~AdjOutput() {
 }
 
-Sparsity JacOutput::sparsity(const FmuFunction& f) const {
-  // DaeBuilder instance
-  auto dae = f.fmu_->dae();
-  // Get the Jacobian block
-  return dae->jac_sparsity(fmu_->get_out(oi_), fmu_->get_in(ii_));
-}
-
 Fmu::Fmu(const DaeBuilderInternal* dae,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
@@ -1131,6 +1124,19 @@ Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
       return Sparsity::dense(fmu_->out_[in_.at(i).ind].size(), 1);
     case DUMMY_OUTPUT:
       return Sparsity(fmu_->out_[in_.at(i).ind].size(), 1);
+  }
+  return Sparsity();
+}
+
+Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
+  switch (out_.at(i)->type_) {
+    case REG_OUTPUT:
+      return Sparsity::dense(fmu_->out_[out_.at(i)->ind_].size(), 1);
+    case ADJ_SENS:
+      return Sparsity::dense(fmu_->in_[out_.at(i)->ind_].size(), 1);
+    case JAC_OUTPUT:
+      return fmu_->dae()->jac_sparsity(fmu_->get_out(out_.at(i)->ind_),
+        fmu_->get_in(out_.at(i)->wrt_));
   }
   return Sparsity();
 }
