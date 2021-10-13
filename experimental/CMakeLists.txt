@@ -12,3 +12,11 @@ if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(blocksqp_test blocksqp_test.cpp)
   target_link_libraries(blocksqp_test casadi)
 endif()
+
+# AD for blackbox C code: Demonstrating the basic idea
+add_executable(blackbox_ad_poc blackbox_ad_poc.cpp)
+target_link_libraries(blackbox_ad_poc casadi)
+
+# AD for blackbox C code: Implementation
+add_executable(blackbox_ad blackbox_ad.cpp)
+target_link_libraries(blackbox_ad casadi)
