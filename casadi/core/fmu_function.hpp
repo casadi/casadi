@@ -88,7 +88,7 @@ struct CASADI_EXPORT Fmu {
     const std::map<std::string, std::vector<size_t>>& lc);
 
   // Initialize
-  void init();
+  void init(const DaeBuilderInternal* dae);
 
   // Reference counter
   int counter_;
@@ -139,6 +139,18 @@ struct CASADI_EXPORT Fmu {
 
   // Path to the FMU resource directory
   std::string resource_loc_;
+
+  // Tolerance
+  double fmutol_;
+
+  // Instance name
+  std::string instance_name_;
+
+  // GUID
+  std::string guid_;
+
+  // Logging?
+  bool logging_on_;
 
   // Variables used for initialization, by type
   std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;

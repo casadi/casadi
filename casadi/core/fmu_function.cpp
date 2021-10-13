@@ -66,10 +66,97 @@ std::string Fmu::dll_suffix() {
 #endif
 }
 
-void Fmu::init() {
-  // DaeBuilder instance
-  auto dae = this->dae();
-
+void Fmu::init(const DaeBuilderInternal* dae) {
+  // Mark input indices
+  size_t numel = 0;
+  std::vector<bool> lookup(dae->variables_.size(), false);
+  for (auto&& n : name_in_) {
+    for (size_t i : scheme_.at(n)) {
+      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
+      lookup.at(i) = true;
+      numel++;
+    }
+  }
+  // Input mappings
+  iind_.reserve(numel);
+  iind_map_.reserve(lookup.size());
+  for (size_t k = 0; k < lookup.size(); ++k) {
+    if (lookup[k]) {
+      iind_map_.push_back(iind_.size());
+      iind_.push_back(k);
+    } else {
+      iind_map_.push_back(-1);
+    }
+  }
+  // Mark output indices
+  numel = 0;
+  std::fill(lookup.begin(), lookup.end(), false);
+  for (auto&& n : name_out_) {
+    for (size_t i : scheme_.at(n)) {
+      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
+      lookup.at(i) = true;
+      numel++;
+    }
+  }
+  // Construct mappings
+  oind_.reserve(numel);
+  oind_map_.reserve(lookup.size());
+  for (size_t k = 0; k < lookup.size(); ++k) {
+    if (lookup[k]) {
+      oind_map_.push_back(oind_.size());
+      oind_.push_back(k);
+    } else {
+      oind_map_.push_back(-1);
+    }
+  }
+  // Inputs
+  ired_.resize(name_in_.size());
+  for (size_t i = 0; i < ired_.size(); ++i) {
+    auto&& s = scheme_.at(name_in_[i]);
+    ired_[i].resize(s.size());
+    for (size_t k = 0; k < s.size(); ++k) {
+      ired_[i][k] = iind_map_.at(s[k]);
+    }
+  }
+  // Outputs
+  ored_.resize(name_out_.size());
+  for (size_t i = 0; i < ored_.size(); ++i) {
+    auto&& s = scheme_.at(name_out_[i]);
+    ored_[i].resize(s.size());
+    for (size_t k = 0; k < s.size(); ++k) {
+      ored_[i][k] = oind_map_.at(s[k]);
+    }
+  }
+  // Collect meta information for inputs
+  nominal_in_.reserve(iind_.size());
+  min_in_.reserve(iind_.size());
+  max_in_.reserve(iind_.size());
+  varname_in_.reserve(iind_.size());
+  vr_in_.reserve(iind_.size());
+  for (size_t i : iind_) {
+    const Variable& v = dae->variables_.at(i);
+    nominal_in_.push_back(v.nominal);
+    min_in_.push_back(v.min);
+    max_in_.push_back(v.max);
+    varname_in_.push_back(v.name);
+    vr_in_.push_back(v.value_reference);
+  }
+  // Collect meta information for outputs
+  nominal_out_.reserve(oind_.size());
+  min_out_.reserve(oind_.size());
+  max_out_.reserve(oind_.size());
+  varname_out_.reserve(oind_.size());
+  vr_out_.reserve(oind_.size());
+  for (size_t i : oind_) {
+    const Variable& v = dae->variables_.at(i);
+    nominal_out_.push_back(v.nominal);
+    min_out_.push_back(v.min);
+    max_out_.push_back(v.max);
+    varname_out_.push_back(v.name);
+    vr_out_.push_back(v.value_reference);
+  }
+  // Get Jacobian sparsity information
+  sp_jac_ = dae->jac_sparsity(oind_, iind_);
   // Load DLL
   std::string instance_name_no_dot = dae->model_identifier_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
@@ -112,6 +199,11 @@ void Fmu::init() {
   // Path to resource directory
   resource_loc_ = "file://" + dae->path_ + "/resources";
 
+  // Copy info from DaeBuilder
+  fmutol_ = dae->fmutol_;
+  instance_name_ = dae->model_identifier_;
+  guid_ = dae->guid_;
+  logging_on_ = dae->debug_;
 
   // Collect variables
   vr_real_.clear();
@@ -198,17 +290,14 @@ void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
 }
 
 fmi2Component Fmu::instantiate() const {
-  // DaeBuilder instance
-  auto dae = this->dae();
   // Instantiate FMU
-  fmi2String instanceName = dae->model_identifier_.c_str();
+  fmi2String instanceName = instance_name_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
-  fmi2String fmuGUID = dae->guid_.c_str();
+  fmi2String fmuGUID = guid_.c_str();
   fmi2String fmuResourceLocation = resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
-  fmi2Boolean loggingOn = dae->debug_;
   fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
-    &functions_, visible, loggingOn);
+    &functions_, visible, logging_on_);
   if (c == 0) casadi_error("fmi2Instantiate failed");
   return c;
 }
@@ -285,11 +374,8 @@ void FmuFunction::free_mem(void *mem) const {
 }
 
 void Fmu::setup_experiment(FmuMemory* m) const {
-  // DaeBuilder instance
-  auto dae = this->dae();
   // Call fmi2SetupExperiment
-  fmi2Status status = setup_experiment_(m->c, dae->fmutol_ > 0, dae->fmutol_, 0.,
-    fmi2True, 1.);
+  fmi2Status status = setup_experiment_(m->c, fmutol_ > 0, fmutol_, 0., fmi2True, 1.);
   casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
 }
 
@@ -818,104 +904,16 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
   set_boolean_ = 0;
   get_real_ = 0;
   get_directional_derivative_ = 0;
-  // Mark input indices
+  // Get input names
   name_in_.clear();
-  size_t numel = 0;
-  std::vector<bool> lookup(dae->variables_.size(), false);
   for (auto&& n : name_in) {
-    auto it = scheme_.find(n);
-    if (it == scheme_.end()) continue;
-    name_in_.push_back(n);
-    for (size_t i : it->second) {
-      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
-      lookup.at(i) = true;
-    }
-    numel += it->second.size();
+    if (scheme_.find(n) != scheme_.end()) name_in_.push_back(n);
   }
-  // Input mappings
-  iind_.reserve(numel);
-  iind_map_.reserve(lookup.size());
-  for (size_t k = 0; k < lookup.size(); ++k) {
-    if (lookup[k]) {
-      iind_map_.push_back(iind_.size());
-      iind_.push_back(k);
-    } else {
-      iind_map_.push_back(-1);
-    }
-  }
-  // Mark output indices
+  // Get output names
   name_out_.clear();
-  numel = 0;
-  std::fill(lookup.begin(), lookup.end(), false);
   for (auto&& n : name_out) {
-    auto it = scheme_.find(n);
-    if (it == scheme_.end()) continue;
-    name_out_.push_back(n);
-    for (size_t i : it->second) {
-      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
-      lookup.at(i) = true;
-    }
-    numel += it->second.size();
+    if (scheme_.find(n) != scheme_.end()) name_out_.push_back(n);
   }
-  // Construct mappings
-  oind_.reserve(numel);
-  oind_map_.reserve(lookup.size());
-  for (size_t k = 0; k < lookup.size(); ++k) {
-    if (lookup[k]) {
-      oind_map_.push_back(oind_.size());
-      oind_.push_back(k);
-    } else {
-      oind_map_.push_back(-1);
-    }
-  }
-  // Inputs
-  ired_.resize(name_in_.size());
-  for (size_t i = 0; i < ired_.size(); ++i) {
-    auto&& s = scheme_.at(name_in_[i]);
-    ired_[i].resize(s.size());
-    for (size_t k = 0; k < s.size(); ++k) {
-      ired_[i][k] = iind_map_.at(s[k]);
-    }
-  }
-  // Outputs
-  ored_.resize(name_out_.size());
-  for (size_t i = 0; i < ored_.size(); ++i) {
-    auto&& s = scheme_.at(name_out_[i]);
-    ored_[i].resize(s.size());
-    for (size_t k = 0; k < s.size(); ++k) {
-      ored_[i][k] = oind_map_.at(s[k]);
-    }
-  }
-  // Collect meta information for inputs
-  nominal_in_.reserve(iind_.size());
-  min_in_.reserve(iind_.size());
-  max_in_.reserve(iind_.size());
-  varname_in_.reserve(iind_.size());
-  vr_in_.reserve(iind_.size());
-  for (size_t i : iind_) {
-    const Variable& v = dae->variables_.at(i);
-    nominal_in_.push_back(v.nominal);
-    min_in_.push_back(v.min);
-    max_in_.push_back(v.max);
-    varname_in_.push_back(v.name);
-    vr_in_.push_back(v.value_reference);
-  }
-  // Collect meta information for outputs
-  nominal_out_.reserve(oind_.size());
-  min_out_.reserve(oind_.size());
-  max_out_.reserve(oind_.size());
-  varname_out_.reserve(oind_.size());
-  vr_out_.reserve(oind_.size());
-  for (size_t i : oind_) {
-    const Variable& v = dae->variables_.at(i);
-    nominal_out_.push_back(v.nominal);
-    min_out_.push_back(v.min);
-    max_out_.push_back(v.max);
-    varname_out_.push_back(v.name);
-    vr_out_.push_back(v.value_reference);
-  }
-  // Get Jacobian sparsity information
-  sp_jac_ = dae->jac_sparsity(oind_, iind_);
 }
 
 size_t Fmu::index_in(const std::string& n) const {

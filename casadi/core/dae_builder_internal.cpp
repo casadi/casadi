@@ -1732,7 +1732,12 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
 #ifdef WITH_FMU
   // New FMU instance (to be shared between derivative functions)
   Fmu* fmu = new Fmu(this, name_in, name_out, scheme, lc);
-  fmu->init();
+  try {
+    fmu->init(this);
+  } catch (std::exception& e) {
+    delete fmu;
+    casadi_error("Fmu::init() failed: " + std::string(e.what()));
+  }
   // Crete new function
   return Function::create(new FmuFunction(name, fmu, name_in, name_out), opts);
 #else  // WITH_FMU
