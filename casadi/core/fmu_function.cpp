@@ -789,6 +789,16 @@ double Fmu::get_sens(FmuMemory* m, size_t id) const {
   return m->sens_.at(id);
 }
 
+Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const {
+  // Convert to indices in DaeBuilder
+  std::vector<size_t> ofull = osub, ifull = isub;
+  for (size_t& i : ofull) i = oind_.at(i);
+  for (size_t& i : ifull) i = iind_.at(i);
+  // Get sparsity pattern for extended Jacobian
+  auto dae = this->dae();
+  return dae->jac_sparsity(ofull, ifull);
+}
+
 Fmu::Fmu(const DaeBuilderInternal* dae,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
@@ -1070,14 +1080,8 @@ void FmuFunction::init(const Dict& opts) {
     if (in_jac[k]) jac_out_.push_back(k);
   }
 
-  // Convert to indices in FMU
-  std::vector<size_t> jac_in = jac_in_, jac_out = jac_out_;
-  for (size_t& i : jac_in) i = fmu_->iind_.at(i);
-  for (size_t& i : jac_out) i = fmu_->oind_.at(i);
-
   // Get sparsity pattern for extended Jacobian
-  auto dae = fmu_->dae();
-  sp_ext_ = dae->jac_sparsity(jac_out, jac_in);
+  sp_ext_ = fmu_->jac_sparsity(jac_out_, jac_in_);
 
   // Calculate graph coloring
   coloring_ = sp_ext_.uni_coloring();
@@ -1163,8 +1167,7 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
     case ADJ_SENS:
       return Sparsity::dense(fmu_->in_[out_.at(i).ind].size(), 1);
     case JAC_OUTPUT:
-      return fmu_->dae()->jac_sparsity(fmu_->get_out(out_.at(i).ind),
-        fmu_->get_in(out_.at(i).wrt));
+      return fmu_->jac_sparsity(fmu_->out_.at(out_.at(i).ind), fmu_->in_.at(out_.at(i).wrt));
   }
   return Sparsity();
 }

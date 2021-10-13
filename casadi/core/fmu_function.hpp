@@ -222,6 +222,9 @@ struct CASADI_EXPORT Fmu {
   // Get a derivative
   double get_sens(FmuMemory* m, size_t id) const;
 
+  // Get Jacobian sparsity for a subset of inputs and outputs
+  Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
+
   // Name of system, per the FMI specification
   static std::string system_infix();
 
