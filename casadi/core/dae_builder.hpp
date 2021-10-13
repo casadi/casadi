@@ -353,7 +353,7 @@ public:
   /// Construct a function object, legacy syntax
   Function create(const std::string& fname,
       const std::vector<std::string>& name_in,
-      const std::vector<std::string>& name_out, bool sx = false, bool lifted_calls = false) const;
+      const std::vector<std::string>& name_out, bool sx = false, bool lifted_calls = false);
 
   /** \brief  Load a function from an FMU DLL, indices provided
     \param name    Name assigned to the resulting function object
@@ -368,7 +368,7 @@ public:
       const std::vector<std::string>& name_out,
       const std::map<std::string, std::vector<std::string>>& scheme,
       const std::map<std::string, std::vector<std::string>>& lc,
-      const Dict& opts=Dict()) const;
+      const Dict& opts=Dict());
   ///@}
 
   /** \brief  Construct a function object, names provided
@@ -380,14 +380,14 @@ public:
   Function create(const std::string& name,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
-      const Dict& opts=Dict()) const;
+      const Dict& opts=Dict());
   ///@}
 
   /** \brief  Load a function from an FMU DLL, standard IO conforming with simulator
     \param name    Name assigned to the resulting function object
     \param opts    Optional settings
   */
-  Function create(const std::string& name, const Dict& opts=Dict()) const;
+  Function create(const std::string& name, const Dict& opts=Dict());
 
   /// Construct a function for evaluating dependent parameters
   Function dependent_fun(const std::string& fname,

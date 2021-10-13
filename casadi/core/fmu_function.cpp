@@ -66,7 +66,7 @@ std::string Fmu::dll_suffix() {
 #endif
 }
 
-void Fmu::init(const DaeBuilderInternal* dae) {
+void Fmu::init(DaeBuilderInternal* dae) {
   // Mark input indices
   size_t numel = 0;
   std::vector<bool> lookup(dae->variables_.size(), false);
@@ -246,6 +246,25 @@ void Fmu::init(const DaeBuilderInternal* dae) {
         casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
     }
   }
+
+  // Create a temporary instance
+  fmi2Component c = instantiate();
+  // Reset solver
+  setup_experiment(c);
+  // Set all values
+  if (set_values(c)) {
+    casadi_error("Fmu::set_values failed");
+  }
+  // Initialization mode begins
+  if (enter_initialization_mode(c)) {
+    casadi_error("Fmu::enter_initialization_mode failed");
+  }
+  // Get all values
+  if (get_values(c, dae)) {
+    casadi_error("Fmu::get_values failed");
+  }
+  // Free memory
+  free_instance(c);
 }
 
 signal_t Fmu::load_function(const std::string& symname) {
@@ -324,11 +343,6 @@ int Fmu::init_mem(FmuMemory* m) const {
   }
   // Initialization mode begins
   if (enter_initialization_mode(m->c)) return 1;
-  // Get all values
-  if (get_values(m->c)) {
-    casadi_warning("Fmu::get_values failed");
-    return 1;
-  }
   // Initialization mode ends
   if (exit_initialization_mode(m->c)) return 1;
   // Allocate/reset input buffer
@@ -448,9 +462,7 @@ int Fmu::set_values(fmi2Component c) const {
   return 0;
 }
 
-int Fmu::get_values(fmi2Component c) const {
-  // DaeBuilder instance
-  auto dae = this->dae();
+int Fmu::get_values(fmi2Component c, DaeBuilderInternal* dae) const {
   // Retrieve values
   for (Variable& v : dae->variables_) {
     // Convert to expected type
@@ -887,13 +899,10 @@ Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<si
   return sp_jac_.sub(osub1, isub1, mapping);
 }
 
-Fmu::Fmu(const DaeBuilderInternal* dae,
-    const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out,
+Fmu::Fmu(const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc)
     : scheme_(scheme), lc_(lc) {
-  dae_ = dae->shared_from_this<DaeBuilder>();
   counter_ = 0;
   instantiate_ = 0;
   free_instance_ = 0;
@@ -936,12 +945,6 @@ size_t Fmu::index_out(const std::string& n) const {
   // Not found
   casadi_error("No such output: " + n);
   return -1;
-}
-
-DaeBuilderInternal* Fmu::dae() const {
-  // Get a pointer to the DaeBuilder class
-  casadi_assert(dae_.alive(), "DaeBuilder instance has been deleted");
-  return static_cast<DaeBuilderInternal*>(dae_->raw_);
 }
 
 FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,

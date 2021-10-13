@@ -81,20 +81,15 @@ CASADI_EXPORT std::string to_string(FdMode v);
 // Interface to binary FMU (shared between derivatives)
 struct CASADI_EXPORT Fmu {
   // Constructor
-  Fmu(const DaeBuilderInternal* dae,
-    const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out,
+  Fmu(const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc);
 
   // Initialize
-  void init(const DaeBuilderInternal* dae);
+  void init(DaeBuilderInternal* dae);
 
   // Reference counter
   int counter_;
-
-  // DaeBuilder instance (non-owning reference to avoid circular dependency)
-  WeakRef dae_;
 
   // DLL
   Importer li_;
@@ -168,9 +163,6 @@ struct CASADI_EXPORT Fmu {
   // Index lookup for output
   size_t index_out(const std::string& n) const;
 
-  // Get DaeBuilder instance
-  DaeBuilderInternal* dae() const;
-
   // Load an FMI function
   signal_t load_function(const std::string& symname);
 
@@ -192,11 +184,11 @@ struct CASADI_EXPORT Fmu {
   // Exit initialization mode
   int exit_initialization_mode(fmi2Component c) const;
 
-  // Retrieve values from DaeBuilder, copy to FMU
+  // Copy values set in DaeBuilder to FMU
   int set_values(fmi2Component c) const;
 
   // Retrieve values from FMU, copy to DaeBuilder
-  int get_values(fmi2Component c) const;
+  int get_values(fmi2Component c, DaeBuilderInternal* dae) const;
 
   /** \brief Initalize memory block */
   int init_mem(FmuMemory* m) const;

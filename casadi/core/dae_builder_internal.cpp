@@ -1144,7 +1144,7 @@ Function DaeBuilderInternal::create(const std::string& name,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc,
-    const Dict& opts) const {
+    const Dict& opts) {
   // Currently only implemented for FMUs
   casadi_assert(!symbolic_, "Not implemented");
   return fmu_fun(name, name_in, name_out, scheme, lc, opts);
@@ -1152,7 +1152,7 @@ Function DaeBuilderInternal::create(const std::string& name,
 
 Function DaeBuilderInternal::create(const std::string& fname,
     const std::vector<std::string>& s_in,
-    const std::vector<std::string>& s_out, const Dict& opts, bool sx, bool lifted_calls) const {
+    const std::vector<std::string>& s_out, const Dict& opts, bool sx, bool lifted_calls) {
   // Are there any '_' in the names?
   bool with_underscore = false;
   for (auto s_io : {&s_in, &s_out}) {
@@ -1728,10 +1728,10 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc,
-    const Dict& opts) const {
+    const Dict& opts) {
 #ifdef WITH_FMU
   // New FMU instance (to be shared between derivative functions)
-  Fmu* fmu = new Fmu(this, name_in, name_out, scheme, lc);
+  Fmu* fmu = new Fmu(name_in, name_out, scheme, lc);
   try {
     // Initialize
     fmu->init(this);
@@ -1750,7 +1750,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
 Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
-    const Dict& opts) const {
+    const Dict& opts) {
   // Generate IO scheme
   std::map<std::string, std::vector<size_t>> scheme, lc;
   scheme["t"] = ind_in("t");

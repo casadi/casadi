@@ -675,7 +675,7 @@ Function DaeBuilder::create(const std::string& name,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<std::string>>& scheme,
     const std::map<std::string, std::vector<std::string>>& lc,
-    const Dict& opts) const {
+    const Dict& opts) {
   try {
     // IO scheme: Get indices
     std::map<std::string, std::vector<size_t>> scheme_ind;
@@ -693,7 +693,7 @@ Function DaeBuilder::create(const std::string& name,
 
 Function DaeBuilder::create(const std::string& fname,
     const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out, bool sx, bool lifted_calls) const {
+    const std::vector<std::string>& name_out, bool sx, bool lifted_calls) {
   try {
     return (*this)->create(fname, name_in, name_out, Dict(), sx, lifted_calls);
   } catch (std::exception& e) {
@@ -704,7 +704,7 @@ Function DaeBuilder::create(const std::string& fname,
 
 Function DaeBuilder::create(const std::string& fname,
     const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out, const Dict& opts) const {
+    const std::vector<std::string>& name_out, const Dict& opts) {
   try {
     return (*this)->create(fname, name_in, name_out, opts, false, false);
   } catch (std::exception& e) {
@@ -713,7 +713,7 @@ Function DaeBuilder::create(const std::string& fname,
   }
 }
 
-Function DaeBuilder::create(const std::string& name, const Dict& opts) const {
+Function DaeBuilder::create(const std::string& name, const Dict& opts) {
   try {
     return (*this)->create(name, dyn_in(), dyn_out(), opts, false, false);
   } catch (std::exception& e) {
