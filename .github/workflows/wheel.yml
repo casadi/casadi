@@ -49,4 +49,21 @@ jobs:
       with:
         name: panocpy-whl-${{ matrix.python-version }}
         path: wheelhouse/panocpy-*manylinux*.whl
-      
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    container: python:${{ matrix.python-version }}-bullseye
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/download-artifact@v2
+      with:
+        name: panocpy-whl-${{ matrix.python-version }}
+        path: wheelhouse
+    - name: 'Install panocpy'
+      run: pip install wheelhouse/panocpy-*manylinux*.whl
+    - name: 'Run tests'
+      run: python src/panocpy/test.py
