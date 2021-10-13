@@ -141,7 +141,7 @@ try:
     x0 = np.zeros((666,))
     sol = almsolver(p, x=x0, y=y0)
 except ValueError as e:
-    assert(e.args[0] == 'Length of x does not match problem size problem.n')
+    assert e.args[0] == "Length of x does not match problem size problem.n"
 
 x0 = old_x0
 
@@ -170,7 +170,7 @@ name = "testproblem"
 cgen, n, m, num_p = pa.generate_casadi_problem(f, g, name=name)
 
 with TemporaryDirectory(prefix="") as tmpdir:
-    cfile = cgen.generate(tmpdir)
+    cfile = cgen.generate(join(tmpdir, ""))
     sofile = join(tmpdir, f"{name}.so")
     os.system(f"cc -fPIC -shared -O3 {cfile} -o {sofile}")
     print(sofile)
@@ -191,10 +191,29 @@ pprint(stats)
 
 # %%
 
-x, y, stats = almsolver(p) # without initial guess
+x, y, stats = almsolver(p)  # without initial guess
 
 print(x)
 print(y)
 pprint(stats)
 
 # %%
+
+f = lambda x: float(np.cosh(x) - x * x + x)
+grad_f = lambda x: np.sinh(x) - 2 * x + 1
+C = pa.Box([10], [-2.5])
+x0 = [5]
+x, stats = pa.panoc(
+    f, grad_f, C, x0, 1e-12, pa.PANOCParams(print_interval=1), pa.LBFGSParams()
+)
+print(x)
+pprint(stats)
+
+# %%
+
+f = lambda x: float(np.cosh(x) - x * x + x)
+grad_f = lambda x: np.sinh(x) - 2 * x + 1
+C = pa.Box([10], [-2.5])
+x, stats = pa.panoc(f, grad_f, C, params=pa.PANOCParams(print_interval=1))
+print(x)
+pprint(stats)

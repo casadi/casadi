@@ -11,6 +11,7 @@
 #include <panoc-alm/inner/panoc.hpp>
 #include <panoc-alm/inner/pga.hpp>
 #include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
+#include <panoc-alm/standalone/panoc.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
 
 #if PANOCPY_HAVE_CASADI
@@ -130,6 +131,14 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
              "n"_a,
              "Create an :math:`n`-dimensional box at with bounds at "
              ":math:`\\pm\\infty` (no constraints).")
+        .def(py::init([](pa::vec ub, pa::vec lb) {
+                 if (ub.size() != lb.size())
+                     throw std::invalid_argument(
+                         "Upper bound and lower bound dimensions do not "
+                         "match");
+                 return pa::Box{std::move(ub), std::move(lb)};
+             }),
+             "ub"_a, "lb"_a, "Create a box with the given bounds.")
         .def_readwrite("upperbound", &pa::Box::upperbound)
         .def_readwrite("lowerbound", &pa::Box::lowerbound);
 
@@ -777,6 +786,35 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             "         * Statistics\n\n")
         .def("__str__", &pa::PolymorphicALMSolver::get_name)
         .def_property_readonly("params", &pa::PolymorphicALMSolver::get_params);
+
+    constexpr auto panoc = [](std::function<pa::real_t(pa::crvec)> ψ,
+                              std::function<pa::vec(pa::crvec)> grad_ψ,
+                              const pa::Box &C, std::optional<pa::vec> x0,
+                              pa::real_t ε, const pa::PANOCParams &params,
+                              const pa::LBFGSParams &lbfgs_params) {
+        auto n = C.lowerbound.size();
+        if (C.upperbound.size() != n)
+            throw std::invalid_argument("Length of C.upperbound does not "
+                                        "match length of C.lowerbound");
+        if (!x0)
+            x0 = pa::vec::Zero(n);
+        else if (x0->size() != n)
+            throw std::invalid_argument(
+                "Length of x does not match problem size problem.n");
+        auto grad_ψ_ = [&](pa::crvec x, pa::rvec gr) {
+            auto &&t = grad_ψ(x);
+            if (t.size() != x.size())
+                throw std::runtime_error("Invalid grad_ψ dimension");
+            gr = std::move(t);
+        };
+        auto stats =
+            pa::panoc<pa::LBFGS>(ψ, grad_ψ_, C, *x0, ε, params, {lbfgs_params});
+        return std::make_tuple(std::move(*x0), stats_to_dict(stats));
+    };
+
+    m.def("panoc", panoc, "ψ"_a, "grad_ψ"_a, "C"_a, "x0"_a = std::nullopt,
+          "ε"_a = 1e-8, "params"_a = pa::PANOCParams{},
+          "lbfgs_params"_a = pa::LBFGSParams{});
 
 #if !PANOCPY_HAVE_CASADI
     auto load_CasADi_problem = [](const char *, unsigned, unsigned,
