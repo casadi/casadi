@@ -147,6 +147,9 @@ struct CASADI_EXPORT Fmu {
   std::vector<fmi2Boolean> init_boolean_;
   std::vector<std::string> init_string_;
 
+  // Get sparsity pattern for Jacobian of all outputs w.r.t. all inputs
+  Sparsity sp_jac_;
+
   // Index lookup for input
   size_t index_in(const std::string& n) const;
 
@@ -218,6 +221,11 @@ struct CASADI_EXPORT Fmu {
 
   // Get Jacobian sparsity for a subset of inputs and outputs
   Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
+
+  // Get Jacobian sparsity for an output/input pair
+  Sparsity jac_sparsity(size_t oind, size_t iind) const {
+    return jac_sparsity(ored_.at(oind), ired_.at(iind));
+  }
 
   // Name of system, per the FMI specification
   static std::string system_infix();

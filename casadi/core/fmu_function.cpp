@@ -790,13 +790,13 @@ double Fmu::get_sens(FmuMemory* m, size_t id) const {
 }
 
 Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const {
-  // Convert to indices in DaeBuilder
-  std::vector<size_t> ofull = osub, ifull = isub;
-  for (size_t& i : ofull) i = oind_.at(i);
-  for (size_t& i : ifull) i = iind_.at(i);
-  // Get sparsity pattern for extended Jacobian
-  auto dae = this->dae();
-  return dae->jac_sparsity(ofull, ifull);
+  // Convert to casadi_int type
+  std::vector<casadi_int> osub1(osub.begin(), osub.end());
+  std::vector<casadi_int> isub1(isub.begin(), isub.end());
+  // Index mapping (not used)
+  std::vector<casadi_int> mapping;
+  // Get selection
+  return sp_jac_.sub(osub1, isub1, mapping);
 }
 
 Fmu::Fmu(const DaeBuilderInternal* dae,
@@ -914,6 +914,8 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
     varname_out_.push_back(v.name);
     vr_out_.push_back(v.value_reference);
   }
+  // Get Jacobian sparsity information
+  sp_jac_ = dae->jac_sparsity(oind_, iind_);
 }
 
 size_t Fmu::index_in(const std::string& n) const {
@@ -1371,16 +1373,7 @@ bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
 
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
-  // DaeBuilder instance
-  auto dae = fmu_->dae();
-  // Get the indices
-  std::vector<size_t> oi = fmu_->ored_[out_.at(oind).ind];
-  std::vector<size_t> ii = fmu_->ired_[in_.at(iind).ind];
-  // Convert to indices in FMU
-  for (size_t& i : oi) i = fmu_->oind_.at(i);
-  for (size_t& i : ii) i = fmu_->iind_.at(i);
-  // Get the Jacobian block
-  return dae->jac_sparsity(oi, ii);
+  return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
 }
 
 #endif  // WITH_FMU
