@@ -1733,6 +1733,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   // New FMU instance (to be shared between derivative functions)
   Fmu* fmu = new Fmu(this, name_in, name_out, scheme, lc);
   try {
+    // Initialize
     fmu->init(this);
   } catch (std::exception& e) {
     delete fmu;

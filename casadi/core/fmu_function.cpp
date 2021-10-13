@@ -302,18 +302,35 @@ fmi2Component Fmu::instantiate() const {
   return c;
 }
 
-int Fmu::init(FmuMemory* m) const {
+void Fmu::free_instance(fmi2Component c) const {
+  if (free_instance_) {
+    free_instance_(c);
+  } else {
+    casadi_warning("No free_instance function pointer available");
+  }
+}
+
+int Fmu::init_mem(FmuMemory* m) const {
   // Ensure not already instantiated
   casadi_assert(m->c == 0, "Already instantiated");
   // Create instance
   m->c = instantiate();
   // Reset solver
-  setup_experiment(m);
+  setup_experiment(m->c);
   // Set all values
-  if (set_values(m)) {
+  if (set_values(m->c)) {
     casadi_warning("Fmu::set_values failed");
     return 1;
   }
+  // Initialization mode begins
+  if (enter_initialization_mode(m->c)) return 1;
+  // Get all values
+  if (get_values(m->c)) {
+    casadi_warning("Fmu::get_values failed");
+    return 1;
+  }
+  // Initialization mode ends
+  if (exit_initialization_mode(m->c)) return 1;
   // Allocate/reset input buffer
   m->ibuf_.resize(iind_.size());
   std::fill(m->ibuf_.begin(), m->ibuf_.end(), casadi::nan);
@@ -334,15 +351,6 @@ int Fmu::init(FmuMemory* m) const {
   std::fill(m->requested_.begin(), m->requested_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
   m->wrt_.resize(oind_.size());
-  // Initialization mode begins
-  if (enter_initialization_mode(m)) return 1;
-  // Get all values
-  if (get_values(m)) {
-    casadi_warning("Fmu::get_values failed");
-    return 1;
-  }
-  // Initialization mode ends
-  if (exit_initialization_mode(m)) return 1;
   // Successful return
   return 0;
 }
@@ -352,35 +360,29 @@ int FmuFunction::init_mem(void* mem) const {
   // Instantiate base classes
   if (FunctionInternal::init_mem(mem)) return 1;
   // Call initialization routine in Fmu
-  return fmu_->init(static_cast<FmuMemory*>(mem));
+  return fmu_->init_mem(static_cast<FmuMemory*>(mem));
 }
 
 void FmuFunction::free_mem(void *mem) const {
-  if (mem == 0) {
-    casadi_warning("Memory is null");
-    return;
-  }
+  // Consistency check
+  casadi_assert(mem != nullptr, "Memory is null");
   // Free FMI memory
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   if (m->c) {
-    if (fmu_->free_instance_) {
-      fmu_->free_instance_(m->c);
-      m->c = nullptr;
-    } else {
-      casadi_warning("No free_instance function pointer available");
-    }
+    fmu_->free_instance(m->c);
+    m->c = nullptr;
   }
   delete m;
 }
 
-void Fmu::setup_experiment(FmuMemory* m) const {
+void Fmu::setup_experiment(fmi2Component c) const {
   // Call fmi2SetupExperiment
-  fmi2Status status = setup_experiment_(m->c, fmutol_ > 0, fmutol_, 0., fmi2True, 1.);
+  fmi2Status status = setup_experiment_(c, fmutol_ > 0, fmutol_, 0., fmi2True, 1.);
   casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
 }
 
-int Fmu::reset(FmuMemory* m) {
-  fmi2Status status = reset_(m->c);
+int Fmu::reset(fmi2Component c) {
+  fmi2Status status = reset_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2Reset failed");
     return 1;
@@ -388,8 +390,8 @@ int Fmu::reset(FmuMemory* m) {
   return 0;
 }
 
-int Fmu::enter_initialization_mode(FmuMemory* m) const {
-  fmi2Status status = enter_initialization_mode_(m->c);
+int Fmu::enter_initialization_mode(fmi2Component c) const {
+  fmi2Status status = enter_initialization_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterInitializationMode failed: " + str(status));
     return 1;
@@ -397,8 +399,8 @@ int Fmu::enter_initialization_mode(FmuMemory* m) const {
   return 0;
 }
 
-int Fmu::exit_initialization_mode(FmuMemory* m) const {
-  fmi2Status status = exit_initialization_mode_(m->c);
+int Fmu::exit_initialization_mode(fmi2Component c) const {
+  fmi2Status status = exit_initialization_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2ExitInitializationMode failed");
     return 1;
@@ -406,10 +408,10 @@ int Fmu::exit_initialization_mode(FmuMemory* m) const {
   return 0;
 }
 
-int Fmu::set_values(FmuMemory* m) const {
+int Fmu::set_values(fmi2Component c) const {
   // Pass real values before initialization
   if (!vr_real_.empty()) {
-    fmi2Status status = set_real_(m->c, get_ptr(vr_real_), vr_real_.size(), get_ptr(init_real_));
+    fmi2Status status = set_real_(c, get_ptr(vr_real_), vr_real_.size(), get_ptr(init_real_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
@@ -417,7 +419,7 @@ int Fmu::set_values(FmuMemory* m) const {
   }
   // Pass integer values before initialization (also enums)
   if (!vr_integer_.empty()) {
-    fmi2Status status = set_integer_(m->c, get_ptr(vr_integer_), vr_integer_.size(),
+    fmi2Status status = set_integer_(c, get_ptr(vr_integer_), vr_integer_.size(),
       get_ptr(init_integer_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetInteger failed");
@@ -426,7 +428,7 @@ int Fmu::set_values(FmuMemory* m) const {
   }
   // Pass boolean values before initialization
   if (!vr_boolean_.empty()) {
-    fmi2Status status = set_boolean_(m->c, get_ptr(vr_boolean_), vr_boolean_.size(),
+    fmi2Status status = set_boolean_(c, get_ptr(vr_boolean_), vr_boolean_.size(),
       get_ptr(init_boolean_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetBoolean failed");
@@ -437,7 +439,7 @@ int Fmu::set_values(FmuMemory* m) const {
   for (size_t k = 0; k < vr_string_.size(); ++k) {
     fmi2ValueReference vr = vr_string_[k];
     fmi2String value = init_string_[k].c_str();
-    fmi2Status status = set_string_(m->c, &vr, 1, &value);
+    fmi2Status status = set_string_(c, &vr, 1, &value);
     if (status != fmi2OK) {
       casadi_error("fmi2SetString failed for value reference " + str(vr));
     }
@@ -446,7 +448,7 @@ int Fmu::set_values(FmuMemory* m) const {
   return 0;
 }
 
-int Fmu::get_values(FmuMemory* m) const {
+int Fmu::get_values(fmi2Component c) const {
   // DaeBuilder instance
   auto dae = this->dae();
   // Retrieve values
@@ -462,7 +464,7 @@ int Fmu::get_values(FmuMemory* m) const {
         {
           // Real
           fmi2Real value;
-          fmi2Status status = get_real_(m->c, &vr, 1, &value);
+          fmi2Status status = get_real_(c, &vr, 1, &value);
           if (status != fmi2OK) {
             casadi_warning("fmi2GetReal failed for " + v.name);
             return 1;
@@ -475,7 +477,7 @@ int Fmu::get_values(FmuMemory* m) const {
         {
           // Integer: Convert to double
           fmi2Integer value;
-          fmi2Status status = get_integer_(m->c, &vr, 1, &value);
+          fmi2Status status = get_integer_(c, &vr, 1, &value);
           if (status != fmi2OK) {
             casadi_warning("fmi2GetInteger failed for " + v.name);
             return 1;
@@ -487,7 +489,7 @@ int Fmu::get_values(FmuMemory* m) const {
         {
           // Boolean: Convert to double
           fmi2Boolean value;
-          fmi2Status status = get_boolean_(m->c, &vr, 1, &value);
+          fmi2Status status = get_boolean_(c, &vr, 1, &value);
           if (status != fmi2OK) {
             casadi_warning("fmi2GetBoolean failed for " + v.name);
             return 1;
@@ -499,7 +501,7 @@ int Fmu::get_values(FmuMemory* m) const {
         {
           // String
           fmi2String value;
-          fmi2Status status = get_string_(m->c, &vr, 1, &value);
+          fmi2Status status = get_string_(c, &vr, 1, &value);
           if (status != fmi2OK) {
             casadi_warning("fmi2GetString failed for " + v.name);
             return 1;

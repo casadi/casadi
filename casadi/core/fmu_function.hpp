@@ -174,29 +174,32 @@ struct CASADI_EXPORT Fmu {
   // Load an FMI function
   signal_t load_function(const std::string& symname);
 
-  // Reset solver
-  int reset(FmuMemory* m);
-
-  // Enter initialization mode
-  int enter_initialization_mode(FmuMemory* m) const;
-
-  // Exit initialization mode
-  int exit_initialization_mode(FmuMemory* m) const;
-
-  // Retrieve values from DaeBuilder, copy to FMU
-  int set_values(FmuMemory* m) const;
-
-  // Retrieve values from FMU, copy to DaeBuilder
-  int get_values(FmuMemory* m) const;
-
-  // Setup experiment
-  void setup_experiment(FmuMemory* m) const;
-
   // New memory object
   fmi2Component instantiate() const;
 
+  // Free FMU instance
+  void free_instance(fmi2Component c) const;
+
+  // Reset solver
+  int reset(fmi2Component c);
+
+  // Setup experiment
+  void setup_experiment(fmi2Component c) const;
+
+  // Enter initialization mode
+  int enter_initialization_mode(fmi2Component c) const;
+
+  // Exit initialization mode
+  int exit_initialization_mode(fmi2Component c) const;
+
+  // Retrieve values from DaeBuilder, copy to FMU
+  int set_values(fmi2Component c) const;
+
+  // Retrieve values from FMU, copy to DaeBuilder
+  int get_values(fmi2Component c) const;
+
   /** \brief Initalize memory block */
-  int init(FmuMemory* m) const;
+  int init_mem(FmuMemory* m) const;
 
   // Set value
   void set(FmuMemory* m, size_t id, double value) const;
