@@ -491,17 +491,14 @@ void Fmu::get(FmuMemory* m, size_t id, double* value) const {
 }
 
 void Fmu::gather_io(FmuMemory* m) const {
-  // DaeBuilder instance
-  auto dae = this->dae();
   // Collect input indices and corresponding value references and values
   m->id_in_.clear();
   m->vr_in_.clear();
   m->v_in_.clear();
   for (size_t id = 0; id < m->changed_.size(); ++id) {
     if (m->changed_[id]) {
-      const Variable& v = dae->variable(iind_.at(id));
       m->id_in_.push_back(id);
-      m->vr_in_.push_back(v.value_reference);
+      m->vr_in_.push_back(vr_in_[id]);
       m->v_in_.push_back(m->ibuf_[id]);
       m->changed_[id] = false;
     }
@@ -511,9 +508,8 @@ void Fmu::gather_io(FmuMemory* m) const {
   m->vr_out_.clear();
   for (size_t id = 0; id < m->requested_.size(); ++id) {
     if (m->requested_[id]) {
-      const Variable& v = dae->variable(oind_.at(id));
       m->id_out_.push_back(id);
-      m->vr_out_.push_back(v.value_reference);
+      m->vr_out_.push_back(vr_out_[id]);
       m->requested_[id] = false;
     }
   }
@@ -885,24 +881,28 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
   min_in_.reserve(iind_.size());
   max_in_.reserve(iind_.size());
   varname_in_.reserve(iind_.size());
+  vr_in_.reserve(iind_.size());
   for (size_t i : iind_) {
     const Variable& v = dae->variables_.at(i);
     nominal_in_.push_back(v.nominal);
     min_in_.push_back(v.min);
     max_in_.push_back(v.max);
     varname_in_.push_back(v.name);
+    vr_in_.push_back(v.value_reference);
   }
   // Collect meta information for outputs
   nominal_out_.reserve(oind_.size());
   min_out_.reserve(oind_.size());
   max_out_.reserve(oind_.size());
   varname_out_.reserve(oind_.size());
+  vr_out_.reserve(oind_.size());
   for (size_t i : oind_) {
     const Variable& v = dae->variables_.at(i);
     nominal_out_.push_back(v.nominal);
     min_out_.push_back(v.min);
     max_out_.push_back(v.max);
     varname_out_.push_back(v.name);
+    vr_out_.push_back(v.value_reference);
   }
 }
 
@@ -1028,11 +1028,8 @@ void FmuFunction::init(const Dict& opts) {
   // Read FD mode
   fd_ = to_enum<FdMode>(fd_method_, "forward");
 
-  // Get a pointer to the DaeBuilder class
-  auto dae = fmu_->dae();
-
   // Consistency checks
-  if (enable_ad_) casadi_assert(dae->provides_directional_derivative_,
+  if (enable_ad_) casadi_assert(fmu_->get_directional_derivative_ != nullptr,
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
@@ -1079,6 +1076,7 @@ void FmuFunction::init(const Dict& opts) {
   for (size_t& i : jac_out) i = fmu_->oind_.at(i);
 
   // Get sparsity pattern for extended Jacobian
+  auto dae = fmu_->dae();
   sp_ext_ = dae->jac_sparsity(jac_out, jac_in);
 
   // Calculate graph coloring
