@@ -270,17 +270,18 @@ PGASolver::operator()(const Problem &problem,        // in
     throw std::logic_error("[PGA]   loop error");
 }
 
-template <class InnerSolver>
+template <class InnerSolverStats>
 struct InnerStatsAccumulator;
 
 template <>
-struct InnerStatsAccumulator<PGASolver> {
+struct InnerStatsAccumulator<PGASolver::Stats> {
     std::chrono::microseconds elapsed_time;
     unsigned iterations = 0;
 };
 
-inline InnerStatsAccumulator<PGASolver> &
-operator+=(InnerStatsAccumulator<PGASolver> &acc, const PGASolver::Stats s) {
+inline InnerStatsAccumulator<PGASolver::Stats> &
+operator+=(InnerStatsAccumulator<PGASolver::Stats> &acc,
+           const PGASolver::Stats &s) {
     acc.elapsed_time += s.elapsed_time;
     acc.iterations += s.iterations;
     return acc;

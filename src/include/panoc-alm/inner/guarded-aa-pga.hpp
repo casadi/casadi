@@ -347,19 +347,19 @@ GAAPGASolver::operator()(const Problem &problem,        // in
     throw std::logic_error("[AAPGA] loop error");
 }
 
-template <class InnerSolver>
+template <class InnerSolverStats>
 struct InnerStatsAccumulator;
 
 template <>
-struct InnerStatsAccumulator<GAAPGASolver> {
+struct InnerStatsAccumulator<GAAPGASolver::Stats> {
     std::chrono::microseconds elapsed_time;
     unsigned iterations                 = 0;
     unsigned accelerated_steps_accepted = 0;
 };
 
-inline InnerStatsAccumulator<GAAPGASolver> &
-operator+=(InnerStatsAccumulator<GAAPGASolver> &acc,
-           const GAAPGASolver::Stats s) {
+inline InnerStatsAccumulator<GAAPGASolver::Stats> &
+operator+=(InnerStatsAccumulator<GAAPGASolver::Stats> &acc,
+           const GAAPGASolver::Stats &s) {
     acc.elapsed_time += s.elapsed_time;
     acc.iterations += s.iterations;
     acc.accelerated_steps_accepted += s.accelerated_steps_accepted;

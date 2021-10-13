@@ -128,11 +128,11 @@ class StructuredPANOCLBFGSSolver {
     LBFGS lbfgs;
 };
 
-template <class InnerSolver>
+template <class InnerSolverStats>
 struct InnerStatsAccumulator;
 
 template <>
-struct InnerStatsAccumulator<StructuredPANOCLBFGSSolver> {
+struct InnerStatsAccumulator<StructuredPANOCLBFGSSolver::Stats> {
     std::chrono::microseconds elapsed_time;
     unsigned iterations          = 0;
     unsigned linesearch_failures = 0;
@@ -143,9 +143,9 @@ struct InnerStatsAccumulator<StructuredPANOCLBFGSSolver> {
     real_t sum_τ                 = 0;
 };
 
-inline InnerStatsAccumulator<StructuredPANOCLBFGSSolver> &
-operator+=(InnerStatsAccumulator<StructuredPANOCLBFGSSolver> &acc,
-           const StructuredPANOCLBFGSSolver::Stats s) {
+inline InnerStatsAccumulator<StructuredPANOCLBFGSSolver::Stats> &
+operator+=(InnerStatsAccumulator<StructuredPANOCLBFGSSolver::Stats> &acc,
+           const StructuredPANOCLBFGSSolver::Stats &s) {
     acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
     acc.linesearch_failures += s.linesearch_failures;

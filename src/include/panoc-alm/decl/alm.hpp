@@ -96,7 +96,7 @@ class ALMSolver {
 
         SolverStatus status = SolverStatus::Unknown;
 
-        InnerStatsAccumulator<InnerSolver> inner;
+        InnerStatsAccumulator<typename InnerSolver::Stats> inner;
     };
 
     ALMSolver(Params params, InnerSolver &&inner_solver)

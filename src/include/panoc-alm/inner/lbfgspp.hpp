@@ -100,6 +100,13 @@ class LBFGSSolver {
     vec work_n, work_m;
 };
 
+struct LBFGSBStats {
+    SolverStatus status = SolverStatus::Unknown;
+    real_t ε            = inf;
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations = 0;
+};
+
 /// Box-constrained LBFGS solver for ALM.
 /// @ingroup    grp_InnerSolvers
 template <template <class> class LineSearchT = LBFGSpp::LineSearchBacktracking>
@@ -107,13 +114,7 @@ class LBFGSBSolver {
   public:
     using Params     = LBFGSpp::LBFGSBParam<real_t>;
     using LineSearch = LineSearchT<real_t>;
-
-    struct Stats {
-        SolverStatus status = SolverStatus::Unknown;
-        real_t ε            = inf;
-        std::chrono::microseconds elapsed_time;
-        unsigned iterations = 0;
-    };
+    using Stats      = LBFGSBStats;
 
     LBFGSBSolver(Params params) : params(params) {}
 
@@ -179,19 +180,17 @@ class LBFGSBSolver {
     vec work_n, work_m;
 };
 
-template <class InnerSolver>
+template <class InnerSolverStats>
 struct InnerStatsAccumulator;
 
-template <template <class> class LineSearchT>
-struct InnerStatsAccumulator<LBFGSBSolver<LineSearchT>> {
+template <>
+struct InnerStatsAccumulator<LBFGSBStats> {
     std::chrono::microseconds elapsed_time;
     unsigned iterations = 0;
 };
 
-template <template <class> class LineSearchT>
-inline InnerStatsAccumulator<LBFGSBSolver<LineSearchT>> &
-operator+=(InnerStatsAccumulator<LBFGSBSolver<LineSearchT>> &acc,
-           const typename LBFGSBSolver<LineSearchT>::Stats s) {
+inline InnerStatsAccumulator<LBFGSBStats> &
+operator+=(InnerStatsAccumulator<LBFGSBStats> &acc, const LBFGSBStats &s) {
     acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
     return acc;

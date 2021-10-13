@@ -48,6 +48,19 @@ struct PANOCParams {
     LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
+struct PANOCStats {
+    SolverStatus status = SolverStatus::Unknown;
+    real_t ε            = inf;
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations          = 0;
+    unsigned linesearch_failures = 0;
+    unsigned lbfgs_failures      = 0;
+    unsigned lbfgs_rejected      = 0;
+    unsigned τ_1_accepted        = 0;
+    unsigned count_τ             = 0;
+    real_t sum_τ                 = 0;
+};
+
 struct PANOCProgressInfo {
     unsigned k;
     crvec x;
@@ -76,21 +89,8 @@ class PANOCSolver {
   public:
     using Params            = PANOCParams;
     using DirectionProvider = DirectionProviderT;
-
-    struct Stats {
-        SolverStatus status = SolverStatus::Unknown;
-        real_t ε            = inf;
-        std::chrono::microseconds elapsed_time;
-        unsigned iterations          = 0;
-        unsigned linesearch_failures = 0;
-        unsigned lbfgs_failures      = 0;
-        unsigned lbfgs_rejected      = 0;
-        unsigned τ_1_accepted        = 0;
-        unsigned count_τ             = 0;
-        real_t sum_τ                 = 0;
-    };
-
-    using ProgressInfo = PANOCProgressInfo;
+    using Stats             = PANOCStats;
+    using ProgressInfo      = PANOCProgressInfo;
 
     PANOCSolver(Params params,
                 PANOCDirection<DirectionProvider> &&direction_provider)
@@ -128,11 +128,11 @@ class PANOCSolver {
     PANOCDirection<DirectionProvider> direction_provider;
 };
 
-template <class InnerSolver>
+template <class InnerSolverStats>
 struct InnerStatsAccumulator;
 
-template <class DirectionProvider>
-struct InnerStatsAccumulator<PANOCSolver<DirectionProvider>> {
+template <>
+struct InnerStatsAccumulator<PANOCStats> {
     std::chrono::microseconds elapsed_time;
     unsigned iterations          = 0;
     unsigned linesearch_failures = 0;
@@ -143,10 +143,8 @@ struct InnerStatsAccumulator<PANOCSolver<DirectionProvider>> {
     real_t sum_τ                 = 0;
 };
 
-template <class DirectionProvider>
-inline InnerStatsAccumulator<PANOCSolver<DirectionProvider>> &
-operator+=(InnerStatsAccumulator<PANOCSolver<DirectionProvider>> &acc,
-           const typename PANOCSolver<DirectionProvider>::Stats s) {
+inline InnerStatsAccumulator<PANOCStats> &
+operator+=(InnerStatsAccumulator<PANOCStats> &acc, const PANOCStats &s) {
     acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
     acc.linesearch_failures += s.linesearch_failures;
