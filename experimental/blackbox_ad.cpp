@@ -31,25 +31,44 @@
 namespace casadi {
 
 // Class with forward derivative calculation
-class FwdAD : public GenericExpression<FwdAD, bool> {
+template<int N>
+class FwdAD : public GenericExpression<FwdAD<N>, bool> {
  public:
   // Nondifferentiated value
   double v;
   // Sensitivities
-  double s;
+  double s[N];
   // Constructor with implicit type conversion
-  FwdAD(double v, double s = 0) : v(v), s(s) {}
+  FwdAD(double v) : v(v) {
+    std::fill(s, s + N, 0);
+  }
+  // Constructor from arrays
+  FwdAD(double v, double s[]) : v(v) {
+    std::copy(s, s + N, this->s);
+  }
+  // Constructor with scalar multiplication of sensitivities
+  FwdAD(double v, double a1, const double* s1) : v(v) {
+    for (int k = 0; k < N; ++k) s[k] = a1 * s1[k];
+  }
+  // Constructor with linear combination of sensitivities
+  FwdAD(double v, double a1, const double* s1, double a2, const double* s2) : v(v) {
+    for (int k = 0; k < N; ++k) s[k] = a1 * s1[k] + a2 * s2[k];
+  }
   // Binary operation
   static FwdAD binary(casadi_int op, const FwdAD& x, const FwdAD& y) {
     // Evaluate and get partial derivatives
     double d[2], f;
     casadi_math<double>::derF(op, x.v, y.v, f, d);
-    // Propagate
-    return FwdAD(f, x.s * d[0] + y.s * d[1]);
+    // Return linear combination
+    return FwdAD<N>(f, d[0], x.s, d[1], y.s);
   }
   // Unary operation
   static FwdAD unary(casadi_int op, const FwdAD& x) {
-    return binary(op, x, 0);
+    // Evaluate and get partial derivatives
+    double d[2], f;
+    casadi_math<double>::derF(op, x.v, 0, f, d);
+    // Return scalar multiplication
+    return FwdAD<N>(f, d[0], x.s);
   }
   // Binary operation, boolean return
   static bool logic_binary(casadi_int op, const FwdAD& x, const FwdAD& y) {
@@ -79,11 +98,11 @@ T testfun(T x, T y) {
 }
 
 int main(){
-  casadi::FwdAD x = 2;
-  x.s = 1;
-  casadi::FwdAD z = testfun(x, x);
+  casadi::FwdAD<1> x = 2;
+  x.s[0] = 1;
+  casadi::FwdAD<1> z = testfun(x, x);
 
-  std::cout << "here: z.v = " << z.v << ", z.s = " << z.s << std::endl;
+  std::cout << "here: z.v = " << z.v << ", z.s = " << z.s[0] << std::endl;
 
   return 0;
 }
