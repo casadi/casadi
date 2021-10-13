@@ -22,6 +22,8 @@ struct PGAParams {
     unsigned max_iter = 100;
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
+    /// Minimum Lipschitz constant estimate.
+    real_t L_min = 1e-5;
     /// Maximum Lipschitz constant estimate.
     real_t L_max = 1e9;
     /// What stop criterion to use.
@@ -171,7 +173,7 @@ PGASolver::operator()(const Problem &problem,        // in
     if (params.Lipschitz.L₀ <= 0) {
         Lₖ = detail::initial_lipschitz_estimate(
             problem, xₖ, y, Σ, params.Lipschitz.ε, params.Lipschitz.δ,
-            params.L_max,
+            params.L_min, params.L_max,
             /* in ⟹ out */ ψₖ, grad_ψₖ, x̂ₖ, grad_ψx̂ₖ, work_n, work_m);
     }
     // Initial Lipschitz constant provided by the user

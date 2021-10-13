@@ -25,6 +25,8 @@ struct GAAPGAParams {
     unsigned max_iter = 100;
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
+    /// Minimum Lipschitz constant estimate.
+    real_t L_min = 1e-5;
     /// Maximum Lipschitz constant estimate.
     real_t L_max = 1e9;
     /// What stopping criterion to use.
@@ -127,19 +129,18 @@ GAAPGASolver::operator()(const Problem &problem,        // in
     const auto n = problem.n;
     const auto m = problem.m;
 
-    vec xₖ = x,       // Value of x at the beginning of the iteration
-        x̂ₖ(n),        // Value of x after a projected gradient step
-        gₖ(n),        // <?>
-        rₖ₋₁(n),      // <?>
-        rₖ(n),        // <?>
-        pₖ(n),        // Projected gradient step
-        yₖ(n),        // Value of x after a gradient or AA step
-        ŷₖ(m),        // <?>
-        grad_ψₖ(n),   // ∇ψ(xₖ)
-        grad_ψₖ₊₁(n), // ∇ψ(xₖ₊₁)
-        grad_ψx̂ₖ(n);  // ∇ψ(x̂ₖ)
+    vec xₖ = x,      // Value of x at the beginning of the iteration
+        x̂ₖ(n),       // Value of x after a projected gradient step
+        gₖ(n),       // <?>
+        rₖ₋₁(n),     // <?>
+        rₖ(n),       // <?>
+        pₖ(n),       // Projected gradient step
+        yₖ(n),       // Value of x after a gradient or AA step
+        ŷₖ(m),       // <?>
+        grad_ψₖ(n),  // ∇ψ(xₖ)
+        grad_ψx̂ₖ(n); // ∇ψ(x̂ₖ)
 
-    vec work_n(n), work_m(m);
+    vec work_n(n), work_n2(n), work_m(m);
 
     unsigned m_AA = std::min(params.limitedqr_mem, n);
     LimitedMemoryQR qr(n, m_AA);
@@ -156,10 +157,6 @@ GAAPGASolver::operator()(const Problem &problem,        // in
     auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
                                                               rvec grad_ψ) {
         return detail::calc_ψ_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
-    };
-    auto calc_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
-                                                            rvec grad_ψ) {
-        detail::calc_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
     };
     auto calc_grad_ψ_from_ŷ = [&problem, &work_n](crvec x, crvec ŷ,
                                                   rvec grad_ψ) {
@@ -191,21 +188,21 @@ GAAPGASolver::operator()(const Problem &problem,        // in
 
     // Estimate Lipschitz constant ---------------------------------------------
 
+    real_t ψₖ, Lₖ;
     // Finite difference approximation of ∇²ψ in starting point
-    auto h = (xₖ * params.Lipschitz.ε).cwiseAbs().cwiseMax(params.Lipschitz.δ);
-    x̂ₖ     = xₖ + h;
-
-    // Calculate ∇ψ(x₀ + h)
-    calc_grad_ψ(x̂ₖ, /* in ⟹ out */ grad_ψₖ₊₁);
-
-    // Calculate ∇ψ(x₀)
-    calc_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
-
-    // Estimate Lipschitz constant
-    real_t Lₖ = (grad_ψₖ₊₁ - grad_ψₖ).norm() / h.norm();
-    if (Lₖ < std::numeric_limits<real_t>::epsilon()) {
-        Lₖ = std::numeric_limits<real_t>::epsilon();
-    } else if (not std::isfinite(Lₖ)) {
+    if (params.Lipschitz.L₀ <= 0) {
+        Lₖ = detail::initial_lipschitz_estimate(
+            problem, xₖ, y, Σ, params.Lipschitz.ε, params.Lipschitz.δ,
+            params.L_min, params.L_max,
+            /* in ⟹ out */ grad_ψₖ, /* work */ x̂ₖ, work_n2, work_n, work_m);
+    }
+    // Initial Lipschitz constant provided by the user
+    else {
+        Lₖ = params.Lipschitz.L₀;
+        // Calculate ψ(xₖ), ∇ψ(x₀)
+        ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
+    }
+    if (not std::isfinite(Lₖ)) {
         s.status = SolverStatus::NotFinite;
         return s;
     }
@@ -224,7 +221,7 @@ GAAPGASolver::operator()(const Problem &problem,        // in
     // Calculate gradient in second iterate ------------------------------------
 
     // Calculate ψ(x₁) and ∇ψ(x₁)
-    real_t ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
+    ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
 
     // Main loop
     // =========================================================================
