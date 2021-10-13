@@ -125,7 +125,7 @@ def compile_and_load_problem(
     """
 
     with TemporaryDirectory(prefix="") as tmpdir:
-        cfile = cgen.generate(tmpdir)
+        cfile = cgen.generate(os.path.join(tmpdir, ""))
         sofile = os.path.join(tmpdir, f"{name}.so")
         os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
         if p > 0:

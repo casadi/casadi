@@ -37,7 +37,7 @@ g_prob = cs.Function("g", [nlp["x"], nlp["p"]], [nlp["g"]])
 cgen, n, m, num_p = pa.generate_casadi_problem(f_prob, g_prob, name=name)
 
 with TemporaryDirectory(prefix="") as tmpdir:
-    cfile = cgen.generate(tmpdir)
+    cfile = cgen.generate(os.path.join(tmpdir, ''))
     sofile = os.path.join(tmpdir, f"{name}.so")
     os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
     print(sofile)
