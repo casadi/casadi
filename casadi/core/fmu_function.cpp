@@ -631,8 +631,8 @@ int Fmu::eval_fd(FmuMemory* m) const {
         // Try to take step
         double test = m->v_in_[i] + pert * m->d_in_[i];
         // Check if in bounds
-        const Variable& v = dae->variable(iind_.at(m->id_in_[i]));
-        bool in_bounds = test >= v.min && test <= v.max;
+        size_t id = m->id_in_[i];
+        bool in_bounds = test >= min_in_[id] && test <= max_in_[id];
         // Take step, if allowed
         m->v_pert_[i] = in_bounds ? test : m->v_in_[i];
         // Keep track for later
@@ -721,11 +721,8 @@ int Fmu::eval_fd(FmuMemory* m) const {
     double d_fd = m->d_out_[ind] * n;
     // Use FD instead of AD or to compare with AD
     if (m->self.validate_ad_) {
-      // Access output variable
-      const Variable& v = dae->variable(oind_.at(id));
       // With respect to what variable
       size_t wrt_id = m->wrt_[id];
-      const Variable& wrt = dae->variable(iind_.at(wrt_id));
       // Nominal value for input
       double wrt_nom = nominal_in_[wrt_id];
       // Value to compare with
@@ -742,9 +739,10 @@ int Fmu::eval_fd(FmuMemory* m) const {
         casadi_assert(wrt_ind < m->id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
-        ss << "Inconsistent derivatives of " << v.name << " w.r.t. " << wrt.name << "\n"
-          << "At " << m->v_in_[wrt_ind] << ", nominal " << wrt_nom << ", min " << wrt.min
-          << ", max " << wrt.max << ", got " << d_ad
+        ss << "Inconsistent derivatives of " << varname_out_[id] << " w.r.t. "
+          << varname_in_[wrt_ind] << "\n"
+          << "At " << m->v_in_[wrt_ind] << ", nominal " << wrt_nom << ", min " << min_in_[wrt_ind]
+          << ", max " << max_in_[wrt_ind] << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].\n";
         // Also print the stencil:
         std::vector<double> stencil;
@@ -886,15 +884,27 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
   }
   // Collect meta information for inputs
   nominal_in_.reserve(iind_.size());
+  min_in_.reserve(iind_.size());
+  max_in_.reserve(iind_.size());
+  varname_in_.reserve(iind_.size());
   for (size_t i : iind_) {
     const Variable& v = dae->variables_.at(i);
     nominal_in_.push_back(v.nominal);
+    min_in_.push_back(v.min);
+    max_in_.push_back(v.max);
+    varname_in_.push_back(v.name);
   }
   // Collect meta information for outputs
   nominal_out_.reserve(oind_.size());
+  min_out_.reserve(oind_.size());
+  max_out_.reserve(oind_.size());
+  varname_out_.reserve(oind_.size());
   for (size_t i : oind_) {
     const Variable& v = dae->variables_.at(i);
     nominal_out_.push_back(v.nominal);
+    min_out_.push_back(v.min);
+    max_out_.push_back(v.max);
+    varname_out_.push_back(v.name);
   }
 }
 

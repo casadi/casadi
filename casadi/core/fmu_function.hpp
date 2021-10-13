@@ -108,6 +108,9 @@ struct CASADI_EXPORT Fmu {
 
   // Meta information about the input/output variable subsets
   std::vector<double> nominal_in_, nominal_out_;
+  std::vector<double> min_in_, min_out_;
+  std::vector<double> max_in_, max_out_;
+  std::vector<std::string> varname_in_, varname_out_;
 
   // Reduced space indices for all inputs and outputs
   std::vector<std::vector<size_t>> in_, out_;
