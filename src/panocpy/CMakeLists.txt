@@ -18,6 +18,14 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
             -static-libstdc++
             -static-libgcc
     )
+    find_package(OpenMP)
+    if (OpenMP_FOUND)
+        target_link_libraries(_panocpy
+            PRIVATE
+                OpenMP::OpenMP_CXX
+                OpenMP::OpenMP_C
+        )
+    endif()
     target_compile_definitions(_panocpy PRIVATE VERSION_INFO=${PROJECT_VERSION})
     set(PANOCPY_RPATH "\${ORIGIN}/../../../.." "\${ORIGIN}")
     set_target_properties(_panocpy PROPERTIES

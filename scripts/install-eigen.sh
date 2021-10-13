@@ -16,7 +16,7 @@ pushd /tmp
 
 # Eigen Linear Algebra
 rm -rf eigen
-git clone --single-branch --depth=1 --branch 3.3.8 \
+git clone --single-branch --depth=1 --branch 3.4.0 \
     https://gitlab.com/libeigen/eigen.git
 mkdir -p eigen/build
 pushd eigen/build

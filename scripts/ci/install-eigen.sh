@@ -4,7 +4,7 @@
 
 set -ex
 
-version="3.3.8"
+version="3.4.0"
 prefix="${1:-$HOME/.local}"
 
 [ -e "$prefix/share/eigen3/cmake/Eigen3Config.cmake" ] \
