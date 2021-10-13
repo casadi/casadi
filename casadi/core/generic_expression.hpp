@@ -44,7 +44,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2012
 */
-template<typename ExType>
+template<typename ExType, typename LogType = ExType>
 class GenericExpression : public GenericExpressionCommon {
   protected:
     // Helper functions
@@ -115,78 +115,78 @@ class GenericExpression : public GenericExpressionCommon {
 
   ///@{
   /** \brief Logical less than: (x,y) -> x < y */
-  static ExType lt(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_LT, x, y);
+  static LogType lt(const ExType &x, const ExType &y) {
+    return ExType::logic_binary(OP_LT, x, y);
   }
-  friend inline ExType lt(const ExType &x, const ExType &y) {
+  friend inline LogType lt(const ExType &x, const ExType &y) {
     return ExType::lt(x, y);
   }
-  friend inline ExType operator<(const ExType &x, const ExType &y) {
+  friend inline LogType operator<(const ExType &x, const ExType &y) {
     return lt(x, y);
   }
   ///@}
 
   ///@{
   /** \brief Logical less or equal to: (x,y) -> x <= y */
-  static ExType le(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_LE, x, y);
+  static LogType le(const ExType &x, const ExType &y) {
+    return ExType::logic_binary(OP_LE, x, y);
   }
-  friend inline ExType le(const ExType &x, const ExType &y) {
+  friend inline LogType le(const ExType &x, const ExType &y) {
     return ExType::le(x, y);
   }
-  friend inline ExType operator<=(const ExType &x, const ExType &y) {
+  friend inline LogType operator<=(const ExType &x, const ExType &y) {
     return le(x, y);
   }
   ///@}
 
   ///@{
   /** \brief Logical greater than: (x,y) -> x > y */
-  static ExType gt(const ExType &x, const ExType &y) {
+  static LogType gt(const ExType &x, const ExType &y) {
     return ExType::lt(y, x);
   }
-  friend inline ExType gt(const ExType &x, const ExType &y) {
+  friend inline LogType gt(const ExType &x, const ExType &y) {
     return ExType::gt(x, y);
   }
-  friend inline ExType operator>(const ExType &x, const ExType &y) {
+  friend inline LogType operator>(const ExType &x, const ExType &y) {
     return gt(x, y);
   }
   ///@}
 
   ///@{
   /** \brief Logical greater or equal to: (x,y) -> x <= y */
-  static ExType ge(const ExType &x, const ExType &y) {
+  static LogType ge(const ExType &x, const ExType &y) {
     return ExType::le(y, x);
   }
-  friend inline ExType ge(const ExType &x, const ExType &y) {
+  friend inline LogType ge(const ExType &x, const ExType &y) {
     return ExType::ge(x, y);
   }
-  friend inline ExType operator>=(const ExType &x, const ExType &y) {
+  friend inline LogType operator>=(const ExType &x, const ExType &y) {
     return ge(x, y);
   }
   ///@}
 
   ///@{
   /** \brief Logical equal to: (x,y) -> x == y */
-  static ExType eq(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_EQ, x, y);
+  static LogType eq(const ExType &x, const ExType &y) {
+    return ExType::logic_binary(OP_EQ, x, y);
   }
-  friend inline ExType eq(const ExType &x, const ExType &y) {
+  friend inline LogType eq(const ExType &x, const ExType &y) {
     return ExType::eq(x, y);
   }
-  friend inline ExType operator==(const ExType &x, const ExType &y) {
+  friend inline LogType operator==(const ExType &x, const ExType &y) {
     return eq(x, y);
   }
   ///@}
 
   ///@{
   /** \brief Logical not equal to: (x,y) -> x != y */
-  static ExType ne(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_NE, x, y);
+  static LogType ne(const ExType &x, const ExType &y) {
+    return ExType::logic_binary(OP_NE, x, y);
   }
-  friend inline ExType ne(const ExType &x, const ExType &y) {
+  friend inline LogType ne(const ExType &x, const ExType &y) {
     return ExType::ne(x, y);
   }
-  friend inline ExType operator!=(const ExType &x, const ExType &y) {
+  friend inline LogType operator!=(const ExType &x, const ExType &y) {
     return ne(x, y);
   }
   ///@}
@@ -196,13 +196,13 @@ class GenericExpression : public GenericExpressionCommon {
    * Returns (an expression evaluating to) 1 if both
    * expressions are nonzero and 0 otherwise
    */
-   static ExType logic_and(const ExType &x, const ExType &y) {
-     return ExType::binary(OP_AND, x, y);
+   static LogType logic_and(const ExType &x, const ExType &y) {
+     return ExType::logic_binary(OP_AND, x, y);
    }
-   friend inline ExType logic_and(const ExType &x, const ExType &y) {
+   friend inline LogType logic_and(const ExType &x, const ExType &y) {
      return ExType::logic_and(x, y);
    }
-   friend inline ExType operator&&(const ExType &x, const ExType &y) {
+   friend inline LogType operator&&(const ExType &x, const ExType &y) {
      return logic_and(x, y);
    }
   ///@}
@@ -212,13 +212,13 @@ class GenericExpression : public GenericExpressionCommon {
    * returns (an expression evaluating to) 1 if at
    * least one expression is nonzero and 0 otherwise
    */
-   static ExType logic_or(const ExType &x, const ExType &y) {
-     return ExType::binary(OP_OR, x, y);
+   static LogType logic_or(const ExType &x, const ExType &y) {
+     return ExType::logic_binary(OP_OR, x, y);
    }
-   friend inline ExType logic_or(const ExType &x, const ExType &y) {
+   friend inline LogType logic_or(const ExType &x, const ExType &y) {
      return ExType::logic_or(x, y);
    }
-   friend inline ExType operator||(const ExType &x, const ExType &y) {
+   friend inline LogType operator||(const ExType &x, const ExType &y) {
      return logic_or(x, y);
    }
    ///@}
@@ -228,13 +228,13 @@ class GenericExpression : public GenericExpressionCommon {
     * Returns (an expression evaluating to) 1 if
     * expression is zero and 0 otherwise
     */
-    static ExType logic_not(const ExType& x) {
-      return ExType::unary(OP_NOT, x);
+    static LogType logic_not(const ExType& x) {
+      return ExType::logic_unary(OP_NOT, x);
     }
-    friend inline ExType logic_not(const ExType& x) {
+    friend inline LogType logic_not(const ExType& x) {
       return ExType::logic_not(x);
     }
-    inline ExType operator!() const {
+    inline LogType operator!() const {
       return logic_not(self());
     }
     ///@}

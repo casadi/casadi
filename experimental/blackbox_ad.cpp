@@ -28,6 +28,43 @@
 #include <ctime>
 #include <cstdlib>
 
+namespace casadi {
+
+// Class with forward derivative calculation
+class FwdAD : public GenericExpression<FwdAD, bool> {
+ public:
+  // Nondifferentiated value
+  double v;
+  // Sensitivities
+  double s;
+  // Constructor with implicit type conversion
+  FwdAD(double v, double s = 0) : v(v), s(s) {}
+  // Binary operation
+  static FwdAD binary(casadi_int op, const FwdAD& x, const FwdAD& y) {
+    // Evaluate and get partial derivatives
+    double d[2], f;
+    casadi_math<double>::derF(op, x.v, y.v, f, d);
+    // Propagate
+    return FwdAD(f, x.s * d[0] + y.s * d[1]);
+  }
+  // Unary operation
+  static FwdAD unary(casadi_int op, const FwdAD& x) {
+    return binary(op, x, 0);
+  }
+  // Binary operation, boolean return
+  static bool logic_binary(casadi_int op, const FwdAD& x, const FwdAD& y) {
+    double f;
+    casadi_math<double>::fun(op, x.v, y.v, f);
+    return static_cast<bool>(f);  // type cast can be avoided by adding second template parameter
+  }
+  // Unary operation, boolean return
+  static bool logic_unary(casadi_int op, const FwdAD& x) {
+    return logic_binary(op, x, 0);
+  }
+};
+
+}  // namespace casadi
+
 // Templated blackbox function
 template<typename T>
 T testfun(T x, T y) {
@@ -41,51 +78,10 @@ T testfun(T x, T y) {
   return z;
 }
 
-// Class with forward derivative calculation
-class FwdAD {
- public:
-  // Nondifferentiated value
-  double v;
-  // Sensitivities
-  double s;
-  // Constructor with implicit type conversion
-  FwdAD(double v, double s = 0) : v(v), s(s) {}
-  // Addition
-  inline friend FwdAD operator+(FwdAD x, FwdAD y) {
-    return FwdAD(x.v + y.v, x.s + y.s);
-  }
-  // Sine
-  inline friend FwdAD sin(FwdAD x) {
-    return FwdAD(std::sin(x.v), std::cos(x.v) * x.s);
-  }
-  // Comparisons return booleans
-  inline friend bool operator==(FwdAD x, FwdAD y) {
-    return x.v == y.v;
-  }
-  inline friend bool operator!=(FwdAD x, FwdAD y) {
-    return x.v != y.v;
-  }
-  inline friend bool operator<(FwdAD x, FwdAD y) {
-    return x.v < y.v;
-  }
-  inline friend bool operator>(FwdAD x, FwdAD y) {
-    return x.v > y.v;
-  }
-  inline friend bool operator<=(FwdAD x, FwdAD y) {
-    return x.v <= y.v;
-  }
-  inline friend bool operator>=(FwdAD x, FwdAD y) {
-    return x.v >= y.v;
-  }
-};
-
-
 int main(){
-  FwdAD x = 2;
+  casadi::FwdAD x = 2;
   x.s = 1;
-  FwdAD z = testfun(x, x);
-
-
+  casadi::FwdAD z = testfun(x, x);
 
   std::cout << "here: z.v = " << z.v << ", z.s = " << z.s << std::endl;
 

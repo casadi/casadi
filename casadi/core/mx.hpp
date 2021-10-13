@@ -316,6 +316,18 @@ namespace casadi {
     static MX unary(casadi_int op, const MX &x);
     ///@}
 
+#ifndef SWIG
+    ///@{
+    /** \brief  Logical operators are treated as non-logical operators */
+    static MX logic_binary(casadi_int op, const MX &x, const MX &y) {
+      return binary(op, x, y);
+    }
+    static MX logic_unary(casadi_int op, const MX &x) {
+      return unary(op, x);
+    }
+    ///@}
+#endif  // SWIG
+
     ///@{
     /** \brief  create a matrix with all inf */
     static MX inf(const Sparsity& sp);

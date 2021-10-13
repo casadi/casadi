@@ -263,6 +263,17 @@ namespace casadi {
     /// \endcond
 
 #ifndef SWIG
+    ///@{
+    /** \brief  Logical operators are treated as non-logical operators */
+    static Matrix<Scalar> logic_binary(casadi_int op,
+        const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
+      return binary(op, x, y);
+    }
+    static Matrix<Scalar> logic_unary(casadi_int op, const Matrix<Scalar> &x) {
+      return unary(op, x);
+    }
+    ///@}
+
     /// \cond CLUTTER
     ///@{
     /// Functions called by friend functions defined for GenericExpression

@@ -128,6 +128,18 @@ namespace casadi {
     static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y);
     static SXElem unary(casadi_int op, const SXElem& x);
 
+#ifndef SWIG
+    ///@{
+    /** \brief  Logical operators are treated as non-logical operators */
+    static SXElem logic_binary(casadi_int op, const SXElem &x, const SXElem &y) {
+      return binary(op, x, y);
+    }
+    static SXElem logic_unary(casadi_int op, const SXElem &x) {
+      return unary(op, x);
+    }
+    ///@}
+#endif  // SWIG
+
     /** \brief Check the truth value of this node
      * Introduced to catch bool(x) situations in python
      */
