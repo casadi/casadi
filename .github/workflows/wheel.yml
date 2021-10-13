@@ -56,7 +56,7 @@ jobs:
     container: python:${{ matrix.python-version }}-bullseye
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9']
     steps:
     - uses: actions/checkout@v1
     - uses: actions/download-artifact@v2
