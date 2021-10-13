@@ -869,21 +869,21 @@ Fmu::Fmu(const DaeBuilderInternal* dae,
     }
   }
   // Inputs
-  in_.resize(name_in_.size());
-  for (size_t i = 0; i < in_.size(); ++i) {
+  ired_.resize(name_in_.size());
+  for (size_t i = 0; i < ired_.size(); ++i) {
     auto&& s = scheme_.at(name_in_[i]);
-    in_[i].resize(s.size());
+    ired_[i].resize(s.size());
     for (size_t k = 0; k < s.size(); ++k) {
-      in_[i][k] = iind_map_.at(s[k]);
+      ired_[i][k] = iind_map_.at(s[k]);
     }
   }
   // Outputs
-  out_.resize(name_out_.size());
-  for (size_t i = 0; i < out_.size(); ++i) {
+  ored_.resize(name_out_.size());
+  for (size_t i = 0; i < ored_.size(); ++i) {
     auto&& s = scheme_.at(name_out_[i]);
-    out_[i].resize(s.size());
+    ored_[i].resize(s.size());
     for (size_t k = 0; k < s.size(); ++k) {
-      out_[i][k] = oind_map_.at(s[k]);
+      ored_[i][k] = oind_map_.at(s[k]);
     }
   }
   // Collect meta information for inputs
@@ -1050,10 +1050,10 @@ void FmuFunction::init(const Dict& opts) {
   std::vector<bool> in_jac(fmu_->iind_.size(), false);
   for (auto&& i : out_) {
     if (i.type == JAC_OUTPUT) {
-      for (size_t j : fmu_->in_.at(i.wrt)) in_jac.at(j) = true;
+      for (size_t j : fmu_->ired_.at(i.wrt)) in_jac.at(j) = true;
       has_jac_ = true;
     } else if (i.type == ADJ_SENS) {
-      for (size_t j : fmu_->in_.at(i.ind)) in_jac.at(j) = true;
+      for (size_t j : fmu_->ired_.at(i.ind)) in_jac.at(j) = true;
       has_adj_ = true;
     }
   }
@@ -1067,12 +1067,12 @@ void FmuFunction::init(const Dict& opts) {
   std::fill(in_jac.begin(), in_jac.end(), false);
   for (auto&& i : out_) {
     if (i.type == JAC_OUTPUT) {
-      for (size_t j : fmu_->out_.at(i.ind)) in_jac.at(j) = true;
+      for (size_t j : fmu_->ored_.at(i.ind)) in_jac.at(j) = true;
     }
   }
   for (auto&& i : in_) {
     if (i.type == ADJ_SEED) {
-      for (size_t j : fmu_->out_.at(i.ind)) in_jac.at(j) = true;
+      for (size_t j : fmu_->ored_.at(i.ind)) in_jac.at(j) = true;
     }
   }
   jac_out_.clear();
@@ -1151,11 +1151,11 @@ void FmuFunction::parse_output(OutputStruct* s, const std::string& n) const {
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
   switch (in_.at(i).type) {
     case REG_INPUT:
-      return Sparsity::dense(fmu_->in_[in_.at(i).ind].size(), 1);
+      return Sparsity::dense(fmu_->ired_[in_.at(i).ind].size(), 1);
     case ADJ_SEED:
-      return Sparsity::dense(fmu_->out_[in_.at(i).ind].size(), 1);
+      return Sparsity::dense(fmu_->ored_[in_.at(i).ind].size(), 1);
     case DUMMY_OUTPUT:
-      return Sparsity(fmu_->out_[in_.at(i).ind].size(), 1);
+      return Sparsity(fmu_->ored_[in_.at(i).ind].size(), 1);
   }
   return Sparsity();
 }
@@ -1163,11 +1163,11 @@ Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
 Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
   switch (out_.at(i).type) {
     case REG_OUTPUT:
-      return Sparsity::dense(fmu_->out_[out_.at(i).ind].size(), 1);
+      return Sparsity::dense(fmu_->ored_[out_.at(i).ind].size(), 1);
     case ADJ_SENS:
-      return Sparsity::dense(fmu_->in_[out_.at(i).ind].size(), 1);
+      return Sparsity::dense(fmu_->ired_[out_.at(i).ind].size(), 1);
     case JAC_OUTPUT:
-      return fmu_->jac_sparsity(fmu_->out_.at(out_.at(i).ind), fmu_->in_.at(out_.at(i).wrt));
+      return fmu_->jac_sparsity(fmu_->ored_.at(out_.at(i).ind), fmu_->ired_.at(out_.at(i).wrt));
   }
   return Sparsity();
 }
@@ -1190,7 +1190,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k].type == REG_INPUT) {
-      const std::vector<size_t>& iind = fmu_->in_[in_[k].ind];
+      const std::vector<size_t>& iind = fmu_->ired_[in_[k].ind];
       for (size_t i = 0; i < iind.size(); ++i) {
         fmu_->set(m, iind[i], arg[k] ? arg[k][i] : 0);
       }
@@ -1199,7 +1199,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k].type == REG_OUTPUT) {
-      const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
+      const std::vector<size_t>& oind = fmu_->ored_[out_[k].ind];
       for (size_t i = 0; i < oind.size(); ++i) {
         fmu_->request(m, oind[i]);
       }
@@ -1210,7 +1210,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Get regular outputs
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k].type == REG_OUTPUT) {
-      const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
+      const std::vector<size_t>& oind = fmu_->ored_[out_[k].ind];
       for (size_t i = 0; i < oind.size(); ++i) {
         fmu_->get(m, oind[i], &res[k][i]);
       }
@@ -1233,7 +1233,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       std::fill(aseed, aseed + fmu_->oind_.size(), 0);
       for (size_t i = 0; i < in_.size(); ++i) {
         if (arg[i] && in_[i].type == ADJ_SEED) {
-          const std::vector<size_t>& oind = fmu_->out_[in_[i].ind];
+          const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
           for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
         }
       }
@@ -1271,12 +1271,12 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         for (size_t k = 0; k < out_.size(); ++k) {
           if (res[k] && out_[k].type == JAC_OUTPUT) {
             // Find input index
-            const std::vector<size_t>& iind = fmu_->in_[out_[k].wrt];
+            const std::vector<size_t>& iind = fmu_->ired_[out_[k].wrt];
             for (size_t Bc = 0; Bc < iind.size(); ++Bc) {
               if (iind[Bc] == Jc) {
                 // Column exists in Jacobian block
                 const Sparsity& sp = sparsity_out(k);
-                const std::vector<size_t>& oind = fmu_->out_[out_[k].ind];
+                const std::vector<size_t>& oind = fmu_->ored_[out_[k].ind];
                 for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
                   // Save Jacobian nonzero, scaled by nominal value factor
                   res[k][Bk] = inv_nom * fmu_->get_sens(m, oind.at(sp.row(Bk)));
@@ -1299,7 +1299,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (has_adj_) {
       for (size_t i = 0; i < out_.size(); ++i) {
         if (res[i] && out_[i].type == ADJ_SENS) {
-          const std::vector<size_t>& iind = fmu_->in_[out_[i].ind];
+          const std::vector<size_t>& iind = fmu_->ired_[out_[i].ind];
           for (size_t k = 0; k < iind.size(); ++k) res[i][k] = asens[iind[k]];
         }
       }
@@ -1374,8 +1374,8 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
   // DaeBuilder instance
   auto dae = fmu_->dae();
   // Get the indices
-  std::vector<size_t> oi = fmu_->out_[out_.at(oind).ind];
-  std::vector<size_t> ii = fmu_->in_[in_.at(iind).ind];
+  std::vector<size_t> oi = fmu_->ored_[out_.at(oind).ind];
+  std::vector<size_t> ii = fmu_->ired_[in_.at(iind).ind];
   // Convert to indices in FMU
   for (size_t& i : oi) i = fmu_->oind_.at(i);
   for (size_t& i : ii) i = fmu_->iind_.at(i);

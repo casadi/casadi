@@ -114,7 +114,7 @@ struct CASADI_EXPORT Fmu {
   std::vector<fmi2ValueReference> vr_in_, vr_out_;
 
   // Reduced space indices for all inputs and outputs
-  std::vector<std::vector<size_t>> in_, out_;
+  std::vector<std::vector<size_t>> ired_, ored_;
 
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
@@ -152,12 +152,6 @@ struct CASADI_EXPORT Fmu {
 
   // Index lookup for output
   size_t index_out(const std::string& n) const;
-
-  // All input variables
-  const std::vector<size_t>& get_in(size_t i) const { return scheme_.at(name_in_.at(i));}
-
-  // All input variables
-  const std::vector<size_t>& get_out(size_t i) const { return scheme_.at(name_out_.at(i));}
 
   // Get DaeBuilder instance
   DaeBuilderInternal* dae() const;
