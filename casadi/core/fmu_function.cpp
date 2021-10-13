@@ -567,8 +567,6 @@ int Fmu::eval_ad(FmuMemory* m) const {
 }
 
 int Fmu::eval_fd(FmuMemory* m) const {
-  // DaeBuilder instance
-  auto dae = this->dae();
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
@@ -1188,8 +1186,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     asens = w;
     w += fmu_->iind_.size();
   }
-  // DaeBuilder instance
-  auto dae = fmu_->dae();
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k].type == REG_INPUT) {
