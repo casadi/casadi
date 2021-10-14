@@ -5,7 +5,7 @@ set -ex
 
 # ./scripts/install-openblas.sh Release
 ./scripts/install-eigen.sh Release
-./scripts/ci/install-casadi-wheel.sh Release
+./scripts/ci/install-casadi-wheel.sh Release # static lib
 # ./scripts/install-cutest.sh
 ./scripts/install-yaml-cpp.sh Release
 ./scripts/install-gtest.sh
