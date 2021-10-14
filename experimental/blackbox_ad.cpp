@@ -145,7 +145,7 @@ void test_fwdad(double x0, double seed_x) {
     << z.s[0] << std::endl;
 }
 
-void test_tracesx(double x0, double seed_x) {
+void test_tracer(double x0, double seed_x) {
   // Expression corresponding to CasADi function inputs
   casadi::SX x = casadi::SX::sym("x");
   // Get the nonzeros (corresponding to doubles)
@@ -163,10 +163,8 @@ void test_tracesx(double x0, double seed_x) {
   // Generate forward mode AD (or any other derivative)
   casadi::Function fwd_f = f.forward(1);
   // Evaluate derivative numerically
-  std::vector<const double*> fwd_f_arg = {&x0, &z0, &seed_x};
   double fwd_z;
-  std::vector<double*> fwd_f_res = {&fwd_z};
-  fwd_f(fwd_f_arg, fwd_f_res);
+  fwd_f({&x0, &z0, &seed_x}, {&fwd_z});
   // Output result
   std::cout << "Traced SX + SCT AD: sensitivity = " << fwd_z << std::endl;
 }
@@ -175,7 +173,7 @@ int main(){
   // Perform memoryless operator overloading orward mode AD during evaluation
   test_fwdad(2, 1);
   // Generate an SX expression for the control flow, then use standard CasADi AD
-  test_tracesx(2, 1);
+  test_tracer(2, 1);
 
   return 0;
 }
