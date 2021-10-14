@@ -33,7 +33,7 @@ cmake .. \
     -D WITH_COMMON=On \
     -D WITH_PYTHON=On \
     -D WITH_PYTHON3=On \
-    -D WITH_OPENMP=On \
+    -D WITH_OPENMP=Off \
     -D WITH_THREAD=On \
     -D WITH_DL=On \
     -D WITH_IPOPT=Off \
