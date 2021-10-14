@@ -82,13 +82,51 @@ class FwdAD : public GenericExpression<FwdAD<N>, bool> {
   }
 };
 
+// Generate an SX expression for a particular control flow
+class Tracer : public GenericExpression<Tracer, bool> {
+ public:
+  // Nondifferentiated value
+  double v;
+  // SX expression
+  SXElem s;
+  // Constructor
+  Tracer(double v, SXElem s) : v(v), s(s) {}
+  // Constructor with implicit type conversion
+  Tracer(double v) : v(v), s(v) {}
+  // Binary operation
+  static Tracer binary(casadi_int op, const Tracer& x, const Tracer& y) {
+    // Perform operation numerically
+    double f;
+    casadi_math<double>::fun(op, x.v, y.v, f);
+    // Perform operation symbolically
+    SXElem f_sx;
+    casadi_math<SXElem>::fun(op, x.s, y.s, f_sx);
+    // Combine
+    return Tracer(f, f_sx);
+  }
+  // Unary operation
+  static Tracer unary(casadi_int op, const Tracer& x) {
+    return binary(op, x, 0);
+  }
+  // Binary operation, boolean return
+  static bool logic_binary(casadi_int op, const Tracer& x, const Tracer& y) {
+    double f;
+    casadi_math<double>::fun(op, x.v, y.v, f);
+    return static_cast<bool>(f);  // type cast can be avoided by adding second template parameter
+  }
+  // Unary operation, boolean return
+  static bool logic_unary(casadi_int op, const Tracer& x) {
+    return logic_binary(op, x, 0);
+  }
+};
+
 }  // namespace casadi
 
 // Templated blackbox function
 template<typename T>
 T testfun(T x, T y) {
   // Conditionals
-  T z = x > y ? x + sin(y) : y + sin(x);
+  T z = x > y ? x + sin(y) : y + sqrt(x);
   // While loop
   while (z < 20) {
     z = z + 4;
@@ -97,12 +135,47 @@ T testfun(T x, T y) {
   return z;
 }
 
-int main(){
-  casadi::FwdAD<1> x = 2;
-  x.s[0] = 1;
+void test_fwdad(double x0, double seed_x) {
+  // Create an instance that contains the value of x and the forward seed
+  casadi::FwdAD<1> x(x0, &seed_x);
+  // Call templated function, calculating forward mode AD on the fly
   casadi::FwdAD<1> z = testfun(x, x);
+  // Output result
+  std::cout << "Operator overloading AD: value = " << z.v << ", sensitivity = "
+    << z.s[0] << std::endl;
+}
 
-  std::cout << "here: z.v = " << z.v << ", z.s = " << z.s[0] << std::endl;
+void test_tracesx(double x0, double seed_x) {
+  // Expression corresponding to CasADi function inputs
+  casadi::SX x = casadi::SX::sym("x");
+  // Get the nonzeros (corresponding to doubles)
+  std::vector<casadi::SXElem> x_nz = x.nonzeros();
+  // Create an instance that contains the value of x and the forward seed
+  casadi::Tracer tx(x0, x_nz.at(0));
+  // Call templated function, generating an SX expression along with the numerical value
+  casadi::Tracer tz = testfun(tx, tx);
+  double z0 = tz.v;
+  casadi::SX z = tz.s;
+  // Output result
+  std::cout << "Tracing AD: value = " << z0 << ", expression = " << z << std::endl;
+  // Generate SX Function
+  casadi::Function f("f", {x}, {z}, {"x"}, {"z"});
+  // Generate forward mode AD (or any other derivative)
+  casadi::Function fwd_f = f.forward(1);
+  // Evaluate derivative numerically
+  std::vector<const double*> fwd_f_arg = {&x0, &z0, &seed_x};
+  double fwd_z;
+  std::vector<double*> fwd_f_res = {&fwd_z};
+  fwd_f(fwd_f_arg, fwd_f_res);
+  // Output result
+  std::cout << "Traced SX + SCT AD: sensitivity = " << fwd_z << std::endl;
+}
+
+int main(){
+  // Perform memoryless operator overloading orward mode AD during evaluation
+  test_fwdad(2, 1);
+  // Generate an SX expression for the control flow, then use standard CasADi AD
+  test_tracesx(2, 1);
 
   return 0;
 }
