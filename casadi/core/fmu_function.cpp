@@ -823,27 +823,25 @@ int Fmu::eval_fd(FmuMemory* m) const {
     // Use FD instead of AD or to compare with AD
     if (m->self.validate_ad_) {
       // With respect to what variable
-      size_t wrt_id = m->wrt_[id];
-      // Nominal value for input
-      double wrt_nom = nominal_in_[wrt_id];
+      size_t wrt = m->wrt_[id];
       // Value to compare with
       double d_ad = m->sens_[id];
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if error exceeds thresholds
-      if (d_max > wrt_nom * n * m->self.abstol_
+      if (d_max > nominal_in_[wrt] * n * m->self.abstol_
           && std::fabs(d_ad - d_fd) > d_max * m->self.reltol_) {
         // Which element in the vector
         size_t wrt_ind = 0;
         for (; wrt_ind < m->id_in_.size(); ++wrt_ind)
-          if (m->id_in_[wrt_ind] == wrt_id) break;
+          if (m->id_in_[wrt_ind] == wrt) break;
         casadi_assert(wrt_ind < m->id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
         ss << "Inconsistent derivatives of " << varname_out_[id] << " w.r.t. "
-          << varname_in_[wrt_ind] << "\n"
-          << "At " << m->v_in_[wrt_ind] << ", nominal " << wrt_nom << ", min " << min_in_[wrt_ind]
-          << ", max " << max_in_[wrt_ind] << ", got " << d_ad
+          << varname_in_[wrt] << "\n"
+          << "At " << m->v_in_[wrt_ind] << ", nominal " << nominal_in_[wrt]
+          << ", min " << min_in_[wrt] << ", max " << max_in_[wrt] << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].\n";
         // Also print the stencil:
         std::vector<double> stencil;
@@ -1055,50 +1053,61 @@ void FmuFunction::init(const Dict& opts) {
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
-  // Do the outputs include Jacobian blocks and/or adjoint directional derivatives
+  // Which inputs and outputs exist
   has_adj_ = has_jac_ = false;
-
-  // Collect all inputs in any Jacobian or adjoint block
-  std::vector<bool> in_jac(fmu_->iind_.size(), false);
   for (auto&& i : out_) {
-    if (i.type == JAC_OUTPUT) {
-      for (size_t j : fmu_->ired_.at(i.wrt)) in_jac.at(j) = true;
+    switch (i.type) {
+    case JAC_OUTPUT:
       has_jac_ = true;
-    } else if (i.type == ADJ_SENS) {
-      for (size_t j : fmu_->ired_.at(i.ind)) in_jac.at(j) = true;
+      break;
+    case ADJ_SENS:
       has_adj_ = true;
+      break;
     }
   }
-  jac_in_.clear();
-  for (size_t k = 0; k < in_jac.size(); ++k) {
-    if (in_jac[k]) jac_in_.push_back(k);
-  }
 
-  // Collect all outputs in any Jacobian or adjoint block
-  in_jac.resize(fmu_->oind_.size());
-  std::fill(in_jac.begin(), in_jac.end(), false);
-  for (auto&& i : out_) {
-    if (i.type == JAC_OUTPUT) {
-      for (size_t j : fmu_->ored_.at(i.ind)) in_jac.at(j) = true;
+  // If extended Jacobian is needed
+  if (has_adj_ || has_jac_) {
+    // Collect all inputs in any Jacobian or adjoint block
+    std::vector<bool> in_jac(fmu_->iind_.size(), false);
+    for (auto&& i : out_) {
+      if (i.type == JAC_OUTPUT) {
+        for (size_t j : fmu_->ired_.at(i.wrt)) in_jac.at(j) = true;
+      } else if (i.type == ADJ_SENS) {
+        for (size_t j : fmu_->ired_.at(i.ind)) in_jac.at(j) = true;
+      }
     }
-  }
-  for (auto&& i : in_) {
-    if (i.type == ADJ_SEED) {
-      for (size_t j : fmu_->ored_.at(i.ind)) in_jac.at(j) = true;
+    jac_in_.clear();
+    for (size_t k = 0; k < in_jac.size(); ++k) {
+      if (in_jac[k]) jac_in_.push_back(k);
     }
-  }
-  jac_out_.clear();
-  for (size_t k = 0; k < in_jac.size(); ++k) {
-    if (in_jac[k]) jac_out_.push_back(k);
-  }
 
-  // Get sparsity pattern for extended Jacobian
-  sp_ext_ = fmu_->jac_sparsity(jac_out_, jac_in_);
+    // Collect all outputs in any Jacobian or adjoint block
+    in_jac.resize(fmu_->oind_.size());
+    std::fill(in_jac.begin(), in_jac.end(), false);
+    for (auto&& i : out_) {
+      if (i.type == JAC_OUTPUT) {
+        for (size_t j : fmu_->ored_.at(i.ind)) in_jac.at(j) = true;
+      }
+    }
+    for (auto&& i : in_) {
+      if (i.type == ADJ_SEED) {
+        for (size_t j : fmu_->ored_.at(i.ind)) in_jac.at(j) = true;
+      }
+    }
+    jac_out_.clear();
+    for (size_t k = 0; k < in_jac.size(); ++k) {
+      if (in_jac[k]) jac_out_.push_back(k);
+    }
 
-  // Calculate graph coloring
-  coloring_ = sp_ext_.uni_coloring();
-  if (verbose_) casadi_message("Graph coloring: " + str(sp_ext_.size2())
-    + " -> " + str(coloring_.size2()) + " directions");
+    // Get sparsity pattern for extended Jacobian
+    sp_ext_ = fmu_->jac_sparsity(jac_out_, jac_in_);
+
+    // Calculate graph coloring
+    coloring_ = sp_ext_.uni_coloring();
+    if (verbose_) casadi_message("Graph coloring: " + str(sp_ext_.size2())
+      + " -> " + str(coloring_.size2()) + " directions");
+  }
 
   // Work vectors
   if (has_adj_) {
