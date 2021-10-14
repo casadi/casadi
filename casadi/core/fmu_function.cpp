@@ -1360,13 +1360,10 @@ std::string FmuFunction::pop_prefix(const std::string& s, std::string* rem) {
 
 Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
     const std::vector<std::string>& onames, const Dict& opts) const {
-  // Return value
+  // Return new instance of class
   Function ret;
   ret.own(new FmuFunction(name, fmu_, inames, onames));
-  // Hack: Manually enable finite differenting (pending implementation in class)
-  Dict opts2 = opts;
-  opts2["enable_fd"] = true;
-  ret->construct(opts2);
+  ret->construct(opts);
   return ret;
 }
 
@@ -1376,13 +1373,10 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
     const Dict& opts) const {
   // Only single directional derivative implemented
   casadi_assert(nadj == 1, "Not implemented");
-  // Return value
+  // Return new instance of class
   Function ret;
   ret.own(new FmuFunction(name, fmu_, inames, onames));
-  // Hack: Manually enable finite differenting (pending implementation in class)
-  Dict opts2 = opts;
-  opts2["enable_fd"] = true;
-  ret->construct(opts2);
+  ret->construct(opts);
   return ret;
 }
 
