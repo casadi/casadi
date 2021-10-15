@@ -9,12 +9,28 @@
 #include <functional>
 #include <map>
 
+#include <pybind11/detail/typeid.h>
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
+struct cast_error_with_types : py::cast_error {
+    cast_error_with_types(const py::cast_error &e, std::string from,
+                          std::string to)
+        : py::cast_error(e), from(std::move(from)), to(std::move(to)) {}
+    std::string from;
+    std::string to;
+};
+
 template <class T, class A>
 auto attr_setter(A T::*attr) {
-    return [attr](T &t, const py::handle &h) { t.*attr = h.cast<A>(); };
+    return [attr](T &t, const py::handle &h) {
+        try {
+            t.*attr = h.cast<A>();
+        } catch (const py::cast_error &e) {
+            throw cast_error_with_types(e, py::str(py::type::handle_of(h)),
+                                        py::type_id<A>());
+        }
+    };
 }
 template <class T, class A>
 auto attr_getter(A T::*attr) {
@@ -46,7 +62,16 @@ void kwargs_to_struct_helper(T &t, const py::kwargs &kwargs) {
         auto it   = m.find(skey);
         if (it == m.end())
             throw py::key_error("Unknown parameter " + skey);
-        it->second.set(t, val);
+        try {
+            it->second.set(t, val);
+        } catch (const cast_error_with_types &e) {
+            throw std::runtime_error("Error converting parameter '" + skey +
+                                     "' from " + e.from + " to '" + e.to +
+                                     "': " + e.what());
+        } catch (const std::runtime_error &e) {
+            throw std::runtime_error("Error setting parameter '" + skey +
+                                     "': " + e.what());
+        }
     }
 }
 

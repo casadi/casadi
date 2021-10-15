@@ -217,3 +217,11 @@ C = pa.Box([10], [-2.5])
 x, stats = pa.panoc(f, grad_f, C, params=pa.PANOCParams(print_interval=1))
 print(x)
 pprint(stats)
+
+# %%
+
+try:
+    pa.PANOCParams(max_iter=1e3)
+    assert False
+except RuntimeError as e:
+    print(e)
