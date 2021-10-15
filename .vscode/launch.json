@@ -81,7 +81,11 @@
                     "text": "catch throw",
                     "ignoreFailures": false,
                 }
-            ]
+            ],
+            "sourceFileMap":{
+                "/mnt": "${workspaceFolder}",
+                "/tmp/py-venv": "${workspaceFolder}/py-venv"
+            }
         }
     ]
 }
