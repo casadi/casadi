@@ -769,6 +769,22 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                 else if (y->size() != p.m)
                     throw std::invalid_argument(
                         "Length of y does not match problem size problem.m");
+                if (p.C.lowerbound.size() != p.n)
+                    throw std::invalid_argument(
+                        "Length of problem.C.lowerbound does not match problem "
+                        "size problem.n");
+                if (p.C.upperbound.size() != p.n)
+                    throw std::invalid_argument(
+                        "Length of problem.C.upperbound does not match problem "
+                        "size problem.n");
+                if (p.D.lowerbound.size() != p.m)
+                    throw std::invalid_argument(
+                        "Length of problem.D.lowerbound does not match problem "
+                        "size problem.m");
+                if (p.D.upperbound.size() != p.m)
+                    throw std::invalid_argument(
+                        "Length of problem.D.upperbound does not match problem "
+                        "size problem.m");
 
                 auto stats = solver(p, *y, *x);
                 return std::make_tuple(std::move(*x), std::move(*y),
@@ -800,7 +816,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             x0 = pa::vec::Zero(n);
         else if (x0->size() != n)
             throw std::invalid_argument(
-                "Length of x does not match problem size problem.n");
+                "Length of x does not match length of bounds C");
         auto grad_ψ_ = [&](pa::crvec x, pa::rvec gr) {
             auto &&t = grad_ψ(x);
             if (t.size() != x.size())
