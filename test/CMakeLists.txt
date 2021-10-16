@@ -39,6 +39,6 @@ target_link_libraries(tests
 )
 
 # Add tests
-if(NOT CMAKE_CROSSCOMPILING)
+if (NOT CMAKE_CROSSCOMPILING)
     gtest_discover_tests(tests)
 endif()
