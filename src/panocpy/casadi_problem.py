@@ -129,7 +129,7 @@ def compile_and_load_problem(
         sofile = os.path.join(tmpdir, f"{name}.so")
         os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
         if p > 0:
-            prob = pa.load_casadi_problem_with_param(sofile, n, m)
+            prob = pa.load_casadi_problem_with_param(sofile, n, m, p)
         else:
             prob = pa.load_casadi_problem(sofile, n, m)
     return prob

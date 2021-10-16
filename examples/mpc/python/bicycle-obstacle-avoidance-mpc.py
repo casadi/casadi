@@ -41,7 +41,7 @@ with TemporaryDirectory(prefix="") as tmpdir:
     sofile = os.path.join(tmpdir, f"{name}.so")
     os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
     print(sofile)
-    prob = pa.load_casadi_problem_with_param(sofile, n, m)
+    prob = pa.load_casadi_problem_with_param(sofile, n, m, num_p)
 
 prob.C.lowerbound = bounds["lbx"]
 prob.C.upperbound = bounds["ubx"]

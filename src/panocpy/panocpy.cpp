@@ -181,7 +181,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         m, "ProblemWithParam",
         "C++ documentation: :cpp:class:`pa::ProblemWithParam`\n\n"
         "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
-        .def(py::init<unsigned, unsigned>(), "n"_a, "m"_a)
+        .def(py::init<unsigned, unsigned, unsigned>(), "n"_a, "m"_a, "p"_a)
         .def_readwrite("n", &pa::Problem::n)
         .def_readwrite("m", &pa::Problem::m)
         .def_readwrite("C", &pa::Problem::C)
@@ -197,7 +197,14 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                       prob_setter_hess_L_prod())
         .def_property(
             "param", py::overload_cast<>(&pa::ProblemWithParam::get_param),
-            py::overload_cast<pa::crvec>(&pa::ProblemWithParam::set_param),
+            [](pa::ProblemWithParam &p, pa::crvec param) {
+                if (param.size() != p.get_param().size())
+                    throw std::invalid_argument(
+                        "Invalid parameter dimension: got " +
+                        std::to_string(param.size()) + ", should be " +
+                        std::to_string(p.get_param().size()) + ".");
+                p.set_param(param);
+            },
             "Parameter vector :math:`p` of the problem");
 
     py::class_<pa::PolymorphicPANOCDirectionBase,
@@ -839,6 +846,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             "This version of panocpy was compiled without CasADi support");
     };
     auto load_CasADi_problem_with_param = [](const char *, unsigned, unsigned,
+                                             unsigned,
                                              bool) -> pa::ProblemWithParam {
         throw std::runtime_error(
             "This version of panocpy was compiled without CasADi support");
@@ -848,12 +856,13 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     using pa::load_CasADi_problem_with_param;
 #endif
 
-    m.def("load_casadi_problem", load_CasADi_problem, "so_name"_a, "n"_a, "m"_a,
-          "second_order"_a = false,
+    m.def("load_casadi_problem", load_CasADi_problem, "so_name"_a, "n"_a = 0,
+          "m"_a = 0, "second_order"_a = false,
           "Load a compiled CasADi problem without parameters.\n\n"
           "C++ documentation: :cpp:func:`pa::load_CasADi_problem`");
     m.def("load_casadi_problem_with_param", load_CasADi_problem_with_param,
-          "so_name"_a, "n"_a, "m"_a, "second_order"_a = false,
+          "so_name"_a, "n"_a = 0, "m"_a = 0, "p"_a = 0,
+          "second_order"_a = false,
           "Load a compiled CasADi problem with parameters.\n\n"
           "C++ documentation: :cpp:func:`pa::load_CasADi_problem_with_param`");
 }

@@ -2,6 +2,7 @@
 
 #include "box.hpp"
 
+#include <cassert>
 #include <functional>
 #include <memory>
 #include <type_traits>
@@ -121,17 +122,25 @@ struct Problem {
           hess_L_prod(std::move(hess_L_prod)), hess_L(std::move(hess_L)) {}
 };
 
-class ProblemWithParam : public pa::Problem {
+class ProblemWithParam : public Problem {
   public:
-    using pa::Problem::Problem;
-    void set_param(pa::crvec p) { *param = p; }
-    void set_param(pa::vec &&p) { *param = std::move(p); }
-    pa::vec &get_param() { return *param; }
-    const pa::vec &get_param() const { return *param; }
-    std::shared_ptr<pa::vec> get_param_ptr() const { return param; }
+    ProblemWithParam(unsigned n, unsigned m, unsigned p)
+        : Problem(n, m), param(std::make_shared<vec>(vec::Constant(p, NaN))) {}
+
+    void set_param(crvec p) {
+        assert(p.size() == param->size());
+        *param = p;
+    }
+    void set_param(vec &&p) {
+        assert(p.size() == param->size());
+        *param = std::move(p);
+    }
+    vec &get_param() { return *param; }
+    const vec &get_param() const { return *param; }
+    std::shared_ptr<vec> get_param_ptr() const { return param; }
 
   private:
-    std::shared_ptr<pa::vec> param = std::make_shared<pa::vec>();
+    std::shared_ptr<vec> param;
 };
 
 struct EvalCounter {
