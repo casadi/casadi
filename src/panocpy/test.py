@@ -1,8 +1,6 @@
-print("hello, world")
-
-exit(0)
-
 #%%
+
+print("starting tests")
 
 import panocpy as pa
 import numpy as np
