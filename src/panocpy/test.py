@@ -148,7 +148,6 @@ x0 = old_x0
 # %%
 
 import os
-from os.path import join
 from tempfile import TemporaryDirectory
 
 print(x.size)
@@ -167,16 +166,9 @@ f = cs.Function("f", [x], [f_])
 g = cs.Function("g", [x], [g_])
 
 name = "testproblem"
-cgen, n, m, num_p = pa.generate_casadi_problem(f, g, name=name)
-
-with TemporaryDirectory(prefix="") as tmpdir:
-    cfile = cgen.generate(join(tmpdir, ""))
-    sofile = join(tmpdir, f"{name}.so")
-    os.system(f"cc -fPIC -shared -O3 {cfile} -o {sofile}")
-    print(sofile)
-    p = pa.load_casadi_problem(sofile, n, m)
-    p.D.lowerbound = [-np.inf, 0.5]
-    p.D.upperbound = [+np.inf, +np.inf]
+p = pa.generate_and_compile_casadi_problem(f, g, name=name)
+p.D.lowerbound = [-np.inf, 0.5]
+p.D.upperbound = [+np.inf, +np.inf]
 solver = pa.StructuredPANOCLBFGSSolver(
     pa.StructuredPANOCLBFGSParams(max_iter=200, print_interval=1),
     pa.LBFGSParams(memory=5),
@@ -225,3 +217,7 @@ try:
     assert False
 except RuntimeError as e:
     print(e)
+
+# %%
+
+print("Success!")

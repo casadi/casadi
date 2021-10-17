@@ -30,11 +30,7 @@ g_function = cs.Function("g", [X, p], [g])
 import panocpy as pa
 import numpy as np
 
-cgen, n, m, num_p = pa.generate_casadi_problem(cost_function, g_function, name=name)
-# Code generator, dimension of decision variables, number of constraints (dual dimension), parameter dimension
-
-# Compile and load the problem, and set the bounds
-prob = pa.compile_and_load_problem(cgen, n, m, num_p, name)
+prob = pa.generate_and_compile_casadi_problem(cost_function, g_function, name=name)
 
 prob.C.lowerbound = np.array([-1.5, -0.5])        # -1.5 <= x <= 1.5
 prob.C.upperbound = np.array([1.5, 2.5])          # -0.5 <= y <= 2.5
@@ -54,7 +50,7 @@ prob.param = np.array([100.0])
 
 # Set initial guesses at arbitrary values
 x_sol = np.array([1.0, 2.0])
-y_sol = np.zeros((m,))
+y_sol = np.zeros((prob.m,))
 
 # Solve the problem
 x_sol, y_sol, stats = solver(prob, x_sol, y_sol)
