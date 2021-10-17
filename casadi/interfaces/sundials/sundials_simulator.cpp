@@ -318,7 +318,7 @@ void SundialsSimulator::set_work(void* mem, const double**& arg, double**& res,
   m->p = w; w += np_;
   m->v1 = w; w += nx_ + nz_;
   m->v2 = w; w += nx_ + nz_;
-  m->jac = w; w += get_function("jac").nnz_out(0);
+  m->jac = w; w += get_function("jac").nnz_out("jac_ode_x");
 }
 
 void SundialsSimulator::add_diag(const casadi_int* sp, double *nz, double v,
