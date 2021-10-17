@@ -11,9 +11,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install Python
-      shell: powershell
-      run: winget install "Python ${{ matrix.python-version }}"
+    - uses: actions/setup-python@v2
+      name: Install Python
+      with: 
+        python-version: ${{ matrix.python-version }}
     - name: Cache Virtual Environment
       id: cache-venv
       uses: actions/cache@v2
