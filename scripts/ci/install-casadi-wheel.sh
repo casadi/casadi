@@ -17,8 +17,7 @@ pushd /tmp
 # Casadi
 [ -d casadi ] || git clone https://github.com/casadi/casadi --branch "3.5.5" --depth 1 --recursive
 rm -rf casadi/build
-mkdir -p casadi/build
-pushd casadi/build
+pushd casadi
 cmake -Bbuild -S. -D CMAKE_BUILD_TYPE="${build_type}" \
     -D WITH_COMMON=Off \
     -D WITH_OPENMP=Off \
