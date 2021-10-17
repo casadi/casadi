@@ -1,3 +1,7 @@
+print("hello, world")
+
+exit(0)
+
 #%%
 
 import panocpy as pa
