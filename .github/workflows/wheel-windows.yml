@@ -65,6 +65,6 @@ jobs:
         name: panocpy-whl-${{ matrix.python-version }}
         path: dist
     - name: 'Install panocpy'
-      run: python -m pip install dist/panocpy-*win*.whl
+      run: python -m pip install --find-links=dist panocpy
     - name: 'Run tests'
       run: python src/panocpy/test.py

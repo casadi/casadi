@@ -64,6 +64,6 @@ jobs:
         name: panocpy-whl-${{ matrix.python-version }}
         path: wheelhouse
     - name: 'Install panocpy'
-      run: pip install wheelhouse/panocpy-*manylinux*.whl
+      run: pip install --find-links=wheelhouse panocpy
     - name: 'Run tests'
       run: python src/panocpy/test.py
