@@ -32,16 +32,16 @@ jobs:
         powershell scripts/windows/install-eigen.ps1
         powershell scripts/windows/install-casadi-wheel.ps1
       env:
-        CXXFLAGS: "/arch:AVX2"
-        CFLAGS: "/arch:AVX2"
+        CXXFLAGS: "/arch:AVX2 /bigobj"
+        CFLAGS: "/arch:AVX2 /bigobj"
     - name: Build
       shell: powershell
       run: |
         ./py-venv/Scripts/Activate.ps1
         python setup.py bdist_wheel --build-type RelWithDebInfo -j2
       env:
-        CXXFLAGS: "/arch:AVX2"
-        CFLAGS: "/arch:AVX2"
+        CXXFLAGS: "/arch:AVX2 /bigobj"
+        CFLAGS: "/arch:AVX2 /bigobj"
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
