@@ -1,4 +1,4 @@
-name: Wheel (Windows)
+name: Python Wheel (Windows)
 
 on: [push]
 
@@ -47,3 +47,24 @@ jobs:
       with:
         name: panocpy-whl-${{ matrix.python-version }}
         path: dist/panocpy-*win*.whl
+
+  test:
+    needs: build
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9']
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+      name: Install Python
+      with: 
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/download-artifact@v2
+      with:
+        name: panocpy-whl-${{ matrix.python-version }}
+        path: dist
+    - name: 'Install panocpy'
+      run: python -m pip install dist/panocpy-*win*.whl
+    - name: 'Run tests'
+      run: python src/panocpy/test.py
