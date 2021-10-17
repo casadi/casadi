@@ -1,0 +1,48 @@
+name: Wheel (Windows)
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Python
+      shell: powershell
+      run: winget install "Python ${{ matrix.python-version }}"
+    - name: Cache Virtual Environment
+      id: cache-venv
+      uses: actions/cache@v2
+      with:
+        path: py-venv
+        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/windows/install-gtest.ps1') }}-${{ hashFiles('scripts/windows/install-eigen.ps1') }}-${{ hashFiles('scripts/windows/install-casadi-wheel.ps1') }}-${{ hashFiles('scripts/requirements-wheel.txt') }}-
+    - name: Install Casadi and other Python Dependencies 
+      if: steps.cache-venv.outputs.cache-hit != 'true'
+      shell: powershell
+      run: |
+        python -m venv py-venv
+        ./py-venv/Scripts/Activate.ps1
+        pip install -r scripts/requirements-wheel.txt
+        powershell scripts/windows/install-gtest.ps1
+        powershell scripts/windows/install-eigen.ps1
+        powershell scripts/windows/install-casadi-wheel.ps1
+      env:
+        CXXFLAGS: "/arch:AVX2"
+        CFLAGS: "/arch:AVX2"
+    - name: Build
+      shell: powershell
+      run: |
+        ./py-venv/Scripts/Activate.ps1
+        python setup.py bdist_wheel --build-type RelWithDebInfo -j2
+      env:
+        CXXFLAGS: "/arch:AVX2"
+        CFLAGS: "/arch:AVX2"
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: panocpy-whl-${{ matrix.python-version }}
+        path: dist/panocpy-*win*.whl
