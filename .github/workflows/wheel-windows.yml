@@ -66,5 +66,9 @@ jobs:
         path: dist
     - name: 'Install panocpy'
       run: python -m pip install --find-links=dist panocpy
+    - name: 'List'
+      shell: powershell
+      run: ls ./src/panocpy
     - name: 'Run tests'
-      run: python src/panocpy/test.py
+      shell: powershell
+      run: python ./src/panocpy/test.py
