@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.17)
 
 project(PANOC-ALM VERSION 0.0.2 LANGUAGES C CXX)
 
-include(CheckLanguage)
-check_language(Fortran)
-if (CMAKE_Fortran_COMPILER)
-    enable_language(Fortran)
+if (NOT WIN32)
+    include(CheckLanguage)
+    check_language(Fortran)
+    if (CMAKE_Fortran_COMPILER)
+        enable_language(Fortran)
+    endif()
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
