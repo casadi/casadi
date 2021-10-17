@@ -25,7 +25,7 @@ cmake -Bbuild -S. -D CMAKE_BUILD_TYPE="${build_type}" \
     -D WITH_DL=On \
     -D ENABLE_STATIC=On \
     -D ENABLE_SHARED=Off
-cmake --build build -j
+cmake --build build -j1
 cmake --install build
 popd
 
