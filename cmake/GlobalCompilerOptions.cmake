@@ -4,6 +4,12 @@ if (WIN32)
     # define the "not" alternative operator
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3 /utf-8 /Dnot=!")
 
+    # Build-type specific flags
+    set(CMAKE_CXX_FLAGS_DEBUG "/DDEBUG \
+        /DEIGEN_INITIALIZE_MATRICES_BY_NAN")
+    set(CMAKE_C_FLAGS_DEBUG   "/DDEBUG")
+    set(CMAKE_DEBUG_POSTFIX "-debug")
+
 else()
 
     # Enable compiler warnings globally
