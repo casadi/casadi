@@ -1070,40 +1070,72 @@ void FmuFunction::init(const Dict& opts) {
   if (has_adj_ || has_jac_) {
     // Collect all inputs in any Jacobian or adjoint block
     std::vector<bool> in_jac(fmu_->iind_.size(), false);
-    for (auto&& i : out_) {
-      if (i.type == JAC_OUTPUT) {
-        for (size_t j : fmu_->ired_.at(i.wrt)) in_jac.at(j) = true;
-      } else if (i.type == ADJ_SENS) {
-        for (size_t j : fmu_->ired_.at(i.ind)) in_jac.at(j) = true;
-      }
-    }
     jac_in_.clear();
     jac_nom_in_.clear();
-    for (size_t k = 0; k < in_jac.size(); ++k) {
-      if (in_jac[k]) {
-        jac_in_.push_back(k);
-        jac_nom_in_.push_back(fmu_->nominal_in_[jac_in_.back()]);
+    for (auto&& i : out_) {
+      if (i.type == JAC_OUTPUT || i.type == ADJ_SENS) {
+        // Get input indices
+        const std::vector<size_t>& iind = fmu_->ired_.at(i.wrt);
+        // Skip if no entries
+        if (iind.empty()) continue;
+        // Consistency check
+        bool exists = in_jac[iind.front()];
+        for (size_t j : iind) casadi_assert(in_jac[j] == exists, "Jacobian block not a block");
+        // Add selection
+        if (!exists) {
+          i.in_begin = jac_in_.size();
+          for (size_t j : iind) {
+            jac_in_.push_back(j);
+            jac_nom_in_.push_back(fmu_->nominal_in_[j]);
+            in_jac[j] = true;
+          }
+          i.in_end = jac_in_.size();
+        }
       }
     }
 
     // Collect all outputs in any Jacobian or adjoint block
     in_jac.resize(fmu_->oind_.size());
     std::fill(in_jac.begin(), in_jac.end(), false);
+    jac_out_.clear();
     for (auto&& i : out_) {
-      if (i.type == JAC_OUTPUT) {
-        for (size_t j : fmu_->ored_.at(i.ind)) in_jac.at(j) = true;
+      if (i.type == JAC_OUTPUT ) {
+        // Get output indices
+        const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
+        // Skip if no entries
+        if (oind.empty()) continue;
+        // Consistency check
+        bool exists = in_jac[oind.front()];
+        for (size_t j : oind) casadi_assert(in_jac[j] == exists, "Jacobian block not a block");
+        // Add selection
+        if (!exists) {
+          i.out_begin = jac_out_.size();
+          for (size_t j : oind) {
+            jac_out_.push_back(j);
+            in_jac[j] = true;
+          }
+          i.out_end = jac_out_.size();
+        }
       }
     }
     for (auto&& i : in_) {
-      if (i.type == ADJ_SEED) {
-        for (size_t j : fmu_->ored_.at(i.ind)) in_jac.at(j) = true;
+      if (i.type == ADJ_SEED ) {
+        // Get output indices
+        const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
+        // Skip if no entries
+        if (oind.empty()) continue;
+        // Consistency check
+        bool exists = in_jac[oind.front()];
+        for (size_t j : oind) casadi_assert(in_jac[j] == exists, "Jacobian block not a block");
+        // Add selection
+        if (!exists) {
+          for (size_t j : oind) {
+            jac_in_.push_back(j);
+            in_jac[j] = true;
+          }
+        }
       }
     }
-    jac_out_.clear();
-    for (size_t k = 0; k < in_jac.size(); ++k) {
-      if (in_jac[k]) jac_out_.push_back(k);
-    }
-
     // Get sparsity pattern for extended Jacobian
     sp_ext_ = fmu_->jac_sparsity(jac_out_, jac_in_);
 
@@ -1173,7 +1205,7 @@ void FmuFunction::parse_output(OutputStruct* s, const std::string& n) const {
     } else if (part1 == "adj") {
       // Adjoint sensitivity
       s->type = ADJ_SENS;
-      s->ind = fmu_->index_in(rem);
+      s->wrt = fmu_->index_in(rem);
     } else {
       // No such prefix
       casadi_error("No such prefix: " + part1);
@@ -1202,7 +1234,7 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
     case REG_OUTPUT:
       return Sparsity::dense(fmu_->ored_[out_.at(i).ind].size(), 1);
     case ADJ_SENS:
-      return Sparsity::dense(fmu_->ired_[out_.at(i).ind].size(), 1);
+      return Sparsity::dense(fmu_->ired_[out_.at(i).wrt].size(), 1);
     case JAC_OUTPUT:
       return fmu_->jac_sparsity(fmu_->ored_.at(out_.at(i).ind), fmu_->ired_.at(out_.at(i).wrt));
   }
@@ -1362,7 +1394,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     // Collect adjoint sensitivities
     for (size_t i = 0; i < out_.size(); ++i) {
       if (res[i] && out_[i].type == ADJ_SENS) {
-        const std::vector<size_t>& iind = fmu_->ired_[out_[i].ind];
+        const std::vector<size_t>& iind = fmu_->ired_[out_[i].wrt];
         for (size_t k = 0; k < iind.size(); ++k) res[i][k] = asens[iind[k]];
       }
     }

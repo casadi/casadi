@@ -277,10 +277,14 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   struct OutputStruct {
     // Type of input
     OutputType type;
-    // Corresponding index in Fmu
+    // Output index in Fmu
     size_t ind;
-    // With-respect-to index (for Jacobian blocks)
+    // With-respect-to index in Fmu
     size_t wrt;
+    // Selection
+    size_t in_begin, in_end, out_begin, out_end;
+    // Constructor
+    OutputStruct() : ind(-1), wrt(-1), in_begin(-1), in_end(-1), out_begin(-1), out_end(-1) {}
   };
 
   // Information about function outputs
