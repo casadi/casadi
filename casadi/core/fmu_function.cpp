@@ -1263,28 +1263,19 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   }
 
   // What other blocks are there?
-  bool need_jac = false;
+  bool need_jac = false, need_adj = false;
   for (size_t k = 0; k < out_.size(); ++k) {
-    if (res[k] && (out_[k].type == JAC_OUTPUT || out_[k].type == ADJ_SENS)) {
-     need_jac = true;
+    if (res[k]) {
+      if (out_[k].type == JAC_OUTPUT) {
+        need_jac = true;
+      } else if (out_[k].type == ADJ_SENS) {
+        need_adj = true;
+      }
     }
   }
 
   // Evalute Jacobian blocks
-  if (need_jac) {
-    // Vectors for adjoint calculation
-    if (has_adj_) {
-      // Copy adjoint seeds to aseed
-      std::fill(aseed, aseed + fmu_->oind_.size(), 0);
-      for (size_t i = 0; i < in_.size(); ++i) {
-        if (arg[i] && in_[i].type == ADJ_SEED) {
-          const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
-          for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
-        }
-      }
-      // Clear adjoint sensitivities
-      std::fill(asens, asens + fmu_->iind_.size(), 0);
-    }
+  if (need_jac || need_adj) {
     // Reset jac_color
     std::fill(jac_color, jac_color + jac_in_.size(), -1);
     // Loop over colors
@@ -1325,8 +1316,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         casadi_int j = jac_out_.at(jac_isens[i]);
         jac_nz[jac_nzind[i]] = jac_sens[j]
           = jac_scal[i] * fmu_->get_sens(m, jac_out_.at(jac_isens[i]));
-        // Propagate adjoint derivatives
-        if (has_adj_) asens[jac_in_.at(jac_wrt[i])] += jac_sens[j] * aseed[j];
       }
       // Fetch Jacobian blocks
       if (has_jac_) {
@@ -1349,13 +1338,32 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         }
       }
     }
+  }
+  // Calculate adjoint sensitivities
+  if (need_adj) {
+    // Copy adjoint seeds to aseed
+    std::fill(aseed, aseed + fmu_->oind_.size(), 0);
+    for (size_t i = 0; i < in_.size(); ++i) {
+      if (arg[i] && in_[i].type == ADJ_SEED) {
+        const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
+        for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
+      }
+    }
+    // Clear adjoint sensitivities
+    std::fill(asens, asens + fmu_->iind_.size(), 0);
+    // Propagate sensitivities
+    const casadi_int *colind = sp_ext_.colind(), *row = sp_ext_.row();
+    for (size_t i = 0; i < jac_in_.size(); ++i) {
+      double s = aseed[jac_in_[i]];
+      for (casadi_int k = colind[i]; k < colind[i + 1]; ++k) {
+        asens[jac_out_[row[k]]] += s * jac_nz[k];
+      }
+    }
     // Collect adjoint sensitivities
-    if (has_adj_) {
-      for (size_t i = 0; i < out_.size(); ++i) {
-        if (res[i] && out_[i].type == ADJ_SENS) {
-          const std::vector<size_t>& iind = fmu_->ired_[out_[i].ind];
-          for (size_t k = 0; k < iind.size(); ++k) res[i][k] = asens[iind[k]];
-        }
+    for (size_t i = 0; i < out_.size(); ++i) {
+      if (res[i] && out_[i].type == ADJ_SENS) {
+        const std::vector<size_t>& iind = fmu_->ired_[out_[i].ind];
+        for (size_t k = 0; k < iind.size(); ++k) res[i][k] = asens[iind[k]];
       }
     }
   }
