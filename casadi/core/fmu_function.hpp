@@ -289,6 +289,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // All Jacobian inputs and outputs
   std::vector<size_t> jac_in_, jac_out_;
 
+  // Nominal values for Jacobian inputs
+  std::vector<double> jac_nom_in_;
+
   // What blocks exist?
   bool has_jac_, has_adj_;
 
