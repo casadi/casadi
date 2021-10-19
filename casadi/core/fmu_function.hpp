@@ -40,9 +40,93 @@
 
 namespace casadi {
 
-// Forward declarations
-class DaeBuilderInternal;
-class FmuFunction;
+// SYMBOL "jac_prob"
+template<typename T1>
+struct casadi_jac_prob {
+  // Number of outputs, i.e. rows of the Jacobian
+  casadi_int n_out;
+  // Number of inputs, i.e. columns of the Jacobian
+  casadi_int n_in;
+  // Number of colors
+  casadi_int n_color;
+  // Extended Jacobian sparsity
+  const casadi_int* sp_ext;
+  // Jacobian coloring
+  const casadi_int* coloring;
+  // Nominal values for inputs, if any
+  const T1* nom_in;
+  // Index mapping for outputs (i.e. Jacobian rows), if any
+  const size_t* map_out;
+  // Index mapping for inputs (i.e.  Jacobian columns), if any
+  const size_t* map_in;
+};
+
+// SYMBOL "jac_setup"
+template<typename T1>
+void casadi_jac_setup(casadi_jac_prob<T1>* p, const casadi_int* sp_ext,
+    const casadi_int* coloring) {
+  // Set pointers
+  p->sp_ext = sp_ext;
+  p->coloring = coloring;
+  // Dimensions are given by the sparsity patterns
+  p->n_out = sp_ext[0];
+  p->n_in = sp_ext[1];
+  p->n_color = coloring[1];
+  // The following defaults to null
+  p->nom_in = 0;
+  p->map_out = 0;
+  p->map_in = 0;
+}
+
+// SYMBOL "jac_work"
+template<typename T1>
+void casadi_jac_work(const casadi_jac_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) {
+  // Reset sz_w, sz_iw
+  *sz_w = *sz_iw = 0;
+  // Work vectors in data struct
+  *sz_iw += p->n_in;  // iseed
+  *sz_w += p->n_in;  // seed
+  *sz_iw += p->n_out;  // isens
+  *sz_w += p->n_out;  // sens
+  *sz_w += p->n_out;  // scal
+  *sz_iw += p->n_out;  // wrt
+  *sz_iw += p->n_out;  // nzind
+}
+
+// SYMBOL "jac_data"
+template<typename T1>
+struct casadi_jac_data {
+  // Number of seeds, sensitivities for the current color
+  casadi_int nseed, nsens;
+  // Inputs that are being seeded
+  casadi_int *iseed;
+  // Set of seeds for the seeded inputs
+  T1 *seed;
+  // Set of outputs for which sensitivities are calculated
+  casadi_int *isens;
+  // Set of values for the calculated sensitivities
+  T1 *sens;
+  // Scaling factors for calculated sensitivities
+  T1 *scal;
+  // Input corresponding to calculated sensitivities
+  casadi_int *wrt;
+  // Jacobian nonzero corresponding to calculated sensitivities
+  casadi_int *nzind;
+};
+
+// SYMBOL "jac_init"
+template<typename T1>
+void casadi_jac_init(const casadi_jac_prob<T1>* p, casadi_jac_data<T1>* d,
+    casadi_int** iw, T1** w) {
+  // Set work vectors
+  d->iseed = *iw; *iw += p->n_in;
+  d->seed = *w; *w += p->n_in;
+  d->isens = *iw; *iw += p->n_out;
+  d->sens = *w; *w += p->n_out;
+  d->scal = *w; *w += p->n_out;
+  d->wrt = *iw; *iw += p->n_out;
+  d->nzind = *iw; *iw += p->n_out;
+}
 
 // SYMBOL "get_sub"
 template<typename T1>
@@ -69,6 +153,10 @@ void casadi_get_sub(T1* sub, const casadi_int* sp_a, const T1* nz_a,
     }
   }
 }
+
+// Forward declarations
+class DaeBuilderInternal;
+class FmuFunction;
 
 // Memory object
 struct CASADI_EXPORT FmuMemory : public FunctionMemory {
@@ -368,6 +456,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Graph coloring
   Sparsity coloring_;
+
+  // Jacobian memory
+  casadi_jac_prob<double> p_;
 
   ///@{
   /** \brief Number of function inputs and outputs */
