@@ -222,22 +222,6 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("get_name", &pa::PolymorphicPANOCDirectionBase::get_name)
         .def("__str__", &pa::PolymorphicPANOCDirectionBase::get_name);
 
-    py::class_<pa::PolymorphicLBFGSDirection,
-               std::shared_ptr<pa::PolymorphicLBFGSDirection>,
-               pa::PolymorphicPANOCDirectionBase>(
-        m, "LBFGSDirection",
-        "C++ documentation: :cpp:class:`pa::LBFGSDirection`")
-        .def(py::init<pa::LBFGSParams>(), "params"_a)
-        .def("initialize", &pa::PolymorphicLBFGSDirection::initialize)
-        .def("update", &pa::PolymorphicLBFGSDirection::update)
-        .def("apply", &pa::PolymorphicLBFGSDirection::apply_ret)
-        .def("changed_γ", &pa::PolymorphicLBFGSDirection::changed_γ)
-        .def("reset", &pa::PolymorphicLBFGSDirection::reset)
-        .def("get_name", &pa::PolymorphicLBFGSDirection::get_name)
-        .def("__str__", &pa::PolymorphicLBFGSDirection::get_name)
-        .def_property_readonly("params",
-                               &pa::PolymorphicLBFGSDirection::get_params);
-
     using paLBFGSParamCBFGS = decltype(pa::LBFGSParams::cbfgs);
     py::class_<paLBFGSParamCBFGS>(
         m, "LBFGSParamsCBFGS",
@@ -257,6 +241,22 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite("cbfgs", &pa::LBFGSParams::cbfgs)
         .def_readwrite("rescale_when_γ_changes",
                        &pa::LBFGSParams::rescale_when_γ_changes);
+
+    py::class_<pa::PolymorphicLBFGSDirection,
+               std::shared_ptr<pa::PolymorphicLBFGSDirection>,
+               pa::PolymorphicPANOCDirectionBase>(
+        m, "LBFGSDirection",
+        "C++ documentation: :cpp:class:`pa::LBFGSDirection`")
+        .def(py::init<pa::LBFGSParams>(), "params"_a)
+        .def("initialize", &pa::PolymorphicLBFGSDirection::initialize)
+        .def("update", &pa::PolymorphicLBFGSDirection::update)
+        .def("apply", &pa::PolymorphicLBFGSDirection::apply_ret)
+        .def("changed_γ", &pa::PolymorphicLBFGSDirection::changed_γ)
+        .def("reset", &pa::PolymorphicLBFGSDirection::reset)
+        .def("get_name", &pa::PolymorphicLBFGSDirection::get_name)
+        .def("__str__", &pa::PolymorphicLBFGSDirection::get_name)
+        .def_property_readonly("params",
+                               &pa::PolymorphicLBFGSDirection::get_params);
 
     py::enum_<pa::LBFGSStepSize>(
         m, "LBFGSStepsize", "C++ documentation: :cpp:enum:`pa::LBFGSStepSize`")

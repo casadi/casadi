@@ -6,6 +6,7 @@ requires = [
     "ninja",
     "cmake",
     "scikit-build",
+    "pybind11-stubgen",
 ]
 
 build-backend = "setuptools.build_meta"

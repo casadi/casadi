@@ -35,7 +35,20 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         target_link_libraries(_panocpy PRIVATE panoc-alm::casadi-loader-obj)
     endif()
 
+    add_custom_command(TARGET _panocpy POST_BUILD 
+        COMMAND "${Python3_EXECUTABLE}"
+            -m pybind11_stubgen _panocpy
+                --ignore-invalid=defaultarg
+                --no-setup-py
+                -o ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY $<TARGET_FILE_DIR:_panocpy>
+        USES_TERMINAL
+        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/_panocpy-stubs/__init__.pyi)
+
     if (SKBUILD)
-        install(TARGETS _panocpy DESTINATION .)
+        install(TARGETS _panocpy
+                DESTINATION .)
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_panocpy-stubs/__init__.pyi
+                DESTINATION .)
     endif()
 endif()
