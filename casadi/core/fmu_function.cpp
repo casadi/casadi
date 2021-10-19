@@ -1128,7 +1128,7 @@ void FmuFunction::init(const Dict& opts) {
     std::fill(in_jac.begin(), in_jac.end(), 0);
     jac_out_.clear();
     for (auto&& i : out_) {
-      if (i.type == JAC_OUTPUT ) {
+      if (i.type == JAC_OUTPUT) {
         // Get output indices
         const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
         // Skip if no entries
@@ -1149,7 +1149,7 @@ void FmuFunction::init(const Dict& opts) {
       }
     }
     for (auto&& i : in_) {
-      if (i.type == ADJ_SEED ) {
+      if (i.type == ADJ_SEED) {
         // Get output indices
         const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
         // Skip if no entries
