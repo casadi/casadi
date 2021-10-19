@@ -75,25 +75,25 @@ struct StructuredPANOCLBFGSProgressInfo {
     const StructuredPANOCLBFGSParams &params;
 };
 
+struct StructuredPANOCLBFGSStats {
+    SolverStatus status = SolverStatus::Unknown;
+    real_t ε            = inf;
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations          = 0;
+    unsigned linesearch_failures = 0;
+    unsigned lbfgs_failures      = 0;
+    unsigned lbfgs_rejected      = 0;
+    unsigned τ_1_accepted        = 0;
+    unsigned count_τ             = 0;
+    real_t sum_τ                 = 0;
+};
+
 /// Second order PANOC solver for ALM.
 /// @ingroup    grp_InnerSolvers
 class StructuredPANOCLBFGSSolver {
   public:
-    using Params = StructuredPANOCLBFGSParams;
-
-    struct Stats {
-        SolverStatus status = SolverStatus::Unknown;
-        real_t ε            = inf;
-        std::chrono::microseconds elapsed_time;
-        unsigned iterations          = 0;
-        unsigned linesearch_failures = 0;
-        unsigned lbfgs_failures      = 0;
-        unsigned lbfgs_rejected      = 0;
-        unsigned τ_1_accepted        = 0;
-        unsigned count_τ             = 0;
-        real_t sum_τ                 = 0;
-    };
-
+    using Params       = StructuredPANOCLBFGSParams;
+    using Stats        = StructuredPANOCLBFGSStats;
     using ProgressInfo = StructuredPANOCLBFGSProgressInfo;
 
     StructuredPANOCLBFGSSolver(Params params, LBFGSParams lbfgsparams)
@@ -132,20 +132,32 @@ template <class InnerSolverStats>
 struct InnerStatsAccumulator;
 
 template <>
-struct InnerStatsAccumulator<StructuredPANOCLBFGSSolver::Stats> {
+struct InnerStatsAccumulator<StructuredPANOCLBFGSStats> {
+    /// Total elapsed time in the inner solver.
     std::chrono::microseconds elapsed_time;
+    /// Total number of inner PANOC iterations.
     unsigned iterations          = 0;
+    /// Total number of PANOC line search failures.
     unsigned linesearch_failures = 0;
+    /// Total number of times that the L-BFGS direction was not finite.
     unsigned lbfgs_failures      = 0;
+    /// Total number of times that the L-BFGS update was rejected (i.e. it
+    /// could have resulted in a non-positive definite Hessian estimate).
     unsigned lbfgs_rejected      = 0;
+    /// Total number of times that a line search parameter of @f$ \tau = 1 @f$
+    /// was accepted (i.e. no backtracking necessary).
     unsigned τ_1_accepted        = 0;
+    /// The total number of line searches performed (used for computing the 
+    /// average value of @f$ \tau @f$).
     unsigned count_τ             = 0;
+    /// The sum of the line search parameter @f$ \tau @f$ in all iterations
+    /// (used for computing the average value of @f$ \tau @f$).
     real_t sum_τ                 = 0;
 };
 
-inline InnerStatsAccumulator<StructuredPANOCLBFGSSolver::Stats> &
-operator+=(InnerStatsAccumulator<StructuredPANOCLBFGSSolver::Stats> &acc,
-           const StructuredPANOCLBFGSSolver::Stats &s) {
+inline InnerStatsAccumulator<StructuredPANOCLBFGSStats> &
+operator+=(InnerStatsAccumulator<StructuredPANOCLBFGSStats> &acc,
+           const StructuredPANOCLBFGSStats &s) {
     acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
     acc.linesearch_failures += s.linesearch_failures;

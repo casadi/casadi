@@ -85,17 +85,49 @@ class ALMSolver {
     using InnerSolver = InnerSolverT;
 
     struct Stats {
+        /// Total number of outer ALM iterations (i.e. the number of times that
+        /// the inner solver was invoked).
         unsigned outer_iterations = 0;
+        /// Total elapsed time.
         std::chrono::microseconds elapsed_time;
+        /// The number of times that the initial penalty factor was reduced by
+        /// @ref ALMParams::Σ₀_lower and that the initial tolerance was 
+        /// increased by @ref ALMParams::ε₀_increase because the inner solver 
+        /// failed to converge in the first ALM iteration. If this number is 
+        /// greater than zero, consider lowering the initial penalty factor 
+        /// @ref ALMParams::Σ₀ or @ref ALMParams::σ₀ or increasing the initial 
+        /// tolerance @ref ALMParams::ε₀ (or both).
         unsigned initial_penalty_reduced    = 0;
+        /// The number of times that the penalty update factor @ref ALMParams::Δ
+        /// was reduced, that the tolerance update factor @ref ALMParams::ρ was 
+        /// increased, and that an ALM iteration had to be restarted with a 
+        /// lower penalty factor and a higher tolerance because the inner solver
+        /// failed to converge (not applicable in the first ALM iteration).
+        /// If this number is greater than zero, consider lowerering the 
+        /// penalty update factor @ref ALMParams::Δ or increasing the tolerance
+        /// update factor (or both). Lowering the initial penalty factor could
+        /// help as well.
         unsigned penalty_reduced            = 0;
+        /// The total number of times that the inner solver failed to converge.
         unsigned inner_convergence_failures = 0;
+        /// Final primal tolerance that was reached, depends on the stopping 
+        /// criterion used by the inner solver, see for example 
+        /// @ref PANOCStopCrit.
         real_t ε                            = inf;
+        /// Final dual tolerance or constraint violation that was reached:
+        /// @f[
+        /// \delta = \| \Pi_D\left(g(x^k) + \Sigma^{-1}y\right) \|_\infty
+        /// @f]
         real_t δ                            = inf;
+        /// 2-norm of the final penalty factors @f$ \| \Sigma \|_2 @f$.
         real_t norm_penalty                 = 0;
 
+        /// Whether the solver converged or not.
+        /// @see @ref SolverStatus
         SolverStatus status = SolverStatus::Unknown;
 
+        /// The statistics of the inner solver invocations, accumulated over all
+        /// ALM iterations.
         InnerStatsAccumulator<typename InnerSolver::Stats> inner;
     };
 
