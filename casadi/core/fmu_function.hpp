@@ -44,6 +44,32 @@ namespace casadi {
 class DaeBuilderInternal;
 class FmuFunction;
 
+// SYMBOL "get_sub"
+template<typename T1>
+void casadi_get_sub(T1* sub, const casadi_int* sp_a, const T1* nz_a,
+    casadi_int rbegin, casadi_int rend, casadi_int cbegin, casadi_int cend) {
+  // Local variables
+  casadi_int nr, nc, r, c, k;
+  const casadi_int *colind, *row;
+  // Quick return if null
+  if (sub == 0) return;
+  // Extract sparsity
+  nr = sp_a[0];
+  nc = sp_a[1];
+  colind = sp_a + 2;
+  row = colind + nc + 1;
+  // Loop over columns
+  for (c = cbegin; c < cend; ++c) {
+    // Loop over nonzeros
+    for (k = colind[c]; k < colind[c + 1]; ++k) {
+      // Get row
+      r = row[k];
+      // Save, if in range
+      if (r >= rbegin && r < rend) *sub++ = nz_a[k];
+    }
+  }
+}
+
 // Memory object
 struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   // Function object
@@ -282,9 +308,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     // With-respect-to index in Fmu
     size_t wrt;
     // Selection
-    size_t in_begin, in_end, out_begin, out_end;
+    size_t rbegin, rend, cbegin, cend;
     // Constructor
-    OutputStruct() : ind(-1), wrt(-1), in_begin(-1), in_end(-1), out_begin(-1), out_end(-1) {}
+    OutputStruct() : ind(-1), wrt(-1), rbegin(-1), rend(-1), cbegin(-1), cend(-1) {}
   };
 
   // Information about function outputs

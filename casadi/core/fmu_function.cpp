@@ -1069,7 +1069,7 @@ void FmuFunction::init(const Dict& opts) {
   // If extended Jacobian is needed
   if (has_adj_ || has_jac_) {
     // Collect all inputs in any Jacobian or adjoint block
-    std::vector<bool> in_jac(fmu_->iind_.size(), false);
+    std::vector<size_t> in_jac(fmu_->iind_.size(), 0);
     jac_in_.clear();
     jac_nom_in_.clear();
     for (auto&& i : out_) {
@@ -1079,24 +1079,25 @@ void FmuFunction::init(const Dict& opts) {
         // Skip if no entries
         if (iind.empty()) continue;
         // Consistency check
-        bool exists = in_jac[iind.front()];
-        for (size_t j : iind) casadi_assert(in_jac[j] == exists, "Jacobian block not a block");
+        bool exists = in_jac[iind.front()] > 0;
+        for (size_t j : iind) casadi_assert((in_jac[j] > 0) == exists, "Jacobian not a block");
         // Add selection
         if (!exists) {
-          i.in_begin = jac_in_.size();
           for (size_t j : iind) {
             jac_in_.push_back(j);
             jac_nom_in_.push_back(fmu_->nominal_in_[j]);
-            in_jac[j] = true;
+            in_jac[j] = jac_in_.size();
           }
-          i.in_end = jac_in_.size();
         }
+        // Add column interval
+        i.cbegin = in_jac[iind.front()] - 1;
+        i.cend = i.cbegin + iind.size();
       }
     }
 
     // Collect all outputs in any Jacobian or adjoint block
     in_jac.resize(fmu_->oind_.size());
-    std::fill(in_jac.begin(), in_jac.end(), false);
+    std::fill(in_jac.begin(), in_jac.end(), 0);
     jac_out_.clear();
     for (auto&& i : out_) {
       if (i.type == JAC_OUTPUT ) {
@@ -1105,17 +1106,18 @@ void FmuFunction::init(const Dict& opts) {
         // Skip if no entries
         if (oind.empty()) continue;
         // Consistency check
-        bool exists = in_jac[oind.front()];
-        for (size_t j : oind) casadi_assert(in_jac[j] == exists, "Jacobian block not a block");
+        bool exists = in_jac[oind.front()] > 0;
+        for (size_t j : oind) casadi_assert((in_jac[j] > 0) == exists, "Jacobian not a block");
         // Add selection
         if (!exists) {
-          i.out_begin = jac_out_.size();
           for (size_t j : oind) {
             jac_out_.push_back(j);
-            in_jac[j] = true;
+            in_jac[j] = jac_out_.size();
           }
-          i.out_end = jac_out_.size();
         }
+        // Add row interval
+        i.rbegin = in_jac[oind.front()] - 1;
+        i.rend = i.rbegin + oind.size();
       }
     }
     for (auto&& i : in_) {
@@ -1151,11 +1153,9 @@ void FmuFunction::init(const Dict& opts) {
     alloc_w(jac_in_.size(), true);  // jac_seed
     alloc_iw(jac_in_.size(), true);  // jac_iseed
     alloc_w(jac_out_.size(), true);  // jac_scal
-    alloc_w(jac_out_.size(), true);  // jac_sens
     alloc_iw(jac_out_.size(), true);  // jac_isens
     alloc_iw(jac_out_.size(), true);  // jac_wrt
     alloc_iw(jac_out_.size(), true);  // jac_nzind
-    alloc_iw(jac_in_.size(), true);  // jac_color
     alloc_w(sp_ext_.nnz(), true);  // jac_nz
     if (has_adj_) {
       alloc_w(fmu_->oind_.size(), true);  // aseed
@@ -1247,17 +1247,15 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != 0, "Memory is null");
   // Work vectors for Jacobian/adjoint calculation
-  double *aseed, *asens, *jac_seed, *jac_scal, *jac_sens, *jac_nz;
-  casadi_int *jac_iseed, *jac_isens, *jac_wrt, *jac_nzind, *jac_color;
+  double *aseed, *asens, *jac_seed, *jac_scal, *jac_nz;
+  casadi_int *jac_iseed, *jac_isens, *jac_wrt, *jac_nzind;
   if (has_adj_ || has_jac_) {
     jac_seed = w; w += jac_in_.size();
     jac_iseed = iw; iw += jac_in_.size();
     jac_scal = w; w += jac_out_.size();
-    jac_sens = w; w += jac_out_.size();
     jac_isens = iw; iw += jac_out_.size();
     jac_wrt = iw; iw += jac_out_.size();
     jac_nzind = iw; iw += jac_out_.size();
-    jac_color = iw; iw += jac_in_.size();
     jac_nz = w; w += sp_ext_.nnz();
     if (has_adj_) {
       aseed = w; w += fmu_->oind_.size();
@@ -1308,8 +1306,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
 
   // Evalute Jacobian blocks
   if (need_jac || need_adj) {
-    // Reset jac_color
-    std::fill(jac_color, jac_color + jac_in_.size(), -1);
     // Loop over colors
     for (casadi_int c = 0; c < coloring_.size2(); ++c) {
       // Loop over input indices for color
@@ -1334,44 +1330,26 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         }
       }
       // Set seed for column, mark colors being calculated
-      for (casadi_int i = 0; i < nseed; ++i) {
+      for (casadi_int i = 0; i < nseed; ++i)
         fmu_->set_seed(m, jac_in_.at(jac_iseed[i]), jac_seed[i]);
-        jac_color[jac_in_.at(jac_iseed[i])] = c;
-      }
       // Request corresponding outputs
       for (casadi_int i = 0; i < nsens; ++i)
         fmu_->request(m, jac_out_.at(jac_isens[i]), jac_in_.at(jac_wrt[i]));
       // Calculate derivatives
       if (fmu_->eval_derivative(m)) return 1;
       // Collect derivatives
-      for (casadi_int i = 0; i < nsens; ++i) {
-        casadi_int j = jac_out_.at(jac_isens[i]);
-        jac_nz[jac_nzind[i]] = jac_sens[j]
-          = jac_scal[i] * fmu_->get_sens(m, jac_out_.at(jac_isens[i]));
-      }
-      // Fetch Jacobian blocks
-      if (has_jac_) {
-        for (size_t k = 0; k < out_.size(); ++k) {
-          if (res[k] && out_[k].type == JAC_OUTPUT) {
-            // Find input index
-            const std::vector<size_t>& iind = fmu_->ired_[out_[k].wrt];
-            for (size_t Bc = 0; Bc < iind.size(); ++Bc) {
-              if (jac_color[iind[Bc]] == c) {
-                // Column exists in Jacobian block
-                const Sparsity& sp = sparsity_out(k);
-                const std::vector<size_t>& oind = fmu_->ored_[out_[k].ind];
-                for (casadi_int Bk = sp.colind(Bc); Bk < sp.colind(Bc + 1); ++Bk) {
-                  // Save Jacobian nonzero, scaled by nominal value factor
-                  res[k][Bk] = jac_sens[oind.at(sp.row(Bk))];
-                }
-              }
-            }
-          }
-        }
-      }
+      for (casadi_int i = 0; i < nsens; ++i)
+        jac_nz[jac_nzind[i]] = jac_scal[i] * fmu_->get_sens(m, jac_out_.at(jac_isens[i]));
     }
   }
-  // Calculate adjoint sensitivities
+  // Fetch Jacobian blocks
+  for (size_t k = 0; k < out_.size(); ++k) {
+    if (res[k] && out_[k].type == JAC_OUTPUT) {
+      casadi_get_sub(res[k], sp_ext_, jac_nz,
+        out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
+    }
+  }
+  // Multiply Jacobian from the left to get adjoint sensitivities
   if (need_adj) {
     // Copy adjoint seeds to aseed
     std::fill(aseed, aseed + fmu_->oind_.size(), 0);
