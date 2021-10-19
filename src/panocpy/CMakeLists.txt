@@ -42,20 +42,42 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         target_link_libraries(_panocpy PRIVATE panoc-alm::casadi-loader-obj)
     endif()
 
-    add_custom_command(TARGET _panocpy POST_BUILD 
-        COMMAND "${Python3_EXECUTABLE}"
-            -m pybind11_stubgen _panocpy
-                --ignore-invalid=defaultarg
-                --no-setup-py
-                -o ${CMAKE_CURRENT_BINARY_DIR}
-        WORKING_DIRECTORY $<TARGET_FILE_DIR:_panocpy>
-        USES_TERMINAL
-        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/_panocpy-stubs/__init__.pyi)
+    if (WIN32)
+        set(PANOCPY_GEN_STUB_DEFAULT Off)
+    else()
+        set(PANOCPY_GEN_STUB_DEFAULT On)
+    endif()
+
+    option(PANOCPY_GEN_STUB "Generate Python stub files (.pyi) for the panocpy module." ${PANOCPY_GEN_STUB_DEFAULT})
+
+    if (PANOCPY_GEN_STUB)
+        add_custom_command(TARGET _panocpy POST_BUILD 
+            COMMAND "${Python3_EXECUTABLE}"
+                -m pybind11_stubgen _panocpy
+                    --ignore-invalid=defaultarg
+                    --no-setup-py
+                    -o ${CMAKE_CURRENT_BINARY_DIR}
+            WORKING_DIRECTORY $<TARGET_FILE_DIR:_panocpy>
+            USES_TERMINAL
+            BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/_panocpy-stubs/__init__.pyi)
+
+        add_custom_command(TARGET _panocpy POST_BUILD 
+            COMMAND stubgen -m panocpy -m panocpy.casadi_problem
+                    -o ${CMAKE_CURRENT_BINARY_DIR}/stubs
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..
+            USES_TERMINAL)
+    endif()
 
     if (SKBUILD)
         install(TARGETS _panocpy
                 DESTINATION .)
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_panocpy-stubs/__init__.pyi
-                DESTINATION .)
+        if (PANOCPY_GEN_STUB)
+            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_panocpy-stubs/__init__.pyi
+                    RENAME _panocpy.pyi
+                    DESTINATION .)
+            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/stubs/panocpy/__init__.pyi
+                        ${CMAKE_CURRENT_BINARY_DIR}/stubs/panocpy/casadi_problem.pyi
+                    DESTINATION .)
+        endif()
     endif()
 endif()

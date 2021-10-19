@@ -6,3 +6,4 @@ scikit-build
 ninja
 cmake
 pybind11-stubgen
+mypy
