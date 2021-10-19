@@ -537,27 +537,34 @@ int Fmu::get_values(fmi2Component c, DaeBuilderInternal* dae) const {
   return 0;
 }
 
-void Fmu::set(FmuMemory* m, size_t id, double value) const {
-  // Update buffer
-  if (value != m->ibuf_.at(id)) {
-    m->ibuf_.at(id) = value;
-    m->changed_.at(id) = true;
+void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
+  if (value) {
+    // Argument is given
+    for (size_t id : ired_[ind]) {
+      if (*value != m->ibuf_.at(id)) {
+        m->ibuf_.at(id) = *value;
+        m->changed_.at(id) = true;
+      }
+      value++;
+    }
+  } else {
+    // Argument is null - all zeros
+    for (size_t id : ired_[ind]) {
+      if (0 != m->ibuf_.at(id)) {
+        m->ibuf_.at(id) = 0;
+        m->changed_.at(id) = true;
+      }
+    }
   }
 }
 
-void Fmu::set_seed(FmuMemory* m, size_t id, double value) const {
-  // Update buffer
-  if (value != 0) {
-    m->seed_.at(id) = value;
-    m->changed_.at(id) = true;
+void Fmu::request(FmuMemory* m, size_t ind) const {
+  for (size_t id : ored_[ind]) {
+    // Mark as requested
+    m->requested_.at(id) = true;
+    // Also log corresponding input index
+    m->wrt_.at(id) = -1;
   }
-}
-
-void Fmu::request(FmuMemory* m, size_t id, size_t wrt_id) const {
-  // Mark as requested
-  m->requested_.at(id) = true;
-  // Also log corresponding input index
-  m->wrt_.at(id) = wrt_id;
 }
 
 int Fmu::eval(FmuMemory* m) const {
@@ -592,9 +599,34 @@ int Fmu::eval(FmuMemory* m) const {
   return 0;
 }
 
-void Fmu::get(FmuMemory* m, size_t id, double* value) const {
+void Fmu::get(FmuMemory* m, size_t ind, double* value) const {
   // Save to return
-  *value = m->obuf_.at(id);
+  for (size_t id : ored_[ind]) {
+    *value++ = m->obuf_.at(id);
+  }
+}
+
+void Fmu::set_seed(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
+  for (casadi_int i = 0; i < nseed; ++i) {
+    m->seed_.at(*id) = *v++;
+    m->changed_.at(*id) = true;
+    id++;
+  }
+}
+
+void Fmu::request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const {
+  for (casadi_int i = 0; i < nsens; ++i) {
+    m->requested_.at(*id) = true;
+    m->wrt_.at(*id) = *wrt_id++;
+    id++;
+  }
+}
+
+void Fmu::get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
+  for (casadi_int i = 0; i < nsens; ++i) {
+    *v++ = m->sens_.at(*id++);
+  }
 }
 
 void Fmu::gather_io(FmuMemory* m) const {
@@ -890,10 +922,6 @@ int Fmu::eval_derivative(FmuMemory* m) const {
   return 0;
 }
 
-double Fmu::get_sens(FmuMemory* m, size_t id) const {
-  return m->sens_.at(id);
-}
-
 Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const {
   // Convert to casadi_int type
   std::vector<casadi_int> osub1(osub.begin(), osub.end());
@@ -1152,8 +1180,9 @@ void FmuFunction::init(const Dict& opts) {
     // Needed for calculating the Jacobian
     alloc_w(jac_in_.size(), true);  // jac_seed
     alloc_iw(jac_in_.size(), true);  // jac_iseed
-    alloc_w(jac_out_.size(), true);  // jac_scal
+    alloc_w(jac_out_.size(), true);  // jac_sens
     alloc_iw(jac_out_.size(), true);  // jac_isens
+    alloc_w(jac_out_.size(), true);  // jac_scal
     alloc_iw(jac_out_.size(), true);  // jac_wrt
     alloc_iw(jac_out_.size(), true);  // jac_nzind
     alloc_w(sp_ext_.nnz(), true);  // jac_nz
@@ -1247,13 +1276,14 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != 0, "Memory is null");
   // Work vectors for Jacobian/adjoint calculation
-  double *aseed, *asens, *jac_seed, *jac_scal, *jac_nz;
+  double *aseed, *asens, *jac_seed, *jac_sens, *jac_scal, *jac_nz;
   casadi_int *jac_iseed, *jac_isens, *jac_wrt, *jac_nzind;
   if (has_adj_ || has_jac_) {
     jac_seed = w; w += jac_in_.size();
     jac_iseed = iw; iw += jac_in_.size();
-    jac_scal = w; w += jac_out_.size();
+    jac_sens = w; w += jac_out_.size();
     jac_isens = iw; iw += jac_out_.size();
+    jac_scal = w; w += jac_out_.size();
     jac_wrt = iw; iw += jac_out_.size();
     jac_nzind = iw; iw += jac_out_.size();
     jac_nz = w; w += sp_ext_.nnz();
@@ -1265,19 +1295,13 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k].type == REG_INPUT) {
-      const std::vector<size_t>& iind = fmu_->ired_[in_[k].ind];
-      for (size_t i = 0; i < iind.size(); ++i) {
-        fmu_->set(m, iind[i], arg[k] ? arg[k][i] : 0);
-      }
+      fmu_->set(m, in_[k].ind, arg[k]);
     }
   }
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k].type == REG_OUTPUT) {
-      const std::vector<size_t>& oind = fmu_->ored_[out_[k].ind];
-      for (size_t i = 0; i < oind.size(); ++i) {
-        fmu_->request(m, oind[i]);
-      }
+      fmu_->request(m, out_[k].ind);
     }
   }
   // Evaluate
@@ -1285,10 +1309,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Get regular outputs
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k] && out_[k].type == REG_OUTPUT) {
-      const std::vector<size_t>& oind = fmu_->ored_[out_[k].ind];
-      for (size_t i = 0; i < oind.size(); ++i) {
-        fmu_->get(m, oind[i], &res[k][i]);
-      }
+      fmu_->get(m, out_[k].ind, res[k]);
     }
   }
 
@@ -1329,24 +1350,26 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
           nsens++;
         }
       }
-      // Set seed for column, mark colors being calculated
-      for (casadi_int i = 0; i < nseed; ++i)
-        fmu_->set_seed(m, jac_in_.at(jac_iseed[i]), jac_seed[i]);
-      // Request corresponding outputs
-      for (casadi_int i = 0; i < nsens; ++i)
-        fmu_->request(m, jac_out_.at(jac_isens[i]), jac_in_.at(jac_wrt[i]));
+      // Convert indices to Fmu indices
+      for (casadi_int i = 0; i < nseed; ++i) jac_iseed[i] = jac_in_[jac_iseed[i]];
+      for (casadi_int i = 0; i < nsens; ++i) jac_isens[i] = jac_out_[jac_isens[i]];
+      for (casadi_int i = 0; i < nsens; ++i) jac_wrt[i] = jac_in_[jac_wrt[i]];
       // Calculate derivatives
+      fmu_->set_seed(m, nseed, jac_iseed, jac_seed);
+      fmu_->request_sens(m, nsens, jac_isens, jac_wrt);
       if (fmu_->eval_derivative(m)) return 1;
-      // Collect derivatives
-      for (casadi_int i = 0; i < nsens; ++i)
-        jac_nz[jac_nzind[i]] = jac_scal[i] * fmu_->get_sens(m, jac_out_.at(jac_isens[i]));
+      fmu_->get_sens(m, nsens, jac_isens, jac_sens);
+      // Get Jacobian nonzeros
+      for (casadi_int i = 0; i < nsens; ++i) jac_nz[jac_nzind[i]] = jac_scal[i] * jac_sens[i];
     }
   }
   // Fetch Jacobian blocks
-  for (size_t k = 0; k < out_.size(); ++k) {
-    if (res[k] && out_[k].type == JAC_OUTPUT) {
-      casadi_get_sub(res[k], sp_ext_, jac_nz,
-        out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
+  if (need_jac) {
+    for (size_t k = 0; k < out_.size(); ++k) {
+      if (res[k] && out_[k].type == JAC_OUTPUT) {
+        casadi_get_sub(res[k], sp_ext_, jac_nz,
+          out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
+      }
     }
   }
   // Multiply Jacobian from the left to get adjoint sensitivities

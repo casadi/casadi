@@ -223,10 +223,10 @@ struct CASADI_EXPORT Fmu {
   int init_mem(FmuMemory* m) const;
 
   // Set value
-  void set(FmuMemory* m, size_t id, double value) const;
+  void set(FmuMemory* m, size_t ind, const double* value) const;
 
   // Request the calculation of a variable
-  void request(FmuMemory* m, size_t id, size_t wrt_id = -1) const;
+  void request(FmuMemory* m, size_t ind) const;
 
   // Gather user inputs and outputs
   void gather_io(FmuMemory* m) const;
@@ -238,7 +238,14 @@ struct CASADI_EXPORT Fmu {
   void get(FmuMemory* m, size_t id, double* value) const;
 
   // Set seed
-  void set_seed(FmuMemory* m, size_t id, double value) const;
+  void set_seed(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const;
+
+  // Request the calculation of a sensitivity
+  void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const;
+
+  // Get calculated derivatives
+  void get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const;
 
   // Gather user sensitivities
   void gather_sens(FmuMemory* m) const;
@@ -251,9 +258,6 @@ struct CASADI_EXPORT Fmu {
 
   // Calculate directional derivatives
   int eval_derivative(FmuMemory* m) const;
-
-  // Get a derivative
-  double get_sens(FmuMemory* m, size_t id) const;
 
   // Get Jacobian sparsity for a subset of inputs and outputs
   Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
