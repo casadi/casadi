@@ -103,14 +103,14 @@ TEST(PANOC, calc_ψ_grad_ψ) {
         pa::detail::calc_ψ_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
-    EXPECT_FLOAT_EQ(ψ_res, ψ);
-    EXPECT_FLOAT_EQ(ψ_res, ψ2);
+    EXPECT_DOUBLE_EQ(ψ_res, ψ);
+    EXPECT_DOUBLE_EQ(ψ_res, ψ2);
 
     // calc_ψ_ŷ
     work_m.setZero();
     ψ_res = pa::detail::calc_ψ_ŷ(p, x, y, Σ, work_m);
     EXPECT_THAT(print_wrap(work_m), EigenAlmostEqual(print_wrap(ŷ), 1e-10));
-    EXPECT_FLOAT_EQ(ψ_res, ψ);
+    EXPECT_DOUBLE_EQ(ψ_res, ψ);
 
     // calc_grad_ψ_from_ŷ
     grad_ψ_res.setZero();
@@ -138,7 +138,7 @@ TEST(PANOC, calc_ψ_grad_ψ) {
     grad_ψ_res = pa_ref::detail::eval_grad_ψ(p, x, y, Σ);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
-    EXPECT_FLOAT_EQ(ψ_res, ψ);
+    EXPECT_DOUBLE_EQ(ψ_res, ψ);
 }
 
 Problem build_test_problem2() {
@@ -297,14 +297,14 @@ TEST(PANOC, hessian) {
         pa::detail::calc_ψ_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
-    EXPECT_FLOAT_EQ(ψ_res, ψ);
-    EXPECT_FLOAT_EQ(ψ_res, ψ2);
+    EXPECT_DOUBLE_EQ(ψ_res, ψ);
+    EXPECT_DOUBLE_EQ(ψ_res, ψ2);
 
     // calc_ψ_ŷ
     work_m.setZero();
     ψ_res = pa::detail::calc_ψ_ŷ(p, x, y, Σ, work_m);
     EXPECT_THAT(print_wrap(work_m), EigenAlmostEqual(print_wrap(ŷ), 1e-10));
-    EXPECT_FLOAT_EQ(ψ_res, ψ);
+    EXPECT_DOUBLE_EQ(ψ_res, ψ);
 
     // calc_grad_ψ_from_ŷ
     grad_ψ_res.setZero();
@@ -332,7 +332,7 @@ TEST(PANOC, hessian) {
     grad_ψ_res = pa_ref::detail::eval_grad_ψ(p, x, y, Σ);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
-    EXPECT_FLOAT_EQ(ψ_res, ψ);
+    EXPECT_DOUBLE_EQ(ψ_res, ψ);
 
     // Hessian of f
     auto grad_fi = [&](unsigned i) {

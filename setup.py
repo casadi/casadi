@@ -35,6 +35,8 @@ setup(
     install_requires=[
         "numpy",
         "casadi",
+        "ninja",
+        "cmake",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

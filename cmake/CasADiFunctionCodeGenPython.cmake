@@ -10,5 +10,7 @@ macro(casadi_function_codegen_python target pythonfile)
     set_target_properties("${target}" PROPERTIES DEBUG_POSTFIX ""
                                                 ASAN_POSTFIX ""
                                                 TSAN_POSTFIX "")
-    target_compile_options("${target}" PRIVATE "-Wno-unused-parameter")
+    if (NOT WIN32)
+        target_compile_options("${target}" PRIVATE "-Wno-unused-parameter")
+    endif()
 endmacro()

@@ -34,14 +34,7 @@ from tempfile import TemporaryDirectory
 name = "mpcproblem"
 f_prob = cs.Function("f", [nlp["x"], nlp["p"]], [nlp["f"]])
 g_prob = cs.Function("g", [nlp["x"], nlp["p"]], [nlp["g"]])
-cgen, n, m, num_p = pa.generate_casadi_problem(f_prob, g_prob, name=name)
-
-with TemporaryDirectory(prefix="") as tmpdir:
-    cfile = cgen.generate(os.path.join(tmpdir, ''))
-    sofile = os.path.join(tmpdir, f"{name}.so")
-    os.system(f"cc -fPIC -shared -O3 -march=native {cfile} -o {sofile}")
-    print(sofile)
-    prob = pa.load_casadi_problem_with_param(sofile, n, m, num_p)
+prob = pa.generate_and_compile_casadi_problem(f_prob, g_prob, name=name)
 
 prob.C.lowerbound = bounds["lbx"]
 prob.C.upperbound = bounds["ubx"]
@@ -89,9 +82,9 @@ dest = np.array([5, 0.1, 0, 0])
 if multipleshooting:
     x_sol = np.concatenate((np.tile(state, N_hor), np.zeros((n_inputs * N_hor,))))
 else:
-    x_sol = np.zeros((n,))
-assert x_sol.size == n
-y_sol = np.zeros((m,))
+    x_sol = np.zeros((prob.n,))
+assert x_sol.size == prob.n
+y_sol = np.zeros((prob.m,))
 
 
 def solve_ocp(state, y_sol, x_sol):

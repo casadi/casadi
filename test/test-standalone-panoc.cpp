@@ -48,7 +48,7 @@ TEST(PANOCStandalone, cosh) {
     EXPECT_EQ(alloc.size(), 50);
     EXPECT_EQ(alloc.used_space(), 0);
 
-    EXPECT_FLOAT_EQ(x(0), -2.4877411259719642);
+    EXPECT_DOUBLE_EQ(x(0), -2.4877411259719642);
 
     std::cout << std::setprecision(16) << std::fixed;
     std::cout << "\n===========\n" << std::endl;

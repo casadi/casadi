@@ -1,4 +1,4 @@
-name: Python Wheel
+name: Python Wheel (Linux)
 
 on: [push]
 
@@ -17,7 +17,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: "/tmp/py-venv"
-        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/ci/install-dependencies-wheel.sh') }}-${{ hashFiles('scripts/requirements.txt') }}-${{ hashFiles('scripts/requirements-wheel.txt') }}-${{ hashFiles('scripts/ci/install-patchelf.sh') }}-
+        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/ci/install-dependencies-wheel.sh') }}-${{ hashFiles('scripts/ci/install-casadi-wheel.sh') }}-${{ hashFiles('scripts/requirements.txt') }}-${{ hashFiles('scripts/requirements-wheel.txt') }}-${{ hashFiles('scripts/ci/install-patchelf.sh') }}-
     - name: Install Casadi and other Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       run: |
@@ -64,6 +64,6 @@ jobs:
         name: panocpy-whl-${{ matrix.python-version }}
         path: wheelhouse
     - name: 'Install panocpy'
-      run: pip install wheelhouse/panocpy-*manylinux*.whl
+      run: pip install --find-links=wheelhouse panocpy
     - name: 'Run tests'
       run: python src/panocpy/test.py

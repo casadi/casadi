@@ -32,14 +32,14 @@ find_package_handle_standard_args(CUTEst
 )
 
 # CUTEst library
-if(CUTEst_FOUND AND NOT TARGET CUTEst::cutest)
+if (CUTEst_FOUND AND NOT TARGET CUTEst::cutest)
     add_library(CUTEst::cutest STATIC IMPORTED)
     set_target_properties(CUTEst::cutest PROPERTIES
         IMPORTED_LOCATION ${CUTEst_LIBRARY})
     target_include_directories(CUTEst::cutest
         INTERFACE ${CUTEst_DIR}/include)
 endif()
-if(CUTEst_FOUND AND NOT TARGET CUTEst::objects)
+if (CUTEst_FOUND AND NOT TARGET CUTEst::objects)
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CUTEst)
     set(CUTEst_OBJECTS
         ${CMAKE_CURRENT_BINARY_DIR}/CUTEst/cutest.o
@@ -133,7 +133,7 @@ if(CUTEst_FOUND AND NOT TARGET CUTEst::objects)
         LINKER_LANGUAGE Fortran
         IMPORTED_OBJECTS "${CUTEst_OBJECTS}")
 endif()
-if(CUTEst_FOUND AND NOT TARGET CUTEst::headers)
+if (CUTEst_FOUND AND NOT TARGET CUTEst::headers)
     add_library(CUTEst::headers INTERFACE IMPORTED)
     target_include_directories(CUTEst::headers
         INTERFACE ${CUTEst_DIR}/include)

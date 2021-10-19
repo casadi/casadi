@@ -46,11 +46,7 @@ Note that this is purely `CasADi <https://web.casadi.org/>`_ code, so thus far, 
     import panocpy as pa
     import numpy as np
 
-    cgen, n, m, num_p = pa.generate_casadi_problem(cost_function, g_function, name=name)
-    # Code generator, dimension of decision variables, number of constraints (dual dimension), parameter dimension
-
-    # Compile and load the problem
-    prob = pa.compile_and_load_problem(cgen, n, m, num_p, name=name)
+    prob = pa.generate_and_compile_casadi_problem(cost_function, g_function, name=name)
 
 The resulting object `prob` is an instance of :py:class:`panocpy._panocpy.Problem`. Before 
 we can solve the problem, we need to set a few numerical values to the 
@@ -77,7 +73,7 @@ We set some initial guesses for the problem and run the optimization::
 
     # Set initial guesses at arbitrary values
     x_sol = np.array([1.0, 2.0])
-    y_sol = np.zeros((m,))
+    y_sol = np.zeros((prob.m,))
 
     # Solve the problem
     x_sol, y_sol, stats = solver(prob, x_sol, y_sol)

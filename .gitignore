@@ -12,3 +12,5 @@ wheelhouse
 !.vscode/launch.json
 !.vscode/settings.json
 .~lock.*
+src/panocpy/_panocpy.pyd
+src/panocpy/bin/*.dll

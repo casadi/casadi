@@ -15,9 +15,14 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         PRIVATE
             panoc-alm::panoc-alm-obj
             pybind11::pybind11
-            -static-libstdc++
-            -static-libgcc
     )
+    if (NOT WIN32)
+        target_link_libraries(_panocpy 
+            PRIVATE
+                -static-libstdc++
+                -static-libgcc
+        )
+    endif()
     target_compile_definitions(_panocpy PRIVATE VERSION_INFO=${PROJECT_VERSION})
     set(PANOCPY_RPATH "\${ORIGIN}/../../../.." "\${ORIGIN}")
     set_target_properties(_panocpy PROPERTIES
@@ -28,7 +33,9 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         C_VISIBILITY_PRESET hidden
         INSTALL_RPATH "${PANOCPY_RPATH}"
     )
-    target_link_options(_panocpy PRIVATE "LINKER:--exclude-libs,ALL")
+    if (NOT WIN32)
+        target_link_options(_panocpy PRIVATE "LINKER:--exclude-libs,ALL")
+    endif()
     target_compile_definitions(_panocpy PRIVATE PANOCPY_MODULE_NAME=_panocpy)
     if (TARGET panoc-alm::casadi-loader)
         target_compile_definitions(_panocpy PRIVATE PANOCPY_HAVE_CASADI)
