@@ -1,6 +1,7 @@
 #pragma once
 
 #include <panoc-alm/inner/directions/decl/lbfgs.hpp>
+#include <stdexcept>
 #include <type_traits>
 
 namespace pa {
@@ -29,8 +30,8 @@ inline bool LBFGS::update_valid(LBFGSParams params, real_t yᵀs, real_t sᵀs,
     return true;
 }
 
-inline bool LBFGS::update(crvec xₖ, crvec xₖ₊₁, crvec pₖ,
-                          crvec pₖ₊₁, Sign sign, bool forced) {
+inline bool LBFGS::update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁, Sign sign,
+                          bool forced) {
     const auto s = xₖ₊₁ - xₖ;
     const auto y = sign == Sign::Positive ? pₖ₊₁ - pₖ : pₖ - pₖ₊₁;
     real_t yᵀs   = y.dot(s);
@@ -185,6 +186,8 @@ inline void LBFGS::reset() {
 }
 
 inline void LBFGS::resize(size_t n) {
+    if (params.memory < 1)
+        throw std::invalid_argument("LBFGSParams::memory must be > 1");
     sto.resize(n + 1, params.memory * 2);
     reset();
 }
@@ -203,26 +206,25 @@ inline void LBFGS::scale_y(real_t factor) {
     }
 }
 
-inline void PANOCDirection<LBFGS>::initialize(crvec x₀, crvec x̂₀,
-                                              crvec p₀, crvec grad₀) {
+inline void PANOCDirection<LBFGS>::initialize(crvec x₀, crvec x̂₀, crvec p₀,
+                                              crvec grad₀) {
     lbfgs.resize(x₀.size());
     (void)x̂₀;
     (void)p₀;
     (void)grad₀;
 }
 
-inline bool PANOCDirection<LBFGS>::update(crvec xₖ, crvec xₖ₊₁,
-                                          crvec pₖ, crvec pₖ₊₁,
-                                          crvec grad_new, const Box &C,
-                                          real_t γ_new) {
+inline bool PANOCDirection<LBFGS>::update(crvec xₖ, crvec xₖ₊₁, crvec pₖ,
+                                          crvec pₖ₊₁, crvec grad_new,
+                                          const Box &C, real_t γ_new) {
     (void)grad_new;
     (void)C;
     (void)γ_new;
     return lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, LBFGS::Sign::Negative);
 }
 
-inline bool PANOCDirection<LBFGS>::apply(crvec xₖ, crvec x̂ₖ,
-                                         crvec pₖ, real_t γ, rvec qₖ) {
+inline bool PANOCDirection<LBFGS>::apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ,
+                                         rvec qₖ) {
     (void)xₖ;
     (void)x̂ₖ;
     qₖ = pₖ;
