@@ -128,6 +128,58 @@ void casadi_jac_init(const casadi_jac_prob<T1>* p, casadi_jac_data<T1>* d,
   d->nzind = *iw; *iw += p->n_out;
 }
 
+// SYMBOL "jac_pre"
+template<typename T1>
+void casadi_jac_pre(const casadi_jac_prob<T1>* p, casadi_jac_data<T1>* d, casadi_int c) {
+  // Local variables
+  casadi_int i, kc, vin, vout, Jk;
+  double nom, inv_nom;
+  const casadi_int *color_colind, *color_row, *jac_colind, *jac_row;
+  // Extract sparsities
+  color_colind = p->coloring + 2;
+  color_row = color_colind + p->n_color + 1;
+  jac_colind = p->sp_ext + 2;
+  jac_row = jac_colind + p->n_in + 1;
+  // Loop over input indices for color
+  d->nseed = d->nsens = 0;
+  for (kc = color_colind[c]; kc < color_colind[c + 1]; ++kc) {
+    vin = color_row[kc];
+    // Nominal value, used as a seed for the column
+    nom = p->nom_in ? p->nom_in[vin] : 1;
+    inv_nom = 1. / nom;
+    // Collect seeds for column
+    d->seed[d->nseed] = nom;
+    d->iseed[d->nseed] = vin;
+    d->nseed++;
+    // Request corresponding outputs
+    for (Jk = jac_colind[vin]; Jk < jac_colind[vin + 1]; ++Jk) {
+      vout = jac_row[Jk];
+      d->scal[d->nsens] = inv_nom;
+      d->isens[d->nsens] = vout;
+      d->wrt[d->nsens] = vin;
+      d->nzind[d->nsens] = Jk;
+      d->nsens++;
+    }
+  }
+  // Map indices
+  if (p->map_in) {
+    for (i = 0; i < d->nseed; ++i) d->iseed[i] = p->map_in[d->iseed[i]];
+    for (i = 0; i < d->nsens; ++i) d->wrt[i] = p->map_in[d->wrt[i]];
+  }
+  if (p->map_out) {
+    for (i = 0; i < d->nsens; ++i) d->isens[i] = p->map_out[d->isens[i]];
+  }
+}
+
+// SYMBOL "jac_scale"
+template<typename T1>
+void casadi_jac_scale(const casadi_jac_prob<T1>* p, casadi_jac_data<T1>* d) {
+  // Local variables
+  casadi_int i;
+  // Scale derivatives
+  for (i = 0; i < d->nsens; ++i) d->sens[i] *= d->scal[i];
+}
+
 // SYMBOL "get_sub"
 template<typename T1>
 void casadi_get_sub(T1* sub, const casadi_int* sp_a, const T1* nz_a,

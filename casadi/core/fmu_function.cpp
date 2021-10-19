@@ -1340,53 +1340,17 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Evalute Jacobian blocks
   if (need_jac || need_adj) {
     casadi_int c_begin = 0, c_end = coloring_.size2();
-    // Local variables
-    casadi_int c, i, kc, vin, vout, Jk;
-    double nom, inv_nom;
-    const casadi_int *color_colind, *color_row, *jac_colind, *jac_row;
-    // Extract sparsities
-    color_colind = p_.coloring + 2;
-    color_row = color_colind + p_.n_color + 1;
-    jac_colind = p_.sp_ext + 2;
-    jac_row = jac_colind + p_.n_in + 1;
     // Loop over colors
-    for (c = c_begin; c < c_end; ++c) {
-      // Loop over input indices for color
-      d.nseed = d.nsens = 0;
-      for (kc = color_colind[c]; kc < color_colind[c + 1]; ++kc) {
-        vin = color_row[kc];
-        // Nominal value, used as a seed for the column
-        nom = p_.nom_in ? p_.nom_in[vin] : 1;
-        inv_nom = 1. / nom;
-        // Collect seeds for column
-        d.seed[d.nseed] = nom;
-        d.iseed[d.nseed] = vin;
-        d.nseed++;
-        // Request corresponding outputs
-        for (Jk = jac_colind[vin]; Jk < jac_colind[vin + 1]; ++Jk) {
-          vout = jac_row[Jk];
-          d.scal[d.nsens] = inv_nom;
-          d.isens[d.nsens] = vout;
-          d.wrt[d.nsens] = vin;
-          d.nzind[d.nsens] = Jk;
-          d.nsens++;
-        }
-      }
-      // Convert indices to Fmu indices
-      if (p_.map_in) {
-        for (i = 0; i < d.nseed; ++i) d.iseed[i] = p_.map_in[d.iseed[i]];
-        for (i = 0; i < d.nsens; ++i) d.wrt[i] = p_.map_in[d.wrt[i]];
-      }
-      if (p_.map_out) {
-        for (i = 0; i < d.nsens; ++i) d.isens[i] = p_.map_out[d.isens[i]];
-      }
+    for (casadi_int c = c_begin; c < c_end; ++c) {
+      // Get derivative directions
+      casadi_jac_pre(&p_, &d, c);
       // Calculate derivatives
       fmu_->set_seed(m, d.nseed, d.iseed, d.seed);
-      fmu_->request_sens(m, d.nsens, d.isens,d.wrt);
+      fmu_->request_sens(m, d.nsens, d.isens, d.wrt);
       if (fmu_->eval_derivative(m)) return 1;
       fmu_->get_sens(m, d.nsens, d.isens, d.sens);
       // Scale derivatives
-      for (casadi_int i = 0; i < d.nsens; ++i)d.sens[i] *= d.scal[i];
+      casadi_jac_scale(&p_, &d);
       // Collect Jacobian nonzeros
       if (need_jac) {
         for (casadi_int i = 0; i < d.nsens; ++i) jac_nz[d.nzind[i]] = d.sens[i];
