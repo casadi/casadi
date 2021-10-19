@@ -580,9 +580,13 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::enum_<pa::PANOCStopCrit>(
         m, "PANOCStopCrit", "C++ documentation: :cpp:enum:`pa::PANOCStopCrit`")
         .value("ApproxKKT", pa::PANOCStopCrit::ApproxKKT)
+        .value("ApproxKKT2", pa::PANOCStopCrit::ApproxKKT2)
         .value("ProjGradNorm", pa::PANOCStopCrit::ProjGradNorm)
+        .value("ProjGradNorm2", pa::PANOCStopCrit::ProjGradNorm2)
         .value("ProjGradUnitNorm", pa::PANOCStopCrit::ProjGradUnitNorm)
+        .value("ProjGradUnitNorm2", pa::PANOCStopCrit::ProjGradUnitNorm2)
         .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
+        .value("FPRNorm2", pa::PANOCStopCrit::FPRNorm2)
         .export_values();
 
     py::class_<pa::StructuredPANOCLBFGSParams>(

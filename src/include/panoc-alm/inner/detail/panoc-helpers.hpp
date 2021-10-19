@@ -142,8 +142,7 @@ inline void calc_x̂(const Problem &prob, ///< [in]  Problem description
     x̂ = x + p;
 }
 
-/// @f[ \left\| \gamma_k^{-1} (x^k - \hat x^k) + \nabla \psi(\hat x^k) -
-/// \nabla \psi(x^k) \right\|_\infty @f]
+/// Compute the ε from the stopping criterion, see @ref PANOCStopCrit.
 inline real_t calc_error_stop_crit(
     PANOCStopCrit crit, ///< [in]  What stoppint criterion to use
     crvec pₖ,      ///< [in]  Projected gradient step @f$ \hat x^k - x^k @f$
@@ -158,18 +157,32 @@ inline real_t calc_error_stop_crit(
             auto err = (1 / γ) * pₖ + (grad_ψₖ - grad_̂ψₖ);
             // These parentheses     ^^^               ^^^     are important to
             // prevent catastrophic cancellation when the step is small
-            auto ε = vec_util::norm_inf(err);
-            return ε;
+            return vec_util::norm_inf(err);
+        }
+        case PANOCStopCrit::ApproxKKT2: {
+            auto err = (1 / γ) * pₖ + (grad_ψₖ - grad_̂ψₖ);
+            // These parentheses     ^^^               ^^^     are important to
+            // prevent catastrophic cancellation when the step is small
+            return err.norm();
+        }
+        case PANOCStopCrit::ProjGradNorm: {
+            return vec_util::norm_inf(pₖ);
+        }
+        case PANOCStopCrit::ProjGradNorm2: {
+            return pₖ.norm();
         }
         case PANOCStopCrit::ProjGradUnitNorm: {
             return vec_util::norm_inf(
                 projected_gradient_step(C, 1, xₖ, grad_ψₖ));
         }
-        case PANOCStopCrit::ProjGradNorm: {
-            return vec_util::norm_inf(pₖ);
+        case PANOCStopCrit::ProjGradUnitNorm2: {
+            return projected_gradient_step(C, 1, xₖ, grad_ψₖ).norm();
         }
         case PANOCStopCrit::FPRNorm: {
             return vec_util::norm_inf(pₖ) / γ;
+        }
+        case PANOCStopCrit::FPRNorm2: {
+            return pₖ.norm() / γ;
         }
     }
     throw std::out_of_range("Invalid PANOCStopCrit");
