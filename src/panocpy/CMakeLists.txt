@@ -42,13 +42,7 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         target_link_libraries(_panocpy PRIVATE panoc-alm::casadi-loader-obj)
     endif()
 
-    if (WIN32)
-        set(PANOCPY_GEN_STUB_DEFAULT Off)
-    else()
-        set(PANOCPY_GEN_STUB_DEFAULT On)
-    endif()
-
-    option(PANOCPY_GEN_STUB "Generate Python stub files (.pyi) for the panocpy module." ${PANOCPY_GEN_STUB_DEFAULT})
+    option(PANOCPY_GEN_STUB "Generate Python stub files (.pyi) for the panocpy module." On)
 
     if (PANOCPY_GEN_STUB)
         add_custom_command(TARGET _panocpy POST_BUILD 
