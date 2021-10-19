@@ -327,6 +327,18 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("get_name", &pa::PolymorphicInnerSolverBase::get_name)
         .def("get_params", &pa::PolymorphicInnerSolverBase::get_params);
 
+    py::enum_<pa::PANOCStopCrit>(
+        m, "PANOCStopCrit", "C++ documentation: :cpp:enum:`pa::PANOCStopCrit`")
+        .value("ApproxKKT", pa::PANOCStopCrit::ApproxKKT)
+        .value("ApproxKKT2", pa::PANOCStopCrit::ApproxKKT2)
+        .value("ProjGradNorm", pa::PANOCStopCrit::ProjGradNorm)
+        .value("ProjGradNorm2", pa::PANOCStopCrit::ProjGradNorm2)
+        .value("ProjGradUnitNorm", pa::PANOCStopCrit::ProjGradUnitNorm)
+        .value("ProjGradUnitNorm2", pa::PANOCStopCrit::ProjGradUnitNorm2)
+        .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
+        .value("FPRNorm2", pa::PANOCStopCrit::FPRNorm2)
+        .export_values();
+
     py::class_<pa::PGAParams>(m, "PGAParams",
                               "C++ documentation: :cpp:class:`pa::PGAParams`")
         .def(py::init())
@@ -576,18 +588,6 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def("__str__", &pa::PolymorphicGAAPGASolver::get_name)
         .def_property_readonly("params",
                                &pa::PolymorphicGAAPGASolver::get_params);
-
-    py::enum_<pa::PANOCStopCrit>(
-        m, "PANOCStopCrit", "C++ documentation: :cpp:enum:`pa::PANOCStopCrit`")
-        .value("ApproxKKT", pa::PANOCStopCrit::ApproxKKT)
-        .value("ApproxKKT2", pa::PANOCStopCrit::ApproxKKT2)
-        .value("ProjGradNorm", pa::PANOCStopCrit::ProjGradNorm)
-        .value("ProjGradNorm2", pa::PANOCStopCrit::ProjGradNorm2)
-        .value("ProjGradUnitNorm", pa::PANOCStopCrit::ProjGradUnitNorm)
-        .value("ProjGradUnitNorm2", pa::PANOCStopCrit::ProjGradUnitNorm2)
-        .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
-        .value("FPRNorm2", pa::PANOCStopCrit::FPRNorm2)
-        .export_values();
 
     py::class_<pa::StructuredPANOCLBFGSParams>(
         m, "StructuredPANOCLBFGSParams",
