@@ -1160,7 +1160,7 @@ void FmuFunction::init(const Dict& opts) {
         // Add selection
         if (!exists) {
           for (size_t j : oind) {
-            jac_in_.push_back(j);
+            jac_out_.push_back(j);
             in_jac[j] = true;
           }
         }
