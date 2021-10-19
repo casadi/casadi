@@ -46,6 +46,7 @@ jobs:
         # CFLAGS: "/arch:AVX2 /bigobj"
         CXXFLAGS: "/bigobj"
         CFLAGS: "/bigobj"
+        PYTHONUTF8: 1
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
