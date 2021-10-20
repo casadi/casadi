@@ -254,9 +254,9 @@ option(SWIG_EXPORT "Export SWIG" OFF)
 option(SWIG_IMPORT "Export SWIG" OFF)
 
 # enabling OpenMP support if requested
-option(WITH_OPENMP "Compile with parallelization support" OFF)
+option(WITH_OPENMP "Compile with parallelization support using OpenMP" OFF)
 if(WITH_OPENMP)
-  find_package(OpenMP)
+  find_package(OpenMP REQUIRED)
   if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DWITH_OPENMP")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -DWITH_OPENMP")
@@ -264,7 +264,7 @@ if(WITH_OPENMP)
 endif()
 
 # enabling Threads support if requested
-option(WITH_THREAD "Compile with parallelization support" OFF)
+option(WITH_THREAD "Compile with parallelization support using POSIX Threads" OFF)
 option(WITH_THREAD_MINGW "For MINGW, use mingw-std-threads" OFF)
 if(WITH_THREAD)
   add_definitions(-DCASADI_WITH_THREAD)
