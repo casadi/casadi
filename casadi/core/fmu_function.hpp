@@ -214,6 +214,15 @@ class FmuFunction;
 struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   // Function object
   const FmuFunction& self;
+  // Evaluation arguments, work vectors
+  const double** arg;
+  double** res;
+  casadi_int* iw;
+  double* w;
+  // Extended Jacobian
+  double *jac_nz;
+  // Adjoint seeds, sensitivities being calculated
+  double *aseed, *asens;
   // Component memory
   fmi2Component c;
   // Input and output buffers
@@ -512,6 +521,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Jacobian memory
   casadi_jac_prob<double> p_;
 
+  // Work vector size for Jacobian calculation
+  casadi_int jac_iw_, jac_w_;
+
+  // Number of threads supported
+  casadi_int max_n_threads_;
+
   ///@{
   /** \brief Number of function inputs and outputs */
   size_t get_n_in() override { return in_.size();}
@@ -526,6 +541,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Evaluate numerically
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+
+  // Evaluate numerically, single thread
+  int eval_thread(FmuMemory* m, casadi_int thread, casadi_int n_thread,
+    bool need_jac, bool need_adj) const;
 
   ///@{
   /** \brief Return sparsity of Jacobian of an output respect to an input */

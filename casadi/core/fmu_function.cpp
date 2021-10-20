@@ -1180,16 +1180,23 @@ void FmuFunction::init(const Dict& opts) {
     p_.map_out = get_ptr(jac_out_);
     p_.map_in = get_ptr(jac_in_);
 
-    // Work vectors for Jacobian calculation
-    casadi_int jac_iw, jac_w;
-    casadi_jac_work(&p_, &jac_iw, &jac_w);
-    alloc_iw(jac_iw, true);
-    alloc_w(jac_w, true);
-    // Work vector for storing extended Jacobian
+    // Number of threads supported
+    max_n_threads_ = 1;
+
+    // Do not use more threads than there are colors in the Jacobian
+    max_n_threads_ = std::min(max_n_threads_, coloring_.size2());
+
+    // Work vectors for Jacobian calculation, for each thread
+    casadi_jac_work(&p_, &jac_iw_, &jac_w_);
+    alloc_iw(max_n_threads_ * jac_iw_, true);
+    alloc_w(max_n_threads_ * jac_w_, true);
+
+    // Work vector for storing extended Jacobian, shared between threads
     if (has_jac_) {
       alloc_w(sp_ext_.nnz(), true);  // jac_nz
     }
-    // Work vectors for adjoint derivative calculation
+
+    // Work vectors for adjoint derivative calculation, shared between threads
     if (has_adj_) {
       alloc_w(fmu_->oind_.size(), true);  // aseed
       alloc_w(fmu_->iind_.size(), true);  // asens
@@ -1279,20 +1286,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Get memory struct
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != 0, "Memory is null");
-  // Data for Jacobian/adjoint calculation
-  casadi_jac_data<double> d;
-  double *aseed, *asens, *jac_nz;
-  if (has_adj_ || has_jac_) {
-    casadi_jac_init(&p_, &d, &iw, &w);
-    if (has_jac_) {
-      jac_nz = w; w += sp_ext_.nnz();
-    }
-    if (has_adj_) {
-      aseed = w; w += fmu_->oind_.size();
-      asens = w; w += fmu_->iind_.size();
-    }
-  }
-  // What other blocks are there?
+  // What blocks are there?
   bool need_jac = false, need_adj = false;
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k]) {
@@ -1303,64 +1297,33 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       }
     }
   }
-  // Pass all regular inputs
-  for (size_t k = 0; k < in_.size(); ++k) {
-    if (in_[k].type == REG_INPUT) {
-      fmu_->set(m, in_[k].ind, arg[k]);
-    }
-  }
-  // Request all regular outputs to be evaluated
-  for (size_t k = 0; k < out_.size(); ++k) {
-    if (res[k] && out_[k].type == REG_OUTPUT) {
-      fmu_->request(m, out_[k].ind);
-    }
-  }
-  // Evaluate
-  if (fmu_->eval(m)) return 1;
-  // Get regular outputs
-  for (size_t k = 0; k < out_.size(); ++k) {
-    if (res[k] && out_[k].type == REG_OUTPUT) {
-      fmu_->get(m, out_[k].ind, res[k]);
-    }
-  }
-  // Setup adjoint calculation
-  if (need_adj) {
-    // Clear seed/sensitivity vectors
-    std::fill(aseed, aseed + fmu_->oind_.size(), 0);
-    std::fill(asens, asens + fmu_->iind_.size(), 0);
-    // Copy adjoint seeds to aseed
-    for (size_t i = 0; i < in_.size(); ++i) {
-      if (arg[i] && in_[i].type == ADJ_SEED) {
-        const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
-        for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
-      }
-    }
-  }
-
-  // Evalute Jacobian blocks
+  // Work vectors, shared between threads
+  double *aseed, *asens, *jac_nz;
   if (need_jac || need_adj) {
-    casadi_int c_begin = 0, c_end = coloring_.size2();
-    // Loop over colors
-    for (casadi_int c = c_begin; c < c_end; ++c) {
-      // Get derivative directions
-      casadi_jac_pre(&p_, &d, c);
-      // Calculate derivatives
-      fmu_->set_seed(m, d.nseed, d.iseed, d.seed);
-      fmu_->request_sens(m, d.nsens, d.isens, d.wrt);
-      if (fmu_->eval_derivative(m)) return 1;
-      fmu_->get_sens(m, d.nsens, d.isens, d.sens);
-      // Scale derivatives
-      casadi_jac_scale(&p_, &d);
-      // Collect Jacobian nonzeros
-      if (need_jac) {
-        for (casadi_int i = 0; i < d.nsens; ++i) jac_nz[d.nzind[i]] = d.sens[i];
-      }
-      // Propagate adjoint sensitivities
-      if (need_adj) {
-        for (casadi_int i = 0; i < d.nsens; ++i) asens[d.isens[i]] += aseed[d.iseed[i]] * d.sens[i];
-      }
+    if (need_jac) {
+      jac_nz = w; w += sp_ext_.nnz();
+    }
+    if (need_adj) {
+      aseed = w; w += fmu_->oind_.size();
+      asens = w; w += fmu_->iind_.size();
     }
   }
+  // Number of threads needed
+  casadi_int n_threads = need_jac || need_adj ? max_n_threads_ : 1;
+  // Set work vectors
+  m->arg = arg;
+  m->res = res;
+  m->iw = iw;
+  m->w = w;
+  m->aseed = aseed;
+  m->asens = asens;
+  m->jac_nz = jac_nz;
+  // Return flag
+  int flag;
+  // Evaluate serially
+  flag = eval_thread(m, 0, n_threads, need_jac, need_adj);
+  // Error in evaluation
+  if (flag) return 1;
   // Fetch Jacobian blocks
   if (need_jac) {
     for (size_t k = 0; k < out_.size(); ++k) {
@@ -1376,6 +1339,81 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       if (res[i] && out_[i].type == ADJ_SENS) {
         double* r = res[i];
         for (size_t id : fmu_->ired_[out_[i].wrt]) *r++ = aseed[id];
+      }
+    }
+  }
+  // Successful return
+  return 0;
+}
+
+int FmuFunction::eval_thread(FmuMemory* m, casadi_int thread, casadi_int n_thread,
+    bool need_jac, bool need_adj) const {
+  // Data for Jacobian/adjoint calculation
+  casadi_jac_data<double> d;
+  if (need_jac || need_adj) {
+    casadi_jac_init(&p_, &d, &m->iw, &m->w);
+  }
+  // Pass all regular inputs
+  for (size_t k = 0; k < in_.size(); ++k) {
+    if (in_[k].type == REG_INPUT) {
+      fmu_->set(m, in_[k].ind, m->arg[k]);
+    }
+  }
+  // Request all regular outputs to be evaluated
+  for (size_t k = 0; k < out_.size(); ++k) {
+    if (m->res[k] && out_[k].type == REG_OUTPUT) {
+      fmu_->request(m, out_[k].ind);
+    }
+  }
+  // Evaluate
+  if (fmu_->eval(m)) return 1;
+  // Get regular outputs (master thread only)
+  if (thread == 0) {
+    for (size_t k = 0; k < out_.size(); ++k) {
+      if (m->res[k] && out_[k].type == REG_OUTPUT) {
+        fmu_->get(m, out_[k].ind, m->res[k]);
+      }
+    }
+  }
+  // Setup adjoint calculation
+  if (need_adj) {
+    // Clear seed/sensitivity vectors
+    std::fill(m->aseed, m->aseed + fmu_->oind_.size(), 0);
+    std::fill(m->asens, m->asens + fmu_->iind_.size(), 0);
+    // Copy adjoint seeds to aseed
+    for (size_t i = 0; i < in_.size(); ++i) {
+      if (m->arg[i] && in_[i].type == ADJ_SEED) {
+        const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
+        for (size_t k = 0; k < oind.size(); ++k) m->aseed[oind[k]] = m->arg[i][k];
+      }
+    }
+  }
+
+  // Evalute Jacobian blocks
+  if (need_jac || need_adj) {
+    // Selection of colors to be evaluated for the thread
+    casadi_int c_begin = (thread * coloring_.size2()) / n_thread;
+    casadi_int c_end = ((thread + 1) * coloring_.size2()) / n_thread;
+    // Loop over colors
+    for (casadi_int c = c_begin; c < c_end; ++c) {
+      // Get derivative directions
+      casadi_jac_pre(&p_, &d, c);
+      // Calculate derivatives
+      fmu_->set_seed(m, d.nseed, d.iseed, d.seed);
+      fmu_->request_sens(m, d.nsens, d.isens, d.wrt);
+      if (fmu_->eval_derivative(m)) return 1;
+      fmu_->get_sens(m, d.nsens, d.isens, d.sens);
+      // Scale derivatives
+      casadi_jac_scale(&p_, &d);
+      // Collect Jacobian nonzeros
+      if (need_jac) {
+        for (casadi_int i = 0; i < d.nsens; ++i)
+          m->jac_nz[d.nzind[i]] = d.sens[i];
+      }
+      // Propagate adjoint sensitivities
+      if (need_adj) {
+        for (casadi_int i = 0; i < d.nsens; ++i)
+          m->asens[d.isens[i]] += m->aseed[d.iseed[i]] * d.sens[i];
       }
     }
   }
