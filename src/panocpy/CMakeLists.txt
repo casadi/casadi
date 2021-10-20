@@ -45,19 +45,11 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
     option(PANOCPY_GEN_STUB "Generate Python stub files (.pyi) for the panocpy module." On)
 
     if (PANOCPY_GEN_STUB)
+        set(STUBS_DIR ${CMAKE_CURRENT_BINARY_DIR}/stubs)
         add_custom_command(TARGET _panocpy POST_BUILD 
-            COMMAND "${Python3_EXECUTABLE}"
-                -m pybind11_stubgen _panocpy
-                    --ignore-invalid=defaultarg
-                    --no-setup-py
-                    -o ${CMAKE_CURRENT_BINARY_DIR}
-            WORKING_DIRECTORY $<TARGET_FILE_DIR:_panocpy>
-            USES_TERMINAL
-            BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/_panocpy-stubs/__init__.pyi)
-
-        add_custom_command(TARGET _panocpy POST_BUILD 
-            COMMAND stubgen -m panocpy -m panocpy.casadi_problem
-                    -o ${CMAKE_CURRENT_BINARY_DIR}/stubs
+            COMMAND stubgen 
+                    -m panocpy -m panocpy.casadi_problem -m panocpy._panocpy
+                    -o ${STUBS_DIR}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..
             USES_TERMINAL)
     endif()
@@ -66,11 +58,9 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         install(TARGETS _panocpy
                 DESTINATION .)
         if (PANOCPY_GEN_STUB)
-            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_panocpy-stubs/__init__.pyi
-                    RENAME _panocpy.pyi
-                    DESTINATION .)
-            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/stubs/panocpy/__init__.pyi
-                        ${CMAKE_CURRENT_BINARY_DIR}/stubs/panocpy/casadi_problem.pyi
+            install(FILES ${STUBS_DIR}/panocpy/__init__.pyi
+                          ${STUBS_DIR}/panocpy/casadi_problem.pyi
+                          ${STUBS_DIR}/panocpy/_panocpy.pyi
                     DESTINATION .)
         endif()
     endif()

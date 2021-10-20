@@ -5,5 +5,4 @@ pybind11~=2.7.1
 scikit-build
 ninja
 cmake
-pybind11-stubgen
 mypy

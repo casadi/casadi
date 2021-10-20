@@ -6,7 +6,6 @@ requires = [
     "ninja",
     "cmake",
     "scikit-build",
-    "pybind11-stubgen",
     "mypy",
 ]
 
