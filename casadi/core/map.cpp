@@ -395,10 +395,10 @@ namespace casadi {
   }
 
   void OmpMap::init(const Dict& opts) {
-#ifndef CASADI_WITH_THREAD
-    casadi_warning("CasADi was not compiled with WITH_THREAD=ON. "
+#ifndef WITH_OPENMP
+    casadi_warning("CasADi was not compiled with WITH_OPENMP=ON. "
                    "Falling back to serial evaluation.");
-#endif // CASADI_WITH_THREAD
+#endif // WITH_OPENMP
     // Call the initialization method of the base class
     Map::init(opts);
 
