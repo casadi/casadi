@@ -419,14 +419,13 @@ void FmuFunction::free_mem(void *mem) const {
   // Free slave memory
   for (FmuMemory*& s : m->slaves) {
     if (!s) continue;
-    // Free FMU mempry
+    // Free FMU memory
     if (s->c) {
       fmu_->free_instance(s->c);
       s->c = nullptr;
     }
     // Free the slave
     delete s;
-    s = nullptr;
   }
   // Free FMI memory
   if (m->c) {
@@ -1373,14 +1372,12 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   bool need_ext = need_jac || need_adj;
   // Work vectors, shared between threads
   double *aseed = 0, *asens = 0, *jac_nz = 0;
-  if (need_jac || need_adj) {
-    if (need_jac) {
-      jac_nz = w; w += sp_ext_.nnz();
-    }
-    if (need_adj) {
-      aseed = w; w += fmu_->oind_.size();
-      asens = w; w += fmu_->iind_.size();
-    }
+  if (need_jac) {
+    jac_nz = w; w += sp_ext_.nnz();
+  }
+  if (need_adj) {
+    aseed = w; w += fmu_->oind_.size();
+    asens = w; w += fmu_->iind_.size();
   }
   // Set work vectors (for master thread)
   m->arg = arg;
@@ -1391,7 +1388,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   m->asens = asens;
   m->jac_nz = jac_nz;
   // Return flag
-  int flag;
+  int flag = 0;
   // Evaluate, serially or in parallel
   if (parallelization_ == Parallelization::SERIAL || !need_ext || max_n_task_ == 1) {
     // Evaluate serially
@@ -1403,13 +1400,15 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     {
       // Get thread number
       casadi_int thread = omp_get_thread_num();
-      // Get actual number of threads
+      // Get number of threads in region
       casadi_int num_threads = omp_get_num_threads();
+      // Number of threads that are actually used
+      casadi_int num_used_threads = std::min(num_threads, max_n_task_);
       // Evaluate in parallel
       if (thread == 0) {
         // Master thread
-        flag = eval_thread(m, thread, max_n_task_, need_jac, need_adj);
-      } else if (thread < max_n_task_) {
+        flag = eval_thread(m, thread, num_used_threads, need_jac, need_adj);
+      } else if (thread < num_used_threads) {
         // Get slave thread
         FmuMemory* s = m->slaves.at(thread - 1);
         // Set work vectors (for slave thread)
@@ -1421,7 +1420,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         s->asens = asens;
         s->jac_nz = jac_nz;
         // Evaluate
-        flag = eval_thread(s, thread, max_n_task_, need_jac, need_adj);
+        flag = eval_thread(s, thread, num_used_threads, need_jac, need_adj);
       } else {
         // Nothing to do for thread
         flag = 0;
@@ -1579,10 +1578,14 @@ std::string FmuFunction::pop_prefix(const std::string& s, std::string* rem) {
 
 Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
     const std::vector<std::string>& onames, const Dict& opts) const {
+  // Hack: Inherit parallelization, verbosity option
+  Dict opts1 = opts;
+  opts1["parallelization"] = to_string(parallelization_);
+  opts1["verbose"] = verbose_;
   // Return new instance of class
   Function ret;
   ret.own(new FmuFunction(name, fmu_, inames, onames));
-  ret->construct(opts);
+  ret->construct(opts1);
   return ret;
 }
 
@@ -1592,10 +1595,14 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
     const Dict& opts) const {
   // Only single directional derivative implemented
   casadi_assert(nadj == 1, "Not implemented");
+  // Hack: Inherit parallelization option
+  Dict opts1 = opts;
+  opts1["parallelization"] = to_string(parallelization_);
+  opts1["verbose"] = verbose_;
   // Return new instance of class
   Function ret;
   ret.own(new FmuFunction(name, fmu_, inames, onames));
-  ret->construct(opts);
+  ret->construct(opts1);
   return ret;
 }
 
