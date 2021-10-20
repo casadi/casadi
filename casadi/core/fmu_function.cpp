@@ -32,6 +32,18 @@
 #include <iostream>
 #include <sstream>
 
+#ifdef WITH_OPENMP
+#include <omp.h>
+#endif // WITH_OPENMP
+
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.thread.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <thread>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif // CASADI_WITH_THREAD
+
 namespace casadi {
 
 #ifdef WITH_FMU
@@ -380,19 +392,48 @@ int FmuFunction::init_mem(void* mem) const {
   casadi_assert(mem != 0, "Memory is null");
   // Instantiate base classes
   if (FunctionInternal::init_mem(mem)) return 1;
-  // Call initialization routine in Fmu
-  return fmu_->init_mem(static_cast<FmuMemory*>(mem));
+  // Initialize master and all slaves
+  FmuMemory* m = static_cast<FmuMemory*>(mem);
+  for (casadi_int i = 0; i < max_n_task_; ++i) {
+    // Initialize the memory object itself or a slave
+    FmuMemory* m1 = i == 0 ? m : m->slaves.at(i - 1);
+    if (fmu_->init_mem(m1)) return 1;
+  }
+  return 0;
+}
+
+void* FmuFunction::alloc_mem() const {
+  // Create (master) memory object
+  FmuMemory* m = new FmuMemory(*this);
+  // Attach additional (slave) memory objects
+  for (casadi_int i = 1; i < max_n_task_; ++i) {
+    m->slaves.push_back(new FmuMemory(*this));
+  }
+  return m;
 }
 
 void FmuFunction::free_mem(void *mem) const {
   // Consistency check
   casadi_assert(mem != nullptr, "Memory is null");
-  // Free FMI memory
   FmuMemory* m = static_cast<FmuMemory*>(mem);
+  // Free slave memory
+  for (FmuMemory*& s : m->slaves) {
+    if (!s) continue;
+    // Free FMU mempry
+    if (s->c) {
+      fmu_->free_instance(s->c);
+      s->c = nullptr;
+    }
+    // Free the slave
+    delete s;
+    s = nullptr;
+  }
+  // Free FMI memory
   if (m->c) {
     fmu_->free_instance(m->c);
     m->c = nullptr;
   }
+  // Free the memory object
   delete m;
 }
 
@@ -1005,6 +1046,9 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   h_iter_ = 0;
   h_min_ = 0;
   h_max_ = inf;
+  parallelization_ = Parallelization::SERIAL;
+  // Number of parallel tasks, by default
+  max_n_task_ = 1;
 }
 
 FmuFunction::~FmuFunction() {
@@ -1042,7 +1086,10 @@ const Options FmuFunction::options_
       "Minimum step size"}},
     {"h_max",
      {OT_DOUBLE,
-      "Maximum step size"}}
+      "Maximum step size"}},
+    {"parallelization",
+     {OT_STRING,
+      "Parallelization [SERIAL|openmp|thread]"}}
    }
 };
 
@@ -1067,6 +1114,8 @@ void FmuFunction::init(const Dict& opts) {
       h_min_ = op.second;
     } else if (op.first=="h_max") {
       h_max_ = op.second;
+    } else if (op.first=="parallelization") {
+      parallelization_ = to_enum<Parallelization>(op.second, "serial");
     }
   }
 
@@ -1090,6 +1139,8 @@ void FmuFunction::init(const Dict& opts) {
       break;
     case ADJ_SENS:
       has_adj_ = true;
+      break;
+    default:
       break;
     }
   }
@@ -1180,16 +1231,32 @@ void FmuFunction::init(const Dict& opts) {
     p_.map_out = get_ptr(jac_out_);
     p_.map_in = get_ptr(jac_in_);
 
-    // Number of threads supported
-    max_n_threads_ = 1;
+    // Parallelization
+    switch (parallelization_) {
+      case Parallelization::SERIAL:
+        if (verbose_) casadi_message("Serial evaluation");
+        break;
+#ifdef WITH_OPENMP
+      case Parallelization::OPENMP:
+        max_n_task_ = omp_get_max_threads();
+        if (verbose_) casadi_message("OpenMP using at most " + str(max_n_task_) + " threads");
+        break;
+#endif // WITH_OPENMP
+#ifdef CASADI_WITH_THREAD
+      case Parallelization::THREAD:
+        max_n_task_ = std::thread::hardware_concurrency();
+        if (verbose_) casadi_message("std::thread using at most " + str(max_n_task_) + " threads");
+        break;
+#endif // CASADI_WITH_THREAD
+      default:
+        casadi_warning("Parallelization " + to_string(parallelization_)
+          + " not implemented. Falling back to serial evaluation");
+        parallelization_ = Parallelization::SERIAL;
+        break;
+    }
 
     // Do not use more threads than there are colors in the Jacobian
-    max_n_threads_ = std::min(max_n_threads_, coloring_.size2());
-
-    // Work vectors for Jacobian calculation, for each thread
-    casadi_jac_work(&p_, &jac_iw_, &jac_w_);
-    alloc_iw(max_n_threads_ * jac_iw_, true);
-    alloc_w(max_n_threads_ * jac_w_, true);
+    max_n_task_ = std::min(max_n_task_, coloring_.size2());
 
     // Work vector for storing extended Jacobian, shared between threads
     if (has_jac_) {
@@ -1201,6 +1268,11 @@ void FmuFunction::init(const Dict& opts) {
       alloc_w(fmu_->oind_.size(), true);  // aseed
       alloc_w(fmu_->iind_.size(), true);  // asens
     }
+
+    // Work vectors for Jacobian calculation, for each thread
+    casadi_jac_work(&p_, &jac_iw_, &jac_w_);
+    alloc_iw(max_n_task_ * jac_iw_, true);
+    alloc_w(max_n_task_ * jac_w_, true);
   }
 }
 
@@ -1297,8 +1369,10 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       }
     }
   }
+  // Do we need to calculate the extended Jacobian?
+  bool need_ext = need_jac || need_adj;
   // Work vectors, shared between threads
-  double *aseed, *asens, *jac_nz;
+  double *aseed = 0, *asens = 0, *jac_nz = 0;
   if (need_jac || need_adj) {
     if (need_jac) {
       jac_nz = w; w += sp_ext_.nnz();
@@ -1308,9 +1382,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       asens = w; w += fmu_->iind_.size();
     }
   }
-  // Number of threads needed
-  casadi_int n_threads = need_jac || need_adj ? max_n_threads_ : 1;
-  // Set work vectors
+  // Set work vectors (for master thread)
   m->arg = arg;
   m->res = res;
   m->iw = iw;
@@ -1320,8 +1392,54 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   m->jac_nz = jac_nz;
   // Return flag
   int flag;
-  // Evaluate serially
-  flag = eval_thread(m, 0, n_threads, need_jac, need_adj);
+  // Evaluate, serially or in parallel
+  if (parallelization_ == Parallelization::SERIAL || !need_ext || max_n_task_ == 1) {
+    // Evaluate serially
+    flag = eval_thread(m, 0, 1, need_jac, need_adj);
+  } else if (parallelization_ == Parallelization::OPENMP) {
+    #ifdef WITH_OPENMP
+    // Parallel region
+    #pragma omp parallel reduction(||:flag)
+    {
+      // Get thread number
+      casadi_int thread = omp_get_thread_num();
+      // Get actual number of threads
+      casadi_int num_threads = omp_get_num_threads();
+      // Evaluate in parallel
+      if (thread == 0) {
+        // Master thread
+        flag = eval_thread(m, thread, max_n_task_, need_jac, need_adj);
+      } else if (thread < max_n_task_) {
+        // Get slave thread
+        FmuMemory* s = m->slaves.at(thread - 1);
+        // Set work vectors (for slave thread)
+        s->arg = arg;
+        s->res = res;
+        s->iw = iw + jac_iw_ * thread;
+        s->w = w + jac_w_ * thread;
+        s->aseed = aseed;
+        s->asens = asens;
+        s->jac_nz = jac_nz;
+        // Evaluate
+        flag = eval_thread(s, thread, max_n_task_, need_jac, need_adj);
+      } else {
+        // Nothing to do for thread
+        flag = 0;
+      }
+    }
+    #else   // WITH_OPENMP
+    flag = 1;
+    #endif  // WITH_OPENMP
+  } else if (parallelization_ == Parallelization::THREAD) {
+    #ifdef CASADI_WITH_THREAD
+    casadi_error("Not implemented");
+    #else   // CASADI_WITH_THREAD
+    flag = 1;
+    #endif  // CASADI_WITH_THREAD
+  } else {
+    casadi_error("Unknown parallelization: " + to_string(parallelization_));
+  }
+
   // Error in evaluation
   if (flag) return 1;
   // Fetch Jacobian blocks
@@ -1346,7 +1464,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   return 0;
 }
 
-int FmuFunction::eval_thread(FmuMemory* m, casadi_int thread, casadi_int n_thread,
+int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
     bool need_jac, bool need_adj) const {
   // Data for Jacobian/adjoint calculation
   casadi_jac_data<double> d;
@@ -1368,7 +1486,7 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int thread, casadi_int n_threa
   // Evaluate
   if (fmu_->eval(m)) return 1;
   // Get regular outputs (master thread only)
-  if (thread == 0) {
+  if (task == 0) {
     for (size_t k = 0; k < out_.size(); ++k) {
       if (m->res[k] && out_[k].type == REG_OUTPUT) {
         fmu_->get(m, out_[k].ind, m->res[k]);
@@ -1392,8 +1510,8 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int thread, casadi_int n_threa
   // Evalute Jacobian blocks
   if (need_jac || need_adj) {
     // Selection of colors to be evaluated for the thread
-    casadi_int c_begin = (thread * coloring_.size2()) / n_thread;
-    casadi_int c_end = ((thread + 1) * coloring_.size2()) / n_thread;
+    casadi_int c_begin = (task * coloring_.size2()) / n_task;
+    casadi_int c_end = ((task + 1) * coloring_.size2()) / n_task;
     // Loop over colors
     for (casadi_int c = c_begin; c < c_end; ++c) {
       // Get derivative directions
@@ -1427,6 +1545,16 @@ std::string to_string(FdMode v) {
   case FdMode::BACKWARD: return "backward";
   case FdMode::CENTRAL: return "central";
   case FdMode::SMOOTHING: return "smoothing";
+  default: break;
+  }
+  return "";
+}
+
+std::string to_string(Parallelization v) {
+  switch (v) {
+  case Parallelization::SERIAL: return "serial";
+  case Parallelization::OPENMP: return "openmp";
+  case Parallelization::THREAD: return "thread";
   default: break;
   }
   return "";

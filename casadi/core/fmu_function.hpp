@@ -225,6 +225,8 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   double *aseed, *asens;
   // Component memory
   fmi2Component c;
+  // Additional (slave) memory objects
+  std::vector<FmuMemory*> slaves;
   // Input and output buffers
   std::vector<double> ibuf_, obuf_;
   // Seeds, sensitivities
@@ -252,6 +254,12 @@ enum class FdMode {FORWARD, BACKWARD, CENTRAL, SMOOTHING, NUMEL};
 
 /// Convert to string
 CASADI_EXPORT std::string to_string(FdMode v);
+
+/// Type of parallelization
+enum class Parallelization {SERIAL, OPENMP, THREAD, NUMEL};
+
+/// Convert to string
+CASADI_EXPORT std::string to_string(Parallelization v);
 
 // Interface to binary FMU (shared between derivatives)
 struct CASADI_EXPORT Fmu {
@@ -486,6 +494,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // FD method as an enum
   FdMode fd_;
 
+  // Types of parallelization
+  Parallelization parallelization_;
+
   /** \brief Constructor */
   FmuFunction(const std::string& name, Fmu* fmu,
       const std::vector<std::string>& name_in,
@@ -524,8 +535,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Work vector size for Jacobian calculation
   casadi_int jac_iw_, jac_w_;
 
-  // Number of threads supported
-  casadi_int max_n_threads_;
+  // Number of parallel tasks
+  casadi_int max_n_task_;
 
   ///@{
   /** \brief Number of function inputs and outputs */
@@ -577,7 +588,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   static std::string pop_prefix(const std::string& s, std::string* rem = 0);
 
   /** \brief Create memory block */
-  void* alloc_mem() const override { return new FmuMemory(*this); }
+  void* alloc_mem() const override;
 
   /** \brief Initalize memory block */
   int init_mem(void* mem) const override;
