@@ -48,9 +48,15 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         set(STUBS_DIR ${CMAKE_CURRENT_BINARY_DIR}/stubs)
         add_custom_command(TARGET _panocpy POST_BUILD 
             COMMAND stubgen 
-                    -m panocpy -m panocpy.casadi_problem -m panocpy._panocpy
+                    -m panocpy -m panocpy.casadi_problem
                     -o ${STUBS_DIR}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..
+            USES_TERMINAL)
+        add_custom_command(TARGET _panocpy POST_BUILD 
+            COMMAND stubgen 
+                    -m panocpy._panocpy
+                    -o ${STUBS_DIR}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/..
             USES_TERMINAL)
     endif()
 
