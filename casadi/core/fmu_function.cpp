@@ -1048,13 +1048,15 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   parallelization_ = Parallelization::SERIAL;
   // Number of parallel tasks, by default
   max_n_task_ = 1;
+  // Increase reference counter (at end in case exception is thrown)
+  fmu_->counter_++;
 }
 
 FmuFunction::~FmuFunction() {
   // Free memory
   clear_mem();
   // Decrease reference pointer to Fmu instance
-  if (fmu_ && fmu_->counter_-- == 0) delete fmu_;
+  if (fmu_ && --fmu_->counter_ == 0) delete fmu_;
 }
 
 const Options FmuFunction::options_
