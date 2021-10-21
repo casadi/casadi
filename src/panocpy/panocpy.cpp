@@ -622,6 +622,9 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
             &pa::StructuredPANOCLBFGSParams::hessian_vec_finited_differences)
         .def_readwrite("full_augmented_hessian",
                        &pa::StructuredPANOCLBFGSParams::full_augmented_hessian)
+        .def_readwrite(
+            "hessian_step_size_heuristic",
+            &pa::StructuredPANOCLBFGSParams::hessian_step_size_heuristic)
         .def_readwrite("lbfgs_stepsize",
                        &pa::StructuredPANOCLBFGSParams::lbfgs_stepsize);
 

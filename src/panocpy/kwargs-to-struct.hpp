@@ -194,6 +194,8 @@ inline const kwargs_to_struct_table_t<pa::StructuredPANOCLBFGSParams>
          &pa::StructuredPANOCLBFGSParams::hessian_vec_finited_differences},
         {"full_augmented_hessian",
          &pa::StructuredPANOCLBFGSParams::full_augmented_hessian},
+        {"hessian_step_size_heuristic",
+         &pa::StructuredPANOCLBFGSParams::hessian_step_size_heuristic},
         {"lbfgs_stepsize", &pa::StructuredPANOCLBFGSParams::lbfgs_stepsize},
     };
 

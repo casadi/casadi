@@ -29,7 +29,7 @@ struct StructuredPANOCLBFGSParams {
     /// Minimum Lipschitz constant estimate.
     real_t L_min = 1e-5;
     /// Maximum Lipschitz constant estimate.
-    real_t L_max = 1e9;
+    real_t L_max = 1e20;
     /// Factor used in update for exponentially weighted nonmonotone line search.
     /// Zero means monotone line search.
     real_t nonmonotone_linesearch = 0;
@@ -50,6 +50,8 @@ struct StructuredPANOCLBFGSParams {
 
     bool hessian_vec_finited_differences = true;
     bool full_augmented_hessian          = true;
+
+    unsigned hessian_step_size_heuristic = 0;
 
     LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };

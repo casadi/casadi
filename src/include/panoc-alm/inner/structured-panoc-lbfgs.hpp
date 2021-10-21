@@ -146,8 +146,53 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
     // =========================================================================
     for (unsigned k = 0; k <= params.max_iter; ++k) {
 
+        // Heuristically try to increase step size
+        bool skip_qub_check = false;
+        if (k > 0 && params.hessian_step_size_heuristic > 0 &&
+            k % params.hessian_step_size_heuristic == 0) {
+            detail::calc_augmented_lagrangian_hessian_prod_fd(
+                problem, xₖ, y, Σ, grad_ψₖ, grad_ψₖ, HqK, work_n, work_n2,
+                work_m);
+            real_t η = grad_ψₖ.squaredNorm() / grad_ψₖ.dot(HqK);
+            if (η > γₖ) {
+                real_t Lₖ₊₁ = params.Lipschitz.Lγ_factor / η;
+                Lₖ₊₁ = std::clamp(Lₖ₊₁, params.L_min, params.L_max);
+                real_t γₖ₊₁ = params.Lipschitz.Lγ_factor / Lₖ₊₁;
+                // Calculate x̂ₖ, pₖ (projected gradient step)
+                calc_x̂(γₖ₊₁, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁);
+                // Calculate ∇ψ(xₖ)ᵀpₖ and ‖pₖ‖²
+                real_t grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ.dot(pₖ₊₁);
+                real_t pₖ₊₁ᵀpₖ₊₁      = pₖ₊₁.squaredNorm();
+                // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
+                real_t ψx̂ₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
+                // Check quadratic upper bound
+                real_t margin = (1 + std::abs(ψₖ)) *
+                                params.quadratic_upperbound_tolerance_factor;
+                if (ψx̂ₖ₊₁ - ψₖ <=
+                    grad_ψₖ₊₁ᵀpₖ₊₁ + 0.5 * Lₖ₊₁ * pₖ₊₁ᵀpₖ₊₁ + margin) {
+                    // If QUB is satisfied, accept new, larger step
+                    Lₖ = Lₖ₊₁;
+                    γₖ = γₖ₊₁;
+                    x̂ₖ.swap(x̂ₖ₊₁);
+                    pₖ.swap(pₖ₊₁);
+                    grad_ψₖᵀpₖ = grad_ψₖ₊₁ᵀpₖ₊₁;
+                    pₖᵀpₖ      = pₖ₊₁ᵀpₖ₊₁;
+                    ψx̂ₖ        = ψx̂ₖ₊₁;
+                    // Recompute forward-backward envelope
+                    φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
+                    // No need to re-check later
+                    skip_qub_check = true;
+                } else {
+                    // nothing is updated (except x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁, which will
+                    // be overwritten before the next use)
+                }
+            }
+        }
+
         // Quadratic upper bound -----------------------------------------------
-        if (k == 0 || params.update_lipschitz_in_linesearch == false) {
+        bool qub_check =
+            k == 0 || params.update_lipschitz_in_linesearch == false;
+        if (qub_check && !skip_qub_check) {
             // Decrease step size until quadratic upper bound is satisfied
             real_t old_γₖ =
                 descent_lemma(xₖ, ψₖ, grad_ψₖ,

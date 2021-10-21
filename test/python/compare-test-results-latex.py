@@ -15,25 +15,30 @@ plt.rcParams.update({
     "lines.linewidth": 1,
 })
 
-machine = "XPS-15-9500"
+machine = "XPS-15-9560"
 this_folder = dirname(__file__) if "__file__" in globals() else abspath("")
 root_folder = dirname(dirname(this_folder))
 out_folder = join(root_folder, "test", "testresults", machine)
 get_test_result_folder = lambda testname: join(out_folder, testname, "CUTEst")
-fig_out_folder = "/home/pieter/Documents/KUL/2020-2021/Master-Thesis-Pieter-Pas/LaTeX/Thesis/fig"
+fig_out_folder = "/tmp/fig"
 
 names = {
-    "gaapga-29-5": "Guarded Anderson accelerated PGA", 
-    "panoc-2nd-29-5-upd-ls-crit": "Structured PANOC (FD, L-BFGS, impr.)",
-    "lbfgsbpp-29-5": "L-BFGS-B",
-    "panoc-2nd-29-5-ad": "Structured PANOC (AD, L-BFGS, impr.)",
-    "panoc-2nd-29-5-baseline": "Structured PANOC (FD, L-BFGS, orig.)",
-    "panoc-29-5-baseline": "PANOC (orig.)",
-    "panoc-29-5-cbfgs": "PANOC (CBFGS, orig.)",
-    "panoc-29-5-upd-ls-crit": "PANOC (impr.)",
-    "pga-29-5": "Projected gradient",
-    "panoc-2nd-29-5-single-penalty": "Structured PANOC (single penalty factor)",
-    "panoc-2nd-4-6-no-backtrack": "Structured PANOC (no ALM backtracking)",
+    # "gaapga-29-5": "Guarded Anderson accelerated PGA", 
+    # "panoc-2nd-29-5-upd-ls-crit": "Structured PANOC (FD, L-BFGS, impr.)",
+    # "lbfgsbpp-29-5": "L-BFGS-B",
+    # "panoc-2nd-29-5-ad": "Structured PANOC (AD, L-BFGS, impr.)",
+    # "panoc-2nd-29-5-baseline": "Structured PANOC (FD, L-BFGS, orig.)",
+    # "panoc-29-5-baseline": "PANOC (orig.)",
+    # "panoc-29-5-cbfgs": "PANOC (CBFGS, orig.)",
+    # "panoc-29-5-upd-ls-crit": "PANOC (impr.)",
+    # "pga-29-5": "Projected gradient",
+    # "panoc-2nd-29-5-single-penalty": "Structured PANOC (single penalty factor)",
+    # "panoc-2nd-4-6-no-backtrack": "Structured PANOC (no ALM backtracking)",
+    "strucpanoc-20-10-baseline": "Structured PANOC (baseline)",
+    "strucpanoc-20-10-hessheur": "Structured PANOC (Hessian heuristic /1)",
+    "strucpanoc-20-10-hessheur10": "Structured PANOC (Hessian heuristic /10)",
+    "strucpanoc-20-10-hessheur50": "Structured PANOC (Hessian heuristic /50)",
+    "strucpanoc-21-10-hessheur10": "Structured PANOC (Hessian heuristic new /10)",
 }
 labelnames = {
     "time": "Time",
@@ -58,16 +63,22 @@ labelhigherbetter = {
 }
 
 sel = [
-    ["panoc-29-5-baseline", "panoc-29-5-upd-ls-crit",         ["time", "inner iterations", "avg time per it", "average τ"]],
-    ["panoc-2nd-29-5-baseline", "panoc-2nd-29-5-upd-ls-crit", ["time", "inner iterations", "avg time per it", "average τ"]],
-    ["panoc-2nd-29-5-ad", "panoc-2nd-29-5-upd-ls-crit",       ["time", "inner iterations", "avg time per it", "grad_f evaluations"]],
-    ["panoc-29-5-upd-ls-crit", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations", "avg time per it", "average τ"]],
-    ["panoc-29-5-baseline", "panoc-29-5-cbfgs",               ["time", "inner iterations", "L-BFGS rejected"]],
-    ["pga-29-5", "panoc-2nd-29-5-upd-ls-crit",                ["time", "inner iterations", "avg time per it", "outer iterations"]],
-    ["gaapga-29-5", "panoc-2nd-29-5-upd-ls-crit",             ["time", "inner iterations", "avg time per it", "outer iterations"]],
-    ["lbfgsbpp-29-5", "panoc-2nd-29-5-upd-ls-crit",           ["time", "inner iterations", "avg time per it", "f evaluations", "‖x‖", "‖y‖", "‖Σ‖"]],
-    ["panoc-2nd-29-5-single-penalty", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations", "‖Σ‖", "outer iterations"]],
-    ["panoc-2nd-4-6-no-backtrack", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations"]],
+    # ["panoc-29-5-baseline", "panoc-29-5-upd-ls-crit",         ["time", "inner iterations", "avg time per it", "average τ"]],
+    # ["panoc-2nd-29-5-baseline", "panoc-2nd-29-5-upd-ls-crit", ["time", "inner iterations", "avg time per it", "average τ"]],
+    # ["panoc-2nd-29-5-ad", "panoc-2nd-29-5-upd-ls-crit",       ["time", "inner iterations", "avg time per it", "grad_f evaluations"]],
+    # ["panoc-29-5-upd-ls-crit", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations", "avg time per it", "average τ"]],
+    # ["panoc-29-5-baseline", "panoc-29-5-cbfgs",               ["time", "inner iterations", "L-BFGS rejected"]],
+    # ["pga-29-5", "panoc-2nd-29-5-upd-ls-crit",                ["time", "inner iterations", "avg time per it", "outer iterations"]],
+    # ["gaapga-29-5", "panoc-2nd-29-5-upd-ls-crit",             ["time", "inner iterations", "avg time per it", "outer iterations"]],
+    # ["lbfgsbpp-29-5", "panoc-2nd-29-5-upd-ls-crit",           ["time", "inner iterations", "avg time per it", "f evaluations", "‖x‖", "‖y‖", "‖Σ‖"]],
+    # ["panoc-2nd-29-5-single-penalty", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations", "‖Σ‖", "outer iterations"]],
+    # ["panoc-2nd-4-6-no-backtrack", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations"]],
+    ["strucpanoc-20-10-baseline", "strucpanoc-21-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-20-10-baseline", "strucpanoc-20-10-hessheur", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-20-10-baseline", "strucpanoc-20-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-20-10-hessheur", "strucpanoc-20-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-20-10-hessheur10", "strucpanoc-20-10-hessheur50", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-20-10-hessheur10", "strucpanoc-21-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
 ]
 
 outf = open('/tmp/input.tex', 'w')
@@ -150,6 +161,26 @@ for s in sel:
         neutralcolor = "b"
         lowercolor = "g" if lowerbetter else "r"
         highercolor = "r" if lowerbetter else "g"
+        drawLines = []
+        for tt0, tt1 in zip(t0, t1):
+            if tt1 != tt0:
+                drawLines.append(np.array([tt0, tt0]))
+                drawLines.append(np.array([tt0, tt1]))
+        plotfun(
+            *drawLines,
+            color='lightgray',
+            linewidth=0.5,
+        )
+        # drawLines = []
+        # for tt0, tt1 in zip(t0, t1):
+        #     if tt1 > tt0:   
+        #         drawLines.append(np.array([tt0, tt0]))
+        #         drawLines.append(np.array([tt0, tt1]))
+        # plotfun(
+        #     *drawLines,
+        #     color='lightgray',
+        #     linewidth=0.5,
+        # )
         plotfun(
             t0[nochange],
             t1[nochange],
