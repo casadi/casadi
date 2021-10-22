@@ -262,7 +262,29 @@ void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, c
 }
 
 SundialsSimMemory::SundialsSimMemory() {
+  // Set pointers to null
   this->xz  = nullptr;
+  this->u = nullptr;
+  this->p = nullptr;
+  this->jac = nullptr;
+  this->v1 = this->v2 = nullptr;
+  // Reset stats
+  this->nsteps = 0;
+  this->nfevals = 0;
+  this->nlinsetups = 0;
+  this->netfails = 0;
+  this->qlast = 0;
+  this->qcur = 0;
+  this->hinused = 0;
+  this->hlast = 0;
+  this->hcur = 0;
+  this->tcur = 0;
+  this->nniters = 0;
+  this->nncfails = 0;
+  // Number of checkpoints stored so far
+  this->ncheck = 0;
+  // Unused
+  this->mem_linsolF = -1;
 }
 
 SundialsSimMemory::~SundialsSimMemory() {
