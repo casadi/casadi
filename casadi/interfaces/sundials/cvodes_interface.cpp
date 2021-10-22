@@ -863,6 +863,8 @@ namespace casadi {
   }
 
   CvodesMemory::~CvodesMemory() {
+    if (this->mem_linsolF >= 0) self.linsolF_.release(this->mem_linsolF);
+    if (this->mem_linsolB >= 0) self.linsolB_.release(this->mem_linsolB);
     if (this->mem) CVodeFree(&this->mem);
   }
 

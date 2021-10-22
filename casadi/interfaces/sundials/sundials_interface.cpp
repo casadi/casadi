@@ -253,14 +253,6 @@ namespace casadi {
     return 0;
   }
 
-  void SundialsInterface::free_mem(void *mem) const {
-    Integrator::free_mem(mem);
-    auto m = static_cast<SundialsMemory*>(mem);
-
-    linsolF_.release(m->mem_linsolF);
-    if (!linsolB_.is_null()) linsolB_.release(m->mem_linsolB);
-  }
-
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,
                                 const double* z, const double* p) const {
     auto m = static_cast<SundialsMemory*>(mem);
@@ -302,6 +294,8 @@ namespace casadi {
     this->rxz = nullptr;
     this->rq = nullptr;
     this->first_callB = true;
+    this->mem_linsolF = -1;
+    this->mem_linsolB = -1;
   }
 
   SundialsMemory::~SundialsMemory() {

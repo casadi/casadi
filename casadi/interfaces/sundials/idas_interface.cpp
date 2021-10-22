@@ -1069,6 +1069,8 @@ namespace casadi {
     if (this->mem) IDAFree(&this->mem);
     if (this->xzdot) N_VDestroy_Serial(this->xzdot);
     if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
+    if (this->mem_linsolF >= 0) self.linsolF_.release(this->mem_linsolF);
+    if (this->mem_linsolB >= 0) self.linsolB_.release(this->mem_linsolB);
   }
 
   IdasInterface::IdasInterface(DeserializingStream& s) : SundialsInterface(s) {
