@@ -160,8 +160,6 @@ namespace casadi {
       add_include("mex.h", false, "MATLAB_MEX_FILE");
     }
 
-    add_include("immintrin.h");
-
     // Memory struct entry point
     if (this->with_mem) {
       this->header << "#include <casadi/mem.h>\n";

@@ -2299,12 +2299,6 @@ namespace casadi {
 
   std::string FunctionInternal::signature(const std::string& fname, bool vectorize, casadi_int vector_width_real) const {
     std::string name = fname;
-    std::string int_type = "casadi_int";
-    if (vector_width_real==8) {
-      int_type = "__m512i";
-    } else if (vector_width_real==4) {
-      int_type = "__m256i";
-    }
     if (vectorize) {
       if (vector_width_real==8) {
         name = "_ZGVeN8uuuuul_" + name;
@@ -2312,7 +2306,7 @@ namespace casadi {
         name = "_ZGVdN4uuuuul_" + name;
       }
       return "void " + name + "(const casadi_real**const arg, casadi_real**const res, "
-                            "casadi_int* iw, casadi_real* w, int mem, " + int_type + " i)";
+                            "casadi_int* iw, casadi_real* w, int mem, casadi_int i)";
     } else {
       return "int " + name + "(const casadi_real** arg, casadi_real** res, "
                             "casadi_int* iw, casadi_real* w, int mem)";
