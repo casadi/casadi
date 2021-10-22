@@ -357,7 +357,7 @@ namespace casadi {
     print("Actual value of initial step size: %g\n", m->hinused);
     print("Step size taken on the last internal step: %g\n", m->hlast);
     print("Step size to be attempted on the next internal step: %g\n", m->hcur);
-    print("Current internal time reached: %g\n");
+    print("Current internal time reached: %g\n", m->tcur);
     print("Number of nonlinear iterations performed: %ld\n", m->nniters);
     print("Number of nonlinear convergence failures: %ld\n", m->nncfails);
     if (nrx_>0) {
