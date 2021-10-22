@@ -459,6 +459,7 @@ CvodesSimMemory::CvodesSimMemory(const CvodesSimulator& s) : self(s) {
 }
 
 CvodesSimMemory::~CvodesSimMemory() {
+  if (this->mem_linsolF >= 0) self.linsolF_.release(this->mem_linsolF);
   if (this->mem) CVodeFree(&this->mem);
 }
 

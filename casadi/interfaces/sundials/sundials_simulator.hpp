@@ -99,9 +99,6 @@ public:
   /** \brief Initalize memory block */
   int init_mem(void* mem) const override;
 
-  /** \brief Free memory block */
-  void free_mem(void *mem) const override;
-
   /** \brief Get relative tolerance */
   double get_reltol() const override { return reltol_;}
 

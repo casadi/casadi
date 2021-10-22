@@ -240,13 +240,6 @@ int SundialsSimulator::init_mem(void* mem) const {
   return 0;
 }
 
-void SundialsSimulator::free_mem(void *mem) const {
-  Simulator::free_mem(mem);
-  auto m = static_cast<SundialsSimMemory*>(mem);
-
-  linsolF_.release(m->mem_linsolF);
-}
-
 void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* u,
     double* z, const double* p, double* y) const {
   auto m = static_cast<SundialsSimMemory*>(mem);
