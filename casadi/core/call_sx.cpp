@@ -106,7 +106,9 @@ namespace casadi {
       g << "const casadi_real* arg[" << f.sz_arg() << "];\n";
       g << "casadi_real* res[" << f.sz_res() << "];\n";
       g << "casadi_int iw[" << f.sz_iw() << "];\n";
-      g << "casadi_real w[" << f.sz_w() << "];\n";
+      g << "casadi_real w[" << f.sz_w() << "]";
+      g << " __attribute__((aligned (" << 64 << ")))";
+      g << ";\n";
       g << "casadi_real r;\n";
       if (f.nnz_in()==1) { 
         g << "arg[0] = &a;\n";
