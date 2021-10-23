@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <map>
+#include <variant>
 
 #include <pybind11/detail/typeid.h>
 #include <pybind11/pybind11.h>
@@ -98,6 +99,13 @@ T kwargs_to_struct(const py::kwargs &kwargs) {
 template <class T>
 py::dict struct_to_dict(const T &t) {
     return struct_to_dict_helper<T>(t);
+}
+
+template <class T>
+T var_kwargs_to_struct(const std::variant<T, py::dict> &p) {
+    return std::holds_alternative<T>(p)
+               ? std::get<T>(p)
+               : kwargs_to_struct<T>(std::get<py::dict>(p));
 }
 
 #include <panoc-alm/inner/decl/panoc.hpp>

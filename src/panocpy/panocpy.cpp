@@ -73,13 +73,14 @@ auto PolymorphicPANOCConversion() {
 
 template <class InnerSolverT>
 auto PolymorphicALMConstructor() {
-    return [](const pa::ALMParams &pp, const InnerSolverT &inner) {
+    return [](const std::variant<pa::ALMParams, py::dict> &pp,
+              const InnerSolverT &inner) {
         using Base = pa::PolymorphicInnerSolverBase;
         static_assert(std::is_base_of_v<Base, InnerSolverT>);
         auto full_python_copy = std::make_shared<py::object>(py::cast(inner));
         auto base_copy        = full_python_copy->template cast<Base *>();
         return pa::PolymorphicALMSolver{
-            pp,
+            var_kwargs_to_struct<pa::ALMParams>(pp),
             std::shared_ptr<Base>(full_python_copy, base_copy),
         };
     };
@@ -640,7 +641,13 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                     pa::LBFGSParams{},
                 });
         }))
-        .def(py::init<pa::StructuredPANOCLBFGSParams, pa::LBFGSParams>(),
+        .def(py::init([](const std::variant<pa::StructuredPANOCLBFGSParams,
+                                            py::dict> &pp,
+                         const std::variant<pa::LBFGSParams, py::dict> &lp) {
+                 return std::make_shared<
+                     pa::PolymorphicStructuredPANOCLBFGSSolver>(
+                     var_kwargs_to_struct(pp), var_kwargs_to_struct(lp));
+             }),
              "panoc_params"_a, "lbfgs_params"_a)
         .def(
             "set_progress_callback",
