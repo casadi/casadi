@@ -1,5 +1,6 @@
 import functools
 from os.path import join, dirname, abspath
+from typing import List, cast
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -35,10 +36,16 @@ names = {
     # "panoc-2nd-29-5-single-penalty": "Structured PANOC (single penalty factor)",
     # "panoc-2nd-4-6-no-backtrack": "Structured PANOC (no ALM backtracking)",
     "strucpanoc-20-10-baseline": "Structured PANOC (baseline)",
+    "strucpanoc-21-10-baseline": "Structured PANOC (baseline new)",
     "strucpanoc-20-10-hessheur": "Structured PANOC (Hessian heuristic /1)",
     "strucpanoc-20-10-hessheur10": "Structured PANOC (Hessian heuristic /10)",
     "strucpanoc-20-10-hessheur50": "Structured PANOC (Hessian heuristic /50)",
     "strucpanoc-21-10-hessheur10": "Structured PANOC (Hessian heuristic new /10)",
+    "strucpanoc-21-10-hessheur10-n":"Structured PANOC (Hessian heuristic new2 /10)",
+    "strucpanoc-21-10-hessheur10-n2":"Structured PANOC (Hessian heuristic new2-2 /10)",
+    "strucpanoc-21-10-hessheur10-n2-5":"Structured PANOC (Hessian heuristic new2-2 /10x5)",
+    "strucpanoc-21-10-hessheur2-n2-5":"Structured PANOC (Hessian heuristic new2-2 /2x5)",
+    "strucpanoc-21-10-hessheur20-n2-5":"Structured PANOC (Hessian heuristic new2-2 /00x5)",
 }
 labelnames = {
     "time": "Time",
@@ -73,18 +80,24 @@ sel = [
     # ["lbfgsbpp-29-5", "panoc-2nd-29-5-upd-ls-crit",           ["time", "inner iterations", "avg time per it", "f evaluations", "‖x‖", "‖y‖", "‖Σ‖"]],
     # ["panoc-2nd-29-5-single-penalty", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations", "‖Σ‖", "outer iterations"]],
     # ["panoc-2nd-4-6-no-backtrack", "panoc-2nd-29-5-upd-ls-crit",  ["time", "inner iterations"]],
-    ["strucpanoc-20-10-baseline", "strucpanoc-21-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
-    ["strucpanoc-20-10-baseline", "strucpanoc-20-10-hessheur", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
-    ["strucpanoc-20-10-baseline", "strucpanoc-20-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
-    ["strucpanoc-20-10-hessheur", "strucpanoc-20-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
-    ["strucpanoc-20-10-hessheur10", "strucpanoc-20-10-hessheur50", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
-    ["strucpanoc-20-10-hessheur10", "strucpanoc-21-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-21-10-hessheur10-n2-5", "strucpanoc-21-10-hessheur20-n2-5", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-21-10-baseline", "strucpanoc-21-10-hessheur2-n2-5", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-21-10-baseline", "strucpanoc-21-10-hessheur10-n2-5", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    ["strucpanoc-21-10-hessheur10-n2", "strucpanoc-21-10-hessheur10-n2-5", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    # ["strucpanoc-20-10-baseline", "strucpanoc-21-10-hessheur10-n2", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    # ["strucpanoc-20-10-baseline", "strucpanoc-21-10-hessheur10-n", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    # ["strucpanoc-20-10-baseline", "strucpanoc-21-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    # ["strucpanoc-20-10-baseline", "strucpanoc-20-10-hessheur", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    # ["strucpanoc-20-10-baseline", "strucpanoc-20-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    # ["strucpanoc-20-10-hessheur", "strucpanoc-20-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    # ["strucpanoc-20-10-hessheur10", "strucpanoc-20-10-hessheur50", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
+    # ["strucpanoc-20-10-hessheur10", "strucpanoc-21-10-hessheur10", ["time", "inner iterations", "avg time per it", "average τ", "f evaluations", "grad_f evaluations"]],
 ]
 
 outf = open('/tmp/input.tex', 'w')
 
 for s in sel:
-    testnames = s[0:2]
+    testnames = cast(List[str], s[0:2])
     dispnames = list(map(lambda n: names[n], testnames))
     folders = list(map(get_test_result_folder, testnames))
     raw_data = list(map(load_raw_data, folders))
