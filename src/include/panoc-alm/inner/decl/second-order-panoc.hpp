@@ -27,7 +27,7 @@ struct SecondOrderPANOCParams {
     /// Minimum Lipschitz constant estimate.
     real_t L_min = 1e-5;
     /// Maximum Lipschitz constant estimate.
-    real_t L_max = 1e9;
+    real_t L_max = 1e20;
     /// What stopping criterion to use.
     PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
     /// Maximum number of iterations without any progress before giving up.

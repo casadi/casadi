@@ -142,9 +142,10 @@ auto get_inner_solver() {
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
     panocparams.stop_crit      = pa::PANOCStopCrit::ProjGradUnitNorm;
-    panocparams.max_time       = 30s;
-    panocparams.hessian_vec_finited_differences = false;
+    panocparams.max_time       = 5min;
+    // panocparams.hessian_vec_finited_differences = false;
     // panocparams.full_augmented_hessian          = true;
+    panocparams.hessian_step_size_heuristic = 10;
 
     pa::LBFGSParams lbfgsparams;
     lbfgsparams.memory = 20;
@@ -177,6 +178,8 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
         << p.hessian_vec_finited_differences;
     out << YAML::Key << "full_augmented_hessian" << YAML::Value
         << p.full_augmented_hessian;
+    out << YAML::Key << "hessian_step_size_heuristic" << YAML::Value
+        << p.hessian_step_size_heuristic;
     out << YAML::EndMap;
     return out;
 }
@@ -287,7 +290,7 @@ int main(int argc, char *argv[]) {
     pa::ALMParams almparams;
     almparams.max_iter = 240;
     almparams.max_time = 30s;
-    // almparams.max_time        = 1min + 30s;
+    almparams.max_time        = 1min + 30s;
     almparams.preconditioning = false;
     // almparams.print_interval  = 1;
     almparams.Σ₀                      = 1;

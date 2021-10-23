@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <map>
+#include <variant>
 
 #include <pybind11/detail/typeid.h>
 #include <pybind11/pybind11.h>
@@ -98,6 +99,13 @@ T kwargs_to_struct(const py::kwargs &kwargs) {
 template <class T>
 py::dict struct_to_dict(const T &t) {
     return struct_to_dict_helper<T>(t);
+}
+
+template <class T>
+T var_kwargs_to_struct(const std::variant<T, py::dict> &p) {
+    return std::holds_alternative<T>(p)
+               ? std::get<T>(p)
+               : kwargs_to_struct<T>(std::get<py::dict>(p));
 }
 
 #include <panoc-alm/inner/decl/panoc.hpp>
@@ -194,6 +202,8 @@ inline const kwargs_to_struct_table_t<pa::StructuredPANOCLBFGSParams>
          &pa::StructuredPANOCLBFGSParams::hessian_vec_finited_differences},
         {"full_augmented_hessian",
          &pa::StructuredPANOCLBFGSParams::full_augmented_hessian},
+        {"hessian_step_size_heuristic",
+         &pa::StructuredPANOCLBFGSParams::hessian_step_size_heuristic},
         {"lbfgs_stepsize", &pa::StructuredPANOCLBFGSParams::lbfgs_stepsize},
     };
 
