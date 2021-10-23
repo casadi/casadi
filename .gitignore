@@ -3,6 +3,7 @@ _skbuild
 *-venv
 .cache
 __pycache__
+.mypy_cache
 dist
 wheelhouse
 *.egg-info
@@ -14,3 +15,5 @@ wheelhouse
 .~lock.*
 src/panocpy/_panocpy.pyd
 src/panocpy/bin/*.dll
+
+test/testresults/XPS-15-9560
