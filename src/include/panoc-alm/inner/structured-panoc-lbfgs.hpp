@@ -66,7 +66,8 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
     lbfgs.resize(n);
 
     // Keep track of how many successive iterations didn't update the iterate
-    unsigned no_progress = 0;
+    unsigned no_progress   = 0;
+    unsigned last_γ_change = 0;
 
     // Helper functions --------------------------------------------------------
 
@@ -147,13 +148,16 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
     for (unsigned k = 0; k <= params.max_iter; ++k) {
 
         // Heuristically try to increase step size
-        bool skip_qub_check = false;
+        bool force_qub_check = false;
+        bool skip_qub_check  = false;
         if (k > 0 && params.hessian_step_size_heuristic > 0 &&
-            k % params.hessian_step_size_heuristic == 0) {
+            k - last_γ_change > params.hessian_step_size_heuristic) {
             detail::calc_augmented_lagrangian_hessian_prod_fd(
                 problem, xₖ, y, Σ, grad_ψₖ, grad_ψₖ, HqK, work_n, work_n2,
                 work_m);
             real_t η = grad_ψₖ.squaredNorm() / grad_ψₖ.dot(HqK);
+            if (η > γₖ * 10)
+                η = γₖ * 10;
             if (η > γₖ) {
                 real_t Lₖ₊₁ = params.Lipschitz.Lγ_factor / η;
                 Lₖ₊₁ = std::clamp(Lₖ₊₁, params.L_min, params.L_max);
@@ -168,8 +172,10 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
                 // Check quadratic upper bound
                 real_t margin = (1 + std::abs(ψₖ)) *
                                 params.quadratic_upperbound_tolerance_factor;
-                if (ψx̂ₖ₊₁ - ψₖ <=
-                    grad_ψₖ₊₁ᵀpₖ₊₁ + 0.5 * Lₖ₊₁ * pₖ₊₁ᵀpₖ₊₁ + margin) {
+                constexpr bool always_accept = false;
+                if (always_accept || ψx̂ₖ₊₁ - ψₖ <= grad_ψₖ₊₁ᵀpₖ₊₁ +
+                                                       0.5 * Lₖ₊₁ * pₖ₊₁ᵀpₖ₊₁ +
+                                                       margin) {
                     // If QUB is satisfied, accept new, larger step
                     Lₖ = Lₖ₊₁;
                     γₖ = γₖ₊₁;
@@ -181,7 +187,9 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
                     // Recompute forward-backward envelope
                     φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
                     // No need to re-check later
-                    skip_qub_check = true;
+                    skip_qub_check  = not always_accept;
+                    force_qub_check = always_accept;
+                    last_γ_change   = k;
                 } else {
                     // nothing is updated (except x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁, which will
                     // be overwritten before the next use)
@@ -192,14 +200,16 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
         // Quadratic upper bound -----------------------------------------------
         bool qub_check =
             k == 0 || params.update_lipschitz_in_linesearch == false;
-        if (qub_check && !skip_qub_check) {
+        if ((qub_check && !skip_qub_check) || force_qub_check) {
             // Decrease step size until quadratic upper bound is satisfied
             real_t old_γₖ =
                 descent_lemma(xₖ, ψₖ, grad_ψₖ,
                               /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
                               /* inout */ ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
-            if (γₖ != old_γₖ)
+            if (γₖ != old_γₖ) {
+                last_γ_change = k;
                 φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
+            }
         }
         // Calculate ∇ψ(x̂ₖ)
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
@@ -333,9 +343,11 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
         }
 
         // Line search loop ----------------------------------------------------
+        unsigned last_γ_changeₖ₊₁;
         do {
-            Lₖ₊₁ = Lₖ;
-            γₖ₊₁ = γₖ;
+            last_γ_changeₖ₊₁ = last_γ_change;
+            Lₖ₊₁             = Lₖ;
+            γₖ₊₁             = γₖ;
 
             // Calculate xₖ₊₁
             if (τ / 2 < params.τ_min) { // line search failed
@@ -363,10 +375,12 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
 
             if (params.update_lipschitz_in_linesearch == true) {
                 // Decrease step size until quadratic upper bound is satisfied
-                (void)descent_lemma(xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
-                                    /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
-                                    /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁,
-                                    grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁);
+                real_t old_γₖ₊₁ = descent_lemma(
+                    xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
+                    /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
+                    /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁);
+                if (old_γₖ₊₁ != γₖ₊₁)
+                    last_γ_changeₖ₊₁ = k;
             }
 
             // Compute forward-backward envelope
@@ -401,8 +415,9 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
                                              LBFGS::Sign::Positive, force);
 
         // Advance step --------------------------------------------------------
-        Lₖ = Lₖ₊₁;
-        γₖ = γₖ₊₁;
+        last_γ_change = last_γ_changeₖ₊₁;
+        Lₖ            = Lₖ₊₁;
+        γₖ            = γₖ₊₁;
 
         ψₖ  = ψₖ₊₁;
         ψx̂ₖ = ψx̂ₖ₊₁;
