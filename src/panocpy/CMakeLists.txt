@@ -45,15 +45,16 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
     option(PANOCPY_GEN_STUB "Generate Python stub files (.pyi) for the panocpy module." On)
 
     if (PANOCPY_GEN_STUB)
+        find_program(STUBGEN_EXE stubgen REQUIRED)
         set(STUBS_DIR ${CMAKE_CURRENT_BINARY_DIR}/stubs)
         add_custom_command(TARGET _panocpy POST_BUILD 
-            COMMAND stubgen 
+            COMMAND ${STUBGEN_EXE} 
                     -m panocpy -m panocpy.casadi_problem
                     -o ${STUBS_DIR}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..
             USES_TERMINAL)
         add_custom_command(TARGET _panocpy POST_BUILD 
-            COMMAND stubgen 
+            COMMAND ${STUBGEN_EXE} 
                     -m panocpy._panocpy
                     -o ${STUBS_DIR}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/..
