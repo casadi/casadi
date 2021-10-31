@@ -376,7 +376,7 @@ int main(int argc, char *argv[]) {
     out << YAML::Key << "‖x‖" << YAML::Value << x.norm();
     out << YAML::Key << "‖y‖" << YAML::Value << y.norm();
     out << YAML::Key << "f" << YAML::Value << f_star;
-    out << YAML::Key << "counters" << YAML::Value << problem_cnt.evaluations;
+    out << YAML::Key << "counters" << YAML::Value << *problem_cnt.evaluations;
     // out << YAML::Key << "x" << YAML::Value << x;
     // out << YAML::Key << "y" << YAML::Value << y;
     out << YAML::EndMap;

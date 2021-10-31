@@ -138,10 +138,10 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
         (end - begin) / N);
     std::cout << duration.count() << "µs" << std::endl;
 
-    std::cout << "# eval f:  " << pc.evaluations.f << std::endl;
-    std::cout << "# eval ∇f: " << pc.evaluations.grad_f << std::endl;
-    std::cout << "# eval g:  " << pc.evaluations.g << std::endl;
-    std::cout << "# eval ∇g: " << pc.evaluations.grad_g_prod << std::endl;
+    std::cout << "# eval f:  " << pc.evaluations->f << std::endl;
+    std::cout << "# eval ∇f: " << pc.evaluations->grad_f << std::endl;
+    std::cout << "# eval g:  " << pc.evaluations->g << std::endl;
+    std::cout << "# eval ∇g: " << pc.evaluations->grad_g_prod << std::endl;
 
     std::cout << "Status: " << stats.status << std::endl;
 

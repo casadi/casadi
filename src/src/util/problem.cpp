@@ -2,40 +2,6 @@
 
 namespace pa {
 
-void ProblemWithCounters::attach_counters(ProblemWithCounters &wc) {
-    wc.f = [&wc, f{std::move(wc.f)}](crvec x) {
-        ++wc.evaluations.f;
-        return f(x);
-    };
-    wc.grad_f = [&wc, grad_f{std::move(wc.grad_f)}](crvec x, rvec grad) {
-        ++wc.evaluations.grad_f;
-        grad_f(x, grad);
-    };
-    wc.g = [&wc, g{std::move(wc.g)}](crvec x, rvec gx) {
-        ++wc.evaluations.g;
-        g(x, gx);
-    };
-    wc.grad_g_prod = [&wc, grad_g_prod{std::move(wc.grad_g_prod)}](
-                         crvec x, crvec y, rvec grad) {
-        ++wc.evaluations.grad_g_prod;
-        grad_g_prod(x, y, grad);
-    };
-    wc.grad_gi = [&wc, grad_gi{std::move(wc.grad_gi)}](crvec x, unsigned i,
-                                                       rvec grad) {
-        ++wc.evaluations.grad_g_prod;
-        grad_gi(x, i, grad);
-    };
-    wc.hess_L_prod = [&wc, hess_L_prod{std::move(wc.hess_L_prod)}](
-                         crvec x, crvec y, crvec v, rvec Hv) {
-        ++wc.evaluations.hess_L_prod;
-        hess_L_prod(x, y, v, Hv);
-    };
-    wc.hess_L = [&wc, hess_L{std::move(wc.hess_L)}](crvec x, crvec y, rmat H) {
-        ++wc.evaluations.hess_L;
-        hess_L(x, y, H);
-    };
-}
-
 void ProblemOnlyD::transform() {
     work.resize(original.m);
     this->n      = original.n;

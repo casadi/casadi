@@ -3,6 +3,7 @@
 #include "box.hpp"
 
 #include <cassert>
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <type_traits>
@@ -144,18 +145,28 @@ class ProblemWithParam : public Problem {
 };
 
 struct EvalCounter {
-    unsigned f           = 0;
-    unsigned grad_f      = 0;
-    unsigned g           = 0;
-    unsigned grad_g_prod = 0;
-    unsigned grad_gi     = 0;
-    unsigned hess_L_prod = 0;
-    unsigned hess_L      = 0;
+    unsigned f{};
+    unsigned grad_f{};
+    unsigned g{};
+    unsigned grad_g_prod{};
+    unsigned grad_gi{};
+    unsigned hess_L_prod{};
+    unsigned hess_L{};
+
+    struct EvalTimer {
+        std::chrono::nanoseconds f{};
+        std::chrono::nanoseconds grad_f{};
+        std::chrono::nanoseconds g{};
+        std::chrono::nanoseconds grad_g_prod{};
+        std::chrono::nanoseconds grad_gi{};
+        std::chrono::nanoseconds hess_L_prod{};
+        std::chrono::nanoseconds hess_L{};
+    } time;
 
     void reset() { *this = {}; }
 };
 
-inline EvalCounter &operator+=(EvalCounter &a, EvalCounter b) {
+inline EvalCounter &operator+=(EvalCounter &a, const EvalCounter &b) {
     a.f += b.f;
     a.grad_f += b.grad_f;
     a.g += b.g;
@@ -166,29 +177,94 @@ inline EvalCounter &operator+=(EvalCounter &a, EvalCounter b) {
     return a;
 }
 
-inline EvalCounter operator+(EvalCounter a, EvalCounter b) { return a += b; }
+inline EvalCounter::EvalTimer &operator+=(EvalCounter::EvalTimer &a,
+                                          const EvalCounter::EvalTimer &b) {
+    a.f += b.f;
+    a.grad_f += b.grad_f;
+    a.g += b.g;
+    a.grad_g_prod += b.grad_g_prod;
+    a.grad_gi += b.grad_gi;
+    a.hess_L_prod += b.hess_L_prod;
+    a.hess_L += b.hess_L;
+    return a;
+}
 
-class ProblemWithCounters : public Problem {
+inline EvalCounter operator+(EvalCounter a, const EvalCounter &b) {
+    return a += b;
+}
+
+template <class ProblemT>
+class ProblemWithCounters : public ProblemT {
   public:
-    ProblemWithCounters(Problem &&p) : Problem(std::move(p)) {
+    ProblemWithCounters(ProblemT &&p) : ProblemT(std::move(p)) {
         attach_counters(*this);
     }
-    ProblemWithCounters(const Problem &p) : Problem(p) {
+    ProblemWithCounters(const ProblemT &p) : ProblemT(p) {
         attach_counters(*this);
     }
 
-    ProblemWithCounters()                            = delete;
-    ProblemWithCounters(const ProblemWithCounters &) = delete;
-    ProblemWithCounters(ProblemWithCounters &&)      = delete;
-    ProblemWithCounters &operator=(const ProblemWithCounters &) = delete;
-    ProblemWithCounters &operator=(ProblemWithCounters &&) = delete;
-
   public:
-    EvalCounter evaluations;
+    std::shared_ptr<EvalCounter> evaluations = std::make_shared<EvalCounter>();
 
   private:
     static void attach_counters(ProblemWithCounters &);
 };
+
+template <class ProblemT>
+void ProblemWithCounters<ProblemT>::attach_counters(
+    ProblemWithCounters<ProblemT> &wc) {
+
+    const static auto timed = [](auto &time, const auto &f) -> decltype(f()) {
+        if constexpr (std::is_same_v<decltype(f()), void>) {
+            auto t0 = std::chrono::steady_clock::now();
+            f();
+            auto t1 = std::chrono::steady_clock::now();
+            time += t1 - t0;
+        } else {
+            auto t0  = std::chrono::steady_clock::now();
+            auto res = f();
+            auto t1  = std::chrono::steady_clock::now();
+            time += t1 - t0;
+            return res;
+        }
+    };
+
+    wc.f = [ev{wc.evaluations}, f{std::move(wc.f)}](crvec x) {
+        ++ev->f;
+        return timed(ev->time.f, [&] { return f(x); });
+    };
+    wc.grad_f = [ev{wc.evaluations}, grad_f{std::move(wc.grad_f)}](crvec x,
+                                                                   rvec grad) {
+        ++ev->grad_f;
+        timed(ev->time.grad_f, [&] { grad_f(x, grad); });
+    };
+    wc.g = [ev{wc.evaluations}, g{std::move(wc.g)}](crvec x, rvec gx) {
+        ++ev->g;
+        timed(ev->time.g, [&] { g(x, gx); });
+    };
+    wc.grad_g_prod = [ev{wc.evaluations},
+                      grad_g_prod{std::move(wc.grad_g_prod)}](crvec x, crvec y,
+                                                              rvec grad) {
+        ++ev->grad_g_prod;
+        timed(ev->time.grad_g_prod, [&] { grad_g_prod(x, y, grad); });
+    };
+    wc.grad_gi = [ev{wc.evaluations}, grad_gi{std::move(wc.grad_gi)}](
+                     crvec x, unsigned i, rvec grad) {
+        ++ev->grad_g_prod;
+        timed(ev->time.grad_g_prod, [&] { grad_gi(x, i, grad); });
+    };
+    wc.hess_L_prod = [ev{wc.evaluations},
+                      hess_L_prod{std::move(wc.hess_L_prod)}](
+                         crvec x, crvec y, crvec v, rvec Hv) {
+        ++ev->hess_L_prod;
+        timed(ev->time.hess_L_prod, [&] { hess_L_prod(x, y, v, Hv); });
+    };
+    wc.hess_L = [ev{wc.evaluations},
+                 hess_L{std::move(wc.hess_L)}](crvec x, crvec y, rmat H) {
+        ++ev->hess_L;
+        timed(ev->time.hess_L, [&] { hess_L(x, y, H); });
+    };
+}
 
 /// Moves the state constraints in the set C to the set D, resulting in an
 /// unconstraint inner problem. The new constraints function g becomes the

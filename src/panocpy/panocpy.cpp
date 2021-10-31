@@ -183,19 +183,17 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         "C++ documentation: :cpp:class:`pa::ProblemWithParam`\n\n"
         "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
         .def(py::init<unsigned, unsigned, unsigned>(), "n"_a, "m"_a, "p"_a)
-        .def_readwrite("n", &pa::Problem::n)
-        .def_readwrite("m", &pa::Problem::m)
-        .def_readwrite("C", &pa::Problem::C)
-        .def_readwrite("D", &pa::Problem::D)
-        .def_property("f", prob_getter_f(), prob_setter_f())
-        .def_property("grad_f", prob_getter_grad_f(), prob_setter_grad_f())
-        .def_property("g", prob_getter_g(), prob_setter_g())
-        .def_property("grad_g_prod", prob_getter_grad_g_prod(),
-                      prob_setter_grad_g_prod())
-        .def_property("grad_gi", prob_getter_grad_gi(), prob_setter_grad_gi())
-        .def_property("hess_L", prob_getter_hess_L(), prob_setter_hess_L())
-        .def_property("hess_L_prod", prob_getter_hess_L_prod(),
-                      prob_setter_hess_L_prod())
+        .def_readwrite("n", &pa::ProblemWithParam::n)
+        .def_readwrite("m", &pa::ProblemWithParam::m)
+        .def_readwrite("C", &pa::ProblemWithParam::C)
+        .def_readwrite("D", &pa::ProblemWithParam::D)
+        .def_property_readonly("f", prob_getter_f())
+        .def_property_readonly("grad_f", prob_getter_grad_f())
+        .def_property_readonly("g", prob_getter_g())
+        .def_property_readonly("grad_g_prod", prob_getter_grad_g_prod())
+        .def_property_readonly("grad_gi", prob_getter_grad_gi())
+        .def_property_readonly("hess_L", prob_getter_hess_L())
+        .def_property_readonly("hess_L_prod", prob_getter_hess_L_prod())
         .def_property(
             "param", py::overload_cast<>(&pa::ProblemWithParam::get_param),
             [](pa::ProblemWithParam &p, pa::crvec param) {
@@ -207,6 +205,90 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
                 p.set_param(param);
             },
             "Parameter vector :math:`p` of the problem");
+
+    py::class_<pa::EvalCounter::EvalTimer>(
+        m, "EvalTimer",
+        "C++ documentation: "
+        ":cpp:class:`pa::EvalCounter::EvalTimer`\n\n")
+        .def_readwrite("f", &pa::EvalCounter::EvalTimer::f)
+        .def_readwrite("grad_f", &pa::EvalCounter::EvalTimer::grad_f)
+        .def_readwrite("g", &pa::EvalCounter::EvalTimer::g)
+        .def_readwrite("grad_g_prod", &pa::EvalCounter::EvalTimer::grad_g_prod)
+        .def_readwrite("grad_gi", &pa::EvalCounter::EvalTimer::grad_gi)
+        .def_readwrite("hess_L_prod", &pa::EvalCounter::EvalTimer::hess_L_prod)
+        .def_readwrite("hess_L", &pa::EvalCounter::EvalTimer::hess_L);
+
+    py::class_<pa::EvalCounter>(m, "EvalCounter",
+                                "C++ documentation: "
+                                ":cpp:class:`pa::EvalCounter`\n\n")
+        .def_readwrite("f", &pa::EvalCounter::f)
+        .def_readwrite("grad_f", &pa::EvalCounter::grad_f)
+        .def_readwrite("g", &pa::EvalCounter::g)
+        .def_readwrite("grad_g_prod", &pa::EvalCounter::grad_g_prod)
+        .def_readwrite("grad_gi", &pa::EvalCounter::grad_gi)
+        .def_readwrite("hess_L_prod", &pa::EvalCounter::hess_L_prod)
+        .def_readwrite("hess_L", &pa::EvalCounter::hess_L)
+        .def_readwrite("time", &pa::EvalCounter::time);
+
+    py::class_<pa::ProblemWithCounters<pa::Problem>, pa::Problem>(
+        m, "ProblemWithCounters",
+        "C++ documentation: "
+        ":cpp:class:`pa::ProblemWithCounters<pa::Problem>`\n\n"
+        "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
+        .def(py::init<pa::Problem>(), "problem"_a)
+        .def_readwrite("n", &pa::ProblemWithCounters<pa::Problem>::n)
+        .def_readwrite("m", &pa::ProblemWithCounters<pa::Problem>::m)
+        .def_readwrite("C", &pa::ProblemWithCounters<pa::Problem>::C)
+        .def_readwrite("D", &pa::ProblemWithCounters<pa::Problem>::D)
+        .def_property_readonly("f", prob_getter_f())
+        .def_property_readonly("grad_f", prob_getter_grad_f())
+        .def_property_readonly("g", prob_getter_g())
+        .def_property_readonly("grad_g_prod", prob_getter_grad_g_prod())
+        .def_property_readonly("grad_gi", prob_getter_grad_gi())
+        .def_property_readonly("hess_L", prob_getter_hess_L())
+        .def_property_readonly("hess_L_prod", prob_getter_hess_L_prod())
+        .def_property_readonly(
+            "evaluations", [](const pa::ProblemWithCounters<pa::Problem> &p) {
+                return *p.evaluations;
+            });
+
+    py::class_<pa::ProblemWithCounters<pa::ProblemWithParam>,
+               pa::ProblemWithParam>(
+        m, "ProblemWithParamWithCounters",
+        "C++ documentation: "
+        ":cpp:class:`pa::ProblemWithCounters<pa::ProblemWithParam>`\n\n"
+        "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
+        .def(py::init<pa::ProblemWithParam>(), "problem"_a)
+        .def_readwrite("n", &pa::ProblemWithCounters<pa::ProblemWithParam>::n)
+        .def_readwrite("m", &pa::ProblemWithCounters<pa::ProblemWithParam>::m)
+        .def_readwrite("C", &pa::ProblemWithCounters<pa::ProblemWithParam>::C)
+        .def_readwrite("D", &pa::ProblemWithCounters<pa::ProblemWithParam>::D)
+        .def_property_readonly("f", prob_getter_f())
+        .def_property_readonly("grad_f", prob_getter_grad_f())
+        .def_property_readonly("g", prob_getter_g())
+        .def_property_readonly("grad_g_prod", prob_getter_grad_g_prod())
+        .def_property_readonly("grad_gi", prob_getter_grad_gi())
+        .def_property_readonly("hess_L", prob_getter_hess_L())
+        .def_property_readonly("hess_L_prod", prob_getter_hess_L_prod())
+        .def_property(
+            "param",
+            py::overload_cast<>(
+                &pa::ProblemWithCounters<pa::ProblemWithParam>::get_param),
+            [](pa::ProblemWithCounters<pa::ProblemWithParam> &p,
+               pa::crvec param) {
+                if (param.size() != p.get_param().size())
+                    throw std::invalid_argument(
+                        "Invalid parameter dimension: got " +
+                        std::to_string(param.size()) + ", should be " +
+                        std::to_string(p.get_param().size()) + ".");
+                p.set_param(param);
+            },
+            "Parameter vector :math:`p` of the problem")
+        .def_property_readonly(
+            "evaluations",
+            [](const pa::ProblemWithCounters<pa::ProblemWithParam> &p) {
+                return *p.evaluations;
+            });
 
     py::class_<pa::PolymorphicPANOCDirectionBase,
                std::shared_ptr<pa::PolymorphicPANOCDirectionBase>,
