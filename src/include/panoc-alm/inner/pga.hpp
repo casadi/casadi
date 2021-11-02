@@ -217,8 +217,8 @@ PGASolver::operator()(const Problem &problem,        // in
 
         // Check stop condition ------------------------------------------------
 
-        real_t εₖ = detail::calc_error_stop_crit(params.stop_crit, pₖ, γₖ, xₖ,
-                                                 grad_ψx̂ₖ, grad_ψₖ, problem.C);
+        real_t εₖ = detail::calc_error_stop_crit(
+            problem.C, params.stop_crit, pₖ, γₖ, xₖ, x̂ₖ, ŷₖ, grad_ψₖ, grad_ψx̂ₖ);
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)

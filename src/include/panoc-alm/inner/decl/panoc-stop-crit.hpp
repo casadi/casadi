@@ -29,6 +29,8 @@ enum class PANOCStopCrit {
     ///     \varepsilon = \left\| x^k -
     ///     \Pi_C\left(x^k - \gamma_k \nabla \psi(x^k)\right) \right\|_2
     /// @f]
+    /// This is the same criterion as used by
+    /// [OpEn](https://alphaville.github.io/optimization-engine/).
     ProjGradNorm2,
     /// ∞-norm of the projected gradient with unit step size:
     /// @f[
@@ -54,6 +56,41 @@ enum class PANOCStopCrit {
     ///     \Pi_C\left(x^k - \gamma_k \nabla \psi(x^k)\right) \right\|_2
     /// @f]
     FPRNorm2,
+    /// The stopping criterion used by Ipopt, see
+    /// https://link.springer.com/article/10.1007/s10107-004-0559-y equation (5).
+    ///
+    /// Given a candidate iterate @f$ \hat x^k @f$ and the corresponding 
+    /// candidate Lagrange multipliers @f$ \hat y^k @f$ for the general 
+    /// constraints @f$ g(x)\in D @f$,
+    /// the multipliers @f$ w @f$ for the box constraints @f$ x\in C @f$
+    /// (that are otherwise not computed explicitly) are given by
+    /// @f[
+    /// w^k = v^k - \Pi_C(v^k),
+    /// @f]
+    /// where
+    /// @f[ \begin{aligned}
+    /// v^k &\triangleq
+    /// \hat x^k - \nabla f(\hat x^k) - \nabla g(\hat x^k)\, \hat y^k \\ &=
+    /// \hat x^k - \nabla \psi(\hat x^k)
+    /// \end{aligned} @f]
+    /// The quantity that is compared to the (scaled) tolerance is then given by
+    /// @f[ \begin{aligned}
+    /// \varepsilon' &=
+    /// \left\|
+    ///     \nabla f(\hat x^k) + \nabla g(\hat x^k)\, \hat y^k + w^k
+    /// \right\|_\infty \\ &=
+    /// \left\|
+    /// \hat x^k - \Pi_C\left(v^k\right)
+    /// \right\|_\infty
+    /// \end{aligned} @f]
+    /// Finally, the quantity is scaled by the factor 
+    /// @f[
+    /// s_d \triangleq \max\left\{
+    /// s_\text{max},\;\frac{\|\hat y^k\|_1 + \|w^k\|_1}{2m + 2n}
+    /// \right\} / s_\text{max},
+    /// @f]
+    /// i.e. @f$ \varepsilon = \varepsilon' / s_d @f$.
+    Ipopt,
 };
 
 inline const char *enum_name(PANOCStopCrit s) {
@@ -66,6 +103,7 @@ inline const char *enum_name(PANOCStopCrit s) {
         case PANOCStopCrit::ProjGradUnitNorm2: return "ProjGradUnitNorm2";
         case PANOCStopCrit::FPRNorm: return "FPRNorm";
         case PANOCStopCrit::FPRNorm2: return "FPRNorm2";
+        case PANOCStopCrit::Ipopt: return "Ipopt";
     }
     throw std::out_of_range("invalid value for pa::PANOCStopCrit");
 }

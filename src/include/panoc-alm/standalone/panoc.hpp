@@ -229,8 +229,8 @@ inline PANOCStats panoc_impl(ObjFunT &ψ, ObjGradFunT &grad_ψ, const Box &C,
         // Calculate ∇ψ(x̂ₖ)
         grad_ψ(x̂ₖ, grad_̂ψₖ);
         // Check stop condition ------------------------------------------------
-        real_t εₖ = detail::calc_error_stop_crit(params.stop_crit, pₖ, γₖ, xₖ,
-                                                 grad_̂ψₖ, grad_ψₖ, C);
+        real_t εₖ = detail::calc_error_stop_crit(
+            C, params.stop_crit, pₖ, γₖ, xₖ, x̂ₖ, vec(), grad_ψₖ, grad_̂ψₖ);
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)

@@ -43,6 +43,13 @@ real_t norm_inf(const Vec &v) {
     return v.template lpNorm<Eigen::Infinity>();
 }
 
+/// Get the 1-norm of the given vector.
+/// @returns @f$ \left\|v\right\|_1 @f$
+template <class Vec>
+real_t norm_1(const Vec &v) {
+    return v.template lpNorm<1>();
+}
+
 } // namespace vec_util
 
 } // namespace pa

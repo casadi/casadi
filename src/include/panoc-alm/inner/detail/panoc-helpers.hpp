@@ -144,13 +144,15 @@ inline void calc_x̂(const Problem &prob, ///< [in]  Problem description
 
 /// Compute the ε from the stopping criterion, see @ref PANOCStopCrit.
 inline real_t calc_error_stop_crit(
+    const Box &C,       ///< [in]  Box constraints on x
     PANOCStopCrit crit, ///< [in]  What stoppint criterion to use
     crvec pₖ,      ///< [in]  Projected gradient step @f$ \hat x^k - x^k @f$
     real_t γ,      ///< [in]  Step size
     crvec xₖ,      ///< [in]  Current iterate
-    crvec grad_̂ψₖ, ///< [in]  Gradient in @f$ \hat x^k @f$
+    crvec x̂ₖ,      ///< [in]  Current iterate after projected gradient step
+    crvec ŷₖ,      ///< [in]  Candidate Lagrange multipliers
     crvec grad_ψₖ, ///< [in]  Gradient in @f$ x^k @f$
-    const Box &C   ///< [in]  Feasible set @f$ C @f$
+    crvec grad_̂ψₖ  ///< [in]  Gradient in @f$ \hat x^k @f$
 ) {
     switch (crit) {
         case PANOCStopCrit::ApproxKKT: {
@@ -183,6 +185,20 @@ inline real_t calc_error_stop_crit(
         }
         case PANOCStopCrit::FPRNorm2: {
             return pₖ.norm() / γ;
+        }
+        case PANOCStopCrit::Ipopt: {
+            auto err =
+                vec_util::norm_inf(projected_gradient_step(C, 1, x̂ₖ, grad_̂ψₖ));
+            auto n = 2 * (ŷₖ.size() + x̂ₖ.size());
+            if (n == 0)
+                return err;
+            auto C_lagr_mult =
+                vec_util::norm_1(projecting_difference(x̂ₖ - grad_̂ψₖ, C));
+            auto D_lagr_mult   = vec_util::norm_1(ŷₖ);
+            const real_t s_max = 100;
+            real_t s_d =
+                std::max(s_max, (C_lagr_mult + D_lagr_mult) / n) / s_max;
+            return err / s_d;
         }
     }
     throw std::out_of_range("Invalid PANOCStopCrit");

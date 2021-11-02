@@ -163,8 +163,8 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
         calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
 
         // Check stop condition ------------------------------------------------
-        real_t εₖ = detail::calc_error_stop_crit(params.stop_crit, pₖ, γₖ, xₖ,
-                                                 grad_̂ψₖ, grad_ψₖ, problem.C);
+        real_t εₖ = detail::calc_error_stop_crit(
+            problem.C, params.stop_crit, pₖ, γₖ, xₖ, x̂ₖ, ŷx̂ₖ, grad_ψₖ, grad_̂ψₖ);
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
