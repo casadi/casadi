@@ -1,0 +1,105 @@
+# dot -Tsvg expression-dep.gv > expression-dep.gv.svg
+
+digraph ""
+{
+    graph [fontname="TeX Gyre Termes Math"];
+    node [fontname="TeX Gyre Termes Math", fontsize=18];
+    edge [fontname="TeX Gyre Termes Math"];
+  newrank=true;
+
+    x;
+    x [label="x"];
+    
+    # subgraph cluster_0 {
+        gx [label="g(x)"];
+        zeta [label="ζ"];
+        zhat [label="ẑ"];
+        dhat [label="d"];
+        yhat [label="ŷ"];
+        dy [label="dᵀŷ"];
+    # }
+
+    x -> gx;
+    sigma;
+    sigma [label="Σ", style=filled, fillcolor=lightgrey];
+    y;
+    y [label="y", style=filled, fillcolor=lightgrey];
+
+    gx -> zeta;
+    sigma -> zeta;
+    y -> zeta;
+
+    D;
+    D [label="D", style=filled, fillcolor=lightgrey];
+
+    D -> zhat;
+    zeta -> zhat;
+
+    zeta -> dhat;
+    zhat -> dhat
+
+    dhat -> yhat;
+    sigma -> yhat;
+
+    x -> fx;
+    fx [label="f(x)"];
+
+    dhat -> dy;
+    yhat -> dy;
+    fx -> psix;
+    dy -> psix;
+    psix [label="ψ(x)"];
+
+    x -> gradfx;
+    gradfx [label="∇f(x)"];
+
+    x -> gradgx
+    gradgx [label="∇g(x)"];
+
+    gradfx -> gradpsix;
+    gradgx -> gradpsix;
+
+    yhat -> gradpsix;
+    gradpsix [label="∇ψ(x)"];
+
+    C; 
+    C [label="C", style=filled, fillcolor=lightgrey];
+
+    gamma;
+    gamma [label="γ"];
+
+    x -> xhat;
+    C -> xhat;
+    gamma -> xhat;
+    gradpsix -> xhat;
+    xhat [label="x̂"];
+
+    x -> p;
+    xhat -> p;
+    p [label="p"];
+
+    gamma -> r;
+    p -> r;
+    r [label="r"];
+
+    psix -> phigamma;
+    gamma -> phigamma;
+    p -> phigamma;
+    gradpsix -> phigamma;
+    phigamma [label=<φ<sub>γ</sub>(x)>];
+
+    H;
+    H [label="H"];
+    H -> q;
+
+    r -> q;
+    q [label="q"];
+
+    x -> xplus;
+    p -> xplus;
+    q -> xplus;
+    xplus [label=<x<sup>+</sup>>];
+
+    xplus -> dotdotdot;
+    dotdotdot [label="..."];
+}
