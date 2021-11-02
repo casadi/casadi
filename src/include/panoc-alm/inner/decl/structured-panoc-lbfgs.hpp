@@ -115,7 +115,7 @@ class StructuredPANOCLBFGSSolver {
         return *this;
     }
 
-    std::string get_name() const { return "SecondOrderPANOCSolverLBFGS"; }
+    std::string get_name() const { return "StructuredPANOCLBFGSSolver"; }
 
     void stop() { stop_signal.stop(); }
 
