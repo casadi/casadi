@@ -1,3 +1,5 @@
+numpy
+casadi
 setuptools>=42
 wheel
 auditwheel

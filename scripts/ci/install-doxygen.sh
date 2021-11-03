@@ -4,7 +4,7 @@
 
 set -ex
 
-version="Release_1_8_20" # Release tag on GitHub
+version="Release_1_9_2" # Release tag on GitHub
 prefix="${1:-$HOME/.local}"
 
 [ -e "$prefix/bin/doxygen" ] \
