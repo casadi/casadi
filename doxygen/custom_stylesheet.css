@@ -1,3 +1,6 @@
+img.inline {
+    vertical-align: text-bottom;
+}
 div.image {
     text-align: initial;
 }
@@ -21,12 +24,21 @@ body {
     background-color: #DDD;
     width: 100%;
     font-family: 'Roboto', 'sans-serif';
-    font-weight: 400;
+    font-weight: 300;
+}
+body, table, div, p, dl {
+    font-weight: 300;
 }
 h1, h2, h3, h4, h5,
 h2.groupheader, .title, #projectname {
     font-family: 'Roboto', 'sans-serif';
     font-weight: 300;
+}
+h2, h2.groupheader, .title, #projectname {
+    font-weight: 400;
+}
+h3, h4, h5 {
+    font-weight: 400;
 }
 div.contents > div.textblock > h1 {
     border-bottom: 1px solid #c8d0e2;
@@ -41,6 +53,9 @@ div.contents > div.textblock > hr {
 }
 * {
     max-width: 100%;
+}
+span.mono {
+    font-family: monospace;
 }
 /* These were originally "bold" which is too bold */
 b, dt, caption, div.groupHeader, td.indexkey, th.dirtab,
@@ -64,13 +79,17 @@ a.el {
 .memtitle:hover span.permalink {
     opacity: 1;
 } */
+.compoundTemplParams {
+    color: #3C4F74;
+    font-size: inherit;
+}
 iframe {
     max-width: initial;
 }
 #MSearchField {
     max-width: initial;
 }
-body > div.header, div.PageDoc > div.header {
+body > div.header, div > div.header {
     max-width: 1100px;
     box-sizing: border-box;
     margin: auto;
@@ -115,10 +134,27 @@ body > div.header {
     left: 0;
     width: 100%;
 }
-ul.sm-dox {
+.sm-dox {
     background-color: #dde;
     background-image: none;
     box-shadow: 0px 1px 2px #458;
+}
+.sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a:hover, .sm-dox a.highlighted {
+    background-image: none;
+    border-right: 0.5px solid #78A;
+    border-bottom: 0.5px solid #78A;
+    margin-bottom: -1px;
+    /* box-shadow: 0px 1px 2px #458; */
+}
+.sm-dox>li:first-child>a, .sm-dox>li:first-child>:not(ul) a {
+    border-radius: 0;
+}
+.sm-dox a:hover {
+    color: #283a5d;
+    text-shadow: 0 3px 6px white;
+}
+li#searchBoxPos2 {
+    margin-left: 1em;
 }
 div.navpath > ul {
     background-color: #dde;
@@ -128,16 +164,26 @@ div.navpath > ul {
     z-index: 101;
     position: relative;
 }
+#main-nav ul {
+    padding-left: 0;
+}
 .directory td {
     vertical-align: text-bottom;
 }
 .directory td > .el {
     display: inline-block;
 }
-.directory td.desc {
+.directory td.desc, .directory td.entry {
     padding: 0.6em 0.5em 0.6em 0.8em;
 }
-h2.memtitle, .memproto, .fieldtable th {
+.markdownTable tr:last-child td {
+    border-bottom: 1px solid #334262;
+}
+/* Hide the "Detailed description" header */
+div.contents a#details + h2.groupheader {
+    display: none;
+}
+h2.memtitle, .memproto, .fieldtable th, .reflist dt {
     background-color: #dde;
     background-image: none;
 }
@@ -159,9 +205,15 @@ span.mlabel {
 .memdoc {
     border-radius: 0 0 0.4em 0.4em;
 }
-#MSearchResultsWindow {
-    margin-top: 8px;
+.reflist dt {
+    border-radius: 0.4em 0.4em 0 0;
 }
+
+/* A bit more space in lists on related pages */
+div.textblock li {
+    margin: 0.4em 0;
+}
+
 code {
     background-color: #f4f4ff;
     border-radius: 6px;
@@ -171,8 +223,86 @@ div.fragment {
     padding: 0.6em;
     border-radius: 0.6em;
 }
+div.line {
+    line-height: 1.25;
+}
 div#powerTip {
     margin-top: 0.5em;
+}
+
+span.preprocessor {
+    color: #af00db;
+    color: #a31515;
+}
+span.comment {
+    color: #008000;
+}
+span.stringliteral {
+    color: #a31515;
+}
+span.charliteral {
+    color: #a31515;
+}
+span.keywordflow {
+    color: #0000ff;
+    color: #af00db;
+}
+span.keywordtype {
+    color: #2b91af;
+    color: #0000ff;
+}
+span.keyword {
+    color: #0000ff;
+}
+div.line a.code.hl_function {
+    color: #795e26;
+}
+div.line a.code.hl_define {
+    color: #0000ff;
+}
+div.line a.code.hl_class,
+div.line a.code.hl_union,
+div.line a.code.hl_struct,
+div.line a.code.hl_typedef,
+div.line a.code.hl_enumeration {
+    color: #2b91af;
+}
+div.line a.code.hl_enumvalue {
+    color: #1C71BE;
+}
+span.preprocessor a,
+span.preprocessor a.code {
+    color: #a31515;
+    text-decoration: underline;
+}
+div.line a.code.hl_namespace {
+    color: #af00db;
+}
+div.line a.code.hl_variable {
+    color: #001080;
+}
+div.line a.code:hover {
+    filter: brightness(120%);
+}
+span.lineno {
+    background-color: inherit;
+    color: #626670;
+    border-right: 1px solid #777;
+}
+span.lineno a {
+    background-color: #F4F4F4;
+}
+
+blockquote.doxtable {
+    padding: 0.5em 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+blockquote.doxtable > p:first-child {
+    margin-top: 0;
+}
+blockquote.doxtable > p:last-child {
+    margin-bottom: 0;
 }
 
 /* --------------------- */
@@ -182,8 +312,8 @@ div#powerTip {
     div#top {
         position: relative;
     }
-    #side-nav { display: none; }
-    #nav-path { display: none; }
+    /* #side-nav { display: none; } */
+    /* #nav-path { display: none; } */
     body { 
         overflow-x: hidden; 
     }
@@ -209,14 +339,21 @@ div#powerTip {
         line-height: 2.4;
     }
     .sm-dox a:hover {
-        background-image: url(tab_a.png);
+        /* background-image: url(tab_a.png); */
         background-repeat: repeat-x;
         color: white;
         text-shadow: initial;
     }
+    .sm-dox>li:first-child>a, .sm-dox>li:first-child>:not(ul) a {
+        border-top: 0.5px solid #78A;
+    }
     .sm-dox li>a span.sub-arrow:before {
         display: block;
         content: '+';
+    }
+    .sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a:hover,
+    .sm-dox a.highlighted {
+        border-right: none;
     }
     .sm-dox li {
         border-bottom: 1px solid #ccd;
@@ -278,7 +415,31 @@ div#powerTip {
 
 /* ---- Start search box ---- */
 
+iframe#MSearchResults {
+    height: auto;
+    width: 100%;
+    max-width: 25em;
+    margin-left: auto;
+    margin-right: 0;
+    display: block;
+    resize: vertical;
+}
 #MSearchResultsWindow {
+    position: relative;
+    border: none;
+    z-index: 10000;
+    width: 100% !important;
+    top: 0 !important; 
+    left: 0 !important; 
+    box-shadow: inset #778 1px 0px 4px 0px;
+}
+.SRResult {
+    margin-left: auto;
+    margin-right: 0;
+    max-width: 25em;
+}
+
+/* #MSearchResultsWindow {
     border: 1px solid #96A7C8;
     background-color: #F9FAFC;
     border-radius: 0 0 4px 4px;
@@ -287,11 +448,11 @@ div#powerTip {
     box-shadow: 1px 1px 2px 0px #777;
 }
 
-@media only screen and (max-width: 767px) /* and (orientation : portrait) */ {
+@media only screen and (max-width: 767px) {
     #MSearchResultsWindow {
         border-radius: 0;
         margin-top: 0;
     }
-}
+} */
 
 /* ---- End search box ---- */

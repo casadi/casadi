@@ -1,5 +1,5 @@
-Examples 
-=========
+Examples
+========
 
 .. toctree::
    :maxdepth: 2
@@ -7,6 +7,6 @@ Examples
    :caption: Examples
 
    ./*
-
+   ./mpc/mpc_landing_page.rst
 
 

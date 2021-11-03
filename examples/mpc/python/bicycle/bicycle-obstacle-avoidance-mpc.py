@@ -1,5 +1,6 @@
-## @example mpc/python/bicycle-obstacle-avoidance-mpc.py
-# This example shows how to call the PANOC-ALM solver from Python code.
+## @example mpc/python/bicycle/bicycle-obstacle-avoidance-mpc.py
+# This example shows how to call the PANOC-ALM solver from Python code, applied
+# to a simple model predictive control problem.
 
 #%% Import necessary libraries and generate the MPC problem
 

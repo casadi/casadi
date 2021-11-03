@@ -70,7 +70,7 @@ struct ALMParams {
 
     /// Apply preconditioning to the problem, based on the gradients in the
     /// starting point.
-    bool preconditioning = true;
+    bool preconditioning = false;
     /// Use one penalty factor for all m constraints.
     bool single_penalty_factor = false;
 };

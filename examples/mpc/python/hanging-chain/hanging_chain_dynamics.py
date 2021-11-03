@@ -22,10 +22,8 @@ class HangingChain:
         self.params = vc(self.m, self.D, self.L)
 
         self.g = np.array([0, 0, -9.81] if dim == 3 else [0, -9.81])  # gravity
-        self.x0 = np.array(
-            [0, 0, 0] if dim == 3 else [0, 0])  # ball 0 position
-        self.x_end = np.array(
-            [1, 0, 0] if dim == 3 else [1, 0])  # ball N+1 ref
+        self.x0 = np.zeros((dim, ))  # ball 0 position
+        self.x_end = np.eye(1, dim, 0).ravel()  # ball N+1 reference position
 
     def dynamics(self, Ts=0.05):
         y, y1, y2, y3, u = self.y, self.y1, self.y2, self.y3, self.u
