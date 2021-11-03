@@ -12,9 +12,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-import os
-import sys
-
+from typing import Any, Dict, List
 
 # -- Project information -----------------------------------------------------
 
@@ -26,7 +24,6 @@ author = 'Pieter Pas'
 version = ''
 # The full version, including alpha/beta/rc tags
 release = ''
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -44,7 +41,9 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'sphinx.ext.doctest',
     'breathe',
+    'matplotlib.sphinxext.plot_directive',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -71,14 +70,12 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns: List[str] = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
-breathe_projects = {
-    'PANOC-ALM': "../../build/xml"
-}
+breathe_projects = {'PANOC-ALM': "../../build/xml"}
 breathe_default_project = "PANOC-ALM"
 
 # -- Options for HTML output -------------------------------------------------
@@ -91,7 +88,6 @@ html_theme = 'furo'
 html_logo = "../../logo/panocpy_logo.svg"
 html_favicon = "../../logo/panocpy_favicon.png"
 
-
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -103,6 +99,10 @@ html_favicon = "../../logo/panocpy_favicon.png"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['sphinxstatic']
 
+html_css_files = [
+    'css/custom.css',
+]
+
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
 #
@@ -113,16 +113,14 @@ html_static_path = ['sphinxstatic']
 #
 # html_sidebars = {}
 
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'panocpydoc'
 
-
 # -- Options for LaTeX output ------------------------------------------------
 
-latex_elements = {
+latex_elements: Dict[str, Any] = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
@@ -146,20 +144,14 @@ latex_elements = {
 title_string = 'PanocPy Documentation'
 
 latex_documents = [
-    (master_doc, 'panocpy.tex', title_string,
-     'Pieter Pas', 'manual'),
+    (master_doc, 'panocpy.tex', title_string, 'Pieter Pas', 'manual'),
 ]
-
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'panocpy', title_string,
-     [author], 1)
-]
-
+man_pages = [(master_doc, 'panocpy', title_string, [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -167,11 +159,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'panocpy', title_string,
-     author, 'panocpy', 'One line description of project.',
-     'Miscellaneous'),
+    (master_doc, 'panocpy', title_string, author, 'panocpy',
+     'One line description of project.', 'Miscellaneous'),
 ]
-
 
 # -- Options for Epub output -------------------------------------------------
 
@@ -190,5 +180,6 @@ epub_title = project
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
-
 # -- Extension configuration -------------------------------------------------
+
+plot_formats = ['svg']

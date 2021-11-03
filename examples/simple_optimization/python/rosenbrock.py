@@ -1,6 +1,6 @@
 ## @example simple_optimization/python/rosenbrock.py
 # This code contains a minimal example of an optimization problem that can be 
-# built and solved using `panocpy`.
+# built and solved using `panocpy`, it includes visualization of the iterates.
 
 # %% Build the problem for PANOC+ALM (CasADi code, independent of panocpy)
 import casadi as cs
@@ -36,6 +36,9 @@ prob.C.upperbound = [1.5, 2.5]          # -0.5  <= x2 <= 2.5
 prob.D.lowerbound = [-np.inf, -np.inf]  # g1 <= 0
 prob.D.upperbound = [0, 0]              # g2 <= 0
 
+# Set parameter to some value
+prob.param = [10.]
+
 # %% Build an inner Structured PANOC solver with custom parameters
 innersolver = pa.StructuredPANOCLBFGSSolver(
     pa.StructuredPANOCLBFGSParams(
@@ -43,14 +46,16 @@ innersolver = pa.StructuredPANOCLBFGSSolver(
         stop_crit=pa.PANOCStopCrit.ApproxKKT,
     ),
     pa.LBFGSParams(
-        memory=4,
+        memory=10,
     ),
 )
 
 # You can attach a callback that is called on each iteration, and keeps track of
 # the iterates so they can be plotted later
 iterates = []
-def cb(it): iterates.append(np.array(it.x))
+def cb(it): iterates.append(np.copy(it.x))
+# Note: the iterate values like it.x are only valid within the callback, if you
+# want to save them for later, you have to make a copy.
 innersolver.set_progress_callback(cb)
 
 # %% Make an ALM solver with default parameters, using the PANOC solver
@@ -67,11 +72,8 @@ solver = pa.ALMSolver(
 
 # %% Compute a solution 
 
-# Set parameter to some value
-prob.param = [10.]
-
 # Set initial guesses at arbitrary values
-x0 = np.array([.1, 1.8]) # decision variables
+x0 = np.array([0.1, 1.8]) # decision variables
 y0 = np.zeros((prob.m,))  # Lagrange multipliers for g(x)
 
 # Solve the problem
