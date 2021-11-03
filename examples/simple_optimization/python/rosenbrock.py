@@ -1,4 +1,4 @@
-## @example simple_optimization/python/minimal_example.py
+## @example simple_optimization/python/rosenbrock.py
 # This code contains a minimal example of an optimization problem that can be 
 # built and solved using `panocpy`.
 
