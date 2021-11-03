@@ -1,3 +1,7 @@
+## @example mpc/python/hanging-chain/hanging-chain-mpc.py
+# This example shows how to call the PANOC-ALM solver from Python code, applied
+# to a challenging model predictive control problem.
+
 # %% Hanging chain MPC example
 
 import casadi as cs
@@ -25,6 +29,7 @@ param = [0.03, 1.6, 0.033 / N]  # Concrete parameters m, D, L
 N_dist = 3
 u_dist = [-0.5, 0.5, 0.5] if dim == 3 else [-0.5, 0.5]
 y_dist = model.simulate(N_dist, y_null, u_dist, param)
+y_dist = np.hstack((np.array([y_null]).T, y_dist))
 
 # %% Simulate the system without a controller
 
@@ -32,7 +37,7 @@ N_sim = 180
 y_sim = model.simulate(N_sim, y_dist[:, -1], u_null, param)
 y_sim = np.hstack((y_dist, y_sim))
 
-# %% Build an MPC controller
+# %% Define MPC cost and constraints
 
 N_horiz = 12
 
@@ -83,10 +88,6 @@ prob.C.lowerbound = -1 * np.ones((dim * N_horiz, ))
 prob.C.upperbound = +1 * np.ones((dim * N_horiz, ))
 prob.D.lowerbound = constr_lb * np.ones((len(constr), ))
 
-y_n = np.array(y_dist[:, -1]).ravel()  # initial state for controller
-n_state = y_n.shape[0]
-prob.param = np.concatenate((y_n, param, constr_coeff))
-
 # %% NLP solver
 from datetime import timedelta
 
@@ -107,37 +108,63 @@ solver = pa.ALMSolver(
     ),
 )
 
+# %% MPC controller
+
+
+class MPCController:
+    tot_it = 0
+    failures = 0
+    U = np.zeros((N_horiz * dim, ))
+    λ = np.zeros(((N + 1) * N_horiz, ))
+
+    def __init__(self, problem):
+        self.problem = problem
+
+    def __call__(self, y_n):
+        y_n = np.array(y_n).ravel()
+        # Set the current state as the initial state
+        self.problem.param[:y_n.shape[0]] = y_n
+        # Solve the optimal control problem
+        # (warm start using the previous solution and Lagrange multipliers)
+        self.U, self.λ, stats = solver(self.problem, self.U, self.λ)
+        # Print some solver statistics
+        print(stats['status'], stats['outer_iterations'],
+              stats['inner']['iterations'], stats['elapsed_time'],
+              stats['inner_convergence_failures'])
+        self.tot_it += stats['inner']['iterations']
+        self.failures += stats['status'] != pa.SolverStatus.Converged
+        # Print the Lagrange multipliers, shows that constraints are active
+        print(np.linalg.norm(self.λ))
+        # Return the optimal control signal for the first time step
+        return u_mat(self.U)[:, 0]
+
+
 # %% Simulate the system using the MPC controller
 
-y_mpc = np.empty((n_state, N_sim))
+y_n = np.array(y_dist[:, -1]).ravel()  # initial state for controller
+n_state = y_n.shape[0]
+prob.param = np.concatenate((y_n, param, constr_coeff))
 
-tot_it, failures = 0, 0
-U = np.zeros((N_horiz * dim, ))
-λ = np.zeros(((N + 1) * N_horiz, ))
+y_mpc = np.empty((n_state, N_sim))
+controller = MPCController(prob)
 for n in range(N_sim):
-    prob.param[:n_state] = y_n  # Set the current state as the initial state
-    U, λ, stats = solver(prob, U, λ)  # Solve the optimal control problem
-    # (warm start using the previous solution and Lagrange multipliers)
-    # Print some solver statistics
-    print(stats['status'], stats['outer_iterations'],
-          stats['inner']['iterations'], stats['elapsed_time'],
-          stats['inner_convergence_failures'])
-    tot_it += stats['inner']['iterations']
-    failures += stats['status'] != pa.SolverStatus.Converged
-    # Print the Lagrange multipliers, shows that constraints are active
-    print(np.linalg.norm(λ))
+    # Solve the optimal control problem
+    u_n = controller(y_n)
     # Apply the first optimal control signal to the system and simulate for
     # one time step, then update the state
-    u_n = u_mat(U)[:, 0]
     y_n = model.simulate(1, y_n, u_n, param).T
     y_mpc[:, n] = y_n
-print(tot_it, failures)
 y_mpc = np.hstack((y_dist, y_mpc))
+
+print(controller.tot_it, controller.failures)
 
 # %% Visualize
 
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+import matplotlib as mpl
+from matplotlib import patheffects
+
+mpl.rcParams['animation.frame_format'] = 'svg'
 
 fig, ax = plt.subplots()
 x, y, z = model.state_to_pos(y_null)
@@ -147,9 +174,14 @@ plt.legend()
 plt.ylim([-2.5, 1])
 plt.xlim([-0.25, 1.25])
 
-x = np.linspace(-0.25, 1.25)
-y = g_constr(constr_coeff, x) + constr_lb
-plt.plot(x, y)
+x = np.linspace(-0.25, 1.25, 256)
+y = np.linspace(-2.5, 1, 256)
+X, Y = np.meshgrid(x, y)
+Z = g_constr(constr_coeff, X) + constr_lb - Y
+
+fx = [patheffects.withTickedStroke(spacing=7, linewidth=0.8)]
+cgc = plt.contour(X, Y, Z, [0], colors='tab:green', linewidths=0.8)
+plt.setp(cgc.collections, path_effects=fx)
 
 
 class Animation:
@@ -174,15 +206,16 @@ class Animation:
         return [line, line_ctrl] + self.points
 
 
-ani = animation.FuncAnimation(fig,
-                              Animation(),
-                              interval=1000 * Ts,
-                              blit=True,
-                              repeat=True,
-                              frames=N_dist + N_sim)
+ani = mpl.animation.FuncAnimation(fig,
+                                  Animation(),
+                                  interval=1000 * Ts,
+                                  blit=True,
+                                  repeat=True,
+                                  frames=1 + N_dist + N_sim)
 
 # Export the animation
 from os.path import join, dirname
+
 out = join(dirname(__file__), '..', '..', '..', '..', 'sphinx', 'source',
            'sphinxstatic', 'hanging-chain.html')
 with open(out, "w") as f:
