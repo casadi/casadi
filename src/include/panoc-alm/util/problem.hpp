@@ -123,25 +123,47 @@ struct Problem {
           hess_L_prod(std::move(hess_L_prod)), hess_L(std::move(hess_L)) {}
 };
 
+class ParamWrapper {
+  public:
+    ParamWrapper(unsigned p) : param(vec::Constant(p, NaN)) {}
+
+    vec param;
+
+    virtual ~ParamWrapper()                             = default;
+    virtual void wrap(Problem &)                        = 0;
+    virtual std::shared_ptr<ParamWrapper> clone() const = 0;
+};
+
 class ProblemWithParam : public Problem {
   public:
-    ProblemWithParam(unsigned n, unsigned m, unsigned p)
-        : Problem(n, m), param(std::make_shared<vec>(vec::Constant(p, NaN))) {}
+    using Problem::Problem;
+    explicit ProblemWithParam(const ProblemWithParam &o)
+        : Problem(o), wrapper(o.wrapper ? o.wrapper->clone() : nullptr) {
+        wrapper->wrap(*this);
+    }
+    ProblemWithParam &operator=(const ProblemWithParam &o) {
+        static_cast<Problem &>(*this) = static_cast<const Problem &>(o);
+        if (o.wrapper) {
+            this->wrapper = o.wrapper->clone();
+            this->wrapper->wrap(*this);
+        }
+        return *this;
+    }
+    ProblemWithParam(ProblemWithParam &&) = default;
+    ProblemWithParam &operator=(ProblemWithParam &&) = default;
 
     void set_param(crvec p) {
-        assert(p.size() == param->size());
-        *param = p;
+        assert(p.size() == wrapper->param.size());
+        wrapper->param = p;
     }
     void set_param(vec &&p) {
-        assert(p.size() == param->size());
-        *param = std::move(p);
+        assert(p.size() == wrapper->param.size());
+        wrapper->param = std::move(p);
     }
-    vec &get_param() { return *param; }
-    const vec &get_param() const { return *param; }
-    std::shared_ptr<vec> get_param_ptr() const { return param; }
+    vec &get_param() { return wrapper->param; }
+    const vec &get_param() const { return wrapper->param; }
 
-  private:
-    std::shared_ptr<vec> param;
+    std::shared_ptr<ParamWrapper> wrapper;
 };
 
 struct EvalCounter {
@@ -202,6 +224,11 @@ class ProblemWithCounters : public ProblemT {
     ProblemWithCounters(const ProblemT &p) : ProblemT(p) {
         attach_counters(*this);
     }
+
+    ProblemWithCounters(const ProblemWithCounters &) = delete;
+    ProblemWithCounters &operator=(const ProblemWithCounters &) = delete;
+    ProblemWithCounters(ProblemWithCounters &&)                 = default;
+    ProblemWithCounters &operator=(ProblemWithCounters &&) = default;
 
   public:
     std::shared_ptr<EvalCounter> evaluations = std::make_shared<EvalCounter>();

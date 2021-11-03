@@ -149,12 +149,6 @@ x0 = old_x0
 
 # %%
 
-import os
-from tempfile import TemporaryDirectory
-
-print(x.size)
-print(g_.size1())
-
 n = 2
 m = 2
 x = cs.SX.sym("x", n)
@@ -185,11 +179,81 @@ pprint(stats)
 
 # %%
 
-x, y, stats = almsolver(p)  # without initial guess
+n = 2
+m = 2
+x = cs.SX.sym("x", n)
+p = cs.SX.sym("p", 3)
+
+p0 = np.array([1.5, 0.5, 1.5])
+
+Q = cs.vertcat(cs.horzcat(p[0], p[1]), cs.horzcat(p[1], p[2]))
+f_ = 0.5 * x.T @ Q @ x
+g_ = x
+f = cs.Function("f", [x, p], [f_])
+g = cs.Function("g", [x, p], [g_])
+
+name = "testproblem"
+prob = pa.generate_and_compile_casadi_problem(f, g, name=name)
+prob.D.lowerbound = [-np.inf, 0.5]
+prob.D.upperbound = [+np.inf, +np.inf]
+prob.param = p0
+solver = pa.StructuredPANOCLBFGSSolver(
+    pa.StructuredPANOCLBFGSParams(max_iter=200, print_interval=1),
+    pa.LBFGSParams(memory=5),
+)
+almparams = pa.ALMParams(max_iter=20, print_interval=1, preconditioning=False)
+almsolver = pa.ALMSolver(almparams, solver)
+x, y, stats = almsolver(prob, x=x0, y=y0)
 
 print(x)
 print(y)
 pprint(stats)
+
+# %% Make sure that the problem is copied
+
+prob.param = [1, 2, 3]
+assert np.all(prob.param == [1, 2, 3])
+prob1 = pa.ProblemWithParamWithCounters(prob)
+print(prob.param)
+print(prob1.param)
+assert np.all(prob.param == [1, 2, 3])
+assert np.all(prob1.param == [1, 2, 3])
+prob1.param = [42, 43, 44]
+print(prob.param)
+print(prob1.param)
+assert np.all(prob.param == [1, 2, 3])
+assert np.all(prob1.param == [42, 43, 44])
+print(prob.f([1, 2]))
+print(prob1.f([1, 2]))
+assert prob.f([1, 2]) == 21 / 2
+assert prob1.f([1, 2]) == 390 / 2
+assert prob1.evaluations.f == 2
+
+prob2 = pa.ProblemWithCounters(prob) # params are not copied!
+print(prob.f([1, 2]))
+print(prob2.f([1, 2]))
+assert prob.f([1, 2]) == 21 / 2
+assert prob2.f([1, 2]) == 21 / 2
+prob.param = [2, 1, 3]
+print(prob.f([1, 2]))
+print(prob2.f([1, 2]))
+assert prob.f([1, 2]) == 18 / 2
+assert prob2.f([1, 2]) == 18 / 2
+assert prob1.evaluations.f == 2
+assert prob2.evaluations.f == 4
+
+# %%
+
+prob1.param = p0
+x, y, stats = almsolver(prob1)  # without initial guess
+
+print(x)
+print(y)
+pprint(stats)
+print(prob1.evaluations.f)
+print(prob1.evaluations.grad_f)
+print(prob1.evaluations.g)
+print(prob1.evaluations.grad_g_prod)
 
 # %%
 

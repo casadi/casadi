@@ -95,7 +95,8 @@ class CasADiFun_1Vi1So {
 /// Wrapper for CasADiFunctionEvaluator with 2 vector inputs, scalar output.
 class CasADiFun_2Vi1So {
   public:
-    CasADiFun_2Vi1So(casadi::Function &&f, const casadi_int (&dim_in)[2] = {})
+    CasADiFun_2Vi1So(casadi::Function &&f,
+                     const std::array<casadi_int, 2> &dim_in = {})
         : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {{1, 1}}) {}
 
     double operator()(pa::crvec x, pa::crvec p) const {
@@ -130,8 +131,9 @@ class CasADiFun_2Vi1Vo {
   public:
     CasADiFun_2Vi1Vo(CasADiFunctionEvaluator<2, 1> &&fun)
         : fun(std::move(fun)) {}
-    CasADiFun_2Vi1Vo(casadi::Function &&f, const casadi_int (&dim_in)[2] = {},
-                     casadi_int dim_out = 0)
+    CasADiFun_2Vi1Vo(casadi::Function &&f,
+                     const std::array<casadi_int, 2> &dim_in = {},
+                     casadi_int dim_out                      = 0)
         : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {{dim_out, 1}}) {}
 
     void operator()(pa::crvec in1, pa::crvec in2, pa::rvec out) const {
@@ -145,7 +147,8 @@ class CasADiFun_2Vi1Vo {
 /// Wrapper for CasADiFunctionEvaluator with 2 vector inputs, 1 matrix output.
 class CasADiFun_2Vi1Mo {
   public:
-    CasADiFun_2Vi1Mo(casadi::Function &&f, const casadi_int (&dim_in)[2] = {},
+    CasADiFun_2Vi1Mo(casadi::Function &&f,
+                     const std::array<casadi_int, 2> &dim_in           = {},
                      CasADiFunctionEvaluator<2, 1>::casadi_dim dim_out = {0, 0})
         : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {dim_out}) {}
 
@@ -160,7 +163,8 @@ class CasADiFun_2Vi1Mo {
 /// Wrapper for CasADiFunctionEvaluator with 3 vector inputs, 1 matrix output.
 class CasADiFun_3Vi1Mo {
   public:
-    CasADiFun_3Vi1Mo(casadi::Function &&f, const casadi_int (&dim_in)[3] = {},
+    CasADiFun_3Vi1Mo(casadi::Function &&f,
+                     const std::array<casadi_int, 3> &dim_in           = {},
                      CasADiFunctionEvaluator<3, 1>::casadi_dim dim_out = {0, 0})
         : fun(std::move(f),
               {
@@ -182,8 +186,9 @@ class CasADiFun_3Vi1Mo {
 /// Wrapper for CasADiFunctionEvaluator with 3 vector inputs, 1 vector output.
 class CasADiFun_3Vi1Vo {
   public:
-    CasADiFun_3Vi1Vo(casadi::Function &&f, const casadi_int (&dim_in)[3] = {},
-                     casadi_int dim_out = 0)
+    CasADiFun_3Vi1Vo(casadi::Function &&f,
+                     const std::array<casadi_int, 3> &dim_in = {},
+                     casadi_int dim_out                      = 0)
         : fun(std::move(f),
               {
                   {dim_in[0], 1},
@@ -204,8 +209,9 @@ class CasADiFun_3Vi1Vo {
 /// Wrapper for CasADiFunctionEvaluator with 4 vector inputs, 1 vector output.
 class CasADiFun_4Vi1Vo {
   public:
-    CasADiFun_4Vi1Vo(casadi::Function &&f, const casadi_int (&dim_in)[4] = {},
-                     casadi_int dim_out = 0)
+    CasADiFun_4Vi1Vo(casadi::Function &&f,
+                     const std::array<casadi_int, 4> &dim_in = {},
+                     casadi_int dim_out                      = 0)
         : fun(std::move(f),
               {
                   {dim_in[0], 1},

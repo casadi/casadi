@@ -46,14 +46,15 @@ namespace py = pybind11;
 
 template <class DirectionProviderT>
 auto PolymorphicPANOCConstructor() {
-    return [](const pa::PANOCParams &pp, const DirectionProviderT &dir) {
+    return [](const std::variant<pa::PANOCParams, py::dict> &pp,
+              const DirectionProviderT &dir) {
         using Base = pa::PolymorphicPANOCDirectionBase;
         static_assert(std::is_base_of_v<Base, DirectionProviderT>);
         auto full_python_copy = std::make_shared<py::object>(py::cast(dir));
         auto base_copy        = full_python_copy->template cast<Base *>();
         return std::make_shared<pa::PolymorphicPANOCSolver>(
             pa::PANOCSolver<Base>{
-                pp,
+                var_kwargs_to_struct(pp),
                 std::shared_ptr<Base>(full_python_copy, base_copy),
             });
     };
@@ -61,13 +62,24 @@ auto PolymorphicPANOCConstructor() {
 
 template <class DirectionProviderT, class... DirectionArgumentsT>
 auto PolymorphicPANOCConversion() {
-    return [](const pa::PANOCParams &pp, const DirectionArgumentsT &...args) {
+    return [](const std::variant<pa::PANOCParams, py::dict> &pp,
+              const DirectionArgumentsT &...args) {
         using Base = pa::PolymorphicPANOCDirectionBase;
         static_assert(std::is_base_of_v<Base, DirectionProviderT>);
         static_assert(std::is_constructible_v<DirectionProviderT,
                                               DirectionArgumentsT...>);
         DirectionProviderT dir{args...};
         return PolymorphicPANOCConstructor<DirectionProviderT>()(pp, dir);
+    };
+}
+
+template <class DirectionProviderT>
+auto PolymorphicPANOCDefaultConversion() {
+    return [](const std::variant<pa::PANOCParams, py::dict> &pp,
+              const std::variant<pa::LBFGSParams, py::dict> &args) {
+        return PolymorphicPANOCConversion<DirectionProviderT,
+                                          pa::LBFGSParams>()(
+            pp, var_kwargs_to_struct(args));
     };
 }
 
@@ -96,7 +108,8 @@ auto PolymorphicALMConstructorDefaultParams() {
 
 template <class InnerSolverT, class... InnerSolverArgumentsT>
 auto PolymorphicALMConversion() {
-    return [](const pa::ALMParams &pp, const InnerSolverArgumentsT &...args) {
+    return [](const std::variant<pa::ALMParams, py::dict> &pp,
+              const InnerSolverArgumentsT &...args) {
         using Base = pa::PolymorphicPANOCDirectionBase;
         static_assert(std::is_base_of_v<Base, InnerSolverT>);
         static_assert(
@@ -182,7 +195,6 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         m, "ProblemWithParam",
         "C++ documentation: :cpp:class:`pa::ProblemWithParam`\n\n"
         "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
-        .def(py::init<unsigned, unsigned, unsigned>(), "n"_a, "m"_a, "p"_a)
         .def_readwrite("n", &pa::ProblemWithParam::n)
         .def_readwrite("m", &pa::ProblemWithParam::m)
         .def_readwrite("C", &pa::ProblemWithParam::C)
@@ -210,6 +222,25 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         m, "EvalTimer",
         "C++ documentation: "
         ":cpp:class:`pa::EvalCounter::EvalTimer`\n\n")
+        .def(py::pickle(
+            [](const pa::EvalCounter::EvalTimer &p) { // __getstate__
+                return py::make_tuple(p.f, p.grad_f, p.g, p.grad_g_prod,
+                                      p.grad_gi, p.hess_L_prod, p.hess_L);
+            },
+            [](py::tuple t) { // __setstate__
+                if (t.size() != 7)
+                    throw std::runtime_error("Invalid state!");
+                using T = pa::EvalCounter::EvalTimer;
+                return T{
+                    py::cast<decltype(T::f)>(t[0]),
+                    py::cast<decltype(T::grad_f)>(t[1]),
+                    py::cast<decltype(T::g)>(t[2]),
+                    py::cast<decltype(T::grad_g_prod)>(t[3]),
+                    py::cast<decltype(T::grad_gi)>(t[4]),
+                    py::cast<decltype(T::hess_L_prod)>(t[5]),
+                    py::cast<decltype(T::hess_L)>(t[6]),
+                };
+            }))
         .def_readwrite("f", &pa::EvalCounter::EvalTimer::f)
         .def_readwrite("grad_f", &pa::EvalCounter::EvalTimer::grad_f)
         .def_readwrite("g", &pa::EvalCounter::EvalTimer::g)
@@ -221,6 +252,27 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<pa::EvalCounter>(m, "EvalCounter",
                                 "C++ documentation: "
                                 ":cpp:class:`pa::EvalCounter`\n\n")
+        .def(py::pickle(
+            [](const pa::EvalCounter &p) { // __getstate__
+                return py::make_tuple(p.f, p.grad_f, p.g, p.grad_g_prod,
+                                      p.grad_gi, p.hess_L_prod, p.hess_L,
+                                      p.time);
+            },
+            [](py::tuple t) { // __setstate__
+                if (t.size() != 8)
+                    throw std::runtime_error("Invalid state!");
+                using T = pa::EvalCounter;
+                return T{
+                    py::cast<decltype(T::f)>(t[0]),
+                    py::cast<decltype(T::grad_f)>(t[1]),
+                    py::cast<decltype(T::g)>(t[2]),
+                    py::cast<decltype(T::grad_g_prod)>(t[3]),
+                    py::cast<decltype(T::grad_gi)>(t[4]),
+                    py::cast<decltype(T::hess_L_prod)>(t[5]),
+                    py::cast<decltype(T::hess_L)>(t[6]),
+                    py::cast<decltype(T::time)>(t[7]),
+                };
+            }))
         .def_readwrite("f", &pa::EvalCounter::f)
         .def_readwrite("grad_f", &pa::EvalCounter::grad_f)
         .def_readwrite("g", &pa::EvalCounter::g)
@@ -235,7 +287,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         "C++ documentation: "
         ":cpp:class:`pa::ProblemWithCounters<pa::Problem>`\n\n"
         "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
-        .def(py::init<pa::Problem>(), "problem"_a)
+        .def(py::init<const pa::Problem &>(), "problem"_a)
         .def_readwrite("n", &pa::ProblemWithCounters<pa::Problem>::n)
         .def_readwrite("m", &pa::ProblemWithCounters<pa::Problem>::m)
         .def_readwrite("C", &pa::ProblemWithCounters<pa::Problem>::C)
@@ -258,7 +310,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         "C++ documentation: "
         ":cpp:class:`pa::ProblemWithCounters<pa::ProblemWithParam>`\n\n"
         "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
-        .def(py::init<pa::ProblemWithParam>(), "problem"_a)
+        .def(py::init<const pa::ProblemWithParam &>(), "problem"_a)
         .def_readwrite("n", &pa::ProblemWithCounters<pa::ProblemWithParam>::n)
         .def_readwrite("m", &pa::ProblemWithCounters<pa::ProblemWithParam>::m)
         .def_readwrite("C", &pa::ProblemWithCounters<pa::ProblemWithParam>::C)
@@ -420,6 +472,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .value("ProjGradUnitNorm2", pa::PANOCStopCrit::ProjGradUnitNorm2)
         .value("FPRNorm", pa::PANOCStopCrit::FPRNorm)
         .value("FPRNorm2", pa::PANOCStopCrit::FPRNorm2)
+        .value("Ipopt", pa::PANOCStopCrit::Ipopt)
         .export_values();
 
     py::class_<pa::PGAParams>(m, "PGAParams",
@@ -582,8 +635,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def(py::init(PolymorphicPANOCConstructor< //
                       pa::PolymorphicLBFGSDirection>()),
              "panoc_params"_a, "lbfgs_direction"_a)
-        .def(py::init(PolymorphicPANOCConversion< //
-                      pa::PolymorphicLBFGSDirection, pa::LBFGSParams>()),
+        .def(py::init(PolymorphicPANOCDefaultConversion< //
+                      pa::PolymorphicLBFGSDirection>()),
              "panoc_params"_a, "lbfgs_params"_a)
         .def(py::init(PolymorphicPANOCConstructor< //
                       pa::PolymorphicPANOCDirectionTrampoline>()),

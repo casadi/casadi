@@ -1,7 +1,10 @@
-#include <casadi/core/external.hpp>
-#include <optional>
 #include <panoc-alm/interop/casadi/CasADiFunctionWrapper.hpp>
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
+
+#include <casadi/core/external.hpp>
+
+#include <memory>
+#include <optional>
 #include <stdexcept>
 
 namespace pa {
@@ -59,218 +62,211 @@ load_CasADi_hessian_lagrangian_prod(const std::string &so_name,
 }
 #endif
 
+template <class F>
+auto wrap_load(const std::string &so_name, const char *name, F f) {
+    try {
+        return f();
+    } catch (const std::invalid_argument &e) {
+        throw std::invalid_argument("Unable to load function '" + so_name +
+                                    ":" + name + "': " + e.what());
+    }
+}
+
+template <class T, class... Args>
+auto wrapped_load(const std::string &so_name, const char *name,
+                  Args &&...args) {
+    return wrap_load(so_name, name, [&] {
+        return T(casadi::external(name, so_name), std::forward<Args>(args)...);
+    });
+}
+
+constexpr static auto dims = [](auto... a) {
+    return std::array<casadi_int, sizeof...(a)>{a...};
+};
+using dim = std::pair<casadi_int, casadi_int>;
+
 pa::Problem load_CasADi_problem(const std::string &so_name, unsigned n,
                                 unsigned m, bool second_order) {
 
-    auto load = [&](const std::string &name) {
-        return casadi::external(name, so_name);
-    };
-    auto wrap_load = [&so_name](const char *name, auto f) {
-        try {
-            f();
-        } catch (const std::invalid_argument &e) {
-            throw std::invalid_argument("Unable to load function '" + so_name +
-                                        ":" + name + "': " + e.what());
-        }
+    auto load_g_unknown_dims = [&] {
+        CasADiFunctionEvaluator<1, 1> g{casadi::external("g", so_name)};
+        if (g.fun.size2_in(0) != 1)
+            throw std::invalid_argument(
+                "First input argument should be a column vector.");
+        if (g.fun.size2_out(0) != 1)
+            throw std::invalid_argument(
+                "First output argument should be a column vector.");
+        if (n == 0)
+            n = g.fun.size1_in(0);
+        if (m == 0)
+            m = g.fun.size1_out(0);
+        g.validate_dimensions({dim(n, 1)}, {dim(m, 1)});
+        return g;
     };
 
-    std::optional<CasADiFunctionEvaluator<1, 1>> g;
-    // If not all dimensions are specified, load the function "g" to determine
-    // the missing dimensions.
-    if (n == 0 || m == 0) {
-        wrap_load("g", [&] {
-            g = load("g");
-            if (g->fun.size2_in(0) != 1)
-                throw std::invalid_argument(
-                    "First input argument should be a column vector.");
-            if (g->fun.size2_out(0) != 1)
-                throw std::invalid_argument(
-                    "First output argument should be a column vector.");
-            if (n == 0)
-                n = g->fun.size1_in(0);
-            if (m == 0)
-                m = g->fun.size1_out(0);
-            g->validate_dimensions({{n, 1}}, {{m, 1}});
-        });
-    }
-    // Otherwise, load the function "g" and compare its dimensions to the
-    // dimensions specified by the user.
-    else {
-        wrap_load("g", [&] { g = {load("g"), {{n, 1}}, {{m, 1}}}; });
-    }
+    auto load_g_known_dims = [&] {
+        CasADiFunctionEvaluator<1, 1> g{
+            casadi::external("g", so_name), {dim(n, 1)}, {dim(m, 1)}};
+        return g;
+    };
+
+    CasADiFunctionEvaluator<1, 1> g =
+        (n == 0 || m == 0)
+            // If not all dimensions are specified, load the function "g" to
+            //determine the missing dimensions.
+            ? wrap_load(so_name, "g", load_g_unknown_dims)
+            // Otherwise, load the function "g" and compare its dimensions to
+            // the dimensions specified by the user.
+            : wrap_load(so_name, "g", load_g_known_dims);
 
     auto prob = pa::Problem(n, m);
-    pa::vec w = pa::vec::Zero(m);
 
-    wrap_load("f", [&] {
-        prob.f = [csf{CasADiFun_1Vi1So(load("f"), n)}] //
-            (pa::crvec x) {                            //
-                return csf(x);
-            };
-    });
-    wrap_load("grad_f", [&] {
-        prob.grad_f = [csf{CasADiFun_1Vi1Vo(load("grad_f"), n, n)}] //
-            (pa::crvec x, pa::rvec gr) {                            //
-                csf(x, gr);
-            };
-    });
-    wrap_load("g", [&] {
-        prob.g = [csf{CasADiFun_1Vi1Vo(std::move(*g))}] //
-            (pa::crvec x, pa::rvec g) {                 //
-                csf(x, g);
-            };
-    });
-    wrap_load("grad_g", [&] {
-        prob.grad_g_prod = [csf{CasADiFun_2Vi1Vo(load("grad_g"), {n, m}, n)}] //
-            (pa::crvec x, pa::crvec y, pa::rvec g) {                          //
-                if (y.size() == 0)
-                    g.setZero();
-                else
-                    csf(x, y, g);
-            };
-    });
+    prob.f      = wrapped_load<CasADiFun_1Vi1So>(so_name, "f", n);
+    prob.grad_f = wrapped_load<CasADiFun_1Vi1Vo>(so_name, "grad_f", n, n);
+    prob.g      = CasADiFun_1Vi1Vo(std::move(g));
+    auto grad_g =
+        wrapped_load<CasADiFun_2Vi1Vo>(so_name, "grad_g", dims(n, m), n);
+    prob.grad_g_prod = grad_g;
     if (second_order) {
-        wrap_load("grad_gi", [&] {
-            prob.grad_gi =
-                [csf{CasADiFun_2Vi1Vo(load("grad_g"), {n, m}, n)}, w] //
-                (pa::crvec x, unsigned i, pa::rvec g) mutable {       //
-                    if (w.size() == 0) {
-                        g.setZero();
-                    } else {
-                        w(i) = 1;
-                        csf(x, w, g);
-                        w(i) = 0;
-                    }
-                };
-        });
-        wrap_load("hess_L", [&] {
-            prob.hess_L =
-                [csf{CasADiFun_2Vi1Mo(load("hess_L"), {n, m}, {n, n})}] //
-                (pa::crvec x, pa::crvec y, pa::rvec g) {                //
-                    csf(x, y, g);
-                };
-        });
-        wrap_load("hess_L_prod", [&] {
-            prob.hess_L_prod =
-                [csf{CasADiFun_3Vi1Vo(load("hess_L_prod"), {n, m, n}, n)}] //
-                (pa::crvec x, pa::crvec y, pa::crvec v, pa::rvec g) {      //
-                    csf(x, y, v, g);
-                };
-        });
+        pa::vec w    = pa::vec::Zero(m);
+        prob.grad_gi = //
+            [grad_g, w](pa::crvec x, unsigned i, pa::rvec g) mutable {
+                w(i) = 1;
+                grad_g(x, w, g);
+                w(i) = 0;
+            };
+        prob.hess_L =                                              //
+            wrapped_load<CasADiFun_2Vi1Mo>(so_name, "hess_L",      //
+                                           dims(n, m), dim(n, n)); //
+        prob.hess_L_prod =                                         //
+            wrapped_load<CasADiFun_3Vi1Vo>(so_name, "hess_L_prod", //
+                                           dims(n, m, n), n);      //
     }
     return prob;
 }
+
+class CasADiParamWrapper
+    : public ParamWrapper,
+      public std::enable_shared_from_this<CasADiParamWrapper> {
+
+  public:
+    struct Functions {
+        CasADiFun_2Vi1So f;
+        CasADiFun_2Vi1Vo grad_f;
+        CasADiFun_2Vi1Vo g;
+        CasADiFun_3Vi1Vo grad_g_prod;
+        std::optional<CasADiFun_3Vi1Mo> hess_L;
+        std::optional<CasADiFun_4Vi1Vo> hess_L_prod;
+    } cs;
+
+  private:
+    CasADiParamWrapper(unsigned p, Functions &&functions)
+        : ParamWrapper(p), cs(std::move(functions)) {}
+
+  public:
+    static std::shared_ptr<CasADiParamWrapper> create(unsigned p,
+                                                      Functions &&functions) {
+        return std::make_shared<CasADiParamWrapper>(CasADiParamWrapper{
+            p,
+            std::move(functions),
+        });
+    }
+
+    void wrap(Problem &prob) override {
+        auto param = this->shared_from_this();
+        prob.f     = [param](crvec x) -> real_t {
+            return param->cs.f(x, param->param);
+        };
+        prob.grad_f = [param](crvec x, rvec gr) {
+            param->cs.grad_f(x, param->param, gr);
+        };
+        prob.g = [param](crvec x, rvec g) -> void {
+            param->cs.g(x, param->param, g);
+        };
+        prob.grad_g_prod = [param](crvec x, crvec y, rvec g) {
+            param->cs.grad_g_prod(x, param->param, y, g);
+        };
+        pa::vec w    = pa::vec::Zero(prob.m);
+        prob.grad_gi = [param, w](crvec x, unsigned i, rvec g) mutable {
+            w(i) = 1;
+            param->cs.grad_g_prod(x, param->param, w, g);
+            w(i) = 0;
+        };
+        if (param->cs.hess_L) {
+            prob.hess_L = [param](crvec x, crvec y, rvec g) {
+                (*param->cs.hess_L)(x, param->param, y, g);
+            };
+        }
+        if (param->cs.hess_L_prod) {
+            prob.hess_L_prod = [param](crvec x, crvec y, crvec v, rvec g) {
+                (*param->cs.hess_L_prod)(x, param->param, y, v, g);
+            };
+        }
+    }
+
+    std::shared_ptr<ParamWrapper> clone() const override {
+        return std::make_shared<CasADiParamWrapper>(*this);
+    }
+};
 
 ProblemWithParam load_CasADi_problem_with_param(const std::string &so_name,
                                                 unsigned n, unsigned m,
                                                 unsigned p, bool second_order) {
 
-    auto load = [&](const std::string &name) {
-        return casadi::external(name, so_name);
+    auto load_g_unknown_dims = [&] {
+        CasADiFunctionEvaluator<2, 1> g{casadi::external("g", so_name)};
+        if (g.fun.size2_in(0) != 1)
+            throw std::invalid_argument(
+                "First input argument should be a column vector.");
+        if (g.fun.size2_in(1) != 1)
+            throw std::invalid_argument(
+                "Second input argument should be a column vector.");
+        if (g.fun.size2_out(0) != 1)
+            throw std::invalid_argument(
+                "First output argument should be a column vector.");
+        if (n == 0)
+            n = g.fun.size1_in(0);
+        if (m == 0)
+            m = g.fun.size1_out(0);
+        if (p == 0)
+            p = g.fun.size1_in(1);
+        g.validate_dimensions({dim(n, 1), dim(p, 1)}, {dim(m, 1)});
+        return g;
     };
-    auto wrap_load = [&so_name](const char *name, auto f) {
-        try {
-            f();
-        } catch (const std::invalid_argument &e) {
-            throw std::invalid_argument("Unable to load function '" + so_name +
-                                        ":" + name + "': " + e.what());
-        }
+
+    auto load_g_known_dims = [&] {
+        CasADiFunctionEvaluator<2, 1> g{casadi::external("g", so_name),
+                                        {dim(n, 1), dim(p, 1)},
+                                        {dim(m, 1)}};
+        return g;
     };
 
-    std::optional<CasADiFunctionEvaluator<2, 1>> g;
-    // If not all dimensions are specified, load the function "g" to determine
-    // the missing dimensions.
-    if (n == 0 || m == 0 || p == 0) {
-        wrap_load("g", [&] {
-            g = load("g");
-            if (g->fun.size2_in(0) != 1)
-                throw std::invalid_argument(
-                    "First input argument should be a column vector.");
-            if (g->fun.size2_in(1) != 1)
-                throw std::invalid_argument(
-                    "Second input argument should be a column vector.");
-            if (g->fun.size2_out(0) != 1)
-                throw std::invalid_argument(
-                    "First output argument should be a column vector.");
-            if (n == 0)
-                n = g->fun.size1_in(0);
-            if (m == 0)
-                m = g->fun.size1_out(0);
-            if (p == 0)
-                p = g->fun.size1_in(1);
-            g->validate_dimensions({{n, 1}, {p, 1}}, {{m, 1}});
-        });
-    }
-    // Otherwise, load the function "g" and compare its dimensions to the
-    // dimensions specified by the user.
-    else {
-        wrap_load("g", [&] { g = {load("g"), {{n, 1}, {p, 1}}, {{m, 1}}}; });
-    }
+    CasADiFunctionEvaluator<2, 1> g =
+        (n == 0 || m == 0 || p == 0)
+            // If not all dimensions are specified, load the function "g" to
+            // determine the missing dimensions.
+            ? wrap_load(so_name, "g", load_g_unknown_dims)
+            // Otherwise, load the function "g" and compare its dimensions to
+            // the dimensions specified by the user.
+            : wrap_load(so_name, "g", load_g_known_dims);
 
-    auto prob        = ProblemWithParam(n, m, p);
-    pa::vec w        = pa::vec::Zero(m);
-    const auto param = prob.get_param_ptr();
+    auto prob = ProblemWithParam(n, m);
 
-    wrap_load("f", [&] {
-        prob.f = [csf{CasADiFun_2Vi1So(load("f"), {n, p})}, p{param}] //
-            (pa::crvec x) {                                           //
-                return csf(x, *p);
-            };
-    });
-    wrap_load("grad_f", [&] {
-        prob.grad_f =
-            [csf{CasADiFun_2Vi1Vo(load("grad_f"), {n, p}, n)}, p{param}] //
-            (pa::crvec x, pa::rvec gr) {                                 //
-                csf(x, *p, gr);
-            };
-    });
-    wrap_load("g", [&] {
-        prob.g = [csf{CasADiFun_2Vi1Vo(std::move(*g))}, p{param}] //
-            (pa::crvec x, pa::rvec g) {                           //
-                csf(x, *p, g);
-            };
-    });
-    wrap_load("grad_g", [&] {
-        prob.grad_g_prod =
-            [csf{CasADiFun_3Vi1Vo(load("grad_g"), {n, p, m}, n)}, p{param}] //
-            (pa::crvec x, pa::crvec y, pa::rvec g) {                        //
-                if (y.size() == 0)
-                    g.setZero();
-                else
-                    csf(x, *p, y, g);
-            };
-    });
-    if (second_order) {
-        wrap_load("grad_g", [&] {
-            prob.grad_gi = [csf{CasADiFun_3Vi1Vo(load("grad_g"), {n, p, m}, n)},
-                            p{param}, w]                        //
-                (pa::crvec x, unsigned i, pa::rvec g) mutable { //
-                    if (w.size() == 0) {
-                        g.setZero();
-                    } else {
-                        w(i) = 1;
-                        csf(x, *p, w, g);
-                        w(i) = 0;
-                    }
-                };
+    prob.wrapper = CasADiParamWrapper::create(
+        p,
+        {
+            wrapped_load<CasADiFun_2Vi1So>(so_name, "f", dims(n, p)),
+            wrapped_load<CasADiFun_2Vi1Vo>(so_name, "grad_f", dims(n, p), n),
+            CasADiFun_2Vi1Vo(std::move(g)),
+            wrapped_load<CasADiFun_3Vi1Vo>(so_name, "grad_g", dims(n, p, m), n),
+            second_order ? std::make_optional(wrapped_load<CasADiFun_3Vi1Mo>(
+                               so_name, "hess_L", dims(n, p, m), dim(n, n)))
+                         : std::nullopt,
+            second_order ? std::make_optional(wrapped_load<CasADiFun_4Vi1Vo>(
+                               so_name, "hess_L_prod", dims(n, p, m, n), n))
+                         : std::nullopt,
         });
-        wrap_load("hess_L", [&] {
-            prob.hess_L =
-                [csf{CasADiFun_3Vi1Mo(load("hess_L"), {n, p, m}, {n, n})},
-                 p{param}]                               //
-                (pa::crvec x, pa::crvec y, pa::rvec g) { //
-                    csf(x, *p, y, g);
-                };
-        });
-        wrap_load("hess_L_prod", [&] {
-            prob.hess_L_prod =
-                [csf{CasADiFun_4Vi1Vo(load("hess_L_prod"), {n, p, m, n}, n)},
-                 p{param}]                                            //
-                (pa::crvec x, pa::crvec y, pa::crvec v, pa::rvec g) { //
-                    csf(x, *p, y, v, g);
-                };
-        });
-    }
+    prob.wrapper->wrap(prob);
     return prob;
 }
 

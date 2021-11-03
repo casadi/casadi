@@ -19,6 +19,9 @@ inline real_t calc_ψ_ŷ(const Problem &p, ///< [in]  Problem description
                        crvec Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
                        rvec ŷ   ///< [out] @f$ \hat{y} @f$
 ) {
+    if (p.m == 0) /* [[unlikely]] */
+        return p.f(x);
+
     // g(x)
     p.g(x, ŷ);
     // ζ = g(x) + Σ⁻¹y
@@ -46,8 +49,10 @@ inline void calc_grad_ψ_from_ŷ(const Problem &p, ///< [in]  Problem descriptio
 ) {
     // ∇ψ = ∇f(x) + ∇g(x) ŷ
     p.grad_f(x, grad_ψ);
-    p.grad_g_prod(x, ŷ, work_n);
-    grad_ψ += work_n;
+    if (p.m != 0) /* [[likely]] */ {
+        p.grad_g_prod(x, ŷ, work_n);
+        grad_ψ += work_n;
+    }
 }
 
 /// Calculate both ψ(x) and its gradient ∇ψ(x).
@@ -79,6 +84,9 @@ inline void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
                         rvec work_n, ///<       Dimension n
                         rvec work_m  ///<       Dimension m
 ) {
+    if (p.m == 0) /* [[unlikely]] */
+        return p.grad_f(x, grad_ψ);
+
     // g(x)
     p.g(x, work_m);
     // ζ = g(x) + Σ⁻¹y
