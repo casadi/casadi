@@ -49,6 +49,8 @@ PANOCSolver<DirectionProviderT>::operator()(
     // TODO: the L-BFGS objects and vectors allocate on each iteration of ALM,
     //       and there are more vectors than strictly necessary.
 
+    bool need_grad_̂ψₖ = detail::stop_crit_requires_grad_̂ψₖ(params.stop_crit);
+
     vec xₖ = x,   // Value of x at the beginning of the iteration
         x̂ₖ(n),    // Value of x after a projected gradient step
         xₖ₊₁(n),  // xₖ for next iteration
@@ -58,9 +60,9 @@ PANOCSolver<DirectionProviderT>::operator()(
         pₖ(n),    // Projected gradient step pₖ = x̂ₖ - xₖ
         pₖ₊₁(n), // Projected gradient step pₖ₊₁ = x̂ₖ₊₁ - xₖ₊₁
         qₖ(n),   // Newton step Hₖ pₖ
-        grad_ψₖ(n),   // ∇ψ(xₖ)
-        grad_̂ψₖ(n),   // ∇ψ(x̂ₖ)
-        grad_ψₖ₊₁(n); // ∇ψ(xₖ₊₁)
+        grad_ψₖ(n),                    // ∇ψ(xₖ)
+        grad_̂ψₖ(need_grad_̂ψₖ ? n : 0), // ∇ψ(x̂ₖ)
+        grad_ψₖ₊₁(n);                  // ∇ψ(xₖ₊₁)
 
     vec work_n(n), work_m(m);
 
@@ -159,7 +161,8 @@ PANOCSolver<DirectionProviderT>::operator()(
                 φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
         }
         // Calculate ∇ψ(x̂ₖ)
-        calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
+        if (need_grad_̂ψₖ)
+            calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
 
         // Check stop condition ------------------------------------------------
         real_t εₖ = detail::calc_error_stop_crit(
@@ -231,7 +234,10 @@ PANOCSolver<DirectionProviderT>::operator()(
             if (τ / 2 < params.τ_min) { // line search failed
                 xₖ₊₁.swap(x̂ₖ);          // → safe prox step
                 ψₖ₊₁ = ψx̂ₖ;
-                grad_ψₖ₊₁.swap(grad_̂ψₖ);
+                if (need_grad_̂ψₖ)
+                    grad_ψₖ₊₁.swap(grad_̂ψₖ);
+                else
+                    calc_grad_ψ_from_ŷ(xₖ₊₁, ŷx̂ₖ, /* in ⟹ out */ grad_ψₖ₊₁);
             } else {        // line search didn't fail (yet)
                 if (τ == 1) // → faster quasi-Newton step
                     xₖ₊₁ = xₖ + qₖ;

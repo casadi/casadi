@@ -150,6 +150,21 @@ inline void calc_x̂(const Problem &prob, ///< [in]  Problem description
     x̂ = x + p;
 }
 
+inline bool stop_crit_requires_grad_̂ψₖ(PANOCStopCrit crit) {
+    switch (crit) {
+        case PANOCStopCrit::ApproxKKT: [[fallthrough]];
+        case PANOCStopCrit::ApproxKKT2: return true;
+        case PANOCStopCrit::ProjGradNorm: [[fallthrough]];
+        case PANOCStopCrit::ProjGradNorm2: [[fallthrough]];
+        case PANOCStopCrit::ProjGradUnitNorm: [[fallthrough]];
+        case PANOCStopCrit::ProjGradUnitNorm2: [[fallthrough]];
+        case PANOCStopCrit::FPRNorm: [[fallthrough]];
+        case PANOCStopCrit::FPRNorm2: return false;
+        case PANOCStopCrit::Ipopt: return true;
+    }
+    throw std::out_of_range("Invalid PANOCStopCrit");
+}
+
 /// Compute the ε from the stopping criterion, see @ref PANOCStopCrit.
 inline real_t calc_error_stop_crit(
     const Box &C,       ///< [in]  Box constraints on x
