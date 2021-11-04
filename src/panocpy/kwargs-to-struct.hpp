@@ -198,6 +198,7 @@ inline const kwargs_to_struct_table_t<pa::StructuredPANOCLBFGSParams>
          &pa::StructuredPANOCLBFGSParams::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond",
          &pa::StructuredPANOCLBFGSParams::alternative_linesearch_cond},
+        {"hessian_vec", &pa::StructuredPANOCLBFGSParams::hessian_vec},
         {"hessian_vec_finited_differences",
          &pa::StructuredPANOCLBFGSParams::hessian_vec_finited_differences},
         {"full_augmented_hessian",

@@ -753,6 +753,8 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         .def_readwrite(
             "alternative_linesearch_cond",
             &pa::StructuredPANOCLBFGSParams::alternative_linesearch_cond)
+        .def_readwrite("hessian_vec",
+                       &pa::StructuredPANOCLBFGSParams::hessian_vec)
         .def_readwrite(
             "hessian_vec_finited_differences",
             &pa::StructuredPANOCLBFGSParams::hessian_vec_finited_differences)

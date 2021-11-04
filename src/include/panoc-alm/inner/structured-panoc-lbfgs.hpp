@@ -263,14 +263,14 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
                     qₖ(i) = pₖ(i);                         //
                 } else {                                   // i ∊ J
                     J.push_back(i);
-                    qₖ(i) = 0;
+                    qₖ(i) = params.hessian_vec ? 0 : -grad_ψₖ(i);
                 }
             }
 
             if (not J.empty()) {     // There are inactive indices J
                 if (J.size() == n) { // There are no active indices K
                     qₖ = -grad_ψₖ;
-                } else { //             There are active indices K
+                } else if (params.hessian_vec) { // There are active indices K
                     if (params.hessian_vec_finited_differences) {
                         detail::calc_augmented_lagrangian_hessian_prod_fd(
                             problem, xₖ, y, Σ, grad_ψₖ, qₖ, HqK, work_n,

@@ -174,6 +174,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
         << p.update_lipschitz_in_linesearch;
     out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
         << p.alternative_linesearch_cond;
+    out << YAML::Key << "hessian_vec" << YAML::Value << p.hessian_vec;
     out << YAML::Key << "hessian_vec_finited_differences" << YAML::Value
         << p.hessian_vec_finited_differences;
     out << YAML::Key << "full_augmented_hessian" << YAML::Value
@@ -288,8 +289,8 @@ int main(int argc, char *argv[]) {
     }
 
     pa::ALMParams almparams;
-    almparams.max_iter = 240;
-    almparams.max_time = 30s;
+    almparams.max_iter        = 240;
+    almparams.max_time        = 30s;
     almparams.max_time        = 1min + 30s;
     almparams.preconditioning = false;
     // almparams.print_interval  = 1;
