@@ -116,7 +116,7 @@ PANOCSolver<DirectionProviderT>::operator()(
         Lₖ = detail::initial_lipschitz_estimate(
             problem, xₖ, y, Σ, params.Lipschitz.ε, params.Lipschitz.δ,
             params.L_min, params.L_max,
-            /* in ⟹ out */ ψₖ, grad_ψₖ, x̂ₖ, grad_̂ψₖ, work_n, work_m);
+            /* in ⟹ out */ ψₖ, grad_ψₖ, x̂ₖ, grad_ψₖ₊₁, work_n, work_m);
     }
     // Initial Lipschitz constant provided by the user
     else {
