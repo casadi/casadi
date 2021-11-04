@@ -6,7 +6,8 @@
 
 import casadi as cs
 import numpy as np
-from os.path import dirname
+import os
+from os.path import join, dirname
 import sys
 
 sys.path.append(dirname(__file__))
@@ -46,20 +47,14 @@ y_init = cs.SX.sym("y_init", *y_null.shape)  # initial state
 U = cs.SX.sym("U", dim * N_horiz)  # control signals over horizon
 constr_param = cs.SX.sym("c", 3)  # Coefficients of cubic constraint function
 mpc_param = cs.vertcat(y_init, model.params, constr_param)  # all parameters
-
-# Reshape the input signal from a vector into a dim × N_horiz matrix
-# (note that CasADi matrices are stored column-wise and NumPy arrays row-wise)
-u_mat = lambda U: \
-    U.reshape((dim, N_horiz), order='F') \
-    if isinstance(U, np.ndarray) \
-    else U.reshape((dim, N_horiz))
+U_mat = model.input_to_matrix(U) # Input as dim by N_horiz matrix
 
 # Cost
-mpc_sim = model.simulate(N_horiz, y_init, u_mat(U), model.params)
+mpc_sim = model.simulate(N_horiz, y_init, U_mat, model.params)
 mpc_cost = 0
 for n in range(N_horiz):  # Apply the stage cost function to each stage
     y_n = mpc_sim[:, n]
-    u_n = u_mat(U)[:, n]
+    u_n = U_mat[:, n]
     mpc_cost += L_cost(y_n, u_n)
 mpc_cost_fun = cs.Function('f_mpc', [U, mpc_param], [mpc_cost])
 
@@ -117,7 +112,8 @@ class MPCController:
     U = np.zeros((N_horiz * dim, ))
     λ = np.zeros(((N + 1) * N_horiz, ))
 
-    def __init__(self, problem):
+    def __init__(self, model, problem):
+        self.model = model
         self.problem = problem
 
     def __call__(self, y_n):
@@ -136,7 +132,7 @@ class MPCController:
         # Print the Lagrange multipliers, shows that constraints are active
         print(np.linalg.norm(self.λ))
         # Return the optimal control signal for the first time step
-        return u_mat(self.U)[:, 0]
+        return self.model.input_to_matrix(self.U)[:, 0]
 
 
 # %% Simulate the system using the MPC controller
@@ -146,7 +142,7 @@ n_state = y_n.shape[0]
 prob.param = np.concatenate((y_n, param, constr_coeff))
 
 y_mpc = np.empty((n_state, N_sim))
-controller = MPCController(prob)
+controller = MPCController(model, prob)
 for n in range(N_sim):
     # Solve the optimal control problem
     u_n = controller(y_n)
@@ -214,10 +210,9 @@ ani = mpl.animation.FuncAnimation(fig,
                                   frames=1 + N_dist + N_sim)
 
 # Export the animation
-from os.path import join, dirname
-
 out = join(dirname(__file__), '..', '..', '..', '..', 'sphinx', 'source',
            'sphinxstatic', 'hanging-chain.html')
+os.makedirs(dirname(out), exist_ok=True)
 with open(out, "w") as f:
     f.write('<center>')
     f.write(ani.to_jshtml())

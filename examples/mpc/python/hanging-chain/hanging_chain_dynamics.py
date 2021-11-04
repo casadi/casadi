@@ -73,6 +73,16 @@ class HangingChain:
         else:
             return (xdim(y, 0), xdim(y, 1), np.zeros((N + 1, )))
 
+    def input_to_matrix(self, u):
+        """
+        Reshape the input signal from a vector into a dim × N_horiz matrix (note
+        that CasADi matrices are stored column-wise and NumPy arrays row-wise)
+        """
+        if isinstance(u, np.ndarray):
+            return u.reshape((self.dim, u.shape[0] // self.dim), order='F')
+        else:
+            return u.reshape((self.dim, u.shape[0] // self.dim))
+
     def simulate(self, N_sim: int, y_0: np.ndarray, u: Union[np.ndarray, list,
                                                              cs.SX.sym],
                  p: Union[np.ndarray, list, cs.SX.sym]):
