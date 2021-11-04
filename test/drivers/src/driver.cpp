@@ -143,8 +143,8 @@ auto get_inner_solver() {
     panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
     panocparams.stop_crit      = pa::PANOCStopCrit::ProjGradUnitNorm;
     panocparams.max_time       = 5min;
-    // panocparams.hessian_vec_finited_differences = false;
-    // panocparams.full_augmented_hessian          = true;
+    // panocparams.hessian_vec_finite_differences = false;
+    // panocparams.full_augmented_hessian         = true;
     panocparams.hessian_step_size_heuristic = 10;
 
     pa::LBFGSParams lbfgsparams;
@@ -175,8 +175,8 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
     out << YAML::Key << "alternative_linesearch_cond" << YAML::Value
         << p.alternative_linesearch_cond;
     out << YAML::Key << "hessian_vec" << YAML::Value << p.hessian_vec;
-    out << YAML::Key << "hessian_vec_finited_differences" << YAML::Value
-        << p.hessian_vec_finited_differences;
+    out << YAML::Key << "hessian_vec_finite_differences" << YAML::Value
+        << p.hessian_vec_finite_differences;
     out << YAML::Key << "full_augmented_hessian" << YAML::Value
         << p.full_augmented_hessian;
     out << YAML::Key << "hessian_step_size_heuristic" << YAML::Value

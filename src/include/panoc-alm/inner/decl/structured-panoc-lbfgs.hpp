@@ -48,9 +48,9 @@ struct StructuredPANOCLBFGSParams {
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;
 
-    bool hessian_vec                     = true;
-    bool hessian_vec_finited_differences = true;
-    bool full_augmented_hessian          = true;
+    bool hessian_vec                    = true;
+    bool hessian_vec_finite_differences = true;
+    bool full_augmented_hessian         = true;
 
     unsigned hessian_step_size_heuristic = 0;
 

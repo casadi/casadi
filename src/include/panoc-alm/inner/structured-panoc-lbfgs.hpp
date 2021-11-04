@@ -271,7 +271,7 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
                 if (J.size() == n) { // There are no active indices K
                     qₖ = -grad_ψₖ;
                 } else if (params.hessian_vec) { // There are active indices K
-                    if (params.hessian_vec_finited_differences) {
+                    if (params.hessian_vec_finite_differences) {
                         detail::calc_augmented_lagrangian_hessian_prod_fd(
                             problem, xₖ, y, Σ, grad_ψₖ, qₖ, HqK, work_n,
                             work_n2, work_m);
