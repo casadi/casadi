@@ -56,15 +56,18 @@ if [ ! -e /usr/local/bin/patchelf ]; then
 fi
 cd /mnt
 . /tmp/py-venv/bin/activate
-rm -rf _skbuild/
+python -m pip install -U build
+rm -rf /tmp/dist
+mkdir /tmp/dist
 FC=gfortran \
 CXXFLAGS="-march=skylake -static-libstdc++ -static-libgcc" \
 CFLAGS="-march=skylake -static-libgcc" \
 LDFLAGS="-static-libstdc++ -static-libgcc" \
-    python setup.py bdist_wheel --build-type RelWithDebInfo -j$(nproc) --generator Ninja --skip-generator-test
+    python -m build --outdir /tmp/dist
 cpv=$(echo $PYTHON_VERSION | awk -F. '{print $1 $2}')
 LD_LIBRARY_PATH=$VIRTUAL_ENV/lib \
     auditwheel repair --plat manylinux_2_27_x86_64 \
-        dist/alpaqa-0.0.1-cp$cpv-cp$cpv-linux_x86_64.whl
+        /tmp/dist/alpaqa-*.whl
+cp /tmp/dist/alpaqa-*.tar.gz wheelhouse
 EOF
 docker stop $container

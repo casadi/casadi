@@ -1,0 +1,16 @@
+graft cmake
+graft src
+graft test
+graft examples
+recursive-exclude src/alpaqa.egg-info *
+recursive-exclude src/alpaqa/.mypy_cache *
+recursive-exclude src/.mypy_cache *
+global-exclude *.py[cod]
+global-exclude *.ipynb_checkpoints/*
+recursive-exclude examples/mpc/python/hanging-chain-panoc/python_build *
+recursive-exclude test/testresults *
+include pyproject.toml
+include CMakeLists.txt
+include setup.py
+include README.md
+include LICENSE

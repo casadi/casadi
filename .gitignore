@@ -17,4 +17,5 @@ src/alpaqa/_alpaqa.pyd
 src/alpaqa/bin/*.dll
 
 test/testresults/XPS-15-9560
+python_build
 MANIFEST
