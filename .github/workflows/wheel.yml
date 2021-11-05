@@ -43,13 +43,16 @@ jobs:
         LDFLAGS: "-static-libstdc++ -static-libgcc"
         CFLAGS: "-march=skylake -static-libgcc"
         FC: gfortran
-    - name: Upload
+    - name: Upload Wheel
       uses: actions/upload-artifact@v2
       with:
         name: panocpy-whl-${{ matrix.python-version }}
-        path: |
-          wheelhouse/panocpy-*manylinux*.whl
-          dist/panocpy-*.tar.gz
+        path: wheelhouse/panocpy-*manylinux*.whl
+    - name: Upload source
+      uses: actions/upload-artifact@v2
+      with:
+        name: panocpy-src-${{ matrix.python-version }}
+        path: dist/panocpy-*.tar.gz
 
   test:
     needs: build
