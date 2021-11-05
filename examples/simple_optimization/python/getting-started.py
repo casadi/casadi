@@ -1,8 +1,8 @@
 ## @example simple_optimization/python/getting-started.py
 # This code contains a minimal example of an optimization problem that can be 
-# built and solved using `panocpy`.
+# built and solved using `alpaqa`.
 
-# %% Build the problem for PANOC+ALM (CasADi code, independent of panocpy)
+# %% Build the problem for PANOC+ALM (CasADi code, independent of alpaqa)
 import casadi as cs
 
 # Make symbolic decision variables
@@ -23,8 +23,8 @@ x = cs.vertcat(x1, x2)
 f = cs.Function("f", [x, p], [f_expr])
 g = cs.Function("g", [x, p], [g_expr])
 
-# %% Generate and compile C-code for the objective and constraints using panocpy
-import panocpy as pa
+# %% Generate and compile C-code for the objective and constraints using alpaqa
+import alpaqa as pa
 
 # Compile and load the problem
 prob = pa.generate_and_compile_casadi_problem(f, g)

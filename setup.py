@@ -19,9 +19,9 @@ with open(os.path.join(dir_path, "README.md"), "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="panocpy",
-    version="0.0.2",
-    description="PANOC+ALM solvers",
+    name="alpaqa",
+    version="0.0.1",
+    description="Augmented Lagrangian PANOC solvers for numerical optimization",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Pieter P",
@@ -30,7 +30,7 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     cmake_args=[],
-    cmake_install_dir="src/panocpy",
+    cmake_install_dir="src/alpaqa",
     include_package_data=False,
     install_requires=[
         "numpy",

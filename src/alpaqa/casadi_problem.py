@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 import casadi as cs
-import panocpy as pa
+import alpaqa as pa
 import os
 from os.path import join, basename
 import shelve
@@ -119,7 +119,7 @@ def generate_and_compile_casadi_problem(
     second_order: bool = False,
     name: str = "PANOC_ALM_problem",
 ) -> Union[pa.Problem, pa.ProblemWithParam]:
-    """Compile the objective and constraint functions into a panocpy Problem.
+    """Compile the objective and constraint functions into a alpaqa Problem.
 
     :param f:            Objective function.
     :param g:            Constraint function.
@@ -133,9 +133,9 @@ def generate_and_compile_casadi_problem(
     if not cachedir:
         homecachedir = os.path.expanduser("~/.cache")
         if os.path.isdir(homecachedir):
-            cachedir = join(homecachedir, 'panocpy', 'cache')
+            cachedir = join(homecachedir, 'alpaqa', 'cache')
         else:
-            cachedir = join(tempfile.gettempdir(), 'panocpy', 'cache')
+            cachedir = join(tempfile.gettempdir(), 'alpaqa', 'cache')
     cachefile = join(cachedir, 'problems')
 
     key = base64.b64encode(pickle.dumps(

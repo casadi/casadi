@@ -54,7 +54,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/py-venv/bin/python3",
             "args": [
-                "${workspaceFolder}/src/panocpy/test.py"
+                "${workspaceFolder}/src/alpaqa/test.py"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

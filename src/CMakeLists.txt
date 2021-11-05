@@ -114,8 +114,8 @@ endif()
 # Python bindings
 # ---------------
 
-option(WITH_PANOCPY "Build the Python module" Off)
+option(WITH_PYTHON_BINDINGS "Build the Python module" Off)
 
-if (WITH_PANOCPY OR SKBUILD)
-    add_subdirectory(panocpy)
+if (WITH_PYTHON_BINDINGS OR SKBUILD)
+    add_subdirectory(alpaqa)
 endif()

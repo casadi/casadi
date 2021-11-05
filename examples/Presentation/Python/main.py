@@ -1,4 +1,4 @@
-import panocpy as pa
+import alpaqa as pa
 import numpy as np
 import casadi as cs
 

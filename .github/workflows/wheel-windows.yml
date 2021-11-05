@@ -50,8 +50,8 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
-        name: panocpy-whl-${{ matrix.python-version }}
-        path: dist/panocpy-*win*.whl
+        name: alpaqa-whl-${{ matrix.python-version }}
+        path: dist/alpaqa-*win*.whl
 
   # test:
   #   needs: build
@@ -67,9 +67,9 @@ jobs:
   #       python-version: ${{ matrix.python-version }}
   #   - uses: actions/download-artifact@v2
   #     with:
-  #       name: panocpy-whl-${{ matrix.python-version }}
+  #       name: alpaqa-whl-${{ matrix.python-version }}
   #       path: dist
-  #   - name: 'Install panocpy'
-  #     run: python -m pip install --find-links=dist panocpy
+  #   - name: 'Install alpaqa'
+  #     run: python -m pip install --find-links=dist alpaqa
   #   - name: 'Run tests'
-  #     run: python ./src/panocpy/test.py
+  #     run: python ./src/alpaqa/test.py

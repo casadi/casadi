@@ -2,7 +2,7 @@
 
 print("starting tests")
 
-import panocpy as pa
+import alpaqa as pa
 import numpy as np
 from pprint import pprint
 

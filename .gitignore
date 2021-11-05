@@ -13,7 +13,8 @@ wheelhouse
 !.vscode/launch.json
 !.vscode/settings.json
 .~lock.*
-src/panocpy/_panocpy.pyd
-src/panocpy/bin/*.dll
+src/alpaqa/_alpaqa.pyd
+src/alpaqa/bin/*.dll
 
 test/testresults/XPS-15-9560
+MANIFEST

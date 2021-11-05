@@ -16,7 +16,7 @@ from typing import Any, Dict, List
 
 # -- Project information -----------------------------------------------------
 
-project = 'PanocPy'
+project = 'Alpaqa'
 copyright = '2021, Pieter Pas'
 author = 'Pieter Pas'
 
@@ -85,8 +85,8 @@ breathe_default_project = "PANOC-ALM"
 #
 html_theme = 'furo'
 
-html_logo = "../../logo/panocpy_logo.svg"
-html_favicon = "../../logo/panocpy_favicon.png"
+html_logo = "../../logo/alpaqa_logo.svg"
+html_favicon = "../../logo/alpaqa_favicon.png"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -116,7 +116,7 @@ html_css_files = [
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'panocpydoc'
+htmlhelp_basename = 'alpaqadoc'
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -141,17 +141,17 @@ latex_elements: Dict[str, Any] = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-title_string = 'PanocPy Documentation'
+title_string = 'Alpaqa Documentation'
 
 latex_documents = [
-    (master_doc, 'panocpy.tex', title_string, 'Pieter Pas', 'manual'),
+    (master_doc, 'alpaqa.tex', title_string, 'Pieter Pas', 'manual'),
 ]
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, 'panocpy', title_string, [author], 1)]
+man_pages = [(master_doc, 'alpaqa', title_string, [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -159,7 +159,7 @@ man_pages = [(master_doc, 'panocpy', title_string, [author], 1)]
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'panocpy', title_string, author, 'panocpy',
+    (master_doc, 'alpaqa', title_string, author, 'alpaqa',
      'One line description of project.', 'Miscellaneous'),
 ]
 

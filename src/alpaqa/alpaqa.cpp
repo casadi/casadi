@@ -14,7 +14,7 @@
 #include <panoc-alm/standalone/panoc.hpp>
 #include <panoc-alm/util/solverstatus.hpp>
 
-#if PANOCPY_HAVE_CASADI
+#if ALPAQA_HAVE_CASADI
 #include <panoc-alm/interop/casadi/CasADiLoader.hpp>
 #endif
 
@@ -122,7 +122,7 @@ auto PolymorphicALMConversion() {
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
-PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
+PYBIND11_MODULE(ALPAQA_MODULE_NAME, m) {
     using py::operator""_a;
 
     py::options options;
@@ -194,7 +194,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
     py::class_<pa::ProblemWithParam, pa::Problem>(
         m, "ProblemWithParam",
         "C++ documentation: :cpp:class:`pa::ProblemWithParam`\n\n"
-        "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
+        "See :py:class:`alpaqa._alpaqa.Problem` for the full documentation.")
         .def_readwrite("n", &pa::ProblemWithParam::n)
         .def_readwrite("m", &pa::ProblemWithParam::m)
         .def_readwrite("C", &pa::ProblemWithParam::C)
@@ -286,7 +286,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         m, "ProblemWithCounters",
         "C++ documentation: "
         ":cpp:class:`pa::ProblemWithCounters<pa::Problem>`\n\n"
-        "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
+        "See :py:class:`alpaqa._alpaqa.Problem` for the full documentation.")
         .def(py::init<const pa::Problem &>(), "problem"_a)
         .def_readwrite("n", &pa::ProblemWithCounters<pa::Problem>::n)
         .def_readwrite("m", &pa::ProblemWithCounters<pa::Problem>::m)
@@ -309,7 +309,7 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
         m, "ProblemWithParamWithCounters",
         "C++ documentation: "
         ":cpp:class:`pa::ProblemWithCounters<pa::ProblemWithParam>`\n\n"
-        "See :py:class:`panocpy._panocpy.Problem` for the full documentation.")
+        "See :py:class:`alpaqa._alpaqa.Problem` for the full documentation.")
         .def(py::init<const pa::ProblemWithParam &>(), "problem"_a)
         .def_readwrite("n", &pa::ProblemWithCounters<pa::ProblemWithParam>::n)
         .def_readwrite("m", &pa::ProblemWithCounters<pa::ProblemWithParam>::m)
@@ -990,17 +990,17 @@ PYBIND11_MODULE(PANOCPY_MODULE_NAME, m) {
           "ε"_a = 1e-8, "params"_a = pa::PANOCParams{},
           "lbfgs_params"_a = pa::LBFGSParams{});
 
-#if !PANOCPY_HAVE_CASADI
+#if !ALPAQA_HAVE_CASADI
     auto load_CasADi_problem = [](const char *, unsigned, unsigned,
                                   bool) -> pa::Problem {
         throw std::runtime_error(
-            "This version of panocpy was compiled without CasADi support");
+            "This version of alpaqa was compiled without CasADi support");
     };
     auto load_CasADi_problem_with_param = [](const char *, unsigned, unsigned,
                                              unsigned,
                                              bool) -> pa::ProblemWithParam {
         throw std::runtime_error(
-            "This version of panocpy was compiled without CasADi support");
+            "This version of alpaqa was compiled without CasADi support");
     };
 #else
     using pa::load_CasADi_problem;

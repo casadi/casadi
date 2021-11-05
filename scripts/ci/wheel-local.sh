@@ -3,8 +3,8 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 set -ex
 
-image=panocpy-wheel-local-img6
-container=panocpy-wheel-local-cnt6
+image=alpaqa-wheel-local-img6
+container=alpaqa-wheel-local-cnt6
 
 if [ -z $(docker image ls -q $image) ]; then
     docker create --interactive \
@@ -65,6 +65,6 @@ LDFLAGS="-static-libstdc++ -static-libgcc" \
 cpv=$(echo $PYTHON_VERSION | awk -F. '{print $1 $2}')
 LD_LIBRARY_PATH=$VIRTUAL_ENV/lib \
     auditwheel repair --plat manylinux_2_27_x86_64 \
-        dist/panocpy-0.0.2-cp$cpv-cp$cpv-linux_x86_64.whl
+        dist/alpaqa-0.0.1-cp$cpv-cp$cpv-linux_x86_64.whl
 EOF
 docker stop $container

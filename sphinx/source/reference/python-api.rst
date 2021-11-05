@@ -4,17 +4,17 @@ Python API Reference
 Inner PANOC solver
 ------------------
 
-.. autoclass:: panocpy._panocpy.PANOCSolver
+.. autoclass:: alpaqa._alpaqa.PANOCSolver
     :noindex:
     :members:
     :undoc-members:
     :special-members: __init__, __call__
-.. autoclass:: panocpy._panocpy.PANOCParams
+.. autoclass:: alpaqa._alpaqa.PANOCParams
     :noindex:
     :members:
     :undoc-members:
     :special-members: __init__, __call__
-.. autoclass:: panocpy._panocpy.LBFGSParams
+.. autoclass:: alpaqa._alpaqa.LBFGSParams
     :noindex:
     :members:
     :undoc-members:
@@ -23,12 +23,12 @@ Inner PANOC solver
 Inner Structured PANOC solver
 -----------------------------
 
-.. autoclass:: panocpy._panocpy.StructuredPANOCLBFGSSolver
+.. autoclass:: alpaqa._alpaqa.StructuredPANOCLBFGSSolver
     :noindex:
     :members:
     :undoc-members:
     :special-members: __init__, __call__
-.. autoclass:: panocpy._panocpy.StructuredPANOCLBFGSParams
+.. autoclass:: alpaqa._alpaqa.StructuredPANOCLBFGSParams
     :noindex:
     :members:
     :undoc-members:
@@ -37,12 +37,12 @@ Inner Structured PANOC solver
 Outer ALM solver
 ----------------
 
-.. autoclass:: panocpy._panocpy.ALMSolver
+.. autoclass:: alpaqa._alpaqa.ALMSolver
     :noindex:
     :members:
     :undoc-members:
     :special-members: __init__, __call__
-.. autoclass:: panocpy._panocpy.ALMParams
+.. autoclass:: alpaqa._alpaqa.ALMParams
     :noindex:
     :members:
     :undoc-members:
@@ -51,12 +51,12 @@ Outer ALM solver
 Problem formulation
 -------------------
 
-.. autoclass:: panocpy._panocpy.Problem
+.. autoclass:: alpaqa._alpaqa.Problem
     :noindex:
     :members:
     :undoc-members:
     :special-members: __init__, __call__
-.. autoclass:: panocpy._panocpy.ProblemWithParam
+.. autoclass:: alpaqa._alpaqa.ProblemWithParam
     :noindex:
     :members:
     :undoc-members:
@@ -65,7 +65,7 @@ Problem formulation
 CasADi Interface
 ----------------
 
-.. automodule:: panocpy.casadi_problem
+.. automodule:: alpaqa.casadi_problem
     :noindex:
     :members:
     :undoc-members:
@@ -74,12 +74,12 @@ CasADi Interface
 All
 ---
 
-.. automodule:: panocpy._panocpy
+.. automodule:: alpaqa._alpaqa
     :members:
     :undoc-members:
     :special-members: __init__, __call__
 
-.. automodule:: panocpy.casadi_problem
+.. automodule:: alpaqa.casadi_problem
     :members:
     :undoc-members:
     :special-members: __init__, __call__

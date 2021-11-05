@@ -1,73 +1,73 @@
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 execute_process(COMMAND "${Python3_EXECUTABLE}"
         -c "import pybind11; print(pybind11.get_include())"
-    OUTPUT_VARIABLE panocpy_pybind11_include_dir
+    OUTPUT_VARIABLE alpaqa_pybind11_include_dir
     OUTPUT_STRIP_TRAILING_WHITESPACE
     RESULT_VARIABLE PANOC_ALM_PYBIND11_RESULT)
 
 if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
     add_library(pybind11::pybind11 INTERFACE IMPORTED)
     target_include_directories(pybind11::pybind11
-        INTERFACE ${panocpy_pybind11_include_dir})
+        INTERFACE ${alpaqa_pybind11_include_dir})
 
-    Python3_add_library(_panocpy MODULE panocpy.cpp)
-    target_link_libraries(_panocpy
+    Python3_add_library(_alpaqa MODULE alpaqa.cpp)
+    target_link_libraries(_alpaqa
         PRIVATE
             panoc-alm::panoc-alm-obj
             pybind11::pybind11
     )
     if (NOT WIN32)
-        target_link_libraries(_panocpy 
+        target_link_libraries(_alpaqa 
             PRIVATE
                 -static-libstdc++
                 -static-libgcc
         )
     endif()
-    target_compile_definitions(_panocpy PRIVATE VERSION_INFO=${PROJECT_VERSION})
-    set(PANOCPY_RPATH "\${ORIGIN}/../../../.." "\${ORIGIN}")
-    set_target_properties(_panocpy PROPERTIES
+    target_compile_definitions(_alpaqa PRIVATE VERSION_INFO=${PROJECT_VERSION})
+    set(ALPAQA_RPATH "\${ORIGIN}/../../../.." "\${ORIGIN}")
+    set_target_properties(_alpaqa PROPERTIES
         DEBUG_POSTFIX ""
         ASAN_POSTFIX ""
         TSAN_POSTFIX ""
         CXX_VISIBILITY_PRESET hidden
         C_VISIBILITY_PRESET hidden
-        INSTALL_RPATH "${PANOCPY_RPATH}"
+        INSTALL_RPATH "${ALPAQA_RPATH}"
     )
     if (NOT WIN32)
-        target_link_options(_panocpy PRIVATE "LINKER:--exclude-libs,ALL")
+        target_link_options(_alpaqa PRIVATE "LINKER:--exclude-libs,ALL")
     endif()
-    target_compile_definitions(_panocpy PRIVATE PANOCPY_MODULE_NAME=_panocpy)
+    target_compile_definitions(_alpaqa PRIVATE ALPAQA_MODULE_NAME=_alpaqa)
     if (TARGET panoc-alm::casadi-loader)
-        target_compile_definitions(_panocpy PRIVATE PANOCPY_HAVE_CASADI)
-        target_link_libraries(_panocpy PRIVATE panoc-alm::casadi-loader-obj)
+        target_compile_definitions(_alpaqa PRIVATE ALPAQA_HAVE_CASADI)
+        target_link_libraries(_alpaqa PRIVATE panoc-alm::casadi-loader-obj)
     endif()
 
-    option(PANOCPY_GEN_STUB "Generate Python stub files (.pyi) for the panocpy module." On)
+    option(ALPAQA_GEN_STUB "Generate Python stub files (.pyi) for the alpaqa module." On)
 
-    if (PANOCPY_GEN_STUB)
+    if (ALPAQA_GEN_STUB)
         find_program(STUBGEN_EXE stubgen REQUIRED)
         set(STUBS_DIR ${CMAKE_CURRENT_BINARY_DIR}/stubs)
-        add_custom_command(TARGET _panocpy POST_BUILD 
+        add_custom_command(TARGET _alpaqa POST_BUILD 
             COMMAND ${STUBGEN_EXE} 
-                    -m panocpy -m panocpy.casadi_problem
+                    -m alpaqa -m alpaqa.casadi_problem
                     -o ${STUBS_DIR}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..
             USES_TERMINAL)
-        add_custom_command(TARGET _panocpy POST_BUILD 
+        add_custom_command(TARGET _alpaqa POST_BUILD 
             COMMAND ${STUBGEN_EXE} 
-                    -m panocpy._panocpy
+                    -m alpaqa._alpaqa
                     -o ${STUBS_DIR}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/..
             USES_TERMINAL)
     endif()
 
     if (SKBUILD)
-        install(TARGETS _panocpy
+        install(TARGETS _alpaqa
                 DESTINATION .)
-        if (PANOCPY_GEN_STUB)
-            install(FILES ${STUBS_DIR}/panocpy/__init__.pyi
-                          ${STUBS_DIR}/panocpy/casadi_problem.pyi
-                          ${STUBS_DIR}/panocpy/_panocpy.pyi
+        if (ALPAQA_GEN_STUB)
+            install(FILES ${STUBS_DIR}/alpaqa/__init__.pyi
+                          ${STUBS_DIR}/alpaqa/casadi_problem.pyi
+                          ${STUBS_DIR}/alpaqa/_alpaqa.pyi
                     DESTINATION .)
         endif()
     endif()

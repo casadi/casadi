@@ -38,7 +38,7 @@ jobs:
         python setup.py bdist_wheel --build-type RelWithDebInfo -j$(nproc) --generator Ninja --skip-generator-test
         LD_LIBRARY_PATH=$VIRTUAL_ENV/lib \
           auditwheel repair --plat manylinux_2_27_x86_64 \
-          dist/panocpy-*.whl
+          dist/alpaqa-*.whl
       env:
         CXXFLAGS: "-march=skylake -static-libstdc++ -static-libgcc"
         LDFLAGS: "-static-libstdc++ -static-libgcc"
@@ -47,8 +47,8 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
-        name: panocpy-whl-${{ matrix.python-version }}
-        path: wheelhouse/panocpy-*manylinux*.whl
+        name: alpaqa-whl-${{ matrix.python-version }}
+        path: wheelhouse/alpaqa-*manylinux*.whl
 
   test:
     needs: build
@@ -61,9 +61,9 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/download-artifact@v2
       with:
-        name: panocpy-whl-${{ matrix.python-version }}
+        name: alpaqa-whl-${{ matrix.python-version }}
         path: wheelhouse
-    - name: 'Install panocpy'
-      run: pip install --find-links=wheelhouse panocpy
+    - name: 'Install alpaqa'
+      run: pip install --find-links=wheelhouse alpaqa
     - name: 'Run tests'
-      run: python src/panocpy/test.py
+      run: python src/alpaqa/test.py

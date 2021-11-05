@@ -81,7 +81,7 @@ decision variables and an optional parameter vector.
 
 .. testcode::
 
-    # %% Build the problem for PANOC+ALM (CasADi code, independent of panocpy)
+    # %% Build the problem for PANOC+ALM (CasADi code, independent of alpaqa)
     import casadi as cs
 
     # Make symbolic decision variables
@@ -104,15 +104,15 @@ decision variables and an optional parameter vector.
 
 Next, the gradients of the functions are computed using CasADi, and they are 
 compiled as efficient C functions. All of this happens inside of the 
-:py:func:`panocpy.casadi_problem.generate_and_compile_casadi_problem`
-function, which returns an instance of :py:class:`panocpy._panocpy.Problem`
-or :py:class:`panocpy._panocpy.ProblemWithParam`, depending on whether the 
+:py:func:`alpaqa.casadi_problem.generate_and_compile_casadi_problem`
+function, which returns an instance of :py:class:`alpaqa._alpaqa.Problem`
+or :py:class:`alpaqa._alpaqa.ProblemWithParam`, depending on whether the 
 provided functions accept a parameter vector.
 
 .. testcode::
 
-    # %% Generate and compile C-code for the objective and constraints using panocpy
-    import panocpy as pa
+    # %% Generate and compile C-code for the objective and constraints using alpaqa
+    import alpaqa as pa
 
     # Compile and load the problem
     prob = pa.generate_and_compile_casadi_problem(f, g)

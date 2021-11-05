@@ -1,4 +1,4 @@
-Panocpy
+Alpaqa
 ===================================
 .. include:: shared/definitions.rst
 

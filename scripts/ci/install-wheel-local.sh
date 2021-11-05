@@ -6,6 +6,6 @@ if [ -z "${VIRTUAL_ENV+x}" ]; then
 fi
 
 set -ex
-pip uninstall -y panocpy
+pip uninstall -y alpaqa
 ./wheel-local.sh
-pip install --find-links=../../wheelhouse panocpy
+pip install --find-links=../../wheelhouse alpaqa
