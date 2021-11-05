@@ -25,7 +25,13 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Pieter P",
+    author_email="",
     url="https://github.com/tttapa/PANOC-ALM",
+    project_urls={
+        "Documentation": "https://tttapa.github.io/PANOC-ALM",
+        "Source": "https://github.com/tttapa/PANOC-ALM",
+        "Bug Tracker": "https://github.com/tttapa/PANOC-ALM/issues",
+    },
     keywords=["optimization"],
     packages=find_packages(where="src"),
     package_dir={"": "src"},
@@ -49,6 +55,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Operating System :: POSIX :: Linux",
+        "Operating System :: Microsoft :: Windows",
     ],
     python_requires=">=3.7",
 )

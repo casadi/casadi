@@ -24,6 +24,7 @@ jobs:
         python3 -m venv /tmp/py-venv
         . /tmp/py-venv/bin/activate
         python -m pip install -r scripts/requirements.txt -r scripts/requirements-wheel.txt
+        python -m pip install build
         bash scripts/ci/install-dependencies-wheel.sh
         bash scripts/ci/install-patchelf.sh
       env:
@@ -34,8 +35,7 @@ jobs:
     - name: Build
       run: |
         . /tmp/py-venv/bin/activate
-        rm -rf _skbuild/
-        python setup.py bdist_wheel --build-type RelWithDebInfo -j$(nproc) --generator Ninja --skip-generator-test
+        python -m build
         LD_LIBRARY_PATH=$VIRTUAL_ENV/lib \
           auditwheel repair --plat manylinux_2_27_x86_64 \
           dist/panocpy-*.whl
@@ -48,7 +48,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: panocpy-whl-${{ matrix.python-version }}
-        path: wheelhouse/panocpy-*manylinux*.whl
+        path: |
+          wheelhouse/panocpy-*manylinux*.whl
+          dist/panocpy-*.tar.gz
 
   test:
     needs: build

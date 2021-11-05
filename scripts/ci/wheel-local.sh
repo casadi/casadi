@@ -3,8 +3,8 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 set -ex
 
-image=panocpy-wheel-local-img6
-container=panocpy-wheel-local-cnt6
+image=panocpy-wheel-local-img9
+container=panocpy-wheel-local-cnt9
 
 if [ -z $(docker image ls -q $image) ]; then
     docker create --interactive \
@@ -56,15 +56,18 @@ if [ ! -e /usr/local/bin/patchelf ]; then
 fi
 cd /mnt
 . /tmp/py-venv/bin/activate
-rm -rf _skbuild/
+python -m pip install -U build
+rm -rf /tmp/dist
+mkdir /tmp/dist
 FC=gfortran \
 CXXFLAGS="-march=skylake -static-libstdc++ -static-libgcc" \
 CFLAGS="-march=skylake -static-libgcc" \
 LDFLAGS="-static-libstdc++ -static-libgcc" \
-    python setup.py bdist_wheel --build-type RelWithDebInfo -j$(nproc) --generator Ninja --skip-generator-test
+    python -m build --outdir /tmp/dist
 cpv=$(echo $PYTHON_VERSION | awk -F. '{print $1 $2}')
 LD_LIBRARY_PATH=$VIRTUAL_ENV/lib \
     auditwheel repair --plat manylinux_2_27_x86_64 \
-        dist/panocpy-0.0.2-cp$cpv-cp$cpv-linux_x86_64.whl
+        /tmp/dist/panocpy-*.whl
+cp /tmp/dist/panocpy-*.tar.gz wheelhouse
 EOF
 docker stop $container

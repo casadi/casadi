@@ -17,3 +17,5 @@ src/panocpy/_panocpy.pyd
 src/panocpy/bin/*.dll
 
 test/testresults/XPS-15-9560
+python_build
+MANIFEST
