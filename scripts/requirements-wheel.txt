@@ -2,6 +2,7 @@ numpy
 casadi
 setuptools>=42
 wheel
+build
 auditwheel
 pybind11~=2.7.1
 scikit-build

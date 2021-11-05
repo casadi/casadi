@@ -24,7 +24,6 @@ jobs:
         python3 -m venv /tmp/py-venv
         . /tmp/py-venv/bin/activate
         python -m pip install -r scripts/requirements.txt -r scripts/requirements-wheel.txt
-        python -m pip install build
         bash scripts/ci/install-dependencies-wheel.sh
         bash scripts/ci/install-patchelf.sh
       env:
