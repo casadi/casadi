@@ -95,6 +95,7 @@ jobs:
     - name: 'Check alpaqa version'
       run: |
         [ "${{ github.event.release.tag_name }}" == "$(python -c 'from importlib.metadata import version as v; print(v("alpaqa"))')" ]
+      shell: bash
     - name: 'Install Twine'
       run: pip install twine
     - name: 'Upload to PyPi'
