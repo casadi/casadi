@@ -105,7 +105,7 @@ jobs:
     - name: 'Install Twine'
       run: python -m pip install twine
     - name: 'Upload Wheel to PyPi'
-      run: python -m twine upload --repository testpypi dist/alpaqa-*.whl
+      run: python -m twine upload dist/alpaqa-*.whl
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PyPi }}

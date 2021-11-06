@@ -100,7 +100,7 @@ jobs:
     - name: 'Install Twine'
       run: pip install twine
     - name: 'Upload Wheel to PyPi'
-      run: python -m twine upload --repository testpypi wheelhouse/alpaqa-*.whl
+      run: python -m twine upload wheelhouse/alpaqa-*.whl
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PyPi }}
@@ -111,7 +111,7 @@ jobs:
         path: dist
     - name: 'Upload source to PyPi'
       if: ${{ matrix.python-version == '3.9' }}
-      run: python -m twine upload --repository testpypi dist/alpaqa-*.tar.gz
+      run: python -m twine upload dist/alpaqa-*.tar.gz
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PyPi }}
