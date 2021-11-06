@@ -79,7 +79,7 @@ jobs:
 
   release:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
-    needs: test
+    needs: build # test
     runs-on: windows-latest
     strategy:
       matrix:
