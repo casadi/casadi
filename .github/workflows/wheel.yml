@@ -1,6 +1,9 @@
 name: Python Wheel (Linux)
 
-on: [push]
+on:
+  push:
+  release:
+    types: ['released', 'prereleased']
 
 jobs:
   build:
@@ -71,3 +74,31 @@ jobs:
       run: pip install --find-links=wheelhouse alpaqa
     - name: 'Run tests'
       run: python src/alpaqa/test.py
+
+  release:
+    if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
+    needs: test
+    runs-on: ubuntu-latest
+    container: python:${{ matrix.python-version }}-bullseye
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9']
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/download-artifact@v2
+      with:
+        name: alpaqa-whl-${{ matrix.python-version }}
+        path: wheelhouse
+    
+    - name: 'Install alpaqa'
+      run: pip install --find-links=wheelhouse alpaqa
+    - name: 'Check alpaqa version'
+      run: |
+        [ "${{ github.event.release.tag_name }}" == "$(python -c 'from importlib.metadata import version as v; print(v("alpaqa"))')" ]
+    - name: 'Install Twine'
+      run: pip install twine
+    - name: 'Upload to PyPi'
+      run: python -m twine upload --repository testpypi wheelhouse/alpaqa-*.whl
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PyPi }}
