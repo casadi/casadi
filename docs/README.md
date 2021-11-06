@@ -1,6 +1,6 @@
 # Documentation
 
-View the online documentation at **https://tttapa.github.io/alpaqa**.
+View the online documentation at **https://kul-optec.github.io/alpaqa**.
 
 ## Generate the documentation yourself
 

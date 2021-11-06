@@ -14,7 +14,7 @@ sudo apt install build-essential cmake git
 ### Clone the repository
 
 ```sh
-git clone git@github.com:tttapa/alpaqa.git
+git clone git@github.com:kul-optec/alpaqa.git
 ```
 For the purposes of these instructions, we'll refer to the alpaqa repository 
 as the environment variable `ALPAQA_ROOT`, for example:
@@ -67,7 +67,7 @@ switching to an optimized version later.
 
 If you install the library locally, as demonstrated in the previous snippet,
 you might have to set some environment variables, as explained here:
-https://tttapa.github.io/Pages/Ubuntu/Software-Installation/Installing-Locally.html
+https://kul-optec.github.io/Pages/Ubuntu/Software-Installation/Installing-Locally.html
 
 Specifically, you need to add `~/.local` to the `CMAKE_PREFIX_PATH` by adding
 the following to your `~/.profile` file:
