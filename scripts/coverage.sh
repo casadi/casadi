@@ -82,7 +82,7 @@ lcov \
     '*/eigen/*' '*/eigen3/*' \
     '*/interop/*' \
     '*/py-venv/*' \
-    '*/alpaqa/*' \
+    '*/src/alpaqa/*' \
     '*/test/*' \
     --output-file "$dest"/coverage_filtered.info \
     --gcov-tool "$gcov_bin" \
