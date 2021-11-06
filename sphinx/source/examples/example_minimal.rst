@@ -104,6 +104,6 @@ Finally, we print and plot the resulting solution to verify correctness of our s
     plt.legend()
     plt.show()
 
-.. image:: ../img/example_minimal.png 
-    :width: 400 
+.. image:: ../img/example_minimal.svg 
+    :width: 100%
     :alt: Contour plot of the result

@@ -73,7 +73,7 @@ language = None
 exclude_patterns: List[str] = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'default'
 
 breathe_projects = {'alpaqa': "../../build/xml"}
 breathe_default_project = "alpaqa"
