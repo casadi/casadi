@@ -2,7 +2,11 @@
 \usetikzlibrary{calc,arrows}
 
 \usepackage{ifthen}
+\usepackage{fix-cm}
 
+\makeatletter
+\newcommand\HUGE{\@setfontsize\Huge{32}{36}}
+\makeatother
 
 \begin{document}
     \input{logo_colors.tex}
@@ -10,7 +14,7 @@
     \begin{tikzpicture}[xscale=0.372]
         \input{logo_common.tex}
 
-        \node[anchor=north west, font=\Huge] at (pt1) {\textcolor{panoccolor}{\textsc{P}}\textcolor{pycolor}{P}};
+        \node[yshift=-12pt, xshift=3pt, anchor=north west, font=\HUGE] at (pt1) {\textcolor{alpaqacolor}{\textsc{A}}};
         
         \end{scope}
     \end{tikzpicture}
