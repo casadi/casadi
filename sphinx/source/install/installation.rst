@@ -10,6 +10,8 @@ The preferred way to install the Alpaqa Python interface is using pip:
 
     python3 -m pip install alpaqa
 
+(`PyPi <https://pypi.org/project/alpaqa>`_)
+
 From source
 -----------
 

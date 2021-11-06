@@ -1,5 +1,8 @@
 # Installation instructions {#installation}
 
+For the installation of the Python package without building from source,
+please see [these instructions](../Sphinx/install/installation.html).
+
 ## Linux
 
 ### Tools

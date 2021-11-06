@@ -2,7 +2,7 @@ Alpaqa
 ===================================
 .. include:: shared/definitions.rst
 
-|pylib_name| is an efficient implementation of an Augmented Lagrangian solver for general nonlinear programming problems,
+|pylib_name| is an efficient implementation of the Augmented Lagrangian method for general nonlinear programming problems,
 which uses the first-order, matrix-free PANOC algorithm as an inner solver.  
 The numerical algorithms themselves are implemented in C++ for optimal performance,
 and they are exposed as an easy-to-use Python package.
