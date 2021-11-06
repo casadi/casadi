@@ -57,7 +57,8 @@ function run_doxygen_coverage {
 }
 
 # Generate the documentation for the current branch
-if curr_branch=$(git branch --show-current); then
+curr_branch=$(git branch --show-current)
+if [ -n "$curr_branch" ]; then
     run_doxygen_coverage "$curr_branch" "$output_folder"
 fi
 # Generate the documentation for the current tag
