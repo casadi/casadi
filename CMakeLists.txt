@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.17)
 
 project(PANOC-ALM VERSION 0.0.1 LANGUAGES C CXX)
 
+if (DEFINED VERIFY_VERSION)
+    if (NOT "${VERIFY_VERSION}" MATCHES "^${PROJECT_VERSION}.*")
+        message(FATAL_ERROR "Version number does not match "
+                             "(${VERIFY_VERSION} - ${PROJECT_VERSION}).")
+    endif()
+endif()
+
 if (NOT WIN32)
     include(CheckLanguage)
     check_language(Fortran)

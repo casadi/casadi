@@ -18,9 +18,11 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 with open(os.path.join(dir_path, "README.md"), "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+version = "0.0.1a0"
+
 setup(
     name="alpaqa",
-    version="0.0.1",
+    version=version,
     description="Augmented Lagrangian PANOC solvers for numerical optimization",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -35,7 +37,7 @@ setup(
     keywords=["optimization"],
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    cmake_args=[],
+    cmake_args=["-D", "VERIFY_VERSION=" + version],
     cmake_install_dir="src/alpaqa",
     include_package_data=False,
     install_requires=[
