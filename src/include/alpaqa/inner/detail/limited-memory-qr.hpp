@@ -4,7 +4,7 @@
 #include <alpaqa/util/vec.hpp>
 #include <type_traits>
 
-namespace pa {
+namespace alpaqa {
 
 /// Incremental QR factorization using modified Gram-Schmidt with
 /// reorthogonalization.
@@ -261,4 +261,4 @@ class LimitedMemoryQR {
     size_t r_pred(size_t i) const { return i == 0 ? m() - 1 : i - 1; }
 };
 
-} // namespace pa
+} // namespace alpaqa

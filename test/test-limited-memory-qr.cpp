@@ -7,9 +7,9 @@
 #include <alpaqa/inner/detail/limited-memory-qr.hpp>
 
 TEST(LimitedMemoryQR, adding) {
-    using pa::mat;
-    using pa::real_t;
-    using pa::vec;
+    using alpaqa::mat;
+    using alpaqa::real_t;
+    using alpaqa::vec;
 
     mat A(4, 3);
     A << 3, 3, 2, //
@@ -19,7 +19,7 @@ TEST(LimitedMemoryQR, adding) {
 
     constexpr real_t ε = 1e-15;
     std::cout << std::setprecision(16) << std::scientific;
-    pa::LimitedMemoryQR qr(4, 3);
+    alpaqa::LimitedMemoryQR qr(4, 3);
 
     qr.add_column(A.col(0));
     EXPECT_THAT(print_wrap(A.block(0, 0, 4, 1)),
@@ -57,9 +57,9 @@ TEST(LimitedMemoryQR, adding) {
 }
 
 TEST(LimitedMemoryQR, removing) {
-    using pa::mat;
-    using pa::real_t;
-    using pa::vec;
+    using alpaqa::mat;
+    using alpaqa::real_t;
+    using alpaqa::vec;
 
     mat A(4, 3);
     A << 3, 3, 2, //
@@ -69,7 +69,7 @@ TEST(LimitedMemoryQR, removing) {
 
     constexpr real_t ε = 1e-15;
     std::cout << std::setprecision(16) << std::scientific;
-    pa::LimitedMemoryQR qr(4, 3);
+    alpaqa::LimitedMemoryQR qr(4, 3);
 
     qr.add_column(A.col(0));
     qr.add_column(A.col(1));
@@ -89,9 +89,9 @@ TEST(LimitedMemoryQR, removing) {
 }
 
 TEST(LimitedMemoryQR, addingremoving) {
-    using pa::mat;
-    using pa::real_t;
-    using pa::vec;
+    using alpaqa::mat;
+    using alpaqa::real_t;
+    using alpaqa::vec;
 
     mat A(4, 11);
     A << 3, 3, 2, 2, 1, 1, 0, 3, 7, 1, 2,  //
@@ -101,7 +101,7 @@ TEST(LimitedMemoryQR, addingremoving) {
 
     constexpr real_t ε = 1e-14;
     std::cout << std::setprecision(16) << std::scientific;
-    pa::LimitedMemoryQR qr(4, 3);
+    alpaqa::LimitedMemoryQR qr(4, 3);
 
     qr.add_column(A.col(0));
     qr.add_column(A.col(1));
@@ -157,9 +157,9 @@ TEST(LimitedMemoryQR, addingremoving) {
 }
 
 TEST(LimitedMemoryQR, solve) {
-    using pa::mat;
-    using pa::real_t;
-    using pa::vec;
+    using alpaqa::mat;
+    using alpaqa::real_t;
+    using alpaqa::vec;
 
     mat A(4, 3);
     A << 3, 3, 2, //
@@ -169,7 +169,7 @@ TEST(LimitedMemoryQR, solve) {
 
     constexpr real_t ε = 1e-15;
     std::cout << std::setprecision(16) << std::scientific;
-    pa::LimitedMemoryQR qr(4, 3);
+    alpaqa::LimitedMemoryQR qr(4, 3);
 
     qr.add_column(vec::Constant(4, 13));
     qr.add_column(A.col(0));
@@ -196,9 +196,9 @@ TEST(LimitedMemoryQR, solve) {
 }
 
 TEST(LimitedMemoryQR, scale_R) {
-    using pa::mat;
-    using pa::real_t;
-    using pa::vec;
+    using alpaqa::mat;
+    using alpaqa::real_t;
+    using alpaqa::vec;
 
     mat A(4, 3);
     A << 3, 3, 2, //
@@ -208,7 +208,7 @@ TEST(LimitedMemoryQR, scale_R) {
 
     constexpr real_t ε = 1e-15;
     std::cout << std::setprecision(16) << std::scientific;
-    pa::LimitedMemoryQR qr(4, 3);
+    alpaqa::LimitedMemoryQR qr(4, 3);
 
     qr.add_column(vec::Constant(4, 13));
     qr.add_column(A.col(0));

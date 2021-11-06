@@ -7,7 +7,7 @@
 #include <chrono>
 #include <string>
 
-namespace pa {
+namespace alpaqa {
 
 /// Parameters for the Augmented Lagrangian solver.
 struct ALMParams {
@@ -156,4 +156,4 @@ class ALMSolver {
     InnerSolver inner_solver;
 };
 
-} // namespace pa
+} // namespace alpaqa

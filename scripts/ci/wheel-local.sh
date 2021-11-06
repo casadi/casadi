@@ -3,8 +3,8 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 set -ex
 
-image=alpaqa-wheel-local-img6
-container=alpaqa-wheel-local-cnt6
+image=alpaqa-wheel-local-img
+container=alpaqa-wheel-local-cnt
 
 if [ -z $(docker image ls -q $image) ]; then
     docker create --interactive \
@@ -59,6 +59,7 @@ cd /mnt
 python -m pip install -U build
 rm -rf /tmp/dist
 mkdir /tmp/dist
+mkdir -p wheelhouse
 FC=gfortran \
 CXXFLAGS="-march=skylake -static-libstdc++ -static-libgcc" \
 CFLAGS="-march=skylake -static-libgcc" \

@@ -2,7 +2,7 @@
 
 #include <alpaqa/inner/directions/decl/lbfgs.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 /// Limited memory Broyden–Fletcher–Goldfarb–Shanno (L-BFGS) algorithm that can
 /// handle updates of the γ parameter.
@@ -84,4 +84,4 @@ class SpecializedLBFGS {
     Params params;
 };
 
-} // namespace pa
+} // namespace alpaqa

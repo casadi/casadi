@@ -1,6 +1,6 @@
 #pragma once
 
-namespace pa {
+namespace alpaqa {
 struct LBFGSParams;
 class LBFGS;
 }

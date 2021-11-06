@@ -8,7 +8,7 @@
 #include <pybind11/pytypes.h>
 namespace py = pybind11;
 
-namespace pa {
+namespace alpaqa {
 
 class PolymorphicPANOCDirectionBase
     : public std::enable_shared_from_this<PolymorphicPANOCDirectionBase> {
@@ -127,4 +127,4 @@ class PolymorphicPANOCDirection : public PolymorphicPANOCDirectionBase {
 
 using PolymorphicLBFGSDirection = PolymorphicPANOCDirection<LBFGS>;
 
-} // namespace pa
+} // namespace alpaqa

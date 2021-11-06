@@ -14,14 +14,14 @@
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
-namespace pa {
+namespace alpaqa {
 
 template <class InnerSolver>
 auto InnerSolverCallWrapper() {
-    return [](InnerSolver &solver, const pa::Problem &p, pa::crvec Σ,
-              pa::real_t ε, pa::vec x,
-              pa::vec y) -> std::tuple<pa::vec, pa::vec, pa::vec, py::dict> {
-        pa::vec z(p.m);
+    return [](InnerSolver &solver, const alpaqa::Problem &p, alpaqa::crvec Σ,
+              alpaqa::real_t ε, alpaqa::vec x,
+              alpaqa::vec y) -> std::tuple<alpaqa::vec, alpaqa::vec, alpaqa::vec, py::dict> {
+        alpaqa::vec z(p.m);
         auto stats = solver(p, Σ, ε, true, x, y, z);
         return std::make_tuple(std::move(x), std::move(y), std::move(z),
                                stats.ptr->to_dict());
@@ -56,9 +56,9 @@ class PolymorphicInnerSolverBase
         unsigned iterations;
 
         static Stats from_dict(py::dict d) {
-            using PolyStats    = pa::PolymorphicInnerSolverStatsBase;
-            using PolyAccStats = pa::PolymorphicInnerSolverStatsAccumulatorBase;
-            using InnerStats   = pa::PolymorphicInnerSolverBase::Stats;
+            using PolyStats    = alpaqa::PolymorphicInnerSolverStatsBase;
+            using PolyAccStats = alpaqa::PolymorphicInnerSolverStatsAccumulatorBase;
+            using InnerStats   = alpaqa::PolymorphicInnerSolverBase::Stats;
             struct AccStats : PolyAccStats {
                 AccStats(py::dict dict) : dict(std::move(dict)) {}
                 py::dict dict;
@@ -168,10 +168,10 @@ class PolymorphicInnerSolverTrampoline : public PolymorphicInnerSolverBase {
             call(problem, Σ, ε, always_overwrite_results, x, y);
         return Stats::from_dict(stats);
     }
-    virtual std::tuple<pa::vec, pa::vec, pa::vec, py::dict>
-    call(const pa::Problem &problem, pa::crvec Σ, pa::real_t ε,
-         bool always_overwrite_results, pa::vec x, pa::vec y) {
-        using ret = std::tuple<pa::vec, pa::vec, pa::vec, py::dict>;
+    virtual std::tuple<alpaqa::vec, alpaqa::vec, alpaqa::vec, py::dict>
+    call(const alpaqa::Problem &problem, alpaqa::crvec Σ, alpaqa::real_t ε,
+         bool always_overwrite_results, alpaqa::vec x, alpaqa::vec y) {
+        using ret = std::tuple<alpaqa::vec, alpaqa::vec, alpaqa::vec, py::dict>;
         PYBIND11_OVERRIDE_PURE_NAME(ret, PolymorphicInnerSolverBase, "__call__",
                                     call, problem, Σ, ε,
                                     always_overwrite_results, x, y);
@@ -363,12 +363,12 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
     InnerSolver innersolver;
 };
 
-} // namespace pa
+} // namespace alpaqa
 
 #include "polymorphic-panoc-direction.hpp"
 #include <alpaqa/alm.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 using PolymorphicPGASolver    = PolymorphicInnerSolver<PGASolver>;
 using PolymorphicGAAPGASolver = PolymorphicInnerSolver<GAAPGASolver>;
@@ -395,4 +395,4 @@ inline py::dict stats_to_dict(const PolymorphicALMSolver::Stats &s) {
     };
 }
 
-} // namespace pa
+} // namespace alpaqa

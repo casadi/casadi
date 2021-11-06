@@ -102,7 +102,7 @@ class CUTEstLoader {
         return (F *)funp;
     }
 
-    doublereal eval_objective_constrained(pa::crvec x) const {
+    doublereal eval_objective_constrained(alpaqa::crvec x) const {
         assert(x.size() == nvar);
         assert(ncon > 0);
         integer status;
@@ -113,7 +113,7 @@ class CUTEstLoader {
         return f;
     }
 
-    doublereal eval_objective_unconstrained(pa::crvec x) const {
+    doublereal eval_objective_unconstrained(alpaqa::crvec x) const {
         assert(x.size() == nvar);
         assert(ncon == 0);
         integer status;
@@ -123,7 +123,7 @@ class CUTEstLoader {
         return f;
     }
 
-    void eval_objective_grad_constrained(pa::crvec x, pa::rvec grad_f) const {
+    void eval_objective_grad_constrained(alpaqa::crvec x, alpaqa::rvec grad_f) const {
         assert(x.size() == nvar);
         assert(grad_f.size() == nvar);
         assert(ncon > 0);
@@ -134,7 +134,7 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cfn", status);
     }
 
-    void eval_objective_grad_unconstrained(pa::crvec x, pa::rvec grad_f) const {
+    void eval_objective_grad_unconstrained(alpaqa::crvec x, alpaqa::rvec grad_f) const {
         assert(x.size() == nvar);
         assert(grad_f.size() == nvar);
         assert(ncon == 0);
@@ -144,7 +144,7 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_ugr", status);
     }
 
-    void eval_constraints(pa::crvec x, pa::rvec g) const {
+    void eval_constraints(alpaqa::crvec x, alpaqa::rvec g) const {
         assert(x.size() == nvar);
         assert(g.size() == ncon);
         if (ncon == 0)
@@ -155,8 +155,8 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cfn", status);
     }
 
-    void eval_constraints_grad_prod(pa::crvec x, pa::crvec v,
-                                    pa::rvec grad_g_v) const {
+    void eval_constraints_grad_prod(alpaqa::crvec x, alpaqa::crvec v,
+                                    alpaqa::rvec grad_g_v) const {
         assert(x.size() == nvar);
         assert(v.size() == ncon);
         assert(grad_g_v.size() == nvar);
@@ -173,8 +173,8 @@ class CUTEstLoader {
         throw_if_error("Failed to call cutest_cjprod", status);
     }
 
-    void eval_constraint_i_grad(pa::crvec x, unsigned i,
-                                pa::rvec grad_gi) const {
+    void eval_constraint_i_grad(alpaqa::crvec x, unsigned i,
+                                alpaqa::rvec grad_gi) const {
         assert(x.size() == nvar);
         assert(grad_gi.size() == nvar);
         if (ncon == 0) {
@@ -185,15 +185,15 @@ class CUTEstLoader {
         integer icon = i + 1;
         assert(icon >= 1);
         assert(icon <= ncon);
-        pa::real_t ci;
+        alpaqa::real_t ci;
         logical grad = true;
         call_as<decltype(CUTEST_ccifg)>(eval_constr_i_grad_p)(
             &status, &nvar, &icon, x.data(), &ci, grad_gi.data(), &grad);
         throw_if_error("Failed to call cutest_ccifg", status);
     }
 
-    void eval_lagr_hess_prod(pa::crvec x, pa::crvec y, pa::crvec v,
-                             pa::rvec Hv) const {
+    void eval_lagr_hess_prod(alpaqa::crvec x, alpaqa::crvec y, alpaqa::crvec v,
+                             alpaqa::rvec Hv) const {
         assert(x.size() == nvar);
         assert(y.size() == ncon);
         assert(v.rows() == nvar);
@@ -207,13 +207,13 @@ class CUTEstLoader {
         } else {
             call_as<decltype(CUTEST_chprod)>(eval_lagr_hess_prod_p)(
                 &status, &nvar, &ncon, &gotH, x.data(), y.data(),
-                const_cast<pa::real_t *>(v.data()), Hv.data());
+                const_cast<alpaqa::real_t *>(v.data()), Hv.data());
             // TODO: why is the VECTOR argument not const?
             throw_if_error("Failed to call cutest_chprod", status);
         }
     }
 
-    void eval_lagr_hess(pa::crvec x, pa::crvec y, pa::rmat H) const {
+    void eval_lagr_hess(alpaqa::crvec x, alpaqa::crvec y, alpaqa::rmat H) const {
         assert(x.size() == nvar);
         assert(y.size() == ncon);
         assert(H.rows() >= nvar);
@@ -233,9 +233,9 @@ class CUTEstLoader {
 
     unsigned count_box_constraints() const {
         return std::count_if(x_l.data(), x_l.data() + nvar,
-                             [](pa::real_t x) { return x > -CUTE_INF; }) +
+                             [](alpaqa::real_t x) { return x > -CUTE_INF; }) +
                std::count_if(x_u.data(), x_u.data() + nvar,
-                             [](pa::real_t x) { return x < +CUTE_INF; });
+                             [](alpaqa::real_t x) { return x < +CUTE_INF; });
     }
 
     std::string get_name() {
@@ -306,15 +306,15 @@ class CUTEstLoader {
     integer ncon; ///< Number of constraints
 
     using logical_vec = Eigen::Matrix<logical, Eigen::Dynamic, 1>;
-    pa::vec x;            ///< decision variable
-    pa::vec x_l;          ///< lower bound on x
-    pa::vec x_u;          ///< upper bound on x
-    pa::vec y;            ///< lagrange multipliers
-    pa::vec c_l;          ///< lower bounds on constraints
-    pa::vec c_u;          ///< upper bounds on constraints
+    alpaqa::vec x;            ///< decision variable
+    alpaqa::vec x_l;          ///< lower bound on x
+    alpaqa::vec x_u;          ///< upper bound on x
+    alpaqa::vec y;            ///< lagrange multipliers
+    alpaqa::vec c_l;          ///< lower bounds on constraints
+    alpaqa::vec c_u;          ///< upper bounds on constraints
     logical_vec equatn;   ///< whether the constraint is an equality
     logical_vec linear;   ///< whether the constraint is linear
-    mutable pa::vec work; ///< work vector
+    mutable alpaqa::vec work; ///< work vector
 
     void *eval_obj_p              = nullptr;
     void *eval_obj_grad_p         = nullptr;
@@ -397,7 +397,7 @@ const char *enum_name(CUTEstProblem::Report::Status s) {
         case Status::EvaluationError: return "EvaluationError";
     }
     throw std::out_of_range(
-        "invalid value for pa::CUTEstProblem::Report::Status");
+        "invalid value for alpaqa::CUTEstProblem::Report::Status");
 }
 
 std::ostream &operator<<(std::ostream &os, CUTEstProblem::Report::Status s) {

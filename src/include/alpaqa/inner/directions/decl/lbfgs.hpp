@@ -6,7 +6,7 @@
 #include <alpaqa/inner/directions/decl/lbfgs-fwd.hpp>
 #include <alpaqa/inner/directions/decl/panoc-direction-update.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 /// Parameters for the @ref LBFGS and @ref SpecializedLBFGS classes.
 struct LBFGSParams {
@@ -115,4 +115,4 @@ struct PANOCDirection<LBFGS> {
     LBFGSParams get_params() const;
 };
 
-} // namespace pa
+} // namespace alpaqa

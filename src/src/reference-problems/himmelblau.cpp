@@ -1,7 +1,7 @@
 #include <memory>
 #include <alpaqa/reference-problems/himmelblau.hpp>
 
-namespace pa {
+namespace alpaqa {
 namespace problems {
 
 Problem himmelblau_problem() {
@@ -44,4 +44,4 @@ Problem himmelblau_problem() {
 }
 
 } // namespace problems
-} // namespace pa
+} // namespace alpaqa

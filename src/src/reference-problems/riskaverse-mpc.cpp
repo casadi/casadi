@@ -1,7 +1,7 @@
 #include <memory>
 #include <alpaqa/reference-problems/riskaverse-mpc.hpp>
 
-namespace pa {
+namespace alpaqa {
 namespace problems {
 
 struct RiskaverseProblem {
@@ -55,10 +55,10 @@ struct RiskaverseProblem {
     using Diag = Eigen::DiagonalMatrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
     RiskaverseProblem() {
-        A       = pa::mat::Identity(nx, nx);
+        A       = alpaqa::mat::Identity(nx, nx);
         A(0, 2) = Ts;
         A(1, 3) = Ts;
-        B       = pa::mat::Zero(nx, nu);
+        B       = alpaqa::mat::Zero(nx, nu);
         B(2, 0) = Ts;
         B(3, 1) = Ts;
 
@@ -89,7 +89,7 @@ struct RiskaverseProblem {
                  (y(ux)(0) - y(ux)(1) - y(ux)(2) - s(ux)(1));
     }
     void grad_g(crvec ux, crvec v, rvec grad_u_v) const {
-        pa::mat grad      = pa::mat::Zero(n, m);
+        alpaqa::mat grad      = alpaqa::mat::Zero(n, m);
         s(grad.col(0))(0) = -1;
         y(grad.col(0))(0) = 1;
         y(grad.col(0))(1) = -1;
@@ -128,4 +128,4 @@ Problem riskaverse_mpc_problem() {
 }
 
 } // namespace problems
-} // namespace pa
+} // namespace alpaqa

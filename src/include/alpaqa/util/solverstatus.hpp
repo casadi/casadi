@@ -1,7 +1,7 @@
 #pragma once
 #include <iosfwd>
 
-namespace pa {
+namespace alpaqa {
 
 /// Exit status of a numerical solver such as ALM or PANOC.
 enum class SolverStatus {
@@ -19,4 +19,4 @@ const char *enum_name(SolverStatus);
 /// @related    SolverStatus
 std::ostream &operator<<(std::ostream &, SolverStatus);
 
-} // namespace pa
+} // namespace alpaqa

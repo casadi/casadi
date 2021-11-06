@@ -2,7 +2,7 @@
 
 #include <Eigen/Core>
 
-namespace pa {
+namespace alpaqa {
 
 /// Default floating point type
 using real_t         = double; // TODO: make template?
@@ -52,4 +52,4 @@ real_t norm_1(const Vec &v) {
 
 } // namespace vec_util
 
-} // namespace pa
+} // namespace alpaqa

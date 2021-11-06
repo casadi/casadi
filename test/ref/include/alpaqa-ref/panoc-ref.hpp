@@ -7,20 +7,20 @@
 /// implementations, used for tests as well
 namespace pa_ref {
 
-using pa::crvec;
-using pa::PANOCParams;
-using pa::Problem;
-using pa::real_t;
-using pa::rvec;
-using pa::vec;
+using alpaqa::crvec;
+using alpaqa::PANOCParams;
+using alpaqa::Problem;
+using alpaqa::real_t;
+using alpaqa::rvec;
+using alpaqa::vec;
 
 class PANOCSolver {
   public:
     using Params = PANOCParams;
 
-    using Stats = pa::PANOCSolver<>::Stats;
+    using Stats = alpaqa::PANOCSolver<>::Stats;
 
-    PANOCSolver(Params params, pa::LBFGSParams lbfgsparams)
+    PANOCSolver(Params params, alpaqa::LBFGSParams lbfgsparams)
         : params(params), lbfgs(lbfgsparams) {}
 
     Stats operator()(const Problem &problem,        // in
@@ -35,7 +35,7 @@ class PANOCSolver {
 
   private:
     Params params;
-    pa::PANOCDirection<pa::LBFGS> lbfgs;
+    alpaqa::PANOCDirection<alpaqa::LBFGS> lbfgs;
     std::atomic<bool> stop_signal{false};
 };
 

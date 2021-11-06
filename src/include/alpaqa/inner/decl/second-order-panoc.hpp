@@ -12,7 +12,7 @@
 #include <limits>
 #include <string>
 
-namespace pa {
+namespace alpaqa {
 
 /// Tuning parameters for the second order PANOC algorithm.
 struct SecondOrderPANOCParams {
@@ -136,4 +136,4 @@ operator+=(InnerStatsAccumulator<SecondOrderPANOCSolver::Stats> &acc,
     return acc;
 }
 
-} // namespace pa
+} // namespace alpaqa

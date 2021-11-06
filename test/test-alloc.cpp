@@ -4,7 +4,7 @@
 #include "eigen-matchers.hpp"
 
 TEST(Alloc, allocrepeat) {
-    pa::vec_allocator alloc{3, 2};
+    alpaqa::vec_allocator alloc{3, 2};
     auto v0 = alloc.alloc();
     EXPECT_EQ(v0.size(), 2);
     v0(0) = 1.2;
@@ -26,7 +26,7 @@ TEST(Alloc, allocrepeat) {
 }
 
 TEST(Alloc, badalloc) {
-    pa::vec_allocator alloc{3, 2};
+    alpaqa::vec_allocator alloc{3, 2};
     auto v0 = alloc.alloc();
     auto v1 = alloc.alloc();
     auto v2 = alloc.alloc();
@@ -44,7 +44,7 @@ TEST(Alloc, badalloc) {
 }
 
 TEST(Alloc, raii) {
-    pa::vec_allocator alloc{3, 2};
+    alpaqa::vec_allocator alloc{3, 2};
     {
         auto v0 = alloc.alloc_raii();
         EXPECT_EQ(alloc.size(), 2);

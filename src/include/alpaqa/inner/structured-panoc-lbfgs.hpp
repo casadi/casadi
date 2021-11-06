@@ -10,7 +10,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace pa {
+namespace alpaqa {
 
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
@@ -440,4 +440,4 @@ inline StructuredPANOCLBFGSSolver::Stats StructuredPANOCLBFGSSolver::operator()(
     throw std::logic_error("[PANOC] loop error");
 }
 
-} // namespace pa
+} // namespace alpaqa

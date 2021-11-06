@@ -5,7 +5,7 @@
 #include "eigen-matchers.hpp"
 
 TEST(ALM, singleshooting1D) {
-    using namespace pa;
+    using namespace alpaqa;
 
     Box C{vec(1), vec(1)};
     C.lowerbound << -1;
@@ -14,8 +14,8 @@ TEST(ALM, singleshooting1D) {
 
     using Diag = Eigen::DiagonalMatrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
-    auto A = pa::mat::Constant(1, 1, 0.5);
-    auto B = pa::mat::Constant(1, 1, 1);
+    auto A = alpaqa::mat::Constant(1, 1, 0.5);
+    auto B = alpaqa::mat::Constant(1, 1, 1);
 
     auto Q = Diag(1);
     Q.diagonal() << 10;
@@ -72,7 +72,7 @@ TEST(ALM, singleshooting1D) {
 }
 
 TEST(ALM, multipleshooting1D) {
-    using namespace pa;
+    using namespace alpaqa;
 
     Box C{vec(2), vec(2)};
     C.lowerbound << -1, -inf;
@@ -83,8 +83,8 @@ TEST(ALM, multipleshooting1D) {
 
     using Diag = Eigen::DiagonalMatrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
-    auto A = pa::mat::Constant(1, 1, 0.5);
-    auto B = pa::mat::Constant(1, 1, 1);
+    auto A = alpaqa::mat::Constant(1, 1, 0.5);
+    auto B = alpaqa::mat::Constant(1, 1, 1);
 
     auto Q = Diag(1);
     Q.diagonal() << 10;
@@ -113,7 +113,7 @@ TEST(ALM, multipleshooting1D) {
     auto grad_g = [&](crvec ux, crvec v, rvec grad_u_v) {
         (void)ux;
         grad_u_v.topRows(1)    = B * v;
-        grad_u_v.bottomRows(1) = -pa::mat::Identity(1, 1) * v;
+        grad_u_v.bottomRows(1) = -alpaqa::mat::Identity(1, 1) * v;
     };
 
     Problem p{2, 1, C, D, f, grad_f, g, grad_g, {}, {}, {}};
@@ -162,7 +162,7 @@ TEST(ALM, multipleshooting1D) {
 }
 
 TEST(ALM, multipleshooting8D) {
-    using namespace pa;
+    using namespace alpaqa;
 
     unsigned nx = 8, nu = 8;
     unsigned n = nu + nx;
@@ -208,7 +208,7 @@ TEST(ALM, multipleshooting8D) {
     auto grad_g = [&](crvec ux, crvec v, rvec grad_u_v) {
         (void)ux;
         grad_u_v.topRows(nu)    = v.transpose() * B;
-        grad_u_v.bottomRows(nx) = -pa::mat::Identity(nx, nx) * v;
+        grad_u_v.bottomRows(nx) = -alpaqa::mat::Identity(nx, nx) * v;
     };
 
     Problem p{n, m, C, D, f, grad_f, g, grad_g, {}, {}, {}};

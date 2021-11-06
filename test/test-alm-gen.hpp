@@ -9,8 +9,8 @@
 #include <chrono>
 
 template <class Data>
-inline pa::Problem make_problem() {
-    using namespace pa;
+inline alpaqa::Problem make_problem() {
+    using namespace alpaqa;
 
     unsigned nx = Data::nx(), nu = Data::nu();
     unsigned n = nu + nx;
@@ -57,15 +57,15 @@ inline pa::Problem make_problem() {
     auto grad_g = [=](crvec ux, crvec v, rvec grad_u_v) {
         (void)ux;
         grad_u_v.topRows(nu)    = B.transpose() * v;
-        grad_u_v.bottomRows(nx) = -pa::mat::Identity(nx, nx) * v;
+        grad_u_v.bottomRows(nx) = -alpaqa::mat::Identity(nx, nx) * v;
     };
 
     return Problem{n, m, C, D, f, grad_f, g, grad_g};
 }
 
-inline void do_test(const pa::Problem &p, const pa::rvec expected_sol,
-                    const pa::rvec expected_lagrange_multipliers) {
-    using namespace pa;
+inline void do_test(const alpaqa::Problem &p, const alpaqa::rvec expected_sol,
+                    const alpaqa::rvec expected_lagrange_multipliers) {
+    using namespace alpaqa;
 
     ALMParams almparam;
     almparam.ε        = 1e-4;

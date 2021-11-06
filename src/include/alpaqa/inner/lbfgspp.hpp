@@ -13,7 +13,7 @@
 #include <LBFGS.h>
 #include <LBFGSB.h>
 
-namespace pa {
+namespace alpaqa {
 
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
@@ -196,4 +196,4 @@ operator+=(InnerStatsAccumulator<LBFGSBStats> &acc, const LBFGSBStats &s) {
     return acc;
 }
 
-} // namespace pa
+} // namespace alpaqa

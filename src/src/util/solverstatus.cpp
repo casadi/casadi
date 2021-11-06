@@ -3,7 +3,7 @@
 #include <ostream>
 #include <stdexcept>
 
-namespace pa {
+namespace alpaqa {
 
 const char *enum_name(SolverStatus s) {
     using Status = SolverStatus;
@@ -16,11 +16,11 @@ const char *enum_name(SolverStatus s) {
         case Status::NoProgress: return "NoProgress";
         case Status::Interrupted: return "Interrupted";
     }
-    throw std::out_of_range("invalid value for pa::SolverStatus");
+    throw std::out_of_range("invalid value for alpaqa::SolverStatus");
 }
 
 std::ostream &operator<<(std::ostream &os, SolverStatus s) {
     return os << enum_name(s);
 }
 
-} // namespace pa
+} // namespace alpaqa

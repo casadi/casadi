@@ -80,11 +80,11 @@ class CUTEstProblem {
     Report get_report() const;
 
   public:
-    pa::Problem problem; ///< Problem statement (bounds, objective, constraints)
+    alpaqa::Problem problem; ///< Problem statement (bounds, objective, constraints)
     std::string name                = "<UNKNOWN>"; ///< Problem name
     unsigned number_box_constraints = 0; ///< The number of box constraints on x
-    pa::vec x0; ///< Initial value of decision variables
-    pa::vec y0; ///< Initial value of Lagrange multipliers
+    alpaqa::vec x0; ///< Initial value of decision variables
+    alpaqa::vec y0; ///< Initial value of Lagrange multipliers
 
   private:
     std::unique_ptr<class CUTEstLoader> implementation;

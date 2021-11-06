@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <iterator>
 
-namespace pa {
+namespace alpaqa {
 
 template <class IndexT = size_t>
 struct CircularIndices {
@@ -209,4 +209,4 @@ class ReverseCircularRange {
     ForwardRange forwardrange;
 };
 
-} // namespace pa
+} // namespace alpaqa

@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-namespace pa {
+namespace alpaqa {
 
 class AtomicStopSignal {
   public:
@@ -21,4 +21,4 @@ class AtomicStopSignal {
     std::atomic<bool> stop_flag{false};
 };
 
-} // namespace pa
+} // namespace alpaqa

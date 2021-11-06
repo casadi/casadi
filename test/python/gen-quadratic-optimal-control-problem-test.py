@@ -108,26 +108,26 @@ inline static constexpr unsigned nu() {{
     return {nu};
 }}
 
-inline static pa::mat A() {{
-    auto A = pa::mat({nx}, {nx});
+inline static alpaqa::mat A() {{
+    auto A = alpaqa::mat({nx}, {nx});
     {eigen(A, 'A')}
     return A;
 }}
 
-inline static pa::mat B() {{
-    auto B = pa::mat({nx}, {nu});
+inline static alpaqa::mat B() {{
+    auto B = alpaqa::mat({nx}, {nu});
     {eigen(B, 'B')}
     return B;
 }}
 
-inline static pa::vec solution() {{
-    auto ux = pa::vec({nx+nu});
+inline static alpaqa::vec solution() {{
+    auto ux = alpaqa::vec({nx+nu});
     {eigen(sol, 'ux')}
     return ux;
 }}
 
-inline static pa::vec lagrange_multipliers() {{
-    auto lam = pa::vec({nx});
+inline static alpaqa::vec lagrange_multipliers() {{
+    auto lam = alpaqa::vec({nx});
     {eigen(lam, 'lam')}
     return lam;
 }}

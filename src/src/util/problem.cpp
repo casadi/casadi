@@ -1,6 +1,6 @@
 #include <alpaqa/util/problem.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 void ProblemOnlyD::transform() {
     work.resize(original.m);
@@ -37,4 +37,4 @@ void ProblemOnlyD::transform() {
     this->D.upperbound.bottomRows(original.n) = original.C.upperbound;
 }
 
-} // namespace pa
+} // namespace alpaqa

@@ -2,7 +2,7 @@
 
 #include "vec.hpp"
 
-namespace pa {
+namespace alpaqa {
 
 struct Box {
     vec upperbound;
@@ -55,4 +55,4 @@ inline real_t dist_squared(crvec v,        ///< [in] The vector to project
     return d.dot(Σ.asDiagonal() * d);
 }
 
-} // namespace pa
+} // namespace alpaqa

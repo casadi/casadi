@@ -4,7 +4,7 @@
 #include "eigen-matchers.hpp"
 
 TEST(ALMGAAPGA, DISABLED_riskaverse) {
-    using namespace pa;
+    using namespace alpaqa;
 
     unsigned nu = 2;
     unsigned nx = 4;
@@ -30,10 +30,10 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
 
     real_t Ts = 0.05;
 
-    pa::mat A = pa::mat::Identity(nx, nx);
+    alpaqa::mat A = alpaqa::mat::Identity(nx, nx);
     A(0, 2)   = Ts;
     A(1, 3)   = Ts;
-    pa::mat B = pa::mat::Zero(nx, nu);
+    alpaqa::mat B = alpaqa::mat::Zero(nx, nu);
     B(2, 0)   = Ts;
     B(3, 1)   = Ts;
 
@@ -62,7 +62,7 @@ TEST(ALMGAAPGA, DISABLED_riskaverse) {
                  (y(ux)(0) - y(ux)(1) - y(ux)(2) - s(ux)(1));
     };
     auto grad_g = [&](crvec ux, crvec v, rvec grad_u_v) {
-        pa::mat grad      = pa::mat::Zero(n, m);
+        alpaqa::mat grad      = alpaqa::mat::Zero(n, m);
         s(grad.col(0))(0) = -1;
         y(grad.col(0))(0) = 1;
         y(grad.col(0))(1) = -1;

@@ -111,146 +111,146 @@ T var_kwargs_to_struct(const std::variant<T, py::dict> &p) {
 #include <alpaqa/inner/decl/panoc.hpp>
 
 template <>
-inline const kwargs_to_struct_table_t<pa::PANOCParams>
-    kwargs_to_struct_table<pa::PANOCParams>{
-        {"Lipschitz", &pa::PANOCParams::Lipschitz},
-        {"max_iter", &pa::PANOCParams::max_iter},
-        {"max_time", &pa::PANOCParams::max_time},
-        {"τ_min", &pa::PANOCParams::τ_min},
-        {"L_min", &pa::PANOCParams::L_min},
-        {"L_max", &pa::PANOCParams::L_max},
-        {"stop_crit", &pa::PANOCParams::stop_crit},
-        {"max_no_progress", &pa::PANOCParams::max_no_progress},
-        {"print_interval", &pa::PANOCParams::print_interval},
+inline const kwargs_to_struct_table_t<alpaqa::PANOCParams>
+    kwargs_to_struct_table<alpaqa::PANOCParams>{
+        {"Lipschitz", &alpaqa::PANOCParams::Lipschitz},
+        {"max_iter", &alpaqa::PANOCParams::max_iter},
+        {"max_time", &alpaqa::PANOCParams::max_time},
+        {"τ_min", &alpaqa::PANOCParams::τ_min},
+        {"L_min", &alpaqa::PANOCParams::L_min},
+        {"L_max", &alpaqa::PANOCParams::L_max},
+        {"stop_crit", &alpaqa::PANOCParams::stop_crit},
+        {"max_no_progress", &alpaqa::PANOCParams::max_no_progress},
+        {"print_interval", &alpaqa::PANOCParams::print_interval},
         {"quadratic_upperbound_tolerance_factor",
-         &pa::PANOCParams::quadratic_upperbound_tolerance_factor},
+         &alpaqa::PANOCParams::quadratic_upperbound_tolerance_factor},
         {"update_lipschitz_in_linesearch",
-         &pa::PANOCParams::update_lipschitz_in_linesearch},
+         &alpaqa::PANOCParams::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond",
-         &pa::PANOCParams::alternative_linesearch_cond},
-        {"lbfgs_stepsize", &pa::PANOCParams::lbfgs_stepsize},
+         &alpaqa::PANOCParams::alternative_linesearch_cond},
+        {"lbfgs_stepsize", &alpaqa::PANOCParams::lbfgs_stepsize},
     };
 
 template <>
-inline const kwargs_to_struct_table_t<pa::LipschitzEstimateParams>
-    kwargs_to_struct_table<pa::LipschitzEstimateParams>{
-        {"L_0", &pa::LipschitzEstimateParams::L₀},
-        {"δ", &pa::LipschitzEstimateParams::δ},
-        {"ε", &pa::LipschitzEstimateParams::ε},
-        {"Lγ_factor", &pa::LipschitzEstimateParams::Lγ_factor},
+inline const kwargs_to_struct_table_t<alpaqa::LipschitzEstimateParams>
+    kwargs_to_struct_table<alpaqa::LipschitzEstimateParams>{
+        {"L_0", &alpaqa::LipschitzEstimateParams::L₀},
+        {"δ", &alpaqa::LipschitzEstimateParams::δ},
+        {"ε", &alpaqa::LipschitzEstimateParams::ε},
+        {"Lγ_factor", &alpaqa::LipschitzEstimateParams::Lγ_factor},
     };
 
 #include <alpaqa/inner/pga.hpp>
 
 template <>
-inline const kwargs_to_struct_table_t<pa::PGAParams>
-    kwargs_to_struct_table<pa::PGAParams>{
-        {"Lipschitz", &pa::PGAParams::Lipschitz},
-        {"max_iter", &pa::PGAParams::max_iter},
-        {"max_time", &pa::PGAParams::max_time},
-        {"L_min", &pa::PGAParams::L_min},
-        {"L_max", &pa::PGAParams::L_max},
-        {"stop_crit", &pa::PGAParams::stop_crit},
-        {"print_interval", &pa::PGAParams::print_interval},
+inline const kwargs_to_struct_table_t<alpaqa::PGAParams>
+    kwargs_to_struct_table<alpaqa::PGAParams>{
+        {"Lipschitz", &alpaqa::PGAParams::Lipschitz},
+        {"max_iter", &alpaqa::PGAParams::max_iter},
+        {"max_time", &alpaqa::PGAParams::max_time},
+        {"L_min", &alpaqa::PGAParams::L_min},
+        {"L_max", &alpaqa::PGAParams::L_max},
+        {"stop_crit", &alpaqa::PGAParams::stop_crit},
+        {"print_interval", &alpaqa::PGAParams::print_interval},
         {"quadratic_upperbound_tolerance_factor",
-         &pa::PGAParams::quadratic_upperbound_tolerance_factor},
+         &alpaqa::PGAParams::quadratic_upperbound_tolerance_factor},
     };
 
 #include <alpaqa/inner/guarded-aa-pga.hpp>
 
 template <>
-inline const kwargs_to_struct_table_t<pa::GAAPGAParams>
-    kwargs_to_struct_table<pa::GAAPGAParams>{
-        {"Lipschitz", &pa::GAAPGAParams::Lipschitz},
-        {"limitedqr_mem", &pa::GAAPGAParams::limitedqr_mem},
-        {"max_iter", &pa::GAAPGAParams::max_iter},
-        {"max_time", &pa::GAAPGAParams::max_time},
-        {"L_min", &pa::GAAPGAParams::L_min},
-        {"L_max", &pa::GAAPGAParams::L_max},
-        {"stop_crit", &pa::GAAPGAParams::stop_crit},
-        {"print_interval", &pa::GAAPGAParams::print_interval},
+inline const kwargs_to_struct_table_t<alpaqa::GAAPGAParams>
+    kwargs_to_struct_table<alpaqa::GAAPGAParams>{
+        {"Lipschitz", &alpaqa::GAAPGAParams::Lipschitz},
+        {"limitedqr_mem", &alpaqa::GAAPGAParams::limitedqr_mem},
+        {"max_iter", &alpaqa::GAAPGAParams::max_iter},
+        {"max_time", &alpaqa::GAAPGAParams::max_time},
+        {"L_min", &alpaqa::GAAPGAParams::L_min},
+        {"L_max", &alpaqa::GAAPGAParams::L_max},
+        {"stop_crit", &alpaqa::GAAPGAParams::stop_crit},
+        {"print_interval", &alpaqa::GAAPGAParams::print_interval},
         {"quadratic_upperbound_tolerance_factor",
-         &pa::GAAPGAParams::quadratic_upperbound_tolerance_factor},
-        {"max_no_progress", &pa::GAAPGAParams::max_no_progress},
-        {"full_flush_on_γ_change", &pa::GAAPGAParams::full_flush_on_γ_change},
+         &alpaqa::GAAPGAParams::quadratic_upperbound_tolerance_factor},
+        {"max_no_progress", &alpaqa::GAAPGAParams::max_no_progress},
+        {"full_flush_on_γ_change", &alpaqa::GAAPGAParams::full_flush_on_γ_change},
     };
 
 #include <alpaqa/inner/decl/structured-panoc-lbfgs.hpp>
 
 template <>
-inline const kwargs_to_struct_table_t<pa::StructuredPANOCLBFGSParams>
-    kwargs_to_struct_table<pa::StructuredPANOCLBFGSParams>{
-        {"Lipschitz", &pa::StructuredPANOCLBFGSParams::Lipschitz},
-        {"max_iter", &pa::StructuredPANOCLBFGSParams::max_iter},
-        {"max_time", &pa::StructuredPANOCLBFGSParams::max_time},
-        {"τ_min", &pa::StructuredPANOCLBFGSParams::τ_min},
-        {"L_min", &pa::StructuredPANOCLBFGSParams::L_min},
-        {"L_max", &pa::StructuredPANOCLBFGSParams::L_max},
+inline const kwargs_to_struct_table_t<alpaqa::StructuredPANOCLBFGSParams>
+    kwargs_to_struct_table<alpaqa::StructuredPANOCLBFGSParams>{
+        {"Lipschitz", &alpaqa::StructuredPANOCLBFGSParams::Lipschitz},
+        {"max_iter", &alpaqa::StructuredPANOCLBFGSParams::max_iter},
+        {"max_time", &alpaqa::StructuredPANOCLBFGSParams::max_time},
+        {"τ_min", &alpaqa::StructuredPANOCLBFGSParams::τ_min},
+        {"L_min", &alpaqa::StructuredPANOCLBFGSParams::L_min},
+        {"L_max", &alpaqa::StructuredPANOCLBFGSParams::L_max},
         {"nonmonotone_linesearch",
-         &pa::StructuredPANOCLBFGSParams::nonmonotone_linesearch},
-        {"stop_crit", &pa::StructuredPANOCLBFGSParams::stop_crit},
-        {"max_no_progress", &pa::StructuredPANOCLBFGSParams::max_no_progress},
-        {"print_interval", &pa::StructuredPANOCLBFGSParams::print_interval},
+         &alpaqa::StructuredPANOCLBFGSParams::nonmonotone_linesearch},
+        {"stop_crit", &alpaqa::StructuredPANOCLBFGSParams::stop_crit},
+        {"max_no_progress", &alpaqa::StructuredPANOCLBFGSParams::max_no_progress},
+        {"print_interval", &alpaqa::StructuredPANOCLBFGSParams::print_interval},
         {"quadratic_upperbound_tolerance_factor",
-         &pa::StructuredPANOCLBFGSParams::
+         &alpaqa::StructuredPANOCLBFGSParams::
              quadratic_upperbound_tolerance_factor},
         {"update_lipschitz_in_linesearch",
-         &pa::StructuredPANOCLBFGSParams::update_lipschitz_in_linesearch},
+         &alpaqa::StructuredPANOCLBFGSParams::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond",
-         &pa::StructuredPANOCLBFGSParams::alternative_linesearch_cond},
-        {"hessian_vec", &pa::StructuredPANOCLBFGSParams::hessian_vec},
+         &alpaqa::StructuredPANOCLBFGSParams::alternative_linesearch_cond},
+        {"hessian_vec", &alpaqa::StructuredPANOCLBFGSParams::hessian_vec},
         {"hessian_vec_finite_differences",
-         &pa::StructuredPANOCLBFGSParams::hessian_vec_finite_differences},
+         &alpaqa::StructuredPANOCLBFGSParams::hessian_vec_finite_differences},
         {"full_augmented_hessian",
-         &pa::StructuredPANOCLBFGSParams::full_augmented_hessian},
+         &alpaqa::StructuredPANOCLBFGSParams::full_augmented_hessian},
         {"hessian_step_size_heuristic",
-         &pa::StructuredPANOCLBFGSParams::hessian_step_size_heuristic},
-        {"lbfgs_stepsize", &pa::StructuredPANOCLBFGSParams::lbfgs_stepsize},
+         &alpaqa::StructuredPANOCLBFGSParams::hessian_step_size_heuristic},
+        {"lbfgs_stepsize", &alpaqa::StructuredPANOCLBFGSParams::lbfgs_stepsize},
     };
 
 #include <alpaqa/inner/directions/decl/lbfgs.hpp>
 
 template <>
-inline const kwargs_to_struct_table_t<pa::LBFGSParams>
-    kwargs_to_struct_table<pa::LBFGSParams>{
-        {"memory", &pa::LBFGSParams::memory},
-        {"cbfgs", &pa::LBFGSParams::cbfgs},
-        {"rescale_when_γ_changes", &pa::LBFGSParams::rescale_when_γ_changes},
+inline const kwargs_to_struct_table_t<alpaqa::LBFGSParams>
+    kwargs_to_struct_table<alpaqa::LBFGSParams>{
+        {"memory", &alpaqa::LBFGSParams::memory},
+        {"cbfgs", &alpaqa::LBFGSParams::cbfgs},
+        {"rescale_when_γ_changes", &alpaqa::LBFGSParams::rescale_when_γ_changes},
     };
 
 template <>
-inline const kwargs_to_struct_table_t<decltype(pa::LBFGSParams::cbfgs)>
-    kwargs_to_struct_table<decltype(pa::LBFGSParams::cbfgs)>{
-        {"α", &decltype(pa::LBFGSParams::cbfgs)::α},
-        {"ϵ", &decltype(pa::LBFGSParams::cbfgs)::ϵ},
+inline const kwargs_to_struct_table_t<decltype(alpaqa::LBFGSParams::cbfgs)>
+    kwargs_to_struct_table<decltype(alpaqa::LBFGSParams::cbfgs)>{
+        {"α", &decltype(alpaqa::LBFGSParams::cbfgs)::α},
+        {"ϵ", &decltype(alpaqa::LBFGSParams::cbfgs)::ϵ},
     };
 
 #include <alpaqa/decl/alm.hpp>
 
 template <>
-inline const kwargs_to_struct_table_t<pa::ALMParams>
-    kwargs_to_struct_table<pa::ALMParams>{
-        {"ε", &pa::ALMParams::ε},
-        {"δ", &pa::ALMParams::δ},
-        {"Δ", &pa::ALMParams::Δ},
-        {"Δ_lower", &pa::ALMParams::Δ_lower},
-        {"Σ_0", &pa::ALMParams::Σ₀},
-        {"σ_0", &pa::ALMParams::σ₀},
-        {"Σ_0_lower", &pa::ALMParams::Σ₀_lower},
-        {"ε_0", &pa::ALMParams::ε₀},
-        {"ε_0_increase", &pa::ALMParams::ε₀_increase},
-        {"ρ", &pa::ALMParams::ρ},
-        {"ρ_increase", &pa::ALMParams::ρ_increase},
-        {"θ", &pa::ALMParams::θ},
-        {"M", &pa::ALMParams::M},
-        {"Σ_max", &pa::ALMParams::Σ_max},
-        {"Σ_min", &pa::ALMParams::Σ_min},
-        {"max_iter", &pa::ALMParams::max_iter},
-        {"max_time", &pa::ALMParams::max_time},
-        {"max_num_initial_retries", &pa::ALMParams::max_num_initial_retries},
-        {"max_num_retries", &pa::ALMParams::max_num_retries},
-        {"max_total_num_retries", &pa::ALMParams::max_total_num_retries},
-        {"print_interval", &pa::ALMParams::print_interval},
-        {"preconditioning", &pa::ALMParams::preconditioning},
-        {"single_penalty_factor", &pa::ALMParams::single_penalty_factor},
+inline const kwargs_to_struct_table_t<alpaqa::ALMParams>
+    kwargs_to_struct_table<alpaqa::ALMParams>{
+        {"ε", &alpaqa::ALMParams::ε},
+        {"δ", &alpaqa::ALMParams::δ},
+        {"Δ", &alpaqa::ALMParams::Δ},
+        {"Δ_lower", &alpaqa::ALMParams::Δ_lower},
+        {"Σ_0", &alpaqa::ALMParams::Σ₀},
+        {"σ_0", &alpaqa::ALMParams::σ₀},
+        {"Σ_0_lower", &alpaqa::ALMParams::Σ₀_lower},
+        {"ε_0", &alpaqa::ALMParams::ε₀},
+        {"ε_0_increase", &alpaqa::ALMParams::ε₀_increase},
+        {"ρ", &alpaqa::ALMParams::ρ},
+        {"ρ_increase", &alpaqa::ALMParams::ρ_increase},
+        {"θ", &alpaqa::ALMParams::θ},
+        {"M", &alpaqa::ALMParams::M},
+        {"Σ_max", &alpaqa::ALMParams::Σ_max},
+        {"Σ_min", &alpaqa::ALMParams::Σ_min},
+        {"max_iter", &alpaqa::ALMParams::max_iter},
+        {"max_time", &alpaqa::ALMParams::max_time},
+        {"max_num_initial_retries", &alpaqa::ALMParams::max_num_initial_retries},
+        {"max_num_retries", &alpaqa::ALMParams::max_num_retries},
+        {"max_total_num_retries", &alpaqa::ALMParams::max_total_num_retries},
+        {"print_interval", &alpaqa::ALMParams::print_interval},
+        {"preconditioning", &alpaqa::ALMParams::preconditioning},
+        {"single_penalty_factor", &alpaqa::ALMParams::single_penalty_factor},
     };

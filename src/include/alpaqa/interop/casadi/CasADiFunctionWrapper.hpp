@@ -82,7 +82,7 @@ class CasADiFun_1Vi1So {
     CasADiFun_1Vi1So(casadi::Function &&f, casadi_int dim_in = 0)
         : fun(std::move(f), {{dim_in, 1}}, {{1, 1}}) {}
 
-    double operator()(pa::crvec x) const {
+    double operator()(alpaqa::crvec x) const {
         double out;
         fun({x.data()}, {&out});
         return out;
@@ -99,7 +99,7 @@ class CasADiFun_2Vi1So {
                      const std::array<casadi_int, 2> &dim_in = {})
         : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {{1, 1}}) {}
 
-    double operator()(pa::crvec x, pa::crvec p) const {
+    double operator()(alpaqa::crvec x, alpaqa::crvec p) const {
         double out;
         fun({x.data(), p.data()}, {&out});
         return out;
@@ -118,7 +118,7 @@ class CasADiFun_1Vi1Vo {
                      casadi_int dim_out = 0)
         : fun(std::move(f), {{dim_in, 1}}, {{dim_out, 1}}) {}
 
-    void operator()(pa::crvec in, pa::rvec out) const {
+    void operator()(alpaqa::crvec in, alpaqa::rvec out) const {
         fun({in.data()}, {out.data()});
     }
 
@@ -136,7 +136,7 @@ class CasADiFun_2Vi1Vo {
                      casadi_int dim_out                      = 0)
         : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {{dim_out, 1}}) {}
 
-    void operator()(pa::crvec in1, pa::crvec in2, pa::rvec out) const {
+    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::rvec out) const {
         fun({in1.data(), in2.data()}, {out.data()});
     }
 
@@ -152,7 +152,7 @@ class CasADiFun_2Vi1Mo {
                      CasADiFunctionEvaluator<2, 1>::casadi_dim dim_out = {0, 0})
         : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {dim_out}) {}
 
-    void operator()(pa::crvec in1, pa::crvec in2, pa::rmat out) const {
+    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::rmat out) const {
         fun({in1.data(), in2.data()}, {out.data()});
     }
 
@@ -174,8 +174,8 @@ class CasADiFun_3Vi1Mo {
               },
               {dim_out}) {}
 
-    void operator()(pa::crvec in1, pa::crvec in2, pa::crvec in3,
-                    pa::rmat out) const {
+    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::crvec in3,
+                    alpaqa::rmat out) const {
         fun({in1.data(), in2.data(), in3.data()}, {out.data()});
     }
 
@@ -197,8 +197,8 @@ class CasADiFun_3Vi1Vo {
               },
               {{dim_out, 1}}) {}
 
-    void operator()(pa::crvec in1, pa::crvec in2, pa::crvec in3,
-                    pa::rvec out) const {
+    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::crvec in3,
+                    alpaqa::rvec out) const {
         fun({in1.data(), in2.data(), in3.data()}, {out.data()});
     }
 
@@ -221,8 +221,8 @@ class CasADiFun_4Vi1Vo {
               },
               {{dim_out, 1}}) {}
 
-    void operator()(pa::crvec in1, pa::crvec in2, pa::crvec in3, pa::crvec in4,
-                    pa::rvec out) const {
+    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::crvec in3, alpaqa::crvec in4,
+                    alpaqa::rvec out) const {
         fun({in1.data(), in2.data(), in3.data(), in4.data()}, {out.data()});
     }
 

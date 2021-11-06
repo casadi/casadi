@@ -10,7 +10,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace pa {
+namespace alpaqa {
 
 namespace detail {
 
@@ -389,4 +389,4 @@ PANOCStats panoc(ObjFunT &ψ, ObjGradFunT &grad_ψ, const Box &C, rvec x,
     return panoc_impl(ψ, grad_ψ, C, x, ε, params, alloc, direction);
 }
 
-} // namespace pa
+} // namespace alpaqa

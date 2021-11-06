@@ -14,7 +14,7 @@
 #include <limits>
 #include <string>
 
-namespace pa {
+namespace alpaqa {
 
 /// Tuning parameters for the PANOC algorithm.
 struct PANOCParams {
@@ -156,4 +156,4 @@ operator+=(InnerStatsAccumulator<PANOCStats> &acc, const PANOCStats &s) {
     return acc;
 }
 
-} // namespace pa
+} // namespace alpaqa

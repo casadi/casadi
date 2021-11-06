@@ -2,10 +2,10 @@
 
 #include <alpaqa/util/problem.hpp>
 
-namespace pa {
+namespace alpaqa {
 namespace problems {
 
 Problem riskaverse_mpc_problem();
 
 } // namespace problems
-} // namespace pa
+} // namespace alpaqa

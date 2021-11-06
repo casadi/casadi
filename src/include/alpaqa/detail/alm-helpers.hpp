@@ -3,7 +3,7 @@
 #include <alpaqa/decl/alm.hpp>
 #include <stdexcept>
 
-namespace pa::detail {
+namespace alpaqa::detail {
 
 inline void project_y(rvec y,     // inout
                       crvec z_lb, // in
@@ -117,4 +117,4 @@ inline void apply_preconditioning(const Problem &problem, Problem &prec_problem,
     };
 }
 
-} // namespace pa::detail
+} // namespace alpaqa::detail

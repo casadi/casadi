@@ -8,7 +8,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace pa {
+namespace alpaqa {
 
 /**
  * @class Problem
@@ -309,4 +309,4 @@ class ProblemOnlyD : public Problem {
     void transform();
 };
 
-} // namespace pa
+} // namespace alpaqa

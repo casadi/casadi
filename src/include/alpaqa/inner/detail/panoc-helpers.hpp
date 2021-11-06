@@ -7,7 +7,7 @@
 
 #include <stdexcept>
 
-namespace pa::detail {
+namespace alpaqa::detail {
 
 /// Calculate both ψ(x) and the vector ŷ that can later be used to compute ∇ψ.
 /// @f[ \psi(x^k) = f(x^k) + \frac{1}{2}
@@ -498,4 +498,4 @@ inline real_t initial_lipschitz_estimate(
     return std::clamp(L, L_min, L_max);
 }
 
-} // namespace pa::detail
+} // namespace alpaqa::detail

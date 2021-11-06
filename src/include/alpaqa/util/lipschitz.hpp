@@ -2,7 +2,7 @@
 
 #include <alpaqa/util/vec.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 struct LipschitzEstimateParams {
     /// Initial estimate of the Lipschitz constant of ∇ψ(x)
@@ -15,4 +15,4 @@ struct LipschitzEstimateParams {
     real_t Lγ_factor = 0.95;
 };
 
-} // namespace pa
+} // namespace alpaqa

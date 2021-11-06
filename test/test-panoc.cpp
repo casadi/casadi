@@ -8,17 +8,17 @@
 #include <alpaqa/inner/detail/panoc-helpers.hpp>
 #include <alpaqa/inner/directions/decl/lbfgs.hpp>
 
-using pa::crvec;
-using pa::inf;
-using pa::mat;
-using pa::Problem;
-using pa::real_t;
-using pa::rmat;
-using pa::rvec;
-using pa::vec;
+using alpaqa::crvec;
+using alpaqa::inf;
+using alpaqa::mat;
+using alpaqa::Problem;
+using alpaqa::real_t;
+using alpaqa::rmat;
+using alpaqa::rvec;
+using alpaqa::vec;
 
 Problem build_test_problem() {
-    pa::Problem p;
+    alpaqa::Problem p;
     p.n            = 2;
     p.m            = 2;
     p.C.upperbound = vec::Constant(2, inf);
@@ -37,7 +37,7 @@ Problem build_test_problem() {
         g(1) = 3 * std::pow(x(0), 3);
     };
     p.grad_g_prod = [](crvec x, crvec y, rvec grad) {
-        pa::mat jacᵀ = pa::mat::Zero(2, 2);
+        alpaqa::mat jacᵀ = alpaqa::mat::Zero(2, 2);
         jacᵀ << 2, 9 * std::pow(x(0), 2), 2, 0;
         grad = jacᵀ * y;
     };
@@ -77,12 +77,12 @@ TEST(PANOC, calc_ψ_grad_ψ) {
     vec Σ⁻¹y = Σ.asDiagonal().inverse() * y;
 
     auto ψ_fun = [&p, &f, &g, &Σ, &Σ⁻¹y](crvec x) -> real_t {
-        return f(x) + 0.5 * pa::dist_squared(g(x) + Σ⁻¹y, p.D, Σ);
+        return f(x) + 0.5 * alpaqa::dist_squared(g(x) + Σ⁻¹y, p.D, Σ);
     };
 
     // Compute ψ and ∇ψ manually
     vec ζ     = g(x) + Σ⁻¹y;
-    vec ẑ     = pa::project(ζ, p.D);
+    vec ẑ     = alpaqa::project(ζ, p.D);
     vec d     = ζ - ẑ;
     vec ŷ     = Σ.asDiagonal() * d;
     real_t ψ  = f(x) + 0.5 * d.dot(ŷ);
@@ -100,7 +100,7 @@ TEST(PANOC, calc_ψ_grad_ψ) {
 
     // calc_ψ_grad_ψ
     real_t ψ_res =
-        pa::detail::calc_ψ_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
+        alpaqa::detail::calc_ψ_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
     EXPECT_DOUBLE_EQ(ψ_res, ψ);
@@ -108,13 +108,13 @@ TEST(PANOC, calc_ψ_grad_ψ) {
 
     // calc_ψ_ŷ
     work_m.setZero();
-    ψ_res = pa::detail::calc_ψ_ŷ(p, x, y, Σ, work_m);
+    ψ_res = alpaqa::detail::calc_ψ_ŷ(p, x, y, Σ, work_m);
     EXPECT_THAT(print_wrap(work_m), EigenAlmostEqual(print_wrap(ŷ), 1e-10));
     EXPECT_DOUBLE_EQ(ψ_res, ψ);
 
     // calc_grad_ψ_from_ŷ
     grad_ψ_res.setZero();
-    pa::detail::calc_grad_ψ_from_ŷ(p, x, work_m, grad_ψ_res, work_n);
+    alpaqa::detail::calc_grad_ψ_from_ŷ(p, x, work_m, grad_ψ_res, work_n);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
 
@@ -122,14 +122,14 @@ TEST(PANOC, calc_ψ_grad_ψ) {
     grad_ψ_res.setZero();
     work_n.setZero();
     work_m.setZero();
-    pa::detail::calc_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
+    alpaqa::detail::calc_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
 
     // calc_err_z
     vec err_z = g(x) - ẑ;
     vec err_z_res(2);
-    pa::detail::calc_err_z(p, x, y, Σ, err_z_res);
+    alpaqa::detail::calc_err_z(p, x, y, Σ, err_z_res);
     EXPECT_THAT(print_wrap(err_z_res),
                 EigenAlmostEqual(print_wrap(err_z), 1e-10));
 
@@ -142,7 +142,7 @@ TEST(PANOC, calc_ψ_grad_ψ) {
 }
 
 Problem build_test_problem2() {
-    pa::Problem p;
+    alpaqa::Problem p;
     p.n            = 2;
     p.m            = 2;
     p.C.upperbound = vec::Constant(2, 10);
@@ -166,7 +166,7 @@ Problem build_test_problem2() {
         g(1) = 0.125 * std::pow(x(0), 4) - x(0) * x(1);
     };
     p.grad_g_prod = [](crvec x, crvec y, rvec grad) {
-        pa::mat gradmat(2, 2);
+        alpaqa::mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
             0.5 * std::pow(x(0), 3) - x(1),             //
@@ -175,7 +175,7 @@ Problem build_test_problem2() {
         grad = gradmat * y;
     };
     p.grad_gi = [](crvec x, unsigned i, rvec grad) {
-        pa::mat gradmat(2, 2);
+        alpaqa::mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
             0.5 * std::pow(x(0), 3) - x(1),             //
@@ -250,12 +250,12 @@ TEST(PANOC, hessian) {
     vec Σ⁻¹y = Σ.asDiagonal().inverse() * y;
 
     auto ψ_fun = [&p, &f, &g, &Σ, &Σ⁻¹y](crvec x) -> real_t {
-        return f(x) + 0.5 * pa::dist_squared(g(x) + Σ⁻¹y, p.D, Σ);
+        return f(x) + 0.5 * alpaqa::dist_squared(g(x) + Σ⁻¹y, p.D, Σ);
     };
 
     // Compute ψ and ∇ψ manually
     vec ζ     = g(x) + Σ⁻¹y;
-    vec ẑ     = pa::project(ζ, p.D);
+    vec ẑ     = alpaqa::project(ζ, p.D);
     vec d     = ζ - ẑ;
     vec ŷ     = Σ.asDiagonal() * d;
     real_t ψ  = f(x) + 0.5 * d.dot(ŷ);
@@ -294,7 +294,7 @@ TEST(PANOC, hessian) {
 
     // calc_ψ_grad_ψ
     real_t ψ_res =
-        pa::detail::calc_ψ_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
+        alpaqa::detail::calc_ψ_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
     EXPECT_DOUBLE_EQ(ψ_res, ψ);
@@ -302,13 +302,13 @@ TEST(PANOC, hessian) {
 
     // calc_ψ_ŷ
     work_m.setZero();
-    ψ_res = pa::detail::calc_ψ_ŷ(p, x, y, Σ, work_m);
+    ψ_res = alpaqa::detail::calc_ψ_ŷ(p, x, y, Σ, work_m);
     EXPECT_THAT(print_wrap(work_m), EigenAlmostEqual(print_wrap(ŷ), 1e-10));
     EXPECT_DOUBLE_EQ(ψ_res, ψ);
 
     // calc_grad_ψ_from_ŷ
     grad_ψ_res.setZero();
-    pa::detail::calc_grad_ψ_from_ŷ(p, x, work_m, grad_ψ_res, work_n);
+    alpaqa::detail::calc_grad_ψ_from_ŷ(p, x, work_m, grad_ψ_res, work_n);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
 
@@ -316,14 +316,14 @@ TEST(PANOC, hessian) {
     grad_ψ_res.setZero();
     work_n.setZero();
     work_m.setZero();
-    pa::detail::calc_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
+    alpaqa::detail::calc_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
     EXPECT_THAT(print_wrap(grad_ψ_res),
                 EigenAlmostEqual(print_wrap(grad_ψ), 1e-10));
 
     // calc_err_z
     vec err_z = g(x) - ẑ;
     vec err_z_res(2);
-    pa::detail::calc_err_z(p, x, y, Σ, err_z_res);
+    alpaqa::detail::calc_err_z(p, x, y, Σ, err_z_res);
     EXPECT_THAT(print_wrap(err_z_res),
                 EigenAlmostEqual(print_wrap(err_z), 1e-10));
 
@@ -370,12 +370,12 @@ TEST(PANOC, hessian) {
     auto grad_ψi = [&](unsigned i) {
         return [&, i](crvec x) {
             vec grad_ψ_res(2);
-            pa::detail::calc_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
+            alpaqa::detail::calc_grad_ψ(p, x, y, Σ, grad_ψ_res, work_n, work_m);
             return grad_ψ_res(i);
         };
     };
     vec gv(2);
-    pa::detail::calc_augmented_lagrangian_hessian(p, x, ŷ, y, Σ, gv, H_res,
+    alpaqa::detail::calc_augmented_lagrangian_hessian(p, x, ŷ, y, Σ, gv, H_res,
                                                   work_n);
     vec hess_ψ1_fd = pa_ref::finite_diff(grad_ψi(0), x);
     vec hess_ψ2_fd = pa_ref::finite_diff(grad_ψi(1), x);
@@ -389,12 +389,12 @@ TEST(PANOC, hessian) {
 
 // Compare the reference implementation of PANOC with the optimized implementation
 TEST(PANOC, ref) {
-    using pa::Box;
-    using pa::inf;
-    using pa::NaN;
-    using pa::Problem;
-    using pa::real_t;
-    using pa::vec;
+    using alpaqa::Box;
+    using alpaqa::inf;
+    using alpaqa::NaN;
+    using alpaqa::Problem;
+    using alpaqa::real_t;
+    using alpaqa::vec;
 
     unsigned nu = 2;
     unsigned nx = 4;
@@ -420,10 +420,10 @@ TEST(PANOC, ref) {
 
     real_t Ts = 0.05;
 
-    pa::mat A = pa::mat::Identity(nx, nx);
+    alpaqa::mat A = alpaqa::mat::Identity(nx, nx);
     A(0, 2)   = Ts;
     A(1, 3)   = Ts;
-    pa::mat B = pa::mat::Zero(nx, nu);
+    alpaqa::mat B = alpaqa::mat::Zero(nx, nu);
     B(2, 0)   = Ts;
     B(3, 1)   = Ts;
 
@@ -453,7 +453,7 @@ TEST(PANOC, ref) {
                  (y(ux)(0) - y(ux)(1) - y(ux)(2) - s(ux)(1));
     };
     auto grad_g_mat = [=](crvec ux) {
-        pa::mat grad      = pa::mat::Zero(n, m);
+        alpaqa::mat grad      = alpaqa::mat::Zero(n, m);
         s(grad.col(0))(0) = -1;
         y(grad.col(0))(0) = 1;
         y(grad.col(0))(1) = -1;
@@ -475,17 +475,17 @@ TEST(PANOC, ref) {
 
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g_prod, {}, {}, {}};
 
-    pa::PANOCParams params;
+    alpaqa::PANOCParams params;
     params.max_iter                       = 1000;
     params.τ_min                          = 1. / (1 << 10);
     params.update_lipschitz_in_linesearch = true;
-    params.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnGradientStepSize;
-    pa::LBFGSParams lbfgsparams;
+    params.lbfgs_stepsize = alpaqa::LBFGSStepSize::BasedOnGradientStepSize;
+    alpaqa::LBFGSParams lbfgsparams;
     lbfgsparams.memory = 20;
 
-    pa::PANOCParams params_ref = params;
+    alpaqa::PANOCParams params_ref = params;
 
-    pa::PANOCSolver<> solver{params, lbfgsparams};
+    alpaqa::PANOCSolver<> solver{params, lbfgsparams};
     pa_ref::PANOCSolver solver_ref{params_ref, lbfgsparams};
 
     vec λ     = vec::Ones(m);
@@ -518,7 +518,7 @@ TEST(PANOC, ref) {
     std::cout << stats_ref.iterations << std::endl;
     std::cout << stats_ref.status << std::endl << std::endl;
 
-    EXPECT_EQ(stats.status, pa::SolverStatus::Converged);
+    EXPECT_EQ(stats.status, alpaqa::SolverStatus::Converged);
     EXPECT_EQ(stats.status, stats_ref.status);
     EXPECT_LT(std::abs(int(stats.iterations) - int(stats_ref.iterations)), 2);
     EXPECT_LT(

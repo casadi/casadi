@@ -9,7 +9,7 @@
 #include <cmath>
 
 TEST(PANOCStandalone, cosh) {
-    using namespace pa;
+    using namespace alpaqa;
 
     auto f = [](crvec x_) {
         auto x = x_(0);
@@ -23,11 +23,11 @@ TEST(PANOCStandalone, cosh) {
     C.lowerbound = vec::Constant(1, -2.5);
     C.upperbound = vec::Constant(1, 10);
 
-    pa::PANOCParams params;
+    alpaqa::PANOCParams params;
     params.max_iter       = 32;
     params.τ_min          = 1. / 16;
     params.print_interval = 0;
-    pa::LBFGSParams lbfgsparams;
+    alpaqa::LBFGSParams lbfgsparams;
     lbfgsparams.memory = 20;
     real_t ε           = 1e-14;
 
@@ -37,12 +37,12 @@ TEST(PANOCStandalone, cosh) {
     std::chrono::microseconds total_duration{0};
     for (size_t i = 0; i < 10'000; ++i) {
         auto stats =
-            pa::panoc(f, grad_f, C, x, ε, params, {lbfgsparams}, alloc);
+            alpaqa::panoc(f, grad_f, C, x, ε, params, {lbfgsparams}, alloc);
         total_duration += stats.elapsed_time;
         x(0) = x(0) + 5 - x(0);
     }
 
-    auto stats = pa::panoc(f, grad_f, C, x, ε, params, {lbfgsparams}, alloc);
+    auto stats = alpaqa::panoc(f, grad_f, C, x, ε, params, {lbfgsparams}, alloc);
 
     EXPECT_EQ(alloc.highwater(), panoc_min_alloc_size);
     EXPECT_EQ(alloc.size(), 50);

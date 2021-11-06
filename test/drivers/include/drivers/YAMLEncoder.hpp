@@ -16,10 +16,10 @@
 
 #include <sstream>
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::crvec v) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, alpaqa::crvec v) {
     out << YAML::Flow;
     out << YAML::BeginSeq;
-    for (pa::vec::Index i = 0; i < v.size(); ++i)
+    for (alpaqa::vec::Index i = 0; i < v.size(); ++i)
         out << v[i];
     out << YAML::EndSeq;
     return out;
@@ -60,7 +60,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
     return out;
 }
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::EvalCounter ctr) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, alpaqa::EvalCounter ctr) {
     out << YAML::BeginMap;
     out << YAML::Key << "f" << YAML::Value << ctr.f;
     out << YAML::Key << "grad_f" << YAML::Value << ctr.grad_f;
@@ -73,15 +73,15 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::EvalCounter ctr) {
     return out;
 }
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::SolverStatus s) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, alpaqa::SolverStatus s) {
     return out << enum_name(s);
 }
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, pa::PANOCStopCrit p) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, alpaqa::PANOCStopCrit p) {
     return out << enum_name(p);
 }
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::LBFGSParams &p) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, const alpaqa::LBFGSParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "memory" << YAML::Value << p.memory;
     out << YAML::BeginMap;
@@ -95,7 +95,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::LBFGSParams &p) {
     return out;
 }
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PANOCParams &p) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, const alpaqa::PANOCParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
@@ -116,7 +116,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PANOCParams &p) {
     return out;
 }
 
-inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::ALMParams &p) {
+inline YAML::Emitter &operator<<(YAML::Emitter &out, const alpaqa::ALMParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "ε" << YAML::Value << p.ε;
     out << YAML::Key << "δ" << YAML::Value << p.δ;
@@ -150,7 +150,7 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::ALMParams &p) {
 
 inline YAML::Emitter &
 operator<<(YAML::Emitter &out,
-           const pa::InnerStatsAccumulator<pa::PANOCStats> &s) {
+           const alpaqa::InnerStatsAccumulator<alpaqa::PANOCStats> &s) {
     out << YAML::BeginMap;
     out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
     out << YAML::Key << "iterations" << YAML::Value << s.iterations;
@@ -167,7 +167,7 @@ operator<<(YAML::Emitter &out,
 
 inline YAML::Emitter &operator<<(
     YAML::Emitter &out,
-    const pa::InnerStatsAccumulator<pa::StructuredPANOCLBFGSSolver::Stats> &s) {
+    const alpaqa::InnerStatsAccumulator<alpaqa::StructuredPANOCLBFGSSolver::Stats> &s) {
     out << YAML::BeginMap;
     out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
     out << YAML::Key << "iterations" << YAML::Value << s.iterations;
@@ -184,7 +184,7 @@ inline YAML::Emitter &operator<<(
 
 inline YAML::Emitter &
 operator<<(YAML::Emitter &out,
-           const pa::InnerStatsAccumulator<pa::PGASolver::Stats> &s) {
+           const alpaqa::InnerStatsAccumulator<alpaqa::PGASolver::Stats> &s) {
     out << YAML::BeginMap;
     out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
     out << YAML::Key << "iterations" << YAML::Value << s.iterations;
@@ -194,7 +194,7 @@ operator<<(YAML::Emitter &out,
 
 inline YAML::Emitter &
 operator<<(YAML::Emitter &out,
-           const pa::InnerStatsAccumulator<pa::GAAPGASolver::Stats> &s) {
+           const alpaqa::InnerStatsAccumulator<alpaqa::GAAPGASolver::Stats> &s) {
     out << YAML::BeginMap;
     out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
     out << YAML::Key << "iterations" << YAML::Value << s.iterations;
@@ -206,7 +206,7 @@ operator<<(YAML::Emitter &out,
 
 inline YAML::Emitter &operator<<(
     YAML::Emitter &out,
-    const pa::InnerStatsAccumulator<pa::SecondOrderPANOCSolver::Stats> &s) {
+    const alpaqa::InnerStatsAccumulator<alpaqa::SecondOrderPANOCSolver::Stats> &s) {
     out << YAML::BeginMap;
     out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
     out << YAML::Key << "iterations" << YAML::Value << s.iterations;
@@ -222,7 +222,7 @@ inline YAML::Emitter &operator<<(
 
 inline YAML::Emitter &
 operator<<(YAML::Emitter &out,
-           const pa::InnerStatsAccumulator<pa::LBFGSBStats> &s) {
+           const alpaqa::InnerStatsAccumulator<alpaqa::LBFGSBStats> &s) {
     out << YAML::BeginMap;
     out << YAML::Key << "elapsed_time" << YAML::Value << s.elapsed_time.count();
     out << YAML::Key << "iterations" << YAML::Value << s.iterations;

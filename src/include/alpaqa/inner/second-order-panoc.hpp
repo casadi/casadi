@@ -11,7 +11,7 @@
 
 #include <Eigen/Cholesky>
 
-namespace pa {
+namespace alpaqa {
 
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
@@ -348,4 +348,4 @@ inline SecondOrderPANOCSolver::Stats SecondOrderPANOCSolver::operator()(
     throw std::logic_error("[PANOC] loop error");
 }
 
-} // namespace pa
+} // namespace alpaqa

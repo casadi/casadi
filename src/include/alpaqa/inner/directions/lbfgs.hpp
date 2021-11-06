@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-namespace pa {
+namespace alpaqa {
 
 inline bool LBFGS::update_valid(LBFGSParams params, real_t yᵀs, real_t sᵀs,
                                 real_t pᵀp) {
@@ -248,4 +248,4 @@ inline LBFGSParams PANOCDirection<LBFGS>::get_params() const {
     return lbfgs.get_params();
 }
 
-} // namespace pa
+} // namespace alpaqa

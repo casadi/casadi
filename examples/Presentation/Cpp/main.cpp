@@ -5,14 +5,14 @@
 #include <iostream>
 
 int main() {
-    using pa::vec;
-    using pa::rvec;
-    using pa::crvec;
-    using pa::mat;
-    using pa::inf;
+    using alpaqa::vec;
+    using alpaqa::rvec;
+    using alpaqa::crvec;
+    using alpaqa::mat;
+    using alpaqa::inf;
 
     // Problem specification
-    pa::Problem problem(2, 1); // # decision variables, # constraints
+    alpaqa::Problem problem(2, 1); // # decision variables, # constraints
 
     // minimize  ½ xᵀHx
     //  s.t.     Ax ≤ b
@@ -33,7 +33,7 @@ int main() {
     problem.D.upperbound = b;
 
     // Settings for the outer augmented Lagrangian method
-    pa::ALMParams almparam;
+    alpaqa::ALMParams almparam;
     almparam.ε              = 1e-8; // tolerance
     almparam.δ              = 1e-8;
     almparam.Δ              = 10;   // penalty update factor
@@ -41,15 +41,15 @@ int main() {
     almparam.print_interval = 1;
 
     // Settings for the inner PANOC solver
-    pa::PANOCParams panocparam;
+    alpaqa::PANOCParams panocparam;
     panocparam.max_iter       = 500;
     panocparam.print_interval = 10;
     // Settings for the L-BFGS algorithm used by PANOC
-    pa::LBFGSParams lbfgsparam;
+    alpaqa::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 2;
 
     // Create an ALM solver using PANOC as inner solver
-    pa::ALMSolver<pa::PANOCSolver<pa::LBFGS>> solver{
+    alpaqa::ALMSolver<alpaqa::PANOCSolver<alpaqa::LBFGS>> solver{
         almparam,                 // params for outer solver
         {panocparam, lbfgsparam}, // inner solver
     };

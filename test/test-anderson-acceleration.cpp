@@ -4,11 +4,11 @@
 #include <Eigen/QR>
 #include <alpaqa/inner/detail/anderson-helpers.hpp>
 
-using pa::crmat;
-using pa::crvec;
-using pa::mat;
-using pa::real_t;
-using pa::vec;
+using alpaqa::crmat;
+using alpaqa::crvec;
+using alpaqa::mat;
+using alpaqa::real_t;
+using alpaqa::vec;
 
 mat rotate_add(crmat m, crvec v) {
     mat result(m.rows(), m.cols());
@@ -27,7 +27,7 @@ TEST(Anderson, minimize) {
     mat ΔR(n, K - 1);
     mat X(n, K);
     mat G(n, K);
-    pa::LimitedMemoryQR qr(4, 3);
+    alpaqa::LimitedMemoryQR qr(4, 3);
 
     X << 1, 2, 3, 5, 7, 9, -1, //
         2, 4, 3, 7, 1, 2, 4,   //
@@ -56,7 +56,7 @@ TEST(Anderson, minimize) {
     vec xₖ_aa(n);
     mat G₀ = G.block(0, 0, n, m);
     // Call function under test
-    pa::minimize_update_anderson(qr, G₀, R.col(k), R.col(k - 1), G.col(k), γ_LS,
+    alpaqa::minimize_update_anderson(qr, G₀, R.col(k), R.col(k - 1), G.col(k), γ_LS,
                                  xₖ_aa);
 
     // Compute reference solution
@@ -108,7 +108,7 @@ TEST(Anderson, minimize) {
     ++k;
 
     // Call function under test
-    pa::minimize_update_anderson(qr, G₁, R.col(k), R.col(k - 1), G.col(k), γ_LS,
+    alpaqa::minimize_update_anderson(qr, G₁, R.col(k), R.col(k - 1), G.col(k), γ_LS,
                                  xₖ_aa);
 
     // Compute reference solution
@@ -157,7 +157,7 @@ TEST(Anderson, minimize) {
     ++k;
 
     // Call function under test
-    pa::minimize_update_anderson(qr, G₂, R.col(k), R.col(k - 1), G.col(k), γ_LS,
+    alpaqa::minimize_update_anderson(qr, G₂, R.col(k), R.col(k - 1), G.col(k), γ_LS,
                                  xₖ_aa);
 
     // Compute reference solution
@@ -206,7 +206,7 @@ TEST(Anderson, minimize) {
     ++k;
 
     // Call function under test
-    pa::minimize_update_anderson(qr, G₃, R.col(k), R.col(k - 1), G.col(k), γ_LS,
+    alpaqa::minimize_update_anderson(qr, G₃, R.col(k), R.col(k - 1), G.col(k), γ_LS,
                                  xₖ_aa);
 
     // Compute reference solution

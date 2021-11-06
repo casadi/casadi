@@ -3,7 +3,7 @@
 #include <ostream>
 #include <stdexcept>
 
-namespace pa {
+namespace alpaqa {
 
 enum class PANOCStopCrit {
     /// Find an ε-approximate KKT point in the ∞-norm:
@@ -105,11 +105,11 @@ inline const char *enum_name(PANOCStopCrit s) {
         case PANOCStopCrit::FPRNorm2: return "FPRNorm2";
         case PANOCStopCrit::Ipopt: return "Ipopt";
     }
-    throw std::out_of_range("invalid value for pa::PANOCStopCrit");
+    throw std::out_of_range("invalid value for alpaqa::PANOCStopCrit");
 }
 
 inline std::ostream &operator<<(std::ostream &os, PANOCStopCrit s) {
     return os << enum_name(s);
 }
 
-} // namespace pa
+} // namespace alpaqa

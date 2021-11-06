@@ -11,9 +11,9 @@
 
 namespace pa_ref {
 
-using pa::dist_squared;
-using pa::LBFGS;
-using pa::project;
+using alpaqa::dist_squared;
+using alpaqa::LBFGS;
+using alpaqa::project;
 
 namespace detail {
 
@@ -96,7 +96,7 @@ bool lipschitz_check(const Problem &prob, crvec xₖ, crvec x̂ₖ, crvec y, crv
 
 } // namespace detail
 
-using pa::SolverStatus;
+using alpaqa::SolverStatus;
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 
@@ -173,7 +173,7 @@ PANOCSolver::Stats PANOCSolver::operator()(
         vec pₖ = projected_gradient_step(problem, xₖ, y, Σ, γₖ);
         vec qₖ(n);
         real_t step_size =
-            params.lbfgs_stepsize == pa::LBFGSStepSize::BasedOnGradientStepSize
+            params.lbfgs_stepsize == alpaqa::LBFGSStepSize::BasedOnGradientStepSize
                 ? 1
                 : -1;
         if (k > 0)

@@ -6,20 +6,20 @@
 #include <Eigen/LU>
 
 TEST(LBFGS, quadratic) {
-    pa::mat H(2, 2);
+    alpaqa::mat H(2, 2);
     H << 2, -1, -1, 3;
 
     std::cout << "Inverse Hessian: \n" << H.inverse() << std::endl;
 
-    auto f      = [&H](pa::crvec v) { return 0.5 * v.dot(H * v); };
-    auto grad_f = [&H](pa::crvec v) { return pa::vec(H * v); };
+    auto f      = [&H](alpaqa::crvec v) { return 0.5 * v.dot(H * v); };
+    auto grad_f = [&H](alpaqa::crvec v) { return alpaqa::vec(H * v); };
 
-    pa::mat B = pa::mat::Identity(2, 2);
+    alpaqa::mat B = alpaqa::mat::Identity(2, 2);
 
-    pa::LBFGSParams param;
+    alpaqa::LBFGSParams param;
     param.memory = 5;
-    pa::LBFGS lbfgs(param, 2);
-    pa::vec x(2);
+    alpaqa::LBFGS lbfgs(param, 2);
+    alpaqa::vec x(2);
     x << 10, -5;
     auto r                = grad_f(x);
     unsigned update_count = 0;
@@ -29,7 +29,7 @@ TEST(LBFGS, quadratic) {
             std::cout << "x:    " << x.transpose() << std::endl;
             std::cout << "f(x): " << f(x) << std::endl;
 
-            pa::mat H⁻¹ = pa::mat::Identity(2, 2);
+            alpaqa::mat H⁻¹ = alpaqa::mat::Identity(2, 2);
             if (i > 0) {
                 lbfgs.apply(H⁻¹.col(0), 1);
                 lbfgs.apply(H⁻¹.col(1), 1);
@@ -39,16 +39,16 @@ TEST(LBFGS, quadratic) {
             std::cout << "   " << update_count << std::endl;
         }
 
-        pa::vec d = r;
+        alpaqa::vec d = r;
         if (i > 0)
             lbfgs.apply(d, 1);
-        pa::vec x_new = x - d;
-        pa::vec r_new = grad_f(x_new);
-        lbfgs.update(x, x_new, r, r_new, pa::LBFGS::Sign::Positive);
+        alpaqa::vec x_new = x - d;
+        alpaqa::vec r_new = grad_f(x_new);
+        lbfgs.update(x, x_new, r, r_new, alpaqa::LBFGS::Sign::Positive);
         ++update_count;
 
-        pa::vec y = r_new - r;
-        pa::vec s = -d;
+        alpaqa::vec y = r_new - r;
+        alpaqa::vec s = -d;
         B         = B + y * y.transpose() / y.dot(s) -
             (B * s) * (s.transpose() * B.transpose()) / (s.transpose() * B * s);
 

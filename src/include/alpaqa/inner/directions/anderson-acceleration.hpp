@@ -3,7 +3,7 @@
 #include <alpaqa/inner/detail/anderson-helpers.hpp>
 #include <alpaqa/inner/directions/decl/panoc-direction-update.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 /// Anderson Acceleration.
 ///
@@ -90,4 +90,4 @@ struct PANOCDirection<AndersonAccel> {
     }
 };
 
-} // namespace pa
+} // namespace alpaqa

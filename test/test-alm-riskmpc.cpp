@@ -7,7 +7,7 @@
 #include "eigen-matchers.hpp"
 
 TEST(ALM, riskaverse) {
-    using namespace pa;
+    using namespace alpaqa;
 
     Problem p = problems::riskaverse_mpc_problem();
     ProblemWithCounters pc(p);

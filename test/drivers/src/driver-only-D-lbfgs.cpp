@@ -15,7 +15,7 @@
 
 using namespace std::chrono_literals;
 
-using Solver = pa::ALMSolver<pa::LBFGSSolver<>>;
+using Solver = alpaqa::ALMSolver<alpaqa::LBFGSSolver<>>;
 
 std::atomic<Solver *> acitve_solver{nullptr};
 void signal_callback_handler(int signum) {
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     CUTEstProblem cp(prob_dir + "/libcutest-problem-" + argv[1] + ".so",
                      prob_dir + "/OUTSDIF.d");
 
-    pa::ALMParams almparams;
+    alpaqa::ALMParams almparams;
     almparams.Σ₀              = 0;
     almparams.max_iter        = 200;
     almparams.max_time        = 1min + 30s;
@@ -56,9 +56,9 @@ int main(int argc, char *argv[]) {
     acitve_solver.store(&solver, std::memory_order_relaxed);
     signal(SIGINT, signal_callback_handler);
 
-    auto problemD = pa::ProblemOnlyD(cp.problem);
-    auto problem  = pa::ProblemWithCounters(problemD);
-    pa::vec y(problem.m);
+    auto problemD = alpaqa::ProblemOnlyD(cp.problem);
+    auto problem  = alpaqa::ProblemWithCounters(problemD);
+    alpaqa::vec y(problem.m);
     y.topRows(cp.problem.m) = cp.y0;
     y.bottomRows(cp.problem.n).setZero();
 

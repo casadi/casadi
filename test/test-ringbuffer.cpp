@@ -5,11 +5,11 @@
 #include <alpaqa/util/ringbuffer.hpp>
 #include <type_traits>
 
-auto circular  = [](pa::CircularIndices<int> i) { return i.circular; };
-auto zerobased = [](pa::CircularIndices<int> i) { return i.zerobased; };
+auto circular  = [](alpaqa::CircularIndices<int> i) { return i.circular; };
+auto zerobased = [](alpaqa::CircularIndices<int> i) { return i.zerobased; };
 
 TEST(CircularRange, mutforward) {
-    pa::CircularRange<int> r{4, 3, 2, 5};
+    alpaqa::CircularRange<int> r{4, 3, 2, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.begin(), r.end(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -21,7 +21,7 @@ TEST(CircularRange, mutforward) {
 }
 
 TEST(CircularRange, constforward) {
-    const pa::CircularRange<int> r{4, 3, 2, 5};
+    const alpaqa::CircularRange<int> r{4, 3, 2, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.begin(), r.end(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -33,7 +33,7 @@ TEST(CircularRange, constforward) {
 }
 
 TEST(CircularRange, forwardfull) {
-    pa::CircularRange<int> r{5, 3, 3, 5};
+    alpaqa::CircularRange<int> r{5, 3, 3, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.begin(), r.end(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -45,7 +45,7 @@ TEST(CircularRange, forwardfull) {
 }
 
 TEST(CircularRange, mutreverse) {
-    pa::CircularRange<int> r{4, 3, 2, 5};
+    alpaqa::CircularRange<int> r{4, 3, 2, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.rbegin(), r.rend(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -59,7 +59,7 @@ TEST(CircularRange, mutreverse) {
 }
 
 TEST(CircularRange, constreverse) {
-    const pa::CircularRange<int> r{4, 3, 2, 5};
+    const alpaqa::CircularRange<int> r{4, 3, 2, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.rbegin(), r.rend(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -73,7 +73,7 @@ TEST(CircularRange, constreverse) {
 }
 
 TEST(CircularRange, reversefull) {
-    pa::CircularRange<int> r{5, 3, 3, 5};
+    alpaqa::CircularRange<int> r{5, 3, 3, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.rbegin(), r.rend(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -87,7 +87,7 @@ TEST(CircularRange, reversefull) {
 }
 
 TEST(CircularRange, iteratortraits) {
-    pa::CircularRange<int> r{5, 3, 3, 5};
+    alpaqa::CircularRange<int> r{5, 3, 3, 5};
     auto a  = std::next(r.begin());
     using I = decltype(a);
 
@@ -143,7 +143,7 @@ TEST(CircularRange, iteratortraits) {
 }
 
 TEST(ReverseCircularRange, mutforward) {
-    pa::ReverseCircularRange<int> r{4, 3, 2, 5};
+    alpaqa::ReverseCircularRange<int> r{4, 3, 2, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.begin(), r.end(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -157,7 +157,7 @@ TEST(ReverseCircularRange, mutforward) {
 }
 
 TEST(ReverseCircularRange, constforward) {
-    const pa::ReverseCircularRange<int> r{4, 3, 2, 5};
+    const alpaqa::ReverseCircularRange<int> r{4, 3, 2, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.begin(), r.end(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -171,7 +171,7 @@ TEST(ReverseCircularRange, constforward) {
 }
 
 TEST(ReverseCircularRange, forwardfull) {
-    pa::ReverseCircularRange<int> r{5, 3, 3, 5};
+    alpaqa::ReverseCircularRange<int> r{5, 3, 3, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.begin(), r.end(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -185,7 +185,7 @@ TEST(ReverseCircularRange, forwardfull) {
 }
 
 TEST(ReverseCircularRange, mutreverse) {
-    pa::ReverseCircularRange<int> r{4, 3, 2, 5};
+    alpaqa::ReverseCircularRange<int> r{4, 3, 2, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.rbegin(), r.rend(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -197,7 +197,7 @@ TEST(ReverseCircularRange, mutreverse) {
 }
 
 TEST(ReverseCircularRange, constreverse) {
-    const pa::ReverseCircularRange<int> r{4, 3, 2, 5};
+    const alpaqa::ReverseCircularRange<int> r{4, 3, 2, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.rbegin(), r.rend(), std::back_insert_iterator(result_z),
                    zerobased);
@@ -209,7 +209,7 @@ TEST(ReverseCircularRange, constreverse) {
 }
 
 TEST(ReverseCircularRange, reversefull) {
-    pa::ReverseCircularRange<int> r{5, 3, 3, 5};
+    alpaqa::ReverseCircularRange<int> r{5, 3, 3, 5};
     std::vector<int> result_z, result_c;
     std::transform(r.rbegin(), r.rend(), std::back_insert_iterator(result_z),
                    zerobased);

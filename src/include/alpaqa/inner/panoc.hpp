@@ -10,7 +10,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace pa {
+namespace alpaqa {
 
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
@@ -316,4 +316,4 @@ PANOCSolver<DirectionProviderT>::operator()(
     throw std::logic_error("[PANOC] loop error");
 }
 
-} // namespace pa
+} // namespace alpaqa

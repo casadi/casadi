@@ -185,7 +185,8 @@ keyword arguments, for example:
     )
 
 For a full overview and description of all parameters, see the documentation 
-for :cpp:class:`pa::StructuredPANOCLBFGSParams` and :cpp:class:`pa::ALMParams`.
+for :cpp:class:`alpaqa::StructuredPANOCLBFGSParams` and
+:cpp:class:`alpaqa::ALMParams`.
 
 Solving the problem
 ^^^^^^^^^^^^^^^^^^^
@@ -225,8 +226,8 @@ This will print something similar to:
 
 The :code:`stats` variable contains some other solver statistics as well, for 
 both the outer and the inner solver. You can find a full overview in the
-documentation of :cpp:class:`pa::ALMSolver::Stats`
-and :cpp:class:`pa::InnerStatsAccumulator\<StructuredPANOCLBFGSStats\>`.
+documentation of :cpp:class:`alpaqa::ALMSolver::Stats`
+and :cpp:class:`alpaqa::InnerStatsAccumulator\<StructuredPANOCLBFGSStats\>`.
 
 
 .. image:: ../img/example_minimal.svg 

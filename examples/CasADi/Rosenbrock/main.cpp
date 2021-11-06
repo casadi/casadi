@@ -18,15 +18,15 @@
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-    using pa::inf;
-    using pa::vec;
+    using alpaqa::inf;
+    using alpaqa::vec;
 
     auto so_name = "examples/CasADi/Rosenbrock/librosenbrock_functions.so";
     if (argc > 1)
         so_name = argv[1];
 
     // Load the problem (with 3 decision variables and 1 general constraint)
-    pa::Problem p = pa::load_CasADi_problem(so_name, 3, 1);
+    alpaqa::Problem p = alpaqa::load_CasADi_problem(so_name, 3, 1);
 
     // Specify the bounds
     p.C.upperbound = vec::Constant(3, inf);
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     p.D.lowerbound = vec::Constant(1, 0.);
 
     // Settings for the outer augmented Lagrangian method
-    pa::ALMParams almparam;
+    alpaqa::ALMParams almparam;
     almparam.ε              = 1e-8; // tolerance
     almparam.δ              = 1e-8;
     almparam.Δ              = 10;
@@ -43,15 +43,15 @@ int main(int argc, char *argv[]) {
     almparam.print_interval = 1;
 
     // Settings for the inner PANOC solver
-    pa::PANOCParams panocparam;
+    alpaqa::PANOCParams panocparam;
     panocparam.max_iter       = 500;
     panocparam.print_interval = 10;
     // Settings for the L-BFGS algorithm used by PANOC
-    pa::LBFGSParams lbfgsparam;
+    alpaqa::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 10;
 
     // Create an ALM solver using PANOC as inner solver
-    pa::ALMSolver<pa::PANOCSolver<>> solver{
+    alpaqa::ALMSolver<alpaqa::PANOCSolver<>> solver{
         almparam,                 // params for outer solver
         {panocparam, lbfgsparam}, // inner solver
     };

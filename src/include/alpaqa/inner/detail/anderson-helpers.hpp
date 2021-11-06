@@ -2,7 +2,7 @@
 
 #include <alpaqa/inner/detail/limited-memory-qr.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 /**
  * @brief   Solve one step of Anderson acceleration to find a fixed point of a 
@@ -63,4 +63,4 @@ inline void minimize_update_anderson(LimitedMemoryQR &qr, rmat G, crvec rₖ,
     G.col(qr.ring_tail()) = gₖ; // TODO: avoid copy, make G an array of vectors
 }
 
-} // namespace pa
+} // namespace alpaqa

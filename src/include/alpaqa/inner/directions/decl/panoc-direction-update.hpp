@@ -2,7 +2,7 @@
 
 #include <alpaqa/util/box.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 template <class DirectionProviderT>
 struct PANOCDirection {
@@ -34,4 +34,4 @@ struct PANOCDirection {
                           real_t old_γₖ) = delete;
 };
 
-} // namespace pa
+} // namespace alpaqa

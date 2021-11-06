@@ -11,7 +11,7 @@
 #include <sstream>
 
 using namespace std::chrono_literals;
-using pa::vec;
+using alpaqa::vec;
 
 #define SOLVER_PANOC_LBFGS 1
 #define SOLVER_PANOC_SLBFGS 2
@@ -27,41 +27,41 @@ using pa::vec;
 #include <alpaqa/alm.hpp>
 #include <alpaqa/inner/directions/specialized-lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
-using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
+using Solver = alpaqa::ALMSolver<alpaqa::PANOCSolver<alpaqa::SpecializedLBFGS>>;
 #elif SOLVER == SOLVER_PANOC_LBFGS
 #include <alpaqa/decl/alm.hpp>
 #include <alpaqa/inner/decl/panoc.hpp>
 #include <alpaqa/inner/directions/decl/lbfgs.hpp>
-using Solver = pa::ALMSolver<>;
+using Solver = alpaqa::ALMSolver<>;
 #elif SOLVER == SOLVER_PANOC_2ND
 #include <alpaqa/alm.hpp>
 #include <alpaqa/inner/second-order-panoc.hpp>
-using Solver = pa::ALMSolver<pa::SecondOrderPANOCSolver>;
+using Solver = alpaqa::ALMSolver<alpaqa::SecondOrderPANOCSolver>;
 #elif SOLVER == SOLVER_PANOC_2ND_LBFGS
 #include <alpaqa/alm.hpp>
 #include <alpaqa/inner/structured-panoc-lbfgs.hpp>
-using Solver = pa::ALMSolver<pa::StructuredPANOCLBFGSSolver>;
+using Solver = alpaqa::ALMSolver<alpaqa::StructuredPANOCLBFGSSolver>;
 #elif SOLVER == SOLVER_LBFGSpp
 #include <alpaqa/alm.hpp>
 #include <alpaqa/inner/lbfgspp.hpp>
-using Solver = pa::ALMSolver<pa::LBFGSSolver<>>;
+using Solver = alpaqa::ALMSolver<alpaqa::LBFGSSolver<>>;
 #elif SOLVER == SOLVER_LBFGSBpp
 #include <alpaqa/alm.hpp>
 #include <alpaqa/inner/lbfgspp.hpp>
-using Solver = pa::ALMSolver<pa::LBFGSBSolver<>>;
+using Solver = alpaqa::ALMSolver<alpaqa::LBFGSBSolver<>>;
 #elif SOLVER == SOLVER_PGA
 #include <alpaqa/alm.hpp>
 #include <alpaqa/inner/pga.hpp>
-using Solver = pa::ALMSolver<pa::PGASolver>;
+using Solver = alpaqa::ALMSolver<alpaqa::PGASolver>;
 #elif SOLVER == SOLVER_GAAPGA
 #include <alpaqa/alm.hpp>
 #include <alpaqa/inner/guarded-aa-pga.hpp>
-using Solver = pa::ALMSolver<pa::GAAPGA>;
+using Solver = alpaqa::ALMSolver<alpaqa::GAAPGA>;
 #elif SOLVER == SOLVER_PANOC_ANDERSON
 #include <alpaqa/alm.hpp>
 #include <alpaqa/inner/directions/anderson-acceleration.hpp>
 #include <alpaqa/inner/panoc.hpp>
-using Solver = pa::ALMSolver<pa::PANOCSolver<pa::AndersonAccel>>;
+using Solver = alpaqa::ALMSolver<alpaqa::PANOCSolver<alpaqa::AndersonAccel>>;
 #endif
 
 std::atomic<Solver *> acitve_solver{nullptr};
@@ -76,46 +76,46 @@ void signal_callback_handler(int signum) {
 
 #if SOLVER == SOLVER_PANOC_SLBFGS
 auto get_inner_solver() {
-    pa::PANOCParams panocparams;
+    alpaqa::PANOCParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
 
-    pa::LBFGSParams lbfgsparams;
+    alpaqa::LBFGSParams lbfgsparams;
     lbfgsparams.memory = 20;
     return Solver::InnerSolver(panocparams, lbfgsparams);
 }
-auto get_problem(const pa::Problem &p) { return p; }
-const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+auto get_problem(const alpaqa::Problem &p) { return p; }
+const vec &get_y(const alpaqa::Problem &, const vec &y) { return y; }
 #elif SOLVER == SOLVER_PANOC_LBFGS
 auto get_inner_solver() {
-    pa::PANOCParams panocparams;
+    alpaqa::PANOCParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = false;
-    panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
-    panocparams.stop_crit      = pa::PANOCStopCrit::ProjGradUnitNorm;
+    panocparams.lbfgs_stepsize = alpaqa::LBFGSStepSize::BasedOnCurvature;
+    panocparams.stop_crit      = alpaqa::PANOCStopCrit::ProjGradUnitNorm;
     panocparams.max_time       = 30s;
 
-    pa::LBFGSParams lbfgsparams;
+    alpaqa::LBFGSParams lbfgsparams;
     lbfgsparams.memory  = 20;
     lbfgsparams.cbfgs.ϵ = 1e-6;
 
     return Solver::InnerSolver(panocparams, lbfgsparams);
 }
-auto get_problem(const pa::Problem &p) { return p; }
-const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+auto get_problem(const alpaqa::Problem &p) { return p; }
+const vec &get_y(const alpaqa::Problem &, const vec &y) { return y; }
 #elif SOLVER == SOLVER_PANOC_2ND
 auto get_inner_solver() {
-    pa::SecondOrderPANOCParams panocparams;
+    alpaqa::SecondOrderPANOCParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
     panocparams.max_time                       = 30s;
 
     return Solver::InnerSolver(panocparams);
 }
-auto get_problem(const pa::Problem &p) { return p; }
-const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+auto get_problem(const alpaqa::Problem &p) { return p; }
+const vec &get_y(const alpaqa::Problem &, const vec &y) { return y; }
 inline YAML::Emitter &operator<<(YAML::Emitter &out,
-                                 const pa::SecondOrderPANOCParams &p) {
+                                 const alpaqa::SecondOrderPANOCParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
@@ -137,25 +137,25 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
 }
 #elif SOLVER == SOLVER_PANOC_2ND_LBFGS
 auto get_inner_solver() {
-    pa::StructuredPANOCLBFGSParams panocparams;
+    alpaqa::StructuredPANOCLBFGSParams panocparams;
     panocparams.max_iter                       = 1000;
     panocparams.update_lipschitz_in_linesearch = true;
-    panocparams.lbfgs_stepsize = pa::LBFGSStepSize::BasedOnCurvature;
-    panocparams.stop_crit      = pa::PANOCStopCrit::ProjGradUnitNorm;
+    panocparams.lbfgs_stepsize = alpaqa::LBFGSStepSize::BasedOnCurvature;
+    panocparams.stop_crit      = alpaqa::PANOCStopCrit::ProjGradUnitNorm;
     panocparams.max_time       = 5min;
     // panocparams.hessian_vec_finite_differences = false;
     // panocparams.full_augmented_hessian         = true;
     panocparams.hessian_step_size_heuristic = 10;
 
-    pa::LBFGSParams lbfgsparams;
+    alpaqa::LBFGSParams lbfgsparams;
     lbfgsparams.memory = 20;
 
     return Solver::InnerSolver(panocparams, lbfgsparams);
 }
-auto get_problem(const pa::Problem &p) { return p; }
-const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+auto get_problem(const alpaqa::Problem &p) { return p; }
+const vec &get_y(const alpaqa::Problem &, const vec &y) { return y; }
 inline YAML::Emitter &operator<<(YAML::Emitter &out,
-                                 const pa::StructuredPANOCLBFGSParams &p) {
+                                 const alpaqa::StructuredPANOCLBFGSParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
@@ -191,15 +191,15 @@ auto get_inner_solver() {
     params.m              = 20;
     return Solver::InnerSolver(params);
 }
-auto get_problem(const pa::Problem &p) { return pa::ProblemOnlyD(p); }
-vec get_y(const pa::Problem &p, const vec &y) {
+auto get_problem(const alpaqa::Problem &p) { return alpaqa::ProblemOnlyD(p); }
+vec get_y(const alpaqa::Problem &p, const vec &y) {
     vec r(p.m);
     r.topRows(p.m - p.n) = y;
     r.bottomRows(p.n).setZero();
     return r;
 }
 YAML::Emitter &operator<<(YAML::Emitter &out,
-                          const pa::LBFGSSolver<>::Params &) {
+                          const alpaqa::LBFGSSolver<>::Params &) {
     out << "todo";
     return out;
 }
@@ -210,24 +210,24 @@ auto get_inner_solver() {
     params.m              = 20;
     return Solver::InnerSolver(params);
 }
-auto get_problem(const pa::Problem &p) { return p; }
-const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+auto get_problem(const alpaqa::Problem &p) { return p; }
+const vec &get_y(const alpaqa::Problem &, const vec &y) { return y; }
 YAML::Emitter &operator<<(YAML::Emitter &out,
-                          const pa::LBFGSBSolver<>::Params &) {
+                          const alpaqa::LBFGSBSolver<>::Params &) {
     out << "todo";
     return out;
 }
 #elif SOLVER == SOLVER_PGA
 auto get_inner_solver() {
-    pa::PGAParams params;
+    alpaqa::PGAParams params;
     params.max_iter  = 1000;
-    params.stop_crit = pa::PANOCStopCrit::ProjGradUnitNorm;
+    params.stop_crit = alpaqa::PANOCStopCrit::ProjGradUnitNorm;
 
     return Solver::InnerSolver(params);
 }
-auto get_problem(const pa::Problem &p) { return p; }
-const vec &get_y(const pa::Problem &, const vec &y) { return y; }
-inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PGAParams &p) {
+auto get_problem(const alpaqa::Problem &p) { return p; }
+const vec &get_y(const alpaqa::Problem &, const vec &y) { return y; }
+inline YAML::Emitter &operator<<(YAML::Emitter &out, const alpaqa::PGAParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
@@ -241,20 +241,20 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out, const pa::PGAParams &p) {
 }
 #elif SOLVER == SOLVER_GAAPGA
 auto get_inner_solver() {
-    pa::GAAPGAParams params;
+    alpaqa::GAAPGAParams params;
     params.max_iter               = 1000;
     params.limitedqr_mem          = 20;
     params.full_flush_on_γ_change = false;
-    params.stop_crit              = pa::PANOCStopCrit::ProjGradUnitNorm;
+    params.stop_crit              = alpaqa::PANOCStopCrit::ProjGradUnitNorm;
     params.max_time               = 30s;
     params.Lipschitz.ε            = 2e-6;
 
     return Solver::InnerSolver(params);
 }
-auto get_problem(const pa::Problem &p) { return p; }
-const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+auto get_problem(const alpaqa::Problem &p) { return p; }
+const vec &get_y(const alpaqa::Problem &, const vec &y) { return y; }
 inline YAML::Emitter &operator<<(YAML::Emitter &out,
-                                 const pa::GAAPGAParams &p) {
+                                 const alpaqa::GAAPGAParams &p) {
     out << YAML::BeginMap;
     out << YAML::Key << "Lipschitz" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ε" << YAML::Value << p.Lipschitz.ε;
@@ -269,15 +269,15 @@ inline YAML::Emitter &operator<<(YAML::Emitter &out,
 }
 #elif SOLVER == SOLVER_PANOC_ANDERSON
 auto get_inner_solver() {
-    pa::PANOCParams params;
+    alpaqa::PANOCParams params;
     params.max_iter                       = 1000;
     params.update_lipschitz_in_linesearch = true;
     params.lbfgs_mem                      = 20;
 
     return Solver::InnerSolver(params, {});
 }
-auto get_problem(const pa::Problem &p) { return p; }
-const vec &get_y(const pa::Problem &, const vec &y) { return y; }
+auto get_problem(const alpaqa::Problem &p) { return p; }
+const vec &get_y(const alpaqa::Problem &, const vec &y) { return y; }
 #endif
 
 int main(int argc, char *argv[]) {
@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    pa::ALMParams almparams;
+    alpaqa::ALMParams almparams;
     almparams.max_iter        = 240;
     almparams.max_time        = 30s;
     almparams.max_time        = 1min + 30s;
@@ -337,7 +337,7 @@ int main(int argc, char *argv[]) {
     acitve_solver.store(&solver, std::memory_order_relaxed);
     signal(SIGINT, signal_callback_handler);
 
-    auto problem_cnt = pa::ProblemWithCounters(cp.problem);
+    auto problem_cnt = alpaqa::ProblemWithCounters(cp.problem);
     auto problem     = get_problem(problem_cnt);
 
     vec x = cp.x0;

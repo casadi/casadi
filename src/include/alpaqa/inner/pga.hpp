@@ -13,7 +13,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace pa {
+namespace alpaqa {
 
 struct PGAParams {
     /// Parameters related to the Lipschitz constant estimate and step size.
@@ -287,4 +287,4 @@ operator+=(InnerStatsAccumulator<PGASolver::Stats> &acc,
     return acc;
 }
 
-} // namespace pa
+} // namespace alpaqa

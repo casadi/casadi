@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-namespace pa {
+namespace alpaqa {
 
 inline void SpecializedLBFGS::initialize(crvec x₀, crvec grad₀) {
     idx  = 0;
@@ -146,11 +146,11 @@ inline void SpecializedLBFGS::reset() {
     full = false;
 }
 
-} // namespace pa
+} // namespace alpaqa
 
 #include <alpaqa/inner/directions/decl/panoc-direction-update.hpp>
 
-namespace pa {
+namespace alpaqa {
 
 template <>
 struct PANOCDirection<SpecializedLBFGS> {
@@ -185,4 +185,4 @@ struct PANOCDirection<SpecializedLBFGS> {
     }
 };
 
-} // namespace pa
+} // namespace alpaqa

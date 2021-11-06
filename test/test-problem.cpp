@@ -4,7 +4,7 @@
 
 #include "eigen-matchers.hpp"
 
-using namespace pa;
+using namespace alpaqa;
 
 TEST(Problem, onlyD) {
     Problem original;

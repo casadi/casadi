@@ -1,6 +1,6 @@
 #include <alpaqa/inner/directions/lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
 
-namespace pa {
+namespace alpaqa {
 template class PANOCSolver<LBFGS>;
-} // namespace pa
+} // namespace alpaqa

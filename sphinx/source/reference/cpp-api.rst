@@ -1,6 +1,6 @@
 C++ API Reference
 =================
 
-.. doxygennamespace:: pa
+.. doxygennamespace:: alpaqa
     :members:
     :undoc-members:

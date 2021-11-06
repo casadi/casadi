@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-namespace pa {
+namespace alpaqa {
 
 class vec_allocator {
   private:
@@ -114,4 +114,4 @@ class vec_allocator {
     size_t highwater() const { return highwatermark; }
 };
 
-} // namespace pa
+} // namespace alpaqa

@@ -9,19 +9,19 @@
 };
 
 TEST(SpecializedLBFGS, constantgamma) {
-    using pa::inf;
-    using pa::real_t;
-    using pa::vec;
-    pa::SpecializedLBFGS l(pa::LBFGSParams{}, 2, 3);
+    using alpaqa::inf;
+    using alpaqa::real_t;
+    using alpaqa::vec;
+    alpaqa::SpecializedLBFGS l(alpaqa::LBFGSParams{}, 2, 3);
 
     vec x0 = vec::Zero(2);
     vec g0(2);
     g0 << 1, 1;
     real_t γ = 1;
-    pa::Box C;
+    alpaqa::Box C;
     C.lowerbound = vec::Constant(2, 0.);
     C.upperbound = vec::Constant(2, inf);
-    vec p0       = pa::detail::projected_gradient_step(C, γ, x0, g0);
+    vec p0       = alpaqa::detail::projected_gradient_step(C, γ, x0, g0);
 
     l.initialize(x0, g0);
 
@@ -33,7 +33,7 @@ TEST(SpecializedLBFGS, constantgamma) {
     vec x1(2), g1(2);
     x1 << 2, -1;
     g1 << 2, 3;
-    vec p1 = pa::detail::projected_gradient_step(C, γ, x1, g1);
+    vec p1 = alpaqa::detail::projected_gradient_step(C, γ, x1, g1);
 
     ASSERT_TRUE(l.update(x0, x1, p0, p1, g1, C, γ));
     EXPECT_EQ(l.x(0), x0);
@@ -50,7 +50,7 @@ TEST(SpecializedLBFGS, constantgamma) {
     vec x2(2), g2(2);
     x2 << 5, -3;
     g2 << 4, -3;
-    vec p2 = pa::detail::projected_gradient_step(C, γ, x2, g2);
+    vec p2 = alpaqa::detail::projected_gradient_step(C, γ, x2, g2);
 
     ASSERT_TRUE(l.update(x1, x2, p1, p2, g2, C, γ));
     EXPECT_EQ(l.x(0), x0);
@@ -73,7 +73,7 @@ TEST(SpecializedLBFGS, constantgamma) {
     vec x3(2), g3(2);
     x3 << 4, -3;
     g3 << -9, -1;
-    vec p3 = pa::detail::projected_gradient_step(C, γ, x3, g3);
+    vec p3 = alpaqa::detail::projected_gradient_step(C, γ, x3, g3);
 
     ASSERT_TRUE(l.update(x2, x3, p2, p3, g3, C, γ));
     EXPECT_EQ(l.x(1), x1);
@@ -99,7 +99,7 @@ TEST(SpecializedLBFGS, constantgamma) {
     vec x4(2), g4(2);
     x4 << -1, -8;
     g4 << 3, -15;
-    vec p4 = pa::detail::projected_gradient_step(C, γ, x4, g4);
+    vec p4 = alpaqa::detail::projected_gradient_step(C, γ, x4, g4);
 
     ASSERT_TRUE(l.update(x3, x4, p3, p4, g4, C, γ));
     EXPECT_EQ(l.x(2), x2);
@@ -122,19 +122,19 @@ TEST(SpecializedLBFGS, constantgamma) {
 }
 
 TEST(SpecializedLBFGS, updategamma1) {
-    using pa::inf;
-    using pa::real_t;
-    using pa::vec;
-    pa::SpecializedLBFGS l(pa::LBFGSParams{}, 2, 3);
+    using alpaqa::inf;
+    using alpaqa::real_t;
+    using alpaqa::vec;
+    alpaqa::SpecializedLBFGS l(alpaqa::LBFGSParams{}, 2, 3);
 
     vec x0 = vec::Zero(2);
     vec g0(2);
     g0 << 1, 1;
     real_t γ = 1;
-    pa::Box C;
+    alpaqa::Box C;
     C.lowerbound = vec::Constant(2, 0.);
     C.upperbound = vec::Constant(2, inf);
-    vec p0       = pa::detail::projected_gradient_step(C, γ, x0, g0);
+    vec p0       = alpaqa::detail::projected_gradient_step(C, γ, x0, g0);
 
     l.initialize(x0, g0);
 
@@ -146,7 +146,7 @@ TEST(SpecializedLBFGS, updategamma1) {
     vec x1(2), g1(2);
     x1 << 2, -1;
     g1 << 2, 3;
-    vec p1 = pa::detail::projected_gradient_step(C, γ, x1, g1);
+    vec p1 = alpaqa::detail::projected_gradient_step(C, γ, x1, g1);
 
     ASSERT_TRUE(l.update(x0, x1, p0, p1, g1, C, γ));
     EXPECT_EQ(l.x(0), x0);
@@ -165,11 +165,11 @@ TEST(SpecializedLBFGS, updategamma1) {
     g2 << 4, -1;
 
     γ      = 0.5;
-    vec p2 = pa::detail::projected_gradient_step(C, γ, x2, g2);
+    vec p2 = alpaqa::detail::projected_gradient_step(C, γ, x2, g2);
 
     ASSERT_TRUE(l.update(x1, x2, p1, p2, g2, C, γ));
-    p0 = pa::detail::projected_gradient_step(C, γ, x0, g0);
-    p1 = pa::detail::projected_gradient_step(C, γ, x1, g1);
+    p0 = alpaqa::detail::projected_gradient_step(C, γ, x0, g0);
+    p1 = alpaqa::detail::projected_gradient_step(C, γ, x1, g1);
     EXPECT_EQ(l.x(0), x0);
     EXPECT_EQ(l.g(0), g0);
 
@@ -190,7 +190,7 @@ TEST(SpecializedLBFGS, updategamma1) {
     vec x3(2), g3(2);
     x3 << 4, -3;
     g3 << -9, -1;
-    vec p3 = pa::detail::projected_gradient_step(C, γ, x3, g3);
+    vec p3 = alpaqa::detail::projected_gradient_step(C, γ, x3, g3);
 
     ASSERT_TRUE(l.update(x2, x3, p2, p3, g3, C, γ));
     EXPECT_EQ(l.x(1), x1);
@@ -216,7 +216,7 @@ TEST(SpecializedLBFGS, updategamma1) {
     vec x4(2), g4(2);
     x4 << -1, -8;
     g4 << 3, -15;
-    vec p4 = pa::detail::projected_gradient_step(C, γ, x4, g4);
+    vec p4 = alpaqa::detail::projected_gradient_step(C, γ, x4, g4);
 
     ASSERT_TRUE(l.update(x3, x4, p3, p4, g4, C, γ));
     EXPECT_EQ(l.x(2), x2);
@@ -239,19 +239,19 @@ TEST(SpecializedLBFGS, updategamma1) {
 }
 
 TEST(SpecializedLBFGS, updategamma2) {
-    using pa::inf;
-    using pa::real_t;
-    using pa::vec;
-    pa::SpecializedLBFGS l(pa::LBFGSParams{}, 2, 3);
+    using alpaqa::inf;
+    using alpaqa::real_t;
+    using alpaqa::vec;
+    alpaqa::SpecializedLBFGS l(alpaqa::LBFGSParams{}, 2, 3);
 
     vec x0 = vec::Zero(2);
     vec g0(2);
     g0 << 1, 1;
     real_t γ = 1;
-    pa::Box C;
+    alpaqa::Box C;
     C.lowerbound = vec::Constant(2, 0.);
     C.upperbound = vec::Constant(2, inf);
-    vec p0       = pa::detail::projected_gradient_step(C, γ, x0, g0);
+    vec p0       = alpaqa::detail::projected_gradient_step(C, γ, x0, g0);
 
     l.initialize(x0, g0);
 
@@ -263,7 +263,7 @@ TEST(SpecializedLBFGS, updategamma2) {
     vec x1(2), g1(2);
     x1 << 2, -1;
     g1 << 2, 3;
-    vec p1 = pa::detail::projected_gradient_step(C, γ, x1, g1);
+    vec p1 = alpaqa::detail::projected_gradient_step(C, γ, x1, g1);
 
     ASSERT_TRUE(l.update(x0, x1, p0, p1, g1, C, γ));
     EXPECT_EQ(l.x(0), x0);
@@ -280,7 +280,7 @@ TEST(SpecializedLBFGS, updategamma2) {
     vec x2(2), g2(2);
     x2 << 5, -3;
     g2 << 4, -3;
-    vec p2 = pa::detail::projected_gradient_step(C, γ, x2, g2);
+    vec p2 = alpaqa::detail::projected_gradient_step(C, γ, x2, g2);
 
     ASSERT_TRUE(l.update(x1, x2, p1, p2, g2, C, γ));
     EXPECT_EQ(l.x(0), x0);
@@ -305,12 +305,12 @@ TEST(SpecializedLBFGS, updategamma2) {
     g3 << -9, -1;
 
     γ      = 0.5;
-    vec p3 = pa::detail::projected_gradient_step(C, γ, x3, g3);
+    vec p3 = alpaqa::detail::projected_gradient_step(C, γ, x3, g3);
 
     ASSERT_TRUE(l.update(x2, x3, p2, p3, g3, C, γ));
-    p0 = pa::detail::projected_gradient_step(C, γ, x0, g0);
-    p1 = pa::detail::projected_gradient_step(C, γ, x1, g1);
-    p2 = pa::detail::projected_gradient_step(C, γ, x2, g2);
+    p0 = alpaqa::detail::projected_gradient_step(C, γ, x0, g0);
+    p1 = alpaqa::detail::projected_gradient_step(C, γ, x1, g1);
+    p2 = alpaqa::detail::projected_gradient_step(C, γ, x2, g2);
     EXPECT_EQ(l.x(1), x1);
     EXPECT_EQ(l.g(1), g1);
 
@@ -334,7 +334,7 @@ TEST(SpecializedLBFGS, updategamma2) {
     vec x4(2), g4(2);
     x4 << -1, -8;
     g4 << 3, -15;
-    vec p4 = pa::detail::projected_gradient_step(C, γ, x4, g4);
+    vec p4 = alpaqa::detail::projected_gradient_step(C, γ, x4, g4);
 
     ASSERT_TRUE(l.update(x3, x4, p3, p4, g4, C, γ));
     EXPECT_EQ(l.x(2), x2);
@@ -357,19 +357,19 @@ TEST(SpecializedLBFGS, updategamma2) {
 }
 
 TEST(SpecializedLBFGS, updategamma3) {
-    using pa::inf;
-    using pa::real_t;
-    using pa::vec;
-    pa::SpecializedLBFGS l(pa::LBFGSParams{}, 2, 3);
+    using alpaqa::inf;
+    using alpaqa::real_t;
+    using alpaqa::vec;
+    alpaqa::SpecializedLBFGS l(alpaqa::LBFGSParams{}, 2, 3);
 
     vec x0 = vec::Zero(2);
     vec g0(2);
     g0 << 1, 1;
     real_t γ = 1;
-    pa::Box C;
+    alpaqa::Box C;
     C.lowerbound = vec::Constant(2, 0.);
     C.upperbound = vec::Constant(2, inf);
-    vec p0       = pa::detail::projected_gradient_step(C, γ, x0, g0);
+    vec p0       = alpaqa::detail::projected_gradient_step(C, γ, x0, g0);
 
     l.initialize(x0, g0);
 
@@ -381,7 +381,7 @@ TEST(SpecializedLBFGS, updategamma3) {
     vec x1(2), g1(2);
     x1 << 2, -1;
     g1 << 2, 3;
-    vec p1 = pa::detail::projected_gradient_step(C, γ, x1, g1);
+    vec p1 = alpaqa::detail::projected_gradient_step(C, γ, x1, g1);
 
     ASSERT_TRUE(l.update(x0, x1, p0, p1, g1, C, γ));
     EXPECT_EQ(l.x(0), x0);
@@ -398,7 +398,7 @@ TEST(SpecializedLBFGS, updategamma3) {
     vec x2(2), g2(2);
     x2 << 5, -3;
     g2 << 4, -3;
-    vec p2 = pa::detail::projected_gradient_step(C, γ, x2, g2);
+    vec p2 = alpaqa::detail::projected_gradient_step(C, γ, x2, g2);
 
     ASSERT_TRUE(l.update(x1, x2, p1, p2, g2, C, γ));
     EXPECT_EQ(l.x(0), x0);
@@ -421,7 +421,7 @@ TEST(SpecializedLBFGS, updategamma3) {
     vec x3(2), g3(2);
     x3 << 4, -3;
     g3 << -9, -1;
-    vec p3 = pa::detail::projected_gradient_step(C, γ, x3, g3);
+    vec p3 = alpaqa::detail::projected_gradient_step(C, γ, x3, g3);
 
     ASSERT_TRUE(l.update(x2, x3, p2, p3, g3, C, γ));
     EXPECT_EQ(l.x(1), x1);
@@ -449,13 +449,13 @@ TEST(SpecializedLBFGS, updategamma3) {
     g4 << 3, -15;
 
     γ      = 0.5;
-    vec p4 = pa::detail::projected_gradient_step(C, γ, x4, g4);
+    vec p4 = alpaqa::detail::projected_gradient_step(C, γ, x4, g4);
 
     ASSERT_TRUE(l.update(x3, x4, p3, p4, g4, C, γ));
-    p0 = pa::detail::projected_gradient_step(C, γ, x0, g0);
-    p1 = pa::detail::projected_gradient_step(C, γ, x1, g1);
-    p2 = pa::detail::projected_gradient_step(C, γ, x2, g2);
-    p3 = pa::detail::projected_gradient_step(C, γ, x3, g3);
+    p0 = alpaqa::detail::projected_gradient_step(C, γ, x0, g0);
+    p1 = alpaqa::detail::projected_gradient_step(C, γ, x1, g1);
+    p2 = alpaqa::detail::projected_gradient_step(C, γ, x2, g2);
+    p3 = alpaqa::detail::projected_gradient_step(C, γ, x3, g3);
     EXPECT_EQ(l.x(2), x2);
     EXPECT_EQ(l.g(2), g2);
 

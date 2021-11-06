@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <iostream>
 
-namespace pa {
+namespace alpaqa {
 
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
@@ -184,4 +184,4 @@ ALMSolver<InnerSolverT>::operator()(const Problem &problem, rvec y, rvec x) {
     throw std::logic_error("[ALM]   loop error");
 }
 
-} // namespace pa
+} // namespace alpaqa

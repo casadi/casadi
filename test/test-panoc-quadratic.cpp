@@ -7,14 +7,14 @@
 #include <iomanip>
 
 TEST(PANOC, quadratic) {
-    using pa::Box;
-    using pa::crvec;
-    using pa::inf;
-    using pa::NaN;
-    using pa::Problem;
-    using pa::real_t;
-    using pa::rvec;
-    using pa::vec;
+    using alpaqa::Box;
+    using alpaqa::crvec;
+    using alpaqa::inf;
+    using alpaqa::NaN;
+    using alpaqa::Problem;
+    using alpaqa::real_t;
+    using alpaqa::rvec;
+    using alpaqa::vec;
 
     const unsigned n = 1;
     const unsigned m = 1;
@@ -33,7 +33,7 @@ TEST(PANOC, quadratic) {
     auto g      = [=](crvec x, rvec g_x) { g_x(0) = x(0); };
 
     auto grad_g = [=]([[maybe_unused]] crvec x, crvec v, rvec grad_u_v) {
-        pa::mat grad = pa::mat::Ones(n, m);
+        alpaqa::mat grad = alpaqa::mat::Ones(n, m);
         grad_u_v     = grad * v;
     };
     auto g_fun = [=](crvec x) {
@@ -44,11 +44,11 @@ TEST(PANOC, quadratic) {
 
     Problem p{n, m, C, D, obj_f, grad_f, g, grad_g, {}, {}, {}};
 
-    pa::PANOCParams params;
+    alpaqa::PANOCParams params;
     params.max_iter = 10;
     params.τ_min    = 1. / 16;
 
-    pa::LBFGSParams lbfgsparam;
+    alpaqa::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 20;
 
     pa_ref::PANOCSolver solver{params, lbfgsparam};
@@ -69,7 +69,7 @@ TEST(PANOC, quadratic) {
     std::cout << std::setprecision(17);
 
     vec gg = g_fun(x);
-    vec z  = pa::project(gg + Σ.asDiagonal().inverse() * y₀, D);
+    vec z  = alpaqa::project(gg + Σ.asDiagonal().inverse() * y₀, D);
     std::cout << "\n===========\n" << std::endl;
     std::cout << "f(x)     = " << obj_f(x) << std::endl;
     std::cout << "x        = " << x.transpose() << std::endl;

@@ -7,39 +7,39 @@
 #include <optional>
 #include <stdexcept>
 
-namespace pa {
+namespace alpaqa {
 
 #if 0
-std::function<pa::Problem::f_sig>
+std::function<alpaqa::Problem::f_sig>
 load_CasADi_objective(const std::string &so_name, const std::string &fun_name) {
     return CasADiFun_1Vi1So(casadi::external(fun_name, so_name));
 }
-std::function<pa::Problem::grad_f_sig>
+std::function<alpaqa::Problem::grad_f_sig>
 load_CasADi_gradient_objective(const std::string &so_name,
                                const std::string &fun_name) {
     return CasADiFun_1Vi1Vo(casadi::external(fun_name, so_name));
 }
-std::function<pa::Problem::g_sig>
+std::function<alpaqa::Problem::g_sig>
 load_CasADi_constraints(const std::string &so_name,
                         const std::string &fun_name) {
     return CasADiFun_1Vi1Vo(casadi::external(fun_name, so_name));
 }
-std::function<pa::Problem::grad_g_prod_sig>
+std::function<alpaqa::Problem::grad_g_prod_sig>
 load_CasADi_gradient_constraints_prod(const std::string &so_name,
                                       const std::string &fun_name) {
     return [csf{CasADiFun_2Vi1Vo(casadi::external(fun_name, so_name))}] //
-        (pa::crvec x, pa::crvec y, pa::rvec gradprod) {                 //
+        (alpaqa::crvec x, alpaqa::crvec y, alpaqa::rvec gradprod) {                 //
             if (y.size() == 0)
                 gradprod.setZero();
             else
                 csf(x, y, gradprod);
         };
 }
-std::function<pa::Problem::hess_L_sig>
+std::function<alpaqa::Problem::hess_L_sig>
 load_CasADi_hessian_lagrangian(const std::string &so_name,
                                const std::string &fun_name) {
     return [csf{CasADiFun_2Vi1Mo(casadi::external(fun_name, so_name))}] //
-        (pa::crvec x, pa::crvec y, pa::rmat H) {                        //
+        (alpaqa::crvec x, alpaqa::crvec y, alpaqa::rmat H) {                        //
             // Fix the stride if the matrix is larger than n
             if (x.rows() != H.rows()) { // TODO: this is probably unnecessary
                 for (auto c = x.rows(); c-- > 1;)
@@ -55,7 +55,7 @@ load_CasADi_hessian_lagrangian(const std::string &so_name,
             }
         };
 }
-std::function<pa::Problem::hess_L_prod_sig>
+std::function<alpaqa::Problem::hess_L_prod_sig>
 load_CasADi_hessian_lagrangian_prod(const std::string &so_name,
                                     const std::string &fun_name) {
     return CasADiFun_3Vi1Vo(casadi::external(fun_name, so_name));
@@ -85,7 +85,7 @@ constexpr static auto dims = [](auto... a) {
 };
 using dim = std::pair<casadi_int, casadi_int>;
 
-pa::Problem load_CasADi_problem(const std::string &so_name, unsigned n,
+alpaqa::Problem load_CasADi_problem(const std::string &so_name, unsigned n,
                                 unsigned m, bool second_order) {
 
     auto load_g_unknown_dims = [&] {
@@ -119,7 +119,7 @@ pa::Problem load_CasADi_problem(const std::string &so_name, unsigned n,
             // the dimensions specified by the user.
             : wrap_load(so_name, "g", load_g_known_dims);
 
-    auto prob = pa::Problem(n, m);
+    auto prob = alpaqa::Problem(n, m);
 
     prob.f      = wrapped_load<CasADiFun_1Vi1So>(so_name, "f", n);
     prob.grad_f = wrapped_load<CasADiFun_1Vi1Vo>(so_name, "grad_f", n, n);
@@ -128,9 +128,9 @@ pa::Problem load_CasADi_problem(const std::string &so_name, unsigned n,
         wrapped_load<CasADiFun_2Vi1Vo>(so_name, "grad_g", dims(n, m), n);
     prob.grad_g_prod = grad_g;
     if (second_order) {
-        pa::vec w    = pa::vec::Zero(m);
+        alpaqa::vec w    = alpaqa::vec::Zero(m);
         prob.grad_gi = //
-            [grad_g, w](pa::crvec x, unsigned i, pa::rvec g) mutable {
+            [grad_g, w](alpaqa::crvec x, unsigned i, alpaqa::rvec g) mutable {
                 w(i) = 1;
                 grad_g(x, w, g);
                 w(i) = 0;
@@ -186,7 +186,7 @@ class CasADiParamWrapper
         prob.grad_g_prod = [param](crvec x, crvec y, rvec g) {
             param->cs.grad_g_prod(x, param->param, y, g);
         };
-        pa::vec w    = pa::vec::Zero(prob.m);
+        alpaqa::vec w    = alpaqa::vec::Zero(prob.m);
         prob.grad_gi = [param, w](crvec x, unsigned i, rvec g) mutable {
             w(i) = 1;
             param->cs.grad_g_prod(x, param->param, w, g);
@@ -270,4 +270,4 @@ ProblemWithParam load_CasADi_problem_with_param(const std::string &so_name,
     return prob;
 }
 
-} // namespace pa
+} // namespace alpaqa
