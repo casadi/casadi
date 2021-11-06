@@ -75,8 +75,8 @@ exclude_patterns: List[str] = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
-breathe_projects = {'PANOC-ALM': "../../build/xml"}
-breathe_default_project = "PANOC-ALM"
+breathe_projects = {'alpaqa': "../../build/xml"}
+breathe_default_project = "alpaqa"
 
 # -- Options for HTML output -------------------------------------------------
 

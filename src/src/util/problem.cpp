@@ -1,4 +1,4 @@
-#include <panoc-alm/util/problem.hpp>
+#include <alpaqa/util/problem.hpp>
 
 namespace pa {
 

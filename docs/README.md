@@ -1,6 +1,6 @@
 # Documentation
 
-View the online documentation at **https://tttapa.github.io/PANOC-ALM**.
+View the online documentation at **https://tttapa.github.io/alpaqa**.
 
 ## Generate the documentation yourself
 

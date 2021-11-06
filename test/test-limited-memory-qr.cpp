@@ -1,10 +1,10 @@
 #include "eigen-matchers.hpp"
-#include "panoc-alm/util/vec.hpp"
+#include "alpaqa/util/vec.hpp"
 #include <gtest/gtest.h>
 
 #include <iomanip>
 #include <iostream>
-#include <panoc-alm/inner/detail/limited-memory-qr.hpp>
+#include <alpaqa/inner/detail/limited-memory-qr.hpp>
 
 TEST(LimitedMemoryQR, adding) {
     using pa::mat;

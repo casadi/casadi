@@ -1,1 +1,1 @@
-#include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
+#include <alpaqa/inner/structured-panoc-lbfgs.hpp>

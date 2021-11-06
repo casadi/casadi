@@ -1,8 +1,8 @@
 #include <iomanip>
-#include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
-#include <panoc-alm/reference-problems/riskaverse-mpc.hpp>
+#include <alpaqa/decl/alm.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
+#include <alpaqa/inner/directions/decl/lbfgs.hpp>
+#include <alpaqa/reference-problems/riskaverse-mpc.hpp>
 
 #include "eigen-matchers.hpp"
 

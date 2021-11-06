@@ -1,4 +1,4 @@
-#include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
+#include <alpaqa/interop/cutest/CUTEstLoader.hpp>
 
 #include <drivers/YAMLEncoder.hpp>
 
@@ -24,43 +24,43 @@ using pa::vec;
 #define SOLVER_PANOC_2ND_LBFGS 9
 
 #if SOLVER == SOLVER_PANOC_SLBFGS
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/directions/specialized-lbfgs.hpp>
-#include <panoc-alm/inner/panoc.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/directions/specialized-lbfgs.hpp>
+#include <alpaqa/inner/panoc.hpp>
 using Solver = pa::ALMSolver<pa::PANOCSolver<pa::SpecializedLBFGS>>;
 #elif SOLVER == SOLVER_PANOC_LBFGS
-#include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
+#include <alpaqa/decl/alm.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
+#include <alpaqa/inner/directions/decl/lbfgs.hpp>
 using Solver = pa::ALMSolver<>;
 #elif SOLVER == SOLVER_PANOC_2ND
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/second-order-panoc.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/second-order-panoc.hpp>
 using Solver = pa::ALMSolver<pa::SecondOrderPANOCSolver>;
 #elif SOLVER == SOLVER_PANOC_2ND_LBFGS
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/structured-panoc-lbfgs.hpp>
 using Solver = pa::ALMSolver<pa::StructuredPANOCLBFGSSolver>;
 #elif SOLVER == SOLVER_LBFGSpp
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/lbfgspp.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/lbfgspp.hpp>
 using Solver = pa::ALMSolver<pa::LBFGSSolver<>>;
 #elif SOLVER == SOLVER_LBFGSBpp
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/lbfgspp.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/lbfgspp.hpp>
 using Solver = pa::ALMSolver<pa::LBFGSBSolver<>>;
 #elif SOLVER == SOLVER_PGA
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/pga.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/pga.hpp>
 using Solver = pa::ALMSolver<pa::PGASolver>;
 #elif SOLVER == SOLVER_GAAPGA
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/guarded-aa-pga.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/guarded-aa-pga.hpp>
 using Solver = pa::ALMSolver<pa::GAAPGA>;
 #elif SOLVER == SOLVER_PANOC_ANDERSON
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/directions/anderson-acceleration.hpp>
-#include <panoc-alm/inner/panoc.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/directions/anderson-acceleration.hpp>
+#include <alpaqa/inner/panoc.hpp>
 using Solver = pa::ALMSolver<pa::PANOCSolver<pa::AndersonAccel>>;
 #endif
 

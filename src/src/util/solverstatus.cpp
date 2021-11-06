@@ -1,4 +1,4 @@
-#include <panoc-alm/util/solverstatus.hpp>
+#include <alpaqa/util/solverstatus.hpp>
 
 #include <ostream>
 #include <stdexcept>

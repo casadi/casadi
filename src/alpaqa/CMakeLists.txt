@@ -13,7 +13,7 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
     Python3_add_library(_alpaqa MODULE alpaqa.cpp)
     target_link_libraries(_alpaqa
         PRIVATE
-            panoc-alm::panoc-alm-obj
+            alpaqa::alpaqa-obj
             pybind11::pybind11
     )
     if (NOT WIN32)
@@ -37,9 +37,9 @@ if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
         target_link_options(_alpaqa PRIVATE "LINKER:--exclude-libs,ALL")
     endif()
     target_compile_definitions(_alpaqa PRIVATE ALPAQA_MODULE_NAME=_alpaqa)
-    if (TARGET panoc-alm::casadi-loader)
+    if (TARGET alpaqa::casadi-loader)
         target_compile_definitions(_alpaqa PRIVATE ALPAQA_HAVE_CASADI)
-        target_link_libraries(_alpaqa PRIVATE panoc-alm::casadi-loader-obj)
+        target_link_libraries(_alpaqa PRIVATE alpaqa::casadi-loader-obj)
     endif()
 
     option(ALPAQA_GEN_STUB "Generate Python stub files (.pyi) for the alpaqa module." On)

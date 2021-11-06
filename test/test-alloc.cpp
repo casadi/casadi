@@ -1,5 +1,5 @@
 #include <new>
-#include <panoc-alm/util/alloc.hpp>
+#include <alpaqa/util/alloc.hpp>
 
 #include "eigen-matchers.hpp"
 

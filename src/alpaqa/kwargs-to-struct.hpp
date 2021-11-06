@@ -108,7 +108,7 @@ T var_kwargs_to_struct(const std::variant<T, py::dict> &p) {
                : kwargs_to_struct<T>(std::get<py::dict>(p));
 }
 
-#include <panoc-alm/inner/decl/panoc.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
 
 template <>
 inline const kwargs_to_struct_table_t<pa::PANOCParams>
@@ -140,7 +140,7 @@ inline const kwargs_to_struct_table_t<pa::LipschitzEstimateParams>
         {"Lγ_factor", &pa::LipschitzEstimateParams::Lγ_factor},
     };
 
-#include <panoc-alm/inner/pga.hpp>
+#include <alpaqa/inner/pga.hpp>
 
 template <>
 inline const kwargs_to_struct_table_t<pa::PGAParams>
@@ -156,7 +156,7 @@ inline const kwargs_to_struct_table_t<pa::PGAParams>
          &pa::PGAParams::quadratic_upperbound_tolerance_factor},
     };
 
-#include <panoc-alm/inner/guarded-aa-pga.hpp>
+#include <alpaqa/inner/guarded-aa-pga.hpp>
 
 template <>
 inline const kwargs_to_struct_table_t<pa::GAAPGAParams>
@@ -175,7 +175,7 @@ inline const kwargs_to_struct_table_t<pa::GAAPGAParams>
         {"full_flush_on_γ_change", &pa::GAAPGAParams::full_flush_on_γ_change},
     };
 
-#include <panoc-alm/inner/decl/structured-panoc-lbfgs.hpp>
+#include <alpaqa/inner/decl/structured-panoc-lbfgs.hpp>
 
 template <>
 inline const kwargs_to_struct_table_t<pa::StructuredPANOCLBFGSParams>
@@ -208,7 +208,7 @@ inline const kwargs_to_struct_table_t<pa::StructuredPANOCLBFGSParams>
         {"lbfgs_stepsize", &pa::StructuredPANOCLBFGSParams::lbfgs_stepsize},
     };
 
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
+#include <alpaqa/inner/directions/decl/lbfgs.hpp>
 
 template <>
 inline const kwargs_to_struct_table_t<pa::LBFGSParams>
@@ -225,7 +225,7 @@ inline const kwargs_to_struct_table_t<decltype(pa::LBFGSParams::cbfgs)>
         {"ϵ", &decltype(pa::LBFGSParams::cbfgs)::ϵ},
     };
 
-#include <panoc-alm/decl/alm.hpp>
+#include <alpaqa/decl/alm.hpp>
 
 template <>
 inline const kwargs_to_struct_table_t<pa::ALMParams>

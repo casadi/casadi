@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <iterator>
-#include <panoc-alm/util/ringbuffer.hpp>
+#include <alpaqa/util/ringbuffer.hpp>
 #include <type_traits>
 
 auto circular  = [](pa::CircularIndices<int> i) { return i.circular; };

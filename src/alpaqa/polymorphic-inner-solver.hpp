@@ -1,11 +1,11 @@
 #pragma once
 
-#include <panoc-alm/inner/decl/structured-panoc-lbfgs.hpp>
-#include <panoc-alm/inner/directions/lbfgs.hpp>
-#include <panoc-alm/inner/guarded-aa-pga.hpp>
-#include <panoc-alm/inner/panoc.hpp>
-#include <panoc-alm/inner/pga.hpp>
-#include <panoc-alm/util/solverstatus.hpp>
+#include <alpaqa/inner/decl/structured-panoc-lbfgs.hpp>
+#include <alpaqa/inner/directions/lbfgs.hpp>
+#include <alpaqa/inner/guarded-aa-pga.hpp>
+#include <alpaqa/inner/panoc.hpp>
+#include <alpaqa/inner/pga.hpp>
+#include <alpaqa/util/solverstatus.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -366,7 +366,7 @@ class PolymorphicInnerSolver : public PolymorphicInnerSolverBase {
 } // namespace pa
 
 #include "polymorphic-panoc-direction.hpp"
-#include <panoc-alm/alm.hpp>
+#include <alpaqa/alm.hpp>
 
 namespace pa {
 

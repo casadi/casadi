@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <panoc-alm/inner/decl/lbfgs-stepsize.hpp>
-#include <panoc-alm/inner/directions/lbfgs.hpp>
-#include <panoc-alm/standalone/panoc.hpp>
-#include <panoc-alm/util/alloc.hpp>
+#include <alpaqa/inner/decl/lbfgs-stepsize.hpp>
+#include <alpaqa/inner/directions/lbfgs.hpp>
+#include <alpaqa/standalone/panoc.hpp>
+#include <alpaqa/util/alloc.hpp>
 
 #include <chrono>
 #include <cmath>

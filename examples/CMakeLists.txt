@@ -2,7 +2,7 @@ if (TARGET casadi)
     add_subdirectory(CasADi)
 endif()
 
-if (TARGET panoc-alm::cutest-loader)
+if (TARGET alpaqa::cutest-loader)
     add_subdirectory(CUTEst)
 endif()
 

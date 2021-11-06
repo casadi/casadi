@@ -1,8 +1,8 @@
 #pragma once
 
-#include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
+#include <alpaqa/decl/alm.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
+#include <alpaqa/inner/directions/decl/lbfgs.hpp>
 
 #include "eigen-matchers.hpp"
 

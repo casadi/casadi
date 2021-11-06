@@ -1,4 +1,4 @@
-#include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
+#include <alpaqa/interop/cutest/CUTEstLoader.hpp>
 
 #include <cutest.h>
 #include <dlfcn.h>

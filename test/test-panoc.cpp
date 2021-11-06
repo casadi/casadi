@@ -1,12 +1,12 @@
 #include "eigen-matchers.hpp"
 #include <gtest/gtest.h>
 
-#include <panoc-alm-ref/fd.hpp>
-#include <panoc-alm-ref/panoc-ref.hpp>
+#include <alpaqa-ref/fd.hpp>
+#include <alpaqa-ref/panoc-ref.hpp>
 
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/detail/panoc-helpers.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
+#include <alpaqa/inner/detail/panoc-helpers.hpp>
+#include <alpaqa/inner/directions/decl/lbfgs.hpp>
 
 using pa::crvec;
 using pa::inf;

@@ -1,5 +1,5 @@
 #include <memory>
-#include <panoc-alm/reference-problems/himmelblau.hpp>
+#include <alpaqa/reference-problems/himmelblau.hpp>
 
 namespace pa {
 namespace problems {

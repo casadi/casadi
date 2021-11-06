@@ -1,5 +1,5 @@
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/guarded-aa-pga.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/guarded-aa-pga.hpp>
 
 #include "eigen-matchers.hpp"
 

@@ -1,1 +1,1 @@
-#include <panoc-alm/inner/directions/lbfgs.hpp>
+#include <alpaqa/inner/directions/lbfgs.hpp>

@@ -1,5 +1,5 @@
 #include <memory>
-#include <panoc-alm/reference-problems/riskaverse-mpc.hpp>
+#include <alpaqa/reference-problems/riskaverse-mpc.hpp>
 
 namespace pa {
 namespace problems {

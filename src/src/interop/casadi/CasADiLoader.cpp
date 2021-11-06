@@ -1,5 +1,5 @@
-#include <panoc-alm/interop/casadi/CasADiFunctionWrapper.hpp>
-#include <panoc-alm/interop/casadi/CasADiLoader.hpp>
+#include <alpaqa/interop/casadi/CasADiFunctionWrapper.hpp>
+#include <alpaqa/interop/casadi/CasADiLoader.hpp>
 
 #include <casadi/core/external.hpp>
 

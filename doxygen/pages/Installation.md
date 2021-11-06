@@ -11,12 +11,12 @@ sudo apt install build-essential cmake git
 ### Clone the repository
 
 ```sh
-git clone git@github.com:tttapa/PANOC-ALM.git
+git clone git@github.com:tttapa/alpaqa.git
 ```
-For the purposes of these instructions, we'll refer to the PANOC-ALM repository 
+For the purposes of these instructions, we'll refer to the alpaqa repository 
 as the environment variable `PANOC_ALM_ROOT`, for example:
 ```sh
-export PANOC_ALM_ROOT="$HOME/GitHub/PANOC-ALM"
+export PANOC_ALM_ROOT="$HOME/GitHub/alpaqa"
 ```
 
 ### Create a virtual environment
@@ -91,8 +91,8 @@ For example:
 
 **main.cpp**
 ```cpp
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/panoc.hpp>
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/panoc.hpp>
 
 int main() {
     // Use the solvers as shown in the examples
@@ -105,11 +105,11 @@ cmake_minimum_required(VERSION 3.16)
 project(Project)
 
 # Find the library you just installed:
-find_package(PANOC-ALM)
+find_package(alpaqa)
 
 add_executable(main main.cpp)
 # Link your executable with the library:
-target_link_libraries(main PRIVATE panoc-alm::panoc-alm)
+target_link_libraries(main PRIVATE alpaqa::alpaqa)
 ```
 
 # Python

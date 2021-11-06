@@ -1,5 +1,5 @@
 ## @example mpc/python/hanging-chain/hanging-chain-mpc.py
-# This example shows how to call the PANOC-ALM solver from Python code, applied
+# This example shows how to call the alpaqa solver from Python code, applied
 # to a challenging model predictive control problem.
 
 # %% Hanging chain MPC example

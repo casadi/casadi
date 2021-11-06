@@ -1,6 +1,6 @@
 #pragma once
 
-#include <panoc-alm/util/problem.hpp>
+#include <alpaqa/util/problem.hpp>
 
 inline auto prob_getter_f() {
     return [](const pa::Problem &p) -> std::function<pa::real_t(pa::crvec)> {

@@ -15,7 +15,7 @@ if (yaml-cpp_FOUND AND CUTEst_FOUND)
         PRIVATE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     )
-    target_link_libraries(yaml-encoder PUBLIC yaml-cpp cutest-loader panoc-alm)
+    target_link_libraries(yaml-encoder PUBLIC yaml-cpp cutest-loader alpaqa)
     
     string(JOIN "\", \"" CUTEst_PROBLEM_LIST_STRINGS ${CUTEst_PROBLEM_LIST})
     string(CONCAT CUTEst_PROBLEM_LIST_STRINGS "\"" "${CUTEst_PROBLEM_LIST_STRINGS}" "\"")

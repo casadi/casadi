@@ -34,8 +34,8 @@ target_link_libraries(tests
     PRIVATE
         GTest::gtest_main
         GTest::gmock
-        panoc-alm::panoc-alm
-        panoc-alm-ref
+        alpaqa::alpaqa
+        alpaqa-ref
 )
 
 # Add tests

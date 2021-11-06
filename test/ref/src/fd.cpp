@@ -1,7 +1,7 @@
 #include <cmath>
 #include <limits>
 
-#include <panoc-alm-ref/fd.hpp>
+#include <alpaqa-ref/fd.hpp>
 
 namespace pa_ref {
 

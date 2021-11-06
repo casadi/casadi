@@ -10,7 +10,7 @@ if [ -z $(docker image ls -q $image) ]; then
     docker create --interactive \
         -v"$PWD/../../:/mnt" \
         --name $container \
-        tttapa/panoc-alm-build-python-gcc:3.9-11 bash
+        tttapa/alpaqa-build-python-gcc:3.9-11 bash
     docker start $container
     docker exec -i $container bash << 'EOF'
 set -e

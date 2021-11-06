@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <Eigen/QR>
-#include <panoc-alm/inner/detail/anderson-helpers.hpp>
+#include <alpaqa/inner/detail/anderson-helpers.hpp>
 
 using pa::crmat;
 using pa::crvec;

@@ -1,8 +1,8 @@
 #include "eigen-matchers.hpp"
 #include <gtest/gtest.h>
 
-#include <panoc-alm-ref/fd.hpp>
-#include <panoc-alm-ref/panoc-ref.hpp>
+#include <alpaqa-ref/fd.hpp>
+#include <alpaqa-ref/panoc-ref.hpp>
 
 #include <iomanip>
 

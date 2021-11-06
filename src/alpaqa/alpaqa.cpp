@@ -3,19 +3,19 @@
  * This file defines all Python bindings.
  */
 
-#include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/directions/lbfgs.hpp>
-#include <panoc-alm/inner/guarded-aa-pga.hpp>
-#include <panoc-alm/inner/panoc.hpp>
-#include <panoc-alm/inner/pga.hpp>
-#include <panoc-alm/inner/structured-panoc-lbfgs.hpp>
-#include <panoc-alm/standalone/panoc.hpp>
-#include <panoc-alm/util/solverstatus.hpp>
+#include <alpaqa/decl/alm.hpp>
+#include <alpaqa/inner/decl/panoc-stop-crit.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
+#include <alpaqa/inner/directions/lbfgs.hpp>
+#include <alpaqa/inner/guarded-aa-pga.hpp>
+#include <alpaqa/inner/panoc.hpp>
+#include <alpaqa/inner/pga.hpp>
+#include <alpaqa/inner/structured-panoc-lbfgs.hpp>
+#include <alpaqa/standalone/panoc.hpp>
+#include <alpaqa/util/solverstatus.hpp>
 
 #if ALPAQA_HAVE_CASADI
-#include <panoc-alm/interop/casadi/CasADiLoader.hpp>
+#include <alpaqa/interop/casadi/CasADiLoader.hpp>
 #endif
 
 #include <pybind11/attr.h>

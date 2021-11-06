@@ -100,7 +100,7 @@ Finally, we print and plot the resulting solution to verify correctness of our s
     plt.xlabel("x")
     plt.ylabel("y")
     plt.scatter(1, 1, color="tab:red", label="Analytic")
-    plt.scatter(x_sol[0], x_sol[1], marker="x", color="tab:green", label="PANOC-ALM")
+    plt.scatter(x_sol[0], x_sol[1], marker="x", color="tab:green", label="alpaqa")
     plt.legend()
     plt.show()
 

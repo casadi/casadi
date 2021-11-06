@@ -1,6 +1,6 @@
 #include <iomanip>
-#include <panoc-alm-ref/fd.hpp>
-#include <panoc-alm/util/problem.hpp>
+#include <alpaqa-ref/fd.hpp>
+#include <alpaqa/util/problem.hpp>
 
 #include "eigen-matchers.hpp"
 

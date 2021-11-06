@@ -1,8 +1,8 @@
-#include "panoc-alm/util/problem.hpp"
-#include <panoc-alm/alm.hpp>
-#include <panoc-alm/inner/lbfgspp.hpp>
+#include "alpaqa/util/problem.hpp"
+#include <alpaqa/alm.hpp>
+#include <alpaqa/inner/lbfgspp.hpp>
 
-#include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
+#include <alpaqa/interop/cutest/CUTEstLoader.hpp>
 
 #include <drivers/YAMLEncoder.hpp>
 

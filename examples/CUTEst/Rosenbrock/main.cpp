@@ -1,14 +1,14 @@
 /** 
  * @example CUTEst/Rosenbrock/main.cpp
  *
- * This example shows how to load and solve CUTEst problems using PANOC-ALM.
+ * This example shows how to load and solve CUTEst problems using alpaqa.
  */
 
-#include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
+#include <alpaqa/decl/alm.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
+#include <alpaqa/inner/directions/decl/lbfgs.hpp>
 
-#include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
+#include <alpaqa/interop/cutest/CUTEstLoader.hpp>
 
 #include <iostream>
 

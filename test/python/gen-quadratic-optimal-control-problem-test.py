@@ -96,7 +96,7 @@ def eigen(M, name=''):
 
 
 content = f"""#include <Eigen/Core>
-#include <panoc-alm/vec.hpp>
+#include <alpaqa/vec.hpp>
 
 struct {args.name} {{
 

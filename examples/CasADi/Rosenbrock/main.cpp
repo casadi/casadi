@@ -2,18 +2,18 @@
  * @example CasADi/Rosenbrock/main.cpp
  *
  * This example shows how to generate a problem using CasADi and how to load
- * and solve it using PANOC-ALM.
+ * and solve it using alpaqa.
  *
  * # Problem generation using CasADi
  * @include CasADi/Rosenbrock/codegen-rosenbrock.py
- * # Problem solution using PANOC-ALM
+ * # Problem solution using alpaqa
  */
 
-#include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/directions/decl/lbfgs.hpp>
+#include <alpaqa/decl/alm.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
+#include <alpaqa/inner/directions/decl/lbfgs.hpp>
 
-#include <panoc-alm/interop/casadi/CasADiLoader.hpp>
+#include <alpaqa/interop/casadi/CasADiLoader.hpp>
 
 #include <iostream>
 

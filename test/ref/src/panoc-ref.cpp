@@ -1,5 +1,5 @@
-#include <panoc-alm-ref/panoc-ref.hpp>
-#include <panoc-alm/inner/directions/lbfgs.hpp>
+#include <alpaqa-ref/panoc-ref.hpp>
+#include <alpaqa/inner/directions/lbfgs.hpp>
 
 #include <cassert>
 #include <cmath>

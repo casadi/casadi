@@ -1,14 +1,14 @@
-#include <panoc-alm/inner/decl/panoc-stop-crit.hpp>
-#include <panoc-alm/inner/decl/panoc.hpp>
-#include <panoc-alm/inner/decl/second-order-panoc.hpp>
-#include <panoc-alm/inner/decl/structured-panoc-lbfgs.hpp>
-#include <panoc-alm/inner/guarded-aa-pga.hpp>
-#include <panoc-alm/inner/lbfgspp.hpp>
-#include <panoc-alm/inner/pga.hpp>
+#include <alpaqa/inner/decl/panoc-stop-crit.hpp>
+#include <alpaqa/inner/decl/panoc.hpp>
+#include <alpaqa/inner/decl/second-order-panoc.hpp>
+#include <alpaqa/inner/decl/structured-panoc-lbfgs.hpp>
+#include <alpaqa/inner/guarded-aa-pga.hpp>
+#include <alpaqa/inner/lbfgspp.hpp>
+#include <alpaqa/inner/pga.hpp>
 
-#include <panoc-alm/decl/alm.hpp>
-#include <panoc-alm/interop/cutest/CUTEstLoader.hpp>
-#include <panoc-alm/util/solverstatus.hpp>
+#include <alpaqa/decl/alm.hpp>
+#include <alpaqa/interop/cutest/CUTEstLoader.hpp>
+#include <alpaqa/util/solverstatus.hpp>
 
 #include <yaml-cpp/emitter.h>
 #include <yaml-cpp/emittermanip.h>

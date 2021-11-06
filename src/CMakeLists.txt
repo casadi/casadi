@@ -1,7 +1,7 @@
 # Target options
 # --------------
 
-add_library(panoc-alm-obj OBJECT
+add_library(alpaqa-obj OBJECT
     "src/inner/panoc.cpp"
     "src/inner/second-order-panoc.cpp"
     "src/inner/structured-panoc-lbfgs.cpp"
@@ -13,62 +13,62 @@ add_library(panoc-alm-obj OBJECT
     "src/reference-problems/riskaverse-mpc.cpp"
     "src/reference-problems/himmelblau.cpp"
 
-    "include/panoc-alm/inner/guarded-aa-pga.hpp"
-    "include/panoc-alm/inner/second-order-panoc.hpp"
-    "include/panoc-alm/inner/panoc.hpp"
-    "include/panoc-alm/inner/lbfgspp.hpp"
-    "include/panoc-alm/inner/directions/lbfgs.hpp"
-    "include/panoc-alm/inner/directions/decl/lbfgs.hpp"
-    "include/panoc-alm/inner/directions/decl/lbfgs-fwd.hpp"
-    "include/panoc-alm/inner/directions/decl/panoc-direction-update.hpp"
-    "include/panoc-alm/inner/directions/decl/specialized-lbfgs.hpp"
-    "include/panoc-alm/inner/directions/anderson-acceleration.hpp"
-    "include/panoc-alm/inner/directions/specialized-lbfgs.hpp"
-    "include/panoc-alm/inner/decl/panoc-fwd.hpp"
-    "include/panoc-alm/inner/decl/second-order-panoc.hpp"
-    "include/panoc-alm/inner/decl/panoc.hpp"
-    "include/panoc-alm/inner/decl/structured-panoc-lbfgs.hpp"
-    "include/panoc-alm/inner/decl/panoc-stop-crit.hpp"
-    "include/panoc-alm/inner/decl/lbfgs-stepsize.hpp"
-    "include/panoc-alm/inner/detail/limited-memory-qr.hpp"
-    "include/panoc-alm/inner/detail/anderson-helpers.hpp"
-    "include/panoc-alm/inner/detail/panoc-helpers.hpp"
-    "include/panoc-alm/inner/structured-panoc-lbfgs.hpp"
-    "include/panoc-alm/inner/pga.hpp"
-    "include/panoc-alm/inner/newton.hpp"
-    "include/panoc-alm/alm.hpp"
-    "include/panoc-alm/reference-problems/himmelblau.hpp"
-    "include/panoc-alm/reference-problems/riskaverse-mpc.hpp"
-    "include/panoc-alm/decl/alm.hpp"
-    "include/panoc-alm/detail/alm-helpers.hpp"
-    "include/panoc-alm/util/problem.hpp"
-    "include/panoc-alm/util/solverstatus.hpp"
-    "include/panoc-alm/util/box.hpp"
-    "include/panoc-alm/util/atomic_stop_signal.hpp"
-    "include/panoc-alm/util/vec.hpp"
-    "include/panoc-alm/util/ringbuffer.hpp"
-    "include/panoc-alm/util/lipschitz.hpp"
+    "include/alpaqa/inner/guarded-aa-pga.hpp"
+    "include/alpaqa/inner/second-order-panoc.hpp"
+    "include/alpaqa/inner/panoc.hpp"
+    "include/alpaqa/inner/lbfgspp.hpp"
+    "include/alpaqa/inner/directions/lbfgs.hpp"
+    "include/alpaqa/inner/directions/decl/lbfgs.hpp"
+    "include/alpaqa/inner/directions/decl/lbfgs-fwd.hpp"
+    "include/alpaqa/inner/directions/decl/panoc-direction-update.hpp"
+    "include/alpaqa/inner/directions/decl/specialized-lbfgs.hpp"
+    "include/alpaqa/inner/directions/anderson-acceleration.hpp"
+    "include/alpaqa/inner/directions/specialized-lbfgs.hpp"
+    "include/alpaqa/inner/decl/panoc-fwd.hpp"
+    "include/alpaqa/inner/decl/second-order-panoc.hpp"
+    "include/alpaqa/inner/decl/panoc.hpp"
+    "include/alpaqa/inner/decl/structured-panoc-lbfgs.hpp"
+    "include/alpaqa/inner/decl/panoc-stop-crit.hpp"
+    "include/alpaqa/inner/decl/lbfgs-stepsize.hpp"
+    "include/alpaqa/inner/detail/limited-memory-qr.hpp"
+    "include/alpaqa/inner/detail/anderson-helpers.hpp"
+    "include/alpaqa/inner/detail/panoc-helpers.hpp"
+    "include/alpaqa/inner/structured-panoc-lbfgs.hpp"
+    "include/alpaqa/inner/pga.hpp"
+    "include/alpaqa/inner/newton.hpp"
+    "include/alpaqa/alm.hpp"
+    "include/alpaqa/reference-problems/himmelblau.hpp"
+    "include/alpaqa/reference-problems/riskaverse-mpc.hpp"
+    "include/alpaqa/decl/alm.hpp"
+    "include/alpaqa/detail/alm-helpers.hpp"
+    "include/alpaqa/util/problem.hpp"
+    "include/alpaqa/util/solverstatus.hpp"
+    "include/alpaqa/util/box.hpp"
+    "include/alpaqa/util/atomic_stop_signal.hpp"
+    "include/alpaqa/util/vec.hpp"
+    "include/alpaqa/util/ringbuffer.hpp"
+    "include/alpaqa/util/lipschitz.hpp"
 )
-add_library(panoc-alm::panoc-alm-obj ALIAS panoc-alm-obj)
-set_property(TARGET panoc-alm-obj PROPERTY POSITION_INDEPENDENT_CODE 1)
-target_include_directories(panoc-alm-obj
+add_library(alpaqa::alpaqa-obj ALIAS alpaqa-obj)
+set_property(TARGET alpaqa-obj PROPERTY POSITION_INDEPENDENT_CODE 1)
+target_include_directories(alpaqa-obj
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
-target_link_libraries(panoc-alm-obj PUBLIC Eigen3::Eigen)
+target_link_libraries(alpaqa-obj PUBLIC Eigen3::Eigen)
 if (LBFGSpp_FOUND)
-    target_link_libraries(panoc-alm-obj PUBLIC LBFGSpp::LBFGSpp)
+    target_link_libraries(alpaqa-obj PUBLIC LBFGSpp::LBFGSpp)
 endif()
 
-add_library(panoc-alm)
-target_link_libraries(panoc-alm PUBLIC panoc-alm-obj)
-add_library(panoc-alm::panoc-alm ALIAS panoc-alm)
-set_target_properties(panoc-alm PROPERTIES EXPORT_NAME panoc-alm::panoc-alm)
+add_library(alpaqa)
+target_link_libraries(alpaqa PUBLIC alpaqa-obj)
+add_library(alpaqa::alpaqa ALIAS alpaqa)
+set_target_properties(alpaqa PROPERTIES EXPORT_NAME alpaqa::alpaqa)
 
-# target_compile_definitions(panoc-alm PUBLIC PRINT_DEBUG_COUT=1)
+# target_compile_definitions(alpaqa PUBLIC PRINT_DEBUG_COUT=1)
 
 # Interop
 # -------
@@ -77,31 +77,31 @@ set_target_properties(panoc-alm PROPERTIES EXPORT_NAME panoc-alm::panoc-alm)
 if (TARGET CUTEst::headers)
     add_library(cutest-loader STATIC 
         "src/interop/cutest/CUTEstLoader.cpp"
-        "include/panoc-alm/interop/cutest/CUTEstLoader.hpp")
+        "include/alpaqa/interop/cutest/CUTEstLoader.hpp")
     target_link_libraries(cutest-loader 
         PRIVATE
             CUTEst::headers
             ${CMAKE_DL_LIBS}
         PUBLIC
-            panoc-alm::panoc-alm)
-    add_library(panoc-alm::cutest-loader ALIAS cutest-loader)
+            alpaqa::alpaqa)
+    add_library(alpaqa::cutest-loader ALIAS cutest-loader)
 endif()
 
 # CasADi
 if (TARGET casadi)
     add_library(casadi-loader-obj OBJECT 
         "src/interop/casadi/CasADiLoader.cpp"
-        "include/panoc-alm/interop/casadi/CasADiFunctionWrapper.hpp"
-        "include/panoc-alm/interop/casadi/CasADiLoader.hpp")
+        "include/alpaqa/interop/casadi/CasADiFunctionWrapper.hpp"
+        "include/alpaqa/interop/casadi/CasADiLoader.hpp")
     target_link_libraries(casadi-loader-obj 
         PUBLIC
             casadi
-            panoc-alm::panoc-alm-obj)
+            alpaqa::alpaqa-obj)
     set_target_properties(casadi-loader-obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
-    add_library(panoc-alm::casadi-loader-obj ALIAS casadi-loader-obj)
+    add_library(alpaqa::casadi-loader-obj ALIAS casadi-loader-obj)
     add_library(casadi-loader)
     target_link_libraries(casadi-loader PUBLIC casadi-loader-obj)
-    add_library(panoc-alm::casadi-loader ALIAS casadi-loader)
+    add_library(alpaqa::casadi-loader ALIAS casadi-loader)
 endif()
 
 # Target installation

@@ -1,1 +1,1 @@
-#include <panoc-alm/inner/second-order-panoc.hpp>
+#include <alpaqa/inner/second-order-panoc.hpp>

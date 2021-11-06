@@ -1,6 +1,6 @@
 #pragma once
-#include <panoc-alm/inner/directions/lbfgs.hpp>
-#include <panoc-alm/inner/panoc.hpp>
+#include <alpaqa/inner/directions/lbfgs.hpp>
+#include <alpaqa/inner/panoc.hpp>
 
 #include <memory>
 
