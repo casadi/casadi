@@ -17,7 +17,7 @@ def generate_casadi_problem(
     f: cs.Function,
     g: cs.Function,
     second_order: bool = False,
-    name: str = "PANOC_ALM_problem",
+    name: str = "alpaqa_problem",
 ) -> Tuple[cs.CodeGenerator, int, int, int]:
     """Convert the objective and constraint functions into a CasADi code
     generator.
@@ -117,7 +117,7 @@ def generate_and_compile_casadi_problem(
     f: cs.Function,
     g: cs.Function,
     second_order: bool = False,
-    name: str = "PANOC_ALM_problem",
+    name: str = "alpaqa_problem",
 ) -> Union[pa.Problem, pa.ProblemWithParam]:
     """Compile the objective and constraint functions into a alpaqa Problem.
 

@@ -3,9 +3,9 @@ execute_process(COMMAND "${Python3_EXECUTABLE}"
         -c "import pybind11; print(pybind11.get_include())"
     OUTPUT_VARIABLE alpaqa_pybind11_include_dir
     OUTPUT_STRIP_TRAILING_WHITESPACE
-    RESULT_VARIABLE PANOC_ALM_PYBIND11_RESULT)
+    RESULT_VARIABLE ALPAQA_PYBIND11_RESULT)
 
-if (PANOC_ALM_PYBIND11_RESULT EQUAL 0)
+if (ALPAQA_PYBIND11_RESULT EQUAL 0)
     add_library(pybind11::pybind11 INTERFACE IMPORTED)
     target_include_directories(pybind11::pybind11
         INTERFACE ${alpaqa_pybind11_include_dir})

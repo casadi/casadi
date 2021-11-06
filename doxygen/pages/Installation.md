@@ -14,15 +14,15 @@ sudo apt install build-essential cmake git
 git clone git@github.com:tttapa/alpaqa.git
 ```
 For the purposes of these instructions, we'll refer to the alpaqa repository 
-as the environment variable `PANOC_ALM_ROOT`, for example:
+as the environment variable `ALPAQA_ROOT`, for example:
 ```sh
-export PANOC_ALM_ROOT="$HOME/GitHub/alpaqa"
+export ALPAQA_ROOT="$HOME/GitHub/alpaqa"
 ```
 
 ### Create a virtual environment
 
 ```sh
-cd "$PANOC_ALM_ROOT"
+cd "$ALPAQA_ROOT"
 python3 -m venv py-venv
 . ./py-venv/bin/activate
 ```
