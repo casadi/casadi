@@ -93,6 +93,7 @@ jobs:
     - name: 'Install alpaqa'
       run: pip install --find-links=wheelhouse alpaqa
     - name: 'Check alpaqa version'
+      if: ${{ matrix.python-version != '3.7' }}
       run: |
         [ "${{ github.event.release.tag_name }}" == "$(python -c 'from importlib.metadata import version as v; print(v("alpaqa"))')" ]
       shell: bash
