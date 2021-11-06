@@ -18,7 +18,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 with open(os.path.join(dir_path, "README.md"), "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-version = "0.0.1a3"
+version = "0.0.1a0"
 
 setup(
     name="alpaqa",
