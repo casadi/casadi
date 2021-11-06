@@ -1,6 +1,9 @@
 name: Python Wheel (Windows)
 
-on: [push]
+on:
+  push:
+  release:
+    types: ['released', 'prereleased']
 
 jobs:
   build:
@@ -73,3 +76,36 @@ jobs:
   #     run: python -m pip install --find-links=dist alpaqa
   #   - name: 'Run tests'
   #     run: python ./src/alpaqa/test.py
+
+  release:
+    if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
+    needs: test
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9']
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+      name: Install Python
+      with: 
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/download-artifact@v2
+      with:
+        name: alpaqa-whl-${{ matrix.python-version }}
+        path: dist
+    
+    - name: 'Install alpaqa'
+      run: python -m pip install --find-links=dist alpaqa
+    - name: 'Check alpaqa version'
+      if: ${{ matrix.python-version != '3.7' }}
+      run: |
+        "${{ github.event.release.tag_name }}" -eq "$(python -c 'from importlib.metadata import version as v; print(v("alpaqa"))')"
+      shell: bash
+    - name: 'Install Twine'
+      run: python -m pip install twine
+    - name: 'Upload to PyPi'
+      run: python -m twine upload --repository testpypi dist/alpaqa-*.whl
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PyPi }}
