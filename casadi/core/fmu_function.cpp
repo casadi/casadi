@@ -1433,7 +1433,36 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     #endif  // WITH_OPENMP
   } else if (parallelization_ == Parallelization::THREAD) {
     #ifdef CASADI_WITH_THREAD
-    casadi_error("Not implemented");
+    // Return value for each thread
+    std::vector<int> flag_task(max_n_task_);
+    // Spawn threads
+    std::vector<std::thread> threads;
+    for (casadi_int task = 0; task < max_n_task_; ++task) {
+      threads.emplace_back(
+        [&, task](int* fl) {
+          if (task == 0) {
+            // Evaluate master thread
+            *fl = eval_thread(m, task, max_n_task_, need_jac, need_adj);
+          } else {
+            // Memory for slave
+            FmuMemory* s = m->slaves.at(task - 1);
+            // Set work vectors (for slave thread)
+            s->arg = arg;
+            s->res = res;
+            s->iw = iw + jac_iw_ * task;
+            s->w = w + jac_w_ * task;
+            s->aseed = aseed;
+            s->asens = asens;
+            s->jac_nz = jac_nz;
+            // Evaluate slave thread
+            *fl = eval_thread(s, task, max_n_task_, need_jac, need_adj);
+          }
+        }, &flag_task[task]);
+    }
+    // Join threads
+    for (auto&& th : threads) th.join();
+    // Join return flags
+    for (int fl : flag_task) flag = flag || fl;
     #else   // CASADI_WITH_THREAD
     flag = 1;
     #endif  // CASADI_WITH_THREAD
