@@ -500,13 +500,13 @@ public:
   double value(const std::string& name) const;
 
   // Set the current value, single value
-  void set_value(const std::string& name, double val);
+  void set(const std::string& name, double val);
 
   // Get the current value, single value (string)
   std::string string_value(const std::string& name) const;
 
   // Set the current value, single value (string)
-  void set_string_value(const std::string& name, const std::string& val);
+  void set(const std::string& name, const std::string& val);
 #endif  // !SWIGMATLAB
 
   /// Get an attribute
@@ -544,13 +544,13 @@ public:
   std::vector<double> value(const std::vector<std::string>& name) const;
 
   /// Set the current value
-  void set_value(const std::vector<std::string>& name, const std::vector<double>& val);
+  void set(const std::vector<std::string>& name, const std::vector<double>& val);
 
   /// Get the current value (string)
   std::vector<std::string> string_value(const std::vector<std::string>& name) const;
 
   /// Set the current value (string)
-  void set_string_value(const std::vector<std::string>& name, const std::vector<std::string>& val);
+  void set(const std::vector<std::string>& name, const std::vector<std::string>& val);
 
   /// Add a new variable: returns corresponding symbolic expression
   MX add_variable(const std::string& name, casadi_int n=1);
