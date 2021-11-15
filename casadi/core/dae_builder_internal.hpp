@@ -469,7 +469,7 @@ protected:
   Function fun(const std::string& name) const;
 
   // Reset value attributes
-  void clear_value();
+  void reset();
 
   ///@{
   /// Get by attribute name

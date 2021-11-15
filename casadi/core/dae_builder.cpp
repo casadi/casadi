@@ -1085,11 +1085,11 @@ void DaeBuilder::set_start(const std::vector<std::string>& name, const std::vect
   }
 }
 
-void DaeBuilder::clear_value() {
+void DaeBuilder::reset() {
   try {
-    (*this)->clear_value();
+    (*this)->reset();
   } catch (std::exception& e) {
-    THROW_ERROR("clear_value", e.what());
+    THROW_ERROR("reset", e.what());
   }
 }
 
