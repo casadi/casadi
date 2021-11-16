@@ -139,34 +139,125 @@ void Fmu::init(DaeBuilderInternal* dae) {
       ored_[i][k] = oind_map_.at(s[k]);
     }
   }
+
   // Collect meta information for inputs
   nominal_in_.reserve(iind_.size());
   min_in_.reserve(iind_.size());
   max_in_.reserve(iind_.size());
-  varname_in_.reserve(iind_.size());
+  vn_in_.reserve(iind_.size());
   vr_in_.reserve(iind_.size());
   for (size_t i : iind_) {
     const Variable& v = dae->variables_.at(i);
     nominal_in_.push_back(v.nominal);
     min_in_.push_back(v.min);
     max_in_.push_back(v.max);
-    varname_in_.push_back(v.name);
+    vn_in_.push_back(v.name);
     vr_in_.push_back(v.value_reference);
   }
   // Collect meta information for outputs
   nominal_out_.reserve(oind_.size());
   min_out_.reserve(oind_.size());
   max_out_.reserve(oind_.size());
-  varname_out_.reserve(oind_.size());
+  vn_out_.reserve(oind_.size());
   vr_out_.reserve(oind_.size());
   for (size_t i : oind_) {
     const Variable& v = dae->variables_.at(i);
     nominal_out_.push_back(v.nominal);
     min_out_.push_back(v.min);
     max_out_.push_back(v.max);
-    varname_out_.push_back(v.name);
+    vn_out_.push_back(v.name);
     vr_out_.push_back(v.value_reference);
   }
+
+  // Collect input and parameter values
+  vr_real_.clear();
+  vr_integer_.clear();
+  vr_boolean_.clear();
+  vr_string_.clear();
+  init_real_.clear();
+  init_integer_.clear();
+  init_boolean_.clear();
+  init_string_.clear();
+  for (const Variable& v : dae->variables_) {
+    // Skip if the wrong type
+    if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
+    // If nan - variable has not been set - keep default value
+    if (std::isnan(v.value)) continue;
+    // Value reference
+    fmi2ValueReference vr = v.value_reference;
+    // Get value
+    switch (v.type) {
+      case Type::REAL:
+        init_real_.push_back(static_cast<fmi2Real>(v.value));
+        vr_real_.push_back(vr);
+        break;
+      case Type::INTEGER:
+      case Type::ENUM:
+        init_integer_.push_back(static_cast<fmi2Integer>(v.value));
+        vr_integer_.push_back(vr);
+        break;
+      case Type::BOOLEAN:
+        init_boolean_.push_back(static_cast<fmi2Boolean>(v.value));
+        vr_boolean_.push_back(vr);
+        break;
+      case Type::STRING:
+        init_string_.push_back(v.stringvalue);
+        vr_string_.push_back(vr);
+        break;
+      default:
+        casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
+    }
+  }
+
+  // Collect auxilliary variables, if any
+  vn_aux_real_.clear();
+  vn_aux_integer_.clear();
+  vn_aux_boolean_.clear();
+  vn_aux_string_.clear();
+  vr_aux_real_.clear();
+  vr_aux_integer_.clear();
+  vr_aux_boolean_.clear();
+  vr_aux_string_.clear();
+  auto aux = scheme_.find("aux");
+  if (aux != scheme_.end()) {
+    for (size_t i : aux->second) {
+      const Variable& v = dae->variables_.at(i);
+      // Convert to expected type
+      fmi2ValueReference vr = v.value_reference;
+      // Sort by type
+      switch (v.type) {
+        case Type::REAL:
+          // Real
+          vn_aux_real_.push_back(v.name);
+          vr_aux_real_.push_back(v.value_reference);
+          break;
+        case Type::INTEGER:
+        case Type::ENUM:
+          // Integer or enum
+          vn_aux_integer_.push_back(v.name);
+          vr_aux_integer_.push_back(v.value_reference);
+          break;
+        case Type::BOOLEAN:
+          // Boolean
+          vn_aux_boolean_.push_back(v.name);
+          vr_aux_boolean_.push_back(v.value_reference);
+          break;
+        case Type::STRING:
+          // String
+          vn_aux_string_.push_back(v.name);
+          vr_aux_string_.push_back(v.value_reference);
+          break;
+        default:
+          casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
+      }
+    }
+  }
+
+  /// Allocate numerical values for initial auxilliary variables
+  aux_.v_real.resize(vn_aux_real_.size());
+  aux_.v_integer.resize(vn_aux_integer_.size());
+  aux_.v_boolean.resize(vn_aux_boolean_.size());
+  aux_.v_string.resize(vn_aux_string_.size());
 
   // Get Jacobian sparsity information
   sp_jac_ = dae->jac_sparsity(oind_, iind_);
@@ -224,48 +315,6 @@ void Fmu::init(DaeBuilderInternal* dae) {
   guid_ = dae->guid_;
   logging_on_ = dae->debug_;
 
-  // Collect variables
-  vr_real_.clear();
-  vr_integer_.clear();
-  vr_boolean_.clear();
-  vr_string_.clear();
-  init_real_.clear();
-  init_integer_.clear();
-  init_boolean_.clear();
-  init_string_.clear();
-
-  // Collect input and parameter values
-  for (const Variable& v : dae->variables_) {
-    // Skip if the wrong type
-    if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
-    // If nan - variable has not been set - keep default value
-    if (std::isnan(v.value)) continue;
-    // Value reference
-    fmi2ValueReference vr = v.value_reference;
-    // Get value
-    switch (v.type) {
-      case Type::REAL:
-        init_real_.push_back(static_cast<fmi2Real>(v.value));
-        vr_real_.push_back(vr);
-        break;
-      case Type::INTEGER:
-      case Type::ENUM:
-        init_integer_.push_back(static_cast<fmi2Integer>(v.value));
-        vr_integer_.push_back(vr);
-        break;
-      case Type::BOOLEAN:
-        init_boolean_.push_back(static_cast<fmi2Boolean>(v.value));
-        vr_boolean_.push_back(vr);
-        break;
-      case Type::STRING:
-        init_string_.push_back(v.stringvalue);
-        vr_string_.push_back(vr);
-        break;
-      default:
-        casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
-    }
-  }
-
   // Create a temporary instance
   fmi2Component c = instantiate();
   // Reset solver
@@ -277,6 +326,10 @@ void Fmu::init(DaeBuilderInternal* dae) {
   // Initialization mode begins
   if (enter_initialization_mode(c)) {
     casadi_error("Fmu::enter_initialization_mode failed");
+  }
+  // Get auxilliary variables
+  if (get_aux(c, &aux_)) {
+    casadi_error("Fmu::get_aux failed");
   }
   // Get all values
   if (get_values(c, dae)) {
@@ -496,7 +549,7 @@ int Fmu::set_values(fmi2Component c) const {
       return 1;
     }
   }
-  // Pass string valeus before initialization
+  // Pass string values before initialization
   for (size_t k = 0; k < vr_string_.size(); ++k) {
     fmi2ValueReference vr = vr_string_[k];
     fmi2String value = init_string_[k].c_str();
@@ -507,6 +560,72 @@ int Fmu::set_values(fmi2Component c) const {
   }
   // Successful return
   return 0;
+}
+
+int Fmu::get_aux(fmi2Component c, Value* v) const {
+  // Get real auxilliary variables
+  if (!vr_aux_real_.empty()) {
+    fmi2Status status = get_real_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
+      get_ptr(v->v_real));
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetReal failed");
+      return 1;
+    }
+  }
+  // Get integer/enum auxilliary variables
+  if (!vr_aux_integer_.empty()) {
+    fmi2Status status = get_integer_(c, get_ptr(vr_aux_integer_), vr_aux_integer_.size(),
+      get_ptr(v->v_integer));
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetInteger failed");
+      return 1;
+    }
+  }
+  // Get boolean auxilliary variables
+  if (!vr_aux_boolean_.empty()) {
+    fmi2Status status = get_boolean_(c, get_ptr(vr_aux_boolean_), vr_aux_boolean_.size(),
+      get_ptr(v->v_boolean));
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetBoolean failed");
+      return 1;
+    }
+  }
+  // Get string auxilliary variables
+  for (size_t k = 0; k < vr_aux_string_.size(); ++k) {
+    fmi2ValueReference vr = vr_aux_string_[k];
+    fmi2String value = v->v_string.at(k).c_str();
+    fmi2Status status = set_string_(c, &vr, 1, &value);
+    if (status != fmi2OK) {
+      casadi_error("fmi2GetString failed for value reference " + str(vr));
+    }
+  }
+}
+
+void Fmu::get_stats(FmuMemory* m, Dict* stats) const {
+  // To do: Use auxillary variables from last evaluation
+  (void)m;  // unused
+  // Values to be copied
+  const Value& v = aux_;
+  // Collect auxilliary variables
+  Dict aux;
+  // Real
+  for (size_t k = 0; k < vn_aux_real_.size(); ++k) {
+    aux[vn_aux_real_[k]] = static_cast<double>(v.v_real[k]);
+  }
+  // Integer
+  for (size_t k = 0; k < vn_aux_integer_.size(); ++k) {
+    aux[vn_aux_integer_[k]] = static_cast<casadi_int>(v.v_integer[k]);
+  }
+  // Boolean
+  for (size_t k = 0; k < vn_aux_boolean_.size(); ++k) {
+    aux[vn_aux_boolean_[k]] = static_cast<bool>(v.v_boolean[k]);
+  }
+  // String
+  for (size_t k = 0; k < vn_aux_string_.size(); ++k) {
+    aux[vn_aux_string_[k]] = v.v_string[k];
+  }
+  // Copy to stats
+  (*stats)["aux"] = aux;
 }
 
 int Fmu::get_values(fmi2Component c, DaeBuilderInternal* dae) const {
@@ -910,8 +1029,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
         casadi_assert(wrt_ind < m->id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
-        ss << "Inconsistent derivatives of " << varname_out_[id] << " w.r.t. "
-          << varname_in_[wrt] << "\n"
+        ss << "Inconsistent derivatives of " << vn_out_[id] << " w.r.t. " << vn_in_[wrt] << "\n"
           << "At " << m->v_in_[wrt_ind] << ", nominal " << nominal_in_[wrt]
           << ", min " << min_in_[wrt] << ", max " << max_in_[wrt] << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].\n";
@@ -1644,6 +1762,17 @@ bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
   return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
+}
+
+Dict FmuFunction::get_stats(void *mem) const {
+  // Get the stats from the base classes
+  Dict stats = FunctionInternal::get_stats(mem);
+  // Get memory object
+  FmuMemory* m = static_cast<FmuMemory*>(mem);
+  // Get auxilliary variables from Fmu
+  fmu_->get_stats(m, &stats);
+  // Return stats
+  return stats;
 }
 
 #endif  // WITH_FMU

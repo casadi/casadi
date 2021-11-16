@@ -288,7 +288,7 @@ struct CASADI_EXPORT Fmu {
   std::vector<double> nominal_in_, nominal_out_;
   std::vector<double> min_in_, min_out_;
   std::vector<double> max_in_, max_out_;
-  std::vector<std::string> varname_in_, varname_out_;
+  std::vector<std::string> vn_in_, vn_out_;
   std::vector<fmi2ValueReference> vr_in_, vr_out_;
 
   // Reduced space indices for all inputs and outputs
@@ -330,12 +330,26 @@ struct CASADI_EXPORT Fmu {
   // Logging?
   bool logging_on_;
 
+  // Collection of variable values, all types
+  struct Value {
+    std::vector<fmi2Real> v_real;
+    std::vector<fmi2Integer> v_integer;
+    std::vector<fmi2Boolean> v_boolean;
+    std::vector<std::string> v_string;
+  };
+
   // Variables used for initialization, by type
   std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;
   std::vector<fmi2Real> init_real_;
   std::vector<fmi2Integer> init_integer_;
   std::vector<fmi2Boolean> init_boolean_;
   std::vector<std::string> init_string_;
+
+
+  // Auxilliary variables, by type
+  std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
+  std::vector<fmi2ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
+  Value aux_;
 
   // Sparsity pattern for Jacobian of all outputs w.r.t. all inputs
   Sparsity sp_jac_;
@@ -373,8 +387,14 @@ struct CASADI_EXPORT Fmu {
   // Copy values set in DaeBuilder to FMU
   int set_values(fmi2Component c) const;
 
+  // Retrieve auxilliary variables from FMU
+  int get_aux(fmi2Component c, Value* v) const;
+
   // Retrieve values from FMU, copy to DaeBuilder
   int get_values(fmi2Component c, DaeBuilderInternal* dae) const;
+
+  /** \brief Get stats */
+  void get_stats(FmuMemory* m, Dict* stats) const;
 
   /** \brief Initalize memory block */
   int init_mem(FmuMemory* m) const;
@@ -497,6 +517,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Types of parallelization
   Parallelization parallelization_;
 
+  // Stats from initialization
+  Dict init_stats_;
+
   /** \brief Constructor */
   FmuFunction(const std::string& name, Fmu* fmu,
       const std::vector<std::string>& name_in,
@@ -595,6 +618,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /** \brief Free memory block */
   void free_mem(void *mem) const override;
+
+  /// Get all statistics
+  Dict get_stats(void* mem) const override;
 };
 
 } // namespace casadi
