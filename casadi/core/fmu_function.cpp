@@ -209,7 +209,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     }
   }
 
-  // Collect auxilliary variables, if any
+  // Collect auxilliary variables
   vn_aux_real_.clear();
   vn_aux_integer_.clear();
   vn_aux_boolean_.clear();
@@ -218,46 +218,43 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   vr_aux_integer_.clear();
   vr_aux_boolean_.clear();
   vr_aux_string_.clear();
-  auto aux = scheme_.find("aux");
-  if (aux != scheme_.end()) {
-    for (size_t i : aux->second) {
-      const Variable& v = dae->variables_.at(i);
-      // Convert to expected type
-      fmi2ValueReference vr = v.value_reference;
-      // Sort by type
-      switch (v.type) {
-        case Type::REAL:
-          // Real
-          vn_aux_real_.push_back(v.name);
-          vr_aux_real_.push_back(v.value_reference);
-          break;
-        case Type::INTEGER:
-        case Type::ENUM:
-          // Integer or enum
-          vn_aux_integer_.push_back(v.name);
-          vr_aux_integer_.push_back(v.value_reference);
-          break;
-        case Type::BOOLEAN:
-          // Boolean
-          vn_aux_boolean_.push_back(v.name);
-          vr_aux_boolean_.push_back(v.value_reference);
-          break;
-        case Type::STRING:
-          // String
-          vn_aux_string_.push_back(v.name);
-          vr_aux_string_.push_back(v.value_reference);
-          break;
-        default:
-          casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
-      }
+  for (auto&& s : aux_) {
+    const Variable& v = dae->variable(s);
+    // Convert to expected type
+    fmi2ValueReference vr = v.value_reference;
+    // Sort by type
+    switch (v.type) {
+      case Type::REAL:
+        // Real
+        vn_aux_real_.push_back(v.name);
+        vr_aux_real_.push_back(v.value_reference);
+        break;
+      case Type::INTEGER:
+      case Type::ENUM:
+        // Integer or enum
+        vn_aux_integer_.push_back(v.name);
+        vr_aux_integer_.push_back(v.value_reference);
+        break;
+      case Type::BOOLEAN:
+        // Boolean
+        vn_aux_boolean_.push_back(v.name);
+        vr_aux_boolean_.push_back(v.value_reference);
+        break;
+      case Type::STRING:
+        // String
+        vn_aux_string_.push_back(v.name);
+        vr_aux_string_.push_back(v.value_reference);
+        break;
+      default:
+        casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
     }
   }
 
   /// Allocate numerical values for initial auxilliary variables
-  aux_.v_real.resize(vn_aux_real_.size());
-  aux_.v_integer.resize(vn_aux_integer_.size());
-  aux_.v_boolean.resize(vn_aux_boolean_.size());
-  aux_.v_string.resize(vn_aux_string_.size());
+  aux_value_.v_real.resize(vn_aux_real_.size());
+  aux_value_.v_integer.resize(vn_aux_integer_.size());
+  aux_value_.v_boolean.resize(vn_aux_boolean_.size());
+  aux_value_.v_string.resize(vn_aux_string_.size());
 
   // Get Jacobian sparsity information
   sp_jac_ = dae->jac_sparsity(oind_, iind_);
@@ -328,7 +325,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     casadi_error("Fmu::enter_initialization_mode failed");
   }
   // Get auxilliary variables
-  if (get_aux(c, &aux_)) {
+  if (get_aux(c, &aux_value_)) {
     casadi_error("Fmu::get_aux failed");
   }
   // Free memory
@@ -601,7 +598,7 @@ void Fmu::get_stats(FmuMemory* m, Dict* stats) const {
   // To do: Use auxillary variables from last evaluation
   (void)m;  // unused
   // Values to be copied
-  const Value& v = aux_;
+  const Value& v = aux_value_;
   // Collect auxilliary variables
   Dict aux;
   // Real
@@ -1020,8 +1017,9 @@ Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<si
 
 Fmu::Fmu(const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::vector<std::string>& aux,
     const std::map<std::string, std::vector<size_t>>& lc)
-    : scheme_(scheme), lc_(lc) {
+    : scheme_(scheme), aux_(aux), lc_(lc) {
   counter_ = 0;
   instantiate_ = 0;
   free_instance_ = 0;
@@ -1107,7 +1105,19 @@ FmuFunction::~FmuFunction() {
 
 const Options FmuFunction::options_
 = {{&FunctionInternal::options_},
-   {{"enable_ad",
+   {{"scheme_in",
+     {OT_STRINGVECTOR,
+      "Names of the inputs in the scheme"}},
+    {"scheme_out",
+     {OT_STRINGVECTOR,
+      "Names of the outputs in the scheme"}},
+    {"scheme_def",
+     {OT_DICT,
+      "Definitions of the scheme variables"}},
+    {"aux",
+     {OT_STRINGVECTOR,
+      "Auxilliary variables"}},
+    {"enable_ad",
      {OT_BOOL,
       "Calculate first order derivatives using FMU directional derivative support"}},
     {"validate_ad",

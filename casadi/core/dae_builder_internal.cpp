@@ -1730,8 +1730,15 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::map<std::string, std::vector<size_t>>& lc,
     const Dict& opts) const {
 #ifdef WITH_FMU
+  // Iterator for options lookup
+  Dict::const_iterator it;
+  // Auxilliary variables, if any
+  std::vector<std::string> aux;
+  if ((it = opts.find("aux")) != opts.end()) {
+    aux = it->second;
+  }
   // New FMU instance (to be shared between derivative functions)
-  Fmu* fmu = new Fmu(name_in, name_out, scheme, lc);
+  Fmu* fmu = new Fmu(name_in, name_out, scheme, aux, lc);
   try {
     // Initialize
     fmu->init(this);

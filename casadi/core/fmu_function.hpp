@@ -266,6 +266,7 @@ struct CASADI_EXPORT Fmu {
   // Constructor
   Fmu(const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::vector<std::string>& aux,
     const std::map<std::string, std::vector<size_t>>& lc);
 
   // Initialize
@@ -277,9 +278,13 @@ struct CASADI_EXPORT Fmu {
   // DLL
   Importer li_;
 
-  // IO scheme, linear combinations
+  // IO scheme
   std::vector<std::string> name_in_, name_out_;
-  std::map<std::string, std::vector<size_t>> scheme_, lc_;
+  std::map<std::string, std::vector<size_t>> scheme_;
+  std::vector<std::string> aux_;
+
+  // Linear combinations
+  std::map<std::string, std::vector<size_t>> lc_;
 
   // Mapping from scheme variable to and from FMU variable indices
   std::vector<size_t> iind_, iind_map_, oind_, oind_map_;
@@ -349,7 +354,7 @@ struct CASADI_EXPORT Fmu {
   // Auxilliary variables, by type
   std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
   std::vector<fmi2ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
-  Value aux_;
+  Value aux_value_;
 
   // Sparsity pattern for Jacobian of all outputs w.r.t. all inputs
   Sparsity sp_jac_;
