@@ -1732,13 +1732,31 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
 #ifdef WITH_FMU
   // Iterator for options lookup
   Dict::const_iterator it;
+  // Scheme inputs
+  std::vector<std::string> scheme_in;
+  bool has_in = false;
+  if ((it = opts.find("scheme_in")) != opts.end()) {
+    scheme_in = it->second;
+    has_in = true;
+  }
+  // Scheme outputs
+  std::vector<std::string> scheme_out;
+  bool has_out = false;
+  if ((it = opts.find("scheme_out")) != opts.end()) {
+    scheme_out = it->second;
+    has_out = true;
+  }
+  // If scheme_in and/or scheme_out not provided, identify from name_in, name_out
+  if (!has_in || !has_out) {
+    FmuFunction::identify_io(has_in ? 0 : &scheme_in, has_out ? 0 : &scheme_out, name_in, name_out);
+  }
   // Auxilliary variables, if any
   std::vector<std::string> aux;
   if ((it = opts.find("aux")) != opts.end()) {
     aux = it->second;
   }
   // New FMU instance (to be shared between derivative functions)
-  Fmu* fmu = new Fmu(name_in, name_out, scheme, aux, lc);
+  Fmu* fmu = new Fmu(scheme_in, scheme_out, scheme, aux, lc);
   try {
     // Initialize
     fmu->init(this);

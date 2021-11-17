@@ -82,7 +82,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   // Mark input indices
   size_t numel = 0;
   std::vector<bool> lookup(dae->variables_.size(), false);
-  for (auto&& n : name_in_) {
+  for (auto&& n : scheme_in_) {
     for (size_t i : scheme_.at(n)) {
       casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
       lookup.at(i) = true;
@@ -103,7 +103,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   // Mark output indices
   numel = 0;
   std::fill(lookup.begin(), lookup.end(), false);
-  for (auto&& n : name_out_) {
+  for (auto&& n : scheme_out_) {
     for (size_t i : scheme_.at(n)) {
       casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
       lookup.at(i) = true;
@@ -122,18 +122,18 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     }
   }
   // Inputs
-  ired_.resize(name_in_.size());
+  ired_.resize(scheme_in_.size());
   for (size_t i = 0; i < ired_.size(); ++i) {
-    auto&& s = scheme_.at(name_in_[i]);
+    auto&& s = scheme_.at(scheme_in_[i]);
     ired_[i].resize(s.size());
     for (size_t k = 0; k < s.size(); ++k) {
       ired_[i][k] = iind_map_.at(s[k]);
     }
   }
   // Outputs
-  ored_.resize(name_out_.size());
+  ored_.resize(scheme_out_.size());
   for (size_t i = 0; i < ored_.size(); ++i) {
-    auto&& s = scheme_.at(name_out_[i]);
+    auto&& s = scheme_.at(scheme_out_[i]);
     ored_[i].resize(s.size());
     for (size_t k = 0; k < s.size(); ++k) {
       ored_[i][k] = oind_map_.at(s[k]);
@@ -1015,11 +1015,11 @@ Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<si
   return sp_jac_.sub(osub1, isub1, mapping);
 }
 
-Fmu::Fmu(const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
+Fmu::Fmu(const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux,
     const std::map<std::string, std::vector<size_t>>& lc)
-    : scheme_(scheme), aux_(aux), lc_(lc) {
+    : scheme_in_(scheme_in), scheme_out_(scheme_out), scheme_(scheme), aux_(aux), lc_(lc) {
   counter_ = 0;
   instantiate_ = 0;
   free_instance_ = 0;
@@ -1032,22 +1032,12 @@ Fmu::Fmu(const std::vector<std::string>& name_in, const std::vector<std::string>
   set_boolean_ = 0;
   get_real_ = 0;
   get_directional_derivative_ = 0;
-  // Get input names
-  name_in_.clear();
-  for (auto&& n : name_in) {
-    if (scheme_.find(n) != scheme_.end()) name_in_.push_back(n);
-  }
-  // Get output names
-  name_out_.clear();
-  for (auto&& n : name_out) {
-    if (scheme_.find(n) != scheme_.end()) name_out_.push_back(n);
-  }
 }
 
 size_t Fmu::index_in(const std::string& n) const {
   // Linear search for the input
-  for (size_t i = 0; i < name_in_.size(); ++i) {
-    if (name_in_[i] == n) return i;
+  for (size_t i = 0; i < scheme_in_.size(); ++i) {
+    if (scheme_in_[i] == n) return i;
   }
   // Not found
   casadi_error("No such input: " + n);
@@ -1056,8 +1046,8 @@ size_t Fmu::index_in(const std::string& n) const {
 
 size_t Fmu::index_out(const std::string& n) const {
   // Linear search for the input
-  for (size_t i = 0; i < name_out_.size(); ++i) {
-    if (name_out_[i] == n) return i;
+  for (size_t i = 0; i < scheme_out_.size(); ++i) {
+    if (scheme_out_[i] == n) return i;
   }
   // Not found
   casadi_error("No such output: " + n);
@@ -1330,6 +1320,71 @@ void FmuFunction::init(const Dict& opts) {
     casadi_jac_work(&p_, &jac_iw_, &jac_w_);
     alloc_iw(max_n_task_ * jac_iw_, true);
     alloc_w(max_n_task_ * jac_w_, true);
+  }
+}
+
+void FmuFunction::identify_io(
+    std::vector<std::string>* scheme_in,
+    std::vector<std::string>* scheme_out,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out) {
+  // Clear returns
+  if (scheme_in) scheme_in->clear();
+  if (scheme_out) scheme_out->clear();
+  // Parse FmuFunction inputs
+  for (const std::string& n : name_in) {
+    if (has_prefix(n)) {
+      // Get the prefix
+      std::string pref, rem;
+      pref = pop_prefix(n, &rem);
+      if (pref == "out") {
+        // Nondifferentiated function output (unused)
+        if (scheme_out) scheme_out->push_back(rem);
+      } else if (pref == "adj") {
+        // Adjoint seed
+        if (scheme_out) scheme_out->push_back(rem);
+      } else {
+        // No such prefix
+        casadi_error("No such prefix: " + pref);
+      }
+    } else {
+      // No prefix - regular input
+      if (scheme_in) scheme_in->push_back(n);
+    }
+  }
+  // Parse FmuFunction outputs
+  for (const std::string& n : name_out) {
+    if (has_prefix(n)) {
+      // Get the prefix
+      std::string part1, rem;
+      part1 = pop_prefix(n, &rem);
+      if (part1 == "jac") {
+        // Jacobian block
+        casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
+        std::string part2 = pop_prefix(rem, &rem);
+        if (scheme_out) scheme_out->push_back(part2);
+        if (scheme_in) scheme_in->push_back(rem);
+      } else if (part1 == "adj") {
+        // Adjoint sensitivity
+        if (scheme_in) scheme_in->push_back(rem);
+      } else {
+        // No such prefix
+        casadi_error("No such prefix: " + part1);
+      }
+    } else {
+      // No prefix - regular output
+      if (scheme_out) scheme_out->push_back(n);
+    }
+  }
+  // Remove duplicates in scheme_in, also sorts alphabetically
+  if (scheme_in) {
+    std::set<std::string> s(scheme_in->begin(), scheme_in->end());
+    scheme_in->assign(s.begin(), s.end());
+  }
+  // Remove duplicates in scheme_out, also sorts alphabetically
+  if (scheme_out) {
+    std::set<std::string> s(scheme_out->begin(), scheme_out->end());
+    scheme_out->assign(s.begin(), s.end());
   }
 }
 

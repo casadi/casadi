@@ -264,7 +264,7 @@ CASADI_EXPORT std::string to_string(Parallelization v);
 // Interface to binary FMU (shared between derivatives)
 struct CASADI_EXPORT Fmu {
   // Constructor
-  Fmu(const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
+  Fmu(const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux,
     const std::map<std::string, std::vector<size_t>>& lc);
@@ -279,8 +279,10 @@ struct CASADI_EXPORT Fmu {
   Importer li_;
 
   // IO scheme
-  std::vector<std::string> name_in_, name_out_;
+  std::vector<std::string> scheme_in_, scheme_out_;
   std::map<std::string, std::vector<size_t>> scheme_;
+
+  // Auxilliary outputs
   std::vector<std::string> aux_;
 
   // Linear combinations
@@ -541,6 +543,13 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /// Initialize
   void init(const Dict& opts) override;
+
+  // Identify input and output schemes from FmuFunction inputs and outputs
+  static void identify_io(
+    std::vector<std::string>* scheme_in,
+    std::vector<std::string>* scheme_out,
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out);
 
   // Parse input name
   void parse_input(InputStruct* s, const std::string& n) const;
