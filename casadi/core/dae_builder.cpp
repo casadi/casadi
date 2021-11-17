@@ -1093,29 +1093,11 @@ void DaeBuilder::reset() {
   }
 }
 
-double DaeBuilder::value(const std::string& name) const {
-  try {
-    return (*this)->attribute(Attribute::VALUE, name);
-  } catch (std::exception& e) {
-    THROW_ERROR("value", e.what());
-    return {}; // never reached
-  }
-}
-
 void DaeBuilder::set(const std::string& name, double val) {
   try {
     (*this)->set_attribute(Attribute::VALUE, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set", e.what());
-  }
-}
-
-std::string DaeBuilder::string_value(const std::string& name) const {
-  try {
-    return (*this)->string_attribute(Attribute::STRINGVALUE, name);
-  } catch (std::exception& e) {
-    THROW_ERROR("string_value", e.what());
-    return {}; // never reached
   }
 }
 
@@ -1127,29 +1109,11 @@ void DaeBuilder::set(const std::string& name, const std::string& val) {
   }
 }
 
-std::vector<double> DaeBuilder::value(const std::vector<std::string>& name) const {
-  try {
-    return (*this)->attribute(Attribute::VALUE, name);
-  } catch (std::exception& e) {
-    THROW_ERROR("value", e.what());
-    return {}; // never reached
-  }
-}
-
 void DaeBuilder::set(const std::vector<std::string>& name, const std::vector<double>& val) {
   try {
     (*this)->set_attribute(Attribute::VALUE, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set", e.what());
-  }
-}
-
-std::vector<std::string> DaeBuilder::string_value(const std::vector<std::string>& name) const {
-  try {
-    return (*this)->string_attribute(Attribute::STRINGVALUE, name);
-  } catch (std::exception& e) {
-    THROW_ERROR("string_value", e.what());
-    return {}; // never reached
   }
 }
 

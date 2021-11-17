@@ -502,12 +502,6 @@ public:
   // Set the current value, single value (string)
   void set(const std::string& name, const std::string& val);
 
-  // Get the current value, single value
-  double value(const std::string& name) const;
-
-  // Get the current value, single value (string)
-  std::string string_value(const std::string& name) const;
-
 #endif  // !SWIGMATLAB
 
   /// Get an attribute
@@ -540,12 +534,6 @@ public:
 
   /// Set the start attribute
   void set_start(const std::vector<std::string>& name, const std::vector<double>& val);
-
-  /// Get the current value
-  std::vector<double> value(const std::vector<std::string>& name) const;
-
-  /// Get the current value (string)
-  std::vector<std::string> string_value(const std::vector<std::string>& name) const;
 
   /// Set the current value
   void set(const std::vector<std::string>& name, const std::vector<double>& val);
