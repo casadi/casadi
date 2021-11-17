@@ -78,7 +78,7 @@ std::string Fmu::dll_suffix() {
 #endif
 }
 
-void Fmu::init(DaeBuilderInternal* dae) {
+void Fmu::init(const DaeBuilderInternal* dae) {
   // Mark input indices
   size_t numel = 0;
   std::vector<bool> lookup(dae->variables_.size(), false);
@@ -330,10 +330,6 @@ void Fmu::init(DaeBuilderInternal* dae) {
   // Get auxilliary variables
   if (get_aux(c, &aux_)) {
     casadi_error("Fmu::get_aux failed");
-  }
-  // Get all values
-  if (get_values(c, dae)) {
-    casadi_error("Fmu::get_values failed");
   }
   // Free memory
   free_instance(c);
@@ -626,74 +622,6 @@ void Fmu::get_stats(FmuMemory* m, Dict* stats) const {
   }
   // Copy to stats
   (*stats)["aux"] = aux;
-}
-
-int Fmu::get_values(fmi2Component c, DaeBuilderInternal* dae) const {
-  // Retrieve values
-  for (Variable& v : dae->variables_) {
-    // Convert to expected type
-    fmi2ValueReference vr = v.value_reference;
-    // Get value
-    switch (v.type) {
-      // Skip if the wrong type
-      if (v.causality == Causality::PARAMETER || v.causality == Causality::INPUT) continue;
-      // Get by type
-      case Type::REAL:
-        {
-          // Real
-          fmi2Real value;
-          fmi2Status status = get_real_(c, &vr, 1, &value);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2GetReal failed for " + v.name);
-            return 1;
-          }
-          v.value = value;
-          break;
-        }
-      case Type::INTEGER:
-      case Type::ENUM:
-        {
-          // Integer: Convert to double
-          fmi2Integer value;
-          fmi2Status status = get_integer_(c, &vr, 1, &value);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2GetInteger failed for " + v.name);
-            return 1;
-          }
-          v.value = value;
-          break;
-        }
-      case Type::BOOLEAN:
-        {
-          // Boolean: Convert to double
-          fmi2Boolean value;
-          fmi2Status status = get_boolean_(c, &vr, 1, &value);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2GetBoolean failed for " + v.name);
-            return 1;
-          }
-          v.value = value;
-          break;
-        }
-      case Type::STRING:
-        {
-          // String
-          fmi2String value;
-          fmi2Status status = get_string_(c, &vr, 1, &value);
-          if (status != fmi2OK) {
-            casadi_warning("fmi2GetString failed for " + v.name);
-            return 1;
-          }
-          v.stringvalue = value;
-          v.value = 0;
-          break;
-        }
-      default:
-        casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
-    }
-  }
-  // Successful return
-  return 0;
 }
 
 void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {

@@ -269,7 +269,7 @@ struct CASADI_EXPORT Fmu {
     const std::map<std::string, std::vector<size_t>>& lc);
 
   // Initialize
-  void init(DaeBuilderInternal* dae);
+  void init(const DaeBuilderInternal* dae);
 
   // Reference counter
   int counter_;
@@ -389,9 +389,6 @@ struct CASADI_EXPORT Fmu {
 
   // Retrieve auxilliary variables from FMU
   int get_aux(fmi2Component c, Value* v) const;
-
-  // Retrieve values from FMU, copy to DaeBuilder
-  int get_values(fmi2Component c, DaeBuilderInternal* dae) const;
 
   /** \brief Get stats */
   void get_stats(FmuMemory* m, Dict* stats) const;

@@ -255,7 +255,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   Function fmu_fun(const std::string& fname,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
-      const Dict& opts);
+      const Dict& opts) const;
 
   /// Construct function from an FMU DLL
   Function fmu_fun(const std::string& name,
@@ -263,7 +263,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
       const std::vector<std::string>& name_out,
       const std::map<std::string, std::vector<size_t>>& scheme,
       const std::map<std::string, std::vector<size_t>>& lc,
-      const Dict& opts);
+      const Dict& opts) const;
 
   /// Construct a function for evaluating dependent parameters
   Function dependent_fun(const std::string& fname,

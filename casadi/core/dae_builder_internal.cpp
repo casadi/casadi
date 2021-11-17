@@ -1728,7 +1728,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::map<std::string, std::vector<size_t>>& lc,
-    const Dict& opts) {
+    const Dict& opts) const {
 #ifdef WITH_FMU
   // New FMU instance (to be shared between derivative functions)
   Fmu* fmu = new Fmu(name_in, name_out, scheme, lc);
@@ -1750,7 +1750,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
 Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
-    const Dict& opts) {
+    const Dict& opts) const {
   // Generate IO scheme
   std::map<std::string, std::vector<size_t>> scheme, lc;
   scheme["t"] = ind_in("t");
