@@ -96,8 +96,8 @@ CASADI_EXPORT std::string to_string(Attribute v) {
   case Attribute::MAX: return "max";
   case Attribute::NOMINAL: return "nominal";
   case Attribute::START: return "start";
-  case Attribute::VALUE: return "nominal";
-  case Attribute::STRINGVALUE: return "STRINGVALUE";
+  case Attribute::VALUE: return "value";
+  case Attribute::STRINGVALUE: return "stringvalue";
   default: break;
   }
   return "";
