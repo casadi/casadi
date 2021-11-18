@@ -1253,13 +1253,13 @@ void FmuFunction::init(const Dict& opts) {
         // Skip if no entries
         if (oind.empty()) continue;
         // Consistency check
-        bool exists = in_jac[oind.front()];
-        for (size_t j : oind) casadi_assert(in_jac[j] == exists, "Jacobian block not a block");
+        bool exists = in_jac[oind.front()] > 0;
+        for (size_t j : oind) casadi_assert((in_jac[j] > 0) == exists, "Jacobian not a block");
         // Add selection
         if (!exists) {
           for (size_t j : oind) {
             jac_out_.push_back(j);
-            in_jac[j] = true;
+            in_jac[j] = jac_out_.size();
           }
         }
       }
