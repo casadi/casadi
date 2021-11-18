@@ -1489,8 +1489,19 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     jac_nz = w; w += sp_ext_.nnz();
   }
   if (need_adj) {
+    // Set up vectors
     aseed = w; w += fmu_->oind_.size();
     asens = w; w += fmu_->iind_.size();
+    // Clear seed/sensitivity vectors
+    std::fill(aseed, aseed + fmu_->oind_.size(), 0);
+    std::fill(asens, asens + fmu_->iind_.size(), 0);
+    // Copy adjoint seeds to aseed
+    for (size_t i = 0; i < in_.size(); ++i) {
+      if (arg[i] && in_[i].type == ADJ_SEED) {
+        const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
+        for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
+      }
+    }
   }
   // Set work vectors (for master thread)
   m->arg = arg;
@@ -1597,7 +1608,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     for (size_t i = 0; i < out_.size(); ++i) {
       if (res[i] && out_[i].type == ADJ_SENS) {
         double* r = res[i];
-        for (size_t id : fmu_->ired_[out_[i].wrt]) *r++ = aseed[id];
+        for (size_t id : fmu_->ired_[out_[i].wrt]) *r++ = asens[id];
       }
     }
   }
@@ -1634,20 +1645,6 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
       }
     }
   }
-  // Setup adjoint calculation
-  if (need_adj) {
-    // Clear seed/sensitivity vectors
-    std::fill(m->aseed, m->aseed + fmu_->oind_.size(), 0);
-    std::fill(m->asens, m->asens + fmu_->iind_.size(), 0);
-    // Copy adjoint seeds to aseed
-    for (size_t i = 0; i < in_.size(); ++i) {
-      if (m->arg[i] && in_[i].type == ADJ_SEED) {
-        const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
-        for (size_t k = 0; k < oind.size(); ++k) m->aseed[oind[k]] = m->arg[i][k];
-      }
-    }
-  }
-
   // Evalute Jacobian blocks
   if (need_jac || need_adj) {
     // Selection of colors to be evaluated for the thread
@@ -1672,7 +1669,7 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Propagate adjoint sensitivities
       if (need_adj) {
         for (casadi_int i = 0; i < d.nsens; ++i)
-          m->asens[d.isens[i]] += m->aseed[d.iseed[i]] * d.sens[i];
+          m->asens[d.wrt[i]] += m->aseed[d.isens[i]] * d.sens[i];
       }
     }
   }
