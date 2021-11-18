@@ -670,27 +670,6 @@ void DaeBuilder::add_lc(const std::string& name,
   }
 }
 
-Function DaeBuilder::create(const std::string& name,
-    const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out,
-    const std::map<std::string, std::vector<std::string>>& scheme,
-    const std::map<std::string, std::vector<std::string>>& lc,
-    const Dict& opts) {
-  try {
-    // IO scheme: Get indices
-    std::map<std::string, std::vector<size_t>> scheme_ind;
-    for (auto&& e : scheme) scheme_ind[e.first] = find(e.second);
-    // Linear combinations: Get indices
-    std::map<std::string, std::vector<size_t>> lc_ind;
-    for (auto&& e : lc) lc_ind[e.first] = find(e.second);
-    // Call internal routine
-    return (*this)->create(name, name_in, name_out, scheme_ind, lc_ind, opts);
-  } catch (std::exception& e) {
-    THROW_ERROR("create", e.what());
-    return Function(); // never reached
-  }
-}
-
 Function DaeBuilder::create(const std::string& fname,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out, bool sx, bool lifted_calls) {
@@ -883,9 +862,7 @@ size_t DaeBuilder::find(const std::string& name) const {
 
 std::vector<size_t> DaeBuilder::find(const std::vector<std::string>& name) const {
   try {
-    std::vector<size_t> r(name.size());
-    for (size_t i = 0; i < r.size(); ++i) r[i] = find(name[i]);
-    return r;
+    return (*this)->find(name);
   } catch (std::exception& e) {
     THROW_ERROR("find", e.what());
     return {}; // never reached

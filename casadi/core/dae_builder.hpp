@@ -355,22 +355,6 @@ public:
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out, bool sx = false, bool lifted_calls = false);
 
-  /** \brief  Load a function from an FMU DLL, indices provided
-    \param name    Name assigned to the resulting function object
-    \param name_in   Names of all the inputs
-    \param name_out  Names of all the outputs
-    \param scheme  Indices corresponding to inputs and outputs
-    \param lc  Definition of linear combinations out output variables
-    \param opts  Optional settings
-  */
-  Function create(const std::string& name,
-      const std::vector<std::string>& name_in,
-      const std::vector<std::string>& name_out,
-      const std::map<std::string, std::vector<std::string>>& scheme,
-      const std::map<std::string, std::vector<std::string>>& lc,
-      const Dict& opts=Dict());
-  ///@}
-
   /** \brief  Construct a function object, names provided
     \param name    Name assigned to the resulting function object
     \param name_in   Names of all the inputs

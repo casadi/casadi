@@ -1015,11 +1015,11 @@ Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<si
   return sp_jac_.sub(osub1, isub1, mapping);
 }
 
-Fmu::Fmu(const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
+Fmu::Fmu(const std::vector<std::string>& scheme_in,
+    const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
-    const std::vector<std::string>& aux,
-    const std::map<std::string, std::vector<size_t>>& lc)
-    : scheme_in_(scheme_in), scheme_out_(scheme_out), scheme_(scheme), aux_(aux), lc_(lc) {
+    const std::vector<std::string>& aux)
+    : scheme_in_(scheme_in), scheme_out_(scheme_out), scheme_(scheme), aux_(aux) {
   counter_ = 0;
   instantiate_ = 0;
   free_instance_ = 0;
@@ -1101,7 +1101,7 @@ const Options FmuFunction::options_
     {"scheme_out",
      {OT_STRINGVECTOR,
       "Names of the outputs in the scheme"}},
-    {"scheme_def",
+    {"scheme",
      {OT_DICT,
       "Definitions of the scheme variables"}},
     {"aux",

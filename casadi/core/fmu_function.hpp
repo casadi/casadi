@@ -265,9 +265,7 @@ CASADI_EXPORT std::string to_string(Parallelization v);
 struct CASADI_EXPORT Fmu {
   // Constructor
   Fmu(const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
-    const std::map<std::string, std::vector<size_t>>& scheme,
-    const std::vector<std::string>& aux,
-    const std::map<std::string, std::vector<size_t>>& lc);
+    const std::map<std::string, std::vector<size_t>>& scheme, const std::vector<std::string>& aux);
 
   // Initialize
   void init(const DaeBuilderInternal* dae);
@@ -284,9 +282,6 @@ struct CASADI_EXPORT Fmu {
 
   // Auxilliary outputs
   std::vector<std::string> aux_;
-
-  // Linear combinations
-  std::map<std::string, std::vector<size_t>> lc_;
 
   // Mapping from scheme variable to and from FMU variable indices
   std::vector<size_t> iind_, iind_map_, oind_, oind_map_;

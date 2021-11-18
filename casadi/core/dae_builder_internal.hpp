@@ -237,32 +237,16 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 
-  /// Construct a function object, component indices given
-  Function create(const std::string& name,
-      const std::vector<std::string>& name_in,
-      const std::vector<std::string>& name_out,
-      const std::map<std::string, std::vector<size_t>>& scheme,
-      const std::map<std::string, std::vector<size_t>>& lc,
-      const Dict& opts);
-
   /// Construct a function object
   Function create(const std::string& fname,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const Dict& opts, bool sx, bool lifted_calls);
 
-  /// Construct function from an FMU DLL, names given
+  /// Construct function from an FMU DLL
   Function fmu_fun(const std::string& fname,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
-      const Dict& opts) const;
-
-  /// Construct function from an FMU DLL
-  Function fmu_fun(const std::string& name,
-      const std::vector<std::string>& name_in,
-      const std::vector<std::string>& name_out,
-      const std::map<std::string, std::vector<size_t>>& scheme,
-      const std::map<std::string, std::vector<size_t>>& lc,
       const Dict& opts) const;
 
   /// Construct a function for evaluating dependent parameters
@@ -324,6 +308,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Get index of variable
   size_t find(const std::string& name) const;
+
+  /// Get indices of variable
+  std::vector<size_t> find(const std::vector<std::string>& name) const;
 
   /// Get the (cached) oracle, SX or MX
   const Function& oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
