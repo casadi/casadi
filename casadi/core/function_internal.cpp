@@ -366,10 +366,6 @@ namespace casadi {
     opts["always_inline"] = always_inline_;
     opts["never_inline"] = never_inline_;
     opts["max_num_dir"] = max_num_dir_;
-    opts["enable_forward"] = enable_forward_op_;
-    opts["enable_reverse"] = enable_reverse_op_;
-    opts["enable_jacobian"] = enable_jacobian_op_;
-    opts["enable_fd"] = enable_fd_op_;
     opts["fd_options"] = fd_options_;
     opts["fd_method"] = fd_method_;
     opts["print_in"] = print_in_;
