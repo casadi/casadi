@@ -376,10 +376,6 @@ namespace casadi {
     opts["dump_dir"] = dump_dir_;
     opts["dump_format"] = dump_format_;
     opts["dump"] = dump_;
-    opts["forward_options"] = forward_options_;
-    opts["reverse_options"] = reverse_options_;
-    //opts["is_diff_in"] = is_diff_in_;
-    //opts["is_diff_out"] = is_diff_out_;
     return opts;
   }
 
