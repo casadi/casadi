@@ -592,9 +592,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
   ///@}
 
+  // Are all inputs/outputs regular?
+  bool all_regular() const;
+
   ///@{
   /** \brief Full Jacobian */
-  bool has_jacobian() const override {return true;}
+  bool has_jacobian() const override;
   Function get_jacobian(const std::string& name,
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,
@@ -603,7 +606,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   ///@{
   /** \brief Reverse mode AD */
-  bool has_reverse(casadi_int nadj) const override { return nadj == 1;}
+  bool has_reverse(casadi_int nadj) const override;
   Function get_reverse(casadi_int nadj, const std::string& name,
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,

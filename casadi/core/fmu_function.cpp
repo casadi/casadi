@@ -1715,6 +1715,19 @@ std::string FmuFunction::pop_prefix(const std::string& s, std::string* rem) {
   return r;
 }
 
+bool FmuFunction::all_regular() const {
+  // Look for any non-regular input
+  for (auto&& e : in_) if (e.type != REG_INPUT) return false;
+  // Look for any non-regular output
+  for (auto&& e : out_) if (e.type != REG_OUTPUT) return false;
+  // Only regular inputs and outputs
+  return true;
+}
+
+bool FmuFunction::has_jacobian() const {
+  return all_regular();
+}
+
 Function FmuFunction::get_jacobian(const std::string& name, const std::vector<std::string>& inames,
     const std::vector<std::string>& onames, const Dict& opts) const {
   // Hack: Inherit parallelization, verbosity option
@@ -1726,6 +1739,13 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
   ret.own(new FmuFunction(name, fmu_, inames, onames));
   ret->construct(opts1);
   return ret;
+}
+
+bool FmuFunction::has_reverse(casadi_int nadj) const {
+  // Only first order analytic derivative possible
+  if (!all_regular()) return false;
+  // Otherwise: Only 1 direction implemented
+  return nadj == 1;
 }
 
 Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
