@@ -1072,6 +1072,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   // Default options
   enable_ad_ = fmu_->get_directional_derivative_ != 0;
   validate_ad_ = false;
+  enable_fd_op_ = enable_ad_ && !all_regular();  // Use FD for second and higher order derivatives
   step_ = 1e-6;
   abstol_ = 1e-3;
   reltol_ = 1e-3;
