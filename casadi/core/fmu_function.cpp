@@ -1767,12 +1767,25 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 }
 
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
-  return in_.at(iind).type == REG_INPUT && out_.at(oind).type == REG_OUTPUT;
+  // Available in the FMU meta information
+  if (out_.at(oind).type == REG_OUTPUT && in_.at(iind).type == REG_INPUT)
+    return true;
+  else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == ADJ_SEED)
+    return true;
+  // Not available
+  return false;
 }
 
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
-  return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
+  // Available in the FMU meta information
+  if (out_.at(oind).type == REG_OUTPUT && in_.at(iind).type == REG_INPUT)
+    return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
+  else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == ADJ_SEED)
+    return fmu_->jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
+  // Not available
+  casadi_error("Implementation error");
+  return Sparsity();
 }
 
 Dict FmuFunction::get_stats(void *mem) const {
