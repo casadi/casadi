@@ -129,6 +129,17 @@ void XmlNode::read(const std::string& str, std::vector<casadi_int>* val) {
   }
 }
 
+void XmlNode::read(const std::string& str, std::vector<std::string>* val) {
+  val->clear();
+  std::istringstream buffer(str);
+  while (true) {
+    std::string v;
+    buffer >> v;
+    if (buffer.fail()) break;
+    val->push_back(v);
+  }
+}
+
 std::vector<std::string> XmlNode::child_names() const {
   std::vector<std::string> ret;
   ret.reserve(this->children.size());

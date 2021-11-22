@@ -129,6 +129,9 @@ struct CASADI_EXPORT XmlNode {
   /** \brief  Read a vector of integer values of a string */
   static void read(const std::string& str, std::vector<casadi_int>* val);
 
+  /** \brief  Read a vector of string values of a string */
+  static void read(const std::string& str, std::vector<std::string>* val);
+
   /** \brief Print to stream */
   CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream, const XmlNode& node);
 

@@ -356,6 +356,9 @@ struct CASADI_EXPORT Fmu {
   // Sparsity pattern for Jacobian of all outputs w.r.t. all inputs
   Sparsity sp_jac_;
 
+  // Sparsity pattern for Hessian of a linear combination of all outputs w.r.t. all inputs
+  Sparsity sp_hess_;
+
   // Graph coloring for sp_jac_
   Sparsity coloring_jac_;
 
@@ -441,6 +444,14 @@ struct CASADI_EXPORT Fmu {
   // Get Jacobian sparsity for an output/input pair
   Sparsity jac_sparsity(size_t oind, size_t iind) const {
     return jac_sparsity(ored_.at(oind), ired_.at(iind));
+  }
+
+  // Get Hessian sparsity for a subset of inputs
+  Sparsity hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const;
+
+  // Get Jacobian sparsity for an input/input pair
+  Sparsity hess_sparsity(size_t r, size_t c) const {
+    return hess_sparsity(ired_.at(r), ired_.at(c));
   }
 
   // Name of system, per the FMI specification

@@ -52,6 +52,9 @@ enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
 // Attributes
 enum class Attribute {MIN, MAX, NOMINAL, START, VALUE, STRINGVALUE, NUMEL};
 
+// Permitted dependenciesKind values
+enum class DependenciesKind {DEPENDENT, CONSTANT, FIXED, TUNABLE, DISCRETE, NUMEL};
+
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
     \date 2012-2021
     \author Joel Andersson
@@ -100,6 +103,9 @@ struct CASADI_EXPORT Variable {
 
   /// Dependencies
   std::vector<casadi_int> dependencies;
+
+  /// Dependencies
+  std::vector<DependenciesKind> dependenciesKind;
 
   /// Variable expression
   MX v;
@@ -317,6 +323,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Get Jacobian sparsity
   Sparsity jac_sparsity(const std::vector<size_t>& oind, const std::vector<size_t>& iind) const;
+
+  /// Get what is known of the Hessian sparsity
+  Sparsity hess_sparsity(const std::vector<size_t>& oind, const std::vector<size_t>& iind) const;
 
   // Internal methods
 protected:
@@ -545,6 +554,7 @@ CASADI_EXPORT std::string to_string(Causality v);
 CASADI_EXPORT std::string to_string(Variability v);
 CASADI_EXPORT std::string to_string(Initial v);
 CASADI_EXPORT std::string to_string(Attribute v);
+CASADI_EXPORT std::string to_string(DependenciesKind v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
 ///@}

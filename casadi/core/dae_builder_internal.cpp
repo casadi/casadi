@@ -103,6 +103,18 @@ CASADI_EXPORT std::string to_string(Attribute v) {
   return "";
 }
 
+CASADI_EXPORT std::string to_string(DependenciesKind v) {
+  switch (v) {
+  case DependenciesKind::DEPENDENT: return "dependent";
+  case DependenciesKind::CONSTANT: return "constant";
+  case DependenciesKind::FIXED: return "fixed";
+  case DependenciesKind::TUNABLE: return "tunable";
+  case DependenciesKind::DISCRETE: return "discrete";
+  default: break;
+  }
+  return "";
+}
+
 double Variable::attribute(Attribute a) const {
   switch (a) {
     case Attribute::MIN:
@@ -2101,11 +2113,22 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     for (auto& e : n["Outputs"].children) {
       // Get index
       outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+      // Corresponding variable
+      Variable& v = variables_.at(outputs_.back());
       // Get dependencies
-      variables_.at(outputs_.back()).dependencies
-        = e.attribute<std::vector<casadi_int>>("dependencies", {});
+      v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
+      // dependenciesKind attribute, if present
+      if (e.has_attribute("dependenciesKind")) {
+        // Load list of strings
+        auto dK = e.attribute<std::vector<std::string>>("dependenciesKind", {});
+        // Convert to enum, add to list
+        v.dependenciesKind.reserve(v.dependencies.size());
+        for (auto&& s : dK) {
+          v.dependenciesKind.push_back(to_enum<DependenciesKind>(s));
+        }
+      }
       // Mark interdependencies, change to index-0
-      for (casadi_int& d : variables_.at(outputs_.back()).dependencies) {
+      for (casadi_int& d : v.dependencies) {
         variables_.at(--d).dependency = true;
       }
     }
@@ -2115,11 +2138,22 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     for (auto& e : n["Derivatives"].children) {
       // Get index
       derivatives_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+      // Corresponding variable
+      Variable& v = variables_.at(derivatives_.back());
       // Get dependencies
-      variables_.at(derivatives_.back()).dependencies
-        = e.attribute<std::vector<casadi_int>>("dependencies", {});
+      v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
+      // dependenciesKind attribute, if present
+      if (e.has_attribute("dependenciesKind")) {
+        // Load list of strings
+        auto dK = e.attribute<std::vector<std::string>>("dependenciesKind", {});
+        // Convert to enum, add to list
+        v.dependenciesKind.reserve(v.dependencies.size());
+        for (auto&& s : dK) {
+          v.dependenciesKind.push_back(to_enum<DependenciesKind>(s));
+        }
+      }
       // Mark interdependencies, change to index-0
-      for (casadi_int& d : variables_.at(derivatives_.back()).dependencies) {
+      for (casadi_int& d : v.dependencies) {
         variables_.at(--d).dependency = true;
       }
     }
@@ -2269,7 +2303,6 @@ Sparsity DaeBuilderInternal::jac_sparsity(const std::vector<size_t>& oind,
   std::vector<casadi_int> row, col;
   // Loop over output nonzeros
   for (casadi_int j = 0; j < oind.size(); ++j) {
-    // Loop over dependencies
     for (casadi_int d : variables_.at(oind[j]).dependencies) {
       casadi_int i = lookup.at(d);
       if (i >= 0) {
@@ -2280,6 +2313,36 @@ Sparsity DaeBuilderInternal::jac_sparsity(const std::vector<size_t>& oind,
   }
   // Assemble sparsity in triplet format
   return Sparsity::triplet(oind.size(), iind.size(), row, col);
+}
+
+Sparsity DaeBuilderInternal::hess_sparsity(const std::vector<size_t>& oind,
+    const std::vector<size_t>& iind) const {
+  // Mark inputs
+  std::vector<casadi_int> lookup(variables_.size(), -1);
+  for (size_t i = 0; i < iind.size(); ++i)
+    lookup.at(iind[i]) = i;
+  // Which variables enter as a nonlinear depdendency in any variable in oind
+  std::vector<bool> nonlin(iind.size(), false);
+  // Loop over outputs
+  for (casadi_int j = 0; j < oind.size(); ++j) {
+    // Get the corresponding variable
+    const Variable& v = variables_.at(oind[j]);
+    // Loop over dependencies
+    for (size_t k = 0; k < v.dependencies.size(); ++k) {
+      if (v.dependenciesKind.empty() || v.dependenciesKind.at(k) == DependenciesKind::DEPENDENT) {
+        casadi_int i = lookup.at(v.dependencies[k]);
+        if (i >= 0) nonlin.at(i) = true;
+      }
+    }
+  }
+  // Convert nonlin to a Sparsity pattern
+  std::vector<casadi_int> row;
+  for (size_t i = 0; i < nonlin.size(); ++i) {
+    if (nonlin[i]) row.push_back(i);
+  }
+  Sparsity n(iind.size(), 1, std::vector<casadi_int>{0, static_cast<casadi_int>(row.size())}, row);
+  // Outer product to get worst-case Hessian sparsity pattern
+  return mtimes(n, n.T());
 }
 
 } // namespace casadi

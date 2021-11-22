@@ -259,6 +259,9 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   // Get Jacobian sparsity information
   sp_jac_ = dae->jac_sparsity(oind_, iind_);
 
+  // Get Hessian sparsity information
+  sp_hess_ = dae->hess_sparsity(oind_, iind_);
+
   // Calculate graph coloring
   coloring_jac_ = sp_jac_.uni_coloring();
   if (dae->debug_) casadi_message("Graph coloring: " + str(sp_jac_.size2())
@@ -1015,6 +1018,16 @@ Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<si
   return sp_jac_.sub(osub1, isub1, mapping);
 }
 
+Sparsity Fmu::hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const {
+  // Convert to casadi_int type
+  std::vector<casadi_int> r1(r.begin(), r.end());
+  std::vector<casadi_int> c1(c.begin(), c.end());
+  // Index mapping (not used)
+  std::vector<casadi_int> mapping;
+  // Get selection
+  return sp_hess_.sub(r1, c1, mapping);
+}
+
 Fmu::Fmu(const std::vector<std::string>& scheme_in,
     const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
@@ -1461,7 +1474,7 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
     case ADJ_SENS:
       return Sparsity::dense(fmu_->ired_[out_.at(i).wrt].size(), 1);
     case JAC_OUTPUT:
-      return fmu_->jac_sparsity(fmu_->ored_.at(out_.at(i).ind), fmu_->ired_.at(out_.at(i).wrt));
+      return fmu_->jac_sparsity(out_.at(i).ind, out_.at(i).wrt);
   }
   return Sparsity();
 }
@@ -1772,6 +1785,8 @@ bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
     return true;
   else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == ADJ_SEED)
     return true;
+  else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == REG_INPUT)
+    return true;
   // Not available
   return false;
 }
@@ -1783,6 +1798,8 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
   else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == ADJ_SEED)
     return fmu_->jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
+  else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == REG_INPUT)
+    return fmu_->hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
   // Not available
   casadi_error("Implementation error");
   return Sparsity();
