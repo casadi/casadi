@@ -1781,12 +1781,19 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
   // Available in the FMU meta information
-  if (out_.at(oind).type == REG_OUTPUT && in_.at(iind).type == REG_INPUT)
-    return true;
-  else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == ADJ_SEED)
-    return true;
-  else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == REG_INPUT)
-    return true;
+  if (out_.at(oind).type == REG_OUTPUT) {
+    if (in_.at(iind).type == REG_INPUT) {
+      return true;
+    } else if (in_.at(iind).type == ADJ_SEED) {
+      return true;
+    }
+  } else if (out_.at(oind).type == ADJ_SENS) {
+    if (in_.at(iind).type == REG_INPUT) {
+      return true;
+    } else if (in_.at(iind).type == ADJ_SEED) {
+      return true;
+    }
+  }
   // Not available
   return false;
 }
@@ -1794,12 +1801,19 @@ bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
   // Available in the FMU meta information
-  if (out_.at(oind).type == REG_OUTPUT && in_.at(iind).type == REG_INPUT)
-    return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
-  else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == ADJ_SEED)
-    return fmu_->jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
-  else if (out_.at(oind).type == ADJ_SENS && in_.at(iind).type == REG_INPUT)
-    return fmu_->hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
+  if (out_.at(oind).type == REG_OUTPUT) {
+    if (in_.at(iind).type == REG_INPUT) {
+      return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
+    } else if (in_.at(iind).type == ADJ_SEED) {
+      return Sparsity(nnz_out(oind), nnz_in(iind));
+    }
+  } else if (out_.at(oind).type == ADJ_SENS) {
+    if (in_.at(iind).type == REG_INPUT) {
+      return fmu_->hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
+    } else if (in_.at(iind).type == ADJ_SEED) {
+      return fmu_->jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
+    }
+  }
   // Not available
   casadi_error("Implementation error");
   return Sparsity();
