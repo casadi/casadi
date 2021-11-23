@@ -482,7 +482,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     InputType type;
     // Corresponding index in Fmu
     size_t ind;
-    // Parse an input
+    // Parse an input string
     static InputStruct parse(const std::string& n, const Fmu* fmu,
       std::vector<std::string>* name_in = 0,
       std::vector<std::string>* name_out = 0);
@@ -504,6 +504,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     size_t wrt;
     // Selection
     size_t rbegin, rend, cbegin, cend;
+    // Parse an output string
+    static OutputStruct parse(const std::string& n, const Fmu* fmu,
+      std::vector<std::string>* name_in = 0,
+      std::vector<std::string>* name_out = 0);
     // Constructor
     OutputStruct() : ind(-1), wrt(-1), rbegin(-1), rend(-1), cbegin(-1), cend(-1) {}
   };
@@ -560,9 +564,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     std::vector<std::string>* scheme_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out);
-
-  // Parse output name
-  void parse_output(OutputStruct* s, const std::string& n) const;
 
   // Get sparsity pattern for extended Jacobian
   Sparsity sp_ext_;

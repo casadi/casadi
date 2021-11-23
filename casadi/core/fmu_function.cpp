@@ -1084,7 +1084,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   out_.resize(name_out.size());
   for (size_t k = 0; k < name_out.size(); ++k) {
     try {
-      parse_output(&out_[k], name_out[k]);
+      out_[k] = OutputStruct::parse(name_out[k], fmu);
     } catch (std::exception& e) {
       casadi_error("Cannot process output " + name_out[k] + ": " + std::string(e.what()));
     }
@@ -1366,27 +1366,7 @@ void FmuFunction::identify_io(
   // Parse FmuFunction outputs
   for (const std::string& n : name_out) {
     try {
-      if (has_prefix(n)) {
-        // Get the prefix
-        std::string part1, rem;
-        part1 = pop_prefix(n, &rem);
-        if (part1 == "jac") {
-          // Jacobian block
-          casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
-          std::string part2 = pop_prefix(rem, &rem);
-          if (scheme_out) scheme_out->push_back(part2);
-          if (scheme_in) scheme_in->push_back(rem);
-        } else if (part1 == "adj") {
-          // Adjoint sensitivity
-          if (scheme_in) scheme_in->push_back(rem);
-        } else {
-          // No such prefix
-          casadi_error("No such prefix: " + part1);
-        }
-      } else {
-        // No prefix - regular output
-        if (scheme_out) scheme_out->push_back(n);
-      }
+      (void)OutputStruct::parse(n, 0, scheme_in, scheme_out);
     } catch (std::exception& e) {
       casadi_error("Cannot process output " + n + ": " + std::string(e.what()));
     }
@@ -1448,7 +1428,10 @@ FmuFunction::InputStruct FmuFunction::InputStruct::parse(const std::string& n, c
   return s;
 }
 
-void FmuFunction::parse_output(OutputStruct* s, const std::string& n) const {
+FmuFunction::OutputStruct FmuFunction::OutputStruct::parse(const std::string& n, const Fmu* fmu,
+    std::vector<std::string>* name_in, std::vector<std::string>* name_out) {
+  // Return value
+  OutputStruct s;
   // Look for prefix
   if (has_prefix(n)) {
     // Get the prefix
@@ -1458,22 +1441,28 @@ void FmuFunction::parse_output(OutputStruct* s, const std::string& n) const {
       // Jacobian block
       casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
       std::string part2 = pop_prefix(rem, &rem);
-      s->type = JAC_OUTPUT;
-      s->ind = fmu_->index_out(part2);
-      s->wrt = fmu_->index_in(rem);
+      s.type = JAC_OUTPUT;
+      s.ind = fmu ? fmu->index_out(part2) : -1;
+      s.wrt = fmu ? fmu->index_in(rem) : -1;
+      if (name_in) name_in->push_back(rem);
+      if (name_out) name_out->push_back(part2);
     } else if (part1 == "adj") {
       // Adjoint sensitivity
-      s->type = ADJ_SENS;
-      s->wrt = fmu_->index_in(rem);
+      s.type = ADJ_SENS;
+      s.wrt = fmu ? fmu->index_in(rem) : -1;
+      if (name_in) name_in->push_back(rem);
     } else {
       // No such prefix
       casadi_error("No such prefix: " + part1);
     }
   } else {
     // No prefix - regular output
-    s->type = REG_OUTPUT;
-    s->ind = fmu_->index_out(n);
+    s.type = REG_OUTPUT;
+    s.ind = fmu ? fmu->index_out(n) : -1;
+    if (name_out) name_out->push_back(n);
   }
+  // Return output struct
+  return s;
 }
 
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
