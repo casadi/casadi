@@ -468,49 +468,55 @@ struct CASADI_EXPORT Fmu {
     fmi2String message, ...);
 };
 
+// Types of inputs
+enum class InputType {REG, ADJ, OUT, ADJ_OUT};
+
+// Input structure
+struct CASADI_EXPORT InputStruct {
+  // Type of input
+  InputType type;
+  // Corresponding index in Fmu
+  size_t ind;
+  // Parse an input string
+  static InputStruct parse(const std::string& n, const Fmu* fmu,
+    std::vector<std::string>* name_in = 0,
+    std::vector<std::string>* name_out = 0);
+};
+
+// Types of inputs
+enum class OutputType {REG, ADJ, JAC, JAC_TRANS, JAC_ADJ_OUT, JAC_REG_ADJ, HESS};
+
+// Output structure
+struct CASADI_EXPORT OutputStruct {
+  // Type of input
+  OutputType type;
+  // Output index in Fmu
+  size_t ind;
+  // With-respect-to index in Fmu
+  size_t wrt;
+  // Selection
+  size_t rbegin, rend, cbegin, cend;
+  // Parse an output string
+  static OutputStruct parse(const std::string& n, const Fmu* fmu,
+    std::vector<std::string>* name_in = 0,
+    std::vector<std::string>* name_out = 0);
+  // Constructor
+  OutputStruct() : ind(-1), wrt(-1), rbegin(-1), rend(-1), cbegin(-1), cend(-1) {}
+};
+
+// Helper function
+CASADI_EXPORT bool has_prefix(const std::string& s);
+
+// Split prefix
+CASADI_EXPORT std::string pop_prefix(const std::string& s, std::string* rem = 0);
+
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
   // FMU (shared between derivative expressions
   Fmu* fmu_;
 
-  // Types of inputs
-  enum InputType {REG_INPUT, ADJ_SEED, DUMMY_OUTPUT, DUMMY_ADJ_OUTPUT};
-
-  // Input structure
-  struct InputStruct {
-    // Type of input
-    InputType type;
-    // Corresponding index in Fmu
-    size_t ind;
-    // Parse an input string
-    static InputStruct parse(const std::string& n, const Fmu* fmu,
-      std::vector<std::string>* name_in = 0,
-      std::vector<std::string>* name_out = 0);
-  };
-
   // Information about function inputs
   std::vector<InputStruct> in_;
-
-  // Types of inputs
-  enum class OutputType {REG, ADJ, JAC, JAC_TRANS, JAC_ADJ_OUT, JAC_REG_ADJ, HESS};
-
-  // Output structure
-  struct OutputStruct {
-    // Type of input
-    OutputType type;
-    // Output index in Fmu
-    size_t ind;
-    // With-respect-to index in Fmu
-    size_t wrt;
-    // Selection
-    size_t rbegin, rend, cbegin, cend;
-    // Parse an output string
-    static OutputStruct parse(const std::string& n, const Fmu* fmu,
-      std::vector<std::string>* name_in = 0,
-      std::vector<std::string>* name_out = 0);
-    // Constructor
-    OutputStruct() : ind(-1), wrt(-1), rbegin(-1), rend(-1), cbegin(-1), cend(-1) {}
-  };
 
   // Information about function outputs
   std::vector<OutputStruct> out_;
@@ -625,12 +631,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& onames,
     const Dict& opts) const override;
   ///@}
-
-  // Helper function
-  static bool has_prefix(const std::string& s);
-
-  // Split prefix
-  static std::string pop_prefix(const std::string& s, std::string* rem = 0);
 
   /** \brief Create memory block */
   void* alloc_mem() const override;

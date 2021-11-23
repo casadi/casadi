@@ -1271,7 +1271,7 @@ void FmuFunction::init(const Dict& opts) {
       }
     }
     for (auto&& i : in_) {
-      if (i.type == ADJ_SEED) {
+      if (i.type == InputType::ADJ) {
         // Get output indices
         const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
         // Skip if no entries
@@ -1383,7 +1383,7 @@ void FmuFunction::identify_io(
   }
 }
 
-FmuFunction::InputStruct FmuFunction::InputStruct::parse(const std::string& n, const Fmu* fmu,
+InputStruct InputStruct::parse(const std::string& n, const Fmu* fmu,
     std::vector<std::string>* name_in, std::vector<std::string>* name_out) {
   // Return value
   InputStruct s;
@@ -1397,7 +1397,7 @@ FmuFunction::InputStruct FmuFunction::InputStruct::parse(const std::string& n, c
         // Second order function output (unused): Get the prefix
         pref = pop_prefix(rem, &rem);
         if (pref == "adj") {
-          s.type = DUMMY_ADJ_OUTPUT;
+          s.type = InputType::ADJ_OUT;
           s.ind = fmu ? fmu->index_in(rem) : -1;
           if (name_in) name_in->push_back(rem);
         } else {
@@ -1405,13 +1405,13 @@ FmuFunction::InputStruct FmuFunction::InputStruct::parse(const std::string& n, c
         }
       } else {
         // Nondifferentiated function output (unused)
-        s.type = DUMMY_OUTPUT;
+        s.type = InputType::OUT;
         s.ind = fmu ? fmu->index_out(rem) : -1;
         if (name_out) name_out->push_back(rem);
       }
     } else if (pref == "adj") {
       // Adjoint seed
-      s.type = ADJ_SEED;
+      s.type = InputType::ADJ;
       s.ind = fmu ? fmu->index_out(rem) : 0;
       if (name_out) name_out->push_back(rem);
     } else {
@@ -1420,7 +1420,7 @@ FmuFunction::InputStruct FmuFunction::InputStruct::parse(const std::string& n, c
     }
   } else {
     // No prefix - regular input
-    s.type = REG_INPUT;
+    s.type = InputType::REG;
     s.ind = fmu ? fmu->index_in(n) : 0;
     if (name_in) name_in->push_back(n);
   }
@@ -1428,7 +1428,7 @@ FmuFunction::InputStruct FmuFunction::InputStruct::parse(const std::string& n, c
   return s;
 }
 
-FmuFunction::OutputStruct FmuFunction::OutputStruct::parse(const std::string& n, const Fmu* fmu,
+OutputStruct OutputStruct::parse(const std::string& n, const Fmu* fmu,
     std::vector<std::string>* name_in, std::vector<std::string>* name_out) {
   // Return value
   OutputStruct s;
@@ -1518,13 +1518,13 @@ FmuFunction::OutputStruct FmuFunction::OutputStruct::parse(const std::string& n,
 
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
   switch (in_.at(i).type) {
-    case REG_INPUT:
+    case InputType::REG:
       return Sparsity::dense(fmu_->ired_.at(in_.at(i).ind).size(), 1);
-    case ADJ_SEED:
+    case InputType::ADJ:
       return Sparsity::dense(fmu_->ored_.at(in_.at(i).ind).size(), 1);
-    case DUMMY_OUTPUT:
+    case InputType::OUT:
       return Sparsity(fmu_->ored_.at(in_.at(i).ind).size(), 1);
-    case DUMMY_ADJ_OUTPUT:
+    case InputType::ADJ_OUT:
       return Sparsity(fmu_->ired_.at(in_.at(i).ind).size(), 1);
   }
   return Sparsity();
@@ -1592,7 +1592,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     std::fill(asens, asens + fmu_->iind_.size(), 0);
     // Copy adjoint seeds to aseed
     for (size_t i = 0; i < in_.size(); ++i) {
-      if (arg[i] && in_[i].type == ADJ_SEED) {
+      if (arg[i] && in_[i].type == InputType::ADJ) {
         const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
         for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
       }
@@ -1720,7 +1720,7 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
   }
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
-    if (in_[k].type == REG_INPUT) {
+    if (in_[k].type == InputType::REG) {
       fmu_->set(m, in_[k].ind, m->arg[k]);
     }
   }
@@ -1793,11 +1793,11 @@ std::string to_string(Parallelization v) {
   return "";
 }
 
-bool FmuFunction::has_prefix(const std::string& s) {
+bool has_prefix(const std::string& s) {
   return s.find('_') < s.size();
 }
 
-std::string FmuFunction::pop_prefix(const std::string& s, std::string* rem) {
+std::string pop_prefix(const std::string& s, std::string* rem) {
   // Get prefix
   casadi_assert_dev(!s.empty());
   size_t pos = s.find('_');
@@ -1812,7 +1812,7 @@ std::string FmuFunction::pop_prefix(const std::string& s, std::string* rem) {
 
 bool FmuFunction::all_regular() const {
   // Look for any non-regular input
-  for (auto&& e : in_) if (e.type != REG_INPUT) return false;
+  for (auto&& e : in_) if (e.type != InputType::REG) return false;
   // Look for any non-regular output
   for (auto&& e : out_) if (e.type != OutputType::REG) return false;
   // Only regular inputs and outputs
@@ -1863,15 +1863,15 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
   // Available in the FMU meta information
   if (out_.at(oind).type == OutputType::REG) {
-    if (in_.at(iind).type == REG_INPUT) {
+    if (in_.at(iind).type == InputType::REG) {
       return true;
-    } else if (in_.at(iind).type == ADJ_SEED) {
+    } else if (in_.at(iind).type == InputType::ADJ) {
       return true;
     }
   } else if (out_.at(oind).type == OutputType::ADJ) {
-    if (in_.at(iind).type == REG_INPUT) {
+    if (in_.at(iind).type == InputType::REG) {
       return true;
-    } else if (in_.at(iind).type == ADJ_SEED) {
+    } else if (in_.at(iind).type == InputType::ADJ) {
       return true;
     }
   }
@@ -1883,15 +1883,15 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
   // Available in the FMU meta information
   if (out_.at(oind).type == OutputType::REG) {
-    if (in_.at(iind).type == REG_INPUT) {
+    if (in_.at(iind).type == InputType::REG) {
       return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
-    } else if (in_.at(iind).type == ADJ_SEED) {
+    } else if (in_.at(iind).type == InputType::ADJ) {
       return Sparsity(nnz_out(oind), nnz_in(iind));
     }
   } else if (out_.at(oind).type == OutputType::ADJ) {
-    if (in_.at(iind).type == REG_INPUT) {
+    if (in_.at(iind).type == InputType::REG) {
       return fmu_->hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
-    } else if (in_.at(iind).type == ADJ_SEED) {
+    } else if (in_.at(iind).type == InputType::ADJ) {
       return fmu_->jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
     }
   }
