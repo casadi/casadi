@@ -492,7 +492,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   std::vector<InputStruct> in_;
 
   // Types of inputs
-  enum OutputType {REG_OUTPUT, ADJ_SENS, JAC_OUTPUT};
+  enum class OutputType {REG, ADJ, JAC, JAC_TRANS, JAC_ADJ_OUT, JAC_REG_ADJ, HESS};
 
   // Output structure
   struct OutputStruct {

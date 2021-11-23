@@ -1205,10 +1205,10 @@ void FmuFunction::init(const Dict& opts) {
   has_adj_ = has_jac_ = false;
   for (auto&& i : out_) {
     switch (i.type) {
-    case JAC_OUTPUT:
+    case OutputType::JAC:
       has_jac_ = true;
       break;
-    case ADJ_SENS:
+    case OutputType::ADJ:
       has_adj_ = true;
       break;
     default:
@@ -1223,7 +1223,7 @@ void FmuFunction::init(const Dict& opts) {
     jac_in_.clear();
     jac_nom_in_.clear();
     for (auto&& i : out_) {
-      if (i.type == JAC_OUTPUT || i.type == ADJ_SENS) {
+      if (i.type == OutputType::JAC || i.type == OutputType::ADJ) {
         // Get input indices
         const std::vector<size_t>& iind = fmu_->ired_.at(i.wrt);
         // Skip if no entries
@@ -1250,7 +1250,7 @@ void FmuFunction::init(const Dict& opts) {
     std::fill(in_jac.begin(), in_jac.end(), 0);
     jac_out_.clear();
     for (auto&& i : out_) {
-      if (i.type == JAC_OUTPUT) {
+      if (i.type == OutputType::JAC) {
         // Get output indices
         const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
         // Skip if no entries
@@ -1435,29 +1435,80 @@ FmuFunction::OutputStruct FmuFunction::OutputStruct::parse(const std::string& n,
   // Look for prefix
   if (has_prefix(n)) {
     // Get the prefix
-    std::string part1, rem;
-    part1 = pop_prefix(n, &rem);
-    if (part1 == "jac") {
+    std::string pref, rem;
+    pref = pop_prefix(n, &rem);
+    if (pref == "jac") {
       // Jacobian block
       casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
-      std::string part2 = pop_prefix(rem, &rem);
-      s.type = JAC_OUTPUT;
-      s.ind = fmu ? fmu->index_out(part2) : -1;
-      s.wrt = fmu ? fmu->index_in(rem) : -1;
-      if (name_in) name_in->push_back(rem);
-      if (name_out) name_out->push_back(part2);
-    } else if (part1 == "adj") {
+      pref = pop_prefix(rem, &rem);
+      if (pref == "adj") {
+        // Jacobian of adjoint sensitivity
+        casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
+        pref = pop_prefix(rem, &rem);
+        if (has_prefix(rem)) {
+          // Jacobian with respect to a sensitivity seed
+          std::string sens = pref;
+          pref = pop_prefix(rem, &rem);
+          if (pref == "adj") {
+            // Jacobian of adjoint sensitivity w.r.t. adjoint seed -> Transpose of Jacobian
+            s.type = OutputType::JAC_TRANS;
+            s.ind = fmu ? fmu->index_out(rem) : -1;
+            if (name_out) name_out->push_back(rem);
+            s.wrt = fmu ? fmu->index_in(sens) : -1;
+            if (name_in) name_in->push_back(sens);
+          } else if (pref == "out") {
+            // Jacobian w.r.t. to dummy output
+            s.type = OutputType::JAC_ADJ_OUT;
+            s.ind = fmu ? fmu->index_in(sens) : -1;
+            if (name_in) name_in->push_back(sens);
+            s.wrt = fmu ? fmu->index_out(rem) : -1;
+            if (name_in) name_out->push_back(rem);
+          } else {
+            casadi_error("No such prefix: " + pref);
+          }
+        } else {
+          // Hessian output
+          s.type = OutputType::HESS;
+          s.ind = fmu ? fmu->index_in(pref) : -1;
+          if (name_in) name_in->push_back(pref);
+          s.wrt = fmu ? fmu->index_in(rem) : -1;
+          if (name_in) name_in->push_back(rem);
+        }
+      } else {
+        if (has_prefix(rem)) {
+          std::string out = pref;
+          pref = pop_prefix(rem, &rem);
+          if (pref == "adj") {
+            // Jacobian of regular output w.r.t. adjoint sensitivity seed
+            s.type = OutputType::JAC_REG_ADJ;
+            s.ind = fmu ? fmu->index_out(out) : -1;
+            if (name_out) name_out->push_back(out);
+            s.wrt = fmu ? fmu->index_out(rem) : -1;
+            if (name_out) name_out->push_back(rem);
+          } else {
+            casadi_error("No such prefix: " + pref);
+          }
+        } else {
+          // Regular Jacobian
+          s.type = OutputType::JAC;
+          s.ind = fmu ? fmu->index_out(pref) : -1;
+          if (name_out) name_out->push_back(pref);
+          s.wrt = fmu ? fmu->index_in(rem) : -1;
+          if (name_in) name_in->push_back(rem);
+        }
+      }
+    } else if (pref == "adj") {
       // Adjoint sensitivity
-      s.type = ADJ_SENS;
+      s.type = OutputType::ADJ;
       s.wrt = fmu ? fmu->index_in(rem) : -1;
       if (name_in) name_in->push_back(rem);
     } else {
       // No such prefix
-      casadi_error("No such prefix: " + part1);
+      casadi_error("No such prefix: " + pref);
     }
   } else {
     // No prefix - regular output
-    s.type = REG_OUTPUT;
+    s.type = OutputType::REG;
     s.ind = fmu ? fmu->index_out(n) : -1;
     if (name_out) name_out->push_back(n);
   }
@@ -1480,13 +1531,22 @@ Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
 }
 
 Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
+  const OutputStruct& s = out_.at(i);
   switch (out_.at(i).type) {
-    case REG_OUTPUT:
-      return Sparsity::dense(fmu_->ored_.at(out_.at(i).ind).size(), 1);
-    case ADJ_SENS:
-      return Sparsity::dense(fmu_->ired_.at(out_.at(i).wrt).size(), 1);
-    case JAC_OUTPUT:
-      return fmu_->jac_sparsity(out_.at(i).ind, out_.at(i).wrt);
+    case OutputType::REG:
+      return Sparsity::dense(fmu_->ored_.at(s.ind).size(), 1);
+    case OutputType::ADJ:
+      return Sparsity::dense(fmu_->ired_.at(s.wrt).size(), 1);
+    case OutputType::JAC:
+      return fmu_->jac_sparsity(s.ind, s.wrt);
+    case OutputType::JAC_TRANS:
+      return fmu_->jac_sparsity(s.ind, s.wrt).T();
+    case OutputType::JAC_ADJ_OUT:
+      return Sparsity(fmu_->ired_.at(s.ind).size(), fmu_->ored_.at(s.wrt).size());
+    case OutputType::JAC_REG_ADJ:
+      return Sparsity(fmu_->ored_.at(s.ind).size(), fmu_->ored_.at(s.wrt).size());
+    case OutputType::HESS:
+      return fmu_->hess_sparsity(s.ind, s.wrt);
   }
   return Sparsity();
 }
@@ -1500,10 +1560,19 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   bool need_jac = false, need_adj = false;
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k]) {
-      if (out_[k].type == JAC_OUTPUT) {
-        need_jac = true;
-      } else if (out_[k].type == ADJ_SENS) {
-        need_adj = true;
+      switch (out_[k].type) {
+        case OutputType::JAC:
+          need_jac = true;
+          break;
+        case OutputType::ADJ:
+          need_adj = true;
+          break;
+        case OutputType::JAC_TRANS:
+          casadi_error("OutputType::JAC_TRANS not implemented");
+          break;
+        case OutputType::HESS:
+          casadi_error("OutputType::HESS not implemented");
+          break;
       }
     }
   }
@@ -1623,7 +1692,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Fetch Jacobian blocks
   if (need_jac) {
     for (size_t k = 0; k < out_.size(); ++k) {
-      if (res[k] && out_[k].type == JAC_OUTPUT) {
+      if (res[k] && out_[k].type == OutputType::JAC) {
         casadi_get_sub(res[k], sp_ext_, jac_nz,
           out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
       }
@@ -1632,7 +1701,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Collect adjoint sensitivities
   if (need_adj) {
     for (size_t i = 0; i < out_.size(); ++i) {
-      if (res[i] && out_[i].type == ADJ_SENS) {
+      if (res[i] && out_[i].type == OutputType::ADJ) {
         double* r = res[i];
         for (size_t id : fmu_->ired_[out_[i].wrt]) *r++ = asens[id];
       }
@@ -1657,7 +1726,7 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
   }
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
-    if (m->res[k] && out_[k].type == REG_OUTPUT) {
+    if (m->res[k] && out_[k].type == OutputType::REG) {
       fmu_->request(m, out_[k].ind);
     }
   }
@@ -1666,7 +1735,7 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
   // Get regular outputs (master thread only)
   if (task == 0) {
     for (size_t k = 0; k < out_.size(); ++k) {
-      if (m->res[k] && out_[k].type == REG_OUTPUT) {
+      if (m->res[k] && out_[k].type == OutputType::REG) {
         fmu_->get(m, out_[k].ind, m->res[k]);
       }
     }
@@ -1745,7 +1814,7 @@ bool FmuFunction::all_regular() const {
   // Look for any non-regular input
   for (auto&& e : in_) if (e.type != REG_INPUT) return false;
   // Look for any non-regular output
-  for (auto&& e : out_) if (e.type != REG_OUTPUT) return false;
+  for (auto&& e : out_) if (e.type != OutputType::REG) return false;
   // Only regular inputs and outputs
   return true;
 }
@@ -1793,13 +1862,13 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
   // Available in the FMU meta information
-  if (out_.at(oind).type == REG_OUTPUT) {
+  if (out_.at(oind).type == OutputType::REG) {
     if (in_.at(iind).type == REG_INPUT) {
       return true;
     } else if (in_.at(iind).type == ADJ_SEED) {
       return true;
     }
-  } else if (out_.at(oind).type == ADJ_SENS) {
+  } else if (out_.at(oind).type == OutputType::ADJ) {
     if (in_.at(iind).type == REG_INPUT) {
       return true;
     } else if (in_.at(iind).type == ADJ_SEED) {
@@ -1813,13 +1882,13 @@ bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
 Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
     bool symmetric) const {
   // Available in the FMU meta information
-  if (out_.at(oind).type == REG_OUTPUT) {
+  if (out_.at(oind).type == OutputType::REG) {
     if (in_.at(iind).type == REG_INPUT) {
       return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
     } else if (in_.at(iind).type == ADJ_SEED) {
       return Sparsity(nnz_out(oind), nnz_in(iind));
     }
-  } else if (out_.at(oind).type == ADJ_SENS) {
+  } else if (out_.at(oind).type == OutputType::ADJ) {
     if (in_.at(iind).type == REG_INPUT) {
       return fmu_->hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
     } else if (in_.at(iind).type == ADJ_SEED) {
