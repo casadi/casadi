@@ -352,8 +352,8 @@ public:
 
   /// Construct a function object, legacy syntax
   Function create(const std::string& fname,
-      const std::vector<std::string>& name_in,
-      const std::vector<std::string>& name_out, bool sx = false, bool lifted_calls = false);
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out, bool sx = false, bool lifted_calls = false) const;
 
   /** \brief  Construct a function object, names provided
     \param name    Name assigned to the resulting function object
@@ -362,16 +362,16 @@ public:
     \param opts    Optional settings
   */
   Function create(const std::string& name,
-      const std::vector<std::string>& name_in,
-      const std::vector<std::string>& name_out,
-      const Dict& opts=Dict());
+    const std::vector<std::string>& name_in,
+    const std::vector<std::string>& name_out,
+    const Dict& opts=Dict()) const;
   ///@}
 
   /** \brief  Load a function from an FMU DLL, standard IO conforming with simulator
     \param name    Name assigned to the resulting function object
     \param opts    Optional settings
   */
-  Function create(const std::string& name, const Dict& opts=Dict());
+  Function create(const std::string& name, const Dict& opts=Dict()) const;
 
   /// Construct a function for evaluating dependent parameters
   Function dependent_fun(const std::string& fname,
@@ -524,6 +524,9 @@ public:
 
   /// Set the current value (string)
   void set(const std::vector<std::string>& name, const std::vector<std::string>& val);
+
+  /// Evaluate the values for a set of variables at the initial time
+  Dict get(const std::vector<std::string>& name) const;
 
   /// Add a new variable: returns corresponding symbolic expression
   MX add_variable(const std::string& name, casadi_int n=1);

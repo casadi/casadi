@@ -672,7 +672,7 @@ void DaeBuilder::add_lc(const std::string& name,
 
 Function DaeBuilder::create(const std::string& fname,
     const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out, bool sx, bool lifted_calls) {
+    const std::vector<std::string>& name_out, bool sx, bool lifted_calls) const {
   try {
     return (*this)->create(fname, name_in, name_out, Dict(), sx, lifted_calls);
   } catch (std::exception& e) {
@@ -683,7 +683,7 @@ Function DaeBuilder::create(const std::string& fname,
 
 Function DaeBuilder::create(const std::string& fname,
     const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out, const Dict& opts) {
+    const std::vector<std::string>& name_out, const Dict& opts) const {
   try {
     return (*this)->create(fname, name_in, name_out, opts, false, false);
   } catch (std::exception& e) {
@@ -692,7 +692,7 @@ Function DaeBuilder::create(const std::string& fname,
   }
 }
 
-Function DaeBuilder::create(const std::string& name, const Dict& opts) {
+Function DaeBuilder::create(const std::string& name, const Dict& opts) const {
   try {
     return (*this)->create(name, dyn_in(), dyn_out(), opts, false, false);
   } catch (std::exception& e) {
@@ -1100,6 +1100,18 @@ void DaeBuilder::set(const std::vector<std::string>& name,
     (*this)->set_string_attribute(Attribute::STRINGVALUE, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set", e.what());
+  }
+}
+
+Dict DaeBuilder::get(const std::vector<std::string>& name) const {
+  try {
+    // Create a temporary FmuFunction instance
+    Function f = create(this->name() + "_get", {}, {}, Dict{{"aux", name}});
+    // Get the stats
+    return f.stats().at("aux");
+  } catch (std::exception& e) {
+    THROW_ERROR("get", e.what());
+    return Dict();
   }
 }
 

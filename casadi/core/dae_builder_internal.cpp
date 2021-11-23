@@ -1153,7 +1153,7 @@ void DaeBuilderInternal::add_lc(const std::string& name, const std::vector<std::
 
 Function DaeBuilderInternal::create(const std::string& fname,
     const std::vector<std::string>& s_in,
-    const std::vector<std::string>& s_out, const Dict& opts, bool sx, bool lifted_calls) {
+    const std::vector<std::string>& s_out, const Dict& opts, bool sx, bool lifted_calls) const {
   // Are there any '_' in the names?
   bool with_underscore = false;
   for (auto s_io : {&s_in, &s_out}) {
