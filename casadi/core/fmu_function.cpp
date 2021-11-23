@@ -1073,12 +1073,22 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
     : FunctionInternal(name), fmu_(fmu) {
   // Parse input IDs
   in_.resize(name_in.size());
-  for (size_t k = 0; k < name_in.size(); ++k)
-    parse_input(&in_[k], name_in[k]);
+  for (size_t k = 0; k < name_in.size(); ++k) {
+    try {
+      parse_input(&in_[k], name_in[k]);
+    } catch (std::exception& e) {
+      casadi_error("Cannot process input " + name_in[k] + ": " + std::string(e.what()));
+    }
+  }
   // Parse output IDs
   out_.resize(name_out.size());
-  for (size_t k = 0; k < name_out.size(); ++k)
-    parse_output(&out_[k], name_out[k]);
+  for (size_t k = 0; k < name_out.size(); ++k) {
+    try {
+      parse_output(&out_[k], name_out[k]);
+    } catch (std::exception& e) {
+      casadi_error("Cannot process output " + name_out[k] + ": " + std::string(e.what()));
+    }
+  }
   // Set input/output names
   name_in_ = name_in;
   name_out_ = name_out;
@@ -1347,47 +1357,65 @@ void FmuFunction::identify_io(
   if (scheme_out) scheme_out->clear();
   // Parse FmuFunction inputs
   for (const std::string& n : name_in) {
-    if (has_prefix(n)) {
-      // Get the prefix
-      std::string pref, rem;
-      pref = pop_prefix(n, &rem);
-      if (pref == "out") {
-        // Nondifferentiated function output (unused)
-        if (scheme_out) scheme_out->push_back(rem);
-      } else if (pref == "adj") {
-        // Adjoint seed
-        if (scheme_out) scheme_out->push_back(rem);
+    try {
+      if (has_prefix(n)) {
+        // Get the prefix
+        std::string pref, rem;
+        pref = pop_prefix(n, &rem);
+        if (pref == "out") {
+          if (has_prefix(rem)) {
+            // Second order function output (unused): Get the prefix
+            pref = pop_prefix(rem, &rem);
+            if (pref == "adj") {
+              if (scheme_in) scheme_in->push_back(rem);
+            } else {
+              casadi_error("No prefix: " + pref);
+            }
+          } else {
+            // Nondifferentiated function output (unused)
+            if (scheme_out) scheme_out->push_back(rem);
+          }
+        } else if (pref == "adj") {
+          // Adjoint seed
+          if (scheme_out) scheme_out->push_back(rem);
+        } else {
+          // No such prefix
+          casadi_error("No prefix: " + pref);
+        }
       } else {
-        // No such prefix
-        casadi_error("No such prefix: " + pref);
+        // No prefix - regular input
+        if (scheme_in) scheme_in->push_back(n);
       }
-    } else {
-      // No prefix - regular input
-      if (scheme_in) scheme_in->push_back(n);
+    } catch (std::exception& e) {
+      casadi_error("Cannot process input " + n + ": " + std::string(e.what()));
     }
   }
   // Parse FmuFunction outputs
   for (const std::string& n : name_out) {
-    if (has_prefix(n)) {
-      // Get the prefix
-      std::string part1, rem;
-      part1 = pop_prefix(n, &rem);
-      if (part1 == "jac") {
-        // Jacobian block
-        casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
-        std::string part2 = pop_prefix(rem, &rem);
-        if (scheme_out) scheme_out->push_back(part2);
-        if (scheme_in) scheme_in->push_back(rem);
-      } else if (part1 == "adj") {
-        // Adjoint sensitivity
-        if (scheme_in) scheme_in->push_back(rem);
+    try {
+      if (has_prefix(n)) {
+        // Get the prefix
+        std::string part1, rem;
+        part1 = pop_prefix(n, &rem);
+        if (part1 == "jac") {
+          // Jacobian block
+          casadi_assert(has_prefix(rem), "Two arguments expected for Jacobian block");
+          std::string part2 = pop_prefix(rem, &rem);
+          if (scheme_out) scheme_out->push_back(part2);
+          if (scheme_in) scheme_in->push_back(rem);
+        } else if (part1 == "adj") {
+          // Adjoint sensitivity
+          if (scheme_in) scheme_in->push_back(rem);
+        } else {
+          // No such prefix
+          casadi_error("No such prefix: " + part1);
+        }
       } else {
-        // No such prefix
-        casadi_error("No such prefix: " + part1);
+        // No prefix - regular output
+        if (scheme_out) scheme_out->push_back(n);
       }
-    } else {
-      // No prefix - regular output
-      if (scheme_out) scheme_out->push_back(n);
+    } catch (std::exception& e) {
+      casadi_error("Cannot process output " + n + ": " + std::string(e.what()));
     }
   }
   // Remove duplicates in scheme_in, also sorts alphabetically
@@ -1409,9 +1437,20 @@ void FmuFunction::parse_input(InputStruct* s, const std::string& n) const {
     std::string pref, rem;
     pref = pop_prefix(n, &rem);
     if (pref == "out") {
-      // Nondifferentiated function output (unused)
-      s->type = DUMMY_OUTPUT;
-      s->ind = fmu_->index_out(rem);
+      if (has_prefix(rem)) {
+        // Second order function output (unused): Get the prefix
+        pref = pop_prefix(rem, &rem);
+        if (pref == "adj") {
+          s->type = DUMMY_ADJ_OUTPUT;
+          s->ind = fmu_->index_in(rem);
+        } else {
+          casadi_error("Cannot process: " + n);
+        }
+      } else {
+        // Nondifferentiated function output (unused)
+        s->type = DUMMY_OUTPUT;
+        s->ind = fmu_->index_out(rem);
+      }
     } else if (pref == "adj") {
       // Adjoint seed
       s->type = ADJ_SEED;
@@ -1458,11 +1497,13 @@ void FmuFunction::parse_output(OutputStruct* s, const std::string& n) const {
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
   switch (in_.at(i).type) {
     case REG_INPUT:
-      return Sparsity::dense(fmu_->ired_[in_.at(i).ind].size(), 1);
+      return Sparsity::dense(fmu_->ired_.at(in_.at(i).ind).size(), 1);
     case ADJ_SEED:
-      return Sparsity::dense(fmu_->ored_[in_.at(i).ind].size(), 1);
+      return Sparsity::dense(fmu_->ored_.at(in_.at(i).ind).size(), 1);
     case DUMMY_OUTPUT:
-      return Sparsity(fmu_->ored_[in_.at(i).ind].size(), 1);
+      return Sparsity(fmu_->ored_.at(in_.at(i).ind).size(), 1);
+    case DUMMY_ADJ_OUTPUT:
+      return Sparsity(fmu_->ired_.at(in_.at(i).ind).size(), 1);
   }
   return Sparsity();
 }
@@ -1470,9 +1511,9 @@ Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
 Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
   switch (out_.at(i).type) {
     case REG_OUTPUT:
-      return Sparsity::dense(fmu_->ored_[out_.at(i).ind].size(), 1);
+      return Sparsity::dense(fmu_->ored_.at(out_.at(i).ind).size(), 1);
     case ADJ_SENS:
-      return Sparsity::dense(fmu_->ired_[out_.at(i).wrt].size(), 1);
+      return Sparsity::dense(fmu_->ired_.at(out_.at(i).wrt).size(), 1);
     case JAC_OUTPUT:
       return fmu_->jac_sparsity(out_.at(i).ind, out_.at(i).wrt);
   }

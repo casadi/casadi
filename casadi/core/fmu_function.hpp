@@ -474,7 +474,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   Fmu* fmu_;
 
   // Types of inputs
-  enum InputType {REG_INPUT, ADJ_SEED, DUMMY_OUTPUT};
+  enum InputType {REG_INPUT, ADJ_SEED, DUMMY_OUTPUT, DUMMY_ADJ_OUTPUT};
 
   // Input structure
   struct InputStruct {
