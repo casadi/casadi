@@ -482,6 +482,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     InputType type;
     // Corresponding index in Fmu
     size_t ind;
+    // Parse an input
+    static InputStruct parse(const std::string& n, const Fmu* fmu,
+      std::vector<std::string>* name_in = 0,
+      std::vector<std::string>* name_out = 0);
   };
 
   // Information about function inputs
@@ -556,9 +560,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     std::vector<std::string>* scheme_out,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out);
-
-  // Parse input name
-  void parse_input(InputStruct* s, const std::string& n) const;
 
   // Parse output name
   void parse_output(OutputStruct* s, const std::string& n) const;

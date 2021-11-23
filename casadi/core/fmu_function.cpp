@@ -1075,7 +1075,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   in_.resize(name_in.size());
   for (size_t k = 0; k < name_in.size(); ++k) {
     try {
-      parse_input(&in_[k], name_in[k]);
+      in_[k] = InputStruct::parse(name_in[k], fmu);
     } catch (std::exception& e) {
       casadi_error("Cannot process input " + name_in[k] + ": " + std::string(e.what()));
     }
@@ -1358,34 +1358,7 @@ void FmuFunction::identify_io(
   // Parse FmuFunction inputs
   for (const std::string& n : name_in) {
     try {
-      if (has_prefix(n)) {
-        // Get the prefix
-        std::string pref, rem;
-        pref = pop_prefix(n, &rem);
-        if (pref == "out") {
-          if (has_prefix(rem)) {
-            // Second order function output (unused): Get the prefix
-            pref = pop_prefix(rem, &rem);
-            if (pref == "adj") {
-              if (scheme_in) scheme_in->push_back(rem);
-            } else {
-              casadi_error("No prefix: " + pref);
-            }
-          } else {
-            // Nondifferentiated function output (unused)
-            if (scheme_out) scheme_out->push_back(rem);
-          }
-        } else if (pref == "adj") {
-          // Adjoint seed
-          if (scheme_out) scheme_out->push_back(rem);
-        } else {
-          // No such prefix
-          casadi_error("No prefix: " + pref);
-        }
-      } else {
-        // No prefix - regular input
-        if (scheme_in) scheme_in->push_back(n);
-      }
+      (void)InputStruct::parse(n, 0, scheme_in, scheme_out);
     } catch (std::exception& e) {
       casadi_error("Cannot process input " + n + ": " + std::string(e.what()));
     }
@@ -1430,8 +1403,11 @@ void FmuFunction::identify_io(
   }
 }
 
-void FmuFunction::parse_input(InputStruct* s, const std::string& n) const {
-  // Look for prefix
+FmuFunction::InputStruct FmuFunction::InputStruct::parse(const std::string& n, const Fmu* fmu,
+    std::vector<std::string>* name_in, std::vector<std::string>* name_out) {
+  // Return value
+  InputStruct s;
+  // Look for a prefix
   if (has_prefix(n)) {
     // Get the prefix
     std::string pref, rem;
@@ -1441,29 +1417,35 @@ void FmuFunction::parse_input(InputStruct* s, const std::string& n) const {
         // Second order function output (unused): Get the prefix
         pref = pop_prefix(rem, &rem);
         if (pref == "adj") {
-          s->type = DUMMY_ADJ_OUTPUT;
-          s->ind = fmu_->index_in(rem);
+          s.type = DUMMY_ADJ_OUTPUT;
+          s.ind = fmu ? fmu->index_in(rem) : -1;
+          if (name_in) name_in->push_back(rem);
         } else {
           casadi_error("Cannot process: " + n);
         }
       } else {
         // Nondifferentiated function output (unused)
-        s->type = DUMMY_OUTPUT;
-        s->ind = fmu_->index_out(rem);
+        s.type = DUMMY_OUTPUT;
+        s.ind = fmu ? fmu->index_out(rem) : -1;
+        if (name_out) name_out->push_back(rem);
       }
     } else if (pref == "adj") {
       // Adjoint seed
-      s->type = ADJ_SEED;
-      s->ind = fmu_->index_out(rem);
+      s.type = ADJ_SEED;
+      s.ind = fmu ? fmu->index_out(rem) : 0;
+      if (name_out) name_out->push_back(rem);
     } else {
       // No such prefix
       casadi_error("No such prefix: " + pref);
     }
   } else {
     // No prefix - regular input
-    s->type = REG_INPUT;
-    s->ind = fmu_->index_in(n);
+    s.type = REG_INPUT;
+    s.ind = fmu ? fmu->index_in(n) : 0;
+    if (name_in) name_in->push_back(n);
   }
+  // Return input struct
+  return s;
 }
 
 void FmuFunction::parse_output(OutputStruct* s, const std::string& n) const {
