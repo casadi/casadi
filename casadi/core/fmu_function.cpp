@@ -1245,12 +1245,17 @@ void FmuFunction::init(const Dict& opts) {
       }
     }
 
+    // Transpose of Jacobian sparsity
+    sp_trans_map_.resize(out_.size(), -1);
+    sp_trans_.clear();
+
     // Collect all outputs in any Jacobian or adjoint block
     in_jac.resize(fmu_->oind_.size());
     std::fill(in_jac.begin(), in_jac.end(), 0);
     jac_out_.clear();
-    for (auto&& i : out_) {
-      if (i.type == OutputType::JAC) {
+    for (size_t k = 0; k < out_.size(); ++k) {
+      OutputStruct& i = out_[k];
+      if (i.type == OutputType::JAC || i.type == OutputType::JAC_TRANS) {
         // Get output indices
         const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
         // Skip if no entries
@@ -1268,6 +1273,17 @@ void FmuFunction::init(const Dict& opts) {
         // Add row interval
         i.rbegin = in_jac[oind.front()] - 1;
         i.rend = i.rbegin + oind.size();
+        // Additional memory for transpose
+        if (i.type == OutputType::JAC_TRANS) {
+          // Retrieve the sparsity pattern
+          const Sparsity& sp = sparsity_out(k);
+          // Save transpose of sparsity pattern
+          sp_trans_map_.at(k) = sp_trans_.size();
+          sp_trans_.push_back(sp.T());
+          // Work vectors for casadi_trans
+          alloc_w(sp.nnz());
+          alloc_iw(sp.size2());
+        }
       }
     }
     for (auto&& i : in_) {
@@ -1562,13 +1578,11 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (res[k]) {
       switch (out_[k].type) {
         case OutputType::JAC:
+        case OutputType::JAC_TRANS:
           need_jac = true;
           break;
         case OutputType::ADJ:
           need_adj = true;
-          break;
-        case OutputType::JAC_TRANS:
-          casadi_error("OutputType::JAC_TRANS not implemented");
           break;
         case OutputType::HESS:
           casadi_error("OutputType::HESS not implemented");
@@ -1689,22 +1703,25 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
 
   // Error in evaluation
   if (flag) return 1;
-  // Fetch Jacobian blocks
-  if (need_jac) {
-    for (size_t k = 0; k < out_.size(); ++k) {
-      if (res[k] && out_[k].type == OutputType::JAC) {
-        casadi_get_sub(res[k], sp_ext_, jac_nz,
+  // Fetch calculated blocks
+  for (size_t k = 0; k < out_.size(); ++k) {
+    // Get nonzeros, skip if not needed
+    double* r = res[k];
+    if (!r) continue;
+    // Get by type
+    switch (out_[k].type) {
+      case OutputType::JAC:
+        casadi_get_sub(r, sp_ext_, jac_nz,
           out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
-      }
-    }
-  }
-  // Collect adjoint sensitivities
-  if (need_adj) {
-    for (size_t i = 0; i < out_.size(); ++i) {
-      if (res[i] && out_[i].type == OutputType::ADJ) {
-        double* r = res[i];
-        for (size_t id : fmu_->ired_[out_[i].wrt]) *r++ = asens[id];
-      }
+        break;
+      case OutputType::JAC_TRANS:
+        casadi_get_sub(w, sp_ext_, jac_nz,
+          out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
+        casadi_trans(w, sp_trans_[sp_trans_map_[k]], r, sparsity_out(k), iw);
+        break;
+      case OutputType::ADJ:
+        for (size_t id : fmu_->ired_[out_[k].wrt]) *r++ = asens[id];
+        break;
     }
   }
   // Successful return

@@ -527,6 +527,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Nominal values for Jacobian inputs
   std::vector<double> jac_nom_in_;
 
+  // Sparsity of transpose (if needed)
+  std::vector<Sparsity> sp_trans_;
+  std::vector<casadi_int> sp_trans_map_;
+
   // What blocks exist?
   bool has_jac_, has_adj_;
 
