@@ -1206,6 +1206,7 @@ void FmuFunction::init(const Dict& opts) {
   for (auto&& i : out_) {
     switch (i.type) {
     case OutputType::JAC:
+    case OutputType::JAC_TRANS:
       has_jac_ = true;
       break;
     case OutputType::ADJ:
@@ -1223,7 +1224,8 @@ void FmuFunction::init(const Dict& opts) {
     jac_in_.clear();
     jac_nom_in_.clear();
     for (auto&& i : out_) {
-      if (i.type == OutputType::JAC || i.type == OutputType::ADJ) {
+      if (i.type == OutputType::JAC || i.type == OutputType::JAC_TRANS
+          || i.type == OutputType::ADJ) {
         // Get input indices
         const std::vector<size_t>& iind = fmu_->ired_.at(i.wrt);
         // Skip if no entries
