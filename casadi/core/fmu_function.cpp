@@ -275,11 +275,6 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   // Get Hessian sparsity information
   sp_hess_ = dae->hess_sparsity(oind_, iind_);
 
-  // Calculate graph coloring
-  coloring_jac_ = sp_jac_.uni_coloring();
-  if (dae->debug_) casadi_message("Graph coloring: " + str(sp_jac_.size2())
-    + " -> " + str(coloring_jac_.size2()) + " directions");
-
   // Load DLL
   std::string instance_name_no_dot = dae->model_identifier_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');

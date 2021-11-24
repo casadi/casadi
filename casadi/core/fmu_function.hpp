@@ -363,9 +363,6 @@ struct CASADI_EXPORT Fmu {
   // Sparsity pattern for Hessian of a linear combination of all outputs w.r.t. all inputs
   Sparsity sp_hess_;
 
-  // Graph coloring for sp_jac_
-  Sparsity coloring_jac_;
-
   // Index lookup for input
   size_t index_in(const std::string& n) const;
 
