@@ -48,6 +48,19 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
+void FmuMemory::set_work(const double** arg, double** res, casadi_int* iw, double* w) {
+  this->arg = arg;
+  this->res = res;
+  this->iw = iw;
+  this->w = w;
+}
+
+void FmuMemory::set_sens(double* aseed, double* asens, double* jac_nz) {
+  this->aseed = aseed;
+  this->asens = asens;
+  this->jac_nz = jac_nz;
+}
+
 std::string Fmu::system_infix() {
 #if defined(_WIN32)
   // Windows system
@@ -1615,13 +1628,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     }
   }
   // Set work vectors (for master thread)
-  m->arg = arg;
-  m->res = res;
-  m->iw = iw;
-  m->w = w;
-  m->aseed = aseed;
-  m->asens = asens;
-  m->jac_nz = jac_nz;
+  m->set_work(arg, res, iw, w);
+  m->set_sens(aseed, asens, jac_nz);
   // Return flag
   int flag = 0;
   // Evaluate, serially or in parallel
@@ -1647,13 +1655,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         // Get slave thread
         FmuMemory* s = m->slaves.at(thread - 1);
         // Set work vectors (for slave thread)
-        s->arg = arg;
-        s->res = res;
-        s->iw = iw + jac_iw_ * thread;
-        s->w = w + jac_w_ * thread;
-        s->aseed = aseed;
-        s->asens = asens;
-        s->jac_nz = jac_nz;
+        s->set_work(arg, res, iw + jac_iw_ * thread, w + jac_w_ * thread);
+        s->set_sens(aseed, asens, jac_nz);
         // Evaluate
         flag = eval_thread(s, thread, num_used_threads, need_jac, need_adj);
       } else {
@@ -1680,13 +1683,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
             // Memory for slave
             FmuMemory* s = m->slaves.at(task - 1);
             // Set work vectors (for slave thread)
-            s->arg = arg;
-            s->res = res;
-            s->iw = iw + jac_iw_ * task;
-            s->w = w + jac_w_ * task;
-            s->aseed = aseed;
-            s->asens = asens;
-            s->jac_nz = jac_nz;
+            s->set_work(arg, res, iw + jac_iw_ * task, w + jac_w_ * task);
+            s->set_sens(aseed, asens, jac_nz);
             // Evaluate slave thread
             *fl = eval_thread(s, task, max_n_task_, need_jac, need_adj);
           }

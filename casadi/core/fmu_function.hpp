@@ -219,10 +219,14 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   double** res;
   casadi_int* iw;
   double* w;
+  // Set work
+  void set_work(const double** arg, double** res, casadi_int* iw, double* w);
   // Extended Jacobian
   double *jac_nz;
   // Adjoint seeds, sensitivities being calculated
   double *aseed, *asens;
+  // Set sensivitity vectors
+  void set_sens(double* aseed, double* asens, double* jac_nz);
   // Component memory
   fmi2Component c;
   // Additional (slave) memory objects
