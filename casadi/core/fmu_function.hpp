@@ -533,12 +533,13 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   std::vector<casadi_int> sp_trans_map_;
 
   // What blocks exist?
-  bool has_jac_, has_adj_;
+  bool has_jac_, has_adj_, has_hess_;
 
   // User-set options
   bool enable_ad_, validate_ad_;
   double step_, abstol_, reltol_, u_aim_, h_min_, h_max_;
   casadi_int h_iter_;
+  bool new_hessian_;
 
   // FD method as an enum
   FdMode fd_;
@@ -576,8 +577,11 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out);
 
-  // Get sparsity pattern for extended Jacobian
-  Sparsity sp_ext_;
+  // Get sparsity pattern for extended Jacobian, Hessian
+  Sparsity sp_jac_, sp_hess_;
+
+  // Number of nonlinearly entering variables
+  casadi_int n_nonlin_;
 
   // Graph coloring
   Sparsity coloring_;
@@ -589,7 +593,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   casadi_int jac_iw_, jac_w_;
 
   // Number of parallel tasks
-  casadi_int max_n_task_;
+  casadi_int max_jac_tasks_, max_hess_tasks_, max_n_tasks_;
 
   ///@{
   /** \brief Number of function inputs and outputs */
@@ -618,6 +622,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Are all inputs/outputs regular?
   bool all_regular() const;
+
+  // Are all inputs/outputs vectors (i.e. not Jacobian or Hessian blocks)?
+  bool all_vectors() const;
 
   ///@{
   /** \brief Full Jacobian */
