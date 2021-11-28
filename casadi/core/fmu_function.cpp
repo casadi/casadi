@@ -1412,17 +1412,32 @@ void FmuFunction::init(const Dict& opts) {
 
   // Get sparsity pattern for extended Hessian
   sp_hess_ = fmu_->hess_sparsity(jac_in_, jac_in_);
-  n_nonlin_ = 0;
-  for (casadi_int c = 0; c < sp_hess_.size2(); ++c) {
-    if (sp_hess_.colind(c + 1) > sp_hess_.colind(c)) {
-      n_nonlin_ = sp_hess_.colind(c + 1) - sp_hess_.colind(c);
-      break;
+  casadi_assert(sp_hess_.size1() == jac_in_.size(), "Inconsistent Hessian dimensions");
+  casadi_assert(sp_hess_.size2() == jac_in_.size(), "Inconsistent Hessian dimensions");
+  const casadi_int *hess_colind = sp_hess_.colind(), *hess_row = sp_hess_.row();
+
+  // Get nonlinearly entering variables
+  nonlin_.clear();
+  for (casadi_int c = 0; c < jac_in_.size(); ++c) {
+    if (hess_colind[c + 1] > hess_colind[c]) {
+      if (nonlin_.empty()) {
+        // Get list of variables
+        for (casadi_int k = hess_colind[c]; k < hess_colind[c + 1]; ++k) {
+          nonlin_.push_back(hess_row[k]);
+        }
+      } else {
+        // Consistency check
+        casadi_assert(hess_colind[c] + nonlin_.size() == hess_colind[c + 1], "Hessian sparsity");
+        for (casadi_int k = hess_colind[c]; k < hess_colind[c + 1]; ++k) {
+          casadi_assert(nonlin_[k] == hess_row[k], "Hessian sparsity");
+        }
+      }
     }
   }
-  if (verbose_) casadi_message("Hessian calculation for " + str(n_nonlin_) + " variables");
+  if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
 
-  // Do not use more threads than there are colors in the Jacobian
-  max_hess_tasks_ = std::min(max_n_tasks_, n_nonlin_);
+  // Do not use more threads than there are nonlinear variables
+  max_hess_tasks_ = std::min(max_n_tasks_, static_cast<casadi_int>(nonlin_.size()));
 
   // Work vector for storing extended Hessian, shared between threads
   alloc_w(sp_hess_.nnz(), true);  // hess_nz
@@ -1679,17 +1694,14 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   if (need_hess) {
     hess_nz = w; w += sp_hess_.nnz();
   }
-  // Number of parallel tasks
-  casadi_int n_tasks = 1;
-  if (need_jac || need_adj) {
-    n_tasks = std::max(n_tasks, max_jac_tasks_);
-  }
-  if (need_hess) {
-    n_tasks = std::max(n_tasks, max_hess_tasks_);
-  }
+  // Number of parallel tasks for Jacobian calculation
+  casadi_int n_jac_tasks = need_jac || need_adj ? max_jac_tasks_ : 1;
+  // Number of parallel tasks for the Hessian calculation
+  casadi_int n_hess_tasks = need_hess ? max_hess_tasks_ : 0;
+  // Total number of memory objects used
+  casadi_int n_tasks = std::max(n_jac_tasks, n_hess_tasks);
   // Setup memory for threads
   for (casadi_int task = 0; task < n_tasks; ++task) {
-    // Set work vectors
     FmuMemory* s = task == 0 ? m : m->slaves.at(task - 1);
     s->set_work(arg, res, iw, w);
     s->set_sens(aseed, asens, jac_nz);
@@ -1699,60 +1711,12 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       w += jac_w_;
     }
   }
-  // Return flag
-  int flag = 0;
-  // Evaluate, serially or in parallel
-  if (parallelization_ == Parallelization::SERIAL || n_tasks == 1) {
-    // Evaluate serially
-    flag = eval_thread(m, 0, 1, need_jac, need_adj);
-  } else if (parallelization_ == Parallelization::OPENMP) {
-    #ifdef WITH_OPENMP
-    // Parallel region
-    #pragma omp parallel reduction(||:flag)
-    {
-      // Get thread number
-      casadi_int task = omp_get_thread_num();
-      // Get number of threads in region
-      casadi_int num_threads = omp_get_num_threads();
-      // Number of threads that are actually used
-      casadi_int num_used_threads = std::min(num_threads, max_jac_tasks_);
-      // Evaluate in parallel
-      if (task < num_used_threads) {
-        FmuMemory* s = task == 0 ? m : m->slaves.at(task - 1);
-        flag = eval_thread(s, task, num_used_threads, need_jac, need_adj);
-      } else {
-        // Nothing to do for thread
-        flag = 0;
-      }
-    }
-    #else   // WITH_OPENMP
-    flag = 1;
-    #endif  // WITH_OPENMP
-  } else if (parallelization_ == Parallelization::THREAD) {
-    #ifdef CASADI_WITH_THREAD
-    // Return value for each thread
-    std::vector<int> flag_task(max_jac_tasks_);
-    // Spawn threads
-    std::vector<std::thread> threads;
-    for (casadi_int task = 0; task < max_jac_tasks_; ++task) {
-      threads.emplace_back(
-        [&, task](int* fl) {
-          FmuMemory* s = task == 0 ? m : m->slaves.at(task - 1);
-          *fl = eval_thread(s, task, max_jac_tasks_, need_jac, need_adj);
-        }, &flag_task[task]);
-    }
-    // Join threads
-    for (auto&& th : threads) th.join();
-    // Join return flags
-    for (int fl : flag_task) flag = flag || fl;
-    #else   // CASADI_WITH_THREAD
-    flag = 1;
-    #endif  // CASADI_WITH_THREAD
-  } else {
-    casadi_error("Unknown parallelization: " + to_string(parallelization_));
+  // Evaluate everything except Hessian, possibly in parallel
+  if (eval_all(m, n_jac_tasks, true, need_jac, need_adj, false)) return 1;
+  // Evaluate Hessian
+  if (need_hess) {
+    if (eval_all(m, n_hess_tasks, false, false, false, true)) return 1;
   }
-  // Error in evaluation
-  if (flag) return 1;
   // Fetch calculated blocks
   for (size_t k = 0; k < out_.size(); ++k) {
     // Get nonzeros, skip if not needed
@@ -1785,13 +1749,68 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   return 0;
 }
 
-int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
-    bool need_jac, bool need_adj) const {
-  // Data for Jacobian/adjoint calculation
-  casadi_jac_data<double> d;
-  if (need_jac || need_adj) {
-    casadi_jac_init(&p_, &d, &m->iw, &m->w);
+int FmuFunction::eval_all(FmuMemory* m, casadi_int n_task,
+    bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const {
+  // Return flag
+  int flag = 0;
+  // Evaluate, serially or in parallel
+  if (parallelization_ == Parallelization::SERIAL || n_task == 1) {
+    // Evaluate serially
+    flag = eval_task(m, 0, 1, need_nondiff, need_jac, need_adj, need_hess);
+  } else if (parallelization_ == Parallelization::OPENMP) {
+    #ifdef WITH_OPENMP
+    // Parallel region
+    #pragma omp parallel reduction(||:flag)
+    {
+      // Get thread number
+      casadi_int task = omp_get_thread_num();
+      // Get number of threads in region
+      casadi_int num_threads = omp_get_num_threads();
+      // Number of threads that are actually used
+      casadi_int num_used_threads = std::min(num_threads, n_task);
+      // Evaluate in parallel
+      if (task < num_used_threads) {
+        FmuMemory* s = task == 0 ? m : m->slaves.at(task - 1);
+        flag = eval_task(s, task, num_used_threads,
+          need_nondiff && task == 0, need_jac, need_adj, need_hess);
+      } else {
+        // Nothing to do for thread
+        flag = 0;
+      }
+    }
+    #else   // WITH_OPENMP
+    flag = 1;
+    #endif  // WITH_OPENMP
+  } else if (parallelization_ == Parallelization::THREAD) {
+    #ifdef CASADI_WITH_THREAD
+    // Return value for each thread
+    std::vector<int> flag_task(n_task);
+    // Spawn threads
+    std::vector<std::thread> threads;
+    for (casadi_int task = 0; task < n_task; ++task) {
+      threads.emplace_back(
+        [&, task](int* fl) {
+          FmuMemory* s = task == 0 ? m : m->slaves.at(task - 1);
+          *fl = eval_task(s, task, n_task,
+            need_nondiff && task == 0, need_jac, need_adj, need_hess);
+        }, &flag_task[task]);
+    }
+    // Join threads
+    for (auto&& th : threads) th.join();
+    // Join return flags
+    for (int fl : flag_task) flag = flag || fl;
+    #else   // CASADI_WITH_THREAD
+    flag = 1;
+    #endif  // CASADI_WITH_THREAD
+  } else {
+    casadi_error("Unknown parallelization: " + to_string(parallelization_));
   }
+  // Return combined error flag
+  return flag;
+}
+
+int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
+    bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const {
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k].type == InputType::REG) {
@@ -1807,15 +1826,18 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
   // Evaluate
   if (fmu_->eval(m)) return 1;
   // Get regular outputs (master thread only)
-  if (task == 0) {
+  if (need_nondiff) {
     for (size_t k = 0; k < out_.size(); ++k) {
       if (m->res[k] && out_[k].type == OutputType::REG) {
         fmu_->get(m, out_[k].ind, m->res[k]);
       }
     }
   }
-  // Evalute Jacobian blocks
+  // Evalute extended Jacobian
   if (need_jac || need_adj) {
+    // Data for Jacobian/adjoint calculation
+    casadi_jac_data<double> d;
+    casadi_jac_init(&p_, &d, &m->iw, &m->w);
     // Selection of colors to be evaluated for the thread
     casadi_int c_begin = (task * coloring_.size2()) / n_task;
     casadi_int c_end = ((task + 1) * coloring_.size2()) / n_task;
@@ -1841,6 +1863,16 @@ int FmuFunction::eval_thread(FmuMemory* m, casadi_int task, casadi_int n_task,
           m->asens[d.wrt[i]] += m->aseed[d.isens[i]] * d.sens[i];
       }
     }
+  }
+  // Evaluate extended Hessian
+  if (need_hess) {
+    // Selection of inputs to be perturbed for the thread
+    casadi_int c_begin = (task * nonlin_.size()) / n_task;
+    casadi_int c_end = ((task + 1) * nonlin_.size()) / n_task;
+    // Not implemented
+    (void)c_begin;
+    (void)c_end;
+    casadi_warning("Hessian evaluation not implemented");
   }
   // Successful return
   return 0;

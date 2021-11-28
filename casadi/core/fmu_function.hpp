@@ -580,11 +580,11 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Get sparsity pattern for extended Jacobian, Hessian
   Sparsity sp_jac_, sp_hess_;
 
-  // Number of nonlinearly entering variables
-  casadi_int n_nonlin_;
-
   // Graph coloring
   Sparsity coloring_;
+
+  // Nonlinearly entering variables
+  std::vector<casadi_int> nonlin_;
 
   // Jacobian memory
   casadi_jac_prob<double> p_;
@@ -610,9 +610,13 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Evaluate numerically
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
+  // Evaluate all tasks numerically, serially or in parallel
+  int eval_all(FmuMemory* m, casadi_int n_task,
+    bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const;
+
   // Evaluate numerically, single thread
-  int eval_thread(FmuMemory* m, casadi_int thread, casadi_int n_thread,
-    bool need_jac, bool need_adj) const;
+  int eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
+    bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const;
 
   ///@{
   /** \brief Return sparsity of Jacobian of an output respect to an input */
