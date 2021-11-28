@@ -12,7 +12,7 @@ pushd $env:Temp
 if (Test-Path googletest) {
     rm -r -fo googletest
 }
-git clone --single-branch --depth=1 --branch master `
+git clone --single-branch --depth=1 --branch main `
     "https://github.com/google/googletest.git"
 pushd googletest
 cmake -Bbuild -S. `
