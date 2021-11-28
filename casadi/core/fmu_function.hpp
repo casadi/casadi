@@ -214,19 +214,18 @@ class FmuFunction;
 struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   // Function object
   const FmuFunction& self;
-  // Evaluation arguments, work vectors
+  // Evaluation inputs
   const double** arg;
+  // Evaluation outputs
   double** res;
-  casadi_int* iw;
-  double* w;
-  // Set work
-  void set_work(const double** arg, double** res, casadi_int* iw, double* w);
   // Extended Jacobian
   double *jac_nz;
+  // Extended Hessian
+  double *hess_nz;
   // Adjoint seeds, sensitivities being calculated
   double *aseed, *asens;
-  // Set sensivitity vectors
-  void set_sens(double* aseed, double* asens, double* jac_nz);
+  // Memory for Jacobian calculation
+  casadi_jac_data<double> d;
   // Component memory
   fmi2Component c;
   // Additional (slave) memory objects
@@ -588,9 +587,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Jacobian memory
   casadi_jac_prob<double> p_;
-
-  // Work vector size for Jacobian calculation
-  casadi_int jac_iw_, jac_w_;
 
   // Number of parallel tasks
   casadi_int max_jac_tasks_, max_hess_tasks_, max_n_tasks_;
