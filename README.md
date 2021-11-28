@@ -30,7 +30,7 @@ should have a Lipschitz-continuous gradient.
 
 ## Installation
 
-The project is available on [PyPi](https://pypi.org/project/alpaqa):
+The project is available on [PyPI](https://pypi.org/project/alpaqa):
 
 ```sh
 python3 -m pip install alpaqa

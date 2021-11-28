@@ -52,14 +52,14 @@ pip install -r scripts/requirements.txt
 ### Build and install
 
 ```sh
-mkdir -p build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$HOME/.local"
-make install -j$(nproc) # Build and install the optimized release version
-make test # Run the tests
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-make install -j$(nproc) # Build and install the debug version
-make test # Run the tests in debug mode (with extra checks)
+cmake -Bbuild -S. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$HOME/.local"
+cmake --build build -j # Build in release mode
+cmake --build build -t test # Run the tests
+cmake --install build # Install the optimized release version
+cmake -Bbuild -S. -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j # Build in debug mode
+cmake --build build -t test # Run the tests in debug mode (with extra checks)
+cmake --install build # Install the debug version
 ```
 Installing both the release and debug versions can be very useful for checking
 matrix dimension errors and out of bounds accesses during development, and 
