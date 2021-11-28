@@ -12,6 +12,9 @@ The preferred way to install the Alpaqa Python interface is using pip:
 
 (`PyPi <https://pypi.org/project/alpaqa>`_)
 
+To compile problems using the Python interface, you will need a C compiler, such
+as GCC or Clang on Linux and MSVC on Windows.
+
 From source
 -----------
 
