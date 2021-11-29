@@ -223,7 +223,7 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   // Extended Hessian
   double *hess_nz;
   // Adjoint seeds, sensitivities being calculated
-  double *aseed, *asens;
+  double *aseed, *asens, *pert_asens;
   // Memory for Jacobian calculation
   casadi_jac_data<double> d;
   // Component memory
@@ -538,7 +538,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   bool enable_ad_, validate_ad_;
   double step_, abstol_, reltol_, u_aim_, h_min_, h_max_;
   casadi_int h_iter_;
-  bool new_hessian_;
+  bool new_jacobian_, new_hessian_;
 
   // FD method as an enum
   FdMode fd_;
