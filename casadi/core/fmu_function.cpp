@@ -1100,7 +1100,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   u_aim_ = 100.;
   h_iter_ = 0;
   new_jacobian_ = true;
-  new_hessian_ = false;
+  new_hessian_ = true;
   h_min_ = 0;
   h_max_ = inf;
   parallelization_ = Parallelization::SERIAL;
