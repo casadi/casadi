@@ -538,7 +538,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   bool enable_ad_, validate_ad_;
   double step_, abstol_, reltol_, u_aim_, h_min_, h_max_;
   casadi_int h_iter_;
-  bool new_jacobian_, new_hessian_;
+  bool print_progress_, new_jacobian_, new_hessian_;
 
   // FD method as an enum
   FdMode fd_;

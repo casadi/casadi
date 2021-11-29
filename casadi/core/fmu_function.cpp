@@ -1099,6 +1099,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   reltol_ = 1e-3;
   u_aim_ = 100.;
   h_iter_ = 0;
+  print_progress_ = false;
   new_jacobian_ = true;
   new_hessian_ = true;
   h_min_ = 0;
@@ -1162,6 +1163,9 @@ const Options FmuFunction::options_
     {"parallelization",
      {OT_STRING,
       "Parallelization [SERIAL|openmp|thread]"}},
+    {"print_progress",
+     {OT_BOOL,
+      "Print progress during Jacobian/Hessian evaluation"}},
     {"new_jacobian",
      {OT_BOOL,
       "Use Jacobian implementation in class"}},
@@ -1194,6 +1198,8 @@ void FmuFunction::init(const Dict& opts) {
       h_max_ = op.second;
     } else if (op.first=="parallelization") {
       parallelization_ = to_enum<Parallelization>(op.second, "serial");
+    } else if (op.first=="print_progress") {
+      print_progress_ = op.second;
     } else if (op.first=="new_jacobian") {
       new_jacobian_ = op.second;
     } else if (op.first=="new_hessian") {
@@ -1719,9 +1725,11 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     }
   }
   // Evaluate everything except Hessian, possibly in parallel
+  if (verbose_) casadi_message("Evaluating regular outputs, extended Jacobian");
   if (eval_all(m, max_jac_tasks_, true, need_jac, need_adj, false)) return 1;
   // Evaluate Hessian
   if (need_hess) {
+    if (verbose_) casadi_message("Evaluating extended Hessian");
     if (eval_all(m, max_hess_tasks_, false, false, false, true)) return 1;
   }
   // Fetch calculated blocks
@@ -1845,6 +1853,9 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
     casadi_int c_end = ((task + 1) * coloring_.size2()) / n_task;
     // Loop over colors
     for (casadi_int c = c_begin; c < c_end; ++c) {
+      // Print progress
+      if (print_progress_) print("Jacobian calculation, thread %d/%d: Seeding variable %d/%d\n",
+        task + 1, n_task, c - c_begin + 1, c_end - c_begin);
       // Get derivative directions
       casadi_jac_pre(&p_, &m->d, c);
       // Calculate derivatives
@@ -1875,28 +1886,31 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
     const casadi_int *hess_colind = sp_hess_.colind(), *hess_row = sp_hess_.row();
     // Loop over perturbed inputs for thread
     for (casadi_int c = c_begin; c < c_end; ++c) {
-     // Corresponding input in Fmu
-     casadi_int ind1 = nonlin_.at(c);
-     casadi_int id = jac_in_.at(ind1);
-     // Get unperturbed value
-     double x = m->ibuf_.at(id);
-     // Step size
-     double h = m->self.step_;
-     double hinv = 1. / h;
-     // Perturb the input
-     m->ibuf_.at(id) += h * fmu_->nominal_in_.at(id);
-     m->changed_.at(id) = true;
-     // Request all outputs
-     for (size_t i : jac_out_) {
+      // Print progress
+      if (print_progress_) print("Hessian calculation, thread %d/%d: Perturbing variable %d/%d\n",
+        task + 1, n_task, c - c_begin + 1, c_end - c_begin);
+      // Corresponding input in Fmu
+      casadi_int ind1 = nonlin_.at(c);
+      casadi_int id = jac_in_.at(ind1);
+      // Get unperturbed value
+      double x = m->ibuf_.at(id);
+      // Step size
+      double h = m->self.step_;
+      double hinv = 1. / h;
+      // Perturb the input
+      m->ibuf_.at(id) += h * fmu_->nominal_in_.at(id);
+      m->changed_.at(id) = true;
+      // Request all outputs
+      for (size_t i : jac_out_) {
        m->requested_.at(i) = true;
        m->wrt_.at(i) = -1;
-     }
-     // Calculate perturbed inputs
-     if (fmu_->eval(m)) return 1;
-     // Clear perturbed adjoint sensitivities
-     std::fill(m->pert_asens, m->pert_asens + fmu_->iind_.size(), 0);
-     // Loop over colors of the Jacobian
-     for (casadi_int c1 = 0; c1 < coloring_.size2(); ++c1) {
+      }
+      // Calculate perturbed inputs
+      if (fmu_->eval(m)) return 1;
+      // Clear perturbed adjoint sensitivities
+      std::fill(m->pert_asens, m->pert_asens + fmu_->iind_.size(), 0);
+      // Loop over colors of the Jacobian
+      for (casadi_int c1 = 0; c1 < coloring_.size2(); ++c1) {
        // Get derivative directions
        casadi_jac_pre(&p_, &m->d, c1);
        // Calculate derivatives
@@ -1909,15 +1923,15 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        // Propagate adjoint sensitivities
        for (casadi_int i = 0; i < m->d.nsens; ++i)
          m->pert_asens[m->d.wrt[i]] += m->aseed[m->d.isens[i]] * m->d.sens[i];
-     }
-     // Restore input
-     m->ibuf_.at(id) = x;
-     m->changed_.at(id) = true;
-     // Get column in Hessian
-     for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
+      }
+      // Restore input
+      m->ibuf_.at(id) = x;
+      m->changed_.at(id) = true;
+      // Get column in Hessian
+      for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
        casadi_int id2 = jac_in_.at(hess_row[k]);
        m->hess_nz[k] = hinv * (m->pert_asens[id2] - m->asens[id2]);
-     }
+      }
     }
   }
   // Successful return
@@ -2014,6 +2028,7 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
   Dict opts1 = opts;
   opts1["parallelization"] = to_string(parallelization_);
   opts1["verbose"] = verbose_;
+  opts1["print_progress"] = print_progress_;
   // Return new instance of class
   Function ret;
   ret.own(new FmuFunction(name, fmu_, inames, onames));
@@ -2039,6 +2054,7 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
   opts1["parallelization"] = to_string(parallelization_);
   opts1["verbose"] = verbose_;
   opts1["new_jacobian"] = new_hessian_;
+  opts1["print_progress"] = print_progress_;
   // Return new instance of class
   Function ret;
   ret.own(new FmuFunction(name, fmu_, inames, onames));
