@@ -1103,15 +1103,24 @@ void DaeBuilder::set(const std::vector<std::string>& name,
   }
 }
 
-Dict DaeBuilder::get(const std::vector<std::string>& name) const {
+GenericType DaeBuilder::get(const std::string& name) const {
+  return get(std::vector<std::string>{name}).front();
+}
+
+std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) const {
   try {
     // Create a temporary FmuFunction instance
     Function f = create(this->name() + "_get", {}, {}, Dict{{"aux", name}});
     // Get the stats
-    return f.stats().at("aux");
+    Dict stats = f.stats().at("aux");
+    // Return in the same order as inputs
+    std::vector<GenericType> ret;
+    ret.reserve(name.size());
+    for (const std::string& n : name) ret.push_back(stats.at(n));
+    return ret;
   } catch (std::exception& e) {
     THROW_ERROR("get", e.what());
-    return Dict();
+    return {};
   }
 }
 

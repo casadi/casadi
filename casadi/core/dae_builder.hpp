@@ -486,6 +486,9 @@ public:
   // Set the current value, single value (string)
   void set(const std::string& name, const std::string& val);
 
+  /// Evaluate the values for a set of variables at the initial time, single value
+  GenericType get(const std::string& name) const;
+
 #endif  // !SWIGMATLAB
 
   /// Get an attribute
@@ -526,7 +529,7 @@ public:
   void set(const std::vector<std::string>& name, const std::vector<std::string>& val);
 
   /// Evaluate the values for a set of variables at the initial time
-  Dict get(const std::vector<std::string>& name) const;
+  std::vector<GenericType> get(const std::vector<std::string>& name) const;
 
   /// Add a new variable: returns corresponding symbolic expression
   MX add_variable(const std::string& name, casadi_int n=1);
