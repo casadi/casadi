@@ -943,11 +943,13 @@ int Fmu::eval_fd(FmuMemory* m) const {
       size_t wrt = m->wrt_[id];
       // Value to compare with
       double d_ad = m->sens_[id];
+      // Is it a not a number?
+      bool d_is_nan = d_ad != d_ad;
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
-      // Check if error exceeds thresholds
-      if (d_max > nominal_in_[wrt] * n * m->self.abstol_
-          && std::fabs(d_ad - d_fd) > d_max * m->self.reltol_) {
+      // Check if NaN or error exceeds thresholds
+      if (d_is_nan || (d_max > nominal_in_[wrt] * n * m->self.abstol_
+          && std::fabs(d_ad - d_fd) > d_max * m->self.reltol_)) {
         // Which element in the vector
         size_t wrt_ind = 0;
         for (; wrt_ind < m->id_in_.size(); ++wrt_ind)
@@ -955,7 +957,8 @@ int Fmu::eval_fd(FmuMemory* m) const {
         casadi_assert(wrt_ind < m->id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
-        ss << "Inconsistent derivatives of " << vn_out_[id] << " w.r.t. " << vn_in_[wrt] << "\n"
+        ss << (d_is_nan ? "NaN" : "Inconsistent") << " derivatives of " << vn_out_[id]
+          << " w.r.t. " << vn_in_[wrt] << "\n"
           << "At " << m->v_in_[wrt_ind] << ", nominal " << nominal_in_[wrt]
           << ", min " << min_in_[wrt] << ", max " << max_in_[wrt] << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].\n";
