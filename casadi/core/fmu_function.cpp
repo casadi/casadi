@@ -821,113 +821,98 @@ int Fmu::eval_fd(FmuMemory* m) const {
   }
   // Allocate memory for perturbed outputs
   m->fd_out_.resize(n_pert * n_unknown);
-  // Perform finite difference algorithm with different step sizes
-  for (casadi_int iter = 0; iter < 1 + m->self.h_iter_; ++iter) {
-    // Calculate all perturbed outputs
-    for (casadi_int k = 0; k < n_pert; ++k) {
-      // Where to save the perturbed outputs
-      yk[k] = &m->fd_out_[n_unknown * k];
-      // Get perturbation expression
-      double pert;
-      switch (m->self.fd_) {
-      case FdMode::FORWARD:
-      case FdMode::BACKWARD:
-        pert = h;
-        break;
-      case FdMode::CENTRAL:
-        pert = (2 * static_cast<double>(k) - 1) * h;
-        break;
-      case FdMode::SMOOTHING:
-        pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
-        break;
-      default: casadi_error("Not implemented");
-      }
-      // Perturb inputs, if allowed
-      m->v_pert_.resize(n_known);
-      m->in_bounds_.clear();
-      for (size_t i = 0; i < n_known; ++i) {
-        // Try to take step
-        double test = m->v_in_[i] + pert * m->d_in_[i];
-        // Check if in bounds
-        size_t id = m->id_in_[i];
-        bool in_bounds = test >= min_in_[id] && test <= max_in_[id];
-        // Take step, if allowed
-        m->v_pert_[i] = in_bounds ? test : m->v_in_[i];
-        // Keep track for later
-        m->in_bounds_.push_back(in_bounds);
-      }
-      // Pass perturbed inputs to FMU
-      status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
-      if (status != fmi2OK) {
-        casadi_warning("fmi2SetReal failed");
-        return 1;
-      }
-      // Evaluate perturbed FMU
-      status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, yk[k]);
-      if (status != fmi2OK) {
-        casadi_warning("fmi2GetReal failed");
-        return 1;
-      }
-      // Post-process yk[k]
-      for (size_t i = 0; i < n_unknown; ++i) {
-        // Variable id
-        size_t id = m->id_out_[i];
-        // Differentiation with respect to what variable
-        size_t wrt_id = m->wrt_.at(id);
-        // Find the corresponding input variable
-        size_t wrt_i;
-        for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
-          if (m->id_in_[wrt_i] == wrt_id) break;
-        }
-        // Check if in bounds
-        if (m->in_bounds_.at(wrt_i)) {
-          // Input was in bounds: Keep output, make dimensionless
-          yk[k][i] /= nominal_out_[m->id_out_[i]];
-        } else {
-          // Input was out of bounds: Discard output
-          yk[k][i] = nan;
-        }
-      }
+  // Calculate all perturbed outputs
+  for (casadi_int k = 0; k < n_pert; ++k) {
+    // Where to save the perturbed outputs
+    yk[k] = &m->fd_out_[n_unknown * k];
+    // Get perturbation expression
+    double pert;
+    switch (m->self.fd_) {
+    case FdMode::FORWARD:
+    case FdMode::BACKWARD:
+      pert = h;
+      break;
+    case FdMode::CENTRAL:
+      pert = (2 * static_cast<double>(k) - 1) * h;
+      break;
+    case FdMode::SMOOTHING:
+      pert = static_cast<double>((2*(k/2)-1) * (k%2+1)) * h;
+      break;
+    default: casadi_error("Not implemented");
     }
-    // Restore FMU inputs
-    status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
+    // Perturb inputs, if allowed
+    m->v_pert_.resize(n_known);
+    m->in_bounds_.clear();
+    for (size_t i = 0; i < n_known; ++i) {
+      // Try to take step
+      double test = m->v_in_[i] + pert * m->d_in_[i];
+      // Check if in bounds
+      size_t id = m->id_in_[i];
+      bool in_bounds = test >= min_in_[id] && test <= max_in_[id];
+      // Take step, if allowed
+      m->v_pert_[i] = in_bounds ? test : m->v_in_[i];
+      // Keep track for later
+      m->in_bounds_.push_back(in_bounds);
+    }
+    // Pass perturbed inputs to FMU
+    status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
     }
-    // FD memory
-    casadi_finite_diff_mem<double> fd_mem;
-    fd_mem.reltol = m->self.reltol_;
-    fd_mem.abstol = m->self.abstol_;
-    fd_mem.smoothing = eps;
-    switch (m->self.fd_) {
-      case FdMode::FORWARD:
-      case FdMode::BACKWARD:
-        u = casadi_forward_diff(yk, get_ptr(m->v_out_),
-          get_ptr(m->d_out_), h, n_unknown, &fd_mem);
-        break;
-      case FdMode::CENTRAL:
-        u = casadi_central_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
-          h, n_unknown, &fd_mem);
-        break;
-      case FdMode::SMOOTHING:
-        u = casadi_smoothing_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
-          h, n_unknown, &fd_mem);
-        break;
-      default: casadi_error("Not implemented");
+    // Evaluate perturbed FMU
+    status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, yk[k]);
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetReal failed");
+      return 1;
     }
-    // Stop, if no more stepsize iterations
-    if (iter == m->self.h_iter_) break;
-    // Update step size
-    if (u < 0) {
-      // Perturbation failed, try a smaller step size
-      h /= m->self.u_aim_;
-    } else {
-      // Update h to get u near the target ratio
-      h *= sqrt(m->self.u_aim_ / fmax(1., u));
+    // Post-process yk[k]
+    for (size_t i = 0; i < n_unknown; ++i) {
+      // Variable id
+      size_t id = m->id_out_[i];
+      // Differentiation with respect to what variable
+      size_t wrt_id = m->wrt_.at(id);
+      // Find the corresponding input variable
+      size_t wrt_i;
+      for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
+        if (m->id_in_[wrt_i] == wrt_id) break;
+      }
+      // Check if in bounds
+      if (m->in_bounds_.at(wrt_i)) {
+        // Input was in bounds: Keep output, make dimensionless
+        yk[k][i] /= nominal_out_[m->id_out_[i]];
+      } else {
+        // Input was out of bounds: Discard output
+        yk[k][i] = nan;
+      }
     }
-    // Make sure h stays in the range [h_min_,h_max_]
-    h = fmin(fmax(h, m->self.h_min_), m->self.h_max_);
+  }
+  // Restore FMU inputs
+  status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
+  if (status != fmi2OK) {
+    casadi_warning("fmi2SetReal failed");
+    return 1;
+  }
+  // FD memory
+  casadi_finite_diff_mem<double> fd_mem;
+  fd_mem.reltol = m->self.reltol_;
+  fd_mem.abstol = m->self.abstol_;
+  fd_mem.smoothing = eps;
+  switch (m->self.fd_) {
+    case FdMode::FORWARD:
+    case FdMode::BACKWARD:
+      u = casadi_forward_diff(yk, get_ptr(m->v_out_),
+        get_ptr(m->d_out_), h, n_unknown, &fd_mem);
+      break;
+    case FdMode::CENTRAL:
+      u = casadi_central_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
+        h, n_unknown, &fd_mem);
+      break;
+    case FdMode::SMOOTHING:
+      u = casadi_smoothing_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
+        h, n_unknown, &fd_mem);
+      break;
+    default: casadi_error("Not implemented");
   }
   // Collect requested variables
   for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {
@@ -961,7 +946,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
           << " w.r.t. " << vn_in_[wrt] << "\n"
           << "At " << m->v_in_[wrt_ind] << ", nominal " << nominal_in_[wrt]
           << ", min " << min_in_[wrt] << ", max " << max_in_[wrt] << ", got " << d_ad
-          << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].\n";
+          << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].";
         // Also print the stencil:
         std::vector<double> stencil;
         switch (m->self.fd_) {
@@ -981,7 +966,15 @@ int Fmu::eval_fd(FmuMemory* m) const {
         }
         // Scale by nominal value
         for (double& s : stencil) s *= n;
-        ss << "Values for step size " << h << ", error ratio " << u << ": " << stencil;
+        ss << "\nValues for step size " << h << ": " << stencil;
+        // Error between truncation and roundoff error
+        if (u == u && u > 0 && !d_is_nan) {
+          const double u_aim = 100;
+          ss << "\nEstimated truncation/roundoff error ratio: " << u
+            << ", suggested step size or nominal value update factor: "
+            << sqrt(u_aim / fmax(1., u));
+        }
+        // Issue warning
         casadi_warning(ss.str());
       }
     } else {
@@ -1100,13 +1093,9 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   step_ = 1e-6;
   abstol_ = 1e-3;
   reltol_ = 1e-3;
-  u_aim_ = 100.;
-  h_iter_ = 0;
   print_progress_ = false;
   new_jacobian_ = true;
   new_hessian_ = true;
-  h_min_ = 0;
-  h_max_ = inf;
   parallelization_ = Parallelization::SERIAL;
   // Number of parallel tasks, by default
   max_n_tasks_ = 1;
@@ -1151,18 +1140,6 @@ const Options FmuFunction::options_
     {"reltol",
      {OT_DOUBLE,
       "Relative error tolerance"}},
-    {"h_iter",
-     {OT_INT,
-      "Number of step size iterations"}},
-    {"u_aim",
-     {OT_DOUBLE,
-      "Target ratio of truncation error to roundoff error"}},
-    {"h_min",
-     {OT_DOUBLE,
-      "Minimum step size"}},
-    {"h_max",
-     {OT_DOUBLE,
-      "Maximum step size"}},
     {"parallelization",
      {OT_STRING,
       "Parallelization [SERIAL|openmp|thread]"}},
@@ -1191,14 +1168,6 @@ void FmuFunction::init(const Dict& opts) {
       abstol_ = op.second;
     } else if (op.first=="reltol") {
       reltol_ = op.second;
-    } else if (op.first=="h_iter") {
-      h_iter_ = op.second;
-    } else if (op.first=="u_aim") {
-      u_aim_ = op.second;
-    } else if (op.first=="h_min") {
-      h_min_ = op.second;
-    } else if (op.first=="h_max") {
-      h_max_ = op.second;
     } else if (op.first=="parallelization") {
       parallelization_ = to_enum<Parallelization>(op.second, "serial");
     } else if (op.first=="print_progress") {
