@@ -227,23 +227,23 @@ void Fmu::init(const DaeBuilderInternal* dae) {
       case Type::REAL:
         // Real
         vn_aux_real_.push_back(v.name);
-        vr_aux_real_.push_back(v.value_reference);
+        vr_aux_real_.push_back(vr);
         break;
       case Type::INTEGER:
       case Type::ENUM:
         // Integer or enum
         vn_aux_integer_.push_back(v.name);
-        vr_aux_integer_.push_back(v.value_reference);
+        vr_aux_integer_.push_back(vr);
         break;
       case Type::BOOLEAN:
         // Boolean
         vn_aux_boolean_.push_back(v.name);
-        vr_aux_boolean_.push_back(v.value_reference);
+        vr_aux_boolean_.push_back(vr);
         break;
       case Type::STRING:
         // String
         vn_aux_string_.push_back(v.name);
-        vr_aux_string_.push_back(v.value_reference);
+        vr_aux_string_.push_back(vr);
         break;
       default:
         casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
@@ -593,6 +593,8 @@ int Fmu::get_aux(fmi2Component c, Value* v) const {
       casadi_error("fmi2GetString failed for value reference " + str(vr));
     }
   }
+  // Successful return
+  return 0;
 }
 
 void Fmu::get_stats(FmuMemory* m, Dict* stats) const {
@@ -1605,6 +1607,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
           need_adj = true;
           need_hess = true;
           break;
+        default:
+          break;
       }
     }
   }
@@ -1679,6 +1683,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       case OutputType::HESS:
         casadi_get_sub(r, sp_hess_, hess_nz,
           out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
+        break;
+      default:
         break;
     }
   }

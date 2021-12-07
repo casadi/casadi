@@ -258,8 +258,6 @@ void casadi_central_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y) {
 template<typename T1>
 T1 casadi_central_diff_err(const T1* yk, T1 h, casadi_int n_y, casadi_int i,
     T1 abstol, T1 reltol) {
-  // Return value
-  T1 u;
   // Local variables
   const T1 *yf, *yc, *yb;
   T1 err_trunc, err_round;
@@ -353,15 +351,13 @@ void casadi_smoothing_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y, T1 smo
 template<typename T1>
 T1 casadi_smoothing_diff_err(const T1* yk, T1 h, casadi_int n_y, casadi_int i,
     T1 abstol, T1 reltol, T1 smoothing) {
-  // Return value
-  T1 u;
   // Stencil
   T1 yb, yc, yf;
   // Local variables
   T1 wk, sw, ui, err_trunc, err_round, sm;
   casadi_int k;
-  // Set u and stencils to zero (also supresses warnings)
-  yf = yc = yb = u = 0;
+  // Set stencils to zero (also supresses warnings)
+  yf = yc = yb = 0;
   // Reset derivative estimate, sum of weights, error estimate
   sw = ui = 0;
   // For backward shifted, central and forward shifted
