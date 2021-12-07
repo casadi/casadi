@@ -894,22 +894,22 @@ int Fmu::eval_fd(FmuMemory* m) const {
     return 1;
   }
   // FD memory
-  casadi_finite_diff_mem<double> fd_mem;
+  casadi_finite_diff_mem_new<double> fd_mem;
   fd_mem.reltol = m->self.reltol_;
   fd_mem.abstol = m->self.abstol_;
   fd_mem.smoothing = eps;
   switch (m->self.fd_) {
     case FdMode::FORWARD:
     case FdMode::BACKWARD:
-      u = casadi_forward_diff(yk, get_ptr(m->v_out_),
+      u = casadi_forward_diff_new(yk, get_ptr(m->v_out_),
         get_ptr(m->d_out_), h, n_unknown, &fd_mem);
       break;
     case FdMode::CENTRAL:
-      u = casadi_central_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
+      u = casadi_central_diff_new(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
         h, n_unknown, &fd_mem);
       break;
     case FdMode::SMOOTHING:
-      u = casadi_smoothing_diff(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
+      u = casadi_smoothing_diff_new(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
         h, n_unknown, &fd_mem);
       break;
     default: casadi_error("Not implemented");
