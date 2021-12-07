@@ -870,30 +870,11 @@ int Fmu::eval_fd(FmuMemory* m) const {
     casadi_warning("fmi2SetReal failed");
     return 1;
   }
-  // Error estimate for step size
-  double u = nan;
-
   // Step size
   double h = m->self.step_;
 
   // Calculate FD approximation
-  switch (m->self.fd_) {
-    case FdMode::FORWARD:
-    case FdMode::BACKWARD:
-      casadi_forward_diff_new(get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown);
-      break;
-    case FdMode::CENTRAL:
-      casadi_central_diff_new(get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown);
-      u = casadi_central_diff_err(get_ptr(m->fd_out_), h, n_unknown,
-        m->self.abstol_, m->self.reltol_);
-      break;
-    case FdMode::SMOOTHING:
-      casadi_smoothing_diff_new(get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown, eps);
-      u = casadi_smoothing_diff_err(get_ptr(m->fd_out_), h, n_unknown,
-        m->self.abstol_, m->self.reltol_, eps);
-      break;
-    default: casadi_error("Not implemented");
-  }
+  finite_diff(m->self.fd_, get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown, eps);
   // Collect requested variables
   for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {
     // Variable id
@@ -928,15 +909,20 @@ int Fmu::eval_fd(FmuMemory* m) const {
           << ", min " << min_in_[wrt] << ", max " << max_in_[wrt] << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].";
         // Also print the stencil:
-        ss << "\nValues for step size " << h << ": {";
+        ss << "\nValues for step size " << h << ": [";
         for (casadi_int k = 0; k < n_points; ++k) {
           if (k > 0) ss << ", ";
           ss << (n * m->d_out_[ind + k * n_unknown]);
         }
-        ss << "}";
+        ss << "]";
         // Error between truncation and roundoff error
-        if (u == u && u > 0 && !d_is_nan) {
+        if (!d_is_nan && fd_has_err(m->self.fd_)) {
+          // Error estimate for step size
+          double u = finite_diff_err(m->self.fd_, get_ptr(m->fd_out_), h, n_unknown, ind,
+            m->self.abstol_, m->self.reltol_, eps);
+          // Target ratio
           const double u_aim = 100;
+          // Output ratio and scaling factor to get closer to target ratio
           ss << "\nEstimated truncation/roundoff error ratio: " << u
             << ", suggested step size or nominal value update factor: "
             << sqrt(u_aim / fmax(1., u));
@@ -1909,6 +1895,17 @@ casadi_int fd_offset(FdMode v) {
   }
   return -1;
 }
+
+bool fd_has_err(FdMode v) {
+  switch (v) {
+    case FdMode::CENTRAL:
+    case FdMode::SMOOTHING:
+      return true;
+    default: break;
+  }
+  return false;
+}
+
 
 std::string to_string(Parallelization v) {
   switch (v) {

@@ -256,35 +256,29 @@ void casadi_central_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y) {
 }
 
 template<typename T1>
-T1 casadi_central_diff_err(const T1* yk, T1 h, casadi_int n_y, T1 abstol, T1 reltol) {
+T1 casadi_central_diff_err(const T1* yk, T1 h, casadi_int n_y, casadi_int i,
+    T1 abstol, T1 reltol) {
   // Return value
   T1 u;
   // Local variables
-  casadi_int i;
   const T1 *yf, *yc, *yb;
-  T1 err_trunc, err_round, hinv;
-  // Inverse of step size
-  hinv = 1. / h;
+  T1 err_trunc, err_round;
   // Get stencil
   yb = yk;
   yc = yk + n_y;
   yf = yk + 2 * n_y;
-  // Initialize u
-  u = 0;
-  // Find largest quotient between truncation error and roundoff error
-  for (i = 0; i < n_y; ++i) {
-    // Only consider points where both forward and backward allowed
-    if (isfinite(yb[i]) && isfinite(yf[i])) {
-      // Truncation error
-      err_trunc = yf[i] - 2*yc[i] + yb[i];
-      // Roundoff error
-      err_round = reltol * hinv * fmax(fabs(yf[i] - yc[i]), fabs(yc[i] - yb[i])) + abstol;
-      // Update error estimate
-      u = fmax(u, fabs(err_trunc / err_round));
-    }
+  // Only consider points where both forward and backward allowed
+  if (isfinite(yb[i]) && isfinite(yf[i])) {
+    // Truncation error
+    err_trunc = yf[i] - 2*yc[i] + yb[i];
+    // Roundoff error
+    err_round = reltol / h * fmax(fabs(yf[i] - yc[i]), fabs(yc[i] - yb[i])) + abstol;
+    // Error quotient estimate
+    return err_trunc / err_round;
+  } else {
+    // Cannot be calculated
+    return std::numeric_limits<T1>::quiet_NaN();;
   }
-  // Return largest quotient
-  return u;
 }
 
 template<typename T1>
@@ -357,7 +351,7 @@ void casadi_smoothing_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y, T1 smo
 }
 
 template<typename T1>
-T1 casadi_smoothing_diff_err(const T1* yk, T1 h, casadi_int n_y,
+T1 casadi_smoothing_diff_err(const T1* yk, T1 h, casadi_int n_y, casadi_int i,
     T1 abstol, T1 reltol, T1 smoothing) {
   // Return value
   T1 u;
@@ -365,44 +359,41 @@ T1 casadi_smoothing_diff_err(const T1* yk, T1 h, casadi_int n_y,
   T1 yb, yc, yf;
   // Local variables
   T1 wk, sw, ui, err_trunc, err_round, sm;
-  casadi_int i, k;
+  casadi_int k;
   // Set u and stencils to zero (also supresses warnings)
   yf = yc = yb = u = 0;
-  for (i=0; i<n_y; ++i) {
-    // Reset derivative estimate, sum of weights, error estimate
-    sw = ui = 0;
-    // For backward shifted, central and forward shifted
-    for (k = 0; k < 3; ++k) {
-      // Get stencil
-      yb = yk[i + k * n_y];
-      yc = yk[i + (k + 1) * n_y];
-      yf = yk[i + (k + 2) * n_y];
-      // No contribuation if any value is infinite
-      if (!isfinite(yb) || !isfinite(yc) || !isfinite(yf)) continue;
-      // Calculate weights
-      wk = casadi_smoothing_diff_weights(k, yb, yc, yf, static_cast<T1*>(0));
-      // Truncation error
-      err_trunc = yf - 2*yc + yb;
-      // Roundoff error
-      err_round = reltol/h*fmax(fabs(yf - yc), fabs(yc - yb)) + abstol;
-      // We use the second order derivative as a smoothness measure
-      sm = err_trunc/(h*h);
-      // Modify the weight according to smoothness
-      wk /= sm*sm + smoothing;
-      sw += wk;
-      // Added weighted contribution to weight and error
-      ui += wk * fabs(err_trunc / err_round);
-    }
-    // If sw is 0, no stencil worked
-    if (sw == 0) {
-      // Set component to 0, return -1
-      u = -1;
-    } else {
-      // Finalize estimate using the sum of weights and the step length
-      if (u>=0) u = fmax(u, ui/sw);
-    }
+  // Reset derivative estimate, sum of weights, error estimate
+  sw = ui = 0;
+  // For backward shifted, central and forward shifted
+  for (k = 0; k < 3; ++k) {
+    // Get stencil
+    yb = yk[i + k * n_y];
+    yc = yk[i + (k + 1) * n_y];
+    yf = yk[i + (k + 2) * n_y];
+    // No contribuation if any value is infinite
+    if (!isfinite(yb) || !isfinite(yc) || !isfinite(yf)) continue;
+    // Calculate weights
+    wk = casadi_smoothing_diff_weights(k, yb, yc, yf, static_cast<T1*>(0));
+    // Truncation error
+    err_trunc = yf - 2*yc + yb;
+    // Roundoff error
+    err_round = reltol/h*fmax(fabs(yf - yc), fabs(yc - yb)) + abstol;
+    // We use the second order derivative as a smoothness measure
+    sm = err_trunc/(h*h);
+    // Modify the weight according to smoothness
+    wk /= sm*sm + smoothing;
+    sw += wk;
+    // Added weighted contribution to weight and error
+    ui += wk * fabs(err_trunc / err_round);
   }
-  return u;
+  // If sw is 0, no stencil worked
+  if (sw == 0) {
+    // Cannot be calculated
+    return std::numeric_limits<T1>::quiet_NaN();;
+  } else {
+    // Finalize estimate using the sum of weights and the step length
+    return ui / sw;
+  }
 }
 
 // Forward declarations
@@ -462,6 +453,41 @@ CASADI_EXPORT casadi_int n_fd_points(FdMode v);
 
 /// Offset for FD stencil, i.e. index of unperturbed input
 CASADI_EXPORT casadi_int fd_offset(FdMode v);
+
+/// Calculate FD estimate
+template<typename T1>
+CASADI_EXPORT void finite_diff(FdMode v, const T1* yk, T1* J, T1 h, casadi_int n_y,
+    T1 smoothing) {
+  switch (v) {
+    case FdMode::FORWARD:
+    case FdMode::BACKWARD:
+      return casadi_forward_diff_new(yk, J, h, n_y);
+    case FdMode::CENTRAL:
+      return casadi_central_diff_new(yk, J, h, n_y);
+    case FdMode::SMOOTHING:
+      return casadi_smoothing_diff_new(yk, J, h, n_y, eps);
+    default:
+      casadi_error("FD mode " + to_string(v) + " not implemented");
+  }
+}
+
+/// Is an error estimate available
+CASADI_EXPORT bool fd_has_err(FdMode v);
+
+/// Calculate FD error estimate
+template<typename T1>
+CASADI_EXPORT T1 finite_diff_err(FdMode v, const T1* yk, T1 h, casadi_int n_y, casadi_int i,
+    T1 abstol, T1 reltol, T1 smoothing) {
+  switch (v) {
+    case FdMode::CENTRAL:
+      return casadi_central_diff_err(yk, h, n_y, i, abstol, reltol);
+    case FdMode::SMOOTHING:
+      return casadi_smoothing_diff_err(yk, h, n_y, i, abstol, reltol, smoothing);
+    default:
+      casadi_error("Error estimate cannot be calculated for FD mode " + to_string(v));
+  }
+  return -1;
+}
 
 /// Type of parallelization
 enum class Parallelization {SERIAL, OPENMP, THREAD, NUMEL};
