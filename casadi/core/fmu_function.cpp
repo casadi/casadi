@@ -872,43 +872,25 @@ int Fmu::eval_fd(FmuMemory* m) const {
   }
   // Error estimate for step size
   double u = nan;
-  // Perturbed outputs
-  double* yk[4];
-  if (m->self.fd_ == FdMode::FORWARD) {
-    yk[0] = &m->fd_out_[n_unknown * 1];
-  } else if (m->self.fd_ == FdMode::BACKWARD) {
-    yk[0] = &m->fd_out_[n_unknown * 0];
-  } else if (m->self.fd_ == FdMode::CENTRAL) {
-    yk[0] = &m->fd_out_[n_unknown * 0];
-    yk[1] = &m->fd_out_[n_unknown * 2];
-  } else if (m->self.fd_ == FdMode::SMOOTHING) {
-    yk[0] = &m->fd_out_[n_unknown * 1];
-    yk[1] = &m->fd_out_[n_unknown * 0];
-    yk[2] = &m->fd_out_[n_unknown * 3];
-    yk[3] = &m->fd_out_[n_unknown * 4];
-  }
 
   // Step size
   double h = m->self.step_;
 
-  // FD memory
-  casadi_finite_diff_mem_new<double> fd_mem;
-  fd_mem.reltol = m->self.reltol_;
-  fd_mem.abstol = m->self.abstol_;
-  fd_mem.smoothing = eps;
+  // Calculate FD approximation
   switch (m->self.fd_) {
     case FdMode::FORWARD:
     case FdMode::BACKWARD:
-      u = casadi_forward_diff_new(yk, get_ptr(m->v_out_),
-        get_ptr(m->d_out_), h, n_unknown, &fd_mem);
+      casadi_forward_diff_new(get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown);
       break;
     case FdMode::CENTRAL:
-      u = casadi_central_diff_new(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
-        h, n_unknown, &fd_mem);
+      casadi_central_diff_new(get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown);
+      u = casadi_central_diff_err(get_ptr(m->fd_out_), h, n_unknown,
+        m->self.abstol_, m->self.reltol_);
       break;
     case FdMode::SMOOTHING:
-      u = casadi_smoothing_diff_new(yk, get_ptr(m->v_out_), get_ptr(m->d_out_),
-        h, n_unknown, &fd_mem);
+      casadi_smoothing_diff_new(get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown, eps);
+      u = casadi_smoothing_diff_err(get_ptr(m->fd_out_), h, n_unknown,
+        m->self.abstol_, m->self.reltol_, eps);
       break;
     default: casadi_error("Not implemented");
   }
@@ -946,25 +928,12 @@ int Fmu::eval_fd(FmuMemory* m) const {
           << ", min " << min_in_[wrt] << ", max " << max_in_[wrt] << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].";
         // Also print the stencil:
-        std::vector<double> stencil;
-        switch (m->self.fd_) {
-          case FdMode::FORWARD:
-            stencil = {m->v_out_[ind], yk[0][ind]};
-            break;
-          case FdMode::BACKWARD:
-            stencil = {yk[0][ind], m->v_out_[ind]};
-            break;
-          case FdMode::CENTRAL:
-            stencil = {yk[0][ind], m->v_out_[ind], yk[1][ind]};
-            break;
-          case FdMode::SMOOTHING:
-            stencil = {yk[1][ind], yk[0][ind], m->v_out_[ind], yk[2][ind], yk[3][ind]};
-            break;
-          default: casadi_error("Not implemented");
+        ss << "\nValues for step size " << h << ": {";
+        for (casadi_int k = 0; k < n_points; ++k) {
+          if (k > 0) ss << ", ";
+          ss << (n * m->d_out_[ind + k * n_unknown]);
         }
-        // Scale by nominal value
-        for (double& s : stencil) s *= n;
-        ss << "\nValues for step size " << h << ": " << stencil;
+        ss << "}";
         // Error between truncation and roundoff error
         if (u == u && u > 0 && !d_is_nan) {
           const double u_aim = 100;
