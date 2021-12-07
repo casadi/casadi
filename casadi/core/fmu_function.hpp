@@ -384,6 +384,12 @@ enum class FdMode {FORWARD, BACKWARD, CENTRAL, SMOOTHING, NUMEL};
 /// Convert to string
 CASADI_EXPORT std::string to_string(FdMode v);
 
+/// Length of FD stencil, including unperturbed input
+CASADI_EXPORT casadi_int n_fd_points(FdMode v);
+
+/// Offset for FD stencil, i.e. index of unperturbed input
+CASADI_EXPORT casadi_int fd_offset(FdMode v);
+
 /// Type of parallelization
 enum class Parallelization {SERIAL, OPENMP, THREAD, NUMEL};
 
