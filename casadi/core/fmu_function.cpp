@@ -1826,10 +1826,25 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Get unperturbed value
       double x = m->ibuf_.at(id);
       // Step size
-      double h = m->self.step_;
+      double h = m->self.step_ * fmu_->nominal_in_.at(id);
+      // Make sure a a forward step remains in bounds
+      if (x + h > fmu_->max_in_.at(id)) {
+        // Ensure a negative step is possible
+        if (m->ibuf_.at(id) - h < fmu_->min_in_.at(id)) {
+          std::stringstream ss;
+          ss << "Cannot perturb " << fmu_->vn_in_.at(id) << " at " << x << " with step size "
+            << m->self.step_ << ", nominal " << fmu_->nominal_in_.at(id) << " min "
+            << fmu_->min_in_.at(id) << ", max " << fmu_->max_in_.at(id);
+          casadi_warning(ss.str());
+          return 1;
+        }
+        // Take reverse step instead
+        h = -h;
+      }
+      // Inverse of step size
       double hinv = 1. / h;
       // Perturb the input
-      m->ibuf_.at(id) += h * fmu_->nominal_in_.at(id);
+      m->ibuf_.at(id) += h;
       m->changed_.at(id) = true;
       // Request all outputs
       for (size_t i : jac_out_) {
