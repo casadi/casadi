@@ -762,7 +762,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   bool has_jac_, has_adj_, has_hess_;
 
   // User-set options
-  bool enable_ad_, validate_ad_;
+  bool enable_ad_, validate_ad_, make_symmetric_, check_hessian_;
   double step_, abstol_, reltol_;
   bool print_progress_, new_jacobian_, new_hessian_;
 
@@ -839,6 +839,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Evaluate numerically, single thread
   int eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
     bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const;
+
+  // Check extended Hessian
+  void check_hessian(const double *hess_nz, casadi_int* iw) const;
+
+  // Make extended Hessian symmetric
+  void make_symmetric(double *hess_nz, casadi_int* iw) const;
 
   ///@{
   /** \brief Return sparsity of Jacobian of an output respect to an input */

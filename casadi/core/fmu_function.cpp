@@ -1044,6 +1044,8 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   // Default options
   enable_ad_ = fmu_->get_directional_derivative_ != 0;
   validate_ad_ = false;
+  make_symmetric_ = true;
+  check_hessian_ = false;
   enable_fd_op_ = enable_ad_ && !all_regular();  // Use FD for second and higher order derivatives
   step_ = 1e-6;
   abstol_ = 1e-3;
@@ -1086,6 +1088,12 @@ const Options FmuFunction::options_
     {"validate_ad",
      {OT_BOOL,
       "Compare analytic derivatives with finite differences for validation"}},
+    {"check_hessian",
+     {OT_BOOL,
+      "Symmetry check for Hessian"}},
+    {"make_symmetric",
+     {OT_BOOL,
+      "Ensure Hessian is symmetric"}},
     {"step",
      {OT_DOUBLE,
       "Step size, scaled by nominal value"}},
@@ -1117,6 +1125,10 @@ void FmuFunction::init(const Dict& opts) {
       enable_ad_ = op.second;
     } else if (op.first=="validate_ad") {
       validate_ad_ = op.second;
+    } else if (op.first=="check_hessian") {
+      check_hessian_ = op.second;
+    } else if (op.first=="make_symmetric") {
+      make_symmetric_ = op.second;
     } else if (op.first=="step") {
       step_ = op.second;
     } else if (op.first=="abstol") {
@@ -1368,6 +1380,9 @@ void FmuFunction::init(const Dict& opts) {
 
     // Work vector for perturbed adjoint sensitivities
     alloc_w(max_hess_tasks_ * fmu_->iind_.size(), true);  // pert_asens
+
+    // Work vector for making symmetric or checking symmetry
+    if (check_hessian_ || make_symmetric_) alloc_iw(sp_hess_.size2());
   }
 
   // Total number of threads used for Jacobian/adjoint calculation
@@ -1660,6 +1675,9 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   if (need_hess) {
     if (verbose_) casadi_message("Evaluating extended Hessian");
     if (eval_all(m, max_hess_tasks_, false, false, false, true)) return 1;
+    // Post-process Hessian
+    if (check_hessian_) check_hessian(hess_nz, iw);
+    if (make_symmetric_) make_symmetric(hess_nz, iw);
   }
   // Fetch calculated blocks
   for (size_t k = 0; k < out_.size(); ++k) {
@@ -1882,6 +1900,70 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   }
   // Successful return
   return 0;
+}
+
+void FmuFunction::check_hessian(const double *hess_nz, casadi_int* iw) const {
+  // Get Hessian sparsity pattern
+  casadi_int n = sp_hess_.size1();
+  const casadi_int *colind = sp_hess_.colind(), *row = sp_hess_.row();
+  // Nonzero counters for transpose
+  casadi_copy(colind, n, iw);
+  // Loop over Hessian columns
+  for (casadi_int c = 0; c < n; ++c) {
+    // Loop over nonzeros for the column
+    for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+      // Get row of Hessian
+      casadi_int r = row[k];
+      // Get nonzero of transpose
+      casadi_int k_tr = iw[r]++;
+      // Get indices
+      casadi_int id_c = jac_in_[c], id_r = jac_in_[r];
+      // Nonzero
+      double nz = hess_nz[k], nz_tr = hess_nz[k_tr];
+      // Check if entry is NaN of inf
+      if (std::isnan(nz) || std::isinf(nz)) {
+        std::stringstream ss;
+        ss << "Second derivative w.r.t. " << fmu_->vn_in_.at(id_r) << " and "
+          << fmu_->vn_in_.at(id_c) << " is " << nz;
+        casadi_warning(ss.str());
+        // Further checks not needed for entry
+        continue;
+      }
+      // Symmetry check (strict upper triangular part only)
+      if (r < c) {
+        // Normaliation factor to be used for relative tolerance
+        double nz_max = std::fmax(std::fabs(nz), std::fabs(nz_tr));
+        // Check if above absolute and relative tolerance bounds
+        if (nz_max > abstol_ && std::fabs(nz - nz_tr) > nz_max * reltol_) {
+          std::stringstream ss;
+          ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
+            << " for second derivative w.r.t. " << fmu_->vn_in_.at(id_r) << " and "
+            << fmu_->vn_in_.at(id_c);
+          casadi_warning(ss.str());
+        }
+      }
+    }
+  }
+}
+
+void FmuFunction::make_symmetric(double *hess_nz, casadi_int* iw) const {
+  // Get Hessian sparsity pattern
+  casadi_int n = sp_hess_.size1();
+  const casadi_int *colind = sp_hess_.colind(), *row = sp_hess_.row();
+  // Nonzero counters for transpose
+  casadi_copy(colind, n, iw);
+  // Loop over Hessian columns
+  for (casadi_int c = 0; c < n; ++c) {
+    // Loop over nonzeros for the column
+    for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+      // Get row of Hessian
+      casadi_int r = row[k];
+      // Get nonzero of transpose
+      casadi_int k_tr = iw[r]++;
+      // Make symmetric
+      if (r < c) hess_nz[k] = hess_nz[k_tr] = 0.5 * (hess_nz[k] + hess_nz[k_tr]);
+    }
+  }
 }
 
 std::string to_string(FdMode v) {
