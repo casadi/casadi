@@ -270,9 +270,12 @@ public:
 
   /** @name Specify all variables of a type */
   ///@{
+  void set_u(const std::vector<std::string>& name);
+  void set_x(const std::vector<std::string>& name);
   void set_z(const std::vector<std::string>& name,
     const std::vector<std::string>& alg = std::vector<std::string>());
-  void set_u(const std::vector<std::string>& name);
+  void set_q(const std::vector<std::string>& name);
+  void set_y(const std::vector<std::string>& name);
   ///@}
 
   /** @name Manipulation

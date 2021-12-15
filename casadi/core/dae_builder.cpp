@@ -392,6 +392,30 @@ void DaeBuilder::set_u(const std::vector<std::string>& name) {
   }
 }
 
+void DaeBuilder::set_x(const std::vector<std::string>& name) {
+  try {
+    (*this)->x_ = find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_x", e.what());
+  }
+}
+
+void DaeBuilder::set_q(const std::vector<std::string>& name) {
+  try {
+    (*this)->q_ = find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_q", e.what());
+  }
+}
+
+void DaeBuilder::set_y(const std::vector<std::string>& name) {
+  try {
+    (*this)->y_ = find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_y", e.what());
+  }
+}
+
 void DaeBuilder::clear_in(const std::string& v) {
   try {
     (*this)->clear_in(v);
