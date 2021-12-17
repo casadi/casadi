@@ -52,7 +52,7 @@ jobs:
         bitness: [64,32]
     steps:
       - run: |
-          export ARCH = manylinux1-{{ matrix.bitness == '64' && 'x64' || 'x86' }}
+          export ARCH = manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
           echo $ARCH
       - run: |
           docker pull dockcross/$ARCH:latest
