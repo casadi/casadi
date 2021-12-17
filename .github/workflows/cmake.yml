@@ -59,7 +59,9 @@ jobs:
   frontend_py36-manylinux1_x86_64:
     needs: [core-manylinux1_x86_64,swig]
     runs-on: ubuntu-20.04
-  
+    steps:
+      - run: echo "hello"
+      
   frontend_py38-manylinux1_x86_64:
     needs: [core-manylinux1_x86_64,swig]
     runs-on: ubuntu-20.04
