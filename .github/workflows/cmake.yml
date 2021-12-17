@@ -52,11 +52,11 @@ jobs:
         bitness: [64,32]
     steps:
       - run: |
-          export ARCH = manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
-          echo $ARCH
+          export ARCH=manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
+          echo "dockcross_image=$ARCH" >> $GITHUB_ENV
       - run: |
-          docker pull dockcross/$ARCH:latest
-          docker run --rm dockcross/$ARCH:latest > dockcross
+          docker pull dockcross/${{ env.dockcross_image }}:latest
+          docker run --rm dockcross/${{ env.dockcross_image }}:latest > dockcross
 
   interfaces-manylinux1_x86_64:
     needs: [core-manylinux1]
