@@ -45,7 +45,29 @@ jobs:
       with:
         name: casadi_source_wrapper
         path: casadi_source.zip
+  core-manylinux1_x86_64:
+    runs-on: ubuntu-20.04
 
+  interfaces-manylinux1_x86_64:
+    needs: [core-manylinux1_x86_64]
+    runs-on: ubuntu-20.04
+
+  frontend_py36-manylinux1_x86_64:
+    needs: [core-manylinux1_x86_64,swig]
+    runs-on: ubuntu-20.04
+  
+  frontend_py38-manylinux1_x86_64:
+    needs: [core-manylinux1_x86_64,swig]
+    runs-on: ubuntu-20.04
+
+  frontend_matlab-manylinux1_x86_64:
+    needs: [core-manylinux1_x86_64,swig]
+    runs-on: ubuntu-20.04
+  
+  linux64-py36:
+    needs: [interfaces-manylinux1_x86_64,frontend_py36-manylinux1_x86_64]
+    runs-on: ubuntu-20.04
+  
   windows_matlab:
     runs-on: windows-2016
     needs: swig
