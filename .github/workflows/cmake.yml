@@ -85,9 +85,11 @@ jobs:
       matrix:
         bitness: [64,32]
     steps:
+      - run: ls
       - uses: actions/download-artifact@v2
         with:
           name: casadi_source_wrapper
+      - run: cat CMakeLists.txt
       - name: Unpack source
         run: unzip casadi_source.zip
       - run: ls
@@ -105,7 +107,7 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -H.
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=$MANYLINUX_PYTHON_INCLUDE_DIR -DWITH_IMPORT=ON -H.
           ./dockcross cmake --build build
       - run: echo "hello"
       
