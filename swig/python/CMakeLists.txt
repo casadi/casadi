@@ -33,12 +33,14 @@ set(MINPYVERSION "3")
 else()
 set(MINPYVERSION "")
 endif()
-find_package(PythonInterp ${MINPYVERSION} REQUIRED)
+#find_package(PythonInterp ${MINPYVERSION} REQUIRED)
 
 # We don't really need the libs, but the headers.
 find_package(PythonLibs ${MINPYVERSION})
 
-if(NOT PYTHON_INCLUDE_PATH)
+if(PYTHON_INCLUDE_PATH)
+  message(INFO "Python include headers found at: ${PYTHON_INCLUDE_PATH}")
+else()
   message(SEND_ERROR "Python include headers not found, but required." )
 endif()
 
