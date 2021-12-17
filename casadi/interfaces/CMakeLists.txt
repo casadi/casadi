@@ -42,6 +42,10 @@ if(WITH_CLANG)
   add_subdirectory(clang)
 endif()
 
+if(WITH_HIGHS)
+  add_subdirectory(highs)
+endif()
+
 if(WITH_HSL)
   add_subdirectory(hsl)
 endif()

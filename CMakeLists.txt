@@ -708,6 +708,13 @@ if(WITH_SNOPT)
 endif()
 add_feature_info(snopt-interface WITH_SNOPT "Interface to the NLP solver SNOPT.")
 
+# HIGHS: A MILP / QP solver
+option(WITH_HIGHS "Compile the HIGHS interface" OFF)
+if(WITH_HIGHS)
+  find_package(HIGHS REQUIRED)
+endif()
+add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HIGHS.")
+
 # HSL: Sparse direct linear solvers
 option(WITH_HSL "Enable HSL interface" OFF)
 if(WITH_HSL)
