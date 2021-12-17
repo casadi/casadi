@@ -82,9 +82,10 @@ jobs:
     needs: [core-manylinux1,swig]
     runs-on: ubuntu-20.04
     strategy:
+      fail-fast: false
       matrix:
         bitness: [64,32]
-        py2: [27,36]
+        py2: [27,35,36,37,38,39]
     steps:
       - run: ls
       - uses: actions/download-artifact@v2
