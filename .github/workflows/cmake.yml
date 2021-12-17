@@ -47,11 +47,15 @@ jobs:
         path: casadi_source.zip
   core-manylinux1_x86_64:
     runs-on: ubuntu-20.04
+    steps:
+      - run: echo "hello"
 
   interfaces-manylinux1_x86_64:
     needs: [core-manylinux1_x86_64]
     runs-on: ubuntu-20.04
-
+    steps:
+      - run: echo "hello"
+      
   frontend_py36-manylinux1_x86_64:
     needs: [core-manylinux1_x86_64,swig]
     runs-on: ubuntu-20.04
@@ -59,15 +63,21 @@ jobs:
   frontend_py38-manylinux1_x86_64:
     needs: [core-manylinux1_x86_64,swig]
     runs-on: ubuntu-20.04
-
+    steps:
+      - run: echo "hello"
+      
   frontend_matlab-manylinux1_x86_64:
     needs: [core-manylinux1_x86_64,swig]
     runs-on: ubuntu-20.04
-  
+    steps:
+      - run: echo "hello"
+      
   linux64-py36:
     needs: [interfaces-manylinux1_x86_64,frontend_py36-manylinux1_x86_64]
     runs-on: ubuntu-20.04
-  
+    steps:
+    - run: echo "hello"
+    
   windows_matlab:
     runs-on: windows-2016
     needs: swig
