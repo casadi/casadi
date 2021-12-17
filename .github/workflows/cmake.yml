@@ -89,10 +89,10 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: casadi_source_wrapper
-      - run: cat CMakeLists.txt
       - name: Unpack source
         run: unzip casadi_source.zip
       - run: ls
+      - run: cat CMakeLists.txt
       - uses: actions/download-artifact@v2
         with:
           name: core-manylinux1-${{ matrix.bitness}}
