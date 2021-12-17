@@ -110,7 +110,7 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -DWITH_IMPORT=ON -H.
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -DWITH_IMPORT=ON -USWIG_IMPORT -H.
           ./dockcross cmake --build build
       - run: echo "hello"
       
