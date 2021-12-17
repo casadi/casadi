@@ -70,6 +70,7 @@ jobs:
         with:
           name: ${{ github.job }}-${{ matrix.bitness}}
           path: build
+          retention-days: 1
         
   interfaces-manylinux1_x86_64:
     needs: [core-manylinux1]
@@ -84,10 +85,16 @@ jobs:
       matrix:
         bitness: [64,32]
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/download-artifact@v2
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source
+        run: unzip casadi_source.zip
+      - run: ls
       - uses: actions/download-artifact@v2
         with:
           name: core-manylinux1-${{ matrix.bitness}}
+          path: build
       - name: Setup dockcross
         run: |
           export ARCH=manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
@@ -98,7 +105,7 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -H.
           ./dockcross cmake --build build
       - run: echo "hello"
       
