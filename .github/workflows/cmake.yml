@@ -68,7 +68,7 @@ jobs:
           ./dockcross cmake --build build
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: ${{ job.name }}-${{ matrix.bitness}}
+          name: ${{ github.job }}-${{ matrix.bitness}}
           path: build
         
   interfaces-manylinux1_x86_64:
@@ -80,7 +80,26 @@ jobs:
   frontend_py36-manylinux1_x86_64:
     needs: [core-manylinux1,swig]
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        bitness: [64,32]
     steps:
+      - uses: actions/checkout@v2.4.0
+      - uses: actions/download-artifact@v2
+        with:
+          name: core-manylinux1-${{ matrix.bitness}}
+      - name: Setup dockcross
+        run: |
+          export ARCH=manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
+          docker pull dockcross/$ARCH:latest
+          docker run --rm dockcross/$ARCH:latest > dockcross
+          chmod +x dockcross
+      - name: Build
+        run: |
+          pwd
+          ls -al
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON
+          ./dockcross cmake --build build
       - run: echo "hello"
       
   frontend_py38-manylinux1_x86_64:
