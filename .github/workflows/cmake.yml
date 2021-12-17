@@ -54,9 +54,13 @@ jobs:
       - run: |
           export ARCH=manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
           echo "dockcross_image=$ARCH" >> $GITHUB_ENV
+      - uses: actions/checkout@v2.4.0
       - run: |
           docker pull dockcross/${{ env.dockcross_image }}:latest
           docker run --rm dockcross/${{ env.dockcross_image }}:latest > dockcross
+          chmod +x dockcross
+          ./dockcross cmake -Bbuild -H.
+          ./dockcross cmake --build build
 
   interfaces-manylinux1_x86_64:
     needs: [core-manylinux1]
