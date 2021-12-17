@@ -45,31 +45,39 @@ jobs:
       with:
         name: casadi_source_wrapper
         path: casadi_source.zip
-  core-manylinux1_x86_64:
+  core-manylinux1:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        bitness: [64,32]
     steps:
-      - run: echo "hello"
+      - run: |
+          export ARCH = manylinux1-{{ matrix.bitness == '64' && 'x64' || 'x86' }}
+          echo $ARCH
+      - run: |
+          docker pull dockcross/$ARCH:latest
+          docker run --rm dockcross/$ARCH:latest > dockcross
 
   interfaces-manylinux1_x86_64:
-    needs: [core-manylinux1_x86_64]
+    needs: [core-manylinux1]
     runs-on: ubuntu-20.04
     steps:
       - run: echo "hello"
       
   frontend_py36-manylinux1_x86_64:
-    needs: [core-manylinux1_x86_64,swig]
+    needs: [core-manylinux1,swig]
     runs-on: ubuntu-20.04
     steps:
       - run: echo "hello"
       
   frontend_py38-manylinux1_x86_64:
-    needs: [core-manylinux1_x86_64,swig]
+    needs: [core-manylinux1,swig]
     runs-on: ubuntu-20.04
     steps:
       - run: echo "hello"
       
   frontend_matlab-manylinux1_x86_64:
-    needs: [core-manylinux1_x86_64,swig]
+    needs: [core-manylinux1,swig]
     runs-on: ubuntu-20.04
     steps:
       - run: echo "hello"
