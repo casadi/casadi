@@ -51,15 +51,19 @@ jobs:
       matrix:
         bitness: [64,32]
     steps:
-      - name: setup dockcross
+      - name: Setup dockcross
         run: |
           export ARCH=manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
           docker pull dockcross/$ARCH:latest
           docker run --rm dockcross/$ARCH:latest > dockcross
           chmod +x dockcross
+          pwd
+          ls -al dockcross
       - uses: actions/checkout@v2.4.0
-      - name: build
+      - name: Build
         run: |
+          pwd
+          ls -al
           ./dockcross cmake -Bbuild -H.
           ./dockcross cmake --build build
 
