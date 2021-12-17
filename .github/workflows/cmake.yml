@@ -51,14 +51,15 @@ jobs:
       matrix:
         bitness: [64,32]
     steps:
-      - run: |
+      - name: setup dockcross
+        run: |
           export ARCH=manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
-          echo "dockcross_image=$ARCH" >> $GITHUB_ENV
-      - uses: actions/checkout@v2.4.0
-      - run: |
-          docker pull dockcross/${{ env.dockcross_image }}:latest
-          docker run --rm dockcross/${{ env.dockcross_image }}:latest > dockcross
+          docker pull dockcross/$ARCH:latest
+          docker run --rm dockcross/$ARCH:latest > dockcross
           chmod +x dockcross
+      - uses: actions/checkout@v2.4.0
+      - name: build
+        run: |
           ./dockcross cmake -Bbuild -H.
           ./dockcross cmake --build build
 
@@ -95,6 +96,7 @@ jobs:
   windows_matlab:
     runs-on: windows-2016
     needs: swig
+    if: false
     env:
       bitness: 64
       compiler: vs2017
