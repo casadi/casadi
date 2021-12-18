@@ -34,8 +34,6 @@
 #include "expm.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::set_precision(casadi_int precision) { stream_precision_ = precision; }
@@ -1960,7 +1958,7 @@ namespace casadi {
     V = nan(spV);
     R = nan(spR);
     beta = nan(ncol, 1);
-    vector<Scalar> w(nrow_ext);
+    std::vector<Scalar> w(nrow_ext);
     casadi_qr(A.sparsity(), A.ptr(), get_ptr(w), spV, V.ptr(),
               spR, R.ptr(), beta.ptr(),
               get_ptr(prinv), get_ptr(pc));
@@ -2037,7 +2035,7 @@ namespace casadi {
     casadi_int n=A.size1();
 
     // Calculate entries in L and D
-    vector<Scalar> D_nz(n), L_nz(Lt_sp.nnz()), w(n);
+    std::vector<Scalar> D_nz(n), L_nz(Lt_sp.nnz()), w(n);
     casadi_ldl(A.sparsity(), get_ptr(A.nonzeros()), Lt_sp,
               get_ptr(L_nz), get_ptr(D_nz), get_ptr(p), get_ptr(w));
 
