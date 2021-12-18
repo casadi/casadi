@@ -34,27 +34,35 @@ function(CasadiGetPythonVersionMajor VERSION_MAJOR_RESULT INCLUDE_PATH)
   set(${VERSION_MAJOR_RESULT} ${PYTHON_VERSION_MAJOR} PARENT_SCOPE)
 endfunction()
 
-if(PYTHON_INCLUDE_DIR)
-  set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_DIR})
-else()
-  # Find packages
+if(SWIG_EXPORT)
   if(WITH_PYTHON3)
-  set(MINPYVERSION "3")
+    set(PYTHON_VERSION_MAJOR 3)
   else()
-  set(MINPYVERSION "")
+    set(PYTHON_VERSION_MAJOR 2)
   endif()
+else()
+  if(PYTHON_INCLUDE_DIR)
+    set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_DIR})
+  else()
+    # Find packages
+    if(WITH_PYTHON3)
+    set(MINPYVERSION "3")
+    else()
+    set(MINPYVERSION "")
+    endif()
 
-  # We don't really need the libs, but the headers.
-  find_package(PythonLibs ${MINPYVERSION})
-  if(NOT PYTHON_INCLUDE_PATH)
-    message(SEND_ERROR "Python include headers not found, but required." )
+    # We don't really need the libs, but the headers.
+    find_package(PythonLibs ${MINPYVERSION})
+    if(NOT PYTHON_INCLUDE_PATH)
+      message(SEND_ERROR "Python include headers not found, but required." )
+    endif()
   endif()
+  
+  CasadiGetPythonVersionMajor(PYTHON_VERSION_MAJOR "${PYTHON_INCLUDE_PATH}")
+  include_directories(${PYTHON_INCLUDE_PATH})
 endif()
 
-CasadiGetPythonVersionMajor(PYTHON_VERSION_MAJOR "${PYTHON_INCLUDE_PATH}")
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${PYTHON_INCLUDE_PATH})
 
 # a python library is built in the build directory inside swig/python
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
