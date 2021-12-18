@@ -71,7 +71,23 @@ jobs:
           name: ${{ github.job }}-${{ matrix.arch}}
           path: build
           retention-days: 1
-        
+          
+  core-macos10_15:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          pwd
+          ls -al
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
+          ./dockcross cmake --build build -v
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{ github.job }}
+          path: build
+          retention-days: 1
+          
   core-dockcross:
     runs-on: ubuntu-20.04
     strategy:
@@ -111,7 +127,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        bitness: [64,32]
+        arch: [x64,x86]
         py2: [27,35,36,37,38,39]
     steps:
       - run: ls
@@ -124,11 +140,11 @@ jobs:
       - run: cat CMakeLists.txt
       - uses: actions/download-artifact@v2
         with:
-          name: core-manylinux1-${{ matrix.bitness}}
+          name: core-manylinux1-${{ matrix.arch }}
           path: build
       - name: Setup dockcross
         run: |
-          export ARCH=manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
+          export ARCH=manylinux1-${{ matrix.arch }}
           docker pull dockcross/$ARCH:latest
           docker run --rm dockcross/$ARCH:latest > dockcross
           chmod +x dockcross
