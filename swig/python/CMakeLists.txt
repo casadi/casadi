@@ -27,22 +27,31 @@ if(APPLE)
   endif()
 endif()
 
-# Find packages
-if(WITH_PYTHON3)
-set(MINPYVERSION "3")
-else()
-set(MINPYVERSION "")
-endif()
-#find_package(PythonInterp ${MINPYVERSION} REQUIRED)
+function(CasadiGetPythonVersionMajor VERSION_MAJOR_RESULT INCLUDE_PATH)
+  set(MATCH_STRING "#define[ \t]+PY_MAJOR_VERSION[ \t]+([0-9]+)")
+  file(STRINGS "${INCLUDE_PATH}/patchlevel.h" PY_MAJOR_VERSION REGEX ${MATCH_STRING})
+  string(REGEX REPLACE "${MATCH_STRING}" "\\1" PYTHON_VERSION_MAJOR "${PY_MAJOR_VERSION}")
+  set(${VERSION_MAJOR_RESULT} ${PYTHON_VERSION_MAJOR} PARENT_SCOPE)
+endfunction()
 
-# We don't really need the libs, but the headers.
-find_package(PythonLibs ${MINPYVERSION})
-
-if(PYTHON_INCLUDE_PATH)
-  message(INFO "Python include headers found at: ${PYTHON_INCLUDE_PATH} ${MINPYVERSION} -- ${PYTHON_VERSION_MAJOR}")
+if(PYTHON_INCLUDE_DIR)
+  set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_DIR})
 else()
-  message(SEND_ERROR "Python include headers not found, but required." )
+  # Find packages
+  if(WITH_PYTHON3)
+  set(MINPYVERSION "3")
+  else()
+  set(MINPYVERSION "")
+  endif()
+
+  # We don't really need the libs, but the headers.
+  find_package(PythonLibs ${MINPYVERSION})
+  if(NOT PYTHON_INCLUDE_PATH)
+    message(SEND_ERROR "Python include headers not found, but required." )
+  endif()
 endif()
+
+CasadiGetPythonVersionMajor(PYTHON_VERSION_MAJOR "${PYTHON_INCLUDE_PATH}")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PYTHON_INCLUDE_PATH})
