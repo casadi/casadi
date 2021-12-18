@@ -78,7 +78,7 @@ jobs:
     steps:
       - run: echo "hello"
       
-  frontend_py36-manylinux1_x86_64:
+  frontend_python-manylinux1:
     needs: [core-manylinux1,swig]
     runs-on: ubuntu-20.04
     strategy:
@@ -113,12 +113,6 @@ jobs:
           ls -al
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -DWITH_IMPORT=ON -USWIG_IMPORT -H.
           ./dockcross cmake --build build -v
-      - run: echo "hello"
-      
-  frontend_py38-manylinux1_x86_64:
-    needs: [core-manylinux1,swig]
-    runs-on: ubuntu-20.04
-    steps:
       - run: echo "hello"
       
   frontend_matlab-manylinux1_x86_64:
