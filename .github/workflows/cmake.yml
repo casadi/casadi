@@ -65,7 +65,7 @@ jobs:
           pwd
           ls -al
           ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
-          ./dockcross cmake --build build
+          ./dockcross cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ github.job }}-${{ matrix.bitness}}
@@ -112,7 +112,7 @@ jobs:
           pwd
           ls -al
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -DWITH_IMPORT=ON -USWIG_IMPORT -H.
-          ./dockcross cmake --build build
+          ./dockcross cmake --build build -v
       - run: echo "hello"
       
   frontend_py38-manylinux1_x86_64:
