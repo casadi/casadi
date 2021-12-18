@@ -49,12 +49,12 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        bitness: [64,32]
+        arch: [x64,x86]
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Setup dockcross
         run: |
-          export ARCH=manylinux1-${{ matrix.bitness == '64' && 'x64' || 'x86' }}
+          export ARCH=manylinux1-${{ matrix.arch }}
           docker pull dockcross/$ARCH:latest
           docker run --rm dockcross/$ARCH:latest > dockcross
           chmod +x dockcross
@@ -68,10 +68,36 @@ jobs:
           ./dockcross cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: ${{ github.job }}-${{ matrix.bitness}}
+          name: ${{ github.job }}-${{ matrix.arch}}
           path: build
           retention-days: 1
         
+  core-dockcross:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        target: [manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,windows-shared-x64-posix]
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Setup dockcross
+        run: |
+          docker pull dockcross/${{ matrix.target }}:latest
+          docker run --rm dockcross/${{ matrix.target }} > dockcross
+          chmod +x dockcross
+          pwd
+          ls -al dockcross
+      - name: Build
+        run: |
+          pwd
+          ls -al
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
+          ./dockcross cmake --build build -v
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{ github.job }}-${{ matrix.target}}
+          path: build
+          retention-days: 1
+          
   interfaces-manylinux1_x86_64:
     needs: [core-manylinux1]
     runs-on: ubuntu-20.04
@@ -111,7 +137,7 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -DWITH_IMPORT=ON -USWIG_IMPORT -H.
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT -H.
           ./dockcross cmake --build build -v
       - run: echo "hello"
       
