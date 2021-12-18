@@ -78,10 +78,8 @@ jobs:
       - uses: actions/checkout@v2.4.0
       - name: Build
         run: |
-          pwd
-          ls -al
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
-          ./dockcross cmake --build build -v
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
+          cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ github.job }}
