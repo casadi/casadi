@@ -121,8 +121,8 @@ jobs:
     steps:
       - run: echo "hello"
       
-  linux64-py36:
-    needs: [interfaces-manylinux1_x86_64,frontend_py36-manylinux1_x86_64]
+  linux-python:
+    needs: [interfaces-manylinux1_x86_64,frontend_python-manylinux1]
     runs-on: ubuntu-20.04
     steps:
     - run: echo "hello"
