@@ -93,7 +93,7 @@ jobs:
     steps:
       - run: echo "hello"
   
-  arch-py2-matrix:
+  matrix-arch-py2:
     runs-on: ubuntu-latest
     steps:
       - id: build-matrix
@@ -102,25 +102,25 @@ jobs:
           config: |
             matrix:
               arch: [manylinux1-x64,manylinux1-x86]
-              py2: [27,35,36,37,38,39]
+              py2: ["27","35","36","37","38","39"]
             operations:
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: [310]
+                  py2: ["310"]
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
-                  py2: [35,36,37,38,39]
+                  py2: ["35","36","37","38","39"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
   
   frontend_python-dockcross:
-    needs: [core-dockcross,arch-py2-matrix,swig]
+    needs: [core-dockcross,matrix-arch-py2,swig]
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.arch-py2-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.matrix-arch-py2.outputs.matrix) }}
     steps:
       - run: ls
       - uses: actions/download-artifact@v2
