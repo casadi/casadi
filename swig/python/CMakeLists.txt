@@ -39,7 +39,7 @@ endif()
 find_package(PythonLibs ${MINPYVERSION})
 
 if(PYTHON_INCLUDE_PATH)
-  message(INFO "Python include headers found at: ${PYTHON_INCLUDE_PATH}")
+  message(INFO "Python include headers found at: ${PYTHON_INCLUDE_PATH} ${MINPYVERSION} -- ${PYTHON_VERSION_MAJOR}")
 else()
   message(SEND_ERROR "Python include headers not found, but required." )
 endif()
@@ -68,6 +68,8 @@ set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-py3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
 endif()
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-threads")
+
+message("PYTHONFLAGS: ${CMAKE_SWIG_FLAGS} ${PYTHONFLAG}")
 
 if(SWIG_EXPORT)
   set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra)
