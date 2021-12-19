@@ -132,7 +132,7 @@ jobs:
       - run: cat CMakeLists.txt
       - uses: actions/download-artifact@v2
         with:
-          name: core-${{ matrix.arch }}
+          name: core-dockcross-${{ matrix.arch }}
           path: build
       - name: Setup dockcross
         run: |
