@@ -184,16 +184,9 @@ jobs:
           path: build
           retention-days: 1
 
-      - name: Setup dockcross
-        run: |
-          docker pull dockcross/${{ matrix.arch }}:latest
-          docker run --rm dockcross/${{ matrix.arch }}:latest > dockcross
-          chmod +x dockcross
-      - run: |
-          echo -n "PYTHON_INCLUDE_DIR=" >> $GITHUB_ENV && ./dockcross bash -c "ls -d /opt/python/cp${{ matrix.py2 }}*/include/python* | head -n 1" >> $GITHUB_ENV && tail $GITHUB_ENV
       - name: Build
         run: |
-          cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR= -DWITH_SELFCONTAINED=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=install
+          cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=install
           cmake --build build --target install --config Release -v
       - run: echo "hello"
 
@@ -233,7 +226,7 @@ jobs:
           pwd
           ls -al
           ./dockcross cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_PYTHON=ON -USWIG_IMPORT -H.
-          ./dockcross cmake --build build --target install -v
+          ./dockcross cmake --build build --target install --config Release -v
       - run: echo "hello"
       
   windows_matlab:
