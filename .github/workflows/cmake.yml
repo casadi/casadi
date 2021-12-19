@@ -163,8 +163,10 @@ jobs:
     steps:
     - run: echo "hello"
     
+
+    
   core-windows:
-    runs-on: windows-2016
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
@@ -173,15 +175,67 @@ jobs:
       - uses: actions/checkout@v2.4.0
       - name : Build
         run: |
-            cmake -Bbuild -G "Visual Studio 15 2017" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
-            cmake --build build --target install --config Release
+            cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
+            cmake --build build --target install --config Release -v
 
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ github.job }}-${{ matrix.arch }}
           path: build
           retention-days: 1
-    
+
+      - name: Setup dockcross
+        run: |
+          docker pull dockcross/${{ matrix.arch }}:latest
+          docker run --rm dockcross/${{ matrix.arch }}:latest > dockcross
+          chmod +x dockcross
+      - run: |
+          echo -n "PYTHON_INCLUDE_DIR=" >> $GITHUB_ENV && ./dockcross bash -c "ls -d /opt/python/cp${{ matrix.py2 }}*/include/python* | head -n 1" >> $GITHUB_ENV && tail $GITHUB_ENV
+      - name: Build
+        run: |
+          cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR= -DWITH_SELFCONTAINED=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=install
+          cmake --build build --target install --config Release -v
+      - run: echo "hello"
+
+  frontend_python-windows:
+    runs-on: windows-latest
+    needs: [swig,core-windows]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64,Win32]
+        py2: ["27","35","36","37","38","39","310"]
+    steps:
+      - id: get-id
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            let py2 = ${{ matrix.py2 }}
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
+      - run: echo "${{steps.get-id.outputs.pydot2}}"
+      - uses: actions/download-artifact@v2
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source
+        run: unzip casadi_source.zip
+      - uses: actions/download-artifact@v2
+        with:
+          name: core-windows-${{ matrix.arch }}
+          path: build
+      - name: Setup Python
+        uses: actions/setup-python@v2.3.1
+        with:
+          python-version: ${{steps.get-id.outputs.pydot2}}
+      - name: Build
+        run: |
+          pwd
+          ls -al
+          ./dockcross cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_PYTHON=ON -USWIG_IMPORT -H.
+          ./dockcross cmake --build build --target install -v
+      - run: echo "hello"
+      
   windows_matlab:
     runs-on: windows-2016
     needs: swig
