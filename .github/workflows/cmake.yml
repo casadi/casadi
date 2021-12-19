@@ -226,8 +226,6 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - name: Build
         run: |
-          pwd
-          ls -al
           ./dockcross cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_PYTHON=ON -USWIG_IMPORT -H.
           ./dockcross cmake --build build --target install --config Release -v
       - run: echo "hello"
