@@ -168,7 +168,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64,x86]
+        arch: [x64,Win32]
     steps:
       - uses: actions/checkout@v2.4.0
       - name : Build
