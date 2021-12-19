@@ -146,7 +146,7 @@ jobs:
           pwd
           ls -al
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT -H.
-          ./dockcross cmake --build build -v
+          ./dockcross cmake --build build --target install -v
       - run: echo "hello"
       
   frontend_matlab-manylinux1_x86_64:
@@ -160,6 +160,29 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - run: echo "hello"
+    
+  core-windows:
+    runs-on: windows-2016
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64,x86]
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
+          cmake --build build -v
+      - name : cmake
+        run: |
+            cmake -Bbuild -G "Visual Studio 15 2017" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
+            cmake --build build --target install --config Release
+
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{ github.job }}
+          path: build
+          retention-days: 1
     
   windows_matlab:
     runs-on: windows-2016
