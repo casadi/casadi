@@ -48,6 +48,7 @@ jobs:
           
   core-macos10_15:
     runs-on: macos-10.15
+    if: false
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Build
@@ -62,6 +63,7 @@ jobs:
           
   core-dockcross:
     runs-on: ubuntu-20.04
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -169,18 +171,14 @@ jobs:
         arch: [x64,x86]
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Build
-        run: |
-          cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
-          cmake --build build -v
-      - name : cmake
+      - name : Build
         run: |
             cmake -Bbuild -G "Visual Studio 15 2017" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
             cmake --build build --target install --config Release
 
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: ${{ github.job }}
+          name: ${{ github.job }}-${{ matrix.arch }}
           path: build
           retention-days: 1
     
