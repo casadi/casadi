@@ -201,9 +201,12 @@ jobs:
     steps:
       - id: get-id
         uses: actions/github-script@v5.0.0
+        env:
+          py2: "${{ matrix.py2 }}"
         with:
+          result-encoding: string
           script: |
-            let py2 = ${{ matrix.py2 }}
+            const { py2 } = process.env;
             const major = py2.substr(0,1);
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
