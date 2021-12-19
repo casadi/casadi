@@ -147,10 +147,14 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT -H.
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
           ./dockcross cmake --build build --target install -v
-      - run: echo "hello"
-      
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{ github.job }}-${{ matrix.arch}}-py${{ matrix.py2}}
+          path: install
+          retention-days: 1
+
   frontend_matlab-manylinux1_x86_64:
     needs: [core-dockcross,swig]
     runs-on: ubuntu-20.04
@@ -186,8 +190,8 @@ jobs:
 
       - name: Build
         run: |
-          cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=install
-          cmake --build build --target install --config Release -v
+          cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -USWIG_IMPORT
+          cmake --build build --config Release -v
       - run: echo "hello"
 
   frontend_python-windows:
@@ -226,9 +230,13 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_PYTHON=ON -USWIG_IMPORT -H.
-          ./dockcross cmake --build build --target install --config Release -v
-      - run: echo "hello"
+          cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_PYTHON=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+          cmake --build build --target install --config Release -v
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{ github.job }}-${{ matrix.arch}}-py${{ matrix.py2}}
+          path: install
+          retention-days: 1
       
   windows_matlab:
     runs-on: windows-2016
