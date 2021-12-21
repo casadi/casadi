@@ -63,7 +63,7 @@ jobs:
           
   core-dockcross:
     runs-on: ubuntu-20.04
-    if: false
+    if: true
     strategy:
       fail-fast: false
       matrix:
@@ -171,6 +171,7 @@ jobs:
     
   core-windows:
     runs-on: windows-latest
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -196,6 +197,7 @@ jobs:
 
   frontend_python-windows:
     runs-on: windows-latest
+    if: false
     needs: [swig,core-windows]
     strategy:
       fail-fast: false
