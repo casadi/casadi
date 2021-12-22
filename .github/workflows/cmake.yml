@@ -156,8 +156,8 @@ jobs:
           wget https://github.com/casadi/artifacts/releases/download/evergreen/windows_python${{ matrix.py2 }}_$archx.zip -O python.zip && unzip python.zip -d python
           pwd
           tree python
-          echo "PYTHON_INCLUDE_DIR=$(pwd)/python/include" >> $GITHUB_ENV
-          echo "PYTHON_LIBRARY=$(pwd)/python/libs/libpython${{ matrix.py2 }}.a" >> $GITHUB_ENV
+          echo "PYTHON_INCLUDE_DIR=/work/python/include" >> $GITHUB_ENV
+          echo "PYTHON_LIBRARY=/work/python/libs/python${{ matrix.py2 }}.lib" >> $GITHUB_ENV
       - name: Build
         run: |
           pwd
@@ -166,7 +166,7 @@ jobs:
           ./dockcross cmake --build build --target install -v
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: ${{ github.job }}-${{ matrix.arch}}-py${{ matrix.py2}}
+          name: ${{github.job}}-${{matrix.arch}}-py${{matrix.py2}}
           path: ${{github.workspace}}/install
           retention-days: 1
 
