@@ -244,6 +244,8 @@ jobs:
         run: |
           cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_PYTHON=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
           cmake --build build --target install --config Release -v
+      - name: (windows only) copy dlls
+        run: ./dockcross bash -c "cp /usr/src/mxe/usr/\$CROSS_TRIPLE/bin/*.dll install/casadi"
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ github.job }}-${{ matrix.arch}}-py${{ matrix.py2}}
