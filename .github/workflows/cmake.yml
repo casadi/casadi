@@ -148,17 +148,21 @@ jobs:
           chmod +x dockcross
       - run: |
           echo -n "PYTHON_INCLUDE_DIR=" >> $GITHUB_ENV && ./dockcross bash -c "ls -d /opt/python/cp${{ matrix.py2 }}*/include/python* | head -n 1" >> $GITHUB_ENV && tail $GITHUB_ENV
+          
       - name: (windows target only) get Python
         if: contains(matrix.arch, 'windows')
         run: |
           archx=$(python -c "print([e for e in '${{matrix.arch}}'.split('-') if e.startswith('x')][0])")
           wget https://github.com/casadi/artifacts/releases/download/evergreen/windows_python${{ matrix.py2 }}_$archx.zip -O python.zip && unzip python.zip -d python
+          pwd
+          tree python
           echo "PYTHON_INCLUDE_DIR=$(pwd)/python/include" >> $GITHUB_ENV
+          echo "PYTHON_LIBRARY=$(pwd)/python/libs/libpython${{ matrix.py2 }}.a" >> $GITHUB_ENV
       - name: Build
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
           ./dockcross cmake --build build --target install -v
       - uses: actions/upload-artifact@v2.2.4
         with:
