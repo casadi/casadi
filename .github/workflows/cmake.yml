@@ -67,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix,windows-shared-x86-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Setup dockcross
@@ -112,7 +112,7 @@ jobs:
                   py2: ["310"]
               - type: append
                 matrix:
-                  arch: [windows-shared-x64-posix,windows-shared-x86-posix]
+                  arch: [windows-shared-x64-posix]
                   py2: ["27","35","36","37","38","39","310"]
               #- type: append
               #  matrix:
