@@ -74,6 +74,9 @@ Input expressions
 'y'
   Output variables :math:`y`
 
+'u'
+  Input variables :math:`u`
+
 
 
 Output expressions
@@ -238,7 +241,7 @@ using the ``parse_fmi`` command:
 
 .. code-block:: python
 
-    dae = DaeBuilder()
+    ocp = DaeBuilder()
     ocp.parse_fmi('modelDescription.xml')
 
 
