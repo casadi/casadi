@@ -126,11 +126,28 @@ if(APPLE AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPIL
   set_target_properties(_casadi PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 endif()
 
+set(COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
+
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
+  # Null
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
+  set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-maybe-uninitialized")
+  if(WIN32)
+    # Fix for error: '_hypot' has not been declared in 'std'
+    # cfr https://github.com/tudat-team/tudatpy/commit/ea9ef90a462825a65741f89ac1776413868f52cb
+    set(COMPILE_FLAGS "${COMPILE_FLAGS} -D_hypot=hypot")
+    # Fix for error: casadiPYTHON_wrap.cxx:(.text+0xd25cc): undefined reference to `__imp_Py_InitModule4'
+    # cfr https://github.com/tpaviot/pythonocc-core/commit/9aef6c8e86c5b77c33742acf36e45db0b2f9ca23#diff-1e7de1ae2d059d21e1dd75d5812d5a34b0222cef273b7c3a2af62eb747f9d20a
+    if(${CMAKE_SIZEOF_VOID_P} MATCHES "8")
+      set(COMPILE_FLAGS "${COMPILE_FLAGS} -DMS_WIN64")
+    endif()
+  endif()
 endif()
+
+message("COMPILE_FLAGS: ${COMPILE_FLAGS}")
+
+set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")
 
 if(WIN32) # dlls don't allow missing symbols
   if(NOT PYTHON_LIBRARIES)
