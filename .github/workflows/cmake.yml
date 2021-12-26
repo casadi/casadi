@@ -167,7 +167,7 @@ jobs:
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{github.job}}-${{matrix.arch}}-py${{matrix.py2}}
-          path: ${{github.workspace}}/install
+          path: install
           retention-days: 1
 
   frontend_matlab-manylinux1_x86_64:
@@ -254,7 +254,7 @@ jobs:
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ github.job }}-${{ matrix.arch}}-py${{ matrix.py2}}
-          path: install/
+          path: install
           retention-days: 1
       
   windows_matlab:
