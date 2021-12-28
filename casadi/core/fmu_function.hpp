@@ -681,6 +681,9 @@ struct CASADI_EXPORT Fmu {
     return hess_sparsity(ired_.at(r), ired_.at(c));
   }
 
+  // Print description of an input
+  std::string desc_in(FmuMemory* m, size_t id) const;
+
   // Name of system, per the FMI specification
   static std::string system_infix();
 
@@ -841,7 +844,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const;
 
   // Check extended Hessian
-  void check_hessian(const double *hess_nz, casadi_int* iw) const;
+  void check_hessian(FmuMemory* m, const double *hess_nz, casadi_int* iw) const;
 
   // Make extended Hessian symmetric
   void make_symmetric(double *hess_nz, casadi_int* iw) const;

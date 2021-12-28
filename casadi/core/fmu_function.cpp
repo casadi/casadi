@@ -48,6 +48,14 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
+std::string Fmu::desc_in(FmuMemory* m, size_t id) const {
+  // Create description
+  std::stringstream ss;
+  ss << vn_in_[id] << " = " << m->ibuf_[id] << " (nominal " << nominal_in_[id]
+  << ", min " << min_in_[id] << ", max " << max_in_[id] << ")";
+  return ss.str();
+}
+
 std::string Fmu::system_infix() {
 #if defined(_WIN32)
   // Windows system
@@ -898,23 +906,18 @@ int Fmu::eval_fd(FmuMemory* m) const {
       // Check if NaN or error exceeds thresholds
       if (d_is_nan || (d_max > nominal_in_[wrt] * n * m->self.abstol_
           && std::fabs(d_ad - d_fd) > d_max * m->self.reltol_)) {
-        // Which element in the vector
-        size_t wrt_ind = 0;
-        for (; wrt_ind < m->id_in_.size(); ++wrt_ind)
-          if (m->id_in_[wrt_ind] == wrt) break;
-        casadi_assert(wrt_ind < m->id_in_.size(), "Inconsistent variable index for validation");
         // Issue warning
         std::stringstream ss;
         ss << (d_is_nan ? "NaN" : "Inconsistent") << " derivatives of " << vn_out_[id]
-          << " w.r.t. " << vn_in_[wrt] << "\n"
-          << "At " << m->v_in_[wrt_ind] << ", nominal " << nominal_in_[wrt]
-          << ", min " << min_in_[wrt] << ", max " << max_in_[wrt] << ", got " << d_ad
+          << " w.r.t. " << desc_in(m, wrt) << ", got " << d_ad
           << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].";
-        // Also print the stencil:
-        ss << "\nValues for step size " << h << ": [";
+        // Offset for printing the stencil
+        double off = m->fd_out_.at(ind + offset * n_unknown);
+        // Print the stencil:
+        ss << "\nValues for step size " << h << ": " << (n * off) << " + [";
         for (casadi_int k = 0; k < n_points; ++k) {
           if (k > 0) ss << ", ";
-          ss << (n * m->d_out_[ind + k * n_unknown]);
+          ss << (n * (m->fd_out_.at(ind + k * n_unknown) - off));
         }
         ss << "]";
         // Error between truncation and roundoff error
@@ -1676,7 +1679,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (verbose_) casadi_message("Evaluating extended Hessian");
     if (eval_all(m, max_hess_tasks_, false, false, false, true)) return 1;
     // Post-process Hessian
-    if (check_hessian_) check_hessian(hess_nz, iw);
+    if (check_hessian_) check_hessian(m, hess_nz, iw);
     if (make_symmetric_) make_symmetric(hess_nz, iw);
   }
   // Fetch calculated blocks
@@ -1902,7 +1905,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   return 0;
 }
 
-void FmuFunction::check_hessian(const double *hess_nz, casadi_int* iw) const {
+void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int* iw) const {
   // Get Hessian sparsity pattern
   casadi_int n = sp_hess_.size1();
   const casadi_int *colind = sp_hess_.colind(), *row = sp_hess_.row();
@@ -1923,8 +1926,8 @@ void FmuFunction::check_hessian(const double *hess_nz, casadi_int* iw) const {
       // Check if entry is NaN of inf
       if (std::isnan(nz) || std::isinf(nz)) {
         std::stringstream ss;
-        ss << "Second derivative w.r.t. " << fmu_->vn_in_.at(id_r) << " and "
-          << fmu_->vn_in_.at(id_c) << " is " << nz;
+        ss << "Second derivative w.r.t. " << fmu_->desc_in(m, id_r) << " and "
+          << fmu_->desc_in(m, id_r) << " is " << nz;
         casadi_warning(ss.str());
         // Further checks not needed for entry
         continue;
@@ -1937,8 +1940,8 @@ void FmuFunction::check_hessian(const double *hess_nz, casadi_int* iw) const {
         if (nz_max > abstol_ && std::fabs(nz - nz_tr) > nz_max * reltol_) {
           std::stringstream ss;
           ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
-            << " for second derivative w.r.t. " << fmu_->vn_in_.at(id_r) << " and "
-            << fmu_->vn_in_.at(id_c);
+            << " for second derivative w.r.t. " << fmu_->desc_in(m, id_r) << " and "
+            << fmu_->desc_in(m, id_c);
           casadi_warning(ss.str());
         }
       }
