@@ -2319,30 +2319,46 @@ Sparsity DaeBuilderInternal::hess_sparsity(const std::vector<size_t>& oind,
     const std::vector<size_t>& iind) const {
   // Mark inputs
   std::vector<casadi_int> lookup(variables_.size(), -1);
-  for (size_t i = 0; i < iind.size(); ++i)
-    lookup.at(iind[i]) = i;
-  // Which variables enter as a nonlinear depdendency in any variable in oind
+  for (size_t i = 0; i < iind.size(); ++i) lookup.at(iind[i]) = i;
+  // Which variables enter as a nonlinear dependency in any variable in oind
   std::vector<bool> nonlin(iind.size(), false);
-  // Loop over outputs
+  // List of nonlinearly entering variables for the specific output
+  std::vector<casadi_int> nonlin_list;
+  // Rows and columns of the Hessian
+  std::vector<casadi_int> row, col;
+  // Loop over output variables
   for (casadi_int j = 0; j < oind.size(); ++j) {
-    // Get the corresponding variable
     const Variable& v = variables_.at(oind[j]);
     // Loop over dependencies
     for (size_t k = 0; k < v.dependencies.size(); ++k) {
       if (v.dependenciesKind.empty() || v.dependenciesKind.at(k) == DependenciesKind::DEPENDENT) {
         casadi_int i = lookup.at(v.dependencies[k]);
-        if (i >= 0) nonlin.at(i) = true;
+        if (i >= 0 && !nonlin.at(i)) {
+          // Add to list
+          nonlin_list.push_back(i);
+          nonlin.at(i) = true;
+        }
       }
     }
+    // Add all combinations to sparsity pattern
+    for (casadi_int k1: nonlin_list) {
+      for (casadi_int k2: nonlin_list) {
+        row.push_back(k1);
+        col.push_back(k2);
+      }
+    }
+    // If row/col vectors grow too large, remove duplicates
+    if (col.size() > 2 * iind.size() * iind.size()) {
+      Sparsity r = Sparsity::triplet(iind.size(), iind.size(), row, col);
+      row = r.get_row();
+      col = r.get_col();
+    }
+    // Reset nonlin, nonlin_list for next iteration
+    for (casadi_int k: nonlin_list) nonlin[k] = false;
+    nonlin_list.clear();
   }
-  // Convert nonlin to a Sparsity pattern
-  std::vector<casadi_int> row;
-  for (size_t i = 0; i < nonlin.size(); ++i) {
-    if (nonlin[i]) row.push_back(i);
-  }
-  Sparsity n(iind.size(), 1, std::vector<casadi_int>{0, static_cast<casadi_int>(row.size())}, row);
-  // Outer product to get worst-case Hessian sparsity pattern
-  return mtimes(n, n.T());
+  // Create sparsity pattern
+  return Sparsity::triplet(iind.size(), iind.size(), row, col);
 }
 
 } // namespace casadi

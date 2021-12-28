@@ -1350,28 +1350,15 @@ void FmuFunction::init(const Dict& opts) {
     sp_hess_ = fmu_->hess_sparsity(jac_in_, jac_in_);
     casadi_assert(sp_hess_.size1() == jac_in_.size(), "Inconsistent Hessian dimensions");
     casadi_assert(sp_hess_.size2() == jac_in_.size(), "Inconsistent Hessian dimensions");
-    const casadi_int *hess_colind = sp_hess_.colind(), *hess_row = sp_hess_.row();
+    const casadi_int *hess_row = sp_hess_.row();
+    casadi_int hess_nnz = sp_hess_.nnz();
 
     // Get nonlinearly entering variables
+    std::vector<bool> is_nonlin(jac_in_.size(), false);
+    for (casadi_int k = 0; k < hess_nnz; ++k) is_nonlin[hess_row[k]] = true;
     nonlin_.clear();
     for (casadi_int c = 0; c < jac_in_.size(); ++c) {
-      size_t n_nonlin = hess_colind[c + 1] - hess_colind[c];
-      if (n_nonlin > 0) {
-        if (nonlin_.empty()) {
-          // Get list of variables
-          nonlin_.reserve(n_nonlin);
-          for (casadi_int k = hess_colind[c]; k < hess_colind[c + 1]; ++k) {
-            nonlin_.push_back(hess_row[k]);
-          }
-        } else {
-          // Consistency check
-          casadi_assert(nonlin_.size() == n_nonlin, "Inconsistent number of nonlinear variables");
-          auto it = nonlin_.begin();
-          for (casadi_int k = hess_colind[c]; k < hess_colind[c + 1]; ++k) {
-            casadi_assert(hess_row[k] == *it++, "Irregular Hessian sparsity");
-          }
-        }
-      }
+      if (is_nonlin[c]) nonlin_.push_back(c);
     }
     if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
 
