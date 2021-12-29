@@ -164,6 +164,8 @@ jobs:
           ls -al
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARIES=${{ env.PYTHON_LIBRARIES}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
           ./dockcross cmake --build build --target install -v
+      - run: echo ${{env.GITHUB_WORKSPACE}}
+      - run: pwd ${{env.GITHUB_WORKSPACE}}
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
