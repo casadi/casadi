@@ -129,6 +129,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-py2.outputs.matrix) }}
     steps:
+      - run: echo ${{ env.GITHUB_WORKSPACE }}
       - run: ls
       - uses: actions/download-artifact@v2
         with:
@@ -146,6 +147,8 @@ jobs:
           docker pull dockcross/${{ matrix.arch }}:latest
           docker run --rm dockcross/${{ matrix.arch }}:latest > dockcross
           chmod +x dockcross
+      - run: echo ${{env.GITHUB_WORKSPACE}}
+      - run: cat $GITHUB_ENV
       - run: |
           echo -n "PYTHON_INCLUDE_DIR=" >> $GITHUB_ENV && ./dockcross bash -c "ls -d /opt/python/cp${{ matrix.py2 }}*/include/python* | head -n 1" >> $GITHUB_ENV && tail $GITHUB_ENV
           
@@ -164,8 +167,12 @@ jobs:
           ls -al
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARIES=${{ env.PYTHON_LIBRARIES}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
           ./dockcross cmake --build build --target install -v
-      - run: echo ${{env.GITHUB_WORKSPACE}}
-      - run: pwd ${{env.GITHUB_WORKSPACE}}
+      - run: cat $GITHUB_ENV
+      - run: echo ${{ github.workspace }}
+      - run: echo ${{ env.GITHUB_WORKSPACE }}
+      - run: pwd
+      - run: ls
+      - run: ls install
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
