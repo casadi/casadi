@@ -233,6 +233,76 @@ else()
   set(WITH_SUPERSCS_DEF OFF)
 endif()
 
+set(DEPENDENT_LIBRARIES)
+
+
+include(ExternalProject)
+
+set(CROSS_FLAGS "")
+set(CROSS_FLAGS_FORTRAN "")
+set(CROSS_FLAGS_CMAKE)
+if(CMAKE_CROSS_COMPILING)
+  set(CROSS_FLAGS "--host=$ENV{CROSS_TRIPLE}")
+  if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
+    set(CROSS_FLAGS_FORTRAN "lt_cv_deplibs_check_method=pass_all")
+  endif()
+  set(CROSS_FLAGS_CMAKE "-DCMAKE_TOOLCHAIN_FILE=$ENV{CMAKE_TOOLCHAIN_FILE}")
+endif()
+
+set(EXTERNAL_CMAKE_COMMAND "${CMAKE_COMMAND}")
+if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
+  string(REPLACE "-gcc" "-cmake" EXTERNAL_CMAKE_COMMAND "$ENV{CC}")
+endif()
+message("EXTERNAL_CMAKE_COMMAND: ${EXTERNAL_CMAKE_COMMAND}")
+ExternalProject_Add(openblas
+    GIT_REPOSITORY https://github.com/jgillis/OpenBLAS.git
+    GIT_TAG ea3db69faa99dc4f7ad6641c9590f77ace7d6b03
+    PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+    UPDATE_COMMAND ""
+    CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+    CMAKE_ARGS -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+
+
+ExternalProject_Add(metis
+    GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Metis.git
+    GIT_TAG releases/2.0.0
+    DEPENDS openblas
+    PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>
+    PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
+set(EXTERNAL_METIS_LIBS coinmetis)
+
+set(DEPENDENT_LIBRARIES ${DEPENDENT_LIBRARIES} ${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${EXTERNAL_METIS_LIBS}${CMAKE_SHARED_LIBRARY_SUFFIX})
+
+ExternalProject_Add(mumps
+    DEPENDS metis
+    GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Mumps.git
+    GIT_TAG releases/3.0.2
+    DEPENDS openblas metis
+    PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${EXTERNAL_METIS_LIBS} -lm" "--with-lapack-lflags=-lopenblas -L${CMAKE_BINARY_DIR}/external_projects/lib" ${CROSS_FLAGS_FORTRAN}
+    PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Mumps)
+
+
+ExternalProject_Add(ipopt-external
+    DEPENDS openblas mumps
+    URL https://www.coin-or.org/download/source/Ipopt/Ipopt-3.14.4.zip
+    PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,--whole-archive  -lcoinmumps -Wl,--no-whole-archive"  "--with-lapack-lflags=-lopenblas -L${CMAKE_BINARY_DIR}/external_projects/lib" ${CROSS_FLAGS_FORTRAN})
+
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
+
+add_library(ipopt SHARED IMPORTED)
+set_target_properties(ipopt PROPERTIES
+  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_SHARED_LIBRARY_SUFFIX}"
+  IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
+)
+
+
 #####################################################
 ######################### swig ######################
 #####################################################
@@ -347,6 +417,12 @@ set(INCLUDE_PREFIX ${DEF_INCLUDE_PREFIX} CACHE PATH "Installation directory for 
 set(CMAKE_PREFIX ${DEF_CMAKE_PREFIX} CACHE PATH "Installation directory for CMake files")
 set(PYTHON_PREFIX ${DEF_PYTHON_PREFIX} CACHE PATH "Installation directory for Python files")
 set(MATLAB_PREFIX ${DEF_MATLAB_PREFIX} CACHE PATH "Installation directory for MATLAB/Octave files")
+
+
+install(DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/bin/" DESTINATION ${LIB_PREFIX})
+if(CMAKE_CROSS_COMPILING)
+  install(DIRECTORY ${CMAKE_FIND_ROOT_PATH}/bin/ DESTINATION ${LIB_PREFIX} FILES_MATCHING PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+endif()
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE PYTHON MATLAB)
@@ -643,7 +719,7 @@ add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver b
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
 if(WITH_IPOPT)
-  find_package(IPOPT REQUIRED)
+  #find_package(IPOPT REQUIRED)
 endif()
 add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt.")
 
