@@ -48,12 +48,11 @@ jobs:
           
   core-macos10_15:
     runs-on: macos-10.15
-    if: false
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Build
         run: |
-          cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
@@ -81,7 +80,7 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -H.
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           ./dockcross cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
