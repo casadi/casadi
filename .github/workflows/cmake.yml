@@ -82,12 +82,14 @@ jobs:
           ls -al
           ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           ./dockcross cmake --build build -v
-      - name: Easy Zip Files
+      - name: Easy Zip Files - fails to ignore some bad symlinks
+        if: false
         uses: vimtor/action-zip@v1
         with:
           files: build/
           recursive: false
           dest: ${{github.job}}-${{matrix.target}}.zip
+      - run: zip -rq ${{github.job}}-${{matrix.target}}.zip build
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{github.job}}-${{ matrix.target}}
@@ -144,7 +146,7 @@ jobs:
         with:
           name: ${{github.job}}-${{matrix.target}}
       - run: ls
-      - run: unzip ${{github.job}}-${{matrix.target}}.zip -d build
+      - run: unzip ${{github.job}}-${{matrix.target}}.zip
       - name: Setup dockcross
         run: |
           docker pull dockcross/${{ matrix.arch }}:latest
