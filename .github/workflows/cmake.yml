@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v2.4.0
       - name: Build
         run: |
-          cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
