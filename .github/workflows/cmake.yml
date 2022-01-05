@@ -82,10 +82,16 @@ jobs:
           ls -al
           ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           ./dockcross cmake --build build -v
+      - name: Easy Zip Files
+        uses: vimtor/action-zip@v1
+        with:
+          files: build/
+          recursive: false
+          dest: ${{github.job}}-${{matrix.target}}.zip
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: ${{ github.job }}-${{ matrix.target}}
-          path: build
+          name: ${{github.job}}-${{ matrix.target}}
+          path: ${{github.job}}-${{matrix.target}}.zip
           retention-days: 1
           
   interfaces-manylinux1_x86_64:
@@ -136,8 +142,9 @@ jobs:
       - run: cat CMakeLists.txt
       - uses: actions/download-artifact@v2
         with:
-          name: core-dockcross-${{ matrix.arch }}
-          path: build
+          name: ${{github.job}}-${{matrix.target}}
+      - run: ls
+      - run: unzip ${{github.job}}-${{matrix.target}}.zip -d build
       - name: Setup dockcross
         run: |
           docker pull dockcross/${{ matrix.arch }}:latest
