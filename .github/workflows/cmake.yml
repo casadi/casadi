@@ -155,9 +155,9 @@ jobs:
       - run: cat CMakeLists.txt
       - uses: actions/download-artifact@v2
         with:
-          name: ${{github.job}}-${{matrix.target}}
+          name: core-dockcross-${{ matrix.arch }}
       - run: ls
-      - run: unzip ${{github.job}}-${{matrix.target}}.zip
+      - run: unzip core-dockcross-${{ matrix.arch }}.zip
       - name: Setup dockcross
         run: |
           docker pull dockcross/${{ matrix.arch }}:latest
