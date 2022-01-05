@@ -49,6 +49,17 @@ jobs:
   core-macos10_15:
     runs-on: macos-10.15
     steps:
+      - name: Setup conda
+        uses: s-weigand/setup-conda@v1
+        with:
+          update-conda: true
+          python-version: 3.8
+          conda-channels: anaconda, conda-forge
+      - run: |
+             conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
+             echo -n "CC=" >> $GITHUB_ENV && which gcc >> $GITHUB_ENV
+             echo -n "CXX=" >> $GITHUB_ENV && which g++ >> $GITHUB_ENV
+             echo -n "FC=" >> $GITHUB_ENV && which gfortran >> $GITHUB_ENV
       - uses: actions/checkout@v2.4.0
       - name: Build
         run: |
