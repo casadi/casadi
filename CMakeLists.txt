@@ -270,6 +270,9 @@ ExternalProject_Add(metis
     PREFIX "${CMAKE_BINARY_DIR}/external_projects"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>
+
+      # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
+      "CFLAGS=-Wno-implicit-function-declaration"
     PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
 set(EXTERNAL_METIS_LIBS coinmetis)
 
