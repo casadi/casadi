@@ -267,8 +267,8 @@ jobs:
     needs: [frontend_python-dockcross]
     strategy:
      fail-fast: false
-      matrix:
-        py2: ["27","35","36","37","38","39","310"]
+     matrix:
+       py2: ["27","35","36","37","38","39","310"]
     steps:
       - uses: actions/checkout@v2.4.0
       - uses: actions/download-artifact@v2
