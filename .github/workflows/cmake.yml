@@ -46,8 +46,12 @@ jobs:
         name: casadi_source_wrapper
         path: casadi_source.zip
           
-  core-macos10_15:
-    runs-on: macos-10.15
+  core-osx:
+    runs-on: ${{matrix.image}}
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [macos-10.15,macos-11]
     steps:
       - name: Setup conda
         uses: s-weigand/setup-conda@v1
@@ -72,7 +76,7 @@ jobs:
           cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: ${{ github.job }}
+          name: ${{ github.job }}-${{matrix.image}}
           path: build
           retention-days: 1
           
@@ -149,7 +153,63 @@ jobs:
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
   
+  frontend_python-osx:
+    needs: [core-osx,swig]
+    runs-on: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [macos-10.15,macos-11]
+        py2: ["27","35","36","37","38","39","310"]
   
+    steps:
+      - id: get-id
+        uses: actions/github-script@v5.0.0
+        env:
+          py2: "${{ matrix.py2 }}"
+        with:
+          result-encoding: string
+          script: |
+            const { py2 } = process.env;
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
+      - name: Setup Python
+        uses: actions/setup-python@v2.3.1
+        with:
+          python-version: ${{steps.get-id.outputs.pydot2}}
+      - name: Setup conda
+        uses: s-weigand/setup-conda@v1
+        with:
+          update-conda: true
+          python-version: 3.8
+          conda-channels: anaconda, conda-forge
+      - uses: actions/download-artifact@v2
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source
+        run: unzip casadi_source.zip
+      - uses: actions/download-artifact@v2
+        with:
+          name: core-osx-${{ matrix.image }}
+      - run: unzip core-osx-${{ matrix.image }}.zip
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_PYTHON=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+          cmake --build build --target install -v
+      - name: Easy Zip Files
+        uses: vimtor/action-zip@v1
+        with:
+          files: install/
+          recursive: false
+          dest: ${{github.job}}-${{matrix.image}}-py${{matrix.py2}}.zip
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{github.job}}-${{matrix.image}}-py${{matrix.py2}}
+          path: ${{github.job}}-${{matrix.image}}-py${{matrix.py2}}.zip
+          retention-days: 1
+
+
   frontend_python-dockcross:
     needs: [core-dockcross,matrix-arch-py2,swig]
     runs-on: ubuntu-20.04
@@ -201,6 +261,42 @@ jobs:
           name: ${{github.job}}-${{matrix.arch}}-py${{matrix.py2}}
           path: ${{github.job}}-${{matrix.arch}}-py${{matrix.py2}}.zip
           retention-days: 1
+
+  test-python-windows:
+    runs-on: windows-latest
+    needs: [frontend_python-dockcross]
+    strategy:
+     fail-fast: false
+      matrix:
+        py2: ["27","35","36","37","38","39","310"]
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - uses: actions/download-artifact@v2
+        with:
+          name: frontend_python-dockcross-windows-shared-x64-posix-py${{matrix.py2}}.zip
+      - run: ls
+      - name: Unpack source
+        run: unzip frontend_python-dockcross-windows-shared-x64-posix-py${{matrix.py2}}.zip
+      - run: ls
+      - id: get-id
+        uses: actions/github-script@v5.0.0
+        env:
+          py2: "${{ matrix.py2 }}"
+        with:
+          result-encoding: string
+          script: |
+            const { py2 } = process.env;
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
+      - name: Setup Python
+        uses: actions/setup-python@v2.3.1
+        with:
+          python-version: ${{steps.get-id.outputs.pydot2}}
+      - run: |
+          cd test/python
+          PYTHONPATH=${{ github.workspace }}/install python alltests.py
+        shell: bash
 
   frontend_matlab-manylinux1_x86_64:
     needs: [core-dockcross,swig]
