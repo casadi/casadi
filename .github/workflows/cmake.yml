@@ -49,6 +49,17 @@ jobs:
   core-macos10_15:
     runs-on: macos-10.15
     steps:
+      - name: Setup conda
+        uses: s-weigand/setup-conda@v1
+        with:
+          update-conda: true
+          python-version: 3.8
+          conda-channels: anaconda, conda-forge
+      - run: |
+             conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
+             echo -n "CC=" >> $GITHUB_ENV && which gcc >> $GITHUB_ENV
+             echo -n "CXX=" >> $GITHUB_ENV && which g++ >> $GITHUB_ENV
+             echo -n "FC=" >> $GITHUB_ENV && which gfortran >> $GITHUB_ENV
       - uses: actions/checkout@v2.4.0
       - name: Cache build dir
         uses: actions/cache@v2
@@ -57,7 +68,7 @@ jobs:
           path: build
       - name: Build
         run: |
-          cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DCMAKE_Fortran_USE_RESPONSE_FILE_FOR_OBJECTS=1 -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DCMAKE_Fortran_USE_RESPONSE_FILE_FOR_OBJECTS=1 -H.
           cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
@@ -92,12 +103,14 @@ jobs:
           ls -al
           ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           ./dockcross cmake --build build -v
-      - name: Easy Zip Files
+      - name: Easy Zip Files - fails to ignore some bad symlinks
+        if: false
         uses: vimtor/action-zip@v1
         with:
           files: build/
           recursive: false
           dest: ${{github.job}}-${{matrix.target}}.zip
+      - run: zip -rq ${{github.job}}-${{matrix.target}}.zip build
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{github.job}}-${{ matrix.target}}
@@ -152,9 +165,9 @@ jobs:
       - run: cat CMakeLists.txt
       - uses: actions/download-artifact@v2
         with:
-          name: ${{github.job}}-${{matrix.target}}
+          name: core-dockcross-${{ matrix.arch }}
       - run: ls
-      - run: unzip ${{github.job}}-${{matrix.target}}.zip -d build
+      - run: unzip core-dockcross-${{ matrix.arch }}.zip
       - name: Setup dockcross
         run: |
           docker pull dockcross/${{ matrix.arch }}:latest
