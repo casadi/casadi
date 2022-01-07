@@ -326,7 +326,7 @@ jobs:
           pip install numpy
           set PYTHONPATH=${{ github.workspace }}/install
           python alltests.py
-      - if: !contains(matrix.arch, 'windows')
+      - if: "!contains(matrix.arch, 'windows')"
         run: |
           cd test/python
           pip install numpy
