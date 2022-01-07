@@ -282,7 +282,7 @@ jobs:
      matrix:
        py2: ["27","35","36","37","38","39","310"]
        image: ["windows-latest","ubuntu-latest"]
-       bit: [32,64]
+       bit: [64]
        exclude:
         # No Windows 32bit builds currently
         - image: "windows-latest"
