@@ -322,6 +322,7 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - run: |
           cd test/python
+          pip install numpy
           PYTHONPATH=${{ github.workspace }}/install python alltests.py
         shell: bash
 
