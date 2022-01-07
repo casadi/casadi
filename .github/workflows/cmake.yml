@@ -274,8 +274,8 @@ jobs:
           path: casadi-${{env.os}}-py${{matrix.py2}}.zip
           retention-days: 1
 
-  test-python-windows:
-    runs-on: windows-latest
+  test-python:
+    runs-on: ${{matrix.image}}
     needs: [frontend_python-dockcross]
     strategy:
      fail-fast: false
