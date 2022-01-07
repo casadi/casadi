@@ -250,17 +250,6 @@ jobs:
         run: |
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARIES=${{ env.PYTHON_LIBRARIES}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install
           ./dockcross cmake --build build --target install -v
-      - id: get-target
-        uses: actions/github-script@v5.0.0
-        env:
-          arch: "${{ matrix.arch }}"
-        with:
-          result-encoding: string
-          script: |
-            const { arch } = process.env;
-            const major = py2.substr(0,1);
-            const minor = py2.substr(1);
-            core.setOutput('target', major+"."+minor)
       - uses: kanga333/variable-mapper@v0.2.2
         with:
           key: "${{matrix.arch}}"
