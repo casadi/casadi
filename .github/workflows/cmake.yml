@@ -73,7 +73,7 @@ jobs:
       - name: Build
         run: |
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DCMAKE_Fortran_USE_RESPONSE_FILE_FOR_OBJECTS=1 -H.
-          cmake --build build -v
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ github.job }}-${{matrix.image}}
