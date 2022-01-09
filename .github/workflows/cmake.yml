@@ -62,7 +62,7 @@ jobs:
       - run: |
              # https://stackoverflow.com/questions/69236331/conda-macos-big-sur-ld-unsupported-tapi-file-type-tapi-tbd-in-yaml-file
              wget https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
-             tar xf MacOSX10.9.sdk.tar.xz -C /opt
+             sudo tar xf MacOSX10.9.sdk.tar.xz -C /opt
              echo <<EOF >> ~/.condarc
              conda_build:
                config_file: ~/.conda/conda_build_config.yaml
