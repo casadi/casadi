@@ -54,6 +54,7 @@ jobs:
         image: [macos-10.15,macos-11]
     env:
       CONDA_BUILD_SYSROOT: /opt/MacOSX10.9.sdk
+      SDKROOT: /opt/MacOSX10.9.sdk
     steps:
       - name: Setup conda
         uses: s-weigand/setup-conda@v1
