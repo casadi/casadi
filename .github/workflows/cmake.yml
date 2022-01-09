@@ -52,6 +52,8 @@ jobs:
       fail-fast: false
       matrix:
         image: [macos-10.15,macos-11]
+    env:
+      CONDA_BUILD_SYSROOT: /opt/MacOSX10.9.sdk
     steps:
       - name: Setup conda
         uses: s-weigand/setup-conda@v1
@@ -63,14 +65,7 @@ jobs:
              # https://stackoverflow.com/questions/69236331/conda-macos-big-sur-ld-unsupported-tapi-file-type-tapi-tbd-in-yaml-file
              wget https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
              sudo tar xf MacOSX10.9.sdk.tar.xz -C /opt
-             echo <<EOF >> ~/.condarc
-             conda_build:
-               config_file: ~/.conda/conda_build_config.yaml
-             EOF
-             echo <<EOF >> ~/.conda/conda_build_config.yaml
-             CONDA_BUILD_SYSROOT:
-               - /opt/MacOSX10.9.sdk        # [osx]
-             EOF
+             
              conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
              echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang" >> $GITHUB_ENV
              echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang++" >> $GITHUB_ENV
