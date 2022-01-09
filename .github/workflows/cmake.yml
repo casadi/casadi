@@ -61,10 +61,12 @@ jobs:
           conda-channels: anaconda, conda-forge
       - run: |
              conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
-             echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/clang" >> $GITHUB_ENV
-             echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/clang++" >> $GITHUB_ENV
+             echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang" >> $GITHUB_ENV
+             echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang++" >> $GITHUB_ENV
              echo "FC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/gfortran" >> $GITHUB_ENV
              ls /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin
+             echo "lib dir"
+             ls /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/lib
       - uses: actions/checkout@v2.4.0
       - name: Cache build dir
         uses: actions/cache@v2
