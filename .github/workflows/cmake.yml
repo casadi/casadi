@@ -65,9 +65,12 @@ jobs:
              conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
              which gcc
              gcc --version
-             echo -n "CC=" >> $GITHUB_ENV && which gcc >> $GITHUB_ENV
-             echo -n "CXX=" >> $GITHUB_ENV && which g++ >> $GITHUB_ENV
-             echo -n "FC=" >> $GITHUB_ENV && which gfortran >> $GITHUB_ENV
+             echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/gcc" >> $GITHUB_ENV
+             echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/g++" >> $GITHUB_ENV
+             echo "FC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/gfortran" >> $GITHUB_ENV
+             ${{env.CC}} --version
+             ${{env.CXX}} --version
+             ${{env.FC}} --version
       - uses: actions/checkout@v2.4.0
       - name: Cache build dir
         uses: actions/cache@v2
