@@ -61,9 +61,10 @@ jobs:
           conda-channels: anaconda, conda-forge
       - run: |
              which gcc
-             conda activate base
+             gcc --version
              conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
              which gcc
+             gcc --version
              echo -n "CC=" >> $GITHUB_ENV && which gcc >> $GITHUB_ENV
              echo -n "CXX=" >> $GITHUB_ENV && which g++ >> $GITHUB_ENV
              echo -n "FC=" >> $GITHUB_ENV && which gfortran >> $GITHUB_ENV
