@@ -71,9 +71,6 @@ jobs:
              echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang" >> $GITHUB_ENV
              echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang++" >> $GITHUB_ENV
              echo "FC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/gfortran" >> $GITHUB_ENV
-             ls /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin
-             echo "lib dir"
-             ls /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/lib
       - uses: actions/checkout@v2.4.0
       - name: Cache build dir
         uses: actions/cache@v2
@@ -173,7 +170,25 @@ jobs:
         image: [macos-11]
         py2: ["27","35","36","37","38","39","310"]
   
+    env:
+      CONDA_BUILD_SYSROOT: /opt/MacOSX10.9.sdk
+      SDKROOT: /opt/MacOSX10.9.sdk
     steps:
+      - name: Setup conda
+        uses: s-weigand/setup-conda@v1
+        with:
+          update-conda: true
+          python-version: 3.8
+          conda-channels: anaconda, conda-forge
+      - run: |
+             # https://stackoverflow.com/questions/69236331/conda-macos-big-sur-ld-unsupported-tapi-file-type-tapi-tbd-in-yaml-file
+             wget https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
+             sudo tar xf MacOSX10.9.sdk.tar.xz -C /opt
+             
+             conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
+             echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang" >> $GITHUB_ENV
+             echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang++" >> $GITHUB_ENV
+             echo "FC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/gfortran" >> $GITHUB_ENV
       - id: get-id
         uses: actions/github-script@v5.0.0
         env:
