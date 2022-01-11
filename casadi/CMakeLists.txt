@@ -91,7 +91,8 @@ endmacro()
 
 if(ENABLE_SHARED)
   if(NOT ENABLE_EXPORT_ALL)
-    add_compiler_export_flags()
+    set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+    set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
   endif()
 endif()
 
