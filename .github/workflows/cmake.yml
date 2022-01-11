@@ -84,10 +84,11 @@ jobs:
         run: |
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DCMAKE_Fortran_USE_RESPONSE_FILE_FOR_OBJECTS=1 -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
+      - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ github.job }}-${{matrix.image}}
-          path: build
+          path: ${{ github.job }}-${{matrix.image}}.zip
           retention-days: 1
           
   core-dockcross:
