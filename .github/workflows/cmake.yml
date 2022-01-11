@@ -78,7 +78,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-macos-10.15-v1
+          key: core-build-${{matrix.image}}-v1
           path: build
       - name: Build
         run: |
