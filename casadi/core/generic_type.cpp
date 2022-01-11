@@ -69,7 +69,7 @@ namespace casadi {
     case OT_DOUBLEVECTORVECTOR:
       return is_double_vector_vector() || is_int_vector_vector();
     case OT_STRINGVECTOR:
-      return is_string_vector() || is_string();
+      return is_string_vector() || is_string() || is_double_vector() || is_int_vector();
     case OT_VOIDPTR:
       return is_void_pointer() || is_int();
     default:
@@ -426,6 +426,14 @@ namespace casadi {
     if (is_string()) {
       std::string s = as_string();
       return vector<string>(1, s);
+    } else if (is_double_vector()) {
+      auto v = as_double_vector();
+      casadi_assert(v.empty(), "Cast only permitted for zero-length vectors");
+      return {};
+    } else if (is_int_vector()) {
+      auto v = as_int_vector();
+      casadi_assert(v.empty(), "Cast only permitted for zero-length vectors");
+      return {};
     } else {
       casadi_assert(is_string_vector(), "type mismatch");
       return as_string_vector();

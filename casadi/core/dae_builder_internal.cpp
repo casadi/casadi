@@ -1735,15 +1735,23 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   std::vector<std::string> scheme_in;
   bool has_in = false;
   if ((it = opts.find("scheme_in")) != opts.end()) {
-    scheme_in = it->second;
+    try {
+      scheme_in = it->second;
+    } catch (std::exception& e) {
+      casadi_error(std::string("Cannot read 'scheme_in': ") + e.what());
+    }
     has_in = true;
   }
   // Scheme outputs
   std::vector<std::string> scheme_out;
   bool has_out = false;
   if ((it = opts.find("scheme_out")) != opts.end()) {
-    scheme_out = it->second;
-    has_out = true;
+    try {
+      scheme_out = it->second;
+      has_out = true;
+    } catch (std::exception& e) {
+      casadi_error(std::string("Cannot read 'scheme_out': ") + e.what());
+    }
   }
   // If scheme_in and/or scheme_out not provided, identify from name_in, name_out
   if (!has_in || !has_out) {
@@ -1752,12 +1760,16 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   // IO scheme
   std::map<std::string, std::vector<size_t>> scheme;
   if ((it = opts.find("scheme")) != opts.end()) {
-    // Argument is a Dict
-    Dict scheme_dict = it->second;
-    // Convert indices
-    for (auto&& e : scheme_dict) {
-      std::vector<std::string> v = e.second;
-      scheme[e.first] = find(v);
+    try {
+      // Argument is a Dict
+      Dict scheme_dict = it->second;
+      // Convert indices
+      for (auto&& e : scheme_dict) {
+        std::vector<std::string> v = e.second;
+        scheme[e.first] = find(v);
+      }
+    } catch (std::exception& e) {
+      casadi_error(std::string("Cannot read 'scheme': ") + e.what());
     }
   } else {
     // Default IO scheme
@@ -1775,7 +1787,11 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   // Auxilliary variables, if any
   std::vector<std::string> aux;
   if ((it = opts.find("aux")) != opts.end()) {
-    aux = it->second;
+    try {
+      aux = it->second;
+    } catch (std::exception& e) {
+      casadi_error(std::string("Cannot read 'aux': ") + e.what());
+    }
   }
   // New FMU instance (to be shared between derivative functions)
   Fmu* fmu = new Fmu(scheme_in, scheme_out, scheme, aux);
