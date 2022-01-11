@@ -298,7 +298,7 @@ ExternalProject_Add(ipopt-external
     URL https://www.coin-or.org/download/source/Ipopt/Ipopt-3.14.4.zip
     PREFIX "${CMAKE_BINARY_DIR}/external_projects"
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,--whole-archive  -lcoinmumps -Wl,--no-whole-archive"  "--with-lapack-lflags=-lopenblas -L${CMAKE_BINARY_DIR}/external_projects/lib" ${CROSS_FLAGS_FORTRAN})
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,-all_load  -lcoinmumps -Wl,-noall_load  "--with-lapack-lflags=-lopenblas -L${CMAKE_BINARY_DIR}/external_projects/lib" ${CROSS_FLAGS_FORTRAN})
 
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
 
