@@ -254,6 +254,26 @@ if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
   string(REPLACE "-gcc" "-cmake" EXTERNAL_CMAKE_COMMAND "$ENV{CC}")
 endif()
 message("EXTERNAL_CMAKE_COMMAND: ${EXTERNAL_CMAKE_COMMAND}")
+
+set(WHOLE_ARCHIVE_ON "")
+set(WHOLE_ARCHIVE_OFF "")
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(WHOLE_ARCHIVE_ON "-Wl,--whole-archive ")
+  set(WHOLE_ARCHIVE_OFF "-Wl,--no-whole-archive ")
+  if(APPLE)
+    set(WHOLE_ARCHIVE_ON "-Wl,-all_load")
+    set(WHOLE_ARCHIVE_OFF "-Wl,-noall_load")
+  endif()
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(WHOLE_ARCHIVE_ON "-Wl,-force_load,")
+  set(WHOLE_ARCHIVE_OFF "")
+  if(APPLE)
+    set(WHOLE_ARCHIVE_ON "-Wl,-all_load")
+    set(WHOLE_ARCHIVE_OFF "-Wl,-noall_load")
+  endif()
+endif()
+
 ExternalProject_Add(openblas
     GIT_REPOSITORY https://github.com/jgillis/OpenBLAS.git
     GIT_TAG d461ce45be91d1b131ef6917819b59b814fc7794
@@ -298,8 +318,7 @@ ExternalProject_Add(ipopt-external
     URL https://www.coin-or.org/download/source/Ipopt/Ipopt-3.14.4.zip
     PREFIX "${CMAKE_BINARY_DIR}/external_projects"
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,-all_load  -lcoinmumps -Wl,-noall_load" "--with-lapack-lflags=-lopenblas -L${CMAKE_BINARY_DIR}/external_projects/lib" ${CROSS_FLAGS_FORTRAN})
-
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags=-lopenblas -L${CMAKE_BINARY_DIR}/external_projects/lib" ${CROSS_FLAGS_FORTRAN})
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
 
 add_library(ipopt SHARED IMPORTED)
@@ -526,6 +545,8 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" 
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
 endif()
 
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-visibility-inlines-hidden")
 
 #######################################################################
 ########################### code coverage #############################
