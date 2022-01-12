@@ -267,7 +267,7 @@ jobs:
           tree python
           echo "PYTHON_INCLUDE_DIR=/work/python/include" >> $GITHUB_ENV
           echo "PYTHON_LIBRARIES=/work/python/libs/python${{ matrix.py2 }}.lib" >> $GITHUB_ENV
-      - run: cat ${{ env.PYTHON_INCLUDE_DIR }}/pyconfig.h
+      - run: cat ${{ env.PYTHON_INCLUDE_DIR }}/Python.h
       - name: Build
         run: |
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARIES=${{ env.PYTHON_LIBRARIES}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install
