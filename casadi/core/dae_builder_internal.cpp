@@ -2357,8 +2357,8 @@ Sparsity DaeBuilderInternal::hess_sparsity(const std::vector<size_t>& oind,
       }
     }
     // Add all combinations to sparsity pattern
-    for (casadi_int k1: nonlin_list) {
-      for (casadi_int k2: nonlin_list) {
+    for (casadi_int k1 : nonlin_list) {
+      for (casadi_int k2 : nonlin_list) {
         row.push_back(k1);
         col.push_back(k2);
       }
@@ -2370,7 +2370,7 @@ Sparsity DaeBuilderInternal::hess_sparsity(const std::vector<size_t>& oind,
       col = r.get_col();
     }
     // Reset nonlin, nonlin_list for next iteration
-    for (casadi_int k: nonlin_list) nonlin[k] = false;
+    for (casadi_int k : nonlin_list) nonlin[k] = false;
     nonlin_list.clear();
   }
   // Create sparsity pattern
