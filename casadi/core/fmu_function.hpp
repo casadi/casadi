@@ -806,7 +806,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   Sparsity jac_sp_, hess_sp_;
 
   // Graph coloring
-  Sparsity jac_coloring_;
+  Sparsity jac_coloring_, hess_coloring_;
 
   // Nonlinearly entering variables
   std::vector<casadi_int> nonlin_;

@@ -1362,6 +1362,11 @@ void FmuFunction::init(const Dict& opts) {
     }
     if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
 
+    // Calculate graph coloring
+    hess_coloring_ = hess_sp_.star_coloring();
+    if (verbose_) casadi_message("Hessian graph coloring: " + str(nonlin_.size())
+      + " -> " + str(hess_coloring_.size2()) + " directions");
+
     // Number of threads to be used for Hessian calculation
     max_hess_tasks_ = std::min(max_n_tasks_, static_cast<casadi_int>(nonlin_.size()));
 
