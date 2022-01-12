@@ -107,6 +107,8 @@ add_definitions(-DOBJECT_FILE_SUFFIX="\\"${CMAKE_C_OUTPUT_EXTENSION}\\"")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CASADI_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CASADI_C_FLAGS}")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-visibility-inlines-hidden")
+
 add_subdirectory(core)
 add_subdirectory(interfaces)
 add_subdirectory(solvers)
