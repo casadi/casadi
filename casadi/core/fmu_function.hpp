@@ -583,11 +583,8 @@ struct CASADI_EXPORT Fmu {
   std::vector<fmi2ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
   Value aux_value_;
 
-  // Sparsity pattern for Jacobian of all outputs w.r.t. all inputs
-  Sparsity sp_jac_;
-
-  // Sparsity pattern for Hessian of a linear combination of all outputs w.r.t. all inputs
-  Sparsity sp_hess_;
+  // Sparsity pattern for extended Jacobian, Hessian
+  Sparsity jac_sp_, hess_sp_;
 
   // Index lookup for input
   size_t index_in(const std::string& n) const;
@@ -806,10 +803,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& name_out);
 
   // Get sparsity pattern for extended Jacobian, Hessian
-  Sparsity sp_jac_, sp_hess_;
+  Sparsity jac_sp_, hess_sp_;
 
   // Graph coloring
-  Sparsity coloring_;
+  Sparsity jac_coloring_;
 
   // Nonlinearly entering variables
   std::vector<casadi_int> nonlin_;

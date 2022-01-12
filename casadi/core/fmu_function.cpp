@@ -265,10 +265,10 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   aux_value_.v_string.resize(vn_aux_string_.size());
 
   // Get Jacobian sparsity information
-  sp_jac_ = dae->jac_sparsity(oind_, iind_);
+  jac_sp_ = dae->jac_sparsity(oind_, iind_);
 
   // Get Hessian sparsity information
-  sp_hess_ = dae->hess_sparsity(oind_, iind_);
+  hess_sp_ = dae->hess_sparsity(oind_, iind_);
 
   // Load DLL
   std::string instance_name_no_dot = dae->model_identifier_;
@@ -967,7 +967,7 @@ Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<si
   // Index mapping (not used)
   std::vector<casadi_int> mapping;
   // Get selection
-  return sp_jac_.sub(osub1, isub1, mapping);
+  return jac_sp_.sub(osub1, isub1, mapping);
 }
 
 Sparsity Fmu::hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const {
@@ -977,7 +977,7 @@ Sparsity Fmu::hess_sparsity(const std::vector<size_t>& r, const std::vector<size
   // Index mapping (not used)
   std::vector<casadi_int> mapping;
   // Get selection
-  return sp_hess_.sub(r1, c1, mapping);
+  return hess_sp_.sub(r1, c1, mapping);
 }
 
 Fmu::Fmu(const std::vector<std::string>& scheme_in,
@@ -1316,25 +1316,25 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Get sparsity pattern for extended Jacobian
-  sp_jac_ = fmu_->jac_sparsity(jac_out_, jac_in_);
+  jac_sp_ = fmu_->jac_sparsity(jac_out_, jac_in_);
 
   // Calculate graph coloring
-  coloring_ = sp_jac_.uni_coloring();
-  if (verbose_) casadi_message("Graph coloring: " + str(sp_jac_.size2())
-    + " -> " + str(coloring_.size2()) + " directions");
+  jac_coloring_ = jac_sp_.uni_coloring();
+  if (verbose_) casadi_message("Jacobian graph coloring: " + str(jac_sp_.size2())
+    + " -> " + str(jac_coloring_.size2()) + " directions");
 
   // Setup Jacobian memory
-  casadi_jac_setup(&p_, sp_jac_, coloring_);
+  casadi_jac_setup(&p_, jac_sp_, jac_coloring_);
   p_.nom_in = get_ptr(jac_nom_in_);
   p_.map_out = get_ptr(jac_out_);
   p_.map_in = get_ptr(jac_in_);
 
   // Do not use more threads than there are colors in the Jacobian
-  max_jac_tasks_ = std::min(max_n_tasks_, coloring_.size2());
+  max_jac_tasks_ = std::min(max_n_tasks_, jac_coloring_.size2());
 
   // Work vector for storing extended Jacobian, shared between threads
   if (has_jac_) {
-    alloc_w(sp_jac_.nnz(), true);  // jac_nz
+    alloc_w(jac_sp_.nnz(), true);  // jac_nz
   }
 
   // Work vectors for adjoint derivative calculation, shared between threads
@@ -1347,11 +1347,11 @@ void FmuFunction::init(const Dict& opts) {
   if (has_hess_) {
 
     // Get sparsity pattern for extended Hessian
-    sp_hess_ = fmu_->hess_sparsity(jac_in_, jac_in_);
-    casadi_assert(sp_hess_.size1() == jac_in_.size(), "Inconsistent Hessian dimensions");
-    casadi_assert(sp_hess_.size2() == jac_in_.size(), "Inconsistent Hessian dimensions");
-    const casadi_int *hess_row = sp_hess_.row();
-    casadi_int hess_nnz = sp_hess_.nnz();
+    hess_sp_ = fmu_->hess_sparsity(jac_in_, jac_in_);
+    casadi_assert(hess_sp_.size1() == jac_in_.size(), "Inconsistent Hessian dimensions");
+    casadi_assert(hess_sp_.size2() == jac_in_.size(), "Inconsistent Hessian dimensions");
+    const casadi_int *hess_row = hess_sp_.row();
+    casadi_int hess_nnz = hess_sp_.nnz();
 
     // Get nonlinearly entering variables
     std::vector<bool> is_nonlin(jac_in_.size(), false);
@@ -1366,13 +1366,13 @@ void FmuFunction::init(const Dict& opts) {
     max_hess_tasks_ = std::min(max_n_tasks_, static_cast<casadi_int>(nonlin_.size()));
 
     // Work vector for storing extended Hessian, shared between threads
-    alloc_w(sp_hess_.nnz(), true);  // hess_nz
+    alloc_w(hess_sp_.nnz(), true);  // hess_nz
 
     // Work vector for perturbed adjoint sensitivities
     alloc_w(max_hess_tasks_ * fmu_->iind_.size(), true);  // pert_asens
 
     // Work vector for making symmetric or checking symmetry
-    if (check_hessian_ || make_symmetric_) alloc_iw(sp_hess_.size2());
+    if (check_hessian_ || make_symmetric_) alloc_iw(hess_sp_.size2());
   }
 
   // Total number of threads used for Jacobian/adjoint calculation
@@ -1620,7 +1620,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Work vectors, shared between threads
   double *aseed = 0, *asens = 0, *jac_nz = 0, *hess_nz = 0;
   if (need_jac) {
-    jac_nz = w; w += sp_jac_.nnz();
+    jac_nz = w; w += jac_sp_.nnz();
   }
   if (need_adj) {
     // Set up vectors
@@ -1638,7 +1638,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     }
   }
   if (need_hess) {
-    hess_nz = w; w += sp_hess_.nnz();
+    hess_nz = w; w += hess_sp_.nnz();
   }
   // Setup memory for threads
   for (casadi_int task = 0; task < max_n_tasks_; ++task) {
@@ -1677,11 +1677,11 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     // Get by type
     switch (out_[k].type) {
       case OutputType::JAC:
-        casadi_get_sub(r, sp_jac_, jac_nz,
+        casadi_get_sub(r, jac_sp_, jac_nz,
           out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
         break;
       case OutputType::JAC_TRANS:
-        casadi_get_sub(w, sp_jac_, jac_nz,
+        casadi_get_sub(w, jac_sp_, jac_nz,
           out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
         casadi_trans(w, sp_trans_[sp_trans_map_[k]], r, sparsity_out(k), iw);
         break;
@@ -1689,7 +1689,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         for (size_t id : fmu_->ired_[out_[k].wrt]) *r++ = asens[id];
         break;
       case OutputType::HESS:
-        casadi_get_sub(r, sp_hess_, hess_nz,
+        casadi_get_sub(r, hess_sp_, hess_nz,
           out_[k].rbegin, out_[k].rend, out_[k].cbegin, out_[k].cend);
         break;
       default:
@@ -1788,8 +1788,8 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   // Evalute extended Jacobian
   if (need_jac || need_adj) {
     // Selection of colors to be evaluated for the thread
-    casadi_int c_begin = (task * coloring_.size2()) / n_task;
-    casadi_int c_end = ((task + 1) * coloring_.size2()) / n_task;
+    casadi_int c_begin = (task * jac_coloring_.size2()) / n_task;
+    casadi_int c_end = ((task + 1) * jac_coloring_.size2()) / n_task;
     // Loop over colors
     for (casadi_int c = c_begin; c < c_end; ++c) {
       // Print progress
@@ -1822,7 +1822,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
     casadi_int c_begin = (task * nonlin_.size()) / n_task;
     casadi_int c_end = ((task + 1) * nonlin_.size()) / n_task;
     // Hessian sparsity
-    const casadi_int *hess_colind = sp_hess_.colind(), *hess_row = sp_hess_.row();
+    const casadi_int *hess_colind = hess_sp_.colind(), *hess_row = hess_sp_.row();
     // Loop over perturbed inputs for thread
     for (casadi_int c = c_begin; c < c_end; ++c) {
       // Print progress
@@ -1864,7 +1864,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Clear perturbed adjoint sensitivities
       std::fill(m->pert_asens, m->pert_asens + fmu_->iind_.size(), 0);
       // Loop over colors of the Jacobian
-      for (casadi_int c1 = 0; c1 < coloring_.size2(); ++c1) {
+      for (casadi_int c1 = 0; c1 < jac_coloring_.size2(); ++c1) {
        // Get derivative directions
        casadi_jac_pre(&p_, &m->d, c1);
        // Calculate derivatives
@@ -1894,8 +1894,8 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
 
 void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int* iw) const {
   // Get Hessian sparsity pattern
-  casadi_int n = sp_hess_.size1();
-  const casadi_int *colind = sp_hess_.colind(), *row = sp_hess_.row();
+  casadi_int n = hess_sp_.size1();
+  const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
   // Nonzero counters for transpose
   casadi_copy(colind, n, iw);
   // Loop over Hessian columns
@@ -1938,8 +1938,8 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
 
 void FmuFunction::make_symmetric(double *hess_nz, casadi_int* iw) const {
   // Get Hessian sparsity pattern
-  casadi_int n = sp_hess_.size1();
-  const casadi_int *colind = sp_hess_.colind(), *row = sp_hess_.row();
+  casadi_int n = hess_sp_.size1();
+  const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
   // Nonzero counters for transpose
   casadi_copy(colind, n, iw);
   // Loop over Hessian columns
