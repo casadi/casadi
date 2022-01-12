@@ -204,12 +204,6 @@ jobs:
         uses: actions/setup-python@v2.3.1
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
-      - name: Setup conda
-        uses: s-weigand/setup-conda@v1
-        with:
-          update-conda: true
-          python-version: 3.8
-          conda-channels: anaconda, conda-forge
       - uses: actions/download-artifact@v2
         with:
           name: casadi_source_wrapper
