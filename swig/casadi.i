@@ -59,21 +59,16 @@
   namespace casadi {
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
-      SWIG_PYTHON_THREAD_BEGIN_BLOCK;
       if (error) {
         PySys_WriteStderr("%.*s", static_cast<int>(num), s);
       } else {
         PySys_WriteStdout("%.*s", static_cast<int>(num), s);
       }
-      SWIG_PYTHON_THREAD_END_BLOCK;
     }
 
     static bool pythoncheckinterrupted() {
       if (!casadi::InterruptHandler::is_main_thread()) return false;
-      SWIG_PYTHON_THREAD_BEGIN_BLOCK;
-      bool check = PyErr_CheckSignals();
-      SWIG_PYTHON_THREAD_END_BLOCK;
-      return check;
+      return PyErr_CheckSignals();
     }
 
     void handle_director_exception() {
