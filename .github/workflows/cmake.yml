@@ -223,11 +223,11 @@ jobs:
         with:
           files: install/
           recursive: false
-          dest: ${{github.job}}-${{matrix.image}}-py${{matrix.py2}}.zip
+          dest: ${{github.job}}-osx64-py${{matrix.py2}}.zip
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: ${{github.job}}-${{matrix.image}}-py${{matrix.py2}}
-          path: ${{github.job}}-${{matrix.image}}-py${{matrix.py2}}.zip
+          name: ${{github.job}}-osx64-py${{matrix.py2}}
+          path: ${{github.job}}-osx64-py${{matrix.py2}}.zip
           retention-days: 1
 
 
@@ -302,7 +302,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["27","35","36","37","38","39","310"]
-       image: ["windows-latest","ubuntu-latest"]
+       image: ["windows-latest","ubuntu-latest","macos-latest"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -316,7 +316,8 @@ jobs:
           map: |
            {
               "windows-latest": {"os": "windows"},
-              "ubuntu-latest": {"os": "linux"}
+              "ubuntu-latest": {"os": "linux"},
+              "macos-latest": {"os": "osx"},
            }
           export_to: env
       - uses: actions/download-artifact@v2
