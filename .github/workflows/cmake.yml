@@ -75,7 +75,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{matrix.image}}-v1
+          key: core-build-${{matrix.image}}-v2
           path: build
       - name: Build
         run: |
@@ -107,13 +107,13 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{ matrix.target }}-v3
+          key: core-build-${{ matrix.target }}-v4
           path: build
       - name: Build
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DCMAKE_BUILD_TYPE=Debug -H.
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           ./dockcross cmake --build build -v
       - name: Easy Zip Files - fails to ignore some bad symlinks
         if: false
