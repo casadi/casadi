@@ -345,13 +345,13 @@ jobs:
       - if: contains(matrix.image, 'windows')
         run: |
           cd test/python
-          pip install numpy==1.20
+          pip install numpy==1.19
           set PYTHONPATH=${{ github.workspace }}/install
           python alltests.py
       - if: "!contains(matrix.image, 'windows')"
         run: |
           cd test/python
-          pip install numpy==1.20
+          pip install numpy==1.19
           PYTHONPATH=${{ github.workspace }}/install python alltests.py
 
   frontend_matlab-manylinux1_x86_64:
