@@ -75,7 +75,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{matrix.image}}-v2
+          key: core-build-${{matrix.image}}-v3
           path: build
       - name: Build
         run: |
@@ -107,7 +107,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{ matrix.target }}-v4
+          key: core-build-${{ matrix.target }}-v5
           path: build
       - name: Build
         run: |
@@ -297,7 +297,7 @@ jobs:
 
   test-python:
     runs-on: ${{matrix.image}}
-    needs: [frontend_python-dockcross]
+    needs: [frontend_python-dockcross,frontend_python-osx]
     strategy:
      fail-fast: false
      matrix:
