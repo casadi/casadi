@@ -317,7 +317,7 @@ jobs:
            {
               "windows-latest": {"os": "windows"},
               "ubuntu-latest": {"os": "linux"},
-              "macos-latest": {"os": "osx"},
+              "macos-latest": {"os": "osx"}
            }
           export_to: env
       - uses: actions/download-artifact@v2
@@ -345,7 +345,7 @@ jobs:
       - if: contains(matrix.arch, 'windows')
         run: |
           cd test/python
-          pip install numpy==
+          pip install numpy==1.19
           set PYTHONPATH=${{ github.workspace }}/install
           python alltests.py
       - if: "!contains(matrix.arch, 'windows')"
