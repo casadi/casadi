@@ -350,6 +350,7 @@ jobs:
         run: |
           cd test/python
           pip install numpy==1.19 scipy
+          python -c "from casadi import *;x=MX.sym('x');nlpsol('solver','ipopt',{'x':x,'f':x**2})()"
           python alltests.py
 
   frontend_matlab-manylinux1_x86_64:
