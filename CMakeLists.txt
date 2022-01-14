@@ -276,7 +276,7 @@ endif()
 
 ExternalProject_Add(openblas
     GIT_REPOSITORY https://github.com/jgillis/OpenBLAS.git
-    GIT_TAG d461ce45be91d1b131ef6917819b59b814fc7794
+    GIT_TAG 15bf4c3b9e1c697f209715d871ba6f33eb651217
     PREFIX "${CMAKE_BINARY_DIR}/external_projects"
     UPDATE_COMMAND ""
     CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
