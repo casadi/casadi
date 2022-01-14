@@ -86,7 +86,7 @@ jobs:
         with:
           name: ${{ github.job }}-${{matrix.image}}
           path: ${{ github.job }}-${{matrix.image}}.zip
-          retention-days: 1
+          retention-days: 5
           
   core-dockcross:
     runs-on: ubuntu-20.04
@@ -127,7 +127,7 @@ jobs:
         with:
           name: ${{github.job}}-${{ matrix.target}}
           path: ${{github.job}}-${{matrix.target}}.zip
-          retention-days: 1
+          retention-days: 5
           
   interfaces-manylinux1_x86_64:
     needs: [core-dockcross]
@@ -228,7 +228,7 @@ jobs:
         with:
           name: ${{github.job}}-osx64-py${{matrix.py2}}
           path: ${{github.job}}-osx64-py${{matrix.py2}}.zip
-          retention-days: 1
+          retention-days: 5
 
 
   frontend_python-dockcross:
@@ -293,7 +293,7 @@ jobs:
         with:
           name: casadi-${{env.os}}-py${{matrix.py2}}
           path: casadi-${{env.os}}-py${{matrix.py2}}.zip
-          retention-days: 1
+          retention-days: 5
 
   test-python:
     runs-on: ${{matrix.image}}
@@ -345,13 +345,13 @@ jobs:
       - if: contains(matrix.arch, 'windows')
         run: |
           cd test/python
-          pip install numpy
+          pip install numpy==
           set PYTHONPATH=${{ github.workspace }}/install
           python alltests.py
       - if: "!contains(matrix.arch, 'windows')"
         run: |
           cd test/python
-          pip install numpy
+          pip install numpy==1.19
           PYTHONPATH=${{ github.workspace }}/install python alltests.py
 
   frontend_matlab-manylinux1_x86_64:
@@ -386,7 +386,7 @@ jobs:
         with:
           name: ${{ github.job }}-${{ matrix.arch }}
           path: build
-          retention-days: 1
+          retention-days: 5
 
       - name: Build
         run: |
@@ -439,7 +439,7 @@ jobs:
         with:
           name: ${{ github.job }}-${{ matrix.arch}}-py${{ matrix.py2}}
           path: install
-          retention-days: 1
+          retention-days: 5
       
   windows_matlab:
     runs-on: windows-2016
