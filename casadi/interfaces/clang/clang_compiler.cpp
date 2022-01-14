@@ -158,8 +158,11 @@ namespace casadi {
     #else
     clang::CompilerInvocation* compInv = new clang::CompilerInvocation();
     #endif
-    clang::CompilerInvocation::CreateFromArgs(*compInv, &args[0],
-                                              &args[0] + args.size(), diags);
+    #if LLVM_VERSION_MAJOR>=10
+    clang::CompilerInvocation::CreateFromArgs(*compInv, args, diags);
+    #else
+    clang::CompilerInvocation::CreateFromArgs(*compInv, &args[0], &args0] + args.size(), diags);
+    #endif
     compInst.setInvocation(compInv);
 
     // Get ready to report problems
