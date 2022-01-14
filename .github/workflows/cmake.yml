@@ -327,6 +327,9 @@ jobs:
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip
       - run: ls
+
+      # Make cl.exe available on Windows
+      - uses: ilammy/msvc-dev-cmd@v1
       - id: get-id
         uses: actions/github-script@v5.0.0
         env:
@@ -346,7 +349,7 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
-          pip install numpy==1.19
+          pip install numpy==1.19 scipy
           python alltests.py
 
   frontend_matlab-manylinux1_x86_64:
