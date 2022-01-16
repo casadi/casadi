@@ -366,7 +366,7 @@ jobs:
       - run: echo "hello"
       
   linux-python:
-    needs: [interfaces-manylinux1_x86_64,frontend_python-dockcross]
+    needs: [interfaces-manylinux1_x86_64,python-dockcross]
     runs-on: ubuntu-20.04
     steps:
     - run: echo "hello"
