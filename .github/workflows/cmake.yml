@@ -327,7 +327,7 @@ jobs:
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip
       - run: ls install
-      - uses: jgillis/universal_grafter.git@master
+      - uses: jgillis/universal_grafter@master
         with:
           source_path: install
           destination_path: install_grafted
