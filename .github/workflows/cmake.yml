@@ -161,7 +161,7 @@ jobs:
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
   
-  frontend_python-osx:
+  python-osx:
     needs: [core-osx,swig]
     runs-on: ${{ matrix.image }}
     strategy:
@@ -223,15 +223,15 @@ jobs:
         with:
           files: install/
           recursive: false
-          dest: ${{github.job}}-osx64-py${{matrix.py2}}.zip
+          dest: casadi-osx64-py${{matrix.py2}}.zip
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: ${{github.job}}-osx64-py${{matrix.py2}}
-          path: ${{github.job}}-osx64-py${{matrix.py2}}.zip
+          name: casadi-osx64-py${{matrix.py2}}
+          path: casadi-osx64-py${{matrix.py2}}.zip
           retention-days: 5
 
 
-  frontend_python-dockcross:
+  python-dockcross:
     needs: [core-dockcross,matrix-arch-py2,swig]
     runs-on: ubuntu-20.04
     strategy:
@@ -297,7 +297,7 @@ jobs:
 
   test-python:
     runs-on: ${{matrix.image}}
-    needs: [frontend_python-dockcross,frontend_python-osx]
+    needs: [python-dockcross,python-osx]
     strategy:
      fail-fast: false
      matrix:
@@ -326,8 +326,14 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip
-      - run: ls
-
+      - run: ls install
+      - uses: jgillis/universal_grafter.git@master
+        with:
+          source_path: install
+          destination_path: install_grafted
+          dockcross: manylinux1-x64
+          bitness: ${{ matrix.bit }}
+      - run: ls install_grafted
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1
       - id: get-id
@@ -346,7 +352,7 @@ jobs:
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - env:
-          PYTHONPATH: ${{ github.workspace }}/install
+          PYTHONPATH: ${{ github.workspace }}/install_grafted
         run: |
           cd test/python
           pip install numpy==1.19 scipy
