@@ -242,7 +242,7 @@ jobs:
         with:
           source_path: install
           destination_path: install_grafted
-          search_paths: /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV
+          search_paths: /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/lib
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
@@ -301,11 +301,11 @@ jobs:
           key: "${{matrix.arch}}"
           map: |
            {
-              "manylinux1-x64": {"os": "linux64"},
-              "manylinux1-x86": {"os": "linux32"},
-              "manylinux2014-x64": {"os": "linux64"},
-              "manylinux2014-x86": {"os": "linux32"},
-              "windows-shared-x64-posix": {"os": "windows64"}
+              "manylinux1-x64": {"os": "linux64", "bitness": "64"},
+              "manylinux1-x86": {"os": "linux32", "bitness": "32"},
+              "manylinux2014-x64": {"os": "linux64", "bitness": "64"},
+              "manylinux2014-x86": {"os": "linux32", "bitness": "32"},
+              "windows-shared-x64-posix": {"os": "windows64", "bitness": "64"}
            }
           export_to: env
       - uses: jgillis/universal_grafter@master
@@ -314,7 +314,7 @@ jobs:
           source_path: install
           destination_path: install_grafted
           dockcross: ${{ matrix.arch }}
-          bitness: ${{ matrix.bit }}
+          bitness: ${{env.bitness}}
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
