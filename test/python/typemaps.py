@@ -803,6 +803,16 @@ class typemaptests(casadiTestCase):
 
     jacobian(x/1.458151064450277e-12,x)
 
+  def test_issue273(self):
+    state = SX.sym('H_body_world', 6, 6)
+
+    H_body_world = np.array([[cos(state[2, 0])*cos(state[1, 0]), -sin(state[2, 0])*cos(state[1, 0]), sin(state[1, 0]), state[3, 0]],
+                             [sin(state[0, 0])*sin(state[1, 0])*cos(state[2, 0]) + sin(state[2, 0])*cos(state[0, 0]), -sin(state[0, 0])*sin(state[2, 0])*sin(state[1, 0]) + cos(state[0, 0])*cos(state[2, 0]), -sin(state[0, 0])*cos(state[1, 0]), state[4, 0]], 
+                             [sin(state[0, 0])*sin(state[2, 0]) - sin(state[1, 0])*cos(state[0, 0])*cos(state[2, 0]), sin(state[0, 0])*cos(state[2, 0]) + sin(state[2, 0])*sin(state[1, 0])*cos(state[0, 0]), cos(state[0, 0])*cos(state[1, 0]), state[5, 0]],
+                             [0, 0, 0, 1]])
+
+    print(H_body_world)
+    print(SX(H_body_world))
 
   def test_issue_2625(self):
     # This is obviously a bug

@@ -2682,9 +2682,15 @@ class NZproxy:
         try:
           return self.full()
         except:
-          raise Exception("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
-                     + "This may occur when you pass a CasADi object to a numpy function.\n"
-                     + "Use an equivalent CasADi function instead of that numpy function.")
+          if self.is_scalar(True):
+            # Needed for #2743
+            E=n.empty((),dtype=object)
+            E[()] = self
+            return E
+          else:
+            raise Exception("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
+                      + "This may occur when you pass a CasADi object to a numpy function.\n"
+                      + "Use an equivalent CasADi function instead of that numpy function.")
 
 %}
 %enddef
