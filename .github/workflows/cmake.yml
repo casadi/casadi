@@ -218,10 +218,16 @@ jobs:
         run: |
           cmake -Bbuild -DWITH_PYTHON=ON -DWITH_PYTHON3=${{steps.get-id.outputs.WITH_PYTHON3}} -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
           cmake --build build --target install -v
+      - uses: jgillis/universal_grafter@master
+        with:
+          source_path: install
+          destination_path: install_grafted
+          bitness: ${{ matrix.bit }}
+          search_paths: /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
-          files: install/
+          files: install_grafted/
           recursive: false
           dest: casadi-osx64-py${{matrix.py2}}.zip
       - uses: actions/upload-artifact@v2.2.4
@@ -283,10 +289,17 @@ jobs:
               "windows-shared-x64-posix": {"os": "windows64"}
            }
           export_to: env
+      - uses: jgillis/universal_grafter@master
+        if: "!contains(matrix.arch, 'windows')"
+        with:
+          source_path: install
+          destination_path: install_grafted
+          dockcross: ${{ matrix.arch }}
+          bitness: ${{ matrix.bit }}
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
-          files: install/
+          files: install_grafted/
           recursive: false
           dest: casadi-${{env.os}}-py${{matrix.py2}}.zip
       - uses: actions/upload-artifact@v2.2.4
@@ -327,12 +340,7 @@ jobs:
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip
       - run: ls install
-      - uses: jgillis/universal_grafter@master
-        with:
-          source_path: install
-          destination_path: install_grafted
-          dockcross: manylinux1-x64
-          bitness: ${{ matrix.bit }}
+
       - run: ls install_grafted
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1
