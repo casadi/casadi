@@ -240,13 +240,13 @@ jobs:
           cmake --build build --target install -v
       - uses: jgillis/universal_grafter@master
         with:
-          source_path: install
-          destination_path: install_grafted
+          source_path: install/casadi
+          destination_path: install/casadi
           search_paths: /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/lib
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
-          files: install_grafted/
+          files: install/
           recursive: false
           dest: casadi-osx64-py${{matrix.py2}}.zip
       - uses: actions/upload-artifact@v2.2.4
@@ -311,14 +311,14 @@ jobs:
       - uses: jgillis/universal_grafter@master
         if: "!contains(matrix.arch, 'windows')"
         with:
-          source_path: install
-          destination_path: install_grafted
+          source_path: install/casadi
+          destination_path: install/casadi
           dockcross: ${{ matrix.arch }}
           bitness: ${{env.bitness}}
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
-          files: install_grafted/
+          files: install/
           recursive: false
           dest: casadi-${{env.os}}-py${{matrix.py2}}.zip
       - uses: actions/upload-artifact@v2.2.4
