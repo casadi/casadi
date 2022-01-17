@@ -222,7 +222,6 @@ jobs:
         with:
           source_path: install
           destination_path: install_grafted
-          bitness: ${{ matrix.bit }}
           search_paths: /usr/local/miniconda/envs/$CONDA_DEFAULT_ENV
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
