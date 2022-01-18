@@ -75,11 +75,11 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{matrix.image}}-v3
+          key: core-build-${{matrix.image}}-v4
           path: build
       - name: Build
         run: |
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DCMAKE_Fortran_USE_RESPONSE_FILE_FOR_OBJECTS=1 -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
       - uses: actions/upload-artifact@v2.2.4
@@ -127,7 +127,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{ matrix.target }}-v5
+          key: core-build-${{ matrix.target }}-v6
           path: build
       - name: Build
         run: |
