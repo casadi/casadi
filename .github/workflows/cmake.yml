@@ -99,7 +99,7 @@ jobs:
           path: build
       - name: Build
         run: |
-          cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DCMAKE_Fortran_USE_RESPONSE_FILE_FOR_OBJECTS=1 -H.
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
           cmake --build build -v
       - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
       - uses: actions/upload-artifact@v2.2.4
