@@ -491,8 +491,8 @@ class Misctests(casadiTestCase):
 
     x = MX.sym("x")
     f = x**2
-    for i in range(100):
-      f=sin(x)*x
+    for i in range(1000):
+      f =sin(f)*f
 
 
     opts = {"record_time":True}
