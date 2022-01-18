@@ -90,6 +90,8 @@ jobs:
 
   core-osx_amd:
     runs-on: macos-11
+    env:
+      FC: gfortran-11
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Cache build dir
