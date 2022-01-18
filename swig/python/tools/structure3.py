@@ -35,6 +35,11 @@ else:
   builtins = __builtin__
 import collections
 
+try:
+  callable = collections.Callable
+except:
+  callable = collections.abc.Callable
+
 def is_integer(a):
   return isinstance(a,int) or isinstance(a,np.integer)
 
@@ -259,7 +264,7 @@ class StructEntry:
                       payload = payloadUnpack(payload,i)
                     )
                  for i in range(s)]
-        elif isinstance(p, collections.Callable):
+        elif isinstance(p, callable):
           r = p(self.traverseByPowerIndex(
                 powerIndex[1:],
                 dims=dims,
@@ -416,7 +421,7 @@ class Structure(object):
                        payload=payloadUnpack(payload,i)
                      )
                  for i,s in enumerate(p)]
-        elif isinstance(p, collections.Callable):
+        elif isinstance(p, callable):
           r = p(self.traverseByPowerIndex(
                 powerIndex[1:],
                 canonicalIndex=canonicalIndex,
