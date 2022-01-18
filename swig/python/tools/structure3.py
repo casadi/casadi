@@ -653,7 +653,7 @@ def delegation(extraIndex,entry,i):
 def performExtraIndex(i,extraIndex=None,entry=None,flip=False):
   if extraIndex is None or len(extraIndex)==0:
     return i
-  if isinstance(extraIndex[0], collections.Callable) and not isinstance(extraIndex[0],Delegater):
+  if isinstance(extraIndex[0], callable) and not isinstance(extraIndex[0],Delegater):
     return extraIndex[0](performExtraIndex(i,extraIndex=extraIndex[1:],entry=entry,flip=flip))
   if not(isinstance(extraIndex[0],NestedDictLiteral)):
     if len(extraIndex)>2 or len(extraIndex)==0:
