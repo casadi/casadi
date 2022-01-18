@@ -358,9 +358,6 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip
-      - run: ls install
-
-      - run: ls install_grafted
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1
       - id: get-id
@@ -379,7 +376,7 @@ jobs:
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - env:
-          PYTHONPATH: ${{ github.workspace }}/install_grafted
+          PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
           pip install numpy scipy
