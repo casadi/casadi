@@ -347,11 +347,17 @@ class LinearSolverTests(casadiTestCase):
                    ]:
         if "symmetry" in req: A_ = A_.T+A_
 
+        print("A")
+        A_.sparsity().spy()
+        print("b")
+        A_.sparsity().spy()
+
         A = MX.sym("A",A_.sparsity())
         b = MX.sym("b",b_.sparsity())
-        print(Solver)
+        print("Solver",Solver)
         solver = casadi.Linsol("solver", Solver, A.sparsity(), options)
         for tr in [True, False]:
+          print("tr",tr)
           x = solver.solve(A,b,tr)
           f = Function("f", [A,b],[x])
           f_out = f(A_, b_)
