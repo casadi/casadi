@@ -56,7 +56,7 @@ namespace casadi {
                 }
         \endcode
 */
-class CasadiException : public std::exception {
+class CASADI_EXPORT CasadiException : public std::exception {
   public:
   //! \brief Default constructor
   CasadiException() {
@@ -77,7 +77,7 @@ class CasadiException : public std::exception {
   std::string msg_;
 };
 
-class KeyboardInterruptException : public CasadiException {
+class CASADI_EXPORT KeyboardInterruptException : public CasadiException {
   public:
   //! \brief Default constructor
   KeyboardInterruptException() : CasadiException("KeyboardInterrupt") {}
