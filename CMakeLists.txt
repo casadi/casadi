@@ -832,7 +832,7 @@ endif()
 add_feature_info(mumps-interface WITH_MUMPS "Interface to MUMPS.")
 
 if(REQUIRE_CLP)
-  if(NOT WITH_BUILD_IPOPT)
+  if(NOT WITH_BUILD_CLP)
     find_package(CLP)
   endif()
   if(WITH_BUILD_CLP OR (WITH_BUILD_REQUIRED AND NOT CLP_FOUND))
@@ -933,7 +933,7 @@ if(REQUIRE_BONMIN)
   if (WITH_BUILD_BONMIN)
     message("Will build BONMIN v${BUILD_BONMIN_VERSION} (BUILD_BONMIN_VERSION)")
     ExternalProject_Add(bonmin
-        DEPENDS ipopt mumps metis coinutils osi clp cgl cbc ipopt-external
+        DEPENDS mumps metis coinutils osi clp cgl cbc ipopt-external
         GIT_REPOSITORY https://github.com/coin-or/Bonmin.git
         GIT_TAG releases/${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -942,7 +942,7 @@ if(REQUIRE_BONMIN)
     set(BONMIN_FOUND TRUE)
   endif()
   if(NOT BONMIN_FOUND)
-    message(FATAL_ERROR "IPOPT not found on your system yet required. Set WITH_BUILD_BONMIN or WITH_BUILD_REQUIRED ON to build this requirement.")
+    message(FATAL_ERROR "BONMIN not found on your system yet required. Set WITH_BUILD_BONMIN or WITH_BUILD_REQUIRED ON to build this requirement.")
   endif()
 endif()
 add_feature_info(bonmin-interface WITH_BONMIN "Interface to the MINLP framework Bonmin.")
