@@ -209,6 +209,9 @@ if(APPLE)
   set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
 endif()
 
+
+option(WITH_BUILD_IPOPT "Download and build IPOPT solver" OFF)
+
 ############################################################
 ################# WITH_COMMON option #######################
 ############################################################
@@ -221,9 +224,13 @@ if(WITH_COMMON)
   set(WITH_QPOASES_DEF ${LAPACK_FOUND})
   set(WITH_BLOCKSQP_DEF ${LAPACK_FOUND})
   set(WITH_SUPERSCS_DEF ${LAPACK_FOUND})
-  # Look for IPOPT
-  find_package(IPOPT QUIET)
-  set(WITH_IPOPT_DEF ${IPOPT_FOUND})
+  if (WITH_BUILD_IPOPT)
+    set(WITH_IPOPT_DEF ON)
+  else()
+    # Look for IPOPT
+    find_package(IPOPT QUIET)
+    set(WITH_IPOPT_DEF ${IPOPT_FOUND})
+  endif()
 else()
   # Disabled by default
   set(WITH_LAPACK_DEF OFF)
@@ -274,59 +281,11 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   endif()
 endif()
 
-ExternalProject_Add(openblas
-    GIT_REPOSITORY https://github.com/jgillis/OpenBLAS.git
-    GIT_TAG ee15f53c9ef7148b05e1b2ff80003df1685f0f10
-    PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-    UPDATE_COMMAND ""
-    CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-    CMAKE_ARGS -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
-
 
 message("CXX $ENV{CXX}")
 message("FC $ENV{FC}")
 message("CC $ENV{CC}")
 
-ExternalProject_Add(metis
-    GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Metis.git
-    GIT_TAG releases/2.0.0
-    DEPENDS openblas
-    PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>
-
-      # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
-      "CFLAGS=-Wno-implicit-function-declaration"
-    PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
-set(EXTERNAL_METIS_LIBS coinmetis)
-
-set(DEPENDENT_LIBRARIES ${DEPENDENT_LIBRARIES} ${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${EXTERNAL_METIS_LIBS}${CMAKE_SHARED_LIBRARY_SUFFIX})
-
-ExternalProject_Add(mumps
-    DEPENDS metis
-    GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Mumps.git
-    GIT_TAG releases/3.0.2
-    DEPENDS openblas metis
-    PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${EXTERNAL_METIS_LIBS} -lm" "--with-lapack-lflags=-lopenblas -L${CMAKE_BINARY_DIR}/external_projects/lib" ${CROSS_FLAGS_FORTRAN}
-    PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Mumps)
-
-
-ExternalProject_Add(ipopt-external
-    DEPENDS openblas mumps
-    URL https://www.coin-or.org/download/source/Ipopt/Ipopt-3.14.4.zip
-    PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags=-lopenblas -L${CMAKE_BINARY_DIR}/external_projects/lib" ${CROSS_FLAGS_FORTRAN})
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
-
-add_library(ipopt SHARED IMPORTED)
-set_target_properties(ipopt PROPERTIES
-  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_SHARED_LIBRARY_SUFFIX}"
-  IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
-  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
-)
 
 
 #####################################################
@@ -591,6 +550,9 @@ include_directories(${PROJECT_BINARY_DIR})
 #######################################################################
 ################# 3rd party interface #################################
 #######################################################################
+
+option(WITH_BUILD_REQUIRED "Build any requirements that are not found on your system")
+
 # Sundials: Solve initial-value problems in ODE and DAE
 option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.6.1" ON)
 option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
@@ -711,16 +673,6 @@ if(WITH_CLANG)
 endif()
 add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler.")
 
-# Lapack: Dense linear solvers
-option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
-if(WITH_LAPACK)
-  find_package(LAPACK REQUIRED)
-  if(DEFINED ENV{CASADI_EXTRA_LIBRARIES_LAPACK})
-    set(LAPACK_LIBRARIES ${LAPACK_LIBRARIES} $ENV{CASADI_EXTRA_LIBRARIES_LAPACK})
-  endif()
-endif()
-add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
-
 # qpOASES: An active-set QP solver
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${WITH_QPOASES_DEF})
 option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
@@ -744,17 +696,10 @@ add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver b
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
-if(WITH_IPOPT)
-  #find_package(IPOPT REQUIRED)
-endif()
-add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt.")
-
-# Bonmin: An MINLP solver
-option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
-if(WITH_BONMIN)
-  find_package(BONMIN REQUIRED)
-endif()
-add_feature_info(bonmin-interface WITH_BONMIN "Interface to the MINLP framework Bonmin.")
+set(BUILD_IPOPT_VERSION "3.14.4")
+set(BUILD_MUMPS_VERSION "3.0.2")
+option(WITH_BUILD_IPOPT "Compile IPOPT itself (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) instead of looking for it on your system" OFF)
+set(REQUIRE_IPOPT ${WITH_IPOPT} OR ${WITH_BUILD_IPOPT} OR ${WITH_BUILD_BONMIN})
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -771,18 +716,236 @@ if(WITH_CPLEX)
 endif()
 add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
 
+# Bonmin: An MINLP solver
+option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
+set(BUILD_BONMIN_VERSION "1.8.8")
+option(WITH_BUILD_BONMIN "Compile BONMIN itself (BUILD_CBC_VERSION=${BUILD_BONMIN_VERSION}) instead of looking for it on your system" OFF)
+set(REQUIRE_BONMIN ${WITH_BONMIN} OR ${WITH_BUILD_BONMIN})
+
+# CBC: A sparse mixed-integer linear solver
+option(WITH_CBC "Compile the CBC interface" OFF)
+set(BUILD_CBC_VERSION "2.10.6")
+option(WITH_BUILD_CBC "Compile CBC itself (BUILD_CBC_VERSION=${BUILD_CBC_VERSION}) instead of looking for it on your system" OFF)
+set(REQUIRE_CBC ${WITH_CBC} OR ${REQUIRE_BONMIN})
+
 # CLP: A sparse linear solver
 option(WITH_CLP "Compile the CLP interface" OFF)
-if(WITH_CLP)
-  find_package(CLP REQUIRED)
+set(BUILD_CLP_VERSION "1.17.7")
+set(BUILD_COINUTILS_VERSION "2.11.6")
+set(BUILD_CGL_VERSION "0.60.4")
+set(BUILD_OSI_VERSION "0.108.7")
+option(WITH_BUILD_CLP "Compile CLP itself (BUILD_CLP_VERSION=${BUILD_CLP_VERSION}) instead of looking for it on your system" OFF)
+set(REQUIRE_CLP ${WITH_CLP} OR ${WITH_BUILD_CLP} OR ${REQUIRE_CBC})
+
+# MUMPS: Sparse direct linear solver
+option(WITH_MUMPS "Enable MUMPS interface" OFF)
+set(BUILD_MUMPS_TP_VERSION "3.0.2")
+set(BUILD_METIS_TP_VERSION "2.0.0")
+option(WITH_BUILD_MUMPS "Compile MUMPS itself (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) instead of looking for it on your system" OFF)
+set(REQUIRE_MUMPS ${WITH_MUMPS} OR ${WITH_BUILD_MUMPS} OR ${REQUIRE_IPOPT} OR ${REQUIRE_CLP})
+
+# Lapack: Dense linear solvers
+option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
+option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
+set(REQUIRE_LAPACK ${WITH_LAPACK} OR ${WITH_BUILD_LAPACK} OR ${REQUIRE_MUMPS} OR ${REQUIRE_CLP})
+
+# HSL: Sparse direct linear solvers
+option(WITH_HSL "Enable HSL interface" OFF)
+if(WITH_HSL)
+  find_package(HSL REQUIRED)
+endif()
+add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
+
+
+if(REQUIRE_LAPACK)
+  if (NOT WITH_BUILD_LAPACK)
+    find_package(LAPACK)
+    if(DEFINED ENV{CASADI_EXTRA_LIBRARIES_LAPACK})
+      set(LAPACK_LIBRARIES ${LAPACK_LIBRARIES} $ENV{CASADI_EXTRA_LIBRARIES_LAPACK})
+    endif()
+  endif()
+  if (WITH_BUILD_LAPACK OR (WITH_BUILD_REQUIRED AND NOT LAPACK_FOUND))
+    message("Will build OPENBLAS")
+    ExternalProject_Add(openblas
+      GIT_REPOSITORY https://github.com/jgillis/OpenBLAS.git
+      GIT_TAG ee15f53c9ef7148b05e1b2ff80003df1685f0f10
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(LAPACK_DEPENDS_TARGET openblas)
+    set(LAPACK_FOUND TRUE)
+  endif()
+  if(NOT LAPACK_FOUND)
+    message(FATAL_ERROR "LAPACK not found on your system yet required. Set WITH_BUILD_LAPACK or WITH_BUILD_REQUIRED to ON to build this requirement.")
+  endif()
+  message("LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+  set(IPOPT_WITH_LAPACK_LFLAGS "")
+  foreach(LIB ${LAPACK_LIBRARIES})
+    get_filename_component(LIB_DIR "${LIB}" DIRECTORY)
+    get_filename_component(LIB_NAME "${LIB}" NAME)
+    set(IPOPT_WITH_LAPACK_LFLAGS "${IPOPT_WITH_LAPACK_LFLAGS} -L${LIB_DIR} -l:${LIB_NAME}")
+  endforeach()
+  message("IPOPT_WITH_LAPACK_LFLAGS: ${IPOPT_WITH_LAPACK_LFLAGS}")
+endif()
+add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
+
+if(REQUIRE_MUMPS)
+  if(NOT WITH_BUILD_MUMPS)
+    find_package(MUMPS)
+  endif()
+  if(WITH_BUILD_MUMPS OR (WITH_BUILD_REQUIRED AND NOT MUMPS_FOUND))
+      message("Will build METIS v${BUILD_METIS_TP_VERSION} (BUILD_METIS_TP_VERSION)")
+      ExternalProject_Add(metis
+          GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Metis.git
+          GIT_TAG releases/${BUILD_METIS_TP_VERSION}
+          DEPENDS ${LAPACK_DEPENDS_TARGET}
+          PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+          UPDATE_COMMAND ""
+          CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>
+
+            # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
+            "CFLAGS=-Wno-implicit-function-declaration"
+          PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
+      set(EXTERNAL_METIS_LIBS coinmetis)
+
+      set(DEPENDENT_LIBRARIES ${DEPENDENT_LIBRARIES} ${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${EXTERNAL_METIS_LIBS}${CMAKE_SHARED_LIBRARY_SUFFIX})
+
+      message("Will build MUMPS v${BUILD_MUMPS_TP_VERSION} (BUILD_MUMPS_TP_VERSION)")
+      ExternalProject_Add(mumps
+          DEPENDS metis
+          GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Mumps.git
+          GIT_TAG releases/${BUILD_MUMPS_TP_VERSION}
+          DEPENDS ${LAPACK_DEPENDS_TARGET} metis
+          PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+          UPDATE_COMMAND ""
+          CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${EXTERNAL_METIS_LIBS} -lm" "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+          PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Mumps)
+
+      set(MUMPS_FOUND TRUE)
+  endif()
+  if(NOT MUMPS_FOUND)
+    message(FATAL_ERROR "MUMPS not found on your system yet required. Set WITH_BUILD_MUMPS or WITH_BUILD_REQUIRED to ON to build this requirement.")
+  endif()
+endif()
+add_feature_info(mumps-interface WITH_MUMPS "Interface to MUMPS.")
+
+if(REQUIRE_CLP)
+  if(NOT WITH_BUILD_IPOPT)
+    find_package(CLP)
+  endif()
+  if(WITH_BUILD_CLP OR (WITH_BUILD_REQUIRED AND NOT CLP_FOUND))
+    message("Will build COINUTILS v${BUILD_COINUTILS_VERSION} (BUILD_COINUTILS_VERSION)")
+    ExternalProject_Add(coinutils
+          DEPENDS ${LAPACK_DEPENDS_TARGET}
+          GIT_REPOSITORY https://github.com/coin-or/CoinUtils.git
+          GIT_TAG releases/${BUILD_COINUTILS_VERSION}
+          PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+          UPDATE_COMMAND ""
+          CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR> )
+    message("Will build OSI v${BUILD_OSI_VERSION} (BUILD_OSI_VERSION)")
+    ExternalProject_Add(osi
+        DEPENDS coinutils
+        GIT_REPOSITORY https://github.com/coin-or/Osi.git
+        GIT_TAG releases/${BUILD_OSI_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> )
+    message("Will build CLP v${BUILD_CLP_VERSION} (BUILD_CLP_VERSION)")
+    ExternalProject_Add(clp
+        DEPENDS osi mumps coinutils ${LAPACK_DEPENDS_TARGET}
+        GIT_REPOSITORY https://github.com/coin-or/Clp.git
+        GIT_TAG releases/${BUILD_CLP_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR> )
+    set(CLP_FOUND TRUE)
+  endif()
+  if(NOT CLP_FOUND)
+    message(FATAL_ERROR "CLP not found on your system yet required. Set WITH_BUILD_CLP or WITH_BUILD_REQUIRED ON to build this requirement.")
+  endif()
 endif()
 add_feature_info(clp-interface WITH_CLP "Interface to the LP solver CLP.")
 
-option(WITH_CBC "Compile the CBC interface" OFF)
-if(WITH_CBC)
-  find_package(CBC REQUIRED)
+
+if(REQUIRE_CBC)
+  if(NOT WITH_BUILD_CBC)
+    find_package(CBC)
+  endif()
+  if (WITH_BUILD_CBC OR (WITH_BUILD_REQUIRED AND NOT CBC_FOUND))
+    message("Will build CGL v${BUILD_CGL_VERSION} (BUILD_CGL_VERSION)")
+    ExternalProject_Add(cgl
+        DEPENDS osi clp coinutils
+        GIT_REPOSITORY https://github.com/coin-or/Cgl.git
+        GIT_TAG releases/${BUILD_CGL_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> )
+    message("Will build CBC v${BUILD_CBC_VERSION} (BUILD_CBC_VERSION)")
+    ExternalProject_Add(cbc
+        DEPENDS coinutils cgl osi mumps clp ${LAPACK_DEPENDS_TARGET}
+        GIT_REPOSITORY https://github.com/coin-or/Cbc.git
+        GIT_TAG releases/${BUILD_CBC_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}")
+    set(CBC_FOUND TRUE)
+  endif()
+  if(NOT CBC_FOUND)
+    message(FATAL_ERROR "CBC not found on your system yet required. Set WITH_BUILD_CBC or WITH_BUILD_REQUIRED ON to build this requirement.")
+  endif()
 endif()
 add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
+
+if(REQUIRE_IPOPT)
+  if(NOT WITH_BUILD_IPOPT)
+    find_package(IPOPT)
+  endif()
+  if (WITH_BUILD_IPOPT OR (WITH_BUILD_REQUIRED AND NOT IPOPT_FOUND))
+    message("Will build IPOPT v${BUILD_IPOPT_VERSION} (BUILD_IPOPT_VERSION)")
+    ExternalProject_Add(ipopt-external
+        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps
+        URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
+
+    add_library(ipopt SHARED IMPORTED)
+    set_target_properties(ipopt PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
+    )
+    set(IPOPT_FOUND TRUE)
+  endif()
+  if(NOT IPOPT_FOUND)
+    message(FATAL_ERROR "IPOPT not found on your system yet required. Set WITH_BUILD_IPOPT or WITH_BUILD_REQUIRED ON to build this requirement.")
+  endif()
+endif()
+add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt.")
+
+if(REQUIRE_BONMIN)
+  if(NOT WITH_BUILD_BONMIN)
+    find_package(BONMIN)
+  endif()
+  if (WITH_BUILD_BONMIN)
+    message("Will build BONMIN v${BUILD_BONMIN_VERSION} (BUILD_BONMIN_VERSION)")
+    ExternalProject_Add(bonmin
+        DEPENDS ipopt mumps metis coinutils osi clp cgl cbc ipopt-external
+        GIT_REPOSITORY https://github.com/coin-or/Bonmin.git
+        GIT_TAG releases/${BUILD_BONMIN_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>)
+    set(BONMIN_FOUND TRUE)
+  endif()
+  if(NOT BONMIN_FOUND)
+    message(FATAL_ERROR "IPOPT not found on your system yet required. Set WITH_BUILD_BONMIN or WITH_BUILD_REQUIRED ON to build this requirement.")
+  endif()
+endif()
+add_feature_info(bonmin-interface WITH_BONMIN "Interface to the MINLP framework Bonmin.")
 
 
 # SNOPT: An SQP method
@@ -802,19 +965,6 @@ if(WITH_SNOPT)
 endif()
 add_feature_info(snopt-interface WITH_SNOPT "Interface to the NLP solver SNOPT.")
 
-# HSL: Sparse direct linear solvers
-option(WITH_HSL "Enable HSL interface" OFF)
-if(WITH_HSL)
-  find_package(HSL REQUIRED)
-endif()
-add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
-
-# MUMPS: Sparse direct linear solver
-option(WITH_MUMPS "Enable MUMPS interface" OFF)
-if(WITH_MUMPS)
-  find_package(MUMPS REQUIRED)
-endif()
-add_feature_info(mumps-interface WITH_MUMPS "Interface to MUMPS.")
 
 # OOQP: A sparse interior point QP solver
 option(WITH_OOQP "Enable OOQP interface" OFF)

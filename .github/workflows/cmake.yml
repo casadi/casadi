@@ -79,7 +79,7 @@ jobs:
           path: build
       - name: Build
         run: |
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
       - uses: actions/upload-artifact@v2.2.4
@@ -135,7 +135,7 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -H.
           ./dockcross cmake --build build -v
       - name: Easy Zip Files - fails to ignore some bad symlinks
         if: false
