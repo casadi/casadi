@@ -1366,15 +1366,27 @@ void FmuFunction::init(const Dict& opts) {
     for (casadi_int c = 0; c < jac_in_.size(); ++c) {
       if (is_nonlin[c]) nonlin_.push_back(c);
     }
-    if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
-
     // Calculate graph coloring
-    hess_coloring_ = hess_sp_.star_coloring();
-    if (verbose_) casadi_message("Hessian graph coloring: " + str(nonlin_.size())
-      + " -> " + str(hess_coloring_.size2()) + " directions");
+    if (!perturb_nonlin_) {
+      // Star coloring
+      hess_coloring_ = hess_sp_.star_coloring();
+      if (verbose_) casadi_message("Hessian graph coloring: " + str(nonlin_.size())
+        + " -> " + str(hess_coloring_.size2()) + " directions");
+      // Indices of non-nonlinearly entering variables
+      std::vector<casadi_int> zind;
+      for (casadi_int c = 0; c < jac_in_.size(); ++c) {
+        if (!is_nonlin[c]) zind.push_back(c);
+      }
+      // Zero out corresponding rows
+      hess_coloring_.erase(zind, range(hess_coloring_.size2()));
+    } else {
+      // One color for each nonlinear variable
+      hess_coloring_ = Sparsity(jac_in_.size(), nonlin_.size(), range(nonlin_.size() + 1), nonlin_);
+      if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
+    }
 
     // Number of threads to be used for Hessian calculation
-    max_hess_tasks_ = std::min(max_n_tasks_, static_cast<casadi_int>(nonlin_.size()));
+    max_hess_tasks_ = std::min(max_n_tasks_, hess_coloring_.size2());
 
     // Work vector for storing extended Hessian, shared between threads
     alloc_w(hess_sp_.nnz(), true);  // hess_nz
@@ -1383,7 +1395,7 @@ void FmuFunction::init(const Dict& opts) {
     alloc_w(max_hess_tasks_ * fmu_->iind_.size(), true);  // pert_asens
 
     // Work vector for making symmetric or checking symmetry
-    if (check_hessian_ || make_symmetric_) alloc_iw(hess_sp_.size2());
+    alloc_iw(hess_sp_.size2());
   }
 
   // Total number of threads used for Jacobian/adjoint calculation
@@ -1631,7 +1643,9 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Work vectors, shared between threads
   double *aseed = 0, *asens = 0, *jac_nz = 0, *hess_nz = 0;
   if (need_jac) {
+    // Jacobian nonzeros, initialize to NaN
     jac_nz = w; w += jac_sp_.nnz();
+    std::fill(jac_nz, jac_nz + jac_sp_.nnz(), casadi::nan);
   }
   if (need_adj) {
     // Set up vectors
@@ -1649,7 +1663,9 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     }
   }
   if (need_hess) {
+    // Hessian nonzeros, initialize to NaN
     hess_nz = w; w += hess_sp_.nnz();
+    std::fill(hess_nz, hess_nz + hess_sp_.nnz(), casadi::nan);
   }
   // Setup memory for threads
   for (casadi_int task = 0; task < max_n_tasks_; ++task) {
@@ -1677,6 +1693,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (verbose_) casadi_message("Evaluating extended Hessian");
     if (eval_all(m, max_hess_tasks_, false, false, false, true)) return 1;
     // Post-process Hessian
+    remove_nans(hess_nz, iw);
     if (check_hessian_) check_hessian(m, hess_nz, iw);
     if (make_symmetric_) make_symmetric(hess_nz, iw);
   }
@@ -1829,46 +1846,60 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   }
   // Evaluate extended Hessian
   if (need_hess) {
-    // Selection of inputs to be perturbed for the thread
-    casadi_int c_begin = (task * nonlin_.size()) / n_task;
-    casadi_int c_end = ((task + 1) * nonlin_.size()) / n_task;
+    // Hessian coloring
+    casadi_int n_hc = hess_coloring_.size2();
+    const casadi_int *hc_colind = hess_coloring_.colind(), *hc_row = hess_coloring_.row();
     // Hessian sparsity
     const casadi_int *hess_colind = hess_sp_.colind(), *hess_row = hess_sp_.row();
-    // Loop over perturbed inputs for thread
+    // Selection of colors to be evaluated for the thread
+    casadi_int c_begin = (task * n_hc) / n_task;
+    casadi_int c_end = ((task + 1) * n_hc) / n_task;
+    // Unperturbed values, step size
+    std::vector<double> x, h;
+    // Loop over colors
     for (casadi_int c = c_begin; c < c_end; ++c) {
       // Print progress
-      if (print_progress_) print("Hessian calculation, thread %d/%d: Perturbing variable %d/%d\n",
+      if (print_progress_) print("Hessian calculation, thread %d/%d: Seeding variable %d/%d\n",
         task + 1, n_task, c - c_begin + 1, c_end - c_begin);
-      // Corresponding input in Fmu
-      casadi_int ind1 = nonlin_.at(c);
-      casadi_int id = jac_in_.at(ind1);
-      // Get unperturbed value
-      double x = m->ibuf_.at(id);
-      // Step size
-      double h = m->self.step_ * fmu_->nominal_in_.at(id);
-      // Make sure a a forward step remains in bounds
-      if (x + h > fmu_->max_in_.at(id)) {
-        // Ensure a negative step is possible
-        if (m->ibuf_.at(id) - h < fmu_->min_in_.at(id)) {
-          std::stringstream ss;
-          ss << "Cannot perturb " << fmu_->vn_in_.at(id) << " at " << x << " with step size "
-            << m->self.step_ << ", nominal " << fmu_->nominal_in_.at(id) << " min "
-            << fmu_->min_in_.at(id) << ", max " << fmu_->max_in_.at(id);
-          casadi_warning(ss.str());
-          return 1;
+      // Variables being seeded
+      casadi_int v_begin = hc_colind[c];
+      casadi_int v_end = hc_colind[c + 1];
+      casadi_int nv = v_end - v_begin;
+      // Loop over variables being seeded for color
+      x.resize(nv);
+      h.resize(nv);
+      for (casadi_int v = 0; v < nv; ++v) {
+        // Corresponding input in Fmu
+        casadi_int ind1 = hc_row[v_begin + v];
+        casadi_int id = jac_in_.at(ind1);
+        // Get unperturbed value
+        x[v] = m->ibuf_.at(id);
+        // Step size
+        h[v] = m->self.step_ * fmu_->nominal_in_.at(id);
+        // Make sure a a forward step remains in bounds
+        if (x[v] + h[v] > fmu_->max_in_.at(id)) {
+          // Ensure a negative step is possible
+          if (m->ibuf_.at(id) - h[v] < fmu_->min_in_.at(id)) {
+            std::stringstream ss;
+            ss << "Cannot perturb " << fmu_->vn_in_.at(id) << " at " << x[v] << " with step size "
+              << m->self.step_ << ", nominal " << fmu_->nominal_in_.at(id) << " min "
+              << fmu_->min_in_.at(id) << ", max " << fmu_->max_in_.at(id);
+            casadi_warning(ss.str());
+            return 1;
+          }
+          // Take reverse step instead
+          h[v] = -h[v];
         }
-        // Take reverse step instead
-        h = -h;
+        // Perturb the input
+        m->ibuf_.at(id) += h[v];
+        m->changed_.at(id) = true;
+        // Inverse of step size
+        h[v] = 1. / h[v];
       }
-      // Inverse of step size
-      double hinv = 1. / h;
-      // Perturb the input
-      m->ibuf_.at(id) += h;
-      m->changed_.at(id) = true;
       // Request all outputs
       for (size_t i : jac_out_) {
-       m->requested_.at(i) = true;
-       m->wrt_.at(i) = -1;
+        m->requested_.at(i) = true;
+        m->wrt_.at(i) = -1;
       }
       // Calculate perturbed inputs
       if (fmu_->eval(m)) return 1;
@@ -1889,13 +1920,19 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        for (casadi_int i = 0; i < m->d.nsens; ++i)
          m->pert_asens[m->d.wrt[i]] += m->aseed[m->d.isens[i]] * m->d.sens[i];
       }
-      // Restore input
-      m->ibuf_.at(id) = x;
-      m->changed_.at(id) = true;
-      // Get column in Hessian
-      for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
-       casadi_int id2 = jac_in_.at(hess_row[k]);
-       m->hess_nz[k] = hinv * (m->pert_asens[id2] - m->asens[id2]);
+      // Loop over variables being seeded for color
+      for (casadi_int v = 0; v < nv; ++v) {
+        // Corresponding input in Fmu
+        casadi_int ind1 = hc_row[v_begin + v];
+        casadi_int id = jac_in_.at(ind1);
+        // Restore input
+        m->ibuf_.at(id) = x[v];
+        m->changed_.at(id) = true;
+        // Get column in Hessian
+        for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
+          casadi_int id2 = jac_in_.at(hess_row[k]);
+          m->hess_nz[k] = h[v] * (m->pert_asens[id2] - m->asens[id2]);
+        }
       }
     }
   }
@@ -1939,9 +1976,37 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
           std::stringstream ss;
           ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
             << " for second derivative w.r.t. " << fmu_->desc_in(m, id_r) << " and "
-            << fmu_->desc_in(m, id_c);
+            << fmu_->desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
           casadi_warning(ss.str());
         }
+      }
+    }
+  }
+}
+
+void FmuFunction::remove_nans(double *hess_nz, casadi_int* iw) const {
+  // Get Hessian sparsity pattern
+  casadi_int n = hess_sp_.size1();
+  const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
+  // Mark variables that have been perturbed
+  std::fill(iw, iw + n, 0);
+  casadi_int hess_coloring_nnz = hess_coloring_.nnz();
+  const casadi_int* hess_coloring_row = hess_coloring_.row();
+  for (casadi_int k = 0; k < hess_coloring_nnz; ++k)
+    iw[hess_coloring_row[k]] = 1;
+  // Nonzero counters for transpose
+  casadi_copy(colind, n, iw);
+  // Loop over Hessian columns
+  for (casadi_int c = 0; c < n; ++c) {
+    // Loop over nonzeros for the column
+    for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+      // Get row of Hessian
+      casadi_int r = row[k];
+      // Get nonzero of transpose
+      casadi_int k_tr = iw[r]++;
+      // If NaN, use element from transpose
+      if (std::isnan(hess_nz[k])) {
+        hess_nz[k] = hess_nz[k_tr];
       }
     }
   }

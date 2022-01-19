@@ -840,6 +840,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   int eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
     bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const;
 
+  // Remove NaNs from Hessian (necessary for star coloring approach)
+  void remove_nans(double *hess_nz, casadi_int* iw) const;
+
   // Check extended Hessian
   void check_hessian(FmuMemory* m, const double *hess_nz, casadi_int* iw) const;
 
