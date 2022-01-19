@@ -67,7 +67,7 @@ jobs:
              wget https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
              sudo tar xf MacOSX10.9.sdk.tar.xz -C /opt
              
-             conda install -y -c conda-forge c-compiler==1.1.0 cxx-compiler==1.1.0 fortran-compiler==1.1.0
+             conda install -y -c conda-forge c-compiler==1.1.1 cxx-compiler==1.1.1 fortran-compiler==1.1.1
              echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/clang" >> $GITHUB_ENV
              echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/clang++" >> $GITHUB_ENV
              echo "FC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/gfortran" >> $GITHUB_ENV
@@ -75,7 +75,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{matrix.image}}-v5
+          key: core-build-${{matrix.image}}-v6
           path: build
       - name: Build
         run: |
