@@ -75,7 +75,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{matrix.image}}-v4-alt
+          key: core-build-${{matrix.image}}-v4-alt2
           path: build
       - name: Build
         run: |
