@@ -67,9 +67,9 @@ jobs:
              wget https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
              sudo tar xf MacOSX10.9.sdk.tar.xz -C /opt
              
-             conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
-             echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang" >> $GITHUB_ENV
-             echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang++" >> $GITHUB_ENV
+             conda install -y -c conda-forge c-compiler==1.1.0 cxx-compiler==1.1.0 fortran-compiler==1.1.0
+             echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/clang" >> $GITHUB_ENV
+             echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/clang++" >> $GITHUB_ENV
              echo "FC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/gfortran" >> $GITHUB_ENV
       - uses: actions/checkout@v2.4.0
       - name: Cache build dir
@@ -207,9 +207,9 @@ jobs:
              wget https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
              sudo tar xf MacOSX10.9.sdk.tar.xz -C /opt
              
-             conda install -y -c conda-forge c-compiler==1.0.4 cxx-compiler==1.0.4 fortran-compiler==1.0.4
-             echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang" >> $GITHUB_ENV
-             echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/x86_64-apple-darwin13.4.0-clang++" >> $GITHUB_ENV
+             conda install -y -c conda-forge c-compiler==1.1.1 cxx-compiler==1.1.1 fortran-compiler==1.1.1
+             echo "CC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/clang" >> $GITHUB_ENV
+             echo "CXX=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/clang++" >> $GITHUB_ENV
              echo "FC=/usr/local/miniconda/envs/$CONDA_DEFAULT_ENV/bin/gfortran" >> $GITHUB_ENV
       - id: get-id
         uses: actions/github-script@v5.0.0
