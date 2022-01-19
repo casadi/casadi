@@ -1056,6 +1056,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   print_progress_ = false;
   new_jacobian_ = true;
   new_hessian_ = true;
+  perturb_nonlin_ = true;
   parallelization_ = Parallelization::SERIAL;
   // Number of parallel tasks, by default
   max_n_tasks_ = 1;
@@ -1117,7 +1118,10 @@ const Options FmuFunction::options_
       "Use Jacobian implementation in class"}},
     {"new_hessian",
      {OT_BOOL,
-      "Use Hessian implementation in class"}}
+      "Use Hessian implementation in class"}},
+    {"perturb_nonlin",
+     {OT_BOOL,
+      "Perturb all nonlinear variables for Hessian calculation"}}
    }
 };
 
@@ -1146,6 +1150,8 @@ void FmuFunction::init(const Dict& opts) {
       new_jacobian_ = op.second;
     } else if (op.first=="new_hessian") {
       new_hessian_ = op.second;
+    } else if (op.first=="perturb_nonlin") {
+      perturb_nonlin_ = op.second;
     }
   }
 
