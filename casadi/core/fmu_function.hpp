@@ -404,6 +404,8 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   const double** arg;
   // Evaluation outputs
   double** res;
+  // Work vector for star coloring
+  casadi_int* star_iw;
   // Extended Jacobian
   double *jac_nz;
   // Extended Hessian

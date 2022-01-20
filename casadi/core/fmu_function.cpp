@@ -1349,9 +1349,8 @@ void FmuFunction::init(const Dict& opts) {
     alloc_w(fmu_->iind_.size(), true);  // asens
   }
 
-  // If Hessian calculation is needed, continue
+  // If Hessian calculation is needed
   if (has_hess_) {
-
     // Get sparsity pattern for extended Hessian
     hess_sp_ = fmu_->hess_sparsity(jac_in_, jac_in_);
     casadi_assert(hess_sp_.size1() == jac_in_.size(), "Inconsistent Hessian dimensions");
@@ -1393,6 +1392,9 @@ void FmuFunction::init(const Dict& opts) {
 
     // Work vector for perturbed adjoint sensitivities
     alloc_w(max_hess_tasks_ * fmu_->iind_.size(), true);  // pert_asens
+
+    // Work vector for avoiding conflicting assignments for star coloring
+    alloc_iw(max_hess_tasks_ * fmu_->iind_.size(), true);  // star_iw
 
     // Work vector for making symmetric or checking symmetry
     alloc_iw(hess_sp_.size2());
@@ -1683,6 +1685,9 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       // Perturbed adjoint sensitivities
       s->pert_asens = w;
       w += fmu_->iind_.size();
+      // Work vector for avoiding assignment of illegal nonzeros
+      s->star_iw = iw;
+      iw += fmu_->iind_.size();
     }
   }
   // Evaluate everything except Hessian, possibly in parallel
@@ -1920,6 +1925,15 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        for (casadi_int i = 0; i < m->d.nsens; ++i)
          m->pert_asens[m->d.wrt[i]] += m->aseed[m->d.isens[i]] * m->d.sens[i];
       }
+      // Count how many times each input is calculated
+      std::fill(m->star_iw, m->star_iw + fmu_->iind_.size(), 0);
+      for (casadi_int v = 0; v < nv; ++v) {
+        casadi_int ind1 = hc_row[v_begin + v];
+        for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
+          casadi_int id2 = jac_in_.at(hess_row[k]);
+          m->star_iw[id2]++;
+        }
+      }
       // Loop over variables being seeded for color
       for (casadi_int v = 0; v < nv; ++v) {
         // Corresponding input in Fmu
@@ -1931,7 +1945,15 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         // Get column in Hessian
         for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
           casadi_int id2 = jac_in_.at(hess_row[k]);
-          m->hess_nz[k] = h[v] * (m->pert_asens[id2] - m->asens[id2]);
+          // Save
+          if (m->star_iw[id2] > 1) {
+            // Input gets perturbed by multiple variables for the same color:
+            // Replace with NaN to use mirror element instead
+            m->hess_nz[k] = casadi::nan;
+          } else {
+            // Finite difference approximation
+            m->hess_nz[k] = h[v] * (m->pert_asens[id2] - m->asens[id2]);
+          }
         }
       }
     }
