@@ -75,7 +75,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{matrix.image}}-v6
+          key: core-build-${{matrix.image}}-v7
           path: build
       - name: Build
         run: |
@@ -97,11 +97,11 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-osx_amd-v1
+          key: core-build-osx_amd-v2
           path: build
       - name: Build
         run: |
-          cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -H.
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BUILD_LAPACK=ON -H.
           cmake --build build -v
       - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
       - uses: actions/upload-artifact@v2.2.4
@@ -129,13 +129,13 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{ matrix.target }}-v6
+          key: core-build-${{ matrix.target }}-v7
           path: build
       - name: Build
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -H. || cat build/external_projects/lib/pkgconfig/coinutils.pc
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BUILD_LAPACK=ON -H. || cat build/external_projects/lib/pkgconfig/coinutils.pc
           ./dockcross cmake --build build -v || cat build/external_projects/lib/pkgconfig/coinutils.pc
       - name: Easy Zip Files - fails to ignore some bad symlinks
         if: false
