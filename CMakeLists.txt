@@ -700,7 +700,9 @@ option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
 set(BUILD_IPOPT_VERSION "3.14.4")
 set(BUILD_MUMPS_VERSION "3.0.2")
 option(WITH_BUILD_IPOPT "Compile IPOPT itself (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) instead of looking for it on your system" OFF)
-set(REQUIRE_IPOPT ${WITH_IPOPT} OR ${WITH_BUILD_IPOPT} OR ${WITH_BUILD_BONMIN})
+if(WITH_IPOPT OR WITH_BUILD_IPOPT OR WITH_BUILD_BONMIN)
+	set(REQUIRE_IPOPT ON)
+endif()
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -721,13 +723,18 @@ add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
 set(BUILD_BONMIN_VERSION "1.8.8")
 option(WITH_BUILD_BONMIN "Compile BONMIN itself (BUILD_CBC_VERSION=${BUILD_BONMIN_VERSION}) instead of looking for it on your system" OFF)
-set(REQUIRE_BONMIN ${WITH_BONMIN} OR ${WITH_BUILD_BONMIN})
+if(WITH_BONMIN OR WITH_BUILD_BONMIN)
+	set(REQUIRE_BONMIN ON)
+endif()
 
+message("BONMIN ${WITH_BONMIN} ${WITH_BUILD_BONMIN} ${REQUIRE_BONMIN}")
 # CBC: A sparse mixed-integer linear solver
 option(WITH_CBC "Compile the CBC interface" OFF)
 set(BUILD_CBC_VERSION "2.10.6")
 option(WITH_BUILD_CBC "Compile CBC itself (BUILD_CBC_VERSION=${BUILD_CBC_VERSION}) instead of looking for it on your system" OFF)
-set(REQUIRE_CBC ${WITH_CBC} OR ${REQUIRE_BONMIN})
+if(WITH_CBC OR REQUIRE_BONMIN)
+	set(REQUIRE_CBC ON)
+endif()
 
 # CLP: A sparse linear solver
 option(WITH_CLP "Compile the CLP interface" OFF)
@@ -736,19 +743,24 @@ set(BUILD_COINUTILS_VERSION "2.11.6")
 set(BUILD_CGL_VERSION "0.60.4")
 set(BUILD_OSI_VERSION "0.108.7")
 option(WITH_BUILD_CLP "Compile CLP itself (BUILD_CLP_VERSION=${BUILD_CLP_VERSION}) instead of looking for it on your system" OFF)
-set(REQUIRE_CLP ${WITH_CLP} OR ${WITH_BUILD_CLP} OR ${REQUIRE_CBC})
-
+if(WITH_CLP OR WITH_BUILD_CLP OR REQUIRE_CBC)
+	set(REQUIRE_CLP ON)
+endif()
 # MUMPS: Sparse direct linear solver
 option(WITH_MUMPS "Enable MUMPS interface" OFF)
 set(BUILD_MUMPS_TP_VERSION "3.0.2")
 set(BUILD_METIS_TP_VERSION "2.0.0")
 option(WITH_BUILD_MUMPS "Compile MUMPS itself (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) instead of looking for it on your system" OFF)
-set(REQUIRE_MUMPS ${WITH_MUMPS} OR ${WITH_BUILD_MUMPS} OR ${REQUIRE_IPOPT} OR ${REQUIRE_CLP})
+if(WITH_MUMPS OR WITH_BUILD_MUMPS OR REQUIRE_IPOPT OR REQUIRE_CLP)
+	set(REQUIRE_MUMPS ON)
+endif()
 
 # Lapack: Dense linear solvers
 option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
 option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
-set(REQUIRE_LAPACK ${WITH_LAPACK} OR ${WITH_BUILD_LAPACK} OR ${REQUIRE_MUMPS} OR ${REQUIRE_CLP})
+if(WITH_LAPACK OR WITH_BUILD_LAPACK OR REQUIRE_MUMPS OR REQUIRE_CLP)
+	set(REQUIRE_LAPACK ON)
+endif()
 
 # HSL: Sparse direct linear solvers
 option(WITH_HSL "Enable HSL interface" OFF)
