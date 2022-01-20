@@ -135,8 +135,8 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -H.
-          ./dockcross cmake --build build -v
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_IPOPT=ON -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -H. || cat build/external_projects/lib/pkgconfig/coinutils.pc
+          ./dockcross cmake --build build -v || cat build/external_projects/lib/pkgconfig/coinutils.pc
       - name: Easy Zip Files - fails to ignore some bad symlinks
         if: false
         uses: vimtor/action-zip@v1
