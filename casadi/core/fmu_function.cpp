@@ -1056,7 +1056,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   print_progress_ = false;
   new_jacobian_ = true;
   new_hessian_ = true;
-  perturb_nonlin_ = true;
+  hessian_coloring_ = true;
   parallelization_ = Parallelization::SERIAL;
   // Number of parallel tasks, by default
   max_n_tasks_ = 1;
@@ -1119,9 +1119,10 @@ const Options FmuFunction::options_
     {"new_hessian",
      {OT_BOOL,
       "Use Hessian implementation in class"}},
-    {"perturb_nonlin",
+    {"hessian_coloring",
      {OT_BOOL,
-      "Perturb all nonlinear variables for Hessian calculation"}}
+      "Enable the use of graph coloring (star coloring) for Hessian calculation. "
+      "Note that disabling the coloring can improve symmetry check diagnostics."}}
    }
 };
 
@@ -1150,8 +1151,8 @@ void FmuFunction::init(const Dict& opts) {
       new_jacobian_ = op.second;
     } else if (op.first=="new_hessian") {
       new_hessian_ = op.second;
-    } else if (op.first=="perturb_nonlin") {
-      perturb_nonlin_ = op.second;
+    } else if (op.first=="hessian_coloring") {
+      hessian_coloring_ = op.second;
     }
   }
 
@@ -1325,18 +1326,18 @@ void FmuFunction::init(const Dict& opts) {
   jac_sp_ = fmu_->jac_sparsity(jac_out_, jac_in_);
 
   // Calculate graph coloring
-  jac_coloring_ = jac_sp_.uni_coloring();
+  jac_colors_ = jac_sp_.uni_coloring();
   if (verbose_) casadi_message("Jacobian graph coloring: " + str(jac_sp_.size2())
-    + " -> " + str(jac_coloring_.size2()) + " directions");
+    + " -> " + str(jac_colors_.size2()) + " directions");
 
   // Setup Jacobian memory
-  casadi_jac_setup(&p_, jac_sp_, jac_coloring_);
+  casadi_jac_setup(&p_, jac_sp_, jac_colors_);
   p_.nom_in = get_ptr(jac_nom_in_);
   p_.map_out = get_ptr(jac_out_);
   p_.map_in = get_ptr(jac_in_);
 
   // Do not use more threads than there are colors in the Jacobian
-  max_jac_tasks_ = std::min(max_n_tasks_, jac_coloring_.size2());
+  max_jac_tasks_ = std::min(max_n_tasks_, jac_colors_.size2());
 
   // Work vector for storing extended Jacobian, shared between threads
   if (has_jac_) {
@@ -1366,26 +1367,26 @@ void FmuFunction::init(const Dict& opts) {
       if (is_nonlin[c]) nonlin_.push_back(c);
     }
     // Calculate graph coloring
-    if (!perturb_nonlin_) {
+    if (hessian_coloring_) {
       // Star coloring
-      hess_coloring_ = hess_sp_.star_coloring();
+      hess_colors_ = hess_sp_.star_coloring();
       if (verbose_) casadi_message("Hessian graph coloring: " + str(nonlin_.size())
-        + " -> " + str(hess_coloring_.size2()) + " directions");
+        + " -> " + str(hess_colors_.size2()) + " directions");
       // Indices of non-nonlinearly entering variables
       std::vector<casadi_int> zind;
       for (casadi_int c = 0; c < jac_in_.size(); ++c) {
         if (!is_nonlin[c]) zind.push_back(c);
       }
       // Zero out corresponding rows
-      hess_coloring_.erase(zind, range(hess_coloring_.size2()));
+      hess_colors_.erase(zind, range(hess_colors_.size2()));
     } else {
       // One color for each nonlinear variable
-      hess_coloring_ = Sparsity(jac_in_.size(), nonlin_.size(), range(nonlin_.size() + 1), nonlin_);
+      hess_colors_ = Sparsity(jac_in_.size(), nonlin_.size(), range(nonlin_.size() + 1), nonlin_);
       if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
     }
 
     // Number of threads to be used for Hessian calculation
-    max_hess_tasks_ = std::min(max_n_tasks_, hess_coloring_.size2());
+    max_hess_tasks_ = std::min(max_n_tasks_, hess_colors_.size2());
 
     // Work vector for storing extended Hessian, shared between threads
     alloc_w(hess_sp_.nnz(), true);  // hess_nz
@@ -1821,8 +1822,8 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   // Evalute extended Jacobian
   if (need_jac || need_adj) {
     // Selection of colors to be evaluated for the thread
-    casadi_int c_begin = (task * jac_coloring_.size2()) / n_task;
-    casadi_int c_end = ((task + 1) * jac_coloring_.size2()) / n_task;
+    casadi_int c_begin = (task * jac_colors_.size2()) / n_task;
+    casadi_int c_end = ((task + 1) * jac_colors_.size2()) / n_task;
     // Loop over colors
     for (casadi_int c = c_begin; c < c_end; ++c) {
       // Print progress
@@ -1852,8 +1853,8 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   // Evaluate extended Hessian
   if (need_hess) {
     // Hessian coloring
-    casadi_int n_hc = hess_coloring_.size2();
-    const casadi_int *hc_colind = hess_coloring_.colind(), *hc_row = hess_coloring_.row();
+    casadi_int n_hc = hess_colors_.size2();
+    const casadi_int *hc_colind = hess_colors_.colind(), *hc_row = hess_colors_.row();
     // Hessian sparsity
     const casadi_int *hess_colind = hess_sp_.colind(), *hess_row = hess_sp_.row();
     // Selection of colors to be evaluated for the thread
@@ -1911,7 +1912,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Clear perturbed adjoint sensitivities
       std::fill(m->pert_asens, m->pert_asens + fmu_->iind_.size(), 0);
       // Loop over colors of the Jacobian
-      for (casadi_int c1 = 0; c1 < jac_coloring_.size2(); ++c1) {
+      for (casadi_int c1 = 0; c1 < jac_colors_.size2(); ++c1) {
        // Get derivative directions
        casadi_jac_pre(&p_, &m->d, c1);
        // Calculate derivatives
@@ -2012,10 +2013,10 @@ void FmuFunction::remove_nans(double *hess_nz, casadi_int* iw) const {
   const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
   // Mark variables that have been perturbed
   std::fill(iw, iw + n, 0);
-  casadi_int hess_coloring_nnz = hess_coloring_.nnz();
-  const casadi_int* hess_coloring_row = hess_coloring_.row();
-  for (casadi_int k = 0; k < hess_coloring_nnz; ++k)
-    iw[hess_coloring_row[k]] = 1;
+  casadi_int hess_colors_nnz = hess_colors_.nnz();
+  const casadi_int* hess_colors_row = hess_colors_.row();
+  for (casadi_int k = 0; k < hess_colors_nnz; ++k)
+    iw[hess_colors_row[k]] = 1;
   // Nonzero counters for transpose
   casadi_copy(colind, n, iw);
   // Loop over Hessian columns

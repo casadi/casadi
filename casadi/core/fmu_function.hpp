@@ -766,7 +766,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // User-set options
   bool enable_ad_, validate_ad_, make_symmetric_, check_hessian_;
   double step_, abstol_, reltol_;
-  bool print_progress_, new_jacobian_, new_hessian_, perturb_nonlin_;
+  bool print_progress_, new_jacobian_, new_hessian_, hessian_coloring_;
 
   // FD method as an enum
   FdMode fd_;
@@ -808,7 +808,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   Sparsity jac_sp_, hess_sp_;
 
   // Graph coloring
-  Sparsity jac_coloring_, hess_coloring_;
+  Sparsity jac_colors_, hess_colors_;
 
   // Nonlinearly entering variables
   std::vector<casadi_int> nonlin_;
