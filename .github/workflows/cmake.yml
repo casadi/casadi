@@ -20,17 +20,17 @@ jobs:
     - name: generate Python 2
       run: >
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
-        "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python_source && cd .. && rm -rf build"
+        "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make python_source && cd .. && rm -rf build"
         
     - name: generate Python 3
       run: >
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
-        "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON3=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON  .. && make python_source && cd .. && rm -rf build"
+        "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON3=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make python_source && cd .. && rm -rf build"
 
     - name: generate Matlab
       run: >
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
-        "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DSWIG_EXPORT=ON  .. && make matlab_source && cd .. && rm -rf build"
+        "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make matlab_source && cd .. && rm -rf build"
     
     - name: set CMAKE default options
       run: |
