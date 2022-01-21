@@ -8,6 +8,29 @@ env:
 
 
 jobs:
+  core-osx_amd:
+    if: false
+    runs-on: macos-11
+    env:
+      FC: gfortran-11
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Cache build dir
+        uses: actions/cache@v2
+        with:
+          key: core-build-osx_amd-${{env.cache-suffix}}
+          path: build
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+      - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{ github.job }}-${{matrix.image}}
+          path: ${{ github.job }}-${{matrix.image}}.zip
+          retention-days: 5
+
   frontend_matlab-manylinux1_x86_64:
     needs: [core-dockcross,swig]
     runs-on: ubuntu-20.04
