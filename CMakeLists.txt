@@ -974,7 +974,7 @@ if(REQUIRE_CBC)
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CbcSolver${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     add_library(cbc INTERFACE)
-    target_link_libraries(cbc INTERFACE cbc-raw cbc-solver coinutils osi)
+    target_link_libraries(cbc INTERFACE cbc-raw cbc-solver coinutils osi osi-clp)
     set(CBC_FOUND TRUE)
   endif()
   if(NOT CBC_FOUND)
