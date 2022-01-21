@@ -251,7 +251,7 @@ set(CROSS_FLAGS "")
 set(CROSS_FLAGS_FORTRAN "")
 set(CROSS_FLAGS_CMAKE)
 if(CMAKE_CROSS_COMPILING)
-  set(CROSS_FLAGS "${CROSS_FLAGS} --host=$ENV{CROSS_TRIPLE}")
+  set(CROSS_FLAGS "--host=$ENV{CROSS_TRIPLE}")
   if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
     # https://github.com/casadi/artifacts/issues/3
     set(CROSS_FLAGS_FORTRAN "lt_cv_deplibs_check_method=pass_all")
