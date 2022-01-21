@@ -779,7 +779,7 @@ if(REQUIRE_LAPACK)
   endif()
   if (WITH_BUILD_LAPACK OR (WITH_BUILD_REQUIRED AND NOT LAPACK_FOUND))
     message("Will build OPENBLAS")
-    ExternalProject_Add(openblas
+    ExternalProject_Add(openblas-external
       GIT_REPOSITORY https://github.com/jgillis/OpenBLAS.git
       GIT_TAG ee15f53c9ef7148b05e1b2ff80003df1685f0f10
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -787,7 +787,7 @@ if(REQUIRE_LAPACK)
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    set(LAPACK_DEPENDS_TARGET openblas)
+    set(LAPACK_DEPENDS_TARGET openblas-external)
     set(LAPACK_FOUND TRUE)
   endif()
   if(NOT LAPACK_FOUND)
@@ -810,7 +810,7 @@ if(REQUIRE_MUMPS)
   endif()
   if(WITH_BUILD_MUMPS OR (WITH_BUILD_REQUIRED AND NOT MUMPS_FOUND))
       message("Will build METIS v${BUILD_METIS_TP_VERSION} (BUILD_METIS_TP_VERSION)")
-      ExternalProject_Add(metis
+      ExternalProject_Add(metis-external
           GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Metis.git
           GIT_TAG releases/${BUILD_METIS_TP_VERSION}
           DEPENDS ${LAPACK_DEPENDS_TARGET}
@@ -826,11 +826,11 @@ if(REQUIRE_MUMPS)
       set(DEPENDENT_LIBRARIES ${DEPENDENT_LIBRARIES} ${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${EXTERNAL_METIS_LIBS}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
       message("Will build MUMPS v${BUILD_MUMPS_TP_VERSION} (BUILD_MUMPS_TP_VERSION)")
-      ExternalProject_Add(mumps
-          DEPENDS metis
+      ExternalProject_Add(mumps-external
+          DEPENDS metis-external
           GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Mumps.git
           GIT_TAG releases/${BUILD_MUMPS_TP_VERSION}
-          DEPENDS ${LAPACK_DEPENDS_TARGET} metis
+          DEPENDS ${LAPACK_DEPENDS_TARGET} metis-external
           PREFIX "${CMAKE_BINARY_DIR}/external_projects"
           UPDATE_COMMAND ""
           CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${EXTERNAL_METIS_LIBS} -lm" "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
@@ -850,7 +850,7 @@ if(REQUIRE_CLP)
   endif()
   if(WITH_BUILD_CLP OR (WITH_BUILD_REQUIRED AND NOT CLP_FOUND))
     message("Will build COINUTILS v${BUILD_COINUTILS_VERSION} (BUILD_COINUTILS_VERSION)")
-    ExternalProject_Add(coinutils
+    ExternalProject_Add(coinutils-external
           DEPENDS ${LAPACK_DEPENDS_TARGET}
           GIT_REPOSITORY https://github.com/coin-or/CoinUtils.git
           GIT_TAG releases/${BUILD_COINUTILS_VERSION}
@@ -858,16 +858,16 @@ if(REQUIRE_CLP)
           UPDATE_COMMAND ""
           CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR> )
     message("Will build OSI v${BUILD_OSI_VERSION} (BUILD_OSI_VERSION)")
-    ExternalProject_Add(osi
-        DEPENDS coinutils
+    ExternalProject_Add(osi-external
+        DEPENDS coinutils-external
         GIT_REPOSITORY https://github.com/coin-or/Osi.git
         GIT_TAG releases/${BUILD_OSI_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> )
     message("Will build CLP v${BUILD_CLP_VERSION} (BUILD_CLP_VERSION)")
-    ExternalProject_Add(clp
-        DEPENDS osi mumps coinutils ${LAPACK_DEPENDS_TARGET}
+    ExternalProject_Add(clp-external
+        DEPENDS osi-external mumps-external coinutils-external ${LAPACK_DEPENDS_TARGET}
         GIT_REPOSITORY https://github.com/coin-or/Clp.git
         GIT_TAG releases/${BUILD_CLP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -888,16 +888,16 @@ if(REQUIRE_CBC)
   endif()
   if (WITH_BUILD_CBC OR (WITH_BUILD_REQUIRED AND NOT CBC_FOUND))
     message("Will build CGL v${BUILD_CGL_VERSION} (BUILD_CGL_VERSION)")
-    ExternalProject_Add(cgl
-        DEPENDS osi clp coinutils
+    ExternalProject_Add(cgl-external
+        DEPENDS osi-external clp-external coinutils-external
         GIT_REPOSITORY https://github.com/coin-or/Cgl.git
         GIT_TAG releases/${BUILD_CGL_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> )
     message("Will build CBC v${BUILD_CBC_VERSION} (BUILD_CBC_VERSION)")
-    ExternalProject_Add(cbc
-        DEPENDS coinutils cgl osi mumps clp ${LAPACK_DEPENDS_TARGET}
+    ExternalProject_Add(cbc-external
+        DEPENDS coinutils-external cgl-external osi-external mumps-external clp-external ${LAPACK_DEPENDS_TARGET}
         GIT_REPOSITORY https://github.com/coin-or/Cbc.git
         GIT_TAG releases/${BUILD_CBC_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -918,7 +918,7 @@ if(REQUIRE_IPOPT)
   if (WITH_BUILD_IPOPT OR (WITH_BUILD_REQUIRED AND NOT IPOPT_FOUND))
     message("Will build IPOPT v${BUILD_IPOPT_VERSION} (BUILD_IPOPT_VERSION)")
     ExternalProject_Add(ipopt-external
-        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps
+        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external
         URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -945,8 +945,8 @@ if(REQUIRE_BONMIN)
   endif()
   if (WITH_BUILD_BONMIN)
     message("Will build BONMIN v${BUILD_BONMIN_VERSION} (BUILD_BONMIN_VERSION)")
-    ExternalProject_Add(bonmin
-        DEPENDS mumps metis coinutils osi clp cgl cbc ipopt-external
+    ExternalProject_Add(bonmin-external
+        DEPENDS mumps-external metis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
         GIT_REPOSITORY https://github.com/coin-or/Bonmin.git
         GIT_TAG releases/${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
