@@ -321,12 +321,34 @@ jobs:
           destination_path: install/casadi
           dockcross: ${{ matrix.arch }}
           bitness: ${{env.bitness}}
+          
+          
+      - run: echo "this file (and the adjacent casadi directory) should end up in a folder with a meaningful name like 'casadi-${{env.os}}-${{matrix.py2}}'. Add that directory to the PYTHONPATH." > install/readme.txt
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1
         with:
           files: install/
           recursive: false
           dest: casadi-${{env.os}}-py${{matrix.py2}}.zip
+          
+      - name: Easy Zip Files
+        uses: vimtor/action-zip@v1
+        with:
+          files: install/
+          recursive: false
+          dest: casadi-${{CI_SHA_SHORT}}-${{env.os}}-py${{matrix.py2}}.zip
+          
+      - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Upload files to a GitHub release
+        if: ${{ github.event_name=='push' }}
+        uses: svenstaro/upload-release-action@2.2.1
+        with:
+          repo_token: ${{ secrets.TOKEN_PUBLIC}}
+          overwrite: true
+          tag:  nightly-${{CI_REF_SLUG}}
+          file: casadi-${{CI_SHA_SHORT}}-${{env.os}}-py${{matrix.py2}}.zip
+
+          
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: casadi-${{env.os}}-py${{matrix.py2}}
