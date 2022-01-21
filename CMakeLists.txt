@@ -897,7 +897,10 @@ if(REQUIRE_CLP)
         GIT_TAG releases/${BUILD_OSI_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
+
+        # For unknown reasons, Osi/configure disables pkg-config by default        
+        --enable-pkg-config)
     add_library(osi SHARED IMPORTED)
     set_target_properties(osi PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_SHARED_LIBRARY_SUFFIX}"
