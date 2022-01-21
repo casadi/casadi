@@ -139,7 +139,7 @@ jobs:
         run: |
           pwd
           ls -al
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON -${{env.build_flags}} -H.
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           ./dockcross cmake --build build -v
       - name: Easy Zip Files - fails to ignore some bad symlinks
         if: false
