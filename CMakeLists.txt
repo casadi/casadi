@@ -936,6 +936,11 @@ if(REQUIRE_CBC)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN})
+    add_library(coinutils SHARED IMPORTED)
+    set_target_properties(coinutils PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
     message("Will build CBC v${BUILD_CBC_VERSION} (BUILD_CBC_VERSION)")
     ExternalProject_Add(cbc-external
         DEPENDS coinutils-external cgl-external osi-external mumps-external clp-external ${LAPACK_DEPENDS_TARGET}
@@ -1010,12 +1015,15 @@ if(REQUIRE_BONMIN)
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN})
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
-    add_library(bonmin SHARED IMPORTED)
-    set_target_properties(bonmin PROPERTIES
+    add_library(bonmin-raw SHARED IMPORTED)
+    set_target_properties(bonmin-raw PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}bonmin${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}bonmin${CMAKE_IMPORT_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin;${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin"
     )
+    add_library(bonmin INTERFACE)
+    target_link_libraries(bonmin INTERFACE bonmin-raw ipopt coinutils)
+
     set(BONMIN_FOUND TRUE)
   endif()
   if(NOT BONMIN_FOUND)
