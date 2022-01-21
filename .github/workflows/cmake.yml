@@ -75,7 +75,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{matrix.image}}-v8
+          key: core-build-${{matrix.image}}-v9
           path: build
       - name: Build
         run: |
@@ -97,7 +97,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-osx_amd-v3
+          key: core-build-osx_amd-v4
           path: build
       - name: Build
         run: |
@@ -129,7 +129,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{ matrix.target }}-v8
+          key: core-build-${{ matrix.target }}-v9
           path: build
       - name: Build
         run: |
