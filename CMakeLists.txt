@@ -247,8 +247,7 @@ set(DEPENDENT_LIBRARIES)
 include(ExternalProject)
 
 
-# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers        
-set(CROSS_FLAGS "--enable-pkg-config")
+set(CROSS_FLAGS "")
 set(CROSS_FLAGS_FORTRAN "")
 set(CROSS_FLAGS_CMAKE)
 if(CMAKE_CROSS_COMPILING)
@@ -899,7 +898,10 @@ if(REQUIRE_CLP)
         GIT_TAG releases/${BUILD_OSI_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
+	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
+	--enable-pkg-config
+    )
     add_library(osi SHARED IMPORTED)
     set_target_properties(osi PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -912,7 +914,10 @@ if(REQUIRE_CLP)
         GIT_TAG releases/${BUILD_CLP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
+	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
+	--enable-pkg-config
+	)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(clp-raw SHARED IMPORTED)
@@ -949,7 +954,10 @@ if(REQUIRE_CBC)
         GIT_TAG releases/${BUILD_CGL_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
+	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
+	--enable-pkg-config
+	)
     add_library(coinutils SHARED IMPORTED)
     set_target_properties(coinutils PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -962,7 +970,10 @@ if(REQUIRE_CBC)
         GIT_TAG releases/${BUILD_CBC_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
+	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
+	--enable-pkg-config
+	)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(cbc-raw SHARED IMPORTED)
     set_target_properties(cbc-raw PROPERTIES
@@ -996,7 +1007,10 @@ if(REQUIRE_IPOPT)
         URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags= ${IPOPT_WITH_LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags= ${IPOPT_WITH_LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
+	--enable-pkg-config
+	)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
 
     add_library(ipopt SHARED IMPORTED)
@@ -1026,7 +1040,10 @@ if(REQUIRE_BONMIN)
         GIT_TAG releases/${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
+	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
+	--enable-pkg-config
+	)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(bonmin-raw SHARED IMPORTED)
