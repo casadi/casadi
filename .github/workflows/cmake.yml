@@ -123,6 +123,11 @@ jobs:
         target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v2.4.0
+        with:
+          ref: dist
+          # for git-restore-mtime
+          fetch-depth: 0
+      - uses: chetan/git-restore-mtime-action@v1
       - name: Setup dockcross
         run: |
           docker pull dockcross/${{ matrix.target }}:latest
