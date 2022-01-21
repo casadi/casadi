@@ -124,9 +124,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
         with:
-          ref: dist
-          # for git-restore-mtime
-          fetch-depth: 0
+          fetch-depth: 0 # for git-restore-mtime
       - uses: chetan/git-restore-mtime-action@v1
       - name: Setup dockcross
         run: |
