@@ -339,7 +339,7 @@ jobs:
 
   test-python:
     runs-on: ${{matrix.image}}
-    needs: [python-dockcross]
+    needs: [python-dockcross,python-osx]
     strategy:
      fail-fast: false
      matrix:
