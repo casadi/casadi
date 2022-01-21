@@ -857,6 +857,13 @@ if(REQUIRE_MUMPS)
           CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${EXTERNAL_METIS_LIBS} -lm" "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
           PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Mumps)
 
+      file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
+      add_library(mumps SHARED IMPORTED)
+      set_target_properties(mumps PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmumps${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmumps${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
+      )
       set(MUMPS_FOUND TRUE)
   endif()
   if(NOT MUMPS_FOUND)
@@ -894,6 +901,14 @@ if(REQUIRE_CLP)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR> )
+
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
+    add_library(clp SHARED IMPORTED)
+    set_target_properties(clp PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin"
+    )
     set(CLP_FOUND TRUE)
   endif()
   if(NOT CLP_FOUND)
@@ -924,6 +939,20 @@ if(REQUIRE_CBC)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
+    add_library(cbc-raw SHARED IMPORTED)
+    set_target_properties(cbc-raw PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Cbc${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Cbc${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin"
+    )
+    add_library(cbc-solver SHARED IMPORTED)
+    set_target_properties(cbc-solver PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CbcSolver${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CbcSolver${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    add_library(cbc INTERFACE)
+    target_link_libraries(cbc INTERFACE cbc-raw cbc-solver)
     set(CBC_FOUND TRUE)
   endif()
   if(NOT CBC_FOUND)
