@@ -252,6 +252,7 @@ set(CROSS_FLAGS_CMAKE)
 if(CMAKE_CROSS_COMPILING)
   set(CROSS_FLAGS "--host=$ENV{CROSS_TRIPLE}")
   if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
+    # https://github.com/casadi/artifacts/issues/3
     set(CROSS_FLAGS_FORTRAN "lt_cv_deplibs_check_method=pass_all")
   endif()
   set(CROSS_FLAGS_CMAKE "-DCMAKE_TOOLCHAIN_FILE=$ENV{CMAKE_TOOLCHAIN_FILE}")
@@ -892,7 +893,7 @@ if(REQUIRE_CLP)
         GIT_TAG releases/${BUILD_OSI_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> )
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN})
     message("Will build CLP v${BUILD_CLP_VERSION} (BUILD_CLP_VERSION)")
     ExternalProject_Add(clp-external
         DEPENDS osi-external mumps-external coinutils-external ${LAPACK_DEPENDS_TARGET}
@@ -900,7 +901,7 @@ if(REQUIRE_CLP)
         GIT_TAG releases/${BUILD_CLP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR> )
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN})
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(clp SHARED IMPORTED)
@@ -930,7 +931,7 @@ if(REQUIRE_CBC)
         GIT_TAG releases/${BUILD_CGL_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> )
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN})
     message("Will build CBC v${BUILD_CBC_VERSION} (BUILD_CBC_VERSION)")
     ExternalProject_Add(cbc-external
         DEPENDS coinutils-external cgl-external osi-external mumps-external clp-external ${LAPACK_DEPENDS_TARGET}
@@ -938,7 +939,7 @@ if(REQUIRE_CBC)
         GIT_TAG releases/${BUILD_CBC_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}")
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN})
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(cbc-raw SHARED IMPORTED)
     set_target_properties(cbc-raw PROPERTIES
@@ -1002,7 +1003,7 @@ if(REQUIRE_BONMIN)
         GIT_TAG releases/${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>)
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN})
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(bonmin SHARED IMPORTED)
