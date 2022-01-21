@@ -770,6 +770,33 @@ endif()
 add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
 
 
+function(libraries2flags libraries out)
+# libtool cannot handle absoulte paths (i.e. it omits the library from the list of dependencies)
+  set(local "")
+  foreach(LIB ${libraries})
+    if (LIB MATCHES "^-")
+      # Pass -l, -L as-is
+      set(local "${local} ${LIB}")
+    else()
+      get_filename_component(LIB_DIR "${LIB}" DIRECTORY)
+      get_filename_component(LIB_NAME "${LIB}" NAME)
+      string(REGEX REPLACE "${CMAKE_SHARED_LIBRARY_PREFIX}([A-Za-z0-9_]+)${CMAKE_SHARED_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME})
+      if(LIB_NAME STREQUAL LIB_NAME_MOD)
+        set(local "${local} ${LIB}")
+      else()
+        set(local "${local} -L${LIB_DIR} -l${LIB_NAME_MOD}")
+      endif()
+    endif()
+    set(${out} "${local}" PARENT_SCOPE)
+  endforeach()
+endfunction()
+
+#message("test")
+#message("")
+#libraries2flags("foo;-lbar;/arg/libfoo.so;/opt/foo.framework" RESULT)
+#message("result: '${RESULT}'")
+
+
 if(REQUIRE_LAPACK)
   if (NOT WITH_BUILD_LAPACK)
     find_package(LAPACK)
@@ -793,13 +820,7 @@ if(REQUIRE_LAPACK)
   if(NOT LAPACK_FOUND)
     message(FATAL_ERROR "LAPACK not found on your system yet required. Set WITH_BUILD_LAPACK or WITH_BUILD_REQUIRED to ON to build this requirement.")
   endif()
-  message("LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
-  set(IPOPT_WITH_LAPACK_LFLAGS "")
-  foreach(LIB ${LAPACK_LIBRARIES})
-    get_filename_component(LIB_DIR "${LIB}" DIRECTORY)
-    get_filename_component(LIB_NAME "${LIB}" NAME)
-    set(IPOPT_WITH_LAPACK_LFLAGS "${IPOPT_WITH_LAPACK_LFLAGS} ${LIB}")
-  endforeach()
+  libraries2flags("${LAPACK_LIBRARIES}" IPOPT_WITH_LAPACK_LFLAGS)
   message("IPOPT_WITH_LAPACK_LFLAGS: ${IPOPT_WITH_LAPACK_LFLAGS}")
 endif()
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
@@ -922,7 +943,7 @@ if(REQUIRE_IPOPT)
         URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags= ${IPOPT_WITH_LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
 
     add_library(ipopt SHARED IMPORTED)
@@ -945,6 +966,7 @@ if(REQUIRE_BONMIN)
   endif()
   if (WITH_BUILD_BONMIN)
     message("Will build BONMIN v${BUILD_BONMIN_VERSION} (BUILD_BONMIN_VERSION)")
+
     ExternalProject_Add(bonmin-external
         DEPENDS mumps-external metis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
         GIT_REPOSITORY https://github.com/coin-or/Bonmin.git
@@ -952,6 +974,14 @@ if(REQUIRE_BONMIN)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>)
+
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
+    add_library(bonmin SHARED IMPORTED)
+    set_target_properties(bonmin PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}bonmin${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}bonmin${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin;${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
+    )
     set(BONMIN_FOUND TRUE)
   endif()
   if(NOT BONMIN_FOUND)
