@@ -246,11 +246,13 @@ set(DEPENDENT_LIBRARIES)
 
 include(ExternalProject)
 
-set(CROSS_FLAGS "")
+
+# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers        
+set(CROSS_FLAGS "--enable-pkg-config")
 set(CROSS_FLAGS_FORTRAN "")
 set(CROSS_FLAGS_CMAKE)
 if(CMAKE_CROSS_COMPILING)
-  set(CROSS_FLAGS "--host=$ENV{CROSS_TRIPLE}")
+  set(CROSS_FLAGS "${CROSS_FLAGS} --host=$ENV{CROSS_TRIPLE}")
   if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
     # https://github.com/casadi/artifacts/issues/3
     set(CROSS_FLAGS_FORTRAN "lt_cv_deplibs_check_method=pass_all")
@@ -897,10 +899,7 @@ if(REQUIRE_CLP)
         GIT_TAG releases/${BUILD_OSI_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
-
-        # For unknown reasons, Osi/configure disables pkg-config by default        
-        --enable-pkg-config)
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN})
     add_library(osi SHARED IMPORTED)
     set_target_properties(osi PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_SHARED_LIBRARY_SUFFIX}"
