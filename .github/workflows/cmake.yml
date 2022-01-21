@@ -336,7 +336,7 @@ jobs:
         with:
           files: install/
           recursive: false
-          dest: casadi-${{CI_SHA_SHORT}}-${{env.os}}-py${{matrix.py2}}.zip
+          dest: casadi-$CI_SHA_SHORT-${{env.os}}-py${{matrix.py2}}.zip
           
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Upload files to a GitHub release
@@ -345,8 +345,8 @@ jobs:
         with:
           repo_token: ${{ secrets.TOKEN_PUBLIC}}
           overwrite: true
-          tag:  nightly-${{CI_REF_SLUG}}
-          file: casadi-${{CI_SHA_SHORT}}-${{env.os}}-py${{matrix.py2}}.zip
+          tag:  nightly-$CI_REF_SLUG
+          file: casadi-$CI_SHA_SHORT-${{env.os}}-py${{matrix.py2}}.zip
 
           
       - uses: actions/upload-artifact@v2.2.4
