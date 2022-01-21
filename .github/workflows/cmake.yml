@@ -2,6 +2,9 @@ name: source_package
 
 on: push
 
+env:
+  cache-suffix: v10
+
 
 jobs:
   swig:
@@ -75,7 +78,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{matrix.image}}-v9
+          key: core-build-${{matrix.image}}-${{env.cache-suffix}}
           path: build
       - name: Build
         run: |
@@ -97,7 +100,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-osx_amd-v4
+          key: core-build-osx_amd-${{env.cache-suffix}}
           path: build
       - name: Build
         run: |
@@ -129,7 +132,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v2
         with:
-          key: core-build-${{ matrix.target }}-v9
+          key: core-build-${{ matrix.target }}-${{env.cache-suffix}}
           path: build
       - name: Build
         run: |
