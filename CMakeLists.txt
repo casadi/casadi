@@ -898,6 +898,11 @@ if(REQUIRE_CLP)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN})
+    add_library(osi SHARED IMPORTED)
+    set_target_properties(osi PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
     message("Will build CLP v${BUILD_CLP_VERSION} (BUILD_CLP_VERSION)")
     ExternalProject_Add(clp-external
         DEPENDS osi-external mumps-external coinutils-external ${LAPACK_DEPENDS_TARGET}
@@ -908,12 +913,19 @@ if(REQUIRE_CLP)
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${IPOPT_WITH_LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN})
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
-    add_library(clp SHARED IMPORTED)
-    set_target_properties(clp PROPERTIES
+    add_library(clp-raw SHARED IMPORTED)
+    set_target_properties(clp-raw PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin"
     )
+    add_library(osi-clp SHARED IMPORTED)
+    set_target_properties(osi-clp PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OsiClp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OsiClp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    add_library(clp INTERFACE)
+    target_link_libraries(clp INTERFACE clp-raw osi-clp coinutils)
     set(CLP_FOUND TRUE)
   endif()
   if(NOT CLP_FOUND)
@@ -962,7 +974,7 @@ if(REQUIRE_CBC)
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CbcSolver${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     add_library(cbc INTERFACE)
-    target_link_libraries(cbc INTERFACE cbc-raw cbc-solver)
+    target_link_libraries(cbc INTERFACE cbc-raw cbc-solver coinutils osi)
     set(CBC_FOUND TRUE)
   endif()
   if(NOT CBC_FOUND)
