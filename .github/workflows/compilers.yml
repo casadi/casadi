@@ -1,4 +1,4 @@
-name: source_package
+name: compilers (experimental)
 
 on: push
 

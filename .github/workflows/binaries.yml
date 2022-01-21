@@ -1,4 +1,4 @@
-name: source_package
+name: binaries
 
 on: push
 
