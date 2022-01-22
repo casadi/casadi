@@ -4,7 +4,7 @@ on: push
 
 env:
   cache-suffix: v12
-  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_CBC=ON -DWITH_THREAD=ON"
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_CBC=ON -DWITH_THREAD=OFF"
 
 
 jobs:
@@ -83,6 +83,7 @@ jobs:
           path: build
       - name: Build
         run: |
+          rm -f build/CMakeCache.txt
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
@@ -118,6 +119,7 @@ jobs:
           path: build
       - name: Build
         run: |
+          rm -f build/CMakeCache.txt
           ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
 
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
