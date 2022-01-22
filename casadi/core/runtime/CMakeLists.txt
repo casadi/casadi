@@ -59,13 +59,6 @@ set(RUNTIME_SRC
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 
-# Stringify C runtime
-CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
-  ${RUNTIME_SRC}
-  casadi_to_mex.hpp
-  casadi_from_mex.hpp
-)
-
 set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-conversion")
 
 install(FILES casadi_runtime.hpp shared.hpp ${RUNTIME_SRC}
