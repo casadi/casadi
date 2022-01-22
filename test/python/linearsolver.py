@@ -509,6 +509,7 @@ class LinearSolverTests(casadiTestCase):
 
 
     for Solver, options, req in lsolvers:
+      if "mumps" in str(Solver): continue
       print(Solver)
       f = Function('f', [x, y], [x ** 2 - y])
       finv = rootfinder('finv', "newton", f, {"linear_solver": Solver, "linear_solver_options": options})
