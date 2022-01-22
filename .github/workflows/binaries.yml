@@ -64,6 +64,8 @@ jobs:
       SDKROOT: /opt/MacOSX10.9.sdk
     steps:
       - uses: casadi/action-setup-compiler@master
+        with:
+          cache-suffix: ''
       - uses: actions/checkout@v2.4.0
         with:
           fetch-depth: 0 # for git-restore-mtime
@@ -171,6 +173,8 @@ jobs:
       SDKROOT: /opt/MacOSX10.9.sdk
     steps:
       - uses: casadi/action-setup-compiler@master
+        with:
+          cache-suffix: ${{matrix.py2}}
       - id: get-id
         uses: actions/github-script@v5.0.0
         env:
