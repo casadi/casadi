@@ -384,15 +384,20 @@ namespace casadi {
 
     // Get the primal solution
     for (casadi_int i=0; i<nx_; ++i) {
-      istringstream s(sol_lines.at(sol_lines.size()-nx_+i-1));
-      s >> d_nlp->z[i + nx_];
+      istringstream s(sol_lines.at(sol_lines.size() - nx_ + i - 1));
+      s >> d_nlp->z[i];
     }
 
-    // Get the dual solution
+    // Get the dual solution (x)
+    for (casadi_int i=0; i<nx_; ++i) {
+      d_nlp->lam[i] = casadi::nan;  // not implemented
+    }
+
+    // Get the dual solution (g)
     for (casadi_int i=0; i<ng_; ++i) {
-      istringstream s(sol_lines.at(sol_lines.size()-ng_-nx_+i-1));
-      s >> d_nlp->lam[i+nx_];
-      d_nlp->lam[i+nx_] *= -1;
+      istringstream s(sol_lines.at(sol_lines.size() - ng_ - nx_ + i - 1));
+      s >> d_nlp->lam[i + nx_];
+      d_nlp->lam[i + nx_] *= -1;
     }
 
     // Close and delete .sol file
