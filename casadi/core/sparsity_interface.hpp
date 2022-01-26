@@ -390,6 +390,18 @@ namespace casadi {
       return horzcat(std::vector<MatType>{x, y, z, w});
     }
 
+    /** \brief Concatenate horizontally, five matrices */
+    inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v) {
+      return horzcat(std::vector<MatType>{x, y, z, w, v});
+    }
+
+    /** \brief Concatenate horizontally, six matrices */
+    inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v, const MatType &u) {
+      return horzcat(std::vector<MatType>{x, y, z, w, v, u});
+    }
+
     /** \brief Concatenate vertically, two matrices */
     inline friend MatType vertcat(const MatType &x, const MatType &y) {
       return vertcat(std::vector<MatType>{x, y});
