@@ -676,6 +676,13 @@ if(WITH_CLANG)
 endif()
 add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler.")
 
+# Lapack: Dense linear solvers
+option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
+option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
+if(WITH_LAPACK OR WITH_BUILD_LAPACK OR REQUIRE_MUMPS OR REQUIRE_CLP)
+	set(REQUIRE_LAPACK ON)
+endif()
+
 # qpOASES: An active-set QP solver
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${WITH_QPOASES_DEF})
 option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
@@ -755,13 +762,6 @@ set(BUILD_METIS_TP_VERSION "2.0.0")
 option(WITH_BUILD_MUMPS "Compile MUMPS itself (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) instead of looking for it on your system" OFF)
 if(WITH_MUMPS OR WITH_BUILD_MUMPS OR REQUIRE_IPOPT OR REQUIRE_CLP)
 	set(REQUIRE_MUMPS ON)
-endif()
-
-# Lapack: Dense linear solvers
-option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
-option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
-if(WITH_LAPACK OR WITH_BUILD_LAPACK OR REQUIRE_MUMPS OR REQUIRE_CLP)
-	set(REQUIRE_LAPACK ON)
 endif()
 
 # HSL: Sparse direct linear solvers
