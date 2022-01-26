@@ -418,6 +418,18 @@ namespace casadi {
       return vertcat(std::vector<MatType>{x, y, z, w});
     }
 
+    /** \brief Concatenate vertically, five matrices */
+    inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v) {
+      return vertcat(std::vector<MatType>{x, y, z, w, v});
+    }
+
+    /** \brief Concatenate vertically, six matrices */
+    inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v, const MatType &u) {
+      return vertcat(std::vector<MatType>{x, y, z, w, v, u});
+    }
+
     /** \brief Concatenate along diagonal, two matrices */
     inline friend MatType diagcat(const MatType &x, const MatType &y) {
       return diagcat(std::vector<MatType>{x, y});
