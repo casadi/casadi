@@ -28,8 +28,8 @@
 
 namespace casadi {
 
+  /// Forward declararation
   class SXElem;
-  typedef Matrix<SXElem> SX;
 
   ///@{
   /// Readability typedefs
