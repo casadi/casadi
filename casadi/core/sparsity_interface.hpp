@@ -446,6 +446,18 @@ namespace casadi {
       return diagcat(std::vector<MatType>{x, y, z, w});
     }
 
+    /** \brief Concatenate along diagonal, five matrices */
+    inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v) {
+      return diagcat(std::vector<MatType>{x, y, z, w, v});
+    }
+
+    /** \brief Concatenate along diagonal, six matrices */
+    inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v, const MatType &u) {
+      return diagcat(std::vector<MatType>{x, y, z, w, v, u});
+    }
+
     /** \brief Return a row-wise summation of elements */
     inline friend MatType sum1(const MatType &x) { return MatType::sum1(x);}
 
