@@ -1102,7 +1102,390 @@ class Integrationtests(casadiTestCase):
       sol = I(x0=0, p=0.15)
       # xf:0.259754<=0, zf:0.26948<=0
 
+  @requires_integrator('idas')
+  @requires_nlpsol('ipopt')
+  def test_reduce_index(self):
+    
+    def problems():
+      free  = 0 # default
+      force = -1
+      approx = 1
+      blank = 0.0 # Will not be enforced but still used as initial guess
 
+      # 2D Pendulum
+      x = SX.sym("x") # horizontal position of point
+      y = SX.sym("y") # vertical position of point
+
+      dx = SX.sym("dx")
+      dy = SX.sym("dy")
+
+      u = SX.sym("u") # helper states to bring second order system to first order
+      v = SX.sym("v")
+
+      du = SX.sym("du")
+      dv = SX.sym("dv")
+
+      # Force
+      T = SX.sym("T")
+
+
+      L = 1
+      g = 9.81
+
+      alg = vertcat(dx-u,dy-v,du-T*x,dv-T*y+g,x**2+y**2-L**2)
+
+      # Implicit differential states
+      x_impl  = vertcat(x,y,u,v)
+      # Derivatives of implict differential states
+      dx_impl = vertcat(dx,dy,du,dv)
+
+      z = T
+
+
+      init_strength = {}
+      init_strength["x_impl"] = vertcat(free,force,free,free)
+      init_strength["dx_impl"] = vertcat(force,free,free,free)
+      init_strength["z"] = vertcat(free)
+      init = {}
+      init["x_impl"]  = vertcat(-1.0,-0.5,blank,blank)  
+      init["dx_impl"] = vertcat(-0.1,blank,blank,blank)
+      init["z"]  = vertcat(blank)
+
+      dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": alg}
+
+      yield (dae,3,init_strength,init,5e-6)
+
+      # 3D Pendulum
+
+
+      x = SX.sym("x")
+      y = SX.sym("y")
+      z = SX.sym("z")
+
+      vx = SX.sym("vx")
+      vy = SX.sym("vy")
+      vz = SX.sym("vz")
+
+      dx = SX.sym("dx")
+      dy = SX.sym("dy")
+      dz = SX.sym("dz")
+
+      dvx = SX.sym("dvx")
+      dvy = SX.sym("dvy")
+      dvz = SX.sym("dvz")
+
+      lambd = SX.sym("lambd")
+
+
+      L = 1
+      g = 9.81
+
+      alg = vertcat(dx-vx,dy-vy,dz-vz,dvx-lambd*x,dvy-lambd*y+g,dvz-lambd*z,x**2+y**2+z**2-L**2)
+
+      x_impl = vertcat(x,y,z,vx,vy,vz)
+      dx_impl = vertcat(dx,dy,dz,dvx,dvy,dvz)
+
+      z = lambd
+
+      init_strength = {}
+      init_strength["x_impl"] = vertcat(free,force,force,free,free,free)
+      init_strength["dx_impl"] = vertcat(force,force,free,free,free,free)
+      init_strength["z"] = vertcat(free)
+      init = {}
+      init["x_impl"]  = vertcat(-1.0,-0.5,-0.5,blank,blank,blank)  
+      init["dx_impl"] = vertcat(-0.1,0.2,blank,blank,blank,blank)
+      init["z"]  = vertcat(blank)
+
+      dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": alg}
+
+      yield (dae,3,init_strength,init,1e-5)
+
+
+      ## Flash system https://github.com/joaoleal/CppADCodeGen/blob/v2.4.3/test/cppad/cg/dae_index_reduction/model/flash.hpp 
+      nEthanol = SX.sym("nEthanol")
+      nWater = SX.sym("nWater")
+      T = SX.sym("T")
+      yWater = SX.sym("yWater")
+      yEthanol = SX.sym("yEthanol")
+      FV = SX.sym("FV")
+
+      Q = 500
+      F_feed = 10
+      p = 1
+      xFEthanol = 0.5
+      T_feed = 50
+
+
+      dnEthanol = SX.sym("dnEthanol")
+      dnWater = SX.sym("dnWater")
+      dT = SX.sym("dT")
+
+      alg = []
+
+      FNEthanol = xFEthanol * F_feed
+      n_lWater = nWater * 1000.
+      n_lEthanol = nEthanol * 1000.
+      m_lEthanol = n_lEthanol * 0.04606844
+      m_lWater = n_lWater * 0.0180152833
+      m = m_lEthanol + m_lWater
+      wEthanol = m_lEthanol / m
+      w_Water = 1 - wEthanol
+      rho = 1 / (w_Water / 983.159471259596 + wEthanol / 743.278841365274)
+      V = m / rho
+      cWater = n_lWater / V
+      dh = V / 0.502654824574367
+      p_aux = p * 101325.
+      dp = 101325. - p_aux
+      v = sqrt((9.80665 * dh + dp / rho) * 2.)
+      F_VL = v * 0.0005
+      FNLWater = cWater * F_VL
+      n = n_lEthanol + n_lWater
+      xWater = n_lWater / n
+      F_NL = FNLWater / xWater
+      FNLEthanol = F_NL - FNLWater
+      FNVWater = yWater * FV
+      FNVEthanol = FV - FNVWater
+      D__nEthanol__Dt = FNEthanol - FNLEthanol - FNVEthanol
+      alg.append(dnEthanol - (D__nEthanol__Dt * 0.001))
+
+      FNFWater = F_feed - FNEthanol
+      D__nWater__Dt = FNFWater - FNLWater - FNVWater
+      alg.append(dnWater - (D__nWater__Dt * 0.001))
+
+      FMFEthanol = FNEthanol * 0.04606844
+      FMFWater = FNFWater * 0.0180152833
+      Tfeed = T_feed + 273.15
+      T_aux = T + 273.15
+      dQ_F = (FMFEthanol * 2898.42878374706 + FMFWater * 4186.92536027523) * (Tfeed - T_aux)
+      dH_mVapEthanol = 50430. * pow(1 - T_aux / 514., 0.4989) * exp((0.4475 * T_aux) / 514.)
+      T_r = T_aux / 647.
+      dH_mVapWater = 52053. * pow(1 - T_r, 0.3199 + -0.212 * T_r + 0.25795 * T_r * T_r)
+      dH_mVap = yEthanol * dH_mVapEthanol + yWater * dH_mVapWater
+      dQ_vap = FV * dH_mVap
+      Q_1 = Q * 1000.
+      cp = wEthanol * 2898.42878374706 + w_Water * 4186.92536027523
+      alg.append(dT - (dQ_F - dQ_vap + Q_1) / (m * cp))
+
+      pVapWater = 100000. * pow(10., 4.6543 - 1435.264 / (T_aux - 64.848))
+      KWater = pVapWater / p_aux
+      alg.append(yWater - xWater * KWater)
+
+      xEthanol = 1 - xWater
+      pVapEthanol = exp(74.475 + -7164.3 / T_aux + -7.327 * log(T_aux) + 3.134e-06 * pow(T_aux, 2.))
+      KEthanol = pVapEthanol / p_aux
+      alg.append(yEthanol - xEthanol * KEthanol)
+      
+      alg.append(yWater + yEthanol - 1)
+
+
+      alg = vvcat(alg)
+
+      x_impl = vvcat([nEthanol,nWater,T])
+      dx_impl = vvcat([dnEthanol,dnWater,dT])
+
+      z = vertcat(yWater,yEthanol,FV)
+
+      dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": alg}
+
+      init_strength = {}
+      init_strength["x_impl"] = vertcat(force,force,approx)
+      init_strength["dx_impl"] = vertcat(free,free,free)
+      init_strength["z"] = vertcat(free,free,free)
+      init = {}
+      init["x_impl"]  = vertcat(2.5,6.4,91)
+      init["dx_impl"] = vertcat(0.1,blank,blank)
+      init["z"]  = vertcat(0.5,0.5,0.5)
+
+      dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": alg}
+
+      yield (dae,2,init_strength,init,1e-8)
+
+      # Exothermic Reactor from pantelides paper
+
+
+      C  = SX.sym("C")
+      dC = SX.sym("dC")
+      T  = SX.sym("T")
+      dT = SX.sym("dT")
+      R  = SX.sym("R")
+
+      C0 = 1
+      T0 = 1
+      K1 = K2 = K3 = K4 = 1
+      Tc = 1
+
+      alg = vertcat(K1*(C0-C)-R-dC,K1*(T0-T)+K2*R-K3*(T-Tc)-dT,R-K3*exp(-K4/T)*C)
+
+      x_impl = vvcat([C,T])
+      dx_impl = vvcat([dC,dT])
+
+      z = vertcat(R)
+
+      dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": alg}
+
+      init_strength = {}
+      init_strength["x_impl"] = vertcat(free,force)
+      init_strength["dx_impl"] = vertcat(free,free)
+      init_strength["z"] = vertcat(free)
+      init = {}
+      init["x_impl"]  = vertcat(blank,2)
+      init["dx_impl"] = vertcat(blank,blank)
+      init["z"]  = vertcat(blank)
+
+      yield (dae,1,init_strength,init,1e-8)
+
+
+      # S. Mattsson and G. Söderlind, Index reduction in differential-algebraic equations using dummy derivatives
+
+      x1 = SX.sym("x1")
+      x2 = SX.sym("x2")
+      x3 = SX.sym("x3")
+      x4 = SX.sym("x4")
+      x5 = SX.sym("x5")
+      x6 = SX.sym("x6")
+      x7 = SX.sym("x7")
+
+      dx1 = SX.sym("dx1")
+      dx2 = SX.sym("dx2")
+      dx3 = SX.sym("dx3")
+      dx4 = SX.sym("dx4")
+      dx5 = SX.sym("dx5")
+      dx6 = SX.sym("dx6")
+      dx7 = SX.sym("dx7")
+
+      eqs = vvcat([dx1+dx2,x2-5])
+      u1 = 1
+      u2 = 1
+      u3 = 1
+      u4 = 1
+
+      x_impl = vvcat([x1,x2,x3,x4,x5,x6,x7])
+      dx_impl = vvcat([dx1,dx2,dx3,dx4,dx5,dx6,dx7])
+
+      eqs = vcat([x5-dx1,x6-dx2,x7-dx3,x1+x2+u1,x1+x2+x3+u2,dx3+x1+x4+u3,2*dx5 + dx6 + dx7 + dx4 + u4])
+      z = SX(0,1)
+
+      dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": eqs}
+
+      # 2 for soares secchi
+      yield (dae,3,None,None,None)
+
+      # 
+
+      """
+      x1 = SX.sym("x1")
+      x2 = SX.sym("x2")
+
+      dx1 = SX.sym("dx1")
+      dx2 = SX.sym("dx2")
+
+      eqs = vvcat([dx1+dx2,x2-5])
+
+      x_impl = vvcat([x1,x2])
+      dx_impl = vvcat([dx1,dx2])
+
+      z = SX(0,1)
+
+      dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": eqs}
+      (dae_reduced,constraints,var_map) = reduce_index(dae,gamma=-1)
+
+      print(dae_reduced)
+      print(constraints)
+
+
+      x_impl0 = vertcat(-1,1)
+      x_impl0_strength = vertcat(2,0) # strength 1: fix, 0: initial guess
+      
+      dx_impl0 = vertcat(0,0)
+      dx_impl0_strength = vertcat(0,0) # strength 1: fix, 0: initial guess
+
+      z0 = DM(0,1)
+      z0_strength = DM(0,1) # strength 1: fix, 0: initial guess
+
+
+      initial = {"x_impl": x_impl0,"dx_impl": dx_impl0,"z": z0}
+      initial_strength = {"x_impl": x_impl0_strength,"dx_impl": dx_impl0_strength,"z": z0_strength}
+      print("integrate")
+      integrate(dae_reduced,constraints,var_map,initial,initial_strength)
+      """
+
+      # Uncontrollable DAE Pantelides
+
+      x  = SX.sym("x")
+      dx = SX.sym("dx")
+
+      u1 = SX.sym("u1")
+      u2 = SX.sym("u2")
+
+      t = SX.sym("t")
+
+      y1 = t
+      y2 = sin(t)
+
+
+      alg = vertcat(x+u1+u2,x+dx+y1,x+y2)
+
+      # Implicit differential states
+      x_impl  = vertcat(x)
+      # Derivatives of implict differential states
+      dx_impl = vertcat(dx)
+
+      z = vertcat(u1,u2)
+
+      dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": alg, "t": t}
+
+      yield (dae,"Structural detection failed",None,None,None)
+
+
+    print("loop")
+    for [dae_orig,index,init_strength_orig,init_orig,max_rms] in problems():
+      print("dae",dae_orig)
+      for perturb_seed in range(5):
+        if perturb_seed==0:
+          dae = dae_orig
+          init_strength = init_strength_orig
+          init = init_orig
+        else:
+          np.random.seed(perturb_seed)
+
+          dae = copy.copy(dae_orig)
+          init_strength = copy.copy(init_strength_orig)
+          init = copy.copy(init_orig)
+          for k in ["x_impl","z","alg"]:
+            s = vertsplit(dae[k])
+            if len(s)==0: continue
+            perm = np.random.permutation(range(len(s)))
+            dae[k] = vcat([s[e] for e in perm])
+            if init is not None and k in init: init[k] = init[k][perm]
+            if init_strength is not None and k in init_strength: init_strength[k] = init_strength[k][perm]
+            if k=="x_impl":
+              s = vertsplit(dae["d"+k])
+              dae["d"+k] = vcat([s[e] for e in perm])
+              if init is not None: init["d"+k] = init["d"+k][perm]
+              if init_strength is not None: init_strength["d"+k] = init_strength["d"+k][perm]
+
+
+        grid = list(np.linspace(0,5,1000))
+        if isinstance(index,str):
+          with self.assertInException(index):
+            dae_reduce_index(dae, {"baumgarte_pole": -1, "algorithm": "pantelides", "max_iter": 20})
+          continue
+        (dae_reduced,meta) = dae_reduce_index(dae, {"baumgarte_pole": -1, "algorithm": "pantelides"}) # soares_secchi
+        assert meta["index"]==index
+        if init_strength is not None:
+          [dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
+          intg = integrator("intg","idas",dae_se,{"grid": grid})
+          init_gen = dae_init_gen(dae, dae_reduced, "ipopt", init_strength, {"error_on_fail" : True})
+          xz0 = init_gen(**init)
+          sol = intg(**xz0)
+          error = phi(x=sol["xf"],z=sol["zf"])["I"]
+          #import pylab as plt
+          #plt.plot(error.T)
+          #plt.show()
+      
+          rms = np.sqrt(np.mean(error**2,axis=1))
+          print("rms error", rms)
+          self.assertTrue(np.all(rms<=max_rms))
 
 if __name__ == '__main__':
     unittest.main()

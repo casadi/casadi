@@ -27,6 +27,7 @@
 #include "integrator.hpp"
 #include "rootfinder.hpp"
 #include "polynomial.hpp"
+#include "nlpsol.hpp"
 
 #include <vector>
 
@@ -399,5 +400,825 @@ namespace casadi {
     // Form discrete-time dynamics
     return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
+
+
+  std::vector<casadi_int> invert_lookup(const std::vector<casadi_int>& lookup) {
+    std::vector<casadi_int> ret(lookup.size(), -1);
+    for (casadi_int i=0;i<lookup.size();++i) {
+      casadi_int e = lookup[i];
+      if (e>=0) {
+        ret[e] = i;
+      }
+    }
+    return ret;
+  }
+
+  namespace IndexRecution {
+
+    struct EquationStruct;
+    /*
+    struct VariableStruct {
+      std::vector<struct EquationStruct*> eqs;
+      // Eligability to serve as candidate, one for each pass during phase 1
+      std::vector<bool> eligible1;
+      struct EquationStruct* assign;
+      // Which variable is this variable's derivative?
+      struct VariableStruct* der;
+      // Which variable produces this variable by differentiation?
+      struct VariableStruct* ;
+      bool visited;
+      // Eligability to serve as candidate during phase 2
+      bool eligible2;
+    };*/
+
+    struct VariableStruct {
+      std::vector<struct EquationStruct*> eqs;
+      std::vector<struct EquationStruct*> eqs0;
+      struct EquationStruct* assign = nullptr;
+      // Which variable is this variable's derivative?
+      struct VariableStruct* der = nullptr;
+      // Which variable produces this variable by differentiation?
+      struct VariableStruct* der_inv = nullptr;
+      casadi_int i; // Position in Graph::V
+      bool visited = false;
+      bool deleted = false;
+    };
+
+    struct EquationStruct {
+      std::vector<struct VariableStruct*> vars;
+      std::vector<struct VariableStruct*> vars0;
+      struct VariableStruct* assign = nullptr;
+      // Which equation is this equations's derivative?
+      struct EquationStruct* der = nullptr;
+      // Which equations produces this equations by differentiation?
+      struct EquationStruct* der_inv = nullptr;
+      casadi_int i; // Position in Graph::E
+      bool visited = false;
+    };
+
+    typedef struct VariableStruct Variable;
+    typedef struct EquationStruct Equation;
+
+    // Bipartite graph
+    struct GraphStruct {
+      std::vector<Variable*> V;
+      std::vector<Equation*> E;
+      casadi_int ncol_orig;
+      casadi_int nrow_orig;
+    };
+
+    typedef struct GraphStruct Graph;
+
+    void graph_add_der(Graph& G, Variable* v) {
+      // Push new equation to the graph
+      G.V.push_back(new Variable());
+      Variable* v_new = G.V.back();
+
+      // Get a position
+      v_new->i = G.V.size()-1;
+
+      // Add derivative relationship between new and old variable
+      v_new->der_inv = v;
+      v->der = v_new;
+    }
+
+    void add_variable(Equation* e, Variable* v) {
+      auto it = std::find(e->vars0.begin(), e->vars0.end(), v);
+      if (it==e->vars0.end()) {
+        e->vars0.push_back(v);
+        if (!v->deleted) {
+          e->vars.push_back(v);
+          v->eqs.push_back(e);
+        }
+      }
+    }
+
+    void graph_add_der(Graph& G, Equation* e, bool add_old=false) {
+      // Push new equation to the graph
+      G.E.push_back(new Equation());
+
+      Equation* e_new = G.E.back();
+
+      // Get a position
+      e_new->i = G.E.size()-1;
+
+      // Add derivative relationship between new and old equation
+      e_new->der_inv = e;
+      e->der = e_new;
+
+      // Loop over all variables in old equation
+      for (auto* v: e->vars0) {
+        // We depend on the old variable
+        if (add_old) {
+          add_variable(e_new, v);
+        }
+        // And we depend on its derivative (create if not present)
+        if (!v->der) graph_add_der(G, v);
+        add_variable(e_new, v->der);
+      }
+
+    }
+
+    bool dfs_match_pantelides(Equation* i) {
+
+      // Pantelides alg 3.2: Colour i (1)
+      i->visited = true;
+
+      // Look for unassigned candidate variables
+      // Pantelides alg 3.2: (2) If a V-node j exists such that edge (i-j) exists...
+      for (auto* j : i->vars) {
+        // Pantelides alg 3.2: ... and ASSIGN (j)= 0 then:
+        if (j->assign==nullptr) {
+          // Found such variable
+          // Assign
+          // Pantelides alg 3.2: (2b) Set ASSIGN(j)=i 
+          j->assign = i; i->assign = j;
+
+          // Pantelides alg 3.2: (2a) set PATHFOUND = TRUE, (2c) return
+          return true; // End successfully
+        }
+      }
+
+      // Look for assigned candidate variables
+      // Pantelides alg 3.2: (3) For every j such that edge (i-j) exists
+      for (auto j : i->vars) {
+        // Pantelides alg 3.2: ... and j is uncoloured do:
+        if (!j->visited) {
+          // Pantelides alg 3.2: (3a) Colour j
+          j->visited = true;
+
+          // Pantelides alg 3.2: (3b) Set k = ASSIGN (j)
+          Equation* k = j->assign;
+
+          // Pantelides alg 3.2: (3c) AUGMENTPATH (k, PATHFOUND)
+          if (dfs_match_pantelides(k)) {
+            // Re-assignment
+            // Pantelides alg 3.2: (3d-1) Set ASSIGN (j) = i
+            j->assign = i; i->assign = j;
+            // Pantelides alg 3.2: (3d-2) Return
+            return true;
+          }
+
+        }
+      }
+
+      // Exhausted all options; return unsuccessfully
+      return false;
+    }
+
+
+    /** \brief Perform Pantelides algorithm for DAE index reduction
+     * 
+     * The algorithm works purely on structure: no symbolics equations are used.
+     *
+     * \param graph   Structural relation between equations (columns) and variables (rows)
+     * \param var_map Indicate for each variable where its derivative can be found in the variable list
+     *                if var_map[i]>=0: var[var_map[i]] == dot(var[i])
+     *                Size will increase to accommodate new variables introduced by index reduction 
+     * \param eq_map  Indicate for each equation if it should be differentiated
+     *                if eq_map[i]>=0:  eq[eq_map[i]] == dot(eq[i])
+     *                Size will increase over the original number of equations to accommodate extra equations introduced by index reduction
+    */
+    bool dae_struct_detect_pantelides(Graph& G,
+      std::vector<casadi_int>& var_map, std::vector<casadi_int>& eq_map,
+      casadi_int max_iter) {
+
+      // Pantelides alg 4.1: Set N'=N do (2)
+      casadi_int Np = G.E.size();
+      // Pantelides alg 4.1: For k=1 to N' do (3)
+      for (casadi_int k=0;k<Np;++k) {
+        // Pantelides alg 4.1: Set i=k (3a)
+        Equation* i = G.E[k];
+
+        casadi_int iter = 0;
+        // Pantelides alg 4.1: Repeat (3b)
+        while(true) {
+          if (iter++>max_iter) return false;
+          // Pantelides alg 4.1: delete all V-nodes with A!=0 and their incident edges
+          //       * from the graph (3b-1)
+          for (auto* v : G.V) {
+            if (v->der) {
+              v->deleted = true;
+              v->eqs.clear();
+              for (auto* e: G.E) {
+                auto it = std::find(e->vars.begin(), e->vars.end(), v);
+                if (it!=e->vars.end()) e->vars.erase(it);
+              }
+            }
+          }
+
+          // Pantelides alg 4.1: Designate all nodes as "uncoloured" (3b-2)
+          for (auto* v : G.V) v->visited = false;
+          for (auto* e : G.E) e->visited = false;
+
+          // Pantelides alg 4.1: Set PATHFOUND= FALSE        (3b-3)
+          // Pantelides alg 4.1: AUGMENTPATH (i, PATHFOUND)  (3b-4)
+          // Pantelides alg 4.1: Until PATHFOUND  (3c)
+          if (dfs_match_pantelides(i)) break; // out of while loop
+
+          // Pantelides alg 4.1: If PATHFOUND FALSE then (3b-5)
+          casadi_int n = G.V.size();
+          // Pantelides alg 4.1: For every coloured V-node j do (3b-5-i)
+          for (casadi_int jj=0;jj<n;++jj) {
+            Variable* j = G.V[jj];
+            if (j->visited && !j->deleted) {
+              graph_add_der(G, j);
+            }
+          }
+
+          // Pantelides alg 4.1: For every coloured E-node l do (3b-5-ii)
+          n = G.E.size();
+          for (casadi_int ll=0;ll<n;++ll) {
+            Equation* l = G.E[ll];
+            if (l->visited) graph_add_der(G, l, true);
+          }
+
+          for (casadi_int ll=n;ll<G.E.size();++ll) {
+            Equation* l = G.E[ll];
+            bool valid = false;
+            for (auto* v : l->vars0) {
+              if (!v->eqs.empty()) valid = true;
+            }
+            if (!valid) return false;
+          }
+
+          // Pantelides alg 4.1: For every coloured V-node j set
+          // ASSIGN (A(j))= B(ASSIGN (j))  (3b-5-iii)
+          for (auto* j : G.V) {
+            if (j->visited && !j->deleted) {
+              j->der->assign = j->assign->der;
+              j->assign->der->assign = j->der;
+            }
+          }
+
+          // Pantelides alg 4.1: Set i=B(i) (3b-5-iv)
+          i = i->der;
+
+        }
+      }
+      return true;
+    }
+
+    void dae_struct_detect(const std::string& algorithm,
+      const Sparsity& graph, std::vector<casadi_int>& var_map,
+      std::vector<casadi_int>& eq_map,
+      casadi_int max_iter) {
+      // Input sanitization
+      casadi_assert(var_map.size()==graph.size2(),
+        "var_map size must match graph columns.");
+
+      // Graph structure
+      Graph G;
+
+      // Allocate space for node representation
+      G.E.resize(graph.size1(), nullptr);
+      G.V.resize(graph.size2(), nullptr);
+      G.nrow_orig = graph.size1();
+      G.ncol_orig = graph.size2();
+
+      for (auto*& e : G.E) e = new Equation();
+      for (auto*& v : G.V) v = new Variable();
+
+      // Set positions
+      casadi_int i;
+      i=0; for (auto* e : G.E) e->i = i++;
+      i=0; for (auto* v : G.V) v->i = i++;
+
+      // Create edges using incidence sparsity
+      const casadi_int* colind = graph.colind();
+      const casadi_int* row = graph.row();
+
+      // Loop over incidence columns
+      for (casadi_int c=0;c<graph.size2();++c) {
+        // Loop over nonzeros
+        for (casadi_int j=colind[c]; j<colind[c+1]; ++j) {
+          casadi_int r = row[j];
+          G.V[c]->eqs.push_back(G.E[r]); // Non-monotone
+          G.E[r]->vars.push_back(G.V[c]);
+        }
+      }
+
+      // Process var_map
+      for (casadi_int i=0;i<var_map.size();++i) {
+        Variable* v = G.V[i];
+        casadi_int i_der = var_map[i];
+        if (i_der>=0) {
+          Variable* e = G.V[i_der];
+          v->der = e;
+          e->der_inv = v; 
+        }
+      }
+
+      for (auto* v : G.V) v->eqs0 = v->eqs;
+      for (auto* e : G.E) e->vars0 = e->vars;
+
+      bool detect = false;
+      if (algorithm=="pantelides") {
+        detect = dae_struct_detect_pantelides(G, var_map, eq_map, max_iter);
+      } else {
+        casadi_error("Algorithm '" + algorithm + "' not recognized.");
+      }
+      casadi_assert(detect, "Structural detection failed.");
+
+      // Prepare outputs
+      var_map.resize(G.V.size());
+      eq_map.resize(G.E.size());
+
+      int k = 0;
+      // Populate var_map
+      for (auto* v : G.V) {
+        if (v->der) {
+          var_map[v->i] = v->der->i;
+        } else  {
+          var_map[v->i] = -1;
+        }
+        casadi_assert_dev(v->i==k);
+        k++;
+      }
+
+      k = 0;
+      // Populate eq_map
+      for (auto* e : G.E) {
+        if (e->der) {
+          eq_map[e->i] = e->der->i;
+        } else  {
+          eq_map[e->i] = -1;
+        }
+        casadi_assert_dev(e->i==k);
+        k++;
+      }
+
+    }
+
+  }
+
+  using namespace IndexRecution;
+
+  template <class X>
+  std::map<std::string, X> add_defaults(const std::map<std::string, X>& in, const std::vector<std::string>& keys) {
+    std::map<std::string, X> ret;
+    for (const std::string& k : keys) {
+      auto it = in.find(k);
+      if (it==in.end()) {
+        ret[k] = X(0, 1);
+      } else {
+        ret[k] = it->second;
+      }
+    }
+    return ret;
+  }
+
+
+  std::vector<casadi_int> get_orders(const std::vector<casadi_int>& map) {
+    std::vector<casadi_int> ret(map.size(), 0);
+    for (casadi_int i=0;i<ret.size();++i) {
+      if (map[i]>=0) ret[map[i]] = ret[i]+1;
+    }
+    return ret;
+  }
+
+  std::vector<casadi_int> get_inverse(const std::vector<casadi_int>& map) {
+    std::vector<casadi_int> ret(map.size(), -1);
+    for (casadi_int i=0;i<ret.size();++i) {
+      if (map[i]>=0) ret[map[i]] = i;
+    }
+    return ret;
+  }
+
+  std::vector<casadi_int> path(const std::vector<casadi_int>& map, casadi_int i_start) {
+    std::vector<casadi_int> ret;
+    casadi_int i = i_start;
+    while (true) {
+      casadi_int i_next = map[i];
+      if (i_next==-1) break;
+      i = i_next;
+      ret.push_back(i);
+    }
+    return ret;
+  }
+
+  template <class X>
+  const std::map<std::string, X>
+  reduce_index_gen(const std::map<std::string, X>& dae, Dict& stats, const Dict& opts) {
+    double baumgarte_pole_ = 0;
+    std::string algorithm = "pantelides";
+    casadi_int max_iter = 500;
+    // Option parsing
+    for (auto&& op : opts) {
+      if (op.first=="baumgarte_pole") {
+        baumgarte_pole_ = op.second;
+      } else if (op.first=="algorithm") {
+        algorithm = op.second.to_string();
+      } else if (op.first=="max_iter") {
+        max_iter = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
+    // Dae input sanitization
+
+    for (const auto& e : dae) {
+      casadi_assert(e.second.is_column() && e.second.is_dense(),
+        "Dense column vector expected for key '" + e.first + "'. "
+        "Got " + e.second.dim(true) + " instead.");
+    }
+
+    X x   = get_from_dict(dae, "x",   X(0, 1));
+    X ode = get_from_dict(dae, "ode", X(0, 1));
+    casadi_assert(x.numel()==ode.numel(),
+      "Size of explicit differential state vector (x: " + str(x.numel()) + ") must "
+      "match size of ode right-hand-side (ode: " + str(ode.numel()) + ").");
+    casadi_assert(x.size1()==0, "Explicit differential states not supported yet.");
+
+    X x_impl  = get_from_dict(dae, "x_impl",  X(0, 1));
+    X dx_impl = get_from_dict(dae, "dx_impl", X(0, 1));
+    casadi_assert(x_impl.numel()==dx_impl.numel(),
+      "Size of implicit differential state vector (x_impl: " + str(x_impl.numel()) + ") must "
+      "match size of implicit differential state derivative vector (dx_impl: " + str(dx_impl.numel()) + ").");
+    
+    X z   = get_from_dict(dae, "z",   X(0, 1));
+    X alg = get_from_dict(dae, "alg", X(0, 1));
+    casadi_assert(z.numel()+x_impl.numel()==alg.numel(),
+      "Size of algebraic state vector (z: " + str(z.numel()) + ") + "
+      "size of implicit states (x_impl: " + str(x_impl.numel()) + ") must "
+      "match size of algebraic equations (alg: " + str(alg.numel()) + ").");
+
+    X t = get_from_dict(dae, "t", X::sym("t"));
+    casadi_assert(t.is_scalar(), "Time must be scalar. Got " + t.dim() + " instead.");
+
+    X p = get_from_dict(dae, "p", X(0, 1));
+
+    // Check that dx_impl are classified correctly
+    std::vector<bool> dep = X::which_depends(alg, dx_impl);
+
+    if (!all(dep)) {
+      std::vector<X> dx_impl_split = vertsplit(dx_impl);
+      std::vector<std::string> prob;
+      for (casadi_int i=0;i<dep.size();++i) {
+        if (!dep[i]) prob.push_back(dx_impl_split[i].name());
+      }
+      casadi_error("Found dx_impl variables that do not appear in alg: " + join(prob, ",") +
+        ". They should be classified as z instead.");
+    }
+
+
+    bool normal_order = true;
+
+    // Determine graph structure of problem for structural index reduction
+    X V;
+    if (normal_order) {
+      V = vertcat(x_impl, dx_impl, z);
+    } else {
+      V = vertcat(x_impl, z, dx_impl);
+    }
+    
+    Function temp("temp", {V, p, t}, {alg});
+    Sparsity G = temp.sparsity_jac(0, 0);
+
+    // Populate var_map: a list that associates variables with their derivatives
+    int nx_impl = x_impl.numel();
+    int nz = z.numel();
+    std::vector<casadi_int> var_map(V.numel(), -1);
+    for (casadi_int i=0;i<nx_impl;++i) {
+      var_map[i] = i+nx_impl+(normal_order? 0: nz);
+    }
+
+    // Allocate space for eq_map: a list that associates equations with their derivatives
+    std::vector<casadi_int> eq_map;
+
+    // Modifies var_map and eq_map
+    dae_struct_detect(algorithm, G, var_map, eq_map, max_iter);
+
+    // Variables should not be removed
+    casadi_assert_dev(var_map.size()>=2*nx_impl+nz);
+
+    // List of scalarized variables
+    std::vector<X> var_ext = vertsplit(V);
+    // Allocate extra space for extension due to index reduction
+    var_ext.resize(var_map.size());
+
+    // Populate extra space
+    for (casadi_int i=0;i<var_map.size();++i) {
+      casadi_int i_der = var_map[i];
+      // Derivate index is in the extra space?
+      if (i_der>=V.numel())
+        // Consstruct a new symbol with derived name
+        var_ext[i_der] = X::sym("d"+var_ext[i].name());
+    }
+
+    // Prepare arguments for jtimes
+    // In essence, this is like to the novel x_impl and dx_impl,
+    // but a subset may be promoted to x (explicit diff. state)
+    std::vector<X> xs; xs.reserve(var_map.size());
+    std::vector<X> dxs; dxs.reserve(var_map.size());
+
+    for (casadi_int i=0;i<var_map.size();++i) {
+      casadi_int i_der = var_map[i];
+      if (i_der>=0) {
+        xs.push_back(var_ext[i]);
+        dxs.push_back(var_ext[i_der]);
+      }
+    }
+
+    // Stack to be used as jtimes arguments
+    X x_cat = vertcat(xs);
+    X dx_cat = vertcat(dxs);
+
+    // Don't forget to differentiate time itself
+    X j1 = vertcat(x_cat,t);
+    X j2 = vertcat(dx_cat,1);
+
+    // List of scalarized equations
+    std::vector<X> eq_ext = vertsplit(alg);
+    // Allocate extra space for extension due to index reduction
+    eq_ext.resize(eq_map.size());
+
+    // For each equation, figure out how many times it was differentiated (=order)
+    std::vector<casadi_int> order = get_orders(eq_map);
+    casadi_int max_order = *std::max_element(order.begin(), order.end());
+
+    // We lump together all relevant equations before doing differentiation in a target group,
+    // in order to make use of shared subexpressions.
+    // order -> all equations that give rise to an equation of this order
+    std::map<casadi_int, std::vector<casadi_int> > targets;
+    for (casadi_int i=0;i<eq_map.size();++i) {
+      if (eq_map[i]>=0) {
+        targets[order[eq_map[i]]].push_back(i);
+      }
+    }
+
+    // Non-active equations will be dropped from the final set
+    std::vector<bool> active(eq_map.size(), true);
+
+    // Equations that get dropped, but should still hold for initial guess
+    std::vector<X> dropped_constraints;
+
+    // Loop over equation elements in increasing order
+    for (casadi_int ord=1;ord<=max_order;++ord) {
+      const std::vector<casadi_int> & target = targets[ord];
+
+      // Remember to-be-dropped equations
+      for (casadi_int i : target) dropped_constraints.push_back(eq_ext[i]);
+
+      // Gather target's equations
+      X block = vertcat(vector_slice(eq_ext, target));
+      // Perform differentiation
+      std::vector<X> dblocks = vertsplit(jtimes(block, j1, j2, false));
+      // Scatter computed derivatives into target resultant equation slots
+      for (casadi_int i=0;i<target.size();++i) {
+        casadi_int t = target[i];
+        eq_ext[eq_map[t]] = dblocks[i];
+        active[t] = false;
+      }
+    }
+
+    std::vector<casadi_int> eq_map_inverse = get_inverse(eq_map);
+
+    // Construct the new list of algebraic equations
+    // In theory, just collect all active members of eq_ext
+    // In practice, we add some Baumgarte stabilization to avoid constraint drifting
+    std::vector<X> alg_new;
+    for (casadi_int i=0;i<eq_map.size();++i) {
+      if (active[i]) {
+
+        // Start from the pure equation
+        X new_eq = eq_ext[i];
+
+        // Construct coefficients of the polynomial (x-gamma)^order
+        Polynomial p(1);
+        for (casadi_int k=0;k<order[i];++k) {
+          p *= Polynomial(1, -baumgarte_pole_);
+        }
+
+        const std::vector<double>& coeff = p.coeff();
+
+        // Find indices of originating equations of equation i
+        // e.g. if eq_i = der(eq_j), eq_j = der(eq_k), obtain [j,k]
+        std::vector<casadi_int> gen_i = path(eq_map_inverse, i);
+
+        // Add inner product of coefficients with originating equations of new_eq
+        for (casadi_int k=0;k<gen_i.size();++k) {
+          new_eq += coeff[k+1]*eq_ext[gen_i[k]];
+        }
+
+        // Ready to add
+        alg_new.push_back(new_eq);
+      }
+    }
+
+    std::vector<casadi_int> var_order = get_orders(var_map);
+    std::vector<casadi_int> var_map_inverse = get_inverse(var_map);
+
+
+    // Which implicit states become explicit pure integrators?
+    std::vector<casadi_int> impl_to_expl;
+    for (casadi_int i=0;i<var_map.size();++i) {
+      if (var_order[i]>=2) {
+        // Find indices of originating variables of variable i
+        // e.g. if var_i = der(var_j), var_j = der(var_k), obtain [j,k]
+        std::vector<casadi_int> gen_i = path(var_map_inverse, i);
+
+        // Anything too deep should become explicit integrator
+        if (gen_i.size()>1)
+          impl_to_expl.insert(impl_to_expl.end(), gen_i.begin()+1, gen_i.end());
+
+      }
+    }
+
+    // Take complement
+    std::vector<casadi_int> impl_to_expl_compl = complement(impl_to_expl, xs.size());
+    std::map<std::string, X> dae_result;
+
+    dae_result["x"] = vertcat(vector_slice(xs, impl_to_expl));
+    dae_result["ode"] = vertcat(vector_slice(dxs, impl_to_expl));
+
+    dae_result["x_impl"] = vertcat(vector_slice(xs, impl_to_expl_compl));
+    dae_result["dx_impl"] = vertcat(vector_slice(dxs, impl_to_expl_compl));
+
+    dae_result["t"] = t;
+    dae_result["p"] = p;
+
+    // Which algebraic variables were not promoted to differential states?
+    std::vector<X> z_orig = vertsplit(z);
+    std::vector<X> z_new;
+    for (casadi_int i=0;i<var_map.size();++i) {
+      // Algebraic
+      if (var_order[i]==0 && var_map[i]==-1) {
+        z_new.push_back(z_orig.at(i-(normal_order?2:1)*nx_impl));
+      }
+    }
+    dae_result["z"] = vertcat(z_new);
+    dae_result["alg"] = vertcat(alg_new);
+
+    dae_result["I"] = vertcat(dropped_constraints);
+
+    stats["index"] = max_order+1;
+
+    return dae_result;
+  }
+
+  MXDict dae_reduce_index(const MXDict& dae, Dict& stats, const Dict& opts) {
+    return reduce_index_gen(dae, stats, opts);
+  }
+
+  SXDict dae_reduce_index(const SXDict& dae, Dict& stats, const Dict& opts) {
+    return reduce_index_gen(dae, stats, opts);
+  }
+
+  template<class X>
+  std::map<std::string, X> map_semi_expl(const std::map<std::string, X>& dae,
+    const std::map<std::string, X>& dae_red,
+    Function& state_to_orig, Function& phi) {
+
+    std::map<std::string, X> dae_se;
+    dae_se["x"] = vertcat(dae_red.at("x"), dae_red.at("x_impl"));
+    dae_se["z"] = vertcat(dae_red.at("dx_impl"), dae_red.at("z"));
+    dae_se["ode"] = vertcat(dae_red.at("ode"), dae_red.at("dx_impl"));
+    dae_se["alg"] = dae_red.at("alg");
+    dae_se["t"] = dae_red.at("t");
+    dae_se["p"] = dae_red.at("p");
+
+    X x_impl  = get_from_dict(dae, "x_impl",  X(0, 1));
+    X dx_impl = get_from_dict(dae, "dx_impl", X(0, 1));
+    X z       = get_from_dict(dae, "z", X(0, 1));
+
+    Sparsity var_map_sp = jacobian(vertcat(dae_red.at("x"), dae_red.at("x_impl"), dae_red.at("dx_impl"), dae_red.at("z")), vertcat(x_impl, dx_impl, z)).sparsity();
+    DM var_map(var_map_sp, 1.0);
+
+    state_to_orig = Function("state_to_orig",
+      {dae_se["x"], dae_se["z"]},
+      {x_impl, dx_impl, z},
+      {"xf", "zf"},
+      {"x_impl", "dx_impl", "z"});
+
+    phi = Function("phi",
+      {dae_se["x"], dae_se["z"], dae_se["p"], dae_se["t"]},
+      {dae_red.at("I")},
+      {"x", "z", "p", "t"},
+      {"I"});
+
+    return dae_se;
+  }
+
+template<class X>
+  Function init_gen(const std::map<std::string, X>& dae,
+    const std::map<std::string, X>& dae_red,
+    const std::string& init_solver, const DMDict& init_strength, const Dict& init_solver_options) {
+
+    X x_impl  = get_from_dict(dae, "x_impl",  X(0, 1));
+    X dx_impl = get_from_dict(dae, "dx_impl", X(0, 1));
+    X z       = get_from_dict(dae, "z", X(0, 1));
+    X p_orig       = get_from_dict(dae, "p", X(0, 1));
+
+    Sparsity var_map_sp = jacobian(vertcat(dae_red.at("x"), dae_red.at("x_impl"), dae_red.at("dx_impl"), dae_red.at("z")), vertcat(x_impl, dx_impl, z)).sparsity();
+    DM var_map(var_map_sp, 1.0);
+
+    // NLP to obtain consistent initial guesses
+    std::map<std::string, X> nlp;
+
+    MX pmx = MX::sym("pmx", p_orig.sparsity());
+    MX tmx = MX::sym("t");
+
+    X init_x_impl_orig  = X::sym("x_impl_init",  x_impl.sparsity());
+    X init_dx_impl_orig = X::sym("dx_impl_init", dx_impl.sparsity());
+    X init_z_orig       = X::sym("z_init",       z.sparsity());
+
+    MX init_x_impl_orig_mx  = MX::sym("x_impl_init",  x_impl.sparsity());
+    MX init_dx_impl_orig_mx = MX::sym("dx_impl_init", dx_impl.sparsity());
+    MX init_z_orig_mx       = MX::sym("z_init",       z.sparsity());
+
+    X init_orig = vertcat(init_x_impl_orig, init_dx_impl_orig, init_z_orig);
+    MX init_orig_mx = vertcat(init_x_impl_orig_mx, init_dx_impl_orig_mx, init_z_orig_mx);
+
+    X init_sym_red = mtimes(X(var_map), init_orig);
+    nlp["p"] = vertcat(init_orig, dae_red.at("p"), dae_red.at("t"));
+    MX p = vertcat(init_orig_mx, pmx, tmx);
+
+    // Dae input sanitization
+
+    for (const auto& e : init_strength) {
+      casadi_assert(e.second.is_column() && e.second.is_dense(),
+        "Dense column vector expected for key '" + e.first + "' of init_strength. "
+        "Got " + e.second.dim(true) + " instead.");
+    }
+
+    DM init_strength_x_impl = get_from_dict(init_strength, "x_impl", DM::zeros(x_impl.numel(), 1));
+    casadi_assert(x_impl.numel()==init_strength_x_impl.numel(),
+      "init_strength 'x_impl' entry should have length " + str(x_impl.numel()) + ". "
+      "Got length " + str(init_strength_x_impl.numel()) + " instead.");
+
+    DM init_strength_dx_impl = get_from_dict(init_strength, "dx_impl", DM::zeros(dx_impl.numel(), 1));
+    casadi_assert(dx_impl.numel()==init_strength_dx_impl.numel(),
+      "init_strength 'dx_impl' entry should have length " + str(dx_impl.numel()) + ". "
+      "Got length " + str(init_strength_dx_impl.numel()) + " instead.");
+
+    DM init_strength_z = get_from_dict(init_strength, "z", DM::zeros(z.numel(), 1));
+    casadi_assert(z.numel()==init_strength_z.numel(),
+      "init_strength 'z' entry should have length " + str(z.numel()) + ". "
+      "Got length " + str(init_strength_z.numel()) + " instead.");
+    
+    DM init_strength_cat = vertcat(init_strength_x_impl, init_strength_dx_impl, init_strength_z);
+
+    DM weights = mtimes(var_map, init_strength_cat);
+    // Should be written more cleanly
+    std::vector<casadi_int> ind = sparsify(weights>0).sparsity().T().get_col();
+
+    std::vector<X> x_parts = {dae_red.at("x"), dae_red.at("x_impl"),
+                       dae_red.at("dx_impl"), dae_red.at("z")};
+
+    nlp["x"] = vertcat(x_parts);
+    nlp["g"] = vertcat(dae_red.at("I"), dae_red.at("alg"));
+    nlp["f"] = sumsqr((nlp["x"](ind)-init_sym_red(ind))*X(weights(ind)));
+
+
+    MX x0 = mtimes(var_map, init_orig_mx);
+    MX lbx = -MX::inf(nlp.at("x").numel());
+    MX ubx = MX::inf(lbx.size());
+
+    // Should be written more cleanly
+    ind = sparsify(mtimes(var_map, init_strength_cat)==-1).sparsity().T().get_col();
+    lbx(ind) = ubx(ind) = x0(ind);
+
+    Function solver = nlpsol("init_solver", init_solver, nlp, init_solver_options); 
+    MXDict res = solver(MXDict{{"x0", x0}, {"lbg", 0}, {"ubg", 0}, {"lbx", lbx}, {"ubx", ubx}, {"p", p}});
+
+    std::vector<casadi_int> x_parts_offsets = {0};
+    for (casadi_int i=0;i<x_parts.size();i+=2) {
+      x_parts_offsets.push_back(x_parts_offsets.back() + x_parts[i].numel() + x_parts[i+1].numel());
+    }
+
+    std::vector<MX> parts = vertsplit(res["x"], x_parts_offsets);
+
+    return Function("init_gen",
+      {init_x_impl_orig_mx, init_dx_impl_orig_mx, init_z_orig_mx, pmx, tmx},
+      parts,
+      {"x_impl", "dx_impl", "z", "p", "t"},
+      {"x0", "z0"});
+  }
+
+  MXDict dae_map_semi_expl(const MXDict& dae, const MXDict& dae_red,
+    Function& state_to_orig, Function& phi) {
+      return map_semi_expl(dae, dae_red, state_to_orig, phi);
+  }
+
+  SXDict dae_map_semi_expl(const SXDict& dae, const SXDict& dae_red,
+    Function& state_to_orig, Function& phi) {
+      return map_semi_expl(dae, dae_red, state_to_orig, phi);
+  }
+
+  Function dae_init_gen(const MXDict& dae, const MXDict& dae_red,
+    const std::string& init_solver, const DMDict& init_strength, const Dict& init_solver_options) {
+      return init_gen(dae, dae_red, init_solver, init_strength, init_solver_options);
+  }
+
+  Function dae_init_gen(const SXDict& dae, const SXDict& dae_red,
+    const std::string& init_solver, const DMDict& init_strength, const Dict& init_solver_options) {
+      return init_gen(dae, dae_red, init_solver, init_strength, init_solver_options);
+  }
+
+  /// @}
+
+
 
 } // namespace casadi

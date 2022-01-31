@@ -1717,7 +1717,7 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       if (e.op==OP_CALL) {
         Function d = e.data.which_function();
-        if (d.is_a("Conic", true)) {
+        if (d.is_a("Conic", true) || d.is_a("Nlpsol")) {
           if (!dep.is_null()) return stats;
           dep = d;
         }

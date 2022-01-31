@@ -65,6 +65,9 @@ namespace casadi {
       return ret;
     }
 
+    /// Coefficients of the polynomial
+    const std::vector<double>& coeff() const { return p_; }
+
     /// Degree of the polynomial
     casadi_int degree() const;
 

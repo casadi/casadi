@@ -163,6 +163,127 @@ namespace casadi {
   CASADI_EXPORT
   Function simpleIntegrator(Function f, const std::string& integrator="cvodes",
                               const Dict& integrator_options = Dict());
+
+ 
+  /**
+   * @brief 
+   * 
+   * 
+   * Index reduction leads to a new set of variables and equations.
+   * 
+   * In the process, a set of constraints (algebraic equations or derivatives) a.k.a invariants is constructed
+   * that are invariant to the problem: whenever an initial point satisfies these constraints,
+   * the boundary-value-problem outcome will keep satisfying those constraints automatically,
+   * even though they are *not* part of the reduced DAE.
+   * 
+   * For any practical numerical integration method, there will be numerical drift away from satisfaction of those constraints.
+   * In other words, you will see the value of invariants slowly moving away from original zero.
+   * 
+   * A classic mitigation technique is Baumgarte stabilization: you add these invariants to the reduced DAE
+   * as a correction term that acts in a way to make small (numerical) perturbations to the invariants decay to the origin
+   * as a dampened linear system.
+   * 
+   * in which a certain set of constraints (algebraic equations or derivatives) has been dropped in favour of 
+   * 
+   * 
+   * 
+   * 
+   * \param dae Expression dictionary describing the DAE
+   *   
+   *   Each value must be a dense column vector.
+   * 
+   *   keys:
+   *      - x_impl:  symbol for implicit differential states
+   *      - dx_impl: symbol for implicit differential state derivatives
+   *      - z:       symbol for algebraic variables
+   *      - alg:     expression for algebraic equations
+   *      - t:       symbol for time
+   *      - p:       symbol for parameters
+   * \param opts Option dictionary
+   * 
+   * 
+   *   'baumgarte_pole': double
+   *      Poles (inverse time constants) of the Baumgarte invariant correction term.
+   *      Must be <0 to dampen out perturbations
+   *      0 (default) amounts to no correction.
+   *      Corresponds to -gamma of equation (1.5) in
+   *      Ascher, Uri M., Hongsheng Chin, and Sebastian Reich. "Stabilization of DAEs and invariant manifolds." Numerische Mathematik 67.2 (1994): 131-149.
+   * 
+   * 
+   * \return Expression dictionary describing the reduced DAE
+   *   
+   *   In addition the fields allowed in the input DAE, the following keys occur:
+   *
+   *      - x:   symbol for explicit differential states
+   *      - ode: expression for right-hand-side of explicit differential states
+   *      - I:   expression for invariants
+   * 
+   */
+  /// @{
+  CASADI_EXPORT
+  MXDict dae_reduce_index(const MXDict& dae, Dict& SWIG_OUTPUT(stats), const Dict& opts={});
+  CASADI_EXPORT
+  SXDict dae_reduce_index(const SXDict& dae, Dict& SWIG_OUTPUT(stats), const Dict& opts={});
+  /// @}
+
+
+  /** \brief Turn a reduced DAE into a semi explicit form suitable for CasADi integrator
+  * 
+  * \param[in]  dae Original (unreduced) DAE structure
+  * \param[in]  dae_red Reduced DAE (see dae_reduce_index)
+  * \param[out] state_to_orig A mapping of integrator (semi explicit) states to states of the original DAE
+  * \param[out] phi A function to compute the invariants of the reduced DAE
+  *             Inputs:
+  *               - x and z: (semi explicit) integrator states; typically integrator outputs xf and zf
+  *               - p: parameters
+  *               - t: time
+  * \return Semi explicit DAE dictionary, suitable to pass to a CasADi integrator
+  * 
+  * \sa dae_reduce_index
+  */
+  /// @{
+  CASADI_EXPORT
+  MXDict dae_map_semi_expl(const MXDict& dae, const MXDict& dae_red,
+    Function& SWIG_OUTPUT(state_to_orig), Function& SWIG_OUTPUT(phi));
+  CASADI_EXPORT
+  SXDict dae_map_semi_expl(const SXDict& dae, const SXDict& dae_red,
+    Function& SWIG_OUTPUT(state_to_orig), Function& SWIG_OUTPUT(phi));
+  /// @}
+
+/** \brief Obtain a generator Function for producing consistent initial guesses of a reduced DAE
+  * 
+  * \param[in] dae Original (unreduced) DAE structure
+  * \param[in] dae_red Reduced DAE (see dae_reduce_index) 
+  * \param[in] init_solver NLP solver plugin name for nlpsol used to construct an initial guess
+  * \param[in] init_strength Influence the nature of the NLP
+  *               Structure with keys x_impl, dx_impl, z corresponding to inputs of init_gen
+  *               Each key maps to a DM that should match the variable size corresponding to that key.
+  *               For each variable the meaning of the corresponding DM value is as follows:
+  *                When >=0, indicates that the provided initial guess is used in a quadratic penalty (value used as weight)
+  *                When -1, indicates that the provided initial guess must be observed (simple bound on variable)
+  * \param[in] init_solver_options NLP solver options to be passed to nlpsol
+  *
+  * \return init_gen A function to generate a consistent initial guess that can
+  *             be used to pass to an integrator constructed from a semi explict reduced DAE
+  *             Inputs:
+  *               - x_impl, dx_impl, z: initial guesses in the original DAE space
+  *               - p: parameters
+  *               - t: time
+  *             Outputs:
+  *               - x0, z0: (semi explicit) integrator states and algebraic variables;
+  *                         typically used as input for integrators
+  * 
+  * \sa dae_reduce_index
+  */
+  /// @{
+  CASADI_EXPORT
+  Function dae_init_gen(const MXDict& dae, const MXDict& dae_red,
+    const std::string& init_solver, const DMDict& init_strength=DMDict(), const Dict& init_solver_options=Dict());
+  CASADI_EXPORT
+  Function dae_init_gen(const SXDict& dae, const SXDict& dae_red,
+    const std::string& init_solver, const DMDict& init_strength=DMDict(), const Dict& init_solver_options=Dict());
+  /// @}
+
 } // namespace casadi
 
 #endif // CASADI_INTEGRATION_TOOLS_HPP
