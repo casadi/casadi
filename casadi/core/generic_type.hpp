@@ -221,6 +221,13 @@ namespace casadi {
 
 #ifndef SWIG
   template<class T>
+  T get_from_dict(const std::map<std::string,T>& d, const std::string& key, const T& default_value) {
+    auto it = d.find(key);
+    if (it==d.end()) return default_value;
+    return it->second;
+  }
+
+  template<class T>
   T get_from_dict(const Dict& d, const std::string& key, const T& default_value) {
     auto it = d.find(key);
     if (it==d.end()) return default_value;
