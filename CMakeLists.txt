@@ -761,7 +761,7 @@ set(BUILD_MUMPS_TP_VERSION "3.0.2")
 set(BUILD_METIS_TP_VERSION "2.0.0")
 option(WITH_BUILD_MUMPS "Compile MUMPS itself (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) instead of looking for it on your system" OFF)
 if(WITH_MUMPS OR WITH_BUILD_MUMPS OR REQUIRE_IPOPT OR REQUIRE_CLP)
-	set(REQUIRE_MUMPS OFF)
+	set(REQUIRE_MUMPS ON)
 endif()
 
 # HSL: Sparse direct linear solvers
