@@ -1467,8 +1467,8 @@ class Integrationtests(casadiTestCase):
 
         grid = list(np.linspace(0,5,1000))
         if isinstance(index,str):
-          with self.assertInException(index):
-            dae_reduce_index(dae, {"baumgarte_pole": -1, "algorithm": "pantelides", "max_iter": 20})
+          #with self.assertInException(index):
+          #  #dae_reduce_index(dae, {"baumgarte_pole": -1, "algorithm": "pantelides", "max_iter": 20})
           continue
         (dae_reduced,meta) = dae_reduce_index(dae, {"baumgarte_pole": -1, "algorithm": "pantelides"}) # soares_secchi
         assert meta["index"]==index
