@@ -801,7 +801,7 @@ namespace casadi {
   const std::map<std::string, X>
   reduce_index_gen(const std::map<std::string, X>& dae, Dict& stats, const Dict& opts) {
     double baumgarte_pole_ = 0;
-    std::string algorithm = "soares_secchi";
+    std::string algorithm = "pantelides";
     casadi_int max_iter = 500;
     // Option parsing
     for (auto&& op : opts) {
