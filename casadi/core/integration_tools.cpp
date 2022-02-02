@@ -469,7 +469,7 @@ namespace casadi {
 
     typedef struct GraphStruct Graph;
 
-    bool graph_add_der(Graph& G, Variable* v) {
+    void graph_add_der(Graph& G, Variable* v) {
       // Push new equation to the graph
       G.V.push_back(new Variable());
       Variable* v_new = G.V.back();
@@ -493,7 +493,7 @@ namespace casadi {
       }
     }
 
-    bool graph_add_der(Graph& G, Equation* e, bool add_old=false) {
+    void graph_add_der(Graph& G, Equation* e, bool add_old=false) {
       // Push new equation to the graph
       G.E.push_back(new Equation());
 
