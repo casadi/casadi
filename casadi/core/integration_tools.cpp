@@ -343,10 +343,10 @@ namespace casadi {
     MX xf = x0;
     for (casadi_int k=0; k<N; ++k) {
       std::vector<MX> ifcn_out = ifcn({repmat(xf, order), xf, p, h});
-      x = vertsplit(ifcn_out[0], x0.size1());
+      x = vertsplit(ifcn_out[0], xf.size1());
 
       // State at end of step
-      xf = D[0]*x0;
+      xf = D[0]*xf;
       for (casadi_int i=1; i<=order; ++i) {
         xf += D[i]*x[i-1];
       }
