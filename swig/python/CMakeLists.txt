@@ -201,6 +201,30 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
   COMPONENT install_python
 )
 
+# Install pip metadata files to ensure that casadi installed via CMake is listed by pip list
+# See https://packaging.python.org/specifications/recording-installed-packages/
+# and https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata
+option(CASADI_PYTHON_PIP_METADATA_INSTALL "Use CMake to install Python pip metadata. Set to off if some other tool already installs it." OFF)
+mark_as_advanced(CASADI_PYTHON_PIP_METADATA_INSTALL)
+set(CASADI_PYTHON_PIP_METADATA_INSTALLER "cmake" CACHE STRING "Specify the string to identify the pip Installer. Default: cmake, change this if you are using another tool.")
+mark_as_advanced(CASADI_PYTHON_PIP_METADATA_INSTALLER)
+if (CASADI_PYTHON_PIP_METADATA_INSTALL)
+  if (WIN32)
+    set(NEW_LINE "\n\r")
+  else()
+    set(NEW_LINE "\n")
+  endif()
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/METADATA "")
+  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/METADATA "Metadata-Version: 2.1${NEW_LINE}")
+  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/METADATA "Name: casadi${NEW_LINE}")
+  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/METADATA "Version: ${CASADI_VERSION}${NEW_LINE}")
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/INSTALLER "${CASADI_PYTHON_PIP_METADATA_INSTALLER}${NEW_LINE}")
+  install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/METADATA" "${CMAKE_CURRENT_BINARY_DIR}/INSTALLER"
+    DESTINATION ${PYTHON_PREFIX}/casadi-${CASADI_VERSION}.dist-info
+    COMPONENT install_python)
+endif()
+
 # Example of how to extend CasADi with additional features
 if (WITH_EXTENDING_CASADI)
   set_source_files_properties(../extending_casadi/extending_casadi.i  PROPERTIES  CPLUSPLUS ON)
