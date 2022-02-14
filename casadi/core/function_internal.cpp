@@ -3035,7 +3035,7 @@ namespace casadi {
     casadi_error("'n_instructions' not defined for " + class_name());
   }
 
-  casadi_int FunctionInternal::instruction_id(casadi_int k) const {
+  Operation FunctionInternal::instruction_id(casadi_int k) const {
     casadi_error("'instruction_id' not defined for " + class_name());
   }
 

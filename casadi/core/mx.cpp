@@ -505,7 +505,7 @@ namespace casadi {
     *this = m->get_nzassign(*this, ind1 ? kk-1 : kk);
   }
 
-  MX MX::binary(casadi_int op, const MX &x, const MX &y) {
+  MX MX::binary(Operation op, const MX &x, const MX &y) {
     // Check, correct dimensions
     if (x.size()!=y.size() && !x.is_scalar() && !y.is_scalar()) {
       // x and y are horizontal multiples of each other?
@@ -524,7 +524,7 @@ namespace casadi {
     return x->get_binary(op, y);
   }
 
-  MX MX::unary(casadi_int op, const MX &x) {
+  MX MX::unary(Operation op, const MX &x) {
     return x->get_unary(Operation(op));
   }
 
@@ -569,10 +569,10 @@ namespace casadi {
   }
 
   MX MX::operator-() const {
-    if ((*this)->op()==OP_NEG) {
+    if ((*this)->op()==Operation::OP_NEG) {
       return (*this)->dep(0);
     } else {
-      return (*this)->get_unary(OP_NEG);
+      return (*this)->get_unary(Operation::OP_NEG);
     }
   }
 
@@ -686,7 +686,7 @@ namespace casadi {
   }
 
   MX MX::printme(const MX& b) const {
-    return binary(OP_PRINTME, *this, b);
+    return binary(Operation::OP_PRINTME, *this, b);
   }
 
   MX MX::attachAssert(const MX& y, const std::string &fail_message) const {
@@ -702,7 +702,7 @@ namespace casadi {
 
   MX MX::lift(const MX& x, const MX& x_guess) {
     casadi_assert_dev(x.sparsity()==x_guess.sparsity());
-    return x->_get_binary(OP_LIFT, x_guess, false, false);
+    return x->_get_binary(Operation::OP_LIFT, x_guess, false, false);
   }
 
   DM MX::evalf(const MX& m) {
@@ -733,15 +733,15 @@ namespace casadi {
   }
 
   bool MX::is_symbolic() const {
-    return (*this)->op()==OP_PARAMETER;
+    return (*this)->op()==Operation::OP_PARAMETER;
   }
 
   bool MX::is_constant() const {
-    return (*this)->op()==OP_CONST;
+    return (*this)->op()==Operation::OP_CONST;
   }
 
   bool MX::is_call() const {
-    return (*this)->op()==OP_CALL;
+    return (*this)->op()==Operation::OP_CALL;
   }
 
   Function MX::which_function() const {
@@ -756,12 +756,12 @@ namespace casadi {
     return (*this)->which_output();
   }
 
-  bool MX::is_op(casadi_int op) const {
+  bool MX::is_op(Operation op) const {
     return (*this)->op()==op;
   }
 
   bool MX::is_multiplication() const {
-    return (*this)->op()==OP_MTIMES;
+    return (*this)->op()==Operation::OP_MTIMES;
   }
 
   bool MX::is_norm() const {
@@ -784,7 +784,7 @@ namespace casadi {
     return (*this)->is_unary();
   }
 
-  casadi_int MX::op() const {
+  Operation MX::op() const {
     return (*this)->op();
   }
 
@@ -948,7 +948,7 @@ namespace casadi {
   }
 
   bool MX::is_transpose() const {
-    return op()==OP_TRANSPOSE;
+    return op()==Operation::OP_TRANSPOSE;
   }
 
   bool MX::is_regular() const {
@@ -1424,7 +1424,7 @@ namespace casadi {
 
     for (auto it=algorithm.begin(); it!=algorithm.end(); ++it) {
 
-      if (it->op != OP_OUTPUT) {
+      if (it->op != Operation::OP_OUTPUT) {
         // Check if it->data points to a supplied expr
         it_lookup = expr_lookup.find((it->data).operator->());
 
@@ -1438,14 +1438,14 @@ namespace casadi {
       }
 
       switch (it->op) {
-      case OP_INPUT:
+      case Operation::OP_INPUT:
         tainted[it->res.front()] = false;
         break;
-      case OP_PARAMETER:
+      case Operation::OP_PARAMETER:
         swork[it->res.front()] = it->data;
         tainted[it->res.front()] = false;
         break;
-      case OP_OUTPUT:
+      case Operation::OP_OUTPUT:
         casadi_assert(it->data->segment()==0, "Not implemented");
         f_out[it->data->ind()] = swork[it->arg.front()];
         break;
@@ -1533,8 +1533,8 @@ namespace casadi {
       for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
         // Increase usage counters
         switch (it->op) {
-        case OP_CONST:
-        case OP_PARAMETER:
+        case Operation::OP_CONST:
+        case Operation::OP_PARAMETER:
           break;
         default: // Unary operation, binary operation or output
           for (casadi_int c=0; c<it->arg.size(); ++c) {
@@ -1560,9 +1560,9 @@ namespace casadi {
         }
         // Perform the operation
         switch (it->op) {
-        case OP_OUTPUT:
+        case Operation::OP_OUTPUT:
           break;
-        case OP_CONST:
+        case Operation::OP_CONST:
           usecount[it->res.front()] = -1; // Never extract constants
           break;
         default:
@@ -1570,7 +1570,7 @@ namespace casadi {
             if (it->res[c]>=0) {
               work[it->res[c]] = it->data.get_output(c);
               origin[it->res[c]] = make_pair(k, c);
-              if (lift_calls && it->op == OP_CALL) {
+              if (lift_calls && it->op == Operation::OP_CALL) {
                 // If function call, replace right away
                 replace.push_back(origin.at(it->res[c]));
                 usecount.at(it->res[c]) = -1; // Do not replace again
@@ -1598,16 +1598,16 @@ namespace casadi {
       k = 0;
       for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
         switch (it->op) {
-        case OP_OUTPUT:
+        case Operation::OP_OUTPUT:
           casadi_assert(it->data->segment()==0, "Not implemented");
           ex[it->data->ind()] = work[it->arg.front()];
           break;
-        case OP_CONST:
+        case Operation::OP_CONST:
           work[it->res.front()] = it->data;
           break;
         default:
           {
-            if (it->op == OP_PARAMETER) {
+            if (it->op == Operation::OP_PARAMETER) {
               // Free parameter
               work[it->res.front()] = it->data;
             } else {
@@ -1634,11 +1634,11 @@ namespace casadi {
               bool replace_node = replace_it != replace.end()
                 && replace_it->first==k && replace_it->second==c;
               // Call node (introduce variable for outputs, even if unused)
-              bool output_node = lift_calls && it->op == OP_CALL;
+              bool output_node = lift_calls && it->op == Operation::OP_CALL;
               // Skip if no reason to replace
               if (!replace_node && !output_node) continue;
               // Create a new variable
-              Sparsity v_sp = it->op == OP_PARAMETER ? it->data.sparsity() : ores.at(c).sparsity();
+              Sparsity v_sp = it->op == Operation::OP_PARAMETER ? it->data.sparsity() : ores.at(c).sparsity();
               v.push_back(MX::sym(v_prefix + std::to_string(v_ind++) + v_suffix, v_sp));
               // Add definition of new variable
               if (ind >= 0) {

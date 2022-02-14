@@ -30,6 +30,8 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "calculus.hpp"
+
 namespace casadi {
   class Slice;
   class Linsol;
@@ -93,6 +95,7 @@ namespace casadi {
     void unpack(int& e);
     void unpack(bool& e);
     void unpack(casadi_int& e);
+    void unpack(Operation& e);
     void unpack(size_t& e);
     void unpack(std::string& e);
     void unpack(double& e);
@@ -221,6 +224,7 @@ namespace casadi {
     void pack(int e);
     void pack(bool e);
     void pack(casadi_int e);
+    void pack(Operation e);
     void pack(size_t e);
     void pack(double e);
     void pack(const std::string& e);

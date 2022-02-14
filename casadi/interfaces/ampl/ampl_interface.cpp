@@ -169,7 +169,7 @@ namespace casadi {
     // Loop over the algorithm
     for (casadi_int k=0; k<F.n_instructions(); ++k) {
       // Get the atomic operation
-      casadi_int op = F.instruction_id(k);
+      Operation op = F.instruction_id(k);
       // Get the operation indices
       std::vector<casadi_int> o = F.instruction_output(k);
       casadi_int o0=-1, o1=-1, i0=-1, i1=-1;
@@ -179,13 +179,13 @@ namespace casadi {
       if (!i.empty()) i0 = i[0];
       if (i.size()>1) i1 = i[1];
       switch (op) {
-        case OP_CONST:
+        case Operation::OP_CONST:
         work[o0] = "n" + str(F.instruction_constant(k)) + "\n";
         break;
-        case OP_INPUT:
+        case Operation::OP_INPUT:
         work[o0] = "v" + str(i0*v.size() + i1) + "\n";
         break;
-        case OP_OUTPUT:
+        case Operation::OP_OUTPUT:
         if (o0==0) {
           // Common subexpression
           nl_init_ << "V" << (x.nnz()+o1) << " 0 0\n" << work[i0];
@@ -197,32 +197,32 @@ namespace casadi {
           nl_init_ << "C" << o1 << "\n" << work[i0];
         }
         break;
-        case OP_ADD: work[o0] = "o0\n" + work[i0] + work[i1]; break;
-        case OP_SUB: work[o0] = "o1\n" + work[i0] + work[i1]; break;
-        case OP_MUL: work[o0] = "o2\n" + work[i0] + work[i1]; break;
-        case OP_DIV: work[o0] = "o3\n" + work[i0] + work[i1]; break;
-        case OP_SQ: work[o0] = "o5\n" + work[i0] + "n2\n"; break;
-        case OP_POW: work[o0] = "o5\n" + work[i0] + work[i1]; break;
-        case OP_FLOOR: work[o0] = "o13\n" + work[i0]; break;
-        case OP_CEIL: work[o0] = "o14\n" + work[i0]; break;
-        case OP_FABS: work[o0] = "o15\n" + work[i0]; break;
-        case OP_NEG: work[o0] = "o16\n" + work[i0]; break;
-        case OP_TANH: work[o0] = "o37\n" + work[i0]; break;
-        case OP_TAN: work[o0] = "o38\n" + work[i0]; break;
-        case OP_SQRT: work[o0] = "o39\n" + work[i0]; break;
-        case OP_SINH: work[o0] = "o40\n" + work[i0]; break;
-        case OP_SIN: work[o0] = "o41\n" + work[i0]; break;
-        case OP_LOG: work[o0] = "o43\n" + work[i0]; break;
-        case OP_EXP: work[o0] = "o44\n" + work[i0]; break;
-        case OP_COSH: work[o0] = "o45\n" + work[i0]; break;
-        case OP_COS: work[o0] = "o46\n" + work[i0]; break;
-        case OP_ATANH: work[o0] = "o47\n" + work[i0]; break;
-        case OP_ATAN2: work[o0] = "o48\n" + work[i0] + work[i1]; break;
-        case OP_ATAN: work[o0] = "o49\n" + work[i0]; break;
-        case OP_ASINH: work[o0] = "o50\n" + work[i0]; break;
-        case OP_ASIN: work[o0] = "o51\n" + work[i0]; break;
-        case OP_ACOSH: work[o0] = "o52\n" + work[i0]; break;
-        case OP_ACOS: work[o0] = "o53\n" + work[i0]; break;
+        case Operation::OP_ADD: work[o0] = "o0\n" + work[i0] + work[i1]; break;
+        case Operation::OP_SUB: work[o0] = "o1\n" + work[i0] + work[i1]; break;
+        case Operation::OP_MUL: work[o0] = "o2\n" + work[i0] + work[i1]; break;
+        case Operation::OP_DIV: work[o0] = "o3\n" + work[i0] + work[i1]; break;
+        case Operation::OP_SQ: work[o0] = "o5\n" + work[i0] + "n2\n"; break;
+        case Operation::OP_POW: work[o0] = "o5\n" + work[i0] + work[i1]; break;
+        case Operation::OP_FLOOR: work[o0] = "o13\n" + work[i0]; break;
+        case Operation::OP_CEIL: work[o0] = "o14\n" + work[i0]; break;
+        case Operation::OP_FABS: work[o0] = "o15\n" + work[i0]; break;
+        case Operation::OP_NEG: work[o0] = "o16\n" + work[i0]; break;
+        case Operation::OP_TANH: work[o0] = "o37\n" + work[i0]; break;
+        case Operation::OP_TAN: work[o0] = "o38\n" + work[i0]; break;
+        case Operation::OP_SQRT: work[o0] = "o39\n" + work[i0]; break;
+        case Operation::OP_SINH: work[o0] = "o40\n" + work[i0]; break;
+        case Operation::OP_SIN: work[o0] = "o41\n" + work[i0]; break;
+        case Operation::OP_LOG: work[o0] = "o43\n" + work[i0]; break;
+        case Operation::OP_EXP: work[o0] = "o44\n" + work[i0]; break;
+        case Operation::OP_COSH: work[o0] = "o45\n" + work[i0]; break;
+        case Operation::OP_COS: work[o0] = "o46\n" + work[i0]; break;
+        case Operation::OP_ATANH: work[o0] = "o47\n" + work[i0]; break;
+        case Operation::OP_ATAN2: work[o0] = "o48\n" + work[i0] + work[i1]; break;
+        case Operation::OP_ATAN: work[o0] = "o49\n" + work[i0]; break;
+        case Operation::OP_ASINH: work[o0] = "o50\n" + work[i0]; break;
+        case Operation::OP_ASIN: work[o0] = "o51\n" + work[i0]; break;
+        case Operation::OP_ACOSH: work[o0] = "o52\n" + work[i0]; break;
+        case Operation::OP_ACOS: work[o0] = "o53\n" + work[i0]; break;
         default:
         if (casadi_math<double>::ndeps(op)==1) {
           casadi_error(casadi_math<double>::print(op, "x") + " not supported");

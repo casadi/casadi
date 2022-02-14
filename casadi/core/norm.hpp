@@ -93,7 +93,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_NORMF;}
+    Operation op() const override { return Operation::OP_NORMF;}
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new NormF(s); }
@@ -120,7 +120,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_NORM2;}
+    Operation op() const override { return Operation::OP_NORM2;}
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new Norm2(s); }
@@ -147,7 +147,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_NORM1;}
+    Operation op() const override { return Operation::OP_NORM1;}
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new Norm1(s); }
@@ -174,7 +174,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_NORMINF;}
+    Operation op() const override { return Operation::OP_NORMINF;}
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new NormInf(s); }

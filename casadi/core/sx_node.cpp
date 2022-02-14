@@ -112,7 +112,7 @@ namespace casadi {
       for (casadi_int i=0; i<n_dep(); ++i) {
         dep(i)->can_inline(nodeind);
       }
-    } else if (it->second==0 && op()!=OP_PARAMETER) {
+    } else if (it->second==0 && op()!=Operation::OP_PARAMETER) {
       // Node encountered before, do not inline (except if symbolic primitive)
       it->second = -1;
     }
@@ -208,7 +208,7 @@ namespace casadi {
   }
 
   SXNode* SXNode::deserialize(DeserializingStream& s) {
-    casadi_int op;
+    Operation op;
     s.unpack("SXNode::op", op);
 
     if (casadi_math<MX>::is_binary(op)) {
@@ -227,9 +227,9 @@ namespace casadi {
 
 
   // Note: binary/unary operations are ommitted here
-  std::map<casadi_int, SXNode* (*)(DeserializingStream&)> SXNode::deserialize_map = {
-    {OP_PARAMETER, SymbolicSX::deserialize},
-    {OP_CONST, ConstantSX_deserialize}};
+  std::map<Operation, SXNode* (*)(DeserializingStream&)> SXNode::deserialize_map = {
+    {Operation::OP_PARAMETER, SymbolicSX::deserialize},
+    {Operation::OP_CONST, ConstantSX_deserialize}};
 
 
 } // namespace casadi

@@ -57,7 +57,7 @@ namespace casadi {
 #endif // SWIG
 
   /// Enum for quick access to any node
-  enum Operation {
+  enum class Operation : unsigned char {
     // Simple assignment
     OP_ASSIGN,
 
@@ -195,6 +195,8 @@ namespace casadi {
     OP_BSPLINE,
 
     OP_CONVEXIFY,
+
+    OP_INVALID
   };
   #define NUM_BUILT_IN_OPS (OP_CONVEXIFY+1)
 
@@ -267,8 +269,10 @@ namespace casadi {
   #endif //HAS_COPYSIGN
 
   // Integer maximum and minimum
-  inline casadi_int casadi_max(casadi_int x, casadi_int y) { return std::max(x, y);}
-  inline casadi_int casadi_min(casadi_int x, casadi_int y) { return std::min(x, y);}
+  template <typename T>
+  inline T casadi_max(T x, T y) { return std::max(x, y);}
+  template <typename T>
+  inline T casadi_min(T x, T y) { return std::min(x, y);}
 
   /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x==0 ? 0 : y;}
@@ -317,7 +321,7 @@ namespace casadi {
     return x*x;
   }
 
-  template<casadi_int I>
+  template<Operation I>
   struct UnaryOperation {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, T& f);
@@ -326,7 +330,7 @@ namespace casadi {
     template<typename T> static inline void der(const T& x, const T& f, T* d);
   };
 
-  template<casadi_int I>
+  template<Operation I>
   struct BinaryOperation {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
@@ -337,7 +341,7 @@ namespace casadi {
         UnaryOperation<I>::der(x, f, d); d[1]=0; }
   };
 
-  template<casadi_int I>
+  template<Operation I>
   struct BinaryOperationE {
     /// Function evaluation
     template<typename T> static inline T fcn(const T& x, const T& y) {
@@ -348,7 +352,7 @@ namespace casadi {
   };
 
   /// Calculate function and derivative
-  template<casadi_int I>
+  template<Operation I>
   struct DerBinaryOpertion {
     /// Perform the operation
     template<typename T> static inline void derf(const T& x, const T& y, T& f, T* d) {
@@ -370,7 +374,7 @@ namespace casadi {
   };
 
   /// Perform a binary operation on two scalars
-  template<casadi_int I>
+  template<Operation I>
   struct BinaryOperationSS {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T& y, T& f, casadi_int n) {
@@ -386,7 +390,7 @@ namespace casadi {
 
 
   /// Perform a binary operation on two vectors
-  template<casadi_int I>
+  template<Operation I>
   struct BinaryOperationVV {
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T* y, T* f, casadi_int n) {
@@ -405,7 +409,7 @@ namespace casadi {
   };
 
   /// Perform a binary operation on a vector and a scalar
-  template<casadi_int I>
+  template<Operation I>
   struct BinaryOperationVS {
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T& y, T* f, casadi_int n) {
@@ -424,7 +428,7 @@ namespace casadi {
   };
 
   /// Perform a binary operation on a scalar and a vector
-  template<casadi_int I>
+  template<Operation I>
   struct BinaryOperationSV {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T* y, T* f, casadi_int n) {
@@ -444,131 +448,131 @@ namespace casadi {
 
   ///@{
   /// Smoothness (by default true)
-  template<casadi_int I> struct SmoothChecker { static const bool check=true;};
-  template<>      struct SmoothChecker<OP_LT>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_LE>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_CEIL>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_FMOD>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_EQ>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_NE>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_COPYSIGN>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_NOT>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_AND>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_OR>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_IF_ELSE_ZERO>{ static const bool check=false;};
+  template<Operation I> struct SmoothChecker { static const bool check=true;};
+  template<>      struct SmoothChecker<Operation::OP_LT>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_LE>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_FLOOR>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_CEIL>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_FMOD>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_EQ>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_NE>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_SIGN>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_COPYSIGN>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_NOT>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_AND>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_OR>{ static const bool check=false;};
+  template<>      struct SmoothChecker<Operation::OP_IF_ELSE_ZERO>{ static const bool check=false;};
   ///@}
 
   ///@{
   /// If evaluated with the first argument zero, is the result zero?
-  template<casadi_int I> struct F0XChecker { static const bool check=false;};
-  template<>      struct F0XChecker<OP_ASSIGN>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_MUL>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_DIV>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_NEG>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_POW>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_CONSTPOW>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_SQRT>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_SQ>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_TWICE>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_SIN>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_TAN>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_ATAN>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_ASIN>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_FLOOR>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_CEIL>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_FMOD>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_FABS>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_SIGN>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_COPYSIGN>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_ERF>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_SINH>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_TANH>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_ASINH>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_ATANH>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_AND>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<Operation I> struct F0XChecker { static const bool check=false;};
+  template<>      struct F0XChecker<Operation::OP_ASSIGN>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_MUL>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_DIV>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_NEG>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_POW>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_CONSTPOW>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_SQRT>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_SQ>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_TWICE>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_SIN>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_TAN>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_ATAN>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_ASIN>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_FLOOR>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_CEIL>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_FMOD>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_FABS>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_SIGN>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_COPYSIGN>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_ERF>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_SINH>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_TANH>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_ASINH>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_ATANH>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_ERFINV>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_AND>{ static const bool check=true;};
+  template<>      struct F0XChecker<Operation::OP_IF_ELSE_ZERO>{ static const bool check=true;};
   ///@}
 
   ///@{
   /// If evaluated with the second argument zero, is the result zero?
-  template<casadi_int I> struct FX0Checker { static const bool check=false;};
-  template<>      struct FX0Checker<OP_MUL>{ static const bool check=true;};
-  template<>      struct FX0Checker<OP_AND>{ static const bool check=true;};
-  template<>      struct FX0Checker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<Operation I> struct FX0Checker { static const bool check=false;};
+  template<>      struct FX0Checker<Operation::OP_MUL>{ static const bool check=true;};
+  template<>      struct FX0Checker<Operation::OP_AND>{ static const bool check=true;};
+  template<>      struct FX0Checker<Operation::OP_IF_ELSE_ZERO>{ static const bool check=true;};
   ///@}
 
   ///@{
   /// If evaluated with both arguments zero, is the result zero?
-  template<casadi_int I> struct F00Checker {
+  template<Operation I> struct F00Checker {
     static const bool check=F0XChecker<I>::check || FX0Checker<I>::check;
   };
-  template<>      struct F00Checker<OP_ADD>{ static const bool check=true;};
-  template<>      struct F00Checker<OP_SUB>{ static const bool check=true;};
-  template<>      struct F00Checker<OP_FMIN>{ static const bool check=true;};
-  template<>      struct F00Checker<OP_FMAX>{ static const bool check=true;};
-  template<>      struct F00Checker<OP_AND>{ static const bool check=true;};
-  template<>      struct F00Checker<OP_OR>{ static const bool check=true;};
-  template<>      struct F00Checker<OP_COPYSIGN>{ static const bool check=true;};
-  template<>      struct F00Checker<OP_LT>{ static const bool check=true;};
+  template<>      struct F00Checker<Operation::OP_ADD>{ static const bool check=true;};
+  template<>      struct F00Checker<Operation::OP_SUB>{ static const bool check=true;};
+  template<>      struct F00Checker<Operation::OP_FMIN>{ static const bool check=true;};
+  template<>      struct F00Checker<Operation::OP_FMAX>{ static const bool check=true;};
+  template<>      struct F00Checker<Operation::OP_AND>{ static const bool check=true;};
+  template<>      struct F00Checker<Operation::OP_OR>{ static const bool check=true;};
+  template<>      struct F00Checker<Operation::OP_COPYSIGN>{ static const bool check=true;};
+  template<>      struct F00Checker<Operation::OP_LT>{ static const bool check=true;};
   ///@}
 
   ///@{
   /// Is commutative
-  template<casadi_int I> struct CommChecker { static const bool check=false;};
-  template<>      struct CommChecker<OP_ADD>{ static const bool check=true;};
-  template<>      struct CommChecker<OP_MUL>{ static const bool check=true;};
-  template<>      struct CommChecker<OP_EQ>{ static const bool check=true;};
-  template<>      struct CommChecker<OP_NE>{ static const bool check=true;};
-  template<>      struct CommChecker<OP_AND>{ static const bool check=true;};
-  template<>      struct CommChecker<OP_OR>{ static const bool check=true;};
+  template<Operation I> struct CommChecker { static const bool check=false;};
+  template<>      struct CommChecker<Operation::OP_ADD>{ static const bool check=true;};
+  template<>      struct CommChecker<Operation::OP_MUL>{ static const bool check=true;};
+  template<>      struct CommChecker<Operation::OP_EQ>{ static const bool check=true;};
+  template<>      struct CommChecker<Operation::OP_NE>{ static const bool check=true;};
+  template<>      struct CommChecker<Operation::OP_AND>{ static const bool check=true;};
+  template<>      struct CommChecker<Operation::OP_OR>{ static const bool check=true;};
   ///@}
 
   ///@{
   /// Always non-negative (false by default)
-  template<casadi_int I> struct NonnegativeChecker { static const bool check=false;};
-  template<>      struct NonnegativeChecker<OP_SQRT>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_SQ>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_EXP>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_LT>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_LE>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_EQ>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_NE>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_NOT>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_AND>{ static const bool check=true;};
-  template<>      struct NonnegativeChecker<OP_OR>{ static const bool check=true;};
+  template<Operation I> struct NonnegativeChecker { static const bool check=false;};
+  template<>      struct NonnegativeChecker<Operation::OP_SQRT>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_SQ>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_EXP>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_LT>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_LE>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_EQ>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_NE>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_NOT>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_AND>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<Operation::OP_OR>{ static const bool check=true;};
   ///@}
 
   ///@{
   /// Is the operation binary as opposed to unary
-  template<casadi_int I> struct NargChecker { static const casadi_int check=1;};
-  template<>      struct NargChecker<OP_ADD>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_SUB>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_MUL>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_DIV>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_POW>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_CONSTPOW>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_EQ>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_NE>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_AND>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_OR>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_FMIN>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_FMAX>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_PRINTME>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_ATAN2>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_IF_ELSE_ZERO>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_FMOD>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_COPYSIGN>{ static const casadi_int check=2;};
-  template<>      struct NargChecker<OP_CONST>{ static const casadi_int check=0;};
-  template<>      struct NargChecker<OP_PARAMETER>{ static const casadi_int check=0;};
-  template<>      struct NargChecker<OP_INPUT>{ static const casadi_int check=0;};
+  template<Operation I> struct NargChecker { static const casadi_int check=1;};
+  template<>      struct NargChecker<Operation::OP_ADD>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_SUB>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_MUL>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_DIV>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_POW>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_CONSTPOW>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_EQ>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_NE>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_AND>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_OR>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_FMIN>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_FMAX>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_PRINTME>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_ATAN2>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_IF_ELSE_ZERO>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_FMOD>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_COPYSIGN>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<Operation::OP_CONST>{ static const casadi_int check=0;};
+  template<>      struct NargChecker<Operation::OP_PARAMETER>{ static const casadi_int check=0;};
+  template<>      struct NargChecker<Operation::OP_INPUT>{ static const casadi_int check=0;};
   ///@}
 
   /// Simple assignment
   template<>
-  struct UnaryOperation<OP_ASSIGN>{
+  struct UnaryOperation<Operation::OP_ASSIGN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = x;}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 1; }
@@ -576,7 +580,7 @@ namespace casadi {
 
   /// Addition
   template<>
-  struct BinaryOperation<OP_ADD>{
+  struct BinaryOperation<Operation::OP_ADD>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x+y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
@@ -585,7 +589,7 @@ namespace casadi {
 
   /// Subtraction
   template<>
-  struct BinaryOperation<OP_SUB>{
+  struct BinaryOperation<Operation::OP_SUB>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x-y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
@@ -594,7 +598,7 @@ namespace casadi {
 
   /// Multiplication
   template<>
-  struct BinaryOperation<OP_MUL>{
+  struct BinaryOperation<Operation::OP_MUL>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x*y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
@@ -603,7 +607,7 @@ namespace casadi {
 
   /// Division
   template<>
-  struct BinaryOperation<OP_DIV>{
+  struct BinaryOperation<Operation::OP_DIV>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x/y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
@@ -612,7 +616,7 @@ namespace casadi {
 
   /// Negation
   template<>
-  struct UnaryOperation<OP_NEG>{
+  struct UnaryOperation<Operation::OP_NEG>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = -x;}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=-1;}
@@ -620,7 +624,7 @@ namespace casadi {
 
   /// Natural exponent
   template<>
-  struct UnaryOperation<OP_EXP>{
+  struct UnaryOperation<Operation::OP_EXP>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = exp(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=f;}
@@ -628,7 +632,7 @@ namespace casadi {
 
   /// Natural logarithm
   template<>
-  struct UnaryOperation<OP_LOG>{
+  struct UnaryOperation<Operation::OP_LOG>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = log(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=1/x;}
@@ -636,7 +640,7 @@ namespace casadi {
 
   /// Power, defined only for x>=0
   template<>
-  struct BinaryOperation<OP_POW>{
+  struct BinaryOperation<Operation::OP_POW>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = pow(x, y);}
     // See issue #104 why d[0] is no longer y*f/x
@@ -646,7 +650,7 @@ namespace casadi {
 
   /// Power, defined only for y constant
   template<>
-  struct BinaryOperation<OP_CONSTPOW>{
+  struct BinaryOperation<Operation::OP_CONSTPOW>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = pow(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
@@ -655,7 +659,7 @@ namespace casadi {
 
   /// Square root
   template<>
-  struct UnaryOperation<OP_SQRT>{
+  struct UnaryOperation<Operation::OP_SQRT>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = sqrt(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=1/(twice(f));}
@@ -663,7 +667,7 @@ namespace casadi {
 
   /// Square
   template<>
-  struct UnaryOperation<OP_SQ>{
+  struct UnaryOperation<Operation::OP_SQ>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = sq(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=twice(x);}
@@ -671,14 +675,14 @@ namespace casadi {
 
   /// Times two
   template<>
-  struct UnaryOperation<OP_TWICE>{
+  struct UnaryOperation<Operation::OP_TWICE>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = 2.*x;}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 2; }
   };
 
   /// Sine
   template<>
-  struct UnaryOperation<OP_SIN>{
+  struct UnaryOperation<Operation::OP_SIN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = sin(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=cos(x);}
@@ -686,7 +690,7 @@ namespace casadi {
 
   /// Cosine
   template<>
-  struct UnaryOperation<OP_COS>{
+  struct UnaryOperation<Operation::OP_COS>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = cos(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=-sin(x);}
@@ -694,7 +698,7 @@ namespace casadi {
 
   /// Tangent
   template<>
-  struct UnaryOperation<OP_TAN>{
+  struct UnaryOperation<Operation::OP_TAN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = tan(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d)
@@ -703,7 +707,7 @@ namespace casadi {
 
   /// Arcus sine
   template<>
-  struct UnaryOperation<OP_ASIN>{
+  struct UnaryOperation<Operation::OP_ASIN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = asin(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=1/sqrt(1-x*x);}
@@ -711,7 +715,7 @@ namespace casadi {
 
   /// Arcus cosine
   template<>
-  struct UnaryOperation<OP_ACOS>{
+  struct UnaryOperation<Operation::OP_ACOS>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = acos(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d)
@@ -720,7 +724,7 @@ namespace casadi {
 
   /// Arcus tangent
   template<>
-  struct UnaryOperation<OP_ATAN>{
+  struct UnaryOperation<Operation::OP_ATAN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = atan(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 1/(1+x*x);}
@@ -728,7 +732,7 @@ namespace casadi {
 
   /// Less than
   template<>
-  struct BinaryOperation<OP_LT>{
+  struct BinaryOperation<Operation::OP_LT>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x < y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
@@ -737,7 +741,7 @@ namespace casadi {
 
   /// Less or equal to
   template<>
-  struct BinaryOperation<OP_LE>{
+  struct BinaryOperation<Operation::OP_LE>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x <= y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
@@ -746,7 +750,7 @@ namespace casadi {
 
   /// Floor function
   template<>
-  struct UnaryOperation<OP_FLOOR>{
+  struct UnaryOperation<Operation::OP_FLOOR>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = floor(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 0;}
@@ -754,7 +758,7 @@ namespace casadi {
 
   /// Ceil function
   template<>
-  struct UnaryOperation<OP_CEIL>{
+  struct UnaryOperation<Operation::OP_CEIL>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = ceil(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 0;}
@@ -762,7 +766,7 @@ namespace casadi {
 
   /// Remainder of division
   template<>
-  struct BinaryOperation<OP_FMOD>{
+  struct BinaryOperation<Operation::OP_FMOD>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmod(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
       d[0]=1; d[1]=(f-x)/y;}
@@ -770,7 +774,7 @@ namespace casadi {
 
   /// Equal to
   template<>
-  struct BinaryOperation<OP_EQ>{
+  struct BinaryOperation<Operation::OP_EQ>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x==y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=d[1]=0;}
@@ -778,7 +782,7 @@ namespace casadi {
 
   /// Not equal to
   template<>
-  struct BinaryOperation<OP_NE>{
+  struct BinaryOperation<Operation::OP_NE>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x!=y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=d[1]=0;}
@@ -786,7 +790,7 @@ namespace casadi {
 
   /// Logical not
   template<>
-  struct UnaryOperation<OP_NOT>{
+  struct UnaryOperation<Operation::OP_NOT>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = !x;}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 0;}
@@ -794,7 +798,7 @@ namespace casadi {
 
   /// Logical and
   template<>
-  struct BinaryOperation<OP_AND>{
+  struct BinaryOperation<Operation::OP_AND>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x && y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=d[1]=0;}
@@ -802,7 +806,7 @@ namespace casadi {
 
   /// Logical or
   template<>
-  struct BinaryOperation<OP_OR>{
+  struct BinaryOperation<Operation::OP_OR>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x || y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=d[1]=0;}
@@ -810,7 +814,7 @@ namespace casadi {
 
   /// Error function
   template<>
-  struct UnaryOperation<OP_ERF>{
+  struct UnaryOperation<Operation::OP_ERF>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = erf(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) {
         d[0] = (2/sqrt(pi))*exp(-x*x);}
@@ -818,7 +822,7 @@ namespace casadi {
 
   /// Absolute value
   template<>
-  struct UnaryOperation<OP_FABS>{
+  struct UnaryOperation<Operation::OP_FABS>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = fabs(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) {
         d[0]=sign(x);}
@@ -826,14 +830,14 @@ namespace casadi {
 
   /// Sign
   template<>
-  struct UnaryOperation<OP_SIGN>{
+  struct UnaryOperation<Operation::OP_SIGN>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = sign(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=0;}
   };
 
   /// Copysign
   template<>
-  struct BinaryOperation<OP_COPYSIGN>{
+  struct BinaryOperation<Operation::OP_COPYSIGN>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = copysign(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         T e = 1; d[0]=copysign(e, y); d[1]=0;}
@@ -841,7 +845,7 @@ namespace casadi {
 
   /// Minimum
   template<>
-  struct BinaryOperation<OP_FMIN>{
+  struct BinaryOperation<Operation::OP_FMIN>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmin(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=x<=y; d[1]=!d[0];}
@@ -849,7 +853,7 @@ namespace casadi {
 
   /// Maximum
   template<>
-  struct BinaryOperation<OP_FMAX>{
+  struct BinaryOperation<Operation::OP_FMAX>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmax(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=x>=y; d[1]=!d[0];}
@@ -857,35 +861,35 @@ namespace casadi {
 
   /// Elementwise inverse
   template<>
-  struct UnaryOperation<OP_INV>{
+  struct UnaryOperation<Operation::OP_INV>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = 1./x;}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = -f*f; }
   };
 
   /// Hyperbolic sine
   template<>
-  struct UnaryOperation<OP_SINH>{
+  struct UnaryOperation<Operation::OP_SINH>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = sinh(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = cosh(x); }
   };
 
   /// Hyperbolic cosine
   template<>
-  struct UnaryOperation<OP_COSH>{
+  struct UnaryOperation<Operation::OP_COSH>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = cosh(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = sinh(x); }
   };
 
   /// Hyperbolic tangent
   template<>
-  struct UnaryOperation<OP_TANH>{
+  struct UnaryOperation<Operation::OP_TANH>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = tanh(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 1-f*f; }
   };
 
   /// Inverse hyperbolic sine
   template<>
-  struct UnaryOperation<OP_ASINH>{
+  struct UnaryOperation<Operation::OP_ASINH>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = asinh(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) {
         d[0] = 1/sqrt(1+x*x); }
@@ -893,7 +897,7 @@ namespace casadi {
 
   /// Inverse hyperbolic cosine
   template<>
-  struct UnaryOperation<OP_ACOSH>{
+  struct UnaryOperation<Operation::OP_ACOSH>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = acosh(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) {
         d[0] = 1/sqrt(x-1)/sqrt(x+1); }
@@ -901,14 +905,14 @@ namespace casadi {
 
   /// Inverse hyperbolic tangent
   template<>
-  struct UnaryOperation<OP_ATANH>{
+  struct UnaryOperation<Operation::OP_ATANH>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = atanh(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 1/(1-x*x); }
   };
 
   /// Inverse of error function
   template<>
-  struct UnaryOperation<OP_ERFINV>{
+  struct UnaryOperation<Operation::OP_ERFINV>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = erfinv(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) {
         d[0] = (sqrt(pi)/2)*exp(f*f); }
@@ -916,7 +920,7 @@ namespace casadi {
 
   /// Identity operator with the side effect of printing
   template<>
-  struct BinaryOperation<OP_PRINTME>{
+  struct BinaryOperation<Operation::OP_PRINTME>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {f = printme(x, y); }
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=1; d[1]=0;}
@@ -924,7 +928,7 @@ namespace casadi {
 
   /// Arctan2
   template<>
-  struct BinaryOperation<OP_ATAN2>{
+  struct BinaryOperation<Operation::OP_ATAN2>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = atan2(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
@@ -933,7 +937,7 @@ namespace casadi {
 
   /// Conditional assignment
   template<>
-  struct BinaryOperation<OP_IF_ELSE_ZERO>{
+  struct BinaryOperation<Operation::OP_IF_ELSE_ZERO>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
         f = if_else_zero(x, y);}
@@ -943,113 +947,113 @@ namespace casadi {
 
   /// Inverse of error function
   template<>
-  struct BinaryOperation<OP_LIFT>{
+  struct BinaryOperation<Operation::OP_LIFT>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0] = 1; d[1] = 0; }
   };
 
-  template<template<casadi_int> class F, typename T>
-  T operation_getter(casadi_int op) {
+  template<template<Operation> class F, typename T>
+  T operation_getter(Operation op) {
     switch (static_cast<Operation>(op)) {
-    case OP_ASSIGN:        return F<OP_ASSIGN>::check;
-    case OP_ADD:           return F<OP_ADD>::check;
-    case OP_SUB:           return F<OP_SUB>::check;
-    case OP_MUL:           return F<OP_MUL>::check;
-    case OP_DIV:           return F<OP_DIV>::check;
-    case OP_NEG:           return F<OP_NEG>::check;
-    case OP_EXP:           return F<OP_EXP>::check;
-    case OP_LOG:           return F<OP_LOG>::check;
-    case OP_POW:           return F<OP_POW>::check;
-    case OP_CONSTPOW:      return F<OP_CONSTPOW>::check;
-    case OP_SQRT:          return F<OP_SQRT>::check;
-    case OP_SQ:            return F<OP_SQ>::check;
-    case OP_TWICE:         return F<OP_TWICE>::check;
-    case OP_SIN:           return F<OP_SIN>::check;
-    case OP_COS:           return F<OP_COS>::check;
-    case OP_TAN:           return F<OP_TAN>::check;
-    case OP_ASIN:          return F<OP_ASIN>::check;
-    case OP_ACOS:          return F<OP_ACOS>::check;
-    case OP_ATAN:          return F<OP_ATAN>::check;
-    case OP_LT:            return F<OP_LT>::check;
-    case OP_LE:            return F<OP_LE>::check;
-    case OP_EQ:            return F<OP_EQ>::check;
-    case OP_NE:            return F<OP_NE>::check;
-    case OP_NOT:           return F<OP_NOT>::check;
-    case OP_AND:           return F<OP_AND>::check;
-    case OP_OR:            return F<OP_OR>::check;
-    case OP_FLOOR:         return F<OP_FLOOR>::check;
-    case OP_CEIL:          return F<OP_CEIL>::check;
-    case OP_FMOD:          return F<OP_FMOD>::check;
-    case OP_FABS:          return F<OP_FABS>::check;
-    case OP_SIGN:          return F<OP_SIGN>::check;
-    case OP_COPYSIGN:      return F<OP_COPYSIGN>::check;
-    case OP_IF_ELSE_ZERO:  return F<OP_IF_ELSE_ZERO>::check;
-    case OP_ERF:           return F<OP_ERF>::check;
-    case OP_FMIN:          return F<OP_FMIN>::check;
-    case OP_FMAX:          return F<OP_FMAX>::check;
-    case OP_INV:           return F<OP_INV>::check;
-    case OP_SINH:          return F<OP_SINH>::check;
-    case OP_COSH:          return F<OP_COSH>::check;
-    case OP_TANH:          return F<OP_TANH>::check;
-    case OP_ASINH:         return F<OP_ASINH>::check;
-    case OP_ACOSH:         return F<OP_ACOSH>::check;
-    case OP_ATANH:         return F<OP_ATANH>::check;
-    case OP_ATAN2:         return F<OP_ATAN2>::check;
-    case OP_CONST:         return F<OP_CONST>::check;
-    case OP_INPUT:         return F<OP_INPUT>::check;
-    case OP_OUTPUT:        return F<OP_OUTPUT>::check;
-    case OP_PARAMETER:     return F<OP_PARAMETER>::check;
-    case OP_CALL:          return F<OP_CALL>::check;
-    case OP_FIND:          return F<OP_FIND>::check;
-    case OP_LOW:           return F<OP_LOW>::check;
-    case OP_MAP:           return F<OP_MAP>::check;
-    case OP_MTIMES:        return F<OP_MTIMES>::check;
-    case OP_SOLVE:         return F<OP_SOLVE>::check;
-    case OP_TRANSPOSE:     return F<OP_TRANSPOSE>::check;
-    case OP_DETERMINANT:   return F<OP_DETERMINANT>::check;
-    case OP_INVERSE:       return F<OP_INVERSE>::check;
-    case OP_DOT:           return F<OP_DOT>::check;
-    case OP_BILIN:         return F<OP_BILIN>::check;
-    case OP_RANK1:         return F<OP_RANK1>::check;
-    case OP_HORZCAT:       return F<OP_HORZCAT>::check;
-    case OP_VERTCAT:       return F<OP_VERTCAT>::check;
-    case OP_DIAGCAT:       return F<OP_DIAGCAT>::check;
-    case OP_HORZSPLIT:     return F<OP_HORZSPLIT>::check;
-    case OP_VERTSPLIT:     return F<OP_VERTSPLIT>::check;
-    case OP_DIAGSPLIT:     return F<OP_DIAGSPLIT>::check;
-    case OP_RESHAPE:       return F<OP_RESHAPE>::check;
-    case OP_SUBREF:        return F<OP_SUBREF>::check;
-    case OP_SUBASSIGN:     return F<OP_SUBASSIGN>::check;
-    case OP_GETNONZEROS:   return F<OP_GETNONZEROS>::check;
-    case OP_GETNONZEROS_PARAM:   return F<OP_GETNONZEROS_PARAM>::check;
-    case OP_ADDNONZEROS:   return F<OP_ADDNONZEROS>::check;
-    case OP_ADDNONZEROS_PARAM:   return F<OP_ADDNONZEROS>::check;
-    case OP_SETNONZEROS:   return F<OP_SETNONZEROS>::check;
-    case OP_SETNONZEROS_PARAM:   return F<OP_SETNONZEROS>::check;
-    case OP_PROJECT:       return F<OP_PROJECT>::check;
-    case OP_ASSERTION:     return F<OP_ASSERTION>::check;
-    case OP_MONITOR:       return F<OP_MONITOR>::check;
-    case OP_NORM2:         return F<OP_NORM2>::check;
-    case OP_NORM1:         return F<OP_NORM1>::check;
-    case OP_NORMINF:       return F<OP_NORMINF>::check;
-    case OP_NORMF:         return F<OP_NORMF>::check;
-    case OP_MMIN:          return F<OP_MMIN>::check;
-    case OP_MMAX:          return F<OP_MMAX>::check;
-    case OP_HORZREPMAT:    return F<OP_HORZREPMAT>::check;
-    case OP_HORZREPSUM:    return F<OP_HORZREPSUM>::check;
-    case OP_ERFINV:        return F<OP_ERFINV>::check;
-    case OP_PRINTME:       return F<OP_PRINTME>::check;
-    case OP_LIFT:          return F<OP_LIFT>::check;
-    case OP_EINSTEIN:      return F<OP_EINSTEIN>::check;
-    case OP_BSPLINE:       return F<OP_BSPLINE>::check;
-    case OP_CONVEXIFY:     return F<OP_CONVEXIFY>::check;
+    case Operation::OP_ASSIGN:        return F<Operation::OP_ASSIGN>::check;
+    case Operation::OP_ADD:           return F<Operation::OP_ADD>::check;
+    case Operation::OP_SUB:           return F<Operation::OP_SUB>::check;
+    case Operation::OP_MUL:           return F<Operation::OP_MUL>::check;
+    case Operation::OP_DIV:           return F<Operation::OP_DIV>::check;
+    case Operation::OP_NEG:           return F<Operation::OP_NEG>::check;
+    case Operation::OP_EXP:           return F<Operation::OP_EXP>::check;
+    case Operation::OP_LOG:           return F<Operation::OP_LOG>::check;
+    case Operation::OP_POW:           return F<Operation::OP_POW>::check;
+    case Operation::OP_CONSTPOW:      return F<Operation::OP_CONSTPOW>::check;
+    case Operation::OP_SQRT:          return F<Operation::OP_SQRT>::check;
+    case Operation::OP_SQ:            return F<Operation::OP_SQ>::check;
+    case Operation::OP_TWICE:         return F<Operation::OP_TWICE>::check;
+    case Operation::OP_SIN:           return F<Operation::OP_SIN>::check;
+    case Operation::OP_COS:           return F<Operation::OP_COS>::check;
+    case Operation::OP_TAN:           return F<Operation::OP_TAN>::check;
+    case Operation::OP_ASIN:          return F<Operation::OP_ASIN>::check;
+    case Operation::OP_ACOS:          return F<Operation::OP_ACOS>::check;
+    case Operation::OP_ATAN:          return F<Operation::OP_ATAN>::check;
+    case Operation::OP_LT:            return F<Operation::OP_LT>::check;
+    case Operation::OP_LE:            return F<Operation::OP_LE>::check;
+    case Operation::OP_EQ:            return F<Operation::OP_EQ>::check;
+    case Operation::OP_NE:            return F<Operation::OP_NE>::check;
+    case Operation::OP_NOT:           return F<Operation::OP_NOT>::check;
+    case Operation::OP_AND:           return F<Operation::OP_AND>::check;
+    case Operation::OP_OR:            return F<Operation::OP_OR>::check;
+    case Operation::OP_FLOOR:         return F<Operation::OP_FLOOR>::check;
+    case Operation::OP_CEIL:          return F<Operation::OP_CEIL>::check;
+    case Operation::OP_FMOD:          return F<Operation::OP_FMOD>::check;
+    case Operation::OP_FABS:          return F<Operation::OP_FABS>::check;
+    case Operation::OP_SIGN:          return F<Operation::OP_SIGN>::check;
+    case Operation::OP_COPYSIGN:      return F<Operation::OP_COPYSIGN>::check;
+    case Operation::OP_IF_ELSE_ZERO:  return F<Operation::OP_IF_ELSE_ZERO>::check;
+    case Operation::OP_ERF:           return F<Operation::OP_ERF>::check;
+    case Operation::OP_FMIN:          return F<Operation::OP_FMIN>::check;
+    case Operation::OP_FMAX:          return F<Operation::OP_FMAX>::check;
+    case Operation::OP_INV:           return F<Operation::OP_INV>::check;
+    case Operation::OP_SINH:          return F<Operation::OP_SINH>::check;
+    case Operation::OP_COSH:          return F<Operation::OP_COSH>::check;
+    case Operation::OP_TANH:          return F<Operation::OP_TANH>::check;
+    case Operation::OP_ASINH:         return F<Operation::OP_ASINH>::check;
+    case Operation::OP_ACOSH:         return F<Operation::OP_ACOSH>::check;
+    case Operation::OP_ATANH:         return F<Operation::OP_ATANH>::check;
+    case Operation::OP_ATAN2:         return F<Operation::OP_ATAN2>::check;
+    case Operation::OP_CONST:         return F<Operation::OP_CONST>::check;
+    case Operation::OP_INPUT:         return F<Operation::OP_INPUT>::check;
+    case Operation::OP_OUTPUT:        return F<Operation::OP_OUTPUT>::check;
+    case Operation::OP_PARAMETER:     return F<Operation::OP_PARAMETER>::check;
+    case Operation::OP_CALL:          return F<Operation::OP_CALL>::check;
+    case Operation::OP_FIND:          return F<Operation::OP_FIND>::check;
+    case Operation::OP_LOW:           return F<Operation::OP_LOW>::check;
+    case Operation::OP_MAP:           return F<Operation::OP_MAP>::check;
+    case Operation::OP_MTIMES:        return F<Operation::OP_MTIMES>::check;
+    case Operation::OP_SOLVE:         return F<Operation::OP_SOLVE>::check;
+    case Operation::OP_TRANSPOSE:     return F<Operation::OP_TRANSPOSE>::check;
+    case Operation::OP_DETERMINANT:   return F<Operation::OP_DETERMINANT>::check;
+    case Operation::OP_INVERSE:       return F<Operation::OP_INVERSE>::check;
+    case Operation::OP_DOT:           return F<Operation::OP_DOT>::check;
+    case Operation::OP_BILIN:         return F<Operation::OP_BILIN>::check;
+    case Operation::OP_RANK1:         return F<Operation::OP_RANK1>::check;
+    case Operation::OP_HORZCAT:       return F<Operation::OP_HORZCAT>::check;
+    case Operation::OP_VERTCAT:       return F<Operation::OP_VERTCAT>::check;
+    case Operation::OP_DIAGCAT:       return F<Operation::OP_DIAGCAT>::check;
+    case Operation::OP_HORZSPLIT:     return F<Operation::OP_HORZSPLIT>::check;
+    case Operation::OP_VERTSPLIT:     return F<Operation::OP_VERTSPLIT>::check;
+    case Operation::OP_DIAGSPLIT:     return F<Operation::OP_DIAGSPLIT>::check;
+    case Operation::OP_RESHAPE:       return F<Operation::OP_RESHAPE>::check;
+    case Operation::OP_SUBREF:        return F<Operation::OP_SUBREF>::check;
+    case Operation::OP_SUBASSIGN:     return F<Operation::OP_SUBASSIGN>::check;
+    case Operation::OP_GETNONZEROS:   return F<Operation::OP_GETNONZEROS>::check;
+    case Operation::OP_GETNONZEROS_PARAM:   return F<Operation::OP_GETNONZEROS_PARAM>::check;
+    case Operation::OP_ADDNONZEROS:   return F<Operation::OP_ADDNONZEROS>::check;
+    case Operation::OP_ADDNONZEROS_PARAM:   return F<Operation::OP_ADDNONZEROS>::check;
+    case Operation::OP_SETNONZEROS:   return F<Operation::OP_SETNONZEROS>::check;
+    case Operation::OP_SETNONZEROS_PARAM:   return F<Operation::OP_SETNONZEROS>::check;
+    case Operation::OP_PROJECT:       return F<Operation::OP_PROJECT>::check;
+    case Operation::OP_ASSERTION:     return F<Operation::OP_ASSERTION>::check;
+    case Operation::OP_MONITOR:       return F<Operation::OP_MONITOR>::check;
+    case Operation::OP_NORM2:         return F<Operation::OP_NORM2>::check;
+    case Operation::OP_NORM1:         return F<Operation::OP_NORM1>::check;
+    case Operation::OP_NORMINF:       return F<Operation::OP_NORMINF>::check;
+    case Operation::OP_NORMF:         return F<Operation::OP_NORMF>::check;
+    case Operation::OP_MMIN:          return F<Operation::OP_MMIN>::check;
+    case Operation::OP_MMAX:          return F<Operation::OP_MMAX>::check;
+    case Operation::OP_HORZREPMAT:    return F<Operation::OP_HORZREPMAT>::check;
+    case Operation::OP_HORZREPSUM:    return F<Operation::OP_HORZREPSUM>::check;
+    case Operation::OP_ERFINV:        return F<Operation::OP_ERFINV>::check;
+    case Operation::OP_PRINTME:       return F<Operation::OP_PRINTME>::check;
+    case Operation::OP_LIFT:          return F<Operation::OP_LIFT>::check;
+    case Operation::OP_EINSTEIN:      return F<Operation::OP_EINSTEIN>::check;
+    case Operation::OP_BSPLINE:       return F<Operation::OP_BSPLINE>::check;
+    case Operation::OP_CONVEXIFY:     return F<Operation::OP_CONVEXIFY>::check;
     }
     return T();
   }
 
-  template<template<casadi_int> class F>
-  bool operation_checker(casadi_int op) {
+  template<template<Operation> class F>
+  bool operation_checker(Operation op) {
     return operation_getter<F, bool>(op);
   }
 
@@ -1058,40 +1062,40 @@ namespace casadi {
   struct casadi_math {
 
     /** \brief Evaluate a built in function (scalar-scalar) */
-    static inline void fun(unsigned char op, const T& x, const T& y, T& f);
+    static inline void fun(Operation op, const T& x, const T& y, T& f);
 
     /** \brief Evaluate a built in function (vector-vector) */
-    static inline void fun(unsigned char op, const T* x, const T* y, T* f, casadi_int n);
+    static inline void fun(Operation op, const T* x, const T* y, T* f, casadi_int n);
 
     /** \brief Evaluate a built in function (vector-scalar) */
-    static inline void fun(unsigned char op, const T* x, const T& y, T* f, casadi_int n);
+    static inline void fun(Operation op, const T* x, const T& y, T* f, casadi_int n);
 
     /** \brief Evaluate a built in function (scalar-vector) */
-    static inline void fun(unsigned char op, const T& x, const T* y, T* f, casadi_int n);
+    static inline void fun(Operation op, const T& x, const T* y, T* f, casadi_int n);
 
     /** \brief Evaluate a built in derivative function */
-    static inline void der(unsigned char op, const T& x, const T& y, const T& f, T* d);
+    static inline void der(Operation op, const T& x, const T& y, const T& f, T* d);
 
     /** \brief Evaluate the function and the derivative function */
-    static inline void derF(unsigned char op, const T& x, const T& y, T& f, T* d);
+    static inline void derF(Operation op, const T& x, const T& y, T& f, T* d);
 
     /** \brief Is binary operation? */
-    static inline bool is_binary(unsigned char op);
+    static inline bool is_binary(Operation op);
 
     /** \brief Is unary operation? */
-    static inline bool is_unary(unsigned char op);
+    static inline bool is_unary(Operation op);
 
     /** \brief Number of dependencies */
-    static inline casadi_int ndeps(unsigned char op);
+    static inline casadi_int ndeps(Operation op);
 
     /** \brief Print */
-    static inline std::string print(unsigned char op, const std::string& x,
+    static inline std::string print(Operation op, const std::string& x,
                              const std::string& y);
-    static inline std::string print(unsigned char op, const std::string& x);
-    static inline std::string name(unsigned char op);
-    static inline std::string pre(unsigned char op);
-    static inline std::string sep(unsigned char op);
-    static inline std::string post(unsigned char op);
+    static inline std::string print(Operation op, const std::string& x);
+    static inline std::string name(Operation op);
+    static inline std::string pre(Operation op);
+    static inline std::string sep(Operation op);
+    static inline std::string post(Operation op);
   };
 
   /// Specialize the class so that it can be used with integer type
@@ -1099,14 +1103,14 @@ namespace casadi {
   struct casadi_math<casadi_int>{
 
     /** \brief Evaluate a built in function */
-    static inline void fun(unsigned char op, const casadi_int& x,
+    static inline void fun(Operation op, const casadi_int& x,
         const casadi_int& y, casadi_int& f) {
       double ff(0);
       casadi_math<double>::fun(op, static_cast<double>(x), static_cast<double>(y), ff);
       f = static_cast<casadi_int>(ff);
     }
 
-    static inline void fun(unsigned char op, const casadi_int* x, const casadi_int* y,
+    static inline void fun(Operation op, const casadi_int* x, const casadi_int* y,
         casadi_int* f, casadi_int n) {
       for (casadi_int i=0; i<n; ++i) {
         double ff(0);
@@ -1115,7 +1119,7 @@ namespace casadi {
       }
     }
 
-    static inline void fun(unsigned char op, const casadi_int* x, const casadi_int& y,
+    static inline void fun(Operation op, const casadi_int* x, const casadi_int& y,
         casadi_int* f, casadi_int n) {
       for (casadi_int i=0; i<n; ++i) {
         double ff;
@@ -1124,7 +1128,7 @@ namespace casadi {
       }
     }
 
-    static inline void fun(unsigned char op, const casadi_int& x, const casadi_int* y,
+    static inline void fun(Operation op, const casadi_int& x, const casadi_int* y,
         casadi_int* f, casadi_int n) {
       for (casadi_int i=0; i<n; ++i) {
         double ff;
@@ -1134,7 +1138,7 @@ namespace casadi {
     }
 
     /** \brief Evaluate a built in derivative function */
-    static inline void der(unsigned char op, const casadi_int& x, const casadi_int& y,
+    static inline void der(Operation op, const casadi_int& x, const casadi_int& y,
         const casadi_int& f, casadi_int* d) {
       double d_real[2] = {static_cast<double>(d[0]), static_cast<double>(d[1])};
       casadi_math<double>::der(op, static_cast<double>(x), static_cast<double>(y),
@@ -1144,7 +1148,7 @@ namespace casadi {
     }
 
     /** \brief Evaluate the function and the derivative function */
-    static inline void derF(unsigned char op, const casadi_int& x, const casadi_int& y,
+    static inline void derF(Operation op, const casadi_int& x, const casadi_int& y,
         casadi_int& f, casadi_int* d) {
       double d_real[2] = {static_cast<double>(d[0]), static_cast<double>(d[1])};
       double f_real = static_cast<double>(f);
@@ -1155,28 +1159,28 @@ namespace casadi {
     }
 
     /** \brief Number of dependencies */
-    static inline casadi_int ndeps(unsigned char op) {
+    static inline casadi_int ndeps(Operation op) {
       return casadi_math<double>::ndeps(op);
     }
 
     /** \brief Print */
-    static inline std::string print(unsigned char op, const std::string& x,
+    static inline std::string print(Operation op, const std::string& x,
                                     const std::string& y) {
       return casadi_math<double>::print(op, x, y);
     }
-    static inline std::string print(unsigned char op, const std::string& x) {
+    static inline std::string print(Operation op, const std::string& x) {
       return casadi_math<double>::print(op, x);
     }
-    static inline std::string pre(unsigned char op) {
+    static inline std::string pre(Operation op) {
       return casadi_math<double>::pre(op);
     }
-    static inline std::string name(unsigned char op) {
+    static inline std::string name(Operation op) {
       return casadi_math<double>::name(op);
     }
-    static inline std::string sep(unsigned char op) {
+    static inline std::string sep(Operation op) {
       return casadi_math<double>::sep(op);
     }
-    static inline std::string post(unsigned char op) {
+    static inline std::string post(Operation op) {
       return casadi_math<double>::post(op);
     }
   };
@@ -1184,57 +1188,57 @@ namespace casadi {
   // Template implementations
 
   template<typename T>
-  inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f) {
+  inline void casadi_math<T>::fun(Operation op, const T& x, const T& y, T& f) {
     // NOTE: We define the implementation in a preprocessor macro to be able to force inlining,
     //  and to allow extensions in the VM
 #define CASADI_MATH_FUN_BUILTIN_GEN(CNAME, X, Y, F, N)                  \
-    case OP_ASSIGN:    CNAME<OP_ASSIGN>::fcn(X, Y, F, N);        break; \
-  case OP_ADD:       CNAME<OP_ADD>::fcn(X, Y, F, N);           break;   \
-  case OP_SUB:       CNAME<OP_SUB>::fcn(X, Y, F, N);           break;   \
-  case OP_MUL:       CNAME<OP_MUL>::fcn(X, Y, F, N);           break;   \
-  case OP_DIV:       CNAME<OP_DIV>::fcn(X, Y, F, N);           break;   \
-  case OP_NEG:       CNAME<OP_NEG>::fcn(X, Y, F, N);           break;   \
-  case OP_EXP:       CNAME<OP_EXP>::fcn(X, Y, F, N);           break;   \
-  case OP_LOG:       CNAME<OP_LOG>::fcn(X, Y, F, N);           break;   \
-  case OP_POW:       CNAME<OP_POW>::fcn(X, Y, F, N);           break;   \
-  case OP_CONSTPOW:  CNAME<OP_CONSTPOW>::fcn(X, Y, F, N);      break;   \
-  case OP_SQRT:      CNAME<OP_SQRT>::fcn(X, Y, F, N);          break;   \
-  case OP_SQ:        CNAME<OP_SQ>::fcn(X, Y, F, N);            break;   \
-  case OP_TWICE:     CNAME<OP_TWICE>::fcn(X, Y, F, N);         break;   \
-  case OP_SIN:       CNAME<OP_SIN>::fcn(X, Y, F, N);           break;   \
-  case OP_COS:       CNAME<OP_COS>::fcn(X, Y, F, N);           break;   \
-  case OP_TAN:       CNAME<OP_TAN>::fcn(X, Y, F, N);           break;   \
-  case OP_ASIN:      CNAME<OP_ASIN>::fcn(X, Y, F, N);          break;   \
-  case OP_ACOS:      CNAME<OP_ACOS>::fcn(X, Y, F, N);          break;   \
-  case OP_ATAN:      CNAME<OP_ATAN>::fcn(X, Y, F, N);          break;   \
-  case OP_LT:        CNAME<OP_LT>::fcn(X, Y, F, N);            break;   \
-  case OP_LE:        CNAME<OP_LE>::fcn(X, Y, F, N);            break;   \
-  case OP_EQ:        CNAME<OP_EQ>::fcn(X, Y, F, N);            break;   \
-  case OP_NE:        CNAME<OP_NE>::fcn(X, Y, F, N);            break;   \
-  case OP_NOT:       CNAME<OP_NOT>::fcn(X, Y, F, N);           break;   \
-  case OP_AND:       CNAME<OP_AND>::fcn(X, Y, F, N);           break;   \
-  case OP_OR:        CNAME<OP_OR>::fcn(X, Y, F, N);            break;   \
-  case OP_IF_ELSE_ZERO: CNAME<OP_IF_ELSE_ZERO>::fcn(X, Y, F, N); break; \
-  case OP_FLOOR:     CNAME<OP_FLOOR>::fcn(X, Y, F, N);         break;   \
-  case OP_CEIL:      CNAME<OP_CEIL>::fcn(X, Y, F, N);          break;   \
-  case OP_FMOD:      CNAME<OP_FMOD>::fcn(X, Y, F, N);          break;   \
-  case OP_FABS:      CNAME<OP_FABS>::fcn(X, Y, F, N);          break;   \
-  case OP_SIGN:      CNAME<OP_SIGN>::fcn(X, Y, F, N);          break;   \
-  case OP_COPYSIGN:  CNAME<OP_COPYSIGN>::fcn(X, Y, F, N);      break;   \
-  case OP_ERF:       CNAME<OP_ERF>::fcn(X, Y, F, N);           break;   \
-  case OP_FMIN:      CNAME<OP_FMIN>::fcn(X, Y, F, N);          break;   \
-  case OP_FMAX:      CNAME<OP_FMAX>::fcn(X, Y, F, N);          break;   \
-  case OP_INV:       CNAME<OP_INV>::fcn(X, Y, F, N);           break;   \
-  case OP_SINH:      CNAME<OP_SINH>::fcn(X, Y, F, N);          break;   \
-  case OP_COSH:      CNAME<OP_COSH>::fcn(X, Y, F, N);          break;   \
-  case OP_TANH:      CNAME<OP_TANH>::fcn(X, Y, F, N);          break;   \
-  case OP_ASINH:     CNAME<OP_ASINH>::fcn(X, Y, F, N);         break;   \
-  case OP_ACOSH:     CNAME<OP_ACOSH>::fcn(X, Y, F, N);         break;   \
-  case OP_ATANH:     CNAME<OP_ATANH>::fcn(X, Y, F, N);         break;   \
-  case OP_ATAN2:     CNAME<OP_ATAN2>::fcn(X, Y, F, N);         break;   \
-  case OP_ERFINV:    CNAME<OP_ERFINV>::fcn(X, Y, F, N);        break;   \
-  case OP_LIFT:      CNAME<OP_LIFT>::fcn(X, Y, F, N);          break;   \
-  case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X, Y, F, N);       break;
+    case Operation::OP_ASSIGN:    CNAME<Operation::OP_ASSIGN>::fcn(X, Y, F, N);        break; \
+  case Operation::OP_ADD:       CNAME<Operation::OP_ADD>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_SUB:       CNAME<Operation::OP_SUB>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_MUL:       CNAME<Operation::OP_MUL>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_DIV:       CNAME<Operation::OP_DIV>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_NEG:       CNAME<Operation::OP_NEG>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_EXP:       CNAME<Operation::OP_EXP>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_LOG:       CNAME<Operation::OP_LOG>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_POW:       CNAME<Operation::OP_POW>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_CONSTPOW:  CNAME<Operation::OP_CONSTPOW>::fcn(X, Y, F, N);      break;   \
+  case Operation::OP_SQRT:      CNAME<Operation::OP_SQRT>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_SQ:        CNAME<Operation::OP_SQ>::fcn(X, Y, F, N);            break;   \
+  case Operation::OP_TWICE:     CNAME<Operation::OP_TWICE>::fcn(X, Y, F, N);         break;   \
+  case Operation::OP_SIN:       CNAME<Operation::OP_SIN>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_COS:       CNAME<Operation::OP_COS>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_TAN:       CNAME<Operation::OP_TAN>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_ASIN:      CNAME<Operation::OP_ASIN>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_ACOS:      CNAME<Operation::OP_ACOS>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_ATAN:      CNAME<Operation::OP_ATAN>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_LT:        CNAME<Operation::OP_LT>::fcn(X, Y, F, N);            break;   \
+  case Operation::OP_LE:        CNAME<Operation::OP_LE>::fcn(X, Y, F, N);            break;   \
+  case Operation::OP_EQ:        CNAME<Operation::OP_EQ>::fcn(X, Y, F, N);            break;   \
+  case Operation::OP_NE:        CNAME<Operation::OP_NE>::fcn(X, Y, F, N);            break;   \
+  case Operation::OP_NOT:       CNAME<Operation::OP_NOT>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_AND:       CNAME<Operation::OP_AND>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_OR:        CNAME<Operation::OP_OR>::fcn(X, Y, F, N);            break;   \
+  case Operation::OP_IF_ELSE_ZERO: CNAME<Operation::OP_IF_ELSE_ZERO>::fcn(X, Y, F, N); break; \
+  case Operation::OP_FLOOR:     CNAME<Operation::OP_FLOOR>::fcn(X, Y, F, N);         break;   \
+  case Operation::OP_CEIL:      CNAME<Operation::OP_CEIL>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_FMOD:      CNAME<Operation::OP_FMOD>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_FABS:      CNAME<Operation::OP_FABS>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_SIGN:      CNAME<Operation::OP_SIGN>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_COPYSIGN:  CNAME<Operation::OP_COPYSIGN>::fcn(X, Y, F, N);      break;   \
+  case Operation::OP_ERF:       CNAME<Operation::OP_ERF>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_FMIN:      CNAME<Operation::OP_FMIN>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_FMAX:      CNAME<Operation::OP_FMAX>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_INV:       CNAME<Operation::OP_INV>::fcn(X, Y, F, N);           break;   \
+  case Operation::OP_SINH:      CNAME<Operation::OP_SINH>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_COSH:      CNAME<Operation::OP_COSH>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_TANH:      CNAME<Operation::OP_TANH>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_ASINH:     CNAME<Operation::OP_ASINH>::fcn(X, Y, F, N);         break;   \
+  case Operation::OP_ACOSH:     CNAME<Operation::OP_ACOSH>::fcn(X, Y, F, N);         break;   \
+  case Operation::OP_ATANH:     CNAME<Operation::OP_ATANH>::fcn(X, Y, F, N);         break;   \
+  case Operation::OP_ATAN2:     CNAME<Operation::OP_ATAN2>::fcn(X, Y, F, N);         break;   \
+  case Operation::OP_ERFINV:    CNAME<Operation::OP_ERFINV>::fcn(X, Y, F, N);        break;   \
+  case Operation::OP_LIFT:      CNAME<Operation::OP_LIFT>::fcn(X, Y, F, N);          break;   \
+  case Operation::OP_PRINTME:   CNAME<Operation::OP_PRINTME>::fcn(X, Y, F, N);       break;
 
 #define CASADI_MATH_FUN_BUILTIN(X, Y, F) CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationSS, X, Y, F, 1)
 
@@ -1244,21 +1248,21 @@ namespace casadi {
   }
 
   template<typename T>
-  inline void casadi_math<T>::fun(unsigned char op, const T* x, const T* y, T* f, casadi_int n) {
+  inline void casadi_math<T>::fun(Operation op, const T* x, const T* y, T* f, casadi_int n) {
     switch (op) {
       CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationVV, x, y, f, n)
         }
   }
 
   template<typename T>
-  inline void casadi_math<T>::fun(unsigned char op, const T* x, const T& y, T* f, casadi_int n) {
+  inline void casadi_math<T>::fun(Operation op, const T* x, const T& y, T* f, casadi_int n) {
     switch (op) {
       CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationVS, x, y, f, n)
         }
   }
 
   template<typename T>
-  inline void casadi_math<T>::fun(unsigned char op, const T& x, const T* y, T* f, casadi_int n) {
+  inline void casadi_math<T>::fun(Operation op, const T& x, const T* y, T* f, casadi_int n) {
     switch (op) {
       CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationSV, x, y, f, n)
         }
@@ -1266,57 +1270,57 @@ namespace casadi {
 
 
   template<typename T>
-  inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const T& f, T* d) {
+  inline void casadi_math<T>::der(Operation op, const T& x, const T& y, const T& f, T* d) {
     // NOTE: We define the implementation in a preprocessor macro to be able to force inlining,
     // and to allow extensions in the VM
-#define CASADI_MATH_DER_BUILTIN(X, Y, F, D)                             \
-    case OP_ASSIGN:    BinaryOperation<OP_ASSIGN>::der(X, Y, F, D);     break; \
-  case OP_ADD:       BinaryOperation<OP_ADD>::der(X, Y, F, D);        break; \
-  case OP_SUB:       BinaryOperation<OP_SUB>::der(X, Y, F, D);        break; \
-  case OP_MUL:       BinaryOperation<OP_MUL>::der(X, Y, F, D);        break; \
-  case OP_DIV:       BinaryOperation<OP_DIV>::der(X, Y, F, D);        break; \
-  case OP_NEG:       BinaryOperation<OP_NEG>::der(X, Y, F, D);        break; \
-  case OP_EXP:       BinaryOperation<OP_EXP>::der(X, Y, F, D);        break; \
-  case OP_LOG:       BinaryOperation<OP_LOG>::der(X, Y, F, D);        break; \
-  case OP_POW:       BinaryOperation<OP_POW>::der(X, Y, F, D);        break; \
-  case OP_CONSTPOW:  BinaryOperation<OP_CONSTPOW>::der(X, Y, F, D);   break; \
-  case OP_SQRT:      BinaryOperation<OP_SQRT>::der(X, Y, F, D);       break; \
-  case OP_SQ:        BinaryOperation<OP_SQ>::der(X, Y, F, D);         break; \
-  case OP_TWICE:     BinaryOperation<OP_TWICE>::der(X, Y, F, D);      break; \
-  case OP_SIN:       BinaryOperation<OP_SIN>::der(X, Y, F, D);        break; \
-  case OP_COS:       BinaryOperation<OP_COS>::der(X, Y, F, D);        break; \
-  case OP_TAN:       BinaryOperation<OP_TAN>::der(X, Y, F, D);        break; \
-  case OP_ASIN:      BinaryOperation<OP_ASIN>::der(X, Y, F, D);       break; \
-  case OP_ACOS:      BinaryOperation<OP_ACOS>::der(X, Y, F, D);       break; \
-  case OP_ATAN:      BinaryOperation<OP_ATAN>::der(X, Y, F, D);       break; \
-  case OP_LT:        BinaryOperation<OP_LT>::der(X, Y, F, D);         break; \
-  case OP_LE:        BinaryOperation<OP_LE>::der(X, Y, F, D);         break; \
-  case OP_EQ:        BinaryOperation<OP_EQ>::der(X, Y, F, D);         break; \
-  case OP_NE:        BinaryOperation<OP_NE>::der(X, Y, F, D);         break; \
-  case OP_NOT:       BinaryOperation<OP_NOT>::der(X, Y, F, D);        break; \
-  case OP_AND:       BinaryOperation<OP_AND>::der(X, Y, F, D);        break; \
-  case OP_OR:        BinaryOperation<OP_OR>::der(X, Y, F, D);         break; \
-  case OP_IF_ELSE_ZERO: BinaryOperation<OP_IF_ELSE_ZERO>::der(X, Y, F, D);         break; \
-  case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X, Y, F, D);      break; \
-  case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X, Y, F, D);       break; \
-  case OP_FMOD:      BinaryOperation<OP_FMOD>::der(X, Y, F, D);       break; \
-  case OP_FABS:      BinaryOperation<OP_FABS>::der(X, Y, F, D);       break; \
-  case OP_SIGN:      BinaryOperation<OP_SIGN>::der(X, Y, F, D);       break; \
-  case OP_COPYSIGN:  BinaryOperation<OP_COPYSIGN>::der(X, Y, F, D);   break; \
-  case OP_ERF:       BinaryOperation<OP_ERF>::der(X, Y, F, D);        break; \
-  case OP_FMIN:      BinaryOperation<OP_FMIN>::der(X, Y, F, D);       break; \
-  case OP_FMAX:      BinaryOperation<OP_FMAX>::der(X, Y, F, D);       break; \
-  case OP_INV:       BinaryOperation<OP_INV>::der(X, Y, F, D);        break; \
-  case OP_SINH:      BinaryOperation<OP_SINH>::der(X, Y, F, D);       break; \
-  case OP_COSH:      BinaryOperation<OP_COSH>::der(X, Y, F, D);       break; \
-  case OP_TANH:      BinaryOperation<OP_TANH>::der(X, Y, F, D);       break; \
-  case OP_ASINH:     BinaryOperation<OP_ASINH>::der(X, Y, F, D);      break; \
-  case OP_ACOSH:     BinaryOperation<OP_ACOSH>::der(X, Y, F, D);      break; \
-  case OP_ATANH:     BinaryOperation<OP_ATANH>::der(X, Y, F, D);      break; \
-  case OP_ATAN2:     BinaryOperation<OP_ATAN2>::der(X, Y, F, D);      break; \
-  case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X, Y, F, D);     break; \
-  case OP_LIFT:      BinaryOperation<OP_LIFT>::der(X, Y, F, D);       break; \
-  case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X, Y, F, D);    break;
+#define CASADI_MATH_DER_BUILTIN(X, Y, F, D)                                                        \
+  case Operation::OP_ASSIGN:    BinaryOperation<Operation::OP_ASSIGN>::der(X, Y, F, D);     break; \
+  case Operation::OP_ADD:       BinaryOperation<Operation::OP_ADD>::der(X, Y, F, D);        break; \
+  case Operation::OP_SUB:       BinaryOperation<Operation::OP_SUB>::der(X, Y, F, D);        break; \
+  case Operation::OP_MUL:       BinaryOperation<Operation::OP_MUL>::der(X, Y, F, D);        break; \
+  case Operation::OP_DIV:       BinaryOperation<Operation::OP_DIV>::der(X, Y, F, D);        break; \
+  case Operation::OP_NEG:       BinaryOperation<Operation::OP_NEG>::der(X, Y, F, D);        break; \
+  case Operation::OP_EXP:       BinaryOperation<Operation::OP_EXP>::der(X, Y, F, D);        break; \
+  case Operation::OP_LOG:       BinaryOperation<Operation::OP_LOG>::der(X, Y, F, D);        break; \
+  case Operation::OP_POW:       BinaryOperation<Operation::OP_POW>::der(X, Y, F, D);        break; \
+  case Operation::OP_CONSTPOW:  BinaryOperation<Operation::OP_CONSTPOW>::der(X, Y, F, D);   break; \
+  case Operation::OP_SQRT:      BinaryOperation<Operation::OP_SQRT>::der(X, Y, F, D);       break; \
+  case Operation::OP_SQ:        BinaryOperation<Operation::OP_SQ>::der(X, Y, F, D);         break; \
+  case Operation::OP_TWICE:     BinaryOperation<Operation::OP_TWICE>::der(X, Y, F, D);      break; \
+  case Operation::OP_SIN:       BinaryOperation<Operation::OP_SIN>::der(X, Y, F, D);        break; \
+  case Operation::OP_COS:       BinaryOperation<Operation::OP_COS>::der(X, Y, F, D);        break; \
+  case Operation::OP_TAN:       BinaryOperation<Operation::OP_TAN>::der(X, Y, F, D);        break; \
+  case Operation::OP_ASIN:      BinaryOperation<Operation::OP_ASIN>::der(X, Y, F, D);       break; \
+  case Operation::OP_ACOS:      BinaryOperation<Operation::OP_ACOS>::der(X, Y, F, D);       break; \
+  case Operation::OP_ATAN:      BinaryOperation<Operation::OP_ATAN>::der(X, Y, F, D);       break; \
+  case Operation::OP_LT:        BinaryOperation<Operation::OP_LT>::der(X, Y, F, D);         break; \
+  case Operation::OP_LE:        BinaryOperation<Operation::OP_LE>::der(X, Y, F, D);         break; \
+  case Operation::OP_EQ:        BinaryOperation<Operation::OP_EQ>::der(X, Y, F, D);         break; \
+  case Operation::OP_NE:        BinaryOperation<Operation::OP_NE>::der(X, Y, F, D);         break; \
+  case Operation::OP_NOT:       BinaryOperation<Operation::OP_NOT>::der(X, Y, F, D);        break; \
+  case Operation::OP_AND:       BinaryOperation<Operation::OP_AND>::der(X, Y, F, D);        break; \
+  case Operation::OP_OR:        BinaryOperation<Operation::OP_OR>::der(X, Y, F, D);         break; \
+  case Operation::OP_IF_ELSE_ZERO: BinaryOperation<Operation::OP_IF_ELSE_ZERO>::der(X, Y, F, D);         break; \
+  case Operation::OP_FLOOR:     BinaryOperation<Operation::OP_FLOOR>::der(X, Y, F, D);      break; \
+  case Operation::OP_CEIL:      BinaryOperation<Operation::OP_CEIL>::der(X, Y, F, D);       break; \
+  case Operation::OP_FMOD:      BinaryOperation<Operation::OP_FMOD>::der(X, Y, F, D);       break; \
+  case Operation::OP_FABS:      BinaryOperation<Operation::OP_FABS>::der(X, Y, F, D);       break; \
+  case Operation::OP_SIGN:      BinaryOperation<Operation::OP_SIGN>::der(X, Y, F, D);       break; \
+  case Operation::OP_COPYSIGN:  BinaryOperation<Operation::OP_COPYSIGN>::der(X, Y, F, D);   break; \
+  case Operation::OP_ERF:       BinaryOperation<Operation::OP_ERF>::der(X, Y, F, D);        break; \
+  case Operation::OP_FMIN:      BinaryOperation<Operation::OP_FMIN>::der(X, Y, F, D);       break; \
+  case Operation::OP_FMAX:      BinaryOperation<Operation::OP_FMAX>::der(X, Y, F, D);       break; \
+  case Operation::OP_INV:       BinaryOperation<Operation::OP_INV>::der(X, Y, F, D);        break; \
+  case Operation::OP_SINH:      BinaryOperation<Operation::OP_SINH>::der(X, Y, F, D);       break; \
+  case Operation::OP_COSH:      BinaryOperation<Operation::OP_COSH>::der(X, Y, F, D);       break; \
+  case Operation::OP_TANH:      BinaryOperation<Operation::OP_TANH>::der(X, Y, F, D);       break; \
+  case Operation::OP_ASINH:     BinaryOperation<Operation::OP_ASINH>::der(X, Y, F, D);      break; \
+  case Operation::OP_ACOSH:     BinaryOperation<Operation::OP_ACOSH>::der(X, Y, F, D);      break; \
+  case Operation::OP_ATANH:     BinaryOperation<Operation::OP_ATANH>::der(X, Y, F, D);      break; \
+  case Operation::OP_ATAN2:     BinaryOperation<Operation::OP_ATAN2>::der(X, Y, F, D);      break; \
+  case Operation::OP_ERFINV:    BinaryOperation<Operation::OP_ERFINV>::der(X, Y, F, D);     break; \
+  case Operation::OP_LIFT:      BinaryOperation<Operation::OP_LIFT>::der(X, Y, F, D);       break; \
+  case Operation::OP_PRINTME:   BinaryOperation<Operation::OP_PRINTME>::der(X, Y, F, D);    break;
 
     switch (op) {
     CASADI_MATH_DER_BUILTIN(x, y, f, d)
@@ -1325,115 +1329,115 @@ namespace casadi {
 
 
     template<typename T>
-      inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f, T* d) {
+      inline void casadi_math<T>::derF(Operation op, const T& x, const T& y, T& f, T* d) {
     // NOTE: We define the implementation in a preprocessor macro to be able to force inlining,
     // and to allow extensions in the VM
-#define CASADI_MATH_DERF_BUILTIN(X, Y, F, D)                            \
-    case OP_ASSIGN:    DerBinaryOpertion<OP_ASSIGN>::derf(X, Y, F, D);        break; \
-  case OP_ADD:       DerBinaryOpertion<OP_ADD>::derf(X, Y, F, D);        break; \
-  case OP_SUB:       DerBinaryOpertion<OP_SUB>::derf(X, Y, F, D);        break; \
-  case OP_MUL:       DerBinaryOpertion<OP_MUL>::derf(X, Y, F, D);        break; \
-  case OP_DIV:       DerBinaryOpertion<OP_DIV>::derf(X, Y, F, D);        break; \
-  case OP_NEG:       DerBinaryOpertion<OP_NEG>::derf(X, Y, F, D);        break; \
-  case OP_EXP:       DerBinaryOpertion<OP_EXP>::derf(X, Y, F, D);        break; \
-  case OP_LOG:       DerBinaryOpertion<OP_LOG>::derf(X, Y, F, D);        break; \
-  case OP_POW:       DerBinaryOpertion<OP_POW>::derf(X, Y, F, D);        break; \
-  case OP_CONSTPOW:  DerBinaryOpertion<OP_CONSTPOW>::derf(X, Y, F, D);   break; \
-  case OP_SQRT:      DerBinaryOpertion<OP_SQRT>::derf(X, Y, F, D);       break; \
-  case OP_SQ:        DerBinaryOpertion<OP_SQ>::derf(X, Y, F, D);         break; \
-  case OP_TWICE:     DerBinaryOpertion<OP_TWICE>::derf(X, Y, F, D);      break; \
-  case OP_SIN:       DerBinaryOpertion<OP_SIN>::derf(X, Y, F, D);        break; \
-  case OP_COS:       DerBinaryOpertion<OP_COS>::derf(X, Y, F, D);        break; \
-  case OP_TAN:       DerBinaryOpertion<OP_TAN>::derf(X, Y, F, D);        break; \
-  case OP_ASIN:      DerBinaryOpertion<OP_ASIN>::derf(X, Y, F, D);       break; \
-  case OP_ACOS:      DerBinaryOpertion<OP_ACOS>::derf(X, Y, F, D);       break; \
-  case OP_ATAN:      DerBinaryOpertion<OP_ATAN>::derf(X, Y, F, D);       break; \
-  case OP_LT:        DerBinaryOpertion<OP_LT>::derf(X, Y, F, D);         break; \
-  case OP_LE:        DerBinaryOpertion<OP_LE>::derf(X, Y, F, D);         break; \
-  case OP_EQ:        DerBinaryOpertion<OP_EQ>::derf(X, Y, F, D);         break; \
-  case OP_NE:        DerBinaryOpertion<OP_NE>::derf(X, Y, F, D);         break; \
-  case OP_NOT:       DerBinaryOpertion<OP_NOT>::derf(X, Y, F, D);        break; \
-  case OP_AND:       DerBinaryOpertion<OP_AND>::derf(X, Y, F, D);        break; \
-  case OP_OR:        DerBinaryOpertion<OP_OR>::derf(X, Y, F, D);         break; \
-  case OP_IF_ELSE_ZERO: DerBinaryOpertion<OP_IF_ELSE_ZERO>::derf(X, Y, F, D);         break; \
-  case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X, Y, F, D);      break; \
-  case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X, Y, F, D);       break; \
-  case OP_FMOD:      DerBinaryOpertion<OP_FMOD>::derf(X, Y, F, D);       break; \
-  case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X, Y, F, D);       break; \
-  case OP_SIGN:      DerBinaryOpertion<OP_SIGN>::derf(X, Y, F, D);       break; \
-  case OP_COPYSIGN:  DerBinaryOpertion<OP_COPYSIGN>::derf(X, Y, F, D);   break; \
-  case OP_ERF:       DerBinaryOpertion<OP_ERF>::derf(X, Y, F, D);        break; \
-  case OP_FMIN:      DerBinaryOpertion<OP_FMIN>::derf(X, Y, F, D);       break; \
-  case OP_FMAX:      DerBinaryOpertion<OP_FMAX>::derf(X, Y, F, D);       break; \
-  case OP_INV:       DerBinaryOpertion<OP_INV>::derf(X, Y, F, D);        break; \
-  case OP_SINH:      DerBinaryOpertion<OP_SINH>::derf(X, Y, F, D);       break; \
-  case OP_COSH:      DerBinaryOpertion<OP_COSH>::derf(X, Y, F, D);       break; \
-  case OP_TANH:      DerBinaryOpertion<OP_TANH>::derf(X, Y, F, D);       break; \
-  case OP_ASINH:     DerBinaryOpertion<OP_ASINH>::derf(X, Y, F, D);      break; \
-  case OP_ACOSH:     DerBinaryOpertion<OP_ACOSH>::derf(X, Y, F, D);      break; \
-  case OP_ATANH:     DerBinaryOpertion<OP_ATANH>::derf(X, Y, F, D);      break; \
-  case OP_ATAN2:     DerBinaryOpertion<OP_ATAN2>::derf(X, Y, F, D);      break; \
-  case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X, Y, F, D);     break; \
-  case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X, Y, F, D);       break; \
-  case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X, Y, F, D);    break;
+#define CASADI_MATH_DERF_BUILTIN(X, Y, F, D)                                                          \
+  case Operation::OP_ASSIGN:    DerBinaryOpertion<Operation::OP_ASSIGN>::derf(X, Y, F, D);     break; \
+  case Operation::OP_ADD:       DerBinaryOpertion<Operation::OP_ADD>::derf(X, Y, F, D);        break; \
+  case Operation::OP_SUB:       DerBinaryOpertion<Operation::OP_SUB>::derf(X, Y, F, D);        break; \
+  case Operation::OP_MUL:       DerBinaryOpertion<Operation::OP_MUL>::derf(X, Y, F, D);        break; \
+  case Operation::OP_DIV:       DerBinaryOpertion<Operation::OP_DIV>::derf(X, Y, F, D);        break; \
+  case Operation::OP_NEG:       DerBinaryOpertion<Operation::OP_NEG>::derf(X, Y, F, D);        break; \
+  case Operation::OP_EXP:       DerBinaryOpertion<Operation::OP_EXP>::derf(X, Y, F, D);        break; \
+  case Operation::OP_LOG:       DerBinaryOpertion<Operation::OP_LOG>::derf(X, Y, F, D);        break; \
+  case Operation::OP_POW:       DerBinaryOpertion<Operation::OP_POW>::derf(X, Y, F, D);        break; \
+  case Operation::OP_CONSTPOW:  DerBinaryOpertion<Operation::OP_CONSTPOW>::derf(X, Y, F, D);   break; \
+  case Operation::OP_SQRT:      DerBinaryOpertion<Operation::OP_SQRT>::derf(X, Y, F, D);       break; \
+  case Operation::OP_SQ:        DerBinaryOpertion<Operation::OP_SQ>::derf(X, Y, F, D);         break; \
+  case Operation::OP_TWICE:     DerBinaryOpertion<Operation::OP_TWICE>::derf(X, Y, F, D);      break; \
+  case Operation::OP_SIN:       DerBinaryOpertion<Operation::OP_SIN>::derf(X, Y, F, D);        break; \
+  case Operation::OP_COS:       DerBinaryOpertion<Operation::OP_COS>::derf(X, Y, F, D);        break; \
+  case Operation::OP_TAN:       DerBinaryOpertion<Operation::OP_TAN>::derf(X, Y, F, D);        break; \
+  case Operation::OP_ASIN:      DerBinaryOpertion<Operation::OP_ASIN>::derf(X, Y, F, D);       break; \
+  case Operation::OP_ACOS:      DerBinaryOpertion<Operation::OP_ACOS>::derf(X, Y, F, D);       break; \
+  case Operation::OP_ATAN:      DerBinaryOpertion<Operation::OP_ATAN>::derf(X, Y, F, D);       break; \
+  case Operation::OP_LT:        DerBinaryOpertion<Operation::OP_LT>::derf(X, Y, F, D);         break; \
+  case Operation::OP_LE:        DerBinaryOpertion<Operation::OP_LE>::derf(X, Y, F, D);         break; \
+  case Operation::OP_EQ:        DerBinaryOpertion<Operation::OP_EQ>::derf(X, Y, F, D);         break; \
+  case Operation::OP_NE:        DerBinaryOpertion<Operation::OP_NE>::derf(X, Y, F, D);         break; \
+  case Operation::OP_NOT:       DerBinaryOpertion<Operation::OP_NOT>::derf(X, Y, F, D);        break; \
+  case Operation::OP_AND:       DerBinaryOpertion<Operation::OP_AND>::derf(X, Y, F, D);        break; \
+  case Operation::OP_OR:        DerBinaryOpertion<Operation::OP_OR>::derf(X, Y, F, D);         break; \
+  case Operation::OP_IF_ELSE_ZERO: DerBinaryOpertion<Operation::OP_IF_ELSE_ZERO>::derf(X, Y, F, D);         break; \
+  case Operation::OP_FLOOR:     DerBinaryOpertion<Operation::OP_FLOOR>::derf(X, Y, F, D);      break; \
+  case Operation::OP_CEIL:      DerBinaryOpertion<Operation::OP_CEIL>::derf(X, Y, F, D);       break; \
+  case Operation::OP_FMOD:      DerBinaryOpertion<Operation::OP_FMOD>::derf(X, Y, F, D);       break; \
+  case Operation::OP_FABS:      DerBinaryOpertion<Operation::OP_FABS>::derf(X, Y, F, D);       break; \
+  case Operation::OP_SIGN:      DerBinaryOpertion<Operation::OP_SIGN>::derf(X, Y, F, D);       break; \
+  case Operation::OP_COPYSIGN:  DerBinaryOpertion<Operation::OP_COPYSIGN>::derf(X, Y, F, D);   break; \
+  case Operation::OP_ERF:       DerBinaryOpertion<Operation::OP_ERF>::derf(X, Y, F, D);        break; \
+  case Operation::OP_FMIN:      DerBinaryOpertion<Operation::OP_FMIN>::derf(X, Y, F, D);       break; \
+  case Operation::OP_FMAX:      DerBinaryOpertion<Operation::OP_FMAX>::derf(X, Y, F, D);       break; \
+  case Operation::OP_INV:       DerBinaryOpertion<Operation::OP_INV>::derf(X, Y, F, D);        break; \
+  case Operation::OP_SINH:      DerBinaryOpertion<Operation::OP_SINH>::derf(X, Y, F, D);       break; \
+  case Operation::OP_COSH:      DerBinaryOpertion<Operation::OP_COSH>::derf(X, Y, F, D);       break; \
+  case Operation::OP_TANH:      DerBinaryOpertion<Operation::OP_TANH>::derf(X, Y, F, D);       break; \
+  case Operation::OP_ASINH:     DerBinaryOpertion<Operation::OP_ASINH>::derf(X, Y, F, D);      break; \
+  case Operation::OP_ACOSH:     DerBinaryOpertion<Operation::OP_ACOSH>::derf(X, Y, F, D);      break; \
+  case Operation::OP_ATANH:     DerBinaryOpertion<Operation::OP_ATANH>::derf(X, Y, F, D);      break; \
+  case Operation::OP_ATAN2:     DerBinaryOpertion<Operation::OP_ATAN2>::derf(X, Y, F, D);      break; \
+  case Operation::OP_ERFINV:    DerBinaryOpertion<Operation::OP_ERFINV>::derf(X, Y, F, D);     break; \
+  case Operation::OP_LIFT:      DerBinaryOpertion<Operation::OP_LIFT>::derf(X, Y, F, D);       break; \
+  case Operation::OP_PRINTME:   DerBinaryOpertion<Operation::OP_PRINTME>::derf(X, Y, F, D);    break;
 
     switch (op) {
       CASADI_MATH_DERF_BUILTIN(x, y, f, d)
         }
   }
 
-  #define CASADI_MATH_BINARY_BUILTIN              \
-    case OP_ADD:                                  \
-    case OP_SUB:                                  \
-    case OP_MUL:                                  \
-    case OP_DIV:                                  \
-    case OP_POW:                                  \
-    case OP_CONSTPOW:                             \
-    case OP_LT:                                   \
-    case OP_LE:                                   \
-    case OP_EQ:                                   \
-    case OP_NE:                                   \
-    case OP_AND:                                  \
-    case OP_OR:                                   \
-    case OP_COPYSIGN:                             \
-    case OP_FMOD:                                 \
-    case OP_FMIN:                                 \
-    case OP_FMAX:                                 \
-    case OP_ATAN2:                                \
-    case OP_PRINTME:                              \
-    case OP_LIFT:
+  #define CASADI_MATH_BINARY_BUILTIN             \
+    case Operation::OP_ADD:                      \
+    case Operation::OP_SUB:                      \
+    case Operation::OP_MUL:                      \
+    case Operation::OP_DIV:                      \
+    case Operation::OP_POW:                      \
+    case Operation::OP_CONSTPOW:                 \
+    case Operation::OP_LT:                       \
+    case Operation::OP_LE:                       \
+    case Operation::OP_EQ:                       \
+    case Operation::OP_NE:                       \
+    case Operation::OP_AND:                      \
+    case Operation::OP_OR:                       \
+    case Operation::OP_COPYSIGN:                 \
+    case Operation::OP_FMOD:                     \
+    case Operation::OP_FMIN:                     \
+    case Operation::OP_FMAX:                     \
+    case Operation::OP_ATAN2:                    \
+    case Operation::OP_PRINTME:                  \
+    case Operation::OP_LIFT:
 
   #define CASADI_MATH_UNARY_BUILTIN              \
-    case OP_ASSIGN:                              \
-    case OP_NEG:                                 \
-    case OP_EXP:                                 \
-    case OP_LOG:                                 \
-    case OP_SQRT:                                \
-    case OP_SQ:                                  \
-    case OP_TWICE:                               \
-    case OP_SIN:                                 \
-    case OP_COS:                                 \
-    case OP_TAN:                                 \
-    case OP_ASIN:                                \
-    case OP_ACOS:                                \
-    case OP_ATAN:                                \
-    case OP_FLOOR:                               \
-    case OP_CEIL:                                \
-    case OP_NOT:                                 \
-    case OP_ERF:                                 \
-    case OP_FABS:                                \
-    case OP_SIGN:                                \
-    case OP_INV:                                 \
-    case OP_SINH:                                \
-    case OP_COSH:                                \
-    case OP_TANH:                                \
-    case OP_ASINH:                               \
-    case OP_ACOSH:                               \
-    case OP_ATANH:                               \
-    case OP_ERFINV:
+    case Operation::OP_ASSIGN:                   \
+    case Operation::OP_NEG:                      \
+    case Operation::OP_EXP:                      \
+    case Operation::OP_LOG:                      \
+    case Operation::OP_SQRT:                     \
+    case Operation::OP_SQ:                       \
+    case Operation::OP_TWICE:                    \
+    case Operation::OP_SIN:                      \
+    case Operation::OP_COS:                      \
+    case Operation::OP_TAN:                      \
+    case Operation::OP_ASIN:                     \
+    case Operation::OP_ACOS:                     \
+    case Operation::OP_ATAN:                     \
+    case Operation::OP_FLOOR:                    \
+    case Operation::OP_CEIL:                     \
+    case Operation::OP_NOT:                      \
+    case Operation::OP_ERF:                      \
+    case Operation::OP_FABS:                     \
+    case Operation::OP_SIGN:                     \
+    case Operation::OP_INV:                      \
+    case Operation::OP_SINH:                     \
+    case Operation::OP_COSH:                     \
+    case Operation::OP_TANH:                     \
+    case Operation::OP_ASINH:                    \
+    case Operation::OP_ACOSH:                    \
+    case Operation::OP_ATANH:                    \
+    case Operation::OP_ERFINV:
 
   template<typename T>
-  bool casadi_math<T>::is_binary(unsigned char op) {
+  bool casadi_math<T>::is_binary(Operation op) {
     switch (op) {
       CASADI_MATH_BINARY_BUILTIN
       case OP_IF_ELSE_ZERO:
@@ -1444,7 +1448,7 @@ namespace casadi {
   }
 
   template<typename T>
-  bool casadi_math<T>::is_unary(unsigned char op) {
+  bool casadi_math<T>::is_unary(Operation op) {
     switch (op) {
       CASADI_MATH_UNARY_BUILTIN
       return true;
@@ -1454,11 +1458,11 @@ namespace casadi {
   }
 
   template<typename T>
-  inline casadi_int casadi_math<T>::ndeps(unsigned char op) {
+  inline casadi_int casadi_math<T>::ndeps(Operation op) {
     switch (op) {
-      case OP_CONST:
-      case OP_PARAMETER:
-      case OP_INPUT:
+      case Operation::OP_CONST:
+      case Operation::OP_PARAMETER:
+      case Operation::OP_INPUT:
         return 0;
       CASADI_MATH_BINARY_BUILTIN
       case OP_IF_ELSE_ZERO:
@@ -1470,7 +1474,7 @@ namespace casadi {
 
   template<typename T>
   inline std::string
-  casadi_math<T>::print(unsigned char op,
+  casadi_math<T>::print(Operation op,
                         const std::string& x, const std::string& y) {
     casadi_assert_dev(ndeps(op)==2);
     return pre(op) + x + sep(op) + y + post(op);
@@ -1478,146 +1482,155 @@ namespace casadi {
 
   template<typename T>
   inline std::string
-  casadi_math<T>::print(unsigned char op, const std::string& x) {
+  casadi_math<T>::print(Operation op, const std::string& x) {
     casadi_assert_dev(ndeps(op)==1);
     return pre(op) + x + post(op);
   }
 
-  template<typename T>
-  inline std::string casadi_math<T>::name(unsigned char op) {
+  static inline const char* get_operation_name_c(Operation op) {
     switch (op) {
-    case OP_ASSIGN:         return "assign";
-    case OP_ADD:            return "add";
-    case OP_SUB:            return "sub";
-    case OP_MUL:            return "mul";
-    case OP_DIV:            return "div";
-    case OP_NEG:            return "neg";
-    case OP_EXP:            return "exp";
-    case OP_LOG:            return "log";
-    case OP_CONSTPOW:
-    case OP_POW:            return "pow";
-    case OP_SQRT:           return "sqrt";
-    case OP_SQ:             return "sq";
-    case OP_TWICE:          return "twice";
-    case OP_SIN:            return "sin";
-    case OP_COS:            return "cos";
-    case OP_TAN:            return "tan";
-    case OP_ASIN:           return "asin";
-    case OP_ACOS:           return "acos";
-    case OP_ATAN:           return "atan";
-    case OP_LT:             return "lt";
-    case OP_LE:             return "le";
-    case OP_EQ:             return "eq";
-    case OP_NE:             return "ne";
-    case OP_NOT:            return "not";
-    case OP_AND:            return "and";
-    case OP_OR:             return "or";
-    case OP_FLOOR:          return "floor";
-    case OP_CEIL:           return "ceil";
-    case OP_FMOD:           return "fmod";
-    case OP_FABS:           return "fabs";
-    case OP_SIGN:           return "sign";
-    case OP_COPYSIGN:       return "copysign";
-    case OP_IF_ELSE_ZERO:   return "if_else_zero";
-    case OP_ERF:            return "erf";
-    case OP_FMIN:           return "fmin";
-    case OP_FMAX:           return "fmax";
-    case OP_INV:            return "inv";
-    case OP_SINH:           return "sinh";
-    case OP_COSH:           return "cosh";
-    case OP_TANH:           return "tanh";
-    case OP_ASINH:          return "asinh";
-    case OP_ACOSH:          return "acosh";
-    case OP_ATANH:          return "atanh";
-    case OP_ATAN2:          return "atan2";
-    case OP_CONST:          return "const";
-    case OP_INPUT:          return "input";
-    case OP_OUTPUT:         return "output";
-    case OP_PARAMETER:      return "parameter";
-    case OP_CALL:           return "call";
-    case OP_MTIMES:         return "mtimes";
-    case OP_SOLVE:          return "solve";
-    case OP_TRANSPOSE:      return "transpose";
-    case OP_DETERMINANT:    return "determinant";
-    case OP_INVERSE:        return "inverse";
-    case OP_DOT:            return "dot";
-    case OP_HORZCAT:        return "horzcat";
-    case OP_VERTCAT:        return "vertcat";
-    case OP_DIAGCAT:        return "diagcat";
-    case OP_HORZSPLIT:      return "horzsplit";
-    case OP_VERTSPLIT:      return "vertsplit";
-    case OP_DIAGSPLIT:      return "diagsplit";
-    case OP_RESHAPE:        return "reshape";
-    case OP_SUBREF:         return "subref";
-    case OP_SUBASSIGN:      return "subassign";
-    case OP_GETNONZEROS:    return "getnonzeros";
-    case OP_GETNONZEROS_PARAM:    return "getnonzeros_param";
-    case OP_ADDNONZEROS:    return "addnonzeros";
-    case OP_ADDNONZEROS_PARAM:    return "addnonzeros_param";
-    case OP_SETNONZEROS:    return "setnonzeros";
-    case OP_SETNONZEROS_PARAM:    return "setnonzeros_param";
-    case OP_PROJECT:        return "project";
-    case OP_ASSERTION:      return "assertion";
-    case OP_NORM2:          return "norm2";
-    case OP_NORM1:          return "norm1";
-    case OP_NORMINF:        return "norminf";
-    case OP_NORMF:          return "normf";
-    case OP_ERFINV:         return "erfinv";
-    case OP_PRINTME:        return "printme";
-    case OP_LIFT:           return "lift";
-    case OP_EINSTEIN:       return "einstein";
-    case OP_BSPLINE:        return "bspline";
-    case OP_CONVEXIFY:      return "convexify";
+      case Operation::OP_ASSIGN:         return "assign";
+      case Operation::OP_ADD:            return "add";
+      case Operation::OP_SUB:            return "sub";
+      case Operation::OP_MUL:            return "mul";
+      case Operation::OP_DIV:            return "div";
+      case Operation::OP_NEG:            return "neg";
+      case Operation::OP_EXP:            return "exp";
+      case Operation::OP_LOG:            return "log";
+      case Operation::OP_CONSTPOW:
+      case Operation::OP_POW:            return "pow";
+      case Operation::OP_SQRT:           return "sqrt";
+      case Operation::OP_SQ:             return "sq";
+      case Operation::OP_TWICE:          return "twice";
+      case Operation::OP_SIN:            return "sin";
+      case Operation::OP_COS:            return "cos";
+      case Operation::OP_TAN:            return "tan";
+      case Operation::OP_ASIN:           return "asin";
+      case Operation::OP_ACOS:           return "acos";
+      case Operation::OP_ATAN:           return "atan";
+      case Operation::OP_LT:             return "lt";
+      case Operation::OP_LE:             return "le";
+      case Operation::OP_EQ:             return "eq";
+      case Operation::OP_NE:             return "ne";
+      case Operation::OP_NOT:            return "not";
+      case Operation::OP_AND:            return "and";
+      case Operation::OP_OR:             return "or";
+      case Operation::OP_FLOOR:          return "floor";
+      case Operation::OP_CEIL:           return "ceil";
+      case Operation::OP_FMOD:           return "fmod";
+      case Operation::OP_FABS:           return "fabs";
+      case Operation::OP_SIGN:           return "sign";
+      case Operation::OP_COPYSIGN:       return "copysign";
+      case Operation::OP_IF_ELSE_ZERO:   return "if_else_zero";
+      case Operation::OP_ERF:            return "erf";
+      case Operation::OP_FMIN:           return "fmin";
+      case Operation::OP_FMAX:           return "fmax";
+      case Operation::OP_INV:            return "inv";
+      case Operation::OP_SINH:           return "sinh";
+      case Operation::OP_COSH:           return "cosh";
+      case Operation::OP_TANH:           return "tanh";
+      case Operation::OP_ASINH:          return "asinh";
+      case Operation::OP_ACOSH:          return "acosh";
+      case Operation::OP_ATANH:          return "atanh";
+      case Operation::OP_ATAN2:          return "atan2";
+      case Operation::OP_CONST:          return "const";
+      case Operation::OP_INPUT:          return "input";
+      case Operation::OP_OUTPUT:         return "output";
+      case Operation::OP_PARAMETER:      return "parameter";
+      case Operation::OP_CALL:           return "call";
+      case Operation::OP_MTIMES:         return "mtimes";
+      case Operation::OP_SOLVE:          return "solve";
+      case Operation::OP_TRANSPOSE:      return "transpose";
+      case Operation::OP_DETERMINANT:    return "determinant";
+      case Operation::OP_INVERSE:        return "inverse";
+      case Operation::OP_DOT:            return "dot";
+      case Operation::OP_HORZCAT:        return "horzcat";
+      case Operation::OP_VERTCAT:        return "vertcat";
+      case Operation::OP_DIAGCAT:        return "diagcat";
+      case Operation::OP_HORZSPLIT:      return "horzsplit";
+      case Operation::OP_VERTSPLIT:      return "vertsplit";
+      case Operation::OP_DIAGSPLIT:      return "diagsplit";
+      case Operation::OP_RESHAPE:        return "reshape";
+      case Operation::OP_SUBREF:         return "subref";
+      case Operation::OP_SUBASSIGN:      return "subassign";
+      case Operation::OP_GETNONZEROS:    return "getnonzeros";
+      case Operation::OP_GETNONZEROS_PARAM:    return "getnonzeros_param";
+      case Operation::OP_ADDNONZEROS:    return "addnonzeros";
+      case Operation::OP_ADDNONZEROS_PARAM:    return "addnonzeros_param";
+      case Operation::OP_SETNONZEROS:    return "setnonzeros";
+      case Operation::OP_SETNONZEROS_PARAM:    return "setnonzeros_param";
+      case Operation::OP_PROJECT:        return "project";
+      case Operation::OP_ASSERTION:      return "assertion";
+      case Operation::OP_NORM2:          return "norm2";
+      case Operation::OP_NORM1:          return "norm1";
+      case Operation::OP_NORMINF:        return "norminf";
+      case Operation::OP_NORMF:          return "normf";
+      case Operation::OP_ERFINV:         return "erfinv";
+      case Operation::OP_PRINTME:        return "printme";
+      case Operation::OP_LIFT:           return "lift";
+      case Operation::OP_EINSTEIN:       return "einstein";
+      case Operation::OP_BSPLINE:        return "bspline";
+      case Operation::OP_CONVEXIFY:      return "convexify";
+      case Operation::OP_INVALID:        return "INVALID";
     }
     return nullptr;
   }
 
+  static inline std::string get_operation_name(Operation op) {
+    return std::move(std::string(get_operation_name_c(op)));
+  }
+
   template<typename T>
-  inline std::string casadi_math<T>::pre(unsigned char op) {
+  inline std::string casadi_math<T>::name(Operation op) {
+    return std::move(get_operation_name(op));
+  }
+
+  template<typename T>
+  inline std::string casadi_math<T>::pre(Operation op) {
     switch (op) {
-    case OP_ASSIGN:    return "";
-    case OP_ADD:       return "(";
-    case OP_SUB:       return "(";
-    case OP_MUL:       return "(";
-    case OP_DIV:       return "(";
-    case OP_NEG:       return "(-";
-    case OP_TWICE:     return "(2.*";
-    case OP_LT:        return "(";
-    case OP_LE:        return "(";
-    case OP_EQ:        return "(";
-    case OP_NE:        return "(";
-    case OP_NOT:       return "(!";
-    case OP_AND:       return "(";
-    case OP_OR:        return "(";
-    case OP_IF_ELSE_ZERO: return "(";
-    case OP_INV:       return "(1./";
+    case Operation::OP_ASSIGN:    return "";
+    case Operation::OP_ADD:       return "(";
+    case Operation::OP_SUB:       return "(";
+    case Operation::OP_MUL:       return "(";
+    case Operation::OP_DIV:       return "(";
+    case Operation::OP_NEG:       return "(-";
+    case Operation::OP_TWICE:     return "(2.*";
+    case Operation::OP_LT:        return "(";
+    case Operation::OP_LE:        return "(";
+    case Operation::OP_EQ:        return "(";
+    case Operation::OP_NE:        return "(";
+    case Operation::OP_NOT:       return "(!";
+    case Operation::OP_AND:       return "(";
+    case Operation::OP_OR:        return "(";
+    case Operation::OP_IF_ELSE_ZERO: return "(";
+    case Operation::OP_INV:       return "(1./";
     default: return name(op) + "(";
     }
   }
 
   template<typename T>
-  inline std::string casadi_math<T>::sep(unsigned char op) {
+  inline std::string casadi_math<T>::sep(Operation op) {
     switch (op) {
-    case OP_ADD:       return "+";
-    case OP_SUB:       return "-";
-    case OP_MUL:       return "*";
-    case OP_DIV:       return "/";
-    case OP_LT:        return "<";
-    case OP_LE:        return "<=";
-    case OP_EQ:        return "==";
-    case OP_NE:        return "!=";
-    case OP_AND:       return "&&";
-    case OP_OR:        return "||";
-    case OP_IF_ELSE_ZERO: return "?";
+    case Operation::OP_ADD:       return "+";
+    case Operation::OP_SUB:       return "-";
+    case Operation::OP_MUL:       return "*";
+    case Operation::OP_DIV:       return "/";
+    case Operation::OP_LT:        return "<";
+    case Operation::OP_LE:        return "<=";
+    case Operation::OP_EQ:        return "==";
+    case Operation::OP_NE:        return "!=";
+    case Operation::OP_AND:       return "&&";
+    case Operation::OP_OR:        return "||";
+    case Operation::OP_IF_ELSE_ZERO: return "?";
     default:           return ",";
     }
   }
 
   template<typename T>
-  inline std::string casadi_math<T>::post(unsigned char op) {
+  inline std::string casadi_math<T>::post(Operation op) {
     switch (op) {
-    case OP_ASSIGN:       return "";
-    case OP_IF_ELSE_ZERO: return ":0)";
+    case Operation::OP_ASSIGN:       return "";
+    case Operation::OP_IF_ELSE_ZERO: return ":0)";
     default:              return ")";
     }
   }

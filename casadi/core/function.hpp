@@ -859,7 +859,7 @@ namespace casadi {
     casadi_int n_instructions() const;
 
     /** \brief Identifier index of the instruction (SXFunction/MXFunction) */
-    casadi_int instruction_id(casadi_int k) const;
+    Operation instruction_id(casadi_int k) const;
 
     /** \brief Locations in the work vector for the inputs of the instruction
      * (SXFunction/MXFunction) */

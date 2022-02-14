@@ -40,13 +40,13 @@ class BinarySX : public SXNode {
   private:
 
     /** \brief  Constructor is private, use "create" below */
-    BinarySX(unsigned char op, const SXElem& dep0, const SXElem& dep1) :
+    BinarySX(Operation op, const SXElem& dep0, const SXElem& dep1) :
         op_(op), dep0_(dep0), dep1_(dep1) {}
 
   public:
 
     /** \brief  Create a binary expression */
-    inline static SXElem create(unsigned char op, const SXElem& dep0, const SXElem& dep1) {
+    inline static SXElem create(Operation op, const SXElem& dep0, const SXElem& dep1) {
       if (dep0.is_constant() && dep1.is_constant()) {
         // Evaluate constant
         double dep0_val(dep0);
@@ -74,7 +74,7 @@ class BinarySX : public SXNode {
 
     bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
-    bool is_op(casadi_int op) const override { return op_==op; }
+    bool is_op(Operation op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const SXNode* node, casadi_int depth) const override {
@@ -97,7 +97,7 @@ class BinarySX : public SXNode {
     SXElem& dep(casadi_int i) override { return i==0 ? dep0_ : dep1_;}
 
     /** \brief  Get the operation */
-    casadi_int op() const override { return op_;}
+    Operation op() const override { return op_;}
 
     /** \brief  Print expression */
     std::string print(const std::string& arg1, const std::string& arg2) const override {
@@ -105,7 +105,8 @@ class BinarySX : public SXNode {
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */
-    unsigned char op_;
+    //Operation op_;
+    Operation op_;
 
     /** \brief  The dependencies of the node */
     SXElem dep0_, dep1_;
@@ -116,7 +117,7 @@ class BinarySX : public SXNode {
     }
 
     /** \brief Deserialize without type information */
-    static SXNode* deserialize(DeserializingStream& s, casadi_int op) {
+    static SXNode* deserialize(DeserializingStream& s, Operation op) {
       SXElem dep0, dep1;
       s.unpack("UnarySX::dep0", dep0);
       s.unpack("UnarySX::dep1", dep1);

@@ -80,11 +80,11 @@ namespace casadi {
       switch (e.op) {
         CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
 
-      case OP_CONST: w[e.i0] = e.d; break;
-      case OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
-      case OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
+      case Operation::OP_CONST: w[e.i0] = e.d; break;
+      case Operation::OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
+      case Operation::OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
       default:
-        casadi_error("Unknown operation" + str(e.op));
+        casadi_error("Unknown operation" + get_operation_name(e.op));
       }
     }
     return 0;
@@ -110,16 +110,16 @@ namespace casadi {
     for (auto&& a : algorithm_) {
       InterruptHandler::check();
       stream << endl;
-      if (a.op==OP_OUTPUT) {
+      if (a.op==Operation::OP_OUTPUT) {
         stream << "output[" << a.i0 << "][" << a.i2 << "] = @" << a.i1;
       } else {
         stream << "@" << a.i0 << " = ";
-        if (a.op==OP_INPUT) {
+        if (a.op==Operation::OP_INPUT) {
           stream << "input[" << a.i1 << "][" << a.i2 << "]";
         } else {
-          if (a.op==OP_CONST) {
+          if (a.op==Operation::OP_CONST) {
             stream << a.d;
-          } else if (a.op==OP_PARAMETER) {
+          } else if (a.op==Operation::OP_PARAMETER) {
             stream << *p_it++;
           } else {
             casadi_int ndep = casadi_math<double>::ndeps(a.op);
@@ -154,7 +154,7 @@ namespace casadi {
 
     // Run the algorithm
     for (auto&& a : algorithm_) {
-      if (a.op==OP_OUTPUT) {
+      if (a.op==Operation::OP_OUTPUT) {
         g << "if (res[" << a.i0 << "]!=0) "
           << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
       } else {
@@ -163,9 +163,9 @@ namespace casadi {
         g << g.sx_work(a.i0) << "=";
 
         // What to store
-        if (a.op==OP_CONST) {
+        if (a.op==Operation::OP_CONST) {
           g << g.constant(a.d);
-        } else if (a.op==OP_INPUT) {
+        } else if (a.op==Operation::OP_INPUT) {
           g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
@@ -301,20 +301,20 @@ namespace casadi {
       AlgEl ae;
 
       // Get operation
-      ae.op = n==nullptr ? static_cast<int>(OP_OUTPUT) : static_cast<int>(n->op());
+      ae.op = n==nullptr ? Operation::OP_OUTPUT : n->op();
 
       // Get instruction
       switch (ae.op) {
-      case OP_CONST: // constant
+      case Operation::OP_CONST: // constant
         ae.d = n->to_double();
         ae.i0 = n->temp;
         break;
-      case OP_PARAMETER: // a parameter or input
+      case Operation::OP_PARAMETER: // a parameter or input
         symb_loc.push_back(make_pair(algorithm_.size(), n));
         ae.i0 = n->temp;
         ae.d = 0; // value not used, but set here to avoid uninitialized data in serialization
         break;
-      case OP_OUTPUT: // output instruction
+      case Operation::OP_OUTPUT: // output instruction
         ae.i0 = curr_oind;
         ae.i1 = out_[curr_oind]->at(curr_nz)->temp;
         ae.i2 = curr_nz;
@@ -374,7 +374,7 @@ namespace casadi {
       }
 
       // Find a place to store the variable
-      if (a.op!=OP_OUTPUT) {
+      if (a.op!=Operation::OP_OUTPUT) {
         if (live_variables_ && !unused.empty()) {
           // Try to reuse a variable from the stack if possible (last in, first out)
           a.i0 = place[a.i0] = unused.top();
@@ -396,7 +396,7 @@ namespace casadi {
 
       // If binary, make sure that the second argument is the same as the first one
       // (in order to treat all operations as binary) NOTE: ugly
-      if (ndeps==1 && a.op!=OP_OUTPUT) {
+      if (ndeps==1 && a.op!=Operation::OP_OUTPUT) {
         a.i2 = a.i1;
       }
     }
@@ -435,7 +435,7 @@ namespace casadi {
         int i = itc->get_temp()-1;
         if (i>=0) {
           // Mark as input
-          algorithm_[i].op = OP_INPUT;
+          algorithm_[i].op = Operation::OP_INPUT;
 
           // Location of the input
           algorithm_[i].i1 = ind;
@@ -492,14 +492,14 @@ namespace casadi {
     if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& a : algorithm_) {
       switch (a.op) {
-      case OP_INPUT:
-      case OP_OUTPUT:
+      case Operation::OP_INPUT:
+      case Operation::OP_OUTPUT:
         it++;
         break;
-      case OP_CONST:
+      case Operation::OP_CONST:
         *it++ = *c_it++;
         break;
-      case OP_PARAMETER:
+      case Operation::OP_PARAMETER:
         *it++ = *p_it++;
         break;
       default:
@@ -527,16 +527,16 @@ namespace casadi {
     if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& a : algorithm_) {
       switch (a.op) {
-      case OP_INPUT:
+      case Operation::OP_INPUT:
         w[a.i0] = arg[a.i1]==nullptr ? 0 : arg[a.i1][a.i2];
         break;
-      case OP_OUTPUT:
+      case Operation::OP_OUTPUT:
         if (res[a.i0]!=nullptr) res[a.i0][a.i2] = w[a.i1];
         break;
-      case OP_CONST:
+      case Operation::OP_CONST:
         w[a.i0] = *c_it++;
         break;
-      case OP_PARAMETER:
+      case Operation::OP_PARAMETER:
         w[a.i0] = *p_it++; break;
       default:
         {
@@ -614,10 +614,10 @@ namespace casadi {
     if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& e : algorithm_) {
       switch (e.op) {
-      case OP_INPUT:
-      case OP_OUTPUT:
-      case OP_CONST:
-      case OP_PARAMETER:
+      case Operation::OP_INPUT:
+      case Operation::OP_OUTPUT:
+      case Operation::OP_CONST:
+      case Operation::OP_PARAMETER:
         break;
       default:
         {
@@ -638,12 +638,12 @@ namespace casadi {
       vector<TapeEl<SXElem> >::const_iterator it2 = s_pdwork.begin();
       for (auto&& a : algorithm_) {
         switch (a.op) {
-        case OP_INPUT:
+        case Operation::OP_INPUT:
           w[a.i0] = fseed[dir][a.i1].nonzeros()[a.i2]; break;
-        case OP_OUTPUT:
+        case Operation::OP_OUTPUT:
           fsens[dir][a.i0].nonzeros()[a.i2] = w[a.i1]; break;
-        case OP_CONST:
-        case OP_PARAMETER:
+        case Operation::OP_CONST:
+        case Operation::OP_PARAMETER:
           w[a.i0] = 0;
           break;
         case OP_IF_ELSE_ZERO:
@@ -722,10 +722,10 @@ namespace casadi {
     if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& a : algorithm_) {
       switch (a.op) {
-      case OP_INPUT:
-      case OP_OUTPUT:
-      case OP_CONST:
-      case OP_PARAMETER:
+      case Operation::OP_INPUT:
+      case Operation::OP_OUTPUT:
+      case Operation::OP_CONST:
+      case Operation::OP_PARAMETER:
         break;
       default:
         {
@@ -748,15 +748,15 @@ namespace casadi {
       for (auto it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
         SXElem seed;
         switch (it->op) {
-        case OP_INPUT:
+        case Operation::OP_INPUT:
           asens[dir][it->i1].nonzeros()[it->i2] = w[it->i0];
           w[it->i0] = 0;
           break;
-        case OP_OUTPUT:
+        case Operation::OP_OUTPUT:
           w[it->i1] += aseed[dir][it->i0].nonzeros()[it->i2];
           break;
-        case OP_CONST:
-        case OP_PARAMETER:
+        case Operation::OP_CONST:
+        case Operation::OP_PARAMETER:
           w[it->i0] = 0;
           break;
         case OP_IF_ELSE_ZERO:
@@ -787,13 +787,13 @@ namespace casadi {
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
-      case OP_CONST:
-      case OP_PARAMETER:
+      case Operation::OP_CONST:
+      case Operation::OP_PARAMETER:
         w[e.i0] = 0; break;
-      case OP_INPUT:
+      case Operation::OP_INPUT:
         w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2];
         break;
-      case OP_OUTPUT:
+      case Operation::OP_OUTPUT:
         if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1];
         break;
       default: // Unary or binary operation
@@ -817,15 +817,15 @@ namespace casadi {
 
       // Propagate seeds
       switch (it->op) {
-      case OP_CONST:
-      case OP_PARAMETER:
+      case Operation::OP_CONST:
+      case Operation::OP_PARAMETER:
         w[it->i0] = 0;
         break;
-      case OP_INPUT:
+      case Operation::OP_INPUT:
         if (arg[it->i1]!=nullptr) arg[it->i1][it->i2] |= w[it->i0];
         w[it->i0] = 0;
         break;
-      case OP_OUTPUT:
+      case Operation::OP_OUTPUT:
         if (res[it->i0]!=nullptr) {
           w[it->i1] |= res[it->i0][it->i2];
           res[it->i0][it->i2] = 0;
@@ -884,25 +884,25 @@ namespace casadi {
 
     for (casadi_int k=0;k<f.n_instructions();++k) {
       // Get operation
-      casadi_int op = static_cast<casadi_int>(f.instruction_id(k));
+      Operation op = static_cast<Operation>(f.instruction_id(k));
       // Get input positions into workvector
       std::vector<casadi_int> o = f.instruction_output(k);
       // Get output positions into workvector
       std::vector<casadi_int> i = f.instruction_input(k);
       switch (op) {
-        case OP_INPUT:
+        case Operation::OP_INPUT:
           {
             ss << indent << "w" << o[0] << " = " << "argin_" << i[0] << "(" << i[1]+1 << ");";
             ss << std::endl;
           }
           break;
-        case OP_OUTPUT:
+        case Operation::OP_OUTPUT:
           {
             ss << indent << "argout_" << o[0] << "{" << o[1]+1 << "} = w" << i[0] << ";";
             ss << std::endl;
           }
           break;
-        case OP_CONST:
+        case Operation::OP_CONST:
           {
             std::ios_base::fmtflags fmtfl = ss.flags();
             ss << indent << "w" << o[0] << " = ";
@@ -911,33 +911,33 @@ namespace casadi {
             ss.flags(fmtfl);
           }
           break;
-        case OP_SQ:
+        case Operation::OP_SQ:
           {
             ss << indent << "w" << o[0] << " = " << "w" << i[0] << "^2;" << std::endl;
           }
           break;
-        case OP_FABS:
+        case Operation::OP_FABS:
           {
             ss << indent << "w" << o[0] << " = abs(" << "w" << i[0] << ");" << std::endl;
           }
           break;
-        case OP_POW:
-        case OP_CONSTPOW:
+        case Operation::OP_POW:
+        case Operation::OP_CONSTPOW:
           ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".^w" << i[1] << ";" << std::endl;
           break;
-        case OP_NOT:
+        case Operation::OP_NOT:
           ss << indent << "w" << o[0] << " = ~" << "w" << i[0] << ";" << std::endl;
           break;
-        case OP_OR:
+        case Operation::OP_OR:
           ss << indent << "w" << o[0] << " = w" << i[0] << " | w" << i[1] << ";" << std::endl;
           break;
-        case OP_AND:
+        case Operation::OP_AND:
           ss << indent << "w" << o[0] << " = w" << i[0] << " & w" << i[1] << ";" << std::endl;
           break;
-        case OP_NE:
+        case Operation::OP_NE:
           ss << indent << "w" << o[0] << " = w" << i[0] << " ~= w" << i[1] << ";" << std::endl;
           break;
-        case OP_IF_ELSE_ZERO:
+        case Operation::OP_IF_ELSE_ZERO:
           ss << indent << "w" << o[0] << " = ";
           ss << "if_else_zero_gen(w" << i[0] << ", w" << i[1] << ");" << std::endl;
           break;

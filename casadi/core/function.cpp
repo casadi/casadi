@@ -1632,7 +1632,7 @@ namespace casadi {
     }
   }
 
-  casadi_int Function::instruction_id(casadi_int k) const {
+  Operation Function::instruction_id(casadi_int k) const {
     try {
       return (*this)->instruction_id(k);
     } catch (exception& e) {

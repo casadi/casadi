@@ -65,10 +65,10 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   bool SX::is_symbolic() const;
 
   template<>
-  casadi_int SX::op() const;
+  Operation SX::op() const;
 
   template<>
-  bool SX::is_op(casadi_int op) const;
+  bool SX::is_op(Operation op) const;
 
   template<> bool SX::has_duplicates() const;
 

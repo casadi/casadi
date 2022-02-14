@@ -698,24 +698,24 @@ namespace casadi {
     s << array("static const casadi_real", name, v.size(), initializer(v));
   }
 
-  std::string CodeGenerator::print_op(casadi_int op, const std::string& a0) {
+  std::string CodeGenerator::print_op(Operation op, const std::string& a0) {
     switch (op) {
-      case OP_SQ:
+      case Operation::OP_SQ:
         add_auxiliary(AUX_SQ);
         return "casadi_sq("+a0+")";
-      case OP_SIGN:
+      case Operation::OP_SIGN:
         add_auxiliary(AUX_SIGN);
         return "casadi_sign("+a0+")";
       default:
         return casadi_math<double>::print(op, a0);
     }
   }
-  std::string CodeGenerator::print_op(casadi_int op, const std::string& a0, const std::string& a1) {
+  std::string CodeGenerator::print_op(Operation op, const std::string& a0, const std::string& a1) {
     switch (op) {
-      case OP_FMIN:
+      case Operation::OP_FMIN:
         add_auxiliary(AUX_FMIN);
         return "casadi_fmin("+a0+","+a1+")";
-      case OP_FMAX:
+      case Operation::OP_FMAX:
         add_auxiliary(AUX_FMAX);
         return "casadi_fmax("+a0+","+a1+")";
       default:

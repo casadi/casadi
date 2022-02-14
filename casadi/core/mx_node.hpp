@@ -173,7 +173,7 @@ namespace casadi {
     virtual const Function& which_function() const;
 
     /** \brief Get the operation */
-    virtual casadi_int op() const = 0;
+    virtual Operation op() const = 0;
 
     /** Obtain information about node */
     virtual Dict info() const;
@@ -491,13 +491,13 @@ namespace casadi {
     virtual MX get_project(const Sparsity& sp) const;
 
     /// Get a unary operation
-    virtual MX get_unary(casadi_int op) const;
+    virtual MX get_unary(Operation op) const;
 
     /// Get a binary operation operation
-    MX get_binary(casadi_int op, const MX& y) const;
+    MX get_binary(Operation op, const MX& y) const;
 
     /// Get a binary operation operation (matrix-matrix)
-    virtual MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY) const;
+    virtual MX _get_binary(Operation op, const MX& y, bool scX, bool scY) const;
 
     /// Determinant
     virtual MX get_det() const;
@@ -573,7 +573,7 @@ namespace casadi {
     /** \brief Propagate sparsities backwards through a copy operation */
     static void copy_rev(bvec_t* arg, bvec_t* res, casadi_int len);
 
-    static std::map<casadi_int, MXNode* (*)(DeserializingStream&)> deserialize_map;
+    static std::map<Operation, MXNode* (*)(DeserializingStream&)> deserialize_map;
 
   protected:
     /** \brief Deserializing constructor */

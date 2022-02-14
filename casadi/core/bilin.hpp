@@ -82,7 +82,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_BILIN;}
+    Operation op() const override { return Operation::OP_BILIN;}
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new Bilin(s); }

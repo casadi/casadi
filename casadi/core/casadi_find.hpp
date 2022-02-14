@@ -66,7 +66,7 @@ namespace casadi {
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_FIND;}
+    Operation op() const override { return Operation::OP_FIND;}
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,

@@ -124,10 +124,10 @@ namespace casadi {
     // Check if inplace
     bool inplace;
     switch (op_) {
-    case OP_ADD:
-    case OP_SUB:
-    case OP_MUL:
-    case OP_DIV:
+    case Operation::OP_ADD:
+    case Operation::OP_SUB:
+    case Operation::OP_MUL:
+    case Operation::OP_DIV:
       inplace = res[0]==arg[0];
       break;
     default:
@@ -141,7 +141,7 @@ namespace casadi {
     string y = g.workel(arg[1]);
 
     // Avoid emitting '/*' which will be mistaken for a comment
-    if (op_==OP_DIV && g.codegen_scalars && dep(1).nnz()==1) {
+    if (op_==Operation::OP_DIV && g.codegen_scalars && dep(1).nnz()==1) {
       y = "(" + y + ")";
     }
 
@@ -157,7 +157,7 @@ namespace casadi {
       if (!ScX && !inplace) {
         g.local("cr", "const casadi_real", "*");
         g << ", cr=" << g.work(arg[0], dep(0).nnz());
-        if (op_==OP_OR || op_==OP_AND) {
+        if (op_==Operation::OP_OR || op_==Operation::OP_AND) {
           // Avoid short-circuiting with side effects
           x = "cr[i]";
         } else {
@@ -170,7 +170,7 @@ namespace casadi {
       if (!ScY) {
         g.local("cs", "const casadi_real", "*");
         g << ", cs=" << g.work(arg[1], dep(1).nnz());
-        if (op_==OP_OR || op_==OP_AND) {
+        if (op_==Operation::OP_OR || op_==Operation::OP_AND) {
           // Avoid short-circuiting with side effects
           y = "cs[i]";
         } else {
@@ -263,7 +263,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::get_unary(casadi_int op) const {
+  MX BinaryMX<ScX, ScY>::get_unary(Operation op) const {
     //switch (op_) {
     //default: break; // no rule
     //}
@@ -273,17 +273,17 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
+  MX BinaryMX<ScX, ScY>::_get_binary(Operation op, const MX& y, bool scX, bool scY) const {
     if (!GlobalOptions::simplification_on_the_fly) return MXNode::_get_binary(op, y, scX, scY);
 
     switch (op_) {
-    case OP_ADD:
-      if (op==OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return dep(1);
-      if (op==OP_SUB && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
+    case Operation::OP_ADD:
+      if (op==Operation::OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return dep(1);
+      if (op==Operation::OP_SUB && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
       break;
-    case OP_SUB:
-      if (op==OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return -dep(1);
-      if (op==OP_ADD && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
+    case Operation::OP_SUB:
+      if (op==Operation::OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return -dep(1);
+      if (op==Operation::OP_ADD && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
       break;
     default: break; // no rule
     }

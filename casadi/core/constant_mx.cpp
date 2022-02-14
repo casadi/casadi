@@ -242,11 +242,11 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::get_unary(casadi_int op) const {
+  MX ZeroByZero::get_unary(Operation op) const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const {
+  MX ZeroByZero::_get_binary(Operation op, const MX& y, bool ScX, bool ScY) const {
     return shared_from_this<MX>();
   }
 

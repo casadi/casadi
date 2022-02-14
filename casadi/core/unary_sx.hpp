@@ -41,12 +41,12 @@ class UnarySX : public SXNode {
   private:
 
     /** \brief  Constructor is private, use "create" below */
-    UnarySX(unsigned char op, const SXElem& dep) : op_(op), dep_(dep) {}
+    UnarySX(Operation op, const SXElem& dep) : op_(op), dep_(dep) {}
 
   public:
 
     /** \brief  Create a unary expression */
-    inline static SXElem create(unsigned char op, const SXElem& dep) {
+    inline static SXElem create(Operation op, const SXElem& dep) {
       if (dep.is_constant()) {
         // Evaluate constant
         double dep_val(dep);
@@ -69,7 +69,7 @@ class UnarySX : public SXNode {
 
     bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
-    bool is_op(casadi_int op) const override { return op_==op; }
+    bool is_op(Operation op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const SXNode* node, casadi_int depth) const override {
@@ -85,7 +85,7 @@ class UnarySX : public SXNode {
     SXElem& dep(casadi_int i) override { return dep_; }
 
     /** \brief  Get the operation */
-    casadi_int op() const override { return op_;}
+    Operation op() const override { return op_;}
 
     /** \brief  Print expression */
     std::string print(const std::string& arg1, const std::string& arg2) const  override {
@@ -93,7 +93,7 @@ class UnarySX : public SXNode {
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */
-    unsigned char op_;
+    Operation op_;
 
     /** \brief  The dependencies of the node */
     SXElem dep_;
@@ -102,7 +102,7 @@ class UnarySX : public SXNode {
       s.pack("UnarySX::dep", dep_);
     }
 
-    static SXNode* deserialize(DeserializingStream& s, casadi_int op) {
+    static SXNode* deserialize(DeserializingStream& s, Operation op) {
       SXElem dep;
       s.unpack("UnarySX::dep", dep);
       return new UnarySX(op, dep);

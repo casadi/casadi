@@ -258,7 +258,7 @@ namespace casadi {
       for (casadi_int i=0; i<n_dep(); ++i) {
         dep(i)->can_inline(nodeind);
       }
-    } else if (it->second==0 && op()!=OP_PARAMETER) {
+    } else if (it->second==0 && op()!=Operation::OP_PARAMETER) {
       // Node encountered before, do not inline (except if symbolic primitive)
       it->second = -1;
     }
@@ -439,7 +439,7 @@ namespace casadi {
 
 
   MXNode* MXNode::deserialize(DeserializingStream& s) {
-    int op;
+    Operation op;
     s.unpack("MXNode::op", op);
 
     if (casadi_math<MX>::is_binary(op)) {
@@ -450,7 +450,7 @@ namespace casadi {
 
     auto it = MXNode::deserialize_map.find(op);
     if (it==MXNode::deserialize_map.end()) {
-      casadi_error("Not implemented op " + str(casadi_int(op)) + ":" + str(OP_GETNONZEROS));
+      casadi_error("Not implemented op " + get_operation_name(op) + ":" + get_operation_name(Operation::OP_GETNONZEROS));
     } else {
       return it->second(s);
     }
@@ -663,7 +663,7 @@ namespace casadi {
     return MX::create(new SubAssign(shared_from_this<MX>(), y, i, j));
   }
 
-  MX MXNode::get_unary(casadi_int op) const {
+  MX MXNode::get_unary(Operation op) const {
     if (operation_checker<F0XChecker>(op) && is_zero()) {
       // If identically zero
       return MX::zeros(sparsity());
@@ -673,22 +673,22 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_binary(casadi_int op, const MX& y) const {
+  MX MXNode::get_binary(Operation op, const MX& y) const {
     // If-else-zero nodes are always simplified at top level to avoid NaN propagation
-    if (y.op() == OP_IF_ELSE_ZERO) {
-      if (op == OP_MUL) {
+    if (y.op() == Operation::OP_IF_ELSE_ZERO) {
+      if (op == Operation::OP_MUL) {
         // (Rule 1.) x * if_else_zero(c, y), simplified to if_else_zero(c, x * y)
         // Background: x is often a partial derivative and may evaluate to INF or NAN.
         // The simplification ensures that the zero seed corresponding to an inactive branch does
         // not give rise to any NaN contribution to the derivative due to NaN * 0 == NaN.
         return if_else_zero(y.dep(0), shared_from_this<MX>() * y.dep(1));
-      } else if (op == OP_ADD && this->op() == OP_IF_ELSE_ZERO && MX::is_equal(dep(0), y.dep(0))) {
+      } else if (op == Operation::OP_ADD && this->op() == Operation::OP_IF_ELSE_ZERO && MX::is_equal(dep(0), y.dep(0))) {
         // (Rule 2.) if_else_zero(c, x) + if_else_zero(c, y) is simplified to if_else_zero(c, x + y)
         // Background: During the backward propagation, seeds are added together. Without this rule,
         // the addition node can prevent rule (1.) from working in subsequent steps.
         return if_else_zero(y.dep(0), dep(1) + y.dep(1));
       }
-    } else if (this->op() == OP_IF_ELSE_ZERO && op == OP_MUL) {
+    } else if (this->op() == Operation::OP_IF_ELSE_ZERO && op == Operation::OP_MUL) {
       // Same as Rule 1. above, but with factors swapped. For symmetry.
       return if_else_zero(dep(0), dep(1) * y);
     }
@@ -728,7 +728,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
+  MX MXNode::_get_binary(Operation op, const MX& y, bool scX, bool scY) const {
     casadi_assert_dev(sparsity()==y.sparsity() || scX || scY);
 
     if (GlobalOptions::simplification_on_the_fly) {
@@ -746,75 +746,75 @@ namespace casadi {
 
       // Handle special operations (independent of type)
       switch (op) {
-      case OP_ADD:
-        if (MXNode::is_equal(y.get(), this, maxDepth())) return get_unary(OP_TWICE);
+      case Operation::OP_ADD:
+        if (MXNode::is_equal(y.get(), this, maxDepth())) return get_unary(Operation::OP_TWICE);
         break;
-      case OP_SUB:
-      case OP_NE:
-      case OP_LT:
+      case Operation::OP_SUB:
+      case Operation::OP_NE:
+      case Operation::OP_LT:
         if (MXNode::is_equal(y.get(), this, maxDepth())) return MX::zeros(sparsity());
         break;
-      case OP_DIV:
+      case Operation::OP_DIV:
         if (y->is_zero()) return MX::nan(sparsity());
         // fall-through
-      case OP_EQ:
-      case OP_LE:
+      case Operation::OP_EQ:
+      case Operation::OP_LE:
         if (MXNode::is_equal(y.get(), this, maxDepth())) return MX::ones(sparsity());
         break;
-      case OP_MUL:
-        if (MXNode::is_equal(y.get(), this, maxDepth())) return get_unary(OP_SQ);
+      case Operation::OP_MUL:
+        if (MXNode::is_equal(y.get(), this, maxDepth())) return get_unary(Operation::OP_SQ);
         break;
       default: break; // no rule
       }
 
       // Handle special cases for the second argument
       switch (y->op()) {
-      case OP_CONST:
+      case Operation::OP_CONST:
         // Make the constant the first argument, if possible
-        if (this->op()!=OP_CONST && operation_checker<CommChecker>(op)) {
+        if (this->op()!=Operation::OP_CONST && operation_checker<CommChecker>(op)) {
           return y->_get_binary(op, shared_from_this<MX>(), scY, scX);
         } else {
           switch (op) {
-          case OP_POW:
-            return _get_binary(OP_CONSTPOW, y, scX, scY);
-          case OP_CONSTPOW:
-            if (y->is_value(-1)) return get_unary(OP_INV);
+          case Operation::OP_POW:
+            return _get_binary(Operation::OP_CONSTPOW, y, scX, scY);
+          case Operation::OP_CONSTPOW:
+            if (y->is_value(-1)) return get_unary(Operation::OP_INV);
             else if (y->is_value(0)) return MX::ones(sparsity());
             else if (y->is_value(1)) return shared_from_this<MX>();
-            else if (y->is_value(2)) return get_unary(OP_SQ);
+            else if (y->is_value(2)) return get_unary(Operation::OP_SQ);
             break;
-          case OP_ADD:
-          case OP_SUB:
+          case Operation::OP_ADD:
+          case Operation::OP_SUB:
             if (y->is_zero())
                 return scX ? repmat(shared_from_this<MX>(), y.size()) : shared_from_this<MX>();
             break;
-          case OP_MUL:
+          case Operation::OP_MUL:
             if (y->is_value(1)) return shared_from_this<MX>();
             break;
-          case OP_DIV:
+          case Operation::OP_DIV:
             if (y->is_value(1)) return shared_from_this<MX>();
-            else if (y->is_value(0.5)) return get_unary(OP_TWICE);
+            else if (y->is_value(0.5)) return get_unary(Operation::OP_TWICE);
             break;
           default: break; // no rule
           }
         }
         break;
-      case OP_NEG:
-        if (op==OP_ADD) {
-          return _get_binary(OP_SUB, y->dep(), scX, scY);
-        } else if (op==OP_SUB) {
-          return _get_binary(OP_ADD, y->dep(), scX, scY);
-        } else if (op==OP_MUL) {
-          return -_get_binary(OP_MUL, y->dep(), scX, scY);
-        } else if (op==OP_DIV) {
-          return -_get_binary(OP_DIV, y->dep(), scX, scY);
+      case Operation::OP_NEG:
+        if (op==Operation::OP_ADD) {
+          return _get_binary(Operation::OP_SUB, y->dep(), scX, scY);
+        } else if (op==Operation::OP_SUB) {
+          return _get_binary(Operation::OP_ADD, y->dep(), scX, scY);
+        } else if (op==Operation::OP_MUL) {
+          return -_get_binary(Operation::OP_MUL, y->dep(), scX, scY);
+        } else if (op==Operation::OP_DIV) {
+          return -_get_binary(Operation::OP_DIV, y->dep(), scX, scY);
         }
         break;
-      case OP_INV:
-        if (op==OP_MUL) {
-          return _get_binary(OP_DIV, y->dep(), scX, scY);
-        } else if (op==OP_DIV) {
-          return _get_binary(OP_MUL, y->dep(), scX, scY);
+      case Operation::OP_INV:
+        if (op==Operation::OP_MUL) {
+          return _get_binary(Operation::OP_DIV, y->dep(), scX, scY);
+        } else if (op==Operation::OP_DIV) {
+          return _get_binary(Operation::OP_MUL, y->dep(), scX, scY);
         }
         break;
       default: break; // no rule
@@ -941,7 +941,7 @@ namespace casadi {
       if (sparsity().nnz()==0) {
         return 0;
       } else if (sparsity().is_scalar()) {
-        return get_binary(OP_MUL, y);
+        return get_binary(Operation::OP_MUL, y);
       } else {
         return MX::create(new Dot(shared_from_this<MX>(), y));
       }
@@ -983,11 +983,11 @@ namespace casadi {
   MX MXNode::get_horzcat(const vector<MX>& x) const {
     // Check if there is any existing horzcat operation
     for (auto i=x.begin(); i!=x.end(); ++i) {
-      if (i->op()==OP_HORZCAT) {
+      if (i->op()==Operation::OP_HORZCAT) {
         // Split up
         vector<MX> x_split(x.begin(), i);
         for (; i!=x.end(); ++i) {
-          if (i->op()==OP_HORZCAT) {
+          if (i->op()==Operation::OP_HORZCAT) {
             x_split.insert(x_split.end(), (*i)->dep_.begin(), (*i)->dep_.end());
           } else {
             x_split.push_back(*i);
@@ -1009,11 +1009,11 @@ namespace casadi {
   MX MXNode::get_vertcat(const vector<MX>& x) const {
     // Check if there is any existing vertcat operation
     for (auto i=x.begin(); i!=x.end(); ++i) {
-      if (i->op()==OP_VERTCAT) {
+      if (i->op()==Operation::OP_VERTCAT) {
         // Split up
         vector<MX> x_split(x.begin(), i);
         for (; i!=x.end(); ++i) {
-          if (i->op()==OP_VERTCAT) {
+          if (i->op()==Operation::OP_VERTCAT) {
             x_split.insert(x_split.end(), (*i)->dep_.begin(), (*i)->dep_.end());
           } else {
             x_split.push_back(*i);
@@ -1040,7 +1040,7 @@ namespace casadi {
 
     if (GlobalOptions::simplification_on_the_fly) {
       // Simplify horzsplit(horzcat)
-      if (op()==OP_HORZCAT) {
+      if (op()==Operation::OP_HORZCAT) {
         casadi_int offset_deps = 0;
         casadi_int j = 0;
         for (casadi_int i=0;i<output_offset.size();++i) {
@@ -1106,7 +1106,7 @@ namespace casadi {
 
     if (GlobalOptions::simplification_on_the_fly) {
       // Simplify vertsplit(vertcat)
-      if (op()==OP_VERTCAT) {
+      if (op()==Operation::OP_VERTCAT) {
         casadi_int offset_deps = 0;
         casadi_int j = 0;
         for (casadi_int i=0;i<output_offset.size();++i) {
@@ -1151,56 +1151,56 @@ namespace casadi {
 
 
   // Note: binary/unary operations are omitted here
-  std::map<casadi_int, MXNode* (*)(DeserializingStream&)> MXNode::deserialize_map = {
-    {OP_INPUT, Input::deserialize},
-    {OP_OUTPUT, Output::deserialize},
-    {OP_PARAMETER, SymbolicMX::deserialize},
-    {OP_CONST, ConstantMX::deserialize},
-    {OP_CALL, Call::deserialize},
-    {OP_FIND, Find::deserialize},
-    {OP_LOW, Low::deserialize},
-    //{OP_MAP, Map::deserialize}, Map is a function
-    {OP_MTIMES, Multiplication::deserialize},
-    {OP_SOLVE, LinsolCall<false>::deserialize},
-    {OP_TRANSPOSE, Transpose::deserialize},
-    {OP_DETERMINANT, Determinant::deserialize},
-    {OP_INVERSE, Inverse::deserialize},
-    {OP_DOT, Dot::deserialize},
-    {OP_BILIN, Bilin::deserialize},
-    {OP_RANK1, Rank1::deserialize},
-    {OP_HORZCAT, Horzcat::deserialize},
-    {OP_VERTCAT, Vertcat::deserialize},
-    {OP_DIAGCAT, Diagcat::deserialize},
-    {OP_HORZSPLIT, Horzsplit::deserialize},
-    {OP_VERTSPLIT, Vertsplit::deserialize},
-    {OP_DIAGSPLIT, Diagsplit::deserialize},
-    {OP_RESHAPE, Reshape::deserialize},
-    // OP_SUBREF
-    // OP_SUBASSIGN,
-    {OP_GETNONZEROS, GetNonzeros::deserialize},
-    {OP_GETNONZEROS_PARAM, GetNonzerosParam::deserialize},
-    {OP_ADDNONZEROS, SetNonzeros<true>::deserialize},
-    {OP_ADDNONZEROS_PARAM, SetNonzerosParam<true>::deserialize},
-    {OP_SETNONZEROS, SetNonzeros<false>::deserialize},
-    {OP_SETNONZEROS_PARAM, SetNonzerosParam<false>::deserialize},
-    {OP_PROJECT, Project::deserialize},
-    {OP_ASSERTION, Assertion::deserialize},
-    {OP_MONITOR, Monitor::deserialize},
-    {OP_NORM1, Norm1::deserialize},
-    {OP_NORM2, Norm2::deserialize},
-    {OP_NORMINF, NormInf::deserialize},
-    {OP_NORMF, NormF::deserialize},
-    {OP_MMIN, MMin::deserialize},
-    {OP_MMAX, MMax::deserialize},
-    {OP_HORZREPMAT, HorzRepmat::deserialize},
-    {OP_HORZREPSUM, HorzRepsum::deserialize},
-    //OP_ERFINV,
-    //OP_PRINTME,
-    //OP_LIFT,
-    //OP_EINSTEIN
-    {OP_BSPLINE, BSplineCommon::deserialize},
-    {OP_CONVEXIFY, Convexify::deserialize},
-    {-1, OutputNode::deserialize}
+  std::map<Operation, MXNode* (*)(DeserializingStream&)> MXNode::deserialize_map = {
+    {Operation::OP_INPUT, Input::deserialize},
+    {Operation::OP_OUTPUT, Output::deserialize},
+    {Operation::OP_PARAMETER, SymbolicMX::deserialize},
+    {Operation::OP_CONST, ConstantMX::deserialize},
+    {Operation::OP_CALL, Call::deserialize},
+    {Operation::OP_FIND, Find::deserialize},
+    {Operation::OP_LOW, Low::deserialize},
+    //{Operation::OP_MAP, Map::deserialize}, Map is a function
+    {Operation::OP_MTIMES, Multiplication::deserialize},
+    {Operation::OP_SOLVE, LinsolCall<false>::deserialize},
+    {Operation::OP_TRANSPOSE, Transpose::deserialize},
+    {Operation::OP_DETERMINANT, Determinant::deserialize},
+    {Operation::OP_INVERSE, Inverse::deserialize},
+    {Operation::OP_DOT, Dot::deserialize},
+    {Operation::OP_BILIN, Bilin::deserialize},
+    {Operation::OP_RANK1, Rank1::deserialize},
+    {Operation::OP_HORZCAT, Horzcat::deserialize},
+    {Operation::OP_VERTCAT, Vertcat::deserialize},
+    {Operation::OP_DIAGCAT, Diagcat::deserialize},
+    {Operation::OP_HORZSPLIT, Horzsplit::deserialize},
+    {Operation::OP_VERTSPLIT, Vertsplit::deserialize},
+    {Operation::OP_DIAGSPLIT, Diagsplit::deserialize},
+    {Operation::OP_RESHAPE, Reshape::deserialize},
+    // Operation::OP_SUBREF
+    // Operation::OP_SUBASSIGN,
+    {Operation::OP_GETNONZEROS, GetNonzeros::deserialize},
+    {Operation::OP_GETNONZEROS_PARAM, GetNonzerosParam::deserialize},
+    {Operation::OP_ADDNONZEROS, SetNonzeros<true>::deserialize},
+    {Operation::OP_ADDNONZEROS_PARAM, SetNonzerosParam<true>::deserialize},
+    {Operation::OP_SETNONZEROS, SetNonzeros<false>::deserialize},
+    {Operation::OP_SETNONZEROS_PARAM, SetNonzerosParam<false>::deserialize},
+    {Operation::OP_PROJECT, Project::deserialize},
+    {Operation::OP_ASSERTION, Assertion::deserialize},
+    {Operation::OP_MONITOR, Monitor::deserialize},
+    {Operation::OP_NORM1, Norm1::deserialize},
+    {Operation::OP_NORM2, Norm2::deserialize},
+    {Operation::OP_NORMINF, NormInf::deserialize},
+    {Operation::OP_NORMF, NormF::deserialize},
+    {Operation::OP_MMIN, MMin::deserialize},
+    {Operation::OP_MMAX, MMax::deserialize},
+    {Operation::OP_HORZREPMAT, HorzRepmat::deserialize},
+    {Operation::OP_HORZREPSUM, HorzRepsum::deserialize},
+    //Operation::OP_ERFINV,
+    //Operation::OP_PRINTME,
+    //Operation::OP_LIFT,
+    //Operation::OP_EINSTEIN
+    {Operation::OP_BSPLINE, BSplineCommon::deserialize},
+    {Operation::OP_CONVEXIFY, Convexify::deserialize},
+    {Operation::OP_INVALID, OutputNode::deserialize}
   };
 
 

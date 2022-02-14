@@ -124,38 +124,38 @@ namespace casadi {
     g << r << " = " << g.print_op(op_, " " + x + " ") << ";\n";
   }
 
-  MX UnaryMX::get_unary(casadi_int op) const {
+  MX UnaryMX::get_unary(Operation op) const {
     if (!GlobalOptions::simplification_on_the_fly) return MXNode::get_unary(op);
 
     switch (op_) {
-    case OP_NEG:
-      if (op==OP_NEG) return dep();
-      else if (op==OP_SQ) return dep()->get_unary(OP_SQ);
-      else if (op==OP_FABS) return dep()->get_unary(OP_FABS);
-      else if (op==OP_COS) return dep()->get_unary(OP_COS);
+    case Operation::OP_NEG:
+      if (op==Operation::OP_NEG) return dep();
+      else if (op==Operation::OP_SQ) return dep()->get_unary(Operation::OP_SQ);
+      else if (op==Operation::OP_FABS) return dep()->get_unary(Operation::OP_FABS);
+      else if (op==Operation::OP_COS) return dep()->get_unary(Operation::OP_COS);
       break;
-    case OP_SQRT:
-      if (op==OP_SQ) return dep();
-      else if (op==OP_FABS) return shared_from_this<MX>();
+    case Operation::OP_SQRT:
+      if (op==Operation::OP_SQ) return dep();
+      else if (op==Operation::OP_FABS) return shared_from_this<MX>();
       break;
-    case OP_SQ:
-      if (op==OP_SQRT) return dep()->get_unary(OP_FABS);
-      else if (op==OP_FABS) return shared_from_this<MX>();
+    case Operation::OP_SQ:
+      if (op==Operation::OP_SQRT) return dep()->get_unary(Operation::OP_FABS);
+      else if (op==Operation::OP_FABS) return shared_from_this<MX>();
       break;
-    case OP_EXP:
-      if (op==OP_LOG) return dep();
-      else if (op==OP_FABS) return shared_from_this<MX>();
+    case Operation::OP_EXP:
+      if (op==Operation::OP_LOG) return dep();
+      else if (op==Operation::OP_FABS) return shared_from_this<MX>();
       break;
-    case OP_LOG:
-      if (op==OP_EXP) return dep();
+    case Operation::OP_LOG:
+      if (op==Operation::OP_EXP) return dep();
       break;
-    case OP_FABS:
-      if (op==OP_FABS) return shared_from_this<MX>();
-      else if (op==OP_SQ) return dep()->get_unary(OP_SQ);
-      else if (op==OP_COS) return dep()->get_unary(OP_COS);
+    case Operation::OP_FABS:
+      if (op==Operation::OP_FABS) return shared_from_this<MX>();
+      else if (op==Operation::OP_SQ) return dep()->get_unary(Operation::OP_SQ);
+      else if (op==Operation::OP_COS) return dep()->get_unary(Operation::OP_COS);
       break;
-    case OP_INV:
-      if (op==OP_INV) return dep();
+    case Operation::OP_INV:
+      if (op==Operation::OP_INV) return dep();
       break;
     default: break; // no rule
     }
@@ -164,23 +164,23 @@ namespace casadi {
     return MXNode::get_unary(op);
   }
 
-  MX UnaryMX::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
+  MX UnaryMX::_get_binary(Operation op, const MX& y, bool scX, bool scY) const {
     switch (op_) {
-    case OP_NEG:
-      if (op==OP_ADD) return y->_get_binary(OP_SUB, dep(), scY, scX);
-      else if (op==OP_MUL) return -dep()->_get_binary(OP_MUL, y, scX, scY);
-      else if (op==OP_DIV) return -dep()->_get_binary(OP_DIV, y, scX, scY);
+    case Operation::OP_NEG:
+      if (op==Operation::OP_ADD) return y->_get_binary(Operation::OP_SUB, dep(), scY, scX);
+      else if (op==Operation::OP_MUL) return -dep()->_get_binary(Operation::OP_MUL, y, scX, scY);
+      else if (op==Operation::OP_DIV) return -dep()->_get_binary(Operation::OP_DIV, y, scX, scY);
       break;
-    case OP_INV:
-      if (op==OP_MUL) return y->_get_binary(OP_DIV, dep(), scY, scX);
+    case Operation::OP_INV:
+      if (op==Operation::OP_MUL) return y->_get_binary(Operation::OP_DIV, dep(), scY, scX);
       break;
-    case OP_TWICE:
-      if (op==OP_SUB && MX::is_equal(y, dep(), maxDepth())) return dep();
+    case Operation::OP_TWICE:
+      if (op==Operation::OP_SUB && MX::is_equal(y, dep(), maxDepth())) return dep();
       break;
-    case OP_SQ:
-      if (op==OP_ADD && y.op()==OP_SQ) /*sum of squares:*/
-        if ((dep().op()==OP_SIN && y->dep().op()==OP_COS) ||
-           (dep().op()==OP_COS && y->dep()->op()==OP_SIN)) /* sin^2(x)+sin^2(y) */
+    case Operation::OP_SQ:
+      if (op==Operation::OP_ADD && y.op()==Operation::OP_SQ) /*sum of squares:*/
+        if ((dep().op()==Operation::OP_SIN && y->dep().op()==Operation::OP_COS) ||
+           (dep().op()==Operation::OP_COS && y->dep()->op()==Operation::OP_SIN)) /* sin^2(x)+sin^2(y) */
           if (MX::is_equal(dep()->dep(), y->dep()->dep(), maxDepth())) /*sin^2(x) + cos^2(x) */
             return MX::ones(y.sparsity());
       break;

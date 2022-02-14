@@ -124,7 +124,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_HORZCAT;}
+    Operation op() const override { return Operation::OP_HORZCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
@@ -170,7 +170,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_VERTCAT;}
+    Operation op() const override { return Operation::OP_VERTCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
@@ -217,7 +217,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_DIAGCAT;}
+    Operation op() const override { return Operation::OP_DIAGCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;

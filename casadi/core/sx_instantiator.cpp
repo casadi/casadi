@@ -157,12 +157,12 @@ namespace casadi {
   }
 
   template<>
-  casadi_int CASADI_EXPORT SX::op() const {
+  Operation CASADI_EXPORT SX::op() const {
     return scalar().op();
   }
 
   template<>
-  bool CASADI_EXPORT SX::is_op(casadi_int op) const {
+  bool CASADI_EXPORT SX::is_op(Operation op) const {
     return scalar().is_op(op);
   }
 
@@ -241,8 +241,8 @@ namespace casadi {
         // Check if addition, subtracton or multiplication
         SXNode* node = to_be_expanded.top();
         // If we have a binary node that we can factorize
-        if (node->op() == OP_ADD || node->op() == OP_SUB ||
-           (node->op() == OP_MUL  && (node->dep(0)->is_constant() ||
+        if (node->op() == Operation::OP_ADD || node->op() == Operation::OP_SUB ||
+           (node->op() == Operation::OP_MUL  && (node->dep(0)->is_constant() ||
                                          node->dep(1)->is_constant()))) {
           // Make sure that both children are factorized, if not - add to stack
           if (indices.find(node->dep(0).get()) == indices.end()) {
@@ -259,7 +259,7 @@ namespace casadi {
           casadi_int ind2 = indices[node->dep(1).get()];
 
           // If multiplication
-          if (node->op() == OP_MUL) {
+          if (node->op() == Operation::OP_MUL) {
             double fac;
             // Multiplication where the first factor is a constant
             if (node->dep(0)->is_constant()) {
@@ -274,7 +274,7 @@ namespace casadi {
             for (casadi_int i=0; i<w.size(); ++i) w[i] *= fac;
 
           } else { // if addition or subtraction
-            if (node->op() == OP_ADD) {          // Addition: join both sums
+            if (node->op() == Operation::OP_ADD) {          // Addition: join both sums
               f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
               w = weights[ind1];    w.insert(w.end(), weights[ind2].begin(), weights[ind2].end());
             } else {      // Subtraction: join both sums with negative weights for second term
@@ -515,11 +515,11 @@ namespace casadi {
     // Evaluate the algorithm
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       switch (it->op) {
-      case OP_INPUT:
+      case Operation::OP_INPUT:
         // reverse is false, substitute out
         work[it->i0] = vdef.at(it->i1)->at(it->i2);
         break;
-      case OP_OUTPUT:
+      case Operation::OP_OUTPUT:
         if (it->i0 < v.size()) {
           vdef.at(it->i0)->at(it->i2) = work[it->i1];
           if (reverse) {
@@ -531,8 +531,8 @@ namespace casadi {
           ex.at(it->i0 - v.size())->at(it->i2) = work[it->i1];
         }
         break;
-      case OP_CONST:      work[it->i0] = *c_it++; break;
-      case OP_PARAMETER:  work[it->i0] = *p_it++; break;
+      case Operation::OP_CONST:      work[it->i0] = *c_it++; break;
+      case Operation::OP_PARAMETER:  work[it->i0] = *p_it++; break;
       default:
         {
           switch (it->op) {
@@ -780,8 +780,8 @@ namespace casadi {
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       // Increase usage counters
       switch (it->op) {
-      case OP_CONST:
-      case OP_PARAMETER:
+      case Operation::OP_CONST:
+      case Operation::OP_PARAMETER:
         break;
       CASADI_MATH_BINARY_BUILTIN // Binary operation
       case OP_IF_ELSE_ZERO:
@@ -793,7 +793,7 @@ namespace casadi {
           usecount[it->i2]=-1; // Extracted, do not extract again
         }
         // fall-through
-      case OP_OUTPUT:
+      case Operation::OP_OUTPUT:
       default: // Unary operation, binary operation or output
         if (usecount[it->i1]==0) {
           usecount[it->i1]=1;
@@ -804,10 +804,10 @@ namespace casadi {
       }
       // Perform the operation
       switch (it->op) {
-      case OP_OUTPUT:
+      case Operation::OP_OUTPUT:
         break;
-      case OP_CONST:
-      case OP_PARAMETER:
+      case Operation::OP_CONST:
+      case Operation::OP_PARAMETER:
         usecount[it->i0] = -1; // Never extract since it is a primitive type
         break;
       default:
@@ -836,9 +836,9 @@ namespace casadi {
     // Evaluate the algorithm
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       switch (it->op) {
-      case OP_OUTPUT:     ex.at(it->i0)->at(it->i2) = work[it->i1];      break;
-      case OP_CONST:      work2[it->i0] = work[it->i0] = *c_it++; break;
-      case OP_PARAMETER:  work2[it->i0] = work[it->i0] = *p_it++; break;
+      case Operation::OP_OUTPUT:     ex.at(it->i0)->at(it->i2) = work[it->i1];      break;
+      case Operation::OP_CONST:      work2[it->i0] = work[it->i0] = *c_it++; break;
+      case Operation::OP_PARAMETER:  work2[it->i0] = work[it->i0] = *p_it++; break;
       default:
         {
           switch (it->op) {

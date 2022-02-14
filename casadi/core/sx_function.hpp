@@ -33,7 +33,7 @@
 namespace casadi {
   /** \brief  An atomic operation for the SXElem virtual machine */
   struct ScalarAtomic {
-    int op;     /// Operator index
+    Operation op;     /// Operator index
     int i0;
     union {
       double d;
@@ -121,12 +121,12 @@ class CASADI_EXPORT SXFunction :
   casadi_int n_instructions() const override { return algorithm_.size();}
 
   /** \brief Get an atomic operation operator index */
-  casadi_int instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
+  Operation instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
 
   /** \brief Get the (integer) input arguments of an atomic operation */
   std::vector<casadi_int> instruction_input(casadi_int k) const override {
     auto e = algorithm_.at(k);
-    if (casadi_math<double>::ndeps(e.op)==2 || e.op==OP_INPUT) {
+    if (casadi_math<double>::ndeps(e.op)==2 || e.op==Operation::OP_INPUT) {
       return {e.i1, e.i2};
     } else if (casadi_math<double>::ndeps(e.op)==1) {
       return {e.i1};
@@ -143,7 +143,7 @@ class CASADI_EXPORT SXFunction :
   /** \brief Get the (integer) output argument of an atomic operation */
   std::vector<casadi_int> instruction_output(casadi_int k) const override {
     auto e = algorithm_.at(k);
-    if (e.op==OP_OUTPUT) {
+    if (e.op==Operation::OP_OUTPUT) {
       return {e.i0, e.i2};
     } else {
       return {e.i0};

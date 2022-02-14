@@ -697,11 +697,11 @@ std::vector<MX> OptiNode::symvar(const MX& expr) const {
 
 std::vector<MX> OptiNode::ineq_unchain(const MX& a, bool& flipped) {
   flipped = false;
-  casadi_assert_dev(a.is_op(OP_LE) || a.is_op(OP_LT));
+  casadi_assert_dev(a.is_op(Operation::OP_LE) || a.is_op(Operation::OP_LT));
 
   // Is there inequalities in the left or right leaf?
-  bool left  = a.dep(0).is_op(OP_LE) || a.dep(0).is_op(OP_LT);
-  bool right = a.dep(1).is_op(OP_LE) || a.dep(1).is_op(OP_LT);
+  bool left  = a.dep(0).is_op(Operation::OP_LE) || a.dep(0).is_op(Operation::OP_LT);
+  bool right = a.dep(1).is_op(Operation::OP_LE) || a.dep(1).is_op(Operation::OP_LT);
   casadi_assert_dev(!left || !right);
 
   if (!left && !right)
@@ -711,9 +711,9 @@ std::vector<MX> OptiNode::ineq_unchain(const MX& a, bool& flipped) {
   bool ineq = !left;
   std::vector<MX> ret = {a.dep(!ineq)};
   MX e = a.dep(ineq);
-  while (e.is_op(OP_LE) || e.is_op(OP_LT)) {
-    casadi_assert_dev(!e.is_op(OP_EQ));
-    casadi_assert_dev(!e.dep(!ineq).is_op(OP_LE) && !e.dep(!ineq).is_op(OP_LT));
+  while (e.is_op(Operation::OP_LE) || e.is_op(Operation::OP_LT)) {
+    casadi_assert_dev(!e.is_op(Operation::OP_EQ));
+    casadi_assert_dev(!e.dep(!ineq).is_op(Operation::OP_LE) && !e.dep(!ineq).is_op(Operation::OP_LT));
     ret.push_back(e.dep(!ineq));
     e = e.dep(ineq);
   }
@@ -747,7 +747,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
   MetaCon con;
   con.original = expr;
 
-  if (c.is_op(OP_LE) || c.is_op(OP_LT)) { // Inequalities
+  if (c.is_op(Operation::OP_LE) || c.is_op(Operation::OP_LT)) { // Inequalities
     std::vector<MX> ret;
     bool flipped;
     std::vector<MX> args = ineq_unchain(c, flipped);
@@ -761,7 +761,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
         casadi_assert(!parametric[0] || !parametric[1],
           "Constraint must contain decision variables.");
         if (problem_type_=="conic") {
-          if (args[0].op()==OP_NORMF || args[0].op()==OP_NORM2) {
+          if (args[0].op()==Operation::OP_NORMF || args[0].op()==Operation::OP_NORM2) {
             args[0] = -soc(args[0].dep(), args[1]);
             args[1] = 0;
           }
@@ -795,7 +795,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
     for (casadi_int j=0;j<args.size()-1;++j) {
       MX e = args[j]-args[j+1];
       if (problem_type_=="conic") {
-        if (args[j].op()==OP_NORMF || args[j].op()==OP_NORM2) {
+        if (args[j].op()==Operation::OP_NORMF || args[j].op()==Operation::OP_NORM2) {
           args[j] = -soc(args[j].dep(), args[j+1]);
           args[j+1] = 0;
           e = args[j]-args[j+1];
@@ -837,7 +837,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       con.n = ret.size();
     }
     return con;
-  } else if (c.is_op(OP_EQ)) { // Inequalities
+  } else if (c.is_op(Operation::OP_EQ)) { // Inequalities
     casadi_assert(!is_parametric(c.dep(0)) || !is_parametric(c.dep(1)),
       "Constraint must contain decision variables.");
     MX e = c.dep(0)-c.dep(1);
@@ -1071,7 +1071,7 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   std::map<VariableType, std::map<casadi_int, MX> > temp;
   temp[OPTI_DUAL_G] = std::map<casadi_int, MX>();
   for (const auto& v : values) {
-    casadi_assert_dev(v.is_op(OP_EQ));
+    casadi_assert_dev(v.is_op(Operation::OP_EQ));
     casadi_int i = meta(v.dep(1)).i;
     casadi_assert_dev(v.dep(0).is_constant());
     temp[meta(v.dep(1)).type][i] = v.dep(0);
@@ -1130,7 +1130,7 @@ void OptiNode::assert_active_symbol(const MX& m) const {
 
 void OptiNode::set_initial(const std::vector<MX>& assignments) {
   for (const auto& v : assignments) {
-    casadi_assert_dev(v.is_op(OP_EQ));
+    casadi_assert_dev(v.is_op(Operation::OP_EQ));
     casadi_assert_dev(v.dep(0).is_constant());
     if (has(v.dep(1)))
       set_initial(v.dep(1), static_cast<DM>(v.dep(0)));
@@ -1139,7 +1139,7 @@ void OptiNode::set_initial(const std::vector<MX>& assignments) {
 
 void OptiNode::set_value(const std::vector<MX>& assignments) {
   for (const auto& v : assignments) {
-    casadi_assert_dev(v.is_op(OP_EQ));
+    casadi_assert_dev(v.is_op(Operation::OP_EQ));
     casadi_assert_dev(v.dep(0).is_constant());
     if (has(v.dep(1)))
       set_value(v.dep(1), static_cast<DM>(v.dep(0)));

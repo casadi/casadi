@@ -42,7 +42,7 @@ namespace casadi {
   /** \brief  An element of the algorithm, namely an MX node */
   struct MXAlgEl {
     /// Operator index
-    casadi_int op;
+    Operation op;
 
     /// Data associated with the operation
     MX data;
@@ -207,7 +207,7 @@ namespace casadi {
     MX instruction_MX(casadi_int k) const override;
 
     /** \brief Get an atomic operation operator index */
-    casadi_int instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
+    Operation instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
 
     /** \brief Get default input value */
     double get_default_in(casadi_int ind) const override { return default_in_.at(ind);}
