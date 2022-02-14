@@ -90,7 +90,7 @@ namespace casadi {
     size_t sz_w() const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_BSPLINE;}
+    Operation op() const override { return Operation::OP_BSPLINE;}
 
     /** \brief Calculate forward mode directional derivatives */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,

@@ -557,7 +557,7 @@ namespace casadi {
     virtual casadi_int n_instructions() const;
 
     /** \brief Get an atomic operation operator index */
-    virtual casadi_int instruction_id(casadi_int k) const;
+    virtual Operation instruction_id(casadi_int k) const;
 
     /** \brief Get the (integer) input arguments of an atomic operation */
     virtual std::vector<casadi_int> instruction_input(casadi_int k) const;

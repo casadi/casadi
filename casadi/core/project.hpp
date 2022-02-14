@@ -79,7 +79,7 @@ namespace casadi {
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_PROJECT;}
+    Operation op() const override { return Operation::OP_PROJECT;}
 
     /** \brief Get required length of w field */
     size_t sz_w() const override { return size1();}

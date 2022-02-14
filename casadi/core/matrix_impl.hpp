@@ -997,7 +997,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::unary(casadi_int op, const Matrix<Scalar> &x) {
+  Matrix<Scalar> Matrix<Scalar>::unary(Operation op, const Matrix<Scalar> &x) {
     // Return value
     Matrix<Scalar> ret = Matrix<Scalar>::zeros(x.sparsity());
 
@@ -1025,7 +1025,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::operator-() const {
-    return unary(OP_NEG, *this);
+    return unary(Operation::OP_NEG, *this);
   }
 
   template<typename Scalar>
@@ -1049,7 +1049,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::printme(const Matrix<Scalar>& y) const {
-    return binary(OP_PRINTME, *this, y);
+    return binary(Operation::OP_PRINTME, *this, y);
   }
 
   template<typename Scalar>
@@ -1207,7 +1207,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::binary(casadi_int op,
+  Matrix<Scalar> Matrix<Scalar>::binary(Operation op,
                                             const Matrix<Scalar> &x,
                                             const Matrix<Scalar> &y) {
     if (x.is_scalar()) {
@@ -1221,7 +1221,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::
-  scalar_matrix(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
+  scalar_matrix(Operation op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
     if ( (operation_checker<FX0Checker>(op) && y.nnz()==0) ||
          (operation_checker<F0XChecker>(op) && x.nnz()==0))
             return Matrix<Scalar>::zeros(Sparsity(y.size()));
@@ -1255,7 +1255,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::
-  matrix_scalar(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
+  matrix_scalar(Operation op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
 
     if ( (operation_checker<FX0Checker>(op) && y.nnz()==0) ||
          (operation_checker<F0XChecker>(op) && x.nnz()==0))
@@ -1290,7 +1290,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::
-  matrix_matrix(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
+  matrix_matrix(Operation op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
     // Check, correct dimensions
     if (x.size() != y.size()) {
       // x and y are horizontal multiples of each other?
@@ -1456,12 +1456,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  casadi_int Matrix<Scalar>::op() const {
+  Operation Matrix<Scalar>::op() const {
     casadi_error("'op' not defined for " + type_name());
   }
 
   template<typename Scalar>
-  bool Matrix<Scalar>::is_op(casadi_int k) const {
+  bool Matrix<Scalar>::is_op(Operation k) const {
     casadi_error("'is_op' not defined for " + type_name());
   }
 

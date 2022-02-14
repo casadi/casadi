@@ -60,7 +60,7 @@ namespace casadi {
     virtual bool is_integer() const { return false; }
     virtual bool is_symbolic() const { return false; }
     virtual bool is_zero() const { return false; }
-    virtual bool is_op(casadi_int op) const { return false; }
+    virtual bool is_op(Operation op) const { return false; }
     virtual bool is_almost_zero(double tol) const { return false; }
     virtual bool is_one() const { return false; }
     virtual bool is_minus_one() const { return false; }
@@ -82,7 +82,7 @@ namespace casadi {
     virtual std::string class_name() const = 0;
 
     /** \brief get the operation */
-    virtual casadi_int op() const=0;
+    virtual Operation op() const=0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool is_equal(const SXNode* node, casadi_int depth) const;
@@ -140,7 +140,7 @@ namespace casadi {
 
     static SXNode* deserialize(DeserializingStream& s);
 
-    static std::map<casadi_int, SXNode* (*)(DeserializingStream&)> deserialize_map;
+    static std::map<Operation, SXNode* (*)(DeserializingStream&)> deserialize_map;
 
 
   };

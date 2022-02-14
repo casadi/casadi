@@ -58,7 +58,7 @@ double to_double() const override = 0;
 bool is_constant() const override { return true; }
 
 /** \brief  Get the operation */
-casadi_int op() const override { return OP_CONST;}
+Operation op() const override { return Operation::OP_CONST;}
 
 /** \brief Check if two nodes are equivalent up to a given depth */
 bool is_equal(const SXNode* node, casadi_int depth) const override {

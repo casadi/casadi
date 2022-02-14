@@ -71,7 +71,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
+    Operation op() const override { return Add ? Operation::OP_ADDNONZEROS : Operation::OP_SETNONZEROS;}
 
     /// Get an IM representation of a GetNonzeros or SetNonzeros node
     Matrix<casadi_int> mapping() const override;

@@ -82,7 +82,7 @@ namespace casadi {
 
   std::vector<casadi_int> MXFunction::instruction_input(casadi_int k) const {
     auto e = algorithm_.at(k);
-    if (e.op==OP_INPUT) {
+    if (e.op==Operation::OP_INPUT) {
       const IOInstruction* io = static_cast<const IOInstruction*>(e.data.get());
       return { io->ind() };
     } else {
@@ -92,7 +92,7 @@ namespace casadi {
 
   std::vector<casadi_int> MXFunction::instruction_output(casadi_int k) const {
     auto e = algorithm_.at(k);
-    if (e.op==OP_OUTPUT) {
+    if (e.op==Operation::OP_OUTPUT) {
       const IOInstruction* io = static_cast<const IOInstruction*>(e.data.get());
       return { io->ind() };
     } else {
@@ -171,15 +171,15 @@ namespace casadi {
     for (MXNode* n : nodes) {
 
       // Get the operation
-      casadi_int op = n->op();
+      Operation op = n->op();
 
       // Store location if parameter (or input)
-      if (op==OP_PARAMETER) {
+      if (op==Operation::OP_PARAMETER) {
         symb_loc.push_back(make_pair(algorithm_.size(), n));
       }
 
       // If a new element in the algorithm needs to be added
-      if (op>=0) {
+      if (op!=Operation::OP_OUTPUT) {
         AlgEl ae;
         ae.op = op;
         ae.data.own(n);
@@ -320,7 +320,7 @@ namespace casadi {
     fill(workloc_.begin(), workloc_.end(), -1);
     size_t wind=0, sz_w=0;
     for (auto&& e : algorithm_) {
-      if (e.op!=OP_OUTPUT) {
+      if (e.op!=Operation::OP_OUTPUT) {
         for (casadi_int c=0; c<e.res.size(); ++c) {
           if (e.res[c]>=0) {
             alloc_arg(e.data->sz_arg());
@@ -368,7 +368,7 @@ namespace casadi {
 
           // Replace parameter with input instruction
           algorithm_[i].data.own(new Input(prim[p].sparsity(), ind, p, nz_offset));
-          algorithm_[i].op = OP_INPUT;
+          algorithm_[i].op = Operation::OP_INPUT;
         }
         nz_offset += prim[p]->nnz();
       }
@@ -418,7 +418,7 @@ namespace casadi {
     // should only evaluate nodes that have not yet been calculated!
     for (auto&& e : algorithm_) {
       // Perform the operation
-      if (e.op==OP_INPUT) {
+      if (e.op==Operation::OP_INPUT) {
         // Pass an input
         double *w1 = w+workloc_[e.res.front()];
         casadi_int nnz=e.data.nnz();
@@ -429,7 +429,7 @@ namespace casadi {
         } else {
           copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
         }
-      } else if (e.op==OP_OUTPUT) {
+      } else if (e.op==Operation::OP_OUTPUT) {
         // Get an output
         double *w1 = w+workloc_[e.arg.front()];
         casadi_int nnz=e.data->dep().nnz();
@@ -456,10 +456,10 @@ namespace casadi {
 
   string MXFunction::print(const AlgEl& el) const {
     stringstream s;
-    if (el.op==OP_OUTPUT) {
+    if (el.op==Operation::OP_OUTPUT) {
       s << "output[" << el.data->ind() << "][" << el.data->segment() << "]"
         << " = @" << el.arg.at(0);
-    } else if (el.op==OP_SETNONZEROS || el.op==OP_ADDNONZEROS) {
+    } else if (el.op==Operation::OP_SETNONZEROS || el.op==Operation::OP_ADDNONZEROS) {
       if (el.res.front()!=el.arg.at(0)) {
         s << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
       }
@@ -483,7 +483,7 @@ namespace casadi {
         s << "} = ";
       }
       vector<string> arg;
-      if (el.op!=OP_INPUT) {
+      if (el.op!=Operation::OP_INPUT) {
         arg.resize(el.arg.size());
         for (casadi_int i=0; i<el.arg.size(); ++i) {
           if (el.arg[i]>=0) {
@@ -537,7 +537,7 @@ namespace casadi {
 
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
-      if (e.op==OP_INPUT) {
+      if (e.op==Operation::OP_INPUT) {
         // Pass input seeds
         casadi_int nnz=e.data.nnz();
         casadi_int i=e.data->ind();
@@ -549,7 +549,7 @@ namespace casadi {
         } else {
           fill_n(w1, nnz, 0);
         }
-      } else if (e.op==OP_OUTPUT) {
+      } else if (e.op==Operation::OP_OUTPUT) {
         // Get the output sensitivities
         casadi_int nnz=e.data.dep().nnz();
         casadi_int i=e.data->ind();
@@ -584,7 +584,7 @@ namespace casadi {
 
     // Propagate sparsity backwards
     for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
-      if (it->op==OP_INPUT) {
+      if (it->op==Operation::OP_INPUT) {
         // Get the input sensitivities and clear it from the work vector
         casadi_int nnz=it->data.nnz();
         casadi_int i=it->data->ind();
@@ -593,7 +593,7 @@ namespace casadi {
         bvec_t* w1 = w + workloc_[it->res.front()];
         if (argi!=nullptr) for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
         fill_n(w1, nnz, 0);
-      } else if (it->op==OP_OUTPUT) {
+      } else if (it->op==Operation::OP_OUTPUT) {
         // Pass output seeds
         casadi_int nnz=it->data.dep().nnz();
         casadi_int i=it->data->ind();
@@ -675,13 +675,13 @@ namespace casadi {
       // Loop over computational nodes in forward order
       casadi_int alg_counter = 0;
       for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
-        if (it->op == OP_INPUT) {
+        if (it->op == Operation::OP_INPUT) {
           swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
                                            it->data.sparsity(), true);
-        } else if (it->op==OP_OUTPUT) {
+        } else if (it->op==Operation::OP_OUTPUT) {
           // Collect the results
           res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
-        } else if (it->op==OP_PARAMETER) {
+        } else if (it->op==Operation::OP_PARAMETER) {
           // Fetch parameter
           swork[it->res.front()] = it->data;
         } else {
@@ -801,19 +801,19 @@ namespace casadi {
 
       // Loop over computational nodes in forward order
       for (auto&& e : algorithm_) {
-        if (e.op == OP_INPUT) {
+        if (e.op == Operation::OP_INPUT) {
           // Fetch forward seed
           for (casadi_int d=0; d<nfwd; ++d) {
             dwork[e.res.front()][d] =
               project(fseed_split[d].at(e.data->ind()).at(e.data->segment()),
                                         e.data.sparsity(), true);
           }
-        } else if (e.op==OP_OUTPUT) {
+        } else if (e.op==Operation::OP_OUTPUT) {
           // Collect forward sensitivity
           for (casadi_int d=0; d<nfwd; ++d) {
             fsens_split[d][e.data->ind()][e.data->segment()] = dwork[e.arg.front()][d];
           }
-        } else if (e.op==OP_PARAMETER) {
+        } else if (e.op==Operation::OP_PARAMETER) {
           // Fetch parameter
           for (casadi_int d=0; d<nfwd; ++d) {
             dwork[e.res.front()][d] = MX();
@@ -972,13 +972,13 @@ namespace casadi {
 
       // Loop over computational nodes in reverse order
       for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
-        if (it->op == OP_INPUT) {
+        if (it->op == Operation::OP_INPUT) {
           // Get the adjoint sensitivities
           for (casadi_int d=0; d<nadj; ++d) {
             asens_split[d].at(it->data->ind()).at(it->data->segment()) = dwork[it->res.front()][d];
             dwork[it->res.front()][d] = MX();
           }
-        } else if (it->op==OP_OUTPUT) {
+        } else if (it->op==Operation::OP_OUTPUT) {
           // Pass the adjoint seeds
           for (casadi_int d=0; d<nadj; ++d) {
             MX a = project(aseed_split[d].at(it->data->ind()).at(it->data->segment()),
@@ -989,7 +989,7 @@ namespace casadi {
               dwork[it->arg.front()][d] += a;
             }
           }
-        } else if (it->op==OP_PARAMETER) {
+        } else if (it->op==Operation::OP_PARAMETER) {
           // Clear adjoint seeds
           for (casadi_int d=0; d<nadj; ++d) {
             dwork[it->res.front()][d] = MX();
@@ -1089,7 +1089,7 @@ namespace casadi {
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
     for (auto&& a : algorithm_) {
-      if (a.op==OP_INPUT) {
+      if (a.op==Operation::OP_INPUT) {
         // Pass an input
         SXElem *w1 = w+workloc_[a.res.front()];
         casadi_int nnz=a.data.nnz();
@@ -1100,14 +1100,14 @@ namespace casadi {
         } else {
           std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
         }
-      } else if (a.op==OP_OUTPUT) {
+      } else if (a.op==Operation::OP_OUTPUT) {
         // Get the outputs
         SXElem *w1 = w+workloc_[a.arg.front()];
         casadi_int nnz=a.data.dep().nnz();
         casadi_int i=a.data->ind();
         casadi_int nz_offset=a.data->offset();
         if (res[i]) std::copy(w1, w1+nnz, res[i]+nz_offset);
-      } else if (a.op==OP_PARAMETER) {
+      } else if (a.op==Operation::OP_PARAMETER) {
         continue; // FIXME
       } else {
         // Point pointers to the data corresponding to the element
@@ -1246,7 +1246,7 @@ namespace casadi {
     for (casadi_int algNo=0; algNo<2; ++algNo) {
       for (auto&& e : algorithm_) {
         switch (e.op) {
-        case OP_LIFT:
+        case Operation::OP_LIFT:
           {
             MX& arg = swork[e.arg.at(0)];
             MX& arg_init = swork[e.arg.at(1)];
@@ -1266,13 +1266,13 @@ namespace casadi {
             }
             break;
           }
-        case OP_INPUT:
+        case Operation::OP_INPUT:
           swork[e.res.front()] = in_split.at(e.data->ind()).at(e.data->segment());
           break;
-        case OP_PARAMETER:
+        case Operation::OP_PARAMETER:
           swork[e.res.front()] = e.data;
           break;
-        case OP_OUTPUT:
+        case Operation::OP_OUTPUT:
           if (algNo==0) {
             f_G.at(e.data->ind()).at(e.data->segment()) = swork[e.arg.front()];
           }
@@ -1339,16 +1339,16 @@ namespace casadi {
     // Evaluate algorithm
     for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
-      case OP_INPUT:
+      case Operation::OP_INPUT:
         casadi_assert(it->data->segment()==0, "Not implemented");
         work.at(it->res.front())
           = out_.at(it->data->ind()).join_primitives(out_split.at(it->data->ind()));
         break;
-      case OP_PARAMETER:
-      case OP_CONST:
+      case Operation::OP_PARAMETER:
+      case Operation::OP_CONST:
         work.at(it->res.front()) = it->data;
         break;
-      case OP_OUTPUT:
+      case Operation::OP_OUTPUT:
         out_split.at(it->data->ind()).at(it->data->segment()) = work.at(it->arg.front());
         break;
       default:
@@ -1423,7 +1423,7 @@ namespace casadi {
     // Loop over algorithm
     for (casadi_int k=0;k<f.n_instructions();++k) {
       // Get operation
-      casadi_int op = static_cast<casadi_int>(f.instruction_id(k));
+      Operation op = static_cast<Operation>(f.instruction_id(k));
       // Get MX node
       MX x = f.instruction_MX(k);
       // Get input positions into workvector
@@ -1432,10 +1432,10 @@ namespace casadi {
       std::vector<casadi_int> i = f.instruction_input(k);
 
       switch (op) {
-        case OP_INPUT:
+        case Operation::OP_INPUT:
           ss << indent << "w" << o[0] << " = varargin{" << i[0]+1 << "};" << std::endl;
           break;
-        case OP_OUTPUT:
+        case Operation::OP_OUTPUT:
           {
             Dict info = x.info();
             casadi_int segment = info["segment"];
@@ -1445,7 +1445,7 @@ namespace casadi {
             ss << "w" << i[0] << "(sp_in==1);" << std::endl;
           }
           break;
-        case OP_CONST:
+        case Operation::OP_CONST:
           {
             DM v = static_cast<DM>(x);
             Dict opts;
@@ -1455,49 +1455,49 @@ namespace casadi {
             ss << indent << "w" << o[0] << " = m;" << std::endl;
           }
           break;
-        case OP_SQ:
+        case Operation::OP_SQ:
           ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".^2;" << std::endl;
           break;
-        case OP_MTIMES:
+        case Operation::OP_MTIMES:
           ss << indent << "w" << o[0] << " = ";
           ss << "w" << i[1] << "*w" << i[2] << "+w" << i[0] << ";" << std::endl;
           break;
-        case OP_MUL:
+        case Operation::OP_MUL:
           {
             std::string prefix = (x.dep(0).is_scalar() || x.dep(1).is_scalar()) ? "" : ".";
             ss << indent << "w" << o[0] << " = " << "w" << i[0] << prefix << "*w" << i[1] << ";";
             ss << std::endl;
           }
           break;
-        case OP_TWICE:
+        case Operation::OP_TWICE:
           ss << indent << "w" << o[0] << " = 2*w" << i[0] << ";" << std::endl;
           break;
-        case OP_INV:
+        case Operation::OP_INV:
           ss << indent << "w" << o[0] << " = 1./w" << i[0] << ";" << std::endl;
           break;
-        case OP_DOT:
+        case Operation::OP_DOT:
           ss << indent << "w" << o[0] << " = dot(w" << i[0] << ",w" << i[1]<< ");" << std::endl;
           break;
-        case OP_BILIN:
+        case Operation::OP_BILIN:
           ss << indent << "w" << o[0] << " = w" << i[1] << ".'*w" << i[0]<< "*w" << i[2] << ";";
           ss << std::endl;
           break;
-        case OP_RANK1:
+        case Operation::OP_RANK1:
           ss << indent << "w" << o[0] << " = w" << i[0] << "+";
           ss << "w" << i[1] << "*w" << i[2] << "*w" << i[3] << ".';";
           ss << std::endl;
           break;
-        case OP_FABS:
+        case Operation::OP_FABS:
           ss << indent << "w" << o[0] << " = abs(w" << i[0] << ");" << std::endl;
           break;
-        case OP_DETERMINANT:
+        case Operation::OP_DETERMINANT:
           ss << indent << "w" << o[0] << " = det(w" << i[0] << ");" << std::endl;
           break;
-        case OP_INVERSE:
+        case Operation::OP_INVERSE:
           ss << indent << "w" << o[0] << " = inv(w" << i[0] << ");";
           ss << "w" << o[0] << "(w" << o[0] << "==0) = 1e-200;" << std::endl;
           break;
-        case OP_SOLVE:
+        case Operation::OP_SOLVE:
           {
             bool tr = x.info()["tr"];
             if (tr) {
@@ -1509,31 +1509,31 @@ namespace casadi {
             ss << "w" << o[0] << "(w" << o[0] << "==0) = 1e-200;" << std::endl;
           }
           break;
-        case OP_DIV:
+        case Operation::OP_DIV:
           {
             std::string prefix = (x.dep(0).is_scalar() || x.dep(1).is_scalar()) ? "" : ".";
             ss << indent << "w" << o[0] << " = " << "w" << i[0] << prefix << "/w" << i[1] << ";";
             ss << std::endl;
           }
           break;
-        case OP_POW:
-        case OP_CONSTPOW:
+        case Operation::OP_POW:
+        case Operation::OP_CONSTPOW:
           ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".^w" << i[1] << ";" << std::endl;
           break;
-        case OP_TRANSPOSE:
+        case Operation::OP_TRANSPOSE:
           ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".';" << std::endl;
           break;
-        case OP_HORZCAT:
-        case OP_VERTCAT:
+        case Operation::OP_HORZCAT:
+        case Operation::OP_VERTCAT:
           {
             ss << indent << "w" << o[0] << " = [";
             for (casadi_int e : i) {
-              ss << "w" << e << (op==OP_HORZCAT ? " " : ";");
+              ss << "w" << e << (op==Operation::OP_HORZCAT ? " " : ";");
             }
             ss << "];" << std::endl;
           }
           break;
-        case OP_DIAGCAT:
+        case Operation::OP_DIAGCAT:
           {
             for (casadi_int k=0;k<i.size();++k) {
               x.dep(k).sparsity().export_code("matlab", ss,
@@ -1553,8 +1553,8 @@ namespace casadi {
             ss << "sparse(sp_i, sp_j, w" << o[0] << ", sp_m, sp_n);" << std::endl;
           }
           break;
-        case OP_HORZSPLIT:
-        case OP_VERTSPLIT:
+        case Operation::OP_HORZSPLIT:
+        case Operation::OP_VERTSPLIT:
           {
             Dict info = x.info();
             std::vector<casadi_int> offset = info["offset"];
@@ -1577,8 +1577,8 @@ namespace casadi {
             }
           }
           break;
-        case OP_GETNONZEROS:
-        case OP_SETNONZEROS:
+        case Operation::OP_GETNONZEROS:
+        case Operation::OP_SETNONZEROS:
           {
             Dict info = x.info();
 
@@ -1618,7 +1618,7 @@ namespace casadi {
             opts["as_matrix"] = false;
             x.sparsity().export_code("matlab", ss, opts);
 
-            if (op==OP_GETNONZEROS) {
+            if (op==Operation::OP_GETNONZEROS) {
               x.dep(0).sparsity().export_code("matlab", ss,
                 {{"name", "sp_in"}, {"indent_level", indent_level}, {"as_matrix", true}});
               //ss << indent << "w" << i[0] << "" << std::endl;
@@ -1642,7 +1642,7 @@ namespace casadi {
             ss << "sparse(sp_i, sp_j, w" << o[0] << ", sp_m, sp_n);" << std::endl;
           }
           break;
-        case OP_PROJECT:
+        case Operation::OP_PROJECT:
           {
             Dict opts;
             opts["name"] = "sp";
@@ -1652,41 +1652,41 @@ namespace casadi {
             ss << "sparse(sp_i, sp_j, w" << i[0] << "(sp==1), sp_m, sp_n);" << std::endl;
           }
           break;
-        case OP_NORM1:
+        case Operation::OP_NORM1:
           ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 1);" << std::endl;
           break;
-        case OP_NORM2:
+        case Operation::OP_NORM2:
           ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 2);" << std::endl;
           break;
-        case OP_NORMF:
+        case Operation::OP_NORMF:
           ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 'fro');" << std::endl;
           break;
-        case OP_NORMINF:
+        case Operation::OP_NORMINF:
           ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", inf);" << std::endl;
           break;
-        case OP_MMIN:
+        case Operation::OP_MMIN:
           ss << indent << "w" << o[0] << " = min(w" << i[0] << ");" << std::endl;
           break;
-        case OP_MMAX:
+        case Operation::OP_MMAX:
           ss << indent << "w" << o[0] << " = max(w" << i[0] << ");" << std::endl;
           break;
-        case OP_NOT:
+        case Operation::OP_NOT:
           ss << indent << "w" << o[0] << " = ~" << "w" << i[0] << ";" << std::endl;
           break;
-        case OP_OR:
+        case Operation::OP_OR:
           ss << indent << "w" << o[0] << " = w" << i[0] << " | w" << i[1] << ";" << std::endl;
           break;
-        case OP_AND:
+        case Operation::OP_AND:
           ss << indent << "w" << o[0] << " = w" << i[0] << " & w" << i[1] << ";" << std::endl;
           break;
-        case OP_NE:
+        case Operation::OP_NE:
           ss << indent << "w" << o[0] << " = w" << i[0] << " ~= w" << i[1] << ";" << std::endl;
           break;
-        case OP_IF_ELSE_ZERO:
+        case Operation::OP_IF_ELSE_ZERO:
           ss << indent << "w" << o[0] << " = ";
           ss << "if_else_zero_gen(w" << i[0] << ", w" << i[1] << ");" << std::endl;
           break;
-        case OP_RESHAPE:
+        case Operation::OP_RESHAPE:
           {
             x.dep(0).sparsity().export_code("matlab", ss,
               {{"name", "sp_in"}, {"indent_level", indent_level}, {"as_matrix", true}});
@@ -1715,7 +1715,7 @@ namespace casadi {
 
     Function dep;
     for (auto&& e : algorithm_) {
-      if (e.op==OP_CALL) {
+      if (e.op==Operation::OP_CALL) {
         Function d = e.data.which_function();
         if (d.is_a("Conic", true) || d.is_a("Nlpsol")) {
           if (!dep.is_null()) return stats;
@@ -1780,7 +1780,7 @@ namespace casadi {
   void MXFunction::find(std::map<FunctionInternal*, Function>& all_fun,
       casadi_int max_depth) const {
     for (auto&& e : algorithm_) {
-      if (e.op == OP_CALL) add_embedded(all_fun, e.data.which_function(), max_depth);
+      if (e.op == Operation::OP_CALL) add_embedded(all_fun, e.data.which_function(), max_depth);
     }
   }
 

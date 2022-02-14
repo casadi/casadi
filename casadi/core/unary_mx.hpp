@@ -73,7 +73,7 @@ namespace casadi {
     bool is_unary() const override { return true;}
 
     /** \brief Get the operation */
-    casadi_int op() const override { return op_;}
+    Operation op() const override { return op_;}
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
@@ -84,10 +84,10 @@ namespace casadi {
     casadi_int n_inplace() const override { return 1;}
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(Operation op) const override;
 
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY) const override;
+    MX _get_binary(Operation op, const MX& y, bool scX, bool scY) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, casadi_int depth) const override {

@@ -91,7 +91,7 @@ namespace casadi {
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_CONST;}
+    Operation op() const override { return Operation::OP_CONST;}
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override = 0;
@@ -313,10 +313,10 @@ namespace casadi {
     MX get_transpose() const override;
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(Operation op) const override;
 
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const override;
+    MX _get_binary(Operation op, const MX& y, bool ScX, bool ScY) const override;
 
     /// Reshape
     MX get_reshape(const Sparsity& sp) const override;
@@ -441,10 +441,10 @@ namespace casadi {
     MX get_transpose() const override;
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(Operation op) const override;
 
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const override;
+    MX _get_binary(Operation op, const MX& y, bool ScX, bool ScY) const override;
 
     /// Reshape
     MX get_reshape(const Sparsity& sp) const override;
@@ -525,7 +525,7 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_unary(casadi_int op) const {
+  MX Constant<Value>::get_unary(Operation op) const {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, to_double(), 0.0, ret);
@@ -547,7 +547,7 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const {
+  MX Constant<Value>::_get_binary(Operation op, const MX& y, bool ScX, bool ScY) const {
     casadi_assert_dev(sparsity()==y.sparsity() || ScX || ScY);
 
     if (ScX && !operation_checker<FX0Checker>(op)) {
@@ -561,7 +561,7 @@ namespace casadi {
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
-      if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==nullptr) {
+      if (y->op()==Operation::OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==nullptr) {
         double ret;
         casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->to_double() : 0, ret);
         grow = ret!=0;
@@ -574,32 +574,32 @@ namespace casadi {
     }
 
     switch (op) {
-    case OP_ADD:
+    case Operation::OP_ADD:
       if (v_.value==0) return ScY && !y->is_zero() ? repmat(y, size1(), size2()) : y;
       break;
-    case OP_SUB:
+    case Operation::OP_SUB:
       if (v_.value==0) return ScY && !y->is_zero() ? repmat(-y, size1(), size2()) : -y;
       break;
-    case OP_MUL:
+    case Operation::OP_MUL:
       if (v_.value==1) return y;
       if (v_.value==-1) return -y;
-      if (v_.value==2) return y->get_unary(OP_TWICE);
+      if (v_.value==2) return y->get_unary(Operation::OP_TWICE);
       break;
-    case OP_DIV:
-      if (v_.value==1) return y->get_unary(OP_INV);
-      if (v_.value==-1) return -y->get_unary(OP_INV);
+    case Operation::OP_DIV:
+      if (v_.value==1) return y->get_unary(Operation::OP_INV);
+      if (v_.value==-1) return -y->get_unary(Operation::OP_INV);
       break;
-    case OP_POW:
+    case Operation::OP_POW:
       if (v_.value==0) return MX::zeros(y.sparsity());
       if (v_.value==1) return MX::ones(y.sparsity());
-      if (v_.value==std::exp(1.0)) return y->get_unary(OP_EXP);
+      if (v_.value==std::exp(1.0)) return y->get_unary(Operation::OP_EXP);
       break;
     default: break; //no rule
     }
 
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
-    if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==nullptr) {
+    if (y->op()==Operation::OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==nullptr) {
       double y_value = y.nnz()>0 ? y->to_double() : 0;
       double ret;
       casadi_math<double>::fun(op, nnz()> 0.0 ? to_double(): 0, y_value, ret);

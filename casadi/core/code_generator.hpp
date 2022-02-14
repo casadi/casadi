@@ -489,8 +489,8 @@ namespace casadi {
                        const std::string& arg3);
 
     /** \brief Print an operation to a c file */
-    std::string print_op(casadi_int op, const std::string& a0);
-    std::string print_op(casadi_int op, const std::string& a0, const std::string& a1);
+    std::string print_op(Operation op, const std::string& a0);
+    std::string print_op(Operation op, const std::string& a0, const std::string& a1);
 
     /** \brief Slurp a file */
     std::string file_slurp(const std::string& fname, casadi_int n, const std::string& a);
