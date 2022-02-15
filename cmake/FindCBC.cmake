@@ -22,3 +22,12 @@ endif(CBC_LIBRARIES)
 # Set standard flags
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CBC DEFAULT_MSG CBC_LIBRARIES CBC_INCLUDE_DIRS)
+
+if(CBC_FOUND)
+  add_library(cbc INTERFACE)
+  target_link_libraries(cbc INTERFACE ${CBC_LIBRARIES})
+  target_include_directories(cbc INTERFACE ${CBC_INCLUDE_DIRS})
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    target_compile_options(cbc INTERFACE "-Wno-misleading-indentation -Wno-unknown-warning-option")
+  endif()
+endif()

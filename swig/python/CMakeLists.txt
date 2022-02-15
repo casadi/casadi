@@ -52,6 +52,7 @@ else()
     endif()
 
     # We don't really need the libs, but the headers.
+    find_package(PythonInterp ${MINPYVERSION})
     find_package(PythonLibs ${MINPYVERSION})
     if(NOT PYTHON_INCLUDE_PATH)
       message(SEND_ERROR "Python include headers not found, but required." )

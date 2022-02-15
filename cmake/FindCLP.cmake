@@ -22,3 +22,9 @@ endif(CLP_LIBRARIES)
 # Set standard flags
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CLP DEFAULT_MSG CLP_LIBRARIES CLP_INCLUDE_DIRS)
+
+if(CLP_FOUND)
+  add_library(clp INTERFACE)
+  target_link_libraries(clp INTERFACE ${CLP_LIBRARIES})
+  target_include_directories(clp INTERFACE ${CLP_INCLUDE_DIRS})
+endif()

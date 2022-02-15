@@ -76,6 +76,12 @@ except:
   pass
 
 try:
+  load_linsol("mumps")
+  lsolvers.append(("mumps",{},{"symmetry"}))
+except:
+  pass
+
+try:
   load_linsol("qr")
   lsolvers.append(("qr",{},set()))
 except:
