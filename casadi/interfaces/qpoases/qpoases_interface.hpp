@@ -117,6 +117,8 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "QpoasesInterface";}
 
+    void reset(int mem) override;
+
     ///@{
     /** \brief Options */
     static const Options options_;

@@ -352,6 +352,11 @@ namespace casadi {
     return 0;
   }
 
+  void QpoasesInterface::reset(int mem) {
+    auto m = static_cast<QpoasesMemory*>(memory(mem));
+    m->called_once = false;
+  }
+
   int QpoasesInterface::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);

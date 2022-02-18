@@ -513,6 +513,8 @@ namespace casadi {
     virtual Sparsity get_jacobian_sparsity() const { return Sparsity(); }
     ///@}
 
+    virtual void reset(int mem) {}
+
     ///@{
     /** \brief Get function input(s) and output(s)  */
     virtual const SX sx_in(casadi_int ind) const;

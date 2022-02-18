@@ -673,6 +673,8 @@ namespace casadi {
      */
     Function reverse(casadi_int nadj) const;
 
+    void reset(int mem=0);
+
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
     const Sparsity sparsity_jac(casadi_int iind, casadi_int oind,

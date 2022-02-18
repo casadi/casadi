@@ -1056,6 +1056,10 @@ namespace casadi {
     return (*this)->generate_dependencies(fname, opts);
   }
 
+  void Function::reset(int mem) {
+    (*this)->reset(mem);
+  }
+
   void Function::generate_in(const std::string& fname, const std::vector<DM>& arg) {
     std::vector<double> d = nz_from_in(arg);
 
