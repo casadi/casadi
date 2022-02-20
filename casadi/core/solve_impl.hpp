@@ -29,7 +29,7 @@
 #include "solve.hpp"
 #include "linsol_internal.hpp"
 
-using namespace std;
+//using namespace std;
 
 namespace casadi {
 
@@ -53,7 +53,7 @@ namespace casadi {
 
   template<bool Tr>
   int Solve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+    if (arg[0]!=res[0]) std::copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     scoped_checkout<Linsol> mem(linsol_);
 
     auto m = static_cast<LinsolMemory*>(linsol_->memory(mem));
@@ -89,9 +89,9 @@ namespace casadi {
   void Solve<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(n_dep());
+    std::vector<MX> arg(n_dep());
     for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
+    std::vector<MX> res(nout());
     for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
     // Number of derivatives
@@ -122,9 +122,9 @@ namespace casadi {
   void Solve<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(n_dep());
+    std::vector<MX> arg(n_dep());
     for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
+    std::vector<MX> res(nout());
     for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
     // Number of derivatives
@@ -187,7 +187,7 @@ namespace casadi {
     // For all right-hand-sides
     for (casadi_int r=0; r<nrhs; ++r) {
       // Copy B to a temporary vector
-      copy(B, B+n, tmp);
+      std::copy(B, B+n, tmp);
 
       // Add A_hat contribution to tmp
       for (casadi_int cc=0; cc<n; ++cc) {

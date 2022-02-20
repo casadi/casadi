@@ -33,7 +33,7 @@
 #include <sstream>
 #include <vector>
 
-using namespace std;
+//using namespace std;
 
 namespace casadi {
 
@@ -122,9 +122,9 @@ namespace casadi {
     }
 
     // Scalar names of arguments (start assuming all scalars)
-    string r = g.workel(res[0]);
-    string x = g.workel(arg[0]);
-    string y = g.workel(arg[1]);
+    std::string r = g.workel(res[0]);
+    std::string x = g.workel(arg[0]);
+    std::string y = g.workel(arg[1]);
 
     // Avoid emitting '/*' which will be mistaken for a comment
     if (op_==OP_DIV && g.codegen_scalars && dep(1).nnz()==1) {

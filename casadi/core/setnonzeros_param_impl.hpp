@@ -32,7 +32,7 @@
 
 /// \cond INTERNAL
 
-using namespace std;
+//using namespace std;
 
 namespace casadi {
 
@@ -313,7 +313,7 @@ namespace casadi {
     casadi_int nnz = this->dep(2).nnz();
     casadi_int max_ind = this->dep(0).nnz();
     if (idata0 != odata) {
-      copy(idata0, idata0+this->dep(0).nnz(), odata);
+      std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
     for (casadi_int k=0; k<nnz; ++k) {
       // Get index
@@ -339,7 +339,7 @@ namespace casadi {
     casadi_int nnz = this->dep(2).nnz();
     casadi_int max_ind = this->dep(0).nnz();
     if (idata0 != odata) {
-      copy(idata0, idata0+this->dep(0).nnz(), odata);
+      std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
 
     casadi_int* inner = iw; iw += nnz;
@@ -373,7 +373,7 @@ namespace casadi {
     casadi_int nnz = this->dep(2).nnz();
     casadi_int max_ind = this->dep(0).nnz();
     if (idata0 != odata) {
-      copy(idata0, idata0+this->dep(0).nnz(), odata);
+      std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
     for (casadi_int k=0; k<nnz; ++k) {
       // Get index
@@ -404,7 +404,7 @@ namespace casadi {
     casadi_int nnz2 = this->dep(3).nnz();
     casadi_int max_ind = this->dep(0).nnz();
     if (idata0 != odata) {
-      copy(idata0, idata0+this->dep(0).nnz(), odata);
+      std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
 
     casadi_int* inner = iw; iw += nnz;
@@ -473,7 +473,7 @@ namespace casadi {
 
   template<bool Add>
   std::string SetNonzerosParamVector<Add>::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[" << arg.at(2) << "]";
     ss << (Add ? " += " : " = ") << arg.at(1) << ")";
     return ss.str();
@@ -481,7 +481,7 @@ namespace casadi {
 
   template<bool Add>
   std::string SetNonzerosParamSlice<Add>::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[(" << arg.at(2) << ";" << outer_ << ")]";
     ss << (Add ? " += " : " = ") << arg.at(1) << ")";
     return ss.str();
@@ -489,7 +489,7 @@ namespace casadi {
 
   template<bool Add>
   std::string SetNonzerosSliceParam<Add>::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[(" << inner_ << ";" << arg.at(2) << ")]";
     ss << (Add ? " += " : " = ") << arg.at(1) << ")";
     return ss.str();
@@ -497,7 +497,7 @@ namespace casadi {
 
   template<bool Add>
   std::string SetNonzerosParamParam<Add>::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[(" << arg.at(2) << ";" << arg.at(3) << ")]";
     ss << (Add ? " += " : " = ") << arg.at(1) << ")";
     return ss.str();
