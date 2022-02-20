@@ -45,7 +45,7 @@ T1 casadi_cvx_house(T1* v, T1* beta, casadi_int nv) {
 // s : stride
 //     normally equal to m
 //     when A is a submatrix of a bigger matrix, set equal to latter's number of rows
-// v : compact housholder factorisation (length m)
+// v : compact Housholder factorisation (length m)
 //     First element (always one) is used to store beta
 // p : length n
 //
@@ -97,7 +97,7 @@ void casadi_cvx_house_apply_symm(casadi_int n, casadi_int k, T1* A, T1* p, T1* v
 // Tri-diagonalize a symmetric matrix in-place
 // Results are in lower-triangular part
 //
-// Upper triangular part contains compact housholder factorisations
+// Upper triangular part contains compact Housholder factorisations
 //
 // A: n-by-n dense
 // p: work vector; length n
@@ -312,7 +312,7 @@ void casadi_cvx_givens_apply(casadi_int n, T1* q, T1 c, T1 s, casadi_int p) {
 /// s : stride
 ///     normally equal to m
 ///     when A is a submatrix of a bigger matrix, set equal to latter's number of rows
-/// v : compact housholder factorisation (length m)
+/// v : compact Housholder factorisation (length m)
 ///     First element (always one) is used to store beta
 /// p : length n
 ///

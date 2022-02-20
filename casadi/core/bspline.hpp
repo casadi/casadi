@@ -63,7 +63,7 @@ namespace casadi {
     casadi_int m_;
     std::vector<casadi_int> lookup_mode_;
 
-    // Derived fiels
+    // Derived fields
     std::vector<casadi_int> strides_;
     std::vector<casadi_int> coeffs_dims_;
     casadi_int coeffs_size_;

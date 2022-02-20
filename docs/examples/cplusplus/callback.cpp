@@ -63,7 +63,7 @@ using namespace casadi;
  };
 
  int main() {
-   // Create a callvack
+   // Create a callback
    MyCallback cb(0.5);
    // Create a function object
    Function f = cb;

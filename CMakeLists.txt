@@ -47,7 +47,7 @@ endif()
 #############################################################
 ########################## Version ##########################
 #############################################################
-# For systems with git installed, find out revsion and description.
+# For systems with git installed, find out revision and description.
 execute_process(COMMAND git rev-parse HEAD
   OUTPUT_VARIABLE git_revision
   OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -541,7 +541,7 @@ if(WITH_FMU)
   add_definitions(-DWITH_FMU)
   set(FMU_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/FMI-Standard-2.0.2/headers)
 endif()
-add_feature_info(dynamic-loading WITH_FMU "Compile with support for dynamic loading of FMU librarieZ")
+add_feature_info(dynamic-loading WITH_FMU "Compile with support for dynamic loading of FMU libraries")
 
 # Include support for deprecated features (to be removed in the next release)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)

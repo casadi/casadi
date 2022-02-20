@@ -878,7 +878,7 @@ namespace casadi {
       ret_out_name.push_back(name_out_.at(k));
     }
 
-    // Assembe function
+    // Assemble function
     return Function(name, ret_in, ret_out,
                     ret_in_name, ret_out_name, opts);
   }

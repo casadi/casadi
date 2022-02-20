@@ -40,7 +40,7 @@ namespace casadi {
       if (e.first=="lookup_mode") {
         lookup_mode = e.second.to_string();
       } else {
-        casadi_error("Unrecongnized option: " + str(e.first));
+        casadi_error("Unrecognized option: " + str(e.first));
       }
     }
 

@@ -99,7 +99,7 @@ namespace casadi {
         this->prefix = e.second.to_string();
         prefix_set = true;
       } else {
-        casadi_error("Unrecongnized option: " + str(e.first));
+        casadi_error("Unrecognized option: " + str(e.first));
       }
     }
 

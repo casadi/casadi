@@ -179,7 +179,7 @@ namespace casadi {
      // Quick return if no elements
      if (N==0) return std::vector<casadi_int>();
 
-     // One dimesion => null-permutation
+     // One dimension => null-permutation
      if (n==1) return range(N);
 
      // Allocate space for resulting mapping

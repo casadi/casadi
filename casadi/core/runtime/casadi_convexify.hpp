@@ -61,7 +61,7 @@ int convexify_eval(const casadi_convexify_config<T1>* c, const T1* Hin, T1* Hout
     }
 
     if (c->strategy==CVX_REGULARIZE) {
-      // Determing regularization parameter with Gershgorin theorem
+      // Determine regularization parameter with Gershgorin theorem
       reg = c->margin-casadi_lb_eig(c->Hsp, Hout);
       if (reg > 0) casadi_regularize(c->Hsp, Hout, reg);
     } else if (c->strategy==CVX_EIGEN_REFLECT || c->strategy==CVX_EIGEN_CLIP) {

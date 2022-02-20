@@ -85,7 +85,7 @@ private:
 
   CASADI_EXPORT std::string join(const std::vector<std::string>& l, const std::string& delim=",");
 
-  /// Checsks if s starts with p
+  /// Checks if s starts with p
   CASADI_EXPORT bool startswith(const std::string& s, const std::string& p);
   /**  \brief Range function
   * \param stop
@@ -413,7 +413,7 @@ private:
         ret = std::numeric_limits<double>::quiet_NaN();
       } else {
         ret = std::numeric_limits<double>::quiet_NaN();
-        return 2; // Failed to interpretas number
+        return 2; // Failed to interpret as number
       }
     }
     return 0;

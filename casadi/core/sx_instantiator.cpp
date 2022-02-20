@@ -527,7 +527,7 @@ namespace casadi {
             work[it->i1] = v.at(it->i0)->at(it->i2);
           }
         } else {
-          // Auxillary output
+          // Auxiliary output
           ex.at(it->i0 - v.size())->at(it->i2) = work[it->i1];
         }
         break;

@@ -181,7 +181,7 @@ namespace casadi {
     /** \brief  Negation */
     SXElem operator-() const;
 
-    /** \brief Elementwise inverse */
+    /** \brief Element-wise inverse */
     SXElem inv() const;
 
     /** \brief Check equality up to a given depth */

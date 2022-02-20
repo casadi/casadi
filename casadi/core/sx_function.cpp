@@ -27,14 +27,11 @@
 #include <limits>
 #include <stack>
 #include <deque>
-#include <fstream>
 #include <sstream>
 #include <iomanip>
-#include "casadi_misc.hpp"
 #include "sx_node.hpp"
 #include "casadi_common.hpp"
 #include "sparsity_internal.hpp"
-#include "global_options.hpp"
 #include "casadi_interrupt.hpp"
 #include "serializing_stream.hpp"
 
@@ -506,7 +503,7 @@ namespace casadi {
         *it++ = *b_it++;
       }
     }
-    casadi_assert(it==ret.end(), "Dimension mismacth");
+    casadi_assert(it==ret.end(), "Dimension mismatch");
     return ret;
   }
 
