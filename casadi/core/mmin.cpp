@@ -97,4 +97,40 @@ namespace casadi {
       << ";\n";
   }
 
+  void MMin::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                     std::vector<std::vector<MX> >& fsens) const {
+    MX m = shared_from_this<MX>()==dep(0);
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = dot(fseed[d][0],m)/N;
+    }
+  }
+
+  void MMin::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                     std::vector<std::vector<MX> >& asens) const {
+    MX m = shared_from_this<MX>()==dep(0);
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += (aseed[d][0]/N)*m;
+    }
+  }
+
+  void MMax::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                     std::vector<std::vector<MX> >& fsens) const {
+    MX m = shared_from_this<MX>()==dep(0);
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = dot(fseed[d][0],m)/N;
+    }
+  }
+
+  void MMax::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                     std::vector<std::vector<MX> >& asens) const {
+    MX m = shared_from_this<MX>()==dep(0);
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += (aseed[d][0]/N)*m;
+    }
+  }
+
 } // namespace casadi

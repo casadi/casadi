@@ -587,7 +587,7 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-    /** \brief Find first nonzero
+    /** \brief Find first nonzero, returned as row index
      * If failed, returns the number of rows
      */
     inline friend MX find(const MX& x) {

@@ -64,6 +64,13 @@ namespace casadi {
     void generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
                       const std::vector<casadi_int>& res) const override;
+    /** \brief Calculate forward mode directional derivatives */
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
+
+    /** \brief Calculate reverse mode directional derivatives */
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new MMin(s); }
@@ -105,6 +112,13 @@ namespace casadi {
     void generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
                       const std::vector<casadi_int>& res) const override;
+    /** \brief Calculate forward mode directional derivatives */
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
+
+    /** \brief Calculate reverse mode directional derivatives */
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new MMax(s); }

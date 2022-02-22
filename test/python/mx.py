@@ -2728,6 +2728,19 @@ class MXtests(casadiTestCase):
         self.assertTrue(mmin_res.is_empty())
         self.assertTrue(mmax_res.is_empty())
 
+    for m in [mmin,mmax]:
+      x = MX.sym("X",2)
+      f = Function("f",[x],[m(x)])
+      #self.checkfunction(f,f.expand(),inputs=[[0.2,0.3]])
+
+      #J = f.jacobian()
+      #print(J([2,2],0))
+      f.expand().disp(True)
+      J = f.expand().jacobian()
+      f.expand().jacobian().disp(True)
+      print(J([2,2],0))
+      self.checkfunction(f,f.expand(),inputs=[[2,2]])
+
   def test_doc_expression_tools(self):
     self.assertTrue("Given a repeated matrix, computes the sum of repeated parts." in repsum.__doc__)
 

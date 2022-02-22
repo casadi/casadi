@@ -859,7 +859,10 @@ namespace casadi {
   struct BinaryOperation<OP_FMIN>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmin(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=x<=y; d[1]=!d[0];}
+      T a = x<=y;
+      T b = y<=x;
+      T c = a+b;
+      d[0]=a/c; d[1]=b/c;}
   };
 
   /// Maximum
@@ -867,7 +870,10 @@ namespace casadi {
   struct BinaryOperation<OP_FMAX>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmax(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=x>=y; d[1]=!d[0];}
+      T a = y<=x;
+      T b = x<=y;
+      T c = a+b;
+      d[0]=a/c; d[1]=b/c;}
   };
 
   /// Elementwise inverse
