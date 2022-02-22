@@ -423,6 +423,26 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
+    /** \brief Precision variant for natural logarithm: x -> log(x+1) */
+    static ExType log1p(const ExType& x) {
+      return ExType::unary(OP_LOG1P, x);
+    }
+    friend inline ExType log1p(const ExType& x) {
+      return ExType::log1p(x);
+    }
+    ///@}
+
+    ///@{
+    /** \brief Precision variant for elementwise exponential: x -> exp(x)-1 */
+    static ExType expm1(const ExType& x) {
+      return ExType::unary(OP_EXPM1, x);
+    }
+    friend inline ExType expm1(const ExType& x) {
+      return ExType::expm1(x);
+    }
+    ///@}
+
+    ///@{
     /** \brief Round down to nearest integer: x -> floor(x) */
     static ExType floor(const ExType& x) {
       return ExType::unary(OP_FLOOR, x);
@@ -584,7 +604,21 @@ class GenericExpression : public GenericExpressionCommon {
      }
      ///@}
 
+    ///@{
+    /** \brief Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2) */
+    static ExType hypot(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_HYPOT, x, y);
+    }
+    friend inline ExType hypot(const ExType& x, const ExType& y) {
+      return ExType::hypot(x, y);
+    }
+    ///@}
+
+
 /** @} */
+
+
+
 };
 #endif // SWIG
 

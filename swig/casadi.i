@@ -3354,6 +3354,8 @@ DECL M casadi_acosh(const M& x) { return acosh(x); }
 DECL M casadi_exp(const M& x) { return exp(x); }
 DECL M casadi_log(const M& x) { return log(x); }
 DECL M casadi_log10(const M& x) { return log10(x); }
+DECL M casadi_log1p(const M& x) { return log1p(x); }
+DECL M casadi_expm1(const M& x) { return expm1(x); }
 DECL M casadi_floor(const M& x) { return floor(x); }
 DECL M casadi_ceil(const M& x) { return ceil(x); }
 DECL M casadi_erf(const M& x) { return erf(x); }
@@ -3365,6 +3367,7 @@ DECL M casadi_fmod(const M& x, const M& y) { return fmod(x, y); }
 DECL M casadi_atan2(const M& x, const M& y) { return atan2(x, y); }
 DECL M casadi_fmin(const M& x, const M& y) { return fmin(x, y); }
 DECL M casadi_fmax(const M& x, const M& y) { return fmax(x, y); }
+DECL M casadi_hypot(const M& x, const M& y) { return hypot(x, y); }
 DECL M casadi_simplify(const M& x) { using casadi::simplify; return simplify(x); }
 DECL bool casadi_is_equal(const M& x, const M& y, casadi_int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
 DECL M casadi_copysign(const M& x, const M& y) { return copysign(x, y); }
@@ -4261,11 +4264,14 @@ namespace casadi {
       def exp(x): return _casadi.exp(x)
       def log(x): return _casadi.log(x)
       def log10(x): return _casadi.log10(x)
+      def log1p(x): return _casadi.log1p(x)
+      def expm1(x): return _casadi.expm1(x)
       def floor(x): return _casadi.floor(x)
       def ceil(x): return _casadi.ceil(x)
       def erf(x): return _casadi.erf(x)
       def sign(x): return _casadi.sign(x)
       def fmod(x, y): return _casadi.mod(x, y)
+      def hypot(x, y): return _casadi.hypot(x, y)
       def __copysign__(x, y): return _casadi.copysign(x, y)
       def __rcopysign__(y, x): return _casadi.copysign(x, y)
       def copysign(x, y): return _casadi.copysign(x, y)
