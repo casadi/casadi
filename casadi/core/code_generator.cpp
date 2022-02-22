@@ -1141,6 +1141,10 @@ namespace casadi {
       add_auxiliary(AUX_COPY);
       this->auxiliaries << sanitize_source(casadi_convexify_str, inst);
       break;
+    case AUX_LOGSUMEXP:
+      add_auxiliary(AUX_LOG1P);
+      this->auxiliaries << sanitize_source(casadi_logsumexp_str, inst);
+      break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
                         << "(" << (this->cpp ? "static_cast<double>(x)" : "(double) x") << ")\n\n";
@@ -1625,6 +1629,14 @@ namespace casadi {
     add_auxiliary(AUX_TRIUSOLVE);
     return "casadi_triusolve(" + sparsity(sp_x) + ", " + x + ", " + y + ", " + str(tr) + ", "
         + str(unity) + ", " + str(nrhs) + ");";
+  }
+
+
+  string CodeGenerator::logsumexp(const string& A, casadi_int n) {
+    add_auxiliary(AUX_LOGSUMEXP);
+    stringstream s;
+    s << "casadi_logsumexp(" << A << ", " << n << ");";
+    return s.str();
   }
 
   void CodeGenerator::print_formatted(const string& s) {

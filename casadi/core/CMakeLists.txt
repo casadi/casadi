@@ -154,6 +154,7 @@ set(CASADI_INTERNAL
   monitor.hpp             monitor.cpp             # Monitor
   repmat.hpp              repmat.cpp              # RepMat
   convexify.hpp           convexify.cpp           # Convexify
+  logsumexp.hpp           logsumexp.cpp           # Logsumexp
 
   # A dynamically created function with AD capabilities
   function.cpp

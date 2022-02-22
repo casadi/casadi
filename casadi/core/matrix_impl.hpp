@@ -1167,6 +1167,13 @@ namespace casadi {
     return ret;
   }
 
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  _logsumexp(const Matrix<Scalar>& x) {
+    return log(sum1(exp(x)));
+  }
+
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::T() const {
     // quick return if empty or scalar

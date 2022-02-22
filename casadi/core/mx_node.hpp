@@ -338,6 +338,9 @@ namespace casadi {
     /** \brief Bilinear form */
     virtual MX get_rank1(const MX& alpha, const MX& x, const MX& y) const;
 
+    /** \brief Logsumexp */
+    virtual MX get_logsumexp() const;
+
     /** \brief Solve a system of linear equations
     *
     *      For system Ax = b:

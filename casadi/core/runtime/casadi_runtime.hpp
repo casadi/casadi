@@ -218,6 +218,10 @@ namespace casadi {
   void casadi_bound_consistency(casadi_int n, T1* x, T1* lam,
                                  const T1* lbx, const T1* ubx);
 
+  // Numerically accurate logsumexp
+  template<typename T1>
+  T1 casadi_logsumexp(const T1* x, casadi_int n);
+
   template <class T1>
   struct casadi_newton_mem;
 
@@ -291,6 +295,7 @@ namespace casadi {
   #include "casadi_lsqr.hpp"
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
+  #include "casadi_logsumexp.hpp"
 
 } // namespace casadi
 

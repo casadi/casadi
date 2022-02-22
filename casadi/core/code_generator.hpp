@@ -213,6 +213,9 @@ namespace casadi {
     std::string rank1(const std::string& A, const Sparsity& sp_A, const std::string& alpha,
                       const std::string& x, const std::string& y);
 
+    /** \brie LogSumExp */
+    std::string logsumexp(const std::string& A, casadi_int n);
+
     /** \brief Multilinear interpolation */
     std::string interpn(const std::string& res, casadi_int ndim, const std::string& grid,
                         const std::string& offset,
@@ -400,7 +403,8 @@ namespace casadi {
       AUX_EXPM1,
       AUX_HYPOT,
       AUX_MMIN,
-      AUX_MMAX
+      AUX_MMAX,
+      AUX_LOGSUMEXP
     };
 
     /** \brief Add a built-in auxiliary function */

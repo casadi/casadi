@@ -364,6 +364,7 @@ namespace casadi {
       const std::vector<casadi_int>& a, const std::vector<casadi_int>& b,
       const std::vector<casadi_int>& c);
     static Matrix<Scalar> cumsum(const Matrix<Scalar> &x, casadi_int axis=-1);
+    static Matrix<Scalar> _logsumexp(const Matrix<Scalar>& x);
     ///@}
 
     ///@{

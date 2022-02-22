@@ -2950,6 +2950,20 @@ class MXtests(casadiTestCase):
 
         self.check_codegen(f,inputs=[A])
 
+  def test_logsumexp(self):
+    x = MX.sym("x",3)
+
+    f_ref = Function("f_ref",[x],[log(exp(x[0])+exp(x[1])+exp(x[2]))])
+    f = Function("f",[x],[logsumexp(x)])
+
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3,1.7)])
+    self.check_codegen(f,inputs=[vertcat(1.1,1.3,1.7)])
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3,1.3)])
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.3,1.3,1.3)])
+
+    # Avoid overflow
+    res = f(vertcat(100,1000,10000))
+    self.checkarray(res,10000)
 
 if __name__ == '__main__':
     unittest.main()

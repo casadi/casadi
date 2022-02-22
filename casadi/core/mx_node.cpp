@@ -59,7 +59,7 @@
 #include "map.hpp"
 #include "bspline.hpp"
 #include "convexify.hpp"
-
+#include "logsumexp.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -503,6 +503,10 @@ namespace casadi {
 
   MX MXNode::get_rank1(const MX& alpha, const MX& x, const MX& y) const {
     return MX::create(new Rank1(shared_from_this<MX>(), alpha, x, y));
+  }
+
+  MX MXNode::get_logsumexp() const {
+    return MX::create(new LogSumExp(shared_from_this<MX>()));
   }
 
   MX MXNode::get_solve_triu(const MX& r, bool tr) const {
@@ -1200,6 +1204,7 @@ namespace casadi {
     //OP_EINSTEIN
     {OP_BSPLINE, BSplineCommon::deserialize},
     {OP_CONVEXIFY, Convexify::deserialize},
+    {OP_LOGSUMEXP, LogSumExp::deserialize},
     {-1, OutputNode::deserialize}
   };
 

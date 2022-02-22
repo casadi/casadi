@@ -2053,6 +2053,11 @@ namespace casadi {
    return A->get_rank1(alpha, x, y);
  }
 
+ MX MX::_logsumexp(const MX& x) {
+   return x->get_logsumexp();
+ }
+
+
  void MX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
    try {
      (*this)->eval_mx(arg, res);

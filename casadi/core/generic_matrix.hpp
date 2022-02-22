@@ -351,6 +351,15 @@ namespace casadi {
       return MatType::sumsqr(x);
     }
 
+    /** \brief x -> log(sum_i exp(x_i))
+     * 
+     * Numerical improvements per https://nhigham.com/2021/01/05/what-is-the-log-sum-exp-function/
+     */
+    inline friend MatType logsumexp(const MatType &x) {
+      return MatType::logsumexp(x);
+    }
+    static MatType logsumexp(const MatType& x);
+
     /** \brief Matlab's \c linspace command
      */
     inline friend MatType linspace(const MatType &a, const MatType &b, casadi_int nsteps) {
@@ -1149,6 +1158,14 @@ namespace casadi {
 
     // Call the class specific method
     return MatType::_rank1(A, alpha, x, y);
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::logsumexp(const MatType& x) {
+    casadi_assert(x.is_dense(), "Argument must be dense");
+    casadi_assert(x.is_column(), "Argument must be column vector");
+    // Call the class specific method
+    return MatType::_logsumexp(x);
   }
 
   template<typename MatType>

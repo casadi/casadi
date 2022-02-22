@@ -200,9 +200,11 @@ namespace casadi {
 
     OP_EXPM1,
 
-    OP_HYPOT
+    OP_HYPOT,
+  
+    OP_LOGSUMEXP
   };
-  #define NUM_BUILT_IN_OPS (OP_HYPOT+1)
+  #define NUM_BUILT_IN_OPS (OP_LOGSUMEXP+1)
 
   #define OP_
 
@@ -1092,6 +1094,7 @@ namespace casadi {
     case OP_LOG1P:         return F<OP_LOG1P>::check;
     case OP_EXPM1:         return F<OP_EXPM1>::check;
     case OP_HYPOT:         return F<OP_HYPOT>::check;
+    case OP_LOGSUMEXP:     return F<OP_LOGSUMEXP>::check;
     }
     return T();
   }
@@ -1629,6 +1632,7 @@ namespace casadi {
     case OP_LOG1P:          return "log1p";
     case OP_EXPM1:          return "expm1";
     case OP_HYPOT:          return "hypot";
+    case OP_LOGSUMEXP:      return "logsumexp";
     }
     return nullptr;
   }
