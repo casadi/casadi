@@ -983,7 +983,7 @@ namespace casadi {
   /// hypot(x,y) = sqrt(x^2+y^2)
   template<>
   struct BinaryOperation<OP_HYPOT>{
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x;}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = hypot(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0] = x/f; d[1] = y/f; }
   };
