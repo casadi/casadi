@@ -877,15 +877,15 @@ namespace casadi {
     return shorthand("s" + str(get_constant(v, true)));
   }
 
-  void CodeGenerator::constant_copy(const std::string& name, const vector<casadi_int>& v) {
+  void CodeGenerator::constant_copy(const std::string& name, const vector<casadi_int>& v, const std::string& type) {
     std::string ref = constant(v);
     if (!v.empty()) {
-      local(name+"[" + str(v.size()) + "]", "casadi_int");
+      local(name+"[" + str(v.size()) + "]", type);
     } else {
-      local(name, "casadi_int", "*");
+      local(name, type, "*");
     }
     if (!v.empty()) {
-      local("i", "casadi_int");
+      local("i", type);
       (*this) << "for (i=0;i<" << v.size() << ";++i) " + name + "[i] = " + ref + "[i];\n";
     } else {
       init_local(name, "0");

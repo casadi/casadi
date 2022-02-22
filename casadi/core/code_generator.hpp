@@ -97,7 +97,7 @@ namespace casadi {
     std::string constant(const std::vector<casadi_int>& v);
 
     /** \brief Represent an array constant; adding it when new */
-    void constant_copy(const std::string& var_name, const std::vector<casadi_int>& v);
+    void constant_copy(const std::string& var_name, const std::vector<casadi_int>& v, const std::string& type="casadi_int");
 
     /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<double>& v);

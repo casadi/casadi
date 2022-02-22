@@ -293,10 +293,10 @@ namespace casadi {
     g.local("dummy[" + str(dummy_size) + "]", "casadi_real");
     g << g.clear("dummy", dummy_size) << "\n";
 
-    g.constant_copy("A_row", Asp.get_row());
-    g.constant_copy("A_colind", Asp.get_colind());
-    g.constant_copy("H_row", H_.get_row());
-    g.constant_copy("H_colind", H_.get_colind());
+    g.constant_copy("A_row", Asp.get_row(), "c_int");
+    g.constant_copy("A_colind", Asp.get_colind(), "c_int");
+    g.constant_copy("H_row", H_.get_row(), "c_int");
+    g.constant_copy("H_colind", H_.get_colind(), "c_int");
 
     g.local("A", "csc");
     g << "A.m = " << nx_ + na_ << ";\n";
