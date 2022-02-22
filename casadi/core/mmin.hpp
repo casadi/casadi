@@ -60,6 +60,11 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                      const std::vector<casadi_int>& arg,
+                      const std::vector<casadi_int>& res) const override;
+
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new MMin(s); }
   protected:
@@ -95,6 +100,11 @@ namespace casadi {
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                      const std::vector<casadi_int>& arg,
+                      const std::vector<casadi_int>& res) const override;
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new MMax(s); }

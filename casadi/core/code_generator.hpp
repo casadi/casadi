@@ -268,6 +268,12 @@ namespace casadi {
     /** \brief fmin */
     std::string fmin(const std::string& x, const std::string& y);
 
+    /** \brief mmax */
+    std::string mmax(const std::string& x, casadi_int n, bool is_dense);
+
+    /** \brief mmin */
+    std::string mmin(const std::string& x, casadi_int n, bool is_dense);
+
     /** \brief vfmax */
     std::string vfmax(const std::string& x, casadi_int n, const std::string& y);
 
@@ -392,7 +398,9 @@ namespace casadi {
       AUX_CACHE,
       AUX_LOG1P,
       AUX_EXPM1,
-      AUX_HYPOT
+      AUX_HYPOT,
+      AUX_MMIN,
+      AUX_MMAX
     };
 
     /** \brief Add a built-in auxiliary function */

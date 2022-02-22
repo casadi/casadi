@@ -22,7 +22,8 @@ set(RUNTIME_SRC
   casadi_kron.hpp
   casadi_low.hpp
   casadi_max_viol.hpp
-  casadi_minmax.hpp
+  casadi_mmin.hpp
+  casadi_mmax.hpp
   casadi_mtimes.hpp
   casadi_vfmin.hpp
   casadi_vfmax.hpp

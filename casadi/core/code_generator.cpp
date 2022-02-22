@@ -1236,6 +1236,16 @@ namespace casadi {
                         << "  return x>y ? x : y;\n"
                         << "}\n\n";
       break;
+    case AUX_MMIN:
+      add_auxiliary(AUX_VFMIN);
+      add_auxiliary(AUX_INF);
+      this->auxiliaries << sanitize_source(casadi_mmin_str, inst);
+      break;
+    case AUX_MMAX:
+      add_auxiliary(AUX_VFMAX);
+      add_auxiliary(AUX_INF);
+      this->auxiliaries << sanitize_source(casadi_mmax_str, inst);
+      break;
     case AUX_INF:
       this->auxiliaries << "#ifndef casadi_inf\n"
                         << "  #define casadi_inf " << this->infinity << "\n"
@@ -1927,6 +1937,17 @@ namespace casadi {
     return "casadi_min(" + x + ", " + y + ")";
   }
 
+  std::string CodeGenerator::
+  mmax(const std::string& x, casadi_int n, bool is_dense) {
+    add_auxiliary(CodeGenerator::AUX_MMAX);
+    return "casadi_mmin(" + x + ", " + str(n) + ", " + str(casadi_int(is_dense)) + ")";
+  }
+
+  std::string CodeGenerator::
+  mmin(const std::string& x, casadi_int n, bool is_dense) {
+    add_auxiliary(CodeGenerator::AUX_MMIN);
+    return "casadi_mmin(" + x + ", " + str(n) + ", " + str(casadi_int(is_dense)) + ")";
+  }
 
   std::string CodeGenerator::
   max_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {
