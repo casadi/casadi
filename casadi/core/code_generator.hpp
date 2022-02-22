@@ -389,7 +389,10 @@ namespace casadi {
       AUX_BOUNDS_CONSISTENCY,
       AUX_LSQR,
       AUX_FILE_SLURP,
-      AUX_CACHE
+      AUX_CACHE,
+      AUX_LOG1P,
+      AUX_EXPM1,
+      AUX_HYPOT
     };
 
     /** \brief Add a built-in auxiliary function */

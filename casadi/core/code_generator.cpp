@@ -700,12 +700,21 @@ namespace casadi {
 
   std::string CodeGenerator::print_op(casadi_int op, const std::string& a0) {
     switch (op) {
+      case OP_FABS:
+        add_auxiliary(AUX_FABS);
+        return "casadi_fabs("+a0+")";
       case OP_SQ:
         add_auxiliary(AUX_SQ);
         return "casadi_sq("+a0+")";
       case OP_SIGN:
         add_auxiliary(AUX_SIGN);
         return "casadi_sign("+a0+")";
+      case OP_LOG1P:
+        add_auxiliary(AUX_LOG1P);
+        return "casadi_log1p("+a0+")";
+      case OP_EXPM1:
+        add_auxiliary(AUX_EXPM1);
+        return "casadi_expm1("+a0+")";
       default:
         return casadi_math<double>::print(op, a0);
     }
@@ -718,6 +727,9 @@ namespace casadi {
       case OP_FMAX:
         add_auxiliary(AUX_FMAX);
         return "casadi_fmax("+a0+","+a1+")";
+      case OP_HYPOT:
+        add_auxiliary(AUX_HYPOT);
+        return "casadi_hypot("+a0+","+a1+")";
       default:
         return casadi_math<double>::print(op, a0, a1);
     }
@@ -1238,6 +1250,39 @@ namespace casadi {
       this->auxiliaries << "#ifndef casadi_real_min\n"
                         << "  #define casadi_real_min " << this->real_min << "\n"
                         << "#endif\n\n";
+      break;
+    case AUX_LOG1P:
+      shorthand("log1p");
+      this->auxiliaries << "casadi_real casadi_log1p(casadi_real x) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return log(1+x);\n"
+                        << "#else\n"
+                        << "  return log1p(x);\n"
+                        << "#endif\n"
+                        << "}\n\n";
+      break;
+    case AUX_EXPM1:
+      shorthand("expm1");
+      this->auxiliaries << "casadi_real casadi_expm1(casadi_real x) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return exp(x)-1;\n"
+                        << "#else\n"
+                        << "  return expm1(x);\n"
+                        << "#endif\n"
+                        << "}\n\n";
+      break;
+    case AUX_HYPOT:
+      shorthand("hypot");
+      this->auxiliaries << "casadi_real casadi_hypot(casadi_real x, casadi_real y) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return sqrt(x*x+y*y);\n"
+                        << "#else\n"
+                        << "  return hypot(x, y);\n"
+                        << "#endif\n"
+                        << "}\n\n";
       break;
     }
   }

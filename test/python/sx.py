@@ -57,8 +57,8 @@ class SXtests(casadiTestCase):
     self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
     self.pool.append(lambda x: floor(x[0]),floor,"floor")
     self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
-    self.pool.append(lambda x: log1p(x[0]),log1p,"log1p")
-    self.pool.append(lambda x: expm1(x[0]),expm1,"log1p")
+    self.pool.append(lambda x: log1p(x[0]),np.log1p,"log1p")
+    self.pool.append(lambda x: expm1(x[0]),np.expm1,"log1p")
     self.Jpool=FunctionPool()
     self.Jpool.append(lambda x: sqrt(x[0]),lambda x:diag(1/(2.0*sqrt(x))),"sqrt")
     self.Jpool.append(lambda x: sin(x[0]),lambda x:diag(cos(x)),"sin")
@@ -85,7 +85,7 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
     self.matrixbinarypool.append(lambda a: fmax(a[0],a[1]),lambda a: fmax(a[0],a[1]),"fmin")
     self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
-    self.matrixbinarypool.append(lambda a: hypot(a[0],a[1]),lambda a: hypot(a[0],a[1]),"hypot")
+    self.matrixbinarypool.append(lambda a: hypot(a[0],a[1]),lambda a: np.hypot(a[0],a[1]),"hypot")
     #self.matrixbinarypool.append(lambda a: dot(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="dot(Matrix,Matrix)")
     self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: np.dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
 
@@ -94,7 +94,7 @@ class SXtests(casadiTestCase):
   def test_equivalence(self):
     x = SX.sym("x")
     y = SX.sym("y")    
-    for expr,equiv in [(log1p(x),log(1+x))]:#,(expm1(x),exp(x)-1),(hypot(x,y),sqrt(x**2+y**2))]:
+    for expr,equiv in [(log1p(x),log(1+x)),(expm1(x),exp(x)-1),(hypot(x,y),sqrt(x**2+y**2))]:
       f=Function("f",[x,y],[expr])
       equiv_f = Function("equiv_f",[x,y],[equiv])
       self.checkfunction(f,equiv_f,inputs=[1.3,1.7])
