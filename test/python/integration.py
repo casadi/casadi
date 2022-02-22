@@ -488,7 +488,9 @@ class Integrationtests(casadiTestCase):
 
             self.checkfunction(integrator,fs,inputs=integrator_in,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
 
-            if "kinsol" not in str(opts): self.check_serialize(integrator,inputs=integrator_in)
+            if "kinsol" not in str(opts):
+              print(integrator)
+              self.check_serialize(integrator,inputs=integrator_in)
 
   def setUp(self):
     # Reference solution is x0 e^((t^3-t0^3)/(3 p))

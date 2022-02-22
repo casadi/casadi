@@ -1083,9 +1083,11 @@ namespace casadi {
     s.unpack("IdasInterface::first_time", first_time_);
     s.unpack("IdasInterface::init_xdot", init_xdot_);
 
-    if (version<2) {
+    if (version>=2) {
       s.unpack("IdasInterface::max_step_size", max_step_size_);
       s.unpack("IdasInterface::y_c", y_c_);
+    } else {
+      max_step_size_ = 0;
     }
   }
 
