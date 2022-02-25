@@ -1952,7 +1952,7 @@ namespace casadi {
   std::string CodeGenerator::
   mmax(const std::string& x, casadi_int n, bool is_dense) {
     add_auxiliary(CodeGenerator::AUX_MMAX);
-    return "casadi_mmin(" + x + ", " + str(n) + ", " + str(casadi_int(is_dense)) + ")";
+    return "casadi_mmax(" + x + ", " + str(n) + ", " + str(casadi_int(is_dense)) + ")";
   }
 
   std::string CodeGenerator::
