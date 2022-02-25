@@ -1780,6 +1780,25 @@ class NLPtests(casadiTestCase):
       self.checkarray(b[1],G[i,:])
       self.checkarray(b[1],c[1])
 
+  def test_derivative(self):
+    x = MX.sym("x",3)
+    p = MX.sym("p",3)
+    nlp = {"x":x,"p":p,"f":sumsqr(sin(x)-p),"g":x}
+    solver = nlpsol("solver","sqpmethod",nlp,{"qpsol":"qrqp"})
+    res = solver(p=p,x0=0,lbg=-inf,ubg=inf)
+    f = Function('f',[p],[res["x"]])
+    f_ref = Function('f_ref',[p],[arcsin(p)])
+    self.checkfunction(f,f_ref,inputs=[vertcat(0.1,0.2,0.3)])
+    
+    x = MX.sym("x",3)
+    p = MX.sym("p",3)
+    nlp = {"x":x,"p":p,"f":sumsqr(sin(x)-p)}
+    solver = nlpsol("solver","sqpmethod",nlp,{"qpsol":"qrqp"})
+    res = solver(p=p,x0=0)
+    f = Function('f',[p],[res["x"]])
+    f_ref = Function('f_ref',[p],[arcsin(p)])
+    self.checkfunction(f,f_ref,inputs=[vertcat(0.1,0.2,0.3)])
+
 if __name__ == '__main__':
     unittest.main()
     print(solvers)

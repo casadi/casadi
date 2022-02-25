@@ -1300,6 +1300,14 @@ namespace casadi {
           return matrix_matrix(op, repmat(x, 1, y.size2() / x.size2()), y);
         }
       }
+      // x and y are empty horizontal multiples of each other?
+      if (x.size1()==0 && y.size1()==0 && x.size2()>0 && y.size2()>0) {
+        if (x.size2() % y.size2() == 0) {
+          return Matrix<Scalar>(0, x.size2());
+        } else if (y.size2() % x.size2() == 0) {
+          return Matrix<Scalar>(0, y.size2());
+        }
+      }
       // Dimension mismatch
       casadi_error("Dimension mismatch for " + casadi_math<Scalar>::print(op, "x", "y") +
                    ", x is " + x.dim() + ", while y is " + y.dim());

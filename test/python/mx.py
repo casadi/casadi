@@ -2965,5 +2965,23 @@ class MXtests(casadiTestCase):
     res = f(vertcat(100,1000,10000))
     self.checkarray(res,10000)
 
+  def test_empty_broadcast(self):
+    for nc in [0,2]:
+      res = atan2(MX.sym("c",nc,1),MX.sym("t",nc,3))
+
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],3)
+  
+      with self.assertInException("Dimension mismatch"):
+        res = atan2(MX.sym("c",nc,2),MX.sym("t",nc,3))
+
+      res = atan2(MX.sym("c",nc,2),MX.sym("t",nc,4))
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],4)
+
+      res = atan2(MX.sym("c",nc,4),MX.sym("t",nc,2))
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],4)
+
 if __name__ == '__main__':
     unittest.main()
