@@ -28,7 +28,7 @@ using namespace std;
 namespace casadi {
 
   LogSumExp::LogSumExp(const MX& A) {
-    set_dep({A});
+    set_dep(A);
     set_sparsity(Sparsity::dense(1, 1));
   }
 
