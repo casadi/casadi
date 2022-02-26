@@ -1653,7 +1653,7 @@ class Functiontests(casadiTestCase):
 
     DM.set_precision(6)
 
-    self.assertTrue("[[1]," in out[0])
+    self.assertTrue("[1, 1, 1, 1, 1]" in out[0])
 
 
   @requires_expm("slicot")
