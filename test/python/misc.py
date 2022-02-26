@@ -493,7 +493,7 @@ class Misctests(casadiTestCase):
     f = x**2
     for i in range(1000):
       f =sin(f)*f
-
+    f=f+x**2
 
     opts = {"record_time":True}
     ff = Function("f",[x],[f],opts)
