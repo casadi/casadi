@@ -355,6 +355,18 @@ namespace casadi {
         if ((y-x).is_nonnegative())
           return 1;
         break;
+      case OP_FMIN:
+        if (x.is_inf()) return y;
+        if (y.is_inf()) return x;
+        if (x.is_minus_inf() || y.is_minus_inf()) return -std::numeric_limits<double>::infinity();
+        if (is_equal(x, y, SXNode::eq_depth_)) return x;
+        break;
+      case OP_FMAX:
+        if (x.is_minus_inf()) return y;
+        if (y.is_minus_inf()) return x;
+        if (x.is_inf() || y.is_inf()) return std::numeric_limits<double>::infinity();
+        if (is_equal(x, y, SXNode::eq_depth_)) return x;
+        break;
       case OP_LT:
         if (((x)-y).is_nonnegative())
           return 0;
