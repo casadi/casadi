@@ -57,6 +57,10 @@ namespace casadi {
   DM DM::
   expm_const(const DM& A, const DM& t);
 
+  template<>
+  DM DM::
+  _logsumexp(const DM& A);
+
   template<> void DM::export_code(const std::string& lang,
        std::ostream &stream, const Dict& options) const;
 
