@@ -22,7 +22,7 @@ jobs:
       with:
           registry: ghcr.io
           username: jgillis
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CASADIBOT_TOKEN }}
           
     - name: generate Python 2
       run: >
@@ -310,7 +310,7 @@ jobs:
         with:
           token: ${{ secrets.TOKEN_PUBLIC}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-${{env.os}}-py${{matrix.py2}}-*untested.zip
+          assets: casadi-${{env.os}}-py${{matrix.py2}}-*-untested.zip
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
