@@ -225,12 +225,12 @@ namespace casadi {
     return {str(t1), str(t2), str(t3), str(t4), str(t5), str(t6)};
   }
 
-  //! \brief Create a string from a formated string
+  //! \brief Create a string from a formatted string
   inline std::string fmtstr(const std::string& fmt, const std::vector<std::string>& args) {
     std::string s = fmt;
     for (auto&& e : args) {
       std::string::size_type n = s.find("%s");
-      if (n==std::string::npos) return "** Ill-formated string ** " + fmt;
+      if (n==std::string::npos) return "** Ill-formatted string ** " + fmt;
       s.replace(n, 2, e);
     }
     return s;

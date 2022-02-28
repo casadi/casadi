@@ -570,7 +570,7 @@ casadi_int casadi_qp_dual_blocking(casadi_qp_data<T1>* d) {
   for (j=0; j<n_tau; ++j) {
     // Distance to the next tau (may be zero)
     dtau = d->w[j] - tau_k;
-    // Check if maximum dual infeasibilty gets exceeded
+    // Check if maximum dual infeasibility gets exceeded
     for (k=0; k<p->nx; ++k) {
       // Get infeasibility and infeasibility tangent
       infeas  = d->infeas[k];

@@ -226,7 +226,7 @@ namespace casadi {
   }
 
 
-  // Note: binary/unary operations are ommitted here
+  // Note: binary/unary operations are omitted here
   std::map<casadi_int, SXNode* (*)(DeserializingStream&)> SXNode::deserialize_map = {
     {OP_PARAMETER, SymbolicSX::deserialize},
     {OP_CONST, ConstantSX_deserialize}};

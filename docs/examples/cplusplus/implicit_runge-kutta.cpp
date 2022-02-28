@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
     X.push_back(V.nz(Slice(r*nx,(r+1)*nx)));
   }
 
-  // Get the collocation quations (that define V)
+  // Get the collocation equations (that define V)
   Function f("f", {dae["x"], dae["p"]}, {dae["ode"]});
   vector<MX> V_eq;
   for(int j=1; j<d+1; ++j){
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
   Function irk_integrator("irk_integrator", MXDict{{"x0", X0}, {"p", P}, {"xf", Xk}},
                           integrator_in(), integrator_out());
 
-  // Create a convensional integrator for reference
+  // Create a conventional integrator for reference
   Function ref_integrator = integrator("ref_integrator",
                                        "cvodes", dae, {{"tf", tf}});
 

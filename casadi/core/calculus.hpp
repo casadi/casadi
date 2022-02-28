@@ -150,7 +150,7 @@ namespace casadi {
     // Nonzero reference
     OP_GETNONZEROS,
 
-    // Parameteric nonzero reference
+    // Parametric nonzero reference
     OP_GETNONZEROS_PARAM,
 
     // Nonzero addition
@@ -360,7 +360,7 @@ namespace casadi {
 
   /// Calculate function and derivative
   template<casadi_int I>
-  struct DerBinaryOpertion {
+  struct DerBinaryOperation {
     /// Perform the operation
     template<typename T> static inline void derf(const T& x, const T& y, T& f, T* d) {
 
@@ -878,7 +878,7 @@ namespace casadi {
       d[0]=a/c; d[1]=b/c;}
   };
 
-  /// Elementwise inverse
+  /// Element-wise inverse
   template<>
   struct UnaryOperation<OP_INV>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = 1./x;}
@@ -1385,56 +1385,56 @@ namespace casadi {
     // NOTE: We define the implementation in a preprocessor macro to be able to force inlining,
     // and to allow extensions in the VM
 #define CASADI_MATH_DERF_BUILTIN(X, Y, F, D)                            \
-    case OP_ASSIGN:    DerBinaryOpertion<OP_ASSIGN>::derf(X, Y, F, D);        break; \
-  case OP_ADD:       DerBinaryOpertion<OP_ADD>::derf(X, Y, F, D);        break; \
-  case OP_SUB:       DerBinaryOpertion<OP_SUB>::derf(X, Y, F, D);        break; \
-  case OP_MUL:       DerBinaryOpertion<OP_MUL>::derf(X, Y, F, D);        break; \
-  case OP_DIV:       DerBinaryOpertion<OP_DIV>::derf(X, Y, F, D);        break; \
-  case OP_NEG:       DerBinaryOpertion<OP_NEG>::derf(X, Y, F, D);        break; \
-  case OP_EXP:       DerBinaryOpertion<OP_EXP>::derf(X, Y, F, D);        break; \
-  case OP_LOG:       DerBinaryOpertion<OP_LOG>::derf(X, Y, F, D);        break; \
-  case OP_POW:       DerBinaryOpertion<OP_POW>::derf(X, Y, F, D);        break; \
-  case OP_CONSTPOW:  DerBinaryOpertion<OP_CONSTPOW>::derf(X, Y, F, D);   break; \
-  case OP_SQRT:      DerBinaryOpertion<OP_SQRT>::derf(X, Y, F, D);       break; \
-  case OP_SQ:        DerBinaryOpertion<OP_SQ>::derf(X, Y, F, D);         break; \
-  case OP_TWICE:     DerBinaryOpertion<OP_TWICE>::derf(X, Y, F, D);      break; \
-  case OP_SIN:       DerBinaryOpertion<OP_SIN>::derf(X, Y, F, D);        break; \
-  case OP_COS:       DerBinaryOpertion<OP_COS>::derf(X, Y, F, D);        break; \
-  case OP_TAN:       DerBinaryOpertion<OP_TAN>::derf(X, Y, F, D);        break; \
-  case OP_ASIN:      DerBinaryOpertion<OP_ASIN>::derf(X, Y, F, D);       break; \
-  case OP_ACOS:      DerBinaryOpertion<OP_ACOS>::derf(X, Y, F, D);       break; \
-  case OP_ATAN:      DerBinaryOpertion<OP_ATAN>::derf(X, Y, F, D);       break; \
-  case OP_LT:        DerBinaryOpertion<OP_LT>::derf(X, Y, F, D);         break; \
-  case OP_LE:        DerBinaryOpertion<OP_LE>::derf(X, Y, F, D);         break; \
-  case OP_EQ:        DerBinaryOpertion<OP_EQ>::derf(X, Y, F, D);         break; \
-  case OP_NE:        DerBinaryOpertion<OP_NE>::derf(X, Y, F, D);         break; \
-  case OP_NOT:       DerBinaryOpertion<OP_NOT>::derf(X, Y, F, D);        break; \
-  case OP_AND:       DerBinaryOpertion<OP_AND>::derf(X, Y, F, D);        break; \
-  case OP_OR:        DerBinaryOpertion<OP_OR>::derf(X, Y, F, D);         break; \
-  case OP_IF_ELSE_ZERO: DerBinaryOpertion<OP_IF_ELSE_ZERO>::derf(X, Y, F, D);         break; \
-  case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X, Y, F, D);      break; \
-  case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X, Y, F, D);       break; \
-  case OP_FMOD:      DerBinaryOpertion<OP_FMOD>::derf(X, Y, F, D);       break; \
-  case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X, Y, F, D);       break; \
-  case OP_SIGN:      DerBinaryOpertion<OP_SIGN>::derf(X, Y, F, D);       break; \
-  case OP_COPYSIGN:  DerBinaryOpertion<OP_COPYSIGN>::derf(X, Y, F, D);   break; \
-  case OP_ERF:       DerBinaryOpertion<OP_ERF>::derf(X, Y, F, D);        break; \
-  case OP_FMIN:      DerBinaryOpertion<OP_FMIN>::derf(X, Y, F, D);       break; \
-  case OP_FMAX:      DerBinaryOpertion<OP_FMAX>::derf(X, Y, F, D);       break; \
-  case OP_INV:       DerBinaryOpertion<OP_INV>::derf(X, Y, F, D);        break; \
-  case OP_SINH:      DerBinaryOpertion<OP_SINH>::derf(X, Y, F, D);       break; \
-  case OP_COSH:      DerBinaryOpertion<OP_COSH>::derf(X, Y, F, D);       break; \
-  case OP_TANH:      DerBinaryOpertion<OP_TANH>::derf(X, Y, F, D);       break; \
-  case OP_ASINH:     DerBinaryOpertion<OP_ASINH>::derf(X, Y, F, D);      break; \
-  case OP_ACOSH:     DerBinaryOpertion<OP_ACOSH>::derf(X, Y, F, D);      break; \
-  case OP_ATANH:     DerBinaryOpertion<OP_ATANH>::derf(X, Y, F, D);      break; \
-  case OP_ATAN2:     DerBinaryOpertion<OP_ATAN2>::derf(X, Y, F, D);      break; \
-  case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X, Y, F, D);     break; \
-  case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X, Y, F, D);       break; \
-  case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X, Y, F, D);    break; \
-  case OP_LOG1P:     DerBinaryOpertion<OP_LOG1P>::derf(X, Y, F, D);      break; \
-  case OP_EXPM1:     DerBinaryOpertion<OP_EXPM1>::derf(X, Y, F, D);      break; \
-  case OP_HYPOT:     DerBinaryOpertion<OP_HYPOT>::derf(X, Y, F, D);      break;
+case OP_ASSIGN:    DerBinaryOperation<OP_ASSIGN>::derf(X, Y, F, D);        break; \
+case OP_ADD:       DerBinaryOperation<OP_ADD>::derf(X, Y, F, D);        break; \
+case OP_SUB:       DerBinaryOperation<OP_SUB>::derf(X, Y, F, D);        break; \
+case OP_MUL:       DerBinaryOperation<OP_MUL>::derf(X, Y, F, D);        break; \
+case OP_DIV:       DerBinaryOperation<OP_DIV>::derf(X, Y, F, D);        break; \
+case OP_NEG:       DerBinaryOperation<OP_NEG>::derf(X, Y, F, D);        break; \
+case OP_EXP:       DerBinaryOperation<OP_EXP>::derf(X, Y, F, D);        break; \
+case OP_LOG:       DerBinaryOperation<OP_LOG>::derf(X, Y, F, D);        break; \
+case OP_POW:       DerBinaryOperation<OP_POW>::derf(X, Y, F, D);        break; \
+case OP_CONSTPOW:  DerBinaryOperation<OP_CONSTPOW>::derf(X, Y, F, D);   break; \
+case OP_SQRT:      DerBinaryOperation<OP_SQRT>::derf(X, Y, F, D);       break; \
+case OP_SQ:        DerBinaryOperation<OP_SQ>::derf(X, Y, F, D);         break; \
+case OP_TWICE:     DerBinaryOperation<OP_TWICE>::derf(X, Y, F, D);      break; \
+case OP_SIN:       DerBinaryOperation<OP_SIN>::derf(X, Y, F, D);        break; \
+case OP_COS:       DerBinaryOperation<OP_COS>::derf(X, Y, F, D);        break; \
+case OP_TAN:       DerBinaryOperation<OP_TAN>::derf(X, Y, F, D);        break; \
+case OP_ASIN:      DerBinaryOperation<OP_ASIN>::derf(X, Y, F, D);       break; \
+case OP_ACOS:      DerBinaryOperation<OP_ACOS>::derf(X, Y, F, D);       break; \
+case OP_ATAN:      DerBinaryOperation<OP_ATAN>::derf(X, Y, F, D);       break; \
+case OP_LT:        DerBinaryOperation<OP_LT>::derf(X, Y, F, D);         break; \
+case OP_LE:        DerBinaryOperation<OP_LE>::derf(X, Y, F, D);         break; \
+case OP_EQ:        DerBinaryOperation<OP_EQ>::derf(X, Y, F, D);         break; \
+case OP_NE:        DerBinaryOperation<OP_NE>::derf(X, Y, F, D);         break; \
+case OP_NOT:       DerBinaryOperation<OP_NOT>::derf(X, Y, F, D);        break; \
+case OP_AND:       DerBinaryOperation<OP_AND>::derf(X, Y, F, D);        break; \
+case OP_OR:        DerBinaryOperation<OP_OR>::derf(X, Y, F, D);         break; \
+case OP_IF_ELSE_ZERO: DerBinaryOperation<OP_IF_ELSE_ZERO>::derf(X, Y, F, D);         break; \
+case OP_FLOOR:     DerBinaryOperation<OP_FLOOR>::derf(X, Y, F, D);      break; \
+case OP_CEIL:      DerBinaryOperation<OP_CEIL>::derf(X, Y, F, D);       break; \
+case OP_FMOD:      DerBinaryOperation<OP_FMOD>::derf(X, Y, F, D);       break; \
+case OP_FABS:      DerBinaryOperation<OP_FABS>::derf(X, Y, F, D);       break; \
+case OP_SIGN:      DerBinaryOperation<OP_SIGN>::derf(X, Y, F, D);       break; \
+case OP_COPYSIGN:  DerBinaryOperation<OP_COPYSIGN>::derf(X, Y, F, D);   break; \
+case OP_ERF:       DerBinaryOperation<OP_ERF>::derf(X, Y, F, D);        break; \
+case OP_FMIN:      DerBinaryOperation<OP_FMIN>::derf(X, Y, F, D);       break; \
+case OP_FMAX:      DerBinaryOperation<OP_FMAX>::derf(X, Y, F, D);       break; \
+case OP_INV:       DerBinaryOperation<OP_INV>::derf(X, Y, F, D);        break; \
+case OP_SINH:      DerBinaryOperation<OP_SINH>::derf(X, Y, F, D);       break; \
+case OP_COSH:      DerBinaryOperation<OP_COSH>::derf(X, Y, F, D);       break; \
+case OP_TANH:      DerBinaryOperation<OP_TANH>::derf(X, Y, F, D);       break; \
+case OP_ASINH:     DerBinaryOperation<OP_ASINH>::derf(X, Y, F, D);      break; \
+case OP_ACOSH:     DerBinaryOperation<OP_ACOSH>::derf(X, Y, F, D);      break; \
+case OP_ATANH:     DerBinaryOperation<OP_ATANH>::derf(X, Y, F, D);      break; \
+case OP_ATAN2:     DerBinaryOperation<OP_ATAN2>::derf(X, Y, F, D);      break; \
+case OP_ERFINV:    DerBinaryOperation<OP_ERFINV>::derf(X, Y, F, D);     break; \
+case OP_LIFT:      DerBinaryOperation<OP_LIFT>::derf(X, Y, F, D);       break; \
+case OP_PRINTME:   DerBinaryOperation<OP_PRINTME>::derf(X, Y, F, D);    break; \
+case OP_LOG1P:     DerBinaryOperation<OP_LOG1P>::derf(X, Y, F, D);      break; \
+case OP_EXPM1:     DerBinaryOperation<OP_EXPM1>::derf(X, Y, F, D);      break; \
+case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     switch (op) {
       CASADI_MATH_DERF_BUILTIN(x, y, f, d)
         }
