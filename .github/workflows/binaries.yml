@@ -22,7 +22,7 @@ jobs:
       with:
           registry: ghcr.io
           username: jgillis
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CASADIBOT_TOKEN }}
           
     - name: generate Python 2
       run: >
