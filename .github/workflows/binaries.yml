@@ -226,13 +226,13 @@ jobs:
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
-          token: ${{ secrets.TOKEN_PUBLIC}}
+          token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           assets: casadi-osx64-py${{matrix.py2}}-*-untested.zip
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
-          repo_token: ${{ secrets.TOKEN_PUBLIC}}
+          repo_token: ${{ secrets.CASADIBOT_TOKEN}}
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-osx64-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
@@ -308,13 +308,13 @@ jobs:
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
-          token: ${{ secrets.TOKEN_PUBLIC}}
+          token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           assets: casadi-${{env.os}}-py${{matrix.py2}}-*-untested.zip
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
-          repo_token: ${{ secrets.TOKEN_PUBLIC}}
+          repo_token: ${{ secrets.CASADIBOT_TOKEN}}
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{env.os}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
@@ -383,13 +383,13 @@ jobs:
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
-          repo_token: ${{ secrets.TOKEN_PUBLIC}}
+          repo_token: ${{ secrets.CASADIBOT_TOKEN}}
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-tested.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
-          token: ${{ secrets.TOKEN_PUBLIC}}
+          token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           assets: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
