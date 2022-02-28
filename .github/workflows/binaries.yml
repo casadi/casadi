@@ -287,6 +287,16 @@ jobs:
           files: install/
           recursive: false
           dest: casadi-${{env.os}}-py${{matrix.py2}}.zip
+      - run: cp casadi-${{env.os}}-py${{matrix.py2}}.zip casadi-${{env.os}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.2.1
+        with:
+          repo_token: ${{ secrets.TOKEN_PUBLIC}}
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{env.os}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: casadi-${{env.os}}-py${{matrix.py2}}
