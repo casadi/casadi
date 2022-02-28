@@ -220,9 +220,9 @@ jobs:
           name: casadi-osx64-py${{matrix.py2}}
           path: casadi-osx64-py${{matrix.py2}}.zip
           retention-days: 5
-      - run: cp casadi-osx64-py${{matrix.py2}}.zip casadi-osx64-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
+      - run: cp casadi-osx64-py${{matrix.py2}}.zip casadi-osx64-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -304,9 +304,9 @@ jobs:
           files: install/
           recursive: false
           dest: casadi-${{env.os}}-py${{matrix.py2}}.zip
-      - run: cp casadi-${{env.os}}-py${{matrix.py2}}.zip casadi-${{env.os}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
+      - run: cp casadi-${{env.os}}-py${{matrix.py2}}.zip casadi-${{env.os}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -383,6 +383,8 @@ jobs:
           pip install numpy scipy
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
           python alltests.py
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
       - run: cp casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-tested.zip
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
