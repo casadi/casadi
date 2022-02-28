@@ -353,10 +353,25 @@ namespace casadi {
 
     /** \brief x -> log(sum_i exp(x_i))
      * 
-     * Numerical improvements per https://nhigham.com/2021/01/05/what-is-the-log-sum-exp-function/
+     * Can be used to achieve a smooth max.
+     * 
+     * Implementations for DM/SX/MX are hardened against overflow
+     * Implementations for DM/MX are more accurate with log1p (*)
+     * 
+     * (*) https://nhigham.com/2021/01/05/what-is-the-log-sum-exp-function/
+     * 
      */
-    inline friend MatType logsumexp(const MatType &x) {
+    inline friend MatType logsumexp(const MatType& x) {
       return MatType::logsumexp(x);
+    }
+    /** \brief Scaled version of logsumexp
+     * 
+     * Scaled such that max(x) <= logsumexp(x, margin) <= max(x)+margin
+     * 
+     */
+    inline friend MatType logsumexp(const MatType& x, const MatType& margin) {
+      MatType alpha = log(x.size1())/margin; 
+      return MatType::logsumexp(alpha*x)/alpha;
     }
     static MatType logsumexp(const MatType& x);
 

@@ -3048,6 +3048,10 @@ DECL M casadi_logsumexp(const M& a) {
   return logsumexp(a);
 }
 
+DECL M casadi_logsumexp(const M& a, const M& margin) {
+  return logsumexp(a, margin);
+}
+
 DECL M casadi_interp1d(const std::vector<double>& x, const M&v,
         const std::vector<double>& xq, const std::string& mode="linear", bool equidistant=false) {
   return interp1d(x, v, xq, mode, equidistant);
