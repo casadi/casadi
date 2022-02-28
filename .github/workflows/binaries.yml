@@ -229,6 +229,8 @@ jobs:
           token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           assets: casadi-osx64-py${{matrix.py2}}-*-untested.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
@@ -311,6 +313,8 @@ jobs:
           token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           assets: casadi-${{env.os}}-py${{matrix.py2}}-*-untested.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
@@ -393,3 +397,5 @@ jobs:
           token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           assets: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
