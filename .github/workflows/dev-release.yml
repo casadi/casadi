@@ -1,4 +1,4 @@
-name: official release
+name: dev-release
 
 on:
   workflow_dispatch:
