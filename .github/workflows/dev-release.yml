@@ -11,7 +11,7 @@ jobs:
   dev-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: jgillis/fetch-gh-release-asset
+      - uses: jgillis/fetch-gh-release-asset@master
         with: 
           repo: "casadi/casadi"
           version: "tags/nightly-${{ github.event.inputs.branch }}"
