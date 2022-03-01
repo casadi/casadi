@@ -295,11 +295,11 @@ jobs:
           key: "${{matrix.arch}}"
           map: |
            {
-              "manylinux1-x64": {"os": "linux64", "bitness": "64"},
-              "manylinux1-x86": {"os": "linux32", "bitness": "32"},
-              "manylinux2014-x64": {"os": "linux64", "bitness": "64"},
-              "manylinux2014-x86": {"os": "linux32", "bitness": "32"},
-              "windows-shared-x64-posix": {"os": "windows64", "bitness": "64"}
+              "manylinux1-x64": {"os": "linux", "bitness": "64"},
+              "manylinux1-x86": {"os": "linux", "bitness": "32"},
+              "manylinux2014-x64": {"os": "linux", "bitness": "64"},
+              "manylinux2014-x86": {"os": "linux", "bitness": "32"},
+              "windows-shared-x64-posix": {"os": "windows", "bitness": "64"}
            }
           export_to: env
       - uses: jgillis/universal_grafter@master
@@ -314,16 +314,16 @@ jobs:
         with:
           files: install/
           recursive: false
-          dest: casadi-${{env.os}}-py${{matrix.py2}}.zip
+          dest: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
-      - run: cp casadi-${{env.os}}-py${{matrix.py2}}.zip casadi-${{env.os}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-${{env.os}}-py${{matrix.py2}}-*-untested.zip
+          assets: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-*-untested.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -332,11 +332,26 @@ jobs:
           repo_token: ${{ secrets.CASADIBOT_TOKEN}}
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{env.os}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+          file: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+
+      
+      - run: |
+          version=$(python misc/get_version.py)
+          wheel=$(python misc/create_wheel_local.py $version+${{ env.GITHUB_SHA_SHORT }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+          echo "::set-output name=wheel::$wheel"
+        id: wheel
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.2.1
+        with:
+          repo_token: ${{ secrets.CASADIBOT_TOKEN}}
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: ${{ steps.wheel.outputs.wheel }}
+
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: casadi-${{env.os}}-py${{matrix.py2}}
-          path: casadi-${{env.os}}-py${{matrix.py2}}.zip
+          name: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}
+          path: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
           retention-days: 5
 
   test-python:
