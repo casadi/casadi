@@ -47,7 +47,18 @@ jobs:
       run: |
         zip -rq ../casadi_source.zip . --exclude '.*' --exclude '*/.*' --exclude 'appveyor.yml'
         mv ../casadi_source.zip casadi_source.zip
-      
+    
+    - name: Inject slug/short variables
+      uses: rlespinasse/github-slug-action@v3.x
+    - run: cp casadi_source.zip casadi-source-${{ env.GITHUB_SHA_SHORT }}.zip
+    - name: Upload files to a GitHub release
+      uses: svenstaro/upload-release-action@2.2.1
+      with:
+        repo_token: ${{ secrets.CASADIBOT_TOKEN}}
+        overwrite: true
+        tag: nightly-${{ env.GITHUB_REF_SLUG }}
+        file: casadi-source-${{ env.GITHUB_SHA_SHORT }}.zip
+
     - uses: actions/upload-artifact@v2.2.4
       with:
         name: casadi_source_wrapper
