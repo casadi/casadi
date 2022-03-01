@@ -419,7 +419,7 @@ jobs:
         with:
           token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: 'casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-*-tested.zip
+          assets: 'casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-*-tested.zip'
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
