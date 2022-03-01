@@ -11,9 +11,10 @@ jobs:
   dev-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: robinraju/release-downloader@v1.3
+      - uses: jgillis/fetch-gh-release-asset
         with: 
-          repository: "casadi/casadi"
-          tag: "nightly-${{ github.event.inputs.branch }}"
-          fileName: "*.whl"
+          repo: "casadi/casadi"
+          version: "tags/nightly-${{ github.event.inputs.branch }}"
+          file: "*.whl"
+          regex: true
       - run: ls
