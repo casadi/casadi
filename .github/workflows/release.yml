@@ -1,6 +1,5 @@
 on:
-  release:
-    types: [edited]
+  release
     
 jobs:
   dev-release:
