@@ -1,0 +1,10 @@
+on:
+  release:
+    types: [edited]
+    
+jobs:
+  dev-release:
+    if: "!contains(github.event.release.name, 'release-') && contains(github.event.release.body, ':ship:')"
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "foo"
