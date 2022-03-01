@@ -1,9 +1,14 @@
 on:
-  release
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch'     
+        required: true
+        type: string
     
 jobs:
   dev-release:
-    if: "!contains(github.event.release.name, 'release-') && contains(github.event.release.body, ':ship:')"
+    if: "!contains(github.event.inputs.branch, 'release-')"
     runs-on: ubuntu-latest
     steps:
       - run: echo "foo"
