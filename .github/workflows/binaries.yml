@@ -50,14 +50,14 @@ jobs:
     
     - name: Inject slug/short variables
       uses: rlespinasse/github-slug-action@v3.x
-    - run: cp casadi_source.zip casadi-source-${{ env.GITHUB_SHA_SHORT }}.zip
+    - run: cp casadi_source.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-source.zip
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.2.1
       with:
         repo_token: ${{ secrets.CASADIBOT_TOKEN}}
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
-        file: casadi-source-${{ env.GITHUB_SHA_SHORT }}.zip
+        file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-source.zip
 
     - uses: actions/upload-artifact@v2.2.4
       with:
@@ -233,13 +233,13 @@ jobs:
           retention-days: 5
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
-      - run: cp casadi-osx64-py${{matrix.py2}}.zip casadi-osx64-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+      - run: cp casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-osx64-py${{matrix.py2}}.zip casadi-osx64-py${{matrix.py2}}-untested.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-osx64-py${{matrix.py2}}-*-untested.zip
+          assets: casadi-*-osx64-py${{matrix.py2}}-untested.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -248,7 +248,7 @@ jobs:
           repo_token: ${{ secrets.CASADIBOT_TOKEN}}
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-osx64-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-osx64-py${{matrix.py2}}-untested.zip
 
   python-dockcross:
     needs: [core-dockcross,matrix-arch-py2,swig]
@@ -317,13 +317,13 @@ jobs:
           dest: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
-      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+      - run: cp casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-untested.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-*-untested.zip
+          assets: casadi-*-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-untested.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -332,7 +332,7 @@ jobs:
           repo_token: ${{ secrets.CASADIBOT_TOKEN}}
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-untested.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-untested.zip
 
       
       - run: |
@@ -341,7 +341,18 @@ jobs:
           wheel=$(python misc/create_wheel_local.py $version+${{ env.GITHUB_SHA_SHORT }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
           echo "<$wheel>"
           echo "::set-output name=wheel::$wheel"
+          wheel_wildcard=$(echo $weel | sed -e 's/${{ env.GITHUB_SHA_SHORT }}/\*/')
+          echo "::set-output name=wheel::$wheel"
+          echo "::set-output name=wheel_wildcard::$wheel_wildcard"
         id: wheel
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ secrets.CASADIBOT_TOKEN}}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: ${{ steps.wheel.outputs.wheel_wildcard }}
+          fail-if-no-assets: false
+          fail-if-no-release: false
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
@@ -413,17 +424,17 @@ jobs:
           python alltests.py
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
-      - run: cp casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-tested.zip
+      - run: cp casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ secrets.CASADIBOT_TOKEN}}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: 'casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-*-tested.zip'
+          assets: 'casadi-*-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip'
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.2.1
         with:
           repo_token: ${{ secrets.CASADIBOT_TOKEN}}
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-${{ env.GITHUB_SHA_SHORT }}-tested.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip
