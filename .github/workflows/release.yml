@@ -1,0 +1,12 @@
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch'     
+        required: true
+    
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "foo"
