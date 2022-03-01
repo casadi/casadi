@@ -4,11 +4,9 @@ on:
       branch:
         description: 'Branch'     
         required: true
-        type: string
     
 jobs:
-  dev-release:
-    if: "!contains(github.event.inputs.branch, 'release-')"
+  release:
     runs-on: ubuntu-latest
     steps:
       - run: echo "foo"
