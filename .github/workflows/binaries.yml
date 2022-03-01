@@ -337,7 +337,9 @@ jobs:
       
       - run: |
           version=$(python misc/get_version.py)
+          echo "<$version>"
           wheel=$(python misc/create_wheel_local.py $version+${{ env.GITHUB_SHA_SHORT }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+          echo "<$wheel>"
           echo "::set-output name=wheel::$wheel"
         id: wheel
       - name: Upload files to a GitHub release
