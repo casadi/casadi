@@ -15,6 +15,6 @@ jobs:
         with: 
           repo: "casadi/casadi"
           version: "tags/nightly-${{ github.event.inputs.branch }}"
-          file: ".*\\\\.whl"
+          file: ".*\\.whl"
           regex: true
       - run: ls
