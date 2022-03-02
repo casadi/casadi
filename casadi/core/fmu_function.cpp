@@ -1011,6 +1011,22 @@ Sparsity Fmu::hess_sparsity(const std::vector<size_t>& r, const std::vector<size
   return hess_sp_.sub(r1, c1, mapping);
 }
 
+std::vector<double> Fmu::get_nominal_in(casadi_int i) const {
+  auto&& ind = ired_.at(i);
+  std::vector<double> n;
+  n.reserve(ind.size());
+  for (size_t k : ind) n.push_back(nominal_in_.at(k));
+  return n;
+}
+
+std::vector<double> Fmu::get_nominal_out(casadi_int i) const {
+  auto&& ind = ored_.at(i);
+  std::vector<double> n;
+  n.reserve(ind.size());
+  for (size_t k : ind) n.push_back(nominal_out_.at(k));
+  return n;
+}
+
 Fmu::Fmu(const std::vector<std::string>& scheme_in,
     const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
@@ -1646,6 +1662,47 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
       return fmu_->hess_sparsity(s.ind, s.wrt);
   }
   return Sparsity();
+}
+
+std::vector<double> FmuFunction::get_nominal_in(casadi_int i) const {
+  switch (in_.at(i).type) {
+    case InputType::REG:
+      return fmu_->get_nominal_in(in_.at(i).ind);
+    case InputType::ADJ:
+      break;
+    case InputType::OUT:
+      return fmu_->get_nominal_out(in_.at(i).ind);
+    case InputType::ADJ_OUT:
+      break;
+  }
+  // Default: Base class
+  return FunctionInternal::get_nominal_in(i);
+}
+
+std::vector<double> FmuFunction::get_nominal_out(casadi_int i) const {
+  switch (out_.at(i).type) {
+    case OutputType::REG:
+      return fmu_->get_nominal_out(out_.at(i).ind);
+    case OutputType::ADJ:
+      break;
+    case OutputType::JAC:
+      casadi_warning("FmuFunction::get_nominal_out not implemented for OutputType::JAC");
+      break;
+    case OutputType::JAC_TRANS:
+      casadi_warning("FmuFunction::get_nominal_out not implemented for OutputType::JAC_TRANS");
+      break;
+    case OutputType::JAC_ADJ_OUT:
+      casadi_warning("FmuFunction::get_nominal_out not implemented for OutputType::JAC_ADJ_OUT");
+      break;
+    case OutputType::JAC_REG_ADJ:
+      casadi_warning("FmuFunction::get_nominal_out not implemented for OutputType::JAC_REG_ADJ");
+      break;
+    case OutputType::HESS:
+      casadi_warning("FmuFunction::get_nominal_out not implemented for OutputType::HESS");
+      break;
+  }
+  // Default: Base class
+  return FunctionInternal::get_nominal_out(i);
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,

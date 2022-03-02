@@ -304,6 +304,12 @@ namespace casadi {
     /** \brief Get smallest input value */
     double min_in(casadi_int ind) const;
 
+    /** \brief Get nominal input value */
+    std::vector<double> nominal_in(casadi_int ind) const;
+
+    /** \brief Get nominal output value */
+    std::vector<double> nominal_out(casadi_int ind) const;
+
     /** \brief Get sparsity of a given input */
     /// @{
     const Sparsity& sparsity_in(casadi_int ind) const;

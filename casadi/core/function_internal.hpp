@@ -762,6 +762,14 @@ namespace casadi {
       return -inf;
     }
 
+    virtual std::vector<double> get_nominal_in(casadi_int ind) const {
+      return std::vector<double>(nnz_in(ind), 1.);
+    }
+
+    virtual std::vector<double> get_nominal_out(casadi_int ind) const {
+      return std::vector<double>(nnz_out(ind), 1.);
+    }
+
     /** \brief Get relative tolerance */
     virtual double get_reltol() const {
       return eps;

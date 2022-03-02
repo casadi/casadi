@@ -687,6 +687,12 @@ struct CASADI_EXPORT Fmu {
     return hess_sparsity(ired_.at(r), ired_.at(c));
   }
 
+  /// @{
+  /** \brief Retreive nominal values */
+  std::vector<double> get_nominal_in(casadi_int i) const;
+  std::vector<double> get_nominal_out(casadi_int i) const;
+  /// @}
+
   // Print description of an input
   std::string desc_in(FmuMemory* m, size_t id) const;
 
@@ -836,6 +842,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /** \brief Retreive sparsities */
   Sparsity get_sparsity_in(casadi_int i) override;
   Sparsity get_sparsity_out(casadi_int i) override;
+  /// @}
+
+  /// @{
+  /** \brief Retreive nominal values */
+  std::vector<double> get_nominal_in(casadi_int i) const override;
+  std::vector<double> get_nominal_out(casadi_int i) const override;
   /// @}
 
   // Evaluate numerically

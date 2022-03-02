@@ -1425,6 +1425,14 @@ namespace casadi {
     return (*this)->get_min_in(ind);
   }
 
+  std::vector<double> Function::nominal_in(casadi_int ind) const {
+    return (*this)->get_nominal_in(ind);
+  }
+
+  std::vector<double> Function::nominal_out(casadi_int ind) const {
+    return (*this)->get_nominal_out(ind);
+  }
+
 #ifdef WITH_EXTRA_CHECKS
   // Initialize at zero depth
   thread_local casadi_int Function::call_depth_ = 0;
