@@ -136,7 +136,11 @@ int CvodesSimulator::init_mem(void* mem) const {
   THROWING(CVodeInit, m->mem, rhs, t0, m->xz);
 
   // Set tolerances
-  THROWING(CVodeSStolerances, m->mem, reltol_, abstol_);
+  if (scale_abstol_) {
+    THROWING(CVodeSVtolerances, m->mem, reltol_, m->abstolv);
+  } else {
+    THROWING(CVodeSStolerances, m->mem, reltol_, abstol_);
+  }
 
   // Maximum number of steps
   THROWING(CVodeSetMaxNumSteps, m->mem, max_num_steps_);

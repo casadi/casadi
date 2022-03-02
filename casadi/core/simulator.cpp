@@ -263,6 +263,10 @@ void Simulator::init(const Dict& opts) {
   // Number of sensitivities
   ns_ = x().size2()-1;
 
+  // Nominal values for states
+  nom_x_ = oracle_.nominal_in(DYN_X);
+  nom_z_ = oracle_.nominal_in(DYN_Z);
+
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
   casadi_assert(!sp_jac_dae_.is_singular(),

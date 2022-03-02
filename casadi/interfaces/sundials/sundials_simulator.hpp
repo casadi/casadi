@@ -56,6 +56,9 @@ struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemo
   // Jacobian
   double *jac;
 
+  // Absolute tolerance
+  N_Vector abstolv;
+
   /// Stats
   long nsteps, nfevals, nlinsetups, netfails;
   int qlast, qcur;
@@ -144,6 +147,7 @@ public:
   double max_step_size_;
   double nonlin_conv_coeff_;
   casadi_int max_order_;
+  bool scale_abstol_;
   ///@}
 
   /// Linear solver

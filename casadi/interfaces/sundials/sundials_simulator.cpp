@@ -135,6 +135,7 @@ void SundialsSimulator::init(const Dict& opts) {
   max_step_size_ = 0;
   max_order_ = 0;
   nonlin_conv_coeff_ = 0;
+  scale_abstol_ = false;
 
   // Read options
   for (auto&& op : opts) {
@@ -176,6 +177,8 @@ void SundialsSimulator::init(const Dict& opts) {
       max_order_ = op.second;
     } else if (op.first=="nonlin_conv_coeff") {
       nonlin_conv_coeff_ = op.second;
+    } else if (op.first=="scale_abstol") {
+      scale_abstol_ = op.second;
     }
   }
 
@@ -234,6 +237,9 @@ int SundialsSimulator::init_mem(void* mem) const {
 
   // Allocate n-vectors
   m->xz = N_VNew_Serial(nx_+nz_);
+  if (scale_abstol_) {
+    m->abstolv = N_VNew_Serial(nx_+nz_);
+  }
 
   m->mem_linsolF = linsolF_.checkout();
 
@@ -252,6 +258,10 @@ void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, c
   // Set the state
   casadi_copy(x, nx_, NV_DATA_S(m->xz));
   casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
+  // Absolute tolerances for each component
+  casadi_copy(get_ptr(nom_x_), nx_, NV_DATA_S(m->abstolv));
+  casadi_copy(get_ptr(nom_z_), nz_, NV_DATA_S(m->abstolv) + nx_);
+  casadi_scal(nx_+nz_, abstol_, NV_DATA_S(m->abstolv));
 }
 
 SundialsSimMemory::SundialsSimMemory() {
@@ -261,6 +271,7 @@ SundialsSimMemory::SundialsSimMemory() {
   this->p = nullptr;
   this->jac = nullptr;
   this->v1 = this->v2 = nullptr;
+  this->abstolv  = nullptr;
   // Reset stats
   this->nsteps = 0;
   this->nfevals = 0;
@@ -282,6 +293,7 @@ SundialsSimMemory::SundialsSimMemory() {
 
 SundialsSimMemory::~SundialsSimMemory() {
   if (this->xz) N_VDestroy_Serial(this->xz);
+  if (this->abstolv) N_VDestroy_Serial(this->abstolv);
 }
 
 Dict SundialsSimulator::get_stats(void* mem) const {

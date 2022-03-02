@@ -145,6 +145,9 @@ public:
   // Copy of the options
   Dict opts_;
 
+  // Nominal values for states
+  std::vector<double> nom_x_, nom_z_;
+
   /// Options
   bool print_stats_;
 
