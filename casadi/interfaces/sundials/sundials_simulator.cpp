@@ -119,7 +119,7 @@ void SundialsSimulator::init(const Dict& opts) {
   // Default options
   abstol_ = 1e-5;
   reltol_ = 1e-5;
-  max_num_steps_ = 10000;
+  max_num_steps_ = 5000;
   stop_at_end_ = true;
   use_precon_ = true;
   max_krylov_ = 10;
