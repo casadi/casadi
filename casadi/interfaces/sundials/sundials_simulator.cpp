@@ -117,8 +117,8 @@ void SundialsSimulator::init(const Dict& opts) {
     "Not implemented.");
 
   // Default options
-  abstol_ = 1e-8;
-  reltol_ = 1e-6;
+  abstol_ = 1e-5;
+  reltol_ = 1e-5;
   max_num_steps_ = 10000;
   stop_at_end_ = true;
   use_precon_ = true;
