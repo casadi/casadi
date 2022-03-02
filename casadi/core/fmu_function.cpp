@@ -177,6 +177,9 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     vr_out_.push_back(v.value_reference);
   }
 
+  // Numerical values for inputs
+  value_in_.resize(iind_.size());
+
   // Collect input and parameter values
   vr_real_.clear();
   vr_integer_.clear();
@@ -329,6 +332,10 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   // Initialization mode begins
   if (enter_initialization_mode(c)) {
     casadi_error("Fmu::enter_initialization_mode failed");
+  }
+  // Get input values
+  if (get_in(c, &value_in_)) {
+    casadi_error("Fmu::get_in failed");
   }
   // Get auxilliary variables
   if (get_aux(c, &aux_value_)) {
@@ -564,6 +571,16 @@ int Fmu::set_values(fmi2Component c) const {
   return 0;
 }
 
+int Fmu::get_in(fmi2Component c, std::vector<fmi2Real>* v) const {
+  if (!vr_in_.empty()) {
+    fmi2Status status = get_real_(c, get_ptr(vr_in_), vr_in_.size(), get_ptr(*v));
+    if (status != fmi2OK) {
+      casadi_warning("fmi2GetReal failed");
+      return 1;
+    }
+  }
+}
+
 int Fmu::get_aux(fmi2Component c, Value* v) const {
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
@@ -605,10 +622,11 @@ int Fmu::get_aux(fmi2Component c, Value* v) const {
   return 0;
 }
 
-void Fmu::get_stats(FmuMemory* m, Dict* stats) const {
+void Fmu::get_stats(FmuMemory* m, Dict* stats,
+    const std::vector<std::string>& name_in, const InputStruct* in) const {
   // To do: Use auxillary variables from last evaluation
   (void)m;  // unused
-  // Values to be copied
+  // Auxilliary values to be copied
   const Value& v = aux_value_;
   // Collect auxilliary variables
   Dict aux;
@@ -630,6 +648,19 @@ void Fmu::get_stats(FmuMemory* m, Dict* stats) const {
   }
   // Copy to stats
   (*stats)["aux"] = aux;
+  // Loop over input variables
+  for (size_t k = 0; k < name_in.size(); ++k) {
+    // Only consider regular inputs
+    if (in[k].type == InputType::REG) {
+      // Get the indices
+      const std::vector<size_t>& iind = ired_.at(in[k].ind);
+      // Collect values
+      std::vector<double> v(iind.size());
+      for (size_t i = 0; i < v.size(); ++i) v[i] = value_in_.at(iind[i]);
+      // Save to stats
+      (*stats)[name_in[k]] = v;
+    }
+  }
 }
 
 void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
@@ -2258,7 +2289,7 @@ Dict FmuFunction::get_stats(void *mem) const {
   // Get memory object
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   // Get auxilliary variables from Fmu
-  fmu_->get_stats(m, &stats);
+  fmu_->get_stats(m, &stats, name_in_, get_ptr(in_));
   // Return stats
   return stats;
 }

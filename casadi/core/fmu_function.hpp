@@ -395,6 +395,7 @@ T1 casadi_smoothing_diff_err(const T1* yk, T1 h, casadi_int n_y, casadi_int i,
 // Forward declarations
 class DaeBuilderInternal;
 class FmuFunction;
+struct InputStruct;
 
 // Memory object
 struct CASADI_EXPORT FmuMemory : public FunctionMemory {
@@ -525,6 +526,9 @@ struct CASADI_EXPORT Fmu {
   std::vector<std::string> vn_in_, vn_out_;
   std::vector<fmi2ValueReference> vr_in_, vr_out_;
 
+  // Numerical values for inputs
+  std::vector<fmi2Real> value_in_;
+
   // Reduced space indices for all inputs and outputs
   std::vector<std::vector<size_t>> ired_, ored_;
 
@@ -579,7 +583,6 @@ struct CASADI_EXPORT Fmu {
   std::vector<fmi2Boolean> init_boolean_;
   std::vector<std::string> init_string_;
 
-
   // Auxilliary variables, by type
   std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
   std::vector<fmi2ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
@@ -618,11 +621,15 @@ struct CASADI_EXPORT Fmu {
   // Copy values set in DaeBuilder to FMU
   int set_values(fmi2Component c) const;
 
+  // Retrieve input variable values from FMU
+  int get_in(fmi2Component c, std::vector<fmi2Real>* v) const;
+
   // Retrieve auxilliary variables from FMU
   int get_aux(fmi2Component c, Value* v) const;
 
   /** \brief Get stats */
-  void get_stats(FmuMemory* m, Dict* stats) const;
+  void get_stats(FmuMemory* m, Dict* stats,
+    const std::vector<std::string>& name_in, const InputStruct* in) const;
 
   /** \brief Initalize memory block */
   int init_mem(FmuMemory* m) const;
