@@ -342,8 +342,7 @@ jobs:
           wheel=$(python misc/create_wheel_local.py $version.dev+${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
           echo "<$wheel>"
           echo "::set-output name=wheel::$wheel"
-          wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\\*-/')
-          wheel_wildcard2=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
+          wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
           echo "::set-output name=wheel::$wheel"
           echo "<$wheel_wildcard>"
           echo "<$wheel_wildcard2>"
