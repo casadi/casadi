@@ -112,7 +112,7 @@ void CvodesSimulator::init(const Dict& opts) {
   }
 
   // Attach functions for jacobian information
-  if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
+  if (newton_scheme_!=NewtonScheme::DIRECT || (ns_>0 && second_order_correction_)) {
     set_function(oracle_.forward(1), "jtimes");
   }
 }
@@ -161,7 +161,7 @@ int CvodesSimulator::init_mem(void* mem) const {
   if (nonlin_conv_coeff_!=0) THROWING(CVodeSetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
 
   // attach a linear solver
-  if (newton_scheme_==SD_DIRECT) {
+  if (newton_scheme_==NewtonScheme::DIRECT) {
     // Direct scheme
     CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
     cv_mem->cv_lmem   = m;
@@ -172,10 +172,10 @@ int CvodesSimulator::init_mem(void* mem) const {
     // Iterative scheme
     casadi_int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
     switch (newton_scheme_) {
-    case SD_DIRECT: casadi_assert_dev(0);
-    case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
-    case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
-    case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
+    case NewtonScheme::DIRECT: casadi_assert_dev(0);
+    case NewtonScheme::GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
+    case NewtonScheme::BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
+    case NewtonScheme::TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
     }
     THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
     if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);

@@ -28,6 +28,7 @@
 
 #include <casadi/interfaces/sundials/casadi_sundials_simulator_export.h>
 #include "casadi/core/simulator_impl.hpp"
+#include "casadi/core/casadi_enum.hpp"
 
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_dense.h>
@@ -38,6 +39,18 @@
 
 /// \cond INTERNAL
 namespace casadi {
+
+/// Supported iterative solvers in Sundials
+enum class NewtonScheme {DIRECT, GMRES, BCGSTAB, TFQMR, NUMEL};
+
+// Supported interpolations in Sundials
+enum class InterpType {POLYNOMIAL, HERMITE, NUMEL};
+
+///@{
+/// Convert to string
+CASADI_EXPORT std::string to_string(NewtonScheme v);
+CASADI_EXPORT std::string to_string(InterpType v);
+///@}
 
 // IdasMemory
 struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemory {
@@ -153,11 +166,11 @@ public:
   /// Linear solver
   Linsol linsolF_;
 
-  /// Supported iterative solvers in Sundials
-  enum NewtonScheme {SD_DIRECT, SD_GMRES, SD_BCGSTAB, SD_TFQMR} newton_scheme_;
+  /// Iterative solver
+  NewtonScheme newton_scheme_;
 
-  // Supported interpolations in Sundials
-  enum InterpType {SD_POLYNOMIAL, SD_HERMITE} interp_;
+  // Interpolation
+  InterpType interp_;
 
   /// Linear solver data (dense) -- what is this?
   struct LinSolDataDense {};

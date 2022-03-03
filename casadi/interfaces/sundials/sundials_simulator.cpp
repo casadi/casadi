@@ -32,6 +32,26 @@ OUTPUTSCHEME(SimulatorOutput)
 
 namespace casadi {
 
+std::string to_string(NewtonScheme v) {
+  switch (v) {
+  case NewtonScheme::DIRECT: return "direct";
+  case NewtonScheme::GMRES: return "gmres";
+  case NewtonScheme::BCGSTAB: return "bcgstab";
+  case NewtonScheme::TFQMR: return "tfqmr";
+  default: break;
+  }
+  return "";
+}
+
+std::string to_string(InterpType v) {
+  switch (v) {
+  case InterpType::POLYNOMIAL: return "polynomial";
+  case InterpType::HERMITE: return "hermite";
+  default: break;
+  }
+  return "";
+}
+
 SundialsSimulator::SundialsSimulator(const std::string& name, const Function& dae,
     const std::vector<double>& grid)
   : Simulator(name, dae, grid) {
@@ -124,9 +144,9 @@ void SundialsSimulator::init(const Dict& opts) {
   use_precon_ = true;
   max_krylov_ = 10;
   linear_solver_ = "qr";
-  std::string newton_scheme = "direct";
+  newton_scheme_ = NewtonScheme::DIRECT;
   quad_err_con_ = false;
-  std::string interpolation_type = "hermite";
+  interp_ = InterpType::HERMITE;
   steps_per_checkpoint_ = 20;
   disable_internal_warnings_ = false;
   max_multistep_order_ = 5;
@@ -152,7 +172,7 @@ void SundialsSimulator::init(const Dict& opts) {
     } else if (op.first=="max_krylov") {
       max_krylov_ = op.second;
     } else if (op.first=="newton_scheme") {
-      newton_scheme = op.second.to_string();
+      newton_scheme_ = to_enum<NewtonScheme>(op.second.to_string());
     } else if (op.first=="linear_solver") {
       linear_solver_ = op.second.to_string();
     } else if (op.first=="linear_solver_options") {
@@ -160,7 +180,7 @@ void SundialsSimulator::init(const Dict& opts) {
     } else if (op.first=="quad_err_con") {
       quad_err_con_ = op.second;
     } else if (op.first=="interpolation_type") {
-      interpolation_type = op.second.to_string();
+      interp_ = to_enum<InterpType>(op.second.to_string());
     } else if (op.first=="steps_per_checkpoint") {
       steps_per_checkpoint_ = op.second;
     } else if (op.first=="disable_internal_warnings") {
@@ -180,28 +200,6 @@ void SundialsSimulator::init(const Dict& opts) {
     } else if (op.first=="scale_abstol") {
       scale_abstol_ = op.second;
     }
-  }
-
-  // Type of Newton scheme
-  if (newton_scheme=="direct") {
-    newton_scheme_ = SD_DIRECT;
-  } else if (newton_scheme=="gmres") {
-    newton_scheme_ = SD_GMRES;
-  } else if (newton_scheme=="bcgstab") {
-    newton_scheme_ = SD_BCGSTAB;
-  } else if (newton_scheme=="tfqmr") {
-    newton_scheme_ = SD_TFQMR;
-  } else {
-    casadi_error("Unknown Newton scheme: " + newton_scheme);
-  }
-
-  // Interpolation_type
-  if (interpolation_type=="hermite") {
-    interp_ = SD_HERMITE;
-  } else if (interpolation_type=="polynomial") {
-    interp_ = SD_POLYNOMIAL;
-  } else {
-    casadi_error("Unknown interpolation type: " + interpolation_type);
   }
 
   // Get or create Jacobians and linear system solvers
