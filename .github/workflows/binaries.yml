@@ -338,6 +338,7 @@ jobs:
       - run: |
           version=$(python misc/get_version.py)
           echo "<$version>"
+          pip install wheel==0.31.1
           wheel=$(python misc/create_wheel_local.py $version.dev+${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
           echo "<$wheel>"
           echo "::set-output name=wheel::$wheel"
