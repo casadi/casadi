@@ -6,7 +6,7 @@ import csv
 from email.message import Message
 from email.generator import Generator
 import shutil
-
+import re
 import sys
 
 def open_for_csv(name, mode):
@@ -25,6 +25,11 @@ bitness   = sys.argv[4]
 arch      = sys.argv[5]
 dir_name  = sys.argv[6]
 
+
+if "+" in version:
+  [pre,post] = version.split("+")
+  post = re.sub(r"[^a-zA-Z1-9]",".",post)
+  version=pre+"+"+post
 
 if version.startswith("v"):
   version = version[1:]
