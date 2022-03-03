@@ -86,9 +86,9 @@ namespace casadi {
       {"linker",
        {OT_STRING,
         "Linker command"}},
-      {"folder",
+      {"directory",
        {OT_STRING,
-        "Folder to put temporary objects in."}},
+        "Directory to put temporary objects in. Must end with a file separator."}},
       {"compiler_setup",
        {OT_STRING,
         "Compiler setup command. Intended to be fixed."
@@ -143,6 +143,7 @@ namespace casadi {
     cleanup_ = true;
     bool temp_suffix = true;
     std::string bare_name = "tmp_casadi_compiler_shell";
+    std::string directory = "";
 
     vector<string> compiler_flags;
     vector<string> linker_flags;
@@ -171,6 +172,8 @@ namespace casadi {
         compiler = op.second.to_string();
       } else if (op.first=="linker") {
         linker = op.second.to_string();
+      } else if (op.first=="directory") {
+        directory = op.second.to_string();
       } else if (op.first=="compiler_setup") {
         compiler_setup = op.second.to_string();
       } else if (op.first=="cleanup") {
@@ -196,9 +199,9 @@ namespace casadi {
 
     // Name of temporary file
     if (temp_suffix) {
-      obj_name_ = temporary_file(bare_name, suffix);
+      obj_name_ = temporary_file(directory + bare_name, suffix);
     } else {
-      obj_name_ = bare_name + suffix;
+      obj_name_ = directory + bare_name + suffix;
     }
     base_name_ = std::string(obj_name_.begin(), obj_name_.begin()+obj_name_.size()-suffix.size());
     bin_name_ = base_name_+SHARED_LIBRARY_SUFFIX;

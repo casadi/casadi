@@ -623,7 +623,8 @@ namespace casadi {
           CodeGenerator gen(jit_name_, opts);
           gen.add(self());
           if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
-          compiler_ = Importer(gen.generate(), compiler_plugin_, jit_options_);
+          std::string jit_directory = get_from_dict(jit_options_, "directory", std::string(""));
+          compiler_ = Importer(gen.generate(jit_directory), compiler_plugin_, jit_options_);
           if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         }
         // Try to load
