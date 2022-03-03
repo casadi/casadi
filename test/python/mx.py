@@ -2950,6 +2950,19 @@ class MXtests(casadiTestCase):
 
         self.check_codegen(f,inputs=[A])
 
+  def test_convexify_bugs(self):
+    for eps in [0,1e-100,1]:
+      q = 4
+      Q = 10
+      for s in [-4,0.1,0,0.1,4]:
+        for trans in [lambda e: e, lambda e: sparsify(e)]:
+          A = trans(blockcat([[q,s,0+eps],[s,Q,0],[0+eps,0,2]]))
+          print(A)
+          self.assertTrue(np.all(np.linalg.eig(A)[0]>0))
+          Ac = evalf(convexify(A,{"strategy":"eigen-reflect"}))
+          self.checkarray(A,Ac,digits=8)
+
+
   def test_logsumexp(self):
     x = MX.sym("x",3)
 

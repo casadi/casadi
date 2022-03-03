@@ -4,8 +4,8 @@
 
 // SYMBOL "cvx_house"
 /// Computes Householder vector
-/// beta: scalar
-/// v: vector of length nv
+/// beta (output): scalar
+/// v (input/output): vector of length nv
 /// Returns 2-norm of v
 ///
 /// Ref: Golub & Van Loan Alg 5.1.1
@@ -20,10 +20,13 @@ T1 casadi_cvx_house(T1* v, T1* beta, casadi_int nv) {
   for (i=1; i<nv; ++i) sigma += v[i]*v[i];
   s = sqrt(v0*v0 + sigma); // s = norm(v)
   if (sigma==0) {
-    *beta = 0;
+    // Note: third edition has *beta = 0
+    // Note: fourth edition has *beta = -2*(v0<0)
+    *beta = 2*(v0<0);
+    v[0] = 1;
   } else {
     if (v0<=0) {
-      v0 -= s;
+      v0 = v0 - s;
     } else {
       v0 = -sigma/(v0+s);
     }
@@ -51,11 +54,9 @@ T1 casadi_cvx_house(T1* v, T1* beta, casadi_int nv) {
 //
 // Reference: Golub & Van Loan, Alg. 8.3.1
 template<typename T1>
-void casadi_cvx_house_apply_symm(casadi_int n, casadi_int k, T1* A, T1* p, T1* v) {
+void casadi_cvx_house_apply_symm(casadi_int n, casadi_int k, T1* A, T1* p, T1* v, T1 beta) {
   casadi_int i, j, stride, N;
   T1 *a;
-  T1 beta = v[0];
-  v[0] = 1;
   stride = k+1;
   A+= k+1+n*k;
   N = n-k-1;
@@ -89,7 +90,6 @@ void casadi_cvx_house_apply_symm(casadi_int n, casadi_int k, T1* A, T1* p, T1* v
     }
     a += stride+i+1;
   }
-  v[0] = beta;
 }
 
 
@@ -101,14 +101,15 @@ void casadi_cvx_house_apply_symm(casadi_int n, casadi_int k, T1* A, T1* p, T1* v
 //
 // A: n-by-n dense
 // p: work vector; length n
+//
+// Reference: Golub & Van Loan, Alg. 8.3.1
 template<typename T1>
-void casadi_cvx_tri(T1* A, casadi_int n, T1* p) {
+void casadi_cvx_tri(T1* A, casadi_int n, T1* beta, T1* p) {
   T1 pp[1000];
   casadi_int k, N;
   T1 *A_base, *v;
-  T1 beta;
   for (k=0;k<n-2;++k) {
-    A_base = A+k+1+n*k;
+    A_base = A+k+1+n*k; // A(k+1)
     N = n-k-1;
 
     v = A+N*n;
@@ -117,10 +118,9 @@ void casadi_cvx_tri(T1* A, casadi_int n, T1* p) {
     casadi_copy(A_base, N, v);
 
     // Assign 2-norm
-    *A_base = casadi_cvx_house(v, &beta, N);
+    *A_base = casadi_cvx_house(v, &beta[k], N);
 
-    v[0] = beta;
-    casadi_cvx_house_apply_symm(n, k, A, pp, v);
+    casadi_cvx_house_apply_symm(n, k, A, pp, v, beta[k]);
 
   }
 }
@@ -318,11 +318,9 @@ void casadi_cvx_givens_apply(casadi_int n, T1* q, T1 c, T1 s, casadi_int p) {
 ///
 template<typename T1>
 void casadi_cvx_house_apply(casadi_int n, casadi_int m, casadi_int s, T1* A,
-    T1* p, const T1* v) {
+    T1* p, const T1* v, T1 beta) {
   casadi_int i, j;
   T1 *a;
-  T1 beta;
-  beta = v[0];
 
   // pi <- beta Aji vj
   casadi_clear(p, n);
@@ -372,6 +370,7 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   casadi_int *t_meta;
   T1 c, s, t_off0;
   T1 *cs, *t_diag, *t_off;
+  T1 beta[100];
 
   // Short-circuit for empty matrices
   if (n==0) return 0;
@@ -382,7 +381,7 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
     return 0;
   }
 
-  casadi_cvx_tri(A, n, w);
+  casadi_cvx_tri(A, n, beta, w);
 
   for (i=0;i<n;++i) {
     for (j=0;j<n;++j) {
@@ -438,8 +437,8 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   for (k = n-3; k>=0; --k) {
     casadi_int N = n-k-1;
     T1 *v = A+N*n;
-    casadi_cvx_house_apply_symm(n, k, A, w, v);
-    casadi_cvx_house_apply(k+1, N, n, A+k+1, w, v);
+    casadi_cvx_house_apply_symm(n, k, A, w, v, beta[k]);
+    casadi_cvx_house_apply(k+1, N, n, A+k+1, w, v, beta[k]);
   }
 
   return 0;
