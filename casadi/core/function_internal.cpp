@@ -123,7 +123,8 @@ namespace casadi {
 
   FunctionInternal::~FunctionInternal() {
     if (jit_cleanup_ && jit_) {
-      std::string jit_name = jit_name_ + ".c";
+      std::string jit_directory = get_from_dict(jit_options_, "directory", std::string(""));
+      std::string jit_name = jit_directory + jit_name_ + ".c";
       if (remove(jit_name.c_str())) casadi_warning("Failed to remove " + jit_name);
     }
   }
