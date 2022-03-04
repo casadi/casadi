@@ -124,7 +124,10 @@ const Options SundialsSimulator::options_
       "Maximum order"}},
     {"nonlin_conv_coeff",
      {OT_DOUBLE,
-      "Coefficient in the nonlinear convergence test"}}
+      "Coefficient in the nonlinear convergence test"}},
+    {"scale_abstol",
+     {OT_BOOL,
+      "Scale absolute tolerance by nominal value"}}
    }
 };
 
@@ -256,12 +259,6 @@ void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, c
   // Set the state
   casadi_copy(x, nx_, NV_DATA_S(m->xz));
   casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
-  // Absolute tolerances for each component
-  if (m->abstolv) {
-    casadi_copy(get_ptr(nom_x_), nx_, NV_DATA_S(m->abstolv));
-    casadi_copy(get_ptr(nom_z_), nz_, NV_DATA_S(m->abstolv) + nx_);
-    casadi_scal(nx_+nz_, abstol_, NV_DATA_S(m->abstolv));
-  }
 }
 
 SundialsSimMemory::SundialsSimMemory() {

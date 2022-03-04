@@ -40,10 +40,10 @@
 /// \cond INTERNAL
 namespace casadi {
 
-/// Supported iterative solvers in Sundials
+/// Supported iterative solvers
 enum class NewtonScheme {DIRECT, GMRES, BCGSTAB, TFQMR, NUMEL};
 
-// Supported interpolations in Sundials
+// Supported interpolations
 enum class InterpType {POLYNOMIAL, HERMITE, NUMEL};
 
 ///@{

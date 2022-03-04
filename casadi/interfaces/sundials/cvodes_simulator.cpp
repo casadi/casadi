@@ -135,6 +135,13 @@ int CvodesSimulator::init_mem(void* mem) const {
   double t0 = 0;
   THROWING(CVodeInit, m->mem, rhs, t0, m->xz);
 
+  // Absolute tolerances for each component
+  if (m->abstolv) {
+    casadi_copy(get_ptr(nom_x_), nx_, NV_DATA_S(m->abstolv));
+    casadi_copy(get_ptr(nom_z_), nz_, NV_DATA_S(m->abstolv) + nx_);
+    casadi_scal(nx_+nz_, abstol_, NV_DATA_S(m->abstolv));
+  }
+
   // Set tolerances
   if (scale_abstol_) {
     THROWING(CVodeSVtolerances, m->mem, reltol_, m->abstolv);
