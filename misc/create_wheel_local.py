@@ -28,7 +28,7 @@ dir_name  = sys.argv[6]
 
 if "+" in version:
   [pre,post] = version.split("+")
-  post = re.sub(r"[^a-zA-Z1-9]",".",post)
+  post = re.sub(r"[^a-zA-Z0-9]",".",post)
   version=pre+"+"+post
 
 if version.startswith("v"):
