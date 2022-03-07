@@ -2725,5 +2725,25 @@ class Functiontests(casadiTestCase):
 
     self.checkfunction_light(g, f2, inputs=[3])
 
+  def test_post_expand(self):
+
+    x = MX.sym("x")
+
+    f = Function("f",[x],[x**2])
+
+    print(f)
+
+    f = Function("f",[x],[x**2],{"post_expand":True})
+    print(f)
+    self.assertTrue(f.is_a("SXFunction"))
+
+    f = Function("f",[x],[x**2],{"post_expand":True,"post_expand_options":{"print_in":True}})
+    print(f)
+    self.assertTrue(f.is_a("SXFunction"))
+
+    # Check that the option came through
+    with assertOutput(["Input 0 (i0): 3"]):
+      f(3)
+
 if __name__ == '__main__':
     unittest.main()

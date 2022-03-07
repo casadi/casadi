@@ -231,6 +231,18 @@ namespace casadi {
     try {
       own(new MXFunction(name, ex_in, ex_out, name_in, name_out));
       (*this)->construct(opts);
+
+      // Perform post-construction expand
+      auto it = opts.find("post_expand");
+      if (it!=opts.end()) {
+        if (!it->second) return;
+        auto it = opts.find("post_expand_options");
+        if (it==opts.end()) {
+          operator=((*this).expand());
+        } else {
+          operator=((*this).expand((*this).name(), it->second));
+        }
+      }
     } catch (exception& e) {
       THROW_ERROR_NOOBJ("Function", e.what(), "MXFunction");
     }
@@ -274,9 +286,17 @@ namespace casadi {
       "Function with free symbols cannot be expanded. "
       "List of free variables in your Function: " +
         join(get_free(), ","));
+
+    Dict my_opts;
+    my_opts["ad_weight"] = (*this)->ad_weight();
+    my_opts["ad_weight_sp"] = (*this)->sp_weight();
+    my_opts["max_num_dir"] = (*this)->max_num_dir_;
+    my_opts["is_diff_in"] = (*this)->is_diff_in_;
+    my_opts["is_diff_out"] = (*this)->is_diff_out_;
+    update_dict(my_opts, opts);
     vector<SX> ex_in = sx_in();
     vector<SX> ex_out = Function(*this)(ex_in);
-    return Function(name, ex_in, ex_out, name_in(), name_out(), opts);
+    return Function(name, ex_in, ex_out, name_in(), name_out(), my_opts);
   }
 
   Function Function::create(FunctionInternal* node) {

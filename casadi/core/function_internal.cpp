@@ -321,7 +321,13 @@ namespace casadi {
         "Indicate for each input if it should be differentiable."}},
       {"is_diff_out",
        {OT_BOOLVECTOR,
-        "Indicate for each output if it should be differentiable."}}
+        "Indicate for each output if it should be differentiable."}},
+      {"post_expand",
+       {OT_BOOL,
+        "After construction, expand this Function. Default: False"}},
+      {"post_expand_options",
+       {OT_DICT,
+        "Options to be passed to post-construction expansion. Default: empty"}}
      }
   };
 
