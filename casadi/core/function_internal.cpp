@@ -312,6 +312,9 @@ namespace casadi {
       {"reverse_options",
        {OT_DICT,
         "Options to be passed to a reverse mode constructor"}},
+      {"jacobian_options",
+       {OT_DICT,
+        "Options to be passed to a Jacobian constructor"}},
       {"custom_jacobian",
        {OT_FUNCTION,
         "Override CasADi's AD. Use together with 'jac_penalty': 0. "
@@ -478,6 +481,8 @@ namespace casadi {
         forward_options_ = op.second;
       } else if (op.first=="reverse_options") {
         reverse_options_ = op.second;
+      } else if (op.first=="jacobian_options") {
+        jacobian_options_ = op.second;
       } else if (op.first=="custom_jacobian") {
         custom_jacobian_ = op.second.to_function();
         casadi_assert(custom_jacobian_.name() == "jac_" + name_,
@@ -2128,7 +2133,7 @@ namespace casadi {
         }
       }
       // Options
-      Dict opts;
+      Dict opts = jacobian_options_;
       opts["derivative_of"] = self();
       // Generate derivative function
       casadi_assert_dev(enable_jacobian_);
