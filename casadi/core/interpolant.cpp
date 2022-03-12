@@ -259,7 +259,7 @@ namespace casadi {
   = {{&FunctionInternal::options_},
      {{"lookup_mode",
        {OT_STRINGVECTOR,
-        "Specifies, for each grid dimenion, the lookup algorithm used to find the correct index. "
+        "Specifies, for each grid dimension, the lookup algorithm used to find the correct index. "
         "'linear' uses a for-loop + break; (default when #knots<=100), "
         "'exact' uses floored division (only for uniform grids), "
         "'binary' uses a binary search. (default when #knots>100)."}},
