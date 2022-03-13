@@ -1,5 +1,5 @@
 if(WITH_TINYXML AND WITH_BUILD_TINYXML)
-  add_subdirectory(tinyxml-2.6.2)
+  add_subdirectory(tinyxml2-9.0.0)
 endif()
 
 if(WITH_CSPARSE AND WITH_BUILD_CSPARSE)
