@@ -33,9 +33,15 @@
 /** \pluginsection{XmlFile,tinyxml} */
 
 /// \cond INTERNAL
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include "casadi/core/xml_file_internal.hpp"
 #include <casadi/interfaces/tinyxml/casadi_xmlfile_tinyxml_export.h>
+
+typedef tinyxml2::XMLNode TiXmlNode;
+typedef tinyxml2::XMLDocument TiXmlDocument;
+typedef tinyxml2::XMLElement TiXmlElement;
+typedef tinyxml2::XMLAttribute TiXmlAttribute;
+typedef tinyxml2::XMLError XMLError;
 
 namespace casadi {
 

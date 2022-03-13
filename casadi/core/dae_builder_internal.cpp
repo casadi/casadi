@@ -40,6 +40,11 @@
 #include "external.hpp"
 #include "fmu_function.hpp"
 
+// Throw informative error message
+#define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
+throw CasadiException("Error in DaeBuilderInternal::" FNAME " for '" + this->name_ \
+  + "', node '" + NODE.name + "' (line " + str(NODE.line) + ") at " + CASADI_WHERE + ":\n" + std::string(WHAT));
+
 namespace casadi {
 
 std::string to_string(Type v) {
@@ -375,138 +380,148 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
 }
 
 Variable& DaeBuilderInternal::read_variable(const XmlNode& node) {
-  // Qualified name
-  std::string qn = qualified_name(node);
+  try {
+    // Qualified name
+    std::string qn = qualified_name(node);
 
-  // Find and return the variable
-  return variable(qn);
+    return variable(qn);
+  } catch (std::exception& e) {
+    THROW_ERROR_NODE("read_variable", node, e.what());
+    //return {};
+  }
 }
 
 MX DaeBuilderInternal::read_expr(const XmlNode& node) {
-  const std::string& fullname = node.name;
-  if (fullname.find("exp:")== std::string::npos) {
-    casadi_error("DaeBuilderInternal::read_expr: unknown - expression is supposed to "
-                 "start with 'exp:' , got " + fullname);
-  }
+  try {
 
-  // Chop the 'exp:'
-  std::string name = fullname.substr(4);
-
-  // The switch below is alphabetical, and can be thus made more efficient,
-  // for example by using a switch statement of the first three letters,
-  // if it would ever become a bottleneck
-  if (name=="Add") {
-    return read_expr(node[0]) + read_expr(node[1]);
-  } else if (name=="Acos") {
-    return acos(read_expr(node[0]));
-  } else if (name=="Asin") {
-    return asin(read_expr(node[0]));
-  } else if (name=="Atan") {
-    return atan(read_expr(node[0]));
-  } else if (name=="Cos") {
-    return cos(read_expr(node[0]));
-  } else if (name=="Der") {
-    return variables_.at(read_variable(node[0]).der_of).v;
-  } else if (name=="Div") {
-    return read_expr(node[0]) / read_expr(node[1]);
-  } else if (name=="Exp") {
-    return exp(read_expr(node[0]));
-  } else if (name=="Identifier") {
-    return read_variable(node).v;
-  } else if (name=="IntegerLiteral" || name=="BooleanLiteral") {
-    casadi_int val;
-    node.get(&val);
-    return val;
-  } else if (name=="Instant") {
-    double val;
-    node.get(&val);
-    return val;
-  } else if (name=="Log") {
-    return log(read_expr(node[0]));
-  } else if (name=="LogLeq") { // Logical less than equal
-    return read_expr(node[0]) <= read_expr(node[1]);
-  } else if (name=="LogGeq") { // Logical greater than equal
-    return read_expr(node[0]) >= read_expr(node[1]);
-  } else if (name=="LogLt") { // Logical less than
-    return read_expr(node[0]) < read_expr(node[1]);
-  } else if (name=="LogGt") { // Logical greater than
-    return read_expr(node[0]) > read_expr(node[1]);
-  } else if (name=="Max") {
-    return fmax(read_expr(node[0]), read_expr(node[1]));
-  } else if (name=="Min") {
-    return fmin(read_expr(node[0]), read_expr(node[1]));
-  } else if (name=="Mul") { // Multiplication
-    return read_expr(node[0]) * read_expr(node[1]);
-  } else if (name=="Neg") {
-    return -read_expr(node[0]);
-  } else if (name=="NoEvent") {
-    // NOTE: This is a workaround, we assume that whenever NoEvent occurs,
-    // what is meant is a switch
-    casadi_int n = node.size();
-
-    // Default-expression
-    MX ex = read_expr(node[n-1]);
-
-    // Evaluate ifs
-    for (casadi_int i=n-3; i>=0; i -= 2) {
-      ex = if_else(read_expr(node[i]), read_expr(node[i+1]), ex);
+    const std::string& fullname = node.name;
+    if (fullname.find("exp:")== std::string::npos) {
+      casadi_error("DaeBuilderInternal::read_expr: unknown - expression is supposed to "
+                  "start with 'exp:' , got " + fullname);
     }
 
-    return ex;
-  } else if (name=="Pow") {
-    return pow(read_expr(node[0]), read_expr(node[1]));
-  } else if (name=="RealLiteral") {
-    double val;
-    node.get(&val);
-    return val;
-  } else if (name=="Sin") {
-    return sin(read_expr(node[0]));
-  } else if (name=="Sqrt") {
-    return sqrt(read_expr(node[0]));
-  } else if (name=="StringLiteral") {
-    casadi_error(node.text);
-  } else if (name=="Sub") {
-    return read_expr(node[0]) - read_expr(node[1]);
-  } else if (name=="Tan") {
-    return tan(read_expr(node[0]));
-  } else if (name=="Time") {
-    return var(t_.at(0));
-  } else if (name=="TimedVariable") {
-    return read_variable(node[0]).v;
-  } else if (name=="FunctionCall") {
-    // Get the name of the function
-    std::string fname = qualified_name(node["exp:Name"]);
-    casadi_warning("Function call to '" + fname + "' incomplete");
-    // Collect the arguments
-    const XmlNode& args = node["exp:Arguments"];
-    std::vector<MX> farg(args.size());
-    for (casadi_int i = 0; i < args.size(); ++i) {
-      // Lift input arguments
-      Variable v("w_" + str(w_.size()));
-      v.v = MX::sym(v.name);
+    // Chop the 'exp:'
+    std::string name = fullname.substr(4);
+
+    // The switch below is alphabetical, and can be thus made more efficient,
+    // for example by using a switch statement of the first three letters,
+    // if it would ever become a bottleneck
+    if (name=="Add") {
+      return read_expr(node[0]) + read_expr(node[1]);
+    } else if (name=="Acos") {
+      return acos(read_expr(node[0]));
+    } else if (name=="Asin") {
+      return asin(read_expr(node[0]));
+    } else if (name=="Atan") {
+      return atan(read_expr(node[0]));
+    } else if (name=="Cos") {
+      return cos(read_expr(node[0]));
+    } else if (name=="Der") {
+      return variables_.at(read_variable(node[0]).der_of).v;
+    } else if (name=="Div") {
+      return read_expr(node[0]) / read_expr(node[1]);
+    } else if (name=="Exp") {
+      return exp(read_expr(node[0]));
+    } else if (name=="Identifier") {
+      return read_variable(node).v;
+    } else if (name=="IntegerLiteral" || name=="BooleanLiteral") {
+      casadi_int val;
+      node.get(&val);
+      return val;
+    } else if (name=="Instant") {
+      double val;
+      node.get(&val);
+      return val;
+    } else if (name=="Log") {
+      return log(read_expr(node[0]));
+    } else if (name=="LogLeq") { // Logical less than equal
+      return read_expr(node[0]) <= read_expr(node[1]);
+    } else if (name=="LogGeq") { // Logical greater than equal
+      return read_expr(node[0]) >= read_expr(node[1]);
+    } else if (name=="LogLt") { // Logical less than
+      return read_expr(node[0]) < read_expr(node[1]);
+    } else if (name=="LogGt") { // Logical greater than
+      return read_expr(node[0]) > read_expr(node[1]);
+    } else if (name=="Max") {
+      return fmax(read_expr(node[0]), read_expr(node[1]));
+    } else if (name=="Min") {
+      return fmin(read_expr(node[0]), read_expr(node[1]));
+    } else if (name=="Mul") { // Multiplication
+      return read_expr(node[0]) * read_expr(node[1]);
+    } else if (name=="Neg") {
+      return -read_expr(node[0]);
+    } else if (name=="NoEvent") {
+      // NOTE: This is a workaround, we assume that whenever NoEvent occurs,
+      // what is meant is a switch
+      casadi_int n = node.size();
+
+      // Default-expression
+      MX ex = read_expr(node[n-1]);
+
+      // Evaluate ifs
+      for (casadi_int i=n-3; i>=0; i -= 2) {
+        ex = if_else(read_expr(node[i]), read_expr(node[i+1]), ex);
+      }
+
+      return ex;
+    } else if (name=="Pow") {
+      return pow(read_expr(node[0]), read_expr(node[1]));
+    } else if (name=="RealLiteral") {
+      double val;
+      node.get(&val);
+      return val;
+    } else if (name=="Sin") {
+      return sin(read_expr(node[0]));
+    } else if (name=="Sqrt") {
+      return sqrt(read_expr(node[0]));
+    } else if (name=="StringLiteral") {
+      casadi_error(node.text);
+    } else if (name=="Sub") {
+      return read_expr(node[0]) - read_expr(node[1]);
+    } else if (name=="Tan") {
+      return tan(read_expr(node[0]));
+    } else if (name=="Time") {
+      return var(t_.at(0));
+    } else if (name=="TimedVariable") {
+      return read_variable(node[0]).v;
+    } else if (name=="FunctionCall") {
+      // Get the name of the function
+      std::string fname = qualified_name(node["exp:Name"]);
+      casadi_warning("Function call to '" + fname + "' incomplete");
+      // Collect the arguments
+      const XmlNode& args = node["exp:Arguments"];
+      std::vector<MX> farg(args.size());
+      for (casadi_int i = 0; i < args.size(); ++i) {
+        // Lift input arguments
+        Variable v("w_" + str(w_.size()));
+        v.v = MX::sym(v.name);
+        // Add to list of variables
+        w_.push_back(add_variable(v.name, v));
+        // Set binding expression
+        v.beq = read_expr(args[i]);
+        // Add to list of function arguments
+        farg[i] = v.v;
+      }
+      // Return argument (scalar for now)
+      Variable r("w_" + str(w_.size()));
+      r.v = MX::sym(r.name);
       // Add to list of variables
-      w_.push_back(add_variable(v.name, v));
-      // Set binding expression
-      v.beq = read_expr(args[i]);
-      // Add to list of function arguments
-      farg[i] = v.v;
+      w_.push_back(add_variable(r.name, r));
+      // Return output variable
+      return r.v;
+    } else if (name=="Array") {
+      // Array of arguments
+      std::vector<MX> v(node.size());
+      for (casadi_int i = 0; i < v.size(); ++i) v[i] = read_expr(node[i]);
+      return vertcat(v);
     }
-    // Return argument (scalar for now)
-    Variable r("w_" + str(w_.size()));
-    r.v = MX::sym(r.name);
-    // Add to list of variables
-    w_.push_back(add_variable(r.name, r));
-    // Return output variable
-    return r.v;
-  } else if (name=="Array") {
-    // Array of arguments
-    std::vector<MX> v(node.size());
-    for (casadi_int i = 0; i < v.size(); ++i) v[i] = read_expr(node[i]);
-    return vertcat(v);
-  }
 
-  // throw error if reached this point
-  casadi_error("Unknown node: " + name);
+    // throw error if reached this point
+    casadi_error("Unknown node: " + name);
+  } catch (std::exception& e) {
+    THROW_ERROR_NODE("read_expr", node, e.what());
+    return {};
+  }
 }
 
 void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {

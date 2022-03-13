@@ -49,6 +49,9 @@ struct CASADI_EXPORT XmlNode {
   // Comment
   std::string comment;
 
+  // Line number
+  casadi_int line;
+
   // Text
   std::string text;
 

@@ -50,8 +50,8 @@ namespace casadi {
   }
 
   XmlNode TinyXmlInterface::parse(const std::string& filename) {
-    bool flag = doc_.LoadFile(filename.c_str());
-    casadi_assert(flag, "Cound not open " + filename);
+    XMLError err = doc_.LoadFile(filename.c_str());
+    casadi_assert(!err, "Cound not open " + filename);
     return addNode(&doc_);
   }
 
@@ -59,20 +59,20 @@ namespace casadi {
     if (!n) casadi_error("Node is 0");
     XmlNode ret;
 
+    ret.line = n->GetLineNum();
+
     // Save name
-    ret.name = n->Value();
+    if (n->Value()) {
+      ret.name = n->Value();
+    }
 
     // Save attributes
-    casadi_int type = n->Type();
-    if (type == TiXmlNode::TINYXML_ELEMENT) {
-      if (n->ToElement()!=nullptr) {
-        for (TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
-             pAttrib;
-             pAttrib=pAttrib->Next()) {
-          ret.set_attribute(pAttrib->Name(), pAttrib->Value());
-        }
+    if (n->ToElement()) {    
+      for (const TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
+                                 pAttrib; pAttrib=pAttrib->Next()) {
+        ret.set_attribute(pAttrib->Name(), pAttrib->Value());
       }
-    } else if (type == TiXmlNode::TINYXML_DOCUMENT) {
+    } else if (n->ToDocument()) {
       // do nothing
     } else {
       casadi_error("TinyXmlInterface::addNode");
@@ -87,21 +87,19 @@ namespace casadi {
 
     // add children
     for (TiXmlNode* child = n->FirstChild(); child != nullptr; child = child->NextSibling()) {
-      switch (child->Type()) {
-        case TiXmlNode::TINYXML_ELEMENT:
-          ret.children.push_back(addNode(child));
-          break;
-        case TiXmlNode::TINYXML_COMMENT:
-          ret.comment = child->Value();
-          break;
-        case TiXmlNode::TINYXML_TEXT:
-          ret.text = child->ToText()->Value();
-          break;
-        case TiXmlNode::TINYXML_DECLARATION:
-          break;
-        default:
-          casadi_error("Unknown node type");
-        }
+      if (child->ToElement()) {
+        ret.children.push_back(addNode(child));
+      } else if (child->ToComment()) {
+        ret.comment = child->Value();
+      } else if (child->ToText()) {
+        ret.text = child->ToText()->Value();
+      } else if (child->ToDeclaration()) {
+        // pass
+      } else if (child->ToDocument()) {
+        // pass
+      } else {
+        casadi_error("Unknown node type");
+      }
     }
 
     // Note: Return value optimization
