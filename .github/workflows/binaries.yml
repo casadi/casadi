@@ -211,6 +211,7 @@ jobs:
         with:
           name: core-osx-${{ matrix.image }}
       - run: unzip core-osx-${{ matrix.image }}.zip
+      - run: rm -rf install
       - name: Build
         run: |
           cmake -Bbuild -DWITH_PYTHON=ON -DWITH_PYTHON3=${{steps.get-id.outputs.WITH_PYTHON3}} -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DSKIP_CONFIG_H_GENERATION=ON
@@ -286,6 +287,7 @@ jobs:
           tree python
           echo "PYTHON_INCLUDE_DIR=/work/python/include" >> $GITHUB_ENV
           echo "PYTHON_LIBRARIES=/work/python/libs/python${{ matrix.py2 }}.lib" >> $GITHUB_ENV
+      - run: rm -rf install
       - name: Build
         run: |
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARIES=${{ env.PYTHON_LIBRARIES}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
