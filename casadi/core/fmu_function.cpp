@@ -827,7 +827,7 @@ int Fmu::eval_ad(FmuMemory* m) const {
   return 0;
 }
 
-int Fmu::eval_fd(FmuMemory* m) const {
+int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
@@ -859,6 +859,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
     // Check if in bounds
     size_t id = m->id_in_[i];
     if (test >= min_in_[id] && test <= max_in_[id]) {
+      // Positive perturbation is fine
       m->flip_[i] = false;
     } else {
       // Try negative direction instead
@@ -918,8 +919,6 @@ int Fmu::eval_fd(FmuMemory* m) const {
       if (m->in_bounds_.at(wrt_i)) {
         // Input was in bounds: Keep output, make dimensionless
         yk[i] /= nominal_out_[m->id_out_[i]];
-        // Correct sign, if necessary
-        if (m->flip_[wrt_i]) yk[i] = -yk[i];
       } else {
         // Input was out of bounds: Discard output
         yk[i] = nan;
@@ -937,18 +936,26 @@ int Fmu::eval_fd(FmuMemory* m) const {
 
   // Calculate FD approximation
   finite_diff(m->self.fd_, get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown, eps);
+
   // Collect requested variables
   for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {
     // Variable id
     size_t id = m->id_out_[ind];
+    // With respect to what variable
+    size_t wrt = m->wrt_[id];
+    // Find the corresponding input variable
+    size_t wrt_i;
+    for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
+      if (m->id_in_[wrt_i] == wrt) break;
+    }
     // Nominal value
     double n = nominal_out_[id];
     // Get the value
     double d_fd = m->d_out_[ind] * n;
+    // Correct sign, if necessary
+    if (m->flip_[wrt_i]) d_fd = -d_fd;
     // Use FD instead of AD or to compare with AD
     if (m->self.validate_ad_) {
-      // With respect to what variable
-      size_t wrt = m->wrt_[id];
       // Value to compare with
       double d_ad = m->sens_[id];
       // Is it a not a number?
@@ -996,7 +1003,7 @@ int Fmu::eval_fd(FmuMemory* m) const {
   return 0;
 }
 
-int Fmu::eval_derivative(FmuMemory* m) const {
+int Fmu::eval_derivative(FmuMemory* m, bool independent_seeds) const {
   // Gather input and output indices
   gather_sens(m);
   // Calculate derivatives using FMU directional derivative support
@@ -1007,7 +1014,7 @@ int Fmu::eval_derivative(FmuMemory* m) const {
   // Calculate derivatives using finite differences
   if (!m->self.enable_ad_ || m->self.validate_ad_) {
     // Evaluate using FD
-    if (eval_fd(m)) return 1;
+    if (eval_fd(m, independent_seeds)) return 1;
   }
   return 0;
 }
@@ -1943,7 +1950,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Calculate derivatives
       fmu_->set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
       fmu_->request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
-      if (fmu_->eval_derivative(m)) return 1;
+      if (fmu_->eval_derivative(m, true)) return 1;
       fmu_->get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
       // Scale derivatives
       casadi_jac_scale(&p_, &m->d);
@@ -2028,7 +2035,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        // Calculate derivatives
        fmu_->set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
        fmu_->request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
-       if (fmu_->eval_derivative(m)) return 1;
+       if (fmu_->eval_derivative(m, true)) return 1;
        fmu_->get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
        // Scale derivatives
        casadi_jac_scale(&p_, &m->d);

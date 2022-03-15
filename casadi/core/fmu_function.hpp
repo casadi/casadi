@@ -668,10 +668,10 @@ struct CASADI_EXPORT Fmu {
   int eval_ad(FmuMemory* m) const;
 
   // Calculate directional derivatives using FD
-  int eval_fd(FmuMemory* m) const;
+  int eval_fd(FmuMemory* m, bool independent_seeds) const;
 
   // Calculate directional derivatives
-  int eval_derivative(FmuMemory* m) const;
+  int eval_derivative(FmuMemory* m, bool independent_seeds) const;
 
   // Get Jacobian sparsity for a subset of inputs and outputs
   Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
