@@ -853,6 +853,7 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
   m->v_pert_.resize(n_known);
   // Do any any inputs need flipping?
   m->flip_.resize(n_known);
+  size_t first_flip = -1;
   for (size_t i = 0; i < n_known; ++i) {
     // Try to take step
     double test = m->v_in_[i] + m->self.step_ * m->d_in_[i];
@@ -868,6 +869,22 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
         "Cannot perturb " + vn_in_[id] + " at " + str(m->v_in_[i]) + ", min " + str(min_in_[id])
         + ", max " + str(max_in_[id]) + ", nominal " + str(nominal_in_[id]));
       m->flip_[i] = true;
+      if (first_flip == size_t(-1)) first_flip = i;
+    }
+  }
+  // If seeds are not independent, we have to flip the sign for all of the seeds or none
+  if (first_flip != size_t(-1) && !independent_seeds) {
+    // Flip the rest of the seeds
+    for (size_t i = 0; i < n_known; ++i) {
+      if (!m->flip_[i]) {
+        // Test negative direction
+        double test = m->v_in_[i] - m->self.step_ * m->d_in_[i];
+        size_t id = m->id_in_[i];
+        casadi_assert(test >= min_in_[id] && test <= max_in_[id],
+          "Cannot perturb both " + vn_in_[id] + " and " + vn_in_[first_flip]);
+        // Flip it too
+        m->flip_[i] = true;
+      }
     }
   }
   // Calculate all perturbed outputs
