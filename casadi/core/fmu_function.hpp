@@ -433,6 +433,8 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   std::vector<size_t> id_in_, id_out_;
   // Which perturbations are permitted
   std::vector<bool> in_bounds_;
+  // Flip sign?
+  std::vector<bool> flip_;
   // Value references
   std::vector<fmi2ValueReference> vr_in_, vr_out_;
   // Work vector (reals)

@@ -851,6 +851,24 @@ int Fmu::eval_fd(FmuMemory* m) const {
   m->in_bounds_.resize(n_known);
   // Memory for perturbed inputs
   m->v_pert_.resize(n_known);
+  // Do any any inputs need flipping?
+  m->flip_.resize(n_known);
+  for (size_t i = 0; i < n_known; ++i) {
+    // Try to take step
+    double test = m->v_in_[i] + m->self.step_ * m->d_in_[i];
+    // Check if in bounds
+    size_t id = m->id_in_[i];
+    if (test >= min_in_[id] && test <= max_in_[id]) {
+      m->flip_[i] = false;
+    } else {
+      // Try negative direction instead
+      test = m->v_in_[i] - m->self.step_ * m->d_in_[i];
+      casadi_assert(test >= min_in_[id] && test <= max_in_[id],
+        "Cannot perturb " + vn_in_[id] + " at " + str(m->v_in_[i]) + ", min " + str(min_in_[id])
+        + ", max " + str(max_in_[id]) + ", nominal " + str(nominal_in_[id]));
+      m->flip_[i] = true;
+    }
+  }
   // Calculate all perturbed outputs
   for (casadi_int k = 0; k < n_points; ++k) {
     // Where to save the perturbed outputs
@@ -865,7 +883,8 @@ int Fmu::eval_fd(FmuMemory* m) const {
     // Perturb inputs, if allowed
     for (size_t i = 0; i < n_known; ++i) {
       // Try to take step
-      double test = m->v_in_[i] + pert * m->d_in_[i];
+      double sign = m->flip_[i] ? -1 : 1;
+      double test = m->v_in_[i] + pert * sign * m->d_in_[i];
       // Check if in bounds
       size_t id = m->id_in_[i];
       m->in_bounds_[i] = test >= min_in_[id] && test <= max_in_[id];
@@ -899,6 +918,8 @@ int Fmu::eval_fd(FmuMemory* m) const {
       if (m->in_bounds_.at(wrt_i)) {
         // Input was in bounds: Keep output, make dimensionless
         yk[i] /= nominal_out_[m->id_out_[i]];
+        // Correct sign, if necessary
+        if (m->flip_[wrt_i]) yk[i] = -yk[i];
       } else {
         // Input was out of bounds: Discard output
         yk[i] = nan;
@@ -1928,8 +1949,9 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       casadi_jac_scale(&p_, &m->d);
       // Collect Jacobian nonzeros
       if (need_jac) {
-        for (casadi_int i = 0; i < m->d.nsens; ++i)
+        for (casadi_int i = 0; i < m->d.nsens; ++i) {
           m->jac_nz[m->d.nzind[i]] = m->d.sens[i];
+        }
       }
       // Propagate adjoint sensitivities
       if (need_adj) {
