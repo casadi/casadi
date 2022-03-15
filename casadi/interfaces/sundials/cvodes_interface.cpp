@@ -649,6 +649,9 @@ namespace casadi {
       m->res[0] = m->jac;
       if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 
+      // Jacobian is now current
+      *jcurPtr = 1;
+
       // Prepare the solution of the linear system (e.g. factorize)
       if (s.linsolF_.nfact(m->jac, m->mem_linsolF)) casadi_error("'jacF' factorization failed");
 
@@ -681,6 +684,9 @@ namespace casadi {
       m->arg[6] = &one;
       m->res[0] = m->jacB;
       if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
+
+      // Jacobian is now current
+      *jcurPtrB = 1;
 
       // Prepare the solution of the linear system (e.g. factorize)
       if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) casadi_error("'jacB' factorization failed");
