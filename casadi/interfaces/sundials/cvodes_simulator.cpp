@@ -168,7 +168,7 @@ int CvodesSimulator::init_mem(void* mem) const {
   if (nonlin_conv_coeff_!=0) THROWING(CVodeSetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
 
   // attach a linear solver
-  if (newton_scheme_==NewtonScheme::DIRECT) {
+  if (newton_scheme_ == NewtonScheme::DIRECT) {
     // Direct scheme
     CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
     cv_mem->cv_lmem   = m;
@@ -179,14 +179,15 @@ int CvodesSimulator::init_mem(void* mem) const {
     // Iterative scheme
     casadi_int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
     switch (newton_scheme_) {
-    case NewtonScheme::DIRECT: casadi_assert_dev(0);
-    case NewtonScheme::GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
-    case NewtonScheme::BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
-    case NewtonScheme::TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
+      case NewtonScheme::DIRECT: casadi_assert_dev(0);
+      case NewtonScheme::GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
+      case NewtonScheme::BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
+      case NewtonScheme::TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
     }
     THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
     if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
   }
+
   return 0;
 }
 
@@ -383,6 +384,9 @@ int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
     std::fill_n(m->res, enum_traits<DynIn>::n_enum * enum_traits<DynOut>::n_enum, nullptr);
     m->res[jac_ind] = m->jac;  // jac:ode:x
+
+    // Jacobian is now current
+    *jcurPtr = 1;
 
     // Evaluate
     if (s.calc_function(m, "jac")) casadi_error("'jac' calculation failed");
