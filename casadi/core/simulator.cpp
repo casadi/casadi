@@ -150,7 +150,7 @@ size_t Simulator::get_n_in() {
   // Regular inputs
   ret += SIMULATOR_NUM_IN;
   // Nondifferentiated outputs
-  if (nfwd_ > 0) ret += SIMULATOR_NUM_OUT;
+  if (!nondiff_ && nfwd_ > 0) ret += SIMULATOR_NUM_OUT;
   // Forward seeds
   if (nfwd_ > 0) ret += SIMULATOR_NUM_IN;
   return ret;
@@ -175,7 +175,7 @@ Sparsity Simulator::get_sparsity_in(casadi_int i) {
   }
   i -= SIMULATOR_NUM_IN;
   // Nondifferentiated outputs
-  if (nfwd_ > 0) {
+  if (!nondiff_ && nfwd_ > 0) {
     switch (i) {
       case SIMULATOR_X: return repmat(Sparsity(x().size()), 1, ng_);
       case SIMULATOR_Z: return repmat(Sparsity(z().size()), 1, ng_);
@@ -225,7 +225,7 @@ std::string Simulator::get_name_in(casadi_int i) {
   if (i < SIMULATOR_NUM_IN) return simulator_in(i);
   i -= SIMULATOR_NUM_IN;
   // Nondifferentiated outputs
-  if (nfwd_ > 0) {
+  if (!nondiff_ && nfwd_ > 0) {
     if (i < SIMULATOR_NUM_OUT) return "out_" + simulator_out(i);
     i -= SIMULATOR_NUM_OUT;
   }
@@ -257,8 +257,7 @@ Function Simulator::create_advanced(const Dict& opts) {
   return Function::create(this, opts);
 }
 
-int Simulator::
-eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
   auto m = static_cast<SimulatorMemory*>(mem);
   // Read inputs
   const double* x0 = arg[SIMULATOR_X0];
@@ -267,9 +266,9 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   const double* p = arg[SIMULATOR_P];
   arg += SIMULATOR_NUM_IN;
   // Read outputs
-  double* x = res[SIMULATOR_X];
-  double* z = res[SIMULATOR_Z];
-  double* y = res[SIMULATOR_Y];
+  double* x = nondiff_ ? res[SIMULATOR_X] : 0;
+  double* z = nondiff_ ? res[SIMULATOR_Z] : 0;
+  double* y = nondiff_ ? res[SIMULATOR_Y] : 0;
   res += SIMULATOR_NUM_OUT;
   // Setup memory object
   setup(m, arg, res, iw, w);
