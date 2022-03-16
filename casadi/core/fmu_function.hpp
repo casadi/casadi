@@ -713,7 +713,7 @@ struct CASADI_EXPORT Fmu {
 };
 
 // Types of inputs
-enum class InputType {REG, ADJ, OUT, ADJ_OUT};
+enum class InputType {REG, FWD, ADJ, OUT, ADJ_OUT};
 
 // Input structure
 struct CASADI_EXPORT InputStruct {
@@ -728,7 +728,7 @@ struct CASADI_EXPORT InputStruct {
 };
 
 // Types of inputs
-enum class OutputType {REG, ADJ, JAC, JAC_TRANS, JAC_ADJ_OUT, JAC_REG_ADJ, HESS};
+enum class OutputType {REG, FWD, ADJ, JAC, JAC_TRANS, JAC_ADJ_OUT, JAC_REG_ADJ, HESS};
 
 // Output structure
 struct CASADI_EXPORT OutputStruct {
@@ -776,7 +776,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   std::vector<casadi_int> sp_trans_map_;
 
   // What blocks exist?
-  bool has_jac_, has_adj_, has_hess_;
+  bool has_jac_, has_fwd_, has_adj_, has_hess_;
 
   // User-set options
   bool enable_ad_, validate_ad_, make_symmetric_, check_hessian_;

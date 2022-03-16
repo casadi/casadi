@@ -1260,12 +1260,15 @@ void FmuFunction::init(const Dict& opts) {
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
   // Which inputs and outputs exist
-  has_adj_ = has_jac_ = has_hess_ = false;
+  has_fwd_ = has_adj_ = has_jac_ = has_hess_ = false;
   for (auto&& i : out_) {
     switch (i.type) {
     case OutputType::JAC:
     case OutputType::JAC_TRANS:
       has_jac_ = true;
+      break;
+    case OutputType::FWD:
+      has_fwd_ = true;
       break;
     case OutputType::ADJ:
       has_adj_ = true;
@@ -1278,7 +1281,11 @@ void FmuFunction::init(const Dict& opts) {
     }
   }
 
-  // Quick return if no derivative calculation
+  // Forward derivatives not yet implemented
+  if (has_fwd_) casadi_warning("Forward derivatives not implemented, ignored");
+
+
+  // Quick return if no Jacobian calculation
   if (!has_jac_ && !has_adj_ && !has_hess_) return;
 
   // Parallelization
@@ -1567,6 +1574,11 @@ InputStruct InputStruct::parse(const std::string& n, const Fmu* fmu,
         s.ind = fmu ? fmu->index_out(rem) : -1;
         if (name_out) name_out->push_back(rem);
       }
+    } else if (pref == "fwd") {
+      // Forward seed
+      s.type = InputType::FWD;
+      s.ind = fmu ? fmu->index_in(rem) : 0;
+      if (name_in) name_in->push_back(rem);
     } else if (pref == "adj") {
       // Adjoint seed
       s.type = InputType::ADJ;
@@ -1655,6 +1667,11 @@ OutputStruct OutputStruct::parse(const std::string& n, const Fmu* fmu,
           if (name_in) name_in->push_back(rem);
         }
       }
+    } else if (pref == "fwd") {
+      // Forward sensitivity
+      s.type = OutputType::FWD;
+      s.ind = fmu ? fmu->index_out(rem) : -1;
+      if (name_out) name_out->push_back(rem);
     } else if (pref == "adj") {
       // Adjoint sensitivity
       s.type = OutputType::ADJ;
@@ -1678,6 +1695,8 @@ Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
   switch (in_.at(i).type) {
     case InputType::REG:
       return Sparsity::dense(fmu_->ired_.at(in_.at(i).ind).size(), 1);
+    case InputType::FWD:
+      return Sparsity::dense(fmu_->ired_.at(in_.at(i).ind).size(), 1);
     case InputType::ADJ:
       return Sparsity::dense(fmu_->ored_.at(in_.at(i).ind).size(), 1);
     case InputType::OUT:
@@ -1692,6 +1711,8 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
   const OutputStruct& s = out_.at(i);
   switch (out_.at(i).type) {
     case OutputType::REG:
+      return Sparsity::dense(fmu_->ored_.at(s.ind).size(), 1);
+    case OutputType::FWD:
       return Sparsity::dense(fmu_->ored_.at(s.ind).size(), 1);
     case OutputType::ADJ:
       return Sparsity::dense(fmu_->ired_.at(s.wrt).size(), 1);
@@ -1713,6 +1734,8 @@ std::vector<double> FmuFunction::get_nominal_in(casadi_int i) const {
   switch (in_.at(i).type) {
     case InputType::REG:
       return fmu_->get_nominal_in(in_.at(i).ind);
+    case InputType::FWD:
+      break;
     case InputType::ADJ:
       break;
     case InputType::OUT:
@@ -1728,6 +1751,8 @@ std::vector<double> FmuFunction::get_nominal_out(casadi_int i) const {
   switch (out_.at(i).type) {
     case OutputType::REG:
       return fmu_->get_nominal_out(out_.at(i).ind);
+    case OutputType::FWD:
+      break;
     case OutputType::ADJ:
       break;
     case OutputType::JAC:
@@ -1825,7 +1850,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     }
   }
   // Evaluate everything except Hessian, possibly in parallel
-  if (verbose_) casadi_message("Evaluating regular outputs, extended Jacobian");
+  if (verbose_) casadi_message("Evaluating regular outputs, forward sens, extended Jacobian");
   if (eval_all(m, max_jac_tasks_, true, need_jac, need_adj, false)) return 1;
   // Evaluate Hessian
   if (need_hess) {
