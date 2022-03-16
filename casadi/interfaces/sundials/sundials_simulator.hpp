@@ -155,7 +155,6 @@ public:
   Dict linear_solver_options_;
   casadi_int max_krylov_;
   bool use_precon_;
-  bool second_order_correction_;
   double step0_;
   double max_step_size_;
   double nonlin_conv_coeff_;

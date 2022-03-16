@@ -138,30 +138,119 @@ Simulator::Simulator(const std::string& name, const Function& oracle,
 
   // Default options
   print_stats_ = false;
+  nondiff_ = true;
+  nfwd_ = 0;
 }
 
 Simulator::~Simulator() {
 }
 
+size_t Simulator::get_n_in() {
+  size_t ret = 0;
+  // Regular inputs
+  ret += SIMULATOR_NUM_IN;
+  // Nondifferentiated outputs
+  if (nfwd_ > 0) ret += SIMULATOR_NUM_OUT;
+  // Forward seeds
+  if (nfwd_ > 0) ret += SIMULATOR_NUM_IN;
+  return ret;
+}
+
+size_t Simulator::get_n_out() {
+  size_t ret = 0;
+  // Regular outputs
+  if (nondiff_) ret += SIMULATOR_NUM_OUT;
+  // Forward sensitivities
+  if (nfwd_ > 0) ret += SIMULATOR_NUM_OUT;
+  return ret;
+}
+
 Sparsity Simulator::get_sparsity_in(casadi_int i) {
-  switch (static_cast<SimulatorInput>(i)) {
-  case SIMULATOR_X0: return x();
-  case SIMULATOR_U: return repmat(u(), 1, grid_.size() - 1);
-  case SIMULATOR_Z0: return z();
-  case SIMULATOR_P: return p();
-  case SIMULATOR_NUM_IN: break;
+  // Regular inputs
+  switch (i) {
+    case SIMULATOR_X0: return x();
+    case SIMULATOR_U: return repmat(u(), 1, ng_ - 1);
+    case SIMULATOR_Z0: return z();
+    case SIMULATOR_P: return p();
   }
+  i -= SIMULATOR_NUM_IN;
+  // Nondifferentiated outputs
+  if (nfwd_ > 0) {
+    switch (i) {
+      case SIMULATOR_X: return repmat(Sparsity(x().size()), 1, ng_);
+      case SIMULATOR_Z: return repmat(Sparsity(z().size()), 1, ng_);
+      case SIMULATOR_Y: return repmat(Sparsity(y().size()), 1, ng_);
+    }
+    i -= SIMULATOR_NUM_OUT;
+  }
+  // Forward seeds
+  if (nfwd_ > 0) {
+    switch (i) {
+      case SIMULATOR_X0: return repmat(x(), 1, nfwd_);
+      case SIMULATOR_U: return repmat(u(), 1, (ng_ - 1) * nfwd_);
+      case SIMULATOR_Z0: return repmat(z(), 1, nfwd_);
+      case SIMULATOR_P: return repmat(p(), 1, nfwd_);
+    }
+    i -= SIMULATOR_NUM_IN;
+  }
+  // Default return
   return Sparsity();
 }
 
 Sparsity Simulator::get_sparsity_out(casadi_int i) {
-  switch (static_cast<SimulatorOutput>(i)) {
-  case SIMULATOR_X: return repmat(x(), 1, grid_.size());
-  case SIMULATOR_Z: return repmat(z(), 1, grid_.size());
-  case SIMULATOR_Y: return repmat(y(), 1, grid_.size());
-  case SIMULATOR_NUM_OUT: break;
+  // Regular outputs
+  if (nondiff_) {
+    switch (i) {
+      case SIMULATOR_X: return repmat(x(), 1, ng_);
+      case SIMULATOR_Z: return repmat(z(), 1, ng_);
+      case SIMULATOR_Y: return repmat(y(), 1, ng_);
+    }
+    i -= SIMULATOR_NUM_OUT;
   }
+  // Forward sensitivities
+  if (nfwd_ > 0) {
+    switch (i) {
+      case SIMULATOR_X: return repmat(x(), 1, ng_ * nfwd_);
+      case SIMULATOR_Z: return repmat(z(), 1, ng_ * nfwd_);
+      case SIMULATOR_Y: return repmat(y(), 1, ng_ * nfwd_);
+    }
+    i -= SIMULATOR_NUM_OUT;
+  }
+  // Default return
   return Sparsity();
+}
+
+std::string Simulator::get_name_in(casadi_int i) {
+  // Regular inputs
+  if (i < SIMULATOR_NUM_IN) return simulator_in(i);
+  i -= SIMULATOR_NUM_IN;
+  // Nondifferentiated outputs
+  if (nfwd_ > 0) {
+    if (i < SIMULATOR_NUM_OUT) return "out_" + simulator_out(i);
+    i -= SIMULATOR_NUM_OUT;
+  }
+  // Forward seeds
+  if (nfwd_ > 0) {
+    if (i < SIMULATOR_NUM_IN) return "fwd_" + simulator_in(i);
+    i -= SIMULATOR_NUM_IN;
+  }
+  // Default return
+  return std::string();
+}
+
+std::string Simulator::get_name_out(casadi_int i) {
+  // Regular outputs
+  if (nondiff_) {
+    if (i < SIMULATOR_NUM_OUT) return simulator_out(i);
+    i -= SIMULATOR_NUM_OUT;
+  }
+  // Forward sensitivities
+  if (nfwd_ > 0) {
+    if (i < SIMULATOR_NUM_OUT) return "fwd_" + simulator_out(i);
+    i -= SIMULATOR_NUM_OUT;
+  }
+  // Default return
+  return std::string();
 }
 
 Function Simulator::create_advanced(const Dict& opts) {
@@ -195,7 +284,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   // Next stop time due to step change in input
   casadi_int k_stop = next_stop(1, u);
   // Integrate forward
-  for (casadi_int k = 1; k < grid_.size(); ++k) {
+  for (casadi_int k = 1; k < ng_; ++k) {
     // Update stopping time, if needed
     if (k > k_stop) k_stop = next_stop(k, u);
     // Integrate forward
@@ -216,7 +305,13 @@ const Options Simulator::options_
 = {{&OracleFunction::options_},
    {{"print_stats",
      {OT_BOOL,
-      "Print out statistics after integration"}}
+      "Print out statistics after integration"}},
+    {"nondiff",
+     {OT_BOOL,
+      "Output nondifferentiated"}},
+    {"nfwd",
+     {OT_INT,
+      "Number of forward sensitivities"}}
    }
 };
 
@@ -225,14 +320,19 @@ void Simulator::init(const Dict& opts) {
   for (auto&& op : opts) {
     if (op.first=="print_stats") {
       print_stats_ = op.second;
+    } else if (op.first=="nondiff") {
+      nondiff_ = op.second;
+    } else if (op.first=="nfwd") {
+      nfwd_ = op.second;
     }
   }
 
-  // Store a copy of the options, for creating augmented simulators
-  opts_ = opts;
+  // Number of grid points
+  ng_ = grid_.size();
 
-  // Consistency check
-  casadi_assert(grid_.size() >= 2, "Need at least two grid points for simulation");
+  // Consistency checks
+  casadi_assert(nondiff_ || nfwd_ > 0, "Inconsistent options");
+  casadi_assert(ng_ >= 2, "Need at least two grid points for simulation");
 
   // Call the base class method
   OracleFunction::init(opts);
@@ -246,13 +346,6 @@ void Simulator::init(const Dict& opts) {
   casadi_assert(z().is_dense(), "Sparse DAE not supported");
   casadi_assert(p().is_dense(), "Sparse DAE not supported");
 
-  // Get dimensions (excluding sensitivity equations)
-  nx1_ = x().size1();
-  nu1_ = u().size1();
-  nz1_ = z().size1();
-  np1_ = p().size1();
-  ny1_ = y().size1();
-
   // Get dimensions (including sensitivity equations)
   nx_ = x().nnz();
   nu_ = u().nnz();
@@ -260,8 +353,8 @@ void Simulator::init(const Dict& opts) {
   np_ = p().nnz();
   ny_ = y().nnz();
 
-  // Number of sensitivities
-  ns_ = x().size2()-1;
+  // Sensitivities not implemented
+  if (nfwd_ > 0) casadi_warning("Forward sensitivities experimental");
 
   // Nominal values for states
   nom_x_ = oracle_.nominal_in(DYN_X);
@@ -366,9 +459,9 @@ void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const do
 
 casadi_int Simulator::next_stop(casadi_int k, const double* u) const {
   // Integrate till the end if no input signals
-  if (nu_ == 0 || u == 0) return grid_.size() - 1;
+  if (nu_ == 0 || u == 0) return ng_ - 1;
   // Find the next discontinuity, if any
-  for (; k + 1 < grid_.size(); ++k) {
+  for (; k + 1 < ng_; ++k) {
     // Next control value
     const double *u_next = u + nu_;
     // Check if there is any change in input from k to k + 1

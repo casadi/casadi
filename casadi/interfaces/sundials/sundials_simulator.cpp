@@ -110,9 +110,6 @@ const Options SundialsSimulator::options_
     {"linear_solver_options",
      {OT_DICT,
       "Options to be passed to the linear solver"}},
-    {"second_order_correction",
-     {OT_BOOL,
-      "Second order correction in the augmented system Jacobian [true]"}},
     {"step0",
      {OT_DOUBLE,
       "initial step size [default: 0/estimated]"}},
@@ -135,10 +132,6 @@ void SundialsSimulator::init(const Dict& opts) {
   // Call the base class method
   Simulator::init(opts);
 
-  // If sensitivity equations, make sure derivative_of_ is available
-  casadi_assert(ns_==0 || !derivative_of_.is_null(),
-    "Not implemented.");
-
   // Default options
   abstol_ = 1e-5;
   reltol_ = 1e-5;
@@ -153,7 +146,6 @@ void SundialsSimulator::init(const Dict& opts) {
   steps_per_checkpoint_ = 20;
   disable_internal_warnings_ = false;
   max_multistep_order_ = 5;
-  second_order_correction_ = true;
   step0_ = 0;
   max_step_size_ = 0;
   max_order_ = 0;
@@ -190,8 +182,6 @@ void SundialsSimulator::init(const Dict& opts) {
       disable_internal_warnings_ = op.second;
     } else if (op.first=="max_multistep_order") {
       max_multistep_order_ = op.second;
-    } else if (op.first=="second_order_correction") {
-      second_order_correction_ = op.second;
     } else if (op.first=="step0") {
       step0_ = op.second;
     } else if (op.first=="max_step_size") {
@@ -206,18 +196,7 @@ void SundialsSimulator::init(const Dict& opts) {
   }
 
   // Get or create Jacobians and linear system solvers
-  Function J;
-  if (ns_ == 0) {
-    J = oracle_.jacobian();
-  } else {
-    SundialsSimulator* d = derivative_of_.get<SundialsSimulator>();
-    casadi_assert_dev(d!=nullptr);
-    if (d->ns_ == 0) {
-      J = d->get_function("jac");
-    } else {
-      J = d->oracle_.jacobian();
-    }
-  }
+  Function J = oracle_.jacobian();
   set_function(J, "jac", true);
 
   // Allocate work vectors

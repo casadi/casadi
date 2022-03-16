@@ -112,7 +112,7 @@ void CvodesSimulator::init(const Dict& opts) {
   }
 
   // Attach functions for jacobian information
-  if (newton_scheme_!=NewtonScheme::DIRECT || (ns_>0 && second_order_correction_)) {
+  if (newton_scheme_ != NewtonScheme::DIRECT) {
     set_function(oracle_.forward(1), "jtimes");
   }
 }
@@ -321,38 +321,7 @@ int CvodesSimulator::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
     if (s.linsolF_.solve(m->jac, m->v1, 1, false, m->mem_linsolF))
       casadi_error("Linear system solve failed");
     v = NV_DATA_S(z); // possibly different from r
-    casadi_copy(m->v1, s.nx1_, v);
-
-    // Sensitivity equations
-    if (s.ns_>0) {
-      // Second order correction
-      if (s.second_order_correction_) {
-        // The outputs will double as seeds for jtimes
-        casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
-        // Set input and output buffers
-        std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum
-          + enum_traits<DynIn>::n_enum, nullptr);
-        m->arg[DYN_T] = &t;  // t
-        m->arg[DYN_X] = NV_DATA_S(x);  // x
-        m->arg[DYN_U] = m->u;  // u
-        m->arg[DYN_P] = m->p;  // p
-        m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
-        m->arg[enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum + DYN_X] = v;  // fwd:x
-        std::fill_n(m->res, enum_traits<DynOut>::n_enum, nullptr);
-        m->res[DYN_ODE] = m->v2;  // fwd:ode
-        // Evaluate
-        s.calc_function(m, "jtimes");
-        // Subtract m->v2 from m->v1, scaled with -gamma
-        casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
-      }
-
-      // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jac, m->v1 + s.nx1_, s.ns_, false, m->mem_linsolF))
-        casadi_error("Linear solve failed");
-
-      // Save to output, reordered
-      casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
-    }
+    casadi_copy(m->v1, s.nx_, v);
 
     return 0;
   } catch(int flag) { // recoverable error

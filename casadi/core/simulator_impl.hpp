@@ -56,8 +56,8 @@ public:
 
   ///@{
   /** \brief Number of function inputs and outputs */
-  size_t get_n_in() override { return SIMULATOR_NUM_IN;}
-  size_t get_n_out() override { return SIMULATOR_NUM_OUT;}
+  size_t get_n_in() override;
+  size_t get_n_out() override;
   ///@}
 
  /// @{
@@ -68,8 +68,8 @@ public:
 
   ///@{
   /** \brief Names of function input and outputs */
-  std::string get_name_in(casadi_int i) override { return simulator_in(i);}
-  std::string get_name_out(casadi_int i) override { return simulator_out(i);}
+  std::string get_name_in(casadi_int i) override;
+  std::string get_name_out(casadi_int i) override;
   /// @}
 
   /** \brief Initalize memory block */
@@ -127,23 +127,26 @@ public:
   // Time grid
   std::vector<double> grid_;
 
+  /// Number of grid points
+  casadi_int ng_;
+
   /// Number of states
-  casadi_int nx_, nz_, nx1_, nz1_;
+  casadi_int nx_, nz_;
 
   /// Number of controls
-  casadi_int nu_, nu1_;
+  casadi_int nu_;
 
   /// Number of parameters
-  casadi_int np_, np1_;
+  casadi_int np_;
 
-  // Number of outputs
-  casadi_int ny_, ny1_;
+  /// Number of outputs
+  casadi_int ny_;
 
-  /// Number of sensitivities
-  casadi_int ns_;
+  /// Output nondifferentiated
+  bool nondiff_;
 
-  // Copy of the options
-  Dict opts_;
+  /// Number of forward sensitivities
+  casadi_int nfwd_;
 
   // Nominal values for states
   std::vector<double> nom_x_, nom_z_;
