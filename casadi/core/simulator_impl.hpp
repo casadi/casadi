@@ -37,6 +37,20 @@ namespace casadi {
 
 /** \brief Simulator memory */
 struct CASADI_EXPORT SimulatorMemory : public OracleMemory {
+  // Input arguments
+  const double *x0, *u, *z0, *p;
+  // Nondifferentiated outputs
+  const double *out_x, *out_z, *out_y;
+  // Forward seeds
+  const double *fwd_x0, *fwd_u, *fwd_z0, *fwd_p;
+  // Outputs
+  double *x, *z, *y;
+  // Forward sensitivities
+  double *fwd_x, *fwd_z, *fwd_y;
+  // Current state
+  double *xk, *zk, *yk;
+  // Current forward sensitivities
+  double *fwd_xk, *fwd_zk, *fwd_yk;
 };
 
 /** \brief Internal storage for simulator related data
@@ -86,6 +100,10 @@ public:
 
   /** Helper for a more powerful 'simulator' factory */
   virtual Function create_advanced(const Dict& opts);
+
+  /** \brief Set the (persistent) work vectors */
+  void set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const override;
 
   /** \brief Reset the forward problem */
   virtual void reset(SimulatorMemory* mem, double t, const double* x, const double* u,

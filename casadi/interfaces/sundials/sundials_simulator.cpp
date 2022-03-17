@@ -200,8 +200,9 @@ void SundialsSimulator::init(const Dict& opts) {
   set_function(J, "jac", true);
 
   // Allocate work vectors
-  alloc_w(nu_, true); // u
-  alloc_w(np_, true); // p
+  // alloc_w(nx_ + nz_, true);  // xz
+  alloc_w(nu_, true); // uk
+  alloc_w(np_, true); // pk
   alloc_w(2 * (nx_+nz_), true); // v1, v2
 
   // Allocate linear solvers

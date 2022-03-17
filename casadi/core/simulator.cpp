@@ -257,46 +257,96 @@ Function Simulator::create_advanced(const Dict& opts) {
   return Function::create(this, opts);
 }
 
+void Simulator::set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const {
+  auto m = static_cast<SimulatorMemory*>(mem);
+  // Call the base class method
+  OracleFunction::set_work(m, arg, res, iw, w);
+  // Inputs
+  m->x0 = arg[SIMULATOR_X0];
+  m->u = arg[SIMULATOR_U];
+  m->z0 = arg[SIMULATOR_Z0];
+  m->p = arg[SIMULATOR_P];
+  arg += SIMULATOR_NUM_IN;
+  // Nondifferentiated outputs, if given
+  if (!nondiff_ && nfwd_ > 0) {
+    m->out_x = arg[SIMULATOR_X];
+    m->out_z = arg[SIMULATOR_Z];
+    m->out_y = arg[SIMULATOR_Y];
+    arg += SIMULATOR_NUM_OUT;
+  } else {
+    m->out_x = m->out_z = m->out_y = 0;
+  }
+  // Forward seeds
+  if (nfwd_ > 0) {
+    m->fwd_x0 = arg[SIMULATOR_X0];
+    m->fwd_u = arg[SIMULATOR_U];
+    m->fwd_z0 = arg[SIMULATOR_Z0];
+    m->fwd_p = arg[SIMULATOR_P];
+    arg += SIMULATOR_NUM_IN;
+  } else {
+    m->fwd_x0 = m->fwd_u = m->fwd_z0 = m->fwd_p = 0;
+  }
+  // Outputs, if requested
+  if (nondiff_) {
+    m->x = res[SIMULATOR_X];
+    m->z = res[SIMULATOR_Z];
+    m->y = res[SIMULATOR_Y];
+    res += SIMULATOR_NUM_OUT;
+  } else {
+    m->x = m->z = m->y = 0;
+  }
+  // Forward sensitivities
+  if (nfwd_ > 0) {
+    m->fwd_x = res[SIMULATOR_X];
+    m->fwd_z = res[SIMULATOR_Z];
+    m->fwd_y = res[SIMULATOR_Y];
+    res += SIMULATOR_NUM_OUT;
+  } else {
+    m->fwd_x = m->fwd_z = m->fwd_y = 0;
+  }
+  // Current state
+  m->xk = w;  w += nx_;
+  m->zk = w;  w += nz_;
+  m->fwd_xk = w;  w += nfwd_ * nx_;
+  m->fwd_zk = w;  w += nfwd_ * nz_;
+}
+
 int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
   auto m = static_cast<SimulatorMemory*>(mem);
-  // Read inputs
-  const double* x0 = arg[SIMULATOR_X0];
-  const double* u = arg[SIMULATOR_U];
-  const double* z0 = arg[SIMULATOR_Z0];
-  const double* p = arg[SIMULATOR_P];
-  arg += SIMULATOR_NUM_IN;
-  // Read outputs
-  double* x = nondiff_ ? res[SIMULATOR_X] : 0;
-  double* z = nondiff_ ? res[SIMULATOR_Z] : 0;
-  double* y = nondiff_ ? res[SIMULATOR_Y] : 0;
-  res += SIMULATOR_NUM_OUT;
   // Setup memory object
   setup(m, arg, res, iw, w);
   // Get initial state, algebraic variable guess
-  casadi_copy(x0, nx_, x);
-  casadi_copy(z0, nz_, z);
+  casadi_copy(m->x0, nx_, m->xk);
+  casadi_copy(m->z0, nz_, m->zk);
   // Reset solver, take time to t0, calculate outputs at t0
-  reset(m, grid_.front(), x0, u, z, p, y);
-  if (x) x += nx_;
-  if (z) z += nz_;
-  if (y) y += ny_;
+  reset(m, grid_.front(), m->xk, m->u, m->zk, m->p, m->y);
+  casadi_copy(m->xk, nx_, m->x);
+  casadi_copy(m->zk, nz_, m->z);
+  // Advance output time
+  if (m->x) m->x += nx_;
+  if (m->z) m->z += nz_;
+  if (m->y) m->y += ny_;
   // Next stop time due to step change in input
-  casadi_int k_stop = next_stop(1, u);
+  casadi_int k_stop = next_stop(1, m->u);
   // Integrate forward
   for (casadi_int k = 1; k < ng_; ++k) {
     // Update stopping time, if needed
-    if (k > k_stop) k_stop = next_stop(k, u);
+    if (k > k_stop) k_stop = next_stop(k, m->u);
     // Integrate forward
     if (verbose_) casadi_message("Integrating to " + str(grid_[k])
       + ", stopping time " + str(grid_[k_stop]));
-    advance(m, grid_[k], grid_[k_stop], x, u, z, p, y);
-    if (x) x += nx_;
-    if (u) u += nu_;
-    if (z) z += nz_;
-    if (y) y += ny_;
+    advance(m, grid_[k], grid_[k_stop], m->xk, m->u, m->zk, m->p, m->y);
+    casadi_copy(m->xk, nx_, m->x);
+    casadi_copy(m->zk, nz_, m->z);
+    // Advance output time
+    if (m->x) m->x += nx_;
+    if (m->u) m->u += nu_;
+    if (m->z) m->z += nz_;
+    if (m->y) m->y += ny_;
   }
+  // Print stats
   if (print_stats_) print_stats(m);
-
   return 0;
 }
 
@@ -362,13 +412,14 @@ void Simulator::init(const Dict& opts) {
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
   casadi_assert(!sp_jac_dae_.is_singular(),
-                        "Jacobian of the forward problem is structurally rank-deficient. "
-                        "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<"
-                        + str(nx_+nz_));
+    "Jacobian of the forward problem is structurally rank-deficient. "
+    "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<" + str(nx_+nz_));
 
-  // Allocate sufficiently large work vectors
-  alloc_w(nx_ + nz_);
-  alloc_w(nx_ + nz_, true);
+  // Work vectors
+  alloc_w(nx_, true);  // xk
+  alloc_w(nz_, true);  // zk
+  alloc_w(nx_ * nfwd_, true);  // fwd_xk
+  alloc_w(nz_ * nfwd_, true);  // fwd_zk
 }
 
 int Simulator::init_mem(void* mem) const {
