@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Andersson
+    given-names: Joel A E
+  - family-names: Gillis
+    given-names: Joris
+    orcid: https://orcid.org/0000-0002-6774-3613
+  - family-names: Horn
+    given-names: Greg
+title: "CasADi - A software framework for nonlinear optimization and optimal control"
+doi: 10.1007/s12532-018-0139-4
+date-released: 2018-07-11
