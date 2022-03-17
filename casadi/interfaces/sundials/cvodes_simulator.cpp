@@ -213,16 +213,15 @@ int CvodesSimulator::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
   }
 }
 
-void CvodesSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* u,
-    double* z, const double* p, double* y) const {
+void CvodesSimulator::reset(SimulatorMemory* mem) const {
   if (verbose_) casadi_message(name_ + "::reset");
   auto m = to_mem(mem);
   // Reset the base classes
-  SundialsSimulator::reset(mem, t, x, u, z, p, y);
+  SundialsSimulator::reset(mem);
   // Re-initialize
-  THROWING(CVodeReInit, m->mem, t, m->xz);
+  THROWING(CVodeReInit, m->mem, m->t, m->xz);
   // Get outputs
-  if (y && ny_ > 0) eval_y(m, t, x, u, z, p, y);
+  if (m->y && ny_ > 0) eval_y(m, m->t, m->xk, m->u, m->zk, m->p, m->y);
 }
 
 void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop, double* x,

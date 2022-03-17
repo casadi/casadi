@@ -227,18 +227,15 @@ int SundialsSimulator::init_mem(void* mem) const {
   return 0;
 }
 
-void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, const double* u,
-    double* z, const double* p, double* y) const {
+void SundialsSimulator::reset(SimulatorMemory* mem) const {
   auto m = static_cast<SundialsSimMemory*>(mem);
-  // Update time
-  m->t = t;
   // Set parameters
-  casadi_copy(p, np_, m->pk);
+  casadi_copy(m->p, np_, m->pk);
   // Set controls
-  casadi_copy(u, nu_, m->uk);
+  casadi_copy(m->u, nu_, m->uk);
   // Set the state
-  casadi_copy(x, nx_, NV_DATA_S(m->xz));
-  casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
+  casadi_copy(m->xk, nx_, NV_DATA_S(m->xz));
+  casadi_copy(m->zk, nz_, NV_DATA_S(m->xz) + nx_);
 }
 
 SundialsSimMemory::SundialsSimMemory() {

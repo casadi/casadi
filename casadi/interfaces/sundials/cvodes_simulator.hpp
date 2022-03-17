@@ -115,9 +115,8 @@ public:
   /** \brief Free memory block */
   void free_mem(void *mem) const override { delete static_cast<CvodesSimMemory*>(mem);}
 
-  /** \brief  Reset the forward problem and bring the time back to t0 */
-  void reset(SimulatorMemory* mem, double t, const double* x, const double* u, double* z,
-    const double* p, double* y) const override;
+  /** \brief  Reset the forward problem */
+  void reset(SimulatorMemory* mem) const override;
 
   /** \brief  Advance solution in time */
   void advance(SimulatorMemory* mem, double t, double t_stop, double* x, const double* u,

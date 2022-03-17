@@ -320,7 +320,8 @@ int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w,
   casadi_copy(m->x0, nx_, m->xk);
   casadi_copy(m->z0, nz_, m->zk);
   // Reset solver, take time to t0, calculate outputs at t0
-  reset(m, grid_.front(), m->xk, m->u, m->zk, m->p, m->y);
+  m->t = grid_.front();
+  reset(m);
   casadi_copy(m->xk, nx_, m->x);
   casadi_copy(m->zk, nz_, m->z);
   // Advance output time

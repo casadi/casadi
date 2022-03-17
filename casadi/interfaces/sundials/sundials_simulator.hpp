@@ -54,9 +54,6 @@ CASADI_EXPORT std::string to_string(InterpType v);
 
 // IdasMemory
 struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemory {
-  // Current time
-  double t;
-
   // N-vectors for the forward integration
   N_Vector xz;
 
@@ -127,9 +124,8 @@ public:
   /** \brief  Print solver statistics */
   void print_stats(SimulatorMemory* mem) const override;
 
-  /** \brief  Reset the forward problem and bring the time back to t0 */
-  void reset(SimulatorMemory* mem, double t, const double* x, const double* u, double* z,
-    const double* p, double* y) const override;
+  /** \brief  Reset the forward problem */
+  void reset(SimulatorMemory* mem) const override;
 
   /** \brief Cast to memory object */
   static SundialsSimMemory* to_mem(void *mem) {

@@ -47,6 +47,8 @@ struct CASADI_EXPORT SimulatorMemory : public OracleMemory {
   double *x, *z, *y;
   // Forward sensitivities
   double *fwd_x, *fwd_z, *fwd_y;
+  // Current time
+  double t;
   // Current state
   double *xk, *zk, *yk;
   // Current forward sensitivities
@@ -106,8 +108,7 @@ public:
     casadi_int*& iw, double*& w) const override;
 
   /** \brief Reset the forward problem */
-  virtual void reset(SimulatorMemory* mem, double t, const double* x, const double* u,
-    double* z, const double* p, double* y) const = 0;
+  virtual void reset(SimulatorMemory* mem) const = 0;
 
   /** \brief  Advance solution in time */
   virtual void advance(SimulatorMemory* mem, double t, double t_stop, double* x, const double* u,
