@@ -232,9 +232,9 @@ void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, c
   // Update time
   m->t = t;
   // Set parameters
-  casadi_copy(p, np_, m->p);
+  casadi_copy(p, np_, m->pk);
   // Set controls
-  casadi_copy(u, nu_, m->u);
+  casadi_copy(u, nu_, m->uk);
   // Set the state
   casadi_copy(x, nx_, NV_DATA_S(m->xz));
   casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
@@ -243,8 +243,8 @@ void SundialsSimulator::reset(SimulatorMemory* mem, double t, const double* x, c
 SundialsSimMemory::SundialsSimMemory() {
   // Set pointers to null
   this->xz  = nullptr;
-  this->u = nullptr;
-  this->p = nullptr;
+  this->uk = nullptr;
+  this->pk = nullptr;
   this->jac = nullptr;
   this->v1 = this->v2 = nullptr;
   this->abstolv  = nullptr;
@@ -317,8 +317,8 @@ void SundialsSimulator::set_work(void* mem, const double**& arg, double**& res,
   Simulator::set_work(mem, arg, res, iw, w);
 
   // Work vectors
-  m->u = w; w += nu_;
-  m->p = w; w += np_;
+  m->uk = w; w += nu_;
+  m->pk = w; w += np_;
   m->v1 = w; w += nx_ + nz_;
   m->v2 = w; w += nx_ + nz_;
   m->jac = w; w += linsolF_.sparsity().nnz();

@@ -61,10 +61,10 @@ struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemo
   N_Vector xz;
 
   // Controls
-  double *u;
+  double *uk;
 
   // Parameters
-  double *p;
+  double *pk;
 
   // Jacobian
   double *jac;
