@@ -119,8 +119,7 @@ public:
   void reset(SimulatorMemory* mem) const override;
 
   /** \brief  Advance solution in time */
-  void advance(SimulatorMemory* mem, double t, double t_stop, double* x, const double* u,
-    double* z, const double* p, double* y) const override;
+  void advance(SimulatorMemory* mem, double t, double t_stop) const override;
 
   /** \brief Cast to memory object */
   static CvodesSimMemory* to_mem(void *mem) {

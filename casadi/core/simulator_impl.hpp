@@ -63,7 +63,7 @@ struct CASADI_EXPORT SimulatorMemory : public OracleMemory {
 */
 class CASADI_EXPORT
 Simulator : public OracleFunction, public PluginInterface<Simulator> {
-public:
+ public:
   /** \brief  Constructor */
   Simulator(const std::string& name, const Function& oracle, const std::vector<double>& grid);
 
@@ -111,8 +111,7 @@ public:
   virtual void reset(SimulatorMemory* mem) const = 0;
 
   /** \brief  Advance solution in time */
-  virtual void advance(SimulatorMemory* mem, double t, double t_stop, double* x, const double* u,
-    double* z, const double* p, double* y) const = 0;
+  virtual void advance(SimulatorMemory* mem, double t, double t_stop) const = 0;
 
   /** \brief  Find next stop time */
   casadi_int next_stop(casadi_int k, const double* u) const;

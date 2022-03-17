@@ -201,8 +201,6 @@ void SundialsSimulator::init(const Dict& opts) {
 
   // Allocate work vectors
   // alloc_w(nx_ + nz_, true);  // xz
-  alloc_w(nu_, true); // uk
-  alloc_w(np_, true); // pk
   alloc_w(2 * (nx_+nz_), true); // v1, v2
 
   // Allocate linear solvers
@@ -229,10 +227,6 @@ int SundialsSimulator::init_mem(void* mem) const {
 
 void SundialsSimulator::reset(SimulatorMemory* mem) const {
   auto m = static_cast<SundialsSimMemory*>(mem);
-  // Set parameters
-  casadi_copy(m->p, np_, m->pk);
-  // Set controls
-  casadi_copy(m->u, nu_, m->uk);
   // Set the state
   casadi_copy(m->xk, nx_, NV_DATA_S(m->xz));
   casadi_copy(m->zk, nz_, NV_DATA_S(m->xz) + nx_);
@@ -241,8 +235,6 @@ void SundialsSimulator::reset(SimulatorMemory* mem) const {
 SundialsSimMemory::SundialsSimMemory() {
   // Set pointers to null
   this->xz  = nullptr;
-  this->uk = nullptr;
-  this->pk = nullptr;
   this->jac = nullptr;
   this->v1 = this->v2 = nullptr;
   this->abstolv  = nullptr;
@@ -315,8 +307,6 @@ void SundialsSimulator::set_work(void* mem, const double**& arg, double**& res,
   Simulator::set_work(mem, arg, res, iw, w);
 
   // Work vectors
-  m->uk = w; w += nu_;
-  m->pk = w; w += np_;
   m->v1 = w; w += nx_ + nz_;
   m->v2 = w; w += nx_ + nz_;
   m->jac = w; w += linsolF_.sparsity().nnz();

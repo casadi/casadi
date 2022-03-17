@@ -199,8 +199,8 @@ int CvodesSimulator::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
     std::fill_n(m->arg, enum_traits<DynIn>::n_enum, nullptr);
     m->arg[DYN_T] = &t;
     m->arg[DYN_X] = NV_DATA_S(x);
-    m->arg[DYN_U] = m->uk;
-    m->arg[DYN_P] = m->pk;
+    m->arg[DYN_U] = m->u;
+    m->arg[DYN_P] = m->p;
     std::fill_n(m->res, enum_traits<DynOut>::n_enum, nullptr);
     m->res[DYN_ODE] = NV_DATA_S(xdot);
     s.calc_function(m, "dae");
@@ -224,27 +224,16 @@ void CvodesSimulator::reset(SimulatorMemory* mem) const {
   if (m->y && ny_ > 0) eval_y(m, m->t, m->xk, m->u, m->zk, m->p, m->y);
 }
 
-void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop, double* x,
-    const double* u, double* z, const double* p, double* y) const {
+void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop) const {
   auto m = to_mem(mem);
-  // Consistency checks
-  casadi_assert(t >= grid_.front(),
-    "CvodesSimulator::integrate(" + str(t) + "): "
-    "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
-  casadi_assert(t <= grid_.back() || !stop_at_end_,
-    "CvodesSimulator::integrate(" + str(t) + "): "
-    "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
-    "unless stop_at_end is set to False.");
   // Do not integrate past change in input signals or past the end
   THROWING(CVodeSetStopTime, m->mem, t_stop);
-  // Set controls
-  casadi_copy(u, nu_, m->uk);
   // Integrate
   THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
   // Set function outputs
-  casadi_copy(NV_DATA_S(m->xz), nx_, x);
+  casadi_copy(NV_DATA_S(m->xz), nx_, m->xk);
   // Get outputs
-  if (y && ny_ > 0) eval_y(m, t, x, u, z, p, y);
+  if (m->y && ny_ > 0) eval_y(m, t, m->xk, m->u, m->zk, m->p, m->y);
   // Get stats
   THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
     &m->netfails, &m->qlast, &m->qcur, &m->hinused,
@@ -287,8 +276,8 @@ int CvodesSimulator::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
       + enum_traits<DynIn>::n_enum, nullptr);
     m->arg[DYN_T] = &t;  // t
     m->arg[DYN_X] = NV_DATA_S(x);  // x
-    m->arg[DYN_U] = m->uk;  // u
-    m->arg[DYN_P] = m->pk;  // p
+    m->arg[DYN_U] = m->u;  // u
+    m->arg[DYN_P] = m->p;  // p
     m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
     m->arg[enum_traits<DynIn>::n_enum
       + enum_traits<DynOut>::n_enum + DYN_X] = NV_DATA_S(v);  // fwd:x
@@ -347,8 +336,8 @@ int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum, nullptr);
     m->arg[DYN_T] = &t;  // t
     m->arg[DYN_X] = NV_DATA_S(x);  // x
-    m->arg[DYN_U] = m->uk;  // u
-    m->arg[DYN_P] = m->pk;  // p
+    m->arg[DYN_U] = m->u;  // u
+    m->arg[DYN_P] = m->p;  // p
     m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
     std::fill_n(m->res, enum_traits<DynIn>::n_enum * enum_traits<DynOut>::n_enum, nullptr);
     m->res[jac_ind] = m->jac;  // jac:ode:x

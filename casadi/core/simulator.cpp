@@ -337,7 +337,7 @@ int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w,
     // Integrate forward
     if (verbose_) casadi_message("Integrating to " + str(grid_[k])
       + ", stopping time " + str(grid_[k_stop]));
-    advance(m, grid_[k], grid_[k_stop], m->xk, m->u, m->zk, m->p, m->y);
+    advance(m, grid_[k], grid_[k_stop]);
     casadi_copy(m->xk, nx_, m->x);
     casadi_copy(m->zk, nz_, m->z);
     // Advance output time

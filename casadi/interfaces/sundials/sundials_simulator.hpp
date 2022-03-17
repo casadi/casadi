@@ -57,12 +57,6 @@ struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemo
   // N-vectors for the forward integration
   N_Vector xz;
 
-  // Controls
-  double *uk;
-
-  // Parameters
-  double *pk;
-
   // Jacobian
   double *jac;
 
