@@ -221,7 +221,7 @@ void CvodesSimulator::reset(SimulatorMemory* mem) const {
   // Re-initialize
   THROWING(CVodeReInit, m->mem, m->t, m->xz);
   // Get outputs
-  if (m->y && ny_ > 0) eval_y(m, m->t, m->xk, m->u, m->zk, m->p, m->y);
+  eval_y(m);
 }
 
 void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop) const {
@@ -233,7 +233,7 @@ void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop) con
   // Set function outputs
   casadi_copy(NV_DATA_S(m->xz), nx_, m->xk);
   // Get outputs
-  if (m->y && ny_ > 0) eval_y(m, t, m->xk, m->u, m->zk, m->p, m->y);
+  eval_y(m);
   // Get stats
   THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
     &m->netfails, &m->qlast, &m->qcur, &m->hinused,

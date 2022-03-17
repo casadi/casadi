@@ -117,8 +117,7 @@ Simulator : public OracleFunction, public PluginInterface<Simulator> {
   casadi_int next_stop(casadi_int k, const double* u) const;
 
   /** \brief  Evaluate output function */
-  virtual void eval_y(SimulatorMemory* mem, double t, const double* x, const double* u,
-    const double* z, const double* p, double* y) const;
+  virtual void eval_y(SimulatorMemory* mem) const;
 
   /** \brief  evaluate */
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;

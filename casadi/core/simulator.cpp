@@ -494,17 +494,18 @@ Function Simulator::map2oracle(const std::string& name,
   return Function(name, de_in, de_out, dyn_in(), dyn_out(), opts);
 }
 
-void Simulator::eval_y(SimulatorMemory* mem, double t, const double* x, const double* u,
-    const double* z, const double* p, double* y) const {
+void Simulator::eval_y(SimulatorMemory* mem) const {
+  // Quick return if nothing to calculate
+  if (!mem->y || ny_ == 0) return;
   // Calculate outputs
   std::fill_n(mem->arg, enum_traits<DynIn>::n_enum, nullptr);
-  mem->arg[DYN_T] = &t;
-  mem->arg[DYN_X] = x;
-  mem->arg[DYN_U] = u;
-  mem->arg[DYN_Z] = z;
-  mem->arg[DYN_P] = p;
+  mem->arg[DYN_T] = &mem->t;
+  mem->arg[DYN_X] = mem->xk;
+  mem->arg[DYN_U] = mem->u;
+  mem->arg[DYN_Z] = mem->zk;
+  mem->arg[DYN_P] = mem->p;
   std::fill_n(mem->res, enum_traits<DynOut>::n_enum, nullptr);
-  mem->res[DYN_YDEF] = y;
+  mem->res[DYN_YDEF] = mem->y;
   if (calc_function(mem, "dae")) casadi_error("'dae' calculation failed");
 }
 
