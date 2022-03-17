@@ -54,8 +54,9 @@ CASADI_EXPORT std::string to_string(InterpType v);
 
 // IdasMemory
 struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemory {
-  // N-vectors for the forward integration
+  // Current state
   N_Vector xz;
+  std::vector<N_Vector> fwd_xz;
 
   // Jacobian
   double *jac;

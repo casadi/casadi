@@ -214,12 +214,17 @@ int SundialsSimulator::init_mem(void* mem) const {
   if (Simulator::init_mem(mem)) return 1;
   auto m = static_cast<SundialsSimMemory*>(mem);
 
-  // Allocate n-vectors
+  // State as NVector
   m->xz = N_VNew_Serial(nx_+nz_);
-  if (scale_abstol_) {
-    m->abstolv = N_VNew_Serial(nx_+nz_);
-  }
 
+  // Sensitivities as NVector
+  m->fwd_xz.resize(nfwd_);
+  for (N_Vector& e : m->fwd_xz) e = N_VNew_Serial(nx_+nz_);
+
+  // Absolute tolerances as NVector
+  if (scale_abstol_) m->abstolv = N_VNew_Serial(nx_+nz_);
+
+  // Checkout linear solver instance
   m->mem_linsolF = linsolF_.checkout();
 
   return 0;
@@ -230,6 +235,11 @@ void SundialsSimulator::reset(SimulatorMemory* mem) const {
   // Set the state
   casadi_copy(m->xk, nx_, NV_DATA_S(m->xz));
   casadi_copy(m->zk, nz_, NV_DATA_S(m->xz) + nx_);
+  // Set forward sensitivities
+  for (size_t i = 0; i < nfwd_; ++i) {
+    casadi_copy(m->xk + i * nx_, nx_, NV_DATA_S(m->fwd_xz[i]));
+    casadi_copy(m->zk + i * nz_, nz_, NV_DATA_S(m->fwd_xz[i]) + nx_);
+  }
 }
 
 SundialsSimMemory::SundialsSimMemory() {
@@ -260,6 +270,7 @@ SundialsSimMemory::SundialsSimMemory() {
 SundialsSimMemory::~SundialsSimMemory() {
   if (this->xz) N_VDestroy_Serial(this->xz);
   if (this->abstolv) N_VDestroy_Serial(this->abstolv);
+  for (N_Vector& e : this->fwd_xz) N_VDestroy_Serial(e);
 }
 
 Dict SundialsSimulator::get_stats(void* mem) const {
