@@ -202,12 +202,16 @@ void SundialsSimulator::init(const Dict& opts) {
   // Allocate work vectors
   // alloc_w(nx_ + nz_, true);  // xz
   alloc_w(2 * (nx_+nz_), true); // v1, v2
+  // alloc_w(nx_ + nz_, true);  // xz
 
   // Allocate linear solvers
   Sparsity Jsp = J.sparsity_out("jac_ode_x");
   Jsp = Jsp + Sparsity::diag(Jsp.size());
   linsolF_ = Linsol("linsolF", linear_solver_, Jsp, linear_solver_options_);
   alloc_w(linsolF_.sparsity().nnz(), true);
+
+  // Absolute tolerances for sensitivity equations
+  if (!scale_abstol_) abstolS_.resize(nfwd_, abstol_);
 }
 
 int SundialsSimulator::init_mem(void* mem) const {
@@ -222,7 +226,12 @@ int SundialsSimulator::init_mem(void* mem) const {
   for (N_Vector& e : m->fwd_xz) e = N_VNew_Serial(nx_+nz_);
 
   // Absolute tolerances as NVector
-  if (scale_abstol_) m->abstolv = N_VNew_Serial(nx_+nz_);
+  if (scale_abstol_) {
+    m->abstolv = N_VNew_Serial(nx_+nz_);
+    // Sensitivity equations have the same tolerance
+    m->abstolvS.resize(nfwd_);
+    for (N_Vector& e : m->abstolvS) e = m->abstolv;
+  }
 
   // Checkout linear solver instance
   m->mem_linsolF = linsolF_.checkout();

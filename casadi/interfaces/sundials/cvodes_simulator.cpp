@@ -188,6 +188,21 @@ int CvodesSimulator::init_mem(void* mem) const {
     if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
   }
 
+  // Forward sensitivities
+  if (nfwd_ > 0) {
+    // Initialize sensitivity problem
+    int ism = CV_SIMULTANEOUS;  // or CV_STAGGERED
+    THROWING(CVodeSensInit, m->mem, nfwd_, ism, sens_rhs, get_ptr(m->fwd_xz));
+
+    // Set tolerances
+    if (scale_abstol_) {
+      THROWING(CVodeSensSVtolerances, m->mem, reltol_, get_ptr(m->abstolvS));
+    } else {
+      casadi_assert(!abstolS_.empty(), "here");
+      THROWING(CVodeSensSStolerances, m->mem, reltol_, const_cast<double*>(get_ptr(abstolS_)));
+    }
+  }
+
   return 0;
 }
 
@@ -220,7 +235,12 @@ void CvodesSimulator::reset(SimulatorMemory* mem) const {
   SundialsSimulator::reset(mem);
   // Re-initialize
   THROWING(CVodeReInit, m->mem, m->t, m->xz);
-  // Get outputs
+  // Forward sensitivities
+  if (nfwd_ > 0) {
+    int ism = CV_SIMULTANEOUS;  // or CV_STAGGERED
+    THROWING(CVodeSensReInit, m->mem, ism, get_ptr(m->fwd_xz));
+  }
+  // Get outputs at initial time
   eval_y(m);
 }
 
@@ -419,6 +439,21 @@ int CvodesSimulator::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsolve failed: " << e.what() << std::endl;
+    return -1;
+  }
+}
+
+int CvodesSimulator::sens_rhs(int Ns, realtype t, N_Vector y, N_Vector ydot, N_Vector *yS,
+    N_Vector *ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2) {
+  try {
+    //auto m = to_mem(cv_mem->cv_lmem);
+    casadi_error("not implemented");
+
+    return 0;
+  } catch(int flag) { // recoverable error
+    return flag;
+  } catch(std::exception& e) { // non-recoverable error
+    uerr() << "CvodesSimulator::sens_rhs failed: " << e.what() << std::endl;
     return -1;
   }
 }

@@ -136,20 +136,19 @@ protected:
   // Sundials callback functions
   static int rhs(double t, N_Vector x, N_Vector xdot, void *user_data);
   static void ehfun(int error_code, const char *module, const char *function, char *msg,
-                    void *user_data);
+    void *user_data);
   static int rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data);
   static int jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
-                    void *user_data, N_Vector tmp);
+    void *user_data, N_Vector tmp);
   static int psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
-                    double gamma, double delta, int lr, void *user_data, N_Vector tmp);
-  static int psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
-                    booleantype *jcurPtr, double gamma, void *user_data,
-                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                    booleantype *jcurPtr,
-                    N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  static int lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x,
-                    N_Vector xdot);
+    double gamma, double delta, int lr, void *user_data, N_Vector tmp);
+  static int psetup(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr,
+    double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr,
+     N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
+  static int sens_rhs(int Ns, realtype t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot,
+      void *user_data, N_Vector tmp1, N_Vector tmp2);
 
   // Throw error
   static void cvodes_error(const char* module, int flag);

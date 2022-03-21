@@ -63,6 +63,7 @@ struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemo
 
   // Absolute tolerance
   N_Vector abstolv;
+  std::vector<N_Vector> abstolvS;
 
   /// Stats
   long nsteps, nfevals, nlinsetups, netfails;
@@ -152,6 +153,9 @@ public:
   casadi_int max_order_;
   bool scale_abstol_;
   ///@}
+
+  // Scalar absolute tolerances for each sensitivity
+  std::vector<double> abstolS_;
 
   /// Linear solver
   Linsol linsolF_;
