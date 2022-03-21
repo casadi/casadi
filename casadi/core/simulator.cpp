@@ -319,11 +319,20 @@ int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w,
   // Get initial state, algebraic variable guess
   casadi_copy(m->x0, nx_, m->xk);
   casadi_copy(m->z0, nz_, m->zk);
+  // Forward seeds w.r.t. initial state
+  casadi_copy(m->fwd_x0, nfwd_ * nx_, m->fwd_xk);
+  casadi_copy(m->fwd_z0, nfwd_ * nz_, m->fwd_zk);
   // Reset solver, take time to t0, calculate outputs at t0
   m->t = grid_.front();
   reset(m);
+  // Get state
   casadi_copy(m->xk, nx_, m->x);
   casadi_copy(m->zk, nz_, m->z);
+  // Get state sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    casadi_copy(m->fwd_xk + nx_ * i, nx_, m->fwd_x + nx_ * ng_ * i);
+    casadi_copy(m->fwd_zk + nz_ * i, nz_, m->fwd_z + nz_ * ng_ * i);
+  }
   // Advance output time
   if (m->x) m->x += nx_;
   if (m->z) m->z += nz_;
@@ -340,9 +349,15 @@ int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w,
     advance(m, grid_[k], grid_[k_stop]);
     casadi_copy(m->xk, nx_, m->x);
     casadi_copy(m->zk, nz_, m->z);
+    // Collect state sensitivities
+    for (casadi_int i = 0; i < nfwd_; ++i) {
+      casadi_copy(m->fwd_xk + nx_ * i, nx_, m->fwd_x + nx_ * (ng_ * i + k));
+      casadi_copy(m->fwd_zk + nz_ * i, nz_, m->fwd_z + nz_ * (ng_ * i + k));
+    }
     // Advance output time
     if (m->x) m->x += nx_;
     if (m->u) m->u += nu_;
+    if (m->fwd_u) m->fwd_u += nu_;
     if (m->z) m->z += nz_;
     if (m->y) m->y += ny_;
   }

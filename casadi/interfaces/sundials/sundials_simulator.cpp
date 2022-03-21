@@ -204,12 +204,16 @@ void SundialsSimulator::init(const Dict& opts) {
   alloc_w(2 * (nx_+nz_), true); // v1, v2
   // alloc_w(nx_ + nz_, true);  // xz
 
-  // Allocate Jacobian
-  jac_sp_ = J.sparsity_out("jac_ode_x");
-  alloc_w(jac_sp_.nnz(), true);  // jac_nz
+  // Allocate Jacobians
+  jac_x_sp_ = J.sparsity_out("jac_ode_x");
+  jac_u_sp_ = J.sparsity_out("jac_ode_u");
+  jac_p_sp_ = J.sparsity_out("jac_ode_p");
+  alloc_w(jac_x_sp_.nnz(), true);  // jac_x
+  alloc_w(jac_u_sp_.nnz(), true);  // jac_u
+  alloc_w(jac_p_sp_.nnz(), true);  // jac_p
 
   // Allocate linear solver
-  lin_sp_ = jac_sp_ + Sparsity::diag(jac_sp_.size());
+  lin_sp_ = jac_x_sp_ + Sparsity::diag(jac_x_sp_.size());
   linsolF_ = Linsol("linsolF", linear_solver_, lin_sp_, linear_solver_options_);
   alloc_w(lin_sp_.nnz(), true);  // lin_nz
 
@@ -249,15 +253,15 @@ void SundialsSimulator::reset(SimulatorMemory* mem) const {
   casadi_copy(m->zk, nz_, NV_DATA_S(m->xz) + nx_);
   // Set forward sensitivities
   for (size_t i = 0; i < nfwd_; ++i) {
-    casadi_copy(m->xk + i * nx_, nx_, NV_DATA_S(m->fwd_xz[i]));
-    casadi_copy(m->zk + i * nz_, nz_, NV_DATA_S(m->fwd_xz[i]) + nx_);
+    casadi_copy(m->fwd_xk + i * nx_, nx_, NV_DATA_S(m->fwd_xz[i]));
+    casadi_copy(m->fwd_zk + i * nz_, nz_, NV_DATA_S(m->fwd_xz[i]) + nx_);
   }
 }
 
 SundialsSimMemory::SundialsSimMemory() {
   // Set pointers to null
   this->xz  = nullptr;
-  this->jac_nz = nullptr;
+  this->jac_x = this->jac_u = this->jac_p = nullptr;
   this->lin_nz = nullptr;
   this->v1 = this->v2 = nullptr;
   this->abstolv  = nullptr;
@@ -333,7 +337,9 @@ void SundialsSimulator::set_work(void* mem, const double**& arg, double**& res,
   // Work vectors
   m->v1 = w; w += nx_ + nz_;
   m->v2 = w; w += nx_ + nz_;
-  m->jac_nz = w; w += jac_sp_.nnz();
+  m->jac_x = w; w += jac_x_sp_.nnz();
+  m->jac_u = w; w += jac_u_sp_.nnz();
+  m->jac_p = w; w += jac_p_sp_.nnz();
   m->lin_nz = w; w += lin_sp_.nnz();
 }
 

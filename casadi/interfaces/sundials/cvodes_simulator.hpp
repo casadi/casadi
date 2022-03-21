@@ -147,8 +147,8 @@ protected:
   static int lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr,
      N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
-  static int sens_rhs(int Ns, realtype t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot,
-      void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int sens_rhs(int Ns, realtype t, N_Vector x, N_Vector xdot, N_Vector *fwd_x,
+      N_Vector *fwd_xdot, void *user_data, N_Vector tmp1, N_Vector tmp2);
 
   // Update Jacobian
   int calculate_jac(CvodesSimMemory* m, double t, N_Vector x, N_Vector xdot) const;

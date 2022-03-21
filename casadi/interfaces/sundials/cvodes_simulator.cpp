@@ -250,8 +250,14 @@ void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop) con
   THROWING(CVodeSetStopTime, m->mem, t_stop);
   // Integrate
   THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
-  // Set function outputs
   casadi_copy(NV_DATA_S(m->xz), nx_, m->xk);
+  //Get forward sensitivities
+  if (nfwd_ > 0) {
+    THROWING(CVodeGetSens, m->mem, &m->t, get_ptr(m->fwd_xz));
+    for (size_t i = 0; i < nfwd_; ++i) {
+      casadi_copy(NV_DATA_S(m->fwd_xz[i]), nx_, m->fwd_xk + i * nx_);
+    }
+  }
   // Get outputs
   eval_y(m);
   // Get stats
@@ -356,11 +362,11 @@ int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     *jcurPtr = 1;
 
     // Copy Jacobian and scale with -gamma
-    casadi_copy(m->jac_nz, s.jac_sp_.nnz(), m->lin_nz);
-    casadi_scal(s.jac_sp_.nnz(), -gamma, m->lin_nz);
+    casadi_copy(m->jac_x, s.jac_x_sp_.nnz(), m->lin_nz);
+    casadi_scal(s.jac_x_sp_.nnz(), -gamma, m->lin_nz);
 
     // Add diagonal contribution, project to correct sparsity
-    add_diag(s.jac_sp_, m->lin_nz, 1., s.lin_sp_, NV_DATA_S(tmp1));
+    add_diag(s.jac_x_sp_, m->lin_nz, 1., s.lin_sp_, NV_DATA_S(tmp1));
 
     // Prepare the solution of the linear system (e.g. factorize)
     if (s.linsolF_.nfact(m->lin_nz, m->mem_linsolF)) casadi_error("'jac' factorization failed");
@@ -375,9 +381,6 @@ int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
 }
 
 int CvodesSimulator::calculate_jac(CvodesSimMemory* m, double t, N_Vector x, N_Vector xdot) const {
-  // Index of the Jacobian being calculated (jac:ode:x)
-  casadi_int jac_ind = DYN_X + enum_traits<DynIn>::n_enum * DYN_ODE;
-
   // Set input and output buffers
   std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum, nullptr);
   m->arg[DYN_T] = &t;  // t
@@ -386,7 +389,9 @@ int CvodesSimulator::calculate_jac(CvodesSimMemory* m, double t, N_Vector x, N_V
   m->arg[DYN_P] = m->p;  // p
   m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
   std::fill_n(m->res, enum_traits<DynIn>::n_enum * enum_traits<DynOut>::n_enum, nullptr);
-  m->res[jac_ind] = m->jac_nz;  // jac:ode:x
+  m->res[DYN_X + enum_traits<DynIn>::n_enum * DYN_ODE] = m->jac_x;  // jac:ode:x
+  m->res[DYN_U + enum_traits<DynIn>::n_enum * DYN_ODE] = m->jac_u;  // jac:ode:u
+  m->res[DYN_P + enum_traits<DynIn>::n_enum * DYN_ODE] = m->jac_p;  // jac:ode:p
 
   // Evaluate
   if (calc_function(m, "jac")) return 1;
@@ -451,12 +456,27 @@ int CvodesSimulator::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
   }
 }
 
-int CvodesSimulator::sens_rhs(int Ns, realtype t, N_Vector y, N_Vector ydot, N_Vector *yS,
-    N_Vector *ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2) {
+int CvodesSimulator::sens_rhs(int Ns, realtype t, N_Vector x, N_Vector xdot, N_Vector *fwd_x,
+    N_Vector *fwd_xdot, void *user_data, N_Vector tmp1, N_Vector tmp2) {
   try {
-    //auto m = to_mem(cv_mem->cv_lmem);
-    casadi_error("not implemented");
-
+    auto m = to_mem(user_data);
+    auto& s = m->self;
+    // Calculate Jacobian
+    if (s.calculate_jac(m, t, x, xdot)) casadi_error("'jac' calculation failed");
+    // Perform Jacobian-vector multiplications (can be parallelized if it matters)
+    for (int k = 0; k < Ns; ++k) {
+      // Consistency checks
+      casadi_assert(NV_LENGTH_S(fwd_x[k]) == s.nx_, "Dimension mismatch");
+      casadi_assert(NV_LENGTH_S(fwd_xdot[k]) == s.nx_, "Dimension mismatch");
+      // Get pointers to data
+      double *fwd_x_k = NV_DATA_S(fwd_x[k]), *fwd_xdot_k = NV_DATA_S(fwd_xdot[k]);
+      // Clear fwd_xdot
+      casadi_clear(fwd_xdot_k, s.nx_);
+      // Matrix-vector multiplications
+      casadi_mv(m->jac_x, s.jac_x_sp_, fwd_x_k, fwd_xdot_k, false);
+      casadi_mv(m->jac_u, s.jac_u_sp_, m->fwd_u + s.nu_ * (s.ng_ - 1) * k, fwd_xdot_k, false);
+      casadi_mv(m->jac_p, s.jac_p_sp_, m->fwd_p, fwd_xdot_k, false);
+    }
     return 0;
   } catch(int flag) { // recoverable error
     return flag;
