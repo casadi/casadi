@@ -59,7 +59,10 @@ struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemo
   std::vector<N_Vector> fwd_xz;
 
   // Jacobian
-  double *jac;
+  double *jac_nz;
+
+  // Linear system of equations
+  double *lin_nz;
 
   // Absolute tolerance
   N_Vector abstolv;
@@ -165,6 +168,9 @@ public:
 
   // Interpolation
   InterpType interp_;
+
+  // Jacobian, linear system sparsity
+  Sparsity jac_sp_, lin_sp_;
 
   /// Linear solver data (dense) -- what is this?
   struct LinSolDataDense {};

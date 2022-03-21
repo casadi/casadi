@@ -326,7 +326,7 @@ int CvodesSimulator::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
     casadi_copy(v, s.nx_, m->v1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolF_.solve(m->jac, m->v1, 1, false, m->mem_linsolF))
+    if (s.linsolF_.solve(m->lin_nz, m->v1, 1, false, m->mem_linsolF))
       casadi_error("Linear system solve failed");
     v = NV_DATA_S(z); // possibly different from r
     casadi_copy(m->v1, s.nx_, v);
@@ -349,34 +349,21 @@ int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     // Store gamma for later
     m->gamma = gamma;
 
-    // Index of the Jacobian being calculated (jac:ode:x)
-    casadi_int jac_ind = DYN_X + enum_traits<DynIn>::n_enum * DYN_ODE;
-
-    // Set input and output buffers
-    std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum, nullptr);
-    m->arg[DYN_T] = &t;  // t
-    m->arg[DYN_X] = NV_DATA_S(x);  // x
-    m->arg[DYN_U] = m->u;  // u
-    m->arg[DYN_P] = m->p;  // p
-    m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
-    std::fill_n(m->res, enum_traits<DynIn>::n_enum * enum_traits<DynOut>::n_enum, nullptr);
-    m->res[jac_ind] = m->jac;  // jac:ode:x
+    // Calculate Jacobian
+    if (s.calculate_jac(m, t, x, xdot)) casadi_error("'jac' calculation failed");
 
     // Jacobian is now current
     *jcurPtr = 1;
 
-    // Evaluate
-    if (s.calc_function(m, "jac")) casadi_error("'jac' calculation failed");
-
-    // Scale with -gamma
-    casadi_scal(s.get_function("jac").sparsity_out(jac_ind).nnz(), -gamma, m->jac);
+    // Copy Jacobian and scale with -gamma
+    casadi_copy(m->jac_nz, s.jac_sp_.nnz(), m->lin_nz);
+    casadi_scal(s.jac_sp_.nnz(), -gamma, m->lin_nz);
 
     // Add diagonal contribution, project to correct sparsity
-    add_diag(s.get_function("jac").sparsity_out(jac_ind), m->jac, 1.,
-      s.linsolF_.sparsity(), NV_DATA_S(tmp1));
+    add_diag(s.jac_sp_, m->lin_nz, 1., s.lin_sp_, NV_DATA_S(tmp1));
 
     // Prepare the solution of the linear system (e.g. factorize)
-    if (s.linsolF_.nfact(m->jac, m->mem_linsolF)) casadi_error("'jac' factorization failed");
+    if (s.linsolF_.nfact(m->lin_nz, m->mem_linsolF)) casadi_error("'jac' factorization failed");
 
     return 0;
   } catch(int flag) { // recoverable error
@@ -385,6 +372,27 @@ int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     uerr() << "psetup failed: " << e.what() << std::endl;
     return -1;
   }
+}
+
+int CvodesSimulator::calculate_jac(CvodesSimMemory* m, double t, N_Vector x, N_Vector xdot) const {
+  // Index of the Jacobian being calculated (jac:ode:x)
+  casadi_int jac_ind = DYN_X + enum_traits<DynIn>::n_enum * DYN_ODE;
+
+  // Set input and output buffers
+  std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum, nullptr);
+  m->arg[DYN_T] = &t;  // t
+  m->arg[DYN_X] = NV_DATA_S(x);  // x
+  m->arg[DYN_U] = m->u;  // u
+  m->arg[DYN_P] = m->p;  // p
+  m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
+  std::fill_n(m->res, enum_traits<DynIn>::n_enum * enum_traits<DynOut>::n_enum, nullptr);
+  m->res[jac_ind] = m->jac_nz;  // jac:ode:x
+
+  // Evaluate
+  if (calc_function(m, "jac")) return 1;
+
+  // Successful return
+  return 0;
 }
 
 int CvodesSimulator::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,

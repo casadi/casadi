@@ -204,11 +204,14 @@ void SundialsSimulator::init(const Dict& opts) {
   alloc_w(2 * (nx_+nz_), true); // v1, v2
   // alloc_w(nx_ + nz_, true);  // xz
 
-  // Allocate linear solvers
-  Sparsity Jsp = J.sparsity_out("jac_ode_x");
-  Jsp = Jsp + Sparsity::diag(Jsp.size());
-  linsolF_ = Linsol("linsolF", linear_solver_, Jsp, linear_solver_options_);
-  alloc_w(linsolF_.sparsity().nnz(), true);
+  // Allocate Jacobian
+  jac_sp_ = J.sparsity_out("jac_ode_x");
+  alloc_w(jac_sp_.nnz(), true);  // jac_nz
+
+  // Allocate linear solver
+  lin_sp_ = jac_sp_ + Sparsity::diag(jac_sp_.size());
+  linsolF_ = Linsol("linsolF", linear_solver_, lin_sp_, linear_solver_options_);
+  alloc_w(lin_sp_.nnz(), true);  // lin_nz
 
   // Absolute tolerances for sensitivity equations
   if (!scale_abstol_) abstolS_.resize(nfwd_, abstol_);
@@ -254,7 +257,8 @@ void SundialsSimulator::reset(SimulatorMemory* mem) const {
 SundialsSimMemory::SundialsSimMemory() {
   // Set pointers to null
   this->xz  = nullptr;
-  this->jac = nullptr;
+  this->jac_nz = nullptr;
+  this->lin_nz = nullptr;
   this->v1 = this->v2 = nullptr;
   this->abstolv  = nullptr;
   // Reset stats
@@ -329,7 +333,8 @@ void SundialsSimulator::set_work(void* mem, const double**& arg, double**& res,
   // Work vectors
   m->v1 = w; w += nx_ + nz_;
   m->v2 = w; w += nx_ + nz_;
-  m->jac = w; w += linsolF_.sparsity().nnz();
+  m->jac_nz = w; w += jac_sp_.nnz();
+  m->lin_nz = w; w += lin_sp_.nnz();
 }
 
 void SundialsSimulator::add_diag(const casadi_int* sp, double *nz, double v,

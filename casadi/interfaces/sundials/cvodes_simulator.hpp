@@ -150,6 +150,9 @@ protected:
   static int sens_rhs(int Ns, realtype t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot,
       void *user_data, N_Vector tmp1, N_Vector tmp2);
 
+  // Update Jacobian
+  int calculate_jac(CvodesSimMemory* m, double t, N_Vector x, N_Vector xdot) const;
+
   // Throw error
   static void cvodes_error(const char* module, int flag);
 
