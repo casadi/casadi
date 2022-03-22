@@ -212,6 +212,9 @@ void SundialsSimulator::init(const Dict& opts) {
   alloc_w(jac_u_sp_.nnz(), true);  // jac_u
   alloc_w(jac_p_sp_.nnz(), true);  // jac_p
 
+  // Last input values for Jacobian evaluation
+  alloc_w(oracle_.nnz_in(), true);  // last_jac_in
+
   // Allocate linear solver
   lin_sp_ = jac_x_sp_ + Sparsity::diag(jac_x_sp_.size());
   linsolF_ = Linsol("linsolF", linear_solver_, lin_sp_, linear_solver_options_);
@@ -256,12 +259,15 @@ void SundialsSimulator::reset(SimulatorMemory* mem) const {
     casadi_copy(m->fwd_xk + i * nx_, nx_, NV_DATA_S(m->fwd_xz[i]));
     casadi_copy(m->fwd_zk + i * nz_, nz_, NV_DATA_S(m->fwd_xz[i]) + nx_);
   }
+  // Clear Jacobian input cache
+  casadi_fill(m->last_jac_in, oracle_.nnz_in(), casadi::nan);
 }
 
 SundialsSimMemory::SundialsSimMemory() {
   // Set pointers to null
   this->xz  = nullptr;
   this->jac_x = this->jac_u = this->jac_p = nullptr;
+  this->last_jac_in = nullptr;
   this->lin_nz = nullptr;
   this->v1 = this->v2 = nullptr;
   this->abstolv  = nullptr;
@@ -340,6 +346,8 @@ void SundialsSimulator::set_work(void* mem, const double**& arg, double**& res,
   m->jac_x = w; w += jac_x_sp_.nnz();
   m->jac_u = w; w += jac_u_sp_.nnz();
   m->jac_p = w; w += jac_p_sp_.nnz();
+  m->last_jac_in = w; w += oracle_.nnz_in();
+
   m->lin_nz = w; w += lin_sp_.nnz();
 }
 
@@ -369,6 +377,31 @@ void SundialsSimulator::add_diag(const casadi_int* sp, double *nz, double v,
     for (k = colind[c]; k < colind[c + 1]; ++k) w[row[k]] = 0;
     w[c] = 0;
   }
+}
+
+bool SundialsSimulator::update_jac_in(SundialsSimMemory* m) const {
+  // Are there any changes to the inputs?
+  bool changed = false;
+  // Last inputs
+  double* last_jac_in = m->last_jac_in;
+  // Loop over oracle/Jacobian inputs
+  for (casadi_int i = 0; i < oracle_.n_in(); ++i) {
+    casadi_int nnz = oracle_.nnz_in(i);
+    if (m->arg[i]) {
+      // Input vector given
+      for (casadi_int k = 0; k < nnz; ++k) {
+        changed = changed || *last_jac_in != m->arg[i][k];
+        *last_jac_in++ = m->arg[i][k];
+      }
+    } else {
+      // Null: All-zero
+      for (casadi_int k = 0; k < nnz; ++k) {
+        changed = changed || *last_jac_in != 0.;
+        *last_jac_in++ = 0.;
+      }
+    }
+  }
+  return changed;
 }
 
 } // namespace casadi

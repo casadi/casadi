@@ -381,17 +381,27 @@ int CvodesSimulator::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
 }
 
 int CvodesSimulator::calculate_jac(CvodesSimMemory* m, double t, N_Vector x, N_Vector xdot) const {
-  // Set input and output buffers
+  // Input buffers
   std::fill_n(m->arg, enum_traits<DynIn>::n_enum + enum_traits<DynOut>::n_enum, nullptr);
   m->arg[DYN_T] = &t;  // t
   m->arg[DYN_X] = NV_DATA_S(x);  // x
   m->arg[DYN_U] = m->u;  // u
   m->arg[DYN_P] = m->p;  // p
   m->arg[enum_traits<DynIn>::n_enum + DYN_ODE] = NV_DATA_S(xdot);  // ode
+
+  // Output buffers
   std::fill_n(m->res, enum_traits<DynIn>::n_enum * enum_traits<DynOut>::n_enum, nullptr);
   m->res[DYN_X + enum_traits<DynIn>::n_enum * DYN_ODE] = m->jac_x;  // jac:ode:x
   m->res[DYN_U + enum_traits<DynIn>::n_enum * DYN_ODE] = m->jac_u;  // jac:ode:u
   m->res[DYN_P + enum_traits<DynIn>::n_enum * DYN_ODE] = m->jac_p;  // jac:ode:p
+
+#if 0
+  // Update input cache
+  bool changed = update_jac_in(m);
+
+  // Quick return if inputs unchanged from last call
+  if (!changed) return 0;
+#endif
 
   // Evaluate
   if (calc_function(m, "jac")) return 1;

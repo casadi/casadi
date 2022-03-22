@@ -61,6 +61,9 @@ struct CASADI_SUNDIALS_SIMULATOR_EXPORT SundialsSimMemory : public SimulatorMemo
   // Jacobian blocks
   double *jac_x, *jac_u, *jac_p;
 
+  // Last used input values for Jacobian evaluation
+  double *last_jac_in;
+
   // Linear system of equations
   double *lin_nz;
 
@@ -136,6 +139,9 @@ public:
   /** \brief Add a diagonal contribution to a matrix */
   static void add_diag(const casadi_int* sp, double *nz, double v,
     const casadi_int* sp_new, double *w);
+
+  /** \brief  Update Jacobian input cache */
+  bool update_jac_in(SundialsSimMemory* m) const;
 
   ///@{
   /// Options
