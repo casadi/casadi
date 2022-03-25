@@ -177,6 +177,9 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     vr_out_.push_back(v.value_reference);
   }
 
+  casadi_assert_dev(isUnique(vr_in_));
+  casadi_assert_dev(isUnique(vr_out_));
+
   // Numerical values for inputs
   value_in_.resize(iind_.size());
 
@@ -191,7 +194,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   init_string_.clear();
   for (const Variable& v : dae->variables_) {
     // Skip if the wrong type
-    if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
+    if (v.causality != Causality::PARAMETER && v.causality != Causality::CALCULATED_PARAMETER && v.causality != Causality::INPUT) continue;
     // If nan - variable has not been set - keep default value
     if (std::isnan(v.value)) continue;
     // Value reference
@@ -219,6 +222,11 @@ void Fmu::init(const DaeBuilderInternal* dae) {
         casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
     }
   }
+
+  casadi_assert_dev(isUnique(vr_real_));
+  casadi_assert_dev(isUnique(vr_integer_));
+  casadi_assert_dev(isUnique(vr_boolean_));
+  casadi_assert_dev(isUnique(vr_string_));
 
   // Collect auxilliary variables
   vn_aux_real_.clear();
@@ -292,6 +300,8 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     load_function("fmi2ExitInitializationMode"));
   enter_continuous_time_mode_ = reinterpret_cast<fmi2EnterContinuousTimeModeTYPE*>(
     load_function("fmi2EnterContinuousTimeMode"));
+  enter_event_mode_ = reinterpret_cast<fmi2EnterEventModeTYPE*>(
+    load_function("fmi2EnterEventMode"));
   get_real_ = reinterpret_cast<fmi2GetRealTYPE*>(load_function("fmi2GetReal"));
   set_real_ = reinterpret_cast<fmi2SetRealTYPE*>(load_function("fmi2SetReal"));
   get_integer_ = reinterpret_cast<fmi2GetIntegerTYPE*>(load_function("fmi2GetInteger"));
@@ -423,6 +433,7 @@ int Fmu::init_mem(FmuMemory* m) const {
   if (enter_initialization_mode(m->c)) return 1;
   // Initialization mode ends
   if (exit_initialization_mode(m->c)) return 1;
+  
   // Allocate/reset input buffer
   m->ibuf_.resize(iind_.size());
   std::fill(m->ibuf_.begin(), m->ibuf_.end(), casadi::nan);
@@ -522,6 +533,24 @@ int Fmu::enter_initialization_mode(fmi2Component c) const {
   return 0;
 }
 
+int Fmu::enter_continuous_time_mode(fmi2Component c) const {
+  fmi2Status status = enter_continuous_time_mode_(c);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2EnterContinuousTimeMode failed: " + str(status));
+    return 1;
+  }
+  return 0;
+}
+
+int Fmu::enter_event_mode(fmi2Component c) const {
+  fmi2Status status = enter_event_mode_(c);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2EnterEventMode failed: " + str(status));
+    return 1;
+  }
+  return 0;
+}
+
 int Fmu::exit_initialization_mode(fmi2Component c) const {
   fmi2Status status = exit_initialization_mode_(c);
   if (status != fmi2OK) {
@@ -532,6 +561,7 @@ int Fmu::exit_initialization_mode(fmi2Component c) const {
 }
 
 int Fmu::set_values(fmi2Component c) const {
+
   // Pass real values before initialization
   if (!vr_real_.empty()) {
     fmi2Status status = set_real_(c, get_ptr(vr_real_), vr_real_.size(), get_ptr(init_real_));
@@ -567,6 +597,7 @@ int Fmu::set_values(fmi2Component c) const {
       casadi_error("fmi2SetString failed for value reference " + str(vr));
     }
   }
+
   // Successful return
   return 0;
 }
@@ -701,12 +732,16 @@ int Fmu::eval(FmuMemory* m) const {
   size_t n_out = m->id_out_.size();
   // Fmi return flag
   fmi2Status status;
+
+  //if (enter_initialization_mode(m->c)) return 1;
   // Set all variables
   status = set_real_(m->c, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
   }
+
+  //if (exit_initialization_mode(m->c)) return 1;
   // Quick return if nothing requested
   if (n_out == 0) return 0;
   // Calculate all variables
@@ -1085,6 +1120,7 @@ Fmu::Fmu(const std::vector<std::string>& scheme_in,
   enter_initialization_mode_ = 0;
   exit_initialization_mode_ = 0;
   enter_continuous_time_mode_ = 0;
+  enter_event_mode_ = 0;
   set_real_ = 0;
   set_boolean_ = 0;
   get_real_ = 0;
@@ -1961,6 +1997,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       fmu_->set(m, in_[k].ind, m->arg[k]);
     }
   }
+
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
     if (m->res[k] && out_[k].type == OutputType::REG) {

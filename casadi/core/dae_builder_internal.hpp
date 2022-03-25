@@ -336,6 +336,8 @@ protected:
   // User-set options
   bool debug_;
   double fmutol_;
+  std::vector<std::string>  extra_outputs_;
+  bool parameter_dep_;
 
   // FMI attributes
   std::string fmi_version_;

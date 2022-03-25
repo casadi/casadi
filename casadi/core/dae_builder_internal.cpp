@@ -232,12 +232,17 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   // Default options
   debug_ = false;
   fmutol_ = 0;
+  parameter_dep_ = false;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="debug") {
       debug_ = op.second;
     } else if (op.first=="fmutol") {
       fmutol_ = op.second;
+    } else if (op.first=="extra_outputs") {
+      extra_outputs_ = op.second;
+    } else if (op.first=="parameter_dep") {
+      parameter_dep_ = true;
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -281,6 +286,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   for (size_t k = 0; k < variables_.size(); ++k) {
     // Get reference to the variable
     Variable& v = variables_[k];
+
     // Skip variable if name starts with underscore
     if (v.name.rfind("_", 0) == 0) continue;
     // Sort by types
@@ -294,7 +300,18 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       c_.push_back(k);
       v.beq = v.start;
     } else if (v.variability == Variability::FIXED || v.variability == Variability::TUNABLE) {
-      p_.push_back(k);
+      /**
+       * Variable v(name);
+  v.v = MX::sym(name);
+  v.variability = Variability::FIXED;
+  v.causality = Causality::CALCULATED_PARAMETER;
+  v.beq = new_ddef;
+  d_.push_back(add_variable(name, v));
+       * 
+       */
+      if (v.causality != Causality::CALCULATED_PARAMETER) {
+        p_.push_back(k);
+      }
     } else if (v.variability == Variability::CONTINUOUS) {
       // Add to list of differential equations?
       if (v.der >= 0) {
@@ -2136,6 +2153,11 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       variables_.at(it->der_of).der = it - variables_.begin();
     }
   }
+  // Promote variables to outputs as needed
+  for (auto& e : extra_outputs_) {
+    Variable& v = variables_.at(find(e));
+    v.causality = Causality::OUTPUT;
+  }
 }
 
 void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
@@ -2148,6 +2170,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       Variable& v = variables_.at(outputs_.back());
       // Get dependencies
       v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
+
       // dependenciesKind attribute, if present
       if (e.has_attribute("dependenciesKind")) {
         // Load list of strings
@@ -2158,12 +2181,54 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           v.dependenciesKind.push_back(to_enum<DependenciesKind>(s));
         }
       }
-      // Mark interdependencies, change to index-0
+      // Change to index-0
       for (casadi_int& d : v.dependencies) {
-        variables_.at(--d).dependency = true;
+        d--;
       }
+
+      if (parameter_dep_) {
+        // Add parameter dependencies
+        for (size_t k = 0; k < variables_.size(); ++k) {
+          // Get reference to the variable
+          const Variable& d = variables_[k];
+          if (d.causality == Causality::PARAMETER) {
+            v.dependencies.push_back(k);
+            v.dependenciesKind.push_back(DependenciesKind::DEPENDENT);
+          }
+        }
+      }
+
+      // Mark interdependencies
+      for (casadi_int& d : v.dependencies) {
+        variables_.at(d).dependency = true;
+      }
+
     }
   }
+
+  // Add extra outputs
+  for (auto& e: extra_outputs_) {
+    Variable& v = variables_.at(find(e));
+    
+    // Add parameter dependencies
+    for (size_t k = 0; k < variables_.size(); ++k) {
+      // Get reference to the variable
+      const Variable& d = variables_[k];
+
+      if (parameter_dep_ && d.causality == Causality::PARAMETER ||
+          d.causality == Causality::INPUT ||
+          d.variability == Variability::CONTINUOUS) {
+        v.dependencies.push_back(k);
+        v.dependenciesKind.push_back(DependenciesKind::DEPENDENT);
+      }
+    }
+
+    // Mark interdependencies
+    for (casadi_int& d : v.dependencies) {
+      variables_.at(d).dependency = true;
+    }
+  }
+
   // Derivatives
   if (n.has_child("Derivatives")) {
     for (auto& e : n["Derivatives"].children) {
@@ -2173,6 +2238,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       Variable& v = variables_.at(derivatives_.back());
       // Get dependencies
       v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
+
       // dependenciesKind attribute, if present
       if (e.has_attribute("dependenciesKind")) {
         // Load list of strings
@@ -2183,10 +2249,28 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           v.dependenciesKind.push_back(to_enum<DependenciesKind>(s));
         }
       }
-      // Mark interdependencies, change to index-0
+      // Change to index-0
       for (casadi_int& d : v.dependencies) {
-        variables_.at(--d).dependency = true;
+        d--;
       }
+
+      if (parameter_dep_) {
+        // Add parameter dependencies
+        for (size_t k = 0; k < variables_.size(); ++k) {
+          // Get reference to the variable
+          const Variable& d = variables_[k];
+          if (d.causality == Causality::PARAMETER) {
+            v.dependencies.push_back(k);
+            v.dependenciesKind.push_back(DependenciesKind::DEPENDENT);
+          }
+        }
+      }
+
+       // Mark interdependencies
+      for (casadi_int& d : v.dependencies) {
+        variables_.at(d).dependency = true;
+      }
+
     }
   }
   // Initial unknowns

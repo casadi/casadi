@@ -542,6 +542,7 @@ struct CASADI_EXPORT Fmu {
   fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
   fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
   fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
+  fmi2EnterEventModeTYPE* enter_event_mode_;
   fmi2GetRealTYPE* get_real_;
   fmi2SetRealTYPE* set_real_;
   fmi2GetBooleanTYPE* get_boolean_;
@@ -619,6 +620,12 @@ struct CASADI_EXPORT Fmu {
 
   // Exit initialization mode
   int exit_initialization_mode(fmi2Component c) const;
+
+  // Enter continuous time mode
+  int enter_continuous_time_mode(fmi2Component c) const;
+
+  // Enter event mode
+  int enter_event_mode(fmi2Component c) const;
 
   // Copy values set in DaeBuilder to FMU
   int set_values(fmi2Component c) const;
