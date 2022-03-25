@@ -89,9 +89,9 @@ distinfo_dir = os.path.join(bdist_dir,'%s.dist-info' % wheel_dist_name)
 if not os.path.exists(distinfo_dir):
   os.mkdir(distinfo_dir)
 
-for d in os.listdir(dir_name):
-  if not d.startswith("casadi"):
-    shutil.move(os.path.join(dir_name, d),os.path.join(bdist_dir,"casadi"))
+#for d in os.listdir(dir_name):
+#  if not d.startswith("casadi"):
+#    shutil.move(os.path.join(dir_name, d),os.path.join(bdist_dir,"casadi"))
 
 msg = Message()
 msg['Wheel-Version'] = '1.0'  # of the spec
