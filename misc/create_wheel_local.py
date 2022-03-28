@@ -34,10 +34,8 @@ if "+" in version:
 if version.startswith("v"):
   version = version[1:]
 if os_name=="linux":
-  if arch=="manylinux1-x86":
-    arch = "manylinux1_i686"
-  elif arch=="manylinux1-x64":
-    arch = "manylinux2010_x86_64"
+  arch = arch.replace("x86","i686")
+  arch = arch.replace("x64","x86_64")
   tag = "cp%s-none-%s" % (pyversion,arch.replace("-","_"))
 elif os_name=="osx":
   tag = ["cp%s-none-macosx_10_13_x86_64" % (pyversion),
