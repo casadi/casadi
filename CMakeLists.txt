@@ -436,7 +436,7 @@ endif()
 # the following commands are needed to fix a problem with the libraries
 # for linux 64 bits
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
-  message(STATUS "x86_64 architecture detected - setting flag -fPIC")
+  message(STATUS "x86_64 or aarch64 architecture detected - setting flag -fPIC")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
