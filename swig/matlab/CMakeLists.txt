@@ -40,6 +40,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
               ${CMAKE_CURRENT_SOURCE_DIR}/SwigType.m
               ${CMAKE_CURRENT_SOURCE_DIR}/returntypes_call.m
               ${CMAKE_CURRENT_SOURCE_DIR}/returntypes.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/casadi_init_struct.m
   DESTINATION ${MATLAB_PREFIX})
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/OptiCallbackHelper.m

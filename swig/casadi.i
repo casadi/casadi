@@ -204,6 +204,37 @@
   casadi::InterruptHandler::clearInterrupted = casadi::mexclearinterrupted;
 
   casadi::InterruptHandler::is_main_thread();
+  
+  // Get file separator
+  mxArray *dict;
+  mexCallMATLAB(1, &dict, 0, 0, "casadi_init_struct");
+  if (mxIsStruct(dict)) {
+    int nfields = mxGetNumberOfFields(dict);
+    for(int i=0; i<nfields; i++) {
+      mxArray* elem = mxGetFieldByNumber(dict, 0, i);
+      std::string key = mxGetFieldNameByNumber(dict, i);
+      if (mxIsChar(elem)) {
+         std::string elems = mxArrayToString(elem);
+         casadi::uout() << "key" << key << ":" << elems <<std::endl;
+         if (key=="defaultCompiler") {
+           casadi::GlobalOptions::setDefaultCompiler(elems);
+         } else if (key=="defaultLinker") {
+           casadi::GlobalOptions::setDefaultLinker(elems);
+         } else if (key=="defaultCompilerSetup") {
+           casadi::GlobalOptions::setDefaultCompilerSetup(elems);
+         } else if (key=="defaultLinkerSetup") {
+           casadi::GlobalOptions::setDefaultLinkerSetup(elems);
+         } else if (key=="defaultCompilerOutputFlag") {
+           casadi::GlobalOptions::setDefaultCompilerOutputFlag(elems);
+         } else if (key=="defaultLinkerOutputFlag") {
+           casadi::GlobalOptions::setDefaultLinkerOutputFlag(elems);
+         } else if (key=="error") {
+           casadi::uerr() << "Exception thrown in casadi_init_struct" << ":" << elems <<std::endl;
+         }
+      }
+    }
+  }
+  mxDestroyArray(dict);
 
 %}
 #endif

@@ -147,24 +147,15 @@ namespace casadi {
     vector<string> compiler_flags;
     vector<string> linker_flags;
     string suffix = OBJECT_FILE_SUFFIX;
-
-#ifdef _WIN32
-    string compiler = "cl.exe";
-    string linker = "link.exe";
-    string compiler_setup = "/c";
-    string linker_setup = "/DLL";
-    std::string compiler_output_flag = "/Fo";
-    std::string linker_output_flag = "/out:";
-    extra_suffixes_ = {".exp", ".lib"};
-#else
-    string compiler = "gcc";
-    string linker = "gcc";
-    string compiler_setup = "-fPIC -c";
-    string linker_setup = "-shared";
-    std::string compiler_output_flag = "-o ";
-    std::string linker_output_flag = "-o ";
-#endif
-
+    
+    string compiler = GlobalOptions::default_compiler;
+    string linker = GlobalOptions::default_linker;
+    string compiler_setup = GlobalOptions::default_compiler_setup;
+    string linker_setup = GlobalOptions::default_linker_setup;
+    string compiler_output_flag = GlobalOptions::default_compiler_output_flag;
+    string linker_output_flag = GlobalOptions::default_linker_output_flag;
+    extra_suffixes_ = GlobalOptions::default_compiler_extra_suffixes;
+  
     // Read options
     for (auto&& op : opts) {
       if (op.first=="compiler") {
