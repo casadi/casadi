@@ -55,6 +55,11 @@
 #define SHARED_LIBRARY_SUFFIX ".so"
 #endif // SHARED_LIBRARY_SUFFIX
 
+// Set casadi library prefix
+#ifndef CASADI_LIBRARY_PREFIX
+#define CASADI_LIBRARY_PREFIX ""
+#endif // CASADI_LIBRARY_PREFIX
+
 #ifdef _WIN32
     #define DL_HANDLE_TYPE HINSTANCE
 #else // _WIN32
@@ -211,7 +216,7 @@ namespace casadi {
 #else // WITH_DL
 
     // Get the name of the shared library
-    std::string lib = SHARED_LIBRARY_PREFIX + libname + SHARED_LIBRARY_SUFFIX;
+    std::string lib = SHARED_LIBRARY_PREFIX + CASADI_LIBRARY_PREFIX + libname + SHARED_LIBRARY_SUFFIX;
 
     // Build up search paths;
     std::vector<std::string> search_paths;
