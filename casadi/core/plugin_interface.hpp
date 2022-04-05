@@ -216,7 +216,9 @@ namespace casadi {
 #else // WITH_DL
 
     // Get the name of the shared library
-    std::string lib = SHARED_LIBRARY_PREFIX + CASADI_LIBRARY_PREFIX + libname + SHARED_LIBRARY_SUFFIX;
+    std::string lib = SHARED_LIBRARY_PREFIX;
+    lib += CASADI_LIBRARY_PREFIX;
+    lib += libname + SHARED_LIBRARY_SUFFIX;
 
     // Build up search paths;
     std::vector<std::string> search_paths;
