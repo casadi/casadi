@@ -579,6 +579,8 @@ int Fmu::get_in(fmi2Component c, std::vector<fmi2Real>* v) const {
       return 1;
     }
   }
+  // Successful return
+  return 0;
 }
 
 int Fmu::get_aux(fmi2Component c, Value* v) const {
@@ -1307,7 +1309,7 @@ void FmuFunction::init(const Dict& opts) {
 #endif // CASADI_WITH_THREAD
     default:
       casadi_warning("Parallelization " + to_string(parallelization_)
-        + " not implemented. Falling back to serial evaluation");
+        + " not enabled during compilation. Falling back to serial evaluation");
       parallelization_ = Parallelization::SERIAL;
       break;
   }

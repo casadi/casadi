@@ -48,8 +48,8 @@ enum class InterpType {POLYNOMIAL, HERMITE, NUMEL};
 
 ///@{
 /// Convert to string
-CASADI_EXPORT std::string to_string(NewtonScheme v);
-CASADI_EXPORT std::string to_string(InterpType v);
+CASADI_SUNDIALS_SIMULATOR_EXPORT std::string to_string(NewtonScheme v);
+CASADI_SUNDIALS_SIMULATOR_EXPORT std::string to_string(InterpType v);
 ///@}
 
 // IdasMemory

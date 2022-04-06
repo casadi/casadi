@@ -148,10 +148,10 @@ namespace casadi {
   CASADI_EXPORT std::string dyn_out(casadi_int ind);
 
   /** \brief Get the number of simulator inputs */
-  inline CASADI_EXPORT casadi_int dyn_n_in() { return DYN_NUM_IN;}
+  inline casadi_int dyn_n_in() { return DYN_NUM_IN;}
 
   /** \brief Get the number of simulator outputs */
-  inline CASADI_EXPORT casadi_int dyn_n_out() { return DYN_NUM_OUT;}
+  inline casadi_int dyn_n_out() { return DYN_NUM_OUT;}
   /** @} */
 
   /** \brief Get simulator input scheme name by index */
@@ -161,10 +161,10 @@ namespace casadi {
   CASADI_EXPORT std::string simulator_out(casadi_int ind);
 
   /** \brief Get the number of simulator inputs */
-  inline CASADI_EXPORT casadi_int simulator_n_in() { return SIMULATOR_NUM_IN;}
+  inline casadi_int simulator_n_in() { return SIMULATOR_NUM_IN;}
 
   /** \brief Get the number of simulator outputs */
-  inline CASADI_EXPORT casadi_int simulator_n_out() { return SIMULATOR_NUM_OUT;}
+  inline casadi_int simulator_n_out() { return SIMULATOR_NUM_OUT;}
   /** @} */
 
 } // namespace casadi
