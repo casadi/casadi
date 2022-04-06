@@ -207,6 +207,7 @@ namespace casadi {
 
     // Construct the compiler command
     stringstream cccmd;
+    cccmd << GlobalOptions::default_system_prefix;
     cccmd << compiler;
     for (vector<string>::const_iterator i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
       cccmd << " " << *i;
@@ -218,6 +219,7 @@ namespace casadi {
 
     // Temporary object file
     cccmd << " " + compiler_output_flag << obj_name_;
+    cccmd << GlobalOptions::default_system_suffix;
 
     // Compile into an object
     if (verbose_) casadi_message("calling \"" + cccmd.str() + "\"");
