@@ -227,6 +227,7 @@ namespace casadi {
 
     // Link step
     stringstream ldcmd;
+    ldcmd << GlobalOptions::default_system_prefix;
     ldcmd << linker;
 
     // Temporary file
@@ -237,6 +238,7 @@ namespace casadi {
       ldcmd << " " << *i;
     }
     ldcmd << " " << linker_setup;
+    ldcmd << GlobalOptions::default_system_suffix;
 
     // Compile into a shared library
     if (verbose_) casadi_message("calling \"" + ldcmd.str() + "\"");

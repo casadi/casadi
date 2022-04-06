@@ -82,6 +82,10 @@ namespace casadi {
 
       static std::vector<std::string> default_compiler_extra_suffixes;
 
+      static std::string default_system_prefix;
+
+      static std::string default_system_suffix;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -120,6 +124,12 @@ namespace casadi {
 
       static void setDefaultCompilerExtraSuffixes(const std::vector<std::string>& s) { default_compiler_extra_suffixes = s; }
       static std::vector<std::string> getDefaultCompilerExtraSuffixes() { return default_compiler_extra_suffixes; }
+
+      static void setDefaultSystemPrefix(const std::string& s) { default_system_prefix = s; }
+      static std::string getDefaultSystemPrefix() { return default_system_prefix; }
+
+      static void setDefaultSystemSuffix(const std::string& s) { default_system_suffix = s; }
+      static std::string getDefaultSystemSuffix() { return default_system_suffix; }
 
   };
 

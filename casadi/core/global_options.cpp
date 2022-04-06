@@ -39,7 +39,11 @@ namespace casadi {
   // By default, use zero-based indexing
   casadi_int GlobalOptions::start_index = 0;
 
+
+
 #ifdef _WIN32
+  std::string GlobalOptions::default_system_prefix = "";
+  std::string GlobalOptions::default_system_suffix = "";
   std::string GlobalOptions::default_compiler = "cl.exe";
   std::string GlobalOptions::default_linker = "link.exe";
   std::string GlobalOptions::default_compiler_setup = "/c";
@@ -48,6 +52,8 @@ namespace casadi {
   std::string GlobalOptions::default_linker_output_flag = "/out:";
   std::vector<std::string> GlobalOptions::default_compiler_extra_suffixes = {".exp", ".lib"};
 #else
+  std::string GlobalOptions::default_system_prefix = "";
+  std::string GlobalOptions::default_system_suffix = "";
   std::string GlobalOptions::default_compiler = "gcc";
   std::string GlobalOptions::default_linker = "gcc";
   std::string GlobalOptions::default_compiler_setup = "-fPIC -c";
