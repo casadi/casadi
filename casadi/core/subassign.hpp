@@ -81,7 +81,7 @@ namespace casadi {
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_SUBASSIGN;}
+    Operation op() const override { return Operation::OP_SUBASSIGN;}
 
     /** Obtain information about node */
     Dict info() const override;

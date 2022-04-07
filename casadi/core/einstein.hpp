@@ -84,7 +84,7 @@ namespace casadi {
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_EINSTEIN;}
+    Operation op() const override { return Operation::OP_EINSTEIN;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}

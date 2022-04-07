@@ -240,7 +240,7 @@ namespace casadi {
         // Skip zero seeds
         if (s.is_zero()) continue;
         // If not a conditional, no common condition
-        if (!s.is_op(OP_IF_ELSE_ZERO)) return MX();
+        if (!s.is_op(Operation::OP_IF_ELSE_ZERO)) return MX();
         // Get conditional
         MX c1 = s.dep(0);
         // Has c already been set

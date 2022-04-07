@@ -87,7 +87,7 @@ namespace casadi {
     casadi_int which_output() const override { return oind_;}
 
     /** \brief Get the operation */
-    casadi_int op() const override { return -1;}
+    Operation op() const override { return Operation::OP_OUTPUT;}
 
     /// Create a horizontal concatenation node
     MX get_horzcat(const std::vector<MX>& x) const override { return dep()->get_horzcat(x);}

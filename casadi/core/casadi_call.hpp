@@ -104,7 +104,7 @@ namespace casadi {
     const Sparsity& sparsity(casadi_int oind) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_CALL;}
+    Operation op() const override { return Operation::OP_CALL;}
 
     /** \brief Get required length of arg field */
     size_t sz_arg() const override;

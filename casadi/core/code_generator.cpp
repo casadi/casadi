@@ -698,36 +698,36 @@ namespace casadi {
     s << array("static const casadi_real", name, v.size(), initializer(v));
   }
 
-  std::string CodeGenerator::print_op(casadi_int op, const std::string& a0) {
+  std::string CodeGenerator::print_op(Operation op, const std::string& a0) {
     switch (op) {
-      case OP_FABS:
+      case Operation::OP_FABS:
         add_auxiliary(AUX_FABS);
         return "casadi_fabs("+a0+")";
-      case OP_SQ:
+      case Operation::OP_SQ:
         add_auxiliary(AUX_SQ);
         return "casadi_sq("+a0+")";
-      case OP_SIGN:
+      case Operation::OP_SIGN:
         add_auxiliary(AUX_SIGN);
         return "casadi_sign("+a0+")";
-      case OP_LOG1P:
+      case Operation::OP_LOG1P:
         add_auxiliary(AUX_LOG1P);
         return "casadi_log1p("+a0+")";
-      case OP_EXPM1:
+      case Operation::OP_EXPM1:
         add_auxiliary(AUX_EXPM1);
         return "casadi_expm1("+a0+")";
       default:
         return casadi_math<double>::print(op, a0);
     }
   }
-  std::string CodeGenerator::print_op(casadi_int op, const std::string& a0, const std::string& a1) {
+  std::string CodeGenerator::print_op(Operation op, const std::string& a0, const std::string& a1) {
     switch (op) {
-      case OP_FMIN:
+      case Operation::OP_FMIN:
         add_auxiliary(AUX_FMIN);
         return "casadi_fmin("+a0+","+a1+")";
-      case OP_FMAX:
+      case Operation::OP_FMAX:
         add_auxiliary(AUX_FMAX);
         return "casadi_fmax("+a0+","+a1+")";
-      case OP_HYPOT:
+      case Operation::OP_HYPOT:
         add_auxiliary(AUX_HYPOT);
         return "casadi_hypot("+a0+","+a1+")";
       default:

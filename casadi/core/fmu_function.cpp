@@ -579,6 +579,7 @@ int Fmu::get_in(fmi2Component c, std::vector<fmi2Real>* v) const {
       return 1;
     }
   }
+  return 0;
 }
 
 int Fmu::get_aux(fmi2Component c, Value* v) const {

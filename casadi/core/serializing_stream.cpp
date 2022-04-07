@@ -122,6 +122,21 @@ namespace casadi {
       for (int j=0;j<8;++j) pack(c[j]);
     }
 
+    void DeserializingStream::unpack(Operation& e) {
+      assert_decoration('O');
+      uint16_t n;
+      char* c = reinterpret_cast<char*>(&n);
+      for (int j=0;j<sizeof(n);++j) unpack(c[j]);
+      e = static_cast<Operation>(n);
+    }
+
+    void SerializingStream::pack(Operation e) {
+      decorate('O');
+      uint16_t n = static_cast<uint16_t>(e);
+      const char* c = reinterpret_cast<const char*>(&n);
+      for (int j=0;j<sizeof(n);++j) pack(c[j]);
+    }
+
     void SerializingStream::pack(size_t e) {
       decorate('K');
       uint64_t n = e;

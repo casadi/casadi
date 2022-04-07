@@ -251,13 +251,13 @@ namespace casadi {
     /// \cond INTERNAL
     ///@{
     /** \brief  Create nodes by their ID */
-    static Matrix<Scalar> binary(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y);
-    static Matrix<Scalar> unary(casadi_int op, const Matrix<Scalar> &x);
-    static Matrix<Scalar> scalar_matrix(casadi_int op,
+    static Matrix<Scalar> binary(Operation op, const Matrix<Scalar> &x, const Matrix<Scalar> &y);
+    static Matrix<Scalar> unary(Operation op, const Matrix<Scalar> &x);
+    static Matrix<Scalar> scalar_matrix(Operation op,
                                           const Matrix<Scalar> &x, const Matrix<Scalar> &y);
-    static Matrix<Scalar> matrix_scalar(casadi_int op,
+    static Matrix<Scalar> matrix_scalar(Operation op,
                                           const Matrix<Scalar> &x, const Matrix<Scalar> &y);
-    static Matrix<Scalar> matrix_matrix(casadi_int op,
+    static Matrix<Scalar> matrix_matrix(Operation op,
                                           const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     ///@}
     /// \endcond
@@ -998,10 +998,10 @@ namespace casadi {
     bool is_eye() const;
 
     /// Get operation type
-    casadi_int op() const;
+    Operation op() const;
 
     /// Is it a certain operation
-    bool is_op(casadi_int op) const;
+    bool is_op(Operation op) const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;

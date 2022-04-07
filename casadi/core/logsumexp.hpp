@@ -76,7 +76,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_LOGSUMEXP;}
+    Operation op() const override { return Operation::OP_LOGSUMEXP;}
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new LogSumExp(s); }

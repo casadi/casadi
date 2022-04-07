@@ -136,7 +136,7 @@ namespace casadi {
   }
 
   SXElem SXElem::operator-() const {
-    if (is_op(OP_NEG))
+    if (is_op(Operation::OP_NEG))
       return dep();
     else if (is_zero())
       return 0;
@@ -145,7 +145,7 @@ namespace casadi {
     else if (is_one())
       return -1;
     else
-      return UnarySX::create(OP_NEG, *this);
+      return UnarySX::create(Operation::OP_NEG, *this);
   }
 
   bool SXElem::__nonzero__() const {
@@ -154,14 +154,14 @@ namespace casadi {
   }
 
   bool SXElem::is_doubled() const {
-    return is_op(OP_ADD) && is_equal(dep(0), dep(1), SXNode::eq_depth_);
+    return is_op(Operation::OP_ADD) && is_equal(dep(0), dep(1), SXNode::eq_depth_);
   }
 
   SXElem SXElem::inv() const {
-    if (is_op(OP_INV)) {
+    if (is_op(Operation::OP_INV)) {
       return dep(0);
     } else {
-      return UnarySX::create(OP_INV, *this);
+      return UnarySX::create(Operation::OP_INV, *this);
     }
   }
 
@@ -177,78 +177,78 @@ namespace casadi {
     return node;
   }
 
-  SXElem SXElem::binary(casadi_int op, const SXElem& x, const SXElem& y) {
+  SXElem SXElem::binary(Operation op, const SXElem& x, const SXElem& y) {
     // If-else-zero nodes are always simplified at top level to avoid NaN propagation
-    if (y.op() == OP_IF_ELSE_ZERO) {
-      if (op == OP_MUL) {
+    if (y.op() == Operation::OP_IF_ELSE_ZERO) {
+      if (op == Operation::OP_MUL) {
         // (Rule 1.) x * if_else_zero(c, y), simplified to if_else_zero(c, x * y)
         // Background: x is often a partial derivative and may evaluate to INF or NAN.
         // The simplification ensures that the zero seed corresponding to an inactive branch does
         // not give rise to any NaN contribution to the derivative due to NaN * 0 == NaN.
         return if_else_zero(y.dep(0), x * y.dep(1));
-      } else if (op == OP_ADD && x.op() == OP_IF_ELSE_ZERO && is_equal(x.dep(0), y.dep(0))) {
+      } else if (op == Operation::OP_ADD && x.op() == Operation::OP_IF_ELSE_ZERO && is_equal(x.dep(0), y.dep(0))) {
         // (Rule 2.) if_else_zero(c, x) + if_else_zero(c, y) is simplified to if_else_zero(c, x + y)
         // Background: During the backward propagation, seeds are added together. Without this rule,
         // the addition node can prevent rule (1.) from working in subsequent steps.
         return if_else_zero(y.dep(0), x.dep(1) + y.dep(1));
       }
-    } else if (x.op() == OP_IF_ELSE_ZERO && op == OP_MUL) {
+    } else if (x.op() == Operation::OP_IF_ELSE_ZERO && op == Operation::OP_MUL) {
       // Same as Rule 1. above, but with factors swapped. For symmetry.
       return if_else_zero(x.dep(0), x.dep(1) * y);
     }
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
-      case OP_ADD:
+      case Operation::OP_ADD:
         if (x.is_zero())
           return y;
         else if (y->is_zero()) // term2 is zero
           return x;
-        else if (y.is_op(OP_NEG))  // x + (-y) -> x - y
+        else if (y.is_op(Operation::OP_NEG))  // x + (-y) -> x - y
           return x - (-y);
-        else if (x.is_op(OP_NEG)) // (-x) + y -> y - x
+        else if (x.is_op(Operation::OP_NEG)) // (-x) + y -> y - x
           return y - x.dep();
-        else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) &&
+        else if (x.is_op(Operation::OP_MUL) && y.is_op(Operation::OP_MUL) &&
                  x.dep(0).is_constant() && static_cast<double>(x.dep(0))==0.5 &&
                  y.dep(0).is_constant() && static_cast<double>(y.dep(0))==0.5 &&
                  is_equal(y.dep(1), x.dep(1), SXNode::eq_depth_)) // 0.5x+0.5x = x
           return x.dep(1);
-        else if (x.is_op(OP_DIV) && y.is_op(OP_DIV) &&
+        else if (x.is_op(Operation::OP_DIV) && y.is_op(Operation::OP_DIV) &&
                  x.dep(1).is_constant() && static_cast<double>(x.dep(1))==2 &&
                  y.dep(1).is_constant() && static_cast<double>(y.dep(1))==2 &&
                  is_equal(y.dep(0), x.dep(0), SXNode::eq_depth_)) // x/2+x/2 = x
           return x.dep(0);
-        else if (x.is_op(OP_SUB) && is_equal(x.dep(1), y, SXNode::eq_depth_))
+        else if (x.is_op(Operation::OP_SUB) && is_equal(x.dep(1), y, SXNode::eq_depth_))
           return x.dep(0);
-        else if (y.is_op(OP_SUB) && is_equal(x, y.dep(1), SXNode::eq_depth_))
+        else if (y.is_op(Operation::OP_SUB) && is_equal(x, y.dep(1), SXNode::eq_depth_))
           return y.dep(0);
-        else if (x.is_op(OP_SQ) && y.is_op(OP_SQ) &&
-                 ((x.dep().is_op(OP_SIN) && y.dep().is_op(OP_COS))
-                  || (x.dep().is_op(OP_COS) && y.dep().is_op(OP_SIN)))
+        else if (x.is_op(Operation::OP_SQ) && y.is_op(Operation::OP_SQ) &&
+                 ((x.dep().is_op(Operation::OP_SIN) && y.dep().is_op(Operation::OP_COS))
+                  || (x.dep().is_op(Operation::OP_COS) && y.dep().is_op(Operation::OP_SIN)))
                  && is_equal(x.dep().dep(), y.dep().dep(), SXNode::eq_depth_))
           return 1; // sin^2 + cos^2 -> 1
         break;
-      case OP_SUB:
+      case Operation::OP_SUB:
         if (y->is_zero()) // term2 is zero
           return x;
         if (x.is_zero()) // term1 is zero
           return -y;
         if (is_equal(x, y, SXNode::eq_depth_)) // the terms are equal
           return 0;
-        else if (y.is_op(OP_NEG)) // x - (-y) -> x + y
+        else if (y.is_op(Operation::OP_NEG)) // x - (-y) -> x + y
           return x + y.dep();
-        else if (x.is_op(OP_ADD) && is_equal(x.dep(1), y, SXNode::eq_depth_))
+        else if (x.is_op(Operation::OP_ADD) && is_equal(x.dep(1), y, SXNode::eq_depth_))
           return x.dep(0);
-        else if (x.is_op(OP_ADD) && is_equal(x.dep(0), y, SXNode::eq_depth_))
+        else if (x.is_op(Operation::OP_ADD) && is_equal(x.dep(0), y, SXNode::eq_depth_))
           return x.dep(1);
-        else if (y.is_op(OP_ADD) && is_equal(x, y.dep(1), SXNode::eq_depth_))
+        else if (y.is_op(Operation::OP_ADD) && is_equal(x, y.dep(1), SXNode::eq_depth_))
           return -y.dep(0);
-        else if (y.is_op(OP_ADD) && is_equal(x, y.dep(0), SXNode::eq_depth_))
+        else if (y.is_op(Operation::OP_ADD) && is_equal(x, y.dep(0), SXNode::eq_depth_))
           return -y.dep(1);
-        else if (x.is_op(OP_NEG))
+        else if (x.is_op(Operation::OP_NEG))
           return -(x.dep() + y);
         break;
-      case OP_MUL:
+      case Operation::OP_MUL:
         if (is_equal(y, x, SXNode::eq_depth_))
           return sq(x);
         else if (!x.is_constant() && y.is_constant())
@@ -263,27 +263,27 @@ namespace casadi {
           return -x;
         else if (x.is_minus_one())
           return -y;
-        else if (y.is_op(OP_INV))
+        else if (y.is_op(Operation::OP_INV))
           return x/y.inv();
-        else if (x.is_op(OP_INV))
+        else if (x.is_op(Operation::OP_INV))
           return y / x.inv();
-        else if (x.is_constant() && y.is_op(OP_MUL) && y.dep(0).is_constant() &&
+        else if (x.is_constant() && y.is_op(Operation::OP_MUL) && y.dep(0).is_constant() &&
                  static_cast<double>(x)*static_cast<double>(y.dep(0))==1) // 5*(0.2*x) = x
           return y.dep(1);
-        else if (x.is_constant() && y.is_op(OP_DIV) && y.dep(1).is_constant() &&
+        else if (x.is_constant() && y.is_op(Operation::OP_DIV) && y.dep(1).is_constant() &&
                  static_cast<double>(x)==static_cast<double>(y.dep(1))) // 5*(x/5) = x
           return y.dep(0);
-        else if (x.is_op(OP_DIV) && is_equal(x.dep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
+        else if (x.is_op(Operation::OP_DIV) && is_equal(x.dep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
           return x.dep(0);
-        else if (y.is_op(OP_DIV) &&
+        else if (y.is_op(Operation::OP_DIV) &&
                  is_equal(y.dep(1), x, SXNode::eq_depth_)) // ((2/x)*x)
           return y.dep(0);
-        else if (x.is_op(OP_NEG))
+        else if (x.is_op(Operation::OP_NEG))
           return -(x.dep() * y);
-        else if (y.is_op(OP_NEG))
+        else if (y.is_op(Operation::OP_NEG))
           return -(x * y.dep());
         break;
-      case OP_DIV:
+      case Operation::OP_DIV:
         if (y->is_zero()) // term2 is zero
           return casadi_limits<SXElem>::nan;
         else if (x.is_zero()) // term1 is zero
@@ -296,46 +296,46 @@ namespace casadi {
           return 1;
         else if (x.is_doubled() && is_equal(y, 2))
           return x.dep(0);
-        else if (x.is_op(OP_MUL) && is_equal(y, x.dep(0), SXNode::eq_depth_))
+        else if (x.is_op(Operation::OP_MUL) && is_equal(y, x.dep(0), SXNode::eq_depth_))
           return x.dep(1);
-        else if (x.is_op(OP_MUL) && is_equal(y, x.dep(1), SXNode::eq_depth_))
+        else if (x.is_op(Operation::OP_MUL) && is_equal(y, x.dep(1), SXNode::eq_depth_))
           return x.dep(0);
         else if (x.is_one())
           return y.inv();
-        else if (y.is_op(OP_INV))
+        else if (y.is_op(Operation::OP_INV))
           return x*y.inv();
         else if (x.is_doubled() && y.is_doubled())
           return x.dep(0) / y->dep(0);
-        else if (y.is_constant() && x.is_op(OP_DIV) && x.dep(1).is_constant() &&
+        else if (y.is_constant() && x.is_op(Operation::OP_DIV) && x.dep(1).is_constant() &&
                  static_cast<double>(y)*static_cast<double>(x.dep(1))==1) // (x/5)/0.2
           return x.dep(0);
-        else if (y.is_op(OP_MUL) &&
+        else if (y.is_op(Operation::OP_MUL) &&
                  is_equal(y.dep(1), x, SXNode::eq_depth_)) // x/(2*x) = 1/2
-          return BinarySX::create(OP_DIV, 1, y.dep(0));
-        else if (x.is_op(OP_NEG) &&
+          return BinarySX::create(Operation::OP_DIV, 1, y.dep(0));
+        else if (x.is_op(Operation::OP_NEG) &&
                  is_equal(x.dep(0), y, SXNode::eq_depth_))      // (-x)/x = -1
           return -1;
-        else if (y.is_op(OP_NEG) &&
+        else if (y.is_op(Operation::OP_NEG) &&
                  is_equal(y.dep(0), x, SXNode::eq_depth_))      // x/(-x) = 1
           return -1;
-        else if (y.is_op(OP_NEG) && x.is_op(OP_NEG) &&
+        else if (y.is_op(Operation::OP_NEG) && x.is_op(Operation::OP_NEG) &&
                  is_equal(x.dep(0), y.dep(0), SXNode::eq_depth_))  // (-x)/(-x) = 1
           return 1;
-        else if (x.is_op(OP_DIV) && is_equal(y, x.dep(0), SXNode::eq_depth_))
+        else if (x.is_op(Operation::OP_DIV) && is_equal(y, x.dep(0), SXNode::eq_depth_))
           return x.dep(1).inv();
-        else if (x.is_op(OP_NEG))
+        else if (x.is_op(Operation::OP_NEG))
           return -(x.dep() / y);
-        else if (y.is_op(OP_NEG))
+        else if (y.is_op(Operation::OP_NEG))
           return -(x / y.dep());
         break;
-      case OP_POW:
+      case Operation::OP_POW:
         if (y->is_constant()) {
           if (y->is_integer()) {
             casadi_int nn = y->to_int();
             if (nn == 0) {
               return 1;
             } else if (nn>100 || nn<-100) { // maximum depth
-              return binary(OP_CONSTPOW, x, nn);
+              return binary(Operation::OP_CONSTPOW, x, nn);
             } else if (nn<0) { // negative power
               return 1/pow(x, -nn);
             } else if (nn%2 == 1) { // odd power
@@ -347,39 +347,39 @@ namespace casadi {
           } else if (y->to_double()==0.5) {
             return sqrt(x);
           } else {
-            return binary(OP_CONSTPOW, x, y);
+            return binary(Operation::OP_CONSTPOW, x, y);
           }
         }
         break;
-        case OP_LE:
+        case Operation::OP_LE:
         if ((y-x).is_nonnegative())
           return 1;
         break;
-      case OP_FMIN:
+      case Operation::OP_FMIN:
         if (x.is_inf()) return y;
         if (y.is_inf()) return x;
         if (x.is_minus_inf() || y.is_minus_inf()) return -std::numeric_limits<double>::infinity();
         if (is_equal(x, y, SXNode::eq_depth_)) return x;
         break;
-      case OP_FMAX:
+      case Operation::OP_FMAX:
         if (x.is_minus_inf()) return y;
         if (y.is_minus_inf()) return x;
         if (x.is_inf() || y.is_inf()) return std::numeric_limits<double>::infinity();
         if (is_equal(x, y, SXNode::eq_depth_)) return x;
         break;
-      case OP_LT:
+      case Operation::OP_LT:
         if (((x)-y).is_nonnegative())
           return 0;
         break;
-      case OP_EQ:
+      case Operation::OP_EQ:
         if (is_equal(x, y))
           return 1;
         break;
-      case OP_NE:
+      case Operation::OP_NE:
         if (is_equal(x, y))
           return 0;
         break;
-      case OP_IF_ELSE_ZERO:
+      case Operation::OP_IF_ELSE_ZERO:
         if (y->is_zero()) {
           return y;
         } else if (x.is_constant()) {
@@ -394,38 +394,38 @@ namespace casadi {
     return BinarySX::create(Operation(op), x, y);
   }
 
-  SXElem SXElem::unary(casadi_int op, const SXElem& x) {
+  SXElem SXElem::unary(Operation op, const SXElem& x) {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
-        case OP_SQ:
-          if (x.is_op(OP_SQRT))
+        case Operation::OP_SQ:
+          if (x.is_op(Operation::OP_SQRT))
             return x.dep();
-          else if (x.is_op(OP_NEG))
+          else if (x.is_op(Operation::OP_NEG))
             return sq(x.dep());
           break;
-        case OP_FABS:
-          if (x.is_op(OP_FABS) || x.is_op(OP_SQ))
+        case Operation::OP_FABS:
+          if (x.is_op(Operation::OP_FABS) || x.is_op(Operation::OP_SQ))
             return x;
           break;
-        case OP_NOT:
-          if (x.is_op(OP_NOT))
+        case Operation::OP_NOT:
+          if (x.is_op(Operation::OP_NOT))
             return x.dep();
           break;
-        case OP_SINH:
-        case OP_TANH:
-        case OP_ATANH:
-        case OP_ACOSH:
-        case OP_ASINH:
+        case Operation::OP_SINH:
+        case Operation::OP_TANH:
+        case Operation::OP_ATANH:
+        case Operation::OP_ACOSH:
+        case Operation::OP_ASINH:
           if (x.is_zero())
             return 0;
           break;
-        case OP_COSH:
+        case Operation::OP_COSH:
           if (x.is_zero())
             return 1;
           break;
-        case OP_SQRT:
-          if (x.is_op(OP_SQ))
+        case Operation::OP_SQRT:
+          if (x.is_op(Operation::OP_SQ))
             return fabs(x.dep());
           break;
       }
@@ -487,11 +487,11 @@ namespace casadi {
     return node->name();
   }
 
-  casadi_int SXElem::op() const {
+    Operation SXElem::op() const {
     return node->op();
   }
 
-  bool SXElem::is_op(casadi_int op) const {
+  bool SXElem::is_op(Operation op) const {
     return node->is_op(op);
   }
 
@@ -509,7 +509,7 @@ namespace casadi {
   bool SXElem::is_nonnegative() const {
     if (is_constant()) {
       return static_cast<double>(*this)>=0;
-    } else if (is_op(OP_SQ) || is_op(OP_FABS)) {
+    } else if (is_op(Operation::OP_SQ) || is_op(Operation::OP_FABS)) {
       return true;
     } else {
       return false;

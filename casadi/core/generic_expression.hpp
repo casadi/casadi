@@ -60,7 +60,7 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Addition: (x,y) -> x + y */
   static ExType plus(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_ADD, x, y);
+    return ExType::binary(Operation::OP_ADD, x, y);
   }
   friend inline ExType plus(const ExType &x, const ExType &y) {
     return ExType::plus(x, y);
@@ -74,7 +74,7 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Subtraction: (x,y) -> x - y */
   static ExType minus(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_SUB, x, y);
+    return ExType::binary(Operation::OP_SUB, x, y);
   }
   friend inline ExType minus(const ExType &x, const ExType &y) {
     return ExType::minus(x, y);
@@ -88,7 +88,7 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Elementwise multiplication: (x,y) -> x .* y */
   static ExType times(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_MUL, x, y);
+    return ExType::binary(Operation::OP_MUL, x, y);
   }
   friend inline ExType times(const ExType &x, const ExType &y) {
     return ExType::times(x, y);
@@ -102,7 +102,7 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Elementwise division: (x,y) -> x ./ y */
   static ExType rdivide(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_DIV, x, y);
+    return ExType::binary(Operation::OP_DIV, x, y);
   }
   friend inline ExType rdivide(const ExType &x, const ExType &y) {
     return ExType::rdivide(x, y);
@@ -116,7 +116,7 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Logical less than: (x,y) -> x < y */
   static ExType lt(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_LT, x, y);
+    return ExType::binary(Operation::OP_LT, x, y);
   }
   friend inline ExType lt(const ExType &x, const ExType &y) {
     return ExType::lt(x, y);
@@ -129,7 +129,7 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Logical less or equal to: (x,y) -> x <= y */
   static ExType le(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_LE, x, y);
+    return ExType::binary(Operation::OP_LE, x, y);
   }
   friend inline ExType le(const ExType &x, const ExType &y) {
     return ExType::le(x, y);
@@ -168,7 +168,7 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Logical equal to: (x,y) -> x == y */
   static ExType eq(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_EQ, x, y);
+    return ExType::binary(Operation::OP_EQ, x, y);
   }
   friend inline ExType eq(const ExType &x, const ExType &y) {
     return ExType::eq(x, y);
@@ -181,7 +181,7 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Logical not equal to: (x,y) -> x != y */
   static ExType ne(const ExType &x, const ExType &y) {
-    return ExType::binary(OP_NE, x, y);
+    return ExType::binary(Operation::OP_NE, x, y);
   }
   friend inline ExType ne(const ExType &x, const ExType &y) {
     return ExType::ne(x, y);
@@ -197,7 +197,7 @@ class GenericExpression : public GenericExpressionCommon {
    * expressions are nonzero and 0 otherwise
    */
    static ExType logic_and(const ExType &x, const ExType &y) {
-     return ExType::binary(OP_AND, x, y);
+     return ExType::binary(Operation::OP_AND, x, y);
    }
    friend inline ExType logic_and(const ExType &x, const ExType &y) {
      return ExType::logic_and(x, y);
@@ -213,7 +213,7 @@ class GenericExpression : public GenericExpressionCommon {
    * least one expression is nonzero and 0 otherwise
    */
    static ExType logic_or(const ExType &x, const ExType &y) {
-     return ExType::binary(OP_OR, x, y);
+     return ExType::binary(Operation::OP_OR, x, y);
    }
    friend inline ExType logic_or(const ExType &x, const ExType &y) {
      return ExType::logic_or(x, y);
@@ -229,7 +229,7 @@ class GenericExpression : public GenericExpressionCommon {
     * expression is zero and 0 otherwise
     */
     static ExType logic_not(const ExType& x) {
-      return ExType::unary(OP_NOT, x);
+      return ExType::unary(Operation::OP_NOT, x);
     }
     friend inline ExType logic_not(const ExType& x) {
       return ExType::logic_not(x);
@@ -242,7 +242,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Absolute value: x -> abs(x) */
     static ExType abs(const ExType& x) {
-      return ExType::unary(OP_FABS, x);
+      return ExType::unary(Operation::OP_FABS, x);
     }
     friend inline ExType abs(const ExType& x) {
       return ExType::abs(x);
@@ -255,7 +255,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Square root: x -> sqrt(x) */
     static ExType sqrt(const ExType& x) {
-      return ExType::unary(OP_SQRT, x);
+      return ExType::unary(Operation::OP_SQRT, x);
     }
     friend inline ExType sqrt(const ExType& x) {
       return ExType::sqrt(x);
@@ -265,7 +265,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Square: x -> x^2 */
     static ExType sq(const ExType& x) {
-      return ExType::unary(OP_SQ, x);
+      return ExType::unary(Operation::OP_SQ, x);
     }
     friend inline ExType sq(const ExType& x) {
       return ExType::sq(x);
@@ -275,7 +275,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Sine: x -> sin(x) */
     static ExType sin(const ExType& x) {
-      return ExType::unary(OP_SIN, x);
+      return ExType::unary(Operation::OP_SIN, x);
     }
     friend inline ExType sin(const ExType& x) {
       return ExType::sin(x);
@@ -285,7 +285,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Cosine: x -> cos(x) */
     static ExType cos(const ExType& x) {
-      return ExType::unary(OP_COS, x);
+      return ExType::unary(Operation::OP_COS, x);
     }
     friend inline ExType cos(const ExType& x) {
       return ExType::cos(x);
@@ -295,7 +295,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Tangent: x -> tan(x) */
     static ExType tan(const ExType& x) {
-      return ExType::unary(OP_TAN, x);
+      return ExType::unary(Operation::OP_TAN, x);
     }
     friend inline ExType tan(const ExType& x) {
       return ExType::tan(x);
@@ -305,7 +305,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Arc tangent: x -> atan(x) */
     static ExType atan(const ExType& x) {
-      return ExType::unary(OP_ATAN, x);
+      return ExType::unary(Operation::OP_ATAN, x);
     }
     friend inline ExType atan(const ExType& x) {
       return ExType::atan(x);
@@ -315,7 +315,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Arc sine: x -> asin(x) */
     static ExType asin(const ExType& x) {
-      return ExType::unary(OP_ASIN, x);
+      return ExType::unary(Operation::OP_ASIN, x);
     }
     friend inline ExType asin(const ExType& x) {
       return ExType::asin(x);
@@ -325,7 +325,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Arc cosine: x -> acos(x) */
     static ExType acos(const ExType& x) {
-      return ExType::unary(OP_ACOS, x);
+      return ExType::unary(Operation::OP_ACOS, x);
     }
     friend inline ExType acos(const ExType& x) {
       return ExType::acos(x);
@@ -335,7 +335,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Hyperbolic tangent: x -> tanh(x) */
     static ExType tanh(const ExType& x) {
-      return ExType::unary(OP_TANH, x);
+      return ExType::unary(Operation::OP_TANH, x);
     }
     friend inline ExType tanh(const ExType& x) {
       return ExType::tanh(x);
@@ -345,7 +345,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Hyperbolic sin: x -> sinh(x) */
     static ExType sinh(const ExType& x) {
-      return ExType::unary(OP_SINH, x);
+      return ExType::unary(Operation::OP_SINH, x);
     }
     friend inline ExType sinh(const ExType& x) {
       return ExType::sinh(x);
@@ -355,7 +355,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Hyperbolic cosine: x -> cosh(x) */
     static ExType cosh(const ExType& x) {
-      return ExType::unary(OP_COSH, x);
+      return ExType::unary(Operation::OP_COSH, x);
     }
     friend inline ExType cosh(const ExType& x) {
       return ExType::cosh(x);
@@ -365,7 +365,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Inverse hyperbolic tangent: x -> atanh(x) */
     static ExType atanh(const ExType& x) {
-      return ExType::unary(OP_ATANH, x);
+      return ExType::unary(Operation::OP_ATANH, x);
     }
     friend inline ExType atanh(const ExType& x) {
       return ExType::atanh(x);
@@ -375,7 +375,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Inverse hyperbolic sin: x -> asinh(x) */
     static ExType asinh(const ExType& x) {
-      return ExType::unary(OP_ASINH, x);
+      return ExType::unary(Operation::OP_ASINH, x);
     }
     friend inline ExType asinh(const ExType& x) {
       return ExType::asinh(x);
@@ -385,7 +385,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Inverse hyperbolic cosine: x -> acosh(x) */
     static ExType acosh(const ExType& x) {
-      return ExType::unary(OP_ACOSH, x);
+      return ExType::unary(Operation::OP_ACOSH, x);
     }
     friend inline ExType acosh(const ExType& x) {
       return ExType::acosh(x);
@@ -395,7 +395,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Elementwise exponential: x -> exp(x) */
     static ExType exp(const ExType& x) {
-      return ExType::unary(OP_EXP, x);
+      return ExType::unary(Operation::OP_EXP, x);
     }
     friend inline ExType exp(const ExType& x) {
       return ExType::exp(x);
@@ -405,7 +405,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Natural logarithm: x -> log(x) */
     static ExType log(const ExType& x) {
-      return ExType::unary(OP_LOG, x);
+      return ExType::unary(Operation::OP_LOG, x);
     }
     friend inline ExType log(const ExType& x) {
       return ExType::log(x);
@@ -425,7 +425,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Precision variant for natural logarithm: x -> log(x+1) */
     static ExType log1p(const ExType& x) {
-      return ExType::unary(OP_LOG1P, x);
+      return ExType::unary(Operation::OP_LOG1P, x);
     }
     friend inline ExType log1p(const ExType& x) {
       return ExType::log1p(x);
@@ -435,7 +435,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Precision variant for elementwise exponential: x -> exp(x)-1 */
     static ExType expm1(const ExType& x) {
-      return ExType::unary(OP_EXPM1, x);
+      return ExType::unary(Operation::OP_EXPM1, x);
     }
     friend inline ExType expm1(const ExType& x) {
       return ExType::expm1(x);
@@ -445,7 +445,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Round down to nearest integer: x -> floor(x) */
     static ExType floor(const ExType& x) {
-      return ExType::unary(OP_FLOOR, x);
+      return ExType::unary(Operation::OP_FLOOR, x);
     }
     friend inline ExType floor(const ExType& x) {
       return ExType::floor(x);
@@ -455,7 +455,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Round up to nearest integer: x -> ceil(x) */
     static ExType ceil(const ExType& x) {
-      return ExType::unary(OP_CEIL, x);
+      return ExType::unary(Operation::OP_CEIL, x);
     }
     friend inline ExType ceil(const ExType& x) {
       return ExType::ceil(x);
@@ -465,7 +465,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Error function: x -> erf(x) */
     static ExType erf(const ExType& x) {
-      return ExType::unary(OP_ERF, x);
+      return ExType::unary(Operation::OP_ERF, x);
     }
     friend inline ExType erf(const ExType& x) {
       return ExType::erf(x);
@@ -475,7 +475,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Inverse error function: x -> erfinv(x) */
     static ExType erfinv(const ExType& x) {
-      return ExType::unary(OP_ERFINV, x);
+      return ExType::unary(Operation::OP_ERFINV, x);
     }
     friend inline ExType erfinv(const ExType& x) {
       return ExType::erfinv(x);
@@ -490,7 +490,7 @@ class GenericExpression : public GenericExpressionCommon {
         sign(NaN) :=  NaN
     */
     static ExType sign(const ExType& x) {
-      return ExType::unary(OP_SIGN, x);
+      return ExType::unary(Operation::OP_SIGN, x);
     }
     friend inline ExType sign(const ExType& x) {
       return ExType::sign(x);
@@ -500,7 +500,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Elementwise power: (x,y) -> x.^y */
     static ExType pow(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_POW, x, y);
+      return ExType::binary(Operation::OP_POW, x, y);
     }
     friend inline ExType pow(const ExType& x, const ExType& y) {
       return ExType::pow(x, y);
@@ -510,7 +510,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Remainder after division: (x,y) -> mod(x,y) */
     static ExType mod(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_FMOD, x, y);
+      return ExType::binary(Operation::OP_FMOD, x, y);
     }
     friend inline ExType mod(const ExType& x, const ExType& y) {
       return ExType::mod(x, y);
@@ -523,7 +523,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Two argument arc tangent: (x,y) -> atan2(x,y) */
     static ExType atan2(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_ATAN2, x, y);
+      return ExType::binary(Operation::OP_ATAN2, x, y);
     }
     friend inline ExType atan2(const ExType& x, const ExType& y) {
       return ExType::atan2(x, y);
@@ -533,7 +533,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Conditional assignment: (x,y) -> x ? y : 0 */
     static ExType if_else_zero(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_IF_ELSE_ZERO, x, y);
+      return ExType::binary(Operation::OP_IF_ELSE_ZERO, x, y);
     }
     friend inline ExType if_else_zero(const ExType& x, const ExType& y) {
       return ExType::if_else_zero(x, y);
@@ -543,7 +543,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Smallest of two values: (x,y) -> min(x,y) */
     static ExType fmin(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_FMIN, x, y);
+      return ExType::binary(Operation::OP_FMIN, x, y);
     }
     friend inline ExType fmin(const ExType& x, const ExType& y) {
       return ExType::fmin(x, y);
@@ -553,7 +553,7 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Largest of two values: (x,y) -> max(x,y) */
     static ExType fmax(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_FMAX, x, y);
+      return ExType::binary(Operation::OP_FMAX, x, y);
     }
     friend inline ExType fmax(const ExType& x, const ExType& y) {
       return ExType::fmax(x, y);
@@ -577,7 +577,7 @@ class GenericExpression : public GenericExpressionCommon {
      ///@{
      /// Copy sign
      static ExType copysign(const ExType& x, const ExType& y) {
-       return ExType::binary(OP_COPYSIGN, x, y);
+       return ExType::binary(Operation::OP_COPYSIGN, x, y);
      }
      friend inline ExType copysign(const ExType& x, const ExType& y) {
        return ExType::copysign(x, y);
@@ -587,7 +587,7 @@ class GenericExpression : public GenericExpressionCommon {
      ///@{
      /// Elementwise power with const power
      static ExType constpow(const ExType& x, const ExType& y) {
-       return ExType::binary(OP_CONSTPOW, x, y);
+       return ExType::binary(Operation::OP_CONSTPOW, x, y);
      }
      friend inline ExType constpow(const ExType& x, const ExType& y) {
        return ExType::constpow(x, y);
@@ -597,17 +597,17 @@ class GenericExpression : public GenericExpressionCommon {
      ///@{
      /// Debug printing
      static ExType printme(const ExType& x, const ExType& y) {
-       return ExType::binary(OP_PRINTME, x, y);
+       return ExType::binary(Operation::OP_PRINTME, x, y);
      }
      friend inline ExType printme(const ExType& x, const ExType& y) {
-       return ExType::binary(OP_PRINTME, x, y);
+       return ExType::binary(Operation::OP_PRINTME, x, y);
      }
      ///@}
 
     ///@{
     /** \brief Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2) */
     static ExType hypot(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_HYPOT, x, y);
+      return ExType::binary(Operation::OP_HYPOT, x, y);
     }
     friend inline ExType hypot(const ExType& x, const ExType& y) {
       return ExType::hypot(x, y);

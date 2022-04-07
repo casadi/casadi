@@ -75,7 +75,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    casadi_int op() const override { return OP_CONVEXIFY;}
+    Operation op() const override { return Operation::OP_CONVEXIFY;}
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream& s) const override;
