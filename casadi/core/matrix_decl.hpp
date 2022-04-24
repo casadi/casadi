@@ -476,6 +476,7 @@ namespace casadi {
                     std::vector<casadi_int>& p, bool amd=true);
     static Matrix<Scalar> ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D,
                                     const Matrix<Scalar>& LT, const std::vector<casadi_int>& p);
+    static Matrix<Scalar> ldl_solve(const Matrix<Scalar>& A, const Matrix<Scalar>& b);
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
     static Matrix<Scalar> any(const Matrix<Scalar>& x);
     static Matrix<Scalar> adj(const Matrix<Scalar>& x);
@@ -582,6 +583,12 @@ namespace casadi {
     ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D, const Matrix<Scalar>& LT,
               const std::vector<casadi_int>& p) {
       return Matrix<Scalar>::ldl_solve(b, D, LT, p);
+    }
+
+    /** \brief Perform LDL^T factorization of A and then solve Ax=b for x */
+    friend inline Matrix<Scalar>
+    ldl_solve(const Matrix<Scalar>& A, const Matrix<Scalar>& b) {
+      return Matrix<Scalar>::ldl_solve(A, b);
     }
 
     /** \brief Returns true only if any element in the matrix is true
