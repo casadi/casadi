@@ -977,41 +977,67 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
     if (m->self.validate_ad_) {
       // Value to compare with
       double d_ad = m->sens_[id];
+      // Nominal value used as seed
+      d_ad /= nominal_in_[wrt];
+      d_fd /= nominal_in_[wrt];
       // Is it a not a number?
       bool d_is_nan = d_ad != d_ad;
       // Magnitude of derivatives
       double d_max = std::fmax(std::fabs(d_fd), std::fabs(d_ad));
       // Check if NaN or error exceeds thresholds
-      if (d_is_nan || (d_max > nominal_in_[wrt] * n * m->self.abstol_
+      if (d_is_nan || (d_max > n * m->self.abstol_
           && std::fabs(d_ad - d_fd) > d_max * m->self.reltol_)) {
-        // Issue warning
-        std::stringstream ss;
-        ss << (d_is_nan ? "NaN" : "Inconsistent") << " derivatives of " << vn_out_[id]
-          << " w.r.t. " << desc_in(m, wrt) << ", got " << d_ad
-          << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].";
         // Offset for printing the stencil
         double off = m->fd_out_.at(ind + offset * n_unknown);
-        // Print the stencil:
-        ss << "\nValues for step size " << h << ": " << (n * off) << " + [";
-        for (casadi_int k = 0; k < n_points; ++k) {
-          if (k > 0) ss << ", ";
-          ss << (n * (m->fd_out_.at(ind + k * n_unknown) - off));
+        // Warning or add to file
+        std::stringstream ss;
+        if (m->self.validate_ad_file_.empty()) {
+          // Issue warning
+          ss << (d_is_nan ? "NaN" : "Inconsistent") << " derivatives of " << vn_out_[id]
+            << " w.r.t. " << desc_in(m, wrt) << ", got " << d_ad
+            << " for AD vs. " << d_fd << " for FD[" << to_string(m->self.fd_) << "].";
+          // Print the stencil:
+          ss << "\nValues for step size " << h << ": " << (n * off) << " + [";
+          for (casadi_int k = 0; k < n_points; ++k) {
+            if (k > 0) ss << ", ";
+            ss << (n * (m->fd_out_.at(ind + k * n_unknown) - off));
+          }
+          ss << "]";
+          // Issue warning
+          casadi_warning(ss.str());
+        } else {
+          // Output
+          ss << vn_out_[id] << " ";
+          // Input
+          ss << vn_in_[wrt] << " ";
+          // Value
+          ss << m->ibuf_[wrt] << " ";
+          // Noninal
+          ss << nominal_in_[wrt] << " ";
+          // Min
+          ss << min_in_[wrt] << " ";
+          // Max
+          ss << max_in_[wrt] << " ";
+          // AD
+          ss << d_ad << " ";
+          // FD
+          ss << d_fd << " ";
+          // Step
+          ss << h << " ";
+          // Offset
+          ss << off << " ";
+          // Stencil
+          ss << "[";
+          for (casadi_int k = 0; k < n_points; ++k) {
+            if (k > 0) ss << ",";
+            ss << (n * (m->fd_out_.at(ind + k * n_unknown) - off));
+          }
+          ss << "]" << std::endl;
+          // Append to file
+          std::ofstream valfile;
+          valfile.open(m->self.validate_ad_file_, std::ios_base::app);
+          valfile << ss.str();
         }
-        ss << "]";
-        // Error between truncation and roundoff error
-        if (!d_is_nan && fd_has_err(m->self.fd_)) {
-          // Error estimate for step size
-          double u = finite_diff_err(m->self.fd_, get_ptr(m->fd_out_), h, n_unknown, ind,
-            m->self.abstol_, m->self.reltol_, eps);
-          // Target ratio
-          const double u_aim = 100;
-          // Output ratio and scaling factor to get closer to target ratio
-          ss << "\nEstimated truncation/roundoff error ratio: " << u
-            << ", suggested step size or nominal value update factor: "
-            << sqrt(u_aim / fmax(1., u));
-        }
-        // Issue warning
-        casadi_warning(ss.str());
       }
     } else {
       // Use instead of AD
@@ -1141,6 +1167,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   // Default options
   enable_ad_ = fmu_->get_directional_derivative_ != 0;
   validate_ad_ = false;
+  validate_ad_file_ = "";
   make_symmetric_ = true;
   check_hessian_ = false;
   enable_fd_op_ = enable_ad_ && !all_regular();  // Use FD for second and higher order derivatives
@@ -1186,6 +1213,9 @@ const Options FmuFunction::options_
     {"validate_ad",
      {OT_BOOL,
       "Compare analytic derivatives with finite differences for validation"}},
+    {"validate_ad_file",
+     {OT_STRING,
+      "Redirect results of Hessian validation to a file instead of generating a warning"}},
     {"check_hessian",
      {OT_BOOL,
       "Symmetry check for Hessian"}},
@@ -1227,6 +1257,8 @@ void FmuFunction::init(const Dict& opts) {
       enable_ad_ = op.second;
     } else if (op.first=="validate_ad") {
       validate_ad_ = op.second;
+    } else if (op.first=="validate_ad_file") {
+      validate_ad_file_ = op.second.to_string();
     } else if (op.first=="check_hessian") {
       check_hessian_ = op.second;
     } else if (op.first=="make_symmetric") {
@@ -1261,6 +1293,12 @@ void FmuFunction::init(const Dict& opts) {
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
+  // New AD validation file, if any
+  if (!validate_ad_file_.empty()) {
+    std::ofstream valfile;
+    valfile.open(validate_ad_file_);
+    valfile << "Output Input Value Nominal Min Max AD FD Step Offset Stencil" << std::endl;
+  }
   // Which inputs and outputs exist
   has_fwd_ = has_adj_ = has_jac_ = has_hess_ = false;
   for (auto&& i : out_) {
