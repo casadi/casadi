@@ -171,14 +171,12 @@ jobs:
         CC="gcc-11" CXX="g++-11" \
           ./scripts/install-casadi-wheel.sh
     - name: Build
-      if: false
       run: |
         source ./py-venv/bin/activate
         CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH" \
         CC="gcc-11" CXX="g++-11" \
             python -m build . --wheel
     - name: Upload
-      if: false
       uses: actions/upload-artifact@v2
       with:
         name: alpaqa-whl-${{ matrix.python-version }}-mac
@@ -192,19 +190,15 @@ jobs:
         python-version: ['3.8', '3.9', '3.10']
     steps:
     - uses: actions/checkout@v1
-      if: false
     - uses: actions/setup-python@v2
-      if: false
       name: Install Python
       with: 
         python-version: ${{ matrix.python-version }}
     - uses: actions/download-artifact@v2
-      if: false
       with:
         name: alpaqa-whl-${{ matrix.python-version }}-mac
         path: dist
     - name: Test
-      if: false
       run: |
         python -m pip install pytest cmake ninja
         python -m pip install dist/alpaqa-*.whl
