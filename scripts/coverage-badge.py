@@ -1,14 +1,11 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Script that extracts the test coverage percentage and saves it as a JSON
 shields.io endpoint.
 """
 
-import os
-from os.path import join, normpath, dirname, splitext, relpath, realpath
+from os.path import join, normpath, dirname, realpath
 import re
-
-from yaml import safe_load
 
 script_dir = dirname(realpath(__file__))
 cov_dir = normpath(join(dirname(script_dir), "docs", "Coverage"))

@@ -1,1 +1,2 @@
+include(CasADiFunctionCodeGenPython.cmake)
 add_subdirectory(Rosenbrock)

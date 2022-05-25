@@ -1,0 +1,3 @@
+---
+BasedOnStyle: InheritParentConfig
+ColumnLimit:     100

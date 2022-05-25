@@ -7,6 +7,7 @@ if [ -z "${VIRTUAL_ENV+x}" ]; then
 fi
 
 build_type="${1:-RelWithDebInfo}"
+version="3.4.0"
 
 set -ex
 export CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH"
@@ -14,17 +15,16 @@ export PKG_CONFIG_PATH="$VIRTUAL_ENV/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 pushd /tmp
 
-# Eigen Linear Algebra
-rm -rf eigen
-git clone --single-branch --depth=1 --branch 3.4.0 \
+# Eigen
+[ -d eigen ] \
+ || git clone --single-branch --depth=1 --branch "$version" \
     https://gitlab.com/libeigen/eigen.git
-mkdir -p eigen/build
-pushd eigen/build
-cmake .. \
-    -D CMAKE_INSTALL_PREFIX="$VIRTUAL_ENV" \
-    -D CMAKE_BUILD_TYPE="${build_type}"
-make -j$(nproc)
-make install
+pushd eigen
+cmake -S. -Bbuild \
+    -G "Ninja Multi-Config" \
+    -D CMAKE_INSTALL_PREFIX="$VIRTUAL_ENV"
+cmake --build build -j --config RelWithDebInfo
+cmake --install build --config RelWithDebInfo
 popd
 
 popd

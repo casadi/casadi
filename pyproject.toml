@@ -1,12 +1,78 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel",
-    "pybind11~=2.7.1",
-    "ninja",
-    "cmake",
-    "scikit-build",
-    "mypy",
+[project]
+name = "alpaqa"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { "file" = "LICENSE" }
+authors = [{ "name" = "Pieter P", "email" = "pieter.p.dev@outlook.com" }]
+keywords = ["addition", "subtraction", "pybind11"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
 ]
+dependencies = ["numpy", "casadi"]
+dynamic = ["version", "description"]
 
-build-backend = "setuptools.build_meta"
+[project.urls]
+"Documentation" = "https://kul-optec.github.io/alpaqa"
+"Source" = "https://github.com/kul-optec/alpaqa"
+"Bug Tracker" = "https://github.com/kul-optec/alpaqa/issues"
+
+[build-system]
+requires = ["py-build-cmake~=0.0.10", "pybind11", "pybind11-stubgen"]
+build-backend = "py_build_cmake.build"
+
+[tool.py-build-cmake.module]
+name = "alpaqa"
+directory = "python"
+
+[tool.py-build-cmake.sdist]
+include = ["CMakeLists.txt", "src", "cmake", "interfaces"]
+exclude = []
+
+[tool.py-build-cmake.cmake]
+minimum_version = "3.21"
+source_path = "."
+config = ["Release"]
+args = ["-Wdev"]
+build_args = ["-j"]
+install_components = ["python_modules"]
+[tool.py-build-cmake.cmake.options]
+"ALPAQA_WITH_PYTHON:BOOL" = "On"
+"ALPAQA_WITH_PY_STUBS:BOOL" = "On"
+"ALPAQA_WITH_TESTS:BOOL" = "Off"
+"ALPAQA_WITH_EXAMPLES:BOOL" = "Off"
+"ALPAQA_WITH_QUAD_PRECISION:BOOL" = "Off"
+"ALPAQA_WITH_UBSAN_DEBUG:BOOL" = "Off"
+"ALPAQA_WITH_ASAN_DEBUG:BOOL" = "Off"
+
+[tool.py-build-cmake.linux.cmake]
+config = ["Debug", "Release"]
+generator = "Ninja Multi-Config"
+[tool.py-build-cmake.mac.cmake]
+config = ["Debug", "Release"]
+generator = "Ninja Multi-Config"
+
+[tool.py-build-cmake.stubgen]
+args = ["-v"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["python/test"]
+
+[tool.mypy]
+plugins = ["numpy.typing.mypy_plugin"]
+
+[tool.pyright]
+# Pyright stops looking after the first match, which is usually in the 
+# site-packages folder. When doing an editable install, it should look in both
+# site-packages and the source folder. To get the search order correct, 
+# explicitly point it to the source folder first (it will still look for the C++ 
+# extension module stubs in site-packages).
+extraPaths = ["python"]

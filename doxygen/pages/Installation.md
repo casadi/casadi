@@ -67,7 +67,7 @@ switching to an optimized version later.
 
 If you install the library locally, as demonstrated in the previous snippet,
 you might have to set some environment variables, as explained here:
-https://kul-optec.github.io/Pages/Ubuntu/Software-Installation/Installing-Locally.html
+https://tttapa.github.io/Pages/Ubuntu/Software-Installation/Installing-Locally.html
 
 Specifically, you need to add `~/.local` to the `CMAKE_PREFIX_PATH` by adding
 the following to your `~/.profile` file:

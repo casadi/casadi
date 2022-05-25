@@ -1,4 +1,0 @@
-numpy
-casadi
-matplotlib
-breathe

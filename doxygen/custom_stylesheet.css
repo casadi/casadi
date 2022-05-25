@@ -35,24 +35,22 @@ h2.groupheader, .title, #projectname {
     font-weight: 300;
 }
 h2, h2.groupheader, .title, #projectname {
-    font-weight: 400;
+    font-weight: 300;
 }
 h3, h4, h5 {
-    font-weight: 400;
+    font-weight: 300;
 }
 div.contents > div.textblock > h1 {
     border-bottom: 1px solid #c8d0e2;
     padding-bottom: 5px;
     margin-top: 1em;
+    font-size: 1.8em;
 }
 div.contents > div.textblock > hr {
     margin-right: 15px; /* To match width of doxygen headers and code blocks */
 }
 .title {
     font-size: 2em;
-}
-* {
-    max-width: 100%;
 }
 span.mono {
     font-family: monospace;
@@ -254,7 +252,8 @@ span.keywordtype {
 span.keyword {
     color: #0000ff;
 }
-div.line a.code.hl_function {
+div.line a.code.hl_function,
+div.line a.code.hl_interface {
     color: #795e26;
 }
 div.line a.code.hl_define {
@@ -269,6 +268,9 @@ div.line a.code.hl_enumeration {
 }
 div.line a.code.hl_enumvalue {
     color: #1C71BE;
+}
+div.line a.code.hl_concept {
+    color: #0070C1;
 }
 span.preprocessor a,
 span.preprocessor a.code {
@@ -308,7 +310,7 @@ blockquote.doxtable > p:last-child {
 /* --------------------- */
 
 /* Portrait and Landscape */
-@media only screen and (max-width: 900px) /* and (orientation : portrait) */ {
+@media only screen and (max-width: 767px) /* and (orientation : portrait) */ {
     div#top {
         position: relative;
     }
@@ -377,12 +379,12 @@ blockquote.doxtable > p:last-child {
         font-size: 11px;
     }
 
-    div.contents p, 
+    div.contents p:not([class]), 
     div.dyncontent, 
     div.textblock, 
     table.memberdecls, 
     div.memitem,
-    div.contents p *, 
+    div.contents p:not([class]) *, 
     div.dyncontent *, 
     table.memberdecls *, 
     div.memitem * {

@@ -1,121 +1,77 @@
-# Target options
-# --------------
+find_package(Eigen3 REQUIRED)
 
-add_library(alpaqa-obj OBJECT
+add_library(alpaqa
+    "src/util/type-erasure.cpp"
+    "src/util/print.cpp"
+    "src/accelerators/lbfgs.cpp"
+    "src/problem/problem.cpp"
+    "src/problem/problem-counters.cpp"
+    "src/outer/alm.cpp"
     "src/inner/panoc.cpp"
-    "src/inner/second-order-panoc.cpp"
-    "src/inner/structured-panoc-lbfgs.cpp"
-    "src/util/box.cpp"
-    "src/inner/directions/lbfgs.cpp"
-    "src/alm.cpp"
-    "src/util/problem.cpp"
-    "src/util/solverstatus.cpp"
-    "src/reference-problems/riskaverse-mpc.cpp"
-    "src/reference-problems/himmelblau.cpp"
-
-    "include/alpaqa/inner/guarded-aa-pga.hpp"
-    "include/alpaqa/inner/second-order-panoc.hpp"
-    "include/alpaqa/inner/panoc.hpp"
-    "include/alpaqa/inner/lbfgspp.hpp"
-    "include/alpaqa/inner/directions/lbfgs.hpp"
-    "include/alpaqa/inner/directions/decl/lbfgs.hpp"
-    "include/alpaqa/inner/directions/decl/lbfgs-fwd.hpp"
-    "include/alpaqa/inner/directions/decl/panoc-direction-update.hpp"
-    "include/alpaqa/inner/directions/decl/specialized-lbfgs.hpp"
-    "include/alpaqa/inner/directions/anderson-acceleration.hpp"
-    "include/alpaqa/inner/directions/specialized-lbfgs.hpp"
-    "include/alpaqa/inner/decl/panoc-fwd.hpp"
-    "include/alpaqa/inner/decl/second-order-panoc.hpp"
-    "include/alpaqa/inner/decl/panoc.hpp"
-    "include/alpaqa/inner/decl/structured-panoc-lbfgs.hpp"
-    "include/alpaqa/inner/decl/panoc-stop-crit.hpp"
-    "include/alpaqa/inner/decl/lbfgs-stepsize.hpp"
-    "include/alpaqa/inner/detail/limited-memory-qr.hpp"
-    "include/alpaqa/inner/detail/anderson-helpers.hpp"
-    "include/alpaqa/inner/detail/panoc-helpers.hpp"
-    "include/alpaqa/inner/structured-panoc-lbfgs.hpp"
-    "include/alpaqa/inner/pga.hpp"
-    "include/alpaqa/inner/newton.hpp"
-    "include/alpaqa/alm.hpp"
-    "include/alpaqa/reference-problems/himmelblau.hpp"
-    "include/alpaqa/reference-problems/riskaverse-mpc.hpp"
-    "include/alpaqa/decl/alm.hpp"
-    "include/alpaqa/detail/alm-helpers.hpp"
-    "include/alpaqa/util/problem.hpp"
-    "include/alpaqa/util/solverstatus.hpp"
-    "include/alpaqa/util/box.hpp"
-    "include/alpaqa/util/atomic_stop_signal.hpp"
-    "include/alpaqa/util/vec.hpp"
-    "include/alpaqa/util/ringbuffer.hpp"
-    "include/alpaqa/util/lipschitz.hpp"
+    "src/inner/internal/solverstatus.cpp"
+    "include/alpaqa/util/type-erasure.hpp"
 )
-add_library(alpaqa::alpaqa-obj ALIAS alpaqa-obj)
-set_property(TARGET alpaqa-obj PROPERTY POSITION_INDEPENDENT_CODE 1)
-target_include_directories(alpaqa-obj
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-    PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-)
-target_link_libraries(alpaqa-obj PUBLIC Eigen3::Eigen)
-if (LBFGSpp_FOUND)
-    target_link_libraries(alpaqa-obj PUBLIC LBFGSpp::LBFGSpp)
+target_compile_features(alpaqa PUBLIC cxx_std_20)
+target_include_directories(alpaqa PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+target_precompile_headers(alpaqa PUBLIC
+    $<BUILD_INTERFACE:alpaqa/config/config.hpp>)
+target_compile_definitions(alpaqa PUBLIC
+    $<$<CONFIG:Debug>:EIGEN_INITIALIZE_MATRICES_BY_NAN>
+    $<$<CONFIG:Debug>:EIGEN_RUNTIME_NO_MALLOC>)
+target_link_libraries(alpaqa PUBLIC Eigen3::Eigen)
+target_link_libraries(alpaqa PRIVATE warnings)
+set_target_properties(alpaqa PROPERTIES CXX_VISIBILITY_PRESET "hidden"
+                                        VISIBILITY_INLINES_HIDDEN true)
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    target_link_options(alpaqa PRIVATE "LINKER:--exclude-libs,ALL")
 endif()
-
-add_library(alpaqa)
-target_link_libraries(alpaqa PUBLIC alpaqa-obj)
+target_compile_definitions(alpaqa PUBLIC
+    $<$<BOOL:${ALPAQA_WITH_QUAD_PRECISION}>:ALPAQA_WITH_QUAD_PRECISION>)
+target_link_libraries(alpaqa PUBLIC
+    $<$<BOOL:${ALPAQA_WITH_QUAD_PRECISION}>:quadmath>)
 add_library(alpaqa::alpaqa ALIAS alpaqa)
-set_target_properties(alpaqa PROPERTIES EXPORT_NAME alpaqa::alpaqa)
+list(APPEND ALPAQA_INSTALL_TARGETS alpaqa)
 
-# target_compile_definitions(alpaqa PUBLIC PRINT_DEBUG_COUT=1)
-
-# Interop
-# -------
-
-# CUTEst
-if (TARGET CUTEst::headers)
-    add_library(cutest-loader STATIC 
-        "src/interop/cutest/CUTEstLoader.cpp"
-        "include/alpaqa/interop/cutest/CUTEstLoader.hpp")
-    target_link_libraries(cutest-loader 
-        PRIVATE
-            CUTEst::headers
-            ${CMAKE_DL_LIBS}
-        PUBLIC
-            alpaqa::alpaqa)
-    add_library(alpaqa::cutest-loader ALIAS cutest-loader)
-endif()
+# DLL import/export
+include(GenerateExportHeader)
+generate_export_header(alpaqa
+    EXPORT_FILE_NAME alpaqa/export.h)
+target_include_directories(alpaqa PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 # CasADi
-if (TARGET casadi)
-    add_library(casadi-loader-obj OBJECT 
-        "src/interop/casadi/CasADiLoader.cpp"
+if (ALPAQA_WITH_CASADI)
+    find_package(casadi REQUIRED)
+    add_library(casadi-loader 
+        "interop/casadi/CasADiLoader.cpp"
         "include/alpaqa/interop/casadi/CasADiFunctionWrapper.hpp"
         "include/alpaqa/interop/casadi/CasADiLoader.hpp")
-    target_link_libraries(casadi-loader-obj 
+    find_package(Threads REQUIRED)
+    target_link_libraries(casadi-loader 
         PUBLIC
             casadi
-            alpaqa::alpaqa-obj)
-    set_target_properties(casadi-loader-obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
-    add_library(alpaqa::casadi-loader-obj ALIAS casadi-loader-obj)
-    add_library(casadi-loader)
-    target_link_libraries(casadi-loader PUBLIC casadi-loader-obj)
+            alpaqa::alpaqa
+            Threads::Threads)
+    target_link_libraries(casadi-loader PRIVATE warnings)
+    set_target_properties(casadi-loader PROPERTIES CXX_VISIBILITY_PRESET "hidden"
+                                        VISIBILITY_INLINES_HIDDEN true)
+    if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+        target_link_options(casadi-loader PRIVATE "LINKER:--exclude-libs,ALL")
+    endif()
     add_library(alpaqa::casadi-loader ALIAS casadi-loader)
+    list(APPEND ALPAQA_INSTALL_TARGETS casadi-loader)
+    # DLL import/export
+    generate_export_header(casadi-loader
+    EXPORT_FILE_NAME alpaqa/casadi-loader-export.h)
+    target_include_directories(casadi-loader PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+
+    message(STATUS "Compiling WITH CasADi support")
+else()
+    message(STATUS "Compiling WITHOUT CasADi support")
 endif()
 
-# Target installation
-# -------------------
-
-if (NOT SKBUILD)
-    include(cmake/Install.cmake)
-endif()
-
-# Python bindings
-# ---------------
-
-option(WITH_PYTHON_BINDINGS "Build the Python module" Off)
-
-if (WITH_PYTHON_BINDINGS OR SKBUILD)
-    add_subdirectory(alpaqa)
-endif()
+# Installation
+include(cmake/Install.cmake)

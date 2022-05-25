@@ -1,43 +1,62 @@
 #pragma once
 
-#include <casadi/core/function.hpp>
-
-#include <alpaqa/util/vec.hpp>
+#include <alpaqa/config/config.hpp>
 
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#include <casadi/core/function.hpp>
+#include <casadi/mem.h>
+
+namespace alpaqa::casadi_loader {
 
 /// @addtogroup grp_ExternalProblemLoaders
 /// @{
 
 /// Class for evaluating CasADi functions, allocating the necessary workspace
 /// storage in advance for allocation-free evaluations.
-template <size_t N_in, size_t N_out>
+template <Config Conf, size_t N_in, size_t N_out>
 class CasADiFunctionEvaluator {
   public:
+    USING_ALPAQA_CONFIG(Conf);
+    static_assert(std::is_same_v<real_t, casadi_real>);
+
     using casadi_dim = std::pair<casadi_int, casadi_int>;
 
     /// @throws std::invalid_argument
-    CasADiFunctionEvaluator(casadi::Function &&f,
-                            const casadi_dim (&dim_in)[N_in]   = {},
-                            const casadi_dim (&dim_out)[N_out] = {})
+    CasADiFunctionEvaluator(casadi::Function &&f)
         : fun(std::move(f)), iwork(fun.sz_iw()), dwork(fun.sz_w()) {
+        using namespace std::literals::string_literals;
         if (N_in != fun.n_in())
-            throw std::invalid_argument("Invalid number of input arguments.");
+            throw std::invalid_argument(
+                "Invalid number of input arguments: got "s +
+                std::to_string(fun.n_in()) + ", should be " +
+                std::to_string(N_in) + ".");
         if (N_out != fun.n_out())
-            throw std::invalid_argument("Invalid number of output arguments.");
+            throw std::invalid_argument(
+                "Invalid number of output arguments: got "s +
+                std::to_string(fun.n_out()) + ", should be " +
+                std::to_string(N_out) + ".");
+    }
+
+    /// @throws std::invalid_argument
+    CasADiFunctionEvaluator(casadi::Function &&f,
+                            const std::array<casadi_dim, N_in> &dim_in,
+                            const std::array<casadi_dim, N_out> &dim_out)
+        : CasADiFunctionEvaluator{std::move(f)} {
         validate_dimensions(dim_in, dim_out);
     }
 
     /// @throws std::invalid_argument
-    void validate_dimensions(const casadi_dim (&dim_in)[N_in],
-                             const casadi_dim (&dim_out)[N_out]) {
-        using std::operator""s;
-        constexpr static const char *count[]{"first", "second", "third",
-                                             "fourth"};
-        static_assert(N_in <= 4);
-        static_assert(N_out <= 4);
+    void
+    validate_dimensions(const std::array<casadi_dim, N_in> &dim_in   = {},
+                        const std::array<casadi_dim, N_out> &dim_out = {}) {
+        using namespace std::literals::string_literals;
+        constexpr static const char *count[]{"first",  "second", "third",
+                                             "fourth", "fifth",  "sixth"};
+        static_assert(N_in <= 6);
+        static_assert(N_out <= 6);
         auto to_string = [](casadi_dim d) {
             return "(" + std::to_string(d.first) + ", " +
                    std::to_string(d.second) + ")";
@@ -76,158 +95,6 @@ class CasADiFunctionEvaluator {
     mutable std::vector<double> dwork;
 };
 
-/// Wrapper for CasADiFunctionEvaluator with 1 vector input, scalar output.
-class CasADiFun_1Vi1So {
-  public:
-    CasADiFun_1Vi1So(casadi::Function &&f, casadi_int dim_in = 0)
-        : fun(std::move(f), {{dim_in, 1}}, {{1, 1}}) {}
-
-    double operator()(alpaqa::crvec x) const {
-        double out;
-        fun({x.data()}, {&out});
-        return out;
-    }
-
-  private:
-    CasADiFunctionEvaluator<1, 1> fun;
-};
-
-/// Wrapper for CasADiFunctionEvaluator with 2 vector inputs, scalar output.
-class CasADiFun_2Vi1So {
-  public:
-    CasADiFun_2Vi1So(casadi::Function &&f,
-                     const std::array<casadi_int, 2> &dim_in = {})
-        : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {{1, 1}}) {}
-
-    double operator()(alpaqa::crvec x, alpaqa::crvec p) const {
-        double out;
-        fun({x.data(), p.data()}, {&out});
-        return out;
-    }
-
-  private:
-    CasADiFunctionEvaluator<2, 1> fun;
-};
-
-/// Wrapper for CasADiFunctionEvaluator with 1 vector input, 1 vector output.
-class CasADiFun_1Vi1Vo {
-  public:
-    CasADiFun_1Vi1Vo(CasADiFunctionEvaluator<1, 1> &&fun)
-        : fun(std::move(fun)) {}
-    CasADiFun_1Vi1Vo(casadi::Function &&f, casadi_int dim_in = 0,
-                     casadi_int dim_out = 0)
-        : fun(std::move(f), {{dim_in, 1}}, {{dim_out, 1}}) {}
-
-    void operator()(alpaqa::crvec in, alpaqa::rvec out) const {
-        fun({in.data()}, {out.data()});
-    }
-
-  private:
-    CasADiFunctionEvaluator<1, 1> fun;
-};
-
-/// Wrapper for CasADiFunctionEvaluator with 2 vector inputs, 1 vector output.
-class CasADiFun_2Vi1Vo {
-  public:
-    CasADiFun_2Vi1Vo(CasADiFunctionEvaluator<2, 1> &&fun)
-        : fun(std::move(fun)) {}
-    CasADiFun_2Vi1Vo(casadi::Function &&f,
-                     const std::array<casadi_int, 2> &dim_in = {},
-                     casadi_int dim_out                      = 0)
-        : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {{dim_out, 1}}) {}
-
-    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::rvec out) const {
-        fun({in1.data(), in2.data()}, {out.data()});
-    }
-
-  private:
-    CasADiFunctionEvaluator<2, 1> fun;
-};
-
-/// Wrapper for CasADiFunctionEvaluator with 2 vector inputs, 1 matrix output.
-class CasADiFun_2Vi1Mo {
-  public:
-    CasADiFun_2Vi1Mo(casadi::Function &&f,
-                     const std::array<casadi_int, 2> &dim_in           = {},
-                     CasADiFunctionEvaluator<2, 1>::casadi_dim dim_out = {0, 0})
-        : fun(std::move(f), {{dim_in[0], 1}, {dim_in[1], 1}}, {dim_out}) {}
-
-    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::rmat out) const {
-        fun({in1.data(), in2.data()}, {out.data()});
-    }
-
-  private:
-    CasADiFunctionEvaluator<2, 1> fun;
-};
-
-/// Wrapper for CasADiFunctionEvaluator with 3 vector inputs, 1 matrix output.
-class CasADiFun_3Vi1Mo {
-  public:
-    CasADiFun_3Vi1Mo(casadi::Function &&f,
-                     const std::array<casadi_int, 3> &dim_in           = {},
-                     CasADiFunctionEvaluator<3, 1>::casadi_dim dim_out = {0, 0})
-        : fun(std::move(f),
-              {
-                  {dim_in[0], 1},
-                  {dim_in[1], 1},
-                  {dim_in[2], 1},
-              },
-              {dim_out}) {}
-
-    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::crvec in3,
-                    alpaqa::rmat out) const {
-        fun({in1.data(), in2.data(), in3.data()}, {out.data()});
-    }
-
-  private:
-    CasADiFunctionEvaluator<3, 1> fun;
-};
-
-/// Wrapper for CasADiFunctionEvaluator with 3 vector inputs, 1 vector output.
-class CasADiFun_3Vi1Vo {
-  public:
-    CasADiFun_3Vi1Vo(casadi::Function &&f,
-                     const std::array<casadi_int, 3> &dim_in = {},
-                     casadi_int dim_out                      = 0)
-        : fun(std::move(f),
-              {
-                  {dim_in[0], 1},
-                  {dim_in[1], 1},
-                  {dim_in[2], 1},
-              },
-              {{dim_out, 1}}) {}
-
-    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::crvec in3,
-                    alpaqa::rvec out) const {
-        fun({in1.data(), in2.data(), in3.data()}, {out.data()});
-    }
-
-  private:
-    CasADiFunctionEvaluator<3, 1> fun;
-};
-
-/// Wrapper for CasADiFunctionEvaluator with 4 vector inputs, 1 vector output.
-class CasADiFun_4Vi1Vo {
-  public:
-    CasADiFun_4Vi1Vo(casadi::Function &&f,
-                     const std::array<casadi_int, 4> &dim_in = {},
-                     casadi_int dim_out                      = 0)
-        : fun(std::move(f),
-              {
-                  {dim_in[0], 1},
-                  {dim_in[1], 1},
-                  {dim_in[2], 1},
-                  {dim_in[3], 1},
-              },
-              {{dim_out, 1}}) {}
-
-    void operator()(alpaqa::crvec in1, alpaqa::crvec in2, alpaqa::crvec in3, alpaqa::crvec in4,
-                    alpaqa::rvec out) const {
-        fun({in1.data(), in2.data(), in3.data(), in4.data()}, {out.data()});
-    }
-
-  private:
-    CasADiFunctionEvaluator<4, 1> fun;
-};
-
 /// @}
+
+} // namespace alpaqa::casadi_loader

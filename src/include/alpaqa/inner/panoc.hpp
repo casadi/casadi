@@ -1,319 +1,209 @@
 #pragma once
 
-#include <alpaqa/inner/decl/panoc.hpp>
-#include <alpaqa/inner/detail/panoc-helpers.hpp>
-#include <alpaqa/inner/directions/decl/panoc-direction-update.hpp>
+#include <alpaqa/export.hpp>
+#include <alpaqa/inner/directions/panoc-direction-update.hpp>
+#include <alpaqa/inner/internal/lbfgs-stepsize.hpp>
+#include <alpaqa/inner/internal/lipschitz.hpp>
+#include <alpaqa/inner/internal/panoc-helpers.hpp>
+#include <alpaqa/inner/internal/panoc-stop-crit.hpp>
+#include <alpaqa/inner/internal/solverstatus.hpp>
+#include <alpaqa/problem/problem.hpp>
+#include <alpaqa/util/atomic-stop-signal.hpp>
 
-#include <cassert>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <stdexcept>
+#include <atomic>
+#include <chrono>
+#include <limits>
+#include <string>
 
 namespace alpaqa {
 
-using std::chrono::duration_cast;
-using std::chrono::microseconds;
+/// Tuning parameters for the PANOC algorithm.
+template <Config Conf = DefaultConfig>
+struct PANOCParams {
+    USING_ALPAQA_CONFIG(Conf);
 
+    /// Parameters related to the Lipschitz constant estimate and step size.
+    LipschitzEstimateParams<config_t> Lipschitz;
+    /// Maximum number of inner PANOC iterations.
+    unsigned max_iter = 100;
+    /// Maximum duration.
+    std::chrono::microseconds max_time = std::chrono::minutes(5);
+    /// Minimum weight factor between Newton step and projected gradient step.
+    real_t τ_min = 1. / 256;
+    /// Minimum Lipschitz constant estimate.
+    real_t L_min = 1e-5;
+    /// Maximum Lipschitz constant estimate.
+    real_t L_max = 1e20;
+    /// What stopping criterion to use.
+    PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
+    /// Maximum number of iterations without any progress before giving up.
+    unsigned max_no_progress = 10;
+
+    /// When to print progress. If set to zero, nothing will be printed.
+    /// If set to N != 0, progress is printed every N iterations.
+    unsigned print_interval = 0;
+
+    real_t quadratic_upperbound_tolerance_factor =
+        10 * std::numeric_limits<real_t>::epsilon();
+
+    bool update_lipschitz_in_linesearch = true;
+    bool alternative_linesearch_cond    = false;
+
+    LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
+};
+
+template <Config Conf = DefaultConfig>
+struct PANOCStats {
+    USING_ALPAQA_CONFIG(Conf);
+
+    SolverStatus status = SolverStatus::Busy;
+    real_t ε            = inf<Conf>;
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations          = 0;
+    unsigned linesearch_failures = 0;
+    unsigned lbfgs_failures      = 0;
+    unsigned lbfgs_rejected      = 0;
+    unsigned τ_1_accepted        = 0;
+    unsigned count_τ             = 0;
+    real_t sum_τ                 = 0;
+    real_t final_γ               = 0;
+};
+
+template <Config Conf = DefaultConfig>
+struct PANOCProgressInfo {
+    USING_ALPAQA_CONFIG(Conf);
+
+    unsigned k;
+    crvec x;
+    crvec p;
+    real_t norm_sq_p;
+    crvec x̂;
+    real_t φγ;
+    real_t ψ;
+    crvec grad_ψ;
+    real_t ψ_hat;
+    crvec grad_ψ_hat;
+    real_t L;
+    real_t γ;
+    real_t τ;
+    real_t ε;
+    crvec Σ;
+    crvec y;
+    const ProblemBase<Conf> &problem;
+    const PANOCParams<Conf> &params;
+};
+
+/// PANOC solver for ALM.
+/// @ingroup    grp_InnerSolvers
 template <class DirectionProviderT>
-std::string PANOCSolver<DirectionProviderT>::get_name() const {
-    return "PANOCSolver<" + direction_provider.get_name() + ">";
+class PANOCSolver {
+  public:
+    USING_ALPAQA_CONFIG_TEMPLATE(DirectionProviderT::config_t);
+
+    using Problem           = alpaqa::ProblemBase<config_t>;
+    using Params            = PANOCParams<config_t>;
+    using DirectionProvider = DirectionProviderT;
+    using Direction         = PANOCDirection<DirectionProvider>;
+    using Stats             = PANOCStats<config_t>;
+    using ProgressInfo      = PANOCProgressInfo<config_t>;
+
+    PANOCSolver(const Params &params, Direction &&direction_provider)
+        : params(params), direction_provider(std::move(direction_provider)) {}
+    PANOCSolver(const Params &params, const Direction &direction_provider)
+        : params(params), direction_provider(direction_provider) {}
+
+    Stats operator()(const Problem &problem,        // in
+                     crvec Σ,                       // in
+                     real_t ε,                      // in
+                     bool always_overwrite_results, // in
+                     rvec x,                        // inout
+                     rvec y,                        // inout
+                     rvec err_z);                   // out
+
+    PANOCSolver &
+    set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
+        this->progress_cb = cb;
+        return *this;
+    }
+
+    std::string get_name() const;
+
+    void stop() { stop_signal.stop(); }
+
+    const Params &get_params() const { return params; }
+
+  private:
+    Params params;
+    AtomicStopSignal stop_signal;
+    std::function<void(const ProgressInfo &)> progress_cb;
+    using Helpers = detail::PANOCHelpers<config_t>;
+
+  public:
+    Direction direction_provider;
+};
+
+template <class InnerSolverStats>
+struct InnerStatsAccumulator;
+
+template <Config Conf>
+struct InnerStatsAccumulator<PANOCStats<Conf>> {
+    USING_ALPAQA_CONFIG(Conf);
+
+    std::chrono::microseconds elapsed_time;
+    unsigned iterations          = 0;
+    unsigned linesearch_failures = 0;
+    unsigned lbfgs_failures      = 0;
+    unsigned lbfgs_rejected      = 0;
+    unsigned τ_1_accepted        = 0;
+    unsigned count_τ             = 0;
+    real_t sum_τ                 = 0;
+};
+
+template <Config Conf>
+InnerStatsAccumulator<PANOCStats<Conf>> &
+operator+=(InnerStatsAccumulator<PANOCStats<Conf>> &acc,
+           const PANOCStats<Conf> &s) {
+    acc.iterations += s.iterations;
+    acc.elapsed_time += s.elapsed_time;
+    acc.linesearch_failures += s.linesearch_failures;
+    acc.lbfgs_failures += s.lbfgs_failures;
+    acc.lbfgs_rejected += s.lbfgs_rejected;
+    acc.τ_1_accepted += s.τ_1_accepted;
+    acc.count_τ += s.count_τ;
+    acc.sum_τ += s.sum_τ;
+    return acc;
 }
 
-template <class DirectionProviderT>
-typename PANOCSolver<DirectionProviderT>::Stats
-PANOCSolver<DirectionProviderT>::operator()(
-    /// [in]    Problem description
-    const Problem &problem,
-    /// [in]    Constraint weights @f$ \Sigma @f$
-    crvec Σ,
-    /// [in]    Tolerance @f$ \varepsilon @f$
-    real_t ε,
-    /// [in]    Overwrite @p x, @p y and @p err_z even if not converged
-    bool always_overwrite_results,
-    /// [inout] Decision variable @f$ x @f$
-    rvec x,
-    /// [inout] Lagrange multipliers @f$ y @f$
-    rvec y,
-    /// [out]   Slack variable error @f$ g(x) - z @f$
-    rvec err_z) {
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, EigenConfigq);
+#endif
 
-    auto start_time = std::chrono::steady_clock::now();
-    Stats s;
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, EigenConfigq);
+#endif
 
-    const auto n = problem.n;
-    const auto m = problem.m;
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, EigenConfigq);
+#endif
 
-    // Allocate vectors, init L-BFGS -------------------------------------------
-
-    // TODO: the L-BFGS objects and vectors allocate on each iteration of ALM,
-    //       and there are more vectors than strictly necessary.
-
-    bool need_grad_̂ψₖ = detail::stop_crit_requires_grad_̂ψₖ(params.stop_crit);
-
-    vec xₖ = x,   // Value of x at the beginning of the iteration
-        x̂ₖ(n),    // Value of x after a projected gradient step
-        xₖ₊₁(n),  // xₖ for next iteration
-        x̂ₖ₊₁(n),  // x̂ₖ for next iteration
-        ŷx̂ₖ(m),   // ŷ(x̂ₖ) = Σ (g(x̂ₖ) - ẑₖ)
-        ŷx̂ₖ₊₁(m), // ŷ(x̂ₖ) for next iteration
-        pₖ(n),    // Projected gradient step pₖ = x̂ₖ - xₖ
-        pₖ₊₁(n), // Projected gradient step pₖ₊₁ = x̂ₖ₊₁ - xₖ₊₁
-        qₖ(n),   // Newton step Hₖ pₖ
-        grad_ψₖ(n),                    // ∇ψ(xₖ)
-        grad_̂ψₖ(need_grad_̂ψₖ ? n : 0), // ∇ψ(x̂ₖ)
-        grad_ψₖ₊₁(n);                  // ∇ψ(xₖ₊₁)
-
-    vec work_n(n), work_m(m);
-
-    // Keep track of how many successive iterations didn't update the iterate
-    unsigned no_progress = 0;
-
-    // Helper functions --------------------------------------------------------
-
-    // Wrappers for helper functions that automatically pass along any arguments
-    // that are constant within PANOC (for readability in the main algorithm)
-    auto calc_ψ_ŷ = [&problem, &y, &Σ](crvec x, rvec ŷ) {
-        return detail::calc_ψ_ŷ(problem, x, y, Σ, ŷ);
-    };
-    auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
-                                                              rvec grad_ψ) {
-        return detail::calc_ψ_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
-    };
-    auto calc_grad_ψ_from_ŷ = [&problem, &work_n](crvec x, crvec ŷ,
-                                                  rvec grad_ψ) {
-        detail::calc_grad_ψ_from_ŷ(problem, x, ŷ, grad_ψ, work_n);
-    };
-    auto calc_x̂ = [&problem](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
-        detail::calc_x̂(problem, γ, x, grad_ψ, x̂, p);
-    };
-    auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
-        detail::calc_err_z(problem, x̂, y, Σ, err_z);
-    };
-    auto descent_lemma = [this, &problem, &y,
-                          &Σ](crvec xₖ, real_t ψₖ, crvec grad_ψₖ, rvec x̂ₖ,
-                              rvec pₖ, rvec ŷx̂ₖ, real_t &ψx̂ₖ, real_t &pₖᵀpₖ,
-                              real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
-        return detail::descent_lemma(
-            problem, params.quadratic_upperbound_tolerance_factor, params.L_max,
-            xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
-    };
-    auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
-                              real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
-        std::cout << "[PANOC] " << std::setw(6) << k
-                  << ": ψ = " << std::setw(13) << ψₖ
-                  << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()
-                  << ", ‖p‖ = " << std::setw(13) << std::sqrt(pₖᵀpₖ)
-                  << ", γ = " << std::setw(13) << γₖ
-                  << ", εₖ = " << std::setw(13) << εₖ << "\r\n";
-    };
-
-    // Estimate Lipschitz constant ---------------------------------------------
-
-    real_t ψₖ, Lₖ;
-    // Finite difference approximation of ∇²ψ in starting point
-    if (params.Lipschitz.L₀ <= 0) {
-        Lₖ = detail::initial_lipschitz_estimate(
-            problem, xₖ, y, Σ, params.Lipschitz.ε, params.Lipschitz.δ,
-            params.L_min, params.L_max,
-            /* in ⟹ out */ ψₖ, grad_ψₖ, x̂ₖ, grad_ψₖ₊₁, work_n, work_m);
-    }
-    // Initial Lipschitz constant provided by the user
-    else {
-        Lₖ = params.Lipschitz.L₀;
-        // Calculate ψ(xₖ), ∇ψ(x₀)
-        ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
-    }
-    if (not std::isfinite(Lₖ)) {
-        s.status = SolverStatus::NotFinite;
-        return s;
-    }
-    real_t γₖ = params.Lipschitz.Lγ_factor / Lₖ;
-    real_t τ  = NaN;
-
-    // First projected gradient step -------------------------------------------
-
-    // Calculate x̂₀, p₀ (projected gradient step)
-    calc_x̂(γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
-    // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
-    real_t ψx̂ₖ        = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷx̂ₖ);
-    real_t grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
-    real_t pₖᵀpₖ      = pₖ.squaredNorm();
-    // Compute forward-backward envelope
-    real_t φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
-
-    // Main PANOC loop
-    // =========================================================================
-    for (unsigned k = 0; k <= params.max_iter; ++k) {
-
-        // Quadratic upper bound -----------------------------------------------
-        if (k == 0 || params.update_lipschitz_in_linesearch == false) {
-            // Decrease step size until quadratic upper bound is satisfied
-            real_t old_γₖ =
-                descent_lemma(xₖ, ψₖ, grad_ψₖ,
-                              /* in ⟹ out */ x̂ₖ, pₖ, ŷx̂ₖ,
-                              /* inout */ ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
-            if (k > 0 && γₖ != old_γₖ) // Flush L-BFGS if γ changed
-                direction_provider.changed_γ(γₖ, old_γₖ);
-            else if (k == 0) // Initialize L-BFGS
-                direction_provider.initialize(xₖ, x̂ₖ, pₖ, grad_ψₖ);
-            if (γₖ != old_γₖ)
-                φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
-        }
-        // Calculate ∇ψ(x̂ₖ)
-        if (need_grad_̂ψₖ)
-            calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
-
-        // Check stop condition ------------------------------------------------
-        real_t εₖ = detail::calc_error_stop_crit(
-            problem.C, params.stop_crit, pₖ, γₖ, xₖ, x̂ₖ, ŷx̂ₖ, grad_ψₖ, grad_̂ψₖ);
-
-        // Print progress
-        if (params.print_interval != 0 && k % params.print_interval == 0)
-            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, εₖ);
-        if (progress_cb)
-            progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, φₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ,
-                         Lₖ, γₖ, τ, εₖ, Σ, y, problem, params});
-
-        auto time_elapsed = std::chrono::steady_clock::now() - start_time;
-        auto stop_status  = detail::check_all_stop_conditions(
-            params, time_elapsed, k, stop_signal, ε, εₖ, no_progress);
-        if (stop_status != SolverStatus::Unknown) {
-            // TODO: We could cache g(x) and ẑ, but would that faster?
-            //       It saves 1 evaluation of g per ALM iteration, but requires
-            //       many extra stores in the inner loops of PANOC.
-            // TODO: move the computation of ẑ and g(x) to ALM?
-            if (stop_status == SolverStatus::Converged ||
-                stop_status == SolverStatus::Interrupted ||
-                always_overwrite_results) {
-                calc_err_z(x̂ₖ, /* in ⟹ out */ err_z);
-                x = std::move(x̂ₖ);
-                y = std::move(ŷx̂ₖ);
-            }
-            s.iterations   = k;
-            s.ε            = εₖ;
-            s.elapsed_time = duration_cast<microseconds>(time_elapsed);
-            s.status       = stop_status;
-            return s;
-        }
-
-        // Calculate quasi-Newton step -----------------------------------------
-        real_t step_size =
-            params.lbfgs_stepsize == LBFGSStepSize::BasedOnGradientStepSize
-                ? 1
-                : -1;
-        if (k > 0)
-            direction_provider.apply(xₖ, x̂ₖ, pₖ, step_size,
-                                     /* in ⟹ out */ qₖ);
-
-        // Line search initialization ------------------------------------------
-        τ                  = 1;
-        real_t σₖγₖ⁻¹pₖᵀpₖ = (1 - γₖ * Lₖ) * pₖᵀpₖ / (2 * γₖ);
-        real_t φₖ₊₁, ψₖ₊₁, ψx̂ₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, pₖ₊₁ᵀpₖ₊₁;
-        real_t Lₖ₊₁, γₖ₊₁;
-        real_t ls_cond;
-        // TODO: make separate parameter
-        real_t margin =
-            (1 + std::abs(φₖ)) * params.quadratic_upperbound_tolerance_factor;
-
-        // Make sure quasi-Newton step is valid
-        if (k == 0) {
-            τ = 0; // Always use prox step on first iteration
-        } else if (not qₖ.allFinite()) {
-            τ = 0;
-            ++s.lbfgs_failures;
-            direction_provider.reset(); // Is there anything else we can do?
-        }
-
-        // Line search loop ----------------------------------------------------
-        do {
-            Lₖ₊₁ = Lₖ;
-            γₖ₊₁ = γₖ;
-
-            // Calculate xₖ₊₁
-            if (τ / 2 < params.τ_min) { // line search failed
-                xₖ₊₁.swap(x̂ₖ);          // → safe prox step
-                ψₖ₊₁ = ψx̂ₖ;
-                if (need_grad_̂ψₖ)
-                    grad_ψₖ₊₁.swap(grad_̂ψₖ);
-                else
-                    calc_grad_ψ_from_ŷ(xₖ₊₁, ŷx̂ₖ, /* in ⟹ out */ grad_ψₖ₊₁);
-            } else {        // line search didn't fail (yet)
-                if (τ == 1) // → faster quasi-Newton step
-                    xₖ₊₁ = xₖ + qₖ;
-                else
-                    xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ;
-                // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
-                ψₖ₊₁ = calc_ψ_grad_ψ(xₖ₊₁, /* in ⟹ out */ grad_ψₖ₊₁);
-            }
-
-            // Calculate x̂ₖ₊₁, pₖ₊₁ (projected gradient step in xₖ₊₁)
-            calc_x̂(γₖ₊₁, xₖ₊₁, grad_ψₖ₊₁, /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁);
-            // Calculate ψ(x̂ₖ₊₁) and ŷ(x̂ₖ₊₁)
-            ψx̂ₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
-
-            // Quadratic upper bound -------------------------------------------
-            grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
-            pₖ₊₁ᵀpₖ₊₁      = pₖ₊₁.squaredNorm();
-            real_t pₖ₊₁ᵀpₖ₊₁_ₖ = pₖ₊₁ᵀpₖ₊₁; // prox step with step size γₖ
-
-            if (params.update_lipschitz_in_linesearch == true) {
-                // Decrease step size until quadratic upper bound is satisfied
-                (void)descent_lemma(xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
-                                    /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
-                                    /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁,
-                                    grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁);
-            }
-
-            // Compute forward-backward envelope
-            φₖ₊₁ = ψₖ₊₁ + 1 / (2 * γₖ₊₁) * pₖ₊₁ᵀpₖ₊₁ + grad_ψₖ₊₁ᵀpₖ₊₁;
-            // Compute line search condition
-            ls_cond = φₖ₊₁ - (φₖ - σₖγₖ⁻¹pₖᵀpₖ);
-            if (params.alternative_linesearch_cond)
-                ls_cond -= (0.5 / γₖ₊₁ - 0.5 / γₖ) * pₖ₊₁ᵀpₖ₊₁_ₖ;
-
-            τ /= 2;
-        } while (ls_cond > margin && τ >= params.τ_min);
-
-        // If τ < τ_min the line search failed and we accepted the prox step
-        if (τ < params.τ_min && k != 0) {
-            ++s.linesearch_failures;
-            τ = 0;
-        }
-        if (k != 0) {
-            s.count_τ += 1;
-            s.sum_τ += τ * 2;
-            s.τ_1_accepted += τ * 2 == 1;
-        }
-
-        // Update L-BFGS -------------------------------------------------------
-        if (γₖ != γₖ₊₁) // Flush L-BFGS if γ changed
-            direction_provider.changed_γ(γₖ₊₁, γₖ);
-
-        s.lbfgs_rejected += not direction_provider.update(
-            xₖ, xₖ₊₁, pₖ, pₖ₊₁, grad_ψₖ₊₁, problem.C, γₖ₊₁);
-
-        // Check if we made any progress
-        if (no_progress > 0 || k % params.max_no_progress == 0)
-            no_progress = xₖ == xₖ₊₁ ? no_progress + 1 : 0;
-
-        // Advance step --------------------------------------------------------
-        Lₖ = Lₖ₊₁;
-        γₖ = γₖ₊₁;
-
-        ψₖ  = ψₖ₊₁;
-        ψx̂ₖ = ψx̂ₖ₊₁;
-        φₖ  = φₖ₊₁;
-
-        xₖ.swap(xₖ₊₁);
-        x̂ₖ.swap(x̂ₖ₊₁);
-        ŷx̂ₖ.swap(ŷx̂ₖ₊₁);
-        pₖ.swap(pₖ₊₁);
-        grad_ψₖ.swap(grad_ψₖ₊₁);
-        grad_ψₖᵀpₖ = grad_ψₖ₊₁ᵀpₖ₊₁;
-        pₖᵀpₖ      = pₖ₊₁ᵀpₖ₊₁;
-    }
-    throw std::logic_error("[PANOC] loop error");
-}
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, LBFGS<DefaultConfig>);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, LBFGS<EigenConfigf>);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, LBFGS<EigenConfigd>);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, LBFGS<EigenConfigl>);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, LBFGS<EigenConfigq>);
+#endif
 
 } // namespace alpaqa

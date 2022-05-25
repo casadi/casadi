@@ -1,5 +1,0 @@
-#pragma once
-
-const char *const CUTEstProblemList[] = {
-    @CUTEst_PROBLEM_LIST_STRINGS@,
-};
