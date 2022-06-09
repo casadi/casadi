@@ -853,8 +853,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
-    std::string qpsol = cg.add_dependency(qpsol_);
-    cg << qpsol << "(m_arg, m_res, m_iw, m_w, 0);\n";
+    cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w");
   }
 
   Dict Sqpmethod::get_stats(void* mem) const {
