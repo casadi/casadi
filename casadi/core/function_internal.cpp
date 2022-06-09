@@ -2198,6 +2198,39 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::codegen_checkout(CodeGenerator& g) const {
+    std::string name = codegen_name(g, false);
+    std::string stack_counter = g.shorthand(name + "_unused_stack_counter");
+    std::string stack = g.shorthand(name + "_unused_stack");
+    std::string mem_counter = g.shorthand(name + "_mem_counter");
+    std::string mem_array = g.shorthand(name + "_mem");
+    std::string alloc_mem = g.shorthand(name + "_alloc_mem");
+    std::string init_mem = g.shorthand(name + "_init_mem");
+
+    g.auxiliaries << "static int " << mem_counter  << " = 0;\n";
+    g.auxiliaries << "static int " << stack_counter  << " = -1;\n";
+    g.auxiliaries << "static int " << stack << "[CASADI_MAX_NUM_THREADS];\n";
+    g.auxiliaries << "static " << codegen_mem_type() <<
+               " *" << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
+    g << "int mid;\n";
+    g << "if (" << stack_counter << ">=0) {\n";
+    g << "return " << stack << "[" << stack_counter << "--];\n";
+    g << "} else {\n";
+    g << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) return -1;\n";
+    g << "mid = " << alloc_mem << "();\n";
+    g << "if (mid<0) return -1;\n";
+    g << "if(" << init_mem << "(mid)) return -1;\n";
+    g << "return mid;\n";
+    g << "}\n";
+  }
+
+  void FunctionInternal::codegen_release(CodeGenerator& g) const {
+    std::string name = codegen_name(g, false);
+    std::string stack_counter = g.shorthand(name + "_unused_stack_counter");
+    std::string stack = g.shorthand(name + "_unused_stack");
+    g << stack << "[++" << stack_counter << "] = mem;\n";
+  }
+
   void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {
     g.add_io_sparsities(name_, sparsity_in_, sparsity_out_);
   }

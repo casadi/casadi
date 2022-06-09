@@ -310,6 +310,47 @@ void External::codegen_body(CodeGenerator& g) const {
   }
 }
 
+std::string External::codegen_mem_type() const {
+  if (checkout_) return "nonempty";
+}
+
+void External::codegen_checkout(CodeGenerator& g) const {
+  if (checkout_) {
+    g << "return " << name_ << "_checkout();\n";
+  } else {
+    g << "return 0;\n";
+  }
+}
+
+void External::codegen_release(CodeGenerator& g) const {
+  if (release_) {
+    g << name_ << "_release();\n";
+  }
+}
+
+void External::codegen_incref(CodeGenerator& g) const {
+  if (incref_) {
+    g << name_ << "_incref();\n";
+  }
+}
+
+void External::codegen_decref(CodeGenerator& g) const {
+  if (decref_) {
+    g << name_ << "_decref();\n";
+  }
+}
+
+void External::codegen_init_mem(CodeGenerator& g) const {
+  g << "return 0;\n";
+}
+
+void External::codegen_alloc_mem(CodeGenerator& g) const {
+  g << "return 0;\n";
+}
+
+void External::codegen_free_mem(CodeGenerator& g) const {
+}
+
 bool External::has_jacobian() const {
   if (FunctionInternal::has_jacobian()) return true;
   return li_.has_function("jac_" + name_);

@@ -619,6 +619,12 @@ namespace casadi {
     /** \brief Codegen for free_mem */
     virtual void codegen_free_mem(CodeGenerator& g) const {}
 
+    /** \brief Codegen for checkout */
+    virtual void codegen_checkout(CodeGenerator& g) const;
+
+    /** \brief Codegen for release */
+    virtual void codegen_release(CodeGenerator& g) const;
+
     /** \brief Code generate the function  */
     std::string signature(const std::string& fname) const;
 

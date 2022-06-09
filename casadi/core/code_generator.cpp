@@ -249,46 +249,27 @@ namespace casadi {
       f->codegen_free_mem(*this);
       scope_exit();
       *this << "}\n\n";
+
+      // Checkout
+      *this << "int " << fname << "_checkout(void) {\n";
+      flush(this->body);
+      scope_enter();
+      f->codegen_checkout(*this);
+      scope_exit();
+      *this << "}\n\n";
+
+      // Clear memory
+      *this << "void " << fname << "_release(int mem) {\n";
+      flush(this->body);
+      scope_enter();
+      f->codegen_release(*this);
+      scope_exit();
+      *this << "}\n\n";
+
     }
 
     // Flush to body
     flush(this->body);
-
-
-    if (fun_needs_mem) {
-      std::string name = f->codegen_name(*this, false);
-      std::string stack_counter = shorthand(name + "_unused_stack_counter");
-      std::string stack = shorthand(name + "_unused_stack");
-      std::string mem_counter = shorthand(name + "_mem_counter");
-      std::string mem_array = shorthand(name + "_mem");
-      std::string alloc_mem = shorthand(name + "_alloc_mem");
-      std::string init_mem = shorthand(name + "_init_mem");
-
-      auxiliaries << "static int " << mem_counter  << " = 0;\n";
-      auxiliaries << "static int " << stack_counter  << " = -1;\n";
-      auxiliaries << "static int " << stack << "[CASADI_MAX_NUM_THREADS];\n";
-      auxiliaries << "static " << f->codegen_mem_type() <<
-               " *" << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
-
-      *this << "int " << shorthand(name + "_checkout") << "(void) {\n";
-      *this << "int mid;\n";
-      *this << "if (" << stack_counter << ">=0) {\n";
-      *this << "return " << stack << "[" << stack_counter << "--];\n";
-      *this << "} else {\n";
-      *this << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) return -1;\n";
-      *this << "mid = " << alloc_mem << "();\n";
-      *this << "if (mid<0) return -1;\n";
-      *this << "if(" << init_mem << "(mid)) return -1;\n";
-      *this << "return mid;\n";
-      *this << "}\n";
-
-      *this << "return " << stack << "[" << stack_counter << "--];\n";
-      *this << "}\n\n";
-
-      *this << "void " << shorthand(name + "_release") << "(int mem) {\n";
-      *this << stack << "[++" << stack_counter << "] = mem;\n";
-      *this << "}\n\n";
-    }
 
     return fname;
   }

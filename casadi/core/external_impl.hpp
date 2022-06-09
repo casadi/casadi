@@ -106,6 +106,30 @@ class CASADI_EXPORT External : public FunctionInternal {
   /** \brief Generate code for the body of the C function */
   void codegen_body(CodeGenerator& g) const override;
 
+  /** \brief Thread-local memory object type */
+  std::string codegen_mem_type() const override;
+
+  /** \brief Codegen incref for dependencies */
+  void codegen_incref(CodeGenerator& g) const override;
+
+  /** \brief Codegen decref for dependencies */
+  void codegen_decref(CodeGenerator& g) const override;
+
+  /** \brief Codegen for checkout */
+  void codegen_checkout(CodeGenerator& g) const override;
+
+  /** \brief Codegen for release */
+  void codegen_release(CodeGenerator& g) const override;
+
+  /** \brief Codegen decref for alloc_mem */
+  void codegen_alloc_mem(CodeGenerator& g) const override;
+
+  /** \brief Codegen decref for init_mem */
+  void codegen_init_mem(CodeGenerator& g) const override;
+
+  /** \brief Codegen for free_mem */
+  void codegen_free_mem(CodeGenerator& g) const override;
+
   ///@{
   /** \brief Number of function inputs and outputs */
   size_t get_n_in() override;
