@@ -14,6 +14,7 @@ struct not_implemented_error : std::logic_error {
     using std::logic_error::logic_error;
 };
 
+/// Base class for problem definitions.
 template <Config Conf = DefaultConfig>
 class ProblemBase {
   public:
@@ -67,6 +68,12 @@ class ProblemBase {
     ///         Gradient of the constraints
     ///         @f$ \nabla g(x)\,y \in \R^n @f$
     virtual void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const;
+
+    /// @}
+
+    /// @name Functions for second-order solvers
+    /// @{
+
     /// Function that evaluates the gradient of one specific constraint,
     /// @f$ \nabla g_i(x) @f$
     /// @param  [in] x
@@ -76,6 +83,7 @@ class ProblemBase {
     /// @param  [out] grad_gi
     ///         Gradient of the constraint
     ///         @f$ \nabla g_i(x) \R^n @f$
+    /// Required for second-order solvers only.
     virtual void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const;
     /// Function that evaluates the Hessian of the Lagrangian multiplied by a
     /// vector,
@@ -89,6 +97,7 @@ class ProblemBase {
     /// @param  [out] Hv
     ///         Hessian-vector product
     ///         @f$ \nabla_{xx}^2 L(x, y)\,v \in \R^{n} @f$
+    /// Required for second-order solvers only.
     virtual void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const;
     /// Function that evaluates the Hessian of the Lagrangian,
     /// @f$ \nabla_{xx}^2L(x, y) @f$
@@ -98,6 +107,7 @@ class ProblemBase {
     ///         Lagrange multipliers @f$ y \in \R^m @f$
     /// @param  [out] H
     ///         Hessian @f$ \nabla_{xx}^2 L(x, y) \in \R^{n\times n} @f$
+    /// Required for second-order solvers only.
     virtual void eval_hess_L(crvec x, crvec y, rmat H) const;
 
     /// @}
@@ -206,6 +216,12 @@ class ProblemBase {
  *  C &\defeq \defset{x\in\R^n}{\underline x \le x \le \overline x} \\
  *  D &\defeq \defset{z\in\R^m}{\underline z \le z \le \overline z} \\
  * \end{aligned} @f]
+ *
+ * The functions in the “Basic functions” section have to be implemented by the
+ * user. Functions in the “Combined evaluations” and “Augmented Lagrangian” 
+ * sections are optional, by default, they are computed by evaluating the 
+ * “Basic functions”, but performance can be improved by providing functions 
+ * that directly compute multiple quantities at once.
  */
 template <Config Conf = DefaultConfig>
 class Problem : public ProblemBase<Conf> {
@@ -289,6 +305,8 @@ class Problem : public ProblemBase<Conf> {
     /// @}
 };
 
+/// @ref Problem class that allows specifying the basic functions as C++
+/// `std::function`s.
 template <Config Conf = DefaultConfig>
 class FunctionalProblem : public Problem<Conf> {
   public:

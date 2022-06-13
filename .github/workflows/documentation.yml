@@ -1,0 +1,56 @@
+# This action generates the documentation and then deploys it to the `gh-pages` branch.
+
+name: Documentation & Coverage
+
+on:
+  push:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container: docker.io/tttapa/alpaqa-docs
+
+    steps:
+    # Checks-out the repository under $GITHUB_WORKSPACE
+    - uses: actions/checkout@v2
+    - run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+    # Install Python dependencies to generate tests
+    - name: Install Python Dependencies 
+      run: | 
+        # python3 -m pip install -r requirements-docs.txt
+        # python3 -m pip install -r requirements-wheel.txt
+        python3 -m pip install numpy casadi
+        # ./install-sphinx.sh --force-install
+        # python3 -m pip install furo
+      working-directory: scripts
+
+    # Create the `gh-pages` branch if it doesn't exist already, check it out, 
+    # and copy it to /tmp/staging.
+    - name: Create staging area
+      run: |
+        rm -rf /tmp/staging
+        git fetch origin gh-pages:gh-pages ||:
+        git checkout gh-pages || \
+        { git checkout --orphan gh-pages && git rm -rf . && git clean -fxd ; }
+        cp -ar $GITHUB_WORKSPACE/ /tmp/staging
+        git checkout ${GITHUB_REF##*/}
+        git config --global --add safe.directory /tmp/staging
+
+    # Generate the documentation and save it in /tmp/staging
+    - name: Generate documentation
+      run: ./scripts/ci/gen-docs.sh /tmp/staging
+      env:
+        CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen"
+
+    # Commit the new documentation, squash the commits, and push it to GitHub
+    - name: Commit and push documention
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
+        commithash=$(git rev-parse HEAD)
+        cd /tmp/staging
+        git add .
+        git commit -m "Documentation for ${commithash}" && \
+        git reset $(git commit-tree HEAD^{tree} -m "Documentation for ${commithash}") && \
+        git push -f origin gh-pages ||:

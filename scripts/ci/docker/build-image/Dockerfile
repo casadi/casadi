@@ -119,6 +119,7 @@ RUN cmake --version
 
 COPY --from=casadi-install-static /tmp/casadi-install/ /usr/local/
 COPY --from=eigen-install /tmp/eigen-install/ /usr/local/
+COPY --from=gtest-install /tmp/gtest-install/ /usr/local/
 RUN ldconfig
 
 RUN python3 -m pip install -U build auditwheel patchelf
