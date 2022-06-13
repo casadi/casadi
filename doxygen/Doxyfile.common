@@ -333,7 +333,7 @@ OPTIMIZE_OUTPUT_SLICE  = NO
 #
 # Note see also the list of default file extension mappings.
 
-EXTENSION_MAPPING      = ino=C++
+EXTENSION_MAPPING      = ino=C++ tpp=C++ ipp=C++
 
 # If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -935,6 +935,7 @@ INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.cpp \
                          *.h \
                          *.hpp \
+                         *.tpp \
                          *.ipp \
                          *.md \
                          *.dox \
