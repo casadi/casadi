@@ -509,14 +509,16 @@ namespace casadi {
     n_in_ = get_n_in();
     if (max_io_ > 0 && n_in_ > max_io_) {
       casadi_warning("Function " + name_ + " has many inputs (" + str(n_in_) + " > "
-        + str(max_io_) + "). Changing the problem formulation is strongly encouraged.");
+        + "max_io (=" + str(max_io_) + ")). "
+        + "Changing the problem formulation is strongly encouraged.");
     }
 
     // Get the number of outputs
     n_out_ = get_n_out();
     if (max_io_ > 0 && n_out_ > max_io_) {
       casadi_warning("Function " + name_ + " has many outputs (" + str(n_out_) + " > "
-        + str(max_io_) + "). Changing the problem formulation is strongly encouraged.");
+        + "max_io (=" + str(max_io_) + ")). "
+        + "Changing the problem formulation is strongly encouraged.");
     }
 
     // Query which inputs are differentiable if not already provided
@@ -3801,7 +3803,11 @@ namespace casadi {
     s.unpack("FunctionInternal::fd_method", fd_method_);
     s.unpack("FunctionInternal::print_in", print_in_);
     s.unpack("FunctionInternal::print_out", print_out_);
-    if (version >= 4) s.unpack("FunctionInternal::max_io", max_io_);
+    if (version >= 4) {
+      s.unpack("FunctionInternal::max_io", max_io_);
+    } else {
+      max_io_ = 10000;
+    }
     s.unpack("FunctionInternal::dump_in", dump_in_);
     s.unpack("FunctionInternal::dump_out", dump_out_);
     s.unpack("FunctionInternal::dump_dir", dump_dir_);
