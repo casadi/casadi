@@ -125,6 +125,15 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
+    // Get list of dependency functions
+    virtual std::vector<std::string> get_function() const override;
+
+    // Get a dependency function
+    const Function& get_function(const std::string &name) const override;
+
+    // Check if a particular dependency exists
+    bool has_function(const std::string& fname) const override;
+
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     bool has_forward(casadi_int nfwd) const override { return true;}

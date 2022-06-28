@@ -98,6 +98,21 @@ namespace casadi {
     clear_mem();
   }
 
+ std::vector<std::string> MapSum::get_function() const {
+    return {"f"};
+  }
+
+  const Function& MapSum::get_function(const std::string &name) const {
+    casadi_assert(has_function(name),
+      "No function \"" + name + "\" in " + name_ + ". " +
+      "Available functions: " + join(get_function()) + ".");
+    return f_;
+  }
+
+  bool MapSum::has_function(const std::string& fname) const {
+    return fname=="f";
+  }
+
   void MapSum::init(const Dict& opts) {
     is_diff_in_ = f_.is_diff_in();
     is_diff_out_ = f_.is_diff_out();
