@@ -3269,6 +3269,13 @@ DECL M casadi_mmax(const M& x) { return mmax(x); }
 DECL casadi::DM casadi_evalf(const M& x) {
   return evalf(x);
 }
+DECL std::vector<M> casadi_cse(const std::vector<M>& e) {
+  return cse(e);
+}
+DECL M casadi_cse(const M& e) {
+  return cse(e);
+}
+
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL

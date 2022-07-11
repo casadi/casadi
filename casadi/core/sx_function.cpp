@@ -189,7 +189,10 @@ namespace casadi {
         "Just-in-time compilation for numeric evaluation using OpenCL (experimental)"}},
       {"live_variables",
        {OT_BOOL,
-        "Reuse variables in the work vector"}}
+        "Reuse variables in the work vector"}},
+      {"cse",
+       {OT_BOOL,
+        "Perform common subexpression elimination (complexity is N*log(N) in graph size)"}}
      }
   };
 
@@ -210,6 +213,8 @@ namespace casadi {
     // Default (temporary) options
     live_variables_ = true;
 
+    bool cse_opt = false;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
@@ -220,8 +225,12 @@ namespace casadi {
         just_in_time_opencl_ = op.second;
       } else if (op.first=="just_in_time_sparsity") {
         just_in_time_sparsity_ = op.second;
+      } else if (op.first=="cse") {
+        cse_opt = op.second;
       }
     }
+
+    if (cse_opt) out_ = cse(out_);
 
     // Check/set default inputs
     if (default_in_.empty()) {

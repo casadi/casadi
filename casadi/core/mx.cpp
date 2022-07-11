@@ -1959,6 +1959,108 @@ namespace casadi {
     return H->get_convexify(opts);
   }
 
+
+  class IncrementalSerializer {
+    public:
+
+    IncrementalSerializer() : serializer(ss, {{"debug", true}}) {
+    }
+
+    std::string pack(const MX& a) {
+      // Serialization goes wrong if serialized SXNodes get destroyed
+      ref.push_back(a);
+      if (a.is_empty()) return "";
+      // First serialize may introduce unknown dependencies (e.g. sparsity)
+      // and hence definitions
+      // Subsequent serialization will have references instead.
+      // In order to still get a match with a later common subexpression,
+      // make sure that all dependencies are already defined.
+      a.serialize(serializer);
+      ss.str("");
+      ss.clear();
+      a.serialize(serializer);
+      std::string ret = ss.str();
+      ss.str("");
+      ss.clear();
+      return ret;
+    }
+
+    private:
+      std::stringstream ss;
+      // List of references to keep alive
+      vector<MX> ref;
+      SerializingStream serializer;
+  };
+
+
+  std::vector<MX> MX::cse(const std::vector<MX>& e) {
+    MX c = veccat(e);
+    Function f("f", std::vector<MX>{}, e, {{"live_variables", false}, {"max_io", 0}, {"cse", false}});
+    MXFunction *ff = f.get<MXFunction>();
+
+    // Symbolic work, non-differentiated
+    vector<MX> swork(ff->workloc_.size()-1);
+
+    // Allocate storage for split outputs
+    vector<vector<MX> > res_split(e.size());
+    for (casadi_int i=0; i<e.size(); ++i) res_split[i].resize(e[i].n_primitives());
+
+    vector<MX> arg1, res1;
+    vector<MX> res(e.size());
+
+    std::unordered_map<std::string, MX > cache;
+    IncrementalSerializer s;
+
+    // Loop over computational nodes in forward order
+    casadi_int alg_counter = 0;
+    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
+      if (it->op == OP_INPUT) {
+        // pass
+      } else if (it->op==OP_OUTPUT) {
+        // Collect the results
+        res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
+      } else if (it->op==OP_PARAMETER) {
+        // Fetch parameter
+        MX& target = swork[it->res.front()];
+        target = it->data;
+        cache[s.pack(target)] = target;
+      } else {
+
+        // Arguments of the operation
+        arg1.resize(it->arg.size());
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+        }
+
+        // Perform the operation
+        res1.resize(it->res.size());
+        it->data->eval_mx(arg1, res1);
+
+        // Get the result
+        for (casadi_int i=0; i<res1.size(); ++i) {
+          casadi_int el = it->res[i]; // index of the output
+          MX& out_i = res1[i];
+
+          std::string key = s.pack(out_i);
+          auto itk = cache.find(key);
+          if (itk==cache.end()) {
+            cache[key] = out_i;
+          } else {
+            out_i = itk->second;
+          }
+
+          if (el>=0) swork[el] = out_i;
+        }
+      }
+    }
+
+    // Join split outputs
+    for (casadi_int i=0; i<res.size(); ++i) res[i] = e[i].join_primitives(res_split[i]);
+
+    return res;
+  }
+
   MX interpn_G(casadi_int i, // Dimension to interpolate along
                 const MX& v, // Coefficients
                 const std::vector<MX>& xis, // Normalised coordinates

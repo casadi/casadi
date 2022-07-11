@@ -532,6 +532,7 @@ namespace casadi {
     static MX project(const MX& x, const Sparsity& sp, bool intersect=false);
     static MX cumsum(const MX &x, casadi_int axis=-1);
     static MX _logsumexp(const MX& x);
+    static std::vector<MX> cse(const std::vector<MX>& e);
     ///@}
 
     ///@{

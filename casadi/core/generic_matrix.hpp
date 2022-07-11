@@ -557,6 +557,19 @@ namespace casadi {
       return MatType::substitute_inplace(v, inout_vdef, inout_ex, reverse);
     }
 
+    /* \brief Common subexpression elimination
+    */
+    inline friend MatType cse(const MatType& e) {
+      return MatType::cse({e}).at(0);
+    }
+
+
+    /* \brief Common subexpression elimination
+    */
+    inline friend std::vector<MatType> cse(const std::vector<MatType>& e) {
+      return MatType::cse(e);
+    }
+
     /** \brief  Solve a system of equations: A*x = b
         The solve routine works similar to Matlab's backslash when A is square and nonsingular.
         The algorithm used is the following:

@@ -87,6 +87,12 @@ namespace casadi {
     return casadi_logsumexp(A.ptr(), A.numel());
   }
 
+  template<>
+  std::vector<DM> CASADI_EXPORT DM::
+  cse(const std::vector<DM>& e) {
+    return e;
+  }
+
   template<> void CASADI_EXPORT DM::export_code(const std::string& lang,
        std::ostream &stream, const Dict& options) const {
 

@@ -64,7 +64,10 @@ namespace casadi {
         "Reuse variables in the work vector"}},
       {"print_instructions",
        {OT_BOOL,
-        "Print each operation during evaluation"}}
+        "Print each operation during evaluation"}},
+      {"cse",
+       {OT_BOOL,
+        "Perform common subexpression elimination (complexity is N*log(N) in graph size)"}}
      }
   };
 
@@ -108,6 +111,7 @@ namespace casadi {
     // Default (temporary) options
     live_variables_ = true;
     print_instructions_ = false;
+    bool cse_opt = false;
 
     // Read options
     for (auto&& op : opts) {
@@ -117,6 +121,8 @@ namespace casadi {
         live_variables_ = op.second;
       } else if (op.first=="print_instructions") {
         print_instructions_ = op.second;
+      } else if (op.first=="cse") {
+        cse_opt = op.second;
       }
     }
 
@@ -127,6 +133,8 @@ namespace casadi {
       casadi_assert(default_in_.size()==n_in_,
                             "Option 'default_in' has incorrect length");
     }
+
+    if (cse_opt) out_ = cse(out_);
 
     // Stack used to sort the computational graph
     stack<MXNode*> s;

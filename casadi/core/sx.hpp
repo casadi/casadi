@@ -110,6 +110,9 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
                              std::vector<SX>& ex, bool reverse);
 
   template<>
+  std::vector<SX> SX::cse(const std::vector<SX>& e);
+
+  template<>
   bool SX::depends_on(const SX &x, const SX &arg);
 
   template<>

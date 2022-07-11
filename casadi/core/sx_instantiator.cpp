@@ -566,6 +566,116 @@ namespace casadi {
     return false;
   }
 
+  class IncrementalSerializer {
+    public:
+
+    IncrementalSerializer() : serializer(ss) {
+    }
+
+    std::string pack(const SXElem& a) {
+      serializer.pack(a);
+      // Serialization goes wrong if serialized SXNodes get destroyed
+      ref.push_back(a);
+      std::string ret = ss.str();
+      ss.str("");
+      ss.clear();
+      //uout() << a << ":" << ret << std::endl;
+      return ret;
+    }
+
+    private:
+      std::stringstream ss;
+      // List of references to keep alive
+      vector<SXElem> ref;
+      SerializingStream serializer;
+  };
+
+
+  template<>
+  std::vector<SX> CASADI_EXPORT SX::cse(const std::vector<SX>& e) {
+
+    SX c = veccat(e);
+    //std::vector<SX> args = symvar(c);
+    Function f("f", vector<SX>{}, e, {{"live_variables", false}, {"max_io", 0}, {"cse", false}});
+    SXFunction *ff = f.get<SXFunction>();
+
+    std::vector<SX> ret;
+    for (casadi_int i=0;i<e.size();++i) {
+      ret.push_back(SX::zeros(e.at(i).sparsity()));
+    }
+
+    // Symbolic work, non-differentiated
+    vector<SXElem> w(ff->worksize_);
+
+    vector<const SXElem*> arg(f.sz_arg());
+    /*for (casadi_int i=0;i<args.size();++i) {
+      arg[i] = get_ptr(args.at(i).nonzeros());
+    }*/
+
+    vector<SXElem*> res(f.sz_res());
+    for (casadi_int i=0;i<e.size();++i) {
+      res[i] = get_ptr(ret.at(i).nonzeros());
+    }
+
+    std::unordered_map<std::string, SXElem > cache;
+    IncrementalSerializer s;
+
+    // Iterator to the binary operations
+    vector<SXElem>::const_iterator b_it=ff->operations_.begin();
+
+    // Iterator to stack of constants
+    vector<SXElem>::const_iterator c_it = ff->constants_.begin();
+
+    // Iterator to free variables
+    vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
+
+    // Evaluate algorithm
+    for (auto&& a : ff->algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+        w[a.i0] = arg[a.i1]==nullptr ? 0 : arg[a.i1][a.i2];
+        if (arg[a.i1]!=nullptr) cache[s.pack(w[a.i0])] = w[a.i0];
+        break;
+      case OP_OUTPUT:
+        if (res[a.i0]!=nullptr) res[a.i0][a.i2] = w[a.i1];
+        break;
+      case OP_CONST:
+        w[a.i0] = *c_it++;
+        cache[s.pack(w[a.i0])] = w[a.i0];
+        break;
+      case OP_PARAMETER:
+        w[a.i0] = *p_it++;
+        cache[s.pack(w[a.i0])] = w[a.i0];
+        break;
+      default:
+        {
+          const SXElem& b = *b_it++;
+
+          // Evaluate the function to a temporary value
+          // (as it might overwrite the children in the work vector)
+          SXElem f;
+          // Missing simplifications like [x+y]->[twice]
+          switch (a.op) {
+            CASADI_MATH_FUN_BUILTIN(w[a.i1], w[a.i2], f)
+          }
+
+          std::string key = s.pack(f);
+
+          auto itk = cache.find(key);
+          if (itk==cache.end()) {
+            cache[key] = f;
+          } else {
+            f = itk->second;
+          }
+
+          // Finally save the function value
+          w[a.i0] = f;
+        }
+      }
+    }
+    return ret;
+  }
+
   template<>
   SX CASADI_EXPORT SX::jacobian(const SX &f, const SX &x, const Dict& opts) {
     // Propagate verbose option to helper function
@@ -731,7 +841,7 @@ namespace casadi {
 
   template<>
   vector<SX> CASADI_EXPORT SX::symvar(const SX& x) {
-    Function f("tmp_symvar", vector<SX>{}, {x}, Dict{{"max_io", 0}});
+    Function f("tmp_symvar", vector<SX>{}, {x}, Dict{{"max_io", 0}, {"cse", false}});
     return f.free_sx();
   }
 
