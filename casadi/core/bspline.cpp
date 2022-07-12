@@ -352,7 +352,7 @@ namespace casadi {
   }
 
   void BSplineParametric::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = arg[0]->get_bspline(arg[0], knots_, offset_, degree_, m_, lookup_mode_);
+    res[0] = arg[0]->get_bspline(arg[1], knots_, offset_, degree_, m_, lookup_mode_);
   }
 
   MX BSpline::jac_cached() const {
