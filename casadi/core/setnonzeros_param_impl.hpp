@@ -128,7 +128,7 @@ namespace casadi {
     MX arg0 = project(arg[0], this->dep(0).sparsity());
     MX arg1 = project(arg[1], this->dep(1).sparsity());
     MX inner = arg[2];
-    MX outer = arg[2];
+    MX outer = arg[3];
     if (Add) {
       res[0] = arg1->get_nzadd(arg0, inner, outer);
     } else {
