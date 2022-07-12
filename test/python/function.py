@@ -2742,7 +2742,7 @@ class Functiontests(casadiTestCase):
     self.assertTrue(f.is_a("SXFunction"))
 
     # Check that the option came through
-    with assertOutput(["Input 0 (i0): 3"]):
+    with self.assertOutput(["Input 0 (i0): 3"],[]):
       f(3)
 
 if __name__ == '__main__':
