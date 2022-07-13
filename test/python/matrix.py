@@ -1098,6 +1098,7 @@ class Matrixtests(casadiTestCase):
       self.checkarray(evalf(norm_2(M(a).T)),r)
 
   def test_ldl(self):
+    numpy.random.seed(1)
     H = diagcat(DM.rand(5,5),DM.rand(5,5))
     H = H+H.T+2*DM.eye(10)
 
