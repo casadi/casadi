@@ -91,6 +91,33 @@ namespace casadi {
   }
 
   template<bool Add>
+  void SetNonzerosVector<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    for (casadi_int i=0;i<this->n_dep();++i) {
+      if (this->dep(i).sparsity()!=arg[i].sparsity()) {
+        SetNonzeros<Add>::eval_mx(arg, res);
+        return;
+      }
+    }
+    // Get references to arguments and results
+    res[0] = arg[0];
+    if (Add) {
+      res[0] = arg[1]->get_nzadd(res[0], nz_);
+    } else {
+      res[0] = arg[1]->get_nzassign(res[0], nz_);
+    }
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    SetNonzeros<Add>::eval_mx(arg, res);
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    SetNonzeros<Add>::eval_mx(arg, res);
+  }
+
+  template<bool Add>
   void SetNonzeros<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     // Get all the nonzeros
     std::vector<casadi_int> nz = all();

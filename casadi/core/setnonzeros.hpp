@@ -105,6 +105,9 @@ namespace casadi {
     /// Get all the nonzeros
     std::vector<casadi_int> all() const override { return nz_;}
 
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
     /// Evaluate the function (template)
     template<typename T>
     int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
@@ -167,6 +170,9 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
     /// Evaluate the function (template)
     template<typename T>
     int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
@@ -223,6 +229,9 @@ namespace casadi {
 
     /** \brief  Propagate sparsity backwards */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /// Evaluate the function (template)
     template<typename T>

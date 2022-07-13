@@ -60,6 +60,17 @@ namespace casadi {
     set_dep(y);
   }
 
+  void GetNonzerosVector::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    for (casadi_int i=0;i<this->n_dep();++i) {
+      if (this->dep(i).sparsity()!=arg[i].sparsity()) {
+        GetNonzeros::eval_mx(arg, res);
+        return;
+      }
+    }
+    res[0] = arg[0]->get_nzref(sparsity(), nz_);
+  }
+
+
   int GetNonzerosVector::
   eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
