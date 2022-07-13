@@ -91,7 +91,8 @@ if not os.path.exists(distinfo_dir):
 
 for d in os.listdir(dir_name):
   if not d.startswith("casadi"):
-    shutil.move(os.path.join(dir_name, d),os.path.join(bdist_dir,"casadi"))
+    shutil.copytree(os.path.join(dir_name, d),os.path.join(bdist_dir,"casadi",d),dirs_exist_ok=True)
+    shutil.rmtree(os.path.join(dir_name, d))
 
 msg = Message()
 msg['Wheel-Version'] = '1.0'  # of the spec
