@@ -737,10 +737,12 @@ namespace casadi {
     /// Readability typedef
     typedef std::map<std::string, MX> MXDict;
 
+    /** \brief Evaluate the MX node with new symbolic dependencies */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& SWIG_OUTPUT(res)) const;
+
 #ifndef SWIG
     ///@{
     /** \brief Called from MXFunction */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                     std::vector<std::vector<MX> >& fsens) const;
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
