@@ -2505,6 +2505,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector< Matrix<Scalar> > Matrix<Scalar>::cse(const std::vector< Matrix<Scalar> >& e) {
+    casadi_error("'cse' not defined for " + type_name());
+    return {};
+  }
+
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::
   jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x, const Dict& opts) {
     casadi_error("'jacobian' not defined for " + type_name());
