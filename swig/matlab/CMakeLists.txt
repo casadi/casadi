@@ -54,13 +54,8 @@ if (WITH_MATLAB AND NOT SWIG_EXPORT)
   find_package(MATLAB REQUIRED)
 
   # Compile MEX file
-  if (EXISTS ${MATLAB_INCLUDE_DIR}/../version/cpp_mexapi_version.cpp)
-    add_library(casadiMATLAB MODULE ${MEX_FILE} ${MATLAB_INCLUDE_DIR}/../version/cpp_mexapi_version.cpp)
-  else()
-    add_library(casadiMATLAB MODULE ${MEX_FILE})
-  endif()
-  target_include_directories(casadiMATLAB PUBLIC ${MATLAB_INCLUDE_DIR})
-  target_link_libraries(casadiMATLAB ${MATLAB_LIBRARIES} casadi)
+  add_library(casadiMATLAB MODULE ${MEX_FILE} ${MEX_VERSION_FILE})
+  target_link_libraries(casadiMATLAB matlab::matlab casadi)
   set_target_properties(casadiMATLAB
     PROPERTIES OUTPUT_NAME "casadiMEX"
                PREFIX ""

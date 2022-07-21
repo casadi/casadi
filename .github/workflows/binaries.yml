@@ -251,6 +251,70 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-osx64-py${{matrix.py2}}-untested.zip
 
+  matlab-dockcross:
+    needs: [core-dockcross,swig]
+    runs-on: ubuntu20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        matlab: ["2020b"]
+        arch: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
+    steps: 
+      - uses: actions/download-artifact@v2
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source
+        run: unzip casadi_source.zip
+      - uses: actions/download-artifact@v2
+        with:
+          name: core-dockcross-${{ matrix.arch }}
+      - run: ls
+      - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - name: Setup dockcross
+        run: |
+          docker pull dockcross/${{ matrix.arch }}:latest
+          docker run --rm dockcross/${{ matrix.arch }}:latest > dockcross
+          chmod +x dockcross
+      - uses: meco-group/mockups@v17
+        with:
+          tag: ${{ matrix.arch }}
+      - name: Build
+        run: |
+          ./dockcross cmake -Bbuild -DCMAKE_PREFIX_PATH=/work/mockups -DWITH_MATLAB=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
+          ./dockcross cmake --build build --target install -v
+      - uses: jgillis/universal_grafter@master
+        if: "!contains(matrix.arch, 'windows')"
+        with:
+          source_path: install/casadi
+          destination_path: install/casadi
+          dockcross: ${{ matrix.arch }}
+          bitness: ${{env.bitness}}
+      - name: Easy Zip Files
+        uses: vimtor/action-zip@v1
+        with:
+          files: install/
+          recursive: false
+          dest: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - run: cp casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ secrets.CASADIBOT_TOKEN}}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.2.1
+        with:
+          repo_token: ${{ secrets.CASADIBOT_TOKEN}}
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+
+      
   python-dockcross:
     needs: [core-dockcross,matrix-arch-py2,swig]
     runs-on: ubuntu-20.04
