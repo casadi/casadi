@@ -329,6 +329,11 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
 
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}
+          path: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          retention-days: 5
       
   python-dockcross:
     needs: [core-dockcross,matrix-arch-py2,swig]
@@ -415,6 +420,11 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-untested.zip
 
+      - uses: actions/upload-artifact@v2.2.4
+        with:
+          name: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}
+          path: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          retention-days: 5
       
       - run: |
           version=$(python misc/get_version.py)
@@ -445,11 +455,6 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: ${{ steps.wheel.outputs.wheel }}
 
-      - uses: actions/upload-artifact@v2.2.4
-        with:
-          name: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}
-          path: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
-          retention-days: 5
 
 
   test-matlab:
