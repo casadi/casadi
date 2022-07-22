@@ -331,8 +331,8 @@ jobs:
 
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}
-          path: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          name: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}
+          path: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
           retention-days: 5
       
   python-dockcross:
