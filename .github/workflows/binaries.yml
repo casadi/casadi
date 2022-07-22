@@ -282,6 +282,18 @@ jobs:
         run: |
           ./dockcross cmake -Bbuild -DCMAKE_PREFIX_PATH=/work/mockups -DWITH_MATLAB=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
           ./dockcross cmake --build build --target install -v
+      - uses: kanga333/variable-mapper@v0.2.2
+        with:
+          key: "${{matrix.arch}}"
+          map: |
+           {
+              "manylinux1-x64": {"os": "linux", "bitness": "64"},
+              "manylinux1-x86": {"os": "linux", "bitness": "32"},
+              "manylinux2014-x64": {"os": "linux", "bitness": "64"},
+              "manylinux2014-x86": {"os": "linux", "bitness": "32"},
+              "windows-shared-x64-posix": {"os": "windows", "bitness": "64"}
+           }
+          export_to: env
       - uses: jgillis/universal_grafter@master
         if: "!contains(matrix.arch, 'windows')"
         with:
