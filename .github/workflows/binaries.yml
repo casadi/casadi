@@ -257,7 +257,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        matlab: ["2020b"]
+        matlab: ["2018b"]
         arch: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
     steps: 
       - uses: actions/download-artifact@v2
@@ -280,7 +280,7 @@ jobs:
           tag: ${{ matrix.arch }}
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -DCMAKE_PREFIX_PATH=/work/mockups -DWITH_MATLAB=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
+          ./dockcross cmake -Bbuild -DCMAKE_PREFIX_PATH=/work/mockups/cmake -DWITH_MATLAB=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
           ./dockcross cmake --build build --target install -v
       - uses: kanga333/variable-mapper@v0.2.2
         with:
