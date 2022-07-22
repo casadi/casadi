@@ -258,7 +258,7 @@ jobs:
       fail-fast: false
       matrix:
         matlab: ["2018b"]
-        arch: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
+        arch: [manylinux1-x64,manylinux2014-x64,windows-shared-x64-posix]
     steps: 
       - uses: actions/download-artifact@v2
         with:
@@ -489,8 +489,8 @@ jobs:
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip
       - run: ls
-      - run: ls/install
-      - run: ls/install/casadi
+      - run: ls install
+      - run: ls install/casadi
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Set up MATLAB
