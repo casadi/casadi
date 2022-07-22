@@ -282,7 +282,7 @@ jobs:
           ls mockups/cmake
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -DCMAKE_PREFIX_PATH=/work/mockups/cmake -DWITH_MATLAB=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
+          ./dockcross cmake -DCMAKE_FIND_DEBUG_MODE=ON -Bbuild -DCMAKE_PREFIX_PATH=/work/mockups/cmake -DWITH_MATLAB=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
           ./dockcross cmake --build build --target install -v
       - uses: kanga333/variable-mapper@v0.2.2
         with:
