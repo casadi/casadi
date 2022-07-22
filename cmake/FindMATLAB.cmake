@@ -46,8 +46,9 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
+message("MATLAB: find via CONFIG")
 find_package(MATLAB CONFIG)
-
+message("MATLAB: ${MATLAB_FOUND}")
 
 if(NOT MATLAB_FOUND)
 

@@ -278,6 +278,8 @@ jobs:
       - uses: meco-group/mockups@v18
         with:
           tag: ${{ matrix.arch }}
+      - run: |
+          ls mockups/cmake
       - name: Build
         run: |
           ./dockcross cmake -Bbuild -DCMAKE_PREFIX_PATH=/work/mockups/cmake -DWITH_MATLAB=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
