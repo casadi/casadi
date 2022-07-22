@@ -451,6 +451,66 @@ jobs:
           path: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
           retention-days: 5
 
+
+  test-matlab:
+    runs-on: ${{matrix.image}}
+    needs: [matlab-dockcross]
+    strategy:
+     fail-fast: false
+     matrix:
+       matlab: ["2018b"]
+       image: ["windows-latest","ubuntu-latest"]
+       bit: [64]
+       exclude:
+        # No Windows 32bit builds currently
+        - image: "windows-latest"
+          bit: 32
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - uses: kanga333/variable-mapper@v0.2.2
+        with:
+          key: "${{matrix.image}}"
+          map: |
+           {
+              "windows-latest": {"os": "windows"},
+              "ubuntu-latest": {"os": "linux"},
+              "macos-latest": {"os": "osx"}
+           }
+          export_to: env
+      - uses: actions/download-artifact@v2
+        with:
+          name: casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}
+      - run: ls
+      - name: Unpack source
+        run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip
+      - run: ls
+      - run: ls/install
+      - run: ls/install/casadi
+      # Make cl.exe available on Windows
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v1
+      - name: Run script
+        uses: matlab-actions/run-command@v1
+        with:
+          command: addapth('${{ github.workspace }}/install/casadi');cd test/matlab;asorted_tests
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - run: cp casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}-tested.zip
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ secrets.CASADIBOT_TOKEN}}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: 'casadi-*-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}-tested.zip'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.2.1
+        with:
+          repo_token: ${{ secrets.CASADIBOT_TOKEN}}
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}-tested.zip
+
   test-python:
     runs-on: ${{matrix.image}}
     needs: [python-dockcross,python-osx]
