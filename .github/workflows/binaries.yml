@@ -498,7 +498,7 @@ jobs:
       - name: Run script
         uses: matlab-actions/run-command@v1
         with:
-          command: addapth('${{ github.workspace }}/install/casadi');cd test/matlab;asorted_tests
+          command: addpath('${{ github.workspace }}/install/casadi');cd test/matlab;asorted_tests
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
       - run: cp casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}-tested.zip
