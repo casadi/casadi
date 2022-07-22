@@ -47,7 +47,7 @@
 #  License text for the above reference.)
 
 message("MATLAB: find via CONFIG")
-find_package(MATLAB CONFIG)
+find_package(MATLAB CONFIG NO_CMAKE_FIND_ROOT_PATH)
 message("MATLAB: ${MATLAB_FOUND}")
 
 if(NOT MATLAB_FOUND)
