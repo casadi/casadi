@@ -49,6 +49,8 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/OptiCallbackHelper.m
 if (WITH_MATLAB AND NOT SWIG_EXPORT)
   # Make target
   add_custom_target(matlab DEPENDS casadiMATLAB)
+  
+  message("${CMAKE_PREFIX_PATH}:$ENV{CMAKE_PREFIX_PATH}:${CMAKE_FIND_USE_CMAKE_PATH}:${CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH}")
 
   # Find MATLAB
   find_package(MATLAB REQUIRED)
