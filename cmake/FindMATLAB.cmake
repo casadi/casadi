@@ -46,6 +46,12 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
+message("MATLAB: find via CONFIG")
+find_package(MATLAB CONFIG NO_CMAKE_FIND_ROOT_PATH)
+message("MATLAB: ${MATLAB_FOUND}")
+
+if(NOT MATLAB_FOUND)
+
 # If MATLAB_ROOT was defined in the environment, use it.
 if (NOT MATLAB_ROOT AND NOT $ENV{MATLAB_ROOT} STREQUAL "")
   set(MATLAB_ROOT $ENV{MATLAB_ROOT} CACHE PATH "set this if CMake does not find it automatically")
@@ -347,3 +353,15 @@ mark_as_advanced(
   MATLAB_CXXLIBS
   MATLAB_FLIBS
 )
+
+  add_library(matlab::matlab INTERFACE)
+  
+  set(MEX_VERSION_FILE "")
+  if (EXISTS ${MATLAB_INCLUDE_DIR}/../version/c_mexapi_version.cpp)
+    set(MEX_VERSION_FILE "${MATLAB_INCLUDE_DIR}/../version/c_mexapi_version.cpp")
+  endif()
+
+  target_link_libraries(matlab::matlab INTERFACE ${MATLAB_LIBRARIES})
+  target_include_directories(matlab::matlab INTERFACE ${MATLAB_INCLUDE_DIR})
+
+endif()
