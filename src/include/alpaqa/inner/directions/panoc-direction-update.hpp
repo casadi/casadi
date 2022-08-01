@@ -9,9 +9,9 @@ template <class DirectionProviderT>
 struct PANOCDirection {
     USING_ALPAQA_CONFIG_TEMPLATE(DirectionProviderT::config_t);
 
-    static void initialize(crvec x₀, crvec x̂₀, crvec p₀, crvec grad₀) = delete;
+    static void initialize(crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0) = delete;
 
-    static bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁,
+    static bool update(crvec xₖ, crvec x_kp1, crvec pₖ, crvec p_kp1,
                        crvec grad_new, const Box<config_t> &C,
                        real_t γ_new) = delete;
 
@@ -23,7 +23,7 @@ struct PANOCDirection {
     /// @param[in]  pₖ
     ///             Proximal gradient step between x̂ₖ and xₖ.
     /// @param[in]  γ
-    ///             H₀ = γI for L-BFGS
+    ///             H_0 = γI for L-BFGS
     /// @param[out] qₖ
     ///             Resulting step.
     static bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) = delete;

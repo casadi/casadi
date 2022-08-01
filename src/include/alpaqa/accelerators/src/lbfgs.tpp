@@ -34,13 +34,13 @@ bool LBFGS<Conf>::update_valid(const Params &params, real_t yᵀs, real_t sᵀs,
 }
 
 template <Config Conf>
-bool LBFGS<Conf>::update_sy_impl(const auto &s, const auto &y, real_t pₖ₊₁ᵀpₖ₊₁,
+bool LBFGS<Conf>::update_sy_impl(const auto &s, const auto &y, real_t p_kp1ᵀp_kp1,
                                  bool forced) {
     real_t yᵀs = y.dot(s);
     real_t ρ   = 1 / yᵀs;
     if (not forced) {
         real_t sᵀs = s.squaredNorm();
-        if (not update_valid(params, yᵀs, sᵀs, pₖ₊₁ᵀpₖ₊₁))
+        if (not update_valid(params, yᵀs, sᵀs, p_kp1ᵀp_kp1))
             return false;
     }
 
@@ -57,17 +57,17 @@ bool LBFGS<Conf>::update_sy_impl(const auto &s, const auto &y, real_t pₖ₊₁
 }
 
 template <Config Conf>
-bool LBFGS<Conf>::update_sy(crvec s, crvec y, real_t pₖ₊₁ᵀpₖ₊₁, bool forced) {
-    return update_sy_impl(s, y, pₖ₊₁ᵀpₖ₊₁, forced);
+bool LBFGS<Conf>::update_sy(crvec s, crvec y, real_t p_kp1ᵀp_kp1, bool forced) {
+    return update_sy_impl(s, y, p_kp1ᵀp_kp1, forced);
 }
 
 template <Config Conf>
-bool LBFGS<Conf>::update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁, Sign sign,
+bool LBFGS<Conf>::update(crvec xₖ, crvec x_kp1, crvec pₖ, crvec p_kp1, Sign sign,
                          bool forced) {
-    const auto s = xₖ₊₁ - xₖ;
-    const auto y = (sign == Sign::Positive) ? pₖ₊₁ - pₖ : pₖ - pₖ₊₁;
-    real_t pₖ₊₁ᵀpₖ₊₁ = params.cbfgs ? pₖ₊₁.squaredNorm() : 0;
-    return update_sy_impl(s, y, pₖ₊₁ᵀpₖ₊₁, forced);
+    const auto s = x_kp1 - xₖ;
+    const auto y = (sign == Sign::Positive) ? p_kp1 - pₖ : pₖ - p_kp1;
+    real_t p_kp1ᵀp_kp1 = params.cbfgs ? p_kp1.squaredNorm() : 0;
+    return update_sy_impl(s, y, p_kp1ᵀp_kp1, forced);
 }
 
 template <Config Conf>
@@ -88,7 +88,7 @@ bool LBFGS<Conf>::apply(rvec q, real_t γ) const {
         q -= α(i) * y(i);
     });
 
-    // r ← H₀ q
+    // r ← H_0 q
     q *= γ;
 
     foreach_fwd([&](index_t i) {
@@ -174,7 +174,7 @@ bool LBFGS<Conf>::apply_masked_impl(rvec q, real_t γ, const auto &J) {
     if (γ < 0)
         return false;
 
-    // r ← H₀ q
+    // r ← H_0 q
     scalJ(γ, q); // q *= γ
 
     foreach_fwd([&](index_t i) {

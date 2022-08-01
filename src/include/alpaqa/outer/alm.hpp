@@ -29,20 +29,20 @@ struct ALMParams {
     real_t Δ_lower = 0.8;
     /// Initial penalty parameter. When set to zero (which is the default),
     /// it is computed automatically, based on the constraint violation in the
-    /// starting point and the parameter @ref σ₀.
+    /// starting point and the parameter @ref σ_0.
     /// @todo Change default to 0.
-    real_t Σ₀ = 1;
-    /// Initial penalty parameter factor. Active if @ref Σ₀ is set
+    real_t Σ_0 = 1;
+    /// Initial penalty parameter factor. Active if @ref Σ_0 is set
     /// to zero.
-    real_t σ₀ = 20;
+    real_t σ_0 = 20;
     /// Factor to reduce the initial penalty factor by if convergence fails in
     /// in the first iteration.
-    real_t Σ₀_lower = 0.6;
+    real_t Σ_0_lower = 0.6;
     /// Initial primal tolerance.
-    real_t ε₀ = 1;
+    real_t ε_0 = 1;
     /// Factor to increase the initial primal tolerance if convergence fails in
     /// the first iteration.
-    real_t ε₀_increase = 1.1;
+    real_t ε_0_increase = 1.1;
     /// Update factor for primal tolerance.
     real_t ρ = 1e-1;
     /// Factor to increase the primal tolerance update factor by if convergence
@@ -61,8 +61,8 @@ struct ALMParams {
     /// Maximum duration.
     std::chrono::microseconds max_time = std::chrono::minutes(5);
 
-    /// How many times can the initial penalty @ref Σ₀ or
-    /// @ref σ₀ and the initial primal tolerance @ref ε₀
+    /// How many times can the initial penalty @ref Σ_0 or
+    /// @ref σ_0 and the initial primal tolerance @ref ε_0
     /// be reduced.
     unsigned max_num_initial_retries = 20;
     /// How many times can the penalty update factor @ref Δ and the
@@ -99,12 +99,12 @@ class ALMSolver {
         /// Total elapsed time.
         std::chrono::microseconds elapsed_time;
         /// The number of times that the initial penalty factor was reduced by
-        /// @ref ALMParams::Σ₀_lower and that the initial tolerance was
-        /// increased by @ref ALMParams::ε₀_increase because the inner solver
+        /// @ref ALMParams::Σ_0_lower and that the initial tolerance was
+        /// increased by @ref ALMParams::ε_0_increase because the inner solver
         /// failed to converge in the first ALM iteration. If this number is
         /// greater than zero, consider lowering the initial penalty factor
-        /// @ref ALMParams::Σ₀ or @ref ALMParams::σ₀ or increasing the initial
-        /// tolerance @ref ALMParams::ε₀ (or both).
+        /// @ref ALMParams::Σ_0 or @ref ALMParams::σ_0 or increasing the initial
+        /// tolerance @ref ALMParams::ε_0 (or both).
         unsigned initial_penalty_reduced = 0;
         /// The number of times that the penalty update factor @ref ALMParams::Δ
         /// was reduced, that the tolerance update factor @ref ALMParams::ρ was

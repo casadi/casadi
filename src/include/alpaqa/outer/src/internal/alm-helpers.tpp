@@ -65,7 +65,7 @@ struct ALMHelpers {
         vec g0(p.m);
         p.eval_g(x0, g0);
         // TODO: reuse evaluations of f ang g in PANOC?
-        real_t σ = params.σ₀ * std::max(real_t(1), std::abs(f0)) /
+        real_t σ = params.σ_0 * std::max(real_t(1), std::abs(f0)) /
                    std::max(real_t(1), real_t(0.5) * g0.squaredNorm());
         σ = std::max(σ, params.Σ_min);
         σ = std::min(σ, params.Σ_max);

@@ -130,7 +130,7 @@ struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
     inline const static kwargs_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table{
-        {"L_0", &alpaqa::LipschitzEstimateParams<Conf>::L₀},
+        {"L_0", &alpaqa::LipschitzEstimateParams<Conf>::L_0},
         {"δ", &alpaqa::LipschitzEstimateParams<Conf>::δ},
         {"ε", &alpaqa::LipschitzEstimateParams<Conf>::ε},
         {"Lγ_factor", &alpaqa::LipschitzEstimateParams<Conf>::Lγ_factor},
@@ -240,11 +240,11 @@ struct kwargs_to_struct_table<alpaqa::ALMParams<Conf>> {
         {"δ", &alpaqa::ALMParams<Conf>::δ},
         {"Δ", &alpaqa::ALMParams<Conf>::Δ},
         {"Δ_lower", &alpaqa::ALMParams<Conf>::Δ_lower},
-        {"Σ_0", &alpaqa::ALMParams<Conf>::Σ₀},
-        {"σ_0", &alpaqa::ALMParams<Conf>::σ₀},
-        {"Σ_0_lower", &alpaqa::ALMParams<Conf>::Σ₀_lower},
-        {"ε_0", &alpaqa::ALMParams<Conf>::ε₀},
-        {"ε_0_increase", &alpaqa::ALMParams<Conf>::ε₀_increase},
+        {"Σ_0", &alpaqa::ALMParams<Conf>::Σ_0},
+        {"σ_0", &alpaqa::ALMParams<Conf>::σ_0},
+        {"Σ_0_lower", &alpaqa::ALMParams<Conf>::Σ_0_lower},
+        {"ε_0", &alpaqa::ALMParams<Conf>::ε_0},
+        {"ε_0_increase", &alpaqa::ALMParams<Conf>::ε_0_increase},
         {"ρ", &alpaqa::ALMParams<Conf>::ρ},
         {"ρ_increase", &alpaqa::ALMParams<Conf>::ρ_increase},
         {"θ", &alpaqa::ALMParams<Conf>::θ},

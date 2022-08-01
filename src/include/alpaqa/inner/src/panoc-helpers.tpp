@@ -423,10 +423,10 @@ struct PANOCHelpers {
         auto h        = (xₖ * ε).cwiseAbs().cwiseMax(δ);
         work_n1       = xₖ + h;
         real_t norm_h = h.norm();
-        // Calculate ∇ψ(x₀ + h)
+        // Calculate ∇ψ(x_0 + h)
         calc_grad_ψ(problem, work_n1, y, Σ, /* in ⟹ out */ work_n2, work_n3,
                     work_m);
-        // Calculate ψ(xₖ), ∇ψ(x₀)
+        // Calculate ψ(xₖ), ∇ψ(x_0)
         ψ = calc_ψ_grad_ψ(problem, xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1,
                           work_m);
 
@@ -468,10 +468,10 @@ struct PANOCHelpers {
         auto h        = (xₖ * ε).cwiseAbs().cwiseMax(δ);
         work_n1       = xₖ + h;
         real_t norm_h = h.norm();
-        // Calculate ∇ψ(x₀ + h)
+        // Calculate ∇ψ(x_0 + h)
         calc_grad_ψ(problem, work_n1, y, Σ, /* in ⟹ out */ work_n2, work_n3,
                     work_m);
-        // Calculate ∇ψ(x₀)
+        // Calculate ∇ψ(x_0)
         calc_grad_ψ(problem, xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1, work_m);
 
         // Estimate Lipschitz constant using finite differences

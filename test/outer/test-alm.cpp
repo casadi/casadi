@@ -53,8 +53,8 @@ TEST(ALM, singleshooting1D) {
     almparam.ε        = 1e-4;
     almparam.δ        = 1e-4;
     almparam.Δ        = 100;
-    almparam.Σ₀       = 20;
-    almparam.ε₀       = 1;
+    almparam.Σ_0       = 20;
+    almparam.ε_0       = 1;
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
@@ -141,8 +141,8 @@ TEST(ALM, multipleshooting1D) {
     almparam.ε        = 1e-4;
     almparam.δ        = 1e-4;
     almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
-    almparam.Σ₀       = 1; ///< Initial penalty parameter
-    almparam.ε₀       = 1e-4; ///< Initial tolerance on x
+    almparam.Σ_0       = 1; ///< Initial penalty parameter
+    almparam.ε_0       = 1e-4; ///< Initial tolerance on x
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;
@@ -245,8 +245,8 @@ TEST(ALM, multipleshooting8D) {
     almparam.ε        = 1e-4;
     almparam.δ        = 1e-4;
     almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
-    almparam.Σ₀       = 1; ///< Initial penalty parameter
-    almparam.ε₀       = 1e-4; ///< Initial tolerance on x
+    almparam.Σ_0       = 1; ///< Initial penalty parameter
+    almparam.ε_0       = 1e-4; ///< Initial tolerance on x
     almparam.θ        = 0.25;
     almparam.ρ        = 1e-1;
     almparam.M        = 1e9;

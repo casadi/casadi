@@ -31,12 +31,12 @@ TEST(LBFGS, quadratic) {
             std::cout << "x:    " << x.transpose() << std::endl;
             std::cout << "f(x): " << f(x) << std::endl;
 
-            Conf::mat H⁻¹ = Conf::mat::Identity(2, 2);
+            Conf::mat invH = Conf::mat::Identity(2, 2);
             if (i > 0) {
-                lbfgs.apply(H⁻¹.col(0), 1);
-                lbfgs.apply(H⁻¹.col(1), 1);
+                lbfgs.apply(invH.col(0), 1);
+                lbfgs.apply(invH.col(1), 1);
             }
-            std::cout << std::endl << "LB⁻¹ = \n" << H⁻¹ << std::endl;
+            std::cout << std::endl << "LB⁻¹ = \n" << invH << std::endl;
             std::cout << "B⁻¹  = \n" << B.inverse() << std::endl;
             std::cout << "   " << update_count << std::endl;
         }

@@ -25,19 +25,19 @@ struct PANOCDirection<LBFGS<Conf>> {
     PANOCDirection(LBFGS &&lbfgs, const ExtraParams &extraparams = {})
         : lbfgs(std::move(lbfgs)), extraparams(extraparams) {}
 
-    void initialize(crvec x₀, crvec x̂₀, crvec p₀, crvec grad₀) {
-        lbfgs.resize(x₀.size());
-        (void)x̂₀;
-        (void)p₀;
-        (void)grad₀;
+    void initialize(crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0) {
+        lbfgs.resize(x_0.size());
+        (void)x̂_0;
+        (void)p_0;
+        (void)grad_0;
     }
 
-    bool update(crvec xₖ, crvec xₖ₊₁, crvec pₖ, crvec pₖ₊₁, crvec grad_new,
+    bool update(crvec xₖ, crvec x_kp1, crvec pₖ, crvec p_kp1, crvec grad_new,
                 const Box<config_t> &C, real_t γ_new) {
         (void)grad_new;
         (void)C;
         (void)γ_new;
-        return lbfgs.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁, LBFGS::Sign::Negative);
+        return lbfgs.update(xₖ, x_kp1, pₖ, p_kp1, LBFGS::Sign::Negative);
     }
 
     bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) const {

@@ -85,14 +85,14 @@ TEST(PANOC, calc_ψ_grad_ψ) {
     x << 5, -7;
     vec y(2);
     y << 0.3, 0.7;
-    vec Σ⁻¹y = Σ.asDiagonal().inverse() * y;
+    vec invΣy = Σ.asDiagonal().inverse() * y;
 
-    auto ψ_fun = [&p, &f, &g, &Σ, &Σ⁻¹y](crvec x) -> real_t {
-        return f(x) + 0.5 * alpaqa::dist_squared(g(x) + Σ⁻¹y, p.D, Σ);
+    auto ψ_fun = [&p, &f, &g, &Σ, &invΣy](crvec x) -> real_t {
+        return f(x) + 0.5 * alpaqa::dist_squared(g(x) + invΣy, p.D, Σ);
     };
 
     // Compute ψ and ∇ψ manually
-    vec ζ     = g(x) + Σ⁻¹y;
+    vec ζ     = g(x) + invΣy;
     vec ẑ     = alpaqa::project(ζ, p.D);
     vec d     = ζ - ẑ;
     vec ŷ     = Σ.asDiagonal() * d;
@@ -244,14 +244,14 @@ TEST(PANOC, hessian) {
     x << -0.9, 3.1;
     vec y(2);
     y << 0.3, 0.7;
-    vec Σ⁻¹y = Σ.asDiagonal().inverse() * y;
+    vec invΣy = Σ.asDiagonal().inverse() * y;
 
-    auto ψ_fun = [&p, &f, &g, &Σ, &Σ⁻¹y](crvec x) -> real_t {
-        return f(x) + 0.5 * alpaqa::dist_squared(g(x) + Σ⁻¹y, p.D, Σ);
+    auto ψ_fun = [&p, &f, &g, &Σ, &invΣy](crvec x) -> real_t {
+        return f(x) + 0.5 * alpaqa::dist_squared(g(x) + invΣy, p.D, Σ);
     };
 
     // Compute ψ and ∇ψ manually
-    vec ζ     = g(x) + Σ⁻¹y;
+    vec ζ     = g(x) + invΣy;
     vec ẑ     = alpaqa::project(ζ, p.D);
     vec d     = ζ - ẑ;
     vec ŷ     = Σ.asDiagonal() * d;
@@ -270,15 +270,15 @@ TEST(PANOC, hessian) {
                 EigenAlmostEqual(grad_f_fd, std::abs(grad_f_res(0)) * 1e-6));
 
     // Finite difference check g₁
-    vec grad_g₁_fd  = pa_ref::finite_diff(g1, x);
-    vec grad_g₁_res = grad_g1(x);
-    EXPECT_THAT(grad_g₁_res,
-                EigenAlmostEqual(grad_g₁_fd, std::abs(grad_g₁_res(0)) * 1e-6));
+    vec grad_g1_fd  = pa_ref::finite_diff(g1, x);
+    vec grad_g1_res = grad_g1(x);
+    EXPECT_THAT(grad_g1_res,
+                EigenAlmostEqual(grad_g1_fd, std::abs(grad_g1_res(0)) * 1e-6));
     // Finite difference check g₂
-    vec grad_g₂_fd  = pa_ref::finite_diff(g2, x);
-    vec grad_g₂_res = grad_g2(x);
-    EXPECT_THAT(grad_g₂_res,
-                EigenAlmostEqual(grad_g₂_fd, std::abs(grad_g₂_res(0)) * 1e-6));
+    vec grad_g2_fd  = pa_ref::finite_diff(g2, x);
+    vec grad_g2_res = grad_g2(x);
+    EXPECT_THAT(grad_g2_res,
+                EigenAlmostEqual(grad_g2_fd, std::abs(grad_g2_res(0)) * 1e-6));
 
     // Finite difference check ψ
     vec grad_ψ_fd = pa_ref::finite_diff(ψ_fun, x);

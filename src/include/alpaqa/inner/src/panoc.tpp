@@ -57,16 +57,16 @@ PANOCSolver<DirectionProviderT>::operator()(
 
     vec xₖ = x,   // Value of x at the beginning of the iteration
         x̂ₖ(n),    // Value of x after a projected gradient step
-        xₖ₊₁(n),  // xₖ for next iteration
-        x̂ₖ₊₁(n),  // x̂ₖ for next iteration
+        x_kp1(n),  // xₖ for next iteration
+        x̂_kp1(n),  // x̂ₖ for next iteration
         ŷx̂ₖ(m),   // ŷ(x̂ₖ) = Σ (g(x̂ₖ) - ẑₖ)
-        ŷx̂ₖ₊₁(m), // ŷ(x̂ₖ) for next iteration
+        ŷx̂_kp1(m), // ŷ(x̂ₖ) for next iteration
         pₖ(n),    // Projected gradient step pₖ = x̂ₖ - xₖ
-        pₖ₊₁(n), // Projected gradient step pₖ₊₁ = x̂ₖ₊₁ - xₖ₊₁
+        p_kp1(n), // Projected gradient step p_kp1 = x̂_kp1 - x_kp1
         qₖ(n),   // Newton step Hₖ pₖ
         grad_ψₖ(n),                    // ∇ψ(xₖ)
         grad_̂ψₖ(need_grad_̂ψₖ ? n : 0), // ∇ψ(x̂ₖ)
-        grad_ψₖ₊₁(n);                  // ∇ψ(xₖ₊₁)
+        grad_ψ_kp1(n);                  // ∇ψ(x_kp1)
 
     vec work_n(n), work_m(m);
 
@@ -116,16 +116,16 @@ PANOCSolver<DirectionProviderT>::operator()(
 
     real_t ψₖ, Lₖ;
     // Finite difference approximation of ∇²ψ in starting point
-    if (params.Lipschitz.L₀ <= 0) {
+    if (params.Lipschitz.L_0 <= 0) {
         Lₖ = Helpers::initial_lipschitz_estimate(
             problem, xₖ, y, Σ, params.Lipschitz.ε, params.Lipschitz.δ,
             params.L_min, params.L_max,
-            /* in ⟹ out */ ψₖ, grad_ψₖ, x̂ₖ, grad_ψₖ₊₁, work_n, work_m);
+            /* in ⟹ out */ ψₖ, grad_ψₖ, x̂ₖ, grad_ψ_kp1, work_n, work_m);
     }
     // Initial Lipschitz constant provided by the user
     else {
-        Lₖ = params.Lipschitz.L₀;
-        // Calculate ψ(xₖ), ∇ψ(x₀)
+        Lₖ = params.Lipschitz.L_0;
+        // Calculate ψ(xₖ), ∇ψ(x_0)
         ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
     }
     if (not std::isfinite(Lₖ)) {
@@ -137,7 +137,7 @@ PANOCSolver<DirectionProviderT>::operator()(
 
     // First projected gradient step -------------------------------------------
 
-    // Calculate x̂₀, p₀ (projected gradient step)
+    // Calculate x̂_0, p_0 (projected gradient step)
     calc_x̂(γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
     // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
     real_t ψx̂ₖ        = calc_ψ_ŷ(x̂ₖ, /* in ⟹ out */ ŷx̂ₖ);
@@ -218,9 +218,9 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Line search initialization ------------------------------------------
         τ                  = 1;
-        real_t σₖγₖ⁻¹pₖᵀpₖ = (1 - γₖ * Lₖ) * pₖᵀpₖ / (2 * γₖ);
-        real_t φₖ₊₁, ψₖ₊₁, ψx̂ₖ₊₁, grad_ψₖ₊₁ᵀpₖ₊₁, pₖ₊₁ᵀpₖ₊₁;
-        real_t Lₖ₊₁, γₖ₊₁;
+        real_t σₖγₖpₖᵀpₖ = (1 - γₖ * Lₖ) * pₖᵀpₖ / (2 * γₖ);
+        real_t φ_kp1, ψ_kp1, ψx̂_kp1, grad_ψ_kp1ᵀp_kp1, p_kp1ᵀp_kp1;
+        real_t L_kp1, γ_kp1;
         real_t ls_cond;
         // TODO: make separate parameter
         real_t margin =
@@ -237,50 +237,50 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Line search loop ----------------------------------------------------
         do {
-            Lₖ₊₁ = Lₖ;
-            γₖ₊₁ = γₖ;
+            L_kp1 = Lₖ;
+            γ_kp1 = γₖ;
 
-            // Calculate xₖ₊₁
+            // Calculate x_kp1
             if (τ / 2 < params.τ_min) { // line search failed
-                xₖ₊₁.swap(x̂ₖ);          // → safe prox step
-                ψₖ₊₁ = ψx̂ₖ;
+                x_kp1.swap(x̂ₖ);          // → safe prox step
+                ψ_kp1 = ψx̂ₖ;
                 if (need_grad_̂ψₖ)
-                    grad_ψₖ₊₁.swap(grad_̂ψₖ);
+                    grad_ψ_kp1.swap(grad_̂ψₖ);
                 else
-                    calc_grad_ψ_from_ŷ(xₖ₊₁, ŷx̂ₖ, /* in ⟹ out */ grad_ψₖ₊₁);
+                    calc_grad_ψ_from_ŷ(x_kp1, ŷx̂ₖ, /* in ⟹ out */ grad_ψ_kp1);
             } else {        // line search didn't fail (yet)
                 if (τ == 1) // → faster quasi-Newton step
-                    xₖ₊₁ = xₖ + qₖ;
+                    x_kp1 = xₖ + qₖ;
                 else
-                    xₖ₊₁ = xₖ + (1 - τ) * pₖ + τ * qₖ;
-                // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
-                ψₖ₊₁ = calc_ψ_grad_ψ(xₖ₊₁, /* in ⟹ out */ grad_ψₖ₊₁);
+                    x_kp1 = xₖ + (1 - τ) * pₖ + τ * qₖ;
+                // Calculate ψ(x_kp1), ∇ψ(x_kp1)
+                ψ_kp1 = calc_ψ_grad_ψ(x_kp1, /* in ⟹ out */ grad_ψ_kp1);
             }
 
-            // Calculate x̂ₖ₊₁, pₖ₊₁ (projected gradient step in xₖ₊₁)
-            calc_x̂(γₖ₊₁, xₖ₊₁, grad_ψₖ₊₁, /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁);
-            // Calculate ψ(x̂ₖ₊₁) and ŷ(x̂ₖ₊₁)
-            ψx̂ₖ₊₁ = calc_ψ_ŷ(x̂ₖ₊₁, /* in ⟹ out */ ŷx̂ₖ₊₁);
+            // Calculate x̂_kp1, p_kp1 (projected gradient step in x_kp1)
+            calc_x̂(γ_kp1, x_kp1, grad_ψ_kp1, /* in ⟹ out */ x̂_kp1, p_kp1);
+            // Calculate ψ(x̂_kp1) and ŷ(x̂_kp1)
+            ψx̂_kp1 = calc_ψ_ŷ(x̂_kp1, /* in ⟹ out */ ŷx̂_kp1);
 
             // Quadratic upper bound -------------------------------------------
-            grad_ψₖ₊₁ᵀpₖ₊₁ = grad_ψₖ₊₁.dot(pₖ₊₁);
-            pₖ₊₁ᵀpₖ₊₁      = pₖ₊₁.squaredNorm();
-            real_t pₖ₊₁ᵀpₖ₊₁_ₖ = pₖ₊₁ᵀpₖ₊₁; // prox step with step size γₖ
+            grad_ψ_kp1ᵀp_kp1 = grad_ψ_kp1.dot(p_kp1);
+            p_kp1ᵀp_kp1      = p_kp1.squaredNorm();
+            real_t p_kp1ᵀp_kp1_ₖ = p_kp1ᵀp_kp1; // prox step with step size γₖ
 
             if (params.update_lipschitz_in_linesearch == true) {
                 // Decrease step size until quadratic upper bound is satisfied
-                (void)descent_lemma(xₖ₊₁, ψₖ₊₁, grad_ψₖ₊₁,
-                                    /* in ⟹ out */ x̂ₖ₊₁, pₖ₊₁, ŷx̂ₖ₊₁,
-                                    /* inout */ ψx̂ₖ₊₁, pₖ₊₁ᵀpₖ₊₁,
-                                    grad_ψₖ₊₁ᵀpₖ₊₁, Lₖ₊₁, γₖ₊₁);
+                (void)descent_lemma(x_kp1, ψ_kp1, grad_ψ_kp1,
+                                    /* in ⟹ out */ x̂_kp1, p_kp1, ŷx̂_kp1,
+                                    /* inout */ ψx̂_kp1, p_kp1ᵀp_kp1,
+                                    grad_ψ_kp1ᵀp_kp1, L_kp1, γ_kp1);
             }
 
             // Compute forward-backward envelope
-            φₖ₊₁ = ψₖ₊₁ + 1 / (2 * γₖ₊₁) * pₖ₊₁ᵀpₖ₊₁ + grad_ψₖ₊₁ᵀpₖ₊₁;
+            φ_kp1 = ψ_kp1 + 1 / (2 * γ_kp1) * p_kp1ᵀp_kp1 + grad_ψ_kp1ᵀp_kp1;
             // Compute line search condition
-            ls_cond = φₖ₊₁ - (φₖ - σₖγₖ⁻¹pₖᵀpₖ);
+            ls_cond = φ_kp1 - (φₖ - σₖγₖpₖᵀpₖ);
             if (params.alternative_linesearch_cond)
-                ls_cond -= real_t(0.5) * (1 / γₖ₊₁ - 1 / γₖ) * pₖ₊₁ᵀpₖ₊₁_ₖ;
+                ls_cond -= real_t(0.5) * (1 / γ_kp1 - 1 / γₖ) * p_kp1ᵀp_kp1_ₖ;
 
             τ /= 2;
         } while (ls_cond > margin && τ >= params.τ_min);
@@ -297,31 +297,31 @@ PANOCSolver<DirectionProviderT>::operator()(
         }
 
         // Update L-BFGS -------------------------------------------------------
-        if (γₖ != γₖ₊₁) // Flush L-BFGS if γ changed
-            direction_provider.changed_γ(γₖ₊₁, γₖ);
+        if (γₖ != γ_kp1) // Flush L-BFGS if γ changed
+            direction_provider.changed_γ(γ_kp1, γₖ);
 
-        s.lbfgs_rejected += not direction_provider.update(xₖ, xₖ₊₁, pₖ, pₖ₊₁,
-                                                          grad_ψₖ₊₁, C, γₖ₊₁);
+        s.lbfgs_rejected += not direction_provider.update(xₖ, x_kp1, pₖ, p_kp1,
+                                                          grad_ψ_kp1, C, γ_kp1);
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)
-            no_progress = xₖ == xₖ₊₁ ? no_progress + 1 : 0;
+            no_progress = xₖ == x_kp1 ? no_progress + 1 : 0;
 
         // Advance step --------------------------------------------------------
-        Lₖ = Lₖ₊₁;
-        γₖ = γₖ₊₁;
+        Lₖ = L_kp1;
+        γₖ = γ_kp1;
 
-        ψₖ  = ψₖ₊₁;
-        ψx̂ₖ = ψx̂ₖ₊₁;
-        φₖ  = φₖ₊₁;
+        ψₖ  = ψ_kp1;
+        ψx̂ₖ = ψx̂_kp1;
+        φₖ  = φ_kp1;
 
-        xₖ.swap(xₖ₊₁);
-        x̂ₖ.swap(x̂ₖ₊₁);
-        ŷx̂ₖ.swap(ŷx̂ₖ₊₁);
-        pₖ.swap(pₖ₊₁);
-        grad_ψₖ.swap(grad_ψₖ₊₁);
-        grad_ψₖᵀpₖ = grad_ψₖ₊₁ᵀpₖ₊₁;
-        pₖᵀpₖ      = pₖ₊₁ᵀpₖ₊₁;
+        xₖ.swap(x_kp1);
+        x̂ₖ.swap(x̂_kp1);
+        ŷx̂ₖ.swap(ŷx̂_kp1);
+        pₖ.swap(p_kp1);
+        grad_ψₖ.swap(grad_ψ_kp1);
+        grad_ψₖᵀpₖ = grad_ψ_kp1ᵀp_kp1;
+        pₖᵀpₖ      = p_kp1ᵀp_kp1;
     }
     throw std::logic_error("[PANOC] loop error");
 }
