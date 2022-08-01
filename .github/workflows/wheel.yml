@@ -166,15 +166,18 @@ jobs:
         python -m venv py-venv
         source ./py-venv/bin/activate
         python -m pip install build ninja
-        CC="gcc-11" CXX="g++-11" \
+        CC="$(brew --prefix llvm@14)/bin/clang" \
+        CXX="$(brew --prefix llvm@14)/bin/clang++" \
           ./scripts/install-eigen.sh
-        CC="gcc-11" CXX="g++-11" \
+        CC="$(brew --prefix llvm@14)/bin/clang" \
+        CXX="$(brew --prefix llvm@14)/bin/clang++" \
           ./scripts/install-casadi-wheel.sh
     - name: Build
       run: |
         source ./py-venv/bin/activate
         CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH" \
-        CC="gcc-11" CXX="g++-11" \
+        CC="$(brew --prefix llvm@14)/bin/clang" \
+        CXX="$(brew --prefix llvm@14)/bin/clang++" \
             python -m build . --wheel
     - name: Upload
       uses: actions/upload-artifact@v2
