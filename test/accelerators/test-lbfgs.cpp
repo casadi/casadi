@@ -1,9 +1,9 @@
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/config/config.hpp>
 
-#include <test-util/eigen-matchers.hpp>
 #include <Eigen/LU>
 #include <limits>
+#include <test-util/eigen-matchers.hpp>
 
 TEST(LBFGS, quadratic) {
     using Conf = alpaqa::DefaultConfig;
@@ -51,7 +51,7 @@ TEST(LBFGS, quadratic) {
 
         Conf::vec y = r_new - r;
         Conf::vec s = -d;
-        B            = B + y * y.transpose() / y.dot(s) -
+        B           = B + y * y.transpose() / y.dot(s) -
             (B * s) * (s.transpose() * B.transpose()) / (s.transpose() * B * s);
 
         r = std::move(r_new);

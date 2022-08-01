@@ -37,9 +37,9 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
         return s;
     }
 
-    constexpr auto NaN              = alpaqa::NaN<config_t>;
-    vec Σ                           = vec::Constant(p.m, NaN);
-    vec Σ_old                       = vec::Constant(p.m, NaN);
+    constexpr auto NaN               = alpaqa::NaN<config_t>;
+    vec Σ                            = vec::Constant(p.m, NaN);
+    vec Σ_old                        = vec::Constant(p.m, NaN);
     vec error_1                      = vec::Constant(p.m, NaN);
     vec error_2                      = vec::Constant(p.m, NaN);
     [[maybe_unused]] real_t norm_e_1 = NaN;
@@ -141,8 +141,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
                 // Recompute penalty with smaller Δ
                 Δ = std::fmax(real_t(1), Δ * params.Δ_lower);
                 Helpers::update_penalty_weights(
-                    params, Δ, first_successful_iter, error_1, error_2, norm_e_1,
-                    norm_e_2, Σ_old, Σ, true);
+                    params, Δ, first_successful_iter, error_1, error_2,
+                    norm_e_1, norm_e_2, Σ_old, Σ, true);
                 // Recompute the primal tolerance with larger ρ
                 ρ = std::fmin(real_t(0.5),
                               ρ * params.ρ_increase); // keep ρ <= 0.5
@@ -186,8 +186,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
             Σ_old.swap(Σ);
             // Update Σ to contain the penalty to use on the next iteration.
             Helpers::update_penalty_weights(params, Δ, first_successful_iter,
-                                            error_1, error_2, norm_e_1, norm_e_2,
-                                            Σ_old, Σ, true);
+                                            error_1, error_2, norm_e_1,
+                                            norm_e_2, Σ_old, Σ, true);
             // Lower the primal tolerance for the inner solver.
             ε_old = std::exchange(ε, std::fmax(ρ * ε, params.ε));
             first_successful_iter = false;

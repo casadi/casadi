@@ -30,10 +30,10 @@ class ProblemBase {
                 length_t m) ///< Number of constraints
         : n{n}, m{m} {}
 
-    ProblemBase(const ProblemBase &) = default;
+    ProblemBase(const ProblemBase &)            = default;
     ProblemBase &operator=(const ProblemBase &) = default;
     ProblemBase(ProblemBase &&)                 = default;
-    ProblemBase &operator=(ProblemBase &&) = default;
+    ProblemBase &operator=(ProblemBase &&)      = default;
 
     virtual std::unique_ptr<ProblemBase> clone() const & = 0;
     virtual std::unique_ptr<ProblemBase> clone()      && = 0;
@@ -329,10 +329,10 @@ class FunctionalProblem : public Problem<Conf> {
     void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const override;
     void eval_hess_L(crvec x, crvec y, rmat H) const override;
 
-    FunctionalProblem(const FunctionalProblem &) = default;
+    FunctionalProblem(const FunctionalProblem &)            = default;
     FunctionalProblem &operator=(const FunctionalProblem &) = default;
     FunctionalProblem(FunctionalProblem &&)                 = default;
-    FunctionalProblem &operator=(FunctionalProblem &&) = default;
+    FunctionalProblem &operator=(FunctionalProblem &&)      = default;
 
     std::unique_ptr<ProblemBase<Conf>> clone() const & override;
     std::unique_ptr<ProblemBase<Conf>> clone() && override;

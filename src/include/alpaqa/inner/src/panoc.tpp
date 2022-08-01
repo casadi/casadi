@@ -55,18 +55,18 @@ PANOCSolver<DirectionProviderT>::operator()(
 
     bool need_grad_̂ψₖ = Helpers::stop_crit_requires_grad_ψx̂(params.stop_crit);
 
-    vec xₖ = x,   // Value of x at the beginning of the iteration
-        x̂ₖ(n),    // Value of x after a projected gradient step
-        x_kp1(n),  // xₖ for next iteration
-        x̂_kp1(n),  // x̂ₖ for next iteration
-        ŷx̂ₖ(m),   // ŷ(x̂ₖ) = Σ (g(x̂ₖ) - ẑₖ)
-        ŷx̂_kp1(m), // ŷ(x̂ₖ) for next iteration
-        pₖ(n),    // Projected gradient step pₖ = x̂ₖ - xₖ
-        p_kp1(n), // Projected gradient step p_kp1 = x̂_kp1 - x_kp1
-        qₖ(n),   // Newton step Hₖ pₖ
-        grad_ψₖ(n),                    // ∇ψ(xₖ)
+    vec xₖ = x,     // Value of x at the beginning of the iteration
+        x̂ₖ(n),      // Value of x after a projected gradient step
+        x_kp1(n),   // xₖ for next iteration
+        x̂_kp1(n),   // x̂ₖ for next iteration
+        ŷx̂ₖ(m),     // ŷ(x̂ₖ) = Σ (g(x̂ₖ) - ẑₖ)
+        ŷx̂_kp1(m),  // ŷ(x̂ₖ) for next iteration
+        pₖ(n),      // Projected gradient step pₖ = x̂ₖ - xₖ
+        p_kp1(n),   // Projected gradient step p_kp1 = x̂_kp1 - x_kp1
+        qₖ(n),      // Newton step Hₖ pₖ
+        grad_ψₖ(n), // ∇ψ(xₖ)
         grad_̂ψₖ(need_grad_̂ψₖ ? n : 0), // ∇ψ(x̂ₖ)
-        grad_ψ_kp1(n);                  // ∇ψ(x_kp1)
+        grad_ψ_kp1(n);                 // ∇ψ(x_kp1)
 
     vec work_n(n), work_m(m);
 
@@ -217,7 +217,7 @@ PANOCSolver<DirectionProviderT>::operator()(
                                      /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
-        τ                  = 1;
+        τ                = 1;
         real_t σₖγₖpₖᵀpₖ = (1 - γₖ * Lₖ) * pₖᵀpₖ / (2 * γₖ);
         real_t φ_kp1, ψ_kp1, ψx̂_kp1, grad_ψ_kp1ᵀp_kp1, p_kp1ᵀp_kp1;
         real_t L_kp1, γ_kp1;
@@ -242,7 +242,7 @@ PANOCSolver<DirectionProviderT>::operator()(
 
             // Calculate x_kp1
             if (τ / 2 < params.τ_min) { // line search failed
-                x_kp1.swap(x̂ₖ);          // → safe prox step
+                x_kp1.swap(x̂ₖ);         // → safe prox step
                 ψ_kp1 = ψx̂ₖ;
                 if (need_grad_̂ψₖ)
                     grad_ψ_kp1.swap(grad_̂ψₖ);
@@ -263,8 +263,8 @@ PANOCSolver<DirectionProviderT>::operator()(
             ψx̂_kp1 = calc_ψ_ŷ(x̂_kp1, /* in ⟹ out */ ŷx̂_kp1);
 
             // Quadratic upper bound -------------------------------------------
-            grad_ψ_kp1ᵀp_kp1 = grad_ψ_kp1.dot(p_kp1);
-            p_kp1ᵀp_kp1      = p_kp1.squaredNorm();
+            grad_ψ_kp1ᵀp_kp1     = grad_ψ_kp1.dot(p_kp1);
+            p_kp1ᵀp_kp1          = p_kp1.squaredNorm();
             real_t p_kp1ᵀp_kp1_ₖ = p_kp1ᵀp_kp1; // prox step with step size γₖ
 
             if (params.update_lipschitz_in_linesearch == true) {

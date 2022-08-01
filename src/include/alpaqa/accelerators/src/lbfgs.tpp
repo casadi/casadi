@@ -34,8 +34,8 @@ bool LBFGS<Conf>::update_valid(const Params &params, real_t yᵀs, real_t sᵀs,
 }
 
 template <Config Conf>
-bool LBFGS<Conf>::update_sy_impl(const auto &s, const auto &y, real_t p_kp1ᵀp_kp1,
-                                 bool forced) {
+bool LBFGS<Conf>::update_sy_impl(const auto &s, const auto &y,
+                                 real_t p_kp1ᵀp_kp1, bool forced) {
     real_t yᵀs = y.dot(s);
     real_t ρ   = 1 / yᵀs;
     if (not forced) {
@@ -62,10 +62,10 @@ bool LBFGS<Conf>::update_sy(crvec s, crvec y, real_t p_kp1ᵀp_kp1, bool forced)
 }
 
 template <Config Conf>
-bool LBFGS<Conf>::update(crvec xₖ, crvec x_kp1, crvec pₖ, crvec p_kp1, Sign sign,
-                         bool forced) {
-    const auto s = x_kp1 - xₖ;
-    const auto y = (sign == Sign::Positive) ? p_kp1 - pₖ : pₖ - p_kp1;
+bool LBFGS<Conf>::update(crvec xₖ, crvec x_kp1, crvec pₖ, crvec p_kp1,
+                         Sign sign, bool forced) {
+    const auto s       = x_kp1 - xₖ;
+    const auto y       = (sign == Sign::Positive) ? p_kp1 - pₖ : pₖ - p_kp1;
     real_t p_kp1ᵀp_kp1 = params.cbfgs ? p_kp1.squaredNorm() : 0;
     return update_sy_impl(s, y, p_kp1ᵀp_kp1, forced);
 }
