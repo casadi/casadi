@@ -75,6 +75,8 @@ struct ALMParams {
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
     unsigned print_interval = 0;
+    /// The precision of the floating point values printed by the solver.
+    int print_precision = std::numeric_limits<real_t>::max_digits10 / 2;
 
     /// Use one penalty factor for all m constraints.
     bool single_penalty_factor = false;

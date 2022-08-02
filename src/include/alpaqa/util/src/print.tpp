@@ -1,3 +1,5 @@
+#pragma once
+
 #include <alpaqa/util/print.hpp>
 
 #include <charconv>
@@ -8,15 +10,44 @@
 
 namespace alpaqa {
 
-std::string_view float_to_str_vw(auto &buf, std::floating_point auto value) {
+#if __cpp_lib_to_chars
+std::string_view float_to_str_vw(
+    auto &buf, std::floating_point auto value,
+    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
     auto begin = buf.data();
     if (!std::signbit(value))
         *begin++ = '+';
-    auto [end, _] = std::to_chars(
-        begin, buf.data() + buf.size(), value, std::chars_format::scientific,
-        std::numeric_limits<decltype(value)>::max_digits10);
+    auto [end, _] = std::to_chars(begin, buf.data() + buf.size(), value,
+                                  std::chars_format::scientific, precision);
     return std::string_view{buf.data(), end};
 }
+#else
+#pragma message "Using snprintf as a fallback to replace std::to_chars"
+
+inline std::string_view float_to_str_vw_snprintf(auto &buf,
+                                                 std::floating_point auto value,
+                                                 int prec, const char *fmt) {
+    int n = std::snprintf(buf.data(), buf.size(), fmt, prec, value);
+    assert((size_t)n < buf.size());
+    return {buf.data(), buf.data() + n};
+}
+
+inline std::string_view float_to_str_vw(
+    auto &buf, double value,
+    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+    return float_to_str_vw_snprintf(buf, value, precision, "%+-#.*e");
+}
+inline std::string_view float_to_str_vw(
+    auto &buf, float value,
+    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+    return float_to_str_vw(buf, static_cast<double>(value), precision);
+}
+inline std::string_view float_to_str_vw(
+    auto &buf, long double value,
+    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+    return float_to_str_vw_snprintf(buf, value, precision, "%+-#.*Le");
+}
+#endif
 
 #ifdef ALPAQA_WITH_QUAD_PRECISION
 std::string_view float_to_str_vw(auto &buf, __float128 value) {

@@ -38,7 +38,7 @@ constexpr inline auto dims(auto... a) {
         return std::array{a...};
     else
         return std::array{dim{a, 1}...};
-};
+}
 
 template <Config Conf>
 struct CasADiFunctionsWithParam {
@@ -59,7 +59,7 @@ struct CasADiFunctionsWithParam {
     std::optional<HessFun> hess;
 };
 
-}; // namespace casadi_loader
+} // namespace casadi_loader
 
 template <Config Conf>
 CasADiProblem<Conf>::CasADiProblem(const std::string &so_name, length_t n,

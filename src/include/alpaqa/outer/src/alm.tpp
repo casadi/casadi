@@ -10,6 +10,7 @@
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/util/quadmath/quadmath-print.hpp>
+#include <alpaqa/util/src/print.tpp>
 
 namespace alpaqa {
 
@@ -44,6 +45,11 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
     vec error_2                      = vec::Constant(p.m, NaN);
     [[maybe_unused]] real_t norm_e_1 = NaN;
     [[maybe_unused]] real_t norm_e_2 = NaN;
+
+    std::array<char, 64> printbuf;
+    auto print_real = [&](real_t x) {
+        return float_to_str_vw(printbuf, x, params.print_precision);
+    };
 
     Stats s;
 
@@ -103,14 +109,14 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
             auto color     = inner_converged ? "\x1b[0;32m" : "\x1b[0;31m";
             auto color_end = "\x1b[0m";
             std::cout << "[\x1b[0;34mALM\x1b[0m]   " << std::setw(5) << i
-                      << ": ‖Σ‖ = " << std::setw(13) << Σ.norm()
-                      << ", ‖y‖ = " << std::setw(13) << y.norm()
-                      << ", δ = " << std::setw(13) << δ
-                      << ", ε = " << std::setw(13) << ps.ε
-                      << ", Δ = " << std::setw(13) << Δ
-                      << ", status = " << color << std::setw(13) << ps.status
-                      << color_end << ", iter = " << std::setw(13)
-                      << ps.iterations << "\r\n";
+                      << ": ‖Σ‖ = " << print_real(Σ.norm())
+                      << ", ‖y‖ = " << print_real(y.norm())
+                      << ", δ = " << print_real(δ)
+                      << ", ε = " << print_real(ps.ε)
+                      << ", Δ = " << print_real(Δ) << ", status = " << color
+                      << std::setw(13) << ps.status << color_end
+                      << ", iter = " << std::setw(13) << ps.iterations
+                      << "\r\n";
         }
 
         // TODO: check penalty size?

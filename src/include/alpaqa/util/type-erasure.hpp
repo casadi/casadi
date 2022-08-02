@@ -46,7 +46,7 @@ template <auto M, class V, class T, class R, class... Args>
 constexpr auto launder_invoke(V *self, Args... args) -> R {
     return std::invoke(M, *std::launder(reinterpret_cast<T *>(self)),
                        std::forward<Args>(args)...);
-};
+}
 template <auto M, class T, class R, class... Args>
 constexpr auto launder_invoke_ovl(R (T::*)(Args...) const) {
     return launder_invoke<M, const void, const T, R, Args...>;

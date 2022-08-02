@@ -12,6 +12,7 @@
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/util/alloc-check.hpp>
 #include <alpaqa/util/quadmath/quadmath-print.hpp>
+#include <alpaqa/util/src/print.tpp>
 
 namespace alpaqa {
 
@@ -102,14 +103,18 @@ PANOCSolver<DirectionProviderT>::operator()(
             problem, params.quadratic_upperbound_tolerance_factor, params.L_max,
             xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
+    std::array<char, 64> printbuf;
+    auto print_real = [&](real_t x) {
+        return float_to_str_vw(printbuf, x, params.print_precision);
+    };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
                               real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
         std::cout << "[PANOC] " << std::setw(6) << k
-                  << ": ψ = " << std::setw(13) << ψₖ
-                  << ", ‖∇ψ‖ = " << std::setw(13) << grad_ψₖ.norm()
-                  << ", ‖p‖ = " << std::setw(13) << std::sqrt(pₖᵀpₖ)
-                  << ", γ = " << std::setw(13) << γₖ
-                  << ", εₖ = " << std::setw(13) << εₖ << "\r\n";
+                  << ": ψ = " << print_real(ψₖ)
+                  << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
+                  << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
+                  << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ)
+                  << "\r\n";
     };
 
     // Estimate Lipschitz constant ---------------------------------------------
