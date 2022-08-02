@@ -81,7 +81,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: py-venv
-        key: ${{ runner.os }}-${{ matrix.full-python-version }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-wheel.ps1') }}
+        key: ${{ runner.os }}-${{ matrix.full-python-version }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
     - name: Install Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       shell: powershell
@@ -89,7 +89,7 @@ jobs:
         python -m venv py-venv
         ./py-venv/Scripts/Activate.ps1
         ./scripts/install-eigen.ps1
-        ./scripts/install-casadi-wheel.ps1
+        ./scripts/install-casadi-static.ps1
         python -m pip install build
       env:
         CXXFLAGS: "/bigobj"
@@ -159,7 +159,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: py-venv
-        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-wheel.sh') }}
+        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-static.sh') }}
     - name: Install Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       run: |
@@ -171,7 +171,7 @@ jobs:
           ./scripts/install-eigen.sh
         CC="$(brew --prefix llvm@14)/bin/clang" \
         CXX="$(brew --prefix llvm@14)/bin/clang++" \
-          ./scripts/install-casadi-wheel.sh
+          ./scripts/install-casadi-static.sh
     - name: Build
       run: |
         source ./py-venv/bin/activate

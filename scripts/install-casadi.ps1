@@ -16,6 +16,7 @@ if ( -not ( Test-Path casadi) ) {
 pushd casadi
 cmake -Bbuild -S. `
     -D CMAKE_INSTALL_PREFIX="$env:VIRTUAL_ENV" `
+    -D CMAKE_POSITION_INDEPENDENT_CODE=On `
     -D WITH_COMMON=Off `
     -D WITH_OPENMP=Off `
     -D WITH_THREAD=On `
