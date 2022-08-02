@@ -32,12 +32,12 @@ struct PANOCDirection<LBFGS<Conf>> {
         (void)grad_0;
     }
 
-    bool update(crvec xₖ, crvec x_kp1, crvec pₖ, crvec p_kp1, crvec grad_new,
+    bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_new,
                 const Box<config_t> &C, real_t γ_new) {
         (void)grad_new;
         (void)C;
         (void)γ_new;
-        return lbfgs.update(xₖ, x_kp1, pₖ, p_kp1, LBFGS::Sign::Negative);
+        return lbfgs.update(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, LBFGS::Sign::Negative);
     }
 
     bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) const {

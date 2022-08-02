@@ -12,7 +12,7 @@ struct PANOCDirection {
     static void initialize(crvec x_0, crvec x̂_0, crvec p_0,
                            crvec grad_0) = delete;
 
-    static bool update(crvec xₖ, crvec x_kp1, crvec pₖ, crvec p_kp1,
+    static bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ,
                        crvec grad_new, const Box<config_t> &C,
                        real_t γ_new) = delete;
 

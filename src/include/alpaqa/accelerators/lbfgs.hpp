@@ -113,15 +113,15 @@ class LBFGS {
                              real_t pᵀp);
 
     /// Update the inverse Hessian approximation using the new vectors
-    /// sₖ = x_kp1 - xₖ and yₖ = p_kp1 - pₖ.
-    bool update_sy(crvec s, crvec y, real_t p_kp1ᵀp_kp1, bool forced = false);
+    /// sₖ = xₙₑₓₜ - xₖ and yₖ = pₙₑₓₜ - pₖ.
+    bool update_sy(crvec s, crvec y, real_t pₙₑₓₜᵀpₙₑₓₜ, bool forced = false);
     /// @see @ref update_sy
-    bool update_sy_impl(const auto &s, const auto &y, real_t p_kp1ᵀp_kp1,
+    bool update_sy_impl(const auto &s, const auto &y, real_t pₙₑₓₜᵀpₙₑₓₜ,
                         bool forced = false);
 
-    /// Update the inverse Hessian approximation using the new vectors x_kp1
-    /// and p_kp1.
-    bool update(crvec xₖ, crvec x_kp1, crvec pₖ, crvec p_kp1,
+    /// Update the inverse Hessian approximation using the new vectors xₙₑₓₜ
+    /// and pₙₑₓₜ.
+    bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ,
                 Sign sign = Sign::Positive, bool forced = false);
 
     /// Apply the inverse Hessian approximation to the given vector q.
