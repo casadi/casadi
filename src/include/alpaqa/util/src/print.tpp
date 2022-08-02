@@ -10,6 +10,15 @@
 
 namespace alpaqa {
 
+inline std::string_view float_to_str_vw_snprintf(auto &&print, auto &buf,
+                                                 std::floating_point auto value,
+                                                 int precision,
+                                                 const char *fmt) {
+    int n = print(buf.data(), buf.size(), fmt, precision, value);
+    assert((size_t)n < buf.size());
+    return {buf.data(), buf.data() + n};
+}
+
 #if __cpp_lib_to_chars
 std::string_view float_to_str_vw(
     auto &buf, std::floating_point auto value,
@@ -24,18 +33,11 @@ std::string_view float_to_str_vw(
 #else
 #pragma message "Using snprintf as a fallback to replace std::to_chars"
 
-inline std::string_view float_to_str_vw_snprintf(auto &buf,
-                                                 std::floating_point auto value,
-                                                 int prec, const char *fmt) {
-    int n = std::snprintf(buf.data(), buf.size(), fmt, prec, value);
-    assert((size_t)n < buf.size());
-    return {buf.data(), buf.data() + n};
-}
-
 inline std::string_view float_to_str_vw(
     auto &buf, double value,
     int precision = std::numeric_limits<decltype(value)>::max_digits10) {
-    return float_to_str_vw_snprintf(buf, value, precision, "%+-#.*e");
+    return float_to_str_vw_snprintf(std::snprintf, buf, value, precision,
+                                    "%+-#.*e");
 }
 inline std::string_view float_to_str_vw(
     auto &buf, float value,
@@ -45,16 +47,17 @@ inline std::string_view float_to_str_vw(
 inline std::string_view float_to_str_vw(
     auto &buf, long double value,
     int precision = std::numeric_limits<decltype(value)>::max_digits10) {
-    return float_to_str_vw_snprintf(buf, value, precision, "%+-#.*Le");
+    return float_to_str_vw_snprintf(std::snprintf, buf, value, precision,
+                                    "%+-#.*Le");
 }
 #endif
 
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-std::string_view float_to_str_vw(auto &buf, __float128 value) {
-    int prec = std::numeric_limits<decltype(value)>::max_digits10;
-    int n = quadmath_snprintf(buf.data(), buf.size(), "%+-#.*Qe", prec, value);
-    assert((size_t)n < buf.size());
-    return {buf.data(), buf.data() + n};
+std::string_view float_to_str_vw(
+    auto &buf, __float128 value,
+    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+    return float_to_str_vw_snprintf(quadmath_snprintf, buf, value, precision,
+                                    "%+-#.*Qe");
 }
 #endif
 
