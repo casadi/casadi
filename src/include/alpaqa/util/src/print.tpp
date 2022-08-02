@@ -20,9 +20,10 @@ inline std::string_view float_to_str_vw_snprintf(auto &&print, auto &buf,
 }
 
 #if __cpp_lib_to_chars
-std::string_view float_to_str_vw(
-    auto &buf, std::floating_point auto value,
-    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+template <std::floating_point F>
+std::string_view
+float_to_str_vw(auto &buf, F value,
+                int precision = std::numeric_limits<F>::max_digits10) {
     auto begin = buf.data();
     if (!std::signbit(value))
         *begin++ = '+';
@@ -33,29 +34,29 @@ std::string_view float_to_str_vw(
 #else
 #pragma message "Using snprintf as a fallback to replace std::to_chars"
 
-inline std::string_view float_to_str_vw(
-    auto &buf, double value,
-    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+inline std::string_view
+float_to_str_vw(auto &buf, double value,
+                int precision = std::numeric_limits<double>::max_digits10) {
     return float_to_str_vw_snprintf(std::snprintf, buf, value, precision,
                                     "%+-#.*e");
 }
-inline std::string_view float_to_str_vw(
-    auto &buf, float value,
-    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+inline std::string_view
+float_to_str_vw(auto &buf, float value,
+                int precision = std::numeric_limits<float>::max_digits10) {
     return float_to_str_vw(buf, static_cast<double>(value), precision);
 }
 inline std::string_view float_to_str_vw(
     auto &buf, long double value,
-    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+    int precision = std::numeric_limits<long double>::max_digits10) {
     return float_to_str_vw_snprintf(std::snprintf, buf, value, precision,
                                     "%+-#.*Le");
 }
 #endif
 
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-std::string_view float_to_str_vw(
-    auto &buf, __float128 value,
-    int precision = std::numeric_limits<decltype(value)>::max_digits10) {
+std::string_view
+float_to_str_vw(auto &buf, __float128 value,
+                int precision = std::numeric_limits<__float128>::max_digits10) {
     return float_to_str_vw_snprintf(quadmath_snprintf, buf, value, precision,
                                     "%+-#.*Qe");
 }
