@@ -55,16 +55,16 @@ PANOCSolver<DirectionProviderT>::operator()(
 
     bool need_grad_̂ψₖ = Helpers::stop_crit_requires_grad_ψx̂(params.stop_crit);
 
-    vec xₖ = x,     // Value of x at the beginning of the iteration
-        x̂ₖ(n),      // Value of x after a projected gradient step
-        xₙₑₓₜ(n),   // xₖ for next iteration
-        x̂ₙₑₓₜ(n),   // x̂ₖ for next iteration
-        ŷx̂ₖ(m),     // ŷ(x̂ₖ) = Σ (g(x̂ₖ) - ẑₖ)
-        ŷx̂ₙₑₓₜ(m),  // ŷ(x̂ₖ) for next iteration
-        pₖ(n),      // Projected gradient step pₖ = x̂ₖ - xₖ
-        pₙₑₓₜ(n),   // Projected gradient step pₙₑₓₜ = x̂ₙₑₓₜ - xₙₑₓₜ
-        qₖ(n),      // Newton step Hₖ pₖ
-        grad_ψₖ(n), // ∇ψ(xₖ)
+    vec xₖ = x,    // Value of x at the beginning of the iteration
+        x̂ₖ(n),     // Value of x after a projected gradient step
+        xₙₑₓₜ(n),  // xₖ for next iteration
+        x̂ₙₑₓₜ(n),  // x̂ₖ for next iteration
+        ŷx̂ₖ(m),    // ŷ(x̂ₖ) = Σ (g(x̂ₖ) - ẑₖ)
+        ŷx̂ₙₑₓₜ(m), // ŷ(x̂ₖ) for next iteration
+        pₖ(n),     // Projected gradient step pₖ = x̂ₖ - xₖ
+        pₙₑₓₜ(n), // Projected gradient step pₙₑₓₜ = x̂ₙₑₓₜ - xₙₑₓₜ
+        qₖ(n),                         // Newton step Hₖ pₖ
+        grad_ψₖ(n),                    // ∇ψ(xₖ)
         grad_̂ψₖ(need_grad_̂ψₖ ? n : 0), // ∇ψ(x̂ₖ)
         grad_ψₙₑₓₜ(n);                 // ∇ψ(xₙₑₓₜ)
 
@@ -263,8 +263,8 @@ PANOCSolver<DirectionProviderT>::operator()(
             ψx̂ₙₑₓₜ = calc_ψ_ŷ(x̂ₙₑₓₜ, /* in ⟹ out */ ŷx̂ₙₑₓₜ);
 
             // Quadratic upper bound -------------------------------------------
-            grad_ψₙₑₓₜᵀpₙₑₓₜ     = grad_ψₙₑₓₜ.dot(pₙₑₓₜ);
-            pₙₑₓₜᵀpₙₑₓₜ          = pₙₑₓₜ.squaredNorm();
+            grad_ψₙₑₓₜᵀpₙₑₓₜ = grad_ψₙₑₓₜ.dot(pₙₑₓₜ);
+            pₙₑₓₜᵀpₙₑₓₜ      = pₙₑₓₜ.squaredNorm();
             real_t pₙₑₓₜᵀpₙₑₓₜ_ₖ = pₙₑₓₜᵀpₙₑₓₜ; // prox step with step size γₖ
 
             if (params.update_lipschitz_in_linesearch == true) {

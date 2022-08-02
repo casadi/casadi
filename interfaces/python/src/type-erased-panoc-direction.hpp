@@ -15,7 +15,7 @@ template <Config Conf>
 struct PANOCDirectionVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
 
-    void (*initialize)(void *self, crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0)        = nullptr;
+    void (*initialize)(void *self, crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0)    = nullptr;
     bool (*update)(void *self, crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_new,
                    const Box<config_t> &C, real_t γ_new)                             = nullptr;
     bool (*apply)(const void *self, crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) = nullptr;

@@ -64,8 +64,8 @@ bool LBFGS<Conf>::update_sy(crvec s, crvec y, real_t pₙₑₓₜᵀpₙₑₓ�
 template <Config Conf>
 bool LBFGS<Conf>::update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ,
                          Sign sign, bool forced) {
-    const auto s       = xₙₑₓₜ - xₖ;
-    const auto y       = (sign == Sign::Positive) ? pₙₑₓₜ - pₖ : pₖ - pₙₑₓₜ;
+    const auto s = xₙₑₓₜ - xₖ;
+    const auto y = (sign == Sign::Positive) ? pₙₑₓₜ - pₖ : pₖ - pₙₑₓₜ;
     real_t pₙₑₓₜᵀpₙₑₓₜ = params.cbfgs ? pₙₑₓₜ.squaredNorm() : 0;
     return update_sy_impl(s, y, pₙₑₓₜᵀpₙₑₓₜ, forced);
 }
