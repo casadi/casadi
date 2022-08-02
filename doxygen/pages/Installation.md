@@ -8,11 +8,13 @@ please see [these instructions](../Sphinx/install/installation.html).
 ## Linux
 
 ### Tools
-First, install a compiler, GNU Make, CMake, Git ...:
+First, install some basic tools: C and C++ compilers, Git, and Python
+(you'll need the development version to build alpaqa's Python interface, and we
+install the `venv` module to create virtual environments).
 ```sh
-sudo apt install g++ gcc make ninja-build cmake git python3-venv python3-dev
+sudo apt install g++ gcc git python3-venv python3-dev
 ```
-This package requires a relatively recent compiler
+The alpaqa package requires a relatively recent compiler
 (tested using GCC 10-11, Clang 10-14).
 
 To install GCC 11 on older versions of Ubuntu, you can use
@@ -20,10 +22,9 @@ To install GCC 11 on older versions of Ubuntu, you can use
 sudo apt update
 sudo apt install software-properties-common
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt update
-sudo apt install gcc-11 g++-11 gfortran-11
+sudo apt install gcc-11 g++-11
 ```
-To install the latest version of Clang, you can use the instructions from <https://apt.llvm.org/>:
+To install the latest version of Clang, you can use the instructions from <https://apt.llvm.org>:
 ```sh
 bash -c "$(wget -O- https://apt.llvm.org/llvm.sh)"
 ```
@@ -31,28 +32,29 @@ bash -c "$(wget -O- https://apt.llvm.org/llvm.sh)"
 ### Clone the repository
 
 ```sh
-git clone git@github.com:kul-optec/alpaqa.git
-```
-For the purposes of these instructions, we'll refer to the alpaqa repository 
-as the environment variable `ALPAQA_ROOT`, for example:
-```sh
-export ALPAQA_ROOT="$HOME/GitHub/alpaqa"
+git clone https://github.com/kul-optec/alpaqa
 ```
 
 ### Create a virtual environment
 
+For convenience, we'll install everything into a Python virtual environment
+(including the C++ libraries and dependencies). This allows you to easily
+experiment in a sandbox, without requiring root permissions, and without the
+risk of messing with system packages.
+
 ```sh
-cd "$ALPAQA_ROOT"
+cd alpaqa
 python3 -m venv py-venv
 . ./py-venv/bin/activate
+pip install cmake ninja casadi numpy
 ```
 
 ### Install dependencies
 
-The `scripts` folder contains some Bash scripts to install the necessary 
-dependencies. We will install everything into the virtual environment, requiring
-no root privileges, and without changes to any other parts of your system. If
-you have some of these installed globally already you can skip these scripts.
+The `scripts` folder contains some Bash scripts to install the necessary
+dependencies. Feel free to inspect and modify the installation scripts.
+If you already have the dependencies installed globally you can skip these
+steps.
 
 ```sh
 bash ./scripts/install-casadi-static.sh "$VIRTUAL_ENV" Release
@@ -60,38 +62,43 @@ bash ./scripts/install-gtest.sh "$VIRTUAL_ENV" Release
 bash ./scripts/install-eigen.sh "$VIRTUAL_ENV" Release
 ```
 
+CasADi is built as a static library because it is later statically linked into
+the final alpaqa libraries for better portability, especially when creating the
+Python package.
+
 ### Build and install
 
-The following commands build and install the alpaqa C++ library. You may want to
-change the installation prefix, e.g. use `--prefix /usr/local` for a system-wide
-installation (requires `sudo`), or `--prefix "$VIRTUAL_ENV"` to install alpaqa
-to the active virtual environment only.
+The following commands build and install the alpaqa C++ library into the virtual
+environment.  
+You may want to change the installation prefix, e.g. use `--prefix /usr/local`
+for a system-wide install (requires `sudo`), or `--prefix $HOME/.local` to
+install it for the current user.
 
 ```sh
 cmake -S. -Bbuild -G "Ninja Multi-Config"
 
 cmake --build build --config Release -j       # Build in release mode
 cmake --build build -t test                   # Run the tests
-cmake --install build --prefix "$HOME/.local" # Install the release version
+cmake --install build --prefix "$VIRTUAL_ENV" # Install the release version
 
 cmake --build build --config Debug -j         # Build in debug mode
 cmake --build build -t test                   # Run the tests with extra checks
-cmake --install build --prefix "$HOME/.local" # Install the debug version
+cmake --install build --prefix "$VIRTUAL_ENV" # Install the debug version
 ```
 Installing both the release and debug versions can be very useful for checking
 matrix dimension errors and out of bounds accesses during development, and 
 switching to an optimized version later.
 
-If you install the library locally (to `~/.local`), as demonstrated in the
-previous snippet, you might have to set some environment variables, as explained
-here: https://tttapa.github.io/Pages/Ubuntu/Software-Installation/Installing-Locally.html
-
-Specifically, you need to add `~/.local` to the `CMAKE_PREFIX_PATH`, e.g. by
-adding the following to your `~/.profile` file:
-```sh
-export CMAKE_PREFIX_PATH="$HOME/.local:$CMAKE_PREFIX_PATH"
-```
-Then source it (`. ~/.profile`) or log out and back in again.
+> **Note**  
+> If you changed the installation prefix, and
+> unless you installed the package to a system folder like `/usr/local`, you'll
+> have to add `~/.local` to the `CMAKE_PREFIX_PATH`, e.g. by adding the
+> following to your `~/.profile` file, where `$HOME/.local` was the prefix used
+> in the when installing alpaqa earlier:
+> ```sh
+> export CMAKE_PREFIX_PATH="$HOME/.local:$CMAKE_PREFIX_PATH"
+> ```
+> Then source it (`. ~/.profile`) or log out and back in again.
 
 ## Windows
 
@@ -112,7 +119,13 @@ the dependencies, you can use the Powershell scripts instead of the Bash scripts
 
 The instructions for macOS are the same as the ones for Linux, with the caveat
 that the default AppleClang compiler might not be supported. Instead, it is
-recommended to use a mainline Clang compiler (version 10 or higher).
+recommended to use a mainline Clang compiler (version 10 or higher).  
+You can select the compiler to use by setting the `CC` and `CXX` environment
+variables, for example:
+```sh
+export CC=clang-14
+export CXX=clang++-14
+```
 
 ***
 
@@ -147,7 +160,8 @@ target_link_libraries(main PRIVATE alpaqa::alpaqa)
 
 # Python
 
-The Python module can be installed using:
+After creating the virtual environment and installing the dependencies, you can
+install the Python module using:
 ```sh
 pip install .
 ```
