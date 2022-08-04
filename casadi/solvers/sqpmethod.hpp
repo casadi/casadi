@@ -109,6 +109,9 @@ namespace casadi {
     /// QP solver for the subproblems
     Function qpsol_;
 
+    /// QP solver for elastic mode subproblems
+    Function qpsol_ela_;
+
     /// Exact Hessian?
     bool exact_hessian_;
 
@@ -149,6 +152,10 @@ namespace casadi {
 
     /// convexify?
     bool convexify_;
+
+    // Elastic mode sparsities
+    Sparsity Hsp_ela_;
+    Sparsity Asp_ela_;
 
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
