@@ -1024,7 +1024,8 @@ namespace casadi {
         SOLVER_RET_UNKNOWN,
         SOLVER_RET_SUCCESS,
         SOLVER_RET_LIMITED, // Out of time
-        SOLVER_RET_NAN
+        SOLVER_RET_NAN,
+        SOLVER_RET_INFEASIBLE
     };
 
     static std::string string_from_UnifiedReturnStatus(UnifiedReturnStatus status);
