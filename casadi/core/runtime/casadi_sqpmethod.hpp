@@ -35,6 +35,16 @@ struct casadi_sqpmethod_data {
   T1* Jk;
   // merit_mem
   T1* merit_mem;
+
+  // TODO: is this the right place for this?
+  // QP solution in elastic mode
+  T1 *dx_ela, *dlam_ela;
+  // Bounds of the elastic mode
+  T1 *lbdz_ela, *ubdz_ela;
+  // Gradient of the objective in elastic mode
+  T1 *gf_ela;
+  // Jacobian in elastic mode
+  T1* Jk_ela;
 };
 // C-REPLACE "casadi_sqpmethod_data<T1>" "struct casadi_sqpmethod_data"
 
@@ -70,6 +80,21 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
   *sz_w += nnz_a; // Jk
   // merit_mem
   if (p->max_iter_ls>0) *sz_w += p->merit_memsize;
+
+  // TODO: option or is this the right place?
+  // Additional work for larger lagrangian
+  *sz_w += 2*ng; //gLag
+  *sz_w += 2*ng; //gLag_old
+  // Additional work for larger solution
+  *sz_w += 2*ng; // df_ela
+  *sz_w += 2*ng; // dlam_ela
+  // Additional work memory for larger objective gradient in elastic mode
+  *sz_w += 2*ng; // gf_ela
+  // Additional work memory for larger jacobian in elastic mode
+  *sz_w += 2*ng; // Jk_ela
+  // Additional work for the larger bounds
+  *sz_w += 2*ng; // lbdz_ela
+  *sz_w += 2*ng; // ubdz_ela
 }
 
 // SYMBOL "sqpmethod_init"
@@ -107,4 +132,17 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
     d->merit_mem = *w;
     *w += p->merit_memsize;
   }
+
+  // TODO: is this the right place for this?
+  // TODO: can we not also do this by just adding the extra space to the standard datastructures?
+  // Solution of QP in elastic mode
+  d->dx_ela = *w; *w += nx + 2*ng;
+  d->dlam_ela = *w; *w += nx + 2*ng + ng;
+  // Bounds of the QP in elastic mode
+  d->lbdz_ela = *w; *w += nx + 2*ng + ng;
+  d->ubdz_ela = *w; *w += nx + 2*ng + ng;
+  // Gradient of the elastic objective
+  d->gf_ela = *w; *w += nx + 2*ng; 
+  // Jacobian for elastic mode
+  d->Jk_ela = *w; *w += nnz_a + 2*ng;
 }

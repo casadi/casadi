@@ -269,22 +269,22 @@ namespace casadi {
     Hsp_ela_ = Sparsity(Hsp_);
     Asp_ela_ = Sparsity(Asp_);
 
-    casadi_int n = Hsp_.size1();
-    casadi_int m = Asp_.size1(); 
-
-    std::vector<casadi_int> n_v(n);
+    std::vector<casadi_int> n_v(nx_);
     std::iota(std::begin(n_v), std::end(n_v), 0);
-    Hsp_ela_.enlarge(2*m + n, 2*m + n, n_v, n_v);
+    Hsp_ela_.enlarge(2*ng_ + nx_, 2*ng_ + nx_, n_v, n_v);
 
-    Sparsity dsp = Sparsity::diag(m,m);
+    Sparsity dsp = Sparsity::diag(ng_,ng_);
     Asp_ela_.appendColumns(dsp);
     Asp_ela_.appendColumns(dsp);
 
     // Allocate QP solver for elastic mode
     // TODO: Maybe we do not always do this? Only when elastic mode is initiated?
+    Dict qpsol_ela_options = Dict(qpsol_options);
+    qpsol_ela_options["error_on_fail"] = true;
+
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
-                   qpsol_options);
+                   qpsol_ela_options);
     alloc(qpsol_ela_);
 
     // BFGS?
@@ -491,8 +491,51 @@ int Sqpmethod::solve(void* mem) const {
       m->iter_count++;
 
       // Solve the QP
-      solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
+      int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam);
+
+      // If QP was infeasible enter elastic mode
+      if (ret == -1) {
+        uout() << "Entering Elastic mode" << std::endl;
+
+        double gamma = 10e4; // TODO: do not hardcode this initial gamma value
+
+        // Make larger gradient (has gamma for slack variables)
+        casadi_fill(d->gf_ela, nx_+2*ng_, gamma);
+        casadi_copy(d->gf, nx_, d->gf_ela);
+
+        // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
+        casadi_fill(d->Jk_ela, Asp_ela_.nnz(), 1.);
+        casadi_fill(d->Jk_ela, Asp_ela_.nnz()-ng_, -1.);
+        casadi_copy(d->Jk, Asp_.nnz(), d->Jk_ela);
+
+        // Initial guess
+        casadi_clear(d->dlam_ela, nx_+3*ng_);
+        casadi_copy(d_nlp->lam, nx_, d->dlam_ela); // TODO: Is it right that we only copy the part of lambda which has to do with the output variables (because the constraints change?)
+        casadi_clear(d->dx_ela, nx_+2*ng_);
+
+        // Initialize bounds
+        double *temp_src;
+        double *temp_dest;
+
+        casadi_fill(d->lbdz_ela, nx_+3*ng_, 0.);
+        temp_src = d->lbdz + nx_;
+        temp_dest = d->lbdz_ela + nx_+2*ng_;
+        casadi_copy(d->lbdz, nx_, d->lbdz_ela);
+        casadi_copy(temp_src, ng_, temp_dest);
+
+        casadi_fill(d->ubdz_ela, nx_+3*ng_, inf);
+        temp_src = d->ubdz + nx_;
+        temp_dest = d->ubdz_ela + nx_+2*ng_;
+        casadi_copy(d->ubdz, nx_, d->ubdz_ela);
+        casadi_copy(temp_src, ng_, temp_dest);
+
+        // Solve the QP
+        solve_ela_QP(m, d->Bk, d->gf_ela, d->lbdz_ela, d->ubdz_ela, d->Jk_ela, d->dx_ela, d->dlam_ela);
+        
+        casadi_error("Elastic QP solved. "
+                   "Now we need to develop more...");
+      }
 
       // Detecting indefiniteness
       double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
@@ -616,7 +659,7 @@ int Sqpmethod::solve(void* mem) const {
     print("\n");
   }
 
-  void Sqpmethod::solve_QP(SqpmethodMemory* m, const double* H, const double* g,
+  int Sqpmethod::solve_QP(SqpmethodMemory* m, const double* H, const double* g,
                            const double* lbdz, const double* ubdz, const double* A,
                            double* x_opt, double* dlam) const {
     ScopedTiming tic(m->fstats.at("QP"));
@@ -647,7 +690,7 @@ int Sqpmethod::solve(void* mem) const {
     //       Thus for now we return the value ret as the unified return state.
     if (!m->success) {
       if (ret == SOLVER_RET_INFEASIBLE) {
-        uout() << "Program should enter elastic mode right now!" << std::endl;
+        return -1;
       }
 
       casadi_error("qpsolver failed. "
@@ -655,6 +698,35 @@ int Sqpmethod::solve(void* mem) const {
     } 
 
     if (verbose_) print("QP solved\n");
+    return 0;
+  }
+
+  void Sqpmethod::solve_ela_QP(SqpmethodMemory* m, const double* H, const double* g,
+                           const double* lbdz, const double* ubdz, const double* A,
+                           double* x_opt, double* dlam) const {
+    ScopedTiming tic(m->fstats.at("QP"));
+    // Inputs
+    fill_n(m->arg, qpsol_ela_.n_in(), nullptr);
+    m->arg[CONIC_H] = H;
+    m->arg[CONIC_G] = g;
+    m->arg[CONIC_X0] = x_opt;
+    m->arg[CONIC_LAM_X0] = dlam;
+    m->arg[CONIC_LAM_A0] = dlam + nx_ + 2*ng_;
+    m->arg[CONIC_LBX] = lbdz;
+    m->arg[CONIC_UBX] = ubdz;
+    m->arg[CONIC_A] = A;
+    m->arg[CONIC_LBA] = lbdz + nx_ + 2*ng_;
+    m->arg[CONIC_UBA] = ubdz + nx_ + 2*ng_;
+
+    // Outputs
+    fill_n(m->res, qpsol_ela_.n_out(), nullptr);
+    m->res[CONIC_X] = x_opt;
+    m->res[CONIC_LAM_X] = dlam;
+    m->res[CONIC_LAM_A] = dlam + nx_ + 2*ng_;
+
+    // Solve the QP
+    int ret = qpsol_ela_(m->arg, m->res, m->iw, m->w, 0);
+    if (verbose_) print("Elastic QP solved\n");
   }
 
 void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
