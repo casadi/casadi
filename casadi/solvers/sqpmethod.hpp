@@ -174,7 +174,13 @@ namespace casadi {
                          double dx_norm, double rg, casadi_int ls_trials, bool ls_success) const;
 
     // Solve the QP subproblem
-    virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
+    virtual int solve_QP(SqpmethodMemory* m, const double* H, const double* g,
+                          const double* lbdz, const double* ubdz,
+                          const double* A,
+                          double* x_opt, double* dlam) const;
+
+    // Solve the QP subproblem for elastic mode
+    virtual void solve_ela_QP(SqpmethodMemory* m, const double* H, const double* g,
                           const double* lbdz, const double* ubdz,
                           const double* A,
                           double* x_opt, double* dlam) const;
