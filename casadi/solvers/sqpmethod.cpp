@@ -22,6 +22,11 @@
  *
  */
 
+/*
+ * GENERAL TODO:
+ * - Add option for elastic mode
+ */
+
 
 #include "sqpmethod.hpp"
 
@@ -258,6 +263,29 @@ namespace casadi {
     qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
+
+    // Generate sparsity patterns for elastic mode
+    // TODO: Maybe add documentation on how the sparsity patterns are formed for elastic mode?
+    Hsp_ela_ = Sparsity(Hsp_);
+    Asp_ela_ = Sparsity(Asp_);
+
+    casadi_int n = Hsp_.size1();
+    casadi_int m = Asp_.size1(); 
+
+    std::vector<casadi_int> n_v(n);
+    std::iota(std::begin(n_v), std::end(n_v), 0);
+    Hsp_ela_.enlarge(2*m + n, 2*m + n, n_v, n_v);
+
+    Sparsity dsp = Sparsity::diag(m,m);
+    Asp_ela_.appendColumns(dsp);
+    Asp_ela_.appendColumns(dsp);
+
+    // Allocate QP solver for elastic mode
+    // TODO: Maybe we do not always do this? Only when elastic mode is initiated?
+    casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
+                   qpsol_options);
+    alloc(qpsol_ela_);
 
     // BFGS?
     if (!exact_hessian_) {
