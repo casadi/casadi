@@ -455,6 +455,10 @@ namespace casadi {
     if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
       m->unified_return_status = SOLVER_RET_LIMITED;
     }
+    // TODO: There is also flag RET_QP_INFEASIBLE / RET_HOTSTART_STOPPED_INFEASIBILITY / RET_ADDCONSTRAINT_FAILED_INFEASIBILITY / RET_ADDBOUND_FAILED_INFEASIBILITY / RET_ENSURELI_FAILED_NOINDEX / RET_ENSURELI_FAILED_CYCLING
+    if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY) {
+      m->unified_return_status = SOLVER_RET_INFEASIBLE;
+    }
 
     m->iter_count = nWSR;
 
@@ -477,7 +481,11 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    return 0;
+    uout() << std::endl << "qpoasis flag: " << flag << std::endl;
+    uout() << "Error message: " << getErrorMessage(flag) << std::endl;
+    uout() << "Unified return state in qpoases interface: " << m->unified_return_status << std::endl << std::endl;
+
+    return m->unified_return_status;
   }
 
   std::string QpoasesInterface::getErrorMessage(casadi_int flag) {
