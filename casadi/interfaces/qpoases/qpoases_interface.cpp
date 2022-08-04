@@ -481,10 +481,6 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    uout() << std::endl << "qpoasis flag: " << flag << std::endl;
-    uout() << "Error message: " << getErrorMessage(flag) << std::endl;
-    uout() << "Unified return state in qpoases interface: " << m->unified_return_status << std::endl << std::endl;
-
     return m->unified_return_status;
   }
 

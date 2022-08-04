@@ -215,8 +215,8 @@ namespace casadi {
       }
     }
 
-    // TODO: Make this more elegant
-    //qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
+    // TODO: Make this more elegant and not hardcoded
+    qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
 
     // Use exact Hessian?
     exact_hessian_ = hessian_approximation =="exact";
@@ -617,7 +617,6 @@ int Sqpmethod::solve(void* mem) const {
     // Check if the QP was infeasible
     // TODO: The nice way to do this (I think) is to use m->unified_return_status but this value gets lost somewhere between the conic method and here. 
     //       Thus for now we return the value ret as the unified return state.
-
     if (!m->success) {
       if (ret == SOLVER_RET_INFEASIBLE) {
         uout() << "Program should enter elastic mode right now!" << std::endl;
