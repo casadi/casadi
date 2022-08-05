@@ -6,7 +6,8 @@ def test_alm():
     lbfgs = pa.LBFGS({})
     panoc = pa.PANOCSolver(pp, lbfgs)
     solver = pa.ALMSolver(pa.ALMParams(), panoc)
-    print(solver)
+    print(f"Solver: {solver} "
+          f"({solver.__class__.__module__}.{solver.__class__.__qualname__})")
 
     import casadi as cs
     import numpy as np
