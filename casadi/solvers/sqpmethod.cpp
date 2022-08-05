@@ -141,7 +141,13 @@ namespace casadi {
         "Maximum number of iterations to compute an eigenvalue decomposition (default: 50)."}},
       {"elastic_mode",
        {OT_BOOL,
-        "Enable the elastic mode which is used when the QP is infeasible (default: false)."}}
+        "Enable the elastic mode which is used when the QP is infeasible (default: false)."}},
+      {"gamma_0",
+       {OT_DOUBLE,
+        "Starting value for the penalty parameter of elastic mode (default: 10e4)."}},
+      {"gamma_max",
+       {OT_DOUBLE,
+        "Maximum value for the penalty parameter of elastic mode (default: 10e20)."}}
      }
   };
 
@@ -167,6 +173,8 @@ namespace casadi {
     print_iteration_ = true;
     print_status_ = true;
     elastic_mode_ = false;
+    gamma_0_ = 10e4;
+    gamma_max_ = 10e20;
 
     std::string convexify_strategy = "none";
     double convexify_margin = 1e-7;
@@ -224,6 +232,10 @@ namespace casadi {
         max_iter_eig = op.second;
       } else if (op.first=="elastic_mode") {
         elastic_mode_ = op.second;
+      } else if (op.first=="gamma_0") {
+        gamma_0_ = op.second;
+      } else if (op.first=="gamma_max") {
+        gamma_max_ = op.second;
       }
     }
 
@@ -515,19 +527,16 @@ int Sqpmethod::solve(void* mem) const {
                d->dx, d->dlam);
 
       // Elastic mode check if this option is turned on.
-      if (elastic_mode_) {
-        double gamma0 = 10e4; // TODO: do not hardcode this initial gamma value + Only assign when entering elastic mode
-        double gamma_max = 10e20; // TODO: do not hardcode this and get an acceptable value for this + Make an option out of this?
-        
+      if (elastic_mode_) {        
         int it = 0;
         double gamma = 0;
 
         // If QP was infeasible enter elastic mode
         while (ret == -1) {
           it += 1;
-          gamma = pow(10, it*(it-1)/2)*gamma0;
+          gamma = pow(10, it*(it-1)/2)*gamma_0_;
 
-          if (gamma > gamma_max) {
+          if (gamma > gamma_max_) {
             casadi_error("Error in elastic mode of QP solver."
                         "Gamma became larger than gamma_max.");
           }
