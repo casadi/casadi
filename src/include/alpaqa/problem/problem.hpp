@@ -82,7 +82,8 @@ class ProblemBase {
     ///         Which constraint @f$ 0 \le i \lt m @f$
     /// @param  [out] grad_gi
     ///         Gradient of the constraint
-    ///         @f$ \nabla g_i(x) \R^n @f$
+    ///         @f$ \nabla g_i(x) \in \R^n @f$
+    ///
     /// Required for second-order solvers only.
     virtual void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const;
     /// Function that evaluates the Hessian of the Lagrangian multiplied by a
@@ -97,6 +98,7 @@ class ProblemBase {
     /// @param  [out] Hv
     ///         Hessian-vector product
     ///         @f$ \nabla_{xx}^2 L(x, y)\,v \in \R^{n} @f$
+    ///
     /// Required for second-order solvers only.
     virtual void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const;
     /// Function that evaluates the Hessian of the Lagrangian,
@@ -107,6 +109,7 @@ class ProblemBase {
     ///         Lagrange multipliers @f$ y \in \R^m @f$
     /// @param  [out] H
     ///         Hessian @f$ \nabla_{xx}^2 L(x, y) \in \R^{n\times n} @f$
+    ///
     /// Required for second-order solvers only.
     virtual void eval_hess_L(crvec x, crvec y, rmat H) const;
 
