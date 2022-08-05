@@ -19,6 +19,14 @@ classifiers = [
 dependencies = ["numpy", "casadi"]
 dynamic = ["version", "description"]
 
+[project.optional-dependencies]
+docs = [
+    "sphinx @ git+https://github.com/tttapa/sphinx@5.x",
+    "matplotlib",
+    "breathe",
+    "furo",
+]
+
 [project.urls]
 "Documentation" = "https://kul-optec.github.io/alpaqa"
 "Source" = "https://github.com/kul-optec/alpaqa"
