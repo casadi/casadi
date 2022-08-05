@@ -9,7 +9,7 @@ struct InnerSolverVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
     using Stats = TypeErasedInnerSolverStats<Conf>;
 
-    Stats (*call)(void *, const ProblemBase<Conf> &, crvec, real_t, bool, rvec, vec,
+    Stats (*call)(void *, const ProblemBase<Conf> &, crvec, real_t, bool, rvec, rvec,
                   rvec)                   = nullptr;
     void (*stop)(void *)                  = nullptr;
     std::string (*get_name)(const void *) = nullptr;
