@@ -138,7 +138,10 @@ namespace casadi {
         "the smallest eigenvalue is at least this (default: 1e-7)."}},
       {"max_iter_eig",
        {OT_DOUBLE,
-        "Maximum number of iterations to compute an eigenvalue decomposition (default: 50)."}}
+        "Maximum number of iterations to compute an eigenvalue decomposition (default: 50)."}},
+      {"elastic_mode",
+       {OT_BOOL,
+        "Enable the elastic mode which is used when the QP is infeasible (default: false)."}}
      }
   };
 
@@ -163,6 +166,7 @@ namespace casadi {
     print_header_ = true;
     print_iteration_ = true;
     print_status_ = true;
+    elastic_mode_ = false;
 
     std::string convexify_strategy = "none";
     double convexify_margin = 1e-7;
@@ -218,12 +222,18 @@ namespace casadi {
         convexify_margin = op.second;
       } else if (op.first=="max_iter_eig") {
         max_iter_eig = op.second;
+      } else if (op.first=="elastic_mode") {
+        elastic_mode_ = op.second;
       }
     }
 
-    // TODO: Make this more elegant and not hardcoded
-    qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
-
+    // Error on failure of the QP solver
+    if (qpsol_options.count("error_on_fail") > 0) {
+      error_on_fail_ = qpsol_options["error_on_fail"];
+    } else {
+      error_on_fail_ = true;
+    }
+      
     // Use exact Hessian?
     exact_hessian_ = hessian_approximation =="exact";
 
@@ -260,33 +270,42 @@ namespace casadi {
     }
 
     // Allocate a QP solver
+    // TODO: Make this more elegant and not hardcoded
+    if (elastic_mode_) {
+      qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
+    }
+
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
 
-    // Generate sparsity patterns for elastic mode
-    // TODO: Maybe add documentation on how the sparsity patterns are formed for elastic mode?
-    Hsp_ela_ = Sparsity(Hsp_);
-    Asp_ela_ = Sparsity(Asp_);
+    if (elastic_mode_) {
+      // Generate sparsity patterns for elastic mode
+      // TODO: Maybe add documentation on how the sparsity patterns are formed for elastic mode?
+      Hsp_ela_ = Sparsity(Hsp_);
+      Asp_ela_ = Sparsity(Asp_);
 
-    std::vector<casadi_int> n_v(nx_);
-    std::iota(std::begin(n_v), std::end(n_v), 0);
-    Hsp_ela_.enlarge(2*ng_ + nx_, 2*ng_ + nx_, n_v, n_v);
+      std::vector<casadi_int> n_v(nx_);
+      std::iota(std::begin(n_v), std::end(n_v), 0);
+      Hsp_ela_.enlarge(2*ng_ + nx_, 2*ng_ + nx_, n_v, n_v);
 
-    Sparsity dsp = Sparsity::diag(ng_,ng_);
-    Asp_ela_.appendColumns(dsp);
-    Asp_ela_.appendColumns(dsp);
+      Sparsity dsp = Sparsity::diag(ng_,ng_);
+      Asp_ela_.appendColumns(dsp);
+      Asp_ela_.appendColumns(dsp);
 
-    // Allocate QP solver for elastic mode
-    // TODO: Maybe we do not always do this? Only when elastic mode is initiated?
-    Dict qpsol_ela_options = Dict(qpsol_options);
-    qpsol_ela_options["error_on_fail"] = false; // TODO: Do not hardcode this
+      // Allocate QP solver for elastic mode
+      // TODO: Maybe we do not always do this? Only when elastic mode is initiated?
+      //       Because elastic mode is not always used even when the setting is on.
+      Dict qpsol_ela_options = Dict(qpsol_options);
+      qpsol_ela_options["error_on_fail"] = false; // TODO: Do not hardcode this
 
-    casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
-                   qpsol_ela_options);
-    alloc(qpsol_ela_);
+      casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+      qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
+                    qpsol_ela_options);
+      alloc(qpsol_ela_);
+    }
+    
 
     // BFGS?
     if (!exact_hessian_) {
@@ -495,66 +514,70 @@ int Sqpmethod::solve(void* mem) const {
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam);
 
-      // If QP was infeasible enter elastic mode
-      double gamma0 = 10e4; // TODO: do not hardcode this initial gamma value + Only assign when entering elastic mode
-      double gamma_max = 10e20; // TODO: do not hardcode this and get an acceptable value for this + Make an option out of this?
-      
-      int it = 0;
-      double gamma = 0;
-      while (ret == -1) {
-        it += 1;
-        gamma = pow(10, it*(it-1)/2)*gamma0;
+      // Elastic mode check if this option is turned on.
+      if (elastic_mode_) {
+        double gamma0 = 10e4; // TODO: do not hardcode this initial gamma value + Only assign when entering elastic mode
+        double gamma_max = 10e20; // TODO: do not hardcode this and get an acceptable value for this + Make an option out of this?
+        
+        int it = 0;
+        double gamma = 0;
 
-        if (gamma > gamma_max) {
-          casadi_error("Error in elastic mode of QP solver."
-                       "Gamma became larger than gamma_max.");
+        // If QP was infeasible enter elastic mode
+        while (ret == -1) {
+          it += 1;
+          gamma = pow(10, it*(it-1)/2)*gamma0;
+
+          if (gamma > gamma_max) {
+            casadi_error("Error in elastic mode of QP solver."
+                        "Gamma became larger than gamma_max.");
+          }
+
+          uout() << "Entering Elastic mode with gamma = " << gamma << std::endl;
+
+          // Make larger gradient (has gamma for slack variables)
+          casadi_fill(d->gf_ela, nx_+2*ng_, gamma);
+          casadi_copy(d->gf, nx_, d->gf_ela);
+
+          // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
+          casadi_fill(d->Jk_ela, Asp_ela_.nnz(), 1.);
+          casadi_fill(d->Jk_ela, Asp_ela_.nnz()-ng_, -1.);
+          casadi_copy(d->Jk, Asp_.nnz(), d->Jk_ela);
+
+          // Initial guess
+          // TODO: Is it right that we copy only the first part of the lambda vector because the constraints change?
+          casadi_clear(d->dlam_ela, nx_+3*ng_);
+          casadi_copy(d_nlp->lam, nx_, d->dlam_ela); 
+          casadi_clear(d->dx_ela, nx_+2*ng_);
+
+          // Initialize bounds
+          double *temp_src;
+          double *temp_dest;
+
+          casadi_fill(d->lbdz_ela, nx_+3*ng_, 0.);
+          temp_src = d->lbdz + nx_;
+          temp_dest = d->lbdz_ela + nx_+2*ng_;
+          casadi_copy(d->lbdz, nx_, d->lbdz_ela);
+          casadi_copy(temp_src, ng_, temp_dest);
+
+          casadi_fill(d->ubdz_ela, nx_+3*ng_, inf);
+          temp_src = d->ubdz + nx_;
+          temp_dest = d->ubdz_ela + nx_+2*ng_;
+          casadi_copy(d->ubdz, nx_, d->ubdz_ela);
+          casadi_copy(temp_src, ng_, temp_dest);
+
+          // Solve the QP
+          ret = solve_ela_QP(m, d->Bk, d->gf_ela, d->lbdz_ela, d->ubdz_ela, d->Jk_ela, d->dx_ela, d->dlam_ela);
         }
 
-        uout() << "Entering Elastic mode with gamma = " << gamma << std::endl;
-
-        // Make larger gradient (has gamma for slack variables)
-        casadi_fill(d->gf_ela, nx_+2*ng_, gamma);
-        casadi_copy(d->gf, nx_, d->gf_ela);
-
-        // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
-        casadi_fill(d->Jk_ela, Asp_ela_.nnz(), 1.);
-        casadi_fill(d->Jk_ela, Asp_ela_.nnz()-ng_, -1.);
-        casadi_copy(d->Jk, Asp_.nnz(), d->Jk_ela);
-
-        // Initial guess
-        // TODO: Is it right that we copy only the first part of the lambda vector because the constraints change?
-        casadi_clear(d->dlam_ela, nx_+3*ng_);
-        casadi_copy(d_nlp->lam, nx_, d->dlam_ela); 
-        casadi_clear(d->dx_ela, nx_+2*ng_);
-
-        // Initialize bounds
-        double *temp_src;
-        double *temp_dest;
-
-        casadi_fill(d->lbdz_ela, nx_+3*ng_, 0.);
-        temp_src = d->lbdz + nx_;
-        temp_dest = d->lbdz_ela + nx_+2*ng_;
-        casadi_copy(d->lbdz, nx_, d->lbdz_ela);
-        casadi_copy(temp_src, ng_, temp_dest);
-
-        casadi_fill(d->ubdz_ela, nx_+3*ng_, inf);
-        temp_src = d->ubdz + nx_;
-        temp_dest = d->ubdz_ela + nx_+2*ng_;
-        casadi_copy(d->ubdz, nx_, d->ubdz_ela);
-        casadi_copy(temp_src, ng_, temp_dest);
-
-        // Solve the QP
-        ret = solve_ela_QP(m, d->Bk, d->gf_ela, d->lbdz_ela, d->ubdz_ela, d->Jk_ela, d->dx_ela, d->dlam_ela);
+        // Copy elastic variables into normal variables
+        // TODO: Find a nicer way to do this
+        // TODO: Is it right that we copy the whole lambda vector because the constraints change?
+        if (gamma != 0) {
+          casadi_copy(d->dx_ela, nx_, d->dx);
+          casadi_copy(d->dlam_ela, nx_, d->dlam);
+        }
       }
-
-      // Copy elastic variables into normal variables
-      // TODO: Find a nicer way to do this
-      // TODO: Is it right that we copy the whole lambda vector because the constraints change?
-      if (gamma != 0) {
-        casadi_copy(d->dx_ela, nx_, d->dx);
-        casadi_copy(d->dlam_ela, nx_, d->dlam);
-      }
-
+      
       // Detecting indefiniteness
       double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
       if (gain < 0) {
@@ -704,14 +727,17 @@ int Sqpmethod::solve(void* mem) const {
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
     auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
 
-    // Check if the QP was infeasible
-    if (!m_qpsol->success) {
+    // Check if the QP was infeasible for elastic mode
+    if (!m_qpsol->success && elastic_mode_) {
       if (m_qpsol->unified_return_status == SOLVER_RET_INFEASIBLE) {
         return -1;
       }
 
-      casadi_error("qpsolver failed. "
-                   "Caught manually due to qpsolver_options.");
+      if (error_on_fail_) {
+        casadi_error("qpsolver failed. "
+                   "Set 'error_on_fail' option to false to ignore this error.");
+      }
+      
     } 
 
     if (verbose_) print("QP solved\n");
@@ -751,8 +777,10 @@ int Sqpmethod::solve(void* mem) const {
         return -1;
       }
 
-      casadi_error("qpsolver failed in elastic mode."
-                   "Caught manually due to qpsolver_options.");
+      if (error_on_fail_) {
+        casadi_error("qpsolver failed in elastic mode. "
+                   "Set 'error_on_fail' option to false to ignore this error.");
+      }
     } 
 
     if (verbose_) print("Elastic QP solved\n");
