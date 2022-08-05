@@ -1,0 +1,21 @@
+\documentclass[tikz]{standalone}
+\usetikzlibrary{calc,arrows}
+
+\usepackage{ifthen}
+\usepackage{fix-cm}
+
+\makeatletter
+\newcommand\HUGE{\@setfontsize\Huge{32}{36}}
+\makeatother
+
+\begin{document}
+    \input{logo_colors.tex}
+
+    \begin{tikzpicture}[xscale=0.372]
+        \input{logo_common.tex}
+
+        \node[yshift=-12pt, xshift=3pt, anchor=north west, font=\HUGE] at (pt1) {\textcolor{alpaqacolor}{\textsc{A}}};
+        
+        \end{scope}
+    \end{tikzpicture}
+\end{document}
