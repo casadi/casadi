@@ -15,31 +15,30 @@ jobs:
     - uses: actions/checkout@v2
     - run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
-    # Install Python dependencies to generate tests
-    - name: Install Python Dependencies 
-      run: | 
-        # python3 -m pip install -r requirements-docs.txt
-        # python3 -m pip install -r requirements-wheel.txt
-        python3 -m pip install numpy casadi
-        # ./install-sphinx.sh --force-install
-        # python3 -m pip install furo
-      working-directory: scripts
-
-    # Create the `gh-pages` branch if it doesn't exist already, check it out, 
-    # and copy it to /tmp/staging.
+    # Create a copy of the repo in /tmp/staging.
+    # Create the `gh-pages` branch if it doesn't exist already, check it out.
     - name: Create staging area
       run: |
         rm -rf /tmp/staging
+        cp -ar $GITHUB_WORKSPACE/ /tmp/staging
+        git config --global --add safe.directory /tmp/staging
+        cd /tmp/staging
         git fetch origin gh-pages:gh-pages ||:
         git checkout gh-pages || \
         { git checkout --orphan gh-pages && git rm -rf . && git clean -fxd ; }
-        cp -ar $GITHUB_WORKSPACE/ /tmp/staging
-        git checkout ${GITHUB_REF##*/}
-        git config --global --add safe.directory /tmp/staging
+
+    # Install Python dependencies for generating docs and tests
+    - name: Install Python package and dependencies 
+      run: | 
+        echo -e '[cmake.options]\n"ALPAQA_WITH_CASADI:BOOL" = "Off"' > py-build-cmake.local.toml
+        python3 -m pip install '.[docs]'
+      shell: bash
+      env:
+        CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen"
 
     # Generate the documentation and save it in /tmp/staging
     - name: Generate documentation
-      run: ./scripts/ci/gen-docs.sh /tmp/staging
+      run: ./doxygen/scripts/gen-docs.sh /tmp/staging
       env:
         CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen"
 

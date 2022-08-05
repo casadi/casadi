@@ -29,7 +29,7 @@ function run_doxygen_coverage {
     rm -rf "$repodir/docs/Coverage"
 
     # Tweak some Doxyfile verion numbers and output paths
-    cat <<- EOF > tmp-Doxyfile
+    cat <<- EOF > "$tmpdir/tmp-Doxyfile"
 	@INCLUDE = "$repodir/doxygen/Doxyfile"
 	PROJECT_NUMBER = "$branch"
 	OUTPUT_DIRECTORY = "$outdir"
@@ -45,15 +45,24 @@ function run_doxygen_coverage {
         -DALPAQA_WITH_PYTHON=Off \
         -DALPAQA_WITH_EXAMPLES=Off \
         -DALPAQA_WITH_CASADI=Off \
-        -DALPAQA_DOXYFILE="$repodir/tmp-Doxyfile"
+        -DALPAQA_DOXYFILE="$tmpdir/tmp-Doxyfile"
 
     # Generate the Doxygen C++ documentation
     cmake --build "$tmpdir/build" -t docs
 
+    # Tweak the settings for Doxygen for breathe
+    cat <<- EOF > "$tmpdir/tmp-Doxyfile"
+	@INCLUDE = "$repodir/doxygen/Doxyfile.breathe"
+	PROJECT_NUMBER = "$branch"
+	OUTPUT_DIRECTORY = "$tmpdir"
+	XML_OUTPUT = "xml"
+	GENERATE_LATEX = NO
+	EOF
+
     # Generate the Sphinx Python & C++ documentation
-    cmake "$tmpdir/build" -DALPAQA_DOXYFILE="$repodir/doxygen/Doxyfile.breathe"
     cmake --build "$tmpdir/build" -t docs
-    sphinx-build -b html -j auto doxygen/sphinx/source "$sphinxdir"
+    sphinx-build -b html -j auto -D "breathe_projects.alpaqa=$tmpdir/xml" \
+        doxygen/sphinx/source "$sphinxdir"
 
     # Generate coverage report
     cmake --build "$tmpdir/build" -j -t coverage
