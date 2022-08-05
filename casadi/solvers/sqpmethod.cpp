@@ -33,6 +33,7 @@
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/calculus.hpp"
 #include "casadi/core/conic.hpp"
+#include "casadi/core/conic_impl.hpp"
 #include "casadi/core/convexify.hpp"
 
 #include <ctime>
@@ -280,7 +281,7 @@ namespace casadi {
     // Allocate QP solver for elastic mode
     // TODO: Maybe we do not always do this? Only when elastic mode is initiated?
     Dict qpsol_ela_options = Dict(qpsol_options);
-    qpsol_ela_options["error_on_fail"] = true;
+    qpsol_ela_options["error_on_fail"] = false; // TODO: Do not hardcode this
 
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
@@ -495,10 +496,21 @@ int Sqpmethod::solve(void* mem) const {
                d->dx, d->dlam);
 
       // If QP was infeasible enter elastic mode
-      if (ret == -1) {
-        uout() << "Entering Elastic mode" << std::endl;
+      double gamma0 = 10e4; // TODO: do not hardcode this initial gamma value + Only assign when entering elastic mode
+      double gamma_max = 10e20; // TODO: do not hardcode this and get an acceptable value for this + Make an option out of this?
+      
+      int it = 0;
+      double gamma = 0;
+      while (ret == -1) {
+        it += 1;
+        gamma = pow(10, it*(it-1)/2)*gamma0;
 
-        double gamma = 10e4; // TODO: do not hardcode this initial gamma value
+        if (gamma > gamma_max) {
+          casadi_error("Error in elastic mode of QP solver."
+                       "Gamma became larger than gamma_max.");
+        }
+
+        uout() << "Entering Elastic mode with gamma = " << gamma << std::endl;
 
         // Make larger gradient (has gamma for slack variables)
         casadi_fill(d->gf_ela, nx_+2*ng_, gamma);
@@ -510,8 +522,9 @@ int Sqpmethod::solve(void* mem) const {
         casadi_copy(d->Jk, Asp_.nnz(), d->Jk_ela);
 
         // Initial guess
+        // TODO: Is it right that we copy the whole lambda vector because the constraints change?
         casadi_clear(d->dlam_ela, nx_+3*ng_);
-        casadi_copy(d_nlp->lam, nx_, d->dlam_ela); // TODO: Is it right that we only copy the part of lambda which has to do with the output variables (because the constraints change?)
+        casadi_copy(d_nlp->lam, nx_, d->dlam_ela); 
         casadi_clear(d->dx_ela, nx_+2*ng_);
 
         // Initialize bounds
@@ -531,10 +544,21 @@ int Sqpmethod::solve(void* mem) const {
         casadi_copy(temp_src, ng_, temp_dest);
 
         // Solve the QP
-        solve_ela_QP(m, d->Bk, d->gf_ela, d->lbdz_ela, d->ubdz_ela, d->Jk_ela, d->dx_ela, d->dlam_ela);
-        
-        casadi_error("Elastic QP solved. "
-                   "Now we need to develop more...");
+        ret = solve_ela_QP(m, d->Bk, d->gf_ela, d->lbdz_ela, d->ubdz_ela, d->Jk_ela, d->dx_ela, d->dlam_ela);
+      }
+
+      // Copy elastic variables into normal variables
+      // TODO: Find a nicer way to do this
+      // TODO: Is it right that we copy the whole lambda vector because the constraints change?
+      if (gamma != 0) {
+        casadi_copy(d->dx_ela, nx_, d->dx);
+
+        // double *temp_src;
+        // double *temp_dest;
+        // temp_src = d->dlam_ela + nx_ + 2*ng_;
+        // temp_dest = d->dlam + nx_;
+        casadi_copy(d->dlam_ela, nx_, d->dlam);
+        // casadi_copy(temp_src, ng_, temp_dest);
       }
 
       // Detecting indefiniteness
@@ -683,13 +707,12 @@ int Sqpmethod::solve(void* mem) const {
     m->res[CONIC_LAM_A] = dlam + nx_;
 
     // Solve the QP
-    int ret = qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
 
     // Check if the QP was infeasible
-    // TODO: The nice way to do this (I think) is to use m->unified_return_status but this value gets lost somewhere between the conic method and here. 
-    //       Thus for now we return the value ret as the unified return state.
-    if (!m->success) {
-      if (ret == SOLVER_RET_INFEASIBLE) {
+    if (!m_qpsol->success) {
+      if (m_qpsol->unified_return_status == SOLVER_RET_INFEASIBLE) {
         return -1;
       }
 
@@ -701,7 +724,7 @@ int Sqpmethod::solve(void* mem) const {
     return 0;
   }
 
-  void Sqpmethod::solve_ela_QP(SqpmethodMemory* m, const double* H, const double* g,
+  int Sqpmethod::solve_ela_QP(SqpmethodMemory* m, const double* H, const double* g,
                            const double* lbdz, const double* ubdz, const double* A,
                            double* x_opt, double* dlam) const {
     ScopedTiming tic(m->fstats.at("QP"));
@@ -725,8 +748,22 @@ int Sqpmethod::solve(void* mem) const {
     m->res[CONIC_LAM_A] = dlam + nx_ + 2*ng_;
 
     // Solve the QP
-    int ret = qpsol_ela_(m->arg, m->res, m->iw, m->w, 0);
+    qpsol_ela_(m->arg, m->res, m->iw, m->w, 0);
+    auto m_qpsol_ela = static_cast<ConicMemory*>(qpsol_ela_->memory(0));
+
+    // Check if the QP was infeasible
+    if (!m_qpsol_ela->success) {
+      if (m_qpsol_ela->unified_return_status == SOLVER_RET_INFEASIBLE) {
+        return -1;
+      }
+
+      casadi_error("qpsolver failed in elastic mode."
+                   "Caught manually due to qpsolver_options.");
+    } 
+
     if (verbose_) print("Elastic QP solved\n");
+
+    return 0;
   }
 
 void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
