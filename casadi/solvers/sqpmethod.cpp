@@ -522,7 +522,7 @@ int Sqpmethod::solve(void* mem) const {
         casadi_copy(d->Jk, Asp_.nnz(), d->Jk_ela);
 
         // Initial guess
-        // TODO: Is it right that we copy the whole lambda vector because the constraints change?
+        // TODO: Is it right that we copy only the first part of the lambda vector because the constraints change?
         casadi_clear(d->dlam_ela, nx_+3*ng_);
         casadi_copy(d_nlp->lam, nx_, d->dlam_ela); 
         casadi_clear(d->dx_ela, nx_+2*ng_);
@@ -552,13 +552,7 @@ int Sqpmethod::solve(void* mem) const {
       // TODO: Is it right that we copy the whole lambda vector because the constraints change?
       if (gamma != 0) {
         casadi_copy(d->dx_ela, nx_, d->dx);
-
-        // double *temp_src;
-        // double *temp_dest;
-        // temp_src = d->dlam_ela + nx_ + 2*ng_;
-        // temp_dest = d->dlam + nx_;
         casadi_copy(d->dlam_ela, nx_, d->dlam);
-        // casadi_copy(temp_src, ng_, temp_dest);
       }
 
       // Detecting indefiniteness
