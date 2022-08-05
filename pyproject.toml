@@ -47,7 +47,7 @@ exclude = []
 [tool.py-build-cmake.cmake]
 minimum_version = "3.21"
 source_path = "."
-config = ["Release"]
+config = []
 args = ["-Wdev"]
 build_args = ["-j"]
 install_components = ["python_modules"]
@@ -66,6 +66,8 @@ generator = "Ninja Multi-Config"
 [tool.py-build-cmake.mac.cmake]
 config = ["Debug", "Release"]
 generator = "Ninja Multi-Config"
+[tool.py-build-cmake.windows.cmake]
+config = ["Release"]
 
 [tool.py-build-cmake.stubgen]
 args = ["-v"]
