@@ -449,6 +449,16 @@ namespace casadi {
 
     m->fstats.at("postprocessing").tic();
 
+    // uout() << std::endl << "QPOASES return flag: " << flag << std::endl;
+    // uout() << "QPOASES flag meaning: " << getErrorMessage(flag) << std::endl;
+    // uout() << "QPOASES RET_QP_INFEASIBLE: " << qpOASES::RET_QP_INFEASIBLE << std::endl;
+    // uout() << "QPOASES RET_HOTSTART_STOPPED_INFEASIBILITY: " << qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY << std::endl;
+    // uout() << "QPOASES RET_ADDCONSTRAINT_FAILED_INFEASIBILITY: " << qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY << std::endl;
+    // uout() << "QPOASES RET_ADDBOUND_FAILED_INFEASIBILITY: " << qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY << std::endl;
+    // uout() << "QPOASES RET_ENSURELI_FAILED_NOINDEX: " << qpOASES::RET_ENSURELI_FAILED_NOINDEX << std::endl;
+    // uout() << "QPOASES RET_ENSURELI_FAILED_CYCLING: " << qpOASES::RET_ENSURELI_FAILED_CYCLING << std::endl;
+    // uout() << "QPOASES SOLVER_RET_INFEASIBLE: " << qpOASES::RET_INIT_FAILED_INFEASIBILITY << std::endl << std::endl;
+
     m->return_status = flag;
     m->success = flag==qpOASES::SUCCESSFUL_RETURN;
     if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
@@ -456,7 +466,9 @@ namespace casadi {
       m->unified_return_status = SOLVER_RET_LIMITED;
     }
     // TODO: There is also flag RET_QP_INFEASIBLE / RET_HOTSTART_STOPPED_INFEASIBILITY / RET_ADDCONSTRAINT_FAILED_INFEASIBILITY / RET_ADDBOUND_FAILED_INFEASIBILITY / RET_ENSURELI_FAILED_NOINDEX / RET_ENSURELI_FAILED_CYCLING
-    if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY) {
+    if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY || flag==qpOASES::RET_QP_INFEASIBLE ||
+        flag==qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY || flag==qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY ||
+        flag==qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY) {
       m->unified_return_status = SOLVER_RET_INFEASIBLE;
     }
 
