@@ -1,4 +1,3 @@
-from typing import Union
 import casadi as cs
 import os
 from os.path import join, basename
@@ -25,7 +24,7 @@ def generate_and_compile_casadi_problem(
     g: cs.Function,
     second_order: bool = False,
     name: str = "alpaqa_problem",
-) -> Union[pa.CasADiProblem, pa.CountedProblem]:
+) -> pa.CasADiProblem:
     """Compile the objective and constraint functions into a alpaqa Problem.
 
     :param f:            Objective function.
