@@ -534,7 +534,7 @@ int Sqpmethod::solve(void* mem) const {
         // If QP was infeasible enter elastic mode
         while (ret == -1) {
           it += 1;
-          gamma = pow(10, it*(it-1)/2)*gamma_0_;
+          gamma = pow(10, it*(it-1)/2)*gamma_0_; // TODO: is this the right update rule?
 
           if (gamma > gamma_max_) {
             casadi_error("Error in elastic mode of QP solver."
