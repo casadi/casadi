@@ -130,8 +130,11 @@ namespace casadi {
     /// Minimum step size allowed
     double min_step_size_;
 
-    /// Elastic mode enables
+    /// Elastic mode
     bool elastic_mode_;
+
+    /// Initial and maximum penalty parameter for elastic mode
+    double gamma_0_, gamma_max_;
 
     /// QP solver error on fail
     bool error_on_fail_;
