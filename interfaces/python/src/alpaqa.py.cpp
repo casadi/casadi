@@ -13,6 +13,7 @@
 #include <pybind11/chrono.h>
 #include <pybind11/eigen.h>
 #include <pybind11/eval.h>
+#include <pybind11/functional.h>
 #include <pybind11/gil.h>
 #include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
@@ -302,7 +303,7 @@ void register_classes_for(py::module_ &m) {
         });
     using Problem = alpaqa::Problem<config_t>;
     py::class_<Problem, ProblemBase, ProblemTrampoline<Problem>, std::shared_ptr<Problem>>(
-        m, "Problem", "C++ documentation: :cpp:class:`Problem`")
+        m, "Problem", "C++ documentation: :cpp:class:`alpaqa::Problem`")
         // .def(py::init())
         .def(py::init<length_t, length_t, length_t>(), "n"_a, "m"_a, "p"_a = 0,
              ":param n: Number of unknowns\n"
@@ -320,9 +321,11 @@ void register_classes_for(py::module_ &m) {
                 p.set_param(param);
             },
             "Parameter vector :math:`p` of the problem");
-    using CountedProblem = alpaqa::WrappedProblemWithCounters<config_t, std::shared_ptr>;
+    using CountedProblem =
+        alpaqa::WrappedProblemWithCounters<config_t, std::shared_ptr<const ProblemBase>>;
     py::class_<CountedProblem, ProblemBase, ProblemTrampoline<CountedProblem>,
-               std::shared_ptr<CountedProblem>>(m, "CountedProblem")
+               std::shared_ptr<CountedProblem>>(
+        m, "CountedProblem", "C++ documentation: :cpp:class:`alpaqa::WrappedProblemWithCounters`")
         .def_readwrite("evaluations", &CountedProblem::evaluations);
 
     m.def(
@@ -376,13 +379,12 @@ void register_classes_for(py::module_ &m) {
         .value("Negative", LBFGSSign::Negative)
         .export_values();
     lbfgs //
-        .def(py::init<LBFGSParams>(), "params"_a)
-        .def(py::init(
-                 [](py::dict params) -> LBFGS { return {kwargs_to_struct<LBFGSParams>(params)}; }),
+        .def(py::init([](params_or_dict<LBFGSParams> params) {
+                 return LBFGS{var_kwargs_to_struct(params)};
+             }),
              "params"_a)
-        .def(py::init<LBFGSParams, length_t>(), "params"_a, "n"_a)
-        .def(py::init([](py::dict params, length_t n) -> LBFGS {
-                 return {kwargs_to_struct<LBFGSParams>(params), n};
+        .def(py::init([](params_or_dict<LBFGSParams> params, length_t n) {
+                 return LBFGS{var_kwargs_to_struct(params), n};
              }),
              "params"_a, "n"_a)
         .def_static("update_valid", LBFGS::update_valid, "params"_a, "yᵀs"_a, "sᵀs"_a, "pᵀp"_a)
@@ -502,16 +504,29 @@ void register_classes_for(py::module_ &m) {
 
     using PANOCSolver = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
-        .def(py::init([](const PANOCParams &params, const LBFGS &lbfgs) {
-            return PANOCSolver{params, alpaqa::erase_direction<LBFGS>(lbfgs)};
-        }));
+        .def(py::init([](params_or_dict<PANOCParams> params, const LBFGS &lbfgs) {
+                 return PANOCSolver{var_kwargs_to_struct(params),
+                                    alpaqa::erase_direction<LBFGS>(lbfgs)};
+             }),
+             "panoc_params"_a, "LBFGS"_a, "Create a PANOC solver using L-BFGS directions.")
+        .def(py::init(
+                 [](params_or_dict<PANOCParams> params, params_or_dict<LBFGSParams> lbfgs_params) {
+                     return PANOCSolver{
+                         var_kwargs_to_struct(params),
+                         alpaqa::erase_direction<LBFGS>(LBFGS{var_kwargs_to_struct(lbfgs_params)})};
+                 }),
+             "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
+             "Create a PANOC solver using L-BFGS directions.")
+        .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
+             "Specify a callable that is invoked with some intermediate results on each iteration "
+             "of the algorithm.");
 
     using InnerSolver = alpaqa::TypeErasedInnerSolver<config_t>;
     py::class_<InnerSolver>(m, "InnerSolver")
         .def(py::init<PANOCSolver>())
         .def("__call__",
              [](InnerSolver &self, const alpaqa::ProblemBase<config_t> &p, crvec Σ, real_t ε,
-                bool a, rvec x, vec y, rvec e) { return self(p, Σ, ε, a, x, y, e).to_dict(); })
+                bool a, rvec x, rvec y, rvec e) { return self(p, Σ, ε, a, x, y, e).to_dict(); })
         .def_property_readonly("name", &InnerSolver::template get_name<>);
 
     using ALMSolver = alpaqa::ALMSolver<InnerSolver>;
@@ -550,12 +565,17 @@ void register_classes_for(py::module_ &m) {
         .def(py::init(
                  []() -> ALMSolver { throw alpaqa::not_implemented_error("ALMSolver.__init__"); }),
              "Build an ALM solver using Structured PANOC as inner solver.")
+        // Solver only
+        .def(py::init([](const PANOCSolver &inner) {
+                 return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
+             }),
+             "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
         // Params and solver
         .def(py::init([](params_or_dict<ALMParams> params, const PANOCSolver &inner) {
                  return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
                                                     InnerSolver{inner});
              }),
-             "alm_params"_a, "panoc_solver"_a, "Build an ALM solver using PANOC as inner solver.")
+             "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
         // .def(
         //     py::init(PolymorphicALMConstructor<alpaqa::PolymorphicPGASolver>()),
         //     "alm_params"_a, "pga_solver"_a,
@@ -662,7 +682,6 @@ void register_classes_for(py::module_ &m) {
             throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
         };
 #else
-        using CountedCasADiProblem = alpaqa::WrappedProblemWithCounters<config_t, std::unique_ptr>;
         constexpr static auto load_CasADi_problem = [](const char *so_name, unsigned n, unsigned m,
                                                        unsigned p, bool second_order) {
             return std::make_shared<CasADiProblem>(so_name, n, m, p, second_order);
@@ -674,7 +693,7 @@ void register_classes_for(py::module_ &m) {
 }
 
 PYBIND11_MODULE(MODULE_NAME, m) {
-    m.doc()               = "C++ implementation of alpaqa";
+    m.doc()               = "Python interface to alpaqa's C++ implementation.";
     m.attr("__version__") = VERSION_INFO;
 #if ALPAQA_HAVE_CASADI
     m.attr("with_casadi") = true;
