@@ -185,9 +185,11 @@ PANOCSolver<DirectionProviderT>::operator()(
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
             print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, εₖ);
-        if (progress_cb)
+        if (progress_cb) {
+            ScopedMallocAllower ma;
             progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, φₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ,
                          Lₖ, γₖ, τ, εₖ, Σ, y, problem, params});
+        }
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status  = Helpers::check_all_stop_conditions(

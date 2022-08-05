@@ -122,6 +122,9 @@ class PANOCSolver {
                      rvec y,                        // inout
                      rvec err_z);                   // out
 
+    /// Specify a callable that is invoked with some intermediate results on
+    /// each iteration of the algorithm.
+    /// @see @ref ProgressInfo
     PANOCSolver &
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
         this->progress_cb = cb;
