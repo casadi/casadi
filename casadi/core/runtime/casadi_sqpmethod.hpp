@@ -83,18 +83,18 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
 
   // TODO: option or is this the right place?
   // Additional work for larger lagrangian
-  *sz_w += 2*ng; //gLag
-  *sz_w += 2*ng; //gLag_old
-  // Additional work for larger solution
-  *sz_w += 2*ng; // df_ela
-  *sz_w += 2*ng; // dlam_ela
+  *sz_w += nx + 2*ng; //gLag
+  *sz_w += nx + 2*ng; //gLag_old
   // Additional work memory for larger objective gradient in elastic mode
-  *sz_w += 2*ng; // gf_ela
-  // Additional work memory for larger jacobian in elastic mode
-  *sz_w += 2*ng; // Jk_ela
+  *sz_w += nx + 2*ng; // gf_ela
   // Additional work for the larger bounds
-  *sz_w += 2*ng; // lbdz_ela
-  *sz_w += 2*ng; // ubdz_ela
+  *sz_w += nx + 2*ng + ng; // lbdz_ela
+  *sz_w += nx + 2*ng + ng; // ubdz_ela
+  // Additional work for larger solution
+  *sz_w += nx + 2*ng; // dx_ela
+  *sz_w += nx + 2*ng + ng; // dlam_ela
+  // Additional work memory for larger jacobian in elastic mode
+  *sz_w += nnz_a + 2*ng; // Jk_ela
 }
 
 // SYMBOL "sqpmethod_init"
