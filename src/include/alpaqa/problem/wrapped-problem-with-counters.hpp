@@ -7,13 +7,13 @@
 
 namespace alpaqa {
 
-template <Config Conf                      = DefaultConfig,
-          template <class...> class Holder = std::unique_ptr>
+template <Config Conf  = DefaultConfig,
+          class Holder = std::unique_ptr<const ProblemBase<Conf>>>
 class WrappedProblemWithCounters : public ProblemBase<Conf> {
   public:
     USING_ALPAQA_CONFIG(Conf);
     using wrapped_type = const ProblemBase<Conf>;
-    using holder_type  = Holder<wrapped_type>;
+    using holder_type  = Holder;
     using Box          = typename wrapped_type::Box;
 
     WrappedProblemWithCounters(holder_type p)
@@ -85,66 +85,61 @@ class WrappedProblemWithCounters : public ProblemBase<Conf> {
 };
 
 template <Config Conf>
-WrappedProblemWithCounters<Conf, std::unique_ptr>
+WrappedProblemWithCounters<Conf, std::unique_ptr<const ProblemBase<Conf>>>
 with_counters(ProblemBase<Conf> &&problem) {
     return std::move(problem).clone();
 }
 
-namespace detail {
-template <class T>
-using NonOwningPointer = T *;
-} // namespace detail
-
 template <Config Conf>
-WrappedProblemWithCounters<Conf, detail::NonOwningPointer>
+WrappedProblemWithCounters<Conf, const ProblemBase<Conf> *>
 with_counters(const ProblemBase<Conf> &problem) {
     return &problem;
 }
 
 template <Config Conf>
-WrappedProblemWithCounters<Conf, std::unique_ptr>
+WrappedProblemWithCounters<Conf, std::unique_ptr<const ProblemBase<Conf>>>
 with_counters(std::unique_ptr<ProblemBase<Conf>> problem) {
     return std::move(problem);
 }
 
 template <Config Conf>
-WrappedProblemWithCounters<Conf, std::shared_ptr>
+WrappedProblemWithCounters<Conf, std::shared_ptr<const ProblemBase<Conf>>>
 with_counters(std::shared_ptr<ProblemBase<Conf>> problem) {
     return std::move(problem);
 }
 
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 auto WrappedProblemWithCounters<Conf, Holder>::eval_f(crvec x) const -> real_t {
     ++evaluations.f;
     return timed(evaluations.time.f, [&] { return problem->eval_f(x); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_grad_f(crvec x,
                                                            rvec grad_fx) const {
     ++evaluations.grad_f;
     return timed(evaluations.time.grad_f,
                  [&] { return problem->eval_grad_f(x, grad_fx); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_g(crvec x, rvec gx) const {
     ++evaluations.g;
     return timed(evaluations.time.g, [&] { return problem->eval_g(x, gx); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_grad_g_prod(
     crvec x, crvec y, rvec grad_gxy) const {
     ++evaluations.grad_g_prod;
     return timed(evaluations.time.grad_g_prod,
                  [&] { return problem->eval_grad_g_prod(x, y, grad_gxy); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_grad_gi(
     crvec x, index_t i, rvec grad_gi) const {
     ++evaluations.grad_gi;
     return timed(evaluations.time.grad_gi,
                  [&] { return problem->eval_grad_gi(x, i, grad_gi); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_hess_L_prod(crvec x,
                                                                 crvec y,
                                                                 crvec v,
@@ -153,7 +148,7 @@ void WrappedProblemWithCounters<Conf, Holder>::eval_hess_L_prod(crvec x,
     return timed(evaluations.time.hess_L_prod,
                  [&] { return problem->eval_hess_L_prod(x, y, v, Hv); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_hess_L(crvec x, crvec y,
                                                            rmat H) const {
     ++evaluations.hess_L;
@@ -161,7 +156,7 @@ void WrappedProblemWithCounters<Conf, Holder>::eval_hess_L(crvec x, crvec y,
                  [&] { return problem->eval_hess_L(x, y, H); });
 }
 
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 typename WrappedProblemWithCounters<Conf, Holder>::real_t
 WrappedProblemWithCounters<Conf, Holder>::eval_f_grad_f(crvec x,
                                                         rvec grad_fx) const {
@@ -169,13 +164,13 @@ WrappedProblemWithCounters<Conf, Holder>::eval_f_grad_f(crvec x,
     return timed(evaluations.time.f_grad_f,
                  [&] { return problem->eval_f_grad_f(x, grad_fx); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 typename WrappedProblemWithCounters<Conf, Holder>::real_t
 WrappedProblemWithCounters<Conf, Holder>::eval_f_g(crvec x, rvec g) const {
     ++evaluations.f_g;
     return timed(evaluations.time.f_g, [&] { return problem->eval_f_g(x, g); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 typename WrappedProblemWithCounters<Conf, Holder>::real_t
 WrappedProblemWithCounters<Conf, Holder>::eval_f_grad_f_g(crvec x, rvec grad_fx,
                                                           rvec g) const {
@@ -183,7 +178,7 @@ WrappedProblemWithCounters<Conf, Holder>::eval_f_grad_f_g(crvec x, rvec grad_fx,
     return timed(evaluations.time.f_grad_f_g,
                  [&] { return problem->eval_f_grad_f_g(x, grad_fx, g); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_grad_f_grad_g_prod(
     crvec x, crvec y, rvec grad_f, rvec grad_gxy) const {
     ++evaluations.grad_f_grad_g_prod;
@@ -191,7 +186,7 @@ void WrappedProblemWithCounters<Conf, Holder>::eval_grad_f_grad_g_prod(
         return problem->eval_grad_f_grad_g_prod(x, y, grad_f, grad_gxy);
     });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_grad_L(crvec x, crvec y,
                                                            rvec grad_L,
                                                            rvec work_n) const {
@@ -199,7 +194,7 @@ void WrappedProblemWithCounters<Conf, Holder>::eval_grad_L(crvec x, crvec y,
     return timed(evaluations.time.grad_L,
                  [&] { return problem->eval_grad_L(x, y, grad_L, work_n); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 auto WrappedProblemWithCounters<Conf, Holder>::eval_ψ_ŷ(crvec x, crvec y,
                                                         crvec Σ, rvec ŷ) const
     -> real_t {
@@ -207,7 +202,7 @@ auto WrappedProblemWithCounters<Conf, Holder>::eval_ψ_ŷ(crvec x, crvec y,
     return timed(evaluations.time.ψ,
                  [&] { return problem->eval_ψ_ŷ(x, y, Σ, ŷ); });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_grad_ψ_from_ŷ(
     crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const {
     ++evaluations.grad_ψ_from_ŷ;
@@ -215,7 +210,7 @@ void WrappedProblemWithCounters<Conf, Holder>::eval_grad_ψ_from_ŷ(
         return problem->eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work_n);
     });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 void WrappedProblemWithCounters<Conf, Holder>::eval_grad_ψ(crvec x, crvec y,
                                                            crvec Σ, rvec grad_ψ,
                                                            rvec work_n,
@@ -225,7 +220,7 @@ void WrappedProblemWithCounters<Conf, Holder>::eval_grad_ψ(crvec x, crvec y,
         return problem->eval_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
     });
 }
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 auto WrappedProblemWithCounters<Conf, Holder>::eval_ψ_grad_ψ(
     crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const
     -> real_t {
@@ -235,12 +230,12 @@ auto WrappedProblemWithCounters<Conf, Holder>::eval_ψ_grad_ψ(
     });
 }
 
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 auto WrappedProblemWithCounters<Conf, Holder>::get_C() const -> const Box & {
     return problem->get_C();
 }
 
-template <Config Conf, template <class...> class Holder>
+template <Config Conf, class Holder>
 auto WrappedProblemWithCounters<Conf, Holder>::get_D() const -> const Box & {
     return problem->get_D();
 }
