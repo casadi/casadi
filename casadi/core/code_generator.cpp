@@ -1124,6 +1124,7 @@ namespace casadi {
       break;
     case AUX_LOGSUMEXP:
       add_auxiliary(AUX_LOG1P);
+      add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_logsumexp_str, inst);
       break;
     case AUX_TO_DOUBLE:
