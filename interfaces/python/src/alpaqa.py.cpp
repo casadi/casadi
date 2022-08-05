@@ -677,7 +677,6 @@ void register_classes_for(py::module_ &m) {
 
 #if !ALPAQA_HAVE_CASADI
         constexpr static auto load_CasADi_problem = [](const char *, unsigned, unsigned, unsigned,
-                                                       bool,
                                                        bool) -> std::unique_ptr<CasADiProblem> {
             throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
         };
