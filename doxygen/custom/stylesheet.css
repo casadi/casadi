@@ -1,0 +1,460 @@
+img.inline {
+    vertical-align: text-bottom;
+}
+div.image {
+    text-align: initial;
+}
+div.contents {
+    max-width: 1100px;
+    box-sizing: border-box;
+    margin: 0 auto 6em auto;
+    padding: 1em 2.5em 2.5em 2.5em;
+    box-shadow: 1px 1px 5px #555;
+    background-color: white;
+}
+div.memitem {
+    display: block !important;
+    overflow: inherit;
+    clear: both;
+}
+div.memproto, div.memdoc, div.directory, div.dyncontent {
+    overflow: auto;
+}
+body {
+    background-color: #DDD;
+    width: 100%;
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 300;
+}
+body, table, div, p, dl {
+    font-weight: 300;
+}
+h1, h2, h3, h4, h5,
+h2.groupheader, .title, #projectname {
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 300;
+}
+h2, h2.groupheader, .title, #projectname {
+    font-weight: 300;
+}
+h3, h4, h5 {
+    font-weight: 300;
+}
+div.contents > div.textblock > h1 {
+    border-bottom: 1px solid #c8d0e2;
+    padding-bottom: 5px;
+    margin-top: 1em;
+    font-size: 1.8em;
+}
+div.contents > div.textblock > hr {
+    margin-right: 15px; /* To match width of doxygen headers and code blocks */
+}
+.title {
+    font-size: 2em;
+}
+span.mono {
+    font-family: monospace;
+}
+/* These were originally "bold" which is too bold */
+b, dt, caption, div.groupHeader, td.indexkey, th.dirtab,
+.memproto, dl.reflist dt,
+.params .paramname, .retval .paramname, .tparams .paramname, .exception .paramname,
+.icon, dl.citelist dt, .inherit_header,
+#powerTip div.ttname a, #powerTip div.ttname {
+    font-weight: 500;
+}
+a.el {
+    font-weight: 500;
+}
+.mdescLeft, .mdescRight {
+    color: #444;
+}
+/* span.permalink {
+    padding: 0 0.4em;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+}
+.memtitle:hover span.permalink {
+    opacity: 1;
+} */
+.compoundTemplParams {
+    color: #3C4F74;
+    font-size: inherit;
+}
+iframe {
+    max-width: initial;
+}
+#MSearchField {
+    max-width: initial;
+}
+body > div.header, div > div.header {
+    max-width: 1100px;
+    box-sizing: border-box;
+    margin: auto;
+    padding: 0.8em 2.5em 0.6em 2.5em;
+    box-shadow: 1px 0px 5px #555;
+}
+div.ingroups {
+    font-size: initial;
+}
+hr.footer { display: none; }
+address.footer {
+    box-shadow: 1px 1px 4px #555;
+    background-color: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 0;
+}
+address.footer * {
+    display: inline-block;
+}
+address.footer > small {
+    padding: 0.6em;
+}
+address.footer img.footer {
+    height: 2em;
+    vertical-align: middle;
+    padding-bottom: 0.25em;
+}
+div#top {
+    /* position: sticky; */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    z-index: 100;
+}
+body > div.header {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+.sm-dox {
+    background-color: #dde;
+    background-image: none;
+    box-shadow: 0px 1px 2px #458;
+}
+.sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a:hover, .sm-dox a.highlighted {
+    background-image: none;
+    border-right: 0.5px solid #78A;
+    border-bottom: 0.5px solid #78A;
+    margin-bottom: -1px;
+    /* box-shadow: 0px 1px 2px #458; */
+}
+.sm-dox>li:first-child>a, .sm-dox>li:first-child>:not(ul) a {
+    border-radius: 0;
+}
+.sm-dox a:hover {
+    color: #283a5d;
+    text-shadow: 0 3px 6px white;
+}
+li#searchBoxPos2 {
+    margin-left: 1em;
+}
+div.navpath > ul {
+    background-color: #dde;
+    background-image: none;
+    box-shadow: 0px 1px 1px #569;
+    margin-bottom: -3px;
+    z-index: 101;
+    position: relative;
+}
+#main-nav ul {
+    padding-left: 0;
+}
+.directory td {
+    vertical-align: text-bottom;
+}
+.directory td > .el {
+    display: inline-block;
+}
+.directory td.desc, .directory td.entry {
+    padding: 0.6em 0.5em 0.6em 0.8em;
+}
+.markdownTable tr:last-child td {
+    border-bottom: 1px solid #334262;
+}
+/* Hide the "Detailed description" header */
+div.contents a#details + h2.groupheader {
+    display: none;
+}
+h2.memtitle, .memproto, .fieldtable th, .reflist dt {
+    background-color: #dde;
+    background-image: none;
+}
+h2.memtitle {
+    border-radius: 0.4em 0.4em 0 0;
+}
+.memproto {
+    border-radius: 0 0.4em 0 0;
+}
+table.fieldtable {
+    border-radius: 0.4em;
+}
+.fieldtable th {
+    font-size: 1.1em;
+}
+span.mlabel {
+    font-size: 0.9em;
+}
+.memdoc {
+    border-radius: 0 0 0.4em 0.4em;
+}
+.reflist dt {
+    border-radius: 0.4em 0.4em 0 0;
+}
+
+/* A bit more space in lists on related pages */
+div.textblock li {
+    margin: 0.4em 0;
+}
+
+code {
+    background-color: #f4f4ff;
+    border-radius: 6px;
+    padding: .1em .3em;
+}
+div.fragment {
+    padding: 0.6em;
+    border-radius: 0.6em;
+}
+div.line {
+    line-height: 1.25;
+}
+div#powerTip {
+    margin-top: 0.5em;
+}
+
+span.preprocessor {
+    color: #af00db;
+    color: #a31515;
+}
+span.comment {
+    color: #008000;
+}
+span.stringliteral {
+    color: #a31515;
+}
+span.charliteral {
+    color: #a31515;
+}
+span.keywordflow {
+    color: #0000ff;
+    color: #af00db;
+}
+span.keywordtype {
+    color: #2b91af;
+    color: #0000ff;
+}
+span.keyword {
+    color: #0000ff;
+}
+div.line a.code.hl_function,
+div.line a.code.hl_interface {
+    color: #795e26;
+}
+div.line a.code.hl_define {
+    color: #0000ff;
+}
+div.line a.code.hl_class,
+div.line a.code.hl_union,
+div.line a.code.hl_struct,
+div.line a.code.hl_typedef,
+div.line a.code.hl_enumeration {
+    color: #2b91af;
+}
+div.line a.code.hl_enumvalue {
+    color: #1C71BE;
+}
+div.line a.code.hl_concept {
+    color: #0070C1;
+}
+span.preprocessor a,
+span.preprocessor a.code {
+    color: #a31515;
+    text-decoration: underline;
+}
+div.line a.code.hl_namespace {
+    color: #af00db;
+}
+div.line a.code.hl_variable {
+    color: #001080;
+}
+div.line a.code:hover {
+    filter: brightness(120%);
+}
+span.lineno {
+    background-color: inherit;
+    color: #626670;
+    border-right: 1px solid #777;
+}
+span.lineno a {
+    background-color: #F4F4F4;
+}
+
+blockquote.doxtable {
+    padding: 0.5em 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+blockquote.doxtable > p:first-child {
+    margin-top: 0;
+}
+blockquote.doxtable > p:last-child {
+    margin-bottom: 0;
+}
+
+/* --------------------- */
+
+/* Portrait and Landscape */
+@media only screen and (max-width: 767px) /* and (orientation : portrait) */ {
+    div#top {
+        position: relative;
+    }
+    /* #side-nav { display: none; } */
+    /* #nav-path { display: none; } */
+    body { 
+        overflow-x: hidden; 
+    }
+    .summary { display: none; }
+    .memitem { page-break-inside: avoid; }
+    div.contents {
+      margin-left:0 !important;
+      overflow-x: hidden;
+      display: block;
+      padding: 0.6em;
+      margin-bottom: 0;
+    }
+    #MSearchResultsWindow {
+        display: none;
+        position: initial;
+        left: 0; 
+        top: 0;
+        bottom: 0;
+        border: 1px solid #ddd;
+        z-index: 9999;
+    }
+    .sm-dox a, .sm-dox a:focus, .sm-dox a:hover, .sm-dox a:active {
+        line-height: 2.4;
+    }
+    .sm-dox a:hover {
+        /* background-image: url(tab_a.png); */
+        background-repeat: repeat-x;
+        color: white;
+        text-shadow: initial;
+    }
+    .sm-dox>li:first-child>a, .sm-dox>li:first-child>:not(ul) a {
+        border-top: 0.5px solid #78A;
+    }
+    .sm-dox li>a span.sub-arrow:before {
+        display: block;
+        content: '+';
+    }
+    .sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a:hover,
+    .sm-dox a.highlighted {
+        border-right: none;
+    }
+    .sm-dox li {
+        border-bottom: 1px solid #ccd;
+    }
+
+    /*
+    address.footer {
+        position: initial;
+        box-shadow: none;
+        background-image: url(nav_h.png);
+        background-repeat: repeat-x;
+        background-color: #F9FAFC;
+        text-align: center;
+    }
+    */
+    address.footer {
+        display: none;
+    }
+
+    div.fragment {
+        font-size: 11px;
+    }
+
+    div.contents p:not([class]), 
+    div.dyncontent, 
+    div.textblock, 
+    table.memberdecls, 
+    div.memitem,
+    div.contents p:not([class]) *, 
+    div.dyncontent *, 
+    table.memberdecls *, 
+    div.memitem * {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+    div.memproto * {
+        font-size: 11px;
+        line-height: 1.2;
+    }
+    .textblock h2 {
+        font-size: 16px;
+    }
+    .textblock h3 {
+        font-size: 14px;
+    }
+    .textblock h4 {
+        font-size: 13px;
+    }
+    h2.groupheader {
+        font-size: 20px;
+    }
+    h2.memtitle {
+        font-size: 18px;
+    }
+    td.memSeparator {
+        line-height: 1px;
+    }
+}
+
+/* ---- Start search box ---- */
+
+iframe#MSearchResults {
+    height: auto;
+    width: 100%;
+    max-width: 25em;
+    margin-left: auto;
+    margin-right: 0;
+    display: block;
+    resize: vertical;
+}
+#MSearchResultsWindow {
+    position: relative;
+    border: none;
+    z-index: 10000;
+    width: 100% !important;
+    top: 0 !important; 
+    left: 0 !important; 
+    box-shadow: inset #778 1px 0px 4px 0px;
+}
+.SRResult {
+    margin-left: auto;
+    margin-right: 0;
+    max-width: 25em;
+}
+
+/* #MSearchResultsWindow {
+    border: 1px solid #96A7C8;
+    background-color: #F9FAFC;
+    border-radius: 0 0 4px 4px;
+    border-top: none;
+    margin-top: 7px;
+    box-shadow: 1px 1px 2px 0px #777;
+}
+
+@media only screen and (max-width: 767px) {
+    #MSearchResultsWindow {
+        border-radius: 0;
+        margin-top: 0;
+    }
+} */
+
+/* ---- End search box ---- */

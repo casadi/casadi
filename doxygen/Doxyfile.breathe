@@ -8,4 +8,3 @@ FILE_PATTERNS          = *.cpp \
 GENERATE_HTML          = NO
 GENERATE_XML           = YES
 XML_OUTPUT             = ../build/xml
-EXCLUDE                = ../src/alpaqa
