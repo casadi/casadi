@@ -83,13 +83,13 @@ jobs:
         cmake --build build-examples -j --config Release
     - name: Run examples (Release)
       run: |
-        ./build-examples/CasADi/Rosenbrock/Release/casadi-rosenbrock
+        ./build-examples/Presentation/Cpp/Release/presentation-cpp
     - name: Build examples (Debug)
       run: |
         cmake --build build-examples -j --config Debug
     - name: Run examples (Debug)
       run: |
-        ./build-examples/CasADi/Rosenbrock/Debug/casadi-rosenbrock
+        ./build-examples/Presentation/Cpp/Debug/presentation-cpp
     - name: Build tests (Release)
       run: |
         cmake -B build-tests -S test \
