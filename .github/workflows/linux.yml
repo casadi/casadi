@@ -8,8 +8,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: docker.io/tttapa/alpaqa-build
-
+    container: ${{ matrix.container }}:gcc11-py3.10
+    strategy:
+      matrix:
+        include:
+          - container: 'alpaqa-build'
+            suffix: ''
+          - container: 'alpaqa-build-static'
+            suffix: '-with-static-casadi'
     steps:
     - uses: actions/checkout@v2
       with:
@@ -38,7 +44,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
-        name: alpaqa-linux
+        name: alpaqa-linux${{ matrix.suffix }}
         path: |
           package/alpaqa*.tar.gz
           package/alpaqa*.deb
@@ -46,8 +52,14 @@ jobs:
   test:
     needs: [build]
     runs-on: ubuntu-latest
-    container: docker.io/tttapa/alpaqa-test
-
+    container: ${{ matrix.container }}:gcc11-py3.10
+    strategy:
+      matrix:
+        include:
+          - container: 'alpaqa-test'
+            suffix: ''
+          - container: 'alpaqa-test-static'
+            suffix: '-with-static-casadi'
     steps:
     - uses: actions/checkout@v2
       with:
@@ -57,7 +69,7 @@ jobs:
     - name: Download
       uses: actions/download-artifact@v2
       with:
-        name: alpaqa-linux
+        name: alpaqa-linux${{ matrix.suffix }}
         path: package
     - name: Install
       run: |
@@ -108,9 +120,23 @@ jobs:
       with:
         name: alpaqa-linux
         path: package
+    - name: Download
+      uses: actions/download-artifact@v2
+      with:
+        name: alpaqa-linux-with-static-casadi
+        path: package-static
+    - name: Rename files
+      shell: bash
+      working-directory: package-static
+      run: |
+        for f in alpaqa*; do
+          mv "$f" "${f/alpaqa/alpaqa-with-static-casadi}"
+        done
     - name: Release
       uses: softprops/action-gh-release@17cd0d34deddf848fc0e7d9be5202c148c270a0a
       with:
         files: |
           package/alpaqa*.tar.gz
           package/alpaqa*.deb
+          package-static/alpaqa*.tar.gz
+          package-static/alpaqa*.deb
