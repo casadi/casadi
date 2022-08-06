@@ -252,55 +252,73 @@ void register_classes_for(py::module_ &m) {
         .def_readwrite("n", &ProblemBase::n, "Number of unknowns, dimension of :math:`x`")
         .def_readwrite("m", &ProblemBase::m,
                        "Number of general constraints, dimension of :math:`g(x)`")
-        .def("eval_f", &ProblemBase::eval_f)
-        .def("eval_grad_f", &ProblemBase::eval_grad_f)
-        .def("eval_grad_f",
-             [](const ProblemBase &p, crvec x) {
-                 vec g(p.n);
-                 p.eval_grad_f(x, g);
-                 return g;
-             })
-        .def("eval_g", &ProblemBase::eval_g)
-        .def("eval_g",
-             [](const ProblemBase &p, crvec x) {
-                 vec g(p.m);
-                 p.eval_g(x, g);
-                 return g;
-             })
-        .def("eval_grad_g_prod", &ProblemBase::eval_grad_g_prod)
-        .def("eval_grad_g_prod",
-             [](const ProblemBase &p, crvec x, crvec y) {
-                 vec g(p.n);
-                 p.eval_grad_g_prod(x, y, g);
-                 return g;
-             })
-        .def("eval_ψ_ŷ", &ProblemBase::eval_ψ_ŷ)
-        .def("eval_ψ_ŷ",
-             [](const ProblemBase &p, crvec x, crvec y, crvec Σ) {
-                 vec ŷ(p.m);
-                 auto ψ = p.eval_ψ_ŷ(x, y, Σ, ŷ);
-                 return std::make_tuple(ψ, ŷ);
-             })
-        .def("eval_grad_ψ_from_ŷ", &ProblemBase::eval_grad_ψ_from_ŷ)
-        .def("eval_grad_ψ_from_ŷ",
-             [](const ProblemBase &p, crvec x, crvec ŷ) {
-                 vec grad_ψ(p.n), work(p.n);
-                 p.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work);
-                 return grad_ψ;
-             })
-        .def("eval_grad_ψ", &ProblemBase::eval_grad_ψ)
-        .def("eval_grad_ψ",
-             [](const ProblemBase &p, crvec x, crvec y, crvec Σ) {
-                 vec grad_ψ(p.n), work_n(p.n), work_m(p.m);
-                 p.eval_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
-                 return grad_ψ;
-             })
-        .def("eval_ψ_grad_ψ", &ProblemBase::eval_ψ_grad_ψ)
-        .def("eval_ψ_grad_ψ", [](const ProblemBase &p, crvec x, crvec y, crvec Σ) {
-            vec grad_ψ(p.n), work_n(p.n), work_m(p.m);
-            auto ψ = p.eval_ψ_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
-            return std::make_tuple(ψ, grad_ψ);
-        });
+        .def("eval_f", &ProblemBase::eval_f, "x"_a)
+        .def("eval_grad_f", &ProblemBase::eval_grad_f, "x"_a, "grad_fx"_a)
+        .def(
+            "eval_grad_f",
+            [](const ProblemBase &p, crvec x) {
+                vec g(p.n);
+                p.eval_grad_f(x, g);
+                return g;
+            },
+            "x"_a)
+        .def("eval_g", &ProblemBase::eval_g, "x"_a, "gx"_a)
+        .def(
+            "eval_g",
+            [](const ProblemBase &p, crvec x) {
+                vec g(p.m);
+                p.eval_g(x, g);
+                return g;
+            },
+            "x"_a)
+        .def("eval_grad_g_prod", &ProblemBase::eval_grad_g_prod, "x"_a, "y"_a, "grad_gxy"_a)
+        .def(
+            "eval_grad_g_prod",
+            [](const ProblemBase &p, crvec x, crvec y) {
+                vec g(p.n);
+                p.eval_grad_g_prod(x, y, g);
+                return g;
+            },
+            "x"_a, "y"_a)
+        .def("eval_ψ_ŷ", &ProblemBase::eval_ψ_ŷ, "x"_a, "y"_a, "Σ"_a, "ŷ"_a)
+        .def(
+            "eval_ψ_ŷ",
+            [](const ProblemBase &p, crvec x, crvec y, crvec Σ) {
+                vec ŷ(p.m);
+                auto ψ = p.eval_ψ_ŷ(x, y, Σ, ŷ);
+                return std::make_tuple(ψ, ŷ);
+            },
+            "x"_a, "y"_a, "Σ"_a)
+        .def("eval_grad_ψ_from_ŷ", &ProblemBase::eval_grad_ψ_from_ŷ, "x"_a, "ŷ"_a, "grad_ψ"_a,
+             "work_n"_a)
+        .def(
+            "eval_grad_ψ_from_ŷ",
+            [](const ProblemBase &p, crvec x, crvec ŷ) {
+                vec grad_ψ(p.n), work(p.n);
+                p.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work);
+                return grad_ψ;
+            },
+            "x"_a, "ŷ"_a)
+        .def("eval_grad_ψ", &ProblemBase::eval_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a,
+             "work_m"_a)
+        .def(
+            "eval_grad_ψ",
+            [](const ProblemBase &p, crvec x, crvec y, crvec Σ) {
+                vec grad_ψ(p.n), work_n(p.n), work_m(p.m);
+                p.eval_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
+                return grad_ψ;
+            },
+            "x"_a, "y"_a, "Σ"_a)
+        .def("eval_ψ_grad_ψ", &ProblemBase::eval_ψ_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a,
+             "work_n"_a, "work_m"_a)
+        .def(
+            "eval_ψ_grad_ψ",
+            [](const ProblemBase &p, crvec x, crvec y, crvec Σ) {
+                vec grad_ψ(p.n), work_n(p.n), work_m(p.m);
+                auto ψ = p.eval_ψ_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
+                return std::make_tuple(ψ, grad_ψ);
+            },
+            "x"_a, "y"_a, "Σ"_a);
     using Problem = alpaqa::Problem<config_t>;
     py::class_<Problem, ProblemBase, ProblemTrampoline<Problem>, std::shared_ptr<Problem>>(
         m, "Problem", "C++ documentation: :cpp:class:`alpaqa::Problem`")

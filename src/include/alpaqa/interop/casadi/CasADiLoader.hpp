@@ -31,9 +31,9 @@ class CasADiProblem : public Problem<Conf> {
     /// @param  filename
     ///         Filename of the shared library to load the functions from.
     /// @param  n
-    ///         Number of decision variables (@f$ x \in \mathbb{R}^n @f$).
+    ///         Number of decision variables (@f$ x \in \R^n @f$).
     /// @param  m
-    ///         Number of general constraints (@f$ g(x) \in \mathbb{R}^m @f$).
+    ///         Number of general constraints (@f$ g(x) \in \R^m @f$).
     /// @param  p
     ///         The number of parameters of the problem (second argument to all
     ///         CasADi functions).
