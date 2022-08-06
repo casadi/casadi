@@ -51,8 +51,9 @@ if (ALPAQA_WITH_CASADI)
     find_package(Threads REQUIRED)
     target_link_libraries(casadi-loader 
         PUBLIC
-            casadi
             alpaqa::alpaqa
+        PRIVATE
+            casadi
             Threads::Threads)
     target_link_libraries(casadi-loader PRIVATE warnings)
     set_target_properties(casadi-loader PROPERTIES CXX_VISIBILITY_PRESET "hidden"
