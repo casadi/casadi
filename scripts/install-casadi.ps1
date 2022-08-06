@@ -18,15 +18,16 @@ cmake -Bbuild -S. `
     -D CMAKE_INSTALL_PREFIX="$env:VIRTUAL_ENV" `
     -D CMAKE_POSITION_INDEPENDENT_CODE=On `
     -D WITH_COMMON=Off `
+    -D WITH_PYTHON=Off `
+    -D WITH_PYTHON3=Off `
     -D WITH_OPENMP=Off `
     -D WITH_THREAD=On `
     -D WITH_DL=On `
+    -D WITH_IPOPT=Off `
     -D ENABLE_STATIC=Off `
     -D ENABLE_SHARED=On
-# cmake --build build -j --config Release
-# cmake --install build --config Release
-cmake --build build -j --config Debug
-cmake --install build --config Debug
+cmake --build build -j --config Release
+cmake --install build --config Release
 popd
 
 popd
