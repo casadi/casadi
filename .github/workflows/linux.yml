@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ${{ matrix.container }}:gcc11-py3.10
+    container: ghcr.io/tttapa/${{ matrix.container }}:gcc11-py3.10
     strategy:
       matrix:
         include:
@@ -52,7 +52,7 @@ jobs:
   test:
     needs: [build]
     runs-on: ubuntu-latest
-    container: ${{ matrix.container }}:gcc11-py3.10
+    container: ghcr.io/tttapa/${{ matrix.container }}:gcc11-py3.10
     strategy:
       matrix:
         include:
