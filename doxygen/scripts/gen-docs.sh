@@ -39,6 +39,7 @@ function run_doxygen_coverage {
 
     # Configure the project
     cmake -S. -B"$tmpdir/build" \
+        -G "Ninja" \
         -DALPAQA_WITH_COVERAGE=On \
         -DALPAQA_WITH_TESTS=On \
         -DALPAQA_WITH_QUAD_PRECISION=On \
@@ -74,8 +75,8 @@ function run_doxygen_coverage {
 
 # Get all tags and branches for generating the index with links to docs for
 # specific branches and versions:
-git fetch
-git fetch --tags
+git fetch ||:
+git fetch --tags ||:
 
 # Generate the documentation for the current branch
 curr_branch=$(git branch --show-current)
@@ -113,7 +114,9 @@ function write_readme {
     # Always have a link to main, it's at the root of the docs folder
     echo -e '\n### Main branch\n' >> "$README"
     echo "- **$mainbranch**  " >> "$README"
-    echo "  [Doxygen]($mainbranch/Doxygen/index.html)" >> "$README"
+    echo "  [Doxygen]($mainbranch/Doxygen/index.html)" \
+         "─ [Sphinx]($mainbranch/Sphinx/index.html)" \
+    >> "$README"
 
     # Find all tags with documentation (version numbers)
     echo -e '\n### Tags and releases\n' >> "$README"
@@ -123,7 +126,9 @@ function write_readme {
         index="$output_folder/$tag/Doxygen/index.html"
         if [ -e "$index" ]; then
             echo "- **$tag**  " >> "$README"
-            echo "  [Doxygen]($tag/Doxygen/index.html)" >> "$README"
+            echo "  [Doxygen]($tag/Doxygen/index.html)" \
+                 "─ [Sphinx]($tag/Sphinx/index.html)" \
+            >> "$README"
         else
             echo "tag $tag has no documentation"
         fi
@@ -139,7 +144,9 @@ function write_readme {
             : # skip the main branch
         elif [ -e "$index" ]; then
             echo "- **$branch**  " >> "$README"
-            echo "  [Doxygen]($branch/Doxygen/index.html)" >> "$README"
+            echo "  [Doxygen]($branch/Doxygen/index.html)" \
+                 "─ [Sphinx]($branch/Sphinx/index.html)" \
+            >> "$README"
         else
             echo "branch $branch has no documentation"
         fi
@@ -180,7 +187,9 @@ function write_index {
     echo -e '\n<h3>Main branch</h3>\n' >> "$README"
     echo -e '<ul>' >> "$README"
     echo "<li><b>$mainbranch</b><br>" >> "$README"
-    echo "<a href=\"$mainbranch/Doxygen/index.html\">Doxygen</a></li>" >> "$README"
+    echo "<a href=\"$mainbranch/Doxygen/index.html\">Doxygen</a> " \
+         "─ <a href=\"$mainbranch/Sphinx/index.html\">Sphinx</a></li>" \
+    >> "$README"
     echo -e '</ul>' >> "$README"
 
     # Find all tags with documentation (version numbers)
@@ -192,7 +201,9 @@ function write_index {
         index="$output_folder/$tag/Doxygen/index.html"
         if [ -e "$index" ]; then
             echo "<li><b>$tag</b><br>" >> "$README"
-            echo "<a href=\"$tag/Doxygen/index.html\">Doxygen</a></li>" >> "$README"
+            echo "<a href=\"$tag/Doxygen/index.html\">Doxygen</a> " \
+                 "─ <a href=\"$tag/Sphinx/index.html\">Sphinx</a></li>" \
+            >> "$README"
         else
             echo "tag $tag has no documentation"
         fi
@@ -210,7 +221,9 @@ function write_index {
             : # skip the main branch
         elif [ -e "$index" ]; then
             echo "<li><b>$branch</b><br>" >> "$README"
-            echo "<a href=\"$branch/Doxygen/index.html\">Doxygen</a></li>" >> "$README"
+            echo "<a href=\"$branch/Doxygen/index.html\">Doxygen</a> " \
+                 "─ <a href=\"$branch/Sphinx/index.html\">Sphinx</a></li>" \
+            >> "$README"
         else
             echo "branch $branch has no documentation"
         fi
