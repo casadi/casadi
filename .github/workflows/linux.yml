@@ -108,6 +108,20 @@ jobs:
         cmake --build build-tests -t test --config Debug
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
+    - name: Upload (Release)
+      uses: actions/upload-artifact@v2
+      with:
+        name: alpaqa-linux${{ matrix.suffix }}-test-examples-release
+        path: |
+          build-examples/Presentation/Cpp/Release/presentation-cpp
+          build-tests/Release/tests
+    - name: Upload (Debug)
+      uses: actions/upload-artifact@v2
+      with:
+        name: alpaqa-linux${{ matrix.suffix }}-test-examples-debug
+        path: |
+          build-examples/Presentation/Cpp/Debug/presentation-cpp
+          build-tests/Debug/tests
 
   release:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
