@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    container: docker.io/tttapa/alpaqa-docs
+    container: ghcr.io/tttapa/alpaqa-docs:gcc11-py3.10
 
     steps:
     # Checks-out the repository under $GITHUB_WORKSPACE
@@ -33,14 +33,10 @@ jobs:
         echo -e '[cmake.options]\n"ALPAQA_WITH_CASADI:BOOL" = "Off"' > py-build-cmake.local.toml
         python3 -m pip install '.[docs]'
       shell: bash
-      env:
-        CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen"
 
     # Generate the documentation and save it in /tmp/staging
     - name: Generate documentation
       run: ./doxygen/scripts/gen-docs.sh /tmp/staging
-      env:
-        CMAKE_PREFIX_PATH: "/tmp/lib-install/gtest:/tmp/lib-install/eigen"
 
     # Commit the new documentation, squash the commits, and push it to GitHub
     - name: Commit and push documention
