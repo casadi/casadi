@@ -2,17 +2,13 @@
 
 #include <alpaqa/export.hpp>
 #include <alpaqa/problem/box.hpp>
+#include <alpaqa/util/not-implemented.hpp>
 
 #include <functional>
 #include <memory>
-#include <stdexcept>
 #include <type_traits>
 
 namespace alpaqa {
-
-struct not_implemented_error : std::logic_error {
-    using std::logic_error::logic_error;
-};
 
 /// Base class for problem definitions.
 template <Config Conf = DefaultConfig>

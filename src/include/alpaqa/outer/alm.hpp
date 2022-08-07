@@ -167,30 +167,12 @@ class ALMSolver {
     InnerSolver inner_solver;
 };
 
-template <class>
-class PANOCSolver;
-template <Config>
-class LBFGS;
-
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMParams, DefaultConfig);
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMParams, EigenConfigf);
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMParams, EigenConfigd);
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMParams, EigenConfigl);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMParams, EigenConfigq);
-#endif
-
-ALPAQA_EXPORT_EXTERN_TEMPLATE(class, ALMSolver,
-                              PANOCSolver<LBFGS<DefaultConfig>>);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(class, ALMSolver,
-                              PANOCSolver<LBFGS<EigenConfigf>>);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(class, ALMSolver,
-                              PANOCSolver<LBFGS<EigenConfigd>>);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(class, ALMSolver,
-                              PANOCSolver<LBFGS<EigenConfigl>>);
-#ifdef ALPAQA_WITH_QUAD_PRECISION
-ALPAQA_EXPORT_EXTERN_TEMPLATE(class, ALMSolver,
-                              PANOCSolver<LBFGS<EigenConfigq>>);
 #endif
 
 } // namespace alpaqa

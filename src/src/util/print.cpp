@@ -8,7 +8,9 @@ using Eigen::VectorX;
 using std::complex;
 using std::ostream;
 
+#ifndef DOXYGEN
 // clang-format off
+
 template ALPAQA_EXPORT std::string float_to_str(float value);
 template ALPAQA_EXPORT std::string float_to_str(double value);
 template ALPAQA_EXPORT std::string float_to_str(long double value);
@@ -34,6 +36,8 @@ template ALPAQA_EXPORT ostream &print_matlab(ostream &os, const MatrixX<complex<
 template ALPAQA_EXPORT ostream &print_matlab(ostream &os, const VectorX<__float128> &);
 template ALPAQA_EXPORT ostream &print_matlab(ostream &os, const VectorX<complex<__float128>> &);
 #endif
+
 // clang-format on
+#endif // DOXYGEN
 
 } // namespace alpaqa
