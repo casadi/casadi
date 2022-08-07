@@ -8,6 +8,7 @@
 
 #include <alpaqa/inner/panoc.hpp>
 
+#include <pybind11/chrono.h>
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 

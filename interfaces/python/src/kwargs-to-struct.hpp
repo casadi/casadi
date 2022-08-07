@@ -104,39 +104,6 @@ T var_kwargs_to_struct(const params_or_dict<T> &p) {
                                         : kwargs_to_struct<T>(std::get<py::dict>(p));
 }
 
-#include <alpaqa/inner/panoc.hpp>
-
-template <alpaqa::Config Conf>
-struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::PANOCParams<Conf>> table{
-        {"Lipschitz", &alpaqa::PANOCParams<Conf>::Lipschitz},
-        {"max_iter", &alpaqa::PANOCParams<Conf>::max_iter},
-        {"max_time", &alpaqa::PANOCParams<Conf>::max_time},
-        {"τ_min", &alpaqa::PANOCParams<Conf>::τ_min},
-        {"L_min", &alpaqa::PANOCParams<Conf>::L_min},
-        {"L_max", &alpaqa::PANOCParams<Conf>::L_max},
-        {"stop_crit", &alpaqa::PANOCParams<Conf>::stop_crit},
-        {"max_no_progress", &alpaqa::PANOCParams<Conf>::max_no_progress},
-        {"print_interval", &alpaqa::PANOCParams<Conf>::print_interval},
-        {"quadratic_upperbound_tolerance_factor",
-         &alpaqa::PANOCParams<Conf>::quadratic_upperbound_tolerance_factor},
-        {"update_lipschitz_in_linesearch",
-         &alpaqa::PANOCParams<Conf>::update_lipschitz_in_linesearch},
-        {"alternative_linesearch_cond", &alpaqa::PANOCParams<Conf>::alternative_linesearch_cond},
-        {"lbfgs_stepsize", &alpaqa::PANOCParams<Conf>::lbfgs_stepsize},
-    };
-};
-
-template <alpaqa::Config Conf>
-struct kwargs_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table{
-        {"L_0", &alpaqa::LipschitzEstimateParams<Conf>::L_0},
-        {"δ", &alpaqa::LipschitzEstimateParams<Conf>::δ},
-        {"ε", &alpaqa::LipschitzEstimateParams<Conf>::ε},
-        {"Lγ_factor", &alpaqa::LipschitzEstimateParams<Conf>::Lγ_factor},
-    };
-};
-
 #if 0
 #include <alpaqa/inner/pga.hpp>
 
@@ -212,51 +179,3 @@ inline const kwargs_to_struct_table_t<alpaqa::StructuredPANOCLBFGSParams>
         {"lbfgs_stepsize", &alpaqa::StructuredPANOCLBFGSParams::lbfgs_stepsize},
     };
 #endif
-
-#include <alpaqa/inner/directions/panoc/lbfgs.hpp>
-
-template <alpaqa::Config Conf>
-struct kwargs_to_struct_table<alpaqa::LBFGSParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::LBFGSParams<Conf>> table{
-        {"memory", &alpaqa::LBFGSParams<Conf>::memory},
-        {"cbfgs", &alpaqa::LBFGSParams<Conf>::cbfgs},
-    };
-};
-
-template <alpaqa::Config Conf>
-struct kwargs_to_struct_table<alpaqa::CBFGSParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::CBFGSParams<Conf>> table{
-        {"α", &alpaqa::CBFGSParams<Conf>::α},
-        {"ϵ", &alpaqa::CBFGSParams<Conf>::ϵ},
-    };
-};
-
-#include <alpaqa/outer/alm.hpp>
-
-template <alpaqa::Config Conf>
-struct kwargs_to_struct_table<alpaqa::ALMParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::ALMParams<Conf>> table{
-        {"ε", &alpaqa::ALMParams<Conf>::ε},
-        {"δ", &alpaqa::ALMParams<Conf>::δ},
-        {"Δ", &alpaqa::ALMParams<Conf>::Δ},
-        {"Δ_lower", &alpaqa::ALMParams<Conf>::Δ_lower},
-        {"Σ_0", &alpaqa::ALMParams<Conf>::Σ_0},
-        {"σ_0", &alpaqa::ALMParams<Conf>::σ_0},
-        {"Σ_0_lower", &alpaqa::ALMParams<Conf>::Σ_0_lower},
-        {"ε_0", &alpaqa::ALMParams<Conf>::ε_0},
-        {"ε_0_increase", &alpaqa::ALMParams<Conf>::ε_0_increase},
-        {"ρ", &alpaqa::ALMParams<Conf>::ρ},
-        {"ρ_increase", &alpaqa::ALMParams<Conf>::ρ_increase},
-        {"θ", &alpaqa::ALMParams<Conf>::θ},
-        {"M", &alpaqa::ALMParams<Conf>::M},
-        {"Σ_max", &alpaqa::ALMParams<Conf>::Σ_max},
-        {"Σ_min", &alpaqa::ALMParams<Conf>::Σ_min},
-        {"max_iter", &alpaqa::ALMParams<Conf>::max_iter},
-        {"max_time", &alpaqa::ALMParams<Conf>::max_time},
-        {"max_num_initial_retries", &alpaqa::ALMParams<Conf>::max_num_initial_retries},
-        {"max_num_retries", &alpaqa::ALMParams<Conf>::max_num_retries},
-        {"max_total_num_retries", &alpaqa::ALMParams<Conf>::max_total_num_retries},
-        {"print_interval", &alpaqa::ALMParams<Conf>::print_interval},
-        {"single_penalty_factor", &alpaqa::ALMParams<Conf>::single_penalty_factor},
-    };
-};
