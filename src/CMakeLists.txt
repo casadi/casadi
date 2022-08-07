@@ -8,6 +8,7 @@ add_library(alpaqa
     "src/problem/problem-counters.cpp"
     "src/outer/alm.cpp"
     "src/inner/panoc.cpp"
+    "src/panoc-alm.cpp"
     "src/inner/internal/solverstatus.cpp"
     "include/alpaqa/util/type-erasure.hpp"
 )
@@ -15,8 +16,6 @@ target_compile_features(alpaqa PUBLIC cxx_std_20)
 target_include_directories(alpaqa PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
-target_precompile_headers(alpaqa PUBLIC
-    $<BUILD_INTERFACE:alpaqa/config/config.hpp>)
 target_compile_definitions(alpaqa PUBLIC
     $<$<CONFIG:Debug>:EIGEN_INITIALIZE_MATRICES_BY_NAN>
     $<$<CONFIG:Debug>:EIGEN_RUNTIME_NO_MALLOC>)
