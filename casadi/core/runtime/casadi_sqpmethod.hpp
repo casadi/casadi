@@ -44,7 +44,7 @@ struct casadi_sqpmethod_data {
 // SYMBOL "sqpmethod_work"
 template<typename T1>
 void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
-    casadi_int* sz_iw, casadi_int* sz_w) {
+    casadi_int* sz_iw, casadi_int* sz_w, bool elastic_mode) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
   nnz_h = p->sp_h[2+p->sp_h[1]];
@@ -73,27 +73,25 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
   // merit_mem
   if (p->max_iter_ls>0) *sz_w += p->merit_memsize;
 
-  // TODO: option or is this the right place?
-  // Additional work for larger lagrangian
-  *sz_w += 2*ng; //gLag
-  *sz_w += 2*ng; //gLag_old
-  // Additional work memory for larger objective gradient in elastic mode
-  *sz_w += 2*ng; // gf
-  // Additional work for the larger bounds
-  *sz_w += 2*ng; // lbdz
-  *sz_w += 2*ng; // ubdz
-  // Additional work for larger solution
-  *sz_w += 2*ng; // dx
-  *sz_w += 2*ng; // dlam
-  // Additional work memory for larger jacobian in elastic mode
-  *sz_w += 2*ng; // Jk
-  // Additional work memory for temp memory
-  *sz_w += ng;
+  if (elastic_mode) {
+    // Additional work for larger objective gradient
+    *sz_w += 2*ng; // gf
+    // Additional work for the larger bounds
+    *sz_w += 2*ng; // lbdz
+    *sz_w += 2*ng; // ubdz
+    // Additional work for larger solution
+    *sz_w += 2*ng; // dx
+    *sz_w += 2*ng; // dlam
+    // Additional work for larger jacobian
+    *sz_w += 2*ng; // Jk
+    // Additional work for temp memory
+    *sz_w += ng;
+  }
 }
 
 // SYMBOL "sqpmethod_init"
 template<typename T1>
-void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w) {
+void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w, bool elastic_mode) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
   const casadi_sqpmethod_prob<T1>* p = d->prob;
@@ -103,29 +101,43 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
   nx = p->nlp->nx;
   ng = p->nlp->ng;
   if (p->max_iter_ls>0) {
-    d->z_cand = *w;
-    *w += nx + ng;
+    d->z_cand = *w; *w += nx + ng;
   }
   // Lagrange gradient in the next iterate
-  d->gLag = *w; *w += nx + 2*ng;
-  d->gLag_old = *w; *w += nx + 2*ng;
-  // Gradient of the objective
-  d->gf = *w; *w += nx + 2*ng;
-  // Bounds of the QP
-  d->lbdz = *w; *w += nx + 3*ng;
-  d->ubdz = *w; *w += nx + 3*ng;
-  // QP solution
-  d->dx = *w; *w += nx + 2*ng;
-  d->dlam = *w; *w += nx + 3*ng;
+  d->gLag = *w; *w += nx;
+  d->gLag_old = *w; *w += nx;
   // Hessian approximation
   d->Bk = *w; *w += nnz_h;
-  // Jacobian
-  d->Jk = *w; *w += nnz_a + 2*ng;
   // merit_mem
   if (p->max_iter_ls>0) {
-    d->merit_mem = *w;
-    *w += p->merit_memsize;
+    d->merit_mem = *w; *w += p->merit_memsize;
   }
-  // temp mem
-  d->temp_mem = *w; *w += ng;
+
+  if (elastic_mode) {
+    // Gradient of the objective
+    d->gf = *w; *w += nx + 2*ng;
+    // Bounds of the QP
+    d->lbdz = *w; *w += nx + 3*ng;
+    d->ubdz = *w; *w += nx + 3*ng;
+    // QP solution
+    d->dx = *w; *w += nx + 2*ng;
+    d->dlam = *w; *w += nx + 3*ng;
+    // Jacobian
+    d->Jk = *w; *w += nnz_a + 2*ng;
+    // temp mem
+    d->temp_mem = *w; *w += ng;
+  } else {
+    // Gradient of the objective
+    d->gf = *w; *w += nx;
+    // Bounds of the QP
+    d->lbdz = *w; *w += nx + ng;
+    d->ubdz = *w; *w += nx + ng;
+    // QP solution
+    d->dx = *w; *w += nx;
+    d->dlam = *w; *w += nx + ng;
+    // Jacobian
+    d->Jk = *w; *w += nnz_a;
+    // Dummy pointer to temp memory
+    d->temp_mem = *w;
+  }
 }
