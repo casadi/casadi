@@ -543,47 +543,39 @@ int Sqpmethod::solve(void* mem) const {
 
           uout() << "Entering Elastic mode with gamma = " << gamma << std::endl;
 
+          // Temp datastructs
+          double *temp_1;
+          double *temp_2;
+
           // Make larger gradient (has gamma for slack variables)
-          casadi_fill(d->gf_ela, nx_+2*ng_, gamma);
-          casadi_copy(d->gf, nx_, d->gf_ela);
+          temp_1 = d->gf + nx_;
+          casadi_fill(temp_1, 2*ng_, gamma);
 
           // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
-          casadi_fill(d->Jk_ela, Asp_ela_.nnz(), 1.);
-          casadi_fill(d->Jk_ela, Asp_ela_.nnz()-ng_, -1.);
-          casadi_copy(d->Jk, Asp_.nnz(), d->Jk_ela);
+          temp_1 = d->Jk + Asp_.nnz();
+          casadi_fill(temp_1, ng_, -1.);
+          temp_1 += ng_;
+          casadi_fill(temp_1, ng_, 1.);
 
           // Initial guess
           // TODO: Is it right that we copy only the first part of the lambda vector because the constraints change?
-          casadi_clear(d->dlam_ela, nx_+3*ng_);
-          casadi_copy(d_nlp->lam, nx_, d->dlam_ela); 
-          casadi_clear(d->dx_ela, nx_+2*ng_);
+          casadi_clear(d->dlam, nx_+3*ng_);
+          casadi_copy(d_nlp->lam, nx_, d->dlam); 
+          casadi_clear(d->dx, nx_+2*ng_);
 
           // Initialize bounds
-          double *temp_src;
-          double *temp_dest;
+          temp_1 = d->lbdz + nx_;
+          temp_2 = d->lbdz + nx_+2*ng_;
+          casadi_copy(temp_1, ng_, temp_2);
+          casadi_clear(temp_1, 2*ng_);
 
-          casadi_fill(d->lbdz_ela, nx_+3*ng_, 0.);
-          temp_src = d->lbdz + nx_;
-          temp_dest = d->lbdz_ela + nx_+2*ng_;
-          casadi_copy(d->lbdz, nx_, d->lbdz_ela);
-          casadi_copy(temp_src, ng_, temp_dest);
-
-          casadi_fill(d->ubdz_ela, nx_+3*ng_, inf);
-          temp_src = d->ubdz + nx_;
-          temp_dest = d->ubdz_ela + nx_+2*ng_;
-          casadi_copy(d->ubdz, nx_, d->ubdz_ela);
-          casadi_copy(temp_src, ng_, temp_dest);
+          temp_1 = d->ubdz + nx_;
+          temp_2 = d->ubdz + nx_+2*ng_;
+          casadi_copy(temp_1, ng_, temp_2);
+          casadi_fill(temp_1, 2*ng_, inf);
 
           // Solve the QP
-          ret = solve_ela_QP(m, d->Bk, d->gf_ela, d->lbdz_ela, d->ubdz_ela, d->Jk_ela, d->dx_ela, d->dlam_ela);
-        }
-
-        // Copy elastic variables into normal variables
-        // TODO: Find a nicer way to do this
-        // TODO: Is it right that we copy the whole lambda vector because the constraints change?
-        if (gamma != 0) {
-          casadi_copy(d->dx_ela, nx_, d->dx);
-          casadi_copy(d->dlam_ela, nx_, d->dlam);
+          ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
         }
       }
       

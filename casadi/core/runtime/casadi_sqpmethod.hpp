@@ -35,16 +35,6 @@ struct casadi_sqpmethod_data {
   T1* Jk;
   // merit_mem
   T1* merit_mem;
-
-  // TODO: is this the right place for this?
-  // QP solution in elastic mode
-  T1 *dx_ela, *dlam_ela;
-  // Bounds of the elastic mode
-  T1 *lbdz_ela, *ubdz_ela;
-  // Gradient of the objective in elastic mode
-  T1 *gf_ela;
-  // Jacobian in elastic mode
-  T1* Jk_ela;
 };
 // C-REPLACE "casadi_sqpmethod_data<T1>" "struct casadi_sqpmethod_data"
 
@@ -83,18 +73,18 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
 
   // TODO: option or is this the right place?
   // Additional work for larger lagrangian
-  *sz_w += nx + 2*ng; //gLag
-  *sz_w += nx + 2*ng; //gLag_old
+  *sz_w += 2*ng; //gLag
+  *sz_w += 2*ng; //gLag_old
   // Additional work memory for larger objective gradient in elastic mode
-  *sz_w += nx + 2*ng; // gf_ela
+  *sz_w += 2*ng; // gf
   // Additional work for the larger bounds
-  *sz_w += nx + 2*ng + ng; // lbdz_ela
-  *sz_w += nx + 2*ng + ng; // ubdz_ela
+  *sz_w += 2*ng; // lbdz
+  *sz_w += 2*ng; // ubdz
   // Additional work for larger solution
-  *sz_w += nx + 2*ng; // dx_ela
-  *sz_w += nx + 2*ng + ng; // dlam_ela
+  *sz_w += 2*ng; // dx
+  *sz_w += 2*ng; // dlam
   // Additional work memory for larger jacobian in elastic mode
-  *sz_w += nnz_a + 2*ng; // Jk_ela
+  *sz_w += 2*ng; // Jk
 }
 
 // SYMBOL "sqpmethod_init"
@@ -113,36 +103,23 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
     *w += nx + ng;
   }
   // Lagrange gradient in the next iterate
-  d->gLag = *w; *w += nx;
-  d->gLag_old = *w; *w += nx;
+  d->gLag = *w; *w += nx + 2*ng;
+  d->gLag_old = *w; *w += nx + 2*ng;
   // Gradient of the objective
-  d->gf = *w; *w += nx;
+  d->gf = *w; *w += nx + 2*ng;
   // Bounds of the QP
-  d->lbdz = *w; *w += nx + ng;
-  d->ubdz = *w; *w += nx + ng;
+  d->lbdz = *w; *w += nx + 3*ng;
+  d->ubdz = *w; *w += nx + 3*ng;
   // QP solution
-  d->dx = *w; *w += nx;
-  d->dlam = *w; *w += nx + ng;
+  d->dx = *w; *w += nx + 2*ng;
+  d->dlam = *w; *w += nx + 3*ng;
   // Hessian approximation
   d->Bk = *w; *w += nnz_h;
   // Jacobian
-  d->Jk = *w; *w += nnz_a;
+  d->Jk = *w; *w += nnz_a + 2*ng;
   // merit_mem
   if (p->max_iter_ls>0) {
     d->merit_mem = *w;
     *w += p->merit_memsize;
   }
-
-  // TODO: is this the right place for this?
-  // TODO: can we not also do this by just adding the extra space to the standard datastructures?
-  // Solution of QP in elastic mode
-  d->dx_ela = *w; *w += nx + 2*ng;
-  d->dlam_ela = *w; *w += nx + 2*ng + ng;
-  // Bounds of the QP in elastic mode
-  d->lbdz_ela = *w; *w += nx + 2*ng + ng;
-  d->ubdz_ela = *w; *w += nx + 2*ng + ng;
-  // Gradient of the elastic objective
-  d->gf_ela = *w; *w += nx + 2*ng; 
-  // Jacobian for elastic mode
-  d->Jk_ela = *w; *w += nnz_a + 2*ng;
 }
