@@ -526,10 +526,13 @@ int Sqpmethod::solve(void* mem) const {
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam);
 
-      // Elastic mode check if this option is turned on.
-      if (elastic_mode_) {        
+      if (elastic_mode_ && ret == -1) {        
         int it = 0;
         double gamma = 0;
+
+        // Temp datastructs for data copy
+        double *temp_1;
+        double *temp_2;
 
         // If QP was infeasible enter elastic mode
         while (ret == -1) {
@@ -543,10 +546,6 @@ int Sqpmethod::solve(void* mem) const {
 
           uout() << "Entering Elastic mode with gamma = " << gamma << std::endl;
 
-          // Temp datastructs
-          double *temp_1;
-          double *temp_2;
-
           // Make larger gradient (has gamma for slack variables)
           temp_1 = d->gf + nx_;
           casadi_fill(temp_1, 2*ng_, gamma);
@@ -559,6 +558,9 @@ int Sqpmethod::solve(void* mem) const {
 
           // Initial guess
           // TODO: Is it right that we copy only the first part of the lambda vector because the constraints change?
+          // TODO: is it logical that the part of dlam needs to be saved to help step?
+          temp_1 = d->dlam + nx_;
+          casadi_copy(temp_1, ng_, d->temp_mem);
           casadi_clear(d->dlam, nx_+3*ng_);
           casadi_copy(d_nlp->lam, nx_, d->dlam); 
           casadi_clear(d->dx, nx_+2*ng_);
@@ -577,6 +579,10 @@ int Sqpmethod::solve(void* mem) const {
           // Solve the QP
           ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
         }
+        
+        // Get second part of dlam from temp memory
+        temp_1 = d->dlam + nx_;
+        casadi_copy(d->temp_mem, ng_, temp_1);
       }
       
       // Detecting indefiniteness
