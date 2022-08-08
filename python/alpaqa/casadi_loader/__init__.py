@@ -80,7 +80,9 @@ def generate_and_compile_casadi_problem(
             """)
         build_type = 'Release'
         configure_cmd = ['cmake', '-B', builddir, '-S', projdir]
-        if platform.system() != 'Windows':
+        if platform.system() == 'Windows':
+            configure_cmd += ['-A', 'x64' if sys.maxsize > 2**32 else 'Win32']
+        else:
             configure_cmd += ['-G', 'Ninja Multi-Config']
         build_cmd = ['cmake', '--build', builddir, '--config', build_type]
         install_cmd = [
