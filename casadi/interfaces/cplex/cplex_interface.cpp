@@ -560,6 +560,11 @@ namespace casadi {
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
+      int stat = CPXXgetstat(m->env, m->lp);
+      if (stat == CPX_STAT_INFEASIBLE) {
+        m->unified_return_status = SOLVER_RET_INFEASIBLE;
+      }
+
       // Get objective value
       if (CPXXgetobjval(m->env, m->lp, &f)) {
         casadi_error("CPXXgetobjval failed");
@@ -594,6 +599,12 @@ namespace casadi {
       if (CPXXqpopt(m->env, m->lp)) {
         casadi_error("CPXXqpopt failed");
       }
+
+      int stat = CPXXgetstat(m->env, m->lp);
+      if (stat == CPX_STAT_INFEASIBLE) {
+        m->unified_return_status = SOLVER_RET_INFEASIBLE;
+      }
+
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
@@ -621,8 +632,17 @@ namespace casadi {
       } else {
 
           // Retrieving solution
-          if (CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
-            casadi_error("CPXXsolution failed");
+          int sol_ret = CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x);
+          if (sol_ret == CPXERR_NO_SOLN) {
+            m->unified_return_status = SOLVER_RET_INFEASIBLE;
+          }
+
+          if (sol_ret) {
+            if (error_on_fail_) {
+              casadi_error("CPXXsolution failed");
+            } else {
+              m->success = false;
+            }
           }
       }
     }
