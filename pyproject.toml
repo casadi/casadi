@@ -34,6 +34,9 @@ docs = [
 "Source" = "https://github.com/kul-optec/alpaqa"
 "Bug Tracker" = "https://github.com/kul-optec/alpaqa/issues"
 
+[project.scripts]
+alpaqa = "alpaqa.__main__:main"
+
 [build-system]
 requires = ["py-build-cmake~=0.0.10", "pybind11", "pybind11-stubgen"]
 build-backend = "py_build_cmake.build"

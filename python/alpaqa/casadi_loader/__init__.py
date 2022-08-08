@@ -8,9 +8,10 @@ import pickle
 import base64
 import glob
 import subprocess
-import tempfile
 import platform
+import sys
 from ..casadi_generator import generate_casadi_problem
+from ..cache import get_alpaqa_cache_dir
 
 
 def _load_casadi_problem(sofile, n, m, p):
@@ -35,13 +36,7 @@ def generate_and_compile_casadi_problem(
     :return:   * Problem specification that can be passed to the solvers.
     """
 
-    cachedir = None
-    if not cachedir:
-        homecachedir = os.path.expanduser("~/.cache")
-        if os.path.isdir(homecachedir):
-            cachedir = join(homecachedir, 'alpaqa', 'cache')
-        else:
-            cachedir = join(tempfile.gettempdir(), 'alpaqa', 'cache')
+    cachedir = get_alpaqa_cache_dir()
     cachefile = join(cachedir, 'problems')
 
     key = base64.b64encode(pickle.dumps(
