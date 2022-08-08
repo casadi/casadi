@@ -74,11 +74,13 @@ void register_panoc(py::module_ &m) {
 
     // ----------------------------------------------------------------------------------------- //
     using LBFGS = alpaqa::LBFGS<config_t>;
-    py::class_<LBFGS> lbfgs(m, "LBFGS");
+    py::class_<LBFGS> lbfgs(m, "LBFGS", "C++ documentation :cpp:class:`alpaqa::LBFGS`");
     using LBFGSParams = typename LBFGS::Params;
-    py::class_<LBFGSParams> lbfgsparams(lbfgs, "Params");
+    py::class_<LBFGSParams> lbfgsparams(lbfgs, "Params",
+                                        "C++ documentation :cpp:class:`alpaqa::LBFGSParams`");
     using CBFGS = alpaqa::CBFGSParams<config_t>;
-    py::class_<CBFGS> cbfgs(lbfgsparams, "CBFGS");
+    py::class_<CBFGS> cbfgs(lbfgsparams, "CBFGS",
+                            "C++ documentation :cpp:class:`alpaqa::CBFGSParams`");
     using LBFGSSign = typename LBFGS::Sign;
     py::enum_<LBFGSSign> lbfgssign(lbfgs, "Sign",
                                    "C++ documentation :cpp:enum:`alpaqa::LBFGS::Sign`");

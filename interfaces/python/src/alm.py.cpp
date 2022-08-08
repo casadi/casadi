@@ -140,10 +140,10 @@ void register_alm(py::module_ &m) {
              py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
              "Solve.\n\n"
              ":param problem: Problem to solve.\n"
-             ":param y: Initial guess for Lagrange multipliers :math:`y`\n"
              ":param x: Initial guess for decision variables :math:`x`\n\n"
-             ":return: * Lagrange multipliers :math:`y` at the solution\n"
-             "         * Solution :math:`x`\n"
+             ":param y: Initial guess for Lagrange multipliers :math:`y`\n"
+             ":return: * Solution :math:`x`\n"
+             "         * Lagrange multipliers :math:`y` at the solution\n"
              "         * Statistics\n\n")
         .def("__str__", &ALMSolver::get_name)
         .def_property_readonly("params", &ALMSolver::get_params);
