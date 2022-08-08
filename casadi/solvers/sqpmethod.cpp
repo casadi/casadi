@@ -344,7 +344,7 @@ namespace casadi {
     set_sqpmethod_prob();
     // Allocate memory
     casadi_int sz_w, sz_iw;
-    casadi_sqpmethod_work(&p_, &sz_iw, &sz_w);
+    casadi_sqpmethod_work(&p_, &sz_iw, &sz_w, elastic_mode_);
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
     if (convexify_) {
@@ -369,7 +369,7 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     m->d.prob = &p_;
-    casadi_sqpmethod_init(&m->d, &iw, &w);
+    casadi_sqpmethod_init(&m->d, &iw, &w, elastic_mode_);
 
     m->iter_count = -1;
   }
