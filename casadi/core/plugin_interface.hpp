@@ -26,6 +26,7 @@
 #include "function_internal.hpp"
 #include "global_options.hpp"
 #include "serializing_stream.hpp"
+#include <casadi/config.h>
 
 #include <stdlib.h>
 
@@ -47,12 +48,14 @@
 
 // Set default shared library prefix
 #ifndef SHARED_LIBRARY_PREFIX
-#define SHARED_LIBRARY_PREFIX "lib"
+#define SHARED_LIBRARY_PREFIX CASADI_SHARED_LIBRARY_PREFIX
 #endif // SHARED_LIBRARY_PREFIX
+
+
 
 // Set default shared library suffix
 #ifndef SHARED_LIBRARY_SUFFIX
-#define SHARED_LIBRARY_SUFFIX ".so"
+#define SHARED_LIBRARY_SUFFIX CASADI_SHARED_LIBRARY_SUFFIX
 #endif // SHARED_LIBRARY_SUFFIX
 
 #ifdef _WIN32
