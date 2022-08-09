@@ -12,7 +12,7 @@ namespace alpaqa {
 template <class T>
 struct is_config : std::false_type {};
 template <class T>
-constexpr inline bool is_config_v = is_config<T>::value;
+inline constexpr bool is_config_v = is_config<T>::value;
 
 template <class Conf>
 concept Config = is_config_v<Conf>;
@@ -35,13 +35,13 @@ struct is_config<DefaultConfig> : std::true_type {};
     using rindexvec [[maybe_unused]]  = Conf::rindexvec;                       \
     using crindexvec [[maybe_unused]] = Conf::crindexvec
 
-#define USING_ALPAQA_CONFIG(Conf)                                              \
+#define USING_ALPAQA_CONFIG(Conf) /** @cond CONFIG_TYPES */                    \
     using config_t [[maybe_unused]] = Conf;                                    \
-    USING_ALPAQA_CONFIG_NO_TYPENAME(typename Conf)
+    USING_ALPAQA_CONFIG_NO_TYPENAME(typename Conf) /** @endcond */
 
-#define USING_ALPAQA_CONFIG_TEMPLATE(Conf)                                     \
+#define USING_ALPAQA_CONFIG_TEMPLATE(Conf) /** @cond CONFIG_TYPES */           \
     using config_t [[maybe_unused]] = typename Conf;                           \
-    USING_ALPAQA_CONFIG_NO_TYPENAME(typename Conf)
+    USING_ALPAQA_CONFIG_NO_TYPENAME(typename Conf) /** @endcond */
 
 // clang-format off
 template <Config Conf = DefaultConfig> using real_t = typename Conf::real_t;
@@ -92,17 +92,17 @@ struct EigenConfig {
 };
 
 struct EigenConfigf : EigenConfig<float> {
-    constexpr static const char *get_name() { return "EigenConfigf"; }
+    static constexpr const char *get_name() { return "EigenConfigf"; }
 };
 struct EigenConfigd : EigenConfig<double> {
-    constexpr static const char *get_name() { return "EigenConfigd"; }
+    static constexpr const char *get_name() { return "EigenConfigd"; }
 };
 struct EigenConfigl : EigenConfig<long double> {
-    constexpr static const char *get_name() { return "EigenConfigl"; }
+    static constexpr const char *get_name() { return "EigenConfigl"; }
 };
 #ifdef ALPAQA_WITH_QUAD_PRECISION
 struct EigenConfigq : EigenConfig<__float128> {
-    constexpr static const char *get_name() { return "EigenConfigq"; }
+    static constexpr const char *get_name() { return "EigenConfigq"; }
 };
 template <>
 struct is_config<EigenConfigq> : std::true_type {};
@@ -122,25 +122,25 @@ namespace vec_util {
 /// Get the Σ norm squared of a given vector, with Σ a diagonal matrix.
 /// @returns @f$ \langle v, \Sigma v \rangle @f$
 template <class Derived>
-    requires(Derived::ColsAtCompileTime == 1)
 auto norm_squared_weighted(const Eigen::MatrixBase<Derived> &v,
-                           const Eigen::MatrixBase<Derived> &Σ) {
+                           const Eigen::MatrixBase<Derived> &Σ) //
+    requires(Derived::ColsAtCompileTime == 1) {
     return v.dot(Σ.asDiagonal() * v);
 }
 
 /// Get the maximum or infinity-norm of the given vector.
 /// @returns @f$ \left\|v\right\|_\infty @f$
 template <class Derived>
-    requires(Derived::ColsAtCompileTime == 1)
-auto norm_inf(const Eigen::MatrixBase<Derived> &v) {
+auto norm_inf(const Eigen::MatrixBase<Derived> &v) //
+    requires(Derived::ColsAtCompileTime == 1) {
     return v.template lpNorm<Eigen::Infinity>();
 }
 
 /// Get the 1-norm of the given vector.
 /// @returns @f$ \left\|v\right\|_1 @f$
 template <class Derived>
-    requires(Derived::ColsAtCompileTime == 1)
-auto norm_1(const Eigen::MatrixBase<Derived> &v) {
+auto norm_1(const Eigen::MatrixBase<Derived> &v) //
+    requires(Derived::ColsAtCompileTime == 1) {
     return v.template lpNorm<1>();
 }
 
