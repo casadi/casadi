@@ -202,6 +202,9 @@ set(CASADI_INTERNAL
   runtime/casadi_runtime.hpp
 )
 
+add_executable(casadi-cli casadi_cli.cpp)
+target_link_libraries(casadi-cli casadi)
+
 # Add the runtime sources to internal (installed separately)
 set(RUNTIME_SRC)
 foreach(FILE ${CASADI_RUNTIME_SRC})
