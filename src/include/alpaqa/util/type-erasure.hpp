@@ -1,8 +1,8 @@
 #pragma once
 
-#include <algorithm>
 #include <alpaqa/util/type-traits.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <functional>
@@ -63,7 +63,7 @@ constexpr auto type_erased_wrapped() {
 }
 
 template <class VTable, class Allocator>
-constexpr inline size_t default_te_buffer_size() {
+inline constexpr size_t default_te_buffer_size() {
     struct S {
         [[no_unique_address]] Allocator allocator;
         void *self = nullptr;
@@ -74,7 +74,7 @@ constexpr inline size_t default_te_buffer_size() {
 }
 
 template <class... Types>
-constexpr inline size_t required_te_buffer_size_for() {
+inline constexpr size_t required_te_buffer_size_for() {
     constexpr size_t sizes[] = {sizeof(Types)...};
     return *std::max_element(std::begin(sizes), std::end(sizes));
 }
@@ -155,8 +155,11 @@ class TypeErased {
     /// prevents this constructor from taking precedence over the copy and move
     /// constructors.
     template <class Tref>
-        requires(!std::is_base_of_v<TypeErased, std::remove_cvref_t<Tref>>)
-    explicit TypeErased(Tref &&d, allocator_type alloc = {})
+    requires(!std::is_base_of_v<
+             TypeErased,
+             std::remove_cvref_t<Tref>>) explicit TypeErased(Tref &&d,
+                                                             allocator_type
+                                                                 alloc = {})
         : allocator{std::move(alloc)} {
         using T = std::remove_cvref_t<Tref>;
         construct_inplace<T>(std::forward<Tref>(d));
@@ -165,7 +168,7 @@ class TypeErased {
     /// Construct a type-erased wrapper of type Ret for an object of type T,
     /// initialized in-place with the given arguments.
     template <class Ret, class T, class... Args>
-        requires std::is_base_of_v<TypeErased, Ret>
+    requires std::is_base_of_v<TypeErased, Ret>
     static Ret make(Args &&...args) {
         Ret r{};
         r.template construct_inplace<T>(std::forward<Args>(args)...);
@@ -174,7 +177,7 @@ class TypeErased {
     /// Construct a type-erased wrapper of type Ret for an object of type T,
     /// initialized in-place with the given arguments.
     template <class Ret, class T, class... Args>
-        requires std::is_base_of_v<TypeErased, Ret>
+    requires std::is_base_of_v<TypeErased, Ret>
     static Ret make(std::allocator_arg_t, allocator_type alloc,
                     Args &&...args) {
         Ret r{std::move(alloc)};

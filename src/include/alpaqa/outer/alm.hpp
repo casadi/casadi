@@ -51,7 +51,7 @@ struct ALMParams {
     /// Factor to increase the primal tolerance update factor by if convergence
     /// fails.
     real_t ρ_increase = 2;
-    /// Maximum value of @ref ρ after increase because of inner convergence 
+    /// Maximum value of @ref ρ after increase because of inner convergence
     /// failure.
     real_t ρ_max = 0.5;
     /// Error tolerance for penalty increase

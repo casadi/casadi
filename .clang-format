@@ -7,7 +7,7 @@ AlignConsecutiveMacros: false
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Right
-AlignOperands:   true
+AlignOperands: true
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: true
 AllowAllConstructorInitializersOnNextLine: true
@@ -68,21 +68,23 @@ ForEachMacros:
   - BOOST_FOREACH
 IncludeBlocks:   Preserve
 IncludeCategories:
-  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
-    Priority:        2
-    SortPriority:    0
-  - Regex:           '^(<|"(gtest|gmock|isl|json)/)'
-    Priority:        3
-    SortPriority:    0
-  - Regex:           '.*'
-    Priority:        1
-    SortPriority:    0
+  - Regex:           '^<alpaqa/.*'
+    Priority:        10
+  - Regex:           '^".*'
+    Priority:        20
+  - Regex:           '^".+/.*'
+    Priority:        30
+  - Regex:           '^<.+/.*'
+    Priority:        40
+  - Regex:           '^<.*\.h>'
+    Priority:        50
+  - Regex:           '^<.*'
+    Priority:        60
 IncludeIsMainRegex: '(Test)?$'
 IncludeIsMainSourceRegex: ''
 IndentCaseLabels: true
 IndentGotoLabels: true
 IndentPPDirectives: None
-IndentRequires: true
 IndentWidth:     4
 IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
@@ -105,6 +107,8 @@ PenaltyBreakTemplateDeclaration: 10
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Right
+QualifierAlignment: Custom
+QualifierOrder: [inline, static, constexpr, const, volatile, type]
 ReflowComments:  false
 SortIncludes:    true
 SortUsingDeclarations: true
@@ -127,11 +131,11 @@ SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SpaceBeforeSquareBrackets: false
-Standard:        Latest
+Standard:        c++20
 StatementMacros:
   - Q_UNUSED
   - QT_REQUIRE_VERSION
-TabWidth:        8
+TabWidth:        4
 UseCRLF:         false
 UseTab:          Never
 ...

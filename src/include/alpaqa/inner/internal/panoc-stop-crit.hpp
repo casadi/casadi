@@ -102,7 +102,7 @@ enum class PANOCStopCrit {
     LBFGSBpp,
 };
 
-constexpr inline const char *enum_name(PANOCStopCrit s) {
+inline constexpr const char *enum_name(PANOCStopCrit s) {
     switch (s) {
         case PANOCStopCrit::ApproxKKT: return "ApproxKKT";
         case PANOCStopCrit::ApproxKKT2: return "ApproxKKT2";

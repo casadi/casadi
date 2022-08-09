@@ -53,7 +53,7 @@ class CasADiFunctionEvaluator {
     validate_dimensions(const std::array<casadi_dim, N_in> &dim_in   = {},
                         const std::array<casadi_dim, N_out> &dim_out = {}) {
         using namespace std::literals::string_literals;
-        constexpr static const char *count[]{"first",  "second", "third",
+        static constexpr const char *count[]{"first",  "second", "third",
                                              "fourth", "fifth",  "sixth"};
         static_assert(N_in <= 6);
         static_assert(N_out <= 6);

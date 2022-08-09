@@ -348,7 +348,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
         if (params.print_interval != 0 && k % params.print_interval == 0)
             print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, εₖ);
         if (progress_cb) {
-            Eigen::Map<indexvec> mJ {J.data(), Eigen::Index(J.size())};
+            Eigen::Map<indexvec> mJ{J.data(), Eigen::Index(J.size())};
             progress_cb({k,  xₖ, pₖ,      pₖᵀpₖ, x̂ₖ,      qₖ,    mJ,
                          φₖ, ψₖ, grad_ψₖ, ψx̂ₖ,   grad_̂ψₖ, Lₖ,    γₖ,
                          τ,  εₖ, Σ,       y,     problem, params});

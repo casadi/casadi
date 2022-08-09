@@ -33,7 +33,7 @@ auto wrapped_load(const std::string &so_name, const char *name,
 }
 
 using dim = std::pair<casadi_int, casadi_int>;
-constexpr inline auto dims(auto... a) {
+inline constexpr auto dims(auto... a) {
     if constexpr ((... && std::is_constructible_v<dim, decltype(a)>))
         return std::array{a...};
     else
@@ -42,7 +42,7 @@ constexpr inline auto dims(auto... a) {
 
 template <Config Conf>
 struct CasADiFunctionsWithParam {
-    constexpr static bool WithParam = true;
+    static constexpr bool WithParam = true;
     CasADiFunctionEvaluator<Conf, 1 + WithParam, 1> f;
     // CasADiFunctionEvaluator<5 + WithParam, 1> grad_ψ;
     CasADiFunctionEvaluator<Conf, 5 + WithParam, 2> ψ_grad_ψ;
