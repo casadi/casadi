@@ -168,6 +168,7 @@ jobs:
           - python-version: '3.11'
             full-python-version: '3.11-dev'
     steps:
+    - run: sysctl -a | grep machdep.cpu.brand_string
     - uses: actions/checkout@v2
       with:
         submodules: recursive
