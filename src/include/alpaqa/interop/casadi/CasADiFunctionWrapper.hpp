@@ -11,9 +11,6 @@
 
 namespace alpaqa::casadi_loader {
 
-/// @addtogroup grp_ExternalProblemLoaders
-/// @{
-
 /// Class for evaluating CasADi functions, allocating the necessary workspace
 /// storage in advance for allocation-free evaluations.
 template <Config Conf, size_t N_in, size_t N_out>
@@ -94,7 +91,5 @@ class CasADiFunctionEvaluator {
     mutable std::vector<casadi_int> iwork;
     mutable std::vector<double> dwork;
 };
-
-/// @}
 
 } // namespace alpaqa::casadi_loader

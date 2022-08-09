@@ -5,6 +5,7 @@
 
 namespace alpaqa {
 
+/// @ingroup grp_DirectionProviders
 template <class DirectionProviderT>
 struct PANOCDirection {
     USING_ALPAQA_CONFIG_TEMPLATE(DirectionProviderT::config_t);

@@ -15,9 +15,8 @@ template <Config>
 struct CasADiFunctionsWithParam;
 } // namespace casadi_loader
 
-/// @addtogroup grp_ExternalProblemLoaders
-/// @{
-
+/// Problem definition for a CasADi problem, loaded from a DLL.
+/// @ingroup grp_Problems
 template <Config Conf = DefaultConfig>
 class CasADiProblem : public Problem<Conf> {
   public:
@@ -76,7 +75,5 @@ class CasADiProblem : public Problem<Conf> {
 
 CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiProblem, EigenConfigd);
 CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiProblem, DefaultConfig);
-
-/// @}
 
 } // namespace alpaqa

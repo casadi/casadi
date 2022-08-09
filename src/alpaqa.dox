@@ -1,0 +1,25 @@
+/**
+ * @defgroup    grp_ALMSolver Augmented Lagrangian Method solver 
+ * @brief   Augmented Lagrangian Method solver (ALM).
+ */
+
+/**
+ * @defgroup    grp_InnerSolvers Inner solvers
+ * @brief   Solvers for the inner problem, such as PANOC.
+ */
+
+/**
+ * @defgroup    grp_Accelerators Accelerators
+ * @brief   Computing accelerated directions, such as L-BFGS.
+ */
+
+/**
+ * @defgroup    grp_DirectionProviders PANOC direction providers
+ * @brief   Algorithms that provide quasi-Newton steps for the PANOC solver, 
+ *          such as L-BFGS.
+ */
+
+/**
+ * @defgroup    grp_Problems  Problems
+ * @brief   Classes for defining optimization problems.
+ */

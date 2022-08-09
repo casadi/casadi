@@ -90,7 +90,7 @@ struct LBFGSStorage {
 };
 
 /// Limited memory Broyden–Fletcher–Goldfarb–Shanno (L-BFGS) algorithm
-/// @ingroup accelerators-grp
+/// @ingroup grp_Accelerators
 template <Config Conf = DefaultConfig>
 class LBFGS {
   public:

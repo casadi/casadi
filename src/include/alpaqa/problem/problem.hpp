@@ -221,6 +221,8 @@ class ProblemBase {
  * sections are optional, by default, they are computed by evaluating the 
  * “Basic functions”, but performance can be improved by providing functions 
  * that directly compute multiple quantities at once.
+ *
+ * @ingroup grp_Problems
  */
 template <Config Conf = DefaultConfig>
 class Problem : public ProblemBase<Conf> {
@@ -306,6 +308,7 @@ class Problem : public ProblemBase<Conf> {
 
 /// @ref Problem class that allows specifying the basic functions as C++
 /// `std::function`s.
+/// @ingroup grp_Problems
 template <Config Conf = DefaultConfig>
 class FunctionalProblem : public Problem<Conf> {
   public:

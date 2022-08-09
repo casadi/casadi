@@ -5,6 +5,7 @@
 
 namespace alpaqa {
 
+/// @ingroup grp_DirectionProviders
 template <Config Conf>
 struct PANOCDirection<LBFGS<Conf>> {
     USING_ALPAQA_CONFIG(Conf);
