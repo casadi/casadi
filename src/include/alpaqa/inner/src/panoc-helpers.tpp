@@ -99,11 +99,11 @@ struct PANOCHelpers {
      * p^k &= \hat{x}^k - x^k \\ 
      * \end{aligned} @f]
      */
-    static auto
-    projected_gradient_step(const Box &C, ///< [in]  Set to project onto
-                            real_t γ,     ///< [in]  Step size
-                            crvec x,      ///< [in]  Decision variable @f$ x @f$
-                            crvec grad_ψ  ///< [in]  @f$ \nabla \psi(x^k) @f$
+    static auto projected_gradient_step(
+        const Box &C,       ///< [in]  Set to project onto
+        real_t γ,           ///< [in]  Step size
+        const crvec &x,     ///< [in]  Decision variable @f$ x @f$
+        const crvec &grad_ψ ///< [in]  @f$ \nabla \psi(x^k) @f$
     ) {
         using binary_real_f = real_t (*)(real_t, real_t);
         return (-γ * grad_ψ)
