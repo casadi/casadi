@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
+#include <type_traits>
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/util/alloc-check.hpp>
@@ -54,6 +55,7 @@ void StructuredPANOCLBFGSSolver<Conf>::compute_quasi_newton_step(
     rvec work_m) {
 
     auto n = problem.n, m = problem.m;
+    auto un = static_cast<std::make_unsigned_t<decltype(n)>>(n);
     J.clear();
     // Find inactive indices J
     for (index_t i = 0; i < n; ++i) {
@@ -68,8 +70,8 @@ void StructuredPANOCLBFGSSolver<Conf>::compute_quasi_newton_step(
         }
     }
 
-    if (not J.empty()) {     // There are inactive indices J
-        if (J.size() == n) { // There are no active indices K
+    if (not J.empty()) {      // There are inactive indices J
+        if (J.size() == un) { // There are no active indices K
             qₖ = -grad_ψₖ;
         } else if (params.hessian_vec) { // There are active indices K
             if (params.hessian_vec_finite_differences) {
@@ -115,7 +117,7 @@ void StructuredPANOCLBFGSSolver<Conf>::compute_quasi_newton_step(
         // This seems to be better than just falling back to a projected
         // gradient step.
         if (not success) {
-            if (J.size() == n)
+            if (J.size() == un)
                 qₖ *= γₖ;
             else
                 for (auto j : J)
