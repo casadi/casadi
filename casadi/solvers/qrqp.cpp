@@ -321,7 +321,13 @@ namespace casadi {
     g.copy_check("d.lam", nx_, g.res(CONIC_LAM_X), false, true);
     g.copy_check("d.lam+"+str(nx_), na_, g.res(CONIC_LAM_A), false, true);
 
-    g << "return d.status != QP_SUCCESS;\n";
+    g << "if (d.status == QP_SUCCESS) {;\n";
+    g << "return 0;\n";
+    g << "} else if (d.status == QP_NO_SEARCH_DIR) {\n";
+    g << "return " << SOLVER_RET_INFEASIBLE <<";\n";
+    g << "} else {\n";
+    g << "return -1;\n";
+    g << "}\n";
   }
 
   Dict Qrqp::get_stats(void* mem) const {
