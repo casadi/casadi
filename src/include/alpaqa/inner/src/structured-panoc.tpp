@@ -53,7 +53,7 @@ void StructuredPANOCLBFGSSolver<Conf>::compute_quasi_newton_step(
     ///         Dimension m
     rvec work_m) {
 
-    unsigned n = problem.n, m = problem.m;
+    auto n = problem.n, m = problem.m;
     J.clear();
     // Find inactive indices J
     for (index_t i = 0; i < n; ++i) {
