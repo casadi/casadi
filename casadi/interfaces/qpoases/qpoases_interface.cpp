@@ -465,8 +465,9 @@ namespace casadi {
     if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
       m->unified_return_status = SOLVER_RET_LIMITED;
     }
-    // TODO: There is also flag RET_ENSURELI_FAILED_NOINDEX / RET_ENSURELI_FAILED_CYCLING
-    // TODO: Are all these flags right??
+    
+    // TODO(@KobeBergmans): Are all these flags right??
+    //                      There is also flag RET_ENSURELI_FAILED_NOINDEX / RET_ENSURELI_FAILED_CYCLING
     if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY || flag==qpOASES::RET_QP_INFEASIBLE ||
         flag==qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY || flag==qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY ||
         flag==qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY) {

@@ -22,12 +22,6 @@
  *
  */
 
-/*
- * GENERAL TODO:
- * - Add option for elastic mode
- */
-
-
 #include "sqpmethod.hpp"
 
 #include "casadi/core/casadi_misc.hpp"
@@ -282,7 +276,6 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    // TODO: Make this more elegant and not hardcoded
     if (elastic_mode_) {
       qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
     }
@@ -294,7 +287,7 @@ namespace casadi {
 
     if (elastic_mode_) {
       // Generate sparsity patterns for elastic mode
-      // TODO: Maybe add documentation on how the sparsity patterns are formed for elastic mode?
+      // TODO(@KobeBergmans): Maybe add documentation on how the sparsity patterns are formed for elastic mode?
       Hsp_ela_ = Sparsity(Hsp_);
       Asp_ela_ = Sparsity(Asp_);
 
@@ -307,10 +300,10 @@ namespace casadi {
       Asp_ela_.appendColumns(dsp);
 
       // Allocate QP solver for elastic mode
-      // TODO: Maybe we do not always do this? Only when elastic mode is initiated?
-      //       Because elastic mode is not always used even when the setting is on.
+      // TODO(@KobeBergmans): Maybe we do not always do this? Only when elastic mode is initiated?
+      //                      Because elastic mode is not always used even when the setting is on.
       Dict qpsol_ela_options = Dict(qpsol_options);
-      qpsol_ela_options["error_on_fail"] = false; // TODO: Do not hardcode this
+      qpsol_ela_options["error_on_fail"] = false;
 
       casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
       qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
@@ -536,7 +529,7 @@ int Sqpmethod::solve(void* mem) const {
         // If QP was infeasible enter elastic mode
         while (ret == SOLVER_RET_INFEASIBLE) {
           it += 1;
-          gamma = pow(10, it*(it-1)/2)*gamma_0_; // TODO: is this the right update rule?
+          gamma = pow(10, it*(it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
 
           if (gamma > gamma_max_) {
             casadi_error("Error in elastic mode of QP solver."
@@ -556,8 +549,8 @@ int Sqpmethod::solve(void* mem) const {
           casadi_fill(temp_1, ng_, 1.);
 
           // Initial guess
-          // TODO: Is it right that we copy only the first part of the lambda vector because the constraints change?
-          // TODO: is it logical that the part of dlam needs to be saved to help step?
+          // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
+          // TODO(@KobeBergmans): is it logical that the part of dlam needs to be saved to get better convergence?
           temp_1 = d->dlam + nx_;
           casadi_copy(temp_1, ng_, d->temp_mem);
           casadi_clear(d->dlam, nx_+3*ng_);
