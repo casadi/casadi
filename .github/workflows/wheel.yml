@@ -196,8 +196,8 @@ jobs:
         CXX="$(brew --prefix llvm@14)/bin/clang++" \
           ./scripts/install-casadi-static.sh
       env:
-        CXXFLAGS: "-march=ivybridge"
-        CFLAGS: "-march=ivybridge"
+        CXXFLAGS: "-march=sandybridge"
+        CFLAGS: "-march=sandybridge"
     - name: Build
       run: |
         source ./py-venv/bin/activate
@@ -206,8 +206,8 @@ jobs:
         CXX="$(brew --prefix llvm@14)/bin/clang++" \
             python -m build . --wheel
       env:
-        CXXFLAGS: "-march=ivybridge"
-        CFLAGS: "-march=ivybridge"
+        CXXFLAGS: "-march=sandybridge"
+        CFLAGS: "-march=sandybridge"
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
