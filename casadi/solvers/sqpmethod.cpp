@@ -141,7 +141,11 @@ namespace casadi {
         "Starting value for the penalty parameter of elastic mode (default: 10e4)."}},
       {"gamma_max",
        {OT_DOUBLE,
-        "Maximum value for the penalty parameter of elastic mode (default: 10e20)."}}
+        "Maximum value for the penalty parameter of elastic mode (default: 10e20)."}},
+      {"second_order_corrections",
+       {OT_BOOL,
+        "Enable second order corrections."
+        "These are used when a step is considered bad by the merit function and constraint norm (default: false)."}}
      }
   };
 
@@ -169,6 +173,7 @@ namespace casadi {
     elastic_mode_ = false;
     gamma_0_ = 10e4;
     gamma_max_ = 10e20;
+    so_corr_ = false;
 
     std::string convexify_strategy = "none";
     double convexify_margin = 1e-7;
@@ -230,6 +235,8 @@ namespace casadi {
         gamma_0_ = op.second;
       } else if (op.first=="gamma_max") {
         gamma_max_ = op.second;
+      } else if (op.first=="second_order_corrections") {
+        so_corr_ = op.second;
       }
     }
 
@@ -595,6 +602,53 @@ int Sqpmethod::solve(void* mem) const {
 
       // Line-search
       if (verbose_) print("Starting line-search\n");
+      // TODO(@KobeBergmans): How does this interact with elastic mode?
+      // TODO(@KobeBergmans): Make this more optimal
+
+      // Calculate penalty parameter of merit function
+      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, d->dlam));
+
+      // Calculate L1-merit function in the actual iterate
+      double l1_infeas = casadi_sum_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
+      double l1 = d_nlp->f + m->sigma * l1_infeas;
+
+      // Take candidate step
+      casadi_copy(d_nlp->z, nx_, d->z_cand);
+      casadi_axpy(nx_, t, d->dx, d->z_cand);
+      
+      // Evaluating objective and constraints
+      m->arg[0] = d->z_cand;
+      m->arg[1] = d_nlp->p;
+      m->res[0] = &fk_cand;
+      m->res[1] = d->z_cand + nx_;
+      if (calc_function(m, "nlp_fg")) uout() << "Something weird happened???" << std::endl;
+
+      // Calculating merit-function in candidate
+      double l1_infeas_cand = casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
+      l1_cand = fk_cand + m->sigma*l1_infeas_cand;
+      
+      if (so_corr_ && l1_cand > l1 && l1_infeas_cand > l1_infeas) {
+        uout() << "Entering Second order corrections" << std::endl;
+
+        // Add bounds
+        casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
+        casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
+
+        // Add gradient times proposal step to bounds
+        casadi_mv(d->Jk, Asp_, d->dx, d->lbdz+nx_, false);
+        casadi_mv(d->Jk, Asp_, d->dx, d->ubdz+nx_, false);
+
+        // Subtract constraints in candidate step from bounds
+        casadi_axpy(nx_, -1., d_nlp->z, d->lbdz);
+        casadi_axpy(ng_, -1., d->z_cand+nx_, d->lbdz+nx_);
+        casadi_axpy(nx_, -1., d_nlp->z, d->ubdz);
+        casadi_axpy(ng_, -1., d->z_cand+nx_, d->ubdz+nx_);
+
+        // Solve the QP, only use solution if no errors occur
+        solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
+            d->dx, d->dlam);
+      } 
+      
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
         ScopedTiming tic(m->fstats.at("linesearch"));
 

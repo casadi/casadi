@@ -166,6 +166,9 @@ namespace casadi {
     Sparsity Hsp_ela_;
     Sparsity Asp_ela_;
 
+    // Second order corrections
+    bool so_corr_;
+
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 
