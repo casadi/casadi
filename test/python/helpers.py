@@ -597,6 +597,7 @@ class casadiTestCase(unittest.TestCase):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None):
+
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
@@ -631,7 +632,7 @@ class casadiTestCase(unittest.TestCase):
           return [commands, output]
 
       [commands, libname] = get_commands(shared=True)
-      print(commands)
+
       p = subprocess.Popen(commands,shell=True).wait()
       F2 = external(F.name(), libname)
 

@@ -591,45 +591,14 @@ add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct 
 
 # BLASFEO
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
-option(WITH_BUILD_BLASFEO "Compile the the included source code for BLASFEO" ON)
-if(WITH_BLASFEO)
-  if(WITH_BUILD_BLASFEO)
-    if(EXISTS ${PROJECT_SOURCE_DIR}/external_packages/blasfeo/src/include)
-      set(BLASFEO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/blasfeo/src/include)
-      set(BLASFEO_LIBRARIES)
-    else()
-      message(FATAL_ERROR "Blasfeo directory not found. If you want blasfeo, do git submodule init; git submodule update.")
-    endif()
-  else()
-    # try to find system blasfeo
-    find_package(BLASFEO REQUIRED)
-    set(BLASFEO_DLOPEN OFF)
-  endif()
-endif()
-add_feature_info(blasfeo-interface WITH_BLASFEO "Interface to blasfeo.")
+set(BUILD_BLASFEO_VERSION "edf92b396adddd9e548b9786f87ad290a0971329")
+option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_VERSION}) from downloaded source." OFF)
 
-# HPMPC
-option(WITH_HPMPC "Compile the interface to HPMPC" OFF)
-option(WITH_BUILD_HPMPC "Compile the the included source code for HPMPC" ON)
-if(WITH_HPMPC)
-  if(NOT WITH_BLASFEO)
-    message(FATAL_ERROR "WITH_HPMPC requires WITH_BLASFEO")
-  endif()
-  if(WITH_BUILD_HPMPC)
-    if(EXISTS ${PROJECT_SOURCE_DIR}/external_packages/hpmpc/src/include)
-      set(HPMPC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/hpmpc/src/include)
-      set(HPMPC_LIBRARIES)
-      set(HPMPC_DLOPEN ON)
-    else()
-      message(FATAL_ERROR "Hpmpc directory not found. If you want hpmpc, do git submodule init; git submodule update.")
-    endif()
-  else()
-    # try to find system hpmpc
-    find_package(HPMPC REQUIRED)
-    set(HPMPC_DLOPEN OFF)
-  endif()
-endif()
-add_feature_info(hpmpc-interface WITH_HPMPC "Interface to hpmpc.")
+# HPIPM
+option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
+set(BUILD_HPIPM_VERSION "b140f3633ef383cdf481ba4e8c94bdc21596c47b")
+option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source." OFF)
+set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
@@ -786,7 +755,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG BONMIN IPOPT CBC CLP MUMPS LAPACK)
+foreach(PKG BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -841,8 +810,57 @@ if(WITH_LAPACK)
 endif()
 if(LAPACK_FOUND)
   libraries2flags("${LAPACK_LIBRARIES}" LAPACK_LFLAGS)
-  message("LAPACK_LFLAGS: ${LAPACK_LFLAGS}")
+  message("LAPACK_LFLAGS: ${LAPBLASFEO_PATHACK_LFLAGS}")
 endif()
+
+
+if(WITH_BLASFEO)
+  if (WITH_BUILD_BLASFEO)
+    ExternalProject_Add(blasfeo-external
+      GIT_REPOSITORY https://github.com/giaf/blasfeo.git
+      GIT_TAG ${BUILD_BLASFEO_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    set(BLASFEO_PATH "${CMAKE_BINARY_DIR}/external_projects")
+    set(BLASFEO_DEPENDS_TARGET blasfeo-external)
+
+    add_library(blasfeo SHARED IMPORTED)
+    set_target_properties(blasfeo PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libblasfeo${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    )
+  else()
+    #add_library(lapack INTERFACE)
+    #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
+  endif()
+endif()
+
+if(WITH_HPIPM)
+  if (WITH_BUILD_HPIPM)
+    ExternalProject_Add(hpipm-external
+      DEPENDS ${BLASFEO_DEPENDS_TARGET}
+      GIT_REPOSITORY https://github.com/jgillis/hpipm.git
+      GIT_TAG ${BUILD_HPIPM_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(LAPACK_DEPENDS_TARGET openblas-external)
+
+    add_library(hpipm SHARED IMPORTED)
+    target_link_libraries(hpipm INTERFACE blasfeo)
+    set_target_properties(hpipm PROPERTIES
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libhpipm${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    )
+  else()
+    #add_library(lapack INTERFACE)
+    #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
+  endif()
+endif()
+
 
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
@@ -925,7 +943,7 @@ if(WITH_CLP)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(clp-raw SHARED IMPORTED)
     set_target_properties(clp-raw PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIXBLASFEO_PATH}Clp${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin"
     )
