@@ -230,6 +230,7 @@ namespace casadi {
         break;
       case QP_NO_SEARCH_DIR:
         m->return_status = "Failed to calculate search direction";
+        m->unified_return_status = SOLVER_RET_INFEASIBLE;
         break;
       case QP_PRINTING_ERROR:
         m->return_status = "Printing error";
