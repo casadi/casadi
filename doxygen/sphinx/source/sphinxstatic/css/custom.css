@@ -12,6 +12,9 @@ span.linenos {
     font-weight: 700;
     color: #333;
 }
+body[data-theme="dark"] .sig.py .sig-param > span.n:first-child {
+    color: #ccc;
+}
 
 .sig.py .sig-param > span.default_value {
     font-weight: 700;
@@ -27,4 +30,7 @@ span.linenos {
 }
 .sig.cpp > span.sig-param {
     color: #333;
+}
+body[data-theme="dark"] .sig.cpp > span.sig-param {
+    color: #ccc;
 }
