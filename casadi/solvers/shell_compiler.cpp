@@ -31,7 +31,7 @@
 
 // Set default object file suffix
 #ifndef OBJECT_FILE_SUFFIX
-#define OBJECT_FILE_SUFFIX ".o"
+#define OBJECT_FILE_SUFFIX CASADI_OBJECT_FILE_SUFFIX
 #endif // OBJECT_FILE_SUFFIX
 
 #include <cstdlib>

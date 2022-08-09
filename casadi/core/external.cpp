@@ -26,10 +26,16 @@
 #include "external_impl.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
+#include <casadi/config.h>
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+// Set default shared library suffix
+#ifndef SHARED_LIBRARY_SUFFIX
+#define SHARED_LIBRARY_SUFFIX CASADI_SHARED_LIBRARY_SUFFIX
+#endif // SHARED_LIBRARY_SUFFIX
 
 namespace casadi {
 
