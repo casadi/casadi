@@ -180,7 +180,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: py-venv
-        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-static.sh') }}
+        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-static.sh') }}-skylake
     - name: Install Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       run: |
@@ -193,6 +193,9 @@ jobs:
         CC="$(brew --prefix llvm@14)/bin/clang" \
         CXX="$(brew --prefix llvm@14)/bin/clang++" \
           ./scripts/install-casadi-static.sh
+      env:
+        CXXFLAGS: "-march=skylake"
+        CFLAGS: "-march=skylake"
     - name: Build
       run: |
         source ./py-venv/bin/activate
@@ -200,6 +203,9 @@ jobs:
         CC="$(brew --prefix llvm@14)/bin/clang" \
         CXX="$(brew --prefix llvm@14)/bin/clang++" \
             python -m build . --wheel
+      env:
+        CXXFLAGS: "-march=skylake"
+        CFLAGS: "-march=skylake"
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
