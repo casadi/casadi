@@ -41,8 +41,8 @@ prob.D.upperbound = [0, 0]              # g2 <= 0
 prob.param = [10.]
 
 # %% Build an inner Structured PANOC solver with custom parameters
-innersolver = pa.PANOCSolver(
-    pa.PANOCParams(
+innersolver = pa.StructuredPANOCLBFGSSolver(
+    pa.StructuredPANOCLBFGSParams(
         max_iter=1000,
         stop_crit=pa.PANOCStopCrit.ApproxKKT,
     ),
@@ -54,10 +54,13 @@ innersolver = pa.PANOCSolver(
 # You can attach a callback that is called on each iteration, and keeps track of
 # the iterates so they can be plotted later
 iterates = []
-def cb(it): iterates.append(np.copy(it.x))
+def callback(it: pa.StructuredPANOCLBFGSProgressInfo):
+    if it.k == 0:
+        iterates.append([])
+    iterates[-1].append(np.copy(it.x))
 # Note: the iterate values like it.x are only valid within the callback, if you
 # want to save them for later, you have to make a copy.
-innersolver.set_progress_callback(cb)
+innersolver.set_progress_callback(callback)
 
 # %% Make an ALM solver with default parameters, using the PANOC solver
 solver = pa.ALMSolver(
@@ -67,6 +70,7 @@ solver = pa.ALMSolver(
         Σ_0=0,
         σ_0=2,
         Δ=20,
+        print_interval=1,
     ),
     innersolver
 )
@@ -123,8 +127,8 @@ plt.xlabel("$x_1$")
 plt.ylabel("$x_2$")
 
 # Draw iterates and solution
-xy = np.array(iterates)
-plt.plot(xy[:,0], xy[:,1], 'r:.', markersize=4, linewidth=1)
+for xy in map(np.array, iterates):
+    plt.plot(xy[:,0], xy[:,1], 'r:.', markersize=4, linewidth=1)
 plt.plot(x_sol[0], x_sol[1], 'ro', markersize=10, fillstyle='none')
 
 plt.tight_layout()
