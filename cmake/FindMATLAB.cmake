@@ -354,7 +354,7 @@ mark_as_advanced(
   MATLAB_FLIBS
 )
 
-  add_library(matlab::matlab INTERFACE)
+  add_library(matlab::matlab INTERFACE IMPORTED)
   
   set(MEX_VERSION_FILE "")
   if (EXISTS ${MATLAB_INCLUDE_DIR}/../version/c_mexapi_version.cpp)
