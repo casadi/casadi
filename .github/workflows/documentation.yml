@@ -29,7 +29,8 @@ jobs:
 
     # Install Python dependencies for generating docs and tests
     - name: Install Python package and dependencies 
-      run: | 
+      run: |
+        python3 -m pip install -r doxygen/requirements.txt
         echo -e '[cmake.options]\n"ALPAQA_WITH_CASADI:BOOL" = "Off"' > py-build-cmake.local.toml
         python3 -m pip install '.[docs]'
       shell: bash

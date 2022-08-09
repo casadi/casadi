@@ -1,0 +1,4 @@
+sphinx @ git+https://github.com/tttapa/sphinx@5.x
+matplotlib
+breathe
+furo

@@ -2,6 +2,8 @@ name: Linux Binaries
 
 on:
   push:
+    tags-ignore:
+      - '**'
   release:
     types: ['released', 'prereleased']
 

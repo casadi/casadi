@@ -2,6 +2,8 @@ name: Python Wheels
 
 on:
   push:
+    tags-ignore:
+      - '**'
   release:
     types: ['released', 'prereleased']
 

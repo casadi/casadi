@@ -23,7 +23,7 @@ dynamic = ["version", "description"]
 
 [project.optional-dependencies]
 docs = [
-    "sphinx @ git+https://github.com/tttapa/sphinx@5.x",
+    "sphinx~=5.1",
     "matplotlib",
     "breathe",
     "furo",
