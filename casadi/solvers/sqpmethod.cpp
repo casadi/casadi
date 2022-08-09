@@ -526,16 +526,15 @@ int Sqpmethod::solve(void* mem) const {
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam);
 
-      if (elastic_mode_ && ret == -1) {        
+      if (elastic_mode_ && ret == SOLVER_RET_INFEASIBLE) {        
         int it = 0;
-        double gamma = 0;
+        double gamma = 0.;
 
         // Temp datastructs for data copy
-        double *temp_1;
-        double *temp_2;
+        double *temp_1, *temp_2;
 
         // If QP was infeasible enter elastic mode
-        while (ret == -1) {
+        while (ret == SOLVER_RET_INFEASIBLE) {
           it += 1;
           gamma = pow(10, it*(it-1)/2)*gamma_0_; // TODO: is this the right update rule?
 
@@ -737,7 +736,7 @@ int Sqpmethod::solve(void* mem) const {
     // Check if the QP was infeasible for elastic mode
     if (!m_qpsol->success && elastic_mode_) {
       if (m_qpsol->unified_return_status == SOLVER_RET_INFEASIBLE) {
-        return -1;
+        return SOLVER_RET_INFEASIBLE;
       }
 
       if (error_on_fail_) {
@@ -781,7 +780,7 @@ int Sqpmethod::solve(void* mem) const {
     // Check if the QP was infeasible
     if (!m_qpsol_ela->success) {
       if (m_qpsol_ela->unified_return_status == SOLVER_RET_INFEASIBLE) {
-        return -1;
+        return SOLVER_RET_INFEASIBLE;
       }
 
       if (error_on_fail_) {
@@ -802,6 +801,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
       g.add_dependency(get_function("nlp_grad"));
     g.add_dependency(qpsol_);
+    if (elastic_mode_) g.add_dependency(qpsol_ela_);
   }
 
   void Sqpmethod::codegen_body(CodeGenerator& g) const {
@@ -831,7 +831,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "p.merit_memsize = " << merit_memsize_ << ";\n";
     g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
     g << "p.nlp = &p_nlp;\n";
-    g << "casadi_sqpmethod_init(&d, &iw, &w);\n";
+    g << "casadi_sqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ");\n";
 
     g.local("m_w", "casadi_real", "*");
     g << "m_w = w;\n";
@@ -914,6 +914,47 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "iter_count++;\n";
     g.comment("Solve the QP");
     codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+    if (elastic_mode_) {
+      g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      g << "int it = 0;\n";
+      g << "double gamma = 0.;\n";
+      g.comment("Temp datastructs for data copy");
+      g << "double *temp_1, *temp_2;\n";
+      g << "while (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      g << "it += 1" << ";\n";
+      g << "gamma = pow(10, it*(it-1)/2)*" << gamma_0_ << ";\n";
+      g << "if (gamma > " << gamma_max_ << ") " << "return -1" << ";\n";
+      g.comment("Make larger gradient (has gamma for slack variables)");
+      g << "temp_1 = d.gf + " << nx_ << ";\n";
+      g << g.fill("temp_1", 2*ng_, "gamma") << ";\n";
+      g.comment("Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)");
+      g << "temp_1 = d.Jk + " << Asp_.nnz() << ";\n";
+      g << g.fill("temp_1", ng_, "-1.") << ";\n";
+      g << "temp_1 += " << ng_ << ";\n";
+      g << g.fill("temp_1", ng_, "1.") << ";\n";
+      g.comment("Initial guess");
+      g << "temp_1 = d.dlam + " << nx_ << ";\n";
+      g << g.copy("temp_1", ng_, "d.temp_mem") << ";\n";
+      g << g.clear("d.dlam", nx_+3*ng_) << ";\n";
+      g << g.copy("d_nlp.lam", nx_, "d.dlam") << ";\n";
+      g << g.clear("d.dx", nx_+2*ng_) << ";\n";
+      g.comment("Initialize bounds");
+      g << "temp_1 = d.lbdz + " << nx_ << ";\n";
+      g << "temp_2 = d.lbdz + " << nx_ + 2*ng_ << ";\n";
+      g << g.copy("temp_1", ng_, "temp_2") << ";\n";
+      g << g.clear("temp_1", 2*ng_) << ";\n";
+      g << "temp_1 = d.ubdz + " << nx_ << ";\n";
+      g << "temp_2 = d.ubdz + " << nx_ + 2*ng_ << ";\n";
+      g << g.copy("temp_1", ng_, "temp_2") << ";\n";
+      g << g.fill("temp_1", 2*ng_, g.constant(inf)) << ";\n";
+      g.comment("Solve the QP");
+      codegen_qp_ela_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+      g << "}\n";
+      g.comment("Get second part of dlam from temp memory");
+      g << "temp_1 = d.dlam + " << nx_ << ";\n";
+      g << g.copy("d.temp_mem", ng_, "temp_1") << ";\n";
+      g << "}\n";
+    }
     if (max_iter_ls_) {
       g.comment("Detecting indefiniteness");
       g.comment("Calculate penalty parameter of merit function");
@@ -1035,7 +1076,32 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
-    cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    if (elastic_mode_) {
+      cg << "int ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    } else {
+      cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    }
+  }
+
+  void Sqpmethod::codegen_qp_ela_solve(CodeGenerator& cg, const std::string&  H, const std::string& g,
+              const std::string&  lbdz, const std::string& ubdz,
+              const std::string&  A, const std::string& x_opt, const std::string&  dlam) const {
+    for (casadi_int i=0;i<qpsol_ela_.n_in();++i) cg << "m_arg[" << i << "] = 0;\n";
+    cg << "m_arg[" << CONIC_H << "] = " << H << ";\n";
+    cg << "m_arg[" << CONIC_G << "] = " << g << ";\n";
+    cg << "m_arg[" << CONIC_X0 << "] = " << x_opt << ";\n";
+    cg << "m_arg[" << CONIC_LAM_X0 << "] = " << dlam << ";\n";
+    cg << "m_arg[" << CONIC_LAM_A0 << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
+    cg << "m_arg[" << CONIC_LBX << "] = " << lbdz << ";\n";
+    cg << "m_arg[" << CONIC_UBX << "] = " << ubdz << ";\n";
+    cg << "m_arg[" << CONIC_A << "] = " << A << ";\n";
+    cg << "m_arg[" << CONIC_LBA << "] = " << lbdz << "+" << nx_+2*ng_ << ";\n";
+    cg << "m_arg[" << CONIC_UBA << "] = " << ubdz << "+" << nx_+2*ng_ << ";\n";
+    for (casadi_int i=0;i<qpsol_.n_out();++i) cg << "m_res[" << i << "] = 0;\n";
+    cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
+    cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
+    cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
+    cg << "ret = " << cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
   }
 
   Dict Sqpmethod::get_stats(void* mem) const {

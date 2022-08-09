@@ -44,7 +44,7 @@ struct casadi_sqpmethod_data {
 // SYMBOL "sqpmethod_work"
 template<typename T1>
 void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
-    casadi_int* sz_iw, casadi_int* sz_w, bool elastic_mode) {
+    casadi_int* sz_iw, casadi_int* sz_w, int elastic_mode) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
   nnz_h = p->sp_h[2+p->sp_h[1]];
@@ -91,7 +91,7 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
 
 // SYMBOL "sqpmethod_init"
 template<typename T1>
-void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w, bool elastic_mode) {
+void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w, int elastic_mode) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
   const casadi_sqpmethod_prob<T1>* p = d->prob;
