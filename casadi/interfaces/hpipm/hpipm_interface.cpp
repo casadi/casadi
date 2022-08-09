@@ -82,7 +82,7 @@ namespace casadi {
     hpipm_mode mode = ROBUST;
     casadi_int struct_cnt=0;
 
-    d_set_default_ocp_qp_ipm_arg(mode, &hpipm_options_);
+    d_ocp_qp_ipm_arg_set_default(mode, &hpipm_options_);
 
     inf_ = 1e8;
 
@@ -119,7 +119,7 @@ namespace casadi {
           }
         }
 
-        d_set_default_ocp_qp_ipm_arg(mode, &hpipm_options_);
+        d_ocp_qp_ipm_arg_set_default(mode, &hpipm_options_);
 
         for (auto&& op : hopts) {
           if (op.first=="mu0") {
@@ -592,20 +592,20 @@ namespace casadi {
     // Statistics
     m->fstats.at("preprocessing").tic();
 
-    int dim_size = d_memsize_ocp_qp_dim(N_);
+    int dim_size = d_ocp_qp_dim_memsize(N_);
 
 	  void *dim_mem = malloc(dim_size);
 
 	  struct d_ocp_qp_dim dim;
-	  d_create_ocp_qp_dim(N_, &dim, dim_mem);
+	  d_ocp_qp_dim_create(N_, &dim, dim_mem);
 
-    d_cvt_int_to_ocp_qp_dim(N_, get_ptr(m->nx), get_ptr(m->nu), get_ptr(m->nbx), get_ptr(m->nbu), get_ptr(m->ng), get_ptr(m->ns), &dim);
+    d_ocp_qp_dim_set_all(get_ptr(m->nx), get_ptr(m->nu), get_ptr(m->nbx), get_ptr(m->nbu), get_ptr(m->ng), get_ptr(m->ns), &dim);
 
-    int qp_size = d_memsize_ocp_qp(&dim);
+    int qp_size = d_ocp_qp_memsize(&dim);
     void *qp_mem = malloc(qp_size);
 
     struct d_ocp_qp qp;
-    d_create_ocp_qp(&dim, &qp, qp_mem);
+    d_ocp_qp_create(&dim, &qp, qp_mem);
 
 
     double* pv =  get_ptr(m->pv);
@@ -739,47 +739,50 @@ namespace casadi {
     uout() << m->ug << std::endl;
     */
 
+    // https://github.com/giaf/hpipm/commit/590f3b21521ff5784c9497869883df695bc0f441
     std::vector<double*> hI;
 
-    d_cvt_colmaj_to_ocp_qp(get_ptr(m->hA), get_ptr(m->hB), get_ptr(m->hb), get_ptr(m->hQ), get_ptr(m->hS), get_ptr(m->hR), get_ptr(m->hq), get_ptr(m->hr), get_ptr(m->hidxb), get_ptr(m->hlb), get_ptr(m->hub), get_ptr(m->hC), get_ptr(m->hD), get_ptr(m->hlg), get_ptr(m->hug), get_ptr(m->hZl), get_ptr(m->hZu), get_ptr(m->hzl), get_ptr(m->hzu), get_ptr(m->hidxs), get_ptr(m->hlls), get_ptr(m->hlus), &qp);
+    d_ocp_qp_set_all(get_ptr(m->hA), get_ptr(m->hB), get_ptr(m->hb), get_ptr(m->hQ), get_ptr(m->hS), get_ptr(m->hR), get_ptr(m->hq), get_ptr(m->hr), get_ptr(m->hidxb), get_ptr(m->hlb), get_ptr(m->hub), get_ptr(m->hC), get_ptr(m->hD), get_ptr(m->hlg), get_ptr(m->hug), get_ptr(m->hZl), get_ptr(m->hZu), get_ptr(m->hzl), get_ptr(m->hzu), get_ptr(m->hidxs), get_ptr(m->hlls), get_ptr(m->hlus), &qp);
 
-    int qp_sol_size = d_memsize_ocp_qp_sol(&dim);
+    int qp_sol_size = d_ocp_qp_sol_memsize(&dim);
     void *qp_sol_mem = malloc(qp_sol_size);
 
     struct d_ocp_qp_sol qp_sol;
-    d_create_ocp_qp_sol(&dim, &qp_sol, qp_sol_mem);
+    d_ocp_qp_sol_create(&dim, &qp_sol, qp_sol_mem);
 
-    int ipm_arg_size = d_memsize_ocp_qp_ipm_arg(&dim);
+    int ipm_arg_size = d_ocp_qp_ipm_arg_memsize(&dim);
     void *ipm_arg_mem = malloc(ipm_arg_size);
     struct d_ocp_qp_ipm_arg myarg;
-    d_create_ocp_qp_ipm_arg(&dim, &myarg, ipm_arg_mem);
+    d_ocp_qp_ipm_arg_create(&dim, &myarg, ipm_arg_mem);
 
     memcpy(&myarg, &hpipm_options_, sizeof(d_ocp_qp_ipm_arg));
 
-    int ipm_size = d_memsize_ocp_qp_ipm(&dim, &myarg);
+    int ipm_size = d_ocp_qp_ipm_ws_memsize(&dim, &myarg);
     void *ipm_mem = malloc(ipm_size);
 
-    struct d_ocp_qp_ipm_workspace workspace;
-    d_create_ocp_qp_ipm(&dim, &myarg, &workspace, ipm_mem);
+    struct d_ocp_qp_ipm_ws workspace;
+    d_ocp_qp_ipm_ws_create(&dim, &myarg, &workspace, ipm_mem);
 
 		// solution guess
-		for (casadi_int i=0; i<N_+1; i++)	d_cvt_colmaj_to_ocp_qp_sol_u(i, m->hu_guess[i], &qp_sol);
-		for (casadi_int i=0; i<N_+1; i++)	d_cvt_colmaj_to_ocp_qp_sol_x(i, m->hx_guess[i], &qp_sol);
+		for (casadi_int i=0; i<N_+1; i++)	d_ocp_qp_sol_set_u(i, m->hu_guess[i], &qp_sol);
+		for (casadi_int i=0; i<N_+1; i++)	d_ocp_qp_sol_set_x(i, m->hx_guess[i], &qp_sol);
 
     m->fstats.at("solver").tic();
 		// call solver
-	  m->return_status = d_solve_ocp_qp_ipm(&qp, &qp_sol, &myarg, &workspace);
+	  d_ocp_qp_ipm_solve(&qp, &qp_sol, &myarg, &workspace);
+    d_ocp_qp_ipm_get_status(&workspace, &m->return_status);
     m->fstats.at("solver").toc();
     m->fstats.at("postprocessing").tic();
 
-    m->iter_count = d_get_ocp_qp_ipm_iter(&workspace);
-    m->res_stat = d_get_ocp_qp_ipm_res_stat(&workspace);
-	  m->res_eq = d_get_ocp_qp_ipm_res_eq(&workspace);
-	  m->res_ineq = d_get_ocp_qp_ipm_res_ineq(&workspace);
-	  m->res_comp = d_get_ocp_qp_ipm_res_comp(&workspace);
+    d_ocp_qp_ipm_get_iter(&workspace, &m->iter_count);
+    d_ocp_qp_ipm_get_max_res_stat(&workspace, &m->res_stat);
+	  d_ocp_qp_ipm_get_max_res_eq(&workspace, &m->res_eq);
+	  d_ocp_qp_ipm_get_max_res_ineq(&workspace, &m->res_ineq);
+	  d_ocp_qp_ipm_get_max_res_comp(&workspace, &m->res_comp);
 
 
-	  double *stat = d_get_ocp_qp_ipm_stat(&workspace);
+	  double *stat;
+    d_ocp_qp_ipm_get_stat(&workspace, &stat);
 printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
     d_print_exp_tran_mat(5, m->iter_count, stat, 5);
 
@@ -807,16 +810,16 @@ printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
 	printf("\n\n");
 
 
-	for(casadi_int i=0; i<N_+1; ++i) d_cvt_ocp_qp_sol_to_colmaj_u(i, &qp_sol, m->hu_guess[i]);
-	for(casadi_int i=0; i<N_+1; ++i) d_cvt_ocp_qp_sol_to_colmaj_x(i, &qp_sol, m->hx_guess[i]);
-	for(casadi_int i=0; i<N_; ++i) d_cvt_ocp_qp_sol_to_colmaj_pi(i, &qp_sol, m->pis[i]);
+	for(casadi_int i=0; i<N_+1; ++i) d_ocp_qp_sol_get_u(i, &qp_sol, m->hu_guess[i]);
+	for(casadi_int i=0; i<N_+1; ++i) d_ocp_qp_sol_get_x(i, &qp_sol, m->hx_guess[i]);
+	for(casadi_int i=0; i<N_; ++i) d_ocp_qp_sol_get_pi(i, &qp_sol, m->pis[i]);
 
   if (res[CONIC_LAM_X]) {
     casadi_int offset = 0;
     for(casadi_int i=0; i<N_+1; ++i) {
       std::vector<double> lam_lb(m->nbx[i]+m->nbu[i], nan), lam_ub(m->nbx[i]+m->nbu[i], nan);
-      d_cvt_ocp_qp_sol_to_colmaj_lam_lb(i, &qp_sol, get_ptr(lam_lb));
-      d_cvt_ocp_qp_sol_to_colmaj_lam_ub(i, &qp_sol, get_ptr(lam_ub));
+      d_ocp_qp_sol_get_lam_lb(i, &qp_sol, get_ptr(lam_lb));
+      d_ocp_qp_sol_get_lam_ub(i, &qp_sol, get_ptr(lam_ub));
       for (casadi_int k=0;k<m->nbx[i];++k) {
         res[CONIC_LAM_X][offset+k] = (lam_ub[k+m->nbu[i]]-lam_lb[k+m->nbu[i]])*2;
       }
@@ -831,8 +834,8 @@ printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
     casadi_int offset = 0;
     for(casadi_int i=0; i<N_+1; ++i) {
       std::vector<double> lam_lg(m->ng[i]), lam_ug(m->ng[i]);
-      d_cvt_ocp_qp_sol_to_colmaj_lam_lg(i, &qp_sol, get_ptr(lam_lg));
-      d_cvt_ocp_qp_sol_to_colmaj_lam_ug(i, &qp_sol, get_ptr(lam_ug));
+      d_ocp_qp_sol_get_lam_lg(i, &qp_sol, get_ptr(lam_lg));
+      d_ocp_qp_sol_get_lam_ug(i, &qp_sol, get_ptr(lam_ug));
       for (casadi_int k=0;k<m->ng[i];++k) {
         res[CONIC_LAM_A][offset+(i<N_ ? m->nx[i+1]: 0)+k] = (lam_ug[k]-lam_lg[k])*2;
       }
