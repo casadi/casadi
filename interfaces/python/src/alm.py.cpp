@@ -20,11 +20,12 @@ constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::ALMParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::ALMParams<Conf>> table{
+    inline static const kwargs_to_struct_table_t<alpaqa::ALMParams<Conf>> table {
         {"ε", &alpaqa::ALMParams<Conf>::ε},
         {"δ", &alpaqa::ALMParams<Conf>::δ},
         {"Δ", &alpaqa::ALMParams<Conf>::Δ},
         {"Δ_lower", &alpaqa::ALMParams<Conf>::Δ_lower},
+        {"Δ_min", &alpaqa::ALMParams<Conf>::Δ_min},
         {"Σ_0", &alpaqa::ALMParams<Conf>::Σ_0},
         {"σ_0", &alpaqa::ALMParams<Conf>::σ_0},
         {"Σ_0_lower", &alpaqa::ALMParams<Conf>::Σ_0_lower},
@@ -32,6 +33,7 @@ struct kwargs_to_struct_table<alpaqa::ALMParams<Conf>> {
         {"ε_0_increase", &alpaqa::ALMParams<Conf>::ε_0_increase},
         {"ρ", &alpaqa::ALMParams<Conf>::ρ},
         {"ρ_increase", &alpaqa::ALMParams<Conf>::ρ_increase},
+        {"ρ_max", &alpaqa::ALMParams<Conf>::ρ_max},
         {"θ", &alpaqa::ALMParams<Conf>::θ},
         {"M", &alpaqa::ALMParams<Conf>::M},
         {"Σ_max", &alpaqa::ALMParams<Conf>::Σ_max},
@@ -50,9 +52,10 @@ template <alpaqa::Config Conf>
 void register_alm(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
 
-    using TypeErasedPANOCDirection = alpaqa::TypeErasedPANOCDirection<Conf>;
-    using PANOCSolver              = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
-    using InnerSolver              = alpaqa::TypeErasedInnerSolver<config_t>;
+    using TypeErasedPANOCDirection   = alpaqa::TypeErasedPANOCDirection<config_t>;
+    using PANOCSolver                = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
+    using StructuredPANOCLBFGSSolver = alpaqa::StructuredPANOCLBFGSSolver<config_t>;
+    using InnerSolver                = alpaqa::TypeErasedInnerSolver<config_t>;
     py::class_<InnerSolver>(m, "InnerSolver")
         .def(py::init<PANOCSolver>())
         .def("__call__",
@@ -70,6 +73,7 @@ void register_alm(py::module_ &m) {
         .def_readwrite("δ", &ALMParams::δ)
         .def_readwrite("Δ", &ALMParams::Δ)
         .def_readwrite("Δ_lower", &ALMParams::Δ_lower)
+        .def_readwrite("Δ_min", &ALMParams::Δ_min)
         .def_readwrite("Σ_0", &ALMParams::Σ_0)
         .def_readwrite("σ_0", &ALMParams::σ_0)
         .def_readwrite("Σ_0_lower", &ALMParams::Σ_0_lower)
@@ -77,6 +81,7 @@ void register_alm(py::module_ &m) {
         .def_readwrite("ε_0_increase", &ALMParams::ε_0_increase)
         .def_readwrite("ρ", &ALMParams::ρ)
         .def_readwrite("ρ_increase", &ALMParams::ρ_increase)
+        .def_readwrite("ρ_max", &ALMParams::ρ_max)
         .def_readwrite("θ", &ALMParams::θ)
         .def_readwrite("M", &ALMParams::M)
         .def_readwrite("Σ_max", &ALMParams::Σ_max)
@@ -117,20 +122,33 @@ void register_alm(py::module_ &m) {
                           "Main augmented Lagrangian solver.\n\n"
                           "C++ documentation: :cpp:class:`alpaqa::ALMSolver`")
         // Default constructor
-        .def(py::init(
-                 []() -> ALMSolver { throw alpaqa::not_implemented_error("ALMSolver.__init__"); }),
+        .def(py::init([] {
+                 return std::make_unique<ALMSolver>(
+                     ALMParams {}, InnerSolver {StructuredPANOCLBFGSSolver {{}, {}}});
+             }),
              "Build an ALM solver using Structured PANOC as inner solver.")
         // Solver only
         .def(py::init([](const PANOCSolver &inner) {
-                 return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
+                 return std::make_unique<ALMSolver>(ALMParams {}, InnerSolver {inner});
              }),
              "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
+        .def(py::init([](const StructuredPANOCLBFGSSolver &inner) {
+                 return std::make_unique<ALMSolver>(ALMParams {}, InnerSolver {inner});
+             }),
+             "inner_solver"_a, "Build an ALM solver using Structured PANOC as inner solver.")
         // Params and solver
         .def(py::init([](params_or_dict<ALMParams> params, const PANOCSolver &inner) {
                  return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
-                                                    InnerSolver{inner});
+                                                    InnerSolver {inner});
              }),
              "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
+        .def(
+            py::init([](params_or_dict<ALMParams> params, const StructuredPANOCLBFGSSolver &inner) {
+                return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
+                                                   InnerSolver {inner});
+            }),
+            "alm_params"_a, "inner_solver"_a,
+            "Build an ALM solver using Structured PANOC as inner solver.")
         // Other functions and properties
         .def_property_readonly(
             "inner_solver",

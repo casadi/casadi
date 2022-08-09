@@ -21,6 +21,7 @@ Python3_add_library(_alpaqa MODULE
     "src/enums.py.cpp"
     "src/panoc.py.cpp"
     "src/problems.py.cpp"
+    "src/structured-panoc.py.cpp"
 )
 target_link_libraries(_alpaqa PRIVATE pybind11::pybind11 alpaqa::alpaqa)
 target_compile_definitions(_alpaqa PRIVATE

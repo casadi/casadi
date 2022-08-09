@@ -1,5 +1,7 @@
 #pragma once
 
+#include <alpaqa/config/config.hpp>
+
 namespace alpaqa::detail {
 
 template <Config Conf>

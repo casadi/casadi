@@ -1,7 +1,7 @@
 #pragma once
 
+#include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/export.hpp>
-#include <alpaqa/inner/directions/panoc-direction-update.hpp>
 #include <alpaqa/inner/internal/lbfgs-stepsize.hpp>
 #include <alpaqa/inner/internal/lipschitz.hpp>
 #include <alpaqa/inner/internal/panoc-helpers.hpp>
@@ -11,14 +11,13 @@
 #include <alpaqa/util/atomic-stop-signal.hpp>
 
 #include <chrono>
-#include <limits>
-#include <string>
+#include <vector>
 
 namespace alpaqa {
 
-/// Tuning parameters for the PANOC algorithm.
+/// Tuning parameters for the structured PANOC algorithm.
 template <Config Conf = DefaultConfig>
-struct PANOCParams {
+struct StructuredPANOCLBFGSParams {
     USING_ALPAQA_CONFIG(Conf);
 
     /// Parameters related to the Lipschitz constant estimate and step size.
@@ -33,6 +32,15 @@ struct PANOCParams {
     real_t L_min = 1e-5;
     /// Maximum Lipschitz constant estimate.
     real_t L_max = 1e20;
+    /// Factor used in update for exponentially weighted nonmonotone line search.
+    /// Zero means monotone line search.
+    real_t nonmonotone_linesearch = 0;
+    /// Check the FPR norm (with γ = 1) to quickly accept steps without line
+    /// search.
+    real_t fpr_shortcut_accept_factor = 0.999;
+    /// If greater than one, allows nonmonotone FPR decrease when accepting the
+    /// FPR shortcut steps. Cannot be zero.
+    unsigned fpr_shortcut_history = 1;
     /// What stopping criterion to use.
     PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
     /// Maximum number of iterations without any progress before giving up.
@@ -50,11 +58,17 @@ struct PANOCParams {
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;
 
+    bool hessian_vec                    = true;
+    bool hessian_vec_finite_differences = true;
+    bool full_augmented_hessian         = true;
+
+    unsigned hessian_step_size_heuristic = 0;
+
     LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
 template <Config Conf = DefaultConfig>
-struct PANOCStats {
+struct StructuredPANOCLBFGSStats {
     USING_ALPAQA_CONFIG(Conf);
 
     SolverStatus status = SolverStatus::Busy;
@@ -67,11 +81,11 @@ struct PANOCStats {
     unsigned τ_1_accepted        = 0;
     unsigned count_τ             = 0;
     real_t sum_τ                 = 0;
-    real_t final_γ               = 0;
+    unsigned fpr_shortcuts       = 0;
 };
 
 template <Config Conf = DefaultConfig>
-struct PANOCProgressInfo {
+struct StructuredPANOCLBFGSProgressInfo {
     USING_ALPAQA_CONFIG(Conf);
 
     unsigned k;
@@ -79,6 +93,8 @@ struct PANOCProgressInfo {
     crvec p;
     real_t norm_sq_p;
     crvec x̂;
+    crvec q;
+    crindexvec J;
     real_t φγ;
     real_t ψ;
     crvec grad_ψ;
@@ -91,27 +107,25 @@ struct PANOCProgressInfo {
     crvec Σ;
     crvec y;
     const ProblemBase<config_t> &problem;
-    const PANOCParams<config_t> &params;
+    const StructuredPANOCLBFGSParams<config_t> &params;
 };
 
-/// PANOC solver for ALM.
+/// Second order PANOC solver for ALM.
 /// @ingroup    grp_InnerSolvers
-template <class DirectionProviderT>
-class PANOCSolver {
+template <Config Conf = DefaultConfig>
+class StructuredPANOCLBFGSSolver {
   public:
-    USING_ALPAQA_CONFIG_TEMPLATE(DirectionProviderT::config_t);
+    USING_ALPAQA_CONFIG(Conf);
 
-    using Problem           = alpaqa::ProblemBase<config_t>;
-    using Params            = PANOCParams<config_t>;
-    using DirectionProvider = DirectionProviderT;
-    using Direction         = PANOCDirection<DirectionProvider>;
-    using Stats             = PANOCStats<config_t>;
-    using ProgressInfo      = PANOCProgressInfo<config_t>;
+    using Problem      = alpaqa::ProblemBase<config_t>;
+    using Params       = StructuredPANOCLBFGSParams<config_t>;
+    using Stats        = StructuredPANOCLBFGSStats<config_t>;
+    using ProgressInfo = StructuredPANOCLBFGSProgressInfo<config_t>;
+    using LBFGS        = alpaqa::LBFGS<config_t>;
+    using LBFGSParams  = alpaqa::LBFGSParams<config_t>;
 
-    PANOCSolver(const Params &params, Direction &&direction_provider)
-        : params(params), direction_provider(std::move(direction_provider)) {}
-    PANOCSolver(const Params &params, const Direction &direction_provider)
-        : params(params), direction_provider(direction_provider) {}
+    StructuredPANOCLBFGSSolver(Params params, LBFGSParams lbfgsparams)
+        : params(params), lbfgs(lbfgsparams) {}
 
     Stats operator()(const Problem &problem,        // in
                      crvec Σ,                       // in
@@ -121,16 +135,13 @@ class PANOCSolver {
                      rvec y,                        // inout
                      rvec err_z);                   // out
 
-    /// Specify a callable that is invoked with some intermediate results on
-    /// each iteration of the algorithm.
-    /// @see @ref ProgressInfo
-    PANOCSolver &
+    StructuredPANOCLBFGSSolver &
     set_progress_callback(std::function<void(const ProgressInfo &)> cb) {
         this->progress_cb = cb;
         return *this;
     }
 
-    std::string get_name() const;
+    std::string get_name() const { return "StructuredPANOCLBFGSSolver"; }
 
     void stop() { stop_signal.stop(); }
 
@@ -140,17 +151,25 @@ class PANOCSolver {
     Params params;
     AtomicStopSignal stop_signal;
     std::function<void(const ProgressInfo &)> progress_cb;
-    using Helpers = detail::PANOCHelpers<config_t>;
+    using Helpers     = detail::PANOCHelpers<config_t>;
+    using indexstdvec = std::vector<index_t>;
+
+  private:
+    void compute_quasi_newton_step(const Params &params, const Problem &problem,
+                                   real_t γₖ, crvec xₖ, crvec y, crvec Σ,
+                                   crvec grad_ψₖ, crvec pₖ, rvec qₖ,
+                                   indexstdvec &J, rvec HqK, LBFGS &lbfgs,
+                                   rvec work_n, rvec work_n2, rvec work_m);
 
   public:
-    Direction direction_provider;
+    LBFGS lbfgs;
 };
 
 template <class InnerSolverStats>
 struct InnerStatsAccumulator;
 
 template <Config Conf>
-struct InnerStatsAccumulator<PANOCStats<Conf>> {
+struct InnerStatsAccumulator<StructuredPANOCLBFGSStats<Conf>> {
     USING_ALPAQA_CONFIG(Conf);
 
     /// Total elapsed time in the inner solver.
@@ -173,12 +192,14 @@ struct InnerStatsAccumulator<PANOCStats<Conf>> {
     /// The sum of the line search parameter @f$ \tau @f$ in all iterations
     /// (used for computing the average value of @f$ \tau @f$).
     real_t sum_τ = 0;
+    /// The number of shortcuts taken because of sufficient FPR decrease.
+    unsigned fpr_shortcuts = 0;
 };
 
 template <Config Conf>
-InnerStatsAccumulator<PANOCStats<Conf>> &
-operator+=(InnerStatsAccumulator<PANOCStats<Conf>> &acc,
-           const PANOCStats<Conf> &s) {
+InnerStatsAccumulator<StructuredPANOCLBFGSStats<Conf>> &
+operator+=(InnerStatsAccumulator<StructuredPANOCLBFGSStats<Conf>> &acc,
+           const StructuredPANOCLBFGSStats<Conf> &s) {
     acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
     acc.linesearch_failures += s.linesearch_failures;
@@ -190,28 +211,38 @@ operator+=(InnerStatsAccumulator<PANOCStats<Conf>> &acc,
     return acc;
 }
 
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, DefaultConfig);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, EigenConfigf);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, EigenConfigd);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, EigenConfigl);
+// clang-format off
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSParams, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSParams, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSParams, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSParams, EigenConfigl);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCParams, EigenConfigq);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSParams, EigenConfigq);
 #endif
 
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, DefaultConfig);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, EigenConfigf);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, EigenConfigd);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, EigenConfigl);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSStats, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSStats, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSStats, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSStats, EigenConfigl);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCStats, EigenConfigq);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSStats, EigenConfigq);
 #endif
 
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, DefaultConfig);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, EigenConfigf);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, EigenConfigd);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, EigenConfigl);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSProgressInfo, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSProgressInfo, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSProgressInfo, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSProgressInfo, EigenConfigl);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCProgressInfo, EigenConfigq);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredPANOCLBFGSProgressInfo, EigenConfigq);
 #endif
+
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, StructuredPANOCLBFGSSolver, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, StructuredPANOCLBFGSSolver, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, StructuredPANOCLBFGSSolver, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, StructuredPANOCLBFGSSolver, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, StructuredPANOCLBFGSSolver, EigenConfigq);
+#endif
+// clang-format on
 
 } // namespace alpaqa

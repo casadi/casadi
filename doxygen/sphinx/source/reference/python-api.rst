@@ -39,6 +39,11 @@ Problem formulation
     :inherited-members:
     :show-inheritance:
 
+.. autoclass:: alpaqa._alpaqa.float64.FunctionalProblem
+    :noindex:
+    :inherited-members:
+    :show-inheritance:
+
 .. autoclass:: alpaqa._alpaqa.float64.CountedProblem
     :noindex:
     :inherited-members:

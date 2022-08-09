@@ -1,5 +1,6 @@
 #include <alpaqa/config/config.hpp>
 #include <pybind11/eigen.h>
+#include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -12,6 +13,32 @@ using namespace py::literals;
 
 #include "trampolines.hpp"
 
+template <class FuncProb, auto py_f, auto f, class Ret, class... Args>
+void functional_setter_ret(FuncProb &p, std::optional<py::object> o) {
+    if (o) {
+        p.*py_f = *std::move(o);
+        p.*f    = [&pf {p.*py_f}](Args... x) -> Ret { return py::cast<Ret>(pf(x...)); };
+    } else {
+        p.*py_f = py::none();
+        p.*f    = [](Args...) -> Ret {
+            throw std::runtime_error("FunctionalProblem function is None");
+        };
+    }
+};
+
+template <class FuncProb, auto py_f, auto f, class Out, class Ret, class... Args>
+void functional_setter_out(FuncProb &p, std::optional<py::object> o) {
+    if (o) {
+        p.*py_f = *std::move(o);
+        p.*f    = [&pf {p.*py_f}](Args... x, Out r) -> void { r = py::cast<Ret>(pf(x...)); };
+    } else {
+        p.*py_f = py::none();
+        p.*f    = [](Args..., Out) -> void {
+            throw std::runtime_error("FunctionalProblem function is None");
+        };
+    }
+};
+
 template <alpaqa::Config Conf>
 void register_problems(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
@@ -19,8 +46,8 @@ void register_problems(py::module_ &m) {
     using Box = alpaqa::Box<config_t>;
     py::class_<Box>(m, "Box", "C++ documentation: :cpp:class:`alpaqa::Box`")
         .def(py::init([](length_t n) {
-                 return Box{vec::Constant(n, alpaqa::inf<config_t>),
-                            vec::Constant(n, -alpaqa::inf<config_t>)};
+                 return Box {vec::Constant(n, alpaqa::inf<config_t>),
+                             vec::Constant(n, -alpaqa::inf<config_t>)};
              }),
              "n"_a,
              "Create an :math:`n`-dimensional box at with bounds at "
@@ -28,7 +55,7 @@ void register_problems(py::module_ &m) {
         .def(py::init([](vec ub, vec lb) {
                  if (ub.size() != lb.size())
                      throw std::invalid_argument("Upper and lower bound dimensions do not match");
-                 return Box{std::move(ub), std::move(lb)};
+                 return Box {std::move(ub), std::move(lb)};
              }),
              "ub"_a, "lb"_a, "Create a box with the given bounds.")
         .def_readwrite("upperbound", &Box::upperbound)
@@ -130,6 +157,71 @@ void register_problems(py::module_ &m) {
             },
             "Parameter vector :math:`p` of the problem");
 
+    struct FunctionalProblem : alpaqa::FunctionalProblem<config_t> {
+        FunctionalProblem(length_t n, length_t m, length_t p)
+            : alpaqa::FunctionalProblem<config_t> {n, m, p} {
+            this->f = [](crvec) -> real_t {
+                throw std::runtime_error("FunctionalProblem.f is uninitialized");
+            };
+            this->grad_f = [](crvec, rvec) -> void {
+                throw std::runtime_error("FunctionalProblem.grad_f is uninitialized");
+            };
+            this->g = [](crvec, rvec) -> void {
+                throw std::runtime_error("FunctionalProblem.g is uninitialized");
+            };
+            this->grad_g_prod = [](crvec, crvec, rvec) -> void {
+                throw std::runtime_error("FunctionalProblem.grad_g_prod is uninitialized");
+            };
+            this->grad_gi = [](crvec, index_t, rvec) -> void {
+                throw std::runtime_error("FunctionalProblem.grad_gi is uninitialized");
+            };
+            this->hess_L_prod = [](crvec, crvec, crvec, rvec) -> void {
+                throw std::runtime_error("FunctionalProblem.hess_L_prod is uninitialized");
+            };
+            this->hess_L = [](crvec, crvec, rmat) -> void {
+                throw std::runtime_error("FunctionalProblem.hess_L is uninitialized");
+            };
+        }
+        py::object py_f, py_grad_f, py_g, py_grad_g_prod, py_grad_gi, py_hess_L_prod, py_hess_L;
+    };
+
+    py::class_<FunctionalProblem, Problem, ProblemTrampoline<FunctionalProblem>,
+               std::shared_ptr<FunctionalProblem>>(
+        m, "FunctionalProblem", "C++ documentation: :cpp:class:`alpaqa::FunctionalProblem`")
+        .def(py::init<length_t, length_t, length_t>(), "n"_a, "m"_a, "p"_a = 0,
+             ":param n: Number of unknowns\n"
+             ":param m: Number of constraints\n"
+             ":param p: Number of parameters")
+        .def_property(
+            "f", [](const FunctionalProblem &p) { return p.py_f; },
+            functional_setter_ret<FunctionalProblem, &FunctionalProblem::py_f,
+                                  &FunctionalProblem::f, real_t, crvec>)
+        .def_property(
+            "grad_f", [](const FunctionalProblem &p) { return p.py_grad_f; },
+            functional_setter_out<FunctionalProblem, &FunctionalProblem::py_grad_f,
+                                  &FunctionalProblem::grad_f, rvec, crvec, crvec>)
+        .def_property(
+            "g", [](const FunctionalProblem &p) { return p.py_g; },
+            functional_setter_out<FunctionalProblem, &FunctionalProblem::py_g,
+                                  &FunctionalProblem::g, rvec, crvec, crvec>)
+        .def_property(
+            "grad_g_prod", [](const FunctionalProblem &p) { return p.py_grad_g_prod; },
+            functional_setter_out<FunctionalProblem, &FunctionalProblem::py_grad_g_prod,
+                                  &FunctionalProblem::grad_g_prod, rvec, crvec, crvec, crvec>)
+        .def_property(
+            "grad_gi", [](const FunctionalProblem &p) { return p.py_grad_gi; },
+            functional_setter_out<FunctionalProblem, &FunctionalProblem::py_grad_gi,
+                                  &FunctionalProblem::grad_gi, rvec, crvec, crvec, index_t>)
+        .def_property(
+            "hess_L_prod", [](const FunctionalProblem &p) { return p.py_hess_L_prod; },
+            functional_setter_out<FunctionalProblem, &FunctionalProblem::py_hess_L_prod,
+                                  &FunctionalProblem::hess_L_prod, rvec, crvec, crvec, crvec,
+                                  crvec>)
+        .def_property(
+            "hess_L", [](const FunctionalProblem &p) { return p.py_hess_L; },
+            functional_setter_out<FunctionalProblem, &FunctionalProblem::py_hess_L,
+                                  &FunctionalProblem::hess_L, rmat, crmat, crvec, crvec>);
+
     using CountedProblem =
         alpaqa::WrappedProblemWithCounters<config_t, std::shared_ptr<const ProblemBase>>;
     py::class_<CountedProblem, ProblemBase, ProblemTrampoline<CountedProblem>,
@@ -139,8 +231,8 @@ void register_problems(py::module_ &m) {
 
     m.def(
         "with_counters",
-        [](std::shared_ptr<ProblemBase> prob) { return CountedProblem{std::move(prob)}; }, "prob"_a,
-        "Return a counted version of the given problem.");
+        [](std::shared_ptr<ProblemBase> prob) { return CountedProblem {std::move(prob)}; },
+        "prob"_a, "Return a counted version of the given problem.");
 }
 
 template void register_problems<alpaqa::EigenConfigd>(py::module_ &);

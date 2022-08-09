@@ -27,6 +27,9 @@ struct ALMParams {
     real_t Δ = 10;
     /// Factor to reduce @ref Δ when inner convergence fails.
     real_t Δ_lower = 0.8;
+    /// Minimum value for @ref Δ after reduction because of inner convergence
+    /// failure.
+    real_t Δ_min = 1.1;
     /// Initial penalty parameter. When set to zero (which is the default),
     /// it is computed automatically, based on the constraint violation in the
     /// starting point and the parameter @ref σ_0.
@@ -48,6 +51,9 @@ struct ALMParams {
     /// Factor to increase the primal tolerance update factor by if convergence
     /// fails.
     real_t ρ_increase = 2;
+    /// Maximum value of @ref ρ after increase because of inner convergence 
+    /// failure.
+    real_t ρ_max = 0.5;
     /// Error tolerance for penalty increase
     real_t θ = 0.1;
     /// Lagrange multiplier bound.

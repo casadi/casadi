@@ -44,5 +44,89 @@ def test_alm():
     print(pc.evaluations)
     assert stats['status'] == pa.SolverStatus.Converged
 
+
+def test_alm_functional():
+    import alpaqa as pa
+    import numpy as np
+    from pprint import pprint
+
+    n = 2
+    m = 2
+
+    Q = np.array([[1.5, 0.5], [0.5, 1.5]])
+
+    p = pa.FunctionalProblem(n=n, m=m, p=0)
+    p.f = lambda x: 0.5 * x.T @ Q @ x
+    p.grad_f = lambda x: Q @ x
+    p.g = lambda x: x
+    p.grad_g_prod = lambda x, y: y
+
+    p.D.lowerbound = [-np.inf, 0.5]
+    p.D.upperbound = [+np.inf, +np.inf]
+    solver = pa.PANOCSolver(
+        pa.PANOCParams(max_iter=200, print_interval=1),
+        pa.LBFGS(pa.LBFGS.Params(memory=5)),
+    )
+    almparams = pa.ALMParams(max_iter=20, print_interval=1)
+    almsolver = pa.ALMSolver(almparams, solver)
+    pc = pa.with_counters(p)
+    x0 = np.array([3, 3])
+    y0 = np.zeros((m, ))
+    x, y, stats = almsolver(pc, x=x0, y=y0)
+
+    print("x", x)
+    print("y", y)
+    pprint(stats)
+    print(pc.evaluations)
+    assert stats['status'] == pa.SolverStatus.Converged
+
+
+def test_alm_inherit():
+    import alpaqa as pa
+    import numpy as np
+    from pprint import pprint
+
+    n = 2
+    m = 2
+
+    Q = np.array([[1.5, 0.5], [0.5, 1.5]])
+
+    class MyProblem(pa.Problem):
+        vec = np.ndarray
+
+        def eval_f(self, x: vec) -> float:
+            return 0.5 * x.T @ Q @ x
+
+        def eval_grad_f(self, x: vec, grad_fx: vec):
+            grad_fx[:] = Q @ x
+
+        def eval_g(self, x: vec, gx: vec):
+            gx[:] = x
+
+        def eval_grad_g_prod(self, x: vec, y: vec, g: vec):
+            g[:] = y
+
+    p = MyProblem(n=n, m=m, p=0)
+
+    p.D.lowerbound = [-np.inf, 0.5]
+    p.D.upperbound = [+np.inf, +np.inf]
+    solver = pa.PANOCSolver(
+        pa.PANOCParams(max_iter=200, print_interval=1),
+        pa.LBFGS(pa.LBFGS.Params(memory=5)),
+    )
+    almparams = pa.ALMParams(max_iter=20, print_interval=1)
+    almsolver = pa.ALMSolver(almparams, solver)
+    pc = pa.with_counters(p)
+    x0 = np.array([3, 3])
+    y0 = np.zeros((m, ))
+    x, y, stats = almsolver(pc, x=x0, y=y0)
+
+    print("x", x)
+    print("y", y)
+    pprint(stats)
+    print(pc.evaluations)
+    assert stats['status'] == pa.SolverStatus.Converged
+
+
 if __name__ == '__main__':
-    test_alm()
+    test_alm_functional()

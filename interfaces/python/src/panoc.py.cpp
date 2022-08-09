@@ -14,11 +14,13 @@ constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 
 #include "check-dim.hpp"
 #include "kwargs-to-struct.hpp"
+#include "lbfgs-params.hpp"
 #include "type-erased-panoc-direction.hpp"
 
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::PANOCParams<Conf>> table{
+    inline static const kwargs_to_struct_table_t<alpaqa::PANOCParams<Conf>> table {
+        // clang-format off
         {"Lipschitz", &alpaqa::PANOCParams<Conf>::Lipschitz},
         {"max_iter", &alpaqa::PANOCParams<Conf>::max_iter},
         {"max_time", &alpaqa::PANOCParams<Conf>::max_time},
@@ -28,18 +30,18 @@ struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
         {"stop_crit", &alpaqa::PANOCParams<Conf>::stop_crit},
         {"max_no_progress", &alpaqa::PANOCParams<Conf>::max_no_progress},
         {"print_interval", &alpaqa::PANOCParams<Conf>::print_interval},
-        {"quadratic_upperbound_tolerance_factor",
-         &alpaqa::PANOCParams<Conf>::quadratic_upperbound_tolerance_factor},
-        {"update_lipschitz_in_linesearch",
-         &alpaqa::PANOCParams<Conf>::update_lipschitz_in_linesearch},
+        {"print_precision", &alpaqa::PANOCParams<Conf>::print_precision},
+        {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCParams<Conf>::quadratic_upperbound_tolerance_factor},
+        {"update_lipschitz_in_linesearch", &alpaqa::PANOCParams<Conf>::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond", &alpaqa::PANOCParams<Conf>::alternative_linesearch_cond},
         {"lbfgs_stepsize", &alpaqa::PANOCParams<Conf>::lbfgs_stepsize},
+        // clang-format on
     };
 };
 
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table{
+    inline static const kwargs_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table {
         {"L_0", &alpaqa::LipschitzEstimateParams<Conf>::L_0},
         {"δ", &alpaqa::LipschitzEstimateParams<Conf>::δ},
         {"ε", &alpaqa::LipschitzEstimateParams<Conf>::ε},
@@ -48,16 +50,8 @@ struct kwargs_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
 };
 
 template <alpaqa::Config Conf>
-struct kwargs_to_struct_table<alpaqa::LBFGSParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::LBFGSParams<Conf>> table{
-        {"memory", &alpaqa::LBFGSParams<Conf>::memory},
-        {"cbfgs", &alpaqa::LBFGSParams<Conf>::cbfgs},
-    };
-};
-
-template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::CBFGSParams<Conf>> {
-    inline const static kwargs_to_struct_table_t<alpaqa::CBFGSParams<Conf>> table{
+    inline static const kwargs_to_struct_table_t<alpaqa::CBFGSParams<Conf>> table {
         {"α", &alpaqa::CBFGSParams<Conf>::α},
         {"ϵ", &alpaqa::CBFGSParams<Conf>::ϵ},
     };
@@ -121,11 +115,11 @@ void register_panoc(py::module_ &m) {
 
     lbfgs //
         .def(py::init([](params_or_dict<LBFGSParams> params) {
-                 return LBFGS{var_kwargs_to_struct(params)};
+                 return LBFGS {var_kwargs_to_struct(params)};
              }),
              "params"_a)
         .def(py::init([](params_or_dict<LBFGSParams> params, length_t n) {
-                 return LBFGS{var_kwargs_to_struct(params), n};
+                 return LBFGS {var_kwargs_to_struct(params), n};
              }),
              "params"_a, "n"_a)
         .def_static("update_valid", LBFGS::update_valid, "params"_a, "yᵀs"_a, "sᵀs"_a, "pᵀp"_a)
@@ -175,46 +169,49 @@ void register_panoc(py::module_ &m) {
         .def(py::init())
         .def(py::init(&kwargs_to_struct<PANOCParams>))
         .def("to_dict", &struct_to_dict<PANOCParams>)
+        // clang-format off
         .def_readwrite("Lipschitz", &PANOCParams::Lipschitz)
         .def_readwrite("max_iter", &PANOCParams::max_iter)
         .def_readwrite("max_time", &PANOCParams::max_time)
         .def_readwrite("τ_min", &PANOCParams::τ_min)
         .def_readwrite("L_min", &PANOCParams::L_min)
         .def_readwrite("L_max", &PANOCParams::L_max)
+        .def_readwrite("stop_crit", &PANOCParams::stop_crit)
         .def_readwrite("max_no_progress", &PANOCParams::max_no_progress)
         .def_readwrite("print_interval", &PANOCParams::print_interval)
-        .def_readwrite("quadratic_upperbound_tolerance_factor",
-                       &PANOCParams::quadratic_upperbound_tolerance_factor)
-        .def_readwrite("update_lipschitz_in_linesearch",
-                       &PANOCParams::update_lipschitz_in_linesearch)
+        .def_readwrite("print_precision", &PANOCParams::print_precision)
+        .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCParams::quadratic_upperbound_tolerance_factor)
+        .def_readwrite("update_lipschitz_in_linesearch", &PANOCParams::update_lipschitz_in_linesearch)
         .def_readwrite("alternative_linesearch_cond", &PANOCParams::alternative_linesearch_cond)
-        .def_readwrite("lbfgs_stepsize", &PANOCParams::lbfgs_stepsize);
+        .def_readwrite("lbfgs_stepsize", &PANOCParams::lbfgs_stepsize)
+        // clang-format on
+        ;
 
     // ----------------------------------------------------------------------------------------- //
     using PANOCProgressInfo = alpaqa::PANOCProgressInfo<config_t>;
     py::class_<PANOCProgressInfo>(m, "PANOCProgressInfo",
                                   "Data passed to the PANOC progress callback.\n\n"
                                   "C++ documentation: :cpp:class:`alpaqa::PANOCProgressInfo`")
+        // clang-format off
         .def_readonly("k", &PANOCProgressInfo::k, "Iteration")
         .def_readonly("x", &PANOCProgressInfo::x, "Decision variable :math:`x`")
         .def_readonly("p", &PANOCProgressInfo::p, "Projected gradient step :math:`p`")
         .def_readonly("norm_sq_p", &PANOCProgressInfo::norm_sq_p, ":math:`\\left\\|p\\right\\|^2`")
-        .def_readonly("x̂", &PANOCProgressInfo::x̂,
-                      "Decision variable after projected gradient step :math:`\\hat x`")
-        .def_readonly("φγ", &PANOCProgressInfo::φγ,
-                      "Forward-backward envelope :math:`\\varphi_\\gamma(x)`")
+        .def_readonly("x̂", &PANOCProgressInfo::x̂, "Decision variable after projected gradient step :math:`\\hat x`")
+        .def_readonly("φγ", &PANOCProgressInfo::φγ, "Forward-backward envelope :math:`\\varphi_\\gamma(x)`")
         .def_readonly("ψ", &PANOCProgressInfo::ψ, "Objective value :math:`\\psi(x)`")
-        .def_readonly("grad_ψ", &PANOCProgressInfo::grad_ψ,
-                      "Gradient of objective :math:`\\nabla\\psi(x)`")
-        .def_readonly("ψ_hat", &PANOCProgressInfo::ψ_hat)
-        .def_readonly("grad_ψ_hat", &PANOCProgressInfo::grad_ψ_hat)
-        .def_readonly("L", &PANOCProgressInfo::L,
-                      "Estimate of Lipschitz constant of objective :math:`L`")
+        .def_readonly("grad_ψ", &PANOCProgressInfo::grad_ψ, "Gradient of objective :math:`\\nabla\\psi(x)`")
+        .def_readonly("ψ_hat", &PANOCProgressInfo::ψ_hat, "Objective at x̂ :math:`\\psi(\\hat x)`")
+        .def_readonly("grad_ψ_hat", &PANOCProgressInfo::grad_ψ_hat, "Gradient of objective at x̂ :math:`\\nabla\\psi(\\hat x)`")
+        .def_readonly("L", &PANOCProgressInfo::L, "Estimate of Lipschitz constant of objective :math:`L`")
         .def_readonly("γ", &PANOCProgressInfo::γ, "Step size :math:`\\gamma`")
         .def_readonly("τ", &PANOCProgressInfo::τ, "Line search parameter :math:`\\tau`")
         .def_readonly("ε", &PANOCProgressInfo::ε, "Tolerance reached :math:`\\varepsilon_k`")
         .def_readonly("Σ", &PANOCProgressInfo::Σ, "Penalty factor :math:`\\Sigma`")
         .def_readonly("y", &PANOCProgressInfo::y, "Lagrange multipliers :math:`y`")
+        .def_property_readonly("problem", [](const PANOCProgressInfo &p) -> auto & { return p.problem; }, "Problem being solved")
+        .def_property_readonly("params", [](const PANOCProgressInfo &p) -> auto & { return p.params; }, "Solver parameters")
+        // clang-format on
         .def_property_readonly(
             "fpr", [](const PANOCProgressInfo &p) { return std::sqrt(p.norm_sq_p) / p.γ; },
             "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
@@ -222,17 +219,17 @@ void register_panoc(py::module_ &m) {
     using PANOCSolver = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
         .def(py::init([](params_or_dict<PANOCParams> params, const LBFGS &lbfgs) {
-                 return PANOCSolver{var_kwargs_to_struct(params),
-                                    alpaqa::erase_direction<LBFGS>(lbfgs)};
+                 return PANOCSolver {var_kwargs_to_struct(params),
+                                     alpaqa::erase_direction<LBFGS>(lbfgs)};
              }),
              "panoc_params"_a, "LBFGS"_a, "Create a PANOC solver using L-BFGS directions.")
-        .def(py::init(
-                 [](params_or_dict<PANOCParams> params, params_or_dict<LBFGSParams> lbfgs_params) {
-                     return PANOCSolver{
-                         var_kwargs_to_struct(params),
-                         alpaqa::erase_direction<LBFGS>(LBFGS{var_kwargs_to_struct(lbfgs_params)})};
-                 }),
-             "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
+        .def(py::init([](params_or_dict<PANOCParams> params,
+                         params_or_dict<LBFGSParams> lbfgs_params) {
+                 return PANOCSolver {
+                     var_kwargs_to_struct(params),
+                     alpaqa::erase_direction<LBFGS>(LBFGS {var_kwargs_to_struct(lbfgs_params)})};
+             }),
+             "panoc_params"_a = py::dict {}, "lbfgs_params"_a = py::dict {},
              "Create a PANOC solver using L-BFGS directions.")
         .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
              "Specify a callable that is invoked with some intermediate results on each iteration "

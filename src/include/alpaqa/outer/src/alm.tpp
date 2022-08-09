@@ -1,10 +1,10 @@
 #pragma once
 
-#include <algorithm>
 #include <alpaqa/inner/internal/solverstatus.hpp>
 #include <alpaqa/outer/alm.hpp>
 #include <alpaqa/outer/src/internal/alm-helpers.tpp>
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 
@@ -67,7 +67,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
     real_t Δ                      = params.Δ;
     real_t ρ                      = params.ρ;
 
-    bool first_successful_iter = true;
+    unsigned num_successful_iters = 0;
 
     auto &&D = p.get_D();
     for (unsigned int i = 0; i < params.max_iter; ++i) {
@@ -76,7 +76,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
         Helpers::project_y(y, D.lowerbound, D.upperbound, params.M);
         // Check if we're allowed to lower the penalty factor even further.
         bool out_of_penalty_factor_updates =
-            (first_successful_iter
+            (num_successful_iters == 0
                  ? s.initial_penalty_reduced == params.max_num_initial_retries
                  : s.penalty_reduced == params.max_num_retries) ||
             (s.initial_penalty_reduced + s.penalty_reduced ==
@@ -136,22 +136,23 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
             // satisfies the required tolerance.
             // The best thing we can do now is to restore the penalty to its
             // previous value (when the inner solver did converge), then lower
-            // the penalty factor, and update the penalty with this smaller
-            // factor.
-            // error_2 was not overwritten by the inner solver, so it still
-            // contains the error from the iteration before the previous
-            // successful iteration. error_1 contains the error of the last
-            // successful iteration.
-            if (not first_successful_iter) {
+            // the penalty update factor Δ, and update the penalty with this
+            // smaller factor.
+            // On convergence failure, error_2 is not overwritten by the inner
+            // solver, so it still contains the error from the iteration before
+            // the previous successful iteration. error_1 contains the error of
+            // the last successful iteration. (Unless, of course, there hasn't
+            // been a successful iteration yet, which is covered by the second
+            // branch of the following if statement.)
+            if (num_successful_iters > 0) {
                 // We have a previous Σ and error
                 // Recompute penalty with smaller Δ
-                Δ = std::fmax(real_t(1), Δ * params.Δ_lower);
-                Helpers::update_penalty_weights(
-                    params, Δ, first_successful_iter, error_1, error_2,
-                    norm_e_1, norm_e_2, Σ_old, Σ, true);
+                Δ = std::fmax(params.Δ_min, Δ * params.Δ_lower);
+                Helpers::update_penalty_weights(params, Δ, false, error_1,
+                                                error_2, norm_e_1, norm_e_2,
+                                                Σ_old, Σ, true);
                 // Recompute the primal tolerance with larger ρ
-                ρ = std::fmin(real_t(0.5),
-                              ρ * params.ρ_increase); // keep ρ <= 0.5
+                ρ = std::fmin(params.ρ_max, ρ * params.ρ_increase);
                 ε = std::fmax(ρ * ε_old, params.ε);
                 ++s.penalty_reduced;
             } else {
@@ -191,12 +192,12 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
             // (successful) iteration.
             Σ_old.swap(Σ);
             // Update Σ to contain the penalty to use on the next iteration.
-            Helpers::update_penalty_weights(params, Δ, first_successful_iter,
-                                            error_1, error_2, norm_e_1,
-                                            norm_e_2, Σ_old, Σ, true);
+            Helpers::update_penalty_weights(
+                params, Δ, num_successful_iters == 0, error_1, error_2,
+                norm_e_1, norm_e_2, Σ_old, Σ, true);
             // Lower the primal tolerance for the inner solver.
             ε_old = std::exchange(ε, std::fmax(ρ * ε, params.ε));
-            first_successful_iter = false;
+            ++num_successful_iters;
         }
     }
     throw std::logic_error("[ALM]   loop error");
