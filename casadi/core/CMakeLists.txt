@@ -204,6 +204,10 @@ set(CASADI_INTERNAL
 
 add_executable(casadi-cli casadi_cli.cpp)
 target_link_libraries(casadi-cli casadi)
+file(RELATIVE_PATH TREL_BIN_PREFIX "${CMAKE_INSTALL_PREFIX}" "${BIN_PREFIX}")
+install(TARGETS casadi-cli
+  RUNTIME DESTINATION ${TREL_BIN_PREFIX}
+)
 
 # Add the runtime sources to internal (installed separately)
 set(RUNTIME_SRC)
