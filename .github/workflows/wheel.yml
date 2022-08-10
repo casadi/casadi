@@ -85,6 +85,7 @@ jobs:
         submodules: recursive
     - uses: actions/setup-python@v2
       name: Install Python
+      id: python
       with: 
         python-version: ${{ matrix.full-python-version }}
     - name: Cache Virtual Environment
@@ -92,7 +93,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: py-venv
-        key: ${{ runner.os }}-${{ matrix.full-python-version }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
+        key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
     - name: Install Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       shell: powershell
@@ -174,6 +175,7 @@ jobs:
       with:
         submodules: recursive
     - uses: actions/setup-python@v2
+      id: python
       name: Install Python
       with: 
         python-version: ${{ matrix.full-python-version }}
@@ -182,7 +184,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: py-venv
-        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-static.sh') }}-skylake
+        key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-static.sh') }}-skylake
     - name: Install Python Dependencies 
       if: steps.cache-venv.outputs.cache-hit != 'true'
       run: |
