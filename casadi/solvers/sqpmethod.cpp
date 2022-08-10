@@ -399,6 +399,9 @@ int Sqpmethod::solve(void* mem) const {
     // Last linesearch successfull
     bool ls_success = true;
 
+    // Last second order correction successfull
+    bool so_succes = false;
+
     // Reset
     m->merit_ind = 0;
     m->sigma = 0.;    // NOTE: Move this into the main optimization loop
@@ -409,6 +412,9 @@ int Sqpmethod::solve(void* mem) const {
 
     // For seeds
     const double one = 1.;
+
+    // Info for printing
+    string info = "";
 
     casadi_clear(d->dx, nx_);
 
@@ -451,7 +457,9 @@ int Sqpmethod::solve(void* mem) const {
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
         print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
-                        m->reg, ls_iter, ls_success);
+                        m->reg, ls_iter, ls_success, so_succes, info);
+        info = "";
+        so_succes = false;
       }
 
       // Callback function
@@ -527,7 +535,7 @@ int Sqpmethod::solve(void* mem) const {
                d->dx, d->dlam);
 
       if (elastic_mode_ && ret == SOLVER_RET_INFEASIBLE) {        
-        int it = 0;
+        int ela_it = 0;
         double gamma = 0.;
 
         // Temp datastructs for data copy
@@ -535,15 +543,20 @@ int Sqpmethod::solve(void* mem) const {
 
         // If QP was infeasible enter elastic mode
         while (ret == SOLVER_RET_INFEASIBLE) {
-          it += 1;
-          gamma = pow(10, it*(it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
+          ela_it += 1;
+          gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
 
           if (gamma > gamma_max_) {
             casadi_error("Error in elastic mode of QP solver."
                         "Gamma became larger than gamma_max.");
           }
 
-          uout() << "Entering Elastic mode with gamma = " << gamma << std::endl;
+          if (print_iteration_) {
+            ls_iter = 0;
+            ls_success = true;
+            print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
+                            m->reg, ls_iter, ls_success, so_succes, info);
+          }
 
           // Make larger gradient (has gamma for slack variables)
           temp_1 = d->gf + nx_;
@@ -577,6 +590,8 @@ int Sqpmethod::solve(void* mem) const {
 
           // Solve the QP
           ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
+
+          info = "Elastic mode QP (gamma = " + str(gamma) + ")";
         }
         
         // Get second part of dlam from temp memory
@@ -624,7 +639,6 @@ int Sqpmethod::solve(void* mem) const {
       if (so_corr_ && l1_cand > l1 && l1_infeas_cand > l1_infeas) {
         // Second order corrections
         // TODO(@KobeBergmans): How does this interact with elastic mode?
-        uout() << "Entering Second order corrections" << std::endl;
 
         // Add gradient times proposal step to bounds
         casadi_clear(d->lbdz, nx_+ng_);
@@ -647,6 +661,8 @@ int Sqpmethod::solve(void* mem) const {
 
         // Copy new dual vars
         casadi_copy(d->dlam, nx_+ng_, d_nlp->lam);
+
+        so_succes = true;
 
       } else if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
         // Line-search
@@ -739,22 +755,35 @@ int Sqpmethod::solve(void* mem) const {
   }
 
   void Sqpmethod::print_iteration() const {
-    print("%4s %14s %9s %9s %9s %7s %2s\n", "iter", "objective", "inf_pr",
-          "inf_du", "||d||", "lg(rg)", "ls");
+    print("%4s %14s %9s %9s %9s %7s %2s %7s\n", "iter", "objective", "inf_pr",
+          "inf_du", "||d||", "lg(rg)", "ls", "info");
   }
 
   void Sqpmethod::print_iteration(casadi_int iter, double obj,
                                   double pr_inf, double du_inf,
                                   double dx_norm, double rg,
-                                  casadi_int ls_trials, bool ls_success) const {
+                                  casadi_int ls_trials, bool ls_success,
+                                  bool so_succes, std::string info) const {
     print("%4d %14.6e %9.2e %9.2e %9.2e ", iter, obj, pr_inf, du_inf, dx_norm);
     if (rg>0) {
       print("%7.2f ", log10(rg));
     } else {
       print("%7s ", "-");
     }
-    print("%2d", ls_trials);
-    if (!ls_success) print("F");
+    
+    if (!so_succes) {
+      print("%2d", ls_trials);
+      if (!ls_success) {
+        print("F");
+      } else {
+        print (" ");
+      }
+    } else {
+      print("SOC");
+    }
+    
+    print(" - ");
+    print(info.c_str());
     print("\n");
   }
 
