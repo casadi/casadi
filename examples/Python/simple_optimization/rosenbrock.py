@@ -1,7 +1,3 @@
-## @example simple_optimization/python/rosenbrock.py
-# This code contains a minimal example of an optimization problem that can be 
-# built and solved using `alpaqa`, it includes visualization of the iterates.
-
 # %% Build the problem for PANOC+ALM (CasADi code, independent of alpaqa)
 import casadi as cs
 

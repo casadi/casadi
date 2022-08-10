@@ -1,7 +1,4 @@
-#include <alpaqa/config/config.hpp>
-#include <alpaqa/inner/directions/panoc/lbfgs.hpp>
-#include <alpaqa/inner/panoc.hpp>
-#include <alpaqa/outer/alm.hpp>
+#include <alpaqa/panoc-alm.hpp>
 
 #include <iostream>
 
@@ -13,20 +10,17 @@ int main() {
 
     // minimize  ½ xᵀHx
     //  s.t.     Ax ≤ b
-    mat H(2, 2);
-    H << 3, -1, -1, 3;
+    mat Q(2, 2);
+    Q << 3, -1, -1, 3;
     mat A(1, 2);
     A << 2, 1;
     vec b(1);
     b << -1;
 
-    problem.f           = [&](crvec x) { return 0.5 * x.dot(H * x); };
-    problem.grad_f      = [&](crvec x, rvec gr) { gr = H * x; };
+    problem.f           = [&](crvec x) { return 0.5 * x.dot(Q * x); };
+    problem.grad_f      = [&](crvec x, rvec gr) { gr = Q * x; };
     problem.g           = [&](crvec x, rvec g) { g = A * x; };
-    problem.grad_g_prod = [&](crvec x, crvec y, rvec gr) {
-        (void)x;
-        gr = A.transpose() * y;
-    };
+    problem.grad_g_prod = [&](crvec x, crvec y, rvec gr) { (void)x; gr = A.transpose() * y; };
 
     // Specify the bounds
     problem.C.lowerbound = vec::Constant(problem.n, -alpaqa::inf<config_t>);

@@ -1,7 +1,3 @@
-## @example simple_optimization/python/getting-started.py
-# This code contains a minimal example of an optimization problem that can be 
-# built and solved using `alpaqa`.
-
 # %% Build the problem (CasADi code, independent of alpaqa)
 import casadi as cs
 

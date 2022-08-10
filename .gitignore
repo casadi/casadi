@@ -4,3 +4,4 @@ py*-venv
 __pycache__
 dist
 wheelhouse
+*.mod

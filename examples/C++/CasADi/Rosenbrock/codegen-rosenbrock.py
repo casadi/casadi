@@ -2,7 +2,8 @@ import casadi as cs
 from sys import argv, path
 from os.path import join, dirname
 
-path.insert(0, join(dirname(__file__), '..', '..', '..', 'python', 'alpaqa'))
+py_path = join(dirname(__file__), '..', '..', '..', '..', 'python', 'alpaqa')
+path.insert(0, py_path)
 import casadi_generator
 
 if len(argv) < 2:
