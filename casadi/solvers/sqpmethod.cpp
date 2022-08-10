@@ -614,8 +614,7 @@ int Sqpmethod::solve(void* mem) const {
         m->res[0] = &fk_cand;
         m->res[1] = d->z_cand + nx_;
         if (calc_function(m, "nlp_fg")) {
-          uout() << "Something weird happened???" << std::endl;
-          l1_cand = -l1; // Make sure the second order corrections are not used!
+          l1_cand = -inf; // Make sure the second order corrections are not used!
         } else {
           l1_infeas_cand = casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
           l1_cand = fk_cand + m->sigma*l1_infeas_cand;
@@ -645,6 +644,9 @@ int Sqpmethod::solve(void* mem) const {
         // Solve the QP
         solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
             d->dx, d->dlam);
+
+        // Copy new dual vars
+        casadi_copy(d->dlam, nx_+ng_, d_nlp->lam);
 
       } else if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
         // Line-search
