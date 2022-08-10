@@ -118,6 +118,11 @@ function, which returns an instance of
     # Compile and load the problem
     prob = cl.generate_and_compile_casadi_problem(f, g)
 
+.. testoutput::
+    :options: +ELLIPSIS
+    :hide:
+
+    ...
 
 The bounds for the constraints can be initialized using lists or NumPy arrays:
 
@@ -195,6 +200,11 @@ constraints :math:`g(x) \in D`. If no initial guess is specified, the default
 initial values for :code:`x0` and :code:`y0` are zero.
 
 .. testcode::
+    :hide:
+
+    np.set_printoptions(precision=5) # make doctest predictable
+
+.. testcode::
 
     # %% Compute a solution
 
@@ -216,7 +226,7 @@ This will print something similar to:
 .. testoutput::
 
     SolverStatus.Converged
-    Solution:      [-0.25      0.578125]
+    Solution:      [-0.25     0.57812]
     Multipliers:   [103.125   0.   ]
     Cost:          28.14941
 

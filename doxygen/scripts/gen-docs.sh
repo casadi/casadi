@@ -62,6 +62,9 @@ function run_doxygen_coverage {
 
     # Generate the Sphinx Python & C++ documentation
     cmake --build "$tmpdir/build" -t docs
+    sphinx-build -b doctest -j auto -D "breathe_projects.alpaqa=$tmpdir/xml" \
+        doxygen/sphinx/source "$sphinxdir" \
+    || echo -e "\n##################\n# DOCTEST FAILED #\n##################\n"
     sphinx-build -b html -j auto -D "breathe_projects.alpaqa=$tmpdir/xml" \
         doxygen/sphinx/source "$sphinxdir"
 
