@@ -183,7 +183,8 @@ namespace casadi {
 
     /// Print iteration
     void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
-                         double dx_norm, double rg, casadi_int ls_trials, bool ls_success) const;
+                         double dx_norm, double rg, casadi_int ls_trials, bool ls_success, 
+                         bool so_succes, std::string info) const;
 
     // Solve the QP subproblem
     virtual int solve_QP(SqpmethodMemory* m, const double* H, const double* g,
