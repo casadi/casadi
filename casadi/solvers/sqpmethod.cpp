@@ -165,7 +165,7 @@ namespace casadi {
     tol_du_ = 1e-6;
     string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
-    string qpsol_plugin = "qpoases";
+    qpsol_plugin_ = "qpoases";
     Dict qpsol_options;
     print_header_ = true;
     print_iteration_ = true;
@@ -204,7 +204,7 @@ namespace casadi {
       } else if (op.first=="min_step_size") {
         min_step_size_ = op.second;
       } else if (op.first=="qpsol") {
-        qpsol_plugin = op.second.to_string();
+        qpsol_plugin_ = op.second.to_string();
       } else if (op.first=="qpsol_options") {
         qpsol_options = op.second;
       } else if (op.first=="print_header") {
@@ -287,8 +287,8 @@ namespace casadi {
       qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
     }
 
-    casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+    casadi_assert(!qpsol_plugin_.empty(), "'qpsol' option has not been set");
+    qpsol_ = conic("qpsol", qpsol_plugin_, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
 
@@ -312,8 +312,8 @@ namespace casadi {
       Dict qpsol_ela_options = Dict(qpsol_options);
       qpsol_ela_options["error_on_fail"] = false;
 
-      casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-      qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
+      casadi_assert(!qpsol_plugin_.empty(), "'qpsol' option has not been set");
+      qpsol_ela_ = conic("qpsol_ela", qpsol_plugin_, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
                     qpsol_ela_options);
       alloc(qpsol_ela_);
     }
@@ -998,12 +998,12 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.comment("Solve the QP");
     codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
     if (elastic_mode_) {
-      g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
       g << "int it = 0;\n";
       g << "double gamma = 0.;\n";
       g.comment("Temp datastructs for data copy");
       g << "double *temp_1, *temp_2;\n";
-      g << "while (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      g << "while (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
       g << "it += 1" << ";\n";
       g << "gamma = pow(10, it*(it-1)/2)*" << gamma_0_ << ";\n";
       g << "if (gamma > " << gamma_max_ << ") " << "return -1" << ";\n";
@@ -1211,8 +1211,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
-    if (elastic_mode_) {
-      cg << "int ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    if (elastic_mode_ && qpsol_plugin_ == "qrqp") {
+      cg << "int flag = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     } else {
       cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
@@ -1236,7 +1236,11 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
-    cg << "ret = " << cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    if (elastic_mode_ && qpsol_plugin_ == "qrqp") {
+      cg << "flag = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    } else {
+      cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    }
   }
 
   Dict Sqpmethod::get_stats(void* mem) const {
