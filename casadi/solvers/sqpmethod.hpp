@@ -106,6 +106,9 @@ namespace casadi {
     // Memory structure
     casadi_sqpmethod_prob<double> p_;
 
+    /// QP solver plugin
+    std::string qpsol_plugin_;
+
     /// QP solver for the subproblems
     Function qpsol_;
 

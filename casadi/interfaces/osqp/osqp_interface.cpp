@@ -276,8 +276,9 @@ namespace casadi {
     if (res[CONIC_COST]) *res[CONIC_COST] = m->work->info->obj_val;
 
     m->success = m->work->info->status_val == OSQP_SOLVED;
-    if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
-    if (m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE || 
+    if (m->success) {
+      m->unified_return_status = SOLVER_RET_SUCCESS;
+    } else if (m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE || 
         m->work->info->status_val == OSQP_MAX_ITER_REACHED ||
         m->work->info->status_val == OSQP_DUAL_INFEASIBLE ||
         m->work->info->status_val == OSQP_NON_CVX) {
@@ -413,7 +414,17 @@ namespace casadi {
     g.copy_check("work->solution->y", nx_, g.res(CONIC_LAM_X), false, true);
     g.copy_check("work->solution->y+" + str(nx_), na_, g.res(CONIC_LAM_A), false, true);
 
-    g << "if (work->info->status_val != OSQP_SOLVED) return 1;\n";
+    g << "if (work->info->status_val != OSQP_SOLVED) {\n";
+    g << "if (work->info->status_val == OSQP_PRIMAL_INFEASIBLE || ";
+    g << "work->info->status_val == OSQP_MAX_ITER_REACHED || ";
+    g << "work->info->status_val == OSQP_DUAL_INFEASIBLE || ";
+    g << "work->info->status_val == OSQP_NON_CVX) {\n";
+    g << "printf(\"Returning solver ret infeasible\\n\");\n";
+    g << "return " << SOLVER_RET_INFEASIBLE << ";\n";
+    g << "} else {\n";
+    g << "return " << SOLVER_RET_UNKNOWN << ";\n";
+    g << "}\n";
+    g << "}\n";
   }
 
   Dict OsqpInterface::get_stats(void* mem) const {
