@@ -46,6 +46,10 @@ if(WITH_HIGHS)
   add_subdirectory(highs)
 endif()
 
+if(WITH_QPSWIFT)
+  add_subdirectory(qpswift)
+endif()
+
 if(WITH_HSL)
   add_subdirectory(hsl)
 endif()

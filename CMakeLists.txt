@@ -600,6 +600,11 @@ set(BUILD_HPIPM_VERSION "b140f3633ef383cdf481ba4e8c94bdc21596c47b")
 option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source." OFF)
 set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
+# qpSWIFT
+option(WITH_QPSWIFT "Compile the interface to qpSWIFT" OFF)
+set(BUILD_QPSWIFT_VERSION "dc707056cb069a4b355ea406eb2ad28589a7fb11")
+option(WITH_BUILD_QPSWIFT "Build qpSWIFT (BUILD_QPSWIFT_VERSION=${BUILD_QPSWIFT_VERSION}) from downloaded source." OFF)
+
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
@@ -755,7 +760,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
+foreach(PKG BONMIN IPOPT CBC CLP MUMPS QPSWIFT HPIPM BLASFEO LAPACK)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -828,6 +833,28 @@ if(WITH_BLASFEO)
 
     add_library(blasfeo SHARED IMPORTED)
     set_target_properties(blasfeo PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+    )
+  else()
+    #add_library(lapack INTERFACE)
+    #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
+  endif()
+endif()
+
+if(WITH_QPSWIFT)
+  if (WITH_BUILD_QPSWIFT)
+    ExternalProject_Add(qpswift-external
+      GIT_REPOSITORY https://github.com/qpSWIFT/qpSWIFT.git
+      GIT_TAG ${BUILD_QPSWIFT_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(LAPACK_DEPENDS_TARGET openblas-external)
+
+    add_library(qpswift SHARED IMPORTED)
+    set_target_properties(qpswift PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
     )
   else()
