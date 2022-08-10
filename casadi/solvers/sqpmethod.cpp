@@ -590,44 +590,41 @@ int Sqpmethod::solve(void* mem) const {
         if (print_status_) print("WARNING(sqpmethod): Indefinite Hessian detected\n");
       }
 
-      // Stepsize
-      t = 1.0;
-      double fk_cand;
-      // Merit function value in candidate
-      double l1_cand = 0;
+      // Pre calculatations for second order corrections and linesearch
+      double l1_infeas, l1;
+      if (so_corr_ || (max_iter_ls_>0)) {
+        // Calculate penalty parameter of merit function
+        m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, d->dlam));
 
-      // Reset line-search counter, success marker
-      ls_iter = 0;
-      ls_success = true;
-
-      // Line-search
-      if (verbose_) print("Starting line-search\n");
-      // TODO(@KobeBergmans): How does this interact with elastic mode?
-      // TODO(@KobeBergmans): Make this more optimal
-
-      // Calculate penalty parameter of merit function
-      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, d->dlam));
-
-      // Calculate L1-merit function in the actual iterate
-      double l1_infeas = casadi_sum_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
-      double l1 = d_nlp->f + m->sigma * l1_infeas;
-
-      // Take candidate step
-      casadi_copy(d_nlp->z, nx_, d->z_cand);
-      casadi_axpy(nx_, t, d->dx, d->z_cand);
+        // Calculate L1-merit function in the actual iterate
+        l1_infeas = casadi_sum_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
+        l1 = d_nlp->f + m->sigma * l1_infeas;
+      }
       
-      // Evaluating objective and constraints
-      m->arg[0] = d->z_cand;
-      m->arg[1] = d_nlp->p;
-      m->res[0] = &fk_cand;
-      m->res[1] = d->z_cand + nx_;
-      if (calc_function(m, "nlp_fg")) uout() << "Something weird happened???" << std::endl;
-
-      // Calculating merit-function in candidate
-      double l1_infeas_cand = casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
-      l1_cand = fk_cand + m->sigma*l1_infeas_cand;
+      // Pre calculations for second order corrections
+      double l1_infeas_cand, l1_cand, fk_cand;
+      if (so_corr_) {
+        // Take candidate step
+        casadi_copy(d_nlp->z, nx_, d->z_cand);
+        casadi_axpy(nx_, 1., d->dx, d->z_cand);
+        
+        // Evaluating objective and constraints
+        m->arg[0] = d->z_cand;
+        m->arg[1] = d_nlp->p;
+        m->res[0] = &fk_cand;
+        m->res[1] = d->z_cand + nx_;
+        if (calc_function(m, "nlp_fg")) {
+          uout() << "Something weird happened???" << std::endl;
+          l1_cand = -l1; // Make sure the second order corrections are not used!
+        } else {
+          l1_infeas_cand = casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
+          l1_cand = fk_cand + m->sigma*l1_infeas_cand;
+        }
+      }
       
       if (so_corr_ && l1_cand > l1 && l1_infeas_cand > l1_infeas) {
+        // Second order corrections
+        // TODO(@KobeBergmans): How does this interact with elastic mode?
         uout() << "Entering Second order corrections" << std::endl;
 
         // Add bounds
@@ -635,6 +632,7 @@ int Sqpmethod::solve(void* mem) const {
         casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
 
         // Add gradient times proposal step to bounds
+        // TODO(@KobeBergmans): This is ineficient.
         casadi_mv(d->Jk, Asp_, d->dx, d->lbdz+nx_, false);
         casadi_mv(d->Jk, Asp_, d->dx, d->ubdz+nx_, false);
 
@@ -644,21 +642,25 @@ int Sqpmethod::solve(void* mem) const {
         casadi_axpy(nx_, -1., d_nlp->z, d->ubdz);
         casadi_axpy(ng_, -1., d->z_cand+nx_, d->ubdz+nx_);
 
-        // Solve the QP, only use solution if no errors occur
+        // Solve the QP
         solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
             d->dx, d->dlam);
-      } 
-      
-      if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
+
+      } else if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
+        // Line-search
+        if (verbose_) print("Starting line-search\n");
         ScopedTiming tic(m->fstats.at("linesearch"));
 
-        // Calculate penalty parameter of merit function
-        m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, d->dlam));
-        // Calculate L1-merit function in the actual iterate
-        double l1_infeas = casadi_sum_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
+        // Reset line-search counter, success marker
+        ls_iter = 0;
+        ls_success = true;
+
+        // Stepsize
+        t = 1.0;
+
         // Right-hand side of Armijo condition
         double tl1 = casadi_dot(nx_, d->dx, d->gf) - m->sigma*l1_infeas;
-        double l1 = d_nlp->f + m->sigma * l1_infeas;
+
         // Storing the actual merit function value in a list
         d->merit_mem[m->merit_ind] = l1;
         m->merit_ind++;
@@ -673,6 +675,7 @@ int Sqpmethod::solve(void* mem) const {
           ls_iter++;
 
           // Candidate step
+          // TODO(@KobeBergmans): This is still duplicate?
           casadi_copy(d_nlp->z, nx_, d->z_cand);
           casadi_axpy(nx_, t, d->dx, d->z_cand);
 
