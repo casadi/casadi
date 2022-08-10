@@ -851,6 +851,7 @@ if(WITH_HPIPM)
     set(LAPACK_DEPENDS_TARGET openblas-external)
 
     add_library(hpipm SHARED IMPORTED)
+    target_link_libraries(hpipm INTERFACE blasfeo)
     set_target_properties(hpipm PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
