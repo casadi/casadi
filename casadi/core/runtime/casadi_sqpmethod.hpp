@@ -44,7 +44,7 @@ struct casadi_sqpmethod_data {
 // SYMBOL "sqpmethod_work"
 template<typename T1>
 void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
-    casadi_int* sz_iw, casadi_int* sz_w, int elastic_mode) {
+    casadi_int* sz_iw, casadi_int* sz_w, int elastic_mode, int so_corr) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
   nnz_h = p->sp_h[2+p->sp_h[1]];
@@ -54,7 +54,7 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
 
   // Reset sz_w, sz_iw
   *sz_w = *sz_iw = 0;
-  if (p->max_iter_ls>0) *sz_w += nx + ng; // z_cand
+  if (p->max_iter_ls>0 || so_corr) *sz_w += nx + ng; // z_cand
   // Lagrange gradient in the next iterate
   *sz_w += nx; // gLag
   *sz_w += nx; // gLag_old
@@ -71,7 +71,7 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
   // Jacobian
   *sz_w += nnz_a; // Jk
   // merit_mem
-  if (p->max_iter_ls>0) *sz_w += p->merit_memsize;
+  if (p->max_iter_ls>0 || so_corr) *sz_w += p->merit_memsize;
 
   if (elastic_mode) {
     // Additional work for larger objective gradient
@@ -91,7 +91,7 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
 
 // SYMBOL "sqpmethod_init"
 template<typename T1>
-void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w, int elastic_mode) {
+void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w, int elastic_mode, int so_corr) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
   const casadi_sqpmethod_prob<T1>* p = d->prob;
@@ -100,7 +100,7 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
   nnz_a = p->sp_a[2+p->sp_a[1]];
   nx = p->nlp->nx;
   ng = p->nlp->ng;
-  if (p->max_iter_ls>0) {
+  if (p->max_iter_ls>0 || so_corr) {
     d->z_cand = *w; *w += nx + ng;
   }
   // Lagrange gradient in the next iterate
@@ -109,7 +109,7 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
   // Hessian approximation
   d->Bk = *w; *w += nnz_h;
   // merit_mem
-  if (p->max_iter_ls>0) {
+  if (p->max_iter_ls>0 || so_corr) {
     d->merit_mem = *w; *w += p->merit_memsize;
   }
 
