@@ -87,13 +87,15 @@ jobs:
         cmake --build build-examples -j --config Release
     - name: Run examples (Release)
       run: |
-        ./build-examples/Presentation/Cpp/Release/presentation-cpp
+        ./build-examples/C++/LambdaProblem/Release/lambda-problem-example
+        ./build-examples/C++/FortranProblem/Release/fortran-problem-example
     - name: Build examples (Debug)
       run: |
         cmake --build build-examples -j --config Debug
     - name: Run examples (Debug)
       run: |
-        ./build-examples/Presentation/Cpp/Debug/presentation-cpp
+        ./build-examples/C++/LambdaProblem/Debug/lambda-problem-example
+        ./build-examples/C++/FortranProblem/Debug/fortran-problem-example
     - name: Build tests (Release)
       run: |
         cmake -B build-tests -S test \
@@ -117,14 +119,16 @@ jobs:
       with:
         name: alpaqa-linux${{ matrix.suffix }}-test-examples-release
         path: |
-          build-examples/Presentation/Cpp/Release/presentation-cpp
+          build-examples/C++/LambdaProblem/Release/lambda-problem-example
+          build-examples/C++/FortranProblem/Release/fortran-problem-example
           build-tests/Release/tests
     - name: Upload (Debug)
       uses: actions/upload-artifact@v2
       with:
         name: alpaqa-linux${{ matrix.suffix }}-test-examples-debug
         path: |
-          build-examples/Presentation/Cpp/Debug/presentation-cpp
+          build-examples/C++/LambdaProblem/Debug/lambda-problem-example
+          build-examples/C++/FortranProblem/Debug/fortran-problem-example
           build-tests/Debug/tests
 
   release:
