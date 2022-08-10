@@ -253,7 +253,7 @@ namespace casadi {
     convexify_ = false;
 
     // Get/generate required functions
-    if (max_iter_ls_) create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+    if (max_iter_ls_ || so_corr_) create_function("nlp_fg", {"x", "p"}, {"f", "g"});
     // First order derivative information
 
     if (!has_function("nlp_jac_fg")) {
@@ -344,7 +344,7 @@ namespace casadi {
     set_sqpmethod_prob();
     // Allocate memory
     casadi_int sz_w, sz_iw;
-    casadi_sqpmethod_work(&p_, &sz_iw, &sz_w, elastic_mode_);
+    casadi_sqpmethod_work(&p_, &sz_iw, &sz_w, elastic_mode_, so_corr_);
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
     if (convexify_) {
@@ -369,7 +369,7 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     m->d.prob = &p_;
-    casadi_sqpmethod_init(&m->d, &iw, &w, elastic_mode_);
+    casadi_sqpmethod_init(&m->d, &iw, &w, elastic_mode_, so_corr_);
 
     m->iter_count = -1;
   }
@@ -847,7 +847,7 @@ int Sqpmethod::solve(void* mem) const {
   }
 
 void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
-    if (max_iter_ls_) g.add_dependency(get_function("nlp_fg"));
+    if (max_iter_ls_ || so_corr_) g.add_dependency(get_function("nlp_fg"));
     g.add_dependency(get_function("nlp_jac_fg"));
     if (exact_hessian_) g.add_dependency(get_function("nlp_hess_l"));
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
@@ -883,7 +883,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "p.merit_memsize = " << merit_memsize_ << ";\n";
     g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
     g << "p.nlp = &p_nlp;\n";
-    g << "casadi_sqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ");\n";
+    g << "casadi_sqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ", " << so_corr_ << ");\n";
 
     g.local("m_w", "casadi_real", "*");
     g << "m_w = w;\n";
@@ -895,11 +895,13 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.init_local("m_res", "res+" + str(NLPSOL_NUM_OUT));
     g.local("iter_count", "casadi_int");
     g.init_local("iter_count", "0");
-    if (max_iter_ls_) {
+    if (max_iter_ls_ || so_corr_) {
       //g.local("merit_ind", "casadi_int");
       //g.init_local("merit_ind", "0");
       g.local("sigma", "casadi_real");
       g.init_local("sigma", "0.0");
+    }
+    if (max_iter_ls_) {
       g.local("ls_iter", "casadi_int");
       g.init_local("ls_iter", "0");
       //g.local("ls_success", "casadi_int");
