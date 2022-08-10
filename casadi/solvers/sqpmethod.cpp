@@ -626,14 +626,14 @@ int Sqpmethod::solve(void* mem) const {
         // TODO(@KobeBergmans): How does this interact with elastic mode?
         uout() << "Entering Second order corrections" << std::endl;
 
-        // Add bounds
-        casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
-        casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
-
         // Add gradient times proposal step to bounds
-        // TODO(@KobeBergmans): This is ineficient.
+        casadi_clear(d->lbdz, nx_+ng_);
         casadi_mv(d->Jk, Asp_, d->dx, d->lbdz+nx_, false);
-        casadi_mv(d->Jk, Asp_, d->dx, d->ubdz+nx_, false);
+        casadi_copy(d->lbdz, nx_+ng_, d->ubdz);
+
+        // Add bounds
+        casadi_axpy(nx_+ng_, 1., d_nlp->lbz, d->lbdz);
+        casadi_axpy(nx_+ng_, 1., d_nlp->ubz, d->ubdz);
 
         // Subtract constraints in candidate step from bounds
         casadi_axpy(nx_, -1., d_nlp->z, d->lbdz);
@@ -1007,20 +1007,68 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << g.copy("d.temp_mem", ng_, "temp_1") << ";\n";
       g << "}\n";
     }
-    if (max_iter_ls_) {
-      g.comment("Detecting indefiniteness");
+    if (max_iter_ls_ > 0 || so_corr_) {
       g.comment("Calculate penalty parameter of merit function");
       g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d.dlam")+")") << "\n";
       g.comment("Calculate L1-merit function in the actual iterate");
       g.local("l1_infeas", "casadi_real");
       g << "l1_infeas = " << g.sum_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+      g.local("l1", "casadi_real");
+      g << "l1 = m_f + sigma * l1_infeas;\n";
+    }
+    if (so_corr_) {
+      g.local("l1_infeas_cand", "casadi_real");
+      g.local("l1_cand", "casadi_real");
+      g.local("fk_cand", "casadi_real");
+      g.comment("Take candidate step");
+      g << g.copy("d_nlp.z", nx_, "d.z_cand") << ";\n";
+      g << g.axpy(nx_, "1.", "d.dx", "d.z_cand") << ";\n";
+
+      g.comment("Evaluate objective and constraints");
+      g << "m_arg[0] = d.z_cand;\n;";
+      g << "m_arg[1] = m_p;\n;";
+      g << "m_res[0] = &fk_cand;\n;";
+      g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n;";
+      std::string nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
+      g << "if (" << nlp_fg << ") {\n";
+      g << "l1_cand = -casadi_inf;\n";
+      g << "} else {\n";
+      g << "l1_infeas_cand = " << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+      g << "l1_cand = fk_cand + sigma*l1_infeas_cand;\n";
+      g << "}\n";
+
+      g << "if (l1_cand > l1 && l1_infeas_cand > l1_infeas) {\n";
+      g.comment("Add gradient times proposal step to bounds");
+      g << g.clear("d.lbdz", nx_+ng_) << ";\n";
+      g << g.mv("d.Jk", Asp_, "d.dx", "d.lbdz+" + str(nx_), false) << ";\n";
+      g << g.copy("d.lbdz", nx_+ng_, "d.ubdz") << ";\n";
+
+      g.comment("Add bounds");
+      g << g.axpy(nx_+ng_, "1.", "d_nlp.lbz", "d.lbdz") << ";\n";
+      g << g.axpy(nx_+ng_, "1.", "d_nlp.ubz", "d.ubdz") << ";\n";
+
+      g.comment("Subtract constraints in candidate step from bounds");
+      g << g.axpy(nx_, "-1.", "d_nlp.z", "d.lbdz") << ";\n";
+      g << g.axpy(ng_, "-1", "d.z_cand+" + str(nx_), "d.lbdz+" + str(nx_)) << ";\n";
+      g << g.axpy(nx_, "-1.", "d_nlp.z", "d.ubdz") << ";\n";
+      g << g.axpy(ng_, "-1.", "d.z_cand+" + str(nx_), "d.ubdz+" + str(nx_)) << ";\n";
+
+      g.comment("Solve the QP");
+      codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+
+      g.comment("Copy new dual vars");
+      g << g.copy("d.dlam", nx_+ng_, "d_nlp.lam");
+
+      g << "} else {\n";
+    }
+
+    if (max_iter_ls_) {
+      g.comment("Detecting indefiniteness");
       g.comment("Right-hand side of Armijo condition");
       g.local("F_sens", "casadi_real");
       g << "F_sens = " << g.dot(nx_, "d.dx", "d.gf") << ";\n";
       g.local("tl1", "casadi_real");
       g << "tl1 = F_sens - sigma * l1_infeas;\n";
-      g.local("l1", "casadi_real");
-      g << "l1 = m_f + sigma * l1_infeas;\n";
       /*g.comment("Storing the actual merit function value in a list");
       g << "d.merit_mem[merit_ind] = l1;\n";
       g << "merit_ind++;\n";
@@ -1083,6 +1131,10 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g.comment("Full step");
       g << g.copy("d.dlam", nx_ + ng_, "d_nlp.lam") << "\n";
     }
+    if (so_corr_) {
+      g << "}\n";
+    }
+
     g.comment("Take step");
     g << g.axpy(nx_, "1.0", "d.dx", "d_nlp.z") << "\n";
     g << "}\n";
