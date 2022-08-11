@@ -8,6 +8,6 @@ if (CMAKE_Fortran_COMPILER)
 endif()
 
 find_package(casadi)
-if (TARGET casadi)
+if (TARGET casadi AND TARGET alpaqa::casadi-loader)
     add_subdirectory(CasADi)
 endif()
