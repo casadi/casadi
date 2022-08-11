@@ -9,10 +9,10 @@ USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
 extern "C" {
 int64_t problem_get_num_vars(void);
 int64_t problem_get_num_constr(void);
-real_t problem_eval_f(const real_t *);
-void problem_eval_grad_f(const real_t *, real_t *);
-void problem_eval_g(const real_t *, real_t *);
-void problem_eval_grad_g_prod(const real_t *, const real_t *, real_t *);
+double problem_eval_f(const double *);
+void problem_eval_grad_f(const double *, double *);
+void problem_eval_g(const double *, double *);
+void problem_eval_grad_g_prod(const double *, const double *, double *);
 }
 
 // Problem specification by inheriting from alpaqa::Problem
@@ -36,7 +36,7 @@ int main() {
     FortranProblem problem{problem_get_num_vars(), problem_get_num_constr()};
 
     // Specify the bounds
-    vec b = vec::Constant(problem.m, -1);
+    vec b                = vec::Constant(problem.m, -1);
     problem.C.lowerbound = vec::Constant(problem.n, -alpaqa::inf<config_t>);
     problem.C.upperbound = vec::Constant(problem.n, alpaqa::inf<config_t>);
     problem.D.lowerbound = vec::Constant(problem.m, -alpaqa::inf<config_t>);
