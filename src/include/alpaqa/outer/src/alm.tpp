@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <utility>
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/util/quadmath/quadmath-print.hpp>

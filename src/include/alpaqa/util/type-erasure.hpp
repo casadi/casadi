@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include <new>
+#include <utility>
 
 namespace alpaqa::util {
 
