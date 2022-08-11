@@ -998,12 +998,21 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.comment("Solve the QP");
     codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
     if (elastic_mode_) {
-      g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      if (qpsol_plugin_ == "qrqp") {
+        g << "if (qp_ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      } else {
+        g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      }
+      
       g << "int it = 0;\n";
       g << "double gamma = 0.;\n";
       g.comment("Temp datastructs for data copy");
       g << "double *temp_1, *temp_2;\n";
-      g << "while (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      if (qpsol_plugin_ == "qrqp") {
+        g << "while (qp_ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      } else {
+        g << "while (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
+      }
       g << "it += 1" << ";\n";
       g << "gamma = pow(10, it*(it-1)/2)*" << gamma_0_ << ";\n";
       g << "if (gamma > " << gamma_max_ << ") " << "return -1" << ";\n";
@@ -1212,7 +1221,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
     if (elastic_mode_ && qpsol_plugin_ == "qrqp") {
-      cg << "int flag = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+      cg << "int qp_ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     } else {
       cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
@@ -1237,7 +1246,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
     if (elastic_mode_ && qpsol_plugin_ == "qrqp") {
-      cg << "flag = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+      cg << "qp_ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     } else {
       cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
