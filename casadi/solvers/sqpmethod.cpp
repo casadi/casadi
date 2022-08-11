@@ -999,17 +999,16 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
     if (elastic_mode_) {
       if (qpsol_plugin_ == "qrqp") {
-        g << "if (qp_ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+        g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
       } else {
         g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
       }
-      
       g << "int it = 0;\n";
       g << "double gamma = 0.;\n";
       g.comment("Temp datastructs for data copy");
       g << "double *temp_1, *temp_2;\n";
       if (qpsol_plugin_ == "qrqp") {
-        g << "while (qp_ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+        g << "while (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
       } else {
         g << "while (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
       }
@@ -1221,7 +1220,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
     if (elastic_mode_ && qpsol_plugin_ == "qrqp") {
-      cg << "int qp_ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+      cg << "int ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     } else {
       cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
@@ -1245,11 +1244,12 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
-    if (elastic_mode_ && qpsol_plugin_ == "qrqp") {
-      cg << "qp_ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    if (qpsol_plugin_ == "qrqp") {
+      cg << "ret = " << cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     } else {
-      cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+      cg << cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
+    
   }
 
   Dict Sqpmethod::get_stats(void* mem) const {
