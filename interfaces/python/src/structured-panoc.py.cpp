@@ -1,3 +1,5 @@
+#include <alpaqa/util/quadmath/quadmath.hpp>
+
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
@@ -17,7 +19,7 @@ constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::StructuredPANOCLBFGSParams<Conf>> {
-    inline static const kwargs_to_struct_table_t<alpaqa::StructuredPANOCLBFGSParams<Conf>> table {
+    inline static const kwargs_to_struct_table_t<alpaqa::StructuredPANOCLBFGSParams<Conf>> table{
         // clang-format off
         {"Lipschitz", &alpaqa::StructuredPANOCLBFGSParams<Conf>::Lipschitz},
         {"max_iter", &alpaqa::StructuredPANOCLBFGSParams<Conf>::max_iter},
@@ -120,10 +122,10 @@ void register_structured_panoc(py::module_ &m) {
         "C++ documentation: :cpp:class:`alpaqa::StructuredPANOCLBFGSSolver`")
         .def(py::init([](params_or_dict<StructuredPANOCLBFGSParams> params,
                          params_or_dict<LBFGSParams> lbfgs_params) {
-                 return StructuredPANOCLBFGSSolver {var_kwargs_to_struct(params),
-                                                    var_kwargs_to_struct(lbfgs_params)};
+                 return StructuredPANOCLBFGSSolver{var_kwargs_to_struct(params),
+                                                   var_kwargs_to_struct(lbfgs_params)};
              }),
-             "panoc_params"_a = py::dict {}, "lbfgs_params"_a = py::dict {},
+             "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
              "Create a PANOC solver using L-BFGS directions.")
         .def("set_progress_callback", &StructuredPANOCLBFGSSolver::set_progress_callback,
              "callback"_a,

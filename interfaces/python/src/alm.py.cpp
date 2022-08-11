@@ -1,3 +1,5 @@
+#include <alpaqa/util/quadmath/quadmath.hpp>
+
 #include <pybind11/eigen.h>
 #include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
@@ -20,7 +22,7 @@ constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::ALMParams<Conf>> {
-    inline static const kwargs_to_struct_table_t<alpaqa::ALMParams<Conf>> table {
+    inline static const kwargs_to_struct_table_t<alpaqa::ALMParams<Conf>> table{
         {"ε", &alpaqa::ALMParams<Conf>::ε},
         {"δ", &alpaqa::ALMParams<Conf>::δ},
         {"Δ", &alpaqa::ALMParams<Conf>::Δ},
@@ -124,28 +126,28 @@ void register_alm(py::module_ &m) {
         // Default constructor
         .def(py::init([] {
                  return std::make_unique<ALMSolver>(
-                     ALMParams {}, InnerSolver {StructuredPANOCLBFGSSolver {{}, {}}});
+                     ALMParams{}, InnerSolver{StructuredPANOCLBFGSSolver{{}, {}}});
              }),
              "Build an ALM solver using Structured PANOC as inner solver.")
         // Solver only
         .def(py::init([](const PANOCSolver &inner) {
-                 return std::make_unique<ALMSolver>(ALMParams {}, InnerSolver {inner});
+                 return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
              }),
              "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
         .def(py::init([](const StructuredPANOCLBFGSSolver &inner) {
-                 return std::make_unique<ALMSolver>(ALMParams {}, InnerSolver {inner});
+                 return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
              }),
              "inner_solver"_a, "Build an ALM solver using Structured PANOC as inner solver.")
         // Params and solver
         .def(py::init([](params_or_dict<ALMParams> params, const PANOCSolver &inner) {
                  return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
-                                                    InnerSolver {inner});
+                                                    InnerSolver{inner});
              }),
              "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
         .def(
             py::init([](params_or_dict<ALMParams> params, const StructuredPANOCLBFGSSolver &inner) {
                 return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
-                                                   InnerSolver {inner});
+                                                   InnerSolver{inner});
             }),
             "alm_params"_a, "inner_solver"_a,
             "Build an ALM solver using Structured PANOC as inner solver.")

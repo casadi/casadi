@@ -155,11 +155,8 @@ class TypeErased {
     /// prevents this constructor from taking precedence over the copy and move
     /// constructors.
     template <class Tref>
-    requires(!std::is_base_of_v<
-             TypeErased,
-             std::remove_cvref_t<Tref>>) explicit TypeErased(Tref &&d,
-                                                             allocator_type
-                                                                 alloc = {})
+    explicit TypeErased(Tref &&d, allocator_type alloc = {}) //
+        requires(!std::is_base_of_v<TypeErased, std::remove_cvref_t<Tref>>)
         : allocator{std::move(alloc)} {
         using T = std::remove_cvref_t<Tref>;
         construct_inplace<T>(std::forward<Tref>(d));

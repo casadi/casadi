@@ -1,3 +1,5 @@
+#include <alpaqa/util/quadmath/quadmath.hpp>
+
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
@@ -19,7 +21,7 @@ constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
-    inline static const kwargs_to_struct_table_t<alpaqa::PANOCParams<Conf>> table {
+    inline static const kwargs_to_struct_table_t<alpaqa::PANOCParams<Conf>> table{
         // clang-format off
         {"Lipschitz", &alpaqa::PANOCParams<Conf>::Lipschitz},
         {"max_iter", &alpaqa::PANOCParams<Conf>::max_iter},
@@ -41,7 +43,7 @@ struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
 
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
-    inline static const kwargs_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table {
+    inline static const kwargs_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table{
         {"L_0", &alpaqa::LipschitzEstimateParams<Conf>::L_0},
         {"δ", &alpaqa::LipschitzEstimateParams<Conf>::δ},
         {"ε", &alpaqa::LipschitzEstimateParams<Conf>::ε},
@@ -51,7 +53,7 @@ struct kwargs_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
 
 template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::CBFGSParams<Conf>> {
-    inline static const kwargs_to_struct_table_t<alpaqa::CBFGSParams<Conf>> table {
+    inline static const kwargs_to_struct_table_t<alpaqa::CBFGSParams<Conf>> table{
         {"α", &alpaqa::CBFGSParams<Conf>::α},
         {"ϵ", &alpaqa::CBFGSParams<Conf>::ϵ},
     };
@@ -115,11 +117,11 @@ void register_panoc(py::module_ &m) {
 
     lbfgs //
         .def(py::init([](params_or_dict<LBFGSParams> params) {
-                 return LBFGS {var_kwargs_to_struct(params)};
+                 return LBFGS{var_kwargs_to_struct(params)};
              }),
              "params"_a)
         .def(py::init([](params_or_dict<LBFGSParams> params, length_t n) {
-                 return LBFGS {var_kwargs_to_struct(params), n};
+                 return LBFGS{var_kwargs_to_struct(params), n};
              }),
              "params"_a, "n"_a)
         .def_static("update_valid", LBFGS::update_valid, "params"_a, "yᵀs"_a, "sᵀs"_a, "pᵀp"_a)
@@ -219,17 +221,17 @@ void register_panoc(py::module_ &m) {
     using PANOCSolver = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
         .def(py::init([](params_or_dict<PANOCParams> params, const LBFGS &lbfgs) {
-                 return PANOCSolver {var_kwargs_to_struct(params),
-                                     alpaqa::erase_direction<LBFGS>(lbfgs)};
+                 return PANOCSolver{var_kwargs_to_struct(params),
+                                    alpaqa::erase_direction<LBFGS>(lbfgs)};
              }),
              "panoc_params"_a, "LBFGS"_a, "Create a PANOC solver using L-BFGS directions.")
-        .def(py::init([](params_or_dict<PANOCParams> params,
-                         params_or_dict<LBFGSParams> lbfgs_params) {
-                 return PANOCSolver {
-                     var_kwargs_to_struct(params),
-                     alpaqa::erase_direction<LBFGS>(LBFGS {var_kwargs_to_struct(lbfgs_params)})};
-             }),
-             "panoc_params"_a = py::dict {}, "lbfgs_params"_a = py::dict {},
+        .def(py::init(
+                 [](params_or_dict<PANOCParams> params, params_or_dict<LBFGSParams> lbfgs_params) {
+                     return PANOCSolver{
+                         var_kwargs_to_struct(params),
+                         alpaqa::erase_direction<LBFGS>(LBFGS{var_kwargs_to_struct(lbfgs_params)})};
+                 }),
+             "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
              "Create a PANOC solver using L-BFGS directions.")
         .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
              "Specify a callable that is invoked with some intermediate results on each iteration "
