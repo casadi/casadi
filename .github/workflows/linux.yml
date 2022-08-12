@@ -12,7 +12,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ghcr.io/tttapa/${{ matrix.container }}:gcc11-py3.10
+    container:
+      image: ghcr.io/tttapa/${{ matrix.container }}:py3.10
+      options: --user root
     strategy:
       matrix:
         include:
@@ -56,7 +58,9 @@ jobs:
   test:
     needs: [build]
     runs-on: ubuntu-latest
-    container: ghcr.io/tttapa/${{ matrix.container }}:gcc11-py3.10
+    container: 
+      image: ghcr.io/tttapa/${{ matrix.container }}:py3.10
+      options: --user root
     strategy:
       matrix:
         include:

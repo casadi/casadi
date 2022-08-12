@@ -12,7 +12,9 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    container: ghcr.io/tttapa/alpaqa-build-static:gcc11-py${{ matrix.python-version }}
+    container: 
+      image: ghcr.io/tttapa/alpaqa-python-build:py${{ matrix.python-version }}
+      options: --user root
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
@@ -27,7 +29,7 @@ jobs:
     - name: Build
       run: |
         python3 -m build .
-        auditwheel repair --plat manylinux_2_27_$(uname -m) dist/*$(uname -m).whl
+        auditwheel repair --plat manylinux_2_17_$(uname -m) dist/*$(uname -m).whl
       env:
         CXXFLAGS: "-march=skylake -static-libstdc++ -static-libgcc"
         LDFLAGS: "-static-libstdc++ -static-libgcc"

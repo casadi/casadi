@@ -8,7 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    container: ghcr.io/tttapa/alpaqa-docs:gcc11-py3.10
+    container: 
+      image: ghcr.io/tttapa/alpaqa-docs:py3.10
+      options: --user root
 
     steps:
     # Checks-out the repository under $GITHUB_WORKSPACE
@@ -31,7 +33,6 @@ jobs:
     - name: Install Python package and dependencies 
       run: |
         python3 -m pip install -r doxygen/requirements.txt
-        echo -e '[cmake.options]\n"ALPAQA_WITH_CASADI:BOOL" = "Off"' > py-build-cmake.local.toml
         python3 -m pip install '.[docs]'
       shell: bash
 
