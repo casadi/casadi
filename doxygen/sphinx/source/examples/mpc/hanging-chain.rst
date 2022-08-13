@@ -25,10 +25,12 @@ shown in green on the figure below.
         }, false);
     </script>
 
-.. literalinclude:: ../../../../examples/mpc/python/hanging-chain/hanging-chain-mpc.py
+.. literalinclude:: ../../../../../examples/Python/mpc/hanging-chain/hanging-chain-mpc.py
     :language: python
     :linenos:
 
-.. literalinclude:: ../../../../examples/mpc/python/hanging-chain/hanging_chain_dynamics.py
+**hanging_chain_dynamics.py**
+
+.. literalinclude:: ../../../../../examples/Python/mpc/hanging-chain/hanging_chain_dynamics.py
     :language: python
     :linenos:
