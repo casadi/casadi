@@ -1,5 +1,6 @@
 #include <alpaqa/util/quadmath/quadmath.hpp>
 
+#include <pybind11/chrono.h>
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
@@ -41,6 +42,7 @@ struct kwargs_to_struct_table<alpaqa::StructuredPANOCLBFGSParams<Conf>> {
         {"hessian_vec", &alpaqa::StructuredPANOCLBFGSParams<Conf>::hessian_vec},
         {"hessian_vec_finite_differences", &alpaqa::StructuredPANOCLBFGSParams<Conf>::hessian_vec_finite_differences},
         {"full_augmented_hessian", &alpaqa::StructuredPANOCLBFGSParams<Conf>::full_augmented_hessian},
+        {"hessian_step_size_heuristic", &alpaqa::StructuredPANOCLBFGSParams<Conf>::hessian_step_size_heuristic},
         {"lbfgs_stepsize", &alpaqa::StructuredPANOCLBFGSParams<Conf>::lbfgs_stepsize},
         // clang-format on
     };
@@ -79,6 +81,7 @@ void register_structured_panoc(py::module_ &m) {
         .def_readwrite("hessian_vec", &StructuredPANOCLBFGSParams::hessian_vec)
         .def_readwrite("hessian_vec_finite_differences", &StructuredPANOCLBFGSParams::hessian_vec_finite_differences)
         .def_readwrite("full_augmented_hessian", &StructuredPANOCLBFGSParams::full_augmented_hessian)
+        .def_readwrite("hessian_step_size_heuristic", &StructuredPANOCLBFGSParams::hessian_step_size_heuristic)
         .def_readwrite("lbfgs_stepsize", &StructuredPANOCLBFGSParams::lbfgs_stepsize)
         // clang-format on
         ;
