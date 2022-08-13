@@ -17,6 +17,13 @@ inverted pendulum mounted on a moving cart.
         }, false);
     </script>
 
+.. figure:: ../../sphinxstatic/inverted-pendulum-graphs.svg
+   :scale: 8%
+   :align: center
+   :alt: Figure of the MPC solution to the inverted pendulum problem.
+
+   Plot of the states and the control signal of the MPC solution.
+
 .. literalinclude:: ../../../../../examples/Python/mpc/inverted-pendulum-mpc.py
     :language: python
     :linenos:

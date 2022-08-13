@@ -3,25 +3,25 @@
 import casadi as cs
 
 # State vector
-x = cs.SX.sym("x")  # Cart position
-v = cs.SX.sym("v")  # Cart velocity
-θ = cs.SX.sym("θ")  # Pendulum angle
-ω = cs.SX.sym("ω")  # Pendulum angular velocity
-i = cs.SX.sym("i")  # Integral of cart position
-state = cs.vertcat(x, v, θ, ω, i)
-nx = state.shape[0]
+x = cs.SX.sym("x")  # Cart position                      [m]
+v = cs.SX.sym("v")  # Cart velocity                      [m/s]
+θ = cs.SX.sym("θ")  # Pendulum angle                     [rad]
+ω = cs.SX.sym("ω")  # Pendulum angular velocity          [rad/s]
+i = cs.SX.sym("i")  # Integral of cart position          [m s]
+state = cs.vertcat(x, v, θ, ω, i)  # Full state vector
+nx = state.shape[0]  # Number of states
 
 # Input
 F = cs.SX.sym("F")  # External force applied to the cart [N]
-nu = F.shape[0]
+nu = F.shape[0]  # Number of inputs
 
 # Parameters
 F_max = 2  #        Maximum force applied to cart        [N]
 m_cart = 0.8  #     Mass of the cart                     [kg]
 m_pend = 0.3  #     Mass of the pendulum                 [kg]
-b_cart = 0.1  #     Friction coefficient of cart         [N m⁻¹ s⁻¹]
+b_cart = 0.1  #     Friction coefficient of the cart     [N/m/s]
 l_pend = 0.3  #     Length of the pendulum               [m]
-g_gravity = 9.81  # Gravitational acceleration           [m s⁻¹]
+g_gravity = 9.81  # Gravitational acceleration           [m/s²]
 Ts = 0.025  #       Simulation sampling time             [s]
 N_horiz = 64  #     MPC horizon                          [time steps]
 N_sim = 240  #      Simulation length                    [time steps]
@@ -184,6 +184,7 @@ plt.ylim([-l_pend + h, l_pend + 2 * h])
 plt.xlim([-1.5 * l_pend, +1.5 * l_pend])
 plt.gca().set_aspect('equal', 'box')
 plt.tight_layout()
+
 
 class Animation:
 
