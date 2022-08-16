@@ -2,7 +2,7 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
@@ -448,16 +448,6 @@ namespace casadi {
     m->called_once = true;
 
     m->fstats.at("postprocessing").tic();
-
-    // uout() << std::endl << "QPOASES return flag: " << flag << std::endl;
-    // uout() << "QPOASES flag meaning: " << getErrorMessage(flag) << std::endl;
-    // uout() << "QPOASES RET_QP_INFEASIBLE: " << qpOASES::RET_QP_INFEASIBLE << std::endl;
-    // uout() << "QPOASES RET_HOTSTART_STOPPED_INFEASIBILITY: " << qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY << std::endl;
-    // uout() << "QPOASES RET_ADDCONSTRAINT_FAILED_INFEASIBILITY: " << qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY << std::endl;
-    // uout() << "QPOASES RET_ADDBOUND_FAILED_INFEASIBILITY: " << qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY << std::endl;
-    // uout() << "QPOASES RET_ENSURELI_FAILED_NOINDEX: " << qpOASES::RET_ENSURELI_FAILED_NOINDEX << std::endl;
-    // uout() << "QPOASES RET_ENSURELI_FAILED_CYCLING: " << qpOASES::RET_ENSURELI_FAILED_CYCLING << std::endl;
-    // uout() << "QPOASES SOLVER_RET_INFEASIBLE: " << qpOASES::RET_INIT_FAILED_INFEASIBILITY << std::endl << std::endl;
 
     m->return_status = flag;
     m->success = flag==qpOASES::SUCCESSFUL_RETURN;
