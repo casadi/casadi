@@ -534,8 +534,9 @@ int Sqpmethod::solve(void* mem) const {
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam);
 
-      if (elastic_mode_ && ret == SOLVER_RET_INFEASIBLE) {        
-        int ela_it = 0;
+      int ela_it = 0;
+      if (elastic_mode_ && ret == SOLVER_RET_INFEASIBLE) { 
+        uout() << "Entering elastic mode" << std::endl;       
         double gamma = 0.;
 
         // Temp datastructs for data copy
@@ -545,6 +546,8 @@ int Sqpmethod::solve(void* mem) const {
         while (ret == SOLVER_RET_INFEASIBLE) {
           ela_it += 1;
           gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
+
+          uout() << "Elastic mode with gamma = " << gamma << std::endl;
 
           if (gamma > gamma_max_) {
             casadi_error("Error in elastic mode of QP solver."
@@ -637,9 +640,6 @@ int Sqpmethod::solve(void* mem) const {
       }
       
       if (so_corr_ && l1_cand > l1 && l1_infeas_cand > l1_infeas) {
-        // Second order corrections
-        // TODO(@KobeBergmans): How does this interact with elastic mode?
-
         // Add gradient times proposal step to bounds
         casadi_clear(d->lbdz, nx_+ng_);
         casadi_mv(d->Jk, Asp_, d->dx, d->lbdz+nx_, false);
@@ -655,12 +655,76 @@ int Sqpmethod::solve(void* mem) const {
         casadi_axpy(nx_, -1., d_nlp->z, d->ubdz);
         casadi_axpy(ng_, -1., d->z_cand+nx_, d->ubdz+nx_);
 
-        // Solve the QP
-        solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
-            d->dx, d->dlam);
 
-        // Copy new dual vars
-        casadi_copy(d->dlam, nx_+ng_, d_nlp->lam);
+        int ret = 0;
+        // Second order corrections
+        if (ela_it == 0) {
+          uout() << "Entering soc" << std::endl;
+
+          // Solve the QP
+          ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
+              d->dx, d->dlam);
+        }
+
+        // Second order corrections in elastic mode
+        if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != 0)) {
+          uout() << "Entering elastic mode during soc" << std::endl;
+          double gamma = 0.;
+
+          // Temp datastructs for data copy
+          double *temp_1, *temp_2;
+
+          if (ela_it == 0) ela_it = 1;
+
+          while (ret == SOLVER_RET_INFEASIBLE) {
+            gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
+
+            uout() << "SOC elastic mode with gamma = " << gamma << std::endl;
+
+            if (gamma > gamma_max_) {
+              casadi_error("Error in second order corrections elastic mode of QP solver."
+                          "Gamma became larger than gamma_max.");
+            }
+
+            // Make larger gradient (has gamma for slack variables)
+            temp_1 = d->gf + nx_;
+            casadi_fill(temp_1, 2*ng_, gamma);
+
+            // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
+            temp_1 = d->Jk + Asp_.nnz();
+            casadi_fill(temp_1, ng_, -1.);
+            temp_1 += ng_;
+            casadi_fill(temp_1, ng_, 1.);
+
+            // Larger initial guess
+            // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
+            casadi_clear(d->dlam, nx_+3*ng_);
+            casadi_copy(d_nlp->lam, nx_, d->dlam); 
+            casadi_clear(d->dx+nx_, 2*ng_);
+
+            // Initialize larger bounds
+            temp_1 = d->lbdz + nx_;
+            temp_2 = d->lbdz + nx_+2*ng_;
+            casadi_copy(temp_1, ng_, temp_2);
+            casadi_clear(temp_1, 2*ng_);
+
+            temp_1 = d->ubdz + nx_;
+            temp_2 = d->ubdz + nx_+2*ng_;
+            casadi_copy(temp_1, ng_, temp_2);
+            casadi_fill(temp_1, 2*ng_, inf);
+
+            // Solve the QP
+            ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
+
+            ela_it += 1;
+          }
+
+          // Copy first part of lambda
+          casadi_copy(d->dlam, nx_, d_nlp->lam);
+        } else {
+          // Copy new dual vars
+          casadi_copy(d->dlam, nx_+ng_, d_nlp->lam);
+        }
 
         so_succes = true;
 
