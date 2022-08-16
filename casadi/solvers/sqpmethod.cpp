@@ -638,6 +638,8 @@ int Sqpmethod::solve(void* mem) const {
           l1_cand = fk_cand + m->sigma*l1_infeas_cand;
         }
       }
+
+      uout() << "Step before SOC: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       
       if (so_corr_ && l1_cand > l1 && l1_infeas_cand > l1_infeas) {
         // Add gradient times proposal step to bounds
@@ -655,9 +657,8 @@ int Sqpmethod::solve(void* mem) const {
         casadi_axpy(nx_, -1., d_nlp->z, d->ubdz);
         casadi_axpy(ng_, -1., d->z_cand+nx_, d->ubdz+nx_);
 
-
         int ret = 0;
-        // Second order corrections
+        // Second order corrections without elastic mode
         if (ela_it == 0) {
           uout() << "Entering soc" << std::endl;
 
@@ -697,9 +698,7 @@ int Sqpmethod::solve(void* mem) const {
             casadi_fill(temp_1, ng_, 1.);
 
             // Larger initial guess
-            // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
-            casadi_clear(d->dlam, nx_+3*ng_);
-            casadi_copy(d_nlp->lam, nx_, d->dlam); 
+            casadi_clear(d->dlam+nx_, 3*ng_);
             casadi_clear(d->dx+nx_, 2*ng_);
 
             // Initialize larger bounds
@@ -805,6 +804,7 @@ int Sqpmethod::solve(void* mem) const {
       }
 
       // Take step
+      uout() << "Step taken: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       casadi_axpy(nx_, 1., d->dx, d_nlp->z);
 
       if (!exact_hessian_) {
