@@ -542,6 +542,23 @@ int Sqpmethod::solve(void* mem) const {
         // Temp datastructs for data copy
         double *temp_1, *temp_2;
 
+        // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
+        temp_1 = d->Jk + Asp_.nnz();
+        casadi_fill(temp_1, ng_, -1.);
+        temp_1 += ng_;
+        casadi_fill(temp_1, ng_, 1.);
+
+        // Initialize bounds
+        temp_1 = d->lbdz + nx_;
+        temp_2 = d->lbdz + nx_+2*ng_;
+        casadi_copy(temp_1, ng_, temp_2);
+        casadi_clear(temp_1, 2*ng_);
+
+        temp_1 = d->ubdz + nx_;
+        temp_2 = d->ubdz + nx_+2*ng_;
+        casadi_copy(temp_1, ng_, temp_2);
+        casadi_fill(temp_1, 2*ng_, inf);
+
         // If QP was infeasible enter elastic mode
         while (ret == SOLVER_RET_INFEASIBLE) {
           ela_it += 1;
@@ -565,28 +582,12 @@ int Sqpmethod::solve(void* mem) const {
           temp_1 = d->gf + nx_;
           casadi_fill(temp_1, 2*ng_, gamma);
 
-          // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
-          temp_1 = d->Jk + Asp_.nnz();
-          casadi_fill(temp_1, ng_, -1.);
-          temp_1 += ng_;
-          casadi_fill(temp_1, ng_, 1.);
-
           // Initial guess
           // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
           casadi_clear(d->dlam, nx_+3*ng_);
           casadi_copy(d_nlp->lam, nx_, d->dlam); 
+          casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_+2*ng_);
           casadi_clear(d->dx, nx_+2*ng_);
-
-          // Initialize bounds
-          temp_1 = d->lbdz + nx_;
-          temp_2 = d->lbdz + nx_+2*ng_;
-          casadi_copy(temp_1, ng_, temp_2);
-          casadi_clear(temp_1, 2*ng_);
-
-          temp_1 = d->ubdz + nx_;
-          temp_2 = d->ubdz + nx_+2*ng_;
-          casadi_copy(temp_1, ng_, temp_2);
-          casadi_fill(temp_1, 2*ng_, inf);
 
           // Solve the QP
           ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
@@ -595,7 +596,7 @@ int Sqpmethod::solve(void* mem) const {
         }
         
         // Get second part of dlam from memory
-        casadi_copy(d_nlp->lam+nx_, ng_, d->dlam + nx_);
+        casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
       }
       
       // Detecting indefiniteness
@@ -653,7 +654,7 @@ int Sqpmethod::solve(void* mem) const {
         casadi_axpy(nx_, -1., d_nlp->z, d->ubdz);
         casadi_axpy(ng_, -1., d->z_cand+nx_, d->ubdz+nx_);
 
-        int ret = 0;
+        int ret = SOLVER_RET_INFEASIBLE;
         // Second order corrections without elastic mode
         if (ela_it == 0) {
           uout() << "Entering soc" << std::endl;
@@ -671,9 +672,24 @@ int Sqpmethod::solve(void* mem) const {
           // Temp datastructs for data copy
           double *temp_1, *temp_2;
 
-          if (ela_it == 0) ela_it = 1;
+          // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
+          temp_1 = d->Jk + Asp_.nnz();
+          casadi_fill(temp_1, ng_, -1.);
+          temp_1 += ng_;
+          casadi_fill(temp_1, ng_, 1.);
 
-          ret = SOLVER_RET_INFEASIBLE;
+          // Initialize larger bounds
+          temp_1 = d->lbdz + nx_;
+          temp_2 = d->lbdz + nx_+2*ng_;
+          casadi_copy(temp_1, ng_, temp_2);
+          casadi_clear(temp_1, 2*ng_);
+          
+          temp_1 = d->ubdz + nx_;
+          temp_2 = d->ubdz + nx_+2*ng_;
+          casadi_copy(temp_1, ng_, temp_2);
+          casadi_fill(temp_1, 2*ng_, inf);
+
+          if (ela_it == 0) ela_it = 1;
           while (ret == SOLVER_RET_INFEASIBLE) {
             gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
 
@@ -688,27 +704,11 @@ int Sqpmethod::solve(void* mem) const {
             temp_1 = d->gf + nx_;
             casadi_fill(temp_1, 2*ng_, gamma);
 
-            // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
-            temp_1 = d->Jk + Asp_.nnz();
-            casadi_fill(temp_1, ng_, -1.);
-            temp_1 += ng_;
-            casadi_fill(temp_1, ng_, 1.);
-
             // Larger initial guess
             casadi_clear(d->dlam, nx_+3*ng_);
             casadi_copy(d_nlp->lam, nx_, d->dlam); 
+            casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_+2*ng_);
             casadi_clear(d->dx, nx_+2*ng_);
-
-            // Initialize larger bounds
-            temp_1 = d->lbdz + nx_;
-            temp_2 = d->lbdz + nx_+2*ng_;
-            casadi_copy(temp_1, ng_, temp_2);
-            casadi_clear(temp_1, 2*ng_);
-
-            temp_1 = d->ubdz + nx_;
-            temp_2 = d->ubdz + nx_+2*ng_;
-            casadi_copy(temp_1, ng_, temp_2);
-            casadi_fill(temp_1, 2*ng_, inf);
 
             // Solve the QP
             ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
@@ -721,7 +721,7 @@ int Sqpmethod::solve(void* mem) const {
 
           // Copy last part of lambda from memory
           // TODO(@KobeBergmans): Is this needed?
-          casadi_copy(d_nlp->lam+nx_, ng_, d->dlam);
+          casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
         } else {
           // Copy new dual vars
           casadi_copy(d->dlam, nx_+ng_, d_nlp->lam);
