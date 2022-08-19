@@ -202,9 +202,9 @@ namespace casadi {
                           double* x_opt, double* dlam) const;
 
     // Execute elastic mode: mode 0 = normal, mode 1 = SOC
-    virtual int solve_elastic_mode(SqpmethodMemory* m, casadi_int ela_it, casadi_int ls_iter,
-                                    bool ls_success, bool so_succes, double pr_inf, double du_inf,
-                                    double dx_norminf, std::string* info, int mode) const;
+    virtual int solve_elastic_mode(SqpmethodMemory* m, casadi_int* ela_it, double gamma_1,
+                                    casadi_int ls_iter, bool ls_success, bool so_succes, double pr_inf, 
+                                    double du_inf, double dx_norminf, std::string* info, int mode) const;
 
 
     // Solve the QP subproblem
