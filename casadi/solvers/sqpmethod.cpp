@@ -416,6 +416,12 @@ int Sqpmethod::solve(void* mem) const {
     // Info for printing
     string info = "";
 
+    // gamma_1
+    double gamma_1;
+
+    // ela_it
+    casadi_int ela_it = 0;
+
     casadi_clear(d->dx, nx_);
 
     // MAIN OPTIMIZATION LOOP
@@ -534,9 +540,17 @@ int Sqpmethod::solve(void* mem) const {
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam);
 
-      int ela_it = 0;
-      if (elastic_mode_ && ret == SOLVER_RET_INFEASIBLE) { 
-        ret = solve_elastic_mode(m, ela_it, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
+      // Elastic mode calculations
+      if (elastic_mode_) {
+        if (ret == 0) {
+          ela_it = 0;
+        } else if (ret == SOLVER_RET_INFEASIBLE) { 
+          if (ela_it == 0) {
+            ela_it = 1;
+            gamma_1 = gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_);
+          }
+          ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
+        }
       }
       
       // Detecting indefiniteness
@@ -606,7 +620,11 @@ int Sqpmethod::solve(void* mem) const {
 
         // Second order corrections in elastic mode
         if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != 0)) {
-          ret = solve_elastic_mode(m, ela_it, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 1);
+          if (ela_it == 0) {
+            ela_it = 1;
+            gamma_1 = gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_);
+          } 
+          ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 1);
         }
 
         so_succes = true;
@@ -824,9 +842,9 @@ int Sqpmethod::solve(void* mem) const {
     return 0;
   }
 
-  int Sqpmethod::solve_elastic_mode(SqpmethodMemory* m, casadi_int ela_it, casadi_int ls_iter,
-                                    bool ls_success, bool so_succes, double pr_inf, double du_inf,
-                                    double dx_norminf, std::string* info, int mode) const {
+  int Sqpmethod::solve_elastic_mode(SqpmethodMemory* m, casadi_int* ela_it, double gamma_1,
+                                    casadi_int ls_iter, bool ls_success, bool so_succes, double pr_inf, 
+                                    double du_inf, double dx_norminf, std::string* info, int mode) const {
     auto d_nlp = &m->d_nlp;
     auto d = &m->d;
 
@@ -856,46 +874,45 @@ int Sqpmethod::solve(void* mem) const {
     casadi_copy(temp_1, ng_, temp_2);
     casadi_fill(temp_1, 2*ng_, inf);
 
-    // If QP was infeasible enter elastic mode
-    int ret = SOLVER_RET_INFEASIBLE;
-    if (mode == 1 && ela_it == 0) ela_it = 1;
-    while (ret == SOLVER_RET_INFEASIBLE) {
-      if (mode == 0) ela_it += 1;
-      gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
+    if (mode == 0) *ela_it += 1;
+    gamma = pow(10, *ela_it * (*ela_it - 1) / 2) * gamma_1; // TODO(@KobeBergmans): is this the right update rule?
 
-      if (mode == 0) uout() << "Elastic mode with gamma = " << gamma << std::endl;
-      else if (mode == 1) uout() << "SOC Elastic mode with gamma = " << gamma << std::endl;
+    if (mode == 0) uout() << "Elastic mode with gamma = " << gamma << std::endl;
+    else if (mode == 1) uout() << "SOC Elastic mode with gamma = " << gamma << std::endl;
 
-      if (gamma > gamma_max_) {
-        casadi_error("Error in elastic mode of QP solver."
-                    "Gamma became larger than gamma_max.");
-      }
-
-      if (mode == 0 && print_iteration_) {
-        ls_iter = 0;
-        ls_success = true;
-        print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
-                        m->reg, ls_iter, ls_success, so_succes, *info);
-      }
-
-      // Make larger gradient (has gamma for slack variables)
-      temp_1 = d->gf + nx_;
-      casadi_fill(temp_1, 2*ng_, gamma);
-
-      // Initial guess
-      // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
-      casadi_clear(d->dlam, nx_+3*ng_);
-      casadi_copy(d_nlp->lam, nx_, d->dlam); 
-      casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_+2*ng_);
-      casadi_clear(d->dx, nx_+2*ng_);
-
-      // Solve the QP
-      ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
-
-      if (mode == 0) *info = "Elastic mode QP (gamma = " + str(gamma) + ")";
-      if (mode == 1) ela_it++;
+    if (gamma > gamma_max_) {
+      casadi_error("Error in elastic mode of QP solver."
+                   "Gamma became larger than gamma_max.");
     }
-        
+
+    if (mode == 0 && print_iteration_) {
+      ls_iter = 0;
+      ls_success = true;
+      print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
+                      m->reg, ls_iter, ls_success, so_succes, *info);
+    }
+
+    // Make larger gradient (has gamma for slack variables)
+    temp_1 = d->gf + nx_;
+    casadi_fill(temp_1, 2 * ng_, gamma);
+
+    // Initial guess
+    // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
+    casadi_clear(d->dlam, nx_ + 3 * ng_);
+    casadi_copy(d_nlp->lam, nx_, d->dlam);
+    casadi_copy(d_nlp->lam + nx_, ng_, d->dlam + nx_ + 2 * ng_);
+    casadi_clear(d->dx, nx_ + 2 * ng_);
+
+    // Solve the QP
+    int ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
+
+    if (ret != 0) {
+      casadi_error("Elastic mode problem failed...");
+    }
+
+    if (mode == 0) *info = "Elastic mode QP (gamma = " + str(gamma) + ")";
+    if (mode == 1) *ela_it++;
+
     // Get second part of dlam from memory
     casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
 
