@@ -621,7 +621,7 @@ int Sqpmethod::solve(void* mem) const {
       if (so_corr_) {
         // Take candidate step
         casadi_copy(d_nlp->z, nx_, d->z_cand);
-        casadi_axpy(nx_, 1., d->dx, d->z_cand); // Full step!
+        casadi_axpy(nx_, 1., d->dx, d->z_cand); // Full step! (d->z_cand = d->z_cand + d->dx*1.)
         
         // Evaluating objective and constraints
         m->arg[0] = d->z_cand;
@@ -716,20 +716,15 @@ int Sqpmethod::solve(void* mem) const {
             ela_it += 1;
           }
 
-          // Copy first part of lambda
-          casadi_copy(d->dlam, nx_, d_nlp->lam);
-
           // Copy last part of lambda from memory
           // TODO(@KobeBergmans): Is this needed?
           casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
-        } else {
-          // Copy new dual vars
-          casadi_copy(d->dlam, nx_+ng_, d_nlp->lam);
         }
 
         so_succes = true;
 
-      } else if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
+      }
+      if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
         // Line-search
         if (verbose_) print("Starting line-search\n");
         ScopedTiming tic(m->fstats.at("linesearch"));
