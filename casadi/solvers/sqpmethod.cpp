@@ -550,6 +550,8 @@ int Sqpmethod::solve(void* mem) const {
             gamma_1 = gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_);
           }
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
+
+          if (ret == SOLVER_RET_INFEASIBLE) continue;
         }
       }
       
@@ -625,11 +627,13 @@ int Sqpmethod::solve(void* mem) const {
             gamma_1 = gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_);
           } 
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 1);
+
+          if (ret == SOLVER_RET_INFEASIBLE) continue;
         }
 
         so_succes = true;
-
       }
+
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
         // Line-search
         if (verbose_) print("Starting line-search\n");
@@ -715,6 +719,12 @@ int Sqpmethod::solve(void* mem) const {
         casadi_copy(d->gf, nx_, d->gLag_old);
         casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag_old, true);
         casadi_axpy(nx_, 1., d_nlp->lam, d->gLag_old);
+      }
+
+      // If linesearch failed enter elastic mode
+      if (!ls_success && elastic_mode_ && (max_iter_ls_>0)) {
+        ela_it = 1;
+        gamma_1 = gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_);
       }
     }
 
@@ -923,10 +933,6 @@ int Sqpmethod::solve(void* mem) const {
 
     // Solve the QP
     int ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
-
-    if (ret != 0) {
-      casadi_error("Elastic mode problem failed...");
-    }
 
     if (mode == 0) *info = "Elastic mode QP (gamma = " + str(gamma) + ")";
     if (mode == 1) *ela_it++;
