@@ -171,7 +171,7 @@ namespace casadi {
     print_iteration_ = true;
     print_status_ = true;
     elastic_mode_ = false;
-    gamma_0_ = 10e4;
+    gamma_0_ = 1;
     gamma_max_ = 10e20;
     so_corr_ = false;
 
@@ -547,7 +547,8 @@ int Sqpmethod::solve(void* mem) const {
         } else if (ret == SOLVER_RET_INFEASIBLE) { 
           if (ela_it == 0) {
             ela_it = 1;
-            gamma_1 = gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_);
+            gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+            uout() << "1. gamma_1: " << gamma_1 << std::endl;
           }
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
 
@@ -595,6 +596,9 @@ int Sqpmethod::solve(void* mem) const {
       uout() << "Step before SOC: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       
       if (so_corr_ && l1_cand > l1 && l1_infeas_cand > l1_infeas) {
+        // Copy in case of a fail
+        casadi_copy(d->dx, nx_, d->temp_dx);
+
         // Add gradient times proposal step to bounds
         casadi_clear(d->lbdz, nx_+ng_);
         casadi_mv(d->Jk, Asp_, d->dx, d->lbdz+nx_, false);
@@ -624,11 +628,14 @@ int Sqpmethod::solve(void* mem) const {
         if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != 0)) {
           if (ela_it == 0) {
             ela_it = 1;
-            gamma_1 = gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_);
+            gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+            uout() << "2. gamma_1: " << gamma_1 << std::endl;
           } 
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 1);
 
-          if (ret == SOLVER_RET_INFEASIBLE) continue;
+          if (ret == SOLVER_RET_INFEASIBLE) {
+            casadi_copy(d->temp_dx, nx_, d->dx);
+          }
         }
 
         so_succes = true;
@@ -722,9 +729,10 @@ int Sqpmethod::solve(void* mem) const {
       }
 
       // If linesearch failed enter elastic mode
-      if (!ls_success && elastic_mode_ && (max_iter_ls_>0)) {
+      if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == 0) {
         ela_it = 1;
-        gamma_1 = gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_);
+        gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+        uout() << "3. gamma_1: " << gamma_1 << std::endl;
       }
     }
 
@@ -884,8 +892,11 @@ int Sqpmethod::solve(void* mem) const {
     casadi_copy(temp_1, ng_, temp_2);
     casadi_fill(temp_1, 2*ng_, inf);
 
-    if (mode == 0) *ela_it += 1;
-    gamma = pow(10, *ela_it * (*ela_it - 1) / 2) * gamma_1; // TODO(@KobeBergmans): is this the right update rule?
+    if (*ela_it > 1) {
+      gamma = pow(10, *ela_it * (*ela_it - 1) / 2) * gamma_1;
+    } else {
+      gamma = gamma_1;
+    }
 
     if (mode == 0) uout() << "Elastic mode with gamma = " << gamma << std::endl;
     else if (mode == 1) uout() << "SOC Elastic mode with gamma = " << gamma << std::endl;
@@ -935,10 +946,13 @@ int Sqpmethod::solve(void* mem) const {
     int ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
 
     if (mode == 0) *info = "Elastic mode QP (gamma = " + str(gamma) + ")";
-    if (mode == 1) *ela_it++;
 
     // Get second part of dlam from memory
     casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
+
+    uout() << "elastic mode iteration: " << *ela_it << std::endl;
+
+    if (mode == 0) (*ela_it)++;
 
     return ret;
   }
