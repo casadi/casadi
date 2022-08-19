@@ -903,6 +903,24 @@ int Sqpmethod::solve(void* mem) const {
     casadi_copy(d_nlp->lam + nx_, ng_, d->dlam + nx_ + 2 * ng_);
     casadi_clear(d->dx, nx_ + 2 * ng_);
 
+    // Make initial guess feasible on x values
+    for (casadi_int i = 0; i < nx_; ++i) {
+      if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
+      else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
+    }
+
+    // Make initial guess feasible on constraints by altering slack variables
+    casadi_mv(d->Jk, Asp_, d->dx, d->temp_mem, false);
+    for (casadi_int i = 0; i < ng_; ++i) {
+      if (d->ubdz[i]-d->temp_mem[i] < 0) {
+        d->dx[nx_+i] = -d->ubdz[i]+d->temp_mem[i];
+      }
+
+      if (d->lbdz[i]-d->temp_mem[i] > 0) {
+        d->dx[nx_+ng_+i] = d->lbdz[i]-d->temp_mem[i];
+      }
+    }
+
     // Solve the QP
     int ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
 
