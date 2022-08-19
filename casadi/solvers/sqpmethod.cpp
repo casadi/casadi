@@ -536,67 +536,7 @@ int Sqpmethod::solve(void* mem) const {
 
       int ela_it = 0;
       if (elastic_mode_ && ret == SOLVER_RET_INFEASIBLE) { 
-        uout() << "Entering elastic mode" << std::endl;       
-        double gamma = 0.;
-
-        // Temp datastructs for data copy
-        double *temp_1, *temp_2;
-
-        // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
-        temp_1 = d->Jk + Asp_.nnz();
-        casadi_fill(temp_1, ng_, -1.);
-        temp_1 += ng_;
-        casadi_fill(temp_1, ng_, 1.);
-
-        // Initialize bounds
-        temp_1 = d->lbdz + nx_;
-        temp_2 = d->lbdz + nx_+2*ng_;
-        casadi_copy(temp_1, ng_, temp_2);
-        casadi_clear(temp_1, 2*ng_);
-
-        temp_1 = d->ubdz + nx_;
-        temp_2 = d->ubdz + nx_+2*ng_;
-        casadi_copy(temp_1, ng_, temp_2);
-        casadi_fill(temp_1, 2*ng_, inf);
-
-        // If QP was infeasible enter elastic mode
-        while (ret == SOLVER_RET_INFEASIBLE) {
-          ela_it += 1;
-          gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
-
-          uout() << "Elastic mode with gamma = " << gamma << std::endl;
-
-          if (gamma > gamma_max_) {
-            casadi_error("Error in elastic mode of QP solver."
-                        "Gamma became larger than gamma_max.");
-          }
-
-          if (print_iteration_) {
-            ls_iter = 0;
-            ls_success = true;
-            print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
-                            m->reg, ls_iter, ls_success, so_succes, info);
-          }
-
-          // Make larger gradient (has gamma for slack variables)
-          temp_1 = d->gf + nx_;
-          casadi_fill(temp_1, 2*ng_, gamma);
-
-          // Initial guess
-          // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
-          casadi_clear(d->dlam, nx_+3*ng_);
-          casadi_copy(d_nlp->lam, nx_, d->dlam); 
-          casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_+2*ng_);
-          casadi_clear(d->dx, nx_+2*ng_);
-
-          // Solve the QP
-          ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
-
-          info = "Elastic mode QP (gamma = " + str(gamma) + ")";
-        }
-        
-        // Get second part of dlam from memory
-        casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
+        ret = solve_elastic_mode(m, ela_it, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
       }
       
       // Detecting indefiniteness
@@ -666,59 +606,7 @@ int Sqpmethod::solve(void* mem) const {
 
         // Second order corrections in elastic mode
         if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != 0)) {
-          uout() << "Entering elastic mode during soc" << std::endl;
-          double gamma = 0.;
-
-          // Temp datastructs for data copy
-          double *temp_1, *temp_2;
-
-          // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
-          temp_1 = d->Jk + Asp_.nnz();
-          casadi_fill(temp_1, ng_, -1.);
-          temp_1 += ng_;
-          casadi_fill(temp_1, ng_, 1.);
-
-          // Initialize larger bounds
-          temp_1 = d->lbdz + nx_;
-          temp_2 = d->lbdz + nx_+2*ng_;
-          casadi_copy(temp_1, ng_, temp_2);
-          casadi_clear(temp_1, 2*ng_);
-          
-          temp_1 = d->ubdz + nx_;
-          temp_2 = d->ubdz + nx_+2*ng_;
-          casadi_copy(temp_1, ng_, temp_2);
-          casadi_fill(temp_1, 2*ng_, inf);
-
-          if (ela_it == 0) ela_it = 1;
-          while (ret == SOLVER_RET_INFEASIBLE) {
-            gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
-
-            uout() << "SOC elastic mode with gamma = " << gamma << std::endl;
-
-            if (gamma > gamma_max_) {
-              casadi_error("Error in second order corrections elastic mode of QP solver."
-                          "Gamma became larger than gamma_max.");
-            }
-
-            // Make larger gradient (has gamma for slack variables)
-            temp_1 = d->gf + nx_;
-            casadi_fill(temp_1, 2*ng_, gamma);
-
-            // Larger initial guess
-            casadi_clear(d->dlam, nx_+3*ng_);
-            casadi_copy(d_nlp->lam, nx_, d->dlam); 
-            casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_+2*ng_);
-            casadi_clear(d->dx, nx_+2*ng_);
-
-            // Solve the QP
-            ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
-
-            ela_it += 1;
-          }
-
-          // Copy last part of lambda from memory
-          // TODO(@KobeBergmans): Is this needed?
-          casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
+          ret = solve_elastic_mode(m, ela_it, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 1);
         }
 
         so_succes = true;
@@ -934,6 +822,84 @@ int Sqpmethod::solve(void* mem) const {
     if (verbose_) print("Elastic QP solved\n");
 
     return 0;
+  }
+
+  int Sqpmethod::solve_elastic_mode(SqpmethodMemory* m, casadi_int ela_it, casadi_int ls_iter,
+                                    bool ls_success, bool so_succes, double pr_inf, double du_inf,
+                                    double dx_norminf, std::string* info, int mode) const {
+    auto d_nlp = &m->d_nlp;
+    auto d = &m->d;
+
+    if (mode == 0) uout() << "Entering elastic mode" << std::endl;
+    else if (mode == 1) uout() << "Entering elastic mode during soc" << std::endl;
+    else casadi_error("Wrong mode provided to solve_elastic_mode.");
+    
+    double gamma = 0.;
+
+    // Temp datastructs for data copy
+    double *temp_1, *temp_2;
+
+    // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
+    temp_1 = d->Jk + Asp_.nnz();
+    casadi_fill(temp_1, ng_, -1.);
+    temp_1 += ng_;
+    casadi_fill(temp_1, ng_, 1.);
+
+    // Initialize bounds
+    temp_1 = d->lbdz + nx_;
+    temp_2 = d->lbdz + nx_+2*ng_;
+    casadi_copy(temp_1, ng_, temp_2);
+    casadi_clear(temp_1, 2*ng_);
+
+    temp_1 = d->ubdz + nx_;
+    temp_2 = d->ubdz + nx_+2*ng_;
+    casadi_copy(temp_1, ng_, temp_2);
+    casadi_fill(temp_1, 2*ng_, inf);
+
+    // If QP was infeasible enter elastic mode
+    int ret = SOLVER_RET_INFEASIBLE;
+    if (mode == 1 && ela_it == 0) ela_it = 1;
+    while (ret == SOLVER_RET_INFEASIBLE) {
+      if (mode == 0) ela_it += 1;
+      gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_0_; // TODO(@KobeBergmans): is this the right update rule?
+
+      if (mode == 0) uout() << "Elastic mode with gamma = " << gamma << std::endl;
+      else if (mode == 1) uout() << "SOC Elastic mode with gamma = " << gamma << std::endl;
+
+      if (gamma > gamma_max_) {
+        casadi_error("Error in elastic mode of QP solver."
+                    "Gamma became larger than gamma_max.");
+      }
+
+      if (mode == 0 && print_iteration_) {
+        ls_iter = 0;
+        ls_success = true;
+        print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
+                        m->reg, ls_iter, ls_success, so_succes, *info);
+      }
+
+      // Make larger gradient (has gamma for slack variables)
+      temp_1 = d->gf + nx_;
+      casadi_fill(temp_1, 2*ng_, gamma);
+
+      // Initial guess
+      // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
+      casadi_clear(d->dlam, nx_+3*ng_);
+      casadi_copy(d_nlp->lam, nx_, d->dlam); 
+      casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_+2*ng_);
+      casadi_clear(d->dx, nx_+2*ng_);
+
+      // Solve the QP
+      ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
+
+      if (mode == 0) *info = "Elastic mode QP (gamma = " + str(gamma) + ")";
+      if (mode == 1) ela_it++;
+    }
+        
+    // Get second part of dlam from memory
+    casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
+
+    return ret;
   }
 
 void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
