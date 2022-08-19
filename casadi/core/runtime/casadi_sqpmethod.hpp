@@ -37,6 +37,8 @@ struct casadi_sqpmethod_data {
   T1* merit_mem;
   // temp_mem
   T1* temp_mem;
+  // temp_dx
+  T1* temp_dx;
 };
 // C-REPLACE "casadi_sqpmethod_data<T1>" "struct casadi_sqpmethod_data"
 
@@ -87,6 +89,8 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
     // Additional work for temp memory
     *sz_w += ng;
   }
+
+  if (so_corr) *sz_w += nx; // Temp memory for failing elastic mode
 }
 
 // SYMBOL "sqpmethod_init"
@@ -111,6 +115,12 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
   // merit_mem
   if (p->max_iter_ls>0 || so_corr) {
     d->merit_mem = *w; *w += p->merit_memsize;
+  }
+
+  if (so_corr) {
+    d->temp_dx = *w; *w += nx;
+  } else {
+    d->temp_dx = *w;
   }
 
   if (elastic_mode) {
