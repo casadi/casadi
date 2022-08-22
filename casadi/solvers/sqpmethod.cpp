@@ -738,11 +738,11 @@ int Sqpmethod::solve(void* mem) const {
       }
 
       // If linesearch failed enter elastic mode
-      // if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == 0) {
-      //   ela_it = 1;
-      //   gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
-      //   uout() << "3. gamma_1: " << gamma_1 << std::endl;
-      // }
+      if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == 0) {
+        ela_it = 1;
+        gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+        uout() << "3. gamma_1: " << gamma_1 << std::endl;
+      }
     }
 
     return 0;
