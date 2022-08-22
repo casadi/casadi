@@ -294,7 +294,6 @@ namespace casadi {
 
     if (elastic_mode_) {
       // Generate sparsity patterns for elastic mode
-      // TODO(@KobeBergmans): Maybe add documentation on how the sparsity patterns are formed for elastic mode?
       Hsp_ela_ = Sparsity(Hsp_);
       Asp_ela_ = Sparsity(Asp_);
 
@@ -307,8 +306,6 @@ namespace casadi {
       Asp_ela_.appendColumns(dsp);
 
       // Allocate QP solver for elastic mode
-      // TODO(@KobeBergmans): Maybe we do not always do this? Only when elastic mode is initiated?
-      //                      Because elastic mode is not always used even when the setting is on.
       Dict qpsol_ela_options = Dict(qpsol_options);
       qpsol_ela_options["error_on_fail"] = false;
 
@@ -678,27 +675,29 @@ int Sqpmethod::solve(void* mem) const {
           // Increase counter
           ls_iter++;
 
-          // Candidate step
-          // TODO(@KobeBergmans): This is still duplicate?
-          casadi_copy(d_nlp->z, nx_, d->z_cand);
-          casadi_axpy(nx_, t, d->dx, d->z_cand);
+          // Candidate step (Not in the first iteration because this is done beforehand)
+          if (!so_corr_ || ls_iter != 1) {
+            casadi_copy(d_nlp->z, nx_, d->z_cand);
+            casadi_axpy(nx_, t, d->dx, d->z_cand);
 
-          // Evaluating objective and constraints
-          m->arg[0] = d->z_cand;
-          m->arg[1] = d_nlp->p;
-          m->res[0] = &fk_cand;
-          m->res[1] = d->z_cand + nx_;
-          if (calc_function(m, "nlp_fg")) {
-            // Avoid infinite recursion
-            if (ls_iter == max_iter_ls_) {
-              ls_success = false;
-              l1_infeas = nan;
-              break;
+            // Evaluating objective and constraints
+            m->arg[0] = d->z_cand;
+            m->arg[1] = d_nlp->p;
+            m->res[0] = &fk_cand;
+            m->res[1] = d->z_cand + nx_;
+            if (calc_function(m, "nlp_fg")) {
+              // Avoid infinite recursion
+              if (ls_iter == max_iter_ls_) {
+                ls_success = false;
+                l1_infeas = nan;
+                break;
+              }
+              // line-search failed, skip iteration
+              t = beta_ * t;
+              continue;
             }
-            // line-search failed, skip iteration
-            t = beta_ * t;
-            continue;
           }
+          
 
           // Calculating merit-function in candidate
           l1_cand = fk_cand + m->sigma*casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
@@ -927,7 +926,6 @@ int Sqpmethod::solve(void* mem) const {
     casadi_fill(temp_1, 2 * ng_, gamma);
 
     // Initial guess
-    // TODO(@KobeBergmans): Is it right that we copy only the first part of the lambda vector because the constraints change?
     casadi_clear(d->dlam, nx_ + 3 * ng_);
     casadi_copy(d_nlp->lam, nx_, d->dlam);
     casadi_copy(d_nlp->lam + nx_, ng_, d->dlam + nx_ + 2 * ng_);
