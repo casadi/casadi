@@ -1003,6 +1003,12 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "p.nlp = &p_nlp;\n";
     g << "casadi_sqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ", " << so_corr_ << ");\n";
 
+    if (elastic_mode_) {
+      g << "double gamma_1;\n";
+      g << "casadi_int ela_it = 0;\n";
+      g << "int ret = 0;\n";
+    }
+
     g.local("m_w", "casadi_real", "*");
     g << "m_w = w;\n";
     g.local("m_iw", "casadi_int", "*");
@@ -1022,8 +1028,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     if (max_iter_ls_) {
       g.local("ls_iter", "casadi_int");
       g.init_local("ls_iter", "0");
-      //g.local("ls_success", "casadi_int");
-      //g.init_local("ls_success", "1");
+      g.local("ls_success", "casadi_int");
+      g.init_local("ls_success", "1");
       g.local("t", "casadi_real");
       g.init_local("t", "0.0");
     }
@@ -1086,58 +1092,50 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "iter_count++;\n";
     g.comment("Solve the QP");
     codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+
     if (elastic_mode_) {
       if (qpsol_plugin_ == "qrqp") {
-        g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+        g << "if (ret == " << 0 << ") {\n";
       } else {
-        g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
+        g << "if (flag == " << 0 << ") {\n";
       }
-      g << "int it = 0;\n";
-      g << "double gamma = 0.;\n";
-      g.comment("Temp datastructs for data copy");
-      g << "double *temp_1, *temp_2;\n";
+      g << "ela_it = 0;\n";
       if (qpsol_plugin_ == "qrqp") {
-        g << "while (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+        g << "} else if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
       } else {
-        g << "while (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
+        g << "} else if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
       }
-      g << "it += 1" << ";\n";
-      g << "gamma = pow(10, it*(it-1)/2)*" << gamma_0_ << ";\n";
-      g << "if (gamma > " << gamma_max_ << ") " << "return -1" << ";\n";
-      g.comment("Make larger gradient (has gamma for slack variables)");
-      g << "temp_1 = d.gf + " << nx_ << ";\n";
-      g << g.fill("temp_1", 2*ng_, "gamma") << ";\n";
-      g.comment("Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)");
-      g << "temp_1 = d.Jk + " << Asp_.nnz() << ";\n";
-      g << g.fill("temp_1", ng_, "-1.") << ";\n";
-      g << "temp_1 += " << ng_ << ";\n";
-      g << g.fill("temp_1", ng_, "1.") << ";\n";
-      g.comment("Initial guess");
-      g << "temp_1 = d.dlam + " << nx_ << ";\n";
-      g << g.copy("temp_1", ng_, "d.temp_mem") << ";\n";
-      g << g.clear("d.dlam", nx_+3*ng_) << ";\n";
-      g << g.copy("d_nlp.lam", nx_, "d.dlam") << ";\n";
-      g << g.clear("d.dx", nx_+2*ng_) << ";\n";
-      g.comment("Initialize bounds");
-      g << "temp_1 = d.lbdz + " << nx_ << ";\n";
-      g << "temp_2 = d.lbdz + " << nx_ + 2*ng_ << ";\n";
-      g << g.copy("temp_1", ng_, "temp_2") << ";\n";
-      g << g.clear("temp_1", 2*ng_) << ";\n";
-      g << "temp_1 = d.ubdz + " << nx_ << ";\n";
-      g << "temp_2 = d.ubdz + " << nx_ + 2*ng_ << ";\n";
-      g << g.copy("temp_1", ng_, "temp_2") << ";\n";
-      g << g.fill("temp_1", 2*ng_, g.constant(inf)) << ";\n";
-      g.comment("Solve the QP");
-      codegen_qp_ela_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+      g << "if (ela_it == 0) {\n";
+      g << "ela_it = 1;\n";
+      g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
+      g << "gamma_1 = " << g.fmax("temp_norm", "1e-5") << ";\n";
       g << "}\n";
-      g.comment("Get second part of dlam from temp memory");
-      g << "temp_1 = d.dlam + " << nx_ << ";\n";
-      g << g.copy("d.temp_mem", ng_, "temp_1") << ";\n";
+      codegen_solve_elastic_mode(g, 0);
+      if (qpsol_plugin_ == "qrqp") {
+        g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
+      } else {
+        g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
+      }
+
+      g << "} else if (ela_it == 0) {\n";
+      g << "double g_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
+      g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
+      g << "gamma_1 = " << g.fmax("temp_norm", "1e-5") << ";\n";
+      g << "if (g_inf > gamma_1) {\n";
+      g << "ela_it = 1;\n";
+      codegen_solve_elastic_mode(g, 0);
+      if (qpsol_plugin_ == "qrqp") {
+        g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
+      } else {
+        g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
+      }
+      g << "}\n";
       g << "}\n";
     }
+        
     if (max_iter_ls_ > 0 || so_corr_) {
       g.comment("Calculate penalty parameter of merit function");
-      g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d.dlam")+")") << "\n";
+      g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d.dlam")+")") << ";\n";
       g.comment("Calculate L1-merit function in the actual iterate");
       g.local("l1_infeas", "casadi_real");
       g << "l1_infeas = " << g.sum_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
@@ -1166,6 +1164,9 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "}\n";
 
       g << "if (l1_cand > l1 && l1_infeas_cand > l1_infeas) {\n";
+      g.comment("Copy in case of fail");
+      g << g.copy("d.dx", nx_, "d.temp_dx") << ";\n";
+
       g.comment("Add gradient times proposal step to bounds");
       g << g.clear("d.lbdz", nx_+ng_) << ";\n";
       g << g.mv("d.Jk", Asp_, "d.dx", "d.lbdz+" + str(nx_), false) << ";\n";
@@ -1181,13 +1182,43 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << g.axpy(nx_, "-1.", "d_nlp.z", "d.ubdz") << ";\n";
       g << g.axpy(ng_, "-1.", "d.z_cand+" + str(nx_), "d.ubdz+" + str(nx_)) << ";\n";
 
-      g.comment("Solve the QP");
-      codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+      if (!elastic_mode_) {
+        codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+      } else {
+        if (qpsol_plugin_ == "qrqp") {
+          g << "ret = " << SOLVER_RET_INFEASIBLE << ";\n";
+        } else {
+          g << "flag = " << SOLVER_RET_INFEASIBLE << ";\n";
+        }
+        g.comment("Second order corrections without elastic mode");
+        g << "if (ela_it == 0) {\n";      
+        g << "printf(\"Entering SOC\\n\");\n";
+        codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+        g << "}\n";
 
-      g.comment("Copy new dual vars");
-      g << g.copy("d.dlam", nx_+ng_, "d_nlp.lam");
+        g.comment("Second order corrections in elastic mode");
+        if (qpsol_plugin_ == "qrqp") {
+          g << "if (ret == " << SOLVER_RET_INFEASIBLE << " || ela_it != 0) {\n";
+        } else {
+          g << "if (flag == " << SOLVER_RET_INFEASIBLE << " || ela_it != 0) {\n";
+        }
+        g << "if (ela_it == 0) {\n";
+        g << "ela_it = 1;\n";
+        g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
+        g << "gamma_1 = " << g.fmax("temp_norm", "1e-5") << ";\n";
+        g << "}\n";
+        codegen_solve_elastic_mode(g, 1);
 
-      g << "} else {\n";
+        if (qpsol_plugin_ == "qrqp") {
+          g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
+        } else {
+          g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
+        }
+        g << g.copy("d.temp_dx", nx_, "d.dx");
+        g << "}\n";
+        g << "}\n";
+      }
+      g << "}\n";
     }
 
     if (max_iter_ls_) {
@@ -1213,30 +1244,40 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "l1_cand = 0.0;\n";
       g.comment("Reset line-search counter, success marker");
       g << "ls_iter = 0;\n";
-      //g << "ls_success = 1;\n";
+      g << "ls_success = 1;\n";
       g.comment("Line-search loop");
       g << "while (1) {\n";
       g.comment(" Increase counter");
       g << "ls_iter++;\n";
-      g.comment("Candidate step");
+      if (so_corr_) {
+        g.comment("Candidate step (Not in the first iteration because this is done beforehand)");
+        g << "if (ls_iter != 1) {\n";
+      } else {
+        g.comment("Candidate step");
+      }
       g << g.copy("d_nlp.z", nx_, "d.z_cand") << "\n";
       g << g.axpy(nx_, "t", "d.dx", "d.z_cand") << "\n";
       g.comment("Evaluating objective and constraints");
-      g << "m_arg[0] = d.z_cand;\n;";
-      g << "m_arg[1] = m_p;\n;";
-      g << "m_res[0] = &fk_cand;\n;";
-      g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n;";
+      g << "m_arg[0] = d.z_cand;\n";
+      g << "m_arg[1] = m_p;\n";
+      g << "m_res[0] = &fk_cand;\n";
+      g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n";
       std::string nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
       g << "if (" << nlp_fg << ") {\n";
       g.comment("Avoid infinite recursion");
       g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
-      //g << "ls_success = 0;\n";
+      g << "ls_success = 0;\n";
       g << "break;\n";
       g << "}\n";
       g.comment("line-search failed, skip iteration");
       g << "t = " << beta_ << "* t;\n";
       g << "continue;\n";
       g << "}\n";
+      
+      if (so_corr_) {
+        g << "}\n";
+      }
+
       g.comment("Calculating merit-function in candidate");
       g << "l1_cand = fk_cand + sigma * "
         << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") + ";\n";
@@ -1245,7 +1286,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "}\n";
       g.comment("Line-search not successful, but we accept it.");
       g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
-      //g << "ls_success = 0;\n";
+      g << "ls_success = 0;\n";
       g << "break;\n";
       g << "}\n";
       g.comment("Backtracking");
@@ -1259,12 +1300,19 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g.comment("Full step");
       g << g.copy("d.dlam", nx_ + ng_, "d_nlp.lam") << "\n";
     }
-    if (so_corr_) {
-      g << "}\n";
-    }
 
     g.comment("Take step");
+    g << "printf(\"Step taken: %f, %f\\n\", d.dx[0], d.dx[1]);\n";
     g << g.axpy(nx_, "1.0", "d.dx", "d_nlp.z") << "\n";
+
+    if (elastic_mode_ && max_iter_ls_ > 0) {
+      g.comment("If linesearch failed enter elastic mode");
+      g << "if (ls_success == 0 && ela_it == 0) {\n";
+      g << "ela_it = 1;\n";
+      g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
+      g << "gamma_1 = " << g.fmax("temp_norm", "1e-5") << ";\n";
+      g << "}\n";
+    }
     g << "}\n";
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
       g << "m_arg[0] = d_nlp.z;\n";
@@ -1309,7 +1357,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
     if (elastic_mode_ && qpsol_plugin_ == "qrqp") {
-      cg << "int ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+      cg << "ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     } else {
       cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
@@ -1338,7 +1386,72 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     } else {
       cg << cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
+  }
+
+  void Sqpmethod::codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const {
+    cg << "double gamma = 0.;\n";
+
+    cg.comment("Temp datastructs for data copy");
+    cg << "double *temp_1, *temp_2;\n";
+
+    cg.comment("Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)");
+    cg << "temp_1 = d.Jk + " << Asp_.nnz() << ";\n";
+    cg << cg.fill("temp_1", ng_, "-1.") << ";\n";
+    cg << "temp_1 += " << ng_ << ";\n";
+    cg << cg.fill("temp_1", ng_, "1.") << ";\n";
+
+    cg.comment("Initialize bounds");
+    cg << "temp_1 = d.lbdz + " << nx_ << ";\n";
+    cg << "temp_2 = d.lbdz + " << nx_ + 2*ng_ << ";\n";
+    cg << cg.copy("temp_1", ng_, "temp_2") << ";\n";
+    cg << cg.clear("temp_1", 2*ng_) << ";\n";
+    cg << "temp_1 = d.ubdz + " << nx_ << ";\n";
+    cg << "temp_2 = d.ubdz + " << nx_ + 2*ng_ << ";\n";
+    cg << cg.copy("temp_1", ng_, "temp_2") << ";\n";
+    cg << cg.fill("temp_1", 2*ng_, cg.constant(inf)) << ";\n";
+
+    cg << "if (ela_it > 1) {\n";
+    cg << "gamma = pow(10, ela_it*(ela_it-1)/2)*gamma_1;\n";
+    cg << "} else {\n";
+    cg << "gamma = gamma_1;\n";
+    cg << "}\n";
+    cg << "if (gamma > " << gamma_max_ << ") " << "return -1" << ";\n";
+
+    cg.comment("Make larger gradient (has gamma for slack variables)");
+    cg << "temp_1 = d.gf + " << nx_ << ";\n";
+    cg << cg.fill("temp_1", 2*ng_, "gamma") << ";\n";
+
+    cg.comment("Initial guess");
+    cg << cg.clear("d.dlam", nx_+3*ng_) << "\n";
+    cg << cg.copy("d_nlp.lam", nx_, "d.dlam") << "\n";
+    cg << cg.copy("d_nlp.lam+"+str(nx_), ng_, "d.dlam+"+str(nx_+2*ng_)) << "\n";
+    cg << cg.clear("d.dx", nx_+2*ng_);
+
+    cg.comment("Make initial guess feasible on x values");
+    cg << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
+    cg << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
+    cg << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+    cg << "}\n";
+
+    cg.comment("Make initial guess feasible on constraints by altering slack variables");
+    cg << cg.mv("d.Jk", Asp_, "d.dx", "d.temp_mem", false) << "\n";
+    cg << "for (casadi_int i = 0; i < " << ng_ << "; ++i) {\n";
+    cg << "if (d.ubdz[i]-d.temp_mem[i] < 0) {\n";
+    cg << "d.dx[" << nx_ << "+i] = -d.ubdz[i]+d.temp_mem[i];\n";
+    cg << "}\n";
+
+    cg << "if (d.lbdz[i]-d.temp_mem[i] > 0) {\n";
+    cg << "d.dx[" << nx_+ng_ << "+i] = d.lbdz[i]-d.temp_mem[i];\n";
+    cg << "}\n";
+    cg << "}\n";
     
+    cg.comment("Solve the QP");
+    codegen_qp_ela_solve(cg, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+
+    cg.comment("Get the second part of dlam from memory");
+    cg << cg.copy("d_nlp.lam+"+str(nx_), ng_, "d.dlam+"+str(nx_)) << "\n";
+    
+    if (mode == 0) cg << "ela_it++;\n";
   }
 
   Dict Sqpmethod::get_stats(void* mem) const {

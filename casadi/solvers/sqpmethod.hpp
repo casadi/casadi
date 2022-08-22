@@ -217,6 +217,9 @@ namespace casadi {
               const std::string& lbdz, const std::string& ubdz,
               const std::string& A, const std::string& x_opt, const std::string& dlam) const;
 
+    // Execute elastic mode: mode 0 = normal, mode 1 = SOC
+    void codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const;
+
     /// A documentation string
     static const std::string meta_doc;
 
