@@ -637,6 +637,7 @@ int Sqpmethod::solve(void* mem) const {
             gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
             uout() << "2. gamma_1: " << gamma_1 << std::endl;
           } 
+          
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 1);
 
           if (ret == SOLVER_RET_INFEASIBLE) {
@@ -675,27 +676,26 @@ int Sqpmethod::solve(void* mem) const {
           // Increase counter
           ls_iter++;
 
-          // Candidate step (Not in the first iteration because this is done beforehand)
-          if (!so_corr_ || ls_iter != 1) {
-            casadi_copy(d_nlp->z, nx_, d->z_cand);
-            casadi_axpy(nx_, t, d->dx, d->z_cand);
+          // Candidate step
+          casadi_copy(d_nlp->z, nx_, d->z_cand);
+          casadi_axpy(nx_, t, d->dx, d->z_cand);
 
-            // Evaluating objective and constraints
-            m->arg[0] = d->z_cand;
-            m->arg[1] = d_nlp->p;
-            m->res[0] = &fk_cand;
-            m->res[1] = d->z_cand + nx_;
-            if (calc_function(m, "nlp_fg")) {
-              // Avoid infinite recursion
-              if (ls_iter == max_iter_ls_) {
-                ls_success = false;
-                l1_infeas = nan;
-                break;
-              }
-              // line-search failed, skip iteration
-              t = beta_ * t;
-              continue;
+          // Evaluating objective and constraints
+          // TODO(@KobeBergmans): if there is no second order correction this is inneficient
+          m->arg[0] = d->z_cand;
+          m->arg[1] = d_nlp->p;
+          m->res[0] = &fk_cand;
+          m->res[1] = d->z_cand + nx_;
+          if (calc_function(m, "nlp_fg")) {
+            // Avoid infinite recursion
+            if (ls_iter == max_iter_ls_) {
+              ls_success = false;
+              l1_infeas = nan;
+              break;
             }
+            // line-search failed, skip iteration
+            t = beta_ * t;
+            continue;
           }
           
 
@@ -764,15 +764,15 @@ int Sqpmethod::solve(void* mem) const {
       print("%7s ", "-");
     }
     
-    if (!so_succes) {
-      print("%2d", ls_trials);
-      if (!ls_success) {
-        print("F");
-      } else {
-        print (" ");
-      }
+    print("%2d", ls_trials);
+    if (!ls_success) {
+      print("F");
     } else {
-      print("SOC");
+      print (" ");
+    }
+    
+    if (so_succes) {
+      print(" - SOC");
     }
     
     print(" - ");
@@ -954,8 +954,8 @@ int Sqpmethod::solve(void* mem) const {
 
     if (mode == 0) *info = "Elastic mode QP (gamma = " + str(gamma) + ")";
 
-    // Get second part of dlam from memory
-    casadi_copy(d_nlp->lam+nx_, ng_, d->dlam+nx_);
+    // Copy constraint dlam to the right place
+    casadi_copy(d->dlam+nx_+2*ng_, ng_, d->dlam+nx_);
 
     uout() << "elastic mode iteration: " << *ela_it << std::endl;
 
@@ -1249,12 +1249,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "while (1) {\n";
       g.comment(" Increase counter");
       g << "ls_iter++;\n";
-      if (so_corr_) {
-        g.comment("Candidate step (Not in the first iteration because this is done beforehand)");
-        g << "if (ls_iter != 1) {\n";
-      } else {
-        g.comment("Candidate step");
-      }
+
+      g.comment("Candidate step");
       g << g.copy("d_nlp.z", nx_, "d.z_cand") << "\n";
       g << g.axpy(nx_, "t", "d.dx", "d.z_cand") << "\n";
       g.comment("Evaluating objective and constraints");
@@ -1273,10 +1269,6 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "t = " << beta_ << "* t;\n";
       g << "continue;\n";
       g << "}\n";
-      
-      if (so_corr_) {
-        g << "}\n";
-      }
 
       g.comment("Calculating merit-function in candidate");
       g << "l1_cand = fk_cand + sigma * "
@@ -1448,8 +1440,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg.comment("Solve the QP");
     codegen_qp_ela_solve(cg, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
 
-    cg.comment("Get the second part of dlam from memory");
-    cg << cg.copy("d_nlp.lam+"+str(nx_), ng_, "d.dlam+"+str(nx_)) << "\n";
+    cg.comment("Copy constraint dlam to the right place");
+    cg << cg.copy("d.dlam+"+str(nx_+2*ng_), ng_, "d.dlam+"+str(nx_)) << "\n";
     
     if (mode == 0) cg << "ela_it++;\n";
   }
