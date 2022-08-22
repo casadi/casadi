@@ -553,6 +553,15 @@ int Sqpmethod::solve(void* mem) const {
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
 
           if (ret == SOLVER_RET_INFEASIBLE) continue;
+        } else if (ela_it == 0) {
+          double g_inf = casadi_norm_inf(ng_, d->dlam+nx_);
+          gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+
+          if (g_inf > gamma_1) {
+            ela_it = 1;
+            ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
+            if (ret == SOLVER_RET_INFEASIBLE) continue;
+          }
         }
       }
       
@@ -729,11 +738,11 @@ int Sqpmethod::solve(void* mem) const {
       }
 
       // If linesearch failed enter elastic mode
-      if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == 0) {
-        ela_it = 1;
-        gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
-        uout() << "3. gamma_1: " << gamma_1 << std::endl;
-      }
+      // if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == 0) {
+      //   ela_it = 1;
+      //   gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+      //   uout() << "3. gamma_1: " << gamma_1 << std::endl;
+      // }
     }
 
     return 0;
