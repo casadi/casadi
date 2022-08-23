@@ -138,14 +138,20 @@ namespace casadi {
         "Enable the elastic mode which is used when the QP is infeasible (default: false)."}},
       {"gamma_0",
        {OT_DOUBLE,
-        "Starting value for the penalty parameter of elastic mode (default: 10e4)."}},
+        "Starting value for the penalty parameter of elastic mode (default: 1)."}},
       {"gamma_max",
        {OT_DOUBLE,
-        "Maximum value for the penalty parameter of elastic mode (default: 10e20)."}},
+        "Maximum value for the penalty parameter of elastic mode (default: 1e20)."}},
+      {"gamma_1_min",
+       {OT_DOUBLE,
+        "Minimum value for gamma_1 (default: 1e-5)."}},
       {"second_order_corrections",
        {OT_BOOL,
         "Enable second order corrections."
-        "These are used when a step is considered bad by the merit function and constraint norm (default: false)."}}
+        "These are used when a step is considered bad by the merit function and constraint norm (default: false)."}},
+      {"init_feasible",
+       {OT_BOOL,
+        "Initialize the QP subproblems with a feasible initial value (default: true)."}}  
      }
   };
 
@@ -172,8 +178,10 @@ namespace casadi {
     print_status_ = true;
     elastic_mode_ = false;
     gamma_0_ = 1;
-    gamma_max_ = 10e20;
+    gamma_max_ = 1e20;
+    gamma_1_min_ = 1e-5;
     so_corr_ = false;
+    init_feasible_ = true;
 
     std::string convexify_strategy = "none";
     double convexify_margin = 1e-7;
@@ -235,8 +243,12 @@ namespace casadi {
         gamma_0_ = op.second;
       } else if (op.first=="gamma_max") {
         gamma_max_ = op.second;
+      } else if (op.first=="gamma_1_min") {
+        gamma_1_min_ = op.second;
       } else if (op.first=="second_order_corrections") {
         so_corr_ = op.second;
+      } else if (op.first=="init_feasible") {
+        init_feasible_ = op.second;
       }
     }
 
@@ -531,9 +543,11 @@ int Sqpmethod::solve(void* mem) const {
       casadi_clear(d->dx, nx_);
 
       // Make initial guess feasable
-      for (casadi_int i = 0; i < nx_; ++i) {
-        if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
-        else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
+      if (init_feasible_) {
+        for (casadi_int i = 0; i < nx_; ++i) {
+          if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
+          else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
+        }
       }
 
       // Increase counter
@@ -550,17 +564,17 @@ int Sqpmethod::solve(void* mem) const {
         } else if (ret == SOLVER_RET_INFEASIBLE) { 
           if (ela_it == 0) {
             ela_it = 1;
-            gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+            gamma_1 = calc_gamma_1(m);
             uout() << "1. gamma_1: " << gamma_1 << std::endl;
           }
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
 
           if (ret == SOLVER_RET_INFEASIBLE) continue;
         } else if (ela_it == 0) {
-          double g_inf = casadi_norm_inf(ng_, d->dlam+nx_);
-          gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+          double pi_inf = casadi_norm_inf(ng_, d->dlam+nx_);
+          gamma_1 = calc_gamma_1(m);;
 
-          if (g_inf > gamma_1) {
+          if (pi_inf > gamma_1) {
             ela_it = 1;
             ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
             if (ret == SOLVER_RET_INFEASIBLE) continue;
@@ -636,9 +650,11 @@ int Sqpmethod::solve(void* mem) const {
           casadi_clear(d->dx, nx_);
 
           // Make initial guess feasible
-          for (casadi_int i = 0; i < nx_; ++i) {
-            if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
-            else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
+          if (init_feasible_) {
+            for (casadi_int i = 0; i < nx_; ++i) {
+              if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
+              else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
+            }
           }
 
           // Solve the QP
@@ -650,7 +666,7 @@ int Sqpmethod::solve(void* mem) const {
         if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != 0)) {
           if (ela_it == 0) {
             ela_it = 1;
-            gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+            gamma_1 = calc_gamma_1(m);;
             uout() << "2. gamma_1: " << gamma_1 << std::endl;
           } 
           
@@ -755,7 +771,7 @@ int Sqpmethod::solve(void* mem) const {
       // If linesearch failed enter elastic mode
       if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == 0) {
         ela_it = 1;
-        gamma_1 = max(gamma_0_*casadi_norm_inf(ng_, d_nlp->z+nx_), 1e-5);
+        gamma_1 = calc_gamma_1(m);;
         uout() << "3. gamma_1: " << gamma_1 << std::endl;
       }
     }
@@ -948,20 +964,22 @@ int Sqpmethod::solve(void* mem) const {
     casadi_clear(d->dx, nx_ + 2 * ng_);
 
     // Make initial guess feasible on x values
-    for (casadi_int i = 0; i < nx_; ++i) {
-      if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
-      else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
-    }
-
-    // Make initial guess feasible on constraints by altering slack variables
-    casadi_mv(d->Jk, Asp_, d->dx, d->temp_mem, false);
-    for (casadi_int i = 0; i < ng_; ++i) {
-      if (d->ubdz[i]-d->temp_mem[i] < 0) {
-        d->dx[nx_+i] = -d->ubdz[i]+d->temp_mem[i];
+    if (init_feasible_) {
+      for (casadi_int i = 0; i < nx_; ++i) {
+        if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
+        else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
       }
 
-      if (d->lbdz[i]-d->temp_mem[i] > 0) {
-        d->dx[nx_+ng_+i] = d->lbdz[i]-d->temp_mem[i];
+      // Make initial guess feasible on constraints by altering slack variables
+      casadi_mv(d->Jk, Asp_, d->dx, d->temp_mem, false);
+      for (casadi_int i = 0; i < ng_; ++i) {
+        if (d->ubdz[nx_+2*ng_+i]-d->temp_mem[i] < 0) {
+          d->dx[nx_+i] = -d->ubdz[nx_+2*ng_+i]+d->temp_mem[i];
+        }
+
+        if (d->lbdz[nx_+2*ng_+i]-d->temp_mem[i] > 0) {
+          d->dx[nx_+ng_+i] = d->lbdz[nx_+2*ng_+i]-d->temp_mem[i];
+        }
       }
     }
 
@@ -978,6 +996,11 @@ int Sqpmethod::solve(void* mem) const {
     if (mode == 0) (*ela_it)++;
 
     return ret;
+  }
+
+  double Sqpmethod::calc_gamma_1(SqpmethodMemory* m) const {
+    auto d = &m->d;
+    return max(gamma_0_*casadi_norm_inf(nx_, d->gf), gamma_1_min_);
   }
 
 void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
@@ -1131,7 +1154,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "if (ela_it == 0) {\n";
       g << "ela_it = 1;\n";
       g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
-      g << "gamma_1 = " << g.fmax("temp_norm", "1e-5") << ";\n";
+      g << "gamma_1 = " << g.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
       g << "}\n";
       codegen_solve_elastic_mode(g, 0);
       if (qpsol_plugin_ == "qrqp") {
@@ -1143,7 +1166,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "} else if (ela_it == 0) {\n";
       g << "double g_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
       g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
-      g << "gamma_1 = " << g.fmax("temp_norm", "1e-5") << ";\n";
+      g << "gamma_1 = " << g.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
       g << "if (g_inf > gamma_1) {\n";
       g << "ela_it = 1;\n";
       codegen_solve_elastic_mode(g, 0);
@@ -1249,7 +1272,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "if (ela_it == 0) {\n";
         g << "ela_it = 1;\n";
         g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
-        g << "gamma_1 = " << g.fmax("temp_norm", "1e-5") << ";\n";
+        g << "gamma_1 = " << g.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
         g << "}\n";
         codegen_solve_elastic_mode(g, 1);
 
@@ -1346,7 +1369,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "if (ls_success == 0 && ela_it == 0) {\n";
       g << "ela_it = 1;\n";
       g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
-      g << "gamma_1 = " << g.fmax("temp_norm", "1e-5") << ";\n";
+      g << "gamma_1 = " << g.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
       g << "}\n";
     }
     g << "}\n";
@@ -1472,12 +1495,12 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg.comment("Make initial guess feasible on constraints by altering slack variables");
     cg << cg.mv("d.Jk", Asp_, "d.dx", "d.temp_mem", false) << "\n";
     cg << "for (casadi_int i = 0; i < " << ng_ << "; ++i) {\n";
-    cg << "if (d.ubdz[i]-d.temp_mem[i] < 0) {\n";
-    cg << "d.dx[" << nx_ << "+i] = -d.ubdz[i]+d.temp_mem[i];\n";
+    cg << "if (d.ubdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i] < 0) {\n";
+    cg << "d.dx[" << nx_ << "+i] = -d.ubdz[" << nx_+2*ng_ << "+i]+d.temp_mem[i];\n";
     cg << "}\n";
 
-    cg << "if (d.lbdz[i]-d.temp_mem[i] > 0) {\n";
-    cg << "d.dx[" << nx_+ng_ << "+i] = d.lbdz[i]-d.temp_mem[i];\n";
+    cg << "if (d.lbdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i] > 0) {\n";
+    cg << "d.dx[" << nx_+ng_ << "+i] = d.lbdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i];\n";
     cg << "}\n";
     cg << "}\n";
     

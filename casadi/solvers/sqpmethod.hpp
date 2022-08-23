@@ -137,7 +137,10 @@ namespace casadi {
     bool elastic_mode_;
 
     /// Initial and maximum penalty parameter for elastic mode
-    double gamma_0_, gamma_max_;
+    double gamma_0_, gamma_max_, gamma_1_min_;
+
+    /// Initialize feasible qp's
+    bool init_feasible_;
 
     /// QP solver error on fail
     bool error_on_fail_;
@@ -219,6 +222,9 @@ namespace casadi {
 
     // Execute elastic mode: mode 0 = normal, mode 1 = SOC
     void codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const;
+
+    // Calculate gamma_1
+    double calc_gamma_1(SqpmethodMemory* m) const;
 
     /// A documentation string
     static const std::string meta_doc;
