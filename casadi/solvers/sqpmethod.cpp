@@ -623,7 +623,8 @@ int Sqpmethod::solve(void* mem) const {
       
       if (so_corr_ && l1_cand > l1 && l1_infeas_cand > l1_infeas) {
         // Copy in case of a fail
-        casadi_copy(d->dx, nx_, d->temp_dx);
+        casadi_copy(d->dx, nx_, d->temp_sol);
+        casadi_copy(d->dlam, nx_+ng_, d->temp_sol+nx_);
 
         // Add gradient times proposal step to bounds
         casadi_clear(d->lbdz, nx_+ng_);
@@ -662,8 +663,8 @@ int Sqpmethod::solve(void* mem) const {
               d->dx, d->dlam);
         }
 
-        // Second order corrections in elastic mode
         if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != 0)) {
+          // Second order corrections in elastic mode
           if (ela_it == 0) {
             ela_it = 1;
             gamma_1 = calc_gamma_1(m);;
@@ -672,9 +673,12 @@ int Sqpmethod::solve(void* mem) const {
           
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 1);
 
-          if (ret == SOLVER_RET_INFEASIBLE) {
-            casadi_copy(d->temp_dx, nx_, d->dx);
-          }
+        } 
+        
+        // Fallback on previous solution if the second order correction failed
+        if (ret != SOLVER_RET_SUCCESS) {
+          casadi_copy(d->temp_sol, nx_, d->dx);
+          casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
         }
 
         so_succes = true;
@@ -1155,8 +1159,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       }
       g << "if (ela_it == 0) {\n";
       g << "ela_it = 1;\n";
-      g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
-      g << "gamma_1 = " << g.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
+      codegen_calc_gamma_1(g);
       g << "}\n";
       codegen_solve_elastic_mode(g, 0);
       if (qpsol_plugin_ == "qrqp") {
@@ -1168,8 +1171,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "} else if (ela_it == 0) {\n";
       g << "double g_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
       g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
-      g << "gamma_1 = " << g.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
-      g << "if (g_inf > gamma_1) {\n";
+      codegen_calc_gamma_1(g);
       g << "ela_it = 1;\n";
       codegen_solve_elastic_mode(g, 0);
       if (qpsol_plugin_ == "qrqp") {
@@ -1213,7 +1215,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
       g << "if (l1_cand > l1 && l1_infeas_cand > l1_infeas) {\n";
       g.comment("Copy in case of fail");
-      g << g.copy("d.dx", nx_, "d.temp_dx") << ";\n";
+      g << g.copy("d.dx", nx_, "d.temp_sol") << "\n";
+      g << g.copy("d.dlam", nx_+ng_, "d.temp_sol+"+str(nx_)) << "\n";
 
       g.comment("Add gradient times proposal step to bounds");
       g << g.clear("d.lbdz", nx_+ng_) << ";\n";
@@ -1277,20 +1280,21 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         }
         g << "if (ela_it == 0) {\n";
         g << "ela_it = 1;\n";
-        g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
-        g << "gamma_1 = " << g.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
+        codegen_calc_gamma_1(g);
         g << "}\n";
         codegen_solve_elastic_mode(g, 1);
-
-        if (qpsol_plugin_ == "qrqp") {
-          g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
-        } else {
-          g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
-        }
-        g << g.copy("d.temp_dx", nx_, "d.dx");
-        g << "}\n";
         g << "}\n";
       }
+      g.comment("Fallback on previous solution if the second order correction failed");
+      if (qpsol_plugin_ == "qrqp") {
+        g << "if (ret != " << 0 << ") {\n";
+      } else {
+        g << "if (flag != " << 0 << ") {\n";
+      }
+      g << g.copy("d.temp_sol", nx_, "d.dx") << "\n";
+      g << g.copy("d.temp_sol+"+str(nx_), nx_+ng_, "d.dlam") << "\n";
+      g << "}\n";
+
       g << "}\n";
     }
 
@@ -1374,8 +1378,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g.comment("If linesearch failed enter elastic mode");
       g << "if (ls_success == 0 && ela_it == 0) {\n";
       g << "ela_it = 1;\n";
-      g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
-      g << "gamma_1 = " << g.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
+      codegen_calc_gamma_1(g);
       g << "}\n";
     }
     g << "}\n";
@@ -1519,6 +1522,11 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << cg.copy("d.dlam+"+str(nx_+2*ng_), ng_, "d.dlam+"+str(nx_)) << "\n";
     
     if (mode == 0) cg << "ela_it++;\n";
+  }
+
+  void Sqpmethod::codegen_calc_gamma_1(CodeGenerator& cg) const {
+    cg << "double temp_norm = " << gamma_0_ << "*" << cg.norm_inf(nx_, "d.gf") << ";\n";
+    cg << "gamma_1 = " << cg.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
   }
 
   Dict Sqpmethod::get_stats(void* mem) const {
