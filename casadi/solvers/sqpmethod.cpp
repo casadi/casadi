@@ -1128,11 +1128,13 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
     g << g.clear("d.dx", nx_) << "\n";
 
-    g.comment("Make initial guess feasible");
-    g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
-    g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
-    g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
-    g << "}\n";
+    if (init_feasible_) {
+      g.comment("Make initial guess feasible");
+      g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
+      g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
+      g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+      g << "}\n";
+    }
 
     g.comment("Increase counter");
     g << "iter_count++;\n";
@@ -1233,11 +1235,13 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
         g << g.clear("d.dx", nx_);
 
-        g.comment("Make initial guess feasible");
-        g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
-        g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
-        g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
-        g << "}\n";
+        if (init_feasible_) {
+          g.comment("Make initial guess feasible");
+          g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
+          g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
+          g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+          g << "}\n";
+        }
 
         codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
       } else {
@@ -1254,11 +1258,13 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
         g << g.clear("d.dx", nx_);
 
-        g.comment("Make initial guess feasible");
-        g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
-        g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
-        g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
-        g << "}\n";
+        if (init_feasible_) {
+          g.comment("Make initial guess feasible");
+          g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
+          g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
+          g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+          g << "}\n";
+        }
 
         codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
         g << "}\n";
@@ -1486,23 +1492,25 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << cg.copy("d_nlp.lam+"+str(nx_), ng_, "d.dlam+"+str(nx_+2*ng_)) << "\n";
     cg << cg.clear("d.dx", nx_+2*ng_);
 
-    cg.comment("Make initial guess feasible on x values");
-    cg << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
-    cg << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
-    cg << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
-    cg << "}\n";
+    if (init_feasible_) {
+      cg.comment("Make initial guess feasible on x values");
+      cg << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
+      cg << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
+      cg << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+      cg << "}\n";
 
-    cg.comment("Make initial guess feasible on constraints by altering slack variables");
-    cg << cg.mv("d.Jk", Asp_, "d.dx", "d.temp_mem", false) << "\n";
-    cg << "for (casadi_int i = 0; i < " << ng_ << "; ++i) {\n";
-    cg << "if (d.ubdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i] < 0) {\n";
-    cg << "d.dx[" << nx_ << "+i] = -d.ubdz[" << nx_+2*ng_ << "+i]+d.temp_mem[i];\n";
-    cg << "}\n";
+      cg.comment("Make initial guess feasible on constraints by altering slack variables");
+      cg << cg.mv("d.Jk", Asp_, "d.dx", "d.temp_mem", false) << "\n";
+      cg << "for (casadi_int i = 0; i < " << ng_ << "; ++i) {\n";
+      cg << "if (d.ubdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i] < 0) {\n";
+      cg << "d.dx[" << nx_ << "+i] = -d.ubdz[" << nx_+2*ng_ << "+i]+d.temp_mem[i];\n";
+      cg << "}\n";
 
-    cg << "if (d.lbdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i] > 0) {\n";
-    cg << "d.dx[" << nx_+ng_ << "+i] = d.lbdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i];\n";
-    cg << "}\n";
-    cg << "}\n";
+      cg << "if (d.lbdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i] > 0) {\n";
+      cg << "d.dx[" << nx_+ng_ << "+i] = d.lbdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i];\n";
+      cg << "}\n";
+      cg << "}\n";
+    }
     
     cg.comment("Solve the QP");
     codegen_qp_ela_solve(cg, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
