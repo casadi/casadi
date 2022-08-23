@@ -530,6 +530,12 @@ int Sqpmethod::solve(void* mem) const {
       casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
       casadi_clear(d->dx, nx_);
 
+      // Make initial guess feasable
+      for (casadi_int i = 0; i < nx_; ++i) {
+        if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
+        else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
+      }
+
       // Increase counter
       m->iter_count++;
 
@@ -624,6 +630,16 @@ int Sqpmethod::solve(void* mem) const {
         // Second order corrections without elastic mode
         if (ela_it == 0) {
           uout() << "Entering soc" << std::endl;
+
+          // Initial guess
+          casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
+          casadi_clear(d->dx, nx_);
+
+          // Make initial guess feasible
+          for (casadi_int i = 0; i < nx_; ++i) {
+            if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
+            else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
+          }
 
           // Solve the QP
           ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
@@ -1088,6 +1104,13 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.comment("Initial guess");
     g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
     g << g.clear("d.dx", nx_) << "\n";
+
+    g.comment("Make initial guess feasible");
+    g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
+    g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
+    g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+    g << "}\n";
+
     g.comment("Increase counter");
     g << "iter_count++;\n";
     g.comment("Solve the QP");
@@ -1183,6 +1206,16 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << g.axpy(ng_, "-1.", "d.z_cand+" + str(nx_), "d.ubdz+" + str(nx_)) << ";\n";
 
       if (!elastic_mode_) {
+        g.comment("Initial guess");
+        g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
+        g << g.clear("d.dx", nx_);
+
+        g.comment("Make initial guess feasible");
+        g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
+        g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
+        g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+        g << "}\n";
+
         codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
       } else {
         if (qpsol_plugin_ == "qrqp") {
@@ -1193,6 +1226,17 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         g.comment("Second order corrections without elastic mode");
         g << "if (ela_it == 0) {\n";      
         g << "printf(\"Entering SOC\\n\");\n";
+
+        g.comment("Initial guess");
+        g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
+        g << g.clear("d.dx", nx_);
+
+        g.comment("Make initial guess feasible");
+        g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
+        g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
+        g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+        g << "}\n";
+
         codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
         g << "}\n";
 
