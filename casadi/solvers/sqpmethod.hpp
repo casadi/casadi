@@ -223,6 +223,10 @@ namespace casadi {
     // Execute elastic mode: mode 0 = normal, mode 1 = SOC
     void codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const;
 
+    // Codegen to calculate gama_1
+    void codegen_calc_gamma_1(CodeGenerator& cg) const;
+
+
     // Calculate gamma_1
     double calc_gamma_1(SqpmethodMemory* m) const;
 
