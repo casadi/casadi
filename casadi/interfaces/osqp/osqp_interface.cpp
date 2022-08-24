@@ -281,7 +281,9 @@ namespace casadi {
     } else if (m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE || 
         m->work->info->status_val == OSQP_MAX_ITER_REACHED ||
         m->work->info->status_val == OSQP_DUAL_INFEASIBLE ||
-        m->work->info->status_val == OSQP_NON_CVX) {
+        m->work->info->status_val == OSQP_NON_CVX ||
+        m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE_INACCURATE ||
+        m->work->info->status_val == OSQP_DUAL_INFEASIBLE_INACCURATE) {
           m->unified_return_status = SOLVER_RET_INFEASIBLE;
     } else {
       m->unified_return_status = SOLVER_RET_UNKNOWN;

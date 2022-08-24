@@ -258,7 +258,7 @@ namespace casadi {
     } else {
       error_on_fail_ = true;
     }
-      
+
     // Use exact Hessian?
     exact_hessian_ = hessian_approximation =="exact";
 
@@ -555,8 +555,8 @@ int Sqpmethod::solve(void* mem) const {
 
       // Solve the QP
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
-               d->dx, d->dlam);
-
+               d->dx, d->dlam, 0);
+      
       // Elastic mode calculations
       if (elastic_mode_) {
         if (ret == 0) {
@@ -666,7 +666,7 @@ int Sqpmethod::solve(void* mem) const {
 
           // Solve the QP
           ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
-              d->dx, d->dlam);
+              d->dx, d->dlam, 1);
         }
 
         if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != -1)) {
@@ -880,7 +880,7 @@ int Sqpmethod::solve(void* mem) const {
 
   int Sqpmethod::solve_QP(SqpmethodMemory* m, const double* H, const double* g,
                            const double* lbdz, const double* ubdz, const double* A,
-                           double* x_opt, double* dlam) const {
+                           double* x_opt, double* dlam, int mode) const {
     ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
@@ -906,8 +906,8 @@ int Sqpmethod::solve(void* mem) const {
     auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
 
     // Check if the QP was infeasible for elastic mode
-    if (!m_qpsol->success && elastic_mode_) {
-      if (m_qpsol->unified_return_status == SOLVER_RET_INFEASIBLE) {
+    if (!m_qpsol->success) {
+      if ((elastic_mode_ && m_qpsol->unified_return_status == SOLVER_RET_INFEASIBLE) || (mode == 1)) {
         return SOLVER_RET_INFEASIBLE;
       }
 
