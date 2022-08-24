@@ -295,7 +295,7 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    if (elastic_mode_) {
+    if (elastic_mode_ | so_corr_) {
       qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
     }
 
@@ -429,7 +429,7 @@ int Sqpmethod::solve(void* mem) const {
     double gamma_1;
 
     // ela_it
-    casadi_int ela_it = 0;
+    casadi_int ela_it = -1;
 
     casadi_clear(d->dx, nx_);
 
@@ -560,25 +560,31 @@ int Sqpmethod::solve(void* mem) const {
       // Elastic mode calculations
       if (elastic_mode_) {
         if (ret == 0) {
-          ela_it = 0;
-        } else if (ret == SOLVER_RET_INFEASIBLE) { 
-          if (ela_it == 0) {
-            ela_it = 1;
+          ela_it = -1;
+        } else if (ret == SOLVER_RET_INFEASIBLE) {
+          if (ela_it == -1) {
+            ela_it = 0;
             gamma_1 = calc_gamma_1(m);
             uout() << "1. gamma_1: " << gamma_1 << std::endl;
           }
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
 
           if (ret == SOLVER_RET_INFEASIBLE) continue;
-        } else if (ela_it == 0) {
+        } else if (ela_it == -1) {
           double pi_inf = casadi_norm_inf(ng_, d->dlam+nx_);
           gamma_1 = calc_gamma_1(m);;
 
           if (pi_inf > gamma_1) {
-            ela_it = 1;
+            ela_it = 0;
             ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
             if (ret == SOLVER_RET_INFEASIBLE) continue;
           }
+        }
+      } else if (error_on_fail_ && so_corr_) {
+        // Manual error handling because this is turned off for the second order corrections
+        // TODO(@KobeBergmans): Make this more elegant and easier to debug
+        if (ret != 0) {
+          casadi_error("QP solver failed...");
         }
       }
       
@@ -642,8 +648,8 @@ int Sqpmethod::solve(void* mem) const {
         casadi_axpy(ng_, -1., d->z_cand+nx_, d->ubdz+nx_);
 
         int ret = SOLVER_RET_INFEASIBLE;
-        // Second order corrections without elastic mode
-        if (ela_it == 0) {
+        // Second order corrections without elastic mode (ela_it is -1 if elastic mode is turned off)
+        if (ela_it == -1) {
           uout() << "Entering soc" << std::endl;
 
           // Initial guess
@@ -663,10 +669,10 @@ int Sqpmethod::solve(void* mem) const {
               d->dx, d->dlam);
         }
 
-        if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != 0)) {
+        if (elastic_mode_ && (ret == SOLVER_RET_INFEASIBLE || ela_it != -1)) {
           // Second order corrections in elastic mode
-          if (ela_it == 0) {
-            ela_it = 1;
+          if (ela_it == -1) {
+            ela_it = 0;
             gamma_1 = calc_gamma_1(m);;
             uout() << "2. gamma_1: " << gamma_1 << std::endl;
           } 
@@ -676,9 +682,65 @@ int Sqpmethod::solve(void* mem) const {
         } 
         
         // Fallback on previous solution if the second order correction failed
-        if (ret != SOLVER_RET_SUCCESS) {
+        if (ret != 0) {
+          uout() << "Rejecting SOC step because solver did not return succesfully" << std::endl;
           casadi_copy(d->temp_sol, nx_, d->dx);
           casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
+        } else {
+          // Check if corrected step is better than the original one using the merit function
+          double l1_cand_norm = l1_cand;
+          double l1_cand_soc;
+
+          // Take candidate step
+          casadi_copy(d_nlp->z, nx_, d->z_cand);
+          casadi_axpy(nx_, 1., d->dx, d->z_cand); // Full step! (d->z_cand = d->z_cand + d->dx*1.)
+          
+          // Evaluating objective and constraints
+          m->arg[0] = d->z_cand;
+          m->arg[1] = d_nlp->p;
+          m->res[0] = &fk_cand;
+          m->res[1] = d->z_cand + nx_;
+          if (calc_function(m, "nlp_fg")) {
+            l1_cand_soc = inf; // Make sure the second order corrections are not used!
+          } else {
+            l1_infeas_cand = casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
+            l1_cand_soc = fk_cand + m->sigma*l1_infeas_cand;
+          }
+
+          if (l1_cand_norm < l1_cand_soc) {
+            // Copy normal step if merit function increases
+            uout() << "Rejecting SOC step because it is bad..." << std::endl;
+            casadi_copy(d->temp_sol, nx_, d->dx);
+            casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
+          }
+
+          // Check if corrected step is better than the original one using the Armijo condition
+          // double l1_cand_norm = l1_cand;
+          // double tl1 = casadi_dot(nx_, d->temp_sol, d->gf) - m->sigma*l1_infeas;
+          // double l1_cand_soc;
+
+          // // Take candidate step
+          // casadi_copy(d_nlp->z, nx_, d->z_cand);
+          // casadi_axpy(nx_, 1., d->dx, d->z_cand); // Full step! (d->z_cand = d->z_cand + d->dx*1.)
+
+          // // Evaluating objective and constraints
+          // m->arg[0] = d->z_cand;
+          // m->arg[1] = d_nlp->p;
+          // m->res[0] = &fk_cand;
+          // m->res[1] = d->z_cand + nx_;
+          // if (calc_function(m, "nlp_fg")) {
+          //   l1_cand_soc = inf; // Make sure the second order corrections are not used!
+          // } else {
+          //   l1_infeas_cand = casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
+          //   l1_cand_soc = fk_cand + m->sigma*l1_infeas_cand;
+          // }
+
+          // if (l1_cand_soc >= l1_cand_norm + t * c1_ * tl1) {
+          //   // If the Armijo condition is not satisfied, use normal step
+          //   uout() << "Rejecting SOC step because it is bad..." << std::endl;
+          //   casadi_copy(d->temp_sol, nx_, d->dx);
+          //   casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
+          // }
         }
 
         so_succes = true;
@@ -773,8 +835,8 @@ int Sqpmethod::solve(void* mem) const {
       }
 
       // If linesearch failed enter elastic mode
-      if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == 0) {
-        ela_it = 1;
+      if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == -1) {
+        ela_it = 0;
         gamma_1 = calc_gamma_1(m);;
         uout() << "3. gamma_1: " << gamma_1 << std::endl;
       }
@@ -916,6 +978,8 @@ int Sqpmethod::solve(void* mem) const {
     
     double gamma = 0.;
 
+    if (mode == 0) (*ela_it)++;
+
     // Temp datastructs for data copy
     double *temp_1, *temp_2;
 
@@ -997,8 +1061,6 @@ int Sqpmethod::solve(void* mem) const {
 
     uout() << "elastic mode iteration: " << *ela_it << std::endl;
 
-    if (mode == 0) (*ela_it)++;
-
     return ret;
   }
 
@@ -1048,8 +1110,13 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
     if (elastic_mode_) {
       g << "double gamma_1;\n";
-      g << "casadi_int ela_it = 0;\n";
-      g << "int ret = 0;\n";
+      g << "casadi_int ela_it = -1;\n";
+      
+      if (qpsol_plugin_ == "qrqp") {
+        g << "int ret = 0;\n";
+      } else {
+        g << "int flag = 0;\n";
+      }
     }
 
     g.local("m_w", "casadi_real", "*");
@@ -1146,19 +1213,20 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
 
     if (elastic_mode_) {
+      g.comment("Elastic mode calculations");
       if (qpsol_plugin_ == "qrqp") {
         g << "if (ret == " << 0 << ") {\n";
       } else {
         g << "if (flag == " << 0 << ") {\n";
       }
-      g << "ela_it = 0;\n";
+      g << "ela_it = -1;\n";
       if (qpsol_plugin_ == "qrqp") {
         g << "} else if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
       } else {
         g << "} else if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
       }
-      g << "if (ela_it == 0) {\n";
-      g << "ela_it = 1;\n";
+      g << "if (ela_it == -1) {\n";
+      g << "ela_it = 0;\n";
       codegen_calc_gamma_1(g);
       g << "}\n";
       codegen_solve_elastic_mode(g, 0);
@@ -1168,11 +1236,12 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
       }
 
-      g << "} else if (ela_it == 0) {\n";
+      g << "} else if (ela_it == -1) {\n";
       g << "double g_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
       g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
       codegen_calc_gamma_1(g);
-      g << "ela_it = 1;\n";
+      g << "if (g_inf > gamma_1) {\n";
+      g << "ela_it = 0;\n";
       codegen_solve_elastic_mode(g, 0);
       if (qpsol_plugin_ == "qrqp") {
         g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
@@ -1180,6 +1249,17 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
       }
       g << "}\n";
+      g << "}\n";
+      g << "}\n";
+    }
+
+    if (error_on_fail_ && so_corr_) {
+      if (qpsol_plugin_ == "qrqp") {
+        g << "else if (ret != 0) {\n";
+      } else {
+        g << "else if (flag != 0) {\n";
+      }
+      g << "return -1;\n";
       g << "}\n";
     }
         
@@ -1254,7 +1334,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
           g << "flag = " << SOLVER_RET_INFEASIBLE << ";\n";
         }
         g.comment("Second order corrections without elastic mode");
-        g << "if (ela_it == 0) {\n";      
+        g << "if (ela_it == -1) {\n";      
         g << "printf(\"Entering SOC\\n\");\n";
 
         g.comment("Initial guess");
@@ -1274,12 +1354,12 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
         g.comment("Second order corrections in elastic mode");
         if (qpsol_plugin_ == "qrqp") {
-          g << "if (ret == " << SOLVER_RET_INFEASIBLE << " || ela_it != 0) {\n";
+          g << "if (ret == " << SOLVER_RET_INFEASIBLE << " || ela_it != -1) {\n";
         } else {
-          g << "if (flag == " << SOLVER_RET_INFEASIBLE << " || ela_it != 0) {\n";
+          g << "if (flag == " << SOLVER_RET_INFEASIBLE << " || ela_it != -1) {\n";
         }
-        g << "if (ela_it == 0) {\n";
-        g << "ela_it = 1;\n";
+        g << "if (ela_it == -1) {\n";
+        g << "ela_it = 0;\n";
         codegen_calc_gamma_1(g);
         g << "}\n";
         codegen_solve_elastic_mode(g, 1);
@@ -1291,6 +1371,32 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       } else {
         g << "if (flag != " << 0 << ") {\n";
       }
+      g << g.copy("d.temp_sol", nx_, "d.dx") << "\n";
+      g << g.copy("d.temp_sol+"+str(nx_), nx_+ng_, "d.dlam") << "\n";
+      g << "} else {\n";
+      g.comment("Check if corrected step is better than the original one using the merit function");
+      g << "double l1_cand_norm = l1_cand;\n";
+      g << "double l1_cand_soc;\n";
+      
+      g.comment("Take candidate step");
+      g << g.copy("d_nlp.z", nx_, "d.z_cand") << "\n";
+      g << g.axpy(nx_, "1.", "d.dx", "d.z_cand") << "\n";
+
+      g.comment("Evaluate objective and constraints");
+      g << "m_arg[0] = d.z_cand;\n;";
+      g << "m_arg[1] = m_p;\n;";
+      g << "m_res[0] = &fk_cand;\n;";
+      g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n;";
+      nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
+      g << "if (" << nlp_fg << ") {\n";
+      g << "l1_cand_soc = casadi_inf;\n";
+      g << "} else {\n";
+      g << "l1_infeas_cand = " << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+      g << "l1_cand_soc = fk_cand + sigma*l1_infeas_cand;\n";
+      g << "}\n";
+
+      g << "if (l1_cand_norm < l1_cand_soc) {\n";
+      g.comment("Copy normal step if merit function increases");
       g << g.copy("d.temp_sol", nx_, "d.dx") << "\n";
       g << g.copy("d.temp_sol+"+str(nx_), nx_+ng_, "d.dlam") << "\n";
       g << "}\n";
@@ -1376,8 +1482,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
     if (elastic_mode_ && max_iter_ls_ > 0) {
       g.comment("If linesearch failed enter elastic mode");
-      g << "if (ls_success == 0 && ela_it == 0) {\n";
-      g << "ela_it = 1;\n";
+      g << "if (ls_success == 0 && ela_it == -1) {\n";
+      g << "ela_it = 0;\n";
       codegen_calc_gamma_1(g);
       g << "}\n";
     }
@@ -1459,6 +1565,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
   void Sqpmethod::codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const {
     cg << "double gamma = 0.;\n";
 
+    if (mode == 0) cg << "ela_it++;\n";
+
     cg.comment("Temp datastructs for data copy");
     cg << "double *temp_1, *temp_2;\n";
 
@@ -1520,8 +1628,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
     cg.comment("Copy constraint dlam to the right place");
     cg << cg.copy("d.dlam+"+str(nx_+2*ng_), ng_, "d.dlam+"+str(nx_)) << "\n";
-    
-    if (mode == 0) cg << "ela_it++;\n";
+  
   }
 
   void Sqpmethod::codegen_calc_gamma_1(CodeGenerator& cg) const {
