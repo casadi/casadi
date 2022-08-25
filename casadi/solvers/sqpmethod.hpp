@@ -213,7 +213,7 @@ namespace casadi {
     // Solve the QP subproblem
     void codegen_qp_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
               const std::string& lbdz, const std::string& ubdz,
-              const std::string& A, const std::string& x_opt, const std::string& dlam) const;
+              const std::string& A, const std::string& x_opt, const std::string& dlam, int mode) const;
 
     // Solve the QP subproblem
     void codegen_qp_ela_solve(CodeGenerator& cg, const std::string& H, const std::string& g,

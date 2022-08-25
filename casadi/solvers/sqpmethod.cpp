@@ -1114,12 +1114,10 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "double temp_norm;\n";
     }
 
-    if (elastic_mode_ || so_corr_) {
-      if (qpsol_plugin_ == "qrqp") {
-        g << "int ret = 0;\n";
-      } else {
-        g << "flag = 0;\n";
-      }
+    if (qpsol_plugin_ == "qrqp") {
+      g << "int ret = 0;\n";
+    } else {
+      g << "flag = 0;\n";
     }
 
     g.local("m_w", "casadi_real", "*");
@@ -1213,7 +1211,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.comment("Increase counter");
     g << "iter_count++;\n";
     g.comment("Solve the QP");
-    codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+    codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam", 0);
 
     if (elastic_mode_) {
       g.comment("Elastic mode calculations");
@@ -1326,7 +1324,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
           g << "}\n";
         }
 
-        codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+        codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam", 1);
       } else {
         if (qpsol_plugin_ == "qrqp") {
           g << "ret = " << SOLVER_RET_INFEASIBLE << ";\n";
@@ -1349,7 +1347,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
           g << "}\n";
         }
 
-        codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+        codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam", 1);
         g << "}\n";
 
         g.comment("Second order corrections in elastic mode");
@@ -1515,7 +1513,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
   }
   void Sqpmethod::codegen_qp_solve(CodeGenerator& cg, const std::string&  H, const std::string& g,
               const std::string&  lbdz, const std::string& ubdz,
-              const std::string&  A, const std::string& x_opt, const std::string&  dlam) const {
+              const std::string&  A, const std::string& x_opt, const std::string&  dlam, int mode) const {
     for (casadi_int i=0;i<qpsol_.n_in();++i) cg << "m_arg[" << i << "] = 0;\n";
     cg << "m_arg[" << CONIC_H << "] = " << H << ";\n";
     cg << "m_arg[" << CONIC_G << "] = " << g << ";\n";
@@ -1531,11 +1529,27 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
-    if (elastic_mode_ && qpsol_plugin_ == "qrqp") {
+    if (qpsol_plugin_ == "qrqp") {
       cg << "ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     } else {
       cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
+    if (error_on_fail_) {
+      if (qpsol_plugin_ == "qrqp") {
+        if (elastic_mode_  || (mode == 1)) {
+          cg << "if (ret != 0 && ret != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
+        } else {
+          cg << "if (ret != 0) return -1;\n";
+        }
+      } else {
+        if (elastic_mode_ || (mode == 1)) {
+          cg << "if (flag != 0 && flag != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
+        } else {
+          cg << "if (flag != 0) return -1;\n";
+        }
+      }
+    }
+    
   }
 
   void Sqpmethod::codegen_qp_ela_solve(CodeGenerator& cg, const std::string&  H, const std::string& g,
@@ -1561,6 +1575,21 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     } else {
       cg << cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
     }
+
+    if (qpsol_plugin_ == "qrqp") {
+      if (elastic_mode_ && error_on_fail_) {
+        cg << "if (ret != 0 && ret != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
+      } else if (error_on_fail_) {
+        cg << "if (ret != 0) return -1;\n";
+      }
+    } else {
+      if (elastic_mode_ && error_on_fail_) {
+        cg << "if (flag != 0 && flag != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
+      } else if (error_on_fail_) {
+        cg << "if (flag != 0) return -1;\n";
+      }
+    }
+    
   }
 
   void Sqpmethod::codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const {
