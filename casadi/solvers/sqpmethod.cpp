@@ -936,7 +936,7 @@ int Sqpmethod::solve(void* mem) const {
     auto d_nlp = &m->d_nlp;
     auto d = &m->d;
 
-    if (mode != 0 || mode != 1) casadi_error("Wrong mode provided to solve_elastic_mode.");
+    if (mode != 0 && mode != 1) casadi_error("Wrong mode provided to solve_elastic_mode.");
     
     double gamma = 0.;
 
