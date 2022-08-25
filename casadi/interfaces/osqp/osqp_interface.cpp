@@ -429,6 +429,8 @@ namespace casadi {
     g << "return " << SOLVER_RET_UNKNOWN << ";\n";
     g << "}\n";
     g << "}\n";
+
+    g << "return 0;\n";
   }
 
   Dict OsqpInterface::get_stats(void* mem) const {
