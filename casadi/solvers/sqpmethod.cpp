@@ -565,7 +565,6 @@ int Sqpmethod::solve(void* mem) const {
           if (ela_it == -1) {
             ela_it = 0;
             gamma_1 = calc_gamma_1(m);
-            uout() << "1. gamma_1: " << gamma_1 << std::endl;
           }
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 0);
 
@@ -624,8 +623,6 @@ int Sqpmethod::solve(void* mem) const {
           l1_cand = fk_cand + m->sigma*l1_infeas_cand;
         }
       }
-
-      uout() << "Step before SOC: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       
       if (so_corr_ && l1_cand > l1 && l1_infeas_cand > l1_infeas) {
         // Copy in case of a fail
@@ -650,8 +647,6 @@ int Sqpmethod::solve(void* mem) const {
         int ret = SOLVER_RET_INFEASIBLE;
         // Second order corrections without elastic mode (ela_it is -1 if elastic mode is turned off)
         if (ela_it == -1) {
-          uout() << "Entering soc" << std::endl;
-
           // Initial guess
           casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
           casadi_clear(d->dx, nx_);
@@ -674,7 +669,6 @@ int Sqpmethod::solve(void* mem) const {
           if (ela_it == -1) {
             ela_it = 0;
             gamma_1 = calc_gamma_1(m);;
-            uout() << "2. gamma_1: " << gamma_1 << std::endl;
           } 
           
           ret = solve_elastic_mode(m, &ela_it, gamma_1, ls_iter, ls_success, so_succes, pr_inf, du_inf, dx_norminf, &info, 1);
@@ -683,7 +677,6 @@ int Sqpmethod::solve(void* mem) const {
         
         // Fallback on previous solution if the second order correction failed
         if (ret != 0) {
-          uout() << "Rejecting SOC step because solver did not return succesfully" << std::endl;
           casadi_copy(d->temp_sol, nx_, d->dx);
           casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
           so_succes = false;
@@ -710,7 +703,6 @@ int Sqpmethod::solve(void* mem) const {
 
           if (l1_cand_norm < l1_cand_soc) {
             // Copy normal step if merit function increases
-            uout() << "Rejecting SOC step because it is bad..." << std::endl;
             casadi_copy(d->temp_sol, nx_, d->dx);
             casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
             so_succes = false;
@@ -798,7 +790,6 @@ int Sqpmethod::solve(void* mem) const {
       }
 
       // Take step
-      uout() << "Step taken: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       casadi_axpy(nx_, 1., d->dx, d_nlp->z);
 
       if (!exact_hessian_) {
@@ -812,7 +803,6 @@ int Sqpmethod::solve(void* mem) const {
       if (!ls_success && elastic_mode_ && (max_iter_ls_>0) && ela_it == -1) {
         ela_it = 0;
         gamma_1 = calc_gamma_1(m);;
-        uout() << "3. gamma_1: " << gamma_1 << std::endl;
       }
     }
 
@@ -946,9 +936,7 @@ int Sqpmethod::solve(void* mem) const {
     auto d_nlp = &m->d_nlp;
     auto d = &m->d;
 
-    if (mode == 0) uout() << "Entering elastic mode" << std::endl;
-    else if (mode == 1) uout() << "Entering elastic mode during soc" << std::endl;
-    else casadi_error("Wrong mode provided to solve_elastic_mode.");
+    if (mode != 0 || mode != 1) casadi_error("Wrong mode provided to solve_elastic_mode.");
     
     double gamma = 0.;
 
@@ -979,9 +967,6 @@ int Sqpmethod::solve(void* mem) const {
     } else {
       gamma = gamma_1;
     }
-
-    if (mode == 0) uout() << "Elastic mode with gamma = " << gamma << std::endl;
-    else if (mode == 1) uout() << "SOC Elastic mode with gamma = " << gamma << std::endl;
 
     if (gamma > gamma_max_) {
       casadi_error("Error in elastic mode of QP solver."
@@ -1032,8 +1017,6 @@ int Sqpmethod::solve(void* mem) const {
 
     // Copy constraint dlam to the right place
     casadi_copy(d->dlam+nx_+2*ng_, ng_, d->dlam+nx_);
-
-    uout() << "elastic mode iteration: " << *ela_it << std::endl;
 
     return ret;
   }
@@ -1306,7 +1289,6 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         }
         g.comment("Second order corrections without elastic mode");
         g << "if (ela_it == -1) {\n";      
-        g << "printf(\"Entering SOC\\n\");\n";
 
         g.comment("Initial guess");
         g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
@@ -1449,7 +1431,6 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     }
 
     g.comment("Take step");
-    g << "printf(\"Step taken: %f, %f\\n\", d.dx[0], d.dx[1]);\n";
     g << g.axpy(nx_, "1.0", "d.dx", "d_nlp.z") << "\n";
 
     if (elastic_mode_ && max_iter_ls_ > 0) {
