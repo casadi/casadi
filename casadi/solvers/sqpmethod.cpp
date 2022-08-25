@@ -1111,11 +1111,14 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     if (elastic_mode_) {
       g << "double gamma_1;\n";
       g << "casadi_int ela_it = -1;\n";
-      
+      g << "double temp_norm;\n";
+    }
+
+    if (elastic_mode_ || so_corr_) {
       if (qpsol_plugin_ == "qrqp") {
         g << "int ret = 0;\n";
       } else {
-        g << "int flag = 0;\n";
+        g << "flag = 0;\n";
       }
     }
 
@@ -1238,7 +1241,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
       g << "} else if (ela_it == -1) {\n";
       g << "double g_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
-      g << "double temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
+      g << "temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
       codegen_calc_gamma_1(g);
       g << "if (g_inf > gamma_1) {\n";
       g << "ela_it = 0;\n";
@@ -1250,14 +1253,11 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       }
       g << "}\n";
       g << "}\n";
-      g << "}\n";
-    }
-
-    if (error_on_fail_ && so_corr_) {
+    } else if (error_on_fail_ && so_corr_) {
       if (qpsol_plugin_ == "qrqp") {
-        g << "else if (ret != 0) {\n";
+        g << "if (ret != 0) {\n";
       } else {
-        g << "else if (flag != 0) {\n";
+        g << "if (flag != 0) {\n";
       }
       g << "return -1;\n";
       g << "}\n";
@@ -1365,6 +1365,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         codegen_solve_elastic_mode(g, 1);
         g << "}\n";
       }
+      g << "}\n";
       g.comment("Fallback on previous solution if the second order correction failed");
       if (qpsol_plugin_ == "qrqp") {
         g << "if (ret != " << 0 << ") {\n";
@@ -1632,7 +1633,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
   }
 
   void Sqpmethod::codegen_calc_gamma_1(CodeGenerator& cg) const {
-    cg << "double temp_norm = " << gamma_0_ << "*" << cg.norm_inf(nx_, "d.gf") << ";\n";
+    cg << "temp_norm = " << gamma_0_ << "*" << cg.norm_inf(nx_, "d.gf") << ";\n";
     cg << "gamma_1 = " << cg.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
   }
 

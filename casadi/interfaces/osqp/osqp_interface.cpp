@@ -420,6 +420,8 @@ namespace casadi {
     g << "if (work->info->status_val == OSQP_PRIMAL_INFEASIBLE || ";
     g << "work->info->status_val == OSQP_MAX_ITER_REACHED || ";
     g << "work->info->status_val == OSQP_DUAL_INFEASIBLE || ";
+    g << "work->info->status_val == OSQP_PRIMAL_INFEASIBLE_INACCURATE || ";
+    g << "work->info->status_val == OSQP_DUAL_INFEASIBLE_INACCURATE || ";
     g << "work->info->status_val == OSQP_NON_CVX) {\n";
     g << "printf(\"Returning solver ret infeasible\\n\");\n";
     g << "return " << SOLVER_RET_INFEASIBLE << ";\n";
