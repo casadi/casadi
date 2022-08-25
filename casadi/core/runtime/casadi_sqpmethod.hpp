@@ -119,8 +119,6 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
 
   if (so_corr) {
     d->temp_sol = *w; *w += nx+nx+ng;
-  } else {
-    d->temp_sol = *w;
   }
 
   if (elastic_mode) {
@@ -147,7 +145,5 @@ void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d, casadi_int** iw, T1** w
     d->dlam = *w; *w += nx + ng;
     // Jacobian
     d->Jk = *w; *w += nnz_a;
-    // Dummy pointer to temp memory
-    d->temp_mem = *w;
   }
 }

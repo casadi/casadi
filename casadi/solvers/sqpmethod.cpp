@@ -581,10 +581,10 @@ int Sqpmethod::solve(void* mem) const {
           }
         }
       } else if (error_on_fail_ && so_corr_) {
-        // Manual error handling because this is turned off for the second order corrections
-        // TODO(@KobeBergmans): Make this more elegant and easier to debug
+        // Manual error handling because this is turned off due to the second order corrections
         if (ret != 0) {
-          casadi_error("QP solver failed...");
+          casadi_error("qpsolver failed. "
+                   "Set 'error_on_fail' option to false to ignore this error.");
         }
       }
       
@@ -610,7 +610,7 @@ int Sqpmethod::solve(void* mem) const {
       if (so_corr_) {
         // Take candidate step
         casadi_copy(d_nlp->z, nx_, d->z_cand);
-        casadi_axpy(nx_, 1., d->dx, d->z_cand); // Full step! (d->z_cand = d->z_cand + d->dx*1.)
+        casadi_axpy(nx_, 1., d->dx, d->z_cand);
         
         // Evaluating objective and constraints
         m->arg[0] = d->z_cand;
@@ -686,6 +686,7 @@ int Sqpmethod::solve(void* mem) const {
           uout() << "Rejecting SOC step because solver did not return succesfully" << std::endl;
           casadi_copy(d->temp_sol, nx_, d->dx);
           casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
+          so_succes = false;
         } else {
           // Check if corrected step is better than the original one using the merit function
           double l1_cand_norm = l1_cand;
@@ -693,7 +694,7 @@ int Sqpmethod::solve(void* mem) const {
 
           // Take candidate step
           casadi_copy(d_nlp->z, nx_, d->z_cand);
-          casadi_axpy(nx_, 1., d->dx, d->z_cand); // Full step! (d->z_cand = d->z_cand + d->dx*1.)
+          casadi_axpy(nx_, 1., d->dx, d->z_cand);
           
           // Evaluating objective and constraints
           m->arg[0] = d->z_cand;
@@ -712,38 +713,11 @@ int Sqpmethod::solve(void* mem) const {
             uout() << "Rejecting SOC step because it is bad..." << std::endl;
             casadi_copy(d->temp_sol, nx_, d->dx);
             casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
+            so_succes = false;
+          } else {
+            so_succes = true;
           }
-
-          // Check if corrected step is better than the original one using the Armijo condition
-          // double l1_cand_norm = l1_cand;
-          // double tl1 = casadi_dot(nx_, d->temp_sol, d->gf) - m->sigma*l1_infeas;
-          // double l1_cand_soc;
-
-          // // Take candidate step
-          // casadi_copy(d_nlp->z, nx_, d->z_cand);
-          // casadi_axpy(nx_, 1., d->dx, d->z_cand); // Full step! (d->z_cand = d->z_cand + d->dx*1.)
-
-          // // Evaluating objective and constraints
-          // m->arg[0] = d->z_cand;
-          // m->arg[1] = d_nlp->p;
-          // m->res[0] = &fk_cand;
-          // m->res[1] = d->z_cand + nx_;
-          // if (calc_function(m, "nlp_fg")) {
-          //   l1_cand_soc = inf; // Make sure the second order corrections are not used!
-          // } else {
-          //   l1_infeas_cand = casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
-          //   l1_cand_soc = fk_cand + m->sigma*l1_infeas_cand;
-          // }
-
-          // if (l1_cand_soc >= l1_cand_norm + t * c1_ * tl1) {
-          //   // If the Armijo condition is not satisfied, use normal step
-          //   uout() << "Rejecting SOC step because it is bad..." << std::endl;
-          //   casadi_copy(d->temp_sol, nx_, d->dx);
-          //   casadi_copy(d->temp_sol+nx_, nx_+ng_, d->dlam);
-          // }
         }
-
-        so_succes = true;
       }
 
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
@@ -779,23 +753,23 @@ int Sqpmethod::solve(void* mem) const {
           casadi_axpy(nx_, t, d->dx, d->z_cand);
 
           // Evaluating objective and constraints
-          // TODO(@KobeBergmans): if there is no second order correction this is inneficient
-          m->arg[0] = d->z_cand;
-          m->arg[1] = d_nlp->p;
-          m->res[0] = &fk_cand;
-          m->res[1] = d->z_cand + nx_;
-          if (calc_function(m, "nlp_fg")) {
-            // Avoid infinite recursion
-            if (ls_iter == max_iter_ls_) {
-              ls_success = false;
-              l1_infeas = nan;
-              break;
+          if (!so_corr_ || !so_succes) {
+            m->arg[0] = d->z_cand;
+            m->arg[1] = d_nlp->p;
+            m->res[0] = &fk_cand;
+            m->res[1] = d->z_cand + nx_;
+            if (calc_function(m, "nlp_fg")) {
+              // Avoid infinite recursion
+              if (ls_iter == max_iter_ls_) {
+                ls_success = false;
+                l1_infeas = nan;
+                break;
+              }
+              // line-search failed, skip iteration
+              t = beta_ * t;
+              continue;
             }
-            // line-search failed, skip iteration
-            t = beta_ * t;
-            continue;
-          }
-          
+          }          
 
           // Calculating merit-function in candidate
           l1_cand = fk_cand + m->sigma*casadi_sum_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
@@ -1238,10 +1212,9 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       }
 
       g << "} else if (ela_it == -1) {\n";
-      g << "double g_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
-      g << "temp_norm = " << gamma_0_ << "*" << g.norm_inf(ng_, "d_nlp.z+"+str(nx_)) << ";\n";
+      g << "double pi_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
       codegen_calc_gamma_1(g);
-      g << "if (g_inf > gamma_1) {\n";
+      g << "if (pi_inf > gamma_1) {\n";
       g << "ela_it = 0;\n";
       codegen_solve_elastic_mode(g, 0);
       if (qpsol_plugin_ == "qrqp") {
