@@ -27,6 +27,7 @@
 #define CASADI_DETERMINANT_HPP
 
 #include "mx_node.hpp"
+#include "linsol_internal.hpp"
 #include <map>
 #include <stack>
 
@@ -45,6 +46,9 @@ namespace casadi {
 
     /// Destructor
     ~Determinant() override {}
+
+    /** \brief Evaluate the function numerically */
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
@@ -65,6 +69,9 @@ namespace casadi {
 
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new Determinant(s); }
+
+    // CSparse interface
+    Linsol linsol_;
 
   protected:
     /** \brief Deserializing constructor */
