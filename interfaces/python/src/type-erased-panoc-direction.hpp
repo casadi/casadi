@@ -86,8 +86,10 @@ class TypeErasedPANOCDirection
 
 template <Config Conf>
 struct PANOCDirection<TypeErasedPANOCDirection<Conf>> : TypeErasedPANOCDirection<Conf> {
-    PANOCDirection(TypeErasedPANOCDirection<Conf> &&o)
-        : TypeErasedPANOCDirection<Conf>(std::move(o)) {}
+    PANOCDirection(const TypeErasedPANOCDirection<Conf> &other)
+        : TypeErasedPANOCDirection<Conf>(other) {}
+    PANOCDirection(TypeErasedPANOCDirection<Conf> &&other)
+        : TypeErasedPANOCDirection<Conf>(std::move(other)) {}
 };
 
 template <class T, class... Args>

@@ -3,6 +3,7 @@
 #include <pybind11/chrono.h>
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
+#include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -18,6 +19,7 @@ constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 #include "check-dim.hpp"
 #include "kwargs-to-struct.hpp"
 #include "lbfgs-params.hpp"
+#include "stats-to-dict.hpp"
 #include "type-erased-panoc-direction.hpp"
 
 template <alpaqa::Config Conf>
@@ -65,8 +67,30 @@ void register_panoc(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
 
     // ----------------------------------------------------------------------------------------- //
+    using Box                      = alpaqa::Box<config_t>;
     using TypeErasedPANOCDirection = alpaqa::TypeErasedPANOCDirection<Conf>;
     py::class_<TypeErasedPANOCDirection>(m, "PANOCDirection")
+        .def(py::init([](py::object o) {
+            struct {
+                void initialize(crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0) {
+                    o.attr("initialize")(x_0, x̂_0, p_0, grad_0);
+                }
+                bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_new,
+                            const Box &C, real_t γ_new) {
+                    return py::cast<bool>(
+                        o.attr("update")(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_new, C, γ_new));
+                }
+                bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) const {
+                    return py::cast<bool>(o.attr("apply")(xₖ, x̂ₖ, pₖ, γ, qₖ));
+                }
+                void changed_γ(real_t γₖ, real_t old_γₖ) { o.attr("changed_γ")(γₖ, old_γₖ); }
+                void reset() { o.attr("reset")(); }
+                std::string get_name() const { return py::cast<std::string>(py::str(o)); }
+
+                py::object o;
+            } s{std::move(o)};
+            return TypeErasedPANOCDirection{std::move(s)};
+        }))
         .def("__str__", &TypeErasedPANOCDirection::template get_name<>);
 
     // ----------------------------------------------------------------------------------------- //
@@ -219,7 +243,37 @@ void register_panoc(py::module_ &m) {
             "fpr", [](const PANOCProgressInfo &p) { return std::sqrt(p.norm_sq_p) / p.γ; },
             "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
 
-    using PANOCSolver = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
+    using PANOCSolver            = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
+    using Problem                = typename PANOCSolver::Problem;
+    auto panoc_independent_solve = [](PANOCSolver &solver, const Problem &problem, crvec Σ,
+                                      real_t ε, std::optional<vec> x, std::optional<vec> y) {
+        bool always_overwrite_results = true;
+        check_dim("Σ", Σ, problem.m);
+        if (x)
+            check_dim("x", *x, problem.n);
+        else
+            x = vec::Zero(problem.n);
+        if (y)
+            check_dim("y", *y, problem.m);
+        else
+            y = vec::Zero(problem.m);
+        vec err_z  = vec::Zero(problem.m);
+        auto stats = solver(problem, Σ, ε, always_overwrite_results, *x, *y, err_z);
+        return std::make_tuple(std::move(*x), std::move(*y), std::move(err_z),
+                               alpaqa::conv::stats_to_dict(stats));
+    };
+    auto panoc_independent_solve_unconstr = [](PANOCSolver &solver, const Problem &problem,
+                                               real_t ε, std::optional<vec> x) {
+        bool always_overwrite_results = true;
+        if (x)
+            check_dim("x", *x, problem.n);
+        else
+            x = vec::Zero(problem.n);
+        vec Σ(0), y(0), err_z(0);
+        auto stats = solver(problem, Σ, ε, always_overwrite_results, *x, y, err_z);
+        return std::make_tuple(std::move(*x), alpaqa::conv::stats_to_dict(stats));
+    };
+
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
         .def(py::init([](params_or_dict<PANOCParams> params, const LBFGS &lbfgs) {
                  return PANOCSolver{var_kwargs_to_struct(params),
@@ -234,6 +288,35 @@ void register_panoc(py::module_ &m) {
                  }),
              "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
              "Create a PANOC solver using L-BFGS directions.")
+        .def(py::init(
+            [](params_or_dict<PANOCParams> params, const TypeErasedPANOCDirection &direction) {
+                return PANOCSolver{var_kwargs_to_struct(params),
+                                   typename PANOCSolver::Direction{direction}};
+            }))
+        .def("__call__", panoc_independent_solve,
+             py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
+             "problem"_a, "Σ"_a, "ε"_a, "x"_a = py::none(),
+             "y"_a = py::none(), //
+             "Solve.\n\n"
+             ":param problem: Problem to solve\n"
+             ":param Σ: Penalty factor\n"
+             ":param ε: Desired tolerance\n"
+             ":param x: Initial guess\n"
+             ":param y: Initial Lagrange multipliers\n\n"
+             ":return: * Solution :math:`x`\n"
+             "         * Updated Lagrange multipliers :math:`y`\n"
+             "         * Slack variable error :math:`g(x) - z`\n"
+             "         * Statistics\n\n")
+        .def("__call__", panoc_independent_solve_unconstr,
+             py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
+             "problem"_a, "ε"_a, "x"_a = py::none(), //
+             "Solve.\n\n"
+             ":param problem: Problem to solve\n"
+             ":param ε: Desired tolerance\n"
+             ":param x: Initial guess\n"
+             ":return: * Solution :math:`x`\n"
+             "         * Statistics\n\n")
+        .def("__str__", &PANOCSolver::get_name)
         .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
              "Specify a callable that is invoked with some intermediate results on each iteration "
              "of the algorithm.");
