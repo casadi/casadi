@@ -65,7 +65,7 @@ if has_nlpsol("bonmin"):
   solvers.append(("bonmin",{},{"discrete"}))
 
 if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
-  solvers.append(("knitro",{"knitro":{"feastol":1e-8,"opttol":1e-8}},set()))
+  solvers.append(("knitro",{"knitro":{"feastol":1e-10,"opttol":1e-10}},set()))
 
 print(solvers)
 
