@@ -46,7 +46,10 @@ namespace casadi {
     const KnitroInterface& self;
 
     // KNITRO context pointer
-    KTR_context_ptr kc;
+    KN_context *kc;
+    
+    // KNITRO callback pointer
+    CB_context *cb;
 
     // Inputs
     double *wlbx, *wubx, *wlbg, *wubg;
@@ -113,12 +116,11 @@ namespace casadi {
     bool integer_support() const override { return true;}
 
     // KNITRO callback wrapper
-    static int callback(const int evalRequestCode, // NOLINT
-                        const int n, const int m, const int nnzJ, // NOLINT
-                        const int nnzH, const double * const x, const double * const lambda, // NOLINT
-                        double * const obj, double * const c, double * const objGrad, // NOLINT
-                        double * const jac, double * const hessian, // NOLINT
-                        double * const hessVector, void *userParams); // NOLINT
+    static int callback(KN_context_ptr        kc,
+                   CB_context_ptr             cb,
+                   KN_eval_request_ptr const  evalRequest,
+                   KN_eval_result_ptr  const  evalResult,
+                   void             *  const  userParams);
 
     // KNITRO return codes
     static const char* return_codes(int flag);
@@ -133,7 +135,7 @@ namespace casadi {
     std::vector<int> contype_;
 
     // Type of complementarity constraints
-    //std::vector<int> comp_type_;
+    std::vector<int> comp_type_;
 
     // Index pair for complementarity constraints
     std::vector<int> comp_i1_;
