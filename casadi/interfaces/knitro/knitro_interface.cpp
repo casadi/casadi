@@ -130,6 +130,13 @@ namespace casadi {
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn.sparsity_out(0);
 
+    // Obtain maximum number of threads needed
+    for (auto&& op : opts_) {
+      if (op.first=="ms_numthreads") {
+        max_num_threads_ = op.second;
+      }
+    }
+
     // Allocate persistent memory
     alloc_w(nx_, true); // wlbx_
     alloc_w(nx_, true); // wubx_
@@ -337,6 +344,8 @@ namespace casadi {
       calc_function(m, "nlp_fg");
     }
 
+    join_results(m);
+
     // Free memory (move to destructor!)
     status = KN_free(&m->kc);
     casadi_assert(status == 0, "KN_free failed");
@@ -350,8 +359,11 @@ namespace casadi {
                    KN_eval_result_ptr  const  evalResult,
                    void             *  const  userParams) {
     try {
+      int thread_id = evalRequest->threadID;
       // Get a pointer to the calling object
       auto m = static_cast<KnitroMemory*>(userParams);
+      // Get thread local memory
+      auto ml = m->thread_local_mem.at(thread_id);
       auto d_nlp = &m->d_nlp;
       const double *x;
       // Direct to the correct function
@@ -362,11 +374,11 @@ namespace casadi {
       x = evalRequest->x;
       obj = evalResult->obj;
       c = evalResult->c;
-      m->arg[0] = x;
-      m->arg[1] = d_nlp->p;
-      m->res[0] = obj;
-      m->res[1] = c;
-      if (m->self.calc_function(m, "nlp_fg")) return KN_RC_EVAL_ERR;
+      ml->arg[0] = x;
+      ml->arg[1] = d_nlp->p;
+      ml->res[0] = obj;
+      ml->res[1] = c;
+      if (m->self.calc_function(m, "nlp_fg", nullptr, thread_id)) return KN_RC_EVAL_ERR;
       break;
       case KN_RC_EVALGA:
       double *objGrad;
@@ -374,11 +386,11 @@ namespace casadi {
       x = evalRequest->x;
       objGrad = evalResult->objGrad;
       jac = evalResult->jac;
-      m->arg[0] = x;
-      m->arg[1] = d_nlp->p;
-      m->res[0] = objGrad;
-      m->res[1] = jac;
-      if (m->self.calc_function(m, "nlp_gf_jg")) return KN_RC_EVAL_ERR;
+      ml->arg[0] = x;
+      ml->arg[1] = d_nlp->p;
+      ml->res[0] = objGrad;
+      ml->res[1] = jac;
+      if (m->self.calc_function(m, "nlp_gf_jg", nullptr, thread_id)) return KN_RC_EVAL_ERR;
       break;
       case KN_RC_EVALH_NO_F:
       case KN_RC_EVALH:
@@ -389,12 +401,12 @@ namespace casadi {
       hess = evalResult->hess;
       lambda = evalRequest->lambda;
       sigma = *(evalRequest->sigma);
-      m->arg[0] = x;
-      m->arg[1] = d_nlp->p;
-      m->arg[2] = &sigma;
-      m->arg[3] = lambda;
-      m->res[0] = hess;
-      if (m->self.calc_function(m, "nlp_hess_l")) {casadi_error("calc_hess_l failed");}
+      ml->arg[0] = x;
+      ml->arg[1] = d_nlp->p;
+      ml->arg[2] = &sigma;
+      ml->arg[3] = lambda;
+      ml->res[0] = hess;
+      if (m->self.calc_function(m, "nlp_hess_l", nullptr, thread_id)) {casadi_error("calc_hess_l failed");}
       break;
       default:
         casadi_error("KnitroInterface::callback: unknown method");

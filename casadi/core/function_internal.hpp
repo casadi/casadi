@@ -857,7 +857,7 @@ namespace casadi {
     void alloc_w(size_t sz_w, bool persistent=false);
 
     /** \brief Ensure work vectors long enough to evaluate function */
-    void alloc(const Function& f, bool persistent=false);
+    void alloc(const Function& f, bool persistent=false, int num_threads=1);
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
