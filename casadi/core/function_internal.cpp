@@ -2673,14 +2673,14 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::alloc(const Function& f, bool persistent) {
+  void FunctionInternal::alloc(const Function& f, bool persistent, int num_threads) {
     if (f.is_null()) return;
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-    alloc_arg(sz_arg, persistent);
-    alloc_res(sz_res, persistent);
-    alloc_iw(sz_iw, persistent);
-    alloc_w(sz_w, persistent);
+    alloc_arg(sz_arg*num_threads, persistent);
+    alloc_res(sz_res*num_threads, persistent);
+    alloc_iw(sz_iw*num_threads, persistent);
+    alloc_w(sz_w*num_threads, persistent);
   }
 
   Dict ProtoFunction::get_stats(void* mem) const {

@@ -56,6 +56,12 @@ namespace casadi {
 
   }
 
+  void FStats::join(FStats& rhs) {
+    t_proc += rhs.t_proc;
+    t_wall += rhs.t_wall;
+    n_call += rhs.n_call;
+  }
+
   ScopedTiming::ScopedTiming(FStats& f) : f_(f) {
     f_.tic();
   }

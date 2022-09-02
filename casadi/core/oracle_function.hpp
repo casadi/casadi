@@ -32,12 +32,23 @@
 namespace casadi {
 
   /** \brief Function memory with temporary work vectors */
-  struct CASADI_EXPORT OracleMemory : public FunctionMemory {
+  struct CASADI_EXPORT LocalOracleMemory : public FunctionMemory {
     // Work vectors
     const double** arg;
     double** res;
     casadi_int* iw;
     double* w;
+  };
+
+  /** \brief Function memory */
+  struct CASADI_EXPORT OracleMemory : public FunctionMemory {
+    // Work vector aliases for non-threaded convenience
+    const double** arg;
+    double** res;
+    casadi_int* iw;
+    double* w;
+
+    std::vector<LocalOracleMemory*> thread_local_mem;
   };
 
   /** \brief Base class for functions that perform calculation with an oracle
@@ -56,6 +67,9 @@ namespace casadi {
     /// Show evaluation warnings
     bool show_eval_warnings_;
 
+    // Maximum number of threads
+    int max_num_threads_;
+
     // Information about one function
     struct RegFun {
       Function f;
@@ -69,6 +83,9 @@ namespace casadi {
 
     // Active monitors
     std::vector<std::string> monitor_;
+
+    // Memory stride in case of multipel threads
+    size_t stride_arg_, stride_res_, stride_iw_, stride_w_;
 
   public:
     /** \brief  Constructor */
@@ -88,6 +105,9 @@ namespace casadi {
 
     /// Finalize initialization
     void finalize() override;
+
+    /// Combine results from different threads
+    void join_results(OracleMemory* m) const;
 
     /** \brief Get oracle */
     const Function& oracle() const override { return oracle_;}
@@ -110,7 +130,7 @@ namespace casadi {
 
     // Calculate an oracle function
     int calc_function(OracleMemory* m, const std::string& fcn,
-                      const double* const* arg=nullptr) const;
+                      const double* const* arg=nullptr, int thread_id=0) const;
 
     /** \brief Get list of dependency functions
      * -1 Indicates irregularity
@@ -136,10 +156,16 @@ namespace casadi {
     void* alloc_mem() const override { return new OracleMemory();}
 
     /** \brief Initalize memory block */
+    int local_init_mem(void* mem) const;
+
+    /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<OracleMemory*>(mem);}
+    void local_free_mem(void *mem) const { delete static_cast<LocalOracleMemory*>(mem);}
+
+   /** \brief Free memory block */
+    void free_mem(void *mem) const override;
 
     /** \brief Set the work vectors */
     void set_temp(void* mem, const double** arg, double** res,

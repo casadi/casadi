@@ -71,6 +71,8 @@ namespace casadi {
 
     show_eval_warnings_ = true;
 
+    max_num_threads_ = 1;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="expand") {
@@ -95,10 +97,29 @@ namespace casadi {
     // Replace MX oracle with SX oracle?
     if (expand) oracle_ = oracle_.expand();
 
+    stride_arg_ = 0;
+    stride_res_ = 0;
+    stride_iw_ = 0;
+    stride_w_ = 0;
+
   }
 
   void OracleFunction::finalize() {
 
+    // Allocate space for (parallel) evaluations
+    // Lifted from set_function as max_num_threads_ is not known yet in that method
+    for (auto&& e : all_functions_) {
+      Function& fcn = e.second.f;
+      // Compute strides for multi threading
+      size_t sz_arg, sz_res, sz_iw, sz_w;
+      fcn.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+      stride_arg_ = max(stride_arg_, sz_arg);
+      stride_res_ = max(stride_res_, sz_res);
+      stride_iw_ = max(stride_iw_, sz_iw);
+      stride_w_ = max(stride_w_, sz_w);
+      bool persistent = false;
+      alloc(fcn, persistent, max_num_threads_);
+    }
 
     // Set corresponding monitors
     for (const string& fname : monitor_) {
@@ -121,6 +142,18 @@ namespace casadi {
 
     // Recursive call
     FunctionInternal::finalize();
+  }
+
+  void OracleFunction::join_results(OracleMemory* m) const {
+    
+    // Combine runtime statistics
+    // Note: probably not correct to simply add wall times
+    for (int i = 0; i < max_num_threads_; ++i) {
+      auto* ml = m->thread_local_mem[i];
+      for (auto&& s : ml->fstats) {
+        m->fstats.at(s.first).join(s.second);
+      }
+    }
   }
 
   Function OracleFunction::create_function(const std::string& fname,
@@ -159,12 +192,12 @@ namespace casadi {
     RegFun& r = all_functions_[fname];
     r.f = fcn;
     r.jit = jit;
-    alloc(fcn);
   }
 
   int OracleFunction::
   calc_function(OracleMemory* m, const std::string& fcn,
-                const double* const* arg) const {
+                const double* const* arg, int thread_id) const {
+    auto ml = m->thread_local_mem.at(thread_id);
     // Is the function monitored?
     bool monitored = this->monitored(fcn);
 
@@ -178,7 +211,7 @@ namespace casadi {
     const Function& f = get_function(fcn);
 
     // Get statistics structure
-    FStats& fstats = m->fstats.at(fcn);
+    FStats& fstats = ml->fstats.at(fcn);
 
     // Number of inputs and outputs
     casadi_int n_in = f.n_in(), n_out = f.n_out();
@@ -188,8 +221,8 @@ namespace casadi {
 
     // Input buffers
     if (arg) {
-      fill_n(m->arg, n_in, nullptr);
-      for (casadi_int i=0; i<n_in; ++i) m->arg[i] = *arg++;
+      fill_n(ml->arg, n_in, nullptr);
+      for (casadi_int i=0; i<n_in; ++i) ml->arg[i] = *arg++;
     }
 
     // Print inputs nonzeros
@@ -198,12 +231,12 @@ namespace casadi {
       s << fcn << " input nonzeros:\n";
       for (casadi_int i=0; i<n_in; ++i) {
         s << " " << i << " (" << f.name_in(i) << "): ";
-        if (m->arg[i]) {
+        if (ml->arg[i]) {
           // Print nonzeros
           s << "[";
           for (casadi_int k=0; k<f.nnz_in(i); ++k) {
             if (k!=0) s << ", ";
-            DM::print_scalar(s, m->arg[i][k]);
+            DM::print_scalar(s, ml->arg[i][k]);
           }
           s << "]\n";
         } else {
@@ -216,7 +249,7 @@ namespace casadi {
 
     // Evaluate memory-less
     try {
-      f(m->arg, m->res, m->iw, m->w);
+      f(ml->arg, ml->res, ml->iw, ml->w);
     } catch(exception& ex) {
       // Fatal error
       if (show_eval_warnings_) {
@@ -231,12 +264,12 @@ namespace casadi {
       s << fcn << " output nonzeros:\n";
       for (casadi_int i=0; i<n_out; ++i) {
         s << " " << i << " (" << f.name_out(i) << "): ";
-        if (m->res[i]) {
+        if (ml->res[i]) {
           // Print nonzeros
           s << "[";
           for (casadi_int k=0; k<f.nnz_out(i); ++k) {
             if (k!=0) s << ", ";
-            DM::print_scalar(s, m->res[i][k]);
+            DM::print_scalar(s, ml->res[i][k]);
           }
           s << "]\n";
         } else {
@@ -249,13 +282,13 @@ namespace casadi {
 
     // Make sure not NaN or Inf
     for (casadi_int i=0; i<n_out; ++i) {
-      if (!m->res[i]) continue;
-      if (!all_of(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
+      if (!ml->res[i]) continue;
+      if (!all_of(ml->res[i], ml->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
         std::stringstream ss;
 
-        auto it = find_if(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return !isfinite(v);});
-        casadi_int k = distance(m->res[i], it);
-        bool is_nan = isnan(m->res[i][k]);
+        auto it = find_if(ml->res[i], ml->res[i]+f.nnz_out(i), [](double v) { return !isfinite(v);});
+        casadi_int k = distance(ml->res[i], it);
+        bool is_nan = isnan(ml->res[i][k]);
         ss << name_ << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
         " detected for output " << f.name_out(i) << ", at " << f.sparsity_out(i).repr_el(k) << ".";
 
@@ -309,6 +342,19 @@ namespace casadi {
     return stats;
   }
 
+  int OracleFunction::local_init_mem(void* mem) const {
+    if (ProtoFunction::init_mem(mem)) return 1;
+    if (!mem) return 1;
+    auto m = static_cast<LocalOracleMemory*>(mem);
+
+    // Create statistics
+    for (auto&& e : all_functions_) {
+      m->add_stat(e.first);
+    }
+
+    return 0;
+  }
+
   int OracleFunction::init_mem(void* mem) const {
     if (ProtoFunction::init_mem(mem)) return 1;
     if (!mem) return 1;
@@ -318,7 +364,26 @@ namespace casadi {
     for (auto&& e : all_functions_) {
       m->add_stat(e.first);
     }
+
+    casadi_assert_dev(m->thread_local_mem.empty());
+
+    // Allocate and initialize local memory for threads
+    for (int i = 0; i < max_num_threads_; ++i) {
+      m->thread_local_mem.push_back(new LocalOracleMemory());
+      if (OracleFunction::local_init_mem(m->thread_local_mem[i])) return 1;
+    }
+    
     return 0;
+  }
+
+  void OracleFunction::free_mem(void *mem) const {
+    auto m = static_cast<OracleMemory*>(mem);
+
+    for (int i = 0; i < max_num_threads_; ++i) {
+      local_free_mem(m->thread_local_mem[i]);
+    }
+
+    delete m;
   }
 
   void OracleFunction::set_temp(void* mem, const double** arg, double** res,
@@ -328,6 +393,17 @@ namespace casadi {
     m->res = res;
     m->iw = iw;
     m->w = w;
+    for (int i = 0; i < max_num_threads_; ++i) {
+      auto* ml = m->thread_local_mem[i];
+      ml->arg = arg;
+      ml->res = res;
+      ml->iw = iw;
+      ml->w = w;
+      arg += stride_arg_;
+      res += stride_res_;
+      iw += stride_iw_;
+      w += stride_w_;
+    }
   }
 
   std::vector<std::string> OracleFunction::get_function() const {
@@ -363,11 +439,12 @@ namespace casadi {
   void OracleFunction::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
-    s.version("OracleFunction", 2);
+    s.version("OracleFunction", 3);
     s.pack("OracleFunction::oracle", oracle_);
     s.pack("OracleFunction::common_options", common_options_);
     s.pack("OracleFunction::specific_options", specific_options_);
     s.pack("OracleFunction::show_eval_warnings", show_eval_warnings_);
+    s.pack("OracleFunction::max_num_threads_", max_num_threads_);
     s.pack("OracleFunction::all_functions::size", all_functions_.size());
     for (auto &e : all_functions_) {
       s.pack("OracleFunction::all_functions::key", e.first);
@@ -388,15 +465,27 @@ namespace casadi {
       s.pack("OracleFunction::all_functions::value::monitored", e.second.monitored);
     }
     s.pack("OracleFunction::monitor", monitor_);
+    s.pack("OracleFunction::stride_arg", stride_arg_);
+    s.pack("OracleFunction::stride_res", stride_res_);
+    s.pack("OracleFunction::stride_iw", stride_iw_);
+    s.pack("OracleFunction::stride_w", stride_w_);
+
   }
 
   OracleFunction::OracleFunction(DeserializingStream& s) : FunctionInternal(s) {
 
-    int version = s.version("OracleFunction", 1, 2);
+    int version = s.version("OracleFunction", 1, 3);
     s.unpack("OracleFunction::oracle", oracle_);
     s.unpack("OracleFunction::common_options", common_options_);
     s.unpack("OracleFunction::specific_options", specific_options_);
     s.unpack("OracleFunction::show_eval_warnings", show_eval_warnings_);
+
+    if (version>=3) {
+      s.unpack("OracleFunction::max_num_threads", max_num_threads_);
+    } else {
+      max_num_threads_ = 1;
+    }
+
     size_t size;
 
     s.unpack("OracleFunction::all_functions::size", size);
@@ -426,6 +515,17 @@ namespace casadi {
       all_functions_[key] = r;
     }
     s.unpack("OracleFunction::monitor", monitor_);
+    if (version>=3) {
+      s.unpack("OracleFunction::stride_arg", stride_arg_);
+      s.unpack("OracleFunction::stride_res", stride_res_);
+      s.unpack("OracleFunction::stride_iw", stride_iw_);
+      s.unpack("OracleFunction::stride_w", stride_w_);
+    } else {
+      stride_arg_ = 0;
+      stride_res_ = 0;
+      stride_iw_ = 0;
+      stride_w_ = 0;
+    }
   }
 
 } // namespace casadi
