@@ -310,8 +310,7 @@ namespace casadi {
     double objSol;
 
     // Solve NLP
-    status =
-    KN_solve(m->kc);
+    status = KN_solve(m->kc);
     int statusKnitro = int(status);
 
     m->return_status = return_codes(status);

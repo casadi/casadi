@@ -28,6 +28,7 @@ import unittest
 from types import *
 from helpers import *
 import itertools
+import copy
 
 import os
 #GlobalOptions.setCatchErrorsPython(False)
@@ -65,7 +66,7 @@ if has_nlpsol("bonmin"):
   solvers.append(("bonmin",{},{"discrete"}))
 
 if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
-  solvers.append(("knitro",{"knitro":{"feastol":1e-10,"opttol":1e-10}},set()))
+  solvers.append(("knitro",{"knitro":{"feastol":1e-9,"opttol":1e-9,"ftol":1e-20}},set()))
 
 print(solvers)
 
@@ -89,7 +90,7 @@ class NLPtests(casadiTestCase):
         print(solver(**solver_in))
       except:
         pass
-      if Solver not in ["ipopt","snopt","blocksqp","bonmin"]:
+      if Solver not in ["ipopt","snopt","blocksqp","bonmin","knitro"]:
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
 
@@ -107,7 +108,7 @@ class NLPtests(casadiTestCase):
         solver_out = solver(**solver_in)
       except:
         pass
-      if Solver not in ["ipopt","snopt","bonmin"]:
+      if Solver not in ["ipopt","snopt","bonmin","knitro"]:
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
 
@@ -308,7 +309,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["g"][0],1,9,str(Solver))
-      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
 
       if "codegen" in features:
@@ -333,7 +334,7 @@ class NLPtests(casadiTestCase):
       self.assertTrue(solver.stats()["success"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
-      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
 
       if "codegen" in features:
@@ -353,7 +354,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-inf]
       solver_in["ubg"]=[inf]
 
-      if Solver in ("worhp","knitro"):
+      if Solver in ["worhp"]:
         with self.assertRaises(Exception):
           solver_out = solver(**solver_in)
         return
@@ -374,7 +375,7 @@ class NLPtests(casadiTestCase):
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
 
-      if Solver in ("worhp","knitro"):
+      if Solver in ["worhp"]:
         with self.assertRaises(Exception):
           solver_out = solver(**solver_in)
         return
@@ -433,7 +434,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]
       solver_in["ubg"]=[10]
       solver_out = solver(**solver_in)
-      self.assertTrue(solver.stats()["success"])
+      if "knitro" not in str(Solver): self.assertTrue(solver.stats()["success"])
 
       digits = 6
 
@@ -1439,8 +1440,12 @@ class NLPtests(casadiTestCase):
 
     for Solver, solver_options, features in solvers:
       if "ipopt" in str(solver_options): continue
+      if "knitro" in str(Solver):
+        solver_options = copy.deepcopy(solver_options)
+        solver_options["knitro"]["algorithm"] = 4 # sqp
 
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      print("foo",Solver,solver(lbg=0,x0=0,p=0.5))
 
       z = solver(p=p,x0=x,lbg=0)["x"]
 

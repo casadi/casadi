@@ -444,7 +444,7 @@ namespace casadi {
     s.pack("OracleFunction::common_options", common_options_);
     s.pack("OracleFunction::specific_options", specific_options_);
     s.pack("OracleFunction::show_eval_warnings", show_eval_warnings_);
-    s.pack("OracleFunction::max_num_threads_", max_num_threads_);
+    s.pack("OracleFunction::max_num_threads", max_num_threads_);
     s.pack("OracleFunction::all_functions::size", all_functions_.size());
     for (auto &e : all_functions_) {
       s.pack("OracleFunction::all_functions::key", e.first);
