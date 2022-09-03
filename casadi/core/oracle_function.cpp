@@ -205,7 +205,10 @@ namespace casadi {
     if (monitored) casadi_message("Calling \"" + fcn + "\"");
 
     // Respond to a possible Crl+C signals
-    InterruptHandler::check();
+    // Python interrupt checker needs the GIL.
+    // We may not have access to it in a multi-threaded context
+    // See issue #2955
+    if (max_num_threads_==1) InterruptHandler::check();
 
     // Get function
     const Function& f = get_function(fcn);
