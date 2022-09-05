@@ -620,9 +620,6 @@ namespace casadi {
     std::unordered_map<std::string, SXElem > cache;
     IncrementalSerializer s;
 
-    // Iterator to the binary operations
-    vector<SXElem>::const_iterator b_it=ff->operations_.begin();
-
     // Iterator to stack of constants
     vector<SXElem>::const_iterator c_it = ff->constants_.begin();
 
@@ -649,7 +646,6 @@ namespace casadi {
         break;
       default:
         {
-          const SXElem& b = *b_it++;
 
           // Evaluate the function to a temporary value
           // (as it might overwrite the children in the work vector)

@@ -318,6 +318,7 @@ void External::codegen_body(CodeGenerator& g) const {
 
 std::string External::codegen_mem_type() const {
   if (checkout_) return "nonempty";
+  return "";
 }
 
 void External::codegen_checkout(CodeGenerator& g) const {
