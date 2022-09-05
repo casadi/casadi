@@ -185,12 +185,11 @@ template<typename T1>
 void casadi_get_sub(T1* sub, const casadi_int* sp_a, const T1* nz_a,
     casadi_int rbegin, casadi_int rend, casadi_int cbegin, casadi_int cend) {
   // Local variables
-  casadi_int nr, nc, r, c, k;
+  casadi_int nc, r, c, k;
   const casadi_int *colind, *row;
   // Quick return if null
   if (sub == 0) return;
   // Extract sparsity
-  nr = sp_a[0];
   nc = sp_a[1];
   colind = sp_a + 2;
   row = colind + nc + 1;
