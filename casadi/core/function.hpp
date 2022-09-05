@@ -236,7 +236,7 @@ namespace casadi {
      */
     casadi_int nnz_in() const;
     casadi_int nnz_in(casadi_int ind) const;
-    casadi_int nnz_in(const std::string& iname) const {return numel_in(index_in(iname));}
+    casadi_int nnz_in(const std::string& iname) const {return nnz_in(index_in(iname));}
     ///@}
 
     ///@{
@@ -246,7 +246,7 @@ namespace casadi {
      */
     casadi_int nnz_out() const;
     casadi_int nnz_out(casadi_int ind) const;
-    casadi_int nnz_out(const std::string& oname) const {return numel_out(index_out(oname));}
+    casadi_int nnz_out(const std::string& oname) const {return nnz_out(index_out(oname));}
     ///@}
 
     ///@{
