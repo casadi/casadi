@@ -106,9 +106,6 @@ namespace casadi {
     // Memory structure
     casadi_sqpmethod_prob<double> p_;
 
-    /// QP solver plugin
-    std::string qpsol_plugin_;
-
     /// QP solver for the subproblems
     Function qpsol_;
 
@@ -167,10 +164,6 @@ namespace casadi {
 
     /// convexify?
     bool convexify_;
-
-    // Elastic mode sparsities
-    Sparsity Hsp_ela_;
-    Sparsity Asp_ela_;
 
     // Second order corrections
     bool so_corr_;
