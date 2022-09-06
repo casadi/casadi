@@ -417,16 +417,20 @@ namespace casadi {
     g.copy_check("work->solution->y+" + str(nx_), na_, g.res(CONIC_LAM_A), false, true);
 
     g << "if (work->info->status_val != OSQP_SOLVED) {\n";
-    g << "if (work->info->status_val == OSQP_PRIMAL_INFEASIBLE || ";
-    g << "work->info->status_val == OSQP_MAX_ITER_REACHED || ";
-    g << "work->info->status_val == OSQP_DUAL_INFEASIBLE || ";
-    g << "work->info->status_val == OSQP_PRIMAL_INFEASIBLE_INACCURATE || ";
-    g << "work->info->status_val == OSQP_DUAL_INFEASIBLE_INACCURATE || ";
-    g << "work->info->status_val == OSQP_NON_CVX) {\n";
-    g << "return " << SOLVER_RET_INFEASIBLE << ";\n";
-    g << "} else {\n";
-    g << "return " << SOLVER_RET_UNKNOWN << ";\n";
-    g << "}\n";
+    if (error_on_fail_) {
+      g << "return -1000;\n";
+    } else {
+      g << "if (work->info->status_val == OSQP_PRIMAL_INFEASIBLE || ";
+      g << "work->info->status_val == OSQP_MAX_ITER_REACHED || ";
+      g << "work->info->status_val == OSQP_DUAL_INFEASIBLE || ";
+      g << "work->info->status_val == OSQP_PRIMAL_INFEASIBLE_INACCURATE || ";
+      g << "work->info->status_val == OSQP_DUAL_INFEASIBLE_INACCURATE || ";
+      g << "work->info->status_val == OSQP_NON_CVX) {\n";
+      g << "return " << SOLVER_RET_INFEASIBLE << ";\n";
+      g << "} else {\n";
+      g << "return " << SOLVER_RET_UNKNOWN << ";\n";
+      g << "}\n";
+    }
     g << "}\n";
 
     g << "return 0;\n";
