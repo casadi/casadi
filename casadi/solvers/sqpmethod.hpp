@@ -139,9 +139,6 @@ namespace casadi {
     /// Initialize feasible qp's
     bool init_feasible_;
 
-    /// QP solver error on fail
-    bool error_on_fail_;
-
     /// Linesearch parameters
     ///@{
     double c1_;

@@ -326,7 +326,11 @@ namespace casadi {
     g << "} else if (d.status == QP_NO_SEARCH_DIR) {\n";
     g << "return " << SOLVER_RET_INFEASIBLE <<";\n";
     g << "} else {\n";
-    g << "return -1;\n";
+    if (error_on_fail_) {
+      g << "return -1000;\n";
+    } else {
+      g << "return -1;\n";
+    }
     g << "}\n";
   }
 

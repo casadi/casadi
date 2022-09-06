@@ -252,11 +252,14 @@ namespace casadi {
       }
     }
 
-    // Error on failure of the QP solver
-    if (qpsol_options.count("error_on_fail") > 0) {
-      error_on_fail_ = qpsol_options["error_on_fail"];
-    } else {
-      error_on_fail_ = true;
+    if (elastic_mode_) {
+      auto it = qpsol_options.find("error_on_fail");
+      if (it==qpsol_options.end()) {
+        qpsol_options["error_on_fail"] = false;
+      } else {
+        casadi_assert(!it->second, "QP solver with setting error_on_fail is incompatible with elastic mode sqpmethod.");
+      }
+      
     }
 
     // Use exact Hessian?
@@ -294,11 +297,6 @@ namespace casadi {
       Hsp_ = Sparsity::dense(nx_, nx_);
     }
 
-    // Allocate a QP solver
-    if (elastic_mode_ | so_corr_) {
-      qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
-    }
-
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
@@ -319,7 +317,6 @@ namespace casadi {
 
       // Allocate QP solver for elastic mode
       Dict qpsol_ela_options = Dict(qpsol_options);
-      qpsol_ela_options["error_on_fail"] = false;
 
       casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
       qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela}, {"a", Asp_ela}},
@@ -579,14 +576,8 @@ int Sqpmethod::solve(void* mem) const {
             if (ret == SOLVER_RET_INFEASIBLE) continue;
           }
         }
-      } else if (error_on_fail_ && so_corr_) {
-        // Manual error handling because this is turned off due to the second order corrections
-        if (ret != 0) {
-          casadi_error("qpsolver failed. "
-                   "Set 'error_on_fail' option to false to ignore this error.");
-        }
       }
-      
+
       // Detecting indefiniteness
       double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
       if (gain < 0) {
@@ -874,12 +865,6 @@ int Sqpmethod::solve(void* mem) const {
       if ((elastic_mode_ && m_qpsol->unified_return_status == SOLVER_RET_INFEASIBLE) || (mode == 1)) {
         return SOLVER_RET_INFEASIBLE;
       }
-
-      if (error_on_fail_) {
-        casadi_error("qpsolver failed. "
-                   "Set 'error_on_fail' option to false to ignore this error.");
-      }
-      
     } 
 
     if (verbose_) print("QP solved\n");
@@ -917,11 +902,6 @@ int Sqpmethod::solve(void* mem) const {
     if (!m_qpsol_ela->success) {
       if (m_qpsol_ela->unified_return_status == SOLVER_RET_INFEASIBLE) {
         return SOLVER_RET_INFEASIBLE;
-      }
-
-      if (error_on_fail_) {
-        casadi_error("qpsolver failed in elastic mode. "
-                   "Set 'error_on_fail' option to false to ignore this error.");
       }
     } 
 
@@ -1071,9 +1051,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g.init_local("ela_it", "-1");
       g.local("temp_norm", "double");
     }
-    if (elastic_mode_ || error_on_fail_) {
-      g.local("ret", "int");
-    }
+    g.local("ret", "int");
     
     g.local("m_w", "casadi_real", "*");
     g << "m_w = w;\n";
@@ -1192,10 +1170,6 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       codegen_solve_elastic_mode(g, 0);
       g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
       g << "}\n";
-      g << "}\n";
-    } else if (error_on_fail_ && so_corr_) {
-      g << "if (ret != 0) {\n";
-      g << "return -1;\n";
       g << "}\n";
     }
         
@@ -1454,20 +1428,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
     std::string flag = cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w");
-    if (elastic_mode_ || error_on_fail_) {
-      cg << "ret = " << flag << ";\n";
-    } else {
-      cg << flag << ";\n";
-    }
-
-    if (error_on_fail_) {
-      if (elastic_mode_  || (mode == 1)) {
-        cg << "if (ret != 0 && ret != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
-      } else {
-        cg << "if (ret != 0) return -1;\n";
-      }
-    }
-    
+    cg << "ret = " << flag << ";\n";
+    cg << "if (ret == -1000) return -1000;\n"; // equivalent to raise Exception
   }
 
   void Sqpmethod::codegen_qp_ela_solve(CodeGenerator& cg, const std::string&  H, const std::string& g,
@@ -1489,18 +1451,8 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
     std::string flag = cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w");
-    if (elastic_mode_ || error_on_fail_) {
-      cg << "ret = " << flag << ";\n";
-    } else {
-      cg << flag << ";\n";
-    }
-    if (elastic_mode_ && error_on_fail_) {
-      cg << "if (ret != 0 && ret != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
-    } else if (error_on_fail_) {
-      cg << "if (ret != 0) return -1;\n";
-    }
-    
-    
+    cg << "ret = " << flag << ";\n";
+    cg << "if (ret == -1000) return -1000;\n"; // equivalent to raise Exception
   }
 
   void Sqpmethod::codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const {

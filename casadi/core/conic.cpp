@@ -394,7 +394,7 @@ namespace casadi {
         "Print a numeric description of the problem"}},
       {"error_on_fail",
        {OT_BOOL,
-        "When the numerical process returns unsuccessfully, raise an error (default false)."}}
+        "When the numerical process returns unsuccessfully, raise an error (default true)."}}
      }
   };
 
