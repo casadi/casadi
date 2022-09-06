@@ -543,12 +543,12 @@ int Sqpmethod::solve(void* mem) const {
       casadi_clear(d->dx, nx_);
 
       // Make initial guess feasable
-      if (init_feasible_) {
+      /*if (init_feasible_) {
         for (casadi_int i = 0; i < nx_; ++i) {
           if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
           else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
         }
-      }
+      }*/
 
       // Increase counter
       m->iter_count++;
