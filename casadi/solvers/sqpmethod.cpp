@@ -147,11 +147,11 @@ namespace casadi {
         "Minimum value for gamma_1 (default: 1e-5)."}},
       {"second_order_corrections",
        {OT_BOOL,
-        "Enable second order corrections."
+        "Enable second order corrections. "
         "These are used when a step is considered bad by the merit function and constraint norm (default: false)."}},
       {"init_feasible",
        {OT_BOOL,
-        "Initialize the QP subproblems with a feasible initial value (default: true)."}}  
+        "Initialize the QP subproblems with a feasible initial value (default: false)."}}  
      }
   };
 
@@ -171,7 +171,7 @@ namespace casadi {
     tol_du_ = 1e-6;
     string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
-    qpsol_plugin_ = "qpoases";
+    std::string qpsol_plugin = "qpoases";
     Dict qpsol_options;
     print_header_ = true;
     print_iteration_ = true;
@@ -181,7 +181,7 @@ namespace casadi {
     gamma_max_ = 1e20;
     gamma_1_min_ = 1e-5;
     so_corr_ = false;
-    init_feasible_ = true;
+    init_feasible_ = false;
 
     std::string convexify_strategy = "none";
     double convexify_margin = 1e-7;
@@ -212,7 +212,7 @@ namespace casadi {
       } else if (op.first=="min_step_size") {
         min_step_size_ = op.second;
       } else if (op.first=="qpsol") {
-        qpsol_plugin_ = op.second.to_string();
+        qpsol_plugin = op.second.to_string();
       } else if (op.first=="qpsol_options") {
         qpsol_options = op.second;
       } else if (op.first=="print_header") {
@@ -299,30 +299,30 @@ namespace casadi {
       qpsol_options["error_on_fail"] = false; // Needed to get the return state INFEASIBLE and not an error
     }
 
-    casadi_assert(!qpsol_plugin_.empty(), "'qpsol' option has not been set");
-    qpsol_ = conic("qpsol", qpsol_plugin_, {{"h", Hsp_}, {"a", Asp_}},
+    casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
 
     if (elastic_mode_) {
       // Generate sparsity patterns for elastic mode
-      Hsp_ela_ = Sparsity(Hsp_);
-      Asp_ela_ = Sparsity(Asp_);
+      Sparsity Hsp_ela = Sparsity(Hsp_);
+      Sparsity Asp_ela = Sparsity(Asp_);
 
       std::vector<casadi_int> n_v(nx_);
       std::iota(std::begin(n_v), std::end(n_v), 0);
-      Hsp_ela_.enlarge(2*ng_ + nx_, 2*ng_ + nx_, n_v, n_v);
+      Hsp_ela.enlarge(2*ng_ + nx_, 2*ng_ + nx_, n_v, n_v);
 
       Sparsity dsp = Sparsity::diag(ng_,ng_);
-      Asp_ela_.appendColumns(dsp);
-      Asp_ela_.appendColumns(dsp);
+      Asp_ela.appendColumns(dsp);
+      Asp_ela.appendColumns(dsp);
 
       // Allocate QP solver for elastic mode
       Dict qpsol_ela_options = Dict(qpsol_options);
       qpsol_ela_options["error_on_fail"] = false;
 
-      casadi_assert(!qpsol_plugin_.empty(), "'qpsol' option has not been set");
-      qpsol_ela_ = conic("qpsol_ela", qpsol_plugin_, {{"h", Hsp_ela_}, {"a", Asp_ela_}},
+      casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+      qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela}, {"a", Asp_ela}},
                     qpsol_ela_options);
       alloc(qpsol_ela_);
     }
@@ -1066,17 +1066,15 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "casadi_sqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ", " << so_corr_ << ");\n";
 
     if (elastic_mode_) {
-      g << "double gamma_1;\n";
-      g << "casadi_int ela_it = -1;\n";
-      g << "double temp_norm;\n";
+      g.local("gamma_1", "double");
+      g.local("ela_it", "casadi_int");
+      g.init_local("ela_it", "-1");
+      g.local("temp_norm", "double");
     }
-
-    if (qpsol_plugin_ == "qrqp") {
-      g << "int ret = 0;\n";
-    } else {
-      g << "flag = 0;\n";
+    if (elastic_mode_ || error_on_fail_) {
+      g.local("ret", "int");
     }
-
+    
     g.local("m_w", "casadi_real", "*");
     g << "m_w = w;\n";
     g.local("m_iw", "casadi_int", "*");
@@ -1096,11 +1094,15 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     if (max_iter_ls_) {
       g.local("ls_iter", "casadi_int");
       g.init_local("ls_iter", "0");
-      g.local("ls_success", "casadi_int");
-      g.init_local("ls_success", "1");
       g.local("t", "casadi_real");
       g.init_local("t", "0.0");
     }
+
+    if (elastic_mode_ && max_iter_ls_) {
+      g.local("ls_success", "casadi_int");
+      g.init_local("ls_success", "1");
+    }
+
     g.local("one", "const casadi_real");
     g.init_local("one", "1");
     g << g.clear("d.dx", nx_) << "\n";
@@ -1172,27 +1174,15 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
     if (elastic_mode_) {
       g.comment("Elastic mode calculations");
-      if (qpsol_plugin_ == "qrqp") {
-        g << "if (ret == " << 0 << ") {\n";
-      } else {
-        g << "if (flag == " << 0 << ") {\n";
-      }
+      g << "if (ret == " << 0 << ") {\n";
       g << "ela_it = -1;\n";
-      if (qpsol_plugin_ == "qrqp") {
-        g << "} else if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
-      } else {
-        g << "} else if (flag == " << SOLVER_RET_INFEASIBLE << ") {\n";
-      }
+      g << "} else if (ret == " << SOLVER_RET_INFEASIBLE << ") {\n";
       g << "if (ela_it == -1) {\n";
       g << "ela_it = 0;\n";
       codegen_calc_gamma_1(g);
       g << "}\n";
       codegen_solve_elastic_mode(g, 0);
-      if (qpsol_plugin_ == "qrqp") {
-        g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
-      } else {
-        g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
-      }
+      g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
 
       g << "} else if (ela_it == -1) {\n";
       g << "double pi_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
@@ -1200,19 +1190,11 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "if (pi_inf > gamma_1) {\n";
       g << "ela_it = 0;\n";
       codegen_solve_elastic_mode(g, 0);
-      if (qpsol_plugin_ == "qrqp") {
-        g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
-      } else {
-        g << "if (flag == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
-      }
+      g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
       g << "}\n";
       g << "}\n";
     } else if (error_on_fail_ && so_corr_) {
-      if (qpsol_plugin_ == "qrqp") {
-        g << "if (ret != 0) {\n";
-      } else {
-        g << "if (flag != 0) {\n";
-      }
+      g << "if (ret != 0) {\n";
       g << "return -1;\n";
       g << "}\n";
     }
@@ -1282,11 +1264,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
         codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam", 1);
       } else {
-        if (qpsol_plugin_ == "qrqp") {
-          g << "ret = " << SOLVER_RET_INFEASIBLE << ";\n";
-        } else {
-          g << "flag = " << SOLVER_RET_INFEASIBLE << ";\n";
-        }
+        g << "ret = " << SOLVER_RET_INFEASIBLE << ";\n";
         g.comment("Second order corrections without elastic mode");
         g << "if (ela_it == -1) {\n";      
 
@@ -1306,11 +1284,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "}\n";
 
         g.comment("Second order corrections in elastic mode");
-        if (qpsol_plugin_ == "qrqp") {
-          g << "if (ret == " << SOLVER_RET_INFEASIBLE << " || ela_it != -1) {\n";
-        } else {
-          g << "if (flag == " << SOLVER_RET_INFEASIBLE << " || ela_it != -1) {\n";
-        }
+        g << "if (ret == " << SOLVER_RET_INFEASIBLE << " || ela_it != -1) {\n";
         g << "if (ela_it == -1) {\n";
         g << "ela_it = 0;\n";
         codegen_calc_gamma_1(g);
@@ -1320,11 +1294,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       }
       g << "}\n";
       g.comment("Fallback on previous solution if the second order correction failed");
-      if (qpsol_plugin_ == "qrqp") {
-        g << "if (ret != " << 0 << ") {\n";
-      } else {
-        g << "if (flag != " << 0 << ") {\n";
-      }
+      g << "if (ret != " << 0 << ") {\n";
       g << g.copy("d.temp_sol", nx_, "d.dx") << "\n";
       g << g.copy("d.temp_sol+"+str(nx_), nx_+ng_, "d.dlam") << "\n";
       g << "} else {\n";
@@ -1381,7 +1351,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "l1_cand = 0.0;\n";
       g.comment("Reset line-search counter, success marker");
       g << "ls_iter = 0;\n";
-      g << "ls_success = 1;\n";
+      if (elastic_mode_ && max_iter_ls_) g << "ls_success = 1;\n";
       g.comment("Line-search loop");
       g << "while (1) {\n";
       g.comment(" Increase counter");
@@ -1399,7 +1369,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "if (" << nlp_fg << ") {\n";
       g.comment("Avoid infinite recursion");
       g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
-      g << "ls_success = 0;\n";
+      if (elastic_mode_ && max_iter_ls_) g << "ls_success = 0;\n";
       g << "break;\n";
       g << "}\n";
       g.comment("line-search failed, skip iteration");
@@ -1415,7 +1385,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "}\n";
       g.comment("Line-search not successful, but we accept it.");
       g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
-      g << "ls_success = 0;\n";
+      if (elastic_mode_ && max_iter_ls_) g << "ls_success = 0;\n";
       g << "break;\n";
       g << "}\n";
       g.comment("Backtracking");
@@ -1483,24 +1453,18 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
-    if (qpsol_plugin_ == "qrqp") {
-      cg << "ret = " << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    std::string flag = cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w");
+    if (elastic_mode_ || error_on_fail_) {
+      cg << "ret = " << flag << ";\n";
     } else {
-      cg << cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+      cg << flag << ";\n";
     }
+
     if (error_on_fail_) {
-      if (qpsol_plugin_ == "qrqp") {
-        if (elastic_mode_  || (mode == 1)) {
-          cg << "if (ret != 0 && ret != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
-        } else {
-          cg << "if (ret != 0) return -1;\n";
-        }
+      if (elastic_mode_  || (mode == 1)) {
+        cg << "if (ret != 0 && ret != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
       } else {
-        if (elastic_mode_ || (mode == 1)) {
-          cg << "if (flag != 0 && flag != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
-        } else {
-          cg << "if (flag != 0) return -1;\n";
-        }
+        cg << "if (ret != 0) return -1;\n";
       }
     }
     
@@ -1524,25 +1488,18 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
     cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
-    if (qpsol_plugin_ == "qrqp") {
-      cg << "ret = " << cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+    std::string flag = cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w");
+    if (elastic_mode_ || error_on_fail_) {
+      cg << "ret = " << flag << ";\n";
     } else {
-      cg << cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w") << ";\n";
+      cg << flag << ";\n";
     }
-
-    if (qpsol_plugin_ == "qrqp") {
-      if (elastic_mode_ && error_on_fail_) {
-        cg << "if (ret != 0 && ret != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
-      } else if (error_on_fail_) {
-        cg << "if (ret != 0) return -1;\n";
-      }
-    } else {
-      if (elastic_mode_ && error_on_fail_) {
-        cg << "if (flag != 0 && flag != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
-      } else if (error_on_fail_) {
-        cg << "if (flag != 0) return -1;\n";
-      }
+    if (elastic_mode_ && error_on_fail_) {
+      cg << "if (ret != 0 && ret != " << SOLVER_RET_INFEASIBLE << ") return -1;\n";
+    } else if (error_on_fail_) {
+      cg << "if (ret != 0) return -1;\n";
     }
+    
     
   }
 
@@ -1629,8 +1586,11 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
   }
 
   Sqpmethod::Sqpmethod(DeserializingStream& s) : Nlpsol(s) {
-    int version = s.version("Sqpmethod", 1, 2);
+    int version = s.version("Sqpmethod", 1, 3);
     s.unpack("Sqpmethod::qpsol", qpsol_);
+    if (version>=3) {
+      s.unpack("Sqpmethod::qpsol_ela", qpsol_ela_);
+    }
     s.unpack("Sqpmethod::exact_hessian", exact_hessian_);
     s.unpack("Sqpmethod::max_iter", max_iter_);
     s.unpack("Sqpmethod::min_iter", min_iter_);
@@ -1646,6 +1606,23 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.unpack("Sqpmethod::print_header", print_header_);
     s.unpack("Sqpmethod::print_iteration", print_iteration_);
     s.unpack("Sqpmethod::print_status", print_status_);
+
+    if (version>=3) {
+      s.unpack("Sqpmethod::elastic_mode", elastic_mode_);
+      s.unpack("Sqpmethod::gamma_0", gamma_0_);
+      s.unpack("Sqpmethod::gamma_max", gamma_max_);
+      s.unpack("Sqpmethod::gamma_1_min", gamma_1_min_);
+      s.unpack("Sqpmethod::init_feasible", init_feasible_);
+      s.unpack("Sqpmethod::so_corr", so_corr_);
+    } else {
+      elastic_mode_ = false;
+      gamma_0_ = 0;
+      gamma_max_ = 0;
+      gamma_1_min_ = 0;
+      init_feasible_ = false;
+      so_corr_ = false;
+    }
+
     s.unpack("Sqpmethod::Hsp", Hsp_);
     if (version==1) {
       Sparsity Hrsp;
@@ -1683,8 +1660,9 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
   void Sqpmethod::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
-    s.version("Sqpmethod", 2);
+    s.version("Sqpmethod", 3);
     s.pack("Sqpmethod::qpsol", qpsol_);
+    s.pack("Sqpmethod::qpsol_ela", qpsol_ela_);
     s.pack("Sqpmethod::exact_hessian", exact_hessian_);
     s.pack("Sqpmethod::max_iter", max_iter_);
     s.pack("Sqpmethod::min_iter", min_iter_);
@@ -1700,6 +1678,15 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.pack("Sqpmethod::print_header", print_header_);
     s.pack("Sqpmethod::print_iteration", print_iteration_);
     s.pack("Sqpmethod::print_status", print_status_);
+
+    s.pack("Sqpmethod::elastic_mode", elastic_mode_);
+    s.pack("Sqpmethod::gamma_0", gamma_0_);
+    s.pack("Sqpmethod::gamma_max", gamma_max_);
+    s.pack("Sqpmethod::gamma_1_min", gamma_1_min_);
+
+    s.pack("Sqpmethod::init_feasible", init_feasible_);
+    s.pack("Sqpmethod::so_corr", so_corr_);
+
     s.pack("Sqpmethod::Hsp", Hsp_);
     s.pack("Sqpmethod::Asp", Asp_);
     s.pack("Sqpmethod::convexify", convexify_);
