@@ -2455,6 +2455,7 @@ namespace casadi {
       g << "casadi_real* a;\n";
       g << "const casadi_real* r;\n";
       g << "casadi_int flag;\n";
+      if (needs_mem) g << "int mem;\n";
 
 
 
@@ -2484,9 +2485,22 @@ namespace casadi {
         << "for (j=0; j<" << nnz_in() << "; ++j) "
         << "if (scanf(\"%lg\", a++)<=0) return 2;\n";
 
+      if (needs_mem) {
+        g << "mem = " << name_ << "_checkout();\n";
+      }
+
       // Call the function
-      g << "flag = " << name_ << "(arg, res, iw, w+" << off << ", 0);\n"
-        << "if (flag) return flag;\n";
+      g << "flag = " << name_ << "(arg, res, iw, w+" << off << ", ";
+      if (needs_mem) {
+        g << "mem";
+      } else {
+        g << "0";
+      }
+      g << ");\n";
+      if (needs_mem) {
+        g << name_ << "_release(mem);\n";
+      }
+      g << "if (flag) return flag;\n";
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
       g << "r = w+" << nnz_in() << ";\n"
