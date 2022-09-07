@@ -575,7 +575,7 @@ class casadiTestCase(unittest.TestCase):
       includedir = GlobalOptions.getCasadiIncludePath()
 
       if isinstance(extralibs,list):
-        extralibs = " " + " ".join([lib + ".lib" if os.name=='nt' else "-l"+lib for lib in extralibs])
+        extralibs = " " + " ".join([lib if "." in lib else (lib + ".lib" if os.name=='nt' else "-l"+lib) for lib in extralibs])
 
       if isinstance(extra_options,bool) or extra_options is None:
         extra_options = ""
@@ -603,7 +603,10 @@ class casadiTestCase(unittest.TestCase):
 
       if main:
         [commands, exename] = get_commands(shared=False)
-        p = subprocess.Popen(commands,shell=True).wait()
+        print(commands)
+        env = os.environ
+        env["LD_LIBRARY_PATH"] = libdir
+        p = subprocess.Popen(commands,shell=True,env=env).wait()
         inputs_main = inputs
         if isinstance(inputs,dict):
           inputs_main = F.convert_in(inputs)
@@ -615,8 +618,13 @@ class casadiTestCase(unittest.TestCase):
       if main:
         with open(F.name()+"_out.txt","w") as stdout:
           with open(F.name()+"_in.txt","r") as stdin:
-            p = subprocess.Popen(exename+" "+F.name(),shell=True,stdin=stdin,stdout=stdout).communicate()
+            commands = exename+" "+F.name()
+            print(commands)
+            p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
+            out = p.communicate()
+        assert p.returncode==0
         outputs = F.generate_out(F.name()+"_out.txt")
+        print(outputs)
         if isinstance(inputs,dict):
           outputs = F.convert_out(outputs)
           for k in F.name_out():
@@ -635,6 +643,8 @@ class casadiTestCase(unittest.TestCase):
 
       if self.check_serialize:
         self.check_serialize(F2,inputs=inputs)
+        
+      return F2, libname
 
   def check_thread_safety(self,F,inputs=None,N=20):
 

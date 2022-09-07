@@ -70,6 +70,8 @@ void External::init_external() {
   incref_ = (signal_t)li_.get_function(name_ + "_incref");
   decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
+  casadi_assert((bool) checkout_ == (bool) checkout_, "External must either define both incref+decref or neither.");
+
   // Getting default arguments
   get_default_in_ = (default_t)li_.get_function(name_ + "_default_in");
 
@@ -115,6 +117,8 @@ void GenericExternal::init_external() {
   // Memory management functions
   checkout_ = (casadi_checkout_t) li_.get_function(name_ + "_checkout");
   release_ = (casadi_release_t) li_.get_function(name_ + "_release");
+
+  casadi_assert((bool) checkout_ == (bool) checkout_, "External must either define both checkout+release or neither.");
 
   // Function for numerical evaluation
   eval_ = (eval_t)li_.get_function(name_);
@@ -304,6 +308,10 @@ void GenericExternal::init(const Dict& opts) {
 void External::codegen_declarations(CodeGenerator& g) const {
   if (!li_.inlined(name_)) {
     g.add_external(signature(name_) + ";");
+    if (checkout_) g.add_external("int " + name_ + "_checkout(void);");
+    if (release_) g.add_external("void " + name_ + "_release(int mem);");
+    if (incref_) g.add_external("void " + name_ + "_incref(void);");
+    if (decref_) g.add_external("void " + name_ + "_decref(void);");
   }
 }
 
@@ -331,7 +339,7 @@ void External::codegen_checkout(CodeGenerator& g) const {
 
 void External::codegen_release(CodeGenerator& g) const {
   if (release_) {
-    g << name_ << "_release();\n";
+    g << name_ << "_release(mem);\n";
   }
 }
 
