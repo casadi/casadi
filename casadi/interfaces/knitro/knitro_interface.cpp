@@ -28,6 +28,8 @@
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
+#include <thread>
 
 using namespace std;
 namespace casadi {
@@ -130,11 +132,31 @@ namespace casadi {
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn.sparsity_out(0);
 
-    // Obtain maximum number of threads needed
-    for (auto&& op : opts_) {
-      if (op.first=="ms_numthreads") {
-        max_num_threads_ = op.second;
+    //may return 0 when not able to detect
+    const auto processor_count = std::thread::hardware_concurrency();
+    if (int(processor_count) == 0) {
+      // Obtain maximum number of threads needed
+      int ms_numthreads = 1;
+      int findiff_numthreads = 1;
+      int numthreads = 1;
+      int mip_numthreads = 1;
+      for (auto&& op : opts_) {
+        if (op.first=="ms_numthreads") {
+          ms_numthreads = op.second;
+        }
+        if (op.first=="findiff_numthreads") {
+          findiff_numthreads = op.second;
+        }
+        if (op.first=="numthreads") {
+          numthreads = op.second;
+        }
+        if (op.first=="mip_numthreads") {
+          mip_numthreads = op.second;
+        }
       }
+      max_num_threads_ = std::max({4, ms_numthreads, findiff_numthreads, numthreads, mip_numthreads});
+    } else {
+      max_num_threads_ = int(processor_count);
     }
 
     // Allocate persistent memory
