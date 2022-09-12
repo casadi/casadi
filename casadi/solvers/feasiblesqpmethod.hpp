@@ -2,7 +2,7 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
@@ -30,10 +30,10 @@
 #include <casadi/solvers/casadi_nlpsol_feasiblesqpmethod_export.h>
 
 /** \defgroup plugin_Nlpsol_feasiblesqpmethod
- An implementation of FP-SQP
+ A textbook FeasibleSQPMethod
 */
 
-/** \pluginsection{Nlpsol,sqpmethod} */
+/** \pluginsection{Nlpsol,feasiblesqpmethod} */
 
 /// \cond INTERNAL
 namespace casadi {
@@ -62,17 +62,17 @@ namespace casadi {
   class CASADI_NLPSOL_FEASIBLESQPMETHOD_EXPORT Feasiblesqpmethod : public Nlpsol {
   public:
     explicit Feasiblesqpmethod(const std::string& name, const Function& nlp);
-    ~FeasibleSqpmethod() override;
+    ~Feasiblesqpmethod() override;
 
     // Get name of the plugin
-    const char* plugin_name() const override { return "sqpmethod";}
+    const char* plugin_name() const override { return "feasible_sqpmethod";}
 
     // Name of the class
-    std::string class_name() const override { return "Sqpmethod";}
+    std::string class_name() const override { return "Feasiblesqpmethod";}
 
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
-      return new Sqpmethod(name, nlp);
+      return new Feasiblesqpmethod(name, nlp);
     }
 
     ///@{
@@ -88,13 +88,13 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_mem() const override { return new SqpmethodMemory();}
+    void* alloc_mem() const override { return new FeasiblesqpmethodMemory();}
 
     /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<SqpmethodMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<FeasiblesqpmethodMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
@@ -104,10 +104,13 @@ namespace casadi {
     int solve(void* mem) const override;
 
     // Memory structure
-    casadi_sqpmethod_prob<double> p_;
+    casadi_feasiblesqpmethod_prob<double> p_;
 
     /// QP solver for the subproblems
     Function qpsol_;
+
+    /// QP solver for elastic mode subproblems
+    Function qpsol_ela_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -126,6 +129,15 @@ namespace casadi {
 
     /// Minimum step size allowed
     double min_step_size_;
+
+    /// Elastic mode
+    bool elastic_mode_;
+
+    /// Initial and maximum penalty parameter for elastic mode
+    double gamma_0_, gamma_max_, gamma_1_min_;
+
+    /// Initialize feasible qp's
+    bool init_feasible_;
 
     /// Linesearch parameters
     ///@{
@@ -150,6 +162,9 @@ namespace casadi {
     /// convexify?
     bool convexify_;
 
+    // Second order corrections
+    bool so_corr_;
+
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 
@@ -164,19 +179,46 @@ namespace casadi {
 
     /// Print iteration
     void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
-                         double dx_norm, double rg, casadi_int ls_trials, bool ls_success) const;
+                         double dx_norm, double rg, casadi_int ls_trials, bool ls_success, 
+                         bool so_succes, std::string info) const;
 
-    // Solve the QP subproblem
-    virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
+    // Solve the QP subproblem: mode 0 = normal, mode 1 = SOC
+    virtual int solve_QP(FeasiblesqpmethodMemory* m, const double* H, const double* g,
+                          const double* lbdz, const double* ubdz,
+                          const double* A,
+                          double* x_opt, double* dlam, int mode) const;
+
+    // Solve the QP subproblem for elastic mode
+    virtual int solve_ela_QP(FeasiblesqpmethodMemory* m, const double* H, const double* g,
                           const double* lbdz, const double* ubdz,
                           const double* A,
                           double* x_opt, double* dlam) const;
+
+    // Execute elastic mode: mode 0 = normal, mode 1 = SOC
+    virtual int solve_elastic_mode(FeasiblesqpmethodMemory* m, casadi_int* ela_it, double gamma_1,
+                                    casadi_int ls_iter, bool ls_success, bool so_succes, double pr_inf, 
+                                    double du_inf, double dx_norminf, std::string* info, int mode) const;
 
 
     // Solve the QP subproblem
     void codegen_qp_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
               const std::string& lbdz, const std::string& ubdz,
+              const std::string& A, const std::string& x_opt, const std::string& dlam, int mode) const;
+
+    // Solve the QP subproblem
+    void codegen_qp_ela_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
+              const std::string& lbdz, const std::string& ubdz,
               const std::string& A, const std::string& x_opt, const std::string& dlam) const;
+
+    // Execute elastic mode: mode 0 = normal, mode 1 = SOC
+    void codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const;
+
+    // Codegen to calculate gama_1
+    void codegen_calc_gamma_1(CodeGenerator& cg) const;
+
+
+    // Calculate gamma_1
+    double calc_gamma_1(FeasiblesqpmethodMemory* m) const;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -186,16 +228,16 @@ namespace casadi {
     void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeserializingStream& s) { return new Sqpmethod(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Feasiblesqpmethod(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Sqpmethod(DeserializingStream& s);
+    explicit Feasiblesqpmethod(DeserializingStream& s);
 
   private:
-    void set_sqpmethod_prob();
+    void set_feasiblesqpmethod_prob();
   };
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_SQPMETHOD_HPP
+#endif // CASADI_FEASIBLESQPMETHOD_HPP

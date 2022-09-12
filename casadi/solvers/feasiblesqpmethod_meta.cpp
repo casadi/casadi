@@ -23,12 +23,12 @@
  */
 
 
-      #include "sqpmethod.hpp"
+      #include "feasiblesqpmethod.hpp"
       #include <string>
 
-      const std::string casadi::Sqpmethod::meta_doc=
+      const std::string casadi::Feasiblesqpmethod::meta_doc=
       "\n"
-"A textbook SQPMethod\n"
+"An implementation of FP-SQP\n"
 "\n"
 "\n"
 ">List of available options\n"
