@@ -165,6 +165,25 @@ namespace casadi {
     // Second order corrections
     bool so_corr_;
 
+    // -------- FROM HERE OPTIONS FOR FP-SQP ------------------
+
+    // tolerances
+    double optim_tol_, feas_tol_;
+
+    // trust-region parameters
+    double tr_eta1_, tr_eta2_;
+    double tr_alpha1_, tr_alpha2_;
+    double tr_tol_;
+    double tr_acceptance_;
+    double tr_rad_max_;
+
+    // inner iterations
+    double contraction_acceptance_;
+    casadi_int watchdog_;
+
+
+
+
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 

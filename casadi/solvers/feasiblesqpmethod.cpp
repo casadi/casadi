@@ -151,7 +151,47 @@ namespace casadi {
         "These are used when a step is considered bad by the merit function and constraint norm (default: false)."}},
       {"init_feasible",
        {OT_BOOL,
-        "Initialize the QP subproblems with a feasible initial value (default: false)."}}  
+        "Initialize the QP subproblems with a feasible initial value (default: false)."}},
+      // ------ From here FP-SQP ---------
+      {"optim_tol",
+       {OT_DOUBLE,
+        "Optimality tolerance. Below this value an iterate is considered to be optimal."}},
+      {"feas_tol",
+       {OT_DOUBLE,
+        "Feasibility tolerance. Below this tolerance an iterate is considered to be feasible."}},
+      {"tr_eta1",
+       {OT_DOUBLE,
+        "Lower eta in trust-region acceptance criterion."}},
+      {"tr_eta2",
+       {OT_DOUBLE,
+        "Upper eta in trust-region acceptance criterion."}},
+      {"tr_alpha1",
+       {OT_DOUBLE,
+        "Lower alpha in trust-region size criterion."}},
+      {"tr_alpha2",
+       {OT_DOUBLE,
+        "Upper alpha in trust-region size criterion."}},
+      {"tr_tol",
+       {OT_DOUBLE,
+        "Trust-region tolerance. Below this value another scalar is equal to the trust region radius."}},
+      {"tr_acceptance",
+       {OT_DOUBLE,
+        "Is the trust-region ratio above this value, the step is accepted."}},
+      {"tr_min",
+       {OT_DOUBLE,
+        "Minimum trust-region radius."}},
+      {"tr_max",
+       {OT_DOUBLE,
+        "Maximum trust-region radius."}},  
+      {"contraction_acceptance_value",
+       {OT_DOUBLE,
+        "If the empirical contraction rate in the feasibility iterations is above this value in the heuristics the iterations are aborted."}},
+      {"watchdog",
+       {OT_INT,
+        "Number of watchdog iterations in feasibility iterations. After this amount of iterations, it is checked with the contraction acceptance value, if iterations are converging."}},
+      {"max_inner_iter",
+       {OT_DOUBLE,
+        "Maximum number of inner iterations."}},
      }
   };
 
@@ -182,6 +222,22 @@ namespace casadi {
     gamma_1_min_ = 1e-5;
     so_corr_ = false;
     init_feasible_ = false;
+
+    // parameters and options for FP-SQP solver
+    optim_tol_ = 1e-8;
+    feas_tol_ = 1e-8;
+    tr_eta1_ = 0.25;
+    tr_eta2_ = 0.75;
+    tr_alpha1_ = 0.5;
+    tr_alpha2_ = 2.0;
+    tr_tol_ = 1e-8;
+    tr_acceptance_ = 1e-8;
+    tr_rad_min_ = 1e-8; //is this valid??
+    tr_rad_max_ = 10.0;
+    contraction_acceptance_value_ = 0.5;
+    watchdog_ = 5;
+    max_inner_iter_ = 50;
+
 
     std::string convexify_strategy = "none";
     double convexify_margin = 1e-7;
@@ -249,6 +305,34 @@ namespace casadi {
         so_corr_ = op.second;
       } else if (op.first=="init_feasible") {
         init_feasible_ = op.second;
+
+      // from here FP-SQP
+      } else if (op.first == "optim_tol") {
+        optim_tol_ = op.second;
+      } else if (op.first == "feas_tol") {
+        feas_tol_ = op.second;
+      } else if (op.first == "tr_eta1") {
+        tr_eta1_ = op.second;
+      } else if (op.first == "tr_eta2") {
+        tr_eta2_ = op.second;
+      } else if (op.first == "tr_alpha1") {
+        tr_alpha1_ = op.second;
+      } else if (op.first == "tr_alpha2") {
+        tr_alpha2_ = op.second;
+      } else if (op.first == "tr_tol") {
+        tr_tol_ = op.second;
+      } else if (op.first == "tr_acceptance") {
+        tr_acceptance_ = op.second;
+      } else if (op.first == "tr_rad_min") {
+        tr_rad_min_ = op.second;
+      } else if (op.first == "tr_rad_max") {
+        tr_rad_max_ = op.second;
+      } else if (op.first == "contraction_acceptance_value") {
+        contraction_acceptance_value_ = op.second;
+      } else if (op.first == "watchdog") {
+        watchdog_ = op.second;
+      } else if (op.first == "max_inner_iter") {
+        max_inner_iter_ = op.second;
       }
     }
 
