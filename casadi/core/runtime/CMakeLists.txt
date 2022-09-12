@@ -9,6 +9,7 @@ set(RUNTIME_SRC
   casadi_de_boor.hpp
   casadi_densify.hpp
   casadi_dot.hpp
+  casadi_feasiblesqpmethod.hpp
   casadi_clear.hpp
   casadi_fill.hpp
   casadi_flip.hpp
