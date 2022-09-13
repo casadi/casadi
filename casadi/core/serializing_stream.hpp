@@ -148,7 +148,7 @@ namespace casadi {
 
   private:
 
-    /* \brief Unpacks a shared object
+    /** \brief Unpacks a shared object
     *
     * Also treats SXNode, which is not actually a SharedObjectInternal
     */
@@ -270,7 +270,7 @@ namespace casadi {
      */
     void decorate(char e);
 
-    /* \brief Packs a shared object
+    /** \brief Packs a shared object
     *
     * Also treats SXNode, which is not actually a SharedObjectInternal
     */
