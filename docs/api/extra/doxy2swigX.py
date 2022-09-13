@@ -41,13 +41,13 @@ for r in open("../../../swig/casadi.i","r"):
       expression_tools.add(m.group(1))
 
 aliases = {}
-for line in file('../Doxyfile.in','r'):
+for line in open('../Doxyfile.in','r'):
   if line.startswith('ALIASES'):
     m = re.search('\+=\s*(\w+)\s*=\s*"(.*?)"',line) 
     if m:
       aliases[m.group(1)]=m.group(2)
 
-print aliases
+print(aliases)
 
 
 def astext(node,whitespace=False,escape=True,strictspacing=False):
@@ -91,7 +91,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
         for e3 in e2.getElementsByTagName("node"):
           for e4 in e3.getElementsByTagName("label"):
             if "Node" in e4.firstChild.data:
-              print "skipped"
+              print("skipped")
               try:
                 self.xmldoc.removeChild(e)
               except:
@@ -174,12 +174,12 @@ class Doxy2SWIG_X(Doxy2SWIG):
         o = my_open_write(fname)
         if self.multi:
             for p in self.pieces:
-              pp = p.encode("ascii","ignore")
+              pp = p#.encode("ascii","ignore")
               pp = re.sub("[A-Z_]*_EXPORT ","",pp)
               o.write(pp)
         else:
             for p in self.clean_pieces(self.pieces):
-              pp = p.encode("ascii","ignore")
+              pp = p#.encode("ascii","ignore")
               pp = re.sub("[A-Z_]*_EXPORT ","",pp)
               o.write(pp)
         o.close()
@@ -197,14 +197,14 @@ class Doxy2SWIG_X(Doxy2SWIG):
           if "SparsityInterface" in refid: filtered = False
           if filtered: continue
 
-          print c.attributes['refid'].value, c.attributes['kind'].value
+          print(c.attributes['refid'].value, c.attributes['kind'].value)
 
           fname = refid + '.xml'
           if not os.path.exists(fname):
               fname = os.path.join(self.my_dir,  fname)
           if fname.endswith("cpp.xml"): continue
           if not self.quiet:
-              print "parsing file: %s"%fname
+              print("parsing file: %s"%fname)
           p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated,merge=self.merge,groupdoc=self.groupdoc)
           p.generate()
           self.pieces.extend(self.clean_pieces(p.pieces))
@@ -247,16 +247,15 @@ class Doxy2SWIG_X(Doxy2SWIG):
     self.add_text(text.replace("\n","%%newline%%").replace('\\', r'\\\\').replace('"', r'\"')+"\n\n")
     
   def do_table(self, node):
-     
     caption = node.getElementsByTagName("caption")
     if len(caption)==1:
-      self.add_text(">" + astext(caption[0]).encode("ascii","ignore")+"\n\n")
+      self.add_text(">" + astext(caption[0]).encode("ascii","replace").decode("ascii")+"\n\n")
     
     rows = []
     for (i,row) in enumerate(node.getElementsByTagName("row")):
       rows.append([])
       for (j,entry) in enumerate(row.getElementsByTagName("entry")):
-        rows[i].append(astext(entry,escape=False).encode("ascii","ignore").replace("&gt;",">").replace("&lt;","<"))
+        rows[i].append(astext(entry,escape=False).encode("ascii","replace").decode("ascii").replace("&gt;",">").replace("&lt;","<"))
       
     table = texttable.Texttable(max_width=80-4)
     table.add_rows(rows)
@@ -286,13 +285,13 @@ class Doxy2SWIG_X(Doxy2SWIG):
 
       if kind in ('class', 'struct'):
           prot = node.attributes['prot'].value
-          if prot <> 'public':
+          if prot != 'public':
               return
           names = ('compoundname', 'briefdescription',
                    'detaileddescription', 'includes')
           first = self.get_specific_nodes(node, names)
           for n in names:
-              if first.has_key(n):
+              if n in first:
                   self.parse(first[n])
           self.end_docstring()
           for n in node.childNodes:
@@ -308,7 +307,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
                      'detaileddescription', 'includes')
             first = self.get_specific_nodes(node, names)
             for n in names:
-                if first.has_key(n):
+                if n in first:
                     self.parse(first[n])
             self.end_docstring()
 
@@ -331,7 +330,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
           if name[:8] == 'operator': # Don't handle operators yet.
               return
 
-          if not first.has_key('definition') or \
+          if not ('definition' in first) or \
                  kind in ['variable', 'typedef']:
               return
 
@@ -357,7 +356,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
           definition = first['definition'].firstChild.data
           #definition of friends is missing parent class
           if not re.search("::~?\w+(<[ \w]+>)?$",definition):
-            print "repair", definition
+            print("repair", definition)
             definition = " ".join(definition.split(" ")[:-1]+[target])
           try:
             defn = definition + first['argsstring'].firstChild.data
@@ -386,7 +385,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
       self.add_text_original(value)
     else:
       #print self.active_docstring, self.docstringmap[self.active_docstring[0]], value
-      if type(value) in (types.ListType, types.TupleType):
+      if type(value) in (list, tuple):
           self.docstringmap[self.active_docstring[0]][-1][1].extend(value)
       else:
           self.docstringmap[self.active_docstring[0]][-1][1].append(value)
@@ -400,7 +399,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
       except Exception as e:
         publicapi = None
       Doxy2SWIG.generate(self)
-      for k, v in self.docstringmap.iteritems():
+      for k, v in self.docstringmap.items():
         if k.startswith("plugin_"):
           groupdoc[k] = v[0][1]
           break
@@ -408,7 +407,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
         grouped_list = []
         grouped_dict = {}
         
-        def fix_signature(a): return re.sub(" *?= *?delete *?$","", a.replace("override",""))
+        def fix_signature(a): return re.sub(" *?= *?(delete|default) *?$","", a.replace("override",""))
         
         for (origin,pieces) in v:
           origin_nostatic = origin.replace("static ","")
@@ -466,7 +465,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
           total = u"".join(pieces)
           totalnowrap = total.replace("\n"," ")
           if (aliases["noswig"] in totalnowrap) or (aliases["nopython"] in totalnowrap):
-             print "skipping", origin
+             print("skipping", origin)
              continue
           if total in grouped_dict:
              grouped_dict[total][0].append(origin)
@@ -511,6 +510,14 @@ class Doxy2SWIG_X(Doxy2SWIG):
       if m.group(1) in expression_tools:
         
         content = [c.replace("[INTERNAL]","") for c in content]
+        new_content = []
+        while len(content)>0:
+            if "Functions called by friend functions defined for"==content[0]:
+                new_content.append("".join(content[:3]))
+                content = content[3:]
+            new_content.append(content[0])
+            content = content[1:]
+        content = new_content
         content = [re.sub("Functions called by friend functions defined (here|for \w+)\.?","",c) for c in content]
         self.doc_target("casadi::casadi_" + m.group(1), content,correction=False)
         target = target.split("(")[0]
@@ -551,15 +558,15 @@ if __name__ == '__main__':
     deprecated = dict()
     groupdoc = dict()
     convert(args[0], args[1], False, options.quiet,internal=internal,deprecated=deprecated,merge=options.merge,groupdoc=groupdoc)
-    file(args[2],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, internal.values()))))
-    file(args[3],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, deprecated.values()))))
+    open(args[2],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, internal.values()))))
+    open(args[3],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, deprecated.values()))))
     import pickle
-    filemap = pickle.load(file('filemap.pkl','r'))
+    filemap = pickle.load(open('filemap.pkl','rb'))
     
-    for k,v in groupdoc.iteritems():
+    for k,v in groupdoc.items():
       fn,n = filemap[k]
-      f = file(fn.replace(".hpp","_meta.cpp"),"w")
-      f.write(file('../../../misc/license_header.txt','r').read())
+      f = open(fn.replace(".hpp","_meta.cpp"),"w")
+      f.write(open('../../../misc/license_header.txt','r').read())
       f.write("""
       #include "%s"
       #include <string>

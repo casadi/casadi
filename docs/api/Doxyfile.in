@@ -1383,6 +1383,9 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = DOXYGENPROC = \
                          "SWIG_OUTPUT(myarg) = output_ ## myarg"
+PREDEFINED+=             "SWIG_CONSTREF(myarg) = constref_ ## myarg"
+PREDEFINED+=             "SWIG_INOUT(myarg) = inout_ ## myarg"
+PREDEFINED+=             "CASADI_PREFIX(myarg) = casadi_ ## myarg"
 PREDEFINED+=             SWIG
 PREDEFINED+=             DOXYGEN
 PREDEFINED+=             WITH_DEPRECATED_FEATURES

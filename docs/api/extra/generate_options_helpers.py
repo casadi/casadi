@@ -32,12 +32,12 @@ def optionDocumented(name,cl,metadata):
   return False
   
 def extra(metadata,i,iname):
-  print "Adding to ", metadata
+  print("Adding to ", metadata)
   for name in i.optionNames():
-    print "found option", name
+    print("found option", name)
     if optionDocumented(name,"casadi::%s" % iname,metadata):
       continue
-    print "Adding it."
+    print("Adding it.")
     meta = metadata["casadi::%s" % iname]["options"][name] = dict()
     meta['name'] = name
     meta['type'] = i.optionTypeName(name)
@@ -49,13 +49,13 @@ def extra(metadata,i,iname):
     except:
       meta['default'] = ''
       pass #too bad
-    print meta
+    print(meta)
 
 def addExtra(metadata):
   # This is not possible anymore
   return
   
-  print "Adding extra"
+  print("Adding extra")
 
   x=SX.sym("x")
   f = {'x':x, 'f':x**2}
