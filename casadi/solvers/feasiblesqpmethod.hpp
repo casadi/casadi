@@ -175,11 +175,12 @@ namespace casadi {
     double tr_alpha1_, tr_alpha2_;
     double tr_tol_;
     double tr_acceptance_;
-    double tr_rad_max_;
+    double tr_rad_min_, tr_rad_max_;
 
     // inner iterations
-    double contraction_acceptance_;
+    double contraction_acceptance_value_;
     casadi_int watchdog_;
+    casadi_int max_inner_iter_;
 
 
 

@@ -1694,7 +1694,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     set_feasiblesqpmethod_prob();
   }
 
-  void Sqpmethod::serialize_body(SerializingStream &s) const {
+  void Feasiblesqpmethod::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
     s.version("Feasiblesqpmethod", 3);
     s.pack("Feasiblesqpmethod::qpsol", qpsol_);
