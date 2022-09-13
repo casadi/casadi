@@ -33,49 +33,16 @@
  \date 2013
 */
 
+/*
+DESCRIPTION: The problem contains a problem that contains a region where the
+local SQP method converges and a region from where it diverges. I.e., a 
+globalization strategy is necessary.
+*/
 
 using namespace casadi;
 
 int main(int argc, char **argv){
-  
-  /*
-  // Get the problem
-  std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
-
-  // Parse an NL-file
-  NlpBuilder nl;
-  nl.import_nl(problem);
-
-  // Set options
-  Dict opts;
-  opts["expand"] = true;
-  // opts["max_iter"] = 10)
-  // opts["verbose"] = true;
-  // opts["linear_solver"] = "ma57";
-  opts["hessian_approximation"] = "exact";
-  // opts["derivative_test"] = "second-order";
-
-  // Specify QP solver
-  opts["qpsol"]  = "nlpsol";
-  opts["qpsol_options.nlpsol"] = "ipopt";
-  opts["qpsol_options.error_on_fail"] = false;
-  opts["qpsol_options.nlpsol_options.ipopt.print_level"] = 0;
-  opts["qpsol_options.nlpsol_options.print_time"] = 0;
-
-
-  // Allocate NLP solver and buffers
-  Function solver = nlpsol("nlpsol", "feasiblesqpmethod", nl, opts);
-  std::map<std::string, DM> arg, res;
-
-  // Solve NLP
-  arg["lbx"] = nl.x_lb;
-  arg["ubx"] = nl.x_ub;
-  arg["lbg"] = nl.g_lb;
-  arg["ubg"] = nl.g_ub;
-  arg["x0"] = nl.x_init;
-  res = solver(arg);*/
-
-  
+   
   // Set options
   Dict opts;
   opts["expand"] = true;

@@ -58,8 +58,11 @@ if(WITH_IPOPT)
   add_executable(sqpmethod_nl sqpmethod_nl.cpp)
   target_link_libraries(sqpmethod_nl casadi)
 
-  add_executable(feasiblesqpmethod_nl feasiblesqpmethod_nl.cpp)
-  target_link_libraries(feasiblesqpmethod_nl casadi)
+  add_executable(feasiblesqpmethod_local_conv_test feasiblesqpmethod_local_conv_test.cpp)
+  target_link_libraries(feasiblesqpmethod_local_conv_test casadi)
+
+  add_executable(feasiblesqpmethod_qp_test feasiblesqpmethod_qp_test.cpp)
+  target_link_libraries(feasiblesqpmethod_qp_test casadi)
 endif()
 
 # Parse AMPL models and solve with Worhp
