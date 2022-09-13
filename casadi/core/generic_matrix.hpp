@@ -557,14 +557,14 @@ namespace casadi {
       return MatType::substitute_inplace(v, inout_vdef, inout_ex, reverse);
     }
 
-    /* \brief Common subexpression elimination
+    /** \brief Common subexpression elimination
     */
     inline friend MatType cse(const MatType& e) {
       return MatType::cse({e}).at(0);
     }
 
 
-    /* \brief Common subexpression elimination
+    /** \brief Common subexpression elimination
     */
     inline friend std::vector<MatType> cse(const std::vector<MatType>& e) {
       return MatType::cse(e);
