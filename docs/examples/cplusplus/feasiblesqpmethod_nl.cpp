@@ -37,6 +37,8 @@
 using namespace casadi;
 
 int main(int argc, char **argv){
+  
+  /*
   // Get the problem
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
 
@@ -71,7 +73,44 @@ int main(int argc, char **argv){
   arg["lbg"] = nl.g_lb;
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
-  res = solver(arg);
+  res = solver(arg);*/
 
+  
+  // Set options
+  Dict opts;
+  opts["expand"] = true;
+  // opts["max_iter"] = 10)
+  // opts["verbose"] = true;
+  // opts["linear_solver"] = "ma57";
+  opts["hessian_approximation"] = "exact";
+  // opts["derivative_test"] = "second-order";
+
+  // Specify QP solver
+  opts["qpsol"]  = "nlpsol";
+  opts["qpsol_options.nlpsol"] = "ipopt";
+  opts["qpsol_options.error_on_fail"] = false;
+  opts["qpsol_options.nlpsol_options.ipopt.print_level"] = 0;
+  opts["qpsol_options.nlpsol_options.ipopt.sb"] = "yes";
+  opts["qpsol_options.nlpsol_options.print_time"] = 0;
+
+  SX x = SX::sym("x");
+  SX f = log(exp(x) + exp(-x));
+  SX g = x;
+  SXDict nlp = {{"x", x}, {"f", f}, {"g", g}};
+
+  // Create an NLP solver
+  // Function solver = nlpsol("solver", "sqpmethod", nlp, opts);
+  Function solver = nlpsol("solver", "feasiblesqpmethod", nlp, opts);
+
+  // Solve the problem
+  DMDict arg;
+  arg["x0"] = 1.0;//std::vector<double>{2.5,3.0,0.75};
+  arg["lbg"] = -2;
+  arg["ubg"] = 2;
+  DMDict res = solver(arg);
+
+  //  Print solution
+  uout() << "Optimal cost:                     " << double(res.at("f")) << std::endl;
+  uout() << "Primal solution:                  " << std::vector<double>(res.at("x")) << std::endl;
   return 0;
 }
