@@ -44,7 +44,7 @@ namespace casadi {
   int CASADI_NLPSOL_FEASIBLESQPMETHOD_EXPORT
       casadi_register_nlpsol_feasiblesqpmethod(Nlpsol::Plugin* plugin) {
     plugin->creator = Feasiblesqpmethod::creator;
-    plugin->name = "feasible_sqpmethod";
+    plugin->name = "feasiblesqpmethod";
     plugin->doc = Feasiblesqpmethod::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Feasiblesqpmethod::options_;

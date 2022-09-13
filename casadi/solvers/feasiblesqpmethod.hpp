@@ -65,7 +65,7 @@ namespace casadi {
     ~Feasiblesqpmethod() override;
 
     // Get name of the plugin
-    const char* plugin_name() const override { return "feasible_sqpmethod";}
+    const char* plugin_name() const override { return "feasiblesqpmethod";}
 
     // Name of the class
     std::string class_name() const override { return "Feasiblesqpmethod";}
