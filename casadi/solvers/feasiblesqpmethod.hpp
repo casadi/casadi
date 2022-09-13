@@ -130,12 +130,6 @@ namespace casadi {
     /// Minimum step size allowed
     double min_step_size_;
 
-    /// Elastic mode
-    bool elastic_mode_;
-
-    /// Initial and maximum penalty parameter for elastic mode
-    double gamma_0_, gamma_max_, gamma_1_min_;
-
     /// Initialize feasible qp's
     bool init_feasible_;
 
@@ -161,9 +155,6 @@ namespace casadi {
 
     /// convexify?
     bool convexify_;
-
-    // Second order corrections
-    bool so_corr_;
 
     // -------- FROM HERE OPTIONS FOR FP-SQP ------------------
 

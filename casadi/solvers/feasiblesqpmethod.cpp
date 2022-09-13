@@ -133,22 +133,6 @@ namespace casadi {
       {"max_iter_eig",
        {OT_DOUBLE,
         "Maximum number of iterations to compute an eigenvalue decomposition (default: 50)."}},
-      {"elastic_mode",
-       {OT_BOOL,
-        "Enable the elastic mode which is used when the QP is infeasible (default: false)."}},
-      {"gamma_0",
-       {OT_DOUBLE,
-        "Starting value for the penalty parameter of elastic mode (default: 1)."}},
-      {"gamma_max",
-       {OT_DOUBLE,
-        "Maximum value for the penalty parameter of elastic mode (default: 1e20)."}},
-      {"gamma_1_min",
-       {OT_DOUBLE,
-        "Minimum value for gamma_1 (default: 1e-5)."}},
-      {"second_order_corrections",
-       {OT_BOOL,
-        "Enable second order corrections. "
-        "These are used when a step is considered bad by the merit function and constraint norm (default: false)."}},
       {"init_feasible",
        {OT_BOOL,
         "Initialize the QP subproblems with a feasible initial value (default: false)."}},
@@ -216,7 +200,6 @@ namespace casadi {
     print_header_ = true;
     print_iteration_ = true;
     print_status_ = true;
-    elastic_mode_ = false;
     gamma_0_ = 1;
     gamma_max_ = 1e20;
     gamma_1_min_ = 1e-5;
@@ -315,16 +298,6 @@ namespace casadi {
         convexify_margin = op.second;
       } else if (op.first=="max_iter_eig") {
         max_iter_eig = op.second;
-      } else if (op.first=="elastic_mode") {
-        elastic_mode_ = op.second;
-      } else if (op.first=="gamma_0") {
-        gamma_0_ = op.second;
-      } else if (op.first=="gamma_max") {
-        gamma_max_ = op.second;
-      } else if (op.first=="gamma_1_min") {
-        gamma_1_min_ = op.second;
-      } else if (op.first=="second_order_corrections") {
-        so_corr_ = op.second;
       } else if (op.first=="init_feasible") {
         init_feasible_ = op.second;
 
