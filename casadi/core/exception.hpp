@@ -55,7 +55,7 @@ namespace casadi {
                         throw CasadiException("Serious error.") << e;
                 }
         \endcode
-*/
+    \identifier{7u} */
 class CASADI_EXPORT CasadiException : public std::exception {
   public:
   //! \brief Default constructor

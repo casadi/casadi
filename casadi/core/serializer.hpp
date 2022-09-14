@@ -198,15 +198,15 @@ namespace casadi {
      * 
      * 
      * \seealso Function::save, Function::serialize, StringDeserializer, FileSerializer
-     * 
-     */
+     *
+        \identifier{7o} */
     StringSerializer(const Dict& opts = Dict());
     ~StringSerializer();
 
     /** \brief Returns a string that holds the serialized objects
      * 
      * As a side effect, this method clears the internal buffer
-    */
+        \identifier{7p} */
     std::string encode();
   };
 
@@ -215,7 +215,7 @@ namespace casadi {
     /** \brief Advanced serialization of CasADi objects
      * 
      * \seealso StringSerializer, FileDeserializer
-     */
+        \identifier{7q} */
     FileSerializer(const std::string& fname, const Dict& opts = Dict());
     ~FileSerializer();
   };
@@ -226,13 +226,13 @@ namespace casadi {
     /** \brief Advanced deserialization of CasADi objects
      * 
      * \seealso StringDeserializer
-     */
+        \identifier{7r} */
     StringDeserializer(const std::string& string);
     ~StringDeserializer();
 
 
     /** \brief Sets the string to deserialize objects from
-    */
+        \identifier{7s} */
     void decode(const std::string& string);
   };
 
@@ -241,7 +241,7 @@ namespace casadi {
      /** \brief Advanced deserialization of CasADi objects
      * 
      * \seealso FileSerializer
-     */
+         \identifier{7t} */
     FileDeserializer(const std::string& fname);
     ~FileDeserializer();
   };

@@ -29,7 +29,8 @@
 #include <cmath>
 #include <limits>
 
-/** \brief The casadi namespace */
+/** \brief The casadi namespace
+    \identifier{1aj} */
 namespace casadi {
 
   /** \brief casadi_limits class
@@ -39,7 +40,7 @@ namespace casadi {
   e.g. symbolic scalars
   \author Joel Andersson
   \date 2011
-  */
+      \identifier{1ak} */
 
   template<class T>
   class CASADI_EXPORT casadi_limits {

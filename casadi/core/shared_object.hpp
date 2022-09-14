@@ -78,7 +78,7 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2010
-  */
+      \identifier{as} */
   class CASADI_EXPORT SharedObject {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
@@ -106,7 +106,7 @@ namespace casadi {
     /** \brief Assign the node to a node class pointer without reference counting
      *
      * improper use will cause memory leaks!
-     */
+        \identifier{at} */
     void assign(SharedObjectInternal* node);
 
     /// Get a const pointer to the node
@@ -123,7 +123,8 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
-    /** \brief Get class name */
+    /** \brief Get class name
+        \identifier{au} */
     std::string class_name() const;
 
     /// Print a description of the object
@@ -146,12 +147,13 @@ namespace casadi {
 
     /** \brief Returns a number that is unique for a given Node.
      * If the Object does not point to any node, "0" is returned.
-     */
+        \identifier{av} */
     casadi_int __hash__() const;
 
 /// \cond INTERNAL
 #ifndef SWIG
-    /** \brief Get a weak reference to the object */
+    /** \brief Get a weak reference to the object
+        \identifier{aw} */
     WeakRef* weak();
   protected:
     void count_up(); // increase counter of the node
@@ -166,35 +168,43 @@ namespace casadi {
     A weak reference to a SharedObject
     \author Joel Andersson
     \date 2013
-*/
+    \identifier{ax} */
   class CASADI_EXPORT WeakRef : public SharedObject {
   public:
     friend class SharedObjectInternal;
 
-    /** \brief Default constructor */
+    /** \brief Default constructor
+        \identifier{ay} */
     WeakRef(int dummy=0);
 
-    /** \brief Construct from a shared object (also implicit type conversion) */
+    /** \brief Construct from a shared object (also implicit type conversion)
+        \identifier{az} */
     WeakRef(SharedObject shared);
 
-    /** \brief Get a shared (owning) reference */
+    /** \brief Get a shared (owning) reference
+        \identifier{b0} */
     SharedObject shared();
 
-    /** \brief Check if alive */
+    /** \brief Check if alive
+        \identifier{b1} */
     bool alive() const;
 
-    /** \brief  Access functions of the node */
+    /** \brief  Access functions of the node
+        \identifier{b2} */
     WeakRefInternal* operator->();
 
-    /** \brief  Const access functions of the node */
+    /** \brief  Const access functions of the node
+        \identifier{b3} */
     const WeakRefInternal* operator->() const;
 
 #ifndef SWIG
   private:
-    /** \brief Construct from a shared object (internal) */
+    /** \brief Construct from a shared object (internal)
+        \identifier{b4} */
     explicit WeakRef(SharedObjectInternal* raw);
 
-    /** \brief The shared object has been deleted */
+    /** \brief The shared object has been deleted
+        \identifier{b5} */
     void kill();
 #endif // SWIG
   };
@@ -203,7 +213,7 @@ namespace casadi {
 
   /** \brief Typecast a shared object to a base class to a shared object to a derived class,
    * cf. dynamic_cast
-   */
+      \identifier{b6} */
   template<class B>
   B shared_cast(SharedObject& A) {
 
@@ -223,7 +233,7 @@ namespace casadi {
 
   /** \brief Typecast a shared object to a base class to a shared object to a derived class,
    * cf. dynamic_cast (const)
-   */
+      \identifier{b7} */
   template<class B>
   const B shared_cast(const SharedObject& A) {
     SharedObject A_copy = A;

@@ -33,51 +33,63 @@ namespace casadi {
   /** \brief Finds the first nonzero element in a vector
       \author Joel Andersson
       \date 2015
-  */
+      \identifier{207} */
   class CASADI_EXPORT Find : public MXNode {
   public:
-    /** \brief  Constructor */
+    /** \brief  Constructor
+        \identifier{208} */
     Find(const MX& x);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+        \identifier{209} */
     ~Find() override {}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+        \identifier{20a} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+        \identifier{20b} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+        \identifier{20c} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+        \identifier{20d} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+        \identifier{20e} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+        \identifier{20f} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+        \identifier{20g} */
     casadi_int op() const override { return OP_FIND;}
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+        \identifier{20h} */
     void generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+        \identifier{20i} */
     static MXNode* deserialize(DeserializingStream& s) { return new Find(s); }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{20j} */
     explicit Find(DeserializingStream& s) : MXNode(s) { }
   };
 

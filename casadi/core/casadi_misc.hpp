@@ -32,7 +32,7 @@
 /** \brief Convenience tools for C++ Standard Library vectors
     \author Joel Andersson
     \date 2010-2011
-*/
+    \identifier{1l5} */
 
 namespace casadi {
 
@@ -73,13 +73,13 @@ private:
   * Consider a infinitely long list [start, start+step, start+2*step, ...]
   * Elements larger than or equal to stop are chopped off.
   *
-  */
+       \identifier{1l6} */
   CASADI_EXPORT std::vector<casadi_int> range(casadi_int start, casadi_int stop, casadi_int step=1,
                                             casadi_int len=std::numeric_limits<casadi_int>::max());
 
   /** \brief Check if a vector matches a range
-   * 
-   */
+   *
+      \identifier{1l7} */
   CASADI_EXPORT bool is_range(const std::vector<casadi_int>& v,
     casadi_int start, casadi_int stop, casadi_int step=1);
 
@@ -91,7 +91,7 @@ private:
   * \param stop
   *
   * \return list [0, 1, 2...stop-1]
-  */
+       \identifier{1l8} */
   CASADI_EXPORT std::vector<casadi_int> range(casadi_int stop);
 
   /// Check if all arguments are true
@@ -128,31 +128,32 @@ private:
   /**  \brief Slicing vector
   *  \param v Vector to slice
   *  \param i List of indices
-  */
+       \identifier{1l9} */
   template<typename T>
   std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i);
 
   /** \brief Reverse a list
-  */
+      \identifier{1la} */
   template<typename T>
   std::vector<T> reverse(const std::vector<T> &v);
 
   /** \brief Join two lists
-  */
+      \identifier{1lb} */
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b);
 
   /** \brief Join three lists
-  */
+      \identifier{1lc} */
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c);
 
   /** \brief permute a list
-  */
+      \identifier{1ld} */
   template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order);
 
-  /** \brief find nonzeros */
+  /** \brief find nonzeros
+      \identifier{1le} */
   template<typename T>
   std::vector<casadi_int> find(const std::vector<T> &v);
 
@@ -187,7 +188,7 @@ private:
   * The supplied vector may contain duplicates and may be non-monotonous
   * The supplied vector will be checked for bounds
   * The result vector is guaranteed to be monotonously increasing
-  */
+      \identifier{1lf} */
   CASADI_EXPORT std::vector<casadi_int> complement(const std::vector<casadi_int> &v,
                                                     casadi_int size);
 
@@ -197,7 +198,7 @@ private:
   *  v[lookupvector[i]] == i <=>  v contains i
   *
   *  Duplicates are treated by looking up last occurrence
-  */
+      \identifier{1lg} */
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v,
                                                      casadi_int size);
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v);
@@ -205,7 +206,7 @@ private:
   /** \brief Flatten a nested std::vector tot a single flattened vector
    * 
    * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
-   */
+      \identifier{1lh} */
   template<class T, class S>
   void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
                             std::vector<S>& flat);
@@ -213,7 +214,7 @@ private:
   /** \brief Flatten a nested std::vector tot a single flattened vector
    * 
    * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
-   */
+      \identifier{1li} */
   template<class T, class S, class I>
   void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
                             std::vector<S>& flat,
@@ -319,38 +320,39 @@ private:
   * \param[out] sorted_values the sorted vector
   * \param[out] indices The indices such that 'sorted_values= values[indices]'
   * \param[in] invert_indices Output indices such that 'sorted_values[indices=values'
-  **/
+  *
+      \identifier{1lj} */
   template<typename T>
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values,
             std::vector<casadi_int> &indices, bool invert_indices =false);
 
   /** \brief product
   *
-  */
+      \identifier{1lk} */
   template<typename T>
   T product(const std::vector<T> &values);
 
   /** \brief sum
   *
-  */
+      \identifier{1ll} */
   template<typename T>
   T sum(const std::vector<T> &values);
 
   /** \brief cumulative sum
   *
-  */
+      \identifier{1lm} */
   template<typename T>
   std::vector<T> cumsum(const std::vector<T> &values);
 
   /** \brief diff
   *
-  */
+      \identifier{1ln} */
   template<typename T>
   std::vector<T> diff(const std::vector<T> &values);
 
   /** \brief cumulative sum, starting with zero
   *
-  */
+      \identifier{1lo} */
   template<typename T>
   std::vector<T> cumsum0(const std::vector<T> &values);
 #endif //SWIG

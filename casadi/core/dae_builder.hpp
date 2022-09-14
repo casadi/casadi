@@ -63,7 +63,7 @@ class DaeBuilderInternal;
 
     \date 2012-2021
     \author Joel Andersson
-*/
+    \identifier{5c} */
 class CASADI_EXPORT DaeBuilder
   : public SharedObject,
     public SWIG_IF_ELSE(PrintableCommon, Printable<DaeBuilder>) {
@@ -79,125 +79,160 @@ public:
   explicit DaeBuilder(const std::string& name, const std::string& path = "",
     const Dict& opts = Dict());
 
-  /** \brief Name of instance */
+  /** \brief Name of instance
+      \identifier{5d} */
   const std::string& name() const;
 
   /** @name Variables and equations */
   ///@{
-  /** \brief Independent variable (usually time) */
+  /** \brief Independent variable (usually time)
+      \identifier{5e} */
   const MX& t() const;
 
-  /** \brief Differential states */
+  /** \brief Differential states
+      \identifier{5f} */
   std::vector<std::string> x() const;
 
-  /** \brief Ordinary differential equations (ODE) */
+  /** \brief Ordinary differential equations (ODE)
+      \identifier{5g} */
   std::vector<MX> ode() const;
 
-  /** \brief Algebraic variables */
+  /** \brief Algebraic variables
+      \identifier{5h} */
   std::vector<std::string> z() const;
 
-  /** \brief Algebraic equations */
+  /** \brief Algebraic equations
+      \identifier{5i} */
   std::vector<MX> alg() const;
 
-  /** \brief Quadrature states */
+  /** \brief Quadrature states
+      \identifier{5j} */
   std::vector<std::string> q() const;
 
-  /** \brief Quadrature equations */
+  /** \brief Quadrature equations
+      \identifier{5k} */
   std::vector<MX> quad() const;
 
-  /** \brief Output variables */
+  /** \brief Output variables
+      \identifier{5l} */
   std::vector<std::string> y() const;
 
-  /** \brief Definitions of output variables */
+  /** \brief Definitions of output variables
+      \identifier{5m} */
   std::vector<MX> ydef() const;
 
-  /** \brief Free controls */
+  /** \brief Free controls
+      \identifier{5n} */
   std::vector<std::string> u() const;
 
-  /** \brief Parameters */
+  /** \brief Parameters
+      \identifier{5o} */
   std::vector<std::string> p() const;
 
-  /** \brief Named constants */
+  /** \brief Named constants
+      \identifier{5p} */
   std::vector<std::string> c() const;
 
-  /** \brief Definitions of named constants */
+  /** \brief Definitions of named constants
+      \identifier{5q} */
   std::vector<MX> cdef() const;
 
-  /** \brief Dependent parameters */
+  /** \brief Dependent parameters
+      \identifier{5r} */
   std::vector<std::string> d() const;
 
   /** \brief Definitions of dependent parameters
     * Interdependencies are allowed but must be non-cyclic.
-    */
+      \identifier{5s} */
   std::vector<MX> ddef() const;
 
-  /** \brief Dependent variables */
+  /** \brief Dependent variables
+      \identifier{5t} */
   std::vector<std::string> w() const;
 
   /** \brief Dependent variables and corresponding definitions
    * Interdependencies are allowed but must be non-cyclic.
-   */
+      \identifier{5u} */
   std::vector<MX> wdef() const;
 
-  /** \brief Auxiliary variables: Used e.g. to define functions */
+  /** \brief Auxiliary variables: Used e.g. to define functions
+      \identifier{5v} */
   const std::vector<MX>& aux() const;
 
-  /** \brief Initial conditions, left-hand-side */
+  /** \brief Initial conditions, left-hand-side
+      \identifier{5w} */
   const std::vector<MX>& init_lhs() const;
 
-  /** \brief Initial conditions, right-hand-side */
+  /** \brief Initial conditions, right-hand-side
+      \identifier{5x} */
   const std::vector<MX>& init_rhs() const;
 
-  /** \brief When statement: triggering condition */
+  /** \brief When statement: triggering condition
+      \identifier{5y} */
   const std::vector<MX>& when_cond() const;
 
-  /** \brief When statement: left-hand-side */
+  /** \brief When statement: left-hand-side
+      \identifier{5z} */
   const std::vector<MX>& when_lhs() const;
 
-  /** \brief When statement: right-hand-side */
+  /** \brief When statement: right-hand-side
+      \identifier{60} */
   const std::vector<MX>& when_rhs() const;
   ///@}
 
-  /** \brief Model structure: outputs */
+  /** \brief Model structure: outputs
+      \identifier{61} */
   std::vector<std::string> outputs() const;
 
-  /** \brief Model structure: derivatives */
+  /** \brief Model structure: derivatives
+      \identifier{62} */
   std::vector<std::string> derivatives() const;
 
-  /** \brief Model structure: initial unknowns */
+  /** \brief Model structure: initial unknowns
+      \identifier{63} */
   std::vector<std::string> initial_unknowns() const;
 
   /** @name Variables and equations */
   ///@{
 
-  /** \brief Is there a time variable? */
+  /** \brief Is there a time variable?
+      \identifier{64} */
   bool has_t() const;
 
-  /** \brief Differential states */
+  /** \brief Differential states
+      \identifier{65} */
   casadi_int nx() const;
 
-  /** \brief Algebraic variables */
+  /** \brief Algebraic variables
+      \identifier{66} */
   casadi_int nz() const;
 
-  /** \brief Quadrature states */
+  /** \brief Quadrature states
+      \identifier{67} */
   casadi_int nq() const;
 
-  /** \brief Output variables */
+  /** \brief Output variables
+      \identifier{68} */
   casadi_int ny() const;
 
-  /** \brief Free controls */
+  /** \brief Free controls
+      \identifier{69} */
   casadi_int nu() const;
 
-  /** \brief Parameters */
+  /** \brief Parameters
+      \identifier{6a} */
   casadi_int np() const;
 
-  /** \brief Named constants */
+  /** \brief Named constants
+      \identifier{6b} */
   casadi_int nc() const;
 
-  /** \brief Dependent parameters */
+  /** \brief Dependent parameters
+      \identifier{6c} */
   casadi_int nd() const;
 
-  /** \brief Dependent variables */
+  /** \brief Dependent variables
+      \identifier{6d} */
   casadi_int nw() const;
   ///@}
 
@@ -363,7 +398,7 @@ public:
     \param name_in   Names of all the inputs
     \param name_out  Names of all the outputs
     \param opts    Optional settings
-  */
+      \identifier{6e} */
   Function create(const std::string& name,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
@@ -373,7 +408,7 @@ public:
   /** \brief  Load a function from an FMU DLL, standard IO conforming with simulator
     \param name    Name assigned to the resulting function object
     \param opts    Optional settings
-  */
+      \identifier{6f} */
   Function create(const std::string& name, const Dict& opts=Dict()) const;
 
   /// Construct a function for evaluating dependent parameters
@@ -561,7 +596,8 @@ public:
   /// Get the (cached) oracle, SX or MX
   Function oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
 
-  /** \brief Get Jacobian sparsity */
+  /** \brief Get Jacobian sparsity
+      \identifier{6g} */
   Sparsity jac_sparsity(const std::vector<std::string>& onames,
     const std::vector<std::string>& inames) const;
 
@@ -602,10 +638,12 @@ public:
   /// Get indices of variable
   std::vector<size_t> find(const std::vector<std::string>& name) const;
 
-  /** \brief Get variable name by index */
+  /** \brief Get variable name by index
+      \identifier{6h} */
   const std::string& name(size_t ind) const;
 
-  /** \brief Get variable names by indices */
+  /** \brief Get variable names by indices
+      \identifier{6i} */
   std::vector<std::string> name(const std::vector<size_t>& ind) const;
 
 #endif // SWIG

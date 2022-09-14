@@ -33,7 +33,8 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Integrator memory */
+  /** \brief Integrator memory
+      \identifier{1o7} */
   struct CASADI_EXPORT RootfinderMemory : public OracleMemory {
     // Inputs
     const double** iarg;
@@ -55,32 +56,36 @@ namespace casadi {
     /** \brief Constructor
      *
      * \param f   Function mapping from (n+1) inputs to 1 output.
-     */
+        \identifier{1o8} */
     Rootfinder(const std::string& name, const Function& oracle);
 
     /// Destructor
     ~Rootfinder() override = 0;
 
     ///@{
-    /** \brief Number of function inputs and outputs */
+    /** \brief Number of function inputs and outputs
+        \identifier{1o9} */
     size_t get_n_in() override { return oracle_.n_in();}
     size_t get_n_out() override { return oracle_.n_out();}
     ///@}
 
     /// @{
-    /** \brief Sparsities of function inputs and outputs */
+    /** \brief Sparsities of function inputs and outputs
+        \identifier{1oa} */
     Sparsity get_sparsity_in(casadi_int i) override { return oracle_.sparsity_in(i);}
     Sparsity get_sparsity_out(casadi_int i) override { return oracle_.sparsity_out(i);}
     /// @}
 
     ///@{
-    /** \brief Names of function input and outputs */
+    /** \brief Names of function input and outputs
+        \identifier{1ob} */
     std::string get_name_in(casadi_int i) override { return oracle_.name_in(i);}
     std::string get_name_out(casadi_int i) override { return oracle_.name_out(i);}
     /// @}
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{1oc} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -88,10 +93,12 @@ namespace casadi {
     /// Initialize
     void init(const Dict& opts) override;
 
-    /** \brief Initalize memory block */
+    /** \brief Initalize memory block
+        \identifier{1od} */
     int init_mem(void* mem) const override;
 
-    /** \brief Set the (persistent) work vectors */
+    /** \brief Set the (persistent) work vectors
+        \identifier{1oe} */
     void set_work(void* mem, const double**& arg, double**& res,
                           casadi_int*& iw, double*& w) const override;
 
@@ -104,11 +111,13 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+        \identifier{1of} */
     int sp_forward(const bvec_t** arg, bvec_t** res,
                     casadi_int* iw, bvec_t* w, void* mem) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+        \identifier{1og} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
     ///@{
@@ -117,11 +126,13 @@ namespace casadi {
     bool has_sprev() const override { return true;}
     ///@}
 
-    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    /** \brief Do the derivative functions need nondifferentiated outputs?
+        \identifier{1oh} */
     bool uses_output() const override {return true;}
 
     ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    /** \brief Generate a function that calculates \a nfwd forward derivatives
+        \identifier{1oi} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -130,7 +141,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives
+        \identifier{1oj} */
     bool has_reverse(casadi_int nadj) const override { return true;}
     Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -138,13 +150,15 @@ namespace casadi {
                          const Dict& opts) const override;
     ///@}
 
-    /** \brief Create call to (cached) derivative function, forward mode  */
+    /** \brief Create call to (cached) derivative function, forward mode
+        \identifier{1ok} */
     virtual void ad_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
                          bool always_inline, bool never_inline) const;
 
-    /** \brief Create call to (cached) derivative function, reverse mode  */
+    /** \brief Create call to (cached) derivative function, reverse mode
+        \identifier{1ol} */
     virtual void ad_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens,
@@ -186,19 +200,24 @@ namespace casadi {
       static Function create_oracle(const std::map<std::string, XType>& d,
                                     const Dict& opts);
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+        \identifier{1om} */
     void serialize_body(SerializingStream &s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+        \identifier{1on} */
     void serialize_type(SerializingStream &s) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize into MX
+        \identifier{1oo} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
+    /** \brief String used to identify the immediate FunctionInternal subclass
+        \identifier{1op} */
     std::string serialize_base_function() const override { return "Rootfinder"; }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{1oq} */
     explicit Rootfinder(DeserializingStream& s);
   };
 

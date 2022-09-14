@@ -132,7 +132,8 @@ namespace casadi {
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
 
   ///@{
-  /** \brief  Function pointer types for the C API */
+  /** \brief  Function pointer types for the C API
+      \identifier{7j} */
   typedef void (*signal_t)(void);
   typedef casadi_int (*getint_t)(void);
   typedef double (*default_t)(casadi_int i);

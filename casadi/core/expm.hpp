@@ -57,10 +57,12 @@ namespace casadi {
                            const Sparsity& A, const Dict& opts=Dict());
   ///@}
 
-  /** \brief Get the number of expm solver inputs */
+  /** \brief Get the number of expm solver inputs
+      \identifier{rs} */
   CASADI_EXPORT casadi_int expm_n_in();
 
-  /** \brief Get the number of expm solver outputs */
+  /** \brief Get the number of expm solver outputs
+      \identifier{rt} */
   CASADI_EXPORT casadi_int expm_n_out();
 
   /// Check if a particular plugin is available

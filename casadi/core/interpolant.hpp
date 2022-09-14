@@ -107,8 +107,8 @@ namespace casadi {
    * By default, derivatives wrt the coefficients are not supported (zero).
    * Some interpolant plugins may support the `inline=true` which enables correct derivatives
    * 
-   * 
-  */
+   *
+      \identifier{1p3} */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
                                      const std::vector<std::vector<double> >& grid,
@@ -122,8 +122,8 @@ namespace casadi {
    *
    * By default, derivatives wrt the coefficients are not supported (zero).
    * Some interpolant plugins may support the `inline=true` which enables correct derivatives
-   * 
-  */
+   *
+      \identifier{1p4} */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
                                      const std::vector<casadi_int>& grid_dims,
@@ -136,7 +136,7 @@ namespace casadi {
    * 
    * By default, derivatives wrt the coefficients are not supported (zero).
    * Some interpolant plugins may support the `inline=true` which enables correct derivatives
-  */
+      \identifier{1p5} */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
                                      const std::vector<casadi_int>& grid_dims,
