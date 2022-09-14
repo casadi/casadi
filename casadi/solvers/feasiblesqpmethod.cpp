@@ -35,6 +35,7 @@
 #include <fstream>
 #include <cmath>
 #include <cfloat>
+#include <signal.h>
 
 using namespace std;
 namespace casadi {
@@ -504,7 +505,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     bool ls_success = true;
 
     // Last second order correction successfull
-    bool so_succes = false;
+    // bool so_succes = false;
 
     // Reset
     m->merit_ind = 0;
@@ -598,6 +599,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
       casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag, true);
       casadi_axpy(nx_, 1., d_nlp->lam, d->gLag);
 
+      // raise(SIGTRAP);
       // Primal infeasability
       double pr_inf = casadi_max_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
       // uout() << "pr_inf: " << pr_inf << std::endl;
@@ -606,16 +608,17 @@ int Feasiblesqpmethod::solve(void* mem) const {
       double du_inf = casadi_norm_inf(nx_, d->gLag);
       // uout() << "du_inf: " << du_inf << std::endl;
 
-      // inf-norm of step
+      // inf-norm of step, d->dx is a nullptr???
+      uout() << "HERE!!!!" << *d->dx << std::endl;
       double dx_norminf = casadi_norm_inf(nx_, d->dx);
 
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
         print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
-                        m->reg, ls_iter, ls_success, so_succes, info);
+                        m->reg, ls_iter, ls_success, info);
         info = "";
-        so_succes = false;
+        // so_succes = false;
       }
 
       // Callback function
@@ -1029,7 +1032,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
                                   double pr_inf, double du_inf,
                                   double dx_norm, double rg,
                                   casadi_int ls_trials, bool ls_success,
-                                  bool so_succes, std::string info) const {
+                                  std::string info) const {
     print("%4d %14.6e %9.2e %9.2e %9.2e ", iter, obj, pr_inf, du_inf, dx_norm);
     if (rg>0) {
       print("%7.2f ", log10(rg));
@@ -1044,9 +1047,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
       print (" ");
     }
     
-    if (so_succes) {
-      print(" - SOC");
-    }
+    // if (so_succes) {
+    //   print(" - SOC");
+    // }
     
     print(" - ");
     print(info.c_str());
@@ -1091,44 +1094,44 @@ int Feasiblesqpmethod::solve(void* mem) const {
     return 0;
   }
 
-  int Feasiblesqpmethod::solve_ela_QP(FeasiblesqpmethodMemory* m, const double* H, const double* g,
-                           const double* lbdz, const double* ubdz, const double* A,
-                           double* x_opt, double* dlam) const {
-    ScopedTiming tic(m->fstats.at("QP"));
-    // Inputs
-    fill_n(m->arg, qpsol_ela_.n_in(), nullptr);
-    m->arg[CONIC_H] = H;
-    m->arg[CONIC_G] = g;
-    m->arg[CONIC_X0] = x_opt;
-    m->arg[CONIC_LAM_X0] = dlam;
-    m->arg[CONIC_LAM_A0] = dlam + nx_ + 2*ng_;
-    m->arg[CONIC_LBX] = lbdz;
-    m->arg[CONIC_UBX] = ubdz;
-    m->arg[CONIC_A] = A;
-    m->arg[CONIC_LBA] = lbdz + nx_ + 2*ng_;
-    m->arg[CONIC_UBA] = ubdz + nx_ + 2*ng_;
+  // int Feasiblesqpmethod::solve_ela_QP(FeasiblesqpmethodMemory* m, const double* H, const double* g,
+  //                          const double* lbdz, const double* ubdz, const double* A,
+  //                          double* x_opt, double* dlam) const {
+  //   ScopedTiming tic(m->fstats.at("QP"));
+  //   // Inputs
+  //   fill_n(m->arg, qpsol_ela_.n_in(), nullptr);
+  //   m->arg[CONIC_H] = H;
+  //   m->arg[CONIC_G] = g;
+  //   m->arg[CONIC_X0] = x_opt;
+  //   m->arg[CONIC_LAM_X0] = dlam;
+  //   m->arg[CONIC_LAM_A0] = dlam + nx_ + 2*ng_;
+  //   m->arg[CONIC_LBX] = lbdz;
+  //   m->arg[CONIC_UBX] = ubdz;
+  //   m->arg[CONIC_A] = A;
+  //   m->arg[CONIC_LBA] = lbdz + nx_ + 2*ng_;
+  //   m->arg[CONIC_UBA] = ubdz + nx_ + 2*ng_;
 
-    // Outputs
-    fill_n(m->res, qpsol_ela_.n_out(), nullptr);
-    m->res[CONIC_X] = x_opt;
-    m->res[CONIC_LAM_X] = dlam;
-    m->res[CONIC_LAM_A] = dlam + nx_ + 2*ng_;
+  //   // Outputs
+  //   fill_n(m->res, qpsol_ela_.n_out(), nullptr);
+  //   m->res[CONIC_X] = x_opt;
+  //   m->res[CONIC_LAM_X] = dlam;
+  //   m->res[CONIC_LAM_A] = dlam + nx_ + 2*ng_;
 
-    // Solve the QP
-    qpsol_ela_(m->arg, m->res, m->iw, m->w, 0);
-    auto m_qpsol_ela = static_cast<ConicMemory*>(qpsol_ela_->memory(0));
+  //   // Solve the QP
+  //   qpsol_ela_(m->arg, m->res, m->iw, m->w, 0);
+  //   auto m_qpsol_ela = static_cast<ConicMemory*>(qpsol_ela_->memory(0));
 
-    // Check if the QP was infeasible
-    if (!m_qpsol_ela->success) {
-      if (m_qpsol_ela->unified_return_status == SOLVER_RET_INFEASIBLE) {
-        return SOLVER_RET_INFEASIBLE;
-      }
-    } 
+  //   // Check if the QP was infeasible
+  //   if (!m_qpsol_ela->success) {
+  //     if (m_qpsol_ela->unified_return_status == SOLVER_RET_INFEASIBLE) {
+  //       return SOLVER_RET_INFEASIBLE;
+  //     }
+  //   } 
 
-    if (verbose_) print("Elastic QP solved\n");
+  //   if (verbose_) print("Elastic QP solved\n");
 
-    return 0;
-  }
+  //   return 0;
+  // }
 
   // int Feasiblesqpmethod::solve_elastic_mode(FeasiblesqpmethodMemory* m, casadi_int* ela_it, double gamma_1,
   //                                   casadi_int ls_iter, bool ls_success, bool so_succes, double pr_inf, 

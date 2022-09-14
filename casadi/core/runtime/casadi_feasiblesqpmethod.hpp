@@ -135,15 +135,15 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   //   // temp mem
   //   d->temp_mem = *w; *w += ng;
   // } else {
-  //   // Gradient of the objective
-  //   d->gf = *w; *w += nx;
-  //   // Bounds of the QP
-  //   d->lbdz = *w; *w += nx + ng;
-  //   d->ubdz = *w; *w += nx + ng;
-  //   // QP solution
-  //   d->dx = *w; *w += nx;
-  //   d->dlam = *w; *w += nx + ng;
-  //   // Jacobian
-  //   d->Jk = *w; *w += nnz_a;
+  // Gradient of the objective
+  d->gf = *w; *w += nx;
+  // Bounds of the QP
+  d->lbdz = *w; *w += nx + ng;
+  d->ubdz = *w; *w += nx + ng;
+  // QP solution
+  d->dx = *w; *w += nx;
+  d->dlam = *w; *w += nx + ng;
+  // Jacobian
+  d->Jk = *w; *w += nnz_a;
   // }
 }
