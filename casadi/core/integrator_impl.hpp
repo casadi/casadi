@@ -34,7 +34,8 @@
 
 namespace casadi {
 
-  /** \brief Integrator memory */
+  /** \brief Integrator memory
+      \identifier{1lp} */
   struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   };
 
@@ -43,44 +44,52 @@ namespace casadi {
       @copydoc DAE_doc
       \author Joel Andersson
       \date 2010
-  */
+      \identifier{1lq} */
   class CASADI_EXPORT
   Integrator : public OracleFunction, public PluginInterface<Integrator> {
   public:
-    /** \brief  Constructor */
+    /** \brief  Constructor
+        \identifier{1lr} */
     Integrator(const std::string& name, const Function& oracle);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+        \identifier{1ls} */
     ~Integrator() override=0;
 
     ///@{
-    /** \brief Number of function inputs and outputs */
+    /** \brief Number of function inputs and outputs
+        \identifier{1lt} */
     size_t get_n_in() override { return INTEGRATOR_NUM_IN;}
     size_t get_n_out() override { return INTEGRATOR_NUM_OUT;}
     ///@}
 
    /// @{
-    /** \brief Sparsities of function inputs and outputs */
+    /** \brief Sparsities of function inputs and outputs
+        \identifier{1lu} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
-    /** \brief Names of function input and outputs */
+    /** \brief Names of function input and outputs
+        \identifier{1lv} */
     std::string get_name_in(casadi_int i) override { return integrator_in(i);}
     std::string get_name_out(casadi_int i) override { return integrator_out(i);}
     /// @}
 
-    /** \brief Initalize memory block */
+    /** \brief Initalize memory block
+        \identifier{1lw} */
     int init_mem(void* mem) const override;
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{1lx} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
-    /** \brief  Initialize */
+    /** \brief  Initialize
+        \identifier{1ly} */
     void init(const Dict& opts) override;
 
     /** Helper for a more powerful 'integrator' factory */
@@ -89,33 +98,41 @@ namespace casadi {
     virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
     virtual MX algebraic_state_output(const MX& Z) const { return Z; }
 
-    /** \brief Reset the forward problem */
+    /** \brief Reset the forward problem
+        \identifier{1lz} */
     virtual void reset(IntegratorMemory* mem, double t,
                        const double* x, const double* z, const double* p) const = 0;
 
-    /** \brief  Advance solution in time */
+    /** \brief  Advance solution in time
+        \identifier{1m0} */
     virtual void advance(IntegratorMemory* mem, double t,
                          double* x, double* z, double* q) const = 0;
 
-    /** \brief Reset the backward problem */
+    /** \brief Reset the backward problem
+        \identifier{1m1} */
     virtual void resetB(IntegratorMemory* mem, double t,
                         const double* rx, const double* rz, const double* rp) const = 0;
 
-    /** \brief  Retreat solution in time */
+    /** \brief  Retreat solution in time
+        \identifier{1m2} */
     virtual void retreat(IntegratorMemory* mem, double t,
                          double* rx, double* rz, double* rq) const = 0;
 
-    /** \brief  evaluate */
+    /** \brief  evaluate
+        \identifier{1m3} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
-    /** \brief  Print solver statistics */
+    /** \brief  Print solver statistics
+        \identifier{1m4} */
     virtual void print_stats(IntegratorMemory* mem) const {}
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+        \identifier{1m5} */
     int sp_forward(const bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+        \identifier{1m6} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
     ///@{
@@ -125,7 +142,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    /** \brief Generate a function that calculates \a nfwd forward derivatives
+        \identifier{1m7} */
     Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
@@ -134,7 +152,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives
+        \identifier{1m8} */
     Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
@@ -142,16 +161,20 @@ namespace casadi {
     bool has_reverse(casadi_int nadj) const override { return true;}
     ///@}
 
-    /** \brief  Set stop time for the integration */
+    /** \brief  Set stop time for the integration
+        \identifier{1m9} */
     virtual void setStopTime(IntegratorMemory* mem, double tf) const;
 
-    /** \brief Set solver specific options to generated augmented integrators */
+    /** \brief Set solver specific options to generated augmented integrators
+        \identifier{1ma} */
     virtual Dict getDerivativeOptions(bool fwd) const;
 
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities */
+    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
+        \identifier{1mb} */
     template<typename MatType> std::map<std::string, MatType> aug_fwd(casadi_int nfwd) const;
 
-    /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities */
+    /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities
+        \identifier{1mc} */
     template<typename MatType> std::map<std::string, MatType> aug_adj(casadi_int nadj) const;
 
     /// Create sparsity pattern of the extended Jacobian (forward problem)
@@ -226,19 +249,24 @@ namespace casadi {
         const std::map<std::string, XType>& d, const Dict& opts=Dict());
 
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+        \identifier{1md} */
     void serialize_body(SerializingStream &s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+        \identifier{1me} */
     void serialize_type(SerializingStream &s) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize into MX
+        \identifier{1mf} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
+    /** \brief String used to identify the immediate FunctionInternal subclass
+        \identifier{1mg} */
     std::string serialize_base_function() const override { return "Integrator"; }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{1mh} */
     explicit Integrator(DeserializingStream& s);
   };
 
@@ -272,7 +300,8 @@ namespace casadi {
     ~FixedStepIntegrator() override;
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{1mi} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -283,23 +312,28 @@ namespace casadi {
     /** Helper for a more powerful 'integrator' factory */
     Function create_advanced(const Dict& opts) override;
 
-    /** \brief Create memory block */
+    /** \brief Create memory block
+        \identifier{1mj} */
     void* alloc_mem() const override { return new FixedStepMemory();}
 
-    /** \brief Initalize memory block */
+    /** \brief Initalize memory block
+        \identifier{1mk} */
     int init_mem(void* mem) const override;
 
-    /** \brief Free memory block */
+    /** \brief Free memory block
+        \identifier{1ml} */
     void free_mem(void *mem) const override { delete static_cast<FixedStepMemory*>(mem);}
 
     /// Setup F and G
     virtual void setupFG() = 0;
 
-    /** \brief Reset the forward problem */
+    /** \brief Reset the forward problem
+        \identifier{1mm} */
     void reset(IntegratorMemory* mem, double t,
                        const double* x, const double* z, const double* p) const override;
 
-    /** \brief  Advance solution in time */
+    /** \brief  Advance solution in time
+        \identifier{1mn} */
     void advance(IntegratorMemory* mem, double t,
                          double* x, double* z, double* q) const override;
 
@@ -307,7 +341,8 @@ namespace casadi {
     void resetB(IntegratorMemory* mem, double t,
                         const double* rx, const double* rz, const double* rp) const override;
 
-    /** \brief  Retreat solution in time */
+    /** \brief  Retreat solution in time
+        \identifier{1mo} */
     void retreat(IntegratorMemory* mem, double t,
                          double* rx, double* rz, double* rq) const override;
 
@@ -329,11 +364,13 @@ namespace casadi {
     /// Number of algebraic variables for the discrete time integration
     casadi_int nZ_, nRZ_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+        \identifier{1mp} */
     void serialize_body(SerializingStream &s) const override;
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{1mq} */
     explicit FixedStepIntegrator(DeserializingStream& s);
   };
 
@@ -347,7 +384,8 @@ namespace casadi {
     ~ImplicitFixedStepIntegrator() override;
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{1mr} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -364,11 +402,13 @@ namespace casadi {
     // Implicit function solver
     Function rootfinder_, backward_rootfinder_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+        \identifier{1ms} */
     void serialize_body(SerializingStream &s) const override;
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{1mt} */
     explicit ImplicitFixedStepIntegrator(DeserializingStream& s);
   };
 

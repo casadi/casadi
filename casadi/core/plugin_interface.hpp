@@ -84,7 +84,7 @@ namespace casadi {
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
       \date 2013
-  */
+      \identifier{rp} */
   template<class Derived>
   class PluginInterface {
     public:
@@ -142,12 +142,14 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
 
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+        \identifier{rq} */
     void serialize_type(SerializingStream& s) const {
       s.pack("PluginInterface::plugin_name", std::string(plugin_name()));
     }
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+        \identifier{rr} */
     static ProtoFunction* deserialize(DeserializingStream& s) {
       std::string class_name, plugin_name;
       s.unpack("PluginInterface::plugin_name", plugin_name);

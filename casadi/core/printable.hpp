@@ -38,14 +38,14 @@ namespace casadi {
 
   /** \brief Empty Base
       This class is extended in SWIG.
-   */
+      \identifier{7h} */
   struct CASADI_EXPORT PrintableCommon {};
 
 #ifndef SWIG
   /** \brief Base class for objects that have a natural string representation
       \author Joel Andersson
       \date 2010-2014
-  */
+      \identifier{7i} */
   template<class Derived>
   class CASADI_EXPORT Printable : public PrintableCommon {
   public:

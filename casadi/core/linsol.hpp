@@ -47,12 +47,13 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2011-2016
-  */
+      \identifier{1kh} */
   class CASADI_EXPORT Linsol
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<Linsol>) {
   public:
-    /** \brief Get type name */
+    /** \brief Get type name
+        \identifier{1ki} */
     static std::string type_name() {return "Linsol";}
 
     /// Default constructor
@@ -73,7 +74,8 @@ namespace casadi {
 
     /// \cond INTERNAL
 #ifndef SWIG
-    /** \brief  Create from node */
+    /** \brief  Create from node
+        \identifier{1kj} */
     static Linsol create(LinsolInternal* node);
 #endif // SWIG
     /// \endcond
@@ -107,12 +109,12 @@ namespace casadi {
 
     /** \brief Number of negative eigenvalues
       * Not available for all solvers
-      */
+        \identifier{1kk} */
     casadi_int neig(const DM& A) const;
 
     /** \brief Matrix rank
       * Not available for all solvers
-      */
+        \identifier{1kl} */
     casadi_int rank(const DM& A) const;
 
    /// Get all statistics obtained at the end of the last evaluate call
@@ -134,10 +136,12 @@ namespace casadi {
     /// Release a memory object
     void release(int mem) const;
 
-    /** \brief Serialize an object */
+    /** \brief Serialize an object
+        \identifier{1km} */
     void serialize(SerializingStream &s) const;
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+        \identifier{1kn} */
     static Linsol deserialize(DeserializingStream& s);
 
     #endif // SWIG

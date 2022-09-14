@@ -39,7 +39,7 @@ namespace casadi {
  *             in your shared library
  *
  * File name is assumed to be ./<name>.so
- */
+    \identifier{i0} */
 CASADI_EXPORT Function external(const std::string& name, const Dict& opts=Dict());
 
 /** \brief  Load an external function from a shared library
@@ -50,13 +50,13 @@ CASADI_EXPORT Function external(const std::string& name, const Dict& opts=Dict()
  *             Use `nm` (linux/osx) or `depends.exe` (win) to check which symbols are present
  *             in your shared library
  * \param bin_name File name of the shared library
- */
+    \identifier{i1} */
 CASADI_EXPORT Function external(const std::string& name, const std::string& bin_name,
                                 const Dict& opts=Dict());
 
 /** \brief  Load a just-in-time compiled external function
  * File name given
- */
+    \identifier{i2} */
 CASADI_EXPORT Function external(const std::string& name, const Importer& li,
                                 const Dict& opts=Dict());
 

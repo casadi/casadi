@@ -43,25 +43,29 @@ namespace casadi {
     ~Dple() override = 0;
 
     ///@{
-    /** \brief Number of function inputs and outputs */
+    /** \brief Number of function inputs and outputs
+        \identifier{15s} */
     size_t get_n_in() override { return DPLE_NUM_IN;}
     size_t get_n_out() override { return DPLE_NUM_OUT;}
     ///@}
 
     /// @{
-    /** \brief Sparsities of function inputs and outputs */
+    /** \brief Sparsities of function inputs and outputs
+        \identifier{15t} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
-    /** \brief Names of function input and outputs */
+    /** \brief Names of function input and outputs
+        \identifier{15u} */
     std::string get_name_in(casadi_int i) override { return dple_in(i);}
     std::string get_name_out(casadi_int i) override { return dple_out(i);}
     /// @}
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{15v} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -70,7 +74,8 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    /** \brief Generate a function that calculates \a nfwd forward derivatives
+        \identifier{15w} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -79,7 +84,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives
+        \identifier{15x} */
     bool has_reverse(casadi_int nadj) const override { return true;}
     Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,

@@ -39,7 +39,8 @@
 namespace casadi {
 
 #ifndef SWIG
-  /** \brief  An element of the algorithm, namely an MX node */
+  /** \brief  An element of the algorithm, namely an MX node
+      \identifier{1x} */
   struct MXAlgEl {
     /// Operator index
     casadi_int op;
@@ -58,17 +59,20 @@ namespace casadi {
   /** \brief  Internal node class for MXFunction
       \author Joel Andersson
       \date 2010-2015
-  */
+      \identifier{1y} */
   class CASADI_EXPORT MXFunction :
         public XFunction<MXFunction, MX, MXNode>{
   public:
-    /** \brief  An element of the algorithm, namely an MX node */
+    /** \brief  An element of the algorithm, namely an MX node
+        \identifier{1z} */
     typedef MXAlgEl AlgEl;
 
-    /** \brief  All the runtime elements in the order of evaluation */
+    /** \brief  All the runtime elements in the order of evaluation
+        \identifier{20} */
     std::vector<AlgEl> algorithm_;
 
-    /** \brief Offsets for elements in the w_ vector */
+    /** \brief Offsets for elements in the w_ vector
+        \identifier{21} */
     std::vector<casadi_int> workloc_;
 
     /// Free variables
@@ -83,29 +87,36 @@ namespace casadi {
     /// Print instructions during evaluation
     bool print_instructions_;
 
-    /** \brief Constructor */
+    /** \brief Constructor
+        \identifier{22} */
     MXFunction(const std::string& name,
       const std::vector<MX>& input, const std::vector<MX>& output,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+        \identifier{23} */
     ~MXFunction() override;
 
-    /** \brief  Evaluate numerically, work vectors given */
+    /** \brief  Evaluate numerically, work vectors given
+        \identifier{24} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
-    /** \brief  Print description */
+    /** \brief  Print description
+        \identifier{25} */
     void disp_more(std::ostream& stream) const override;
 
-    /** \brief Get type name */
+    /** \brief Get type name
+        \identifier{26} */
     std::string class_name() const override {return "MXFunction";}
 
-    /** \brief Check if the function is of a particular type */
+    /** \brief Check if the function is of a particular type
+        \identifier{27} */
     bool is_a(const std::string& type, bool recursive) const override;
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{28} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -116,58 +127,72 @@ namespace casadi {
     /// Reconstruct options dict
     Dict generate_options(bool is_temp) const override;
 
-    /** \brief  Initialize */
+    /** \brief  Initialize
+        \identifier{29} */
     void init(const Dict& opts) override;
 
-    /** \brief Generate code for the declarations of the C function */
+    /** \brief Generate code for the declarations of the C function
+        \identifier{2a} */
     void codegen_declarations(CodeGenerator& g) const override;
 
-    /** \brief Codegen incref for dependencies */
+    /** \brief Codegen incref for dependencies
+        \identifier{2b} */
     void codegen_incref(CodeGenerator& g) const override;
 
-    /** \brief Codegen decref for dependencies */
+    /** \brief Codegen decref for dependencies
+        \identifier{2c} */
     void codegen_decref(CodeGenerator& g) const override;
 
-    /** \brief Generate code for the body of the C function */
+    /** \brief Generate code for the body of the C function
+        \identifier{2d} */
     void codegen_body(CodeGenerator& g) const override;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+        \identifier{2e} */
     void serialize_body(SerializingStream &s) const override;
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+        \identifier{2f} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
-     * (see Albersmeyer2010 paper) */
+     * (see Albersmeyer2010 paper)
+        \identifier{2g} */
     void generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const override;
 
     /** Inline calls? */
     bool should_inline(bool always_inline, bool never_inline) const override;
 
-    /** \brief Evaluate symbolically, SX type*/
+    /** \brief Evaluate symbolically, SX type
+        \identifier{2h} */
     int eval_sx(const SXElem** arg, SXElem** res,
                 casadi_int* iw, SXElem* w, void* mem) const override;
 
-    /** \brief Evaluate symbolically, MX type */
+    /** \brief Evaluate symbolically, MX type
+        \identifier{2i} */
     void eval_mx(const MXVector& arg, MXVector& res,
                  bool always_inline, bool never_inline) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+        \identifier{2j} */
     void ad_forward(const std::vector<std::vector<MX> >& fwdSeed,
                         std::vector<std::vector<MX> >& fwdSens) const;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+        \identifier{2k} */
     void ad_reverse(const std::vector<std::vector<MX> >& adjSeed,
                         std::vector<std::vector<MX> >& adjSens) const;
 
     /// Get a vector of symbolic variables corresponding to the outputs
     std::vector<MX> symbolic_output(const std::vector<MX>& arg) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+        \identifier{2l} */
     int sp_forward(const bvec_t** arg, bvec_t** res,
                   casadi_int* iw, bvec_t* w, void* mem) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+        \identifier{2m} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
     // print an element of an algorithm
@@ -180,7 +205,8 @@ namespace casadi {
     void print_res(std::ostream &stream, casadi_int k, const AlgEl& el, double** res) const;
 
     ///@{
-    /** \brief Get function input(s) and output(s)  */
+    /** \brief Get function input(s) and output(s)
+        \identifier{2n} */
     const MX mx_in(casadi_int ind) const override;
     const std::vector<MX> mx_in() const override;
     ///@}
@@ -188,37 +214,46 @@ namespace casadi {
     /// Get free variables (MX)
     std::vector<MX> free_mx() const override {return free_vars_;}
 
-    /** \brief Does the function have free variables */
+    /** \brief Does the function have free variables
+        \identifier{2o} */
     bool has_free() const override { return !free_vars_.empty();}
 
-    /** \brief Print free variables */
+    /** \brief Print free variables
+        \identifier{2p} */
     std::vector<std::string> get_free() const override {
       std::vector<std::string> ret;
       for (auto&& e : free_vars_) ret.push_back(e.name());
       return ret;
     }
 
-    /** \brief Number of nodes in the algorithm */
+    /** \brief Number of nodes in the algorithm
+        \identifier{2q} */
     casadi_int n_nodes() const override { return algorithm_.size();}
 
     casadi_int n_instructions() const override { return algorithm_.size();}
 
-    /** *\brief get MX expression associated with instruction */
+    /** *\brief get MX expression associated with instruction
+         \identifier{2r} */
     MX instruction_MX(casadi_int k) const override;
 
-    /** \brief Get an atomic operation operator index */
+    /** \brief Get an atomic operation operator index
+        \identifier{2s} */
     casadi_int instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
 
-    /** \brief Get default input value */
+    /** \brief Get default input value
+        \identifier{2t} */
     double get_default_in(casadi_int ind) const override { return default_in_.at(ind);}
 
-    /** \brief Get the (integer) input arguments of an atomic operation */
+    /** \brief Get the (integer) input arguments of an atomic operation
+        \identifier{2u} */
     std::vector<casadi_int> instruction_input(casadi_int k) const override;
 
-    /** \brief Get the (integer) output argument of an atomic operation */
+    /** \brief Get the (integer) output argument of an atomic operation
+        \identifier{2v} */
     std::vector<casadi_int> instruction_output(casadi_int k) const override;
 
-    /** \brief Export function in a specific language */
+    /** \brief Export function in a specific language
+        \identifier{2w} */
     void export_code_body(const std::string& lang,
       std::ostream &stream, const Dict& options) const override;
 
@@ -228,11 +263,13 @@ namespace casadi {
     // Get all embedded functions, recursively
     void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
 
-    /** \brief Change option after object creation for debugging */
+    /** \brief Change option after object creation for debugging
+        \identifier{2x} */
     void change_option(const std::string& option_name, const GenericType& option_value) override;
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{2y} */
     explicit MXFunction(DeserializingStream& s);
   };
 

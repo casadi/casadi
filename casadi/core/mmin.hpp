@@ -35,47 +35,59 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2017
-  */
+      \identifier{1t8} */
   class CASADI_EXPORT MMin : public MXNode {
   public:
 
-    /** \brief  Constructor */
+    /** \brief  Constructor
+        \identifier{1t9} */
     explicit MMin(const MX& x);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+        \identifier{1ta} */
     ~MMin() override {}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+        \identifier{1tb} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+        \identifier{1tc} */
     casadi_int op() const override { return OP_MMIN;}
 
-    /** \brief  Evaluate numerically */
+    /** \brief  Evaluate numerically
+        \identifier{1td} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (SX) */
+    /** \brief  Evaluate symbolically (SX)
+        \identifier{1te} */
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+        \identifier{1tf} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+        \identifier{1tg} */
     void generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
                       const std::vector<casadi_int>& res) const override;
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+        \identifier{1th} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+        \identifier{1ti} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+        \identifier{1tj} */
     static MXNode* deserialize(DeserializingStream& s) { return new MMin(s); }
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{1tk} */
     explicit MMin(DeserializingStream& s) : MXNode(s) {}
   };
 
@@ -83,47 +95,59 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2017
-  */
+      \identifier{1tl} */
   class CASADI_EXPORT MMax : public MXNode {
   public:
 
-    /** \brief  Constructor */
+    /** \brief  Constructor
+        \identifier{1tm} */
     explicit MMax(const MX& x);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+        \identifier{1tn} */
     ~MMax() override {}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+        \identifier{1to} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+        \identifier{1tp} */
     casadi_int op() const override { return OP_MMAX;}
 
-    /** \brief  Evaluate numerically */
+    /** \brief  Evaluate numerically
+        \identifier{1tq} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (SX) */
+    /** \brief  Evaluate symbolically (SX)
+        \identifier{1tr} */
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+        \identifier{1ts} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+        \identifier{1tt} */
     void generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
                       const std::vector<casadi_int>& res) const override;
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+        \identifier{1tu} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+        \identifier{1tv} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+        \identifier{1tw} */
     static MXNode* deserialize(DeserializingStream& s) { return new MMax(s); }
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{1tx} */
     explicit MMax(DeserializingStream& s) : MXNode(s) {}
   };
 

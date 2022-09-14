@@ -211,7 +211,8 @@ namespace casadi {
 #ifndef SWIG
 
   ///@{
-  /** \brief Enable using elementary numerical operations without std:: prefix */
+  /** \brief Enable using elementary numerical operations without std:: prefix
+      \identifier{1g4} */
   using std::isfinite;
   using std::sqrt;
   using std::sin;
@@ -257,7 +258,8 @@ namespace casadi {
   ///@}
 
   ///@{
-  /** \brief  CasADi additions */
+  /** \brief  CasADi additions
+      \identifier{1g5} */
   inline double simplify(double x) { return x;}
   inline double constpow(double x, double y) { return pow(x, y);}
   inline double printme(double x, double y) {
@@ -1108,34 +1110,44 @@ namespace casadi {
   template<typename T>
   struct casadi_math {
 
-    /** \brief Evaluate a built in function (scalar-scalar) */
+    /** \brief Evaluate a built in function (scalar-scalar)
+        \identifier{1g6} */
     static inline void fun(unsigned char op, const T& x, const T& y, T& f);
 
-    /** \brief Evaluate a built in function (vector-vector) */
+    /** \brief Evaluate a built in function (vector-vector)
+        \identifier{1g7} */
     static inline void fun(unsigned char op, const T* x, const T* y, T* f, casadi_int n);
 
-    /** \brief Evaluate a built in function (vector-scalar) */
+    /** \brief Evaluate a built in function (vector-scalar)
+        \identifier{1g8} */
     static inline void fun(unsigned char op, const T* x, const T& y, T* f, casadi_int n);
 
-    /** \brief Evaluate a built in function (scalar-vector) */
+    /** \brief Evaluate a built in function (scalar-vector)
+        \identifier{1g9} */
     static inline void fun(unsigned char op, const T& x, const T* y, T* f, casadi_int n);
 
-    /** \brief Evaluate a built in derivative function */
+    /** \brief Evaluate a built in derivative function
+        \identifier{1ga} */
     static inline void der(unsigned char op, const T& x, const T& y, const T& f, T* d);
 
-    /** \brief Evaluate the function and the derivative function */
+    /** \brief Evaluate the function and the derivative function
+        \identifier{1gb} */
     static inline void derF(unsigned char op, const T& x, const T& y, T& f, T* d);
 
-    /** \brief Is binary operation? */
+    /** \brief Is binary operation?
+        \identifier{1gc} */
     static inline bool is_binary(unsigned char op);
 
-    /** \brief Is unary operation? */
+    /** \brief Is unary operation?
+        \identifier{1gd} */
     static inline bool is_unary(unsigned char op);
 
-    /** \brief Number of dependencies */
+    /** \brief Number of dependencies
+        \identifier{1ge} */
     static inline casadi_int ndeps(unsigned char op);
 
-    /** \brief Print */
+    /** \brief Print
+        \identifier{1gf} */
     static inline std::string print(unsigned char op, const std::string& x,
                              const std::string& y);
     static inline std::string print(unsigned char op, const std::string& x);
@@ -1149,7 +1161,8 @@ namespace casadi {
   template<>
   struct casadi_math<casadi_int>{
 
-    /** \brief Evaluate a built in function */
+    /** \brief Evaluate a built in function
+        \identifier{1gg} */
     static inline void fun(unsigned char op, const casadi_int& x,
         const casadi_int& y, casadi_int& f) {
       double ff(0);
@@ -1184,7 +1197,8 @@ namespace casadi {
       }
     }
 
-    /** \brief Evaluate a built in derivative function */
+    /** \brief Evaluate a built in derivative function
+        \identifier{1gh} */
     static inline void der(unsigned char op, const casadi_int& x, const casadi_int& y,
         const casadi_int& f, casadi_int* d) {
       double d_real[2] = {static_cast<double>(d[0]), static_cast<double>(d[1])};
@@ -1194,7 +1208,8 @@ namespace casadi {
       d[1] = static_cast<casadi_int>(d_real[1]);
     }
 
-    /** \brief Evaluate the function and the derivative function */
+    /** \brief Evaluate the function and the derivative function
+        \identifier{1gi} */
     static inline void derF(unsigned char op, const casadi_int& x, const casadi_int& y,
         casadi_int& f, casadi_int* d) {
       double d_real[2] = {static_cast<double>(d[0]), static_cast<double>(d[1])};
@@ -1205,12 +1220,14 @@ namespace casadi {
       d[1] = static_cast<casadi_int>(d_real[1]);
     }
 
-    /** \brief Number of dependencies */
+    /** \brief Number of dependencies
+        \identifier{1gj} */
     static inline casadi_int ndeps(unsigned char op) {
       return casadi_math<double>::ndeps(op);
     }
 
-    /** \brief Print */
+    /** \brief Print
+        \identifier{1gk} */
     static inline std::string print(unsigned char op, const std::string& x,
                                     const std::string& y) {
       return casadi_math<double>::print(op, x, y);

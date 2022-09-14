@@ -60,7 +60,8 @@ namespace casadi {
     return r;
   }
 
-  /** \brief Function memory with temporary work vectors */
+  /** \brief Function memory with temporary work vectors
+      \identifier{ja} */
   struct CASADI_EXPORT ProtoFunctionMemory {
     // Function specific statistics
     std::map<std::string, FStats> fstats;
@@ -75,29 +76,33 @@ namespace casadi {
     }
   };
 
-  /** \brief Function memory with temporary work vectors */
+  /** \brief Function memory with temporary work vectors
+      \identifier{jb} */
   struct CASADI_EXPORT FunctionMemory : public ProtoFunctionMemory {
   };
 
   /** \brief Base class for FunctionInternal and LinsolInternal
     \author Joel Andersson
     \date 2017
-  */
+      \identifier{jc} */
   class CASADI_EXPORT ProtoFunction : public SharedObjectInternal {
   public:
-    /** \brief Constructor */
+    /** \brief Constructor
+        \identifier{jd} */
     ProtoFunction(const std::string& name);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+        \identifier{je} */
     ~ProtoFunction() override = 0;
 
     /** \brief Construct
         Prepares the function for evaluation
-     */
+        \identifier{jf} */
     void construct(const Dict& opts);
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{jg} */
     static const Options options_;
     virtual const Options& get_options() const { return options_;}
     ///@}
@@ -105,29 +110,34 @@ namespace casadi {
     /// Reconstruct options dict
     virtual Dict generate_options(bool is_temp=false) const;
 
-    /** \brief Print list of options */
+    /** \brief Print list of options
+        \identifier{jh} */
     void print_options(std::ostream &stream) const;
 
-    /** \brief Print all information there is to know about a certain option */
+    /** \brief Print all information there is to know about a certain option
+        \identifier{ji} */
     void print_option(const std::string &name, std::ostream &stream) const;
 
-    /** \brief Does a particular option exist */
+    /** \brief Does a particular option exist
+        \identifier{jj} */
     bool has_option(const std::string &option_name) const;
 
-    /** \brief Change option after object creation for debugging */
+    /** \brief Change option after object creation for debugging
+        \identifier{jk} */
     virtual void change_option(const std::string& option_name, const GenericType& option_value);
 
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation.
         This method is typically called after setting options but before evaluating.
         If passed to another class (in the constructor), this class should invoke
-        this function when initialized. */
+        this function when initialized.
+        \identifier{jl} */
     virtual void init(const Dict& opts);
 
     /** \brief Finalize the object creation
         This function, which visits the class hierarchy in reverse order is run after
         init() has been completed.
-    */
+        \identifier{jm} */
     virtual void finalize();
 
     /// Checkout a memory object
@@ -139,42 +149,54 @@ namespace casadi {
     /// Memory objects
     void* memory(int ind) const;
 
-    /** \brief Create memory block */
+    /** \brief Create memory block
+        \identifier{jn} */
     virtual void* alloc_mem() const { return new ProtoFunctionMemory(); }
 
-    /** \brief Initalize memory block */
+    /** \brief Initalize memory block
+        \identifier{jo} */
     virtual int init_mem(void* mem) const;
 
-    /** \brief Free memory block */
+    /** \brief Free memory block
+        \identifier{jp} */
     virtual void free_mem(void *mem) const { delete static_cast<ProtoFunctionMemory*>(mem); }
 
     /// Get all statistics
     virtual Dict get_stats(void* mem) const;
 
-    /** \brief Clear all memory (called from destructor) */
+    /** \brief Clear all memory (called from destructor)
+        \identifier{jq} */
     void clear_mem();
 
-    /** \brief C-style formatted printing during evaluation */
+    /** \brief C-style formatted printing during evaluation
+        \identifier{jr} */
     void print(const char* fmt, ...) const;
 
-    /** \brief C-style formatted printing to string */
+    /** \brief C-style formatted printing to string
+        \identifier{js} */
     void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
 
-    /** \brief Format time in a fixed width 8 format */
+    /** \brief Format time in a fixed width 8 format
+        \identifier{jt} */
     void format_time(char* buffer, double time) const;
 
-    /** \brief Print timing statistics */
+    /** \brief Print timing statistics
+        \identifier{ju} */
     void print_time(const std::map<std::string, FStats>& fstats) const;
 
-    /** \brief Serialize an object */
+    /** \brief Serialize an object
+        \identifier{jv} */
     void serialize(SerializingStream &s) const;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+        \identifier{jw} */
     virtual void serialize_body(SerializingStream &s) const;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+        \identifier{jx} */
     virtual void serialize_type(SerializingStream &s) const {}
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
+    /** \brief String used to identify the immediate FunctionInternal subclass
+        \identifier{jy} */
     virtual std::string serialize_base_function() const {
       return class_name();
     }
@@ -195,7 +217,8 @@ namespace casadi {
     bool regularity_check_;
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{jz} */
     explicit ProtoFunction(DeserializingStream& s);
 
 #ifdef CASADI_WITH_THREAD
@@ -214,21 +237,25 @@ namespace casadi {
   /** \brief Internal class for Function
       \author Joel Andersson
       \date 2010-2015
-  */
+      \identifier{k0} */
   class CASADI_EXPORT FunctionInternal : public ProtoFunction {
     friend class Function;
   public:
-    /** \brief Constructor */
+    /** \brief Constructor
+        \identifier{k1} */
     FunctionInternal(const std::string& name);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+        \identifier{k2} */
     ~FunctionInternal() override = 0;
 
-    /** \brief  Obtain solver name from Adaptor */
+    /** \brief  Obtain solver name from Adaptor
+        \identifier{k3} */
     virtual std::string getAdaptorSolverName() const { return ""; }
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{k4} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -236,16 +263,20 @@ namespace casadi {
     /// Reconstruct options dict
     Dict generate_options(bool is_temp=false) const override;
 
-    /** \brief Change option after object creation for debugging */
+    /** \brief Change option after object creation for debugging
+        \identifier{k5} */
     void change_option(const std::string& option_name, const GenericType& option_value) override;
 
-    /** \brief Initialize */
+    /** \brief Initialize
+        \identifier{k6} */
     void init(const Dict& opts) override;
 
-    /** \brief Finalize the object creation */
+    /** \brief Finalize the object creation
+        \identifier{k7} */
     void finalize() override;
 
-    /** \brief Get a public class instance */
+    /** \brief Get a public class instance
+        \identifier{k8} */
     Function self() const { return shared_from_this<Function>();}
 
     // Factory
@@ -276,39 +307,45 @@ namespace casadi {
     * \param[in] s_out Output name(s)
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
     * \param[in] tr   Flip the relationship. Return which expressions contain the variables
-    */
+        \identifier{k9} */
     virtual std::vector<bool> which_depends(const std::string& s_in,
                                            const std::vector<std::string>& s_out,
                                            casadi_int order, bool tr=false) const;
 
     ///@{
-    /** \brief  Is the class able to propagate seeds through the algorithm? */
+    /** \brief  Is the class able to propagate seeds through the algorithm?
+        \identifier{ka} */
     virtual bool has_spfwd() const { return false;}
     virtual bool has_sprev() const { return false;}
     ///@}
 
     ///@{
-    /** \brief  Evaluate numerically */
+    /** \brief  Evaluate numerically
+        \identifier{kb} */
     int eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
     virtual int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
     ///@}
 
-    /** \brief  Evaluate with symbolic scalars */
+    /** \brief  Evaluate with symbolic scalars
+        \identifier{kc} */
     virtual int eval_sx(const SXElem** arg, SXElem** res,
       casadi_int* iw, SXElem* w, void* mem) const;
 
-    /** \brief  Evaluate with symbolic matrices */
+    /** \brief  Evaluate with symbolic matrices
+        \identifier{kd} */
     virtual void eval_mx(const MXVector& arg, MXVector& res,
                          bool always_inline, bool never_inline) const;
 
     ///@{
-    /** \brief Evaluate with DM matrices */
+    /** \brief Evaluate with DM matrices
+        \identifier{ke} */
     virtual std::vector<DM> eval_dm(const std::vector<DM>& arg) const;
     virtual bool has_eval_dm() const { return false;}
     ///@}
 
     ///@{
-    /** \brief Evaluate a function, overloaded */
+    /** \brief Evaluate a function, overloaded
+        \identifier{kf} */
     int eval_gen(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem) const {
       return eval_sx(arg, res, iw, w, mem);
     }
@@ -318,7 +355,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Call a function, overloaded */
+    /** \brief Call a function, overloaded
+        \identifier{kg} */
     void call_gen(const MXVector& arg, MXVector& res, casadi_int npar,
                   bool always_inline, bool never_inline) const;
 
@@ -327,7 +365,8 @@ namespace casadi {
                   casadi_int npar, bool always_inline, bool never_inline) const;
     ///@}
 
-    /** \brief Call a function, templated */
+    /** \brief Call a function, templated
+        \identifier{kh} */
     template<typename M>
       void call(const std::vector<M>& arg, std::vector<M>& res,
                bool always_inline, bool never_inline) const;
@@ -348,7 +387,7 @@ namespace casadi {
      *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
      * \param[out] npar: max number of horizontal repetitions across all arguments (or -1)
-     */
+        \identifier{ki} */
     template<typename M>
     void check_arg(const std::vector<M>& arg, casadi_int& npar) const;
     ///@}
@@ -360,7 +399,7 @@ namespace casadi {
      *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
      * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
-     */
+        \identifier{kj} */
     template<typename M>
     void check_res(const std::vector<M>& res, casadi_int& npar) const;
     ///@}
@@ -371,7 +410,7 @@ namespace casadi {
      *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
      * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
-     */
+        \identifier{kk} */
     template<typename M> bool
     matching_arg(const std::vector<M>& arg, casadi_int& npar) const;
 
@@ -381,38 +420,44 @@ namespace casadi {
      *
      * \param npar[in] normal usage: 1, disallow pararallel calls: -1
      * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
-     */
+        \identifier{kl} */
     template<typename M> bool
     matching_res(const std::vector<M>& arg, casadi_int& npar) const;
 
     /** \brief Replace 0-by-0 inputs
-     */
+        \identifier{km} */
     template<typename M> std::vector<M>
     replace_arg(const std::vector<M>& arg, casadi_int npar) const;
 
     /** \brief Project sparsities
-     * */
+     *
+        \identifier{kn} */
     template<typename M> std::vector<M>
     project_arg(const std::vector<M>& arg, casadi_int npar) const;
 
     /** \brief Project sparsities
-     * */
+     *
+        \identifier{ko} */
     template<typename M> std::vector<M>
     project_res(const std::vector<M>& arg, casadi_int npar) const;
 
-    /** \brief Replace 0-by-0 outputs */
+    /** \brief Replace 0-by-0 outputs
+        \identifier{kp} */
     template<typename M> std::vector<M>
     replace_res(const std::vector<M>& res, casadi_int npar) const;
 
-    /** \brief Replace 0-by-0 forward seeds */
+    /** \brief Replace 0-by-0 forward seeds
+        \identifier{kq} */
     template<typename M> std::vector<std::vector<M>>
     replace_fseed(const std::vector<std::vector<M>>& fseed, casadi_int npar) const;
 
-    /** \brief Replace 0-by-0 reverse seeds */
+    /** \brief Replace 0-by-0 reverse seeds
+        \identifier{kr} */
     template<typename M> std::vector<std::vector<M>>
     replace_aseed(const std::vector<std::vector<M>>& aseed, casadi_int npar) const;
 
-    /** \brief Convert from/to input/output lists/map  */
+    /** \brief Convert from/to input/output lists/map
+        \identifier{ks} */
     /// @{
     template<typename M>
     std::map<std::string, M> convert_arg(const std::vector<M>& arg) const;
@@ -424,7 +469,8 @@ namespace casadi {
     std::vector<M> convert_res(const std::map<std::string, M>& res) const;
     /// @}
 
-    /** \brief Convert from/to flat vector of input/output nonzeros */
+    /** \brief Convert from/to flat vector of input/output nonzeros
+        \identifier{kt} */
     /// @{
     std::vector<double> nz_in(const std::vector<DM>& arg) const;
     std::vector<double> nz_out(const std::vector<DM>& res) const;
@@ -433,7 +479,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Forward mode AD, virtual functions overloaded in derived classes */
+    /** \brief Forward mode AD, virtual functions overloaded in derived classes
+        \identifier{ku} */
     virtual void call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                             const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens,
@@ -445,7 +492,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Reverse mode, virtual functions overloaded in derived classes */
+    /** \brief Reverse mode, virtual functions overloaded in derived classes
+        \identifier{kv} */
     virtual void call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                             const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens,
@@ -456,14 +504,17 @@ namespace casadi {
                             bool always_inline, bool never_inline) const;
     ///@}
 
-    /** \brief Parallel evaluation */
+    /** \brief Parallel evaluation
+        \identifier{kw} */
     std::vector<MX> mapsum_mx(const std::vector<MX > &arg, const std::string& parallelization);
 
-    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    /** \brief Do the derivative functions need nondifferentiated outputs?
+        \identifier{kx} */
     virtual bool uses_output() const {return false;}
 
     ///@{
-    /** \brief Return Jacobian of all input elements with respect to all output elements */
+    /** \brief Return Jacobian of all input elements with respect to all output elements
+        \identifier{ky} */
     Function jacobian() const;
     virtual bool has_jacobian() const { return false;}
     virtual Function get_jacobian(const std::string& name,
@@ -473,7 +524,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Get Jacobian sparsity */
+    /** \brief Get Jacobian sparsity
+        \identifier{kz} */
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& jac_sparsity(casadi_int oind, casadi_int iind, bool compact, bool symmetric) const;
     virtual bool has_jac_sparsity(casadi_int oind, casadi_int iind) const { return false;}
@@ -485,7 +537,7 @@ namespace casadi {
      *    forward(nfwd) returns a cached instance if available,
      *    and calls <tt>Function get_forward(casadi_int nfwd)</tt>
      *    if no cached version is available.
-     */
+        \identifier{l0} */
     Function forward(casadi_int nfwd) const;
     virtual bool has_forward(casadi_int nfwd) const { return false;}
     virtual Function get_forward(casadi_int nfwd, const std::string& name,
@@ -499,7 +551,7 @@ namespace casadi {
      *    reverse(nadj) returns a cached instance if available,
      *    and calls <tt>Function get_reverse(casadi_int nadj)</tt>
      *    if no cached version is available.
-     */
+        \identifier{l1} */
     Function reverse(casadi_int nadj) const;
     virtual bool has_reverse(casadi_int nadj) const { return false;}
     virtual Function get_reverse(casadi_int nadj, const std::string& name,
@@ -508,25 +560,31 @@ namespace casadi {
                                  const Dict& opts) const;
     ///@}
 
-    /** \brief returns a new function with a selection of inputs/outputs of the original */
+    /** \brief returns a new function with a selection of inputs/outputs of the original
+        \identifier{l2} */
     virtual Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
                            const std::vector<casadi_int>& order_out, const Dict& opts) const;
 
-    /** \brief Get oracle */
+    /** \brief Get oracle
+        \identifier{l3} */
     virtual const Function& oracle() const;
 
-    /** \brief Can derivatives be calculated in any way? */
+    /** \brief Can derivatives be calculated in any way?
+        \identifier{l4} */
     bool has_derivative() const;
 
-    /** \brief  Weighting factor for chosing forward/reverse mode */
+    /** \brief  Weighting factor for chosing forward/reverse mode
+        \identifier{l5} */
     virtual double ad_weight() const;
 
     /** \brief  Weighting factor for chosing forward/reverse mode,
-        sparsity propagation */
+        sparsity propagation
+        \identifier{l6} */
     virtual double sp_weight() const;
 
     ///@{
-    /** \brief Get function input(s) and output(s)  */
+    /** \brief Get function input(s) and output(s)
+        \identifier{l7} */
     virtual const SX sx_in(casadi_int ind) const;
     virtual const SX sx_out(casadi_int ind) const;
     virtual const std::vector<SX> sx_in() const;
@@ -547,137 +605,180 @@ namespace casadi {
     /// Get free variables (SX)
     virtual std::vector<SX> free_sx() const;
 
-    /** \brief Does the function have free variables */
+    /** \brief Does the function have free variables
+        \identifier{l8} */
     virtual bool has_free() const { return false;}
 
-    /** \brief Extract the functions needed for the Lifted Newton method */
+    /** \brief Extract the functions needed for the Lifted Newton method
+        \identifier{l9} */
     virtual void generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const;
 
-    /** \brief Get the number of atomic operations */
+    /** \brief Get the number of atomic operations
+        \identifier{la} */
     virtual casadi_int n_instructions() const;
 
-    /** \brief Get an atomic operation operator index */
+    /** \brief Get an atomic operation operator index
+        \identifier{lb} */
     virtual casadi_int instruction_id(casadi_int k) const;
 
-    /** \brief Get the (integer) input arguments of an atomic operation */
+    /** \brief Get the (integer) input arguments of an atomic operation
+        \identifier{lc} */
     virtual std::vector<casadi_int> instruction_input(casadi_int k) const;
 
-    /** \brief Get the floating point output argument of an atomic operation */
+    /** \brief Get the floating point output argument of an atomic operation
+        \identifier{ld} */
     virtual double instruction_constant(casadi_int k) const;
 
-    /** \brief Get the (integer) output argument of an atomic operation */
+    /** \brief Get the (integer) output argument of an atomic operation
+        \identifier{le} */
     virtual std::vector<casadi_int> instruction_output(casadi_int k) const;
 
-    /** \brief Number of nodes in the algorithm */
+    /** \brief Number of nodes in the algorithm
+        \identifier{lf} */
     virtual casadi_int n_nodes() const;
 
-    /** *\brief get MX expression associated with instruction */
+    /** *\brief get MX expression associated with instruction
+         \identifier{lg} */
     virtual MX instruction_MX(casadi_int k) const;
 
-    /** *\brief get SX expression associated with instructions */
+    /** *\brief get SX expression associated with instructions
+         \identifier{lh} */
     virtual SX instructions_sx() const;
 
-    /** \brief Wrap in an Function instance consisting of only one MX call */
+    /** \brief Wrap in an Function instance consisting of only one MX call
+        \identifier{li} */
     Function wrap() const;
 
-    /** \brief Wrap in an Function instance consisting of only one MX call */
+    /** \brief Wrap in an Function instance consisting of only one MX call
+        \identifier{lj} */
     Function wrap_as_needed(const Dict& opts) const;
 
-    /** \brief Get function in cache */
+    /** \brief Get function in cache
+        \identifier{lk} */
     bool incache(const std::string& fname, Function& f, const std::string& suffix="") const;
 
-    /** \brief Save function to cache */
+    /** \brief Save function to cache
+        \identifier{ll} */
     void tocache(const Function& f, const std::string& suffix="") const;
 
-    /** \brief Generate code the function */
+    /** \brief Generate code the function
+        \identifier{lm} */
     void codegen(CodeGenerator& g, const std::string& fname) const;
 
-    /** \brief Generate meta-information allowing a user to evaluate a generated function */
+    /** \brief Generate meta-information allowing a user to evaluate a generated function
+        \identifier{ln} */
     void codegen_meta(CodeGenerator& g) const;
 
-    /** \brief Codegen sparsities */
+    /** \brief Codegen sparsities
+        \identifier{lo} */
     void codegen_sparsities(CodeGenerator& g) const;
 
-    /** \brief Get name in codegen */
+    /** \brief Get name in codegen
+        \identifier{lp} */
     virtual std::string codegen_name(const CodeGenerator& g, bool ns=true) const;
 
-    /** \brief Get thread-local memory object */
+    /** \brief Get thread-local memory object
+        \identifier{lq} */
     std::string codegen_mem(CodeGenerator& g, const std::string& index="mem") const;
 
-    /** \brief Codegen incref for dependencies */
+    /** \brief Codegen incref for dependencies
+        \identifier{lr} */
     virtual void codegen_incref(CodeGenerator& g) const {}
 
-    /** \brief Codegen decref for dependencies */
+    /** \brief Codegen decref for dependencies
+        \identifier{ls} */
     virtual void codegen_decref(CodeGenerator& g) const {}
 
-    /** \brief Codegen decref for alloc_mem */
+    /** \brief Codegen decref for alloc_mem
+        \identifier{lt} */
     virtual void codegen_alloc_mem(CodeGenerator& g) const;
 
-    /** \brief Codegen decref for init_mem */
+    /** \brief Codegen decref for init_mem
+        \identifier{lu} */
     virtual void codegen_init_mem(CodeGenerator& g) const;
 
-    /** \brief Codegen for free_mem */
+    /** \brief Codegen for free_mem
+        \identifier{lv} */
     virtual void codegen_free_mem(CodeGenerator& g) const {}
 
-    /** \brief Codegen for checkout */
+    /** \brief Codegen for checkout
+        \identifier{lw} */
     virtual void codegen_checkout(CodeGenerator& g) const;
 
-    /** \brief Codegen for release */
+    /** \brief Codegen for release
+        \identifier{lx} */
     virtual void codegen_release(CodeGenerator& g) const;
 
-    /** \brief Code generate the function  */
+    /** \brief Code generate the function
+        \identifier{ly} */
     std::string signature(const std::string& fname) const;
 
-    /** \brief Generate code for the declarations of the C function */
+    /** \brief Generate code for the declarations of the C function
+        \identifier{lz} */
     virtual void codegen_declarations(CodeGenerator& g) const;
 
-    /** \brief Generate code for the function body */
+    /** \brief Generate code for the function body
+        \identifier{m0} */
     virtual void codegen_body(CodeGenerator& g) const;
 
-    /** \brief Thread-local memory object type */
+    /** \brief Thread-local memory object type
+        \identifier{m1} */
     virtual std::string codegen_mem_type() const { return ""; }
 
-    /** \brief Export / Generate C code for the dependency function */
+    /** \brief Export / Generate C code for the dependency function
+        \identifier{m2} */
     virtual std::string generate_dependencies(const std::string& fname, const Dict& opts) const;
 
-    /** \brief Is codegen supported? */
+    /** \brief Is codegen supported?
+        \identifier{m3} */
     virtual bool has_codegen() const { return false;}
 
-    /** \brief Jit dependencies */
+    /** \brief Jit dependencies
+        \identifier{m4} */
     virtual void jit_dependencies(const std::string& fname) {}
 
-    /** \brief Export function in a specific language */
+    /** \brief Export function in a specific language
+        \identifier{m5} */
     virtual void export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const;
 
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+        \identifier{m6} */
     void serialize_type(SerializingStream &s) const override;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+        \identifier{m7} */
     void serialize_body(SerializingStream &s) const override;
 
-    /** \brief Display object */
+    /** \brief Display object
+        \identifier{m8} */
     void disp(std::ostream& stream, bool more) const override;
 
-    /** \brief  Print more */
+    /** \brief  Print more
+        \identifier{m9} */
     virtual void disp_more(std::ostream& stream) const {}
 
-    /** \brief Get function signature: name:(inputs)->(outputs) */
+    /** \brief Get function signature: name:(inputs)->(outputs)
+        \identifier{ma} */
     std::string definition() const;
 
-    /** \brief Print dimensions of inputs and outputs */
+    /** \brief Print dimensions of inputs and outputs
+        \identifier{mb} */
     void print_dimensions(std::ostream &stream) const;
 
-    /** \brief Print free variables */
+    /** \brief Print free variables
+        \identifier{mc} */
     virtual std::vector<std::string> get_free() const;
 
-    /** \brief Get the unidirectional or bidirectional partition */
+    /** \brief Get the unidirectional or bidirectional partition
+        \identifier{md} */
     void get_partition(casadi_int iind, casadi_int oind, Sparsity& D1, Sparsity& D2,
                       bool compact, bool symmetric,
                       bool allow_forward, bool allow_reverse) const;
 
     ///@{
-    /** \brief Number of input/output nonzeros */
+    /** \brief Number of input/output nonzeros
+        \identifier{me} */
     casadi_int nnz_in() const;
     casadi_int nnz_in(casadi_int ind) const { return sparsity_in(ind).nnz(); }
     casadi_int nnz_out() const;
@@ -685,7 +786,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Number of input/output elements */
+    /** \brief Number of input/output elements
+        \identifier{mf} */
     casadi_int numel_in() const;
     casadi_int numel_in(casadi_int ind) const { return sparsity_in(ind).numel(); }
     casadi_int numel_out(casadi_int ind) const { return sparsity_out(ind).numel(); }
@@ -693,7 +795,8 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Input/output dimensions */
+    /** \brief Input/output dimensions
+        \identifier{mg} */
     casadi_int size1_in(casadi_int ind) const { return sparsity_in(ind).size1(); }
     casadi_int size2_in(casadi_int ind) const { return sparsity_in(ind).size2(); }
     casadi_int size1_out(casadi_int ind) const { return sparsity_out(ind).size1(); }
@@ -707,13 +810,15 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Input/output sparsity */
+    /** \brief Input/output sparsity
+        \identifier{mh} */
     const Sparsity& sparsity_in(casadi_int ind) const { return sparsity_in_.at(ind); }
     const Sparsity& sparsity_out(casadi_int ind) const { return sparsity_out_.at(ind); }
     ///@}
 
     ///@{
-    /** \brief Are all inputs and outputs scalar */
+    /** \brief Are all inputs and outputs scalar
+        \identifier{mi} */
     bool all_scalar() const;
 
     /// Is a Jacobian block known to be symmetric a priori?
@@ -741,29 +846,34 @@ namespace casadi {
     virtual std::vector<MX> symbolic_output(const std::vector<MX>& arg) const;
 
     ///@{
-    /** \brief Number of function inputs and outputs */
+    /** \brief Number of function inputs and outputs
+        \identifier{mj} */
     virtual size_t get_n_in();
     virtual size_t get_n_out();
     ///@}
 
 
     ///@{
-    /** \brief Names of function input and outputs */
+    /** \brief Names of function input and outputs
+        \identifier{mk} */
     virtual std::string get_name_in(casadi_int i);
     virtual std::string get_name_out(casadi_int i);
     ///@}
 
-    /** \brief Get default input value */
+    /** \brief Get default input value
+        \identifier{ml} */
     virtual double get_default_in(casadi_int ind) const {
       return 0;
     }
 
-    /** \brief Get largest input value */
+    /** \brief Get largest input value
+        \identifier{mm} */
     virtual double get_max_in(casadi_int ind) const {
       return inf;
     }
 
-    /** \brief Get smallest input value */
+    /** \brief Get smallest input value
+        \identifier{mn} */
     virtual double get_min_in(casadi_int ind) const {
       return -inf;
     }
@@ -776,29 +886,36 @@ namespace casadi {
       return std::vector<double>(nnz_out(ind), 1.);
     }
 
-    /** \brief Get relative tolerance */
+    /** \brief Get relative tolerance
+        \identifier{mo} */
     virtual double get_reltol() const {
       return eps;
     }
 
-    /** \brief Get absolute tolerance */
+    /** \brief Get absolute tolerance
+        \identifier{mp} */
     virtual double get_abstol() const {
       return eps;
     }
 
-    /** \brief Get sparsity of a given input */
+    /** \brief Get sparsity of a given input
+        \identifier{mq} */
     virtual Sparsity get_sparsity_in(casadi_int i);
 
-    /** \brief Get sparsity of a given output */
+    /** \brief Get sparsity of a given output
+        \identifier{mr} */
     virtual Sparsity get_sparsity_out(casadi_int i);
 
-    /** \brief Which inputs are differentiable */
+    /** \brief Which inputs are differentiable
+        \identifier{ms} */
     virtual bool get_diff_in(casadi_int i) { return true; }
 
-    /** \brief Which outputs are differentiable */
+    /** \brief Which outputs are differentiable
+        \identifier{mt} */
     virtual bool get_diff_out(casadi_int i) { return true; }
 
-    /** \brief Get input scheme index by name */
+    /** \brief Get input scheme index by name
+        \identifier{mu} */
     casadi_int index_in(const std::string &name) const {
       for (casadi_int i=0; i<name_in_.size(); ++i) {
         if (name_in_[i]==name) return i;
@@ -808,7 +925,8 @@ namespace casadi {
       return -1;
     }
 
-    /** \brief Get output scheme index by name */
+    /** \brief Get output scheme index by name
+        \identifier{mv} */
     casadi_int index_out(const std::string &name) const {
       for (casadi_int i=0; i<name_out_.size(); ++i) {
         if (name_out_[i]==name) return i;
@@ -818,60 +936,77 @@ namespace casadi {
       return -1;
     }
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+        \identifier{mw} */
     virtual int sp_forward(const bvec_t** arg, bvec_t** res,
                             casadi_int* iw, bvec_t* w, void* mem) const;
 
-    /** \brief  Propagate sparsity forward, specific block */
+    /** \brief  Propagate sparsity forward, specific block
+        \identifier{mx} */
     virtual int sp_forward_block(const bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem, casadi_int oind, casadi_int iind) const;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+        \identifier{my} */
     virtual int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const;
 
-    /** \brief Get number of temporary variables needed */
+    /** \brief Get number of temporary variables needed
+        \identifier{mz} */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
-    /** \brief Get required length of arg field */
+    /** \brief Get required length of arg field
+        \identifier{n0} */
     size_t sz_arg() const { return sz_arg_per_ + sz_arg_tmp_;}
 
-    /** \brief Get required length of res field */
+    /** \brief Get required length of res field
+        \identifier{n1} */
     size_t sz_res() const { return sz_res_per_ + sz_res_tmp_;}
 
-    /** \brief Get required length of iw field */
+    /** \brief Get required length of iw field
+        \identifier{n2} */
     size_t sz_iw() const { return sz_iw_per_ + sz_iw_tmp_;}
 
-    /** \brief Get required length of w field */
+    /** \brief Get required length of w field
+        \identifier{n3} */
     size_t sz_w() const { return sz_w_per_ + sz_w_tmp_;}
 
-    /** \brief Ensure required length of arg field */
+    /** \brief Ensure required length of arg field
+        \identifier{n4} */
     void alloc_arg(size_t sz_arg, bool persistent=false);
 
-    /** \brief Ensure required length of res field */
+    /** \brief Ensure required length of res field
+        \identifier{n5} */
     void alloc_res(size_t sz_res, bool persistent=false);
 
-    /** \brief Ensure required length of iw field */
+    /** \brief Ensure required length of iw field
+        \identifier{n6} */
     void alloc_iw(size_t sz_iw, bool persistent=false);
 
-    /** \brief Ensure required length of w field */
+    /** \brief Ensure required length of w field
+        \identifier{n7} */
     void alloc_w(size_t sz_w, bool persistent=false);
 
-    /** \brief Ensure work vectors long enough to evaluate function */
+    /** \brief Ensure work vectors long enough to evaluate function
+        \identifier{n8} */
     void alloc(const Function& f, bool persistent=false, int num_threads=1);
 
-    /** \brief Set the (persistent) work vectors */
+    /** \brief Set the (persistent) work vectors
+        \identifier{n9} */
     virtual void set_work(void* mem, const double**& arg, double**& res,
                           casadi_int*& iw, double*& w) const {}
 
-    /** \brief Set the (temporary) work vectors */
+    /** \brief Set the (temporary) work vectors
+        \identifier{na} */
     virtual void set_temp(void* mem, const double** arg, double** res,
                           casadi_int* iw, double* w) const {}
 
-    /** \brief Set the (persistent and temporary) work vectors */
+    /** \brief Set the (persistent and temporary) work vectors
+        \identifier{nb} */
     void setup(void* mem, const double** arg, double** res, casadi_int* iw, double* w) const;
 
     ///@{
-    /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
+    /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying
+        \identifier{nc} */
     virtual bool fwdViaJac(casadi_int nfwd) const;
     virtual bool adjViaJac(casadi_int nadj) const;
     ///@}
@@ -879,10 +1014,12 @@ namespace casadi {
     /** Obtain information about function */
     virtual Dict info() const;
 
-    /** \brief Generate/retrieve cached serial map */
+    /** \brief Generate/retrieve cached serial map
+        \identifier{nd} */
     Function map(casadi_int n, const std::string& parallelization) const;
 
-    /** \brief Export an input file that can be passed to generate C code with a main */
+    /** \brief Export an input file that can be passed to generate C code with a main
+        \identifier{ne} */
     void generate_in(const std::string& fname, const double** arg) const;
     void generate_out(const std::string& fname, double** res) const;
 
@@ -900,36 +1037,46 @@ namespace casadi {
     /// Input and output scheme
     std::vector<std::string> name_in_, name_out_;
 
-    /** \brief  Use just-in-time compiler */
+    /** \brief  Use just-in-time compiler
+        \identifier{nf} */
     bool jit_;
 
-    /** \brief  Cleanup jit source file */
+    /** \brief  Cleanup jit source file
+        \identifier{ng} */
     bool jit_cleanup_;
 
-    /** \brief  Serialize behaviour */
+    /** \brief  Serialize behaviour
+        \identifier{nh} */
     std::string jit_serialize_;
 
-    /** \brief  Name if jit source file */
+    /** \brief  Name if jit source file
+        \identifier{ni} */
     std::string jit_name_;
 
     std::string jit_base_name_;
 
-    /** \brief Use a temporary name */
+    /** \brief Use a temporary name
+        \identifier{nj} */
     bool jit_temp_suffix_;
 
-    /** \brief Numerical evaluation redirected to a C function */
+    /** \brief Numerical evaluation redirected to a C function
+        \identifier{nk} */
     eval_t eval_;
 
-    /** \brief Checkout redirected to a C function */
+    /** \brief Checkout redirected to a C function
+        \identifier{nl} */
     casadi_checkout_t checkout_;
 
-   /** \brief Release redirected to a C function */
+   /** \brief Release redirected to a C function
+       \identifier{nm} */
     casadi_release_t release_;
 
-    /** \brief Dict of statistics (resulting from evaluate) */
+    /** \brief Dict of statistics (resulting from evaluate)
+        \identifier{nn} */
     Dict stats_;
 
-    /** \brief Reference counting in codegen? */
+    /** \brief Reference counting in codegen?
+        \identifier{no} */
     bool has_refcount_;
 
     /// Function cache
@@ -1002,19 +1149,23 @@ namespace casadi {
     mutable std::mutex dump_count_mtx_;
 #endif // CASADI_WITH_THREAD
 
-    /** \brief Check if the function is of a particular type */
+    /** \brief Check if the function is of a particular type
+        \identifier{np} */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
-    /** \brief Can a derivative direction be skipped */
+    /** \brief Can a derivative direction be skipped
+        \identifier{nq} */
     template<typename MatType>
     static bool purgable(const std::vector<MatType>& seed);
 
-    /** \brief Symbolic expressions for the forward seeds */
+    /** \brief Symbolic expressions for the forward seeds
+        \identifier{nr} */
     template<typename MatType>
     std::vector<std::vector<MatType> >
     fwd_seed(casadi_int nfwd) const;
 
-    /** \brief Symbolic expressions for the adjoint seeds */
+    /** \brief Symbolic expressions for the adjoint seeds
+        \identifier{ns} */
     template<typename MatType>
     std::vector<std::vector<MatType> >
     symbolicAdjSeed(casadi_int nadj, const std::vector<MatType>& v) const;
@@ -1030,21 +1181,26 @@ namespace casadi {
 
     static std::string string_from_UnifiedReturnStatus(UnifiedReturnStatus status);
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{nt} */
     explicit FunctionInternal(DeserializingStream& e);
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+        \identifier{nu} */
     static Function deserialize(DeserializingStream& s);
     static std::map<std::string, ProtoFunction* (*)(DeserializingStream&)> deserialize_map;
 
-    /** \brief Print inputs */
+    /** \brief Print inputs
+        \identifier{nv} */
     void print_in(std::ostream &stream, const double** arg, bool truncate) const;
 
-    /** \brief Print outputs */
+    /** \brief Print outputs
+        \identifier{nw} */
     void print_out(std::ostream &stream, double** res, bool truncate) const;
 
   protected:
-    /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
+    /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization
+        \identifier{nx} */
     void set_jac_sparsity(casadi_int oind, casadi_int iind, const Sparsity& sp);
 
   private:
@@ -1056,10 +1212,12 @@ namespace casadi {
     void dump() const;
     // @}
 
-    /** \brief Memory that is persistent during a call (but not between calls) */
+    /** \brief Memory that is persistent during a call (but not between calls)
+        \identifier{ny} */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;
 
-    /** \brief Temporary memory inside a function */
+    /** \brief Temporary memory inside a function
+        \identifier{nz} */
     size_t sz_arg_tmp_, sz_res_tmp_, sz_iw_tmp_, sz_w_tmp_;
   };
 

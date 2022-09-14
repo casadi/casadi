@@ -129,41 +129,53 @@ namespace casadi {
   };
   #endif // SWIG
 
-  /** \brief Get input scheme of simulators */
+  /** \brief Get input scheme of simulators
+      \identifier{wx} */
   CASADI_EXPORT std::vector<std::string> simulator_in();
 
-  /** \brief Get simulator output scheme of simulators */
+  /** \brief Get simulator output scheme of simulators
+      \identifier{wy} */
   CASADI_EXPORT std::vector<std::string> simulator_out();
 
-  /** \brief Get input scheme of simulators */
+  /** \brief Get input scheme of simulators
+      \identifier{wz} */
   CASADI_EXPORT std::vector<std::string> dyn_in();
 
-  /** \brief Get simulator output scheme of simulators */
+  /** \brief Get simulator output scheme of simulators
+      \identifier{x0} */
   CASADI_EXPORT std::vector<std::string> dyn_out();
 
-  /** \brief Get simulator input scheme name by index */
+  /** \brief Get simulator input scheme name by index
+      \identifier{x1} */
   CASADI_EXPORT std::string dyn_in(casadi_int ind);
 
-  /** \brief Get output scheme name by index */
+  /** \brief Get output scheme name by index
+      \identifier{x2} */
   CASADI_EXPORT std::string dyn_out(casadi_int ind);
 
-  /** \brief Get the number of simulator inputs */
+  /** \brief Get the number of simulator inputs
+      \identifier{x3} */
   inline casadi_int dyn_n_in() { return DYN_NUM_IN;}
 
-  /** \brief Get the number of simulator outputs */
+  /** \brief Get the number of simulator outputs
+      \identifier{x4} */
   inline casadi_int dyn_n_out() { return DYN_NUM_OUT;}
   /** @} */
 
-  /** \brief Get simulator input scheme name by index */
+  /** \brief Get simulator input scheme name by index
+      \identifier{x5} */
   CASADI_EXPORT std::string simulator_in(casadi_int ind);
 
-  /** \brief Get output scheme name by index */
+  /** \brief Get output scheme name by index
+      \identifier{x6} */
   CASADI_EXPORT std::string simulator_out(casadi_int ind);
 
-  /** \brief Get the number of simulator inputs */
+  /** \brief Get the number of simulator inputs
+      \identifier{x7} */
   inline casadi_int simulator_n_in() { return SIMULATOR_NUM_IN;}
 
-  /** \brief Get the number of simulator outputs */
+  /** \brief Get the number of simulator outputs
+      \identifier{x8} */
   inline casadi_int simulator_n_out() { return SIMULATOR_NUM_OUT;}
   /** @} */
 

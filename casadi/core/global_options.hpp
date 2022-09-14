@@ -55,7 +55,7 @@ namespace casadi {
       /** \brief Indicates whether simplifications should be made on the fly.
       * e.g.   cos(-x) -> cos(x)
       * Default: true
-      */
+          \identifier{17v} */
       static bool simplification_on_the_fly;
 
       static std::string casadipath;

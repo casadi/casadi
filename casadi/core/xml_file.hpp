@@ -41,12 +41,13 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2014
-   */
+      \identifier{7k} */
   class CASADI_EXPORT XmlFile
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<XmlFile>) {
   public:
-    /** \brief Get type name */
+    /** \brief Get type name
+        \identifier{7l} */
     static std::string type_name() {return "XmlFile";}
 
     // Default constructor
@@ -65,10 +66,12 @@ namespace casadi {
     static std::string doc(const std::string& name);
 
 #ifndef SWIG
-    /** \brief  Access functions of the node */
+    /** \brief  Access functions of the node
+        \identifier{7m} */
     XmlFileInternal* operator->();
 
-    /** \brief  Const access functions of the node */
+    /** \brief  Const access functions of the node
+        \identifier{7n} */
     const XmlFileInternal* operator->() const;
 
     // Parse an XML file

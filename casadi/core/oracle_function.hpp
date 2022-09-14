@@ -31,7 +31,8 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Function memory with temporary work vectors */
+  /** \brief Function memory with temporary work vectors
+      \identifier{b} */
   struct CASADI_EXPORT LocalOracleMemory : public FunctionMemory {
     // Work vectors
     const double** arg;
@@ -40,7 +41,8 @@ namespace casadi {
     double* w;
   };
 
-  /** \brief Function memory */
+  /** \brief Function memory
+      \identifier{c} */
   struct CASADI_EXPORT OracleMemory : public FunctionMemory {
     // Work vector aliases for non-threaded convenience
     const double** arg;
@@ -54,7 +56,7 @@ namespace casadi {
   /** \brief Base class for functions that perform calculation with an oracle
       \author Joel Andersson
       \date 2016
-  */
+      \identifier{d} */
   class CASADI_EXPORT OracleFunction : public FunctionInternal {
   protected:
     /// Oracle: Used to generate other functions
@@ -88,14 +90,17 @@ namespace casadi {
     size_t stride_arg_, stride_res_, stride_iw_, stride_w_;
 
   public:
-    /** \brief  Constructor */
+    /** \brief  Constructor
+        \identifier{e} */
     OracleFunction(const std::string& name, const Function& oracle);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+        \identifier{f} */
     ~OracleFunction() override = 0;
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+        \identifier{g} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -109,7 +114,8 @@ namespace casadi {
     /// Combine results from different threads
     void join_results(OracleMemory* m) const;
 
-    /** \brief Get oracle */
+    /** \brief Get oracle
+        \identifier{h} */
     const Function& oracle() const override { return oracle_;}
 
     // Replace MX oracle with SX oracle?
@@ -134,7 +140,7 @@ namespace casadi {
 
     /** \brief Get list of dependency functions
      * -1 Indicates irregularity
-    */
+        \identifier{i} */
     std::vector<std::string> get_function() const override;
 
     // Get a dependency function
@@ -146,39 +152,49 @@ namespace casadi {
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const override;
 
-    /** \brief Export / Generate C code for the generated functions */
+    /** \brief Export / Generate C code for the generated functions
+        \identifier{j} */
     std::string generate_dependencies(const std::string& fname, const Dict& opts) const override;
 
-    /** \brief JIT for dependencies */
+    /** \brief JIT for dependencies
+        \identifier{k} */
     void jit_dependencies(const std::string& fname) override;
 
-    /** \brief Create memory block */
+    /** \brief Create memory block
+        \identifier{l} */
     void* alloc_mem() const override { return new OracleMemory();}
 
-    /** \brief Initalize memory block */
+    /** \brief Initalize memory block
+        \identifier{m} */
     int local_init_mem(void* mem) const;
 
-    /** \brief Initalize memory block */
+    /** \brief Initalize memory block
+        \identifier{n} */
     int init_mem(void* mem) const override;
 
-    /** \brief Free memory block */
+    /** \brief Free memory block
+        \identifier{o} */
     void local_free_mem(void *mem) const { delete static_cast<LocalOracleMemory*>(mem);}
 
-   /** \brief Free memory block */
+   /** \brief Free memory block
+       \identifier{p} */
     void free_mem(void *mem) const override;
 
-    /** \brief Set the work vectors */
+    /** \brief Set the work vectors
+        \identifier{q} */
     void set_temp(void* mem, const double** arg, double** res,
                           casadi_int* iw, double* w) const override;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+        \identifier{r} */
     void serialize_body(SerializingStream &s) const override;
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+        \identifier{s} */
     explicit OracleFunction(DeserializingStream& s);
 
   };

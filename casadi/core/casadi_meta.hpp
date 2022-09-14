@@ -50,40 +50,40 @@ namespace casadi {
     *     and might be more recent than 'x.y.w'  with w>z.
     *
     *  \see getGitRevision getGitDescribe
-    */
+        \identifier{iz} */
     static const char* version();
     /** \brief Obtain the git hash of this build
     *      (only available if built from a git repo)
-    */
+        \identifier{j0} */
     static const char* git_revision();
     /** \brief Obtain the git description of this build
     *      (only available if built from a git repo)
-    */
+        \identifier{j1} */
     static const char* git_describe();
     /** \brief Obtain list of features that were compiled into this build
-    */
+        \identifier{j2} */
     static const char* feature_list();
     /** \brief Obtain build type: RELEASE/Debug
-    */
+        \identifier{j3} */
     static const char* build_type();
     /** \brief Obtain compiler identification
     * Provided by http://www.cmake.org/cmake/help/v2.8.10/cmake.html#variable:CMAKE_LANG_COMPILER_ID
-    */
+        \identifier{j4} */
     static const char* compiler_id();
     /** \brief Obtain compiler
-    */
+        \identifier{j5} */
     static const char* compiler();
     /** \brief Obtain compiler flags
-    */
+        \identifier{j6} */
     static const char* compiler_flags();
     /** \brief Obtain modules list
-    */
+        \identifier{j7} */
     static const char* modules();
     /** \brief Obtain plugins list
-    */
+        \identifier{j8} */
     static const char* plugins();
     /** \brief Obtain install prefix
-    */
+        \identifier{j9} */
     static const char* install_prefix();
   };
 
