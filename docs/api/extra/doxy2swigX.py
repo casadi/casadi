@@ -31,8 +31,14 @@ import re
 
 import lxml.etree as ET
 import pydot
+import os
+cwd = os.getcwd()
+
+import pathlib
+stem = str(pathlib.Path(cwd).parent.parent.parent)
 
 expression_tools = set()
+
 
 for r in open("../../../swig/casadi.i","r"):
   if "casadi_" in r:
@@ -324,6 +330,11 @@ class Doxy2SWIG_X(Doxy2SWIG):
       compdef = tmp.getElementsByTagName('compounddef')[0]
       cdef_kind = compdef.attributes['kind'].value
       location = node.getElementsByTagName('location')[0].attributes['file'].value
+      if "bodyfile" in node.getElementsByTagName('location')[0].attributes:
+          bodylocation = node.getElementsByTagName('location')[0].attributes['bodyfile'].value
+          bodystart = int(node.getElementsByTagName('location')[0].attributes['bodystart'].value)
+          bodyend = int(node.getElementsByTagName('location')[0].attributes['bodyend'].value)
+      line = int(node.getElementsByTagName('location')[0].attributes['line'].value)
       if prot == 'public' and not location.endswith('cpp'):
           first = self.get_specific_nodes(node, ('definition', 'name','argsstring'))
           name = first['name'].firstChild.data
@@ -362,19 +373,23 @@ class Doxy2SWIG_X(Doxy2SWIG):
             defn = definition + first['argsstring'].firstChild.data
           except:
             return
+            
+          meta = {"decl": {"file":location, "line": line}}
+          if "bodyfile" in node.getElementsByTagName('location')[0].attributes:
+            meta["impl"] = {"file": bodylocation, "lines": (bodystart,bodyend)}
               
-          self.start_docstring(target,defn)
+          self.start_docstring(target,defn,meta=meta)
           for n in node.childNodes:
               if n not in first.values():
                   self.parse(n)
           self.end_docstring()
 
-  def start_docstring(self,target,origin="huma kavula"):
-    self.active_docstring = (target,origin)
+  def start_docstring(self,target,origin="huma kavula",meta=None):
+    self.active_docstring = (target,origin,meta)
     if target in self.docstringmap:
-      self.docstringmap[target].append((origin,[]))
+      self.docstringmap[target].append((origin,[],meta))
     else:
-      self.docstringmap[target]= [(origin,[])]
+      self.docstringmap[target]= [(origin,[],meta)]
     
   def end_docstring(self):
     self.active_docstring = None
@@ -409,7 +424,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
         
         def fix_signature(a): return re.sub(" *?= *?(delete|default) *?$","", a.replace("override",""))
         
-        for (origin,pieces) in v:
+        for (origin,pieces,meta) in v:
           origin_nostatic = origin.replace("static ","")
           m = list(re.finditer("\[DEPRECATED(:(.*?))?\]","".join(pieces)))
           deprecated = ("" if m[-1].group(2) is None else m[-1].group(2)) if len(m)>0 else None
@@ -442,6 +457,10 @@ class Doxy2SWIG_X(Doxy2SWIG):
           else:
             swigname = ""
             
+          if meta is not None:
+              pieces = pieces+["Doc source: https://github.com/casadi/casadi/blob/develop%s#L%d\n" % (meta["decl"]["file"].replace(stem,""),meta["decl"]["line"])]
+              if "impl" in meta:
+                  pieces = pieces+["Implementation: https://github.com/casadi/casadi/blob/develop%s#L%d-L%d\n" % (meta["impl"]["file"].replace(stem,""),meta["impl"]["lines"][0],meta["impl"]["lines"][1])]
             
           #"INTERNAL": "mark_internal(\"$decl\");"
           #"DEPRECATED": "deprecated(\"%s\");"
