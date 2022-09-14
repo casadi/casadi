@@ -196,6 +196,7 @@ ALIASES                += structargument{1}="\n \parblock \n Problem structure. 
 ALIASES                += doctest="\htmlonly <div class='doctest'> <div class='doctestcode'> \endhtmlonly \code{.py}"
 ALIASES                += doctestout="\endcode \htmlonly </div> \endhtmlonly \htmlonly <div class='doctestout'> \endhtmlonly \verbatim"
 ALIASES                += enddoctest="\endverbatim \htmlonly </div> </div> \endhtmlonly"
+ALIASES                += identifier{1}="\n Extra doc: https://github.com/casadi/casadi/wiki/L_\1"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 

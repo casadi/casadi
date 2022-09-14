@@ -165,7 +165,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
                 else:
                   _tmp = i.strip()
               else:
-                _tmp = textwrap.fill(i.strip(), 80-4, break_long_words=False)
+                _tmp = textwrap.fill(i.strip(), 80-4, break_long_words=False,drop_whitespace=False,replace_whitespace=False)
               _tmp = self.lead_spc.sub(r'\1"\2', _tmp)
               ret.extend([_tmp, '\n\n'])
       return ret
@@ -512,13 +512,13 @@ class Doxy2SWIG_X(Doxy2SWIG):
         content = [c.replace("[INTERNAL]","") for c in content]
         new_content = []
         while len(content)>0:
-            if "Functions called by friend functions defined for"==content[0]:
+            if "Functions called by friend functions defined for"==content[0].rstrip():
                 new_content.append("".join(content[:3]))
                 content = content[3:]
             new_content.append(content[0])
             content = content[1:]
         content = new_content
-        content = [re.sub("Functions called by friend functions defined (here|for \w+)\.?","",c) for c in content]
+        content = [re.sub("Functions called by friend functions defined (here|for +\w+)\.?","",c) for c in content]
         self.doc_target("casadi::casadi_" + m.group(1), content,correction=False)
         target = target.split("(")[0]
         target = "::".join(target.split("::")[:-1])
