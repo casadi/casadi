@@ -579,6 +579,8 @@ CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
 ///@}
 
+/// \endcond
+
 } // namespace casadi
 
 #endif // CASADI_DAE_BUILDER_INTERNAL_HPP
