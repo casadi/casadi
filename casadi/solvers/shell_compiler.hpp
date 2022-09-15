@@ -31,8 +31,10 @@
 #include "casadi/core/plugin_interface.hpp"
 
 /** \defgroup plugin_Importer_shell
+
       Interface to the JIT compiler SHELL
-*/
+
+    \identifier{22w} */
 
 /** \pluginsection{Importer,shell} */
 

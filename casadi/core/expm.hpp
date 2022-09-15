@@ -41,7 +41,8 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2017
-  */
+
+      \identifier{21l} */
 
   /** \defgroup expm
   * @copydoc main_expm

@@ -30,11 +30,13 @@
 #include "casadi/core/nlpsol_impl.hpp"
 
 /** \defgroup plugin_Nlpsol_ampl
+
   * Interface to AMPL
   *
   * \author Joel Andersson
   * \date 2017
-*/
+
+    \identifier{22b} */
 
 /** \pluginsection{Nlpsol,AmplInterface} */
 

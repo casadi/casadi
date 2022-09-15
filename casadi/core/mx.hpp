@@ -469,7 +469,6 @@ namespace casadi {
 
     ///@{
     /// Set a submatrix, two arguments
-    ///@}
     void set(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
     void set(const MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc);
     void set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc);

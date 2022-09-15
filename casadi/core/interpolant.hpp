@@ -32,6 +32,7 @@ namespace casadi {
 
 
   /** \defgroup main_interpolant
+
    * An interpolant function for lookup table data
    *
    * \param[in] name label for the resulting Function
@@ -83,7 +84,8 @@ namespace casadi {
    *  \pluginssection{Interpolant}
    * \author Joel Andersson
    * \date 2016
-   */
+
+      \identifier{21p} */
 
   /** \defgroup interpolant
   * @copydoc main_interpolant
@@ -143,7 +145,6 @@ namespace casadi {
                                      const std::vector<casadi_int>& grid_dims,
                                      const std::vector<double>& values,
                                      const Dict& opts=Dict());
-  ///@}
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_interpolant(const std::string& name);

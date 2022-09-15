@@ -61,8 +61,10 @@
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
 /** \defgroup plugin_Importer_clang
+
       Interface to the JIT compiler CLANG
-*/
+
+    \identifier{21v} */
 
 /** \pluginsection{Importer,clang} */
 

@@ -37,7 +37,7 @@
 
      The method is still under development
 
-*/
+    \identifier{234} */
 
 /** \pluginsection{Integrator,collocation} */
 

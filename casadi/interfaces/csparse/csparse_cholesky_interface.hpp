@@ -27,8 +27,10 @@
 #define CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP
 
 /** \defgroup plugin_Linsol_csparsecholesky
+
    * Linsol with CSparseCholesky Interface
-*/
+
+    \identifier{21u} */
 
 /** \pluginsection{Linsol,csparsecholesky} */
 

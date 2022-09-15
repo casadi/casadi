@@ -30,8 +30,10 @@
 #include <casadi/solvers/casadi_rootfinder_nlpsol_export.h>
 
 /** \defgroup plugin_Rootfinder_nlp
+
   Use an Nlpsol as Rootfinder solver
-*/
+
+    \identifier{238} */
 /** \pluginsection{Rootfinder,nlpsol} */
 
 /// \cond INTERNAL

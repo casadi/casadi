@@ -34,7 +34,8 @@
 
    Solve QPs using an Nlpsol
    Use the 'nlpsol' option to specify the NLP solver to use.
-*/
+
+    \identifier{235} */
 
 /** \pluginsection{Conic,nlpsol} */
 

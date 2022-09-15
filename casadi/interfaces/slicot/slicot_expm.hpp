@@ -32,7 +32,8 @@
 
 /** \defgroup plugin_Expm_slicot
  *
-*/
+
+    \identifier{22l} */
 
 /** \pluginsection{Expm,slicot} */
 

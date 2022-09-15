@@ -32,9 +32,10 @@
 #include <qpOASES.hpp>
 
 /** \defgroup plugin_Conic_qpoases
+
 Interface to QPOases Solver for quadratic programming
 
-*/
+    \identifier{22o} */
 
 /** \pluginsection{Conic,qpoases} */
 

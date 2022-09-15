@@ -49,7 +49,8 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2013-2016
-  */
+
+      \identifier{21o} */
 
   /** \defgroup dple
   * @copydoc main_dple

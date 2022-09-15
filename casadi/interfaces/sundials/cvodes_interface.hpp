@@ -45,7 +45,8 @@
 
       You can retrieve the entire state trajectory as follows, after the evaluate call:
       Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
-*/
+
+    \identifier{228} */
 
 /** \pluginsection{Integrator,cvodes} */
 

@@ -32,11 +32,13 @@
 #include <scs_parser.h>
 
 /** \defgroup plugin_Conic_superscs
+
     Interface to the SuperSCS solver for conic programming
 
 
     Joris Gillis, 2019
-*/
+
+    \identifier{21z} */
 
 /** \pluginsection{Conic,superscs} */
 

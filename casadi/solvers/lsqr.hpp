@@ -34,7 +34,7 @@
     Linear solver for sparse least-squares problems
     Inspired from https://github.com/scipy/scipy/blob/v0.14.0/scipy/sparse/linalg/isolve/lsqr.py#L96
 
-*/
+    \identifier{230} */
 
 /** \pluginsection{Linsol,symbolicqr} */
 

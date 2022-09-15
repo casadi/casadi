@@ -846,8 +846,8 @@ namespace casadi {
 
     /** \brief Export an input file that can be passed to generate C code with a main
      *
-     * \seealso generate_out
-     * \seealso convert_in to convert between dict/map and vector
+     * \see generate_out
+     * \see convert_in to convert between dict/map and vector
 
         \identifier{1wx} */
     /// @{
@@ -857,8 +857,8 @@ namespace casadi {
 
     /** \brief Export an output file that can be checked with generated C code output
      *
-     * \seealso generate_in
-     * \seealso convert_out to convert between dict/map and vector
+     * \see generate_in
+     * \see convert_out to convert between dict/map and vector
 
         \identifier{1wy} */
     /// @{

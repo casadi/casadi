@@ -31,6 +31,7 @@
 namespace casadi {
 
   /** \defgroup main_nlpsol
+
       Create an NLP solver
       Creates a solver for the following parametric nonlinear program (NLP):
       \verbatim
@@ -54,7 +55,8 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2011-2015
-  */
+
+      \identifier{21q} */
 
   /** \defgroup nlpsol
   * @copydoc main_nlpsol

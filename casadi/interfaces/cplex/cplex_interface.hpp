@@ -34,7 +34,8 @@
 /** \defgroup plugin_Conic_cplex
 
       Interface to Cplex solver for sparse Quadratic Programs
-*/
+
+    \identifier{22a} */
 
 /** \pluginsection{Conic,cplex} */
 

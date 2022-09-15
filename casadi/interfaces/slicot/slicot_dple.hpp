@@ -42,7 +42,8 @@
  *   J. Gillis
  *   Practical Methods for Approximate Robust Periodic Optimal Control ofNonlinear Mechanical Systems,
  *   PhD Thesis, KULeuven, 2015
-*/
+
+    \identifier{22j} */
 
 /** \pluginsection{Dple,slicot} */
 

@@ -35,8 +35,10 @@ extern "C" {
 }
 
 /** \defgroup plugin_Conic_osqp
+
     Interface to the OSQP Solver for quadratic programming
-*/
+
+    \identifier{220} */
 
 /** \pluginsection{Conic,osqp} */
 
