@@ -85,6 +85,6 @@ std::vector<std::string> enum_names() {
 }
 
 } // namespace casadi
-/// \cond INTERNAL
+/// \endcond
 
 #endif // CASADI_ENUM_HPP
