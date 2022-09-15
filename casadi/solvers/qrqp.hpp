@@ -34,7 +34,7 @@
  * 
  * Solve QPs using an active-set method
  *
- * \identifier{22y} */
+ \identifier{22y} */
 
 /** \pluginsection{Conic,qrqp} */
 
