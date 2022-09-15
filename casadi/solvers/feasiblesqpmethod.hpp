@@ -128,7 +128,7 @@ namespace casadi {
     double tol_pr_, tol_du_;
 
     /// Minimum step size allowed
-    double min_step_size_;
+    // double min_step_size_;
 
     /// Initialize feasible qp's
     bool init_feasible_;
@@ -136,7 +136,7 @@ namespace casadi {
     /// Linesearch parameters
     ///@{
     // double c1_;
-    double beta_;
+    // double beta_;
     // casadi_int max_iter_ls_;
     casadi_int merit_memsize_;
     ///@}
