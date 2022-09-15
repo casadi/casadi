@@ -138,7 +138,7 @@ namespace casadi {
     // double c1_;
     // double beta_;
     // casadi_int max_iter_ls_;
-    casadi_int merit_memsize_;
+    // casadi_int merit_memsize_;
     ///@}
 
     // Print options

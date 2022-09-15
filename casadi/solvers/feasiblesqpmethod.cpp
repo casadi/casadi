@@ -202,7 +202,7 @@ namespace casadi {
     // max_iter_ls_ = 3;
     // c1_ = 1e-4;
     // beta_ = 0.8;
-    merit_memsize_ = 4;
+    // merit_memsize_ = 4;
     lbfgs_memory_ = 10;
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
@@ -255,9 +255,10 @@ namespace casadi {
       // else if (op.first=="beta") {
       //   beta_ = op.second;
       // } 
-      else if (op.first=="merit_memory") {
-        merit_memsize_ = op.second;
-      } else if (op.first=="lbfgs_memory") {
+      // else if (op.first=="merit_memory") {
+      //   merit_memsize_ = op.second;
+      // } 
+      else if (op.first=="lbfgs_memory") {
         lbfgs_memory_ = op.second;
       } else if (op.first=="tol_pr") {
         tol_pr_ = op.second;
@@ -479,7 +480,7 @@ namespace casadi {
   void Feasiblesqpmethod::set_feasiblesqpmethod_prob() {
     p_.sp_h = Hsp_;
     p_.sp_a = Asp_;
-    p_.merit_memsize = merit_memsize_;
+    // p_.merit_memsize = merit_memsize_;
     // p_.max_iter_ls = max_iter_ls_;
     p_.nlp = &p_nlp_;
   }
@@ -1281,7 +1282,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "d.prob = &p;\n";
     g << "p.sp_h = " << g.sparsity(Hsp_) << ";\n";
     g << "p.sp_a = " << g.sparsity(Asp_) << ";\n";
-    g << "p.merit_memsize = " << merit_memsize_ << ";\n";
+    // g << "p.merit_memsize = " << merit_memsize_ << ";\n";
     // g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
     g << "p.nlp = &p_nlp;\n";
     // g << "casadi_feasiblesqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ", " << so_corr_ << ");\n";

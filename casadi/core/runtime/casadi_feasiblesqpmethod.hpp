@@ -8,7 +8,7 @@ struct casadi_feasiblesqpmethod_prob {
   const casadi_nlpsol_prob<T1>* nlp;
   // Sparsity patterns
   const casadi_int *sp_h, *sp_a, *sp_hr;
-  casadi_int merit_memsize;
+  // casadi_int merit_memsize;
   casadi_int max_iter_ls;
 };
 // C-REPLACE "casadi_sqpmethod_prob<T1>" "struct casadi_sqpmethod_prob"
@@ -73,7 +73,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   // Jacobian
   *sz_w += nnz_a; // Jk
   // merit_mem
-  if (p->max_iter_ls>0) *sz_w += p->merit_memsize;
+  // if (p->max_iter_ls>0) *sz_w += p->merit_memsize;
 
   // if (elastic_mode) {
   //   // Additional work for larger objective gradient
@@ -113,9 +113,9 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   // Hessian approximation
   d->Bk = *w; *w += nnz_h;
   // merit_mem
-  if (p->max_iter_ls>0) {
-    d->merit_mem = *w; *w += p->merit_memsize;
-  }
+  // if (p->max_iter_ls>0) {
+  //   d->merit_mem = *w; *w += p->merit_memsize;
+  // }
 
   // if (so_corr) {
   //   d->temp_sol = *w; *w += nx+nx+ng;
