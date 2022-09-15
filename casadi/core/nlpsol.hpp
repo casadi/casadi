@@ -83,57 +83,71 @@ namespace casadi {
   ///@}
 
   /** \brief Get input scheme of NLP solvers
+
   * \if EXPANDED
   * @copydoc scheme_NlpsolInput
   * \endif
+
       \identifier{1sy} */
   CASADI_EXPORT std::vector<std::string> nlpsol_in();
 
   /** \brief Get NLP solver output scheme of NLP solvers
+
   * \if EXPANDED
   * @copydoc scheme_NlpsolOutput
   * \endif
+
       \identifier{1sz} */
   CASADI_EXPORT std::vector<std::string> nlpsol_out();
 
   /** \brief Get NLP solver input scheme name by index
+
   * \if EXPANDED
   * @copydoc scheme_NlpsolInput
   * \endif
+
       \identifier{1t0} */
   CASADI_EXPORT std::string nlpsol_in(casadi_int ind);
 
   /** \brief Get output scheme name by index
+
   * \if EXPANDED
   * @copydoc scheme_NlpsolOutput
   * \endif
+
       \identifier{1t1} */
   CASADI_EXPORT std::string nlpsol_out(casadi_int ind);
 
   /** \brief Number of NLP solver inputs
+
       \identifier{1t2} */
   CASADI_EXPORT casadi_int nlpsol_n_in();
 
   /** \brief Number of NLP solver outputs
+
       \identifier{1t3} */
   CASADI_EXPORT casadi_int nlpsol_n_out();
 
   ///@{
   /** \brief Default input for an NLP solver
+
       \identifier{1t4} */
   CASADI_EXPORT double nlpsol_default_in(casadi_int ind);
   CASADI_EXPORT std::vector<double> nlpsol_default_in();
   ///@}
 
   /** \brief Get all options for a plugin
+
       \identifier{1t5} */
   CASADI_EXPORT std::vector<std::string> nlpsol_options(const std::string& name);
 
   /** \brief Get type info for a particular option
+
       \identifier{1t6} */
   CASADI_EXPORT std::string nlpsol_option_type(const std::string& name, const std::string& op);
 
   /** \brief Get documentation for a particular option
+
       \identifier{1t7} */
   CASADI_EXPORT std::string nlpsol_option_info(const std::string& name, const std::string& op);
 

@@ -39,8 +39,10 @@
 namespace casadi {
 
 /** \brief Represents a constant SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1jj} */
 class ConstantSX : public SXNode {
 public:
@@ -52,18 +54,22 @@ public:
 std::string class_name() const override {return "ConstantSX";}
 
 /** \brief  Get the value must be defined
+
     \identifier{1jk} */
 double to_double() const override = 0;
 
 /** \brief  Properties
+
     \identifier{1jl} */
 bool is_constant() const override { return true; }
 
 /** \brief  Get the operation
+
     \identifier{1jm} */
 casadi_int op() const override { return OP_CONST;}
 
 /** \brief Check if two nodes are equivalent up to a given depth
+
     \identifier{1jn} */
 bool is_equal(const SXNode* node, casadi_int depth) const override {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
@@ -73,6 +79,7 @@ bool is_equal(const SXNode* node, casadi_int depth) const override {
 protected:
 
 /** \brief  Print expression
+
     \identifier{1jo} */
 std::string print(const std::string& arg1, const std::string& arg2) const override {
    std::stringstream ss;
@@ -83,11 +90,14 @@ std::string print(const std::string& arg1, const std::string& arg2) const overri
 };
 
 /** \brief  DERIVED CLASSES
+
     \identifier{1jp} */
 
 /** \brief  Represents a constant real SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1jq} */
 class RealtypeSX : public ConstantSX {
   private:
@@ -125,6 +135,7 @@ class RealtypeSX : public ConstantSX {
 
     ///@{
     /** \brief  Get the value
+
         \identifier{1jr} */
     double to_double() const override { return value;}
     casadi_int to_int() const override { return static_cast<casadi_int>(value);}
@@ -139,19 +150,24 @@ class RealtypeSX : public ConstantSX {
 
   protected:
     /** \brief Hash map of all constants currently allocated
+
      * (storage is allocated for it in sx_element.cpp)
+
         \identifier{1js} */
     static CACHING_MAP<double, RealtypeSX*> cached_constants_;
 
     /** \brief  Data members
+
         \identifier{1jt} */
     double value;
 };
 
 
 /** \brief  Represents a constant integer SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1ju} */
 class IntegerSX : public ConstantSX {
   private:
@@ -192,12 +208,14 @@ class IntegerSX : public ConstantSX {
 
     ///@{
     /** \brief  evaluate function
+
         \identifier{1jv} */
     double to_double() const override {  return static_cast<double>(value); }
     casadi_int to_int() const override {  return static_cast<casadi_int>(value); }
     ///@}
 
     /** \brief  Properties
+
         \identifier{1jw} */
     bool is_integer() const override { return true; }
 
@@ -209,18 +227,23 @@ class IntegerSX : public ConstantSX {
   protected:
 
     /** \brief Hash map of all constants currently allocated
+
      * (storage is allocated for it in sx_element.cpp)
+
         \identifier{1jx} */
     static CACHING_MAP<casadi_int, IntegerSX*> cached_constants_;
 
     /** \brief  Data members
+
         \identifier{1jy} */
     int value;
 };
 
 /** \brief  Represents a zero SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1jz} */
 class ZeroSX : public ConstantSX {
 private:
@@ -236,6 +259,7 @@ public:
   ~ZeroSX() override {this->count--;}
   ///@{
   /** \brief  Get the value
+
       \identifier{1k0} */
   double to_double() const override { return 0;}
   casadi_int to_int() const override { return 0;}
@@ -243,6 +267,7 @@ public:
 
   ///@{
   /** \brief  Properties
+
       \identifier{1k1} */
   bool is_integer() const override { return true; }
   bool is_zero() const override { return true; }
@@ -256,8 +281,10 @@ public:
 
 
 /** \brief  Represents a one SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1k2} */
 class OneSX : public ConstantSX {
 private:
@@ -272,11 +299,13 @@ public:
   /* Destructor */
   ~OneSX() override {this->count--;}
   /** \brief  Get the value
+
       \identifier{1k3} */
   double to_double() const override { return 1;}
   casadi_int to_int() const override { return 1;}
 
   /** \brief  Properties
+
       \identifier{1k4} */
   bool is_integer() const override { return true; }
   bool is_one() const override { return true; }
@@ -289,8 +318,10 @@ public:
 
 
 /** \brief  Represents a minus one SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1k5} */
 class MinusOneSX : public ConstantSX {
 private:
@@ -307,6 +338,7 @@ public:
 
   ///@{
   /** \brief  Get the value
+
       \identifier{1k6} */
   double to_double() const override { return -1;}
   casadi_int to_int() const override { return -1;}
@@ -314,6 +346,7 @@ public:
 
   ///@{
   /** \brief  Properties
+
       \identifier{1k7} */
   bool is_integer() const override { return true; }
   bool is_minus_one() const override { return true; }
@@ -327,8 +360,10 @@ public:
 
 
 /** \brief  Represents an infinity SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1k8} */
 class InfSX : public ConstantSX {
 private:
@@ -343,10 +378,12 @@ public:
   /* Destructor */
   ~InfSX() override {this->count--;}
   /** \brief  Get the value
+
       \identifier{1k9} */
   double to_double() const override { return std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties
+
       \identifier{1ka} */
   bool is_inf() const override { return true; }
 
@@ -358,8 +395,10 @@ public:
 
 
 /** \brief  Represents a minus infinity SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1kb} */
 class MinusInfSX : public ConstantSX {
 private:
@@ -375,10 +414,12 @@ public:
   ~MinusInfSX() override {this->count--;}
 
   /** \brief  Get the value
+
       \identifier{1kc} */
   double to_double() const override { return -std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties
+
       \identifier{1kd} */
   bool is_minus_inf() const override { return true; }
 
@@ -388,8 +429,10 @@ public:
 };
 
 /** \brief  Represents a not-a-number SX
+
   \author Joel Andersson
   \date 2010
+
     \identifier{1ke} */
 class NanSX : public ConstantSX {
 private:
@@ -404,10 +447,12 @@ public:
   /* Destructor */
   ~NanSX() override {this->count--;}
   /** \brief  Get the value
+
       \identifier{1kf} */
   double to_double() const override { return std::numeric_limits<double>::quiet_NaN();}
 
   /** \brief  Properties
+
       \identifier{1kg} */
   bool is_nan() const override { return true; }
 

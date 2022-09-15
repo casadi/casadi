@@ -33,13 +33,16 @@
 namespace casadi {
 
 /** \brief Represents a basic binary operation on two SXElem nodes
+
   \author Joel Andersson
   \date 2010
+
     \identifier{115} */
 class BinarySX : public SXNode {
   private:
 
     /** \brief  Constructor is private, use "create" below
+
         \identifier{116} */
     BinarySX(unsigned char op, const SXElem& dep0, const SXElem& dep1) :
         op_(op), dep0_(dep0), dep1_(dep1) {}
@@ -47,6 +50,7 @@ class BinarySX : public SXNode {
   public:
 
     /** \brief  Create a binary expression
+
         \identifier{117} */
     inline static SXElem create(unsigned char op, const SXElem& dep0, const SXElem& dep1) {
       if (dep0.is_constant() && dep1.is_constant()) {
@@ -63,8 +67,10 @@ class BinarySX : public SXNode {
     }
 
     /** \brief Destructor
+
     This is a rather complex destructor which is necessary since the default destructor
     can cause stack overflow due to recursive calling.
+
         \identifier{118} */
     ~BinarySX() override {
       safe_delete(dep0_.assignNoDelete(casadi_limits<SXElem>::nan));
@@ -79,6 +85,7 @@ class BinarySX : public SXNode {
     bool is_op(casadi_int op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth
+
         \identifier{119} */
     bool is_equal(const SXNode* node, casadi_int depth) const override {
       const BinarySX* n = dynamic_cast<const BinarySX*>(node);
@@ -93,29 +100,35 @@ class BinarySX : public SXNode {
     }
 
     /** \brief  Number of dependencies
+
         \identifier{11a} */
     casadi_int n_dep() const override { return 2;}
 
     /** \brief  get the reference of a dependency
+
         \identifier{11b} */
     const SXElem& dep(casadi_int i) const override { return i==0 ? dep0_ : dep1_;}
     SXElem& dep(casadi_int i) override { return i==0 ? dep0_ : dep1_;}
 
     /** \brief  Get the operation
+
         \identifier{11c} */
     casadi_int op() const override { return op_;}
 
     /** \brief  Print expression
+
         \identifier{11d} */
     std::string print(const std::string& arg1, const std::string& arg2) const override {
       return casadi_math<double>::print(op_, arg1, arg2);
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values)
+
         \identifier{11e} */
     unsigned char op_;
 
     /** \brief  The dependencies of the node
+
         \identifier{11f} */
     SXElem dep0_, dep1_;
 
@@ -125,6 +138,7 @@ class BinarySX : public SXNode {
     }
 
     /** \brief Deserialize without type information
+
         \identifier{11g} */
     static SXNode* deserialize(DeserializingStream& s, casadi_int op) {
       SXElem dep0, dep1;

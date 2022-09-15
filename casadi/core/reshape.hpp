@@ -34,8 +34,10 @@
 
 namespace casadi {
   /** \brief Reshape an expression
+
       \author Joel Andersson
       \date 2013
+
       \identifier{1dj} */
   class CASADI_EXPORT Reshape : public MXNode {
   public:
@@ -57,38 +59,46 @@ namespace casadi {
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{1dk} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{1dl} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{1dm} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward
+
         \identifier{1dn} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards
+
         \identifier{1do} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Print expression
+
         \identifier{1dp} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Generate code for the operation
+
         \identifier{1dq} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Get the operation
+
         \identifier{1dr} */
     casadi_int op() const override { return OP_RESHAPE;}
 
@@ -99,6 +109,7 @@ namespace casadi {
     MX get_reshape(const Sparsity& sp) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth
+
         \identifier{1ds} */
     bool is_equal(const MXNode* node, casadi_int depth) const override
     { return sameOpAndDeps(node, depth) && sparsity()==node->sparsity();}
@@ -107,38 +118,47 @@ namespace casadi {
     MX get_transpose() const override;
 
     /** \brief  Check if valid function input
+
         \identifier{1dt} */
     bool is_valid_input() const override;
 
     /** \brief Get the number of symbolic primitives
+
         \identifier{1du} */
     casadi_int n_primitives() const override;
 
     /** \brief Get symbolic primitives
+
         \identifier{1dv} */
     void primitives(std::vector<MX>::iterator& it) const override;
 
     /** \brief Split up an expression along symbolic primitives
+
         \identifier{1dw} */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
 
     /** \brief Join an expression along symbolic primitives
+
         \identifier{1dx} */
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Detect duplicate symbolic expressions
+
         \identifier{1dy} */
     bool has_duplicates() const override;
 
     /** \brief Reset the marker for an input expression
+
         \identifier{1dz} */
     void reset_input() const override;
 
     /** \brief Deserialize without type information
+
         \identifier{1e0} */
     static MXNode* deserialize(DeserializingStream& s) { return new Reshape(s); }
   protected:
     /** \brief Deserializing constructor
+
         \identifier{1e1} */
     explicit Reshape(DeserializingStream& s) : MXNode(s) {}
   };

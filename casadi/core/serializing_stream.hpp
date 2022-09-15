@@ -61,8 +61,10 @@ namespace casadi {
   typedef std::map<std::string, GenericType> Dict;
 
   /** \brief Helper class for Serialization
+
       \author Joris Gillis
       \date 2018
+
       \identifier{ak} */
   class CASADI_EXPORT DeserializingStream {
     friend class SerializingStream;
@@ -76,6 +78,7 @@ namespace casadi {
     *
     * If the reference is not of the same type as the object encoded in the stream.
     * an error will be raised.
+
         \identifier{al} */
     void unpack(Sparsity& e);
     void unpack(MX& e);
@@ -151,6 +154,7 @@ namespace casadi {
     /** \brief Unpacks a shared object
     *
     * Also treats SXNode, which is not actually a SharedObjectInternal
+
         \identifier{am} */
     template <class T, class M>
     void shared_unpack(T& e) {
@@ -178,6 +182,7 @@ namespace casadi {
     /** \brief Primitive typecheck during deserialization
      *
      * No-op unless in debug mode
+
         \identifier{an} */
     void assert_decoration(char e);
 
@@ -195,6 +200,7 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2018
+
       \identifier{ao} */
   class CASADI_EXPORT SerializingStream {
     friend class DeserializingStream;
@@ -205,6 +211,7 @@ namespace casadi {
 
     // @{
     /** \brief Serializes an object to the output stream
+
         \identifier{ap} */
     void pack(const Sparsity& e);
     void pack(const MX& e);
@@ -268,12 +275,14 @@ namespace casadi {
     /** \brief Insert information for a primitive typecheck during deserialization
      *
      * No-op unless in debug mode
+
         \identifier{aq} */
     void decorate(char e);
 
     /** \brief Packs a shared object
     *
     * Also treats SXNode, which is not actually a SharedObjectInternal
+
         \identifier{ar} */
     template <class T>
     void shared_pack(const T& e) {

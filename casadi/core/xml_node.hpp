@@ -56,22 +56,27 @@ struct CASADI_EXPORT XmlNode {
   std::string text;
 
   /** \brief  Check if an attribute is present
+
       \identifier{vc} */
   bool has_attribute(const std::string& att_name) const;
 
   /** \brief  Add an attribute
+
       \identifier{vd} */
   void set_attribute(const std::string& att_name, const std::string& att);
 
   /** \brief  Names of children
+
       \identifier{ve} */
   std::vector<std::string> child_names() const;
 
   /** \brief  Names of attributes
+
       \identifier{vf} */
   std::vector<std::string> attribute_names() const;
 
   /** \brief  Get an attribute by its name
+
       \identifier{vg} */
   template<typename T>
   T attribute(const std::string& att_name) const {
@@ -85,6 +90,7 @@ struct CASADI_EXPORT XmlNode {
   }
 
   /** \brief  Get an attribute by its name, default value if not found
+
       \identifier{vh} */
   template<typename T>
   T attribute(const std::string& att_name, const T& def_att) const {
@@ -102,63 +108,78 @@ struct CASADI_EXPORT XmlNode {
   }
 
   /** \brief  Get a reference to a child by its index
+
       \identifier{vi} */
   const XmlNode& operator[](size_t i) const { return this->children.at(i);}
 
   /** \brief  Get a reference to a child by its index
+
       \identifier{vj} */
   XmlNode& operator[](size_t i) { return this->children.at(i);}
 
   /** \brief  Get a reference to a child by its name
+
       \identifier{vk} */
   const XmlNode& operator[](const std::string& childname) const;
 
   /** \brief  Get a reference to a child by its name
+
       \identifier{vl} */
   XmlNode& operator[](const std::string& childname);
 
   /** \brief  Check if a child is present
+
       \identifier{vm} */
   bool has_child(const std::string& childname) const;
 
   /** \brief  Get the number of children
+
       \identifier{vn} */
   size_t size() const { return this->children.size();}
 
   /** \brief  Get value of text field
+
       \identifier{vo} */
   template<typename T>
   void get(T* val) const { read(this->text, val);}
 
   /** \brief  Read the string value of a string (i.e. copy)
+
       \identifier{vp} */
   static void read(const std::string& str, std::string* val);
 
   /** \brief  Read the boolean value of a string
+
       \identifier{vq} */
   static void read(const std::string& str, bool* val);
 
   /** \brief  Read the integer value of a string
+
       \identifier{vr} */
   static void read(const std::string& str, casadi_int* val);
 
   /** \brief  Read the double value of a string
+
       \identifier{vs} */
   static void read(const std::string& str, double* val);
 
   /** \brief  Read a vector of integer values of a string
+
       \identifier{vt} */
   static void read(const std::string& str, std::vector<casadi_int>* val);
 
   /** \brief  Read a vector of string values of a string
+
       \identifier{vu} */
   static void read(const std::string& str, std::vector<std::string>* val);
 
   /** \brief Print to stream
+
       \identifier{vv} */
   CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream, const XmlNode& node);
 
   /** \brief  Dump representation
+
       \identifier{vw} */
   void dump(std::ostream &stream, casadi_int indent = 0) const;
 };

@@ -43,14 +43,17 @@ namespace casadi {
                            const Function& f, casadi_int n);
 
     /** \brief Destructor
+
         \identifier{h2} */
     ~Map() override;
 
     /** \brief Get type name
+
         \identifier{h3} */
     std::string class_name() const override {return "Map";}
 
     /** \brief Check if the function is of a particular type
+
         \identifier{h4} */
     bool is_a(const std::string& type, bool recursive) const override;
 
@@ -65,6 +68,7 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs
+
         \identifier{h5} */
     Sparsity get_sparsity_in(casadi_int i) override {
       return repmat(f_.sparsity_in(i), 1, n_);
@@ -75,11 +79,13 @@ namespace casadi {
     /// @}
 
     /** \brief Get default input value
+
         \identifier{h6} */
     double get_default_in(casadi_int ind) const override { return f_.default_in(ind);}
 
     ///@{
     /** \brief Number of function inputs and outputs
+
         \identifier{h7} */
     size_t get_n_in() override { return f_.n_in();}
     size_t get_n_out() override { return f_.n_out();}
@@ -87,12 +93,14 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs
+
         \identifier{h8} */
     std::string get_name_in(casadi_int i) override { return f_.name_in(i);}
     std::string get_name_out(casadi_int i) override { return f_.name_out(i);}
     /// @}
 
     /** \brief  Evaluate or propagate sparsities
+
         \identifier{h9} */
     template<typename T>
     int eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem=0) const;
@@ -104,16 +112,19 @@ namespace casadi {
     virtual std::string parallelization() const { return "serial"; }
 
     /** \brief  evaluate symbolically while also propagating directional derivatives
+
         \identifier{ha} */
     int eval_sx(const SXElem** arg, SXElem** res,
                 casadi_int* iw, SXElem* w, void* mem) const override;
 
     /** \brief  Propagate sparsity forward
+
         \identifier{hb} */
     int sp_forward(const bvec_t** arg, bvec_t** res,
                     casadi_int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards
+
         \identifier{hc} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
@@ -124,23 +135,28 @@ namespace casadi {
     ///@}
 
     /** \brief Is codegen supported?
+
         \identifier{hd} */
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the declarations of the C function
+
         \identifier{he} */
     void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function
+
         \identifier{hf} */
     void codegen_body(CodeGenerator& g) const override;
 
     /** \brief  Initialize
+
         \identifier{hg} */
     void init(const Dict& opts) override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives
+
         \identifier{hh} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
@@ -151,6 +167,7 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives
+
         \identifier{hi} */
     bool has_reverse(casadi_int nadj) const override { return true;}
     Function get_reverse(casadi_int nadj, const std::string& name,
@@ -163,22 +180,27 @@ namespace casadi {
     Dict info() const override { return {{"f", f_}, {"n", n_}}; }
 
     /** \brief Serialize an object without type information
+
         \identifier{hj} */
     void serialize_body(SerializingStream &s) const override;
     /** \brief Serialize type information
+
         \identifier{hk} */
     void serialize_type(SerializingStream &s) const override;
 
     /** \brief String used to identify the immediate FunctionInternal subclass
+
         \identifier{hl} */
     std::string serialize_base_function() const override { return "Map"; }
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{hm} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{hn} */
     explicit Map(DeserializingStream& s);
 
@@ -206,14 +228,17 @@ namespace casadi {
     OmpMap(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
     /** \brief  Destructor
+
         \identifier{ho} */
     ~OmpMap() override;
 
     /** \brief Get type name
+
         \identifier{hp} */
     std::string class_name() const override {return "OmpMap";}
 
     /** \brief Check if the function is of a particular type
+
         \identifier{hq} */
     bool is_a(const std::string& type, bool recursive) const override;
 
@@ -221,6 +246,7 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief  Initialize
+
         \identifier{hr} */
     void init(const Dict& opts) override;
 
@@ -228,11 +254,13 @@ namespace casadi {
     std::string parallelization() const override { return "openmp"; }
 
     /** \brief Generate code for the body of the C function
+
         \identifier{hs} */
     void codegen_body(CodeGenerator& g) const override;
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{ht} */
     explicit OmpMap(DeserializingStream& s) : Map(s) {}
   };
@@ -251,14 +279,17 @@ namespace casadi {
     ThreadMap(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
     /** \brief  Destructor
+
         \identifier{hu} */
     ~ThreadMap() override;
 
     /** \brief Get type name
+
         \identifier{hv} */
     std::string class_name() const override {return "ThreadMap";}
 
     /** \brief Check if the function is of a particular type
+
         \identifier{hw} */
     bool is_a(const std::string& type, bool recursive) const override;
 
@@ -266,6 +297,7 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief  Initialize
+
         \identifier{hx} */
     void init(const Dict& opts) override;
 
@@ -273,11 +305,13 @@ namespace casadi {
     std::string parallelization() const override { return "thread"; }
 
     /** \brief Generate code for the body of the C function
+
         \identifier{hy} */
     void codegen_body(CodeGenerator& g) const override;
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{hz} */
     explicit ThreadMap(DeserializingStream& s) : Map(s) {}
   };

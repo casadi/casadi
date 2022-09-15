@@ -35,8 +35,10 @@
 namespace casadi {
 
   /** \brief Horizontal repmat
+
       \author Joris Gillis
       \date 2015
+
       \identifier{20k} */
   class CASADI_EXPORT HorzRepmat : public MXNode {
   public:
@@ -52,6 +54,7 @@ namespace casadi {
     ~HorzRepmat() override {}
 
     /** \brief  Print expression
+
         \identifier{20l} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
@@ -62,56 +65,68 @@ namespace casadi {
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{20m} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief  Propagate sparsity forward
+
         \identifier{20n} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards
+
         \identifier{20o} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{20p} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{20q} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Generate code for the operation
+
         \identifier{20r} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Get the operation
+
         \identifier{20s} */
     casadi_int op() const override { return OP_HORZREPMAT;}
 
     casadi_int n_;
 
     /** \brief Serialize an object without type information
+
         \identifier{20t} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information
+
         \identifier{20u} */
     static MXNode* deserialize(DeserializingStream& s) { return new HorzRepmat(s); }
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{20v} */
     explicit HorzRepmat(DeserializingStream& s);
   };
 
   /** \brief Horizontal repsum
+
       \author Joris Gillis
       \date 2015
+
       \identifier{20w} */
   class CASADI_EXPORT HorzRepsum : public MXNode {
   public:
@@ -127,6 +142,7 @@ namespace casadi {
     ~HorzRepsum() override {}
 
     /** \brief  Print expression
+
         \identifier{20x} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
@@ -137,49 +153,59 @@ namespace casadi {
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{20y} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief  Propagate sparsity forward
+
         \identifier{20z} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards
+
         \identifier{210} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{211} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{212} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Generate code for the operation
+
         \identifier{213} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Get the operation
+
         \identifier{214} */
     casadi_int op() const override { return OP_HORZREPSUM;}
 
     casadi_int n_;
 
     /** \brief Serialize an object without type information
+
         \identifier{215} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information
+
         \identifier{216} */
     static MXNode* deserialize(DeserializingStream& s) { return new HorzRepsum(s); }
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{217} */
     explicit HorzRepsum(DeserializingStream& s);
   };

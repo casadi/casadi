@@ -41,6 +41,7 @@
 namespace casadi {
 
 /** \brief  Casadi exception class
+
         \author Joel Andersson
         \date 2010
         Example for simple exception throwing:
@@ -55,6 +56,7 @@ namespace casadi {
                         throw CasadiException("Serious error.") << e;
                 }
         \endcode
+
     \identifier{7u} */
 class CASADI_EXPORT CasadiException : public std::exception {
   public:

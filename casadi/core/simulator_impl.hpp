@@ -36,6 +36,7 @@
 namespace casadi {
 
 /** \brief Simulator memory
+
     \identifier{1mu} */
 struct CASADI_EXPORT SimulatorMemory : public OracleMemory {
   // Input arguments
@@ -61,20 +62,24 @@ struct CASADI_EXPORT SimulatorMemory : public OracleMemory {
     @copydoc DAE_doc
     \author Joel Andersson
     \date 2010
+
     \identifier{1mv} */
 class CASADI_EXPORT
 Simulator : public OracleFunction, public PluginInterface<Simulator> {
  public:
   /** \brief  Constructor
+
       \identifier{1mw} */
   Simulator(const std::string& name, const Function& oracle, const std::vector<double>& grid);
 
   /** \brief  Destructor
+
       \identifier{1mx} */
   ~Simulator() override=0;
 
   ///@{
   /** \brief Number of function inputs and outputs
+
       \identifier{1my} */
   size_t get_n_in() override;
   size_t get_n_out() override;
@@ -82,6 +87,7 @@ Simulator : public OracleFunction, public PluginInterface<Simulator> {
 
  /// @{
   /** \brief Sparsities of function inputs and outputs
+
       \identifier{1mz} */
   Sparsity get_sparsity_in(casadi_int i) override;
   Sparsity get_sparsity_out(casadi_int i) override;
@@ -89,23 +95,27 @@ Simulator : public OracleFunction, public PluginInterface<Simulator> {
 
   ///@{
   /** \brief Names of function input and outputs
+
       \identifier{1n0} */
   std::string get_name_in(casadi_int i) override;
   std::string get_name_out(casadi_int i) override;
   /// @}
 
   /** \brief Initalize memory block
+
       \identifier{1n1} */
   int init_mem(void* mem) const override;
 
   ///@{
   /** \brief Options
+
       \identifier{1n2} */
   static const Options options_;
   const Options& get_options() const override { return options_;}
   ///@}
 
   /** \brief  Initialize
+
       \identifier{1n3} */
   void init(const Dict& opts) override;
 
@@ -113,31 +123,38 @@ Simulator : public OracleFunction, public PluginInterface<Simulator> {
   virtual Function create_advanced(const Dict& opts);
 
   /** \brief Set the (persistent) work vectors
+
       \identifier{1n4} */
   void set_work(void* mem, const double**& arg, double**& res,
     casadi_int*& iw, double*& w) const override;
 
   /** \brief Reset the forward problem
+
       \identifier{1n5} */
   virtual void reset(SimulatorMemory* mem) const = 0;
 
   /** \brief  Advance solution in time
+
       \identifier{1n6} */
   virtual void advance(SimulatorMemory* mem, double t, double t_stop) const = 0;
 
   /** \brief  Find next stop time
+
       \identifier{1n7} */
   casadi_int next_stop(casadi_int k, const double* u) const;
 
   /** \brief  Evaluate output function
+
       \identifier{1n8} */
   virtual void eval_y(SimulatorMemory* mem) const;
 
   /** \brief  evaluate
+
       \identifier{1n9} */
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
   /** \brief  Print solver statistics
+
       \identifier{1na} */
   virtual void print_stats(SimulatorMemory* mem) const {}
 

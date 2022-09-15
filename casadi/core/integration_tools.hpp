@@ -32,6 +32,7 @@ namespace casadi {
 
   ///@{
   /** \brief Obtain collocation points of specific order and scheme
+
   \param order Which order (1 to 9 supported)
   \param scheme  'radau' or 'legendre'
   *
@@ -68,6 +69,7 @@ namespace casadi {
     \verbatim
       Pi @X_f = Sum_i D[i]*Z_i
     \endverbatim
+
       \identifier{1sp} */
   CASADI_EXPORT void
   collocation_interpolators(const std::vector<double> & tau,
@@ -109,6 +111,7 @@ namespace casadi {
     \verbatim
       q = quad*B*h
     \endverbatim
+
       \identifier{1sq} */
   CASADI_EXPORT void
   collocation_coeff(const std::vector<double> & tau,
@@ -120,6 +123,7 @@ namespace casadi {
   enum CollocationPoints {LEGENDRE, RADAU};
 
   /** \brief Construct an explicit Runge-Kutta integrator
+
    * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
@@ -127,10 +131,12 @@ namespace casadi {
    * \param f     ODE function with two inputs (x and p) and one output (xdot)
    * \param N     Number of integrator steps
    * \param order Order of interpolating polynomials
+
       \identifier{1sr} */
   CASADI_EXPORT Function simpleRK(Function f, casadi_int N=10, casadi_int order=4);
 
   /** \brief Construct an implicit Runge-Kutta integrator using a collocation scheme
+
    * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
@@ -141,6 +147,7 @@ namespace casadi {
    * \param scheme Collocation scheme, as excepted by collocationPoints function.
    * \param solver Solver plugin
    * \param solver_options Options to be passed to the solver plugin
+
       \identifier{1ss} */
   CASADI_EXPORT
   Function simpleIRK(Function f, casadi_int N=10, casadi_int order=4,
@@ -149,6 +156,7 @@ namespace casadi {
                       const Dict& solver_options = Dict());
 
   /** \brief Simplified wrapper for the Integrator class
+
    * Constructs an integrator using the same syntax as simpleRK and simpleIRK.
    * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)
@@ -158,6 +166,7 @@ namespace casadi {
    * \param N      Number of integrator steps
    * \param order  Order of interpolating polynomials
    * \param scheme Collocation scheme, as excepted by collocationPoints function.
+
       \identifier{1st} */
   CASADI_EXPORT
   Function simpleIntegrator(Function f, const std::string& integrator="cvodes",
@@ -239,6 +248,7 @@ namespace casadi {
   * \return Semi explicit DAE dictionary, suitable to pass to a CasADi integrator
   * 
   * \sa dae_reduce_index
+
       \identifier{1su} */
   /// @{
   CASADI_EXPORT
@@ -273,6 +283,7 @@ namespace casadi {
   *                         typically used as input for integrators
   * 
   * \sa dae_reduce_index
+
     \identifier{1sv} */
   /// @{
   CASADI_EXPORT

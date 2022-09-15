@@ -21,6 +21,10 @@ re_comments = re.compile(r"^ */\*\* (.*?)\*/$", re.MULTILINE | re.DOTALL)
 identifiers = set()
 location = {}
 
+def is_blank(line):
+    line = line.strip()
+    return line=="*" or line==""
+
 
 for root, dirs, files in os.walk("../casadi"):
    for name in files:
@@ -42,11 +46,26 @@ for root, dirs, files in os.walk("../casadi"):
                         raise Exception(f"Duplicate identifiers:\n{loc}\n{location[identifier]}")
                     identifiers.add(identifier)
                     location[identifier] = loc
+                    
+                    # Make sure there is a blank line after \brief when multi-line
+                    # If there is no such newline, doxygen xml lumps brief and subsequent lines into a single para
+                    if "\n" in match.group(0):
+                        split = match.group(0).split("\n")
+                        if not is_blank(split[1]):
+                            split = [split[0]] + [""]+split[1:]
+                            return "\n".join(split)
+                        
+                    # Make sure there is a blank line before \identifier
+                    split = match.group(0).split("\n")
+                    identifier_index = [i for i,e in enumerate(split) if e.strip().startswith("\\identifier")][0]
+                    if not is_blank(split[identifier_index-1]):
+                        split = split[:identifier_index] + [""] + split[identifier_index:]
+                        return "\n".join(split)
                  else:
                     m = match.group(0).rstrip()
                     ident = m.find("\\brief")*" "
                     next_identifier+=1
-                    return m[:-2].rstrip() + "\n" + ident+ "\\identifier{" + id2str(next_identifier) + "}" + " */"
+                    return m[:-2].rstrip() + "\n\n" + ident+ "\\identifier{" + id2str(next_identifier) + "}" + " */"
                 return match.group(0)
             data = re.sub(re_comments, process, data)
           if data!=orig:

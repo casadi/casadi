@@ -41,40 +41,49 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2013
+
       \identifier{fs} */
   template<bool Tr>
   class CASADI_EXPORT Solve : public MXNode {
   public:
     /** \brief  Constructor
+
         \identifier{ft} */
     Solve(const MX& r, const MX& A);
 
     /** \brief  Destructor
+
         \identifier{fu} */
     ~Solve() override {}
 
     /** \brief  Print expression
+
         \identifier{fv} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Modifier for linear system, before argument
+
         \identifier{fw} */
     virtual std::string mod_prefix() const {return "";}
 
     /** \brief  Modifier for linear system, after argument
+
         \identifier{fx} */
     virtual std::string mod_suffix() const {return "";}
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{fy} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{fz} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{g0} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
@@ -83,14 +92,17 @@ namespace casadi {
     casadi_int n_inplace() const override { return 1;}
 
     /** \brief  Propagate sparsity forward
+
         \identifier{g1} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards
+
         \identifier{g2} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Get the operation
+
         \identifier{g3} */
     casadi_int op() const override { return OP_SOLVE;}
 
@@ -106,18 +118,22 @@ namespace casadi {
     virtual const Sparsity& A_sp() const { return dep(1).sparsity();}
 
     /** \brief Serialize an object without type information
+
         \identifier{g4} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Serialize type information
+
         \identifier{g5} */
     void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{g6} */
     static MXNode* deserialize(DeserializingStream& s);
 
     /** \brief Deserializing constructor
+
         \identifier{g7} */
     explicit Solve(DeserializingStream& s);
   };
@@ -126,16 +142,19 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2013
+
       \identifier{g8} */
   template<bool Tr>
   class CASADI_EXPORT LinsolCall : public Solve<Tr> {
   public:
 
     /** \brief  Constructor
+
         \identifier{g9} */
     LinsolCall(const MX& r, const MX& A, const Linsol& linear_solver);
 
     /** \brief  Destructor
+
         \identifier{ga} */
     ~LinsolCall() override {}
 
@@ -146,10 +165,12 @@ namespace casadi {
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief Get required length of w field
+
         \identifier{gb} */
     size_t sz_w() const override;
 
     /** \brief Generate code for the operation
+
         \identifier{gc} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
@@ -164,18 +185,22 @@ namespace casadi {
     }
 
     /** \brief Serialize an object without type information
+
         \identifier{gd} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Serialize type information
+
         \identifier{ge} */
     void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{gf} */
     static MXNode* deserialize(DeserializingStream& s);
 
     /** \brief Deserializing constructor
+
         \identifier{gg} */
     explicit LinsolCall(DeserializingStream& s);
   };
@@ -184,16 +209,19 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2020
+
       \identifier{gh} */
   template<bool Tr>
   class CASADI_EXPORT TriuSolve : public Solve<Tr> {
   public:
 
     /** \brief  Constructor
+
         \identifier{gi} */
     TriuSolve(const MX& r, const MX& A);
 
     /** \brief  Destructor
+
         \identifier{gj} */
     ~TriuSolve() override {}
 
@@ -209,6 +237,7 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation
+
         \identifier{gk} */
     void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res) const override;
@@ -218,16 +247,19 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2020
+
       \identifier{gl} */
   template<bool Tr>
   class CASADI_EXPORT TrilSolve : public Solve<Tr> {
   public:
 
     /** \brief  Constructor
+
         \identifier{gm} */
     TrilSolve(const MX& r, const MX& A);
 
     /** \brief  Destructor
+
         \identifier{gn} */
     ~TrilSolve() override {}
 
@@ -243,6 +275,7 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation
+
         \identifier{go} */
     void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res) const override;
@@ -252,24 +285,29 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2020
+
       \identifier{gp} */
   template<bool Tr>
   class CASADI_EXPORT SolveUnity : public Solve<Tr> {
   public:
 
     /** \brief  Constructor
+
         \identifier{gq} */
     SolveUnity(const MX& r, const MX& A);
 
     /** \brief  Destructor
+
         \identifier{gr} */
     ~SolveUnity() override {}
 
     /** \brief  Modifier for linear system, before argument
+
         \identifier{gs} */
     std::string mod_prefix() const override {return "(I - ";}
 
     /** \brief  Modifier for linear system, after argument
+
         \identifier{gt} */
     std::string mod_suffix() const override {return ")";}
 
@@ -284,16 +322,19 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2020
+
       \identifier{gu} */
   template<bool Tr>
   class CASADI_EXPORT TriuSolveUnity : public SolveUnity<Tr> {
   public:
 
     /** \brief  Constructor
+
         \identifier{gv} */
     TriuSolveUnity(const MX& r, const MX& A);
 
     /** \brief  Destructor
+
         \identifier{gw} */
     ~TriuSolveUnity() override {}
 
@@ -309,6 +350,7 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation
+
         \identifier{gx} */
     void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res) const override;
@@ -318,16 +360,19 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2020
+
       \identifier{gy} */
   template<bool Tr>
   class CASADI_EXPORT TrilSolveUnity : public SolveUnity<Tr> {
   public:
 
     /** \brief  Constructor
+
         \identifier{gz} */
     TrilSolveUnity(const MX& r, const MX& A);
 
     /** \brief  Destructor
+
         \identifier{h0} */
     ~TrilSolveUnity() override {}
 
@@ -343,6 +388,7 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation
+
         \identifier{h1} */
     void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res) const override;

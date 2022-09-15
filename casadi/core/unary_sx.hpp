@@ -34,19 +34,23 @@
 namespace casadi {
 
 /** \brief Represents a basic unary operation on an SXElem node
+
   \author Joel Andersson
   \date 2012
+
     \identifier{dt} */
 class UnarySX : public SXNode {
   private:
 
     /** \brief  Constructor is private, use "create" below
+
         \identifier{du} */
     UnarySX(unsigned char op, const SXElem& dep) : op_(op), dep_(dep) {}
 
   public:
 
     /** \brief  Create a unary expression
+
         \identifier{dv} */
     inline static SXElem create(unsigned char op, const SXElem& dep) {
       if (dep.is_constant()) {
@@ -62,6 +66,7 @@ class UnarySX : public SXNode {
     }
 
     /** \brief Destructor
+
         \identifier{dw} */
     ~UnarySX() override {
       safe_delete(dep_.assignNoDelete(casadi_limits<SXElem>::nan));
@@ -75,6 +80,7 @@ class UnarySX : public SXNode {
     bool is_op(casadi_int op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth
+
         \identifier{dx} */
     bool is_equal(const SXNode* node, casadi_int depth) const override {
       const UnarySX* n = dynamic_cast<const UnarySX*>(node);
@@ -82,29 +88,35 @@ class UnarySX : public SXNode {
     }
 
     /** \brief  Number of dependencies
+
         \identifier{dy} */
     casadi_int n_dep() const override { return 1;}
 
     /** \brief  get the reference of a dependency
+
         \identifier{dz} */
     const SXElem& dep(casadi_int i) const override { return dep_; }
     SXElem& dep(casadi_int i) override { return dep_; }
 
     /** \brief  Get the operation
+
         \identifier{e0} */
     casadi_int op() const override { return op_;}
 
     /** \brief  Print expression
+
         \identifier{e1} */
     std::string print(const std::string& arg1, const std::string& arg2) const  override {
       return casadi_math<double>::print(op_, arg1);
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values)
+
         \identifier{e2} */
     unsigned char op_;
 
     /** \brief  The dependencies of the node
+
         \identifier{e3} */
     SXElem dep_;
 

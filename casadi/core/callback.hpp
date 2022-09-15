@@ -44,45 +44,56 @@ namespace casadi {
 
    \author Joris Gillis, Joel Andersson
    \date 2015
+
       \identifier{o0} */
   class CASADI_EXPORT Callback : public Function {
   public:
     /** \brief Get type name
+
         \identifier{o1} */
     static std::string type_name() {return "Callback";}
 
     /** \brief Default constructor
+
         \identifier{o2} */
     Callback();
 
     /** \brief Copy constructor (throws an error)
+
         \identifier{o3} */
     Callback(const Callback& obj);
 
     /** \brief  Destructor
+
         \identifier{o4} */
     virtual ~Callback();
 
     /** \brief Construct internal object
+
      * This is the step that actually construct the internal object, as the
      * class constructor only creates a null pointer.
      * It should be called from the user constructor.
+
         \identifier{o5} */
     void construct(const std::string& name, const Dict& opts=Dict());
 
     /** \brief Initialize the object
+
      * This function is called after the object construction (for the whole class
      * hierarchy) is complete, but before the finalization step.
      * It is called recursively for the whole class hierarchy, starting with the
      * lowest level.
+
         \identifier{o6} */
     virtual void init() {}
 
     /** \brief Finalize the object
+
      * This function is called after the construction and init steps are completed,
      * but before user functions are called.
      * It is called recursively for the whole class hierarchy, starting with the
      * highest level.
+
         \identifier{o7} */
     virtual void finalize() {}
 
@@ -90,53 +101,69 @@ namespace casadi {
      *
      * This signature is not thread-safe.
      * For guaranteed thread-safety, use `eval_buffer`
+
         \identifier{o8} */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
     /** \brief A copy-free low level interface
      *
      * In Python, you will be passed two tuples of memoryview objects
+
         \identifier{o9} */
     virtual int eval_buffer(const double **arg, const std::vector<casadi_int>& sizes_arg,
                               double **res, const std::vector<casadi_int>& sizes_res) const;
     virtual bool has_eval_buffer() const;
 
     /** \brief Get the number of inputs
+
      * This function is called during construction.
+
         \identifier{oa} */
     virtual casadi_int get_n_in();
 
     /** \brief Get the number of outputs
+
      * This function is called during construction.
+
         \identifier{ob} */
     virtual casadi_int get_n_out();
 
     /** \brief Get the sparsity of an input
+
      * This function is called during construction.
+
         \identifier{oc} */
     virtual Sparsity get_sparsity_in(casadi_int i);
 
     /** \brief Get the sparsity of an output
+
      * This function is called during construction.
+
         \identifier{od} */
     virtual Sparsity get_sparsity_out(casadi_int i);
 
     /** \brief Get the name of an input
+
      * This function is called during construction.
+
         \identifier{oe} */
     virtual std::string get_name_in(casadi_int i);
 
     /** \brief Get the name of an output
+
      * This function is called during construction.
+
         \identifier{of} */
     virtual std::string get_name_out(casadi_int i);
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
+
         \identifier{og} */
     virtual bool uses_output() const;
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements
+
         \identifier{oh} */
     virtual bool has_jacobian() const;
     virtual Function get_jacobian(const std::string& name,
@@ -147,9 +174,11 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates forward derivatives
+
      *    forward(nfwd) returns a cached instance if available,
      *    and calls <tt>Function get_forward(casadi_int nfwd)</tt>
      *    if no cached version is available.
+
         \identifier{oi} */
     virtual bool has_forward(casadi_int nfwd) const;
     virtual Function get_forward(casadi_int nfwd, const std::string& name,
@@ -160,9 +189,11 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives
+
      *    reverse(nadj) returns a cached instance if available,
      *    and calls <tt>Function get_reverse(casadi_int nadj)</tt>
      *    if no cached version is available.
+
         \identifier{oj} */
     virtual bool has_reverse(casadi_int nadj) const;
     virtual Function get_reverse(casadi_int nadj, const std::string& name,
@@ -173,7 +204,9 @@ namespace casadi {
 
     ///@{
     /** \brief Return sparsity of Jacobian of all input elements
+
      * with respect to all output elements
+
         \identifier{ok} */
     virtual bool has_jac_sparsity(casadi_int oind, casadi_int iind) const { return false; }
     virtual Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const {

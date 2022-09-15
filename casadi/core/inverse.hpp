@@ -34,8 +34,10 @@
 
 namespace casadi {
   /** \brief Matrix inverse
+
       \author Joel Andersson
       \date 2013
+
       \identifier{1q3} */
   class CASADI_EXPORT Inverse : public MXNode {
   public:
@@ -47,33 +49,40 @@ namespace casadi {
     ~Inverse() override {}
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{1q4} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{1q5} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{1q6} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Print expression
+
         \identifier{1q7} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation
+
         \identifier{1q8} */
     casadi_int op() const override { return OP_INVERSE;}
 
     /** \brief Deserialize without type information
+
         \identifier{1q9} */
     static MXNode* deserialize(DeserializingStream& s) { return new Inverse(s); }
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{1qa} */
     explicit Inverse(DeserializingStream& s) : MXNode(s) {}
   };

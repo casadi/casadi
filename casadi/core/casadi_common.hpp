@@ -133,6 +133,7 @@ namespace casadi {
 
   ///@{
   /** \brief  Function pointer types for the C API
+
       \identifier{7j} */
   typedef void (*signal_t)(void);
   typedef casadi_int (*getint_t)(void);

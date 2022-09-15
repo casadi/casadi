@@ -34,8 +34,10 @@
 
 namespace casadi {
   /** \brief Calculate logsumexp update
+
       \author Joel Andersson
       \date 2015
+
       \identifier{9a} */
   class CASADI_EXPORT LogSumExp : public MXNode {
   public:
@@ -54,20 +56,24 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{9b} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{9c} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{9d} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Generate code for the operation
+
         \identifier{9e} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
@@ -77,14 +83,17 @@ namespace casadi {
     casadi_int n_inplace() const override { return 1;}
 
     /** \brief  Print expression
+
         \identifier{9f} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation
+
         \identifier{9g} */
     casadi_int op() const override { return OP_LOGSUMEXP;}
 
     /** \brief Deserialize without type information
+
         \identifier{9h} */
     static MXNode* deserialize(DeserializingStream& s) { return new LogSumExp(s); }
 

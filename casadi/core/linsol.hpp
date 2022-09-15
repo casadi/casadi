@@ -35,6 +35,7 @@ namespace casadi {
   class LinsolInternal;
 
   /** \brief Linear solver
+
     * Create a solver for linear systems of equations
     * Solves the linear system A*X = B or A^T*X = B for X
     * with A square and non-singular
@@ -47,12 +48,14 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2011-2016
+
       \identifier{1kh} */
   class CASADI_EXPORT Linsol
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<Linsol>) {
   public:
     /** \brief Get type name
+
         \identifier{1ki} */
     static std::string type_name() {return "Linsol";}
 
@@ -75,6 +78,7 @@ namespace casadi {
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node
+
         \identifier{1kj} */
     static Linsol create(LinsolInternal* node);
 #endif // SWIG
@@ -108,12 +112,16 @@ namespace casadi {
     ///@}
 
     /** \brief Number of negative eigenvalues
+
       * Not available for all solvers
+
         \identifier{1kk} */
     casadi_int neig(const DM& A) const;
 
     /** \brief Matrix rank
+
       * Not available for all solvers
+
         \identifier{1kl} */
     casadi_int rank(const DM& A) const;
 
@@ -137,10 +145,12 @@ namespace casadi {
     void release(int mem) const;
 
     /** \brief Serialize an object
+
         \identifier{1km} */
     void serialize(SerializingStream &s) const;
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{1kn} */
     static Linsol deserialize(DeserializingStream& s);
 

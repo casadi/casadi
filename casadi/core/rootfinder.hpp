@@ -77,38 +77,47 @@ namespace casadi {
   ///@}
 
   /** \brief Get rootfinder input scheme
+
       \identifier{1ty} */
   CASADI_EXPORT std::vector<std::string> rootfinder_in();
 
   /** \brief Get rootfinder output scheme
+
       \identifier{1tz} */
   CASADI_EXPORT std::vector<std::string> rootfinder_out();
 
   /** \brief Get rootfinder input scheme name by index
+
       \identifier{1u0} */
   CASADI_EXPORT std::string rootfinder_in(casadi_int ind);
 
   /** \brief Get rootfinder output scheme name by index
+
       \identifier{1u1} */
   CASADI_EXPORT std::string rootfinder_out(casadi_int ind);
 
   /** \brief Number of rootfinder inputs
+
       \identifier{1u2} */
   CASADI_EXPORT casadi_int rootfinder_n_in();
 
   /** \brief Number of rootfinder outputs
+
       \identifier{1u3} */
   CASADI_EXPORT casadi_int rootfinder_n_out();
 
   /** \brief Get all options for a plugin
+
       \identifier{1u4} */
   CASADI_EXPORT std::vector<std::string> rootfinder_options(const std::string& name);
 
   /** \brief Get type info for a particular option
+
       \identifier{1u5} */
   CASADI_EXPORT std::string rootfinder_option_type(const std::string& name, const std::string& op);
 
   /** \brief Get documentation for a particular option
+
       \identifier{1u6} */
   CASADI_EXPORT std::string rootfinder_option_info(const std::string& name, const std::string& op);
 

@@ -36,12 +36,14 @@
 namespace casadi {
 
 /** \brief Represents an MX that is only composed of a constant.
+
         \author Joel Andersson
         \date 2010-2013
 
         A regular user is not supposed to work with this Node class.
         This user can call MX(double) directly, or even rely on implicit typecasting.
         \sa zeros , ones
+
     \identifier{yu} */
   class CASADI_EXPORT ConstantMX : public MXNode {
   public:
@@ -74,28 +76,34 @@ namespace casadi {
                          casadi_int* iw, SXElem* w) const override = 0;
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{yv} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{yw} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{yx} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward
+
         \identifier{yy} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards
+
         \identifier{yz} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Get the operation
+
         \identifier{z0} */
     casadi_int op() const override { return OP_CONST;}
 
@@ -115,38 +123,47 @@ namespace casadi {
     bool __nonzero__() const override;
 
     /** \brief  Check if valid function input
+
         \identifier{z1} */
     bool is_valid_input() const override;
 
     /** \brief Get the number of symbolic primitives
+
         \identifier{z2} */
     casadi_int n_primitives() const override;
 
     /** \brief Get symbolic primitives
+
         \identifier{z3} */
     void primitives(std::vector<MX>::iterator& it) const override;
 
     /** \brief Split up an expression along symbolic primitives
+
         \identifier{z4} */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
 
     /** \brief Join an expression along symbolic primitives
+
         \identifier{z5} */
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Detect duplicate symbolic expressions
+
         \identifier{z6} */
     bool has_duplicates() const override { return false;}
 
     /** \brief Reset the marker for an input expression
+
         \identifier{z7} */
     void reset_input() const override {}
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{z8} */
     static MXNode* deserialize(DeserializingStream& s);
 
     /** \brief Deserializing constructor
+
         \identifier{z9} */
     explicit ConstantMX(DeserializingStream& s) : MXNode(s) {}
   };
@@ -156,6 +173,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor
+
         \identifier{za} */
     explicit ConstantDM(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x) {}
 
@@ -163,12 +181,14 @@ namespace casadi {
     ~ConstantDM() override {}
 
     /** \brief  Print expression
+
         \identifier{zb} */
     std::string disp(const std::vector<std::string>& arg) const override {
       return x_.get_str();
     }
 
     /** \brief  Evaluate the function numerically
+
         \identifier{zc} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
       std::copy(x_->begin(), x_->end(), res[0]);
@@ -176,6 +196,7 @@ namespace casadi {
     }
 
     /** \brief  Evaluate the function symbolically (SX)
+
         \identifier{zd} */
     int eval_sx(const SXElem** arg, SXElem** res,
                          casadi_int* iw, SXElem* w) const override {
@@ -184,12 +205,14 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation
+
         \identifier{ze} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief  Check if a particular integer value
+
         \identifier{zf} */
     bool is_zero() const override;
     bool is_one() const override;
@@ -203,21 +226,26 @@ namespace casadi {
     Matrix<double> get_DM() const override { return x_;}
 
     /** \brief Check if two nodes are equivalent up to a given depth
+
         \identifier{zg} */
     bool is_equal(const MXNode* node, casadi_int depth) const override;
 
     /** \brief  data member
+
         \identifier{zh} */
     Matrix<double> x_;
 
     /** \brief Serialize an object without type information
+
         \identifier{zi} */
     void serialize_body(SerializingStream& s) const override;
     /** \brief Serialize type information
+
         \identifier{zj} */
     void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserializing constructor
+
         \identifier{zk} */
     explicit ConstantDM(DeserializingStream& s);
   };
@@ -227,6 +255,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor
+
         \identifier{zl} */
     explicit ConstantFile(const Sparsity& x, const std::string& fname);
 
@@ -234,10 +263,12 @@ namespace casadi {
     ~ConstantFile() override {}
 
     /** \brief Codegen incref
+
         \identifier{zm} */
     void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
 
     /** \brief  Print expression
+
         \identifier{zn} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
@@ -248,6 +279,7 @@ namespace casadi {
     Matrix<double> get_DM() const override;
 
     /** \brief  Evaluate the function numerically
+
         \identifier{zo} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
       std::copy(x_.begin(), x_.end(), res[0]);
@@ -255,6 +287,7 @@ namespace casadi {
     }
 
     /** \brief  Evaluate the function symbolically (SX)
+
         \identifier{zp} */
     int eval_sx(const SXElem** arg, SXElem** res,
                          casadi_int* iw, SXElem* w) const override {
@@ -263,31 +296,38 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation
+
         \identifier{zq} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Add a dependent function
+
         \identifier{zr} */
     void add_dependency(CodeGenerator& g) const override;
 
     /** \brief file to read from
+
         \identifier{zs} */
     std::string fname_;
 
     /** \brief nonzeros
+
         \identifier{zt} */
     std::vector<double> x_;
 
     /** \brief Serialize an object without type information
+
         \identifier{zu} */
     void serialize_body(SerializingStream& s) const override;
     /** \brief Serialize type information
+
         \identifier{zv} */
     void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserializing constructor
+
         \identifier{zw} */
     explicit ConstantFile(DeserializingStream& s);
   };
@@ -296,6 +336,7 @@ namespace casadi {
   class CASADI_EXPORT ZeroByZero : public ConstantMX {
   private:
     /** \brief Private constructor (singleton design pattern)
+
         \identifier{zx} */
     explicit ZeroByZero() : ConstantMX(Sparsity(0, 0)) {
       initSingleton();
@@ -303,6 +344,7 @@ namespace casadi {
 
   public:
     /** \brief Get a pointer to the singleton
+
         \identifier{zy} */
     static ZeroByZero* getInstance() {
       static ZeroByZero instance;
@@ -315,10 +357,12 @@ namespace casadi {
     }
 
     /** \brief  Print expression
+
         \identifier{zz} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate the function numerically
+
         \identifier{100} */
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
@@ -332,6 +376,7 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation
+
         \identifier{101} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
@@ -365,10 +410,12 @@ namespace casadi {
     MX get_reshape(const Sparsity& sp) const override;
 
     /** \brief  Check if valid function input
+
         \identifier{102} */
     bool is_valid_input() const override { return true;}
 
     /** \brief  Get the name
+
         \identifier{103} */
     const std::string& name() const override {
       static std::string dummyname;
@@ -376,15 +423,18 @@ namespace casadi {
     }
 
     /** \brief Serialize specific part of node
+
         \identifier{104} */
     void serialize_type(SerializingStream& s) const override;
     /** \brief Serialize type information
+
         \identifier{105} */
     void serialize_body(SerializingStream& s) const override;
 
   };
 
   /** \brief Constant known at runtime
+
       \identifier{106} */
   template<typename T>
   struct RuntimeConst {
@@ -437,10 +487,12 @@ namespace casadi {
   public:
 
     /** \brief  Constructor
+
         \identifier{107} */
     explicit Constant(const Sparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v) {}
 
     /** \brief Deserializing constructor
+
         \identifier{108} */
     explicit Constant(DeserializingStream& s, const Value& v);
 
@@ -448,10 +500,12 @@ namespace casadi {
     ~Constant() override {}
 
     /** \brief  Print expression
+
         \identifier{109} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate the function numerically
+
         \identifier{10a} */
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
@@ -460,12 +514,14 @@ namespace casadi {
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief Generate code for the operation
+
         \identifier{10b} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief  Check if a particular integer value
+
         \identifier{10c} */
     bool is_zero() const override { return v_.value==0;}
     bool is_one() const override { return v_.value==1;}
@@ -510,13 +566,16 @@ namespace casadi {
     MX get_vertcat(const std::vector<MX>& x) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth
+
         \identifier{10d} */
     bool is_equal(const MXNode* node, casadi_int depth) const override;
 
     /** \brief Serialize an object without type information
+
         \identifier{10e} */
     void serialize_body(SerializingStream& s) const override;
     /** \brief Serialize type information
+
         \identifier{10f} */
     void serialize_type(SerializingStream& s) const override;
 

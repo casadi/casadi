@@ -42,6 +42,7 @@ namespace casadi {
    *
    * Note that Python or Octave do not need to use this class.
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
+
       \identifier{13} */
   class CASADI_EXPORT Slice
     : public SWIG_IF_ELSE(PrintableCommon, Printable<Slice>) {
@@ -121,10 +122,12 @@ namespace casadi {
     }
 
     /** \brief Serialize an object
+
         \identifier{14} */
     void serialize(SerializingStream& s) const;
 
     /** \brief Deserialize without type information
+
         \identifier{15} */
     static Slice deserialize(DeserializingStream& s);
   };

@@ -30,8 +30,10 @@
 #include "casadi_common.hpp"
 
 /** \brief Convenience tools for C++ Standard Library vectors
+
     \author Joel Andersson
     \date 2010-2011
+
     \identifier{1l5} */
 
 namespace casadi {
@@ -65,6 +67,7 @@ private:
 };
 
   /**  \brief Range function
+
   * \param start
   * \param stop
   * \param step
@@ -88,9 +91,11 @@ private:
   /// Checks if s starts with p
   CASADI_EXPORT bool startswith(const std::string& s, const std::string& p);
   /**  \brief Range function
+
   * \param stop
   *
   * \return list [0, 1, 2...stop-1]
+
        \identifier{1l8} */
   CASADI_EXPORT std::vector<casadi_int> range(casadi_int stop);
 
@@ -126,33 +131,40 @@ private:
   CASADI_EXPORT std::string str_bvec(bvec_t v);
 
   /**  \brief Slicing vector
+
   *  \param v Vector to slice
   *  \param i List of indices
+
        \identifier{1l9} */
   template<typename T>
   std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i);
 
   /** \brief Reverse a list
+
       \identifier{1la} */
   template<typename T>
   std::vector<T> reverse(const std::vector<T> &v);
 
   /** \brief Join two lists
+
       \identifier{1lb} */
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b);
 
   /** \brief Join three lists
+
       \identifier{1lc} */
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c);
 
   /** \brief permute a list
+
       \identifier{1ld} */
   template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order);
 
   /** \brief find nonzeros
+
       \identifier{1le} */
   template<typename T>
   std::vector<casadi_int> find(const std::vector<T> &v);
@@ -188,6 +200,7 @@ private:
   * The supplied vector may contain duplicates and may be non-monotonous
   * The supplied vector will be checked for bounds
   * The result vector is guaranteed to be monotonously increasing
+
       \identifier{1lf} */
   CASADI_EXPORT std::vector<casadi_int> complement(const std::vector<casadi_int> &v,
                                                     casadi_int size);
@@ -198,6 +211,7 @@ private:
   *  v[lookupvector[i]] == i <=>  v contains i
   *
   *  Duplicates are treated by looking up last occurrence
+
       \identifier{1lg} */
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v,
                                                      casadi_int size);
@@ -206,6 +220,7 @@ private:
   /** \brief Flatten a nested std::vector tot a single flattened vector
    * 
    * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+
       \identifier{1lh} */
   template<class T, class S>
   void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
@@ -214,6 +229,7 @@ private:
   /** \brief Flatten a nested std::vector tot a single flattened vector
    * 
    * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+
       \identifier{1li} */
   template<class T, class S, class I>
   void flatten_nested_vector(const std::vector< std::vector<T> >& nested,

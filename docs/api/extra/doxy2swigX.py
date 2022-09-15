@@ -458,9 +458,10 @@ class Doxy2SWIG_X(Doxy2SWIG):
             swigname = ""
             
           if meta is not None:
-              pieces = pieces+["Doc source: https://github.com/casadi/casadi/blob/develop%s#L%d\n" % (meta["decl"]["file"].replace(stem,""),meta["decl"]["line"])]
-              if "impl" in meta:
-                  pieces = pieces+["Implementation: https://github.com/casadi/casadi/blob/develop%s#L%d-L%d\n" % (meta["impl"]["file"].replace(stem,""),meta["impl"]["lines"][0],meta["impl"]["lines"][1])]
+              if len("".join(pieces).strip())>0:
+                  pieces = pieces+["Doc source: https://github.com/casadi/casadi/blob/develop%s#L%d\n" % (meta["decl"]["file"].replace(stem,""),meta["decl"]["line"])]
+                  if "impl" in meta:
+                      pieces = pieces+["Implementation: https://github.com/casadi/casadi/blob/develop%s#L%d-L%d\n" % (meta["impl"]["file"].replace(stem,""),meta["impl"]["lines"][0],meta["impl"]["lines"][1])]
             
           #"INTERNAL": "mark_internal(\"$decl\");"
           #"DEPRECATED": "deprecated(\"%s\");"
@@ -527,16 +528,9 @@ class Doxy2SWIG_X(Doxy2SWIG):
     m = re.search(r"\b(\w+)\(",target)
     if m:
       if m.group(1) in expression_tools:
-        
         content = [c.replace("[INTERNAL]","") for c in content]
-        new_content = []
-        while len(content)>0:
-            if "Functions called by friend functions defined for"==content[0].rstrip():
-                new_content.append("".join(content[:3]))
-                content = content[3:]
-            new_content.append(content[0])
-            content = content[1:]
-        content = new_content
+        if "Functions called by friend functions defined" in " ".join(content):
+            content = []
         content = [re.sub("Functions called by friend functions defined (here|for +\w+)\.?","",c) for c in content]
         self.doc_target("casadi::casadi_" + m.group(1), content,correction=False)
         target = target.split("(")[0]

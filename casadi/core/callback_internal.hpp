@@ -35,19 +35,23 @@ namespace casadi {
   public:
 
     /** \brief Constructor
+
         \identifier{17w} */
     explicit CallbackInternal(const std::string& name, Callback* self);
 
     /** \brief Destructor
+
         \identifier{17x} */
     ~CallbackInternal() override;
 
     /** \brief Get type name
+
         \identifier{17y} */
     std::string class_name() const override {return "CallbackInternal";}
 
     ///@{
     /** \brief Number of function inputs and outputs
+
         \identifier{17z} */
     size_t get_n_in() override;
     size_t get_n_out() override;
@@ -55,6 +59,7 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs
+
         \identifier{180} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
@@ -62,38 +67,45 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs
+
         \identifier{181} */
     std::string get_name_in(casadi_int i) override;
     std::string get_name_out(casadi_int i) override;
     /// @}
 
     /** \brief  Initialize
+
         \identifier{182} */
     void init(const Dict& opts) override;
 
     /** \brief Finalize the object creation
+
         \identifier{183} */
     void finalize() override;
 
     ///@{
     /** \brief Evaluate with DM matrices
+
         \identifier{184} */
     std::vector<DM> eval_dm(const std::vector<DM>& arg) const override;
     bool has_eval_dm() const override { return !has_eval_buffer_;}
     ///@}
 
     /** \brief  Evaluate numerically
+
         \identifier{185} */
     virtual int eval(const double** arg, double** res,
       casadi_int* iw, double* w, void* mem) const override;
     bool has_eval_buffer() const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
+
         \identifier{186} */
     bool uses_output() const override;
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements
+
         \identifier{187} */
     bool has_jacobian() const override;
     Function get_jacobian(const std::string& name,
@@ -104,6 +116,7 @@ namespace casadi {
 
     ///@{
     /** \brief Return sparsity of Jacobian of an output respect to an input
+
         \identifier{188} */
     bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override;
     Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
@@ -111,6 +124,7 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates forward derivatives
+
         \identifier{189} */
     bool has_forward(casadi_int nfwd) const override;
     Function get_forward(casadi_int nfwd, const std::string& name,
@@ -121,6 +135,7 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives
+
         \identifier{18a} */
     bool has_reverse(casadi_int nadj) const override;
     Function get_reverse(casadi_int nadj, const std::string& name,
@@ -130,6 +145,7 @@ namespace casadi {
     ///@}
 
     /** \brief Pointer to the public class
+
         \identifier{18b} */
     Callback* self_;
 

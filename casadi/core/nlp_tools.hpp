@@ -73,6 +73,7 @@ namespace casadi {
 
 
   /** \brief Check sos structure and generate defaults
+
       \identifier{1sx} */
   template <class T>
   void check_sos(casadi_int nx, const std::vector< std::vector<T> >& groups,

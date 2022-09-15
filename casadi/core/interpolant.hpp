@@ -136,6 +136,7 @@ namespace casadi {
    * 
    * By default, derivatives wrt the coefficients are not supported (zero).
    * Some interpolant plugins may support the `inline=true` which enables correct derivatives
+
       \identifier{1p5} */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
