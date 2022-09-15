@@ -156,6 +156,9 @@ namespace casadi {
       {"feas_tol",
        {OT_DOUBLE,
         "Feasibility tolerance. Below this tolerance an iterate is considered to be feasible."}},
+      {"tr_rad0",
+       {OT_DOUBLE,
+        "Initial trust-region radius."}},
       {"tr_eta1",
        {OT_DOUBLE,
         "Lower eta in trust-region acceptance criterion."}},
@@ -230,6 +233,7 @@ namespace casadi {
     tr_acceptance_ = 1e-8;
     tr_rad_min_ = 1e-10; //is this valid??
     tr_rad_max_ = 10.0;
+    tr_rad_ = 1.0;
     contraction_acceptance_value_ = 0.5;
     watchdog_ = 5;
     max_inner_iter_ = 50;
@@ -326,6 +330,8 @@ namespace casadi {
         optim_tol_ = op.second;
       } else if (op.first == "feas_tol") {
         feas_tol_ = op.second;
+      } else if (op.first == "tr_rad0") {
+        tr_rad_ = op.second;
       } else if (op.first == "tr_eta1") {
         tr_eta1_ = op.second;
       } else if (op.first == "tr_eta2") {
@@ -509,6 +515,18 @@ namespace casadi {
     return 0;
   }
 
+double Feasiblesqpmethod::eval_m_k(void* mem) const {
+  auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
+  // auto d_nlp = &m->d_nlp;
+  auto d = &m->d;
+
+  return 0.5*casadi_bilin(d->Bk, Hsp_, d->dx, d->dx) + casadi_dot(nx_, d->gf, d->dx);
+}
+
+double Feasiblesqpmethod::eval_tr_ratio(double val_f, double val_f_corr, double val_m_k) const{
+  return (val_f - val_f_corr) / val_m_k;
+}
+
 int Feasiblesqpmethod::solve(void* mem) const {
     auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
     auto d_nlp = &m->d_nlp;
@@ -518,10 +536,10 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->iter_count = 0;
 
     // Number of line-search iterations
-    casadi_int ls_iter = 0;
+    // casadi_int ls_iter = 0;
 
     // Last linesearch successfull
-    bool ls_success = true;
+    // bool ls_success = true;
 
     // Last second order correction successfull
     // bool so_succes = false;
@@ -530,6 +548,13 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->merit_ind = 0;
     m->sigma = 0.;    // NOTE: Move this into the main optimization loop
     m->reg = 0;
+
+    // Default quadratic model value of objective
+    double m_k = -1.0;
+
+    double tr_ratio = 0.0;
+
+
 
     // Default stepsize
     double t = 0;
@@ -541,10 +566,10 @@ int Feasiblesqpmethod::solve(void* mem) const {
     string info = "";
 
     // gamma_1
-    double gamma_1;
+    // double gamma_1;
 
     // ela_it
-    casadi_int ela_it = -1;
+    // casadi_int ela_it = -1;
 
     casadi_clear(d->dx, nx_);
 
@@ -609,9 +634,35 @@ int Feasiblesqpmethod::solve(void* mem) const {
         default:
           return 1;
       }
-      uout() << "x0: " << *d_nlp->z << std::endl;
-      uout() << "nlp_f: " << d_nlp->f << std::endl;
-      uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
+      // uout() << "x0: " << *d_nlp->z << std::endl;
+      // uout() << "nlp_f: " << d_nlp->f << std::endl;
+      // uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
+
+      if (exact_hessian_) {
+        // Update/reset exact Hessian
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
+        m->arg[2] = &one;
+        m->arg[3] = d_nlp->lam + nx_;
+        m->res[0] = d->Bk;
+        if (calc_function(m, "nlp_hess_l")) return 1;
+        if (convexify_) {
+          ScopedTiming tic(m->fstats.at("convexify"));
+          if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+        }
+      } else if (m->iter_count==0) {
+        ScopedTiming tic(m->fstats.at("BFGS"));
+        // Initialize BFGS
+        casadi_fill(d->Bk, Hsp_.nnz(), 1.);
+        casadi_bfgs_reset(Hsp_, d->Bk);
+      } else {
+        ScopedTiming tic(m->fstats.at("BFGS"));
+        // Update BFGS
+        if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
+        // Update the Hessian approximation
+        casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
+      }
+
 
       // Evaluate the gradient of the Lagrangian
       casadi_copy(d->gf, nx_, d->gLag);
@@ -628,14 +679,14 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // uout() << "du_inf: " << du_inf << std::endl;
 
       // inf-norm of step, d->dx is a nullptr???
-      uout() << "HERE!!!!" << *d->dx << std::endl;
+      // uout() << "HERE!!!!" << *d->dx << std::endl;
       double dx_norminf = casadi_norm_inf(nx_, d->dx);
 
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
-        print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
-                        m->reg, ls_iter, ls_success, info);
+        print_iteration(m->iter_count, d_nlp->f, m_k, pr_inf, du_inf, dx_norminf,
+                        m->reg, tr_rad_, info);
         info = "";
         // so_succes = false;
       }
@@ -670,30 +721,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
       //   break;
       // }
 
-      if (exact_hessian_) {
-        // Update/reset exact Hessian
-        m->arg[0] = d_nlp->z;
-        m->arg[1] = d_nlp->p;
-        m->arg[2] = &one;
-        m->arg[3] = d_nlp->lam + nx_;
-        m->res[0] = d->Bk;
-        if (calc_function(m, "nlp_hess_l")) return 1;
-        if (convexify_) {
-          ScopedTiming tic(m->fstats.at("convexify"));
-          if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
-        }
-      } else if (m->iter_count==0) {
-        ScopedTiming tic(m->fstats.at("BFGS"));
-        // Initialize BFGS
-        casadi_fill(d->Bk, Hsp_.nnz(), 1.);
-        casadi_bfgs_reset(Hsp_, d->Bk);
-      } else {
-        ScopedTiming tic(m->fstats.at("BFGS"));
-        // Update BFGS
-        if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
-        // Update the Hessian approximation
-        casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
-      }
+      
 
       // Formulate the QP
       casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
@@ -1043,31 +1071,27 @@ int Feasiblesqpmethod::solve(void* mem) const {
   }
 
   void Feasiblesqpmethod::print_iteration() const {
-    print("%4s %14s %9s %9s %9s %7s %2s %7s\n", "iter", "objective", "inf_pr",
-          "inf_du", "||d||", "lg(rg)", "ls", "info");
+    print("%4s %9s %14s %9s %9s %9s %7s %5s %7s\n", "iter", "m_k", "objective", "inf_pr",
+          "inf_du", "||d||", "lg(rg)", "tr_rad", "info");
   }
 
   void Feasiblesqpmethod::print_iteration(casadi_int iter, double obj,
-                                  double pr_inf, double du_inf,
+                                  double m_k, double pr_inf, double du_inf,
                                   double dx_norm, double rg,
-                                  casadi_int ls_trials, bool ls_success,
+                                  double tr_rad,
                                   std::string info) const {
-    print("%4d %14.6e %9.2e %9.2e %9.2e ", iter, obj, pr_inf, du_inf, dx_norm);
+    print("%4d %9.2e %14.6e %9.2e %9.2e %9.2e ", iter, obj, pr_inf, du_inf, dx_norm);
     if (rg>0) {
       print("%7.2f ", log10(rg));
     } else {
       print("%7s ", "-");
     }
     
-    print("%2d", ls_trials);
-    if (!ls_success) {
-      print("F");
-    } else {
-      print (" ");
-    }
-    
-    // if (so_succes) {
-    //   print(" - SOC");
+    print("%9.5e", tr_rad);
+    // if (!ls_success) {
+    //   print("F");
+    // } else {
+    //   print (" ");
     // }
     
     print(" - ");
@@ -1795,7 +1819,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // s.unpack("Feasiblesqpmethod::c1", c1_);
     // s.unpack("Feasiblesqpmethod::beta", beta_);
     // s.unpack("Feasiblesqpmethod::max_iter_ls_", max_iter_ls_);
-    s.unpack("Feasiblesqpmethod::merit_memsize_", merit_memsize_);
+    // s.unpack("Feasiblesqpmethod::merit_memsize_", merit_memsize_);
     // s.unpack("Feasiblesqpmethod::beta", beta_);
     s.unpack("Feasiblesqpmethod::print_header", print_header_);
     s.unpack("Feasiblesqpmethod::print_iteration", print_iteration_);
@@ -1867,7 +1891,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // s.pack("Feasiblesqpmethod::c1", c1_);
     // s.pack("Feasiblesqpmethod::beta", beta_);
     // s.pack("Feasiblesqpmethod::max_iter_ls_", max_iter_ls_);
-    s.pack("Feasiblesqpmethod::merit_memsize_", merit_memsize_);
+    // s.pack("Feasiblesqpmethod::merit_memsize_", merit_memsize_);
     // s.pack("Feasiblesqpmethod::beta", beta_);
     s.pack("Feasiblesqpmethod::print_header", print_header_);
     s.pack("Feasiblesqpmethod::print_iteration", print_iteration_);

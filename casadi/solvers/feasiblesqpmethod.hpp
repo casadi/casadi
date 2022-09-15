@@ -100,6 +100,10 @@ namespace casadi {
     void set_work(void* mem, const double**& arg, double**& res,
                           casadi_int*& iw, double*& w) const override;
 
+    double eval_m_k(void* mem) const;
+
+    double eval_tr_ratio(double val_f, double val_f_corr, double val_m_k) const;
+
     // Solve the NLP
     int solve(void* mem) const override;
 
@@ -165,6 +169,7 @@ namespace casadi {
     double tr_eta1_, tr_eta2_;
     double tr_alpha1_, tr_alpha2_;
     double tr_tol_;
+    double tr_rad_;
     double tr_acceptance_;
     double tr_rad_min_, tr_rad_max_;
 
@@ -189,8 +194,8 @@ namespace casadi {
     void print_iteration() const;
 
     /// Print iteration
-    void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
-                         double dx_norm, double rg, casadi_int ls_trials, bool ls_success, 
+    void print_iteration(casadi_int iter, double obj, double m_k, double pr_inf, double du_inf,
+                         double dx_norm, double rg, double tr_rad, 
                          std::string info) const;
 
     // Solve the QP subproblem: mode 0 = normal, mode 1 = SOC
