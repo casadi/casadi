@@ -42,8 +42,10 @@
 #include <ctime>
 
 /** \defgroup plugin_Rootfinder_kinsol
+
  KINSOL interface from the Sundials suite
-*/
+
+    \identifier{226} */
 /** \pluginsection{Rootfinder,kinsol} */
 
 /// \cond INTERNAL

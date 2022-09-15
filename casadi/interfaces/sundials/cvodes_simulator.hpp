@@ -40,7 +40,8 @@
 /** \defgroup plugin_Simulator_cvodes
 
       Interface to CVodes from the Sundials suite.
-*/
+
+    \identifier{227} */
 
 /** \pluginsection{Simulator,cvodes} */
 

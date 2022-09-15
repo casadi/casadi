@@ -33,6 +33,7 @@
 namespace casadi {
 
   /** \defgroup main_simulator
+
       Create an ODE/DAE simulator
       Solves an initial value problem (IVP) with the differential equation given as an
       implicit ODE coupled to an algebraic equation and a set of output equations:
@@ -57,7 +58,8 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2011-2021
-  */
+
+      \identifier{21m} */
   /** \defgroup simulator
   * @copydoc main_simulator
   *  @{
@@ -168,7 +170,6 @@ namespace casadi {
 
       \identifier{x4} */
   inline casadi_int dyn_n_out() { return DYN_NUM_OUT;}
-  /** @} */
 
   /** \brief Get simulator input scheme name by index
 

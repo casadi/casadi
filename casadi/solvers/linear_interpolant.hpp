@@ -30,7 +30,8 @@
 #include <casadi/solvers/casadi_interpolant_linear_export.h>
 
 /** \defgroup plugin_Interpolant_linear
-*/
+
+    \identifier{23b} */
 
 /** \pluginsection{Interpolant,linear} */
 

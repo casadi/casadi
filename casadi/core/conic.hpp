@@ -31,6 +31,7 @@
 namespace casadi {
 
   /** \defgroup main_conic
+
       Create a QP solver
       Solves the following strictly convex problem:
 
@@ -80,7 +81,8 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2011-2015
-  */
+
+      \identifier{21n} */
 
   /** \defgroup conic
   * @copydoc main_conic

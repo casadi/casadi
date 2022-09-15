@@ -62,7 +62,8 @@
  * Change the 'fixed_variable_treatment' to 'make_constraint' or 'relax_bounds' to obtain
  * correct results.
  *
- */
+
+    \identifier{223} */
 
 /** \pluginsection{Nlpsol,bonmin} **/
 

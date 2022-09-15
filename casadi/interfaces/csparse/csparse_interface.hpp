@@ -27,8 +27,10 @@
 #define CASADI_CSPARSE_INTERFACE_HPP
 
 /** \defgroup plugin_Linsol_csparse
+
  * Linsol with CSparse Interface
-*/
+
+    \identifier{21t} */
 
 /** \pluginsection{Linsol,csparse} */
 

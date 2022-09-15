@@ -47,12 +47,14 @@ extern "C" {
 }
 
 /** \defgroup plugin_Linsol_ma27
+
  * Interface to the sparse direct linear solver MA27
  * Works for symmetric indefinite systems
  * Partly adopted from qpOASES 3.2
  * \author Joel Andersson
  * \date 2016
- */
+
+    \identifier{229} */
 
 /** \pluginsection{Linsol,ma27} */
 /// \cond INTERNAL

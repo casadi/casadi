@@ -33,6 +33,7 @@
 namespace casadi {
 
   /** \defgroup main_integrator
+
       Create an ODE/DAE integrator
       Solves an initial value problem (IVP) coupled to a terminal value problem
       with differential equation given as an implicit ODE coupled to an algebraic
@@ -68,7 +69,8 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2011-2015
-  */
+
+      \identifier{21k} */
   /** \defgroup integrator
   * @copydoc main_integrator
   *  @{

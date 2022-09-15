@@ -222,7 +222,7 @@ namespace casadi {
                             const std::vector<casadi_int>& col);
     ///@}
 
-    /** \brrief Create a sparsity from nonzeros
+    /** \brief Create a sparsity from nonzeros
     *
     * Inverse of `find()`
     */

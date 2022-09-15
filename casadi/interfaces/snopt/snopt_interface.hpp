@@ -35,8 +35,10 @@ extern "C" {
 }
 
 /** \defgroup plugin_Nlpsol_snopt
+
   SNOPT interface
-*/
+
+    \identifier{22m} */
 
 /** \pluginsection{Nlpsol,snopt} */
 

@@ -32,6 +32,7 @@
 namespace casadi {
 
   /** \defgroup main_rootfinder
+
    * Create a solver for rootfinding problems
    * Takes a function where one of the inputs is unknown and one of the outputs
    * is a residual function that is always zero, defines a new function where
@@ -53,7 +54,8 @@ namespace casadi {
    *
    * \author Joel Andersson
    * \date 2011-2015
-   */
+
+      \identifier{21r} */
 
 
   /** \defgroup rootfinder

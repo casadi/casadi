@@ -33,11 +33,13 @@
 #include <mumps/dmumps_c.h>
 
 /** \defgroup plugin_Linsol_mumps
+
  * Interface to the sparse direct linear solver MUMPS
  * Works for symmetric indefinite systems
  * \author Joel Andersson
  * \date 2019
- */
+
+    \identifier{22t} */
 
 /** \pluginsection{Linsol,mumps} */
 /// \cond INTERNAL

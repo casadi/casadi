@@ -38,8 +38,10 @@
 #include <ctime>
 
 /** \defgroup plugin_Integrator_idas
+
       Interface to IDAS from the Sundials suite.
-*/
+
+    \identifier{225} */
 
 /** \pluginsection{Integrator,idas} */
 

@@ -37,7 +37,8 @@
       see highs.dev for more information and
       https://www.maths.ed.ac.uk/hall/HiGHS/HighsOptions.html
       for a list of options.
-*/
+
+    \identifier{22f} */
 
 /** \pluginsection{Conic,highs} */
 

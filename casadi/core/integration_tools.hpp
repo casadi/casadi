@@ -49,9 +49,9 @@ namespace casadi {
   /** \brief Obtain collocation interpolating matrices
   
   A collocation method poses a polynomial Pi that interpolates exactly through
-  an initial state (0,X_0) and helper states at collocation points (tau_j,X@collPoint(j)).
+  an initial state (0,X_0) and helper states at collocation points (tau_j,X:collPoint(j)).
 
-  This function computes the linear mapping between dPi/dt and coefficients Z=[X_0 X@collPoints].
+  This function computes the linear mapping between dPi/dt and coefficients Z=[X_0 X:collPoints].
 
   \param tau  location of collocation points, as obtained from collocation_points
   \param[out] output_C interpolating coefficients to obtain derivatives.

@@ -36,7 +36,8 @@
 /** \defgroup plugin_Conic_cbc
 
       Interface to Cbc solver for sparse Quadratic Programs
-*/
+
+    \identifier{221} */
 
 /** \pluginsection{Conic,cbc} */
 

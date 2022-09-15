@@ -27,8 +27,10 @@
 #define CASADI_TINYXML_INTERFACE_HPP
 
 /** \defgroup plugin_XmlFile_tinyxml
+
  * XmlFile using TinyXml
-*/
+
+    \identifier{22i} */
 
 /** \pluginsection{XmlFile,tinyxml} */
 

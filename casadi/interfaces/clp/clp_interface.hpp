@@ -38,7 +38,8 @@
 /** \defgroup plugin_Conic_clp
 
       Interface to Clp solver for sparse Quadratic Programs
-*/
+
+    \identifier{22d} */
 
 /** \pluginsection{Conic,clp} */
 

@@ -28,8 +28,10 @@
 #define CASADI_LINSOL_TRIDIAG_HPP
 
 /** \defgroup plugin_Linsol_tridiag
+
   * Linear solver for tridiagonal matrices
-*/
+
+    \identifier{22v} */
 
 /** \pluginsection{Linsol,tridiag} */
 

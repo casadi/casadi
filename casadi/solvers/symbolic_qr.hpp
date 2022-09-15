@@ -33,7 +33,8 @@
 
        Linsol based on QR factorization with sparsity pattern based reordering
       _without_ partial pivoting
-*/
+
+    \identifier{231} */
 
 /** \pluginsection{Linsol,symbolicqr} */
 
