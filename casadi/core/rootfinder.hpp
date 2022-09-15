@@ -31,7 +31,7 @@
 
 namespace casadi {
 
-  /** \defgroup main_rootfinder
+  /** \defgroup main_rootfinder Title
 
    * Create a solver for rootfinding problems
    * Takes a function where one of the inputs is unknown and one of the outputs
@@ -58,7 +58,7 @@ namespace casadi {
       \identifier{21r} */
 
 
-  /** \defgroup rootfinder
+  /** \defgroup rootfinder Title
   * @copydoc main_rootfinder
   *  @{
   */

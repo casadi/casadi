@@ -59,9 +59,7 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
   if (p->max_iter_ls>0 || so_corr) *sz_w += nx + ng; // z_cand
   // Lagrange gradient in the next iterate
   *sz_w += nx; // gLag
-  *sz_w += nx; // gLag_old
-  // Gradient of the objective
-  *sz_w += nx; // gf
+  *sz_w += nx; // gLag_old*sz_w += nx; // dx
   // Bounds of the QP
   *sz_w += nx + ng; // lbdz
   *sz_w += nx + ng; // ubdz

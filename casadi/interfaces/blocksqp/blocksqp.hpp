@@ -31,7 +31,7 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include "../qpoases/qpoases_interface.hpp"
 
-/** \defgroup plugin_Nlpsol_blocksqp
+/** \defgroup plugin_Nlpsol_blocksqp Title
 
   * This is a modified version of blockSQP by Janka et al.
   *

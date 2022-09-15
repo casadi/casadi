@@ -32,7 +32,7 @@
 #include <mumps/mumps_mpi.h>
 #include <mumps/dmumps_c.h>
 
-/** \defgroup plugin_Linsol_mumps
+/** \defgroup plugin_Linsol_mumps Title
 
  * Interface to the sparse direct linear solver MUMPS
  * Works for symmetric indefinite systems

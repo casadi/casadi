@@ -31,7 +31,7 @@
 namespace casadi {
 
 
-  /** \defgroup main_interpolant
+  /** \defgroup main_interpolant Title
 
    * An interpolant function for lookup table data
    *
@@ -87,7 +87,7 @@ namespace casadi {
 
       \identifier{21p} */
 
-  /** \defgroup interpolant
+  /** \defgroup interpolant Title
   * @copydoc main_interpolant
   *  @{
   */

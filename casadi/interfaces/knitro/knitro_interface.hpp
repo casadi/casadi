@@ -30,7 +30,7 @@
 #include <knitro.h>
 #include "casadi/core/nlpsol_impl.hpp"
 
-/** \defgroup plugin_Nlpsol_knitro
+/** \defgroup plugin_Nlpsol_knitro Title
 
   KNITRO interface
 

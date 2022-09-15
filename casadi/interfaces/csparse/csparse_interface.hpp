@@ -26,7 +26,7 @@
 #ifndef CASADI_CSPARSE_INTERFACE_HPP
 #define CASADI_CSPARSE_INTERFACE_HPP
 
-/** \defgroup plugin_Linsol_csparse
+/** \defgroup plugin_Linsol_csparse Title
 
  * Linsol with CSparse Interface
 

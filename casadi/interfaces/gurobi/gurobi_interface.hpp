@@ -34,7 +34,7 @@ extern "C" {
 #include "gurobi_c.h" // NOLINT(build/include)
 }
 
-/** \defgroup plugin_Conic_gurobi
+/** \defgroup plugin_Conic_gurobi Title
 
     Interface to the GUROBI Solver for quadratic programming
 

@@ -32,7 +32,7 @@
 
 namespace casadi {
 
-  /** \defgroup main_simulator
+  /** \defgroup main_simulator Title
 
       Create an ODE/DAE simulator
       Solves an initial value problem (IVP) with the differential equation given as an
@@ -60,7 +60,7 @@ namespace casadi {
       \date 2011-2021
 
       \identifier{21m} */
-  /** \defgroup simulator
+  /** \defgroup simulator Title
   * @copydoc main_simulator
   *  @{
   */

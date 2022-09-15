@@ -36,7 +36,7 @@
 
 // MACROs that pollute our code
 #undef Q
-/**\defgroup plugin_Nlpsol_worhp
+/**\defgroup plugin_Nlpsol_worhp Title
  WORHP interface
 
  Designed for Worhp 1.12
