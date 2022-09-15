@@ -135,9 +135,9 @@ namespace casadi {
 
     /// Linesearch parameters
     ///@{
-    double c1_;
+    // double c1_;
     double beta_;
-    casadi_int max_iter_ls_;
+    // casadi_int max_iter_ls_;
     casadi_int merit_memsize_;
     ///@}
 

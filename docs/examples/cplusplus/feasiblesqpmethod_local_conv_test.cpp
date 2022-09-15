@@ -69,12 +69,18 @@ int main(int argc, char **argv){
   // Function solver = nlpsol("solver", "sqpmethod", nlp, opts);
   Function solver = nlpsol("solver", "feasiblesqpmethod", nlp, opts);
 
+  uout() << "Here goes the non-converging initial point for local SQP" << std::endl;
   // Solve the problem
   DMDict arg;
-  arg["x0"] = 1.0;//std::vector<double>{2.5,3.0,0.75};
+  arg["x0"] = 1.4;
   arg["lbg"] = -2;
   arg["ubg"] = 2;
   DMDict res = solver(arg);
+  uout() << "Optimal cost:                     " << double(res.at("f")) << std::endl;
+  uout() << "Primal solution:                  " << std::vector<double>(res.at("x")) << std::endl;
+  uout() << "Here goes the converging initial point for local SQP" << std::endl;
+  arg["x0"] = 1.0;//std::vector<double>{2.5,3.0,0.75};
+  res = solver(arg);
 
   //  Print solution
   uout() << "Optimal cost:                     " << double(res.at("f")) << std::endl;

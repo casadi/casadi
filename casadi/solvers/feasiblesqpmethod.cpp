@@ -83,18 +83,18 @@ namespace casadi {
       {"min_iter",
        {OT_INT,
         "Minimum number of SQP iterations"}},
-      {"max_iter_ls",
-       {OT_INT,
-        "Maximum number of linesearch iterations"}},
+      // {"max_iter_ls",
+      //  {OT_INT,
+      //   "Maximum number of linesearch iterations"}},
       {"tol_pr",
        {OT_DOUBLE,
         "Stopping criterion for primal infeasibility"}},
       {"tol_du",
        {OT_DOUBLE,
         "Stopping criterion for dual infeasability"}},
-      {"c1",
-       {OT_DOUBLE,
-        "Armijo condition, coefficient of decrease in merit"}},
+      // {"c1",
+      //  {OT_DOUBLE,
+      //   "Armijo condition, coefficient of decrease in merit"}},
       {"beta",
        {OT_DOUBLE,
         "Line-search parameter, restoration factor of stepsize"}},
@@ -130,7 +130,7 @@ namespace casadi {
       {"convexify_margin",
        {OT_DOUBLE,
         "When using a convexification strategy, make sure that "
-        "the smallest eigenvalue is at least this (default: 1e-7)."}},
+        "the smallest eigenvalue4 is at least this (default: 1e-7)."}},
       {"max_iter_eig",
        {OT_DOUBLE,
         "Maximum number of iterations to compute an eigenvalue decomposition (default: 50)."}},
@@ -187,8 +187,8 @@ namespace casadi {
     // Default options
     min_iter_ = 0;
     max_iter_ = 50;
-    max_iter_ls_ = 3;
-    c1_ = 1e-4;
+    // max_iter_ls_ = 3;
+    // c1_ = 1e-4;
     beta_ = 0.8;
     merit_memsize_ = 4;
     lbfgs_memory_ = 10;
@@ -233,11 +233,14 @@ namespace casadi {
         max_iter_ = op.second;
       } else if (op.first=="min_iter") {
         min_iter_ = op.second;
-      } else if (op.first=="max_iter_ls") {
-        max_iter_ls_ = op.second;
-      } else if (op.first=="c1") {
-        c1_ = op.second;
-      } else if (op.first=="beta") {
+      } 
+      // else if (op.first=="max_iter_ls") {
+      //   max_iter_ls_ = op.second;
+      // } 
+      // else if (op.first=="c1") {
+      //   c1_ = op.second;
+      // } 
+      else if (op.first=="beta") {
         beta_ = op.second;
       } else if (op.first=="merit_memory") {
         merit_memsize_ = op.second;
@@ -462,7 +465,7 @@ namespace casadi {
     p_.sp_h = Hsp_;
     p_.sp_a = Asp_;
     p_.merit_memsize = merit_memsize_;
-    p_.max_iter_ls = max_iter_ls_;
+    // p_.max_iter_ls = max_iter_ls_;
     p_.nlp = &p_nlp_;
   }
 
@@ -1230,7 +1233,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
   // }
 
 void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
-    if (max_iter_ls_) g.add_dependency(get_function("nlp_fg"));
+    // if (max_iter_ls_) g.add_dependency(get_function("nlp_fg"));
     g.add_dependency(get_function("nlp_jac_fg"));
     if (exact_hessian_) g.add_dependency(get_function("nlp_hess_l"));
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
@@ -1264,7 +1267,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "p.sp_h = " << g.sparsity(Hsp_) << ";\n";
     g << "p.sp_a = " << g.sparsity(Asp_) << ";\n";
     g << "p.merit_memsize = " << merit_memsize_ << ";\n";
-    g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
+    // g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
     g << "p.nlp = &p_nlp;\n";
     // g << "casadi_feasiblesqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ", " << so_corr_ << ");\n";
 
@@ -1286,18 +1289,18 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.init_local("m_res", "res+" + str(NLPSOL_NUM_OUT));
     g.local("iter_count", "casadi_int");
     g.init_local("iter_count", "0");
-    if (max_iter_ls_) {
-      //g.local("merit_ind", "casadi_int");
-      //g.init_local("merit_ind", "0");
-      g.local("sigma", "casadi_real");
-      g.init_local("sigma", "0.0");
-    }
-    if (max_iter_ls_) {
-      g.local("ls_iter", "casadi_int");
-      g.init_local("ls_iter", "0");
-      g.local("t", "casadi_real");
-      g.init_local("t", "0.0");
-    }
+    // if (max_iter_ls_) {
+    //   //g.local("merit_ind", "casadi_int");
+    //   //g.init_local("merit_ind", "0");
+    //   g.local("sigma", "casadi_real");
+    //   g.init_local("sigma", "0.0");
+    // }
+    // if (max_iter_ls_) {
+    //   g.local("ls_iter", "casadi_int");
+    //   g.init_local("ls_iter", "0");
+    //   g.local("t", "casadi_real");
+    //   g.init_local("t", "0.0");
+    // }
 
     // if (elastic_mode_ && max_iter_ls_) {
     //   g.local("ls_success", "casadi_int");
@@ -1396,15 +1399,15 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     //   g << "}\n";
     // }
         
-    if (max_iter_ls_ > 0) {
-      g.comment("Calculate penalty parameter of merit function");
-      g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d.dlam")+")") << ";\n";
-      g.comment("Calculate L1-merit function in the actual iterate");
-      g.local("l1_infeas", "casadi_real");
-      g << "l1_infeas = " << g.sum_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
-      g.local("l1", "casadi_real");
-      g << "l1 = m_f + sigma * l1_infeas;\n";
-    }
+    // if (max_iter_ls_ > 0) {
+    //   g.comment("Calculate penalty parameter of merit function");
+    //   g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d.dlam")+")") << ";\n";
+    //   g.comment("Calculate L1-merit function in the actual iterate");
+    //   g.local("l1_infeas", "casadi_real");
+    //   g << "l1_infeas = " << g.sum_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+    //   g.local("l1", "casadi_real");
+    //   g << "l1 = m_f + sigma * l1_infeas;\n";
+    // }
     // if (so_corr_) {
     //   g.local("l1_infeas_cand", "casadi_real");
     //   g.local("l1_cand", "casadi_real");
@@ -1525,77 +1528,77 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     //   g << "}\n";
     // }
 
-    if (max_iter_ls_) {
-      g.comment("Detecting indefiniteness");
-      g.comment("Right-hand side of Armijo condition");
-      g.local("F_sens", "casadi_real");
-      g << "F_sens = " << g.dot(nx_, "d.dx", "d.gf") << ";\n";
-      g.local("tl1", "casadi_real");
-      g << "tl1 = F_sens - sigma * l1_infeas;\n";
-      /*g.comment("Storing the actual merit function value in a list");
-      g << "d.merit_mem[merit_ind] = l1;\n";
-      g << "merit_ind++;\n";
-      g << "merit_ind %= " << merit_memsize_ << ";\n";
-      g.comment("Calculating maximal merit function value so far");
-      g.local("meritmax", "casadi_real");
-      g << "meritmax = " << g.vfmax("d.merit_mem+1", g.min(str(merit_memsize_),
-           "iter_count")+"-1", "d.merit_mem[0]") << "\n";*/
-      g.comment("Stepsize");
-      g << "t = 1.0;\n";
-      g.local("fk_cand", "casadi_real");
-      g.comment("Merit function value in candidate");
-      g.local("l1_cand", "casadi_real");
-      g << "l1_cand = 0.0;\n";
-      g.comment("Reset line-search counter, success marker");
-      g << "ls_iter = 0;\n";
-      // if (elastic_mode_ && max_iter_ls_) g << "ls_success = 1;\n";
-      g.comment("Line-search loop");
-      g << "while (1) {\n";
-      g.comment(" Increase counter");
-      g << "ls_iter++;\n";
+    // if (max_iter_ls_) {
+    //   g.comment("Detecting indefiniteness");
+    //   g.comment("Right-hand side of Armijo condition");
+    //   g.local("F_sens", "casadi_real");
+    //   g << "F_sens = " << g.dot(nx_, "d.dx", "d.gf") << ";\n";
+    //   g.local("tl1", "casadi_real");
+    //   g << "tl1 = F_sens - sigma * l1_infeas;\n";
+    //   /*g.comment("Storing the actual merit function value in a list");
+    //   g << "d.merit_mem[merit_ind] = l1;\n";
+    //   g << "merit_ind++;\n";
+    //   g << "merit_ind %= " << merit_memsize_ << ";\n";
+    //   g.comment("Calculating maximal merit function value so far");
+    //   g.local("meritmax", "casadi_real");
+    //   g << "meritmax = " << g.vfmax("d.merit_mem+1", g.min(str(merit_memsize_),
+    //        "iter_count")+"-1", "d.merit_mem[0]") << "\n";*/
+    //   g.comment("Stepsize");
+    //   g << "t = 1.0;\n";
+    //   g.local("fk_cand", "casadi_real");
+    //   g.comment("Merit function value in candidate");
+    //   g.local("l1_cand", "casadi_real");
+    //   g << "l1_cand = 0.0;\n";
+    //   g.comment("Reset line-search counter, success marker");
+    //   g << "ls_iter = 0;\n";
+    //   // if (elastic_mode_ && max_iter_ls_) g << "ls_success = 1;\n";
+    //   g.comment("Line-search loop");
+    //   g << "while (1) {\n";
+    //   g.comment(" Increase counter");
+    //   g << "ls_iter++;\n";
 
-      g.comment("Candidate step");
-      g << g.copy("d_nlp.z", nx_, "d.z_cand") << "\n";
-      g << g.axpy(nx_, "t", "d.dx", "d.z_cand") << "\n";
-      g.comment("Evaluating objective and constraints");
-      g << "m_arg[0] = d.z_cand;\n";
-      g << "m_arg[1] = m_p;\n";
-      g << "m_res[0] = &fk_cand;\n";
-      g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n";
-      std::string nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
-      g << "if (" << nlp_fg << ") {\n";
-      g.comment("Avoid infinite recursion");
-      g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
-      // if (elastic_mode_ && max_iter_ls_) g << "ls_success = 0;\n";
-      g << "break;\n";
-      g << "}\n";
-      g.comment("line-search failed, skip iteration");
-      g << "t = " << beta_ << "* t;\n";
-      g << "continue;\n";
-      g << "}\n";
+    //   g.comment("Candidate step");
+    //   g << g.copy("d_nlp.z", nx_, "d.z_cand") << "\n";
+    //   g << g.axpy(nx_, "t", "d.dx", "d.z_cand") << "\n";
+    //   g.comment("Evaluating objective and constraints");
+    //   g << "m_arg[0] = d.z_cand;\n";
+    //   g << "m_arg[1] = m_p;\n";
+    //   g << "m_res[0] = &fk_cand;\n";
+    //   g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n";
+    //   std::string nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
+    //   g << "if (" << nlp_fg << ") {\n";
+    //   g.comment("Avoid infinite recursion");
+    //   g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
+    //   // if (elastic_mode_ && max_iter_ls_) g << "ls_success = 0;\n";
+    //   g << "break;\n";
+    //   g << "}\n";
+    //   g.comment("line-search failed, skip iteration");
+    //   g << "t = " << beta_ << "* t;\n";
+    //   g << "continue;\n";
+    //   g << "}\n";
 
-      g.comment("Calculating merit-function in candidate");
-      g << "l1_cand = fk_cand + sigma * "
-        << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") + ";\n";
-      g << "if (l1_cand <= l1 + t * " << c1_ << "* tl1) {\n";
-      g << "break;\n";
-      g << "}\n";
-      g.comment("Line-search not successful, but we accept it.");
-      g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
-      // if (elastic_mode_ && max_iter_ls_) g << "ls_success = 0;\n";
-      g << "break;\n";
-      g << "}\n";
-      g.comment("Backtracking");
-      g << "t = " << beta_ << "* t;\n";
-      g << "}\n";
-      g.comment("Candidate accepted, update dual variables");
-      g << g.scal(nx_+ng_, "1-t", "d_nlp.lam") << "\n";
-      g << g.axpy(nx_+ng_, "t", "d.dlam", "d_nlp.lam") << "\n";
-      g << g.scal(nx_, "t", "d.dx") << "\n";
-    } else {
-      g.comment("Full step");
-      g << g.copy("d.dlam", nx_ + ng_, "d_nlp.lam") << "\n";
-    }
+    //   g.comment("Calculating merit-function in candidate");
+    //   g << "l1_cand = fk_cand + sigma * "
+    //     << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") + ";\n";
+    //   g << "if (l1_cand <= l1 + t * " << c1_ << "* tl1) {\n";
+    //   g << "break;\n";
+    //   g << "}\n";
+    //   g.comment("Line-search not successful, but we accept it.");
+    //   g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
+    //   // if (elastic_mode_ && max_iter_ls_) g << "ls_success = 0;\n";
+    //   g << "break;\n";
+    //   g << "}\n";
+    //   g.comment("Backtracking");
+    //   g << "t = " << beta_ << "* t;\n";
+    //   g << "}\n";
+    //   g.comment("Candidate accepted, update dual variables");
+    //   g << g.scal(nx_+ng_, "1-t", "d_nlp.lam") << "\n";
+    //   g << g.axpy(nx_+ng_, "t", "d.dlam", "d_nlp.lam") << "\n";
+    //   g << g.scal(nx_, "t", "d.dx") << "\n";
+    // } else {
+    g.comment("Full step");
+    g << g.copy("d.dlam", nx_ + ng_, "d_nlp.lam") << "\n";
+    // }
 
     g.comment("Take step");
     g << g.axpy(nx_, "1.0", "d.dx", "d_nlp.z") << "\n";
@@ -1773,9 +1776,9 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.unpack("Feasiblesqpmethod::tol_pr_", tol_pr_);
     s.unpack("Feasiblesqpmethod::tol_du_", tol_du_);
     s.unpack("Feasiblesqpmethod::min_step_size_", min_step_size_);
-    s.unpack("Feasiblesqpmethod::c1", c1_);
+    // s.unpack("Feasiblesqpmethod::c1", c1_);
     s.unpack("Feasiblesqpmethod::beta", beta_);
-    s.unpack("Feasiblesqpmethod::max_iter_ls_", max_iter_ls_);
+    // s.unpack("Feasiblesqpmethod::max_iter_ls_", max_iter_ls_);
     s.unpack("Feasiblesqpmethod::merit_memsize_", merit_memsize_);
     s.unpack("Feasiblesqpmethod::beta", beta_);
     s.unpack("Feasiblesqpmethod::print_header", print_header_);
@@ -1845,9 +1848,9 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.pack("Feasiblesqpmethod::tol_pr_", tol_pr_);
     s.pack("Feasiblesqpmethod::tol_du_", tol_du_);
     s.pack("Feasiblesqpmethod::min_step_size_", min_step_size_);
-    s.pack("Feasiblesqpmethod::c1", c1_);
+    // s.pack("Feasiblesqpmethod::c1", c1_);
     s.pack("Feasiblesqpmethod::beta", beta_);
-    s.pack("Feasiblesqpmethod::max_iter_ls_", max_iter_ls_);
+    // s.pack("Feasiblesqpmethod::max_iter_ls_", max_iter_ls_);
     s.pack("Feasiblesqpmethod::merit_memsize_", merit_memsize_);
     s.pack("Feasiblesqpmethod::beta", beta_);
     s.pack("Feasiblesqpmethod::print_header", print_header_);
