@@ -29,7 +29,7 @@
 #include "casadi/core/rootfinder_impl.hpp"
 #include <casadi/solvers/casadi_rootfinder_nlpsol_export.h>
 
-/** \defgroup plugin_Rootfinder_nlp
+/** \defgroup plugin_Rootfinder_nlp Title
 
   Use an Nlpsol as Rootfinder solver
 

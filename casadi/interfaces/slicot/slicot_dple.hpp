@@ -30,7 +30,7 @@
 #include "../../core/linsol.hpp"
 #include <casadi/interfaces/slicot/casadi_dple_slicot_export.h>
 
-/** \defgroup plugin_Dple_slicot
+/** \defgroup plugin_Dple_slicot Title
  *
  * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
 

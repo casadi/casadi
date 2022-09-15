@@ -37,7 +37,7 @@
 #include <idas/idas_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_Integrator_idas
+/** \defgroup plugin_Integrator_idas Title
 
       Interface to IDAS from the Sundials suite.
 

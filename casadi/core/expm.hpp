@@ -30,7 +30,7 @@
 
 namespace casadi {
 
-  /** \defgroup main_expm
+  /** \defgroup main_expm Title
 
       Performs a matrix exponentiation
       expm(A)
@@ -44,7 +44,7 @@ namespace casadi {
 
       \identifier{21l} */
 
-  /** \defgroup expm
+  /** \defgroup expm Title
   * @copydoc main_expm
   *  @{
   */

@@ -29,7 +29,7 @@
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/ooqp/casadi_conic_ooqp_export.h>
 
-/** \defgroup plugin_Conic_ooqp
+/** \defgroup plugin_Conic_ooqp Title
 
  Interface to the OOQP Solver for quadratic programming
   The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.

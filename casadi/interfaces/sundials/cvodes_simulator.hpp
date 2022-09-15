@@ -37,7 +37,7 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_Simulator_cvodes
+/** \defgroup plugin_Simulator_cvodes Title
 
       Interface to CVodes from the Sundials suite.
 

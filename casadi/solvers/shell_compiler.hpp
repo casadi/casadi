@@ -30,7 +30,7 @@
 #include <casadi/solvers/casadi_importer_shell_export.h>
 #include "casadi/core/plugin_interface.hpp"
 
-/** \defgroup plugin_Importer_shell
+/** \defgroup plugin_Importer_shell Title
 
       Interface to the JIT compiler SHELL
 

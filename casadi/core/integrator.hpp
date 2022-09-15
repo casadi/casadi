@@ -32,7 +32,7 @@
 
 namespace casadi {
 
-  /** \defgroup main_integrator
+  /** \defgroup main_integrator Title
 
       Create an ODE/DAE integrator
       Solves an initial value problem (IVP) coupled to a terminal value problem
@@ -71,7 +71,7 @@ namespace casadi {
       \date 2011-2015
 
       \identifier{21k} */
-  /** \defgroup integrator
+  /** \defgroup integrator Title
   * @copydoc main_integrator
   *  @{
   */

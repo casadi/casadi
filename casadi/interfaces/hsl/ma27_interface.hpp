@@ -46,7 +46,7 @@ extern "C" {
                int* ICNTL, double* CNTL);
 }
 
-/** \defgroup plugin_Linsol_ma27
+/** \defgroup plugin_Linsol_ma27 Title
 
  * Interface to the sparse direct linear solver MA27
  * Works for symmetric indefinite systems

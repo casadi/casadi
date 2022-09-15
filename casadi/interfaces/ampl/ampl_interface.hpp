@@ -29,7 +29,7 @@
 #include <casadi/interfaces/ampl/casadi_nlpsol_ampl_export.h>
 #include "casadi/core/nlpsol_impl.hpp"
 
-/** \defgroup plugin_Nlpsol_ampl
+/** \defgroup plugin_Nlpsol_ampl Title
 
   * Interface to AMPL
   *

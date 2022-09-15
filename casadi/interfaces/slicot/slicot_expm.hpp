@@ -30,7 +30,7 @@
 #include "../../core/linsol.hpp"
 #include <casadi/interfaces/slicot/casadi_expm_slicot_export.h>
 
-/** \defgroup plugin_Expm_slicot
+/** \defgroup plugin_Expm_slicot Title
  *
 
     \identifier{22l} */

@@ -29,7 +29,7 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include <casadi/solvers/casadi_nlpsol_scpgen_export.h>
 
-/** \defgroup plugin_Nlpsol_scpgen
+/** \defgroup plugin_Nlpsol_scpgen Title
 
    A structure-exploiting sequential quadratic programming
      (to be come sequential convex programming) method for nonlinear programming.

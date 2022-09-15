@@ -31,7 +31,7 @@
 #include "Highs.h"
 #include <string>
 
-/** \defgroup plugin_Conic_highs
+/** \defgroup plugin_Conic_highs Title
 
       Interface to HiGHS solver for sparse Quadratic Programs,
       see highs.dev for more information and

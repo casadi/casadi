@@ -34,7 +34,7 @@ extern "C" {
 #include "snopt_cwrap.h" // NOLINT(build/include)
 }
 
-/** \defgroup plugin_Nlpsol_snopt
+/** \defgroup plugin_Nlpsol_snopt Title
 
   SNOPT interface
 

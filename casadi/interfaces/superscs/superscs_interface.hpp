@@ -31,7 +31,7 @@
 
 #include <scs_parser.h>
 
-/** \defgroup plugin_Conic_superscs
+/** \defgroup plugin_Conic_superscs Title
 
     Interface to the SuperSCS solver for conic programming
 

@@ -30,7 +30,7 @@
 #include <casadi/solvers/casadi_conic_nlpsol_export.h>
 
 
-/** \defgroup plugin_Conic_nlpsol
+/** \defgroup plugin_Conic_nlpsol Title
 
    Solve QPs using an Nlpsol
    Use the 'nlpsol' option to specify the NLP solver to use.

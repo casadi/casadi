@@ -27,7 +27,7 @@
 #ifndef CASADI_LINSOL_TRIDIAG_HPP
 #define CASADI_LINSOL_TRIDIAG_HPP
 
-/** \defgroup plugin_Linsol_tridiag
+/** \defgroup plugin_Linsol_tridiag Title
 
   * Linear solver for tridiagonal matrices
 

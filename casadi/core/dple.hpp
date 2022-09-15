@@ -30,7 +30,7 @@
 
 namespace casadi {
 
-  /** \defgroup main_dple
+  /** \defgroup main_dple Title
 
       Discrete periodic Lyapunov Equation solver
       Given matrices \f$A_k\f$ and symmetric \f$V_k,  k = 0..K-1\f$
@@ -52,7 +52,7 @@ namespace casadi {
 
       \identifier{21o} */
 
-  /** \defgroup dple
+  /** \defgroup dple Title
   * @copydoc main_dple
   *  @{
   */

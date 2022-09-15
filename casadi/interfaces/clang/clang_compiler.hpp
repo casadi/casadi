@@ -60,7 +60,7 @@
 #include <llvm/Support/raw_os_ostream.h>
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
-/** \defgroup plugin_Importer_clang
+/** \defgroup plugin_Importer_clang Title
 
       Interface to the JIT compiler CLANG
 

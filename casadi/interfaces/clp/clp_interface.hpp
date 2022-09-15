@@ -35,7 +35,7 @@
 
 #include <string>
 
-/** \defgroup plugin_Conic_clp
+/** \defgroup plugin_Conic_clp Title
 
       Interface to Clp solver for sparse Quadratic Programs
 
