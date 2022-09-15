@@ -56,8 +56,10 @@ enum class Attribute {MIN, MAX, NOMINAL, START, VALUE, STRINGVALUE, NUMEL};
 enum class DependenciesKind {DEPENDENT, CONSTANT, FIXED, TUNABLE, DISCRETE, NUMEL};
 
 /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
+
     \date 2012-2021
     \author Joel Andersson
+
     \identifier{t} */
 struct CASADI_EXPORT Variable {
   /// Constructor
@@ -384,30 +386,37 @@ protected:
   ///@}
 
   /** \brief Definitions of dependent constants
+
       \identifier{u} */
   std::vector<MX> cdef() const;
 
   /** \brief Definitions of dependent parameters
+
       \identifier{v} */
   std::vector<MX> ddef() const;
 
   /** \brief Definitions of dependent variables
+
       \identifier{w} */
   std::vector<MX> wdef() const;
 
   /** \brief Definitions of output variables
+
       \identifier{x} */
   std::vector<MX> ydef() const;
 
   /** \brief ODE right hand sides
+
       \identifier{y} */
   std::vector<MX> ode() const;
 
   /** \brief Algebraic right hand sides
+
       \identifier{z} */
   std::vector<MX> alg() const;
 
   /** \brief Quadrature right hand sides
+
       \identifier{10} */
   std::vector<MX> quad() const;
 
@@ -431,10 +440,12 @@ protected:
   Function::AuxOut lc_;
 
   /** \brief Functions
+
       \identifier{11} */
   std::vector<Function> fun_;
 
   /** \brief Function oracles (cached)
+
       \identifier{12} */
   mutable Function oracle_[2][2][2];
 

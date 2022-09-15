@@ -101,38 +101,47 @@ namespace casadi {
   ///@}
 
   /** \brief Get input scheme of QP solvers
+
       \identifier{1ee} */
   CASADI_EXPORT std::vector<std::string> conic_in();
 
   /** \brief Get QP solver output scheme of QP solvers
+
       \identifier{1ef} */
   CASADI_EXPORT std::vector<std::string> conic_out();
 
   /** \brief Get QP solver input scheme name by index
+
       \identifier{1eg} */
   CASADI_EXPORT std::string conic_in(casadi_int ind);
 
   /** \brief Get output scheme name by index
+
       \identifier{1eh} */
   CASADI_EXPORT std::string conic_out(casadi_int ind);
 
   /** \brief Get the number of QP solver inputs
+
       \identifier{1ei} */
   CASADI_EXPORT casadi_int conic_n_in();
 
   /** \brief Get the number of QP solver outputs
+
       \identifier{1ej} */
   CASADI_EXPORT casadi_int conic_n_out();
 
   /** \brief Get all options for a plugin
+
       \identifier{1ek} */
   CASADI_EXPORT std::vector<std::string> conic_options(const std::string& name);
 
   /** \brief Get type info for a particular option
+
       \identifier{1el} */
   CASADI_EXPORT std::string conic_option_type(const std::string& name, const std::string& op);
 
   /** \brief Get documentation for a particular option
+
       \identifier{1em} */
   CASADI_EXPORT std::string conic_option_info(const std::string& name, const std::string& op);
 

@@ -46,16 +46,19 @@ throw CasadiException("Error in XFunction::" FNAME " for '" + this->name_ + "' "
 namespace casadi {
 
   /** \brief  Internal node class for the base class of SXFunction and MXFunction
+
       (lacks a public counterpart)
       The design of the class uses the curiously recurring template pattern (CRTP) idiom
       \author Joel Andersson
       \date 2011
+
       \identifier{xn} */
   template<typename DerivedType, typename MatType, typename NodeType>
   class CASADI_EXPORT XFunction : public FunctionInternal {
   public:
 
     /** \brief  Constructor
+
         \identifier{xo} */
     XFunction(const std::string& name,
               const std::vector<MatType>& ex_in,
@@ -64,11 +67,13 @@ namespace casadi {
               const std::vector<std::string>& name_out);
 
     /** \brief  Destructor
+
         \identifier{xp} */
     ~XFunction() override {
     }
 
     /** \brief  Initialize
+
         \identifier{xq} */
     void init(const Dict& opts) override;
 
@@ -79,14 +84,17 @@ namespace casadi {
     ///@}
 
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS)
+
         \identifier{xr} */
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
 
     /** \brief  Construct a complete Jacobian by compression
+
         \identifier{xs} */
     std::vector<MatType> jac(const Dict& opts) const;
 
     /** \brief Check if the function is of a particular type
+
         \identifier{xt} */
     bool is_a(const std::string& type, bool recursive) const override {
       return type=="xfunction" || (recursive && FunctionInternal::is_a(type, recursive));
@@ -103,6 +111,7 @@ namespace casadi {
     *
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
     * \param[in] tr   Flip the relationship. Return which expressions contain the variables
+
         \identifier{xu} */
     std::vector<bool> which_depends(const std::string& s_in,
                                             const std::vector<std::string>& s_out,
@@ -110,6 +119,7 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives
+
         \identifier{xv} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
@@ -120,6 +130,7 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives
+
         \identifier{xw} */
     bool has_reverse(casadi_int nadj) const override { return true;}
     Function get_reverse(casadi_int nadj, const std::string& name,
@@ -130,6 +141,7 @@ namespace casadi {
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements
+
         \identifier{xx} */
     bool has_jacobian() const override { return true;}
     Function get_jacobian(const std::string& name,
@@ -139,33 +151,40 @@ namespace casadi {
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original
+
         \identifier{xy} */
     Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
                    const std::vector<casadi_int>& order_out, const Dict& opts) const override;
 
     /** \brief Generate code for the declarations of the C function
+
         \identifier{xz} */
     void codegen_declarations(CodeGenerator& g) const override = 0;
 
     /** \brief Generate code for the body of the C function
+
         \identifier{y0} */
     void codegen_body(CodeGenerator& g) const override = 0;
 
     /** \brief Export function in a specific language
+
         \identifier{y1} */
     void export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const override;
 
     /** \brief Export function body in a specific language
+
         \identifier{y2} */
     virtual void export_code_body(const std::string& lang,
         std::ostream &stream, const Dict& options) const = 0;
 
     /** \brief Is codegen supported?
+
         \identifier{y3} */
     bool has_codegen() const override { return true;}
 
     /** \brief Helper function: Check if a vector equals ex_in
+
         \identifier{y4} */
     virtual bool isInput(const std::vector<MatType>& arg) const;
 
@@ -173,6 +192,7 @@ namespace casadi {
     virtual bool should_inline(bool always_inline, bool never_inline) const = 0;
 
     /** \brief Create call to (cached) derivative function, forward mode
+
         \identifier{y5} */
     void call_forward(const std::vector<MatType>& arg,
                               const std::vector<MatType>& res,
@@ -181,6 +201,7 @@ namespace casadi {
                               bool always_inline, bool never_inline) const override;
 
     /** \brief Create call to (cached) derivative function, reverse mode
+
         \identifier{y6} */
     void call_reverse(const std::vector<MatType>& arg,
                               const std::vector<MatType>& res,
@@ -190,6 +211,7 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs
+
         \identifier{y7} */
     size_t get_n_in() override { return in_.size(); }
     size_t get_n_out() override { return out_.size(); }
@@ -197,15 +219,18 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs
+
         \identifier{y8} */
     Sparsity get_sparsity_in(casadi_int i) override { return in_.at(i).sparsity();}
     Sparsity get_sparsity_out(casadi_int i) override { return out_.at(i).sparsity();}
     /// @}
 
     /** \brief Deserializing constructor
+
         \identifier{y9} */
     explicit XFunction(DeserializingStream& s);
     /** \brief Serialize an object without type information
+
         \identifier{ya} */
     void serialize_body(SerializingStream &s) const override;
 
@@ -213,6 +238,7 @@ namespace casadi {
      *
      * The out member is problematic to de/serialize before the sorted algorithm
      * has a chance of laying out the expression graph efficiently
+
         \identifier{yb} */
     //@{
     void delayed_serialize_members(SerializingStream &s) const;
@@ -222,10 +248,12 @@ namespace casadi {
     // Data members (all public)
 
     /** \brief  Inputs of the function (needed for symbolic calculations)
+
         \identifier{yc} */
     std::vector<MatType> in_;
 
     /** \brief  Outputs of the function (needed for symbolic calculations)
+
         \identifier{yd} */
     std::vector<MatType> out_;
   };

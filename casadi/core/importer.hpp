@@ -33,6 +33,7 @@ namespace casadi {
 
 #ifndef SWIG
     /** \brief Convert to a type
+
         \identifier{15y} */
     template<typename T>
     T text2type(const std::string& text) {
@@ -43,6 +44,7 @@ namespace casadi {
     }
 
     /** \brief Get entry as a vector
+
         \identifier{15z} */
     template<typename T>
     std::vector<T> text2vector(const std::string& text) {
@@ -54,6 +56,7 @@ namespace casadi {
     }
 
     /** \brief Get entry as a set
+
         \identifier{160} */
     template<typename T>
     std::set<T> text2set(const std::string& text) {
@@ -76,12 +79,14 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2015
+
       \identifier{161} */
   class CASADI_EXPORT Importer
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<Importer>) {
   public:
     /** \brief Get type name
+
         \identifier{162} */
     static std::string type_name() {return "Importer";}
 
@@ -123,20 +128,24 @@ namespace casadi {
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node
+
         \identifier{163} */
     static Importer create(ImporterInternal* node);
 
     /** \brief  Create from node and initialize
+
         \identifier{164} */
     static Importer create(ImporterInternal* node, const Dict& opts);
 #endif // SWIG
     /// \endcond
 
     /** \brief Does a meta entry exist?
+
         \identifier{165} */
     bool has_meta(const std::string& cmd, casadi_int ind=-1) const;
 
     /** \brief Get entry as a text
+
         \identifier{166} */
     std::string get_meta(const std::string& cmd, casadi_int ind=-1) const;
 
@@ -158,6 +167,7 @@ namespace casadi {
     }
 
     /** \brief Convert to a type
+
         \identifier{167} */
     template<typename T>
     T to(const std::string& cmd, casadi_int ind=-1) const {
@@ -165,12 +175,14 @@ namespace casadi {
     }
 
     /** \brief Get entry as a string
+
         \identifier{168} */
     std::string meta_string(const std::string& cmd, casadi_int ind=-1) const {
       return to<std::string>(cmd, ind);
     }
 
     /** \brief Get entry as a vector
+
         \identifier{169} */
     template<typename T>
     std::vector<T> meta_vector(const std::string& cmd, casadi_int ind=-1) const {
@@ -178,6 +190,7 @@ namespace casadi {
     }
 
     /** \brief Get entry as a set
+
         \identifier{16a} */
     template<typename T>
     std::set<T> meta_set(const std::string& cmd, casadi_int ind=-1) const {
@@ -185,6 +198,7 @@ namespace casadi {
     }
 
     /** \brief Get entry as an integer
+
         \identifier{16b} */
     casadi_int meta_int(const std::string& cmd, casadi_int ind=-1) const {
       return to<casadi_int>(cmd, ind);
@@ -192,10 +206,12 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Serialize an object
+
         \identifier{16c} */
     void serialize(SerializingStream &s) const;
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{16d} */
     static Importer deserialize(DeserializingStream& s);
   };

@@ -39,6 +39,7 @@ namespace casadi {
   @copydoc Importer_doc
   \author Joel Andersson
   \date 2010-2013
+
     \identifier{218} */
   class CASADI_EXPORT
   ImporterInternal : public SharedObjectInternal,
@@ -52,10 +53,12 @@ namespace casadi {
     ~ImporterInternal() override;
 
     /** \brief Get type name
+
         \identifier{219} */
     std::string class_name() const override { return "ImporterInternal";}
 
     /** \brief Print
+
         \identifier{21a} */
     void disp(std::ostream& stream, bool more) const override;
 
@@ -63,18 +66,22 @@ namespace casadi {
     typedef ImporterInternal* (*Creator)(const std::string& name);
 
     /** \brief Construct
+
         Prepares the function for evaluation
+
         \identifier{21b} */
     void construct(const Dict& opts);
 
     ///@{
     /** \brief Options
+
         \identifier{21c} */
     static const Options options_;
     virtual const Options& get_options() const { return options_;}
     ///@}
 
     /** \brief Initialize
+
         \identifier{21d} */
     virtual void init(const Dict& opts);
 
@@ -102,10 +109,12 @@ namespace casadi {
     bool has_function(const std::string& symname) const;
 
     /** \brief Does an entry exist?
+
         \identifier{21e} */
     bool has_meta(const std::string& cmd, casadi_int ind=-1) const;
 
     /** \brief Get entry as a text
+
         \identifier{21f} */
     std::string get_meta(const std::string& cmd, casadi_int ind=-1) const;
 
@@ -129,6 +138,7 @@ namespace casadi {
     virtual bool can_have_meta() const { return true;}
 
     /** \brief Get entry as a text
+
         \identifier{21g} */
     std::string to_text(const std::string& cmd, casadi_int ind=-1) const;
 
@@ -149,6 +159,7 @@ namespace casadi {
     std::map<std::string, std::pair<bool, std::string> > external_;
 
     /** \brief  Verbose -- for debugging purposes
+
         \identifier{21h} */
     bool verbose_;
 
@@ -164,8 +175,10 @@ namespace casadi {
   };
 
   /** \brief Dynamically linked library
+
       \author Joel Andersson
       \date 2016
+
       \identifier{21i} */
   class CASADI_EXPORT
   DllLibrary : public ImporterInternal {
@@ -189,6 +202,7 @@ namespace casadi {
     ~DllLibrary() override;
 
     /** \brief Get type name
+
         \identifier{21j} */
     std::string class_name() const override { return "DllLibrary";}
 

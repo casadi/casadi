@@ -34,6 +34,7 @@ namespace casadi {
   class CASADI_EXPORT JitFunction : public FunctionInternal {
   public:
     /** \brief Constructor
+
         \identifier{ab} */
     JitFunction(const std::string& name, const std::string& body,
               const std::vector<std::string>& name_in,
@@ -42,41 +43,49 @@ namespace casadi {
               const std::vector<Sparsity>& sparsity_out);
 
     /** \brief Get type name
+
         \identifier{ac} */
     std::string class_name() const override { return "JitFunction";}
 
     /** \brief Destructor
+
         \identifier{ad} */
     ~JitFunction() override;
 
     ///@{
     /** \brief Options
+
         \identifier{ae} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief Initialize
+
         \identifier{af} */
     void init(const Dict& opts) override;
 
     ///@{
     /** \brief Number of function inputs and outputs
+
         \identifier{ag} */
     size_t get_n_in() override { return name_in_.size();}
     size_t get_n_out() override { return name_out_.size();}
     ///@}
 
     /** \brief Is codegen supported?
+
         \identifier{ah} */
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the function body
+
         \identifier{ai} */
     void codegen_body(CodeGenerator& g) const override;
 
     ///@{
     /** \brief Jacobian of all outputs with respect to all inputs
+
         \identifier{aj} */
     bool has_jacobian() const override;
     Function get_jacobian(const std::string& name,

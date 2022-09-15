@@ -99,26 +99,32 @@ namespace casadi {
   CASADI_EXPORT std::string doc_integrator(const std::string& name);
 
   /** \brief Get input scheme of integrators
+
       \identifier{7b} */
   CASADI_EXPORT std::vector<std::string> integrator_in();
 
   /** \brief Get integrator output scheme of integrators
+
       \identifier{7c} */
   CASADI_EXPORT std::vector<std::string> integrator_out();
 
   /** \brief Get integrator input scheme name by index
+
       \identifier{7d} */
   CASADI_EXPORT std::string integrator_in(casadi_int ind);
 
   /** \brief Get output scheme name by index
+
       \identifier{7e} */
   CASADI_EXPORT std::string integrator_out(casadi_int ind);
 
   /** \brief Get the number of integrator inputs
+
       \identifier{7f} */
   CASADI_EXPORT casadi_int integrator_n_in();
 
   /** \brief Get the number of integrator outputs
+
       \identifier{7g} */
   CASADI_EXPORT casadi_int integrator_n_out();
   /** @} */

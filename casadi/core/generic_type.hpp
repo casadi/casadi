@@ -38,6 +38,7 @@ namespace casadi {
 #if !(defined(SWIG) && !defined(SWIGXML))
 
   /** \brief  Types of options
+
       \identifier{17m} */
   enum TypeID {
     OT_NULL,
@@ -59,8 +60,10 @@ namespace casadi {
 #endif // SWIG
 
   /** \brief Generic data type, can hold different types such as bool, casadi_int, string etc.
+
       \author Joel Andersson
       \date 2010
+
       \identifier{17n} */
   class CASADI_EXPORT GenericType
     : public SWIG_IF_ELSE(PrintableCommon, Printable<GenericType>)
@@ -107,6 +110,7 @@ namespace casadi {
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node
+
         \identifier{17o} */
     static GenericType create(SharedObjectInternal* node);
 #endif // SWIG
@@ -152,6 +156,7 @@ namespace casadi {
 
     ///@{
     /** \brief Check if a particular type
+
         \identifier{17p} */
     bool is_bool() const;
     bool is_int() const;
@@ -172,6 +177,7 @@ namespace casadi {
 
     ///@{
     /** \brief Cast to the internal type
+
         \identifier{17q} */
     const bool& as_bool() const;
     const casadi_int& as_int() const;
@@ -214,10 +220,12 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Serialize an object
+
         \identifier{17r} */
     void serialize(SerializingStream& s) const;
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{17s} */
     static GenericType deserialize(DeserializingStream& s);
   };
@@ -267,6 +275,7 @@ namespace casadi {
   CASADI_EXPORT Dict combine(const Dict& first, const Dict& second, bool recurse=false);
 
   /** \brief Update the target dictorionary in place with source elements
+
       \identifier{17u} */
   CASADI_EXPORT void update_dict(Dict& target, const Dict& source, bool recurse=false);
 #endif

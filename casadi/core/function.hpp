@@ -41,6 +41,7 @@ namespace casadi {
 #endif // SWIG
 
   /** \brief Function object
+
       A Function instance is a general multiple-input, multiple-output function
       where each input and output can be a sparse matrix.\n
 
@@ -52,25 +53,30 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2010-2017
+
       \identifier{1uw} */
   class CASADI_EXPORT Function :
     public SharedObject,
     public SWIG_IF_ELSE(PrintableCommon, Printable<Function>) {
   public:
     /** \brief Get type name
+
         \identifier{1ux} */
     static std::string type_name() {return "Function";}
 
     /** \brief Default constructor, null pointer
+
         \identifier{1uy} */
     Function();
 
     /** \brief Construct from a file
+
         \identifier{1uz} */
     Function(const std::string& fname);
 
     ///@{
     /** \brief Construct an SX function
+
         \identifier{1v0} */
     Function(const std::string& name,
              const std::vector<SX>& ex_in,
@@ -90,6 +96,7 @@ namespace casadi {
 
     ///@{
     /** \brief Construct an MX function
+
         \identifier{1v1} */
     Function(const std::string& name,
              const std::vector<MX>& ex_in,
@@ -109,6 +116,7 @@ namespace casadi {
 
     ///@{
     /** \brief To resolve ambiguity on some compilers
+
         \identifier{1v2} */
 #ifndef SWIG
     Function(const std::string& name, SXIList ex_in,
@@ -146,6 +154,7 @@ namespace casadi {
 
     ///@{
     /** \brief Create a just-in-time compiled function from a C language string
+
      * The names and sparsity patterns of all the inputs and outputs must be provided.
      * If sparsities are not provided, all inputs and outputs are assumed to be scalar.
      * Only specify the function body, assuming that input and output nonzeros are
@@ -186,10 +195,12 @@ namespace casadi {
     ///@}
 
     /** \brief  Destructor
+
         \identifier{1v4} */
     ~Function();
 
     /** \brief Expand a function to SX
+
         \identifier{1v5} */
     ///@{
     Function expand() const;
@@ -200,25 +211,30 @@ namespace casadi {
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node
+
         \identifier{1v6} */
     static Function create(FunctionInternal* node);
 
     /** \brief  Create from node and initialize
+
         \identifier{1v7} */
     static Function create(FunctionInternal* node, const Dict& opts);
 #endif // SWIG
     /// \endcond
 
     /** \brief Get the number of function inputs
+
         \identifier{1v8} */
     casadi_int n_in() const;
 
     /** \brief Get the number of function outputs
+
         \identifier{1v9} */
     casadi_int n_out() const;
 
     ///@{
     /** \brief Get input dimension
+
         \identifier{1va} */
     casadi_int size1_in(casadi_int ind) const;
     casadi_int size1_in(const std::string& iname) const {return size1_in(index_in(iname));}
@@ -232,6 +248,7 @@ namespace casadi {
 
     ///@{
     /** \brief Get output dimension
+
         \identifier{1vb} */
     casadi_int size1_out(casadi_int ind) const;
     casadi_int size1_out(const std::string& oname) const {return size1_out(index_out(oname));}
@@ -247,6 +264,7 @@ namespace casadi {
     /** \brief  Get number of input nonzeros
      *
      * For a particular input or for all of the inputs
+
         \identifier{1vc} */
     casadi_int nnz_in() const;
     casadi_int nnz_in(casadi_int ind) const;
@@ -257,6 +275,7 @@ namespace casadi {
     /** \brief  Get number of output nonzeros
      *
      * For a particular output or for all of the outputs
+
         \identifier{1vd} */
     casadi_int nnz_out() const;
     casadi_int nnz_out(casadi_int ind) const;
@@ -267,6 +286,7 @@ namespace casadi {
     /** \brief  Get number of input elements
      *
      * For a particular input or for all of the inputs
+
         \identifier{1ve} */
     casadi_int numel_in() const;
     casadi_int numel_in(casadi_int ind) const;
@@ -277,6 +297,7 @@ namespace casadi {
     /** \brief  Get number of output elements
      *
      * For a particular output or for all of the outputs
+
         \identifier{1vf} */
     casadi_int numel_out() const;
     casadi_int numel_out(casadi_int ind) const;
@@ -284,18 +305,22 @@ namespace casadi {
     ///@}
 
     /** \brief Get input scheme
+
         \identifier{1vg} */
     const std::vector<std::string>& name_in() const;
 
     /** \brief Get output scheme
+
         \identifier{1vh} */
     const std::vector<std::string>& name_out() const;
 
     /** \brief Get input scheme name by index
+
         \identifier{1vi} */
     const std::string& name_in(casadi_int ind) const;
 
     /** \brief Get output scheme name by index
+
         \identifier{1vj} */
     const std::string& name_out(casadi_int ind) const;
 
@@ -303,6 +328,7 @@ namespace casadi {
      *
      * example:  schemeEntry("x_opt")  -> returns  NLPSOL_X if FunctionInternal adheres to
      * SCHEME_NLPINput
+
         \identifier{1vk} */
     casadi_int index_in(const std::string &name) const;
 
@@ -310,30 +336,37 @@ namespace casadi {
      *
      * example:  schemeEntry("x_opt")  -> returns  NLPSOL_X if FunctionInternal adheres to
      * SCHEME_NLPINput
+
         \identifier{1vl} */
     casadi_int index_out(const std::string &name) const;
 
     /** \brief Get default input value
+
         \identifier{1vm} */
     double default_in(casadi_int ind) const;
 
     /** \brief Get largest input value
+
         \identifier{1vn} */
     double max_in(casadi_int ind) const;
 
     /** \brief Get smallest input value
+
         \identifier{1vo} */
     double min_in(casadi_int ind) const;
 
     /** \brief Get nominal input value
+
         \identifier{1vp} */
     std::vector<double> nominal_in(casadi_int ind) const;
 
     /** \brief Get nominal output value
+
         \identifier{1vq} */
     std::vector<double> nominal_out(casadi_int ind) const;
 
     /** \brief Get sparsity of a given input
+
         \identifier{1vr} */
     /// @{
     const Sparsity& sparsity_in(casadi_int ind) const;
@@ -341,6 +374,7 @@ namespace casadi {
     /// @}
 
     /** \brief Get sparsity of a given output
+
         \identifier{1vs} */
     /// @{
     const Sparsity& sparsity_out(casadi_int ind) const;
@@ -348,6 +382,7 @@ namespace casadi {
     /// @}
 
     /** \brief Get differentiability of inputs/output
+
         \identifier{1vt} */
     /// @{
     bool is_diff_in(casadi_int ind) const;
@@ -367,14 +402,17 @@ namespace casadi {
                      const Dict& opts=Dict()) const;
 
     /** \brief Get oracle
+
         \identifier{1vu} */
     Function oracle() const;
 
     /** \brief Wrap in an Function instance consisting of only one MX call
+
         \identifier{1vv} */
     Function wrap() const;
 
     /** \brief Wrap in a Function with options
+
         \identifier{1vw} */
     Function wrap_as_needed(const Dict& opts) const;
 
@@ -382,43 +420,53 @@ namespace casadi {
     *
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
     * \param[in] tr   Flip the relationship. Return which expressions contain the variables
+
         \identifier{1vx} */
     std::vector<bool> which_depends(const std::string& s_in,
                                     const std::vector<std::string>& s_out,
                                     casadi_int order=1, bool tr=false) const;
 
     /** \brief Print dimensions of inputs and outputs
+
         \identifier{1vy} */
     void print_dimensions(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Print options to a stream
+
         \identifier{1vz} */
     void print_options(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Print all information there is to know about a certain option
+
         \identifier{1w0} */
     void print_option(const std::string &name, std::ostream &stream = casadi::uout()) const;
 
     /** \brief Does a particular option exist
+
         \identifier{1w1} */
     bool has_option(const std::string &option_name) const;
 
     /** \brief Change option after object creation for debugging
+
       * This is only possible for a selected number of options that do not change the numerical
       * results of the computation, e.g. to enable a more verbose output or saving to file.
+
         \identifier{1w2} */
     void change_option(const std::string& option_name, const GenericType& option_value);
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
+
         \identifier{1w3} */
     bool uses_output() const;
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Replaced by Function::factory.
+
         \identifier{1w4} */
     Function jacobian_old(casadi_int iind, casadi_int oind) const;
 
     /** \brief [DEPRECATED] Replaced by Function::factory.
+
         \identifier{1w5} */
     Function hessian_old(casadi_int iind, casadi_int oind) const;
 
@@ -442,6 +490,7 @@ namespace casadi {
 #endif // WITH_DEPRECATED_FEATURES
 
   /** \brief Calculate all Jacobian blocks
+
     * Generates a function that takes all non-differentiated inputs and outputs
     * and calculates all Jacobian blocks.
     * Inputs that are not needed by the routine are all-zero sparse matrices
@@ -454,11 +503,13 @@ namespace casadi {
     * jac_f : (x, y, out_r, out_s) -> (jac_r_x, jac_r_y, jac_s_x, jac_s_y)
     *
     * This function is cached.
+
       \identifier{1w6} */
     Function jacobian() const;
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically
+
         \identifier{1w7} */
     void call(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false) const;
@@ -490,6 +541,7 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate with temporary memory allocation
+
         \identifier{1w8} */
     void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
     void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const;
@@ -499,6 +551,7 @@ namespace casadi {
 
     ///@{
     /** \brief Supported arguments for numerical evaluation and converters
+
         \identifier{1w9} */
     typedef const std::vector<std::vector<double>>& VecArg;
     std::vector<const double*> buf_in(VecArg arg) const;
@@ -517,6 +570,7 @@ namespace casadi {
 
     ///@{
     /** \brief Numerical evaluation
+
         \identifier{1wa} */
     void operator()(VecArg arg, VecRes res) const { (*this)(buf_in(arg), buf_out(res)); }
     void operator()(VecArg arg, MapRes res) const { (*this)(buf_in(arg), buf_out(res)); }
@@ -543,38 +597,47 @@ namespace casadi {
     ///@}
 
     /** \brief Evaluate memory-less, numerically
+
         \identifier{1wb} */
     int operator()(const double** arg, double** res,
         casadi_int* iw, double* w, int mem) const;
 
     /** \brief Evaluate numerically with checkout/release
+
         \identifier{1wc} */
     int operator()(const double** arg, double** res,
         casadi_int* iw, double* w) const;
 
     /** \brief Evaluate memory-less SXElem
+
         Same syntax as the double version, allowing use in templated code
+
         \identifier{1wd} */
     int operator()(const SXElem** arg, SXElem** res,
         casadi_int* iw, SXElem* w, int mem=0) const;
 
     /** \brief  Propagate sparsity forward
+
         \identifier{1we} */
     int operator()(const bvec_t** arg, bvec_t** res,
         casadi_int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief  Propagate sparsity backward
+
         \identifier{1wf} */
     int rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief Propagate sparsity backward with temporary memory allocation
+
         \identifier{1wg} */
     int rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
 
 #endif // SWIG
 
     /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
+
         \param parallelization Type of parallelization used: unroll|serial|openmp
+
         \identifier{1wh} */
     std::vector<MX> mapsum(const std::vector<MX > &x,
                            const std::string& parallelization="serial") const;
@@ -618,6 +681,7 @@ namespace casadi {
         after each chunk of iterations with size base.
 
         Set base to -1 to unroll all the way; no gains in memory efficiency here.
+
         \identifier{1wi} */
     Function mapaccum(const std::string& name, casadi_int N, const Dict& opts = Dict()) const;
     Function mapaccum(const std::string& name, casadi_int N, casadi_int n_accum,
@@ -657,6 +721,7 @@ namespace casadi {
         \endverbatim
 
         \param parallelization Type of parallelization used: unroll|serial|openmp
+
         \identifier{1wj} */
     Function map(casadi_int n, const std::string& parallelization="serial") const;
     Function map(casadi_int n, const std::string& parallelization,
@@ -664,8 +729,10 @@ namespace casadi {
 
     ///@{
     /** \brief Map with reduction
+
       A subset of the inputs are non-repeated and a subset of the outputs summed
       up.
+
         \identifier{1wk} */
     Function map(const std::string& name, const std::string& parallelization, casadi_int n,
       const std::vector<casadi_int>& reduce_in,
@@ -682,16 +749,19 @@ namespace casadi {
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original
+
         \identifier{1wl} */
     Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
                    const std::vector<casadi_int>& order_out, const Dict& opts=Dict()) const;
 
     /** \brief Constuct a switch function
+
         \identifier{1wm} */
     static Function conditional(const std::string& name, const std::vector<Function>& f,
                                 const Function& f_def, const Dict& opts=Dict());
 
     /** \brief Conditional call to a function
+
         \identifier{1wn} */
     static Function conditional(const std::string& name,
       const Function& f, const Dict& opts=Dict());
@@ -699,12 +769,14 @@ namespace casadi {
     /** \brief BSpline evaluator function
      *
      *  Requires a known coefficient tensor
+
         \identifier{1wo} */
     static Function bspline(const std::string &name,
       const std::vector< std::vector<double> >& knots, const std::vector<double>& coeffs,
       const std::vector<casadi_int>& degree, casadi_int m=1, const Dict& opts=Dict());
 
     /** \brief Constructor (if-else)
+
         \identifier{1wp} */
     static Function if_else(const std::string& name, const Function& f_true,
                             const Function& f_false, const Dict& opts=Dict());
@@ -723,6 +795,7 @@ namespace casadi {
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
+
         \identifier{1wq} */
     Function forward(casadi_int nfwd) const;
 
@@ -742,26 +815,32 @@ namespace casadi {
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
+
         \identifier{1wr} */
     Function reverse(casadi_int nadj) const;
 
     /** \brief Get, if necessary generate, the sparsity of all Jacobian blocks
+
         \identifier{1ws} */
     const std::vector<Sparsity>& jac_sparsity(bool compact = false) const;
 
     /** \brief Get, if necessary generate, the sparsity of a single Jacobian block
+
         \identifier{1wt} */
     Sparsity jac_sparsity(casadi_int oind, casadi_int iind, bool compact = false) const;
 
     /** \brief Export / Generate C code for the function
+
         \identifier{1wu} */
     std::string generate(const std::string& fname, const Dict& opts=Dict()) const;
 
     /** \brief Export / Generate C code for the function
+
         \identifier{1wv} */
     std::string generate(const Dict& opts=Dict()) const;
 
     /** \brief Export / Generate C code for the dependency function
+
         \identifier{1ww} */
     std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
@@ -769,6 +848,7 @@ namespace casadi {
      *
      * \seealso generate_out
      * \seealso convert_in to convert between dict/map and vector
+
         \identifier{1wx} */
     /// @{
     void generate_in(const std::string& fname, const std::vector<DM>& arg);
@@ -779,6 +859,7 @@ namespace casadi {
      *
      * \seealso generate_in
      * \seealso convert_out to convert between dict/map and vector
+
         \identifier{1wy} */
     /// @{
     void generate_out(const std::string& fname, const std::vector<DM>& arg);
@@ -788,6 +869,7 @@ namespace casadi {
     /** \brief Export function in specific language
      *
      * Only allowed for (a subset of) SX/MX Functions
+
         \identifier{1wz} */
     ///@{
     void export_code(const std::string& lang,
@@ -795,15 +877,18 @@ namespace casadi {
 
 #ifndef SWIG
     /** \brief Serialize
+
         \identifier{1x0} */
     void serialize(std::ostream &stream, const Dict& opts=Dict()) const;
 
     /** \brief Serialize an object
+
         \identifier{1x1} */
     void serialize(SerializingStream &s) const;
 #endif
 
     /** \brief Serialize
+
         \identifier{1x2} */
     std::string serialize(const Dict& opts=Dict()) const;
     void save(const std::string &fname, const Dict& opts=Dict()) const;
@@ -828,6 +913,7 @@ namespace casadi {
     }
 
     /** \brief  Const access functions of the node
+
         \identifier{1x3} */
     FunctionInternal* operator->() const;
 
@@ -841,7 +927,9 @@ namespace casadi {
 
     ///@{
     /** \brief Get symbolic primitives equivalent to the input expressions
+
      * There is no guarantee that subsequent calls return unique answers
+
         \identifier{1x4} */
     const SX sx_in(casadi_int iind) const;
     const SX sx_in(const std::string& iname) const {
@@ -857,7 +945,9 @@ namespace casadi {
 
     ///@{
     /** \brief Get symbolic primitives equivalent to the output expressions
+
     * There is no guarantee that subsequent calls return unique answers
+
         \identifier{1x5} */
     const SX sx_out(casadi_int oind) const;
     const SX sx_out(const std::string& oname) const {
@@ -872,6 +962,7 @@ namespace casadi {
     ///@}
 
     /** \brief Convert from/to flat vector of input/output nonzeros
+
         \identifier{1x6} */
     /// @{
     std::vector<double> nz_from_in(const std::vector<DM>& arg) const;
@@ -884,6 +975,7 @@ namespace casadi {
     *
     * Will raise an error when an unknown key is used or a list has incorrect size.
     * Does not perform sparsity checking.
+
         \identifier{1x7} */
     /// @{
     DMDict convert_in(const std::vector<DM>& arg) const;
@@ -901,53 +993,67 @@ namespace casadi {
     /// @}
 
     /** \brief Does the function have free variables
+
         \identifier{1x8} */
     bool has_free() const;
 
     /** \brief Get free variables as a string
+
         \identifier{1x9} */
     std::vector<std::string> get_free() const;
 
     /** \brief Get all the free variables of the function
+
         \identifier{1xa} */
     std::vector<SX> free_sx() const;
 
     /** \brief Get all the free variables of the function
+
         \identifier{1xb} */
     std::vector<MX> free_mx() const;
 
     /** \brief Extract the functions needed for the Lifted Newton method
+
         \identifier{1xc} */
     void generate_lifted(Function& SWIG_OUTPUT(vdef_fcn),
                          Function& SWIG_OUTPUT(vinit_fcn)) const;
 
     /** \brief Number of nodes in the algorithm
+
         \identifier{1xd} */
     casadi_int n_nodes() const;
 
     /** \brief Number of instruction in the algorithm (SXFunction/MXFunction)
+
         \identifier{1xe} */
     casadi_int n_instructions() const;
 
     /** \brief Identifier index of the instruction (SXFunction/MXFunction)
+
         \identifier{1xf} */
     casadi_int instruction_id(casadi_int k) const;
 
     /** \brief Locations in the work vector for the inputs of the instruction
+
      * (SXFunction/MXFunction)
+
         \identifier{1xg} */
     std::vector<casadi_int> instruction_input(casadi_int k) const;
 
     /** \brief Get the floating point output argument of an instruction (SXFunction)
+
         \identifier{1xh} */
     double instruction_constant(casadi_int k) const;
 
     /** \brief Location in the work vector for the output of the instruction
+
      * (SXFunction/MXFunction)
+
         \identifier{1xi} */
     std::vector<casadi_int> instruction_output(casadi_int k) const;
 
     /** \brief Get the MX node corresponding to an instruction (MXFunction)
+
         \identifier{1xj} */
     MX instruction_MX(casadi_int k) const;
 
@@ -955,52 +1061,63 @@ namespace casadi {
      *
      * Note: input and output instructions have no SX representation.
      * This method returns nan for those instructions.
+
         \identifier{1xk} */
     SX instructions_sx() const;
 
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm?
+
         \identifier{1xl} */
     bool has_spfwd() const;
     bool has_sprev() const;
     ///@}
 
     /** \brief Get required length of arg field
+
         \identifier{1xm} */
     size_t sz_arg() const;
 
     /** \brief Get required length of res field
+
         \identifier{1xn} */
     size_t sz_res() const;
 
     /** \brief Get required length of iw field
+
         \identifier{1xo} */
     size_t sz_iw() const;
 
     /** \brief Get required length of w field
+
         \identifier{1xp} */
     size_t sz_w() const;
 
 #ifndef SWIG
     /** \brief Get number of temporary variables needed
+
         \identifier{1xq} */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
     /** \brief Set the (persistent) work vectors
+
         \identifier{1xr} */
     void set_work(const double**& arg, double**& res,
       casadi_int*& iw, double*& w, int mem=0) const;
 
     /** \brief Set the (temporary) work vectors
+
         \identifier{1xs} */
     void set_temp(const double** arg, double** res,
         casadi_int* iw, double* w, int mem=0) const;
 
     /** \brief Set the (persistent and temporary) work vectors
+
         \identifier{1xt} */
     void setup(const double** arg, double** res, casadi_int* iw, double* w, int mem=0) const;
 
     /** \brief Call using a map
+
         \identifier{1xu} */
     template<typename M>
     void call_gen(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
@@ -1009,15 +1126,19 @@ namespace casadi {
     /// \endcond
 
     /** \brief Name of the function
+
         \identifier{1xv} */
     std::string name() const;
 
     /** \brief Check if the function is of a particular type
+
         Optionally check if name matches one of the base classes (default true)
+
         \identifier{1xw} */
     bool is_a(const std::string& type, bool recursive=true) const;
 
     /** \brief Check if a string is a valid function name
+
      * Valid function names consist of
      *
      * - At least one character
@@ -1026,28 +1147,35 @@ namespace casadi {
      * - Underscore, but never as first character and never next to another underscore
      *
      * May not be one of the following keywords: "null", "jac", "hess"
+
         \identifier{1xx} */
     static bool check_name(const std::string& name);
 
     /** \brief Turn a string into a valid function name as defined by "check_name"
+
      * Non-alphanumeric characters are converted into underscores and multiple
      * consecutive undercores are dropped
+
         \identifier{1xy} */
     static std::string fix_name(const std::string& name);
 
     /** \brief Build function from serialization
+
         \identifier{1xz} */
     static Function deserialize(std::istream& stream);
 
     /** \brief Build function from serialization
+
         \identifier{1y0} */
     static Function deserialize(const std::string& s);
 
     /** \brief Build function from serialization
+
         \identifier{1y1} */
     static Function load(const std::string& filename);
 
     /** \brief Build function from serialization
+
         \identifier{1y2} */
     static Function deserialize(DeserializingStream& s);
 
@@ -1069,25 +1197,32 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Get a list of all functions
+
         \identifier{1y3} */
     std::vector<std::string> get_function() const;
 
     /** \brief Get a dependency function
+
         \identifier{1y4} */
     Function get_function(const std::string &name) const;
 
     /** \brief Check if a particular dependency exists
+
         \identifier{1y5} */
     bool has_function(const std::string& fname) const;
 
     /** \brief Get all functions embedded in the expression graphs
+
       * \param[in] max_depth  Maximum depth - a negative number indicates no maximum
+
         \identifier{1y6} */
     std::vector<Function> find(casadi_int max_depth = -1) const;
 
     /** \brief  Get a specific function embedded in the expression graphs
+
       * \param[in] max_depth  Maximum depth - a negative number indicates no maximum
       * \param[in] name  Name of function needed
+
         \identifier{1y7} */
     Function find(casadi_int max_depth, const std::string &name) const;
 
@@ -1098,6 +1233,7 @@ namespace casadi {
     protected:
     ///@{
     /** \brief Called by constructors
+
         \identifier{1y8} */
     void construct(const std::string& name,
                    const std::vector<SX>& ex_in, const std::vector<SX>& ex_out,
@@ -1139,6 +1275,7 @@ namespace casadi {
 
 
 /** \brief Class to achieve minimal overhead function evaluations
+
     \identifier{1y9} */
 class CASADI_EXPORT FunctionBuffer {
   Function f_;
@@ -1152,6 +1289,7 @@ class CASADI_EXPORT FunctionBuffer {
   int ret_;
 public:
   /** \brief Main constructor
+
       \identifier{1ya} */
   FunctionBuffer(const Function& f);
 #ifndef SWIG
@@ -1165,6 +1303,7 @@ public:
       mem.set_arg(0, memoryview(a))
 
       Note that CasADi uses 'fortran' order: column-by-column
+
       \identifier{1yb} */
   void set_arg(casadi_int i, const double* a, casadi_int size);
 
@@ -1173,6 +1312,7 @@ public:
       mem.set_res(0, memoryview(a))
 
       Note that CasADi uses 'fortran' order: column-by-column
+
       \identifier{1yc} */
   void set_res(casadi_int i, double* a, casadi_int size);
   /// Get last return value

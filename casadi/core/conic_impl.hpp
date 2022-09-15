@@ -57,6 +57,7 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs
+
         \identifier{1j6} */
     size_t get_n_in() override { return CONIC_NUM_IN;}
     size_t get_n_out() override { return CONIC_NUM_OUT;}
@@ -64,6 +65,7 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs
+
         \identifier{1j7} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
@@ -71,6 +73,7 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs
+
         \identifier{1j8} */
     std::string get_name_in(casadi_int i) override { return conic_in(i);}
     std::string get_name_out(casadi_int i) override { return conic_out(i);}
@@ -78,6 +81,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options
+
         \identifier{1j9} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
@@ -94,10 +98,12 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Initalize memory block
+
         \identifier{1ja} */
     int init_mem(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors
+
         \identifier{1jb} */
     void set_work(void* mem, const double**& arg, double**& res,
                           casadi_int*& iw, double*& w) const override;
@@ -126,10 +132,12 @@ namespace casadi {
     static std::string shortname() { return "conic";}
 
     /** \brief Check if the function is of a particular type
+
         \identifier{1jc} */
     bool is_a(const std::string& type, bool recursive) const override;
 
     /** \brief Get default input value
+
         \identifier{1jd} */
     double get_default_in(casadi_int ind) const override;
 
@@ -188,22 +196,27 @@ namespace casadi {
 
   public:
       /** \brief Serialize an object without type information
+
           \identifier{1je} */
     void serialize_body(SerializingStream &s) const override;
     /** \brief Serialize type information
+
         \identifier{1jf} */
     void serialize_type(SerializingStream &s) const override;
 
     /** \brief String used to identify the immediate FunctionInternal subclass
+
         \identifier{1jg} */
     std::string serialize_base_function() const override { return "Conic"; }
     /** \brief Deserialize with type disambiguation
+
         \identifier{1jh} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
   protected:
 
     /** \brief Deserializing constructor
+
         \identifier{1ji} */
     explicit Conic(DeserializingStream& s);
   };

@@ -35,8 +35,10 @@
 namespace casadi {
 
   /** \brief Helper class for C code generation
+
       \author Joel Andersson
       \date 2016
+
       \identifier{ru} */
   class CASADI_EXPORT CodeGenerator {
   public:
@@ -55,9 +57,11 @@ namespace casadi {
     std::string dump();
 
     /** \brief Generate file(s)
+
       The "prefix" argument will be prepended to the generated files and may
       be a directory or a file prefix.
       returns the filename
+
         \identifier{rv} */
     std::string generate(const std::string& prefix="");
 
@@ -85,60 +89,74 @@ namespace casadi {
     casadi_int add_sparsity(const Sparsity& sp);
 
     /** \brief Get the index of an existing sparsity pattern
+
         \identifier{rw} */
     casadi_int get_sparsity(const Sparsity& sp) const;
 
     /** \brief Get or add a constant
+
         \identifier{rx} */
     casadi_int get_constant(const std::vector<double>& v, bool allow_adding=false);
 
     /** \brief Get or add an integer constant
+
         \identifier{ry} */
     casadi_int get_constant(const std::vector<casadi_int>& v, bool allow_adding=false);
 
     /** \brief Represent an array constant; adding it when new
+
         \identifier{rz} */
     std::string constant(const std::vector<casadi_int>& v);
 
     /** \brief Represent an array constant; adding it when new
+
         \identifier{s0} */
     void constant_copy(const std::string& var_name, const std::vector<casadi_int>& v, const std::string& type="casadi_int");
 
     /** \brief Represent an array constant; adding it when new
+
         \identifier{s1} */
     std::string constant(const std::vector<double>& v);
 
     /** \brief Allocate file scope double read-only memory
+
         \identifier{s2} */
     void define_rom_double(const void* id, casadi_int size);
 
     /** \brief Access file scope double read-only memory
+
         \identifier{s3} */
     std::string rom_double(const void* id) const;
 
     /** \brief Allocate file scope integer read-only memory
+
         \identifier{s4} */
     void define_rom_integer(const void* id, casadi_int size);
 
     /** \brief Access file scope integer read-only memory
+
         \identifier{s5} */
     std::string rom_integer(const void* id) const;
 
     /** \brief Generate a call to a function (generic signature)
+
         \identifier{s6} */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
                            const std::string& w);
 
     /** \brief Print a string to buffer
+
         \identifier{s7} */
     CodeGenerator& operator<<(const std::string& s);
 
     /** \brief Print without newline characters
+
         \identifier{s8} */
     void print_formatted(const std::string& s);
 
     /** \brief Print an arbitrary type to buffer
+
         \identifier{s9} */
     template<typename T>
     CodeGenerator& operator<<(T s) {
@@ -148,81 +166,99 @@ namespace casadi {
     }
 
     /** \brief Flush the buffer to a stream of choice
+
         \identifier{sa} */
     void flush(std::ostream &s);
 
     /** \brief Declare a local variable
+
         \identifier{sb} */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
 
     /** \brief Enter a local scope
+
         \identifier{sc} */
     void scope_enter();
 
     /** \brief Exit a local scope
+
         \identifier{sd} */
     void scope_exit();
 
     /** \brief Declare a work vector element
+
         \identifier{se} */
     std::string sx_work(casadi_int i);
 
     /** \brief Specify the default value for a local variable
+
         \identifier{sf} */
     void init_local(const std::string& name, const std::string& def);
 
     /** \brief Increase indentation
+
         \identifier{sg} */
     void indent() {current_indent_++;}
 
     /** \brief Decrease indentation
+
         \identifier{sh} */
     void unindent() {current_indent_--;}
 
     /** \brief Avoid stack?
+
         \identifier{si} */
     bool avoid_stack() { return avoid_stack_;}
 
     /** \brief Print a constant in a lossless but compact manner
+
         \identifier{sj} */
     std::string constant(double v);
     std::string constant(casadi_int v);
 
     /** \brief Print an intializer
+
         \identifier{sk} */
     std::string initializer(const std::vector<double>& v);
     std::string initializer(const std::vector<casadi_int>& v);
 
     /** \brief Sanitize source files for codegen
+
         \identifier{sl} */
     std::string sanitize_source(const std::string& src,
                                 const std::vector<std::string>& inst,
                                 bool add_shorthand=true);
 
     /** \brief Codegen inner product
+
         \identifier{sm} */
     std::string dot(casadi_int n, const std::string& x, const std::string& y);
 
     /** \brief Codegen sparse matrix-vector multiplication
+
         \identifier{sn} */
     std::string mv(const std::string& x, const Sparsity& sp_x,
                    const std::string& y, const std::string& z, bool tr);
 
     /** \brief Codegen dense matrix-vector multiplication
+
         \identifier{so} */
     std::string mv(const std::string& x, casadi_int nrow_x, casadi_int ncol_x,
                    const std::string& y, const std::string& z, bool tr);
 
     /** \brief Codegen axpy: y += a*x
+
         \identifier{sp} */
     std::string axpy(casadi_int n, const std::string& a,
                      const std::string& x, const std::string& y);
 
     /** \brief Codegen axpy: x *= alpha
+
         \identifier{sq} */
     std::string scal(casadi_int n, const std::string& alpha, const std::string& x);
 
     /** \brief Codegen sparse matrix-matrix multiplication
+
         \identifier{sr} */
     std::string mtimes(const std::string& x, const Sparsity& sp_x,
                        const std::string& y, const Sparsity& sp_y,
@@ -230,21 +266,25 @@ namespace casadi {
                        const std::string& w, bool tr);
 
     /** \brief Codegen lower triangular solve
+
         \identifier{ss} */
     std::string trilsolve(const Sparsity& sp_x, const std::string& x, const std::string& y,
                           bool tr, bool unity, casadi_int nrhs);
 
     /** \brief Codegen upper triangular solve
+
         \identifier{st} */
     std::string triusolve(const Sparsity& sp_x, const std::string& x, const std::string& y,
                           bool tr, bool unity, casadi_int nrhs);
 
     /** \brief Codegen bilinear form
+
         \identifier{su} */
     std::string bilin(const std::string& A, const Sparsity& sp_A,
                       const std::string& x, const std::string& y);
 
     /** \brief Rank-1 update
+
         \identifier{sv} */
     std::string rank1(const std::string& A, const Sparsity& sp_A, const std::string& alpha,
                       const std::string& x, const std::string& y);
@@ -253,6 +293,7 @@ namespace casadi {
     std::string logsumexp(const std::string& A, casadi_int n);
 
     /** \brief Multilinear interpolation
+
         \identifier{sw} */
     std::string interpn(const std::string& res, casadi_int ndim, const std::string& grid,
                         const std::string& offset,
@@ -261,6 +302,7 @@ namespace casadi {
                         const std::string& iw, const std::string& w);
 
     /** \brief Multilinear interpolation - calculate gradient
+
         \identifier{sx} */
     std::string interpn_grad(const std::string& grad,
       casadi_int ndim, const std::string& grid,
@@ -270,11 +312,13 @@ namespace casadi {
       const std::string& iw, const std::string& w);
 
     /** \brief Transpose
+
         \identifier{sy} */
     std::string trans(const std::string& x, const Sparsity& sp_x,
       const std::string& y, const Sparsity& sp_y, const std::string& iw);
 
     /** \brief QR factorization
+
         \identifier{sz} */
     std::string qr(const std::string& sp, const std::string& A,
                    const std::string& w, const std::string& sp_v,
@@ -283,6 +327,7 @@ namespace casadi {
                    const std::string& prinv, const std::string& pc);
 
     /** \brief QR solve
+
         \identifier{t0} */
     std::string qr_solve(const std::string& x, casadi_int nrhs, bool tr,
                          const std::string& sp_v, const std::string& v,
@@ -291,11 +336,13 @@ namespace casadi {
                          const std::string& pc, const std::string& w);
 
     /** \\brief LSQR solve
+
          \identifier{t1} */
     std::string lsqr_solve(const std::string& A, const std::string&x,
                           casadi_int nrhs, bool tr, const std::string& sp, const std::string& w);
 
     /** \brief LDL factorization
+
         \identifier{t2} */
     std::string ldl(const std::string& sp_a, const std::string& a,
                    const std::string& sp_lt, const std::string& lt,
@@ -303,6 +350,7 @@ namespace casadi {
                    const std::string& w);
 
     /** \brief LDL solve
+
         \identifier{t3} */
     std::string ldl_solve(const std::string& x, casadi_int nrhs,
                          const std::string& sp_lt, const std::string& lt,
@@ -310,91 +358,112 @@ namespace casadi {
                          const std::string& w);
 
     /** \brief fmax
+
         \identifier{t4} */
     std::string fmax(const std::string& x, const std::string& y);
 
     /** \brief fmin
+
         \identifier{t5} */
     std::string fmin(const std::string& x, const std::string& y);
 
     /** \brief mmax
+
         \identifier{t6} */
     std::string mmax(const std::string& x, casadi_int n, bool is_dense);
 
     /** \brief mmin
+
         \identifier{t7} */
     std::string mmin(const std::string& x, casadi_int n, bool is_dense);
 
     /** \brief vfmax
+
         \identifier{t8} */
     std::string vfmax(const std::string& x, casadi_int n, const std::string& y);
 
     /** \brief vfmin
+
         \identifier{t9} */
     std::string vfmin(const std::string& x, casadi_int n, const std::string& y);
 
     /** \brief vfmax
+
         \identifier{ta} */
     std::string vfmax(const std::string& x, const std::string& n, const std::string& y);
 
     /** \brief vfmin
+
         \identifier{tb} */
     std::string vfmin(const std::string& x, const std::string& n, const std::string& y);
 
     /** \brief max
+
         \identifier{tc} */
     std::string max(const std::string& x, const std::string& y);
 
     /** \brief min
+
         \identifier{td} */
     std::string min(const std::string& x, const std::string& y);
 
     /** \brief norm_inf
+
         \identifier{te} */
     std::string norm_inf(casadi_int n, const std::string& x);
 
     /** \brief max_viol
+
         \identifier{tf} */
     std::string max_viol(casadi_int n, const std::string& x,
       const std::string& lb, const std::string& ub);
 
     /** \brief sum_viol
+
         \identifier{tg} */
     std::string sum_viol(casadi_int n, const std::string& x,
       const std::string& lb, const std::string& ub);
 
     /** \brief bound_consistency
+
         \identifier{th} */
     std::string bound_consistency(casadi_int n, const std::string& x,
       const std::string& lam, const std::string& lbx, const std::string& ubx);
 
     /** \brief lb_eig
+
         \identifier{ti} */
     std::string lb_eig(const Sparsity& sp_h, const std::string& h);
 
     /** \brief regularize
+
         \identifier{tj} */
     std::string regularize(const Sparsity& sp_h, const std::string& h, const std::string& reg);
 
     /** \brief convexify
+
         \identifier{tk} */
     std::string convexify_eval(const ConvexifyData& d,
       const std::string& Hin, const std::string& Hout, const std::string& iw, const std::string& w);
 
     /** \brief low
+
         \identifier{tl} */
     std::string low(const std::string& x, const std::string& grid,
       casadi_int ng, casadi_int lookup_mode);
 
     /** \brief Declare a function
+
         \identifier{tm} */
     std::string declare(std::string s);
 
     /** \brief Write a comment line (ignored if not verbose)
+
         \identifier{tn} */
     void comment(const std::string& s);
 
     /** \brief Auxiliary functions
+
         \identifier{to} */
     enum Auxiliary {
       AUX_COPY,
@@ -473,10 +542,12 @@ namespace casadi {
     };
 
     /** \brief Add a built-in auxiliary function
+
         \identifier{tp} */
     void add_auxiliary(Auxiliary f, const std::vector<std::string>& inst = {"casadi_real"});
 
     /** \brief Add io sparsity patterns of a function
+
         \identifier{tq} */
     void add_io_sparsities(const std::string& name,
                            const std::vector<Sparsity>& sp_in,
@@ -493,16 +564,19 @@ namespace casadi {
                              const std::string& def=std::string());
 
     /** \brief  Print casadi_int vector to a c file
+
         \identifier{tr} */
     void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<casadi_int>& v);
 
     /** \brief  Print real vector to a c file
+
         \identifier{ts} */
     void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<double>& v);
 
     /** \brief Create a copy operation
+
         \identifier{tt} */
     std::string copy(const std::string& arg, std::size_t n, const std::string& res);
     void copy_check(const std::string& arg, std::size_t n, const std::string& res,
@@ -511,57 +585,69 @@ namespace casadi {
       const std::string& def,  bool check_rhs=true);
 
     /** \brief Create a fill operation
+
         \identifier{tu} */
     std::string fill(const std::string& res, std::size_t n, const std::string& v);
 
     /** \brief Create a fill operation
+
         \identifier{tv} */
     std::string clear(const std::string& res, std::size_t n);
 
     /** \brief Refer to argument
+
         \identifier{tw} */
     std::string arg(casadi_int i) const;
 
     /** \brief Refer to resuly
+
         \identifier{tx} */
     std::string res(casadi_int i) const;
 
     /** \brief Access thread-local memory
+
         \identifier{ty} */
     std::string mem(const Function& f);
 
     /** \brief Sparse assignment
+
         \identifier{tz} */
     std::string project(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, const Sparsity& sp_res,
                         const std::string& w);
 
     /** \brief Project triangular part
+
         \identifier{u0} */
     std::string tri_project(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, bool lower);
 
     /** \brief Densify
+
         \identifier{u1} */
     std::string densify(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, bool tr=false);
 
     /** \brief Sparsify
+
         \identifier{u2} */
     std::string sparsify(const std::string& arg, const std::string& res,
                          const Sparsity& sp_res, bool tr=false);
 
     /** \brief Create matrix in MATLAB's MEX format
+
         \identifier{u3} */
     std::string to_mex(const Sparsity& sp, const std::string& arg);
 
     /** \brief Get matrix from MATLAB's MEX format
+
         \identifier{u4} */
     std::string from_mex(std::string& arg,
                          const std::string& res, std::size_t res_off, const Sparsity& sp_res,
                          const std::string& w);
 
     /** \brief Printf
+
         \identifier{u5} */
     std::string printf(const std::string& str,
                        const std::vector<std::string>& arg=std::vector<std::string>());
@@ -571,15 +657,18 @@ namespace casadi {
                        const std::string& arg3);
 
     /** \brief Print an operation to a c file
+
         \identifier{u6} */
     std::string print_op(casadi_int op, const std::string& a0);
     std::string print_op(casadi_int op, const std::string& a0, const std::string& a1);
 
     /** \brief Slurp a file
+
         \identifier{u7} */
     std::string file_slurp(const std::string& fname, casadi_int n, const std::string& a);
 
     /** \brief cache check
+
         \identifier{u8} */
     std::string cache_check(const std::string& key, const std::string& cache,
         const std::string& loc, casadi_int stride, casadi_int sz, casadi_int key_sz,
@@ -653,8 +742,10 @@ namespace casadi {
     std::string infinity, nan, real_min;
 
     /** \brief Codegen scalar
+
      * Use the work vector for storing work vector elements of length 1
      * (typically scalar) instead of using local variables
+
         \identifier{u9} */
     bool codegen_scalars;
 

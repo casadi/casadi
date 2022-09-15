@@ -30,6 +30,7 @@
 #include <limits>
 
 /** \brief The casadi namespace
+
     \identifier{1aj} */
 namespace casadi {
 
@@ -40,6 +41,7 @@ namespace casadi {
   e.g. symbolic scalars
   \author Joel Andersson
   \date 2011
+
       \identifier{1ak} */
 
   template<class T>

@@ -34,8 +34,10 @@
 
 namespace casadi {
   /** \brief Matrix determinant
+
       \author Joel Andersson
       \date 2013
+
       \identifier{xf} */
   class CASADI_EXPORT Determinant : public MXNode {
   public:
@@ -47,33 +49,40 @@ namespace casadi {
     ~Determinant() override {}
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{xg} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{xh} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{xi} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Print expression
+
         \identifier{xj} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation
+
         \identifier{xk} */
     casadi_int op() const override { return OP_DETERMINANT;}
 
     /** \brief Deserialize without type information
+
         \identifier{xl} */
     static MXNode* deserialize(DeserializingStream& s) { return new Determinant(s); }
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{xm} */
     explicit Determinant(DeserializingStream& s) : MXNode(s) {}
 

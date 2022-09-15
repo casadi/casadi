@@ -41,11 +41,13 @@ namespace casadi {
     FiniteDiff(const std::string& name, casadi_int n);
 
     /** \brief Destructor
+
         \identifier{1u7} */
     ~FiniteDiff() override;
 
     ///@{
     /** \brief Options
+
         \identifier{1u8} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
@@ -53,17 +55,20 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs
+
         \identifier{1u9} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     /** \brief Get default input value
+
         \identifier{1ua} */
     double get_default_in(casadi_int ind) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs
+
         \identifier{1ub} */
     size_t get_n_in() override;
     size_t get_n_out() override;
@@ -71,12 +76,14 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs
+
         \identifier{1uc} */
     std::string get_name_in(casadi_int i) override;
     std::string get_name_out(casadi_int i) override;
     ///@}
 
     /** \brief  Initialize
+
         \identifier{1ud} */
     void init(const Dict& opts) override;
 
@@ -84,18 +91,22 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief Is the scheme using the (nondifferentiated) output?
+
         \identifier{1ue} */
     bool uses_output() const override {return true;}
 
     /** \brief Is codegen supported?
+
         \identifier{1uf} */
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the declarations of the C function
+
         \identifier{1ug} */
     void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function
+
         \identifier{1uh} */
     void codegen_body(CodeGenerator& g) const override;
 
@@ -153,10 +164,12 @@ namespace casadi {
     ForwardDiff(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor
+
         \identifier{1ui} */
     ~ForwardDiff() override {}
 
     /** \brief Get type name
+
         \identifier{1uj} */
     std::string class_name() const override {return "ForwardDiff";}
 
@@ -186,11 +199,13 @@ namespace casadi {
     double calc_stepsize(double abstol) const override { return sqrt(abstol);}
 
     /** \brief Get absolute tolerance
+
         \identifier{1uk} */
     double get_abstol() const override { return h_;}
 
     ///@{
     /** \brief Second order derivatives
+
         \identifier{1ul} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
@@ -210,10 +225,12 @@ namespace casadi {
     BackwardDiff(const std::string& name, casadi_int n) : ForwardDiff(name, n) {}
 
     /** \brief Destructor
+
         \identifier{1um} */
     ~BackwardDiff() override {}
 
     /** \brief Get type name
+
         \identifier{1un} */
     std::string class_name() const override {return "BackwardDiff";}
 
@@ -233,10 +250,12 @@ namespace casadi {
     CentralDiff(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor
+
         \identifier{1uo} */
     ~CentralDiff() override {}
 
     /** \brief Get type name
+
         \identifier{1up} */
     std::string class_name() const override {return "CentralDiff";}
 
@@ -266,11 +285,13 @@ namespace casadi {
     double calc_stepsize(double abstol) const override { return pow(abstol, 1./3);}
 
     /** \brief Get absolute tolerance
+
         \identifier{1uq} */
     double get_abstol() const override { return h_*h_;}
 
     ///@{
     /** \brief Second order derivatives
+
         \identifier{1ur} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
@@ -290,10 +311,12 @@ namespace casadi {
     Smoothing(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor
+
         \identifier{1us} */
     ~Smoothing() override {}
 
     /** \brief Get type name
+
         \identifier{1ut} */
     std::string class_name() const override {return "Smoothing";}
 
@@ -319,11 +342,13 @@ namespace casadi {
     double calc_stepsize(double abstol) const override { return pow(abstol, 1./3);}
 
     /** \brief Get absolute tolerance
+
         \identifier{1uu} */
     double get_abstol() const override { return h_*h_;}
 
     ///@{
     /** \brief Second order derivatives
+
         \identifier{1uv} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,

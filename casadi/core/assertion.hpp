@@ -33,8 +33,10 @@
 /// \cond INTERNAL
 namespace casadi {
   /** \brief Assertion
+
       \author Joris Gillis
       \date 2013
+
       \identifier{139} */
   class CASADI_EXPORT Assertion : public MXNode {
   public:
@@ -46,15 +48,18 @@ namespace casadi {
     ~Assertion() override {}
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{13a} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{13b} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{13c} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
@@ -66,24 +71,29 @@ namespace casadi {
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Propagate sparsity forward
+
         \identifier{13d} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards
+
         \identifier{13e} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation
+
         \identifier{13f} */
     void generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const override;
 
     /** \brief  Print expression
+
         \identifier{13g} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation
+
         \identifier{13h} */
     casadi_int op() const override { return OP_ASSERTION;}
 
@@ -91,15 +101,18 @@ namespace casadi {
     casadi_int n_inplace() const override { return 1;}
 
     /** \brief Serialize an object without type information
+
         \identifier{13i} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information
+
         \identifier{13j} */
     static MXNode* deserialize(DeserializingStream& s) { return new Assertion(s); }
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{13k} */
     explicit Assertion(DeserializingStream& s);
 

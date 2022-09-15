@@ -32,51 +32,63 @@
 
 namespace casadi {
   /** \brief Represents any binary operation that involves two matrices
+
       \author Joel Andersson
       \date 2010
+
       \identifier{1fn} */
   template<bool ScX, bool ScY>
   class CASADI_EXPORT BinaryMX : public MXNode {
   public:
     /** \brief  Constructor
+
         \identifier{1fo} */
     BinaryMX(Operation op, const MX& x, const MX& y);
 
     /** \brief  Destructor
+
         \identifier{1fp} */
     ~BinaryMX() override;
 
     /** \brief  Print expression
+
         \identifier{1fq} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation
+
         \identifier{1fr} */
     casadi_int op() const override { return op_;}
 
     /** \brief Check if binary operation
+
         \identifier{1fs} */
     bool is_binary() const override { return true;}
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{1ft} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives
+
         \identifier{1fu} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives
+
         \identifier{1fv} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward
+
         \identifier{1fw} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards
+
         \identifier{1fx} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
@@ -94,20 +106,24 @@ namespace casadi {
     casadi_int n_inplace() const override { return 2;}
 
     /** \brief Generate code for the operation
+
         \identifier{1fy} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Serialize an object without type information
+
         \identifier{1fz} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Serialize type information
+
         \identifier{1g0} */
     void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{1g1} */
     static MXNode* deserialize(DeserializingStream& s);
 
@@ -118,6 +134,7 @@ namespace casadi {
     MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth
+
         \identifier{1g2} */
     bool is_equal(const MXNode* node, casadi_int depth) const override {
       if (op_==node->op()) {
@@ -146,6 +163,7 @@ namespace casadi {
     Operation op_;
 
     /** \brief Deserializing constructor
+
         \identifier{1g3} */
     explicit BinaryMX(DeserializingStream& s);
 

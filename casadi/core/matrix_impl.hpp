@@ -2317,6 +2317,7 @@ namespace casadi {
   }
 
   /** \brief   Construct a matrix with given block on the diagonal
+
       \identifier{1nb} */
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::diagcat(const std::vector< Matrix<Scalar> > &A) {

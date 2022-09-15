@@ -55,10 +55,12 @@ namespace casadi {
     ~LinsolInternal() override;
 
     /** \brief Display object
+
         \identifier{e4} */
     void disp(std::ostream& stream, bool more) const override;
 
     /** \brief  Print more
+
         \identifier{e5} */
     virtual void disp_more(std::ostream& stream) const {}
 
@@ -66,14 +68,17 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block
+
         \identifier{e6} */
     void* alloc_mem() const override { return new LinsolMemory();}
 
     /** \brief Initalize memory block
+
         \identifier{e7} */
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block
+
         \identifier{e8} */
     void free_mem(void *mem) const override { delete static_cast<LinsolMemory*>(mem);}
 
@@ -135,13 +140,16 @@ namespace casadi {
     casadi_int nnz() const { return sp_.nnz();}
 
     /** \brief Serialize type information
+
         \identifier{e9} */
     void serialize_type(SerializingStream &s) const override;
     /** \brief Serialize an object without type information
+
         \identifier{ea} */
     void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation
+
         \identifier{eb} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
@@ -150,6 +158,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor
+
         \identifier{ec} */
     explicit LinsolInternal(DeserializingStream& s);
   };

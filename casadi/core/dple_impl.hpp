@@ -44,6 +44,7 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs
+
         \identifier{15s} */
     size_t get_n_in() override { return DPLE_NUM_IN;}
     size_t get_n_out() override { return DPLE_NUM_OUT;}
@@ -51,6 +52,7 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs
+
         \identifier{15t} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
@@ -58,6 +60,7 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs
+
         \identifier{15u} */
     std::string get_name_in(casadi_int i) override { return dple_in(i);}
     std::string get_name_out(casadi_int i) override { return dple_out(i);}
@@ -65,6 +68,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options
+
         \identifier{15v} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
@@ -75,6 +79,7 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives
+
         \identifier{15w} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
@@ -85,6 +90,7 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives
+
         \identifier{15x} */
     bool has_reverse(casadi_int nadj) const override { return true;}
     Function get_reverse(casadi_int nadj, const std::string& name,

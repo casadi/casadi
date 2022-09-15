@@ -38,8 +38,10 @@ namespace casadi {
 
 
   /** \brief Convexify a symmetric matrix
+
       \author Joris Gillis
       \date 2020
+
       \identifier{9i} */
   class CASADI_EXPORT Convexify : public MXNode {
   public:
@@ -58,36 +60,44 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /** \brief  Evaluate symbolically (MX)
+
         \identifier{9j} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Generate code for the operation
+
         \identifier{9k} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Get required length of iw field
+
         \identifier{9l} */
     size_t sz_iw() const override;
 
     /** \brief Get required length of w field
+
         \identifier{9m} */
     size_t sz_w() const override;
 
     /** \brief  Print expression
+
         \identifier{9n} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation
+
         \identifier{9o} */
     casadi_int op() const override { return OP_CONVEXIFY;}
 
     /** \brief Serialize an object without type information
+
         \identifier{9p} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information
+
         \identifier{9q} */
     static MXNode* deserialize(DeserializingStream& s) { return new Convexify(s); }
 
@@ -106,6 +116,7 @@ namespace casadi {
   protected:
 
     /** \brief Deserializing constructor
+
         \identifier{9r} */
     explicit Convexify(DeserializingStream& s);
   };

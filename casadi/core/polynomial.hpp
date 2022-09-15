@@ -31,8 +31,10 @@
 namespace casadi {
 
   /** \brief Helper class for differentiating and integrating polynomials
+
       \author Joel Andersson
       \date 2014
+
       \identifier{8y} */
   class CASADI_EXPORT Polynomial : public Printable<Polynomial> {
   public:

@@ -72,26 +72,32 @@ namespace casadi {
   ///@}
 
   /** \brief Get input scheme of DPLE solvers
+
       \identifier{1nc} */
   CASADI_EXPORT std::vector<std::string> dple_in();
 
   /** \brief Get output scheme of DPLE solvers
+
       \identifier{1nd} */
   CASADI_EXPORT std::vector<std::string> dple_out();
 
   /** \brief Get DPLE input scheme name by index
+
       \identifier{1ne} */
   CASADI_EXPORT std::string dple_in(casadi_int ind);
 
   /** \brief Get DPLE output scheme name by index
+
       \identifier{1nf} */
   CASADI_EXPORT std::string dple_out(casadi_int ind);
 
   /** \brief Get the number of QP solver inputs
+
       \identifier{1ng} */
   CASADI_EXPORT casadi_int dple_n_in();
 
   /** \brief Get the number of QP solver outputs
+
       \identifier{1nh} */
   CASADI_EXPORT casadi_int dple_n_out();
 

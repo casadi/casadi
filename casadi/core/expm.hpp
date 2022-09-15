@@ -58,10 +58,12 @@ namespace casadi {
   ///@}
 
   /** \brief Get the number of expm solver inputs
+
       \identifier{rs} */
   CASADI_EXPORT casadi_int expm_n_in();
 
   /** \brief Get the number of expm solver outputs
+
       \identifier{rt} */
   CASADI_EXPORT casadi_int expm_n_out();
 
