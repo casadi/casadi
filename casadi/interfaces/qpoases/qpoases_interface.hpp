@@ -32,6 +32,7 @@
 #include <qpOASES.hpp>
 
 /** \defgroup plugin_Conic_qpoases Title
+    \par
 
 Interface to QPOases Solver for quadratic programming
 

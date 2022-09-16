@@ -32,6 +32,7 @@ namespace casadi {
 
 
   /** \defgroup main_interpolant Title
+      \par
 
    * An interpolant function for lookup table data
    *

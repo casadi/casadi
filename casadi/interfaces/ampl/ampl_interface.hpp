@@ -30,6 +30,7 @@
 #include "casadi/core/nlpsol_impl.hpp"
 
 /** \defgroup plugin_Nlpsol_ampl Title
+    \par
 
   * Interface to AMPL
   *

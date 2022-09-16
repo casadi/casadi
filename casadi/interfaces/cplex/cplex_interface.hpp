@@ -32,6 +32,7 @@
 #include <string>
 
 /** \defgroup plugin_Conic_cplex Title
+    \par
 
       Interface to Cplex solver for sparse Quadratic Programs
 

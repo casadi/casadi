@@ -33,6 +33,7 @@
 namespace casadi {
 
   /** \defgroup main_integrator Title
+      \par
 
       Create an ODE/DAE integrator
       Solves an initial value problem (IVP) coupled to a terminal value problem

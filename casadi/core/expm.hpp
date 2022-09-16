@@ -31,6 +31,7 @@
 namespace casadi {
 
   /** \defgroup main_expm Title
+      \par
 
       Performs a matrix exponentiation
       expm(A)

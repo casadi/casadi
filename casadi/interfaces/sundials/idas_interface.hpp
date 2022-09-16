@@ -38,6 +38,7 @@
 #include <ctime>
 
 /** \defgroup plugin_Integrator_idas Title
+    \par
 
       Interface to IDAS from the Sundials suite.
 

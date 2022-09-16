@@ -32,6 +32,7 @@
 #include "../qpoases/qpoases_interface.hpp"
 
 /** \defgroup plugin_Nlpsol_blocksqp Title
+    \par
 
   * This is a modified version of blockSQP by Janka et al.
   *

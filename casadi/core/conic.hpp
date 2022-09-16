@@ -31,6 +31,7 @@
 namespace casadi {
 
   /** \defgroup main_conic Title
+      \par
 
       Create a QP solver
       Solves the following strictly convex problem:

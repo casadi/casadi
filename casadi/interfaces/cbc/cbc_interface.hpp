@@ -34,6 +34,7 @@
 #include <string>
 
 /** \defgroup plugin_Conic_cbc Title
+    \par
 
       Interface to Cbc solver for sparse Quadratic Programs
 

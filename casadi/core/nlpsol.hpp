@@ -31,6 +31,7 @@
 namespace casadi {
 
   /** \defgroup main_nlpsol Title
+      \par
 
       Create an NLP solver
       Creates a solver for the following parametric nonlinear program (NLP):

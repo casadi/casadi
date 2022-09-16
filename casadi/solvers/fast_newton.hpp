@@ -30,6 +30,7 @@
 #include <casadi/solvers/casadi_rootfinder_fast_newton_export.h>
 
 /** \defgroup plugin_Rootfinder_fast_newton Title
+    \par
 
      Implements simple newton iterations to solve an implicit function.
 

@@ -30,6 +30,7 @@
 #include <casadi/interfaces/sqic/casadi_conic_sqic_export.h>
 
 /** \defgroup plugin_Conic_sqic Title
+    \par
 
        Interface to the SQIC solver for quadratic programming
 

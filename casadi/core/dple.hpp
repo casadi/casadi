@@ -31,6 +31,7 @@
 namespace casadi {
 
   /** \defgroup main_dple Title
+      \par
 
       Discrete periodic Lyapunov Equation solver
       Given matrices \f$A_k\f$ and symmetric \f$V_k,  k = 0..K-1\f$

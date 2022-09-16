@@ -30,6 +30,7 @@
 #include <casadi/solvers/casadi_nlpsol_qrsqp_export.h>
 
 /** \defgroup plugin_Nlpsol_qrsqp Title
+    \par
 
  A textbook SQPMethod
 

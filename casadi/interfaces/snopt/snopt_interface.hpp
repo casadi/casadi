@@ -35,6 +35,7 @@ extern "C" {
 }
 
 /** \defgroup plugin_Nlpsol_snopt Title
+    \par
 
   SNOPT interface
 

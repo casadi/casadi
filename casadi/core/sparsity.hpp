@@ -225,7 +225,8 @@ namespace casadi {
     /** \brief Create a sparsity from nonzeros
     *
     * Inverse of `find()`
-    */
+
+        \identifier{23g} */
     static Sparsity nonzeros(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& nz,
                               bool ind1=SWIG_IND1);
 

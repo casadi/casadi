@@ -27,6 +27,7 @@
 #define CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP
 
 /** \defgroup plugin_Linsol_csparsecholesky Title
+    \par
 
    * Linsol with CSparseCholesky Interface
 

@@ -27,6 +27,7 @@
 #define CASADI_LINSOL_QR_HPP
 
 /** \defgroup plugin_Linsol_qr Title
+    \par
 
   * Linear solver using sparse direct QR factorization
 

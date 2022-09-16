@@ -31,6 +31,7 @@
 #include "casadi/core/plugin_interface.hpp"
 
 /** \defgroup plugin_Importer_shell Title
+    \par
 
       Interface to the JIT compiler SHELL
 

@@ -30,6 +30,7 @@
 #include <casadi/solvers/casadi_interpolant_bspline_export.h>
 
 /** \defgroup plugin_Interpolant_bspline Title
+    \par
 
     \identifier{239} */
 

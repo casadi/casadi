@@ -47,6 +47,7 @@ extern "C" {
 }
 
 /** \defgroup plugin_Linsol_ma27 Title
+    \par
 
  * Interface to the sparse direct linear solver MA27
  * Works for symmetric indefinite systems

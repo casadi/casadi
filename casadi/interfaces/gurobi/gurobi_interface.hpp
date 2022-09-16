@@ -35,6 +35,7 @@ extern "C" {
 }
 
 /** \defgroup plugin_Conic_gurobi Title
+    \par
 
     Interface to the GUROBI Solver for quadratic programming
 
