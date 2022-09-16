@@ -30,12 +30,12 @@
 #include <string>
 
 namespace casadi {
-  /**
-  * \brief Collects global CasADi meta information
+  /** \brief Collects global CasADi meta information
   *
   *  \author Joris Gillis
   *  \date 2012
-  */
+
+      \identifier{23k} */
   class CASADI_EXPORT CasadiMeta {
     private:
       /// No instances are allowed

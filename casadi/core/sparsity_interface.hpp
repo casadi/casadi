@@ -131,7 +131,7 @@ namespace casadi {
       return MatType::horzsplit(x, incr);
     }
 
-    /** * \brief  split vertically, retaining groups of rows
+    /** \brief  split vertically, retaining groups of rows
 
      * \param output_offset List of all start rows for each group
      *      the last row group will run to the end.

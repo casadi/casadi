@@ -667,8 +667,7 @@ namespace casadi {
       return Matrix<Scalar>::heaviside(x);
     }
 
-    /**
-     * \brief rectangle function
+    /** \brief rectangle function
      *
      * \f[
      * \begin {cases}
@@ -679,13 +678,13 @@ namespace casadi {
      * \f]
      *
      * Also called: gate function, block function, band function, pulse function, window function
-     */
+
+        \identifier{23n} */
     friend inline Matrix<Scalar> rectangle(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::rectangle(x);
     }
 
-    /**
-     * \brief triangle function
+    /** \brief triangle function
      *
      * \f[
      * \begin {cases}
@@ -694,13 +693,13 @@ namespace casadi {
      * \end {cases}
      * \f]
      *
-     */
+
+        \identifier{23o} */
     friend inline Matrix<Scalar> triangle(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::triangle(x);
     }
 
-    /**
-     * \brief ramp function
+    /** \brief ramp function
      *
      *
      * \f[
@@ -711,7 +710,8 @@ namespace casadi {
      * \f]
      *
      * Also called: slope function
-     */
+
+        \identifier{23p} */
     friend inline Matrix<Scalar> ramp(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::ramp(x);
     }
@@ -735,8 +735,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /**
-     * \brief univariate Taylor series expansion
+    /** \brief univariate Taylor series expansion
      *
      * Calculate the Taylor expansion of expression 'ex' up to order 'order' with
      * respect to variable 'x' around the point 'a'
@@ -748,7 +747,8 @@ namespace casadi {
      * taylor(sin(x), x)
      * \endcode
      * \verbatim >>   x \endverbatim
-     */
+
+        \identifier{23q} */
     friend inline Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                           const Matrix<Scalar>& a, casadi_int order=1) {
       return Matrix<Scalar>::taylor(ex, x, a, order);
@@ -758,20 +758,19 @@ namespace casadi {
     }
     ///@}
 
-    /**
-     * \brief multivariate Taylor series expansion
+    /** \brief multivariate Taylor series expansion
      *
      * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
      * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
      *
-     */
+
+        \identifier{23r} */
     friend inline Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                            const Matrix<Scalar>& a, casadi_int order=1) {
       return Matrix<Scalar>::mtaylor(ex, x, a, order);
     }
 
-    /**
-     * \brief multivariate Taylor series expansion
+    /** \brief multivariate Taylor series expansion
      *
      * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
      * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
@@ -795,7 +794,8 @@ namespace casadi {
      * \endcode
      * \f$  (-3 x^2 y-x^3)/6+y+x \f$
      *
-     */
+
+        \identifier{23s} */
     friend inline Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                            const Matrix<Scalar>& a, casadi_int order,
                                            const std::vector<casadi_int>& order_contributions) {
@@ -976,9 +976,10 @@ namespace casadi {
         \identifier{19j} */
     Sparsity get_sparsity() const { return sparsity();}
 
-    /* \brief Construct a sparse matrix from triplet form
+    /** \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
-     */
+
+        \identifier{23t} */
     ///@{
     static Matrix<Scalar> triplet(const std::vector<casadi_int>& row,
                                   const std::vector<casadi_int>& col,
