@@ -70,8 +70,7 @@ doxexport:
 	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/'  | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	python extra/generate_options_doc.py
 	rm -rf XML XML_internal XML_clutter
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = DEPRECATED CLUTTER UNSAFE SWIGINTERNAL EXPANDED/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_cluttered /' | doxygen -
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL EXPANDED/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/'  | sed 's/PREDEFINED+=             SWIG//' | doxygen -
+	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = DEPRECATED CLUTTER UNSAFE SWIGINTERNAL EXPANDED/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/'  | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	sh extra/doc2swig.sh
 
 full: 

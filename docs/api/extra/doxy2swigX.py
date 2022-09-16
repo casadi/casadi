@@ -232,7 +232,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
     pass
     
   def do_programlisting(self,node):
-    if hasattr(node.previousSibling,'tagName') and node.previousSibling.tagName=="htmlonly" and "doctest" in node.previousSibling.firstChild.data:
+    if True or hasattr(node.previousSibling,'tagName') and node.previousSibling.tagName=="htmlonly" and "doctest" in node.previousSibling.firstChild.data:
       self.add_text("\n\n::\n\n")
       for codeline in node.getElementsByTagName("codeline"):
         self.add_text("  >>> " + astext(codeline,strictspacing=True).replace("\n","%%newline%%")+"\n")
@@ -329,7 +329,11 @@ class Doxy2SWIG_X(Doxy2SWIG):
       tmp = node.parentNode.parentNode.parentNode
       compdef = tmp.getElementsByTagName('compounddef')[0]
       cdef_kind = compdef.attributes['kind'].value
-      location = node.getElementsByTagName('location')[0].attributes['file'].value
+      location = node.getElementsByTagName('location')[0]
+      if "declfile" in location.attributes:
+        location = location.attributes['declfile'].value
+      else:
+        location = location.attributes['file'].value
       if "bodyfile" in node.getElementsByTagName('location')[0].attributes:
           bodylocation = node.getElementsByTagName('location')[0].attributes['bodyfile'].value
           bodystart = int(node.getElementsByTagName('location')[0].attributes['bodystart'].value)
@@ -337,6 +341,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
       line = int(node.getElementsByTagName('location')[0].attributes['line'].value)
       if prot == 'public' and not location.endswith('cpp'):
           first = self.get_specific_nodes(node, ('definition', 'name','argsstring'))
+
           name = first['name'].firstChild.data
           if name[:8] == 'operator': # Don't handle operators yet.
               return
@@ -495,7 +500,6 @@ class Doxy2SWIG_X(Doxy2SWIG):
           if not self.merge:
             target = fix_signature(swigname if len(swigname)>0 else k)
             self.doc_target(target, pieces)
-            
         if self.merge:
           target = fix_signature(k)
           
