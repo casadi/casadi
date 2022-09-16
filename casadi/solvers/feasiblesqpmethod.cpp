@@ -682,6 +682,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // uout() << "HERE!!!!" << *d->dx << std::endl;
       double dx_norminf = casadi_norm_inf(nx_, d->dx);
 
+      // uout() << "objective value: " << d_nlp->f << std::endl;
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
@@ -699,6 +700,8 @@ int Feasiblesqpmethod::solve(void* mem) const {
       }
 
       // Checking convergence criteria
+      // TODO David: implement alternative convergence criterion with m_k
+      // Where is the complementarity condition??
       if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && du_inf < tol_du_) {
         if (print_status_)
           print("MESSAGE(feasiblesqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
@@ -778,6 +781,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
       if (gain < 0) {
         if (print_status_) print("WARNING(feasiblesqpmethod): Indefinite Hessian detected\n");
       }
+
+      // Calculating the quadratic model of objective
+      m_k = eval_m_k(mem);
 
       /*
       // Pre calculatations for second order corrections and linesearch
@@ -1080,7 +1086,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
                                   double dx_norm, double rg,
                                   double tr_rad,
                                   std::string info) const {
-    print("%4d %9.2e %14.6e %9.2e %9.2e %9.2e ", iter, obj, pr_inf, du_inf, dx_norm);
+    print("%4d %9.2e %14.6e %9.2e %9.2e %9.2e ", iter, m_k, obj, pr_inf, du_inf, dx_norm);
     if (rg>0) {
       print("%7.2f ", log10(rg));
     } else {
