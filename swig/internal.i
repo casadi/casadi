@@ -559,10 +559,16 @@
 %exception  casadi::DaeBuilder::find(const std::vector< std::string > &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::name() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::name(const std::vector< size_t > &ind) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::name(size_t ind) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::var(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::var(const std::vector< size_t > &ind) const {
