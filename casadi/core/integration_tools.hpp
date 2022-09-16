@@ -36,7 +36,7 @@ namespace casadi {
   \param order Which order (1 to 9 supported)
   \param scheme  'radau' or 'legendre'
   *
-      \identifier{1so} */
+  \identifier{1so} */
   CASADI_EXPORT
     std::vector<double> collocation_points(casadi_int order, const std::string& scheme="radau");
 #ifndef SWIG
@@ -70,7 +70,7 @@ namespace casadi {
       Pi @X_f = Sum_i D[i]*Z_i
     \endverbatim
 
-      \identifier{1sp} */
+  \identifier{1sp} */
   CASADI_EXPORT void
   collocation_interpolators(const std::vector<double> & tau,
                             std::vector< std::vector<double> > &SWIG_OUTPUT(C),
@@ -112,7 +112,7 @@ namespace casadi {
       q = quad*B*h
     \endverbatim
 
-      \identifier{1sq} */
+  \identifier{1sq} */
   CASADI_EXPORT void
   collocation_coeff(const std::vector<double> & tau,
                             DM &SWIG_OUTPUT(C),
@@ -132,7 +132,7 @@ namespace casadi {
    * \param N     Number of integrator steps
    * \param order Order of interpolating polynomials
 
-      \identifier{1sr} */
+  \identifier{1sr} */
   CASADI_EXPORT Function simpleRK(Function f, casadi_int N=10, casadi_int order=4);
 
   /** \brief Construct an implicit Runge-Kutta integrator using a collocation scheme
@@ -148,7 +148,7 @@ namespace casadi {
    * \param solver Solver plugin
    * \param solver_options Options to be passed to the solver plugin
 
-      \identifier{1ss} */
+  \identifier{1ss} */
   CASADI_EXPORT
   Function simpleIRK(Function f, casadi_int N=10, casadi_int order=4,
                       const std::string& scheme="radau",
@@ -167,14 +167,13 @@ namespace casadi {
    * \param order  Order of interpolating polynomials
    * \param scheme Collocation scheme, as excepted by collocationPoints function.
 
-      \identifier{1st} */
+  \identifier{1st} */
   CASADI_EXPORT
   Function simpleIntegrator(Function f, const std::string& integrator="cvodes",
                               const Dict& integrator_options = Dict());
 
  
-  /**
-   * @brief 
+  /** \brief Reduce index
    * 
    * 
    * Index reduction leads to a new set of variables and equations.
@@ -225,8 +224,9 @@ namespace casadi {
    *      - x:   symbol for explicit differential states
    *      - ode: expression for right-hand-side of explicit differential states
    *      - I:   expression for invariants
-   * 
-   */
+   *
+
+      \identifier{23h} */
   /// @{
   CASADI_EXPORT
   MXDict dae_reduce_index(const MXDict& dae, Dict& SWIG_OUTPUT(stats), const Dict& opts={});
@@ -249,7 +249,7 @@ namespace casadi {
   * 
   * \sa dae_reduce_index
 
-      \identifier{1su} */
+  \identifier{1su} */
   /// @{
   CASADI_EXPORT
   MXDict dae_map_semi_expl(const MXDict& dae, const MXDict& dae_red,
@@ -284,7 +284,7 @@ namespace casadi {
   * 
   * \sa dae_reduce_index
 
-    \identifier{1sv} */
+  \identifier{1sv} */
   /// @{
   CASADI_EXPORT
   Function dae_init_gen(const MXDict& dae, const MXDict& dae_red,
