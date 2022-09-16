@@ -32,6 +32,7 @@
 namespace casadi {
 
   /** \defgroup main_rootfinder Title
+      \par
 
    * Create a solver for rootfinding problems
    * Takes a function where one of the inputs is unknown and one of the outputs

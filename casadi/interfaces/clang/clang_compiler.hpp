@@ -61,6 +61,7 @@
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
 /** \defgroup plugin_Importer_clang Title
+    \par
 
       Interface to the JIT compiler CLANG
 

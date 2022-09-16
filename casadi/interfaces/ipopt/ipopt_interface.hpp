@@ -31,6 +31,7 @@
 #include "casadi/core/timing.hpp"
 
 /** \defgroup plugin_Nlpsol_ipopt Title
+    \par
  *
  * When in warmstart mode, output NLPSOL_LAM_X may be used as input
  *

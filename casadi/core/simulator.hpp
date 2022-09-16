@@ -33,6 +33,7 @@
 namespace casadi {
 
   /** \defgroup main_simulator Title
+      \par
 
       Create an ODE/DAE simulator
       Solves an initial value problem (IVP) with the differential equation given as an

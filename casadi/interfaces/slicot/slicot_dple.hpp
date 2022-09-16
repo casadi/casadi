@@ -31,6 +31,7 @@
 #include <casadi/interfaces/slicot/casadi_dple_slicot_export.h>
 
 /** \defgroup plugin_Dple_slicot Title
+    \par
  *
  * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
 

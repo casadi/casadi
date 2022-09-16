@@ -38,6 +38,7 @@
 #include <ctime>
 
 /** \defgroup plugin_Integrator_cvodes Title
+    \par
 
       Interface to CVodes from the Sundials suite.
 

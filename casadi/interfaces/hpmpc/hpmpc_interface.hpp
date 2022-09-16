@@ -31,6 +31,7 @@
 #include <casadi/interfaces/hpmpc/casadi_conic_hpmpc_export.h>
 
 /** \defgroup plugin_Conic_hpmpc Title
+    \par
 
 Interface to HMPC Solver
 

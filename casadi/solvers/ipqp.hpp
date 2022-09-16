@@ -31,6 +31,7 @@
 #include "casadi/core/linsol.hpp"
 
 /** \defgroup plugin_Conic_ipqp Title
+    \par
 
  Solves QPs using a Mehrotra predictor-corrector interior point method
 

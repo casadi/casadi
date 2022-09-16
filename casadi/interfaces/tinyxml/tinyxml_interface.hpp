@@ -27,6 +27,7 @@
 #define CASADI_TINYXML_INTERFACE_HPP
 
 /** \defgroup plugin_XmlFile_tinyxml Title
+    \par
 
  * XmlFile using TinyXml
 

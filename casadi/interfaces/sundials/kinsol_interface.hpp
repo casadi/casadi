@@ -42,6 +42,7 @@
 #include <ctime>
 
 /** \defgroup plugin_Rootfinder_kinsol Title
+    \par
 
  KINSOL interface from the Sundials suite
 

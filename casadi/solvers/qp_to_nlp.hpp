@@ -31,6 +31,7 @@
 
 
 /** \defgroup plugin_Conic_nlpsol Title
+    \par
 
    Solve QPs using an Nlpsol
    Use the 'nlpsol' option to specify the NLP solver to use.

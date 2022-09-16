@@ -31,6 +31,7 @@
 #include "casadi/core/nlpsol_impl.hpp"
 
 /** \defgroup plugin_Nlpsol_knitro Title
+    \par
 
   KNITRO interface
 

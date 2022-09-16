@@ -30,6 +30,7 @@
 #include <casadi/solvers/casadi_conic_qrqp_export.h>
 
 /** \defgroup plugin_Conic_qrqp Title
+    \par
  * 
  * 
  * Solve QPs using an active-set method
