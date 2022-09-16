@@ -727,10 +727,18 @@ int Feasiblesqpmethod::solve(void* mem) const {
       
 
       // Formulate the QP
+      // Define lower bounds
       casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->lbdz);
+      casadi_clip_min(d->lbdz, nx_, -tr_rad_);
+      uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
+      
+
+      // Define upper bounds
       casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->ubdz);
+      casadi_clip_max(d->ubdz, nx_, tr_rad_);
+      uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
 
       // Initial guess
       casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);

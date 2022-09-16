@@ -11,6 +11,8 @@ set(RUNTIME_SRC
   casadi_dot.hpp
   casadi_feasiblesqpmethod.hpp
   casadi_clear.hpp
+  casadi_clip_min.hpp
+  casadi_clip_max.hpp
   casadi_fill.hpp
   casadi_flip.hpp
   casadi_file_slurp.hpp

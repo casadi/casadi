@@ -250,6 +250,8 @@ namespace casadi {
   #include "casadi_dot.hpp"
   #include "casadi_kron.hpp"
   #include "casadi_clear.hpp"
+  #include "casadi_clip_max.hpp"
+  #include "casadi_clip_min.hpp"
   #include "casadi_fill.hpp"
   #include "casadi_max_viol.hpp"
   #include "casadi_mmin.hpp"
