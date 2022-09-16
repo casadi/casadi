@@ -675,7 +675,7 @@ namespace casadi {
 
 #if !defined(SWIG) || defined(DOXYGEN)
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
     /** \brief Find first nonzero, returned as row index

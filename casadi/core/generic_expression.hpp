@@ -56,7 +56,7 @@ class GenericExpression : public GenericExpressionCommon {
   public:
 
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
 

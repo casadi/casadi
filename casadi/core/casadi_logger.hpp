@@ -34,6 +34,7 @@
 
 namespace casadi {
   /** \brief Keeps track of logging output to screen and/or files.
+
    * All printout from CasADi routines should go through this files.
    *
    *  \author Joel Andersson

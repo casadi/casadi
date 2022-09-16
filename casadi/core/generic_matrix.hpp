@@ -298,7 +298,7 @@ namespace casadi {
 
 #if !defined(SWIG) || defined(DOXYGEN)
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
 
@@ -764,29 +764,56 @@ namespace casadi {
       return MatType::pinv(A, lsolver, dict);
     }
 
+
+    /** \brief Calculate Matrix exponential
+     * 
+     * Computes expm(A*t) with A constant
+     * 
+     * \param A[in] Square matrix
+     * \param t[in] Scalar
+     *
+
+        \identifier{23v} */
     friend inline MatType expm_const(const MatType& A, const MatType& t) {
       return MatType::expm_const(A, t);
     }
 
+    /** \brief Calculate Matrix exponential
+     *
+
+        \identifier{23w} */
     friend inline MatType expm(const MatType& A) {
       return MatType::expm(A);
     }
 
-    ///@{
     /** \brief Calculate Jacobian
+     * 
+     * \return Sparse matrix
 
         \identifier{1cv} */
     inline friend MatType jacobian(const MatType &ex, const MatType &arg,
                                    const Dict& opts = Dict()) {
       return MatType::jacobian(ex, arg, opts);
     }
+    /** \brief Calculate the gradient of an expression
+     * 
+     * \param ex[in] Scalar expression to take the gradient of
+     * \param arg[in] Vector expression of symbols
+     * \param opts[in] Options
+     * 
+     * \return Dense column vector
+
+        \identifier{23x} */
     inline friend MatType gradient(const MatType &ex, const MatType &arg, const Dict& opts=Dict()) {
       return MatType::gradient(ex, arg, opts);
     }
+    /** \brief Calculate the tangent of an expression
+     *
+
+        \identifier{23y} */
     inline friend MatType tangent(const MatType &ex, const MatType &arg, const Dict& opts=Dict()) {
       return MatType::tangent(ex, arg, opts);
     }
-    ///@}
 
     /** \brief Calculate the Jacobian and multiply by a vector from the right
 
@@ -823,7 +850,9 @@ namespace casadi {
     }
 
     ///@{
-    // Hessian and (optionally) gradient
+    /** \brief Hessian and (optionally) gradient
+
+        \identifier{23z} */
     inline friend MatType hessian(const MatType &ex, const MatType &arg,
         const Dict& opts = Dict()) {
       return MatType::hessian(ex, arg, opts);

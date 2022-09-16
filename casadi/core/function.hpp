@@ -891,6 +891,12 @@ namespace casadi {
 
         \identifier{1x2} */
     std::string serialize(const Dict& opts=Dict()) const;
+
+    /** \brief Save Function to a file
+
+        \see load
+
+        \identifier{240} */
     void save(const std::string &fname, const Dict& opts=Dict()) const;
 
     std::string export_code(const std::string& lang, const Dict& options=Dict()) const;

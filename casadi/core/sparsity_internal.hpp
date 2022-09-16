@@ -36,6 +36,7 @@ namespace casadi {
   class CASADI_EXPORT SparsityInternal : public SharedObjectInternal {
   private:
     /** \brief Sparsity pattern in compressed column storage (CCS) format
+
        The first two entries are the number of rows (nrow) and columns (ncol).
        The next (ncol+1) entries are the column offsets (colind). This means that
        the number of nonzeros (nnz) is given as sp_[sp_[1]+2].
@@ -56,6 +57,7 @@ namespace casadi {
     };
 
     /** \brief The block-triangular factorization for the sparsity
+
       Calculated on first call, then cached
 
         \identifier{23j} */
