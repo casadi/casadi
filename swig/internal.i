@@ -1807,9 +1807,6 @@
 %exception  casadi::GenericExpression< ExType >::ne(const ExType &x, const ExType &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericExpression< ExType >::plus(const ExType &x, const ExType &y) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::GenericExpression< ExType >::pow(const ExType &x, const ExType &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1952,9 +1949,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExpression< SXElem  >::ne(const SXElem &x, const SXElem &y) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericExpression< SXElem  >::plus(const SXElem &x, const SXElem &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExpression< SXElem  >::pow(const SXElem &x, const SXElem &y) {

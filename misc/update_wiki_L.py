@@ -1,10 +1,13 @@
 import casadi
 
 import pathlib
+from collections import defaultdict
 
 wiki = pathlib.Path("../../casadi.wiki/")
 
 import re
+
+entries = defaultdict(dict)
 
 def parse_all(a,parent=[]):
     if hasattr(a,"__dict__"):
@@ -16,13 +19,25 @@ def parse_all(a,parent=[]):
                     target_indent = 6
                     assert initial_indent>=target_indent
                     for m in re.findall("casadi/casadi/wiki/L_(\w+)",v.__doc__):
-                        md = wiki / f"L_{m}.md"
-                        
-                        with open(md,"w") as outp:
-                            drepr = "\n".join(["> " + e[initial_indent-target_indent:] for e in v.__doc__.split("\n")])
-                            
-                            outp.write(f"""
-# Standard documentation for `{v.__qualname__}`:
+                        drepr = "\n".join(["> " + e[initial_indent-target_indent:] for e in v.__doc__.split("\n")])
+                        entries[m][v] = (v.__qualname__,drepr)
+
+                                   
+            parse_all(v,parent+[k])
+            
+        
+parse_all(casadi)
+
+for L,parts in entries.items():
+  md = wiki / f"L_{L}.md"
+  qualnames = [qualname for k,(qualname,descr) in parts.items()]
+  qualnames = ",".join("`"+e+"`" for e in qualnames)
+  descrs = [descr for k,(qualname,descr) in parts.items()]
+  descrs = list(dict.fromkeys(descrs))
+  drepr = "\n".join(descrs)
+  with open(md,"w") as outp:
+    outp.write(f"""
+# Standard documentation for {qualnames}:
 {drepr}
 
 # Extra documentation
@@ -30,8 +45,8 @@ def parse_all(a,parent=[]):
 _To edit, see [writing tips](Extra-doc-tips)_.
 
 """)
-                        
-            parse_all(v,parent+[k])
-        
-        
-parse_all(casadi)
+
+    if len(parts)>1:
+        print(L,[qualname for k,(qualname,descr) in parts.items()])
+
+             

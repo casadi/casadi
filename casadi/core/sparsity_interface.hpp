@@ -82,7 +82,7 @@ namespace casadi {
 *
 */
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
     /** \brief Concatenate a list of matrices horizontally

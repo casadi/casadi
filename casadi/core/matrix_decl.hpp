@@ -493,7 +493,7 @@ namespace casadi {
 
 #if !defined(SWIG) || defined(DOXYGEN)
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
     /** \brief Matrix adjoint
@@ -977,6 +977,7 @@ namespace casadi {
     Sparsity get_sparsity() const { return sparsity();}
 
     /** \brief Construct a sparse matrix from triplet form
+
      * Default matrix size is max(col) x max(row)
 
         \identifier{23t} */
