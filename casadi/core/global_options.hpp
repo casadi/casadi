@@ -34,8 +34,7 @@
 
 namespace casadi {
 
-  /**
-  * \brief Collects global CasADi options
+  /** \brief Collects global CasADi options
   *
   *
   * Note to developers:  \n
@@ -44,7 +43,8 @@ namespace casadi {
   *
   *  \author Joris Gillis
   *  \date 2012
-  */
+
+      \identifier{23m} */
   class CASADI_EXPORT GlobalOptions {
     private:
       /// No instances are allowed

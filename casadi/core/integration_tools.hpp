@@ -54,7 +54,7 @@ namespace casadi {
   This function computes the linear mapping between dPi/dt and coefficients Z=[X_0 X:collPoints].
 
   \param tau  location of collocation points, as obtained from collocation_points
-  \param[out] output_C interpolating coefficients to obtain derivatives.
+  \param[out] C interpolating coefficients to obtain derivatives.
       Length: order+1, order+1
 
     \verbatim
@@ -63,7 +63,7 @@ namespace casadi {
 
     with h the length of the integration interval.
 
-  \param[out] output_D interpolating coefficients to obtain end state.
+  \param[out] D interpolating coefficients to obtain end state.
       Length: order+1
 
     \verbatim
@@ -157,16 +157,6 @@ namespace casadi {
 
   /** \brief Simplified wrapper for the Integrator class
 
-   * Constructs an integrator using the same syntax as simpleRK and simpleIRK.
-   * The constructed function has three inputs,
-   * corresponding to initial state (x0), parameter (p) and integration time (h)
-   * and one output, corresponding to final state (xf).
-   *
-   * \param f      ODE function with two inputs (x and p) and one output (xdot)
-   * \param N      Number of integrator steps
-   * \param order  Order of interpolating polynomials
-   * \param scheme Collocation scheme, as excepted by collocationPoints function.
-
   \identifier{1st} */
   CASADI_EXPORT
   Function simpleIntegrator(Function f, const std::string& integrator="cvodes",
@@ -216,6 +206,7 @@ namespace casadi {
    *      Corresponds to -gamma of equation (1.5) in
    *      Ascher, Uri M., Hongsheng Chin, and Sebastian Reich. "Stabilization of DAEs and invariant manifolds." Numerische Mathematik 67.2 (1994): 131-149.
    * 
+   * \param stats Statistics
    * 
    * \return Expression dictionary describing the reduced DAE
    *   

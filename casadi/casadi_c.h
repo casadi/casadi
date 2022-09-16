@@ -58,7 +58,7 @@ extern "C" {
 
 CASADI_EXPORT int casadi_c_push_file(const char *filename);
 
-/* \brief Unloads the last batch of added Functions
+/** \brief Unloads the last batch of added Functions
 * Not thread-safe
 */
 CASADI_EXPORT void casadi_c_pop(void);

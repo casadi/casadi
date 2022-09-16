@@ -33,13 +33,13 @@
 #include <iostream>
 
 namespace casadi {
-  /**
-   * \brief Keeps track of logging output to screen and/or files.
+  /** \brief Keeps track of logging output to screen and/or files.
    * All printout from CasADi routines should go through this files.
    *
    *  \author Joel Andersson
    *  \date 2015
-   */
+
+      \identifier{23u} */
   class CASADI_EXPORT Logger {
   private:
     /// No implementation - no instances are allowed of this class

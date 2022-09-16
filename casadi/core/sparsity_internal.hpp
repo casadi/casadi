@@ -35,12 +35,14 @@ namespace casadi {
 
   class CASADI_EXPORT SparsityInternal : public SharedObjectInternal {
   private:
-    /* \brief Sparsity pattern in compressed column storage (CCS) format
+    /** \brief Sparsity pattern in compressed column storage (CCS) format
        The first two entries are the number of rows (nrow) and columns (ncol).
        The next (ncol+1) entries are the column offsets (colind). This means that
        the number of nonzeros (nnz) is given as sp_[sp_[1]+2].
        The last nnz entries are the rows of the nonzeros (row). See public class
-       for more info about the CCS format used in CasADi. */
+       for more info about the CCS format used in CasADi.
+
+        \identifier{23i} */
     std::vector<casadi_int> sp_;
 
     /** \brief Structure to hold the block triangular form
@@ -53,9 +55,10 @@ namespace casadi {
       std::vector<casadi_int> coarse_rowblock, coarse_colblock;
     };
 
-    /* \brief The block-triangular factorization for the sparsity
+    /** \brief The block-triangular factorization for the sparsity
       Calculated on first call, then cached
-    */
+
+        \identifier{23j} */
     mutable Btf* btf_;
 
   public:
