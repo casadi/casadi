@@ -686,8 +686,8 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
-        print_iteration(m->iter_count, d_nlp->f, m_k, pr_inf, du_inf, dx_norminf,
-                        m->reg, tr_rad_, info);
+        print_iteration(m->iter_count, d_nlp->f, m_k, tr_ratio,
+                        pr_inf, du_inf, dx_norminf, m->reg, tr_rad_, info);
         info = "";
         // so_succes = false;
       }
@@ -1077,16 +1077,17 @@ int Feasiblesqpmethod::solve(void* mem) const {
   }
 
   void Feasiblesqpmethod::print_iteration() const {
-    print("%4s %9s %14s %9s %9s %9s %7s %5s %7s\n", "iter", "m_k", "objective", "inf_pr",
+    print("%4s %9s %14s %9s %9s %9s %9s %7s %5s %7s\n", "iter", "m_k", "objective", "tr_ratio", "inf_pr",
           "inf_du", "||d||", "lg(rg)", "tr_rad", "info");
   }
 
   void Feasiblesqpmethod::print_iteration(casadi_int iter, double obj,
-                                  double m_k, double pr_inf, double du_inf,
+                                  double m_k, double tr_ratio, 
+                                  double pr_inf, double du_inf,
                                   double dx_norm, double rg,
                                   double tr_rad,
                                   std::string info) const {
-    print("%4d %9.2e %14.6e %9.2e %9.2e %9.2e ", iter, m_k, obj, pr_inf, du_inf, dx_norm);
+    print("%4d %9.2e %14.6e %9.2e %9.2e %9.2e %9.2e ", iter, m_k, obj, tr_ratio, pr_inf, du_inf, dx_norm);
     if (rg>0) {
       print("%7.2f ", log10(rg));
     } else {

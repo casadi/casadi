@@ -194,7 +194,8 @@ namespace casadi {
     void print_iteration() const;
 
     /// Print iteration
-    void print_iteration(casadi_int iter, double obj, double m_k, double pr_inf, double du_inf,
+    void print_iteration(casadi_int iter, double obj, double m_k, 
+                         double tr_ratio, double pr_inf, double du_inf,
                          double dx_norm, double rg, double tr_rad, 
                          std::string info) const;
 
