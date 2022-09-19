@@ -527,6 +527,234 @@ double Feasiblesqpmethod::eval_tr_ratio(double val_f, double val_f_corr, double 
   return (val_f - val_f_corr) / val_m_k;
 }
 
+void Feasiblesqpmethod::tr_update(void* mem, double& tr_rad, double tr_ratio) const {
+  auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
+  auto d_nlp = &m->d_nlp;
+  auto d = &m->d;
+  
+  if (tr_ratio < tr_eta1_){
+    tr_rad = tr_alpha1_ * casadi_norm_inf(nx_, d->dx);
+  } else if (tr_ratio > tr_eta2_ && abs(casadi_norm_inf(nx_, d->dx) - tr_rad) < optim_tol_){
+    tr_rad = fmin(tr_alpha2_*tr_rad, tr_rad_max_);
+  }
+  // else: keep trust-region as it is....
+}
+
+void Feasiblesqpmethod::feasibility_iterations(void* mem) const{
+  auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
+  auto d_nlp = &m->d_nlp;
+  auto d = &m->d;
+
+  uout() << "Hahahahahahaha....." << std::endl;
+  // p_tmp = p
+  casadi_copy(d->dx, nx_, d->dx_feas);
+//   lam_p_g_tmp = self.lam_p_g_k
+//   lam_p_x_tmp = self.lam_p_x_k
+  casadi_copy(d->dlam, nx_ + ng_, d->dlam_feas);
+
+  bool kappa_acceptance = false;
+
+  // self.x_tmp = self.x_k + p_tmp
+  casadi_copy(d_nlp->z, nx_+ng_, d->z_feas);
+  casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
+
+  // Evaluate g
+  //   self.g_tmp = self.__eval_g(self.x_tmp)
+  m->arg[0] = d->z_feas;
+  m->arg[1] = d_nlp->p;
+  m->res[0] = d->z_feas + nx_;
+  if (calc_function(m, "nlp_g")) {
+    uout() << "What does it mean that calc_function fails here??" << std::endl;
+  }
+  int inner_iter = 0;
+//   asymptotic_exactness = []
+  double asymptotic_exactness = 0.0;
+//   self.prev_infeas = self.feasibility_measure(self.x_tmp, self.g_tmp)
+//   self.curr_infeas = self.feasibility_measure(self.x_tmp, self.g_tmp)
+  double prev_infeas = casadi_max_viol(nx_+ng_, d->z_feas, d_nlp->lbz, d_nlp->ubz);
+  double curr_infeas = prev_infeas;
+//   feasibilities = [self.prev_infeas]
+//   step_norms = []
+//   kappas = []
+
+//   watchdog_prev_inf_norm = self.prev_step_inf_norm
+//   accumulated_as_ex = 0
+  double watchdog_prev_inf_norm = 1.0; //TODO: implement right version here
+  int accumulated_as_ex = 0;
+  int as_exac = 1.0;
+
+  for (int j=0; j<max_inner_iter_; ++j){
+    if (curr_infeas < feas_tol_){
+      inner_iter = j;
+      kappa_acceptance = true;
+      break;
+    } else if (j>0 && (curr_infeas > 1.0 || as_exac > 1.0)){
+      kappa_acceptance = false;
+      break;
+    }
+    inner_iter = j+1;
+
+    //       self.lam_tmp_g = self.lam_p_g_k
+    //       self.lam_tmp_x = self.lam_p_x_k
+    casadi_copy(d->dlam_feas, nx_+ng_, d->lam_feas);
+
+    // create corrected gradient here
+    casadi_copy(d->z_feas, nx_, d->dx_feas);
+    casadi_axpy(nx_, -1., d_nlp->z, d->dx_feas);
+    casadi_copy(d->gf, nx_, d->gf_feas);
+    casadi_mv(d->Bk, Hsp_, d->dx_feas, d->gf_feas, true);
+
+    // create bounds of correction QP
+    // upper bounds of constraints
+    casadi_copy(d_nlp->ubz + nx_, ng_, d->ubdz_feas + nx_);
+    casadi_axpy(nx_, -1., d->z_feas + nx_, d->ubdz_feas + nx_);
+
+    // lower bounds of constraints
+    casadi_copy(d_nlp->lbz + nx_, ng_, d->lbdz_feas + nx_);
+    casadi_axpy(nx_, -1., d->z_feas + nx_, d->lbdz_feas + nx_);
+
+    // upper bounds of variables
+    //       ubp = cs.fmin(self.tr_rad_k*self.tr_scale_mat_inv_k @
+//                     cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
+//                     self.ubx - self.x_tmp)
+    casadi_clear(d->lbdz, nx_);
+    casadi_axpy(nx_, -1., d->dx_feas, d->lbdz_feas);
+    casadi_clip_min(d->lbdz_feas, nx_, -tr_rad_); // here should be added a scalar
+
+    casadi_copy(d_nlp->lbz, nx_, d->dx_feas);
+    casadi_axpy(nx_, -1., d->z_feas, d->dx_feas);
+
+    // missing here comparison of both vectors....
+
+    int ret = solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas, d->Jk,
+    d->dx_feas, d->dlam_feas, 0); // put definition of ret out of loop
+
+
+
+
+  }
+
+}
+
+
+
+
+
+//   for j in range(self.max_inner_iter):
+
+//       if self.curr_infeas < self.feas_tol:
+//           inner_iter = j
+//           self.kappa_acceptance = True
+//           break
+//       elif j > 0 and (self.curr_infeas > 1.0 or as_exac > 1.0):
+//           self.kappa_acceptance = False
+//           break
+
+//       inner_iter = j+1
+//       self.lam_tmp_g = self.lam_p_g_k
+//       self.lam_tmp_x = self.lam_p_x_k
+
+//       # 'Relative' version TR Methods book
+//       # d = self.g_tmp
+//       # lba_correction = self.lbg - d
+//       # uba_correction = self.ubg - d
+
+//       if self.gradient_correction:
+//           grad_L_tmp = self.__eval_grad_lag(self.x_tmp, lam_p_g_tmp, lam_p_x_tmp)
+//           print('Gradient of Lagrangian: ', cs.norm_inf(grad_L_tmp))
+//           # Do the gradient correction, could also be + instead of -??
+//           grad_f_correction = grad_L_tmp - self.A_k.T @ lam_p_g_tmp - lam_p_x_tmp#self.tr_scale_mat_k.T @ lam_p_x_tmp
+//       else:
+//           # Do just Zero-Order Iterations
+//           grad_f_correction = self.val_grad_f_k #here is missing the quadratic term
+
+
+//       lbp = cs.fmax(-self.tr_rad_k*self.tr_scale_mat_inv_k @
+//                     cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
+//                     self.lbx - self.x_tmp)
+//       ubp = cs.fmin(self.tr_rad_k*self.tr_scale_mat_inv_k @
+//                     cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
+//                     self.ubx - self.x_tmp)
+
+//       lba_correction = self.lbg - self.g_tmp#- d
+//       uba_correction = self.ubg - self.g_tmp#- d
+//       lb_var_correction = lbp
+//       ub_var_correction = ubp
+
+//       (_,
+//         p_tmp,
+//         lam_p_g_tmp,
+//         lam_p_x_tmp) = self.solve_lp(g=grad_f_correction,
+//                                     a=self.A_k,
+//                                     lba=lba_correction,
+//                                     uba=uba_correction,
+//                                     lbx=lb_var_correction,
+//                                     ubx=ub_var_correction)
+
+//       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
+//                d->dx, d->dlam, 0);
+
+//       p_tmp = self.__set_optimal_slack_step(self.x_tmp, p_tmp)
+
+//       self.step_inf_norm = cs.fmax(cs.norm_inf(p_tmp),
+//                                     cs.fmax(
+//                                         cs.norm_inf(
+//                                             self.lam_tmp_g-self.lam_p_g_k),
+//                                         cs.norm_inf(self.lam_tmp_x-
+//                                                     self.lam_p_x_k)))
+
+//       self.x_tmp = self.x_tmp + p_tmp
+//       self.g_tmp = self.__eval_g(self.x_tmp)  # x_tmp = x_{tmp-1} + p_tmp
+
+//       self.curr_infeas = self.feasibility_measure(self.x_tmp, self.g_tmp)
+//       self.prev_infeas = self.curr_infeas
+
+//       kappa = self.step_inf_norm/self.prev_step_inf_norm
+//       kappas.append(kappa)
+//       as_exac = cs.norm_2(
+//           self.p_k - (self.x_tmp - self.x_k)) / cs.norm_2(self.p_k)
+//       if self.verbose:
+//           print("Kappa: ", kappa,
+//                 "Infeasibility", self.feasibility_measure(
+//                           self.x_tmp, self.g_tmp),
+//                 "Asymptotic Exactness: ", as_exac)
+
+//       # +1 excludes the first iteration from the kappa test
+//       accumulated_as_ex += as_exac
+//       if inner_iter % self.watchdog == 0:
+//           kappa_watch = self.step_inf_norm/watchdog_prev_inf_norm
+//           watchdog_prev_inf_norm = self.step_inf_norm
+//           if self.verbose:
+//               print("kappa watchdog: ", kappa_watch)
+//           if self.curr_infeas < self.feas_tol and as_exac < 0.5:
+//               self.kappa_acceptance = True
+//               break
+//           if kappa_watch > self.contraction_acceptance or\
+//                   accumulated_as_ex/self.watchdog > 0.5:
+//               self.kappa_acceptance = False
+//               break
+//           accumulated_as_ex = 0
+
+//       feasibilities.append(
+//           self.feasibility_measure(self.x_tmp, self.g_tmp))
+//       asymptotic_exactness.append(as_exac)
+//       step_norms.append(cs.norm_inf(p_tmp))
+
+//       self.prev_step_inf_norm = self.step_inf_norm
+//       self.lam_tmp_g = self.lam_p_g_k
+//       self.lam_tmp_x = self.lam_p_x_k
+
+//   self.stats['inner_iter'] += inner_iter
+//   self.inner_iters.append(inner_iter)
+//   self.inner_steps.append(step_norms)
+//   self.inner_feas.append(feasibilities)
+//   self.inner_as_exac.append(asymptotic_exactness)
+//   self.inner_kappas.append(kappas)
+
+//   return self.x_tmp, lam_p_g_tmp, lam_p_x_tmp, inner_iter
+
+// }
+
 int Feasiblesqpmethod::solve(void* mem) const {
     auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
     auto d_nlp = &m->d_nlp;

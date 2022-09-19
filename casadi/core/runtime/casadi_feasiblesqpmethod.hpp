@@ -9,7 +9,7 @@ struct casadi_feasiblesqpmethod_prob {
   // Sparsity patterns
   const casadi_int *sp_h, *sp_a, *sp_hr;
   // casadi_int merit_memsize;
-  casadi_int max_iter_ls;
+  // casadi_int max_iter_ls;
 };
 // C-REPLACE "casadi_sqpmethod_prob<T1>" "struct casadi_sqpmethod_prob"
 
@@ -29,6 +29,14 @@ struct casadi_feasiblesqpmethod_data {
   T1 *lbdz, *ubdz;
   // QP solution
   T1 *dx, *dlam;
+  // Feasibility QP solution
+  T1 *dx_feas;
+  T1 *dlam_feas;
+  // Feasibility iterate
+  T1 *z_feas;
+  T1 *lam_feas;
+  T1 *gf_feas;
+  T1 *lbdz_feas, *ubdz_feas;
   // Hessian approximation
   T1 *Bk;
   // Jacobian
@@ -56,7 +64,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
 
   // Reset sz_w, sz_iw
   *sz_w = *sz_iw = 0;
-  if (p->max_iter_ls>0) *sz_w += nx + ng; // z_cand
+  // if (p->max_iter_ls>0) *sz_w += nx + ng; // z_cand
   // Lagrange gradient in the next iterate
   *sz_w += nx; // gLag
   *sz_w += nx; // gLag_old
@@ -68,6 +76,15 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   // QP solution
   *sz_w += nx; // dx
   *sz_w += nx + ng; // dlam
+  // Feasibility QP solution
+  *sz_w += nx; // dx_feas
+  *sz_w += nx + ng; // dlam_feas
+  // Feasibility iterate
+  *sz_w += nx + ng; // x_feas + g_feas
+  *sz_w += nx + ng; // lam_feas
+  *sz_w += nx; // gf_feas
+  *sz_w += nx + ng; // lower bounds feasibile QP
+  *sz_w += nx + ng; // upper bounds feasible QP
   // Hessian approximation
   *sz_w += nnz_h; // Bk
   // Jacobian
@@ -104,9 +121,9 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   nnz_a = p->sp_a[2+p->sp_a[1]];
   nx = p->nlp->nx;
   ng = p->nlp->ng;
-  if (p->max_iter_ls>0) {
-    d->z_cand = *w; *w += nx + ng;
-  }
+  // if (p->max_iter_ls>0) {
+  //   d->z_cand = *w; *w += nx + ng;
+  // }
   // Lagrange gradient in the next iterate
   d->gLag = *w; *w += nx;
   d->gLag_old = *w; *w += nx;
@@ -143,6 +160,16 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   // QP solution
   d->dx = *w; *w += nx;
   d->dlam = *w; *w += nx + ng;
+  // Feasible QP solution
+  d->dx_feas = *w; *w += nx;
+  d->dlam_feas = *w; *w += nx + ng;
+  // feasibility iterate
+  d->z_feas = *w; *w += nx + ng;
+  d->lam_feas = *w; *w += nx + ng;
+  d->gf_feas = *w; *w += nx;
+  // Bounds of the feasibility QPs
+  d->lbdz_feas = *w; *w += nx + ng;
+  d->ubdz_feas = *w; *w += nx + ng;
   // Jacobian
   d->Jk = *w; *w += nnz_a;
   // }
