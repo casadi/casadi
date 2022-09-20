@@ -42,11 +42,11 @@ struct casadi_feasiblesqpmethod_data {
   // Jacobian
   T1* Jk;
   // merit_mem
-  T1* merit_mem;
+  // T1* merit_mem;
   // temp_mem
-  T1* temp_mem;
+  // T1* temp_mem;
   // temp_sol
-  T1* temp_sol;
+  // T1* temp_sol;
 };
 // C-REPLACE "casadi_feasiblesqpmethod_data<T1>" "struct casadi_feasiblesqpmethod_data"
 

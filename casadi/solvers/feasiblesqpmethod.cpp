@@ -552,6 +552,9 @@ void Feasiblesqpmethod::feasibility_iterations(void* mem) const{
 //   lam_p_x_tmp = self.lam_p_x_k
   casadi_copy(d->dlam, nx_ + ng_, d->dlam_feas);
 
+  double step_inf_norm = fmax(casadi_norm_inf(nx_, d->dx_feas), casadi_norm_inf(nx_ + ng_, d->dlam_feas));
+  double prev_step_inf_norm = step_inf_norm;
+
   bool kappa_acceptance = false;
 
   // self.x_tmp = self.x_k + p_tmp
@@ -570,6 +573,7 @@ void Feasiblesqpmethod::feasibility_iterations(void* mem) const{
 //   asymptotic_exactness = []
   double acc_as_exac = 0.0;
   double asymptotic_exactness = 0.0;
+  double kappa_watch = 0.0;
 //   self.prev_infeas = self.feasibility_measure(self.x_tmp, self.g_tmp)
 //   self.curr_infeas = self.feasibility_measure(self.x_tmp, self.g_tmp)
   double prev_infeas = casadi_max_viol(nx_+ng_, d->z_feas, d_nlp->lbz, d_nlp->ubz);
@@ -664,9 +668,13 @@ void Feasiblesqpmethod::feasibility_iterations(void* mem) const{
     prev_infeas = casadi_max_viol(nx_+ng_, d->z_feas, d_nlp->lbz, d_nlp->ubz);
     curr_infeas = prev_infeas;
 
-    // MISSING: kappa = ......
     //       kappa = self.step_inf_norm/self.prev_step_inf_norm
     //       kappas.append(kappa) 
+    kappa = step_inf_norm/prev_step_inf_norm;
+    //MISSING: as_exac:
+    // as_exac = casadi_norm_2(nx_, ) / casadi_norm_2(nx_, d->dx);
+    
+    
     //       as_exac = cs.norm_2(
     //           self.p_k - (self.x_tmp - self.x_k)) / cs.norm_2(self.p_k)
 
@@ -680,10 +688,9 @@ void Feasiblesqpmethod::feasibility_iterations(void* mem) const{
 
     accumulated_as_ex += as_exac;
     if (inner_iter % watchdog_ == 0){
-      print("MISSING here");
-      //kappa_watchdog = ....
-      //watchdog_prev_inf_norm = ....
-      //print("Kappa watchdog: ", kappa_watch);
+      double kappa_watchdog = step_inf_norm / watchdog_prev_inf_norm;
+      watchdog_prev_inf_norm = step_inf_norm;
+      print("Kappa watchdog: %9.2e", kappa_watchdog);
       if (curr_infeas < feas_tol_ && as_exac < 0.5){
         kappa_acceptance = true;
         break;
@@ -700,7 +707,6 @@ void Feasiblesqpmethod::feasibility_iterations(void* mem) const{
     //       self.lam_tmp_x = self.lam_p_x_k
     prev_step_inf_norm = step_inf_norm;
     casadi_copy(d->dlam_feas, nx_+ng_, d->lam_feas);
-
 
 
 
