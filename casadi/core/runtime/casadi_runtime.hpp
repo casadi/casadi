@@ -258,6 +258,8 @@ namespace casadi {
   #include "casadi_mmax.hpp"
   #include "casadi_vfmin.hpp"
   #include "casadi_vfmax.hpp"
+  #include "casadi_elem_vfmin.hpp"
+  #include "casadi_elem_vfmax.hpp"
   #include "casadi_sum_viol.hpp"
   #include "casadi_mtimes.hpp"
   #include "casadi_mv.hpp"
