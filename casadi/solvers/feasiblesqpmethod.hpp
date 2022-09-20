@@ -107,7 +107,7 @@ namespace casadi {
     void tr_update(void* mem, double& tr_rad, double tr_ratio) const;
 
     // function to get feasible iterate
-    void feasibility_iterations(void* mem) const;
+    int feasibility_iterations(void* mem) const;
 
     // Solve the NLP
     int solve(void* mem) const override;

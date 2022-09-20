@@ -20,7 +20,6 @@ struct casadi_feasiblesqpmethod_data {
   // Problem structure
   const casadi_feasiblesqpmethod_prob<T1>* prob;
 
-  T1* z_cand;
   // Lagrange gradient in the next iterate
   T1 *gLag, *gLag_old;
   // Gradient of the objective
@@ -37,6 +36,7 @@ struct casadi_feasiblesqpmethod_data {
   T1 *lam_feas;
   T1 *gf_feas;
   T1 *lbdz_feas, *ubdz_feas;
+  T1* x_tmp;
   // Hessian approximation
   T1 *Bk;
   // Jacobian
@@ -85,6 +85,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   *sz_w += nx; // gf_feas
   *sz_w += nx + ng; // lower bounds feasibile QP
   *sz_w += nx + ng; // upper bounds feasible QP
+  *sz_w += nx; // x tmp feasible QP
   // Hessian approximation
   *sz_w += nnz_h; // Bk
   // Jacobian
@@ -170,6 +171,8 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   // Bounds of the feasibility QPs
   d->lbdz_feas = *w; *w += nx + ng;
   d->ubdz_feas = *w; *w += nx + ng;
+  // x tmp for QPs
+  d->x_tmp = *w; *w += nx;
   // Jacobian
   d->Jk = *w; *w += nnz_a;
   // }
