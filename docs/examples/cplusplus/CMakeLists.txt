@@ -63,6 +63,9 @@ if(WITH_IPOPT)
 
   add_executable(feasiblesqpmethod_qp_test feasiblesqpmethod_qp_test.cpp)
   target_link_libraries(feasiblesqpmethod_qp_test casadi)
+
+  add_executable(feasiblesqpmethod_feas_iter_test feasiblesqpmethod_feas_iter_test.cpp)
+  target_link_libraries(feasiblesqpmethod_feas_iter_test casadi)
 endif()
 
 # Parse AMPL models and solve with Worhp
