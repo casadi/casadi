@@ -33,8 +33,6 @@
  \date 2013
 */
 
-
-
 /*
 DESCRIPTION: The problem is a simple QP. Any SQP solver should just need one
 iteration! Depending on the size of the trust-region. It could take more 

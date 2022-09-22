@@ -613,10 +613,10 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem) const{
     casadi_copy(d->dlam_feas, nx_+ng_, d->lam_feas);
 
     // create corrected gradient here -----------------------------
-    casadi_copy(d->z_feas, nx_, d->dx_feas);
-    casadi_axpy(nx_, -1., d_nlp->z, d->dx_feas);
+    casadi_copy(d->z_feas, nx_, d->x_tmp);
+    casadi_axpy(nx_, -1., d_nlp->z, d->x_tmp);
     casadi_copy(d->gf, nx_, d->gf_feas);
-    casadi_mv(d->Bk, Hsp_, d->dx_feas, d->gf_feas, true);
+    casadi_mv(d->Bk, Hsp_, d->x_tmp, d->gf_feas, true);
 
     // create bounds of correction QP -----------------------------
     // upper bounds of constraints
@@ -635,10 +635,10 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem) const{
     casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->lbdz_feas);
 
-    casadi_copy(d_nlp->lbz, nx_, d->dx_feas);
-    casadi_axpy(nx_, -1., d->z_feas, d->dx_feas);
+    casadi_copy(d_nlp->lbz, nx_, d->x_tmp);
+    casadi_axpy(nx_, -1., d->z_feas, d->x_tmp);
     // comparison of both vectors
-    casadi_elem_vfmax(nx_, d->dx_feas, d->lbdz_feas);
+    casadi_elem_vfmax(nx_, d->x_tmp, d->lbdz_feas);
 
     // upper bounds of variables
     //       ubp = cs.fmin(self.tr_rad_k*self.tr_scale_mat_inv_k @
@@ -648,20 +648,25 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem) const{
     casadi_axpy(nx_, -1., d->z_feas, d->ubdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->ubdz_feas);
 
-    casadi_copy(d_nlp->ubz, nx_, d->dx_feas);
-    casadi_axpy(nx_, -1., d->z_feas, d->dx_feas);
+    casadi_copy(d_nlp->ubz, nx_, d->x_tmp);
+    casadi_axpy(nx_, -1., d->z_feas, d->x_tmp);
     // comparison of both vectors
     casadi_elem_vfmin(nx_, d->dx_feas, d->ubdz_feas);
 
+    // copy back d->dx back to d->dx_feas
+    // casadi_copy(d->dx, nx_, d->x_tmp);
+
     int ret = solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas, d->Jk,
     d->dx_feas, d->dlam_feas, 0); // put definition of ret out of loop
+
+    //MISSING: Depending on the result terminate program
 
     //MISSING: Calculate the step_inf_norm
     step_inf_norm = casadi_norm_inf(nx_, d->dx_feas);
 
     //       self.x_tmp = self.x_tmp + p_tmp
     //       self.g_tmp = self.__eval_g(self.x_tmp)  # x_tmp = x_{tmp-1} + p_tmp
-    casadi_copy(d_nlp->z, nx_+ng_, d->z_feas);
+    
     casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
 
     // Evaluate g
@@ -871,9 +876,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->iter_count = 0;
 
     // Reset
-    m->merit_ind = 0;
-    m->sigma = 0.;    // NOTE: Move this into the main optimization loop
-    m->reg = 0;
+    // m->merit_ind = 0;
+    // m->sigma = 0.;    // NOTE: Move this into the main optimization loop
+    // m->reg = 0;
 
     // Default quadratic model value of objective
     double m_k = -1.0;
@@ -882,10 +887,10 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
 
 
-    // Default stepsize
-    double t = 0;
+    // // Default stepsize
+    // double t = 0;
 
-    // For seeds
+    // For seeds ---- This is so far needed!!! ------------------
     const double one = 1.;
 
     // Info for printing
@@ -1078,6 +1083,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Solve the QP
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam, 0);
+      uout() << "QP step: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       // Detecting indefiniteness
       double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
       if (gain < 0) {
