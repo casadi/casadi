@@ -52,6 +52,7 @@ int main(int argc, char **argv){
   // opts["verbose"] = true;
   // opts["linear_solver"] = "ma57";
   opts["hessian_approximation"] = "exact";
+  opts["tr_rad0"] = 1.0;
   // opts["derivative_test"] = "second-order";
 
   // Specify QP solver

@@ -233,7 +233,7 @@ namespace casadi {
     tr_acceptance_ = 1e-8;
     tr_rad_min_ = 1e-10; //is this valid??
     tr_rad_max_ = 10.0;
-    tr_rad_ = 1.0;
+    tr_rad0_ = 1.0;
     contraction_acceptance_value_ = 0.5;
     watchdog_ = 5;
     max_inner_iter_ = 50;
@@ -331,7 +331,7 @@ namespace casadi {
       } else if (op.first == "feas_tol") {
         feas_tol_ = op.second;
       } else if (op.first == "tr_rad0") {
-        tr_rad_ = op.second;
+        tr_rad0_ = op.second;
       } else if (op.first == "tr_eta1") {
         tr_eta1_ = op.second;
       } else if (op.first == "tr_eta2") {
@@ -524,7 +524,7 @@ double Feasiblesqpmethod::eval_m_k(void* mem) const {
 }
 
 double Feasiblesqpmethod::eval_tr_ratio(double val_f, double val_f_corr, double val_m_k) const{
-  return (val_f - val_f_corr) / val_m_k;
+  return (val_f - val_f_corr) / (-val_m_k);
 }
 
 void Feasiblesqpmethod::tr_update(void* mem, double& tr_rad, double tr_ratio) const {
@@ -540,16 +540,35 @@ void Feasiblesqpmethod::tr_update(void* mem, double& tr_rad, double tr_ratio) co
   // else: keep trust-region as it is....
 }
 
+int Feasiblesqpmethod::step_update(void* mem, double tr_ratio) const {
+  auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
+  auto d_nlp = &m->d_nlp;
+  auto d = &m->d;
+  
+  if (tr_ratio > tr_acceptance_){
+    // This is not properly implemented yet: d_nlp->z_old = d_mlp->z;
+    casadi_copy(d->z_feas, nx_ + ng_, d_nlp->z);
+    casadi_copy(&d->f_feas, nx_ + ng_, &d_nlp->f);
+    casadi_copy(d->lam_feas, nx_ + ng_, d_nlp->lam);
+
+    uout() << "ACCEPTED" << std::endl;
+    return 0;
+  } else {
+    uout() << "REJECTED" << std::endl;
+    return -1;
+  }
+}
+
 /*
 Calculates the feasibility_iterations. If iterations are accepted return 0.
 If iterations are aborted return -1.
 */
-int Feasiblesqpmethod::feasibility_iterations(void* mem) const{
+int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
   auto d_nlp = &m->d_nlp;
   auto d = &m->d;
 
-  uout() << "Hahahahahahaha....." << std::endl;
+  // uout() << "Hahahahahahaha....." << std::endl;
   // p_tmp = p
   casadi_copy(d->dx, nx_, d->dx_feas);
 //   lam_p_g_tmp = self.lam_p_g_k
@@ -591,7 +610,14 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem) const{
 
 //   watchdog_prev_inf_norm = self.prev_step_inf_norm
 //   accumulated_as_ex = 0
-  double as_exac = 1.0;
+
+  // Calculate asymptotic exactness of current step
+  casadi_copy(d->dx, nx_, d->z_tmp);
+  casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
+  casadi_axpy(nx_, 1., d_nlp->z, d->z_tmp);
+  double as_exac = casadi_norm_2(nx_, d->z_tmp) / casadi_norm_2(nx_, d->dx);
+
+  // double as_exac = 1.0;
   double kappa_watchdog = 0.0;
   double kappa = 0.0;
   double acc_as_exac = 0.0;
@@ -637,7 +663,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem) const{
     // lbp = cs.fmax(-self.tr_rad_k*self.tr_scale_mat_inv_k @
     //                       cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
     //                       self.lbx - self.x_tmp)
-    casadi_fill(d->lbdz_feas, nx_, -tr_rad_);
+    casadi_fill(d->lbdz_feas, nx_, -tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->lbdz_feas);
 
@@ -650,7 +676,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem) const{
     //       ubp = cs.fmin(self.tr_rad_k*self.tr_scale_mat_inv_k @
     //                     cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
     //                     self.ubx - self.x_tmp)
-    casadi_fill(d->ubdz_feas, nx_, tr_rad_);
+    casadi_fill(d->ubdz_feas, nx_, tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->ubdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->ubdz_feas);
 
@@ -661,19 +687,19 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem) const{
 
     // copy back d->dx back to d->dx_feas
     // casadi_copy(d->dx, nx_, d->x_tmp);
-    uout() << "x_tmp: " << std::vector<double>(d->z_feas, d->z_feas+nx_) << std::endl;
-    uout() << "g_tmp: " << std::vector<double>(d->z_feas+nx_, d->z_feas+nx_+ng_) << std::endl;
-    uout() << "lbdz: " << std::vector<double>(d->lbdz_feas, d->lbdz_feas+nx_) << std::endl;
-    uout() << "ubdz: " << std::vector<double>(d->ubdz_feas, d->ubdz_feas+nx_) << std::endl;
-    uout() << "lbg: " << std::vector<double>(d->lbdz_feas+nx_, d->lbdz_feas+nx_+ng_) << std::endl;
-    uout() << "ubg: " << std::vector<double>(d->ubdz_feas+nx_, d->ubdz_feas+nx_+ng_) << std::endl;
+    // uout() << "x_tmp: " << std::vector<double>(d->z_feas, d->z_feas+nx_) << std::endl;
+    // uout() << "g_tmp: " << std::vector<double>(d->z_feas+nx_, d->z_feas+nx_+ng_) << std::endl;
+    // uout() << "lbdz: " << std::vector<double>(d->lbdz_feas, d->lbdz_feas+nx_) << std::endl;
+    // uout() << "ubdz: " << std::vector<double>(d->ubdz_feas, d->ubdz_feas+nx_) << std::endl;
+    // uout() << "lbg: " << std::vector<double>(d->lbdz_feas+nx_, d->lbdz_feas+nx_+ng_) << std::endl;
+    // uout() << "ubg: " << std::vector<double>(d->ubdz_feas+nx_, d->ubdz_feas+nx_+ng_) << std::endl;
 
     //prepare step_inf_norm
 
     int ret = solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas, d->Jk,
     d->dx_feas, d->dlam_feas, 0); // put definition of ret out of loop
 
-    uout() << "Feas QP step: " << std::vector<double>(d->dx_feas, d->dx_feas+nx_) << std::endl;
+    // uout() << "Feas QP step: " << std::vector<double>(d->dx_feas, d->dx_feas+nx_) << std::endl;
     //MISSING: Depending on the result terminate program
 
     //MISSING: Calculate the step_inf_norm
@@ -788,13 +814,14 @@ int Feasiblesqpmethod::solve(void* mem) const {
     // m->merit_ind = 0;
     // m->sigma = 0.;    // NOTE: Move this into the main optimization loop
     // m->reg = 0;
+    int step_accepted = 0;
 
     // Default quadratic model value of objective
     double m_k = -1.0;
 
     double tr_ratio = 0.0;
 
-
+    double tr_rad = tr_rad0_;
 
     // // Default stepsize
     // double t = 0;
@@ -830,74 +857,127 @@ int Feasiblesqpmethod::solve(void* mem) const {
         default:
           return 1;
       }*/
-      // Evaluate the sensitivities -------------------------------------------
-      // Evaluate f
-      m->arg[0] = d_nlp->z;
-      m->arg[1] = d_nlp->p;
-      m->res[0] = &d_nlp->f;
-      if (calc_function(m, "nlp_f")) {
-        uout() << "What does it mean that calc_function fails here??" << std::endl;
-      }
-      // Evaluate g
-      m->arg[0] = d_nlp->z;
-      m->arg[1] = d_nlp->p;
-      m->res[0] = d_nlp->z + nx_;
-      if (calc_function(m, "nlp_g")) {
-        uout() << "What does it mean that calc_function fails here??" << std::endl;
-      }
-      // Evaluate grad_f
-      m->arg[0] = d_nlp->z;
-      m->arg[1] = d_nlp->p;
-      m->res[0] = d->gf;
-      if (calc_function(m, "nlp_grad_f")) {
-        uout() << "What does it mean that calc_function fails here??" << std::endl;
-      }
-      // Evaluate jac_g
-      m->arg[0] = d_nlp->z;
-      m->arg[1] = d_nlp->p;
-      m->res[0] = d->Jk;
-      switch (calc_function(m, "nlp_jac_g")) {
-        case -1:
-          m->return_status = "Non_Regular_Sensitivities";
-          m->unified_return_status = SOLVER_RET_NAN;
-          if (print_status_)
-            print("MESSAGE(feasiblesqpmethod): No regularity of sensitivities at current point.\n");
-          return 1;
-        case 0:
-          break;
-        default:
-          return 1;
-      }
-      // uout() << "x0: " << *d_nlp->z << std::endl;
-      // uout() << "nlp_f: " << d_nlp->f << std::endl;
-      // uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
-
-      if (exact_hessian_) {
-        // Update/reset exact Hessian
+      if(m->iter_count == 0){
+        // Evaluate the sensitivities -------------------------------------------
+        // Evaluate f
         m->arg[0] = d_nlp->z;
         m->arg[1] = d_nlp->p;
-        m->arg[2] = &one;
-        m->arg[3] = d_nlp->lam + nx_;
-        m->res[0] = d->Bk;
-        if (calc_function(m, "nlp_hess_l")) return 1;
-        if (convexify_) {
-          ScopedTiming tic(m->fstats.at("convexify"));
-          if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+        m->res[0] = &d_nlp->f;
+        if (calc_function(m, "nlp_f")) {
+          uout() << "What does it mean that calc_function fails here??" << std::endl;
         }
-      } else if (m->iter_count==0) {
-        ScopedTiming tic(m->fstats.at("BFGS"));
-        // Initialize BFGS
-        casadi_fill(d->Bk, Hsp_.nnz(), 1.);
-        casadi_bfgs_reset(Hsp_, d->Bk);
-      } else {
-        ScopedTiming tic(m->fstats.at("BFGS"));
-        // Update BFGS
-        if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
-        // Update the Hessian approximation
-        casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
+        // Evaluate g
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
+        m->res[0] = d_nlp->z + nx_;
+        if (calc_function(m, "nlp_g")) {
+          uout() << "What does it mean that calc_function fails here??" << std::endl;
+        }
+        // Evaluate grad_f
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
+        m->res[0] = d->gf;
+        if (calc_function(m, "nlp_grad_f")) {
+          uout() << "What does it mean that calc_function fails here??" << std::endl;
+        }
+        // Evaluate jac_g
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
+        m->res[0] = d->Jk;
+        switch (calc_function(m, "nlp_jac_g")) {
+          case -1:
+            m->return_status = "Non_Regular_Sensitivities";
+            m->unified_return_status = SOLVER_RET_NAN;
+            if (print_status_)
+              print("MESSAGE(feasiblesqpmethod): No regularity of sensitivities at current point.\n");
+            return 1;
+          case 0:
+            break;
+          default:
+            return 1;
+        }
+        // uout() << "x0: " << *d_nlp->z << std::endl;
+        // uout() << "nlp_f: " << d_nlp->f << std::endl;
+        // uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
+
+        if (exact_hessian_) {
+          // Update/reset exact Hessian
+          m->arg[0] = d_nlp->z;
+          m->arg[1] = d_nlp->p;
+          m->arg[2] = &one;
+          m->arg[3] = d_nlp->lam + nx_;
+          m->res[0] = d->Bk;
+          if (calc_function(m, "nlp_hess_l")) return 1;
+          if (convexify_) {
+            ScopedTiming tic(m->fstats.at("convexify"));
+            if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+          }
+        } else if (m->iter_count==0) {
+          ScopedTiming tic(m->fstats.at("BFGS"));
+          // Initialize BFGS
+          casadi_fill(d->Bk, Hsp_.nnz(), 1.);
+          casadi_bfgs_reset(Hsp_, d->Bk);
+        } else {
+          ScopedTiming tic(m->fstats.at("BFGS"));
+          // Update BFGS
+          if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
+          // Update the Hessian approximation
+          casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
+        }
+      } else if (step_accepted == 0){
+        // Evaluate grad_f
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
+        m->res[0] = d->gf;
+        if (calc_function(m, "nlp_grad_f")) {
+          uout() << "What does it mean that calc_function fails here??" << std::endl;
+        }
+        // Evaluate jac_g
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
+        m->res[0] = d->Jk;
+        switch (calc_function(m, "nlp_jac_g")) {
+          case -1:
+            m->return_status = "Non_Regular_Sensitivities";
+            m->unified_return_status = SOLVER_RET_NAN;
+            if (print_status_)
+              print("MESSAGE(feasiblesqpmethod): No regularity of sensitivities at current point.\n");
+            return 1;
+          case 0:
+            break;
+          default:
+            return 1;
+        }
+        // uout() << "x0: " << *d_nlp->z << std::endl;
+        // uout() << "nlp_f: " << d_nlp->f << std::endl;
+        // uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
+
+        if (exact_hessian_) {
+          // Update/reset exact Hessian
+          m->arg[0] = d_nlp->z;
+          m->arg[1] = d_nlp->p;
+          m->arg[2] = &one;
+          m->arg[3] = d_nlp->lam + nx_;
+          m->res[0] = d->Bk;
+          if (calc_function(m, "nlp_hess_l")) return 1;
+          if (convexify_) {
+            ScopedTiming tic(m->fstats.at("convexify"));
+            if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+          }
+        } else if (m->iter_count==0) {
+          ScopedTiming tic(m->fstats.at("BFGS"));
+          // Initialize BFGS
+          casadi_fill(d->Bk, Hsp_.nnz(), 1.);
+          casadi_bfgs_reset(Hsp_, d->Bk);
+        } else {
+          ScopedTiming tic(m->fstats.at("BFGS"));
+          // Update BFGS
+          if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
+          // Update the Hessian approximation
+          casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
+        }
       }
-
-
+      
       // Evaluate the gradient of the Lagrangian
       casadi_copy(d->gf, nx_, d->gLag);
       casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag, true);
@@ -921,7 +1001,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
         print_iteration(m->iter_count, d_nlp->f, m_k, tr_ratio,
-                        pr_inf, du_inf, dx_norminf, m->reg, tr_rad_, info);
+                        pr_inf, du_inf, dx_norminf, m->reg, tr_rad, info);
         info = "";
         // so_succes = false;
       }
@@ -936,13 +1016,13 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Checking convergence criteria
       // TODO David: implement alternative convergence criterion with m_k
       // Where is the complementarity condition??
-      if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && du_inf < tol_du_) {
-        if (print_status_)
-          print("MESSAGE(feasiblesqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
-        m->return_status = "Solve_Succeeded";
-        m->success = true;
-        break;
-      }
+      // if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && du_inf < tol_du_) {
+      //   if (print_status_)
+      //     print("MESSAGE(feasiblesqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
+      //   m->return_status = "Solve_Succeeded";
+      //   m->success = true;
+      //   break;
+      // }
 
       if (m->iter_count >= max_iter_) {
         if (print_status_) print("MESSAGE(feasiblesqpmethod): Maximum number of iterations reached.\n");
@@ -958,21 +1038,19 @@ int Feasiblesqpmethod::solve(void* mem) const {
       //   break;
       // }
 
-      
-
       // Formulate the QP
       // Define lower bounds
       casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->lbdz);
-      casadi_clip_min(d->lbdz, nx_, -tr_rad_);
-      uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
+      casadi_clip_min(d->lbdz, nx_, -tr_rad);
+      // uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
       
 
       // Define upper bounds
       casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->ubdz);
-      casadi_clip_max(d->ubdz, nx_, tr_rad_);
-      uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
+      casadi_clip_max(d->ubdz, nx_, tr_rad);
+      // uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
 
       // Initial guess
       casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
@@ -992,6 +1070,17 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Solve the QP
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam, 0);
+
+      // Eval quadratic model and check for convergence
+      m_k = eval_m_k(mem);
+      if (fabs(m_k) < optim_tol_) {
+        if (print_status_)
+          print("MESSAGE(feasiblesqpmethod): Optimal Point Found? Quadratic model is zero. After %d iterations\n", m->iter_count);
+        m->return_status = "Solve_Succeeded";
+        m->success = true;
+        break;
+      }   
+        
       uout() << "QP step: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       // Detecting indefiniteness
       double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
@@ -1000,17 +1089,31 @@ int Feasiblesqpmethod::solve(void* mem) const {
       }
 
       // Do the feasibility iterations here
-      ret = feasibility_iterations(mem);
+      ret = feasibility_iterations(mem, tr_rad);
 
-      // Calculating the quadratic model of objective
-      m_k = eval_m_k(mem);      
+      // Check if step was accepted or not
+      if (ret < 0){
+        uout() << "Rejected inner iterates" << std::endl;
+        tr_rad = 0.5 * casadi_norm_inf(nx_, d->dx);
+      } else{
+        // Evaluate f
+        m->arg[0] = d->z_feas;
+        m->arg[1] = d_nlp->p;
+        m->res[0] = &d->f_feas;
+        if (calc_function(m, "nlp_f")) {
+          uout() << "What does it mean that calc_function fails here??" << std::endl;
+        }
+        tr_ratio = eval_tr_ratio(d_nlp->f, d->f_feas, m_k);
+        tr_update(mem, tr_rad, tr_ratio);
+        step_accepted = step_update(mem, tr_ratio);
+      }
+
     
-
       // Local SQP method -----------------------------------
-      // Full step on Lagrange multipliers
-      casadi_copy(d->dlam, nx_ + ng_, d_nlp->lam);
-      // Take step on primal variables
-      casadi_axpy(nx_, 1., d->dx, d_nlp->z);
+      // // Full step on Lagrange multipliers
+      // casadi_copy(d->dlam, nx_ + ng_, d_nlp->lam);
+      // // Take step on primal variables
+      // casadi_axpy(nx_, 1., d->dx, d_nlp->z);
 
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new lam (for BFGS)

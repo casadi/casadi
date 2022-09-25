@@ -50,8 +50,8 @@ int main(int argc, char **argv){
   // opts["verbose"] = true;
   // opts["linear_solver"] = "ma57";
   opts["hessian_approximation"] = "exact";
-  opts["max_inner_iter"] = 12;
-  opts["max_iter"] = 1;
+  opts["max_inner_iter"] = 30;
+  opts["max_iter"] = 20;
   opts["feas_tol"] = 1e-6;
   // opts["derivative_test"] = "second-order";
 

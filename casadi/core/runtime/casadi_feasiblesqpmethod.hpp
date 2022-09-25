@@ -41,6 +41,9 @@ struct casadi_feasiblesqpmethod_data {
   T1 *Bk;
   // Jacobian
   T1* Jk;
+
+  // Function value of feasibility iterate
+  T1 f_feas;
   // merit_mem
   // T1* merit_mem;
   // temp_mem
