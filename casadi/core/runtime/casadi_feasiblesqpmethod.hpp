@@ -37,6 +37,7 @@ struct casadi_feasiblesqpmethod_data {
   T1 *gf_feas;
   T1 *lbdz_feas, *ubdz_feas;
   T1* z_tmp;
+  T1 *tr_scale_vector; 
   // Hessian approximation
   T1 *Bk;
   // Jacobian
@@ -89,6 +90,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   *sz_w += nx + ng; // lower bounds feasibile QP
   *sz_w += nx + ng; // upper bounds feasible QP
   *sz_w += nx+ng; // x tmp feasible QP
+  *sz_w += nx; // tr_scale_vector
   // Hessian approximation
   *sz_w += nnz_h; // Bk
   // Jacobian
@@ -176,6 +178,8 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   d->ubdz_feas = *w; *w += nx + ng;
   // x tmp for QPs
   d->z_tmp = *w; *w += nx+ng;
+  // trust-region scale vector
+  d->tr_scale_vector = *w; *w += nx;
   // Jacobian
   d->Jk = *w; *w += nnz_a;
   // }

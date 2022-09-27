@@ -177,12 +177,18 @@ namespace casadi {
       {"tr_acceptance",
        {OT_DOUBLE,
         "Is the trust-region ratio above this value, the step is accepted."}},
-      {"tr_min",
+      {"tr_rad_min",
        {OT_DOUBLE,
         "Minimum trust-region radius."}},
-      {"tr_max",
+      {"tr_rad_max",
        {OT_DOUBLE,
-        "Maximum trust-region radius."}},  
+        "Maximum trust-region radius."}},
+      // {"tr_scale_vector",
+      //  {OT_DOUBLEVECTOR,
+      //   "Vector that tells where trust-region is applied."}}, 
+      {"tr_scale",
+       {OT_DOUBLE,
+        "Vector that tells where trust-region is applied."}}, 
       {"contraction_acceptance_value",
        {OT_DOUBLE,
         "If the empirical contraction rate in the feasibility iterations is above this value in the heuristics the iterations are aborted."}},
@@ -234,6 +240,8 @@ namespace casadi {
     tr_rad_min_ = 1e-10; //is this valid??
     tr_rad_max_ = 10.0;
     tr_rad0_ = 1.0;
+    tr_scale_ = 1.0;
+    // tr_scale_vector_ = std::vector<double>(nx_, 1.0);
     contraction_acceptance_value_ = 0.5;
     watchdog_ = 5;
     max_inner_iter_ = 50;
@@ -348,6 +356,10 @@ namespace casadi {
         tr_rad_min_ = op.second;
       } else if (op.first == "tr_rad_max") {
         tr_rad_max_ = op.second;
+      // } else if (op.first == "tr_scale_vector") {
+      //   tr_scale_vector_ = op.second;
+      } else if (op.first == "tr_scale") {
+        tr_scale_ = op.second;
       } else if (op.first == "contraction_acceptance_value") {
         contraction_acceptance_value_ = op.second;
       } else if (op.first == "watchdog") {
@@ -823,6 +835,11 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
     double tr_rad = tr_rad0_;
 
+    // transfer the scale vector to the problem.... thats not a nice way???
+    for (int i=0; i<nx_; ++i){
+      d->tr_scale_vector[i] = 1.0;//tr_scale_vector_[i];
+    }
+
     // // Default stepsize
     // double t = 0;
 
@@ -924,6 +941,15 @@ int Feasiblesqpmethod::solve(void* mem) const {
           // Update the Hessian approximation
           casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
         }
+
+        // test if initialization is feasible
+        if (casadi_max_viol(nx_ + ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz) > feas_tol_){
+          if (print_status_) print("MESSAGE(feasiblesqpmethod): No feasible initialization given! "
+              "Find feasible initialization.\n");
+          m->return_status = "No_Feasible_Initialization";
+          break;
+        }
+
       } else if (step_accepted == 0){
         // Evaluate grad_f
         m->arg[0] = d_nlp->z;
@@ -1003,7 +1029,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
         print_iteration(m->iter_count, d_nlp->f, m_k, tr_ratio,
                         pr_inf, du_inf, dx_norminf, m->reg, tr_rad, info);
         info = "";
-        // so_succes = false;
       }
 
       // Callback function
@@ -1014,7 +1039,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
       }
 
       // Checking convergence criteria
-      // TODO David: implement alternative convergence criterion with m_k
       // Where is the complementarity condition??
       // if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && du_inf < tol_du_) {
       //   if (print_status_)
@@ -1030,7 +1054,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
         m->unified_return_status = SOLVER_RET_LIMITED;
         break;
       }
-
       // if (m->iter_count >= 1 && m->iter_count >= min_iter_ && dx_norminf <= min_step_size_) {
       //   if (print_status_) print("MESSAGE(feasiblesqpmethod): Search direction becomes too small without "
       //         "convergence criteria being met.\n");
@@ -1042,14 +1065,14 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Define lower bounds
       casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->lbdz);
-      casadi_clip_min(d->lbdz, nx_, -tr_rad);
+      casadi_clip_min(d->lbdz, d->tr_scale_vector, nx_, -tr_rad);
       // uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
       
 
       // Define upper bounds
       casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->ubdz);
-      casadi_clip_max(d->ubdz, nx_, tr_rad);
+      casadi_clip_max(d->ubdz, d->tr_scale_vector, nx_, tr_rad);
       // uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
 
       // Initial guess
@@ -1081,7 +1104,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
         break;
       }   
         
-      uout() << "QP step: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
+      // uout() << "QP step: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       // Detecting indefiniteness
       double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
       if (gain < 0) {
@@ -1105,15 +1128,15 @@ int Feasiblesqpmethod::solve(void* mem) const {
         }
         tr_ratio = eval_tr_ratio(d_nlp->f, d->f_feas, m_k);
         tr_update(mem, tr_rad, tr_ratio);
+        if (tr_rad < feas_tol_){
+          if (print_status_) print("MESSAGE(feasiblesqpmethod): Trust-region radius smaller than feasibility!! "
+            "Abort!!.\n");
+          m->return_status = "Trust_Region_Radius_Becomes_Too_Small";
+          break;
+        }
+      
         step_accepted = step_update(mem, tr_ratio);
       }
-
-    
-      // Local SQP method -----------------------------------
-      // // Full step on Lagrange multipliers
-      // casadi_copy(d->dlam, nx_ + ng_, d_nlp->lam);
-      // // Take step on primal variables
-      // casadi_axpy(nx_, 1., d->dx, d_nlp->z);
 
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new lam (for BFGS)

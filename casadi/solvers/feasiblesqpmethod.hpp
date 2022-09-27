@@ -138,9 +138,6 @@ namespace casadi {
     /// Tolerance of primal and dual infeasibility
     double tol_pr_, tol_du_;
 
-    /// Minimum step size allowed
-    // double min_step_size_;
-
     /// Initialize feasible qp's
     bool init_feasible_;
 
@@ -180,12 +177,13 @@ namespace casadi {
     double tr_acceptance_;
     double tr_rad_min_, tr_rad_max_;
 
+    // std::vector<double> tr_scale_vector_;
+    double tr_scale_;
+
     // inner iterations
     double contraction_acceptance_value_;
     casadi_int watchdog_;
     casadi_int max_inner_iter_;
-
-
 
 
     /** \brief Generate code for the function body */
