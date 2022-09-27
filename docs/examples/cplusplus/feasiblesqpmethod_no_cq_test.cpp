@@ -51,9 +51,9 @@ int main(int argc, char **argv){
   // opts["linear_solver"] = "ma57";
   opts["hessian_approximation"] = "exact";
   opts["max_inner_iter"] = 30;
-  opts["max_iter"] = 20;
+  opts["max_iter"] = 50;
   opts["feas_tol"] = 1e-6;
-  opts["tr_scale_vector"] = std::vector<double>{1.0, 0.0};//std::vector<double>{2.5,3.0,0.75};
+  opts["optim_tol"] = 1e-10;
   // opts["derivative_test"] = "second-order";
 
   // Specify QP solver
@@ -66,8 +66,10 @@ int main(int argc, char **argv){
 
   SX x = SX::sym("x");
   SX y = SX::sym("y");
-  SX f = pow(x, 2) + pow(y-2, 2);;
-  SX g = pow(x, 2) + pow(y, 2);
+  SX f = -x;
+  SX g1 = -y;
+  SX g2 = y + pow(x, 5); 
+  SX g = SX::vertcat({g1,g2});
   SXDict nlp = {{"x", SX::vertcat({x,y})}, {"f", f}, {"g", g}};
 
   // Create an NLP solver
@@ -76,9 +78,9 @@ int main(int argc, char **argv){
 
   // Solve the problem
   DMDict arg;
-  arg["x0"] = std::vector<double>{2.0, 0.0};//std::vector<double>{2.5,3.0,0.75};
-  arg["lbg"] = 4;
-  arg["ubg"] = 4;
+  arg["x0"] = std::vector<double>{-1.0, 1.0};//std::vector<double>{2.5,3.0,0.75};
+  // arg["lbg"] = 4;
+  arg["ubg"] = std::vector<double>{0.0, 0.0};
   DMDict res = solver(arg);
 
   //  Print solution

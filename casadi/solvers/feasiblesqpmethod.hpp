@@ -177,8 +177,7 @@ namespace casadi {
     double tr_acceptance_;
     double tr_rad_min_, tr_rad_max_;
 
-    // std::vector<double> tr_scale_vector_;
-    double tr_scale_;
+    std::vector<double> tr_scale_vector_;
 
     // inner iterations
     double contraction_acceptance_value_;

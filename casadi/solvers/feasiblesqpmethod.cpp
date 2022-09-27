@@ -183,11 +183,8 @@ namespace casadi {
       {"tr_rad_max",
        {OT_DOUBLE,
         "Maximum trust-region radius."}},
-      // {"tr_scale_vector",
-      //  {OT_DOUBLEVECTOR,
-      //   "Vector that tells where trust-region is applied."}}, 
-      {"tr_scale",
-       {OT_DOUBLE,
+      {"tr_scale_vector",
+       {OT_DOUBLEVECTOR,
         "Vector that tells where trust-region is applied."}}, 
       {"contraction_acceptance_value",
        {OT_DOUBLE,
@@ -240,8 +237,7 @@ namespace casadi {
     tr_rad_min_ = 1e-10; //is this valid??
     tr_rad_max_ = 10.0;
     tr_rad0_ = 1.0;
-    tr_scale_ = 1.0;
-    // tr_scale_vector_ = std::vector<double>(nx_, 1.0);
+    tr_scale_vector_ = std::vector<double>(nx_, 1.0);
     contraction_acceptance_value_ = 0.5;
     watchdog_ = 5;
     max_inner_iter_ = 50;
@@ -356,10 +352,8 @@ namespace casadi {
         tr_rad_min_ = op.second;
       } else if (op.first == "tr_rad_max") {
         tr_rad_max_ = op.second;
-      // } else if (op.first == "tr_scale_vector") {
-      //   tr_scale_vector_ = op.second;
-      } else if (op.first == "tr_scale") {
-        tr_scale_ = op.second;
+      } else if (op.first == "tr_scale_vector") {
+        tr_scale_vector_ = op.second;
       } else if (op.first == "contraction_acceptance_value") {
         contraction_acceptance_value_ = op.second;
       } else if (op.first == "watchdog") {
@@ -837,7 +831,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
     // transfer the scale vector to the problem.... thats not a nice way???
     for (int i=0; i<nx_; ++i){
-      d->tr_scale_vector[i] = 1.0;//tr_scale_vector_[i];
+      d->tr_scale_vector[i] = tr_scale_vector_[i];
     }
 
     // // Default stepsize
