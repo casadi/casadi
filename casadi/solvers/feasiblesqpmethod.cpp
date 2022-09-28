@@ -669,6 +669,9 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     // lbp = cs.fmax(-self.tr_rad_k*self.tr_scale_mat_inv_k @
     //                       cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
     //                       self.lbx - self.x_tmp)
+
+    // casadi_copy(d_nlp->lbz, nx_, d->lbdz_feas);
+    // casadi_clip_min(d->lbdz, d->tr_scale_vector, nx_, -tr_rad);
     casadi_fill(d->lbdz_feas, nx_, -tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->lbdz_feas);
@@ -682,6 +685,9 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //       ubp = cs.fmin(self.tr_rad_k*self.tr_scale_mat_inv_k @
     //                     cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
     //                     self.ubx - self.x_tmp)
+
+    // casadi_copy(d_nlp->ubz, nx_, d->ubdz_feas);
+    // casadi_clip_max(d->ubdz, d->tr_scale_vector, nx_, tr_rad);
     casadi_fill(d->ubdz_feas, nx_, tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->ubdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->ubdz_feas);
@@ -1060,14 +1066,14 @@ int Feasiblesqpmethod::solve(void* mem) const {
       casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->lbdz);
       casadi_clip_min(d->lbdz, d->tr_scale_vector, nx_, -tr_rad);
-      // uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
+      uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
       
 
       // Define upper bounds
       casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->ubdz);
       casadi_clip_max(d->ubdz, d->tr_scale_vector, nx_, tr_rad);
-      // uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
+      uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
 
       // Initial guess
       casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
@@ -1111,6 +1117,8 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Check if step was accepted or not
       if (ret < 0){
         uout() << "Rejected inner iterates" << std::endl;
+
+        // tr_rad = 0.5 * casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
         tr_rad = 0.5 * casadi_norm_inf(nx_, d->dx);
       } else{
         // Evaluate f

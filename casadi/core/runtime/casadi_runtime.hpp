@@ -269,6 +269,7 @@ namespace casadi {
   #include "casadi_norm_1.hpp"
   #include "casadi_norm_2.hpp"
   #include "casadi_norm_inf.hpp"
+  #include "casadi_tr_norm_inf.hpp"
   #include "casadi_norm_inf_mul.hpp"
   #include "casadi_bilin.hpp"
   #include "casadi_rank1.hpp"
