@@ -574,7 +574,6 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   auto d_nlp = &m->d_nlp;
   auto d = &m->d;
 
-  // uout() << "Hahahahahahaha....." << std::endl;
   // p_tmp = p
   casadi_copy(d->dx, nx_, d->dx_feas);
 //   lam_p_g_tmp = self.lam_p_g_k
@@ -670,9 +669,9 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //                       cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
     //                       self.lbx - self.x_tmp)
 
-    // casadi_copy(d_nlp->lbz, nx_, d->lbdz_feas);
-    // casadi_clip_min(d->lbdz, d->tr_scale_vector, nx_, -tr_rad);
-    casadi_fill(d->lbdz_feas, nx_, -tr_rad);
+    casadi_copy(d_nlp->lbz, nx_, d->lbdz_feas);
+    casadi_clip_min(d->lbdz_feas, d->tr_scale_vector, nx_, -tr_rad);
+    // casadi_fill(d->lbdz_feas, nx_, -tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->lbdz_feas);
 
@@ -686,9 +685,9 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //                     cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
     //                     self.ubx - self.x_tmp)
 
-    // casadi_copy(d_nlp->ubz, nx_, d->ubdz_feas);
-    // casadi_clip_max(d->ubdz, d->tr_scale_vector, nx_, tr_rad);
-    casadi_fill(d->ubdz_feas, nx_, tr_rad);
+    casadi_copy(d_nlp->ubz, nx_, d->ubdz_feas);
+    casadi_clip_max(d->ubdz_feas, d->tr_scale_vector, nx_, tr_rad);
+    // casadi_fill(d->ubdz_feas, nx_, tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->ubdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->ubdz_feas);
 
@@ -1079,14 +1078,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
       casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
       casadi_clear(d->dx, nx_);
 
-      // Make initial guess feasible
-      /*if (init_feasible_) {
-        for (casadi_int i = 0; i < nx_; ++i) {
-          if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
-          else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
-        }
-      }*/
-
       // Increase counter
       m->iter_count++;
 
@@ -1118,8 +1109,8 @@ int Feasiblesqpmethod::solve(void* mem) const {
       if (ret < 0){
         uout() << "Rejected inner iterates" << std::endl;
 
-        // tr_rad = 0.5 * casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
-        tr_rad = 0.5 * casadi_norm_inf(nx_, d->dx);
+        tr_rad = 0.5 * casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
+        // tr_rad = 0.5 * casadi_norm_inf(nx_, d->dx);
       } else{
         // Evaluate f
         m->arg[0] = d->z_feas;
