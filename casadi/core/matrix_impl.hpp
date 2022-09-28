@@ -2566,6 +2566,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Sparsity
+  Matrix<Scalar>::jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x) {
+    casadi_error("'jacobian_sparsity' not defined for " + type_name());
+    return Sparsity();
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::taylor(const Matrix<Scalar>& f,
                                             const Matrix<Scalar>& x,
                                             const Matrix<Scalar>& a, casadi_int order) {

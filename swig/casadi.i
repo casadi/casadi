@@ -3209,6 +3209,10 @@ DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
   return which_depends(expr, var, order, tr);
 }
 
+DECL Sparsity casadi_jacobian_sparsity(const M& f, const M& x) {
+  return jacobian_sparsity(f, x);
+}
+
 DECL bool casadi_is_linear(const M& expr, const M& var) {
   return is_linear(expr, var);
 }

@@ -1775,6 +1775,10 @@ namespace casadi {
     return _which_depends(expr, var, order, tr);
   }
 
+  Sparsity MX::jacobian_sparsity(const MX &f, const MX &x) {
+    return _jacobian_sparsity(f, x);
+  }
+
   MX MX::det(const MX& x) {
     return x->get_det();
   }
