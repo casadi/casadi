@@ -301,6 +301,7 @@ namespace casadi {
     static Matrix<Scalar> simplify(const Matrix<Scalar> &x);
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                    const Dict& opts = Dict());
+    static Sparsity jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
       const Dict& opts = Dict());
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,

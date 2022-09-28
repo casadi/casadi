@@ -1174,6 +1174,12 @@ namespace casadi {
   }
 
   template<typename MatType>
+  Sparsity _jacobian_sparsity(const MatType &expr, const MatType &var) {
+    Function f = Function("tmp_jacobian_sparsity", {var}, {expr});
+    return f.jac_sparsity(0, 0, false);
+  }
+
+  template<typename MatType>
   std::vector<bool> _which_depends(const MatType &expr, const MatType &var,
       casadi_int order, bool tr) {
     // Short-circuit
