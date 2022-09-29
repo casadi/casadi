@@ -169,6 +169,22 @@ namespace casadi {
     return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
   }
 
+  bool is_permutation(const std::vector<casadi_int> &order) {
+    std::set<casadi_int> order_set(order.begin(), order.end());
+    return (order_set.size()==order.size()) &&
+           (*order_set.begin()==0) &&
+           (*order_set.rbegin()==order.size()-1);
+  }
+
+  std::vector<casadi_int> invert_permutation(const std::vector<casadi_int> &a) {
+    casadi_assert(is_permutation(a), "Not a permutation");
+    std::vector<casadi_int> ret(a.size());
+    for (casadi_int i=0;i<a.size();++i) {
+      ret[a[i]] = i;
+    }
+    return ret;
+  }
+  
   // Better have a bool return flag saying if we need reorer at all
   std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
       const std::vector<casadi_int>& order) {

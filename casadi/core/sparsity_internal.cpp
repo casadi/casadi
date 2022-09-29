@@ -1833,6 +1833,50 @@ namespace casadi {
     return is_transpose(*this);
   }
 
+  bool SparsityInternal::is_permutation() const {
+    return is_orthonormal();
+  }
+
+  bool SparsityInternal::is_orthonormal(bool allow_empty) const {
+    if (!allow_empty) {
+      if (!is_square()) return false;
+      if (nnz()!=size1()) return false;
+    }
+
+    Sparsity sp = shared_from_this<Sparsity>();
+    if (sum2(sp).nnz()!=nnz()) return false;
+    if (sum1(sp).nnz()!=nnz()) return false;
+    return true;
+  }
+
+  bool SparsityInternal::is_orthonormal_rows(bool allow_empty) const {
+    if (!allow_empty) {
+      if (size1()>size2()) return false;
+      if (nnz()!=size1()) return false;
+    }
+
+    Sparsity sp = shared_from_this<Sparsity>();
+    if (sum2(sp).nnz()!=nnz()) return false;
+    if (sum1(sp).nnz()!=nnz()) return false;
+    return true;
+  }
+
+  bool SparsityInternal::is_orthonormal_columns(bool allow_empty) const {
+    if (!allow_empty) {
+      if (size2()>size1()) return false;
+      if (nnz()!=size2()) return false;
+    }
+
+    Sparsity sp = shared_from_this<Sparsity>();
+    if (sum2(sp).nnz()!=nnz()) return false;
+    if (sum1(sp).nnz()!=nnz()) return false;
+    return true;
+  }
+
+  bool SparsityInternal::is_selection(bool allow_empty) const {
+    return is_orthonormal_rows(allow_empty);
+  }
+
   casadi_int SparsityInternal::nnz_lower(bool strictly) const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();

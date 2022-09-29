@@ -295,6 +295,26 @@ namespace casadi {
     return (*this)->is_square();
   }
 
+  bool Sparsity::is_permutation() const {
+    return (*this)->is_permutation();
+  }
+
+  bool Sparsity::is_selection(bool allow_empty) const {
+    return (*this)->is_selection(allow_empty);
+  }
+
+  bool Sparsity::is_orthonormal(bool allow_empty) const {
+    return (*this)->is_orthonormal(allow_empty);
+  }
+
+  bool Sparsity::is_orthonormal_rows(bool allow_empty) const {
+    return (*this)->is_orthonormal_rows(allow_empty);
+  }
+
+  bool Sparsity::is_orthonormal_columns(bool allow_empty) const {
+    return (*this)->is_orthonormal_columns(allow_empty);
+  }
+
   bool Sparsity::is_symmetric() const {
     return (*this)->is_symmetric();
   }
@@ -1319,6 +1339,16 @@ namespace casadi {
       return Sparsity(nrow, ncol,
                       vector<casadi_int>(colind, colind+ncol+1),
                       vector<casadi_int>(row, row+nnz), order_rows);
+    }
+  }
+
+  Sparsity Sparsity::permutation(const std::vector<casadi_int>& p, bool invert) {
+    casadi_assert(casadi::is_permutation(p), "Sparsity::permutation supplied list is not a permutation.");
+    std::vector<casadi_int> colind = range(p.size()+1);
+    if (invert) {
+      return Sparsity(p.size(), p.size(), colind, p);
+    } else {
+      return Sparsity(p.size(), p.size(), colind, invert_permutation(p));
     }
   }
 
