@@ -535,6 +535,21 @@ namespace casadi {
     /// Is square?
     bool is_square() const;
 
+    /** \brief Is this a permutation matrix? */
+    bool is_permutation() const;
+
+    /** \brief Is this a selection matrix */
+    bool is_selection(bool allow_empty=false) const;
+
+    /** \brief Are the rows and columns of the pattern orthonormal ? */
+    bool is_orthonormal(bool allow_empty=false) const;
+
+    /** \brief Are the rows of the pattern orthonormal ?  */
+    bool is_orthonormal_rows(bool allow_empty=false) const;
+
+    /** \brief  Are the columns of the pattern orthonormal ?*/
+    bool is_orthonormal_columns(bool allow_empty=false) const;
+  
     /// Is symmetric?
     bool is_symmetric() const;
 

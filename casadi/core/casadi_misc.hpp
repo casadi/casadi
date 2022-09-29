@@ -157,11 +157,17 @@ private:
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c);
 
+  /** \brief Does the list represent a permutation? */
+  bool is_permutation(const std::vector<casadi_int> &order);
+
   /** \brief permute a list
 
       \identifier{1ld} */
   template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order);
+
+  /** \brief inverse a permutation vector */
+  std::vector<casadi_int> invert_permutation(const std::vector<casadi_int> &a);
 
   /** \brief find nonzeros
 
@@ -536,10 +542,7 @@ namespace casadi {
   template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order) {
     casadi_assert_dev(order.size()==a.size());
-    std::set<casadi_int> order_set(order.begin(), order.end());
-    casadi_assert_dev(order_set.size()==a.size());
-    casadi_assert_dev(*order_set.begin()==0);
-    casadi_assert_dev(*order_set.rbegin()==a.size()-1);
+    casadi_assert_dev(is_permutation(order));
     return vector_slice(a, order);
   }
 

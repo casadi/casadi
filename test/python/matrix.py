@@ -1118,6 +1118,79 @@ class Matrixtests(casadiTestCase):
     a = vertcat(1,2)
     self.assertTrue(isinstance(a,DM))
     self.checkarray(c.linspace(1,3,10),c.linspace(1.0,3.0,10))
+  
+  def test_permutation(self):
+    n = 10
+    numpy.random.seed(1)
+    p = np.random.permutation(n)
+    S = Sparsity.permutation(p)
+    self.assertTrue(S.is_permutation())
+    v = DM.rand(n)
+    self.checkarray(S @ v, v[p])
+    S = Sparsity.permutation(p, True)
+    self.checkarray((S @ v)[p], v)
 
+  def test_sparsity_orthonormality(self):
+    alltests = [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_orthonormal_columns',False),('is_selection',False),('is_permutation',),('is_orthonormal',False),('is_orthonormal',True)]
+    
+    def check_properties(S,prop):
+      for p in prop:
+        assert p in alltests
+      for t in alltests:
+        quality = t in prop
+        method = getattr(S,t[0])
+        result = method(*t[1:])
+        self.assertEqual(quality,result,"Call %s expected to return %s" % (str(t),str(quality)))
+        
+    for S in [sparsify(DM([[0,0,0,0,0],
+                           [0,0,0,0,0],
+                           [0,0,0,0,0],
+                           [0,0,0,0,0]])),
+              sparsify(DM([[0,0,0,0,0],
+                           [0,1,0,0,0],
+                           [0,0,0,0,0],
+                           [0,0,0,0,0]])),
+              sparsify(DM([[0,0,0,0,0],
+                           [0,1,0,0,0],
+                           [0,0,0,1,0],
+                           [0,0,0,0,0]]))]:
+      check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal',True)]) 
+
+    for S in [sparsify(DM([[0,0,0,0,0],
+                           [0,1,1,0,0],
+                           [0,0,0,0,0],
+                           [0,0,0,0,0]])),
+              sparsify(DM([[0,1,0,0],
+                           [1,0,0,0],
+                           [0,1,1,0],
+                           [0,0,0,0],
+                           [0,0,0,1]])),
+              sparsify(DM([[0,0,0,0,0],
+                           [0,1,0,0,0],
+                           [0,1,0,0,0],
+                           [0,0,0,0,0]]))]:
+      check_properties(S.sparsity(), []) 
+    
+    S = sparsify(DM([[0,1,0,0,0],
+                     [1,0,0,0,0],
+                     [0,0,1,0,0],
+                     [0,0,0,1,0]]))
+    check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_selection',False),('is_orthonormal',True)])
+    
+    S = sparsify(DM([[0,1,0,0],
+                     [1,0,0,0],
+                     [0,0,1,0],
+                     [0,0,0,1]]))
+    check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_orthonormal_columns',False),('is_selection',False),('is_permutation',),('is_orthonormal',True),('is_orthonormal',False)])
+
+    S = sparsify(DM([[0,1,0,0],
+                     [1,0,0,0],
+                     [0,0,1,0],
+                     [0,0,0,0],
+                     [0,0,0,1]]))
+    check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_columns',False),('is_orthonormal',True)])
+    
+
+    
 if __name__ == '__main__':
     unittest.main()

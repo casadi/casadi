@@ -244,6 +244,17 @@ namespace casadi {
 #endif // SWIG
     ///@}
 
+    /** \brief Construct a permutation matrix P from a permutation vector p
+     * 
+     * Right multiplication of P with a vector leads to the same results as indexing that vector with p
+     * 
+     * P @ v = v[p]
+     * 
+     * The inverse of a permutation matrix is equal to its transpose (property of orthonormality)
+     * 
+     */
+    static Sparsity permutation(const std::vector<casadi_int>& p, bool invert=false);
+
     /** Get the diagonal of the matrix/create a diagonal matrix
         (mapping will contain the nonzero mapping)
         When the input is square, the diagonal elements are returned.
@@ -762,23 +773,63 @@ namespace casadi {
         \identifier{cz} */
     bool is_vector() const;
 
-    /// Is diagonal?
+    /** \brief Is diagonal? */
     bool is_diag() const;
 
-    /// Is square?
+    /** \brief Is square? */
     bool is_square() const;
 
-    /// Is symmetric?
+    /** \brief Is symmetric? */
     bool is_symmetric() const;
 
-    /// Is upper triangular?
+    /** \brief Is upper triangular? */
     bool is_triu(bool strictly = false) const;
 
-    /// Is lower triangular?
+    /** \brief Is lower triangular? */
     bool is_tril(bool strictly = false) const;
 
-    /// Check whether the sparsity-pattern indicates structural singularity
+    /** \brief Check whether the sparsity-pattern indicates structural singularity */
     bool is_singular() const;
+
+    /** \brief Is this a permutation matrix?
+     * 
+     * A Matrix P is permutation matrix if right multiplication with a dense vector v leads to 
+     * a vector with the same elements, but permuted.
+     * 
+     * Implies square
+     * 
+     * Equivalent to is_orthonormal(false)
+     */
+    bool is_permutation() const;
+
+    /** \brief Is this a selection matrix?
+     * 
+     * A Matrix S is selection matrix if right multiplication with a dense vector leads to 
+     * a vector with a subset of the elements of the original vector
+     * 
+     * \param[in] allow_empty Allow the resultant vector to have structural zeros
+     * 
+     * Equivalent to is_orthonormal_rows(allow_empty)
+     */
+    bool is_selection(bool allow_empty=false) const;
+
+    /** \brief Are both rows and columns orthonormal ?
+     * 
+     * \param[in] allow_empty Disregard empty rows and columns in the analysis
+     */
+    bool is_orthonormal(bool allow_empty=false) const;
+
+    /** \brief Are the rows of the pattern orthonormal ?
+     * 
+     * \param[in] allow_empty Disregard empty rows in the analysis
+     */
+    bool is_orthonormal_rows(bool allow_empty=false) const;
+
+    /** \brief Are the columns of the pattern orthonormal ?
+     * 
+     * \param[in] allow_empty Disregard empty columns in the analysis
+     */
+    bool is_orthonormal_columns(bool allow_empty=false) const;
 
     /** \brief Do the rows appear sequentially on each column
     *
