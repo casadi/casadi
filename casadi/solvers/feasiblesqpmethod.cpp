@@ -554,8 +554,8 @@ int Feasiblesqpmethod::step_update(void* mem, double tr_ratio) const {
   if (tr_ratio > tr_acceptance_){
     // This is not properly implemented yet: d_nlp->z_old = d_mlp->z;
     casadi_copy(d->z_feas, nx_ + ng_, d_nlp->z);
-    casadi_copy(&d->f_feas, nx_ + ng_, &d_nlp->f);
-    casadi_copy(d->lam_feas, nx_ + ng_, d_nlp->lam);
+    d_nlp->f = d->f_feas;
+    casadi_copy(d->dlam_feas, nx_ + ng_, d_nlp->lam);
 
     uout() << "ACCEPTED" << std::endl;
     return 0;
@@ -647,7 +647,6 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
 
     //       self.lam_tmp_g = self.lam_p_g_k
     //       self.lam_tmp_x = self.lam_p_x_k
-    casadi_copy(d->dlam_feas, nx_+ng_, d->lam_feas);
 
     // create corrected gradient here -----------------------------
     casadi_copy(d->z_feas, nx_, d->z_tmp);
@@ -806,7 +805,6 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //       self.lam_tmp_g = self.lam_p_g_k
     //       self.lam_tmp_x = self.lam_p_x_k
     prev_step_inf_norm = step_inf_norm;
-    casadi_copy(d->dlam_feas, nx_+ng_, d->lam_feas);
   }
   //maximum iterations reached
   // kappa_acceptance = false;
@@ -1065,14 +1063,14 @@ int Feasiblesqpmethod::solve(void* mem) const {
       casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->lbdz);
       casadi_clip_min(d->lbdz, d->tr_scale_vector, nx_, -tr_rad);
-      uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
+      // uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
       
 
       // Define upper bounds
       casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->ubdz);
       casadi_clip_max(d->ubdz, d->tr_scale_vector, nx_, tr_rad);
-      uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
+      // uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
 
       // Initial guess
       casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);

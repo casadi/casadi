@@ -33,7 +33,6 @@ struct casadi_feasiblesqpmethod_data {
   T1 *dlam_feas;
   // Feasibility iterate
   T1 *z_feas;
-  T1 *lam_feas;
   T1 *gf_feas;
   T1 *lbdz_feas, *ubdz_feas;
   T1* z_tmp;
@@ -85,7 +84,6 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   *sz_w += nx + ng; // dlam_feas
   // Feasibility iterate
   *sz_w += nx + ng; // x_feas + g_feas
-  *sz_w += nx + ng; // lam_feas
   *sz_w += nx; // gf_feas
   *sz_w += nx + ng; // lower bounds feasibile QP
   *sz_w += nx + ng; // upper bounds feasible QP
@@ -144,20 +142,6 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   //   d->temp_sol = *w; *w += nx+nx+ng;
   // }
 
-  // if (elastic_mode) {
-  //   // Gradient of the objective
-  //   d->gf = *w; *w += nx + 2*ng;
-  //   // Bounds of the QP
-  //   d->lbdz = *w; *w += nx + 3*ng;
-  //   d->ubdz = *w; *w += nx + 3*ng;
-  //   // QP solution
-  //   d->dx = *w; *w += nx + 2*ng;
-  //   d->dlam = *w; *w += nx + 3*ng;
-  //   // Jacobian
-  //   d->Jk = *w; *w += nnz_a + 2*ng;
-  //   // temp mem
-  //   d->temp_mem = *w; *w += ng;
-  // } else {
   // Gradient of the objective
   d->gf = *w; *w += nx;
   // Bounds of the QP
@@ -171,7 +155,6 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   d->dlam_feas = *w; *w += nx + ng;
   // feasibility iterate
   d->z_feas = *w; *w += nx + ng;
-  d->lam_feas = *w; *w += nx + ng;
   d->gf_feas = *w; *w += nx;
   // Bounds of the feasibility QPs
   d->lbdz_feas = *w; *w += nx + ng;

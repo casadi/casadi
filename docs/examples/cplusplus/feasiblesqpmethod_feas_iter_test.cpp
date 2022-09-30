@@ -53,7 +53,7 @@ int main(int argc, char **argv){
   opts["max_inner_iter"] = 30;
   opts["max_iter"] = 20;
   opts["feas_tol"] = 1e-6;
-  opts["tr_scale_vector"] = std::vector<double>{1.0, 0.0};//std::vector<double>{2.5,3.0,0.75};
+  opts["tr_scale_vector"] = std::vector<double>{1.0, 1.0};//std::vector<double>{2.5,3.0,0.75};
   // opts["derivative_test"] = "second-order";
 
   // Specify QP solver
