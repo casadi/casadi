@@ -413,13 +413,13 @@ class MXtests(casadiTestCase):
       self.assertAlmostEqual(L[i], zt[0,i],10)
 
   def test_sparsity_cast(self):
-    sp_source = sparsify(IM([[1, 0, 1],[0, 0, 1],[1, 0,0]])).sparsity()
+    sp_source = sparsify(DM([[1, 0, 1],[0, 0, 1],[1, 0,0]])).sparsity()
     x   = MX.sym("x",sp_source)
     xsx = SX.sym("x",sp_source)
 
 
 
-    sp = sparsify(IM([[1, 0, 1],[1, 0,1]])).sparsity()
+    sp = sparsify(DM([[1, 0, 1],[1, 0,1]])).sparsity()
 
     with self.assertInException("mismatch"):
       reshape(x,sp)
