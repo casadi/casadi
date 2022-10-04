@@ -1915,45 +1915,45 @@ MX DaeBuilderInternal::add_t(const std::string& name) {
   return v.v;
 }
 
-MX DaeBuilderInternal::add_p(const std::string& name) {
+MX DaeBuilderInternal::add_p(const std::string& name, casadi_int n) {
   Variable v(name);
-  v.v = MX::sym(name);
+  v.v = MX::sym(name, n);
   v.variability = Variability::FIXED;
   v.causality = Causality::INPUT;
   p_.push_back(add_variable(name, v));
   return v.v;
 }
 
-MX DaeBuilderInternal::add_u(const std::string& name) {
+MX DaeBuilderInternal::add_u(const std::string& name, casadi_int n) {
   Variable v(name);
-  v.v = MX::sym(name);
+  v.v = MX::sym(name, n);
   v.variability = Variability::CONTINUOUS;
   v.causality = Causality::INPUT;
   u_.push_back(add_variable(name, v));
   return v.v;
 }
 
-MX DaeBuilderInternal::add_x(const std::string& name) {
+MX DaeBuilderInternal::add_x(const std::string& name, casadi_int n) {
   Variable v(name);
-  v.v = MX::sym(name);
+  v.v = MX::sym(name, n);
   v.variability = Variability::CONTINUOUS;
   v.causality = Causality::LOCAL;
   x_.push_back(add_variable(name, v));
   return v.v;
 }
 
-MX DaeBuilderInternal::add_z(const std::string& name) {
+MX DaeBuilderInternal::add_z(const std::string& name, casadi_int n) {
   Variable v(name);
-  v.v = MX::sym(name);
+  v.v = MX::sym(name, n);
   v.variability = Variability::CONTINUOUS;
   v.causality = Causality::LOCAL;
   z_.push_back(add_variable(name, v));
   return v.v;
 }
 
-MX DaeBuilderInternal::add_q(const std::string& name) {
+MX DaeBuilderInternal::add_q(const std::string& name, casadi_int n) {
   Variable v(name);
-  v.v = MX::sym(name);
+  v.v = MX::sym(name, n);
   v.variability = Variability::CONTINUOUS;
   v.causality = Causality::LOCAL;
   q_.push_back(add_variable(name, v));
