@@ -1190,7 +1190,84 @@ class Matrixtests(casadiTestCase):
                      [0,0,0,1]]))
     check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_columns',False),('is_orthonormal',True)])
     
+  def test_permutation_solve(self):
+    n = 10
+    numpy.random.seed(1)
+    DM.rng(1)
+    p = np.random.permutation(n)
+    P = Sparsity.permutation(p)
+    fs = []
+    for X in [SX,MX]:
+      x = X.sym("x",P)
+      b = X.sym("b",n)
+      assert x.sparsity().is_orthonormal()
+      nz = sparsity_cast(x, Sparsity.dense(n))
+      f = Function("f",[x,b],[solve(x,b)])
+      f.generate('f.c')
+      fs.append(f)    
+    x0 = DM.rand(x.sparsity())
+    b0 = DM.rand(b.sparsity())
+    res0 = fs[0](x0,b0)
+    res1 = fs[1](x0,b0)
+    self.checkarray(res0,res1)
 
+  def test_permutation_inv(self):
+    n = 10
+    numpy.random.seed(1)
+    DM.rng(1)
+    p = np.random.permutation(n)
+    P = Sparsity.permutation(p)
+    fs = []
+    for X in [SX,MX]:
+      x = X.sym("x",P)
+      f = Function("f",[x],[solve(x,X.eye(n))])
+      f.generate('f.c')
+      fs.append(f)    
+    x0 = DM(P,DM.rand(n))
+    res0 = fs[0](x0)
+    res1 = fs[1](x0)
+    self.checkarray(res0,res1)
+
+    fs = []
+    for X in [SX,MX]:
+      x = X.sym("x",P)
+      f = Function("f",[x],[inv(x)])
+      f.disp(True)
+      fs.append(f)    
+    x0 = DM(P,DM.rand(n))
+    res0 = fs[0](x0)
+    res1 = fs[1](x0)
+    self.checkarray(res0,res1)
+
+    
+  def test_mac_simplify(self):
+    n = 10
+    numpy.random.seed(1)
+    DM.rng(1)
+    p = np.random.permutation(n)
+    P = Sparsity.permutation(p)
+    fs = []
+    for X in [SX,MX]:
+      b = X.sym("b",n)
+      x = X.sym("x",P)
+      f = Function("f",[x,b],[mtimes(x,b)])
+      f.generate('f.c')
+      fs.append(f)  
+    x0 = DM(P,DM.rand(n))
+    b0 = DM.rand(b.sparsity())
+    res0 = fs[0](x0,b0)
+    res1 = fs[1](x0,b0)
+    self.checkarray(res0,res1)
+    
+
+  def test_inplace(self):
+    n = 10
+    x = MX.sym("x",n)
+    y = MX(Sparsity.diag(n),x)
+    f = Function('f',[x],[y])
+    self.assertTrue(f.sz_w()==n)
+
+    
     
 if __name__ == '__main__':
     unittest.main()
