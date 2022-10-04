@@ -1885,6 +1885,11 @@ namespace casadi {
     } else if (a.is_tril()) {
       // A is lower triangular
       return a->get_solve_tril(b, false);
+    } else if (a.sparsity().is_orthonormal()) {
+      // A is orthonormal -> inv(A)==A.T
+      MX nz = sparsity_cast(a, Sparsity::dense(a.nnz()));
+      const Sparsity& Q = a.sparsity();
+      return mtimes(MX(Q, 1/nz).T(), b);
     } else {
       // Fall-back to QR factorization
       return solve(a, b, "qr");
@@ -1892,6 +1897,7 @@ namespace casadi {
   }
 
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
+    if (a.sparsity().is_orthonormal()) return solve(a, b);
     Linsol mysolver("tmp_solve", lsolver, a.sparsity(), dict);
     return mysolver.solve(a, b, false);
   }

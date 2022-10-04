@@ -496,7 +496,12 @@ namespace casadi {
     g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz())
       << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "; cii!=" << ind << "+" << nz_.size()
-      << "; ++cii) *rr++ = *cii>=0 ? ss[*cii] : 0;\n";
+      << "; ++cii) *rr++ = ";
+    if (has_negative(nz_)) {
+      g << "*cii>=0 ? ss[*cii] : 0;\n";
+    } else {
+      g << "ss[*cii];\n";
+    }
   }
 
   MX GetNonzeros::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {

@@ -468,6 +468,11 @@ namespace casadi {
 
 
   MX MXNode::get_mac(const MX& y, const MX& z) const {
+    if (sparsity().is_orthonormal() && y.is_column() && y.is_dense() && y.sparsity()==z.sparsity() && z.is_zero()) {
+      std::vector<casadi_int> perm = sparsity().permutation();
+      MX nz = sparsity_cast(shared_from_this<MX>(), Sparsity::dense(nnz()));
+      return (nz*y)(perm);
+    }
     // Get reference to transposed first argument
     MX x = shared_from_this<MX>();
 
@@ -560,6 +565,9 @@ namespace casadi {
   }
 
   MX MXNode::get_nzref(const Sparsity& sp, const vector<casadi_int>& nz) const {
+    if (sparsity().is_dense() && is_range(nz, 0, nnz())) {
+      return sparsity_cast(shared_from_this<MX>(), sp);
+    }
     return GetNonzeros::create(sp, shared_from_this<MX>(), nz);
   }
 

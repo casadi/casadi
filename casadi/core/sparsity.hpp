@@ -255,6 +255,9 @@ namespace casadi {
      */
     static Sparsity permutation(const std::vector<casadi_int>& p, bool invert=false);
 
+    /** \brief Construct permutation vector from permutation matrix */
+    const std::vector<casadi_int> permutation(bool invert=false) const;
+
     /** Get the diagonal of the matrix/create a diagonal matrix
         (mapping will contain the nonzero mapping)
         When the input is square, the diagonal elements are returned.
