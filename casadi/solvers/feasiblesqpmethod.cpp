@@ -601,12 +601,13 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   if (calc_function(m, "nlp_g")) {
     uout() << "What does it mean that calc_function fails here??" << std::endl;
   }
-  int inner_iter = 0;
+  int inner_iter = 0; 
   
 //   asymptotic_exactness = []
   // double asymptotic_exactness = 0.0;
 //   self.prev_infeas = self.feasibility_measure(self.x_tmp, self.g_tmp)
 //   self.curr_infeas = self.feasibility_measure(self.x_tmp, self.g_tmp)
+  
   double prev_infeas = casadi_max_viol(nx_+ng_, d->z_feas, d_nlp->lbz, d_nlp->ubz);
   double curr_infeas = prev_infeas;
 //   feasibilities = [self.prev_infeas]
@@ -628,7 +629,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   double acc_as_exac = 0.0;
   
 
-  double watchdog_prev_inf_norm = prev_step_inf_norm;
+  double watchdog_prev_inf_norm = prev_step_inf_norm; // until here everything is correct!
 
   for (int j=0; j<max_inner_iter_; ++j){
     if (curr_infeas < feas_tol_){
@@ -657,11 +658,11 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     // create bounds of correction QP -----------------------------
     // upper bounds of constraints
     casadi_copy(d_nlp->ubz + nx_, ng_, d->ubdz_feas + nx_);
-    casadi_axpy(nx_, -1., d->z_feas + nx_, d->ubdz_feas + nx_);
+    casadi_axpy(ng_, -1., d->z_feas + nx_, d->ubdz_feas + nx_);
 
     // lower bounds of constraints
     casadi_copy(d_nlp->lbz + nx_, ng_, d->lbdz_feas + nx_);
-    casadi_axpy(nx_, -1., d->z_feas + nx_, d->lbdz_feas + nx_);
+    casadi_axpy(ng_, -1., d->z_feas + nx_, d->lbdz_feas + nx_);
 
     // lower bounds of variables
     // lbp = cs.fmax(-self.tr_rad_k*self.tr_scale_mat_inv_k @
@@ -684,6 +685,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //                     cs.DM.ones(self.nx, 1) - (self.x_tmp-self.x_k),
     //                     self.ubx - self.x_tmp)
 
+
     casadi_copy(d_nlp->ubz, nx_, d->ubdz_feas);
     casadi_clip_max(d->ubdz_feas, d->tr_scale_vector, nx_, tr_rad);
     // casadi_fill(d->ubdz_feas, nx_, tr_rad);
@@ -695,14 +697,15 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     // comparison of both vectors
     casadi_elem_vfmin(nx_, d->z_tmp, d->ubdz_feas);
 
+    // std::string suffix = str(j);
+    // DM(std::vector<double>(d_nlp->lbz,d_nlp->lbz+nx_+ng_)).to_file("nlp_lbz"+suffix+".mtx");
+    // DM(std::vector<double>(d_nlp->ubz,d_nlp->ubz+nx_+ng_)).to_file("nlp_ubz"+suffix+".mtx");
+    // DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_+ng_)).to_file("lbz"+suffix+".mtx");
+    // DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_+ng_)).to_file("ubz"+suffix+".mtx");
+    // DM(std::vector<double>(d->z_feas,d->z_feas+nx_+ng_)).to_file("z_feas"+suffix+".mtx");
+    // DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_feas"+suffix+".mtx");
     // copy back d->dx back to d->dx_feas
     // casadi_copy(d->dx, nx_, d->x_tmp);
-    // uout() << "x_tmp: " << std::vector<double>(d->z_feas, d->z_feas+nx_) << std::endl;
-    // uout() << "g_tmp: " << std::vector<double>(d->z_feas+nx_, d->z_feas+nx_+ng_) << std::endl;
-    // uout() << "lbdz: " << std::vector<double>(d->lbdz_feas, d->lbdz_feas+nx_) << std::endl;
-    // uout() << "ubdz: " << std::vector<double>(d->ubdz_feas, d->ubdz_feas+nx_) << std::endl;
-    // uout() << "lbg: " << std::vector<double>(d->lbdz_feas+nx_, d->lbdz_feas+nx_+ng_) << std::endl;
-    // uout() << "ubg: " << std::vector<double>(d->ubdz_feas+nx_, d->ubdz_feas+nx_+ng_) << std::endl;
 
     //prepare step_inf_norm
 
