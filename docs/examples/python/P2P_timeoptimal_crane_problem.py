@@ -607,10 +607,10 @@ opts_sqpmethod = {  'qpsol': 'nlpsol',
                                                                     "print_time": False}, 
                                     "error_on_fail": False},
                     'print_time': False,
-                    'max_iter':100,
+                    'max_iter':20,
                     'max_inner_iter':50,
                     'tr_rad0': 1,
-                    'feas_tol': 1e-7,
+                    'feas_tol': 1e-8,
                     'hess_lag': testproblem.create_gn_hessian(),
                     'tr_scale_vector': testproblem.create_scaling_matrices()}
 # opts_sqpmethod = {

@@ -539,8 +539,8 @@ void Feasiblesqpmethod::tr_update(void* mem, double& tr_rad, double tr_ratio) co
   auto d = &m->d;
   
   if (tr_ratio < tr_eta1_){
-    tr_rad = tr_alpha1_ * casadi_norm_inf(nx_, d->dx);
-  } else if (tr_ratio > tr_eta2_ && abs(casadi_norm_inf(nx_, d->dx) - tr_rad) < optim_tol_){
+    tr_rad = tr_alpha1_ * casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
+  } else if (tr_ratio > tr_eta2_ && abs(casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector) - tr_rad) < optim_tol_){
     tr_rad = fmin(tr_alpha2_*tr_rad, tr_rad_max_);
   }
   // else: keep trust-region as it is....
@@ -1109,6 +1109,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Check if step was accepted or not
       if (ret < 0){
         uout() << "Rejected inner iterates" << std::endl;
+        uout() << casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector) << std::endl;
 
         tr_rad = 0.5 * casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
         // tr_rad = 0.5 * casadi_norm_inf(nx_, d->dx);
