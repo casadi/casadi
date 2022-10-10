@@ -2842,6 +2842,6 @@ class Functiontests(casadiTestCase):
         f2 = Function('f',[x,y],[w],{"cse":True})
         self.assertTrue(f1.n_instructions()>3)
         self.assertTrue(f2.n_instructions()<=3)
-        
+
 if __name__ == '__main__':
     unittest.main()
