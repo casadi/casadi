@@ -133,6 +133,7 @@ namespace casadi {
 
   DefaultLayout::DefaultLayout() {
     layout_ = {0};
+    initSingleton();
   }
 
   /** \brief Get name of public class */
@@ -145,7 +146,7 @@ namespace casadi {
 
 
   DefaultLayout::~DefaultLayout() {
-
+    destroySingleton();
   }
 
   size_t DefaultLayout::size() const {
@@ -194,6 +195,9 @@ namespace casadi {
       return new DefaultLayout(s);
     } else if (type==1) {
       return new StridedLayout(s);
+    } else {
+      casadi_error("cannot occur");
+      return 0;
     }
   }
 

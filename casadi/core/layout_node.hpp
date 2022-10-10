@@ -88,9 +88,16 @@ namespace casadi {
   */
   class CASADI_EXPORT DefaultLayout : public LayoutNode {
 
-  public:
+  private:
     /// Constructor
     DefaultLayout();
+  public:
+
+    /** \brief Get a pointer to the singleton */
+    static DefaultLayout* getInstance() {
+      static DefaultLayout instance;
+      return &instance;
+    }
 
     /** \brief  Destructor */
     ~DefaultLayout() override;

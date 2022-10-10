@@ -33,7 +33,7 @@ using namespace std;
 namespace casadi {
 
   Layout::Layout() {
-    own(new DefaultLayout());
+    own(DefaultLayout::getInstance());
   }
   /*Layout::Layout(const Sparsity& sp) {
     own(new StridedLayout({sp.nnz()}));
@@ -297,6 +297,8 @@ namespace casadi {
       Relayout result = r_left.absorbed(r_right);
       uout() << "simplify to " << result.source() << ":" << result.target() << std::endl;
       return r_left.absorbed(r_right);
+    } else {
+      casadi_error("Cannot occur");
     }
   }
 
