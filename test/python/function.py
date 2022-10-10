@@ -2762,5 +2762,22 @@ class Functiontests(casadiTestCase):
     print("memful_external")
     self.check_codegen(F,inputs=inputs,main=True,extralibs=[lib])
     
+  def test_cse(self):
+    for X in [SX,MX]:
+        x = X.sym("x",2)
+        y = X.sym("y",2)
+        p = X.sym("p",2)
+        z=p*cos(x+5*y)
+        z2=p*cos(x+5*y)
+        w = z-z2
+        self.assertFalse(w.is_zero())
+        res = cse(w)
+        self.assertTrue(res.is_zero())
+        f1 = Function('f',[x,y],[w],{"cse":False})
+        f2 = Function('f',[x,y],[w],{"cse":True})
+        self.assertTrue(f1.n_instructions()>3)
+        self.assertTrue(f2.n_instructions()<=3)
+
+    
 if __name__ == '__main__':
     unittest.main()
