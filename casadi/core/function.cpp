@@ -1707,6 +1707,14 @@ namespace casadi {
     }
   }
 
+  casadi_int Function::n_ce() const {
+    try {
+      return (*this)->n_ce();
+    } catch (exception& e) {
+      THROW_ERROR("n_ce", e.what());
+    }
+  }
+
   casadi_int Function::checkout() const {
     return (*this)->checkout();
   }

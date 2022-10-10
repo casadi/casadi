@@ -296,6 +296,9 @@ namespace casadi {
         \identifier{2q} */
     casadi_int n_nodes() const override { return algorithm_.size();}
 
+    /** \brief Number of elided copies */
+    casadi_int n_ce() const override { return n_ce_;}
+
     casadi_int n_instructions() const override { return algorithm_.size();}
 
     /** *\brief get MX expression associated with instruction

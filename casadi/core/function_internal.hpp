@@ -724,6 +724,9 @@ namespace casadi {
         \identifier{lf} */
     virtual casadi_int n_nodes() const;
 
+    /** \brief Number of elided copies */
+    virtual casadi_int n_ce() const { return 0; }
+
     /** *\brief get MX expression associated with instruction
 
          \identifier{lg} */

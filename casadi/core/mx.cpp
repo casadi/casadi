@@ -1998,10 +1998,10 @@ namespace casadi {
   }
 
 
-  class IncrementalSerializer {
+  class IncrementalSerializerMX {
     public:
 
-    IncrementalSerializer() : serializer(ss, {{"debug", true}}) {
+    IncrementalSerializerMX() : serializer(ss, {{"debug", true}}) {
     }
 
     std::string pack(const MX& a) {
@@ -2037,7 +2037,8 @@ namespace casadi {
     MXFunction *ff = f.get<MXFunction>();
 
     // Symbolic work, non-differentiated
-    vector<MX> swork(ff->workloc_.size()-1);
+    vector<MX> swork_vec(ff->workloc_.size()+f.n_ce()+1);
+    MX* swork = get_ptr(swork_vec)+f.n_ce()+1;
 
     // Allocate storage for split outputs
     vector<vector<MX> > res_split(e.size());
@@ -2047,13 +2048,13 @@ namespace casadi {
     vector<MX> res(e.size());
 
     std::unordered_map<std::string, MX > cache;
-    IncrementalSerializer s;
+    IncrementalSerializerMX s;
 
     // Loop over computational nodes in forward order
     casadi_int alg_counter = 0;
     for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
       if (it->op == OP_INPUT) {
-        // pass
+        casadi_error("cannot occur");
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
         res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
@@ -2068,7 +2069,7 @@ namespace casadi {
         arg1.resize(it->arg.size());
         for (casadi_int i=0; i<arg1.size(); ++i) {
           casadi_int el = it->arg[i]; // index of the argument
-          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+          arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : swork[el];
         }
 
         // Perform the operation
@@ -2088,7 +2089,7 @@ namespace casadi {
             out_i = itk->second;
           }
 
-          if (el>=0) swork[el] = out_i;
+          if (el!=-1) swork[el] = out_i;
         }
       }
     }

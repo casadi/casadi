@@ -27,6 +27,9 @@
 
 #include "sx_function.hpp"
 
+#include "fun_ref.hpp"
+#include "call_sx.hpp"
+
 using namespace std;
 
 namespace casadi {
@@ -579,10 +582,10 @@ namespace casadi {
     return false;
   }
 
-  class IncrementalSerializer {
+  class IncrementalSerializerSX {
     public:
 
-    IncrementalSerializer() : serializer(ss) {
+    IncrementalSerializerSX() : serializer(ss) {
     }
 
     std::string pack(const SXElem& a) {
@@ -631,7 +634,7 @@ namespace casadi {
     }
 
     std::unordered_map<std::string, SXElem > cache;
-    IncrementalSerializer s;
+    IncrementalSerializerSX s;
 
     // Iterator to stack of constants
     vector<SXElem>::const_iterator c_it = ff->constants_.begin();
@@ -657,6 +660,10 @@ namespace casadi {
         w[a.i0] = *p_it++;
         cache[s.pack(w[a.i0])] = w[a.i0];
         break;
+      case OP_FUNREF:
+        w[a.i0] = SXElem::create(new FunRef(ff->functions_[a.i2], w[a.i1])); break;
+      case OP_CALL:
+        w[a.i0] = SXElem::create(new CallSX(w[a.i1], w[a.i2])); break;
       default:
         {
 

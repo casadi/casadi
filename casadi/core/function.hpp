@@ -1031,6 +1031,9 @@ namespace casadi {
         \identifier{1xd} */
     casadi_int n_nodes() const;
 
+    /** \brief Number of elided copies */
+    casadi_int n_ce() const;
+
     /** \brief Number of instruction in the algorithm (SXFunction/MXFunction)
 
         \identifier{1xe} */
