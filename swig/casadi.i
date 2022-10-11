@@ -597,6 +597,10 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, casadi::Function** m);
     GUESTOBJECT* from_ptr(const casadi::Function *a);
 
+    // Function
+    bool to_ptr(GUESTOBJECT *p, casadi::Layout** m);
+    GUESTOBJECT* from_ptr(const casadi::Layout *a);
+
     // SXElem
     bool to_ptr(GUESTOBJECT *p, casadi::SXElem** m);
     GUESTOBJECT* from_ptr(const casadi::SXElem *a);
@@ -1410,6 +1414,28 @@ namespace std {
   } // namespace casadi
 }
 
+%fragment("casadi_layout", "header", fragment="casadi_aux") {
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, Layout** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Function already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Layout*), 0))) {
+        return true;
+      }
+
+      // No match
+      return false;
+    }
+
+    GUESTOBJECT* from_ptr(const Layout *a) {
+      return SWIG_NewPointerObj(new Layout(*a), $descriptor(casadi::Layout *), SWIG_POINTER_OWN);
+    }
+  } // namespace casadi
+}
+
 %fragment("casadi_generictype", "header", fragment="casadi_aux") {
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, GenericType** m) {
@@ -1441,7 +1467,8 @@ namespace std {
           || to_generic<std::vector<std::vector<double> > >(p, m)
           || to_generic<casadi::Function>(p, m)
           || to_generic<std::vector<casadi::Function> >(p, m)
-          || to_generic<casadi::GenericType::Dict>(p, m)) {
+          || to_generic<casadi::GenericType::Dict>(p, m)
+          || to_generic<std::vector<casadi::Layout> >(p, m)) {
         return true;
       }
 
@@ -1476,6 +1503,8 @@ namespace std {
       case OT_VOIDPTR:
         return mxCreateDoubleScalar(0);
 #endif
+      case OT_LAYOUTVECTOR:
+        return from_tmp(a->as_layout_vector());
       default: return 0;
       }
     }
@@ -2066,7 +2095,7 @@ namespace std {
 %fragment("casadi_extra", "header") {}
 
 // Collect all fragments
-%fragment("casadi_all", "header", fragment="casadi_aux,casadi_extra,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_vectorvector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
+%fragment("casadi_all", "header", fragment="casadi_aux,casadi_extra,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_vectorvector,casadi_function,casadi_layout,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
 
 #endif // SWIGXML
 
@@ -2220,6 +2249,7 @@ namespace std {
 %define PREC_CREATOR 150 %enddef
 %define PREC_STRING 180 %enddef
 %define PREC_FUNCTION 200 %enddef
+%define PREC_LAYOUT 200 %enddef
 %define PREC_GENERICTYPE 201 %enddef
 
 #ifndef SWIGXML
@@ -2359,6 +2389,8 @@ namespace std {
 %casadi_typemaps("Slice", PREC_SLICE, casadi::Slice)
 %casadi_typemaps("Function", PREC_FUNCTION, casadi::Function)
 %casadi_template(LL "Function" LR, PREC_FUNCTION, std::vector<casadi::Function>)
+%casadi_typemaps("Layout", PREC_LAYOUT, casadi::Layout)
+%casadi_template(LL "Layout" LR, PREC_LAYOUT, std::vector<casadi::Layout>)
 %casadi_template(LPAIR("Function","Function"), PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
 %casadi_template(L_DICT, PREC_DICT, std::map<std::string, casadi::GenericType>)
 %casadi_template(LDICT(LL L_STR LR), PREC_DICT, std::map<std::string, std::vector<std::string> >)
@@ -2835,6 +2867,7 @@ namespace casadi{
 %include <casadi/core/calculus.hpp>
 %include <casadi/core/sparsity_interface.hpp>
 %include <casadi/core/sparsity.hpp>
+%include <casadi/core/layout.hpp>
 
 // Logic for pickling
 #ifdef SWIGPYTHON
@@ -3600,6 +3633,12 @@ DECL M casadi_bspline(const M& x,
 DECL M casadi_convexify(const M& H,
         const Dict& opts = Dict()) {
   return convexify(H, opts);
+}
+DECL M casadi_reinterpret_layout(const M& x, const Layout& target) {
+  return reinterpret_layout(x, target);
+}
+DECL M casadi_permute_layout(const M& x, const Relayout& relay) {
+  return permute_layout(x, relay);
 }
 
 #endif

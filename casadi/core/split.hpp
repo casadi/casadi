@@ -58,6 +58,9 @@ namespace casadi {
         \identifier{12f} */
     const Sparsity& sparsity(casadi_int oind) const override { return output_sparsity_.at(oind);}
 
+    /** \brief  Get the sparsity of output oind */
+    const Layout& layout(casadi_int oind) const override { return output_layout_; }
+
     /// Evaluate the function (template)
     template<typename T>
     int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
@@ -91,6 +94,8 @@ namespace casadi {
     // Sparsity pattern of the outputs
     std::vector<casadi_int> offset_;
     std::vector<Sparsity> output_sparsity_;
+    // TODO
+    Layout output_layout_;
 
     /** \brief Serialize an object without type information
 

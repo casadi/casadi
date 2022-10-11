@@ -23,22 +23,23 @@
  */
 
 
-#include "global_options.hpp"
-#include "exception.hpp"
+#ifndef CASADI_INSTANCE_HPP
+#define CASADI_INSTANCE_HPP
+
+#include "layout.hpp"
+#include <vector>
 
 namespace casadi {
 
-  bool GlobalOptions::simplification_on_the_fly = true;
-  bool GlobalOptions::hierarchical_sparsity = true;
-
-  std::string GlobalOptions::casadipath;
-  std::string GlobalOptions::casadi_include_path;
-
-  casadi_int GlobalOptions::max_num_dir = 64;
-
-  // By default, use zero-based indexing
-  casadi_int GlobalOptions::start_index = 0;
-
-  casadi_int GlobalOptions::vector_width_real = 1;
+  // Move to internal
+  struct Instance {
+    std::vector<bool> arg_null;
+    std::vector<bool> res_null;
+    std::vector<casadi_int> stride_in;
+    std::vector<casadi_int> stride_out;
+    bool operator==(const Instance &rhs) { return rhs.arg_null==arg_null && rhs.res_null==res_null && stride_in ==rhs.stride_in && stride_out==rhs.stride_out; }
+  };
 
 } // namespace casadi
+
+#endif // CASADI_INSTANCE_HPP

@@ -86,7 +86,7 @@ namespace casadi {
     g.local("rr", "casadi_real", "*");
     g << "rr=" << g.work(res[0], nnz()) << ";\n";
     for (casadi_int i=0; i<arg.size(); ++i) {
-      casadi_int nz = dep(i).nnz();
+      casadi_int nz = dep(i)->sz_self();
       if (nz==1) {
         g << "*rr++ = " << g.workel(arg[i]) << ";\n";
       } else if (nz!=0) {
@@ -198,6 +198,20 @@ namespace casadi {
     for (casadi_int i=0; i<x.size(); ++i)
       sp[i] = x[i].sparsity();
     set_sparsity(horzcat(sp));
+    if (sparsity()==repmat(sp[0], 1, x.size())) {
+      std::vector<Layout> layout(x.size());
+      const Layout& ref = x[0].layout();
+      bool normal = true;
+      for (casadi_int i=0; i<x.size(); ++i) {
+        if (ref!= x[i].layout()) {
+          normal = false;
+          break;
+        }
+      }
+      if (normal) {
+        set_layout(ref.push_right(x.size()));
+      }
+    }
   }
 
   std::string Horzcat::disp(const std::vector<std::string>& arg) const {

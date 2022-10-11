@@ -210,10 +210,13 @@ namespace casadi {
   
     OP_LOGSUMEXP,
 
-    OP_REMAINDER
+    OP_REMAINDER,
 
+    OP_REINTERPRET_LAYOUT,
+
+    OP_PERMUTE_LAYOUT
   };
-  #define NUM_BUILT_IN_OPS (OP_REMAINDER+1)
+  #define NUM_BUILT_IN_OPS (OP_PERMUTE_LAYOUT+1)
 
   #define OP_
 

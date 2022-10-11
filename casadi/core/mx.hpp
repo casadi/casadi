@@ -33,6 +33,8 @@
 #include "generic_expression.hpp"
 #include "generic_type.hpp"
 #include "printable.hpp"
+#include "layout.hpp"
+
 #include <vector>
 namespace casadi {
 
@@ -145,6 +147,10 @@ namespace casadi {
         \identifier{q9} */
     ~MX();
 /// \endcond
+
+    /** \brief Get the sparsity pattern */
+    const Layout& layout() const;
+
 
 #ifndef SWIG
 /// \cond INTERNAL
@@ -654,6 +660,8 @@ namespace casadi {
             casadi_int m,
             const Dict& opts = Dict());
     static MX convexify(const MX& H, const Dict& opts = Dict());
+    static MX reinterpret_layout(const MX& x, const Layout& target);
+    static MX permute_layout(const MX& x, const Relayout& relay);
     ///@}
     /// \endcond
 
@@ -801,6 +809,15 @@ namespace casadi {
     inline friend DM evalf(const MX& expr) {
       return MX::evalf(expr);
     }
+
+    inline friend MX reinterpret_layout(const MX& expr, const Layout& target) {
+      return MX::reinterpret_layout(expr, target);
+    }
+
+    inline friend MX permute_layout(const MX& expr, const Relayout& relay) {
+      return MX::permute_layout(expr, relay);
+    }
+
 
 /** @} */
 #endif // SWIG

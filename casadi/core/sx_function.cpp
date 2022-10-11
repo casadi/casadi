@@ -154,16 +154,75 @@ namespace casadi {
   }
 
   void SXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
+    std::map<const AlgEl*, casadi_int> lookup_rets, lookup_ins;
+    std::vector< const AlgEl* > rets, ins;
+
+    // Run the algorithm
+    for (auto&& a : algorithm_) {
+      if (a.op==OP_OUTPUT) {
+        if (!inst.res_null.empty()) {
+          if (!inst.res_null[a.i0]) {
+            rets.push_back(&a);
+          }
+        }
+      } else if (a.op==OP_INPUT) {
+        if (!inst.arg_null.empty()) {
+          if (!inst.arg_null[a.i1]) {
+            ins.push_back(&a);
+          }
+        }
+      }
+    }
+
+    struct {
+      bool operator()(const AlgEl* a, const AlgEl* b) const { 
+        if (a->i0 == b->i0) {
+          return a->i2 < b->i2;
+        } else {
+          return a->i0 < b->i0;
+        }
+      };
+    } sortme_rets;
+
+    struct {
+      bool operator()(const AlgEl* a, const AlgEl* b) const { 
+        if (a->i1 == b->i1) {
+          return a->i2 < b->i2;
+        } else {
+          return a->i1 < b->i1;
+        }
+      };
+    } sortme_ins;
+
+
+    std::sort(rets.begin(), rets.end(), sortme_rets);
+    for (casadi_int i=0;i<rets.size();++i) {
+      const AlgEl& a = *rets[i];
+      g.local("ret"+str(i), "casadi_real");
+      lookup_rets[&a] = i;
+    }
+    std::sort(ins.begin(), ins.end(), sortme_ins);
+    for (casadi_int i=0;i<ins.size();++i) {
+      const AlgEl& a = *ins[i];
+      g.local("in"+str(i), "casadi_real");
+      int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
+      g << "in" << i << " = " << g.arg(a.i1) << "[" << a.i2*stride << "]" << ";\n";
+      lookup_ins[&a] = i;
+    }
 
     // Run the algorithm
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
         if (inst.res_null.empty()) {
           g << "if (res[" << a.i0 << "]!=0) ";
-          g << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
+          int stride = inst.stride_out.empty() ? 1 : inst.stride_out.at(a.i0);
+          g << g.res(a.i0) << "[" << a.i2*abs(stride) << "]" << (stride<0? "+": "")<<  "=" << g.sx_work(a.i1);
         } else {
-          if (!inst.res_null[a.i0])
-            g << g.res(a.i0) << "[" << a.i2 << "]=" << g.sx_work(a.i1);
+          if (!inst.res_null[a.i0]) {
+            g << "ret" << lookup_rets[&a] << " =" << g.sx_work(a.i1);
+            //int stride = inst.stride_out.empty() ? 1 : inst.stride_out.at(a.i0);
+            //g << g.res(a.i0) << "[" << a.i2*abs(stride) << "]" << " =" << g.sx_work(a.i1);
+          }
         }
       } else {
 
@@ -180,7 +239,9 @@ namespace casadi {
             if (inst.arg_null[a.i1]) {
               g << "0";
             } else {
-              g << g.arg(a.i1) << "[" << a.i2 << "]";
+              g << "in" << lookup_ins[&a]; //g.arg(a.i1) << "[" << a.i2 << "]";
+              //int stride = inst.stride_in.empty() ? 1 : inst.stride_in.at(a.i1);
+              //g << g.arg(a.i1) << "[" << a.i2*stride << "]";
             }
           }
         } else {
@@ -191,6 +252,11 @@ namespace casadi {
         }
       }
       g  << ";\n";
+    }
+    for (casadi_int i=0;i<rets.size();++i) {
+      const AlgEl& a = *rets[i];
+      casadi_int stride = inst.stride_out.empty() ? 1 : inst.stride_out[a.i0];
+      g << g.res(a.i0) << "[" << a.i2*abs(stride)  << "]" << (stride<0? "+": "")<< "= ret" << i << ";\n";
     }
   }
 
@@ -211,7 +277,13 @@ namespace casadi {
         "Reuse variables in the work vector"}},
       {"cse",
        {OT_BOOL,
-        "Perform common subexpression elimination (complexity is N*log(N) in graph size)"}}
+        "Perform common subexpression elimination (complexity is N*log(N) in graph size)"}},
+      {"layout_in",
+       {OT_LAYOUTVECTOR,
+        "Layout in"}},
+      {"layout_out",
+       {OT_LAYOUTVECTOR,
+        "Layout out"}}
      }
   };
 
@@ -250,6 +322,7 @@ namespace casadi {
     }
 
     if (cse_opt) out_ = cse(out_);
+    //uout() << "after layout_in/out" << layout_in_ << layout_out_ << std::endl;
 
     // Check/set default inputs
     if (default_in_.empty()) {
@@ -342,7 +415,7 @@ namespace casadi {
       case OP_OUTPUT: // output instruction
         ae.i0 = curr_oind;
         ae.i1 = out_[curr_oind]->at(curr_nz)->temp;
-        ae.i2 = curr_nz;
+        ae.i2 = curr_nz;//*layout_out_[ae.i0].stride();
 
         // Go to the next nonzero
         casadi_assert(curr_nz < std::numeric_limits<int>::max(), "Integer overflow");
@@ -464,7 +537,7 @@ namespace casadi {
 
           // Location of the input
           algorithm_[i].i1 = ind;
-          algorithm_[i].i2 = nz;
+          algorithm_[i].i2 = nz;//*layout_in_[ind].stride();
 
           // Mark input as read
           itc->set_temp(0);
@@ -664,9 +737,9 @@ namespace casadi {
       for (auto&& a : algorithm_) {
         switch (a.op) {
         case OP_INPUT:
-          w[a.i0] = fseed[dir][a.i1].nonzeros()[a.i2]; break;
+          w[a.i0] = fseed[dir][a.i1].nonzeros()[a.i2]; break; // / layout_in_[a.i1].stride()
         case OP_OUTPUT:
-          fsens[dir][a.i0].nonzeros()[a.i2] = w[a.i1]; break;
+          fsens[dir][a.i0].nonzeros()[a.i2] = w[a.i1]; break;//  / layout_out_[a.i0].stride()
         case OP_CONST:
         case OP_PARAMETER:
           w[a.i0] = 0;

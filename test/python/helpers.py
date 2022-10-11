@@ -82,6 +82,60 @@ sys.argv[1:] = ['-v'] + args.unittest_args
 from io import StringIO
 
 
+class Node:
+  def __init__(self,val):
+    self.val = val
+    self.nodes = []
+
+class AutoBrancher:
+  OPEN = 0
+  DONE = 1
+  def __init__(self):
+    self.root = Node(AutoBrancher.OPEN)
+    self.trace = [self.root]
+
+  @property
+  def current(self):
+    return self.trace[-1]
+
+  def branch(self, alternatives = [True, False]):
+    alternatives = list(alternatives)
+    nodes = self.current.nodes
+    if len(nodes)==0:
+      nodes += [None]*len(alternatives)
+    for i,n in enumerate(nodes):
+      if n is None:
+        nodes[i] = Node(AutoBrancher.OPEN)
+        self.trace.append(nodes[i])
+        self.this_branch.append(alternatives[i])
+        return alternatives[i]
+      else:
+        if n.val == AutoBrancher.OPEN:
+          self.trace.append(nodes[i])
+          self.this_branch.append(alternatives[i])
+          return alternatives[i]
+
+  def __iter__(self):
+    cnt = 0
+    
+    while self.root.val==AutoBrancher.OPEN:
+      self.this_branch = []
+      cnt+=1
+      yield self
+      # Indicate that current leaf is done
+      self.current.val = AutoBrancher.DONE
+      # Close leaves when subleaves are done
+      for n in reversed(self.trace[:-1]):
+        finished = True
+        for e in n.nodes:
+          finished = finished and e and e.val==AutoBrancher.DONE
+        if finished:
+          n.val = AutoBrancher.DONE
+      # Reset trace
+      self.trace = [self.root]
+      print("Evaluated branch",self.this_branch)
+    print("Evaluated",cnt,"branches")
+
 class LazyString(object):
   def __init__(self,f):
      self.f = f
@@ -562,13 +616,45 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None):
+
+  def check_outputs(self,res,ref,digits=15):
+    if isinstance(res, dict):
+      self.assertTrue(set(list(res.keys()))==set(list(ref.keys())))
+      for k in res.keys():
+        self.checkarray(res[k],ref[k],digits=digits)
+    else:
+      self.assertTrue(len(res)==len(ref))
+      for i in range(len(res)):
+        self.checkarray(res[i],ref[i],digits=digits)
+
+  def check_codegen(self,F,inputs,**kwargs):
+    if args.run_slow:
+      Fout = F.call(inputs)
+      Fout2 = self.do_codegen(F,inputs,**kwargs)
+
+      if isinstance(inputs, dict):
+        for k in F.name_out():
+          self.checkarray(Fout[k],Fout2[k],digits=15)
+      else:
+        for i in range(F.n_out()):
+          self.checkarray(Fout[i],Fout2[i],digits=15)
+
+
+
+  def do_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,vectorize_check=1,compiler=None,static=False,digits=15,includes=None):
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
+      if static: main=True
       if opts is None: opts = {}
       if main: opts["main"] = True
-      F.generate(name, opts)
+      cg = CodeGenerator(name, opts)
+      cg.add(F)
+      if includes:
+        if not isinstance(includes,list): includes = [includes]
+        for inc in includes:
+          cg.add_include(inc)
+      cg.generate()
       import subprocess
 
       libdir = GlobalOptions.getCasadiPath()
@@ -584,36 +670,73 @@ class casadiTestCase(unittest.TestCase):
       if definitions is None:
         definitions = []
 
+      def check(stderr):
+        pass
+
+      if vectorize_check>1:
+        # g for line-numbers?
+        extra_options+= " -g -O2 -fno-math-errno -funsafe-math-optimizations -ffinite-math-only --param min-vect-loop-bound=1 -march=skylake -mtune=skylake -mprefer-vector-width=256 -fvect-cost-model=unlimited -fdisable-tree-sincos -fopenmp -ftree-loop-vectorize -fno-tree-loop-distribute-patterns -fdisable-tree-cunrolli --param loop-max-datarefs-for-datadeps=1000000 -fopt-info-vec-optimized"
+        def check(stderr):
+          simdlines = []
+          with open(name+".c", "r") as inp:
+            for i,l in enumerate(inp.readlines()):
+               if "omp simd" in l:
+                  # index one, simd comes one line before loop, reported loop line is one after loop statement
+                  simdlines.append(i+3)
+          stderr = stderr.decode("utf-8")
+          vectorized = []
+          for l in stderr.split("\n"):
+             if "note: loop vectorized" in l:
+               vectorized.append(int(l.split(":")[1]))
+          self.assertTrue(set(simdlines).issubset(set(vectorized)))
+
+      
+      if compiler is None:
+        if os.name=='nt':
+          compiler = "cl.exe"
+        else:
+          compiler = "gcc"
       def get_commands(shared=True):
         if os.name=='nt':
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {definitions} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs)
+          commands = compiler + " {shared} {definitions} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=includedir,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs)
           output = "./" + name + (".dll" if shared else ".exe")
           return [commands, output]
         else:
           defs = " ".join(["-D"+d for d in definitions])
           output = "./" + name + (".so" if shared else "")
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir}".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir,definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = compiler + " -pedantic -std={std} {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir}".format(shared="-fPIC -shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir,definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
           return [commands, output]
 
-      [commands, libname] = get_commands(shared=True)
-      print(commands)
-      p = subprocess.Popen(commands,shell=True).wait()
-      F2 = external(F.name(), libname)
+      if not static:
+        [commands, libname] = get_commands(shared=True)
+        print(commands)
+        p = subprocess.Popen(commands,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        outs,errs = p.communicate()
+        check(errs)
+        if p.returncode!=0:
+          sys.stderr.buffer.write(errs)
+          raise Exception("")
+        
+        F2 = external(F.name(), libname)
 
       if main:
         [commands, exename] = get_commands(shared=False)
         print(commands)
-        env = os.environ
-        env["LD_LIBRARY_PATH"] = libdir
-        p = subprocess.Popen(commands,shell=True,env=env).wait()
+        p = subprocess.Popen(commands,shell=True,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        outs,errs = p.communicate()
+        check(errs)
+        if p.returncode!=0:
+          sys.stderr.buffer.write(errs)
+          raise Exception("")
+
         inputs_main = inputs
         if isinstance(inputs,dict):
           inputs_main = F.convert_in(inputs)
         F.generate_in(F.name()+"_in.txt", inputs_main)
 
-      Fout = F.call(inputs)
-      Fout2 = F2.call(inputs)
+      if not static:
+        Fout2 = F2.call(inputs)
 
       if main:
         with open(F.name()+"_out.txt","w") as stdout:
@@ -624,27 +747,22 @@ class casadiTestCase(unittest.TestCase):
             out = p.communicate()
         assert p.returncode==0
         outputs = F.generate_out(F.name()+"_out.txt")
-        print(outputs)
+        if static:
+          return outputs
         if isinstance(inputs,dict):
           outputs = F.convert_out(outputs)
           for k in F.name_out():
-            self.checkarray(Fout[k],outputs[k],digits=15)
+            self.checkarray(Fout2[k],outputs[k],digits=digits)
         else:
           for i in range(F.n_out()):
-            self.checkarray(Fout[i],Fout2[i],digits=15)
+            self.checkarray(outputs[i],Fout2[i],digits=digits)
 
-      if isinstance(inputs, dict):
-        self.assertEqual(F.name_out(), F2.name_out())
-        for k in F.name_out():
-          self.checkarray(Fout[k],Fout2[k],digits=15)
-      else:
-        for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i],digits=15)
+
 
       if self.check_serialize:
         self.check_serialize(F2,inputs=inputs)
-        
-      return F2, libname
+
+      return Fout2, libname
 
   def check_thread_safety(self,F,inputs=None,N=20):
 

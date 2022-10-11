@@ -24,6 +24,7 @@
 
 
 #include "function.hpp"
+#include "layout.hpp"
 #include "serializing_stream.hpp"
 #include "slice.hpp"
 #include "linsol.hpp"
@@ -34,6 +35,7 @@
 #include "sparsity_internal.hpp"
 #include "mx_node.hpp"
 #include "function_internal.hpp"
+#include "layout_node.hpp"
 #include <iomanip>
 
 using namespace std;
@@ -239,6 +241,16 @@ namespace casadi {
     void DeserializingStream::unpack(Function& e) {
       assert_decoration('F');
       shared_unpack<Function, FunctionInternal>(e);
+    }
+
+    void SerializingStream::pack(const Layout& e) {
+      decorate('L');
+      shared_pack(e);
+    }
+
+    void DeserializingStream::unpack(Layout& e) {
+      assert_decoration('L');
+      shared_unpack<Layout, LayoutNode>(e);
     }
 
     void SerializingStream::pack(const Importer& e) {

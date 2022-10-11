@@ -80,6 +80,7 @@ namespace casadi {
 
         \identifier{21} */
     std::vector<casadi_int> workloc_;
+    std::vector<casadi_int> workloc_sz_self_;
 
     /** \brief Offset for the 'extra' working memory (non-io) */
     size_t w_extra_offset_;
@@ -273,6 +274,18 @@ namespace casadi {
       for (auto&& e : free_vars_) ret.push_back(e.name());
       return ret;
     }
+
+    // Get list of dependency functions
+    std::vector<std::string> get_function() const override;
+
+    // Get a dependency function
+    const Function& get_function(const std::string &name) const override;
+
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    Layout get_layout_in(casadi_int i) override { return in_.at(i).layout();}
+    Layout get_layout_out(casadi_int i) override { return out_.at(i).layout();}
+    /// @}
 
     /** \brief Number of nodes in the algorithm
 

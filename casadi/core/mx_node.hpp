@@ -324,17 +324,23 @@ namespace casadi {
     /// Get the sparsity
     const Sparsity& sparsity() const { return sparsity_;}
 
+    /// Get the sparsity
+    const Layout& layout() const { return layout_;}
+
     /// Get the sparsity of output oind
     virtual const Sparsity& sparsity(casadi_int oind) const;
 
+    /// Get the sparsity of output oind
+    virtual const Layout& layout(casadi_int oind) const;
+
     /// Alignment (bytes) for specific input argument
-    virtual size_t align_in(casadi_int iind) const { return 1; }
+    virtual size_t align_in(casadi_int iind) const { return 32; }
 
     /// Alignment (bytes) for specific output argument
-    virtual size_t align_out(casadi_int oind) const { return 1; }
+    virtual size_t align_out(casadi_int oind) const { return 32; }
 
     /// Alignment (bytes) for work vector
-    virtual size_t align_w() const { return 1; }
+    virtual size_t align_w() const { return 32; }
 
     /// Get shape
     casadi_int numel() const { return sparsity().numel(); }
@@ -342,6 +348,7 @@ namespace casadi {
     casadi_int size1() const { return sparsity().size1(); }
     casadi_int size2() const { return sparsity().size2(); }
     std::pair<casadi_int, casadi_int> size() const { return sparsity().size();}
+    casadi_int sz_self(casadi_int i=0) const;
 
     // Get IO index
     virtual casadi_int ind() const;
@@ -354,6 +361,9 @@ namespace casadi {
 
     /// Set the sparsity
     void set_sparsity(const Sparsity& sparsity);
+
+    /// Set dimensions
+    void set_layout(const Layout& layout);
 
     /** \brief Get required length of arg field
 
@@ -667,6 +677,12 @@ namespace casadi {
     /// 1-norm
     virtual MX get_norm_1() const;
 
+    /// 1-norm
+    virtual MX get_permute_layout(const Relayout& relay) const;
+
+    /// 1-norm
+    virtual MX get_reinterpret_layout(const Layout& target) const;
+
     /// Min
     virtual MX get_mmin() const;
 
@@ -717,6 +733,8 @@ namespace casadi {
 
         \identifier{1sk} */
     Sparsity sparsity_;
+
+    Layout layout_;
 
     /** \brief Propagate sparsities forward through a copy operation
 
