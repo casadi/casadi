@@ -77,7 +77,7 @@ bool LBFGS<Conf>::apply(rvec q, real_t γ) const {
         return false;
 
     // If the step size is negative, compute it as sᵀy/yᵀy
-    if (γ < 0) {
+    if (params.stepsize == LBFGSStepSize::BasedOnCurvature || γ < 0) {
         auto new_idx = pred(idx);
         real_t yᵀy   = y(new_idx).squaredNorm();
         γ            = 1 / (ρ(new_idx) * yᵀy);
@@ -105,6 +105,10 @@ bool LBFGS<Conf>::apply_masked_impl(rvec q, real_t γ, const auto &J) {
     if (idx == 0 && not full)
         return false;
     const bool fullJ = q.size() == static_cast<index_t>(J.size());
+
+    // Use curvature to compute initial scale
+    if (params.stepsize == LBFGSStepSize::BasedOnCurvature)
+        γ = -1;
 
     if (params.cbfgs)
         throw std::invalid_argument("CBFGS check not supported when using "

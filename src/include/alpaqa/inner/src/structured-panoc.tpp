@@ -103,14 +103,10 @@ void StructuredPANOCLBFGSSolver<Conf>::compute_quasi_newton_step(
                 qₖ(j) = -grad_ψₖ(j) - HqK(j);
         }
 
-        real_t stepsize =
-            params.lbfgs_stepsize == LBFGSStepSize::BasedOnGradientStepSize
-                ? γₖ
-                : -1;
         // If all indices are inactive, we can use standard L-BFGS,
         // if there are active indices, we need the specialized version
         // that only applies L-BFGS to the inactive indices
-        bool success = lbfgs.apply_masked(qₖ, stepsize, J);
+        bool success = lbfgs.apply_masked(qₖ, γₖ, J);
         // If L-BFGS application failed, qₖ(J) still contains
         // -∇ψ(x)(J) - HqK(J) or -∇ψ(x)(J), which is not a valid step.
         // A good alternative is to use H₀ = γI as an L-BFGS estimate.

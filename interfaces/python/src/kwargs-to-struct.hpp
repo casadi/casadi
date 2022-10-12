@@ -176,6 +176,5 @@ inline const kwargs_to_struct_table_t<alpaqa::StructuredPANOCLBFGSParams>
          &alpaqa::StructuredPANOCLBFGSParams::full_augmented_hessian},
         {"hessian_step_size_heuristic",
          &alpaqa::StructuredPANOCLBFGSParams::hessian_step_size_heuristic},
-        {"lbfgs_stepsize", &alpaqa::StructuredPANOCLBFGSParams::lbfgs_stepsize},
     };
 #endif

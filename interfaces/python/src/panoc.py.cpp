@@ -39,7 +39,6 @@ struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
         {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCParams<Conf>::quadratic_upperbound_tolerance_factor},
         {"update_lipschitz_in_linesearch", &alpaqa::PANOCParams<Conf>::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond", &alpaqa::PANOCParams<Conf>::alternative_linesearch_cond},
-        {"lbfgs_stepsize", &alpaqa::PANOCParams<Conf>::lbfgs_stepsize},
         // clang-format on
     };
 };
@@ -80,8 +79,9 @@ void register_panoc(py::module_ &m) {
                     return py::cast<bool>(
                         o.attr("update")(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_new, C, γ_new));
                 }
-                bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) const {
-                    return py::cast<bool>(o.attr("apply")(xₖ, x̂ₖ, pₖ, γ, qₖ));
+                bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ, real_t γ,
+                           rvec qₖ) const {
+                    return py::cast<bool>(o.attr("apply")(xₖ, x̂ₖ, pₖ, grad_xₖ, grad_x̂ₖ, γ, qₖ));
                 }
                 void changed_γ(real_t γₖ, real_t old_γₖ) { o.attr("changed_γ")(γₖ, old_γₖ); }
                 void reset() { o.attr("reset")(); }
@@ -116,7 +116,11 @@ void register_panoc(py::module_ &m) {
         .def(py::init(&kwargs_to_struct<LBFGSParams>))
         .def("to_dict", &struct_to_dict<LBFGSParams>)
         .def_readwrite("memory", &LBFGSParams::memory)
-        .def_readwrite("cbfgs", &LBFGSParams::cbfgs);
+        .def_readwrite("min_div_fac", &LBFGSParams::min_div_fac)
+        .def_readwrite("min_abs_s", &LBFGSParams::min_abs_s)
+        .def_readwrite("cbfgs", &LBFGSParams::cbfgs)
+        .def_readwrite("force_pos_def", &LBFGSParams::force_pos_def)
+        .def_readwrite("stepsize", &LBFGSParams::stepsize);
     lbfgssign //
         .value("Positive", LBFGSSign::Positive)
         .value("Negative", LBFGSSign::Negative)
@@ -210,7 +214,6 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCParams::quadratic_upperbound_tolerance_factor)
         .def_readwrite("update_lipschitz_in_linesearch", &PANOCParams::update_lipschitz_in_linesearch)
         .def_readwrite("alternative_linesearch_cond", &PANOCParams::alternative_linesearch_cond)
-        .def_readwrite("lbfgs_stepsize", &PANOCParams::lbfgs_stepsize)
         // clang-format on
         ;
 

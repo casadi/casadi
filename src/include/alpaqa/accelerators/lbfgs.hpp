@@ -21,6 +21,19 @@ struct CBFGSParams {
     explicit operator bool() const { return ϵ > 0; }
 };
 
+/// Which method to use to select the L-BFGS step size.
+enum class LBFGSStepSize {
+    /// Initial inverse Hessian approximation is set to
+    /// @f$ H_0 = \gamma I @f$.
+    BasedOnExternalStepSize = 0,
+    /// Initial inverse Hessian approximation is set to
+    /// @f$ H_0 = \frac{s^\top y}{y^\top y} I @f$.
+    BasedOnCurvature = 1,
+    BasedOnGradientStepSize
+    [[deprecated("use BasedOnExternalStepSize instead")]] =
+        BasedOnExternalStepSize,
+};
+
 /// Parameters for the @ref LBFGS class.
 template <Config Conf = DefaultConfig>
 struct LBFGSParams {
@@ -44,6 +57,8 @@ struct LBFGSParams {
     /// update if
     /// @f$ \left| y^\top s \right| \le \text{min_div_fac} \cdot s^\top s @f$.
     bool force_pos_def = true;
+    /// @see LBFGSStepSize
+    LBFGSStepSize stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
 /// Layout:

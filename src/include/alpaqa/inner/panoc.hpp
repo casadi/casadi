@@ -2,7 +2,6 @@
 
 #include <alpaqa/export.hpp>
 #include <alpaqa/inner/directions/panoc-direction-update.hpp>
-#include <alpaqa/inner/internal/lbfgs-stepsize.hpp>
 #include <alpaqa/inner/internal/lipschitz.hpp>
 #include <alpaqa/inner/internal/panoc-helpers.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
@@ -49,8 +48,6 @@ struct PANOCParams {
 
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;
-
-    LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
 template <Config Conf = DefaultConfig>

@@ -24,11 +24,16 @@ struct PANOCDirection {
     ///             Result of proximal gradient step in current iterate.
     /// @param[in]  pₖ
     ///             Proximal gradient step between x̂ₖ and xₖ.
+    /// @param[in]  grad_xₖ
+    ///             The gradient of the objective at xₖ.
+    /// @param[in]  grad_x̂ₖ
+    ///             The gradient of the objective at x̂ₖ.
     /// @param[in]  γ
     ///             H_0 = γI for L-BFGS
     /// @param[out] qₖ
     ///             Resulting step.
-    static bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) = delete;
+    static bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ,
+                      crvec grad_x̂ₖ, real_t γ, rvec qₖ) = delete;
 
     static void changed_γ(real_t γₖ, real_t old_γₖ) = delete;
 

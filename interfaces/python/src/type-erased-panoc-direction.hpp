@@ -15,13 +15,14 @@ template <Config Conf>
 struct PANOCDirectionVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
 
-    void (*initialize)(void *self, crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0)    = nullptr;
+    void (*initialize)(void *self, crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0) = nullptr;
     bool (*update)(void *self, crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_new,
-                   const Box<config_t> &C, real_t γ_new)                             = nullptr;
-    bool (*apply)(const void *self, crvec xₖ, crvec x̂ₖ, crvec pₖ, real_t γ, rvec qₖ) = nullptr;
-    void (*changed_γ)(void *self, real_t γₖ, real_t old_γₖ)                          = nullptr;
-    void (*reset)(void *self)                                                        = nullptr;
-    std::string (*get_name)(const void *self)                                        = nullptr;
+                   const Box<config_t> &C, real_t γ_new)                          = nullptr;
+    bool (*apply)(const void *self, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ,
+                  real_t γ, rvec qₖ)                                              = nullptr;
+    void (*changed_γ)(void *self, real_t γₖ, real_t old_γₖ)                       = nullptr;
+    void (*reset)(void *self)                                                     = nullptr;
+    std::string (*get_name)(const void *self)                                     = nullptr;
 
     template <class T>
     PANOCDirectionVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {

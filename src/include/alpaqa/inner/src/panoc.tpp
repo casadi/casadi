@@ -107,14 +107,17 @@ PANOCSolver<DirectionProviderT>::operator()(
     auto print_real = [&](real_t x) {
         return float_to_str_vw(printbuf, x, params.print_precision);
     };
+    auto print_real3 = [&](real_t x) {
+        return float_to_str_vw(printbuf, x, 3);
+    };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
-                              real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
+                              real_t pₖᵀpₖ, real_t γₖ, real_t τₖ, real_t εₖ) {
         std::cout << "[PANOC] " << std::setw(6) << k
                   << ": ψ = " << print_real(ψₖ)
                   << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
                   << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
-                  << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ)
-                  << "\r\n";
+                  << ", γ = " << print_real(γₖ) << ", τ = " << print_real3(τₖ)
+                  << ", εₖ = " << print_real(εₖ) << "\r\n";
     };
 
     // Estimate Lipschitz constant ---------------------------------------------
@@ -184,7 +187,7 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
-            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, εₖ);
+            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, τ, εₖ);
         if (progress_cb) {
             ScopedMallocAllower ma;
             progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, φₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ,
@@ -215,12 +218,9 @@ PANOCSolver<DirectionProviderT>::operator()(
         }
 
         // Calculate quasi-Newton step -----------------------------------------
-        real_t step_size =
-            params.lbfgs_stepsize == LBFGSStepSize::BasedOnGradientStepSize
-                ? real_t(1)
-                : real_t(-1);
         if (k > 0)
-            direction_provider.apply(xₖ, x̂ₖ, pₖ, step_size,
+            direction_provider.apply(xₖ, x̂ₖ, pₖ, grad_ψₖ,
+                                     need_grad_̂ψₖ ? grad_̂ψₖ : vec(), real_t(1),
                                      /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
@@ -297,10 +297,11 @@ PANOCSolver<DirectionProviderT>::operator()(
             ++s.linesearch_failures;
             τ = 0;
         }
+        τ *= 2; // restore to the value that was actually accepted
         if (k != 0) {
             s.count_τ += 1;
-            s.sum_τ += τ * 2;
-            s.τ_1_accepted += τ * 2 == 1;
+            s.sum_τ += τ;
+            s.τ_1_accepted += τ == 1;
         }
 
         // Update L-BFGS -------------------------------------------------------

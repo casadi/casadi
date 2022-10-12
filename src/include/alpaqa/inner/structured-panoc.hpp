@@ -2,7 +2,6 @@
 
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/export.hpp>
-#include <alpaqa/inner/internal/lbfgs-stepsize.hpp>
 #include <alpaqa/inner/internal/lipschitz.hpp>
 #include <alpaqa/inner/internal/panoc-helpers.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
@@ -63,8 +62,6 @@ struct StructuredPANOCLBFGSParams {
     bool full_augmented_hessian         = true;
 
     unsigned hessian_step_size_heuristic = 0;
-
-    LBFGSStepSize lbfgs_stepsize = LBFGSStepSize::BasedOnCurvature;
 };
 
 template <Config Conf = DefaultConfig>

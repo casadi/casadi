@@ -1,4 +1,4 @@
-#include <alpaqa/inner/internal/lbfgs-stepsize.hpp>
+#include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
 #include <alpaqa/inner/internal/solverstatus.hpp>
 #include <pybind11/pybind11.h>
@@ -9,7 +9,7 @@ void register_enums(py::module_ &m) {
 
     py::enum_<alpaqa::LBFGSStepSize>(m, "LBFGSStepsize",
                                      "C++ documentation: :cpp:enum:`alpaqa::LBFGSStepSize`")
-        .value("BasedOnGradientStepSize", alpaqa::LBFGSStepSize::BasedOnGradientStepSize)
+        .value("BasedOnExternalStepSize", alpaqa::LBFGSStepSize::BasedOnExternalStepSize)
         .value("BasedOnCurvature", alpaqa::LBFGSStepSize::BasedOnCurvature)
         .export_values();
 
