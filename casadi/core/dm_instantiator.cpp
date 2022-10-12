@@ -213,7 +213,7 @@ namespace casadi {
 
       for (casadi_int k=0;k<row.size();++k) {
         out << row[k]+1 << " " << col[k]+1 << " ";
-        normalized_out(out, nonzeros ? nonzeros[k]: 0);
+        normalized_out(out, nonzeros ? nonzeros[k]: casadi::nan);
         out << std::endl;
       }
     } else if (format=="txt") {
@@ -239,7 +239,7 @@ namespace casadi {
           if (cc<size2-1) out << std::setw(w);
           // String representation of element
           if (ind[cc]<colind[cc+1] && row[ind[cc]]==rr) {
-            normalized_out(out, nonzeros ? nonzeros[ind[cc]++]: 0);
+            normalized_out(out, nonzeros ? nonzeros[ind[cc]++]: casadi::nan);
           } else {
             out << std::setw(w) << "00";
           }
