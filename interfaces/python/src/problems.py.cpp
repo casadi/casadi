@@ -17,7 +17,7 @@ template <class FuncProb, auto py_f, auto f, class Ret, class... Args>
 void functional_setter_ret(FuncProb &p, std::optional<py::object> o) {
     if (o) {
         p.*py_f = *std::move(o);
-        p.*f    = [&pf {p.*py_f}](Args... x) -> Ret { return py::cast<Ret>(pf(x...)); };
+        p.*f    = [&pf{p.*py_f}](Args... x) -> Ret { return py::cast<Ret>(pf(x...)); };
     } else {
         p.*py_f = py::none();
         p.*f    = [](Args...) -> Ret {
@@ -30,7 +30,7 @@ template <class FuncProb, auto py_f, auto f, class Out, class Ret, class... Args
 void functional_setter_out(FuncProb &p, std::optional<py::object> o) {
     if (o) {
         p.*py_f = *std::move(o);
-        p.*f    = [&pf {p.*py_f}](Args... x, Out r) -> void { r = py::cast<Ret>(pf(x...)); };
+        p.*f    = [&pf{p.*py_f}](Args... x, Out r) -> void { r = py::cast<Ret>(pf(x...)); };
     } else {
         p.*py_f = py::none();
         p.*f    = [](Args..., Out) -> void {
@@ -46,8 +46,8 @@ void register_problems(py::module_ &m) {
     using Box = alpaqa::Box<config_t>;
     py::class_<Box>(m, "Box", "C++ documentation: :cpp:class:`alpaqa::Box`")
         .def(py::init([](length_t n) {
-                 return Box {vec::Constant(n, alpaqa::inf<config_t>),
-                             vec::Constant(n, -alpaqa::inf<config_t>)};
+                 return Box{vec::Constant(n, +alpaqa::inf<config_t>),
+                            vec::Constant(n, -alpaqa::inf<config_t>)};
              }),
              "n"_a,
              "Create an :math:`n`-dimensional box at with bounds at "
@@ -55,7 +55,7 @@ void register_problems(py::module_ &m) {
         .def(py::init([](vec ub, vec lb) {
                  if (ub.size() != lb.size())
                      throw std::invalid_argument("Upper and lower bound dimensions do not match");
-                 return Box {std::move(ub), std::move(lb)};
+                 return Box{std::move(ub), std::move(lb)};
              }),
              "ub"_a, "lb"_a, "Create a box with the given bounds.")
         .def_readwrite("upperbound", &Box::upperbound)
@@ -63,8 +63,15 @@ void register_problems(py::module_ &m) {
 
     using ProblemBase = alpaqa::ProblemBase<config_t>;
     py::class_<ProblemBase, std::shared_ptr<ProblemBase>>(m, "ProblemBase")
-        .def("__copy__", [](const ProblemBase &p) { return p.clone(); })
-        .def("__deepcopy__", [](const ProblemBase &p, py::dict) { return p.clone(); })
+        // It is important here to return a raw pointer, not a unique_ptr,
+        // because otherwise pybind11 doesn't cast it to the derived type
+        // correctly, resulting in a segfault.
+        .def(
+            "__copy__", [](const ProblemBase &p) { return p.clone().release(); },
+            py::return_value_policy::take_ownership)
+        .def(
+            "__deepcopy__", [](const ProblemBase &p, py::dict) { return p.clone().release(); },
+            py::return_value_policy::take_ownership)
         .def_readwrite("n", &ProblemBase::n, "Number of unknowns, dimension of :math:`x`")
         .def_readwrite("m", &ProblemBase::m,
                        "Number of general constraints, dimension of :math:`g(x)`")
@@ -159,7 +166,7 @@ void register_problems(py::module_ &m) {
 
     struct FunctionalProblem : alpaqa::FunctionalProblem<config_t> {
         FunctionalProblem(length_t n, length_t m, length_t p)
-            : alpaqa::FunctionalProblem<config_t> {n, m, p} {
+            : alpaqa::FunctionalProblem<config_t>{n, m, p} {
             this->f = [](crvec) -> real_t {
                 throw std::runtime_error("FunctionalProblem.f is uninitialized");
             };
@@ -231,8 +238,8 @@ void register_problems(py::module_ &m) {
 
     m.def(
         "with_counters",
-        [](std::shared_ptr<ProblemBase> prob) { return CountedProblem {std::move(prob)}; },
-        "prob"_a, "Return a counted version of the given problem.");
+        [](std::shared_ptr<ProblemBase> prob) { return CountedProblem{std::move(prob)}; }, "prob"_a,
+        "Return a counted version of the given problem.");
 }
 
 template void register_problems<alpaqa::EigenConfigd>(py::module_ &);
