@@ -72,19 +72,28 @@ void register_panoc(py::module_ &m) {
         .def(py::init([](py::object o) {
             struct {
                 void initialize(crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0) {
+                    alpaqa::ScopedMallocAllower ma;
                     o.attr("initialize")(x_0, x̂_0, p_0, grad_0);
                 }
                 bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_new,
                             const Box &C, real_t γ_new) {
+                    alpaqa::ScopedMallocAllower ma;
                     return py::cast<bool>(
                         o.attr("update")(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_new, C, γ_new));
                 }
                 bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ, real_t γ,
                            rvec qₖ) const {
+                    alpaqa::ScopedMallocAllower ma;
                     return py::cast<bool>(o.attr("apply")(xₖ, x̂ₖ, pₖ, grad_xₖ, grad_x̂ₖ, γ, qₖ));
                 }
-                void changed_γ(real_t γₖ, real_t old_γₖ) { o.attr("changed_γ")(γₖ, old_γₖ); }
-                void reset() { o.attr("reset")(); }
+                void changed_γ(real_t γₖ, real_t old_γₖ) {
+                    alpaqa::ScopedMallocAllower ma;
+                    o.attr("changed_γ")(γₖ, old_γₖ);
+                }
+                void reset() {
+                    alpaqa::ScopedMallocAllower ma;
+                    o.attr("reset")();
+                }
                 std::string get_name() const { return py::cast<std::string>(py::str(o)); }
 
                 py::object o;
