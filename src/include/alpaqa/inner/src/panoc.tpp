@@ -67,7 +67,8 @@ PANOCSolver<DirectionProviderT>::operator()(
         qₖ(n),                         // Newton step Hₖ pₖ
         grad_ψₖ(n),                    // ∇ψ(xₖ)
         grad_̂ψₖ(need_grad_̂ψₖ ? n : 0), // ∇ψ(x̂ₖ)
-        grad_ψₙₑₓₜ(n);                 // ∇ψ(xₙₑₓₜ)
+        grad_ψₙₑₓₜ(n),                 // ∇ψ(xₙₑₓₜ)
+        empty_vec(0);                  // []
 
     vec work_n(n), work_m(m);
 
@@ -220,7 +221,7 @@ PANOCSolver<DirectionProviderT>::operator()(
         // Calculate quasi-Newton step -----------------------------------------
         if (k > 0)
             direction_provider.apply(xₖ, x̂ₖ, pₖ, grad_ψₖ,
-                                     need_grad_̂ψₖ ? grad_̂ψₖ : vec(), γₖ,
+                                     need_grad_̂ψₖ ? grad_̂ψₖ : empty_vec, γₖ,
                                      /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
