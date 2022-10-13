@@ -16,7 +16,7 @@ inline std::string_view float_to_str_vw_snprintf(auto &&print, auto &buf,
                                                  const char *fmt) {
     int n = print(buf.data(), buf.size(), fmt, precision, value);
     assert((size_t)n < buf.size());
-    return {buf.data(), buf.data() + n};
+    return {buf.data(), (size_t)n};
 }
 
 #if __cpp_lib_to_chars

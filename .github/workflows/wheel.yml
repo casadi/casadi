@@ -194,25 +194,15 @@ jobs:
         python -m venv py-venv
         source ./py-venv/bin/activate
         python -m pip install build ninja
-        CC="$(brew --prefix llvm@14)/bin/clang" \
-        CXX="$(brew --prefix llvm@14)/bin/clang++" \
-          ./scripts/install-eigen.sh
-        CC="$(brew --prefix llvm@14)/bin/clang" \
-        CXX="$(brew --prefix llvm@14)/bin/clang++" \
-          ./scripts/install-casadi-static.sh
-      env:
-        CXXFLAGS: "-march=sandybridge"
-        CFLAGS: "-march=sandybridge"
+        ./scripts/install-eigen.sh
+        ./scripts/install-casadi-static.sh
     - name: Build
       run: |
         source ./py-venv/bin/activate
         CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH" \
-        CC="$(brew --prefix llvm@14)/bin/clang" \
-        CXX="$(brew --prefix llvm@14)/bin/clang++" \
+        _PYTHON_HOST_PLATFORM='macosx-10.9-universal2' \
+        ARCHFLAGS='-arch arm64 -arch x86_64' \
             python -m build . --wheel
-      env:
-        CXXFLAGS: "-march=sandybridge"
-        CFLAGS: "-march=sandybridge"
     - name: Upload
       uses: actions/upload-artifact@v2
       with:

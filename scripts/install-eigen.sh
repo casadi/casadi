@@ -27,7 +27,8 @@ pushd /tmp
 pushd eigen
 cmake -S. -Bbuild \
     -G "Ninja Multi-Config" \
-    -D CMAKE_INSTALL_PREFIX="$prefix"
+    -D CMAKE_INSTALL_PREFIX="$prefix" \
+    -D CMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 cmake --build build -j --config $build_type
 cmake --install build --config $build_type
 popd

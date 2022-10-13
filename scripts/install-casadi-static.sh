@@ -37,7 +37,8 @@ cmake -S. -Bbuild \
     -D WITH_DL=On \
     -D WITH_IPOPT=Off \
     -D ENABLE_STATIC=On \
-    -D ENABLE_SHARED=Off
+    -D ENABLE_SHARED=Off \
+    -D CMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 cmake --build build -j --config $build_type
 cmake --install build --config $build_type
 popd
