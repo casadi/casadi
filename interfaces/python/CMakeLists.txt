@@ -13,7 +13,7 @@ include(cmake/QueryPythonForPybind11.cmake)
 find_pybind11_python_first()
 
 # Compile the example Python module
-Python3_add_library(_alpaqa MODULE
+pybind11_add_module(_alpaqa MODULE
     "src/alm.py.cpp"
     "src/alpaqa.py.cpp"
     "src/casadi-problem.py.cpp"
