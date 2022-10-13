@@ -38,7 +38,9 @@ jobs:
 
     # Generate the documentation and save it in /tmp/staging
     - name: Generate documentation
-      run: ./doxygen/scripts/gen-docs.sh /tmp/staging
+      run: |
+        ./doxygen/scripts/gen-docs.sh /tmp/staging
+        ./doxygen/scripts/gen-docs-index.sh /tmp/staging md
 
     # Commit the new documentation, squash the commits, and push it to GitHub
     - name: Commit and push documention
