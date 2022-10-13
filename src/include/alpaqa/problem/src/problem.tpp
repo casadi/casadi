@@ -215,13 +215,12 @@ void FunctionalProblem<Conf>::eval_hess_L(crvec x, crvec y, rmat H) const {
 
 template <Config Conf>
 std::unique_ptr<ProblemBase<Conf>> FunctionalProblem<Conf>::clone() const & {
-    return std::unique_ptr<FunctionalProblem>(new FunctionalProblem(*this));
+    return std::make_unique<FunctionalProblem>(*this);
 }
 
 template <Config Conf>
 std::unique_ptr<ProblemBase<Conf>> FunctionalProblem<Conf>::clone() && {
-    return std::unique_ptr<FunctionalProblem>(
-        new FunctionalProblem(std::move(*this)));
+    return std::make_unique<FunctionalProblem>(std::move(*this));
 }
 
 } // namespace alpaqa
