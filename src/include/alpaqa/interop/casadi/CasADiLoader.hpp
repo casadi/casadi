@@ -55,8 +55,13 @@ class CasADiProblem : public Problem<Conf> {
                   length_t p = 0, bool second_order = false);
     ~CasADiProblem();
 
+    CasADiProblem(const CasADiProblem &);
+    CasADiProblem &operator=(const CasADiProblem &);
     CasADiProblem(CasADiProblem &&);
     CasADiProblem &operator=(CasADiProblem &&);
+
+    std::unique_ptr<ProblemBase<config_t>> clone() const & override;
+    std::unique_ptr<ProblemBase<config_t>> clone() && override;
 
     real_t eval_f(crvec x) const override;
     void eval_g(crvec x, rvec g) const override;
@@ -70,7 +75,8 @@ class CasADiProblem : public Problem<Conf> {
                             rvec work_n) const override;
 
   private:
-    std::unique_ptr<casadi_loader::CasADiFunctionsWithParam<Conf>> impl;
+    using Functions = casadi_loader::CasADiFunctionsWithParam<Conf>;
+    std::unique_ptr<Functions> impl;
 };
 
 CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiProblem, EigenConfigd);

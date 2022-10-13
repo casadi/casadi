@@ -157,12 +157,31 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name, length_t n,
 }
 
 template <Config Conf>
+CasADiProblem<Conf>::CasADiProblem(const CasADiProblem &o)
+    : Problem<config_t>{o}, impl(std::make_unique<Functions>(*o.impl)) {}
+template <Config Conf>
+CasADiProblem<Conf> &CasADiProblem<Conf>::operator=(const CasADiProblem &o) {
+    Problem<config_t>::operator=(o);
+    this->impl = std::make_unique<Functions>(*o.impl);
+    return *this;
+}
+
+template <Config Conf>
 CasADiProblem<Conf>::CasADiProblem(CasADiProblem &&) = default;
 template <Config Conf>
 CasADiProblem<Conf> &CasADiProblem<Conf>::operator=(CasADiProblem &&) = default;
 
 template <Config Conf>
 CasADiProblem<Conf>::~CasADiProblem() = default;
+
+template <Config Conf>
+std::unique_ptr<ProblemBase<Conf>> CasADiProblem<Conf>::clone() const & {
+    return std::make_unique<CasADiProblem>(*this);
+}
+template <Config Conf>
+std::unique_ptr<ProblemBase<Conf>> CasADiProblem<Conf>::clone() && {
+    return std::make_unique<CasADiProblem>(std::move(*this));
+}
 
 template <Config Conf>
 typename CasADiProblem<Conf>::real_t
