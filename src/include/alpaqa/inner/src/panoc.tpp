@@ -103,12 +103,12 @@ PANOCSolver<DirectionProviderT>::operator()(
             problem, params.quadratic_upperbound_tolerance_factor, params.L_max,
             xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
-    std::array<char, 64> printbuf;
+    std::array<char, 64> print_buf;
     auto print_real = [&](real_t x) {
-        return float_to_str_vw(printbuf, x, params.print_precision);
+        return float_to_str_vw(print_buf, x, params.print_precision);
     };
     auto print_real3 = [&](real_t x) {
-        return float_to_str_vw(printbuf, x, 3);
+        return float_to_str_vw(print_buf, x, 3);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
                               real_t pₖᵀpₖ, real_t γₖ, real_t τₖ, real_t εₖ) {
@@ -220,7 +220,7 @@ PANOCSolver<DirectionProviderT>::operator()(
         // Calculate quasi-Newton step -----------------------------------------
         if (k > 0)
             direction_provider.apply(xₖ, x̂ₖ, pₖ, grad_ψₖ,
-                                     need_grad_̂ψₖ ? grad_̂ψₖ : vec(), real_t(1),
+                                     need_grad_̂ψₖ ? grad_̂ψₖ : vec(), γₖ,
                                      /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
