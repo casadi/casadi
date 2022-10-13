@@ -1,3 +1,6 @@
+from copy import copy, deepcopy
+
+
 def test_alm():
     import alpaqa as pa
     import alpaqa.casadi_loader as cl
@@ -25,6 +28,8 @@ def test_alm():
 
     name = "testproblem"
     p = cl.generate_and_compile_casadi_problem(f, g, name=name)
+    p = copy(p) # test copying/cloning
+    p = deepcopy(p) # test copying/cloning
     p.D.lowerbound = [-np.inf, 0.5]
     p.D.upperbound = [+np.inf, +np.inf]
     solver = pa.PANOCSolver(
@@ -129,4 +134,4 @@ def test_alm_inherit():
 
 
 if __name__ == '__main__':
-    test_alm_functional()
+    test_alm()
