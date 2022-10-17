@@ -187,14 +187,6 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     return relay_.sz_iw();
   }
 
-  int PermuteLayout::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
-    const casadi_int* source = relay_.source();
-    const casadi_int* target = relay_.target();
-    const casadi_int* perms = get_ptr(relay_.perms());
-    if (arg[0] && res[0]) casadi_relayout(arg[0], res[0], source, perms, target, iw);
-    return 0;
-  }
-
   int PermuteLayout::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     const casadi_int* source = relay_.source();
     const casadi_int* target = relay_.target();
