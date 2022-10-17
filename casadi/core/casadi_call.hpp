@@ -185,11 +185,6 @@ namespace casadi {
         \identifier{79} */
     explicit Call(DeserializingStream& s);
 
-    /** \brief Find a common conditional argument for all seeds
-
-        \identifier{7a} */
-    static MX common_cond(const std::vector<std::vector<MX>>& seed);
-
     // Function to be evaluated
     Function fcn_;
   };

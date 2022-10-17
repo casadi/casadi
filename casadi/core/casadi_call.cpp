@@ -125,8 +125,6 @@ namespace casadi {
   void Call::ad_reverse(const std::vector<std::vector<MX>>& aseed,
       std::vector<std::vector<MX>>& asens) const {
     try {
-      // Find a common conditional argument among the seeds, if any
-      MX cond = common_cond(aseed);
       // Nondifferentiated inputs and outputs
       std::vector<MX> arg(n_dep());
       for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -137,12 +135,9 @@ namespace casadi {
       fcn_->call_reverse(arg, res, aseed, v, false, false);
       for (casadi_int i=0; i<v.size(); ++i) {
         for (casadi_int j=0; j<v[i].size(); ++j) {
-          // Skip structurally zero contributions (necessary?)
-          if (v[i][j].is_empty()) continue;
-          // Prevent propagation of NaNs through if/else
-          if (!cond.is_empty()) v[i][j] = if_else(cond, v[i][j], 0);
-          // Add seeds
-          asens[i][j] += v[i][j];
+          if (!v[i][j].is_empty()) { // TODO(@jaeandersson): Hack
+            asens[i][j] += v[i][j];
+          }
         }
       }
     } catch (std::exception& e) {
@@ -230,30 +225,6 @@ namespace casadi {
 
   Call::Call(DeserializingStream& s) : MultipleOutput(s) {
     s.unpack("Call::fcn", fcn_);
-  }
-
-  MX Call::common_cond(const std::vector<std::vector<MX> >& seed) {
-    // Check if all seeds are conditional with the same seed
-    MX c;
-    for (const std::vector<MX>& seed_dir : seed) {
-      for (const MX& s : seed_dir) {
-        // Skip zero seeds
-        if (s.is_zero()) continue;
-        // If not a conditional, no common condition
-        if (!s.is_op(OP_IF_ELSE_ZERO)) return MX();
-        // Get conditional
-        MX c1 = s.dep(0);
-        // Has c already been set
-        if (c.is_empty(true)) {
-          // First time encountered
-          c = c1;
-        } else if (!MX::is_equal(c, c1)) {
-          // Different conditionals
-          return MX();
-        }
-      }
-    }
-    return c;
   }
 
 } // namespace casadi

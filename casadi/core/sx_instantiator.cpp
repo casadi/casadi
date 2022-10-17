@@ -894,15 +894,14 @@ namespace casadi {
       case OP_CONST:
       case OP_PARAMETER:
         break;
-      CASADI_MATH_BINARY_BUILTIN // Binary operation
-      case OP_IF_ELSE_ZERO:
-        if (usecount[it->i2]==0) {
-          usecount[it->i2]=1;
-        } else if (usecount[it->i2]==1) {
-          // Get a suitable name
-          vdef.push_back(work[it->i2]);
-          usecount[it->i2]=-1; // Extracted, do not extract again
-        }
+        CASADI_MATH_BINARY_BUILTIN // Binary operation
+          if (usecount[it->i2]==0) {
+            usecount[it->i2]=1;
+          } else if (usecount[it->i2]==1) {
+            // Get a suitable name
+            vdef.push_back(work[it->i2]);
+            usecount[it->i2]=-1; // Extracted, do not extract again
+          }
         // fall-through
       case OP_OUTPUT:
       default: // Unary operation, binary operation or output

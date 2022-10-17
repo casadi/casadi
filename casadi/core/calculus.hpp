@@ -991,7 +991,7 @@ namespace casadi {
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
         f = if_else_zero(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=0; d[1]=x;}
+        d[0]=0; d[1]=if_else_zero(x, T(1));}
   };
 
   /// Inverse of error function
@@ -1502,6 +1502,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_NE:                                   \
     case OP_AND:                                  \
     case OP_OR:                                   \
+    case OP_IF_ELSE_ZERO:                         \
     case OP_COPYSIGN:                             \
     case OP_FMOD:                                 \
     case OP_REMAINDER:                            \
@@ -1547,10 +1548,9 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
   bool casadi_math<T>::is_binary(unsigned char op) {
     switch (op) {
       CASADI_MATH_BINARY_BUILTIN
-      case OP_IF_ELSE_ZERO:
-        return true;
-      default:
-        return false;
+      return true;
+    default:
+      return false;
     }
   }
 
@@ -1571,9 +1571,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
       case OP_PARAMETER:
       case OP_INPUT:
         return 0;
-      CASADI_MATH_BINARY_BUILTIN
-      case OP_IF_ELSE_ZERO:
-        return 2;
+        CASADI_MATH_BINARY_BUILTIN
+          return 2;
       default:
         return 1;
     }

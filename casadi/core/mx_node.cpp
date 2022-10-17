@@ -696,24 +696,6 @@ namespace casadi {
   }
 
   MX MXNode::get_binary(casadi_int op, const MX& y) const {
-    // If-else-zero nodes are always simplified at top level to avoid NaN propagation
-    if (y.op() == OP_IF_ELSE_ZERO) {
-      if (op == OP_MUL) {
-        // (Rule 1.) x * if_else_zero(c, y), simplified to if_else_zero(c, x * y)
-        // Background: x is often a partial derivative and may evaluate to INF or NAN.
-        // The simplification ensures that the zero seed corresponding to an inactive branch does
-        // not give rise to any NaN contribution to the derivative due to NaN * 0 == NaN.
-        return if_else_zero(y.dep(0), shared_from_this<MX>() * y.dep(1));
-      } else if (op == OP_ADD && this->op() == OP_IF_ELSE_ZERO && MX::is_equal(dep(0), y.dep(0))) {
-        // (Rule 2.) if_else_zero(c, x) + if_else_zero(c, y) is simplified to if_else_zero(c, x + y)
-        // Background: During the backward propagation, seeds are added together. Without this rule,
-        // the addition node can prevent rule (1.) from working in subsequent steps.
-        return if_else_zero(y.dep(0), dep(1) + y.dep(1));
-      }
-    } else if (this->op() == OP_IF_ELSE_ZERO && op == OP_MUL) {
-      // Same as Rule 1. above, but with factors swapped. For symmetry.
-      return if_else_zero(dep(0), dep(1) * y);
-    }
     // Create binary node
     if (sparsity().is_scalar(false)) {
       if (nnz()==0) {
