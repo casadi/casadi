@@ -221,37 +221,6 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SX")
       self.assertRaises(RuntimeError, lambda : mtimes(x,y))
 
-  def test_SXbinary_codegen(self):
-      self.message("SX binary operations")
-      x=SX.sym("x",4,2)
-      y=SX.sym("x",4,2)
-      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999],[1,2]])
-      y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6],[1,2]])
-      for f in self.matrixbinarypool.casadioperators:
-        f = Function('f',[x,y],[f([x,y])])
-        self.check_codegen(f,inputs=[x0,y0],std="c99")
-        self.check_codegen(f,inputs=[x0,y0],std="c89")
-
-  def test_SXbinary_diff(self):
-      self.message("SX binary operations")
-      x=SX.sym("x",4,2)
-      y=SX.sym("x",4,2)
-      dx=SX.sym("x",4,2)
-      dy=SX.sym("x",4,2)
-      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999],[1,2]])
-      y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6],[1,2]])
-      for f,name in zip(self.matrixbinarypool.casadioperators,self.matrixbinarypool.names):
-        f = Function('f',[x,y],[f([x,y])])
-        f.disp(True)
-        df = Function('f',[x,y,dx,dy],[jtimes(f(x,y),x,dx)+jtimes(f(x,y),y,dy)])
-        eps = 1e-7
-        DM.rng(0)
-        dx0 = DM.rand(x.sparsity())
-        dy0 = dx0 if name in ["fmin","fmax"] else DM.rand(y.sparsity())
-        dy0 = dx0 if name in ["fmin","fmax"] else DM.rand(y.sparsity())
-        df_experiment = (f(x0+eps*dx0,y0+eps*dy0)-f(x0,y0))/eps
-        print(df_experiment,df(x0,y0,dx0,dy0))
-        self.checkarray(df(x0,y0,dx0,dy0),df_experiment,digits=4)
 
   def test_DMbinary(self):
       self.message("SX binary operations")
@@ -1479,26 +1448,7 @@ class SXtests(casadiTestCase):
   def test_ufunc(self):
     y = np.sin(casadi.SX.sym('x'))
 
-  def test_mmin(self):
-      x = SX.sym("X",2)
-      f0 = Function("f",[x],[(x[0]+x[1])/2])
-      f1 = Function("f",[x],[mmin(x)])
-      f2 = Function("f",[x],[fmin(x[0],x[1])])
-      self.checkfunction(f1,f2,inputs=[[0.2,0.3]])
-      self.checkfunction(f1,f2,inputs=[[2,2]])
-      self.checkfunction(f1,f0,inputs=[[2,2]])
-      f1 = Function("f",[x],[mmax(x)])
-      f2 = Function("f",[x],[fmax(x[0],x[1])])
-      self.checkfunction(f1,f2,inputs=[[0.2,0.3]])
-      self.checkfunction(f1,f2,inputs=[[2,2]])
-      self.checkfunction(f1,f0,inputs=[[2,2]])
 
-      x = SX.sym("X")
-      f0 = Function("f",[x],[x])
-      f1 = Function("f",[x],[fmin(x,x)])
-      self.checkfunction(f1,f0,inputs=[[1]])
-      f1 = Function("f",[x],[fmax(x,x)])
-      self.checkfunction(f1,f0,inputs=[[1]])
 
   def test_empty_broadcast(self):
     for nc in [0,2]:
