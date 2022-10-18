@@ -1,7 +1,7 @@
 """
 Augmented Lagrangian and PANOC solvers for nonconvex numerical optimization.
 """
-__version__ = '1.0.0a2'
+__version__ = '1.0.0a3'
 
 import os
 import typing
