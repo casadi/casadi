@@ -25,7 +25,7 @@ namespace alpaqa::conv {
 template <Config Conf>
 py::dict stats_to_dict(const PANOCStats<Conf> &s) {
     using namespace py::literals;
-    return py::dict {
+    return py::dict{
         "status"_a              = s.status,
         "ε"_a                   = s.ε,
         "elapsed_time"_a        = s.elapsed_time,
@@ -36,13 +36,14 @@ py::dict stats_to_dict(const PANOCStats<Conf> &s) {
         "τ_1_accepted"_a        = s.τ_1_accepted,
         "count_τ"_a             = s.count_τ,
         "sum_τ"_a               = s.sum_τ,
+        "final_γ"_a             = s.final_γ,
     };
 }
 
 template <Config Conf>
 py::dict stats_to_dict(const InnerStatsAccumulator<PANOCStats<Conf>> &s) {
     using namespace py::literals;
-    return py::dict {
+    return py::dict{
         "elapsed_time"_a        = s.elapsed_time,
         "iterations"_a          = s.iterations,
         "linesearch_failures"_a = s.linesearch_failures,
@@ -57,7 +58,7 @@ py::dict stats_to_dict(const InnerStatsAccumulator<PANOCStats<Conf>> &s) {
 template <Config Conf>
 py::dict stats_to_dict(const StructuredPANOCLBFGSStats<Conf> &s) {
     using namespace py::literals;
-    return py::dict {
+    return py::dict{
         "status"_a              = s.status,
         "ε"_a                   = s.ε,
         "elapsed_time"_a        = s.elapsed_time,
@@ -69,13 +70,14 @@ py::dict stats_to_dict(const StructuredPANOCLBFGSStats<Conf> &s) {
         "count_τ"_a             = s.count_τ,
         "sum_τ"_a               = s.sum_τ,
         "fpr_shortcuts"_a       = s.fpr_shortcuts,
+        "final_γ"_a             = s.final_γ,
     };
 }
 
 template <Config Conf>
 py::dict stats_to_dict(const InnerStatsAccumulator<StructuredPANOCLBFGSStats<Conf>> &s) {
     using namespace py::literals;
-    return py::dict {
+    return py::dict{
         "elapsed_time"_a        = s.elapsed_time,
         "iterations"_a          = s.iterations,
         "linesearch_failures"_a = s.linesearch_failures,
@@ -91,7 +93,7 @@ py::dict stats_to_dict(const InnerStatsAccumulator<StructuredPANOCLBFGSStats<Con
 template <class Inner>
 py::dict stats_to_dict(const typename ALMSolver<Inner>::Stats &s) {
     using namespace py::literals;
-    return py::dict {
+    return py::dict{
         "outer_iterations"_a           = s.outer_iterations,
         "elapsed_time"_a               = s.elapsed_time,
         "initial_penalty_reduced"_a    = s.initial_penalty_reduced,

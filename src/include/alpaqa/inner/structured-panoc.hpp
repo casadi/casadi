@@ -79,6 +79,7 @@ struct StructuredPANOCLBFGSStats {
     unsigned count_τ             = 0;
     real_t sum_τ                 = 0;
     unsigned fpr_shortcuts       = 0;
+    real_t final_γ               = 0;
 };
 
 template <Config Conf = DefaultConfig>

@@ -371,6 +371,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<microseconds>(time_elapsed);
             s.status       = stop_status;
+            s.final_γ      = γₖ;
             return s;
         }
 
