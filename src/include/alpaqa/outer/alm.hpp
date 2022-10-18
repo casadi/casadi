@@ -70,13 +70,13 @@ struct ALMParams {
     /// How many times can the initial penalty @ref Σ_0 or
     /// @ref σ_0 and the initial primal tolerance @ref ε_0
     /// be reduced.
-    unsigned max_num_initial_retries = 20;
+    unsigned max_num_initial_retries = 0;
     /// How many times can the penalty update factor @ref Δ and the
     /// primal tolerance factor @ref ρ be reduced.
-    unsigned max_num_retries = 20;
+    unsigned max_num_retries = 0;
     /// Combined limit for @ref max_num_initial_retries and
     /// @ref max_num_retries.
-    unsigned max_total_num_retries = 40;
+    unsigned max_total_num_retries = 0;
 
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
