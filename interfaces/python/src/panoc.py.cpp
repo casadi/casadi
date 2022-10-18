@@ -301,10 +301,11 @@ void register_panoc(py::module_ &m) {
              "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
              "Create a PANOC solver using L-BFGS directions.")
         .def(py::init(
-            [](params_or_dict<PANOCParams> params, const TypeErasedPANOCDirection &direction) {
-                return PANOCSolver{var_kwargs_to_struct(params),
-                                   typename PANOCSolver::Direction{direction}};
-            }))
+                 [](params_or_dict<PANOCParams> params, const TypeErasedPANOCDirection &direction) {
+                     return PANOCSolver{var_kwargs_to_struct(params),
+                                        typename PANOCSolver::Direction{direction}};
+                 }),
+             "panoc_params"_a, "direction"_a, "Create a PANOC solver using a custom direction.")
         .def("__call__", panoc_independent_solve,
              py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
              "problem"_a, "Σ"_a, "ε"_a, "x"_a = py::none(),
