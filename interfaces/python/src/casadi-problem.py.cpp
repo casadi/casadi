@@ -34,7 +34,7 @@ void register_casadi_problem(py::module_ &m) {
                std::shared_ptr<CasADiProblem>>(
         m, "CasADiProblem",
         "C++ documentation: :cpp:class:`alpaqa::CasADiProblem`\n\n"
-        "See :py:class:`alpaqa._alpaqa.Problem` for the full documentation.");
+        "See :py:class:`alpaqa._alpaqa.float64.Problem` for the full documentation.");
 
     m.def("load_casadi_problem", load_CasADi_problem, "so_name"_a, "n"_a = 0, "m"_a = 0, "p"_a = 0,
           "second_order"_a = false, "Load a compiled CasADi problem.\n\n");
