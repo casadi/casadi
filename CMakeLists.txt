@@ -624,7 +624,7 @@ option(WITH_BUILD_QPOASES "Compile the the included source code for qpOASES" ${W
 option(WITH_QPOASES "Compile the interface to qpOASES" ${WITH_QPOASES_DEF})
 option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
 if(WITH_QPOASES)
-  if(WITH_BUILD_DSDP)
+  if(WITH_BUILD_QPOASES)
     if (NOT WITH_LAPACK)
       message(FATAL_ERROR "WITH_BUILD_QPOASES requires WITH_LAPACK.")
     endif()
