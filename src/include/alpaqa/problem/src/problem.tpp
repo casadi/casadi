@@ -38,36 +38,53 @@ void ProblemBase<Conf>::eval_hess_L(crvec, crvec, rmat) const {
     throw not_implemented_error("eval_hess_L");
 }
 
+template <class F, class... Args>
+inline decltype(auto) wrap_not_implemented(std::string_view fname, F &&f,
+                                           Args &&...args) {
+    try {
+        return std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
+    } catch (const not_implemented_error &e) {
+        std::string msg = e.what();
+        msg += "\n  required from: ";
+        msg += fname;
+        throw not_implemented_error(msg);
+    }
+}
+
 template <Config Conf>
 auto ProblemBase<Conf>::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t {
-    eval_grad_f(x, grad_fx);
-    return eval_f(x);
+    wrap_not_implemented(__PRETTY_FUNCTION__, [&] { eval_grad_f(x, grad_fx); });
+    return wrap_not_implemented(__PRETTY_FUNCTION__, [&] { return eval_f(x); });
 }
 template <Config Conf>
 auto ProblemBase<Conf>::eval_f_g(crvec x, rvec g) const -> real_t {
-    eval_g(x, g);
-    return eval_f(x);
+    wrap_not_implemented(__PRETTY_FUNCTION__, [&] { eval_g(x, g); });
+    return wrap_not_implemented(__PRETTY_FUNCTION__, [&] { return eval_f(x); });
 }
 
 template <Config Conf>
 auto ProblemBase<Conf>::eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const
     -> real_t {
-    eval_g(x, g);
-    return eval_f_grad_f(x, grad_fx);
+    wrap_not_implemented(__PRETTY_FUNCTION__, [&] { eval_g(x, g); });
+    return wrap_not_implemented(__PRETTY_FUNCTION__,
+                                [&] { return eval_f_grad_f(x, grad_fx); });
 }
 
 template <Config Conf>
 void ProblemBase<Conf>::eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f,
                                                 rvec grad_gxy) const {
-    eval_grad_f(x, grad_f);
-    eval_grad_g_prod(x, y, grad_gxy);
+    wrap_not_implemented(__PRETTY_FUNCTION__, [&] { eval_grad_f(x, grad_f); });
+    wrap_not_implemented(__PRETTY_FUNCTION__,
+                         [&] { eval_grad_g_prod(x, y, grad_gxy); });
 }
 
 template <Config Conf>
 void ProblemBase<Conf>::eval_grad_L(crvec x, crvec y, rvec grad_L,
                                     rvec work_n) const {
     // ∇L = ∇f(x) + ∇g(x) y
-    eval_grad_f_grad_g_prod(x, y, grad_L, work_n);
+    wrap_not_implemented(__PRETTY_FUNCTION__, [&] {
+        eval_grad_f_grad_g_prod(x, y, grad_L, work_n);
+    });
     grad_L += work_n;
 }
 
@@ -75,9 +92,11 @@ template <Config Conf>
 auto ProblemBase<Conf>::eval_ψ_ŷ(crvec x, crvec y, crvec Σ, rvec ŷ) const
     -> real_t {
     if (m == 0) /* [[unlikely]] */
-        return eval_f(x);
+        return wrap_not_implemented(__PRETTY_FUNCTION__,
+                                    [&] { return eval_f(x); });
 
-    real_t f   = eval_f_g(x, ŷ);
+    real_t f   = wrap_not_implemented(__PRETTY_FUNCTION__,
+                                      [&] { return eval_f_g(x, ŷ); });
     real_t dᵀŷ = calc_ŷ_dᵀŷ(ŷ, y, Σ);
     // ψ(x) = f(x) + ½ dᵀŷ
     real_t ψ = f + real_t(0.5) * dᵀŷ;
@@ -88,9 +107,11 @@ template <Config Conf>
 void ProblemBase<Conf>::eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ,
                                            rvec work_n) const {
     if (m == 0) /* [[unlikely]] */ {
-        eval_grad_f(x, grad_ψ);
+        wrap_not_implemented(__PRETTY_FUNCTION__,
+                             [&] { eval_grad_f(x, grad_ψ); });
     } else {
-        eval_grad_L(x, ŷ, grad_ψ, work_n);
+        wrap_not_implemented(__PRETTY_FUNCTION__,
+                             [&] { eval_grad_L(x, ŷ, grad_ψ, work_n); });
     }
 }
 
@@ -98,11 +119,14 @@ template <Config Conf>
 void ProblemBase<Conf>::eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ,
                                     rvec work_n, rvec work_m) const {
     if (m == 0) /* [[unlikely]] */ {
-        eval_grad_f(x, grad_ψ);
+        wrap_not_implemented(__PRETTY_FUNCTION__,
+                             [&] { eval_grad_f(x, grad_ψ); });
     } else {
-        eval_g(x, work_m);
+        wrap_not_implemented(__PRETTY_FUNCTION__, [&] { eval_g(x, work_m); });
         (void)calc_ŷ_dᵀŷ(work_m, y, Σ);
-        eval_grad_ψ_from_ŷ(x, work_m, grad_ψ, work_n);
+        wrap_not_implemented(__PRETTY_FUNCTION__, [&] {
+            eval_grad_ψ_from_ŷ(x, work_m, grad_ψ, work_n);
+        });
     }
 }
 
@@ -113,9 +137,11 @@ auto
 ProblemBase<Conf>::eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ,
                              rvec work_n, rvec work_m) const {
     // ψ(x) = f(x) + ½ dᵀŷ
-    real_t ψ = eval_ψ_ŷ(x, y, Σ, work_m);
+    real_t ψ = wrap_not_implemented(__PRETTY_FUNCTION__,
+                                    [&] { eval_ψ_ŷ(x, y, Σ, work_m);});
     // ∇ψ = ∇f(x) + ∇g(x) ŷ
-    eval_grad_ψ_from_ŷ(x, work_m, grad_ψ, work_n);
+    wrap_not_implemented(__PRETTY_FUNCTION__,
+                         [&] { eval_grad_ψ_from_ŷ(x, work_m, grad_ψ, work_n);});
     return ψ;
 }
 #else
@@ -124,15 +150,18 @@ auto ProblemBase<Conf>::eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ
                                       rvec work_n, rvec work_m) const
     -> real_t {
     if (m == 0) /* [[unlikely]] */
-        return eval_f_grad_f(x, grad_ψ);
+        return wrap_not_implemented(__PRETTY_FUNCTION__,
+                                    [&] { return eval_f_grad_f(x, grad_ψ); });
 
     auto &ŷ = work_m;
     // ψ(x) = f(x) + ½ dᵀŷ
-    real_t f   = eval_f_g(x, ŷ);
+    real_t f   = wrap_not_implemented(__PRETTY_FUNCTION__,
+                                      [&] { return eval_f_g(x, ŷ); });
     real_t dᵀŷ = calc_ŷ_dᵀŷ(ŷ, y, Σ);
     real_t ψ   = f + real_t(0.5) * dᵀŷ;
     // ∇ψ(x) = ∇f(x) + ∇g(x) ŷ
-    eval_grad_L(x, ŷ, grad_ψ, work_n);
+    wrap_not_implemented(__PRETTY_FUNCTION__,
+                         [&] { eval_grad_L(x, ŷ, grad_ψ, work_n); });
     return ψ;
 }
 #endif
