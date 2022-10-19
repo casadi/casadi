@@ -104,16 +104,16 @@
 #else
 
     /** Macro for switching on/off the beginning of the qpOASES namespace definition. */
-    #define BEGIN_NAMESPACE_QPOASES  namespace qpOASES {
+    #define BEGIN_NAMESPACE_QPOASES  namespace casadi_qpOASES {
 
     /** Macro for switching on/off the end of the qpOASES namespace definition. */
     #define END_NAMESPACE_QPOASES    }
 
     /** Macro for switching on/off the use of the qpOASES namespace. */
-    #define USING_NAMESPACE_QPOASES  using namespace qpOASES;
+    #define USING_NAMESPACE_QPOASES  using namespace casadi_qpOASES;
 
     /** Macro for switching on/off references to the qpOASES namespace. */
-    #define REFER_NAMESPACE_QPOASES  qpOASES::
+    #define REFER_NAMESPACE_QPOASES  casadi_qpOASES::
 
 #endif
 
