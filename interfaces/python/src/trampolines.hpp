@@ -16,4 +16,15 @@ class ProblemTrampoline : ProblemBase {
     void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const override { PYBIND11_OVERRIDE(void, ProblemBase, eval_hess_L_prod, x, y, v, Hv); }
     void eval_hess_L(crvec x, crvec y, rmat H) const override { PYBIND11_OVERRIDE(void, ProblemBase, eval_hess_L, x, y, H); }
     // clang-format on
+
+    // clang-format off
+    real_t eval_f_grad_f(crvec x, rvec grad_fx) const override { PYBIND11_OVERRIDE(real_t, ProblemBase, eval_f_grad_f, x, grad_fx); }
+    real_t eval_f_g(crvec x, rvec g) const override { PYBIND11_OVERRIDE(real_t, ProblemBase, eval_f_g, x, g); }
+    real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const override { PYBIND11_OVERRIDE(real_t, ProblemBase, eval_f_grad_f_g, x, grad_fx, g); }
+    void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const override { PYBIND11_OVERRIDE(void, ProblemBase, eval_grad_f_grad_g_prod, x, y, grad_f, grad_gxy); }
+    real_t eval_ψ_ŷ(crvec x, crvec y, crvec Σ, rvec ŷ) const override { PYBIND11_OVERRIDE(real_t, ProblemBase, eval_ψ_ŷ, x, y, Σ, ŷ); }
+    void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const override { PYBIND11_OVERRIDE(void, ProblemBase, eval_grad_ψ_from_ŷ, x, ŷ, grad_ψ, work_n); }
+    void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const override { PYBIND11_OVERRIDE(void, ProblemBase, eval_grad_ψ, x, y, Σ, grad_ψ, work_n, work_m); }
+    real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const override { PYBIND11_OVERRIDE(real_t, ProblemBase, eval_ψ_grad_ψ, x, y, Σ, grad_ψ, work_n, work_m); }
+    // clang-format on
 };
