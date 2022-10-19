@@ -112,13 +112,16 @@ PANOCSolver<DirectionProviderT>::operator()(
         return float_to_str_vw(print_buf, x, 3);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
-                              real_t pₖᵀpₖ, real_t γₖ, real_t τₖ, real_t εₖ) {
+                              real_t pₖᵀpₖ, crvec qₖ, real_t γₖ, real_t τₖ,
+                              real_t εₖ) {
         std::cout << "[PANOC] " << std::setw(6) << k
                   << ": ψ = " << print_real(ψₖ)
                   << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
                   << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
+                  << ", ‖q‖ = " << print_real(qₖ.norm())
                   << ", γ = " << print_real(γₖ) << ", τ = " << print_real3(τₖ)
-                  << ", εₖ = " << print_real(εₖ) << "\r\n";
+                  << ", εₖ = " << print_real(εₖ)
+                  << std::endl; // Flush for Python buffering
     };
 
     // Estimate Lipschitz constant ---------------------------------------------
@@ -188,7 +191,7 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
-            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, τ, εₖ);
+            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, qₖ, γₖ, τ, εₖ);
         if (progress_cb) {
             ScopedMallocAllower ma;
             progress_cb({k, xₖ, pₖ, pₖᵀpₖ, x̂ₖ, φₖ, ψₖ, grad_ψₖ, ψx̂ₖ, grad_̂ψₖ,

@@ -117,7 +117,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
                       << ", Δ = " << print_real(Δ) << ", status = " << color
                       << std::setw(13) << ps.status << color_end
                       << ", iter = " << std::setw(13) << ps.iterations
-                      << "\r\n";
+                      << std::endl; // Flush for Python buffering
         }
 
         // TODO: check penalty size?

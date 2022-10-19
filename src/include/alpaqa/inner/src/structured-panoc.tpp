@@ -210,18 +210,25 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
             problem, params.quadratic_upperbound_tolerance_factor, params.L_max,
             xₖ, ψₖ, grad_ψₖ, y, Σ, x̂ₖ, pₖ, ŷx̂ₖ, ψx̂ₖ, pₖᵀpₖ, grad_ψₖᵀpₖ, Lₖ, γₖ);
     };
-    std::array<char, 64> printbuf;
+    std::array<char, 64> print_buf;
     auto print_real = [&](real_t x) {
-        return float_to_str_vw(printbuf, x, params.print_precision);
+        return float_to_str_vw(print_buf, x, params.print_precision);
+    };
+    auto print_real3 = [&](real_t x) {
+        return float_to_str_vw(print_buf, x, 3);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
-                              real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
+                              real_t pₖᵀpₖ, crvec qₖ, length_t nJ, real_t γₖ,
+                              real_t τₖ, real_t εₖ) {
         std::cout << "[PANOC] " << std::setw(6) << k
                   << ": ψ = " << print_real(ψₖ)
                   << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
                   << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
-                  << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ)
-                  << "\r\n";
+                  << ", ‖q‖ = " << print_real(qₖ.norm())
+                  << ", #J/n = " << std::setw(6) << nJ << '/' << std::setw(6)
+                  << n << ", γ = " << print_real(γₖ)
+                  << ", τ = " << print_real3(τₖ) << ", εₖ = " << print_real(εₖ)
+                  << std::endl; // Flush for Python buffering
     };
 
     // Estimate Lipschitz constant ---------------------------------------------
@@ -344,7 +351,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
-            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, γₖ, εₖ);
+            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, qₖ, J.size(), γₖ, τ, εₖ);
         if (progress_cb) {
             Eigen::Map<indexvec> mJ{J.data(), Eigen::Index(J.size())};
             progress_cb({k,  xₖ, pₖ,      pₖᵀpₖ, x̂ₖ,      qₖ,    mJ,
@@ -477,6 +484,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
             ++s.linesearch_failures;
             τ = 0;
         }
+        τ *= 2; // restore to the value that was actually accepted
         if (k != 0) {
             s.count_τ += 1;
             s.sum_τ += τ * 2;
