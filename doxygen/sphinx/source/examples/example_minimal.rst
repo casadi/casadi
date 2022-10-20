@@ -48,7 +48,7 @@ Note that this is purely `CasADi <https://web.casadi.org/>`_ code, so thus far, 
 
     prob = pa.generate_and_compile_casadi_problem(cost_function, g_function, name=name)
 
-The resulting object `prob` is an instance of :py:class:`alpaqa._alpaqa.Problem`. Before 
+The resulting object `prob` is an instance of :py:class:`alpaqa._alpaqa.float64.Problem`. Before 
 we can solve the problem, we need to set a few numerical values to the 
 constraint bounds of this problem:: 
 
