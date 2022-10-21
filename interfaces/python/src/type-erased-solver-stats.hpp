@@ -10,6 +10,7 @@
 
 #include "stats-to-dict.hpp"
 
+#include <pybind11/gil.h>
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
@@ -37,7 +38,10 @@ operator+=(InnerStatsAccumulator<TypeErasedInnerSolverStats<Conf>> &acc, const S
     if (!act_acc)
         throw std::logic_error("Cannot combine different types of solver stats");
     *act_acc += stats;
-    acc.as_dict = conv::stats_to_dict(*act_acc);
+    {
+        py::gil_scoped_acquire gil{};
+        acc.as_dict = conv::stats_to_dict(*act_acc);
+    }
     return acc;
 }
 

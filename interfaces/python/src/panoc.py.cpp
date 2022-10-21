@@ -3,6 +3,7 @@
 #include <pybind11/chrono.h>
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
+#include <pybind11/gil.h>
 #include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -10,6 +11,11 @@
 namespace py = pybind11;
 using namespace py::literals;
 constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
+
+#include <chrono>
+#include <exception>
+#include <future>
+using namespace std::chrono_literals;
 
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
@@ -275,15 +281,46 @@ void register_panoc(py::module_ &m) {
                                alpaqa::conv::stats_to_dict(stats));
     };
     auto panoc_independent_solve_unconstr = [](PANOCSolver &solver, const Problem &problem,
-                                               real_t ε, std::optional<vec> x) {
+                                               real_t ε, std::optional<vec> x, bool async) {
         bool always_overwrite_results = true;
         if (x)
             check_dim("x", *x, problem.n);
         else
             x = vec::Zero(problem.n);
         vec Σ(0), y(0), err_z(0);
-        auto stats = solver(problem, Σ, ε, always_overwrite_results, *x, y, err_z);
-        return std::make_tuple(std::move(*x), alpaqa::conv::stats_to_dict(stats));
+        auto invoke_solver = [&] {
+            return solver(problem, Σ, ε, always_overwrite_results, *x, y, err_z);
+        };
+        if (!async) {
+            auto stats = invoke_solver();
+            return std::make_tuple(std::move(*x), alpaqa::conv::stats_to_dict(stats));
+        } else {
+            auto stats = std::async(std::launch::async, invoke_solver);
+            {
+                py::gil_scoped_release gil{};
+                while (stats.wait_for(50ms) != std::future_status::ready) {
+                    py::gil_scoped_acquire gil{};
+                    // Check if Python received a signal (e.g. Ctrl+C)
+                    if (PyErr_CheckSignals() != 0) {
+                        // Nicely ask the solver to stop
+                        solver.stop();
+                        // It should return a result soon
+                        if (py::gil_scoped_release gil{};
+                            stats.wait_for(15s) != std::future_status::ready) {
+                            // If it doesn't, we terminate the entire program,
+                            // because the solver uses variables local to this
+                            // function, so we cannot safely return without
+                            // waiting for the solver to finish.
+                            std::terminate();
+                        }
+                        if (PyErr_Occurred())
+                            throw py::error_already_set();
+                        break;
+                    }
+                }
+            }
+            return std::make_tuple(std::move(*x), alpaqa::conv::stats_to_dict(stats.get()));
+        }
     };
 
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
@@ -322,11 +359,12 @@ void register_panoc(py::module_ &m) {
              "         * Statistics\n\n")
         .def("__call__", panoc_independent_solve_unconstr,
              py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
-             "problem"_a, "ε"_a, "x"_a = py::none(), //
+             "problem"_a, "ε"_a, "x"_a = py::none(), "async_"_a = false, //
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
              ":param ε: Desired tolerance\n"
              ":param x: Initial guess\n"
+             ":param async_: Release the GIL and run the solver on a separate thread\n"
              ":return: * Solution :math:`x`\n"
              "         * Statistics\n\n")
         .def("__str__", &PANOCSolver::get_name)

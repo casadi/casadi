@@ -2,14 +2,20 @@
 
 #include <pybind11/chrono.h>
 #include <pybind11/eigen.h>
+#include <pybind11/gil.h>
 #include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <stdexcept>
 
 namespace py = pybind11;
 using namespace py::literals;
 constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
+
+#include <chrono>
+#include <exception>
+#include <future>
+#include <stdexcept>
+using namespace std::chrono_literals;
 
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/inner/src/panoc.tpp>
@@ -98,8 +104,8 @@ void register_alm(py::module_ &m) {
         .def_readwrite("single_penalty_factor", &ALMParams::single_penalty_factor);
 
     auto safe_alm_call = [](ALMSolver &solver, const alpaqa::ProblemBase<config_t> &p,
-                            std::optional<vec> x,
-                            std::optional<vec> y) -> std::tuple<vec, vec, py::dict> {
+                            std::optional<vec> x, std::optional<vec> y,
+                            bool async) -> std::tuple<vec, vec, py::dict> {
         if (!x)
             x = vec::Zero(p.n);
         else
@@ -116,9 +122,40 @@ void register_alm(py::module_ &m) {
                       "Length of problem.D.lowerbound does not match problem size problem.m");
         check_dim_msg(p.get_D().upperbound, p.m,
                       "Length of problem.D.upperbound does not match problem size problem.m");
-        auto stats = solver(p, *y, *x);
-        return std::make_tuple(std::move(*x), std::move(*y),
-                               alpaqa::conv::stats_to_dict<InnerSolver>(stats));
+
+        auto invoke_solver = [&] { return solver(p, *y, *x); };
+        if (!async) {
+            auto stats = invoke_solver();
+            return std::make_tuple(std::move(*x), std::move(*y),
+                                   alpaqa::conv::stats_to_dict<InnerSolver>(stats));
+        } else {
+            auto stats = std::async(std::launch::async, invoke_solver);
+            {
+                py::gil_scoped_release gil{};
+                while (stats.wait_for(50ms) != std::future_status::ready) {
+                    py::gil_scoped_acquire gil{};
+                    // Check if Python received a signal (e.g. Ctrl+C)
+                    if (PyErr_CheckSignals() != 0) {
+                        // Nicely ask the solver to stop
+                        solver.stop();
+                        // It should return a result soon
+                        if (py::gil_scoped_release gil{};
+                            stats.wait_for(15s) != std::future_status::ready) {
+                            // If it doesn't, we terminate the entire program,
+                            // because the solver uses variables local to this
+                            // function, so we cannot safely return without
+                            // waiting for the solver to finish.
+                            std::terminate();
+                        }
+                        if (PyErr_Occurred())
+                            throw py::error_already_set();
+                        break;
+                    }
+                }
+            }
+            return std::make_tuple(std::move(*x), std::move(*y),
+                                   alpaqa::conv::stats_to_dict<InnerSolver>(stats.get()));
+        }
     };
 
     py::class_<ALMSolver>(m, "ALMSolver",
@@ -158,11 +195,13 @@ void register_alm(py::module_ &m) {
             py::cpp_function([](ALMSolver &self) -> InnerSolver & { return self.inner_solver; },
                              ret_ref_internal))
         .def("__call__", safe_alm_call, "problem"_a, "x"_a = std::nullopt, "y"_a = std::nullopt,
+             "async_"_a = false,
              py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
              "Solve.\n\n"
              ":param problem: Problem to solve.\n"
              ":param x: Initial guess for decision variables :math:`x`\n\n"
              ":param y: Initial guess for Lagrange multipliers :math:`y`\n"
+             ":param async_: Release the GIL and run the solver on a separate thread\n"
              ":return: * Solution :math:`x`\n"
              "         * Lagrange multipliers :math:`y` at the solution\n"
              "         * Statistics\n\n")
