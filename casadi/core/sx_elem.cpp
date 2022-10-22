@@ -383,6 +383,9 @@ namespace casadi {
           } else {
             return 0;
           }
+        } else if (y.is_op(OP_IF_ELSE_ZERO) && is_equal(x, y.dep(0))) {
+          // Same check twice
+          return y;
         }
       }
     }
