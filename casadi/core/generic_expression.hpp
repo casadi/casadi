@@ -560,6 +560,28 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
+    /** \brief Safe variant of division
+    */
+    static ExType safe_div(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_SAFE_DIV, x, y);
+    }
+    friend inline ExType safe_div(const ExType& x, const ExType& y) {
+      return ExType::safe_div(x, y);
+    }
+    ///@}
+
+    ///@{
+    /** \brief Safe variant of square root
+    */
+    static ExType safe_sqrt(const ExType& x) {
+      return ExType::unary(OP_SAFE_SQRT, x);
+    }
+    friend inline ExType safe_sqrt(const ExType& x) {
+      return ExType::safe_sqrt(x);
+    }
+    ///@}
+
+    ///@{
     /** \brief Sign function:
 
         sign(x)   := -1 for x<0

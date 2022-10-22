@@ -3422,6 +3422,8 @@ DECL M casadi_expm1(const M& x) { return expm1(x); }
 DECL M casadi_floor(const M& x) { return floor(x); }
 DECL M casadi_ceil(const M& x) { return ceil(x); }
 DECL M casadi_erf(const M& x) { return erf(x); }
+DECL M casadi_safe_div(const M& x, const M& y) { using casadi::safe_div; return safe_div(x, y); }
+DECL M casadi_safe_sqrt(const M& x) { using casadi::safe_sqrt; return safe_sqrt(x); }
 DECL M casadi_erfinv(const M& x) { using casadi::erfinv; return erfinv(x); }
 DECL M casadi_sign(const M& x) { using casadi::sign; return sign(x); }
 DECL M casadi_power(const M& x, const M& n) { return pow(x, n); }
