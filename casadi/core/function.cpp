@@ -279,6 +279,7 @@ namespace casadi {
     opts["is_diff_in"] = (*this)->is_diff_in_;
     opts["is_diff_out"] = (*this)->is_diff_out_;
     opts["jac_penalty"] = (*this)->jac_penalty_;
+    opts["cse"] = true;
     return expand(name(), opts);
   }
 
