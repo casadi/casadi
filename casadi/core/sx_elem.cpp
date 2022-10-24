@@ -244,10 +244,10 @@ namespace casadi {
           return y * x;
         // Make sure NaN does not propagate through an inactive branch
         // On demand by Deltares, July 2016
-        else if (x.is_op(OP_IF_ELSE_ZERO))
-          return if_else_zero(x.dep(0), x.dep(1)*y);
-        else if (y.is_op(OP_IF_ELSE_ZERO))
-          return if_else_zero(y.dep(0), y.dep(1)*x);
+        //else if (x.is_op(OP_IF_ELSE_ZERO))
+        //  return if_else_zero(x.dep(0), x.dep(1)*y);
+        //else if (y.is_op(OP_IF_ELSE_ZERO))
+        //  return if_else_zero(y.dep(0), y.dep(1)*x);
         else if (x.is_zero() || y->is_zero()) // one of the terms is zero
           return 0;
         else if (x.is_one()) // term1 is one
