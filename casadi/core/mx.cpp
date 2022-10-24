@@ -1247,6 +1247,8 @@ namespace casadi {
       sw_arg.insert(sw_arg.end(), arg.begin(), arg.end());
       return sw(sw_arg).at(0);
     } else {
+      if (x_false.is_zero()) return if_else_zero(cond, x_true);
+      if (x_true.is_zero()) return if_else_zero(!cond, x_false);
       return if_else_zero(cond, x_true) + if_else_zero(!cond, x_false);
     }
   }

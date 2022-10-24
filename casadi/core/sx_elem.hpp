@@ -264,6 +264,8 @@ namespace casadi {
 
         \identifier{113} */
     friend inline SXElem if_else(const SXElem& x, const SXElem& y, const SXElem& z) {
+      if (z.is_zero()) return if_else_zero(x, y);
+      if (y.is_zero()) return if_else_zero(!x, z);
       return if_else_zero(x, y) + if_else_zero(!x, z);
     }
 
