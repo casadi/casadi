@@ -40,6 +40,8 @@ namespace casadi {
 
   MX MultipleOutput::get_output(casadi_int oind) const {
     MX this_ = shared_from_this<MX>();
+    // No need for an OutputNode if sparsity is fully sparse
+    if (this_->sparsity(oind).nnz()==0) return MX(this_->sparsity(oind));
     return MX::create(new OutputNode(this_, oind));
   }
 

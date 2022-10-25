@@ -327,6 +327,16 @@ namespace casadi {
     /// Get the sparsity of output oind
     virtual const Sparsity& sparsity(casadi_int oind) const;
 
+    template<class T>
+    bool matches_sparsity(const std::vector<T>& arg) const {
+        for (casadi_int i=0;i<dep_.size();++i) {
+            if (dep_[i].sparsity()!=arg[i].sparsity()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /// Get shape
     casadi_int numel() const { return sparsity().numel(); }
     casadi_int nnz(casadi_int i=0) const { return sparsity(i).nnz(); }

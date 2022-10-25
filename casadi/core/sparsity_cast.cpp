@@ -99,7 +99,11 @@ namespace casadi {
   }
 
   MX SparsityCast::get_reshape(const Sparsity& sp) const {
-    return reshape(dep(0), sp);
+    if (sp.is_reshape(dep(0).sparsity())) {
+      return reshape(dep(0), sp);
+    } else {
+      return MXNode::get_reshape(sp);
+    }
   }
 
   MX SparsityCast::get_sparsity_cast(const Sparsity& sp) const {

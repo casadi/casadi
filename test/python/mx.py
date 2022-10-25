@@ -437,6 +437,13 @@ class MXtests(casadiTestCase):
     self.checkfunction(f,fsx,inputs=[inp])
     y = fsx(inp)
     self.checkarray(y,DM([[1, 0, 2],[4, 0, 3]]))
+    
+    x = MX.sym("x",2)
+    sp = sparsify(blockcat([[1,0],[0,1]])).sparsity()
+    y = sparsity_cast(MX.sym("y",2),sp)
+
+    vec(y)
+
 
   def test_MXcompose(self):
     self.message("compositions of vec, trans, reshape with vertcat")
