@@ -66,7 +66,7 @@ namespace casadi {
 
   MX ConstantMX::join_primitives(std::vector<MX>::const_iterator& it) const {
     if (nnz()==0) {
-      return MX(sparsity());
+      return shared_from_this<MX>();
     } else {
       return MXNode::join_primitives(it);
     }

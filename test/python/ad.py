@@ -614,6 +614,7 @@ class ADtests(casadiTestCase):
       fun = Function("fun", inputs,[out])
       out_eval_mx = fun.call([e+1e-300 for e in inputs],True,False)[0] 
       for out in [out,out_eval_mx]:
+          self.check_eval_mx(out)
           fun = Function("fun", inputs,[out,jac])
 
           fun_ad = [Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
@@ -684,7 +685,11 @@ class ADtests(casadiTestCase):
                   vf_in.append(0)
 
                 vf_out = vf.call(vf_in)
+                if sym is MX.sym:
+                    self.check_eval_mx([vvcat(e) for e in fwdsens])
+                    self.check_eval_mx([vvcat(e) for e in adjsens])
                 self.check_codegen(vf,inputs=vf_in,std=std,main=True)
+
                 self.check_serialize(vf,inputs=vf_in)
 
                 offset = len(res)
@@ -735,6 +740,10 @@ class ADtests(casadiTestCase):
                   res2 = vf.call(inputss2,True)
                   fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=True))
                   adjsens2 = reverse(res2,inputss2,aseeds2,dict(always_inline=True))
+
+                  if sym2 is MX.sym:
+                      self.check_eval_mx([vvcat(e) for e in fwdsens2])
+                      self.check_eval_mx([vvcat(e) for e in adjsens2])
 
                   vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
 

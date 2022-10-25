@@ -440,6 +440,40 @@ class casadiTestCase(unittest.TestCase):
       if len(excludeflags.intersection(pool.flags[i]))>0:
         continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
+      
+  def check_eval_mx(self, mx):
+    if isinstance(mx,list):
+        return self.check_eval_mx(vvcat(mx))
+    assert isinstance(mx,MX)
+    args = symvar(mx)
+    f = Function("f",args,[mx])
+    d = MX.sym("d") # dummy
+    #mx_eval = f.call(args,True,False)[0]
+    new_args = [MX.sym(e.name(),e.sparsity()) for e in args]
+    mx_eval = f.call(new_args,True,False)[0]
+    if isinstance(mx_eval,DM):
+        mx = evalf(mx)
+        self.checkarray(mx,mx_eval)
+        return
+    mx_eval = substitute([mx_eval],new_args,args)[0]
+    if isinstance(mx_eval,MX): # In all sparse case, might falsely look like SX
+        self.check_identical_mx(mx_eval,mx)
+
+  def check_identical_fun(self, a, b):
+    s = a.serialize()
+    s2 = b.serialize()
+    a.save('a.casadi',{"debug":True})
+    b.save('b.casadi',{"debug":True})
+    self.assertTrue(s==s2)
+        
+  def check_identical_mx(self, a, b):
+    assert isinstance(a,MX)
+    assert isinstance(b,MX)
+    arg_a = symvar(a)
+    arg_b = symvar(b)
+    fa = Function('f',arg_a,[a])
+    fb = Function('f',arg_b,[b])
+    self.check_identical_fun(fa,fb)    
 
   def checkfunction_light(self,trial,solution,inputs=None,**kwargs):
     self.checkfunction(trial,solution,inputs,fwd=False,adj=False,jacobian=False,gradient=False,hessian=False,sens_der=False,evals=False,**kwargs)

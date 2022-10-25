@@ -344,6 +344,16 @@ namespace casadi {
     /// Alignment (bytes) for work vector
     virtual size_t align_w() const { return GlobalOptions::vector_width_real*GlobalOptions::byte_width_real; }
 
+    template<class T>
+    bool matches_sparsity(const std::vector<T>& arg) const {
+        for (casadi_int i=0;i<dep_.size();++i) {
+            if (dep_[i].sparsity()!=arg[i].sparsity()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /// Get shape
     casadi_int numel() const { return sparsity().numel(); }
     casadi_int nnz(casadi_int i=0) const { return sparsity(i).nnz(); }
