@@ -248,7 +248,12 @@ namespace casadi {
                             "Option 'default_in' has incorrect length");
     }
 
-    if (cse_opt) out_ = cse(out_);
+    if (cse_opt) {
+      casadi_int n_before = MX::n_nodes(veccat(out_));
+      out_ = cse(out_);
+      casadi_int n_after = MX::n_nodes(veccat(out_));
+      if (verbose_) casadi_message("cse pass: " + str(n_before) + " -> " + str(n_after));
+    }
 
     // Stack used to sort the computational graph
     stack<MXNode*> s;

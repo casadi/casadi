@@ -404,8 +404,12 @@ namespace casadi {
       }
     }
 
-    if (cse_opt) out_ = cse(out_);
-    //uout() << "after layout_in/out" << layout_in_ << layout_out_ << std::endl;
+    if (cse_opt) {
+      casadi_int n_before = SX::n_nodes(veccat(out_));
+      out_ = cse(out_);
+      casadi_int n_after = SX::n_nodes(veccat(out_));
+      if (verbose_) casadi_message("cse pass: " + str(n_before) + " -> " + str(n_after));
+    }
 
     // Check/set default inputs
     if (default_in_.empty()) {
