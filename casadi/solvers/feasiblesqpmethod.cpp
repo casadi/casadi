@@ -363,16 +363,6 @@ namespace casadi {
       }
     }
 
-    // if (elastic_mode_) {
-    //   auto it = qpsol_options.find("error_on_fail");
-    //   if (it==qpsol_options.end()) {
-    //     qpsol_options["error_on_fail"] = false;
-    //   } else {
-    //     casadi_assert(!it->second, "QP solver with setting error_on_fail is incompatible with elastic mode feasiblesqpmethod.");
-    //   }
-      
-    // }
-
     // Use exact Hessian?
     exact_hessian_ = hessian_approximation =="exact";
 
@@ -428,32 +418,18 @@ namespace casadi {
     }
 
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    // qpsol_options["dump_in"] = true;
+    // qpsol_options["dump_out"] = true;
+    // qpsol_options["dump"] = true;
+    // qpsol_options["print_out"] = true;
+    // qpsol_options["error_on_fail"] = false;
+    
+    Hsp_.to_file("h.mtx");
+    Asp_.to_file("a.mtx");
+    uout() << qpsol_options << std::endl;
     qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
-
-    // if (elastic_mode_) {
-    //   // Generate sparsity patterns for elastic mode
-    //   Sparsity Hsp_ela = Sparsity(Hsp_);
-    //   Sparsity Asp_ela = Sparsity(Asp_);
-
-    //   std::vector<casadi_int> n_v(nx_);
-    //   std::iota(std::begin(n_v), std::end(n_v), 0);
-    //   Hsp_ela.enlarge(2*ng_ + nx_, 2*ng_ + nx_, n_v, n_v);
-
-    //   Sparsity dsp = Sparsity::diag(ng_,ng_);
-    //   Asp_ela.appendColumns(dsp);
-    //   Asp_ela.appendColumns(dsp);
-
-    //   // Allocate QP solver for elastic mode
-    //   Dict qpsol_ela_options = Dict(qpsol_options);
-
-    //   casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    //   qpsol_ela_ = conic("qpsol_ela", qpsol_plugin, {{"h", Hsp_ela}, {"a", Asp_ela}},
-    //                 qpsol_ela_options);
-    //   alloc(qpsol_ela_);
-    // }
-    
 
     // BFGS?
     if (!exact_hessian_) {
@@ -584,7 +560,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   casadi_axpy(nx_+ng_, -1.0, d_nlp->lam, d->z_tmp);
 
   // this is in solve in fslp.py
-  double step_inf_norm = fmax(casadi_norm_inf(nx_, d->dx), casadi_norm_inf(nx_+ng_, d->z_tmp));// fmax(casadi_norm_inf(nx_, d->dx_feas), casadi_norm_inf(nx_ + ng_, d->dlam_feas));
+  double step_inf_norm = casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
   double prev_step_inf_norm = step_inf_norm;
 
   // bool kappa_acceptance = false;
@@ -623,7 +599,6 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   casadi_axpy(nx_, 1., d_nlp->z, d->z_tmp);
   double as_exac = casadi_norm_2(nx_, d->z_tmp) / casadi_norm_2(nx_, d->dx);
 
-  // double as_exac = 1.0;
   double kappa_watchdog = 0.0;
   double kappa = 0.0;
   double acc_as_exac = 0.0;
@@ -671,14 +646,21 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
 
     casadi_copy(d_nlp->lbz, nx_, d->lbdz_feas);
     casadi_clip_min(d->lbdz_feas, d->tr_scale_vector, nx_, -tr_rad);
+    DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_part1_part1.mtx");
     // casadi_fill(d->lbdz_feas, nx_, -tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->lbdz_feas);
+    DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_part1.mtx");
+
 
     casadi_copy(d_nlp->lbz, nx_, d->z_tmp);
     casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
+    DM(std::vector<double>(d->z_tmp,d->z_tmp+nx_)).to_file("lbx_feas_part2.mtx");
+
     // comparison of both vectors
     casadi_elem_vfmax(nx_, d->z_tmp, d->lbdz_feas);
+    DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_end.mtx");
+
 
     // upper bounds of variables
     //       ubp = cs.fmin(self.tr_rad_k*self.tr_scale_mat_inv_k @
@@ -688,14 +670,21 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
 
     casadi_copy(d_nlp->ubz, nx_, d->ubdz_feas);
     casadi_clip_max(d->ubdz_feas, d->tr_scale_vector, nx_, tr_rad);
+    DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_part1_part1.mtx");
     // casadi_fill(d->ubdz_feas, nx_, tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->ubdz_feas);
+    DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("ubx_feas_part1_zfeas.mtx");
     casadi_axpy(nx_, 1., d_nlp->z, d->ubdz_feas);
+
+    DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_part1.mtx");
 
     casadi_copy(d_nlp->ubz, nx_, d->z_tmp);
     casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
+    DM(std::vector<double>(d->z_tmp,d->z_tmp+nx_)).to_file("ubx_feas_part2.mtx");
     // comparison of both vectors
     casadi_elem_vfmin(nx_, d->z_tmp, d->ubdz_feas);
+    DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_end.mtx");
+
 
     // std::string suffix = str(j);
     // DM(std::vector<double>(d_nlp->lbz,d_nlp->lbz+nx_+ng_)).to_file("nlp_lbz"+suffix+".mtx");
@@ -708,10 +697,16 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     // casadi_copy(d->dx, nx_, d->x_tmp);
 
     //prepare step_inf_norm
+    DM(std::vector<double>(d->gf_feas,d->gf_feas+nx_)).to_file("gf_feas.mtx");
+    DM(std::vector<double>(d->lbdz_feas, d->lbdz_feas+nx_)).to_file("lb_var_correction.mtx");
+    DM(std::vector<double>(d->ubdz_feas, d->ubdz_feas+nx_)).to_file("ub_var_correction.mtx");
+    DM(std::vector<double>(d->lbdz_feas+nx_, d->lbdz_feas+nx_+ng_)).to_file("lba_correction.mtx");
+    DM(std::vector<double>(d->ubdz_feas+nx_, d->ubdz_feas+nx_+ng_)).to_file("uba_correction.mtx");
 
     int ret = solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas, d->Jk,
     d->dx_feas, d->dlam_feas, 0); // put definition of ret out of loop
 
+    DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_feas.mtx");
     // uout() << "Feas QP step: " << std::vector<double>(d->dx_feas, d->dx_feas+nx_) << std::endl;
     //MISSING: Depending on the result terminate program
 
@@ -728,7 +723,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     // here!!
     // casadi_copy(d->dlam_feas, nx_+ng_, d->z_tmp);
     // casadi_axpy(nx_+ng_, -1.0, d->dlam, d->z_tmp);
-    step_inf_norm = casadi_norm_inf(nx_, d->dx_feas);//fmax(casadi_norm_inf(nx_, d->dx), casadi_norm_inf(nx_+ng_, d->z_tmp));//
+    step_inf_norm = casadi_tr_norm_inf(nx_, d->dx_feas, d->tr_scale_vector);
 
     //       self.x_tmp = self.x_tmp + p_tmp
     //       self.g_tmp = self.__eval_g(self.x_tmp)  # x_tmp = x_{tmp-1} + p_tmp
@@ -751,6 +746,13 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //       kappas.append(kappa) 
     kappa = step_inf_norm/prev_step_inf_norm;
     //MISSING: as_exac:
+
+    DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("z.mtx");
+    DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("z_feas.mtx");
+    // DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_feas"+suffix+".mtx");
+    // DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx.mtx");
+
+
     casadi_copy(d->dx, nx_, d->z_tmp);
     casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
     casadi_axpy(nx_, 1., d_nlp->z, d->z_tmp);
@@ -765,7 +767,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //                 "Infeasibility", self.feasibility_measure(
     //                           self.x_tmp, self.g_tmp),
     //                 "Asymptotic Exactness: ", as_exac)
-    print("%6s %9.2e %14s %9.2e %20s %9.2e\n", "Kappa:", kappa, 
+    print("%6s %9.10f %14s %9.10f %20s %9.10f\n", "Kappa:", kappa, 
     "Infeasibility:", curr_infeas, "AsymptoticExactness:", as_exac);
 
     //       accumulated_as_ex += as_exac
@@ -781,7 +783,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     if (inner_iter % watchdog_ == 0){
       kappa_watchdog = step_inf_norm / watchdog_prev_inf_norm;
       watchdog_prev_inf_norm = step_inf_norm;
-      print("Kappa watchdog: %9.2e\n", kappa_watchdog);
+      print("Kappa watchdog: %9.10f\n", kappa_watchdog);
       if (curr_infeas < feas_tol_ && as_exac < 0.5){
         // kappa_acceptance = true;
         return 0;
@@ -819,6 +821,8 @@ int Feasiblesqpmethod::solve(void* mem) const {
     auto d_nlp = &m->d_nlp;
     auto d = &m->d;
 
+
+    DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("x0.mtx");
     // Number of SQP iterations
     m->iter_count = 0;
 
@@ -834,6 +838,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     double tr_ratio = 0.0;
 
     double tr_rad = tr_rad0_;
+    double tr_rad_prev = tr_rad0_;
 
     // transfer the scale vector to the problem.... thats not a nice way???
     for (int i=0; i<nx_; ++i){
@@ -912,6 +917,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
             break;
           default:
             return 1;
+
         }
         // uout() << "x0: " << *d_nlp->z << std::endl;
         // uout() << "nlp_f: " << d_nlp->f << std::endl;
@@ -949,6 +955,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
           m->return_status = "No_Feasible_Initialization";
           break;
         }
+
+        DM(std::vector<double>(d_nlp->z+nx_, d_nlp->z+nx_+ng_)).to_file("g0.mtx");
+        DM(std::vector<double>(d->gf, d->gf+nx_)).to_file("gf0.mtx");
 
       } else if (step_accepted == 0){
         // Evaluate grad_f
@@ -1025,11 +1034,13 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // uout() << "objective value: " << d_nlp->f << std::endl;
       // Printing information about the actual iterate
       if (print_iteration_) {
-        if (m->iter_count % 10 == 0) print_iteration();
+        // if (m->iter_count % 10 == 0) print_iteration();
+        print_iteration();
         print_iteration(m->iter_count, d_nlp->f, m_k, tr_ratio,
-                        pr_inf, du_inf, dx_norminf, m->reg, tr_rad, info);
+                        pr_inf, du_inf, dx_norminf, m->reg, tr_rad_prev, info);
         info = "";
       }
+      tr_rad_prev = tr_rad;
 
       // Callback function
       if (callback(m)) {
@@ -1082,15 +1093,24 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Increase counter
       m->iter_count++;
 
+      DM(std::vector<double>(d->gf,d->gf+nx_)).to_file("gf.mtx");
+      DM(std::vector<double>(d->lbdz, d->lbdz+nx_)).to_file("lb_var.mtx");
+      DM(std::vector<double>(d->ubdz, d->ubdz+nx_)).to_file("ub_var.mtx");
+      DM(std::vector<double>(d->lbdz+nx_, d->lbdz+nx_+ng_)).to_file("lba.mtx");
+      DM(std::vector<double>(d->ubdz+nx_, d->ubdz+nx_+ng_)).to_file("uba.mtx");
+      DM(std::vector<double>(d->Bk, d->Bk+Hsp_.nnz())).to_file("Bk.mtx");
+      DM(std::vector<double>(d->Jk, d->Jk+Asp_.nnz())).to_file("Jk.mtx");
+
       // Solve the QP
       int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
                d->dx, d->dlam, 0);
 
+      DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx.mtx");
       // Eval quadratic model and check for convergence
       m_k = eval_m_k(mem);
       if (fabs(m_k) < optim_tol_) {
         if (print_status_)
-          print("MESSAGE(feasiblesqpmethod): Optimal Point Found? Quadratic model is zero. After %d iterations\n", m->iter_count);
+          print("MESSAGE(feasiblesqpmethod): Optimal Point Found? Quadratic model is zero. After %d iterations\n", m->iter_count-1);
         m->return_status = "Solve_Succeeded";
         m->success = true;
         break;
@@ -1112,7 +1132,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
         uout() << casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector) << std::endl;
 
         tr_rad = 0.5 * casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
-        // tr_rad = 0.5 * casadi_norm_inf(nx_, d->dx);
       } else{
         // Evaluate f
         m->arg[0] = d->z_feas;
@@ -1196,6 +1215,10 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;
+    // double obj;
+    // m->res[CONIC_COST] = &obj;
+    m->res[CONIC_COST] = nullptr;
+
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
@@ -1340,11 +1363,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
   //   casadi_copy(d->dlam+nx_+2*ng_, ng_, d->dlam+nx_);
 
   //   return ret;
-  // }
-
-  // double Feasiblesqpmethod::calc_gamma_1(FeasiblesqpmethodMemory* m) const {
-  //   auto d = &m->d;
-  //   return max(gamma_0_*casadi_norm_inf(nx_, d->gf), gamma_1_min_);
   // }
 
 void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {

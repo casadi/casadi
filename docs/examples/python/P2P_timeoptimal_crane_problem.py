@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 import copy
 
+cs.DM.set_precision(16)
 
 class crane_problem:
 
@@ -103,7 +104,7 @@ class crane_problem:
         xdot_temp = cs.vertcat(l_dot, x_c_dot, theta_dot,
                                l_ddot, x_ddot, theta_ddot)
         ode = {'x': x_temp, 'p': cs.vertcat(u_temp, T), 'ode': T*xdot_temp}
-        opts = {'tf': 1}
+        opts = {'tf': 1}#, 'number_of_finite_elements':100}
         ode_integrator = cs.integrator('integrator', 'rk', ode, opts)
         return ode_integrator
 
@@ -146,7 +147,7 @@ class crane_problem:
                 sh_tmp.append(self.opti.variable(self.n_sh, 1))    
         Sf = self.opti.variable(self.n_sf, 1)
         T = self.opti.variable(self.n_t, 1)
-        
+
         self.indeces_S0 = list(range(self.n_s0))
         self.indeces_state0 = list(range(self.n_s0, self.n_s0+self.n_x))
         self.indeces_Sf = list(range(n_var-self.n_sf-self.n_t, n_var-self.n_t))
@@ -184,7 +185,6 @@ class crane_problem:
                 self.opti.subject_to(self.ode_integrator(
                     x0=X[:, k],
                     p=cs.vertcat(U[:, k], T/self.N))['xf'] == X[:, k+1])
-                # self.opti.subject_to(T[k] == T[k+1])
 
             if k == 0:
                 self.opti.subject_to(self.opti.bounded(0, S0, cs.inf))
@@ -223,15 +223,13 @@ class crane_problem:
                                                 U[0, k], self.l_ddot_max))
                 self.opti.subject_to(self.opti.bounded(-self.x_ddot_max,
                                                 U[1, k], self.x_ddot_max))
-            # add bound constraints on time variable
 
         # Slacked Constraints on terminal state and temperature constraint
         self.opti.subject_to(self.end_state <= X[:, -1] + Sf)
         self.opti.subject_to(X[:, -1] - Sf <= self.end_state)
         self.opti.subject_to(self.opti.bounded(0, Sf, cs.inf))
-        self.opti.subject_to(self.opti.bounded(0.5, T, 20))
+        self.opti.subject_to(self.opti.bounded(0.5, T, 10))
 
-        # For the Gauss-Newton Hessian
         self.V_mats = cs.vertcat((1/cs.sqrt(10))*1e-2*U[0, :].T,
             	                 1e-3*U[1,:].T,
                                  cs.sqrt(10)*1e2*S0,
@@ -277,7 +275,6 @@ class crane_problem:
             p_load_curr = cs.vertcat(x_curr[1] + x_curr[0]*cs.sin(x_curr[2]),
                                      -x_curr[0]*cs.cos(x_curr[2]))
             self.p_load_init = cs.horzcat(self.p_load_init, p_load_curr)
-            
 
         x_curr = x0_init
         for k in range(self.N+1):
@@ -308,8 +305,6 @@ class crane_problem:
             'hessian_approximation': 'exact',
             'limited_memory_max_history': 5,
             'print_level': 5}})
-        # sol = opti.solve_limited()
-        # self.sol = self.opti.solve()
 
         x0 = cs.vertcat(*init)
         x = self.opti.x
@@ -324,27 +319,40 @@ class crane_problem:
 
         return (x, f, g, lbg, ubg, lbx, ubx, x0)
 
-    def create_gn_hessian(self):
+    def create_gn_hessian_python(self):
         """
         Creates the Gauss-Newton Hessian matrix and returns it as a function.
         """
         J = cs.jacobian(self.V_mats, self.opti.x)
         self.H_gn = 2*J.T @ J
 
-        # lam_x = cs.MX.sym('lam_x', self.opti.x.shape[0])
+        lam_x = cs.MX.sym('lam_x', self.opti.x.shape[0])
         # lam_g = cs.MX.sym('lam_g', self.opti.g.shape[0])
+
+        H_gn_fun = cs.Function('gn_fun', [self.opti.x,
+                                          self.opti.lam_g,
+                                          lam_x], [self.H_gn])
+
+        return H_gn_fun
+
+    def create_gn_hessian_cpp(self):
+        """
+        Creates the Gauss-Newton Hessian matrix and returns it as a function.
+        """
+        J = cs.jacobian(self.V_mats, self.opti.x)
+        self.H_gn = 2*J.T @ J
 
         sigma = cs.MX.sym('sigma')
 
         H_gn_fun = cs.Function('gn_fun', [self.opti.x,
                                           self.opti.p,
                                           sigma,
-                                          self.opti.lam_g], [sigma * self.H_gn])
+                                          self.opti.lam_g], [self.H_gn])
 
         return H_gn_fun
 
 
-    def create_scaling_matrices(self, states=True, controls=True,
+    def create_scaling_matrices_python(self, states=True, controls=True,
             time=True, sep_hyp=False, slack0=False, slack_f=False):
         """
         Creates the scaling matrices and its inverse for the feasible SQP
@@ -423,7 +431,77 @@ class crane_problem:
         tr_scale_mat_inv_vec[tr_scale_mat_inv_vec == 0] = np.inf
         tr_scale_mat_inv = cs.diag(tr_scale_mat_inv_vec)
 
-        return tr_scale_mat_vec#tr_scale_mat, tr_scale_mat_inv
+        return tr_scale_mat, tr_scale_mat_inv
+
+    def create_scaling_matrices_cpp(self, states=True, controls=True,
+            time=True, sep_hyp=False, slack0=False, slack_f=False):
+        """
+        Creates the scaling matrices and its inverse for the feasible SQP
+        solver.
+        As default we set a trust-region around the states, controls, and time.
+        For additional trust-regions set the bools to TRUE.
+
+        Args:
+            states (bool, optional): Are states in trust-region? Defaults to True.
+            controls (bool, optional): Are controls in trust-region?. Defaults to True.
+            time (bool, optional): Is time in trust-region?. Defaults to True.
+            sep_hyp (bool, optional): Are separating hyperplane variables in 
+            trust-region? Defaults to False.
+            slack0 (bool, optional): Is slack variable of initial condition 
+            in trust-region? Defaults to False.
+            slack_f (bool, optional): Is slack variable of terminal condition 
+            in trust-region? Defaults to False.
+
+        Returns:
+            Casadi DM vectors: First entry of tuple is scaling matrix of the 
+            decision variables. Second entry is the inverse of the scaling 
+            matrix.
+        """
+        # Define the one or zero vectors, if variable is in trust-region or
+        # not
+        if states:
+            vec_states = np.ones(self.n_x)
+        else:
+            vec_states = np.zeros(self.n_x)
+
+        if controls:
+            vec_controls = np.ones(self.n_u)
+        else:
+            vec_controls = np.zeros(self.n_u)
+
+        if time:
+            vec_time = np.ones(self.n_t)
+        else:
+            vec_time = np.zeros(self.n_t)
+
+        if sep_hyp:
+            vec_sep_hyp = np.ones(self.n_sh)
+        else:
+            vec_sep_hyp = np.zeros(self.n_sh)
+
+        if slack0:
+            vec_slack0 = np.ones(self.n_s0)
+        else:
+            vec_slack0 = np.zeros(self.n_s0)
+
+        if slack_f:
+            vec_slack_f = np.ones(self.n_sf)
+        else:
+            vec_slack_f = np.zeros(self.n_sf)
+
+        # Create the trust-region scaling matrix
+        list_tr_scale_mat_vec = []
+        list_tr_scale_mat_vec.append(vec_slack0)
+        for k in range(self.N+1):
+            list_tr_scale_mat_vec.append(vec_states)
+            if k < self.N:
+                list_tr_scale_mat_vec.append(vec_controls)
+                list_tr_scale_mat_vec.append(vec_sep_hyp)
+        list_tr_scale_mat_vec.append(vec_slack_f)
+        list_tr_scale_mat_vec.append(vec_time)
+        tr_scale_mat_vec = np.hstack(list_tr_scale_mat_vec)
+
+        return tr_scale_mat_vec
 
     def get_state_sol(self, sol):
         """
@@ -486,7 +564,6 @@ class crane_problem:
         """
         time = sol[-1]
         return time
-        # return self.T0*cs.exp(time/(self.T0*self.beta))
 
     def get_initial_state(self, sol):
         """
@@ -560,7 +637,7 @@ class crane_problem:
 
         return (l_sol, xc_sol, theta_sol, p_load)
 
-    def plot(self, x_sol, x_sol_ipopt):
+    def plot(self, list_X, list_labels):
         """
         Plot the optimal trajectory of the crane load.
         
@@ -568,59 +645,80 @@ class crane_problem:
             x_sol (Casadi DM vector): optimal solution calculated by FSLP
             x_sol_ipopt (Casadi DM vector): optimal solution calculated by IPOPT
         """
-        (_, _, _, p_load) = self.get_particular_states(x_sol)
-        (_, _, _, p_load_ipopt) = self.get_particular_states(x_sol_ipopt)
-
         _, ax = plt.subplots()
         ax.set_aspect('equal')
         rect = Rectangle((0.1, -2), 0.1, 1.3, linewidth=1,
                          edgecolor='r', facecolor='none')
         ax.add_patch(rect)
-        ax.plot(p_load[:, 0], p_load[:, 1], label='FP-SQP opt')
-        ax.plot(p_load_ipopt[:, 0], p_load_ipopt[:, 1], label='IPOPT')
-        ax.set_ylim((-2, -0.02))
+        for i in range(len(list_X)):
+            (_, _, _, p_load) = self.get_particular_states(list_X[i])
+            ax.plot(p_load[:, 0], p_load[:, 1], label=list_labels[i])
+        ax.set_ylim((-1, -0.5))
         plt.legend(loc='upper right')
-        plt.xlabel('x1')
-        plt.ylabel('x2')
+        plt.xlabel('$x_1$-axis')
+        plt.ylabel('$x_2$-axis')
         plt.title('Overhead Crane, P2P Motion with obstacle')
         plt.show()
+    
 
 testproblem = crane_problem()
 (x, f, g, lbg, ubg, lbx, ubx, x0) = testproblem.create_problem()
 
+solve_str = 'qrqp'
+
 # Create an NLP solver
-opts_sqpmethod = {  'qpsol': 'nlpsol',
-                'qpsol_options': {  "nlpsol": "ipopt", 
-                                    "verbose": True, 
-                                    "print_time": False, 
-                                    "nlpsol_options": {"ipopt": {   "print_level": 0, 
-                                                                    "sb": "yes", 
-                                                                    "fixed_variable_treatment": "make_constraint", 
-                                                                    "hessian_constant": "yes", 
-                                                                    "jac_c_constant": "yes", 
-                                                                    "jac_d_constant": "yes",
-                                                                    "tol": 1e-12, 
-                                                                    "tiny_step_tol": 1e-20, 
-                                                                    "mumps_scaling": 0, 
-                                                                    "honor_original_bounds": "no", 
-                                                                    "bound_relax_factor": 0}, 
-                                                                    "print_time": False}, 
-                                    "error_on_fail": False},
-                    'print_time': False,
-                    'max_iter':20,
-                    'max_inner_iter':50,
-                    'tr_rad0': 1,
-                    'feas_tol': 1e-8,
-                    'hess_lag': testproblem.create_gn_hessian(),
-                    'tr_scale_vector': testproblem.create_scaling_matrices()}
-# opts_sqpmethod = {
-#                     'print_time': False,
-#                     'max_iter':1,
-#                     'max_inner_iter':50,
-#                     'tr_rad0': 1,
-#                     'feas_tol': 1e-7,
-#                     'hess_lag': testproblem.create_gn_hessian(),
-#                     'tr_scale_vector': testproblem.create_scaling_matrices()}
+if solve_str == 'ipopt':
+    opts_sqpmethod = {  'qpsol': 'nlpsol',
+                    'qpsol_options': {  "nlpsol": "ipopt", 
+                                        "verbose": True, 
+                                        "print_time": False, 
+                                        "nlpsol_options": {"ipopt": {   "print_level": 0, 
+                                                                        "sb": "yes", 
+                                                                        "fixed_variable_treatment": "make_constraint", 
+                                                                        "hessian_constant": "yes", 
+                                                                        "jac_c_constant": "yes", 
+                                                                        "jac_d_constant": "yes",
+                                                                        "tol": 1e-12, 
+                                                                        "tiny_step_tol": 1e-20, 
+                                                                        "mumps_scaling": 0, 
+                                                                        "honor_original_bounds": "no", 
+                                                                        "bound_relax_factor": 0}, 
+                                        "print_time": False}, 
+                                        "error_on_fail": False}}
+elif solve_str == 'qpoases':
+    opts_sqpmethod = {  'qpsol': 'qpoases',
+                        'qpsol_options': {  'nWSR':1000000,
+                                            # 'schur': True,
+                                            # 'linsol_plugin': 'ma57',
+                                            'printLevel': 'none',
+                                            'sparse':True,
+                                            'hessian_type': 'semidef'
+                                            # 'enableEqualities':True
+                        }}
+elif solve_str == 'osqp':
+    opts_sqpmethod = {  'qpsol': 'osqp',
+                        'qpsol_options': {'osqp':{'verbose':True}},
+                        'print_time': False,
+                        # 'convexify_strategy':'regularize'
+                        }
+elif solve_str == 'qrqp':
+    opts_sqpmethod = {  'qpsol': 'qrqp',
+                        # 'qpsol_options': {'osqp':{'verbose':True}},
+                        # 'print_time': False,
+                        # 'convexify_strategy':'regularize'
+                        }
+
+
+opts_sqpmethod['max_iter']=50
+opts_sqpmethod['max_inner_iter']=50
+opts_sqpmethod['tr_rad0']= 1.0
+opts_sqpmethod['feas_tol']= 1e-8
+opts_sqpmethod['hess_lag']= testproblem.create_gn_hessian_cpp()
+#opts_sqpmethod[# 'hessian_approximation']= 'limited-memory',
+#opts_sqpmethod[# 'lbfgs_memory']= 3,
+opts_sqpmethod['tr_scale_vector']= testproblem.create_scaling_matrices_cpp()
+opts_sqpmethod['print_time'] = False
+
 nlp = {'x':x, 'f':f, 'g':g}
 # solver = cs.nlpsol("solver", "ipopt", nlp)
 solver = cs.nlpsol("S", "feasiblesqpmethod", nlp, opts_sqpmethod)
@@ -631,6 +729,6 @@ res = solver(x0  = x0, ubg = ubg, lbg = lbg, lbx = lbx, ubx=ubx)
 print("Optimal cost:", res["f"])
 print("Primal solution:", res["x"])
 
-state_sol = testproblem.get_state_sol(res["x"])
-print(state_sol)
-testproblem.plot([testproblem.X_init, state_sol], ['init', 'FP-SQP'])
+# state_sol = testproblem.get_state_sol(res["x"])
+# print(state_sol)
+testproblem.plot([res['x']], ['FP-SQP'])
