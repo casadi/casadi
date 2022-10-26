@@ -1334,7 +1334,7 @@ namespace casadi {
   }
 
   casadi_int MX::n_nodes(const MX& x) {
-    Function f("tmp_n_nodes", vector<MX>{}, {x}, Dict{{"max_io", 0}});
+    Function f("tmp_n_nodes", vector<MX>{}, {x}, Dict{{"max_io", 0},{"cse", false}});
     return f.n_nodes();
   }
 

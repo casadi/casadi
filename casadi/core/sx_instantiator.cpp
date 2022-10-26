@@ -842,7 +842,7 @@ namespace casadi {
 
   template<>
   casadi_int CASADI_EXPORT SX::n_nodes(const SX& x) {
-    Function f("tmp_n_nodes", {SX()}, {x}, Dict{{"max_io", 0}});
+    Function f("tmp_n_nodes", {SX()}, {x}, Dict{{"max_io", 0}, {"cse", false}});
     return f.n_nodes();
   }
 
