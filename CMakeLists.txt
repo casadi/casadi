@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(alpaqa VERSION 1.0.0 LANGUAGES CXX)
-set(PY_VERSION_SUFFIX "a4")
+set(PY_VERSION_SUFFIX "a5")
 
 # Options
 option(ALPAQA_WITH_QUAD_PRECISION
