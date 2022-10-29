@@ -1,24 +1,29 @@
+option(USE_GLOBAL_PYBIND11 "Don't query Python to find pybind11" Off)
+mark_as_advanced(USE_GLOBAL_PYBIND11)
+
 # First tries to find Python 3, then tries to import the pybind11 module to
 # query the CMake config location, and finally imports pybind11 using
 # find_package(pybind11 REQUIRED CONFIG CMAKE_FIND_ROOT_PATH_BOTH).
 function(find_pybind11_python_first)
 
-    # Query Python to see if it knows where the headers are
     find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-    if (NOT pybind11_ROOT OR NOT EXISTS ${pybind11_ROOT})
-        message(STATUS "Detecting pybind11 CMake location")
-        execute_process(COMMAND ${Python3_EXECUTABLE}
-                -m pybind11 --cmakedir
-            OUTPUT_VARIABLE PY_BUILD_PYBIND11_ROOT
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            RESULT_VARIABLE PY_BUILD_CMAKE_PYBIND11_RESULT)
-        # If it was successful
-        if (PY_BUILD_CMAKE_PYBIND11_RESULT EQUAL 0)
-            message(STATUS "pybind11 CMake location: ${PY_BUILD_PYBIND11_ROOT}")
-            set(pybind11_ROOT ${PY_BUILD_PYBIND11_ROOT}
-                CACHE PATH "Path to the pybind11 CMake configuration." FORCE)
-        else()
-            unset(pybind11_ROOT CACHE)
+    if (NOT USE_GLOBAL_PYBIND11)
+        # Query Python to see if it knows where the headers are
+        if (NOT pybind11_ROOT OR NOT EXISTS ${pybind11_ROOT})
+            message(STATUS "Detecting pybind11 CMake location")
+            execute_process(COMMAND ${Python3_EXECUTABLE}
+                    -m pybind11 --cmakedir
+                OUTPUT_VARIABLE PY_BUILD_PYBIND11_ROOT
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                RESULT_VARIABLE PY_BUILD_CMAKE_PYBIND11_RESULT)
+            # If it was successful
+            if (PY_BUILD_CMAKE_PYBIND11_RESULT EQUAL 0)
+                message(STATUS "pybind11 CMake location: ${PY_BUILD_PYBIND11_ROOT}")
+                set(pybind11_ROOT ${PY_BUILD_PYBIND11_ROOT}
+                    CACHE PATH "Path to the pybind11 CMake configuration." FORCE)
+            else()
+                unset(pybind11_ROOT CACHE)
+            endif()
         endif()
     endif()
 
