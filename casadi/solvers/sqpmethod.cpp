@@ -307,8 +307,7 @@ namespace casadi {
       Sparsity Hsp_ela = Sparsity(Hsp_);
       Sparsity Asp_ela = Sparsity(Asp_);
 
-      std::vector<casadi_int> n_v(nx_);
-      std::iota(std::begin(n_v), std::end(n_v), 0);
+      std::vector<casadi_int> n_v = range(nx_);
       Hsp_ela.enlarge(2*ng_ + nx_, 2*ng_ + nx_, n_v, n_v);
 
       Sparsity dsp = Sparsity::diag(ng_,ng_);
