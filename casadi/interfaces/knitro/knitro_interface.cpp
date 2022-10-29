@@ -343,8 +343,6 @@ namespace casadi {
       calc_function(m, "nlp_fg");
     }
 
-    join_results(m);
-
     // Free memory (move to destructor!)
     status = KN_free(&m->kc);
     casadi_assert(status == 0, "KN_free failed");

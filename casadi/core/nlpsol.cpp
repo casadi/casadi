@@ -609,6 +609,9 @@ namespace casadi {
     // Solve the NLP
     int flag = solve(m);
 
+    // Join statistics (introduced for parallel oracle facilities)
+    join_results(m);
+
     // Calculate multiplers
     if ((calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) && !flag) {
       const double lam_f = 1.;
