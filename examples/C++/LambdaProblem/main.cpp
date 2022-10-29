@@ -69,7 +69,8 @@ int main() {
     std::cout << "status: " << stats.status << std::endl;
     std::cout << "inner iterations: " << stats.inner.iterations << std::endl;
     std::cout << "outer iterations: " << stats.outer_iterations << std::endl;
-    std::cout << "elapsed time:     " << stats.elapsed_time.count() * 1e-6
+    std::cout << "elapsed time:     "
+              << std::chrono::duration<double>{stats.elapsed_time}.count()
               << 's' << std::endl;
     std::cout << "x = " << x.transpose() << std::endl;
     std::cout << "y = " << y.transpose() << std::endl;

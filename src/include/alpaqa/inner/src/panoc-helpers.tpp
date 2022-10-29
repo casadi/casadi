@@ -193,8 +193,9 @@ struct PANOCHelpers {
                     vec_util::norm_1(projecting_difference(x̂ₖ - grad_̂ψₖ, C));
                 auto D_lagr_mult   = vec_util::norm_1(ŷₖ);
                 const real_t s_max = 100;
+                const real_t s_n   = static_cast<real_t>(n);
                 real_t s_d =
-                    std::max(s_max, (C_lagr_mult + D_lagr_mult) / n) / s_max;
+                    std::max(s_max, (C_lagr_mult + D_lagr_mult) / s_n) / s_max;
                 return err / s_d;
             }
             case PANOCStopCrit::LBFGSBpp: {

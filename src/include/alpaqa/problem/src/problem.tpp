@@ -184,7 +184,7 @@ auto ProblemBase<Conf>::calc_ŷ_dᵀŷ(rvec g_ŷ, crvec y, crvec Σ) const -> re
         g_ŷ = projecting_difference(g_ŷ, get_D());
         // dᵀŷ, ŷ = Σ d
         real_t dᵀŷ = 0;
-        for (unsigned i = 0; i < m; ++i) {
+        for (index_t i = 0; i < m; ++i) {
             dᵀŷ += g_ŷ(i) * Σ(i) * g_ŷ(i); // TODO: vectorize
             g_ŷ(i) = Σ(i) * g_ŷ(i);
         }

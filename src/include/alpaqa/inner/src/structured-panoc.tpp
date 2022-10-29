@@ -171,7 +171,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
     vec HqK(n);
 
     std::vector<index_t> J;
-    J.reserve(n);
+    J.reserve(static_cast<size_t>(n));
     lbfgs.resize(n);
 
     // Keep track of how many successive iterations didn't update the iterate
@@ -218,7 +218,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
         return float_to_str_vw(print_buf, x, 3);
     };
     auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
-                              real_t pₖᵀpₖ, crvec qₖ, length_t nJ, real_t γₖ,
+                              real_t pₖᵀpₖ, crvec qₖ, size_t nJ, real_t γₖ,
                               real_t τₖ, real_t εₖ) {
         std::cout << "[PANOC] " << std::setw(6) << k
                   << ": ψ = " << print_real(ψₖ)
@@ -266,10 +266,10 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
     real_t φₖ   = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
     real_t nmΦₖ = φₖ;
     // History of FPR norms
-    MaxHistory<real_t> fpr_buffer(params.fpr_shortcut_accept_factor //
+    MaxHistory<real_t> fpr_buffer(params.fpr_shortcut_accept_factor > 0 //
                                       ? params.fpr_shortcut_history
                                       : 0);
-    if (params.fpr_shortcut_accept_factor && params.fpr_shortcut_history)
+    if (params.fpr_shortcut_accept_factor > 0 && params.fpr_shortcut_history)
         fpr_buffer.add(proj_grad_step(1, xₖ, grad_ψₖ).norm());
 
     // Main PANOC loop
@@ -465,7 +465,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
             if (params.alternative_linesearch_cond)
                 ls_cond -= real_t(0.5) * (1 / γₙₑₓₜ - 1 / γₖ) * pₙₑₓₜᵀpₙₑₓₜ_ₖ;
 
-            real_t fpr1_new = params.fpr_shortcut_accept_factor && τ == 1
+            real_t fpr1_new = params.fpr_shortcut_accept_factor > 0 && τ == 1
                                   ? proj_grad_step(1, xₙₑₓₜ, grad_ψₙₑₓₜ).norm()
                                   : inf<config_t>;
 

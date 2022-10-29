@@ -88,11 +88,11 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name, length_t n,
             throw std::invalid_argument(
                 "First output argument should be a column vector.");
         if (n <= 0)
-            n = gfun.size1_in(0);
+            n = static_cast<length_t>(gfun.size1_in(0));
         if (m <= 0 && gfun.n_out() == 1)
-            m = gfun.size1_out(0);
+            m = static_cast<length_t>(gfun.size1_out(0));
         if (p <= 0)
-            p = gfun.size1_in(1);
+            p = static_cast<length_t>(gfun.size1_in(1));
         if (gfun.n_out() == 0) {
             if (m != 0)
                 throw std::invalid_argument(

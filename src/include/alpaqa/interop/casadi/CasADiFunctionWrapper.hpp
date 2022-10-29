@@ -58,18 +58,22 @@ class CasADiFunctionEvaluator {
             return "(" + std::to_string(d.first) + ", " +
                    std::to_string(d.second) + ")";
         };
-        for (size_t n = 0; n < N_in; ++n)
-            if (dim_in[n].first != 0 && dim_in[n] != fun.size_in(n))
+        for (size_t n = 0; n < N_in; ++n) {
+            auto cs_n = static_cast<casadi_int>(n);
+            if (dim_in[n].first != 0 && dim_in[n] != fun.size_in(cs_n))
                 throw std::invalid_argument(
                     "Invalid dimension of "s + count[n] +
-                    " input argument: got " + to_string(fun.size_in(n)) +
+                    " input argument: got " + to_string(fun.size_in(cs_n)) +
                     ", should be " + to_string(dim_in[n]) + ".");
-        for (size_t n = 0; n < N_out; ++n)
-            if (dim_out[n].first != 0 && dim_out[n] != fun.size_out(n))
+        }
+        for (size_t n = 0; n < N_out; ++n) {
+            auto cs_n = static_cast<casadi_int>(n);
+            if (dim_out[n].first != 0 && dim_out[n] != fun.size_out(cs_n))
                 throw std::invalid_argument(
                     "Invalid dimension of "s + count[n] +
-                    " output argument: got " + to_string(fun.size_out(n)) +
+                    " output argument: got " + to_string(fun.size_out(cs_n)) +
                     ", should be " + to_string(dim_out[n]) + ".");
+        }
     }
 
   protected:
