@@ -120,6 +120,7 @@ namespace casadi {
     Dict opt = opts;
     auto it = opt.find("expand");
     bool expand = false;
+    bool error_on_fail = get_from_dict(opts, "error_on_fail", true); 
     if (it!=opt.end()) {
       expand = it->second;
       opt.erase(it);
@@ -250,8 +251,11 @@ namespace casadi {
     ret_out[NLPSOL_LAM_G] = reshape(w[CONIC_LAM_A], g.size());
     ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());
 
-    return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out(),
-                    {{"default_in", nlpsol_default_in()}});
+    Dict fun_opts;
+    fun_opts["default_in"] = nlpsol_default_in();
+    fun_opts["error_on_fail"] = error_on_fail;
+
+    return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out(), fun_opts);
   }
 
   Function qpsol(const std::string& name, const std::string& solver,
@@ -267,6 +271,9 @@ namespace casadi {
   // Constructor
   Conic::Conic(const std::string& name, const std::map<std::string, Sparsity> &st)
     : FunctionInternal(name) {
+
+    // Set default options
+    error_on_fail_ = true;
 
     P_ = Sparsity(0, 0);
     for (auto i=st.begin(); i!=st.end(); ++i) {
@@ -391,10 +398,7 @@ namespace casadi {
         "Indicates which of the variables are discrete, i.e. integer-valued"}},
       {"print_problem",
        {OT_BOOL,
-        "Print a numeric description of the problem"}},
-      {"error_on_fail",
-       {OT_BOOL,
-        "When the numerical process returns unsuccessfully, raise an error (default true)."}}
+        "Print a numeric description of the problem"}}
      }
   };
 
@@ -403,7 +407,6 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     print_problem_ = false;
-    error_on_fail_ = true;
 
     // Read options
     for (auto&& op : opts) {
@@ -411,8 +414,6 @@ namespace casadi {
         discrete_ = op.second;
       } else if (op.first=="print_problem") {
         print_problem_ = op.second;
-      } else if (op.first=="error_on_fail") {
-        error_on_fail_ = op.second;
       }
     }
 
@@ -703,10 +704,9 @@ namespace casadi {
   void Conic::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
-    s.version("Conic", 1);
+    s.version("Conic", 2);
     s.pack("Conic::discrete", discrete_);
     s.pack("Conic::print_problem", print_problem_);
-    s.pack("Conic::error_on_fail", error_on_fail_);
     s.pack("Conic::H", H_);
     s.pack("Conic::A", A_);
     s.pack("Conic::Q", Q_);
@@ -726,10 +726,12 @@ namespace casadi {
   }
 
   Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
-    s.version("Conic", 1);
+    int version = s.version("Conic", 1, 2);
     s.unpack("Conic::discrete", discrete_);
     s.unpack("Conic::print_problem", print_problem_);
-    s.unpack("Conic::error_on_fail", error_on_fail_);
+    if (version==1) {
+      s.unpack("Conic::error_on_fail", error_on_fail_);
+    }
     s.unpack("Conic::H", H_);
     s.unpack("Conic::A", A_);
     s.unpack("Conic::Q", Q_);

@@ -77,9 +77,6 @@ namespace casadi {
     /// Execute the callback function only after this amount of iterations
     casadi_int callback_step_;
 
-    /// Throw an exception on failure?
-    bool error_on_fail_;
-
     /// Linear solver and options
     std::string sens_linsol_;
     Dict sens_linsol_options_;

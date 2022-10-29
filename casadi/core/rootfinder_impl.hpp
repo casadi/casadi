@@ -192,9 +192,6 @@ namespace casadi {
     /// Indices of the input and output that correspond to the actual root-finding
     casadi_int iin_, iout_;
 
-    /// Throw an exception on failure?
-    bool error_on_fail_;
-
     // Creator function for internal class
     typedef Rootfinder* (*Creator)(const std::string& name, const Function& oracle);
 

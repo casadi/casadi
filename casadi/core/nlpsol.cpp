@@ -310,9 +310,6 @@ namespace casadi {
       {"oracle_options",
        {OT_DICT,
         "Options to be passed to the oracle function"}},
-      {"error_on_fail",
-       {OT_BOOL,
-        "When the numerical process returns unsuccessfully, raise an error (default false)."}},
       {"sens_linsol",
        {OT_STRING,
         "Linear solver used for parametric sensitivities (default 'qr')."}},
@@ -356,8 +353,6 @@ namespace casadi {
         bound_consistency_ = op.second;
       } else if (op.first=="min_lam") {
         min_lam_ = op.second;
-      } else if (op.first=="error_on_fail") {
-        error_on_fail_ = op.second;
       } else if (op.first=="sens_linsol") {
         sens_linsol_ = op.second.to_string();
       } else if (op.first=="sens_linsol_options") {
@@ -1006,7 +1001,6 @@ namespace casadi {
     s.pack("Nlpsol::np", np_);
     s.pack("Nlpsol::fcallback", fcallback_);
     s.pack("Nlpsol::callback_step", callback_step_);
-    s.pack("Nlpsol::error_on_fail", error_on_fail_);
     s.pack("Nlpsol::eval_errors_fatal", eval_errors_fatal_);
     s.pack("Nlpsol::warn_initial_bounds", warn_initial_bounds_);
     s.pack("Nlpsol::iteration_callback_ignore_errors", iteration_callback_ignore_errors_);
@@ -1040,7 +1034,9 @@ namespace casadi {
     s.unpack("Nlpsol::np", np_);
     s.unpack("Nlpsol::fcallback", fcallback_);
     s.unpack("Nlpsol::callback_step", callback_step_);
-    s.unpack("Nlpsol::error_on_fail", error_on_fail_);
+    if (version==1) {
+      s.unpack("Nlpsol::error_on_fail", error_on_fail_);
+    }
     s.unpack("Nlpsol::eval_errors_fatal", eval_errors_fatal_);
     s.unpack("Nlpsol::warn_initial_bounds", warn_initial_bounds_);
     s.unpack("Nlpsol::iteration_callback_ignore_errors", iteration_callback_ignore_errors_);

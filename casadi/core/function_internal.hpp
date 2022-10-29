@@ -245,6 +245,9 @@ namespace casadi {
     /// Errors are thrown when NaN is produced
     bool regularity_check_;
 
+    /// Throw an exception on failure?
+    bool error_on_fail_;
+
   protected:
     /** \brief Deserializing constructor
 
@@ -1342,8 +1345,8 @@ namespace casadi {
 
     /** Unified return status for solvers */
     enum UnifiedReturnStatus {
-        SOLVER_RET_UNKNOWN,
         SOLVER_RET_SUCCESS,
+        SOLVER_RET_UNKNOWN,
         SOLVER_RET_LIMITED, // Out of time
         SOLVER_RET_NAN,
         SOLVER_RET_INFEASIBLE
@@ -1590,7 +1593,7 @@ namespace casadi {
       // Call memory-less
       if (eval_gen(get_ptr(argp), get_ptr(resp),
                    get_ptr(iw_tmp), get_ptr(w_tmp), memory(0))) {
-        casadi_error("Evaluation failed");
+        if (error_on_fail_) casadi_error("Evaluation failed");
       }
       // Update offsets
       if (p==npar-1) break;

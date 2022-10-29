@@ -185,9 +185,6 @@ namespace casadi {
       casadi_int indval_size;
     };
 
-    /// Throw an exception on failure?
-    bool error_on_fail_;
-
     /// SDP to SOCP conversion initialization
     void sdp_to_socp_init(SDPToSOCPMem& mem) const;
 
