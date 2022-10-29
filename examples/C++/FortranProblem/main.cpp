@@ -1,4 +1,5 @@
 #include <alpaqa/panoc-alm.hpp>
+#include <alpaqa/problem/wrapped-problem-with-counters.hpp>
 
 #include <iostream>
 
@@ -34,6 +35,10 @@ struct FortranProblem : alpaqa::Problem<config_t> {
 int main() {
     // Instantiate a problem
     FortranProblem problem{problem_get_num_vars(), problem_get_num_constr()};
+    using CountedProblem =
+        alpaqa::WrappedProblemWithCounters<config_t,
+                                           alpaqa::ProblemBase<config_t> *>;
+    auto counted_prob = CountedProblem(&problem);
 
     // Specify the bounds
     vec b                = vec::Constant(problem.m, -1);
@@ -76,16 +81,25 @@ int main() {
     y << 1; // Lagrange multipliers
 
     // Solve the problem
-    auto stats = solver(problem, y, x);
+    auto stats = solver(counted_prob, y, x);
     // y and x have been overwritten by the solution
 
     // Print the results
+    std::cout << "f = " << problem.eval_f(x) << std::endl;
     std::cout << "status: " << stats.status << std::endl;
     std::cout << "inner iterations: " << stats.inner.iterations << std::endl;
     std::cout << "outer iterations: " << stats.outer_iterations << std::endl;
-    std::cout << "elapsed time:     " << stats.elapsed_time.count() * 1e-6
+    std::cout << "elapsed time:     "
+              << std::chrono::duration<double>{stats.elapsed_time}.count()
               << 's' << std::endl;
     std::cout << "x = " << x.transpose() << std::endl;
     std::cout << "y = " << y.transpose() << std::endl;
-    std::cout << "f = " << problem.eval_f(x) << std::endl;
+    std::cout << "avg τ = " << (stats.inner.sum_τ / stats.inner.count_τ)
+              << std::endl
+              << "L-BFGS rejected = " << stats.inner.lbfgs_rejected << std::endl
+              << "L-BFGS failures = " << stats.inner.lbfgs_failures << std::endl
+              << "Line search failures = " << stats.inner.linesearch_failures
+              << std::endl
+              << "evaluations:\n"
+              << counted_prob.evaluations << std::endl;
 }
