@@ -486,6 +486,7 @@ int Sqpmethod::solve(void* mem) const {
           print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
         m->return_status = "Solve_Succeeded";
         m->success = true;
+        m->unified_return_status = SOLVER_RET_SUCCESS;
         break;
       }
 
@@ -596,6 +597,7 @@ int Sqpmethod::solve(void* mem) const {
       
       // Pre calculations for second order corrections
       double l1_infeas_cand, l1_cand, fk_cand;
+      l1_infeas_cand = 0;
       if (so_corr_) {
         // Take candidate step
         casadi_copy(d_nlp->z, nx_, d->z_cand);
@@ -1187,6 +1189,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     }
     if (so_corr_) {
       g.local("l1_infeas_cand", "casadi_real");
+      g.init_local("l1_infeas_cand", "0");
       g.local("l1_cand", "casadi_real");
       g.local("fk_cand", "casadi_real");
       g.comment("Take candidate step");
