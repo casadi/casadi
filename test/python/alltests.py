@@ -39,6 +39,7 @@ from tools import *
 from simulator import *
 from vectortools import *
 from optistack import *
+from feasiblesqpmethod import *
 
 if __name__ == '__main__':
     unittest.main()
