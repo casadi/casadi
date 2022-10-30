@@ -550,7 +550,7 @@ namespace casadi {
   void Rootfinder::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
-    s.version("Rootfinder", 1);
+    s.version("Rootfinder", 2);
     s.pack("Rootfinder::n", n_);
     s.pack("Rootfinder::linsol", linsol_);
     s.pack("Rootfinder::sp_jac", sp_jac_);

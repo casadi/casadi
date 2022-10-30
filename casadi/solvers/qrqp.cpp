@@ -2,7 +2,7 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
@@ -230,6 +230,7 @@ namespace casadi {
         break;
       case QP_NO_SEARCH_DIR:
         m->return_status = "Failed to calculate search direction";
+        m->unified_return_status = SOLVER_RET_INFEASIBLE;
         break;
       case QP_PRINTING_ERROR:
         m->return_status = "Printing error";
@@ -320,7 +321,17 @@ namespace casadi {
     g.copy_check("d.lam", nx_, g.res(CONIC_LAM_X), false, true);
     g.copy_check("d.lam+"+str(nx_), na_, g.res(CONIC_LAM_A), false, true);
 
-    g << "return d.status != QP_SUCCESS;\n";
+    g << "if (d.status == QP_SUCCESS) {;\n";
+    g << "return 0;\n";
+    g << "} else if (d.status == QP_NO_SEARCH_DIR) {\n";
+    g << "return " << SOLVER_RET_INFEASIBLE <<";\n";
+    g << "} else {\n";
+    if (error_on_fail_) {
+      g << "return -1000;\n";
+    } else {
+      g << "return -1;\n";
+    }
+    g << "}\n";
   }
 
   Dict Qrqp::get_stats(void* mem) const {

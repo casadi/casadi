@@ -2754,6 +2754,7 @@ class Functiontests(casadiTestCase):
 
   @requires_conic('osqp')
   def test_memful_external(self):
+    if not args.run_slow: return
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
     inputs = c.convert_in(inputs)
