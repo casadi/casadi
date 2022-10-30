@@ -9,7 +9,10 @@ set(RUNTIME_SRC
   casadi_de_boor.hpp
   casadi_densify.hpp
   casadi_dot.hpp
+  casadi_feasiblesqpmethod.hpp
   casadi_clear.hpp
+  casadi_clip_min.hpp
+  casadi_clip_max.hpp
   casadi_fill.hpp
   casadi_flip.hpp
   casadi_file_slurp.hpp
@@ -36,6 +39,7 @@ set(RUNTIME_SRC
   casadi_norm_1.hpp
   casadi_norm_2.hpp
   casadi_norm_inf.hpp
+  casadi_tr_norm_inf.hpp
   casadi_norm_inf_mul.hpp
   casadi_polyval.hpp
   casadi_project.hpp

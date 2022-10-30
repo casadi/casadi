@@ -2,7 +2,7 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
@@ -455,12 +455,6 @@ namespace casadi {
     if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
       m->unified_return_status = SOLVER_RET_LIMITED;
     }
-    
-    if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY || flag==qpOASES::RET_QP_INFEASIBLE ||
-        flag==qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY || flag==qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY ||
-        flag==qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY || flag==qpOASES::RET_ENSURELI_FAILED_NOINDEX || flag==qpOASES::RET_ENSURELI_FAILED_CYCLING) {
-      m->unified_return_status = SOLVER_RET_INFEASIBLE;
-    }
 
     m->iter_count = nWSR;
 
@@ -483,7 +477,7 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    return m->unified_return_status;
+    return 0;
   }
 
   std::string QpoasesInterface::getErrorMessage(casadi_int flag) {
