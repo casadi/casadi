@@ -24,4 +24,15 @@ using class_from_member_ptr_impl_t =
 template <auto M>
 using class_from_member_ptr_t = class_from_member_ptr_impl_t<decltype(M)>;
 
+template <class First, class... Pack>
+struct last_type {
+    using type = typename last_type<Pack...>::type;
+};
+template <class Only>
+struct last_type<Only> {
+    using type = Only;
+};
+template <class... Pack>
+using last_type_t = typename last_type<Pack...>::type;
+
 } // namespace alpaqa::util

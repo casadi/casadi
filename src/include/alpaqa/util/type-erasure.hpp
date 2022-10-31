@@ -8,21 +8,66 @@
 #include <functional>
 #include <memory>
 #include <new>
+#include <type_traits>
 #include <utility>
+#ifndef NDEBUG
+#include <typeinfo>
+#endif
 
 namespace alpaqa::util {
 
 template <class T>
-struct VTableTypeTag {};
+struct VTableTypeTag {
+    T *t = nullptr;
+};
 
 /// Struct that stores the size of a polymorphic object, as well as pointers to
 /// functions to copy, move or destroy the object.
 /// Inherit from this struct to add useful functions.
 struct BasicVTable {
+
+    template <class>
+    struct required_function;
+    template <class R, class... Args>
+    struct required_function<R(Args...)> {
+        using type = R (*)(void *self, Args...);
+    };
+    template <class>
+    struct required_const_function;
+    template <class R, class... Args>
+    struct required_const_function<R(Args...)> {
+        using type = R (*)(const void *self, Args...);
+    };
+    template <class F>
+    using required_function_t = typename required_function<F>::type;
+    template <class F>
+    using required_const_function_t = typename required_const_function<F>::type;
+
+    template <class, class VTable = BasicVTable>
+    struct optional_function;
+    template <class R, class... Args, class VTable>
+    struct optional_function<R(Args...), VTable> {
+        using type = R (*)(void *self, Args..., const VTable &);
+    };
+    template <class, class VTable = BasicVTable>
+    struct optional_const_function;
+    template <class R, class... Args, class VTable>
+    struct optional_const_function<R(Args...), VTable> {
+        using type = R (*)(const void *self, Args..., const VTable &);
+    };
+    template <class F, class VTable = BasicVTable>
+    using optional_function_t = typename optional_function<F, VTable>::type;
+    template <class F, class VTable = BasicVTable>
+    using optional_const_function_t =
+        typename optional_const_function<F, VTable>::type;
+
     size_t size = static_cast<size_t>(0xDEADBEEFDEADBEEF);
-    void (*copy)(const void *self, void *storage) = nullptr;
-    void (*move)(void *self, void *storage)       = nullptr;
-    void (*destroy)(void *self)                   = nullptr;
+    required_const_function_t<void(void *storage)> copy = nullptr;
+    required_function_t<void(void *storage)> move       = nullptr;
+    required_function_t<void()> destroy                 = nullptr;
+#ifndef NDEBUG
+    const std::type_info *type = &typeid(void);
+#endif
 
     BasicVTable() = default;
 
@@ -39,28 +84,39 @@ struct BasicVTable {
         destroy = [](void *self) {
             std::launder(reinterpret_cast<T *>(self))->~T();
         };
+        type = &typeid(T);
     }
 };
 
 namespace detail {
-template <auto M, class V, class T, class R, class... Args>
-constexpr auto launder_invoke(V *self, Args... args) -> R {
-    return std::invoke(M, *std::launder(reinterpret_cast<T *>(self)),
-                       std::forward<Args>(args)...);
-}
-template <auto M, class T, class R, class... Args>
-constexpr auto launder_invoke_ovl(R (T::*)(Args...) const) {
-    return launder_invoke<M, const void, const T, R, Args...>;
-}
-template <auto M, class T, class R, class... Args>
-constexpr auto launder_invoke_ovl(R (T::*)(Args...)) {
-    return launder_invoke<M, void, T, R, Args...>;
-}
+template <class... ExtraArgs>
+struct Launderer {
+  private:
+    template <auto M, class V, class T, class R, class... Args>
+    static constexpr auto do_invoke(V *self, Args... args, ExtraArgs...) -> R {
+        return std::invoke(M, *std::launder(reinterpret_cast<T *>(self)),
+                           std::forward<Args>(args)...);
+    }
+    template <auto M, class T, class R, class... Args>
+    static constexpr auto invoke_ovl(R (T::*)(Args...) const) {
+        return do_invoke<M, const void, const T, R, Args...>;
+    }
+    template <auto M, class T, class R, class... Args>
+    static constexpr auto invoke_ovl(R (T::*)(Args...)) {
+        return do_invoke<M, void, T, R, Args...>;
+    }
+
+  public:
+    template <auto M>
+    static constexpr auto invoke() {
+        return invoke_ovl<M>(M);
+    }
+};
 } // namespace detail
 
-template <auto M>
+template <auto Method, class... ExtraArgs>
 constexpr auto type_erased_wrapped() {
-    return detail::launder_invoke_ovl<M>(M);
+    return detail::Launderer<ExtraArgs...>::template invoke<Method>();
 }
 
 template <class VTable, class Allocator>
@@ -190,15 +246,33 @@ class TypeErased {
     /// Get a copy of the allocator.
     allocator_type get_allocator() const { return allocator; }
 
+    /// Convert the type-erased object to the given type. The type is checked
+    /// in debug builds only, use with caution.
+    template <class T>
+    T &as() {
+#ifndef NDEBUG
+        assert(typeid(T) == *vtable.type);
+#endif
+        return *reinterpret_cast<T *>(self);
+    }
+    /// @copydoc as()
+    template <class T>
+    const T &as() const {
+#ifndef NDEBUG
+        assert(typeid(T) == *vtable.type);
+#endif
+        return *reinterpret_cast<const T *>(self);
+    }
+
   private:
     /// Ensure that storage is available, either by using the small buffer if
     /// it is large enough, or by calling the allocator.
-    void ensure_storage() {
+    void ensure_storage(size_t size) {
         assert(!self);
-        self = vtable.size <= small_buffer_size
-                   ? small_buffer.data()
-                   : self = allocator.allocate(vtable.size);
+        self = size <= small_buffer_size ? small_buffer.data()
+                                         : allocator.allocate(size);
     }
+    void ensure_storage() { ensure_storage(vtable.size); }
 
     /// Destroy the type-erased object (if not empty), and deallocate the memory
     /// if necessary.
@@ -256,9 +330,35 @@ class TypeErased {
     /// Ensure storage and construct the type-erased object of type T in-place.
     template <class T, class... Args>
     void construct_inplace(Args &&...args) {
-        vtable = VTable{VTableTypeTag<T>{}};
-        ensure_storage();
-        new (self) T{std::forward<Args>(args)...};
+        ensure_storage(sizeof(T));
+        T *t   = new (self) T{std::forward<Args>(args)...};
+        vtable = VTable{VTableTypeTag<T>{t}};
+    }
+
+    /// Call the vtable function @p f with the given arguments @p args,
+    /// implicitly passing the @ref self pointer and @ref vtable reference if
+    /// necessary.
+    template <class Ret, class... FArgs, class... Args>
+    decltype(auto) call(Ret (*f)(const void *, FArgs...),
+                        Args &&...args) const {
+        assert(f);
+        assert(self);
+        using LastArg = util::last_type_t<FArgs...>;
+        if constexpr (std::is_same_v<LastArg, const VTable &>)
+            return f(self, std::forward<Args>(args)..., vtable);
+        else
+            return f(self, std::forward<Args>(args)...);
+    }
+    /// @copydoc call
+    template <class Ret, class... FArgs, class... Args>
+    decltype(auto) call(Ret (*f)(void *, FArgs...), Args &&...args) {
+        assert(f);
+        assert(self);
+        using LastArg = util::last_type_t<FArgs...>;
+        if constexpr (std::is_same_v<LastArg, const VTable &>)
+            return f(self, std::forward<Args>(args)..., vtable);
+        else
+            return f(self, std::forward<Args>(args)...);
     }
 };
 
