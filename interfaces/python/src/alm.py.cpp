@@ -45,6 +45,7 @@ struct kwargs_to_struct_table<alpaqa::ALMParams<Conf>> {
         {"ρ_max", &alpaqa::ALMParams<Conf>::ρ_max},
         {"θ", &alpaqa::ALMParams<Conf>::θ},
         {"M", &alpaqa::ALMParams<Conf>::M},
+        {"penalty_alm_split", &alpaqa::ALMParams<Conf>::penalty_alm_split},
         {"Σ_max", &alpaqa::ALMParams<Conf>::Σ_max},
         {"Σ_min", &alpaqa::ALMParams<Conf>::Σ_min},
         {"max_iter", &alpaqa::ALMParams<Conf>::max_iter},
@@ -93,6 +94,7 @@ void register_alm(py::module_ &m) {
         .def_readwrite("ρ_max", &ALMParams::ρ_max)
         .def_readwrite("θ", &ALMParams::θ)
         .def_readwrite("M", &ALMParams::M)
+        .def_readwrite("penalty_alm_split", &ALMParams::penalty_alm_split)
         .def_readwrite("Σ_max", &ALMParams::Σ_max)
         .def_readwrite("Σ_min", &ALMParams::Σ_min)
         .def_readwrite("max_iter", &ALMParams::max_iter)
@@ -122,6 +124,9 @@ void register_alm(py::module_ &m) {
                       "Length of problem.D.lowerbound does not match problem size problem.m");
         check_dim_msg(p.get_D().upperbound, p.m,
                       "Length of problem.D.upperbound does not match problem size problem.m");
+        auto penalty_alm_split = solver.get_params().penalty_alm_split;
+        if (penalty_alm_split < 0 || penalty_alm_split > p.m)
+            throw std::invalid_argument("invalid penalty_alm_split");
 
         auto invoke_solver = [&] { return solver(p, *y, *x); };
         if (!async) {

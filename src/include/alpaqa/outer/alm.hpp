@@ -58,6 +58,11 @@ struct ALMParams {
     real_t θ = 0.1;
     /// Lagrange multiplier bound.
     real_t M = 1e9;
+    /// Components of the constraint function with indices below this number are
+    /// handled using the quadratic penalty method rather than using an
+    /// augmented Lagrangian method. Specifically, the Lagrange multipliers for
+    /// these components (which determine the shifts in ALM) are kept at zero.
+    index_t penalty_alm_split = 0;
     /// Maximum penalty factor.
     real_t Σ_max = 1e9;
     /// Minimum penalty factor (used during initialization).

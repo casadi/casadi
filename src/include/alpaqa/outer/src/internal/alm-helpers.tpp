@@ -10,10 +10,11 @@ template <Config Conf>
 struct ALMHelpers {
     USING_ALPAQA_CONFIG(Conf);
 
-    static void project_y(rvec y,     // inout
-                          crvec z_lb, // in
-                          crvec z_ub, // in
-                          real_t M    // in
+    static void project_y(rvec y,                   // inout
+                          crvec z_lb,               // in
+                          crvec z_ub,               // in
+                          real_t M,                 // in
+                          index_t penalty_alm_split // in
     ) {
         // TODO: Handle NaN correctly
         auto max_lb = [M](real_t y, real_t z_lb) {
@@ -24,7 +25,11 @@ struct ALMHelpers {
             real_t y_ub = z_ub == inf<config_t> ? 0 : M;
             return std::min(y, y_ub);
         };
-        y = y.binaryExpr(z_lb, max_lb).binaryExpr(z_ub, min_ub);
+        auto num_alm    = y.size() - penalty_alm_split;
+        auto &&y_alm    = y.bottomRows(num_alm);
+        auto &&z_alm_lb = z_lb.bottomRows(num_alm);
+        auto &&z_alm_ub = z_ub.bottomRows(num_alm);
+        y_alm = y_alm.binaryExpr(z_alm_lb, max_lb).binaryExpr(z_alm_ub, min_ub);
     }
 
     static void update_penalty_weights(const ALMParams<config_t> &params,

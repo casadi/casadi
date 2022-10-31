@@ -20,7 +20,10 @@ typename ALMSolver<InnerSolverT>::Stats
 ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
     using std::chrono::duration_cast;
     using std::chrono::microseconds;
-    auto start_time = std::chrono::steady_clock::now();
+    auto start_time  = std::chrono::steady_clock::now();
+    // Lagrange multipliers corresponding to penalty constraints are always 0.
+    auto &&y_penalty = y.topRows(params.penalty_alm_split);
+    y_penalty.setZero();
 
     if (p.m == 0) { // No general constraints, only box constraints
         Stats s;
@@ -74,7 +77,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
     for (unsigned int i = 0; i < params.max_iter; ++i) {
         // TODO: this is unnecessary when the previous iteration lowered the
         // penalty update factor.
-        Helpers::project_y(y, D.lowerbound, D.upperbound, params.M);
+        Helpers::project_y(y, D.lowerbound, D.upperbound, params.M,
+                           params.penalty_alm_split);
         // Check if we're allowed to lower the penalty factor even further.
         bool out_of_penalty_factor_updates =
             (num_successful_iters == 0
@@ -94,6 +98,9 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
         // Call the inner solver to minimize the augmented lagrangian for fixed
         // Lagrange multipliers y.
         auto ps = inner_solver(p, Σ, ε, overwrite_results, x, y, error_2);
+        // Reset the Lagrange multipliers for the penalty constraints to 0 again.
+        y_penalty.setZero();
+        // Check if the inner solver converged
         bool inner_converged = ps.status == SolverStatus::Converged;
         // Accumulate the inner solver statistics
         s.inner_convergence_failures += not inner_converged;
