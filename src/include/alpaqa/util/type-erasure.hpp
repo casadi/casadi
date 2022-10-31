@@ -84,7 +84,9 @@ struct BasicVTable {
         destroy = [](void *self) {
             std::launder(reinterpret_cast<T *>(self))->~T();
         };
+#ifndef NDEBUG
         type = &typeid(T);
+#endif
     }
 };
 
