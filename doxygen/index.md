@@ -7,16 +7,12 @@ performance, and they are also exposed as an easy-to-use Python package.
 
 The solvers in this library solve minimization problems of the following form:
 @f[
-\newcommand\mymathbb[1]
-    { {\rm I\mathchoice{\hspace{-2pt}}{\hspace{-2pt}}
-        {\hspace{-1.75pt}}{\hspace{-1.7pt}}#1} }
-\renewcommand{\Re}{\mymathbb R}
 \begin{aligned}
     & \underset{x}{\text{minimize}}
-    & & f(x) &&&& f : \Re^n \rightarrow \Re \\
+    & & f(x) &&&& f : \Rn \rightarrow \R \\
     & \text{subject to}
     & & \underline{x} \le x \le \overline{x} \\
-    &&& \underline{z} \le g(x) \le \overline{z} &&&& g : \Re^n \rightarrow \Re^m
+    &&& \underline{z} \le g(x) \le \overline{z} &&&& g : \Rn \rightarrow \R^m
 \end{aligned}
 @f]
 

@@ -11,10 +11,10 @@ The nonlinear program we wish to solve is of the form:
 \begin{equation}
     \begin{aligned}
         & \underset{x}{\text{minimize}}
-        & & f(x) &&&& f : \Re^n \rightarrow \Re \\
+        & & f(x) &&&& f : \Rn \rightarrow \R \\
         & \text{subject to}
         & & \underline{x} \le x \le \overline{x} \\
-        &&& \underline{z} \le g(x) \le \overline{z} &&&& g : \Re^n \rightarrow \Re^m
+        &&& \underline{z} \le g(x) \le \overline{z} &&&& g : \Rn \rightarrow \R^m
     \end{aligned}
     \label{eq:problem-orig}
     \tag{P}
@@ -25,8 +25,8 @@ Define the convex sets @f$C@f$ and @f$D@f$ as
 @f[
 \begin{equation}
     \begin{aligned}
-        C &= \left\{ x \in \Re^n \mid \underline x \le x \le \overline x \right\} \\
-        D &= \left\{ z \in \Re^m \mid \underline z \le z \le \overline z \right\}. \\
+        C &= \left\{ x \in \Rn \mid \underline x \le x \le \overline x \right\} \\
+        D &= \left\{ z \in \R^m \mid \underline z \le z \le \overline z \right\}. \\
     \end{aligned}
     \label{eq:setCD}
 \end{equation}
@@ -73,24 +73,24 @@ The Lagrangian function of problem @f$\eqref{eq:problem-origCD-alm}@f$ is given 
 @f[
 \begin{equation}\label{eq:def-lagr}
     \begin{aligned}
-        \Lagr : \Re^n \times \Re^m \times \Re^m \rightarrow \Re : (x, z, y) &\mapsto \Lagr(x, z, y) \\
+        \Lagr : \Rn \times \R^m \times \R^m \rightarrow \R : (x, z, y) &\mapsto \Lagr(x, z, y) \\
         &\,\triangleq\, f(x) + \left\langle g(x) - z,\; y\right\rangle.
     \end{aligned}
 \end{equation}
 @f]
-The vector @f$y \in \Re^m@f$ is called the vector of Lagrange multipliers.
+The vector @f$y \in \R^m@f$ is called the vector of Lagrange multipliers.
 
 The augmented Lagrangian function with penalty factor @f$\Sigma@f$ of the problem @f$\eqref{eq:problem-origCD-alm}@f$ is defined as the sum of the Lagrangian function and a quadratic 
 term that penalizes the constraint violation:
 @f[
 \begin{equation}\label{eq:def-auglagr}
     \begin{aligned}
-        \Lagr_\Sigma : \Re^n \times \Re^m \times \Re^m \rightarrow \Re : (x, z, y) &\mapsto \Lagr_\Sigma(x, z, y) \\
+        \Lagr_\Sigma : \Rn \times \R^m \times \R^m \rightarrow \R : (x, z, y) &\mapsto \Lagr_\Sigma(x, z, y) \\
         &\,\triangleq\, \Lagr(x, z, y) + \tfrac{1}{2} \left\|g(x) - z\right\|^2_\Sigma,
     \end{aligned}
 \end{equation}
 @f]
-where @f$\Sigma@f$ is a symmetric positive definite @f$m\times m@f$ matrix that defines a norm on @f$\Re^m@f$, @f$\|z\|^2_\Sigma \triangleq z^\top \Sigma z@f$.
+where @f$\Sigma@f$ is a symmetric positive definite @f$m\times m@f$ matrix that defines a norm on @f$\R^m@f$, @f$\|z\|^2_\Sigma \triangleq z^\top \Sigma z@f$.
 
 ### The augmented Lagrangian method algorithm
 
@@ -199,8 +199,8 @@ PANOC is an algorithm that solves optimization problems of the form:
     \tag{P-PANOC}
 \end{equation}
 @f]
-where @f$\psi : \Re^n \rightarrow \Re @f$ has Lipschitz gradient, and
-@f$h : \Re^n \rightarrow \overline \Re @f$ allows efficient computation of the
+where @f$\psi : \Rn \rightarrow \R @f$ has Lipschitz gradient, and
+@f$h : \Rn \rightarrow \overline \R @f$ allows efficient computation of the
 proximal operator.
 
 Recall the inner minimization problem @f$\eqref{eq:alm-step-1-argmin}@f$ 
@@ -266,10 +266,10 @@ implementation of the PANOC algorithm.
     \DeclareMathOperator*{\minimize}{\mathbf{minimize}\;\;}
 
     \begin{aligned}
-    y &\in \Re^m &\text{Current Lagrange multipliers} \\
-    \Sigma &\in \text{diag}(\Re^m_{>0}) &\text{Current penalty factor} \\
-    x^k &\in \Re^n &\text{Current PANOC iterate} \\
-    \gamma_k &\in \Re_{>0} &\text{Current proximal gradient step size} \\[1em]
+    y &\in \R^m &\text{Current Lagrange multipliers} \\
+    \Sigma &\in \text{diag}(\R^m_{>0}) &\text{Current penalty factor} \\
+    x^k &\in \Rn &\text{Current PANOC iterate} \\
+    \gamma_k &\in \R_{>0} &\text{Current proximal gradient step size} \\[1em]
     \zeta^k &\triangleq g(x^k) + \Sigma^{-1}y &\text{Shifted constraint value}\\
     \hat{z}^k &\triangleq \Pi_D\left(g(x^k) + \Sigma^{-1}y\right) &\text{Closest feasible value for slack variable } z \\
     &= \Pi_D(\zeta^k) \\

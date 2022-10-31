@@ -14,13 +14,13 @@ The solvers in this library solve minimization problems of the following form:
     \newcommand\mymathbb[1]
     { {\rm I\mathchoice{\hspace{-2pt}}{\hspace{-2pt}}
         {\hspace{-1.75pt}}{\hspace{-1.7pt}}#1} }
-    \newcommand{\Re}{\mymathbb R}
+    \newcommand{\R}{\mymathbb R}
     \begin{aligned}
         & \underset{x}{\text{minimize}}
-        & & f(x) &&&& f : \Re^n \rightarrow \Re \\
+        & & f(x) &&&& f : \R^n \rightarrow \R \\
         & \text{subject to}
         & & \underline{x} \le \phantom{g(}x\phantom{)} \le \overline{x} \\
-        &&& \underline{z} \le g(x) \le \overline{z} &&&& g : \Re^n \rightarrow \Re^m
+        &&& \underline{z} \le g(x) \le \overline{z} &&&& g : \R^n \rightarrow \R^m
     \end{aligned}
 
 For more information, please see :ref:`getting started`.
