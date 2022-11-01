@@ -12,13 +12,10 @@ template <alpaqa::Config Conf>
 void register_problems(py::module_ &m);
 
 template <alpaqa::Config Conf>
-void register_casadi_problem(py::module_ &m);
-
-template <alpaqa::Config Conf>
 void register_panoc(py::module_ &m);
 
-template <alpaqa::Config Conf>
-void register_structured_panoc(py::module_ &m);
+// template <alpaqa::Config Conf>
+// void register_structured_panoc(py::module_ &m);
 
 template <alpaqa::Config Conf>
 void register_alm(py::module_ &m);
@@ -26,10 +23,8 @@ void register_alm(py::module_ &m);
 template <alpaqa::Config Conf>
 void register_classes_for(py::module_ &m) {
     register_problems<Conf>(m);
-    if constexpr (std::is_same_v<typename Conf::real_t, double>)
-        register_casadi_problem<Conf>(m);
     register_panoc<Conf>(m);
-    register_structured_panoc<Conf>(m);
+    // register_structured_panoc<Conf>(m);
     register_alm<Conf>(m);
 }
 

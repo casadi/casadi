@@ -12,8 +12,8 @@ constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 
 #include <alpaqa/inner/src/structured-panoc.tpp>
 #include <alpaqa/inner/structured-panoc.hpp>
+#include <alpaqa/util/check-dim.hpp>
 
-#include "check-dim.hpp"
 #include "kwargs-to-struct.hpp"
 #include "lbfgs-params.hpp"
 #include "type-erased-panoc-direction.hpp"

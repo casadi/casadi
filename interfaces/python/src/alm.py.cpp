@@ -21,8 +21,8 @@ using namespace std::chrono_literals;
 #include <alpaqa/inner/src/panoc.tpp>
 #include <alpaqa/outer/alm.hpp>
 #include <alpaqa/outer/src/alm.tpp>
+#include <alpaqa/util/check-dim.hpp>
 
-#include "check-dim.hpp"
 #include "kwargs-to-struct.hpp"
 #include "type-erased-inner-solver.hpp"
 #include "type-erased-panoc-direction.hpp"
@@ -62,15 +62,16 @@ template <alpaqa::Config Conf>
 void register_alm(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
 
-    using TypeErasedPANOCDirection   = alpaqa::TypeErasedPANOCDirection<config_t>;
-    using PANOCSolver                = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
-    using StructuredPANOCLBFGSSolver = alpaqa::StructuredPANOCLBFGSSolver<config_t>;
-    using InnerSolver                = alpaqa::TypeErasedInnerSolver<config_t>;
+    using TypeErasedPANOCDirection = alpaqa::TypeErasedPANOCDirection<config_t>;
+    using PANOCSolver              = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
+    using TypeErasedProblem        = alpaqa::TypeErasedProblem<config_t>;
+    // using StructuredPANOCLBFGSSolver = alpaqa::StructuredPANOCLBFGSSolver<config_t>;
+    using InnerSolver = alpaqa::TypeErasedInnerSolver<config_t>;
     py::class_<InnerSolver>(m, "InnerSolver")
         .def(py::init<PANOCSolver>())
         .def("__call__",
-             [](InnerSolver &self, const alpaqa::ProblemBase<config_t> &p, crvec Σ, real_t ε,
-                bool a, rvec x, rvec y, rvec e) { return self(p, Σ, ε, a, x, y, e).to_dict(); })
+             [](InnerSolver &self, const TypeErasedProblem &p, crvec Σ, real_t ε, bool a, rvec x,
+                rvec y, rvec e) { return self(p, Σ, ε, a, x, y, e).to_dict(); })
         .def_property_readonly("name", &InnerSolver::template get_name<>);
 
     using ALMSolver = alpaqa::ALMSolver<InnerSolver>;
@@ -105,27 +106,18 @@ void register_alm(py::module_ &m) {
         .def_readwrite("print_interval", &ALMParams::print_interval)
         .def_readwrite("single_penalty_factor", &ALMParams::single_penalty_factor);
 
-    auto safe_alm_call = [](ALMSolver &solver, const alpaqa::ProblemBase<config_t> &p,
-                            std::optional<vec> x, std::optional<vec> y,
-                            bool async) -> std::tuple<vec, vec, py::dict> {
+    auto safe_alm_call = [](ALMSolver &solver, const TypeErasedProblem &p, std::optional<vec> x,
+                            std::optional<vec> y, bool async) -> std::tuple<vec, vec, py::dict> {
         if (!x)
-            x = vec::Zero(p.n);
+            x = vec::Zero(p.get_n());
         else
-            check_dim_msg(*x, p.n, "Length of x does not match problem size problem.n");
+            check_dim_msg(*x, p.get_n(), "Length of x does not match problem size problem.n");
         if (!y)
-            y = vec::Zero(p.m);
+            y = vec::Zero(p.get_m());
         else
-            check_dim_msg(*y, p.m, "Length of y does not match problem size problem.m");
-        check_dim_msg(p.get_C().lowerbound, p.n,
-                      "Length of problem.C.lowerbound does not match problem size problem.n");
-        check_dim_msg(p.get_C().upperbound, p.n,
-                      "Length of problem.C.upperbound does not match problem size problem.n");
-        check_dim_msg(p.get_D().lowerbound, p.m,
-                      "Length of problem.D.lowerbound does not match problem size problem.m");
-        check_dim_msg(p.get_D().upperbound, p.m,
-                      "Length of problem.D.upperbound does not match problem size problem.m");
+            check_dim_msg(*y, p.get_m(), "Length of y does not match problem size problem.m");
         auto penalty_alm_split = solver.get_params().penalty_alm_split;
-        if (penalty_alm_split < 0 || penalty_alm_split > p.m)
+        if (penalty_alm_split < 0 || penalty_alm_split > p.get_m())
             throw std::invalid_argument("invalid penalty_alm_split");
 
         auto invoke_solver = [&] { return solver(p, *y, *x); };
@@ -167,33 +159,33 @@ void register_alm(py::module_ &m) {
                           "Main augmented Lagrangian solver.\n\n"
                           "C++ documentation: :cpp:class:`alpaqa::ALMSolver`")
         // Default constructor
-        .def(py::init([] {
-                 return std::make_unique<ALMSolver>(
-                     ALMParams{}, InnerSolver{StructuredPANOCLBFGSSolver{{}, {}}});
-             }),
-             "Build an ALM solver using Structured PANOC as inner solver.")
+        // .def(py::init([] {
+        //          return std::make_unique<ALMSolver>(
+        //              ALMParams{}, InnerSolver{StructuredPANOCLBFGSSolver{{}, {}}});
+        //      }),
+        //      "Build an ALM solver using Structured PANOC as inner solver.")
         // Solver only
         .def(py::init([](const PANOCSolver &inner) {
                  return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
              }),
              "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
-        .def(py::init([](const StructuredPANOCLBFGSSolver &inner) {
-                 return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
-             }),
-             "inner_solver"_a, "Build an ALM solver using Structured PANOC as inner solver.")
+        // .def(py::init([](const StructuredPANOCLBFGSSolver &inner) {
+        //          return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
+        //      }),
+        //      "inner_solver"_a, "Build an ALM solver using Structured PANOC as inner solver.")
         // Params and solver
         .def(py::init([](params_or_dict<ALMParams> params, const PANOCSolver &inner) {
                  return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
                                                     InnerSolver{inner});
              }),
              "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
-        .def(
-            py::init([](params_or_dict<ALMParams> params, const StructuredPANOCLBFGSSolver &inner) {
-                return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
-                                                   InnerSolver{inner});
-            }),
-            "alm_params"_a, "inner_solver"_a,
-            "Build an ALM solver using Structured PANOC as inner solver.")
+        // .def(
+        //     py::init([](params_or_dict<ALMParams> params, const StructuredPANOCLBFGSSolver &inner) {
+        //         return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
+        //                                            InnerSolver{inner});
+        //     }),
+        //     "alm_params"_a, "inner_solver"_a,
+        //     "Build an ALM solver using Structured PANOC as inner solver.")
         // Other functions and properties
         .def_property_readonly(
             "inner_solver",

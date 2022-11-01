@@ -1,5 +1,6 @@
 #pragma once
 
+#include <alpaqa/problem/type-erased-problem.hpp>
 #include "type-erased-solver-stats.hpp"
 
 namespace alpaqa {
@@ -7,18 +8,23 @@ namespace alpaqa {
 template <Config Conf>
 struct InnerSolverVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
-    using Stats = TypeErasedInnerSolverStats<Conf>;
+    using Stats   = TypeErasedInnerSolverStats<Conf>;
+    using Problem = TypeErasedProblem<Conf>;
 
-    Stats (*call)(void *, const ProblemBase<Conf> &, crvec, real_t, bool, rvec, rvec,
-                  rvec)                   = nullptr;
-    void (*stop)(void *)                  = nullptr;
-    std::string (*get_name)(const void *) = nullptr;
+    // clang-format off
+    required_function_t<Stats(const Problem &, crvec, real_t, bool, rvec, rvec, rvec)>
+        call = nullptr;
+    required_function_t<void()>
+        stop = nullptr;
+    required_const_function_t<std::string()>
+        get_name = nullptr;
+    // clang-format on
 
     template <class T>
     InnerSolverVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
         stop     = util::type_erased_wrapped<&T::stop>();
         get_name = util::type_erased_wrapped<&T::get_name>();
-        call     = [](void *self, const ProblemBase<Conf> &p, auto... valargs) {
+        call     = [](void *self, const Problem &p, auto... valargs) {
             constexpr auto call = util::type_erased_wrapped<&T::operator()>();
             return Stats{call(self, p, valargs...)};
         };

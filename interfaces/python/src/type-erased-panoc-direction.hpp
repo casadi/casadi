@@ -15,14 +15,20 @@ template <Config Conf>
 struct PANOCDirectionVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
 
-    void (*initialize)(void *self, crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0) = nullptr;
-    bool (*update)(void *self, crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_new,
-                   const Box<config_t> &C, real_t γ_new)                          = nullptr;
-    bool (*apply)(const void *self, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ,
-                  real_t γ, rvec qₖ)                                              = nullptr;
-    void (*changed_γ)(void *self, real_t γₖ, real_t old_γₖ)                       = nullptr;
-    void (*reset)(void *self)                                                     = nullptr;
-    std::string (*get_name)(const void *self)                                     = nullptr;
+    // clang-format off
+    required_function_t<void(crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0)>
+        initialize = nullptr;
+    required_function_t<bool(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec gradₙₑₓₜ, real_t γₙₑₓₜ)>
+        update = nullptr;
+    required_const_function_t<bool(crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ, real_t γ, rvec qₖ)>
+        apply = nullptr;
+    required_function_t<void(real_t γₖ, real_t old_γₖ)>
+        changed_γ = nullptr;
+    required_function_t<void()>
+        reset = nullptr;
+    required_const_function_t<std::string()>
+        get_name = nullptr;
+    // clang-format on
 
     template <class T>
     PANOCDirectionVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {

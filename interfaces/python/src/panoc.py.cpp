@@ -21,8 +21,8 @@ using namespace std::chrono_literals;
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/inner/src/panoc.tpp>
+#include <alpaqa/util/check-dim.hpp>
 
-#include "check-dim.hpp"
 #include "kwargs-to-struct.hpp"
 #include "lbfgs-params.hpp"
 #include "stats-to-dict.hpp"
@@ -81,11 +81,10 @@ void register_panoc(py::module_ &m) {
                     alpaqa::ScopedMallocAllower ma;
                     o.attr("initialize")(x_0, x̂_0, p_0, grad_0);
                 }
-                bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_new,
-                            const Box &C, real_t γ_new) {
+                bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec gradₙₑₓₜ,
+                            real_t γₙₑₓₜ) {
                     alpaqa::ScopedMallocAllower ma;
-                    return py::cast<bool>(
-                        o.attr("update")(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_new, C, γ_new));
+                    return py::cast<bool>(o.attr("update")(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, gradₙₑₓₜ, γₙₑₓₜ));
                 }
                 bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ, real_t γ,
                            rvec qₖ) const {
@@ -266,16 +265,18 @@ void register_panoc(py::module_ &m) {
     auto panoc_independent_solve = [](PANOCSolver &solver, const Problem &problem, crvec Σ,
                                       real_t ε, std::optional<vec> x, std::optional<vec> y) {
         bool always_overwrite_results = true;
-        check_dim("Σ", Σ, problem.m);
+        auto n                        = problem.get_n();
+        auto m                        = problem.get_m();
+        check_dim("Σ", Σ, m);
         if (x)
-            check_dim("x", *x, problem.n);
+            check_dim("x", *x, n);
         else
-            x = vec::Zero(problem.n);
+            x = vec::Zero(n);
         if (y)
-            check_dim("y", *y, problem.m);
+            check_dim("y", *y, m);
         else
-            y = vec::Zero(problem.m);
-        vec err_z  = vec::Zero(problem.m);
+            y = vec::Zero(m);
+        vec err_z  = vec::Zero(m);
         auto stats = solver(problem, Σ, ε, always_overwrite_results, *x, *y, err_z);
         return std::make_tuple(std::move(*x), std::move(*y), std::move(err_z),
                                alpaqa::conv::stats_to_dict(stats));
@@ -283,10 +284,12 @@ void register_panoc(py::module_ &m) {
     auto panoc_independent_solve_unconstr = [](PANOCSolver &solver, const Problem &problem,
                                                real_t ε, std::optional<vec> x, bool async) {
         bool always_overwrite_results = true;
+        auto n                        = problem.get_n();
+        auto m                        = problem.get_m();
         if (x)
-            check_dim("x", *x, problem.n);
+            check_dim("x", *x, n);
         else
-            x = vec::Zero(problem.n);
+            x = vec::Zero(n);
         vec Σ(0), y(0), err_z(0);
         auto invoke_solver = [&] {
             return solver(problem, Σ, ε, always_overwrite_results, *x, y, err_z);
