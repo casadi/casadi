@@ -45,9 +45,8 @@ PANOCSolver<DirectionProviderT>::operator()(
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
-    const auto n = problem.n;
-    const auto m = problem.m;
-    auto &&C     = problem.get_C();
+    const auto n = problem.get_n();
+    const auto m = problem.get_m();
 
     // Allocate vectors, init L-BFGS -------------------------------------------
 
@@ -80,18 +79,18 @@ PANOCSolver<DirectionProviderT>::operator()(
     // Wrappers for helper functions that automatically pass along any arguments
     // that are constant within PANOC (for readability in the main algorithm)
     auto calc_ψ_ŷ = [&problem, &y, &Σ](crvec x, rvec ŷ) {
-        return Helpers::calc_ψ_ŷ(problem, x, y, Σ, ŷ);
+        return problem.eval_ψ(x, y, Σ, ŷ);
     };
     auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
                                                               rvec grad_ψ) {
-        return Helpers::calc_ψ_grad_ψ(problem, x, y, Σ, grad_ψ, work_n, work_m);
+        return problem.eval_ψ_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
     };
     auto calc_grad_ψ_from_ŷ = [&problem, &work_n](crvec x, crvec ŷ,
                                                   rvec grad_ψ) {
-        Helpers::calc_grad_ψ_from_ŷ(problem, x, ŷ, grad_ψ, work_n);
+        problem.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work_n);
     };
     auto calc_x̂ = [&](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
-        Helpers::calc_x̂(C, γ, x, grad_ψ, x̂, p);
+        problem.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
     };
     auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
         Helpers::calc_err_z(problem, x̂, y, Σ, err_z);
@@ -186,8 +185,9 @@ PANOCSolver<DirectionProviderT>::operator()(
             calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
 
         // Check stop condition ------------------------------------------------
-        real_t εₖ = Helpers::calc_error_stop_crit(
-            C, params.stop_crit, pₖ, γₖ, xₖ, x̂ₖ, ŷx̂ₖ, grad_ψₖ, grad_̂ψₖ);
+        real_t εₖ = Helpers::calc_error_stop_crit(problem, params.stop_crit, pₖ,
+                                                  γₖ, xₖ, x̂ₖ, ŷx̂ₖ, grad_ψₖ,
+                                                  grad_̂ψₖ, work_n, pₙₑₓₜ);
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
@@ -313,7 +313,7 @@ PANOCSolver<DirectionProviderT>::operator()(
             direction_provider.changed_γ(γₙₑₓₜ, γₖ);
 
         s.lbfgs_rejected += not direction_provider.update(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ,
-                                                          grad_ψₙₑₓₜ, C, γₙₑₓₜ);
+                                                          grad_ψₙₑₓₜ, γₙₑₓₜ);
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)

@@ -4,7 +4,7 @@
 #include <alpaqa/export.hpp>
 #include <alpaqa/inner/internal/solverstatus.hpp>
 #include <alpaqa/outer/internal/alm-helpers.hpp>
-#include <alpaqa/problem/problem.hpp>
+#include <alpaqa/problem/type-erased-problem.hpp>
 
 #include <chrono>
 #include <string>
@@ -101,7 +101,7 @@ class ALMSolver {
   public:
     USING_ALPAQA_CONFIG_TEMPLATE(InnerSolverT::config_t);
 
-    using Problem     = alpaqa::ProblemBase<config_t>;
+    using Problem     = TypeErasedProblem<config_t>;
     using Params      = ALMParams<config_t>;
     using InnerSolver = InnerSolverT;
 
@@ -159,6 +159,10 @@ class ALMSolver {
         : params(params), inner_solver(inner_solver) {}
 
     Stats operator()(const Problem &problem, rvec y, rvec x);
+    template <class P>
+    Stats operator()(const P &problem, rvec y, rvec x) {
+        return operator()(Problem::template make<P>(problem), y, x);
+    }
 
     std::string get_name() const {
         return "ALMSolver<" + inner_solver.get_name() + ">";

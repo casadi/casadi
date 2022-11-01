@@ -20,12 +20,17 @@ typename ALMSolver<InnerSolverT>::Stats
 ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
     using std::chrono::duration_cast;
     using std::chrono::microseconds;
-    auto start_time  = std::chrono::steady_clock::now();
+    auto start_time = std::chrono::steady_clock::now();
+
+    // Check the problem dimensions etc.
+    p.check();
+
     // Lagrange multipliers corresponding to penalty constraints are always 0.
     auto &&y_penalty = y.topRows(params.penalty_alm_split);
     y_penalty.setZero();
 
-    if (p.m == 0) { // No general constraints, only box constraints
+    auto m = p.get_m();
+    if (m == 0) { // No general constraints, only box constraints
         Stats s;
         vec Σ(0), error(0);
         auto ps = inner_solver(p, Σ, params.ε, true, x, y, error);
@@ -43,10 +48,10 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
     }
 
     constexpr auto NaN               = alpaqa::NaN<config_t>;
-    vec Σ                            = vec::Constant(p.m, NaN);
-    vec Σ_old                        = vec::Constant(p.m, NaN);
-    vec error_1                      = vec::Constant(p.m, NaN);
-    vec error_2                      = vec::Constant(p.m, NaN);
+    vec Σ                            = vec::Constant(m, NaN);
+    vec Σ_old                        = vec::Constant(m, NaN);
+    vec error_1                      = vec::Constant(m, NaN);
+    vec error_2                      = vec::Constant(m, NaN);
     [[maybe_unused]] real_t norm_e_1 = NaN;
     [[maybe_unused]] real_t norm_e_2 = NaN;
 
@@ -73,12 +78,10 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
 
     unsigned num_successful_iters = 0;
 
-    auto &&D = p.get_D();
     for (unsigned int i = 0; i < params.max_iter; ++i) {
         // TODO: this is unnecessary when the previous iteration lowered the
         // penalty update factor.
-        Helpers::project_y(y, D.lowerbound, D.upperbound, params.M,
-                           params.penalty_alm_split);
+        p.eval_proj_multipliers(y, params.M, params.penalty_alm_split);
         // Check if we're allowed to lower the penalty factor even further.
         bool out_of_penalty_factor_updates =
             (num_successful_iters == 0

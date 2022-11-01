@@ -362,6 +362,20 @@ class TypeErased {
         else
             return f(self, std::forward<Args>(args)...);
     }
+    /// @copydoc call
+    template <class Ret>
+    decltype(auto) call(Ret (*f)(const void *)) const {
+        assert(f);
+        assert(self);
+        return f(self);
+    }
+    /// @copydoc call
+    template <class Ret>
+    decltype(auto) call(Ret (*f)(void *)) {
+        assert(f);
+        assert(self);
+        return f(self);
+    }
 };
 
 } // namespace alpaqa::util

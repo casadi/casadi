@@ -1,74 +1,21 @@
 #pragma once
 
+#include <alpaqa/config/config.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
 #include <alpaqa/inner/internal/solverstatus.hpp>
-#include <alpaqa/problem/problem.hpp>
+#include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/atomic-stop-signal.hpp>
+#include <alpaqa/util/not-implemented.hpp>
 
 #include <stdexcept>
-
-#include <alpaqa/config/config.hpp>
 
 namespace alpaqa::detail {
 
 template <Config Conf>
 struct PANOCHelpers {
     USING_ALPAQA_CONFIG(Conf);
-    using Problem = alpaqa::ProblemBase<config_t>;
+    using Problem = alpaqa::TypeErasedProblem<config_t>;
     using Box     = alpaqa::Box<config_t>;
-
-    /// Calculate both ψ(x) and the vector ŷ that can later be used to compute ∇ψ.
-    /// @f[ \psi(x^k) = f(x^k) + \frac{1}{2}
-    /// \text{dist}_\Sigma^2\left(g(x^k) + \Sigma^{-1}y,\;D\right) @f]
-    /// @f[ \hat{y}  @f]
-    static real_t calc_ψ_ŷ(const Problem &p, ///< [in]  Problem description
-                           crvec x, ///< [in]  Decision variable @f$ x @f$
-                           crvec y, ///< [in]  Lagrange multipliers @f$ y @f$
-                           crvec Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
-                           rvec ŷ   ///< [out] @f$ \hat{y} @f$
-    ) {
-        return p.eval_ψ_ŷ(x, y, Σ, ŷ);
-    }
-
-    /// Calculate ∇ψ(x) using ŷ.
-    static void
-    calc_grad_ψ_from_ŷ(const Problem &p, ///< [in]  Problem description
-                       crvec x,          ///< [in]  Decision variable @f$ x @f$
-                       crvec ŷ,          ///< [in]  @f$ \hat{y} @f$
-                       rvec grad_ψ,      ///< [out] @f$ \nabla \psi(x) @f$
-                       rvec work_n       ///<       Dimension n
-    ) {
-        return p.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work_n);
-    }
-
-    /// Calculate both ψ(x) and its gradient ∇ψ(x).
-    /// @f[ \psi(x^k) = f(x^k) + \frac{1}{2}
-    /// \text{dist}_\Sigma^2\left(g(x^k) + \Sigma^{-1}y,\;D\right) @f]
-    /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\ \hat{y}(x) @f]
-    static real_t
-    calc_ψ_grad_ψ(const Problem &p, ///< [in]  Problem description
-                  crvec x,          ///< [in]  Decision variable @f$ x @f$
-                  crvec y,          ///< [in]  Lagrange multipliers @f$ y @f$
-                  crvec Σ,          ///< [in]  Penalty weights @f$ \Sigma @f$
-                  rvec grad_ψ,      ///< [out] @f$ \nabla \psi(x) @f$
-                  rvec work_n,      ///<       Dimension n
-                  rvec work_m       ///<       Dimension m
-    ) {
-        return p.eval_ψ_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
-    }
-
-    /// Calculate the gradient ∇ψ(x).
-    /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\ \hat{y}(x) @f]
-    static void calc_grad_ψ(const Problem &p, ///< [in]  Problem description
-                            crvec x, ///< [in]  Decision variable @f$ x @f$
-                            crvec y, ///< [in]  Lagrange multipliers @f$ y @f$
-                            crvec Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
-                            rvec grad_ψ, ///< [out] @f$ \nabla \psi(x) @f$
-                            rvec work_n, ///<       Dimension n
-                            rvec work_m  ///<       Dimension m
-    ) {
-        return p.eval_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
-    }
 
     /// Calculate the error between ẑ and g(x).
     /// @f[ \hat{z}^k = \Pi_D\left(g(x^k) + \Sigma^{-1}y\right) @f]
@@ -78,48 +25,18 @@ struct PANOCHelpers {
                            crvec Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
                            rvec err_z ///< [out] @f$ g(\hat{x}) - \hat{z} @f$
     ) {
-        if (p.m == 0)
+        if (p.get_m() == 0) /* [[unlikely]] */
             return;
 
         // g(x̂)
         p.eval_g(x̂, err_z);
         // ζ = g(x̂) + Σ⁻¹y
+        err_z += Σ.asDiagonal().inverse() * y;
         // ẑ = Π(ζ, D)
+        p.eval_proj_diff_g(err_z, err_z);
         // g(x) - ẑ
-        err_z =
-            err_z - project(err_z + Σ.asDiagonal().inverse() * y, p.get_D());
+        err_z -= Σ.asDiagonal().inverse() * y;
         // TODO: catastrophic cancellation?
-    }
-
-    /**
-     * Projected gradient step
-     * @f[ \begin{aligned} 
-     * \hat{x}^k &= T_{\gamma^k}\left(x^k\right) \\ 
-     * &= \Pi_C\left(x^k - \gamma^k \nabla \psi(x^k)\right) \\ 
-     * p^k &= \hat{x}^k - x^k \\ 
-     * \end{aligned} @f]
-     */
-    static auto projected_gradient_step(
-        const Box &C,       ///< [in]  Set to project onto
-        real_t γ,           ///< [in]  Step size
-        const crvec &x,     ///< [in]  Decision variable @f$ x @f$
-        const crvec &grad_ψ ///< [in]  @f$ \nabla \psi(x^k) @f$
-    ) {
-        using binary_real_f = real_t (*)(real_t, real_t);
-        return (-γ * grad_ψ)
-            .binaryExpr(C.lowerbound - x, binary_real_f(std::fmax))
-            .binaryExpr(C.upperbound - x, binary_real_f(std::fmin));
-    }
-
-    static void calc_x̂(const Box &C, ///< [in]  Box C to project onto
-                       real_t γ,     ///< [in]  Step size
-                       crvec x,      ///< [in]  Decision variable @f$ x @f$
-                       crvec grad_ψ, ///< [in]  @f$ \nabla \psi(x^k) @f$
-                       rvec x̂, ///< [out] @f$ \hat{x}^k = T_{\gamma^k}(x^k) @f$
-                       rvec p  ///< [out] @f$ \hat{x}^k - x^k @f$
-    ) {
-        p = projected_gradient_step(C, γ, x, grad_ψ);
-        x̂ = x + p;
     }
 
     static bool stop_crit_requires_grad_ψx̂(PANOCStopCrit crit) {
@@ -141,15 +58,17 @@ struct PANOCHelpers {
 
     /// Compute the ε from the stopping criterion, see @ref PANOCStopCrit.
     static real_t calc_error_stop_crit(
-        const Box &C,       ///< [in]  Box constraints on x
-        PANOCStopCrit crit, ///< [in]  What stoppint criterion to use
+        const Problem &problem, ///< [in]  Problem description
+        PANOCStopCrit crit,     ///< [in]  What stoppint criterion to use
         crvec pₖ,      ///< [in]  Projected gradient step @f$ \hat x^k - x^k @f$
         real_t γ,      ///< [in]  Step size
         crvec xₖ,      ///< [in]  Current iterate
         crvec x̂ₖ,      ///< [in]  Current iterate after projected gradient step
         crvec ŷₖ,      ///< [in]  Candidate Lagrange multipliers
         crvec grad_ψₖ, ///< [in]  Gradient in @f$ x^k @f$
-        crvec grad_̂ψₖ  ///< [in]  Gradient in @f$ \hat x^k @f$
+        crvec grad_̂ψₖ, ///< [in]  Gradient in @f$ \hat x^k @f$
+        rvec work_n1,  ///<       Workspace of dimension n
+        rvec work_n2   ///<       Workspace of dimension n
     ) {
         switch (crit) {
             case PANOCStopCrit::ApproxKKT: {
@@ -171,11 +90,14 @@ struct PANOCHelpers {
                 return pₖ.norm();
             }
             case PANOCStopCrit::ProjGradUnitNorm: {
-                return vec_util::norm_inf(
-                    projected_gradient_step(C, 1, xₖ, grad_ψₖ));
+                problem.eval_prox_grad_step(real_t(1), xₖ, grad_ψₖ, work_n1,
+                                            work_n2);
+                return vec_util::norm_inf(work_n2);
             }
             case PANOCStopCrit::ProjGradUnitNorm2: {
-                return projected_gradient_step(C, 1, xₖ, grad_ψₖ).norm();
+                problem.eval_prox_grad_step(real_t(1), xₖ, grad_ψₖ, work_n1,
+                                            work_n2);
+                return work_n2.norm();
             }
             case PANOCStopCrit::FPRNorm: {
                 return vec_util::norm_inf(pₖ) / γ;
@@ -184,13 +106,16 @@ struct PANOCHelpers {
                 return pₖ.norm() / γ;
             }
             case PANOCStopCrit::Ipopt: {
-                auto err = vec_util::norm_inf(
-                    projected_gradient_step(C, 1, x̂ₖ, grad_̂ψₖ));
-                auto n = 2 * (ŷₖ.size() + x̂ₖ.size());
+                // work_n2 ← x̂ₖ - Π_C(x̂ₖ - ∇ψ(x̂ₖ))
+                problem.eval_prox_grad_step(real_t(1), x̂ₖ, grad_̂ψₖ, work_n1,
+                                            work_n2);
+                auto err = vec_util::norm_inf(work_n2);
+                auto n   = 2 * (ŷₖ.size() + x̂ₖ.size());
                 if (n == 0)
                     return err;
-                auto C_lagr_mult =
-                    vec_util::norm_1(projecting_difference(x̂ₖ - grad_̂ψₖ, C));
+                // work_n2 ← x̂ₖ - ∇ψ(x̂ₖ) - Π_C(x̂ₖ - ∇ψ(x̂ₖ))
+                work_n2 -= grad_̂ψₖ;
+                auto C_lagr_mult   = vec_util::norm_1(work_n2);
                 auto D_lagr_mult   = vec_util::norm_1(ŷₖ);
                 const real_t s_max = 100;
                 const real_t s_n   = static_cast<real_t>(n);
@@ -199,8 +124,9 @@ struct PANOCHelpers {
                 return err / s_d;
             }
             case PANOCStopCrit::LBFGSBpp: {
-                return vec_util::norm_inf(
-                           projected_gradient_step(C, real_t(1), xₖ, grad_ψₖ)) /
+                problem.eval_prox_grad_step(real_t(1), xₖ, grad_ψₖ, work_n1,
+                                            work_n2);
+                return vec_util::norm_inf(work_n2) /
                        std::fmax(real_t(1), xₖ.norm());
             }
             default:;
@@ -261,7 +187,6 @@ struct PANOCHelpers {
         real_t &γₖ) {
 
         real_t old_γₖ = γₖ;
-        auto &&C      = problem.get_C();
         real_t margin = (1 + std::abs(ψₖ)) * rounding_tolerance;
         while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + real_t(0.5) * Lₖ * norm_sq_pₖ + margin) {
             if (not(Lₖ * 2 <= L_max))
@@ -271,13 +196,13 @@ struct PANOCHelpers {
             γₖ /= 2;
 
             // Calculate x̂ₖ and pₖ (with new step size)
-            calc_x̂(C, γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
+            problem.eval_prox_grad_step(γₖ, xₖ, grad_ψₖ, /* in ⟹ out */ x̂ₖ, pₖ);
             // Calculate ∇ψ(xₖ)ᵀpₖ and ‖pₖ‖²
             grad_ψₖᵀpₖ = grad_ψₖ.dot(pₖ);
             norm_sq_pₖ = pₖ.squaredNorm();
 
             // Calculate ψ(x̂ₖ) and ŷ(x̂ₖ)
-            ψx̂ₖ = problem.eval_ψ_ŷ(x̂ₖ, y, Σ, /* in ⟹ out */ ŷx̂ₖ);
+            ψx̂ₖ = problem.eval_ψ(x̂ₖ, y, Σ, /* in ⟹ out */ ŷx̂ₖ);
         }
         return old_γₖ;
     }
@@ -339,19 +264,32 @@ struct PANOCHelpers {
         ///         Dimension n
         rvec work_n) {
 
-        // Compute the Hessian of the Lagrangian
-        problem.eval_hess_L(xₖ, ŷxₖ, H);
-        // Compute the Hessian of the augmented Lagrangian
-        problem.eval_g(xₖ, g);
-        auto &&D = problem.get_D();
-        for (index_t i = 0; i < problem.m; ++i) {
-            real_t ζ      = g(i) + y(i) / Σ(i);
-            bool inactive = D.lowerbound(i) < ζ && ζ < D.upperbound(i);
-            if (not inactive) {
-                problem.eval_grad_gi(xₖ, i, work_n);
-                H += work_n * Σ(i) * work_n.transpose();
-            }
-        }
+        // // Compute the Hessian of the Lagrangian
+        // problem.eval_hess_L(xₖ, ŷxₖ, H);
+        // // Compute the Hessian of the augmented Lagrangian
+        // problem.eval_g(xₖ, g);
+        // auto &&D = problem.get_D();
+        // for (index_t i = 0; i < problem.m; ++i) {
+        //     real_t ζ      = g(i) + y(i) / Σ(i);
+        //     bool inactive = D.lowerbound(i) < ζ && ζ < D.upperbound(i);
+        //     if (not inactive) {
+        //         problem.eval_grad_gi(xₖ, i, work_n);
+        //         H += work_n * Σ(i) * work_n.transpose();
+        //     }
+        // }
+
+        throw not_implemented_error(
+            "TODO: implement calc_augmented_lagrangian_hessian in "
+            "TypeErasedProblem");
+
+        (void)problem;
+        (void)xₖ;
+        (void)ŷxₖ;
+        (void)y;
+        (void)Σ;
+        (void)g;
+        (void)H;
+        (void)work_n;
     }
 
     /// Compute the Hessian matrix of the augmented Lagrangian function multiplied
@@ -384,7 +322,7 @@ struct PANOCHelpers {
         real_t h      = cbrt_ε * (1 + xₖ.norm());
         rvec xₖh      = work_n1;
         xₖh           = xₖ + h * v;
-        calc_grad_ψ(problem, xₖh, y, Σ, Hv, work_n2, work_m);
+        problem.eval_grad_ψ(xₖh, y, Σ, Hv, work_n2, work_m);
         Hv -= grad_ψ;
         Hv /= h;
     }
@@ -424,12 +362,12 @@ struct PANOCHelpers {
         auto h        = (xₖ * ε).cwiseAbs().cwiseMax(δ);
         work_n1       = xₖ + h;
         real_t norm_h = h.norm();
-        // Calculate ∇ψ(x_0 + h)
-        calc_grad_ψ(problem, work_n1, y, Σ, /* in ⟹ out */ work_n2, work_n3,
-                    work_m);
-        // Calculate ψ(xₖ), ∇ψ(x_0)
-        ψ = calc_ψ_grad_ψ(problem, xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1,
-                          work_m);
+        // Calculate ∇ψ(x₀ + h)
+        problem.eval_grad_ψ(work_n1, y, Σ, /* in ⟹ out */ work_n2, work_n3,
+                            work_m);
+        // Calculate ψ(x₀), ∇ψ(x₀)
+        ψ = problem.eval_ψ_grad_ψ(xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1,
+                                  work_m);
 
         // Estimate Lipschitz constant using finite differences
         real_t L = (work_n2 - grad_ψ).norm() / norm_h;
@@ -470,10 +408,10 @@ struct PANOCHelpers {
         work_n1       = xₖ + h;
         real_t norm_h = h.norm();
         // Calculate ∇ψ(x_0 + h)
-        calc_grad_ψ(problem, work_n1, y, Σ, /* in ⟹ out */ work_n2, work_n3,
-                    work_m);
+        problem.eval_grad_ψ(work_n1, y, Σ, /* in ⟹ out */ work_n2, work_n3,
+                            work_m);
         // Calculate ∇ψ(x_0)
-        calc_grad_ψ(problem, xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1, work_m);
+        problem.eval_grad_ψ(xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1, work_m);
 
         // Estimate Lipschitz constant using finite differences
         real_t L = (work_n2 - grad_ψ).norm() / norm_h;

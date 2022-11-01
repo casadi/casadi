@@ -14,8 +14,7 @@ struct PANOCDirection {
                            crvec grad_0) = delete;
 
     static bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ,
-                       crvec grad_new, const Box<config_t> &C,
-                       real_t γ_new) = delete;
+                       crvec gradₙₑₓₜ, real_t γₙₑₓₜ) = delete;
 
     /// Apply the direction estimation in the current point.
     /// @param[in]  xₖ

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <alpaqa/export.h>
-#include <alpaqa/problem/problem.hpp>
 
 #include <chrono>
 #include <iosfwd>
@@ -9,6 +8,9 @@
 namespace alpaqa {
 
 struct EvalCounter {
+    unsigned proj_diff_g{};
+    unsigned proj_multipliers{};
+    unsigned prox_grad_step{};
     unsigned f{};
     unsigned grad_f{};
     unsigned f_grad_f{};
@@ -27,6 +29,9 @@ struct EvalCounter {
     unsigned ψ_grad_ψ{};
 
     struct EvalTimer {
+        std::chrono::nanoseconds proj_diff_g{};
+        std::chrono::nanoseconds proj_multipliers{};
+        std::chrono::nanoseconds prox_grad_step{};
         std::chrono::nanoseconds f{};
         std::chrono::nanoseconds grad_f{};
         std::chrono::nanoseconds f_grad_f{};
@@ -52,6 +57,9 @@ ALPAQA_EXPORT std::ostream &operator<<(std::ostream &, const EvalCounter &);
 
 inline EvalCounter::EvalTimer &operator+=(EvalCounter::EvalTimer &a,
                                           const EvalCounter::EvalTimer &b) {
+    a.proj_diff_g += b.proj_diff_g;
+    a.proj_multipliers += b.proj_multipliers;
+    a.prox_grad_step += b.prox_grad_step;
     a.f += b.f;
     a.grad_f += b.grad_f;
     a.f_grad_f += b.f_grad_f;
@@ -72,6 +80,9 @@ inline EvalCounter::EvalTimer &operator+=(EvalCounter::EvalTimer &a,
 }
 
 inline EvalCounter &operator+=(EvalCounter &a, const EvalCounter &b) {
+    a.proj_diff_g += b.proj_diff_g;
+    a.proj_multipliers += b.proj_multipliers;
+    a.prox_grad_step += b.prox_grad_step;
     a.f += b.f;
     a.grad_f += b.grad_f;
     a.f_grad_f += b.f_grad_f;
@@ -92,8 +103,21 @@ inline EvalCounter &operator+=(EvalCounter &a, const EvalCounter &b) {
     return a;
 }
 
-inline EvalCounter operator+(EvalCounter a, const EvalCounter &b) {
-    return a += b;
-}
+inline EvalCounter operator+(EvalCounter a, const EvalCounter &b) { return a += b; }
+
+namespace detail {
+template <class T>
+struct Timed {
+    Timed(T &time) : time(time) { time -= std::chrono::steady_clock::now().time_since_epoch(); }
+    ~Timed() { time += std::chrono::steady_clock::now().time_since_epoch(); }
+    Timed(const Timed &)            = delete;
+    Timed(Timed &&)                 = delete;
+    Timed &operator=(const Timed &) = delete;
+    Timed &operator=(Timed &&)      = delete;
+    T &time;
+};
+template <class T>
+Timed(T &) -> Timed<T>;
+} // namespace detail
 
 } // namespace alpaqa

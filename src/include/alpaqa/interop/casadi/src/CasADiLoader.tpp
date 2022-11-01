@@ -2,6 +2,7 @@
 
 #include <alpaqa/interop/casadi/CasADiFunctionWrapper.hpp>
 #include <alpaqa/interop/casadi/CasADiLoader.hpp>
+#include <alpaqa/util/not-implemented.hpp>
 
 #include <casadi/core/external.hpp>
 
@@ -64,7 +65,7 @@ struct CasADiFunctionsWithParam {
 template <Config Conf>
 CasADiProblem<Conf>::CasADiProblem(const std::string &so_name, length_t n,
                                    length_t m, length_t p, bool second_order)
-    : Problem<Conf>{n, m} {
+    : BoxConstrProblem<Conf>{n, m} {
     using namespace casadi_loader;
     auto load_g_unknown_dims =
         [&]() -> std::optional<CasADiFunctionEvaluator<Conf, 2, 1>> {
@@ -123,6 +124,10 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name, length_t n,
     this->n     = n;
     this->m     = m;
     this->param = vec::Constant(p, alpaqa::NaN<Conf>);
+    this->C     = {vec::Constant(n, +alpaqa::inf<Conf>),
+                   vec::Constant(n, -alpaqa::inf<Conf>)};
+    this->D     = {vec::Constant(m, +alpaqa::inf<Conf>),
+                   vec::Constant(m, -alpaqa::inf<Conf>)};
 
     impl = std::make_unique<CasADiFunctionsWithParam<Conf>>(
         CasADiFunctionsWithParam<Conf>{
@@ -158,11 +163,14 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name, length_t n,
 
 template <Config Conf>
 CasADiProblem<Conf>::CasADiProblem(const CasADiProblem &o)
-    : Problem<config_t>{o}, impl(std::make_unique<Functions>(*o.impl)) {}
+    : BoxConstrProblem<config_t>{o}, param{o.param},
+      impl(o.impl ? std::make_unique<Functions>(*o.impl) : nullptr) {}
+// Note: impl can be null if the CasADiProblem was moved from
 template <Config Conf>
 CasADiProblem<Conf> &CasADiProblem<Conf>::operator=(const CasADiProblem &o) {
-    Problem<config_t>::operator=(o);
-    this->impl = std::make_unique<Functions>(*o.impl);
+    BoxConstrProblem<config_t>::operator=(o);
+    this->param = std::move(o.param);
+    this->impl  = o.impl ? std::make_unique<Functions>(*o.impl) : nullptr;
     return *this;
 }
 
@@ -175,20 +183,15 @@ template <Config Conf>
 CasADiProblem<Conf>::~CasADiProblem() = default;
 
 template <Config Conf>
-std::unique_ptr<ProblemBase<Conf>> CasADiProblem<Conf>::clone() const & {
-    return std::make_unique<CasADiProblem>(*this);
-}
-template <Config Conf>
-std::unique_ptr<ProblemBase<Conf>> CasADiProblem<Conf>::clone() && {
-    return std::make_unique<CasADiProblem>(std::move(*this));
-}
-
-template <Config Conf>
-typename CasADiProblem<Conf>::real_t
-CasADiProblem<Conf>::eval_f(crvec x) const {
+auto CasADiProblem<Conf>::eval_f(crvec x) const -> real_t {
     real_t f;
     impl->f({x.data(), param.data()}, {&f});
     return f;
+}
+
+template <Config Conf>
+void CasADiProblem<Conf>::eval_grad_f(crvec, rvec) const {
+    throw not_implemented_error("CasADiProblem::eval_grad_f"); // TODO
 }
 
 template <Config Conf>
@@ -196,7 +199,12 @@ void CasADiProblem<Conf>::eval_g(crvec x, rvec g) const {
     if (impl->constr)
         impl->constr->g({x.data(), param.data()}, {g.data()});
     else
-        throw std::logic_error("No constraints function g");
+        throw std::logic_error("No constraints function g"); // TODO
+}
+
+template <Config Conf>
+void CasADiProblem<Conf>::eval_grad_g_prod(crvec, crvec, rvec) const {
+    throw not_implemented_error("CasADiProblem::eval_grad_g_prod"); // TODO
 }
 
 template <Config Conf>
@@ -204,14 +212,14 @@ void CasADiProblem<Conf>::eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ,
                                       rvec, rvec) const {
 #if 0
     impl->grad_ψ({x.data(), param.data(), y.data(), Σ.data(),
-                    D.lowerbound.data(), D.upperbound.data()},
-                   {grad_ψ.data()});
+                  this->D.lowerbound.data(), this->D.upperbound.data()},
+                 {grad_ψ.data()});
 #else
     // This seems to be faster than having a specialized function. Possibly
     // cache-related?
     real_t ψ;
     impl->ψ_grad_ψ({x.data(), param.data(), y.data(), Σ.data(),
-                    D.lowerbound.data(), D.upperbound.data()},
+                    this->D.lowerbound.data(), this->D.upperbound.data()},
                    {&ψ, grad_ψ.data()});
 #endif
 }
@@ -222,7 +230,7 @@ CasADiProblem<Conf>::eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, r
                                    rvec) const {
     real_t ψ;
     impl->ψ_grad_ψ({x.data(), param.data(), y.data(), Σ.data(),
-                    D.lowerbound.data(), D.upperbound.data()},
+                    this->D.lowerbound.data(), this->D.upperbound.data()},
                    {&ψ, grad_ψ.data()});
     return ψ;
 }
@@ -239,11 +247,11 @@ void CasADiProblem<Conf>::eval_grad_L(crvec x, crvec y, rvec grad_L,
 
 template <Config Conf>
 typename CasADiProblem<Conf>::real_t
-CasADiProblem<Conf>::eval_ψ_ŷ(crvec x, crvec y, crvec Σ, rvec ŷ) const {
+CasADiProblem<Conf>::eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const {
     real_t ψ;
     if (impl->constr)
         impl->constr->ψ({x.data(), param.data(), y.data(), Σ.data(),
-                         D.lowerbound.data(), D.upperbound.data()},
+                         this->D.lowerbound.data(), this->D.upperbound.data()},
                         {&ψ, ŷ.data()});
     else
         impl->f({x.data(), param.data()}, {&ψ});
@@ -253,7 +261,7 @@ CasADiProblem<Conf>::eval_ψ_ŷ(crvec x, crvec y, crvec Σ, rvec ŷ) const {
 template <Config Conf>
 void CasADiProblem<Conf>::eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ,
                                              rvec) const {
-    if (m == 0) {
+    if (this->m == 0) {
         real_t ψ;
         impl->ψ_grad_ψ(
             {x.data(), param.data(), nullptr, nullptr, nullptr, nullptr},
@@ -262,6 +270,35 @@ void CasADiProblem<Conf>::eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ,
         impl->constr->grad_L({x.data(), param.data(), ŷ.data()},
                              {grad_ψ.data()});
     }
+}
+
+template <Config Conf>
+void CasADiProblem<Conf>::eval_grad_gi(crvec, index_t, rvec) const {
+    throw not_implemented_error("CasADiProblem::eval_grad_gi"); // TODO
+}
+
+template <Config Conf>
+void CasADiProblem<Conf>::eval_hess_L_prod(crvec x, crvec y, crvec v,
+                                           rvec Hv) const {
+    impl->hess->hess_L_prod({x.data(), param.data(), y.data(), v.data()},
+                            {Hv.data()});
+}
+template <Config Conf>
+void CasADiProblem<Conf>::eval_hess_L(crvec x, crvec y, rmat H) const {
+    impl->hess->hess_L({x.data(), param.data(), y.data()}, {H.data()});
+}
+
+template <Config Conf>
+bool CasADiProblem<Conf>::provides_eval_grad_gi() const {
+    return false; // TODO
+}
+template <Config Conf>
+bool CasADiProblem<Conf>::provides_eval_hess_L_prod() const {
+    return impl->hess.has_value();
+}
+template <Config Conf>
+bool CasADiProblem<Conf>::provides_eval_hess_L() const {
+    return impl->hess.has_value();
 }
 
 template <Config Conf>

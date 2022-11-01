@@ -6,7 +6,7 @@
 #include <alpaqa/inner/internal/panoc-helpers.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
 #include <alpaqa/inner/internal/solverstatus.hpp>
-#include <alpaqa/problem/problem.hpp>
+#include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/atomic-stop-signal.hpp>
 
 #include <chrono>
@@ -87,7 +87,7 @@ struct PANOCProgressInfo {
     real_t ε;
     crvec Σ;
     crvec y;
-    const ProblemBase<config_t> &problem;
+    const TypeErasedProblem<config_t> &problem;
     const PANOCParams<config_t> &params;
 };
 
@@ -98,7 +98,7 @@ class PANOCSolver {
   public:
     USING_ALPAQA_CONFIG_TEMPLATE(DirectionProviderT::config_t);
 
-    using Problem           = alpaqa::ProblemBase<config_t>;
+    using Problem           = TypeErasedProblem<config_t>;
     using Params            = PANOCParams<config_t>;
     using DirectionProvider = DirectionProviderT;
     using Direction         = PANOCDirection<DirectionProvider>;

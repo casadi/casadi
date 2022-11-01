@@ -183,7 +183,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
     // Wrappers for helper functions that automatically pass along any arguments
     // that are constant within PANOC (for readability in the main algorithm)
     auto calc_ψ_ŷ = [&problem, &y, &Σ](crvec x, rvec ŷ) {
-        return problem.eval_ψ_ŷ(x, y, Σ, ŷ);
+        return problem.eval_ψ(x, y, Σ, ŷ);
     };
     auto calc_ψ_grad_ψ = [&problem, &y, &Σ, &work_n, &work_m](crvec x,
                                                               rvec grad_ψ) {
