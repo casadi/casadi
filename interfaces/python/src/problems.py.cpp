@@ -142,7 +142,7 @@ void register_problems(py::module_ &m) {
 
         // clang-format off
         void eval_proj_diff_g(crvec z, rvec p) const { o.attr("eval_proj_diff_g")(z, p); }
-        void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { std::puts("py proj mult"); o.attr("eval_proj_multipliers")(y, M, penalty_alm_split); }
+        void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { o.attr("eval_proj_multipliers")(y, M, penalty_alm_split); }
         void eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { o.attr("eval_prox_grad_step")(γ, x, grad_ψ, x̂, p); }
         real_t eval_f(crvec x) const { return py::cast<real_t>(o.attr("eval_f")(x)); }
         void eval_grad_f(crvec x, rvec grad_fx) const { o.attr("eval_grad_f")(x, grad_fx); }
@@ -378,19 +378,28 @@ void register_problems(py::module_ &m) {
                     return std::make_tuple(std::move(ψ), std::move(grad_ψ));
                 },
                 "x"_a, "y"_a, "Σ"_a)
+            .def_property(
+                "param", [](CasADiProblem &p) -> rvec { return p.param; },
+                [](CasADiProblem &p, crvec param) {
+                    if (param.size() != p.param.size())
+                        throw std::invalid_argument("Invalid parameter dimension: got " +
+                                                    std::to_string(param.size()) + ", should be " +
+                                                    std::to_string(p.param.size()) + ".");
+                    p.param = param;
+                },
+                "Parameter vector :math:`p` of the problem");
 #endif
-            ;
+        ;
 
 #ifdef ALPAQA_HAVE_CASADI
-        te_problem.def(py::init(
-            [](const CasADiProblem &p) { return TEProblem::template make<CasADiProblem>(p); }));
+        te_problem.def(py::init<const CasADiProblem &>());
+        py::implicitly_convertible<CasADiProblem, TEProblem>();
 #endif
 
         m.def("load_casadi_problem", load_CasADi_problem, "so_name"_a, "n"_a = 0, "m"_a = 0,
               "p"_a = 0, "second_order"_a = false, "Load a compiled CasADi problem.\n\n");
 
         static constexpr auto te_pwc = []<class P>(P &&p) {
-            std::puts(__PRETTY_FUNCTION__);
             using PwC = alpaqa::ProblemWithCounters<std::remove_cvref_t<P>>;
             auto te_p = TEProblem::template make<PwC>(std::forward<P>(p));
             auto eval = te_p.template as<PwC>().evaluations;
