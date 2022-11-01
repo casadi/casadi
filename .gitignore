@@ -1,7 +1,21 @@
+# Temporary build and cache folders
 build
 .*cache
-py*-venv
 __pycache__
+
+# Virtual environments
+py*-venv*
+
+# Python distribution and building
 dist
 wheelhouse
+python-cross-staging
+*.py-build-cmake.config.toml
+
+# Compiled or generated files
 *.mod
+*.o
+*.a
+*.so
+a.out
+dynamics.c
