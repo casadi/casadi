@@ -1,7 +1,7 @@
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/outer/alm.hpp>
-#include <alpaqa/problem/wrapped-problem-with-counters.hpp>
+#include <alpaqa/problem/type-erased-problem.hpp>
 
 #include <alpaqa/interop/casadi/CasADiLoader.hpp>
 
@@ -21,13 +21,13 @@ int main(int argc, char *argv[]) {
     std::cout << "Loading " << so_name << std::endl;
 
     // Load the problem (with 3 decision variables and 1 general constraint)
-    auto p = alpaqa::CasADiProblem<config_t>(so_name.string(), 3, 1);
+    auto problem = alpaqa::CasADiProblem<config_t>(so_name.string(), 3, 1);
 
     // Specify the bounds
-    p.C.upperbound = vec::Constant(3, alpaqa::inf<config_t>);
-    p.C.lowerbound = vec::Constant(3, -alpaqa::inf<config_t>);
-    p.D.upperbound = vec::Constant(1, 0.);
-    p.D.lowerbound = vec::Constant(1, 0.);
+    problem.C.upperbound = vec::Constant(3, alpaqa::inf<config_t>);
+    problem.C.lowerbound = vec::Constant(3, -alpaqa::inf<config_t>);
+    problem.D.upperbound = vec::Constant(1, 0.);
+    problem.D.lowerbound = vec::Constant(1, 0.);
 
     // Define the solvers to use
     using Accelerator = alpaqa::LBFGS<config_t>;
@@ -63,24 +63,26 @@ int main(int argc, char *argv[]) {
     y << 1;
 
     // Parameter
-    p.param(0) = 100;
+    problem.param(0) = 100;
 
-    // Evaluation counters
-    auto pc = alpaqa::with_counters(p);
+    // Wrap the problem to count the function evaluations
+    auto counted_problem = alpaqa::problem_with_counters_ref(problem);
 
     // Solve the problem
-    auto stats = solver(pc, y, x);
+    auto stats = solver(counted_problem, y, x);
 
     // Print the results
-    vec g(p.m);
-    p.eval_g(x, g);
-    std::cout << "status: " << stats.status << std::endl;
-    std::cout << "x = " << x.transpose() << std::endl;
-    std::cout << "y = " << y.transpose() << std::endl;
-    std::cout << "g = " << g.transpose() << std::endl;
-    std::cout << "f = " << p.eval_f(x) << std::endl;
-    std::cout << "inner: " << stats.inner.iterations << std::endl;
-    std::cout << "outer: " << stats.outer_iterations << std::endl << std::endl;
-
-    std::cout << pc.evaluations << std::endl;
+    std::cout << '\n' << *counted_problem.evaluations << '\n';
+    vec g(problem.m);
+    problem.eval_g(x, g);
+    std::cout << "status: " << stats.status << '\n'
+              << "x = " << x.transpose() << '\n'
+              << "y = " << y.transpose() << '\n'
+              << "f = " << problem.eval_f(x) << '\n'
+              << "g = " << g.transpose() << '\n'
+              << "ε = " << stats.ε << '\n'
+              << "δ = " << stats.δ << '\n'
+              << "inner: " << stats.inner.iterations << '\n'
+              << "outer: " << stats.outer_iterations << '\n'
+              << std::endl;
 }

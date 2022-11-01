@@ -1,4 +1,4 @@
-add_subdirectory(LambdaProblem)
+add_subdirectory(CustomCppProblem)
 
 include(CheckLanguage)
 check_language(Fortran)

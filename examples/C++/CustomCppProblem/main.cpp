@@ -3,45 +3,51 @@
 
 #include <iostream>
 
-// Double precision, same as in Fortran
-USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
-
-// External Fortran routines
-extern "C" {
-int64_t problem_get_num_vars(void);
-int64_t problem_get_num_constr(void);
-double problem_eval_f(const double *);
-void problem_eval_grad_f(const double *, double *);
-void problem_eval_g(const double *, double *);
-void problem_eval_grad_g_prod(const double *, const double *, double *);
-}
-
-// Problem specification by inheriting from alpaqa::Problem
-struct FortranProblem : alpaqa::BoxConstrProblem<config_t> {
-    using alpaqa::BoxConstrProblem<config_t>::BoxConstrProblem;
-
-    real_t eval_f(crvec x) const { return problem_eval_f(x.data()); }
-    void eval_grad_f(crvec x, rvec fx) const {
-        problem_eval_grad_f(x.data(), fx.data());
-    }
-    void eval_g(crvec x, rvec gx) const { problem_eval_g(x.data(), gx.data()); }
-    void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const {
-        problem_eval_grad_g_prod(x.data(), y.data(), grad_gxy.data());
-    }
-};
-
 int main() {
-    // Instantiate a problem
-    FortranProblem problem{problem_get_num_vars(), problem_get_num_constr()};
+    USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
+
+    // Problem specification
+    // minimize  ½ xᵀQx
+    //  s.t.     Ax ≤ b
+    struct Problem : alpaqa::BoxConstrProblem<config_t> {
+        mat Q{n, n};
+        mat A{m, n};
+        vec b{m};
+        mutable vec Qx{n};
+
+        Problem() : alpaqa::BoxConstrProblem<config_t>{2, 1} {
+            // Initialize problem matrices
+            Q << 3, -1, -1, 3;
+            A << 2, 1;
+            b << -1;
+
+            // Specify the bounds
+            C.lowerbound = vec::Constant(n, -alpaqa::inf<config_t>);
+            C.upperbound = vec::Constant(n, +alpaqa::inf<config_t>);
+            D.lowerbound = vec::Constant(m, -alpaqa::inf<config_t>);
+            D.upperbound = b;
+        }
+
+        // Evaluate the cost
+        real_t eval_f(crvec x) const {
+            Qx.noalias() = Q * x;
+            return 0.5 * x.dot(Qx);
+        }
+        // Evaluat the gradient of the cost
+        void eval_grad_f(crvec x, rvec gr) const { gr.noalias() = Q * x; }
+        // Evaluate the constraints
+        void eval_g(crvec x, rvec g) const { g.noalias() = A * x; }
+        // Evaluate a matrix-vector product with the gradient of the constraints
+        void eval_grad_g_prod(crvec x, crvec y, rvec gr) const {
+            (void)x;
+            gr.noalias() = A.transpose() * y;
+        }
+    };
+
+    Problem problem;
+
     // Wrap the problem to count the function evaluations
     auto counted_problem = alpaqa::problem_with_counters_ref(problem);
-
-    // Specify the bounds
-    vec b                = vec::Constant(problem.m, -1);
-    problem.C.lowerbound = vec::Constant(problem.n, -alpaqa::inf<config_t>);
-    problem.C.upperbound = vec::Constant(problem.n, +alpaqa::inf<config_t>);
-    problem.D.lowerbound = vec::Constant(problem.m, -alpaqa::inf<config_t>);
-    problem.D.upperbound = b;
 
     // Define the solvers to use
     using Accelerator = alpaqa::LBFGS<config_t>;
@@ -59,7 +65,7 @@ int main() {
     // Settings for the inner PANOC solver
     InnerSolver::Params panocparam;
     panocparam.max_iter       = 500;
-    panocparam.print_interval = 10;
+    panocparam.print_interval = 1;
     // Settings for the L-BFGS algorithm used by PANOC
     Accelerator::Params lbfgsparam;
     lbfgsparam.memory = 2;
