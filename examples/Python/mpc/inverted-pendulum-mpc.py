@@ -16,7 +16,7 @@ F = cs.SX.sym("F")  # External force applied to the cart [N]
 nu = F.shape[0]  # Number of inputs
 
 # Parameters
-F_max = 2  #        Maximum force applied to cart        [N]
+F_max = 2  #        Maximum force applied to the cart    [N]
 m_cart = 0.8  #     Mass of the cart                     [kg]
 m_pend = 0.3  #     Mass of the pendulum                 [kg]
 b_cart = 0.1  #     Friction coefficient of the cart     [N/m/s]
