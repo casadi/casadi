@@ -40,12 +40,17 @@ struct TestReqProblem {
 
     // clang-format off
     MOCK_METHOD(void, eval_proj_diff_g, (crvec g, rvec p), (const));
+    MOCK_METHOD(void, eval_proj_multipliers, (rvec y, real_t M, index_t penalty_alm_split), (const));
     MOCK_METHOD(void, eval_prox_grad_step, (real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p), (const));
     MOCK_METHOD(real_t, eval_f, (crvec x), (const));
     MOCK_METHOD(void, eval_grad_f, (crvec x, rvec grad_fx), (const));
     MOCK_METHOD(void, eval_g, (crvec x, rvec gx), (const));
     MOCK_METHOD(void, eval_grad_g_prod, (crvec x, crvec y, rvec grad_gxy), (const));
+    MOCK_METHOD(void, check, (), (const));
     // clang-format on
+
+    length_t get_n() const { return 0; }
+    length_t get_m() const { return 0; }
 };
 
 TEST(TypeErasedProblem, RequiredProblem) {
@@ -55,6 +60,10 @@ TEST(TypeErasedProblem, RequiredProblem) {
 
     EXPECT_CALL(te_prob.as<TestReqProblem>(), eval_proj_diff_g);
     te_prob.vtable.eval_proj_diff_g(te_prob.self, x, x);
+    testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestReqProblem>());
+
+    EXPECT_CALL(te_prob.as<TestReqProblem>(), eval_proj_multipliers);
+    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0, 0);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestReqProblem>());
 
     EXPECT_CALL(te_prob.as<TestReqProblem>(), eval_prox_grad_step);
@@ -94,7 +103,7 @@ TEST(TypeErasedProblem, RequiredProblem) {
 
     // Defaults for Lagrangians
     EXPECT_EQ(te_prob.vtable.eval_grad_L, te_prob.vtable.default_eval_grad_L);
-    EXPECT_EQ(te_prob.vtable.eval_ψ_ŷ, te_prob.vtable.default_eval_ψ_ŷ);
+    EXPECT_EQ(te_prob.vtable.eval_ψ, te_prob.vtable.default_eval_ψ);
     EXPECT_EQ(te_prob.vtable.eval_grad_ψ_from_ŷ,
               te_prob.vtable.default_eval_grad_ψ_from_ŷ);
     EXPECT_EQ(te_prob.vtable.eval_grad_ψ, te_prob.vtable.default_eval_grad_ψ);
@@ -118,7 +127,7 @@ struct TestOptProblem : TestReqProblem {
     MOCK_METHOD(real_t, eval_f_grad_f_g, (crvec x, rvec grad_fx, rvec g), (const));
     MOCK_METHOD(void, eval_grad_f_grad_g_prod, (crvec x, crvec y, rvec grad_f, rvec grad_gxy), (const));
     MOCK_METHOD(void, eval_grad_L, (crvec x, crvec y, rvec grad_L, rvec work_n), (const));
-    MOCK_METHOD(real_t, eval_ψ_ŷ, (crvec x, crvec y, crvec Σ, rvec ŷ), (const));
+    MOCK_METHOD(real_t, eval_ψ, (crvec x, crvec y, crvec Σ, rvec ŷ), (const));
     MOCK_METHOD(void, eval_grad_ψ_from_ŷ, (crvec x, crvec ŷ, rvec grad_ψ, rvec work_n), (const));
     MOCK_METHOD(void, eval_grad_ψ, (crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m), (const));
     MOCK_METHOD(real_t, eval_ψ_grad_ψ, (crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m), (const));
@@ -134,6 +143,11 @@ TEST(TypeErasedProblem, OptionalProblem) {
     ASSERT_NE(te_prob.vtable.eval_proj_diff_g, nullptr);
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_proj_diff_g);
     te_prob.vtable.eval_proj_diff_g(te_prob.self, x, x);
+    testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
+
+    ASSERT_NE(te_prob.vtable.eval_proj_multipliers, nullptr);
+    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_proj_multipliers);
+    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0, 0);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     ASSERT_NE(te_prob.vtable.eval_prox_grad_step, nullptr);
@@ -202,9 +216,9 @@ TEST(TypeErasedProblem, OptionalProblem) {
     te_prob.vtable.eval_grad_L(te_prob.self, x, x, x, x, te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
-    ASSERT_NE(te_prob.vtable.eval_ψ_ŷ, nullptr);
-    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_ψ_ŷ);
-    te_prob.vtable.eval_ψ_ŷ(te_prob.self, x, x, x, x, te_prob.vtable);
+    ASSERT_NE(te_prob.vtable.eval_ψ, nullptr);
+    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_ψ);
+    te_prob.vtable.eval_ψ(te_prob.self, x, x, x, x, te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     ASSERT_NE(te_prob.vtable.eval_grad_ψ_from_ŷ, nullptr);
@@ -229,7 +243,7 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     using Problem = alpaqa::ProblemWithCounters<TestOptProblem &>;
     TestOptProblem prob;
     auto te_prob = alpaqa::TestTypeErasedProblem<>::make<Problem>(prob);
-    auto &evals  = te_prob.as<Problem>().evaluations;
+    auto &evals  = *te_prob.as<Problem>().evaluations;
     vec x;
     mat H;
 
@@ -239,7 +253,13 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     te_prob.vtable.eval_proj_diff_g(te_prob.self, x, x);
     testing::Mock::VerifyAndClearExpectations(&prob);
     EXPECT_EQ(evals.proj_diff_g, 1);
-    std::cout << evals.time.proj_diff_g.count() << std::endl;
+
+    EXPECT_EQ(evals.proj_multipliers, 0);
+    ASSERT_NE(te_prob.vtable.eval_proj_multipliers, nullptr);
+    EXPECT_CALL(prob, eval_proj_multipliers);
+    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0, 0);
+    testing::Mock::VerifyAndClearExpectations(&prob);
+    EXPECT_EQ(evals.proj_multipliers, 1);
 
     EXPECT_EQ(evals.prox_grad_step, 0);
     ASSERT_NE(te_prob.vtable.eval_prox_grad_step, nullptr);
@@ -333,12 +353,12 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     testing::Mock::VerifyAndClearExpectations(&prob);
     EXPECT_EQ(evals.grad_L, 1);
 
-    EXPECT_EQ(evals.ψ_ŷ, 0);
-    ASSERT_NE(te_prob.vtable.eval_ψ_ŷ, nullptr);
-    EXPECT_CALL(prob, eval_ψ_ŷ);
-    te_prob.vtable.eval_ψ_ŷ(te_prob.self, x, x, x, x, te_prob.vtable);
+    EXPECT_EQ(evals.ψ, 0);
+    ASSERT_NE(te_prob.vtable.eval_ψ, nullptr);
+    EXPECT_CALL(prob, eval_ψ);
+    te_prob.vtable.eval_ψ(te_prob.self, x, x, x, x, te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&prob);
-    EXPECT_EQ(evals.ψ_ŷ, 1);
+    EXPECT_EQ(evals.ψ, 1);
 
     EXPECT_EQ(evals.grad_ψ_from_ŷ, 0);
     ASSERT_NE(te_prob.vtable.eval_grad_ψ_from_ŷ, nullptr);
@@ -394,7 +414,7 @@ struct TestOptProblemNoPsi : TestOptProblem {
     TestOptProblemNoPsi(TestOptProblemNoPsi &&)      = default;
 
     bool provides_eval_grad_L() { return true; }
-    bool provides_eval_ψ_ŷ() { return false; }
+    bool provides_eval_ψ() { return false; }
     bool provides_eval_ψ_grad_ψ() { return false; }
 };
 
@@ -403,7 +423,7 @@ TEST(TypeErasedProblem, providesNoPsi) {
     auto te_prob = alpaqa::TestTypeErasedProblem<>::make<TestOptProblemNoPsi>();
 
     EXPECT_NE(te_prob.vtable.eval_grad_L, te_prob.vtable.default_eval_grad_L);
-    EXPECT_EQ(te_prob.vtable.eval_ψ_ŷ, te_prob.vtable.default_eval_ψ_ŷ);
+    EXPECT_EQ(te_prob.vtable.eval_ψ, te_prob.vtable.default_eval_ψ);
     EXPECT_EQ(te_prob.vtable.eval_ψ_grad_ψ,
               te_prob.vtable.default_eval_ψ_grad_ψ);
 }
@@ -416,6 +436,10 @@ TEST(TypeErasedProblem, TEOptionalProblem) {
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_proj_diff_g);
     te_prob.eval_proj_diff_g(x, x);
+    testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
+
+    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_proj_multipliers);
+    te_prob.eval_proj_multipliers(x, 0, 0);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_prox_grad_step);
@@ -470,8 +494,8 @@ TEST(TypeErasedProblem, TEOptionalProblem) {
     te_prob.eval_grad_L(x, x, x, x);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
-    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_ψ_ŷ);
-    te_prob.eval_ψ_ŷ(x, x, x, x);
+    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_ψ);
+    te_prob.eval_ψ(x, x, x, x);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_grad_ψ_from_ŷ);
