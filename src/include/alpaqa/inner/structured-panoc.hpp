@@ -6,7 +6,7 @@
 #include <alpaqa/inner/internal/panoc-helpers.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
 #include <alpaqa/inner/internal/solverstatus.hpp>
-#include <alpaqa/problem/problem.hpp>
+#include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/atomic-stop-signal.hpp>
 
 #include <chrono>
@@ -104,7 +104,7 @@ struct StructuredPANOCLBFGSProgressInfo {
     real_t ε;
     crvec Σ;
     crvec y;
-    const ProblemBase<config_t> &problem;
+    const TypeErasedProblem<config_t> &problem;
     const StructuredPANOCLBFGSParams<config_t> &params;
 };
 
@@ -115,7 +115,7 @@ class StructuredPANOCLBFGSSolver {
   public:
     USING_ALPAQA_CONFIG(Conf);
 
-    using Problem      = alpaqa::ProblemBase<config_t>;
+    using Problem      = TypeErasedProblem<config_t>;
     using Params       = StructuredPANOCLBFGSParams<config_t>;
     using Stats        = StructuredPANOCLBFGSStats<config_t>;
     using ProgressInfo = StructuredPANOCLBFGSProgressInfo<config_t>;

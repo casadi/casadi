@@ -54,17 +54,20 @@ void StructuredPANOCLBFGSSolver<Conf>::compute_quasi_newton_step(
     ///         Dimension m
     rvec work_m) {
 
-    auto n = problem.n, m = problem.m;
+    auto n  = problem.get_n();
+    auto m  = problem.get_m();
     auto un = static_cast<std::make_unsigned_t<decltype(n)>>(n);
     J.clear();
+    const auto &C = problem.get_box_C();
+    const auto &D = problem.get_box_D();
     // Find inactive indices J
     for (index_t i = 0; i < n; ++i) {
         real_t gd = xₖ(i) - γₖ * grad_ψₖ(i);
-        if (gd <= problem.get_C().lowerbound(i)) {        // i ∊ J̲ ⊆ K
-            qₖ(i) = pₖ(i);                                //
-        } else if (problem.get_C().upperbound(i) <= gd) { // i ∊ J̅ ⊆ K
-            qₖ(i) = pₖ(i);                                //
-        } else {                                          // i ∊ J
+        if (gd <= C.lowerbound(i)) {        // i ∊ J̲ ⊆ K
+            qₖ(i) = pₖ(i);                  //
+        } else if (C.upperbound(i) <= gd) { // i ∊ J̅ ⊆ K
+            qₖ(i) = pₖ(i);                  //
+        } else {                            // i ∊ J
             J.push_back(i);
             qₖ(i) = params.hessian_vec ? 0 : -grad_ψₖ(i);
         }
@@ -84,9 +87,9 @@ void StructuredPANOCLBFGSSolver<Conf>::compute_quasi_newton_step(
                     auto &g = work_m;
                     problem.eval_g(xₖ, g);
                     for (index_t i = 0; i < m; ++i) {
-                        real_t ζ      = g(i) + y(i) / Σ(i);
-                        bool inactive = problem.get_D().lowerbound(i) < ζ &&
-                                        ζ < problem.get_D().upperbound(i);
+                        real_t ζ = g(i) + y(i) / Σ(i);
+                        bool inactive =
+                            D.lowerbound(i) < ζ && ζ < D.upperbound(i);
                         if (not inactive) {
                             problem.eval_grad_gi(xₖ, i, work_n);
                             auto t = Σ(i) * work_n.dot(qₖ);
@@ -142,8 +145,8 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
-    const auto n = problem.n;
-    const auto m = problem.m;
+    const auto n = problem.get_n();
+    const auto m = problem.get_m();
 
     // Allocate vectors, init L-BFGS -------------------------------------------
 
@@ -194,10 +197,13 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
         problem.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work_n);
     };
     auto calc_x̂ = [&problem](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
-        Helpers::calc_x̂(problem.get_C(), γ, x, grad_ψ, x̂, p);
+        problem.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
     };
-    auto proj_grad_step = [&problem](real_t γ, crvec x, crvec grad_ψ) {
-        return Helpers::projected_gradient_step(problem.get_C(), γ, x, grad_ψ);
+    auto proj_grad_step = [&problem, &work_n, &work_n2](real_t γ, crvec x,
+                                                        crvec grad_ψ) -> rvec {
+        // TODO: can be optimized
+        problem.eval_prox_grad_step(γ, x, grad_ψ, work_n, work_n2);
+        return work_n2;
     };
     auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
         Helpers::calc_err_z(problem, x̂, y, Σ, err_z);
@@ -345,9 +351,9 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
             calc_grad_ψ_from_ŷ(x̂ₖ, ŷx̂ₖ, /* in ⟹ out */ grad_̂ψₖ);
 
         // Check stop condition ------------------------------------------------
-        real_t εₖ =
-            Helpers::calc_error_stop_crit(problem.get_C(), params.stop_crit, pₖ,
-                                          γₖ, xₖ, x̂ₖ, ŷx̂ₖ, grad_ψₖ, grad_̂ψₖ);
+        real_t εₖ = Helpers::calc_error_stop_crit(problem, params.stop_crit, pₖ,
+                                                  γₖ, xₖ, x̂ₖ, ŷx̂ₖ, grad_ψₖ,
+                                                  grad_̂ψₖ, work_n, work_n2);
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)

@@ -1,6 +1,6 @@
 #include <alpaqa/panoc-alm.hpp>
-// #include <alpaqa/structured-panoc-alm.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
+#include <alpaqa/structured-panoc-alm.hpp>
 
 #include <test-util/eigen-matchers.hpp>
 
@@ -305,129 +305,128 @@ TEST(ALM, multipleshooting8D) {
     EXPECT_THAT(y, EigenAlmostEqual(y_ref, ε));
 }
 
-// TEST(ALM, multipleshooting8Dstructured) {
-//     USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
-//     using namespace alpaqa;
+TEST(ALM, multipleshooting8Dstructured) {
+    USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
+    using namespace alpaqa;
 
-//     length_t nx = 8, nu = 8;
-//     length_t n = nu + nx;
-//     length_t m = nx;
+    length_t nx = 8, nu = 8;
+    length_t n = nu + nx;
+    length_t m = nx;
 
-//     Box<config_t> C{vec(n), vec(n)};
-//     C.lowerbound.topRows(nu).fill(-1);
-//     C.lowerbound.bottomRows(nx).fill(-inf<config_t>);
-//     C.upperbound.topRows(nu).fill(1);
-//     C.upperbound.bottomRows(nx).fill(inf<config_t>);
-//     Box<config_t> D{vec(m), vec(m)};
-//     D.lowerbound.fill(0);
-//     D.upperbound.fill(0);
+    Box<config_t> C{vec(n), vec(n)};
+    C.lowerbound.topRows(nu).fill(-1);
+    C.lowerbound.bottomRows(nx).fill(-inf<config_t>);
+    C.upperbound.topRows(nu).fill(1);
+    C.upperbound.bottomRows(nx).fill(inf<config_t>);
+    Box<config_t> D{vec(m), vec(m)};
+    D.lowerbound.fill(0);
+    D.upperbound.fill(0);
 
-// #include "matrices/test-alm.mat.ipp"
+#include "matrices/test-alm.mat.ipp"
 
-//     using Diag = Eigen::DiagonalMatrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
+    using Diag = Eigen::DiagonalMatrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
-//     auto Q = Diag(nx);
-//     Q.diagonal().fill(10);
-//     auto R = Diag(nu);
-//     R.diagonal().fill(1);
+    auto Q = Diag(nx);
+    Q.diagonal().fill(10);
+    auto R = Diag(nu);
+    R.diagonal().fill(1);
 
-//     auto x0 = vec(nx);
-//     x0.fill(1);
+    auto x0 = vec(nx);
+    x0.fill(1);
 
-//     auto f = [&](crvec ux) {
-//         auto u = ux.topRows(nu);
-//         auto x = ux.bottomRows(nx);
-//         return x.dot(Q * x) + u.dot(R * u);
-//     };
-//     auto grad_f = [&](crvec ux, rvec grad_f) {
-//         auto u                = ux.topRows(nu);
-//         auto x                = ux.bottomRows(nx);
-//         grad_f.topRows(nu)    = 2 * (R * u);
-//         grad_f.bottomRows(nx) = 2 * (Q * x);
-//     };
-//     auto g = [&](crvec ux, rvec g_u) {
-//         auto u         = ux.topRows(nu);
-//         auto x         = ux.bottomRows(nx);
-//         g_u.topRows(m) = A * x0 + B * u - x;
-//     };
-//     auto grad_g = [&](crvec ux, crvec v, rvec grad_u_v) {
-//         (void)ux;
-//         grad_u_v.topRows(nu)    = v.transpose() * B;
-//         grad_u_v.bottomRows(nx) = -mat::Identity(nx, nx) * v;
-//     };
+    auto f = [&](crvec ux) {
+        auto u = ux.topRows(nu);
+        auto x = ux.bottomRows(nx);
+        return x.dot(Q * x) + u.dot(R * u);
+    };
+    auto grad_f = [&](crvec ux, rvec grad_f) {
+        auto u                = ux.topRows(nu);
+        auto x                = ux.bottomRows(nx);
+        grad_f.topRows(nu)    = 2 * (R * u);
+        grad_f.bottomRows(nx) = 2 * (Q * x);
+    };
+    auto g = [&](crvec ux, rvec g_u) {
+        auto u         = ux.topRows(nu);
+        auto x         = ux.bottomRows(nx);
+        g_u.topRows(m) = A * x0 + B * u - x;
+    };
+    auto grad_g = [&](crvec ux, crvec v, rvec grad_u_v) {
+        (void)ux;
+        grad_u_v.topRows(nu)    = v.transpose() * B;
+        grad_u_v.bottomRows(nx) = -mat::Identity(nx, nx) * v;
+    };
 
-//     FunctionalProblem<config_t> p{n, m, C, D};
-//     p.f           = f;
-//     p.grad_f      = grad_f;
-//     p.g           = g;
-//     p.grad_g_prod = grad_g;
+    FunctionalProblem<config_t> p{C, D};
+    p.f           = f;
+    p.grad_f      = grad_f;
+    p.g           = g;
+    p.grad_g_prod = grad_g;
 
-//     using LBFGS = alpaqa::LBFGS<config_t>;
-//     using StructuredPANOCLBFGSSolver =
-//         alpaqa::StructuredPANOCLBFGSSolver<config_t>;
-//     using ALMSolver = alpaqa::ALMSolver<StructuredPANOCLBFGSSolver>;
+    using Accelerator = alpaqa::StructuredLBFGS<config_t>;
+    using InnerSolver = alpaqa::PANOCSolver<Accelerator>;
+    using ALMSolver   = alpaqa::ALMSolver<InnerSolver>;
 
-//     ALMSolver::Params almparam;
-//     almparam.ε        = 1e-4;
-//     almparam.δ        = 1e-4;
-//     almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
-//     almparam.Σ_0      = 1; ///< Initial penalty parameter
-//     almparam.ε_0      = 1e-4; ///< Initial tolerance on x
-//     almparam.θ        = 0.25;
-//     almparam.ρ        = 1e-1;
-//     almparam.M        = 1e9;
-//     almparam.Σ_max    = 1e9;
-//     almparam.max_iter = 20;
+    ALMSolver::Params almparam;
+    almparam.ε        = 1e-4;
+    almparam.δ        = 1e-4;
+    almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
+    almparam.Σ_0      = 1; ///< Initial penalty parameter
+    almparam.ε_0      = 1e-4; ///< Initial tolerance on x
+    almparam.θ        = 0.25;
+    almparam.ρ        = 1e-1;
+    almparam.M        = 1e9;
+    almparam.Σ_max    = 1e9;
+    almparam.max_iter = 20;
 
-//     StructuredPANOCLBFGSSolver::Params panocparam;
-//     panocparam.Lipschitz.ε = 1e-6;
-//     panocparam.Lipschitz.δ = 1e-12;
-//     panocparam.max_iter    = 200;
+    InnerSolver::Params panocparam;
+    panocparam.Lipschitz.ε = 1e-6;
+    panocparam.Lipschitz.δ = 1e-12;
+    panocparam.max_iter    = 200;
 
-//     LBFGS::Params lbfgsparam;
-//     lbfgsparam.memory = 10;
+    Accelerator::Params lbfgsparam;
+    lbfgsparam.memory = 10;
 
-//     ALMSolver solver{almparam, {panocparam, lbfgsparam}};
+    ALMSolver solver{almparam, {panocparam, lbfgsparam}};
 
-//     vec x(n);
-//     x.fill(5);
-//     vec y(m);
-//     y.fill(1);
+    vec x(n);
+    x.fill(5);
+    vec y(m);
+    y.fill(1);
 
-//     auto begin = std::chrono::high_resolution_clock::now();
-//     auto stats = solver(p, y, x);
-//     auto end   = std::chrono::high_resolution_clock::now();
+    auto begin = std::chrono::high_resolution_clock::now();
+    auto stats = solver(p, y, x);
+    auto end   = std::chrono::high_resolution_clock::now();
 
-//     std::cout << "u = " << x.topRows(nu).transpose() << std::endl;
-//     std::cout << "x = " << x.bottomRows(nx).transpose() << std::endl;
-//     std::cout << "y = " << y.transpose() << std::endl;
-//     std::cout << "f(x) = " << f(x) << std::endl;
-//     auto gx = vec(m);
-//     g(x, gx);
-//     std::cout << "g(x) = " << gx.transpose() << std::endl;
-//     std::cout << "Inner: " << stats.inner.iterations
-//               << ", Outer: " << stats.outer_iterations << std::endl;
+    std::cout << "u = " << x.topRows(nu).transpose() << std::endl;
+    std::cout << "x = " << x.bottomRows(nx).transpose() << std::endl;
+    std::cout << "y = " << y.transpose() << std::endl;
+    std::cout << "f(x) = " << f(x) << std::endl;
+    auto gx = vec(m);
+    g(x, gx);
+    std::cout << "g(x) = " << gx.transpose() << std::endl;
+    std::cout << "Inner: " << stats.inner.iterations
+              << ", Outer: " << stats.outer_iterations << std::endl;
 
-//     auto duration =
-//         std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
-//     std::cout << duration.count() << "µs" << std::endl;
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    std::cout << duration.count() << "µs" << std::endl;
 
-//     auto u  = x.topRows(nu);
-//     auto xs = x.bottomRows(nx);
-//     auto ε  = 6e-4;
+    auto u  = x.topRows(nu);
+    auto xs = x.bottomRows(nx);
+    auto ε  = 6e-4;
 
-//     // TODO: write matcher for Eigen vectors
-//     vec u_ref(nu);
-//     u_ref << -1, -1, -1, -1, -1, -0.878565, -0.719274, -0.999999;
-//     EXPECT_THAT(u, EigenAlmostEqual(u_ref, ε));
+    // TODO: write matcher for Eigen vectors
+    vec u_ref(nu);
+    u_ref << -1, -1, -1, -1, -1, -0.878565, -0.719274, -0.999999;
+    EXPECT_THAT(u, EigenAlmostEqual(u_ref, ε));
 
-//     vec xs_ref(nx);
-//     xs_ref << 0.312975, -1.14893, -0.03111, 1.69392, -0.11316, 1.60049,
-//         0.177012, 1.14043;
-//     EXPECT_THAT(xs, EigenAlmostEqual(xs_ref, ε));
+    vec xs_ref(nx);
+    xs_ref << 0.312975, -1.14893, -0.03111, 1.69392, -0.11316, 1.60049,
+        0.177012, 1.14043;
+    EXPECT_THAT(xs, EigenAlmostEqual(xs_ref, ε));
 
-//     vec y_ref(m);
-//     y_ref << 6.2595, -22.9787, -0.6222, 33.8783, -2.2632, 32.0098, 3.54023,
-//         22.8086;
-//     EXPECT_THAT(y, EigenAlmostEqual(y_ref, ε));
-// }
+    vec y_ref(m);
+    y_ref << 6.2595, -22.9787, -0.6222, 33.8783, -2.2632, 32.0098, 3.54023,
+        22.8086;
+    EXPECT_THAT(y, EigenAlmostEqual(y_ref, ε));
+}

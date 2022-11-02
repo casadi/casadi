@@ -7,9 +7,9 @@ add_library(alpaqa
     "src/problem/problem-counters.cpp"
     "src/outer/alm.cpp"
     "src/inner/panoc.cpp"
-    # "src/inner/structured-panoc.cpp"
+    "src/inner/structured-panoc.cpp"
     "src/panoc-alm.cpp"
-    # "src/structured-panoc-alm.cpp"
+    "src/structured-panoc-alm.cpp"
     "src/inner/internal/solverstatus.cpp"
     "include/alpaqa/util/type-erasure.hpp"
 )

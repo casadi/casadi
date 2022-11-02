@@ -1,5 +1,5 @@
-#include <alpaqa/panoc-alm.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
+#include <alpaqa/structured-panoc-alm.hpp>
 
 #include <iostream>
 
@@ -44,7 +44,7 @@ int main() {
     problem.D.upperbound = b;
 
     // Define the solvers to use
-    using Accelerator = alpaqa::LBFGS<config_t>;
+    using Accelerator = alpaqa::StructuredLBFGS<config_t>;
     using InnerSolver = alpaqa::PANOCSolver<Accelerator>;
     using OuterSolver = alpaqa::ALMSolver<InnerSolver>;
 
@@ -83,6 +83,7 @@ int main() {
     // Print the results
     std::cout << '\n' << *counted_problem.evaluations << '\n';
     std::cout << "status: " << stats.status << '\n'
+              << "solver: " << solver.get_name() << '\n'
               << "f = " << problem.eval_f(x) << '\n'
               << "inner iterations: " << stats.inner.iterations << '\n'
               << "outer iterations: " << stats.outer_iterations << '\n'

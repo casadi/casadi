@@ -19,6 +19,7 @@ using namespace std::chrono_literals;
 
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/inner/src/panoc.tpp>
+#include <alpaqa/inner/structured-panoc.hpp>
 #include <alpaqa/outer/alm.hpp>
 #include <alpaqa/outer/src/alm.tpp>
 #include <alpaqa/util/check-dim.hpp>
@@ -62,11 +63,11 @@ template <alpaqa::Config Conf>
 void register_alm(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
 
-    using TypeErasedPANOCDirection = alpaqa::TypeErasedPANOCDirection<config_t>;
-    using PANOCSolver              = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
-    using TypeErasedProblem        = alpaqa::TypeErasedProblem<config_t>;
-    // using StructuredPANOCLBFGSSolver = alpaqa::StructuredPANOCLBFGSSolver<config_t>;
-    using InnerSolver = alpaqa::TypeErasedInnerSolver<config_t>;
+    using TypeErasedPANOCDirection   = alpaqa::TypeErasedPANOCDirection<config_t>;
+    using PANOCSolver                = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
+    using TypeErasedProblem          = alpaqa::TypeErasedProblem<config_t>;
+    using StructuredPANOCLBFGSSolver = alpaqa::StructuredPANOCLBFGSSolver<config_t>;
+    using InnerSolver                = alpaqa::TypeErasedInnerSolver<config_t>;
     py::class_<InnerSolver>(m, "InnerSolver")
         .def(py::init<PANOCSolver>())
         .def("__call__",
@@ -159,33 +160,33 @@ void register_alm(py::module_ &m) {
                           "Main augmented Lagrangian solver.\n\n"
                           "C++ documentation: :cpp:class:`alpaqa::ALMSolver`")
         // Default constructor
-        // .def(py::init([] {
-        //          return std::make_unique<ALMSolver>(
-        //              ALMParams{}, InnerSolver{StructuredPANOCLBFGSSolver{{}, {}}});
-        //      }),
-        //      "Build an ALM solver using Structured PANOC as inner solver.")
+        .def(py::init([] {
+                 return std::make_unique<ALMSolver>(
+                     ALMParams{}, InnerSolver{StructuredPANOCLBFGSSolver{{}, {}}});
+             }),
+             "Build an ALM solver using Structured PANOC as inner solver.")
         // Solver only
         .def(py::init([](const PANOCSolver &inner) {
                  return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
              }),
              "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
-        // .def(py::init([](const StructuredPANOCLBFGSSolver &inner) {
-        //          return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
-        //      }),
-        //      "inner_solver"_a, "Build an ALM solver using Structured PANOC as inner solver.")
+        .def(py::init([](const StructuredPANOCLBFGSSolver &inner) {
+                 return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
+             }),
+             "inner_solver"_a, "Build an ALM solver using Structured PANOC as inner solver.")
         // Params and solver
         .def(py::init([](params_or_dict<ALMParams> params, const PANOCSolver &inner) {
                  return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
                                                     InnerSolver{inner});
              }),
              "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
-        // .def(
-        //     py::init([](params_or_dict<ALMParams> params, const StructuredPANOCLBFGSSolver &inner) {
-        //         return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
-        //                                            InnerSolver{inner});
-        //     }),
-        //     "alm_params"_a, "inner_solver"_a,
-        //     "Build an ALM solver using Structured PANOC as inner solver.")
+        .def(
+            py::init([](params_or_dict<ALMParams> params, const StructuredPANOCLBFGSSolver &inner) {
+                return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
+                                                   InnerSolver{inner});
+            }),
+            "alm_params"_a, "inner_solver"_a,
+            "Build an ALM solver using Structured PANOC as inner solver.")
         // Other functions and properties
         .def_property_readonly(
             "inner_solver",

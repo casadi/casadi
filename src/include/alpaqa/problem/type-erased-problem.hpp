@@ -30,6 +30,7 @@ namespace alpaqa {
 template <Config Conf>
 struct ProblemVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
+    using Box = alpaqa::Box<config_t>;
 
     template <class F>
     using optional_function_t = util::BasicVTable::optional_function_t<F, ProblemVTable>;
@@ -84,6 +85,12 @@ struct ProblemVTable : util::BasicVTable {
         eval_grad_ψ = nullptr;
     optional_const_function_t<real_t(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m)>
         eval_ψ_grad_ψ = nullptr;
+
+    // Constraint sets
+    optional_const_function_t<const Box &()>
+        get_box_C = nullptr;
+    optional_const_function_t<const Box &()>
+        get_box_D = nullptr;
 
     // Check
     required_const_function_t<void()>
@@ -196,6 +203,12 @@ struct ProblemVTable : util::BasicVTable {
         vtable.eval_grad_L(self, x, ŷ, grad_ψ, work_n, vtable);
         return ψ;
     }
+    static const Box &default_get_box_C(const void *, const ProblemVTable &) {
+        throw not_implemented_error("get_box_C");
+    }
+    static const Box &default_get_box_D(const void *, const ProblemVTable &) {
+        throw not_implemented_error("get_box_D");
+    }
 
     template <class P>
     ProblemVTable(util::VTableTypeTag<P> t) : util::BasicVTable{t} {
@@ -227,6 +240,9 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ_from_ŷ);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ_grad_ψ);
+        // Constraint set
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_C);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_D);
         // Check
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, check);
 
@@ -247,6 +263,9 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_DISABLED_METHOD(vtable, eval_grad_ψ_from_ŷ, t.t);
         ALPAQA_TE_DISABLED_METHOD(vtable, eval_grad_ψ, t.t);
         ALPAQA_TE_DISABLED_METHOD(vtable, eval_ψ_grad_ψ, t.t);
+        // Constraint sets
+        ALPAQA_TE_DISABLED_METHOD(vtable, P, get_box_C);
+        ALPAQA_TE_DISABLED_METHOD(vtable, P, get_box_D);
 
         // Provide defaults
 
@@ -265,6 +284,9 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_DEFAULT_METHOD(vtable, eval_grad_ψ_from_ŷ, default_eval_grad_ψ_from_ŷ);
         ALPAQA_TE_DEFAULT_METHOD(vtable, eval_grad_ψ, default_eval_grad_ψ);
         ALPAQA_TE_DEFAULT_METHOD(vtable, eval_ψ_grad_ψ, default_eval_ψ_grad_ψ);
+        // Constraint sets
+        ALPAQA_TE_DEFAULT_METHOD(vtable, get_box_C, default_get_box_C);
+        ALPAQA_TE_DEFAULT_METHOD(vtable, get_box_D, default_get_box_D);
 
         // Dimensions
         vtable.n = t.t->get_n();
@@ -282,7 +304,8 @@ template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byt
 class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator> {
   public:
     USING_ALPAQA_CONFIG(Conf);
-    using VTable         = ProblemVTable<Conf>;
+    using Box            = alpaqa::Box<config_t>;
+    using VTable         = ProblemVTable<config_t>;
     using allocator_type = Allocator;
     using TypeErased     = util::TypeErased<VTable, allocator_type>;
     using TypeErased::TypeErased;
@@ -494,6 +517,18 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
 
     /// @}
 
+    /// @name Constraint sets
+    /// @{
+
+    /// Get the rectangular constraint set of the decision variables,
+    /// @f$ x \in C @f$.
+    const Box &get_box_C() const;
+    /// Get the rectangular constraint set of the general constraint function,
+    /// @f$ g(x) \in D @f$.
+    const Box &get_box_D() const;
+
+    /// @}
+
     /// @name Checks
     /// @{
 
@@ -556,6 +591,12 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     bool provides_eval_ψ_grad_ψ() const {
         return vtable.eval_ψ_grad_ψ != vtable.default_eval_ψ_grad_ψ;
     }
+    /// Returns true if the problem provides an implementation of
+    /// @ref get_box_C.
+    bool provides_get_box_C() const { return vtable.get_box_C != vtable.default_get_box_C; }
+    /// Returns true if the problem provides an implementation of
+    /// @ref get_box_D.
+    bool provides_get_box_D() const { return vtable.get_box_D != vtable.default_get_box_D; }
 
     /// @}
 };
@@ -667,6 +708,14 @@ auto TypeErasedProblem<Conf, Allocator>::calc_ŷ_dᵀŷ(rvec g_ŷ, crvec y, crve
     return call(vtable.calc_ŷ_dᵀŷ, g_ŷ, y, Σ);
 }
 template <Config Conf, class Allocator>
+auto TypeErasedProblem<Conf, Allocator>::get_box_C() const -> const Box & {
+    return call(vtable.get_box_C);
+}
+template <Config Conf, class Allocator>
+auto TypeErasedProblem<Conf, Allocator>::get_box_D() const -> const Box & {
+    return call(vtable.get_box_D);
+}
+template <Config Conf, class Allocator>
 void TypeErasedProblem<Conf, Allocator>::check() const {
     return call(vtable.check);
 }
@@ -674,6 +723,7 @@ void TypeErasedProblem<Conf, Allocator>::check() const {
 template <class Problem>
 struct ProblemWithCounters {
     USING_ALPAQA_CONFIG_TEMPLATE(std::remove_cvref_t<Problem>::config_t);
+    using Box = typename TypeErasedProblem<config_t>::Box;
 
     // clang-format off
     void eval_proj_diff_g(crvec z, rvec p) const { ++evaluations->proj_diff_g; return timed(evaluations->time.proj_diff_g, std::bind(&std::remove_cvref_t<Problem>::eval_proj_diff_g, &problem, z, p)); }
@@ -695,6 +745,8 @@ struct ProblemWithCounters {
     void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_ψ_from_ŷ; } { ++evaluations->grad_ψ_from_ŷ; return timed(evaluations->time.grad_ψ_from_ŷ, std::bind(&std::remove_cvref_t<Problem>::eval_grad_ψ_from_ŷ, &problem, x, ŷ, grad_ψ, work_n)); }
     void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_ψ; } { ++evaluations->grad_ψ; return timed(evaluations->time.grad_ψ, std::bind(&std::remove_cvref_t<Problem>::eval_grad_ψ, &problem, x, y, Σ, grad_ψ, work_n, work_m)); }
     real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const requires requires { &std::remove_cvref_t<Problem>::eval_ψ_grad_ψ; } { ++evaluations->ψ_grad_ψ; return timed(evaluations->time.ψ_grad_ψ, std::bind(&std::remove_cvref_t<Problem>::eval_ψ_grad_ψ, &problem, x, y, Σ, grad_ψ, work_n, work_m)); }
+    const Box &get_box_C() const requires requires { &std::remove_cvref_t<Problem>::get_box_C; } { ++evaluations->f_g; return timed(evaluations->time.f_g, std::bind(&std::remove_cvref_t<Problem>::get_box_C, &problem)); }
+    const Box &get_box_D() const requires requires { &std::remove_cvref_t<Problem>::get_box_D; } { ++evaluations->f_g; return timed(evaluations->time.f_g, std::bind(&std::remove_cvref_t<Problem>::get_box_D, &problem)); }
     void check() const { problem.check(); }
 
     template <class... Args> decltype(auto) provides_eval_grad_gi(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_grad_gi; } { return problem.provides_eval_grad_gi(std::forward<Args>(args)...); }
@@ -709,6 +761,8 @@ struct ProblemWithCounters {
     template <class... Args> decltype(auto) provides_eval_grad_ψ_from_ŷ(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_grad_ψ_from_ŷ; } { return problem.provides_eval_grad_ψ_from_ŷ(std::forward<Args>(args)...); }
     template <class... Args> decltype(auto) provides_eval_grad_ψ(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_grad_ψ; } { return problem.provides_eval_grad_ψ(std::forward<Args>(args)...); }
     template <class... Args> decltype(auto) provides_eval_ψ_grad_ψ(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_ψ_grad_ψ; } { return problem.provides_eval_ψ_grad_ψ(std::forward<Args>(args)...); }
+    template <class... Args> decltype(auto) provides_get_box_C(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_get_box_C; } { return problem.provides_get_box_C(std::forward<Args>(args)...); }
+    template <class... Args> decltype(auto) provides_get_box_D(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_get_box_D; } { return problem.provides_get_box_D(std::forward<Args>(args)...); }
     // clang-format on
 
     length_t get_n() const { return problem.get_n(); }
@@ -817,6 +871,12 @@ class BoxConstrProblem {
         eval_proj_multipliers_box(D, y, M, penalty_alm_split);
     }
 
+    /// @see @ref TypeErasedProblem::get_box_C
+    const Box &get_box_C() const { return C; }
+    /// @see @ref TypeErasedProblem::get_box_D
+    const Box &get_box_D() const { return D; }
+
+    /// @see @ref TypeErasedProblem::check
     void check() const {
         check_dim_msg(C.lowerbound, n,
                       "Length of problem.C.lowerbound does not match problem size problem.n");

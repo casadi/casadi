@@ -13,15 +13,17 @@ struct PANOCDirection<LBFGS<Conf>> {
 
     using Problem = TypeErasedProblem<Conf>;
     using LBFGS   = alpaqa::LBFGS<Conf>;
-    using Params  = typename LBFGS::Params;
 
     LBFGS lbfgs;
 
     struct ExtraParams {
         bool rescale_when_γ_changes = false;
-    } extraparams;
+    };
+    struct Params : LBFGS::Params, ExtraParams {};
 
-    PANOCDirection(const Params &params, const ExtraParams &extraparams = {})
+    PANOCDirection(const Params &params) : lbfgs(params), extraparams(params) {}
+    PANOCDirection(const typename LBFGS::Params &params,
+                   const ExtraParams &extraparams = {})
         : lbfgs(params), extraparams(extraparams) {}
     PANOCDirection(const LBFGS &lbfgs, const ExtraParams &extraparams = {})
         : lbfgs(lbfgs), extraparams(extraparams) {}
@@ -60,7 +62,8 @@ struct PANOCDirection<LBFGS<Conf>> {
     void reset() { lbfgs.reset(); }
 
     std::string get_name() const { return lbfgs.get_name(); }
-    Params get_params() const { return lbfgs.get_params(); }
+
+    ExtraParams extraparams;
 };
 
 } // namespace alpaqa
