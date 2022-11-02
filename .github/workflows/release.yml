@@ -1,0 +1,14 @@
+name: official release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch'     
+        required: true
+    
+jobs:
+  dev-release:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "foo"

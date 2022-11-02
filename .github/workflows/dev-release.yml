@@ -1,0 +1,19 @@
+name: dev-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch'     
+        required: true
+    
+jobs:
+  dev-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: robinraju/release-downloader@v1.3
+        with: 
+          repository: "casadi/casadi"
+          tag: "nightly-${{ github.event.inputs.branch }}"
+          fileName: "*.whl"
+      - run: ls
