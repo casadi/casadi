@@ -134,11 +134,15 @@ void register_problems(py::module_ &m) {
                 prob.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
                 return std::make_tuple(std::move(x̂), std::move(p));
             },
-            "γ"_a, "x"_a, "grad_ψ"_a);
+            "γ"_a, "x"_a, "grad_ψ"_a)
+        .def("get_box_C", &BoxConstrProblem::get_box_C)
+        .def("get_box_D", &BoxConstrProblem::get_box_D);
 
     struct PyProblem {
         USING_ALPAQA_CONFIG(Conf);
         py::object o;
+
+        PyProblem(py::object o) : o{std::move(o)} {}
 
         // clang-format off
         void eval_proj_diff_g(crvec z, rvec p) const { o.attr("eval_proj_diff_g")(z, p); }
@@ -161,6 +165,8 @@ void register_problems(py::module_ &m) {
         void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { o.attr("eval_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m); }
         real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { return py::cast<real_t>(o.attr("eval_ψ_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m)); }
         void check() const { if (auto ch = py::getattr(o, "check", py::none()); !ch.is_none()) ch(); }
+        const Box &get_box_C() const { C = o.attr("get_box_C")(); return py::cast<const Box &>(C); }
+        const Box &get_box_D() const { D = o.attr("get_box_D")(); return py::cast<const Box &>(D); }
 
         bool provides_eval_grad_gi() const { return py::hasattr(o, "eval_grad_gi"); }
         bool provides_eval_hess_L_prod() const { return py::hasattr(o, "eval_hess_L_prod"); }
@@ -174,22 +180,28 @@ void register_problems(py::module_ &m) {
         bool provides_eval_grad_ψ_from_ŷ() const { return py::hasattr(o, "eval_grad_ψ_from_ŷ"); }
         bool provides_eval_grad_ψ() const { return py::hasattr(o, "eval_grad_ψ"); }
         bool provides_eval_ψ_grad_ψ() const { return py::hasattr(o, "eval_ψ_grad_ψ"); }
+        bool provides_get_box_C() const { return py::hasattr(o, "get_box_C"); }
+        bool provides_get_box_D() const { return py::hasattr(o, "get_box_D"); }
         // clang-format on
 
         length_t get_n() const { return py::cast<length_t>(o.attr("n")); }
         length_t get_m() const { return py::cast<length_t>(o.attr("m")); }
+
+        // To keep the references to the boxes alive
+        mutable py::object C;
+        mutable py::object D;
     };
 
     using TEProblem = alpaqa::TypeErasedProblem<config_t>;
     py::class_<TEProblem> te_problem(m, "TEProblem",
                                      "C++ documentation: :cpp:class:`alpaqa::TypeErasedProblem`");
     te_problem //
+        .def(py::init<const TEProblem &>())
         .def("__copy__", [](const TEProblem &self) { return TEProblem{self}; })
         .def(
             "__deepcopy__", [](const TEProblem &self, py::dict) { return TEProblem{self}; },
             "memo"_a)
         // clang-format off
-        .def(py::init([](py::object o) { return TEProblem::template make<PyProblem>(o); }))
         .def("eval_proj_diff_g", &TEProblem::eval_proj_diff_g, "z"_a, "p"_a)
         .def("eval_proj_multipliers", &TEProblem::eval_proj_multipliers, "y"_a, "M"_a, "penalty_alm_split"_a)
         .def("eval_prox_grad_step", &TEProblem::eval_prox_grad_step, "γ"_a, "x"_a, "grad_ψ"_a, "x̂"_a, "p"_a)
@@ -209,6 +221,23 @@ void register_problems(py::module_ &m) {
         .def("eval_grad_ψ_from_ŷ", &TEProblem::eval_grad_ψ_from_ŷ, "x"_a, "ŷ"_a, "grad_ψ"_a, "work_n"_a)
         .def("eval_grad_ψ", &TEProblem::eval_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
         .def("eval_ψ_grad_ψ", &TEProblem::eval_ψ_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
+        .def("get_box_C", &TEProblem::get_box_C)
+        .def("get_box_D", &TEProblem::get_box_D)
+
+        .def("provides_eval_grad_gi", &TEProblem::provides_eval_grad_gi)
+        .def("provides_eval_hess_L_prod", &TEProblem::provides_eval_hess_L_prod)
+        .def("provides_eval_hess_L", &TEProblem::provides_eval_hess_L)
+        .def("provides_eval_f_grad_f", &TEProblem::provides_eval_f_grad_f)
+        .def("provides_eval_f_g", &TEProblem::provides_eval_f_g)
+        .def("provides_eval_f_grad_f_g", &TEProblem::provides_eval_f_grad_f_g)
+        .def("provides_eval_grad_f_grad_g_prod", &TEProblem::provides_eval_grad_f_grad_g_prod)
+        .def("provides_eval_grad_L", &TEProblem::provides_eval_grad_L)
+        .def("provides_eval_ψ", &TEProblem::provides_eval_ψ)
+        .def("provides_eval_grad_ψ_from_ŷ", &TEProblem::provides_eval_grad_ψ_from_ŷ)
+        .def("provides_eval_grad_ψ", &TEProblem::provides_eval_grad_ψ)
+        .def("provides_eval_ψ_grad_ψ", &TEProblem::provides_eval_ψ_grad_ψ)
+        .def("provides_get_box_C", &TEProblem::provides_get_box_C)
+        .def("provides_get_box_D", &TEProblem::provides_get_box_D)
         // clang-format on
         .def(
             "eval_proj_diff_g",
@@ -415,6 +444,8 @@ void register_problems(py::module_ &m) {
             "problem_with_counters", [](py::object p) { return te_pwc(PyProblem{std::move(p)}); },
             "problem"_a);
     }
+    // Must be last
+    te_problem.def(py::init([](py::object o) { return TEProblem::template make<PyProblem>(o); }));
 }
 
 template void register_problems<alpaqa::EigenConfigd>(py::module_ &);
