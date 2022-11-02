@@ -309,8 +309,12 @@ namespace casadi {
 
     g.constant_copy("A_row", Asp.get_row(), "c_int");
     g.constant_copy("A_colind", Asp.get_colind(), "c_int");
-    g.constant_copy("H_row", H_.get_row(), "c_int");
-    g.constant_copy("H_colind", H_.get_colind(), "c_int");
+
+    // convert H in a upper triangular matrix. This is required by osqp v0.6.0
+    Sparsity H_triu = Sparsity::triu(H_);
+
+    g.constant_copy("H_row", H_triu.get_row(), "c_int");
+    g.constant_copy("H_colind", H_triu.get_colind(), "c_int");
 
     g.local("A", "csc");
     g << "A.m = " << nx_ + na_ << ";\n";
@@ -324,8 +328,8 @@ namespace casadi {
     g.local("H", "csc");
     g << "H.m = " << nx_ << ";\n";
     g << "H.n = " << nx_ << ";\n";
-    g << "H.nz = " << H_.nnz() << ";\n";
-    g << "H.nzmax = " << H_.nnz() << ";\n";
+    g << "H.nz = " << H_.nnz_upper() << ";\n";
+    g << "H.nzmax = " << H_.nnz_upper() << ";\n";
     g << "H.x = dummy;\n";
     g << "H.i = H_row;\n";
     g << "H.p = H_colind;\n";
@@ -363,8 +367,7 @@ namespace casadi {
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
     //g << "settings.time_limit = " << settings_.time_limit << ";\n";
 
-    g << codegen_mem(g) + " = osqp_setup(&data, &settings);\n";
-    g << "return 0;\n";
+    g << "return osqp_setup(&" + codegen_mem(g) + ", &data, &settings)!=0;\n";
   }
 
   void OsqpInterface::codegen_body(CodeGenerator& g) const {
