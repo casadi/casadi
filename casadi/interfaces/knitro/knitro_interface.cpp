@@ -29,7 +29,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <algorithm>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.thread.h>
+#else // CASADI_WITH_THREAD_MINGW
 #include <thread>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
 
 using namespace std;
 namespace casadi {
@@ -132,8 +138,11 @@ namespace casadi {
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn.sparsity_out(0);
 
+    unsigned int hc = 0;
+    #ifdef CASADI_WITH_THREAD
     //may return 0 when not able to detect. If it's the case, then return 8.
-    unsigned int hc = std::thread::hardware_concurrency();
+    hc = std::thread::hardware_concurrency();
+    #endif
     int processor_count = hc ? hc : 8;
     //Obtain maximum number of threads needed
     int ms_numthreads = 1;
