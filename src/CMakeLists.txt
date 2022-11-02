@@ -2,6 +2,7 @@ find_package(Eigen3 REQUIRED)
 
 add_library(alpaqa
     "src/util/type-erasure.cpp"
+    "src/util/demangled-typename.cpp"
     "src/util/print.cpp"
     "src/accelerators/lbfgs.cpp"
     "src/problem/problem-counters.cpp"
