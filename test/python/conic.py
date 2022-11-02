@@ -81,6 +81,9 @@ if has_conic("cbc"):
 if has_conic("qrqp"):
   conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True, "discrete": False, "sos":False}))
 
+if has_conic("proxqp"):
+  conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "sparse"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+  conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "dense"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
 
 print(conics)
 

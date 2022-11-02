@@ -639,6 +639,10 @@ add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver Sup
 option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
+# PROXQP: A QP solver based on proximal methods
+option(WITH_PROXQP "Compile the interface to PROXQP (the source code for PROXQP is included)" OFF)
+add_feature_info(proxqp-interface WITH_PROXQP "Interface to QP solver PROXQP.")
+
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
