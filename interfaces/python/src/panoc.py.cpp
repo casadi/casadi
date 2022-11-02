@@ -175,7 +175,8 @@ void register_panoc(py::module_ &m) {
         .def("update_sy", safe_lbfgs_update_sy, "sk"_a, "yk"_a, "pkp1Tpkp1"_a, "forced"_a = false)
         .def("apply", safe_lbfgs_apply, "q"_a, "γ"_a)
         .def("apply_masked",
-             py::overload_cast<rvec, real_t, const std::vector<index_t> &>(&LBFGS::apply_masked),
+             py::overload_cast<rvec, real_t, const std::vector<index_t> &>(&LBFGS::apply_masked,
+                                                                           py::const_),
              // [](LBFGS &self, rvec q, real_t γ, const std::vector<index_t> &J) {
              //     return self.apply_masked(q, γ, J);
              // },

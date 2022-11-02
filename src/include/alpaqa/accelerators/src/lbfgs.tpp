@@ -100,7 +100,7 @@ bool LBFGS<Conf>::apply(rvec q, real_t γ) const {
 }
 
 template <Config Conf>
-bool LBFGS<Conf>::apply_masked_impl(rvec q, real_t γ, const auto &J) {
+bool LBFGS<Conf>::apply_masked_impl(rvec q, real_t γ, const auto &J) const {
     // Only apply if we have previous vectors s and y
     if (idx == 0 && not full)
         return false;
@@ -192,13 +192,13 @@ bool LBFGS<Conf>::apply_masked_impl(rvec q, real_t γ, const auto &J) {
 }
 
 template <Config Conf>
-bool LBFGS<Conf>::apply_masked(rvec q, real_t γ, crindexvec J) {
+bool LBFGS<Conf>::apply_masked(rvec q, real_t γ, crindexvec J) const {
     return apply_masked_impl(q, γ, J);
 }
 
 template <Config Conf>
 bool LBFGS<Conf>::apply_masked(rvec q, real_t γ,
-                               const std::vector<index_t> &J) {
+                               const std::vector<index_t> &J) const {
     return apply_masked_impl(q, γ, J);
 }
 

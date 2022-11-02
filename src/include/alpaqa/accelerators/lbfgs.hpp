@@ -93,9 +93,7 @@ struct LBFGSStorage {
         return std::as_const(sto).col(2 * i + 1).topRows(n());
     }
     real_t &ρ(index_t i) { return sto.coeffRef(n(), 2 * i); }
-    const real_t &ρ(index_t i) const {
-        return std::as_const(sto).coeff(n(), 2 * i);
-    }
+    real_t &ρ(index_t i) const { return sto.coeffRef(n(), 2 * i); }
     real_t &α(index_t i) { return sto.coeffRef(n(), 2 * i + 1); }
     real_t &α(index_t i) const { return sto.coeffRef(n(), 2 * i + 1); }
 
@@ -146,11 +144,11 @@ class LBFGS {
 
     /// Apply the inverse Hessian approximation to the given vector q, applying
     /// only the columns and rows of the Hessian in the index set J.
-    bool apply_masked(rvec q, real_t γ, crindexvec J);
+    bool apply_masked(rvec q, real_t γ, crindexvec J) const;
     /// @copydoc apply_masked(rvec, real_t, crindexvec)
-    bool apply_masked(rvec q, real_t γ, const std::vector<index_t> &J);
+    bool apply_masked(rvec q, real_t γ, const std::vector<index_t> &J) const;
     /// @see @ref apply_masked
-    bool apply_masked_impl(rvec q, real_t γ, const auto &J);
+    bool apply_masked_impl(rvec q, real_t γ, const auto &J) const;
 
     /// Throw away the approximation and all previous vectors s and y.
     void reset();
@@ -185,7 +183,7 @@ class LBFGS {
     auto y(index_t i) { return sto.y(i); }
     auto y(index_t i) const { return sto.y(i); }
     real_t &ρ(index_t i) { return sto.ρ(i); }
-    const real_t &ρ(index_t i) const { return sto.ρ(i); }
+    real_t &ρ(index_t i) const { return sto.ρ(i); }
     real_t &α(index_t i) { return sto.α(i); }
     real_t &α(index_t i) const { return sto.α(i); }
 
