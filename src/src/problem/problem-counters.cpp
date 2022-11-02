@@ -12,7 +12,7 @@ struct CountResult {
 };
 std::ostream &operator<<(std::ostream &os, const CountResult &t) {
     auto sec = [](auto t) { return std::chrono::duration<double>(t).count(); };
-    os << std::setw(6);
+    os << std::setw(8);
     if (t.count > 0) {
         os << t.count << "  (" << sec(t.time) << " s)\r\n";
     } else {
