@@ -596,11 +596,8 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-<<<<<<< HEAD
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None):
-=======
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None):
->>>>>>> sqp3
+
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
@@ -634,17 +631,8 @@ class casadiTestCase(unittest.TestCase):
           commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir}".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=includedir,definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
           return [commands, output]
 
-<<<<<<< HEAD
       [commands, libname] = get_commands(shared=True)
-      print(commands)
-=======
-      if isinstance(extra_options,bool) or extra_options is None:
-        extra_options = ""
-      if isinstance(extra_options,list):
-        extra_options = " " + " ".join(extra_options)
 
-      commands = "gcc -pedantic -std={std} -fPIC -shared -Wall -Werror -Wextra -I{includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {name}.c -o {name}.so -L{libdir}".format(std=std,name=name,libdir=libdir,includedir=includedir) + extralibs + extra_options
->>>>>>> sqp3
       p = subprocess.Popen(commands,shell=True).wait()
       F2 = external(F.name(), libname)
 

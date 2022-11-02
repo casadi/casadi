@@ -158,8 +158,8 @@ namespace casadi {
             hpipm_options_.warm_start = op.second;
           } else if (op.first=="abs_form") {
             hpipm_options_.abs_form = op.second;
-          } else if (op.first=="comp_dual_sol") {
-            hpipm_options_.comp_dual_sol = op.second;
+          } else if (op.first=="comp_dual_sol_eq") {
+            hpipm_options_.comp_dual_sol_eq = op.second;
           } else if (op.first=="comp_res_exit") {
             hpipm_options_.comp_res_exit = op.second;
           } else if (op.first=="mode") {
@@ -453,6 +453,9 @@ namespace casadi {
     init_vector(m->nu, nus_); m->nu.push_back(0);
     init_vector(m->ng, ngs_);
     m->ns.resize(N_+1, 0);
+    m->nsbx.resize(N_+1, 0);
+    m->nsbu.resize(N_+1, 0);
+    m->nsg.resize(N_+1, 0);
 
     const std::vector<int>& nx = m->nx;
     const std::vector<int>& nu = m->nu;
@@ -488,12 +491,18 @@ namespace casadi {
 
     m->pi.resize(pisp_.nnz());
 
-    offset = 0;
-    for (casadi_int k=0;k<N_+1;++k) offset+=nx[k]+nu[k];
-    m->iidxb.resize(offset); // TODO; make range?
+    casadi_int nx_total = 0;
+    for (casadi_int k=0;k<N_+1;++k) nx_total+=nx[k];
+    m->iidxbx.resize(nx_total); // TODO; make range?
+    m->lbx.resize(nx_total);
+    m->ubx.resize(nx_total);
 
-    m->lb.resize(offset);
-    m->ub.resize(offset);
+    casadi_int nu_total = 0;
+    for (casadi_int k=0;k<N_+1;++k) nu_total+=nu[k];
+    m->iidxbu.resize(nu_total); // TODO; make range?
+
+    m->lbu.resize(nu_total);
+    m->ubu.resize(nu_total);
 
     offset = 0;
     for (casadi_int k=0;k<N_+1;++k) offset+=ng[k]+nx[k];
@@ -523,13 +532,21 @@ namespace casadi {
       offset+=nx[k+1];
     }
 
-    m->hlb.resize(N_+1);
-    m->hub.resize(N_+1);
+    m->hlbx.resize(N_+1);
+    m->hubx.resize(N_+1);
     offset = 0;
     for (casadi_int k=0;k<N_+1;++k) {
-      m->hlb[k] = get_ptr(m->lb)+offset;
-      m->hub[k] = get_ptr(m->ub)+offset;
-      offset+=nu[k]+nx[k];
+      m->hlbx[k] = get_ptr(m->lbx)+offset;
+      m->hubx[k] = get_ptr(m->ubx)+offset;
+      offset+=nx[k];
+    }
+    m->hlbu.resize(N_+1);
+    m->hubu.resize(N_+1);
+    offset = 0;
+    for (casadi_int k=0;k<N_+1;++k) {
+      m->hlbu[k] = get_ptr(m->lbu)+offset;
+      m->hubu[k] = get_ptr(m->ubu)+offset;
+      offset+=nu[k];
     }
 
     m->lams.resize(N_+1);
@@ -539,12 +556,19 @@ namespace casadi {
       offset+=2*(ng[k]+nx[k]);
     }
 
-    m->hidxb.resize(N_+1);
+    m->hidxbx.resize(N_+1);
+    m->hidxbu.resize(N_+1);
     offset = 0;
     for (casadi_int k=0;k<N_+1;++k) {
-      m->hidxb[k] = get_ptr(m->iidxb)+offset;
-      for (casadi_int i=0;i<nbx[k]+nbu[k];++i) m->hidxb[k][i] = i;
-      offset+=nbx[k]+nbu[k];
+      m->hidxbx[k] = get_ptr(m->iidxbx)+offset;
+      for (casadi_int i=0;i<nbx[k];++i) m->hidxbx[k][i] = i;
+      offset+=nbx[k];
+    }
+    offset = 0;
+    for (casadi_int k=0;k<N_+1;++k) {
+      m->hidxbu[k] = get_ptr(m->iidxbu)+offset;
+      for (casadi_int i=0;i<nbx[k];++i) m->hidxbu[k][i] = i;
+      offset+=nbu[k];
     }
 
     m->pv.resize(2*(nx_+na_));
@@ -599,7 +623,9 @@ namespace casadi {
 	  struct d_ocp_qp_dim dim;
 	  d_ocp_qp_dim_create(N_, &dim, dim_mem);
 
-    d_ocp_qp_dim_set_all(get_ptr(m->nx), get_ptr(m->nu), get_ptr(m->nbx), get_ptr(m->nbu), get_ptr(m->ng), get_ptr(m->ns), &dim);
+    d_ocp_qp_dim_set_all(
+      get_ptr(m->nx), get_ptr(m->nu), get_ptr(m->nbx), get_ptr(m->nbu),
+      get_ptr(m->ng), get_ptr(m->nsbx), get_ptr(m->nsbu), get_ptr(m->nsg), &dim);
 
     int qp_size = d_ocp_qp_memsize(&dim);
     void *qp_mem = malloc(qp_size);
@@ -630,13 +656,15 @@ namespace casadi {
     casadi_project(arg[CONIC_UBA], sparsity_in_.at(CONIC_UBA), get_ptr(m->ug), lugsp_, pv);
 
     // Dissect LBX/UBX input
-    std::fill(m->lb.begin(), m->lb.end(), 0);
-    std::fill(m->ub.begin(), m->ub.end(), 0);
+    std::fill(m->lbu.begin(), m->lbu.end(), 0);
+    std::fill(m->ubu.begin(), m->ubu.end(), 0);
+    std::fill(m->lbx.begin(), m->lbx.end(), 0);
+    std::fill(m->ubx.begin(), m->ubx.end(), 0);
 
-    dense_transfer(1.0, arg[CONIC_LBX], xsp_, get_ptr(m->lb), theirs_xsp_, pv);
-    dense_transfer(1.0, arg[CONIC_UBX], xsp_, get_ptr(m->ub), theirs_xsp_, pv);
-    dense_transfer(1.0, arg[CONIC_LBX], usp_, get_ptr(m->lb), theirs_usp_, pv);
-    dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ub), theirs_usp_, pv);
+    dense_transfer(1.0, arg[CONIC_LBX], xsp_, get_ptr(m->lbx), theirs_Xsp_, pv);
+    dense_transfer(1.0, arg[CONIC_UBX], xsp_, get_ptr(m->ubx), theirs_Xsp_, pv);
+    dense_transfer(1.0, arg[CONIC_LBX], usp_, get_ptr(m->lbu), theirs_Usp_, pv);
+    dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ubu), theirs_Usp_, pv);
 
     // Dissect G
     mproject(0.5, arg[CONIC_G], sparsity_in_.at(CONIC_G), get_ptr(m->r), usp_, pv);
@@ -660,11 +688,17 @@ namespace casadi {
     }
 
     // replace infinities
-    for (casadi_int i=0;i<m->lb.size();++i) {
-      if (m->lb[i]==-std::numeric_limits<double>::infinity()) m->lb[i] = -inf_;
+    for (casadi_int i=0;i<m->lbx.size();++i) {
+      if (m->lbx[i]==-std::numeric_limits<double>::infinity()) m->lbx[i] = -inf_;
     }
-    for (casadi_int i=0;i<m->ub.size();++i) {
-      if (m->ub[i]==std::numeric_limits<double>::infinity()) m->ub[i] = inf_;
+    for (casadi_int i=0;i<m->lbu.size();++i) {
+      if (m->lbu[i]==-std::numeric_limits<double>::infinity()) m->lbu[i] = -inf_;
+    }
+    for (casadi_int i=0;i<m->ubx.size();++i) {
+      if (m->ubx[i]==std::numeric_limits<double>::infinity()) m->ubx[i] = inf_;
+    }
+    for (casadi_int i=0;i<m->ubu.size();++i) {
+      if (m->ubu[i]==std::numeric_limits<double>::infinity()) m->ubu[i] = inf_;
     }
     for (casadi_int i=0;i<m->lg.size();++i) {
       if (m->lg[i]==-std::numeric_limits<double>::infinity()) m->lg[i] = -inf_;
@@ -742,7 +776,16 @@ namespace casadi {
     // https://github.com/giaf/hpipm/commit/590f3b21521ff5784c9497869883df695bc0f441
     std::vector<double*> hI;
 
-    d_ocp_qp_set_all(get_ptr(m->hA), get_ptr(m->hB), get_ptr(m->hb), get_ptr(m->hQ), get_ptr(m->hS), get_ptr(m->hR), get_ptr(m->hq), get_ptr(m->hr), get_ptr(m->hidxb), get_ptr(m->hlb), get_ptr(m->hub), get_ptr(m->hC), get_ptr(m->hD), get_ptr(m->hlg), get_ptr(m->hug), get_ptr(m->hZl), get_ptr(m->hZu), get_ptr(m->hzl), get_ptr(m->hzu), get_ptr(m->hidxs), get_ptr(m->hlls), get_ptr(m->hlus), &qp);
+    d_ocp_qp_set_all(get_ptr(m->hA), get_ptr(m->hB), get_ptr(m->hb),
+      get_ptr(m->hQ), get_ptr(m->hS), get_ptr(m->hR),
+      get_ptr(m->hq), get_ptr(m->hr),
+      get_ptr(m->hidxbx), get_ptr(m->hlbx), get_ptr(m->hubx),
+      get_ptr(m->hidxbu), get_ptr(m->hlbu), get_ptr(m->hubu),
+      get_ptr(m->hC), get_ptr(m->hD),
+      get_ptr(m->hlg), get_ptr(m->hug),
+      get_ptr(m->hZl), get_ptr(m->hZu), get_ptr(m->hzl),
+      get_ptr(m->hzu), get_ptr(m->hidxs),
+      get_ptr(m->hlls), get_ptr(m->hlus), &qp);
 
     int qp_sol_size = d_ocp_qp_sol_memsize(&dim);
     void *qp_sol_mem = malloc(qp_sol_size);

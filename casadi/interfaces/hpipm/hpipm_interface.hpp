@@ -74,17 +74,17 @@ namespace casadi {
 
   struct CASADI_CONIC_HPIPM_EXPORT HpipmMemory : public ConicMemory {
 
-    std::vector<double> A, B, b, b2, Q, S, R, q, r, lb, ub, C, D, lg, ug;
+    std::vector<double> A, B, b, b2, Q, S, R, q, r, lbx, ubx, lbu, ubu, C, D, lg, ug;
 
     std::vector<double> I;
     std::vector<double> x, u, pi, lam, lamg;
     std::vector<double*> xs, us, pis, lams, lamgs;
 
-    std::vector<int> iidxb, iidxs;
-    std::vector<int*> hidxb, hidxs;
+    std::vector<int> iidxbx, iidxbu, iidxs;
+    std::vector<int*> hidxbx, hidxbu, hidxs;
 
     std::vector<double*> hA, hB, hb, hQ, hR, hS, hq, hr;
-    std::vector<double*> hlb, hub, hC, hD, hlg, hug, hZl, hZu, hzl, hzu, hlls, hlus;
+    std::vector<double*> hlbx, hubx, hlbu, hubu, hC, hD, hlg, hug, hZl, hZu, hzl, hzu, hlls, hlus;
     std::vector<double*> hu_guess, hx_guess;
     std::vector<double*> hI;
 
@@ -100,6 +100,12 @@ namespace casadi {
     std::vector<int> nbu;
     // Number of soft constraints
     std::vector<int> ns;
+    // Number of (two-sided) soft state box constraints
+    std::vector<int> nsbx;
+    // Number of (two-sided) soft input box constraints
+    std::vector<int> nsbu;
+    // Number of (two-sided) soft general constraints
+    std::vector<int> nsg;
 
     std::vector<double> stats;
 

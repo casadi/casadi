@@ -823,7 +823,7 @@ if(WITH_BLASFEO)
   if (WITH_BUILD_BLASFEO)
     ExternalProject_Add(blasfeo-external
       GIT_REPOSITORY https://github.com/giaf/blasfeo.git
-      GIT_TAG ${BUILD_BLASFEO_VBLASFEO_PATHERSION}
+      GIT_TAG ${BUILD_BLASFEO_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
@@ -834,6 +834,7 @@ if(WITH_BLASFEO)
     add_library(blasfeo SHARED IMPORTED)
     set_target_properties(blasfeo PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libblasfeo${CMAKE_STATIC_LIBRARY_SUFFIX}"
     )
   else()
     #add_library(lapack INTERFACE)
@@ -879,8 +880,7 @@ if(WITH_HPIPM)
     add_library(hpipm SHARED IMPORTED)
     target_link_libraries(hpipm INTERFACE blasfeo)
     set_target_properties(hpipm PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libhpipm${CMAKE_STATIC_LIBRARY_SUFFIX}"
     )
   else()
     #add_library(lapack INTERFACE)
