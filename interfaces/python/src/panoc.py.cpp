@@ -77,19 +77,21 @@ void register_panoc(py::module_ &m) {
     py::class_<TypeErasedPANOCDirection>(m, "PANOCDirection")
         .def(py::init([](py::object o) {
             struct {
-                void initialize(crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0) {
+                using Problem = alpaqa::TypeErasedProblem<Conf>;
+                void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0, crvec x_0,
+                                crvec x̂_0, crvec p_0, crvec grad_ψx_0) {
                     alpaqa::ScopedMallocAllower ma;
-                    o.attr("initialize")(x_0, x̂_0, p_0, grad_0);
+                    o.attr("initialize")(problem, y, Σ, γ_0, x_0, x̂_0, p_0, grad_ψx_0);
                 }
-                bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec gradₙₑₓₜ,
-                            real_t γₙₑₓₜ) {
+                bool update(real_t γₖ, real_t γₙₑₓₜ, crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ,
+                            crvec grad_ψxₖ, crvec grad_ψxₙₑₓₜ) {
                     alpaqa::ScopedMallocAllower ma;
-                    return py::cast<bool>(o.attr("update")(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, gradₙₑₓₜ, γₙₑₓₜ));
+                    return py::cast<bool>(
+                        o.attr("update")(γₖ, γₙₑₓₜ, xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_ψxₖ, grad_ψxₙₑₓₜ));
                 }
-                bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ, real_t γ,
-                           rvec qₖ) const {
+                bool apply(real_t γₖ, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_ψxₖ, rvec qₖ) const {
                     alpaqa::ScopedMallocAllower ma;
-                    return py::cast<bool>(o.attr("apply")(xₖ, x̂ₖ, pₖ, grad_xₖ, grad_x̂ₖ, γ, qₖ));
+                    return py::cast<bool>(o.attr("apply")(γₖ, xₖ, x̂ₖ, pₖ, grad_ψxₖ, qₖ));
                 }
                 void changed_γ(real_t γₖ, real_t old_γₖ) {
                     alpaqa::ScopedMallocAllower ma;

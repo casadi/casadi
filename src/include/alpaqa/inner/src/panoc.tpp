@@ -25,8 +25,7 @@ std::string PANOCSolver<DirectionProviderT>::get_name() const {
 }
 
 template <class DirectionProviderT>
-typename PANOCSolver<DirectionProviderT>::Stats
-PANOCSolver<DirectionProviderT>::operator()(
+auto PANOCSolver<DirectionProviderT>::operator()(
     /// [in]    Problem description
     const Problem &problem,
     /// [in]    Constraint weights @f$ \Sigma @f$
@@ -40,7 +39,7 @@ PANOCSolver<DirectionProviderT>::operator()(
     /// [inout] Lagrange multipliers @f$ y @f$
     rvec y,
     /// [out]   Slack variable error @f$ g(x) - z @f$
-    rvec err_z) {
+    rvec err_z) -> Stats {
 
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
@@ -66,8 +65,7 @@ PANOCSolver<DirectionProviderT>::operator()(
         qₖ(n),                         // Newton step Hₖ pₖ
         grad_ψₖ(n),                    // ∇ψ(xₖ)
         grad_̂ψₖ(need_grad_̂ψₖ ? n : 0), // ∇ψ(x̂ₖ)
-        grad_ψₙₑₓₜ(n),                 // ∇ψ(xₙₑₓₜ)
-        empty_vec(0);                  // []
+        grad_ψₙₑₓₜ(n);                 // ∇ψ(xₙₑₓₜ)
 
     vec work_n(n), work_m(m);
 
@@ -89,7 +87,7 @@ PANOCSolver<DirectionProviderT>::operator()(
                                                   rvec grad_ψ) {
         problem.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work_n);
     };
-    auto calc_x̂ = [&](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
+    auto calc_x̂ = [&problem](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
         problem.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
     };
     auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
@@ -136,7 +134,7 @@ PANOCSolver<DirectionProviderT>::operator()(
     // Initial Lipschitz constant provided by the user
     else {
         Lₖ = params.Lipschitz.L_0;
-        // Calculate ψ(xₖ), ∇ψ(x_0)
+        // Calculate ψ(xₖ), ∇ψ(x₀)
         ψₖ = calc_ψ_grad_ψ(xₖ, /* in ⟹ out */ grad_ψₖ);
     }
     if (not std::isfinite(Lₖ)) {
@@ -175,7 +173,8 @@ PANOCSolver<DirectionProviderT>::operator()(
                 direction_provider.changed_γ(γₖ, old_γₖ);
             } else if (k == 0) { // Initialize L-BFGS
                 ScopedMallocAllower ma;
-                direction_provider.initialize(xₖ, x̂ₖ, pₖ, grad_ψₖ);
+                direction_provider.initialize(problem, y, Σ, γₖ, xₖ, x̂ₖ, pₖ,
+                                              grad_ψₖ);
             }
             if (γₖ != old_γₖ)
                 φₖ = ψₖ + 1 / (2 * γₖ) * pₖᵀpₖ + grad_ψₖᵀpₖ;
@@ -223,8 +222,7 @@ PANOCSolver<DirectionProviderT>::operator()(
 
         // Calculate quasi-Newton step -----------------------------------------
         if (k > 0)
-            direction_provider.apply(xₖ, x̂ₖ, pₖ, grad_ψₖ,
-                                     need_grad_̂ψₖ ? grad_̂ψₖ : empty_vec, γₖ,
+            direction_provider.apply(γₖ, xₖ, x̂ₖ, pₖ, grad_ψₖ,
                                      /* in ⟹ out */ qₖ);
 
         // Line search initialization ------------------------------------------
@@ -312,8 +310,8 @@ PANOCSolver<DirectionProviderT>::operator()(
         if (γₖ != γₙₑₓₜ) // Flush L-BFGS if γ changed
             direction_provider.changed_γ(γₙₑₓₜ, γₖ);
 
-        s.lbfgs_rejected += not direction_provider.update(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ,
-                                                          grad_ψₙₑₓₜ, γₙₑₓₜ);
+        s.lbfgs_rejected += not direction_provider.update(γₖ, γₙₑₓₜ, xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ,
+                                                          grad_ψₖ, grad_ψₙₑₓₜ);
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)

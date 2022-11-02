@@ -14,13 +14,14 @@ namespace alpaqa {
 template <Config Conf>
 struct PANOCDirectionVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
+    using Problem = TypeErasedProblem<config_t>;
 
     // clang-format off
-    required_function_t<void(crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0)>
+    required_function_t<void(const Problem &problem, crvec y, crvec Σ, real_t γ_0, crvec x_0, crvec x̂_0, crvec p_0, crvec grad_ψx_0)>
         initialize = nullptr;
-    required_function_t<bool(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec gradₙₑₓₜ, real_t γₙₑₓₜ)>
+    required_function_t<bool(real_t γₖ, real_t γₙₑₓₜ, crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_ψxₖ, crvec grad_ψxₙₑₓₜ)>
         update = nullptr;
-    required_const_function_t<bool(crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ, real_t γ, rvec qₖ)>
+    required_const_function_t<bool(real_t γₖ, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_ψxₖ, rvec qₖ)>
         apply = nullptr;
     required_function_t<void(real_t γₖ, real_t old_γₖ)>
         changed_γ = nullptr;
@@ -54,8 +55,10 @@ class TypeErasedPANOCDirection
     using allocator_type = Allocator;
     using TypeErased     = util::TypeErased<VTable, allocator_type, te_pd_buff_size<Conf>>;
     using TypeErased::TypeErased;
+    using Problem = TypeErasedProblem<config_t>;
 
   private:
+    using TypeErased::call;
     using TypeErased::self;
     using TypeErased::vtable;
 
@@ -67,27 +70,27 @@ class TypeErasedPANOCDirection
 
     template <class... Args>
     decltype(auto) initialize(Args &&...args) {
-        return vtable.initialize(self, std::forward<Args>(args)...);
+        return call(vtable.initialize, std::forward<Args>(args)...);
     }
     template <class... Args>
     decltype(auto) update(Args &&...args) {
-        return vtable.update(self, std::forward<Args>(args)...);
+        return call(vtable.update, std::forward<Args>(args)...);
     }
     template <class... Args>
     decltype(auto) apply(Args &&...args) const {
-        return vtable.apply(self, std::forward<Args>(args)...);
+        return call(vtable.apply, std::forward<Args>(args)...);
     }
     template <class... Args>
     decltype(auto) changed_γ(Args &&...args) {
-        return vtable.changed_γ(self, std::forward<Args>(args)...);
+        return call(vtable.changed_γ, std::forward<Args>(args)...);
     }
     template <class... Args>
     decltype(auto) reset(Args &&...args) {
-        return vtable.reset(self, std::forward<Args>(args)...);
+        return call(vtable.reset, std::forward<Args>(args)...);
     }
     template <class... Args>
     decltype(auto) get_name(Args &&...args) const {
-        return vtable.get_name(self, std::forward<Args>(args)...);
+        return call(vtable.get_name, std::forward<Args>(args)...);
     }
 };
 

@@ -2,6 +2,7 @@
 
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc-direction-update.hpp>
+#include <alpaqa/problem/type-erased-problem.hpp>
 
 namespace alpaqa {
 
@@ -10,8 +11,9 @@ template <Config Conf>
 struct PANOCDirection<LBFGS<Conf>> {
     USING_ALPAQA_CONFIG(Conf);
 
-    using LBFGS  = alpaqa::LBFGS<Conf>;
-    using Params = typename LBFGS::Params;
+    using Problem = TypeErasedProblem<Conf>;
+    using LBFGS   = alpaqa::LBFGS<Conf>;
+    using Params  = typename LBFGS::Params;
 
     LBFGS lbfgs;
 
@@ -26,28 +28,26 @@ struct PANOCDirection<LBFGS<Conf>> {
     PANOCDirection(LBFGS &&lbfgs, const ExtraParams &extraparams = {})
         : lbfgs(std::move(lbfgs)), extraparams(extraparams) {}
 
-    void initialize(crvec x_0, crvec x̂_0, crvec p_0, crvec grad_0) {
-        lbfgs.resize(x_0.size());
-        (void)x̂_0;
-        (void)p_0;
-        (void)grad_0;
+    void initialize(const Problem &problem, [[maybe_unused]] crvec y,
+                    [[maybe_unused]] crvec Σ, [[maybe_unused]] real_t γ_0,
+                    [[maybe_unused]] crvec x_0, [[maybe_unused]] crvec x̂_0,
+                    [[maybe_unused]] crvec p_0,
+                    [[maybe_unused]] crvec grad_ψx_0) {
+        lbfgs.resize(problem.get_n());
     }
 
-    bool update(crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec gradₙₑₓₜ,
-                real_t γₙₑₓₜ) {
-        (void)gradₙₑₓₜ;
-        (void)γₙₑₓₜ;
+    bool update([[maybe_unused]] real_t γₖ, [[maybe_unused]] real_t γₙₑₓₜ,
+                crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ,
+                [[maybe_unused]] crvec grad_ψxₖ,
+                [[maybe_unused]] crvec grad_ψxₙₑₓₜ) {
         return lbfgs.update(xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, LBFGS::Sign::Negative);
     }
 
-    bool apply(crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_xₖ, crvec grad_x̂ₖ,
-               real_t γ, rvec qₖ) const {
-        (void)xₖ;
-        (void)x̂ₖ;
-        (void)grad_xₖ;
-        (void)grad_x̂ₖ;
+    bool apply([[maybe_unused]] real_t γₖ, [[maybe_unused]] crvec xₖ,
+               [[maybe_unused]] crvec x̂ₖ, crvec pₖ,
+               [[maybe_unused]] crvec grad_ψxₖ, rvec qₖ) const {
         qₖ = pₖ;
-        return lbfgs.apply(qₖ, γ);
+        return lbfgs.apply(qₖ, γₖ);
     }
 
     void changed_γ(real_t γₖ, real_t old_γₖ) {
